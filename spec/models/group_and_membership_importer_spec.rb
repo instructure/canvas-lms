@@ -286,8 +286,7 @@ describe GroupAndMembershipImporter do
         "groups.auto_create",
         tags: {
           split_type: "csv",
-          root_account_id: gc1.root_account&.global_id,
-          root_account_name: gc1.root_account&.name
+          cluster: gc1.root_account&.shard&.database_server&.id
         }
       )
     end

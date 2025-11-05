@@ -129,7 +129,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     let(:alignment) { outcome.align(assignment, course) }
 
     it "returns an empty relation when no results exist" do
-      results = subject.send(:fetch_canvas_results)
+      results = subject.send(:fetch_canvas_results, course:, users: [student])
       expect(results).to be_empty
     end
 
@@ -148,7 +148,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       end
 
       it "returns learning outcome results associated to the user" do
-        results = subject.send(:fetch_canvas_results)
+        results = subject.send(:fetch_canvas_results, course:, users: [student])
         expect(results.count).to eq(1)
         expect(results.first.user_id).to eq(student.id)
       end
@@ -226,7 +226,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       end
 
       it "only returns active results with active links" do
-        results = subject.send(:fetch_canvas_results)
+        results = subject.send(:fetch_canvas_results, course:, users: [student])
 
         # Verify results - should only include the active result with active link
         expect(results.count).to eq(1)
@@ -536,7 +536,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     let(:assignment) { assignment_model(context: course) }
 
     it "returns an empty array when no results are provided" do
-      rollups = subject.send(:generate_student_rollups, [])
+      rollups = subject.send(:generate_rollups, [], [student], course)
       expect(rollups).to be_an(Array)
       expect(rollups).to be_empty
     end
@@ -583,7 +583,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
 
       it "correctly groups results by outcome" do
         # Generate rollups
-        rollups = subject.send(:generate_student_rollups, [@result1, @result2])
+        rollups = subject.send(:generate_rollups, [@result1, @result2], [student], course)
 
         # We should have one rollup for the student
         expect(rollups.size).to eq(1)
@@ -680,8 +680,8 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       )
 
       expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
-      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { course_id: course.id }).at_least(:once)
-      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 1, tags: { course_id: course.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { cluster: course.shard.database_server&.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 1, tags: { cluster: course.shard.database_server&.id }).at_least(:once)
       allow(InstStatsd::Statsd).to receive(:distributed_increment)
 
       subject.call
@@ -691,8 +691,8 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       allow(subject).to receive(:fetch_canvas_results).and_raise(StandardError, "Database error")
 
       expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
-      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.error", tags: { course_id: course.id }).at_least(:once)
-      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { course_id: course.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.error", tags: { cluster: course.shard.database_server&.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { cluster: course.shard.database_server&.id }).at_least(:once)
       allow(InstStatsd::Statsd).to receive(:distributed_increment)
 
       expect { subject.call }.to raise_error(StandardError, "Database error")
@@ -700,8 +700,8 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
 
     it "records metrics for empty results" do
       expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
-      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { course_id: course.id }).at_least(:once)
-      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { course_id: course.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { cluster: course.shard.database_server&.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { cluster: course.shard.database_server&.id }).at_least(:once)
       allow(InstStatsd::Statsd).to receive(:distributed_increment)
 
       subject.call

@@ -763,20 +763,6 @@ window.modules = (function () {
       }
     },
 
-    getNextPosition($module) {
-      let maxPosition = 0
-      $module
-        .find('.context_module_items')
-        .children()
-        .each(function () {
-          const position = parseInt(
-            $(this).getTemplateData({textValues: ['position']}).position,
-            10,
-          )
-          if (position > maxPosition) maxPosition = position
-        })
-      return maxPosition + 1
-    },
     refreshModuleList() {
       $('#module_list').find('.context_module_option').remove()
       $('#context_modules .context_module').each(function () {
@@ -1730,9 +1716,12 @@ modules.initModuleManagement = async function (duplicate) {
       const $module = $('#context_module_' + id)
       let $item
       if (!ENV.FEATURE_MODULES_PERF) {
-        let nextPosition = modules.getNextPosition($module)
+        const nextPosition = item_data._bulk_base_position + item_data._bulk_item_index
         item_data.content_details = ['items']
-        item_data['item[position]'] = nextPosition++
+        item_data['item[position]'] = nextPosition
+        // Remove the bulk metadata before sending to server
+        delete item_data._bulk_item_index
+        delete item_data._bulk_base_position
         $item = modules.addItemToModule($module, item_data)
       }
       $module.find('.context_module_items.ui-sortable').sortable('refresh').sortable('disable')

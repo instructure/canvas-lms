@@ -25,6 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {AllocationRuleType} from '../graphql/teacher/AssignmentTeacherTypes'
+import {useDeleteAllocationRule} from '../graphql/hooks/useDeleteAllocationRule'
 
 const I18n = createI18nScope('peer_review_allocation_rule_card')
 
@@ -33,14 +34,25 @@ const AllocationRuleCard = ({
   canEdit,
   assignmentId,
   refetchRules,
+  handleRuleDelete,
 }: {
   rule: AllocationRuleType
   canEdit: boolean
   assignmentId: string
   refetchRules: (ruleId: string, isNewRule?: boolean) => void
+  handleRuleDelete?: (ruleId: string, error?: any) => void
 }): React.ReactElement => {
   const {mustReview, reviewPermitted, appliesToAssessor, assessor, assessee} = rule
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+
+  const {mutate: deleteRule} = useDeleteAllocationRule(
+    () => {
+      handleRuleDelete?.(rule._id)
+    },
+    error => {
+      handleRuleDelete?.(rule._id, error)
+    },
+  )
 
   const formatRuleDescription = () => {
     if (appliesToAssessor) {
@@ -106,7 +118,7 @@ const AllocationRuleCard = ({
                   screenReaderLabel={I18n.t('Delete Allocation Rule: %{rule}', {
                     rule: formatRuleDescription(),
                   })}
-                  onClick={() => {}} // TODO [EGG-1628]: Delete allocation rule
+                  onClick={() => deleteRule({ruleId: rule._id})}
                 />
               </Flex.Item>
             </Flex>

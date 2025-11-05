@@ -347,6 +347,9 @@
     "clubs_suit_c1ffedff": {
         "message": "Trèfle (cartes à jouer)"
     },
+    "collab_575ac7bc": {
+        "message": "Collaboration"
+    },
     "collaborations_5c56c15f": {
         "message": "Collaborations"
     },
@@ -1271,6 +1274,9 @@
     "latvian_2bbb6aab": {
         "message": "Letton"
     },
+    "learn_ad3b3505": {
+        "message": "Apprentissage"
+    },
     "learn_more_about_adjacent_links_2cb9762c": {
         "message": "Apprenez-en davantage sur les liens adjacents"
     },
@@ -1697,6 +1703,9 @@
     "operators_a2ef9a93": {
         "message": "Opérateurs"
     },
+    "options_3ab0ea65": {
+        "message": "Options"
+    },
     "or_9b70ccaa": {
         "message": "Ou"
     },
@@ -1960,6 +1969,9 @@
     },
     "remove_link_d1f2f4d0": {
         "message": "Supprimer lien"
+    },
+    "remove_studio_media_f913e502": {
+        "message": "Retirer le média Studio"
     },
     "replace_all_d3d68b3": {
         "message": "Tout remplacer"
@@ -2482,6 +2494,9 @@
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Bien que votre vidéo aura le bon titre dans le navigateur, nous n''avons pas pu mettre ce dernier à jour dans la base de données."
+    },
+    "thumbnail_e0de666f": {
+        "message": "Vignette"
     },
     "timebar_a4d18443": {
         "message": "Barre de temps"

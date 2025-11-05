@@ -155,7 +155,7 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
         <Flex.Item shouldGrow>
           {filteredItems.length === 0 ? (
             <Flex justifyItems="center" padding="large">
-              <Text color="secondary">
+              <Text color="secondary" data-testid="no-course-work-message">
                 {selectedCourse === 'all'
                   ? I18n.t('No upcoming course work')
                   : I18n.t('No upcoming course work for selected course')}

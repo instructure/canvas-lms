@@ -1902,6 +1902,125 @@ describe OutcomeResultsController do
       end
     end
 
+    context "outcomes_rollup_read feature flag" do
+      it "uses stored_outcome_rollups when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:outcomes_rollup_read)
+
+        OutcomeRollup.create!(
+          course: @course,
+          user: @student1,
+          outcome: @outcome,
+          calculation_method: "highest",
+          aggregate_score: 4.5,
+          last_calculated_at: Time.zone.now
+        )
+
+        allow(controller).to receive(:stored_outcome_rollups).and_call_original
+        allow(controller).to receive(:find_canvas_os_results).and_call_original
+
+        get_rollups({})
+
+        expect(controller).to have_received(:stored_outcome_rollups)
+        expect(controller).not_to have_received(:find_canvas_os_results)
+      end
+
+      it "uses calculated rollups when feature flag is disabled" do
+        Account.site_admin.disable_feature!(:outcomes_rollup_read)
+
+        create_result(@student1.id, @outcome, outcome_assignment, 3)
+
+        allow(controller).to receive(:stored_outcome_rollups).and_call_original
+        allow(controller).to receive(:find_canvas_os_results).and_call_original
+
+        get_rollups({})
+
+        expect(controller).not_to have_received(:stored_outcome_rollups)
+        expect(controller).to have_received(:find_canvas_os_results)
+      end
+
+      it "respects excludes parameter when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:outcomes_rollup_read)
+
+        OutcomeRollup.create!(
+          course: @course,
+          user: @student1,
+          outcome: @outcome,
+          calculation_method: "highest",
+          aggregate_score: 4.5,
+          last_calculated_at: Time.zone.now
+        )
+
+        allow(controller).to receive(:stored_outcome_rollups).and_call_original
+
+        get_rollups({ exclude: ["missing_user_rollups"] })
+
+        expect(controller).to have_received(:stored_outcome_rollups).with(
+          hash_including(excludes: ["missing_user_rollups"])
+        )
+      end
+
+      it "passes correct users parameter based on all_users option" do
+        Account.site_admin.enable_feature!(:outcomes_rollup_read)
+
+        OutcomeRollup.create!(
+          course: @course,
+          user: @student1,
+          outcome: @outcome,
+          calculation_method: "highest",
+          aggregate_score: 4.5,
+          last_calculated_at: Time.zone.now
+        )
+
+        allow(controller).to receive(:stored_outcome_rollups).and_call_original
+
+        get_rollups({})
+
+        expect(controller).to have_received(:stored_outcome_rollups).with(
+          hash_including(users: kind_of(Enumerable))
+        )
+      end
+
+      it "returns rollup data structure with both flag states" do
+        create_result(@student1.id, @outcome, outcome_assignment, 3)
+        create_result(@student2.id, @outcome, outcome_assignment, 4)
+
+        Account.site_admin.disable_feature!(:outcomes_rollup_read)
+        calculated_json = parse_response(get_rollups({}))
+
+        expect(calculated_json).to have_key("rollups")
+        expect(calculated_json["rollups"]).to be_an(Array)
+        expect(calculated_json["rollups"].length).to be > 0
+        expect(calculated_json["rollups"].first).to have_key("scores")
+        expect(calculated_json["rollups"].first).to have_key("links")
+
+        OutcomeRollup.create!(
+          course: @course,
+          user: @student1,
+          outcome: @outcome,
+          calculation_method: "highest",
+          aggregate_score: 3.0,
+          last_calculated_at: Time.zone.now
+        )
+        OutcomeRollup.create!(
+          course: @course,
+          user: @student2,
+          outcome: @outcome,
+          calculation_method: "highest",
+          aggregate_score: 4.0,
+          last_calculated_at: Time.zone.now
+        )
+
+        Account.site_admin.enable_feature!(:outcomes_rollup_read)
+        stored_rollups = controller.send(:user_rollups)
+
+        expect(stored_rollups).to be_an(Array)
+        expect(stored_rollups.length).to be > 0
+        expect(stored_rollups.first).to respond_to(:context)
+        expect(stored_rollups.first).to respond_to(:scores)
+        expect(stored_rollups.first.scores).to be_an(Array)
+      end
+    end
+
     context "StatsD metrics" do
       before do
         allow(InstStatsd::Statsd).to receive(:time).and_call_original

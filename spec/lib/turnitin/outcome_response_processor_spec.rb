@@ -228,9 +228,8 @@ module Turnitin
         end.to raise_error Turnitin::Errors::SubmissionNotScoredError
         expect(InstStatsd::Statsd).to have_received(:increment)
           .with(
-            "submission_not_scored.account_#{lti_assignment.root_account.global_id}",
-            short_stat: "submission_not_scored",
-            tags: { root_account_id: lti_assignment.root_account.global_id }
+            "submission_not_scored",
+            tags: { cluster: lti_assignment.root_account.shard.database_server&.id }
           ).once
       end
 

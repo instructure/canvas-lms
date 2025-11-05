@@ -68,8 +68,8 @@ const DEFAULT_PROPS = {
 
 describe('Other Calendars modal ', () => {
   it('opens and closes the dropdown', () => {
-    const {getByTestId, getByRole} = render(<ContextSelector {...DEFAULT_PROPS} />)
-    const button = getByRole('button', {name: 'Select Calendars'})
+    const {getByTestId} = render(<ContextSelector {...DEFAULT_PROPS} />)
+    const button = getByTestId('select-calendars-button')
     expect(button).toBeInTheDocument()
     const dropdown = getByTestId('context-selector-dropdown')
     expect(dropdown.classList.contains('hidden')).toBe(true)
@@ -78,15 +78,15 @@ describe('Other Calendars modal ', () => {
   })
 
   it('renders courses in the dropdown', () => {
-    const {getByText, getByRole} = render(<ContextSelector {...DEFAULT_PROPS} />)
-    act(() => getByRole('button', {name: 'Select Calendars'}).click())
+    const {getByText, getByTestId} = render(<ContextSelector {...DEFAULT_PROPS} />)
+    act(() => getByTestId('select-calendars-button').click())
     expect(getByText('testcourse')).toBeInTheDocument()
   })
 
   it('shows sections in the dropdown when expanded', () => {
-    const {getByText, getByRole} = render(<ContextSelector {...DEFAULT_PROPS} />)
-    act(() => getByRole('button', {name: 'Select Calendars'}).click())
-    const testcourse = getByRole('button', {name: 'Expand testcourse'})
+    const {getByText, getByTestId} = render(<ContextSelector {...DEFAULT_PROPS} />)
+    act(() => getByTestId('select-calendars-button').click())
+    const testcourse = getByTestId('expand-course-1')
     expect(testcourse).toBeInTheDocument()
     const testsection = getByText('testsection').closest(`div#course_${COURSE_1.id}_sections`)
     expect(testsection.classList.contains('hiddenSection')).toBe(true)
@@ -96,10 +96,10 @@ describe('Other Calendars modal ', () => {
 
   it('calls setSelectedContexts when a course is selected', () => {
     const setSelectedContexts = jest.fn()
-    const {getByText, getByRole, rerender} = render(
+    const {getByText, getByTestId, rerender} = render(
       <ContextSelector {...DEFAULT_PROPS} setSelectedContexts={setSelectedContexts} />,
     )
-    act(() => getByRole('button', {name: 'Select Calendars'}).click())
+    act(() => getByTestId('select-calendars-button').click())
     act(() => getByText('testcourse').click())
     expect(setSelectedContexts).toHaveBeenCalledWith(new Set(['course_1']))
     rerender(
@@ -116,14 +116,14 @@ describe('Other Calendars modal ', () => {
   it('toggles parent context when a section is selected', () => {
     const setSelectedContexts = jest.fn()
     const setSelectedSubContexts = jest.fn()
-    const {getByText, getByRole, getByLabelText, rerender} = render(
+    const {getByText, getByTestId} = render(
       <ContextSelector
         {...DEFAULT_PROPS}
         setSelectedContexts={setSelectedContexts}
         setSelectedSubContexts={setSelectedSubContexts}
       />,
     )
-    act(() => getByRole('button', {name: 'Select Calendars'}).click())
+    act(() => getByTestId('select-calendars-button').click())
     act(() => getByText('testsection').click())
     expect(setSelectedContexts).toHaveBeenCalledWith(new Set(['course_1']))
     expect(setSelectedSubContexts).toHaveBeenCalledWith(new Set(['course_section_1']))
@@ -145,13 +145,14 @@ describe('Other Calendars modal ', () => {
   })
 
   it('renders the button label according to the number of selected contexts', () => {
-    const {getByRole, rerender} = render(
+    const {getByTestId, rerender} = render(
       <ContextSelector {...DEFAULT_PROPS} selectedContexts={new Set(['course_1'])} />,
     )
-    expect(getByRole('button', {name: 'testcourse'})).toBeInTheDocument()
+    const button = getByTestId('select-calendars-button')
+    expect(button).toHaveTextContent('testcourse')
     rerender(
       <ContextSelector {...DEFAULT_PROPS} selectedContexts={new Set(['course_1', 'course_2'])} />,
     )
-    expect(getByRole('button', {name: 'testcourse and 1 other'})).toBeInTheDocument()
+    expect(button).toHaveTextContent('testcourse and 1 other')
   })
 })

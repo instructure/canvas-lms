@@ -18,13 +18,13 @@
 
 class AccessibilityIssue < ActiveRecord::Base
   extend RootAccountResolver
-  include Accessibility::HasContext
 
   resolves_root_account through: :course
 
   belongs_to :course
   belongs_to :updated_by, class_name: "User", optional: true
   belongs_to :accessibility_resource_scan
+  belongs_to :context, polymorphic: %i[assignment attachment wiki_page], separate_columns: true, optional: false
 
   enum :workflow_state, %i[active resolved dismissed], validate: true
 

@@ -41,6 +41,49 @@ describe('AssignmentTabs', () => {
     expect(screen.getByTestId('peer-review-tab')).toBeInTheDocument()
   })
 
+  describe('Assignment Description', () => {
+    it('renders assignment description in the assignment tab', () => {
+      const assignmentWithDescription = {
+        ...mockAssignment,
+        description: 'This is a detailed assignment description',
+      }
+      render(<AssignmentTabs assignment={assignmentWithDescription} />)
+
+      expect(screen.getByTestId('assignments-2-assignment-description')).toBeInTheDocument()
+      expect(screen.getByText('This is a detailed assignment description')).toBeInTheDocument()
+    })
+
+    it('renders Description heading', () => {
+      render(<AssignmentTabs assignment={mockAssignment} />)
+
+      expect(screen.getByText('Description')).toBeInTheDocument()
+    })
+
+    it('renders fallback message when description is empty', () => {
+      const assignmentWithEmptyDescription = {
+        ...mockAssignment,
+        description: '',
+      }
+      render(<AssignmentTabs assignment={assignmentWithEmptyDescription} />)
+
+      expect(
+        screen.getByText('No additional details were added for this assignment.'),
+      ).toBeInTheDocument()
+    })
+
+    it('renders fallback message when description is undefined', () => {
+      const assignmentWithoutDescription = {
+        ...mockAssignment,
+        description: undefined,
+      }
+      render(<AssignmentTabs assignment={assignmentWithoutDescription} />)
+
+      expect(
+        screen.getByText('No additional details were added for this assignment.'),
+      ).toBeInTheDocument()
+    })
+  })
+
   describe('PeerReviewDetailsView', () => {
     it('renders PeerReviewDetailsView when Peer Review tab is selected and user has permissions', async () => {
       const user = userEvent.setup()

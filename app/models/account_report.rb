@@ -174,6 +174,15 @@ class AccountReport < ActiveRecord::Base
     end
   end
 
+  def self.recent_for(account:, report_type:, parameters: nil)
+    account.shard.activate do
+      report_window = Setting.get("recent_account_report_window_hours", "12").to_i.hours
+      scope = account.account_reports.created_or_running.where(report_type:)
+      scope = scope.where(parameters:) unless parameters.nil?
+      scope.where(created_at: report_window.ago..).order(created_at: :desc).first
+    end
+  end
+
   def abort_incomplete_runners_if_needed
     if saved_change_to_workflow_state? && (deleted? || aborted? || error?)
       abort_incomplete_runners

@@ -181,11 +181,34 @@ describe "Account Reports" do
   describe ".failed_report" do
     let(:account_report) { FakeAccountReport.new }
 
-    it "when exception is a RootAccountRequiredError it sets a more descriptive message" do
-      exception = CustomReports::Rubrics::RootAccountRequiredError.new
+    it "sets a generic failure message by default" do
+      exception = StandardError.new("something bad happened")
       AccountReports.failed_report(account_report, exception:)
-      message = "This report can only be run on the root account."
+      message = "Failed, the report failed to generate a file. Please try again."
       expect(account_report.parameters["extra_text"]).to eq message
+    end
+
+    context "when given an error report id" do
+      it "includes the error report id in the message" do
+        AccountReports.failed_report(account_report, error_report_id: 42)
+        message = "Failed, please report the following error code to your system administrator: ErrorReport:42;"
+        expect(account_report.parameters["extra_text"]).to eq message
+      end
+    end
+
+    context "when custom reports is installed" do
+      before do
+        stub_const("CustomReports", Module.new)
+        stub_const("CustomReports::Rubrics", Module.new)
+        stub_const("CustomReports::Rubrics::RootAccountRequiredError", Class.new(RuntimeError))
+      end
+
+      it "when exception is a RootAccountRequiredError it sets a more descriptive message" do
+        exception = CustomReports::Rubrics::RootAccountRequiredError.new
+        AccountReports.failed_report(account_report, exception:)
+        message = "This report can only be run on the root account."
+        expect(account_report.parameters["extra_text"]).to eq message
+      end
     end
   end
 

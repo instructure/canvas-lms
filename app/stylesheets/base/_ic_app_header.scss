@@ -409,6 +409,7 @@ body.primary-nav-expanded {
 
 #mobile-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   z-index: 100;
   background-color: var(--ic-brand-global-nav-bgd);

@@ -2,5 +2,6 @@
   "name": "@canvas/unread-icon",
   "private": true,
   "version": "1.0.0",
-  "main": "./index.jsx"
+  "main": "./index.jsx",
+  "owner": "VICE"
 }

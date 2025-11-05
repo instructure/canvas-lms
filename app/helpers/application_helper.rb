@@ -1448,4 +1448,11 @@ module ApplicationHelper
 
     "#{formatted_number} #{BYTE_UNITS[exponent]}"
   end
+
+  def microfrontend_overrides
+    return nil unless Setting.get("allow_microfrontend_release_tag_override", "false") == "true"
+
+    service = MicrofrontendsReleaseTagOverrideService.new(session)
+    service.overrides_summary if service.overrides_active?
+  end
 end

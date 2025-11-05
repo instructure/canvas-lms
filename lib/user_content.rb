@@ -142,7 +142,7 @@ module UserContent
   end
 
   class HtmlRewriter
-    AssetTypes = {
+    ASSET_TYPES = {
       "assignments" => :Assignment,
       "announcements" => :Announcement,
       "calendar_events" => :CalendarEvent,
@@ -163,7 +163,11 @@ module UserContent
       "modules" => :ContextModule,
       "items" => :ContentTag
     }.freeze
-    DefaultAllowedTypes = AssetTypes.keys
+    DEFAULT_ALLOWED_TYPES = ASSET_TYPES.keys
+    # "courses" is not included here because the @context is usually already a course.
+    # including it here would make the whole context prefix filtering moot.
+    FILES_LOCATIONS_PREFIXES = %w[users assessment_questions groups folders].freeze
+    IGNORE_CLOSING_TAGS = %w[/p /div /pre /span /td /th /tr /table /thead /tfoot /caption /math /iframe /ul /ol /li /h1 /h2 /h3 /h4 /h5 /h6 /blockquote /b /i /em /strong /super /sub /strike /article /footer /ol /ul /li].freeze
 
     def initialize(context, user, contextless_types: %w[media_attachments_iframe])
       raise(ArgumentError, "context required") unless context
@@ -172,13 +176,13 @@ module UserContent
       @user = user
       @contextless_types = contextless_types
       @context_prefix = "/#{context.class.name.tableize}/#{context.id}"
-      @context_regex = %r{(?:/(#{context.class.name.tableize})/(#{context.id})|/(assessment_questions|users)/([^\s"<'?/]+))}
+      @context_regex = %r{(?:/(#{context.class.name.tableize})/(#{context.id})|/(#{FILES_LOCATIONS_PREFIXES.join("|")})/([^\s"<'?/]+))}
       @absolute_part = '(https?://[\w-]+(?:\.[\w-]+)*(?:\:\d{1,5})?)?'
       @toplevel_regex = %r{#{@absolute_part}#{@context_regex}?/(\w+)(?:/([^\s"<'?/]*)([^\s"<']*))?}
       @handlers = {}
       @default_handler = nil
       @unknown_handler = nil
-      @allowed_types = DefaultAllowedTypes
+      @allowed_types = DEFAULT_ALLOWED_TYPES
     end
 
     attr_reader :user, :context
@@ -257,16 +261,24 @@ module UserContent
     end
 
     def replacement(url)
+      # This is a terrible, horrible hack to avoid dealing with closing tags.
+      # The regexp itself should be fixed but without a proper unit test or
+      # business description I dare not change it lest I break some exotic
+      # use case.
+      return url if IGNORE_CLOSING_TAGS.include?(url)
+
       matched = url.match(@toplevel_regex)
-      asset_types = AssetTypes.slice(*@allowed_types)
+      asset_types = ASSET_TYPES.slice(*@allowed_types)
       context_type = matched[2] || matched[4]
       context_id   = matched[3] || matched[5]
       type, obj_id, rest = matched.values_at(6, 7, 8)
-      home_link = url.match(%r{(/courses/\d+/?(?=\b|[^/\w]|$))})
+      home_link = url.match(%r{(/courses/#{Api::SHARDID_REGEX}/?(?=\b|[^/\w]|$))}o)
       url = url.sub(%r{/$}, "") if home_link
       prefix = "/#{context_type}/#{context_id}" if context_type && context_id
-      return url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix && context_type != "users"
+      return url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix && !FILES_LOCATIONS_PREFIXES.include?(context_type)
 
+      # wiki pages can have slugs instead of ids, but nothing else can.
+      # the following takes care of throwing out invalid ids.
       if type != "wiki" && type != "pages"
         if Shard.integral_id_for(obj_id).to_i > 0
           obj_id = Shard.integral_id_for(obj_id)
@@ -276,7 +288,10 @@ module UserContent
         end
       end
 
-      if (module_item = rest.try(:match, %r{/items/(\d+)}))
+      # module items can be in a format like /courses/xx/modules/yy/items/zz
+      # if that is the case, we switch from type=module, obj_id=yy
+      # to type=items, obj_id=zz
+      if (module_item = rest.try(:match, %r{/items/(#{Api::SHARDID_REGEX})}o))
         type   = "items"
         obj_id = module_item[1].to_i
       end

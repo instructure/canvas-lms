@@ -51,22 +51,14 @@ describe('"Add Announcement" button', () => {
   test('is present when the user has permission to create an announcement', () => {
     const props = makeProps()
     render(<IndexHeader {...props} />)
-    expect(
-      screen.getByRole('link', {
-        name: /add announcement/i,
-      }),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('add-announcement-button')).toBeInTheDocument()
   })
 
   test('is absent when the user does not have permission to create an announcement', () => {
     const props = makeProps()
     props.permissions.create = false
     render(<IndexHeader {...props} />)
-    expect(
-      screen.queryByRole('link', {
-        name: /add announcement/i,
-      }),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByTestId('add-announcement-button')).not.toBeInTheDocument()
   })
 })
 
@@ -76,7 +68,7 @@ describe('searching announcements', () => {
     const props = makeProps()
     props.searchAnnouncements = spy
     render(<IndexHeader {...props} />)
-    const input = screen.getByRole('textbox')
+    const input = screen.getByTestId('announcements-search')
     await userEvent.type(input, 'foo')
 
     await waitFor(() => {
@@ -106,7 +98,7 @@ describe('"Announcement Filter" select', () => {
     const props = makeProps()
     render(<IndexHeader {...props} />)
 
-    const filterDDown = screen.getByRole('combobox', {name: 'Announcement Filter'})
+    const filterDDown = screen.getByTestId('announcement-filter')
 
     await userEvent.click(filterDDown)
 
@@ -126,7 +118,7 @@ describe('"Announcement Filter" select', () => {
     const props = makeProps()
     render(<IndexHeader {...props} />)
 
-    const filterButton = screen.getByRole('button', {name: 'Announcement Filter'})
+    const filterButton = screen.getByTestId('toggle-filter-menu')
 
     await userEvent.click(filterButton)
 
@@ -142,7 +134,7 @@ describe('"Announcement Filter" select', () => {
     props.searchAnnouncements = spy
     render(<IndexHeader {...props} />)
 
-    const filterDDown = screen.getByRole('combobox', {name: 'Announcement Filter'})
+    const filterDDown = screen.getByTestId('announcement-filter')
 
     await userEvent.click(filterDDown)
 
@@ -200,7 +192,7 @@ describe('"Lock Selected Announcements" button', () => {
     render(<IndexHeader {...props} />)
     await userEvent.click(screen.getByTestId('lock_announcements'))
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(props.toggleSelectedAnnouncementsLock).toHaveBeenCalledTimes(1)
     })
   })
@@ -243,11 +235,7 @@ describe('"Delete Selected Announcements" button', () => {
     const delButton = screen.getByTestId('delete-announcements-button')
     await userEvent.click(delButton)
 
-    expect(
-      screen.getByRole('heading', {
-        name: /confirm delete/i,
-      }),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/confirm delete/i)).toBeInTheDocument()
   })
 })
 

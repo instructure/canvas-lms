@@ -21,6 +21,11 @@ import React from 'react'
 import {PostToolbar} from '../PostToolbar'
 import {Discussion} from '../../../../graphql/Discussion'
 import {MockedProvider} from '@apollo/client/testing'
+import {useTranslationStore} from '../../../hooks/useTranslationStore'
+import {useTranslation} from '../../../hooks/useTranslation'
+
+jest.mock('../../../hooks/useTranslation')
+jest.mock('../../../hooks/useTranslationStore')
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -37,6 +42,10 @@ beforeAll(() => {
       removeListener: jest.fn(),
     }
   })
+})
+
+beforeEach(() => {
+  useTranslation.mockReturnValue({tryTranslate: jest.fn()})
 })
 
 const setup = (props, mocks = []) => {
@@ -419,6 +428,32 @@ describe('PostToolbar', () => {
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(getByText('Share to Commons')).toBeTruthy()
         expect(getByText('Share to Example')).toBeTruthy()
+      })
+    })
+
+    describe('translate', () => {
+      const tryTranslate = jest.fn()
+      const clearEntry = jest.fn()
+
+      it('displays Hide Translation when translation exists', () => {
+        useTranslation.mockReturnValue({tryTranslate})
+        window.ENV.ai_translation_improvements = true
+        useTranslationStore.mockImplementation(selector =>
+          selector({
+            entries: {topic: {translatedMessage: 'Translated text'}},
+            translateAll: false,
+            clearEntry,
+          }),
+        )
+
+        const {getByTestId, queryByText, getByText} = setup()
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+
+        expect(queryByText('Translate Text')).toBeFalsy()
+        expect(queryByText('Hide Translation')).toBeInTheDocument()
+
+        fireEvent.click(getByText('Hide Translation'))
+        expect(clearEntry).toHaveBeenCalledWith('topic')
       })
     })
   })

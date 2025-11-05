@@ -606,34 +606,159 @@ describe ContextModule do
       @module.insert_items([@attach, @assign], 3)
       expect(@module.content_tags.not_deleted.pluck(:title)).to eq(%w[one three attach assign])
     end
+  end
 
-    it "respects the added items' published state" do
-      @page.unpublish!
-      m = @course.context_modules.create!
-      m.insert_items([@assign, @page, @tool])
-      expect(m.content_tags.pluck(:title, :workflow_state)).to eq(
-        [["assign", "active"], ["page", "unpublished"], ["tool", "active"]]
-      )
+  describe "add_item with resolve_conflicts option" do
+    before :once do
+      course_module
+      # Create items at existing positions to test conflict resolution
+      @module.add_item(type: "context_module_sub_header", title: "item_1", position: 1)
+      @module.add_item(type: "context_module_sub_header", title: "item_2", position: 2)
+      @module.add_item(type: "context_module_sub_header", title: "item_3", position: 3)
     end
 
-    it "adds the submittable object when given a graded discussion topic or quiz's assignment" do
-      m = @course.context_modules.create!
-      m.insert_items([@quiz.assignment.reload, @topic.assignment.reload])
-      expect(m.content_tags.map(&:content_type)).to eq(%w[Quizzes::Quiz DiscussionTopic])
-      expect(m.content_tags.map(&:content_id)).to eq([@quiz.id, @topic.id])
+    it "shifts existing items when resolve_conflicts: true" do
+      # Add new item at position 2, should shift items 2 and 3 to positions 3 and 4
+      new_tag = @module.add_item(
+        { type: "context_module_sub_header", title: "new_item", position: 2 },
+        nil,
+        { resolve_conflicts: true }
+      )
+
+      expect(new_tag.position).to eq(2)
+      expect(new_tag.title).to eq("new_item")
+
+      # Check that existing items were shifted
+      tags_by_position = @module.content_tags.reload.index_by(&:position)
+      expect(tags_by_position[1].title).to eq("item_1")
+      expect(tags_by_position[2].title).to eq("new_item")
+      expect(tags_by_position[3].title).to eq("item_2")
+      expect(tags_by_position[4].title).to eq("item_3")
     end
 
-    it "doesn't add duplicate items" do
-      @module.add_item(type: "assignment", id: @assign.id)
-      @module.insert_items([@page, @assign, @quiz])
-      expect(@module.content_tags.pluck(:content_type)).to eq(
-        ["ContextModuleSubHeader",
-         "ContextModuleSubHeader",
-         "ContextModuleSubHeader",
-         "Assignment",
-         "WikiPage",
-         "Quizzes::Quiz"]
+    it "does not shift items when resolve_conflicts is false or not specified" do
+      # Add new item at position 2 without resolve_conflicts
+      new_tag = @module.add_item(
+        { type: "context_module_sub_header", title: "new_item", position: 2 }
       )
+
+      expect(new_tag.position).to eq(2)
+
+      # Check that we now have duplicate positions
+      items_at_position_2 = @module.content_tags.reload.where(position: 2)
+      expect(items_at_position_2.count).to eq(2)
+      expect(items_at_position_2.pluck(:title)).to match_array(["item_2", "new_item"])
+    end
+
+    it "handles adding at position 1 with resolve_conflicts" do
+      new_tag = @module.add_item(
+        { type: "context_module_sub_header", title: "new_first", position: 1 },
+        nil,
+        { resolve_conflicts: true }
+      )
+
+      expect(new_tag.position).to eq(1)
+
+      # All existing items should be shifted up by 1
+      tags_by_position = @module.content_tags.reload.index_by(&:position)
+      expect(tags_by_position[1].title).to eq("new_first")
+      expect(tags_by_position[2].title).to eq("item_1")
+      expect(tags_by_position[3].title).to eq("item_2")
+      expect(tags_by_position[4].title).to eq("item_3")
+    end
+
+    it "handles adding at non-conflicting position" do
+      # Position 5 doesn't exist, so no conflicts to resolve
+      new_tag = @module.add_item(
+        { type: "context_module_sub_header", title: "new_item", position: 5 },
+        nil,
+        { resolve_conflicts: true }
+      )
+
+      expect(new_tag.position).to eq(5)
+
+      # Existing items should be unchanged
+      existing_positions = @module.content_tags.reload.where.not(id: new_tag.id).pluck(:position)
+      expect(existing_positions).to match_array([1, 2, 3])
+    end
+  end
+
+  describe "add_item with defer_position option" do
+    before :once do
+      course_module
+      # Create items at positions [1, 3, 4, 5, 6] to match API test scenario
+      @module.add_item(type: "context_module_sub_header", title: "item_1", position: 1)
+      @module.add_item(type: "context_module_sub_header", title: "item_3", position: 3)
+      @module.add_item(type: "context_module_sub_header", title: "item_4", position: 4)
+      @module.add_item(type: "context_module_sub_header", title: "item_5", position: 5)
+      @module.add_item(type: "context_module_sub_header", title: "item_6", position: 6)
+    end
+
+    it "creates item without position when defer_position: true" do
+      initial_max_position = @module.content_tags.maximum(:position) || 0
+
+      tag = @module.add_item(
+        { type: "context_module_sub_header", title: "new_item", position: 3 },
+        nil,
+        { defer_position: true }
+      )
+
+      expect(tag.position).to be > initial_max_position
+      expect(tag.title).to eq("new_item")
+    end
+
+    it "creates item with position when defer_position is false" do
+      tag = @module.add_item(
+        { type: "context_module_sub_header", title: "new_item", position: 3 },
+        nil,
+        { defer_position: false }
+      )
+
+      expect(tag.position).to eq(3)
+      expect(tag.title).to eq("new_item")
+    end
+
+    it "creates item with position when defer_position is not specified" do
+      tag = @module.add_item(
+        { type: "context_module_sub_header", title: "new_item", position: 3 }
+      )
+
+      expect(tag.position).to eq(3)
+      expect(tag.title).to eq("new_item")
+    end
+
+    it "ignores position parameter when defer_position: true" do
+      # Test with different position values - should append regardless of position
+      initial_max_position = @module.content_tags.maximum(:position) || 0
+
+      tag1 = @module.add_item(
+        { type: "context_module_sub_header", title: "item_a", position: 1 },
+        nil,
+        { defer_position: true }
+      )
+      tag2 = @module.add_item(
+        { type: "context_module_sub_header", title: "item_b", position: 999 },
+        nil,
+        { defer_position: true }
+      )
+
+      # Both should be appended, ignoring the position parameters
+      expect(tag1.position).to be > initial_max_position
+      expect(tag2.position).to be > tag1.position
+    end
+
+    it "respects defer_position even with opts[:position] set" do
+      # Test that defer_position takes precedence over opts[:position]
+      initial_max_position = @module.content_tags.maximum(:position) || 0
+
+      tag = @module.add_item(
+        { type: "context_module_sub_header", title: "new_item" },
+        nil,
+        { position: 3, defer_position: true }
+      )
+
+      # Should ignore opts[:position] and append instead
+      expect(tag.position).to be > initial_max_position
     end
   end
 
@@ -1880,6 +2005,67 @@ describe ContextModule do
       expect(progression).not_to be_nil
       expect(progression.user_id).to eq(admin.id)
       expect(progression.context_module_id).to eq(cm.id)
+    end
+
+    it "creates progressions for enrolled teachers" do
+      course_with_teacher(active_all: true)
+      cm = @course.context_modules.create!
+      progression = cm.find_or_create_progression(@teacher)
+      expect(progression).not_to be_nil
+      expect(progression.user_id).to eq(@teacher.id)
+      expect(progression.context_module_id).to eq(cm.id)
+    end
+
+    context "with sharding" do
+      specs_require_sharding
+
+      it "does not create progressions for cross-shard site admins" do
+        site_admin_user = nil
+        @shard1.activate do
+          site_admin_user = user_factory(active_all: true)
+          Account.site_admin.account_users.create!(user: site_admin_user)
+        end
+
+        @shard2.activate do
+          account = Account.create!
+          course = account.courses.create!
+          cm = course.context_modules.create!
+          progression = cm.find_or_create_progression(site_admin_user)
+          expect(progression).to be_nil
+          expect(ContextModuleProgression.where(context_module: cm, user: site_admin_user).exists?).to be false
+        end
+      end
+
+      it "creates progressions for same-shard site admins" do
+        @shard1.activate do
+          site_admin_user = user_factory(active_all: true)
+          Account.site_admin.account_users.create!(user: site_admin_user)
+          account = Account.create!
+          course = account.courses.create!
+          cm = course.context_modules.create!
+          progression = cm.find_or_create_progression(site_admin_user)
+          expect(progression).not_to be_nil
+          expect(progression.user_id).to eq(site_admin_user.id)
+          expect(progression.context_module_id).to eq(cm.id)
+        end
+      end
+
+      it "creates progressions for cross-shard enrolled students" do
+        student = nil
+        @shard1.activate do
+          student = user_factory(active_all: true)
+        end
+
+        @shard2.activate do
+          account = Account.create!
+          course = account.courses.create!
+          course.enroll_student(student, enrollment_state: "active")
+          cm = course.context_modules.create!
+          progression = cm.find_or_create_progression(student)
+          expect(progression).not_to be_nil
+          expect(progression.user_id).to eq(student.id)
+        end
+      end
     end
   end
 

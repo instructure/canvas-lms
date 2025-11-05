@@ -33,6 +33,7 @@ import NewActivityInfo from '../NewActivityInfo/NewActivityInfo'
 import {IconEyeLine, IconMoveDownBottomLine, IconSpeedGraderLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('discussion_insights')
 
@@ -83,6 +84,9 @@ const filterEntriesbyRelevance = (relevanceFilterType: string, entries: InsightE
 
 const DiscussionInsights: React.FC = () => {
   const [query, setQuery] = useState('')
+  const [screenReader, setScreenReader] = useState('')
+  const [previousInsightState, setPreviousInsightState] = useState<string | undefined>()
+  const [previousLoadingState, setPreviousLoadingState] = useState(false)
 
   const context = useInsightStore(state => state.context)
   const contextId = useInsightStore(state => state.contextId)
@@ -178,6 +182,51 @@ const DiscussionInsights: React.FC = () => {
     {count: filteredEntries.length},
   )
 
+  useEffect(() => {
+    const isCurrentlyLoading =
+      loading || ['created', 'in_progress'].includes(insight?.workflow_state as string)
+
+    if (isCurrentlyLoading && !previousLoadingState) {
+      setScreenReader(I18n.t('Insights loading'))
+    }
+
+    setPreviousLoadingState(isCurrentlyLoading)
+  }, [loading, insight?.workflow_state])
+
+  useEffect(() => {
+    if (
+      loading ||
+      insight?.workflow_state !== 'completed' ||
+      previousInsightState === 'completed' ||
+      entries?.length === 0
+    ) {
+      setPreviousInsightState(insight?.workflow_state ?? undefined)
+      return
+    }
+
+    setScreenReader(I18n.t('Insights generated'))
+    setPreviousInsightState(insight?.workflow_state ?? undefined)
+  }, [loading, insight?.workflow_state, entries, previousInsightState])
+
+  useEffect(() => {
+    if (!query || loading || !entries) {
+      return
+    }
+
+    const resultCount = filteredEntries.length
+    const message =
+      resultCount === 0
+        ? I18n.t('No results found for "%{searchTerm}"', {searchTerm: query})
+        : I18n.t(
+            {
+              one: '1 result for "%{searchTerm}"',
+              other: '%{count} results for "%{searchTerm}"',
+            },
+            {count: resultCount, searchTerm: query},
+          )
+    setScreenReader(message)
+  }, [query, filteredEntries.length, loading, entries])
+
   const tableRows: Row[] = filteredEntries.map(item => ({
     relevance: item.relevance_ai_classification,
     name: item.student_name,
@@ -245,6 +294,9 @@ const DiscussionInsights: React.FC = () => {
 
   return (
     <>
+      <div aria-live="polite" aria-atomic="true">
+        <ScreenReaderContent>{screenReader}</ScreenReaderContent>
+      </div>
       <InsightsHeader />
       {insight?.needs_processing && <NewActivityInfo />}
       <InsightsActionBar

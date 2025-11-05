@@ -293,6 +293,15 @@ RSpec.describe SubmissionComment do
       expect(@comment.messages_sent.keys).not_to include("Submission Comment")
     end
 
+    it "dispatches notifications when posted_comments_at is set" do
+      @assignment.ensure_post_policy(post_manually: true)
+      @assignment.hide_submissions(submission_ids: [@submission.id])
+      @submission.reload.update!(posted_comments_at: Time.zone.now)
+
+      @comment = @submission.add_comment(author: @teacher, comment: "some comment")
+      expect(@comment.messages_sent.keys).to include("Submission Comment")
+    end
+
     context "draft comment" do
       before do
         @comment = @submission.add_comment(author: @teacher, comment: "42", draft_comment: true)
@@ -792,6 +801,47 @@ RSpec.describe SubmissionComment do
           end
         end
       end
+
+      context "with manual posting and posted_comments_at" do
+        let(:course) { Course.create! }
+        let(:assignment) { course.assignments.create!(title: "test assignment") }
+        let(:student) { course.enroll_student(User.create!, enrollment_state: "active").user }
+        let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: "active").user }
+        let(:submission) { assignment.submission_for_student(student) }
+
+        before do
+          assignment.ensure_post_policy(post_manually: true)
+          assignment.hide_submissions(submission_ids: [submission.id])
+        end
+
+        it "student cannot read hidden comments when neither posted_at nor posted_comments_at are set" do
+          comment = submission.add_comment(author: teacher, comment: "hidden comment")
+          expect(comment.grants_right?(student, :read)).to be false
+        end
+
+        it "student can read comments when posted_comments_at is set" do
+          submission.update!(posted_comments_at: Time.zone.now)
+          comment = submission.add_comment(author: teacher, comment: "posted comment")
+          expect(comment.grants_right?(student, :read)).to be true
+        end
+
+        it "student can read previously hidden comments after posted_comments_at is set" do
+          comment = submission.add_comment(author: teacher, comment: "comment", hidden: true)
+          expect(comment.grants_right?(student, :read)).to be false
+
+          submission.update!(posted_comments_at: Time.zone.now)
+          AdheresToPolicy::Cache.clear
+          expect(comment.grants_right?(student, :read)).to be true
+        end
+
+        it "teacher can always read comments regardless of posting status" do
+          comment = submission.add_comment(author: teacher, comment: "teacher comment")
+          expect(comment.grants_right?(teacher, :read)).to be true
+
+          submission.update!(posted_comments_at: Time.zone.now)
+          expect(comment.grants_right?(teacher, :read)).to be true
+        end
+      end
     end
   end
 
@@ -1001,6 +1051,100 @@ RSpec.describe SubmissionComment do
     it "returns false if the comment is a draft" do
       comment = @submission.add_comment(author: @teacher, comment: "hi", hidden: true, draft_comment: true)
       expect(comment).not_to be_allows_posting_submission
+    end
+  end
+
+  describe "#author_visible_name" do
+    it "returns translated 'Someone' when author is nil" do
+      comment = @submission.submission_comments.create!(valid_attributes)
+      comment.author = nil
+      expect(comment.author_visible_name(@student)).to eq(I18n.t("Someone"))
+    end
+
+    it "returns author short_name when viewing own comment" do
+      comment = @submission.submission_comments.create!(valid_attributes.merge(author: @student))
+      expect(comment.author_visible_name(@student)).to eq(@student.short_name)
+    end
+
+    context "without moderated grading" do
+      it "returns author short_name when user has read_author permission" do
+        comment = @submission.submission_comments.create!(valid_attributes.merge(author: @teacher))
+        expect(comment.author_visible_name(@student)).to eq(@teacher.short_name)
+      end
+
+      it "calls get_anonymous_student_name when user does not have read_author permission" do
+        comment = @submission.submission_comments.create!(valid_attributes.merge(author: @teacher))
+        # Stub grants_right? to return false for read_author
+        allow(comment).to receive(:grants_right?).with(@observer, :read_author).and_return(false)
+
+        # Should call get_anonymous_student_name in this case
+        expect(comment).to receive(:get_anonymous_student_name).with(@teacher, @assignment).and_call_original
+        comment.author_visible_name(@observer)
+      end
+    end
+
+    context "with moderated grading" do
+      before(:once) do
+        @assignment.update!(moderated_grading: true, grader_count: 2, final_grader: @teacher)
+        @grader1 = @course.enroll_teacher(User.create!, enrollment_state: "active").user
+        @grader2 = @course.enroll_teacher(User.create!, enrollment_state: "active").user
+      end
+
+      it "returns translated 'Someone' when author is nil" do
+        comment = @submission.submission_comments.create!(valid_attributes)
+        comment.author = nil
+        expect(comment.author_visible_name(@teacher)).to eq(I18n.t("Someone"))
+      end
+
+      context "when author is the student" do
+        it "returns student short_name when assignment does not anonymize students" do
+          comment = @submission.submission_comments.create!(valid_attributes.merge(author: @student))
+          expect(comment.author_visible_name(@grader1)).to eq(@student.short_name)
+        end
+
+        it "returns anonymous student name when assignment anonymizes students" do
+          @assignment.update!(anonymous_grading: true)
+          comment = @submission.submission_comments.create!(valid_attributes.merge(author: @student))
+          result = comment.author_visible_name(@grader1)
+          expect(result).to match(/Student/)
+        end
+      end
+
+      context "when author is a grader" do
+        it "returns grader short_name when viewing user can view other grader identities" do
+          comment = @submission.submission_comments.create!(valid_attributes.merge(author: @grader1))
+          # Final grader (moderator) should be able to see grader identities
+          expect(comment.author_visible_name(@teacher)).to eq(@grader1.short_name)
+        end
+
+        it "calls get_anonymous_grader_name when viewing user cannot view other grader identities" do
+          comment = @submission.submission_comments.create!(valid_attributes.merge(author: @grader1))
+          # Stub the can_view_other_grader_identities? to return false
+          allow(@assignment).to receive(:can_view_other_grader_identities?).with(@grader2).and_return(false)
+
+          # Should call get_anonymous_grader_name in this case and return an anonymized name
+          expect(comment).to receive(:get_anonymous_grader_name).with(@grader1, @assignment).and_return("Anonymous Grader")
+          result = comment.author_visible_name(@grader2)
+          expect(result).to eq("Anonymous Grader")
+        end
+      end
+    end
+
+    context "edge cases" do
+      it "returns author short_name when viewing user is the author (even in moderated grading)" do
+        @assignment.update!(moderated_grading: true, grader_count: 2, grader_names_visible_to_final_grader: false)
+        grader = @course.enroll_teacher(User.create!, enrollment_state: "active").user
+        comment = @submission.submission_comments.create!(valid_attributes.merge(author: grader))
+        expect(comment.author_visible_name(grader)).to eq(grader.short_name)
+      end
+
+      it "returns author short_name when viewing user is the author (even with anonymous peer reviews)" do
+        @assignment.update!(anonymous_peer_reviews: true, peer_reviews: true)
+        peer_reviewer = student_in_course(active_all: true).user
+        @assignment.assign_peer_review(peer_reviewer, @student)
+        comment = @submission.submission_comments.create!(valid_attributes.merge(author: peer_reviewer))
+        expect(comment.author_visible_name(peer_reviewer)).to eq(peer_reviewer.short_name)
+      end
     end
   end
 

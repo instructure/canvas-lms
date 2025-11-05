@@ -144,7 +144,7 @@ const editorWrappers = new WeakMap()
 // determines if localStorage is available for our use.
 // see https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
 export function storageAvailable() {
-  let storage
+  let storage: Storage | null = null
   try {
     storage = window.localStorage
     const x = '__storage_test__'
@@ -863,9 +863,13 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       window.visualViewport?.addEventListener('resize', this._handleFullscreenResize)
       this._handleFullscreenResize()
       // @ts-expect-error
-      this._focusRegion = FocusRegionManager.activateRegion(document[FS_ELEMENT], {
-        shouldContainFocus: true,
-      })
+      this._focusRegion = FocusRegionManager.activateRegion(
+        // @ts-expect-error
+        document[FS_ELEMENT],
+        {
+          shouldContainFocus: true,
+        },
+      )
     } else {
       event.target.removeEventListener(FS_CHANGEEVENT, this._onFullscreenChange)
       this.resizeObserver.unobserve(event.target)
@@ -1011,10 +1015,12 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
           return
         }
 
-        const activeClass = document.activeElement && document.activeElement.getAttribute('class')
+        const activeClass = document.activeElement?.getAttribute('class')
         if (
           // @ts-expect-error
-          (event.focusedEditor === undefined || event.target.id === event.focusedEditor?.id) &&
+          (event.focusedEditor === undefined ||
+            // @ts-expect-error
+            event.target.id === event.focusedEditor?.id) &&
           activeClass?.includes('tox-')
         ) {
           // if a toolbar button has focus, then the user clicks on the "more" button
@@ -1501,9 +1507,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
   /* *********** end autosave support *************** */
 
-  onWordCountUpdate = (e: {
-    wordCount: {words: number}
-  }) => {
+  onWordCountUpdate = (e: {wordCount: {words: number}}) => {
     if (!this.editor) return
     const shouldIgnore = countShouldIgnore(this.editor, 'body', 'words')
     const updatedCount = e.wordCount.words - shouldIgnore
@@ -1855,7 +1859,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
         ],
         // filter out the plugins designated for removal
         // @ts-expect-error
-        sanitizePlugins(options.plugins)?.filter(p => p.length > 0 && p[0] !== '-'),
+        sanitizePlugins(options.plugins)?.filter((p: string) => p.length > 0 && p[0] !== '-'),
         this.pluginsToExclude,
       ),
       textpattern_patterns: [
@@ -2209,7 +2213,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                     />
                   </Suspense>
                 ) : null}
-                {/* @ts-expect-error liveRegion prop type mismatch */}
                 <Alert screenReaderOnly={true} liveRegion={this.props.liveRegion}>
                   {this.state.announcement || null}
                 </Alert>

@@ -149,6 +149,18 @@ describe('api actions', () => {
       expect(mockDispatch).toHaveBeenCalledWith({type: 'START_LOADING_OPPORTUNITIES'})
       expect(mockDispatch).toHaveBeenCalledWith({type: 'ALL_OPPORTUNITIES_LOADED'})
     })
+    it('returns early without dispatching if items array is empty', () => {
+      const mockDispatch = jest.fn()
+      const state = getBasicState()
+      // no items means initial load hasn't happened yet
+      state.opportunities.items = []
+      state.opportunities.nextUrl = '/'
+      const getState = () => {
+        return state
+      }
+      Actions.getNextOpportunities()(mockDispatch, getState)
+      expect(mockDispatch).not.toHaveBeenCalled()
+    })
   })
 
   describe('getOpportunities', () => {
@@ -189,6 +201,32 @@ describe('api actions', () => {
           nextUrl: '/',
         },
       })
+    })
+
+    it('dispatches allOpportunitiesLoaded when response is empty', async () => {
+      server.use(
+        http.get('*', () => {
+          return new HttpResponse(JSON.stringify([]), {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/json',
+              link: '</>; rel="current"',
+            },
+          })
+        }),
+      )
+
+      const mockDispatch = jest.fn(action => {
+        if (isPromise(action)) {
+          return action
+        }
+      })
+      await Actions.getInitialOpportunities()(mockDispatch, getBasicState)
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'START_LOADING_OPPORTUNITIES'})
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'ALL_OPPORTUNITIES_LOADED'})
+      expect(mockDispatch).not.toHaveBeenCalledWith(
+        expect.objectContaining({type: 'ADD_OPPORTUNITIES'}),
+      )
     })
 
     it('dispatches startDismissingOpportunity and dismissedOpportunity actions', async () => {

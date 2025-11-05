@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./i18nObj.js"
+  "main": "./i18nObj.js",
+  "owner": "CFA"
 }

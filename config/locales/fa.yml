@@ -2322,6 +2322,7 @@ fa:
   all_discussion_entries_report_c1e02906: "گزارش همه ورودی های بحث"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "همه کارها انجام شده؟ زمان انتشار درس است! برای رسمی کردن آن، روی دکمه زیر کلیک کنید! انتشار به کاربران امکان می دهد در درس شرکت کنند."
   all_gradeable_student_submissions_report_d11ee705: "همه گزارش های ارسالی دانشجوی نمره دار"
+  all_grades_for_students_in_this_course_will_no_lon_a32bf5d4: "هیچ یک از نمره های دانشجویان این درس دیگر قابل مشاهده نیست. بعدا می توانید با فهرست بندی متقابل درس نمره ها را بازیابی کنید، اما در عین حال، نمره های این دانشجویان از درس اصلی نشأت می گیرند."
   all_grades_hidden_3092d5b5: "همه نمره‌ها پنهان شدند"
   all_grades_hidden_84409b76: "همه نمره‌ها پنهان شدند."
   all_grades_posted_616a85ab: "همه نمره‌ها ارسال شد"
@@ -3186,6 +3187,7 @@ fa:
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "آیا مطمئن هستید که می خواهید قرار ملاقات خود را با %{name} لغو کنید؟"
   are_you_sure_you_want_to_change_the_state_of_this__18c6a72: "آیا مطمئن هستید که می خواهید وضعیت این کلید توسعه دهنده را تغییر دهید؟"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "مطمئنید که می خواهید نمره نهایی کپی شود؟ این نمره جایگزین نمره موجود خواهد شد."
+  are_you_sure_you_want_to_de_cross_list_this_sectio_fae8a399: "مطمئنید که می خواهید فهرست بندی این بخش لغو شود؟"
   are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "مطمئنید که می خواهید این کاربر غیر فعال شود؟ او قادر نخواهد بود در هنگام غیر فعال بودن در درس شرکت کند."
   are_you_sure_you_want_to_delete_domain_domain_c9b4b5f5: "مطمئن هستید که می خواهید دامنه را حذف کنید %{domain}?"
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
@@ -3473,6 +3475,12 @@ fa:
       other: "%{count} دانشجو"
   assignment_path_selected_e80191d1: "مسیر تکلیف انتخاب شد"
   assignment_preview_3833e819: "پیش نمایش %{assignment}"
+  assignment_quiz_type: 
+    quiz_type: "نوع آزمون"
+    quiz_type_options: 
+      graded_quiz: "آزمون نمره گذاری شده"
+      graded_survey: "نظرسنجی نمره گذاری شده"
+      ungraded_survey: "نظرسنجی نمره گذاری نشده"
   assignment_scheduling_e2a3eaf6: "زمان بندی تکلیف"
   assignment_score_summary_f1dc9708: "خلاصه نمره تکلیف"
   assignment_selection_6bff05c4: "انتخاب تکلیف"
@@ -4876,6 +4884,8 @@ fa:
       slot_limit: "این بازه زمانی محدود شود به"
       users: کاربران.
     edit_assignment: 
+      ? " group"
+      : "گروه:"
       calendar: "تقویم:"
       due: "مهلت:"
       group: "گروه:"
@@ -5017,6 +5027,7 @@ fa:
       delete_link: "حذف بازه زمانی"
       end_time_label: "تاریخ پایان"
       start_time_label: "زمان شروع"
+    title_is_required: "عنوان لازم است!"
     titles: 
       edit_appointment_group: "ویرایش گروه قرار ملاقات"
       edit_event: "ویرایش رویداد"
@@ -7956,6 +7967,7 @@ fa:
         grade_syncing: "همگام‌سازی نمره"
         integrations: "یکپارچگی ها"
         navigation: پیمایش
+        quiz_settings: "تنظیمات آزمون"
         sections: "بخش ها"
         tools: "برنامه ها"
       titles: 
@@ -8588,6 +8600,9 @@ fa:
   day_s_7cc1231f: روز(ها)
   days_af2ac87b: "روز ها"
   days_late_a3a721b0: "روزهای تأخیر"
+  de_cross_list_this_section_6f7b5984: "لغو فهرست بندی متقابل این بخش"
+  de_cross_list_this_section_774a827c: "لغو فهرست بندی متقابل این بخش"
+  de_cross_listing_section_c2ee371: "در حال لغو فهرست بندی متقابل..."
   deactivate_this_key_3e79a2b5: "غیر فعالسازی این کلید"
   deactivate_user_86c09036: "غیر فعالسازی کاربر"
   debugging_f98fcd74: "اشکال زدایی"
@@ -20794,6 +20809,7 @@ fa:
   review_now_318a6a3e: "هم اکنون بازبینی کنید"
   reviewer_b993ce28: "بازبینی کننده"
   reviewers_successfully_added_bd4b629a: "بازبینی کننده ها با موفقیت افزوده شدند!"
+  revision_history_abfd1cfd: "تاریخچه بازنگری"
   rich_content_editor_2708ef21: "ویرایشگر محتوای غنی"
   rich_content_editor_sidebar_enhancements_8bd945d3: "ارتقاء نوار کناری ویرایشگر محتوای غنی"
   right_sidebar_logo_5483dc0a: "لوگوی نوار کناری سمت راست"
@@ -21367,6 +21383,7 @@ fa:
   section_specific_discussions_are_disabled_9e3fd431: "بحث های خاص بخش غیر فعال شده اند"
   section_specific_topics_must_have_sections_11868960: "موضوع های خاص بخش باید بخش داشته باشند"
   section_starts_at_65eaed1: "بخش شروع می شود در"
+  section_successfully_de_cross_listed_df3b64e: "لغو فهرست بندی متقابل بخش با موفقیت انجام شد!"
   sections: 
     section_created: "بخش با موفقیت ایجاد شد!"
     section_creation_failed: "ایجاد بخش انجام نشد!"

@@ -1167,7 +1167,23 @@ describe "Accounts API", type: :request do
     end
 
     describe "horizon_account setting" do
-      it "can enable the horizon account setting" do
+      let(:pine_client_mock) { double("PineClient") }
+      let(:redwood_client_mock) { double("RedwoodClient") }
+
+      before do
+        # Enable the horizon_course_setting feature flag
+        @a1.root_account.enable_feature!(:horizon_course_setting)
+
+        # Set up PineClient mock
+        allow(pine_client_mock).to receive_messages(enabled?: true, provision_tenant: true, delete_tenant: true)
+        stub_const("PineClient", pine_client_mock)
+
+        # Set up RedwoodClient mock
+        allow(redwood_client_mock).to receive_messages(enabled?: true, provision_tenant: true, delete_tenant: true)
+        stub_const("RedwoodClient", redwood_client_mock)
+      end
+
+      it "can be enabled" do
         api_call(:put,
                  "/api/v1/accounts/#{@a1.id}",
                  { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
@@ -1177,7 +1193,7 @@ describe "Accounts API", type: :request do
         expect(@a1.settings[:horizon_account][:locked]).to be true
       end
 
-      it "can disable the horizon account setting" do
+      it "can be disabled" do
         @a1.settings[:horizon_account] = { value: true }
         @a1.save!
         api_call(:put,
@@ -1185,6 +1201,75 @@ describe "Accounts API", type: :request do
                  { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
                  { account: { settings: { horizon_account: { value: false } } } })
         expect(@a1.reload.settings[:horizon_account][:value]).to be false
+      end
+
+      context "tenant provisioning" do
+        it "provisions the tenant when enabled for the first account in the root account" do
+          api_call(:put,
+                   "/api/v1/accounts/#{@a1.id}",
+                   { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                   { account: { settings: { horizon_account: { value: true } } } })
+          expect(@a1.reload.settings[:horizon_account][:value]).to be true
+
+          run_jobs
+          expect(PineClient).to have_received(:provision_tenant).with(root_account_uuid: @a1.root_account.uuid, feature_slug: "horizon", current_user: @user)
+          expect(RedwoodClient).to have_received(:provision_tenant).with(root_account_uuid: @a1.root_account.uuid, feature_slug: "horizon", current_user: @user)
+        end
+
+        it "does not provision the tenant when enabled for a non-first account in the root account" do
+          @a2.settings[:horizon_account] = { value: true }
+          @a2.save!
+          api_call(:put,
+                   "/api/v1/accounts/#{@a2.id}",
+                   { controller: "accounts", action: "update", id: @a2.to_param, format: "json" },
+                   { account: { settings: { horizon_account: { value: true } } } })
+          expect(@a2.reload.settings[:horizon_account][:value]).to be true
+          run_jobs
+          expect(PineClient).not_to have_received(:provision_tenant)
+          expect(RedwoodClient).not_to have_received(:provision_tenant)
+        end
+
+        it "deletes the tenant when disabled and no other accounts in the root account have it enabled" do
+          @a1.settings[:horizon_account] = { value: true }
+          @a1.save!
+          api_call(:put,
+                   "/api/v1/accounts/#{@a1.id}",
+                   { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                   { account: { settings: { horizon_account: { value: false } } } })
+          expect(@a1.reload.settings[:horizon_account][:value]).to be false
+          run_jobs
+          expect(PineClient).to have_received(:delete_tenant).with(root_account_uuid: @a1.root_account.uuid, feature_slug: "horizon", current_user: @user)
+          expect(RedwoodClient).to have_received(:delete_tenant).with(root_account_uuid: @a1.root_account.uuid, feature_slug: "horizon", current_user: @user)
+        end
+
+        it "does not delete the tenant when disabled and other accounts in the root account have it enabled" do
+          @a1.settings[:horizon_account] = { value: true }
+          @a1.save!
+          @a2.settings[:horizon_account] = { value: true }
+          @a2.save!
+          api_call(:put,
+                   "/api/v1/accounts/#{@a1.id}",
+                   { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                   { account: { settings: { horizon_account: { value: false } } } })
+          expect(@a1.reload.settings[:horizon_account][:value]).to be false
+
+          run_jobs
+          expect(PineClient).not_to have_received(:delete_tenant)
+          expect(RedwoodClient).not_to have_received(:delete_tenant)
+        end
+
+        it "takes no action when enabling a second account" do
+          @a1.settings[:horizon_account] = { value: true }
+          @a1.save!
+          api_call(:put,
+                   "/api/v1/accounts/#{@a2.id}",
+                   { controller: "accounts", action: "update", id: @a2.to_param, format: "json" },
+                   { account: { settings: { horizon_account: { value: true } } } })
+          expect(@a2.reload.settings[:horizon_account][:value]).to be true
+          run_jobs
+          expect(PineClient).not_to have_received(:provision_tenant)
+          expect(RedwoodClient).not_to have_received(:provision_tenant)
+        end
       end
 
       describe "when at the horizon account limit" do

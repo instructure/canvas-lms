@@ -28,13 +28,21 @@ class TeacherViewPageV2
       fj("div[role='tab']:contains('Details')")
     end
 
+    def assignment_tab
+      fj("div[role='tab']:contains('Assignment')")
+    end
+
+    def peer_review_tab
+      fj("div[role='tab']:contains('Peer Review')")
+    end
+
     def assignment_type
       f("#AssignmentType")
     end
 
     # Methods & Actions
     def visit(course, assignment)
-      course.account.enable_feature!(:assignment_enhancements_teacher_view)
+      course.enable_feature!(:assignment_enhancements_teacher_view)
       get "/courses/#{course.id}/assignments/#{assignment.id}"
       wait_for(method: nil, timeout: 1) do
         assignment_type
@@ -111,6 +119,160 @@ class TeacherViewPageV2
 
     def next_assignment_button
       f("[data-testid='next-assignment-button']")
+    end
+
+    def peer_review_allocation_rules_link
+      f("a[data-testid='peer-review-allocation-rules-link']")
+    end
+
+    def allocation_rules_tray
+      fj("h2:contains('Allocation Rules')")
+    end
+
+    def allocation_rules_tray_close_button
+      f("span[data-testid='allocation-rules-tray-close-button'] button")
+    end
+
+    def allocation_rule_cards
+      ff("div[data-testid='allocation-rule-card-wrapper']")
+    end
+
+    def delete_allocation_rule_button(rule_card)
+      f("button[data-testid='delete-allocation-rule-button']", rule_card)
+    end
+
+    def delete_error_alert
+      f("div[data-testid='delete-error-alert']")
+    end
+
+    def add_rule_button
+      f("button[data-testid='add-rule-button']")
+    end
+
+    def edit_rule_button(rule_card)
+      f("button[id^='edit-rule-button-']", rule_card)
+    end
+
+    def assignment_description
+      f("[data-testid='assignments-2-assignment-description']")
+    end
+
+    def create_rule_modal
+      f("span[data-testid='create-rule-modal']")
+    end
+
+    def edit_rule_modal
+      f("span[data-testid='edit-rule-modal']")
+    end
+
+    def modal_close_button
+      f("span[data-testid='allocation-rule-modal-close-button'] button")
+    end
+
+    def target_type_reviewer_radio
+      fj("label:contains('Rule for a reviewer')")
+    end
+
+    def target_type_reviewee_radio
+      fj("label:contains('Rule for recipient of a review')")
+    end
+
+    def target_type_reciprocal_radio
+      fj("label:contains('Reciprocal review')")
+    end
+
+    def target_select_input
+      f("input#target-select")
+    end
+
+    def subject_select_input
+      f("input#subject-select-main")
+    end
+
+    def review_type_must_review_radio
+      fj("label:contains('Must review')")
+    end
+
+    def review_type_must_not_review_radio
+      fj("label:contains('Must not review')")
+    end
+
+    def review_type_should_review_radio
+      fj("label:contains('Should review')")
+    end
+
+    def review_type_should_not_review_radio
+      fj("label:contains('Should not review')")
+    end
+
+    def add_subject_button
+      f("button[data-testid='add-subject-button']")
+    end
+
+    def modal_save_button
+      f("button[data-testid='save-button']")
+    end
+
+    def modal_cancel_button
+      f("button[data-testid='cancel-button']")
+    end
+
+    def select_student_option(student_name)
+      fj("span[role='option']:contains('#{student_name}')")
+    end
+
+    def delete_additional_subject_field_button(key)
+      f("button[data-testid='delete-additional-subject-field-#{key}-button']")
+    end
+
+    def additional_subject_select_input(key)
+      f("input#subject-select-#{key}")
+    end
+
+    def validation_error_message
+      fj("span:contains('is required')")
+    end
+
+    def create_error_alert
+      fj("div:contains('An error occurred while creating the rule')")
+    end
+
+    def edit_error_alert
+      fj("div:contains('An error occurred while editing the rule')")
+    end
+
+    def student_search_error_alert
+      fj("div:contains('An error occurred while searching for')")
+    end
+
+    def allocation_rules_search_input
+      f("input[data-testid='allocation-rules-search-input']")
+    end
+
+    def clear_search_button
+      f("button[data-testid='clear-search-button']")
+    end
+
+    def no_search_results_message
+      f("div[data-testid='no-search-results']")
+    end
+
+    def pagination_button(page_text)
+      pagination_nav = f("nav[data-testid='allocation-rules-pagination']")
+      fj("button:contains('#{page_text}')", pagination_nav)
+    end
+
+    def allocation_rules_loading_spinner
+      f("span[data-testid='allocation-rules-loading-spinner']")
+    end
+
+    def fetch_rules_error_alert
+      f("div[data-testid='fetch-rules-error-alert']")
+    end
+
+    def wait_for_spinner(&)
+      wait_for_transient_element('svg[role="img"] circle', &)
+      wait_for_ajaximations
     end
   end
 end

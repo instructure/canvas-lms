@@ -20,19 +20,14 @@ import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
-import AIExperienceRow from './components/AIExperienceRow'
-
-interface AiExperience {
-  id: number
-  title: string
-  description?: string
-  workflow_state: 'published' | 'unpublished'
-  facts?: string
-  learning_objective?: string
-  scenario?: string
-}
+import {Button} from '@instructure/ui-buttons'
+import {IconAddLine} from '@instructure/ui-icons'
+import AIExperienceList from './components/AIExperienceList'
+import AIExperiencesEmptyState from './components/AIExperiencesEmptyState'
+import type {AiExperience} from './types'
 
 const AiExperiencesIndex: React.FC = () => {
   const I18n = useI18nScope('ai_experiences')
@@ -43,14 +38,12 @@ const AiExperiencesIndex: React.FC = () => {
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
-        // Get course ID from URL path since ENV might not have it
-        const courseId = window.location.pathname.match(/\/courses\/(\d+)/)?.[1]
+        const courseId = ENV.COURSE_ID
 
         if (!courseId) {
-          throw new Error('Could not find course ID in URL')
+          throw new Error('Could not find course ID in environment')
         }
 
-        console.log('Fetching AI experiences for course:', courseId)
         const response = await fetch(`/courses/${courseId}/ai_experiences`, {
           headers: {
             Accept: 'application/json',
@@ -62,7 +55,6 @@ const AiExperiencesIndex: React.FC = () => {
         }
 
         const data = await response.json()
-        console.log('AI experiences loaded:', data)
         setExperiences(data)
       } catch (err) {
         console.error('Error fetching AI experiences:', err)
@@ -76,19 +68,50 @@ const AiExperiencesIndex: React.FC = () => {
   }, [])
 
   const handleEdit = (id: number) => {
-    const courseId = window.location.pathname.match(/\/courses\/(\d+)/)?.[1]
+    const courseId = ENV.COURSE_ID
     window.location.href = `/courses/${courseId}/ai_experiences/${id}/edit`
   }
 
   const handleTestConversation = (id: number) => {
-    console.log('Test conversation for AI experience:', id)
+    const courseId = ENV.COURSE_ID
+    window.location.href = `/courses/${courseId}/ai_experiences/${id}?preview=true`
+  }
+
+  const handleDelete = async (id: number) => {
+    if (
+      !window.confirm(
+        I18n.t('Are you sure you want to delete this AI Experience? This action cannot be undone.'),
+      )
+    ) {
+      return
+    }
+
+    try {
+      const courseId = ENV.COURSE_ID
+
+      const response = await fetch(`/courses/${courseId}/ai_experiences/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete AI experience')
+      }
+
+      // Remove from local state
+      setExperiences(prevExperiences => prevExperiences.filter(exp => exp.id !== id))
+    } catch (err) {
+      console.error('Error deleting AI experience:', err)
+      alert(I18n.t('Failed to delete AI Experience. Please try again.'))
+    }
   }
 
   const handlePublishToggle = async (id: number, newState: 'published' | 'unpublished') => {
     try {
-      const courseId = window.location.pathname.match(/\/courses\/(\d+)/)?.[1]
-
-      console.log(`API call: Updating AI experience ${id} to ${newState}`)
+      const courseId = ENV.COURSE_ID
 
       const response = await fetch(`/courses/${courseId}/ai_experiences/${id}`, {
         method: 'PUT',
@@ -97,7 +120,9 @@ const AiExperiencesIndex: React.FC = () => {
           Accept: 'application/json',
         },
         body: JSON.stringify({
-          workflow_state: newState,
+          ai_experience: {
+            workflow_state: newState,
+          },
         }),
       })
 
@@ -106,7 +131,6 @@ const AiExperiencesIndex: React.FC = () => {
       }
 
       const updatedExperience = await response.json()
-      console.log('AI experience updated successfully:', updatedExperience)
 
       // Update the local state
       setExperiences(prevExperiences =>
@@ -115,6 +139,11 @@ const AiExperiencesIndex: React.FC = () => {
     } catch (err) {
       console.error('Error updating AI experience:', err)
     }
+  }
+
+  const handleCreateNew = () => {
+    const courseId = ENV.COURSE_ID
+    window.location.href = `/courses/${courseId}/ai_experiences/new`
   }
 
   if (loading) {
@@ -136,33 +165,35 @@ const AiExperiencesIndex: React.FC = () => {
   return (
     <View as="div" margin="medium">
       <View as="div" margin="0 0 medium 0">
-        <Heading level="h1">{I18n.t('AI Experiences')}</Heading>
+        <Flex justifyItems="space-between" alignItems="center">
+          <Flex.Item>
+            <Heading level="h1">{I18n.t('AI Experiences')}</Heading>
+          </Flex.Item>
+          {experiences.length > 0 && (
+            <Flex.Item>
+              <Button
+                data-testid="ai-expriences-index-create-new-button"
+                color="primary"
+                renderIcon={() => <IconAddLine />}
+                onClick={handleCreateNew}
+              >
+                {I18n.t('Create new')}
+              </Button>
+            </Flex.Item>
+          )}
+        </Flex>
       </View>
 
       {experiences.length === 0 ? (
-        <View as="div" textAlign="center" margin="large">
-          <Text size="large">{I18n.t('No AI experiences found')}</Text>
-          <View as="div" margin="medium 0 0 0">
-            <Text size="medium" color="secondary">
-              {I18n.t('Create your first AI experience to get started')}
-            </Text>
-          </View>
-        </View>
+        <AIExperiencesEmptyState onCreateNew={handleCreateNew} />
       ) : (
-        <View as="div">
-          {experiences.map(experience => (
-            <AIExperienceRow
-              key={experience.id}
-              id={experience.id}
-              title={experience.title}
-              workflowState={experience.workflow_state}
-              experienceType="LLM Conversation"
-              onEdit={handleEdit}
-              onTestConversation={handleTestConversation}
-              onPublishToggle={handlePublishToggle}
-            />
-          ))}
-        </View>
+        <AIExperienceList
+          experiences={experiences}
+          onEdit={handleEdit}
+          onTestConversation={handleTestConversation}
+          onPublishToggle={handlePublishToggle}
+          onDelete={handleDelete}
+        />
       )}
     </View>
   )

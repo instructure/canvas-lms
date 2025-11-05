@@ -166,7 +166,6 @@ module Api::V1::Attachment
       hash["user"] = user_display_json(attachment.user, context)
     end
     if includes.include? "preview_url"
-
       url_opts = {
         moderated_grading_allow_list: options[:moderated_grading_allow_list],
         enable_annotations: options[:enable_annotations],
@@ -187,6 +186,7 @@ module Api::V1::Attachment
       }
       url_opts[:verifier] = url_options[:verifier] if url_options[:verifier].present?
       url_opts[:verifier] ||= attachment.uuid if downloadable && !options[:omit_verifier_in_app] && !((respond_to?(:in_app?, true) && in_app?) || @authenticated_with_jwt)
+      url_opts[:location] = url_options[:location] if url_options[:location].present?
 
       if options[:access_token].present? && options[:instfs_id].present?
         url_opts.merge!(options.slice(:access_token, :instfs_id))

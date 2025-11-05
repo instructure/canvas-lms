@@ -25,6 +25,7 @@ class ConversationMessage < ActiveRecord::Base
   include Rails.application.routes.url_helpers
   include SendToStream
   include SimpleTags::ReaderInstanceMethods
+  include LinkedAttachmentHandler
 
   belongs_to :conversation
   belongs_to :author, class_name: "User"
@@ -40,7 +41,6 @@ class ConversationMessage < ActiveRecord::Base
   before_create :set_root_account_ids
   after_create :log_conversation_message_metrics
   after_create :check_for_out_of_office_participants, unless: :automated_message?
-  after_save :update_attachment_associations
 
   scope :human, -> { where("NOT generated") }
   scope :with_attachments, -> { where("has_attachments") }
@@ -160,6 +160,12 @@ class ConversationMessage < ActiveRecord::Base
   def root_account_feature_enabled?(feature)
     Account.where(id: root_account_ids&.split(",")).any? do |root_account|
       root_account.feature_enabled?(feature)
+    end
+  end
+
+  def attachment_associations_enabled?
+    Account.where(id: root_account_ids&.split(",")).any? do |acc|
+      acc.feature_enabled?(:file_association_access)
     end
   end
 

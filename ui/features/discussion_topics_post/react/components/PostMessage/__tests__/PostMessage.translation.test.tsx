@@ -61,8 +61,10 @@ const initalMockState = {
   entries: {
     '1': {loading: false},
   },
+  translateAll: false,
   addEntry: jest.fn(),
   removeEntry: jest.fn(),
+  clearEntry: jest.fn(),
 }
 
 const defaultProviderProps = {
@@ -104,6 +106,7 @@ describe('PostMessage AI translation', () => {
     useTranslationStoreMock.mockImplementation((selector: any) => {
       return selector({...initalMockState})
     })
+    ;(useTranslationStoreMock as any).getState = jest.fn(() => ({...initalMockState}))
   })
 
   it('should display loading spinner and text while translation is in progress', async () => {
@@ -317,6 +320,220 @@ describe('PostMessage AI translation', () => {
     expect(queryByTestId('post-title-translated')).not.toBeInTheDocument()
     expect(queryByTestId('post-message-translated')).not.toBeInTheDocument()
   })
+
+  describe('Translation Actions', () => {
+    it('should display "Change translation language" and "Hide translation" links when translation is complete', async () => {
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {
+              loading: false,
+              language: 'en',
+              translatedTitle: 'Translated title',
+              translatedMessage: 'Translated message',
+            },
+          },
+          removeEntry: jest.fn(),
+          setModalOpen: jest.fn(),
+        }
+
+        return selector(state)
+      })
+
+      const {findByTestId} = setup()
+
+      const changeLanguageLink = await findByTestId('change-language-link')
+      expect(changeLanguageLink).toBeInTheDocument()
+      expect(changeLanguageLink).toHaveTextContent('Change translation language')
+
+      const hideTranslationLink = await findByTestId('hide-translation-link')
+      expect(hideTranslationLink).toBeInTheDocument()
+      expect(hideTranslationLink).toHaveTextContent('Hide translation')
+    })
+
+    it('should not display actions when there is no translation', async () => {
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {
+              loading: false,
+            },
+          },
+        }
+
+        return selector(state)
+      })
+
+      const {queryByTestId} = setup()
+
+      expect(queryByTestId('change-language-link')).not.toBeInTheDocument()
+      expect(queryByTestId('hide-translation-link')).not.toBeInTheDocument()
+    })
+
+    it('should not display actions when translation is loading', async () => {
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {
+              loading: true,
+            },
+          },
+        }
+
+        return selector(state)
+      })
+
+      const {queryByTestId} = setup()
+
+      expect(queryByTestId('change-language-link')).not.toBeInTheDocument()
+      expect(queryByTestId('hide-translation-link')).not.toBeInTheDocument()
+    })
+
+    it('should not display actions when there is an error', async () => {
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {
+              loading: false,
+              language: 'en',
+              error: {type: 'newError', message: 'Error occurred'},
+            },
+          },
+        }
+
+        return selector(state)
+      })
+
+      const {queryByTestId} = setup()
+
+      expect(queryByTestId('change-language-link')).not.toBeInTheDocument()
+      expect(queryByTestId('hide-translation-link')).not.toBeInTheDocument()
+    })
+
+    it('should call setModalOpen when "Change translation language" is clicked', async () => {
+      const setModalOpenMock = jest.fn()
+
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {
+              loading: false,
+              language: 'en',
+              translatedTitle: 'Translated title',
+              translatedMessage: 'Translated message',
+            },
+          },
+          removeEntry: jest.fn(),
+          setModalOpen: setModalOpenMock,
+        }
+
+        return selector(state)
+      })
+
+      const {findByTestId} = setup()
+
+      const changeLanguageLink = await findByTestId('change-language-link')
+      changeLanguageLink.click()
+
+      expect(setModalOpenMock).toHaveBeenCalledWith('1', 'Posts are fun', undefined)
+    })
+
+    it('should call setModalOpen with originalTitle when id is "topic"', async () => {
+      const setModalOpenMock = jest.fn()
+
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            topic: {
+              loading: false,
+              language: 'en',
+              translatedTitle: 'Translated title',
+              translatedMessage: 'Translated message',
+            },
+          },
+          removeEntry: jest.fn(),
+          setModalOpen: setModalOpenMock,
+        }
+
+        return selector(state)
+      })
+
+      const {findByTestId} = setup({discussionEntry: undefined})
+
+      const changeLanguageLink = await findByTestId('change-language-link')
+      changeLanguageLink.click()
+
+      expect(setModalOpenMock).toHaveBeenCalledWith('topic', 'Posts are fun', 'Thoughts')
+    })
+
+    it('should call clearEntry when "Hide translation" is clicked', async () => {
+      const clearEntryMock = jest.fn()
+
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {
+              loading: false,
+              language: 'en',
+              translatedTitle: 'Translated title',
+              translatedMessage: 'Translated message',
+            },
+          },
+          clearEntry: clearEntryMock,
+          setModalOpen: jest.fn(),
+        }
+
+        return selector(state)
+      })
+
+      const {findByTestId} = setup()
+
+      const hideTranslationLink = await findByTestId('hide-translation-link')
+      hideTranslationLink.click()
+
+      expect(clearEntryMock).toHaveBeenCalledWith('1')
+    })
+
+    it('should not display actions when translateAll is active', async () => {
+      const state = {
+        ...initalMockState,
+        entries: {
+          '1': {
+            loading: false,
+            language: 'en',
+            translatedTitle: 'Translated title',
+            translatedMessage: 'Translated message',
+          },
+        },
+        translateAll: true,
+        removeEntry: jest.fn(),
+        setModalOpen: jest.fn(),
+      }
+
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        return selector(state)
+      })
+      ;(useTranslationStoreMock as any).getState = jest.fn(() => state)
+
+      const {queryByTestId} = setup(
+        {},
+        {
+          enqueueTranslation: jest.fn(),
+          entryTranslatingSet: new Set(),
+        },
+      )
+
+      expect(queryByTestId('change-language-link')).not.toBeInTheDocument()
+      expect(queryByTestId('hide-translation-link')).not.toBeInTheDocument()
+    })
+  })
 })
 
 describe('PostMessage intersection observer registration', () => {
@@ -325,6 +542,7 @@ describe('PostMessage intersection observer registration', () => {
     useTranslationStoreMock.mockImplementation((selector: any) => {
       return selector({...initalMockState})
     })
+    ;(useTranslationStoreMock as any).getState = jest.fn(() => ({...initalMockState}))
   })
 
   it('should register the component with the observer during mount', () => {

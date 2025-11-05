@@ -358,11 +358,10 @@ module DataFixup::PopulateRootAccountIdOnModels
 
       assoc_options = table.reflections[assoc.to_s].options
       prefix = assoc_options[:polymorphic_prefix] ? "#{assoc}_" : ""
-      if assoc_options[:polymorphic].present?
-        assoc_options[:polymorphic].each do |poly_a|
-          poly_a = poly_a.keys.first if poly_a.is_a? Hash
-          account_columns = Account.resolved_root_account_id_sql if poly_a == :account
-          memo[:"#{prefix}#{poly_a}"] = account_columns || columns
+      if assoc_options[:polymorphic].is_a?(Hash)
+        assoc_options[:polymorphic].each_value do |name|
+          account_columns = Account.resolved_root_account_id_sql if name == :account
+          memo[:"#{prefix}#{name}"] = account_columns || columns
         end
       else
         columns = Account.resolved_root_account_id_sql if assoc == :account

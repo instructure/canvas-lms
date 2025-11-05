@@ -18,16 +18,24 @@
 
 async function scrollToHighlight(element, _window = window) {
   const scrollableParent = (() => {
-    const drawerLayoutContent = _window.document.getElementById('drawer-layout-content')
+    const drawerLayoutContent = _window.document.getElementById('discussion-drawer-layout')
     if (drawerLayoutContent) {
       return {
-        get scrollY() { return drawerLayoutContent.scrollTop },
-        scrollToY(y) { drawerLayoutContent.scrollTo(drawerLayoutContent.scrollLeft, y) },
+        get scrollY() {
+          return drawerLayoutContent.scrollTop
+        },
+        scrollToY(y) {
+          drawerLayoutContent.scrollTo(drawerLayoutContent.scrollLeft, y)
+        },
       }
     }
     return {
-      get scrollY() { return _window.scrollY },
-      scrollToY(y) { _window.scrollTo(_window.scrollX, y) },
+      get scrollY() {
+        return _window.scrollY
+      },
+      scrollToY(y) {
+        _window.scrollTo(_window.scrollX, y)
+      },
     }
   })()
   const EXPIRE_AFTER_MS = 10_000
@@ -40,9 +48,9 @@ async function scrollToHighlight(element, _window = window) {
   const startTime = _window.Date.now()
 
   let shouldAbortDueToInteraction = false
-  const abortViaMouse = () => shouldAbortDueToInteraction = true
+  const abortViaMouse = () => (shouldAbortDueToInteraction = true)
   const abortViaKeyboard = event => {
-    if (["Home", "End", "PageUp", "PageDown", "ArrowUp", "ArrowDown"].includes(event.key)) {
+    if (['Home', 'End', 'PageUp', 'PageDown', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
       shouldAbortDueToInteraction = true
     }
   }
@@ -58,12 +66,14 @@ async function scrollToHighlight(element, _window = window) {
       await new Promise(resolve => _window.requestAnimationFrame(resolve))
       const deltaTimeSeconds = (_window.Date.now() - now) / 1000
       const yDifference = element.offsetTop - SCROLL_MARGIN_TOP - scrollableParent.scrollY
-      const magnitude = Math.max(
-        Math.abs(yDifference) * SCROLL_MAGNITUDE_MULTIPLIER,
-        SCROLL_MAGNITUDE_MIN) * deltaTimeSeconds * Math.sign(yDifference)
-      const targetY = yDifference >= 0
-        ? Math.min(element.offsetTop - SCROLL_MARGIN_TOP, scrollableParent.scrollY + magnitude)
-        : Math.max(element.offsetTop - SCROLL_MARGIN_TOP, scrollableParent.scrollY + magnitude)
+      const magnitude =
+        Math.max(Math.abs(yDifference) * SCROLL_MAGNITUDE_MULTIPLIER, SCROLL_MAGNITUDE_MIN) *
+        deltaTimeSeconds *
+        Math.sign(yDifference)
+      const targetY =
+        yDifference >= 0
+          ? Math.min(element.offsetTop - SCROLL_MARGIN_TOP, scrollableParent.scrollY + magnitude)
+          : Math.max(element.offsetTop - SCROLL_MARGIN_TOP, scrollableParent.scrollY + magnitude)
       scrollableParent.scrollToY(targetY)
       if (elementPreviousOffsetTop === element.offsetTop && targetY === scrollableParent.scrollY) {
         waitForAdditionalScrollSecondsLeft -= deltaTimeSeconds
@@ -77,7 +87,8 @@ async function scrollToHighlight(element, _window = window) {
         _window.Date.now() - startTime > EXPIRE_AFTER_MS || // We've been scrolling for too long. Abort.
         _window.document.activeElement !== activeElementAtStart || // The user interacted in a way that would change which element is focused (ex.: TAB key). Abort.
         shouldAbortDueToInteraction // The user scrolled via mouse or touchpad or "swiping", or clicked (maybe on the scroll bar?), or scrolled via keyboard. Abort.
-      ) break
+      )
+        break
     }
   } finally {
     _window.removeEventListener('wheel', abortViaMouse)
@@ -87,4 +98,4 @@ async function scrollToHighlight(element, _window = window) {
   return 'SCROLL_ABORTED'
 }
 
-export { scrollToHighlight }
+export {scrollToHighlight}

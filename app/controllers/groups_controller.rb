@@ -158,6 +158,7 @@ class GroupsController < ApplicationController
   include Context
   include K5Mode
   include GroupPermissionHelper
+  include SectionRestrictionsHelper
 
   SETTABLE_GROUP_ATTRIBUTES = %w[
     name
@@ -198,7 +199,14 @@ class GroupsController < ApplicationController
              end
 
     users = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause("users"))
-                    .paginate(page:, per_page:)
+
+    # Apply section restrictions using helper for check and section IDs
+    if user_has_section_restrictions?(@context, @current_user)
+      teacher_section_ids = get_teacher_section_ids(@context, @current_user)
+      users = users.where(enrollments: { course_section_id: teacher_section_ids })
+    end
+
+    users = users.paginate(page:, per_page:)
 
     if authorized_action(@context, @current_user, :manage)
       json = {
@@ -958,7 +966,6 @@ class GroupsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
 
     search_term = params[:search_term].presence
-
     include_inactive = params[:exclude_inactive].present? ? !value_to_boolean(params[:exclude_inactive]) : true
 
     users = if search_term
@@ -966,6 +973,12 @@ class GroupsController < ApplicationController
             else
               UserSearch.scope_for(@context, @current_user, { include_inactive_enrollments: include_inactive })
             end
+
+    # Apply section restrictions using helper for check and filtering
+    if @context.context_type == "Course" && user_has_section_restrictions?(@context.context, @current_user)
+      student_ids_in_sections = get_students_in_teacher_sections(@context.context, @current_user)
+      users = users.where(id: student_ids_in_sections)
+    end
 
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_users_url)
@@ -1019,7 +1032,7 @@ class GroupsController < ApplicationController
   # Upload a file to the group.
   #
   # This API endpoint is the first step in uploading a file to a group.
-  # See the {file:file.file_uploads.html File Upload Documentation} for details on
+  # See the {file:file_uploads.html File Upload Documentation} for details on
   # the file upload workflow.
   #
   # Only those with the "Manage Files" permission on a group can upload files

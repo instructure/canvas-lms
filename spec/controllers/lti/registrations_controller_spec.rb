@@ -2845,4 +2845,107 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
   end
+
+  describe "PUT apply_registration_update_request", type: :request do
+    subject { put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/update_requests/#{registration_update_request.id}/apply", params:, as: :json }
+
+    let_once(:registration) do
+      ims_reg = lti_ims_registration_model(account:)
+      ims_reg.lti_registration
+    end
+    let_once(:registration_update_request) { lti_ims_registration_update_request_model(lti_registration: registration, root_account: account) }
+    let(:params) { { accepted: } }
+    let(:accepted) { true }
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_registrations_page) }
+
+      it "returns 404" do
+        subject
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when registration does not belong to account" do
+      let_once(:other_account) { account_model }
+      let_once(:registration) { lti_registration_model(account: other_account) }
+
+      it "returns 400" do
+        subject
+        expect(response).to have_http_status(:bad_request)
+        expect(response_json["errors"]).to eq("registration does not belong to account")
+      end
+    end
+
+    context "when registration update request is already processed" do
+      before { registration_update_request.update!(accepted_at: 1.hour.ago) }
+
+      it "returns 404" do
+        subject
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when accepted is true" do
+      let(:accepted) { true }
+
+      it "applies the registration update request" do
+        expect { subject }.to change { registration_update_request.reload.accepted_at }.from(nil).to(be_present)
+        expect(response).to have_http_status(:ok)
+        expect(response_json).to include("id" => registration.id)
+      end
+    end
+
+    context "when accepted is false" do
+      let(:accepted) { false }
+
+      it "rejects the registration update request" do
+        expect { subject }.to change { registration_update_request.reload.rejected_at }.from(nil).to(be_present)
+        expect(registration_update_request.accepted_at).to be_nil
+        expect(response).to have_http_status(:ok)
+        expect(response_json).to include("id" => registration.id)
+      end
+
+      it "does not modify the registration" do
+        original_name = registration.name
+        original_updated_at = registration.updated_at
+
+        subject
+
+        registration.reload
+        expect(registration.name).to eq(original_name)
+        expect(registration.updated_at).to eq(original_updated_at)
+      end
+    end
+
+    context "when accepted parameter is omitted" do
+      let(:params) { {} }
+
+      it "returns 400 bad request" do
+        expect { subject }.not_to change { registration_update_request.reload.accepted_at }
+        expect(response).to have_http_status(:bad_request)
+        expect(response_json["errors"]).to eq("accepted parameter is required")
+      end
+    end
+  end
 end

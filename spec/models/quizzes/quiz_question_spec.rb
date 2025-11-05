@@ -261,4 +261,68 @@ describe Quizzes::QuizQuestion do
       expect(results).not_to include(linked_question)
     end
   end
+
+  describe "#create_assessment_question" do
+    before do
+      course_with_teacher
+      @quiz = @course.quizzes.create!
+    end
+
+    it "passes updating_user to assessment_question when creating" do
+      question_data = {
+        question_name: "Test Question",
+        question_type: "multiple_choice_question",
+        points_possible: 1,
+        answers: [
+          { answer_text: "Answer 1", weight: 100 },
+          { answer_text: "Answer 2", weight: 0 }
+        ]
+      }
+
+      quiz_question = @quiz.quiz_questions.create!(
+        question_data:,
+        updating_user: @teacher
+      )
+
+      expect(quiz_question.assessment_question).not_to be_nil
+      expect(quiz_question.assessment_question.current_user).to eq(@teacher)
+    end
+
+    it "does not create assessment_question for text_only questions" do
+      question_data = {
+        question_name: "Text Only",
+        question_type: "text_only_question"
+      }
+
+      quiz_question = @quiz.quiz_questions.create!(
+        question_data:,
+        updating_user: @teacher
+      )
+
+      expect(quiz_question.assessment_question).to be_nil
+    end
+
+    it "updates assessment_question with updating_user on save" do
+      @attachment = attachment_with_context(@course)
+      question_data = {
+        question_name: "Test Question",
+        question_type: "multiple_choice_question",
+        points_possible: 1,
+        question_text: "<p>File ref:<img src='/courses/#{@course.id}/files/#{@attachment.id}'></p>",
+        answers: [
+          { answer_text: "Answer 1", weight: 100 }
+        ]
+      }
+
+      quiz_question = @quiz.quiz_questions.create!(question_data:, updating_user: @teacher)
+      assessment_question = quiz_question.assessment_question
+
+      quiz_question.updating_user = @teacher
+      quiz_question.question_data = question_data.merge(question_name: "Updated Question")
+      quiz_question.save!
+
+      expect(quiz_question.assessment_question).to eq(assessment_question)
+      expect(quiz_question.assessment_question.attachments).not_to be_empty
+    end
+  end
 end

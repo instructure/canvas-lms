@@ -3039,16 +3039,29 @@ class Submission < ActiveRecord::Base
     assignment.muted?
   end
 
+  def graded_or_resubmitted_without_posting?
+    # Only indicate that the grade is hidden if there's an actual grade.
+    # Similarly, hide the grade if the student resubmits (which will keep
+    # the old grade but bump the workflow back to "submitted").
+    (graded? || resubmitted?) && !posted?
+  end
+  private :graded_or_resubmitted_without_posting?
+
   def hide_grade_from_student?(for_plagiarism: false)
     return false if for_plagiarism
 
     if assignment.post_manually?
       posted_at.blank?
     else
-      # Only indicate that the grade is hidden if there's an actual grade.
-      # Similarly, hide the grade if the student resubmits (which will keep
-      # the old grade but bump the workflow back to "submitted").
-      (graded? || resubmitted?) && !posted?
+      graded_or_resubmitted_without_posting?
+    end
+  end
+
+  def hide_comments_from_student?
+    if assignment.post_manually?
+      !comments_posted?
+    else
+      graded_or_resubmitted_without_posting?
     end
   end
 
@@ -3063,6 +3076,10 @@ class Submission < ActiveRecord::Base
     posted_at.present?
   end
 
+  def comments_posted?
+    posted? || posted_comments_at.present?
+  end
+
   def assignment_muted_changed
     grade_change_audit(force_audit: true)
   end
@@ -3075,9 +3092,18 @@ class Submission < ActiveRecord::Base
     return [] unless assignment.active_rubric_association?
 
     unless posted? || grants_right?(viewing_user, :read_grade)
+      assessments = rubric_assessments_for_attempt(attempt:)
+
+      if posted_comments_at.present?
+        # Comments are posted but grades are not, so show assessments without point information
+        return assessments.map do |assessment|
+          strip_rubric_assessment_points(assessment)
+        end
+      end
+
       # If this submission is unposted and the viewer can't view the grade,
       # show only that viewer's assessments
-      return rubric_assessments_for_attempt(attempt:).select do |assessment|
+      return assessments.select do |assessment|
         assessment.assessor_id == viewing_user.id
       end
     end
@@ -3133,6 +3159,26 @@ class Submission < ActiveRecord::Base
     end
   end
   private :rubric_assessments_for_attempt
+
+  # Strips point information from a rubric assessment while preserving comments
+  # Used when comments are posted but grades are not (posted_comments_at set but not posted_at)
+  def strip_rubric_assessment_points(assessment)
+    stripped = assessment.dup
+    stripped.id = assessment.id
+    stripped.score = nil
+
+    # Strip points from each rating in the data while keeping comments
+    if assessment.data.present?
+      stripped.data = assessment.data.map do |rating|
+        rating = rating.dup if rating.is_a?(Hash)
+        rating.delete(:points) if rating.is_a?(Hash)
+        rating
+      end
+    end
+
+    stripped
+  end
+  private :strip_rubric_assessment_points
 
   def self.queue_bulk_update(context, section, grader, grade_data)
     progress = Progress.create!(context:, tag: "submissions_update")
@@ -3213,7 +3259,7 @@ class Submission < ActiveRecord::Base
             comment = {
               comment: comment[:text_comment],
               author: grader,
-              hidden: assignment.post_manually? && !submission.posted?
+              hidden: assignment.post_manually? && !submission.comments_posted?,
             }.merge(
               comment
             ).with_indifferent_access

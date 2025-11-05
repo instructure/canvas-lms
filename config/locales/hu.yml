@@ -2419,6 +2419,7 @@ hu:
   all_filters_have_been_cleared_7f38f765: "Minden szűrő alaphelyzetbe állt"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Mindennel elkészült? Akkor ideje publikálnia a kurzusát! Kattintson a lenti gombra a publikáláshoz! A publikálás után a hallgatók már hozzá is férhetnek a kurzushoz."
   all_gradeable_student_submissions_report_d11ee705: "Minden osztályozható tanulói beküldött jelentés"
+  all_grades_for_students_in_this_course_will_no_lon_a32bf5d4: "A kurzuson részt vevő hallgatók osztályzatai nem lesznek láthatóak. Visszaállíthatja a jegyeket később a kurzus újbóli keresztlistázásával, de addig a hallgatók jegyei az eredeti kurzusból fognak származni."
   all_grades_hidden_3092d5b5: "Minden osztályzat elrejtve"
   all_grades_hidden_84409b76: "Minden osztályzat elrejtve"
   all_grades_posted_616a85ab: "Minden osztályzat felkerült"
@@ -3379,6 +3380,7 @@ hu:
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "Biztos benne, hogy törli a megbeszélést vele: %{name}? "
   are_you_sure_you_want_to_change_the_state_of_this__18c6a72: "Biztosan módosítani szeretné ennek a fejlesztői kulcsnak az állapotát?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Biztos benne, hogy bemásolja a végső jegyet? Ez felülírja a meglévő jegyet."
+  are_you_sure_you_want_to_de_cross_list_this_sectio_fae8a399: "Biztos benne, hogy törli a szekció keresztlistázását?"
   are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "Biztos benne, hogy deaktiválja a felhasználót? Az inaktív felhasználók nem fognak tudni részt venni a kurzusokban."
   are_you_sure_you_want_to_delete_domain_domain_c9b4b5f5: "Biztos benne, hogy törölni szeretné %{domain}domaint?"
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
@@ -3697,6 +3699,12 @@ hu:
   assignment_overrides_export_1c008ad2: "Feladat felülírások Exportálása"
   assignment_path_selected_e80191d1: "Feladat útvonal kiválasztva"
   assignment_preview_3833e819: "%{assignment}előnézete"
+  assignment_quiz_type: 
+    quiz_type: "Kvíz típusa"
+    quiz_type_options: 
+      graded_quiz: "Értékelésbe számító kvíz"
+      graded_survey: "Értékelésbe számító felmérés"
+      ungraded_survey: "Nem értékelt felmérés"
   assignment_scheduling_e2a3eaf6: "Feladat ütemezése"
   assignment_score_summary_f1dc9708: "Feladat pontszám összefoglalója"
   assignment_selection_6bff05c4: Feladatkiválasztás
@@ -4974,6 +4982,8 @@ hu:
     edit_appt_calendar_event: 
       description: "Leírás:"
     edit_assignment: 
+      ? " group"
+      : "Csoport:"
       calendar: "Naptár:"
       due: "Határidő: "
       group: "Csoport:"
@@ -5094,6 +5104,7 @@ hu:
       delete_link: "Idősáv törlése"
       end_time_label: "Záró időpont"
       start_time_label: "Kezdési idő"
+    title_is_required: "Cím megadása kötelező!"
     titles: 
       edit_appointment_group: "Megbeszélés-csoport szerkesztése"
       edit_event: "Esemény szerkesztése"
@@ -8123,6 +8134,7 @@ hu:
         grade_syncing: "Értékelés szinkronizálása"
         integrations: Integrációk
         navigation: Navigáció
+        quiz_settings: "Kvíz beállítások"
         sections: Szekciók
         tools: Alkalmazások
       titles: 
@@ -8775,6 +8787,9 @@ hu:
   day_s_7cc1231f: Nap(ok)
   days_af2ac87b: Napok
   days_late_a3a721b0: "Napos késéssel"
+  de_cross_list_this_section_6f7b5984: "Szekció keresztlistázásának törlése"
+  de_cross_list_this_section_774a827c: "Szekció keresztlistázásának törlése"
+  de_cross_listing_section_c2ee371: "Szekció keresztlistázásának törlése..."
   deactivate_this_key_3e79a2b5: "Ezen kulcs deaktiválása"
   deactivate_user_86c09036: "Felhasználó deaktiválása"
   debugging_f98fcd74: Hibakeresés
@@ -21474,6 +21489,7 @@ hu:
   reviewers_successfully_added_bd4b629a: "Az értékelők sikeresen hozzá lettek rendelve"
   reviews_due_5178cab6: "Vélemények Határideje"
   reviews_per_student_378292b3: "Vélemények Hallgatónként"
+  revision_history_abfd1cfd: "Módosítási előzmények"
   rich_content_editor_2708ef21: "Vizuális szövegszerkesztő"
   right_sidebar_logo_5483dc0a: "Jobb oldalsáv logó"
   rocketship_on_launchpad_4011ea8c: "rakétahajó a kilövőálláson"
@@ -22120,6 +22136,7 @@ hu:
   section_size_1f3b7f18: "Szekció mérete"
   section_specific_topics_must_have_sections_11868960: "A szekcióspecifikus témáknak rendelkezniük kell szekciókkal"
   section_starts_at_65eaed1: "A szekció kezdődik ekkor:"
+  section_successfully_de_cross_listed_df3b64e: "Szekció keresztlistázásának törlése sikeres!"
   sections: 
     section_created: "Szekció sikeresen létrehozva!"
     section_creation_failed: "Szekció létrehozása sikertelen"

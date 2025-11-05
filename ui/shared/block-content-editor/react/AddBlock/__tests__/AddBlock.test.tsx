@@ -35,6 +35,12 @@ jest.mock('../../hooks/useGetBlocksCount', () => ({
   }),
 }))
 
+jest.mock('../../hooks/useFocusManagement', () => ({
+  useFocusManagement: () => ({
+    elementRef: jest.fn(),
+  }),
+}))
+
 describe('AddBlock', () => {
   beforeEach(() => {
     jest.clearAllMocks()

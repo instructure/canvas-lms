@@ -586,7 +586,7 @@ describe "Outcome Reports" do
           report_record = run_report(report_type, account: @root_account, params: { "include_deleted" => true })
           expect(report_record.workflow_state).to eq "error"
           expect(report_record.message).to start_with "Generating the report, Outcome Results CSV, failed."
-          expect(report_record.parameters["extra_text"]).to eq "Failed, the report failed to generate a file. Please try again."
+          expect(report_record.parameters["extra_text"]).to include "Failed, please report the following error code"
         end
       end
 
@@ -643,7 +643,7 @@ describe "Outcome Reports" do
           report_record = run_report(report_type, account: @root_account, params: { "include_deleted" => true })
           expect(report_record.workflow_state).to eq "error"
           expect(report_record.message).to start_with "Generating the report, Outcome Results CSV, failed."
-          expect(report_record.parameters["extra_text"]).to eq "Failed, the report failed to generate a file. Please try again."
+          expect(report_record.parameters["extra_text"]).to include "Failed, please report the following error code"
         end
       end
 

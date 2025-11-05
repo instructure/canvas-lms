@@ -344,6 +344,10 @@ class MediaObjectsController < ApplicationController
 
     js_env media_object: media_api_json if media_api_json
 
+    # Add custom body class for responsive padding control
+    @body_classes ||= []
+    @body_classes.push("immersive-media-view", "content-only")
+
     deferred_js_bundle :media_immersive_view
     render html: '<div id="immersive_view_container"></div>'.html_safe,
            layout: "layouts/application"

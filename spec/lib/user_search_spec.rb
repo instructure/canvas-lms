@@ -1018,41 +1018,6 @@ describe UserSearch do
     end
   end
 
-  describe "Bookmarker" do
-    before :once do
-      @user1 = Account.default.users.create!
-      @user2 = Account.default.users.create!
-    end
-
-    describe "with include_bookmark: false" do
-      it "works with id ascending by default" do
-        bookmarker = UserSearch::Bookmarker.new
-        pager = double(current_bookmark: bookmarker.bookmark_for(@user1), include_bookmark: false)
-        expect(bookmarker.restrict_scope(Account.default.users, pager).first).to eq @user2
-      end
-
-      it "works with id descending" do
-        bookmarker = UserSearch::Bookmarker.new(order: "desc")
-        pager = double(current_bookmark: bookmarker.bookmark_for(@user2), include_bookmark: false)
-        expect(bookmarker.restrict_scope(Account.default.users, pager).first).to eq @user1
-      end
-    end
-
-    describe "with include_bookmark: true" do
-      it "works with id ascending by default" do
-        bookmarker = UserSearch::Bookmarker.new
-        pager = double(current_bookmark: bookmarker.bookmark_for(@user1), include_bookmark: true)
-        expect(bookmarker.restrict_scope(Account.default.users, pager).first(2)).to eq [@user1, @user2]
-      end
-
-      it "works with id descending" do
-        bookmarker = UserSearch::Bookmarker.new(order: "desc")
-        pager = double(current_bookmark: bookmarker.bookmark_for(@user2), include_bookmark: true)
-        expect(bookmarker.restrict_scope(Account.default.users, pager).first(2)).to eq [@user2, @user1]
-      end
-    end
-  end
-
   describe "#differentiation_tag_scope" do
     let(:account) { Account.create! }
     let(:course) { course_model(name: "Differentiation Tag Course", account:) }

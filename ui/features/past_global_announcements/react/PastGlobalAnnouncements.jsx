@@ -50,13 +50,27 @@ const PastGlobalAnnouncements = ({breakpoints}) => {
           renderTitle={I18n.t('Current')}
           isSelected={selectedIndex === 0}
           data-testid="GlobalAnnouncementCurrentTab"
-        />
+        >
+          <View margin="0 0 small 0" display="block">
+            <Text size="medium" lineHeight="double">
+              {I18n.t('Active Announcements')}
+            </Text>
+          </View>
+          {activeAnnouncements}
+        </Tabs.Panel>
         <Tabs.Panel
           id="pastTab"
           renderTitle={I18n.t('Recent')}
           isSelected={selectedIndex === 1}
           data-testid="GlobalAnnouncementPastTab"
-        />
+        >
+          <View margin="0 0 small 0" display="block">
+            <Text size="medium" lineHeight="double">
+              {I18n.t('Announcements from the past four months')}
+            </Text>
+          </View>
+          {pastAnnouncements}
+        </Tabs.Panel>
       </Tabs>
     )
   }
@@ -86,7 +100,7 @@ const PastGlobalAnnouncements = ({breakpoints}) => {
     )
   }
 
-  const renderTabContent = () => {
+  const renderSelectContent = () => {
     const text =
       selectedIndex === 0
         ? I18n.t('Active Announcements')
@@ -104,6 +118,7 @@ const PastGlobalAnnouncements = ({breakpoints}) => {
       </>
     )
   }
+
   const headerMargin = breakpoints.desktop ? '0 0 large 0' : '0 0 medium 0'
 
   return (
@@ -122,10 +137,16 @@ const PastGlobalAnnouncements = ({breakpoints}) => {
           <Heading margin={headerMargin} as="h1" level={breakpoints.desktop ? 'h1' : 'h2'}>
             {I18n.t('Global Announcements')}
           </Heading>
-          {breakpoints.mobileOnly ? renderSelect() : renderTabs()}
+          {breakpoints.mobileOnly ? (
+            <>
+              {renderSelect()}
+              {renderSelectContent()}
+            </>
+          ) : (
+            renderTabs()
+          )}
         </>
       )}
-      {renderTabContent()}
     </>
   )
 }

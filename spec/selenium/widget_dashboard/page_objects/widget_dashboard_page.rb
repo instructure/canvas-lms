@@ -25,6 +25,10 @@ module WidgetDashboardPage
     "[data-testid='announcement-filter-select']"
   end
 
+  def announcement_item_prefix_selector
+    "[data-testid*='announcement-item-']"
+  end
+
   def announcement_item_selector(item_id)
     "[data-testid='announcement-item-#{item_id}']"
   end
@@ -100,6 +104,66 @@ module WidgetDashboardPage
   def course_grade_text_selector(course_id)
     "[data-testid='course-#{course_id}-grade']"
   end
+
+  def course_work_summary_stats_selector(label)
+    "[data-testid='statistics-card-#{label}']"
+  end
+
+  def course_work_course_filter_select_selector
+    "[data-testid='course-filter-select']"
+  end
+
+  def course_work_date_filter_select_selector
+    "[data-testid='date-filter-select']"
+  end
+
+  def course_work_item_selector(item_id)
+    "[data-testid='listed-course-work-item-#{item_id}']"
+  end
+
+  def course_work_item_link_selector(item_id)
+    "[data-testid='course-work-item-link-#{item_id}']"
+  end
+
+  def course_work_item_pill_selector(status_label, item_id)
+    "[data-testid='#{status_label}-status-pill-#{item_id}']"
+  end
+
+  def no_course_work_message_selector
+    "[data-testid='no-course-work-message']"
+  end
+
+  def no_announcements_message_selector
+    "[data-testid='no-announcements-message']"
+  end
+
+  def no_instructors_message_selector
+    "[data-testid='no-instructors-message']"
+  end
+
+  def no_enrolled_courses_message_selector
+    "[data-testid='no-courses-message']"
+  end
+
+  def enrollment_invitation_selector
+    "[data-testid='enrollment-invitation']"
+  end
+
+  def enrollment_invitation_accept_button_selector
+    "[data-testid='enrollment-invitation'] button:contains('Accept')"
+  end
+
+  def enrollment_invitation_decline_button_selector
+    "[data-testid='enrollment-invitation'] button:contains('Decline')"
+  end
+
+  def all_enrollment_invitations_selector
+    "[data-testid='enrollment-invitation']"
+  end
+
+  def observed_student_dropdown_selector
+    "[data-testid='observed-student-dropdown']"
+  end
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -107,7 +171,7 @@ module WidgetDashboardPage
   end
 
   def all_announcement_items
-    ff("[data-testid*='announcement-item-']")
+    ff(announcement_item_prefix_selector)
   end
 
   def announcement_item(item_id)
@@ -194,6 +258,62 @@ module WidgetDashboardPage
     ff("[data-testid*='hide-single-grade-button-']")
   end
 
+  def course_work_summary_stats(label)
+    f(course_work_summary_stats_selector(label))
+  end
+
+  def all_course_work_items
+    ff("[data-testid*='listed-course-work-item-']")
+  end
+
+  def course_work_item(item_id)
+    f(course_work_item_selector(item_id))
+  end
+
+  def course_work_item_link(item_id)
+    f(course_work_item_link_selector(item_id))
+  end
+
+  def course_work_item_pill(status_label, item_id)
+    f(course_work_item_pill_selector(status_label, item_id))
+  end
+
+  def no_course_work_message
+    f(no_course_work_message_selector)
+  end
+
+  def no_announcements_message
+    f(no_announcements_message_selector)
+  end
+
+  def no_instructors_message
+    f(no_instructors_message_selector)
+  end
+
+  def no_enrolled_courses_message
+    f(no_enrolled_courses_message_selector)
+  end
+
+  def enrollment_invitation
+    f(enrollment_invitation_selector)
+  end
+
+  def all_enrollment_invitations
+    ff(all_enrollment_invitations_selector)
+  end
+
+  def enrollment_invitation_accept_button
+    fj(enrollment_invitation_accept_button_selector)
+  end
+
+  def enrollment_invitation_decline_button
+    fj(enrollment_invitation_decline_button_selector)
+  end
+
+  def observed_student_dropdown
+    f(observed_student_dropdown_selector)
+  end
+
   #------------------------------ Actions -------------------------------
 
   def dashboard_student_setup
@@ -233,8 +353,8 @@ module WidgetDashboardPage
   end
 
   def dashboard_course_assignment_setup
-    @due_graded_discussion = @course1.assignments.create!(name: "Course 1: due_graded_discussion", points_possible: "10", due_at: 1.day.from_now, submission_types: "discussion_topic")
-    @due_assignment = @course1.assignments.create!(name: "Course 1: due_assignment", points_possible: "10", due_at: 6.days.from_now, submission_types: "online_text_entry")
+    @due_graded_discussion = @course1.assignments.create!(name: "Course 1: due_graded_discussion", points_possible: "10", due_at: 6.days.from_now, submission_types: "discussion_topic")
+    @due_assignment = @course1.assignments.create!(name: "Course 1: due_assignment", points_possible: "10", due_at: 1.day.from_now, submission_types: "online_text_entry")
     @due_quiz = @course1.assignments.create!(title: "Course 1: due_quiz", points_possible: "10", due_at: 13.days.from_now, submission_types: "online_quiz")
 
     @missing_graded_discussion = @course1.assignments.create!(name: "Course 1: missing_graded_discussion", points_possible: "10", due_at: 2.days.ago, submission_types: "discussion_topic")
@@ -243,7 +363,6 @@ module WidgetDashboardPage
 
     @graded_discussion = @course1.assignments.create!(name: "Course 1: graded_discussion", points_possible: "10", due_at: 5.days.ago, submission_types: "discussion_topic")
     @graded_assignment = @course2.assignments.create!(name: "Course 2: graded_assignment", points_possible: "10", due_at: 3.days.ago, submission_types: "online_text_entry")
-    @graded_quiz = @course2.quizzes.create!(title: "Course 2: graded_quiz", points_possible: "10", due_at: 1.day.from_now, quiz_type: "assignment")
 
     @submitted_discussion = @course2.assignments.create!(name: "Course 2: submitted_discussion", points_possible: "10", due_at: 2.days.ago, submission_types: "discussion_topic")
     @submitted_assignment = @course1.assignments.create!(name: "Course 1: submitted_assignment", points_possible: "10", due_at: 1.day.from_now, submission_types: "online_text_entry")
@@ -271,9 +390,82 @@ module WidgetDashboardPage
     @graded_discussion.grade_student(@student, grade: "9", grader: @teacher1)
   end
 
+  def observed_student_setup
+    @student2 = user_factory(active_all: true, name: "student2")
+    @course1.enroll_student(@student2, enrollment_state: :active)
+    @course2.enroll_student(@student2, enrollment_state: :active)
+
+    @submitted_discussion.submit_homework(@student2, submission_type: "discussion_topic")
+    @graded_assignment.submit_homework(@student2, submission_type: "online_text_entry")
+    @graded_assignment.grade_student(@student2, grade: "10", grader: @teacher2)
+  end
+
+  def observer_setup
+    @observer = user_factory(name: "Observer", active_all: true)
+
+    @course1.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student })
+    @course2.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student2 })
+  end
+
+  def dashboard_pending_enrollment_setup
+    @course3 = course_factory(active_all: true, course_name: "Test Course")
+
+    @assignment_pending_course = @course3.assignments.create!(name: "Course 3: due_graded_discussion", points_possible: "10", due_at: 2.days.from_now, submission_types: "discussion_topic")
+    @course3.enroll_teacher(@teacher1, enrollment_state: :active)
+    @announcement_pending_course = @course3.announcements.create!(title: "Course 3 - Announcement", message: "Announcement message for pending enrollment course")
+  end
+
+  def dashboard_inactive_courses_setup
+    @student_w_inactive = user_factory(active_all: true, name: "Student-W Inactive-courses")
+
+    @past_course = course_factory(active_all: true, course_name: "Past Course")
+    @past_course.enroll_student(@student_w_inactive, enrollment_state: "active")
+    @past_course.update!(conclude_at: 1.week.ago, restrict_enrollments_to_course_dates: true)
+
+    @concluded_course = course_factory(active_all: true, course_name: "Concluded Course")
+    student_enroll1 = @concluded_course.enroll_student(@student_w_inactive, enrollment_state: "active")
+    student_enroll1.workflow_state = "completed"
+    student_enroll1.save!
+
+    @unpublished_course = course_factory(active_all: true, course_name: "Unpublished Course")
+    student_enroll2 = @unpublished_course.enroll_student(@student_w_inactive, enrollment_state: "active")
+    student_enroll2.workflow_state = "creation_pending"
+    student_enroll2.save!
+  end
+
+  def observer_w_inactive_courses_setup
+    @observer = user_factory(name: "Observer2", active_all: true)
+    @past_course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student_w_inactive)
+    observer_enroll2 = @concluded_course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student_w_inactive)
+    observer_enroll2.workflow_state = "completed"
+    observer_enroll2.save!
+
+    observer_enroll2 = @unpublished_course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student_w_inactive)
+    observer_enroll2.workflow_state = "creation_pending"
+    observer_enroll2.save!
+    @course1.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student })
+    @course1.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student_w_inactive })
+  end
+
   def filter_announcements_list_by(status)
     announcement_filter.click
     click_INSTUI_Select_option(announcement_filter_select, status)
+  end
+
+  def filter_course_work_by(filter_type, filter_value)
+    case filter_type
+    when :course
+      click_INSTUI_Select_option(course_work_course_filter_select_selector, filter_value)
+    when :date
+      click_INSTUI_Select_option(course_work_date_filter_select_selector, filter_value)
+    end
+    wait_for_ajaximations
+  end
+
+  def select_observed_student(student_name)
+    expect(observed_student_dropdown).to be_displayed
+    click_INSTUI_Select_option(observed_student_dropdown_selector, student_name)
+    wait_for_ajaximations
   end
 
   def go_to_dashboard

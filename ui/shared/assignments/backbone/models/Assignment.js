@@ -1774,13 +1774,11 @@ Assignment.prototype.sortingDueAt = function () {
   if (this.hasSubAssignments()) {
     const checkpoints = this.getCheckpoints()
     if (checkpoints && checkpoints.length > 0) {
-      const dueDates = checkpoints
-        .map(checkpoint => checkpoint.due_at)
-        .filter(date => date !== null)
-      if (dueDates.length > 0) {
-        return dueDates.reduce((earliest, current) => {
-          return Date.parse(current) < Date.parse(earliest) ? current : earliest
-        })
+      const replyToEntryCheckpoint = checkpoints.find(
+        checkpoint => checkpoint.tag === 'reply_to_entry',
+      )
+      if (replyToEntryCheckpoint && replyToEntryCheckpoint.due_at) {
+        return replyToEntryCheckpoint.due_at
       }
     }
   }

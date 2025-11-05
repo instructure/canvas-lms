@@ -37,6 +37,15 @@ export const LTI_ASSET_REPORT_COMMON_FIELDS = gql`
     result
     resultTruncated
     title
+    asset {
+      attachmentId,
+      submissionAttempt,
+      discussionEntryVersion {
+        _id
+        messageIntro
+        createdAt
+      }
+    }
   }
 `
 
@@ -44,7 +53,9 @@ export const LTI_ASSET_REPORT_COMMON_FIELDS = gql`
 export const LTI_ASSET_REPORT_FOR_STUDENT_FRAGMENT = gql`
   fragment LtiAssetReportForStudent on LtiAssetReport {
     ...LtiAssetReportCommonFields
-    asset { attachmentId, attachmentName, submissionAttempt }
+    asset {
+      attachmentName
+    }
   }
   ${LTI_ASSET_REPORT_COMMON_FIELDS}
 `
@@ -56,7 +67,6 @@ export const LTI_ASSET_REPORTS_QUERY: GqlTemplateStringType = gql`
       ltiAssetReportsConnection(first: 20) {
         nodes {
           ...LtiAssetReportCommonFields
-          asset { attachmentId, submissionAttempt }
         }
       }
     }

@@ -18,16 +18,20 @@
 
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {IconAiLine, IconWarningSolid} from '@instructure/ui-icons'
+import {IconAiLine, IconWarningSolid, IconRefreshLine} from '@instructure/ui-icons'
 import {createContext, PropsWithChildren, useContext, useEffect} from 'react'
 import {DiscussionManagerUtilityContext} from '../../../utils/constants'
 import {useTranslationStore} from '../../../hooks/useTranslationStore'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getTranslation} from '../../../utils'
+import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('discussion_topics_post')
 
 interface TranslationContextType {
+  id: string
+  originalMessage: string
+  originalTitle?: string
   isTranslating: boolean
   isTranslationReady: boolean
   translateTargetLanguage: string | null
@@ -35,6 +39,7 @@ interface TranslationContextType {
   translatedTitle: string | null
   translatedMessage: string | null
   translationLanguages?: {id: string; translated_to_name: string}[]
+  retryTranslation?: () => void
 }
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined)
@@ -60,27 +65,81 @@ const Translation = ({id, title, message, children}: PropsWithChildren<Translati
   const addEntry = useTranslationStore(state => state.addEntry)
   const removeEntry = useTranslationStore(state => state.removeEntry)
 
+  const retryTranslation = async () => {
+    const language = entryInfo?.language || activeLanguage
+    if (!language) return
+
+    try {
+      setTranslationStart(id)
+
+      const [translatedTitle, translatedMessage] = await Promise.all([
+        getTranslation(title, language),
+        getTranslation(message, language),
+      ])
+
+      setTranslationEnd(id, language, translatedMessage, translatedTitle)
+    } catch (error: any) {
+      setTranslationEnd(id)
+      if (error.translationError) {
+        setTranslationError(id, error.translationError, language)
+      }
+    }
+  }
+
   useEffect(() => {
     addEntry(id, {title, message})
 
-    // This is a very hard anti pattern
-    // we should avoid att all cost to extend this hook
-    // we need exhaustive testsing to make sure it works as excpected
     if (isTranslateAll) {
-      const translationJob = async () => {
+      // Double-check translateAll is still active before enqueueing
+      const currentState = useTranslationStore.getState()
+      if (!currentState.translateAll) {
+        return
+      }
+
+      const translationJob = async (signal: AbortSignal) => {
         try {
+          // Check if already aborted before starting
+          if (signal.aborted) {
+            return
+          }
+
+          // Get current language from store, not from closure
+          const currentLanguage = useTranslationStore.getState().activeLanguage
+          if (!currentLanguage) {
+            return
+          }
+
           setTranslationStart(id)
 
           const [translatedTitle, translatedMessage] = await Promise.all([
-            getTranslation(title, activeLanguage),
-            getTranslation(message, activeLanguage),
+            getTranslation(title, currentLanguage, signal),
+            getTranslation(message, currentLanguage, signal),
           ])
 
-          setTranslationEnd(id, activeLanguage!, translatedMessage, translatedTitle)
+          // Check multiple conditions before updating state
+          const currentState = useTranslationStore.getState()
+
+          if (
+            signal.aborted ||
+            !currentState.translateAll ||
+            currentState.activeLanguage !== currentLanguage
+          ) {
+            return
+          }
+
+          setTranslationEnd(id, currentLanguage, translatedMessage, translatedTitle)
         } catch (error: any) {
+          // Don't update state if the request was aborted
+          if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+            return
+          }
+
+          // Get current language from store for error reporting
+          const errorLanguage = useTranslationStore.getState().activeLanguage
+
           setTranslationEnd(id)
           if (error.translationError) {
-            setTranslationError(id, error.translationError, activeLanguage!)
+            setTranslationError(id, error.translationError, errorLanguage!)
           } else {
             setTranslationError(
               id,
@@ -88,7 +147,7 @@ const Translation = ({id, title, message, children}: PropsWithChildren<Translati
                 type: 'newError',
                 message: I18n.t('There was an unexpected error during translation.'),
               },
-              activeLanguage!,
+              errorLanguage!,
             )
           }
         }
@@ -128,6 +187,9 @@ const Translation = ({id, title, message, children}: PropsWithChildren<Translati
   return (
     <TranslationContext.Provider
       value={{
+        id,
+        originalMessage: message,
+        originalTitle: id === 'topic' ? title : undefined,
         isTranslating: entryInfo.loading,
         isTranslationReady,
         translateTargetLanguage: entryInfo.language || null,
@@ -135,6 +197,7 @@ const Translation = ({id, title, message, children}: PropsWithChildren<Translati
         translatedMessage: entryInfo.translatedMessage || null,
         translationError: entryInfo.error || null,
         translationLanguages: translationLanguages?.current,
+        retryTranslation,
       }}
     >
       {children}
@@ -192,7 +255,11 @@ interface ContentProps {
     title,
     message,
     targetLanguage,
-  }: {title: string | null; message: string | null; targetLanguage?: string}) => React.ReactNode
+  }: {
+    title: string | null
+    message: string | null
+    targetLanguage?: string
+  }) => React.ReactNode
 }
 
 const Content = ({children}: ContentProps) => {
@@ -232,10 +299,35 @@ const Error = () => {
     return null
   }
 
-  const {isTranslating, translateTargetLanguage, translationError} = context
+  const {isTranslating, translateTargetLanguage, translationError, retryTranslation} = context
 
   if (isTranslating || !translateTargetLanguage || !translationError) {
     return null
+  }
+
+  if (translationError.type === 'rateLimitError') {
+    return (
+      <Flex direction="column" gap="medium" margin="0 0 small 0">
+        <Flex direction="row" alignItems="center" gap="x-small">
+          <IconWarningSolid color="error" title="warning" />
+          <Text color="danger" data-testid="error_type_rate_limit">
+            {translationError.message}
+          </Text>
+        </Flex>
+        <Link
+          variant="standalone"
+          onClick={retryTranslation}
+          data-testid="retry-translation-button"
+          width="fit-content"
+          forceButtonRole={false}
+        >
+          <Flex direction="row" alignItems="center" gap="x-small">
+            <IconRefreshLine />
+            <Text>{I18n.t('Retry Translation')}</Text>
+          </Flex>
+        </Link>
+      </Flex>
+    )
   }
 
   if (translationError.type === 'error' || translationError.type === 'newError') {
@@ -262,10 +354,69 @@ const Error = () => {
   return null
 }
 
+const Actions = () => {
+  const context = useContext(TranslationContext)
+  const clearEntry = useTranslationStore(state => state.clearEntry)
+  const setModalOpen = useTranslationStore(state => state.setModalOpen)
+  const translateAll = useTranslationStore(state => state.translateAll)
+
+  if (context === undefined) {
+    return null
+  }
+
+  const {id, originalMessage, originalTitle, isTranslationReady, translationError} = context
+
+  if (!isTranslationReady || translationError || translateAll) {
+    return null
+  }
+
+  const handleChangeLanguage = () => {
+    setModalOpen(id, originalMessage, originalTitle)
+  }
+
+  const handleHideTranslation = () => {
+    clearEntry(id)
+  }
+
+  return (
+    <Flex direction="row" gap="x-small" margin="small 0" alignItems="center">
+      <Flex.Item>
+        <Link
+          onClick={handleChangeLanguage}
+          isWithinText={false}
+          data-testid="change-language-link"
+        >
+          <Flex direction="row" gap="x-small" alignItems="center">
+            <Text size="small">{I18n.t('Change translation language')}</Text>
+          </Flex>
+        </Link>
+      </Flex.Item>
+      <Flex.Item>
+        <Text color="brand" size="small">
+          •
+        </Text>
+      </Flex.Item>
+      <Flex.Item>
+        <Link
+          onClick={handleHideTranslation}
+          isWithinText={false}
+          data-testid="hide-translation-link"
+        >
+          <Flex direction="row" gap="x-small" alignItems="center">
+            <Text size="small">{I18n.t('Hide translation')}</Text>
+          </Flex>
+        </Link>
+      </Flex.Item>
+    </Flex>
+  )
+}
+
 Translation.Content = Content
 
 Translation.Divider = Divider
 
 Translation.Error = Error
+
+Translation.Actions = Actions
 
 export {Translation}

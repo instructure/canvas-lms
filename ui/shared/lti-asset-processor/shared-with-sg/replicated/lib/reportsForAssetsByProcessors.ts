@@ -20,7 +20,12 @@ import _ from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import type {LtiAssetProcessor} from '../types/LtiAssetProcessors'
-import type {AssetReportCompatibleSubmissionType, LtiAssetReport} from '../types/LtiAssetReports'
+import type {
+  AssetReportCompatibleSubmissionType,
+  LtiAssetReport,
+  LtiDiscussionAssetReport,
+} from '../types/LtiAssetReports'
+import DateHelper from '@canvas/datetime/dateHelper'
 
 const I18n = createI18nScope('lti_asset_processor')
 
@@ -59,6 +64,17 @@ export function reportsForAssetsByProcessors(
   }))
 }
 
+function reportsForAttachmentAssets(
+  reportsForProc: LtiAssetReport[],
+  attachments: {_id: string; displayName: string}[],
+): LtiAssetReportGroup[] {
+  return attachments.map(a => ({
+    key: a._id,
+    displayName: a.displayName,
+    reports: reportsForProc.filter(r => r.asset.attachmentId === a._id),
+  }))
+}
+
 function reportsForAssets(
   reportsForProc: LtiAssetReport[],
   reportsAssetSelector: ReportsAssetSelector,
@@ -74,12 +90,41 @@ function reportsForAssets(
         },
       ]
     case 'online_upload':
-      return attachments.map(a => ({
-        key: a._id,
-        displayName: a.displayName,
-        reports: reportsForProc.filter(r => r.asset.attachmentId === a._id),
-      }))
+      return reportsForAttachmentAssets(reportsForProc, attachments)
+    case 'discussion_topic':
+      return [
+        ...reportsForAttachmentAssets(reportsForProc, attachments),
+        ...Object.entries(discussionReportsByEntryId(reportsForProc)).map(([entryId, reports]) => ({
+          key: entryId,
+          displayName: discussionAssetDisplayName(reports[0]),
+          reports,
+        })),
+      ]
     default:
       return submissionType satisfies never
   }
+}
+
+function discussionReportsByEntryId(
+  reportsForProc: LtiAssetReport[],
+): Record<string, LtiDiscussionAssetReport[]> {
+  const discReports: LtiDiscussionAssetReport[] = reportsForProc.filter(isDiscussionReport)
+  return _.groupBy(discReports, r => r.asset.discussionEntryVersion._id)
+}
+
+function discussionAssetDisplayName(sampleReport: LtiDiscussionAssetReport) {
+  const version = sampleReport.asset.discussionEntryVersion
+  if (!version.createdAt) return undefined // shouldn't actually happen, but type is nullable in graphql
+  const formattedDate = DateHelper.formatDatetimeForDiscussions(new Date(version.createdAt))
+  return I18n.t('%{date}: "%{messageIntro}"', {
+    date: formattedDate,
+    messageIntro: version.messageIntro,
+  })
+}
+
+function isDiscussionReport(report: LtiAssetReport): report is LtiDiscussionAssetReport {
+  return (
+    report.asset.discussionEntryVersion !== null &&
+    report.asset.discussionEntryVersion !== undefined
+  )
 }

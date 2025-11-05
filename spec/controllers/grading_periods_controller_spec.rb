@@ -73,6 +73,7 @@ describe GradingPeriodsController do
       expect(json_parse).to have_key("meta")
       expect(json_parse["meta"]).to have_key("pagination")
       expect(json_parse["meta"]["primaryCollection"]).to eql("grading_periods")
+      expect(response.headers["Link"]).to include "http://test.host/api/v1/courses/#{course.id}/grading_periods"
     end
 
     describe "with root account admins" do

@@ -314,6 +314,9 @@ Rails/OutputSafety:
 Rails/RakeEnvironment:
   Severity: convention
   AutoCorrect: false
+Rails/StrongParametersExpect:
+  Severity: convention
+  AutoCorrect: false
 Rails/TimeZoneAssignment:
   Severity: convention
 

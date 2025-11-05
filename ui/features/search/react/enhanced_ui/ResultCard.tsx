@@ -39,7 +39,7 @@ import {List} from '@instructure/ui-list'
 
 const I18n = createI18nScope('SmartSearch')
 
-const iconClass = (content_type: string) => {
+function iconClass(content_type: string): React.JSX.Element {
   switch (content_type) {
     case 'Assignment':
       return (
@@ -70,10 +70,10 @@ export interface ResultCardProps {
   searchTerm: string
 }
 
-export default function ResultCard(props: ResultCardProps) {
+export default function ResultCard(props: ResultCardProps): React.JSX.Element {
   const {body, content_type, html_url, title, readable_type} = props.result
 
-  const renderModuleList = (modules: Module[]) => {
+  function renderModuleList(modules: Module[]): React.JSX.Element | null {
     let trimmedModules = modules
     let extraModuleText: string | null = null
     if (modules.length > MAX_MODULES_SHOWN) {
@@ -85,15 +85,14 @@ export default function ResultCard(props: ResultCardProps) {
         },
       )
     }
-    if (trimmedModules.length === 0) {
-      return null
-    }
+    if (trimmedModules.length === 0) return null
+
     return (
-      <Flex gap="space8" key="module-list">
+      <Flex gap="space8" key="module-list" wrap="wrap">
         {trimmedModules.map((module: Module, index: number) => (
           <Flex key={`module-item-${module.id}`} gap="space8">
             <IconModuleLine data-testid="module_icon" />
-            <Text key={`module-name-${module.id}`} variant="contentSmall">
+            <Text key={`module-name-${module.id}`} variant="contentSmall" wrap="break-word">
               {module.name}
             </Text>
             {index < modules.length - 1 || extraModuleText ? (
@@ -110,7 +109,11 @@ export default function ResultCard(props: ResultCardProps) {
     )
   }
 
-  const renderPills = (id: string, dueDate: string | null, published: boolean | null) => {
+  function renderPills(
+    id: string,
+    dueDate: string | null,
+    published: boolean | null,
+  ): React.JSX.Element {
     const pills = [
       iconClass(content_type),
       <Text variant="content" key="content-type">
@@ -135,7 +138,7 @@ export default function ResultCard(props: ResultCardProps) {
       )
     }
     return (
-      <Flex key="result-pills" gap="space8" alignItems="center">
+      <Flex key="result-pills" gap="space8" alignItems="center" wrap="wrap">
         {pills}
       </Flex>
     )
@@ -151,12 +154,14 @@ export default function ResultCard(props: ResultCardProps) {
           gap="space8"
           justifyItems="space-between"
           data-testid="search-result"
+          width="100%"
         >
           <Link href={html_url} target="_blank" key="result-link">
             <Text
               size="descriptionPage"
               weight="weightImportant"
               data-pendo={`smart-search-${props.resultType}-result`}
+              wrap="break-word"
             >
               {title}
             </Text>
@@ -169,6 +174,7 @@ export default function ResultCard(props: ResultCardProps) {
           <Text
             key="result-body"
             variant="content"
+            wrap="break-word"
             dangerouslySetInnerHTML={{
               __html: addSearchHighlighting(props.searchTerm, htmlEscape(body)),
             }}

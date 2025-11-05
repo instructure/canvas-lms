@@ -16,17 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createRoot } from 'react-dom/client'
-import type { GlobalEnv } from '@canvas/global/env/GlobalEnv.d'
-import type { MediaInfo } from '@canvas/canvas-studio-player/react/types'
+import {createRoot} from 'react-dom/client'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+import type {MediaInfo} from '@canvas/canvas-studio-player/react/types'
+import './index.css'
 
-import { ImmersiveView } from './ImmersiveView'
+import {ImmersiveView} from './ImmersiveView'
 
 declare const ENV: GlobalEnv & {
   media_object: MediaInfo
+  attachment_id?: string
+  attachment?: boolean
 }
 
 const container = document.getElementById('immersive_view_container')
 const root = createRoot(container!)
 
-root.render(<ImmersiveView id={ENV.media_object?.media_id} title={ENV.media_object?.title} />)
+root.render(
+  <ImmersiveView
+    id={ENV.media_object?.media_id}
+    title={ENV.media_object?.title}
+    attachmentId={ENV.attachment_id}
+    isAttachment={ENV.attachment}
+  />,
+)

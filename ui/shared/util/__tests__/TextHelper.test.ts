@@ -163,4 +163,27 @@ describe('stripHtmlTags', () => {
     const result = TextHelper.stripHtmlTags()
     expect(result).toEqual('')
   })
+
+  test('decodes HTML entities to their character equivalents', () => {
+    expect(TextHelper.stripHtmlTags('&quot;')).toBe('"')
+    expect(TextHelper.stripHtmlTags('&amp;')).toBe('&')
+    expect(TextHelper.stripHtmlTags('&lt;')).toBe('<')
+    expect(TextHelper.stripHtmlTags('&gt;')).toBe('>')
+  })
+
+  test('handles complex names with multiple HTML entities', () => {
+    expect(TextHelper.stripHtmlTags('John Fields j&quot;E&amp;D&lt;I&gt;')).toBe(
+      'John Fields j"E&D<I>',
+    )
+  })
+
+  test('handles names without HTML entities', () => {
+    expect(TextHelper.stripHtmlTags('John Doe')).toBe('John Doe')
+  })
+
+  test('handles mixed text with some HTML entities', () => {
+    expect(TextHelper.stripHtmlTags('Hello &amp; welcome to &lt;Canvas&gt;!')).toBe(
+      'Hello & welcome to <Canvas>!',
+    )
+  })
 })

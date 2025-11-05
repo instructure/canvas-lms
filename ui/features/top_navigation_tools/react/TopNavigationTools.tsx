@@ -61,58 +61,82 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
   const pinned_tools = props.tools.filter(tool => tool.pinned)
   const menu_tools = props.tools.filter(tool => !tool.pinned)
 
-  return (
-    <Flex as="div" gap="small" width="100%" height="100%" direction="row-reverse">
-      {menu_tools.length > 0 && (
-        <Flex.Item>
-          <Menu
-            placement="bottom end"
-            trigger={
-              <Tooltip renderTip={I18n.t('LTI Tools Menu')}>
-                {/* @ts-expect-error */}
-                <Button renderIcon={IconLtiLine} data-pendo="top-nav-menu-button" />
-              </Tooltip>
+  const a11yFixes = ENV.FEATURES?.top_navigation_placement_a11y_fixes
+
+  const menuToolsElement = menu_tools.length > 0 && (
+    <Flex.Item>
+      <Menu
+        placement="bottom end"
+        trigger={
+          <Tooltip renderTip={I18n.t('LTI Tools Menu')}>
+            <Button
+              renderIcon={IconLtiLine as any}
+              data-pendo="top-nav-menu-button"
+              aria-label={I18n.t('LTI Tools Menu')}
+            />
+          </Tooltip>
+        }
+        key="menu"
+        label={I18n.t('LTI Tools Menu')}
+      >
+        {menu_tools.map((tool: Tool) => {
+          return (
+            <Menu.Item
+              // @ts-expect-error
+              onSelect={(e, val) => handleToolClick(val, menu_tools, props.handleToolLaunch)}
+              key={tool.id}
+              value={tool.id}
+              label={I18n.t('Launch %{tool}', {tool: tool.title})}
+              data-pendo="top-nav-launch-tool-button"
+            >
+              <Flex direction="row" gap="small">
+                {getToolIcon(tool)}
+                <TruncateText>{tool.title}</TruncateText>
+              </Flex>
+            </Menu.Item>
+          )
+        })}
+      </Menu>
+    </Flex.Item>
+  )
+
+  const pinnedToolsElements = pinned_tools.map((tool: Tool) => {
+    return (
+      <Flex.Item key={tool.id}>
+        <Tooltip renderTip={tool.title}>
+          <IconButton
+            renderIcon={getToolIcon(tool)}
+            onClick={e =>
+              // @ts-expect-error
+              handleToolClick(e.target.dataset.toolId, pinned_tools, props.handleToolLaunch)
             }
-            key="menu"
-            label={I18n.t('LTI Tools Menu')}
-          >
-            {menu_tools.map((tool: Tool) => {
-              return (
-                <Menu.Item
-                  // @ts-expect-error
-                  onSelect={(e, val) => handleToolClick(val, menu_tools, props.handleToolLaunch)}
-                  key={tool.id}
-                  value={tool.id}
-                  label={I18n.t('Launch %{tool}', {tool: tool.title})}
-                  data-pendo="top-nav-launch-tool-button"
-                >
-                  <Flex direction="row" gap="small">
-                    {getToolIcon(tool)}
-                    <TruncateText>{tool.title}</TruncateText>
-                  </Flex>
-                </Menu.Item>
-              )
-            })}
-          </Menu>
-        </Flex.Item>
+            data-tool-id={tool.id}
+            screenReaderLabel={tool.title}
+          />
+        </Tooltip>
+      </Flex.Item>
+    )
+  })
+
+  return (
+    <Flex
+      as="div"
+      gap="small"
+      width="100%"
+      height="100%"
+      direction={a11yFixes ? undefined : 'row-reverse'}
+    >
+      {a11yFixes ? (
+        <>
+          {pinnedToolsElements}
+          {menuToolsElement}
+        </>
+      ) : (
+        <>
+          {menuToolsElement}
+          {pinnedToolsElements}
+        </>
       )}
-      {pinned_tools.map((tool: Tool) => {
-        return (
-          <Flex.Item key={tool.id}>
-            <Tooltip renderTip={tool.title}>
-              <IconButton
-                renderIcon={getToolIcon(tool)}
-                onClick={e =>
-                  // @ts-expect-error
-                  handleToolClick(e.target.dataset.toolId, pinned_tools, props.handleToolLaunch)
-                }
-                data-tool-id={tool.id}
-                screenReaderLabel={tool.title}
-              />
-            </Tooltip>
-          </Flex.Item>
-        )
-      })}
     </Flex>
   )
 }

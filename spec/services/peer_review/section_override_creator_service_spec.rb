@@ -87,6 +87,11 @@ RSpec.describe PeerReview::SectionOverrideCreatorService do
         override = service.call
         expect(override.unassign_item).to be(false)
       end
+
+      it "sets dont_touch_assignment to true" do
+        override = service.call
+        expect(override.dont_touch_assignment).to be(true)
+      end
     end
 
     context "with unassign_item set to true" do

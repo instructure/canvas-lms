@@ -20,8 +20,8 @@
 # NOTE: Indented gems are meant to indicate optional dependencies of parent gems
 
 gem "bootsnap", "~> 1.16", require: false
-gem "rails", ($canvas_rails == "7.2") ? "~> 7.2.0" : "~> 8.0.0"
-gem "rack", ($canvas_rails == "7.2") ? "~> 3.1.0" : "~> 3.2"
+gem "rails", "~> 8.0.0"
+gem "rack", "~> 3.2"
 gem "sqlite3", "~> 2.6"
 
 gem "switchman", "~> 4.0"

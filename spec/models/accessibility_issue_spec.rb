@@ -20,8 +20,6 @@
 describe AccessibilityIssue do
   subject { described_class.new }
 
-  it_behaves_like "it has a single accessibility context"
-
   describe "defaults" do
     it "sets the default workflow_state to active" do
       expect(subject.workflow_state).to eq "active"
@@ -31,29 +29,6 @@ describe AccessibilityIssue do
   describe "factories" do
     it "has a valid factory" do
       expect(accessibility_issue_model).to be_valid
-    end
-  end
-
-  describe "scopes" do
-    describe ".for_context" do
-      context "when context is valid" do
-        let(:wiki_page) { wiki_page_model }
-        let(:subject_for_context) { accessibility_issue_model(context: wiki_page) }
-
-        it "returns the correct record" do
-          expect(described_class.for_context(wiki_page)).to contain_exactly(subject_for_context)
-        end
-      end
-
-      context "when context is not valid" do
-        let(:invalid_context) { double("InvalidContext", id: 1) }
-
-        it "raises an error" do
-          expect { described_class.for_context(invalid_context) }.to(
-            raise_error(ArgumentError, "Unsupported context type: RSpec::Mocks::Double")
-          )
-        end
-      end
     end
   end
 

@@ -752,7 +752,7 @@ self.user,
     global_account_id = Shard.global_id_for(root_account_id, shard)
     InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{global_account_id}",
                                  short_stat: "message.deliver_per_account",
-                                 tags: { path_type:, root_account_id: global_account_id })
+                                 tags: { path_type: }.merge(Utils::InstStatsdUtils::Tags.tags_for(shard)))
 
     if check_acct.feature_enabled?(:notification_service)
       enqueue_to_sqs

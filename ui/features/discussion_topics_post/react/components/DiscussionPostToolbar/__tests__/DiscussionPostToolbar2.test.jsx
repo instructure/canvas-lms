@@ -117,11 +117,11 @@ describe('DiscussionPostToolbar', () => {
 
   describe('Assign To', () => {
     it('renders the Assign To button if user can manageAssignTo and in a course discussion', () => {
-      const {getByRole} = setup({
+      const {getByTestId} = setup({
         manageAssignTo: true,
         showAssignTo: true,
       })
-      expect(getByRole('button', {name: 'Assign To'})).toBeInTheDocument()
+      expect(getByTestId('manage-assign-to')).toBeInTheDocument()
     })
 
     it('does not render the Assign To button if in speedGrader', () => {
@@ -225,7 +225,7 @@ describe('DiscussionPostToolbar', () => {
         const {getByText} = setup({isAnnouncement: true}, null, {
           translationLanguages: {current: ['en', 'es']},
         })
-        expect(getByText('Open Translate')).toBeTruthy()
+        expect(getByText('Enable Translation')).toBeTruthy()
       })
     })
 
@@ -243,7 +243,7 @@ describe('DiscussionPostToolbar', () => {
           translationLanguages: {current: ['en', 'es']},
         })
 
-        expect(getByText('Open Translate')).toBeTruthy()
+        expect(getByText('Enable Translation')).toBeTruthy()
       })
 
       it('does render the translate button with improved text when the translation controls are on', () => {
@@ -252,7 +252,7 @@ describe('DiscussionPostToolbar', () => {
           showTranslationControl: true,
         })
 
-        expect(getByText('Close Translate')).toBeTruthy()
+        expect(getByText('Disable Translation')).toBeTruthy()
         expect(getByTestId('translate-button')).toHaveAttribute(
           'data-action-state',
           'disableTranslation',

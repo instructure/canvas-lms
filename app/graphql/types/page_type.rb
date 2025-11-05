@@ -30,5 +30,6 @@ module Types
     global_id_field :id
 
     field :title, String, null: true
+    field :todo_date, Types::DateTimeType, null: true
   end
 end

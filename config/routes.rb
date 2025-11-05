@@ -407,6 +407,12 @@ CanvasRails::Application.routes.draw do
     post "assignments/publish/quiz"   => "assignments#publish_quizzes"
     post "assignments/unpublish/quiz" => "assignments#unpublish_quizzes"
 
+    # Wildcard routes for AMS paths
+    # The controller checks ams_integration_enabled? and renders AMS or falls back to regular quiz views
+    get "quizzes/activity_builder/*path" => "quizzes/quizzes#index"
+    get "quizzes/take/*path" => "quizzes/quizzes#index"
+    get "quizzes/reports/*path" => "quizzes/quizzes#index"
+
     post "quizzes/new" => "quizzes/quizzes#new" # use POST instead of GET (not idempotent)
     resources :quizzes, controller: "quizzes/quizzes", except: :new do
       get :managed_quiz_data
@@ -552,6 +558,7 @@ CanvasRails::Application.routes.draw do
     resources :accessibility_issues, only: [:update, :show]
 
     resources :ai_experiences, only: %i[index create new show edit update destroy]
+    resources :ai_experiences, only: %i[index show new edit]
   end
 
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
@@ -626,9 +633,7 @@ CanvasRails::Application.routes.draw do
   end
 
   resources :assessment_questions do
-    get "files/:id/download" => "files#assessment_question_show", :as => :map, :download => "1"
-    get "files/:id/preview" => "files#assessment_question_show", :preview => "1"
-    get "files/:id/:verifier" => "files#assessment_question_show", :as => :verified_file, :download => "1"
+    concerns :files
   end
 
   resources :eportfolios, except: :index do
@@ -1249,9 +1254,16 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/ai_experiences", action: :create
       get "courses/:course_id/ai_experiences/new", action: :new, as: "new_course_ai_experience"
       get "courses/:course_id/ai_experiences/:id", action: :show, as: "course_ai_experience"
-      get "courses/:course_id/ai_experiences/:id/edit", action: :edit, as: "edit_course_ai_experience"
+      get "courses/:course_id/ai_experiences/:id/edit", action: :edit, as: "course_ai_experience_edit"
       put "courses/:course_id/ai_experiences/:id", action: :update
-      delete "courses/:course_id/ai_experiences/:id", action: :destroy
+      delete "courses/:course_id/ai_experiences/:id", action: :destroy, as: "course_ai_experience_destroy"
+      post "courses/:course_id/ai_experiences/:id/continue_conversation", action: :continue_conversation, as: "course_ai_experience_continue_conversation"
+      get "courses/:course_id/ai_experiences/:id/messages", action: :messages, as: "course_ai_experience_messages"
+    end
+
+    scope(controller: :microfrontends_release_tag_override) do
+      get "microfrontends/release_tag_override", action: :create, as: :microfrontends_release_tag_override
+      delete "microfrontends/release_tag_override", action: :destroy
     end
 
     scope(controller: :account_calendars_api) do
@@ -1885,7 +1897,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :account_reports) do
       get "accounts/:account_id/reports/:report", action: :index
       get "accounts/:account_id/reports", action: :available_reports
-      get "accounts/:account_id/reports/:report/:id", action: :show
+      get "accounts/:account_id/reports/:report/:id", action: :show, as: "account_report"
       post "accounts/:account_id/reports/:report", action: :create, as: "account_create_report"
       delete "accounts/:account_id/reports/:report/:id", action: :destroy
       put "accounts/:account_id/reports/:report/:id/abort", action: :abort
@@ -2074,6 +2086,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/lti_registrations/:id/overlay_history", action: :overlay_history
       get "accounts/:account_id/lti_registrations/:id/history", action: :history, as: :lti_registration_history
       get "accounts/:account_id/lti_registration_by_client_id/:client_id", action: :show_by_client_id
+      put "accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id/apply", action: :apply_registration_update_request, as: "apply_lti_registration_update_request"
       put "accounts/:account_id/lti_registrations/:id", action: :update
       put "accounts/:account_id/lti_registrations/:id/reset", action: :reset
       post "accounts/:account_id/lti_registrations/:id/bind", action: :bind

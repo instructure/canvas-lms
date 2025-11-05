@@ -385,4 +385,8 @@ Rails.configuration.after_initialize do
         singleton: "Canvas::LiveEvents#heartbeat" }
     )
   end
+
+  Delayed::Periodic.cron "ScheduledPost#process_scheduled_posts", "*/30 * * * *" do
+    with_each_shard_by_database(ScheduledPost, :process_scheduled_posts)
+  end
 end

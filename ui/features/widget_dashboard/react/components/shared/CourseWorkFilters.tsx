@@ -68,18 +68,22 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
     [userCourses],
   )
 
-  const dateFilterOptions: DateFilterConfig[] = useMemo(() => {
-    const options: DateFilterConfig[] = [
+  const dateFilterOptions: DateFilterConfig[] = useMemo(
+    () => [
       {id: 'next3days', label: I18n.t('Next 3 days')},
       {id: 'next7days', label: I18n.t('Next 7 days')},
       {id: 'next14days', label: I18n.t('Next 14 days')},
+    ],
+    [],
+  )
+
+  const statusFilterOptions: DateFilterConfig[] = useMemo(
+    () => [
       {id: 'missing', label: I18n.t('Missing')},
       {id: 'submitted', label: I18n.t('Submitted')},
-    ]
-    return statisticsOnly
-      ? options.filter(opt => opt.id !== 'missing' && opt.id !== 'submitted')
-      : options
-  }, [statisticsOnly])
+    ],
+    [],
+  )
 
   return (
     <Flex direction={isMobile ? 'column' : 'row'} wrap="wrap" gap="small">
@@ -88,6 +92,7 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
           renderLabel={I18n.t('Course filter:')}
           value={selectedCourse}
           onChange={onCourseChange}
+          data-testid="course-filter-select"
         >
           {courseOptions.map(option => (
             <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
@@ -98,15 +103,27 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
       </Flex.Item>
       <Flex.Item shouldGrow overflowX="visible" overflowY="visible">
         <SimpleSelect
-          renderLabel={I18n.t('Date filter:')}
+          renderLabel={I18n.t('Assignment filter:')}
           value={selectedDateFilter}
           onChange={onDateFilterChange}
+          data-testid="date-filter-select"
         >
-          {dateFilterOptions.map(option => (
-            <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
-              {option.label}
-            </SimpleSelect.Option>
-          ))}
+          <SimpleSelect.Group renderLabel={I18n.t('Filter by date')}>
+            {dateFilterOptions.map(option => (
+              <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
+                {option.label}
+              </SimpleSelect.Option>
+            ))}
+          </SimpleSelect.Group>
+          {!statisticsOnly && (
+            <SimpleSelect.Group renderLabel={I18n.t('Filter by submission status')}>
+              {statusFilterOptions.map(option => (
+                <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
+                  {option.label}
+                </SimpleSelect.Option>
+              ))}
+            </SimpleSelect.Group>
+          )}
         </SimpleSelect>
       </Flex.Item>
     </Flex>

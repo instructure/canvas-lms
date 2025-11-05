@@ -27,7 +27,7 @@
   end
 %>
 <%# include active tab status in cache key so that the HTML is always accurate %>
-<% cache([ContextExternalTool.global_navigation_menu_render_cache_key(@domain_root_account, granted_permissions), tools.pluck(:current_page)]) do %>
+<% cache([ContextExternalTool.global_navigation_menu_render_cache_key(@domain_root_account, granted_permissions), tools.pluck(:current_page), I18n.locale]) do %>
   <% tools.each do |tool_details|
         tool = tool_details[:tool]
         new_tab = tool_details[:new_tab]
@@ -43,7 +43,7 @@
           <img src="<%= tool.extension_setting(:global_navigation, :icon_url) %>" alt="<%= tool.name %>" class="lti_tool_icon_large"/>
         <% end %>
         <div class="menu-item__text">
-          <%= tool.label_for(:global_navigation) %>
+          <%= tool.label_for(:global_navigation, I18n.locale) %>
         </div>
       </a>
     </li>

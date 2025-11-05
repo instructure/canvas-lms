@@ -151,4 +151,6 @@ export interface EnvGradebookSpeedGrader {
     anonymous_id?: string
   }
   ENTRY_ID: string
+
+  use_comment_library_v2?: boolean
 }

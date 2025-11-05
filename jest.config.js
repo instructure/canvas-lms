@@ -72,6 +72,7 @@ module.exports = {
     'jest-canvas-mock',
     '<rootDir>/jest/jest-setup.js',
     '<rootDir>/jest/punycodeWarningFilter.js',
+    '<rootDir>/jest/fast-check-setup.js',
   ],
   setupFilesAfterEnv: setupFilesAfterEnv,
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],

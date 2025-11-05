@@ -25,8 +25,23 @@ class Lti::RegistrationUpdateRequest < ActiveRecord::Base
 
   self.table_name = "lti_registration_update_requests"
 
-  def as_json
-    super(include_root: false).merge(
+  scope :active, -> { where(accepted_at: nil, rejected_at: nil) }
+  scope :pending, -> { active }
+
+  def applied?
+    accepted_at.present?
+  end
+
+  def rejected?
+    rejected_at.present?
+  end
+
+  def pending?
+    accepted_at.blank? && rejected_at.blank?
+  end
+
+  def as_json(options = {})
+    super({ include_root: false }.merge(options)).merge(
       {
         # TODO: switch this on type of underlying registration
         internal_lti_configuration: Lti::IMS::Registration.to_internal_lti_configuration(lti_ims_registration)

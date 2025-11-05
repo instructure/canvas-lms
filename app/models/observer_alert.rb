@@ -83,7 +83,7 @@ class ObserverAlert < ActiveRecord::Base
 
   def self.create_assignment_missing_alerts
     alerts = []
-    GuardRail.activate(:secondary) do
+    GuardRail.activate(:report) do
       last_user_id = nil
       now = Time.now.utc
       loop do

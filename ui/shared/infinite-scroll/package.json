@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./react/components/InfiniteScroll.jsx"
+  "main": "./react/components/InfiniteScroll.jsx",
+  "owner": "CFA"
 }

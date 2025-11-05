@@ -95,7 +95,7 @@ describe Lti::ContextControlService do
 
       it "raises an error with control validation messages" do
         expect { subject }.to raise_error(Lti::ContextControlErrors) do |error|
-          expect(error.message).to include("Context must have either an account or a course, not both")
+          expect(error.message).to include("Exactly one context must be present")
         end
       end
     end

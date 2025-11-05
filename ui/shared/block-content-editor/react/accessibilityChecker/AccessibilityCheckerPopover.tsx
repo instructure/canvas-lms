@@ -137,6 +137,7 @@ export const AccessibilityCheckerPopover = ({
       shouldReturnFocus
       shouldCloseOnDocumentClick={true}
       renderTrigger={renderTrigger}
+      screenReaderLabel={I18n.t('Accessibility checker')}
     >
       <View as="div" width="30rem">
         <Flex direction="column" justifyItems="space-between" padding="small medium">

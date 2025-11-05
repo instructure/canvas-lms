@@ -23,6 +23,7 @@ import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import '@testing-library/jest-dom'
 import DashboardNotifications from '../DashboardNotifications'
+import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
 
 const mockNotifications = [
   {
@@ -85,6 +86,7 @@ describe('DashboardNotifications', () => {
   })
 
   beforeEach(() => {
+    clearWidgetDashboardCache()
     queryClient = new QueryClient({
       defaultOptions: {
         queries: {

@@ -19,6 +19,12 @@
 
 module ActiveModelErrors
   def to_hash(full_messages = false)
+    if Rails.env.local?
+      raise "ActiveModel::Errors#to_hash is deprecated, use Api::Errors::Reporter.to_json instead"
+    else
+      Sentry.capture_message("ActiveModel::Errors#to_hash is deprecated, use Api::Errors::Reporter.to_json instead", level: :warning)
+    end
+
     message_method = full_messages ? :full_message : :message
     result = group_by_attribute.transform_values do |errors|
       errors.map do |error|

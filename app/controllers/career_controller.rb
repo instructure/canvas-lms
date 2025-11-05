@@ -33,7 +33,7 @@ class CareerController < ApplicationController
     js_env(CANVAS_CAREER: env)
     js_env(MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size)
 
-    config = CanvasCareer::Config.new(@domain_root_account)
+    config = CanvasCareer::Config.new(@domain_root_account, session)
     if app == CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER
       remote_env(canvas_career_learning_provider: config.learning_provider_app_launch_url)
     elsif app == CanvasCareer::Constants::App::CAREER_LEARNER
@@ -61,6 +61,9 @@ class CareerController < ApplicationController
       horizon_bulk_metadata_import
       horizon_manual_dashboard_builder
       horizon_dark_career_theme_in_learning_provider
+      horizon_learning_library
+      horizon_course_navigation
+      horizon_course_redesign
     ].index_with { |feature| @domain_root_account.feature_enabled?(feature) }
   end
 end

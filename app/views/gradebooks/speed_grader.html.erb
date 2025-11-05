@@ -43,55 +43,53 @@
   <nav id="gradebook_header_container">
     <%= form_tag({ :controller => :gradebooks, :course_id => @context.id, :action => :update_submission }, :class => "speed_grader_nav_form") do %>
     <div id="gradebook_header" class="subheadContent" style="display:none;">
-      <div class="subheadContent subheadContent--flex-start">
-        <div id="speedgrader-icons" class="gradebookActions">
-          <a href="<%= polymorphic_url([@context, :gradebook]) %>" id="speed_grader_gradebook_link" class="Button Button--icon-action-rev gradebookActions__Button gradebook-icon-link" title="<%= t('Gradebook') %>">
-            <i class="icon-gradebook" aria-hidden="true"></i>
-            <span class="screenreader-only" aria-hidden="true"><%= t("Gradebook") %></span>
-          </a>
+      <div id="speedgrader-icons" class="gradebookActions subheadContent subheadContent--flex-start">
+        <a href="<%= polymorphic_url([@context, :gradebook]) %>" id="speed_grader_gradebook_link" class="Button Button--icon-action-rev gradebookActions__Button gradebook-icon-link" title="<%= t('Gradebook') %>">
+          <i class="icon-gradebook" aria-hidden="true"></i>
+          <span class="screenreader-only" aria-hidden="true"><%= t("Gradebook") %></span>
+        </a>
+        <span id="speed_grader_post_grades_menu_mount_point"></span>
+        <span id="speed_grader_settings_mount_point"></span>
+      </div>
 
-          <span id="speed_grader_post_grades_menu_mount_point"></span>
-          <span id="speed_grader_settings_mount_point"></span>
+      <div class="assignmentDetails">
+        <a id="assignment_url" role="button" href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>">
+          <h2 class="assignmentDetails__Title"><%= @assignment.title %></h2>
+        </a>
+        <p class="assignmentDetails__Info">
+          <span><%= translated_due_date_for_speedgrader(@assignment) %></span>
+          - <a id="context_title" href="<%= context_url(@context, :context_url) %>"><%= @context.short_name %></a>
+        </p>
+      </div>
+
+      <div class="statsMetric subheadContent">
+        <div class="statsMetric__Item">
+          <div class="statsMetric__Item-value" id="x_of_x_graded"></div>
+          <div class="statsMetric__Item-label"><%= t("Graded") %></div>
         </div>
-        <div class="assignmentDetails">
-          <a id="assignment_url" role="button" href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>">
-            <h2 class="assignmentDetails__Title"><%= @assignment.title %></h2>
-          </a>
-          <p class="assignmentDetails__Info">
-            <span><%= translated_due_date_for_speedgrader(@assignment) %></span>
-            - <a id="context_title" href="<%= context_url(@context, :context_url) %>"><%= @context.short_name %></a>
-          </p>
+        <div id="average-score-wrapper" class="statsMetric__Item" tabindex="0">
+          <div class="statsMetric__Item-value" id='average_score'>0.0</div>
+          <div class="statsMetric__Item-label"><%= t("Average") %></div>
+        </div>
+        <div class="statsMetric__Item">
+          <div class="statsMetric__Item-value" id="x_of_x_students_frd"></div>
+          <div class="statsMetric__Item-label" id="gradee"></div>
         </div>
       </div>
-      <div class="subheadContent subheadContent--flex-end">
-        <div class="statsMetric">
-          <div class="statsMetric__Item">
-            <div class="statsMetric__Item-value" id="x_of_x_graded"></div>
-            <div class="statsMetric__Item-label"><%= t("Graded") %></div>
+
+      <div class="studentSelection subheadContent--flex-end">
+        <button id="prev-student-button" class="Button Button--icon-action-rev gradebookMoveToNext prev" type="button" aria-label="<%= t("Previous") %>">
+          <i class="icon-arrow-left prev" aria-hidden="true"></i>
+        </button>
+        <% if service_enabled?(:avatars) %>
+          <div id="avatar" class="gradebookAvatar">
+            <img src="/images/blank.png" id="avatar_image" alt=""/>
           </div>
-          <div id="average-score-wrapper" class="statsMetric__Item" tabindex="0">
-            <div class="statsMetric__Item-value" id='average_score'>0.0</div>
-            <div class="statsMetric__Item-label"><%= t("Average") %></div>
-          </div>
-          <div class="statsMetric__Item">
-            <div class="statsMetric__Item-value" id="x_of_x_students_frd"></div>
-            <div class="statsMetric__Item-label" id="gradee"></div>
-          </div>
-        </div>
-        <div class="studentSelection">
-          <button id="prev-student-button" class="Button Button--icon-action-rev gradebookMoveToNext prev" type="button" aria-label="<%= t("Previous") %>">
-            <i class="icon-arrow-left prev" aria-hidden="true"></i>
-          </button>
-          <% if service_enabled?(:avatars) %>
-            <div id="avatar" class="gradebookAvatar">
-              <img src="/images/blank.png" id="avatar_image" alt=""/>
-            </div>
-          <% end %>
-          <div id="combo_box_container"></div>
-          <button id="next-student-button" class="Button Button--icon-action-rev gradebookMoveToNext next" type="button" aria-label="<%= t("Next") %>">
-            <i class="icon-arrow-right next" aria-hidden="true"></i>
-          </button>
-        </div>
+        <% end %>
+        <div id="combo_box_container"></div>
+        <button id="next-student-button" class="Button Button--icon-action-rev gradebookMoveToNext next" type="button" aria-label="<%= t("Next") %>">
+          <i class="icon-arrow-right next" aria-hidden="true"></i>
+        </button>
       </div>
     <% end %>
     </div>
@@ -106,7 +104,7 @@
     <span><%= t "Notice: The grading period is closed for this student" %></span>
   </figure>
   <section id="full_width_container" style="display:none; flex: 1;">
-    <div id="left_side" class="full_height">
+    <div id="left_side">
     <div id="screen-capture-indicator-mount-point"></div>
       <div id="left_side_inner">
         <div id="no_annotation_warning" class="alert speedgrader_alert">
@@ -153,9 +151,10 @@
       </div>
     </div>
     <div id="speed_grader_rubric_assessment_tray_wrapper"></div>
-    <div id="right_side" class="full_height">
+    <div id="right_side">
       <div id="not_gradeable_message"><%= t("This submission has already been graded and is ready for moderation.") %></div>
-      <div class="full_height" id="width_resizer"></div>
+      <div class="width_resizer full_height" id="width_resizer_ew"></div>
+      <div class="width_resizer full_height" id="width_resizer_ns"></div>
       <div class=right_side_content>
         <div id="rightside_inner" class="full_height">
           <div class="secondary_mount_point_container">

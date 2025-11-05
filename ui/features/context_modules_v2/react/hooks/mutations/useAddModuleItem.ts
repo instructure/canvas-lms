@@ -38,6 +38,7 @@ const initialState: FormState = {
   externalTool: {url: '', name: '', newTab: false, selectedToolId: '', isUrlValid: false},
   newItem: {name: '', assignmentGroup: '', file: null, folder: ''},
   selectedItemId: '',
+  selectedItem: null,
   tabIndex: 0,
   isLoading: false,
 }
@@ -49,6 +50,7 @@ export type Action =
   | {type: 'SET_EXTERNAL_TOOL'; field: keyof ExternalToolUrl; value: string | boolean}
   | {type: 'SET_NEW_ITEM'; field: keyof NewItem; value: string | File | null}
   | {type: 'SET_SELECTED_ITEM_ID'; value: string}
+  | {type: 'SET_SELECTED_ITEM'; value: ContentItem | null}
   | {type: 'SET_TAB_INDEX'; value: number}
   | {type: 'SET_LOADING'; value: boolean}
   | {type: 'RESET'}
@@ -78,6 +80,8 @@ function reducer(state: FormState, action: Action): FormState {
       }
     case 'SET_SELECTED_ITEM_ID':
       return {...state, selectedItemId: action.value}
+    case 'SET_SELECTED_ITEM':
+      return {...state, selectedItem: action.value}
     case 'SET_TAB_INDEX':
       return {...state, tabIndex: action.value}
     case 'SET_LOADING':
@@ -137,7 +141,8 @@ export function useAddModuleItem({
     const selectedItemId =
       itemType === 'external_tool' ? state.externalTool.selectedToolId : state.selectedItemId
 
-    const selectedItem = contentItems.find(item => item.id === selectedItemId) || null
+    const selectedItem =
+      state.selectedItem || contentItems.find(item => item.id === selectedItemId) || null
 
     const {name, url, newTab} = itemType === 'external_tool' ? externalTool : externalUrl
 

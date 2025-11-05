@@ -347,6 +347,9 @@
     "clubs_suit_c1ffedff": {
         "message": "Clubes (Fato)"
     },
+    "collab_575ac7bc": {
+        "message": "Colab"
+    },
     "collaborations_5c56c15f": {
         "message": "Colaborações"
     },
@@ -1271,6 +1274,9 @@
     "latvian_2bbb6aab": {
         "message": "Letão"
     },
+    "learn_ad3b3505": {
+        "message": "Aprender"
+    },
     "learn_more_about_adjacent_links_2cb9762c": {
         "message": "Saiba mais sobre ligações adjacentes"
     },
@@ -1697,6 +1703,9 @@
     "operators_a2ef9a93": {
         "message": "Operadores"
     },
+    "options_3ab0ea65": {
+        "message": "Opções"
+    },
     "or_9b70ccaa": {
         "message": "Ou"
     },
@@ -1960,6 +1969,9 @@
     },
     "remove_link_d1f2f4d0": {
         "message": "Remover ligação"
+    },
+    "remove_studio_media_f913e502": {
+        "message": "Remover o Studio Media"
     },
     "replace_all_d3d68b3": {
         "message": "Substituir tudo"
@@ -2482,6 +2494,9 @@
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Embora o seu vídeo tenha o título correto no navegador, não o atualizámos na base de dados."
+    },
+    "thumbnail_e0de666f": {
+        "message": "Lista"
     },
     "timebar_a4d18443": {
         "message": "Barra de tempo"

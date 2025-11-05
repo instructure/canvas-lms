@@ -4,5 +4,6 @@
   "scripts": {
     "dev": "vite build --mode development --watch",
     "build": "vite build"
-  }
+  },
+  "owner": "LX"
 }

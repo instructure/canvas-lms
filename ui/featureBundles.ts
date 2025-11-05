@@ -29,6 +29,7 @@ const featureBundles: {
   accessibility_checker: () => import('./features/accessibility/accessibility_checker/index'),
   accessibility_issues: () => import('./features/accessibility/accessibility_issues/index'),
   admin_split: () => import('./features/admin_split/index'),
+  ai_experiences_show: () => import('./features/ai_experiences_show/index'),
   analytics_hub: () => import('./features/analytics_hub/index'),
   announcements_on_home_page: () => import('./features/announcements_on_home_page/index'),
   announcements: () => import('./features/announcements/index'),

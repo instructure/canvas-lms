@@ -1052,11 +1052,19 @@ class AccountsController < ApplicationController
 
             enable_horizon = params.dig(:account, :settings, :horizon_account, :value)
             unless enable_horizon.nil?
+              horizon_enabled = value_to_boolean(enable_horizon)
               existing_account_ids = @account.root_account.settings[:horizon_account_ids] || []
-              if value_to_boolean(enable_horizon) && existing_account_ids.length + 1 > HORIZON_MAX_ACCOUNTS
+
+              if horizon_enabled && existing_account_ids.length + 1 > HORIZON_MAX_ACCOUNTS
                 @account.errors.add(:horizon_account, t("You cannot enable horizon_account on more than %{max_accounts} accounts", max_accounts: HORIZON_MAX_ACCOUNTS))
               else
-                @account.horizon_account = value_to_boolean(enable_horizon)
+                @account.horizon_account = horizon_enabled
+
+                if horizon_enabled && existing_account_ids.empty?
+                  @account.delay(singleton: "provision_horizon_tenants:#{@domain_root_account.uuid}").provision_horizon_tenants(@domain_root_account, @current_user)
+                elsif !horizon_enabled && existing_account_ids.length == 1
+                  @account.delay(singleton: "delete_horizon_tenants:#{@domain_root_account.uuid}").delete_horizon_tenants(@domain_root_account, @current_user)
+                end
               end
             end
 
@@ -1471,17 +1479,21 @@ class AccountsController < ApplicationController
 
   def acceptable_use_policy
     TermsOfService.ensure_terms_for_account(@domain_root_account)
-    if request.format.html?
-      # disable navigation_header JavaScript bundle (in _head.html.erb) to
-      # prevent console errors caused by missing DOM elements in this bare layout
-      @headers = false
-      # disable custom js/css
-      @exclude_account_css = @exclude_account_js = true
-    end
+    external_url = TermsOfService.external_url(@domain_root_account)
     respond_to do |format|
-      format.html { render html: "", layout: "bare" }
+      format.html do
+        if external_url
+          redirect_to external_url, allow_other_host: true, status: :found # HTTP 302
+        else
+          # disable navigation_header JavaScript bundle (in _head.html.erb) to
+          # prevent console errors caused by missing DOM elements in this bare layout
+          @headers = false
+          # disable custom js/css
+          @exclude_account_css = @exclude_account_js = true
+          render html: "", layout: "bare"
+        end
+      end
       format.json do
-        external_url = TermsOfService.external_url(@domain_root_account)
         if external_url
           render json: { redirectUrl: external_url }, status: :ok
         else

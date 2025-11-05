@@ -247,6 +247,83 @@ describe('RubricForm Tests', () => {
       })
     })
 
+    it('preserves masteryPoints when saving a rubric with outcome criteria', async () => {
+      const saveRubricSpy = jest.spyOn(RubricFormQueries, 'saveRubric').mockImplementation(() =>
+        Promise.resolve({
+          rubric: {
+            id: '1',
+            criteriaCount: 1,
+            pointsPossible: 10,
+            title: 'Rubric with Outcome',
+            criteria: [
+              {
+                id: '2',
+                description: 'Outcome Criterion',
+                points: 5,
+                criterionUseRange: false,
+                masteryPoints: 3.5,
+                learningOutcomeId: 'outcome_123',
+                ratings: [],
+              },
+            ],
+          },
+          rubricAssociation: {
+            hidePoints: false,
+            hideScoreTotal: false,
+            hideOutcomeResults: false,
+            id: '1',
+            useForGrading: true,
+            associationType: 'Assignment',
+            associationId: '1',
+          },
+        }),
+      )
+
+      // Load a rubric with an outcome criterion that has masteryPoints
+      queryClient.setQueryData(['fetch-rubric', '1'], {
+        ...RUBRICS_QUERY_RESPONSE,
+        criteria: [
+          {
+            id: '2',
+            points: 5,
+            description: 'Outcome Criterion',
+            longDescription: '',
+            ignoreForScoring: false,
+            masteryPoints: 3.5,
+            criterionUseRange: false,
+            outcome: {
+              displayName: 'Test Outcome',
+              title: 'Test Outcome Title',
+            },
+            learningOutcomeId: 'outcome_123',
+            ratings: [
+              {
+                id: '1',
+                description: 'Excellent',
+                longDescription: '',
+                points: 5,
+              },
+            ],
+          },
+        ],
+      })
+
+      const {getByTestId} = renderComponent({rubricId: '1'})
+      const titleInput = getByTestId('rubric-form-title')
+      fireEvent.change(titleInput, {target: {value: 'Rubric with Outcome'}})
+      fireEvent.click(getByTestId('save-rubric-button'))
+
+      await waitFor(() => {
+        expect(getSRAlert()).toContain('Rubric saved successfully')
+      })
+
+      // Verify saveRubric was called with masteryPoints preserved
+      expect(saveRubricSpy).toHaveBeenCalledTimes(1)
+      const rubricArg = saveRubricSpy.mock.calls[0][0]
+      expect(rubricArg.criteria[0].masteryPoints).toBe(3.5)
+      expect(rubricArg.criteria[0].learningOutcomeId).toBe('outcome_123')
+    })
+
     it('does not display save as draft button if rubric has associations', () => {
       queryClient.setQueryData(['fetch-rubric', '1'], {
         ...RUBRICS_QUERY_RESPONSE,

@@ -824,10 +824,10 @@ describe "submissions/show" do
       it "renders asset report text entry status container with correct data attributes" do
         render "submissions/show"
 
-        expect(response.body).to include('id="asset_report_text_entry_status_container"')
-        expect(response.body).to match(/id="asset_report_text_entry_status_container"[^>]*data-attempt="#{submission.attempt}"/)
-        expect(response.body).to match(/id="asset_report_text_entry_status_container"[^>]*data-submission-id="#{submission.id}"/)
-        expect(response.body).to match(/id="asset_report_text_entry_status_container"[^>]*data-submission-type="online_text_entry"/)
+        expect(response.body).to include('id="asset_report_status_container"')
+        expect(response.body).to match(/id="asset_report_status_container"[^>]*data-attempt="#{submission.attempt}"/)
+        expect(response.body).to match(/id="asset_report_status_container"[^>]*data-submission-id="#{submission.id}"/)
+        expect(response.body).to match(/id="asset_report_status_container"[^>]*data-submission-type="online_text_entry"/)
       end
 
       it "renders asset report modal mount point" do
@@ -853,7 +853,7 @@ describe "submissions/show" do
       it "does not render text entry status container" do
         render "submissions/show"
 
-        expect(response.body).not_to include('id="asset_report_text_entry_status_container"')
+        expect(response.body).not_to include('id="asset_report_status_container"')
       end
 
       it "still renders asset report modal mount point" do

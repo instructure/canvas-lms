@@ -1340,6 +1340,20 @@ describe AccountsController do
       expect(assigns(:exclude_account_js)).to be_nil
       expect(assigns(:headers)).to be_nil
     end
+
+    it "redirects to external url when configured" do
+      allow(TermsOfService).to receive(:external_url).and_return("https://example.com/aup")
+      get :acceptable_use_policy, format: :html
+      expect(response).to have_http_status(:found) # 302
+      expect(response).to redirect_to("https://example.com/aup")
+    end
+
+    it "returns redirectUrl in JSON when configured" do
+      allow(TermsOfService).to receive(:external_url).and_return("https://example.com/aup")
+      get :acceptable_use_policy, format: :json
+      expect(response).to be_successful
+      expect(response.parsed_body["redirectUrl"]).to eq("https://example.com/aup")
+    end
   end
 
   describe "#settings" do

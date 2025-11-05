@@ -23,17 +23,6 @@ unless $canvas_tasks_loaded
   namespace :canvas do
     desc "Compile javascript and css assets."
     task :compile_assets do # rubocop:disable Rails/RakeEnvironment
-      # running :environment as a prerequisite task is necessary even if we don't
-      # need it for this task: forked processes (through Parallel) that invoke other
-      # Rake tasks may require the Rails environment and for some reason, Rake will
-      # not re-run the environment task when forked
-      begin
-        require_relative "../../config/environment"
-      rescue
-        # we may be running in a reduced environment with just basic code in order to
-        # build a release tarball; just ignore
-      end
-
       # opt out
       npm_install = ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
       build_api_docs = ENV["COMPILE_ASSETS_API_DOCS"] != "0"

@@ -66,7 +66,7 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
       go_to_modules
 
       add_item_button(@module.id).click
-      click_INSTUI_Select_option(add_existing_item_select_selector, "Assignment 1")
+      search_and_select_existing_item("Assignment 1")
       add_item_modal_add_item_button.click
       wait_for_ajaximations
 
@@ -87,7 +87,7 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
       click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
       wait_for_ajaximations
 
-      click_INSTUI_Select_option(add_existing_item_select_selector, "Quiz 1")
+      search_and_select_existing_item("Quiz 1")
       add_item_modal_add_item_button.click
       wait_for_ajaximations
 
@@ -115,14 +115,14 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
       go_to_modules
 
       add_item_button(@module.id).click
-      click_INSTUI_Select_option(add_existing_item_select_selector, "Assignment With Due Date")
+      search_and_select_existing_item("Assignment With Due Date")
       add_item_modal_add_item_button.click
       wait_for_ajaximations
 
       add_item_button(@module.id).click
       click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
       wait_for_ajaximations
-      click_INSTUI_Select_option(add_existing_item_select_selector, "Quiz With Due Date")
+      search_and_select_existing_item("Quiz With Due Date")
       add_item_modal_add_item_button.click
       wait_for_ajaximations
 
@@ -151,7 +151,7 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
       go_to_modules
 
       add_item_button(@module.id).click
-      click_INSTUI_Select_option(add_existing_item_select_selector, "Assignment1")
+      search_and_select_existing_item("Assignment1")
       add_item_modal_add_item_button.click
       wait_for_ajaximations
 
@@ -187,7 +187,7 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
       click_INSTUI_Select_option(new_item_type_select_selector, "Page")
       wait_for_ajaximations
 
-      click_INSTUI_Select_option(add_existing_item_select_selector, "Wiki Page 1")
+      search_and_select_existing_item("Wiki Page 1")
       add_item_modal_add_item_button.click
       wait_for_ajaximations
 
@@ -208,7 +208,7 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
       click_INSTUI_Select_option(new_item_type_select_selector, "Discussion")
       wait_for_ajaximations
 
-      click_INSTUI_Select_option(add_existing_item_select_selector, "Discussion Topic 1")
+      search_and_select_existing_item("Discussion Topic 1")
       add_item_modal_add_item_button.click
       wait_for_ajaximations
 
@@ -269,7 +269,7 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
       click_INSTUI_Select_option(new_item_type_select_selector, "File")
       wait_for_ajaximations
 
-      click_INSTUI_Select_option(add_existing_item_select_selector, "file")
+      search_and_select_existing_item("file")
       add_item_modal_add_item_button.click
       wait_for_ajaximations
 
@@ -305,12 +305,13 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
       click_INSTUI_Select_option(new_item_type_select_selector, "External Tool")
       wait_for_ajaximations
 
-      # Select external tool from the dropdown
+      # External tools use a regular select, not the async search select
       click_INSTUI_Select_option(add_existing_item_select_selector, @external_tool.name)
       wait_for_ajaximations
 
       new_item_name = "External Tool Page Name"
 
+      wait_for(method: nil, timeout: 5) { external_tool_page_name_input }
       replace_content(external_tool_page_name_input, new_item_name)
 
       # Click Add Item
@@ -343,7 +344,7 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
         add_item_button(@module.id).click
         wait_for_ajaximations
 
-        click_INSTUI_Select_option(add_existing_item_select_selector, "Assignment 1")
+        search_and_select_existing_item("Assignment 1")
         add_item_modal_add_item_button.click
         wait_for_ajaximations
 
@@ -518,7 +519,7 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
 
       click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
       wait_for_ajaximations
-      click_INSTUI_Select_option(add_existing_item_select_selector, @new_quiz.title)
+      search_and_select_existing_item(@new_quiz.title)
 
       add_item_modal_add_item_button.click
       wait_for_ajaximations

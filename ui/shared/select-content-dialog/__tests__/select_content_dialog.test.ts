@@ -312,6 +312,11 @@ describe('SelectContentDialog: Dialog options', () => {
     jest.restoreAllMocks()
   })
 
+  it('opens a dialog with the close button focused', () => {
+    selectContentDialog({})
+    expect($('.ui-dialog-titlebar-close').is(':focus')).toBe(true)
+  })
+
   it('opens a dialog with the width option', () => {
     const width = 500
     selectContentDialog({width})

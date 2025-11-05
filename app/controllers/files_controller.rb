@@ -134,7 +134,6 @@ class FilesController < ApplicationController
 
   before_action :require_user, only: :create_pending
   before_action :require_context, except: %i[
-    assessment_question_show
     image_thumbnail
     show_thumbnail
     create_pending
@@ -469,17 +468,6 @@ class FilesController < ApplicationController
 
       render html: "".html_safe, layout: true
     end
-  end
-
-  def assessment_question_show
-    @context = AssessmentQuestion.find(params[:assessment_question_id])
-    @attachment = @context.attachments.find(params[:id])
-    @skip_crumb = true
-    if @attachment.deleted?
-      flash[:notice] = t "notices.deleted", "The file %{display_name} has been deleted", display_name: @attachment.display_name
-      return redirect_to dashboard_url
-    end
-    show
   end
 
   # @API Get public inline preview url

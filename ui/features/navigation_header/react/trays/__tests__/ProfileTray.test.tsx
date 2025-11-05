@@ -111,6 +111,11 @@ describe('ProfileTray', () => {
     domGetByText(elt, '12 unread.')
   })
 
+  it('renders the Accessibility Settings section', () => {
+    const {getByText} = render(<ProfileTray />)
+    expect(getByText('Accessibility Settings')).toBeInTheDocument()
+  })
+
   it('renders the high contrast toggle', () => {
     const {getByTestId} = render(<ProfileTray />)
     const toggle = getByTestId('high-contrast-toggle')
@@ -138,6 +143,42 @@ describe('ProfileTray', () => {
       it('renders the dyslexic font toggle', () => {
         const {getByTestId} = render(<ProfileTray />)
         const toggle = getByTestId('dyslexic-font-toggle')
+        expect(toggle).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('widget dashboard toggle', () => {
+    describe('when the widget_dashboard feature is not available', () => {
+      beforeEach(() => {
+        delete window.ENV.widget_dashboard_overridable
+      })
+
+      it('does not render the Early Adopter Program Settings section', () => {
+        const {queryByText} = render(<ProfileTray />)
+        expect(queryByText('Early Adopter Program Settings')).not.toBeInTheDocument()
+      })
+
+      it('does not render the widget dashboard toggle', () => {
+        const {queryByTestId} = render(<ProfileTray />)
+        const toggle = queryByTestId('widget-dashboard-toggle')
+        expect(toggle).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when the widget_dashboard feature is available', () => {
+      beforeEach(() => {
+        window.ENV.widget_dashboard_overridable = false
+      })
+
+      it('renders the Early Adopter Program Settings section', () => {
+        const {getByText} = render(<ProfileTray />)
+        expect(getByText('Early Adopter Program Settings')).toBeInTheDocument()
+      })
+
+      it('renders the widget dashboard toggle', () => {
+        const {getByTestId} = render(<ProfileTray />)
+        const toggle = getByTestId('widget-dashboard-toggle')
         expect(toggle).toBeInTheDocument()
       })
     })

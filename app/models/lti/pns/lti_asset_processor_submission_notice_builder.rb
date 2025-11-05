@@ -73,6 +73,7 @@ module Lti
           },
           activity: {
             id: @params[:assignment].lti_context_id,
+            title: @params[:assignment].title,
           },
           submission: {
             id: @params[:submission_lti_id],

@@ -1761,6 +1761,7 @@ hy:
   all_courses_a7dbb853: "Բոլոր դասընթացներ"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Ամսաթվերի բոլոր դաշտերը պետք է առկա լինեն և ճիշտ ձևով ֆորմատավորված"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Եթե բոլորը աշխատանքներն ավարտել եք, ապա կարող եք հրապարակել ձեր դասընթացը: Սեղմեք ներքևի կոճակը այն հրապարակելու համար: Հրապարակումը թույլ կտա օգտատերերին սկսել մասնակցությունը դասընթացին:"
+  all_grades_for_students_in_this_course_will_no_lon_a32bf5d4: "Այս դասընթացի ունկնդիրների բոլոր գնահատականները այլևս տեսանելի չեն լինի: Դուք կարող եք ավելի ուշ ստանալ գնահատականները, դասընթացը կրկին ընդգրկելով խաչաձև ցուցակում, մինչդեռ այդ ունկնդիրների գնահատականները կվերաբերեն սկզբնական դասընթացին: "
   all_grading_periods_77974940: "Գնահատման բոլոր ժամանակահատվածները"
   all_grading_periods_must_have_a_title_a1a38d87: "Բոլոր գնահատման ժամանակահատվածները պետք է անվանում ունենան"
   all_groups_cea25817: "Բոլոր խմբեր"
@@ -1960,6 +1961,7 @@ hy:
   archived_de543437: "Արխիվացվել է"
   are_you_sure_26795d3c: "Դուք համոզված՞ եք"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Դուք իսկապե՞ս ցանկանում եք պատճենել վերջնական գնահատականը: Այն կարող է ջնջել գոյություն ունեցող գնահատականը:"
+  are_you_sure_you_want_to_de_cross_list_this_sectio_fae8a399: "Դուք իսկապե՞ս ցանկանում եք այս բաժինը ջնջել խաչաձև ցուցակից:"
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "Դուք իսկապե՞ս ցանկանում եք ջնջել %{name}:"
     other: "Դուք իսկապե՞ս ցանկանում եք ջնջել այդ %{count} տարրերը:"
@@ -2125,6 +2127,12 @@ hy:
     student_count: 
       one: "%{count} ունկնդիր"
       other: "%{count}  ունկնդիր"
+  assignment_quiz_type: 
+    quiz_type: "Թեստի տեսակ"
+    quiz_type_options: 
+      graded_quiz: "Գնահատվող թեստ"
+      graded_survey: "Գնահատվող հարցում"
+      ungraded_survey: "Չգնահատված հարցում"
   assignment_selection_6bff05c4: "Հանձնարարության ընտրություն"
   assignment_title_8a707dd2: "հանձնարարության անվանում"
   assignment_url_37c849c6: "Հանձնարարության url հասցեն"
@@ -3201,6 +3209,8 @@ hy:
       slot_limit: "Սահմանափակել այս միջակայքը __ով"
       users: օգտատերեր
     edit_assignment: 
+      ? " group"
+      : Խումբ.
       calendar: Օրացույց
       due: Մինչև
       group: Խումբ.
@@ -5849,6 +5859,9 @@ hy:
       second: Վայրկյան
       year: Տարի
   day_s_7cc1231f: Օր(եր)
+  de_cross_list_this_section_6f7b5984: "Այս բաժինը ջնջել խաչաձև ցուցակից"
+  de_cross_list_this_section_774a827c: "Այս բաժինը ջնջել խաչաձև ցուցակից"
+  de_cross_listing_section_c2ee371: "Չեղարկել խաչաձև ցուցակների բաժինը... "
   deactivate_this_key_3e79a2b5: "Ապաակտիվացնել այս բանալին"
   decaying_average_8bf6a0dd: "Նվազող միջին միավոր"
   decline_7eeb5ff4: Մերժել
@@ -14757,6 +14770,7 @@ hy:
   retry_ebd5f8ba: "Փորձել կրկին"
   reviewer_b993ce28: "Կարծիք ներկայացնող"
   reviewers_successfully_added_bd4b629a: "Կարծիք ներկայացնողները հաջողությամբ ավելացվել են"
+  revision_history_abfd1cfd: "Վերանայման պատմություն"
   rich_content_editor_2708ef21: "Ֆորմատավորված տեքստի խմբագիր"
   right_sidebar_logo_5483dc0a: "Աջ մասի կողային վահանակ"
   role: 
@@ -15169,6 +15183,7 @@ hy:
   section_name_is_too_long_9cec2a30: "Բաժնի անվանումը չափազանց երկար է"
   section_sis_id_6f989834: "sis բաժնի id"
   section_starts_at_65eaed1: "Բաժինը սկսվում է "
+  section_successfully_de_cross_listed_df3b64e: "Բաժինը հաջողությամբ ջնջվել է խաչաձև ցուցակներից:"
   sections: 
     section_created: "Բաժինը հաջողությամբ ստեղծված է: "
     section_creation_failed: "Բաժինը ստեղծել չհաջողվեց"

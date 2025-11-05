@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "Weston Dransfield",
-  "main": "./react/index.jsx"
+  "main": "./react/index.jsx",
+  "owner": "CFA"
 }

@@ -38,36 +38,37 @@ RSpec.describe DataFixup::Lti::MigrateOverlayVersionsToRegistrationHistoryEntrie
 
   describe "#run" do
     it "migrates overlay versions from root accounts" do
-      skip "2025-09-25: broken due to updated_at filter INTEROP-9856" if Time.now.utc > Time.utc(2025, 9, 25, 6, 59)
-      new_data = data.deep_dup.tap do |d|
-        d["placements"]["course_navigation"]["default"] = "enabled"
-        d["title"] = "New Title"
-        d["custom_fields"]["test_field"] = "test_value"
-        d["disabled_placements"] = ["account_navigation"]
-        d["disabled_scopes"] << TokenScopes::LTI_ASSET_READ_ONLY_SCOPE
+      Timecop.freeze(Time.utc(2025, 9, 20)) do
+        new_data = data.deep_dup.tap do |d|
+          d["placements"]["course_navigation"]["default"] = "enabled"
+          d["title"] = "New Title"
+          d["custom_fields"]["test_field"] = "test_value"
+          d["disabled_placements"] = ["account_navigation"]
+          d["disabled_scopes"] << TokenScopes::LTI_ASSET_READ_ONLY_SCOPE
+        end
+
+        # Ensure we can actually handle real Hashdiff data, not just what
+        # we think it looks like.
+        overlay.update!(data: new_data)
+
+        expect { subject }.to change(Lti::RegistrationHistoryEntry, :count).by(1)
+
+        history_entry = Lti::RegistrationHistoryEntry.last
+        expect(history_entry.lti_registration).to eq(registration)
+        expect(history_entry.root_account).to eq(root_account)
+        expect(history_entry.created_by).to eq(user)
+        expect(history_entry.update_type).to eq("manual_edit")
+
+        # Check that the diff has been converted to array paths and wrapped in overlay key
+        expected_diff = [
+          ["+", ["disabled_scopes", 1], TokenScopes::LTI_ASSET_READ_ONLY_SCOPE],
+          ["+", ["disabled_placements"], ["account_navigation"]],
+          ["+", ["custom_fields", "test_field"], "test_value"],
+          ["~", ["title"], "Old Title", "New Title"],
+          ["~", %w[placements course_navigation default], "disabled", "enabled"]
+        ]
+        expect(history_entry.diff["overlay"]).to match_array(expected_diff)
       end
-
-      # Ensure we can actually handle real Hashdiff data, not just what
-      # we think it looks like.
-      overlay.update!(data: new_data)
-
-      expect { subject }.to change(Lti::RegistrationHistoryEntry, :count).by(1)
-
-      history_entry = Lti::RegistrationHistoryEntry.last
-      expect(history_entry.lti_registration).to eq(registration)
-      expect(history_entry.root_account).to eq(root_account)
-      expect(history_entry.created_by).to eq(user)
-      expect(history_entry.update_type).to eq("manual_edit")
-
-      # Check that the diff has been converted to array paths and wrapped in overlay key
-      expected_diff = [
-        ["+", ["disabled_scopes", 1], TokenScopes::LTI_ASSET_READ_ONLY_SCOPE],
-        ["+", ["disabled_placements"], ["account_navigation"]],
-        ["+", ["custom_fields", "test_field"], "test_value"],
-        ["~", ["title"], "Old Title", "New Title"],
-        ["~", %w[placements course_navigation default], "disabled", "enabled"]
-      ]
-      expect(history_entry.diff["overlay"]).to match_array(expected_diff)
     end
 
     it "skips overlay versions from sub-accounts" do
@@ -96,24 +97,25 @@ RSpec.describe DataFixup::Lti::MigrateOverlayVersionsToRegistrationHistoryEntrie
     end
 
     it "preserves timestamps from original overlay version" do
-      skip "2025-09-25: broken due to updated_at filter INTEROP-9856" if Time.now.utc > Time.utc(2025, 9, 25, 7)
-      created_time = 1.week.ago
-      updated_time = 3.days.ago
+      Timecop.freeze(Time.utc(2025, 9, 20)) do
+        created_time = 1.week.ago
+        updated_time = 3.days.ago
 
-      Lti::OverlayVersion.create!(
-        account: root_account,
-        lti_overlay: overlay,
-        created_by: user,
-        diff: [["+", "test", "value"]],
-        created_at: created_time,
-        updated_at: updated_time
-      )
+        Lti::OverlayVersion.create!(
+          account: root_account,
+          lti_overlay: overlay,
+          created_by: user,
+          diff: [["+", "test", "value"]],
+          created_at: created_time,
+          updated_at: updated_time
+        )
 
-      subject
+        subject
 
-      history_entry = Lti::RegistrationHistoryEntry.last
-      expect(history_entry.created_at).to be_within(1.second).of(created_time)
-      expect(history_entry.updated_at).to be_within(1.second).of(updated_time)
+        history_entry = Lti::RegistrationHistoryEntry.last
+        expect(history_entry.created_at).to be_within(1.second).of(created_time)
+        expect(history_entry.updated_at).to be_within(1.second).of(updated_time)
+      end
     end
   end
 

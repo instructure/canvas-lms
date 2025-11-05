@@ -1226,21 +1226,43 @@ describe "Files API", type: :request do
       expect(json["url"]).to eq file_download_url(@att, download: "1", download_frd: "1")
     end
 
-    it "omits verifiers in the enhanced preview when using session auth" do
-      user_session(@user)
-      get @file_path + "?include[]=enhanced_preview_url"
-      expect(response).to be_successful
-      json = json_parse
-      expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0)
-    end
+    context "with enhanced preview" do
+      it "omits verifiers in the enhanced preview when using session auth" do
+        user_session(@user)
+        get @file_path + "?include[]=enhanced_preview_url"
+        expect(response).to be_successful
+        json = json_parse
+        expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0)
+      end
 
-    it "passes along given verifiers when creating the enhanced_preview_url" do
-      user_session(@user)
-      @att.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
-      get @file_path + "?include[]=enhanced_preview_url&verifier=#{@att.uuid}"
-      expect(response).to be_successful
-      json = json_parse
-      expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0, verifier: @att.uuid)
+      it "passes along given verifiers when creating the enhanced_preview_url" do
+        user_session(@user)
+        @att.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
+        get @file_path + "?include[]=enhanced_preview_url&verifier=#{@att.uuid}"
+        expect(response).to be_successful
+        json = json_parse
+        expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0, verifier: @att.uuid)
+      end
+
+      it "passes along given location tags when creating the enhanced_preview_url" do
+        @att.root_account.enable_feature!(:file_association_access)
+        user_session(@user)
+        get @file_path + "?include[]=enhanced_preview_url&location=whatever_12"
+        expect(response).to be_successful
+        json = json_parse
+        expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0, location: "whatever_12")
+      end
+
+      it "works with assessment question context" do
+        assessment_question_bank_with_questions(course: @course, count: 1)
+        @att.context = @q1
+        @att.save!
+        user_session(@user)
+        get @file_path + "?include[]=enhanced_preview_url"
+        expect(response).to be_successful
+        json = json_parse
+        expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0)
+      end
     end
 
     describe "with JWT access token" do

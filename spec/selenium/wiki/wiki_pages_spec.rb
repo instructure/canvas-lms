@@ -371,6 +371,22 @@ describe "Wiki Pages" do
       expect(lock_explanation).to match(/foo\s+must view the page/)
     end
 
+    it "does not honor unlock dates if course paces is enabled" do
+      @course.enable_course_paces = true
+      @course.save!
+      page = @course.wiki_pages.create!(title: "locked page", unlock_at: 1.day.from_now)
+      get "/courses/#{@course.id}/pages/#{page.url}"
+      expect(f("#content")).not_to include_text("This page is locked until")
+    end
+
+    it "does not honor lock dates if course paces is enabled" do
+      @course.enable_course_paces = true
+      @course.save!
+      page = @course.wiki_pages.create!(title: "locked page", lock_at: 1.day.ago)
+      get "/courses/#{@course.id}/pages/#{page.url}"
+      expect(f("#content")).not_to include_text("This page was locked")
+    end
+
     it "does not show the show all pages link if the pages tab is disabled" do
       @course.tab_configuration = [{ id: Course::TAB_PAGES, hidden: true }]
       @course.save!

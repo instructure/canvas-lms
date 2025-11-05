@@ -187,12 +187,18 @@ module Api
       is_not_scoped_to_account: ["id"].freeze,
       root_account_id_column: "root_account_id"
     }.freeze,
+    "assessment_questions" => {
+      lookups: { "id" => "id" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze
   }.freeze
 
   MAX_ID = ((2**63) - 1)
   MAX_ID_LENGTH = MAX_ID.to_s.length
   MAX_ID_RANGE = (-MAX_ID...MAX_ID)
   ID_REGEX = /\A\d{1,#{MAX_ID_LENGTH}}\z/
+  SHARDID_REGEX = /\d+~?\d*/
   UUID_REGEX = /\Auuid:([\w|-]{36,})\z/
 
   def self.not_scoped_to_account?(columns, sis_mapping)

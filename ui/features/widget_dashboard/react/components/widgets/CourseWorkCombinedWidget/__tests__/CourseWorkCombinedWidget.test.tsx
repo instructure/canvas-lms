@@ -23,7 +23,7 @@ import {setupServer} from 'msw/node'
 import {http, HttpResponse, graphql} from 'msw'
 import CourseWorkCombinedWidget from '../CourseWorkCombinedWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
-import {defaultGraphQLHandlers} from '../../../../__tests__/testHelpers'
+import {defaultGraphQLHandlers, clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
 
 const tomorrow = new Date()
 tomorrow.setDate(tomorrow.getDate() + 1)
@@ -219,6 +219,7 @@ afterAll(() => {
 })
 
 beforeEach(() => {
+  clearWidgetDashboardCache()
   window.ENV = {current_user_id: '1'} as any
 })
 

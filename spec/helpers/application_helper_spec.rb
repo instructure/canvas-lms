@@ -1534,4 +1534,55 @@ describe ApplicationHelper do
       expect(include_masquerade_stylesheets).to include("stylesheet")
     end
   end
+
+  describe "microfrontend_overrides" do
+    let(:test_session) { {} }
+
+    before do
+      allow(helper).to receive(:session).and_return(test_session)
+    end
+
+    context "when feature is disabled" do
+      before do
+        Setting.set("allow_microfrontend_release_tag_override", "false")
+      end
+
+      it "returns nil even if overrides are set in session" do
+        service = MicrofrontendsReleaseTagOverrideService.new(test_session)
+        service.set_override(app: "canvas_career_learner", assets_url: "https://assets.instructure.com/test")
+
+        expect(helper.microfrontend_overrides).to be_nil
+      end
+    end
+
+    context "when feature is enabled" do
+      before do
+        Setting.set("allow_microfrontend_release_tag_override", "true")
+      end
+
+      it "returns nil when no overrides are set" do
+        expect(helper.microfrontend_overrides).to be_nil
+      end
+
+      it "returns overrides hash when overrides are active" do
+        service = MicrofrontendsReleaseTagOverrideService.new(test_session)
+        service.set_override(app: "canvas_career_learner", assets_url: "https://assets.instructure.com/test")
+
+        overrides = helper.microfrontend_overrides
+        expect(overrides).to eq({ "canvas_career_learner" => "https://assets.instructure.com/test" })
+      end
+
+      it "returns multiple overrides" do
+        service = MicrofrontendsReleaseTagOverrideService.new(test_session)
+        service.set_override(app: "canvas_career_learner", assets_url: "https://assets.instructure.com/test1")
+        service.set_override(app: "canvas_career_learning_provider", assets_url: "https://assets.instructure.com/test2")
+
+        overrides = helper.microfrontend_overrides
+        expect(overrides).to eq({
+                                  "canvas_career_learner" => "https://assets.instructure.com/test1",
+                                  "canvas_career_learning_provider" => "https://assets.instructure.com/test2"
+                                })
+      end
+    end
+  end
 end

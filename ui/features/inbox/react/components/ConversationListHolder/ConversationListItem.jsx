@@ -207,6 +207,7 @@ export const ConversationListItem = ({...props}) => {
                         size="small"
                         withBackground={false}
                         withBorder={false}
+                        aria-pressed={!props.isUnread}
                       >
                         {props.isUnread ? <IconEmptySolid /> : <IconEmptyLine />}
                       </IconButton>
@@ -264,7 +265,7 @@ export const ConversationListItem = ({...props}) => {
                   )}
                 </Grid.Col>
               </Grid.Row>
-              <Grid.Row role='button'>
+              <Grid.Row role="button">
                 <Grid.Col>
                   <Focusable>
                     {({focused}) => {

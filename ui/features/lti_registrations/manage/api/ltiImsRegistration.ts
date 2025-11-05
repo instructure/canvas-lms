@@ -22,6 +22,18 @@ import type {DynamicRegistrationTokenUUID} from '../model/DynamicRegistrationTok
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
 import {ZLtiRegistrationWithConfiguration} from '../model/LtiRegistration'
+import {LtiRegistrationId} from '../model/LtiRegistrationId'
+import {
+  LtiRegistrationUpdateRequest,
+  ZLtiRegistrationUpdateRequest,
+} from '../model/lti_ims_registration/LtiRegistrationUpdateRequest'
+import {ZLtiImsRegistration} from '../model/lti_ims_registration/LtiImsRegistration'
+import {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
+import {RegistrationOverlay} from '../model/RegistrationOverlay'
+import {LtiRegistrationUpdateRequestId} from '../model/lti_ims_registration/LtiRegistrationUpdateRequestId'
+import {z} from 'zod'
+import {LtiOverlay} from '../model/LtiOverlay'
+import {LtiConfigurationOverlay} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
 
 /**
  * Fetch a newly generated registration token which will
@@ -37,12 +49,17 @@ export const fetchRegistrationToken = (
   accountId: AccountId,
   registrationUrl: string,
   unifiedToolId?: UnifiedToolId,
+  /**
+   * The existing registration to update
+   */
+  registrationId?: LtiRegistrationId,
 ) =>
   parseFetchResult(ZDynamicRegistrationToken)(
     fetch(
       `/api/lti/accounts/${accountId}/registration_token?unified_tool_id=${
         unifiedToolId || ''
-      }&registration_url=${registrationUrl}`,
+      }&registration_url=${registrationUrl.trim()}
+      ${registrationId ? `&registration_id=${registrationId}` : ''}`,
       defaultFetchOptions(),
     ),
   )
@@ -66,5 +83,89 @@ export const getLtiRegistrationByUUID = (
     fetch(
       `/api/lti/accounts/${accountId}/lti_registrations/uuid/${registrationUuid}`,
       defaultFetchOptions(),
+    ),
+  )
+
+/**
+ * Retrieve a newly created registration update request
+ * by its UUID.
+ *
+ * This is used in the dynamic registration flow for after
+ * the tool has gone through the registration update process
+ * and returned the flow to the platform.
+ *
+ * @param accountId
+ * @param registrationUuid uuid of the registration update request
+ * @returns
+ */
+export const getLtiRegistrationUpdateRequestByUUID = (
+  accountId: AccountId,
+  registrationUuid: DynamicRegistrationTokenUUID,
+) =>
+  parseFetchResult(ZLtiRegistrationUpdateRequest)(
+    fetch(
+      `/api/lti/accounts/${accountId}/lti_registration_update_request/uuid/${registrationUuid}`,
+      defaultFetchOptions(),
+    ),
+  )
+
+/**
+ * Retrieve a registration by its ID. Useful for managing a registration
+ * after it's been created.
+ *
+ * @param accountId
+ * @param registrationId ID of the registration
+ * @returns
+ */
+export const getLtiImsRegistrationById = (
+  accountId: AccountId,
+  registrationId: LtiImsRegistrationId,
+) =>
+  parseFetchResult(ZLtiImsRegistration)(
+    fetch(`/api/lti/accounts/${accountId}/registrations/${registrationId}`, defaultFetchOptions()),
+  )
+
+/**
+ * Updates the overlay for an LtiImsRegistration.
+ * @param accountId
+ * @param registrationId
+ * @param overlay
+ * @returns
+ */
+export const updateRegistrationOverlay = (
+  accountId: AccountId,
+  registrationId: LtiImsRegistrationId,
+  overlay: RegistrationOverlay,
+) =>
+  parseFetchResult(ZLtiImsRegistration)(
+    fetch(`/api/lti/accounts/${accountId}/registrations/${registrationId}/overlay`, {
+      ...defaultFetchOptions(),
+      method: 'PUT',
+      headers: {
+        ...defaultFetchOptions().headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(overlay),
+    }),
+  )
+
+export const applyLtiRegistrationUpdateRequest = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+  registrationUpdateRequestId: LtiRegistrationUpdateRequestId,
+  ltiOverlay: LtiConfigurationOverlay,
+) =>
+  parseFetchResult(z.unknown())(
+    fetch(
+      `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/update_requests/${registrationUpdateRequestId}/apply`,
+      {
+        method: 'PUT',
+        ...defaultFetchOptions({
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }),
+        body: JSON.stringify({overlay: ltiOverlay, accepted: true}),
+      },
     ),
   )

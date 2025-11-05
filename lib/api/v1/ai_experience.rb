@@ -21,7 +21,7 @@ module Api::V1::AiExperience
   include Api::V1::Json
 
   API_JSON_OPTS = {
-    only: %w[id title description facts learning_objective scenario workflow_state course_id created_at updated_at]
+    only: %w[id title description facts learning_objective pedagogical_guidance workflow_state course_id created_at updated_at]
   }.freeze
 
   def ai_experience_json(ai_experience, user, session, opts = {})

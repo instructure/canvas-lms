@@ -335,5 +335,10 @@ module Lti::Messages
 
       @message.extensions["#{JwtMessage::EXTENSION_PREFIX}#{key}"] = value
     end
+
+    def add_activity_claim!(assignment)
+      @message.activity.id = assignment.lti_context_id
+      @message.activity.title = assignment.title
+    end
   end
 end

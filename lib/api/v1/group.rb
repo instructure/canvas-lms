@@ -22,6 +22,7 @@ module Api::V1::Group
   include Api::V1::Json
   include Api::V1::Context
   include Api::V1::Tab
+  include SectionRestrictionsHelper
 
   GROUP_MEMBER_LIMIT = 1000
 
@@ -51,12 +52,25 @@ module Api::V1::Group
     # hash['leader_id'] = group.leader_id
     hash["leader"] = group.leader ? user_display_json(group.leader, group) : nil
 
+    # Apply section restrictions to members_count if applicable
+    if user_has_section_restrictions?(group.context, user)
+      restricted_member_count = count_visible_group_members(group, user)
+      hash["members_count"] = restricted_member_count
+    end
+
     if includes.include?("users")
       users = if group.grants_right?(@current_user, :read_as_admin)
                 group.users.order_by_sortable_name.limit(GROUP_MEMBER_LIMIT).distinct
               else
                 group.participating_users_in_context(sort: true, include_inactive_users: options[:include_inactive_users]).limit(GROUP_MEMBER_LIMIT).distinct
               end
+
+      # Apply section restrictions to users list if applicable
+      if user_has_section_restrictions?(group.context, user)
+        student_ids_in_sections = get_students_in_teacher_sections(group.context, user)
+        users = users.where(id: student_ids_in_sections)
+      end
+
       active_user_ids = nil
       if options[:include_inactive_users]
         active_user_ids = group.participating_users_in_context.pluck("id").to_set
@@ -71,6 +85,7 @@ module Api::V1::Group
         json
       end
     end
+
     if includes.include?("group_category")
       hash["group_category"] = group.group_category && group_category_json(group.group_category, user, session)
     end
@@ -110,5 +125,12 @@ module Api::V1::Group
       hash["sis_import_id"] = membership.sis_batch_id
     end
     hash
+  end
+
+  private
+
+  def count_visible_group_members(group, user)
+    visible_student_ids = get_students_in_teacher_sections(group.context, user)
+    group.users.where(id: visible_student_ids).count
   end
 end

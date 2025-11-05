@@ -701,5 +701,85 @@ describe Types::QueryType do
                          .pluck("course").pluck("_id").sort
       expect(course_ids).to eq([@course1.id.to_s, @course2.id.to_s])
     end
+
+    it "deduplicates instructors with multiple section enrollments in the same course" do
+      # Create multiple sections in course1
+      section1 = @course1.course_sections.create!(name: "Section 1")
+      section2 = @course1.course_sections.create!(name: "Section 2")
+      section3 = @course1.course_sections.create!(name: "Section 3")
+
+      # Enroll instructor1 in multiple sections
+      enrollment1 = @course1.enroll_teacher(@instructor1, section: section1, allow_multiple_enrollments: true)
+      enrollment1.accept!
+      enrollment2 = @course1.enroll_teacher(@instructor1, section: section2, allow_multiple_enrollments: true)
+      enrollment2.accept!
+      enrollment3 = @course1.enroll_teacher(@instructor1, section: section3, allow_multiple_enrollments: true)
+      enrollment3.accept!
+
+      result = CanvasSchema.execute(
+        query,
+        variables: { courseIds: [@course1.id.to_s] },
+        context: { current_user: @student }
+      )
+
+      instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+      # Should only return instructor1 once, not three times (one per section)
+      expect(instructors.length).to eq(1)
+      expect(instructors[0].dig("user", "name")).to eq("Instructor 1")
+      expect(instructors[0].dig("course", "_id")).to eq(@course1.id.to_s)
+    end
+
+    it "filters out past enrollments based on course end dates" do
+      # Create a course that ended in the past
+      @past_course = Course.create!(name: "Past Course", workflow_state: "available", conclude_at: 1.week.ago)
+      @past_instructor = user_factory(name: "Past Instructor")
+      past_enrollment = @past_course.enroll_teacher(@past_instructor)
+      past_enrollment.accept!
+      @past_course.enroll_student(@student, enrollment_state: "active")
+
+      result = CanvasSchema.execute(
+        query,
+        variables: { courseIds: [@past_course.id.to_s] },
+        context: { current_user: @student }
+      )
+
+      instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+      # Should not return instructors from past courses
+      expect(instructors).to be_empty
+    end
+
+    it "filters out hard inactive enrollments" do
+      # Make instructor2's enrollment inactive
+      @teacher_enrollment2.deactivate
+
+      result = CanvasSchema.execute(
+        query,
+        variables: { courseIds: [@course2.id.to_s] },
+        context: { current_user: @student }
+      )
+
+      instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+      # Should not return inactive instructors
+      expect(instructors).to be_empty
+    end
+
+    it "filters out instructors from unpublished courses" do
+      # Create an unpublished course with a teacher
+      @unpublished_course = Course.create!(name: "Unpublished Course", workflow_state: "unpublished")
+      @unpublished_instructor = user_factory(name: "Unpublished Instructor")
+      unpublished_enrollment = @unpublished_course.enroll_teacher(@unpublished_instructor)
+      unpublished_enrollment.accept!
+      @unpublished_course.enroll_student(@student, enrollment_state: "active")
+
+      result = CanvasSchema.execute(
+        query,
+        variables: { courseIds: [@unpublished_course.id.to_s] },
+        context: { current_user: @student }
+      )
+
+      instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+      # Should not return instructors from unpublished courses
+      expect(instructors).to be_empty
+    end
   end
 end

@@ -114,6 +114,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_discussion_topic_participant, mutation: Mutations::UpdateDiscussionTopicParticipant
   field :update_gradebook_group_filter, mutation: Mutations::UpdateGradebookGroupFilter
   field :update_internal_setting, mutation: Mutations::UpdateInternalSetting
+  field :update_learner_dashboard_tab_selection, mutation: Mutations::UpdateLearnerDashboardTabSelection
   field :update_learning_outcome, mutation: Mutations::UpdateLearningOutcome
   field :update_learning_outcome_group, mutation: Mutations::UpdateLearningOutcomeGroup
   field :update_my_inbox_settings, mutation: Mutations::UpdateMyInboxSettings

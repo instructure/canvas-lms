@@ -23,6 +23,8 @@ import {gql} from 'graphql-tag'
 import type {Announcement} from '../types'
 import {ANNOUNCEMENTS_PAGINATED_KEY} from '../constants'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
+import {widgetDashboardPersister} from '../utils/persister'
+import {useBroadcastQuery} from '@canvas/query/broadcast'
 
 interface UseAnnouncementsOptions {
   limit?: number
@@ -293,6 +295,14 @@ export function useAnnouncementsPaginated(options: UseAnnouncementsOptions = {})
     },
     enabled: !!currentUserId,
     staleTime: 5 * 60 * 1000,
+    persister: widgetDashboardPersister,
+    refetchOnMount: false,
+  })
+
+  // Broadcast announcement updates across tabs
+  useBroadcastQuery({
+    queryKey: [ANNOUNCEMENTS_PAGINATED_KEY],
+    broadcastChannel: 'widget-dashboard',
   })
 
   const error = queryError as Error | null
@@ -315,7 +325,6 @@ export function useAnnouncementsPaginated(options: UseAnnouncementsOptions = {})
 
   useEffect(() => {
     setPageCache({})
-    setTotalCount(null)
     setCurrentPageIndex(0)
   }, [options.filter])
 

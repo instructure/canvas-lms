@@ -1,0 +1,39 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Global layout overrides for immersive media view */
+/* Remove all default layout padding on mobile, preserve nav margin on desktop */
+
+/* Preserve the left margin for navigation on desktop (≥768px) */
+body.immersive-media-view .ic-Layout-wrapper {
+  min-height: 100vh;
+}
+
+@media (min-width: 768px) {
+  #immersive_view_container {
+    padding: 2.25rem;
+  }
+
+  body.immersive-media-view:not(.no-headers) .ic-Layout-wrapper {
+    margin-left: 54px;
+  }
+
+  body.immersive-media-view:not(.no-headers).primary-nav-expanded .ic-Layout-wrapper {
+    margin-left: 84px;
+  }
+}

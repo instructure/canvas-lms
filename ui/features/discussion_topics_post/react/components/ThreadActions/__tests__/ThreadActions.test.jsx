@@ -20,14 +20,19 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {ThreadActions} from '../ThreadActions'
 import {MockedProvider} from '@apollo/client/testing'
+import {useTranslationStore} from '../../../hooks/useTranslationStore'
 
 const tryTranslate = jest.fn()
+const clearEntry = jest.fn()
+const setModalOpen = jest.fn()
 
 jest.mock('../../../hooks/useTranslation', () => ({
   useTranslation: () => ({
     tryTranslate,
   }),
 }))
+
+jest.mock('../../../hooks/useTranslationStore')
 
 const defaultRequiredProps = {
   id: '1',
@@ -352,16 +357,19 @@ describe('ThreadActions', () => {
       delete window.ENV.ai_translation_improvements
     })
 
+    beforeEach(() => {
+      useTranslationStore.mockImplementation(selector =>
+        selector({entries: {}, translateAll: false, clearEntry, setModalOpen}),
+      )
+    })
+
     it('does not display if the feature flag is off', () => {
       window.ENV.ai_translation_improvements = false
       const props = createProps()
       const {getByTestId, queryByText} = setup(props)
-      const menu = getByTestId('thread-actions-menu')
-      expect(menu).toBeInTheDocument()
-      fireEvent.click(menu)
+      fireEvent.click(getByTestId('thread-actions-menu'))
 
-      const element = queryByText('Translate Text')
-      expect(element).toBeFalsy()
+      expect(queryByText('Translate Text')).toBeFalsy()
 
       window.ENV.ai_translation_improvements = true
     })
@@ -369,12 +377,9 @@ describe('ThreadActions', () => {
     it('displays if the feature flag is on', () => {
       const props = createProps()
       const {getByTestId, queryByText} = setup(props)
-      const menu = getByTestId('thread-actions-menu')
-      expect(menu).toBeInTheDocument()
-      fireEvent.click(menu)
+      fireEvent.click(getByTestId('thread-actions-menu'))
 
-      const element = queryByText('Translate Text')
-      expect(element).toBeInTheDocument()
+      expect(queryByText('Translate Text')).toBeInTheDocument()
     })
 
     it('calls the onTranslate callback when clicked', () => {
@@ -382,9 +387,60 @@ describe('ThreadActions', () => {
       const {getByTestId, getByText} = setup(props)
 
       fireEvent.click(getByTestId('thread-actions-menu'))
-      expect(tryTranslate.mock.calls).toHaveLength(0)
       fireEvent.click(getByText('Translate Text'))
-      expect(tryTranslate.mock.calls).toHaveLength(1)
+
+      expect(tryTranslate).toHaveBeenCalledWith('1', undefined)
+    })
+
+    it('displays only Hide Translation when translation exists', () => {
+      useTranslationStore.mockImplementation(selector =>
+        selector({
+          entries: {1: {translatedMessage: 'Translated text'}},
+          translateAll: false,
+          clearEntry,
+          setModalOpen,
+        }),
+      )
+
+      const props = createProps()
+      const {getByTestId, queryByText} = setup(props)
+      fireEvent.click(getByTestId('thread-actions-menu'))
+
+      expect(queryByText('Translate Text')).toBeFalsy()
+      expect(queryByText('Change Language')).toBeFalsy()
+      expect(queryByText('Hide Translation')).toBeInTheDocument()
+    })
+
+    it('calls clearEntry when Hide Translation is clicked', () => {
+      useTranslationStore.mockImplementation(selector =>
+        selector({
+          entries: {1: {translatedMessage: 'Translated text'}},
+          translateAll: false,
+          clearEntry,
+          setModalOpen,
+        }),
+      )
+
+      const props = createProps()
+      const {getByTestId, getByText} = setup(props)
+      fireEvent.click(getByTestId('thread-actions-menu'))
+      fireEvent.click(getByText('Hide Translation'))
+
+      expect(clearEntry).toHaveBeenCalledWith('1')
+    })
+
+    it('does not display translation options when translateAll is active', () => {
+      useTranslationStore.mockImplementation(selector =>
+        selector({entries: {}, translateAll: true, clearEntry, setModalOpen}),
+      )
+
+      const props = createProps()
+      const {getByTestId, queryByText} = setup(props)
+      fireEvent.click(getByTestId('thread-actions-menu'))
+
+      expect(queryByText('Translate Text')).toBeFalsy()
+      expect(queryByText('Change Language')).toBeFalsy()
+      expect(queryByText('Hide Translation')).toBeFalsy()
     })
   })
 })

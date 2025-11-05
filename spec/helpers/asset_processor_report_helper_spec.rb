@@ -556,4 +556,263 @@ describe AssetProcessorReportHelper do
       expect(reports.first[:title]).to eq("String Comparison Report")
     end
   end
+
+  describe "discussion entry version filtering" do
+    before do
+      @discussion_assignment = assignment_model(course: @course, submission_types: "discussion_topic")
+      @discussion_topic = @discussion_assignment.discussion_topic
+      @discussion_ap = lti_asset_processor_model(tool: @tool, assignment: @discussion_assignment, title: "Discussion AP")
+      @discussion_submission = @discussion_assignment.submit_homework(@student, submission_type: "discussion_topic")
+    end
+
+    def make_asset_and_report(entry, title)
+      discussion_entry_version = entry.discussion_entry_versions.first
+      asset = lti_asset_model(submission: @discussion_submission, discussion_entry_version:)
+      lti_asset_report_model(
+        asset_processor: @discussion_ap,
+        asset:,
+        title:,
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: true
+      )
+    end
+
+    context "with single discussion entry with multiple versions" do
+      it "returns reports for latest version" do
+        entry = @discussion_topic.discussion_entries.create!(message: "Version 1", user: @student)
+        make_asset_and_report(entry, "Report for Version 1")
+
+        entry.update!(message: "Version 2")
+
+        make_asset_and_report(entry, "Report for Version 2")
+
+        entry.update!(message: "Version 3")
+        versions = entry.discussion_entry_versions.to_a
+        expect(versions.length).to eq 3
+        make_asset_and_report(entry, "Report for Version 3")
+
+        reports = asset_reports_info_for_display(submission: @discussion_submission)
+
+        expect(reports).to be_a(Array)
+        expect(reports.length).to eq(1)
+        expect(reports.first[:title]).to eq("Report for Version 3")
+        expect(reports.pluck(:title)).not_to include("Report for Version 1", "Report for Version 2")
+      end
+    end
+
+    context "with multiple discussion entries each with multiple versions" do
+      it "returns latest version report for each entry" do
+        # Entry 1 with 2 versions
+        entry1 = @discussion_topic.discussion_entries.create!(message: "Entry 1 Version 1", user: @student)
+        make_asset_and_report(entry1, "Entry 1 Report V1")
+        entry1.update!(message: "Entry 1 Version 2")
+        make_asset_and_report(entry1, "Entry 1 Report V2")
+
+        # Entry 2 with 2 versions
+        entry2 = @discussion_topic.discussion_entries.create!(message: "Entry 2 Version 1", user: @student)
+        make_asset_and_report(entry2, "Entry 2 Report V1")
+        entry2.update!(message: "Entry 2 Version 2")
+        make_asset_and_report(entry2, "Entry 2 Report V2")
+
+        # Should include latest version reports for both entries
+        reports = asset_reports_info_for_display(submission: @discussion_submission)
+        expect(reports).to be_a(Array)
+        expect(reports.length).to eq(2)
+        expect(reports.pluck(:title)).to match_array(["Entry 1 Report V2", "Entry 2 Report V2"])
+        expect(reports.pluck(:title)).not_to include("Entry 1 Report V1", "Entry 2 Report V1")
+      end
+    end
+
+    context "with mixed asset types" do
+      it "returns discussion latest versions along with attachment and text entry reports" do
+        # Create discussion entry with 2 versions
+        entry = @discussion_topic.discussion_entries.create!(message: "Version 1", user: @student)
+        make_asset_and_report(entry, "Discussion Report V1")
+
+        entry.update!(message: "Version 2")
+        make_asset_and_report(entry, "Discussion Report V2")
+
+        # Query all reports (including attachment and text entry from before block)
+        all_reports = raw_asset_reports(
+          submission_ids: [@submission.id, @submission_text.id, @discussion_submission.id],
+          for_student: true
+        )
+
+        # Attachment submission should still have its reports
+        expect(all_reports[@submission.id]).to include(@apreport1, @apreport2)
+
+        # Text entry submission should still have its report
+        expect(all_reports[@submission_text.id]).to include(@apreport_text)
+
+        # Discussion submission should only have latest version report
+        discussion_reports = all_reports[@discussion_submission.id]
+        expect(discussion_reports.length).to eq(1)
+        expect(discussion_reports.first.title).to eq("Discussion Report V2")
+      end
+    end
+
+    context "raw_asset_reports for teachers" do
+      it "filters to latest discussion entry versions for teachers" do
+        # Create entry with 2 versions
+        entry = @discussion_topic.discussion_entries.create!(message: "Version 1", user: @student)
+        report1 = make_asset_and_report(entry, "Report V1")
+
+        entry.update!(message: "Version 2")
+        make_asset_and_report(entry, "Report V2")
+
+        # Teachers see all reports (not filtered by visible_to_owner), but still filtered by version
+        reports = raw_asset_reports(submission_ids: [@discussion_submission.id], for_student: false)
+
+        expect(reports[@discussion_submission.id]).to be_a(Array)
+        expect(reports[@discussion_submission.id].length).to eq(1)
+        expect(reports[@discussion_submission.id].first.title).to eq("Report V2")
+        expect(reports[@discussion_submission.id]).not_to include(report1)
+      end
+    end
+  end
+
+  describe "#asset_reports_info_for_display with discussionEntryVersion data" do
+    before do
+      @discussion_assignment = assignment_model(course: @course, submission_types: "discussion_topic")
+      @discussion_topic = @discussion_assignment.discussion_topic
+      @discussion_ap = lti_asset_processor_model(tool: @tool, assignment: @discussion_assignment, title: "Discussion AP")
+      @discussion_submission = @discussion_assignment.submit_homework(@student, submission_type: "discussion_topic")
+    end
+
+    it "includes discussionEntryVersion data in asset info" do
+      entry = @discussion_topic.discussion_entries.create!(
+        message: "<p>This is a <strong>test</strong> message</p>",
+        user: @student
+      )
+      discussion_entry_version = entry.discussion_entry_versions.first
+      asset = lti_asset_model(submission: @discussion_submission, discussion_entry_version:)
+      lti_asset_report_model(
+        asset_processor: @discussion_ap,
+        asset:,
+        title: "Discussion Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: true
+      )
+
+      reports = asset_reports_info_for_display(submission: @discussion_submission)
+
+      expect(reports).to be_a(Array)
+      expect(reports.length).to eq(1)
+
+      report = reports.first
+      expect(report[:asset][:discussionEntryVersion]).not_to be_nil
+
+      dev_data = report[:asset][:discussionEntryVersion]
+      expect(dev_data[:_id]).to eq(discussion_entry_version.id.to_s)
+      expect(dev_data[:createdAt]).to eq(discussion_entry_version.created_at)
+      expect(dev_data[:messageIntro]).to eq("This is a test message")
+    end
+
+    it "handles multiple reports with different discussion entry versions" do
+      entry1 = @discussion_topic.discussion_entries.create!(
+        message: "First entry",
+        user: @student
+      )
+      entry2 = @discussion_topic.discussion_entries.create!(
+        message: "Second entry",
+        user: @student
+      )
+
+      dev1 = entry1.discussion_entry_versions.first
+      dev2 = entry2.discussion_entry_versions.first
+
+      asset1 = lti_asset_model(submission: @discussion_submission, discussion_entry_version: dev1)
+      asset2 = lti_asset_model(submission: @discussion_submission, discussion_entry_version: dev2)
+
+      lti_asset_report_model(
+        asset_processor: @discussion_ap,
+        asset: asset1,
+        title: "Report 1",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: true
+      )
+      lti_asset_report_model(
+        asset_processor: @discussion_ap,
+        asset: asset2,
+        title: "Report 2",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: true
+      )
+
+      reports = asset_reports_info_for_display(submission: @discussion_submission)
+
+      expect(reports.length).to eq(2)
+
+      report1 = reports.find { |r| r[:title] == "Report 1" }
+      report2 = reports.find { |r| r[:title] == "Report 2" }
+
+      expect(report1[:asset][:discussionEntryVersion][:_id]).to eq(dev1.id.to_s)
+      expect(report1[:asset][:discussionEntryVersion][:messageIntro]).to eq("First entry")
+
+      expect(report2[:asset][:discussionEntryVersion][:_id]).to eq(dev2.id.to_s)
+      expect(report2[:asset][:discussionEntryVersion][:messageIntro]).to eq("Second entry")
+    end
+
+    it "returns nil discussionEntryVersion when asset has no discussion entry version" do
+      # Use the text entry report from the before block
+      reports = asset_reports_info_for_display(submission: @submission_text)
+
+      expect(reports).to be_a(Array)
+      expect(reports.length).to eq(1)
+
+      report = reports.first
+      expect(report[:asset][:discussionEntryVersion]).to be_nil
+    end
+
+    it "truncates long messages in messageIntro" do
+      long_message = "<p>#{"a" * 400}</p>"
+      entry = @discussion_topic.discussion_entries.create!(
+        message: long_message,
+        user: @student
+      )
+      discussion_entry_version = entry.discussion_entry_versions.first
+      asset = lti_asset_model(submission: @discussion_submission, discussion_entry_version:)
+      lti_asset_report_model(
+        asset_processor: @discussion_ap,
+        asset:,
+        title: "Long Message Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: true
+      )
+
+      reports = asset_reports_info_for_display(submission: @discussion_submission)
+      dev_data = reports.first[:asset][:discussionEntryVersion]
+
+      expect(dev_data[:messageIntro].length).to eq(301) # 0..300 inclusive
+      expect(dev_data[:messageIntro]).to eq("a" * 301)
+    end
+
+    it "efficiently queries only needed discussion_entry_version fields" do
+      entry = @discussion_topic.discussion_entries.create!(
+        message: "Test message",
+        user: @student
+      )
+      discussion_entry_version = entry.discussion_entry_versions.first
+      asset = lti_asset_model(submission: @discussion_submission, discussion_entry_version:)
+      lti_asset_report_model(
+        asset_processor: @discussion_ap,
+        asset:,
+        title: "Efficiency Test Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: true
+      )
+
+      # Mock DiscussionEntryVersion to verify the select clause
+      expect(DiscussionEntryVersion).to receive(:where)
+        .with(id: [discussion_entry_version.id])
+        .and_call_original
+        .once
+
+      # The actual method should call .select(:id, :created_at, :message)
+      # We can't easily mock this without breaking the test, but we can verify behavior
+      reports = asset_reports_info_for_display(submission: @discussion_submission)
+
+      expect(reports.first[:asset][:discussionEntryVersion]).not_to be_nil
+    end
+  end
 end

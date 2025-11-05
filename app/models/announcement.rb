@@ -238,10 +238,7 @@ class Announcement < DiscussionTopic
 
   def sync_participants_with_visibility
     ActiveRecord::Base.transaction do
-      participants = context.participants(include_observers: false, by_date: true)
-      current_valid_user_ids = users_with_section_visibility(
-        participants.compact
-      ).pluck(:id)
+      current_valid_user_ids = participants_to_insert
 
       # Remove participants who no longer have visibility
       discussion_topic_participants.where.not(user_id: current_valid_user_ids).destroy_all
@@ -252,6 +249,24 @@ class Announcement < DiscussionTopic
 
       bulk_insert_participants(new_user_ids) if new_user_ids.any?
     end
+  rescue ActiveRecord::RecordNotUnique
+    # If a race condition occurred, check if any participants are still missing
+    current_valid_user_ids = participants_to_insert
+    existing_participant_ids = discussion_topic_participants.pluck(:user_id)
+    missing_user_ids = current_valid_user_ids - existing_participant_ids
+
+    if missing_user_ids.any?
+      begin
+        bulk_insert_participants(missing_user_ids)
+      rescue ActiveRecord::RecordNotUnique
+        nil
+      end
+    end
+  end
+
+  def participants_to_insert
+    participants = context.participants(include_observers: false, by_date: true)
+    users_with_section_visibility(participants.compact).pluck(:id)
   end
 
   def create_participant

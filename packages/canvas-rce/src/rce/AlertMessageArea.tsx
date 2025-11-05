@@ -44,7 +44,6 @@ export default function AlertMessageArea({
           key={message.id}
           variant={message.variant || 'info'}
           timeout={10000}
-          // @ts-expect-error
           liveRegion={liveRegion}
           onDismiss={() => afterDismiss(message.id)}
         >

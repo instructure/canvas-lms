@@ -4,5 +4,6 @@
   "version": "0.0.1",
   "author": "collaboration",
   "main": "./index.tsx",
-  "module": "./index.tsx"
+  "module": "./index.tsx",
+  "owner": "CFA"
 }

@@ -26,5 +26,14 @@ class MockLtiToolUi
       # Button in the tool's UI for subscribing to the notification service
       f("#notification-btn")
     end
+
+    def eula_accept_button
+      f("#eula-accept-btn")
+    end
+
+    def deep_link_button
+      # Button in the tool's UI for creating an asset processor via deep linking
+      f("#deep-link-btn")
+    end
   end
 end

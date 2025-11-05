@@ -77,11 +77,13 @@ module CC
             set_progress(60)
 
             zipper = ContentZipper.new(check_user: false)
-            (@html_exporter.referenced_files.values + @html_exporter.referenced_assessment_question_files.values).each do |att|
+            @html_exporter.referenced_files.each_value do |att|
               path = if att.context_type == "AssessmentQuestion"
                        "assessment_questions#{att.full_display_path}"
+                     elsif att.context_type == "User"
+                       "#{WEB_RESOURCES_FOLDER}/#{Folder.media_folder(exporter.course).name}/#{att.display_name}"
                      else
-                       att.full_display_path.sub("course files", "web_resources")
+                       att.full_display_path.sub("course files", WEB_RESOURCES_FOLDER)
                      end
               zipper.add_attachment_to_zip(att, @exporter.zip_file, path)
 

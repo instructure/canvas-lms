@@ -59,7 +59,6 @@ describe('AssetProcessorsAddModal', () => {
 
   it('starts hidden/closed (with no dialog)', () => {
     const {queryByText} = renderModal()
-    expect(queryByText('Configure settings for t1.')).toBeNull()
     expect(queryByText('Add A Document Processing App')).toBeNull()
     expect(
       queryByText('Choose the document processing app that you wish to add to this assignment.'),

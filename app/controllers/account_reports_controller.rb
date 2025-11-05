@@ -326,7 +326,8 @@ class AccountReportsController < ApplicationController
   def create
     if authorized_action(@context, @current_user, :read_reports)
       available_reports = AccountReport.available_reports.keys
-      raise ActiveRecord::RecordNotFound unless available_reports.include? params[:report]
+      report_type = params[:report]
+      raise ActiveRecord::RecordNotFound unless available_reports.include? report_type
 
       parameters = params[:parameters]&.to_unsafe_h
       enrollment_term_id = parameters&.dig("enrollment_term_id") || parameters&.dig("enrollment_term")
@@ -334,7 +335,14 @@ class AccountReportsController < ApplicationController
         return render json: { error: "invalid enrollment_term_id '#{enrollment_term_id}'" }, status: :bad_request
       end
 
-      report = @account.account_reports.build(user: @current_user, report_type: params[:report], parameters:)
+      if api_request? && (existing_report = AccountReport.recent_for(account: @account, report_type:, parameters:))
+        # Respond with 409 Conflict and include a Location header
+        # Clients can use this header instead of parsing the response body to obtain the report URL.
+        headers["Location"] = api_v1_account_report_url(@account, report_type, existing_report.id)
+        return render json: account_report_json(existing_report, @current_user), status: :conflict
+      end
+
+      report = @account.account_reports.build(user: @current_user, report_type:, parameters:)
       report.workflow_state = :created
       report.progress = 0
       report.save

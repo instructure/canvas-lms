@@ -137,6 +137,10 @@ class FeatureFlagsController < ApplicationController
   #
   # A paginated list of all features that apply to a given Account, Course, or User.
   #
+  # @argument hide_inherited_enabled [Boolean]
+  #   When true, feature flags that are enabled in a higher context and cannot
+  #   be overridden will be omitted.
+  #
   # @example_request
   #
   #   curl 'http://<canvas>/api/v1/courses/1/features' \
@@ -159,8 +163,7 @@ class FeatureFlagsController < ApplicationController
                                           skip_cache:)
 
         # Hide flags that are forced ON at a higher level
-        # Undocumented flag for frontend use only
-        ff unless params[:hide_inherited_enabled] && ff&.enabled? && ff.locked?(@context)
+        ff unless value_to_boolean(params[:hide_inherited_enabled]) && ff&.enabled? && ff.locked?(@context)
       end
 
       render json: flags.map { |flag| feature_with_flag_json(flag, @context, @current_user, session) }

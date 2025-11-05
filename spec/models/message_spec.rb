@@ -444,7 +444,7 @@ describe Message do
         "message.deliver.email.#{@message.root_account.global_id}",
         {
           short_stat: "message.deliver_per_account",
-          tags: { path_type: "email", root_account_id: @message.root_account.global_id }
+          tags: { path_type: "email", cluster: "test" }
         }
       )
     end

@@ -19,6 +19,7 @@
 import {EnvContentMigrations} from './ContentMigrations'
 import {EnvAccessibilityChecker} from './EnvAccessibilityChecker'
 import {EnvAccounts} from './EnvAccounts'
+import {EnvAiExperiences} from './EnvAiExperiences'
 import {EnvAlerts} from './EnvAlerts'
 import {EnvAms} from './EnvAms'
 import {EnvAssignments} from './EnvAssignments'
@@ -61,6 +62,7 @@ export type GlobalEnv =
     // Individual typescript files can narrow the type of ENV to include them
     Partial<
       EnvAccounts &
+        EnvAiExperiences &
         EnvAms &
         EnvAccessibilityChecker &
         EnvAssignments &

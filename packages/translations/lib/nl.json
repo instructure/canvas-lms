@@ -347,6 +347,9 @@
     "clubs_suit_c1ffedff": {
         "message": "Klaveren (speelkaart)"
     },
+    "collab_575ac7bc": {
+        "message": "Samenwerking"
+    },
     "collaborations_5c56c15f": {
         "message": "Samenwerkingen"
     },
@@ -1271,6 +1274,9 @@
     "latvian_2bbb6aab": {
         "message": "Lets"
     },
+    "learn_ad3b3505": {
+        "message": "Leren"
+    },
     "learn_more_about_adjacent_links_2cb9762c": {
         "message": "Meer informatie over aangrenzende links"
     },
@@ -1697,6 +1703,9 @@
     "operators_a2ef9a93": {
         "message": "Operators"
     },
+    "options_3ab0ea65": {
+        "message": "Opties"
+    },
     "or_9b70ccaa": {
         "message": "Of"
     },
@@ -1960,6 +1969,9 @@
     },
     "remove_link_d1f2f4d0": {
         "message": "Link verwijderen"
+    },
+    "remove_studio_media_f913e502": {
+        "message": "Studio-media verwijderen"
     },
     "replace_all_d3d68b3": {
         "message": "Alles vervangen"
@@ -2482,6 +2494,9 @@
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Ook al krijgt je video de juiste titel in de browser, de video kon niet worden bijgewerkt in de database."
+    },
+    "thumbnail_e0de666f": {
+        "message": "Miniatuur"
     },
     "timebar_a4d18443": {
         "message": "Tijdbalk"

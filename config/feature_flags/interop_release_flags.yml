@@ -218,6 +218,20 @@ lti_asset_processor_discussions:
       state: allowed_on
     ci:
       state: allowed_on
+lti_asset_processor_course:
+  state: hidden
+  applies_to: Course
+  display_name: Document Processor
+  description: |-
+    If enabled, the Document Processor placement will be visible on Assignments and Discussions
+    when at least one tool is configured to use this placement and Documents Processors are enabled for the root account.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_before_assignment_results:
   state: hidden
   display_name: Display LTI placement before assignment description after submitting.
@@ -513,6 +527,21 @@ top_navigation_placement:
   applies_to: RootAccount
   display_name: Top Navigation Placement
   description: Enables top_navigation LTI placement. (LTI 1.3 Only)
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+top_navigation_placement_a11y_fixes:
+  state: hidden
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: Top Navigation Placement Accessibility Tab Order Fix
+  description: |-
+    When enabled, fixes the tab order for View as Student and LTI Tools buttons
+    in the top navigation. View as Student will receive focus before LTI Tools,
+    following logical left-to-right reading order. Requires top_navigation_placement
+    to be enabled.
   environments:
     development:
       state: allowed_on

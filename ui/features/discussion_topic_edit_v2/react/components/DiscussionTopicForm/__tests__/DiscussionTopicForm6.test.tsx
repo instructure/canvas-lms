@@ -72,6 +72,7 @@ describe('DiscussionTopicForm', () => {
       },
       FEATURES: {
         lti_asset_processor_discussions: true,
+        lti_asset_processor_course: true,
       },
       // @ts-expect-error
       PERMISSIONS: {},
@@ -138,7 +139,7 @@ describe('DiscussionTopicForm', () => {
       const mockDiscussionTopic = DiscussionTopic.mock({assignment})
       const mockOnSubmit = jest.fn()
 
-      const {getByRole} = setup({
+      const {getByTestId} = setup({
         isEditing: true,
         currentDiscussionTopic: mockDiscussionTopic,
         onSubmit: mockOnSubmit,
@@ -154,7 +155,7 @@ describe('DiscussionTopicForm', () => {
 
       expect(useAssetProcessorsState.getState().attachedProcessors).toHaveLength(2)
 
-      getByRole('button', {name: 'Save'}).click()
+      getByTestId('save-button').click()
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalled()
@@ -179,7 +180,7 @@ describe('DiscussionTopicForm', () => {
 
     it('adds a new discussion topic with AssetProcessors', async () => {
       const mockOnSubmit = jest.fn()
-      const {getByRole, getByLabelText, getByPlaceholderText} = setup({
+      const {getByTestId, getByLabelText, getByPlaceholderText} = setup({
         isEditing: false,
         onSubmit: mockOnSubmit,
       })
@@ -198,7 +199,7 @@ describe('DiscussionTopicForm', () => {
       })
 
       expect(useAssetProcessorsState.getState().attachedProcessors).toHaveLength(1)
-      getByRole('button', {name: 'Save'}).click()
+      getByTestId('save-button').click()
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalled()
@@ -218,6 +219,54 @@ describe('DiscussionTopicForm', () => {
           },
         },
       ])
+    })
+
+    it('does not show AssetProcessors section when lti_asset_processor_course is disabled', () => {
+      window.ENV.FEATURES = {
+        lti_asset_processor_discussions: true,
+        lti_asset_processor_course: false,
+      }
+      const assignment = Assignment.mock()
+      // @ts-expect-error
+      const mockDiscussionTopic = DiscussionTopic.mock({assignment})
+      const {queryByText} = setup({
+        isEditing: true,
+        currentDiscussionTopic: mockDiscussionTopic,
+      })
+
+      expect(queryByText('Document Processing App(s)')).not.toBeInTheDocument()
+    })
+
+    it('does not show AssetProcessors section when lti_asset_processor_discussions is disabled', () => {
+      window.ENV.FEATURES = {
+        lti_asset_processor_discussions: false,
+        lti_asset_processor_course: true,
+      }
+      const assignment = Assignment.mock()
+      // @ts-expect-error
+      const mockDiscussionTopic = DiscussionTopic.mock({assignment})
+      const {queryByText} = setup({
+        isEditing: true,
+        currentDiscussionTopic: mockDiscussionTopic,
+      })
+
+      expect(queryByText('Document Processing App(s)')).not.toBeInTheDocument()
+    })
+
+    it('does not show AssetProcessors section when both feature flags are disabled', () => {
+      window.ENV.FEATURES = {
+        lti_asset_processor_discussions: false,
+        lti_asset_processor_course: false,
+      }
+      const assignment = Assignment.mock()
+      // @ts-expect-error
+      const mockDiscussionTopic = DiscussionTopic.mock({assignment})
+      const {queryByText} = setup({
+        isEditing: true,
+        currentDiscussionTopic: mockDiscussionTopic,
+      })
+
+      expect(queryByText('Document Processing App(s)')).not.toBeInTheDocument()
     })
   })
 })

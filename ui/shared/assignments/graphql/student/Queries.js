@@ -184,7 +184,7 @@ export const SUBMISSION_HISTORIES_QUERY = gql`
   query NextSubmission($submissionID: ID!) {
     node(id: $submissionID) {
       ... on Submission {
-        submissionHistoriesConnection(filter: {includeCurrentSubmission: false}) {
+        submissionHistoriesConnection(filter: {includeCurrentSubmission: false}, first: 100) {
           nodes {
             ...SubmissionHistory
           }

@@ -309,6 +309,7 @@ class ApplicationController < ActionController::Base
           RAILS_ENVIRONMENT: Canvas.environment
         }
         @js_env[:use_dyslexic_font] = @current_user&.prefers_dyslexic_font? if @current_user&.can_see_dyslexic_font_feature_flag?(session) && !mobile_device?
+        @js_env[:widget_dashboard_overridable] = @current_user&.prefers_widget_dashboard? if widget_dashboard_allowed_for_user? && !mobile_device?
         if @domain_root_account&.feature_enabled?(:restrict_student_access)
           @js_env[:current_user_has_teacher_enrollment] = @current_user&.teacher_enrollment?
         end
@@ -342,7 +343,8 @@ class ApplicationController < ActionController::Base
         @js_env[:DIRECT_SHARE_ENABLED] = @context.respond_to?(:grants_right?) && @context.grants_right?(@current_user, session, :direct_share)
         @js_env[:CAN_VIEW_CONTENT_SHARES] = @current_user&.can_view_content_shares?
         @js_env[:FEATURES] = cached_features.merge(
-          canvas_k6_theme: @context.try(:feature_enabled?, :canvas_k6_theme)
+          canvas_k6_theme: @context.try(:feature_enabled?, :canvas_k6_theme),
+          lti_asset_processor_course: @context.try(:feature_enabled?, :lti_asset_processor_course)
         )
         @js_env[:PENDO_APP_ID] = usage_metrics_api_key if load_usage_metrics?
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(["user_display_json", @current_user].cache_key, expires_in: 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback, :email]) } : {}
@@ -464,6 +466,7 @@ class ApplicationController < ActionController::Base
     scheduled_feedback_releases
     speedgrader_studio_media_capture
     student_access_token_management
+    top_navigation_placement_a11y_fixes
     validate_call_to_action
     block_content_editor_ai_alt_text
   ].freeze
@@ -746,6 +749,14 @@ class ApplicationController < ActionController::Base
     @domain_root_account&.feature_enabled?(:k12)
   end
   helper_method :k12?
+
+  def widget_dashboard_allowed_for_user?
+    return false unless @current_user && @domain_root_account
+
+    # Check if the feature is allowed in any of the user's associated accounts
+    # This allows sub-accounts to independently enable the feature
+    @current_user.associated_accounts.any? { |account| account.feature_allowed?(:widget_dashboard) }
+  end
 
   def grading_periods?
     !!@context.try(:grading_periods?)
@@ -1398,6 +1409,10 @@ class ApplicationController < ActionController::Base
           params[:context_id] = params[:course_section_id]
           params[:context_type] = "CourseSection"
           @context = api_find(CourseSection, params[:course_section_id])
+        elsif params[:assessment_question_id]
+          params[:context_id] = params[:assessment_question_id]
+          params[:context_type] = "AssessmentQuestion"
+          @context = api_find(AssessmentQuestion, params[:assessment_question_id])
         elsif request.path.start_with?("/profile") || request.path == "/" || request.path.start_with?("/dashboard/files") || request.path.start_with?("/calendar") || request.path.start_with?("/assignments") || request.path.start_with?("/files") || request.path == "/api/v1/calendar_events/visible_contexts"
           # ^ this should be split out into things on the individual controllers
           @context_is_current_user = true
@@ -1426,6 +1441,10 @@ class ApplicationController < ActionController::Base
           if @context.respond_to?(:short_name)
             crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, session, :read)
             add_crumb(@context.nickname_for(@current_user, :short_name), crumb_url)
+          end
+
+          if @context.is_a?(AssessmentQuestion)
+            @skip_crumb = true if params[:controller] == "files" && params[:action] == "show"
           end
 
           @set_badge_counts = true
@@ -2808,7 +2827,7 @@ class ApplicationController < ActionController::Base
   end
 
   def json_cast(obj)
-    obj = obj.as_json if obj.respond_to?(:as_json)
+    obj = recursively_transform_errors(obj)
     stringify_json_ids? ? StringifyIds.recursively_stringify_ids(obj) : obj
   end
 
@@ -3508,4 +3527,19 @@ class ApplicationController < ActionController::Base
     true
   end
   helper_method :add_ignite_agent_bundle?
+
+  private
+
+  def recursively_transform_errors(obj)
+    case obj.class.name
+    when "ActiveModel::Errors"
+      ::Api::Errors::Reporter.to_json(obj)
+    when "Hash", "ActiveSupport::HashWithIndifferentAccess"
+      obj.transform_values { |value| recursively_transform_errors(value) }
+    when "Array"
+      obj.map { |item| recursively_transform_errors(item) }
+    else
+      obj.respond_to?(:as_json) ? obj.as_json : obj
+    end
+  end
 end

@@ -20,8 +20,6 @@
 describe AccessibilityResourceScan do
   subject { described_class.new }
 
-  it_behaves_like "it has a single accessibility context"
-
   describe "defaults" do
     it "sets the default workflow_state to queued" do
       expect(subject.workflow_state).to eq "queued"
@@ -31,29 +29,6 @@ describe AccessibilityResourceScan do
   describe "factories" do
     it "has a valid factory" do
       expect(accessibility_resource_scan_model).to be_valid
-    end
-  end
-
-  describe "scopes" do
-    describe ".for_context" do
-      context "when context is valid" do
-        let(:wiki_page) { wiki_page_model }
-        let(:subject_for_context) { accessibility_resource_scan_model(context: wiki_page) }
-
-        it "returns the correct record" do
-          expect(described_class.for_context(wiki_page)).to contain_exactly(subject_for_context)
-        end
-      end
-
-      context "when context is not valid" do
-        let(:invalid_context) { double("InvalidContext", id: 1) }
-
-        it "raises an error" do
-          expect { described_class.for_context(invalid_context) }.to(
-            raise_error(ArgumentError, "Unsupported context type: RSpec::Mocks::Double")
-          )
-        end
-      end
     end
   end
 
@@ -191,6 +166,45 @@ describe AccessibilityResourceScan do
         scan.update_issue_count!
 
         expect(scan.reload.issue_count).to eq 0
+      end
+    end
+  end
+
+  describe "#context_url" do
+    let(:course_id) { 1 }
+
+    before { allow(subject).to receive(:course_id).and_return(course_id) }
+
+    context "when the context is a wiki_page" do
+      let(:wiki_page) { wiki_page_model }
+
+      it "returns the correct wiki_page URL" do
+        subject.wiki_page = wiki_page
+        expect(subject.context_url).to eq("/courses/#{subject.course_id}/pages/#{wiki_page.id}")
+      end
+    end
+
+    context "when the context is an assignment" do
+      let(:assignment) { assignment_model }
+
+      it "returns the correct assignment URL" do
+        subject.assignment = assignment
+        expect(subject.context_url).to eq("/courses/#{subject.course_id}/assignments/#{assignment.id}")
+      end
+    end
+
+    context "when the context is an attachment" do
+      let(:attachment) { attachment_model }
+
+      it "returns the correct attachment URL" do
+        subject.attachment = attachment
+        expect(subject.context_url).to eq("/courses/#{subject.course_id}/files?preview=#{attachment.id}")
+      end
+    end
+
+    context "when no context is present" do
+      it "returns nil" do
+        expect(subject.context_url).to be_nil
       end
     end
   end

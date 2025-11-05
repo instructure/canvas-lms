@@ -24,8 +24,7 @@ describe Lti::ContextControl do
 
   let(:params) do
     {
-      account:,
-      course:,
+      context: account || course,
       registration:,
       deployment:,
       available:,
@@ -52,20 +51,12 @@ describe Lti::ContextControl do
   end
 
   describe "validations" do
-    context "when both account and course are present" do
-      let(:course) { course_model(account:) }
-
-      it "is invalid" do
-        expect { create! }.to raise_error(ActiveRecord::RecordInvalid, /must have either an account or a course, not both/)
-      end
-    end
-
     context "when neither account nor course are present" do
       let(:account) { nil }
       let(:course) { nil }
 
       it "is invalid" do
-        expect { create! }.to raise_error(ActiveRecord::RecordInvalid, /must have either an account or a course/)
+        expect { create! }.to raise_error(ActiveRecord::RecordInvalid, /Exactly one context must be present/)
       end
     end
 
@@ -225,8 +216,7 @@ describe Lti::ContextControl do
       let_once(:controls) do
         contexts.map do |context|
           Lti::ContextControl.create!(
-            account: context.is_a?(Account) ? context : nil,
-            course: context.is_a?(Course) ? context : nil,
+            context:,
             registration:,
             deployment:
           )

@@ -53,6 +53,43 @@ module Api::V1::QuizQuestion
     matching_answer_incorrect_matches
   ].freeze
 
+  # allowlist question details for students
+  API_CENSOR_ATTR_ALLOWLIST = %w[
+    id
+    position
+    quiz_group_id
+    quiz_id
+    assessment_question_id
+    assessment_question
+    question_name
+    question_type
+    question_text
+    answers
+    matches
+    formulas
+    variables
+    answer_tolerance
+    formula_decimal_places
+  ].freeze
+
+  # only include answers for types that need it to show choices
+  API_CENSOR_QUESTION_TYPE_ANSWERS_ALLOWLIST = %w[
+    multiple_choice_question
+    true_false_question
+    multiple_answers_question
+    matching_question
+    multiple_dropdowns_question
+    calculated_question
+  ].freeze
+
+  API_CENSOR_ANSWER_ATTRS_ALLOWLIST = %w[
+    id
+    text
+    html
+    blank_id
+    variables
+  ].freeze
+
   # @param [Quizzes::Quiz#quiz_data] quiz_data
   #   If you specify a quiz_data construct from a submission (or a quiz), then
   #   the questions will be modified to use the fields found in that
@@ -120,38 +157,9 @@ module Api::V1::QuizQuestion
   #   question.
   def censor(question_data)
     question_data = question_data.with_indifferent_access
+    question_data.keep_if { |k, _v| API_CENSOR_ATTR_ALLOWLIST.include?(k.to_s) }
 
-    # whitelist question details for students
-    attr_whitelist = %w[
-      id
-      position
-      quiz_group_id
-      quiz_id
-      assessment_question_id
-      assessment_question
-      question_name
-      question_type
-      question_text
-      answers
-      matches
-      formulas
-      variables
-      answer_tolerance
-      formula_decimal_places
-    ]
-    question_data.keep_if { |k, _v| attr_whitelist.include?(k.to_s) }
-
-    # only include answers for types that need it to show choices
-    allow_answer_whitelist = %w[
-      multiple_choice_question
-      true_false_question
-      multiple_answers_question
-      matching_question
-      multiple_dropdowns_question
-      calculated_question
-    ]
-
-    unless allow_answer_whitelist.include?(question_data[:question_type])
+    unless API_CENSOR_QUESTION_TYPE_ANSWERS_ALLOWLIST.include?(question_data[:question_type])
       question_data.delete(:answers)
     end
 
@@ -159,7 +167,7 @@ module Api::V1::QuizQuestion
     # multiple_dropdown needs blank_id
     # formula questions need variables
     question_data[:answers]&.each do |record|
-      record.keep_if { |k, _| %w[id text html blank_id variables].include?(k.to_s) }
+      record.keep_if { |k, _| API_CENSOR_ANSWER_ATTRS_ALLOWLIST.include?(k.to_s) }
     end
 
     question_data

@@ -33,8 +33,8 @@ module PeerReview::Validations
   end
 
   def validate_feature_enabled(assignment)
-    unless assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
-      raise PeerReview::FeatureDisabledError, I18n.t("Peer Review Allocation and Grading feature flag is disabled")
+    unless assignment.context.feature_enabled?(:peer_review_grading)
+      raise PeerReview::FeatureDisabledError, I18n.t("Peer Review Grading feature flag is disabled")
     end
   end
 
@@ -106,6 +106,10 @@ module PeerReview::Validations
 
   def validate_section_exists(section)
     raise PeerReview::SectionNotFoundError, I18n.t("Section does not exist") unless section.present?
+  end
+
+  def validate_course_exists(course)
+    raise PeerReview::CourseNotFoundError, I18n.t("Course does not exist") unless course.present?
   end
 
   def validate_student_ids_required(student_ids)

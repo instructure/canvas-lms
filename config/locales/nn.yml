@@ -2592,6 +2592,7 @@ nn:
   all_filters_have_been_cleared_7f38f765: "Alle filter er fjerna."
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Er du ferdig?  Du kan publisere emnet ditt. Klikk på knappen nedanfor. Publisering inneber at brukarane kan ta del på emnet."
   all_gradeable_student_submissions_report_d11ee705: "Rapport over alle studentinnleveringar som kan vurderast"
+  all_grades_for_students_in_this_course_will_no_lon_a32bf5d4: "Vurderingane til studentane på dette emnet er ikkje lenger synlege. Du kan hente inn vurderingar seinare ved å kryssliste emnet på nytt, men i mellomtida kjem vurderingane for desse studentane frå det opphavlege emnet."
   all_grades_hidden_3092d5b5: "Alle vurderingar er skjulte"
   all_grades_hidden_84409b76: "Alle vurderingar er skjulte"
   all_grades_posted_616a85ab: "Alle vurderingar er posta"
@@ -3742,6 +3743,7 @@ nn:
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "Er du sikker på at du vil avlyse avtalen med %{name}?"
   are_you_sure_you_want_to_change_the_state_of_this__18c6a72: "Er du sikker på at du vil endre tilstanda til denne utviklernøkkelen?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Er du sikker på at du vil kopiere til den siste karakteren? Dette overskriv den gjeldande karakteren."
+  are_you_sure_you_want_to_de_cross_list_this_sectio_fae8a399: "Er du sikker på at du vil fjerne krysslisting for denne klassa?"
   are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "Er du sikker på at du vil deaktivere brukaren? Då vil ikkje brukaren lenger kunne delta på emnet."
   are_you_sure_you_want_to_delete_domain_domain_c9b4b5f5: "Er du sikker på at du vil slette domenet %{domain}?"
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
@@ -4077,6 +4079,11 @@ nn:
   assignment_overrides_export_1c008ad2: "Oppgåve overstyrer eksport"
   assignment_path_selected_e80191d1: "Oppgåvesti valt"
   assignment_preview_3833e819: "%{assignment}førehandsvising"
+  assignment_quiz_type: 
+    quiz_type: Quiztype
+    quiz_type_options: 
+      graded_survey: "Vurdert undersøking"
+      ungraded_survey: "Undersøking som ikkje er vurdert"
   assignment_scheduling_e2a3eaf6: "Planlegging av oppgåve"
   assignment_score_summary_f1dc9708: "Oppsummering av oppgåveresultat"
   assignment_selection_6bff05c4: Oppgåveutval
@@ -5522,6 +5529,8 @@ nn:
       slot_limit: "Avgrens tidsluka til"
       users: brukarar.
     edit_assignment: 
+      ? " group"
+      : "Gruppe:"
       calendar: "Kalender:"
       due: "Frist:"
       group: "Gruppe:"
@@ -5658,6 +5667,7 @@ nn:
       delete_link: "Slett tidsintervallet"
       end_time_label: Sluttidspunkt
       start_time_label: Starttidspunkt
+    title_is_required: "Tittel er obligatorisk! "
     titles: 
       edit_appointment_group: "Rediger avtalegruppe"
       edit_event: "Rediger hending"
@@ -8803,6 +8813,7 @@ nn:
         grade_syncing: "Synkronisering av vurderingar"
         integrations: Integrasjonar
         navigation: Navigasjon
+        quiz_settings: Quizinnstillingar
         sections: Seksjonar
         tools: Appar
       titles: 
@@ -9491,6 +9502,9 @@ nn:
   day_s_7cc1231f: Dag(ar)
   days_af2ac87b: Dagar
   days_late_a3a721b0: "Dagar for seint"
+  de_cross_list_this_section_6f7b5984: "Fjern denne klassa frå krysslisting"
+  de_cross_list_this_section_774a827c: "Fjern klassa frå krysslisting"
+  de_cross_listing_section_c2ee371: "Fjernar krysslisting av seksjon..."
   deactivate_this_key_3e79a2b5: "Deaktiver denne nøkkelen"
   deactivate_user_86c09036: "Deaktiver brukar"
   debugging_f98fcd74: Feilsøking
@@ -22920,6 +22934,7 @@ nn:
   reviewers_successfully_added_bd4b629a: "Fagfellevurderarar er lagt til"
   reviews_due_5178cab6: "Vurderingar med frist"
   reviews_per_student_378292b3: "Vurderingar per brukar"
+  revision_history_abfd1cfd: Revisjonshistorikk
   rich_content_editor_2708ef21: "Redigeringsprogram for rikt innhald"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Sidemeny med ekstra val til redigeringsprogram for rikt innhald"
   right_sidebar_logo_5483dc0a: "Logo for høgre sidestolpe"
@@ -23586,6 +23601,7 @@ nn:
   section_specific_discussions_are_disabled_9e3fd431: "Seksjonsspesifikke diskusjonar er slått av"
   section_specific_topics_must_have_sections_11868960: "Seksjonsspesifikke diskusjonsemne må ha seksjonar"
   section_starts_at_65eaed1: "Seksjon startar på"
+  section_successfully_de_cross_listed_df3b64e: "Fjerna klassa frå krysslisting."
   sections: 
     section_created: "Seksjon er oppretta."
     section_creation_failed: "Oppretting av seksjon mislukkast"

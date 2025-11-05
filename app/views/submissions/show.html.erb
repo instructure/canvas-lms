@@ -250,9 +250,9 @@
         <% end %>
       </div>
     </div>
-    <% if @submission.submission_type == "online_text_entry" %>
+    <% if @submission.submission_type == "online_text_entry" || @submission.submission_type == "discussion_topic" %>
       <div
-        id="asset_report_text_entry_status_container"
+        id="asset_report_status_container"
         data-attempt="<%= @submission.attempt %>"
         data-submission-id="<%= @submission.id %>"
         data-submission-type="<%= @submission.submission_type %>"

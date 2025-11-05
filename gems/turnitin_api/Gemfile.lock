@@ -12,13 +12,13 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (7.2.2.2)
-      activesupport (= 7.2.2.2)
-    activerecord (7.2.2.2)
-      activemodel (= 7.2.2.2)
-      activesupport (= 7.2.2.2)
+    activemodel (8.0.3)
+      activesupport (= 8.0.3)
+    activerecord (8.0.3)
+      activemodel (= 8.0.3)
+      activesupport (= 8.0.3)
       timeout (>= 0.4.0)
-    activesupport (7.2.2.2)
+    activesupport (8.0.3)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -30,6 +30,7 @@ GEM
       minitest (>= 5.1)
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
+      uri (>= 0.13.1)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
     aroi (1.0.0)
@@ -37,7 +38,7 @@ GEM
       activesupport (>= 5.2)
     base64 (0.3.0)
     benchmark (0.4.1)
-    bigdecimal (3.2.3)
+    bigdecimal (3.3.1)
     concurrent-ruby (1.3.5)
     connection_pool (2.5.4)
     crack (1.0.0)
@@ -65,7 +66,7 @@ GEM
       statsd-ruby (~> 1.0)
     json (2.15.0)
     logger (1.7.0)
-    minitest (5.25.5)
+    minitest (5.26.0)
     multipart-post (2.4.1)
     net-http (0.6.0)
       uri
@@ -91,7 +92,7 @@ GEM
     timeout (0.4.3)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    uri (1.0.3)
+    uri (1.0.4)
     webmock (3.25.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)

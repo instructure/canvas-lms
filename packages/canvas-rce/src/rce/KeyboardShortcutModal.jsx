@@ -124,7 +124,7 @@ export default function KeyboardShortcutModal(props) {
               href="https://www.tiny.cloud/docs/advanced/keyboard-shortcuts/"
               target="rcekbshortcut"
             >
-              https://www.tiny.cloud/docs/advanced/keyboard-shortcuts/
+              TinyMCE Keyboard Shortcuts
             </a>
           </View>
         </View>

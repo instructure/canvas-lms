@@ -31,7 +31,6 @@ admin_analytics:
   root_opt_in: true
   beta: false
 
-
 # Intelligent Insights - Provided through K20 LTI App
 k20_course_readiness:
   state: hidden
@@ -141,6 +140,15 @@ title_iv_financial_aid_report:
   root_opt_in: true
   beta: true
   shadow: true
+k20_improved_criteria_builder:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Improved Criteria Builder
+  description:
+    k20_improved_criteria_builder: Enables the Intelligent Insights - Improved Criteria Builder feature
+  root_opt_in: true
+  beta: true
+  shadow: true
 
 # Intelligent Insights - Provided through Ask Your Data LTI App
 advanced_analytics_ask_questions:
@@ -174,6 +182,14 @@ intelligent_insights_contextual_messaging:
   applies_to: Account
   display_name: "Intelligent Insights - Contextual Messaging"
   description: Show Intelligent Insights new contextual messaging feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+intelligent_insights_student_level_contextual_messaging:
+  state: hidden
+  applies_to: Account
+  display_name: "Intelligent Insights - Student level contextual messaging"
+  description: Show Intelligent Insights new student level contextual messaging feature.
   root_opt_in: true
   beta: true
   shadow: true
