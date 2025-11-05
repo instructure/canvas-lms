@@ -25,7 +25,11 @@ import {ZAccountId} from '../../../../model/AccountId'
 import {ZLtiRegistrationId} from '../../../../model/LtiRegistrationId'
 import {mockUser} from '../../../manage/__tests__/helpers'
 import {LtiPlacements} from '../../../../model/LtiPlacement'
-import type {ConfigChangeEntryWithDiff} from '../differ'
+import type {ConfigChangeEntryWithDiff, AvailabilityChangeEntryWithDiff} from '../differ'
+import {mockDeployment, mockContextControl} from '../../availability/__tests__/helpers'
+import {ZLtiDeploymentId} from '../../../../model/LtiDeploymentId'
+import {ZLtiContextControlId} from '../../../../model/LtiContextControl'
+import {createMockAvailabilityEntry} from './factories'
 
 const mockConfigSnapshot = () => ({
   internal_config: {
@@ -1003,6 +1007,184 @@ describe('HistoryDiffModal', () => {
       expect(
         screen.getByText(
           /We're unable to show a comparison for these changes. For a complete representation of changes, please use the API\./,
+        ),
+      ).toBeInTheDocument()
+    })
+  })
+
+  describe('availability changes', () => {
+    const mockAvailabilityEntry = (
+      overrides: Partial<AvailabilityChangeEntryWithDiff>,
+    ): AvailabilityChangeEntryWithDiff => ({
+      ...createMockAvailabilityEntry([], []),
+      deploymentDiffs: [],
+      totalAdditions: 0,
+      totalRemovals: 0,
+      ...overrides,
+    })
+
+    it('displays availability change', () => {
+      const entry = mockAvailabilityEntry({
+        deploymentDiffs: [
+          {
+            ...mockDeployment({
+              id: ZLtiDeploymentId.parse('1'),
+              deployment_id: '1',
+              context_id: '100',
+              context_name: 'Test Account',
+              context_type: 'Account',
+            }),
+            controlDiffs: [
+              {
+                ...mockContextControl({
+                  id: ZLtiContextControlId.parse('1'),
+                  context_name: 'Test Account',
+                  available: true,
+                }),
+                availabilityChange: {
+                  oldValue: false,
+                  newValue: true,
+                },
+              },
+            ],
+          },
+        ],
+        totalAdditions: 1,
+        totalRemovals: 1,
+      })
+
+      render(<HistoryDiffModal entry={entry} isOpen={true} onClose={onClose} />)
+
+      expect(screen.getByText(/Installed in Test Account/i)).toBeInTheDocument()
+      expect(screen.getByText(/Deployment ID: 1/)).toBeInTheDocument()
+      expect(
+        screen.getByLabelText(
+          /The availability of this tool in Test Account was changed from Not Available to Available/i,
+        ),
+      ).toBeInTheDocument()
+    })
+
+    it('handles rendering diffs across multiple deployments', () => {
+      const entry = mockAvailabilityEntry({
+        deploymentDiffs: [
+          {
+            ...mockDeployment({
+              id: ZLtiDeploymentId.parse('1'),
+              deployment_id: '1',
+              context_id: '100',
+              context_name: 'Account A',
+              context_type: 'Account',
+            }),
+            controlDiffs: [
+              {
+                ...mockContextControl({
+                  id: ZLtiContextControlId.parse('1'),
+                  context_name: 'Account A',
+                  available: true,
+                }),
+                availabilityChange: {
+                  oldValue: false,
+                  newValue: true,
+                },
+              },
+            ],
+          },
+          {
+            ...mockDeployment({
+              id: ZLtiDeploymentId.parse('2'),
+              deployment_id: '2',
+              context_id: '200',
+              context_name: 'Course B',
+              context_type: 'Course',
+            }),
+            controlDiffs: [
+              {
+                ...mockContextControl({
+                  id: ZLtiContextControlId.parse('2'),
+                  context_name: 'Course B',
+                  available: false,
+                }),
+                availabilityChange: {
+                  oldValue: true,
+                  newValue: false,
+                },
+              },
+            ],
+          },
+        ],
+        totalAdditions: 2,
+        totalRemovals: 2,
+      })
+
+      render(<HistoryDiffModal entry={entry} isOpen={true} onClose={onClose} />)
+
+      expect(screen.getByText(/Installed in Account A/i)).toBeInTheDocument()
+      expect(screen.getByText(/Deployment ID: 1/)).toBeInTheDocument()
+      expect(
+        screen.getByLabelText(
+          /The availability of this tool in Account A was changed from Not Available to Available/i,
+        ),
+      ).toBeInTheDocument()
+
+      expect(screen.getByText(/Installed in Course B/i)).toBeInTheDocument()
+      expect(screen.getByText(/Deployment ID: 2/)).toBeInTheDocument()
+      expect(
+        screen.getByLabelText(
+          /The availability of this tool in Course B was changed from Available to Not Available/i,
+        ),
+      ).toBeInTheDocument()
+    })
+
+    it('displays multiple control changes within a single deployment', () => {
+      const entry = mockAvailabilityEntry({
+        deploymentDiffs: [
+          {
+            ...mockDeployment({
+              id: ZLtiDeploymentId.parse('1'),
+              deployment_id: '1',
+              context_name: 'Main Account',
+            }),
+            controlDiffs: [
+              {
+                ...mockContextControl({
+                  id: ZLtiContextControlId.parse('1'),
+                  context_name: 'Sub Account 1',
+                  available: true,
+                }),
+                availabilityChange: {
+                  oldValue: false,
+                  newValue: true,
+                },
+              },
+              {
+                ...mockContextControl({
+                  id: ZLtiContextControlId.parse('2'),
+                  context_name: 'Sub Account 2',
+                  available: false,
+                }),
+                availabilityChange: {
+                  oldValue: true,
+                  newValue: false,
+                },
+              },
+            ],
+          },
+        ],
+        totalAdditions: 2,
+        totalRemovals: 2,
+      })
+
+      render(<HistoryDiffModal entry={entry} isOpen={true} onClose={onClose} />)
+
+      expect(screen.getByText(/Installed in Main Account/i)).toBeInTheDocument()
+      expect(
+        screen.getByLabelText(
+          /The availability of this tool in Sub Account 1 was changed from Not Available to Available/i,
+        ),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByLabelText(
+          /The availability of this tool in Sub Account 2 was changed from Available to Not Available/i,
         ),
       ).toBeInTheDocument()
     })
