@@ -363,6 +363,137 @@ describe AuthenticationMethods do
         expect(controller.render_hash[:json][:errors]).to eq "Cannot change masquerade"
       end
     end
+
+    context "with an InstAccess token" do
+      include_context "InstAccess setup"
+
+      let(:account) { Account.create!(name: "Test Account") }
+      let(:user) { user_with_pseudonym(active_all: true, account:) }
+
+      def setup_with_inst_access_token(token)
+        request = double(
+          authorization: "Bearer #{token.to_unencrypted_token_string}",
+          format: double(json?: true),
+          host_with_port: "",
+          url: "",
+          method: "GET"
+        )
+        controller = mock_controller_class.new(request:, root_account: account)
+        allow(controller).to receive(:api_request?).and_return(true)
+        controller
+      end
+
+      context "with tenant matching enforcement" do
+        context "when token tenant matches domain root account" do
+          let(:token) do
+            InstAccess::Token.for_user(
+              user_uuid: user.uuid,
+              account_uuid: account.uuid
+            )
+          end
+
+          it "successfully loads the user" do
+            controller = setup_with_inst_access_token(token)
+            expect(controller.send(:load_user)).to eq user
+            expect(controller.instance_variable_get(:@current_user)).to eq user
+            expect(controller.instance_variable_get(:@current_pseudonym)).to eq @pseudonym
+          end
+
+          it "sets authenticated_with_jwt to true" do
+            controller = setup_with_inst_access_token(token)
+            controller.send(:load_user)
+            expect(controller.instance_variable_get(:@authenticated_with_jwt)).to be true
+          end
+        end
+
+        context "when token tenant does NOT match domain root account" do
+          let(:different_account) { Account.create!(name: "Different Account") }
+          let(:token) do
+            InstAccess::Token.for_user(
+              user_uuid: user.uuid,
+              account_uuid: different_account.uuid
+            )
+          end
+
+          context "with feature flag DISABLED (shadow mode)" do
+            before do
+              Account.site_admin.feature_flags.where(feature: :enforce_service_token_tenant_matching).destroy_all
+            end
+
+            it "allows authentication" do
+              controller = setup_with_inst_access_token(token)
+              expect(controller.send(:load_user)).to eq user
+            end
+
+            it "sets current_user and current_pseudonym" do
+              controller = setup_with_inst_access_token(token)
+              controller.send(:load_user)
+              expect(controller.instance_variable_get(:@current_user)).to eq user
+              expect(controller.instance_variable_get(:@current_pseudonym)).to eq @pseudonym
+            end
+
+            it "sends an InstStatsd event for monitoring" do
+              expect(InstStatsd::Statsd).to receive(:event).with(
+                "Service user authorization tenant mismatch",
+                anything,
+                hash_including(
+                  type: "tenant_mismatch",
+                  alert_type: :error
+                )
+              )
+              controller = setup_with_inst_access_token(token)
+              controller.send(:load_user)
+            end
+          end
+
+          context "with feature flag ENABLED" do
+            before do
+              Account.site_admin.feature_flags.create!(
+                feature: :enforce_service_token_tenant_matching,
+                state: "on"
+              )
+            end
+
+            it "raises AccessTokenError" do
+              controller = setup_with_inst_access_token(token)
+              expect { controller.send(:load_user) }.to raise_error(AuthenticationMethods::AccessTokenError)
+            end
+
+            it "does not set current_user" do
+              controller = setup_with_inst_access_token(token)
+              begin
+                controller.send(:load_user)
+              rescue AuthenticationMethods::AccessTokenError
+                # Expected
+              end
+              expect(controller.instance_variable_get(:@current_user)).to be_nil
+            end
+
+            it "does not send an InstStatsd event" do
+              expect(InstStatsd::Statsd).not_to receive(:event)
+              controller = setup_with_inst_access_token(token)
+              expect { controller.send(:load_user) }.to raise_error(AuthenticationMethods::AccessTokenError)
+            end
+          end
+        end
+
+        context "when tenant check passes but developer key is invalid" do
+          let(:developer_key) { DeveloperKey.create!(name: "key", account:, workflow_state: "deleted") }
+          let(:token) do
+            InstAccess::Token.for_user(
+              user_uuid: user.uuid,
+              account_uuid: account.uuid,
+              client_id: developer_key.global_id
+            )
+          end
+
+          it "raises AccessTokenError due to invalid developer key" do
+            controller = setup_with_inst_access_token(token)
+            expect { controller.send(:load_user) }.to raise_error(AuthenticationMethods::AccessTokenError)
+          end
+        end
+      end
+    end
   end
 
   describe "#masked_authenticity_token" do
