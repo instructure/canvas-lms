@@ -151,9 +151,7 @@ module Types
       if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
          context[:course]&.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
          object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
-        Loaders::AssociationLoader.for(User, :pseudonyms)
-                                  .load(object)
-                                  .then do
+        load_association(:pseudonyms).then do
           pseudonym = SisPseudonym.for(object,
                                        domain_root_account,
                                        type: :implicit,
@@ -171,9 +169,7 @@ module Types
       if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
          context[:course]&.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
          object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
-        Loaders::AssociationLoader.for(User, :pseudonyms)
-                                  .load(object)
-                                  .then do
+        load_association(:pseudonyms).then do
           pseudonym = SisPseudonym.for(object,
                                        domain_root_account,
                                        type: :implicit,
@@ -216,24 +212,23 @@ module Types
                required: false
     end
 
-    # TODO: handle N+1
     field :login_id, String, null: true
     def login_id
       course = context[:course]
       return nil unless course
       return nil unless course.grants_right?(current_user, session, :view_user_logins)
 
-      pseudonym = SisPseudonym.for(
-        object,
-        course,
-        type: :implicit,
-        require_sis: false,
-        root_account: context[:domain_root_account],
-        in_region: true
-      )
-      return nil unless pseudonym
-
-      pseudonym.unique_id
+      load_association(:pseudonyms).then do
+        pseudonym = SisPseudonym.for(
+          object,
+          course,
+          type: :implicit,
+          require_sis: false,
+          root_account: context[:domain_root_account],
+          in_region: true
+        )
+        pseudonym&.unique_id
+      end
     end
 
     def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {})
