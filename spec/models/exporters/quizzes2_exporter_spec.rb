@@ -106,6 +106,73 @@ describe "Quizzes2 Exporter" do
       )
     end
 
+    context "new_quizzes type mapping" do
+      before do
+        Account.site_admin.enable_feature!(:new_quizzes_surveys)
+      end
+
+      {
+        "survey" => "ungraded_survey",
+        "graded_survey" => "graded_survey",
+        "assignment" => "graded_quiz",
+        "practice_quiz" => "graded_quiz"
+      }.each do |quiz_type, expected_type|
+        it "maps '#{quiz_type}' to '#{expected_type}'" do
+          assignment = export(quiz_type)
+          expect(assignment.settings.dig("new_quizzes", "type")).to eq expected_type
+        end
+      end
+
+      def export(quiz_type)
+        graded_survey_quiz = @course.quizzes.create!(title: quiz_type.capitalize, quiz_type:)
+        ce = @course.content_exports.create!(
+          export_type: ContentExport::QUIZZES2,
+          selected_content: graded_survey_quiz.id
+        )
+        exporter = Exporters::Quizzes2Exporter.new(ce)
+        exporter.export
+        @course.assignments.where(migrate_from_id: graded_survey_quiz.id).first
+      end
+    end
+
+    context "anonymous_participants setting" do
+      before do
+        Account.site_admin.enable_feature!(:new_quizzes_surveys)
+      end
+
+      it "sets anonymous_participants to true when quiz has anonymous_submissions" do
+        anonymous_quiz = @course.quizzes.create!(
+          title: "Anonymous Quiz",
+          quiz_type: "survey",
+          anonymous_submissions: true
+        )
+        ce = @course.content_exports.create!(
+          export_type: ContentExport::QUIZZES2,
+          selected_content: anonymous_quiz.id
+        )
+        exporter = Exporters::Quizzes2Exporter.new(ce)
+        exporter.export
+        assignment = @course.assignments.where(migrate_from_id: anonymous_quiz.id).first
+        expect(assignment.settings.dig("new_quizzes", "anonymous_participants")).to be true
+      end
+
+      it "sets anonymous_participants to false when quiz doesn't have anonymous_submissions" do
+        non_anonymous_quiz = @course.quizzes.create!(
+          title: "Non-Anonymous Quiz",
+          quiz_type: "survey",
+          anonymous_submissions: false
+        )
+        ce = @course.content_exports.create!(
+          export_type: ContentExport::QUIZZES2,
+          selected_content: non_anonymous_quiz.id
+        )
+        exporter = Exporters::Quizzes2Exporter.new(ce)
+        exporter.export
+        assignment = @course.assignments.where(migrate_from_id: non_anonymous_quiz.id).first
+        expect(assignment.settings.dig("new_quizzes", "anonymous_participants")).to be false
+      end
+    end
+
     context "when newquizzes_on_quiz_page is enabled" do
       before do
         @course.root_account.enable_feature!(:newquizzes_on_quiz_page)
