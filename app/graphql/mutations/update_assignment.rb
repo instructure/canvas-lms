@@ -37,7 +37,7 @@ class Mutations::UpdateAssignment < Mutations::AssignmentBase::Mutation
     # check permissions asap
     raise GraphQL::ExecutionError, "insufficient permission" unless @working_assignment.grants_right? current_user, :update
 
-    update_proxy = ApiProxy.new(context[:request], @working_assignment, context[:session], current_user)
+    update_proxy = ApiProxy.new(context[:request], @working_assignment, context[:session], current_user, in_app: context[:in_app])
 
     # to use the update_api_assignment method, we have to modify some of the
     # input. first, update_api_assignment doesnt expect a :state key. instead,

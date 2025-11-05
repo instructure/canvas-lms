@@ -1399,6 +1399,11 @@ class AssignmentsApiController < ApplicationController
   #
   #   Only applies when submission_types includes "student_annotation".
   #
+  # @argument assignment[asset_processors][] [Array]
+  #   Document processors for this assignment. New document processors can only be added
+  #   via the interactive LTI Deep Linking flow (in a browser), not via API token or JWT authentication.
+  #   Deletion of document processors (passing an empty array) is allowed via API.
+  #
   # @argument assignment[peer_review][points_possible] [Float]
   #   The maximum points possible for peer reviews.
   #
@@ -1634,6 +1639,11 @@ class AssignmentsApiController < ApplicationController
   #   The Attachment ID of the document being annotated.
   #
   #   Only applies when submission_types includes "student_annotation".
+  #
+  # @argument assignment[asset_processors][] [Array]
+  #   Document processors for this assignment. New document processors can only be added
+  #   via the interactive LTI Deep Linking flow (in a browser), not via API token or JWT authentication.
+  #   Deletion of document processors (passing an empty array) is allowed via API.
   #
   # @argument assignment[force_updated_at] [Boolean]
   #   If true, updated_at will be set even if no changes were made.

@@ -107,12 +107,13 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
     include Api
     include Api::V1::Assignment
 
-    def initialize(request, working_assignment, session, current_user)
+    def initialize(request, working_assignment, session, current_user, in_app: true)
       @request = request
       @working_assignment = working_assignment
       @session = session
       @current_user = current_user
       @context = working_assignment.context
+      @in_app = in_app
     end
 
     attr_reader :session
@@ -135,6 +136,10 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
 
     def load_root_account
       @domain_root_account = @request.env["canvas.domain_root_account"] || LoadAccount.default_domain_root_account
+    end
+
+    def in_app?
+      @in_app
     end
   end
 
