@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../common"
-require_relative "widget_dashboard_page"
+require_relative "../../helpers/student_dashboard_common"
 require_relative "../../helpers/files_common"
 
 module CourseTabPage
-  include WidgetDashboardPage
+  include StudentDashboardCommon
   include FilesCommon
 
   #------------------------------ Selectors -----------------------------
