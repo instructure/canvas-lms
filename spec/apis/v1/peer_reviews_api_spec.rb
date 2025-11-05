@@ -470,4 +470,360 @@ describe PeerReviewsApiController, type: :request do
       end
     end
   end
+
+  describe "Post 'allocate'" do
+    before :once do
+      # Enable feature flag for allocation endpoint
+      @course.enable_feature!(:peer_review_allocation)
+
+      @assignment2 = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        peer_reviews: true,
+        peer_review_count: 2,
+        automatic_peer_reviews: false
+      )
+      @resource_path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/allocate"
+      @resource_params = {
+        controller: "peer_reviews_api",
+        action: "allocate",
+        format: "json",
+        course_id: @course.id,
+        assignment_id: @assignment2.id
+      }
+    end
+
+    context "with student context" do
+      it "allocates a peer review successfully" do
+        @user = @student1
+        # Student1 submits
+        @assignment2.submit_homework(@student1, body: "My submission")
+        # Student2 submits
+        @assignment2.submit_homework(@student2, body: "Student2 submission")
+
+        json = api_call(:post, @resource_path, @resource_params)
+
+        expect(json["assessor_id"]).to eq(@student1.id)
+        expect(json["user_id"]).to eq(@student2.id)
+        expect(json["workflow_state"]).to eq("assigned")
+      end
+
+      it "returns error when feature flag is not enabled" do
+        @course.disable_feature!(:peer_review_allocation)
+        @user = @student1
+        @assignment2.submit_homework(@student1, body: "My submission")
+        @assignment2.submit_homework(@student2, body: "Student2 submission")
+
+        json = api_call(:post,
+                        @resource_path,
+                        @resource_params,
+                        {},
+                        {},
+                        { expected_status: 400 })
+        expect(json["errors"]["base"]).to include("feature is not enabled")
+
+        # Re-enable for other tests
+        @course.enable_feature!(:peer_review_allocation)
+      end
+
+      it "returns error when assignment does not have peer reviews enabled" do
+        @assignment3 = @course.assignments.create!(title: "No Peer Reviews")
+        @resource_path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment3.id}/allocate"
+        @resource_params[:assignment_id] = @assignment3.id
+
+        @user = @student1
+        @assignment3.submit_homework(@student1, body: "My submission")
+
+        api_call(:post,
+                 @resource_path,
+                 @resource_params,
+                 {},
+                 {},
+                 { expected_status: 400 })
+      end
+
+      it "returns error when student has not submitted" do
+        @user = @student1
+        @assignment2.submit_homework(@student2, body: "Student2 submission")
+
+        json = api_call(:post,
+                        @resource_path,
+                        @resource_params,
+                        {},
+                        {},
+                        { expected_status: 400 })
+        expect(json["errors"]["base"]).to include("must submit")
+      end
+
+      it "returns error when assignment is locked" do
+        @user = @student1
+        @assignment2.update!(lock_at: 1.day.ago)
+        @assignment2.submit_homework(@student1, body: "My submission")
+
+        json = api_call(:post,
+                        @resource_path,
+                        @resource_params,
+                        {},
+                        {},
+                        { expected_status: 400 })
+        expect(json["errors"]["base"]).to include("no longer available")
+      end
+
+      it "returns error when assignment has not unlocked" do
+        @user = @student1
+        @assignment2.update!(unlock_at: 1.day.from_now)
+        @assignment2.submit_homework(@student1, body: "My submission")
+
+        json = api_call(:post,
+                        @resource_path,
+                        @resource_params,
+                        {},
+                        {},
+                        { expected_status: 400 })
+        expect(json["errors"]["base"]).to include("locked until")
+      end
+
+      it "returns existing ongoing review instead of allocating new one" do
+        @assignment2.submit_homework(@student1, body: "My submission")
+        student3 = student_in_course(active_all: true).user
+        @assignment2.submit_homework(student3, body: "Student3 submission")
+
+        # Create an ongoing review
+        existing_request = @assignment2.assign_peer_review(@student1, student3)
+
+        # Set @user AFTER creating student3 to avoid it being overwritten
+        @user = @student1
+
+        json = api_call(:post, @resource_path, @resource_params)
+
+        expect(json["id"]).to eq(existing_request.id)
+        expect(json["user_id"]).to eq(student3.id)
+      end
+
+      it "returns error when peer review count limit reached" do
+        @assignment2.update!(peer_review_count: 1)
+        @assignment2.submit_homework(@student1, body: "My submission")
+        student3 = student_in_course(active_all: true).user
+        @assignment2.submit_homework(student3, body: "Student3 submission")
+
+        # Create and complete a review
+        request = @assignment2.assign_peer_review(@student1, student3)
+        request.update!(workflow_state: "completed")
+
+        # Set @user AFTER creating student3
+        @user = @student1
+
+        json = api_call(:post,
+                        @resource_path,
+                        @resource_params,
+                        {},
+                        {},
+                        { expected_status: 400 })
+        expect(json["errors"]["base"]).to include("completed all required")
+      end
+
+      it "returns error when no submissions available" do
+        @user = @student1
+        @assignment2.submit_homework(@student1, body: "My submission")
+
+        json = api_call(:post,
+                        @resource_path,
+                        @resource_params,
+                        {},
+                        {},
+                        { expected_status: 400 })
+        expect(json["errors"]["base"]).to include("no peer reviews available")
+      end
+
+      it "prioritizes unreviewed submissions" do
+        @assignment2.submit_homework(@student1, body: "My submission")
+        @assignment2.submit_homework(@student2, body: "Student2 submission")
+
+        student3 = student_in_course(active_all: true).user
+        student4 = student_in_course(active_all: true).user
+
+        # Student3 submits first
+        submission3 = @assignment2.submit_homework(student3, body: "Student3 submission")
+        submission3.update!(submitted_at: 2.days.ago)
+
+        # Student4 submits later
+        submission4 = @assignment2.submit_homework(student4, body: "Student4 submission")
+        submission4.update!(submitted_at: 1.day.ago)
+
+        # Student2 reviews student3 (older submission)
+        @assignment2.assign_peer_review(@student2, student3)
+
+        # Set @user AFTER creating additional students
+        @user = @student1
+
+        # Student1 should get student4 (unreviewed) even though it's newer
+        json = api_call(:post, @resource_path, @resource_params)
+        expect(json["user_id"]).to eq(student4.id)
+      end
+
+      it "prioritizes older submissions when all have been reviewed" do
+        @assignment2.submit_homework(@student1, body: "My submission")
+
+        student3 = student_in_course(active_all: true).user
+        student4 = student_in_course(active_all: true).user
+
+        # Create submissions with different times
+        submission3 = @assignment2.submit_homework(student3, body: "Student3 submission")
+        submission3.update!(submitted_at: 3.days.ago)
+
+        submission4 = @assignment2.submit_homework(student4, body: "Student4 submission")
+        submission4.update!(submitted_at: 2.days.ago)
+
+        # All have been reviewed by someone else (student2 doesn't need to submit to be a reviewer)
+        @assignment2.assign_peer_review(@student2, student3)
+        @assignment2.assign_peer_review(@student2, student4)
+
+        # Set @user AFTER creating additional students
+        @user = @student1
+
+        # Should allocate the oldest submission (student3) even though both have been reviewed
+        json = api_call(:post, @resource_path, @resource_params)
+        expect(json["user_id"]).to eq(student3.id)
+      end
+
+      it "excludes student's own submission" do
+        @user = @student1
+        @assignment2.submit_homework(@student1, body: "My submission")
+        @assignment2.submit_homework(@student2, body: "Student2 submission")
+
+        json = api_call(:post, @resource_path, @resource_params)
+
+        expect(json["user_id"]).to eq(@student2.id)
+        expect(json["user_id"]).not_to eq(@student1.id)
+      end
+
+      it "handles anonymous peer reviews" do
+        @assignment2.update!(anonymous_peer_reviews: true)
+        @user = @student1
+        @assignment2.submit_homework(@student1, body: "My submission")
+        @assignment2.submit_homework(@student2, body: "Student2 submission")
+
+        json = api_call(:post, @resource_path, @resource_params)
+
+        expect(json["assessor_id"]).to be_nil # Should be hidden for students
+        expect(json["user_id"]).to eq(@student2.id)
+      end
+
+      context "with assignment overrides" do
+        it "allows access when student has adhoc override" do
+          @assignment2.update!(only_visible_to_overrides: true)
+          @assignment2.submit_homework(@student1, body: "My submission")
+          @assignment2.submit_homework(@student2, body: "Student2 submission")
+
+          # Create adhoc override for student1 and student2 so both can see assignment
+          create_adhoc_override_for_assignment(@assignment2, [@student1, @student2])
+
+          @user = @student1
+
+          json = api_call(:post, @resource_path, @resource_params)
+
+          # Verify allocation succeeded
+          expect(json["id"]).to be_present
+          expect(json["user_id"]).to eq(@student2.id)
+          expect(json["workflow_state"]).to eq("assigned")
+        end
+
+        it "returns 403 when student has no override and only_visible_to_overrides is true" do
+          @assignment2.update!(only_visible_to_overrides: true)
+          @assignment2.submit_homework(@student1, body: "My submission")
+
+          # Create override for student2 only
+          create_adhoc_override_for_assignment(@assignment2, @student2)
+
+          @user = @student1
+
+          api_call(:post,
+                   @resource_path,
+                   @resource_params,
+                   {},
+                   {},
+                   { expected_status: 403 })
+        end
+
+        it "allows access when student is in section with override" do
+          section2 = @course.course_sections.create!(name: "Section 2")
+          @student1.enrollments.first.update!(course_section: section2)
+          @student2.enrollments.first.update!(course_section: section2)
+
+          @assignment2.update!(only_visible_to_overrides: true)
+          @assignment2.submit_homework(@student1, body: "My submission")
+          @assignment2.submit_homework(@student2, body: "Student2 submission")
+
+          # Create section override for section2 (both students are in it)
+          create_section_override_for_assignment(@assignment2, course_section: section2)
+
+          @user = @student1
+
+          json = api_call(:post, @resource_path, @resource_params)
+
+          # Verify allocation succeeded
+          expect(json["id"]).to be_present
+          expect(json["workflow_state"]).to eq("assigned")
+        end
+
+        it "returns 403 when student is not in section with override" do
+          section2 = @course.course_sections.create!(name: "Section 2")
+          @student2.enrollments.first.update!(course_section: section2)
+
+          @assignment2.update!(only_visible_to_overrides: true)
+          @assignment2.submit_homework(@student1, body: "My submission")
+
+          # Create section override for section2 only (student1 is in default section)
+          create_section_override_for_assignment(@assignment2, course_section: section2)
+
+          @user = @student1
+
+          api_call(:post,
+                   @resource_path,
+                   @resource_params,
+                   {},
+                   {},
+                   { expected_status: 403 })
+        end
+
+        it "allows access when student is in group with override" do
+          group_category = @course.group_categories.create!(name: "Project Groups")
+          group1 = @course.groups.create!(name: "Group 1", group_category:)
+          group2 = @course.groups.create!(name: "Group 2", group_category:)
+          group1.add_user(@student1, "accepted")
+          group2.add_user(@student2, "accepted")
+
+          @assignment2.update!(only_visible_to_overrides: true, grade_group_students_individually: false)
+          @assignment2.group_category = group_category
+          @assignment2.save!
+
+          @assignment2.submit_homework(@student1, body: "My submission")
+          @assignment2.submit_homework(@student2, body: "Student2 submission")
+
+          # Create group overrides for both groups
+          create_group_override_for_assignment(@assignment2, group: group1)
+          create_group_override_for_assignment(@assignment2, group: group2)
+
+          @user = @student1
+
+          json = api_call(:post, @resource_path, @resource_params)
+
+          # Verify allocation succeeded
+          expect(json["id"]).to be_present
+          expect(json["workflow_state"]).to eq("assigned")
+        end
+      end
+    end
+
+    context "with teacher context" do
+      it "returns 403 forbidden for teachers" do
+        @user = @teacher
+        api_call(:post,
+                 @resource_path,
+                 @resource_params,
+                 {},
+                 {},
+                 { expected_status: 403 })
+      end
+    end
+  end
 end
