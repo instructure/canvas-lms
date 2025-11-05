@@ -37,90 +37,9 @@ import {ZCourseId} from '../../../../model/CourseId'
 import {ZLtiDeploymentId} from '../../../../model/LtiDeploymentId'
 import type {LtiDeployment} from '../../../../model/LtiDeployment'
 import type {InternalLtiConfiguration} from '../../../../model/internal_lti_configuration/InternalLtiConfiguration'
-import {mockToolConfiguration} from '../../../../dynamic_registration_wizard/__tests__/helpers'
 import {LtiPlacements} from '../../../../model/LtiPlacement'
-import {mockDeployment} from '../../../manage/__tests__/helpers'
 import {mockContextControl} from '../../availability/__tests__/helpers'
-
-export const createMockConfigEntry = (
-  oldConfig: Partial<InternalLtiConfiguration>,
-  newConfig: Partial<InternalLtiConfiguration>,
-): ConfigChangeHistoryEntry => ({
-  id: ZLtiRegistrationHistoryEntryId.parse('1'),
-  root_account_id: ZAccountId.parse('1'),
-  lti_registration_id: ZLtiRegistrationId.parse('1'),
-  created_at: new Date(),
-  updated_at: new Date(),
-  diff: {},
-  update_type: 'manual_edit',
-  comment: null,
-  created_by: 'Instructure',
-  old_configuration: {
-    internal_config: mockToolConfiguration(oldConfig),
-    developer_key: {
-      email: null,
-      name: 'Test Key',
-      redirect_uri: null,
-      redirect_uris: [],
-      icon_url: null,
-      vendor_code: null,
-      public_jwk: null,
-      public_jwk_url: null,
-      scopes: [],
-    },
-    registration: {
-      admin_nickname: null,
-      name: 'Test Tool',
-      vendor: 'Test Vendor',
-      workflow_state: 'active',
-      description: null,
-    },
-    overlay: {},
-    overlaid_internal_config: mockToolConfiguration(oldConfig),
-  },
-  new_configuration: {
-    internal_config: mockToolConfiguration(newConfig),
-    developer_key: {
-      email: null,
-      name: 'Test Key',
-      redirect_uri: null,
-      redirect_uris: [],
-      icon_url: null,
-      vendor_code: null,
-      public_jwk: null,
-      public_jwk_url: null,
-      scopes: [],
-    },
-    registration: {
-      admin_nickname: null,
-      name: 'Test Tool',
-      vendor: 'Test Vendor',
-      workflow_state: 'active',
-      description: null,
-    },
-    overlay: {},
-    overlaid_internal_config: mockToolConfiguration(newConfig),
-  },
-})
-
-const createMockAvailabilityEntry = (
-  oldDeployments: Array<Partial<LtiDeployment>>,
-  newDeployments: Array<Partial<LtiDeployment>>,
-): AvailabilityChangeHistoryEntry => {
-  return {
-    id: ZLtiRegistrationHistoryEntryId.parse('1'),
-    root_account_id: ZAccountId.parse('1'),
-    lti_registration_id: ZLtiRegistrationId.parse('1'),
-    created_at: new Date(),
-    updated_at: new Date(),
-    diff: {},
-    update_type: 'control_edit',
-    comment: null,
-    created_by: 'Instructure',
-    old_controls_by_deployment: oldDeployments.map(mockDeployment),
-    new_controls_by_deployment: newDeployments.map(mockDeployment),
-  }
-}
+import {createMockAvailabilityEntry, createMockConfigEntry} from './factories'
 
 describe('countDiffValue', () => {
   it('returns 0 additions and 0 removals for null or undefined', () => {

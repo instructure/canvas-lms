@@ -59,8 +59,8 @@ export const Diff = <T,>({
   formatter = String,
   labelSize = 'h4',
 }: {
-  label: string
   diff: DiffType<T>
+  label?: string
   formatter?: (value: NonNullable<T>) => string
   labelSize?: HeadingProps['level'] | 'text'
 }): React.ReactElement | null => {
@@ -68,18 +68,20 @@ export const Diff = <T,>({
 
   return (
     <View as="div" margin="small 0">
-      {labelSize === 'text' ? (
-        <View margin="0 0 x-small 0">
-          <Text>{label}</Text>
-        </View>
-      ) : (
-        <Heading level={labelSize} margin="0 0 x-small 0">
-          {label}
-        </Heading>
-      )}
+      {label ? (
+        labelSize === 'text' ? (
+          <View margin="0 0 x-small 0">
+            <Text>{label}</Text>
+          </View>
+        ) : (
+          <Heading level={labelSize} margin="0 0 x-small 0">
+            {label}
+          </Heading>
+        )
+      ) : null}
       <TwoColumnLayout
         removalsColumn={
-          diff.oldValue ? (
+          diff.oldValue !== undefined && diff.oldValue !== null ? (
             <del>
               <code>[-] {formatter(diff.oldValue)}</code>
             </del>
@@ -88,7 +90,7 @@ export const Diff = <T,>({
           )
         }
         additionsColumn={
-          diff.newValue ? (
+          diff.newValue !== undefined && diff.newValue !== null ? (
             <ins>
               <code>[+] {formatter(diff.newValue)}</code>
             </ins>
