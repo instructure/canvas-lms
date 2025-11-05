@@ -238,6 +238,8 @@ describe('AccessibilityIssuesDrawerContent', () => {
 
       const textarea = screen.getByTestId('checkbox-text-input-form')
       await userEvent.type(textarea, '1')
+      const saveButton = screen.getByTestId('save-and-next-button')
+      await userEvent.click(saveButton)
 
       await waitFor(() => {
         expect(screen.getAllByText('Test error')[0]).toBeInTheDocument()

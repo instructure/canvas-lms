@@ -315,14 +315,13 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
 
   const handleValidationChange = useCallback(
     (isValid: boolean, errorMessage?: string) => {
+      setIsSaveButtonEnabled(isValid)
+      if (!isValid) {
+        setFormError(errorMessage)
+      } else {
+        setFormError(null)
+      }
       if (['small-text-contrast', 'large-text-contrast'].includes(current.issue?.ruleId)) {
-        setIsSaveButtonEnabled(isValid)
-        if (!isValid) {
-          setFormError(errorMessage)
-        } else {
-          setFormError(null)
-        }
-
         // Reset remediation state when color changes after being applied
         if (isRemediated) {
           setIsRemediated(false)
@@ -361,7 +360,6 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       undoMessage={current.issue.form.undoText}
       isApplied={isRemediated}
       isLoading={isFormLocked}
-      disabled={!isSaveButtonEnabled}
     >
       {applyButtonText}
     </ApplyButton>

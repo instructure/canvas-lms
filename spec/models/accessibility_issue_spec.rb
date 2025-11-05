@@ -82,4 +82,38 @@ describe AccessibilityIssue do
       end
     end
   end
+
+  describe "#allow_nil_param_value?" do
+    let(:course) { course_model }
+
+    context "when rule type is in the allowed list" do
+      subject do
+        described_class.new(
+          course:,
+          rule_type: "allowed-rule"
+        )
+      end
+
+      before do
+        allow(Accessibility::Rules::ImgAltRule).to receive(:id).and_return("allowed-rule")
+      end
+
+      it "returns true" do
+        expect(subject.allow_nil_param_value?).to be true
+      end
+    end
+
+    context "when rule type is not in the allowed list" do
+      subject do
+        described_class.new(
+          course:,
+          rule_type: "not-allowed-rule"
+        )
+      end
+
+      it "returns false" do
+        expect(subject.allow_nil_param_value?).to be false
+      end
+    end
+  end
 end

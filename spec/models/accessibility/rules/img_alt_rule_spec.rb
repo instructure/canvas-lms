@@ -57,6 +57,72 @@ describe Accessibility::Rules::ImgAltRule do
 
       expect(fixed_html).to include('<img id="test-element" src="image.jpg" alt="Descriptive alt text">')
     end
+
+    it "marks image as decorative when value is nil" do
+      input_html = '<div><img id="test-element" src="image.jpg"></div>'
+      document = Nokogiri::HTML.fragment(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      img_element = document.at_css("img")
+      rule = Accessibility::Rules::ImgAltRule.new
+
+      result = rule.fix!(img_element, nil)
+
+      expect(result).to be_a(Array)
+      expect(result.length).to eq(2)
+      expect(img_element["role"]).to eq("presentation")
+      expect(img_element["alt"]).to eq("")
+    end
+
+    it "returns styled HTML as second element in array" do
+      input_html = '<div><img id="test-element" src="image.jpg" alt=""></div>'
+      document = Nokogiri::HTML.fragment(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      img_element = document.at_css("img")
+      rule = Accessibility::Rules::ImgAltRule.new
+
+      result = rule.fix!(img_element, "Descriptive alt text")
+
+      expect(result).to be_a(Array)
+      expect(result.length).to eq(2)
+      expect(result[1]).to include('style="max-width: 100%; max-height: 13rem; object-fit: contain;"')
+      expect(result[1]).to include('alt="Descriptive alt text"')
+    end
+
+    it "raises an error when alt text is a generic filename" do
+      input_html = '<div><img id="test-element" src="https://example.com/beach-photo.jpg" alt=""></div>'
+      document = Nokogiri::HTML.fragment(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      img_element = document.at_css("img")
+      rule = Accessibility::Rules::ImgAltRule.new
+
+      expect do
+        rule.fix!(img_element, "beach-photo.jpg")
+      end.to raise_error(StandardError, /Alt text can not be a filename/)
+    end
+
+    it "allows alt text without extension" do
+      input_html = '<div><img id="test-element" src="https://example.com/sunset.png" alt=""></div>'
+      document = Nokogiri::HTML.fragment(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      img_element = document.at_css("img")
+      rule = Accessibility::Rules::ImgAltRule.new
+
+      expect do
+        rule.fix!(img_element, "sunset")
+      end.not_to raise_error
+    end
+
+    it "allows alt text that is different from the filename" do
+      input_html = '<div><img id="test-element" src="https://example.com/img123.jpg" alt=""></div>'
+      document = Nokogiri::HTML.fragment(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      img_element = document.at_css("img")
+      rule = Accessibility::Rules::ImgAltRule.new
+
+      expect do
+        rule.fix!(img_element, "A beautiful sunset over the ocean")
+      end.not_to raise_error
+    end
   end
 
   context "when generating form for image alt text" do
@@ -90,6 +156,51 @@ describe Accessibility::Rules::ImgAltRule do
 
       # Verify the result is what our mock returned
       expect(result).to eq(generated_alt)
+    end
+  end
+
+  context "when generating issue preview" do
+    it "returns styled HTML for img elements" do
+      input_html = '<div><img id="test-img" src="image.jpg" alt=""></div>'
+      document = Nokogiri::HTML.fragment(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      img_element = document.at_css("img")
+      rule = Accessibility::Rules::ImgAltRule.new
+
+      result = rule.issue_preview(img_element)
+
+      expect(result).not_to be_nil
+      expect(result).to include('style="max-width: 100%; max-height: 13rem; object-fit: contain;"')
+      expect(result).to include('id="test-img"')
+      expect(result).to include('src="image.jpg"')
+    end
+
+    it "returns nil for non-img elements" do
+      input_html = '<div id="test-div">Some content</div>'
+      document = Nokogiri::HTML.fragment(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      div_element = document.at_css("div")
+      rule = Accessibility::Rules::ImgAltRule.new
+
+      result = rule.issue_preview(div_element)
+
+      expect(result).to be_nil
+    end
+
+    it "preserves all image attributes in preview" do
+      input_html = '<img id="test-img" src="image.jpg" alt="old alt" class="hero-image" data-id="123">'
+      document = Nokogiri::HTML.fragment(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      img_element = document.at_css("img")
+      rule = Accessibility::Rules::ImgAltRule.new
+
+      result = rule.issue_preview(img_element)
+
+      expect(result).to include('id="test-img"')
+      expect(result).to include('src="image.jpg"')
+      expect(result).to include('alt="old alt"')
+      expect(result).to include('class="hero-image"')
+      expect(result).to include('data-id="123"')
     end
   end
 end

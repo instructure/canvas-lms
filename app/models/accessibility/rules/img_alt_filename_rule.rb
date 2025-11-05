@@ -20,8 +20,6 @@
 module Accessibility
   module Rules
     class ImgAltFilenameRule < Accessibility::Rule
-      IMAGE_FILENAME_PATTERN = /[^\s]+(.*?)\.(jpg|jpeg|png|gif|svg|bmp|webp)$/i
-
       self.id = "img-alt-filename"
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H37.html"
 
@@ -37,9 +35,7 @@ module Accessibility
         return nil if alt == "" && role == "presentation"
         return nil if alt.blank?
 
-        filename_like = IMAGE_FILENAME_PATTERN.match?(alt)
-
-        I18n.t("Image filenames should not be used as the alt attribute.") if filename_like
+        ImgAltRuleHelper.validation_error_filename if ImgAltRuleHelper.filename_like?(alt)
       end
 
       def form(elem)
@@ -49,7 +45,7 @@ module Accessibility
           undo_text: I18n.t("Alt text fixed"),
           input_label: I18n.t("Alt text"),
           input_description: I18n.t("Describe what's on the picture."),
-          input_max_length: 120,
+          input_max_length: ImgAltRuleHelper::MAX_LENGTH,
           can_generate_fix: true,
           generate_button_label: I18n.t("Generate alt text"),
           value: elem.get_attribute("alt") || ""
@@ -65,16 +61,7 @@ module Accessibility
       end
 
       def fix!(elem, value)
-        if value.blank?
-          elem["role"] = "presentation"
-        elsif IMAGE_FILENAME_PATTERN.match?(value)
-          raise StandardError, I18n.t("Image filenames should not be used as the alt attribute.")
-        end
-
-        return elem if elem["alt"] == value
-
-        elem["alt"] = value
-        elem
+        ImgAltRuleHelper.fix_alt_text!(elem, value)
       end
 
       def display_name
