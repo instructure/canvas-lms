@@ -8858,6 +8858,7 @@ tr:
         folder_locked: "Bu dosyanın içinde olduğu \"%{folder}\" klasör kilitli."
     no_preview: 
       file_previews: 
+        download: İndir
         download_file: "*filename*'i indir"
         no_preview_available: "Bu dosya için ön izleme bulunmamaktadır."
   file_rename_form: 
@@ -17706,6 +17707,7 @@ tr:
         crosslist_this_section: "Bu Bölümün Çarpraz Listesini Oluştur"
         current_enrollments: "Varolan Kayıtlar"
         decrosslist_section: "Bu Bölümü Çarpraz Listeden Kaldır"
+  sections_are_an_additional_way_to_organize_users_t_57551e0: "Bölümler kullanıcıları bütünleştirmenin ilave bir yoludur. Aynı ders içerisinde çoklu öğretim sınıflarına izin verilir, bu sayede tüm ders içerikleri tek bir yerde bulunur. Kullanıcıyı farklı bölüme taşımak veya bölüm kayıdı eklemek/silme işlemlerini yapabilirsiniz. Kullanıcılar en az bir bölümde olmalıdırlar."
   see_rubric_results_62a6447d: "Değerlendirme listesi sonuçlarına bak"
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "Canvas ile sorunsuz çalışan bazı Harici Araçlar"
   see_this_assignment_in_speedgrader_14b8abaf: "Bu ödevi hızlı notlandırmada gör"
