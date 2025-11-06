@@ -41,7 +41,12 @@ shared_examples "Gradebook - concluded courses and enrollments" do |ff_enabled|
     gradebook_data_setup
   end
 
-  before { user_session(@teacher) }
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
+    user_session(@teacher)
+  end
 
   let(:conclude_student_1) { @student_1.enrollments.where(course_id: @course).first.conclude }
   let(:deactivate_student_1) { @student_1.enrollments.where(course_id: @course).first.deactivate }

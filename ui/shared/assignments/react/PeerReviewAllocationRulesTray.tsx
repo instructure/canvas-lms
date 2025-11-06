@@ -38,9 +38,13 @@ import {View} from '@instructure/ui-view'
 import {debounce} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import pandasBalloonUrl from './images/pandasBalloon.svg'
-import {AllocationRuleType} from '../graphql/teacher/AssignmentTeacherTypes'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('peer_review_allocation_rules_tray')
+
+// We allow 5000ms for the screen reader to finish reading the label of the focused element before
+// announcing the screen reader alert. Otherwise, the focus announcement steals the alert announcement.
+const SCREENREADER_ALERT_TIMEOUT = 5000
 
 const NoResultsFound = ({searchTerm}: {searchTerm: string}) => (
   <Flex.Item as="div" padding="x-small medium" data-testid="no-search-results">
@@ -107,11 +111,13 @@ interface DeleteFocusInfo {
 
 const PeerReviewAllocationRulesTray = ({
   assignmentId,
+  requiredPeerReviewsCount,
   isTrayOpen,
   closeTray,
   canEdit = false,
 }: {
   assignmentId: string
+  requiredPeerReviewsCount: number
   isTrayOpen: boolean
   closeTray: () => void
   canEdit: boolean
@@ -128,9 +134,11 @@ const PeerReviewAllocationRulesTray = ({
   const [searchTerm, setSearchTerm] = useState('')
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [deleteFocusInfo, setDeleteFocusInfo] = useState<DeleteFocusInfo | null>(null)
+  const [screenReaderAnnouncement, setScreenReaderAnnouncement] = useState('')
 
   const containerRef = useRef<Element | null>(null)
   const createRuleButtonRef = useRef<HTMLButtonElement | null>(null)
+  const screenReaderAnnouncementTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const {rules, totalCount, loading, error, refetch} = useAllocationRules(
     assignmentId,
@@ -150,10 +158,32 @@ const PeerReviewAllocationRulesTray = ({
   }, [])
 
   const handleRuleSave = useCallback(
-    (ruleId?: string) => {
+    (ruleId?: string, isNewRule = true, ruleDescription?: string) => {
       if (ruleId) {
         setRuleToFocus(ruleId)
       }
+      showFlashAlert({
+        type: 'success',
+        message: isNewRule
+          ? I18n.t('New rule has been created successfully')
+          : I18n.t('Rule has been edited successfully'),
+      })
+
+      // We set a delay before announcing the deletion so that it doesn't overlap with the focus change
+      if (screenReaderAnnouncementTimeoutRef.current) {
+        clearTimeout(screenReaderAnnouncementTimeoutRef.current)
+      }
+      screenReaderAnnouncementTimeoutRef.current = setTimeout(() => {
+        const message = ruleDescription
+          ? isNewRule
+            ? I18n.t('New rule "%{rule}" has been created successfully', {rule: ruleDescription})
+            : I18n.t('Rule "%{rule}" has been edited successfully', {rule: ruleDescription})
+          : isNewRule
+            ? I18n.t('New rule has been created successfully')
+            : I18n.t('Rule has been edited successfully')
+        setScreenReaderAnnouncement(message)
+      }, SCREENREADER_ALERT_TIMEOUT)
+
       setShouldRefetch(true)
       if (!containerRef.current || isUserNavigating || loading) {
         if (preCreationTotalCount !== null) {
@@ -168,7 +198,7 @@ const PeerReviewAllocationRulesTray = ({
   )
 
   const handleRuleDelete = useCallback(
-    async (ruleId: string, error?: any) => {
+    async (ruleId: string, ruleDescription?: string, error?: any) => {
       if (error) {
         const errorMessage =
           error?.message || I18n.t('An error occurred while deleting the allocation rule')
@@ -198,6 +228,19 @@ const PeerReviewAllocationRulesTray = ({
       if (!isOnlyRule && isFirstRuleOnPage && rules.length === 1 && currentPage > 1) {
         handlePageChange(currentPage - 1)
       }
+
+      showFlashAlert({type: 'success', message: I18n.t('Rule has been deleted successfully')})
+
+      // We set a delay before announcing the deletion so that it doesn't overlap with the focus change
+      if (screenReaderAnnouncementTimeoutRef.current) {
+        clearTimeout(screenReaderAnnouncementTimeoutRef.current)
+      }
+      screenReaderAnnouncementTimeoutRef.current = setTimeout(() => {
+        const message = ruleDescription
+          ? I18n.t('Rule "%{rule}" has been deleted successfully', {rule: ruleDescription})
+          : I18n.t('Rule has been deleted successfully')
+        setScreenReaderAnnouncement(message)
+      }, SCREENREADER_ALERT_TIMEOUT)
 
       setShouldRefetch(true)
     },
@@ -396,6 +439,9 @@ const PeerReviewAllocationRulesTray = ({
           observer.disconnect()
         }
       }
+      if (screenReaderAnnouncementTimeoutRef.current) {
+        clearTimeout(screenReaderAnnouncementTimeoutRef.current)
+      }
     }
   }, [])
 
@@ -472,6 +518,7 @@ const PeerReviewAllocationRulesTray = ({
                 assignmentId={assignmentId}
                 refetchRules={handleRuleSave}
                 handleRuleDelete={handleRuleDelete}
+                requiredPeerReviewsCount={requiredPeerReviewsCount}
               />
             </Flex.Item>
           ))}
@@ -482,6 +529,9 @@ const PeerReviewAllocationRulesTray = ({
 
   return (
     <View data-testid="allocation-rules-tray">
+      <View as="div" role="alert" aria-live="polite" data-testid="allocation-rules-tray-alert">
+        <ScreenReaderContent>{screenReaderAnnouncement}</ScreenReaderContent>
+      </View>
       <Tray label={I18n.t('Allocation Rules')} open={isTrayOpen} placement="end">
         <Flex direction="column" height="100vh">
           <Flex.Item>
@@ -586,7 +636,7 @@ const PeerReviewAllocationRulesTray = ({
         isOpen={isCreateModalOpen}
         setIsOpen={setIsCreateModalOpen}
         assignmentId={assignmentId}
-        courseId={ENV.COURSE_ID}
+        requiredPeerReviewsCount={requiredPeerReviewsCount}
         refetchRules={handleRuleSave}
       />
     </View>

@@ -33,6 +33,8 @@ import type actions from './actions/developerKeysActions'
 import type {AnyAction, Dispatch} from 'redux'
 import type {DeveloperKey} from '../model/api/DeveloperKey'
 import {confirmWithPrompt} from '@canvas/instui-bindings/react/ConfirmWithPrompt'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('react_developer_keys')
 
@@ -176,8 +178,13 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
     const method = editing ? 'put' : 'post'
     const toSubmit = this.developerKey
 
-    if (!toSubmit.require_scopes) {
-      toSubmit.require_scopes = false
+    if (this.newForm && !this.newForm.valid()) {
+      this.setState({submitted: true})
+      return
+    }
+
+    if (toSubmit.require_scopes === undefined) {
+      toSubmit.require_scopes = true
     }
     if (!toSubmit.name) {
       toSubmit.name = 'Unnamed Tool'
@@ -403,74 +410,77 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       createOrEditDeveloperKeyState: {editing, developerKeyModalOpen, isLtiKey},
     } = this.props
     return (
-      <div>
-        <Modal
-          open={developerKeyModalOpen}
-          onDismiss={this.closeModal}
-          size="fullscreen"
-          label={editing ? I18n.t('Edit Developer Key') : I18n.t('Create Developer Key')}
-          shouldCloseOnDocumentClick={false}
-        >
-          <Modal.Header>
-            <CloseButton
-              placement="end"
-              onClick={this.closeModal}
-              screenReaderLabel={I18n.t('Cancel')}
-            />
-            <Heading level="h1">{I18n.t('Key Settings')}</Heading>
-          </Modal.Header>
-          <Modal.Body>
-            {this.isSaving ? (
-              <View as="div" textAlign="center">
-                <Spinner
-                  renderTitle={editing ? I18n.t('Saving Key') : I18n.t('Creating Key')}
-                  margin="0 0 0 medium"
-                  aria-live="polite"
-                />
-              </View>
-            ) : (
-              <NewKeyForm
-                ref={this.setNewFormRef}
-                developerKey={this.developerKey}
-                availableScopes={availableScopes}
-                availableScopesPending={availableScopesPending}
-                dispatch={this.props.store.dispatch}
-                listDeveloperKeyScopesSet={actions.listDeveloperKeyScopesSet}
-                tool_configuration={this.toolConfiguration}
-                editing={editing}
-                showRequiredMessages={this.state.submitted}
-                showMissingRedirectUrisMessage={
-                  this.state.submitted && isLtiKey && !this.hasRedirectUris && !this.isUrlConfig
-                }
-                hasRedirectUris={this.hasRedirectUris}
-                hasInvalidRedirectUris={this.hasInvalidRedirectUris}
-                syncRedirectUris={this.syncRedirectUris}
-                updateToolConfiguration={this.updateToolConfiguration}
-                updateDeveloperKey={this.updateDeveloperKey}
-                updateToolConfigurationUrl={this.updateToolConfigurationUrl}
-                toolConfigurationUrl={this.state.toolConfigurationUrl}
-                configurationMethod={this.state.configurationMethod}
-                updateConfigurationMethod={this.updateConfigurationMethod}
-                isLtiKey={isLtiKey}
-                isRedirectUriRequired={isLtiKey && !this.isUrlConfig}
+      <QueryClientProvider client={queryClient}>
+        <div>
+          <Modal
+            open={developerKeyModalOpen}
+            onDismiss={this.closeModal}
+            size="fullscreen"
+            label={editing ? I18n.t('Edit Developer Key') : I18n.t('Create Developer Key')}
+            shouldCloseOnDocumentClick={false}
+          >
+            <Modal.Header>
+              <CloseButton
+                placement="end"
+                onClick={this.closeModal}
+                screenReaderLabel={I18n.t('Cancel')}
               />
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button id="lti-key-cancel-button" onClick={this.closeModal} margin="0 small 0 0">
-              {I18n.t('Cancel')}
-            </Button>
-            <Button
-              id="lti-key-save-button"
-              onClick={this.handleSave}
-              color="primary"
-              disabled={this.isSaving}
-            >
-              {I18n.t('Save')}
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
+              <Heading level="h1">{I18n.t('Key Settings')}</Heading>
+            </Modal.Header>
+            <Modal.Body>
+              {this.isSaving ? (
+                <View as="div" textAlign="center">
+                  <Spinner
+                    renderTitle={editing ? I18n.t('Saving Key') : I18n.t('Creating Key')}
+                    margin="0 0 0 medium"
+                    aria-live="polite"
+                  />
+                </View>
+              ) : (
+                <NewKeyForm
+                  ref={this.setNewFormRef}
+                  developerKey={this.developerKey}
+                  availableScopes={availableScopes}
+                  availableScopesPending={availableScopesPending}
+                  dispatch={this.props.store.dispatch}
+                  listDeveloperKeyScopesSet={actions.listDeveloperKeyScopesSet}
+                  tool_configuration={this.toolConfiguration}
+                  editing={editing}
+                  showRequiredMessages={this.state.submitted}
+                  showMissingRedirectUrisMessage={
+                    this.state.submitted && isLtiKey && !this.hasRedirectUris && !this.isUrlConfig
+                  }
+                  hasRedirectUris={this.hasRedirectUris}
+                  hasInvalidRedirectUris={this.hasInvalidRedirectUris}
+                  syncRedirectUris={this.syncRedirectUris}
+                  updateToolConfiguration={this.updateToolConfiguration}
+                  updateDeveloperKey={this.updateDeveloperKey}
+                  updateToolConfigurationUrl={this.updateToolConfigurationUrl}
+                  toolConfigurationUrl={this.state.toolConfigurationUrl}
+                  configurationMethod={this.state.configurationMethod}
+                  updateConfigurationMethod={this.updateConfigurationMethod}
+                  isLtiKey={isLtiKey}
+                  isRedirectUriRequired={isLtiKey && !this.isUrlConfig}
+                  contextId={this.props.ctx.params.contextId}
+                />
+              )}
+            </Modal.Body>
+            <Modal.Footer>
+              <Button id="lti-key-cancel-button" onClick={this.closeModal} margin="0 small 0 0">
+                {I18n.t('Cancel')}
+              </Button>
+              <Button
+                id="lti-key-save-button"
+                onClick={this.handleSave}
+                color="primary"
+                disabled={this.isSaving}
+              >
+                {I18n.t('Save')}
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </div>
+      </QueryClientProvider>
     )
   }
 }

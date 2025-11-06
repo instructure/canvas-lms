@@ -30,6 +30,7 @@ import '@canvas/util/templateData'
 import 'jqueryui/menu'
 import 'jqueryui/autocomplete'
 import PaginatedList from './PaginatedList'
+import UncrosslistForm from '../react/UncrosslistForm'
 import enrollmentTemplate from '../jst/enrollment.handlebars'
 import sectionEnrollmentPresenter from '../sectionEnrollmentPresenter'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
@@ -40,10 +41,11 @@ import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessa
 import StartDateTimeInput from '../react/StartDateTimeInput'
 import EndDateTimeInput from '../react/EndDateTimeInput'
 import {validateDateTime, validateStartDateAfterEnd, START_AT_DATE, END_AT_DATE} from '../utils'
+import ready from '@instructure/ready'
 
 const I18n = createI18nScope('section')
 
-$(document).ready(function () {
+ready(() => {
   const section_id = window.location.pathname.split('/')[4],
     $edit_section_form = $('#edit_section_form'),
     $edit_section_link = $('.edit_section_link')
@@ -59,7 +61,7 @@ $(document).ready(function () {
     url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed',
   })
 
-  const renderStartAt = () => {
+  function renderStartAt() {
     const startDateTimeInput = document.getElementById('course_section_start_datetime_input')
     if (startDateTimeInput) {
       const startDateTimeValue = document.getElementById('start_datetime_value')
@@ -80,7 +82,7 @@ $(document).ready(function () {
     }
   }
 
-  const renderEndAt = () => {
+  function renderEndAt() {
     const endDateTimeInput = document.getElementById('course_section_end_datetime_input')
     if (endDateTimeInput) {
       const endDateTimeValue = document.getElementById('end_datetime_value')
@@ -103,7 +105,7 @@ $(document).ready(function () {
 
   const errorRoots = {}
 
-  const renderFormErrors = (formErrors, shouldFocus = false) => {
+  function renderFormErrors(formErrors, shouldFocus = false) {
     formErrors.forEach(formError => {
       let container = $(formError.containerId)
       if (!container.length) container = $(`[name="${formError.containerName}"]`)
@@ -132,7 +134,7 @@ $(document).ready(function () {
     })
   }
 
-  const validateSectionFormName = () => {
+  function validateSectionFormName() {
     const sectionNameValue = $edit_section_form.find('#course_section_name')[0].value
     const nameErrors = []
     if (!sectionNameValue?.trim()) {
@@ -157,16 +159,16 @@ $(document).ready(function () {
     return nameErrors
   }
 
-  const validateSectionFormDates = () => {
+  function validateSectionFormDates() {
     return [...validateSectionStart(), ...validateSectionEnd()]
   }
 
-  const validateSectionStart = () => {
+  function validateSectionStart() {
     const startDate = document.querySelector(`[name="${START_AT_DATE}"]`).value
     return validateDateTime(startDate, START_AT_DATE)
   }
 
-  const validateSectionEnd = () => {
+  function validateSectionEnd() {
     let errors = []
     const endDate = document.querySelector(`[name="${END_AT_DATE}"]`).value
 
@@ -181,7 +183,7 @@ $(document).ready(function () {
     return errors
   }
 
-  const validateCrossListForm = courseName => {
+  function validateCrossListForm(courseName) {
     const courseLookupValue = $('#course_autocomplete_id').val()
     const autocompleteValue = $('#course_autocomplete_id_lookup').val()
     const courseIdValue = $('#course_id').val()
@@ -221,14 +223,12 @@ $(document).ready(function () {
         'Not a valid course name',
       )
       renderFormErrors([error], true)
-    } else if (courseLookupValue) {
-      return true
-    }
+    } else if (courseLookupValue) return true
 
     return false
   }
 
-  const clearCrossListFormErrors = () => {
+  function clearCrossListFormErrors() {
     errorRoots['#course_autocomplete_id_lookup']?.unmount()
     errorRoots['#course_autocomplete_id_lookup'] = null
     errorRoots['#course_id']?.unmount()
@@ -237,7 +237,7 @@ $(document).ready(function () {
   }
 
   // remove course_section_name errors if you begin to type.
-  $edit_section_form.find('#course_section_name').on('input', function (e) {
+  $edit_section_form.find('#course_section_name').on('input', function () {
     const container = $(this)
     if (container) {
       container.removeClass('error-outline')
@@ -247,7 +247,7 @@ $(document).ready(function () {
     $('label[for="course_section_name"] > abbr').removeClass('text-error')
   })
 
-  $edit_section_form.find('#course_section_name').blur(function (e) {
+  $edit_section_form.find('#course_section_name').on('blur', function (_e) {
     const validateFormErrors = validateSectionFormName()
     if (validateFormErrors.length > 0) {
       renderFormErrors(validateFormErrors)
@@ -299,11 +299,11 @@ $(document).ready(function () {
     })
     .end()
     .find('.cancel_button')
-    .click(() => {
+    .on('click', () => {
       $edit_section_form.hide()
     })
 
-  $edit_section_link.click(event => {
+  $edit_section_link.on('click', event => {
     event.preventDefault()
     $edit_section_form.toggle()
     $('#edit_section_form :text:visible:first').focus().select()
@@ -326,27 +326,26 @@ $(document).ready(function () {
         },
       })
   })
+
   renderDatetimeField($('.datetime_field'))
-  $('.uncrosslist_link').click(event => {
-    event.preventDefault()
-    $('#uncrosslist_form').dialog({
-      width: 400,
-      modal: true,
-      zIndex: 1000,
-    })
-  })
-  $('#uncrosslist_form .cancel_button')
-    .click(_event => {
-      $('#uncrosslist_form').dialog('close')
-    })
-    .submit(function () {
-      $(this)
-        .find('button')
-        .prop('disabled', true)
-        .filter('.submit_button')
-        .text(I18n.t('status.removing_crosslisting_of_section', 'De-Cross-Listing Section...'))
-    })
-  $('.crosslist_link').click(event => {
+
+  const uncrosslistLinkContainer = document.getElementById('uncrosslist_link_button_container')
+  if (uncrosslistLinkContainer) {
+    /** @type {{courseName: string, enrollmentsCount: number, courseId: string, sectionId: string, nonxlistCourseId: string}} */
+    const props = JSON.parse(uncrosslistLinkContainer.dataset.props)
+    const {courseName, enrollmentsCount, courseId, sectionId, nonxlistCourseId} = props
+    createRoot(uncrosslistLinkContainer).render(
+      <UncrosslistForm
+        courseId={courseId}
+        sectionId={sectionId}
+        nonxlistCourseId={nonxlistCourseId}
+        courseName={courseName}
+        studentEnrollmentsCount={enrollmentsCount}
+      />,
+    )
+  }
+
+  $('.crosslist_link').on('click', event => {
     event.preventDefault()
     $('#crosslist_course_form').dialog({
       width: 450,
@@ -354,13 +353,14 @@ $(document).ready(function () {
       zIndex: 1000,
     })
     $('#course_autocomplete_id_lookup').val('')
-    $('#course_id').val('').change()
+    $('#course_id').val('').trigger('change')
     clearCrossListFormErrors()
   })
+
   $('#course_autocomplete_id_lookup')
     .autocomplete({
       source: $('#course_autocomplete_url').attr('href'),
-      select(event, ui) {
+      select(_e, ui) {
         $('#course_id').val('').trigger('input')
         $('#crosslist_course_form').triggerHandler('id_entered', ui.item)
       },
@@ -394,12 +394,14 @@ $(document).ready(function () {
       )
       .appendTo(ul)
   }
+
   $('#course_id').keycodes('return', function (event) {
     event.preventDefault()
-    $(this).change()
+    $(this).trigger('change')
   })
+
   $('#course_autocomplete_id_lookup')
-    .on('input', function (event) {
+    .on('input', function () {
       const container = $(this)
       if (container) {
         container.removeClass('error-outline')
@@ -408,14 +410,12 @@ $(document).ready(function () {
       $('#course_id').val('')
       clearCrossListFormErrors()
     })
-    .on('blur', function (event) {
+    .on('blur', function () {
       const CourseLookupValue = $('#course_autocomplete_id_lookup').val()
-      if (CourseLookupValue) {
-        validateCrossListForm()
-      }
+      if (CourseLookupValue) validateCrossListForm()
     })
 
-  $('#course_id').on('input', function (event) {
+  $('#course_id').on('input', function () {
     const container = $(this)
     if (container) {
       container.removeClass('error-outline')
@@ -423,18 +423,16 @@ $(document).ready(function () {
     clearCrossListFormErrors()
   })
 
-  $('#course_id').bind('change', function () {
+  $('#course_id').on('change', function () {
     $('#course_autocomplete_id_lookup').val('')
     $('#crosslist_course_form').triggerHandler('id_entered', {id: $(this).val()})
   })
-  $('#crosslist_course_form .cancel_button').click(() => {
+  $('#crosslist_course_form .cancel_button').on('click', () => {
     $('#crosslist_course_form').dialog('close')
   })
   let latest_course_id = null
-  $('#crosslist_course_form').bind('id_entered', (event, course) => {
-    if (course.id == latest_course_id) {
-      return
-    }
+  $('#crosslist_course_form').on('id_entered', (_e, course) => {
+    if (course.id == latest_course_id) return
 
     $('#course_autocomplete_id').val('')
     if (!course.id) {
@@ -497,8 +495,6 @@ $(document).ready(function () {
   })
   $("#crosslist_course_form button[type='submit']").on('click', function (e) {
     e.preventDefault()
-    if (validateCrossListForm()) {
-      $('#crosslist_course_form').trigger('submit')
-    }
+    if (validateCrossListForm()) $('#crosslist_course_form').trigger('submit')
   })
 })

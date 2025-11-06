@@ -392,11 +392,13 @@ RSpec.describe ApplicationController do
                               cache_key: "key",
                               uuid: "bleh",
                               salesforce_id: "blah",
-                              suppress_assignments?: false,
-                              enable_content_a11y_checker?: true)
+                              suppress_assignments?: false)
+        context = double(a11y_checker_enabled?: true)
+        allow(context).to receive(:grants_any_right?).and_return(false)
         allow(root_account).to receive(:kill_joy?).and_return(false)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
+        controller.instance_variable_set(:@context, context)
         expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
         expect(controller.js_env[:SETTINGS][:can_add_pronouns]).to be_truthy
         expect(controller.js_env[:SETTINGS][:show_sections_in_course_tray]).to be_truthy
@@ -2994,6 +2996,36 @@ RSpec.describe ApplicationController do
     end
   end
 
+  describe "new_quizzes_native_experience_enabled? helper" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    before do
+      user_session(@teacher)
+      controller.instance_variable_set(:@context, @course)
+    end
+
+    it "returns false when the feature flag is disabled" do
+      expect(controller.send(:new_quizzes_native_experience_enabled?)).to be false
+    end
+
+    it "returns true when the feature flag is enabled on the root account" do
+      @course.root_account.enable_feature!(:new_quizzes_native_experience)
+      expect(controller.send(:new_quizzes_native_experience_enabled?)).to be true
+    end
+
+    it "returns false when context does not respond to root_account" do
+      controller.instance_variable_set(:@context, Object.new)
+      expect(controller.send(:new_quizzes_native_experience_enabled?)).to be false
+    end
+
+    it "returns false when context is nil" do
+      controller.instance_variable_set(:@context, nil)
+      expect(controller.send(:new_quizzes_native_experience_enabled?)).to be false
+    end
+  end
+
   describe "new math equation handling feature" do
     let(:root_account) { Account.default }
 
@@ -3779,6 +3811,7 @@ RSpec.describe ApplicationController, "#cached_js_env_account_features" do
     flags = controller.cached_js_env_account_features
 
     expect(flags).to have_key(:course_pace_pacing_with_mastery_paths)
+    expect(flags).to have_key(:new_quizzes_surveys)
   end
 
   it "does not include course-level feature flags" do

@@ -38,6 +38,9 @@ shared_examples "sync grades to sis" do |ff_enabled|
   before(:once) { export_plugin_setting.update(disabled: false) }
 
   before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
     course_with_admin_logged_in
     stub_rcs_config
     Account.default.set_feature_flag!("post_grades", "on")

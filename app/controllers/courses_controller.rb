@@ -609,7 +609,7 @@ class CoursesController < ApplicationController
       when "enrolled_as"
         e.readable_role_name
       when "accessibility"
-        [e.course.exceeds_accessibility_scan_limit? ? 1 : 0, accessibility_issues_count(e.course)]
+        [e.course.a11y_checker_enabled? ? 1 : 0, accessibility_issues_count(e.course)]
       else
         if type == "past"
           [e.course.published? ? 0 : 1, Canvas::ICU.collation_key(e.long_name)]
@@ -1835,7 +1835,8 @@ class CoursesController < ApplicationController
       :conditional_release,
       :show_student_only_module_id,
       :show_teacher_only_module_id,
-      :horizon_course
+      :horizon_course,
+      :default_student_gradebook_view
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
 
@@ -2306,8 +2307,7 @@ class CoursesController < ApplicationController
           @course_notifications_enabled = NotificationPolicyOverride.enabled_for(@current_user, @context)
         end
 
-        @accessibility_scan_enabled =
-          @context.root_account.enable_content_a11y_checker? ? !@context.exceeds_accessibility_scan_limit? : false
+        @accessibility_scan_enabled = @context.try(:a11y_checker_enabled?) || false
       end
 
       return if check_for_xlist
@@ -4460,11 +4460,41 @@ class CoursesController < ApplicationController
   helper_method :visible_self_enrollment_option
 
   def accessibility_issues_count(course)
-    return 0 if course.exceeds_accessibility_scan_limit?
-
     AccessibilityIssue.active.where(course:).count
   end
   helper_method :accessibility_issues_count
+
+  # @API Restore course version
+  #
+  # Restore a course to a prior version.
+  #
+  # @argument version_id [Required, Integer]
+  #   The version to restore to (use the syllabus_versions include parameter
+  #   in the course show API to see available versions)
+  #
+  # @example_request
+  #    curl -X POST -H 'Authorization: Bearer <token>' \
+  #    https://<canvas>/api/v1/courses/123/restore/4
+  #
+  # @returns Course
+  def restore_version
+    not_found unless Account.site_admin&.feature_enabled?(:syllabus_versioning)
+
+    get_context
+    return unless authorized_action(@context, @current_user, :manage_course_content_edit)
+
+    version_id = params[:version_id].to_i
+    @version = @context.versions.find_by!(number: version_id).model
+
+    @context.syllabus_body = @version.syllabus_body
+    @context.saving_user = @current_user
+
+    if @context.save
+      render json: course_json(@context, @current_user, session, [], nil)
+    else
+      render json: @context.errors, status: :unprocessable_entity
+    end
+  end
 
   private
 
@@ -4562,7 +4592,8 @@ class CoursesController < ApplicationController
       :conditional_release,
       :post_manually,
       :horizon_course,
-      :disable_csp
+      :disable_csp,
+      :default_student_gradebook_view
     )
   end
 

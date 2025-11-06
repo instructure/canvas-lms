@@ -31,6 +31,13 @@ ready(() => {
     return
   }
 
+  const courseId = window.ENV.current_context?.id
+  if (!courseId) {
+    return
+  }
+
+  const scanDisabled = !!window.ENV.SCAN_DISABLED
+
   // Hides the old React root container from ui/features/top_navigation_tools/index.tsx
   if (topNavToolsDrawerLayoutMountPoint) {
     topNavToolsDrawerLayoutMountPoint.style.display = 'none'
@@ -38,6 +45,11 @@ ready(() => {
 
   const root = ReactDOM.createRoot(drawerLayoutMountPoint)
   root.render(
-    <AccessibilityCheckerDrawer pageContent={canvasApplicationBody} container={container} />,
+    <AccessibilityCheckerDrawer
+      pageContent={canvasApplicationBody}
+      container={container}
+      courseId={courseId}
+      scanDisabled={scanDisabled}
+    />,
   )
 })

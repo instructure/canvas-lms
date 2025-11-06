@@ -98,7 +98,7 @@ class GradingSchemesJsonController < ApplicationController
 
     respond_to do |format|
       if @context.save
-        @context.recompute_assignments_using_account_default(grading_standard || GradingStandard.default_instance)
+        @context.delay_if_production(priority: Delayed::LOWER_PRIORITY, strand: ["recompute_account_default", @context.global_id]).recompute_assignments_using_account_default(grading_standard&.id)
         format.json { render json: response }
       else
         format.json { render json: @context.errors, status: :bad_request }

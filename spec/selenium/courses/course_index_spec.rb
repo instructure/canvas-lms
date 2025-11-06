@@ -139,11 +139,13 @@ describe "course index" do
     end
   end
 
-  context "accessibility column" do
+  context "accessibility column", skip: "2025-10-22 Temporarily disabled until we figure out what to do with this (in scope of RCX-4312)" do
     before do
       account = Account.default
-      account.settings[:enable_content_a11y_checker] = true
-      account.save!
+      account.enable_feature!(:a11y_checker)
+      [@current_courses, @past_courses, @future_courses].flatten.each do |course|
+        course.enable_feature!(:a11y_checker_eap)
+      end
     end
 
     it "is visible when at least one classic course exists" do

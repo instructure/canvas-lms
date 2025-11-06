@@ -225,9 +225,13 @@ class User < ActiveRecord::Base
            dependent: :destroy
   has_many :gradebook_csvs, dependent: :destroy, class_name: "GradebookCSV"
   has_many :block_editor_templates, class_name: "BlockEditorTemplate", as: :context, inverse_of: :context
+
+  # added for dsr
   has_many :asset_user_accesses
   has_many :wiki_pages
   has_many :announcements
+  has_many :discussion_topics, -> { where(type: nil) }
+  has_many :submission_comments, foreign_key: "author_id", inverse_of: :author
 
   has_one :profile, class_name: "UserProfile"
 

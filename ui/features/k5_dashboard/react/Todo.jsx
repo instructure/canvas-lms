@@ -52,9 +52,9 @@ const Todo = ({
 
   // Only assignments are supported (ungraded_quizzes are not)
   if (!assignment || ignored) return null
-  const {id, all_dates, name, points_possible} = assignment
+  const {id, all_dates, all_dates_count, name, points_possible} = assignment
   const baseDueAt = getBaseDueAt(assignment)
-  const hasMultipleDueDates = all_dates.length > 1
+  const hasMultipleDueDates = all_dates_count ? all_dates_count > 1 : all_dates.length > 1
 
   const handleIgnoreTodo = () => {
     ignoreTodo(ignore)
@@ -118,9 +118,15 @@ const Todo = ({
               •
             </View>
           </PresentationContent>
-          <View>{dueDate}</View>
-          {hasMultipleDueDates && (
-            <View margin="0 0 0 x-small">{I18n.t('(Multiple Due Dates)')}</View>
+          {all_dates_count > 1 && all_dates.length === 0 ? (
+            <View>{I18n.t('Multiple Due Dates')}</View>
+          ) : (
+            <>
+              <View>{dueDate}</View>
+              {hasMultipleDueDates && (
+                <View margin="0 0 0 x-small">{I18n.t('(Multiple Due Dates)')}</View>
+              )}
+            </>
           )}
         </Text>
       </Flex>
@@ -148,6 +154,7 @@ Todo.propTypes = {
         due_at: PropTypes.string,
       }),
     ).isRequired,
+    all_dates_count: PropTypes.number,
     due_at: PropTypes.string,
     name: PropTypes.string.isRequired,
     points_possible: PropTypes.number.isRequired,

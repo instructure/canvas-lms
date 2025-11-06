@@ -23,6 +23,10 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
   before_action :require_context
   before_action :authorize
 
+  VALID_SECONDARY_INFO_DISPLAY_VALUES = %w[none sis_id integration_id login_id].freeze
+  VALID_NAME_DISPLAY_FORMAT_VALUES = %w[first_last last_first].freeze
+  VALID_STUDENTS_PER_PAGE_VALUES = [15, 30, 50, 100].freeze
+
   # @API Get Learning Mastery Gradebook Settings
   #
   # Get the current user's Learning Mastery Gradebook settings for the current context.
@@ -45,12 +49,14 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
   def update
     return unless outcome_gradebook_enabled?
 
+    errors = update_learning_mastery_gradebook_settings
+
     respond_to do |format|
-      if update_learning_mastery_gradebook_settings
+      if errors.empty?
         settings = learning_mastery_gradebook_settings
         format.json { render json: { learning_mastery_gradebook_settings: settings }, status: :ok }
       else
-        format.json { render json: @current_user.errors, status: :unprocessable_entity }
+        format.json { render json: { errors: }, status: :unprocessable_content }
       end
     end
   end
@@ -61,7 +67,9 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
     params.require(:learning_mastery_gradebook_settings).permit(
       :secondary_info_display,
       :show_students_with_no_results,
-      :show_student_avatars
+      :show_student_avatars,
+      :name_display_format,
+      :students_per_page
     )
   end
 
@@ -70,9 +78,57 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
   end
 
   def update_learning_mastery_gradebook_settings
-    current_settings = learning_mastery_gradebook_settings
-    updated_settings = current_settings.deep_merge(learning_mastery_gradebook_settings_params.to_h)
-    @current_user.set_preference(:learning_mastery_gradebook_settings, @context.global_id, updated_settings)
+    settings = learning_mastery_gradebook_settings_params
+    errors = validate_settings(settings)
+
+    if errors.empty?
+      current_settings = learning_mastery_gradebook_settings
+      updated_settings = current_settings.deep_merge(settings.to_h)
+      @current_user.set_preference(:learning_mastery_gradebook_settings, @context.global_id, updated_settings)
+    end
+
+    errors
+  end
+
+  def validate_settings(settings)
+    errors = []
+
+    if settings.key?(:secondary_info_display)
+      value = settings[:secondary_info_display]
+      unless VALID_SECONDARY_INFO_DISPLAY_VALUES.include?(value)
+        errors << "Invalid secondary_info_display. Valid values are: #{VALID_SECONDARY_INFO_DISPLAY_VALUES.join(", ")}"
+      end
+    end
+
+    if settings.key?(:show_students_with_no_results)
+      value = settings[:show_students_with_no_results]
+      unless [true, false, "true", "false"].include?(value)
+        errors << "Invalid show_students_with_no_results ('#{value}'). Valid values are: [true, false]"
+      end
+    end
+
+    if settings.key?(:show_student_avatars)
+      value = settings[:show_student_avatars]
+      unless [true, false, "true", "false"].include?(value)
+        errors << "Invalid show_student_avatars ('#{value}'). Valid values are: [true, false]"
+      end
+    end
+
+    if settings.key?(:name_display_format)
+      value = settings[:name_display_format]
+      unless VALID_NAME_DISPLAY_FORMAT_VALUES.include?(value)
+        errors << "Invalid name_display_format ('#{value}'). Valid values are: #{VALID_NAME_DISPLAY_FORMAT_VALUES.join(", ")}"
+      end
+    end
+
+    if settings.key?(:students_per_page)
+      value = settings[:students_per_page]
+      unless VALID_STUDENTS_PER_PAGE_VALUES.include?(value.to_i)
+        errors << "Invalid students_per_page ('#{value}'). Valid values are: #{VALID_STUDENTS_PER_PAGE_VALUES.join(", ")}"
+      end
+    end
+
+    errors
   end
 
   def authorize

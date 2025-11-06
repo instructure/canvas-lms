@@ -16,27 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef, useEffect} from 'react'
+import React, {useState, useRef, useEffect, useMemo} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Button, CloseButton, CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {FormMessage} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
-import {IconTrashLine} from '@instructure/ui-icons'
+import {IconTrashLine, IconInfoLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
+import {Text} from '@instructure/ui-text'
+import {canvasHighContrast, canvas} from '@instructure/ui-themes'
+import {View} from '@instructure/ui-view'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import StudentSelect from './StudentSelect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {CourseStudent} from '../graphql/hooks/useAssignedStudents'
-import {useCreateAllocationRule} from '../graphql/hooks/useCreateAllocationRule'
 import {
+  CourseStudent,
   CreateAllocationRuleResponse,
   UpdateAllocationRuleResponse,
   AllocationRuleType,
 } from '../graphql/teacher/AssignmentTeacherTypes'
+import {useCreateAllocationRule} from '../graphql/hooks/useCreateAllocationRule'
 import {useEditAllocationRule} from '../graphql/hooks/useEditAllocationRule'
+import {formatFullRuleDescription} from './utils/formatRuleDescription'
 
 const I18n = createI18nScope('peer_review_allocation_rule_card')
+const baseTheme = ENV.use_high_contrast ? canvasHighContrast : canvas
+const {colors: instui10Colors} = baseTheme
+
 const TARGET_TYPES = {
   REVIEWER: 'reviewer',
   REVIEWEE: 'reviewee',
@@ -47,18 +54,18 @@ const SUGGESTED_REVIEW_TYPE = ['should', 'should_not']
 
 const CreateEditAllocationRuleModal = ({
   assignmentId,
-  courseId,
+  requiredPeerReviewsCount,
   setIsOpen,
   rule,
   refetchRules,
   isOpen = false,
   isEdit = false,
 }: {
-  assignmentId?: string
-  courseId?: string
+  assignmentId: string
+  requiredPeerReviewsCount: number
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
-  refetchRules: (ruleId: string, isNewRule?: boolean) => void
+  refetchRules: (ruleId: string, isNewRule?: boolean, ruleDescription?: string) => void
   isEdit?: boolean
   rule?: AllocationRuleType
 }): React.ReactElement => {
@@ -93,7 +100,8 @@ const CreateEditAllocationRuleModal = ({
 
   const createAllocationRuleMutation = useCreateAllocationRule(
     (data: CreateAllocationRuleResponse) => {
-      refetchRules(data.createAllocationRule.allocationRules[0]._id)
+      const newRule = data.createAllocationRule.allocationRules[0]
+      refetchRules(newRule._id, true, formatFullRuleDescription(newRule))
       handleClose()
     },
     (allocationErrors: any[]) => {
@@ -136,7 +144,7 @@ const CreateEditAllocationRuleModal = ({
     (data: UpdateAllocationRuleResponse) => {
       const editedRule = data.updateAllocationRule.allocationRules.find(r => r._id === rule?._id)
       if (editedRule) {
-        refetchRules(editedRule._id, false)
+        refetchRules(editedRule._id, false, formatFullRuleDescription(editedRule))
         handleClose(editedRule)
       }
     },
@@ -396,6 +404,7 @@ const CreateEditAllocationRuleModal = ({
   }
 
   const handleReviewTypeChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
+    clearAllErrors(true)
     switch (value) {
       case 'permit':
         setPermitReview(true)
@@ -425,9 +434,44 @@ const CreateEditAllocationRuleModal = ({
     }
   }, [additionalSubjectSelectRefs, additionalSubjectCount, shouldFocusNewField])
 
+  const additionalSubjectsKeys = useMemo(
+    () =>
+      Object.keys(additionalSubjects)
+        .sort()
+        .map(key => additionalSubjects[key]?._id || '')
+        .join(','),
+    [additionalSubjects],
+  )
+
+  useEffect(() => {
+    if (target && targetType !== TARGET_TYPES.REVIEWEE) checkPeerReviewStatus(target)
+  }, [target, targetType, mustReview, permitReview])
+
+  useEffect(() => {
+    if (targetType === TARGET_TYPES.REVIEWEE && subject) {
+      checkPeerReviewStatus(subject, false)
+    }
+  }, [targetType, subject, mustReview, permitReview])
+
+  useEffect(() => {
+    if (targetType === TARGET_TYPES.REVIEWEE) {
+      Object.keys(additionalSubjects).forEach(subjectKey => {
+        if (additionalSubjects[subjectKey])
+          checkPeerReviewStatus(additionalSubjects[subjectKey], false, subjectKey)
+      })
+    }
+  }, [targetType, additionalSubjectsKeys, mustReview, permitReview])
+
   const handleAddSubjectField = () => {
     const newCount = additionalSubjectCount + 1
-    setAdditionalSubjects(prev => ({...prev, [newCount]: {id: '', name: ''}}))
+    setAdditionalSubjects(prev => ({
+      ...prev,
+      [newCount]: {
+        id: '',
+        name: '',
+        peerReviewStatus: {mustReviewCount: 0, completedReviewsCount: 0},
+      },
+    }))
     setAdditionalSubjectCount(newCount)
     setShouldFocusNewField(true)
   }
@@ -455,8 +499,106 @@ const CreateEditAllocationRuleModal = ({
     }
   }
 
-  const handleAddSubjectFieldClick = () => {
-    handleAddSubjectField()
+  const hintText = (hint: string, useIconMargin: boolean = false) => {
+    return (
+      <View
+        as="div"
+        width="100%"
+        background="primary"
+        borderRadius="medium"
+        padding="small"
+        margin="x-small 0 0 0"
+        themeOverride={{
+          backgroundPrimary: instui10Colors.dataVisualization.ocean12Primary,
+        }}
+        data-testid="peer-review-status-hint"
+      >
+        <Flex as="div" alignItems="center">
+          <Flex
+            as="div"
+            alignItems="center"
+            margin={useIconMargin ? 'xx-small xx-small x-large 0' : '0 xx-small 0 0'}
+            themeOverride={{gapXLarge: '2.5rem'}}
+          >
+            <IconInfoLine />
+          </Flex>
+          <Text size="small">{hint}</Text>
+        </Flex>
+      </View>
+    )
+  }
+
+  const getPeerReviewStatusMessages = (student: CourseStudent): FormMessage[] => {
+    if (!student.peerReviewStatus) return []
+    const {mustReviewCount, completedReviewsCount} = student.peerReviewStatus
+    if (completedReviewsCount >= requiredPeerReviewsCount) {
+      return [
+        {
+          type: 'hint',
+          text: hintText(
+            I18n.t('%{name} has already completed the required peer reviews.', {
+              name: student.name,
+            }),
+          ),
+        },
+      ]
+    } else if (
+      mustReview &&
+      (mustReviewCount >= requiredPeerReviewsCount ||
+        completedReviewsCount + mustReviewCount >= requiredPeerReviewsCount)
+    ) {
+      return [
+        {
+          type: 'hint',
+          text: hintText(
+            I18n.t(
+              '%{name} already has enough “must review” allocations to meet required peer reviews. Additional allocations will follow available submissions and precedence.',
+              {name: student.name},
+            ),
+            true,
+          ),
+        },
+      ]
+    } else {
+      return []
+    }
+  }
+
+  const checkPeerReviewStatus = (
+    student: CourseStudent,
+    isTarget: boolean = true,
+    subjectKey?: string,
+  ) => {
+    const peerReviewStatusErrors = getPeerReviewStatusMessages(student)
+    if (peerReviewStatusErrors.length > 0) {
+      if (isTarget) {
+        setTargetErrors(peerReviewStatusErrors)
+      } else if (subjectKey) {
+        setAdditionalSubjectsErrors(prev => ({
+          ...prev,
+          [subjectKey]: peerReviewStatusErrors,
+        }))
+      } else {
+        setSubjectErrors(peerReviewStatusErrors)
+      }
+    }
+  }
+
+  const handleSetSubject = (student?: CourseStudent, subjectKey?: string) => {
+    if (!subjectKey) {
+      setSubject(student)
+    } else {
+      if (student) {
+        setAdditionalSubjects(prev => ({
+          ...prev,
+          [subjectKey]: student ?? ({} as CourseStudent),
+        }))
+      }
+    }
+  }
+
+  const handleSetTarget = (student?: CourseStudent) => {
+    setTarget(student)
   }
 
   const getFilterStudents = (isSubject: boolean, subjectKey?: string) => {
@@ -483,16 +625,7 @@ const CreateEditAllocationRuleModal = ({
       selectedStudent={index === -1 ? subject : additionalSubjects[subjectKey || '']}
       assignmentId={assignmentId}
       filteredStudents={getFilterStudents(true, subjectKey)}
-      onOptionSelect={
-        !subjectKey
-          ? setSubject
-          : (student?: CourseStudent) => {
-              setAdditionalSubjects(prev => ({
-                ...prev,
-                [subjectKey]: student ?? ({} as CourseStudent),
-              }))
-            }
-      }
+      onOptionSelect={student => handleSetSubject(student, subjectKey)}
       handleInputRef={ref => {
         if (index === -1) {
           if (subjectSelectRef) subjectSelectRef.current = ref
@@ -587,7 +720,7 @@ const CreateEditAllocationRuleModal = ({
               selectedStudent={target}
               assignmentId={assignmentId}
               filteredStudents={getFilterStudents(false)}
-              onOptionSelect={setTarget}
+              onOptionSelect={handleSetTarget}
               clearErrors={() => clearErrors(false)}
             />
           </Flex.Item>
@@ -692,7 +825,7 @@ const CreateEditAllocationRuleModal = ({
             Object.keys(additionalSubjectSelectRefs).length < 49 && (
               <Flex.Item padding="small">
                 <CondensedButton
-                  onClick={handleAddSubjectFieldClick}
+                  onClick={handleAddSubjectField}
                   aria-label={
                     targetType === TARGET_TYPES.REVIEWEE
                       ? I18n.t('Add another reviewer name')

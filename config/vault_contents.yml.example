@@ -34,7 +34,7 @@ development:
         cedar_audience: "cedar-local"
         cedar_shared_secret: fake-secrete-key
         cedar_consumer_name: "canvas"
-      observe:
+      observe_api:
         host: "103443579803.observeinc.com"
         customer_id: "103443579803"
         dataset_id: "41999019"

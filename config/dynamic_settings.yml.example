@@ -180,6 +180,8 @@ development:
       #       traces_sample_rate: 0.1
       #     environment: "dev"
       #     feedback_url: "https://docs.google.com/forms/d/e/1FAIpQLScj-OKZVmsva-OE6T5rcvvm9fI6_eLtt2tk8pkgQ24DjSAPDQ/viewform"
+      # new_quizzes.yml: |
+      #   launch_url: http://quizzes-ui-app.inseng.test:8082/mf/none/remoteEntry.js
 
   store:
     canvas:

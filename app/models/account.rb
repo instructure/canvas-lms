@@ -195,8 +195,6 @@ class Account < ActiveRecord::Base
   after_update :log_rqd_setting_enable_or_disable
   after_create :create_default_objects
 
-  after_commit :enqueue_a11y_scan_if_enabled, on: :update
-
   serialize :settings, type: Hash
   include TimeZoneHelper
 
@@ -348,7 +346,6 @@ class Account < ActiveRecord::Base
   add_setting :show_scheduler, boolean: true, root_only: true, default: false
   add_setting :enable_profiles, boolean: true, root_only: true, default: false
   add_setting :enable_turnitin, boolean: true, default: false
-  add_setting :enable_content_a11y_checker, boolean: true, root_only: true, default: false
   add_setting :suppress_assignments, boolean: true, root_only: true, default: false
   add_setting :mfa_settings, root_only: true
   add_setting :mobile_qr_login_is_enabled, boolean: true, root_only: true, default: true
@@ -427,6 +424,7 @@ class Account < ActiveRecord::Base
   add_setting :enable_usage_metrics, boolean: true, root_only: true, default: false
 
   add_setting :allow_observers_in_appointment_groups, boolean: true, default: false, inheritable: true
+  add_setting :default_allow_observer_signup, boolean: true, default: false, inheritable: true
   add_setting :enable_name_pronunciation, boolean: true, root_only: true, default: false
   add_setting :allow_name_pronunciation_edit_for_admins, boolean: true, root_only: true, default: false
   add_setting :allow_name_pronunciation_edit_for_students, boolean: true, root_only: true, default: false
@@ -556,6 +554,10 @@ class Account < ActiveRecord::Base
 
   def allow_observers_in_appointment_groups?
     allow_observers_in_appointment_groups[:value] && Account.site_admin.feature_enabled?(:observer_appointment_groups)
+  end
+
+  def default_allow_observer_signup?
+    default_allow_observer_signup[:value]
   end
 
   def allow_assign_to_differentiation_tags?
@@ -2131,6 +2133,7 @@ class Account < ActiveRecord::Base
   TAB_EPORTFOLIO_MODERATION = 21
   TAB_ACCOUNT_CALENDARS = 22
   TAB_REPORTS = 23
+  TAB_RATE_LIMITING = 24
 
   # site admin tabs
   TAB_PLUGINS = 14
@@ -2162,6 +2165,7 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_AUTHENTICATION, label: t("#account.tab_authentication", "Authentication"), css_class: "authentication", href: :account_authentication_providers_path } if root_account? && manage_settings
       tabs << { id: TAB_PLUGINS, label: t("#account.tab_plugins", "Plugins"), css_class: "plugins", href: :plugins_path, no_args: true } if root_account? && grants_right?(user, :manage_site_settings)
       tabs << { id: TAB_RELEASE_NOTES, label: t("Release Notes"), css_class: "release_notes", href: :account_release_notes_manage_path } if root_account? && ReleaseNote.enabled? && grants_right?(user, :manage_release_notes)
+      tabs << { id: TAB_RATE_LIMITING, label: t("#account.tab_rate_limiting", "Rate Limiting"), css_class: "rate_limiting", href: :account_rate_limiting_path } if user && feature_enabled?(:api_rate_limits) && grants_right?(user, :manage_rate_limiting)
       tabs << { id: TAB_JOBS, label: t("#account.tab_jobs", "Jobs"), css_class: "jobs", href: :jobs_path, no_args: true } if root_account? && grants_right?(user, :view_jobs)
     else
       tabs << { id: TAB_COURSES, label: t("#account.tab_courses", "Courses"), css_class: "courses", href: :account_path } if user && grants_right?(user, :read_course_list)
@@ -2187,6 +2191,7 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_ACCOUNT_CALENDARS, label: t("Account Calendars"), css_class: "account_calendars", href: :account_calendar_settings_path } if user && grants_right?(user, :manage_account_calendar_visibility)
       tabs << { id: TAB_TERMS, label: t("#account.tab_terms", "Terms"), css_class: "terms", href: :account_terms_path } if root_account? && manage_settings
       tabs << { id: TAB_AUTHENTICATION, label: t("#account.tab_authentication", "Authentication"), css_class: "authentication", href: :account_authentication_providers_path } if root_account? && manage_settings
+      tabs << { id: TAB_RATE_LIMITING, label: t("#account.tab_rate_limiting", "Rate Limiting"), css_class: "rate_limiting", href: :account_rate_limiting_path } if user && feature_enabled?(:api_rate_limits) && grants_right?(user, :manage_rate_limiting)
       if root_account? && allow_sis_import && user && grants_any_right?(user, :manage_sis, :import_sis)
         tabs << { id: TAB_SIS_IMPORT,
                   label: t("#account.tab_sis_import", "SIS Import"),
@@ -2797,14 +2802,20 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def recompute_assignments_using_account_default(grading_standard)
+  def recompute_assignments_using_account_default(grading_standard_id, grading_standard = nil)
+    grading_standard ||= if grading_standard_id
+                           GradingStandard.find(grading_standard_id)
+                         else
+                           GradingStandard.default_instance
+                         end
+
     courses.where(grading_standard_id: nil).where.not(workflow_state: "completed").where.not(workflow_state: "deleted").find_each do |course|
       affected_assignment_ids = course.assignments.where(grading_type: ["letter_grade", "gpa_scale"], grading_standard_id: nil).pluck(:id)
       delay_if_production(priority: Delayed::LOWER_PRIORITY, strand: ["recalc_account_default", Shard.current.database_server.id], singleton: "recalc_account_default:#{course.global_id}").regrade_affected_assignments(affected_assignment_ids, grading_standard.id)
     end
 
     sub_accounts.where(grading_standard: nil).find_each do |sub_account|
-      sub_account.recompute_assignments_using_account_default(grading_standard)
+      sub_account.recompute_assignments_using_account_default(grading_standard_id, grading_standard)
     end
   end
 
@@ -2867,16 +2878,5 @@ class Account < ActiveRecord::Base
 
       client.delete_tenant(root_account_uuid: root_account.uuid, feature_slug: HORIZON_FEATURE_SLUG, current_user:)
     end
-  end
-
-  def enqueue_a11y_scan_if_enabled
-    return unless root_account?
-    return unless saved_change_to_settings?
-    return unless enable_content_a11y_checker?
-
-    old_settings, = saved_change_to_settings
-    return if old_settings[:enable_content_a11y_checker]
-
-    Accessibility::RootAccountScannerService.call(account: self)
   end
 end

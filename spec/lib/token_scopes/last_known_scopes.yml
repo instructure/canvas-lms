@@ -128,6 +128,8 @@
 - verb: POST
   path: '/api/v1/accounts/:account_id/developer_keys/:developer_key_id/developer_key_account_bindings'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/developer_keys/lookup_utids'
+- verb: GET
   path: '/api/v1/accounts/:account_id/enrollments/:id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/external_tools'
@@ -589,18 +591,22 @@
   path: '/api/v1/courses/:course_id/ai_experiences'
 - verb: POST
   path: '/api/v1/courses/:course_id/ai_experiences'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations'
+- verb: POST
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations'
+- verb: DELETE
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id'
+- verb: POST
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages'
 - verb: DELETE
   path: '/api/v1/courses/:course_id/ai_experiences/:id'
 - verb: GET
   path: '/api/v1/courses/:course_id/ai_experiences/:id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/ai_experiences/:id'
-- verb: POST
-  path: '/api/v1/courses/:course_id/ai_experiences/:id/continue_conversation'
 - verb: GET
   path: '/api/v1/courses/:course_id/ai_experiences/:id/edit'
-- verb: GET
-  path: '/api/v1/courses/:course_id/ai_experiences/:id/messages'
 - verb: GET
   path: '/api/v1/courses/:course_id/ai_experiences/new'
 - verb: GET
@@ -1405,6 +1411,8 @@
   path: '/api/v1/courses/:course_id/reports/:report_type/:id'
 - verb: POST
   path: '/api/v1/courses/:course_id/reset_content'
+- verb: POST
+  path: '/api/v1/courses/:course_id/restore/:version_id'
 - verb: GET
   path: '/api/v1/courses/:course_id/root_outcome_group'
 - verb: POST
@@ -1509,6 +1517,8 @@
   path: '/api/v1/courses/:course_id/users'
 - verb: GET
   path: '/api/v1/courses/:course_id/users/:id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/users/:id/lmgb_user_details'
 - verb: PUT
   path: '/api/v1/courses/:course_id/users/:user_id/last_attended'
 - verb: GET
@@ -2163,6 +2173,8 @@
   path: '/api/v1/support_helpers/asset_processor/bulk_resubmit'
 - verb: GET
   path: '/api/v1/support_helpers/asset_processor/submission_details'
+- verb: POST
+  path: '/api/v1/support_helpers/asset_processor_discussion/bulk_resubmit'
 - verb: GET
   path: '/api/v1/support_helpers/plagiarism_platform/add_service'
 - verb: GET

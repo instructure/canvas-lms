@@ -20,6 +20,8 @@
 require "spec_helper"
 
 RSpec.describe Accessibility::PreviewController do
+  include Factories
+
   describe "#create" do
     let!(:course) { Course.create! }
     let!(:user) { User.create! }
@@ -108,13 +110,42 @@ RSpec.describe Accessibility::PreviewController do
       controller.instance_variable_set(:@current_user, user)
     end
 
-    context "for an assignment" do
-      let!(:assignment) { course.assignments.create!(description: "Assignment description") }
+    context "with missing issue_id parameter" do
+      let(:params) do
+        {
+          course_id: course.id
+        }
+      end
+
+      it "returns bad request" do
+        get :show, params:, format: :json
+        expect(response).to have_http_status(:bad_request)
+        expect(response.body).to be_empty
+      end
+    end
+
+    context "with non-existent issue_id" do
       let(:params) do
         {
           course_id: course.id,
-          content_type: "Assignment",
-          content_id: assignment.id.to_s
+          issue_id: "99999"
+        }
+      end
+
+      it "returns not found" do
+        get :show, params:, format: :json
+        expect(response).to have_http_status(:not_found)
+        expect(response.parsed_body["error"]).to be_present
+      end
+    end
+
+    context "for an assignment" do
+      let!(:assignment) { course.assignments.create!(description: "Assignment description") }
+      let!(:issue) { accessibility_issue_model(course:, context: assignment, node_path: nil) }
+      let(:params) do
+        {
+          course_id: course.id,
+          issue_id: issue.id.to_s
         }
       end
 
@@ -127,11 +158,11 @@ RSpec.describe Accessibility::PreviewController do
 
     context "for a wiki page" do
       let!(:wiki_page) { course.wiki_pages.create!(title: "Test Page", body: "Wiki page body") }
+      let!(:issue) { accessibility_issue_model(course:, context: wiki_page, node_path: nil) }
       let(:params) do
         {
           course_id: course.id,
-          content_type: "Page",
-          content_id: wiki_page.id.to_s
+          issue_id: issue.id.to_s
         }
       end
 
@@ -143,34 +174,23 @@ RSpec.describe Accessibility::PreviewController do
     end
 
     context "with unknown content type" do
+      let!(:wiki_page) { course.wiki_pages.create!(title: "Test Page", body: "Test content") }
+      let!(:issue) { accessibility_issue_model(course:, context: wiki_page, node_path: nil) }
       let(:params) do
         {
           course_id: course.id,
-          content_type: "UnknownType",
-          content_id: "123"
+          issue_id: issue.id.to_s
         }
       end
 
       it "returns an error for unknown content type" do
+        allow_any_instance_of(Accessibility::ContentLoader).to receive(:resource_html_content).and_raise(
+          Accessibility::ContentLoader::UnsupportedResourceTypeError.new("Unsupported resource type: Course")
+        )
+
         get :show, params:, format: :json
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.parsed_body).to eq({ "error" => "Unknown content type: UnknownType" })
-      end
-    end
-
-    context "with non-existent resource" do
-      let(:params) do
-        {
-          course_id: course.id,
-          content_type: "Assignment",
-          content_id: "999999"
-        }
-      end
-
-      it "returns not found for missing resource" do
-        get :show, params:, format: :json
-        expect(response).to have_http_status(:not_found)
-        expect(response.parsed_body).to eq({ "error" => "Resource 'Assignment' with id '999999' was not found." })
+        expect(response.parsed_body["error"]).to include("Unsupported resource type")
       end
     end
 
@@ -178,12 +198,11 @@ RSpec.describe Accessibility::PreviewController do
       let!(:wiki_page) { course.wiki_pages.create!(title: "Test Page", body: "<div><h1>Page Title</h1><p>Page content</p></div>") }
 
       context "when element exists" do
+        let!(:issue) { accessibility_issue_model(course:, context: wiki_page, node_path: ".//h1") }
         let(:params) do
           {
             course_id: course.id,
-            content_type: "Page",
-            content_id: wiki_page.id.to_s,
-            path: ".//h1"
+            issue_id: issue.id.to_s
           }
         end
 
@@ -195,29 +214,27 @@ RSpec.describe Accessibility::PreviewController do
       end
 
       context "when element does not exist" do
+        let!(:issue) { accessibility_issue_model(course:, context: wiki_page, node_path: ".//nonexistent") }
         let(:params) do
           {
             course_id: course.id,
-            content_type: "Page",
-            content_id: wiki_page.id.to_s,
-            path: ".//nonexistent"
+            issue_id: issue.id.to_s
           }
         end
 
         it "returns element not found error" do
           get :show, params:, format: :json
           expect(response).to have_http_status(:not_found)
-          expect(response.parsed_body).to eq({ "error" => "Element not found" })
+          expect(response.parsed_body["error"]).to include("Element not found")
         end
       end
 
       context "when path is empty string" do
+        let!(:issue) { accessibility_issue_model(course:, context: wiki_page, node_path: "") }
         let(:params) do
           {
             course_id: course.id,
-            content_type: "Page",
-            content_id: wiki_page.id.to_s,
-            path: ""
+            issue_id: issue.id.to_s
           }
         end
 
@@ -230,12 +247,11 @@ RSpec.describe Accessibility::PreviewController do
 
       context "for assignment with path" do
         let!(:assignment) { course.assignments.create!(description: "<div><h2>Assignment Title</h2><p>Assignment description</p></div>") }
+        let!(:issue) { accessibility_issue_model(course:, context: assignment, node_path: ".//h2") }
         let(:params) do
           {
             course_id: course.id,
-            content_type: "Assignment",
-            content_id: assignment.id.to_s,
-            path: ".//h2"
+            issue_id: issue.id.to_s
           }
         end
 
@@ -243,6 +259,51 @@ RSpec.describe Accessibility::PreviewController do
           get :show, params:, format: :json
           expect(response).to have_http_status(:ok)
           expect(response.parsed_body).to eq({ "content" => "<h2>Assignment Title</h2>" })
+        end
+      end
+
+      context "with rule_id parameter" do
+        let!(:wiki_page) { course.wiki_pages.create!(title: "Test Page", body: "<div><h1>Test Header</h1></div>") }
+        let!(:issue) { accessibility_issue_model(course:, context: wiki_page, rule_type: "img-alt", node_path: ".//h1") }
+        let(:mock_rule_instance) { double("RuleInstance") }
+        let(:mock_rule_registry) { { "img-alt" => mock_rule_instance } }
+        let(:params) do
+          {
+            course_id: course.id,
+            issue_id: issue.id.to_s
+          }
+        end
+
+        before do
+          allow(Accessibility::Rule).to receive(:registry).and_return(mock_rule_registry)
+          allow(mock_rule_instance).to receive(:issue_preview).and_return("<h1>Test Header</h1><p>Additional context</p>")
+        end
+
+        it "passes rule_id to ContentLoader and uses rule's issue_preview" do
+          get :show, params:, format: :json
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body["content"]).to eq("<h1>Test Header</h1><p>Additional context</p>")
+        end
+      end
+
+      context "with rule_id but no matching rule" do
+        let!(:wiki_page) { course.wiki_pages.create!(title: "Test Page", body: "<div><h1>Title</h1></div>") }
+        let!(:issue) { accessibility_issue_model(course:, context: wiki_page, rule_type: "img-alt", node_path: ".//h1") }
+        let(:params) do
+          {
+            course_id: course.id,
+            issue_id: issue.id.to_s
+          }
+        end
+
+        before do
+          allow(Accessibility::Rule).to receive(:registry).and_return({})
+        end
+
+        it "falls back to default HTML when rule not found" do
+          get :show, params:, format: :json
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body).to eq({ "content" => "<h1>Title</h1>" })
         end
       end
     end

@@ -102,17 +102,24 @@ class Attachments::S3Storage
   end
 
   def open(temp_folder: nil, integrity_check: false)
-    tempfile = attachment.create_tempfile(temp_folder:) do |file|
-      attachment.s3object.get(response_target: file)
+    return nil if attachment.file_state == "broken"
+
+    begin
+      tempfile = attachment.create_tempfile(temp_folder:) do |file|
+        attachment.s3object.get(response_target: file)
+      end
+    rescue Aws::S3::Errors::NoSuchKey => e
+      Canvas::Errors.capture_exception(:attachment, e, :warn)
+      attachment.file_state = "broken"
+      attachment.shard.activate { attachment.update_column(:file_state, "broken") }
+      return nil
     end
     attachment.validate_hash { |hash_context| hash_context&.file(tempfile.path) } if integrity_check
 
     if block_given?
       File.open(tempfile.path, "rb") do |file|
-        chunk = file.read(64_000)
-        while chunk
+        while (chunk = file.read(64_000))
           yield chunk
-          chunk = file.read(64_000)
         end
       end
     end

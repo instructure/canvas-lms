@@ -260,9 +260,14 @@ module Lti::IMS
       end
       submit_homework(attachments) if new_submission? && trigger_submission?
       update_or_create_result
+      @context = context
+      @current_user = user
+      log_asset_access(line_item.assignment, "assignments", line_item.assignment.assignment_group, "participate")
       json[:resultUrl] = result_url
 
       render json:, content_type: MIME_TYPE
+    rescue Assignment::GradeError => e
+      render_error(e.message, :unprocessable_entity)
     end
 
     private

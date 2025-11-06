@@ -136,51 +136,6 @@ RSpec.describe Lti::AssetReport do
     end
   end
 
-  describe "#info_for_display" do
-    subject { report.info_for_display }
-
-    let(:report) do
-      lti_asset_report_model(
-        title: "My cool report",
-        comment: "What a great report",
-        indication_color: "#008800",
-        indication_alt: "WOW",
-        result: "8/10",
-        error_code: "MYERRORCODE",
-        processing_progress: "Processed"
-      )
-    end
-
-    it "returns a hash with the report's details" do
-      expect(subject[:_id]).to eq(report.id.to_s)
-      expect(subject[:title]).to eq("My cool report")
-      expect(subject[:comment]).to eq("What a great report")
-      expect(subject[:result]).to eq("8/10")
-      expect(subject).to_not have_key(:resultTruncated)
-      expect(subject[:indicationColor]).to eq("#008800")
-      expect(subject[:indicationAlt]).to eq("WOW")
-      expect(subject[:errorCode]).to eq("MYERRORCODE")
-      expect(subject[:processingProgress]).to eq("Processed")
-      expect(subject[:resubmitAvailable]).to be(false)
-    end
-
-    it "defaults processingProgress to NotReady if it is unrecognized" do
-      report.update! processing_progress: "something unrecognized"
-      expect(subject[:processingProgress]).to eq("NotReady")
-    end
-
-    it "truncates result_truncated to 16 characters" do
-      report.update!(result: "12345678901234567890")
-      expect(subject[:resultTruncated]).to eq("123456789012345…")
-      expect(subject[:result]).to eq("12345678901234567890")
-    end
-
-    it "includes launchUrlPath for processed reports" do
-      expect(subject[:launchUrlPath]).to \
-        eq "/asset_processors/#{report.lti_asset_processor_id}/reports/#{report.id}/launch"
-    end
-  end
-
   describe "#result_truncated" do
     context "when result is < 16 chars" do
       it "is nil" do

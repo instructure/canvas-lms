@@ -53,6 +53,11 @@ module LearnPlatform
           end
           json
         end
+
+        # Delete error responses from cache
+        if json[:lp_server_error]
+          Rails.cache.delete cache_key
+        end
       rescue
         json = {}
         Rails.cache.delete cache_key

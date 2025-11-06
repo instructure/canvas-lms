@@ -27,21 +27,16 @@ module Accessibility
 
       def test(elem)
         return nil if elem.tag_name != "a"
+        return nil unless adjacent_link_with_same_href?(elem)
 
-        next_elem = elem.next_element_sibling
-        return nil unless next_elem && next_elem.tag_name == "a"
-
-        elem_href = elem.get_attribute("href")
-        next_href = next_elem.get_attribute("href")
-
-        I18n.t("Adjacent links contain the same URL.") if elem_href == next_href
+        I18n.t("Adjacent links contain the same URL.")
       end
 
       def form(_elem)
         Accessibility::Forms::Button.new(
           label: I18n.t("Merge links"),
           value: "false",
-          undo_text: I18n.t("Link merged")
+          undo_text: I18n.t("Links merged")
         )
       end
 
@@ -49,9 +44,8 @@ module Accessibility
         return nil if test(elem).nil?
         return nil unless value == "true" || elem.tag_name == "a"
 
-        next_elem = elem.next_element_sibling
-
-        return elem unless next_elem && next_elem.tag_name == "a" && elem.get_attribute("href") == next_elem.get_attribute("href")
+        next_elem = get_adjacent_link(elem)
+        return elem unless next_elem
 
         left_image = self.class.single_child_image(elem)
         right_image = self.class.single_child_image(next_elem)
@@ -62,19 +56,42 @@ module Accessibility
           right_image.set_attribute("alt", "")
         end
 
+        intermediate_nodes = collect_intermediate_nodes(elem, next_elem)
+
         elem.inner_html += " " + next_elem.inner_html
 
         next_elem.remove
 
-        elem
+        intermediate_nodes.reverse_each do |node|
+          elem.add_next_sibling(node)
+        end
+
+        html = elem.to_html
+        html += elem.next_sibling.to_html if elem.next_sibling
+        [elem, html]
       end
 
       def display_name
-        I18n.t("Adjacent links")
+        I18n.t("Duplicate links found")
       end
 
       def message
         I18n.t("These are two links that go to the same place. Turn them into one link to avoid repetition.")
+      end
+
+      def issue_preview(elem)
+        next_elem = get_adjacent_link(elem)
+        return nil unless next_elem
+
+        intermediate_nodes = collect_intermediate_nodes(elem, next_elem)
+
+        html = elem.to_html
+        intermediate_nodes.each do |node|
+          html += node.to_html
+        end
+        html += next_elem.to_html
+
+        html
       end
 
       def why
@@ -86,6 +103,31 @@ module Accessibility
       end
 
       # Helper methods
+
+      def adjacent_link_with_same_href?(elem)
+        next_elem = elem.next_element_sibling
+        return false unless next_elem && next_elem.tag_name == "a"
+
+        elem.get_attribute("href") == next_elem.get_attribute("href")
+      end
+
+      def get_adjacent_link(elem)
+        next_elem = elem.next_element_sibling
+        return nil unless next_elem && next_elem.tag_name == "a"
+        return nil unless elem.get_attribute("href") == next_elem.get_attribute("href")
+
+        next_elem
+      end
+
+      def collect_intermediate_nodes(elem, next_elem)
+        intermediate_nodes = []
+        current = elem.next_sibling
+        while current && current != next_elem
+          intermediate_nodes << current
+          current = current.next_sibling
+        end
+        intermediate_nodes
+      end
 
       def self.root_node(elem)
         elem.parent_node

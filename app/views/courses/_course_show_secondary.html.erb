@@ -80,14 +80,10 @@
       </a>
       <% end %>
 
-      <% if @domain_root_account.enable_content_a11y_checker? %>
+      <% if @accessibility_scan_enabled %>
         <a id="course_check_accessibility_btn" href="<%= context_url(@context, :controller => :accessibility, :action => :index) %>"
-           class="btn button-sidebar-wide accessibility_link <%= 'disabled' unless @accessibility_scan_enabled %>"
-           aria-disabled="<%= !@accessibility_scan_enabled %>"
-           <% unless @accessibility_scan_enabled %>
-           data-tooltip="bottom" title="<%= t(:accessibility_limit_exceeded, "The Course Accessibility Checker is not yet available for courses with more than 1,000 resources (pages and assignments combined).") %>"
-           onclick="return false;"
-           <% end %>>
+           class="btn button-sidebar-wide accessibility_link"
+        >
           <i class="icon-a11y"></i> <%= t('links.course_check_accessibility', %{Check Accessibility}) %>
         </a>
       <% end %>

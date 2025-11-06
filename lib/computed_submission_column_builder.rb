@@ -29,12 +29,42 @@ module ComputedSubmissionColumnBuilder
     { scope:, column: }
   end
 
-  def self.add_needs_grading_column(submission_scope)
+  # Adds a computed column indicating whether a submission needs grading by the current user.
+  # For moderated assignments, excludes submissions where the current user has already
+  # provided a provisional grade with a non-null score.
+  #
+  # @param submission_scope [ActiveRecord::Relation] Base submission scope to augment
+  # @param current_user [User, nil] Current user for moderated grading filtering
+  # @return [Hash] Hash with :scope and :column keys
+  def self.add_needs_grading_column(submission_scope, current_user = nil)
     column = "db_needs_grading"
-    scope = submission_scope.select(
-      "submissions.*",
-      "#{Submission.needs_grading_conditions} AS #{column}"
-    )
+
+    needs_grading_sql = Submission.needs_grading_conditions
+
+    # For moderated assignments, exclude submissions where the current user has already
+    # provided a provisional grade (they don't "need" grading from this user anymore)
+    if current_user
+      needs_grading_sql = <<~SQL.squish
+        (#{needs_grading_sql})
+        AND (
+          assignments.moderated_grading IS FALSE
+          OR assignments.grades_published_at IS NOT NULL
+          OR NOT EXISTS (
+            SELECT 1 FROM #{ModeratedGrading::ProvisionalGrade.quoted_table_name} AS provisional_grades
+            WHERE provisional_grades.submission_id = submissions.id
+              AND provisional_grades.scorer_id = #{submission_scope.connection.quote(current_user.id)}
+              AND provisional_grades.score IS NOT NULL
+          )
+        )
+      SQL
+    end
+
+    scope = submission_scope
+            .joins(:assignment)
+            .select(
+              "submissions.*",
+              "#{needs_grading_sql} AS #{column}"
+            )
 
     { scope:, column: }
   end

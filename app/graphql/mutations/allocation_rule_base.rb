@@ -153,7 +153,7 @@ module Mutations
     def create_or_find_new_rule(assignment, course, opts)
       return unless assignment && course && opts[:assessor_id] && opts[:assessee_id]
 
-      existing_rule = AllocationRule.find_by(
+      existing_rule = AllocationRule.active.find_by(
         assignment:,
         assessor_id: opts[:assessor_id],
         assessee_id: opts[:assessee_id],
@@ -161,9 +161,10 @@ module Mutations
         review_permitted: opts[:review_permitted]
       )
 
-      if existing_rule&.deleted?
-        # Record will be saved during processing if validation passes
-        existing_rule.workflow_state = "active"
+      if existing_rule && existing_rule.applies_to_assessor != opts[:applies_to_assessor]
+        # Update applies_to_assessor if it differs. The applies_to_assessor field does not affect the
+        # review relationship, but rather the wording of the relationship.
+        existing_rule.applies_to_assessor = opts[:applies_to_assessor]
       end
 
       existing_rule || create_new_rule(assignment, course, opts)

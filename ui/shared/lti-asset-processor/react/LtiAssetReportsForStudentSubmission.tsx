@@ -17,7 +17,7 @@
  */
 
 import {useState} from 'react'
-import LtiAssetReportStatus from './LtiAssetReportStatus'
+import LtiAssetReportStatus from '../shared-with-sg/replicated/components/LtiAssetReportStatus'
 import {useLtiAssetProcessorsAndReportsForStudent} from './hooks/useLtiAssetProcessorsAndReportsForStudent'
 import StudentLtiAssetReportModal from './StudentLtiAssetReportModal'
 

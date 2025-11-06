@@ -217,6 +217,24 @@ RSpec.describe Mutations::UpdateAllocationRule, type: :graphql do
       expect(rule_data["appliesToAssessor"]).to be false
     end
 
+    it "updates applies_to_assessor on existing rule" do
+      query = <<~GQL
+        ruleId: "#{@rule.id}"
+        assessorIds: ["#{@student1.id}"]
+        assesseeIds: ["#{@student2.id}"]
+        mustReview: true
+        reviewPermitted: true
+        appliesToAssessor: false
+      GQL
+
+      result = execute_with_input(query)
+      expect(result["errors"]).to be_nil
+
+      all_rules = AllocationRule.where(assignment: @assignment).active
+      updated_existing = all_rules.find_by(id: @rule.id)
+      expect(updated_existing.applies_to_assessor).to be false
+    end
+
     it "changes assessor and assessee" do
       query = <<~GQL
         ruleId: "#{@rule.id}"

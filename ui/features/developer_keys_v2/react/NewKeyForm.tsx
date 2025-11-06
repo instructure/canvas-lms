@@ -33,6 +33,7 @@ import React, {createRef} from 'react'
 
 import Scopes from './Scopes'
 import ToolConfigurationForm from './ToolConfigurationForm'
+import {UtidSelector} from './UtidSelector'
 import type {AvailableScope} from './reducers/listScopesReducer'
 import type {DeveloperKey} from '../model/api/DeveloperKey'
 
@@ -58,6 +59,7 @@ export type NewKeyFormProps = {
   updateConfigurationMethod: Function
   hasRedirectUris: boolean
   hasInvalidRedirectUris: boolean
+  contextId: string
   syncRedirectUris: Function
 }
 
@@ -82,6 +84,7 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
     invalidJson: null,
     jsonString: null,
     canPrettify: false,
+    isUtidValid: true,
   }
 
   static defaultProps = {
@@ -93,16 +96,24 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
   }
 
   valid = () => {
-    const isValidToolConfig = this.toolConfigRef?.valid()
     const isValidRedirectUris = this.props.hasRedirectUris && !this.props.hasInvalidRedirectUris
 
     if (!isValidRedirectUris && this.redirectUrisRef.current && this.props.isRedirectUriRequired) {
       this.redirectUrisRef.current.focus()
     }
 
-    return this.props.isRedirectUriRequired
-      ? isValidToolConfig && isValidRedirectUris
-      : isValidToolConfig
+    let isValid = true
+    if (this.toolConfigRef) {
+      isValid &&= this.toolConfigRef.valid()
+    }
+    if (this.props.isRedirectUriRequired) {
+      isValid &&= isValidRedirectUris
+    }
+    if (!this.props.isLtiKey) {
+      isValid &&= this.state.isUtidValid
+    }
+
+    return isValid
   }
 
   get keyForm() {
@@ -118,7 +129,8 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
   }
 
   handleRequireScopesChange = () => {
-    this.props.updateDeveloperKey('require_scopes', !this.props.developerKey.require_scopes)
+    const currentValue = this.props.developerKey.require_scopes ?? true
+    this.props.updateDeveloperKey('require_scopes', !currentValue)
   }
 
   handleTestClusterOnlyChange = () => {
@@ -155,6 +167,12 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
 
   syncRedirectUris = () => {
     this.props.syncRedirectUris()
+  }
+
+  handleUtidValidationChange = (isValid: boolean) => {
+    this.setState({
+      isUtidValid: isValid,
+    })
   }
 
   render() {
@@ -208,6 +226,16 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                   resize="both"
                   messages={showMissingRedirectUrisMessage ? validationMessage : []}
                 />
+                {!isLtiKey && ENV.FEATURES.api_rate_limits && (
+                  <UtidSelector
+                    redirectUris={developerKey.redirect_uris}
+                    accountId={this.props.contextId}
+                    selectedUtid={developerKey.unified_tool_id}
+                    onUtidChange={utid => updateDeveloperKey('unified_tool_id', utid)}
+                    showRequiredMessage={showRequiredMessages}
+                    onValidationChange={this.handleUtidValidationChange}
+                  />
+                )}
                 {this.props.configurationMethod === 'json' && (
                   <div>
                     <Button onClick={this.syncRedirectUris} color="primary">
@@ -261,7 +289,7 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                   <SimpleSelect
                     renderLabel={
                       <div>
-                        <span>{I18n.t('Client Credentials Audience')}</span>
+                        <span>{I18n.t('Client Credentials Audience:')}</span>
                         <Tooltip
                           renderTip={clientCredentialsAudienceTooltip}
                           on={['click', 'focus']}
@@ -272,6 +300,7 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                             withBackground={false}
                             withBorder={false}
                             screenReaderLabel={I18n.t('toggle tooltip')}
+                            size="small"
                           />
                         </Tooltip>
                       </div>
@@ -316,7 +345,7 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                   availableScopes={this.props.availableScopes}
                   availableScopesPending={this.props.availableScopesPending}
                   developerKey={this.props.developerKey}
-                  requireScopes={developerKey.require_scopes}
+                  requireScopes={developerKey.require_scopes ?? true}
                   onRequireScopesChange={this.handleRequireScopesChange}
                   dispatch={this.props.dispatch}
                   listDeveloperKeyScopesSet={this.props.listDeveloperKeyScopesSet}

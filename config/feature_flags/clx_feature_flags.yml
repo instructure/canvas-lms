@@ -88,6 +88,13 @@ horizon_course_redesign:
   display_name: "Canvas Career: Course Redesign"
   description: |-
     Enables courses to leverage Canvas Career features natively.
+horizon_course_index_page:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Course Index Page"
+  description: |-
+    Enables native course index page in Canvas Career.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:
@@ -97,3 +104,10 @@ horizon_bulk_api_permission:
   display_name: "Canvas Career: Manage Bulk API & Permission"
   description: |-
     Enables the ability to manage bulk API and permission settings in Canvas Career.
+horizon_auto_content_ingestion:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Auto Content Ingestion"
+  description: |-
+    Automatically ingests course files and wiki pages into Pine when a course becomes a Canvas Career course.

@@ -22,7 +22,7 @@ class CoursePeople
     include SeleniumDependencies
 
     def section_input
-      f("#react_section_input input")
+      f("[data-testid='section-input']")
     end
 
     def loading_spinner

@@ -21,7 +21,7 @@ import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import DeleteCommentIconButton from '../DeleteCommentIconButton'
-import {SpeedGrader_DeleteCommentBankItem} from '../../graphql/mutations'
+import {SpeedGraderLegacy_DeleteCommentBankItem} from '../../graphql/mutations'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
@@ -46,7 +46,7 @@ describe('DeleteCommentIconButton', () => {
 
   const createDeleteMock = (success = true) => ({
     request: {
-      query: SpeedGrader_DeleteCommentBankItem,
+      query: SpeedGraderLegacy_DeleteCommentBankItem,
       variables: {id: 'comment-1'},
     },
     result: success
@@ -147,7 +147,7 @@ describe('DeleteCommentIconButton', () => {
 
       const delayedMock = {
         request: {
-          query: SpeedGrader_DeleteCommentBankItem,
+          query: SpeedGraderLegacy_DeleteCommentBankItem,
           variables: {id: 'comment-1'},
         },
         delay: 100,
@@ -190,7 +190,7 @@ describe('DeleteCommentIconButton', () => {
 
       const customMock = {
         request: {
-          query: SpeedGrader_DeleteCommentBankItem,
+          query: SpeedGraderLegacy_DeleteCommentBankItem,
           variables: {id: 'comment-123'},
         },
         result: {

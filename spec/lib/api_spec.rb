@@ -838,6 +838,35 @@ describe Api do
     end
   end
 
+  context "SHARDID_REGEX" do
+    let(:regex) { /\A#{Api::SHARDID_REGEX}\z/o }
+
+    it "matches simple numeric IDs" do
+      expect(regex).to match "123"
+      expect(regex).to match "1"
+      expect(regex).to match "999999"
+    end
+
+    it "matches shard-prefixed IDs" do
+      expect(regex).to match "2~123"
+      expect(regex).to match "10~456"
+      expect(regex).to match "1~1"
+    end
+
+    it "does not match invalid formats" do
+      expect(regex).to_not match "abc"
+      expect(regex).to_not match "~123"
+      expect(regex).to_not match "123~"
+      expect(regex).to_not match "a~b"
+      expect(regex).to_not match "123~abc"
+    end
+
+    it "does not match negative numbers" do
+      expect(regex).to_not match "-123"
+      expect(regex).to_not match "2~-123"
+    end
+  end
+
   describe ".api_user_content" do
     let(:klass) do
       Class.new do
@@ -1059,10 +1088,28 @@ describe Api do
     describe "ordinal collection" do
       let(:collection) { [1, 2, 3] }
 
+      it "works as expected with a page number in range" do
+        controller = double("controller", request:, response:, params: { per_page: 1 })
+        page = Api.paginate(collection, controller, "example.com", page: 2)
+        expect(page).to eq [2]
+        expect(page.next_page).to eq 3
+        expect(page.last_page).to eq 3
+      end
+
+      it "retrieves the last page" do
+        controller = double("controller", request:, response:, params: { per_page: 1 })
+        page = Api.paginate(collection, controller, "example.com", page: 3)
+        expect(page).to eq [3]
+        expect(page.next_page).to be_nil
+        expect(page.last_page).to eq 3
+      end
+
       it "does not raise Folio::InvalidPage for pages past the end" do
         controller = double("controller", request:, response:, params: { per_page: 1 })
-        expect(Api.paginate(collection, controller, "example.com", page: collection.size + 1))
-          .to eq []
+        page = Api.paginate(collection, controller, "example.com", page: 4)
+        expect(page).to eq []
+        expect(page.next_page).to be_nil
+        expect(page.last_page).to eq 3
       end
 
       it "does not raise Folio::InvalidPage for integer-equivalent non-Integer pages" do

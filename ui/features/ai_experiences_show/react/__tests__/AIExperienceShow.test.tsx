@@ -36,8 +36,10 @@ const mockAiExperience: AIExperience = {
 describe('AIExperienceShow', () => {
   beforeEach(() => {
     fetchMock.restore()
-    // Mock the API call that LLMConversationView makes
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+    // Mock the API calls that LLMConversationView makes
+    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {})
+    fetchMock.post('/api/v1/courses/123/ai_experiences/1/conversations', {
+      id: 1,
       messages: [],
     })
     // Mock scrollIntoView which is not available in JSDOM

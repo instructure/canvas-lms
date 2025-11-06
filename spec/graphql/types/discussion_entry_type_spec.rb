@@ -470,6 +470,24 @@ describe Types::DiscussionEntryType do
       expect(discussion_entry_type.resolve("reportTypeCounts { total }")).to eq 6
     end
 
+    it "returns counts and total if account admin" do
+      account_admin_user(account: @topic.context.account)
+      discussion_entry_type = GraphQLTypeTester.new(@entry, current_user: @admin)
+      expect(discussion_entry_type.resolve("reportTypeCounts { inappropriateCount }")).to eq 3
+      expect(discussion_entry_type.resolve("reportTypeCounts { offensiveCount }")).to eq 2
+      expect(discussion_entry_type.resolve("reportTypeCounts { otherCount }")).to eq 1
+      expect(discussion_entry_type.resolve("reportTypeCounts { total }")).to eq 6
+    end
+
+    it "returns counts and total if site admin" do
+      site_admin_user
+      discussion_entry_type = GraphQLTypeTester.new(@entry, current_user: @admin)
+      expect(discussion_entry_type.resolve("reportTypeCounts { inappropriateCount }")).to eq 3
+      expect(discussion_entry_type.resolve("reportTypeCounts { offensiveCount }")).to eq 2
+      expect(discussion_entry_type.resolve("reportTypeCounts { otherCount }")).to eq 1
+      expect(discussion_entry_type.resolve("reportTypeCounts { total }")).to eq 6
+    end
+
     it "returns nil if student" do
       discussion_entry_type = GraphQLTypeTester.new(@entry, current_user: @user[0])
       expect(discussion_entry_type.resolve("reportTypeCounts { inappropriateCount }")).to be_nil
@@ -611,6 +629,46 @@ describe Types::DiscussionEntryType do
     entry.save!
 
     discussion_entry_versions = discussion_entry_teacher_type.resolve("discussionEntryVersions { message }")
+    expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
+  end
+
+  it "returns discussion entry versions when retrieved by an account admin" do
+    course_with_teacher(active_all: true)
+    student_in_course(course: @course, active_all: true)
+    account_admin_user(account: @course.account)
+
+    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
+    entry = @topic.discussion_entries.create!(message: "Hello!", user: @student, editor: @student)
+
+    discussion_entry_admin_type = GraphQLTypeTester.new(entry, current_user: @admin)
+
+    entry.message = "Hello! 2"
+    entry.save!
+
+    entry.message = "Hello! 3"
+    entry.save!
+
+    discussion_entry_versions = discussion_entry_admin_type.resolve("discussionEntryVersions { message }")
+    expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
+  end
+
+  it "returns discussion entry versions when retrieved by site admin" do
+    course_with_teacher(active_all: true)
+    student_in_course(course: @course, active_all: true)
+    site_admin_user
+
+    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
+    entry = @topic.discussion_entries.create!(message: "Hello!", user: @student, editor: @student)
+
+    discussion_entry_site_admin_type = GraphQLTypeTester.new(entry, current_user: @admin)
+
+    entry.message = "Hello! 2"
+    entry.save!
+
+    entry.message = "Hello! 3"
+    entry.save!
+
+    discussion_entry_versions = discussion_entry_site_admin_type.resolve("discussionEntryVersions { message }")
     expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
   end
 

@@ -37,7 +37,7 @@ describe('Preview', () => {
   const mockIssue: AccessibilityIssue = {
     id: '1',
     ruleId: 'adjacent-links',
-    displayName: 'Adjacent links',
+    displayName: 'Duplicate links',
     path: '//div[@class="test-element"]',
     message: 'Test accessibility issue',
     why: 'This is why it is an issue',
@@ -170,9 +170,13 @@ describe('Preview', () => {
 
       render(<Preview {...defaultProps} />)
 
+      const expectedParams = new URLSearchParams({
+        issue_id: '1',
+      })
+
       await waitFor(() => {
         expect(mockDoFetchApi).toHaveBeenCalledWith({
-          path: '/preview?content_type=Assignment&content_id=123&path=%2F%2Fdiv%5B%40class%3D%22test-element%22%5D',
+          path: `/preview?${expectedParams.toString()}`,
           method: 'GET',
         })
       })
@@ -463,9 +467,13 @@ describe('Preview', () => {
 
       render(<Preview {...defaultProps} itemType={ResourceType.WikiPage} />)
 
+      const expectedParams = new URLSearchParams({
+        issue_id: '1',
+      })
+
       await waitFor(() => {
         expect(mockDoFetchApi).toHaveBeenCalledWith({
-          path: '/preview?content_type=Page&content_id=123&path=%2F%2Fdiv%5B%40class%3D%22test-element%22%5D',
+          path: `/preview?${expectedParams.toString()}`,
           method: 'GET',
         })
       })
@@ -484,9 +492,13 @@ describe('Preview', () => {
 
       render(<Preview {...defaultProps} itemType={ResourceType.Attachment} />)
 
+      const expectedParams = new URLSearchParams({
+        issue_id: '1',
+      })
+
       await waitFor(() => {
         expect(mockDoFetchApi).toHaveBeenCalledWith({
-          path: '/preview?content_type=attachment&content_id=123&path=%2F%2Fdiv%5B%40class%3D%22test-element%22%5D',
+          path: `/preview?${expectedParams.toString()}`,
           method: 'GET',
         })
       })

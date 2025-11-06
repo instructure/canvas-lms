@@ -607,6 +607,7 @@ export default (AssignmentListItemView = (function () {
 
         // Rerender the list item
         this.render()
+        document.getElementById(`assign_${this.model.id}_manage_link`)?.focus()
       }
       root.render(<CreateAssignmentViewAdapter assignment={this.model} closeHandler={onClose} />)
     }
@@ -642,12 +643,16 @@ export default (AssignmentListItemView = (function () {
       e.preventDefault()
       const returnFocusTo = $(e.target).closest('ul').prev('.al-trigger')
 
-      const courseId = e.target.getAttribute('data-assignment-context-id')
-      const itemName = e.target.getAttribute('data-assignment-name')
-      const itemContentId = e.target.getAttribute('data-assignment-id')
+      // Get data from the inner span with translate="no"
+      const $link = $(e.target).closest('.assign-to-link')
+      const $dataSpan = $link.find('.assign-to-link-resources')
+
+      const courseId = $dataSpan.attr('data-assignment-context-id')
+      const itemName = $dataSpan.attr('data-assignment-name')
+      const itemContentId = $dataSpan.attr('data-assignment-id')
       const pointsPossible = this.model.get('points_possible')
-      const iconType = e.target.getAttribute('data-assignment-type')
-      const isCheckpoint = e.target.getAttribute('data-assignment-has-checkpoint')
+      const iconType = $dataSpan.attr('data-assignment-type')
+      const isCheckpoint = $dataSpan.attr('data-assignment-has-checkpoint')
       this.renderItemAssignToTray(true, returnFocusTo, {
         courseId,
         itemName,

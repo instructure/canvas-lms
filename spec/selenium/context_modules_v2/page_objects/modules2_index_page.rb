@@ -1020,7 +1020,11 @@ module Modules2IndexPage
 
   def search_and_select_existing_item(item_name)
     search_chars = (item_name.length > 10) ? item_name[0..3] : item_name[0..1]
-    f(add_existing_item_select_selector).send_keys(search_chars)
+    wait_for_ajaximations
+    wait_for(method: nil, timeout: 10) { f(add_existing_item_select_selector) }
+    input_element = f(add_existing_item_select_selector)
+    input_element.click
+    input_element.send_keys(search_chars)
     wait_for_ajaximations
     wait_for(method: nil, timeout: 5) { fj("[role='option']:contains('#{item_name}')") }
     fj("[role='option']:contains('#{item_name}')").click

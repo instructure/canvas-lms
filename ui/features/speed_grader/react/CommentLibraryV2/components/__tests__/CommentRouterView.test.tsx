@@ -21,7 +21,7 @@ import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import CommentRouterView from '../CommentRouterView'
-import {SpeedGrader_UpdateCommentBankItem} from '../../graphql/mutations'
+import {SpeedGraderLegacy_UpdateCommentBankItem} from '../../graphql/mutations'
 import * as shave from '@canvas/shave'
 
 jest.mock('@canvas/shave')
@@ -42,7 +42,7 @@ describe('CommentRouterView', () => {
 
   const createUpdateMock = (comment: string) => ({
     request: {
-      query: SpeedGrader_UpdateCommentBankItem,
+      query: SpeedGraderLegacy_UpdateCommentBankItem,
       variables: {id: 'comment-1', comment},
     },
     result: {

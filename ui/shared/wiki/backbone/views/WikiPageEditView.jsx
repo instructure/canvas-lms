@@ -15,25 +15,26 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import {LATEST_BLOCK_DATA_VERSION} from '@canvas/block-editor/react/utils'
+import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
+import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
+import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
+import {redirectWithHorizonParams} from '@canvas/horizon/utils'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import MasteryPathToggle from '@canvas/mastery-path-toggle/react/MasteryPathToggle'
+import RichContentEditor from '@canvas/rce/RichContentEditor'
+import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import $ from 'jquery'
 import React, {lazy, Suspense} from 'react'
 import ReactDOM from 'react-dom'
 import {createRoot} from 'react-dom/client'
-import RichContentEditor from '@canvas/rce/RichContentEditor'
 import template from '../../jst/WikiPageEdit.handlebars'
-import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
+import {renderAssignToTray} from '../../react/renderAssignToTray'
+import renderWikiPageTitle from '../../react/renderWikiPageTitle'
+import {BODY_MAX_LENGTH} from '../../utils/constants'
 import WikiPageDeleteDialog from './WikiPageDeleteDialog'
 import WikiPageReloadView from './WikiPageReloadView'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
-import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
-import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
-import renderWikiPageTitle from '../../react/renderWikiPageTitle'
-import {renderAssignToTray} from '../../react/renderAssignToTray'
-import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
-import {LATEST_BLOCK_DATA_VERSION} from '@canvas/block-editor/react/utils'
-import {BODY_MAX_LENGTH} from '../../utils/constants'
-import MasteryPathToggle from '@canvas/mastery-path-toggle/react/MasteryPathToggle'
 
 const I18n = createI18nScope('pages')
 
@@ -89,7 +90,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
       ENV.FEATURES.course_pace_pacing_with_mastery_paths
     const redirect = () => {
-      window.location.href = this.model.get('html_url')
+      redirectWithHorizonParams(this.model.get('html_url'))
     }
     let callBack = redirect
     if (this.enableAssignTo) {
@@ -305,6 +306,8 @@ export default class WikiPageEditView extends ValidatedFormView {
       const data = this.model.get('block_editor_attributes')?.['blocks'] ?? null
       import('@canvas/block-content-editor').then(({BlockContentEditor}) => {
         const aiAltTextGenerationURL = ENV?.ai_alt_text_generation_url ?? null
+        const blockContentEditorToolbarReorder =
+          ENV?.FEATURES?.block_content_editor_toolbar_reorder ?? false
 
         const root = createRoot(document.getElementById('block_editor'))
         root.render(
@@ -314,6 +317,7 @@ export default class WikiPageEditView extends ValidatedFormView {
               this.blockEditorHandler = handler
             }}
             aiAltTextGenerationURL={aiAltTextGenerationURL}
+            toolbarReorder={blockContentEditorToolbarReorder}
           />,
         )
       })

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef, useCallback} from 'react'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -64,13 +64,7 @@ export const renderPeerReviewDetails = (assignment: Assignment) => {
 }
 
 const FlexRow = ({children, ...props}: {children: React.ReactNode} & any) => (
-  <Flex
-    as="div"
-    className="assignment_peer_reviews_checkbox"
-    justifyItems="space-between"
-    wrap="no-wrap"
-    {...props}
-  >
+  <Flex as="div" justifyItems="space-between" wrap="no-wrap" {...props}>
     {children}
   </Flex>
 )
@@ -156,6 +150,12 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
   const [peerReviewChecked, setPeerReviewChecked] = useState(assignment.peerReviews() || false)
   const [peerReviewEnabled, setPeerReviewEnabled] = useState(!assignment.moderatedGrading())
 
+  const reviewsRequiredInputRef = useRef<HTMLInputElement | null>(null)
+  const pointsPerReviewInputRef = useRef<HTMLInputElement | null>(null)
+
+  const gradingEnabled = ENV.PEER_REVIEW_GRADING_ENABLED
+  const allocationEnabled = ENV.PEER_REVIEW_ALLOCATION_ENABLED
+
   const {
     reviewsRequired,
     handleReviewsRequiredChange,
@@ -177,7 +177,47 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
     submissionsRequiredBeforePeerReviews,
     handleSubmissionRequiredCheck,
     resetFields,
-  } = usePeerReviewSettings()
+  } = usePeerReviewSettings({peerReviewCount: assignment.peerReviewCount(), submissionRequired: assignment.peerReviewSubmissionRequired()})
+
+  const validatePeerReviewDetails = useCallback(() => {
+    let valid = true
+
+    if (reviewsRequiredInputRef.current) {
+      const err = validateReviewsRequired({
+        target: reviewsRequiredInputRef.current,
+      } as React.FocusEvent<HTMLInputElement>)
+      if (err) valid = false
+    }
+
+    if (gradingEnabled && pointsPerReviewInputRef.current) {
+      const err = validatePointsPerReview({
+        target: pointsPerReviewInputRef.current,
+      } as React.FocusEvent<HTMLInputElement>)
+      if (err) valid = false
+    }
+
+    return valid
+  }, [validateReviewsRequired, validatePointsPerReview, gradingEnabled])
+
+  const focusOnFirstError = useCallback(() => {
+    if (reviewsRequiredInputRef.current && errorMessageReviewsRequired) {
+      reviewsRequiredInputRef.current.focus()
+    } else if (gradingEnabled && pointsPerReviewInputRef.current && errorMessagePointsPerReview) {
+      pointsPerReviewInputRef.current.focus()
+    }
+  }, [errorMessageReviewsRequired, errorMessagePointsPerReview, gradingEnabled])
+
+  const handleMouseOut = (e: React.MouseEvent<HTMLDivElement>) => {
+    const relatedTarget = e.relatedTarget as HTMLElement
+    const currentTarget = e.currentTarget
+
+    // Does not trigger validation if relatedTarget is within the peer review section
+    if (relatedTarget && currentTarget.contains(relatedTarget)) {
+      return
+    }
+
+    validatePeerReviewDetails()
+  }
 
   useEffect(() => {
     const handlePeerReviewToggle = (event: MessageEvent) => {
@@ -189,7 +229,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
         }
       }
     }
-
     // Listen for peer review toggle messages from EditView
     window.addEventListener('message', handlePeerReviewToggle as EventListener)
     return () => {
@@ -197,15 +236,26 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
     }
   }, [])
 
+  useEffect(() => {
+    const mountPoint = document.getElementById('peer_reviews_allocation_and_grading_details')
+    if (mountPoint) {
+      ;(mountPoint as any).validatePeerReviewDetails = validatePeerReviewDetails
+      ;(mountPoint as any).focusOnFirstError = focusOnFirstError
+    }
+    return () => {
+      if (mountPoint) {
+        delete (mountPoint as any).validatePeerReviewDetails
+        delete (mountPoint as any).focusOnFirstError
+      }
+    }
+  }, [validatePeerReviewDetails, focusOnFirstError])
+
   const handlePeerReviewCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPeerReviewChecked(e.target.checked)
     if (!e.target.checked) {
       resetFields()
     }
   }
-
-  const gradingEnabled = ENV.PEER_REVIEW_GRADING_ENABLED
-  const allocationEnabled = ENV.PEER_REVIEW_ALLOCATION_ENABLED
 
   const advancedConfigLabel = (
     <Text size="content">{I18n.t('Advanced Peer Review Configurations')}</Text>
@@ -243,7 +293,9 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
         </Flex.Item>
       )}
       {peerReviewChecked && (
-        <>
+        // There is no need to set onBlur handler on the parent div element since those events are handled in the NumberInput components
+        /* eslint-disable-next-line jsx-a11y/mouse-events-have-key-events */
+        <div onMouseOut={handleMouseOut}>
           <SectionHeader title={I18n.t('Review Settings')} padding="none small small small" />
 
           <LabeledInput
@@ -252,7 +304,8 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
             errorMessage={errorMessageReviewsRequired}
           >
             <NumberInput
-              id="assignment_peer_reviews_required_input"
+              id="assignment_peer_reviews_count"
+              name="peer_review_count"
               data-testid="reviews-required-input"
               width="4.5rem"
               showArrows={false}
@@ -261,6 +314,9 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
               onBlur={validateReviewsRequired}
               themeOverride={inputOverride}
               value={reviewsRequired}
+              inputRef={(el: HTMLInputElement | null) => {
+                reviewsRequiredInputRef.current = el
+              }}
               renderLabel={
                 <ScreenReaderContent>{I18n.t('Number of reviews required')}</ScreenReaderContent>
               }
@@ -283,6 +339,9 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
                   onBlur={validatePointsPerReview}
                   themeOverride={inputOverride}
                   value={pointsPerReview}
+                  inputRef={(el: HTMLInputElement | null) => {
+                    pointsPerReviewInputRef.current = el
+                  }}
                   renderLabel={
                     <ScreenReaderContent>
                       {I18n.t('Number of Points per Peer Review')}
@@ -405,7 +464,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
               </Flex>
             </ToggleDetails>
           </Flex.Item>
-        </>
+        </div>
       )}
     </Flex>
   )

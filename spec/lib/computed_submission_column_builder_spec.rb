@@ -67,6 +67,58 @@ describe ComputedSubmissionColumnBuilder do
       expect(sub1.db_needs_grading).to be false
       expect(sub2.db_needs_grading).to be true
     end
+
+    context "with moderated assignment" do
+      before do
+        @final_grader = @teacher
+        @assignment.update!(moderated_grading: true, grader_count: 2, final_grader: @final_grader)
+        @prov_grader1 = teacher_in_course(course: @course, active_all: true).user
+        @prov_grader2 = teacher_in_course(course: @course, active_all: true).user
+        @assignment.submit_homework(@student1, body: "hello!")
+        @assignment.submit_homework(@student2, body: "hello!")
+      end
+
+      it "returns false for needs_grading when provisional grader has already graded" do
+        @assignment.grade_student(@student1, score: 10, grader: @prov_grader1, provisional: true)
+        ComputedSubmissionColumnBuilder.add_needs_grading_column(@assignment.submissions, @prov_grader1) => { scope: }
+        sub1 = scope.find_by!(user: @student1)
+        sub2 = scope.find_by!(user: @student2)
+        expect(sub1.db_needs_grading).to be false # already graded by this user
+        expect(sub2.db_needs_grading).to be true  # not yet graded by this user
+      end
+
+      it "returns true for needs_grading when provisional grade has null score" do
+        @assignment.grade_student(@student1, score: 10, grader: @prov_grader1, provisional: true)
+        pg = @assignment.provisional_grades.find_by!(scorer: @prov_grader1, submission_id: @student1.submissions.first.id)
+        pg.update!(score: nil)
+        ComputedSubmissionColumnBuilder.add_needs_grading_column(@assignment.submissions, @prov_grader1) => { scope: }
+        sub1 = scope.find_by!(user: @student1)
+        expect(sub1.db_needs_grading).to be true # null score means still needs grading
+      end
+
+      it "ignores provisional grades after grades are published" do
+        @assignment.grade_student(@student1, score: 10, grader: @prov_grader1, provisional: true)
+        @assignment.update!(grades_published_at: Time.zone.now)
+        # After publication, the provisional grade logic should not apply
+        # The submission doesn't have a real grade yet (provisional grades aren't copied to submission automatically)
+        ComputedSubmissionColumnBuilder.add_needs_grading_column(@assignment.submissions, @prov_grader1) => { scope: }
+        sub1 = scope.find_by!(user: @student1)
+        sub2 = scope.find_by!(user: @student2)
+        # Both still need grading because provisional grades haven't been published to submissions
+        expect(sub1.db_needs_grading).to be true
+        expect(sub2.db_needs_grading).to be true
+      end
+
+      it "works correctly without current_user parameter" do
+        @assignment.grade_student(@student1, score: 10, grader: @prov_grader1, provisional: true)
+        ComputedSubmissionColumnBuilder.add_needs_grading_column(@assignment.submissions) => { scope: }
+        sub1 = scope.find_by!(user: @student1)
+        sub2 = scope.find_by!(user: @student2)
+        # Without current_user, should still return true (uses base logic only)
+        expect(sub1.db_needs_grading).to be true
+        expect(sub2.db_needs_grading).to be true
+      end
+    end
   end
 
   describe ".add_submission_status_column" do

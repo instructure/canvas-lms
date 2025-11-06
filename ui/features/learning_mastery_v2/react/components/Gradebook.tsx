@@ -31,6 +31,7 @@ import {
   GradebookSettings,
   DEFAULT_GRADEBOOK_SETTINGS,
   DisplayFilter,
+  NameDisplayFormat,
 } from '../utils/constants'
 import {Student, Outcome, StudentRollupData, Pagination as PaginationType} from '../types/rollup'
 import {GradebookPagination} from './pagination/GradebookPagination'
@@ -45,6 +46,7 @@ export interface GradebookProps {
   setCurrentPage: (page: number) => void
   sorting: Sorting
   gradebookSettings?: GradebookSettings
+  onChangeNameDisplayFormat: (format: NameDisplayFormat) => void
 }
 
 export const Gradebook: React.FC<GradebookProps> = ({
@@ -56,6 +58,7 @@ export const Gradebook: React.FC<GradebookProps> = ({
   setCurrentPage,
   sorting,
   gradebookSettings = DEFAULT_GRADEBOOK_SETTINGS,
+  onChangeNameDisplayFormat,
 }) => {
   const headerRow = useRef<HTMLElement | null>(null)
   const gridRef = useRef<HTMLElement | null>(null)
@@ -83,7 +86,11 @@ export const Gradebook: React.FC<GradebookProps> = ({
       <Flex padding="medium 0 0 0">
         <Flex.Item>
           <View borderWidth="large 0 medium 0">
-            <StudentHeader sorting={sorting} />
+            <StudentHeader
+              sorting={sorting}
+              nameDisplayFormat={gradebookSettings.nameDisplayFormat}
+              onChangeNameDisplayFormat={onChangeNameDisplayFormat}
+            />
           </View>
         </Flex.Item>
         <Flex.Item size={`${STUDENT_COLUMN_RIGHT_PADDING}px`} />
@@ -100,7 +107,7 @@ export const Gradebook: React.FC<GradebookProps> = ({
         >
           {outcomes.map((outcome, index) => (
             <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`} key={`${outcome.id}.${index}`}>
-              <OutcomeHeader outcome={outcome} />
+              <OutcomeHeader outcome={outcome} sorting={sorting} />
             </Flex.Item>
           ))}
         </View>
@@ -124,6 +131,9 @@ export const Gradebook: React.FC<GradebookProps> = ({
                 showStudentAvatar={gradebookSettings.displayFilters.includes(
                   DisplayFilter.SHOW_STUDENT_AVATARS,
                 )}
+                nameDisplayFormat={gradebookSettings.nameDisplayFormat}
+                outcomes={outcomes}
+                rollups={rollups}
               />
             </View>
           ))}

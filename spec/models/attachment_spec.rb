@@ -2010,6 +2010,44 @@ describe Attachment do
     end
   end
 
+  describe "copy_attachment_content" do
+    let_once(:course) { course_model }
+
+    def fresh_attachment(**opts)
+      attachment_model({ context: course }.merge(opts))
+      @attachment
+    end
+
+    it "copy_attachment_content stores file when open returns IO" do
+      source = fresh_attachment(filename: "src.txt", content_type: "text/plain")
+      dest = fresh_attachment(filename: "dest.txt", content_type: "text/plain")
+      io = StringIO.new("content2")
+      allow(source).to receive(:open).and_return(io)
+      expect(Attachments::Storage).to receive(:store_for_attachment).with(dest, io)
+      source.copy_attachment_content(dest)
+      expect(dest.workflow_state).to eq("pending_upload")
+      expect(dest.filename).to eq(source.filename)
+    end
+
+    it "copy_attachment_content marks destination broken when open returns nil and md5 nil" do
+      source = fresh_attachment(filename: "src.txt", content_type: "text/plain")
+      dest = fresh_attachment(filename: "dest.txt", content_type: "text/plain")
+      allow(source).to receive(:open).and_return(nil)
+      expect(Attachments::Storage).not_to receive(:store_for_attachment)
+      expect { source.copy_attachment_content(dest) }.to change { dest.reload.file_state }.to("broken")
+    end
+
+    it "copy_attachment_content leaves file_state unchanged when open returns nil and md5 present" do
+      source = fresh_attachment(filename: "src.txt", content_type: "text/plain")
+      dest = fresh_attachment(filename: "dest.txt", content_type: "text/plain", md5: "already")
+      original_state = dest.file_state
+      allow(source).to receive(:open).and_return(nil)
+      expect(Attachments::Storage).not_to receive(:store_for_attachment)
+      source.copy_attachment_content(dest)
+      expect(dest.reload.file_state).to eq(original_state)
+    end
+  end
+
   describe "#change_namespace and #make_childless" do
     before :once do
       @old_account = account_model
@@ -3443,6 +3481,67 @@ describe Attachment do
       )
 
       expect(@att.used_in_submission_history?(@course)).to be true
+    end
+  end
+
+  describe "#ingest_to_pine" do
+    let(:course) { Course.create! }
+    let(:public_download_url) { "https://s3.amazonaws.com/bucket/file.pdf" }
+    let(:attachment) { attachment_model(context: course, content_type: "application/pdf", filename: "test.pdf") }
+    let(:pine_client_mock) { double("PineClient") }
+
+    before do
+      allow(pine_client_mock).to receive_messages(enabled?: true, ingest_url: true)
+      stub_const("PineClient", pine_client_mock)
+      allow_any_instance_of(Attachment).to receive(:public_download_url).and_return(public_download_url)
+    end
+
+    it "calls PineClient.ingest_url with correct parameters" do
+      expect(pine_client_mock).to receive(:ingest_url) do |**args|
+        expect(args[:url]).to eq(public_download_url)
+        expect(args[:metadata]).to eq({
+                                        course_id: course.id.to_s,
+                                        filename: "test.pdf",
+                                        content_type: "application/pdf"
+                                      })
+        expect(args[:source]).to eq("canvas")
+        expect(args[:source_id]).to eq(attachment.id.to_s)
+        expect(args[:source_type]).to eq("attachment")
+        expect(args[:feature_slug]).to eq("horizon-content-ingestion")
+        expect(args[:root_account_uuid]).to eq(course.root_account.uuid)
+        expect(args[:current_user].uuid).to be_nil
+        expect(args[:current_user].global_id).to be_nil
+        true
+      end
+
+      attachment.ingest_to_pine
+    end
+
+    it "uses system ingestion user with nil uuid and global_id" do
+      expect(pine_client_mock).to receive(:ingest_url) do |**args|
+        user = args[:current_user]
+        expect(user.uuid).to be_nil
+        expect(user.global_id).to be_nil
+        true
+      end
+
+      attachment.ingest_to_pine
+    end
+
+    it "logs error and re-raises on failure" do
+      expect(pine_client_mock).to receive(:ingest_url).and_raise(StandardError.new("API Error"))
+
+      expect(Rails.logger).to receive(:error).with(/Failed to ingest attachment/)
+      expect { attachment.ingest_to_pine }.to raise_error(StandardError, "API Error")
+    end
+
+    it "does not ingest if context is not a Course" do
+      user = User.create!
+      user_attachment = attachment_model(context: user)
+
+      expect(pine_client_mock).not_to receive(:ingest_url)
+
+      user_attachment.ingest_to_pine
     end
   end
 end

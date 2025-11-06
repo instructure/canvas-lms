@@ -57,14 +57,7 @@ describe Translation do
       subject { described_class.languages({ translation: true, ai_translation_improvements: false, cedar_translation: false }) }
 
       let(:language_abbrs) do
-        %w[
-          af sq am ar hy az bn bs bg ca zh hr cs da nl en et
-          fa tl fi fr ka de el gu ht ha he hi hu is id
-          ga it ja kn kk ko lv lt mk ms ml mr mn no ps pl pt pa
-          ro ru sr si sk sl so es sw sv ta th tr uk ur uz vi cy
-          ast ba be br ceb ff fy gd gl ig ilo jv km lb lg ln lo
-          mg my ne ns oc or sd ss su tn wo xh yi yo zu
-        ]
+        %w[ca de en es fr nl pt-BR ru sv zh-Hans]
       end
 
       it "returns the proper list" do
@@ -112,9 +105,9 @@ describe Translation do
       expect(described_class.current_translation_provider_type(flags)).to be_nil
     end
 
-    it "returns sagemaker as default translation provider" do
+    it "returns cedar as default translation provider" do
       flags = { translation: true, ai_translation_improvements: false, cedar_translation: false }
-      expect(described_class.current_translation_provider_type(flags)).to eq(Translation::TranslationType::SAGEMAKER)
+      expect(described_class.current_translation_provider_type(flags)).to eq(Translation::TranslationType::CEDAR)
     end
 
     it "returns aws translate as improved translation provider" do

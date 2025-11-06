@@ -304,22 +304,24 @@
               <% if @context.allows_speed_grader? && @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)%>
                 <% speed_grader_id = module_item ? "#{module_item.content_type_class}-#{module_item.content_id}" : "blank" %>
                 <li id="<%="speed-grader-container-#{speed_grader_id}"%>" role='presentation' class="speed-grader-link-container <%= module_item&.assignment&.id && ['assignment', 'quiz','lti-quiz', 'discussion_topic'].include?(module_item.content_type_class) && item_data[:published_status] == 'published' ? '' : 'hidden' %>">
-                  <a href="<%= context_url(@context, :context_url) %>/gradebook/speed_grader?assignment_id=<%= module_item&.assignment&.present? ? module_item.assignment.id : "{{ assignment_id }}" %>" title="<%= t('SpeedGrader')%>"><%= @module_item_image_tags['speed_grader'] %> <%= t('SpeedGrader') %></a>
+                  <a href="<%= context_url(@context, :context_url) %>/gradebook/speed_grader?assignment_id=<%= module_item&.assignment&.present? ? module_item.assignment.id : "{{ assignment_id }}" %>" target="_blank" rel="noopener" title="<%= t('SpeedGrader')%>"><%= @module_item_image_tags['speed_grader'] %> <%= t('SpeedGrader') %></a>
                 </li>
               <% end %>
                 <li class="assign-to-option <%= (module_item.present? && (module_item.show_assign_to?) && module_item.content&.grants_right?(@current_user, :manage_assign_to) ) ? "" : "hidden" %>" role="presentation">
                   <a
                     class="module-item-assign-to-link"
                     href="#<%= module_item ? module_item.id : "{{ id }}" %>"
+                    title="<%= t('Assign this module') %>"
+                  >
+                  <span class="assign-to-link-resources"
+                    translate="no"
                     data-item-id="<%= module_item ? module_item.id : '' %>"
                     data-item-name="<%= module_item ? module_item.title : '' %>"
                     data-item-type="<%= module_item ? module_item.content_type_class : '' %>"
                     data-item-context-id="<%= module_item ? module_item.context_id : '' %>"
                     data-item-content-id="<%= module_item ? module_item.content_id : '' %>"
                     data-item-has-assignment="<%= module_item ? module_item&.assignment&.present? : '' %>"
-                    data-item-has-assignment-checkpoint="<%= module_item ? module_item&.assignment&.has_sub_assignments : '' %>"
-                    title="<%= t('Assign this module') %>"
-                  >
+                    data-item-has-assignment-checkpoint="<%= module_item ? module_item&.assignment&.has_sub_assignments : '' %>"></span>
                     <%= @module_item_image_tags['assign_to'] %> <%= t('Assign To...') %>
                   </a>
                 </li>

@@ -131,5 +131,13 @@ module CanvasCareer
         CAREER_PERMISSION_LABEL_OVERRIDES
       end
     end
+
+    module QueryParams
+      ACADEMIC_CONTENT_ONLY_CAREER_THEME = {
+        content_only: "true",
+        instui_theme: "career",
+        force_classic: "true"
+      }.freeze
+    end
   end
 end

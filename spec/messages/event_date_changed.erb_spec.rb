@@ -28,5 +28,5 @@ describe "event_date_changed" do
   let(:asset) { @event }
   let(:notification_name) { :event_date_changed }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

@@ -100,6 +100,26 @@ describe Types::AssignmentType do
     end
   end
 
+  describe "hasPlagiarismTool" do
+    it "returns true when assignment has a plagiarism tool configured" do
+      tool = course.context_external_tools.create!(
+        name: "Plagiarism Tool",
+        url: "http://example.com",
+        consumer_key: "key",
+        shared_secret: "secret"
+      )
+      assignment.assignment_configuration_tool_lookups.create!(
+        tool:,
+        tool_type: "ContextExternalTool"
+      )
+      expect(assignment_type.resolve("hasPlagiarismTool")).to be true
+    end
+
+    it "returns false when assignment has no plagiarism tool configured" do
+      expect(assignment_type.resolve("hasPlagiarismTool")).to be false
+    end
+  end
+
   describe "gradeAsGroup" do
     it "returns true for group assignments being graded as group" do
       assignment.update!(group_category: course.group_categories.create!(name: "My Category"))
@@ -902,6 +922,7 @@ describe Types::AssignmentType do
     let(:course) { Course.create!(workflow_state: "available") }
     let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
     let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
+    let(:observer) { course.enroll_user(User.create!, "ObserverEnrollment", enrollment_state: "active", associated_user_id: student.id).user }
 
     context "when lti_asset_processor feature flag is disabled" do
       before { course.root_account.disable_feature!(:lti_asset_processor) }
@@ -929,27 +950,20 @@ describe Types::AssignmentType do
       end
     end
 
-    context "when user does not have manage_grades permission" do
-      let(:context) { { current_user: student } }
-      let!(:asset_processor) { lti_asset_processor_model(assignment:) }
+    context "when user is an observer" do
+      let(:context) { { current_user: observer } }
 
-      context "when student can read their own grade" do
-        it "returns lti asset processors" do
-          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student, for_plagiarism: true).and_return(true)
-
-          resolver = GraphQLTypeTester.new(assignment, context)
-          result = resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")
-          expect(result).to eq([asset_processor.id.to_s])
-        end
+      it "returns lti asset processors" do
+        asset_processor = lti_asset_processor_model(assignment:)
+        resolver = GraphQLTypeTester.new(assignment, context)
+        result = resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")
+        expect(result).to eq([asset_processor.id.to_s])
       end
 
-      context "when student cannot read their own grade" do
-        it "returns null" do
-          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student, for_plagiarism: true).and_return(false)
-
-          resolver = GraphQLTypeTester.new(assignment, context)
-          expect(resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")).to be_nil
-        end
+      it "returns empty collection when no asset processors exist" do
+        resolver = GraphQLTypeTester.new(assignment, context)
+        result = resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")
+        expect(result).to eq([])
       end
     end
   end
@@ -1706,6 +1720,92 @@ describe Types::AssignmentType do
       expect(result).to eq [student2.id.to_s]
       expect(result).not_to include(student.id.to_s)
     end
+
+    describe "assigned_students with peer review status" do
+      before(:once) do
+        @peer_review_course = course_factory(active_all: true)
+        @peer_review_teacher = teacher_in_course(active_all: true, course: @peer_review_course).user
+        @peer_review_assignment = @peer_review_course.assignments.create!(
+          title: "Peer Review Assignment",
+          points_possible: 10,
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+        @student1 = student_in_course(course: @peer_review_course, name: "Student One", active_all: true).user
+        @student2 = student_in_course(course: @peer_review_course, name: "Student Two", active_all: true).user
+
+        @peer_review_course.enable_feature!(:peer_review_allocation)
+
+        AllocationRule.create!(
+          assignment: @peer_review_assignment,
+          course: @peer_review_course,
+          assessor: @student1,
+          assessee: @student2,
+          must_review: true
+        )
+
+        submission1 = @peer_review_assignment.submit_homework(@student1, {
+                                                                submission_type: "online_text_entry",
+                                                                body: "Student 1 submission"
+                                                              })
+        submission2 = @peer_review_assignment.submit_homework(@student2, {
+                                                                submission_type: "online_text_entry",
+                                                                body: "Student 2 submission"
+                                                              })
+        AssessmentRequest.create!(
+          asset: submission2,
+          assessor_asset: submission1,
+          user: @student2,
+          assessor: @student1,
+          workflow_state: "completed"
+        )
+      end
+
+      let(:peer_review_assignment_type) { GraphQLTypeTester.new(@peer_review_assignment, current_user: @peer_review_teacher) }
+
+      it "includes peer review status for assigned students" do
+        must_review_count = peer_review_assignment_type.resolve("assignedStudents { nodes { peerReviewStatus { mustReviewCount } } }")
+        expect(must_review_count.length).to eq(2)
+        expect(must_review_count.sort).to eq([0, 1])
+
+        completed_reviews_count = peer_review_assignment_type.resolve("assignedStudents { nodes { peerReviewStatus { completedReviewsCount } } }")
+        expect(completed_reviews_count.sort).to eq([0, 1])
+      end
+
+      it "returns nil for peer review status when user lacks grade permission" do
+        student_assignment_type = GraphQLTypeTester.new(@peer_review_assignment, current_user: @student1)
+
+        result = student_assignment_type.resolve("assignedStudents { nodes { peerReviewStatus { mustReviewCount } } }")
+        expect(result).to be_nil
+      end
+
+      it "returns nil for peer review status when feature is disabled" do
+        @peer_review_course.disable_feature!(:peer_review_allocation)
+
+        result = peer_review_assignment_type.resolve("assignedStudents { nodes { peerReviewStatus { mustReviewCount } } }")
+
+        # Should still return students but with nil peer review status
+        expect(result.length).to eq(2)
+        expect(result).to all(be_nil)
+      end
+
+      it "returns nil for peer review status when peer reviews are disabled" do
+        @peer_review_assignment.update!(peer_reviews: false)
+
+        result = peer_review_assignment_type.resolve("assignedStudents { nodes { peerReviewStatus { mustReviewCount } } }")
+
+        # Should still return students but with nil peer review status
+        expect(result.length).to eq(2)
+        expect(result).to all(be_nil)
+      end
+
+      it "filters students with search term and maintains peer review status" do
+        result = peer_review_assignment_type.resolve("assignedStudents (filter: { searchTerm: \"Student One\" }) { edges { node { peerReviewStatus { mustReviewCount } } } }")
+
+        expect(result.length).to eq(1)
+        expect(result.first).to eq(1)
+      end
+    end
   end
 
   describe "graderIdentitiesConnection" do
@@ -2317,6 +2417,43 @@ describe Types::AssignmentType do
       course.enable_feature!(:project_lhotse)
       expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
       expect(assignment_type.resolve("autoGradeAssignmentErrors")).to eq(["Test error"])
+    end
+  end
+
+  describe "allowProvisionalGrading" do
+    before(:once) do
+      @moderated_assignment = course.assignments.create!(
+        name: "moderated assignment",
+        moderated_grading: true,
+        grader_count: 2,
+        final_grader: teacher
+      )
+      @moderated_assignment.create_moderation_grader(teacher, occupy_slot: true)
+    end
+
+    let(:moderated_assignment_type) { GraphQLTypeTester.new(@moderated_assignment, current_user: teacher) }
+    let(:moderated_assignment_type_for_student) { GraphQLTypeTester.new(@moderated_assignment, current_user: student) }
+
+    it "returns 'allowed' for allowProvisionalGrading when user can be a moderated grader" do
+      expect(moderated_assignment_type.resolve("allowProvisionalGrading")).to eq "allowed"
+    end
+
+    it "returns 'not_allowed' for allowProvisionalGrading when user cannot be a moderated grader" do
+      expect(moderated_assignment_type_for_student.resolve("allowProvisionalGrading")).to eq "not_allowed"
+    end
+
+    it "returns 'not_applicable' for allowProvisionalGrading on non-moderated assignments" do
+      expect(teacher_assignment_type.resolve("allowProvisionalGrading")).to eq "not_applicable"
+    end
+
+    it "returns 'not_applicable' for allowProvisionalGrading after grades are published" do
+      @moderated_assignment.update!(grades_published_at: Time.zone.now)
+      expect(moderated_assignment_type.resolve("allowProvisionalGrading")).to eq "not_applicable"
+    end
+
+    it "returns 'not_applicable' for allowProvisionalGrading after grades are published (non-provisional grader)" do
+      @moderated_assignment.update!(grades_published_at: Time.zone.now)
+      expect(moderated_assignment_type_for_student.resolve("allowProvisionalGrading")).to eq "not_applicable"
     end
   end
 end

@@ -27,19 +27,26 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import AccessibilityIssuesContent from '../../../../shared/react/components/AccessibilityIssuesContent'
 import {AccessibilityCheckerContext} from '../../../../shared/react/contexts/AccessibilityCheckerContext'
 import {AccessibilityResourceScan} from '../../../../shared/react/types'
-import {AccessibilityChecker} from '../../index'
+import {CourseScan} from '../AccessibilityScanWrapper'
+import {AccessibilityCheckerApp} from '../AccessibilityCheckerApp/AccessibilityCheckerApp'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 const I18n = createI18nScope('accessibility_checker')
 
 interface AccessibilityCheckerDrawerProps {
   pageContent: HTMLElement
   container: HTMLElement
+  courseId: string
+  scanDisabled: boolean
 }
 
 // Based on ContentTypeExternalToolDrawer from ui/shared/trays/react/ContentTypeExternalToolDrawer.tsx
 export default function AccessibilityCheckerDrawer({
   pageContent,
   container,
+  courseId,
+  scanDisabled,
 }: AccessibilityCheckerDrawerProps) {
   const pageContentRef = useRef<HTMLDivElement>(null)
   const [selectedItem, setSelectedItem] = useState<AccessibilityResourceScan | null>(null)
@@ -64,11 +71,14 @@ export default function AccessibilityCheckerDrawer({
         <AccessibilityCheckerContext.Provider
           value={{selectedItem, setSelectedItem, isTrayOpen, setIsTrayOpen}}
         >
-          <AccessibilityChecker />
+          <QueryClientProvider client={queryClient}>
+            <CourseScan courseId={courseId} scanDisabled={scanDisabled}>
+              <AccessibilityCheckerApp />
+            </CourseScan>
+          </QueryClientProvider>
         </AccessibilityCheckerContext.Provider>,
       )
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   )
 

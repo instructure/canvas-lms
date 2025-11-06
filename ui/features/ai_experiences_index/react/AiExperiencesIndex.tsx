@@ -57,7 +57,7 @@ const AiExperiencesIndex: React.FC = () => {
         const data = await response.json()
         setExperiences(data)
       } catch (err) {
-        console.error('Error fetching AI experiences:', err)
+        // TODO: Show flash alert to user for fetch error
         setError(err instanceof Error ? err.message : 'An error occurred')
       } finally {
         setLoading(false)
@@ -104,7 +104,7 @@ const AiExperiencesIndex: React.FC = () => {
       // Remove from local state
       setExperiences(prevExperiences => prevExperiences.filter(exp => exp.id !== id))
     } catch (err) {
-      console.error('Error deleting AI experience:', err)
+      // TODO: Replace alert() with flash alert
       alert(I18n.t('Failed to delete AI Experience. Please try again.'))
     }
   }
@@ -137,7 +137,7 @@ const AiExperiencesIndex: React.FC = () => {
         prevExperiences.map(exp => (exp.id === id ? {...exp, workflow_state: newState} : exp)),
       )
     } catch (err) {
-      console.error('Error updating AI experience:', err)
+      // TODO: Show flash alert to user for publish/unpublish error
     }
   }
 

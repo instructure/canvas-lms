@@ -60,6 +60,10 @@ class AssessmentQuestion < ActiveRecord::Base
   self.collection_owner_association = :assessment_question_bank
   restrict_columns :content, [:name, :question_data]
 
+  include LinkedAttachmentHandler
+
+  def update_attachment_associations; end
+
   set_policy do
     given do |user, session|
       context.grants_right?(user, session, :manage_assignments_edit)

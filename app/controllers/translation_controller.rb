@@ -17,7 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class TranslationController < ApplicationController
-  require "pragmatic_segmenter"
   require "aws-sdk-translate"
 
   before_action :require_context, only: :translate

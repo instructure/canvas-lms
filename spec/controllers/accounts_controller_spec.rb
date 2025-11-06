@@ -687,7 +687,6 @@ describe AccountsController do
                                  global_includes: true,
                                  enable_profiles: true,
                                  enable_turnitin: true,
-                                 enable_content_a11y_checker: true,
                                  admins_can_change_passwords: true,
                                  admins_can_view_notifications: true,
                                  limit_parent_app_web_access: true,
@@ -696,7 +695,6 @@ describe AccountsController do
       expect(@account.global_includes?).to be_falsey
       expect(@account.enable_profiles?).to be_falsey
       expect(@account.enable_turnitin?).to be_falsey
-      expect(@account.enable_content_a11y_checker?).to be_falsey
       expect(@account.admins_can_change_passwords?).to be_falsey
       expect(@account.admins_can_view_notifications?).to be_falsey
       expect(@account.limit_parent_app_web_access?).to be_falsey
@@ -712,7 +710,6 @@ describe AccountsController do
                                  global_includes: true,
                                  enable_profiles: true,
                                  enable_turnitin: true,
-                                 enable_content_a11y_checker: true,
                                  admins_can_change_passwords: true,
                                  admins_can_view_notifications: true,
                                  limit_parent_app_web_access: true,
@@ -721,7 +718,6 @@ describe AccountsController do
       expect(@account.global_includes?).to be_truthy
       expect(@account.enable_profiles?).to be_truthy
       expect(@account.enable_turnitin?).to be_truthy
-      expect(@account.enable_content_a11y_checker?).to be_truthy
       expect(@account.admins_can_change_passwords?).to be_truthy
       expect(@account.admins_can_view_notifications?).to be_truthy
       expect(@account.limit_parent_app_web_access?).to be_truthy
@@ -1848,18 +1844,9 @@ describe AccountsController do
       end
     end
 
-    it "does not set pagination total_pages/last page link" do
+    it "sets pagination total_pages/last page link for session-authenticated requests" do
       admin_logged_in(@account)
       get "courses_api", params: { account_id: @account.id, per_page: 1 }
-
-      expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).to_not include("last")
-    end
-
-    it "sets pagination total_pages/last page link if includes ui_invoked is set" do
-      Setting.set("ui_invoked_count_pages", "true")
-      admin_logged_in(@account)
-      get "courses_api", params: { account_id: @account.id, per_page: 1, include: ["ui_invoked"] }
 
       expect(response).to be_successful
       expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).to include("last")

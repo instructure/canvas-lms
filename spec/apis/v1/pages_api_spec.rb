@@ -1608,7 +1608,6 @@ describe "Pages API", type: :request do
         page_json = json.find { |p| p["url"] == @page.url }
         expect(page_json["locked_for_user"]).to be(false)
         expect(page_json.keys).not_to include("lock_explanation")
-        p page_json
         expect(page_json["body"]).to eq("the page body")
       end
     end

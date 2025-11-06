@@ -85,7 +85,7 @@ class TokenScopes
     LTI_NRPS_V2_SCOPE => I18n.t("Can retrieve user data associated with the context the tool is installed in."),
 
     # PNS + Asset Processor
-    LTI_PNS_SCOPE => I18n.t("Can register to be notified when Document Processor Assignment is submitted to."),
+    LTI_PNS_SCOPE => I18n.t("Can register to receive asynchronous notifications from Canvas."),
     LTI_ASSET_READ_ONLY_SCOPE => I18n.t("Can retrieve submissions from Document Processor Assignments."),
     LTI_ASSET_REPORT_SCOPE => I18n.t("Can send reports for Document Processor Assignments."),
     LTI_EULA_DEPLOYMENT_SCOPE => I18n.t("Can reset EULA acceptance status."),
@@ -179,6 +179,20 @@ class TokenScopes
       }
     end
     @_api_routes = routes.uniq { |route| route[:scope] }.freeze
+  end
+
+  # Returns the same info as api_routes but in a format that is useable by
+  # swagger_yard.
+  def self.api_routes_for_openapi_docs
+    api_routes_with_action = TokenScopes.api_routes.map do |route|
+      {
+        name: route[:controller].to_s + "#" + route[:action].to_s,
+        method: route[:verb],
+        path: route[:path],
+      }
+    end
+
+    api_routes_with_action.group_by { |route| route[:name] }
   end
 
   def self.hidden_scopes_for_account(root_account)

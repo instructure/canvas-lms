@@ -23,10 +23,10 @@ import {IconAddLine} from '@instructure/ui-icons'
 import {TextArea} from '@instructure/ui-text-area'
 import {View} from '@instructure/ui-view'
 import {useRef, useState} from 'react'
-import {SpeedGrader_CreateCommentBankItem} from '../graphql/mutations'
+import {SpeedGraderLegacy_CreateCommentBankItem} from '../graphql/mutations'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {SpeedGrader_CreateCommentBankItemMutation} from '@canvas/graphql/codegen/graphql'
+import {SpeedGraderLegacy_CreateCommentBankItemMutation} from '@canvas/graphql/codegen/graphql'
 
 const I18n = createI18nScope('CommentLibrary')
 
@@ -38,9 +38,14 @@ export const CreateCommentSection: React.FC<CreateCommentSectionProps> = ({cours
   const textInputRef = useRef<HTMLTextAreaElement | null>()
   const [value, setValue] = useState('')
 
-  const [createComment, {loading}] = useMutation<SpeedGrader_CreateCommentBankItemMutation>(
-    SpeedGrader_CreateCommentBankItem,
-    {refetchQueries: ['SpeedGrader_CommentBankItems', 'SpeedGrader_CommentBankItemsCount']},
+  const [createComment, {loading}] = useMutation<SpeedGraderLegacy_CreateCommentBankItemMutation>(
+    SpeedGraderLegacy_CreateCommentBankItem,
+    {
+      refetchQueries: [
+        'SpeedGraderLegacy_CommentBankItems',
+        'SpeedGraderLegacy_CommentBankItemsCount',
+      ],
+    },
   )
 
   const handleAddComment = async () => {

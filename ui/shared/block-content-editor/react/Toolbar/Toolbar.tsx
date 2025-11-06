@@ -22,21 +22,25 @@ import {PreviewButton} from './PreviewButton'
 import {RedoButton} from './RedoButton'
 import {UndoButton} from './UndoButton'
 import {AccessibilityCheckerButton} from './AccessibilityCheckerButton'
+import {ReorderBlocksButton} from './ReorderBlocksButton'
 import {useEditHistory} from '../hooks/useEditHistory'
 import {showScreenReaderAlert} from '../utilities/accessibility'
 import {List} from '@instructure/ui-list'
 import {useEditorMode} from '../hooks/useEditorMode'
 import {useAppSelector} from '../store'
+import {useGetBlocksCount} from '../hooks/useGetBlocksCount'
 
 const I18n = createI18nScope('block_content_editor')
 
 export const Toolbar = () => {
-  const {a11yIssueCount, a11yIssues} = useAppSelector(state => ({
+  const {a11yIssueCount, a11yIssues, toolbarReorder} = useAppSelector(state => ({
     ...state.accessibility,
+    toolbarReorder: state.toolbarReorder,
   }))
   const {mode, setMode} = useEditorMode()
   const {undo, redo, canUndo, canRedo} = useEditHistory()
   const isPreviewMode = mode === 'preview'
+  const {blocksCount} = useGetBlocksCount()
 
   const handleUndo = () => {
     undo()
@@ -55,12 +59,17 @@ export const Toolbar = () => {
     />,
   ]
   if (!isPreviewMode) {
-    const allIssues = Array.from(a11yIssues.values()).flat()
     menuItems.push(
       <UndoButton active={canUndo} onClick={handleUndo} />,
       <RedoButton active={canRedo} onClick={handleRedo} />,
-      <AccessibilityCheckerButton count={a11yIssueCount} issues={allIssues} />,
     )
+
+    if (toolbarReorder) {
+      menuItems.push(<ReorderBlocksButton blockCount={blocksCount} />)
+    }
+
+    const allIssues = Array.from(a11yIssues.values()).flat()
+    menuItems.push(<AccessibilityCheckerButton count={a11yIssueCount} issues={allIssues} />)
   }
 
   return (

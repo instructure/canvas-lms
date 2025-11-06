@@ -72,6 +72,9 @@ export const ExportCSVButton: React.FC<ExportCSVButtonProps> = ({
         data={exportData}
         filename={`course-${courseId}-gradebook-export.csv`}
         data-testid="csv-link"
+        style={{display: 'none'}}
+        tabIndex={-1}
+        aria-hidden="true"
       >
         <span ref={csvElementRef} />
       </CSVLink>

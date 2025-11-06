@@ -385,6 +385,26 @@ input AllocationRulesFilterInput {
 }
 
 """
+Indicates whether a submission requires a provisional grade
+"""
+enum AllowProvisionalGradingType {
+  """
+  User can provide a provisional grade
+  """
+  allowed
+
+  """
+  User is not allowed to provide a provisional grade
+  """
+  not_allowed
+
+  """
+  Assignment does not use moderated grading or grades are already published
+  """
+  not_applicable
+}
+
+"""
 An anonymous student identity
 """
 type AnonymousStudentIdentity {
@@ -454,6 +474,11 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   """
   allocationRules: AssignmentAllocationRules
   allowGoogleDocsSubmission: Boolean
+
+  """
+  Whether the current user can provide a provisional grade for this assignment
+  """
+  allowProvisionalGrading: AllowProvisionalGradingType!
 
   """
   The number of submission attempts a student can make for this assignment. null implies unlimited.
@@ -679,6 +704,11 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   """
   hasGroupCategory: Boolean!
   hasMultipleDueDates: Boolean
+
+  """
+  Indicates if the assignment has LTI 2.0 plagiarism detection tool configured
+  """
+  hasPlagiarismTool: Boolean!
   hasRubric: Boolean!
 
   """
@@ -1239,6 +1269,7 @@ input AssignmentPeerReviewsUpdate {
   dueAt: DateTime
   enabled: Boolean
   intraReviews: Boolean
+  submissionRequired: Boolean
 }
 
 """
@@ -4462,8 +4493,13 @@ enum DraftableSubmissionType {
 }
 
 type EligibilityIssue {
-  level: String!
+  level: EligibilityIssueLevel!
   message: String!
+}
+
+enum EligibilityIssueLevel {
+  error
+  warning
 }
 
 type Enrollment implements AssetString & Node & Timestamped {
@@ -4760,6 +4796,7 @@ type File implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   createdAt: DateTime
   displayName: String
   fileState: String
+  folder: Folder
   graded: Boolean
   id: ID!
   isLockedByMasterCourse: Boolean!
@@ -7686,6 +7723,21 @@ interface PagesConnectionInterface {
 }
 
 """
+Peer review status for a student on an assignment
+"""
+type PeerReviewStatus {
+  """
+  Number of peer reviews the student has completed
+  """
+  completedReviewsCount: Int!
+
+  """
+  Number of peer reviews the student has been allocated
+  """
+  mustReviewCount: Int!
+}
+
+"""
 Settings for Peer Reviews on an Assignment
 """
 type PeerReviews {
@@ -7720,6 +7772,11 @@ type PeerReviews {
   group assignment can be assigned to peer review their own group's work
   """
   intraReviews: Boolean
+
+  """
+  Boolean indicating if students must submit their assignment before they can do peer reviews
+  """
+  submissionRequired: Boolean
 }
 
 type Placement {
@@ -9215,6 +9272,11 @@ type SubAssignmentSubmission {
   customGradeStatusId: ID
 
   """
+  how many points are being deducted due to late policy
+  """
+  deductedPoints: Float
+
+  """
   the submission grade *before* late policy deductions were applied
   """
   enteredGrade: String
@@ -9239,6 +9301,7 @@ type SubAssignmentSubmission {
   secondsLate: Int
   statusTag: SubmissionStatusTagType!
   subAssignmentTag: String
+  submittedAt: DateTime
 }
 
 type SubHeader implements ModuleItemInterface {
@@ -9406,6 +9469,11 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   groupId: ID
   hasOriginalityReport: Boolean!
   hasPostableComments: Boolean!
+
+  """
+  Whether the current user has provided a provisional grade with a non-null score for this submission
+  """
+  hasProvisionalGradeByCurrentUser: Boolean!
   hasSubAssignmentSubmissions: Boolean
   hasUnreadRubricAssessment: Boolean!
 
@@ -9790,6 +9858,11 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   groupId: ID
   hasOriginalityReport: Boolean!
   hasPostableComments: Boolean!
+
+  """
+  Whether the current user has provided a provisional grade with a non-null score for this submission
+  """
+  hasProvisionalGradeByCurrentUser: Boolean!
   hasSubAssignmentSubmissions: Boolean
   hasUnreadRubricAssessment: Boolean!
 
@@ -10010,6 +10083,11 @@ interface SubmissionInterface {
   groupId: ID
   hasOriginalityReport: Boolean!
   hasPostableComments: Boolean!
+
+  """
+  Whether the current user has provided a provisional grade with a non-null score for this submission
+  """
+  hasProvisionalGradeByCurrentUser: Boolean!
   hasSubAssignmentSubmissions: Boolean
   hasUnreadRubricAssessment: Boolean!
 
@@ -11411,6 +11489,11 @@ type User implements LegacyIDInterface & Node & Timestamped {
   name: HtmlEncodedString
   notificationPreferences: NotificationPreferences
   notificationPreferencesEnabled(accountId: ID, contextType: NotificationPreferencesContextType!, courseId: ID): Boolean!
+
+  """
+  Peer review status for assignments where peer reviews are enabled
+  """
+  peerReviewStatus: PeerReviewStatus
   pronouns: String
   recipients(context: String, search: String): Recipients
   recipientsObservers(

@@ -18,7 +18,7 @@
 
 import {useInfiniteQuery, useQuery, useQueryClient} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
-import {useState, useCallback, useEffect} from 'react'
+import {useState, useCallback, useMemo, useEffect} from 'react'
 import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
 import {COURSE_WORK_KEY, QUERY_CONFIG} from '../constants'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
@@ -438,8 +438,38 @@ export function useCourseWork(options: UseCourseWorkOptions = {}) {
 export function useCourseWorkPaginated(options: UseCourseWorkOptions = {}) {
   const {observedUserId} = useWidgetDashboard()
   const queryClient = useQueryClient()
-  const [currentPageIndex, setCurrentPageIndex] = useState<number>(0)
   const pageSize = options.pageSize || 4
+
+  // Create a stable filter key - when this changes, we know filters have changed
+  const filterKey = useMemo(
+    () =>
+      JSON.stringify({
+        courseFilter: options.courseFilter,
+        startDate: options.startDate,
+        endDate: options.endDate,
+        includeOverdue: options.includeOverdue,
+        includeNoDueDate: options.includeNoDueDate,
+        onlySubmitted: options.onlySubmitted,
+        observedUserId,
+      }),
+    [
+      options.courseFilter,
+      options.startDate,
+      options.endDate,
+      options.includeOverdue,
+      options.includeNoDueDate,
+      options.onlySubmitted,
+      observedUserId,
+    ],
+  )
+
+  // Track current page index - always resets to 0 when filters change
+  const [currentPageIndex, setCurrentPageIndex] = useState<number>(0)
+
+  // Reset to page 1 whenever filters change
+  useEffect(() => {
+    setCurrentPageIndex(0)
+  }, [filterKey])
 
   // Generate unique query key for current page
   const queryKey = [
@@ -476,11 +506,6 @@ export function useCourseWorkPaginated(options: UseCourseWorkOptions = {}) {
     queryKey: [COURSE_WORK_KEY],
     broadcastChannel: 'widget-dashboard',
   })
-
-  // Reset to page 0 when filters change
-  useEffect(() => {
-    setCurrentPageIndex(0)
-  }, [options.courseFilter, options.startDate, options.endDate, observedUserId])
 
   const totalCount = currentPage?.pageInfo.totalCount ?? null
   const totalPages =

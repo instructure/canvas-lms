@@ -16,18 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import {useState} from 'react'
 import {Popover} from '@instructure/ui-popover'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Heading} from '@instructure/ui-heading'
+import {CondensedButton, CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
-import {IconInfoLine} from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
+import {IconInfoLine, IconExternalLinkLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {AccessibilityIssue} from './types'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('block_content_editor')
-const linkColor = '#0374B5'
 
 interface IssuesContentProps {
   currentIssue: AccessibilityIssue
@@ -67,11 +69,28 @@ export const IssuesContent = ({
           shouldContainFocus
           shouldReturnFocus
           shouldCloseOnDocumentClick={true}
+          screenReaderLabel={I18n.t('Why it matters')}
           renderTrigger={() => (
-            <CondensedButton onClick={handleShowInfoPopover} renderIcon={<IconInfoLine />} />
+            // the div wrapper is needed to pass aria-expanded
+            <div>
+              <CondensedButton
+                onClick={handleShowInfoPopover}
+                renderIcon={<IconInfoLine />}
+                aria-label={I18n.t('Tooltip issues information')}
+              />
+            </div>
           )}
         >
           <Flex direction="column" width="18rem" padding="medium" gap="medium">
+            <CloseButton
+              placement="end"
+              offset="small"
+              onClick={handleHideInfoPopover}
+              screenReaderLabel={I18n.t('Close')}
+            />
+            <Heading level="h3" margin="0">
+              {I18n.t('Why it matters')}
+            </Heading>
             <Flex.Item>
               <Text size="medium" lineHeight="default">
                 {currentIssue?.rule.why()}
@@ -80,14 +99,16 @@ export const IssuesContent = ({
             {currentIssue?.rule.link && (
               <Flex.Item>
                 <Text size="medium">
-                  <a
+                  <Link
                     href={currentIssue.rule.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{color: linkColor, textDecoration: 'underline'}}
+                    iconPlacement="end"
+                    renderIcon={<IconExternalLinkLine size="x-small" />}
                   >
                     {currentIssue.rule.linkText?.()}
-                  </a>
+                    <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
+                  </Link>
                 </Text>
               </Flex.Item>
             )}

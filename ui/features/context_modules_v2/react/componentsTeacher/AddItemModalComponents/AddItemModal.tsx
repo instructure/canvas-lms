@@ -20,7 +20,7 @@ import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-import ModuleItemAsyncSelect from './ModuleItemAsyncSelect'
+import ModuleItemMultiSelect from './ModuleItemMultiSelect'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -81,11 +81,17 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     isError,
   } = useModuleItemContent(itemType, courseId, undefined, isModuleItemContentEnabled)
 
+  const allItems = useMemo(() => {
+    return data?.pages?.flatMap(page => page.items) || []
+  }, [data?.pages])
+
   const handleExited = () => {
     setFormErrors({})
     reset()
     dispatch({type: 'SET_SELECTED_ITEM_ID', value: ''})
     dispatch({type: 'SET_SELECTED_ITEM', value: null})
+    dispatch({type: 'SET_SELECTED_ITEM_IDS', value: []})
+    dispatch({type: 'SET_SELECTED_ITEMS', value: []})
     dispatch({type: 'SET_TAB_INDEX', value: 0})
     queryClient.invalidateQueries({
       queryKey: ['moduleItemContent', itemType, courseId, undefined],
@@ -102,9 +108,9 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       case ITEM_TYPE.EXTERNAL_URL:
         return [{id: 'new_url', name: I18n.t('Create a new URL')}]
       default:
-        return (data?.items ?? []) as AssignmentLike[]
+        return allItems as AssignmentLike[]
     }
-  }, [itemType, data?.items])
+  }, [itemType, allItems])
 
   const contentItems: ContentItem[] = useMemo(() => {
     return itemType === ITEM_TYPE.ASSIGNMENT
@@ -125,6 +131,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     reset()
     dispatch({type: 'SET_SELECTED_ITEM_ID', value: ''})
     dispatch({type: 'SET_SELECTED_ITEM', value: null})
+    dispatch({type: 'SET_SELECTED_ITEM_IDS', value: []})
+    dispatch({type: 'SET_SELECTED_ITEMS', value: []})
   }, [isOpen, itemType, state.tabIndex])
 
   useEffect(() => {
@@ -146,6 +154,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     state: {
       tabIndex: number
       selectedItemId: string
+      selectedItems: any[]
       newItem: {name: string; file: File | null}
       externalUrl: {name: string}
       externalTool: {name: string}
@@ -157,7 +166,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     const createItemTabSelected = state.tabIndex === 1
 
     return (
-      (addItemTabSelected && !state.selectedItemId && !NAMELESS_TYPES.includes(type)) ||
+      (addItemTabSelected && state.selectedItems.length === 0 && !NAMELESS_TYPES.includes(type)) ||
       (createItemTabSelected && !state.newItem.name.trim() && !NAMELESS_TYPES.includes(type)) ||
       (createItemTabSelected && type === ITEM_TYPE.FILE && !state.newItem.file) ||
       (type === ITEM_TYPE.CONTEXT_MODULE_SUB_HEADER && !state?.textHeader) ||
@@ -181,13 +190,13 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
 
   const renderContentItems = () => {
     return (
-      <ModuleItemAsyncSelect
+      <ModuleItemMultiSelect
         itemType={itemType}
         courseId={courseId}
-        selectedItemId={state.selectedItemId || undefined}
-        onSelectionChange={(itemId, item) => {
-          dispatch({type: 'SET_SELECTED_ITEM_ID', value: itemId || ''})
-          dispatch({type: 'SET_SELECTED_ITEM', value: item || null})
+        selectedItemIds={state.selectedItemIds}
+        onSelectionChange={(itemIds, items) => {
+          dispatch({type: 'SET_SELECTED_ITEM_IDS', value: itemIds})
+          dispatch({type: 'SET_SELECTED_ITEMS', value: items})
           if (formErrors.name) {
             setFormErrors(prev => ({...prev, name: undefined}))
           }

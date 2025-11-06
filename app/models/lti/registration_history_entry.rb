@@ -38,6 +38,8 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
 
   validates :comment, if: -> { comment.present? }, length: { maximum: 2000 }
 
+  validate :valid_columns_for_update_type
+
   class << self
     # Track all changes made to an Lti::Registration and its associated models to create
     # an accurate change-log entry. This can and should be used whenever any changes are being
@@ -62,6 +64,9 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
       old_internal_config = Schemas::InternalLtiConfiguration.to_sorted(
         lti_registration.internal_lti_configuration(include_overlay: false)
       )
+      old_overlaid_internal_config = Schemas::InternalLtiConfiguration.to_sorted(
+        lti_registration.internal_lti_configuration(include_overlay: true)
+      )
       old_overlay_data = lti_registration.overlay_for(context)&.data
       old_developer_key_values = lti_registration.developer_key.current_tracked_attributes
 
@@ -74,6 +79,9 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
       new_registration_values = lti_registration.current_tracked_attributes
       new_internal_config = Schemas::InternalLtiConfiguration.to_sorted(
         lti_registration.internal_lti_configuration(include_overlay: false)
+      )
+      new_overlaid_internal_config = Schemas::InternalLtiConfiguration.to_sorted(
+        lti_registration.internal_lti_configuration(include_overlay: true)
       )
       new_overlay_data = lti_registration.overlay_for(context)&.data
       new_developer_key_values = lti_registration.developer_key.current_tracked_attributes
@@ -108,13 +116,32 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
       diff[:overlay] = overlay_data_diff unless overlay_data_diff.empty?
 
       if diff.present?
+        # We store a straight snapshot of configs as they were and now are.
+        old_configuration = {
+          internal_config: old_internal_config,
+          overlaid_internal_config: old_overlaid_internal_config,
+          registration: old_registration_values,
+          developer_key: old_developer_key_values,
+          overlay: old_overlay_data
+        }
+
+        new_configuration = {
+          internal_config: new_internal_config,
+          overlaid_internal_config: new_overlaid_internal_config,
+          registration: new_registration_values,
+          developer_key: new_developer_key_values,
+          overlay: new_overlay_data
+        }
+
         Lti::RegistrationHistoryEntry.create!(
           lti_registration:,
           created_by: current_user,
           root_account: context.root_account,
           comment:,
           update_type:,
-          diff:
+          diff:,
+          old_configuration:,
+          new_configuration:
         )
       end
 
@@ -131,7 +158,7 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
     # Must be one of Lti::RegistrationHistoryEntry::VALID_UPDATE_TYPES
     # @param [Proc] block
     # @returns The value returned by the block
-    def track_control_changes(control:, current_user:, comment: nil, update_type: "control_edit", &)
+    def track_control_changes(control:, current_user:, comment: nil, &)
       raise ArgumentError, "control is required" if control.blank?
       raise ArgumentError, "current_user is required" if current_user.blank?
 
@@ -140,20 +167,25 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
       new_control_values = control.reload.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES)
 
       diff = {}
+      old_context_controls = { control.id => old_control_values }
+      new_context_controls = { control.id => new_control_values }
+
       # Purposefully mimic the format of the bulk control changes diff
-      diff[:context_controls] = Hashdiff.diff({ control.id => old_control_values },
-                                              { control.id => new_control_values },
+      diff[:context_controls] = Hashdiff.diff(old_context_controls,
+                                              new_context_controls,
                                               array_path: true,
                                               preserve_key_order: true)
 
-      if diff.present?
+      if diff[:context_controls].present?
         Lti::RegistrationHistoryEntry.create!(
           lti_registration: control.registration,
           created_by: current_user,
           root_account: control.root_account,
           comment:,
-          update_type:,
-          diff:
+          update_type: "control_edit",
+          diff:,
+          old_context_controls:,
+          new_context_controls:
         )
       end
 
@@ -177,7 +209,7 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
     # @param [String | nil] comment A possible comment to add to the entry, such as why the change was made
     # @param [String | nil] update_type The type of update being made.
     # Must be one of Lti::RegistrationHistoryEntry::VALID_UPDATE_TYPES
-    def track_bulk_control_changes(control_params:, lti_registration:, root_account:, current_user:, comment: nil, update_type: "bulk_control_create", &)
+    def track_bulk_control_changes(control_params:, lti_registration:, root_account:, current_user:, comment: nil, &)
       raise ArgumentError, "lti_registration is required" if lti_registration.blank?
       raise ArgumentError, "root_account is required" if root_account.blank?
       raise ArgumentError, "control_params is required" if control_params.blank?
@@ -197,25 +229,36 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
 
       result = yield
 
+      # Shape of:
+      # {
+      #   <control_id> => {
+      #     ...
+      #     <attribute_name> => <attribute_value>
+      #   }
+      # }
       new_controls = Lti::RegistrationHistoryEntry.uncached do
         union_query.pluck(*Lti::ContextControl::TRACKED_ATTRIBUTES)
                    .map { |values| Lti::ContextControl::TRACKED_ATTRIBUTES.zip(values).to_h }
       end
 
       diff = {}
-      diff[:context_controls] = Hashdiff.diff(old_controls.index_by { |c| c[:id] },
-                                              new_controls.index_by { |c| c[:id] },
+      old_context_controls = old_controls.index_by { |c| c[:id] }
+      new_context_controls = new_controls.index_by { |c| c[:id] }
+      diff[:context_controls] = Hashdiff.diff(old_context_controls,
+                                              new_context_controls,
                                               array_path: true,
                                               preserve_key_order: true)
 
-      if diff.present?
+      if diff[:context_controls].present?
         Lti::RegistrationHistoryEntry.create!(
           lti_registration:,
           root_account:,
           created_by: current_user,
           comment:,
-          update_type:,
-          diff:
+          update_type: "control_edit",
+          diff:,
+          old_context_controls:,
+          new_context_controls:
         )
       end
 
@@ -267,6 +310,29 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
         Lti::ContextControl.from("(#{union_sql}) AS lti_context_controls")
       else
         Lti::ContextControl.none
+      end
+    end
+  end
+
+  def availability_update?
+    ["bulk_control_create", "control_edit"].include?(update_type)
+  end
+
+  def configuration_update?
+    ["bulk_control_create", "control_edit"].include?(update_type)
+  end
+
+  private
+
+  def valid_columns_for_update_type
+    case update_type
+    when "control_edit"
+      if old_configuration.present? || new_configuration.present?
+        errors.add("old_config", "Cannot modify config when updating tool availability")
+      end
+    when "manual_edit" || "registration_update"
+      if old_context_controls.present? || new_context_controls.present?
+        errors.add("old_context_controls", "Cannot modify context control attributes when updating tool availability")
       end
     end
   end

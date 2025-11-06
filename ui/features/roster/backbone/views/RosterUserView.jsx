@@ -20,7 +20,7 @@ import $ from 'jquery'
 import {map, some, every, find as _find, filter, reject, isEmpty} from 'lodash'
 import {View} from '@canvas/backbone'
 import template from '../../jst/rosterUser.handlebars'
-import EditSectionsView from './EditSectionsView'
+import EditSectionsModal from '../../react/EditSectionsModal'
 import EditRolesModal from '../../react/EditRolesModal'
 import InvitationsView from './InvitationsView'
 import React from 'react'
@@ -34,11 +34,12 @@ import RosterDialogMixin from './RosterDialogMixin'
 import UserTaggedModal from '@canvas/differentiation-tags/react/UserTaggedModal/UserTaggedModal'
 import MessageBus from '@canvas/util/MessageBus'
 import {queryClient} from '@canvas/query'
+import {createSectionEnrollments, deleteExistingSectionEnrollments} from '../../react/api'
 
 const I18n = createI18nScope('RosterUserView')
 
-let editSectionsDialog = null
 let invitationDialog = null
+let editSectionsRoot = null
 let linkToStudentsRoot = null
 let editRolesRoot = null
 
@@ -218,11 +219,71 @@ export default class RosterUserView extends View {
   }
 
   editSections() {
-    if (!editSectionsDialog) {
-      editSectionsDialog = new EditSectionsView()
+    const mountPoint = document.getElementById('edit_sections_mount_point')
+    if (mountPoint) {
+      if (editSectionsRoot === null) {
+        editSectionsRoot = createRoot(mountPoint)
+      }
+      const enrollments = this.model.sectionEditableEnrollments()
+      const excludeSections = enrollments.map(enrollment => {
+        const section = ENV.SECTIONS.find(s => s.id === enrollment.course_section_id)
+        if (section) {
+          return {
+            id: section.id,
+            name: section.name,
+            role: enrollment.role,
+            can_be_removed: enrollment.can_be_removed,
+          }
+        } else {
+          // if we can't find the associated section, don't bother excluding it
+          return null
+        }
+      })
+      const filteredExcludeSections = excludeSections.filter(section => section !== null)
+      editSectionsRoot.render(
+        <EditSectionsModal
+          onClose={() => {
+            editSectionsRoot.render(null)
+          }}
+          onUpdate={sections => this.updateSections(sections)}
+          excludeSections={filteredExcludeSections}
+        />,
+      )
     }
-    editSectionsDialog.model = this.model
-    return editSectionsDialog.render().show()
+  }
+
+  async updateSections(sections) {
+    const editableEnrollments = this.model.sectionEditableEnrollments()
+    const enrollment = this.model.findEnrollmentByRole(this.model.currentRole)
+    const currentIds = editableEnrollments.map(en => en.course_section_id)
+    const sectionIds = sections.map(s => s.id)
+    const newSections = sectionIds.filter(id => !currentIds.includes(id))
+
+    // delete old section enrollments
+    const sectionsToRemove = currentIds.filter(id => !sectionIds.includes(id))
+    const enrollmentsToRemove = editableEnrollments.filter(en =>
+      sectionsToRemove.includes(en.course_section_id),
+    )
+    if (newSections.length === 0 && enrollmentsToRemove.length === 0) {
+      return
+    }
+    const formData = new FormData()
+    formData.append('enrollment[user_id]', this.model.get('id'))
+    formData.append('enrollment[type]', enrollment.type)
+    formData.append(
+      'enrollment[limit_privileges_to_course_section]',
+      enrollment.limit_privileges_to_course_section.toString(),
+    )
+    if (enrollment.role !== enrollment.type) {
+      formData.append('enrollment[role_id]', enrollment.role_id)
+    }
+    if (!this.model.pending(this.model.currentRole)) {
+      formData.append('enrollment[enrollment_state]', 'active')
+    }
+
+    const createdEnrollments = await createSectionEnrollments(newSections, formData)
+    await deleteExistingSectionEnrollments(enrollmentsToRemove.map(en => en.id))
+    this.updateEnrollments(createdEnrollments, enrollmentsToRemove)
   }
 
   getUniqueObservees(enrollments) {

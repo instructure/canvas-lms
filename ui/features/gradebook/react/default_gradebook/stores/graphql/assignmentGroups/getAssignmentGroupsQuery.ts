@@ -19,7 +19,7 @@
 import {gql} from '@apollo/client'
 
 export const GET_ASSIGNMENT_GROUPS_QUERY = gql`
-query getAssignmentGroups(
+query Gradebook__GetAssignmentGroups(
   $after: String,
   $courseId: ID!,
 ) {

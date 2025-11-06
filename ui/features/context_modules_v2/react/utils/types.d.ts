@@ -77,6 +77,8 @@ export type FormState = {
   newItem: NewItem
   selectedItemId: string
   selectedItem: any | null
+  selectedItemIds: string[]
+  selectedItems: any[]
   tabIndex: number
   isLoading: boolean
 }

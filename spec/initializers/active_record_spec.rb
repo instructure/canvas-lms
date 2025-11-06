@@ -548,8 +548,8 @@ module ActiveRecord
         let(:base_s1) { @shard1.activate { User.active } }
         let(:base_s2) { @shard2.activate { User.active } }
 
-        include_examples "query creation"
-        include_examples "query creation sharding"
+        it_behaves_like "query creation"
+        it_behaves_like "query creation sharding"
       end
 
       context "through a relation" do
@@ -557,8 +557,8 @@ module ActiveRecord
         let(:base_s1) { @shard1.activate { Account.create.users } }
         let(:base_s2) { @shard2.activate { Account.create.users } }
 
-        include_examples "query creation"
-        include_examples "query creation sharding"
+        it_behaves_like "query creation"
+        it_behaves_like "query creation sharding"
       end
 
       context "through a where query that references multiple shards" do
@@ -570,7 +570,7 @@ module ActiveRecord
         let(:base_s1) { @shard1.activate { User.where(id: [user_s1, user_s2]) } }
         let(:base_s2) { @shard2.activate { User.where(id: [user_s1, user_s2]) } }
 
-        include_examples "query creation sharding"
+        it_behaves_like "query creation sharding"
       end
     end
 

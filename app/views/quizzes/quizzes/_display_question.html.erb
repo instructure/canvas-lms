@@ -21,16 +21,26 @@
   display_question ||= nil
   question = display_question
   question_type = answer_type(question)
+  question_bank_id ||= nil
+
   user_answer ||= nil
   user_answer_hash ||= {}
   user_answer ||= user_answer_hash[hash_get(question, :id)]
+
+  asset_string = if question_bank_id
+                   "assessment_question_#{hash_get(question, :id)}"
+                 elsif @submission
+                   "quiz_submission_#{@submission.id}"
+                 else
+                   "quiz_question_#{hash_get(question, :id)}"
+                 end
+
   assessing ||= false
   assessment_results ||= false
   editable ||= false
   editing ||= false
   in_group ||= false
   group_id ||= nil
-  question_bank_id ||= nil
   display_correct_answers = show_correct_answers?
   correct = user_answer && hash_get(user_answer, :correct) == true
   incorrect = user_answer && hash_get(user_answer, :correct) == false
@@ -52,7 +62,6 @@
     (hash_get(question, 'question_type') == 'essay_question' && hash_get(user_answer, 'text').blank?) ||
     false
   partial_credit = user_answer && hash_get(user_answer, :correct) == 'partial'
-  asset_string ||= (question_bank_id ? 'assessment_question' : 'quiz_question') + "_#{hash_get(question, :id)}"
   if question_type.display_answers == "multiple" && hash_get(question, :question_type) != "missing_word_question"
     right_answers = hash_get(question, :answers, {})
     right_answers = (hash_get(question, :matches) || hash_get(question, :answers).sort_by{|a| rand }) if question_type.entry_type == "matching" rescue {}
@@ -166,14 +175,14 @@
         <% end %>
         <% if question && hash_get(question, :question_type) == "missing_word_question" %>
 
-          <span class="text_before_answers"><%= user_content(hash_get(question, :question_text)) %></span>
+          <span class="text_before_answers"><%= user_content(hash_get(question, :question_text), location: asset_string) %></span>
           <select class="answer_select question_input" name="question_<%= hash_get(question, :id, "blank") %>">
             <option value=""><%= t(:default_question_answer, "[ Choose ]") %></option>
             <% hash_get(question, :answers, []).each do |answer| %>
               <option value="<%= hash_get(answer, :id) %>" <%= "selected" if user_answer && hash_get(user_answer, :answer_id) == hash_get(answer, :id) || (@stored_params && @stored_params["question_#{hash_get(question, :id)}"].to_s == hash_get(answer, :id).to_s) %>><%= hash_get(answer, :text) %></option>
             <% end %>
           </select>
-          <span class="text_after_answers"><%= user_content(hash_get(question, :text_after_answers)) %></span>
+          <span class="text_after_answers"><%= user_content(hash_get(question, :text_after_answers), location: asset_string) %></span>
         <% elsif question && hash_get(question, :question_type) == "fill_in_multiple_blanks_question" && @stored_params %>
 
           <%
@@ -209,7 +218,7 @@
             :question => question, :answers => @stored_params, :answer_list => answer_list, :editable => assessing
           }) %>
         <% else %>
-          <%= user_content(hash_get(question, :question_text)) %>
+          <%= user_content(hash_get(question, :question_text), location: asset_string) %>
         <% end %>
       </div>
       <% if question_type && question_type.unsupported %>
@@ -306,11 +315,11 @@
                 </legend>
                 <% list = hash_get(question, :answers, []) %>
                 <%= render :partial => "quizzes/quizzes/multi_answer", :collection => list, :locals =>
-                    {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer} %>
+                    {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer, :asset_string => asset_string} %>
               </fieldset>
             <% elsif question_type.display_answers == "single" %>
               <%= render :partial => "quizzes/quizzes/single_answer", :locals =>
-                    {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer, :editable => assessing} %>
+                    {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer, :editable => assessing, :asset_string => asset_string} %>
             <% end %>
           <% end %>
         <% else %>
@@ -346,7 +355,7 @@
                     <% end %>
                   </div>
                   <% if editing || display_correct_answers %>
-                    <%= render :partial => "quizzes/quizzes/display_answer", :collection => answers, :locals => {:assessment_results => assessment_results, :question_type => question_type, :user_answer => user_answer, :question => question, :skip_if_correct => true, :matched_answer => matched_answer} %>
+                    <%= render :partial => "quizzes/quizzes/display_answer", :collection => answers, :locals => { assessment_results:, question_type:, user_answer:, question:, skip_if_correct: true, matched_answer: } %>
                   <% end %>
                 <% else %>
                   <% if user_answer[:answer_id].nil? %>
@@ -354,7 +363,7 @@
                       <%= t(:you_left_this_blank, "(You left this blank)") %>
                     </div>
                   <% end %>
-                  <%= render :partial => "quizzes/quizzes/display_answer", :collection => answers, :locals => {:assessment_results => assessment_results, :question_type => question_type, :user_answer => user_answer, :question => question} %>
+                  <%= render :partial => "quizzes/quizzes/display_answer", :collection => answers, :locals => { assessment_results:, question_type:, user_answer:, question: } %>
                 <% end %>
               </div>
             <% end %>
@@ -363,7 +372,7 @@
               <div>
                 <% if question_type.entry_type == 'textarea' %>
                   <%= t('Your Answer:') %>
-                  <div class="user_content quiz_response_text"><%= user_content(hash_get(user_answer, :text)) %></div>
+                  <div class="user_content quiz_response_text"><%= user_content(hash_get(user_answer, :text), location: asset_string) %></div>
                 <% else %>
                   <% matched_answer = hash_get(question, :answers, []).find{|a| hash_get(a, :text) == hash_get(user_answer, :text) || hash_get(a, :id) == hash_get(user_answer, :answer_id) } %>
                   <% hash_get(question, :answers, []).each do |a|
@@ -408,7 +417,7 @@
               <% show_headers = @quiz && display_correct_answers && user_answer && question_type.display_answers == "single" && hash_get(question, :question_type) != "essay_question" %>
               <% if editing || show_headers || !question_type.entry_type.match(/text_box/) %>
                 <div class="answers_wrapper">
-                  <%= render :partial => "quizzes/quizzes/display_answer", :collection => hash_get(question, :answers), :locals => {:assessment_results => assessment_results, :question_type => question_type, :user_answer => user_answer, :question => question} %>
+                  <%= render :partial => "quizzes/quizzes/display_answer", :collection => hash_get(question, :answers), :locals => { assessment_results:, question_type:, user_answer:, question:, question_bank_id: } %>
                 </div>
               <% end %>
             <% end %>
@@ -449,19 +458,19 @@
           <div class="comment_top"></div>
           <div class="correct_comments_header comments_header"><%= t('Correct answer comments') %></div>
           <div class="question_comment_text correct_comments" <%= hidden(include_style: true) if hash_get(question, :correct_comments_html).present? %>><%= hash_get(question, :correct_comments) %></div>
-          <div class="question_comment_html correct_comments_html"><%= user_content Sanitize.clean(hash_get(question, :correct_comments_html) || '', CanvasSanitize::SANITIZE) %></div>
+          <div class="question_comment_html correct_comments_html"><%= user_content(Sanitize.clean(hash_get(question, :correct_comments_html) || '', CanvasSanitize::SANITIZE), location: asset_string) %></div>
         </div>
         <div title="<%= t('titles.question_incorrect_comment', "Students will see this comment if they get the question wrong") %>" class="quiz_comment question_incorrect_comment" <%= hidden(include_style: true) unless question && comment_get(question, :incorrect_comments).present? %>>
           <div class="comment_top"></div>
           <div class="incorrect_comments_header comments_header"><%= t('Wrong answer comments') %></div>
           <div class="question_comment_text incorrect_comments" <%= hidden(include_style: true) if hash_get(question, :incorrect_comments_html).present? %>><%= hash_get(question, :incorrect_comments) %></div>
-          <div class="question_comment_html incorrect_comments_html"><%= user_content Sanitize.clean(hash_get(question, :incorrect_comments_html) || '', CanvasSanitize::SANITIZE) %></div>
+          <div class="question_comment_html incorrect_comments_html"><%= user_content(Sanitize.clean(hash_get(question, :incorrect_comments_html) || '', CanvasSanitize::SANITIZE), location: asset_string) %></div>
         </div>
         <div title="<%= t('titles.question_neutral_comment', "Students will see this comment once they've answered the question") %>" class="quiz_comment question_neutral_comment" <%= hidden(include_style: true) unless question && comment_get(question, :neutral_comments).present? %>>
           <div class="comment_top"></div>
           <div class="neutral_comments_header comments_header"><%= t('General answer comments') %></div>
           <div class="question_comment_text neutral_comments" <%= hidden(include_style: true) if hash_get(question, :neutral_comments_html).present? %>><%= hash_get(question, :neutral_comments) %></div>
-          <div class="question_comment_html neutral_comments_html"><%= user_content Sanitize.clean(hash_get(question, :neutral_comments_html) || '', CanvasSanitize::SANITIZE) %></div>
+          <div class="question_comment_html neutral_comments_html"><%= user_content(Sanitize.clean(hash_get(question, :neutral_comments_html) || '', CanvasSanitize::SANITIZE), location: asset_string) %></div>
         </div>
       </div>
     <% end %>

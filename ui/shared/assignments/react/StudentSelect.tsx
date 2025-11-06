@@ -21,7 +21,8 @@ import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
 import {Flex} from '@instructure/ui-flex'
 import {FormMessage} from '@instructure/ui-form-field'
-import {useAssignedStudents, CourseStudent} from '../graphql/hooks/useAssignedStudents'
+import {useAssignedStudents} from '../graphql/hooks/useAssignedStudents'
+import {CourseStudent} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
 import {Spinner} from '@instructure/ui-spinner'
 import {debounce} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -63,6 +64,10 @@ const StudentSelect = ({
   useEffect(() => {
     setInputErrors(errors)
   }, [errors])
+
+  const availableStudents = useMemo(() => {
+    return students.filter(student => !filteredStudents.map(s => s._id).includes(student._id))
+  }, [students, filteredStudents])
 
   const debouncedSearch = useMemo(
     () =>
@@ -159,10 +164,6 @@ const StudentSelect = ({
       {I18n.t('No results')}
     </Select.Option>
   )
-
-  const availableStudents = useMemo(() => {
-    return students.filter(student => !filteredStudents.map(s => s._id).includes(student._id))
-  }, [students, filteredStudents])
 
   return (
     <Flex as="div" direction="column">

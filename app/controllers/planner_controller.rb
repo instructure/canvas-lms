@@ -260,7 +260,7 @@ class PlannerController < ApplicationController
       collections << item_collection(scope_name.to_s,
                                      scope,
                                      Assignment,
-                                     %i[user_due_date due_at created_at],
+                                     [{ submissions: :cached_due_date }, :due_at, :created_at],
                                      :id)
     end
     collections
@@ -270,7 +270,7 @@ class PlannerController < ApplicationController
     item_collection("sub_assignment_viewing",
                     @user.assignments_for_student("viewing", is_sub_assignment: true, **default_opts).preload(:discussion_topic),
                     SubAssignment,
-                    %i[user_due_date due_at created_at],
+                    [{ submissions: :cached_due_date }, :due_at, :created_at],
                     :id)
   end
 
@@ -306,7 +306,7 @@ class PlannerController < ApplicationController
     item_collection("unread_assignment_submissions",
                     scope,
                     Assignment,
-                    %i[user_due_date due_at created_at],
+                    [{ submissions: :cached_due_date }, :due_at, :created_at],
                     :id)
   end
 
@@ -323,7 +323,7 @@ class PlannerController < ApplicationController
     item_collection("unread_sub_assignment_submissions",
                     scope,
                     SubAssignment,
-                    %i[user_due_date due_at created_at],
+                    [{ submissions: :cached_due_date }, :due_at, :created_at],
                     :id)
   end
 

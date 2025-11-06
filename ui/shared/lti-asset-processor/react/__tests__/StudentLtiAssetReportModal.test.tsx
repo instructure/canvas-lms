@@ -159,26 +159,6 @@ describe('StudentLtiAssetReportModal', () => {
     expect(screen.getByText(attachmentName)).toBeInTheDocument()
   })
 
-  it('filters asset processors to only include those with reports', () => {
-    const reports = [
-      createUploadReport(0, '10', 'test.pdf', {processorId: '1'}),
-      createUploadReport(1, '10', 'test.pdf', {processorId: '2'}),
-    ]
-
-    render(
-      <StudentLtiAssetReportModal
-        assetProcessors={mockAssetProcessors}
-        assignmentName={assignmentName}
-        reports={reports}
-        submissionType="online_upload"
-      />,
-    )
-
-    expect(screen.getByText('Test Processor · Test Processor Title')).toBeInTheDocument()
-    expect(screen.getByText('Another Processor · Another Processor Title')).toBeInTheDocument()
-    expect(screen.queryByText('Unused Processor · Unused Processor Title')).not.toBeInTheDocument()
-  })
-
   it('properly renders with reports from multiple processors', () => {
     const reports = [
       createUploadReport(0, '10', 'test.pdf', {processorId: '1'}),

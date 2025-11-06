@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useCallback, useEffect} from 'react'
+import React, {useState, useCallback, useEffect, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
@@ -69,20 +69,24 @@ export default function ModuleItemAsyncSelect({
     searchTerm.length >= MINIMUM_SEARCH_LENGTH,
   )
 
+  const allItems = useMemo(() => {
+    return data?.pages?.flatMap(page => page.items) || []
+  }, [data?.pages])
+
   useEffect(() => {
     if (!selectedItemId) {
       setSelectedItem(null)
       if (selectedItem) {
         setInputValue('')
       }
-    } else if (data?.items) {
-      const item = data.items.find(item => item.id === selectedItemId)
+    } else if (allItems.length > 0) {
+      const item = allItems.find(item => item.id === selectedItemId)
       if (item && (!selectedItem || selectedItem.id !== selectedItemId)) {
         setSelectedItem(item)
         setInputValue(item.name)
       }
     }
-  }, [selectedItemId, data?.items, selectedItem])
+  }, [selectedItemId, allItems, selectedItem])
 
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,16 +104,14 @@ export default function ModuleItemAsyncSelect({
 
   const handleItemSelected = useCallback(
     (_event: React.SyntheticEvent, itemId: string) => {
-      if (!data?.items) return
-
-      const foundItem = data.items.find(item => item.id === itemId)
+      const foundItem = allItems.find(item => item.id === itemId)
       if (!foundItem) return
 
       setSelectedItem(foundItem)
       setInputValue(foundItem.name)
       onSelectionChange(itemId, foundItem)
     },
-    [data?.items, onSelectionChange],
+    [allItems, onSelectionChange],
   )
 
   if (isError) {
@@ -132,9 +134,8 @@ export default function ModuleItemAsyncSelect({
       ? I18n.t('Enter at least %{count} characters', {count: MINIMUM_SEARCH_LENGTH})
       : I18n.t('No items found')
 
-  const processedItems = data?.items || []
   const filteredItems =
-    itemType === 'assignment' ? processedItems.filter((item: any) => !item.isQuiz) : processedItems
+    itemType === 'assignment' ? allItems.filter((item: any) => !item.isQuiz) : allItems
 
   const itemOptions = filteredItems.map(item => (
     <CanvasAsyncSelect.Option key={item.id} id={item.id}>

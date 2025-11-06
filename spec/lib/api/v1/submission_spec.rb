@@ -147,13 +147,13 @@ describe Api::V1::Submission do
         expect(sas.pluck("entered_score")).to match_array([nil, nil])
         expect(sas.pluck("entered_grade")).to match_array([nil, nil])
         expect(sas.pluck("user_id")).to match_array([student.id, student.id])
+        expect(sas.pluck("submitted_at")).to match_array([nil, nil])
+        expect(sas.pluck("points_deducted")).to match_array([nil, nil])
 
         # the following are properties we do not expect in the response since these are sub_assignments already
         expect(sas.pluck("has_sub_assignment_submissions")).to match_array([nil, nil])
         expect(sas.pluck("sub_assignment_submissions")).to match_array([nil, nil])
         expect(sas.pluck("submission_type")).to match_array([nil, nil])
-        expect(sas.pluck("submitted_at")).to match_array([nil, nil])
-        expect(sas.pluck("points_deducted")).to match_array([nil, nil])
         expect(sas.pluck("has_postable_comments")).to match_array([nil, nil])
         expect(sas.pluck("workflow_state")).to match_array([nil, nil])
         expect(sas.pluck("assignment_id")).to match_array([nil, nil])

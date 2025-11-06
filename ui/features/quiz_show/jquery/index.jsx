@@ -368,10 +368,14 @@ $(document).ready(function () {
     event.preventDefault()
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
 
-    const courseId = event.target.getAttribute('data-quiz-context-id')
-    const itemName = event.target.getAttribute('data-quiz-name')
-    const itemContentId = event.target.getAttribute('data-quiz-id')
-    const pointsString = event.target.getAttribute('data-quiz-points-possible')
+    // Get data from the inner span with translate="no"
+    const $button = $(event.target).closest('.assign-to-link')
+    const $dataSpan = $button.find('.assign-to-link-resources')
+
+    const courseId = $dataSpan.attr('data-quiz-context-id')
+    const itemName = $dataSpan.attr('data-quiz-name')
+    const itemContentId = $dataSpan.attr('data-quiz-id')
+    const pointsString = $dataSpan.attr('data-quiz-points-possible')
     const pointsPossible = pointsString ? parseFloat(pointsString) : undefined
     renderItemAssignToTray(true, returnFocusTo, {
       courseId,

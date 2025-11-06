@@ -422,6 +422,17 @@ BASE_PERMISSIONS = {
     true_for: %w[AccountAdmin],
     available_to: %w[AccountAdmin AccountMembership],
   },
+  manage_rate_limiting: {
+    label: -> { I18n.t("Account - Rate Limiting") },
+    account_only: :site_admin,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: [],
+    account_allows: ->(a) { a.feature_enabled?(:api_rate_limits) },
+    account_details: [
+      { title: -> { I18n.t("Rate Limiting Management") },
+        description: -> { I18n.t("Allows user to manage API rate limits for external tools and integrations.") } }
+    ],
+  },
   manage_internal_settings: {
     label: -> { I18n.t("permissions.manage_internal_settings", "Manage environment-wide internal settings") },
     account_only: :site_admin,

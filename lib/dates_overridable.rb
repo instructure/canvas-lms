@@ -404,31 +404,6 @@ module DatesOverridable
     hash
   end
 
-  def merge_overrides_by_date(overrides)
-    result = {}
-
-    overrides.each do |override|
-      key = [override[:due_at], override[:unlock_at], override[:lock_at]]
-
-      unless result[key]
-        result[key] = {
-          due_at: override[:due_at],
-          unlock_at: override[:unlock_at],
-          lock_at: override[:lock_at],
-          options: []
-        }
-      end
-
-      result[key][:options] << if override[:set_type] == "ADHOC"
-                                 override[:title]
-                               else
-                                 override[:set_type]
-                               end
-    end
-
-    result.values
-  end
-
   def get_overridden_assignees(assignment_overrides = [], visible_users_ids = nil)
     # return a list of any duplicate ids for each type (student, section, group)
     section_ids = assignment_overrides&.select { |override| override.set_type == "CourseSection" }&.map(&:set_id)

@@ -232,6 +232,7 @@ module Api::V1::Assignment
       hash["is_quiz_lti_assignment"] = true
       hash["frozen_attributes"] ||= []
       hash["frozen_attributes"] << "submission_types"
+      hash["settings"] = assignment.settings
     end
 
     if assignment.external_tool? && assignment.external_tool_tag.present?
@@ -276,14 +277,8 @@ module Api::V1::Assignment
       hash["webhook_info"] = assignment.assignment_configuration_tool_lookups[0]&.webhook_info
     end
 
-    if assignment.automatic_peer_reviews? && assignment.peer_reviews?
-      peer_review_params = assignment.slice(
-        :peer_review_count,
-        :peer_reviews_assign_at,
-        :intra_group_peer_reviews
-      )
-      hash.merge!(peer_review_params)
-    end
+    peer_review_params = extract_peer_review_params(assignment)
+    hash.merge!(peer_review_params) if peer_review_params
 
     include_needs_grading_count = opts[:exclude_response_fields].exclude?("needs_grading_count")
     if include_needs_grading_count && assignment.context.grants_right?(user, :manage_grades)
@@ -388,6 +383,7 @@ module Api::V1::Assignment
           hash["all_dates"] = assignment.dates_hash_visible_to(user)
         else
           hash["all_dates_count"] = override_count
+          hash["all_dates"] = []
         end
       end
     end
@@ -536,6 +532,16 @@ module Api::V1::Assignment
     hash
   end
 
+  def extract_peer_review_params(assignment)
+    return unless assignment.peer_reviews?
+
+    if assignment.automatic_peer_reviews?
+      assignment.slice(:peer_review_count, :peer_reviews_assign_at, :intra_group_peer_reviews)
+    elsif assignment.context.feature_enabled?(:peer_review_allocation)
+      assignment.slice(:peer_review_count, :peer_review_submission_required)
+    end
+  end
+
   def turnitin_settings_json(assignment)
     settings = assignment.turnitin_settings.with_indifferent_access
     %i[s_paper_check internet_check journal_check exclude_biblio exclude_quoted submit_papers_to].each do |key|
@@ -586,6 +592,7 @@ module Api::V1::Assignment
     peer_review_count
     automatic_peer_reviews
     intra_group_peer_reviews
+    peer_review_submission_required
     peer_review
     grade_group_students_individually
     turnitin_enabled
@@ -629,28 +636,34 @@ module Api::V1::Assignment
     return false unless prepared_create[:valid]
 
     response = :created
+    has_peer_reviews = prepared_create[:assignment].peer_reviews && prepared_create[:assignment].context.feature_enabled?(:peer_review_grading)
 
     Assignment.suspend_due_date_caching do
       assignment.quiz_lti! if assignment_params.key?(:quiz_lti) || assignment&.quiz_lti?
 
-      response = if prepared_create[:overrides].present?
-                   create_api_assignment_with_overrides(prepared_create, user)
-                 else
-                   prepared_create[:assignment].save!
-                   :created
-                 end
-    end
+      update_new_quizzes_params(assignment, assignment_params)
 
-    if [:created, :ok].include?(response) &&
-       prepared_create[:assignment].peer_reviews &&
-       prepared_create[:assignment].context.feature_enabled?(:peer_review_grading)
+      if has_peer_reviews
+        Assignment.transaction do
+          response = if prepared_create[:overrides].present?
+                       create_api_assignment_with_overrides(prepared_create, user)
+                     else
+                       prepared_create[:assignment].save!
+                       :created
+                     end
 
-      begin
-        create_api_peer_review_sub_assignment(prepared_create[:assignment], assignment_params[:peer_review])
-        prepared_create[:assignment].association(:peer_review_sub_assignment).reload
-      rescue
-        prepared_create[:assignment].destroy
-        return :peer_review_error
+          if [:created, :ok].include?(response)
+            create_api_peer_review_sub_assignment(prepared_create[:assignment], assignment_params[:peer_review])
+            prepared_create[:assignment].association(:peer_review_sub_assignment).reload
+          end
+        end
+      else
+        response = if prepared_create[:overrides].present?
+                     create_api_assignment_with_overrides(prepared_create, user)
+                   else
+                     prepared_create[:assignment].save!
+                     :created
+                   end
       end
     end
 
@@ -1084,10 +1097,15 @@ module Api::V1::Assignment
   end
 
   def update_new_quizzes_params(assignment, assignment_params)
-    return unless Account.site_admin.feature_enabled?(:new_quizzes_surveys) && assignment.quiz_lti?
+    return unless Account.site_admin.feature_enabled?(:new_quizzes_surveys) && assignment.quiz_lti? && assignment.new_record?
 
     type = assignment_params[:new_quizzes_quiz_type]
-    assignment.new_quizzes_type = type if type.present?
+    if type.present?
+      assignment.new_quizzes_type = type
+      assignment.hide_in_gradebook = (type == "ungraded_survey")
+      assignment.omit_from_final_grade = (type == "ungraded_survey")
+    end
+    assignment.anonymous_participants = assignment_params[:new_quizzes_anonymous_submission]
   end
 
   def turnitin_settings_hash(assignment_params)
@@ -1257,8 +1275,6 @@ module Api::V1::Assignment
       assignment.line_item_tag = line_item[:tag]
     end
 
-    update_new_quizzes_params(assignment, assignment_params)
-
     assignment.saving_user = user
 
     {
@@ -1295,7 +1311,15 @@ module Api::V1::Assignment
     assignment = prepared_update[:assignment]
     overrides = prepared_update[:overrides]
 
-    return :forbidden if overrides.any? && assignment.is_child_content? && (assignment.editing_restricted?(:due_dates) || assignment.editing_restricted?(:availability_dates))
+    if overrides.any? && assignment.is_child_content?
+      updating_due_dates = overrides.any? { |o| o.key?(:due_at) || o.key?(:reply_to_topic_due_at) || o.key?(:required_replies_due_at) }
+      updating_availability_dates = overrides.any? { |o| o.key?(:unlock_at) || o.key?(:lock_at) }
+
+      if (updating_due_dates && assignment.editing_restricted?(:due_dates)) ||
+         (updating_availability_dates && assignment.editing_restricted?(:availability_dates))
+        return :forbidden
+      end
+    end
 
     prepared_batch = prepare_assignment_overrides_for_batch_update(assignment, overrides, user)
 
@@ -1465,7 +1489,10 @@ module Api::V1::Assignment
       { "ab_guid" => strong_anything },
       ({ "suppress_assignment" => strong_anything } if assignment.root_account.suppress_assignments?),
       ({ "estimated_duration_attributes" => strong_anything } if estimated_duration_enabled?(assignment)),
-      ({ "peer_review" => %w[points_possible grading_type due_at unlock_at lock_at] } if assignment.context.feature_enabled?(:peer_review_grading)),
+      (if assignment.context.feature_enabled?(:peer_review_grading)
+         { "peer_review" => (%w[points_possible grading_type due_at unlock_at lock_at] +
+                             [{ "peer_review_overrides" => strong_anything }]) }
+       end),
     ].compact
   end
 
@@ -1524,7 +1551,7 @@ module Api::V1::Assignment
     end
   end
 
-  def peer_review_params(params)
+  def prepare_peer_review_params(params)
     peer_review_params = {}
 
     unless params.nil?
@@ -1533,16 +1560,32 @@ module Api::V1::Assignment
       peer_review_params[:due_at] = params[:due_at] if params[:due_at].present?
       peer_review_params[:unlock_at] = params[:unlock_at] if params[:unlock_at].present?
       peer_review_params[:lock_at] = params[:lock_at] if params[:lock_at].present?
+      peer_review_params[:peer_review_overrides] = params[:peer_review_overrides] if params[:peer_review_overrides].present?
     end
 
     peer_review_params
   end
 
   def create_api_peer_review_sub_assignment(parent_assignment, params)
-    PeerReview::PeerReviewCreatorService.call(parent_assignment:, **peer_review_params(params))
+    peer_review_params = prepare_peer_review_params(params)
+    overrides = peer_review_params.delete(:peer_review_overrides)
+    peer_review_sub_assignment = PeerReview::PeerReviewCreatorService.call(
+      parent_assignment:,
+      **peer_review_params
+    )
+
+    if overrides.present?
+      PeerReview::DateOverriderService.call(
+        peer_review_sub_assignment:,
+        overrides:
+      )
+    end
+
+    peer_review_sub_assignment
   end
 
   def update_api_peer_review_sub_assignment(parent_assignment, params)
-    PeerReview::PeerReviewUpdaterService.call(parent_assignment:, **peer_review_params(params))
+    peer_review_params = prepare_peer_review_params(params)
+    PeerReview::PeerReviewUpdaterService.call(parent_assignment:, **peer_review_params)
   end
 end

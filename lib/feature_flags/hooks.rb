@@ -159,10 +159,51 @@ module FeatureFlags
       InstStatsd::Statsd.distributed_increment("speedgrader.modernized.flag.#{state}.#{cxt}")
     end
 
-    def self.only_admins_can_enable_block_content_editor_during_eap(user, context, _from_state, transitions)
-      flag_enabled = false
-      flag_enabled = true if context.is_a?(Course) && context.account.feature_enabled?(:block_content_editor)
-      flag_enabled = true if context.is_a?(Account) && context.feature_enabled?(:block_content_editor)
+    def self.rollback_assignments_state(_user, context, _old_state, new_state)
+      if new_state == "off"
+        affected_states = ["outcome_alignment_cloning", "failed_to_clone_outcome_alignment"]
+        context.delay_if_production(
+          priority: Delayed::LOW_PRIORITY,
+          n_strand: ["rollback_assignment_states", context.global_id]
+        ).all_courses.find_ids_in_ranges do |start_id, end_id|
+          Assignment.where(workflow_state: affected_states, context_type: "Course")
+                    .where(context_id: start_id..end_id)
+                    .update_all(workflow_state: "unpublished")
+        end
+      end
+    end
+
+    def self.only_admins_can_enable_block_content_editor_during_eap(user, context, from_state, transitions)
+      only_admins_can_enable_during_eap(user, context, :block_content_editor, from_state, transitions)
+    end
+
+    def self.block_content_editor_flag_enabled(context)
+      shadow_flag_enabled?(context, :block_content_editor)
+    end
+
+    def self.a11y_checker_flag_enabled(context)
+      shadow_flag_enabled?(context, :a11y_checker)
+    end
+
+    def self.only_admins_can_enable_a11y_checker_during_eap(user, context, from_state, transitions)
+      only_admins_can_enable_during_eap(user, context, :a11y_checker, from_state, transitions)
+    end
+
+    # Private helper methods
+
+    def self.shadow_flag_enabled?(context, flag_name)
+      return false unless context.is_a?(Account) || context.is_a?(Course)
+
+      if context.is_a?(Account)
+        context.feature_enabled?(flag_name)
+      else
+        context.account.feature_enabled?(flag_name)
+      end
+    end
+    private_class_method :shadow_flag_enabled?
+
+    def self.only_admins_can_enable_during_eap(user, context, flag_name, _from_state, transitions)
+      flag_enabled = shadow_flag_enabled?(context, flag_name)
       user_is_site_admin = Account.site_admin.grants_right?(user, :read)
       user_is_root_admin = (context.is_a?(Course) || context.is_a?(Account)) && context.root_account.account_users.active.where(user_id: user&.id).exists?
 
@@ -177,13 +218,16 @@ module FeatureFlags
       transitions["allowed"]["locked"] = true
       transitions["allowed_on"]["locked"] = true
     end
+    private_class_method :only_admins_can_enable_during_eap
 
-    def self.block_content_editor_flag_enabled(context)
-      bce_shadow_flag_enabled = false
-      bce_shadow_flag_enabled = context.feature_enabled?(:block_content_editor) if context.is_a?(Account)
-      bce_shadow_flag_enabled = context.account.feature_enabled?(:block_content_editor) if context.is_a?(Course)
+    def self.sync_with_salesforce(_user, context, old_state, new_state)
+      return unless context.respond_to?(:sync_with_salesforce)
 
-      bce_shadow_flag_enabled
+      enabled_before = ["allowed_on", "on"].include?(old_state)
+      enabled_after = ["allowed_on", "on"].include?(new_state)
+      if enabled_before != enabled_after
+        context.sync_with_salesforce
+      end
     end
   end
 end

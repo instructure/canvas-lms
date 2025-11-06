@@ -146,21 +146,31 @@ export default class ScopesList extends React.Component {
             <Flex.Item shouldGrow={true} shouldShrink={true}>
               {this.state.availableScopes.map(scopeGroup => {
                 return Object.keys(scopeGroup).reduce((result, key) => {
-                  if (
-                    this.noFilter() ||
-                    key.toLowerCase().indexOf(this.props.filter.toLowerCase()) > -1
-                  ) {
+                  const groupMatchesFilter =
+                    this.noFilter() || key.toLowerCase().includes(this.props.filter.toLowerCase())
+                  const scopeMatchesFilter = scopeGroup[key].some(s =>
+                    s.scope.toLowerCase().includes(this.props.filter.toLowerCase()),
+                  )
+                  const filteredScopes =
+                    this.noFilter() || groupMatchesFilter
+                      ? scopeGroup[key]
+                      : scopeGroup[key].filter(s =>
+                          s.scope.toLowerCase().includes(this.props.filter.toLowerCase()),
+                        )
+                  const expanded = !this.noFilter() && scopeMatchesFilter
+                  if (groupMatchesFilter || filteredScopes.length > 0) {
                     result.push(
                       <LazyLoad
                         offset={1000}
                         debounce={false}
                         height={50}
                         width="100%"
-                        key={`${key}-scope-group`}
+                        key={`${key}-scope-group-${expanded ? 'expanded' : ''}`}
                       >
                         <ScopesGroup
-                          scopes={this.props.availableScopes[key]}
+                          scopes={filteredScopes}
                           name={key}
+                          expanded={expanded}
                           selectedScopes={this.state.selectedScopes}
                           setSelectedScopes={this.setSelectedScopes}
                         />

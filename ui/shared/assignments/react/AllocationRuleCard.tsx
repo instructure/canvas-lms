@@ -26,6 +26,7 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {AllocationRuleType} from '../graphql/teacher/AssignmentTeacherTypes'
 import {useDeleteAllocationRule} from '../graphql/hooks/useDeleteAllocationRule'
+import {formatRuleDescription, formatFullRuleDescription} from './utils/formatRuleDescription'
 
 const I18n = createI18nScope('peer_review_allocation_rule_card')
 
@@ -33,50 +34,28 @@ const AllocationRuleCard = ({
   rule,
   canEdit,
   assignmentId,
+  requiredPeerReviewsCount,
   refetchRules,
   handleRuleDelete,
 }: {
   rule: AllocationRuleType
   canEdit: boolean
   assignmentId: string
-  refetchRules: (ruleId: string, isNewRule?: boolean) => void
-  handleRuleDelete?: (ruleId: string, error?: any) => void
+  requiredPeerReviewsCount: number
+  refetchRules: (ruleId: string, isNewRule?: boolean, ruleDescription?: string) => void
+  handleRuleDelete?: (ruleId: string, ruleDescription?: string, error?: any) => void
 }): React.ReactElement => {
   const {mustReview, reviewPermitted, appliesToAssessor, assessor, assessee} = rule
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   const {mutate: deleteRule} = useDeleteAllocationRule(
     () => {
-      handleRuleDelete?.(rule._id)
+      handleRuleDelete?.(rule._id, formatFullRuleDescription(rule))
     },
     error => {
-      handleRuleDelete?.(rule._id, error)
+      handleRuleDelete?.(rule._id, undefined, error)
     },
   )
-
-  const formatRuleDescription = () => {
-    if (appliesToAssessor) {
-      if (mustReview && reviewPermitted) {
-        return I18n.t('Must review %{subject}', {subject: assessee.name})
-      } else if (mustReview && !reviewPermitted) {
-        return I18n.t('Must not review %{subject}', {subject: assessee.name})
-      } else if (!mustReview && reviewPermitted) {
-        return I18n.t('Should review %{subject}', {subject: assessee.name})
-      } else {
-        return I18n.t('Should not review %{subject}', {subject: assessee.name})
-      }
-    } else {
-      if (mustReview && reviewPermitted) {
-        return I18n.t('Must be reviewed by %{subject}', {subject: assessor.name})
-      } else if (mustReview && !reviewPermitted) {
-        return I18n.t('Must not be reviewed by %{subject}', {subject: assessor.name})
-      } else if (!mustReview && reviewPermitted) {
-        return I18n.t('Should be reviewed by %{subject}', {subject: assessor.name})
-      } else {
-        return I18n.t('Should not be reviewed by %{subject}', {subject: assessor.name})
-      }
-    }
-  }
 
   return (
     <View as="div" padding="xx-small small" borderRadius="medium" borderWidth="small">
@@ -87,7 +66,7 @@ const AllocationRuleCard = ({
           </Text>
           <br />
           <Text color="secondary" size="contentSmall" wrap="break-word">
-            {formatRuleDescription()}
+            {formatRuleDescription(rule)}
           </Text>
         </Flex.Item>
 
@@ -103,7 +82,7 @@ const AllocationRuleCard = ({
                   withBorder={false}
                   size="small"
                   screenReaderLabel={I18n.t('Edit Allocation Rule: %{rule}', {
-                    rule: formatRuleDescription(),
+                    rule: formatFullRuleDescription(rule),
                   })}
                   onClick={() => setIsEditModalOpen(true)}
                 />
@@ -116,7 +95,7 @@ const AllocationRuleCard = ({
                   withBorder={false}
                   size="small"
                   screenReaderLabel={I18n.t('Delete Allocation Rule: %{rule}', {
-                    rule: formatRuleDescription(),
+                    rule: formatFullRuleDescription(rule),
                   })}
                   onClick={() => deleteRule({ruleId: rule._id})}
                 />
@@ -131,7 +110,7 @@ const AllocationRuleCard = ({
         isEdit={true}
         setIsOpen={setIsEditModalOpen}
         assignmentId={assignmentId}
-        courseId={ENV.COURSE_ID}
+        requiredPeerReviewsCount={requiredPeerReviewsCount}
         refetchRules={refetchRules}
       />
     </View>

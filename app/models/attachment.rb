@@ -123,6 +123,7 @@ class Attachment < ActiveRecord::Base
   has_many :thumbnails, foreign_key: "parent_id", inverse_of: :attachment
   has_many :children, foreign_key: :root_attachment_id, class_name: "Attachment", inverse_of: :root_attachment
   has_many :attachment_upload_statuses
+  has_one :last_attachment_upload_status, -> { order(created_at: :desc) }, class_name: "AttachmentUploadStatus"
   has_one :canvadoc
   belongs_to :usage_rights
   has_many :canvadocs_annotation_contexts, inverse_of: :attachment
@@ -2019,7 +2020,14 @@ class Attachment < ActiveRecord::Base
       destination.workflow_state = "processed"
     else
       destination.avoid_linking_to_root_attachment = true if split_root_attachment
-      Attachments::Storage.store_for_attachment(destination, open)
+      # If open returns nil (e.g., underlying S3 object missing and marked broken),
+      # skip attempting to store, and mark destination broken as well to prevent
+      # downstream service errors like InstFS::BadRequestError ("No file uploaded").
+      if (source_file = open)
+        Attachments::Storage.store_for_attachment(destination, source_file)
+      elsif destination.md5.nil?
+        Attachment.where(id: destination).update_all(file_state: "broken")
+      end
     end
   end
 
@@ -2512,6 +2520,36 @@ class Attachment < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def ingest_to_pine
+    return unless context.is_a?(Course) && context.root_account.present?
+
+    url = public_download_url
+
+    metadata = {
+      course_id: context.id.to_s,
+      filename:,
+      content_type:
+    }
+
+    # PineClient requires a user object with uuid and global_id, but we don't have a user in this context
+    # and the action is more of a system-initiated action than a user-initiated action
+    null_user = Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil)
+
+    PineClient.ingest_url(
+      url:,
+      metadata:,
+      source: "canvas",
+      source_id: id.to_s,
+      source_type: "attachment",
+      feature_slug: "horizon-content-ingestion",
+      root_account_uuid: context.root_account.uuid,
+      current_user: null_user
+    )
+  rescue => e
+    Rails.logger.error("Failed to ingest attachment #{id} for context #{context.class.name}:#{context.id}: #{e.message}")
+    raise
   end
 
   def self.migrate_attachments(from_context, to_context, scope = nil)

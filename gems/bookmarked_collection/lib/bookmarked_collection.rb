@@ -157,6 +157,11 @@ module BookmarkedCollection
   # base_scope is the ActiveRecord scope to wrap. options and block act on the
   # base_scope as in association.with_each_shard.
   #
+  # count_total_entries performs a .count on the scope to determine when the end
+  # of the collection is reached; set to false to skip this count. this may speed
+  # up pagination of large collections, at the expense of possibly getting an empty
+  # page at the end of the collection.
+  #
   # Example:
   #
   #   module UserBookmarker
@@ -193,8 +198,8 @@ module BookmarkedCollection
   #   bookmarked_collection = BookmarkedCollection.wrap(UserBookmarker, User.active)
   #   Api.paginate(bookmarked_collection, ...)
   #
-  def self.wrap(bookmarker, base_scope, &)
-    BookmarkedCollection::WrapProxy.new(bookmarker, base_scope, &)
+  def self.wrap(bookmarker, base_scope, count_total_entries: true, &)
+    BookmarkedCollection::WrapProxy.new(bookmarker, base_scope, count_total_entries:, &)
   end
 
   # Combines multiple named bookmarked collections into a single collection

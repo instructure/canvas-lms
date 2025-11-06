@@ -177,6 +177,55 @@ describe SectionTabHelper do
           end
         end
 
+        context "and Accessibility Checker is available" do
+          before do
+            allow(course).to receive(:tabs_available).and_call_original
+            account_admin_user_with_role_changes(role_changes: { manage_courses: true })
+          end
+
+          let(:available_section_tabs) do
+            SectionTabHelperSpec::AvailableSectionTabs.new(
+              course, current_user, course.account, session
+            )
+          end
+
+          it "uncaches tabs when a11y_checker account-level FF is updated" do
+            enable_cache do
+              expect(course).to receive(:tabs_available).twice.and_call_original
+              course.account.disable_feature!(:a11y_checker)
+              course.set_feature_flag!(:a11y_checker_eap, "on")
+
+              tabs_without_a11y = available_section_tabs.to_a
+              a11y_tab = tabs_without_a11y.find { |tab| tab[:id] == Course::TAB_ACCESSIBILITY }
+              expect(a11y_tab).to be_nil
+              course.remove_instance_variable(:@tabs_available) if course.instance_variable_defined?(:@tabs_available)
+
+              course.account.enable_feature!(:a11y_checker)
+              tabs_with_a11y = available_section_tabs.to_a
+              a11y_tab = tabs_with_a11y.find { |tab| tab[:id] == Course::TAB_ACCESSIBILITY }
+              expect(a11y_tab).to_not be_nil
+            end
+          end
+
+          it "uncaches tabs when a11y_checker_eap course-level FF is updated" do
+            enable_cache do
+              expect(course).to receive(:tabs_available).twice.and_call_original
+              course.account.enable_feature!(:a11y_checker)
+              course.set_feature_flag!(:a11y_checker_eap, "off")
+
+              tabs_without_a11y = available_section_tabs.to_a
+              a11y_tab = tabs_without_a11y.find { |tab| tab[:id] == Course::TAB_ACCESSIBILITY }
+              expect(a11y_tab).to be_nil
+              course.remove_instance_variable(:@tabs_available) if course.instance_variable_defined?(:@tabs_available)
+
+              course.set_feature_flag!(:a11y_checker_eap, "on")
+              tabs_with_a11y = available_section_tabs.to_a
+              a11y_tab = tabs_with_a11y.find { |tab| tab[:id] == Course::TAB_ACCESSIBILITY }
+              expect(a11y_tab).to_not be_nil
+            end
+          end
+        end
+
         context "and tabs include TAB_CONFERENCES" do
           it "includes TAB_CONFERENCES if WebConference.config" do
             allow(WebConference).to receive(:config).and_return({})
@@ -258,7 +307,7 @@ describe SectionTabHelper do
             allow(context).to receive(:tabs_available).and_return(tabs)
           end
 
-          include_examples "allow Quiz LTI placement when the correct Feature Flags are enabled"
+          it_behaves_like "allow Quiz LTI placement when the correct Feature Flags are enabled"
         end
 
         context "the root account has a course_navigation Quiz LTI placement and @context is a Course" do
@@ -279,7 +328,7 @@ describe SectionTabHelper do
             allow(context).to receive(:tabs_available).and_return(tabs)
           end
 
-          include_examples "allow Quiz LTI placement when the correct Feature Flags are enabled"
+          it_behaves_like "allow Quiz LTI placement when the correct Feature Flags are enabled"
         end
 
         context "the root account has non-Quiz_LTI navigation placements" do

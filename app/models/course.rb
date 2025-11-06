@@ -38,6 +38,35 @@ class Course < ActiveRecord::Base
 
   alias_attribute :short_name, :course_code
 
+  SIMPLY_VERSIONED_EXCLUDE_FIELDS = %w[
+    id
+    account_id
+    root_account_id
+    wiki_id
+    enrollment_term_id
+    abstract_course_id
+    grading_standard_id
+    template_course_id
+    replacement_course_id
+    latest_outcome_import_id
+    homeroom_course_id
+    sis_source_id
+    sis_batch_id
+    stuck_sis_fields
+    integration_id
+    lti_context_id
+    turnitin_id
+    workflow_state
+    uuid
+    indexed
+    delete_me_frd
+    deleted_at
+    archived_at
+    storage_quota
+    created_at
+    updated_at
+  ].freeze
+
   time_zone_attribute :time_zone
   def time_zone
     super || RequestCache.cache("account_time_zone", root_account_id) do
@@ -309,6 +338,7 @@ class Course < ActiveRecord::Base
   before_save :set_self_enrollment_code
   before_save :validate_license
   before_save :set_horizon_course, if: -> { account_id_changed? || new_record? }
+  after_save :handle_horizon_activation, if: :just_became_horizon_course?
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :update_lti_context_controls_if_necessary
@@ -347,6 +377,19 @@ class Course < ActiveRecord::Base
   validates_locale allow_nil: true
 
   sanitize_field :syllabus_body, CanvasSanitize::SANITIZE
+
+  simply_versioned exclude: SIMPLY_VERSIONED_EXCLUDE_FIELDS,
+                   keep: 5,
+                   when: lambda { |course|
+                     return false unless course.syllabus_body_changed?
+
+                     begin
+                       !!Account.site_admin&.feature_enabled?(:syllabus_versioning)
+                     rescue => e
+                       Rails.logger.warn("Error checking syllabus_versioning flag: #{e.message}")
+                       false
+                     end
+                   }
 
   include StickySisFields
 
@@ -1521,6 +1564,16 @@ class Course < ActiveRecord::Base
     true
   end
 
+  def just_became_horizon_course?
+    saved_change_to_horizon_course? && horizon_course?
+  end
+
+  def handle_horizon_activation
+    return unless root_account.feature_enabled?(:horizon_auto_content_ingestion)
+
+    delay(n_strand: ["horizon_content_discovery", global_root_account_id], singleton: "horizon_content_discovery:#{global_id}").ingest_horizon_content
+  end
+
   def update_cached_due_dates
     if saved_change_to_enrollment_term_id?
       recompute_student_scores
@@ -1581,6 +1634,32 @@ class Course < ActiveRecord::Base
       grading_period_id: opts[:grading_period_id],
       update_all_grading_period_scores: opts.fetch(:update_all_grading_period_scores, true)
     )
+  end
+
+  def ingest_horizon_content
+    return unless horizon_course?
+
+    files = attachments
+            .active
+            .by_content_types(PineClient.allowed_attachment_content_types)
+
+    pages = wiki_pages.active
+
+    files.find_each do |file|
+      file.delay(
+        n_strand: ["horizon_file_ingestion", global_root_account_id],
+        singleton: "horizon_file_ingestion:#{global_id}:#{file.id}",
+        max_attempts: 3
+      ).ingest_to_pine
+    end
+
+    pages.find_each do |page|
+      page.delay(
+        n_strand: ["horizon_wiki_ingestion", global_root_account_id],
+        singleton: "horizon_wiki_ingestion:#{global_id}:#{page.id}",
+        max_attempts: 3
+      ).ingest_to_pine
+    end
   end
 
   def handle_syllabus_changes_for_master_migration
@@ -3456,14 +3535,12 @@ class Course < ActiveRecord::Base
                           })
     end
 
-    if root_account.enable_content_a11y_checker?
-      # Add Accessibility tab at the end of the tabs (except for Settings tab)
+    if a11y_checker_enabled? && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       default_tabs.push({
                           id: TAB_ACCESSIBILITY,
                           label: t("#tabs.accessibility", "Accessibility"),
                           css_class: "accessibility",
-                          href: :course_accessibility_index_path,
-                          visibility: "admins"
+                          href: :course_accessibility_index_path
                         })
     end
 
@@ -3787,6 +3864,7 @@ class Course < ActiveRecord::Base
   add_setting :allow_student_anonymous_discussion_topics, boolean: true, default: false
   add_setting :show_total_grade_as_points, boolean: true, default: false
   add_setting :filter_speed_grader_by_student_group, boolean: true, default: false
+  add_setting :default_student_gradebook_view, boolean: true, default: false
   add_setting :lock_all_announcements, boolean: true, default: false, inherited: true
   add_setting :large_roster, boolean: true, default: ->(c) { c.root_account.large_course_rosters? }
   add_setting :course_format
@@ -3825,6 +3903,10 @@ class Course < ActiveRecord::Base
 
   def block_content_editor_enabled?
     account.feature_enabled?(:block_content_editor) && feature_enabled?(:block_content_editor_eap)
+  end
+
+  def a11y_checker_enabled?
+    account.feature_enabled?(:a11y_checker) && feature_enabled?(:a11y_checker_eap)
   end
 
   def elementary_enabled?

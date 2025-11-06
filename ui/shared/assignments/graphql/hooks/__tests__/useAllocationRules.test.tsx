@@ -21,7 +21,8 @@ import {waitFor} from '@testing-library/react'
 import {QueryClient} from '@tanstack/react-query'
 import React from 'react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {useAllocationRules, AllocationRule} from '../useAllocationRules'
+import {useAllocationRules} from '../useAllocationRules'
+import {AllocationRuleType} from '../../teacher/AssignmentTeacherTypes'
 
 jest.mock('@canvas/graphql', () => ({
   executeQuery: jest.fn(),
@@ -30,7 +31,7 @@ jest.mock('@canvas/graphql', () => ({
 const {executeQuery} = require('@canvas/graphql')
 const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
 
-const mockAllocationRules: AllocationRule[] = [
+const mockAllocationRules: AllocationRuleType[] = [
   {
     _id: '1',
     mustReview: true,
@@ -39,10 +40,12 @@ const mockAllocationRules: AllocationRule[] = [
     assessor: {
       _id: 'assessor-1',
       name: 'Mudkip',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
     },
     assessee: {
       _id: 'assessee-1',
       name: 'Torchic',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
     },
   },
   {
@@ -53,10 +56,12 @@ const mockAllocationRules: AllocationRule[] = [
     assessor: {
       _id: 'assessor-2',
       name: 'Latias',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
     },
     assessee: {
       _id: 'assessee-2',
       name: 'Latios',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
     },
   },
 ]
@@ -181,8 +186,16 @@ describe('useAllocationRules', () => {
         mustReview: i % 2 === 0,
         reviewPermitted: true,
         appliesToAssessor: true,
-        assessor: {_id: `assessor-${start + i}`, name: `Assessor ${start + i}`},
-        assessee: {_id: `assessee-${start + i}`, name: `Assessee ${start + i}`},
+        assessor: {
+          _id: `assessor-${start + i}`,
+          name: `Assessor ${start + i}`,
+          peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+        },
+        assessee: {
+          _id: `assessee-${start + i}`,
+          name: `Assessee ${start + i}`,
+          peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+        },
       }))
 
     mockExecuteQuery
@@ -280,8 +293,16 @@ describe('useAllocationRules', () => {
                 mustReview: true,
                 reviewPermitted: false,
                 appliesToAssessor: true,
-                assessor: {_id: 'assessor-3', name: 'New Assessor'},
-                assessee: {_id: 'assessee-3', name: 'New Assessee'},
+                assessor: {
+                  _id: 'assessor-3',
+                  name: 'New Assessor',
+                  peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+                },
+                assessee: {
+                  _id: 'assessee-3',
+                  name: 'New Assessee',
+                  peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+                },
               },
             ],
             pageInfo: {

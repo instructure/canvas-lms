@@ -125,7 +125,8 @@ class Submission < ActiveRecord::Base
                 :score_unchanged,
                 :skip_grade_calc,
                 :skip_grader_check,
-                :visible_to_user
+                :visible_to_user,
+                :preloaded_attachments
 
   # This can be set to true to force late policy behaviour that would
   # be skipped otherwise. See #late_policy_relevant_changes? and
@@ -2096,9 +2097,10 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  # Avoids having O(N) attachment queries.  Returns a hash of
-  # submission to attachments.
-  def self.bulk_load_attachments_for_submissions(submissions, preloads: nil)
+  # Avoids having O(N) attachment queries.  If preload_only is true, sets the
+  # preloaded_attachments attribute on each given submission and returns nil.
+  # Otherwise, returns a hash of submission to attachments.
+  def self.bulk_load_attachments_for_submissions(submissions, preloads: nil, preload_only: false)
     submissions = Array(submissions)
     attachment_ids_by_submission =
       submissions.index_with { |s| s.attachment_associations.map(&:attachment_id) }
@@ -2111,10 +2113,22 @@ class Submission < ActiveRecord::Base
       attachments_by_id = attachments_by_id.group_by(&:id)
     end
 
-    attachments_by_submission = submissions.map do |s|
-      [s, attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.compact.uniq]
+    get_attachments = ->(s) { attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.compact.uniq }
+
+    if preload_only
+      submissions.each do |s|
+        attachments = get_attachments.call(s)
+        s.preloaded_attachments = attachments
+      end
+      nil
+    else
+      attachments_by_submission = submissions.map do |s|
+        attachments = get_attachments.call(s)
+        s.preloaded_attachments = attachments
+        [s, attachments]
+      end
+      attachments_by_submission.to_h
     end
-    attachments_by_submission.to_h
   end
 
   def includes_attachment?(attachment)
@@ -2574,7 +2588,7 @@ class Submission < ActiveRecord::Base
   end
 
   def visible_submission_comments_for(current_user)
-    displayable_comments = if assignment.grade_as_group?
+    displayable_comments = if assignment.grade_as_group? && assignment.has_groups?
                              all_submission_comments_for_groups
                            elsif assignment.moderated_grading? && assignment.grades_published?
                              # When grades are published for a moderated assignment, provisional

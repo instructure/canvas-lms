@@ -23,7 +23,6 @@ import {useGradebookSettings} from '../hooks/useGradebookSettings'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {Rating, Student, Outcome, StudentRollupData} from '../types/rollup'
 import {SortOrder, SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '../utils/constants'
-import {getSearchParams, setSearchParams} from '../utils/ManageURLSearchParams'
 import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../__fixtures__/rollups'
 import {saveLearningMasteryGradebookSettings} from '../apiClient'
 
@@ -31,11 +30,6 @@ jest.mock('../apiClient')
 
 jest.mock('../hooks/useRollups')
 jest.mock('../hooks/useGradebookSettings')
-
-jest.mock('../utils/ManageURLSearchParams', () => ({
-  getSearchParams: jest.fn(),
-  setSearchParams: jest.fn(),
-}))
 
 describe('LearningMastery', () => {
   const ratings: Rating[] = MOCK_RATINGS
@@ -92,15 +86,14 @@ describe('LearningMastery', () => {
       students,
       outcomes,
       rollups,
-      currentPage: 1,
       setCurrentPage: jest.fn(),
-      studentsPerPage: 15,
-      setStudentsPerPage: jest.fn(),
       sorting: {
         sortOrder: SortOrder.ASC,
         setSortOrder: jest.fn(),
         sortBy: SortBy.SortableName,
         setSortBy: jest.fn(),
+        sortOutcomeId: null,
+        setSortOutcomeId: jest.fn(),
       },
     })
 
@@ -125,56 +118,22 @@ describe('LearningMastery', () => {
     fakeENV.teardown()
   })
 
-  it('calls getSearchParams and setSearchParams. setSearchParams gets default values.', async () => {
-    render(<LearningMastery {...defaultProps()} />)
-    expect(getSearchParams).toHaveBeenCalled()
-    expect(setSearchParams).toHaveBeenCalledWith(1, 15, {
-      setSortOrder: expect.any(Function),
-      setSortBy: expect.any(Function),
-      sortBy: SortBy.SortableName,
-      sortOrder: SortOrder.ASC,
-    })
-  })
-
-  it('setSearchParams correctly sets values', async () => {
-    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
-    mockUseRollups.mockReturnValueOnce({
-      isLoading: false,
-      error: null,
-      students,
-      outcomes,
-      rollups,
-      currentPage: 1,
-      setCurrentPage: jest.fn(),
-      studentsPerPage: 30,
-      setStudentsPerPage: jest.fn(),
-      sorting: {
-        sortOrder: SortOrder.DESC,
-        setSortOrder: jest.fn(),
-        sortBy: SortBy.Name,
-        setSortBy: jest.fn(),
-      },
-    })
-    render(<LearningMastery {...defaultProps()} />)
-    expect(getSearchParams).toHaveBeenCalled()
-    expect(setSearchParams).toHaveBeenCalledWith(1, 30, {
-      setSortOrder: expect.any(Function),
-      setSortBy: expect.any(Function),
-      sortBy: SortBy.Name,
-      sortOrder: SortOrder.DESC,
-    })
-  })
-
   it('renders a loading spinner when useRollups.isLoading is true', async () => {
     const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue({
       isLoading: true,
       error: null,
-      currentPage: 1,
-      studentsPerPage: 15,
+      students: [],
+      outcomes: [],
+      rollups: [],
+      setCurrentPage: jest.fn(),
       sorting: {
         sortBy: SortBy.SortableName,
         sortOrder: SortOrder.ASC,
+        setSortOrder: jest.fn(),
+        setSortBy: jest.fn(),
+        sortOutcomeId: null,
+        setSortOutcomeId: jest.fn(),
       },
     } as ReturnType<typeof useRollups>)
     const {getByText} = render(<LearningMastery {...defaultProps()} />)

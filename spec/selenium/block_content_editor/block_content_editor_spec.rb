@@ -409,6 +409,392 @@ describe "Block Content Editor", :ignore_js_errors do
     end
   end
 
+  shared_examples "editing image" do
+    it "shows image placeholder in edit preview mode when no image is uploaded" do
+      expect(blocks.first.image_placeholder).to be_displayed
+      expect(element_exists?(blocks.first.image_selector)).to be false
+      expect(element_exists?(blocks.first.add_image_button_selector)).to be false
+    end
+
+    it "shows add image button in edit mode when no image is uploaded" do
+      blocks.first.block_title.title.click
+      wait_for_ajaximations
+
+      expect(element_exists?(blocks.first.image_placeholder_selector)).to be false
+      expect(element_exists?(blocks.first.image_selector)).to be false
+      expect(blocks.first.add_image_button).to be_displayed
+    end
+
+    it "adds an image" do
+      blocks.first.block_title.title.click
+      wait_for_ajaximations
+
+      image_path = "https://placehold.co/600x400.png"
+      blocks.first.add_external_image(image_path)
+      wait_for_ajaximations
+
+      expect(element_exists?(blocks.first.image_placeholder_selector)).to be false
+      expect(blocks.first.image).to be_displayed
+      expect(blocks.first.image.attribute("src")).to include(image_path)
+    end
+
+    it "replaces an image" do
+      blocks.first.block_title.title.click
+      wait_for_ajaximations
+
+      image_path = "https://placehold.co/600x400.png"
+      blocks.first.add_external_image(image_path)
+      wait_for_ajaximations
+
+      expect(blocks.first.image.attribute("src")).to include(image_path)
+
+      new_image_path = "https://placehold.co/800x600.png"
+      blocks.first.replace_with_external_image(new_image_path)
+      wait_for_ajaximations
+
+      expect(blocks.first.image).to be_displayed
+      expect(blocks.first.image.attribute("src")).to include(new_image_path)
+    end
+
+    describe "image caption" do
+      it "displays default image caption after adding an image" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        image_path = "https://placehold.co/600x400.png"
+        blocks.first.add_external_image(image_path)
+        wait_for_ajaximations
+
+        expect(blocks.first.image_caption).to be_displayed
+        expect(blocks.first.image_caption.text).to eq("Image caption")
+      end
+
+      it "opens settings tray when edit caption button is clicked" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        image_path = "https://placehold.co/600x400.png"
+        blocks.first.add_external_image(image_path)
+        wait_for_ajaximations
+
+        blocks.first.edit_image_caption_button.click
+        wait_for_ajaximations
+
+        expect(blocks.first.settings_tray).to be_displayed
+      end
+
+      it "updates image caption" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        image_path = "https://placehold.co/600x400.png"
+        blocks.first.add_external_image(image_path)
+        wait_for_ajaximations
+
+        blocks.first.edit_image_caption_button.click
+        wait_for_ajaximations
+
+        blocks.first.settings.image_caption_input.send_keys("A random 1024x768 image")
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        expect(blocks.first.image_caption.text).to eq("A random 1024x768 image")
+      end
+
+      it "shows unchecked 'use alt text as caption' checkbox by default" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        blocks.first.add_external_image("https://placehold.co/600x400.png")
+        wait_for_ajaximations
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings
+        expect(settings.use_alt_text_as_caption_checkbox).to be_displayed
+        expect(settings.use_alt_text_as_caption_checked?).to be false
+      end
+
+      it "uses alt text as caption when checkbox is enabled" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        blocks.first.add_external_image("https://placehold.co/600x400.png")
+        wait_for_ajaximations
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings
+        settings.alt_text_input.send_keys("Alt text")
+        settings.use_alt_text_as_caption_checkbox.click
+        wait_for_ajaximations
+
+        expect(settings.use_alt_text_as_caption_checked?).to be true
+        expect(blocks.first.image_caption.text).to eq("Alt text")
+      end
+
+      it "disables inputs for image caption and decorative image when using alt text as caption" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        blocks.first.add_external_image("https://placehold.co/600x400.png")
+        wait_for_ajaximations
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings
+        settings.alt_text_input.send_keys("Alt text")
+        settings.use_alt_text_as_caption_checkbox.click
+        wait_for_ajaximations
+
+        expect(settings.image_caption_input).not_to be_enabled
+        expect(settings.decorative_image_input).not_to be_enabled
+      end
+
+      it "persists alt text as caption after closing settings tray" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        blocks.first.add_external_image("https://placehold.co/600x400.png")
+        wait_for_ajaximations
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings
+        settings.alt_text_input.send_keys("Alt text")
+        settings.use_alt_text_as_caption_checkbox.click
+        wait_for_ajaximations
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        expect(blocks.first.image_caption.text).to eq("Alt text")
+      end
+
+      it "reverts to default caption when checkbox is unchecked" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        blocks.first.add_external_image("https://placehold.co/600x400.png")
+        wait_for_ajaximations
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings
+        settings.alt_text_input.send_keys("Alt text")
+        settings.use_alt_text_as_caption_checkbox.click
+        wait_for_ajaximations
+
+        settings.use_alt_text_as_caption_checkbox.click
+        wait_for_ajaximations
+
+        expect(settings.use_alt_text_as_caption_checked?).to be false
+        expect(blocks.first.image_caption.text).to eq("Image caption")
+      end
+
+      it "persists default caption after unchecking and closing settings tray" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        blocks.first.add_external_image("https://placehold.co/600x400.png")
+        wait_for_ajaximations
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings
+        settings.alt_text_input.send_keys("Alt text")
+        settings.use_alt_text_as_caption_checkbox.click
+        wait_for_ajaximations
+
+        settings.use_alt_text_as_caption_checkbox.click
+        wait_for_ajaximations
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        expect(blocks.first.image_caption.text).to eq("Image caption")
+      end
+    end
+
+    describe "alt text" do
+      it "adds alt text" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        blocks.first.add_external_image("https://placehold.co/600x400.png")
+        expect(blocks.first.image.attribute("alt")).to eq("")
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        blocks.first.settings.alt_text_input.send_keys("Alt text")
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        expect(blocks.first.image.attribute("alt")).to eq("Alt text")
+      end
+
+      it "sets empty alt text and no role attribute by default" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        blocks.first.add_external_image("https://placehold.co/600x400.png")
+        wait_for_ajaximations
+
+        expect(blocks.first.image.attribute("alt")).to eq("")
+        expect(blocks.first.image.attribute("role")).to be_nil
+      end
+
+      it "shows unchecked decorative image checkbox by default" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        blocks.first.add_external_image("https://placehold.co/600x400.png")
+        wait_for_ajaximations
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings
+        expect(settings.decorative_image_checkbox).to be_displayed
+        expect(settings.alt_text_input).to be_enabled
+        expect(settings.image_caption_input).to be_enabled
+        expect(settings.use_alt_text_as_caption_input).to be_enabled
+      end
+
+      it "sets presentation role attribute when image is marked as decorative" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        blocks.first.add_external_image("https://placehold.co/600x400.png")
+        wait_for_ajaximations
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings
+        settings.decorative_image_checkbox.click
+        wait_for_ajaximations
+
+        expect(blocks.first.image.attribute("alt")).to eq("")
+        expect(blocks.first.image.attribute("role")).to eq("presentation")
+      end
+
+      it "disables alt text and caption as alt text inputs when image is marked as decorative" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        blocks.first.add_external_image("https://placehold.co/600x400.png")
+        wait_for_ajaximations
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings
+        settings.alt_text_input.send_keys("Alt text")
+        settings.decorative_image_checkbox.click
+        wait_for_ajaximations
+
+        expect(settings.alt_text_input).not_to be_enabled
+        expect(settings.image_caption_input).to be_enabled
+        expect(settings.use_alt_text_as_caption_input).not_to be_enabled
+      end
+
+      it "restores alt text and removes role attribute when image is no longer marked as decorative" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        blocks.first.add_external_image("https://placehold.co/600x400.png")
+        wait_for_ajaximations
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings
+        settings.alt_text_input.send_keys("Alt text")
+        settings.decorative_image_checkbox.click
+        wait_for_ajaximations
+
+        settings.decorative_image_checkbox.click
+        wait_for_ajaximations
+
+        expect(settings.alt_text_input).to be_enabled
+        expect(settings.image_caption_input).to be_enabled
+        expect(settings.use_alt_text_as_caption_input).to be_enabled
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        expect(blocks.first.image.attribute("alt")).to eq("Alt text")
+        expect(blocks.first.image.attribute("role")).to be_nil
+      end
+
+      it "persists decorative image state after closing and reopening settings tray" do
+        blocks.first.block_title.title.click
+        wait_for_ajaximations
+
+        blocks.first.add_external_image("https://placehold.co/600x400.png")
+        wait_for_ajaximations
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings
+        settings.decorative_image_checkbox.click
+        wait_for_ajaximations
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        expect(blocks.first.image.attribute("role")).to eq("presentation")
+      end
+    end
+
+    it "removes the image" do
+      blocks.first.block_title.title.click
+      wait_for_ajaximations
+
+      blocks.first.add_external_image("https://placehold.co/600x400.png")
+
+      blocks.first.settings_button.click
+      wait_for_ajaximations
+
+      settings = blocks.first.settings
+      expect(settings.replace_image_button).to be_displayed
+
+      settings.remove_image_button.click
+      wait_for_ajaximations
+
+      expect(settings.upload_image_button).to be_displayed
+      expect(blocks.first.add_image_button).to be_displayed
+      expect(element_exists?(blocks.first.image_selector)).to be false
+      expect(element_exists?(blocks.first.image_placeholder_selector)).to be false
+    end
+  end
+
+  shared_examples "editing text" do
+    it "edits text content" do
+      expect(blocks.first.text_content).to be_displayed
+      expect(blocks.first.text_content.text).to eq("Click to edit")
+
+      blocks.first.text_content.click
+      blocks.first.type("This is a text block.")
+      wait_for_ajaximations
+      click_outside_block
+
+      expect(blocks.first.text_content.text).to eq("This is a text block.")
+    end
+  end
+
   context "Editing blocks" do
     context "Separator block" do
       before do
@@ -664,6 +1050,110 @@ describe "Block Content Editor", :ignore_js_errors do
 
         expect(blocks.first.media_content).to be_displayed
         expect(blocks.first.media_content.attribute("src")).to eq(new_embed_url)
+      end
+    end
+
+    context "Image block" do
+      before do
+        add_a_block("Image", "Full width image")
+      end
+
+      include_examples "editing block title"
+      include_examples "editing background color"
+      include_examples "editing image"
+    end
+
+    context "Text block" do
+      before do
+        add_a_block("Text", "Text column")
+      end
+
+      include_examples "editing block title"
+      include_examples "editing background color"
+      include_examples "editing text"
+    end
+
+    context "Image + Text block" do
+      before do
+        add_a_block("Image", "Image + text")
+      end
+
+      include_examples "editing block title"
+      include_examples "editing background color"
+      include_examples "editing text"
+      include_examples "editing image"
+
+      def expect_image_position(image_element, text_element, expected_image_position)
+        image_x = image_element.location.x
+        text_x = text_element.location.x
+
+        case expected_image_position
+        when :left
+          expect(image_x).to be < text_x
+        when :right
+          expect(image_x).to be > text_x
+        end
+      end
+
+      [
+        ["Image on the left", :left],
+        ["Image on the right", :right]
+      ].each do |arrangement, expected_image_position|
+        it "changes element arrangement - #{arrangement.downcase}" do
+          blocks.first.block_title.title.click
+          wait_for_ajaximations
+
+          blocks.first.add_external_image("https://placehold.co/600x400.png")
+          wait_for_ajaximations
+          blocks.first.type("Sample text")
+          wait_for_ajaximations
+
+          blocks.first.settings_button.click
+          wait_for_ajaximations
+
+          blocks.first.settings.element_arrangement_radio_option(arrangement).click
+          wait_for_ajaximations
+          expect_image_position(blocks.first.image, blocks.first.rce_wrapper, expected_image_position)
+
+          blocks.first.settings_tray_component.close_button.click
+          wait_for_ajaximations
+
+          click_outside_block
+
+          expect_image_position(blocks.first.image, blocks.first.text_content, expected_image_position)
+        end
+      end
+
+      [
+        ["1:1", 1.0],
+        ["2:1", 2.0]
+      ].each do |ratio_name, expected_ratio|
+        it "changes text-to-image ratio - #{ratio_name}" do
+          blocks.first.block_title.title.click
+          wait_for_ajaximations
+
+          blocks.first.add_external_image("https://placehold.co/600x400.png")
+          wait_for_ajaximations
+          blocks.first.type("Sample text")
+          wait_for_ajaximations
+
+          blocks.first.settings_button.click
+          wait_for_ajaximations
+
+          blocks.first.settings.text_to_image_ratio_radio_option(ratio_name).click
+          wait_for_ajaximations
+
+          actual_ratio = blocks.first.image_text_ratio(blocks.first.image, blocks.first.rce_wrapper)
+          expect(actual_ratio).to be_within(0.1).of(expected_ratio)
+
+          blocks.first.settings_tray_component.close_button.click
+          wait_for_ajaximations
+
+          click_outside_block
+
+          actual_ratio = blocks.first.image_text_ratio(blocks.first.image, blocks.first.text_content)
+          expect(actual_ratio).to be_within(0.1).of(expected_ratio)
+        end
       end
     end
   end

@@ -24,11 +24,19 @@ type TokenResponse = {
   refreshToken: string | null
 }
 
+type Context = {
+  id: string
+  name: string
+  type: string
+  url: string
+}
+
 export type User = {
   name: string
   id: string
   roles: string[]
   isStudent: boolean
+  context: Context
 }
 
 export type AuthProps = {
@@ -50,6 +58,7 @@ export const getAccessToken: AuthProps['getAccessToken'] = async () => {
       return resp.json()
     })
     .then(data => data.token)
+    .then(token => atob(token)) // remove extra encoding carried by this JWT
   // uncomment for debugging
   // console.debug('Access token:', token)
   // console.debug('Decoded access token:', Buffer.from(token, 'base64').toString('utf8'))
@@ -90,5 +99,6 @@ export const getUser: AuthProps['getUser'] = async () => {
     name: ENV.current_user?.display_name,
     roles: ENV.current_user_roles,
     isStudent: ENV.current_user_is_student,
+    context: ENV.current_context as Context,
   }
 }

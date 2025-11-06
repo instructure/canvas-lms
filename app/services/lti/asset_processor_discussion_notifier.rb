@@ -25,7 +25,7 @@ module Lti
 
     module_function
 
-    def notify_asset_processors_of_discussion(current_user:, discussion_entry_version:, assignment:, contribution_status:, submission: nil, asset_processor: nil)
+    def notify_asset_processors_of_discussion(current_user:, discussion_entry_version:, assignment:, contribution_status:, submission: nil, asset_processor: nil, tool_id: nil)
       return unless assignment.discussion_topic?
       return unless discussion_entry_version.root_account.feature_enabled?(:lti_asset_processor_discussions)
       return if submission.present? && !submission.asset_processor_for_discussions_compatible?
@@ -33,6 +33,9 @@ module Lti
       asset_processors = assignment.lti_asset_processors
       if asset_processor.present?
         asset_processors = asset_processors.where(id: asset_processor.id)
+      end
+      if tool_id.present?
+        asset_processors = asset_processors.where(context_external_tool_id: tool_id)
       end
       return if asset_processors.empty?
 

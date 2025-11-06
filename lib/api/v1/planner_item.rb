@@ -75,7 +75,7 @@ module Api::V1::PlannerItem
           reply_to_entry_required_count: item.parent_assignment&.discussion_topic&.reply_to_entry_required_count || 1
         }
         hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
-        hash[:plannable_date] = item[:user_due_date] || item.due_at
+        hash[:plannable_date] = item[:cached_due_date] || item.due_at
         hash[:plannable] = plannable_json(item.attributes.merge(unread_attributes), extra_fields: SUB_ASSIGNMENT_FIELDS + GRADABLE_FIELDS)
         hash[:html_url] = assignment_html_url(item.parent_assignment, user, hash[:submissions])
       elsif item.is_a?(::PlannerNote)
@@ -110,7 +110,7 @@ module Api::V1::PlannerItem
         unread_count, read_state = topics_status_for(user, topic.id, opts[:topics_status])[topic.id]
         unread_attributes = { unread_count:, read_state: }
         hash[:plannable_id] = topic.id
-        hash[:plannable_date] = item[:user_due_date] || topic.todo_date || topic.posted_at || topic.created_at
+        hash[:plannable_date] = item[:cached_due_date] || topic.todo_date || topic.posted_at || topic.created_at
         hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(topic.class_name)
         hash[:plannable] = plannable_json(unread_attributes.merge(item.attributes).merge(topic.attributes), extra_fields: GRADABLE_FIELDS)
         hash[:html_url] = discussion_topic_html_url(topic, user, hash[:submissions])
@@ -123,7 +123,7 @@ module Api::V1::PlannerItem
         submission = item.asset
         hash[:html_url] = student_peer_review_url(submission.context, submission.assignment, item, user)
       else
-        hash[:plannable_date] = item[:user_due_date] || item.due_at
+        hash[:plannable_date] = item[:cached_due_date] || item[:user_due_date] || item.due_at
         hash[:plannable] = plannable_json(item.attributes, extra_fields: GRADABLE_FIELDS)
         hash[:html_url] = assignment_html_url(item, user, hash[:submissions])
       end

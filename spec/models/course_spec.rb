@@ -828,6 +828,25 @@ describe Course do
         expect(new_course).to be_valid
       end
 
+      describe "default_student_gradebook_view validation" do
+        before do
+          @course = course_factory
+          @course.enable_feature!(:outcome_gradebook)
+          @course.enable_feature!(:student_outcome_gradebook)
+          @course.enable_feature!(:default_to_learning_mastery_gradebook)
+        end
+
+        it "allows setting to true when all feature flags are enabled" do
+          @course.default_student_gradebook_view = true
+          expect(@course).to be_valid
+        end
+
+        it "allows setting to false" do
+          @course.default_student_gradebook_view = false
+          expect(@course).to be_valid
+        end
+      end
+
       it "validates the license" do
         course = course_factory
         course.license = "blah"
@@ -2801,7 +2820,8 @@ describe Course do
       end
 
       it "returns Accessibility tab if feature flag is enabled for teachers" do
-        @course.root_account.settings[:enable_content_a11y_checker] = true
+        @course.root_account.enable_feature!(:a11y_checker)
+        @course.enable_feature!(:a11y_checker_eap)
         tabs = @course.tabs_available(@user)
 
         # Checks that Accessibility tab is at the end of the tabs (except for Settings tab)
@@ -2809,7 +2829,8 @@ describe Course do
         accessibility_tab_index = tabs.pluck(:id).index(Course::TAB_ACCESSIBILITY)
         expect(accessibility_tab_index).to eq(settings_tab_index - 1)
       ensure
-        @course.root_account.settings[:enable_content_a11y_checker] = false
+        @course.disable_feature!(:a11y_checker_eap)
+        @course.root_account.disable_feature!(:a11y_checker)
       end
 
       describe "TAB_YOUTUBE_MIGRATION" do
@@ -9007,6 +9028,154 @@ describe Course do
     end
   end
 
+  describe "horizon content ingestion" do
+    let(:horizon_account) do
+      account = Account.create!
+      account.enable_feature!(:horizon_course_setting)
+      account.enable_feature!(:horizon_auto_content_ingestion)
+      account.horizon_account = true
+      account.save!
+      account
+    end
+
+    let(:regular_account) { Account.create! }
+    let(:pine_client_mock) { double("PineClient") }
+
+    before do
+      allow(pine_client_mock).to receive_messages(enabled?: true, ingest_url: true, ingest_html: true)
+      stub_const("PineClient", pine_client_mock)
+    end
+
+    describe "#handle_horizon_activation" do
+      it "enqueues content discovery job when course becomes a horizon course" do
+        course = regular_account.courses.create!
+
+        # Allow other delay calls but expect our specific one
+        allow(course).to receive(:delay).and_call_original
+        expect(course).to receive(:delay).with(
+          n_strand: ["horizon_content_discovery", horizon_account.global_id],
+          singleton: "horizon_content_discovery:#{course.global_id}"
+        ).and_return(course)
+        expect(course).to receive(:ingest_horizon_content)
+
+        course.account = horizon_account
+        course.save!
+      end
+
+      it "does not enqueue job when feature flag is disabled" do
+        horizon_account.disable_feature!(:horizon_auto_content_ingestion)
+        course = regular_account.courses.create!
+
+        expect(course).not_to receive(:ingest_horizon_content)
+
+        course.account = horizon_account
+        course.save!
+      end
+
+      it "does not enqueue job when course is already a horizon course" do
+        course = horizon_account.courses.create!
+        course.save!
+
+        expect(course).not_to receive(:ingest_horizon_content)
+
+        course.name = "Updated Name"
+        course.save!
+      end
+
+      it "does not enqueue job when course stops being a horizon course" do
+        course = horizon_account.courses.create!
+        course.save!
+
+        expect(course).not_to receive(:ingest_horizon_content)
+
+        course.account = regular_account
+        course.save!
+      end
+    end
+
+    describe "#ingest_horizon_content" do
+      let(:course) { horizon_account.courses.create! }
+      let(:pdf_file) { attachment_model(context: course, content_type: "application/pdf") }
+      let(:txt_file) { attachment_model(context: course, content_type: "text/plain") }
+      let(:image_file) { attachment_model(context: course, content_type: "image/png") }
+      let(:wiki_page) { course.wiki_pages.create!(title: "Test Page", body: "<p>Content</p>") }
+
+      before do
+        allow(PineClient).to receive(:allowed_attachment_content_types).and_return([
+                                                                                     "application/pdf",
+                                                                                     "text/plain",
+                                                                                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                                                                   ])
+      end
+
+      it "enqueues jobs for allowed file types" do
+        pdf_file
+        txt_file
+        image_file
+
+        delayed_files = []
+        allow_any_instance_of(Attachment).to receive(:delay) do |attachment, **args|
+          expect(args[:n_strand]).to eq(["horizon_file_ingestion", horizon_account.global_id])
+          expect(args[:singleton]).to match(/^horizon_file_ingestion:#{course.global_id}:\d+$/)
+          expect(args[:max_attempts]).to eq(3)
+          delayed_files << attachment
+          attachment
+        end
+
+        allow_any_instance_of(Attachment).to receive(:ingest_to_pine)
+
+        course.ingest_horizon_content
+
+        expect(delayed_files.map(&:id)).to match_array([pdf_file.id, txt_file.id])
+      end
+
+      it "enqueues jobs for wiki pages" do
+        wiki_page
+
+        delayed_pages = []
+        allow_any_instance_of(WikiPage).to receive(:delay) do |page, **args|
+          expect(args[:n_strand]).to eq(["horizon_wiki_ingestion", horizon_account.global_id])
+          expect(args[:singleton]).to match(/^horizon_wiki_ingestion:#{course.global_id}:\d+$/)
+          expect(args[:max_attempts]).to eq(3)
+          delayed_pages << page
+          page
+        end
+
+        allow_any_instance_of(WikiPage).to receive(:ingest_to_pine)
+
+        course.ingest_horizon_content
+
+        expect(delayed_pages.map(&:id)).to eq([wiki_page.id])
+      end
+
+      it "does not enqueue jobs for non-horizon courses" do
+        regular_course = regular_account.courses.create!
+
+        expect(regular_course).not_to receive(:delay)
+
+        regular_course.ingest_horizon_content
+      end
+
+      it "only processes active attachments" do
+        deleted_file = attachment_model(context: course, content_type: "application/pdf")
+        deleted_file.destroy
+
+        expect(course).not_to receive(:delay)
+
+        course.ingest_horizon_content
+      end
+
+      it "only processes active wiki pages" do
+        deleted_page = course.wiki_pages.create!(title: "Deleted", body: "Content")
+        deleted_page.destroy
+
+        expect(course).not_to receive(:delay)
+
+        course.ingest_horizon_content
+      end
+    end
+  end
+
   describe "copied assets" do
     it "returns courses that copied a page" do
       source_course = Course.create!
@@ -9250,6 +9419,39 @@ describe Course do
 
       it "returns false" do
         expect(course.block_content_editor_enabled?).to be false
+      end
+    end
+  end
+
+  describe "syllabus versioning" do
+    let(:course) { Course.create!(name: "Test Course") }
+
+    context "when syllabus_versioning feature flag is enabled" do
+      before { Account.site_admin.enable_feature!(:syllabus_versioning) }
+
+      it "creates version when syllabus_body changes and excludes specified fields" do
+        expect do
+          course.update!(syllabus_body: "Initial syllabus content", name: "Updated Course Name")
+        end.to change { course.versions.count }.by(1)
+
+        version = course.versions.last
+        versioned_data = YAML.safe_load(version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
+        expect(versioned_data["syllabus_body"]).to eq("Initial syllabus content")
+        expect(versioned_data).to have_key("syllabus_body")
+        expect(versioned_data).to have_key("name")
+        Course::SIMPLY_VERSIONED_EXCLUDE_FIELDS.each do |excluded_field|
+          expect(versioned_data).not_to have_key(excluded_field)
+        end
+      end
+    end
+
+    context "when syllabus_versioning feature flag is disabled" do
+      before { Account.site_admin.disable_feature!(:syllabus_versioning) }
+
+      it "does not create versions when syllabus_body changes" do
+        expect do
+          course.update!(syllabus_body: "Initial syllabus content", name: "Updated Course Name")
+        end.not_to change { course.versions.count }
       end
     end
   end

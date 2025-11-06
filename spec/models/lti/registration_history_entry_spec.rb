@@ -25,6 +25,9 @@ describe Lti::RegistrationHistoryEntry do
       Lti::RegistrationHistoryEntry.new(lti_registration:,
                                         root_account: account,
                                         diff: [["+", "foo.bar", "stuff"]],
+                                        # Not actually valid internal config but doesn't matter
+                                        old_configuration: { "name" => "Old Name" },
+                                        new_configuration: { "name" => "New Name" },
                                         update_type: "manual_edit",
                                         created_by: user)
     end
@@ -53,6 +56,18 @@ describe Lti::RegistrationHistoryEntry do
       history_entry.update_type = "invalid type"
       expect(history_entry).not_to be_valid
     end
+
+    it "is invalid if configs are present & update type is for context controls" do
+      history_entry.update_type = "control_edit"
+      expect(history_entry).not_to be_valid
+    end
+
+    it "is invalid if controls are present & update type is for config changes" do
+      history_entry.update_type = "manual_edit"
+      history_entry.old_context_controls = { "1" => "foo" }
+      history_entry.new_context_controls = { "1" => "bar" }
+      expect(history_entry).not_to be_valid
+    end
   end
 
   describe "cross-shard associations" do
@@ -74,7 +89,9 @@ describe Lti::RegistrationHistoryEntry do
           root_account: shard2_account,
           diff: [["+", "foo.bar", "stuff"]],
           update_type: "manual_edit",
-          created_by:
+          created_by:,
+          old_configuration: { "name" => "Old Name" },
+          new_configuration: { "name" => "New Name" }
         )
       end
 
@@ -125,6 +142,8 @@ describe Lti::RegistrationHistoryEntry do
         expect(history_entry.comment).to eq("Updated registration name")
         expect(history_entry.update_type).to eq("manual_edit")
         expect(history_entry.created_by).to eq(user)
+        expect(history_entry.new_configuration["internal_config"])
+          .to eql(Schemas::InternalLtiConfiguration.to_sorted(registration.internal_lti_configuration))
       end
 
       it "tracks changes to the developer key" do
@@ -146,6 +165,12 @@ describe Lti::RegistrationHistoryEntry do
           ["~", ["name"], old_name, "New Dev Key Name"],
           ["~", ["email"], old_email, "new@example.com"]
         )
+
+        # Verify state columns for developer_key
+        expect(history_entry.old_configuration["developer_key"]["name"]).to eq(old_name)
+        expect(history_entry.old_configuration["developer_key"]["email"]).to eq(old_email)
+        expect(history_entry.new_configuration["developer_key"]["name"]).to eq("New Dev Key Name")
+        expect(history_entry.new_configuration["developer_key"]["email"]).to eq("new@example.com")
       end
 
       it "tracks changes to the tool configuration" do
@@ -163,6 +188,9 @@ describe Lti::RegistrationHistoryEntry do
         expect(history_entry.diff["internal_lti_configuration"]).to include(
           ["~", ["title"], old_title, "Updated Tool Title"]
         )
+
+        expect(history_entry.old_configuration["internal_config"]["title"]).to eq(old_title)
+        expect(history_entry.new_configuration["internal_config"]["title"]).to eq("Updated Tool Title")
       end
 
       it "tracks changes to overlays" do
@@ -189,6 +217,10 @@ describe Lti::RegistrationHistoryEntry do
         expect(history_entry.diff["overlay"]).to include(
           ["~", ["custom_fields", "test_field"], "original_value", "updated_value"]
         )
+
+        expect(history_entry.old_configuration["overlay"]["custom_fields"]).to eq(overlay_data["custom_fields"])
+        expect(history_entry.new_configuration["overlay"]["custom_fields"]).to eq({ "test_field" => "updated_value" })
+        expect(history_entry.new_configuration["overlaid_internal_config"]["custom_fields"]).to include({ "test_field" => "updated_value" })
       end
 
       it "tracks multiple types of changes in a single call" do
@@ -225,6 +257,18 @@ describe Lti::RegistrationHistoryEntry do
         expect(diff["overlay"]).to include(
           ["~", ["privacy_level"], overlay_data["privacy_level"], "public"]
         )
+
+        history_entry = Lti::RegistrationHistoryEntry.last
+
+        # Verify the values
+        expect(history_entry.old_configuration["registration"]["name"]).to eq(old_reg_name)
+        expect(history_entry.old_configuration["developer_key"]["email"]).to eq(old_dev_email)
+        expect(history_entry.old_configuration["overlay"]["privacy_level"]).to eq("anonymous")
+
+        expect(history_entry.new_configuration["registration"]["name"]).to eq("Multi-Change Test")
+        expect(history_entry.new_configuration["developer_key"]["email"]).to eq("multi@example.com")
+        expect(history_entry.new_configuration["overlay"]["privacy_level"]).to eq("public")
+        expect(history_entry.new_configuration["overlaid_internal_config"]["privacy_level"]).to eq("public")
       end
 
       it "returns the value from the block" do
@@ -266,6 +310,9 @@ describe Lti::RegistrationHistoryEntry do
         expect(history_entry.diff["internal_lti_configuration"]).to include(
           ["~", ["title"], old_client_name, "Updated Dynamic Registration"]
         )
+
+        expect(history_entry.old_configuration["internal_config"]["title"]).to eq(old_client_name)
+        expect(history_entry.new_configuration["internal_config"]["title"]).to eq("Updated Dynamic Registration")
       end
 
       it "tracks changes to IMS tool configuration" do
@@ -284,6 +331,9 @@ describe Lti::RegistrationHistoryEntry do
         expect(history_entry.diff["internal_lti_configuration"]).to include(
           ["~", ["domain"], "example.com", "updated.example.com"]
         )
+
+        expect(history_entry.old_configuration["internal_config"]["domain"]).to eq("example.com")
+        expect(history_entry.new_configuration["internal_config"]["domain"]).to eq("updated.example.com")
       end
 
       it "tracks changes when overlays are applied to dynamic registrations" do
@@ -314,6 +364,15 @@ describe Lti::RegistrationHistoryEntry do
         expect(history_entry.diff["overlay"]).to include(
           ["~", ["target_link_uri"], "https://different.com/launch", "https://different.com/updated_launch"]
         )
+
+        expect(history_entry.old_configuration["overlay"]["target_link_uri"])
+          .to eq("https://different.com/launch")
+        expect(history_entry.new_configuration["overlay"]["target_link_uri"])
+          .to eq("https://different.com/updated_launch")
+        expect(history_entry.old_configuration["overlaid_internal_config"]["target_link_uri"])
+          .to eq("https://different.com/launch")
+        expect(history_entry.new_configuration["overlaid_internal_config"]["target_link_uri"])
+          .to eq("https://different.com/updated_launch")
       end
     end
 
@@ -341,6 +400,9 @@ describe Lti::RegistrationHistoryEntry do
         expect(history_entry.diff["overlay"]).to include(
           ["~", [], { "test" => "value" }, nil]
         )
+
+        expect(history_entry.old_configuration["overlay"]).to eq(overlay_data)
+        expect(history_entry.new_configuration["overlay"]).to be_nil
       end
 
       it "handles when overlay is created during tracking" do
@@ -361,6 +423,8 @@ describe Lti::RegistrationHistoryEntry do
         expect(history_entry.diff["overlay"]).to include(
           ["~", [], nil, { "new_field" => "new_value" }]
         )
+        expect(history_entry.old_configuration["overlay"]).to be_nil
+        expect(history_entry.new_configuration["overlay"]).to eq({ "new_field" => "new_value" })
       end
 
       it "reloads the registration to ensure accurate tracking" do
@@ -380,6 +444,9 @@ describe Lti::RegistrationHistoryEntry do
         expect(history_entry.diff["registration"]).to include(
           ["~", ["name"], original_name, "Externally Updated"]
         )
+
+        expect(history_entry.old_configuration["registration"]["name"]).to eq(original_name)
+        expect(history_entry.new_configuration["registration"]["name"]).to eq("Externally Updated")
       end
 
       it "validates required parameters" do

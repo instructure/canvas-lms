@@ -51,55 +51,6 @@ class OverrideListPresenter
     multiple_due_dates? ? I18n.t("overrides.everyone_else", "Everyone else") : I18n.t("overrides.everyone", "Everyone")
   end
 
-  def formatted_due_for(formatted_override, other_due_dates_exist: false)
-    everyone = false
-    section_count = 0
-    group_count = 0
-    tag_count = 0
-    student_count = 0
-    mastery_paths = false
-
-    formatted_override[:options].each do |option|
-      everyone = true if ["Course", nil].include?(option)
-      section_count += 1 if option == "CourseSection"
-      group_count += 1 if option == "Group"
-      tag_count += 1 if option == "Tag"
-      if option&.include?("student")
-        count = option[/\d+/]
-        student_count += count.to_i if count
-      end
-      mastery_paths = true if option == "Noop"
-    end
-
-    have_multiple_due_dates = other_due_dates_exist || section_count > 0 || group_count > 0 || tag_count > 0 || student_count > 0 || mastery_paths
-    result = []
-    if everyone
-      result << (have_multiple_due_dates ? I18n.t("overrides.everyone_else", "Everyone else") : I18n.t("overrides.everyone", "Everyone"))
-    end
-
-    if section_count > 0
-      result << I18n.t(:section_count, { one: "%{count} Section", other: "%{count} Sections" }, count: section_count)
-    end
-
-    if group_count > 0
-      result << I18n.t(:group_count, { one: "%{count} Group", other: "%{count} Groups" }, count: group_count)
-    end
-
-    if tag_count > 0
-      result << I18n.t(:tag_count, { one: "%{count} Tag", other: "%{count} Tags" }, count: tag_count)
-    end
-
-    if student_count > 0
-      result << I18n.t(:student_count, { one: "%{count} Student", other: "%{count} Students" }, count: student_count)
-    end
-
-    if mastery_paths
-      result << I18n.t("overrides.mastery_paths", "Mastery Paths")
-    end
-
-    result.join(", ")
-  end
-
   def formatted_date_string(date_field, date_hash = {})
     date = date_hash[date_field]
     if date.present? && CanvasTime.is_fancy_midnight?(date_hash[date_field]) &&
@@ -132,13 +83,11 @@ class OverrideListPresenter
   #   if it isn't needed (e.g. if all sections have overrides).
   #
   # Returns an array of due date hashes.
-  def visible_due_dates(group_by_date: true)
+  def visible_due_dates
     return [] unless assignment
 
     overrides = assignment.dates_hash_visible_to(user)
     overrides = convert_non_collaborative_groups_to_tags_v2(overrides)
-    overrides = assignment.merge_overrides_by_date(overrides) if group_by_date
-    other_due_dates_exist = overrides.length > 1
 
     overrides.map do |due_date|
       result = {}
@@ -146,7 +95,7 @@ class OverrideListPresenter
       result[:lock_at] = lock_at(due_date)
       result[:unlock_at] = unlock_at(due_date)
       result[:due_at] = due_at(due_date)
-      result[:due_for] = group_by_date ? formatted_due_for(due_date, other_due_dates_exist:) : due_for(due_date)
+      result[:due_for] = due_for(due_date)
       result
     end
   end

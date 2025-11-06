@@ -935,8 +935,8 @@ class AccountsController < ApplicationController
     includes -= %w[permissions sections needs_grading_count total_scores]
     all_precalculated_permissions = nil
 
-    page_opts = { total_entries: nil }
-    page_opts = {} if includes.include?("ui_invoked") # let Folio calculate total entries
+    # Let Folio calculate total entries for pagination when invoked from web interface
+    page_opts = in_app? ? {} : { total_entries: nil }
 
     GuardRail.activate(:secondary) do
       @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
@@ -1370,7 +1370,6 @@ class AccountsController < ApplicationController
              enable_eportfolios
              enable_profiles
              enable_turnitin
-             enable_content_a11y_checker
              suppress_assignments
              include_integration_ids_in_gradebook_exports
              show_scheduler
@@ -2201,7 +2200,6 @@ class AccountsController < ApplicationController
                                    :enable_profiles,
                                    :enable_gravatar,
                                    :enable_turnitin,
-                                   :enable_content_a11y_checker,
                                    :equella_endpoint,
                                    :equella_teaser,
                                    :external_notification_warning,
@@ -2277,6 +2275,7 @@ class AccountsController < ApplicationController
                                    { conditional_release: [:value, :locked] }.freeze,
                                    { enable_course_paces: [:value, :locked] }.freeze,
                                    { allow_observers_in_appointment_groups: [:value] }.freeze,
+                                   { default_allow_observer_signup: [:value] }.freeze,
                                    :enable_inbox_signature_block,
                                    :disable_inbox_signature_block_for_students,
                                    :enable_inbox_auto_response,

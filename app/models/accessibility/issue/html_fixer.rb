@@ -61,9 +61,7 @@ module Accessibility
 
       def generate_fix
         html_content = resource.send(target_attribute)
-        doc = Nokogiri::HTML5(html_content, nil, **CanvasSanitize::SANITIZE[:parser_options])
-        body = doc.at_css("body")
-        extend_nokogiri_with_dom_adapter(body)
+        doc, _ = parse_html_content(html_content)
 
         begin
           # Convert relative path (./div/p) to absolute path (/html/body/div/p)
@@ -98,22 +96,27 @@ module Accessibility
       end
 
       def fix_content_base(html_content, rule, path, fix_value, full_document:)
-        doc = Nokogiri::HTML5(html_content, nil, **CanvasSanitize::SANITIZE[:parser_options])
-        body = doc.at_css("body")
-        extend_nokogiri_with_dom_adapter(body)
+        doc, _ = parse_html_content(html_content)
 
         begin
           absolute_path = path.sub(/^\./, "/html/body")
           element = doc.at_xpath(absolute_path)
           raise "Element not found for path: #{path}" unless element
 
-          changed = rule.fix!(element, fix_value)
+          # TODO: update all rules fix method to return changed element and content preview
+          changed, content_preview = rule.fix!(element, fix_value)
 
           error = changed.nil? ? nil : rule.test(changed)
 
-          fixed_path = changed.path.sub(%r{^/html/body}, ".")
+          fixed_path = changed&.path&.sub(%r{^/html/body}, ".")
 
-          content = full_document ? body.inner_html : changed.to_html
+          body = doc.at_css("body")
+          content = if full_document
+                      body.inner_html
+                    else
+                      content_preview || changed&.to_html
+                    end
+
           [content, fixed_path, error]
         rescue => e
           Rails.logger.error "Cannot fix accessibility issue due to error: #{e.message} (rule #{rule.class.id})"

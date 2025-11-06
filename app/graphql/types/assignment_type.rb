@@ -92,6 +92,15 @@ module Types
             "Boolean representing whether or not members from within the same group on a group assignment can be assigned to peer review their own group's work",
             method: :intra_group_peer_reviews,
             null: true
+      field :submission_required,
+            Boolean,
+            "Boolean indicating if students must submit their assignment before they can do peer reviews",
+            null: true
+      def submission_required
+        return nil unless object.context.feature_enabled?(:peer_review_allocation)
+
+        object.peer_review_submission_required
+      end
     end
 
     class AssignmentModeratedGrading < ApplicationObjectType
@@ -417,6 +426,12 @@ module Types
     def has_rubric
       Loaders::AssignmentLoaders::HasRubricLoader.load(object.id)
     end
+
+    field :has_plagiarism_tool, Boolean, "Indicates if the assignment has LTI 2.0 plagiarism detection tool configured", null: false
+    def has_plagiarism_tool
+      assignment.assignment_configuration_tool_lookup_ids.present?
+    end
+
     field :muted, Boolean, null: true
 
     field :assignment_visibility, [ID], null: true do
@@ -601,6 +616,16 @@ module Types
       assignment.moderated_grading?
     end
 
+    field :allow_provisional_grading, Types::AllowProvisionalGradingType, null: false, description: "Whether the current user can provide a provisional grade for this assignment"
+    def allow_provisional_grading
+      return "not_applicable" unless assignment.moderated_grading?
+      # Once grades are published, moderation is over - treat as normal assignment
+      return "not_applicable" if assignment.grades_published_at.present?
+
+      can_grade = assignment.can_be_moderated_grader?(current_user)
+      can_grade ? "allowed" : "not_allowed"
+    end
+
     field :post_manually, Boolean, null: true
     def post_manually
       Loaders::AssignmentLoaders::PostManuallyLoader.load(object.id)
@@ -729,14 +754,7 @@ module Types
       load_association(:context).then do |course|
         next unless course.root_account.feature_enabled?(:lti_asset_processor)
 
-        # Check if user has manage_grades permission or if student can read their own grade
-        if course.grants_right?(current_user, :manage_grades)
-          load_association(:lti_asset_processors)
-        elsif current_user && (submission = assignment.submissions.find_by(user: current_user))
-          if submission.user_can_read_grade?(current_user, for_plagiarism: true)
-            load_association(:lti_asset_processors)
-          end
-        end
+        load_association(:lti_asset_processors)
       end
     end
 
@@ -896,6 +914,7 @@ module Types
         scope = scope.name_like(search_term, "peer_review")
       end
 
+      context.scoped_set!(:assignment_id, assignment.id)
       scope
     end
 
@@ -922,6 +941,7 @@ module Types
                         assignment.context.feature_enabled?(:peer_review_allocation) &&
                         assignment.peer_reviews
 
+      context.scoped_set!(:assignment_id, assignment.id)
       assignment
     end
   end

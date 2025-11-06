@@ -264,6 +264,38 @@ describe('DeleteCalendarEventDialog', () => {
     })
   })
 
+  describe('appointment group deletion', () => {
+    it('renders appointment group warning text when isAppointmentGroup is true', () => {
+      const testIdPrefix = 'appointment-group-test-'
+      const {getByTestId, getByText} = renderDialog({
+        isRepeating: false,
+        isAppointmentGroup: true,
+        testIdPrefix,
+      })
+      expect(getByText('Delete for everyone?')).toBeInTheDocument()
+      expect(getByTestId(`${testIdPrefix}dialog`)).toBeInTheDocument()
+      expect(getByTestId(`${testIdPrefix}dialog-content`)).toHaveTextContent(
+        'If you delete this appointment group, all course teachers will lose access, and all student signups will be permanently deleted.',
+      )
+    })
+
+    it('renders standard dialog when isAppointmentGroup is false', () => {
+      const testIdPrefix = 'standard-test-'
+      const {getByTestId} = renderDialog({
+        isRepeating: false,
+        isAppointmentGroup: false,
+        testIdPrefix,
+      })
+      expect(getByTestId(`${testIdPrefix}dialog-content`)).toHaveTextContent(
+        'Are you sure you want to delete this event?',
+      )
+      const cancelButton = getByTestId(`${testIdPrefix}cancel-button`)
+      expect(cancelButton).toHaveTextContent('Cancel')
+      const deleteButton = getByTestId(`${testIdPrefix}delete-button`)
+      expect(deleteButton).toHaveTextContent('Delete')
+    })
+  })
+
   describe('render function', () => {
     it('renders', () => {
       const container = document.createElement('div')

@@ -62,6 +62,7 @@ module Api::V1::Course
     settings[:friendly_name] = course.friendly_name
     settings[:default_due_time] = course.default_due_time || "23:59:59"
     settings[:conditional_release] = course.conditional_release?
+    settings[:default_student_gradebook_view] = course.default_student_gradebook_view
 
     settings
   end
@@ -171,6 +172,9 @@ module Api::V1::Course
       if includes.include?("post_manually")
         hash["post_manually"] = course.post_manually?
       end
+      if Account.site_admin.feature_enabled?(:syllabus_versioning) && includes.include?("syllabus_versions") && course.grants_right?(user, :manage_course_content_edit)
+        hash["syllabus_versions"] = syllabus_versions_json(course)
+      end
       # return hash from the block for additional processing in Api::V1::CourseJson
       hash
     end
@@ -198,6 +202,21 @@ module Api::V1::Course
     hash["html_url"] = course_url(course, host: HostUrl.context_host(course, request.try(:host_with_port))) if builder.include_url
     hash["time_zone"] = course.time_zone&.tzinfo&.name
     hash
+  end
+
+  def syllabus_versions_json(course)
+    versions = course.versions.limit(5).order(number: :desc)
+    Rails.cache.fetch(["syllabus_versions", course, course.updated_at]) do
+      versions.map do |version|
+        version_data = YAML.safe_load(version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
+        {
+          version: version.number,
+          syllabus_body: api_user_content(version_data["syllabus_body"], course),
+          created_at: version.created_at,
+          updated_at: version_data["updated_at"]
+        }
+      end
+    end
   end
 
   def apply_nickname(hash, course, user, prefer_friendly_name: true)

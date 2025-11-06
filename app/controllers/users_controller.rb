@@ -413,7 +413,7 @@ class UsersController < ApplicationController
     get_context
     return unless authorized_action(@context, @current_user, :read_roster)
 
-    includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid ui_invoked]
+    includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid]
     includes << "last_login" if params[:sort] == "last_login" && !includes.include?("last_login")
     include_deleted_users = value_to_boolean(params[:include_deleted_users])
     includes << "deleted_pseudonyms" if include_deleted_users
@@ -440,7 +440,6 @@ class UsersController < ApplicationController
                                      sort: params[:sort],
                                      enrollment_role_id: params[:role_filter_id],
                                      enrollment_type: params[:enrollment_type],
-                                     ui_invoked: includes.include?("ui_invoked"),
                                      temporary_enrollment_recipients: value_to_boolean(params[:temporary_enrollment_recipients]),
                                      temporary_enrollment_providers: value_to_boolean(params[:temporary_enrollment_providers]),
                                      include_deleted_users:
@@ -459,12 +458,13 @@ class UsersController < ApplicationController
     users.preload(:pseudonyms) if includes.include? "deleted_pseudonyms"
 
     page_opts = { total_entries: nil }
-    if includes.include?("ui_invoked")
+    if in_app?
       page_opts = {} # let Folio calculate total entries
-      includes.delete("ui_invoked")
     elsif params[:sort] == "id"
       # for a more efficient way to retrieve many pages in bulk
-      users = BookmarkedCollection.wrap(Plannable::Bookmarker.new(User, params[:order] == "desc", :id), users)
+      users = BookmarkedCollection.wrap(Plannable::Bookmarker.new(User, params[:order] == "desc", :id),
+                                        users,
+                                        count_total_entries: false)
     end
 
     GuardRail.activate(:secondary) do

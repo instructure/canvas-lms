@@ -443,6 +443,15 @@ export default class EditAppointmentGroupDetails {
       contextCodes.every(c => this.contextsHash[c].allow_observers_in_appointment_groups)
     this.allowObserverOption = showObserverSignupCheckbox
     this.form.find('#observer-signup-option').toggle(showObserverSignupCheckbox)
+
+    if (showObserverSignupCheckbox && this.creating()) {
+      const shouldDefaultChecked = contextCodes.some(
+        c => this.contextsHash[c].default_allow_observer_signup,
+      )
+      this.form
+        .find('#observer-signup-option input[type="checkbox"]')
+        .prop('checked', shouldDefaultChecked)
+    }
   }
 
   disableGroups() {

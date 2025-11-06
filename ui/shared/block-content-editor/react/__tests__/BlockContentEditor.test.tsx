@@ -31,6 +31,7 @@ describe('BlockContentEditor', () => {
           data={null}
           onInit={null}
           aiAltTextGenerationURL="/api/v1/courses/1/pages/ai/alt_text"
+          toolbarReorder={false}
         />,
       )
     }).not.toThrow()

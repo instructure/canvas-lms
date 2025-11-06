@@ -23,7 +23,16 @@
     <a href="#" class="btn button-sidebar-wide edit_section_link"><i class="icon-edit"></i> <%= t('buttons.edit_section', 'Edit Section') %></a>
     <% if @section.nonxlist_course_id %>
       <% if can_do(@section.nonxlist_course, @current_user, :manage_sections_edit) %>
-        <a href="#" class="btn button-sidebar-wide uncrosslist_link"><i class="icon-off"></i> <%= t('buttons.uncrosslist_section', 'De-Cross-List this Section') %></a>
+        <div
+          id="uncrosslist_link_button_container"
+          data-props="<%= {
+            courseName: @section.nonxlist_course.name,
+            enrollmentsCount: @student_enrollments_count,
+            sectionId: @section.id.to_s,
+            courseId: @section.course.id.to_s,
+            nonxlistCourseId: @section.nonxlist_course.id.to_s
+          }.to_json %>"
+        ></div>
       <% end %>
       <a href="#" class="btn button-sidebar-wide crosslist_link"><i class="icon-off"></i> <%= t('buttons.recrosslist_section', 'Re-Cross-List this Section') %></a>
     <% else %>
@@ -292,29 +301,6 @@ h3 .tally {
     <div class="form-controls">
       <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.crosslist_this_section', 'Cross-List This Section') %></button>
       <button type="button" class="btn button-secondary cancel_button"><%= t('buttons.cancel', 'Cancel') %></button>
-    </div>
-  <% end %>
-
-  <%= form_tag context_url(@context, :context_section_uncrosslist_url, @section.id), :id => "uncrosslist_form", :title => t('titles.decrosslist_section', 'De-Cross-List this Section'), :method => :delete do %>
-    <h2><%= t('titles.decrosslist_section', 'De-Cross-List this Section') %></h2>
-    <p>
-      <%= t('prompts.are_you_sure_decrosslist', 'Are you sure you want to de-cross-list this section?') %>
-      <% if @section.nonxlist_course %>
-        <%= mt('decrosslist_description', 'This will move the section back to its original course, **%{course_name}**.', :course_name => @section.nonxlist_course.name) %>
-      <% end %>
-    </p>
-    <% if @student_enrollments_count > 0 %>
-      <p>
-        <%= t('decrosslist_long_description', %{
-        All grades for students in this course will no longer be visible.
-        You can retrieve the grades later by re-cross-listing the course,
-        but in the mean time the grades for these students will come from the original course.
-        }) %>
-      </p>
-    <% end %>
-    <div class="button-container">
-      <button type="submit" class="btn submit_button"><%= t('buttons.decrosslit_section', 'De-Cross-List This Section') %></button>
-      <button type="button" class="btn btn button-secondary cancel_button"><%= t('buttons.cancel', 'Cancel') %></button>
     </div>
   <% end %>
 </div>

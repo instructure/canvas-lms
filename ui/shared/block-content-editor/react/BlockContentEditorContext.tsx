@@ -24,13 +24,19 @@ import {createStore} from './store'
 export type BlockContentEditorContextProps = {
   data: SerializedNodes | null
   aiAltTextGenerationURL: string | null
+  toolbarReorder: boolean
 }
 
 export const BlockContentEditorContext = (
   props: PropsWithChildren<BlockContentEditorContextProps>,
 ) => {
   return (
-    <Provider store={createStore({aiAltTextGenerationURL: props.aiAltTextGenerationURL})}>
+    <Provider
+      store={createStore({
+        aiAltTextGenerationURL: props.aiAltTextGenerationURL,
+        toolbarReorder: props.toolbarReorder,
+      })}
+    >
       {props.children}
     </Provider>
   )
