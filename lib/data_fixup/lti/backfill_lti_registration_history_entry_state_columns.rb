@@ -52,6 +52,18 @@ module DataFixup::Lti::BackfillLtiRegistrationHistoryEntryStateColumns
   # @return [void]
   def self.backfill_for_root_account(registration_id, root_account_id)
     registration = Lti::Registration.where(id: registration_id).preload(:developer_key).first
+    if registration.internal_lti_configuration(include_overlay: false).empty?
+      Sentry.with_scope do |scope|
+        scope.set_context("DataFixup::Lti::BackfillLtiRegistrationHistoryEntryStateColumns", {
+                            registration_global_id: registration.global_id,
+                            root_account_id:,
+                            error: "Registration has no internal LTI configuration, cannot backfill history entries.",
+                            active: registration.active?,
+                          })
+        Sentry.capture_message("DataFixup::Lti::BackfillLtiRegistrationHistoryEntryStateColumns: Registration has no internal LTI configuration, cannot backfill history entries.")
+      end
+      return
+    end
     root_account = Account.find(root_account_id)
 
     root_account.shard.activate do
