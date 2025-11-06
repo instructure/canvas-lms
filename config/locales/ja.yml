@@ -529,7 +529,7 @@ ja:
     tab_authentication: 認証
     tab_brand_configs: テーマ
     tab_courses: コース
-    tab_developer_keys: 開発者鍵
+    tab_developer_keys: 開発者キー
     tab_extensions: 拡張機能
     tab_faculty_journal: 講師日誌
     tab_grading_standards: 採点
@@ -4504,7 +4504,7 @@ ja:
   apps_54d24a47: アプリ
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "アプリを利用すると、Canvas に新しい機能を簡単に追加できます。アプリは、個別のコースに追加することも、アカウントのすべてのコースに追加することもできます。アプリを設定すると、コース モジュールからアプリにリンクして、アセスメント ツール用の課題を作成できます。"
   apps_discover_88bf5792: "アプリ - 検索"
-  apps_is_the_central_hub_to_discover_manage_and_mon_8a20e5b2: アプリは、統合されたアプリを発見、管理、監視するための中央ハブです。強力なアプリを活用して、コンテンツ、評価、マルチメディア、コラボレーション、アナリティクス、アクセシビリティなど、デジタル教育と学習体験を拡張・強化できます。「発見する」を選択して新しいアプリを探索・インストールし、「管理する」でインストール済みのアプリを確認・管理し、「監視する」で利用状況を確認・分析できます。
+  apps_is_the_central_hub_to_discover_manage_and_mon_8a20e5b2: アプリは、統合されたアプリを探索、管理、監視するための中央ハブです。強力なアプリを活用して、コンテンツ、評価、マルチメディア、コラボレーション、アナリティクス、アクセシビリティなど、デジタル教育と学習体験を拡張・強化できます。「探す」を選択して新しいアプリを探索・インストールし、「管理」でインストール済みのアプリを確認・管理し、「監視」で利用状況を確認・分析できます。
   apps_manage_ddead75: "アプリ - 管理"
   apps_monitor_aaa3e0ca: "アプリ - モニタリング"
   apps_new_1a7a93b2: アプリケーション（新規）
@@ -11352,7 +11352,7 @@ ja:
     conferences: 会議
     confirmation: 確認
     copy_course: コースのコピー
-    developer_keys: 開発者鍵
+    developer_keys: 開発者キー
     discussions: ディスカッション
     eportfolio_welcome: "ePortfolio へようこそ"
     error_reports: "エラー レポート"
@@ -12268,7 +12268,7 @@ ja:
       notes: メモ
       show_all: "全部で %{count} 個の鍵を表示"
       stats: ステータス
-      title: 開発者鍵
+      title: 開発者キー
       user: ユーザ
     index_react: 
       add_developer_key: 開発者キーを追加
@@ -12279,7 +12279,7 @@ ja:
       confirm_delete: この開発者鍵を削除してもよろしいですか?
     no_user: ユーザなし
     unnamed_tool: 名前のないツール
-  developer_keys_d70ba44a: 開発者鍵
+  developer_keys_d70ba44a: 開発者キー
   developer_keys_manage_806da2d: "開発者キー - 管理"
   developer_keys_report_4d041e62: 開発者キーレポート
   developername_logo_88951d4: "%{developerName}ロゴ"
@@ -12415,7 +12415,7 @@ ja:
   discard_changes_e04b15f9: 変更をなしにする
   discarded_20a4e7e8: 放棄
   disccussions_515a3a99: ディスカッション
-  discover_56d42b60: 発見する
+  discover_56d42b60: 探す
   discover_something_new_or_manage_existing_lti_exte_793093cb: 何か新しいLTI拡張機能を発見するか、既存のLTI拡張機能を管理する
   discover_what_you_can_create_using_the_block_conte_65cfdebe: ブロックコンテンツエディターで作成可能な機能を発見しましょう。
   discovery_service_url_ca13d3f4: ディスカバリサービスURL
@@ -23333,8 +23333,8 @@ ja:
   mon_8f18082a: 月曜
   monday_432ff613: 月曜日
   mongolian_5467c6a8: モンゴル語
-  monitor_b908967: モニター
-  monitor_c42db0fb: モニター
+  monitor_b908967: 監視
+  monitor_c42db0fb: 監視
   month_4b83b95f: 月
   month_s_5c17590e: 月
   monthandday_starting_at_time_769b12c8: "%{monthAndDay}開始地点%{time}"
@@ -36542,7 +36542,7 @@ ja:
   tool_privacy_level_9d392813: "ツール プライバシー レベル"
   tool_returned_with_no_content_9d228702: ツールはコンテンツなしで返されました
   tool_supports_deep_linking_at_this_placement_561e1874: ツールはこの配置でディープリンクをサポートする
-  tool_toolname_found_for_client_id_clientid_would_y_13f35b91: "依頼者 ID %{clientId}のツール \"%{toolName}\" が見つかりません。インストールしますか？"
+  tool_toolname_found_for_client_id_clientid_would_y_13f35b91: "クライアント ID %{clientId} 用の「%{toolName}」が見つかりました。インストールしてよろしいですか。"
   tool_type_afa58fcb: ツールタイプ
   tool_type_tool_configured_tool_id_251c2959: ツールタイプ（ツール設定"tool_id"）
   toolname_hasn_t_requested_any_permissions_3c575c01: "*%{toolName}* は、許可を要求していません。"
