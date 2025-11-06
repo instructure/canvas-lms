@@ -23,16 +23,33 @@ module Accessibility
     included do
       after_commit :trigger_accessibility_scan_on_create,
                    on: :create,
+                   unless: -> { skip_accessibility_scan },
                    if: :a11y_checker_enabled?
 
       after_commit :trigger_accessibility_scan_on_update,
                    on: :update,
-                   unless: :deleted?,
+                   unless: -> { deleted? || skip_accessibility_scan },
                    if: :a11y_checker_enabled?
 
       after_commit :remove_accessibility_scan,
                    on: :update,
                    if: :deleted?
+
+      attr_accessor :skip_accessibility_scan
+    end
+
+    def save_without_accessibility_scan
+      @skip_accessibility_scan = true
+      save
+    ensure
+      @skip_accessibility_scan = false
+    end
+
+    def save_without_accessibility_scan!
+      @skip_accessibility_scan = true
+      save!
+    ensure
+      @skip_accessibility_scan = false
     end
 
     private

@@ -92,6 +92,18 @@ describe Accessibility::Issue::HtmlFixer do
           }
         )
       end
+
+      it "does not trigger accessibility scan when saving the fix" do
+        wiki_page
+
+        account = course.root_account
+        account.enable_feature!(:a11y_checker)
+        course.enable_feature!(:a11y_checker_eap)
+
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        html_fixer.apply_fix!
+      end
     end
   end
 

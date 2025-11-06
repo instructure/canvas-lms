@@ -36,7 +36,7 @@ module Accessibility
         fixed_content, _, error = fix_content(html_content, rule, path, value)
         if error.nil?
           resource.send("#{target_attribute}=", fixed_content)
-          resource.save!
+          resource.save_without_accessibility_scan!
           { json: { success: true }, status: :ok }
         else
           { json: { error: }, status: :bad_request }
