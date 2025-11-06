@@ -1,4 +1,4 @@
-# to use this add docker-compose/selenium.override.yml
+# to use this add inst-cli/docker-compose/selenium.override.yml
 # to your COMPOSE_FILE var in .env
 # http://127.0.0.1:7900/?autoconnect=1&resize=scale&password=secret
 # use this ^^ to peek into the test
