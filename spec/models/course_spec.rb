@@ -5841,6 +5841,114 @@ describe Course do
         section_ids = @course.section_visibilities_for(@teacher).pluck(:course_section_id)
         expect(section_ids).to match_array([@course.default_section.id, @other_section.id])
       end
+
+      it "filters out concluded enrollments when include_concluded is false" do
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+        student = user_factory(active_all: true)
+
+        # Active enrollment in section 1
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Completed enrollment in section 2
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "completed",
+          course_section: section2,
+          course: @course
+        )
+
+        # With include_concluded: false, should only see section 1
+        section_ids = @course.section_visibilities_for(student, include_concluded: false).pluck(:course_section_id)
+        expect(section_ids).to match_array([section1.id])
+
+        # With include_concluded: true (default), should see both sections
+        section_ids = @course.section_visibilities_for(student, include_concluded: true).pluck(:course_section_id)
+        expect(section_ids).to match_array([section1.id, section2.id])
+      end
+
+      it "filters out inactive enrollments when include_concluded is false" do
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+        student = user_factory(active_all: true)
+
+        # Active enrollment in section 1
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Inactive enrollment in section 2
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "inactive",
+          course_section: section2,
+          course: @course
+        )
+
+        # With include_concluded: false, should only see section 1
+        section_ids = @course.section_visibilities_for(student, include_concluded: false).pluck(:course_section_id)
+        expect(section_ids).to match_array([section1.id])
+      end
+
+      it "filters out rejected enrollments when include_concluded is false" do
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+        student = user_factory(active_all: true)
+
+        # Active enrollment in section 1
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Rejected enrollment in section 2
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "rejected",
+          course_section: section2,
+          course: @course
+        )
+
+        # With include_concluded: false, should only see section 1
+        section_ids = @course.section_visibilities_for(student, include_concluded: false).pluck(:course_section_id)
+        expect(section_ids).to match_array([section1.id])
+      end
+
+      it "filters out deleted enrollments when include_concluded is false" do
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+        student = user_factory(active_all: true)
+
+        # Active enrollment in section 1
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Deleted enrollment in section 2
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "deleted",
+          course_section: section2,
+          course: @course
+        )
+
+        # With include_concluded: false, should only see section 1
+        section_ids = @course.section_visibilities_for(student, include_concluded: false).pluck(:course_section_id)
+        expect(section_ids).to match_array([section1.id])
+      end
     end
   end
 
