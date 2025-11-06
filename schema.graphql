@@ -1263,6 +1263,7 @@ Objects that can be assigned overridden dates
 union AssignmentOverrideSet = AdhocStudents | Course | Group | Noop | Section
 
 input AssignmentPeerReviewsUpdate {
+  acrossSections: Boolean
   anonymousReviews: Boolean
   automaticReviews: Boolean
   count: Int
@@ -7741,6 +7742,11 @@ type PeerReviewStatus {
 Settings for Peer Reviews on an Assignment
 """
 type PeerReviews {
+  """
+  Boolean indicating if peer reviews can be assigned across different sections
+  """
+  acrossSections: Boolean
+
   """
   Boolean representing whether or not peer reviews are anonymous
   """

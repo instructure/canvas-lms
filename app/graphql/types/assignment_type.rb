@@ -101,6 +101,15 @@ module Types
 
         object.peer_review_submission_required
       end
+      field :across_sections,
+            Boolean,
+            "Boolean indicating if peer reviews can be assigned across different sections",
+            null: true
+      def across_sections
+        return nil unless object.context.feature_enabled?(:peer_review_allocation)
+
+        object.peer_review_across_sections
+      end
     end
 
     class AssignmentModeratedGrading < ApplicationObjectType

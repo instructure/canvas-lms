@@ -2684,6 +2684,119 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
+    describe "peer_review_across_sections" do
+      before do
+        @course.enable_feature!(:peer_review_allocation)
+      end
+
+      it "creates assignment with peer_review_across_sections set to true" do
+        json = api_create_assignment_in_course(@course, {
+                                                 "name" => "test assignment",
+                                                 "peer_reviews" => true,
+                                                 "peer_review_across_sections" => true
+                                               })
+
+        assignment = Assignment.find(json["id"])
+        expect(json["peer_review_across_sections"]).to be true
+        expect(assignment.peer_review_across_sections).to be true
+      end
+
+      it "creates assignment with peer_review_across_sections set to false" do
+        json = api_create_assignment_in_course(@course, {
+                                                 "name" => "test assignment",
+                                                 "peer_reviews" => true,
+                                                 "peer_review_across_sections" => false
+                                               })
+
+        assignment = Assignment.find(json["id"])
+        expect(json["peer_review_across_sections"]).to be false
+        expect(assignment.peer_review_across_sections).to be false
+      end
+
+      it "defaults peer_review_across_sections to true when not provided" do
+        json = api_create_assignment_in_course(@course, {
+                                                 "name" => "test assignment",
+                                                 "peer_reviews" => true
+                                               })
+
+        assignment = Assignment.find(json["id"])
+        expect(json["peer_review_across_sections"]).to be true
+        expect(assignment.peer_review_across_sections).to be true
+      end
+
+      it "updates assignment peer_review_across_sections to false" do
+        assignment = @course.assignments.create!(name: "test assignment", peer_reviews: true)
+
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+                 {
+                   controller: "assignments_api",
+                   action: "update",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   id: assignment.to_param
+                 },
+                 { assignment: { peer_review_across_sections: false } })
+
+        assignment.reload
+        expect(assignment.peer_review_across_sections).to be false
+      end
+
+      it "updates assignment peer_review_across_sections to true" do
+        assignment = @course.assignments.create!(
+          name: "test assignment",
+          peer_reviews: true,
+          peer_review_across_sections: false
+        )
+
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+                 {
+                   controller: "assignments_api",
+                   action: "update",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   id: assignment.to_param
+                 },
+                 { assignment: { peer_review_across_sections: true } })
+
+        assignment.reload
+        expect(assignment.peer_review_across_sections).to be true
+      end
+
+      context "when feature flag is off" do
+        before do
+          @course.disable_feature!(:peer_review_allocation)
+        end
+
+        it "does not include peer_review_across_sections in the API response" do
+          json = api_create_assignment_in_course(@course, {
+                                                   "name" => "test assignment",
+                                                   "peer_reviews" => true
+                                                 })
+
+          expect(json).not_to have_key("peer_review_across_sections")
+        end
+
+        it "does not include peer_review_across_sections when updating" do
+          assignment = @course.assignments.create!(name: "test assignment", peer_reviews: true)
+
+          json = api_call(:put,
+                          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+                          {
+                            controller: "assignments_api",
+                            action: "update",
+                            format: "json",
+                            course_id: @course.id.to_s,
+                            id: assignment.to_param
+                          },
+                          { assignment: { peer_reviews: true } })
+
+          expect(json).not_to have_key("peer_review_across_sections")
+        end
+      end
+    end
+
     context "create_api_assignment: peer review sub assignment creation logic" do
       before do
         @course.enable_feature!(:peer_review_grading)
