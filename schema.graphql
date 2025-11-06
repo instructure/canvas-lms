@@ -9332,7 +9332,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   _id: ID!
   anonymousId: ID
   assignedAssessments: [AssessmentRequest!]
-  assignment: Assignment
+  assignment: Assignment!
   assignmentId: ID!
   attachment: File
   attachments: [File!]
@@ -9774,7 +9774,7 @@ enum SubmissionGradingStatus {
 type SubmissionHistory implements SubmissionInterface & Timestamped {
   anonymousId: ID
   assignedAssessments: [AssessmentRequest!]
-  assignment: Assignment
+  assignment: Assignment!
   assignmentId: ID!
   attachment: File
   attachments: [File!]
@@ -10000,7 +10000,7 @@ Types for submission or submission history
 interface SubmissionInterface {
   anonymousId: ID
   assignedAssessments: [AssessmentRequest!]
-  assignment: Assignment
+  assignment: Assignment!
   assignmentId: ID!
   attachment: File
   attachments: [File!]

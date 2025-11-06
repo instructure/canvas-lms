@@ -122,7 +122,7 @@ module Interfaces::SubmissionInterface
 
   field :anonymous_id, ID, null: true
 
-  field :assignment, Types::AssignmentType, null: true
+  field :assignment, Types::AssignmentType, null: false
   def assignment
     load_association(:assignment)
   end
