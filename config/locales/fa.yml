@@ -10741,6 +10741,7 @@ fa:
         folder_locked: "پوشه \"%{folder},\" که این فایل در آن قرار دارد، قفل شده است."
     no_preview: 
       file_previews: 
+        download: بارگیری
         download_file: "بارگیری *filename*"
         no_preview_available: "هیچ پیش نمایشی برای این فایل موجود نیست."
   file_rename_form: 
@@ -21444,6 +21445,7 @@ fa:
         decrosslist_section: "لغو فهرست بندی متقابل این بخش"
   sections_6d057c07: "بخش ها"
   sections_94731e51: بخش‌ها
+  sections_are_an_additional_way_to_organize_users_t_57551e0: "بخش ها روش دیگری برای سازماندهی کاربران هستند. این روش شما امکان می دهد چند کلاس را از یک درس تدریس کنید، تا کل محتوای درس را یکجا داشته باشید. در قسمت زیر می توانید یک کاربر را به یک بخش دیگر منتقل کنید، یا ثبت نام های بخش را حذف یا اضافه کنید. کاربران همیشه باید حداقل در یک بخش باشند."
   security_7a7e8808: امنیت
   security_tab_failed_to_load_2d2242a: "بارگذاری زبانه امنیتی انجام نشد."
   see_more_in_canvas_guides_fc90a457: "موارد بیشتر را در راهنمای کانواس ببینید"
