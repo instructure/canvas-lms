@@ -75,7 +75,7 @@
     "@instructure/debounce": "10.26.3",
     "@instructure/emotion": "10.26.3",
     "@instructure/k5uploader": "*",
-    "@instructure/media-capture": "^9.0.0",
+    "@instructure/media-capture": "^11.5.1",
     "@instructure/theme-registry": "10.26.3",
     "@instructure/ui-a11y-content": "10.26.3",
     "@instructure/ui-a11y-utils": "10.26.3",
