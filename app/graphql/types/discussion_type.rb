@@ -230,10 +230,13 @@ module Types
 
     field :child_topics, [Types::DiscussionType], null: true
     def child_topics
+      # Group discussion topics - visibility follows root topic permissions (teachers see unpublished, students don't).
       load_association(:child_topics).then do |child_topics|
         Loaders::AssociationLoader.for(DiscussionTopic, :context).load_many(child_topics).then do
-          child_topics = child_topics.select { |ct| ct.active? && ct.context.active? }
-          child_topics.sort_by { |ct| ct.context.name }
+          active_topics = child_topics.select { |ct| ct.context&.active? && !ct.deleted? }
+          return [] unless object.visible_for?(current_user)
+
+          active_topics.sort_by { |ct| ct.context.name }
         end
       end
     end
