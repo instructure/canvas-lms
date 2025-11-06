@@ -63,7 +63,7 @@ export default function UncrosslistForm({
         method: 'DELETE',
       })
       // On success, redirect to the section page in the original (nonxlist) course
-      addFlashNoticeForNextPage('success', 'Section successfully de-cross-listed!')
+      addFlashNoticeForNextPage('success', I18n.t('Section successfully de-cross-listed!'))
       window.location.href = `/courses/${nonxlistCourseId}/sections/${sectionId}`
     } catch (error) {
       setIsSubmitting(false)
