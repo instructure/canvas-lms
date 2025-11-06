@@ -143,6 +143,23 @@ describe "Improved Learning Mastery Gradebook" do
         wait_for_ajaximations
         expect(LearningMasteryGradebookPage.student_cells.size).to eq(30)
       end
+
+      it "resets to page 1 when students per page is changed" do
+        register_and_enroll_students(50)
+        navigate_to_gradebook
+
+        LearningMasteryGradebookPage.page_button(2).click
+        wait_for_ajaximations
+
+        expect(LearningMasteryGradebookPage.current_page_text).to eq("2")
+
+        per_page_dropdown = LearningMasteryGradebookPage.per_page_dropdown
+        click_INSTUI_Select_option(per_page_dropdown, "30")
+        wait_for_ajaximations
+
+        expect(LearningMasteryGradebookPage.current_page_text).to eq("1")
+        expect(LearningMasteryGradebookPage.student_cells.size).to eq(30)
+      end
     end
   end
 end

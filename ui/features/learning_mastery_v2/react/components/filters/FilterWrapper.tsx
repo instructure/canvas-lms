@@ -17,7 +17,6 @@
  */
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
 import {Pagination} from '../../types/rollup'
 import {TotalStudentText} from '../pagination/TotalStudentText'
 import {StudentPerPageSelector} from '../pagination/StudentPerPageSelector'
