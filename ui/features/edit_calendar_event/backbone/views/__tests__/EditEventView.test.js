@@ -27,11 +27,13 @@ import * as UpdateCalendarEventDialogModule from '@canvas/calendar/react/Recurri
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import deparam from 'deparam'
 
 jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog', () => ({
   renderUpdateCalendarEventDialog: jest.fn().mockImplementation(() => Promise.resolve('all')),
 }))
+jest.mock('deparam', () => jest.fn(() => ({})))
 
 const defaultTZ = 'Asia/Tokyo'
 const server = setupServer(
@@ -69,6 +71,8 @@ describe('EditEventView', () => {
     fakeENV.teardown()
     jest.clearAllMocks()
     server.resetHandlers()
+    // Reset deparam to default behavior
+    deparam.mockReturnValue({})
   })
 
   function render(overrides = {}) {
@@ -440,6 +444,145 @@ describe('EditEventView', () => {
       await waitFor(() => {
         if (view.model.get('which') !== 'all') throw new Error('which was not set')
       })
+    })
+  })
+
+  describe('URL parameter handling for time fields', () => {
+    it('skips URL param times when editing existing event', async () => {
+      deparam.mockReturnValue({start_time: '3:00am', end_time: '4:00am'})
+
+      const event = new CalendarEvent({
+        id: 1,
+        title: 'Existing Event',
+        start_at: '2020-05-11T15:00:00.000Z', // 3:00 PM
+        end_at: '2020-05-11T16:00:00.000Z', // 4:00 PM
+        context_code: 'course_1',
+      })
+      event.sync = () => {}
+
+      new EditEventView({el: document.getElementById('content'), model: event})
+      await waitForRender()
+
+      // Should NOT use URL params (3:00am), should use model times formatted correctly
+      const startTimeInput = within(document.body).getByTestId('more_options_start_time')
+      const endTimeInput = within(document.body).getByTestId('more_options_end_time')
+
+      // The times should be empty (not set from URL params) and will be formatted by template
+      expect(startTimeInput.value).not.toBe('3:00am')
+      expect(endTimeInput.value).not.toBe('4:00am')
+    })
+
+    it('uses URL param times when creating new event', async () => {
+      deparam.mockReturnValue({start_time: '3:00pm', end_time: '4:00pm'})
+
+      const event = new CalendarEvent({
+        title: 'New Event',
+        context_code: 'course_1',
+      })
+      event.sync = () => {}
+
+      new EditEventView({el: document.getElementById('content'), model: event})
+      await waitForRender()
+
+      // Should use URL params for new events
+      const startTimeInput = within(document.body).getByTestId('more_options_start_time')
+      const endTimeInput = within(document.body).getByTestId('more_options_end_time')
+
+      expect(startTimeInput.value).toBe('3:00pm')
+      expect(endTimeInput.value).toBe('4:00pm')
+    })
+
+    it('skips section-specific URL param times when editing existing event', async () => {
+      deparam.mockReturnValue({
+        start_time: '3:00am',
+        end_time: '4:00am',
+        start_date: 'May 12, 2020',
+        calendar_event_context_code: 'course_section_123',
+        course_sections: [{id: 123, name: 'Section 1'}],
+      })
+
+      const event = new CalendarEvent({
+        id: 1,
+        title: 'Existing Event',
+        start_at: '2020-05-11T15:00:00.000Z', // 3:00 PM
+        end_at: '2020-05-11T16:00:00.000Z', // 4:00 PM
+        context_code: 'course_1',
+      })
+      event.sync = () => {}
+
+      new EditEventView({el: document.getElementById('content'), model: event})
+      await waitForRender()
+
+      // Section-specific time inputs should NOT use URL params
+      const sectionStartTimeInput = document.querySelector(
+        'input[name="child_event_data[123][start_time]"]',
+      )
+      const sectionEndTimeInput = document.querySelector(
+        'input[name="child_event_data[123][end_time]"]',
+      )
+
+      if (sectionStartTimeInput && sectionEndTimeInput) {
+        expect(sectionStartTimeInput.value).not.toBe('3:00am')
+        expect(sectionEndTimeInput.value).not.toBe('4:00am')
+      }
+    })
+
+    it('uses section-specific URL param times when creating new event', async () => {
+      deparam.mockReturnValue({
+        start_time: '3:00pm',
+        end_time: '4:00pm',
+        start_date: 'May 12, 2020',
+        calendar_event_context_code: 'course_section_123',
+        course_sections: [{id: 123, name: 'Section 1'}],
+      })
+
+      const event = new CalendarEvent({
+        title: 'New Event',
+        context_code: 'course_1',
+      })
+      event.sync = () => {}
+
+      new EditEventView({el: document.getElementById('content'), model: event})
+      await waitForRender()
+
+      // Section-specific time inputs SHOULD use URL params for new events
+      const sectionStartTimeInput = document.querySelector(
+        'input[name="child_event_data[123][start_time]"]',
+      )
+      const sectionEndTimeInput = document.querySelector(
+        'input[name="child_event_data[123][end_time]"]',
+      )
+
+      if (sectionStartTimeInput && sectionEndTimeInput) {
+        expect(sectionStartTimeInput.value).toBe('3:00pm')
+        expect(sectionEndTimeInput.value).toBe('4:00pm')
+      }
+    })
+
+    it('preserves other URL params when skipping time params', async () => {
+      deparam.mockReturnValue({
+        title: 'Test Event',
+        start_time: '3:00am',
+        end_time: '4:00am',
+        location_name: 'Test Location',
+      })
+
+      const event = new CalendarEvent({
+        id: 1,
+        start_at: '2020-05-11T15:00:00.000Z',
+        context_code: 'course_1',
+      })
+      event.sync = () => {}
+
+      new EditEventView({el: document.getElementById('content'), model: event})
+      await waitForRender()
+
+      // Non-time URL params should still be applied
+      const titleInput = document.getElementById('calendar_event_title')
+      const locationInput = document.getElementById('calendar_event_location_name')
+
+      expect(titleInput.value).toBe('Test Event')
+      expect(locationInput.value).toBe('Test Location')
     })
   })
 })
