@@ -562,7 +562,7 @@ const PeerReviewAllocationRulesTray = ({
               <Text>
                 {I18n.t('For peer review configuration return to ')}
                 <Link
-                  isWithinText={false}
+                  isWithinText={true}
                   href={`/courses/${ENV.COURSE_ID}/assignments/${assignmentId}/edit?scrollTo=assignment_peer_reviews_fields`}
                 >
                   {I18n.t('Edit Assignment')}
