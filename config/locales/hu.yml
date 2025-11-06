@@ -11081,6 +11081,7 @@ hu:
         folder_locked: "A \"%{folder}\" mappa, amely ezt a fájl tartalmazza, zárolva lett."
     no_preview: 
       file_previews: 
+        download: Letöltés
         download_file: "*filename* letöltése"
         no_preview_available: "Ehhez a fájlhoz nincs előnézet."
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "A fájl(ok) minden oldalon megjelennek a Canvas asztali alkalmazásban."
@@ -22197,6 +22198,7 @@ hu:
   sections_6d057c07: szekciók
   sections_94731e51: Szekciók
   sections_aef3ebf2: "Szekciók:"
+  sections_are_an_additional_way_to_organize_users_t_57551e0: "A szekciók létrehozása egy további lehetőséget biztosít a felhasználók csoportosítására. Engedélyezi, hogy több csoportot tanítson ugyanazon kurzuson belül, oly módon, hogy az összes kurzustartalom egy helyen legyen. Az alábbi részen felhasználókat tud mozgatni egy másik szekcióba, vagy hozzáadni/eltávolítani szekcióbeiratkozásokat. A felhasználóknak legalább egy szekcióban jelen kell lenniük."
   security_7a7e8808: Biztonság
   security_setting_to_restrict_join_urls_to_a_confer_258d3605: "Biztonsági beállítás a konferenciához csatlakozó URL-ek korlátozásához"
   security_tab_failed_to_load_2d2242a: "Nem sikerült betölteni a Biztonság fület."
