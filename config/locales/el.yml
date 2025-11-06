@@ -6622,6 +6622,7 @@ el:
         folder_locked: "Ο φάκελος «%{folder}» που περιέχει αυτό το αρχείο είναι κλειδωμένος."
     no_preview: 
       file_previews: 
+        download: Λήψη
         download_file: "Λήψη του *όνομα αρχείου*"
         no_preview_available: "Δεν υπάρχει διαθέσιμη προεπισκόπηση για αυτό το αρχείο."
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "Το/α αρχείο/α θα περιληφθεί/ούν σε όλες τις σελίδες της εφαρμογής desktop του Canvas."
@@ -13685,6 +13686,7 @@ el:
         current_enrollments: "Τρέχουσες εγγραφές"
         decrosslist_section: "Επαναφορά αυτού του Τομέα στη Λίστα"
   sections_94731e51: Τμήματα
+  sections_are_an_additional_way_to_organize_users_t_57551e0: "<mrk mid=\"6641\" mtype=\"seg\">Οι τομείς είναι άλλος ένας τρόπος οργάνωσης των χρηστών.</mrk> <mrk mid=\"6642\" mtype=\"seg\">Σας επιτρέπει να διδάσκετε πολλαπλές ομάδες για το ίδιο μάθημα, ώστε όλο το περιεχόμενο του μαθήματος να βρίσκεται σε ένα σημείο.</mrk> <mrk mid=\"6643\" mtype=\"seg\">Παρακάτω μπορείτε να μεταφέρετε κάποιον χρήστη σε διαφορετικό τομέα ή/και να προσθέσετε/αφαιρέσετε εγγραφές στον τομέα.</mrk> <mrk mid=\"6644\" mtype=\"seg\">Οι χρήστες θα πρέπει να βρίσκονται όλοι τουλάχιστον σε έναν τομέα την ίδια στιγμή.</mrk>"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Δείτε μερικά εργαλεία LTI* που λειτουργούν τέλεια με το Canvas."
   see_this_assignment_in_speedgrader_14b8abaf: "Εμφάνιση της εργασίας στο speedgrader"
   see_vericite_results_b44dd8c8: "Προβολή των αποτελεσμάτων του VeriCite"
