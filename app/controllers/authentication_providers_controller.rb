@@ -264,7 +264,7 @@ class AuthenticationProvidersController < ApplicationController
   #
   # @returns AuthenticationProvider
   def show
-    aac = @account.authentication_providers.active.find(params[:id])
+    aac = load_aac(params[:id])
     return if aac.auth_type != "canvas" && !require_root_account_management
 
     render json: aac_json(aac)
@@ -745,7 +745,7 @@ class AuthenticationProvidersController < ApplicationController
   # @returns AuthenticationProvider
   def update
     aac_data = params.fetch(:authentication_provider, params)
-    aac = @account.authentication_providers.active.find params[:id]
+    aac = load_aac(params[:id])
     aac_data["auth_type"] ||= aac.auth_type
     update_deprecated_account_settings_data(aac_data, aac)
     position = aac_data.delete(:position)
@@ -793,7 +793,8 @@ class AuthenticationProvidersController < ApplicationController
   #   curl -X DELETE 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers/<id>' \
   #        -H 'Authorization: Bearer <token>'
   def destroy
-    aac = @account.authentication_providers.active.find params[:id]
+    aac = load_aac(params[:id])
+
     aac.destroy
 
     respond_to do |format|
@@ -1103,5 +1104,9 @@ class AuthenticationProvidersController < ApplicationController
 
   def ldap_providers(account)
     account.authentication_providers.active.where(auth_type: "ldap")
+  end
+
+  def load_aac(aac_id)
+    @account.authentication_providers.active.find(aac_id)
   end
 end
