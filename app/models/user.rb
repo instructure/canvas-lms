@@ -2799,7 +2799,7 @@ class User < ActiveRecord::Base
     filter_after_db = !opts[:use_db_filter] &&
                       (context_codes.grep(/\Acourse_\d+\z/).count > Setting.get("filter_events_by_section_code_threshold", "25").to_i)
 
-    section_codes = section_context_codes(context_codes, filter_after_db)
+    section_codes = section_context_codes(context_codes, filter_after_db, include_concluded: false)
     limit = filter_after_db ? opts[:limit] * 2 : opts[:limit] # pull extra events just in case
     events = CalendarEvent.active.for_user_and_context_codes(self, context_codes, section_codes)
                           .between(now, opts[:end_at]).limit(limit).order(:start_at).to_a.reject(&:hidden?)
@@ -2810,7 +2810,7 @@ class User < ActiveRecord::Base
         section_ids = events.map(&:context_code).grep(/\Acourse_section_\d+\z/).map { |s| s.delete_prefix("course_section_").to_i }
         section_course_codes = Course.joins(:course_sections).where(course_sections: { id: section_ids })
                                      .pluck(:id).map { |id| "course_#{id}" }
-        visible_section_codes = section_context_codes(section_course_codes)
+        visible_section_codes = section_context_codes(section_course_codes, false, include_concluded: false)
         events.reject! { |e| e.context_code.start_with?("course_section_") && !visible_section_codes.include?(e.context_code) }
         events = events.first(opts[:limit]) # strip down to the original limit
       end
@@ -3066,7 +3066,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def section_context_codes(context_codes, skip_visibility_filter = false)
+  def section_context_codes(context_codes, skip_visibility_filter = false, include_concluded: true)
     course_ids = context_codes.grep(/\Acourse_\d+\z/).map { |s| s.delete_prefix("course_").to_i }
     return [] unless course_ids.present?
 
@@ -3076,7 +3076,7 @@ class User < ActiveRecord::Base
     else
       full_course_ids = []
       Course.where(id: course_ids).each do |course|
-        result = course.course_section_visibility(self)
+        result = course.course_section_visibility(self, include_concluded:)
         case result
         when Array
           section_ids.concat(result)

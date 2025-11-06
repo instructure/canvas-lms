@@ -642,6 +642,251 @@ describe CalendarEventsApiController, type: :request do
       expect(json.detect { |e| e["id"] == event.child_events.first.id && e["hidden"] == false }).to be_present
     end
 
+    it "does not show section-specific events to students with inactive enrollment in that section" do
+      # Create two sections
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+
+      # Create a student
+      student = user_factory(active_all: true, active_state: "active")
+
+      # Enroll the student in section 1 (active)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "active",
+        course_section: section1,
+        course: @course
+      )
+
+      # Enroll the student in section 2 (inactive)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "inactive",
+        course_section: section2,
+        course: @course
+      )
+
+      # Create an event only for section 2 (where student is inactive)
+      event = @course.calendar_events.build(
+        title: "Section 2 Only Event",
+        child_event_data: {
+          "0" => {
+            start_at: "2012-01-09 12:00:00",
+            end_at: "2012-01-09 13:00:00",
+            context_code: section2.asset_string
+          }
+        }
+      )
+      event.updating_user = @teacher
+      event.save!
+
+      # Create an event for section 1 (where student is active)
+      event_section1 = @course.calendar_events.build(
+        title: "Section 1 Event",
+        child_event_data: {
+          "0" => {
+            start_at: "2012-01-09 12:00:00",
+            end_at: "2012-01-09 13:00:00",
+            context_code: section1.asset_string
+          }
+        }
+      )
+      event_section1.updating_user = @teacher
+      event_section1.save!
+
+      # Make API call as the student
+      json = api_call_as_user(
+        student,
+        :get,
+        "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}",
+        {
+          controller: "calendar_events_api",
+          action: "index",
+          format: "json",
+          context_codes: ["course_#{@course.id}"],
+          start_date: "2012-01-07",
+          end_date: "2012-01-19"
+        }
+      )
+
+      # Student should see the event from section 1 (active enrollment)
+      expect(json.detect { |e| e["id"] == event_section1.child_events.first.id }).to be_present
+
+      # Student should NOT see the event from section 2 (inactive enrollment)
+      expect(json.detect { |e| e["id"] == event.child_events.first.id }).to be_nil
+    end
+
+    it "does not show section-specific events to students with completed enrollment in that section" do
+      # Create two sections
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+
+      # Create a student
+      student = user_factory(active_all: true, active_state: "active")
+
+      # Enroll the student in section 1 (active)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "active",
+        course_section: section1,
+        course: @course
+      )
+
+      # Enroll the student in section 2 (completed/concluded)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "completed",
+        course_section: section2,
+        course: @course
+      )
+
+      # Create an event only for section 2 (where student is concluded)
+      event = @course.calendar_events.build(
+        title: "Section 2 Only Event",
+        child_event_data: {
+          "0" => {
+            start_at: "2012-01-09 12:00:00",
+            end_at: "2012-01-09 13:00:00",
+            context_code: section2.asset_string
+          }
+        }
+      )
+      event.updating_user = @teacher
+      event.save!
+
+      # Make API call as the student
+      json = api_call_as_user(
+        student,
+        :get,
+        "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}",
+        {
+          controller: "calendar_events_api",
+          action: "index",
+          format: "json",
+          context_codes: ["course_#{@course.id}"],
+          start_date: "2012-01-07",
+          end_date: "2012-01-19"
+        }
+      )
+
+      # Student should NOT see the event from section 2 (completed enrollment)
+      expect(json.detect { |e| e["id"] == event.child_events.first.id }).to be_nil
+    end
+
+    it "does not show section-specific events to students with rejected enrollment in that section" do
+      # Create two sections
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+
+      # Create a student
+      student = user_factory(active_all: true, active_state: "active")
+
+      # Enroll the student in section 1 (active)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "active",
+        course_section: section1,
+        course: @course
+      )
+
+      # Enroll the student in section 2 (rejected)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "rejected",
+        course_section: section2,
+        course: @course
+      )
+
+      # Create an event only for section 2 (where student is rejected)
+      event = @course.calendar_events.build(
+        title: "Section 2 Only Event",
+        child_event_data: {
+          "0" => {
+            start_at: "2012-01-09 12:00:00",
+            end_at: "2012-01-09 13:00:00",
+            context_code: section2.asset_string
+          }
+        }
+      )
+      event.updating_user = @teacher
+      event.save!
+
+      # Make API call as the student
+      json = api_call_as_user(
+        student,
+        :get,
+        "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}",
+        {
+          controller: "calendar_events_api",
+          action: "index",
+          format: "json",
+          context_codes: ["course_#{@course.id}"],
+          start_date: "2012-01-07",
+          end_date: "2012-01-19"
+        }
+      )
+
+      # Student should NOT see the event from section 2 (rejected enrollment)
+      expect(json.detect { |e| e["id"] == event.child_events.first.id }).to be_nil
+    end
+
+    it "does not show section-specific events to students with deleted enrollment in that section" do
+      # Create two sections
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+
+      # Create a student
+      student = user_factory(active_all: true, active_state: "active")
+
+      # Enroll the student in section 1 (active)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "active",
+        course_section: section1,
+        course: @course
+      )
+
+      # Enroll the student in section 2 (deleted)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "deleted",
+        course_section: section2,
+        course: @course
+      )
+
+      # Create an event only for section 2 (where student is deleted)
+      event = @course.calendar_events.build(
+        title: "Section 2 Only Event",
+        child_event_data: {
+          "0" => {
+            start_at: "2012-01-09 12:00:00",
+            end_at: "2012-01-09 13:00:00",
+            context_code: section2.asset_string
+          }
+        }
+      )
+      event.updating_user = @teacher
+      event.save!
+
+      # Make API call as the student
+      json = api_call_as_user(
+        student,
+        :get,
+        "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}",
+        {
+          controller: "calendar_events_api",
+          action: "index",
+          format: "json",
+          context_codes: ["course_#{@course.id}"],
+          start_date: "2012-01-07",
+          end_date: "2012-01-19"
+        }
+      )
+
+      # Student should NOT see the event from section 2 (deleted enrollment)
+      expect(json.detect { |e| e["id"] == event.child_events.first.id }).to be_nil
+    end
+
     it "doesn't allow account admins to view events for courses they don't have access to" do
       sub_account1 = Account.default.sub_accounts.create!
       course_with_teacher(active_all: true, account: sub_account1)

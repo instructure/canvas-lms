@@ -2901,6 +2901,129 @@ describe User do
   end
 
   describe "event methods" do
+    describe "section_context_codes" do
+      it "filters out concluded enrollments when include_concluded is false" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (completed)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "completed",
+          course_section: section2,
+          course: @course
+        )
+
+        context_codes = ["course_#{@course.id}"]
+
+        # With include_concluded: false, should only see section 1
+        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        expect(section_codes).to include(section1.asset_string)
+        expect(section_codes).not_to include(section2.asset_string)
+
+        # With include_concluded: true (default), should see both sections
+        section_codes = @student.section_context_codes(context_codes, false, include_concluded: true)
+        expect(section_codes).to include(section1.asset_string)
+        expect(section_codes).to include(section2.asset_string)
+      end
+
+      it "filters out inactive enrollments when include_concluded is false" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (inactive)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "inactive",
+          course_section: section2,
+          course: @course
+        )
+
+        context_codes = ["course_#{@course.id}"]
+
+        # With include_concluded: false, should only see section 1
+        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        expect(section_codes).to include(section1.asset_string)
+        expect(section_codes).not_to include(section2.asset_string)
+      end
+
+      it "filters out rejected enrollments when include_concluded is false" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (rejected)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "rejected",
+          course_section: section2,
+          course: @course
+        )
+
+        context_codes = ["course_#{@course.id}"]
+
+        # With include_concluded: false, should only see section 1
+        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        expect(section_codes).to include(section1.asset_string)
+        expect(section_codes).not_to include(section2.asset_string)
+      end
+
+      it "filters out deleted enrollments when include_concluded is false" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (deleted)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "deleted",
+          course_section: section2,
+          course: @course
+        )
+
+        context_codes = ["course_#{@course.id}"]
+
+        # With include_concluded: false, should only see section 1
+        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        expect(section_codes).to include(section1.asset_string)
+        expect(section_codes).not_to include(section2.asset_string)
+      end
+    end
+
     describe "upcoming_events" do
       before(:once) { course_with_teacher(active_all: true) }
 
@@ -2963,6 +3086,141 @@ describe User do
           EnrollmentState.recalculate_expired_states # runs periodically in background
           expect(User.find(@user.id).upcoming_events).not_to include(event) # re-find user to clear cached_contexts
         end
+      end
+
+      it "doesn't include calendar events for sections with inactive enrollments" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (inactive)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "inactive",
+          course_section: section2,
+          course: @course
+        )
+
+        # Create event for section 1 (active enrollment)
+        event1 = @course.calendar_events.build(
+          title: "Section 1 Event",
+          child_event_data: {
+            "0" => {
+              start_at: 2.days.from_now,
+              end_at: 2.days.from_now + 1.hour,
+              context_code: section1.asset_string
+            }
+          }
+        )
+        event1.updating_user = @teacher
+        event1.save!
+
+        # Create event for section 2 (inactive enrollment)
+        event2 = @course.calendar_events.build(
+          title: "Section 2 Event",
+          child_event_data: {
+            "0" => {
+              start_at: 3.days.from_now,
+              end_at: 3.days.from_now + 1.hour,
+              context_code: section2.asset_string
+            }
+          }
+        )
+        event2.updating_user = @teacher
+        event2.save!
+
+        # Student should see event from section 1 but not section 2
+        events = @student.upcoming_events(end_at: 1.week.from_now)
+        expect(events).to include(event1.child_events.first)
+        expect(events).not_to include(event2.child_events.first)
+      end
+
+      it "doesn't include calendar events for sections with rejected enrollments" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (rejected)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "rejected",
+          course_section: section2,
+          course: @course
+        )
+
+        # Create event for section 2 (rejected enrollment)
+        event = @course.calendar_events.build(
+          title: "Section 2 Event",
+          child_event_data: {
+            "0" => {
+              start_at: 2.days.from_now,
+              end_at: 2.days.from_now + 1.hour,
+              context_code: section2.asset_string
+            }
+          }
+        )
+        event.updating_user = @teacher
+        event.save!
+
+        # Student should not see event from section 2 (rejected enrollment)
+        events = @student.upcoming_events(end_at: 1.week.from_now)
+        expect(events).not_to include(event.child_events.first)
+      end
+
+      it "doesn't include calendar events for sections with deleted enrollments" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (deleted)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "deleted",
+          course_section: section2,
+          course: @course
+        )
+
+        # Create event for section 2 (deleted enrollment)
+        event = @course.calendar_events.build(
+          title: "Section 2 Event",
+          child_event_data: {
+            "0" => {
+              start_at: 2.days.from_now,
+              end_at: 2.days.from_now + 1.hour,
+              context_code: section2.asset_string
+            }
+          }
+        )
+        event.updating_user = @teacher
+        event.save!
+
+        # Student should not see event from section 2 (deleted enrollment)
+        events = @student.upcoming_events(end_at: 1.week.from_now)
+        expect(events).not_to include(event.child_events.first)
       end
 
       it "shows assignments assigned to a section in correct order" do

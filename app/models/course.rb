@@ -3061,7 +3061,12 @@ class Course < ActiveRecord::Base
   ADMIN_TYPES = %w[TeacherEnrollment TaEnrollment DesignerEnrollment].freeze
   def section_visibilities_for(user, opts = {})
     fetch_on_enrollments("section_visibilities_for", user, opts) do
-      workflow_not = opts[:excluded_workflows] || "deleted"
+      include_concluded = opts.fetch(:include_concluded, true)
+      workflow_not = if include_concluded
+                       opts[:excluded_workflows] || %w[deleted rejected inactive]
+                     else
+                       opts[:excluded_workflows] || %w[completed deleted rejected inactive]
+                     end
 
       enrollment_rows = all_enrollments
                         .where(user:)
