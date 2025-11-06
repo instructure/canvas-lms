@@ -744,4 +744,74 @@ describe('PeerReviewAllocationRulesTray', () => {
       })
     })
   })
+
+  describe('Accessibility - List semantics', () => {
+    beforeEach(() => {
+      Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+        configurable: true,
+        get() {
+          if (this.dataset?.testid === 'allocation-rule-card-wrapper') {
+            return 120
+          }
+          return 1000
+        },
+      })
+    })
+
+    it('renders rules in a list with proper role', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: mockAllocationRules,
+              pageInfo: {hasNextPage: false, endCursor: null},
+            },
+            count: mockAllocationRules.length,
+          },
+        },
+      })
+
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getAllByTestId('allocation-rule-card')).toHaveLength(
+          mockAllocationRules.length,
+        )
+      })
+
+      const list = screen.getByTestId('allocation-rules-list')
+      expect(list).toBeInTheDocument()
+      expect(list.tagName).toBe('UL')
+    })
+
+    it('renders each rule as a list item with descriptive aria-label', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: mockAllocationRules,
+              pageInfo: {hasNextPage: false, endCursor: null},
+            },
+            count: mockAllocationRules.length,
+          },
+        },
+      })
+
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getAllByTestId('allocation-rule-card')).toHaveLength(
+          mockAllocationRules.length,
+        )
+      })
+
+      expect(screen.getByLabelText('John Smith must review Jane Doe')).toBeInTheDocument()
+      expect(
+        screen.getByLabelText('Alice Brown should be reviewed by Bob Johnson'),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByLabelText('Charlie Wilson must not review Diana Prince'),
+      ).toBeInTheDocument()
+    })
+  })
 })

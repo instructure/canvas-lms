@@ -19,6 +19,7 @@
 import React, {useState, useRef, useEffect, useCallback, useMemo} from 'react'
 import AllocationRuleCard from './AllocationRuleCard'
 import CreateEditAllocationRuleModal from './CreateEditAllocationRuleModal'
+import {formatFullRuleDescription} from './utils/formatRuleDescription'
 import {Alert} from '@instructure/ui-alerts'
 import {useAllocationRules} from '../graphql/hooks/useAllocationRules'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -35,6 +36,7 @@ import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
+import {List} from '@instructure/ui-list'
 import {debounce} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import pandasBalloonUrl from './images/pandasBalloon.svg'
@@ -523,23 +525,27 @@ const PeerReviewAllocationRulesTray = ({
     return (
       <Flex direction="column" height="100%" elementRef={setContainerRef}>
         <Flex.Item shouldGrow shouldShrink>
-          {rules.map(rule => (
-            <Flex.Item
-              as="div"
-              padding="x-small medium"
-              key={rule._id}
-              data-testid="allocation-rule-card-wrapper"
-            >
-              <AllocationRuleCard
-                rule={rule}
-                canEdit={canEdit}
-                assignmentId={assignmentId}
-                refetchRules={handleRuleSave}
-                handleRuleDelete={handleRuleDelete}
-                requiredPeerReviewsCount={requiredPeerReviewsCount}
-              />
-            </Flex.Item>
-          ))}
+          <List isUnstyled margin="none" data-testid="allocation-rules-list">
+            {rules.map(rule => (
+              <List.Item key={rule._id} aria-label={formatFullRuleDescription(rule)}>
+                <View
+                  as="div"
+                  padding="x-small 0"
+                  margin="0 medium"
+                  data-testid="allocation-rule-card-wrapper"
+                >
+                  <AllocationRuleCard
+                    rule={rule}
+                    canEdit={canEdit}
+                    assignmentId={assignmentId}
+                    refetchRules={handleRuleSave}
+                    handleRuleDelete={handleRuleDelete}
+                    requiredPeerReviewsCount={requiredPeerReviewsCount}
+                  />
+                </View>
+              </List.Item>
+            ))}
+          </List>
         </Flex.Item>
       </Flex>
     )
