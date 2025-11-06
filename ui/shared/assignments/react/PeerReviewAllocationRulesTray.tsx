@@ -67,7 +67,7 @@ const EmptyState = () => (
   >
     <Img
       src={pandasBalloonUrl}
-      alt="Pandas Balloon"
+      alt=""
       style={{width: '160px', height: 'auto', marginBottom: '1rem'}}
     />
     <Heading level="h3" margin="medium 0">

@@ -319,7 +319,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
 
     it('displays empty state image', () => {
-      const image = screen.getByAltText('Pandas Balloon')
+      const image = screen.getByAltText('')
       expect(image).toBeInTheDocument()
       expect(image).toHaveAttribute('src', 'mock-pandas-balloon.svg')
     })
