@@ -8586,6 +8586,7 @@ he:
         folder_locked: "התיקיה \"%{folder},\" הכוללת קובץ זה, ננעלה."
     no_preview: 
       file_previews: 
+        download: הורדה
         download_file: "הורדת *שם קובץ*"
         no_preview_available: "אין תצוגה מקדימה לקובץ זה"
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "קבץ(ים) יכללו בכל הדפים באפליקצית שולחן העבודה של קנבס"
@@ -17671,6 +17672,7 @@ he:
         crosslist_this_section: "ביצוע רישום צולב להקבצה זו"
         current_enrollments: "הרשמות נוכחיות"
         decrosslist_section: "ביטול רישום צולב של הקבצה זו"
+  sections_are_an_additional_way_to_organize_users_t_57551e0: "הקבצות הן דרך נוספת לארגן משתמשים. הדבר יאפשר ללמד כיתות מרובות מאותו הקורס, כך שניתן להשתמש באותו תוכן קורס בכל המקומות. ניתן להעביר תלמיד להקבצה אחרת, או להוסיף/ להסיר הרשמות לסעיף בדף מתחת. תלמידים חייבים להיות לפחות בהקבצה אחת בכל רגע נתון."
   see_rubric_results_62a6447d: "עיון בתוצאות הרובריקה"
   see_scoring_details_f7fd1f3b: "עיון בפרטי הציונים"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*ראה/י כמה כלי למידה משולבים* אשר עובדים בצורה יפה עם קנבס"
