@@ -92,5 +92,13 @@ class LearningMasteryGradebookPage
     def per_page_dropdown_options
       INSTUI_Select_options(per_page_dropdown_selector)
     end
+
+    def page_button(page_number)
+      fj("#{pagination_controls_selector} button:contains('#{page_number}')")
+    end
+
+    def current_page_text
+      f('button[aria-current="page"]').text
+    end
   end
 end
