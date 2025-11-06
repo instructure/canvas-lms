@@ -45,6 +45,7 @@ class Mutations::AssignmentBase::AssignmentModeratedGradingUpdate < GraphQL::Sch
 end
 
 class Mutations::AssignmentBase::AssignmentPeerReviewsUpdate < GraphQL::Schema::InputObject
+  argument :across_sections, Boolean, required: false
   argument :anonymous_reviews, Boolean, required: false
   argument :automatic_reviews, Boolean, required: false
   argument :count, Int, required: false
@@ -250,6 +251,7 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
       # peer_reviews.key?(:intra_reviews) should be sufficient.
       input_hash[:intra_group_peer_reviews] = peer_reviews[:intra_reviews] if peer_reviews.key?(:intra_reviews)
       input_hash[:peer_review_submission_required] = peer_reviews[:submission_required] if peer_reviews.key?(:submission_required)
+      input_hash[:peer_review_across_sections] = peer_reviews[:across_sections] if peer_reviews.key?(:across_sections)
 
       # this should be peer_reviews_due_at, but its not permitted in the backend and peer_reviews_assign_at
       # is transformed into peer_reviews_due_at. that's probably a bug, but just to keep this update resilient
