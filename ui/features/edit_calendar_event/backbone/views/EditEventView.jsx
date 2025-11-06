@@ -150,6 +150,13 @@ export default class EditCalendarEventView extends Backbone.View {
       }
 
       return Object.keys(picked_params).forEach(key => {
+        // Skip start_time and end_time if editing an existing event.
+        // The template will format from start_at correctly.
+        // Only use URL param times when creating a new event.
+        if ((key === 'start_time' || key === 'end_time') && !this.model.isNew()) {
+          return
+        }
+
         const $e = this.$el.find(`input[name='${key}'], select[name='${key}']`)
         const value = $e.prop('type') === 'checkbox' ? [picked_params[key]] : picked_params[key]
         $e.val(value)
@@ -170,6 +177,12 @@ export default class EditCalendarEventView extends Backbone.View {
           const active_section_id = picked_params[key].split('_')[2]
           const eventDateKeys = ['start_date', 'start_time', 'end_time']
           eventDateKeys.forEach(dateKey => {
+            // Skip start_time and end_time if editing an existing event.
+            // Template will format from section event data correctly.
+            if ((dateKey === 'start_time' || dateKey === 'end_time') && !this.model.isNew()) {
+              return
+            }
+
             const $element = this.$el.find(
               `input[name='child_event_data[${active_section_id}][${dateKey}]']`,
             )
