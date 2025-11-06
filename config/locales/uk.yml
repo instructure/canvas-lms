@@ -7810,6 +7810,7 @@ uk:
         folder_locked: "Тека \"%{folder},\" що містить цей файл, заблокована."
     no_preview: 
       file_previews: 
+        download: Завантажити
         download_file: "Завантажити *назва файлу*"
         no_preview_available: "Попередній перегляд  для цього файлу недоступний."
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "Файл(и) буде долучено до всіх сторінок у настільному застосунку Canvas."
@@ -15968,6 +15969,7 @@ uk:
         current_enrollments: "Поточні реєстрації"
         decrosslist_section: "De-Cross-List цього розділу"
   sections_94731e51: Розділи
+  sections_are_an_additional_way_to_organize_users_t_57551e0: "Секції є додатковим способом організації користувачів. Це може дозволити вам навчити кілька класів з того ж курсу, так що ви можете мати вміст курсу в одному місці. Нижче ви можете перемістити користувача в інший розділ, або додати / видалити розділ контингенту слухачів. Користувачі повинні мати принаймні один розділ в будь-який час."
   see_rubric_results_62a6447d: "Побачити результати рубрики"
   see_scoring_details_f7fd1f3b: "Побачити деталі оцінки"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Деякі інструменти LTI *, які чудово працюють з Canvas."
