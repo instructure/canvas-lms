@@ -1870,7 +1870,7 @@ class Lti::RegistrationsController < ApplicationController
     require_account_context
     return if @account.root_account?
 
-    unless Account.site_admin.feature_enabled?(:canvas_apps_sub_account_access)
+    unless @account.root_account.feature_enabled?(:canvas_apps_sub_account_access)
       raise ActiveRecord::RecordNotFound
     end
   rescue ActiveRecord::RecordNotFound => e

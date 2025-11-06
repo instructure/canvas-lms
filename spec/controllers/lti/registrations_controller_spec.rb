@@ -97,7 +97,7 @@ RSpec.describe Lti::RegistrationsController do
 
       context "without feature flag" do
         before do
-          Account.site_admin.disable_feature!(:canvas_apps_sub_account_access)
+          account.disable_feature!(:canvas_apps_sub_account_access)
         end
 
         it "isn't found" do
