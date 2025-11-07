@@ -22,7 +22,13 @@ include YARD::Templates::Helpers::HtmlHelper
 
 def init
   super
-  sections :argument, :request_field, :response_field, :example_request, :example_response, :returns, :see
+  sections :hint_section, :argument, :request_field, :response_field, :example_request, :example_response, :returns, :see
+end
+
+def hint_section
+  return unless object.has_tag?(:hint)
+
+  erb(:hint)
 end
 
 def see
