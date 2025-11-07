@@ -655,8 +655,17 @@ module Api::V1::Assignment
                      end
 
           if [:created, :ok].include?(response)
-            create_api_peer_review_sub_assignment(prepared_create[:assignment], assignment_params[:peer_review])
-            prepared_create[:assignment].association(:peer_review_sub_assignment).reload
+            peer_review_result = create_api_peer_review_sub_assignment(
+              prepared_create[:assignment],
+              assignment_params[:peer_review]
+            )
+
+            if peer_review_result == false
+              response = false
+              raise ActiveRecord::Rollback
+            else
+              prepared_create[:assignment].association(:peer_review_sub_assignment).reload
+            end
           end
         ensure
           prepared_create[:assignment].skip_peer_review_sub_assignment_sync = false
@@ -711,17 +720,30 @@ module Api::V1::Assignment
                      end
 
           if response == :ok
+            peer_review_result = true
+
             if has_peer_reviews
-              if prepared_update[:assignment].peer_review_sub_assignment.present?
-                update_api_peer_review_sub_assignment(prepared_update[:assignment], assignment_params[:peer_review])
-              else
-                create_api_peer_review_sub_assignment(prepared_update[:assignment], assignment_params[:peer_review])
-              end
+              peer_review_result = if prepared_update[:assignment].peer_review_sub_assignment.present?
+                                     update_api_peer_review_sub_assignment(
+                                       prepared_update[:assignment],
+                                       assignment_params[:peer_review]
+                                     )
+                                   else
+                                     create_api_peer_review_sub_assignment(
+                                       prepared_update[:assignment],
+                                       assignment_params[:peer_review]
+                                     )
+                                   end
             else
               prepared_update[:assignment]&.peer_review_sub_assignment&.destroy
             end
 
-            prepared_update[:assignment].association(:peer_review_sub_assignment).reload
+            if peer_review_result == false
+              response = false
+              raise ActiveRecord::Rollback
+            else
+              prepared_update[:assignment].association(:peer_review_sub_assignment).reload
+            end
           end
         end
       else
@@ -1618,6 +1640,9 @@ module Api::V1::Assignment
     end
 
     peer_review_sub_assignment
+  rescue PeerReview::PeerReviewError => e
+    parent_assignment.errors.add(:base, "Peer Review: #{e.message}")
+    false
   end
 
   def update_api_peer_review_sub_assignment(parent_assignment, params)
@@ -1637,5 +1662,8 @@ module Api::V1::Assignment
     end
 
     peer_review_sub_assignment
+  rescue PeerReview::PeerReviewError => e
+    parent_assignment.errors.add(:base, "Peer Review: #{e.message}")
+    false
   end
 end
