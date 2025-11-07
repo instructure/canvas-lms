@@ -109,7 +109,6 @@ describe Lti::CreateRegistrationService do
 
     it "uses the scopes from the overlay when creating the developer key" do
       subject
-      puts overlay_params[:scopes]
       expect(DeveloperKey.last.scopes).not_to include(TokenScopes::LTI_SCOPES.keys[0])
     end
   end
@@ -150,6 +149,35 @@ describe Lti::CreateRegistrationService do
       expect { subject }.to change { Lti::RegistrationAccountBinding.count }.by(1)
 
       expect(Lti::RegistrationAccountBinding.last.workflow_state).to eql("on")
+    end
+
+    context "when workflow_state is off" do
+      let(:binding_params) { { workflow_state: :off } }
+      let(:course) { course_model(account:) }
+
+      before do
+        account.enable_feature!(:lti_registrations_next)
+      end
+
+      it "tool is not available even with available context control" do
+        registration = subject
+        deployment = registration.deployments.first
+
+        # Tool should not be available when binding is off
+        expect(Lti::ContextToolFinder.all_tools_for(course))
+          .not_to include(deployment)
+
+        # Try to make it available at course level via context control
+        Lti::ContextControl.create!(
+          course:,
+          deployment:,
+          workflow_state: "available"
+        )
+
+        # Tool should still not be available because binding is off
+        expect(Lti::ContextToolFinder.all_tools_for(course))
+          .not_to include(deployment)
+      end
     end
   end
 

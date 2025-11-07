@@ -191,7 +191,7 @@ module Lti
                .eager_load(:deployment)
                .active
                .where(registration:, root_account: @account)
-               .where.not(context_external_tools: { workflow_state: ["deleted", "disabled"] })
+               .where.not(context_external_tools: { workflow_state: ["deleted"] })
                .order(:deployment_id, :path)
       )
 
