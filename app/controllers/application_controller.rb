@@ -452,6 +452,7 @@ class ApplicationController < ActionController::Base
     discussion_permalink
     enhanced_course_creation_account_fetching
     explicit_latex_typesetting
+    feature_flag_ui_sorting
     files_a11y_rewrite
     files_a11y_rewrite_toggle
     horizon_course_setting

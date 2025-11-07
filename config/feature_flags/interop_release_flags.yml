@@ -120,6 +120,17 @@ external_tool_drawer:
       state: allowed_on
     ci:
       state: allowed_on
+feature_flag_ui_sorting:
+  state: hidden
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: Feature Flag UI Sorting
+  description: When enabled, allows users to sort by any of the available columns in the feature flags UI.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 import_numeric_lti_custom_params_as_string:
   state: hidden
   shadow: true
