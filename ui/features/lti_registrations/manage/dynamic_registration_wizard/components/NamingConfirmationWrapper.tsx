@@ -20,6 +20,7 @@ import {NamingConfirmation} from '../../registration_wizard_forms/NamingConfirma
 import type {DynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
 import {useOverlayStore} from '../hooks/useOverlayStore'
+import {filterPlacementObjectsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 
 export type NamingConfirmationWrapperProps = {
   overlayStore: DynamicRegistrationOverlayStore
@@ -31,12 +32,14 @@ export const NamingConfirmationWrapper = ({
   registration,
 }: NamingConfirmationWrapperProps) => {
   const [state, actions] = useOverlayStore(overlayStore)
-  const placements = registration.configuration.placements
-    .filter(p => !state.overlay.disabled_placements?.includes(p.placement))
-    .map(p => ({
-      placement: p.placement,
-      label: state.overlay.placements?.[p.placement]?.text ?? '',
-    }))
+
+  const enabledPlacements = registration.configuration.placements.filter(
+    p => !state.overlay.disabled_placements?.includes(p.placement),
+  )
+  const placements = filterPlacementObjectsByFeatureFlags(enabledPlacements).map(p => ({
+    placement: p.placement,
+    label: state.overlay.placements?.[p.placement]?.text ?? '',
+  }))
 
   return (
     <NamingConfirmation

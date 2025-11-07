@@ -66,6 +66,16 @@ module Lti
         Account.default.enable_feature! :lti_asset_processor_discussions
         expect(described_class.valid_placements(Account.default)).to include(:ActivityAssetProcessorContribution)
       end
+
+      it "does not include top_navigation when FF disabled" do
+        Account.default.disable_feature! :top_navigation_placement
+        expect(described_class.valid_placements(Account.default)).not_to include(:top_navigation)
+      end
+
+      it "includes top_navigation when FF enabled" do
+        Account.default.enable_feature! :top_navigation_placement
+        expect(described_class.valid_placements(Account.default)).to include(:top_navigation)
+      end
     end
 
     describe ".public_placements" do

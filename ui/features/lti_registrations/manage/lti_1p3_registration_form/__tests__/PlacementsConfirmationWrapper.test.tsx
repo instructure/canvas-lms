@@ -32,6 +32,7 @@ describe('PlacementsConfirmationWrapper', () => {
         FEATURES: {
           lti_asset_processor: true,
           lti_asset_processor_discussions: true,
+          top_navigation_placement: true,
         },
       })
     })
@@ -55,6 +56,62 @@ describe('PlacementsConfirmationWrapper', () => {
       expect(screen.getAllByRole('checkbox')).toHaveLength(
         AllLtiPlacements.length - InternalOnlyLtiPlacements.length,
       )
+    })
+  })
+
+  describe('when top_navigation_placement feature flag is disabled', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {
+          top_navigation_placement: false,
+        },
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('does not show top_navigation placement in available placements', () => {
+      const internalConfig = mockInternalConfiguration({placements: []})
+      const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
+
+      render(
+        <PlacementsConfirmationWrapper
+          internalConfig={internalConfig}
+          overlayStore={overlayStore}
+        />,
+      )
+
+      expect(screen.queryByLabelText(i18nLtiPlacement('top_navigation'))).not.toBeInTheDocument()
+    })
+  })
+
+  describe('when top_navigation_placement feature flag is enabled', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {
+          top_navigation_placement: true,
+        },
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('shows top_navigation placement in available placements', () => {
+      const internalConfig = mockInternalConfiguration({placements: []})
+      const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
+
+      render(
+        <PlacementsConfirmationWrapper
+          internalConfig={internalConfig}
+          overlayStore={overlayStore}
+        />,
+      )
+
+      expect(screen.getByLabelText(i18nLtiPlacement('top_navigation'))).toBeInTheDocument()
     })
   })
 
@@ -169,6 +226,7 @@ describe('PlacementsConfirmationWrapper', () => {
       fakeENV.setup({
         FEATURES: {
           increased_top_nav_pane_size: true,
+          top_navigation_placement: true,
         },
       })
     })

@@ -33,6 +33,7 @@ import {i18nLtiPrivacyLevel} from '../../../model/i18nLtiPrivacyLevel'
 import {i18nLtiPlacement} from '../../../model/i18nLtiPlacement'
 import {DefaultLtiPrivacyLevel} from '../../../model/LtiPrivacyLevel'
 import {isLtiPlacementWithDefaultIcon, isLtiPlacementWithIcon} from '../../../model/LtiPlacement'
+import {filterPlacementObjectsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {ltiToolDefaultIconUrl} from '../../../model/ltiToolIcons'
 import {ToolConfigurationFooter} from './ToolConfigurationFooter'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -135,9 +136,11 @@ export const ToolConfigurationView = () => {
 
   const customFields = Object.entries(registration.overlaid_configuration.custom_fields || {})
   const redirectUris = registration.overlaid_configuration.redirect_uris || []
-  const enabledPlacements = registration.overlaid_configuration.placements.filter(p => {
-    return !('enabled' in p) || p.enabled
-  })
+  const enabledPlacements = filterPlacementObjectsByFeatureFlags(
+    registration.overlaid_configuration.placements.filter(p => {
+      return !('enabled' in p) || p.enabled
+    }),
+  )
 
   const enabledPlacementsWithIcons = enabledPlacements.filter(p =>
     isLtiPlacementWithIcon(p.placement),

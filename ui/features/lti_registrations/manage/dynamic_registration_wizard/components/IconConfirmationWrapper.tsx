@@ -23,6 +23,7 @@ import type {DynamicRegistrationActions} from '../DynamicRegistrationWizardState
 import {IconConfirmation} from '../../registration_wizard_forms/IconConfirmation'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
 import {LtiPlacementsWithIcons, type LtiPlacementWithIcon} from '../../model/LtiPlacement'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 import {Footer} from '../../registration_wizard_forms/Footer'
 import {
@@ -46,7 +47,9 @@ export const IconConfirmationWrapper = ({
   transitionToReviewingState,
 }: IconConfirmationProps) => {
   const [overlayState, actions] = useOverlayStore(overlayStore)
-  const placements = registration.configuration.placements.map(p => p.placement)
+  const placements = filterPlacementsByFeatureFlags(
+    registration.configuration.placements.map(p => p.placement),
+  )
   const iconPlacements = React.useMemo(
     () =>
       placements.filter((p): p is LtiPlacementWithIcon =>

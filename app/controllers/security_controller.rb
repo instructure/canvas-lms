@@ -50,6 +50,7 @@ class SecurityController < ApplicationController
       .reject { |p| p == :resource_selection }
       .reject { |p| p == :ActivityAssetProcessor unless account.root_account.feature_enabled?(:lti_asset_processor) }
       .reject { |p| p == :ActivityAssetProcessorContribution unless account.root_account.feature_enabled?(:lti_asset_processor_discussions) }
+      .reject { |p| p == :top_navigation unless account.root_account.feature_enabled?(:top_navigation_placement) }
       .map { |p| Lti::ResourcePlacement.add_extension_prefix_if_necessary(p) } + [Lti::ResourcePlacement::CONTENT_AREA] + (
       (message_type == LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE) ? [Lti::ResourcePlacement::RICH_TEXT_EDITOR] : []
     )

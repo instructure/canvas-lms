@@ -356,6 +356,7 @@ export type RootAccountFeatureId =
   | 'rubric_criterion_range'
   | 'scheduled_page_publication'
   | 'send_usage_metrics'
+  | 'top_navigation_placement'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_SERVICES

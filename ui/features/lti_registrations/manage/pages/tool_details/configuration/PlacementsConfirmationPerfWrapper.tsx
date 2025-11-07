@@ -20,6 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {AllLtiScopes} from '@canvas/lti/model/LtiScope'
 import * as React from 'react'
 import {AllLtiPlacements} from '../../../../manage/model/LtiPlacement'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {PlacementsConfirmation} from '../../../../manage/registration_wizard_forms/PlacementsConfirmation'
 import {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
 import {Lti1p3RegistrationOverlayStore} from '../../../registration_overlay/Lti1p3RegistrationOverlayStore'
@@ -67,13 +68,13 @@ export const PlacementsConfirmationPerfWrapper = React.memo(
     /**
      * The possible placements that an admin can choose from.
      */
-    const possiblePlacements = React.useMemo(
-      () =>
-        showAllSettings
-          ? AllLtiPlacements
-          : registration.configuration.placements.map(p => p.placement),
-      [registration.configuration.placements],
-    )
+    const possiblePlacements = React.useMemo(() => {
+      const placements = showAllSettings
+        ? AllLtiPlacements
+        : registration.configuration.placements.map(p => p.placement)
+
+      return filterPlacementsByFeatureFlags(placements)
+    }, [showAllSettings, registration.configuration.placements])
 
     return (
       <PlacementsConfirmation

@@ -43,6 +43,7 @@ import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
 import {toUndefined} from '../../common/lib/toUndefined'
 import {Footer} from '../registration_wizard_forms/Footer'
 import {isLtiPlacementWithIcon} from '../model/LtiPlacement'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {Header} from '../registration_wizard_forms/Header'
 import {LaunchTypeSpecificSettingsConfirmationWrapper} from './components/LaunchTypeSpecificSettingsConfirmationWrapper'
 
@@ -214,7 +215,8 @@ export const Lti1p3RegistrationWizard = ({
             onPreviousClicked={handlePreviousClicked('OverrideURIs')}
             onNextClicked={() => {
               const placements = store.state.overlayStore.getState().state.placements.placements
-              if (placements?.some(p => isLtiPlacementWithIcon(p))) {
+              const enabledPlacements = filterPlacementsByFeatureFlags(placements ?? [])
+              if (enabledPlacements.some(p => isLtiPlacementWithIcon(p))) {
                 handleNextClicked('Icons')()
               } else {
                 handleNextClicked('Review')()
@@ -249,7 +251,8 @@ export const Lti1p3RegistrationWizard = ({
             currentScreen="last"
             onPreviousClicked={() => {
               const placements = store.state.overlayStore.getState().state.placements.placements
-              if (placements?.some(p => isLtiPlacementWithIcon(p))) {
+              const enabledPlacements = filterPlacementsByFeatureFlags(placements ?? [])
+              if (enabledPlacements.some(p => isLtiPlacementWithIcon(p))) {
                 handlePreviousClicked('Icons')()
               } else {
                 handlePreviousClicked('Naming')()

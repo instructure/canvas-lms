@@ -150,6 +150,7 @@ module Lti
         p.delete(:conference_selection) unless Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
         p.delete(:ActivityAssetProcessor) unless root_account&.feature_enabled?(:lti_asset_processor)
         p.delete(:ActivityAssetProcessorContribution) unless root_account&.feature_enabled?(:lti_asset_processor_discussions)
+        p.delete(:top_navigation) unless root_account&.feature_enabled?(:top_navigation_placement)
       end
     end
 

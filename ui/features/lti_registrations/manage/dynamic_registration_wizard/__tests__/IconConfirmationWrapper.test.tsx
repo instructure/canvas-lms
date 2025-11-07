@@ -23,6 +23,7 @@ import {render, screen} from '@testing-library/react'
 import * as ue from '@testing-library/user-event'
 import {LtiPlacements, LtiPlacementsWithIcons} from '../../model/LtiPlacement'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const userEvent = ue.userEvent.setup({advanceTimers: jest.advanceTimersByTime})
 
@@ -30,11 +31,19 @@ describe('IconConfirmation', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     jest.resetAllMocks()
+    fakeENV.setup({
+      FEATURES: {
+        top_navigation_placement: true,
+        lti_asset_processor: true,
+        lti_asset_processor_discussions: true,
+      },
+    })
   })
 
   afterEach(() => {
     jest.runOnlyPendingTimers()
     jest.useRealTimers()
+    fakeENV.teardown()
   })
 
   const mockTransitionToConfirmationState = jest.fn()
