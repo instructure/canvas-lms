@@ -3063,6 +3063,42 @@ describe AssignmentsApiController, type: :request do
           expect { call_create_assignment_api(assignment, assignment_params) }
             .to raise_error(PeerReview::PeerReviewError, "Peer review creation failed")
         end
+
+        it "rolls back transaction when create_api_peer_review_sub_assignment returns false" do
+          assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:prepare_assignment_create_or_update)
+            .and_return({ assignment:, valid: true })
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
+            .and_return(false)
+
+          result = call_create_assignment_api(assignment, assignment_params)
+
+          expect(result).to be false
+          expect(assignment).not_to be_persisted
+        end
+
+        it "rolls back transaction with overrides when create_api_peer_review_sub_assignment returns false" do
+          add_section("Section 1", course: @course)
+          assignment, assignment_params = build_peer_review_assignment(
+            peer_review_params: { points_possible: 50 }
+          )
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:prepare_assignment_create_or_update)
+            .and_return({ assignment:, valid: true, overrides: [double("override")] })
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:create_api_assignment_with_overrides)
+            .and_return(:created)
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
+            .and_return(false)
+
+          result = call_create_assignment_api(assignment, assignment_params)
+
+          expect(result).to be false
+          expect(assignment).not_to be_persisted
+        end
       end
 
       describe "transaction behavior" do
@@ -3711,17 +3747,22 @@ describe AssignmentsApiController, type: :request do
         end
       end
 
-      context "error handling" do
-        it "propagates PeerReview::PeerReviewError from service" do
+      context "error handling for service calls" do
+        before do
+          parent_assignment
+        end
+
+        it "rescues PeerReview::PeerReviewError from service and adds to assignment errors" do
           params = { points_possible: 50 }
           error_message = "Cannot create peer review sub assignment"
 
           allow(PeerReview::PeerReviewCreatorService).to receive(:call)
             .and_raise(PeerReview::PeerReviewError.new(error_message))
 
-          expect do
-            test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
-          end.to raise_error(PeerReview::PeerReviewError, error_message)
+          result = test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+
+          expect(result).to be(false)
+          expect(parent_assignment.errors[:base]).to include("Peer Review: #{error_message}")
         end
 
         it "propagates other errors from service" do
@@ -3873,6 +3914,38 @@ describe AssignmentsApiController, type: :request do
           override = peer_review_sub.assignment_overrides.active.first
           expect(override.set).to eq(section1)
           expect(override.due_at.to_i).to eq(params[:peer_review_overrides][0][:due_at].to_i)
+        end
+      end
+
+      context "error handling" do
+        before do
+          parent_assignment
+        end
+
+        it "rescues PeerReview errors and adds them to assignment" do
+          parent_assignment.submission_types = "discussion_topic"
+          params = { points_possible: 50 }
+          error_message = "Peer reviews cannot be used with Discussion Topic assignments"
+
+          allow(PeerReview::PeerReviewCreatorService).to receive(:call)
+            .and_raise(PeerReview::InvalidAssignmentSubmissionTypesError.new(error_message))
+
+          result = test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+
+          expect(result).to be(false)
+          expect(parent_assignment.errors[:base]).to include("Peer Review: #{error_message}")
+        end
+
+        it "does not rescue non-PeerReview errors" do
+          params = { points_possible: 50 }
+          error_message = "Database connection failed"
+
+          allow(PeerReview::PeerReviewCreatorService).to receive(:call)
+            .and_raise(ActiveRecord::ConnectionNotEstablished.new(error_message))
+
+          expect do
+            test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+          end.to raise_error(ActiveRecord::ConnectionNotEstablished, error_message)
         end
       end
     end
@@ -4285,6 +4358,27 @@ describe AssignmentsApiController, type: :request do
             expect do
               test_object.send(:update_api_assignment, assignment, assignment_params, user)
             end.to raise_error(StandardError, "Deletion failed")
+          end
+
+          it "rolls back transaction when create_api_peer_review_sub_assignment returns false" do
+            allow(test_object).to receive(:create_api_peer_review_sub_assignment)
+              .and_return(false)
+
+            result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
+
+            expect(result).to be false
+          end
+
+          it "rolls back transaction when update_api_peer_review_sub_assignment returns false" do
+            peer_review_sub_assignment = double("peer_review_sub_assignment")
+            peer_reviews = true
+            allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
+            allow(test_object).to receive(:update_api_peer_review_sub_assignment)
+              .and_return(false)
+
+            result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
+
+            expect(result).to be false
           end
         end
 
@@ -4743,6 +4837,42 @@ describe AssignmentsApiController, type: :request do
           result = test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
 
           expect(result).to eq(peer_review_sub_assignment)
+        end
+      end
+
+      context "error handling" do
+        before do
+          parent_assignment
+        end
+
+        it "rescues PeerReview errors and adds them to assignment" do
+          params = {
+            points_possible: 50,
+            peer_review_overrides: [{ course_section_id: 1, due_at: "invalid" }]
+          }
+          error_message = "Unlock date cannot be after lock date"
+
+          peer_review_sub_assignment = double("peer_review_sub_assignment")
+          allow(PeerReview::PeerReviewUpdaterService).to receive(:call).and_return(peer_review_sub_assignment)
+          allow(PeerReview::DateOverriderService).to receive(:call)
+            .and_raise(PeerReview::InvalidOverrideDatesError.new(error_message))
+
+          result = test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
+
+          expect(result).to be(false)
+          expect(parent_assignment.errors[:base]).to include("Peer Review: #{error_message}")
+        end
+
+        it "does not rescue non-PeerReview errors" do
+          params = { points_possible: 50 }
+          error_message = "Database connection not established"
+
+          allow(PeerReview::PeerReviewUpdaterService).to receive(:call)
+            .and_raise(ActiveRecord::ConnectionNotEstablished.new(error_message))
+
+          expect do
+            test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
+          end.to raise_error(ActiveRecord::ConnectionNotEstablished, error_message)
         end
       end
     end
