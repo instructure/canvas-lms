@@ -235,5 +235,59 @@ describe CC::AssignmentResources do
         expect(asset_processor_node.at("context_external_tool_url").text).to eq context_tool.url
       end
     end
+
+    context "export new quizzes settings" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
+      end
+
+      it "does not export new_quizzes_type when settings are not present" do
+        expect(subject.at("new_quizzes_type")).to be_nil
+      end
+
+      it "does not export new_quizzes_anonymous_participants when settings are not present" do
+        expect(subject.at("new_quizzes_anonymous_participants")).to be_nil
+      end
+
+      it "exports new_quizzes_type when present in settings" do
+        assignment.settings = { "new_quizzes" => { "type" => "graded_quiz" } }
+        assignment.save!
+        expect(subject.at("new_quizzes_type").text).to eq("graded_quiz")
+      end
+
+      it "exports new_quizzes_anonymous_participants when present in settings" do
+        assignment.settings = { "new_quizzes" => { "anonymous_participants" => true } }
+        assignment.save!
+        expect(subject.at("new_quizzes_anonymous_participants").text).to eq("true")
+      end
+
+      it "exports both type and anonymous_participants when both are present" do
+        assignment.settings = { "new_quizzes" => { "type" => "graded_survey", "anonymous_participants" => false } }
+        assignment.save!
+        expect(subject.at("new_quizzes_type").text).to eq("graded_survey")
+        expect(subject.at("new_quizzes_anonymous_participants").text).to eq("false")
+      end
+
+      it "does not export anonymous_participants when it is nil" do
+        assignment.settings = { "new_quizzes" => { "type" => "ungraded_survey", "anonymous_participants" => nil } }
+        assignment.save!
+        expect(subject.at("new_quizzes_type").text).to eq("ungraded_survey")
+        expect(subject.at("new_quizzes_anonymous_participants")).to be_nil
+      end
+
+      context "when feature flag is disabled" do
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
+        end
+
+        it "does not export new_quizzes settings even when present" do
+          assignment.settings = { "new_quizzes" => { "type" => "graded_quiz", "anonymous_participants" => true } }
+          assignment.save!
+          expect(subject.at("new_quizzes_type")).to be_nil
+          expect(subject.at("new_quizzes_anonymous_participants")).to be_nil
+        end
+      end
+    end
   end
 end
