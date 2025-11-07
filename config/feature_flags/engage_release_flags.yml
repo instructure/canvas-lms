@@ -46,6 +46,11 @@ ai_experiences:
   display_name: AI Experiences
   description: Introduces AI Experiences - a new Canvas Learning Object.
   touch_context: true
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 updated_mastery_connect_icon:
   state: hidden
   applies_to: SiteAdmin

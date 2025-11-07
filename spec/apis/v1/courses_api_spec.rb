@@ -4553,6 +4553,7 @@ describe CoursesController, type: :request do
           outcomes
           quizzes
           modules
+          ai_experiences
           settings
           rubrics
         ]
