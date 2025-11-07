@@ -18,14 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module GitbookDecorator
-  # Gitbook specific implementation of the hint method
-  # see: https://docs.gitbook.com/content-editor/blocks/hint
-  #
-  # @param hint_style [String] the style of the hint
-  # @param text [String] the hint text
-  # @return [String] the hint in Gitbook format
-  def hint(hint_style, text)
-    "{% hint style=\"#{hint_style}\" %}\n#{text}\n{% endhint %}"
-  end
-end
+require "decorator"
+
+include Decorator

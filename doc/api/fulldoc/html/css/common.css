@@ -452,6 +452,40 @@ div.warning-message {
   border-radius: 3px;
 }
 
+div.info-message {
+  background-color: #d9edf7;
+  color: #31708f;
+  padding: 12px;
+  border-left: 4px solid #3498db;
+  border-radius: 3px;
+  margin: 12px 0;
+}
+
+div.danger-message {
+  background-color: #f2dede;
+  color: #a94442;
+  padding: 12px;
+  border-left: 4px solid #e74c3c;
+  border-radius: 3px;
+  margin: 12px 0;
+}
+
+div.success-message {
+  background-color: #dff0d8;
+  color: #3c763d;
+  padding: 12px;
+  border-left: 4px solid #27ae60;
+  border-radius: 3px;
+  margin: 12px 0;
+}
+
+div.info-message p,
+div.danger-message p,
+div.success-message p {
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
 code {
   background: #efefef;
   border-radius: 4px;
