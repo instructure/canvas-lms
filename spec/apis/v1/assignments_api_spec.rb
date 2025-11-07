@@ -3539,6 +3539,34 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
+    context "PeerReviewUpdaterService call verification" do
+      before do
+        @course.enable_feature!(:peer_review_grading)
+        @group = @course.assignment_groups.create!(name: "test group")
+      end
+
+      it "does not call PeerReviewUpdaterService when creating an assignment" do
+        expect(PeerReview::PeerReviewUpdaterService).not_to receive(:call)
+
+        api_call(:post,
+                 "/api/v1/courses/#{@course.id}/assignments",
+                 { controller: "assignments_api", action: "create", format: "json", course_id: @course.id.to_s },
+                 {
+                   assignment: {
+                     name: "Test Assignment",
+                     points_possible: 100,
+                     peer_reviews: true,
+                     peer_review: {
+                       points_possible: 50,
+                       grading_type: "points"
+                     }
+                   }
+                 })
+
+        expect(response).to be_successful
+      end
+    end
+
     describe "#create_api_peer_review_sub_assignment" do
       let(:course) { course_model }
       let(:parent_assignment) { assignment_model(context: course, name: "Parent Assignment") }
@@ -7864,6 +7892,50 @@ describe AssignmentsApiController, type: :request do
           call_update({ assignment_overrides: override_params }, 200)
           expect(override.reload).to be_deleted
         end
+      end
+    end
+
+    context "PeerReviewUpdaterService call verification" do
+      before :once do
+        course_with_teacher(active_all: true)
+        @course.enable_feature!(:peer_review_grading)
+      end
+
+      it "calls PeerReviewUpdaterService exactly once when updating an assignment with peer reviews" do
+        @assignment = @course.assignments.create!(
+          name: "Original Assignment",
+          points_possible: 100,
+          peer_reviews: true
+        )
+
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: @assignment,
+          points_possible: 50,
+          grading_type: "points"
+        )
+
+        expect(PeerReview::PeerReviewUpdaterService).to receive(:call).once.and_call_original
+
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                 {
+                   controller: "assignments_api",
+                   action: "update",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   id: @assignment.to_param
+                 },
+                 {
+                   assignment: {
+                     peer_reviews: true,
+                     peer_review: {
+                       points_possible: 75,
+                       grading_type: "points"
+                     }
+                   }
+                 })
+
+        expect(response).to be_successful
       end
     end
 

@@ -184,6 +184,23 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
         expect(result.group_category_id).to eq(group_category.id)
       end
+
+      it "syncs context_id and context_type from parent assignment" do
+        new_course = course_factory(active_all: true)
+        new_course.enable_feature!(:peer_review_grading)
+
+        # Move the parent assignment to a new context
+        # (This is unusual but testing the sync mechanism)
+        parent_assignment.update!(context: new_course)
+
+        # Call the updater service to trigger the sync
+        PeerReview::PeerReviewUpdaterService.call(parent_assignment:)
+
+        # Now check that the peer review sub assignment was synced
+        existing_peer_review_sub_assignment.reload
+        expect(existing_peer_review_sub_assignment.context_id).to eq(new_course.id)
+        expect(existing_peer_review_sub_assignment.context_type).to eq("Course")
+      end
     end
 
     context "with partial updates" do

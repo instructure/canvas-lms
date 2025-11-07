@@ -646,6 +646,7 @@ module Api::V1::Assignment
 
       if has_peer_reviews
         Assignment.transaction do
+          prepared_create[:assignment].skip_peer_review_sub_assignment_sync = true
           response = if prepared_create[:overrides].present?
                        create_api_assignment_with_overrides(prepared_create, user)
                      else
@@ -657,6 +658,8 @@ module Api::V1::Assignment
             create_api_peer_review_sub_assignment(prepared_create[:assignment], assignment_params[:peer_review])
             prepared_create[:assignment].association(:peer_review_sub_assignment).reload
           end
+        ensure
+          prepared_create[:assignment].skip_peer_review_sub_assignment_sync = false
         end
       else
         response = if prepared_create[:overrides].present?
@@ -690,6 +693,8 @@ module Api::V1::Assignment
 
     has_peer_reviews = prepared_update[:assignment].peer_reviews
     peer_review_grading_enabled = prepared_update[:assignment].context.feature_enabled?(:peer_review_grading)
+
+    prepared_update[:assignment].skip_peer_review_sub_assignment_sync = true if prepared_update[:assignment].context.feature_enabled?(:peer_review_grading)
 
     Assignment.suspend_due_date_caching do
       if peer_review_grading_enabled
@@ -810,6 +815,10 @@ module Api::V1::Assignment
 
         opts[:migrated_urls_content_migration_id] = content_migration.global_id
       end
+    end
+
+    if prepared_update[:assignment].context.feature_enabled?(:peer_review_grading)
+      prepared_update[:assignment].skip_peer_review_sub_assignment_sync = false
     end
 
     response
