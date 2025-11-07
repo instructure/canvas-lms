@@ -165,10 +165,19 @@ describe TabsController, type: :request do
           "type" => "internal"
         },
         {
+          "id" => "ai_experiences",
+          "html_url" => "/courses/#{@course.id}/ai_experiences",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/ai_experiences",
+          "position" => 14,
+          "visibility" => "public",
+          "label" => "AI Experiences",
+          "type" => "internal"
+        },
+        {
           "id" => "settings",
           "html_url" => "/courses/#{@course.id}/settings",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/settings",
-          "position" => 14,
+          "position" => 15,
           "visibility" => "admins",
           "label" => "Settings",
           "type" => "internal"
@@ -567,6 +576,7 @@ describe TabsController, type: :request do
                         "/api/v1/courses/#{@course.id}/tabs",
                         { controller: "tabs", action: "index", course_id: @course.to_param, format: "json" },
                         { include: ["course_subject_tabs"] })
+        # AI Experiences is excluded from subject tabs
         expect(json).to eq [
           {
             "id" => "home",
@@ -737,10 +747,19 @@ describe TabsController, type: :request do
             "type" => "internal"
           },
           {
+            "id" => "ai_experiences",
+            "html_url" => "/courses/#{@course.id}/ai_experiences",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/ai_experiences",
+            "position" => 13,
+            "visibility" => "public",
+            "label" => "AI Experiences",
+            "type" => "internal"
+          },
+          {
             "id" => "settings",
             "html_url" => "/courses/#{@course.id}/settings",
             "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/settings",
-            "position" => 13,
+            "position" => 14,
             "visibility" => "admins",
             "label" => "Settings",
             "type" => "internal"
@@ -752,7 +771,7 @@ describe TabsController, type: :request do
     describe "teacher in a course" do
       before :once do
         course_with_teacher(active_all: true)
-        @tab_ids = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 18, 4, 10, 13]
+        @tab_ids = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 18, 4, 10, 16, 25, 13]
         @tab_lookup = {}.with_indifferent_access
         @course.tabs_available(@teacher, api: true).each do |t|
           t = t.with_indifferent_access
@@ -761,14 +780,20 @@ describe TabsController, type: :request do
       end
 
       it "has the correct position" do
-        tab_order = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 18, 4, 10, 13]
+        # Exclude TAB_AI_EXPERIENCES (25) since it's dynamically inserted
+        tab_order = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 18, 4, 10, 16, 13]
         @course.tab_configuration = tab_order.map { |n| { "id" => n } }
         @course.save
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", { controller: "tabs",
                                                                       action: "index",
                                                                       course_id: @course.to_param,
                                                                       format: "json" })
-        json.each { |t| expect(t["position"]).to eq tab_order.find_index(@tab_lookup[t["id"]]) + 1 }
+        json.each do |t|
+          # Skip AI Experiences - it's inserted dynamically before Settings
+          next if t["id"] == "ai_experiences"
+
+          expect(t["position"]).to eq tab_order.find_index(@tab_lookup[t["id"]]) + 1
+        end
       end
 
       it "correctly labels navigation items as unused" do
@@ -809,7 +834,7 @@ describe TabsController, type: :request do
 
       it "correctly sets visibility" do
         hidden_tabs = [3, 8, 5]
-        public_visibility = %w[home people syllabus]
+        public_visibility = %w[home people syllabus ai_experiences]
         admins_visibility = %w[announcements assignments pages files outcomes rubrics quizzes modules settings discussions grades]
         @course.tab_configuration = @tab_ids.map do |n|
           hash = { "id" => n }

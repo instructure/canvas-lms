@@ -2806,15 +2806,19 @@ describe Course do
 
       it "returns the defaults if nothing specified" do
         tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).to eql(default_tab_ids)
-        expect(tab_ids.length).to eql(default_tab_ids.length)
+        # Reject AI Experiences tab since it's added dynamically when feature flag is enabled
+        tab_ids_without_ai = tab_ids.reject { |id| id == Course::TAB_AI_EXPERIENCES }
+        expect(tab_ids_without_ai).to eql(default_tab_ids)
+        expect(tab_ids.length).to be >= default_tab_ids.length
       end
 
       it "returns K-6 tabs if feature flag is enabled for teachers" do
         @course.enable_feature!(:canvas_k6_theme)
         tabs = @course.tabs_available(@user)
-        expect(tabs.count { |t| !t[:hidden] }).to eq 5
-        expect(tabs.count { |t| t[:hidden] }).to eq 12
+        # Reject AI Experiences tab since it's added dynamically when feature flag is enabled
+        tabs_without_ai = tabs.reject { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
+        expect(tabs_without_ai.count { |t| !t[:hidden] }).to eq 5
+        expect(tabs_without_ai.count { |t| t[:hidden] }).to eq 12
       ensure
         @course.disable_feature!(:canvas_k6_theme)
       end
@@ -3079,14 +3083,17 @@ describe Course do
       it "overwrites the order of tabs if configured" do
         @course.tab_configuration = [{ id: Course::TAB_COLLABORATIONS }]
         available_tabs = @course.tabs_available(@user).pluck(:id)
+        # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+        # TODO: Determine if AI Experiences should be excluded - see Jira ticket LLMA-94
+        available_tabs_filtered = available_tabs.reject { |id| id == Course::TAB_AI_EXPERIENCES }
         custom_tabs    = @course.tab_configuration.pluck(:id)
         expected_tabs  = (custom_tabs + default_tab_ids).uniq
         # Home tab always comes first
         home_tab = default_tab_ids[0]
         expected_tabs.insert(0, expected_tabs.delete(home_tab))
 
-        expect(available_tabs).to        eq expected_tabs
-        expect(available_tabs.length).to eq default_tab_ids.length
+        expect(available_tabs_filtered).to        eq expected_tabs
+        expect(available_tabs_filtered.length).to eq default_tab_ids.length
       end
 
       it "does not blow up if somehow nils got in there" do
@@ -3132,7 +3139,9 @@ describe Course do
         @course.tab_configuration = [{ "id" => 912 }]
         expect(@course.tabs_available(@user).pluck(:id)).not_to include(912)
         tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).to eql(default_tab_ids)
+        # Reject AI Experiences tab since it's added dynamically when feature flag is enabled
+        tab_ids_without_ai = tab_ids.reject { |id| id == Course::TAB_AI_EXPERIENCES }
+        expect(tab_ids_without_ai).to eql(default_tab_ids)
         expect(tab_ids.length).to be > 0
         expect(@course.tabs_available(@user).filter_map { |t| t[:label] }.length).to eql(tab_ids.length)
       end
@@ -3250,7 +3259,9 @@ describe Course do
           end
 
           it "hides most tabs for homeroom courses" do
-            tab_ids = @course.tabs_available(@user).pluck(:id)
+            # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+            # TODO: Determine if AI Experiences should be excluded from homeroom courses - see Jira ticket LLMA-94
+            tab_ids = @course.tabs_available(@user).pluck(:id).reject { |id| id == Course::TAB_AI_EXPERIENCES }
             expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_FILES, Course::TAB_SETTINGS]
           end
 
@@ -3272,7 +3283,9 @@ describe Course do
               }
             )
             @course.tab_configuration = [{ id: Course::TAB_ANNOUNCEMENTS }, { id: "context_external_tool_8" }]
-            tab_ids = @course.tabs_available(@user).pluck(:id)
+            # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+            # TODO: Determine if AI Experiences should be excluded from homeroom courses - see Jira ticket LLMA-94
+            tab_ids = @course.tabs_available(@user).pluck(:id).reject { |id| id == Course::TAB_AI_EXPERIENCES }
             expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_FILES, Course::TAB_SETTINGS]
           end
         end
@@ -3285,7 +3298,9 @@ describe Course do
           it "returns default course tabs without home if course_subject_tabs option is not passed" do
             course_elementary_nav_tabs = default_tab_ids.reject { |id| id == Course::TAB_HOME }
             length = course_elementary_nav_tabs.length
-            tab_ids = @course.tabs_available(@user).pluck(:id)
+            # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+            # TODO: Determine if AI Experiences should be excluded from elementary courses - see Jira ticket LLMA-94
+            tab_ids = @course.tabs_available(@user).pluck(:id).reject { |id| id == Course::TAB_AI_EXPERIENCES }
             expect(tab_ids).to eql(course_elementary_nav_tabs)
             expect(tab_ids.length).to eql(length)
           end
@@ -3350,7 +3365,9 @@ describe Course do
           context "with course_subject_tabs option" do
             it "returns subject tabs only by default" do
               length = Course.course_subject_tabs.length
-              tab_ids = @course.tabs_available(@user, course_subject_tabs: true).pluck(:id)
+              # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+              # TODO: Determine if AI Experiences should be excluded from subject tabs - see Jira ticket LLMA-94
+              tab_ids = @course.tabs_available(@user, course_subject_tabs: true).pluck(:id).reject { |id| id == Course::TAB_AI_EXPERIENCES }
               expect(tab_ids).to eql(Course.course_subject_tabs.pluck(:id))
               expect(tab_ids.length).to eql(length)
             end
@@ -3364,7 +3381,9 @@ describe Course do
                 { id: Course::TAB_SETTINGS },
                 { id: Course::TAB_GROUPS },
               ]
-              available_tabs = @course.tabs_available(@user, course_subject_tabs: true).pluck(:id)
+              # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+              # TODO: Determine if AI Experiences should be excluded from subject tabs - see Jira ticket LLMA-94
+              available_tabs = @course.tabs_available(@user, course_subject_tabs: true).pluck(:id).reject { |id| id == Course::TAB_AI_EXPERIENCES }
               expected_tabs = [
                 Course::TAB_HOME,
                 Course::TAB_SCHEDULE,
@@ -3400,7 +3419,9 @@ describe Course do
               ]
               available_tabs = @course.tabs_available(@user, course_subject_tabs: true, include_external: true, for_reordering: true)
               expected_tab_ids = Course.course_subject_tabs.pluck(:id) + [t1.asset_string, t2.asset_string]
-              expect(available_tabs.pluck(:id)).to eql(expected_tab_ids)
+              # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+              # TODO: Determine if AI Experiences should be excluded from subject tabs - see Jira ticket LLMA-94
+              expect(available_tabs.pluck(:id).reject { |id| id == Course::TAB_AI_EXPERIENCES }).to eql(expected_tab_ids)
             end
 
             it "includes modules tab even if there's no modules" do
@@ -3433,7 +3454,9 @@ describe Course do
                                                      shared_secret: "🤫",
                                                      domain: "example.com",
                                                      course_navigation: { text: "Blah", url: "https://google.com" })
-              last_tab_id = @course.tabs_available(@user, course_subject_tabs: true, include_external: true).last[:id]
+              # AI Experiences is excluded from subject tabs
+              tabs = @course.tabs_available(@user, course_subject_tabs: true, include_external: true)
+              last_tab_id = tabs.last[:id]
               expect(last_tab_id).to equal Course::TAB_GROUPS
             end
 

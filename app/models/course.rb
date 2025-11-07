@@ -3606,6 +3606,15 @@ class Course < ActiveRecord::Base
       smart_search_tab = default_tabs.detect { |t| t[:id] == TAB_SEARCH }
       tabs.insert(1, default_tabs.delete(smart_search_tab)) if smart_search_tab && !tabs.empty?
 
+      # since TAB_AI_EXPERIENCES is added dynamically, insert it before Settings if not already configured
+      # If it was configured by the user, it will have been removed from default_tabs by the mapping above
+      ai_experiences_tab = default_tabs.detect { |t| t[:id] == TAB_AI_EXPERIENCES }
+      if ai_experiences_tab && !tabs.empty?
+        settings_index = tabs.index { |t| t[:id] == TAB_SETTINGS }
+        settings_index ||= tabs.length
+        tabs.insert(settings_index, default_tabs.delete(ai_experiences_tab))
+      end
+
       tabs += default_tabs
       tabs += external_tabs
 
@@ -3626,8 +3635,9 @@ class Course < ActiveRecord::Base
 
       tabs.delete_if { |t| t[:id] == TAB_SETTINGS }
       if course_subject_tabs
-        # Don't show Settings, ensure that all external tools are at the bottom (with the exception of Groups, which
+        # Don't show Settings or AI Experiences, ensure that all external tools are at the bottom (with the exception of Groups, which
         # should stick to the end unless it has been re-ordered)
+        tabs.delete_if { |t| t[:id] == TAB_AI_EXPERIENCES }
         lti_tabs = tabs.filter { |t| t[:external] }
         tabs -= lti_tabs
         groups_tab = tabs.pop if tabs.last&.dig(:id) == TAB_GROUPS && !opts[:for_reordering]
