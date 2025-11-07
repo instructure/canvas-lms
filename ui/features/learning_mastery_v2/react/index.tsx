@@ -28,6 +28,7 @@ import LMGBContext, {
   LMGBContextType,
 } from '@canvas/outcomes/react/contexts/LMGBContext'
 import {FilterWrapper} from './components/filters/FilterWrapper'
+import {SearchWrapper} from './components/filters/SearchWrapper'
 import {Toolbar} from './components/toolbar/Toolbar'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
@@ -60,6 +61,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
   } = useGradebookSettings(courseId)
 
   const [isSavingSettings, setIsSavingSettings] = useState(false)
+  const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
 
   const {
     isLoading: isLoadingGradebook,
@@ -75,6 +77,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     accountMasteryScalesEnabled: accountLevelMasteryScalesFF ?? false,
     enabled: !isLoadingSettings,
     settings: gradebookSettings,
+    selectedUserIds,
   })
 
   const handleGradebookSettingsChange = useCallback(
@@ -156,6 +159,13 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
           setGradebookSettings={handleGradebookSettingsChange}
           isSavingSettings={isSavingSettings}
         />
+        {pagination && (
+          <SearchWrapper
+            courseId={courseId}
+            selectedUserIds={selectedUserIds}
+            onSelectedUserIdsChange={setSelectedUserIds}
+          />
+        )}
         <FilterWrapper pagination={pagination} onPerPageChange={handleUpdateStudentsPerPage} />
         {renderBody()}
       </LMGBContext.Provider>

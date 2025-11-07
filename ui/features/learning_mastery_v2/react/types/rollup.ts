@@ -51,7 +51,7 @@ export interface StudentRollup {
 }
 
 export interface Student {
-  id: string | number
+  id: string
   name: string
   display_name: string
   sortable_name: string

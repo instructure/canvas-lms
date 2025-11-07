@@ -24,6 +24,7 @@ import {
   GradebookSettings,
   DisplayFilter,
 } from './utils/constants'
+import {Student} from './types/rollup'
 
 /**
  * Parameters for outcome rollups API
@@ -38,6 +39,7 @@ interface RollupParams {
   page: number
   add_defaults?: boolean
   sort_outcome_id?: string
+  user_ids?: number[]
 }
 
 /**
@@ -50,6 +52,7 @@ interface RollupParams {
  * @param sortOrder - The order to sort the results by
  * @param sortBy - The field to sort the results by
  * @param sortOutcomeId - The ID of the outcome to sort by (when sortBy is 'outcome')
+ * @param selectedUserIds - Array of user IDs to filter by (optional)
  * @returns A promise that resolves to the API response
  */
 export const loadRollups = (
@@ -61,6 +64,7 @@ export const loadRollups = (
   sortOrder: SortOrder = SortOrder.ASC,
   sortBy: string = SortBy.SortableName,
   sortOutcomeId?: string,
+  selectedUserIds?: number[],
 ): Promise<AxiosResponse> => {
   const params: {params: RollupParams} = {
     params: {
@@ -73,6 +77,7 @@ export const loadRollups = (
       page,
       ...(needDefaults && {add_defaults: true}),
       ...(sortOutcomeId && {sort_outcome_id: sortOutcomeId}),
+      ...(selectedUserIds && selectedUserIds.length > 0 && {user_ids: selectedUserIds}),
     },
   }
 
@@ -140,4 +145,33 @@ export const saveLearningMasteryGradebookSettings = (
   }
 
   return axios.put(`/api/v1/courses/${courseId}/learning_mastery_gradebook_settings`, body)
+}
+
+/**
+ * Parameters for course users API
+ */
+interface CourseUsersParams {
+  enrollment_type?: string[]
+  per_page?: number
+  search_term?: string
+}
+
+/**
+ * Load users enrolled in a course
+ * @param courseId - The ID of the course
+ * @returns A promise that resolves to the API response with Student array
+ */
+export const loadCourseUsers = (
+  courseId: string | number,
+  searchTerm?: string,
+): Promise<AxiosResponse<Student[]>> => {
+  const params: {params: CourseUsersParams} = {
+    params: {
+      enrollment_type: ['student', 'student_view'],
+      per_page: 100,
+      ...(searchTerm ? {search_term: searchTerm} : {}),
+    },
+  }
+
+  return axios.get(`/api/v1/courses/${courseId}/users`, params)
 }

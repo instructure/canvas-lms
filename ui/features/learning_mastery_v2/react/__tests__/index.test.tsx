@@ -20,6 +20,7 @@ import {render, waitFor} from '@testing-library/react'
 import LearningMastery from '../index'
 import useRollups from '../hooks/useRollups'
 import {useGradebookSettings} from '../hooks/useGradebookSettings'
+import {useStudents} from '../hooks/useStudents'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {Rating, Student, Outcome, StudentRollupData} from '../types/rollup'
 import {SortOrder, SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '../utils/constants'
@@ -30,6 +31,7 @@ jest.mock('../apiClient')
 
 jest.mock('../hooks/useRollups')
 jest.mock('../hooks/useGradebookSettings')
+jest.mock('../hooks/useStudents')
 
 describe('LearningMastery', () => {
   const ratings: Rating[] = MOCK_RATINGS
@@ -106,6 +108,13 @@ describe('LearningMastery', () => {
       isLoading: false,
       error: null,
       updateSettings: jest.fn(),
+    })
+
+    const mockUseStudents = useStudents as jest.MockedFunction<typeof useStudents>
+    mockUseStudents.mockReturnValue({
+      students,
+      isLoading: false,
+      error: null,
     })
   })
 
@@ -195,6 +204,7 @@ describe('LearningMastery', () => {
       accountMasteryScalesEnabled: true,
       enabled: true,
       settings: DEFAULT_GRADEBOOK_SETTINGS,
+      selectedUserIds: [],
     })
   })
 })
