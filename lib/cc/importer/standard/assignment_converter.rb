@@ -139,7 +139,15 @@ module CC::Importer::Standard
         assignment[:asset_processors] = asset_processors if asset_processors.any?
       end
 
-      %w[title allowed_extensions grading_type submission_types external_tool_url external_tool_data_json external_tool_link_settings_json turnitin_settings time_zone_edited].each do |string_type|
+      %w[title
+         allowed_extensions
+         grading_type
+         submission_types
+         external_tool_url
+         external_tool_data_json
+         external_tool_link_settings_json
+         turnitin_settings
+         time_zone_edited].each do |string_type|
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
       end
