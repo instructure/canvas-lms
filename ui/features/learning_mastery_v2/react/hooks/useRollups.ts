@@ -48,6 +48,7 @@ interface UseRollupsProps {
   accountMasteryScalesEnabled: boolean
   settings?: GradebookSettings | null
   enabled?: boolean
+  selectedUserIds?: number[]
 }
 
 interface UseRollupsReturn extends RollupData {
@@ -63,6 +64,8 @@ interface RollupData {
   students: Student[]
   pagination?: Pagination
 }
+
+const EMPTY_USER_IDS: number[] = []
 
 const getRow = (studentRollups: StudentRollup[], outcomes: Outcome[]): OutcomeRollup[] =>
   studentRollups[0].scores.map(score => {
@@ -114,6 +117,7 @@ export default function useRollups({
   accountMasteryScalesEnabled,
   settings = null,
   enabled = true,
+  selectedUserIds = EMPTY_USER_IDS,
 }: UseRollupsProps): UseRollupsReturn {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<null | string>(null)
@@ -166,6 +170,7 @@ export default function useRollups({
           sortOrder,
           sortBy,
           sortOutcomeId || undefined,
+          selectedUserIds,
         )) as RollupsResponse
         const {users: fetchedUsers, outcomes: fetchedOutcomes} = data.linked
         const students = getStudents(data.rollups, fetchedUsers)
@@ -200,6 +205,7 @@ export default function useRollups({
     sortOutcomeId,
     settings,
     enabled,
+    selectedUserIds,
   ])
 
   return {

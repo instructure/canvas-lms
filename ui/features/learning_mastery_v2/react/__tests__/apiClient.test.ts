@@ -17,7 +17,12 @@
  */
 
 import axios from '@canvas/axios'
-import {loadRollups, exportCSV, saveLearningMasteryGradebookSettings} from '../apiClient'
+import {
+  loadRollups,
+  exportCSV,
+  saveLearningMasteryGradebookSettings,
+  loadCourseUsers,
+} from '../apiClient'
 import {
   DEFAULT_STUDENTS_PER_PAGE,
   SortOrder,
@@ -86,6 +91,57 @@ describe('apiClient', () => {
         '/api/v1/courses/789/outcome_rollups',
         expect.any(Object),
       )
+    })
+
+    it('includes user_ids when selectedUserIds is provided', async () => {
+      await loadRollups(
+        '123',
+        [],
+        false,
+        1,
+        DEFAULT_STUDENTS_PER_PAGE,
+        SortOrder.ASC,
+        SortBy.SortableName,
+        undefined,
+        [97, 42, 101],
+      )
+
+      expect(mockedAxios.get).toHaveBeenCalledWith('/api/v1/courses/123/outcome_rollups', {
+        params: {
+          rating_percents: true,
+          per_page: DEFAULT_STUDENTS_PER_PAGE,
+          exclude: [],
+          include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+          sort_by: SortBy.SortableName,
+          sort_order: SortOrder.ASC,
+          page: 1,
+          user_ids: [97, 42, 101],
+        },
+      })
+    })
+
+    it('does not include user_ids when selectedUserIds is empty array', async () => {
+      await loadRollups(
+        '123',
+        [],
+        false,
+        1,
+        DEFAULT_STUDENTS_PER_PAGE,
+        SortOrder.ASC,
+        SortBy.SortableName,
+        undefined,
+        [],
+      )
+
+      const callArgs = mockedAxios.get.mock.calls[0][1]
+      expect(callArgs?.params).not.toHaveProperty('user_ids')
+    })
+
+    it('does not include user_ids when selectedUserIds is undefined', async () => {
+      await loadRollups('123', [])
+
+      const callArgs = mockedAxios.get.mock.calls[0][1]
+      expect(callArgs?.params).not.toHaveProperty('user_ids')
     })
   })
 
@@ -269,6 +325,43 @@ describe('apiClient', () => {
           },
         },
       )
+    })
+  })
+
+  describe('loadCourseUsers', () => {
+    it('calls the correct endpoint with default parameters', async () => {
+      await loadCourseUsers('123')
+
+      expect(mockedAxios.get).toHaveBeenCalledWith('/api/v1/courses/123/users', {
+        params: {
+          enrollment_type: ['student', 'student_view'],
+          per_page: 100,
+        },
+      })
+    })
+
+    it('accepts numeric courseId', async () => {
+      await loadCourseUsers(456)
+
+      expect(mockedAxios.get).toHaveBeenCalledWith('/api/v1/courses/456/users', {
+        params: {
+          enrollment_type: ['student', 'student_view'],
+          per_page: 100,
+        },
+      })
+    })
+
+    it('returns the response from axios', async () => {
+      const mockStudents = [
+        {id: 1, name: 'Student 1', display_name: 'S1', sortable_name: 'Student, 1'},
+        {id: 2, name: 'Student 2', display_name: 'S2', sortable_name: 'Student, 2'},
+      ]
+      mockedAxios.get.mockResolvedValue({data: mockStudents, status: 200})
+
+      const response = await loadCourseUsers('123')
+
+      expect(response.data).toEqual(mockStudents)
+      expect(response.status).toBe(200)
     })
   })
 })
