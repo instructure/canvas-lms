@@ -322,7 +322,7 @@ module Lti
             registration.save!
 
             if root_account.feature_enabled?(:lti_registrations_next)
-              deployment = registration.new_external_tool(root_account, current_user:, available: false)
+              deployment = registration.new_external_tool(root_account, current_user:, available: false, enabled: false)
             end
           end
 

@@ -134,14 +134,18 @@ module Lti
           **configuration_params
         )
 
-        Lti::AccountBindingService.call(account:,
-                                        registration:,
-                                        user: created_by,
-                                        overwrite_created_by: true,
-                                        **binding_params.deep_symbolize_keys)
+        binding = Lti::AccountBindingService.call(account:,
+                                                  registration:,
+                                                  user: created_by,
+                                                  overwrite_created_by: true,
+                                                  **binding_params.deep_symbolize_keys)
 
         if account.feature_enabled?(:lti_registrations_next)
-          registration.new_external_tool(account, current_user: created_by, available: false)
+          # If the account binding is "off," make the tool unavailable. Any other binding
+          # state (on/allow/etc.) should make the tool available.
+          # In this case, the tool default's to the registration's current privacy level.
+          enabled = binding[:lti_registration_account_binding].workflow_state != "off"
+          registration.new_external_tool(account, current_user: created_by, available: false, enabled:)
         end
 
         registration

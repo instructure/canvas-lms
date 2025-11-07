@@ -36,6 +36,7 @@ RSpec.describe Lti::DeploymentsController do
       created_by: admin,
       registration_params:,
       configuration_params:,
+      binding_params: { workflow_state: "on" },
     }
   end
   let(:registration_params) do
@@ -389,6 +390,11 @@ RSpec.describe Lti::DeploymentsController do
         ContextExternalTool.last.id
       )
       expect(Lti::ContextControl.last.created_by).to eql(admin)
+    end
+
+    it "sets the deployment's workflow_state to the registration's privacy level" do
+      subject
+      expect(ContextExternalTool.last.workflow_state).to eq(registration.privacy_level)
     end
 
     context "for a subaccount" do
