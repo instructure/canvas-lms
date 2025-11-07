@@ -335,10 +335,12 @@ RSpec.describe PeerReview::PeerReviewCommonService do
 
     context "when inherited attributes have changed on parent" do
       before do
+        parent_assignment.skip_peer_review_sub_assignment_sync = true
         parent_assignment.update!(
           description: "Updated description",
           peer_review_count: 3
         )
+        parent_assignment.skip_peer_review_sub_assignment_sync = false
       end
 
       it "includes inherited attributes that differ from the peer review sub assignment" do
@@ -351,10 +353,12 @@ RSpec.describe PeerReview::PeerReviewCommonService do
 
     context "when both inherited and specific attributes have changed" do
       before do
+        parent_assignment.skip_peer_review_sub_assignment_sync = true
         parent_assignment.update!(
           description: "New description",
           peer_review_count: 5
         )
+        parent_assignment.skip_peer_review_sub_assignment_sync = false
       end
 
       let(:service) do
@@ -406,7 +410,9 @@ RSpec.describe PeerReview::PeerReviewCommonService do
         before do
           initial_title = I18n.t("%{title} Peer Review", title: parent_assignment.title)
           peer_review_sub_assignment.update!(title: initial_title)
+          parent_assignment.skip_peer_review_sub_assignment_sync = true
           parent_assignment.update!(title: "Updated Parent Assignment")
+          parent_assignment.skip_peer_review_sub_assignment_sync = false
         end
 
         it "includes the updated title based on new parent title" do

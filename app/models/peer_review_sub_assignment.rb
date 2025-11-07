@@ -22,6 +22,23 @@ class PeerReviewSubAssignment < AbstractAssignment
   belongs_to :parent_assignment, class_name: "Assignment", inverse_of: :peer_review_sub_assignment
   has_many :assessment_requests, dependent: :nullify
 
+  SYNCABLE_ATTRIBUTES = %w[
+    anonymous_peer_reviews
+    assignment_group_id
+    automatic_peer_reviews
+    context_id
+    context_type
+    description
+    group_category_id
+    intra_group_peer_reviews
+    peer_review_count
+    peer_reviews
+    peer_reviews_assigned
+    peer_reviews_due_at
+    title
+    workflow_state
+  ].freeze
+
   validates :parent_assignment_id,
             presence: true,
             uniqueness: { conditions: -> { where.not(workflow_state: "deleted") } },

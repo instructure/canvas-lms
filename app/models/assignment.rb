@@ -24,7 +24,7 @@ class Assignment < AbstractAssignment
   # Later versions of Rails try to read the attribute when setting an error for that attribute. In order to maintain
   # backwards compatibility with error consumers, create a fake attribute :custom_params so it doesn't error out.
   attr_reader :custom_params
-  attr_accessor :question_count
+  attr_accessor :question_count, :skip_peer_review_sub_assignment_sync
 
   has_one :peer_review_sub_assignment, -> { active }, foreign_key: :parent_assignment_id, inverse_of: :parent_assignment, dependent: :destroy
   has_many :allocation_rules,
@@ -39,6 +39,7 @@ class Assignment < AbstractAssignment
   SUB_ASSIGNMENT_SYNC_ATTRIBUTES = %w[workflow_state grading_type].freeze
   after_update :delete_allocation_rules, if: :peer_reviews_changed?
   after_save :sync_sub_assignments, if: :sync_attributes_changed?
+  after_save :sync_peer_review_sub_assignment, if: :should_sync_peer_review_sub_assignment?
   after_save :sync_stream_items_hidden, if: :saved_change_to_suppress_assignment?
   after_commit :sync_sub_assignments_after_commit, if: :sync_attributes_changed_after_commit?
 
@@ -241,6 +242,18 @@ class Assignment < AbstractAssignment
 
   def sync_attributes_changed_after_commit?
     previous_changes.keys.intersect?(SubAssignment::SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
+  end
+
+  def should_sync_peer_review_sub_assignment?
+    return false if skip_peer_review_sub_assignment_sync
+    return false unless context.feature_enabled?(:peer_review_grading)
+    return false unless peer_review_sub_assignment.present?
+
+    previous_changes.keys.intersect?(PeerReviewSubAssignment::SYNCABLE_ATTRIBUTES)
+  end
+
+  def sync_peer_review_sub_assignment
+    PeerReview::PeerReviewUpdaterService.call(parent_assignment: self)
   end
 
   def sync_stream_items_hidden
