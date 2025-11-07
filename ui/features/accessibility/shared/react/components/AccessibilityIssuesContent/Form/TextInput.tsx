@@ -15,7 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {forwardRef, useImperativeHandle, useRef, useState, useContext} from 'react'
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+  useContext,
+  useEffect,
+} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -37,7 +44,18 @@ const I18n = createI18nScope('accessibility_checker')
 
 const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
-    ({issue, error, value, onChangeValue}: FormComponentProps, ref) => {
+    (
+      {
+        issue,
+        error,
+        value,
+        onChangeValue,
+        actionButtons,
+        isDisabled,
+        onValidationChange,
+      }: FormComponentProps,
+      ref,
+    ) => {
       const [generateLoading, setGenerateLoading] = useState(false)
       const {selectedItem} = useContext(AccessibilityCheckerContext)
       const inputRef = useRef<HTMLInputElement | null>(null)
@@ -51,6 +69,10 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
           inputRef.current?.focus()
         },
       }))
+
+      useEffect(() => {
+        onValidationChange?.(value?.trim()?.length > 0, I18n.t('Caption cannot be empty.'))
+      }, [value, onValidationChange])
 
       const handleGenerateClick = () => {
         setGenerateLoading(true)
@@ -102,44 +124,44 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             onChange={(_, value) => onChangeValue(value)}
             inputRef={el => (inputRef.current = el)}
             messages={error ? [{text: error, type: 'newError'}] : []}
+            interaction={isDisabled ? 'disabled' : 'enabled'}
           />
-          {isAiGenerationEnabled && (
-            <>
-              <Flex as="div" margin="small 0">
-                <Flex.Item>
-                  <Button
-                    color="ai-primary"
-                    renderIcon={() => <IconAiSolid />}
-                    onClick={handleGenerateClick}
-                    disabled={generateLoading}
-                  >
-                    {issue.form.generateButtonLabel}
-                  </Button>
-                </Flex.Item>
-                {generateLoading ? (
-                  <Flex.Item>
-                    <Spinner
-                      size="x-small"
-                      renderTitle={I18n.t('Generating...')}
-                      margin="0 small 0 0"
-                    />
-                  </Flex.Item>
-                ) : (
-                  <></>
-                )}
-              </Flex>
-              {generationError !== null ? (
-                <Flex>
-                  <Flex.Item>
-                    <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
-                      {generationError}
-                    </Alert>
-                  </Flex.Item>
-                </Flex>
-              ) : (
-                <></>
-              )}
-            </>
+          <Flex as="div" margin="medium 0" gap="small">
+            {isAiGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
+              <Flex.Item>
+                <Button
+                  color="ai-primary"
+                  renderIcon={() => <IconAiSolid />}
+                  onClick={handleGenerateClick}
+                  disabled={generateLoading || isDisabled}
+                >
+                  {issue.form.generateButtonLabel}
+                </Button>
+              </Flex.Item>
+            )}
+            {actionButtons && <Flex.Item>{actionButtons}</Flex.Item>}
+            {generateLoading ? (
+              <Flex.Item>
+                <Spinner
+                  size="x-small"
+                  renderTitle={I18n.t('Generating...')}
+                  margin="0 small 0 0"
+                />
+              </Flex.Item>
+            ) : (
+              <></>
+            )}
+          </Flex>
+          {generationError !== null ? (
+            <Flex>
+              <Flex.Item>
+                <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
+                  {generationError}
+                </Alert>
+              </Flex.Item>
+            </Flex>
+          ) : (
+            <></>
           )}
         </>
       )

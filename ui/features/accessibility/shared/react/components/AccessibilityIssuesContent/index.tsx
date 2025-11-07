@@ -26,7 +26,6 @@ import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {CloseButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
@@ -355,6 +354,19 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       />
     )
 
+  const applyButton = (
+    <ApplyButton
+      onApply={handleApply}
+      onUndo={handleUndo}
+      undoMessage={current.issue.form.undoText}
+      isApplied={isRemediated}
+      isLoading={isFormLocked}
+      disabled={!isSaveButtonEnabled}
+    >
+      {applyButtonText}
+    </ApplyButton>
+  )
+
   if (isRequestInFlight) return renderSpinner()
 
   return (
@@ -362,26 +374,38 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       <Flex as="div" direction="column" height={pageView ? 'auto' : '100%'} width="100%">
         <Flex.Item
           as="header"
-          padding="medium"
+          padding="small medium 0"
           elementRef={(el: Element | null) => {
             regionRef.current = el as HTMLDivElement | null
           }}
         >
-          <View>
-            <Heading level="h2" variant="titleCardRegular">
-              {current.resource.resourceName}
-            </Heading>
-          </View>
-          <View>
-            <Text size="large" variant="descriptionPage" as="h3">
-              {I18n.t('Issue %{current}/%{total}: %{message}', {
-                current: currentIssueIndex + 1,
-                total: issues.length,
-                message: current.issue.displayName,
-              })}{' '}
-              <WhyMattersPopover issue={current.issue} />
-            </Text>
-          </View>
+          <Flex direction="column" gap="small">
+            <Flex.Item>
+              <View>
+                <Heading level="h2" variant="titleCardRegular">
+                  {current.resource.resourceName}
+                </Heading>
+              </View>
+            </Flex.Item>
+            <Flex.Item>
+              <View>
+                <Flex alignItems="center" gap="xx-small">
+                  <Flex.Item>
+                    <Text size="large" variant="descriptionPage" as="h3">
+                      {I18n.t('Issue %{current}/%{total}: %{message}', {
+                        current: currentIssueIndex + 1,
+                        total: issues.length,
+                        message: current.issue.displayName,
+                      })}
+                    </Text>
+                  </Flex.Item>
+                  <Flex.Item>
+                    <WhyMattersPopover issue={current.issue} />
+                  </Flex.Item>
+                </Flex>
+              </View>
+            </Flex.Item>
+          </Flex>
         </Flex.Item>
         <Flex.Item as="main" padding="x-small medium" shouldGrow={true} overflowY="auto">
           <Flex justifyItems="space-between">
@@ -418,20 +442,23 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
               onReload={updatePreview}
               onClearError={handleClearError}
               onValidationChange={handleValidationChange}
+              isDisabled={isRemediated}
+              actionButtons={
+                !isApplyButtonHidden && current.issue.form.canGenerateFix ? applyButton : undefined
+              }
             />
+            {!isApplyButtonHidden &&
+              current.issue.form.canGenerateFix &&
+              formError &&
+              current.issue.form.type === FormType.Button && (
+                <View as="div" margin="x-small 0">
+                  <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
+                </View>
+              )}
           </View>
-          {!isApplyButtonHidden && (
+          {!isApplyButtonHidden && !current.issue.form.canGenerateFix && (
             <View as="section" margin="medium 0">
-              <ApplyButton
-                onApply={handleApply}
-                onUndo={handleUndo}
-                undoMessage={current.issue.form.undoText}
-                isApplied={isRemediated}
-                isLoading={isFormLocked}
-                disabled={!isSaveButtonEnabled}
-              >
-                {applyButtonText}
-              </ApplyButton>
+              {applyButton}
               {formError && current.issue.form.type === FormType.Button && (
                 <View as="div" margin="x-small 0">
                   <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
