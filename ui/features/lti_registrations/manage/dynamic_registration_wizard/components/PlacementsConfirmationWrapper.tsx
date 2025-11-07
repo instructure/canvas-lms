@@ -21,6 +21,7 @@ import {PlacementsConfirmation} from '../../registration_wizard_forms/Placements
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
 import {InternalOnlyLtiPlacements} from '../../model/LtiPlacement'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 
 export type PlacementsConfirmationProps = {
   registration: LtiRegistrationWithConfiguration
@@ -33,13 +34,15 @@ export const PlacementsConfirmationWrapper = ({
 }: PlacementsConfirmationProps) => {
   const [overlayState, actions] = useOverlayStore(overlayStore)
   const requestedPlacements = Object.keys(overlayState.overlay.placements ?? {})
-  const placements = registration.configuration.placements
-    .filter(
-      p =>
-        !InternalOnlyLtiPlacements.includes(p.placement as any) ||
-        requestedPlacements.includes(p.placement),
-    )
-    .map(p => p.placement)
+  const placements = filterPlacementsByFeatureFlags(
+    registration.configuration.placements
+      .filter(
+        p =>
+          !InternalOnlyLtiPlacements.includes(p.placement as any) ||
+          requestedPlacements.includes(p.placement),
+      )
+      .map(p => p.placement),
+  )
 
   const handleToggleAllowFullscreen = () => {
     return actions.updatePlacement('top_navigation')(prevState => {
