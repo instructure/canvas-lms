@@ -34,6 +34,10 @@ import {Sorting} from '../../types/shapes'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
+const getSortByForFormat = (format: NameDisplayFormat): SortBy => {
+  return format === NameDisplayFormat.LAST_FIRST ? SortBy.SortableName : SortBy.Name
+}
+
 export interface StudentHeaderProps {
   sorting: Sorting
   nameDisplayFormat: NameDisplayFormat
@@ -45,6 +49,26 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
   nameDisplayFormat,
   onChangeNameDisplayFormat,
 }) => {
+  const handleNameDisplayFormatChange = React.useCallback(
+    (format: NameDisplayFormat) => {
+      onChangeNameDisplayFormat(format)
+      // When display format changes and we're currently sorting by name or sortable name,
+      // update the sort to match the new format
+      if (sorting.sortBy === SortBy.Name || sorting.sortBy === SortBy.SortableName) {
+        const newSortBy = getSortByForFormat(format)
+        sorting.setSortBy(newSortBy)
+      }
+    },
+    [onChangeNameDisplayFormat, sorting],
+  )
+
+  const handleNameSortClick = React.useCallback(() => {
+    // When sorting by name, use sortable name for "Last, First" format
+    // and regular name for "First, Last" format
+    const sortBy = getSortByForFormat(nameDisplayFormat)
+    sorting.setSortBy(sortBy)
+  }, [nameDisplayFormat, sorting])
+
   return (
     <View background="secondary" as="div" width={STUDENT_COLUMN_WIDTH}>
       <Flex alignItems="center" justifyItems="space-between" height={CELL_HEIGHT}>
@@ -67,13 +91,13 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
           >
             <Menu.Group label={I18n.t('Display as')}>
               <Menu.Item
-                onSelect={() => onChangeNameDisplayFormat(NameDisplayFormat.FIRST_LAST)}
+                onSelect={() => handleNameDisplayFormatChange(NameDisplayFormat.FIRST_LAST)}
                 selected={nameDisplayFormat === NameDisplayFormat.FIRST_LAST}
               >
                 {I18n.t('First, Last Name')}
               </Menu.Item>
               <Menu.Item
-                onSelect={() => onChangeNameDisplayFormat(NameDisplayFormat.LAST_FIRST)}
+                onSelect={() => handleNameDisplayFormatChange(NameDisplayFormat.LAST_FIRST)}
                 selected={nameDisplayFormat === NameDisplayFormat.LAST_FIRST}
               >
                 {I18n.t('Last, First Name')}
@@ -98,16 +122,10 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
             </Menu.Item>
             <Menu.Group label={I18n.t('Sort By')}>
               <Menu.Item
-                onSelect={() => sorting.setSortBy(SortBy.Name)}
-                selected={sorting.sortBy === SortBy.Name}
+                onSelect={handleNameSortClick}
+                selected={sorting.sortBy === SortBy.Name || sorting.sortBy === SortBy.SortableName}
               >
                 {I18n.t('Name')}
-              </Menu.Item>
-              <Menu.Item
-                onSelect={() => sorting.setSortBy(SortBy.SortableName)}
-                selected={sorting.sortBy === SortBy.SortableName}
-              >
-                {I18n.t('Sortable Name')}
               </Menu.Item>
               <Menu.Item
                 onSelect={() => sorting.setSortBy(SortBy.SisId)}
