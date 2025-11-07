@@ -83,6 +83,7 @@ module NewQuizzes
         # Enrollment and permissions
         custom_canvas_enrollment_state: enrollment_state,
         custom_canvas_permissions: permissions,
+        roles:,
         ext_roles:,
 
         # Rich Content Service
@@ -173,6 +174,44 @@ module NewQuizzes
       end
 
       granted.join(",")
+    end
+
+    def roles
+      # Generate LTI context roles (matches traditional LTI launch behavior)
+      # Returns comma-separated role strings based on user's enrollments and account roles
+      # This mirrors the logic in Lti::SubstitutionsHelper#current_lis_roles
+
+      # Get course enrollments
+      course_enrollments = @context.enrollments.where(user_id: @current_user).active
+      course_roles = course_enrollments.filter_map do |enrollment|
+        Lti::LtiUserCreator::ENROLLMENT_MAP[enrollment.class]
+      end
+
+      # Get account enrollments (for account admins)
+      account_enrollments = if @context.respond_to?(:account_chain) && !@context.account_chain.empty?
+                              @current_user.account_users.active
+                                           .where(account_id: @context.account_chain)
+                                           .distinct
+                                           .to_a
+                            else
+                              []
+                            end
+
+      account_roles = account_enrollments.map do
+        Lti::LtiUserCreator::ENROLLMENT_MAP[AccountUser]
+      end
+
+      # Combine course and account roles
+      all_roles = course_roles + account_roles
+
+      # Add site admin role if applicable (matches traditional LTI behavior)
+      # Site admins get the System-level SysAdmin role, not Institution Administrator
+      if Account.site_admin.account_users_for(@current_user).present?
+        all_roles << LtiOutbound::LTIRoles::System::SYS_ADMIN
+      end
+
+      # Deduplicate roles and return comma-separated string or NONE if no roles found
+      all_roles.uniq.join(",").presence || LtiOutbound::LTIRoles::System::NONE
     end
 
     def ext_roles

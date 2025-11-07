@@ -80,6 +80,155 @@ module NewQuizzes
           expect(result[:backend_url]).to be_nil
         end
       end
+
+      context "roles parameter" do
+        it "includes roles in the build output" do
+          course.enroll_teacher(user, enrollment_state: "active")
+          result = builder.build
+          expect(result[:roles]).to eq("Instructor")
+        end
+
+        it "returns Learner for StudentEnrollment" do
+          course.enroll_student(user, enrollment_state: "active")
+          result = builder.build
+          expect(result[:roles]).to eq("Learner")
+        end
+
+        it "returns TA role for TaEnrollment" do
+          course.enroll_ta(user, enrollment_state: "active")
+          result = builder.build
+          expect(result[:roles]).to include("TeachingAssistant")
+        end
+
+        it "returns comma-separated roles for multiple enrollments" do
+          course.enroll_teacher(user, enrollment_state: "active")
+          course.enroll_student(user, enrollment_state: "active")
+          result = builder.build
+          expect(result[:roles]).to include("Instructor")
+          expect(result[:roles]).to include("Learner")
+          expect(result[:roles]).to include(",")
+        end
+
+        it "ignores inactive enrollments" do
+          course.enroll_teacher(user, enrollment_state: "deleted")
+          result = builder.build
+          expect(result[:roles]).to eq("urn:lti:sysrole:ims/lis/None")
+        end
+
+        it "returns NONE when user has no roles" do
+          result = builder.build
+          expect(result[:roles]).to eq("urn:lti:sysrole:ims/lis/None")
+        end
+
+        context "with account admin" do
+          it "includes Administrator role for account admin" do
+            account_admin_user_with_role_changes(user:, account:, role: admin_role)
+            result = builder.build
+            expect(result[:roles]).to eq("urn:lti:instrole:ims/lis/Administrator")
+          end
+
+          it "includes both course role and account admin role" do
+            course.enroll_teacher(user, enrollment_state: "active")
+            account_admin_user_with_role_changes(user:, account:, role: admin_role)
+            result = builder.build
+            roles = result[:roles].split(",")
+            expect(roles).to include("Instructor")
+            expect(roles).to include("urn:lti:instrole:ims/lis/Administrator")
+          end
+
+          it "deduplicates account admin role if user is admin in multiple accounts in chain" do
+            sub_account = account.sub_accounts.create!
+            course.update!(account: sub_account)
+            account_admin_user_with_role_changes(user:, account:, role: admin_role)
+            account_admin_user_with_role_changes(user:, account: sub_account, role: admin_role)
+            result = builder.build
+            # Should only have one Administrator role despite being admin in 2 accounts
+            expect(result[:roles].scan("Administrator").count).to eq(1)
+          end
+        end
+
+        context "with site admin" do
+          before do
+            # Create site admin role for user
+            Account.site_admin.account_users.create!(user:)
+          end
+
+          it "includes SysAdmin role for site admin" do
+            result = builder.build
+            expect(result[:roles]).to eq("urn:lti:sysrole:ims/lis/SysAdmin")
+          end
+
+          it "includes both course role and site admin role" do
+            course.enroll_teacher(user, enrollment_state: "active")
+            result = builder.build
+            roles = result[:roles].split(",")
+            expect(roles).to include("Instructor")
+            expect(roles).to include("urn:lti:sysrole:ims/lis/SysAdmin")
+          end
+
+          it "includes site admin, account admin, and course roles" do
+            course.enroll_teacher(user, enrollment_state: "active")
+            account_admin_user_with_role_changes(user:, account:, role: admin_role)
+            result = builder.build
+            roles = result[:roles].split(",")
+            expect(roles).to include("Instructor")
+            expect(roles).to include("urn:lti:instrole:ims/lis/Administrator")
+            expect(roles).to include("urn:lti:sysrole:ims/lis/SysAdmin")
+          end
+        end
+
+        context "with role deduplication" do
+          it "deduplicates multiple enrollments of same type" do
+            # Create two sections and enroll in both
+            section1 = course.course_sections.create!(name: "Section 1")
+            section2 = course.course_sections.create!(name: "Section 2")
+            course.enroll_teacher(user, enrollment_state: "active", section: section1)
+            course.enroll_teacher(user, enrollment_state: "active", section: section2)
+            result = builder.build
+            # Should only have one Instructor role despite 2 teacher enrollments
+            expect(result[:roles]).to eq("Instructor")
+          end
+        end
+      end
+
+      context "ext_roles parameter" do
+        it "includes ext_roles in the build output" do
+          course.enroll_teacher(user, enrollment_state: "active")
+          result = builder.build
+          expect(result[:ext_roles]).to be_present
+          expect(result[:ext_roles]).to include("urn:lti:role:ims/lis/Instructor")
+        end
+
+        it "includes institution roles from all_roles" do
+          account_admin_user_with_role_changes(user:, account:, role: admin_role)
+          result = builder.build
+          expect(result[:ext_roles]).to include("urn:lti:instrole:ims/lis/Administrator")
+        end
+
+        it "includes site admin role in ext_roles" do
+          Account.site_admin.account_users.create!(user:)
+          result = builder.build
+          expect(result[:ext_roles]).to include("urn:lti:sysrole:ims/lis/SysAdmin")
+        end
+
+        it "returns deduplicated and sorted roles" do
+          course.enroll_teacher(user, enrollment_state: "active")
+          account_admin_user_with_role_changes(user:, account:, role: admin_role)
+          Account.site_admin.account_users.create!(user:)
+          result = builder.build
+          ext_roles = result[:ext_roles].split(",")
+          # Check that roles are unique
+          expect(ext_roles.uniq).to eq(ext_roles)
+          # Check that roles are sorted
+          expect(ext_roles).to eq(ext_roles.sort)
+        end
+
+        it "returns User role when user has no enrollments" do
+          result = builder.build
+          # Users with no enrollments still get the "User" system role from all_roles
+          expect(result[:ext_roles]).to eq("urn:lti:sysrole:ims/lis/User")
+        end
+      end
     end
 
     describe "#build_with_signature" do
