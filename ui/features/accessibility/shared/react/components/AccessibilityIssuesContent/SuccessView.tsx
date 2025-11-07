@@ -21,7 +21,6 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {CloseButton} from '@instructure/ui-buttons'
 import {Alert} from '@instructure/ui-alerts'
 import {Img} from '@instructure/ui-img'
 
@@ -72,13 +71,6 @@ const SuccessView: React.FC<SuccessViewProps> = ({
             <Heading level="h2" variant="titleCardRegular">
               {title}
             </Heading>
-            <CloseButton
-              placement="end"
-              data-testid="close-button"
-              margin="small"
-              screenReaderLabel={I18n.t('Close')}
-              onClick={onClose}
-            />
           </View>
           <View margin="large 0">
             <Text size="large" variant="descriptionPage" as="h3">
