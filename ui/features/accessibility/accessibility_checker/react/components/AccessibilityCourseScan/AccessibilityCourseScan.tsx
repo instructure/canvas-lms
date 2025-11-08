@@ -46,7 +46,11 @@ const onSuccessCallbackForScan = (courseId: string, queryClient: QueryClient) =>
   })
 }
 
-export const CourseScan: React.FC<CourseScanProps> = ({courseId, children, scanDisabled}) => {
+export const AccessibilityCourseScan: React.FC<CourseScanProps> = ({
+  courseId,
+  children,
+  scanDisabled,
+}) => {
   const queryClient = useQueryClient()
   const [isMutationLoading, setIsMutationLoading] = useState(false)
 

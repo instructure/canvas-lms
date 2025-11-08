@@ -29,7 +29,7 @@ export const accessibilityScanQuery = async ({
 }: QueryFunctionContext): Promise<AccessibilityScanResult | undefined> => {
   const [, , courseId] = queryKey
   const fetchOpts = {signal}
-  const path = `/courses/${courseId}/accessibility/scan`
+  const path = `/courses/${courseId}/accessibility/course_scan`
 
   const {json} = await doFetchApi<AccessibilityScanResult>({path, fetchOpts})
 
@@ -42,7 +42,7 @@ export const createAccessibilityScanMutation = async ({
   courseId: string
 }): Promise<AccessibilityScanResult> => {
   const {json, response} = await doFetchApi<AccessibilityScanResult>({
-    path: `/courses/${courseId}/accessibility/scan`,
+    path: `/courses/${courseId}/accessibility/course_scan`,
     method: 'POST',
   })
 

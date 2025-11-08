@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe Accessibility::CourseScannerService do
+describe Accessibility::CourseScanService do
   subject { described_class.new(course:) }
 
   let!(:course) { course_model }
 
   describe ".queue_scan_course" do
     it "creates a Progress record with the correct tag and context" do
-      expect { described_class.queue_scan_course(course) }
+      expect { described_class.queue_course_scan(course) }
         .to change { Progress.where(tag: "course_accessibility_scan", context: course).count }.by(1)
     end
 
@@ -34,9 +34,9 @@ describe Accessibility::CourseScannerService do
       end
 
       it "returns the existing progress without creating a new one" do
-        expect { described_class.queue_scan_course(course) }
+        expect { described_class.queue_course_scan(course) }
           .not_to change { Progress.where(tag: "course_accessibility_scan", context: course).count }
-        expect(described_class.queue_scan_course(course)).to eq(existing_progress)
+        expect(described_class.queue_course_scan(course)).to eq(existing_progress)
       end
     end
 
@@ -46,9 +46,9 @@ describe Accessibility::CourseScannerService do
       end
 
       it "returns the existing progress without creating a new one" do
-        expect { described_class.queue_scan_course(course) }
+        expect { described_class.queue_course_scan(course) }
           .not_to change { Progress.where(tag: "course_accessibility_scan", context: course).count }
-        expect(described_class.queue_scan_course(course)).to eq(existing_progress)
+        expect(described_class.queue_course_scan(course)).to eq(existing_progress)
       end
     end
 
@@ -58,7 +58,7 @@ describe Accessibility::CourseScannerService do
       end
 
       it "creates a new progress" do
-        expect { described_class.queue_scan_course(course) }
+        expect { described_class.queue_course_scan(course) }
           .to change { Progress.where(tag: "course_accessibility_scan", context: course).count }.by(1)
       end
     end

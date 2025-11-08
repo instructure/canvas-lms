@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RSpec.describe Accessibility::ScanController do
+RSpec.describe Accessibility::CourseScanController do
   let!(:course) { course_model }
 
   before do
@@ -67,7 +67,7 @@ RSpec.describe Accessibility::ScanController do
     end
 
     it "returns existing progress if scan is already queued" do
-      existing_progress = Accessibility::CourseScannerService.queue_scan_course(course)
+      existing_progress = Accessibility::CourseScanService.queue_course_scan(course)
 
       post :create, params: { course_id: course.id }
 
