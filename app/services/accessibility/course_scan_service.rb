@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Accessibility::CourseScannerService < ApplicationService
+class Accessibility::CourseScanService < ApplicationService
   SCAN_TAG = "course_accessibility_scan"
 
   class ScanLimitExceededError < StandardError; end
 
-  def self.last_accessibility_scan_progress_by_course(course)
+  def self.last_accessibility_course_scan(course)
     Progress.where(tag: SCAN_TAG, context: course).last
   end
 
-  def self.queue_scan_course(course)
+  def self.queue_course_scan(course)
     progress = Progress.where(tag: SCAN_TAG, context_type: "Course", context_id: course.id).last
     return progress if progress&.pending?
 

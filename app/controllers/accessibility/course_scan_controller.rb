@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module Accessibility
-  class ScanController < ApplicationController
+  class CourseScanController < ApplicationController
     before_action :require_context
     before_action :require_user
     before_action :check_authorized_action
 
     def show
-      progress = Accessibility::CourseScannerService.last_accessibility_scan_progress_by_course(@context)
+      progress = Accessibility::CourseScanService.last_accessibility_course_scan(@context)
 
       unless progress
         head :not_found
@@ -39,13 +39,13 @@ module Accessibility
     end
 
     def create
-      progress = Accessibility::CourseScannerService.queue_scan_course(@context)
+      progress = Accessibility::CourseScanService.queue_course_scan(@context)
       render json: {
                id: progress.id,
                workflow_state: progress.workflow_state
              },
              status: :ok
-    rescue Accessibility::CourseScannerService::ScanLimitExceededError => e
+    rescue Accessibility::CourseScanService::ScanLimitExceededError => e
       render json: { error: e.message }, status: :bad_request
     end
 

@@ -27,7 +27,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import AccessibilityIssuesContent from '../../../../shared/react/components/AccessibilityIssuesContent'
 import {AccessibilityCheckerContext} from '../../../../shared/react/contexts/AccessibilityCheckerContext'
 import {AccessibilityResourceScan} from '../../../../shared/react/types'
-import {CourseScan} from '../AccessibilityScanWrapper'
+import {AccessibilityCourseScan} from '../././AccessibilityCourseScan'
 import {AccessibilityCheckerApp} from '../AccessibilityCheckerApp/AccessibilityCheckerApp'
 import {queryClient} from '@canvas/query'
 import {QueryClientProvider} from '@tanstack/react-query'
@@ -72,9 +72,9 @@ export default function AccessibilityCheckerDrawer({
           value={{selectedItem, setSelectedItem, isTrayOpen, setIsTrayOpen}}
         >
           <QueryClientProvider client={queryClient}>
-            <CourseScan courseId={courseId} scanDisabled={scanDisabled}>
+            <AccessibilityCourseScan courseId={courseId} scanDisabled={scanDisabled}>
               <AccessibilityCheckerApp />
-            </CourseScan>
+            </AccessibilityCourseScan>
           </QueryClientProvider>
         </AccessibilityCheckerContext.Provider>,
       )

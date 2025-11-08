@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe AccessibilityResourceScansController do
+describe Accessibility::ResourceScanController do
   let(:course) { course_model }
 
   before do
