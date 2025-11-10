@@ -96,19 +96,6 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     expect(@entry.reload.message).to eq "<p>Howdy</p>"
   end
 
-  it "deletes discussion_entry_drafts for an edit" do
-    delete_me = DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, message: "Howdy Hey", entry: @entry)
-    run_mutation(discussion_entry_id: @entry.id, message: "New message")
-    expect(DiscussionEntryDraft.where(id: delete_me)).to eq []
-  end
-
-  it "deletes discussion_entry_drafts for an edit for a non author" do
-    delete_me = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: "talk to me", entry: @entry)
-    keeper = DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, message: "Howdy Hey", entry: @entry)
-    run_mutation({ discussion_entry_id: @entry.id, message: "New message" }, @teacher)
-    expect(DiscussionEntryDraft.where(id: [delete_me, keeper].flatten).pluck(:id)).to eq keeper
-  end
-
   it "removes a discussion entry attachment" do
     result = run_mutation(discussion_entry_id: @entry.id, remove_attachment: true)
     expect(result["errors"]).to be_nil

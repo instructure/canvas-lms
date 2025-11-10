@@ -39,14 +39,6 @@ discussions_reporting:
     Discussions Redesign work.
   applies_to: RootAccount
 
-draft_discussions:
-  state: hidden
-  beta: true
-  display_name: Draft Discussion Entries
-  description: |-
-    Will allow for saving drafts as students type their replies to a discussion topic
-    in the discussions redesign
-  applies_to: SiteAdmin
 
 discussion_grading_view:
   state: hidden

@@ -900,7 +900,6 @@ class DiscussionTopicsController < ApplicationController
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
                rce_mentions_in_discussions: @context.feature_enabled?(:react_discussions_post) && !@topic.anonymous?,
                discussion_grading_view: Account.site_admin.feature_enabled?(:discussion_grading_view),
-               draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
                discussion_translation_available: Translation.available?(translation_flags), # Is translation enabled on the course.
                ai_translation_improvements: @domain_root_account.feature_enabled?(:ai_translation_improvements),

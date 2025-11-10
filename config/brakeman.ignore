@@ -139,29 +139,6 @@
       "note": ""
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "1af6d779fa538c578b2cb63fed80210c1fe06ea6f651a21fd0be4edda89f990d",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/discussion_entry_draft.rb",
-      "line": 77,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "connection.select_values(\"  INSERT INTO #{quoted_table_name}\\n              (#{\"user_id,discussion_topic_id,discussion_entry_id,root_entry_id,parent_id,attachment_id,message,include_reply_preview,updated_at,created_at\"})\\n       VALUES (#{[user.id, topic.id, entry.id, (parent.root_entry_id or parent.id), parent.id, attachment.id, message, reply_preview].map do\n connection.quote(iv)\n end.join(\",\")},NOW(),NOW())\\n  ON CONFLICT #{((\"(discussion_topic_id, user_id) WHERE root_entry_id IS NULL AND discussion_entry_id IS NULL\" or \"(root_entry_id, user_id) WHERE discussion_entry_id IS NULL\") or \"(discussion_entry_id, user_id)\")}\\nDO UPDATE SET #{\"#{[\"message\", \"include_reply_preview\", \"parent_id\", \"attachment\"].zip([message, reply_preview, parent.id, attachment.id].map do\n connection.quote(uv)\n end).map do\n a.join(\"=\")\n end.join(\",\")},updated_at=NOW()\"}\\n    RETURNING id\\n\".squish)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DiscussionEntryDraft",
-        "method": "DiscussionEntryDraft.upsert_draft"
-      },
-      "user_input": "[user.id, topic.id, entry.id, (parent.root_entry_id or parent.id), parent.id, attachment.id, message, reply_preview].map do\n connection.quote(iv)\n end.join(\",\")",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Remote Code Execution",
       "warning_code": 24,
       "fingerprint": "1cfe984723e00196cfea88b92c2967adfffe747d43508a73aaf045607ad3a241",

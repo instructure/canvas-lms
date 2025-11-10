@@ -136,11 +136,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       next unless AuditLogFieldExtension.enabled?
 
       mutation = field.mutation
-      # DiscussionEntryDrafts are not objects that need audit logs, they are
-      # only allowed to be created by the user, and they have timestamps, so
-      # skip audit logs for this mutation.
-      #
-      # Also skip audit logs for internal setting mutations, which can only
+      # Skip audit logs for internal setting mutations, which can only
       # be executed by siteadmins.
       #
       # Also skip audit logs for user inbox label mutations, which can only
@@ -150,8 +146,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       # Via the same logic for skipping audit logs for user inbox label,
       # we can skip audit logs for updating gradebook group filter and
       # learner dashboard tab selection, as they update the current user's settings.
-      next if [Mutations::CreateDiscussionEntryDraft,
-               Mutations::CreateInternalSetting,
+      next if [Mutations::CreateInternalSetting,
                Mutations::UpdateInternalSetting,
                Mutations::DeleteInternalSetting,
                Mutations::CreateUserInboxLabel,
