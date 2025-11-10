@@ -320,6 +320,7 @@ describe "conversations new" do
         expect(f("[data-testid='course-select']").attribute("value")).to eq @course.name
         force_click("[data-testid='delete-course-button'] > button")
         wait_for_ajaximations
+        # After reset, the input value is empty and placeholder shows "All Courses"
         expect(f("[data-testid='course-select']").attribute("value")).to eq ""
       end
     end

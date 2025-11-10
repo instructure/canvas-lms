@@ -176,7 +176,7 @@ describe('CanvasInbox App Container', () => {
 
         let mailboxDropdown = await container.findByTestId('course-select')
         expect(window.location.hash).toBe('#filter=type=inbox')
-        expect(mailboxDropdown.getAttribute('value')).toBe('')
+        expect(mailboxDropdown.getAttribute('value')).toBe('All Courses')
 
         window.location.hash = '#filter=type=inbox&course=course_195'
         await waitForApolloLoading()
@@ -212,7 +212,7 @@ describe('CanvasInbox App Container', () => {
 
         const mailboxDropdown = await container.findByTestId('course-select')
         expect(window.location.hash).toBe('#filter=type=inbox')
-        expect(mailboxDropdown.getAttribute('value')).toBe('')
+        expect(mailboxDropdown.getAttribute('value')).toBe('All Courses')
       })
       it('should set course select in compose modal to course name when the context id param is in the url', async () => {
         const url = new URL(window.location.href)
