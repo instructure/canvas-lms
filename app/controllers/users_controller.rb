@@ -547,7 +547,8 @@ class UsersController < ApplicationController
                                    .profile
                                    .tabs_available(@current_user, root_account: @domain_root_account)
                                    .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES },
-               SHARED_COURSE_DATA: course_data_with_grades
+               SHARED_COURSE_DATA: course_data_with_grades,
+               DASHBOARD_FEATURES: { widget_dashboard_customization: Account.site_admin.feature_enabled?(:widget_dashboard_customization) }
              })
       return render html: "", layout: true
     end
