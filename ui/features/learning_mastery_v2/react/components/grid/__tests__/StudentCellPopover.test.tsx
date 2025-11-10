@@ -147,10 +147,13 @@ describe('StudentCellPopover', () => {
     })
 
     it('shows loading spinner while fetching user details', async () => {
+      let res: (value: {} | PromiseLike<{}>) => void
       const user = userEvent.setup()
       fetchMock.get(
         `/api/v1/courses/${courseId}/users/${mockStudent.id}/lmgb_user_details`,
-        new Promise(resolve => setTimeout(() => resolve({body: mockUserDetails}), 100)),
+        new Promise(resolve => {
+          res = resolve
+        }),
       )
 
       renderWithQueryClient(<StudentCellPopover {...defaultProps()} />)
@@ -159,6 +162,8 @@ describe('StudentCellPopover', () => {
 
       // Spinner should appear while loading
       expect(screen.getByText('Loading user details')).toBeInTheDocument()
+
+      res!({body: mockUserDetails})
 
       // Wait for content to load
       await waitFor(() => {
