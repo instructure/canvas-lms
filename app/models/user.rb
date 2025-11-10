@@ -2109,18 +2109,19 @@ class User < ActiveRecord::Base
     true
   end
 
-  def prefers_widget_dashboard?
+  def prefers_widget_dashboard?(domain_root_account, flag = nil)
     # Explicit preference takes priority
     return preferences[:widget_dashboard_user_preference] unless preferences[:widget_dashboard_user_preference].nil?
 
-    # Default based on feature flag state:
+    # Default based on feature flag state on the domain root account:
     # - "allowed" state: default to FALSE (opt-in required)
     # - "allowed_on" state: default to TRUE (opt-out available)
-    # Check if any associated account has the feature enabled (allowed_on or on states)
-    # Use EXISTS subquery to avoid N+1 queries for users with many accounts
-    associated_accounts
-      .where("EXISTS (SELECT 1 FROM #{FeatureFlag.quoted_table_name} WHERE context_type = 'Account' AND context_id = accounts.id AND feature = 'widget_dashboard' AND state IN ('on', 'allowed_on'))")
-      .exists?
+    # - "on" state: enabled for everyone
+    return false unless domain_root_account
+
+    # Use provided flag to avoid redundant lookups, or fetch if not provided
+    flag ||= domain_root_account.lookup_feature_flag(:widget_dashboard)
+    flag&.enabled? || false
   end
 
   def auto_show_cc?

@@ -251,4 +251,4 @@ widget_dashboard:
   display_name: Widgets for Dashboard
   description: |-
     When enabled, this allows learners to add, remove, and rearrange dashboard widgets.
-  applies_to: Account
+  applies_to: RootAccount

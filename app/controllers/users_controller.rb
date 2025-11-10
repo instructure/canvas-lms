@@ -3653,26 +3653,15 @@ class UsersController < ApplicationController
   def should_show_widget_dashboard?
     return false if k5_user?
 
-    flag = widget_dashboard_feature_flag
+    # Single feature flag lookup to avoid redundant queries
+    flag = @domain_root_account&.lookup_feature_flag(:widget_dashboard)
     return false unless flag
 
-    # If feature is locked on (cannot override), force widget dashboard for all eligible users
-    # If feature can be overridden (allowed or allowed_on), respect user preference
-    if flag.enabled? && !flag.can_override?
-      # Feature is locked on - show for all eligible users regardless of preference
-      if @current_user.observer_enrollments.active.any?
-        # only show widget dashboard if observer is actively observing a student
-        return true if @selected_observed_user && @selected_observed_user != @current_user
-      elsif !@current_user.non_student_enrollment?
-        return true
-      end
-      return false
-    end
+    # Check if feature is locked on (cannot be overridden)
+    force_on = flag.enabled? && !flag.can_override?
 
-    # Feature allows override (allowed or allowed_on) - check user preference
-    # For allowed_on, preference defaults to true; for allowed, it defaults to true
-    return false unless flag.can_override?
-    return false unless @current_user.prefers_widget_dashboard?
+    # If not forced on, check user preference (pass flag to avoid re-lookup)
+    return false unless force_on || @current_user.prefers_widget_dashboard?(@domain_root_account, flag)
 
     if @current_user.observer_enrollments.active.any?
       # only show widget dashboard if observer is actively observing a student
@@ -3681,29 +3670,5 @@ class UsersController < ApplicationController
       return true
     end
     false
-  end
-
-  def widget_dashboard_feature_flag
-    return nil unless @current_user
-
-    # Check all associated accounts and return the most permissive flag
-    # This allows any account in the user's hierarchy to enable the feature
-    flags = @current_user.associated_accounts.filter_map do |account|
-      flag = account.lookup_feature_flag(:widget_dashboard)
-      flag if flag && (flag.enabled? || flag.can_override?)
-    end
-
-    # Return the most enabling flag (prioritize locked-on > enabled > allowed)
-    flags.max_by do |flag|
-      if flag.enabled? && !flag.can_override?
-        3 # Locked on
-      elsif flag.enabled?
-        2 # Enabled
-      elsif flag.can_override?
-        1 # Allowed
-      else
-        0
-      end
-    end
   end
 end
