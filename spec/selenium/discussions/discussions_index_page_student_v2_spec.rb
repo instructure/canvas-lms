@@ -94,7 +94,6 @@ describe "discussions index" do
     include ItemsAssignToTray
 
     before :once do
-      Account.default.enable_feature! :discussion_create
       setup_course_and_students
       sub_account = Account.create!(name: "Sub Account", parent_account: Account.default)
       @course.update!(account: sub_account)

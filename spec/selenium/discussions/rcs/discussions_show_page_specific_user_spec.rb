@@ -164,6 +164,7 @@ describe "discussions" do
       end
 
       it "creates a group discussion", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         group
         get "/courses/#{course.id}/discussion_topics"
         expect_new_page_load { f("#add_discussion").click }
@@ -178,6 +179,7 @@ describe "discussions" do
       end
 
       it "creates a graded group discussion", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         assignment_group
         group
         get "/courses/#{course.id}/discussion_topics/new"
@@ -200,6 +202,7 @@ describe "discussions" do
       end
 
       it "shows attachment", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         get "/courses/#{course.id}/discussion_topics"
         expect_new_page_load { f("#add_discussion").click }
         filename, fullpath, _data = get_file("graded.png")

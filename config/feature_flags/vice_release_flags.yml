@@ -64,7 +64,7 @@ discussion_entry_version_history:
   applies_to: SiteAdmin
 
 discussion_create:
-  state: hidden
+  state: 'on'
   display_name: Discussion Create/Edit Page React Update
   description: |-
     This feature flag enables the use of the updated
