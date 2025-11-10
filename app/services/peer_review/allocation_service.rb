@@ -28,11 +28,9 @@ class PeerReview::AllocationService < ApplicationService
     validation_result = validate
     return validation_result unless validation_result[:success]
 
-    # Check if assessor already has an ongoing peer review
     ongoing_review = find_ongoing_review
     return success_result(ongoing_review) if ongoing_review
 
-    # Find an available submission to review
     submission_to_review = find_available_submission
     return error_result(:no_submissions_available, I18n.t("There are no peer reviews available to allocate to you.")) unless submission_to_review
 
@@ -83,7 +81,6 @@ class PeerReview::AllocationService < ApplicationService
   end
 
   def find_ongoing_review
-    # Find any incomplete assessment requests for this assessor on this assignment
     AssessmentRequest.for_assignment(@assignment.id)
                      .for_assessor(@assessor.id)
                      .incomplete
@@ -97,7 +94,9 @@ class PeerReview::AllocationService < ApplicationService
   end
 
   def find_available_submission
-    # Get all submitted submissions for this assignment, excluding assessor's own
+    must_review_submission = find_must_review_submission
+    return must_review_submission if must_review_submission
+
     all_submissions = @assignment.submissions
                                  .where(workflow_state: %w[submitted graded complete])
                                  .where.not(user_id: @assessor.id)
@@ -111,19 +110,15 @@ class PeerReview::AllocationService < ApplicationService
                                 .for_assessor(@assessor.id)
                                 .pluck(:user_id)
 
-    # Get all user IDs from submitted submissions
     available_user_ids = all_submissions.pluck(:user_id) - already_assigned_user_ids
-
     return nil if available_user_ids.empty?
 
-    # Get all assessment requests for this assignment to find reviewed submissions
     reviewed_user_ids = AssessmentRequest
                         .for_assignment(@assignment.id)
                         .where(user_id: available_user_ids)
                         .distinct
                         .pluck(:user_id)
 
-    # Find user IDs that have not been reviewed yet
     unreviewed_user_ids = available_user_ids - reviewed_user_ids
 
     if unreviewed_user_ids.any?
@@ -137,6 +132,41 @@ class PeerReview::AllocationService < ApplicationService
       all_submissions.where(user_id: available_user_ids)
                      .order(:submitted_at)
                      .first
+    end
+  end
+
+  def find_must_review_submission
+    must_review_rules = AllocationRule.active
+                                      .where(assignment: @assignment)
+                                      .where(assessor_id: @assessor.id)
+                                      .where(must_review: true)
+
+    return nil if must_review_rules.empty?
+
+    assessee_ids = must_review_rules.pluck(:assessee_id)
+    already_assigned_user_ids = AssessmentRequest
+                                .for_assignment(@assignment.id)
+                                .for_assessor(@assessor.id)
+                                .pluck(:user_id)
+
+    available_user_ids = assessee_ids - already_assigned_user_ids
+    return nil if available_user_ids.empty?
+
+    available_submissions = @assignment.submissions
+                                       .where(workflow_state: %w[submitted graded complete])
+                                       .where(user_id: available_user_ids)
+
+    return nil if available_submissions.empty?
+
+    submission_ids = available_submissions.pluck(:id)
+    review_counts = AssessmentRequest
+                    .where(asset_type: "Submission", asset_id: submission_ids)
+                    .group(:asset_id)
+                    .count
+
+    # Choose the submission with fewest reviews, and if tied, the oldest one
+    available_submissions.min_by do |submission|
+      [review_counts[submission.id] || 0, submission.submitted_at]
     end
   end
 
