@@ -202,8 +202,8 @@ class GroupsController < ApplicationController
 
     # Apply section restrictions using helper for check and section IDs
     if user_has_section_restrictions?(@context, @current_user)
-      teacher_section_ids = get_teacher_section_ids(@context, @current_user)
-      users = users.where(enrollments: { course_section_id: teacher_section_ids })
+      user_section_ids = get_user_section_ids(@context, @current_user)
+      users = users.where(enrollments: { course_section_id: user_section_ids })
     end
 
     users = users.paginate(page:, per_page:)
@@ -975,8 +975,8 @@ class GroupsController < ApplicationController
             end
 
     # Apply section restrictions using helper for check and filtering
-    if @context.context_type == "Course" && user_has_section_restrictions?(@context.context, @current_user)
-      student_ids_in_sections = get_students_in_teacher_sections(@context.context, @current_user)
+    if @context.context_type == "Course" && @context.context.course_sections.active.length > 1 && user_has_section_restrictions?(@context.context, @current_user)
+      student_ids_in_sections = get_visible_student_ids_in_course(@context.context, @current_user)
       users = users.where(id: student_ids_in_sections)
     end
 
