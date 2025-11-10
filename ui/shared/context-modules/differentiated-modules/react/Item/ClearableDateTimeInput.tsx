@@ -102,6 +102,7 @@ function ClearableDateTimeInput({
 
   const [hasErrorBorder, setHasErrorBorder] = useState(false)
   const clearButtonContainer = useRef<HTMLElement | null>()
+  const [validationError, setValidationError] = useState<FormMessage | null>(null)
 
   const handleResize = useCallback((element: Element) => {
     // Selector for the date time input that is affected by the red border and padding
@@ -131,7 +132,34 @@ function ClearableDateTimeInput({
     </Flex>
   )
 
+  const handleChange = (event: React.SyntheticEvent, newValue: string | undefined) => {
+    // Clear any existing validation error first
+    setValidationError(null)
+
+    // If the value is being cleared or is undefined, allow it
+    if (!newValue) {
+      onChange(event, newValue)
+      return
+    }
+
+    // Parse the date to check the year
+    const selectedDate = new Date(newValue)
+
+    // Check if the date is valid and if the year is before 1980
+    if (!isNaN(selectedDate.getTime()) && selectedDate.getFullYear() < 1980) {
+      setValidationError({
+        text: I18n.t('Please select a date in the year 1980 or later'),
+        type: 'newError',
+      })
+      return
+    }
+
+    // Date is valid, proceed with the original onChange
+    onChange(event, newValue)
+  }
+
   const handleClear = () => {
+    setValidationError(null)
     onClear()
     setTimeout(() => {
       setOnSuccess(I18n.t('Cleared successfully'))
@@ -165,11 +193,11 @@ function ClearableDateTimeInput({
           nextMonthLabel={I18n.t('Next month')}
           value={value ?? undefined}
           layout="columns"
-          messages={messages}
+          messages={validationError ? [validationError] : messages}
           showMessages={showMessages}
           locale={locale}
           timezone={timezone}
-          onChange={onChange}
+          onChange={handleChange}
           onBlur={onBlur}
           dateInputRef={dateInputRef}
           timeInputRef={timeInputRef}
