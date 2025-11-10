@@ -35,6 +35,7 @@ import type {LtiAssetReport} from '../types/LtiAssetReports'
 import {AssetReportModal} from './AssetReportModal'
 import LtiAssetReportStatus from './LtiAssetReportStatus'
 import {LtiAssetReports} from './LtiAssetReports'
+import {ResubmitDiscussionNoticesButton} from './ResubmitDiscussionNoticesButton'
 
 const I18n = createI18nScope('lti_asset_processor')
 
@@ -65,7 +66,17 @@ function studentIdForResubmission(student: StudentUserIdOrAnonymousId): string |
   return student.studentUserId
 }
 
-function AllReportsCard({reports, openModal}: {reports: LtiAssetReport[]; openModal: () => void}) {
+function AllReportsCard({
+  reports,
+  openModal,
+  assignmentId,
+  studentIdForResubmission,
+}: {
+  reports: LtiAssetReport[]
+  openModal: () => void
+  assignmentId: string
+  studentIdForResubmission?: string
+}) {
   return (
     <Flex direction="column" gap="small" padding="small 0 0 0">
       <Heading level="h3">
@@ -87,20 +98,30 @@ function AllReportsCard({reports, openModal}: {reports: LtiAssetReport[]; openMo
             </Text>
           </Heading>
           <LtiAssetReportStatus reports={reports} textSize="small" textWeight="normal" />
-          <div>
-            <Button
-              data-pendo="asset-reports-all-reports-view-reports-button"
-              size="small"
-              onClick={openModal}
-            >
-              {I18n.t('View reports')}
-            </Button>
-          </div>
+          {reports.length > 0 && (
+            <div>
+              <Button
+                data-pendo="asset-reports-all-reports-view-reports-button"
+                size="small"
+                onClick={openModal}
+              >
+                {I18n.t('View reports')}
+              </Button>
+            </div>
+          )}
         </Flex>
       </View>
+      {studentIdForResubmission && (
+        <ResubmitDiscussionNoticesButton
+          size="small"
+          assignmentId={assignmentId}
+          studentId={studentIdForResubmission}
+        />
+      )}
     </Flex>
   )
 }
+
 export function LtiAssetReportsForSpeedgrader(
   props: LtiAssetReportsForSpeedgraderProps,
 ): JSX.Element | null {
@@ -144,8 +165,13 @@ export function LtiAssetReportsForSpeedgrader(
         onToggle={props.onToggleExpanded}
         defaultExpanded={props.onToggleExpanded ? undefined : true}
       >
-        {submissionType === 'discussion_topic' && assetReports.length > 1 ? (
-          <AllReportsCard reports={assetReports} openModal={() => setModalOpen(true)} />
+        {submissionType === 'discussion_topic' ? (
+          <AllReportsCard
+            reports={assetReports}
+            openModal={() => setModalOpen(true)}
+            assignmentId={assignmentId}
+            studentIdForResubmission={studentIdForResubmission(props) ?? undefined}
+          />
         ) : (
           <LtiAssetReports {...childProps} />
         )}
@@ -153,6 +179,7 @@ export function LtiAssetReportsForSpeedgrader(
           <AssetReportModal
             modalTitle={I18n.t('Document processor reports')}
             onClose={() => setModalOpen(false)}
+            assignmentId={assignmentId}
             {...childProps}
           />
         )}

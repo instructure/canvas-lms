@@ -52,6 +52,7 @@ import {
 // of error.
 import {useLtiAssetProcessors, useLtiAssetReports} from '../react/hooks/graphqlQueryHooks'
 import {useResubmitLtiAssetReports} from '../react/hooks/useResubmitLtiAssetReports'
+import {useResubmitDiscussionNotices} from '../react/hooks/useResubmitDiscussionNotices'
 import DateHelper from '@canvas/datetime/dateHelper'
 
 const useFormatDateTime = () => DateHelper.formatDatetimeForDiscussions
@@ -64,5 +65,6 @@ export {
   useLtiAssetProcessors,
   useLtiAssetReports,
   useResubmitLtiAssetReports,
+  useResubmitDiscussionNotices,
   useFormatDateTime,
 }

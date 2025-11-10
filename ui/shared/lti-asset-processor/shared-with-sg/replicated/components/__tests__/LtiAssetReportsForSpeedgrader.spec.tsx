@@ -18,11 +18,11 @@
 
 // This import needs to be first to ensure that the mocked dependencies are set up before any other imports.
 
-import {fireEvent, screen} from '@testing-library/react'
 import {
   mockUseLtiAssetProcessors,
   mockUseLtiAssetReports,
 } from '../../../__tests__/mockedDependenciesShims'
+import {fireEvent, screen} from '@testing-library/react'
 import {renderComponent} from '../../../__tests__/renderingShims'
 import {describe, expect, fn, it} from '../../../__tests__/testPlatformShims'
 import {useLtiAssetProcessors, useLtiAssetReports} from '../../../dependenciesShims'
@@ -89,7 +89,7 @@ describe('LtiAssetReportsForSpeedgrader', () => {
       })
     }
 
-    it('renders status in AllReportsCard for multiple reports', () => {
+    it('renders status in AllReportsCard', () => {
       mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
       const multipleReports = [makeMockDiscussionReport(), makeMockDiscussionReport({priority: 5})]
       mockUseLtiAssetReports({
@@ -117,7 +117,7 @@ describe('LtiAssetReportsForSpeedgrader', () => {
       expect(screen.getByText('Needs attention')).toBeInTheDocument()
     })
 
-    it('opens modal when View reports button is clicked for discussion_topic with multiple reports', () => {
+    it('opens modal when View reports button is clicked', () => {
       mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
       const multipleReports = [
         makeMockDiscussionReport({title: 'myreport1'}),
@@ -151,12 +151,16 @@ describe('LtiAssetReportsForSpeedgrader', () => {
       expect(screen.getByText('myreport1')).toBeInTheDocument()
     })
 
-    it('renders LtiAssetReports directly when there is only one report for discussion_topic', () => {
+    it('shows Resubmit All Replies button', () => {
       mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
+      const multipleReports = [
+        makeMockDiscussionReport({resubmitAvailable: true}),
+        makeMockDiscussionReport({priority: 5}),
+      ]
       mockUseLtiAssetReports({
         submission: {
           ltiAssetReportsConnection: {
-            nodes: [makeMockDiscussionReport({title: 'My OK Report'})],
+            nodes: multipleReports,
           },
         },
       })
@@ -172,9 +176,60 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         />,
       )
 
-      // Should show the report directly, not in AllReportsCard
-      expect(screen.queryByText('All comments')).not.toBeInTheDocument()
-      expect(screen.getByText('My OK Report')).toBeInTheDocument()
+      expect(screen.getByText('Resubmit All Replies')).toBeInTheDocument()
+    })
+
+    it('shows Resubmit All Replies button when there are no reports', () => {
+      mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
+      const reports: LtiAssetReport[] = []
+      mockUseLtiAssetReports({
+        submission: {
+          ltiAssetReportsConnection: {
+            nodes: reports,
+          },
+        },
+      })
+
+      renderComponent(
+        <LtiAssetReportsForSpeedgrader
+          assignmentId="123"
+          attempt={1}
+          submissionType="discussion_topic"
+          attachments={[]}
+          studentUserId="456"
+          studentAnonymousId={null}
+        />,
+      )
+
+      expect(screen.getByText('Resubmit All Replies')).toBeInTheDocument()
+    })
+
+    it('hides Resubmit All Replies button when studentIdForResubmission is not provided', () => {
+      mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
+      const multipleReports = [
+        makeMockDiscussionReport({resubmitAvailable: true}),
+        makeMockDiscussionReport({priority: 5}),
+      ]
+      mockUseLtiAssetReports({
+        submission: {
+          ltiAssetReportsConnection: {
+            nodes: multipleReports,
+          },
+        },
+      })
+
+      renderComponent(
+        <LtiAssetReportsForSpeedgrader
+          assignmentId="123"
+          attempt={1}
+          submissionType="discussion_topic"
+          attachments={[]}
+          studentUserId={null}
+          studentAnonymousId={null}
+        />,
+      )
+
+      expect(screen.queryByText('Resubmit All Replies')).not.toBeInTheDocument()
     })
   })
 
@@ -344,7 +399,7 @@ describe('LtiAssetReportsForSpeedgrader', () => {
 
       // Click the toggle button to expand
       const toggleButton = screen.getByRole('button', {
-        name: /Document processor reports/i,
+        name: 'Document processor reports',
       })
       fireEvent.click(toggleButton)
 

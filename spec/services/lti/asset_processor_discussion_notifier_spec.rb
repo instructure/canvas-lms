@@ -51,7 +51,7 @@ RSpec.describe Lti::AssetProcessorDiscussionNotifier do
     received = []
     allow(Lti::PlatformNotificationService).to receive(:notify_tools) { |payload| received << payload }
     described_class.notify_asset_processors_of_discussion(
-      discussion_entry_version: version,
+      discussion_entry_versions: [version],
       assignment:,
       contribution_status:,
       submission:,
@@ -107,7 +107,7 @@ RSpec.describe Lti::AssetProcessorDiscussionNotifier do
         allow(submission).to receive(:asset_processor_for_discussions_compatible?).and_return(false)
         expect(Lti::PlatformNotificationService).not_to receive(:notify_tools)
         described_class.notify_asset_processors_of_discussion(
-          discussion_entry_version: version,
+          discussion_entry_versions: [version],
           assignment:,
           contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
           submission:,
@@ -120,7 +120,7 @@ RSpec.describe Lti::AssetProcessorDiscussionNotifier do
         version, submission = reply_version(user: @student, html: "Another comment")
         expect(Lti::PlatformNotificationService).not_to receive(:notify_tools)
         described_class.notify_asset_processors_of_discussion(
-          discussion_entry_version: version,
+          discussion_entry_versions: [version],
           assignment:,
           contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
           submission:,
@@ -198,7 +198,7 @@ RSpec.describe Lti::AssetProcessorDiscussionNotifier do
 
         # Initial notify sends to both tools (2 asset processors total)
         described_class.notify_asset_processors_of_discussion(
-          discussion_entry_version: version,
+          discussion_entry_versions: [version],
           assignment:,
           contribution_status:,
           submission:,
@@ -209,7 +209,7 @@ RSpec.describe Lti::AssetProcessorDiscussionNotifier do
 
         # Resubmit filtered to tool2 only
         described_class.notify_asset_processors_of_discussion(
-          discussion_entry_version: version,
+          discussion_entry_versions: [version],
           assignment:,
           contribution_status:,
           submission:,

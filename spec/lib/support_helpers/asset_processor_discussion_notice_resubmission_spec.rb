@@ -46,7 +46,7 @@ describe SupportHelpers::AssetProcessorDiscussionNoticeResubmission do
         hash_including(
           assignment:,
           submission:,
-          discussion_entry_version: @discussion_entry_version,
+          discussion_entry_versions: [@discussion_entry_version],
           contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
           current_user: student,
           asset_processor: nil
@@ -62,7 +62,7 @@ describe SupportHelpers::AssetProcessorDiscussionNoticeResubmission do
         hash_including(
           assignment:,
           submission:,
-          discussion_entry_version: @discussion_entry_version,
+          discussion_entry_versions: [@discussion_entry_version],
           contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
           current_user: student,
           asset_processor: nil
@@ -87,7 +87,7 @@ describe SupportHelpers::AssetProcessorDiscussionNoticeResubmission do
       expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion).once.with(
         hash_including(
           assignment:,
-          discussion_entry_version: @discussion_entry_version
+          discussion_entry_versions: [@discussion_entry_version]
         )
       )
 
