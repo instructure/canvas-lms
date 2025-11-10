@@ -779,6 +779,7 @@ class AssignmentsApiController < ApplicationController
   include Api::V1::AssignmentOverride
   include Api::V1::Quiz
   include Api::V1::Progress
+  include Api::V1::AccessibilityResourceScan
 
   # @API List assignments
   # Returns the paginated list of assignments for the current course or assignment group.
@@ -1748,6 +1749,15 @@ class AssignmentsApiController < ApplicationController
                          { strand: "assignment_bulk_update:#{@context.global_id}" },
                          data)
     render json: progress_json(progress, @current_user, session)
+  end
+
+  def accessibility_scan
+    return render_unauthorized_action unless @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    return render_unauthorized_action unless @context.a11y_checker_enabled?
+
+    @assignment = api_find(@context.active_assignments, params[:assignment_id])
+    scan = Accessibility::ResourceScannerService.new(resource: @assignment).call_sync
+    render json: accessibility_resource_scan_json(scan)
   end
 
   private

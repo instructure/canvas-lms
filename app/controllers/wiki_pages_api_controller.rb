@@ -188,6 +188,7 @@ class WikiPagesApiController < ApplicationController
 
   include Api::V1::WikiPage
   include Api::V1::Assignment
+  include Api::V1::AccessibilityResourceScan
   include SubmittableHelper
 
   # @API Show front page
@@ -691,6 +692,14 @@ class WikiPagesApiController < ApplicationController
     )
 
     render json: { image: { altText: generation_result.image["altText"] } }
+  end
+
+  def accessibility_scan
+    return render_unauthorized_action unless @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    return render_unauthorized_action unless @context.a11y_checker_enabled?
+
+    scan = Accessibility::ResourceScannerService.new(resource: @page).call_sync
+    render json: accessibility_resource_scan_json(scan)
   end
 
   protected
