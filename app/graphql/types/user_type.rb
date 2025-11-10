@@ -97,6 +97,12 @@ module Types
       object.discussions_splitscreen_view?
     end
 
+    field :widget_dashboard_config, String, null: true
+    def widget_dashboard_config
+      config = object.get_preference(:widget_dashboard_config)
+      config&.to_json
+    end
+
     field :avatar_url, UrlType, null: true
     def avatar_url
       load_association(:pseudonym).then do

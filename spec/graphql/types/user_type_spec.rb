@@ -3565,4 +3565,34 @@ describe Types::UserType do
       end
     end
   end
+
+  context "widgetDashboardConfig" do
+    it "returns null when no preference is set" do
+      expect(student_user_type.resolve("widgetDashboardConfig")).to be_nil
+    end
+
+    it "returns the stored configuration as JSON" do
+      config = { "columns" => 2, "widgets" => [] }
+      @student.set_preference(:widget_dashboard_config, config)
+      result = student_user_type.resolve("widgetDashboardConfig")
+      expect(JSON.parse(result)).to eq(config)
+    end
+
+    it "returns a complete widget configuration" do
+      config = {
+        "columns" => 2,
+        "widgets" => [
+          {
+            "id" => "course-work-widget",
+            "type" => "course_work",
+            "position" => { "col" => 1, "row" => 1, "relative" => 1 },
+            "title" => "Course work"
+          }
+        ]
+      }
+      @student.set_preference(:widget_dashboard_config, config)
+      result = student_user_type.resolve("widgetDashboardConfig")
+      expect(JSON.parse(result)).to eq(config)
+    end
+  end
 end
