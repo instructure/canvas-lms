@@ -35,7 +35,7 @@
     "@instructure/emotion": "10.26.2",
     "@instructure/k5uploader": "*",
     "@instructure/media-capture": "^9.0.0",
-    "@instructure/studio-player": "1.3.12",
+    "@instructure/studio-player": "1.4.2",
     "@instructure/ui-a11y-content": "10.26.2",
     "@instructure/ui-alerts": "10.26.2",
     "@instructure/ui-billboard": "10.26.2",
