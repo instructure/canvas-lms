@@ -36,10 +36,10 @@ describe "confirm_registration" do
                                             password_confirmation: "password")
     end
 
-    include_examples "a message"
+    it_behaves_like "a message"
   end
 
   context "without_pseudonym" do
-    include_examples "a message"
+    it_behaves_like "a message"
   end
 end

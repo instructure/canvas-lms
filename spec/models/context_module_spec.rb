@@ -110,6 +110,82 @@ describe ContextModule do
     end
   end
 
+  describe "unpublish_items!" do
+    before :once do
+      course_module
+    end
+
+    context "with simple published files" do
+      before :once do
+        @simple_file = @course.attachments.create!(
+          display_name: "simple file",
+          uploaded_data: default_uploaded_data,
+          locked: false,
+          file_state: "available"
+        )
+        @simple_tag = @module.add_item(id: @simple_file.id, type: "attachment")
+        @simple_tag.publish
+      end
+
+      it "unpublishes simple files" do
+        @module.unpublish_items!
+        expect(@simple_tag.reload.published?).to be false
+        expect(@simple_file.reload.published?).to be false
+      end
+    end
+
+    context "with files that have complex permissions" do
+      before :once do
+        @hidden_file = @course.attachments.create!(
+          display_name: "hidden file",
+          uploaded_data: default_uploaded_data,
+          locked: false,
+          file_state: "hidden"
+        )
+        @hidden_tag = @module.add_item(id: @hidden_file.id, type: "attachment")
+        @hidden_tag.publish
+
+        @scheduled_file = @course.attachments.create!(
+          display_name: "scheduled file",
+          uploaded_data: default_uploaded_data,
+          locked: false,
+          file_state: "available",
+          lock_at: 1.day.from_now
+        )
+        @scheduled_tag = @module.add_item(id: @scheduled_file.id, type: "attachment")
+        @scheduled_tag.publish
+
+        @context_visibility_file = @course.attachments.create!(
+          display_name: "context visibility file",
+          uploaded_data: default_uploaded_data,
+          locked: false,
+          file_state: "available",
+          visibility_level: "context"
+        )
+        @context_visibility_tag = @module.add_item(id: @context_visibility_file.id, type: "attachment")
+        @context_visibility_tag.publish
+      end
+
+      it "does not unpublish files with hidden state" do
+        @module.unpublish_items!
+        expect(@hidden_tag.reload.published?).to be true
+        expect(@hidden_file.reload.locked?).to be false
+      end
+
+      it "does not unpublish files with scheduled dates" do
+        @module.unpublish_items!
+        expect(@scheduled_tag.reload.published?).to be true
+        expect(@scheduled_file.reload.locked?).to be false
+      end
+
+      it "does not unpublish files with custom visibility" do
+        @module.unpublish_items!
+        expect(@context_visibility_tag.reload.published?).to be true
+        expect(@context_visibility_file.reload.locked?).to be false
+      end
+    end
+  end
+
   describe "can_be_duplicated?" do
     it "forbid quiz" do
       course_module

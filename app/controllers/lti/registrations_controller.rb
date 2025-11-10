@@ -1046,6 +1046,7 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_lti_registrations_next_feature_flag, only: %i[reset context_search overlay_history]
   before_action :require_lti_registrations_history_feature_flag, only: [:history]
   before_action :require_manage_lti_registrations
+  before_action :require_manage_lti_registrations_in_registrations_account, only: %i[reset update destroy]
   before_action :restrict_sub_account_to_read_only, except: %i[index list show show_by_client_id context_search overlay_history history]
   before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
@@ -1869,7 +1870,7 @@ class Lti::RegistrationsController < ApplicationController
     require_account_context
     return if @account.root_account?
 
-    unless Account.site_admin.feature_enabled?(:canvas_apps_sub_account_access)
+    unless @account.root_account.feature_enabled?(:canvas_apps_sub_account_access)
       raise ActiveRecord::RecordNotFound
     end
   rescue ActiveRecord::RecordNotFound => e
@@ -1924,6 +1925,10 @@ class Lti::RegistrationsController < ApplicationController
     require_context_with_permission(@context, :manage_lti_registrations)
   end
 
+  def require_manage_lti_registrations_in_registrations_account
+    require_context_with_permission(registration.account, :manage_lti_registrations)
+  end
+
   def restrict_sub_account_to_read_only
     unless @context.root_account?
       render json: { errors: "sub-accounts can only view registrations" }, status: :forbidden
@@ -1954,6 +1959,12 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def inject_lti_usage_env
+    lti_usage_flags = {
+      isPremium: @account.root_account.feature_enabled?(:lti_usage_premium),
+      isDevelopment: @account.root_account.feature_enabled?(:lti_registrations_usage_data_dev),
+      isLowUsageAlerts: @account.root_account.feature_enabled?(:lti_registrations_usage_data_low_usage),
+    }
+
     js_env({
              LTI_USAGE: {
                env: Canvas.environment,
@@ -1963,7 +1974,8 @@ class Lti::RegistrationsController < ApplicationController
                locale: I18n.locale,
                rootAccountId: @account.root_account.id,
                rootAccountUuid: @account.root_account.uuid,
-               isPremiumAccount: @account.root_account.feature_enabled?(:lti_usage_premium)
+               isPremiumAccount: @account.root_account.feature_enabled?(:lti_usage_premium),
+               flags: lti_usage_flags,
              },
            })
 

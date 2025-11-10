@@ -1761,6 +1761,52 @@ describe ExternalToolsController do
         expect(assigns[:lti_launch].params["ext_outcome_result_total_score_accepted"]).to eq "true"
         expect(assigns[:lti_launch].params["lis_outcome_service_url"]).to eq lti_grade_passback_api_url(tool)
       end
+
+      it "uses deep linking when editing assignment to select new resource via retrieve endpoint" do
+        # This test verifies the fix for INTEROP-9964 / https://github.com/instructure/canvas-lms/issues/2553
+        # When launching with placement=assignment_selection and assignment in secure_params (not URL params),
+        # Canvas should send LtiDeepLinkingRequest for resource selection, not LtiResourceLinkRequest
+        # This happens when an instructor edits an existing assignment to select a NEW resource
+
+        # Create a tool with assignment_selection configured for deep linking
+        reg = lti_registration_with_tool(account: @course.account)
+        deep_linking_tool = reg.new_external_tool(@course)
+        deep_linking_tool.assignment_selection = {
+          message_type: "LtiDeepLinkingRequest",
+          url: "http://example.com/deep_link",
+          enabled: true
+        }
+        deep_linking_tool.save!
+
+        # Create an assignment that's already linked to the tool (simulates existing assignment)
+        existing_assignment = assignment_model(course: @course, title: "Existing Assignment")
+        existing_assignment.submission_types = "external_tool"
+        existing_assignment.external_tool_tag_attributes = { url: deep_linking_tool.url, content_id: deep_linking_tool.id }
+        existing_assignment.save!
+
+        # Pass assignment via secure_params (simulates editing assignment to select new resource)
+        jwt = Canvas::Security.create_jwt({ lti_assignment_id: existing_assignment.lti_context_id })
+
+        get :retrieve, params: {
+          course_id: @course.id,
+          url: deep_linking_tool.url,
+          placement: :assignment_selection,
+          secure_params: jwt
+        }
+
+        expect(response).to be_successful
+
+        # For LTI 1.3, decode the message hint to get the verifier, then fetch the cached launch
+        decoded_hint = JSON::JWT.decode(assigns[:lti_launch].params["lti_message_hint"], :skip_verification)
+        launch_data = JSON.parse(fetch_and_delete_launch(@course, decoded_hint["verifier"]))
+
+        # Verify it's a deep linking request, not a resource link request
+        # WITHOUT the fix, this would be LtiResourceLinkRequest with assignment-specific claims
+        post_payload = launch_data["post_payload"]
+        expect(post_payload["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiDeepLinkingRequest"
+        expect(post_payload["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]).to be_present
+        expect(post_payload["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["accept_types"]).to eq ["ltiResourceLink"]
+      end
     end
 
     context "collaborations" do

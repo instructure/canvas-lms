@@ -42,6 +42,19 @@ class LtiApiController < ApplicationController
 
     lti_response, status = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, @xml)
 
+    # Log asset access for participation tracking
+    if lti_response && lti_response.operation_ref_identifier == "replaceResult" && lti_response.code_major == "success"
+      begin
+        assignment = lti_response.assignment
+        user = lti_response.user
+        @context = assignment.context
+        @current_user = user
+        log_asset_access(assignment, "assignments", assignment.assignment_group, "participate")
+      rescue
+        # Don't fail the grade passback if asset logging fails
+      end
+    end
+
     # Data around New Quizzes submissions are not being propagated to the Apache logs.
     # Adding this sourced_id and quiz submission time to header so that they can be
     # parsed by TurboLogParser and used in the data/analytics pipeline owned by the OREO team.

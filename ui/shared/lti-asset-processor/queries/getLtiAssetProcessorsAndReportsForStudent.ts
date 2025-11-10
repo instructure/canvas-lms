@@ -54,7 +54,7 @@ export const ZGetLtiAssetProcessorsAndReportsForStudentResult = zGqlObj('Query',
       'LtiAssetReportConnection',
       ZLtiAssetReportForStudent,
     ),
-    assignment: zNullishGqlObj('Assignment', {
+    assignment: zGqlObj('Assignment', {
       name: z.string().nullish(),
       ltiAssetProcessorsConnection: zGqlConnection(
         'LtiAssetProcessorConnection',

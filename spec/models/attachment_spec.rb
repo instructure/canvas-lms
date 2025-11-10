@@ -2010,6 +2010,44 @@ describe Attachment do
     end
   end
 
+  describe "copy_attachment_content" do
+    let_once(:course) { course_model }
+
+    def fresh_attachment(**opts)
+      attachment_model({ context: course }.merge(opts))
+      @attachment
+    end
+
+    it "copy_attachment_content stores file when open returns IO" do
+      source = fresh_attachment(filename: "src.txt", content_type: "text/plain")
+      dest = fresh_attachment(filename: "dest.txt", content_type: "text/plain")
+      io = StringIO.new("content2")
+      allow(source).to receive(:open).and_return(io)
+      expect(Attachments::Storage).to receive(:store_for_attachment).with(dest, io)
+      source.copy_attachment_content(dest)
+      expect(dest.workflow_state).to eq("pending_upload")
+      expect(dest.filename).to eq(source.filename)
+    end
+
+    it "copy_attachment_content marks destination broken when open returns nil and md5 nil" do
+      source = fresh_attachment(filename: "src.txt", content_type: "text/plain")
+      dest = fresh_attachment(filename: "dest.txt", content_type: "text/plain")
+      allow(source).to receive(:open).and_return(nil)
+      expect(Attachments::Storage).not_to receive(:store_for_attachment)
+      expect { source.copy_attachment_content(dest) }.to change { dest.reload.file_state }.to("broken")
+    end
+
+    it "copy_attachment_content leaves file_state unchanged when open returns nil and md5 present" do
+      source = fresh_attachment(filename: "src.txt", content_type: "text/plain")
+      dest = fresh_attachment(filename: "dest.txt", content_type: "text/plain", md5: "already")
+      original_state = dest.file_state
+      allow(source).to receive(:open).and_return(nil)
+      expect(Attachments::Storage).not_to receive(:store_for_attachment)
+      source.copy_attachment_content(dest)
+      expect(dest.reload.file_state).to eq(original_state)
+    end
+  end
+
   describe "#change_namespace and #make_childless" do
     before :once do
       @old_account = account_model
@@ -3504,6 +3542,130 @@ describe Attachment do
       expect(pine_client_mock).not_to receive(:ingest_url)
 
       user_attachment.ingest_to_pine
+    end
+  end
+
+  describe "#can_unpublish?" do
+    context "published file" do
+      it "returns true for basic published file" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available"
+        )
+        expect(attachment.can_unpublish?).to be true
+      end
+
+      it "returns true for file with inherit visibility" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          visibility_level: "inherit"
+        )
+        expect(attachment.can_unpublish?).to be true
+      end
+    end
+
+    context "file with complex permissions" do
+      it "returns false for hidden file" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "hidden"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for public file" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "public"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with lock_at date" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          lock_at: 1.day.from_now
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with unlock_at date" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          unlock_at: 1.day.ago
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with context visibility" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          visibility_level: "context"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with institution visibility" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          visibility_level: "institution"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with public visibility" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          visibility_level: "public"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+    end
+
+    context "already unpublished file" do
+      it "returns false for locked file" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: true,
+          file_state: "available"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
     end
   end
 end

@@ -2156,13 +2156,13 @@ describe DiscussionTopicsController do
       context "enabled on course" do
         before { @course.update!(usage_rights_required: true) }
 
-        include_examples "usage rights returned"
+        it_behaves_like "usage rights returned"
       end
 
       context "disabled on course" do
         before { @course.update!(usage_rights_required: false) }
 
-        include_examples "no usage rights returned"
+        it_behaves_like "no usage rights returned"
       end
     end
   end
@@ -2772,13 +2772,13 @@ describe DiscussionTopicsController do
       context "enabled on course" do
         before { @course.update!(usage_rights_required: true) }
 
-        include_examples "usage rights set"
+        it_behaves_like "usage rights set"
       end
 
       context "disabled on course" do
         before { @course.update!(usage_rights_required: false) }
 
-        include_examples "no usage rights set"
+        it_behaves_like "no usage rights set"
       end
     end
   end

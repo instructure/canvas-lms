@@ -340,4 +340,132 @@ describe AuthenticationMethods::InstAccessToken do
       end
     end
   end
+
+  describe ".token_matches_tenant?" do
+    specs_require_sharding
+
+    subject { described_class.token_matches_tenant?(token, account) }
+
+    let(:account) { Account.create!(name: "Test Account") }
+    let(:user) { user_model }
+
+    context "when token account_uuid matches domain root account uuid" do
+      let(:token) do
+        InstAccess::Token.for_user(
+          user_uuid: user.uuid,
+          account_uuid: account.uuid
+        )
+      end
+
+      it { is_expected.to be true }
+
+      it "does not send an InstStatsd event" do
+        expect(InstStatsd::Statsd).not_to receive(:event)
+        subject
+      end
+    end
+
+    context "when token account_uuid does NOT match domain root account" do
+      let(:different_account) { Account.create!(name: "Different Account") }
+      let(:token) do
+        InstAccess::Token.for_user(
+          user_uuid: user.uuid,
+          account_uuid: different_account.uuid
+        )
+      end
+
+      context "with feature flag DISABLED (shadow mode)" do
+        before do
+          Account.site_admin.feature_flags.where(feature: :enforce_service_token_tenant_matching).destroy_all
+        end
+
+        it "returns true (allows authentication)" do
+          expect(subject).to be true
+        end
+
+        it "sends an InstStatsd event for monitoring" do
+          expect(InstStatsd::Statsd).to receive(:event).with(
+            "Service user authorization tenant mismatch",
+            "Token account UUID #{different_account.uuid} does not match domain root account UUID #{account.uuid} for client ",
+            hash_including(
+              type: "tenant_mismatch",
+              alert_type: :error
+            )
+          )
+          subject
+        end
+
+        it "includes shard tags in the event" do
+          expect(InstStatsd::Statsd).to receive(:event).with(
+            anything,
+            anything,
+            hash_including(:tags)
+          )
+          subject
+        end
+
+        context "when token has a client_id" do
+          let(:developer_key) { DeveloperKey.create!(name: "key", account:) }
+          let(:token) do
+            InstAccess::Token.for_user(
+              user_uuid: user.uuid,
+              account_uuid: different_account.uuid,
+              client_id: developer_key.global_id
+            )
+          end
+
+          it "includes client_id in the event message" do
+            expect(InstStatsd::Statsd).to receive(:event).with(
+              anything,
+              "Token account UUID #{different_account.uuid} does not match domain root account UUID #{account.uuid} for client #{developer_key.global_id}",
+              anything
+            )
+            subject
+          end
+
+          it "still returns true in shadow mode" do
+            expect(subject).to be true
+          end
+        end
+      end
+
+      context "with feature flag ENABLED (enforcing)" do
+        before do
+          Account.site_admin.feature_flags.create!(
+            feature: :enforce_service_token_tenant_matching,
+            state: "on"
+          )
+        end
+
+        it "returns false (blocks authentication)" do
+          expect(subject).to be false
+        end
+
+        it "does not send an InstStatsd event" do
+          expect(InstStatsd::Statsd).not_to receive(:event)
+          subject
+        end
+
+        context "when token has a client_id" do
+          let(:developer_key) { DeveloperKey.create!(name: "key", account:) }
+          let(:token) do
+            InstAccess::Token.for_user(
+              user_uuid: user.uuid,
+              account_uuid: different_account.uuid,
+              client_id: developer_key.global_id
+            )
+          end
+
+          it "returns false" do
+            expect(subject).to be false
+          end
+
+          it "does not send an event when enforcing" do
+            expect(InstStatsd::Statsd).not_to receive(:event)
+            subject
+          end
+        end
+      end
+    end
+  end
 end

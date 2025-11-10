@@ -45,6 +45,7 @@ const I18n = createI18nScope('peer_review_allocation_rules_tray')
 // We allow 5000ms for the screen reader to finish reading the label of the focused element before
 // announcing the screen reader alert. Otherwise, the focus announcement steals the alert announcement.
 const SCREENREADER_ALERT_TIMEOUT = 5000
+const CARD_HEIGHT = 120
 
 const NoResultsFound = ({searchTerm}: {searchTerm: string}) => (
   <Flex.Item as="div" padding="x-small medium" data-testid="no-search-results">
@@ -277,7 +278,7 @@ const PeerReviewAllocationRulesTray = ({
       return
     }
 
-    let cardHeight = 120
+    let cardHeight = CARD_HEIGHT
     const cardElement = containerRef.current.querySelector(
       '[data-testid="allocation-rule-card-wrapper"]',
     )
@@ -504,7 +505,7 @@ const PeerReviewAllocationRulesTray = ({
 
     return (
       <Flex direction="column" height="100%" elementRef={setContainerRef}>
-        <Flex.Item overflowY="hidden" shouldGrow shouldShrink>
+        <Flex.Item shouldGrow shouldShrink>
           {rules.map(rule => (
             <Flex.Item
               as="div"
@@ -532,7 +533,12 @@ const PeerReviewAllocationRulesTray = ({
       <View as="div" role="alert" aria-live="polite" data-testid="allocation-rules-tray-alert">
         <ScreenReaderContent>{screenReaderAnnouncement}</ScreenReaderContent>
       </View>
-      <Tray label={I18n.t('Allocation Rules')} open={isTrayOpen} placement="end">
+      <Tray
+        label={I18n.t('Allocation Rules')}
+        open={isTrayOpen}
+        onDismiss={closeTray}
+        placement="end"
+      >
         <Flex direction="column" height="100vh">
           <Flex.Item>
             <Flex as="div" padding="medium">
@@ -556,7 +562,7 @@ const PeerReviewAllocationRulesTray = ({
               <Text>
                 {I18n.t('For peer review configuration return to ')}
                 <Link
-                  isWithinText={false}
+                  isWithinText={true}
                   href={`/courses/${ENV.COURSE_ID}/assignments/${assignmentId}/edit?scrollTo=assignment_peer_reviews_fields`}
                 >
                   {I18n.t('Edit Assignment')}
@@ -611,7 +617,7 @@ const PeerReviewAllocationRulesTray = ({
               </Flex.Item>
             )}
           </Flex.Item>
-          <Flex.Item overflowY="hidden" shouldGrow shouldShrink>
+          <Flex.Item size={`${CARD_HEIGHT}px`} shouldGrow shouldShrink>
             {renderContent()}
           </Flex.Item>
           <Flex.Item as="div" padding="small medium">

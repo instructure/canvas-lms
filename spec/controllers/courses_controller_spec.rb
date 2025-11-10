@@ -521,7 +521,7 @@ describe CoursesController do
       end
 
       describe "sorting" do
-        include_examples "sorting" do
+        it_behaves_like "sorting" do
           let(:type) { "current" }
           let(:sort_column) { "cc_sort" }
           let(:order_column) { "cc_order" }
@@ -801,7 +801,7 @@ describe CoursesController do
       end
 
       describe "sorting" do
-        include_examples "sorting" do
+        it_behaves_like "sorting" do
           let(:type) { "past" }
           let(:sort_column) { "pc_sort" }
           let(:order_column) { "pc_order" }
@@ -942,7 +942,7 @@ describe CoursesController do
       end
 
       describe "sorting" do
-        include_examples "sorting" do
+        it_behaves_like "sorting" do
           let(:type) { "future" }
           let(:sort_column) { "fc_sort" }
           let(:order_column) { "fc_order" }
@@ -5342,13 +5342,13 @@ describe CoursesController do
     describe "render ui" do
       subject { get :youtube_migration, params: { course_id: @course.id } }
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
     end
 
     describe "get last scan" do
       subject { get :youtube_migration_scan, params: { course_id: @course.id } }
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
 
       context "when ff is on" do
         before do
@@ -5459,7 +5459,7 @@ describe CoursesController do
     describe "post a new scan" do
       subject { post :start_youtube_migration_scan, params: { course_id: @course.id } }
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
     end
 
     describe "post a new convert" do
@@ -5484,7 +5484,7 @@ describe CoursesController do
         allow(service).to receive(:convert_embed).and_return(progress)
       end
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
 
       context "when authorized" do
         before do
@@ -5810,7 +5810,7 @@ describe CoursesController do
 
       let(:new_quizzes_scan_status) { "completed" }
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
 
       context "when feature flag is disabled" do
         before do

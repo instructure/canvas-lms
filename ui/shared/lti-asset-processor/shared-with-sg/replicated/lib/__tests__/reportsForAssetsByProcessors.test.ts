@@ -17,10 +17,17 @@
  */
 
 import {describe, expect, it} from '../../../__tests__/testPlatformShims'
-import {reportsForAssetsByProcessors} from '../reportsForAssetsByProcessors'
 import {defaultLtiAssetProcessors} from '../../__fixtures__/default/ltiAssetProcessors'
 import {defaultLtiAssetReports, makeMockReport} from '../../__fixtures__/default/ltiAssetReports'
 import type {LtiAssetReport} from '../../types/LtiAssetReports'
+import {reportsForAssetsByProcessors} from '../reportsForAssetsByProcessors'
+
+const dateTimeFmtOpts = {
+  timeStyle: 'long',
+  dateStyle: 'long',
+  timeZone: 'UTC',
+} as const
+const formatDateTime = new Intl.DateTimeFormat('en-US', dateTimeFmtOpts).format
 
 describe('reportsForAssetsByProcessors', () => {
   const mockProcessors = defaultLtiAssetProcessors
@@ -54,7 +61,12 @@ describe('reportsForAssetsByProcessors', () => {
         }),
       ]
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        reportsAssetSelector,
+        formatDateTime,
+      )
 
       expect(result).toHaveLength(2)
 
@@ -87,7 +99,12 @@ describe('reportsForAssetsByProcessors', () => {
         }),
       ]
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        reportsAssetSelector,
+        formatDateTime,
+      )
 
       expect(result).toHaveLength(2)
       expect(result[0]?.reportGroups[0]?.reports).toHaveLength(0)
@@ -104,10 +121,15 @@ describe('reportsForAssetsByProcessors', () => {
         }),
       ]
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, {
-        ...reportsAssetSelector,
-        attempt: '2', // String
-      })
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        {
+          ...reportsAssetSelector,
+          attempt: '2', // String
+        },
+        formatDateTime,
+      )
 
       expect(result[0]?.reportGroups[0]?.reports).toHaveLength(1)
     })
@@ -147,7 +169,12 @@ describe('reportsForAssetsByProcessors', () => {
         }),
       ]
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        reportsAssetSelector,
+        formatDateTime,
+      )
 
       expect(result).toHaveLength(2)
 
@@ -194,10 +221,15 @@ describe('reportsForAssetsByProcessors', () => {
         }),
       ]
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, {
-        ...reportsAssetSelector,
-        attachments: [],
-      })
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        {
+          ...reportsAssetSelector,
+          attachments: [],
+        },
+        formatDateTime,
+      )
 
       expect(result[0]?.reportGroups).toHaveLength(0)
       expect(result[1]?.reportGroups).toHaveLength(0)
@@ -213,7 +245,12 @@ describe('reportsForAssetsByProcessors', () => {
         }),
       ]
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        reportsAssetSelector,
+        formatDateTime,
+      )
 
       // Should still create groups for all attachments, but with empty reports
       expect(result[0]?.reportGroups).toHaveLength(2)
@@ -231,7 +268,12 @@ describe('reportsForAssetsByProcessors', () => {
         attempt: '1',
       }
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        reportsAssetSelector,
+        formatDateTime,
+      )
 
       expect(result).toHaveLength(2)
       expect(result[0]?.reportGroups[0]?.reports).toHaveLength(0)
@@ -248,7 +290,7 @@ describe('reportsForAssetsByProcessors', () => {
         attempt: '1',
       }
 
-      const result = reportsForAssetsByProcessors(reports, [], reportsAssetSelector)
+      const result = reportsForAssetsByProcessors(reports, [], reportsAssetSelector, formatDateTime)
 
       expect(result).toHaveLength(0)
     })
@@ -271,7 +313,12 @@ describe('reportsForAssetsByProcessors', () => {
         attempt: '1',
       }
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        reportsAssetSelector,
+        formatDateTime,
+      )
 
       expect(result).toHaveLength(2)
       expect(result[0]?.reportGroups[0]?.reports).toHaveLength(0)
@@ -292,7 +339,12 @@ describe('reportsForAssetsByProcessors', () => {
         attempt: '1',
       }
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        reportsAssetSelector,
+        formatDateTime,
+      )
 
       expect(result).toHaveLength(2)
 
@@ -354,7 +406,12 @@ describe('reportsForAssetsByProcessors', () => {
         }),
       ]
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        reportsAssetSelector,
+        formatDateTime,
+      )
 
       expect(result).toHaveLength(2)
 
@@ -387,16 +444,19 @@ describe('reportsForAssetsByProcessors', () => {
         }),
       ]
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        reportsAssetSelector,
+        formatDateTime,
+      )
 
       // Display name should contain formatted date, colon, and quoted messageIntro
       const displayName = result[0]?.reportGroups[0]?.displayName
-      expect(displayName).toContain(':')
-      expect(displayName).toContain('"This is a test discussion entry message"')
-      // Date format will depend on locale, but should be formatted (not raw ISO string)
       expect(displayName).not.toContain('2025-01-15T16:45:00Z')
-      // Should not contain the old format
-      expect(displayName).not.toContain('--')
+      expect(displayName).toContain(
+        'January 15, 2025 at 4:45:00 PM UTC: "This is a test discussion entry message"',
+      )
     })
 
     it('handles reports with no discussion entry version', () => {
@@ -409,7 +469,12 @@ describe('reportsForAssetsByProcessors', () => {
         }),
       ]
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        reportsAssetSelector,
+        formatDateTime,
+      )
 
       // Should return empty report groups since no discussion entries
       expect(result[0]?.reportGroups).toHaveLength(0)
@@ -473,6 +538,7 @@ describe('reportsForAssetsByProcessors', () => {
         reports,
         mockProcessors,
         reportsAssetSelectorWithAttachments,
+        formatDateTime,
       )
 
       expect(result).toHaveLength(2)
@@ -538,7 +604,12 @@ describe('reportsForAssetsByProcessors', () => {
         attempt: '1',
       }
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        reportsAssetSelector,
+        formatDateTime,
+      )
 
       // Should not match since null !== "1"
       expect(result[0]?.reportGroups[0]?.reports).toHaveLength(0)
@@ -560,7 +631,12 @@ describe('reportsForAssetsByProcessors', () => {
         attempt: '2', // String in selector
       }
 
-      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        reportsAssetSelector,
+        formatDateTime,
+      )
 
       expect(result[0]?.reportGroups[0]?.reports).toHaveLength(1)
     })

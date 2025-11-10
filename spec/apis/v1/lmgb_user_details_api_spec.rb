@@ -146,6 +146,74 @@ describe "LMGB User Details API", type: :request do
       expect(section_names).to eq(section_names.sort)
     end
 
+    it "includes sections with invited enrollments" do
+      section_invited = @course.course_sections.create!(name: "Invited Section")
+      # Create an invited (pending) enrollment without accepting it
+      @course.enroll_student(@student, section: section_invited, allow_multiple_enrollments: true)
+
+      json = api_call(:get,
+                      lmgb_user_details_url(@course, @student),
+                      controller: "lmgb_user_details",
+                      action: "show",
+                      format: "json",
+                      course_id: @course.id.to_s,
+                      id: @student.id.to_s)
+
+      section_ids = json["user"]["sections"].pluck("id")
+      expect(section_ids).to include(section_invited.id)
+    end
+
+    it "includes sections with completed enrollments" do
+      section_completed = @course.course_sections.create!(name: "Completed Section")
+      enrollment = @course.enroll_student(@student, section: section_completed, allow_multiple_enrollments: true)
+      enrollment.conclude
+
+      json = api_call(:get,
+                      lmgb_user_details_url(@course, @student),
+                      controller: "lmgb_user_details",
+                      action: "show",
+                      format: "json",
+                      course_id: @course.id.to_s,
+                      id: @student.id.to_s)
+
+      section_ids = json["user"]["sections"].pluck("id")
+      expect(section_ids).to include(section_completed.id)
+    end
+
+    it "includes sections with inactive enrollments" do
+      section_inactive = @course.course_sections.create!(name: "Inactive Section")
+      enrollment = @course.enroll_student(@student, section: section_inactive, allow_multiple_enrollments: true)
+      enrollment.deactivate
+
+      json = api_call(:get,
+                      lmgb_user_details_url(@course, @student),
+                      controller: "lmgb_user_details",
+                      action: "show",
+                      format: "json",
+                      course_id: @course.id.to_s,
+                      id: @student.id.to_s)
+
+      section_ids = json["user"]["sections"].pluck("id")
+      expect(section_ids).to include(section_inactive.id)
+    end
+
+    it "excludes sections with deleted enrollments" do
+      section_deleted = @course.course_sections.create!(name: "Deleted Section")
+      enrollment = @course.enroll_student(@student, section: section_deleted, allow_multiple_enrollments: true)
+      enrollment.destroy
+
+      json = api_call(:get,
+                      lmgb_user_details_url(@course, @student),
+                      controller: "lmgb_user_details",
+                      action: "show",
+                      format: "json",
+                      course_id: @course.id.to_s,
+                      id: @student.id.to_s)
+
+      section_ids = json["user"]["sections"].pluck("id")
+      expect(section_ids).not_to include(section_deleted.id)
+    end
+
     it "returns user last login" do
       json = api_call(:get,
                       lmgb_user_details_url(@course, @student),

@@ -640,12 +640,14 @@ class AccountsController < ApplicationController
   #
   # @returns TermsOfService
   def terms_of_service
-    keys = %w[id terms_type passive account_id]
-    tos = @account.root_account.terms_of_service
-    res = tos.attributes.slice(*keys)
-    res["content"] = tos.terms_of_service_content&.content
-    res["self_registration_type"] = @account.self_registration_type
-    render json: res
+    GuardRail.activate(:secondary) do
+      keys = %w[id terms_type passive account_id]
+      tos = @account.root_account.terms_of_service
+      res = tos.attributes.slice(*keys)
+      res["content"] = tos.terms_of_service_content&.content
+      res["self_registration_type"] = @account.self_registration_type
+      render json: res
+    end
   end
 
   # @API Get help links
@@ -935,8 +937,8 @@ class AccountsController < ApplicationController
     includes -= %w[permissions sections needs_grading_count total_scores]
     all_precalculated_permissions = nil
 
-    page_opts = { total_entries: nil }
-    page_opts = {} if includes.include?("ui_invoked") # let Folio calculate total entries
+    # Let Folio calculate total entries for pagination when invoked from web interface
+    page_opts = in_app? ? {} : { total_entries: nil }
 
     GuardRail.activate(:secondary) do
       @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
@@ -1477,26 +1479,28 @@ class AccountsController < ApplicationController
   end
 
   def acceptable_use_policy
-    TermsOfService.ensure_terms_for_account(@domain_root_account)
-    external_url = TermsOfService.external_url(@domain_root_account)
-    respond_to do |format|
-      format.html do
-        if external_url
-          redirect_to external_url, allow_other_host: true, status: :found # HTTP 302
-        else
-          # disable navigation_header JavaScript bundle (in _head.html.erb) to
-          # prevent console errors caused by missing DOM elements in this bare layout
-          @headers = false
-          # disable custom js/css
-          @exclude_account_css = @exclude_account_js = true
-          render html: "", layout: "bare"
+    GuardRail.activate(:secondary) do
+      TermsOfService.ensure_terms_for_account(@domain_root_account)
+      external_url = TermsOfService.external_url(@domain_root_account)
+      respond_to do |format|
+        format.html do
+          if external_url
+            redirect_to external_url, allow_other_host: true, status: :found # HTTP 302
+          else
+            # disable navigation_header JavaScript bundle (in _head.html.erb) to
+            # prevent console errors caused by missing DOM elements in this bare layout
+            @headers = false
+            # disable custom js/css
+            @exclude_account_css = @exclude_account_js = true
+            render html: "", layout: "bare"
+          end
         end
-      end
-      format.json do
-        if external_url
-          render json: { redirectUrl: external_url }, status: :ok
-        else
-          render json: { content: @domain_root_account.terms_of_service.terms_of_service_content&.content }, status: :ok
+        format.json do
+          if external_url
+            render json: { redirectUrl: external_url }, status: :ok
+          else
+            render json: { content: @domain_root_account.terms_of_service.terms_of_service_content&.content }, status: :ok
+          end
         end
       end
     end
@@ -2275,6 +2279,7 @@ class AccountsController < ApplicationController
                                    { conditional_release: [:value, :locked] }.freeze,
                                    { enable_course_paces: [:value, :locked] }.freeze,
                                    { allow_observers_in_appointment_groups: [:value] }.freeze,
+                                   { default_allow_observer_signup: [:value] }.freeze,
                                    :enable_inbox_signature_block,
                                    :disable_inbox_signature_block_for_students,
                                    :enable_inbox_auto_response,

@@ -162,8 +162,12 @@ class ModuleItemsLazyLoader {
         },
       })
 
-      if (!allPages && !result.link?.last && page > 1) {
-        return this.fetchModuleItemsHtml(moduleId, page - 1)
+      if (!allPages) {
+        // check whether the selected page no longer exists, and return the last page if so
+        const lastPageNumber = parseInt(result.link?.last?.page || '')
+        if (page > lastPageNumber) {
+          return this.fetchModuleItemsHtml(moduleId, lastPageNumber)
+        }
       }
 
       this.clearPageNumberIfAllPages(moduleId, allPages)

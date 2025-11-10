@@ -70,7 +70,7 @@ describe Accessibility::Issue do
     end
 
     # TODO: Disable PDF Accessibility Checks Until Post-InstCon
-    it "returns issues for attachments", skip: "Not implemented yet" do
+    it "returns issues for attachments", skip: "LMA-181 2025-06-11" do
       attachment_pdf = double("AttachmentPDF",
                               id: 3,
                               title: "Document.pdf",

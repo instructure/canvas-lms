@@ -426,6 +426,12 @@ module Types
     def has_rubric
       Loaders::AssignmentLoaders::HasRubricLoader.load(object.id)
     end
+
+    field :has_plagiarism_tool, Boolean, "Indicates if the assignment has LTI 2.0 plagiarism detection tool configured", null: false
+    def has_plagiarism_tool
+      assignment.assignment_configuration_tool_lookup_ids.present?
+    end
+
     field :muted, Boolean, null: true
 
     field :assignment_visibility, [ID], null: true do
@@ -608,6 +614,16 @@ module Types
     field :moderated_grading_enabled, Boolean, null: true
     def moderated_grading_enabled
       assignment.moderated_grading?
+    end
+
+    field :allow_provisional_grading, Types::AllowProvisionalGradingType, null: false, description: "Whether the current user can provide a provisional grade for this assignment"
+    def allow_provisional_grading
+      return "not_applicable" unless assignment.moderated_grading?
+      # Once grades are published, moderation is over - treat as normal assignment
+      return "not_applicable" if assignment.grades_published_at.present?
+
+      can_grade = assignment.can_be_moderated_grader?(current_user)
+      can_grade ? "allowed" : "not_allowed"
     end
 
     field :post_manually, Boolean, null: true

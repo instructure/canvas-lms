@@ -239,6 +239,52 @@ describe('usePeerReviewSettings', () => {
 
       expect(result.current.errorMessageReviewsRequired).toBe('Please enter a valid number.')
     })
+
+    it('returns undefined when field is valid', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '5')
+      })
+
+      let errorMessage
+      const mockEvent = {
+        target: {
+          validity: {valid: true},
+        },
+      } as React.FocusEvent<HTMLInputElement>
+
+      act(() => {
+        errorMessage = result.current.validateReviewsRequired(mockEvent)
+      })
+
+      expect(errorMessage).toBeUndefined()
+      expect(result.current.errorMessageReviewsRequired).toBeUndefined()
+    })
+
+    it('returns error message when field is invalid', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '-1')
+      })
+
+      let errorMessage
+      const mockEvent = {
+        target: {
+          validity: {valid: true},
+        },
+      } as React.FocusEvent<HTMLInputElement>
+
+      act(() => {
+        errorMessage = result.current.validateReviewsRequired(mockEvent)
+      })
+
+      expect(errorMessage).toBe('Number of peer reviews cannot be negative.')
+      expect(result.current.errorMessageReviewsRequired).toBe(
+        'Number of peer reviews cannot be negative.',
+      )
+    })
   })
 
   describe('points per review validation', () => {
@@ -343,6 +389,52 @@ describe('usePeerReviewSettings', () => {
       })
 
       expect(result.current.errorMessagePointsPerReview).toBe('Please enter a valid number.')
+    })
+
+    it('returns undefined when field is valid', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '10')
+      })
+
+      let errorMessage
+      const mockEvent = {
+        target: {
+          validity: {valid: true},
+        },
+      } as React.FocusEvent<HTMLInputElement>
+
+      act(() => {
+        errorMessage = result.current.validatePointsPerReview(mockEvent)
+      })
+
+      expect(errorMessage).toBeUndefined()
+      expect(result.current.errorMessagePointsPerReview).toBeUndefined()
+    })
+
+    it('returns error message when field is invalid', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '-5')
+      })
+
+      let errorMessage
+      const mockEvent = {
+        target: {
+          validity: {valid: true},
+        },
+      } as React.FocusEvent<HTMLInputElement>
+
+      act(() => {
+        errorMessage = result.current.validatePointsPerReview(mockEvent)
+      })
+
+      expect(errorMessage).toBe('Points per review cannot be negative.')
+      expect(result.current.errorMessagePointsPerReview).toBe(
+        'Points per review cannot be negative.',
+      )
     })
   })
 

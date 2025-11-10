@@ -67,6 +67,12 @@ require "json_token"
 require "will_paginate/active_record"
 
 module BookmarkedCollection
+  class InvalidPage < ArgumentError
+    def response_status
+      400
+    end
+  end
+
   require "bookmarked_collection/collection"
   require "bookmarked_collection/composite_collection"
   require "bookmarked_collection/proxy"

@@ -25,7 +25,8 @@ import type {
   LtiAssetReport,
   LtiDiscussionAssetReport,
 } from '../types/LtiAssetReports'
-import DateHelper from '@canvas/datetime/dateHelper'
+
+type DateTimeFormatter = (date: Date) => string
 
 const I18n = createI18nScope('lti_asset_processor')
 
@@ -56,11 +57,16 @@ export function reportsForAssetsByProcessors(
   reports: LtiAssetReport[],
   processors: LtiAssetProcessor[],
   reportsAssetSelector: ReportsAssetSelector,
+  formatDateTime: DateTimeFormatter,
 ): GroupedLtiAssetReports {
   const reportsByProc: Record<string, LtiAssetReport[]> = _.groupBy(reports, r => r.processorId)
   return processors.map(p => ({
     processor: p,
-    reportGroups: reportsForAssets(reportsByProc[p._id] || [], reportsAssetSelector),
+    reportGroups: reportsForAssets(
+      reportsByProc[p._id] || [],
+      reportsAssetSelector,
+      formatDateTime,
+    ),
   }))
 }
 
@@ -78,6 +84,7 @@ function reportsForAttachmentAssets(
 function reportsForAssets(
   reportsForProc: LtiAssetReport[],
   reportsAssetSelector: ReportsAssetSelector,
+  formatDateTime: DateTimeFormatter,
 ): LtiAssetReportGroup[] {
   const {submissionType, attachments, attempt} = reportsAssetSelector
   switch (submissionType) {
@@ -94,29 +101,40 @@ function reportsForAssets(
     case 'discussion_topic':
       return [
         ...reportsForAttachmentAssets(reportsForProc, attachments),
-        ...Object.entries(discussionReportsByEntryId(reportsForProc)).map(([entryId, reports]) => ({
-          key: entryId,
-          displayName: discussionAssetDisplayName(reports[0]),
-          reports,
-        })),
+        ...discussionReports(reportsForProc, formatDateTime),
       ]
     default:
       return submissionType satisfies never
   }
 }
 
-function discussionReportsByEntryId(
+function discussionReports(
   reportsForProc: LtiAssetReport[],
-): Record<string, LtiDiscussionAssetReport[]> {
-  const discReports: LtiDiscussionAssetReport[] = reportsForProc.filter(isDiscussionReport)
-  return _.groupBy(discReports, r => r.asset.discussionEntryVersion._id)
+  formatDateTime: DateTimeFormatter,
+): LtiAssetReportGroup[] {
+  const discReports = reportsForProc.filter(isDiscussionReport)
+  const grouped = _.groupBy(discReports, r => r.asset.discussionEntryVersion._id)
+
+  const result = []
+  for (const [entryId, reports] of Object.entries(grouped)) {
+    const version = reports[0]?.asset.discussionEntryVersion
+    const displayName = version && discussionEntryVersionDisplayName(version, formatDateTime)
+    if (displayName) {
+      result.push({key: entryId, displayName, reports})
+    }
+  }
+  return result
 }
 
-function discussionAssetDisplayName(sampleReport: LtiDiscussionAssetReport) {
-  const version = sampleReport.asset.discussionEntryVersion
-  if (!version.createdAt) return undefined // shouldn't actually happen, but type is nullable in graphql
-  const formattedDate = DateHelper.formatDatetimeForDiscussions(new Date(version.createdAt))
-  return I18n.t('%{date}: "%{messageIntro}"', {
+function discussionEntryVersionDisplayName(
+  version: LtiDiscussionAssetReport['asset']['discussionEntryVersion'],
+  formatDateTime: DateTimeFormatter,
+): string | undefined {
+  // createdAt shouldn't actually be undefined, but type is nullable in graphql:
+  if (!version.createdAt) return undefined
+
+  const formattedDate = formatDateTime(new Date(version.createdAt))
+  return I18n.t('{{date}}: "{{messageIntro}}"', {
     date: formattedDate,
     messageIntro: version.messageIntro,
   })

@@ -19,5 +19,12 @@
 import {BlockContentEditor} from '@canvas/block-content-editor'
 
 export const BlockContentEditorWrapper = () => {
-  return <BlockContentEditor data={null} onInit={null} aiAltTextGenerationURL={null} />
+  return (
+    <BlockContentEditor
+      data={null}
+      onInit={null}
+      aiAltTextGenerationURL={null}
+      toolbarReorder={false}
+    />
+  )
 }

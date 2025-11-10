@@ -892,7 +892,68 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
     end
   end
 
-  describe "soft deletion and reactivation" do
+  describe "applies_to_assessor updates on existing rules" do
+    before do
+      @existing_rule = AllocationRule.create!(
+        course: @course,
+        assignment: @assignment,
+        assessor: @student1,
+        assessee: @student2,
+        must_review: true,
+        review_permitted: true,
+        applies_to_assessor: true
+      )
+    end
+
+    it "updates applies_to_assessor when finding existing rule with different value" do
+      query = <<~GQL
+        assignmentId: "#{@assignment.id}"
+        assessorIds: ["#{@student1.id}"]
+        assesseeIds: ["#{@student2.id}"]
+        mustReview: true
+        reviewPermitted: true
+        appliesToAssessor: false
+      GQL
+
+      result = execute_with_input(query)
+      expect(result["errors"]).to be_nil
+
+      all_rules = AllocationRule.where(assignment: @assignment)
+      expect(all_rules.count).to eq(1)
+
+      updated_rule = all_rules.first
+      expect(updated_rule.id).to eq(@existing_rule.id)
+      expect(updated_rule.applies_to_assessor).to be false
+      expect(updated_rule.must_review).to be true
+      expect(updated_rule.review_permitted).to be true
+    end
+
+    it "does not modify applies_to_assessor when value matches" do
+      original_updated_at = @existing_rule.updated_at
+
+      query = <<~GQL
+        assignmentId: "#{@assignment.id}"
+        assessorIds: ["#{@student1.id}"]
+        assesseeIds: ["#{@student2.id}"]
+        mustReview: true
+        reviewPermitted: true
+        appliesToAssessor: true
+      GQL
+
+      result = execute_with_input(query)
+      expect(result["errors"]).to be_nil
+
+      all_rules = AllocationRule.where(assignment: @assignment)
+      expect(all_rules.count).to eq(1)
+
+      same_rule = all_rules.first
+      expect(same_rule.id).to eq(@existing_rule.id)
+      expect(same_rule.applies_to_assessor).to be true
+      expect(same_rule.updated_at).to eq(original_updated_at)
+    end
+  end
+
+  describe "soft deletion and new rule creation" do
     before do
       @original_rule = AllocationRule.create!(
         course: @course,
@@ -903,7 +964,7 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
       @original_rule.destroy
     end
 
-    it "reactivates soft-deleted rule instead of creating new record" do
+    it "creates new rule when matching soft-deleted rule exists" do
       query = <<~GQL
         assignmentId: "#{@assignment.id}"
         assessorIds: ["#{@student1.id}"]
@@ -914,14 +975,15 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
       expect(result["errors"]).to be_nil
 
       all_rules = AllocationRule.where(assignment: @assignment)
-      expect(all_rules.count).to eq(1)
+      expect(all_rules.count).to eq(2)
       expect(all_rules.active.count).to eq(1)
 
-      reactivated_rule = all_rules.first
-      expect(reactivated_rule.id).to eq(@original_rule.id)
-      expect(reactivated_rule.workflow_state).to eq("active")
-      expect(reactivated_rule.assessor_id).to eq(@student1.id)
-      expect(reactivated_rule.assessee_id).to eq(@student2.id)
+      new_rule = all_rules.active.first
+      expect(new_rule.id).not_to eq(@original_rule.id)
+      expect(new_rule.workflow_state).to eq("active")
+      expect(new_rule.assessor_id).to eq(@student1.id)
+      expect(new_rule.assessee_id).to eq(@student2.id)
+      expect(@original_rule.reload.workflow_state).to eq("deleted")
     end
 
     it "creates new rule when attributes differ from soft-deleted rule" do

@@ -1173,6 +1173,34 @@ describe "as a teacher" do
           expect(element_exists?("div[data-testid='allocation-rule-card-wrapper']")).to be_falsey
         end
       end
+
+      context "ESC key accessibility" do
+        it "closes allocation rules tray and create rule modal with ESC key" do
+          TeacherViewPageV2.visit(@course, @assignment)
+          TeacherViewPageV2.peer_review_tab.click
+          wait_for_ajaximations
+
+          TeacherViewPageV2.peer_review_allocation_rules_link.click
+          wait_for_ajaximations
+          expect(TeacherViewPageV2.allocation_rules_tray).to be_displayed
+
+          TeacherViewPageV2.add_rule_button.click
+          wait_for_ajaximations
+          expect(TeacherViewPageV2.create_rule_modal).to be_displayed
+          expect(element_exists?("div[role='dialog'][aria-label='Allocation Rules']")).to be_truthy
+
+          driver.action.send_keys(:escape).perform
+          wait_for_ajaximations
+
+          expect(element_exists?("span[data-testid='create-rule-modal']")).to be_falsey
+          expect(TeacherViewPageV2.allocation_rules_tray).to be_displayed
+
+          driver.action.send_keys(:escape).perform
+          wait_for_ajaximations
+
+          expect(element_exists?("div[role='dialog'][aria-label='Allocation Rules']")).to be_falsey
+        end
+      end
     end
   end
 end

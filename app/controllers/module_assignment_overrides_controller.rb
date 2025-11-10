@@ -225,8 +225,16 @@ class ModuleAssignmentOverridesController < ApplicationController
           current_override.set_id = nil
         end
         existing_user_ids = current_override.assignment_override_students.pluck(:user_id)
-        override["student_ids"].map(&:to_i).each do |student_id|
-          current_override.assignment_override_students.create!(user: @context.students.find(student_id)) unless existing_user_ids.include?(student_id)
+        student_ids_to_add = override["student_ids"].map(&:to_i) - existing_user_ids
+
+        students_by_id = @context.students
+                                 .where(id: student_ids_to_add)
+                                 .eager_load(:student_enrollments)
+                                 .index_by(&:id)
+
+        student_ids_to_add.each do |student_id|
+          user = students_by_id[student_id]
+          current_override.assignment_override_students.create!(user:) if user
         end
       end
       current_override.save!
@@ -243,7 +251,17 @@ class ModuleAssignmentOverridesController < ApplicationController
         group = find_group(override["group_id"])
         new_override.group = group if group.non_collaborative?
       elsif override["student_ids"].present?
-        override["student_ids"].each { |student_id| new_override.assignment_override_students.build(user: @context.students.find(student_id)) }
+        student_ids = override["student_ids"].map(&:to_i)
+
+        students_by_id = @context.students
+                                 .where(id: student_ids)
+                                 .eager_load(:student_enrollments)
+                                 .index_by(&:id)
+
+        student_ids.each do |student_id|
+          user = students_by_id[student_id]
+          new_override.assignment_override_students.build(user:) if user
+        end
       end
       new_override.save!
     end

@@ -88,6 +88,13 @@ horizon_course_redesign:
   display_name: "Canvas Career: Course Redesign"
   description: |-
     Enables courses to leverage Canvas Career features natively.
+horizon_course_index_page:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Course Index Page"
+  description: |-
+    Enables native course index page in Canvas Career.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:

@@ -781,5 +781,418 @@ describe Types::QueryType do
       # Should not return instructors from unpublished courses
       expect(instructors).to be_empty
     end
+
+    describe "pagination" do
+      before(:once) do
+        @paginated_course = Course.create!(name: "Paginated Course", workflow_state: "available")
+        @paginated_student = user_factory(name: "Paginated Student")
+        @paginated_course.enroll_student(@paginated_student, enrollment_state: "active")
+
+        # Create 10 instructors
+        @paginated_instructors = (1..10).map do |i|
+          instructor = user_factory(name: "Instructor #{i.to_s.rjust(2, "0")}", sortable_name: "Instructor #{i.to_s.rjust(2, "0")}")
+          enrollment = @paginated_course.enroll_teacher(instructor)
+          enrollment.accept!
+          instructor
+        end
+      end
+
+      let(:paginated_query) do
+        <<~GQL
+          query($courseIds: [ID!]!, $first: Int, $after: String) {
+            courseInstructorsConnection(courseIds: $courseIds, first: $first, after: $after) {
+              nodes {
+                user {
+                  _id
+                  name
+                }
+              }
+              pageInfo {
+                hasNextPage
+                hasPreviousPage
+                startCursor
+                endCursor
+                totalCount
+              }
+            }
+          }
+        GQL
+      end
+
+      it "respects the first parameter to limit results" do
+        result = CanvasSchema.execute(
+          paginated_query,
+          variables: { courseIds: [@paginated_course.id.to_s], first: 5 },
+          context: { current_user: @paginated_student }
+        )
+
+        nodes = result.dig("data", "courseInstructorsConnection", "nodes")
+        page_info = result.dig("data", "courseInstructorsConnection", "pageInfo")
+
+        expect(nodes.length).to eq(5)
+        expect(page_info["hasNextPage"]).to be true
+        expect(page_info["hasPreviousPage"]).to be false
+        expect(page_info["totalCount"]).to eq(10)
+      end
+
+      it "handles cursor-based pagination correctly" do
+        # First page
+        first_result = CanvasSchema.execute(
+          paginated_query,
+          variables: { courseIds: [@paginated_course.id.to_s], first: 3 },
+          context: { current_user: @paginated_student }
+        )
+
+        first_nodes = first_result.dig("data", "courseInstructorsConnection", "nodes")
+        first_page_info = first_result.dig("data", "courseInstructorsConnection", "pageInfo")
+        end_cursor = first_page_info["endCursor"]
+
+        expect(first_nodes.length).to eq(3)
+        expect(first_page_info["hasNextPage"]).to be true
+        expect(end_cursor).not_to be_nil
+
+        # Second page
+        second_result = CanvasSchema.execute(
+          paginated_query,
+          variables: { courseIds: [@paginated_course.id.to_s], first: 3, after: end_cursor },
+          context: { current_user: @paginated_student }
+        )
+
+        second_nodes = second_result.dig("data", "courseInstructorsConnection", "nodes")
+        second_page_info = second_result.dig("data", "courseInstructorsConnection", "pageInfo")
+
+        expect(second_nodes.length).to eq(3)
+        expect(second_page_info["hasNextPage"]).to be true
+        expect(second_page_info["hasPreviousPage"]).to be true
+
+        # Verify no duplicate instructors between pages
+        first_ids = first_nodes.pluck("user").pluck("_id")
+        second_ids = second_nodes.pluck("user").pluck("_id")
+        expect(first_ids & second_ids).to be_empty
+      end
+
+      it "returns accurate totalCount after deduplication with multiple section enrollments" do
+        # Create multiple sections and enroll instructor in all of them
+        section1 = @paginated_course.course_sections.create!(name: "Section A")
+        section2 = @paginated_course.course_sections.create!(name: "Section B")
+        section3 = @paginated_course.course_sections.create!(name: "Section C")
+
+        multi_section_instructor = @paginated_instructors.first
+        @paginated_course.enroll_teacher(multi_section_instructor, section: section1, allow_multiple_enrollments: true).accept!
+        @paginated_course.enroll_teacher(multi_section_instructor, section: section2, allow_multiple_enrollments: true).accept!
+        @paginated_course.enroll_teacher(multi_section_instructor, section: section3, allow_multiple_enrollments: true).accept!
+
+        result = CanvasSchema.execute(
+          paginated_query,
+          variables: { courseIds: [@paginated_course.id.to_s] },
+          context: { current_user: @paginated_student }
+        )
+
+        page_info = result.dig("data", "courseInstructorsConnection", "pageInfo")
+        nodes = result.dig("data", "courseInstructorsConnection", "nodes")
+
+        # Should still be 10 unique instructors, not 13 (10 + 3 additional enrollments)
+        expect(page_info["totalCount"]).to eq(10)
+        expect(nodes.length).to eq(10)
+      end
+
+      it "handles pagination when last page has fewer items than requested" do
+        result = CanvasSchema.execute(
+          paginated_query,
+          variables: { courseIds: [@paginated_course.id.to_s], first: 7 },
+          context: { current_user: @paginated_student }
+        )
+
+        result.dig("data", "courseInstructorsConnection", "nodes")
+        first_page_info = result.dig("data", "courseInstructorsConnection", "pageInfo")
+
+        # Get second page
+        second_result = CanvasSchema.execute(
+          paginated_query,
+          variables: { courseIds: [@paginated_course.id.to_s], first: 7, after: first_page_info["endCursor"] },
+          context: { current_user: @paginated_student }
+        )
+
+        second_nodes = second_result.dig("data", "courseInstructorsConnection", "nodes")
+        second_page_info = second_result.dig("data", "courseInstructorsConnection", "pageInfo")
+
+        expect(second_nodes.length).to eq(3) # Only 3 remaining
+        expect(second_page_info["hasNextPage"]).to be false
+      end
+    end
+
+    describe "TA enrollments" do
+      before(:once) do
+        @ta_course = Course.create!(name: "TA Course", workflow_state: "available")
+        @ta_student = user_factory(name: "TA Student")
+        @ta_course.enroll_student(@ta_student, enrollment_state: "active")
+
+        @teacher = user_factory(name: "Teacher User")
+        @ta1 = user_factory(name: "TA User 1")
+        @ta2 = user_factory(name: "TA User 2")
+
+        @teacher_enrollment = @ta_course.enroll_teacher(@teacher)
+        @teacher_enrollment.accept!
+        @ta_enrollment1 = @ta_course.enroll_ta(@ta1)
+        @ta_enrollment1.accept!
+        @ta_enrollment2 = @ta_course.enroll_ta(@ta2)
+        @ta_enrollment2.accept!
+      end
+
+      it "returns TAs alongside teachers" do
+        result = CanvasSchema.execute(
+          query,
+          variables: { courseIds: [@ta_course.id.to_s] },
+          context: { current_user: @ta_student }
+        )
+
+        instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+        expect(instructors.length).to eq(3)
+
+        instructor_names = instructors.pluck("user").pluck("name").sort
+        expect(instructor_names).to eq(["TA User 1", "TA User 2", "Teacher User"])
+      end
+
+      it "correctly identifies enrollment type for TAs" do
+        result = CanvasSchema.execute(
+          <<~GQL,
+            query($courseIds: [ID!]!) {
+              courseInstructorsConnection(courseIds: $courseIds) {
+                nodes {
+                  user {
+                    name
+                  }
+                  type
+                }
+              }
+            }
+          GQL
+          variables: { courseIds: [@ta_course.id.to_s] },
+          context: { current_user: @ta_student }
+        )
+
+        nodes = result.dig("data", "courseInstructorsConnection", "nodes")
+        ta_nodes = nodes.select { |n| n["user"]["name"].include?("TA User") }
+        teacher_nodes = nodes.select { |n| n["user"]["name"].include?("Teacher User") }
+
+        expect(ta_nodes.length).to eq(2)
+        expect(ta_nodes.all? { |n| n["type"] == "TaEnrollment" }).to be true
+        expect(teacher_nodes.length).to eq(1)
+        expect(teacher_nodes.first["type"]).to eq("TeacherEnrollment")
+      end
+
+      it "returns TAs when course has only TAs and no teachers" do
+        @ta_only_course = Course.create!(name: "TA Only Course", workflow_state: "available")
+        @ta_only_course.enroll_student(@ta_student, enrollment_state: "active")
+        @ta_only_course.enroll_ta(@ta1).accept!
+        @ta_only_course.enroll_ta(@ta2).accept!
+
+        result = CanvasSchema.execute(
+          query,
+          variables: { courseIds: [@ta_only_course.id.to_s] },
+          context: { current_user: @ta_student }
+        )
+
+        instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+        expect(instructors.length).to eq(2)
+        instructor_names = instructors.pluck("user").pluck("name").sort
+        expect(instructor_names).to eq(["TA User 1", "TA User 2"])
+      end
+    end
+
+    describe "enrollment priority and deduplication" do
+      before(:once) do
+        @priority_course = Course.create!(name: "Priority Course", workflow_state: "available")
+        @priority_student = user_factory(name: "Priority Student")
+        @priority_course.enroll_student(@priority_student, enrollment_state: "active")
+      end
+
+      it "returns active enrollment over invited when user has both" do
+        instructor = user_factory(name: "Multi-State Instructor")
+
+        # Create invited enrollment
+        invited_enrollment = @priority_course.enroll_teacher(instructor)
+        expect(invited_enrollment.workflow_state).to eq("invited")
+
+        # Create active enrollment in different section
+        section2 = @priority_course.course_sections.create!(name: "Active Section")
+        active_enrollment = @priority_course.enroll_teacher(instructor, section: section2, allow_multiple_enrollments: true)
+        active_enrollment.accept!
+        expect(active_enrollment.workflow_state).to eq("active")
+
+        result = CanvasSchema.execute(
+          query,
+          variables: { courseIds: [@priority_course.id.to_s] },
+          context: { current_user: @priority_student }
+        )
+
+        instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+        expect(instructors.length).to eq(1)
+        expect(instructors[0].dig("user", "name")).to eq("Multi-State Instructor")
+
+        # Verify the active enrollment is returned (we can check via enrollmentState field)
+        result_with_state = CanvasSchema.execute(
+          <<~GQL,
+            query($courseIds: [ID!]!) {
+              courseInstructorsConnection(courseIds: $courseIds) {
+                nodes {
+                  user { name }
+                  enrollmentState
+                }
+              }
+            }
+          GQL
+          variables: { courseIds: [@priority_course.id.to_s] },
+          context: { current_user: @priority_student }
+        )
+
+        enrollment_state = result_with_state.dig("data", "courseInstructorsConnection", "nodes", 0, "enrollmentState")
+        expect(enrollment_state).to eq("active")
+      end
+
+      it "filters out restricted access enrollments" do
+        instructor = user_factory(name: "Restricted Instructor")
+        enrollment = @priority_course.enroll_teacher(instructor)
+        enrollment.accept!
+
+        # Set restricted access
+        enrollment.enrollment_state.update!(restricted_access: true)
+
+        result = CanvasSchema.execute(
+          query,
+          variables: { courseIds: [@priority_course.id.to_s] },
+          context: { current_user: @priority_student }
+        )
+
+        instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+        instructor_names = instructors.pluck("user").pluck("name")
+        expect(instructor_names).not_to include("Restricted Instructor")
+      end
+
+      it "handles user with both Teacher and TA enrollments in same course" do
+        instructor = user_factory(name: "Dual Role Instructor")
+
+        # Enroll as teacher
+        teacher_enrollment = @priority_course.enroll_teacher(instructor)
+        teacher_enrollment.accept!
+
+        # Also enroll as TA in different section
+        section2 = @priority_course.course_sections.create!(name: "TA Section")
+        ta_enrollment = @priority_course.enroll_ta(instructor, section: section2, allow_multiple_enrollments: true)
+        ta_enrollment.accept!
+
+        result = CanvasSchema.execute(
+          <<~GQL,
+            query($courseIds: [ID!]!) {
+              courseInstructorsConnection(courseIds: $courseIds) {
+                nodes {
+                  user { name }
+                  type
+                }
+              }
+            }
+          GQL
+          variables: { courseIds: [@priority_course.id.to_s] },
+          context: { current_user: @priority_student }
+        )
+
+        nodes = result.dig("data", "courseInstructorsConnection", "nodes")
+        dual_role_nodes = nodes.select { |n| n["user"]["name"] == "Dual Role Instructor" }
+
+        # Should return only one enrollment (deduplicated by course_id + user_id)
+        expect(dual_role_nodes.length).to eq(1)
+      end
+
+      it "filters out completed enrollments even when user has no active enrollment" do
+        instructor = user_factory(name: "Completed Instructor")
+        enrollment = @priority_course.enroll_teacher(instructor)
+        enrollment.accept!
+        enrollment.complete!
+
+        result = CanvasSchema.execute(
+          query,
+          variables: { courseIds: [@priority_course.id.to_s] },
+          context: { current_user: @priority_student }
+        )
+
+        instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+        instructor_names = instructors.pluck("user").pluck("name")
+        expect(instructor_names).not_to include("Completed Instructor")
+      end
+    end
+
+    describe "sorting" do
+      before(:once) do
+        @course_z = Course.create!(name: "Z Course", workflow_state: "available")
+        @course_a = Course.create!(name: "A Course", workflow_state: "available")
+        @course_m = Course.create!(name: "M Course", workflow_state: "available")
+
+        @sort_student = user_factory(name: "Sort Student")
+        @course_z.enroll_student(@sort_student, enrollment_state: "active")
+        @course_a.enroll_student(@sort_student, enrollment_state: "active")
+        @course_m.enroll_student(@sort_student, enrollment_state: "active")
+
+        # Add instructors with specific sortable names
+        @instructor_z = user_factory(name: "Instructor Z", sortable_name: "Z, Instructor")
+        @instructor_a = user_factory(name: "Instructor A", sortable_name: "A, Instructor")
+        @instructor_m = user_factory(name: "Instructor M", sortable_name: "M, Instructor")
+
+        @course_z.enroll_teacher(@instructor_z).accept!
+        @course_a.enroll_teacher(@instructor_a).accept!
+        @course_a.enroll_teacher(@instructor_z).accept! # Add Z to A course too
+        @course_m.enroll_teacher(@instructor_m).accept!
+      end
+
+      it "sorts by course name ascending, then by user sortable name ascending" do
+        result = CanvasSchema.execute(
+          query,
+          variables: { courseIds: [@course_z.id.to_s, @course_a.id.to_s, @course_m.id.to_s] },
+          context: { current_user: @sort_student }
+        )
+
+        nodes = result.dig("data", "courseInstructorsConnection", "nodes")
+        course_names = nodes.pluck("course").pluck("name")
+
+        # Should be sorted by course name: A Course, M Course, Z Course
+        expect(course_names).to eq(["A Course", "A Course", "M Course", "Z Course"])
+
+        # Within A Course, should be sorted by sortable name: A then Z
+        a_course_instructors = nodes.select { |n| n["course"]["name"] == "A Course" }
+        a_course_names = a_course_instructors.pluck("user").pluck("name")
+        expect(a_course_names).to eq(["Instructor A", "Instructor Z"])
+      end
+    end
+
+    describe "empty courseIds" do
+      before(:once) do
+        @empty_student = user_factory(name: "Empty Student")
+
+        # Enroll in 5 courses
+        @student_courses = (1..5).map do |i|
+          course = Course.create!(name: "Student Course #{i}", workflow_state: "available")
+          course.enroll_student(@empty_student, enrollment_state: "active")
+
+          instructor = user_factory(name: "Instructor #{i}")
+          course.enroll_teacher(instructor).accept!
+
+          course
+        end
+      end
+
+      it "returns instructors from all user's courses when courseIds is empty array" do
+        result = CanvasSchema.execute(
+          query,
+          variables: { courseIds: [] },
+          context: { current_user: @empty_student }
+        )
+
+        instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+
+        # Should return instructors from all 5 courses
+        expect(instructors.length).to eq(5)
+        instructor_names = instructors.pluck("user").pluck("name").sort
+        expect(instructor_names).to eq((1..5).map { |i| "Instructor #{i}" })
+      end
+    end
   end
 end

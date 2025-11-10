@@ -59,6 +59,7 @@ describe('useUtidMatching', () => {
   ]
 
   beforeEach(() => {
+    mockDoFetchApi.mockReset()
     jest.clearAllMocks()
     jest.useFakeTimers()
   })

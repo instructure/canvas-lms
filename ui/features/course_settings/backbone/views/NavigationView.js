@@ -31,6 +31,9 @@ export default class NavigationView extends Backbone.View {
       'click .disable_nav_item_link': 'disableNavLink',
       'click .move_nav_item_link': 'moveNavLink',
       'click .enable_nav_item_link': 'enableNavLink',
+      'keydown .navitem.enabled': 'handleKeyboardNav',
+      'focus .navitem.enabled': 'handleNavItemFocus',
+      'blur .navitem.enabled': 'handleNavItemBlur',
     }
 
     this.prototype.els = {
@@ -103,10 +106,127 @@ export default class NavigationView extends Backbone.View {
     $('.drag_and_drop_warning').addClass('screenreader-only read')
   }
 
+  handleNavItemFocus(e) {
+    $(e.currentTarget).addClass('keyboard-focus')
+  }
+
+  handleNavItemBlur(e) {
+    $(e.currentTarget).removeClass('keyboard-focus')
+    if (this.isMovingItem) return
+
+    const $target = $(e.relatedTarget)
+    if (this.draggedItem && this.draggedItem[0] === e.currentTarget) {
+      if (!$target.hasClass('navitem') && !$target.closest('.nav_list').length) {
+        this.cancelDrag()
+      }
+    }
+  }
+
+  handleKeyboardNav(e) {
+    const $currentItem = $(e.currentTarget)
+
+    if ($(e.target).closest('.admin-links, .al-options').length) {
+      return
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      if (this.draggedItem && this.draggedItem[0] === e.currentTarget) {
+        const $prev = $currentItem.prev('.navitem.enabled')
+        if ($prev.length) {
+          this.isMovingItem = true
+          $currentItem.insertBefore($prev)
+          $currentItem.focus()
+          this.isMovingItem = false
+        }
+      } else {
+        const $prev = $currentItem.prev('.navitem.enabled')
+        if ($prev.length) {
+          $prev.focus()
+        }
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      if (this.draggedItem && this.draggedItem[0] === e.currentTarget) {
+        const $next = $currentItem.next('.navitem.enabled')
+        if ($next.length) {
+          this.isMovingItem = true
+          $currentItem.insertAfter($next)
+          $currentItem.focus()
+          this.isMovingItem = false
+        }
+      } else {
+        const $next = $currentItem.next('.navitem.enabled')
+        if ($next.length) {
+          $next.focus()
+        }
+      }
+    } else if (e.key === ' ') {
+      e.preventDefault()
+      if (this.draggedItem && this.draggedItem[0] === e.currentTarget) {
+        this.dropItem($currentItem)
+      } else {
+        this.startDrag($currentItem)
+      }
+    } else if (e.key === 'Escape') {
+      if (this.draggedItem) {
+        e.preventDefault()
+        this.cancelDrag()
+      }
+    }
+  }
+
+  startDrag($item) {
+    this.draggedItem = $item
+    const $prevSibling = $item.prev('.navitem.enabled')
+    const $nextSibling = $item.next('.navitem.enabled')
+    this.originalPrevSibling = $prevSibling.length ? $prevSibling : null
+    this.originalNextSibling = $nextSibling.length ? $nextSibling : null
+    $item.addClass('dragging')
+    $item.attr('aria-grabbed', 'true')
+    const label = $item.attr('aria-label')
+    $.screenReaderFlashMessage(
+      I18n.t('Grabbed %{item}. Use arrow keys to move, Space to drop, Escape to cancel.', {
+        item: label,
+      }),
+    )
+  }
+
+  dropItem($item) {
+    const label = $item.attr('aria-label')
+    $item.removeClass('dragging')
+    $item.attr('aria-grabbed', 'false')
+    this.draggedItem = null
+    this.originalPrevSibling = null
+    this.originalNextSibling = null
+    $.screenReaderFlashMessage(I18n.t('Dropped %{item}', {item: label}))
+  }
+
+  cancelDrag() {
+    if (!this.draggedItem) return
+    const $item = this.draggedItem
+    const label = $item.attr('aria-label')
+    $item.removeClass('dragging')
+    $item.attr('aria-grabbed', 'false')
+
+    if (this.originalPrevSibling) {
+      $item.insertAfter(this.originalPrevSibling)
+    } else if (this.originalNextSibling) {
+      $item.insertBefore(this.originalNextSibling)
+    }
+
+    this.draggedItem = null
+    this.originalPrevSibling = null
+    this.originalNextSibling = null
+    $.screenReaderFlashMessage(I18n.t('Cancelled move of %{item}', {item: label}))
+  }
+
   afterRender() {
     $('#navigation_tab').on('blur', this.resetReadState)
     $('#tab-navigation').on('keyup', this.focusKeyboardHelp)
     $('.drag_and_drop_warning').on('blur', this.hideKeyboardHelp)
+
+    this.$enabled_list.children('.navitem.enabled').attr('tabindex', '0')
   }
 }
 NavigationView.initClass()

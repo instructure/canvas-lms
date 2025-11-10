@@ -123,6 +123,7 @@ class Attachment < ActiveRecord::Base
   has_many :thumbnails, foreign_key: "parent_id", inverse_of: :attachment
   has_many :children, foreign_key: :root_attachment_id, class_name: "Attachment", inverse_of: :root_attachment
   has_many :attachment_upload_statuses
+  has_one :last_attachment_upload_status, -> { order(created_at: :desc) }, class_name: "AttachmentUploadStatus"
   has_one :canvadoc
   belongs_to :usage_rights
   has_many :canvadocs_annotation_contexts, inverse_of: :attachment
@@ -2019,7 +2020,14 @@ class Attachment < ActiveRecord::Base
       destination.workflow_state = "processed"
     else
       destination.avoid_linking_to_root_attachment = true if split_root_attachment
-      Attachments::Storage.store_for_attachment(destination, open)
+      # If open returns nil (e.g., underlying S3 object missing and marked broken),
+      # skip attempting to store, and mark destination broken as well to prevent
+      # downstream service errors like InstFS::BadRequestError ("No file uploaded").
+      if (source_file = open)
+        Attachments::Storage.store_for_attachment(destination, source_file)
+      elsif destination.md5.nil?
+        Attachment.where(id: destination).update_all(file_state: "broken")
+      end
     end
   end
 
@@ -2424,7 +2432,15 @@ class Attachment < ActiveRecord::Base
   private :preview_params
 
   def can_unpublish?
-    false
+    # Only allow if file is in a simple "published" state with no special restrictions
+    return false if locked?
+
+    has_complex_state = file_state != "available" ||
+                        lock_at.present? ||
+                        unlock_at.present? ||
+                        (visibility_level.present? && visibility_level != "inherit")
+
+    !has_complex_state
   end
 
   def self.copy_attachments_to_submissions_folder(assignment_context, attachments)

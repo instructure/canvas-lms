@@ -1038,7 +1038,7 @@ class AssignmentsApiController < ApplicationController
           scope = if @context.grants_right?(user, :read_as_admin)
                     scope.with_latest_due_date.reorder(Arel.sql("latest_due_date, #{Assignment.best_unicode_collation_key("assignments.title")}, assignment_groups.position, assignments.position, assignments.id"))
                   else
-                    scope.with_user_due_date(user).reorder(Arel.sql("user_due_date, #{Assignment.best_unicode_collation_key("assignments.title")}, assignment_groups.position, assignments.position, assignments.id"))
+                    scope.with_user_due_date(user).reorder(Arel.sql("submissions.cached_due_date, #{Assignment.best_unicode_collation_key("assignments.title")}, assignment_groups.position, assignments.position, assignments.id"))
                   end
         end
       end
@@ -1399,6 +1399,11 @@ class AssignmentsApiController < ApplicationController
   #
   #   Only applies when submission_types includes "student_annotation".
   #
+  # @argument assignment[asset_processors][] [Array]
+  #   Document processors for this assignment. New document processors can only be added
+  #   via the interactive LTI Deep Linking flow (in a browser), not via API token or JWT authentication.
+  #   Deletion of document processors (passing an empty array) is allowed via API.
+  #
   # @argument assignment[peer_review][points_possible] [Float]
   #   The maximum points possible for peer reviews.
   #
@@ -1634,6 +1639,11 @@ class AssignmentsApiController < ApplicationController
   #   The Attachment ID of the document being annotated.
   #
   #   Only applies when submission_types includes "student_annotation".
+  #
+  # @argument assignment[asset_processors][] [Array]
+  #   Document processors for this assignment. New document processors can only be added
+  #   via the interactive LTI Deep Linking flow (in a browser), not via API token or JWT authentication.
+  #   Deletion of document processors (passing an empty array) is allowed via API.
   #
   # @argument assignment[force_updated_at] [Boolean]
   #   If true, updated_at will be set even if no changes were made.

@@ -17,15 +17,44 @@
  */
 
 import {useState, useCallback} from 'react'
+import {useMutation} from '@tanstack/react-query'
 import type {TabId} from '../types'
-import {TAB_IDS} from '../constants'
+import {TAB_IDS, UPDATE_LEARNER_DASHBOARD_TAB_SELECTION} from '../constants'
+import {executeQuery} from '@canvas/graphql'
+
+interface UpdateTabSelectionResponse {
+  updateLearnerDashboardTabSelection?: {
+    tab: string
+    errors?: Array<{message: string}>
+  }
+}
 
 export function useTabState(defaultTab: TabId = TAB_IDS.DASHBOARD) {
   const [currentTab, setCurrentTab] = useState<TabId>(defaultTab)
 
-  const handleTabChange = useCallback((tabId: TabId) => {
-    setCurrentTab(tabId)
-  }, [])
+  const updateTabMutation = useMutation({
+    mutationFn: async (tab: TabId) => {
+      const result = await executeQuery<UpdateTabSelectionResponse>(
+        UPDATE_LEARNER_DASHBOARD_TAB_SELECTION,
+        {tab},
+      )
+      return result
+    },
+    onError: error => {
+      console.error('Failed to save tab preference:', error)
+    },
+  })
+
+  const handleTabChange = useCallback(
+    (tabId: TabId) => {
+      // Optimistic update
+      setCurrentTab(tabId)
+
+      // Persist to backend (fire and forget)
+      updateTabMutation.mutate(tabId)
+    },
+    [updateTabMutation.mutate],
+  )
 
   return {
     currentTab,

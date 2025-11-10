@@ -122,7 +122,7 @@ module Interfaces::SubmissionInterface
 
   field :anonymous_id, ID, null: true
 
-  field :assignment, Types::AssignmentType, null: true
+  field :assignment, Types::AssignmentType, null: false
   def assignment
     load_association(:assignment)
   end
@@ -701,6 +701,16 @@ module Interfaces::SubmissionInterface
 
   field :word_count, Float, null: true
   delegate :word_count, to: :object
+
+  field :has_provisional_grade_by_current_user, Boolean, null: false, description: "Whether the current user has provided a provisional grade with a non-null score for this submission"
+  def has_provisional_grade_by_current_user
+    load_association(:assignment).then do |assignment|
+      return false unless assignment&.moderated_grading?
+      return false if assignment.grades_published_at.present?
+
+      Loaders::SubmissionLoaders::HasProvisionalGradeByCurrentUserLoader.for(current_user.id).load(submission.id)
+    end
+  end
 
   def version_query_param(submission)
     if submission.attempt.present? && submission.attempt > 0 && submission.submission_type != "online_quiz"

@@ -35,6 +35,7 @@ import {EnvGradebook} from './EnvGradebook'
 import {EnvGradingStandards} from './EnvGradingStandards'
 import {EnvHorizon} from './EnvHorizon'
 import {EnvLtiRegistrations} from './EnvLtiRegistrations'
+import {EnvNewQuizzes} from './EnvNewQuizzes'
 import {EnvNotices} from './EnvNotices'
 import {EnvPlatformStorage} from './EnvPlatformStorage'
 import {EnvPortfolio} from './EnvPortfolio'
@@ -90,5 +91,6 @@ export type GlobalEnv =
         EnvHorizon &
         EnvAuthentication &
         EnvWidgetDashboard &
+        EnvNewQuizzes &
         EnvNotices
     >

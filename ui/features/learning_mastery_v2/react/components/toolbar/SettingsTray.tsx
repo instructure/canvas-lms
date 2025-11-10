@@ -26,6 +26,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {GradebookSettings} from '../../utils/constants'
 import {SecondaryInfoSelector} from './SecondaryInfoSelector'
 import {DisplayFilterSelector} from './DisplayFilterSelector'
+import {ScoreDisplayFormatSelector} from './ScoreDisplayFormatSelector'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -48,17 +49,24 @@ export const SettingsTray: React.FC<SettingsTrayProps> = ({
     gradebookSettings.secondaryInfoDisplay,
   )
   const [displayFilters, setDisplayFilters] = useState(gradebookSettings.displayFilters)
+  const [scoreDisplayFormat, setScoreDisplayFormat] = useState(gradebookSettings.scoreDisplayFormat)
 
   const resetForm = useCallback(() => {
     setSecondaryInfoDisplay(gradebookSettings.secondaryInfoDisplay)
     setDisplayFilters(gradebookSettings.displayFilters)
-  }, [gradebookSettings.secondaryInfoDisplay, gradebookSettings.displayFilters])
+    setScoreDisplayFormat(gradebookSettings.scoreDisplayFormat)
+  }, [
+    gradebookSettings.secondaryInfoDisplay,
+    gradebookSettings.displayFilters,
+    gradebookSettings.scoreDisplayFormat,
+  ])
 
   const saveSettings = async () => {
     const newSettings = {
       ...gradebookSettings,
       secondaryInfoDisplay,
       displayFilters,
+      scoreDisplayFormat,
     }
 
     const result = await setGradebookSettings(newSettings)
@@ -106,6 +114,10 @@ export const SettingsTray: React.FC<SettingsTrayProps> = ({
         <DisplayFilterSelector
           values={displayFilters}
           onChange={filters => setDisplayFilters(filters)}
+        />
+        <ScoreDisplayFormatSelector
+          value={scoreDisplayFormat}
+          onChange={format => setScoreDisplayFormat(format)}
         />
         <Flex gap="small" alignItems="stretch" direction="column">
           <Button color="primary" onClick={saveSettings} disabled={isSavingSettings}>

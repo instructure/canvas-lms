@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-shared_examples_for "url validation tests" do
+shared_context "url validation tests" do
   def test_url_validation(model)
     # should add http://
     model.url = "example.com"

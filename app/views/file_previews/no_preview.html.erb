@@ -20,11 +20,12 @@
 <%= render :partial => "layouts/head" %>
 <body style="margin:0; padding: 0; background: transparent;">
   <div id="content" class="file_preview_container" style="margin:0; padding: 0; position: absolute; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); color: white; text-align: center;">
-    <h2><%= @file.display_name %></h2>
-    <div><%= t('file_previews.no_preview_available', 'No preview is available for this file.')%></div>
-    <div>
-      <%= link_to(t('file_previews.download_file', 'Download *filename*', :wrapper => {'*' => h(@file.display_name)}), context_url(@context, :context_file_download_url, @file.id, :download_frd => 1)) %>
-      (<%= @file.readable_size %>)
+    <h2><%= t('file_previews.no_preview_available', 'No preview is available for this file.')%></h2>
+    <div><%= h(@file.display_name) %> <%= @file.readable_size %></div>
+    <div style="margin-top: 1rem;">
+      <a href="<%= context_url(@context, :context_file_download_url, @file.id, :download_frd => 1) %>" class="btn">
+        <i class="icon-download" aria-hidden="true"></i> <%= t('file_previews.download', 'Download') %>
+      </a>
     </div>
   </div>
   <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>

@@ -128,3 +128,9 @@ new_quizzes_surveys:
   state: hidden
   applies_to: SiteAdmin
   shadow: true
+new_quizzes_native_experience:
+  display_name: New Quizzes Native Experience
+  description: When enabled, New Quizzes opens directly within Canvas for a smoother experience.
+  state: hidden
+  shadow: true
+  applies_to: RootAccount

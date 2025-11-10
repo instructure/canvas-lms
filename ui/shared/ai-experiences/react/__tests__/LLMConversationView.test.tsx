@@ -42,6 +42,15 @@ describe('LLMConversationView', () => {
     Element.prototype.scrollIntoView = jest.fn()
     // Mock focus which is used for accessibility
     HTMLElement.prototype.focus = jest.fn()
+
+    // Default mocks for most tests - can be overridden in individual tests
+    // Mock get active conversation (returns empty - no active conversation)
+    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {})
+    // Mock create new conversation
+    fetchMock.post('/api/v1/courses/123/ai_experiences/1/conversations', {
+      id: '1',
+      messages: [],
+    })
   })
 
   afterEach(() => {
@@ -62,22 +71,12 @@ describe('LLMConversationView', () => {
   })
 
   it('renders expanded state when expanded', () => {
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-      conversation_id: 'test-conv-id',
-      messages: [],
-    })
-
     render(<LLMConversationView {...defaultProps} />)
     expect(screen.getByText('Preview')).toBeInTheDocument()
     expect(screen.getByText('Restart')).toBeInTheDocument()
   })
 
   it('renders restart button', () => {
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-      conversation_id: 'test-conv-id',
-      messages: [],
-    })
-
     render(<LLMConversationView {...defaultProps} />)
     expect(screen.getByText('Restart')).toBeInTheDocument()
   })
@@ -99,11 +98,6 @@ describe('LLMConversationView', () => {
   })
 
   it('calls onToggleExpanded when close button is clicked', () => {
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-      conversation_id: 'test-conv-id',
-      messages: [],
-    })
-
     const onToggleExpanded = jest.fn()
     render(<LLMConversationView {...defaultProps} onToggleExpanded={onToggleExpanded} />)
 
@@ -119,10 +113,13 @@ describe('LLMConversationView', () => {
       {role: 'Assistant', text: 'Hello! How can I help you?', timestamp: new Date()},
     ]
 
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-      conversation_id: 'test-conv-id',
-      messages: mockMessages,
-    })
+    // Override default mocks with custom messages
+    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
+    fetchMock.post(
+      '/api/v1/courses/123/ai_experiences/1/conversations',
+      {id: '1', messages: mockMessages},
+      {overwriteRoutes: true},
+    )
 
     render(<LLMConversationView {...defaultProps} />)
 
@@ -139,10 +136,13 @@ describe('LLMConversationView', () => {
       {role: 'Assistant', text: 'How can I help?', timestamp: new Date()},
     ]
 
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-      conversation_id: 'test-conv-id',
-      messages: mockMessages,
-    })
+    // Override default mocks with custom messages
+    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
+    fetchMock.post(
+      '/api/v1/courses/123/ai_experiences/1/conversations',
+      {id: '1', messages: mockMessages},
+      {overwriteRoutes: true},
+    )
 
     render(<LLMConversationView {...defaultProps} />)
 
@@ -157,11 +157,6 @@ describe('LLMConversationView', () => {
   })
 
   it('renders text input and send button', () => {
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-      conversation_id: 'test-conv-id',
-      messages: [],
-    })
-
     render(<LLMConversationView {...defaultProps} />)
 
     expect(screen.getByPlaceholderText('Your answer...')).toBeInTheDocument()
@@ -174,20 +169,22 @@ describe('LLMConversationView', () => {
       {role: 'Assistant', text: 'Hello', timestamp: new Date()},
     ]
 
-    let callCount = 0
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', () => {
-      callCount++
-      if (callCount === 1) {
-        return {conversation_id: 'test-conv-id', messages: initialMessages}
-      }
-      return {
-        conversation_id: 'test-conv-id',
-        messages: [
-          ...initialMessages,
-          {role: 'User', text: 'Test message', timestamp: new Date()},
-          {role: 'Assistant', text: 'Response', timestamp: new Date()},
-        ],
-      }
+    // Override default mocks with custom messages
+    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
+    fetchMock.post(
+      '/api/v1/courses/123/ai_experiences/1/conversations',
+      {id: '1', messages: initialMessages},
+      {overwriteRoutes: true},
+    )
+
+    // Mock post message
+    fetchMock.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', {
+      id: '1',
+      messages: [
+        ...initialMessages,
+        {role: 'User', text: 'Test message', timestamp: new Date()},
+        {role: 'Assistant', text: 'Response', timestamp: new Date()},
+      ],
     })
 
     render(<LLMConversationView {...defaultProps} />)
@@ -209,11 +206,6 @@ describe('LLMConversationView', () => {
   })
 
   it('clears input after sending message', async () => {
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-      conversation_id: 'test-conv-id',
-      messages: [],
-    })
-
     render(<LLMConversationView {...defaultProps} />)
 
     const input = screen.getByPlaceholderText('Your answer...') as HTMLTextAreaElement
@@ -235,19 +227,22 @@ describe('LLMConversationView', () => {
       {role: 'Assistant', text: 'Hello', timestamp: new Date()},
     ]
 
+    // Override default mocks with custom messages
+    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
     fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/continue_conversation',
-      {conversation_id: 'test-conv-id', messages: initialMessages},
-      {overwriteRoutes: false},
+      '/api/v1/courses/123/ai_experiences/1/conversations',
+      {id: '1', messages: initialMessages},
+      {overwriteRoutes: true},
     )
 
+    // Mock post message with delay
     fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/continue_conversation',
+      '/api/v1/courses/123/ai_experiences/1/conversations/1/messages',
       {
-        conversation_id: 'test-conv-id',
+        id: '1',
         messages: [...initialMessages, {role: 'User', text: 'New message', timestamp: new Date()}],
       },
-      {delay: 100, overwriteRoutes: false},
+      {delay: 100},
     )
 
     render(<LLMConversationView {...defaultProps} />)
@@ -274,10 +269,13 @@ describe('LLMConversationView', () => {
       {role: 'Assistant', text: 'Hello', timestamp: new Date()},
     ]
 
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-      conversation_id: 'test-conv-id',
-      messages: mockMessages,
-    })
+    // Override default mocks with custom messages
+    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
+    fetchMock.post(
+      '/api/v1/courses/123/ai_experiences/1/conversations',
+      {id: '1', messages: mockMessages},
+      {overwriteRoutes: true},
+    )
 
     render(<LLMConversationView {...defaultProps} />)
 
@@ -301,10 +299,13 @@ describe('LLMConversationView', () => {
       {role: 'User', text: 'User message', timestamp: new Date()},
     ]
 
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-      conversation_id: 'test-conv-id',
-      messages: mockMessages,
-    })
+    // Override default mocks with custom messages
+    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
+    fetchMock.post(
+      '/api/v1/courses/123/ai_experiences/1/conversations',
+      {id: '1', messages: mockMessages},
+      {overwriteRoutes: true},
+    )
 
     render(<LLMConversationView {...defaultProps} />)
 
@@ -319,11 +320,6 @@ describe('LLMConversationView', () => {
 
   describe('accessibility features', () => {
     it('renders ARIA live region for screen reader announcements', () => {
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-        conversation_id: 'test-conv-id',
-        messages: [],
-      })
-
       render(<LLMConversationView {...defaultProps} />)
 
       const liveRegion = document.querySelector('[aria-live="polite"]')
@@ -332,11 +328,6 @@ describe('LLMConversationView', () => {
     })
 
     it('adds role="log" to messages container', () => {
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-        conversation_id: 'test-conv-id',
-        messages: [],
-      })
-
       render(<LLMConversationView {...defaultProps} />)
 
       const messagesContainer = screen.getByLabelText('Conversation messages')
@@ -351,10 +342,17 @@ describe('LLMConversationView', () => {
         {role: 'User', text: 'Test message', timestamp: new Date()},
       ]
 
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-        conversation_id: 'test-conv-id',
-        messages: mockMessages,
-      })
+      // Override default mocks with custom messages
+      fetchMock.get(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {},
+        {overwriteRoutes: true},
+      )
+      fetchMock.post(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {id: '1', messages: mockMessages},
+        {overwriteRoutes: true},
+      )
 
       render(<LLMConversationView {...defaultProps} />)
 
@@ -371,10 +369,17 @@ describe('LLMConversationView', () => {
         {role: 'User', text: 'User message', timestamp: new Date()},
       ]
 
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-        conversation_id: 'test-conv-id',
-        messages: mockMessages,
-      })
+      // Override default mocks with custom messages
+      fetchMock.get(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {},
+        {overwriteRoutes: true},
+      )
+      fetchMock.post(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {id: '1', messages: mockMessages},
+        {overwriteRoutes: true},
+      )
 
       render(<LLMConversationView {...defaultProps} />)
 
@@ -385,10 +390,16 @@ describe('LLMConversationView', () => {
     })
 
     it('announces "Initializing conversation..." when initializing', () => {
+      // Override with delayed response
+      fetchMock.get(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {},
+        {overwriteRoutes: true},
+      )
       fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/continue_conversation',
-        {conversation_id: 'test-conv-id', messages: []},
-        {delay: 100},
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {id: '1', messages: []},
+        {delay: 100, overwriteRoutes: true},
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -403,27 +414,31 @@ describe('LLMConversationView', () => {
         {role: 'Assistant', text: 'Hello', timestamp: new Date()},
       ]
 
-      let callCount = 0
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', () => {
-        callCount++
-        if (callCount === 1) {
-          return {conversation_id: 'test-conv-id', messages: initialMessages}
-        }
-        return new Promise(resolve =>
-          setTimeout(
-            () =>
-              resolve({
-                conversation_id: 'test-conv-id',
-                messages: [
-                  ...initialMessages,
-                  {role: 'User', text: 'Test', timestamp: new Date()},
-                  {role: 'Assistant', text: 'Response', timestamp: new Date()},
-                ],
-              }),
-            100,
-          ),
-        )
-      })
+      // Override default mocks with custom messages
+      fetchMock.get(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {},
+        {overwriteRoutes: true},
+      )
+      fetchMock.post(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {id: '1', messages: initialMessages},
+        {overwriteRoutes: true},
+      )
+
+      // Mock post message with delay
+      fetchMock.post(
+        '/api/v1/courses/123/ai_experiences/1/conversations/1/messages',
+        {
+          id: '1',
+          messages: [
+            ...initialMessages,
+            {role: 'User', text: 'Test', timestamp: new Date()},
+            {role: 'Assistant', text: 'Response', timestamp: new Date()},
+          ],
+        },
+        {delay: 100},
+      )
 
       render(<LLMConversationView {...defaultProps} />)
 
@@ -447,10 +462,17 @@ describe('LLMConversationView', () => {
 
   describe('error handling', () => {
     it('displays error alert when conversation initialization fails', async () => {
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-        status: 503,
-        body: {error: 'Service unavailable'},
-      })
+      // Override with error response
+      fetchMock.get(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {},
+        {overwriteRoutes: true},
+      )
+      fetchMock.post(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {status: 503, body: {error: 'Service unavailable'}},
+        {overwriteRoutes: true},
+      )
 
       render(<LLMConversationView {...defaultProps} />)
 
@@ -467,16 +489,21 @@ describe('LLMConversationView', () => {
         {role: 'Assistant', text: 'Hello', timestamp: new Date()},
       ]
 
-      let callCount = 0
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', () => {
-        callCount++
-        if (callCount === 1) {
-          return {conversation_id: 'test-conv-id', messages: initialMessages}
-        }
-        return {
-          status: 503,
-          body: {error: 'Failed to send'},
-        }
+      // Override default mocks with custom messages
+      fetchMock.get(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {},
+        {overwriteRoutes: true},
+      )
+      fetchMock.post(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {id: '1', messages: initialMessages},
+        {overwriteRoutes: true},
+      )
+      // Mock post message failure
+      fetchMock.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', {
+        status: 503,
+        body: {error: 'Failed to send'},
       })
 
       render(<LLMConversationView {...defaultProps} />)
@@ -505,17 +532,24 @@ describe('LLMConversationView', () => {
         {role: 'Assistant', text: 'Hello', timestamp: new Date()},
       ]
 
-      let callCount = 0
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', () => {
-        callCount++
-        if (callCount === 1) {
-          return {conversation_id: 'test-conv-id', messages: initialMessages}
-        }
-        return {
-          status: 503,
-          body: {error: 'Failed to restart'},
-        }
-      })
+      // Mock get active conversation
+      fetchMock.get(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {},
+        {overwriteRoutes: true},
+      )
+      // Mock create conversation (first call - success)
+      fetchMock.post(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {id: '1', messages: initialMessages},
+        {repeat: 1, overwriteRoutes: true},
+      )
+      // Mock create conversation (second call for restart - failure)
+      fetchMock.post(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {status: 503, body: {error: 'Failed to restart'}},
+        {repeat: 1, overwriteRoutes: false},
+      )
 
       render(<LLMConversationView {...defaultProps} />)
 
@@ -534,10 +568,17 @@ describe('LLMConversationView', () => {
     })
 
     it('allows dismissing error alerts', async () => {
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
-        status: 503,
-        body: {error: 'Service unavailable'},
-      })
+      // Override with error response
+      fetchMock.get(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {},
+        {overwriteRoutes: true},
+      )
+      fetchMock.post(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {status: 503, body: {error: 'Service unavailable'}},
+        {overwriteRoutes: true},
+      )
 
       render(<LLMConversationView {...defaultProps} />)
 
@@ -558,20 +599,30 @@ describe('LLMConversationView', () => {
     })
 
     it('clears error when retrying after failure', async () => {
-      let callCount = 0
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', () => {
-        callCount++
-        if (callCount === 1) {
-          return {status: 503, body: {error: 'Failed'}}
-        }
-        return {
-          conversation_id: 'test-conv-id',
+      // Mock get active conversation
+      fetchMock.get(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {},
+        {overwriteRoutes: true},
+      )
+      // Mock create conversation (first call - failure)
+      fetchMock.post(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {status: 503, body: {error: 'Failed'}},
+        {repeat: 1, overwriteRoutes: true},
+      )
+      // Mock create conversation (second call - success)
+      fetchMock.post(
+        '/api/v1/courses/123/ai_experiences/1/conversations',
+        {
+          id: '1',
           messages: [
             {role: 'User', text: 'Start', timestamp: new Date()},
             {role: 'Assistant', text: 'Hello', timestamp: new Date()},
           ],
-        }
-      })
+        },
+        {repeat: 1, overwriteRoutes: false},
+      )
 
       render(<LLMConversationView {...defaultProps} />)
 

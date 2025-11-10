@@ -141,4 +141,62 @@ describe('CoursePickerTable component', () => {
     instance.handleFocusLoss(1)
     expect(check.focus).toHaveBeenCalledTimes(1)
   })
+
+  test('renders concluded pill when course is concluded', () => {
+    window.ENV = {FEATURES: {ux_list_concluded_courses_in_bp: true}}
+
+    const props = defaultProps()
+    props.courses = [
+      {
+        id: '1',
+        name: 'Concluded Course',
+        course_code: 'CONCLUDED101',
+        term: {id: '1', name: 'Term One'},
+        teachers: [{display_name: 'Teacher One'}],
+        sis_course_id: '1001',
+        concluded: true,
+      },
+    ]
+
+    const {getByText} = render(<CoursePickerTable {...props} />)
+    const pill = getByText('Concluded')
+    expect(pill).toBeInTheDocument()
+  })
+
+  test('does not render pill when course is not concluded', () => {
+    const props = defaultProps()
+    props.courses = [
+      {
+        id: '1',
+        name: 'Active Course',
+        course_code: 'ACTIVE101',
+        term: {id: '1', name: 'Term One'},
+        teachers: [{display_name: 'Teacher One'}],
+        sis_course_id: '1001',
+        concluded: false,
+      },
+    ]
+
+    const {queryByText} = render(<CoursePickerTable {...props} />)
+    const pill = queryByText('Concluded')
+    expect(pill).not.toBeInTheDocument()
+  })
+
+  test('does not render pill when concluded property is missing', () => {
+    const props = defaultProps()
+    props.courses = [
+      {
+        id: '1',
+        name: 'Course Without Concluded Property',
+        course_code: 'NORMAL101',
+        term: {id: '1', name: 'Term One'},
+        teachers: [{display_name: 'Teacher One'}],
+        sis_course_id: '1001',
+      },
+    ]
+
+    const {queryByText} = render(<CoursePickerTable {...props} />)
+    const pill = queryByText('Concluded')
+    expect(pill).not.toBeInTheDocument()
+  })
 })

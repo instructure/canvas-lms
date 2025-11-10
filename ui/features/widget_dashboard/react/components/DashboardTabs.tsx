@@ -23,6 +23,7 @@ import {View} from '@instructure/ui-view'
 import type {DashboardTab, TabId} from '../types'
 import {TAB_IDS} from '../constants'
 import {useTabState} from '../hooks/useTabState'
+import {useWidgetDashboard} from '../hooks/useWidgetDashboardContext'
 import DashboardTabContent from './DashboardTab'
 import CoursesTab from './CoursesTab'
 
@@ -40,7 +41,10 @@ const DASHBOARD_TABS: DashboardTab[] = [
 ]
 
 const DashboardTabs: React.FC = () => {
-  const {currentTab, handleTabChange} = useTabState()
+  const {preferences} = useWidgetDashboard()
+  const {currentTab, handleTabChange} = useTabState(
+    preferences?.learner_dashboard_tab_selection || TAB_IDS.DASHBOARD,
+  )
 
   const handleTabSelect = (_event: any, tabData: {index: number; id?: string}) => {
     if (tabData.id) {

@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   include Api::V1::WikiPage
   include LegalInformationHelper
   include ObserverEnrollmentsHelper
+  include NewQuizzesHelper
 
   helper :all
 
@@ -309,7 +310,7 @@ class ApplicationController < ActionController::Base
           RAILS_ENVIRONMENT: Canvas.environment
         }
         @js_env[:use_dyslexic_font] = @current_user&.prefers_dyslexic_font? if @current_user&.can_see_dyslexic_font_feature_flag?(session) && !mobile_device?
-        @js_env[:widget_dashboard_overridable] = @current_user&.prefers_widget_dashboard? if @domain_root_account&.feature_allowed?(:widget_dashboard) && !mobile_device?
+        @js_env[:widget_dashboard_overridable] = @current_user&.prefers_widget_dashboard? if widget_dashboard_allowed_for_user? && !mobile_device?
         if @domain_root_account&.feature_enabled?(:restrict_student_access)
           @js_env[:current_user_has_teacher_enrollment] = @current_user&.teacher_enrollment?
         end
@@ -471,6 +472,7 @@ class ApplicationController < ActionController::Base
     top_navigation_placement_a11y_fixes
     validate_call_to_action
     block_content_editor_ai_alt_text
+    ux_list_concluded_courses_in_bp
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales
@@ -501,6 +503,8 @@ class ApplicationController < ActionController::Base
     lti_registrations_next
     lti_registrations_page
     lti_registrations_usage_data
+    lti_registrations_usage_data_dev
+    lti_registrations_usage_data_low_usage
     lti_registrations_usage_tab
     lti_toggle_placements
     mobile_offline_mode
@@ -752,6 +756,14 @@ class ApplicationController < ActionController::Base
     @domain_root_account&.feature_enabled?(:k12)
   end
   helper_method :k12?
+
+  def widget_dashboard_allowed_for_user?
+    return false unless @current_user && @domain_root_account
+
+    # Check if the feature is allowed in any of the user's associated accounts
+    # This allows sub-accounts to independently enable the feature
+    @current_user.associated_accounts.any? { |account| account.feature_allowed?(:widget_dashboard) }
+  end
 
   def grading_periods?
     !!@context.try(:grading_periods?)
@@ -2019,6 +2031,7 @@ class ApplicationController < ActionController::Base
   rescue_from CanvasHttp::CircuitBreakerError, with: :rescue_expected_error_type
   rescue_from InstFS::ServiceError, with: :rescue_expected_error_type
   rescue_from InstFS::BadRequestError, with: :rescue_expected_error_type
+  rescue_from BookmarkedCollection::InvalidPage, with: :rescue_expected_error_type
 
   def rescue_expected_error_type(error)
     rescue_exception(error, level: :info)
@@ -2175,6 +2188,8 @@ class ApplicationController < ActionController::Base
       data = { errors: [{ message: "Insufficient scopes on access token." }] }
     when ActionController::ParameterMissing
       data = { errors: [{ message: "#{exception.param} is missing" }] }
+    when BookmarkedCollection::InvalidPage
+      data = { status: :bad_request, errors: [{ page: "Invalid page; please restart iteration and follow `next` links" }] }
     when BasicLTI::BasicOutcomes::Unauthorized,
         BasicLTI::BasicOutcomes::InvalidRequest
       data = { errors: [{ message: exception.message }] }
@@ -2316,6 +2331,11 @@ class ApplicationController < ActionController::Base
 
       tag.context_module_action(@current_user, :read)
       if @tool
+        # Check if we should use native New Quizzes experience
+        if @tool.quiz_lti? && new_quizzes_native_experience_enabled?
+          return render_native_new_quizzes
+        end
+
         log_asset_access(@tool, "external_tools", "external_tools", overwrite: false)
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
@@ -3443,6 +3463,32 @@ class ApplicationController < ActionController::Base
 
   def new_quizzes_lti_tool?
     @tool&.quiz_lti?
+  end
+
+  def new_quizzes_native_experience_enabled?
+    return false unless @context.respond_to?(:root_account)
+
+    @context.root_account.feature_enabled?(:new_quizzes_native_experience)
+  end
+  helper_method :new_quizzes_native_experience_enabled?
+
+  def render_native_new_quizzes
+    add_new_quizzes_bundle
+
+    # Build launch data with HMAC signature for tamper protection
+    signed_launch_data = ::NewQuizzes::LaunchDataBuilder.new(
+      context: @context,
+      assignment: @assignment,
+      tool: @tool,
+      current_user: @current_user,
+      request:
+    ).build_with_signature
+
+    js_env(NEW_QUIZZES: signed_launch_data)
+
+    add_body_class("native-new-quizzes full-width")
+
+    render "assignments/native_new_quizzes", layout: "application"
   end
 
   def show_blueprint_button?

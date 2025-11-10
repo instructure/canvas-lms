@@ -3520,7 +3520,7 @@ class Course < ActiveRecord::Base
       default_tabs.insert(1,
                           {
                             id: TAB_SEARCH,
-                            label: t("#tabs.search", "Smart Search"),
+                            label: t("IgniteAI Search"),
                             css_class: "search",
                             href: :course_search_path
                           })
@@ -3864,6 +3864,7 @@ class Course < ActiveRecord::Base
   add_setting :allow_student_anonymous_discussion_topics, boolean: true, default: false
   add_setting :show_total_grade_as_points, boolean: true, default: false
   add_setting :filter_speed_grader_by_student_group, boolean: true, default: false
+  add_setting :default_student_gradebook_view, boolean: true, default: false
   add_setting :lock_all_announcements, boolean: true, default: false, inherited: true
   add_setting :large_roster, boolean: true, default: ->(c) { c.root_account.large_course_rosters? }
   add_setting :course_format

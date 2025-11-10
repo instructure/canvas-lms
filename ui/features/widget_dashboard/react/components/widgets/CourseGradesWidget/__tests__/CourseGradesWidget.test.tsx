@@ -25,6 +25,7 @@ import {
   WidgetDashboardProvider,
   type SharedCourseData,
 } from '../../../../hooks/useWidgetDashboardContext'
+import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
 
 const mockWidget: Widget = {
   id: 'test-course-grades-widget',
@@ -95,6 +96,10 @@ const setup = (
 }
 
 describe('CourseGradesWidget', () => {
+  beforeEach(() => {
+    clearWidgetDashboardCache()
+  })
+
   it('renders basic widget', async () => {
     setup({}, [])
 

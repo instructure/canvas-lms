@@ -808,30 +808,30 @@ describe Assignment do
   let(:overridable_type) { :assignment }
   let(:overridable) { assignment_model(due_at: 5.days.ago) }
 
-  include_examples "learning object with due dates"
-  include_examples "all learning objects"
+  it_behaves_like "learning object with due dates"
+  it_behaves_like "all learning objects"
 end
 
 describe Quizzes::Quiz do
   let(:overridable_type) { :quiz }
   let(:overridable) { quiz_model(due_at: 5.days.ago) }
 
-  include_examples "learning object with due dates"
-  include_examples "all learning objects"
+  it_behaves_like "learning object with due dates"
+  it_behaves_like "all learning objects"
 end
 
 describe WikiPage do
   let(:overridable_type) { :wiki_page }
   let(:overridable) { wiki_page_model(lock_at: 5.days.ago) }
 
-  include_examples "all learning objects"
+  it_behaves_like "all learning objects"
 end
 
 describe DiscussionTopic do
   let(:overridable_type) { :discussion_topic }
   let(:overridable) { discussion_topic_model(lock_at: 5.days.ago) }
 
-  include_examples "all learning objects"
+  it_behaves_like "all learning objects"
 end
 
 describe "preload_override_data_for_objects" do

@@ -348,6 +348,15 @@ CanvasRails::Application.routes.draw do
       get :tool_launch
     end
 
+    # Support wildcard paths to enable routing in the federated New Quizzes app.
+    #
+    # When the `new_quizzes_native_experience_enabled` feature flag is enabled, path segments after
+    # `/assignment/:id` will be handled by the router in the federated New Quizzes app. Otherwise,
+    # pages will fall back to the assignment view page.
+    #
+    # This route must come after the resources :assignments block to avoid conflicts.
+    get "assignments/:id#{full_path_glob}", controller: :assignments, action: :show
+
     resources :grading_standards, only: %i[index create update destroy]
 
     resources :assignment_groups do
@@ -409,9 +418,9 @@ CanvasRails::Application.routes.draw do
 
     # Wildcard routes for AMS paths
     # The controller checks ams_integration_enabled? and renders AMS or falls back to regular quiz views
-    get "quizzes/activity_builder/*path" => "quizzes/quizzes#index"
-    get "quizzes/take/*path" => "quizzes/quizzes#index"
-    get "quizzes/reports/*path" => "quizzes/quizzes#index"
+    get "activity_builder/*path" => "quizzes/quizzes#index"
+    get "take/*path" => "quizzes/quizzes#index"
+    get "reports/*path" => "quizzes/quizzes#index"
 
     post "quizzes/new" => "quizzes/quizzes#new" # use POST instead of GET (not idempotent)
     resources :quizzes, controller: "quizzes/quizzes", except: :new do
@@ -549,6 +558,7 @@ CanvasRails::Application.routes.draw do
         post "preview" => "accessibility/preview#create"
         get "preview" => "accessibility/preview#show"
         post "generate" => "accessibility/generate#create"
+        get "scan" => "accessibility/scan#show"
         post "scan" => "accessibility/scan#create"
         get "issue_summary" => "accessibility/issue_summary#show"
       end
@@ -1260,8 +1270,13 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/ai_experiences/:id/edit", action: :edit, as: "course_ai_experience_edit"
       put "courses/:course_id/ai_experiences/:id", action: :update
       delete "courses/:course_id/ai_experiences/:id", action: :destroy, as: "course_ai_experience_destroy"
-      post "courses/:course_id/ai_experiences/:id/continue_conversation", action: :continue_conversation, as: "course_ai_experience_continue_conversation"
-      get "courses/:course_id/ai_experiences/:id/messages", action: :messages, as: "course_ai_experience_messages"
+    end
+
+    scope(controller: :ai_conversations) do
+      get "courses/:course_id/ai_experiences/:ai_experience_id/conversations", action: :active_conversation, as: "course_ai_experience_conversations"
+      post "courses/:course_id/ai_experiences/:ai_experience_id/conversations", action: :create
+      post "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages", action: :post_message, as: "course_ai_experience_conversation_messages"
+      delete "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id", action: :destroy, as: "course_ai_experience_conversation"
     end
 
     scope(controller: :microfrontends_release_tag_override) do
@@ -2422,6 +2437,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: "support_helpers/asset_processor") do
       get "support_helpers/asset_processor/submission_details", action: :submission_details
       post "support_helpers/asset_processor/bulk_resubmit", action: :bulk_resubmit
+      post "support_helpers/asset_processor_discussion/bulk_resubmit", action: :bulk_resubmit_discussion
     end
 
     scope(controller: :outcome_groups_api) do

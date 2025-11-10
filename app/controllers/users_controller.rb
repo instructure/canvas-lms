@@ -413,7 +413,7 @@ class UsersController < ApplicationController
     get_context
     return unless authorized_action(@context, @current_user, :read_roster)
 
-    includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid ui_invoked]
+    includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid]
     includes << "last_login" if params[:sort] == "last_login" && !includes.include?("last_login")
     include_deleted_users = value_to_boolean(params[:include_deleted_users])
     includes << "deleted_pseudonyms" if include_deleted_users
@@ -440,7 +440,6 @@ class UsersController < ApplicationController
                                      sort: params[:sort],
                                      enrollment_role_id: params[:role_filter_id],
                                      enrollment_type: params[:enrollment_type],
-                                     ui_invoked: includes.include?("ui_invoked"),
                                      temporary_enrollment_recipients: value_to_boolean(params[:temporary_enrollment_recipients]),
                                      temporary_enrollment_providers: value_to_boolean(params[:temporary_enrollment_providers]),
                                      include_deleted_users:
@@ -459,9 +458,8 @@ class UsersController < ApplicationController
     users.preload(:pseudonyms) if includes.include? "deleted_pseudonyms"
 
     page_opts = { total_entries: nil }
-    if includes.include?("ui_invoked")
+    if in_app?
       page_opts = {} # let Folio calculate total entries
-      includes.delete("ui_invoked")
     elsif params[:sort] == "id"
       # for a more efficient way to retrieve many pages in bulk
       users = BookmarkedCollection.wrap(Plannable::Bookmarker.new(User, params[:order] == "desc", :id),
@@ -540,7 +538,8 @@ class UsersController < ApplicationController
                PREFERENCES: {
                  dashboard_view: @current_user.dashboard_view(@domain_root_account),
                  hide_dashcard_color_overlays: @current_user.preferences[:hide_dashcard_color_overlays],
-                 custom_colors: @current_user.custom_colors
+                 custom_colors: @current_user.custom_colors,
+                 learner_dashboard_tab_selection: @current_user.get_preference(:learner_dashboard_tab_selection) || "dashboard"
                },
                OBSERVED_USERS_LIST: observed_users_list,
                OBSERVED_USER_ID: observed_user&.id,
@@ -3611,7 +3610,7 @@ class UsersController < ApplicationController
   def should_show_widget_dashboard?
     return false if k5_user?
 
-    flag = @domain_root_account.lookup_feature_flag(:widget_dashboard)
+    flag = widget_dashboard_feature_flag
     return false unless flag
 
     # If feature is locked on (cannot override), force widget dashboard for all eligible users
@@ -3639,5 +3638,29 @@ class UsersController < ApplicationController
       return true
     end
     false
+  end
+
+  def widget_dashboard_feature_flag
+    return nil unless @current_user
+
+    # Check all associated accounts and return the most permissive flag
+    # This allows any account in the user's hierarchy to enable the feature
+    flags = @current_user.associated_accounts.filter_map do |account|
+      flag = account.lookup_feature_flag(:widget_dashboard)
+      flag if flag && (flag.enabled? || flag.can_override?)
+    end
+
+    # Return the most enabling flag (prioritize locked-on > enabled > allowed)
+    flags.max_by do |flag|
+      if flag.enabled? && !flag.can_override?
+        3 # Locked on
+      elsif flag.enabled?
+        2 # Enabled
+      elsif flag.can_override?
+        1 # Allowed
+      else
+        0
+      end
+    end
   end
 end

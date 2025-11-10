@@ -202,8 +202,8 @@ describe Assignment do
   let(:service_method) { :assignments_visible_to_students }
   let(:differentiable) { assignment_model(due_at: 5.days.ago, only_visible_to_overrides: true) }
 
-  include_examples "a non-module differentiable object"
-  include_examples "a differentiable_object"
+  it_behaves_like "a non-module differentiable object"
+  it_behaves_like "a differentiable_object"
 end
 
 describe Quizzes::Quiz do
@@ -211,8 +211,8 @@ describe Quizzes::Quiz do
   let(:service_method) { :quizzes_visible_to_students }
   let(:differentiable) { quiz_model(due_at: 5.days.ago, only_visible_to_overrides: true) }
 
-  include_examples "a non-module differentiable object"
-  include_examples "a differentiable_object"
+  it_behaves_like "a non-module differentiable object"
+  it_behaves_like "a differentiable_object"
 end
 
 describe ContextModule do
@@ -225,5 +225,5 @@ describe ContextModule do
     cm
   end
 
-  include_examples "a differentiable_object"
+  it_behaves_like "a differentiable_object"
 end

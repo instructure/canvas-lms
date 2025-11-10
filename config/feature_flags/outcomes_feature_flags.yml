@@ -195,3 +195,16 @@ account_outcome_rollup_orchestrator:
   description: Uses batch processing orchestrator when account-level outcomes are updated to recalculate rollups for affected courses.
   applies_to: SiteAdmin
   shadow: true
+default_to_learning_mastery_gradebook:
+  state: hidden
+  applies_to: Course
+  display_name: Student Grades Page Learning Mastery Default
+  description: Student Grades Page Learning Mastery Default sets the Learning Mastery tab as the default view when students access their Grades page. This option helps students focus on progress toward course learning outcomes using both numerical scores and mastery levels.
+  shadow: true
+  environments:
+    development:
+      state: allowed
+    test:
+      state: allowed
+    ci:
+      state: allowed

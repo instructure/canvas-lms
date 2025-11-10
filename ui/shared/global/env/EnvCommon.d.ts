@@ -308,6 +308,7 @@ export type SiteAdminFeatureId =
   | 'validate_call_to_action'
   | 'youtube_migration'
   | 'youtube_overlay'
+  | 'ux_list_concluded_courses_in_bp'
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
@@ -337,6 +338,8 @@ export type RootAccountFeatureId =
   | 'lti_registrations_next'
   | 'lti_registrations_page'
   | 'lti_registrations_usage_data'
+  | 'lti_registrations_usage_data_dev'
+  | 'lti_registrations_usage_data_low_usage'
   | 'lti_registrations_usage_tab'
   | 'mobile_offline_mode'
   | 'modules_requirements_allow_percentage'

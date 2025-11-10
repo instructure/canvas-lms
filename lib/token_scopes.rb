@@ -181,6 +181,20 @@ class TokenScopes
     @_api_routes = routes.uniq { |route| route[:scope] }.freeze
   end
 
+  # Returns the same info as api_routes but in a format that is useable by
+  # swagger_yard.
+  def self.api_routes_for_openapi_docs
+    api_routes_with_action = TokenScopes.api_routes.map do |route|
+      {
+        name: route[:controller].to_s + "#" + route[:action].to_s,
+        method: route[:verb],
+        path: route[:path],
+      }
+    end
+
+    api_routes_with_action.group_by { |route| route[:name] }
+  end
+
   def self.hidden_scopes_for_account(root_account)
     SCOPES_MADE_VISIBLE_BY_FEATURE_FLAG.reject do |feature_flag, _scopes|
       root_account&.feature_enabled?(feature_flag)

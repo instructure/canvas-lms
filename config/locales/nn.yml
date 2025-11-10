@@ -11820,6 +11820,7 @@ nn:
         folder_locked: "Mappa \"%{folder},\" som inneheld denne fila, er låst."
     no_preview: 
       file_previews: 
+        download: "Last ned"
         download_file: "Last ned *filnamn*"
         no_preview_available: "Førehandsvising er ikkje tilgjengeleg for denne fila."
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "Fila/filene blir inkludert(e) på alle sidene i webapplikasjonen."
@@ -23663,6 +23664,7 @@ nn:
   sections_6d057c07: seksjonar
   sections_94731e51: Seksjonar
   sections_aef3ebf2: "Seksjonar:"
+  sections_are_an_additional_way_to_organize_users_t_57551e0: "Seksjonar er ein annan måte å organisere brukarar på. Dette gjer at du kan undervise fleire seksjonar i det same emnet, og ha alt emneinnhaldet på same plass. Nedanfor kan du flytte ein brukar til ei anna seksjon, eller legge til/fjerne seksjonspåmeldingar. Brukarane må vere i minst eit område til kvar tid."
   security_7a7e8808: Tryggleik
   security_setting_to_restrict_join_urls_to_a_confer_258d3605: "Sikkerheitsinnstillingar for å begrense påloggingslenkar til ei konferanse"
   security_tab_failed_to_load_2d2242a: "Tryggleiksknapp lastar ikkje"

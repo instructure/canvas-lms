@@ -100,6 +100,26 @@ describe Types::AssignmentType do
     end
   end
 
+  describe "hasPlagiarismTool" do
+    it "returns true when assignment has a plagiarism tool configured" do
+      tool = course.context_external_tools.create!(
+        name: "Plagiarism Tool",
+        url: "http://example.com",
+        consumer_key: "key",
+        shared_secret: "secret"
+      )
+      assignment.assignment_configuration_tool_lookups.create!(
+        tool:,
+        tool_type: "ContextExternalTool"
+      )
+      expect(assignment_type.resolve("hasPlagiarismTool")).to be true
+    end
+
+    it "returns false when assignment has no plagiarism tool configured" do
+      expect(assignment_type.resolve("hasPlagiarismTool")).to be false
+    end
+  end
+
   describe "gradeAsGroup" do
     it "returns true for group assignments being graded as group" do
       assignment.update!(group_category: course.group_categories.create!(name: "My Category"))
@@ -2397,6 +2417,43 @@ describe Types::AssignmentType do
       course.enable_feature!(:project_lhotse)
       expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
       expect(assignment_type.resolve("autoGradeAssignmentErrors")).to eq(["Test error"])
+    end
+  end
+
+  describe "allowProvisionalGrading" do
+    before(:once) do
+      @moderated_assignment = course.assignments.create!(
+        name: "moderated assignment",
+        moderated_grading: true,
+        grader_count: 2,
+        final_grader: teacher
+      )
+      @moderated_assignment.create_moderation_grader(teacher, occupy_slot: true)
+    end
+
+    let(:moderated_assignment_type) { GraphQLTypeTester.new(@moderated_assignment, current_user: teacher) }
+    let(:moderated_assignment_type_for_student) { GraphQLTypeTester.new(@moderated_assignment, current_user: student) }
+
+    it "returns 'allowed' for allowProvisionalGrading when user can be a moderated grader" do
+      expect(moderated_assignment_type.resolve("allowProvisionalGrading")).to eq "allowed"
+    end
+
+    it "returns 'not_allowed' for allowProvisionalGrading when user cannot be a moderated grader" do
+      expect(moderated_assignment_type_for_student.resolve("allowProvisionalGrading")).to eq "not_allowed"
+    end
+
+    it "returns 'not_applicable' for allowProvisionalGrading on non-moderated assignments" do
+      expect(teacher_assignment_type.resolve("allowProvisionalGrading")).to eq "not_applicable"
+    end
+
+    it "returns 'not_applicable' for allowProvisionalGrading after grades are published" do
+      @moderated_assignment.update!(grades_published_at: Time.zone.now)
+      expect(moderated_assignment_type.resolve("allowProvisionalGrading")).to eq "not_applicable"
+    end
+
+    it "returns 'not_applicable' for allowProvisionalGrading after grades are published (non-provisional grader)" do
+      @moderated_assignment.update!(grades_published_at: Time.zone.now)
+      expect(moderated_assignment_type_for_student.resolve("allowProvisionalGrading")).to eq "not_applicable"
     end
   end
 end

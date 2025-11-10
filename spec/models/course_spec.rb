@@ -828,6 +828,25 @@ describe Course do
         expect(new_course).to be_valid
       end
 
+      describe "default_student_gradebook_view validation" do
+        before do
+          @course = course_factory
+          @course.enable_feature!(:outcome_gradebook)
+          @course.enable_feature!(:student_outcome_gradebook)
+          @course.enable_feature!(:default_to_learning_mastery_gradebook)
+        end
+
+        it "allows setting to true when all feature flags are enabled" do
+          @course.default_student_gradebook_view = true
+          expect(@course).to be_valid
+        end
+
+        it "allows setting to false" do
+          @course.default_student_gradebook_view = false
+          expect(@course).to be_valid
+        end
+      end
+
       it "validates the license" do
         course = course_factory
         course.license = "blah"

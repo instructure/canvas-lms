@@ -1270,3 +1270,55 @@ describe('Assignment#quizzesRespondusEnabled', () => {
     expect(json.quizzesRespondusEnabled).toBe(true)
   })
 })
+
+describe('renderCreateEditAssignmentModal focus management', () => {
+  beforeEach(() => {
+    const mountPoint = document.createElement('div')
+    mountPoint.id = 'create-edit-mount-point'
+    document.body.appendChild(mountPoint)
+  })
+
+  afterEach(() => {
+    const mountPoint = document.getElementById('create-edit-mount-point')
+    if (mountPoint) {
+      mountPoint.remove()
+    }
+  })
+
+  test('focuses on manage link when modal closes', () => {
+    const model = buildAssignment({id: 1})
+    const view = createView(model)
+
+    const manageLink = document.createElement('a')
+    manageLink.id = `assign_${model.id}_manage_link`
+    document.body.appendChild(manageLink)
+
+    const focusSpy = jest.spyOn(manageLink, 'focus')
+
+    let capturedOnClose
+    const mockRender = jest.fn(element => {
+      // Extract the closeHandler prop from CreateAssignmentViewAdapter
+      if (element && element.props && element.props.closeHandler) {
+        capturedOnClose = element.props.closeHandler
+      }
+    })
+    const mockRoot = {
+      render: mockRender,
+      unmount: jest.fn(),
+    }
+
+    jest.spyOn(require('react-dom/client'), 'createRoot').mockReturnValue(mockRoot)
+
+    view.renderCreateEditAssignmentModal()
+
+    expect(mockRoot.render).toHaveBeenCalled()
+
+    if (capturedOnClose) {
+      capturedOnClose()
+    }
+
+    expect(focusSpy).toHaveBeenCalled()
+
+    manageLink.remove()
+  })
+})

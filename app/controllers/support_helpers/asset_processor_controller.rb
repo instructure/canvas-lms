@@ -164,9 +164,10 @@ module SupportHelpers
       course_id = permitted[:course_id].presence
       tool_id = permitted[:tool_id].presence
 
-      if assignment_id.present?
+      if assignment_id
         context = Assignment.find(assignment_id)
-      elsif course_id.present?
+        return render json: { error: "Invalid assignment, for discussions use bulk_resubmit for discussions" }, status: :bad_request if context.discussion_topic?
+      elsif course_id
         context = Course.find(course_id)
       else
         render json: { error: "assignment_id or course_id is required" }, status: :bad_request
@@ -175,6 +176,50 @@ module SupportHelpers
 
       run_fixer(
         SupportHelpers::AssetProcessorNoticeResubmission,
+        context,
+        tool_id
+      )
+    end
+
+    # @API Trigger Discussion Asset Processor Notice Resubmission
+    # @internal
+    # Go through all the discussion entries in the context
+    # (discussion topic or course) and trigger asset processor
+    # notices for each discussion entry version.
+    # One of discussion_topic_id or course_id is required, and
+    # the optional tool_id can be used to send notices only to a
+    # specific tool's Asset Processors.
+    #
+    # Example Request:
+    # curl -X POST 'http://canvas-web.inseng.test/api/v1/support_helpers/asset_processor_discussion/bulk_resubmit' \
+    # -H "Authorization: Bearer $Canvas-User-Token" \
+    # -H "Content-Type: application/json" \
+    # -d '{"discussion_topic_id":123}'
+    #
+    # @argument discussion_topic_id [Optional, Integer]
+    #   The ID of the discussion topic we want to resubmit notices for
+    # @argument course_id [Optional, Integer]
+    #   The ID of the course containing discussion topics we want to resubmit notices for
+    # @argument tool_id [Optional, Integer]
+    #   The ID of the external tool to filter asset processors we want to resend notices
+    def bulk_resubmit_discussion
+      permitted = params.permit(:discussion_topic_id, :course_id, :tool_id)
+      discussion_topic_id = permitted[:discussion_topic_id].presence
+      course_id = permitted[:course_id].presence
+      tool_id = permitted[:tool_id].presence
+
+      if discussion_topic_id
+        context = DiscussionTopic.find(discussion_topic_id)
+        return render json: { error: "Invalid discussion" }, status: :bad_request unless context.graded?
+      elsif course_id
+        context = Course.find(course_id)
+      else
+        render json: { error: "discussion_topic_id or course_id is required" }, status: :bad_request
+        return
+      end
+
+      run_fixer(
+        SupportHelpers::AssetProcessorDiscussionNoticeResubmission,
         context,
         tool_id
       )

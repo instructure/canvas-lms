@@ -29,7 +29,7 @@ import type {ResponseSection} from './api'
 
 const I18n = createI18nScope('roster_section_selector')
 
-type ExistingSectionEnrollment = {
+export type ExistingSectionEnrollment = {
   id: string
   name: string
   can_be_removed: boolean
@@ -37,13 +37,16 @@ type ExistingSectionEnrollment = {
 }
 
 type SectionSelectorProps = {
-  courseId: number
-  initialSections: ExistingSectionEnrollment[]
+  courseId: string | undefined
+  selectedSections: ExistingSectionEnrollment[]
+  setSelectedSections: (sections: ExistingSectionEnrollment[]) => void
 }
 
-const SectionSelector: React.FC<SectionSelectorProps> = ({courseId, initialSections}) => {
-  const [selectedSections, setSelectedSections] = useState(initialSections)
-
+const SectionSelector: React.FC<SectionSelectorProps> = ({
+  courseId,
+  selectedSections,
+  setSelectedSections,
+}) => {
   const exclude = selectedSections.map(section => `section_${section.id}`)
 
   const handleOnSelect = (section: ResponseSection) => {
@@ -57,35 +60,38 @@ const SectionSelector: React.FC<SectionSelectorProps> = ({courseId, initialSecti
 
   return (
     <View>
-      <SectionInput onSelect={handleOnSelect} courseId={courseId} exclude={exclude} />
+      <SectionInput onSelect={handleOnSelect} courseId={courseId || ''} exclude={exclude} />
       <ul id="user_sections">
-        {selectedSections.map(section => (
-          <li key={section.id} className={`${section.can_be_removed ? '' : 'cannot_remove'}`}>
-            <View
-              as="div"
-              className="ellipsis"
-              title={
-                section.can_be_removed
-                  ? `${section.name} - ${enrollmentName(section.role)}`
-                  : I18n.t('You cannot remove this enrollment.')
-              }
-            >
-              {section.name} - {enrollmentName(section.role)}
-            </View>
-            {section.can_be_removed && (
-              <CloseButton
-                screenReaderLabel={I18n.t('Remove user from %{sectionName}', {
-                  sectionName: section.name,
-                })}
-                onClick={() => {
-                  setSelectedSections(selectedSections.filter(s => s.id !== section.id))
-                }}
-              />
-            )}
-
-            <input type="hidden" name="sections[]" value={`section_${section.id}`} />
-          </li>
-        ))}
+        {selectedSections.map(section => {
+          const roleName = enrollmentName(section.role)
+          const sectionLabel = roleName ? `${section.name} - ${roleName}` : section.name
+          return (
+            <li key={section.id} className={`${section.can_be_removed ? '' : 'cannot_remove'}`}>
+              <View
+                as="div"
+                className="ellipsis"
+                title={
+                  section.can_be_removed
+                    ? sectionLabel
+                    : I18n.t('You cannot remove this enrollment.')
+                }
+              >
+                {sectionLabel}
+              </View>
+              {section.can_be_removed && (
+                <CloseButton
+                  screenReaderLabel={I18n.t('Remove user from %{sectionName}', {
+                    sectionName: section.name,
+                  })}
+                  data-testid={`remove-section-${section.id}`}
+                  onClick={() => {
+                    setSelectedSections(selectedSections.filter(s => s.id !== section.id))
+                  }}
+                />
+              )}
+            </li>
+          )
+        })}
       </ul>
     </View>
   )

@@ -329,6 +329,33 @@ describe GradebooksController do
       assert_unauthorized
     end
 
+    context "with default_student_gradebook_view set to true" do
+      before do
+        @course.enable_feature!(:outcome_gradebook)
+        @course.enable_feature!(:student_outcome_gradebook)
+        @course.enable_feature!(:default_to_learning_mastery_gradebook)
+        @course.default_student_gradebook_view = true
+        @course.save!
+        user_session(@student)
+      end
+
+      it "sets default_student_grade_summary_tab to 'outcomes'" do
+        get "grade_summary", params: { course_id: @course.id, id: @student.id }
+        expect(assigns[:js_env][:default_student_grade_summary_tab]).to eq("outcomes")
+      end
+
+      context "when feature flags are disabled" do
+        before do
+          @course.disable_feature!(:default_to_learning_mastery_gradebook)
+        end
+
+        it "does not set default_student_grade_summary_tab" do
+          get "grade_summary", params: { course_id: @course.id, id: @student.id }
+          expect(assigns[:js_env][:default_student_grade_summary_tab]).to be_nil
+        end
+      end
+    end
+
     it "does not allow access for an observer linked in a different course" do
       @course1 = @course
       course_factory(active_all: true)
@@ -1688,7 +1715,7 @@ describe GradebooksController do
           @user.set_preference(:gradebook_version, "2")
         end
 
-        include_examples "working download"
+        it_behaves_like "working download"
       end
 
       context "with teacher that prefers Individual View" do
@@ -1696,7 +1723,7 @@ describe GradebooksController do
           @user.set_preference(:gradebook_version, "srgb")
         end
 
-        include_examples "working download"
+        it_behaves_like "working download"
       end
     end
 

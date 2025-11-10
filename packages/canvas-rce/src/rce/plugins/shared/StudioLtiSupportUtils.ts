@@ -178,6 +178,7 @@ export const updateStudioIframeDimensions = (
   width: number,
   height: number,
   embedType: EmbedType,
+  resizable?: boolean,
 ) => {
   const selectedNode = editor.selection.getNode()
   const videoContainer = findMediaPlayerIframe(selectedNode)
@@ -200,6 +201,20 @@ export const updateStudioIframeDimensions = (
     width: `${width}px`,
     height: `${height}px`,
   })
+
+  if (resizable !== undefined) {
+    // Update both the actual attribute and the TinyMCE prefixed version
+    // This ensures they stay in sync when content is saved and reloaded
+    editor.dom.setAttrib(tinymceIframeShim, 'data-studio-resizable', String(resizable))
+    editor.dom.setAttrib(tinymceIframeShim, 'data-mce-p-data-studio-resizable', String(resizable))
+
+    // Force TinyMCE to update the overlay by setting/removing data-mce-resize
+    if (!resizable) {
+      tinymceIframeShim.setAttribute('data-mce-resize', 'false')
+    } else {
+      tinymceIframeShim.removeAttribute('data-mce-resize')
+    }
+  }
 
   const href = editor.dom.getAttrib(tinymceIframeShim, 'data-mce-p-src')
 
@@ -236,4 +251,8 @@ export const isValidEmbedType = (embedType: any): embedType is ValidStudioEmbedT
 
 export const isValidDimension = (value: any): value is number => {
   return typeof value === 'number' && !isNaN(value) && isFinite(value) && value > 0
+}
+
+export const isValidResizable = (value: any): value is boolean => {
+  return typeof value === 'boolean'
 }

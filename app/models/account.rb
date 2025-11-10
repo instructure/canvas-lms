@@ -424,6 +424,7 @@ class Account < ActiveRecord::Base
   add_setting :enable_usage_metrics, boolean: true, root_only: true, default: false
 
   add_setting :allow_observers_in_appointment_groups, boolean: true, default: false, inheritable: true
+  add_setting :default_allow_observer_signup, boolean: true, default: false, inheritable: true
   add_setting :enable_name_pronunciation, boolean: true, root_only: true, default: false
   add_setting :allow_name_pronunciation_edit_for_admins, boolean: true, root_only: true, default: false
   add_setting :allow_name_pronunciation_edit_for_students, boolean: true, root_only: true, default: false
@@ -553,6 +554,10 @@ class Account < ActiveRecord::Base
 
   def allow_observers_in_appointment_groups?
     allow_observers_in_appointment_groups[:value] && Account.site_admin.feature_enabled?(:observer_appointment_groups)
+  end
+
+  def default_allow_observer_signup?
+    default_allow_observer_signup[:value]
   end
 
   def allow_assign_to_differentiation_tags?
@@ -2208,7 +2213,7 @@ class Account < ActiveRecord::Base
     if root_account? && grants_right?(user, :manage_developer_keys) && root_account.feature_enabled?(:lti_registrations_page)
       registrations_path = root_account.feature_enabled?(:lti_registrations_discover_page) ? :account_lti_registrations_path : :account_lti_manage_registrations_path
       tabs << { id: TAB_APPS, label: t("#account.tab_apps", "Apps"), css_class: "apps", href: registrations_path, account_id: root_account.id }
-    elsif Account.site_admin.feature_enabled?(:canvas_apps_sub_account_access) && root_account.feature_enabled?(:lti_registrations_usage_data) && !root_account? && grants_right?(user, :manage_lti_registrations)
+    elsif root_account.feature_enabled?(:canvas_apps_sub_account_access) && root_account.feature_enabled?(:lti_registrations_usage_data) && !root_account? && grants_right?(user, :manage_lti_registrations)
       # Sub-account admins can access Canvas Apps when feature flag is enabled
       tabs << { id: TAB_APPS, label: t("#account.tab_apps", "Apps"), css_class: "apps", href: :account_lti_registrations_path, account_id: id }
     end

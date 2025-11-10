@@ -2996,6 +2996,36 @@ RSpec.describe ApplicationController do
     end
   end
 
+  describe "new_quizzes_native_experience_enabled? helper" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    before do
+      user_session(@teacher)
+      controller.instance_variable_set(:@context, @course)
+    end
+
+    it "returns false when the feature flag is disabled" do
+      expect(controller.send(:new_quizzes_native_experience_enabled?)).to be false
+    end
+
+    it "returns true when the feature flag is enabled on the root account" do
+      @course.root_account.enable_feature!(:new_quizzes_native_experience)
+      expect(controller.send(:new_quizzes_native_experience_enabled?)).to be true
+    end
+
+    it "returns false when context does not respond to root_account" do
+      controller.instance_variable_set(:@context, Object.new)
+      expect(controller.send(:new_quizzes_native_experience_enabled?)).to be false
+    end
+
+    it "returns false when context is nil" do
+      controller.instance_variable_set(:@context, nil)
+      expect(controller.send(:new_quizzes_native_experience_enabled?)).to be false
+    end
+  end
+
   describe "new math equation handling feature" do
     let(:root_account) { Account.default }
 

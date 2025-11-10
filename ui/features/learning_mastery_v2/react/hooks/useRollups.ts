@@ -124,6 +124,7 @@ export default function useRollups({
   })
   const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC)
   const [sortBy, setSortBy] = useState<SortBy>(SortBy.SortableName)
+  const [sortOutcomeId, setSortOutcomeId] = useState<string | null>(null)
 
   const needMasteryAndColorDefaults = !accountMasteryScalesEnabled
 
@@ -143,6 +144,7 @@ export default function useRollups({
           settings?.studentsPerPage,
           sortOrder,
           sortBy,
+          sortOutcomeId || undefined,
         )) as RollupsResponse
         const {users: fetchedUsers, outcomes: fetchedOutcomes} = data.linked
         const students = getStudents(data.rollups, fetchedUsers)
@@ -168,7 +170,16 @@ export default function useRollups({
         setIsLoading(false)
       }
     })()
-  }, [courseId, needMasteryAndColorDefaults, currentPage, sortOrder, sortBy, settings, enabled])
+  }, [
+    courseId,
+    needMasteryAndColorDefaults,
+    currentPage,
+    sortOrder,
+    sortBy,
+    sortOutcomeId,
+    settings,
+    enabled,
+  ])
 
   return {
     isLoading,
@@ -185,6 +196,8 @@ export default function useRollups({
       setSortOrder,
       sortBy,
       setSortBy,
+      sortOutcomeId,
+      setSortOutcomeId,
     },
   }
 }

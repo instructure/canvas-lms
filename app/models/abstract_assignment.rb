@@ -1226,6 +1226,7 @@ class AbstractAssignment < ActiveRecord::Base
       intra_group_peer_reviews
       anonymous_grading
       peer_review_submission_required
+      peer_review_across_sections
     ].each { |attr| self[attr] = false if self[attr].nil? }
     self.graders_anonymous_to_graders = false unless grader_comments_visible_to_graders
   end
@@ -3342,14 +3343,14 @@ class AbstractAssignment < ActiveRecord::Base
   }
 
   scope :due_between_for_user, lambda { |start, ending, user|
-    with_user_due_date(user).where(user_due_date: start..ending)
+    with_user_due_date(user).where(submissions: { cached_due_date: start..ending })
   }
 
   scope :with_user_due_date, lambda { |user|
-    from("(SELECT s.cached_due_date AS user_due_date, a.*
-          FROM #{Assignment.quoted_table_name} a
-          INNER JOIN #{Submission.quoted_table_name} AS s ON s.assignment_id = a.id
-          WHERE s.user_id = #{User.connection.quote(user.id_for_database)} AND s.workflow_state <> 'deleted') AS assignments").select(arel.projections, "user_due_date")
+    joins(:submissions)
+      .where(submissions: { user_id: user.id_for_database })
+      .where.not(submissions: { workflow_state: "deleted" })
+      .select(arel.projections, "submissions.cached_due_date")
   }
 
   scope :with_latest_due_date, lambda {
@@ -4135,6 +4136,8 @@ class AbstractAssignment < ActiveRecord::Base
   # If you're going to be checking this for multiple assignments, you may want
   # to call .preload_unposted_anonymous_submissions on the lot of them first
   def anonymize_students?
+    return true if anonymous_participants?
+
     return false unless anonymous_grading?
 
     # Only anonymize students for moderated assignments if grades have not been published.
@@ -4446,9 +4449,19 @@ class AbstractAssignment < ActiveRecord::Base
     settings&.dig("new_quizzes", "type") || "graded_quiz"
   end
 
+  def anonymous_participants?
+    value = settings&.dig("new_quizzes", "anonymous_participants")
+    ActiveModel::Type::Boolean.new.cast(value) || false
+  end
+
   def new_quizzes_type=(type)
     self.settings ||= {}
     self.settings["new_quizzes"] = (settings["new_quizzes"] || {}).merge({ "type" => type })
+  end
+
+  def anonymous_participants=(enabled)
+    self.settings ||= {}
+    self.settings["new_quizzes"] = (settings["new_quizzes"] || {}).merge({ "anonymous_participants" => ActiveModel::Type::Boolean.new.cast(enabled) || false })
   end
 
   private
@@ -4625,6 +4638,8 @@ class AbstractAssignment < ActiveRecord::Base
     self.automatic_peer_reviews = false
     self.anonymous_peer_reviews = false
     self.intra_group_peer_reviews = false
+    self.peer_review_submission_required = false
+    self.peer_review_across_sections = false
   end
 
   def instructor_selectable_states

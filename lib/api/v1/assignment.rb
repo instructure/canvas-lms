@@ -383,6 +383,7 @@ module Api::V1::Assignment
           hash["all_dates"] = assignment.dates_hash_visible_to(user)
         else
           hash["all_dates_count"] = override_count
+          hash["all_dates"] = []
         end
       end
     end
@@ -1096,7 +1097,7 @@ module Api::V1::Assignment
   end
 
   def update_new_quizzes_params(assignment, assignment_params)
-    return unless Account.site_admin.feature_enabled?(:new_quizzes_surveys) && assignment.quiz_lti?
+    return unless Account.site_admin.feature_enabled?(:new_quizzes_surveys) && assignment.quiz_lti? && assignment.new_record?
 
     type = assignment_params[:new_quizzes_quiz_type]
     if type.present?
@@ -1104,6 +1105,7 @@ module Api::V1::Assignment
       assignment.hide_in_gradebook = (type == "ungraded_survey")
       assignment.omit_from_final_grade = (type == "ungraded_survey")
     end
+    assignment.anonymous_participants = assignment_params[:new_quizzes_anonymous_submission]
   end
 
   def turnitin_settings_hash(assignment_params)
@@ -1309,7 +1311,15 @@ module Api::V1::Assignment
     assignment = prepared_update[:assignment]
     overrides = prepared_update[:overrides]
 
-    return :forbidden if overrides.any? && assignment.is_child_content? && (assignment.editing_restricted?(:due_dates) || assignment.editing_restricted?(:availability_dates))
+    if overrides.any? && assignment.is_child_content?
+      updating_due_dates = overrides.any? { |o| o.key?(:due_at) || o.key?(:reply_to_topic_due_at) || o.key?(:required_replies_due_at) }
+      updating_availability_dates = overrides.any? { |o| o.key?(:unlock_at) || o.key?(:lock_at) }
+
+      if (updating_due_dates && assignment.editing_restricted?(:due_dates)) ||
+         (updating_availability_dates && assignment.editing_restricted?(:availability_dates))
+        return :forbidden
+      end
+    end
 
     prepared_batch = prepare_assignment_overrides_for_batch_update(assignment, overrides, user)
 
@@ -1405,6 +1415,12 @@ module Api::V1::Assignment
   def sync_asset_processors(assignment, asset_processors_from_params:)
     existing_ids_to_keep = asset_processors_from_params.filter_map { |ap| ap["existing_id"] }
     content_items_to_create = asset_processors_from_params.filter_map { |ap| ap["new_content_item"] }
+
+    # Asset processors can only be created via Deep Linking flow (session-based auth).
+    # Deletion via API is allowed.
+    if content_items_to_create.any? && !in_app?
+      raise RequestError.new("Asset processors can only be created via the LTI Deep Linking flow. ", :forbidden)
+    end
 
     assignment.lti_asset_processors.where.not(id: existing_ids_to_keep).destroy_all
     assignment.lti_asset_processors += content_items_to_create.filter_map do |content_item|

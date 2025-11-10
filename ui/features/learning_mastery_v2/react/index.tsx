@@ -20,6 +20,7 @@ import React, {useState, useCallback} from 'react'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {Gradebook} from './components/Gradebook'
 import useRollups from './hooks/useRollups'
 import LMGBContext, {
@@ -33,6 +34,8 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {GradebookSettings, NameDisplayFormat} from './utils/constants'
 import {saveLearningMasteryGradebookSettings} from './apiClient'
 import {useGradebookSettings} from './hooks/useGradebookSettings'
+
+const queryClient = new QueryClient()
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -143,18 +146,20 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
   }
 
   return (
-    <LMGBContext.Provider value={contextValues}>
-      <Toolbar
-        courseId={courseId}
-        contextURL={contextURL}
-        showDataDependentControls={error === null && !isLoadingSettings}
-        gradebookSettings={gradebookSettings}
-        setGradebookSettings={handleGradebookSettingsChange}
-        isSavingSettings={isSavingSettings}
-      />
-      <FilterWrapper pagination={pagination} onPerPageChange={handleUpdateStudentsPerPage} />
-      {renderBody()}
-    </LMGBContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <LMGBContext.Provider value={contextValues}>
+        <Toolbar
+          courseId={courseId}
+          contextURL={contextURL}
+          showDataDependentControls={error === null && !isLoadingSettings}
+          gradebookSettings={gradebookSettings}
+          setGradebookSettings={handleGradebookSettingsChange}
+          isSavingSettings={isSavingSettings}
+        />
+        <FilterWrapper pagination={pagination} onPerPageChange={handleUpdateStudentsPerPage} />
+        {renderBody()}
+      </LMGBContext.Provider>
+    </QueryClientProvider>
   )
 }
 

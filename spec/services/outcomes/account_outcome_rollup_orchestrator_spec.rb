@@ -56,19 +56,37 @@ describe Outcomes::AccountOutcomeRollupOrchestrator do
         described_class,
         :perform_rollup_calculation,
         {
-          account_id: account.id,
-          outcome_id: outcome.id,
           priority: Delayed::LOW_PRIORITY,
           singleton: "AccountOutcomeRollupOrchestrator:#{account.id}:#{outcome.id}",
           on_conflict: :use_earliest,
           max_attempts: 3
-        }
+        },
+        account_id: account.id,
+        outcome_id: outcome.id
       )
 
       described_class.process_account_outcome_change(
         account_id: account.id,
         outcome_id: outcome.id
       )
+    end
+
+    it "successfully creates and executes the delayed job" do
+      allow(Outcomes::CourseOutcomeRollupCalculationService).to receive(:calculate_for_course_outcome)
+
+      progress = described_class.process_account_outcome_change(
+        account_id: account.id,
+        outcome_id: outcome.id
+      )
+
+      expect(progress).to be_queued
+      expect(progress.delayed_job_id).to be_present
+
+      run_jobs
+
+      expect(progress.reload).to be_completed
+      expect(Outcomes::CourseOutcomeRollupCalculationService).to have_received(:calculate_for_course_outcome)
+        .at_least(:once)
     end
   end
 
@@ -143,7 +161,7 @@ describe Outcomes::AccountOutcomeRollupOrchestrator do
           message: match(/Processing \d+ courses with outcome #{Regexp.escape(outcome.short_description)}/)
         )
 
-        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course_outcome)
+        expect(Outcomes::CourseOutcomeRollupCalculationService).to receive(:calculate_for_course_outcome)
           .at_least(:once)
 
         expect(progress).to receive(:update!).with(
@@ -156,7 +174,7 @@ describe Outcomes::AccountOutcomeRollupOrchestrator do
       end
 
       it "continues processing other courses when one fails" do
-        allow(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course_outcome)
+        allow(Outcomes::CourseOutcomeRollupCalculationService).to receive(:calculate_for_course_outcome)
           .and_raise(StandardError.new("Test error"))
 
         expect(Canvas::Errors).to receive(:capture_exception).at_least(:once)
@@ -206,16 +224,16 @@ describe Outcomes::AccountOutcomeRollupOrchestrator do
     let(:courses) { [course1, course2] }
 
     it "calls calculate_for_course_outcome for each course" do
-      expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course_outcome)
+      expect(Outcomes::CourseOutcomeRollupCalculationService).to receive(:calculate_for_course_outcome)
         .with(course_id: course1.id, outcome_id: outcome.id)
-      expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course_outcome)
+      expect(Outcomes::CourseOutcomeRollupCalculationService).to receive(:calculate_for_course_outcome)
         .with(course_id: course2.id, outcome_id: outcome.id)
 
       subject.send(:process_course_batch, courses)
     end
 
     it "handles exceptions for individual courses" do
-      allow(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course_outcome)
+      allow(Outcomes::CourseOutcomeRollupCalculationService).to receive(:calculate_for_course_outcome)
         .with(course_id: course1.id, outcome_id: outcome.id)
         .and_raise(StandardError.new("Test error"))
 
@@ -230,7 +248,7 @@ describe Outcomes::AccountOutcomeRollupOrchestrator do
       )
       expect(Rails.logger).to receive(:error)
 
-      expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course_outcome)
+      expect(Outcomes::CourseOutcomeRollupCalculationService).to receive(:calculate_for_course_outcome)
         .with(course_id: course2.id, outcome_id: outcome.id)
 
       subject.send(:process_course_batch, courses)

@@ -22,48 +22,87 @@ describe Accessibility::CourseScannerService do
 
   let!(:course) { course_model }
 
-  describe "#call" do
-    let(:delay_mock) { instance_double(described_class) }
-
-    before do
-      allow(subject).to receive(:delay).and_return(delay_mock)
-      allow(delay_mock).to receive(:scan_course)
+  describe ".queue_scan_course" do
+    it "creates a Progress record with the correct tag and context" do
+      expect { described_class.queue_scan_course(course) }
+        .to change { Progress.where(tag: "course_accessibility_scan", context: course).count }.by(1)
     end
 
-    it "enqueues a delayed job for scanning the course" do
-      expect(subject).to receive(:delay)
-        .with(singleton: "accessibility_scan_course_#{course.global_id}")
-        .and_return(delay_mock)
-      expect(delay_mock).to receive(:scan_course)
+    context "when a scan is already pending" do
+      let!(:existing_progress) do
+        Progress.create!(tag: "course_accessibility_scan", context: course, workflow_state: "queued")
+      end
 
-      subject.call
+      it "returns the existing progress without creating a new one" do
+        expect { described_class.queue_scan_course(course) }
+          .not_to change { Progress.where(tag: "course_accessibility_scan", context: course).count }
+        expect(described_class.queue_scan_course(course)).to eq(existing_progress)
+      end
+    end
+
+    context "when a scan is already running" do
+      let!(:existing_progress) do
+        Progress.create!(tag: "course_accessibility_scan", context: course, workflow_state: "running")
+      end
+
+      it "returns the existing progress without creating a new one" do
+        expect { described_class.queue_scan_course(course) }
+          .not_to change { Progress.where(tag: "course_accessibility_scan", context: course).count }
+        expect(described_class.queue_scan_course(course)).to eq(existing_progress)
+      end
+    end
+
+    context "when a previous scan is completed" do
+      before do
+        Progress.create!(tag: "course_accessibility_scan", context: course, workflow_state: "completed")
+      end
+
+      it "creates a new progress" do
+        expect { described_class.queue_scan_course(course) }
+          .to change { Progress.where(tag: "course_accessibility_scan", context: course).count }.by(1)
+      end
+    end
+  end
+
+  describe ".scan" do
+    let(:progress) do
+      Progress.create!(tag: "course_accessibility_scan", context: course).tap(&:start!)
+    end
+
+    before do
+      allow(Accessibility::ResourceScannerService).to receive(:call)
+    end
+
+    it "calls scan_course on a new service instance" do
+      service_instance = instance_double(described_class)
+      allow(described_class).to receive(:new).with(course:).and_return(service_instance)
+      allow(service_instance).to receive(:scan_course)
+
+      described_class.scan(progress)
+
+      expect(service_instance).to have_received(:scan_course)
+    end
+
+    it "completes the progress" do
+      described_class.scan(progress)
+      expect(progress.reload).to be_completed
+    end
+
+    context "when an error occurs" do
+      before do
+        allow_any_instance_of(described_class).to receive(:scan_course).and_raise(StandardError, "Scan failed")
+      end
+
+      it "marks the progress as failed" do
+        expect { described_class.scan(progress) }.to raise_error(StandardError, "Scan failed")
+        expect(progress.reload).to be_failed
+      end
     end
   end
 
   describe "#scan_course" do
     before do
       allow(Accessibility::ResourceScannerService).to receive(:call)
-    end
-
-    context "when the course exceeds the accessibility scan size limit" do
-      before do
-        allow_any_instance_of(Course).to receive(:exceeds_accessibility_scan_limit?).and_return(true)
-        wiki_page_model(course:)
-      end
-
-      it "logs a warning" do
-        expect(Rails.logger).to receive(:warn).with(
-          "[A11Y Scan] Skipped scanning the course #{course.name} (ID: #{course.id}) due to exceeding the size limit."
-        )
-
-        subject.scan_course
-      end
-
-      it "does not scan resources" do
-        expect(Accessibility::ResourceScannerService).not_to receive(:call)
-
-        subject.scan_course
-      end
     end
 
     context "when scanning wiki pages" do

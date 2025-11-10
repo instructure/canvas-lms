@@ -91,7 +91,7 @@ class AllocationRule < ApplicationRecord
   def rule_does_not_conflict_with_existing_rules
     return unless assignment
 
-    existing_rules = assignment.allocation_rules.where(
+    existing_rules = assignment.allocation_rules.active.where(
       assessor_id:,
       assessee_id:
     )
@@ -115,15 +115,15 @@ class AllocationRule < ApplicationRecord
     completed_assessee_ids = completed_reviews.pluck(:user_id)
 
     if !review_permitted && completed_assessee_ids.include?(assessee_id)
-      assessee_name = User.find(assessee_id).name
-      assessor_name = User.find(assessor_id).name
+      assessee_name = assessee.name
+      assessor_name = assessor.name
       errors.add(:assessee_id, I18n.t("This rule conflicts with completed peer review. %{assessor_name} has already reviewed %{assessee_name}", assessor_name:, assessee_name:))
     end
   end
 
   def format_rule_text(rule)
-    assessor_name = User.find(rule.assessor_id).name
-    assessee_name = User.find(rule.assessee_id).name
+    assessee_name = assessee.name
+    assessor_name = assessor.name
     if rule.must_review
       if rule.review_permitted
         if rule.applies_to_assessor

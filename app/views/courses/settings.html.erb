@@ -680,6 +680,12 @@
                 <%= f.check_box :hide_final_grades, :disabled => !can_manage %>
                 <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
                 </div>
+              <% if @context.feature_enabled?(:outcome_gradebook) && @context.feature_enabled?(:student_outcome_gradebook) && @context.feature_enabled?(:default_to_learning_mastery_gradebook) %>
+                <div class="checkbox-flex-container">
+                  <%= f.check_box :default_student_gradebook_view, disabled: !can_manage %>
+                  <%= f.label :default_student_gradebook_view, t('Default students to Learning Mastery tab') %><br/>
+                </div>
+              <% end %>
               <% unless @context.elementary_subject_course? || (@context.restrict_quantitative_data && @context.root_account.feature_enabled?(:restrict_quantitative_data)) %>
                 <div class="checkbox-flex-container">
                 <%= f.check_box :hide_distribution_graphs, :disabled => !can_manage %>

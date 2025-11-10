@@ -257,12 +257,15 @@ describe "assignments show page assign to" do
     end
 
     def validate_all_overrides(expected)
-      expect(AssignmentPage.retrieve_overrides_count).to eq(expected.count)
-      AssignmentPage.retrieve_all_overrides_formatted.each_with_index do |override, index|
-        expect(override[:due_at]).to eq(expected[index][:due_at])
-        expect(override[:due_for]).to eq(expected[index][:due_for])
-        expect(override[:unlock_at]).to eq(expected[index][:unlock_at])
-        expect(override[:lock_at]).to eq(expected[index][:lock_at])
+      actual = AssignmentPage.retrieve_all_overrides_formatted
+      expect(actual.count).to eq(expected.count)
+
+      expected.each do |expected_override|
+        matching_override = actual.find { |o| o[:due_for] == expected_override[:due_for] }
+        expect(matching_override).not_to be_nil
+        expect(matching_override[:due_at]).to eq(expected_override[:due_at])
+        expect(matching_override[:unlock_at]).to eq(expected_override[:unlock_at])
+        expect(matching_override[:lock_at]).to eq(expected_override[:lock_at])
       end
     end
 
@@ -310,9 +313,11 @@ describe "assignments show page assign to" do
 
       validate_all_overrides([
                                { due_at: "Apr 15, 2024 at 12am", due_for: "Everyone else", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 12am" },
-                               { due_at: "Apr 16, 2024", due_for: "2 Students", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
-                               { due_at: "Apr 17, 2024", due_for: "2 Sections", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
-                               { due_at: "Apr 18, 2024", due_for: "2 Groups", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" }
+                               { due_at: "Apr 16, 2024", due_for: "2 students", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                               { due_at: "Apr 17, 2024", due_for: "Section Alpha", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                               { due_at: "Apr 17, 2024", due_for: "Section Beta", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                               { due_at: "Apr 18, 2024", due_for: "Course Group A", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                               { due_at: "Apr 18, 2024", due_for: "Course Group B", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" }
                              ])
     end
 
@@ -356,9 +361,11 @@ describe "assignments show page assign to" do
 
       expect(@assignment.visible_to_everyone).to be_falsey
       validate_all_overrides([
-                               { due_at: "Apr 15, 2024", due_for: "2 Students", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
-                               { due_at: "Apr 16, 2024", due_for: "2 Sections", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
-                               { due_at: "Apr 17, 2024", due_for: "2 Groups", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" }
+                               { due_at: "Apr 15, 2024", due_for: "2 students", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                               { due_at: "Apr 16, 2024", due_for: "Section Alpha", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                               { due_at: "Apr 16, 2024", due_for: "Section Beta", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                               { due_at: "Apr 17, 2024", due_for: "Course Group A", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                               { due_at: "Apr 17, 2024", due_for: "Course Group B", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" }
                              ])
     end
 
@@ -396,7 +403,7 @@ describe "assignments show page assign to" do
 
       expect(@assignment.visible_to_everyone).to be_falsey
       validate_all_overrides([
-                               { due_at: "Apr 15, 2024", due_for: "1 Section", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" }
+                               { due_at: "Apr 15, 2024", due_for: "Unnamed Course", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" }
                              ])
     end
 
@@ -474,7 +481,11 @@ describe "assignments show page assign to" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
         validate_all_overrides([
-                                 { due_at: "-", due_for: "2 Sections, 2 Groups, 2 Students", unlock_at: "-", lock_at: "-" }
+                                 { due_at: "-", due_for: "Section Alpha", unlock_at: "-", lock_at: "-" },
+                                 { due_at: "-", due_for: "Section Beta", unlock_at: "-", lock_at: "-" },
+                                 { due_at: "-", due_for: "Course Group A", unlock_at: "-", lock_at: "-" },
+                                 { due_at: "-", due_for: "Course Group B", unlock_at: "-", lock_at: "-" },
+                                 { due_at: "-", due_for: "2 students", unlock_at: "-", lock_at: "-" }
                                ])
       end
 
@@ -501,7 +512,11 @@ describe "assignments show page assign to" do
 
         # Doesn't show 'Everyone' when there are module overrides even if only_visible_to_overrides is false
         validate_all_overrides([
-                                 { due_at: "Apr 15, 2024", due_for: "2 Sections, 2 Groups, 2 Students", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" }
+                                 { due_at: "Apr 15, 2024", due_for: "Section Alpha", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                                 { due_at: "Apr 15, 2024", due_for: "Section Beta", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                                 { due_at: "Apr 15, 2024", due_for: "Course Group A", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                                 { due_at: "Apr 15, 2024", due_for: "Course Group B", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                                 { due_at: "Apr 15, 2024", due_for: "2 students", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" }
                                ])
       end
 
@@ -544,8 +559,11 @@ describe "assignments show page assign to" do
 
         # Doesn't show 'Everyone' when there are module overrides even if only_visible_to_overrides is false
         validate_all_overrides([
-                                 { due_at: "Apr 15, 2024", due_for: "2 Groups, 2 Students", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
-                                 { due_at: "-", due_for: "2 Sections", unlock_at: "-", lock_at: "-" }
+                                 { due_at: "Apr 15, 2024", due_for: "Course Group A", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                                 { due_at: "Apr 15, 2024", due_for: "Course Group B", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                                 { due_at: "Apr 15, 2024", due_for: "2 students", unlock_at: "Apr 10, 2024 at 12am", lock_at: "Apr 20, 2024 at 11:59pm" },
+                                 { due_at: "-", due_for: "Section Alpha", unlock_at: "-", lock_at: "-" },
+                                 { due_at: "-", due_for: "Section Beta", unlock_at: "-", lock_at: "-" }
                                ])
       end
     end
@@ -582,9 +600,9 @@ describe "assignments show page assign to" do
       expect(AssignmentPage.retrieve_overrides_count).to eq(2)
       overrides = AssignmentPage.retrieve_all_overrides_formatted
       expect(overrides[0][:due_at]).to eq("Apr 12, 2024")
-      expect(overrides[0][:due_for]).to eq("1 Student")
+      expect(overrides[0][:due_for]).to eq("1 student")
       expect(overrides[1][:due_at]).to eq("-")
-      expect(overrides[1][:due_for]).to eq("1 Student")
+      expect(overrides[1][:due_for]).to eq("1 student")
     end
   end
 

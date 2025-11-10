@@ -23,6 +23,7 @@ import {waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import {usePaginatedCoursesWithGrades} from '../useUserCourses'
+import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
 
 const errorMsg = 'Failed to fetch courses'
 
@@ -163,6 +164,9 @@ describe('usePaginatedCoursesWithGrades', () => {
     server.listen({
       onUnhandledRequest: 'error',
     })
+  })
+  beforeEach(() => {
+    clearWidgetDashboardCache()
   })
   afterEach(() => {
     server.resetHandlers()

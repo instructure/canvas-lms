@@ -28,5 +28,5 @@ describe "new_user" do
   let(:asset) { @user }
   let(:notification_name) { :new_user }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

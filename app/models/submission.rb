@@ -125,7 +125,8 @@ class Submission < ActiveRecord::Base
                 :score_unchanged,
                 :skip_grade_calc,
                 :skip_grader_check,
-                :visible_to_user
+                :visible_to_user,
+                :preloaded_attachments
 
   # This can be set to true to force late policy behaviour that would
   # be skipped otherwise. See #late_policy_relevant_changes? and
@@ -2096,9 +2097,10 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  # Avoids having O(N) attachment queries.  Returns a hash of
-  # submission to attachments.
-  def self.bulk_load_attachments_for_submissions(submissions, preloads: nil)
+  # Avoids having O(N) attachment queries.  If preload_only is true, sets the
+  # preloaded_attachments attribute on each given submission and returns nil.
+  # Otherwise, returns a hash of submission to attachments.
+  def self.bulk_load_attachments_for_submissions(submissions, preloads: nil, preload_only: false)
     submissions = Array(submissions)
     attachment_ids_by_submission =
       submissions.index_with { |s| s.attachment_associations.map(&:attachment_id) }
@@ -2111,10 +2113,22 @@ class Submission < ActiveRecord::Base
       attachments_by_id = attachments_by_id.group_by(&:id)
     end
 
-    attachments_by_submission = submissions.map do |s|
-      [s, attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.compact.uniq]
+    get_attachments = ->(s) { attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.compact.uniq }
+
+    if preload_only
+      submissions.each do |s|
+        attachments = get_attachments.call(s)
+        s.preloaded_attachments = attachments
+      end
+      nil
+    else
+      attachments_by_submission = submissions.map do |s|
+        attachments = get_attachments.call(s)
+        s.preloaded_attachments = attachments
+        [s, attachments]
+      end
+      attachments_by_submission.to_h
     end
-    attachments_by_submission.to_h
   end
 
   def includes_attachment?(attachment)
@@ -3387,6 +3401,16 @@ class Submission < ActiveRecord::Base
     read_or_calc_extracted_text[:contains_images]
   end
 
+  def read_extracted_text
+    rows = submission_texts.where(attempt:).pluck(:text, :contains_images)
+
+    rows.each_with_object({ text: +"", contains_images: false }) do |(row_txt, has_img), result|
+      result[:text] << "\n\n" unless result[:text].empty?
+      result[:text] << row_txt.to_s
+      result[:contains_images] ||= has_img
+    end
+  end
+
   def extract_text_from_upload?
     submission_type == "online_upload" && Account.site_admin.feature_enabled?(:grading_assistance_file_uploads) && attachments.any?
   end
@@ -3707,19 +3731,6 @@ class Submission < ActiveRecord::Base
 
       result
     end
-  end
-
-  def read_extracted_text
-    rows = submission_texts.where(attempt:).pluck(:text, :contains_images)
-
-    rows.each_with_object({ text: +"", contains_images: false }) do |(row_txt, has_img), result|
-      result[:text] << "\n\n" unless result[:text].empty?
-      result[:text] << row_txt.to_s
-      result[:contains_images] ||= has_img
-    end
-  rescue => e
-    Rails.logger.error("Failed to read extracted attachment for submission #{id}: #{e.message}")
-    { text: "", contains_images: false }
   end
 
   def contains_rce_file_link?(html_body)

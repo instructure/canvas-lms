@@ -154,6 +154,16 @@ if (!Array.prototype.flatMap) {
   })
 }
 
+if (!Set.prototype.difference) {
+  Object.defineProperty(Set.prototype, 'difference', {
+    configurable: true,
+    value: function difference(other) {
+      return new Set([...this].filter(x => !other.has(x)))
+    },
+    writable: true,
+  })
+}
+
 require('@instructure/ui-themes')
 
 // set up mocks for native APIs
