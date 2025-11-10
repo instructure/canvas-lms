@@ -566,6 +566,261 @@ RSpec.describe PeerReview::AllocationService do
     end
   end
 
+  describe "#find_must_review_submission" do
+    context "when there are no allocation rules" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+        assignment.submit_homework(student1, body: "Student1 submission")
+      end
+
+      it "returns nil" do
+        result = service.send(:find_must_review_submission)
+        expect(result).to be_nil
+      end
+    end
+
+    context "when there are allocation rules but must_review is false" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+        assignment.submit_homework(student1, body: "Student1 submission")
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student1,
+          must_review: false,
+          review_permitted: true
+        )
+      end
+
+      it "returns nil" do
+        result = service.send(:find_must_review_submission)
+        expect(result).to be_nil
+      end
+    end
+
+    context "when there is one must review rule with available submission" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student1,
+          must_review: true
+        )
+      end
+
+      it "returns the must review submission" do
+        result = service.send(:find_must_review_submission)
+        expect(result.id).to eq(@submission1.id)
+        expect(result.user_id).to eq(student1.id)
+      end
+    end
+
+    context "when must review submission is already assigned to assessor" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+        assignment.submit_homework(student1, body: "Student1 submission")
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student1,
+          must_review: true
+        )
+
+        assignment.assign_peer_review(assessor, student1)
+      end
+
+      it "returns nil" do
+        result = service.send(:find_must_review_submission)
+        expect(result).to be_nil
+      end
+    end
+
+    context "when must review submission has not been submitted yet" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student1,
+          must_review: true
+        )
+      end
+
+      it "returns nil" do
+        result = service.send(:find_must_review_submission)
+        expect(result).to be_nil
+      end
+    end
+
+    context "when multiple must review rules exist" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+
+        # Student1 submits first (older)
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission1.update!(submitted_at: 3.days.ago)
+
+        # Student2 submits later (newer)
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission2.update!(submitted_at: 1.day.ago)
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student1,
+          must_review: true
+        )
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: true
+        )
+      end
+
+      context "when both submissions have no reviews" do
+        it "returns the oldest submission" do
+          result = service.send(:find_must_review_submission)
+          expect(result.id).to eq(@submission1.id)
+          expect(result.user_id).to eq(student1.id)
+        end
+      end
+
+      context "when one submission has fewer reviews" do
+        before do
+          # Student3 reviews student1 (so student1 has 1 review)
+          assignment.submit_homework(student3, body: "Student3 submission")
+          assignment.assign_peer_review(student3, student1)
+        end
+
+        it "returns the submission with fewer reviews" do
+          result = service.send(:find_must_review_submission)
+          expect(result.id).to eq(@submission2.id)
+          expect(result.user_id).to eq(student2.id)
+        end
+      end
+
+      context "when both submissions have same number of reviews" do
+        before do
+          # Student3 reviews both student1 and student2
+          assignment.submit_homework(student3, body: "Student3 submission")
+          assignment.assign_peer_review(student3, student1)
+          assignment.assign_peer_review(student3, student2)
+        end
+
+        it "returns the oldest submission as tiebreaker" do
+          result = service.send(:find_must_review_submission)
+          expect(result.id).to eq(@submission1.id)
+          expect(result.user_id).to eq(student1.id)
+        end
+      end
+    end
+
+    context "with three must review submissions at different review counts" do
+      let(:student4) { user_model }
+
+      before do
+        course.enroll_student(student4, enrollment_state: :active)
+
+        assignment.submit_homework(assessor, body: "My submission")
+
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission1.update!(submitted_at: 5.days.ago)
+
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission2.update!(submitted_at: 3.days.ago)
+
+        @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
+        @submission3.update!(submitted_at: 1.day.ago)
+
+        assignment.submit_homework(student4, body: "Student4 submission")
+
+        AllocationRule.create!(course:, assignment:, assessor:, assessee: student1, must_review: true)
+        AllocationRule.create!(course:, assignment:, assessor:, assessee: student2, must_review: true)
+        AllocationRule.create!(course:, assignment:, assessor:, assessee: student3, must_review: true)
+
+        # Student1 has 2 reviews, Student2 has 1 review, Student3 has 0 reviews
+        assignment.assign_peer_review(student4, student1)
+        assignment.assign_peer_review(student4, student1)
+        assignment.assign_peer_review(student4, student2)
+      end
+
+      it "returns submission with fewest reviews" do
+        result = service.send(:find_must_review_submission)
+        expect(result.id).to eq(@submission3.id)
+        expect(result.user_id).to eq(student3.id)
+      end
+    end
+  end
+
+  describe "#find_available_submission with must review rules" do
+    context "when must review submission exists" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+
+        # Student1 is older and unreviewed
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission1.update!(submitted_at: 5.days.ago)
+
+        # Student2 has must_review rule but is newer
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission2.update!(submitted_at: 1.day.ago)
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: true
+        )
+      end
+
+      it "prioritizes must review submission over older submissions" do
+        result = service.send(:find_available_submission)
+        expect(result.id).to eq(@submission2.id)
+        expect(result.user_id).to eq(student2.id)
+      end
+    end
+
+    context "when must review submission is unavailable" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        assignment.submit_homework(student2, body: "Student2 submission")
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: true
+        )
+
+        # Already assigned the must review submission
+        assignment.assign_peer_review(assessor, student2)
+      end
+
+      it "falls back to regular allocation logic" do
+        result = service.send(:find_available_submission)
+        expect(result.id).to eq(@submission1.id)
+        expect(result.user_id).to eq(student1.id)
+      end
+    end
+  end
+
   describe "#success_result" do
     let(:mock_request) { instance_double(AssessmentRequest) }
 
