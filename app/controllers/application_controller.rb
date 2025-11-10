@@ -309,7 +309,7 @@ class ApplicationController < ActionController::Base
           RAILS_ENVIRONMENT: Canvas.environment
         }
         @js_env[:use_dyslexic_font] = @current_user&.prefers_dyslexic_font? if @current_user&.can_see_dyslexic_font_feature_flag?(session) && !mobile_device?
-        @js_env[:widget_dashboard_overridable] = @current_user&.prefers_widget_dashboard? if widget_dashboard_allowed_for_user? && !mobile_device?
+        @js_env[:widget_dashboard_overridable] = @current_user&.prefers_widget_dashboard?(@domain_root_account) if @current_user && @domain_root_account&.feature_allowed?(:widget_dashboard) && !mobile_device?
         if @domain_root_account&.feature_enabled?(:restrict_student_access)
           @js_env[:current_user_has_teacher_enrollment] = @current_user&.teacher_enrollment?
         end
@@ -749,14 +749,6 @@ class ApplicationController < ActionController::Base
     @domain_root_account&.feature_enabled?(:k12)
   end
   helper_method :k12?
-
-  def widget_dashboard_allowed_for_user?
-    return false unless @current_user && @domain_root_account
-
-    # Check if the feature is allowed in any of the user's associated accounts
-    # This allows sub-accounts to independently enable the feature
-    @current_user.associated_accounts.any? { |account| account.feature_allowed?(:widget_dashboard) }
-  end
 
   def grading_periods?
     !!@context.try(:grading_periods?)
