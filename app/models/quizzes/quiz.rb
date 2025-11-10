@@ -1580,7 +1580,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     quiz_students = if visible_user_ids.any?
                       context_students.where(id: visible_user_ids)
                     else
-                      none
+                      context_students.none
                     end
 
     # empty quiz_students means the quiz is for everyone
