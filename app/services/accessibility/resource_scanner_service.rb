@@ -31,6 +31,17 @@ class Accessibility::ResourceScannerService < ApplicationService
   def call
     return if scan_already_queued_or_in_progress?
 
+    scan = first_or_initialize_scan
+    delay(singleton: "accessibility_scan_resource_#{@resource.global_id}").scan_resource(scan:)
+  end
+
+  def call_sync
+    scan = first_or_initialize_scan
+    scan_resource(scan:)
+    scan
+  end
+
+  def first_or_initialize_scan
     scan = AccessibilityResourceScan.where(context: @resource).first_or_initialize
     scan.assign_attributes(
       course_id: @resource.course.id,
@@ -42,8 +53,7 @@ class Accessibility::ResourceScannerService < ApplicationService
       error_message: nil
     )
     scan.save!
-
-    delay(singleton: "accessibility_scan_resource_#{@resource.global_id}").scan_resource(scan:)
+    scan
   end
 
   def scan_resource(scan:)

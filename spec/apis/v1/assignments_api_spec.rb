@@ -9568,6 +9568,93 @@ describe AssignmentsApiController, type: :request do
       end
     end
   end
+
+  describe "POST accessibility_scan" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @student = student_in_course(active_all: true).user
+      @assignment = @course.assignments.create!(
+        title: "Test Assignment",
+        description: "<h1>Title</h1><p>Content</p>"
+      )
+    end
+
+    def accessibility_scan_request(user, assignment_id, expected_status: 200)
+      url = "/api/v1/courses/#{@course.id}/assignments/#{assignment_id}/accessibility/scan"
+      path = {
+        controller: "assignments_api",
+        action: "accessibility_scan",
+        format: "json",
+        course_id: @course.id.to_s,
+        assignment_id:
+      }
+      api_call_as_user(user, :post, url, path, {}, {}, { expected_status: })
+    end
+
+    context "when a11_checker feature is enabled" do
+      before do
+        @course.account.enable_feature!(:a11y_checker)
+        @course.enable_feature!(:a11y_checker_eap)
+      end
+
+      it "requires manage course content permissions" do
+        accessibility_scan_request(@student, @assignment.id.to_s, expected_status: 403)
+      end
+
+      it "runs a synchronous accessibility scan and returns scan results" do
+        json = accessibility_scan_request(@teacher, @assignment.id.to_s)
+
+        expect(json["id"]).to be_present
+        expect(json["resource_id"]).to eq(@assignment.id)
+        expect(json["resource_type"]).to eq("Assignment")
+        expect(json["resource_name"]).to eq("Test Assignment")
+        expect(json["workflow_state"]).to eq("completed")
+        expect(json["issue_count"]).to be >= 0
+        expect(json["issues"]).to be_an(Array)
+      end
+
+      it "returns 404 for non-existent assignment" do
+        accessibility_scan_request(@teacher, "999999", expected_status: 404)
+      end
+
+      it "calls ResourceScannerService with the assignment" do
+        service_double = instance_double(Accessibility::ResourceScannerService)
+        scan_double = instance_double(AccessibilityResourceScan,
+                                      id: 1,
+                                      context: @assignment,
+                                      resource_name: "Test Assignment",
+                                      resource_workflow_state: "published",
+                                      resource_updated_at: Time.zone.now,
+                                      context_url: "/courses/#{@course.id}/assignments/#{@assignment.id}",
+                                      workflow_state: "completed",
+                                      error_message: nil,
+                                      issue_count: 0,
+                                      accessibility_issues: double(select: []))
+
+        expect(Accessibility::ResourceScannerService).to receive(:new)
+          .with(resource: @assignment)
+          .and_return(service_double)
+        expect(service_double).to receive(:call_sync).and_return(scan_double)
+
+        accessibility_scan_request(@teacher, @assignment.id.to_s)
+      end
+    end
+
+    context "when a11y_checker feature is disabled" do
+      before do
+        @course.account.disable_feature!(:a11y_checker)
+        @course.disable_feature!(:a11y_checker_eap)
+      end
+
+      it "returns forbidden even for teachers" do
+        accessibility_scan_request(@teacher, @assignment.id.to_s, expected_status: 403)
+      end
+
+      it "returns forbidden for students" do
+        accessibility_scan_request(@student, @assignment.id.to_s, expected_status: 403)
+      end
+    end
+  end
 end
 
 def api_get_assignments_index_from_course_as_user(course, user, params = {})
