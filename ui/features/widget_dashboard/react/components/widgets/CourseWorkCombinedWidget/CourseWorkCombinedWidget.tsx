@@ -43,6 +43,7 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
   isLoading: externalIsLoading,
   error: externalError,
   onRetry,
+  isEditMode = false,
 }) => {
   const [selectedCourse, setSelectedCourse] = useState<string>('all')
   const [selectedDateFilter, setSelectedDateFilter] = useState<DateFilterOption>('next3days')
@@ -119,6 +120,7 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
       isLoading={isLoading}
       error={error ? I18n.t('Failed to load course work. Please try again.') : null}
       onRetry={handleRetry}
+      isEditMode={isEditMode}
       pagination={{
         currentPage: currentPageIndex + 1,
         totalPages,

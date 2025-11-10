@@ -32,7 +32,7 @@ import {convertDateFilterToStatisticsRange} from '../../../utils/dateUtils'
 
 const I18n = createI18nScope('widget_dashboard')
 
-const CourseWorkSummaryWidget: React.FC<BaseWidgetProps> = ({widget}) => {
+const CourseWorkSummaryWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false}) => {
   const [selectedCourse, setSelectedCourse] = useState<string>('all')
   const [selectedDateRange, setSelectedDateRange] = useState<DateFilterOption>('next3days')
 
@@ -83,6 +83,7 @@ const CourseWorkSummaryWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   return (
     <TemplateWidget
       widget={widget}
+      isEditMode={isEditMode}
       isLoading={isLoading}
       error={error ? I18n.t('Failed to load course work data. Please try again.') : null}
       loadingText={I18n.t('Loading course work data...')}

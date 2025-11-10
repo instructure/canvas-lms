@@ -22,9 +22,10 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Pagination} from '@instructure/ui-pagination'
+import {IconDragHandleLine, IconTrashLine} from '@instructure/ui-icons'
 import type {BaseWidgetProps} from '../../../types'
 import {useResponsiveContext} from '../../../hooks/useResponsiveContext'
 
@@ -46,6 +47,7 @@ export interface TemplateWidgetProps extends BaseWidgetProps {
   headerActions?: React.ReactNode
   loadingText?: string
   pagination?: PaginationProps
+  isEditMode?: boolean
 }
 
 const TemplateWidget: React.FC<TemplateWidgetProps> = ({
@@ -60,10 +62,34 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   onRetry,
   loadingText,
   pagination,
+  isEditMode = false,
 }) => {
-  const {isMobile} = useResponsiveContext()
+  const {isMobile, isDesktop} = useResponsiveContext()
   const widgetTitle = title || widget.title
   const headingId = `${widget.id}-heading`
+
+  const editModeActions = (
+    <Flex gap="x-small">
+      <IconButton
+        screenReaderLabel={I18n.t('Drag to reorder widget')}
+        size="small"
+        withBackground={false}
+        withBorder={false}
+        data-testid={`${widget.id}-drag-handle`}
+      >
+        <IconDragHandleLine />
+      </IconButton>
+      <IconButton
+        screenReaderLabel={I18n.t('Remove widget')}
+        size="small"
+        withBackground={false}
+        withBorder={false}
+        data-testid={`${widget.id}-remove-button`}
+      >
+        <IconTrashLine />
+      </IconButton>
+    </Flex>
+  )
 
   const renderContent = () => {
     if (isLoading) {
@@ -130,6 +156,9 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
                 {headerActions && (
                   <Flex.Item padding="x-small 0 x-small x-small">{headerActions}</Flex.Item>
                 )}
+                {isEditMode && isDesktop && editModeActions && (
+                  <Flex.Item padding="x-small 0 x-small x-small">{editModeActions}</Flex.Item>
+                )}
               </Flex>
             ) : (
               <Flex direction="row" alignItems="center" justifyItems="space-between">
@@ -139,6 +168,11 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
                   </Heading>
                 </Flex.Item>
                 {headerActions && <Flex.Item shouldGrow={false}>{headerActions}</Flex.Item>}
+                {isEditMode && isDesktop && editModeActions && (
+                  <Flex.Item margin="0 0 0 small" shouldGrow={false}>
+                    {editModeActions}
+                  </Flex.Item>
+                )}
               </Flex>
             )}
           </>
