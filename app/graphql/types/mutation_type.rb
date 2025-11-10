@@ -130,6 +130,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_submission_student_entered_score, mutation: Mutations::UpdateSubmissionStudentEnteredScore
   field :update_submissions_read_state, mutation: Mutations::UpdateSubmissionsReadState
   field :update_user_discussions_splitscreen_view, mutation: Mutations::UpdateUserDiscussionsSplitscreenView
+  field :update_widget_dashboard_config, mutation: Mutations::UpdateWidgetDashboardConfig
   field :upsert_custom_grade_status, mutation: Mutations::UpsertCustomGradeStatus
   field :upsert_standard_grade_status, mutation: Mutations::UpsertStandardGradeStatus
 
