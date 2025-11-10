@@ -43,6 +43,12 @@ shared_examples "New Gradebook" do |ff_enabled|
     @student1 = student_in_course(active_all: true).user
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+  end
+
   context "with an anonymous assignment" do
     before(:once) do
       # create a regular non-anonymous assignment
