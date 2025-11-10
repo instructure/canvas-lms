@@ -4746,6 +4746,72 @@ describe User do
     end
   end
 
+  describe "#prefers_widget_dashboard?" do
+    let(:root_account) { Account.default }
+    let(:user) { user_model }
+
+    it "returns false when no domain_root_account is provided" do
+      expect(user.prefers_widget_dashboard?(nil)).to be false
+    end
+
+    it "returns false by default when no feature flag is set" do
+      expect(user.prefers_widget_dashboard?(root_account)).to be false
+    end
+
+    context "when user has explicit preference set to true" do
+      before do
+        user.preferences[:widget_dashboard_user_preference] = true
+        user.save!
+      end
+
+      it "returns true regardless of feature flag state" do
+        expect(user.prefers_widget_dashboard?(root_account)).to be true
+      end
+    end
+
+    context "when user has explicit preference set to false" do
+      before do
+        user.preferences[:widget_dashboard_user_preference] = false
+        user.save!
+      end
+
+      it "returns false even if feature flag is enabled" do
+        root_account.enable_feature!(:widget_dashboard)
+        expect(user.prefers_widget_dashboard?(root_account)).to be false
+      end
+    end
+
+    context "when feature flag is in 'allowed_on' state" do
+      before do
+        root_account.set_feature_flag!(:widget_dashboard, "allowed_on")
+      end
+
+      it "returns true" do
+        expect(user.prefers_widget_dashboard?(root_account)).to be true
+      end
+    end
+
+    context "when feature flag is in 'on' state" do
+      before do
+        root_account.enable_feature!(:widget_dashboard)
+      end
+
+      it "returns true" do
+        expect(user.prefers_widget_dashboard?(root_account)).to be true
+      end
+    end
+
+    context "when feature flag is in 'allowed' state" do
+      before do
+        root_account.allow_feature!(:widget_dashboard)
+      end
+
+      it "returns false (requires opt-in)" do
+        expect(user.prefers_widget_dashboard?(root_account)).to be false
+      end
+    end
+  end
+
   describe "with_last_login" do
     it "does not double the users select if select values are already present" do
       expect(User.all.order_by_sortable_name.with_last_login.to_sql.scan(".*").count).to eq 1
@@ -4753,6 +4819,50 @@ describe User do
 
     it "still includes it if select values aren't present" do
       expect(User.all.with_last_login.to_sql.scan(".*").count).to eq 1
+    end
+  end
+
+  describe "#prefers_widget_dashboard? with cross-shard enrollments" do
+    specs_require_sharding
+
+    it "only checks domain_root_account and does not query cross-shard accounts" do
+      # This test ensures the fix for LX-3507 is correct
+      # Users with cross-shard enrollments were getting 500 errors because
+      # the old implementation queried feature_flags across all associated_accounts
+      # The fix changes the method to only check the domain_root_account parameter
+
+      user = nil
+      domain_root_account = nil
+      @shard1.activate do
+        domain_root_account = Account.create!(name: "Domain Root Account")
+        user = User.create!(name: "Cross-Shard User")
+      end
+
+      cross_shard_account = nil
+      @shard2.activate do
+        cross_shard_account = Account.create!(name: "Cross-Shard Account")
+        cross_shard_account.enable_feature!(:widget_dashboard)
+
+        course = Course.create!(account: cross_shard_account, workflow_state: "available")
+        course.enroll_student(user, enrollment_state: "active")
+      end
+
+      # NEW implementation: only checks the domain_root_account parameter
+      # This should return false since domain_root_account doesn't have the feature enabled
+      expect(user.prefers_widget_dashboard?(domain_root_account)).to be false
+
+      @shard1.activate do
+        domain_root_account.enable_feature!(:widget_dashboard)
+      end
+
+      # Now should return true based on domain_root_account only
+      # The cross-shard account's feature flag should be ignored
+      expect(user.prefers_widget_dashboard?(domain_root_account)).to be true
+
+      # Verify user preference override still works
+      user.preferences[:widget_dashboard_user_preference] = false
+      user.save!
+      expect(user.prefers_widget_dashboard?(domain_root_account)).to be false
     end
   end
 
