@@ -32,7 +32,7 @@ import {useResponsiveContext} from '../../../hooks/useResponsiveContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
-const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
+const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false}) => {
   const [gradeVisibilities, setGradeVisibilities] = useState<{[key: string]: boolean}>({})
   const [globalGradeVisibility, setGlobalGradeVisibility] = useState(true)
   const {isMobile} = useResponsiveContext()
@@ -87,6 +87,7 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   return (
     <TemplateWidget
       widget={widget}
+      isEditMode={isEditMode}
       isLoading={isLoading}
       error={error ? I18n.t('Failed to load course grades. Please try again.') : null}
       loadingText={I18n.t('Loading course grades...')}

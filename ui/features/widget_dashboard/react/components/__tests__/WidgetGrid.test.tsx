@@ -190,11 +190,13 @@ describe('WidgetGrid', () => {
 
       const {getByTestId} = setUp({config})
       const columns = getByTestId('widget-columns')
+      const column1 = getByTestId('widget-column-1')
+      const column2 = getByTestId('widget-column-2')
 
       expect(columns).toBeInTheDocument()
       expect(columns.children).toHaveLength(2)
-      expect((columns.children.item(0) as Element).children).toHaveLength(0)
-      expect((columns.children.item(1) as Element).children).toHaveLength(0)
+      expect(column1.children).toHaveLength(0)
+      expect(column2.children).toHaveLength(0)
     })
   })
 

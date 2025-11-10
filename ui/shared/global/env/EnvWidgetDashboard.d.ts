@@ -33,4 +33,7 @@ export interface EnvWidgetDashboard {
     lastUpdated: string
   }>
   OBSERVED_USER_ID: string | null
+  DASHBOARD_FEATURES: {
+    widget_dashboard_customization?: boolean
+  }
 }

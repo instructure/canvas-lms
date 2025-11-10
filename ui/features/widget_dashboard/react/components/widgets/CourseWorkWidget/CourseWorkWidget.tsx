@@ -35,6 +35,7 @@ const I18n = createI18nScope('widget_dashboard')
 
 const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
   widget,
+  isEditMode = false,
   isLoading: externalIsLoading,
   error: externalError,
   onRetry,
@@ -103,6 +104,7 @@ const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
   return (
     <TemplateWidget
       widget={widget}
+      isEditMode={isEditMode}
       isLoading={isLoading}
       error={error ? I18n.t('Failed to load course work. Please try again.') : null}
       onRetry={handleRetry}

@@ -32,7 +32,7 @@ import {FilterOption} from './utils'
 
 const I18n = createI18nScope('widget_dashboard')
 
-const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
+const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false}) => {
   const [filter, setFilter] = useState<FilterOption>('unread')
 
   const {
@@ -138,6 +138,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   return (
     <TemplateWidget
       widget={widget}
+      isEditMode={isEditMode}
       isLoading={isLoading}
       error={error ? I18n.t('Failed to load announcements. Please try again.') : null}
       onRetry={refetch}
