@@ -37,6 +37,7 @@ const I18n = createI18nScope('widget_dashboard')
 
 const PeopleWidget: React.FC<BaseWidgetProps> = ({
   widget,
+  isEditMode = false,
   isLoading: externalIsLoading,
   error: externalError,
   onRetry,
@@ -112,6 +113,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
   return (
     <TemplateWidget
       widget={widget}
+      isEditMode={isEditMode}
       isLoading={isLoading}
       error={error}
       onRetry={onRetry}

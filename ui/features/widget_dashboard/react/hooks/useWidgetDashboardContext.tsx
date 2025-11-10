@@ -46,6 +46,10 @@ export interface SharedCourseData {
   lastUpdated: string
 }
 
+interface DashboardFeatures {
+  widget_dashboard_customization?: boolean
+}
+
 const WidgetDashboardContext = createContext<{
   preferences: DashboardPreferences
   observedUsersList: ObservedUser[]
@@ -54,6 +58,7 @@ const WidgetDashboardContext = createContext<{
   observedUserId: string | null
   currentUserRoles: string[]
   sharedCourseData: SharedCourseData[]
+  dashboardFeatures: DashboardFeatures
 }>({
   preferences: {
     dashboard_view: 'cards',
@@ -66,6 +71,7 @@ const WidgetDashboardContext = createContext<{
   observedUserId: null,
   currentUserRoles: [],
   sharedCourseData: [],
+  dashboardFeatures: {},
 })
 
 export const WidgetDashboardProvider = ({
@@ -77,6 +83,7 @@ export const WidgetDashboardProvider = ({
   observedUserId,
   currentUserRoles,
   sharedCourseData,
+  dashboardFeatures,
 }: {
   children: React.ReactNode
   preferences?: DashboardPreferences
@@ -86,6 +93,7 @@ export const WidgetDashboardProvider = ({
   observedUserId?: string | null
   currentUserRoles?: string[]
   sharedCourseData?: SharedCourseData[]
+  dashboardFeatures?: DashboardFeatures
 }) => {
   const contextValue = useMemo(
     () => ({
@@ -96,6 +104,7 @@ export const WidgetDashboardProvider = ({
       observedUserId: observedUserId ?? widgetDashboardDefaultProps.observedUserId,
       currentUserRoles: currentUserRoles ?? widgetDashboardDefaultProps.currentUserRoles,
       sharedCourseData: sharedCourseData ?? widgetDashboardDefaultProps.sharedCourseData,
+      dashboardFeatures: dashboardFeatures ?? widgetDashboardDefaultProps.dashboardFeatures,
     }),
     [
       preferences,
@@ -105,6 +114,7 @@ export const WidgetDashboardProvider = ({
       observedUserId,
       currentUserRoles,
       sharedCourseData,
+      dashboardFeatures,
     ],
   )
 
@@ -132,4 +142,5 @@ export const widgetDashboardDefaultProps = {
   observedUserId: null,
   currentUserRoles: [],
   sharedCourseData: [],
+  dashboardFeatures: {},
 }

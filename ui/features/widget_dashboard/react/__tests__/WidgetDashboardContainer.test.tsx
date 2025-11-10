@@ -23,6 +23,7 @@ import {setupServer} from 'msw/node'
 import {graphql, http, HttpResponse} from 'msw'
 import WidgetDashboardContainer from '../WidgetDashboardContainer'
 import {WidgetDashboardProvider} from '../hooks/useWidgetDashboardContext'
+import {WidgetDashboardEditProvider} from '../hooks/useWidgetDashboardEdit'
 import {ResponsiveProvider} from '../hooks/useResponsiveContext'
 import {defaultGraphQLHandlers, clearWidgetDashboardCache} from './testHelpers'
 
@@ -113,9 +114,11 @@ const setup = (contextProps = {}, envOverrides = {}) => {
   const renderResult = render(
     <QueryClientProvider client={queryClient}>
       <WidgetDashboardProvider {...contextProps}>
-        <ResponsiveProvider matches={['desktop']}>
-          <WidgetDashboardContainer />
-        </ResponsiveProvider>
+        <WidgetDashboardEditProvider>
+          <ResponsiveProvider matches={['desktop']}>
+            <WidgetDashboardContainer />
+          </ResponsiveProvider>
+        </WidgetDashboardEditProvider>
       </WidgetDashboardProvider>
     </QueryClientProvider>,
   )
