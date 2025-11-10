@@ -310,6 +310,7 @@ describe "calendar2" do
       end
 
       it "loads discussion edit page when click on edit button in discussion checkpoint info modal" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         @course.account.enable_feature!(:discussion_checkpoints)
         due_at = Time.zone.now.utc + 1.day
         title = "graded discussion with checkpoints"

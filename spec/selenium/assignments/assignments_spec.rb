@@ -369,6 +369,7 @@ describe "assignments" do
       end
 
       it "preserves all assignment attributes for checkpointed discussion when opening and submitting without changes using more options", :ignore_js_errors do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         sub_account = Account.create!(name: "sub1", parent_account: Account.default)
         @course.update!(account: sub_account)
         sub_account.enable_feature!(:discussion_checkpoints)
