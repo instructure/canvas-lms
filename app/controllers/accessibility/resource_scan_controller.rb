@@ -39,16 +39,37 @@ module Accessibility
       scans = apply_sorting(scans)
       scans = apply_accessibility_filters(scans, params[:filters], params[:search]) if params[:filters].present? || params[:search].present?
 
-      base_url = "/courses/#{@context.id}/accessibility/resource_scan"
+      base_url = resource_scan_course_accessibility_index_path(@context)
       paginated = Api.paginate(scans, self, base_url)
 
       render json: paginated.map { |scan| scan_attributes(scan) }
     end
 
+    # GET /courses/:course_id/accessibility/resource_scan/poll
+    # Params:
+    #   scan_ids – comma-separated list of scan IDs to poll
+    # Returns updated scan data for scans that are queued or in progress
+    def poll
+      scan_ids = params[:scan_ids]&.split(",")&.map(&:to_i) || []
+
+      return render json: { scans: [] } if scan_ids.empty?
+
+      max_poll_ids = Setting.get("accessibility_resource_scan_poll_max_ids", "10").to_i
+      if scan_ids.length > max_poll_ids
+        return render json: { error: "Too many scan IDs. Maximum allowed: #{max_poll_ids}" }, status: :bad_request
+      end
+
+      scans = AccessibilityResourceScan
+              .where(id: scan_ids, course_id: @context.id)
+              .preload(:accessibility_issues)
+
+      render json: { scans: scans.map { |scan| scan_attributes(scan) } }
+    end
+
     private
 
     def check_authorized_action
-      return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY)
+      return render_unauthorized_action unless @context.is_a?(Course) && @context.a11y_checker_enabled?
 
       authorized_action(@context, @current_user, [:read, :update])
     end
@@ -90,7 +111,8 @@ module Accessibility
       resource_id = resource&.id
       resource_type = resource&.class&.name
       scan_completed = scan.workflow_state == "completed"
-      {
+
+      result = {
         id: scan.id,
         resource_id:,
         resource_type:,
@@ -99,10 +121,16 @@ module Accessibility
         resource_updated_at: scan.resource_updated_at&.iso8601 || "",
         resource_url: scan.context_url,
         workflow_state: scan.workflow_state,
-        error_message: scan.error_message || "",
-        issue_count: scan_completed ? scan.issue_count : 0,
-        issues: scan_completed ? scan.accessibility_issues.select(&:active?).map { |issue| issue_attributes(issue) } : []
+        error_message: scan.error_message || ""
       }
+
+      # Only include issue-related data when the scan is completed
+      if scan_completed
+        result[:issue_count] = scan.issue_count
+        result[:issues] = scan.accessibility_issues.select(&:active?).map { |issue| issue_attributes(issue) }
+      end
+
+      result
     end
 
     # Returns a hash representation of the issue, for JSON rendering.

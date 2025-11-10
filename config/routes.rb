@@ -561,6 +561,7 @@ CanvasRails::Application.routes.draw do
         get "course_scan" => "accessibility/course_scan#show"
         post "course_scan" => "accessibility/course_scan#create"
         get "resource_scan" => "accessibility/resource_scan#index"
+        get "resource_scan/poll" => "accessibility/resource_scan#poll"
         get "issue_summary" => "accessibility/issue_summary#show"
       end
     end

@@ -81,20 +81,23 @@ describe Accessibility::ResourceScanController do
       end
     end
 
-    it "sets issue_count if scan complete" do
+    it "only includes issue_count and issues for completed scans" do
       get :index, params: { course_id: course.id }, format: :json
       expect(response).to have_http_status(:ok)
 
       json = response.parsed_body
 
       queued_json = json.find { |scan| scan["resource_name"] == "Queued Resource" }
-      expect(queued_json["issue_count"]).to eq(0)
+      expect(queued_json).not_to have_key("issue_count")
+      expect(queued_json).not_to have_key("issues")
 
       in_progress_json = json.find { |scan| scan["resource_name"] == "In Progress Resource" }
-      expect(in_progress_json["issue_count"]).to eq(0)
+      expect(in_progress_json).not_to have_key("issue_count")
+      expect(in_progress_json).not_to have_key("issues")
 
       completed_json = json.find { |scan| scan["resource_name"] == "Completed Resource" }
       expect(completed_json["issue_count"]).to eq(3)
+      expect(completed_json).to have_key("issues")
     end
 
     context "with issues" do
@@ -276,6 +279,276 @@ describe Accessibility::ResourceScanController do
           expect(json).to be_empty
         end
       end
+    end
+  end
+
+  describe "GET #poll" do
+    let(:queued_scan) do
+      accessibility_resource_scan_model(
+        course:,
+        context: assignment_model(course:),
+        workflow_state: "queued",
+        resource_name: "Queued Scan"
+      )
+    end
+
+    let(:in_progress_scan) do
+      accessibility_resource_scan_model(
+        course:,
+        context: wiki_page_model(course:),
+        workflow_state: "in_progress",
+        resource_name: "In Progress Scan"
+      )
+    end
+
+    let(:completed_scan) do
+      accessibility_resource_scan_model(
+        course:,
+        context: wiki_page_model(course:),
+        workflow_state: "completed",
+        resource_name: "Completed Scan",
+        issue_count: 2
+      )
+    end
+
+    let(:failed_scan) do
+      accessibility_resource_scan_model(
+        course:,
+        context: attachment_model(course:),
+        workflow_state: "failed",
+        resource_name: "Failed Scan",
+        error_message: "Scan failed"
+      )
+    end
+
+    it "returns empty array when no scan_ids provided" do
+      get :poll, params: { course_id: course.id }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      expect(json["scans"]).to eq([])
+    end
+
+    it "returns empty array when scan_ids is empty string" do
+      get :poll, params: { course_id: course.id, scan_ids: "" }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      expect(json["scans"]).to eq([])
+    end
+
+    it "returns requested scans by scan_ids" do
+      scan1_id = queued_scan.id
+      scan2_id = in_progress_scan.id
+
+      get :poll, params: { course_id: course.id, scan_ids: "#{scan1_id},#{scan2_id}" }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      expect(json["scans"].length).to eq(2)
+
+      scan_ids = json["scans"].pluck("id")
+      expect(scan_ids).to contain_exactly(scan1_id, scan2_id)
+    end
+
+    it "only includes scans from the specified course" do
+      other_course = course_model
+      other_scan = accessibility_resource_scan_model(
+        course: other_course,
+        context: assignment_model(course: other_course),
+        workflow_state: "queued"
+      )
+
+      scan_id = queued_scan.id
+
+      get :poll, params: { course_id: course.id, scan_ids: "#{scan_id},#{other_scan.id}" }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      expect(json["scans"].length).to eq(1)
+      expect(json["scans"][0]["id"]).to eq(scan_id)
+    end
+
+    it "does not include issue_count and issues for queued scans" do
+      scan_id = queued_scan.id
+
+      get :poll, params: { course_id: course.id, scan_ids: scan_id.to_s }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      scan_json = json["scans"][0]
+
+      expect(scan_json).not_to have_key("issue_count")
+      expect(scan_json).not_to have_key("issues")
+    end
+
+    it "does not include issue_count and issues for in_progress scans" do
+      scan_id = in_progress_scan.id
+
+      get :poll, params: { course_id: course.id, scan_ids: scan_id.to_s }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      scan_json = json["scans"][0]
+
+      expect(scan_json).not_to have_key("issue_count")
+      expect(scan_json).not_to have_key("issues")
+    end
+
+    it "includes issue_count and issues for completed scans" do
+      scan_id = completed_scan.id
+      accessibility_issue_model(
+        course:,
+        accessibility_resource_scan: completed_scan,
+        rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id
+      )
+
+      get :poll, params: { course_id: course.id, scan_ids: scan_id.to_s }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      scan_json = json["scans"][0]
+
+      expect(scan_json["issue_count"]).to eq(2)
+      expect(scan_json).to have_key("issues")
+      expect(scan_json["issues"]).to be_an(Array)
+    end
+
+    it "does not include issue_count and issues for failed scans" do
+      scan_id = failed_scan.id
+
+      get :poll, params: { course_id: course.id, scan_ids: scan_id.to_s }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      scan_json = json["scans"][0]
+
+      expect(scan_json).not_to have_key("issue_count")
+      expect(scan_json).not_to have_key("issues")
+      expect(scan_json["error_message"]).to eq("Scan failed")
+    end
+
+    it "handles mixed scan states correctly" do
+      queued_id = queued_scan.id
+      in_progress_id = in_progress_scan.id
+      completed_id = completed_scan.id
+      failed_id = failed_scan.id
+
+      scan_ids = "#{queued_id},#{in_progress_id},#{completed_id},#{failed_id}"
+
+      get :poll, params: { course_id: course.id, scan_ids: }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      expect(json["scans"].length).to eq(4)
+
+      queued_json = json["scans"].find { |s| s["id"] == queued_id }
+      expect(queued_json).not_to have_key("issue_count")
+
+      in_progress_json = json["scans"].find { |s| s["id"] == in_progress_id }
+      expect(in_progress_json).not_to have_key("issue_count")
+
+      completed_json = json["scans"].find { |s| s["id"] == completed_id }
+      expect(completed_json["issue_count"]).to eq(2)
+      expect(completed_json).to have_key("issues")
+
+      failed_json = json["scans"].find { |s| s["id"] == failed_id }
+      expect(failed_json).not_to have_key("issue_count")
+      expect(failed_json).not_to have_key("issues")
+      expect(failed_json["error_message"]).to eq("Scan failed")
+    end
+
+    it "returns correct JSON structure for each scan" do
+      scan_id = completed_scan.id
+
+      get :poll, params: { course_id: course.id, scan_ids: scan_id.to_s }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      scan_json = json["scans"][0]
+
+      expect(scan_json).to have_key("id")
+      expect(scan_json).to have_key("resource_id")
+      expect(scan_json).to have_key("resource_type")
+      expect(scan_json).to have_key("resource_name")
+      expect(scan_json).to have_key("resource_workflow_state")
+      expect(scan_json).to have_key("resource_updated_at")
+      expect(scan_json).to have_key("resource_url")
+      expect(scan_json).to have_key("workflow_state")
+      expect(scan_json).to have_key("error_message")
+    end
+
+    it "handles non-existent scan IDs gracefully" do
+      non_existent_id = 999_999
+
+      get :poll, params: { course_id: course.id, scan_ids: non_existent_id.to_s }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      expect(json["scans"]).to be_empty
+    end
+
+    it "accepts up to the maximum number of scan IDs" do
+      # Create 10 scans (the default limit)
+      scans = (1..10).map do |_i|
+        accessibility_resource_scan_model(
+          course:,
+          context: assignment_model(course:),
+          workflow_state: "queued"
+        )
+      end
+
+      scan_ids = scans.map(&:id).join(",")
+
+      get :poll, params: { course_id: course.id, scan_ids: }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      expect(json["scans"].length).to eq(10)
+    end
+
+    it "rejects more than the maximum number of scan IDs" do
+      # Create 11 scans (exceeds the default limit of 10)
+      scans = (1..11).map do |_i|
+        accessibility_resource_scan_model(
+          course:,
+          context: assignment_model(course:),
+          workflow_state: "queued"
+        )
+      end
+
+      scan_ids = scans.map(&:id).join(",")
+
+      get :poll, params: { course_id: course.id, scan_ids: }, format: :json
+      expect(response).to have_http_status(:bad_request)
+
+      json = response.parsed_body
+      expect(json["error"]).to include("Too many scan IDs")
+      expect(json["error"]).to include("Maximum allowed: 10")
+    end
+
+    it "respects custom limit from settings" do
+      Setting.set("accessibility_resource_scan_poll_max_ids", "5")
+
+      # Create 6 scans (exceeds the custom limit of 5)
+      scans = (1..6).map do |_i|
+        accessibility_resource_scan_model(
+          course:,
+          context: assignment_model(course:),
+          workflow_state: "queued"
+        )
+      end
+
+      scan_ids = scans.map(&:id).join(",")
+
+      get :poll, params: { course_id: course.id, scan_ids: }, format: :json
+      expect(response).to have_http_status(:bad_request)
+
+      json = response.parsed_body
+      expect(json["error"]).to include("Maximum allowed: 5")
+
+      # Clean up setting
+      Setting.remove("accessibility_resource_scan_poll_max_ids")
     end
   end
 end
