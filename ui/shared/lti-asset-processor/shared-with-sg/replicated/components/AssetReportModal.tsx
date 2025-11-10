@@ -27,11 +27,13 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import LtiAssetReportStatus from './LtiAssetReportStatus'
 import {LtiAssetReports, type LtiAssetReportsProps} from './LtiAssetReports'
 import TruncateWithTooltip from './TruncateWithTooltip'
+import {ResubmitDiscussionNoticesButton} from './ResubmitDiscussionNoticesButton'
 
 export type AssetReportModalProps = LtiAssetReportsProps & {
   modalTitle: string
   mainTitle?: string
   onClose?: () => void
+  assignmentId?: string
 }
 
 const I18n = createI18nScope('lti_asset_processor')
@@ -47,6 +49,7 @@ export function AssetReportModal({
   showDocumentDisplayName,
   studentIdForResubmission,
   submissionType,
+  assignmentId,
 }: AssetReportModalProps): JSX.Element {
   const assetProcessorsWithReports = assetProcessors.filter(assetProcessor =>
     reports.some(report => report.processorId === assetProcessor._id),
@@ -100,9 +103,20 @@ export function AssetReportModal({
         </View>
       </Modal.Body>
       <Modal.Footer>
-        <Button data-pendo="asset-reports-modal-close-footer-button" onClick={onClose}>
-          {I18n.t('Close')}
-        </Button>
+        <Flex gap="small">
+          {submissionType === 'discussion_topic' && studentIdForResubmission && assignmentId && (
+            <ResubmitDiscussionNoticesButton
+              size="medium"
+              assignmentId={assignmentId}
+              studentId={studentIdForResubmission}
+            />
+          )}
+          <Flex.Item>
+            <Button data-pendo="asset-reports-modal-close-footer-button" onClick={onClose}>
+              {I18n.t('Close')}
+            </Button>
+          </Flex.Item>
+        </Flex>
       </Modal.Footer>
     </Modal>
   )

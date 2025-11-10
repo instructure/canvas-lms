@@ -184,13 +184,15 @@ export function LtiAssetReports({
                   showDisplayName={showDocumentDisplayName}
                 />
               ))}
-              {studentIdForResubmission && shouldShowResubmitButton(reportGroups) && (
-                <ResubmitButton
-                  processorId={processor._id}
-                  studentId={studentIdForResubmission}
-                  attempt={attempt}
-                />
-              )}
+              {submissionType !== 'discussion_topic' &&
+                studentIdForResubmission &&
+                shouldShowResubmitButton(reportGroups) && (
+                  <ResubmitButton
+                    processorId={processor._id}
+                    studentId={studentIdForResubmission}
+                    attempt={attempt}
+                  />
+                )}
             </Flex>
           </View>
         ))}

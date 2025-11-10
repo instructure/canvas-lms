@@ -3135,6 +3135,7 @@ CanvasRails::Application.routes.draw do
     # Asset Processor internal endpoints
     scope(controller: "lti/asset_processor") do
       post "asset_processors/:asset_processor_id/notices/:student_id/attempts/:attempt", action: :resubmit_notice, as: :lti_asset_processor_notice_resubmit
+      post "asset_processors/discussion_notices/:assignment_id/:student_id/resubmit_all", action: :resubmit_discussion_notices_all
     end
 
     # Dynamic Registration Service

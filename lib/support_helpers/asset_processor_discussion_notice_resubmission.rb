@@ -96,7 +96,7 @@ module SupportHelpers
         Lti::AssetProcessorDiscussionNotifier.notify_asset_processors_of_discussion(
           assignment: topic.assignment,
           submission:,
-          discussion_entry_version:,
+          discussion_entry_versions: [discussion_entry_version],
           contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
           current_user: discussion_entry_version.user,
           asset_processor: nil,

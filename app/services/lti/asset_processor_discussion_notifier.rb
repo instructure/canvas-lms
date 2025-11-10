@@ -25,9 +25,10 @@ module Lti
 
     module_function
 
-    def notify_asset_processors_of_discussion(current_user:, discussion_entry_version:, assignment:, contribution_status:, submission: nil, asset_processor: nil, tool_id: nil)
+    def notify_asset_processors_of_discussion(current_user:, discussion_entry_versions:, assignment:, contribution_status:, submission: nil, asset_processor: nil, tool_id: nil)
+      return if discussion_entry_versions.empty?
       return unless assignment.discussion_topic?
-      return unless discussion_entry_version.root_account.feature_enabled?(:lti_asset_processor_discussions)
+      return unless discussion_entry_versions.first.root_account.feature_enabled?(:lti_asset_processor_discussions)
       return if submission.present? && !submission.asset_processor_for_discussions_compatible?
 
       asset_processors = assignment.lti_asset_processors
@@ -39,12 +40,17 @@ module Lti
       end
       return if asset_processors.empty?
 
-      lti_assets = create_assets_for_discussion_entry(submission, discussion_entry_version)
-      lti_assets.each(&:calculate_sha256_checksum!)
+      version_assets = discussion_entry_versions.map do |version|
+        assets = create_assets_for_discussion_entry(submission, version)
+        assets.each(&:calculate_sha256_checksum!)
+        [version, assets]
+      end
 
       asset_processors.each do |ap|
-        builder = collaboration_notice_builder(assignment, submission, lti_assets, ap, discussion_entry_version, contribution_status, current_user)
-        Lti::PlatformNotificationService.notify_tools(cet_id_or_ids: ap.context_external_tool_id, builders: [builder])
+        builders = version_assets.map do |version, assets|
+          collaboration_notice_builder(assignment, submission, assets, ap, version, contribution_status, current_user)
+        end
+        Lti::PlatformNotificationService.notify_tools(cet_id_or_ids: ap.context_external_tool_id, builders:)
       end
     end
 
