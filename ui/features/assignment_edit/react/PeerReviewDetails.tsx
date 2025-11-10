@@ -50,6 +50,21 @@ function createOrUpdateRoot(elementId: string, component: React.ReactNode) {
   root.render(component)
 }
 
+const hasValidGroupCategory = (assignment: Assignment): boolean => {
+  const groupCategoryId = assignment.groupCategoryId()
+  return !!groupCategoryId && groupCategoryId !== 'blank'
+}
+
+const getIsGroupAssignment = (assignment: Assignment): boolean => {
+  const hasGroupCategoryCheckbox = document.getElementById('has_group_category') as HTMLInputElement
+
+  if (hasGroupCategoryCheckbox) {
+    return hasGroupCategoryCheckbox.checked
+  }
+
+  return hasValidGroupCategory(assignment)
+}
+
 export const renderPeerReviewDetails = (assignment: Assignment) => {
   const $mountPoint = document.getElementById('peer_reviews_allocation_and_grading_details')
   if ($mountPoint) {
@@ -149,6 +164,7 @@ const SectionHeader = ({title, padding = 'small'}: {title: string; padding?: str
 const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
   const [peerReviewChecked, setPeerReviewChecked] = useState(assignment.peerReviews() || false)
   const [peerReviewEnabled, setPeerReviewEnabled] = useState(!assignment.moderatedGrading())
+  const [isGroupAssignment, setIsGroupAssignment] = useState(hasValidGroupCategory(assignment))
 
   const reviewsRequiredInputRef = useRef<HTMLInputElement | null>(null)
   const pointsPerReviewInputRef = useRef<HTMLInputElement | null>(null)
@@ -177,7 +193,10 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
     submissionsRequiredBeforePeerReviews,
     handleSubmissionRequiredCheck,
     resetFields,
-  } = usePeerReviewSettings({peerReviewCount: assignment.peerReviewCount(), submissionRequired: assignment.peerReviewSubmissionRequired()})
+  } = usePeerReviewSettings({
+    peerReviewCount: assignment.peerReviewCount(),
+    submissionRequired: assignment.peerReviewSubmissionRequired(),
+  })
 
   const validatePeerReviewDetails = useCallback(() => {
     let valid = true
@@ -235,6 +254,16 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
       window.removeEventListener('message', handlePeerReviewToggle as EventListener)
     }
   }, [])
+
+  useEffect(() => {
+    const handleGroupCategoryChange = () => {
+      setIsGroupAssignment(getIsGroupAssignment(assignment))
+    }
+    document.addEventListener('group_category_changed', handleGroupCategoryChange)
+    return () => {
+      document.removeEventListener('group_category_changed', handleGroupCategoryChange)
+    }
+  }, [assignment])
 
   useEffect(() => {
     const mountPoint = document.getElementById('peer_reviews_allocation_and_grading_details')
@@ -397,17 +426,19 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
                       />
                     </Flex.Item>
 
-                    <Flex.Item as="div" overflowY="visible">
-                      <ToggleCheckbox
-                        testId="within-groups-checkbox"
-                        name="peer_reviews_prevent_friends"
-                        id="peer_reviews_within_groups_checkbox"
-                        checked={allowPeerReviewWithinGroups}
-                        onChange={handleInterGroupCheck}
-                        label={I18n.t('Allow peer reviews within groups')}
-                        srLabel={I18n.t('Allow peer reviews within student groups')}
-                      />
-                    </Flex.Item>
+                    {isGroupAssignment && (
+                      <Flex.Item as="div" overflowY="visible">
+                        <ToggleCheckbox
+                          testId="within-groups-checkbox"
+                          name="peer_reviews_prevent_friends"
+                          id="peer_reviews_within_groups_checkbox"
+                          checked={allowPeerReviewWithinGroups}
+                          onChange={handleInterGroupCheck}
+                          label={I18n.t('Allow peer reviews within groups')}
+                          srLabel={I18n.t('Allow peer reviews within student groups')}
+                        />
+                      </Flex.Item>
+                    )}
                   </>
                 )}
 

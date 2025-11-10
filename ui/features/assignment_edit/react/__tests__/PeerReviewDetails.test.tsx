@@ -42,6 +42,7 @@ const createMockAssignment = (overrides = {}) => ({
   courseID: jest.fn(() => '123'),
   getId: jest.fn(() => '456'),
   peerReviewSubmissionRequired: jest.fn(() => false),
+  groupCategoryId: jest.fn(() => null),
   ...overrides,
 })
 
@@ -169,19 +170,16 @@ describe('PeerReviewDetails', () => {
       await user.click(advancedSettingsToggle)
 
       const acrossSectionsCheckbox = screen.getByTestId('across-sections-checkbox')
-      const withinGroupsCheckbox = screen.getByTestId('within-groups-checkbox')
       const passFailGradingCheckbox = screen.getByTestId('pass-fail-grading-checkbox')
       const anonymityCheckbox = screen.getByTestId('anonymity-checkbox')
       const submissionRequiredCheckbox = screen.getByTestId('submission-required-checkbox')
 
       await user.click(acrossSectionsCheckbox)
-      await user.click(withinGroupsCheckbox)
       await user.click(passFailGradingCheckbox)
       await user.click(anonymityCheckbox)
       await user.click(submissionRequiredCheckbox)
 
       expect(acrossSectionsCheckbox).toBeChecked()
-      expect(withinGroupsCheckbox).toBeChecked()
       expect(passFailGradingCheckbox).toBeChecked()
       expect(anonymityCheckbox).toBeChecked()
       expect(submissionRequiredCheckbox).toBeChecked()
@@ -206,7 +204,6 @@ describe('PeerReviewDetails', () => {
       await user.click(screen.getByText('Advanced Peer Review Configurations'))
 
       expect(screen.getByTestId('across-sections-checkbox')).not.toBeChecked()
-      expect(screen.getByTestId('within-groups-checkbox')).not.toBeChecked()
       expect(screen.getByTestId('pass-fail-grading-checkbox')).not.toBeChecked()
       expect(screen.getByTestId('anonymity-checkbox')).not.toBeChecked()
       expect(screen.getByTestId('submission-required-checkbox')).not.toBeChecked()
@@ -333,6 +330,141 @@ describe('PeerReviewDetails', () => {
       expect(screen.getByText('Allocations')).toBeInTheDocument()
       expect(screen.getByText('Allow peer reviews across sections')).toBeInTheDocument()
       expect(screen.getByTestId('across-sections-checkbox')).toBeInTheDocument()
+    })
+
+    it('does not show within groups toggle when assignment is not a group assignment', () => {
+      expect(screen.queryByText('Allow peer reviews within groups')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('within-groups-checkbox')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Group assignment toggle visibility', () => {
+    beforeEach(() => {
+      const mockCheckbox = document.createElement('input')
+      mockCheckbox.type = 'checkbox'
+      mockCheckbox.id = 'has_group_category'
+      document.body.appendChild(mockCheckbox)
+    })
+
+    afterEach(() => {
+      const mockCheckbox = document.getElementById('has_group_category')
+      if (mockCheckbox) {
+        document.body.removeChild(mockCheckbox)
+      }
+    })
+
+    it('shows within groups toggle when assignment is a group assignment', async () => {
+      const mockCheckbox = document.getElementById('has_group_category') as HTMLInputElement
+      mockCheckbox.checked = true
+      assignment.groupCategoryId = jest.fn(() => '123')
+
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+      const checkbox = screen.getByTestId('peer-review-checkbox')
+      await user.click(checkbox)
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
+      expect(screen.getByText('Allow peer reviews within groups')).toBeInTheDocument()
+      expect(screen.getByTestId('within-groups-checkbox')).toBeInTheDocument()
+    })
+
+    it('hides within groups toggle when assignment has blank group category', async () => {
+      const mockCheckbox = document.getElementById('has_group_category') as HTMLInputElement
+      mockCheckbox.checked = false
+      assignment.groupCategoryId = jest.fn(() => 'blank')
+
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+      const checkbox = screen.getByTestId('peer-review-checkbox')
+      await user.click(checkbox)
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
+      expect(screen.queryByText('Allow peer reviews within groups')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('within-groups-checkbox')).not.toBeInTheDocument()
+    })
+
+    it('shows within groups toggle when group_category_changed event fires with group category', async () => {
+      const mockCheckbox = document.getElementById('has_group_category') as HTMLInputElement
+      mockCheckbox.checked = false
+      assignment.groupCategoryId = jest.fn(() => null)
+
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+      const checkbox = screen.getByTestId('peer-review-checkbox')
+      await user.click(checkbox)
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
+      expect(screen.queryByText('Allow peer reviews within groups')).not.toBeInTheDocument()
+
+      mockCheckbox.checked = true
+      assignment.groupCategoryId = jest.fn(() => '456')
+      fireEvent(document, new Event('group_category_changed'))
+
+      await waitFor(() => {
+        expect(screen.getByText('Allow peer reviews within groups')).toBeInTheDocument()
+        expect(screen.getByTestId('within-groups-checkbox')).toBeInTheDocument()
+      })
+    })
+
+    it('hides within groups toggle when group_category_changed event fires without group category', async () => {
+      const mockCheckbox = document.getElementById('has_group_category') as HTMLInputElement
+      mockCheckbox.checked = true
+      assignment.groupCategoryId = jest.fn(() => '789')
+
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+      const checkbox = screen.getByTestId('peer-review-checkbox')
+      await user.click(checkbox)
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
+      expect(screen.getByText('Allow peer reviews within groups')).toBeInTheDocument()
+
+      mockCheckbox.checked = false
+      assignment.groupCategoryId = jest.fn(() => null)
+      fireEvent(document, new Event('group_category_changed'))
+
+      await waitFor(() => {
+        expect(screen.queryByText('Allow peer reviews within groups')).not.toBeInTheDocument()
+        expect(screen.queryByTestId('within-groups-checkbox')).not.toBeInTheDocument()
+      })
+    })
+
+    it('hides within groups toggle when group_category_changed event fires with blank', async () => {
+      const mockCheckbox = document.getElementById('has_group_category') as HTMLInputElement
+      mockCheckbox.checked = true
+      assignment.groupCategoryId = jest.fn(() => '999')
+
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+      const checkbox = screen.getByTestId('peer-review-checkbox')
+      await user.click(checkbox)
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
+      expect(screen.getByText('Allow peer reviews within groups')).toBeInTheDocument()
+
+      mockCheckbox.checked = false
+      assignment.groupCategoryId = jest.fn(() => 'blank')
+      fireEvent(document, new Event('group_category_changed'))
+
+      await waitFor(() => {
+        expect(screen.queryByText('Allow peer reviews within groups')).not.toBeInTheDocument()
+        expect(screen.queryByTestId('within-groups-checkbox')).not.toBeInTheDocument()
+      })
+    })
+
+    it('falls back to assignment model when checkbox is not present', async () => {
+      const mockCheckbox = document.getElementById('has_group_category')
+      if (mockCheckbox) {
+        document.body.removeChild(mockCheckbox)
+      }
+
+      assignment.groupCategoryId = jest.fn(() => '123')
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+      const checkbox = screen.getByTestId('peer-review-checkbox')
+      await user.click(checkbox)
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
       expect(screen.getByText('Allow peer reviews within groups')).toBeInTheDocument()
       expect(screen.getByTestId('within-groups-checkbox')).toBeInTheDocument()
     })
@@ -601,7 +733,6 @@ describe('PeerReviewDetails', () => {
 
         expect(screen.getByText('Allocations')).toBeInTheDocument()
         expect(screen.getByTestId('across-sections-checkbox')).toBeInTheDocument()
-        expect(screen.getByTestId('within-groups-checkbox')).toBeInTheDocument()
         expect(screen.getByText('Anonymity')).toBeInTheDocument()
         expect(screen.getByTestId('anonymity-checkbox')).toBeInTheDocument()
         expect(screen.getByText('Submission required')).toBeInTheDocument()
