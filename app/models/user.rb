@@ -1815,18 +1815,21 @@ class User < ActiveRecord::Base
 
   def avatar_location(image_url)
     url = image_url
-    if associated_root_accounts.any? { |a| a.feature_enabled?(:file_association_access) } &&
-       %w[attachment external].include?(avatar_image_source)
-      uri = URI.parse(image_url)
-      attachment_id = get_attachment_id_from_known_avatar_paths(uri.path)
-      if attachment_id
-        params = URI.decode_www_form(uri.query || "")
-        params << ["location", "avatar_#{id}"]
-        uri.query = URI.encode_www_form(params)
-        url = uri.to_s
-      end
+    return url unless image_url &&
+                      %w[attachment external].include?(avatar_image_source) &&
+                      associated_root_accounts.any? { |a| a.feature_enabled?(:file_association_access) }
+
+    uri = URI.parse(image_url)
+    attachment_id = get_attachment_id_from_known_avatar_paths(uri.path)
+    if attachment_id
+      params = URI.decode_www_form(uri.query || "")
+      params << ["location", "avatar_#{id}"]
+      uri.query = URI.encode_www_form(params)
+      url = uri.to_s
     end
     url
+  rescue URI::InvalidURIError
+    image_url
   end
 
   # returns the attachment id specified in the path, or nil if there is no match
