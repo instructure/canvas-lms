@@ -131,4 +131,68 @@ RSpec.describe PeerReview::CourseOverrideCommonService do
       end
     end
   end
+
+  describe "#find_parent_override" do
+    let(:course) { course_model(name: "Test Course") }
+    let(:peer_review_sub_assignment) { peer_review_model(course:) }
+    let(:parent_assignment) { peer_review_sub_assignment.parent_assignment }
+    let(:service) { described_class.new(peer_review_sub_assignment:) }
+
+    context "when parent override exists with matching course ID" do
+      let!(:parent_override) do
+        assignment_override_model(assignment: parent_assignment, set: course)
+      end
+
+      it "finds the parent override based on course ID" do
+        result = service.send(:find_parent_override, course.id)
+        expect(result).to eq(parent_override)
+      end
+
+      it "returns an AssignmentOverride instance" do
+        result = service.send(:find_parent_override, course.id)
+        expect(result).to be_a(AssignmentOverride)
+      end
+
+      it "returns override with correct set_type" do
+        result = service.send(:find_parent_override, course.id)
+        expect(result.set_type).to eq(AssignmentOverride::SET_TYPE_COURSE)
+      end
+    end
+
+    context "when parent override does not exist" do
+      it "returns nil" do
+        result = service.send(:find_parent_override, course.id)
+        expect(result).to be_nil
+      end
+    end
+
+    context "when parent override is deleted" do
+      let(:parent_override) do
+        override = assignment_override_model(assignment: parent_assignment, set: course)
+        override.destroy
+        override
+      end
+
+      it "returns nil for deleted override" do
+        result = service.send(:find_parent_override, course.id)
+        expect(result).to be_nil
+      end
+    end
+  end
+
+  describe "#parent_assignment" do
+    let(:course) { course_model(name: "Test Course") }
+    let(:peer_review_sub_assignment) { peer_review_model(course:) }
+    let(:service) { described_class.new(peer_review_sub_assignment:) }
+
+    it "returns the parent assignment of the peer review sub assignment" do
+      result = service.send(:parent_assignment)
+      expect(result).to eq(peer_review_sub_assignment.parent_assignment)
+    end
+
+    it "returns an Assignment instance" do
+      result = service.send(:parent_assignment)
+      expect(result).to be_a(Assignment)
+    end
+  end
 end

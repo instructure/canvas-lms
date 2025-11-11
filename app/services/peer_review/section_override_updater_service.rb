@@ -21,7 +21,7 @@ class PeerReview::SectionOverrideUpdaterService < PeerReview::SectionOverrideCom
   def call
     validate_override_dates(@override)
 
-    override = find_section_override
+    override = find_override
     validate_override_exists(override)
 
     section_id = fetch_set_id || override.set_id
@@ -30,23 +30,33 @@ class PeerReview::SectionOverrideUpdaterService < PeerReview::SectionOverrideCom
     section = course_section(section_id)
     validate_section_exists(section)
 
-    update_override(override, section)
+    ActiveRecord::Base.transaction do
+      parent_override = if section_id == override.set_id
+                          override.parent_override
+                        else
+                          find_parent_override(section_id)
+                        end
+      validate_section_parent_override_exists(parent_override, section_id)
+
+      update_override(override, section, parent_override)
+    end
   end
 
   private
 
-  def find_section_override
-    @peer_review_sub_assignment.assignment_overrides.find_by(
-      id: @override[:id],
-      set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION
-    )
-  end
-
-  def update_override(override, section)
+  def update_override(override, section, parent_override)
     override.set = section unless section.id == override.set_id
+    override.parent_override = parent_override
     apply_overridden_dates(override, @override)
 
-    override.save!
+    override.save! if override.changed?
     override
+  end
+
+  def find_override
+    @peer_review_sub_assignment.active_assignment_overrides.find_by(
+      id: fetch_id,
+      set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION
+    )
   end
 end

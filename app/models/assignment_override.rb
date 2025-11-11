@@ -153,12 +153,12 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def validate_parent_override_for_sub_assignment
-    if assignment.is_a?(SubAssignment)
+    if assignment.is_a?(SubAssignment) || assignment.is_a?(PeerReviewSubAssignment)
       if parent_override_id.blank?
-        errors.add(:parent_override_id, "must be present for sub-assignment overrides")
+        errors.add(:parent_override_id, "must be present for overrides belonging to SubAssignment or PeerReviewSubAssignment")
       end
     elsif parent_override_id.present?
-      errors.add(:parent_override_id, "can only be set for overrides belonging to a SubAssignment")
+      errors.add(:parent_override_id, "can only be set for overrides belonging to SubAssignment or PeerReviewSubAssignment")
     end
   end
 

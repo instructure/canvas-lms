@@ -71,4 +71,15 @@ class PeerReview::GroupOverrideCommonService < ApplicationService
   def fetch_set_id
     @override.fetch(:set_id, nil)
   end
+
+  def find_parent_override(group_id)
+    parent_assignment.active_assignment_overrides.find_by(
+      set_id: group_id,
+      set_type: AssignmentOverride::SET_TYPE_GROUP
+    )
+  end
+
+  def parent_assignment
+    @peer_review_sub_assignment.parent_assignment
+  end
 end

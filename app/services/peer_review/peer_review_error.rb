@@ -36,4 +36,5 @@ module PeerReview
   class GroupAssignmentRequiredError < PeerReviewError; end
   class GroupNotFoundError < PeerReviewError; end
   class CourseNotFoundError < PeerReviewError; end
+  class ParentOverrideNotFoundError < PeerReviewError; end
 end

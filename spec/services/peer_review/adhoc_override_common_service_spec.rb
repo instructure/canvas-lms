@@ -122,8 +122,11 @@ RSpec.describe PeerReview::AdhocOverrideCommonService do
 
   describe "#build_override_students" do
     let(:service) { described_class.new }
+    let!(:parent_override) do
+      assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set_type: "ADHOC")
+    end
     let(:override) do
-      assignment_override_model(assignment: peer_review_sub_assignment, set_type: "ADHOC")
+      assignment_override_model(assignment: peer_review_sub_assignment, set_type: "ADHOC", parent_override_id: parent_override.id)
     end
 
     context "when no existing student overrides" do
@@ -303,8 +306,11 @@ RSpec.describe PeerReview::AdhocOverrideCommonService do
 
     context "with empty student IDs array" do
       let(:service) { described_class.new }
+      let!(:parent_override) do
+        assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set_type: "ADHOC")
+      end
       let(:override) do
-        assignment_override_model(assignment: peer_review_sub_assignment, set_type: "ADHOC")
+        assignment_override_model(assignment: peer_review_sub_assignment, set_type: "ADHOC", parent_override_id: parent_override.id)
       end
 
       it "handles empty student IDs gracefully" do
@@ -313,6 +319,93 @@ RSpec.describe PeerReview::AdhocOverrideCommonService do
         expect(override.changed_student_ids).to be_a(Set)
         expect(override.changed_student_ids).to be_empty
       end
+    end
+  end
+
+  describe "#find_parent_override" do
+    let(:parent_assignment) { peer_review_sub_assignment.parent_assignment }
+    let(:service) { described_class.new(peer_review_sub_assignment:) }
+
+    context "when parent override exists with matching student IDs" do
+      let!(:parent_override) do
+        override = parent_assignment.assignment_overrides.build(set_type: AssignmentOverride::SET_TYPE_ADHOC)
+        students.each do |student|
+          override.assignment_override_students.build(user: student)
+        end
+        override.save!
+        override
+      end
+
+      it "finds the parent override based on student IDs" do
+        result = service.send(:find_parent_override, students.map(&:id))
+        expect(result).to eq(parent_override)
+      end
+
+      it "finds parent override regardless of student ID order" do
+        shuffled_ids = students.map(&:id).shuffle
+        result = service.send(:find_parent_override, shuffled_ids)
+        expect(result).to eq(parent_override)
+      end
+
+      it "normalizes student IDs by converting to integers" do
+        string_ids = students.map { |s| s.id.to_s }
+        result = service.send(:find_parent_override, string_ids)
+        expect(result).to eq(parent_override)
+      end
+    end
+
+    context "when parent override does not exist" do
+      it "returns nil" do
+        result = service.send(:find_parent_override, students.map(&:id))
+        expect(result).to be_nil
+      end
+    end
+
+    context "when parent override exists but with different student IDs" do
+      let(:other_students) { create_users_in_course(course, 2, return_type: :record) }
+      let(:parent_override) do
+        override = parent_assignment.assignment_overrides.build(set_type: AssignmentOverride::SET_TYPE_ADHOC)
+        other_students.each do |student|
+          override.assignment_override_students.build(user: student)
+        end
+        override.save!
+        override
+      end
+
+      it "returns nil" do
+        result = service.send(:find_parent_override, students.map(&:id))
+        expect(result).to be_nil
+      end
+    end
+
+    context "when parent override exists but with subset of student IDs" do
+      let(:parent_override) do
+        override = parent_assignment.assignment_overrides.build(set_type: AssignmentOverride::SET_TYPE_ADHOC)
+        [students[0], students[1]].each do |student|
+          override.assignment_override_students.build(user: student)
+        end
+        override.save!
+        override
+      end
+
+      it "returns nil because student lists don't match exactly" do
+        result = service.send(:find_parent_override, students.map(&:id))
+        expect(result).to be_nil
+      end
+    end
+  end
+
+  describe "#parent_assignment" do
+    let(:service) { described_class.new(peer_review_sub_assignment:) }
+
+    it "returns the parent assignment of the peer review sub assignment" do
+      result = service.send(:parent_assignment)
+      expect(result).to eq(peer_review_sub_assignment.parent_assignment)
+    end
+
+    it "returns an Assignment instance" do
+      result = service.send(:parent_assignment)
+      expect(result).to be_a(Assignment)
     end
   end
 end

@@ -29,13 +29,12 @@ RSpec.describe PeerReview::CourseOverrideUpdaterService do
   let(:updated_unlock_at) { 2.days.from_now }
   let(:updated_lock_at) { 3.weeks.from_now }
 
+  let(:parent_override) do
+    assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: course)
+  end
+
   let!(:existing_override) do
-    peer_review_sub_assignment.assignment_overrides.create!(
-      set: course,
-      due_at: existing_due_at,
-      lock_at: existing_lock_at,
-      unlock_at: existing_unlock_at
-    )
+    assignment_override_model(assignment: peer_review_sub_assignment, set: course, due_at: existing_due_at, lock_at: existing_lock_at, unlock_at: existing_unlock_at, parent_override:)
   end
 
   let(:override_data) do
@@ -150,9 +149,15 @@ RSpec.describe PeerReview::CourseOverrideUpdaterService do
 
       it "raises error when override is for wrong set_type" do
         section = add_section("Test Section", course:)
+        parent_section_override = peer_review_sub_assignment.parent_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set: section,
+          dont_touch_assignment: true
+        )
         section_override = peer_review_sub_assignment.assignment_overrides.create!(
           set: section,
-          due_at: existing_due_at
+          due_at: existing_due_at,
+          parent_override: parent_section_override
         )
 
         wrong_type_data = override_data.merge(id: section_override.id)
@@ -164,6 +169,15 @@ RSpec.describe PeerReview::CourseOverrideUpdaterService do
         expect { wrong_type_service.call }.to raise_error(
           PeerReview::OverrideNotFoundError,
           "Override does not exist"
+        )
+      end
+
+      it "raises error when course does not exist" do
+        allow(peer_review_sub_assignment).to receive(:course).and_return(nil)
+
+        expect { service.call }.to raise_error(
+          PeerReview::CourseNotFoundError,
+          "Course does not exist"
         )
       end
     end
@@ -186,11 +200,11 @@ RSpec.describe PeerReview::CourseOverrideUpdaterService do
 
     context "with multiple course overrides" do
       let(:other_peer_review) { peer_review_model(course:) }
+      let!(:other_parent_override) do
+        assignment_override_model(assignment: other_peer_review.parent_assignment, set: course)
+      end
       let!(:other_override) do
-        other_peer_review.assignment_overrides.create!(
-          set: course,
-          due_at: existing_due_at
-        )
+        assignment_override_model(assignment: other_peer_review, set: course, due_at: existing_due_at, parent_override: other_parent_override)
       end
 
       it "only updates the correct override" do
@@ -247,6 +261,63 @@ RSpec.describe PeerReview::CourseOverrideUpdaterService do
         it "raises InvalidOverrideDatesError" do
           expect { service.call }.to raise_error(PeerReview::InvalidOverrideDatesError, "Unlock date cannot be after lock date")
         end
+      end
+    end
+  end
+
+  describe "parent override tracking" do
+    let(:parent_assignment) { peer_review_sub_assignment.parent_assignment }
+    let!(:parent_override) do
+      assignment_override_model(assignment: parent_assignment, set: course)
+    end
+
+    before do
+      existing_override.update!(parent_override:)
+    end
+
+    it "validates parent_override exists during update" do
+      service.call
+      existing_override.reload
+      expect(existing_override.parent_override).to eq(parent_override)
+    end
+
+    context "when parent override is deleted" do
+      before do
+        parent_override.destroy
+      end
+
+      it "raises OverrideNotFoundError when parent is deleted" do
+        expect { service.call }.to raise_error(
+          PeerReview::OverrideNotFoundError,
+          "Override does not exist"
+        )
+      end
+    end
+
+    it "maintains the same parent_override reference on update" do
+      result = service.call
+      expect(result.parent_override).to eq(parent_override)
+      expect(result.parent_override_id).to eq(parent_override.id)
+    end
+
+    it "wraps the operation in a transaction" do
+      expect(ActiveRecord::Base).to receive(:transaction).at_least(:once).and_call_original
+      service.call
+    end
+
+    context "race condition protection" do
+      it "validates parent override within transaction" do
+        allow(service).to receive(:validate_course_parent_override_exists).and_call_original
+
+        service.call
+
+        expect(service).to have_received(:validate_course_parent_override_exists).with(parent_override, course.id).once
+      end
+
+      it "uses a transaction to ensure atomicity of parent override lookup and update" do
+        expect(ActiveRecord::Base).to receive(:transaction).and_call_original.at_least(:once)
+
+        service.call
       end
     end
   end
