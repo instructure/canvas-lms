@@ -729,6 +729,7 @@ describe "Canvas Cartridge importing" do
     }
     Importers::CourseContentImporter.import_syllabus_from_migration(@copy_to, syllabus_body, @migration)
     @migration.resolve_content_links!
+    @migration.create_attachment_associations
 
     syllabus_attachment_associations = @copy_to.attachment_associations.where(context_concern: "syllabus_body")
     expect(syllabus_attachment_associations.pluck(:attachment_id)).to match_array([image_to.id, media_to.id])

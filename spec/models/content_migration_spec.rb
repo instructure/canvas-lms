@@ -1924,10 +1924,10 @@ describe ContentMigration do
     it "creates attachment associations during imports" do
       @copy_to = @cm.context
       mig_att = @copy_to.attachments.create(filename: "first", display_name: "first", uploaded_data: fixture_file_upload("migration/migration_example.imscc"))
-      user_att1 = @teacher.attachments.create(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"))
-      user_att2 = @teacher.attachments.create(id: 100_000_000_002, uploaded_data: fixture_file_upload("instructure.png"))
-      user_att3 = @teacher.attachments.create(id: 100_000_000_003, uploaded_data: fixture_file_upload("test_image.jpg"))
-      user_att4 = @teacher.attachments.create(id: 100_000_000_004, uploaded_data: fixture_file_upload("cn_image.jpg"))
+      user_att1 = @teacher.attachments.create(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"), uuid: "sekret")
+      user_att2 = @teacher.attachments.create(id: 100_000_000_002, uploaded_data: fixture_file_upload("instructure.png"), uuid: "sekret2")
+      user_att3 = @teacher.attachments.create(id: 100_000_000_003, uploaded_data: fixture_file_upload("test_image.jpg"), uuid: "sekret3")
+      user_att4 = @teacher.attachments.create(id: 100_000_000_004, uploaded_data: fixture_file_upload("cn_image.jpg"), uuid: "sekret4")
       run_import(mig_att.id)
       course_att1 = @copy_to.attachments.find_by(migration_id: "ge928eec163f37c0b61e80a894e6fd1ba")
       course_att2 = @copy_to.attachments.find_by(migration_id: "gd91205577b505bf54004413542b7bc8f")
@@ -2006,6 +2006,38 @@ describe ContentMigration do
       aq2 = @copy_to.assessment_questions.find { |aq| aq.migration_id == "gaf93143a49786b1582443d81cd6e2b4a" }
       expect(aq1.attachments.pluck(:display_name)).to match_array(%w[27.jpg ab.jpg basic_sql.png beavercode1.png])
       expect(aq2.attachments.pluck(:display_name)).to match_array(%w[cn_image.jpg instructure.png test_image.jpg])
+    end
+
+    it "creates attachment_associations during content migration for user attachments with matching UUIDs" do
+      other_user = user_factory
+      @copy_to = @cm.context
+      mig_att = @copy_to.attachments.create(filename: "first", display_name: "first", uploaded_data: fixture_file_upload("migration/migration_example.imscc"))
+      user_att1 = other_user.attachments.create(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"), uuid: "sekret")
+      user_att2 = other_user.attachments.create(id: 100_000_000_005, uploaded_data: fixture_file_upload("292.mp3"), uuid: "sekret")
+      run_import(mig_att.id)
+      page2 = @copy_to.wiki_pages.find_by(migration_id: "g5870e63ac70483ee49477ae0ee284d66")
+      expect(page2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id, user_att2.id])
+    end
+
+    it "does not create attachment_associations during content migration for user attachments without matching UUIDs" do
+      other_user = user_factory
+      @copy_to = @cm.context
+      mig_att = @copy_to.attachments.create(filename: "first", display_name: "first", uploaded_data: fixture_file_upload("migration/migration_example.imscc"))
+      user_att1 = other_user.attachments.create(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"), uuid: "wrong_sekret")
+      user_att2 = other_user.attachments.create(id: 100_000_000_005, uploaded_data: fixture_file_upload("292.mp3"), uuid: "wrong_sekret")
+      run_import(mig_att.id)
+      page2 = @copy_to.wiki_pages.find_by(migration_id: "g5870e63ac70483ee49477ae0ee284d66")
+      expect(page2.attachment_associations.pluck(:attachment_id)).not_to match_array([user_att1.id, user_att2.id])
+    end
+
+    it "does not create attachment_associations during content migration for other course files" do
+      other_course = course_factory
+      other_file = other_course.attachments.create!(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"), uuid: "sekret")
+      @copy_to = @cm.context
+      mig_att = @copy_to.attachments.create(filename: "first", display_name: "first", uploaded_data: fixture_file_upload("migration/migration_example.imscc"))
+      run_import(mig_att.id)
+      page1 = @copy_to.wiki_pages.find_by(migration_id: "gd7317fea42eb13fb5bc92127baabdf8d")
+      expect(page1.attachment_associations.pluck(:attachment_id)).not_to match_array([other_file.id])
     end
   end
 

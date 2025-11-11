@@ -1179,6 +1179,35 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
+  def user_file_link_matches_uuid?(html, attachment)
+    # TODO: We changed how user files are exported into export packages in
+    # 600e3abd10eb6f4e2746d866dd8f757659ff884a and 21e87b373408165938e73e2bf7aad097e7d0f582
+    # This whole method should be removed in a few years once content migrations are less
+    # likely to have user files directly linked in them.
+    return false if html.blank? || attachment.context_type != "User"
+
+    Nokogiri::HTML5.fragment(html, max_tree_depth: 10_000).search("*").each do |node|
+      CanvasLinkMigrator::LinkParser::LINK_ATTRS.each do |attr|
+        next unless node[attr]&.include?(attachment.id.to_s)
+
+        url = begin
+          Rails.application.routes.recognize_path(node[attr])
+        rescue ActionController::RoutingError
+          next
+        end
+        next if Shard.integral_id_for(url[:attachment_id] || url[:file_id] || url[:id]) != attachment.id
+
+        query_values = Addressable::URI.parse(node[attr]).query_values || {}
+        return true if query_values["verifier"] == attachment.uuid
+      end
+    end
+    false
+  end
+
+  def add_association_for_migration?(html, attachment)
+    context == attachment.context || user_file_link_matches_uuid?(html, attachment)
+  end
+
   def convert_block_editor_blocks(blocks_json, migration_id, context)
     blocks_json.each_value { |block| convert_block(block, context, migration_id) }
   end

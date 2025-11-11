@@ -184,7 +184,7 @@ class AssessmentQuestion < ActiveRecord::Base
     end
   end
 
-  def translate_links
+  def translate_links(migration: nil)
     # we can't translate links unless this question has a context (through a bank)
     return unless assessment_question_bank&.context
 
@@ -201,7 +201,7 @@ class AssessmentQuestion < ActiveRecord::Base
         obj.map { |v| deep_translate.call(v) }
       when String
         obj.gsub(translate_link_regex) do |match|
-          translate_file_link(match, $~)
+          translate_file_link(match, $~, migration:)
         end
       else
         obj

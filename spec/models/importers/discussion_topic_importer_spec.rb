@@ -97,19 +97,6 @@ describe Importers::DiscussionTopicImporter do
     expect(topic.attachment).to be_nil
   end
 
-  it "imports htmls with attachments" do
-    data = get_import_data("vista", "discussion_topic").first.with_indifferent_access
-    context = get_import_context
-    aa_test_data = AttachmentAssociationsSpecHelper.new(context.account, context)
-    migration = context.content_migrations.create!
-    migration.user = @teacher
-    data["description"] = aa_test_data.base_html
-    Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)
-    expect(context.discussion_topics.count).to eq 1
-    expect(context.discussion_topics.first.attachment_associations.count).to eq 1
-    expect(context.discussion_topics.first.attachment_associations.first.attachment_id).to eq aa_test_data.attachment1.id
-  end
-
   describe "assignments" do
     subject do
       Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)
