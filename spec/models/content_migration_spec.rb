@@ -2153,6 +2153,118 @@ describe ContentMigration do
         end
       end
     end
+
+    context "deleting Lti::AssetProcessor" do
+      let(:master_course) { course_factory }
+      let(:template) { MasterCourses::MasterTemplate.set_as_master_course(master_course) }
+      let(:child_course) { course_factory }
+      let(:subscription) { template.add_child_course!(child_course) }
+      let(:cm) do
+        ContentMigration.create!(
+          context: child_course,
+          migration_type: "master_course_import",
+          child_subscription_id: subscription.id
+        )
+      end
+      let(:tool) do
+        child_course.context_external_tools.create!(
+          name: "Test Tool",
+          consumer_key: "key",
+          shared_secret: "secret",
+          url: "http://example.com/launch"
+        )
+      end
+      let(:deletions) { { "Lti::AssetProcessor" => [asset_processor.migration_id] } }
+
+      shared_examples "processes asset processor deletion" do |expected_state|
+        it "#{(expected_state == :deleted) ? "deletes" : "skips deletion of"} the asset processor" do
+          expect(asset_processor).to be_active
+          cm.process_master_deletions(deletions)
+          if expected_state == :deleted
+            expect(asset_processor.reload).to be_deleted
+          else
+            expect(asset_processor.reload).to be_active
+          end
+        end
+      end
+
+      context "with assignment" do
+        let(:assignment) { child_course.assignments.create!(title: "Test Assignment") }
+        let(:asset_processor) do
+          Lti::AssetProcessor.create!(
+            assignment:,
+            context_external_tool: tool,
+            url: "http://example.com/process",
+            title: "Test Processor",
+            migration_id: "#{MasterCourses::MIGRATION_ID_PREFIX}_test_processor_mig_id"
+          )
+        end
+
+        before { subscription.create_content_tag_for!(assignment) }
+
+        context "without downstream changes" do
+          include_examples "processes asset processor deletion", :deleted
+        end
+
+        context "with downstream changes and not locked" do
+          before do
+            content_tag = subscription.create_content_tag_for!(assignment)
+            content_tag.update!(downstream_changes: ["content"])
+          end
+
+          include_examples "processes asset processor deletion", :active
+        end
+
+        context "with downstream changes but locked" do
+          before do
+            assignment.update!(migration_id: "#{MasterCourses::MIGRATION_ID_PREFIX}_test_assignment_mig_id")
+            content_tag = subscription.create_content_tag_for!(assignment)
+            content_tag.update!(downstream_changes: ["content"])
+            allow_any_instance_of(Assignment).to receive(:editing_restricted?).with(:any).and_return(true)
+          end
+
+          include_examples "processes asset processor deletion", :deleted
+        end
+      end
+
+      context "with discussion topic" do
+        let(:discussion_topic) { DiscussionTopic.create_graded_topic!(course: child_course, title: "Test Discussion") }
+        let(:assignment) { discussion_topic.assignment }
+        let(:asset_processor) do
+          Lti::AssetProcessor.create!(
+            assignment:,
+            context_external_tool: tool,
+            url: "http://example.com/process",
+            title: "Test Processor",
+            migration_id: "#{MasterCourses::MIGRATION_ID_PREFIX}_test_processor_mig_id"
+          )
+        end
+
+        before do
+          subscription.create_content_tag_for!(assignment)
+        end
+
+        context "with downstream changes and not locked" do
+          before do
+            discussion_content_tag = subscription.create_content_tag_for!(discussion_topic)
+            discussion_content_tag.update!(downstream_changes: ["content"])
+          end
+
+          include_examples "processes asset processor deletion", :active
+        end
+
+        context "with downstream changes but locked" do
+          before do
+            discussion_topic.update!(migration_id: "#{MasterCourses::MIGRATION_ID_PREFIX}_test_discussion_mig_id")
+            discussion_content_tag = subscription.create_content_tag_for!(discussion_topic)
+            discussion_content_tag.update!(downstream_changes: ["content"])
+            allow_any_instance_of(DiscussionTopic).to receive(:editing_restricted?).with(:any).and_return(true)
+          end
+
+          include_examples "processes asset processor deletion", :deleted
+        end
+      end
+    end
   end
 
   context "outcomes" do

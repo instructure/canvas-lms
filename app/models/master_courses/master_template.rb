@@ -304,6 +304,32 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     deletions_by_type
   end
 
+  # sub types has no master_content_tags, but we still want to track deletions, without including these to normal exports
+  # We don't filter for last_export_started_at here since we want to handle unlock -> lock cycles correctly
+  def deletions_for_sub_types
+    return {} unless last_export_started_at
+
+    deletions_by_type = {}
+    MasterCourses::SUB_TYPES_FOR_DELETIONS.each do |sub_type|
+      next if sub_type == "Lti::AssetProcessor" && !course.root_account.feature_enabled?(:lti_asset_processor)
+
+      item_scope = case sub_type
+                   when "Lti::AssetProcessor"
+                     Lti::AssetProcessor.where(workflow_state: "deleted", assignment: course.assignments)
+                   end
+
+      deleted_mig_ids = item_scope.map do |ap|
+        migration_id_for(ap)
+      end
+      deletions_by_type[sub_type] = deleted_mig_ids if deleted_mig_ids.any?
+    end
+    deletions_by_type
+  end
+
+  def deletions_by_type
+    deletions_since_last_export.merge(deletions_for_sub_types)
+  end
+
   def default_restrictions_for(object)
     if use_default_restrictions_by_type
       if object.is_a?(Assignment) && (submittable = object.submittable_object)
