@@ -594,6 +594,52 @@ describe SubmissionSearch do
           expect(results.first.user.id).to eq jonah.id
         end
       end
+
+      it "includes concluded enrollments in representatives when gradebook settings specify" do
+        course.enrollments.find_by(user: amanda).conclude
+        teacher.preferences[:gradebook_settings] = {
+          course.global_id => {
+            "show_concluded_enrollments" => "true"
+          }
+        }
+        teacher.save!
+
+        results = SubmissionSearch.new(
+          assignment,
+          teacher,
+          nil,
+          apply_gradebook_enrollment_filters: true,
+          representatives_only: true
+        ).search
+
+        aggregate_failures do
+          expect(results.count).to eq 1
+          expect(results.first.user.id).to eq jonah.id
+        end
+      end
+
+      it "excludes concluded enrollments from representatives when gradebook settings do not include them" do
+        course.enrollments.find_by(user: jonah).conclude
+        teacher.preferences[:gradebook_settings] = {
+          course.global_id => {
+            "show_concluded_enrollments" => "false"
+          }
+        }
+        teacher.save!
+
+        results = SubmissionSearch.new(
+          assignment,
+          teacher,
+          nil,
+          apply_gradebook_enrollment_filters: true,
+          representatives_only: true
+        ).search
+
+        aggregate_failures do
+          expect(results.count).to eq 1
+          expect(results.first.user.id).to eq amanda.id
+        end
+      end
     end
   end
 end

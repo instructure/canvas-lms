@@ -246,7 +246,10 @@ class SubmissionSearch
   end
 
   def representatives
-    @representatives ||= @assignment.representatives(user: @searcher, ignore_student_visibility: true, include_others: true)
+    includes = [:inactive]
+    settings = @searcher.get_preference(:gradebook_settings, @course.global_id) || {}
+    includes << :completed if settings["show_concluded_enrollments"] == "true"
+    @representatives ||= @assignment.representatives(user: @searcher, includes:, ignore_student_visibility: true, include_others: true)
   end
 
   def excluded_enrollment_states_from_gradebook_settings
