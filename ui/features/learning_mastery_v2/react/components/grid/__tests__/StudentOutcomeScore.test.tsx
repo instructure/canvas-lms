@@ -21,6 +21,7 @@ import {render} from '@testing-library/react'
 import {StudentOutcomeScore, StudentOutcomeScoreProps} from '../StudentOutcomeScore'
 import {svgUrl} from '../../../utils/icons'
 import {Outcome, OutcomeRollup, Rating} from '../../../types/rollup'
+import {ScoreDisplayFormat} from '../../../utils/constants'
 
 jest.mock('../../../utils/icons', () => ({
   svgUrl: jest.fn(() => 'http://test.com'),
@@ -47,6 +48,7 @@ describe('StudentOutcomeScore', () => {
       } as Outcome,
       rollup: {
         outcomeId: '1',
+        score: 3,
         rating: {
           color: 'FFFFF',
           points: 3,
@@ -81,11 +83,77 @@ describe('StudentOutcomeScore', () => {
         {...defaultProps({
           rollup: {
             outcomeId: '1',
+            score: 3,
             rating: {points: 3, color: 'FFFFF', description: '', mastery: false},
           },
         })}
       />,
     )
     expect(getByText('Unassessed')).toBeInTheDocument()
+  })
+
+  describe('scoreDisplayFormat', () => {
+    it('renders only ScreenReaderContent with ICON_ONLY format (default)', () => {
+      const {getByText} = render(<StudentOutcomeScore {...defaultProps()} />)
+      const srContent = getByText('great!')
+      expect(srContent).toBeInTheDocument()
+      expect(srContent.closest('[class*="screenReaderContent"]')).toBeInTheDocument()
+    })
+
+    it('renders visible text with rating description when ICON_AND_LABEL format is used', () => {
+      const {getByText} = render(
+        <StudentOutcomeScore
+          {...defaultProps()}
+          scoreDisplayFormat={ScoreDisplayFormat.ICON_AND_LABEL}
+        />,
+      )
+      const labelText = getByText('great!')
+      expect(labelText).toBeInTheDocument()
+      expect(labelText.closest('[class*="screenReaderContent"]')).not.toBeInTheDocument()
+    })
+
+    it('renders visible text with score points when ICON_AND_POINTS format is used', () => {
+      const {getByText} = render(
+        <StudentOutcomeScore
+          {...defaultProps()}
+          scoreDisplayFormat={ScoreDisplayFormat.ICON_AND_POINTS}
+        />,
+      )
+      const pointsText = getByText('3')
+      expect(pointsText).toBeInTheDocument()
+      expect(pointsText.closest('[class*="screenReaderContent"]')).not.toBeInTheDocument()
+    })
+
+    it('renders "Unassessed" label when ICON_AND_LABEL format is used and no rating', () => {
+      const {getByText} = render(
+        <StudentOutcomeScore
+          {...defaultProps({
+            rollup: {
+              outcomeId: '1',
+              score: 0,
+              rating: {points: 0, color: 'FFFFF', description: '', mastery: false},
+            },
+          })}
+          scoreDisplayFormat={ScoreDisplayFormat.ICON_AND_LABEL}
+        />,
+      )
+      expect(getByText('Unassessed')).toBeInTheDocument()
+    })
+
+    it('renders score when ICON_AND_POINTS format is used even with no rating description', () => {
+      const {getByText} = render(
+        <StudentOutcomeScore
+          {...defaultProps({
+            rollup: {
+              outcomeId: '1',
+              score: 2.5,
+              rating: {points: 2.5, color: 'FFFFF', description: '', mastery: false},
+            },
+          })}
+          scoreDisplayFormat={ScoreDisplayFormat.ICON_AND_POINTS}
+        />,
+      )
+      expect(getByText('2.5')).toBeInTheDocument()
+    })
   })
 })
