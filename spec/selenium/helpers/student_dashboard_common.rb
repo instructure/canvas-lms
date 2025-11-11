@@ -36,6 +36,13 @@ module StudentDashboardCommon
     @course2.enroll_student(@student, enrollment_state: :active)
   end
 
+  def pagination_course_setup
+    20.times do |i|
+      course = course_with_teacher(name: "Teacher #{i + 3}", course_name: "Course #{i + 3}", active_all: true).course
+      course.enroll_student(@student, enrollment_state: :active)
+    end
+  end
+
   def dashboard_announcement_setup
     @announcement1 = @course1.announcements.create!(title: "Course 1 - Announcement title 1", message: "Announcement message 1")
     @announcement2 = @course2.announcements.create!(title: "Course 2 - Announcement title 2", message: "Announcement message 2")
@@ -47,6 +54,17 @@ module StudentDashboardCommon
 
     @announcement6.discussion_topic_participants.find_by(user: @student)&.update!(workflow_state: "read")
     @announcement5.discussion_topic_participants.find_by(user: @student)&.update!(workflow_state: "read")
+  end
+
+  def pagination_announcement_setup
+    15.times do |i|
+      read_announcement = @course1.announcements.create!(title: "Announcement #{i + 1}", message: "message #{i + 1}")
+      read_announcement.discussion_topic_participants.find_by(user: @student)&.update!(workflow_state: "read")
+    end
+
+    11.times do |i|
+      @course1.announcements.create!(title: "Announcement #{i + 11}", message: "message #{i + 11}")
+    end
   end
 
   def dashboard_people_setup
@@ -85,6 +103,18 @@ module StudentDashboardCommon
     qs = @graded_quiz.generate_submission(@student)
     qs.submission_data
     Quizzes::SubmissionGrader.new(qs).grade_submission
+  end
+
+  def pagination_submission_setup
+    14.times do |i|
+      assignment = @course1.assignments.create!(name: "Course1: HW due in #{i + 1} days", points_possible: "10", due_at: (i + 1).days.from_now, submission_types: "online_text_entry")
+      @course1.assignments.create!(name: "Course1: HW due in #{i + 2} days", points_possible: "10", due_at: (i + 2).days.from_now, submission_types: "online_text_entry")
+      @course2.assignments.create!(name: "Course2: HW due in #{i + 3} days", points_possible: "10", due_at: (i + 3).days.from_now, submission_types: "online_text_entry")
+      @course1.assignments.create!(name: "Course1: Missing HW #{i + 1} days", points_possible: "10", due_at: (i + 1).days.ago, submission_types: "online_text_entry")
+      @course2.assignments.create!(name: "Course2: Missing HW #{i + 1} days", points_possible: "10", due_at: (i + 1).days.ago, submission_types: "online_text_entry")
+
+      assignment.submit_homework(@student, submission_type: "online_text_entry")
+    end
   end
 
   def dashboard_course_grade_setup
