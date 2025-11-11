@@ -180,6 +180,7 @@ function Assignment() {
   this.peerReviews = this.peerReviews.bind(this)
   this.peerReviewsAssignAt = this.peerReviewsAssignAt.bind(this)
   this.peerReviewSubmissionRequired = this.peerReviewSubmissionRequired.bind(this)
+  this.peerReviewAcrossSections = this.peerReviewAcrossSections.bind(this)
   this.pointsPossible = this.pointsPossible.bind(this)
   this.pollUntilFinished = this.pollUntilFinished.bind(this)
   this.pollUntilFinishedCloningAlignment = this.pollUntilFinishedCloningAlignment.bind(this)
@@ -692,6 +693,13 @@ Assignment.prototype.peerReviewSubmissionRequired = function (submissionRequired
     return this.get('peer_review_submission_required') || false
   }
   return this.set('peer_review_submission_required', submissionRequired)
+}
+
+Assignment.prototype.peerReviewAcrossSections = function (acrossSections) {
+  if (!(arguments.length > 0)) {
+    return this.get('peer_review_across_sections') !== false
+  }
+  return this.set('peer_review_across_sections', acrossSections)
 }
 
 Assignment.prototype.intraGroupPeerReviews = function () {

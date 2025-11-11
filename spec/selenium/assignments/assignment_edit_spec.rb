@@ -257,4 +257,81 @@ describe "assignment" do
       expect(@assignment.reload.peer_review_submission_required).to be false
     end
   end
+
+  describe "peer review across sections" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @course.enable_feature!(:peer_review_allocation)
+      @assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        points_possible: 10,
+        submission_types: "online_text_entry",
+        peer_reviews: true
+      )
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "loads the initial value of allow across sections when editing an assignment", custom_timeout: 30 do
+      @assignment.update!(peer_review_across_sections: false)
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      wait_for_ajaximations
+
+      fj("button:contains('Advanced Peer Review Configurations')").click
+      wait_for_ajaximations
+
+      across_sections_checkbox = f("#peer_reviews_across_sections_checkbox")
+      expect(across_sections_checkbox).not_to be_selected
+    end
+
+    it "allows toggling allow across sections and persists the value", custom_timeout: 40 do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      wait_for_ajaximations
+
+      fj("button:contains('Advanced Peer Review Configurations')").click
+      wait_for_ajaximations
+
+      f("[data-testid='across-sections-checkbox'] + label").click
+
+      find_button("Save").click
+      wait_for_ajaximations
+
+      expect(@assignment.reload.peer_review_across_sections).to be false
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      wait_for_ajaximations
+
+      fj("button:contains('Advanced Peer Review Configurations')").click
+      wait_for_ajaximations
+
+      f("[data-testid='across-sections-checkbox'] + label").click
+
+      find_button("Save").click
+      wait_for_ajaximations
+
+      expect(@assignment.reload.peer_review_across_sections).to be true
+    end
+
+    it "persists disabled state after collapsing Advanced Configuration section", custom_timeout: 40 do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      wait_for_ajaximations
+
+      fj("button:contains('Advanced Peer Review Configurations')").click
+      wait_for_ajaximations
+
+      f("[data-testid='across-sections-checkbox'] + label").click
+
+      # Collapse the Advanced Configuration section
+      fj("button:contains('Advanced Peer Review Configurations')").click
+      wait_for_ajaximations
+
+      find_button("Save").click
+      wait_for_ajaximations
+
+      expect(@assignment.reload.peer_review_across_sections).to be false
+    end
+  end
 end

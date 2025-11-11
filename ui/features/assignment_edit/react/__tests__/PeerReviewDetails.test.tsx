@@ -43,6 +43,7 @@ const createMockAssignment = (overrides = {}) => ({
   getId: jest.fn(() => '456'),
   peerReviewSubmissionRequired: jest.fn(() => false),
   groupCategoryId: jest.fn(() => null),
+  peerReviewAcrossSections: jest.fn(() => true),
   ...overrides,
 })
 
@@ -119,6 +120,32 @@ describe('PeerReviewDetails', () => {
       const submissionRequiredCheckbox = screen.getByTestId('submission-required-checkbox')
       expect(submissionRequiredCheckbox).not.toBeChecked()
     })
+
+    it('loads initial value of across sections as checked when set to true in assignment', async () => {
+      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviewAcrossSections = jest.fn(() => true)
+
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
+      const acrossSectionsCheckbox = screen.getByTestId('across-sections-checkbox')
+      expect(acrossSectionsCheckbox).toBeChecked()
+    })
+
+    it('defaults across sections to checked when not set in assignment', async () => {
+      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviewAcrossSections = jest.fn(() => true)
+
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
+      const acrossSectionsCheckbox = screen.getByTestId('across-sections-checkbox')
+      expect(acrossSectionsCheckbox).toBeChecked()
+    })
   })
 
   describe('Checkbox interactions', () => {
@@ -179,7 +206,7 @@ describe('PeerReviewDetails', () => {
       await user.click(anonymityCheckbox)
       await user.click(submissionRequiredCheckbox)
 
-      expect(acrossSectionsCheckbox).toBeChecked()
+      expect(acrossSectionsCheckbox).not.toBeChecked()
       expect(passFailGradingCheckbox).toBeChecked()
       expect(anonymityCheckbox).toBeChecked()
       expect(submissionRequiredCheckbox).toBeChecked()
@@ -203,7 +230,7 @@ describe('PeerReviewDetails', () => {
 
       await user.click(screen.getByText('Advanced Peer Review Configurations'))
 
-      expect(screen.getByTestId('across-sections-checkbox')).not.toBeChecked()
+      expect(screen.getByTestId('across-sections-checkbox')).toBeChecked()
       expect(screen.getByTestId('pass-fail-grading-checkbox')).not.toBeChecked()
       expect(screen.getByTestId('anonymity-checkbox')).not.toBeChecked()
       expect(screen.getByTestId('submission-required-checkbox')).not.toBeChecked()
@@ -335,6 +362,18 @@ describe('PeerReviewDetails', () => {
     it('does not show within groups toggle when assignment is not a group assignment', () => {
       expect(screen.queryByText('Allow peer reviews within groups')).not.toBeInTheDocument()
       expect(screen.queryByTestId('within-groups-checkbox')).not.toBeInTheDocument()
+    })
+
+    it('toggles across sections checkbox when clicked', async () => {
+      const acrossSectionsCheckbox = screen.getByTestId('across-sections-checkbox')
+
+      expect(acrossSectionsCheckbox).toBeChecked()
+
+      await user.click(acrossSectionsCheckbox)
+      expect(acrossSectionsCheckbox).not.toBeChecked()
+
+      await user.click(acrossSectionsCheckbox)
+      expect(acrossSectionsCheckbox).toBeChecked()
     })
   })
 

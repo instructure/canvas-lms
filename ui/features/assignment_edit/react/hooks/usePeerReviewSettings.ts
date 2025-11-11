@@ -26,9 +26,11 @@ export const MAX_NUM_PEER_REVIEWS = 10
 export const usePeerReviewSettings = ({
   peerReviewCount,
   submissionRequired,
+  acrossSections,
 }: {
   peerReviewCount: number
   submissionRequired: boolean
+  acrossSections: boolean
 }) => {
   const [reviewsRequired, setReviewsRequired] = useState<string>(
     peerReviewCount ? peerReviewCount.toString() : '1',
@@ -42,7 +44,7 @@ export const usePeerReviewSettings = ({
     string | undefined
   >(undefined)
   const [allowPeerReviewAcrossMultipleSections, setAllowPeerReviewAcrossMultipleSections] =
-    useState<boolean>(false)
+    useState<boolean>(acrossSections)
   const [allowPeerReviewWithinGroups, setAllowPeerReviewWithinGroups] = useState<boolean>(false)
   const [usePassFailGrading, setUsePassFailGrading] = useState<boolean>(false)
   const [anonymousPeerReviews, setAnonymousPeerReviews] = useState<boolean>(false)
@@ -161,7 +163,7 @@ export const usePeerReviewSettings = ({
     setPointsPerReview('0')
     setErrorMessageReviewsRequired(undefined)
     setErrorMessagePointsPerReview(undefined)
-    setAllowPeerReviewAcrossMultipleSections(false)
+    setAllowPeerReviewAcrossMultipleSections(true)
     setAllowPeerReviewWithinGroups(false)
     setUsePassFailGrading(false)
     setAnonymousPeerReviews(false)
