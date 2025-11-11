@@ -375,6 +375,14 @@ describe('CreateEditAllocationRuleModal', () => {
       expect(screen.getByTestId('review-type-group')).toBeInTheDocument()
     })
 
+    it('displays "Rule Type" description for target type radio group', () => {
+      expect(screen.getByText('Rule Type')).toBeInTheDocument()
+    })
+
+    it('displays "Review Requirement" description for review type group', () => {
+      expect(screen.getByText('Review Requirement')).toBeInTheDocument()
+    })
+
     it('provides correct aria-label for add subject button based on target type', async () => {
       const addButton = screen.getByTestId('add-subject-button')
       expect(addButton).toHaveAttribute('aria-label', 'Add another recipient name')
