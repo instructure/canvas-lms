@@ -78,6 +78,42 @@ describe PageView::Pv4Client do
       expect(pv.render_time).to eq 6.367549
     end
 
+    it "handles nil vhost gracefully by constructing URL from http_request only" do
+      pv_without_vhost = pv4_object.merge("vhost" => nil)
+      stub_http_request("page_views" => [pv_without_vhost])
+
+      response = client.fetch(user)
+      pv = response.first
+      expect(pv.url).to eq "http:/accounts/2/users/1"
+    end
+
+    it "handles nil http_request gracefully by constructing URL from vhost only" do
+      pv_without_http_request = pv4_object.merge("http_request" => nil)
+      stub_http_request("page_views" => [pv_without_http_request])
+
+      response = client.fetch(user)
+      pv = response.first
+      expect(pv.url).to eq "http://canvas.instructure.com"
+    end
+
+    it "handles nil vhost and http_request by setting url to nil" do
+      pv_without_url_data = pv4_object.merge("vhost" => nil, "http_request" => nil)
+      stub_http_request("page_views" => [pv_without_url_data])
+
+      response = client.fetch(user)
+      pv = response.first
+      expect(pv.url).to be_nil
+    end
+
+    it "handles nil agent gracefully by setting user_agent to nil" do
+      pv_without_agent = pv4_object.merge("agent" => nil)
+      stub_http_request("page_views" => [pv_without_agent])
+
+      response = client.fetch(user)
+      pv = response.first
+      expect(pv.user_agent).to be_nil
+    end
+
     it "formats url params correctly" do
       t = Time.zone.parse("2016-04-27")
       Timecop.freeze(t) do
