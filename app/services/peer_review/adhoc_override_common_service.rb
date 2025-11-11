@@ -51,11 +51,42 @@ class PeerReview::AdhocOverrideCommonService < ApplicationService
     AssignmentOverride.title_from_student_count(student_ids.count)
   end
 
+  def fetch_id
+    @override.fetch(:id, nil)
+  end
+
   def fetch_student_ids
     @override.fetch(:student_ids, nil)
   end
 
   def fetch_unassign_item
     @override.fetch(:unassign_item, false)
+  end
+
+  def find_parent_override(student_ids)
+    normalized_student_ids = student_ids.map(&:to_i).uniq
+
+    parent_assignment
+      .active_assignment_overrides
+      .where(set_type: AssignmentOverride::SET_TYPE_ADHOC)
+      .where(
+        id: AssignmentOverrideStudent
+          .active
+          .select(:assignment_override_id)
+          .where(user_id: normalized_student_ids)
+          .group(:assignment_override_id)
+          .having("COUNT(DISTINCT user_id) = ?", normalized_student_ids.length)
+      )
+      .where.not(
+        id: AssignmentOverrideStudent
+          .active
+          .select(:assignment_override_id)
+          .where.not(user_id: normalized_student_ids)
+      )
+      .first
+  end
+
+  def parent_assignment
+    @peer_review_sub_assignment.parent_assignment
   end
 end

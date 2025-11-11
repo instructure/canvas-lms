@@ -24,20 +24,29 @@ class PeerReview::CourseOverrideUpdaterService < PeerReview::CourseOverrideCommo
     override = find_override
     validate_override_exists(override)
 
-    update_override(override)
+    course = @peer_review_sub_assignment.course
+    validate_course_exists(course)
+
+    ActiveRecord::Base.transaction do
+      parent_override = override.parent_override
+      validate_course_parent_override_exists(parent_override, course.id)
+
+      update_override(override, parent_override)
+    end
   end
 
   private
 
-  def update_override(override)
+  def update_override(override, parent_override)
+    override.parent_override = parent_override
     apply_overridden_dates(override, @override)
 
-    override.save!
+    override.save! if override.changed?
     override
   end
 
   def find_override
-    @peer_review_sub_assignment.assignment_overrides.find_by(
+    @peer_review_sub_assignment.active_assignment_overrides.find_by(
       id: fetch_id,
       set_type: AssignmentOverride::SET_TYPE_COURSE
     )

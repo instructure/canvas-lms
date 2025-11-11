@@ -37,11 +37,26 @@ class PeerReview::SectionOverrideCommonService < ApplicationService
     @peer_review_sub_assignment&.course&.active_course_sections&.find(section_id)
   end
 
+  def fetch_id
+    @override.fetch(:id, nil)
+  end
+
   def fetch_set_id
     @override.fetch(:set_id, nil)
   end
 
   def fetch_unassign_item
     @override.fetch(:unassign_item, false)
+  end
+
+  def find_parent_override(section_id)
+    parent_assignment.active_assignment_overrides.find_by(
+      set_id: section_id,
+      set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION
+    )
+  end
+
+  def parent_assignment
+    @peer_review_sub_assignment.parent_assignment
   end
 end

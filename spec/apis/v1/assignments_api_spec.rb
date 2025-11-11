@@ -3205,6 +3205,24 @@ describe AssignmentsApiController, type: :request do
                    points_possible: 100,
                    peer_reviews: true,
                    group_category_id: group_category.id,
+                   assignment_overrides: [
+                     {
+                       course_section_id: @section1.id,
+                       due_at: section_due_date.iso8601
+                     },
+                     {
+                       student_ids: [student1.id, student2.id],
+                       due_at: adhoc_due_date.iso8601
+                     },
+                     {
+                       group_id: group1.id,
+                       due_at: group_due_date.iso8601
+                     },
+                     {
+                       course_id: @course.id,
+                       due_at: course_due_date.iso8601
+                     }
+                   ],
                    peer_review: {
                      points_possible: 50,
                      grading_type: "points",
@@ -3283,6 +3301,24 @@ describe AssignmentsApiController, type: :request do
                    points_possible: 100,
                    peer_reviews: true,
                    group_category_id: group_category.id,
+                   assignment_overrides: [
+                     {
+                       course_section_id: @section1.id,
+                       due_at: section_due_date.iso8601
+                     },
+                     {
+                       student_ids: [student1.id, student2.id],
+                       due_at: adhoc_due_date.iso8601
+                     },
+                     {
+                       group_id: group1.id,
+                       due_at: group_due_date.iso8601
+                     },
+                     {
+                       course_id: @course.id,
+                       due_at: course_due_date.iso8601
+                     }
+                   ],
                    peer_review: {
                      points_possible: 50,
                      grading_type: "points",
@@ -3429,6 +3465,24 @@ describe AssignmentsApiController, type: :request do
                    points_possible: 100,
                    peer_reviews: true,
                    group_category_id: group_category.id,
+                   assignment_overrides: [
+                     {
+                       course_section_id: @section1.id,
+                       due_at: section_due_date.iso8601
+                     },
+                     {
+                       student_ids: [student1.id, student2.id],
+                       due_at: adhoc_due_date.iso8601
+                     },
+                     {
+                       group_id: group1.id,
+                       due_at: group_due_date.iso8601
+                     },
+                     {
+                       course_id: @course.id,
+                       due_at: course_due_date.iso8601
+                     }
+                   ],
                    peer_review: {
                      points_possible: 50,
                      grading_type: "points",
@@ -3505,6 +3559,24 @@ describe AssignmentsApiController, type: :request do
                    points_possible: 100,
                    peer_reviews: true,
                    group_category_id: group_category.id,
+                   assignment_overrides: [
+                     {
+                       course_section_id: @section1.id,
+                       due_at: section_due_date.iso8601
+                     },
+                     {
+                       student_ids: [student1.id, student2.id],
+                       due_at: adhoc_due_date.iso8601
+                     },
+                     {
+                       group_id: group1.id,
+                       due_at: group_due_date.iso8601
+                     },
+                     {
+                       course_id: @course.id,
+                       due_at: course_due_date.iso8601
+                     }
+                   ],
                    peer_review: {
                      points_possible: 50,
                      grading_type: "points",
@@ -3889,6 +3961,10 @@ describe AssignmentsApiController, type: :request do
 
         it "successfully creates peer review sub assignment with overrides via real service calls" do
           parent_assignment.update!(peer_reviews: true)
+          parent_assignment.assignment_overrides.create!(
+            set: section1,
+            due_at: 1.week.from_now
+          )
           params = {
             points_possible: 25,
             grading_type: "points",

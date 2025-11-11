@@ -71,6 +71,10 @@ RSpec.describe PeerReview::GroupOverrideCreatorService do
 
   describe "#call" do
     context "with valid parameters for group override" do
+      before do
+        assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: group)
+      end
+
       it "creates override for the group" do
         expect { service.call }.to change { peer_review_sub_assignment.assignment_overrides.count }.by(1)
       end
@@ -111,6 +115,10 @@ RSpec.describe PeerReview::GroupOverrideCreatorService do
           set_id: group.id,
           due_at:
         }
+      end
+
+      before do
+        assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: group)
       end
 
       it "only applies the provided dates" do
@@ -253,6 +261,11 @@ RSpec.describe PeerReview::GroupOverrideCreatorService do
       before do
         account.settings[:allow_assign_to_differentiation_tags] = true
         account.save!
+        peer_review_sub_assignment.parent_assignment.assignment_overrides.create!(
+          set_type: AssignmentOverride::SET_TYPE_GROUP,
+          set: differentiation_tag,
+          dont_touch_assignment: true
+        )
       end
 
       it "creates override for differentiation tag" do
@@ -264,6 +277,7 @@ RSpec.describe PeerReview::GroupOverrideCreatorService do
       it "does not require group assignment for differentiation tags" do
         non_group_assignment = course.assignments.create!(title: "Non-group Assignment")
         non_group_peer_review_sub_assignment = peer_review_model(parent_assignment: non_group_assignment)
+        assignment_override_model(assignment: non_group_assignment, set: differentiation_tag)
         service_with_tag = described_class.new(
           peer_review_sub_assignment: non_group_peer_review_sub_assignment,
           override: override_params
@@ -311,6 +325,90 @@ RSpec.describe PeerReview::GroupOverrideCreatorService do
           result = service.send(:differentiation_tag_override?, group.id)
           expect(result).to be(false)
         end
+      end
+    end
+  end
+
+  describe "parent override tracking" do
+    let!(:parent_override) do
+      assignment_override_model(assignment: parent_assignment, set: group)
+    end
+
+    it "sets the parent_override on the created override" do
+      override = service.call
+      expect(override.parent_override).to eq(parent_override)
+      expect(override.parent_override_id).to eq(parent_override.id)
+    end
+
+    it "finds the correct parent override based on group ID" do
+      override = service.call
+      expect(override.parent_override.set).to eq(group)
+      expect(override.parent_override.set_type).to eq(AssignmentOverride::SET_TYPE_GROUP)
+    end
+
+    context "when parent override does not exist" do
+      before do
+        parent_override.destroy
+      end
+
+      it "raises ParentOverrideNotFoundError" do
+        expect { service.call }.to raise_error(
+          PeerReview::ParentOverrideNotFoundError,
+          /Parent assignment Group override not found for group [\d,]+/
+        )
+      end
+    end
+
+    context "when parent override exists for different group" do
+      let(:other_group) { Group.create!(context: course, group_category:, name: "Group 2") }
+      let(:other_parent_override) do
+        assignment_override_model(assignment: parent_assignment, set: other_group)
+      end
+
+      before do
+        parent_override.destroy
+      end
+
+      it "raises ParentOverrideNotFoundError" do
+        expect { service.call }.to raise_error(
+          PeerReview::ParentOverrideNotFoundError,
+          /Parent assignment Group override not found for group [\d,]+/
+        )
+      end
+    end
+
+    it "wraps the operation in a transaction" do
+      expect(ActiveRecord::Base).to receive(:transaction).at_least(:once).and_call_original
+      service.call
+    end
+
+    context "transaction protection for parent override lookup" do
+      it "validates parent override exists within transaction" do
+        allow(service).to receive(:validate_group_parent_override_exists).and_call_original
+
+        service.call
+
+        expect(service).to have_received(:validate_group_parent_override_exists).once
+      end
+
+      it "rolls back if parent override validation fails during transaction" do
+        allow(service).to receive(:validate_group_parent_override_exists).and_raise(PeerReview::ParentOverrideNotFoundError, "Test error")
+
+        expect { service.call }.to raise_error(PeerReview::ParentOverrideNotFoundError)
+        expect(peer_review_sub_assignment.assignment_overrides.count).to eq(0)
+      end
+
+      it "finds parent override inside the transaction block" do
+        find_parent_called_in_transaction = false
+
+        allow(service).to receive(:find_parent_override).and_wrap_original do |method, *args|
+          find_parent_called_in_transaction = ActiveRecord::Base.connection.transaction_open?
+          method.call(*args)
+        end
+
+        service.call
+
+        expect(find_parent_called_in_transaction).to be true
       end
     end
   end

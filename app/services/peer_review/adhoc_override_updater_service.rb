@@ -21,7 +21,7 @@ class PeerReview::AdhocOverrideUpdaterService < PeerReview::AdhocOverrideCommonS
   def call
     validate_override_dates(@override)
 
-    override = find_override(@override[:id])
+    override = find_override
     validate_override_exists(override)
 
     # Fall back to getting student ids from the override set
@@ -35,8 +35,15 @@ class PeerReview::AdhocOverrideUpdaterService < PeerReview::AdhocOverrideCommonS
     student_ids_to_delete = existing_student_ids - provided_student_ids_in_course
 
     ActiveRecord::Base.transaction do
+      parent_override = if provided_student_ids_in_course.sort == existing_student_ids.sort
+                          override.parent_override
+                        else
+                          find_parent_override(provided_student_ids_in_course)
+                        end
+      validate_adhoc_parent_override_exists(parent_override, provided_student_ids_in_course)
+
       destroy_override_students(override, student_ids_to_delete) if student_ids_to_delete.any?
-      update_override(override, provided_student_ids_in_course)
+      update_override(override, provided_student_ids_in_course, parent_override)
     end
 
     override
@@ -48,8 +55,9 @@ class PeerReview::AdhocOverrideUpdaterService < PeerReview::AdhocOverrideCommonS
     override.assignment_override_students.where(user_id: student_ids).destroy_all
   end
 
-  def update_override(override, student_ids)
+  def update_override(override, student_ids, parent_override)
     override.title = override_title(student_ids)
+    override.parent_override = parent_override
 
     build_override_students(override, student_ids)
     apply_overridden_dates(override, @override)
@@ -58,9 +66,9 @@ class PeerReview::AdhocOverrideUpdaterService < PeerReview::AdhocOverrideCommonS
     override
   end
 
-  def find_override(override_id)
-    @peer_review_sub_assignment.assignment_overrides.find_by(
-      id: override_id,
+  def find_override
+    @peer_review_sub_assignment.active_assignment_overrides.find_by(
+      id: fetch_id,
       set_type: AssignmentOverride::SET_TYPE_ADHOC
     )
   end

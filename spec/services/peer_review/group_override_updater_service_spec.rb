@@ -33,12 +33,11 @@ RSpec.describe PeerReview::GroupOverrideUpdaterService do
   let(:peer_review_sub_assignment) { peer_review_model(parent_assignment:) }
   let(:group1) { Group.create!(context: course, group_category:, name: "Group 1") }
   let(:group2) { Group.create!(context: course, group_category:, name: "Group 2") }
+  let(:parent_override) do
+    assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: group1)
+  end
   let(:existing_override) do
-    assignment_override_model(
-      assignment: peer_review_sub_assignment,
-      set: group1,
-      dont_touch_assignment: true
-    )
+    assignment_override_model(assignment: peer_review_sub_assignment, set: group1, parent_override:)
   end
   let(:due_at) { 1.week.from_now }
   let(:unlock_at) { 1.day.from_now }
@@ -139,6 +138,10 @@ RSpec.describe PeerReview::GroupOverrideUpdaterService do
         )
       end
 
+      before do
+        assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: group2)
+      end
+
       it "updates the override to use the new group" do
         service.call
         existing_override.reload
@@ -208,8 +211,11 @@ RSpec.describe PeerReview::GroupOverrideUpdaterService do
 
     context "when override exists but is not Group type" do
       let(:section) { add_section("Test Section", course:) }
+      let!(:parent_section_override) do
+        assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: section)
+      end
       let(:section_override) do
-        create_section_override_for_assignment(peer_review_sub_assignment, course_section: section)
+        assignment_override_model(assignment: peer_review_sub_assignment, set: section, parent_override: parent_section_override)
       end
 
       let(:override_params) do
@@ -330,12 +336,14 @@ RSpec.describe PeerReview::GroupOverrideUpdaterService do
           non_collaborative: true
         )
       end
-      let(:tag_override) do
-        assignment_override_model(
-          assignment: peer_review_sub_assignment,
-          set: differentiation_tag,
-          dont_touch_assignment: true
+      let(:parent_tag_override) do
+        peer_review_sub_assignment.parent_assignment.assignment_overrides.find_by(
+          set_type: AssignmentOverride::SET_TYPE_GROUP,
+          set: differentiation_tag
         )
+      end
+      let(:tag_override) do
+        assignment_override_model(assignment: peer_review_sub_assignment, set: differentiation_tag, parent_override: parent_tag_override)
       end
       let(:override_params) do
         {
@@ -355,6 +363,7 @@ RSpec.describe PeerReview::GroupOverrideUpdaterService do
       before do
         account.settings[:allow_assign_to_differentiation_tags] = true
         account.save!
+        assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: differentiation_tag)
       end
 
       it "updates override for differentiation tag" do
@@ -366,12 +375,8 @@ RSpec.describe PeerReview::GroupOverrideUpdaterService do
       it "does not require group assignment for differentiation tags" do
         non_group_assignment = course.assignments.create!(title: "Non-group Assignment")
         non_group_peer_review_sub_assignment = peer_review_model(parent_assignment: non_group_assignment)
-        tag_override_non_group = assignment_override_model(
-          assignment: non_group_peer_review_sub_assignment,
-          set: differentiation_tag,
-          dont_touch_assignment: true
-        )
-
+        non_group_parent_tag_override = assignment_override_model(assignment: non_group_assignment, set: differentiation_tag)
+        tag_override_non_group = assignment_override_model(assignment: non_group_peer_review_sub_assignment, set: differentiation_tag, parent_override: non_group_parent_tag_override)
         service_with_tag = described_class.new(
           peer_review_sub_assignment: non_group_peer_review_sub_assignment,
           override: {
@@ -433,8 +438,8 @@ RSpec.describe PeerReview::GroupOverrideUpdaterService do
 
     it "returns nil for override with different set_type" do
       section = add_section("Test Section", course:)
-      section_override = create_section_override_for_assignment(peer_review_sub_assignment, course_section: section)
-
+      parent_section_override = assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: section)
+      section_override = assignment_override_model(assignment: peer_review_sub_assignment, set: section, parent_override: parent_section_override)
       result = peer_review_sub_assignment.assignment_overrides.find_by(
         id: section_override.id,
         set_type: AssignmentOverride::SET_TYPE_GROUP
@@ -470,6 +475,144 @@ RSpec.describe PeerReview::GroupOverrideUpdaterService do
       it "finds the group by id" do
         found_group = service.send(:find_group, group1.id)
         expect(found_group).to eq(group1)
+      end
+    end
+  end
+
+  describe "parent override tracking" do
+    let!(:parent_override_group1) do
+      assignment_override_model(assignment: parent_assignment, set: group1)
+    end
+    let!(:parent_override_group2) do
+      assignment_override_model(assignment: parent_assignment, set: group2)
+    end
+
+    let!(:tracking_existing_override) do
+      assignment_override_model(assignment: peer_review_sub_assignment, set: group1, parent_override: parent_override_group1)
+    end
+
+    context "when group doesn't change" do
+      let(:same_group_override_params) do
+        {
+          id: tracking_existing_override.id,
+          set_type: "Group",
+          set_id: group1.id,
+          due_at:
+        }
+      end
+
+      let(:same_group_service) do
+        described_class.new(
+          peer_review_sub_assignment:,
+          override: same_group_override_params
+        )
+      end
+
+      it "keeps the same parent_override" do
+        same_group_service.call
+        tracking_existing_override.reload
+        expect(tracking_existing_override.parent_override).to eq(parent_override_group1)
+      end
+
+      it "validates parent_override still exists" do
+        parent_override_group1.destroy
+        expect { same_group_service.call }.to raise_error(
+          PeerReview::OverrideNotFoundError,
+          "Override does not exist"
+        )
+      end
+    end
+
+    context "when group changes" do
+      let(:change_group_override_params) do
+        {
+          id: tracking_existing_override.id,
+          set_type: "Group",
+          set_id: group2.id,
+          due_at:
+        }
+      end
+
+      let(:change_group_service) do
+        described_class.new(
+          peer_review_sub_assignment:,
+          override: change_group_override_params
+        )
+      end
+
+      it "updates to the new parent_override" do
+        change_group_service.call
+        tracking_existing_override.reload
+        expect(tracking_existing_override.parent_override).to eq(parent_override_group2)
+        expect(tracking_existing_override.parent_override_id).to eq(parent_override_group2.id)
+      end
+
+      it "finds parent override based on new group ID" do
+        change_group_service.call
+        tracking_existing_override.reload
+        expect(tracking_existing_override.parent_override.set).to eq(group2)
+        expect(tracking_existing_override.parent_override.set_type).to eq(AssignmentOverride::SET_TYPE_GROUP)
+      end
+
+      context "when new parent override does not exist" do
+        before do
+          parent_override_group2.destroy
+        end
+
+        it "raises ParentOverrideNotFoundError" do
+          expect { change_group_service.call }.to raise_error(
+            PeerReview::ParentOverrideNotFoundError,
+            /Parent assignment Group override not found for group [\d,]+/
+          )
+        end
+      end
+    end
+
+    it "wraps the operation in a transaction" do
+      override_params = {
+        id: tracking_existing_override.id,
+        set_type: "Group",
+        set_id: group1.id,
+        due_at:
+      }
+      service = described_class.new(
+        peer_review_sub_assignment:,
+        override: override_params
+      )
+
+      expect(ActiveRecord::Base).to receive(:transaction).at_least(:once).and_call_original
+      service.call
+    end
+
+    context "race condition protection" do
+      let(:override_params) do
+        {
+          id: tracking_existing_override.id,
+          set_type: "Group",
+          set_id: group2.id,
+          due_at:
+        }
+      end
+
+      let(:service) do
+        described_class.new(
+          peer_review_sub_assignment:,
+          override: override_params
+        )
+      end
+
+      it "validates parent override within transaction" do
+        allow(service).to receive(:validate_group_parent_override_exists).and_call_original
+
+        service.call
+
+        expect(service).to have_received(:validate_group_parent_override_exists).once
+      end
+
+      it "uses a transaction to ensure atomicity of parent override lookup and update" do
+        expect(ActiveRecord::Base).to receive(:transaction).and_call_original.at_least(:once)
+
+        service.call
       end
     end
   end

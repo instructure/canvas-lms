@@ -2331,8 +2331,14 @@ describe LearningObjectDatesController do
       context "with peer review sub assignment overrides" do
         before :once do
           @section = @course.course_sections.create!(name: "Test Section")
+          @parent_override = @assignment_with_peer_review.assignment_overrides.create!(
+            course_section: @section,
+            due_at: "2025-09-10T18:00:00Z",
+            due_at_overridden: true
+          )
           @peer_review_override = @peer_review_sub_assignment.assignment_overrides.create!(
             course_section: @section,
+            parent_override: @parent_override,
             due_at: "2025-09-12T18:00:00Z",
             unlock_at: "2025-09-07T08:00:00Z",
             lock_at: "2025-09-17T18:00:00Z",
@@ -2363,20 +2369,14 @@ describe LearningObjectDatesController do
           expect(override_data["lock_at"]).to eq("2025-09-17T18:00:00Z")
         end
 
-        it "includes both main assignment overrides and peer review sub assignment overrides when include_peer_review=true is specified" do
-          main_override = @assignment_with_peer_review.assignment_overrides.create!(
-            course_section: @section,
-            due_at: "2025-09-05T18:00:00Z",
-            due_at_overridden: true
-          )
-
+        it "includes both parent assignment overrides and peer review sub assignment overrides when include_peer_review=true is specified" do
           get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id, include_peer_review: true }
           expect(response).to be_successful
 
           json = json_parse
 
           expect(json["overrides"]).to have(1).item
-          expect(json["overrides"][0]["id"]).to eq(main_override.id)
+          expect(json["overrides"][0]["id"]).to eq(@parent_override.id)
           expect(json["overrides"][0]["assignment_id"]).to eq(@assignment_with_peer_review.id)
           expect(json["peer_review_sub_assignment"]["overrides"]).to have(1).item
           expect(json["peer_review_sub_assignment"]["overrides"][0]["id"]).to eq(@peer_review_override.id)
