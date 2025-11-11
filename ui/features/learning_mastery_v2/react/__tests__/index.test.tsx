@@ -46,6 +46,7 @@ describe('LearningMastery', () => {
       outcomeRollups: [
         {
           outcomeId: '1',
+          score: 2,
           rating: {
             points: 3,
             color: 'green',

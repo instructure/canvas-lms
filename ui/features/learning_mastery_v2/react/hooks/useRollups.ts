@@ -70,6 +70,7 @@ const getRow = (studentRollups: StudentRollup[], outcomes: Outcome[]): OutcomeRo
     const rating = findRating(outcome.ratings, score.score)
     return {
       outcomeId: outcome.id,
+      score: score.score,
       rating: {
         ...rating,
         color: `#` + rating.color,

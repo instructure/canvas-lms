@@ -64,6 +64,7 @@ export interface Student {
 
 export interface OutcomeRollup {
   outcomeId: string | number
+  score: number
   rating: Rating & {
     color: string
   }
