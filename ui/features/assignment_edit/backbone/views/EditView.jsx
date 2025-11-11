@@ -391,7 +391,10 @@ EditView.prototype.initialize = function (options) {
     this.quizTypeSelector.on('change:quizType', this.handleQuizTypeChange)
   }
   if (this.anonymousSubmissionSelector) {
-    this.anonymousSubmissionSelector.on('change:anonymousSubmission', this.handleAnonymousSubmissionChange)
+    this.anonymousSubmissionSelector.on(
+      'change:anonymousSubmission',
+      this.handleAnonymousSubmissionChange,
+    )
   }
   this.lockedItems = options.lockedItems || {}
   return (this.cannotEditGrades = !options.canEditGrades)
@@ -1070,7 +1073,6 @@ EditView.prototype.handleQuizTypeChange = function (quizType) {
   if (isUngradedSurvey) {
     this.$assignmentPointsPossible.val('0')
   }
-  this.anonymousSubmissionSelector.$el.closest('.control-group').toggleAccessibly(isUngradedSurvey)
 
   const isSurvey = quizType === 'graded_survey' || quizType === 'ungraded_survey'
   // Hide Assignment Group, Display Grade as, Submission Type and Graded Assignment Fields for surveys
@@ -1078,6 +1080,7 @@ EditView.prototype.handleQuizTypeChange = function (quizType) {
   this.$gradingTypeSelector.toggleAccessibly(!isSurvey)
   this.$submissionTypeFields.toggleAccessibly(!isSurvey)
   this.$gradedAssignmentFields.toggleAccessibly(!isSurvey)
+  this.anonymousSubmissionSelector.$el.closest('.control-group').toggleAccessibly(isSurvey)
 }
 
 EditView.prototype.handleAnonymousSubmissionChange = function (isAnonymous) {
@@ -1452,10 +1455,10 @@ EditView.prototype.toJSON = function () {
         ? ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED
         : void 0) || false,
     is_horizon_course: !!ENV.horizon_course,
-    newQuizzesSurveysFFEnabled:
-      newQuizzesSurveysFFEnabled && this.assignment.isQuizLTIAssignment(),
+    newQuizzesSurveysFFEnabled: newQuizzesSurveysFFEnabled && this.assignment.isQuizLTIAssignment(),
     showAnonymousSubmissionSelector:
-      newQuizzesSurveysFFEnabled && this.assignment.isQuizLTIAssignment() &&
+      newQuizzesSurveysFFEnabled &&
+      this.assignment.isQuizLTIAssignment() &&
       (this.assignment.newQuizzesType() === 'graded_survey' ||
         this.assignment.newQuizzesType() === 'ungraded_survey'),
   })
