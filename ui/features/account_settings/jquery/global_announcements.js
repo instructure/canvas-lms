@@ -74,7 +74,10 @@ export default {
           title_el.focus()
         }, 100)
 
-        RichContentEditor.loadNewEditor(message_el)
+        const rceExists = RichContentEditor.callOnRCE(message_el, 'exists?')
+        if (!rceExists) {
+          RichContentEditor.loadNewEditor(message_el)
+        }
       }
     })
 
@@ -158,7 +161,10 @@ export default {
         target_title_el.focus()
       }, 100)
 
-      RichContentEditor.loadNewEditor(target_message_el)
+      const rceExists = RichContentEditor.callOnRCE(target_message_el, 'exists?')
+      if (!rceExists) {
+        RichContentEditor.loadNewEditor(target_message_el)
+      }
     })
 
     $('.edit_notification_toggle_focus').on('click', function () {
@@ -170,7 +176,11 @@ export default {
           $('#account_notification_subject_' + id).focus()
         }, 100)
       }
-      RichContentEditor.loadNewEditor($(`${form_id} textarea`))
+      const $textarea = $(`${form_id} textarea`)
+      const rceExists = RichContentEditor.callOnRCE($textarea, 'exists?')
+      if (!rceExists) {
+        RichContentEditor.loadNewEditor($textarea)
+      }
     })
 
     $('.add_notification_cancel_focus').on('click', () => {
