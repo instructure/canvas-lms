@@ -359,5 +359,44 @@ describe GradebooksHelper do
       )
       expect(translated_due_date_for_speedgrader(parent)).to eq "Due: Apr 22, 2021 at 10pm"
     end
+
+    it "uses override due date for checkpointed assignment when student has override" do
+      @course.account.enable_feature!(:discussion_checkpoints)
+      parent = @course.assignments.create!(
+        title: "Checkpointed Assignment with Override",
+        has_sub_assignments: true,
+        workflow_state: "published"
+      )
+      checkpoint1 = parent.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+        due_at: "2021-04-15T22:00:24Z"
+      )
+      checkpoint2 = parent.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+        due_at: "2021-04-22T22:00:24Z"
+      )
+      parent_override = parent.assignment_overrides.create!(
+        set_type: AssignmentOverride::SET_TYPE_ADHOC
+      )
+      parent_override.assignment_override_students.create!(user: @student1)
+      override1 = checkpoint1.assignment_overrides.create!(
+        due_at: "2021-05-01T22:00:24Z",
+        due_at_overridden: true,
+        set_type: AssignmentOverride::SET_TYPE_ADHOC,
+        parent_override:
+      )
+      override1.assignment_override_students.create!(user: @student1)
+      override2 = checkpoint2.assignment_overrides.create!(
+        due_at: "2021-05-10T22:00:24Z",
+        due_at_overridden: true,
+        set_type: AssignmentOverride::SET_TYPE_ADHOC,
+        parent_override:
+      )
+      override2.assignment_override_students.create!(user: @student1)
+      @current_user = @student1
+      expect(translated_due_date_for_speedgrader(parent)).to eq "Due: May 10, 2021 at 10pm"
+    end
   end
 end

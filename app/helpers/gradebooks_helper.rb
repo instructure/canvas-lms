@@ -198,7 +198,7 @@ module GradebooksHelper
     end
 
     if assignment.has_sub_assignments?
-      latest_due_date = assignment.sub_assignments.active.maximum(:due_at)
+      latest_due_date = assignment.sub_assignments.active.map { |sub_assignment| sub_assignment.overridden_for(@current_user) }.maximum(:due_at)
       if latest_due_date
         return I18n.t("Due: %{assignment_due_date_time}", assignment_due_date_time: datetime_string(force_zone(latest_due_date)))
       end
