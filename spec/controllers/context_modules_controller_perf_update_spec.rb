@@ -524,6 +524,127 @@ describe ContextModulesController do
     end
   end
 
+  describe "GET 'bulk_items_html'" do
+    render_views
+
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+    end
+
+    let(:page1) { @course.wiki_pages.create! title: "title1" }
+    let(:page2) { @course.wiki_pages.create! title: "title2" }
+
+    let(:module1) do
+      context_module = @course.context_modules.create!
+      context_module.add_item({ type: "wiki_page", id: page1.id }, nil, position: 1)
+      context_module
+    end
+
+    let(:module2) do
+      context_module = @course.context_modules.create!
+      context_module.add_item({ type: "wiki_page", id: page2.id }, nil, position: 1)
+      context_module
+    end
+
+    context "when modules_perf enabled" do
+      before do
+        @course.account.enable_feature!(:modules_perf)
+      end
+
+      context "when there is a user session" do
+        before do
+          user_session(@user)
+        end
+
+        it "returns bad request when module_ids is empty" do
+          get "bulk_items_html", params: { course_id: @course.id, module_ids: [] }
+          assert_status(400)
+        end
+
+        it "returns bad request when module_ids contains non-numeric values" do
+          get "bulk_items_html", params: { course_id: @course.id, module_ids: ["abc", "123"] }
+          assert_status(400)
+          expect(response.parsed_body["error"]).to eq("All module_ids must be numeric")
+        end
+
+        it "returns bad request when module_ids exceeds maximum of 40 modules" do
+          module_ids = (1..41).to_a
+          get "bulk_items_html", params: { course_id: @course.id, module_ids: }
+          assert_status(400)
+          expect(response.parsed_body["error"]).to eq("Cannot request more than 40 modules at once")
+        end
+
+        it "renders items for multiple modules" do
+          get "bulk_items_html", params: { course_id: @course.id, module_ids: [module1.id, module2.id] }
+          assert_status(200)
+
+          result = response.parsed_body
+          expect(result.keys).to contain_exactly(module1.id.to_s, module2.id.to_s)
+          expect(result[module1.id.to_s]["html"]).to include("<ul class=\"ig-list items context_module_items")
+          expect(result[module2.id.to_s]["html"]).to include("<ul class=\"ig-list items context_module_items")
+        end
+
+        it "skips modules that don't exist" do
+          get "bulk_items_html", params: { course_id: @course.id, module_ids: [module1.id, 99_999] }
+          assert_status(200)
+
+          result = response.parsed_body
+          expect(result.keys).to contain_exactly(module1.id.to_s)
+        end
+
+        describe "pagination" do
+          let(:module_with_many_items) do
+            context_module = @course.context_modules.create!
+            30.times do |i|
+              context_module.add_item({ type: "wiki_page", id: page1.id }, nil, position: i)
+            end
+            context_module
+          end
+
+          it "includes pagination info when there are multiple pages" do
+            get "bulk_items_html", params: { course_id: @course.id, module_ids: [module_with_many_items.id], per_page: 10 }
+            assert_status(200)
+
+            result = response.parsed_body
+            pagination = result[module_with_many_items.id.to_s]["pagination"]
+            expect(pagination).not_to be_nil
+            expect(pagination["current_page"]).to eq(1)
+            expect(pagination["total_pages"]).to eq(3)
+            expect(pagination["per_page"]).to eq(10)
+          end
+
+          it "does not include pagination info for single page modules" do
+            get "bulk_items_html", params: { course_id: @course.id, module_ids: [module1.id] }
+            assert_status(200)
+
+            result = response.parsed_body
+            expect(result[module1.id.to_s]["pagination"]).to be_nil
+          end
+
+          it "respects no_pagination parameter" do
+            get "bulk_items_html", params: { course_id: @course.id, module_ids: [module_with_many_items.id], no_pagination: true }
+            assert_status(200)
+
+            result = response.parsed_body
+            expect(result[module_with_many_items.id.to_s]["pagination"]).to be_nil
+          end
+        end
+      end
+    end
+
+    context "when modules_perf disabled" do
+      before do
+        @course.account.disable_feature!(:modules_perf)
+      end
+
+      it "renders 404" do
+        get "bulk_items_html", params: { course_id: @course.id, module_ids: [module1.id] }
+        assert_status(404)
+      end
+    end
+  end
+
   RSpec.shared_examples "rendering when context_module_id is provided" do
     context "when context_module_id is provided" do
       subject do

@@ -445,6 +445,69 @@ class ContextModulesController < ApplicationController
     end
   end
 
+  def bulk_items_html
+    unless @context.account.feature_enabled?(:modules_perf)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    if authorized_action(@context, @current_user, :read)
+      module_ids = params[:module_ids] || []
+      return render json: {}, status: :bad_request if module_ids.empty?
+
+      unless module_ids.all? { |id| id.to_s.match?(/^\d+$/) }
+        return render json: { error: "All module_ids must be numeric" }, status: :bad_request
+      end
+
+      # Limit to 40 modules per request (matches frontend MAX_BATCH_SIZE)
+      max_modules = 40
+      if module_ids.length > max_modules
+        return render json: { error: "Cannot request more than #{max_modules} modules at once" }, status: :bad_request
+      end
+
+      modules = @context.modules_visible_to(@current_user)
+                        .where(id: module_ids)
+                        .preload(content_tags: :content)
+                        .index_by(&:id)
+
+      load_menu_tools
+      load_permissions
+
+      result = {}
+      module_ids.each do |module_id|
+        @module = modules[module_id.to_i]
+        next unless @module
+
+        @items = load_content_tags(@module, @current_user)
+        @items_count = @items.count
+
+        pagination_info = nil
+        unless params[:no_pagination]
+          per_page = params[:per_page]&.to_i || 10
+          total_pages = (@items_count.to_f / per_page).ceil
+          @items = @items.take(per_page)
+
+          # Include pagination info if there are multiple pages
+          if total_pages > 1
+            pagination_info = {
+              current_page: 1,
+              total_pages:,
+              per_page:
+            }
+          end
+        end
+
+        # Render the template for this module (force HTML format)
+        html = render_to_string(template: "context_modules/items_html", layout: false, formats: [:html])
+        result[module_id] = {
+          html:,
+          pagination: pagination_info
+        }
+      end
+
+      render json: result
+    end
+  end
+
   def module_html
     unless @context.account.feature_enabled?(:modules_perf)
       return render status: :not_found, template: "shared/errors/404_message"

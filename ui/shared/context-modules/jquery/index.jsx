@@ -2540,13 +2540,9 @@ function initContextModules() {
 
   // this is the callback after the expand/collapse all button is clicked
   // when the instui header is NOT enabled
-  async function expandCollapseAllButtonHandler(expanding) {
-    if (expanding && ENV.FEATURE_MODULES_PERF) {
-      const moduleSelector = '.context_module.collapsed_module:not(#context_module_blank)'
-      const moduleIds = Array.from(document.querySelectorAll(moduleSelector)).map(
-        d => d.dataset.moduleId,
-      )
-      await modules.lazyLoadItems(moduleIds)
+  async function expandCollapseAllButtonHandler(expanding, collapsedModuleIds) {
+    if (expanding && ENV.FEATURE_MODULES_PERF && collapsedModuleIds?.length > 0) {
+      await modules.lazyLoadItems(collapsedModuleIds)
     }
     $('#expand_collapse_all').prop('disabled', false)
   }

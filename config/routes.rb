@@ -499,6 +499,7 @@ CanvasRails::Application.routes.draw do
       collection do
         post :reorder
         get :progressions
+        get "bulk_items_html" => "context_modules#bulk_items_html", :as => :bulk_items_html
       end
     end
 
