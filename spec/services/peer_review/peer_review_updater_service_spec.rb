@@ -20,6 +20,8 @@
 require "spec_helper"
 
 RSpec.describe PeerReview::PeerReviewUpdaterService do
+  include PeerReviewHelpers
+
   let(:course) { course_model(name: "Course with Assignment") }
   let(:parent_assignment) do
     assignment_model(
@@ -165,7 +167,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
         result = service.call
 
-        expect(result.title).to eq("Updated Parent Assignment Peer Review")
+        expect(result.title).to eq(expected_peer_review_title("Updated Parent Assignment", parent_assignment.peer_review_count))
       end
 
       it "updates title even when peer review sub assignment has incorrect title" do
@@ -173,7 +175,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
         result = service.call
 
-        expect(result.title).to eq("Parent Assignment Peer Review")
+        expect(result.title).to eq(expected_peer_review_title(parent_assignment.title, parent_assignment.peer_review_count))
       end
 
       it "updates group_category_id when parent assignment group_category_id changes" do
