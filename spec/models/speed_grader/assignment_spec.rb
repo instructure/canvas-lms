@@ -859,7 +859,7 @@ describe SpeedGrader::Assignment do
         submissions = @groups.map do |group|
           rep = group.users.sample
           @assignment.grade_student(rep, grade: 10, grader: @teacher).first.tap do |submission|
-            submission.update!(turnitin_data: { blah: 1 })
+            submission.update!(turnitin_data: { blah: {} })
           end
         end
 
@@ -1737,7 +1737,7 @@ describe SpeedGrader::Assignment do
 
     it "includes the OriginalityReport in the json" do
       submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
-      submission.update_attribute(:turnitin_data, { blah: 1 })
+      submission.update_attribute(:turnitin_data, { blah: {} })
       OriginalityReport.create!(attachment:, originality_score: "1", submission:)
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       tii_data = json["submissions"].first["submission_history"].first["submission"]["turnitin_data"]
@@ -1746,7 +1746,7 @@ describe SpeedGrader::Assignment do
 
     it "includes 'has_originality_report' in the json for text entry submissions" do
       submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
-      submission.update_attribute(:turnitin_data, { blah: 1 })
+      submission.update_attribute(:turnitin_data, { blah: {} })
       OriginalityReport.create!(originality_score: "1", submission:)
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       has_report = json["submissions"].first["submission_history"].first["submission"]["has_originality_report"]
@@ -1765,7 +1765,7 @@ describe SpeedGrader::Assignment do
       assignment.submit_homework(user_two, submission_type: "online_upload", attachments: [attachment])
 
       assignment.submissions.each do |s|
-        s.update!(group:, turnitin_data: { blah: 1 })
+        s.update!(group:, turnitin_data: { blah: {} })
       end
 
       report = OriginalityReport.create!(originality_score: "1", submission:, attachment:)
@@ -1779,7 +1779,7 @@ describe SpeedGrader::Assignment do
 
     it "includes 'has_originality_report' in the json" do
       submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
-      submission.update_attribute(:turnitin_data, { blah: 1 })
+      submission.update_attribute(:turnitin_data, { blah: {} })
       OriginalityReport.create!(attachment:, originality_score: "1", submission:)
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       has_report = json["submissions"].first["submission_history"].first["submission"]["has_originality_report"]
@@ -1788,7 +1788,7 @@ describe SpeedGrader::Assignment do
 
     it 'includes "has_plagiarism_tool" if the assignment has a plagiarism tool' do
       submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
-      submission.update_attribute(:turnitin_data, { blah: 1 })
+      submission.update_attribute(:turnitin_data, { blah: {} })
 
       AssignmentConfigurationToolLookup.create!(
         assignment:,
@@ -1805,7 +1805,7 @@ describe SpeedGrader::Assignment do
 
     it 'includes "has_originality_score" if the originality report includes an originality score' do
       submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
-      submission.update_attribute(:turnitin_data, { blah: 1 })
+      submission.update_attribute(:turnitin_data, { blah: {} })
       OriginalityReport.create!(attachment:, originality_score: "1", submission:)
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       has_score = json["submissions"].first["submission_history"].first["submission"]["has_originality_score"]
@@ -1814,7 +1814,7 @@ describe SpeedGrader::Assignment do
 
     it "includes originality data" do
       submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
-      submission.update_attribute(:turnitin_data, { blah: 1 })
+      submission.update_attribute(:turnitin_data, { blah: {} })
       OriginalityReport.create!(attachment:, originality_score: "1", submission:)
       OriginalityReport.create!(originality_score: "1", submission:)
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
@@ -1827,7 +1827,7 @@ describe SpeedGrader::Assignment do
 
     it 'does not override "turnitin_data"' do
       submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
-      submission.update_attribute(:turnitin_data, { test_key: 1 })
+      submission.update_attribute(:turnitin_data, { test_key: {} })
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       keys = json["submissions"].first["submission_history"].first["submission"]["turnitin_data"].keys
       expect(keys).to include "test_key"
