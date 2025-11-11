@@ -1,6 +1,6 @@
 {
   "name": "@instructure/canvas-rce",
-  "version": "7.3.0",
+  "version": "7.3.1",
   "description": "A component wrapping Canvas's usage of Tinymce",
   "main": "es/index.js",
   "types": "es/index.d.ts",
