@@ -44,14 +44,6 @@ describe "student dashboard people widget", :ignore_js_errors do
       expect(message_instructor_button(@ta1.id, @course1.id)).to be_displayed
     end
 
-    it "displays people in pagination" do
-      go_to_dashboard
-
-      expect(all_message_buttons.size).to eq(5)
-      widget_pagination_button("people", "2").click
-      expect(all_message_buttons.size).to eq(1)
-    end
-
     it "can message instructors" do
       go_to_dashboard
 
@@ -66,6 +58,48 @@ describe "student dashboard people widget", :ignore_js_errors do
       message_modal_send_button.click
       expect(message_modal_alert).to be_displayed
       expect(message_modal_alert.text).to include("Your message was sent!")
+    end
+  end
+
+  context "People widget pagination" do
+    before :once do
+      pagination_course_setup # Creates 20 courses with different teachers
+    end
+
+    it "displays all pagination link on initial load" do
+      go_to_dashboard
+
+      expect(all_message_buttons.size).to eq(5)
+      expect(widget_pagination_button("Instructors", "1")).to be_displayed
+      expect(widget_pagination_button("Instructors", "2")).to be_displayed
+      expect(widget_pagination_button("Instructors", "10")).to be_displayed
+      widget_pagination_button("Instructors", "10").click
+      expect(all_message_buttons.size).to eq(1)
+      widget_pagination_button("Instructors", "1").click
+      expect(all_message_buttons.size).to eq(5)
+    end
+
+    it "navigates using prev and next button" do
+      go_to_dashboard
+
+      expect(widget_pagination_button("Instructors", "10")).to be_displayed
+      expect(element_exists?(widget_pagination_prev_button_selector("Instructors"))).to be_falsey
+      widget_pagination_next_button("Instructors").click
+      expect(widget_pagination_prev_button("Instructors")).to be_displayed
+      widget_pagination_next_button("Instructors").click
+      expect(widget_pagination_button("Instructors", "4")).to be_displayed
+      widget_pagination_next_button("Instructors").click
+      widget_pagination_button("Instructors", "10").click
+      expect(element_exists?(widget_pagination_next_button_selector("Instructors"))).to be_falsey
+
+      widget_pagination_prev_button("Instructors").click
+      expect(widget_pagination_next_button("Instructors")).to be_displayed
+      widget_pagination_prev_button("Instructors").click
+      expect(widget_pagination_button("Instructors", "7")).to be_displayed
+      widget_pagination_prev_button("Instructors").click
+      expect(widget_pagination_button("Instructors", "6")).to be_displayed
+      widget_pagination_button("Instructors", "1").click
+      expect(element_exists?(widget_pagination_prev_button_selector("Instructors"))).to be_falsey
     end
   end
 end

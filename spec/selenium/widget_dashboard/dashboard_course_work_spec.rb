@@ -135,7 +135,7 @@ describe "student dashboard Course work widget", :ignore_js_errors do
       filter_course_work_by(:date, "Next 14 days")
       expect(all_course_work_items.size).to eq(6)
       expect(course_work_summary_stats("Due").text).to eq("7\nDue")
-      widget_pagination_button("course-work-combined", "2").click
+      widget_pagination_button("Course work", "2").click
       expect(all_course_work_items.size).to eq(1)
     end
   end
@@ -188,6 +188,56 @@ describe "student dashboard Course work widget", :ignore_js_errors do
       filter_course_work_by(:date, "Missing")
       expect(all_course_work_items.size).to eq(6)
       expect(course_work_summary_stats("Missing").text).to eq("6\nMissing")
+    end
+  end
+
+  context "Course work widget pagination" do
+    before :once do
+      dashboard_course_submission_setup
+      pagination_submission_setup # Creates 70 assignments
+    end
+
+    it "displays all pagination link on initial load" do
+      go_to_dashboard
+
+      filter_course_work_by(:date, "Next 14 days")
+      expect(widget_pagination_button("Course work", "5")).to be_displayed
+      widget_pagination_button("Course work", "5").click
+      expect(widget_pagination_button("Course work", "1")).to be_displayed
+
+      filter_course_work_by(:date, "Missing")
+      expect(widget_pagination_button("Course work", "6")).to be_displayed
+      widget_pagination_button("Course work", "6").click
+      expect(widget_pagination_button("Course work", "1")).to be_displayed
+
+      filter_course_work_by(:date, "Submitted")
+      expect(widget_pagination_button("Course work", "4")).to be_displayed
+      widget_pagination_button("Course work", "4").click
+      expect(widget_pagination_button("Course work", "1")).to be_displayed
+      widget_pagination_button("Course work", "1").click
+      expect(widget_pagination_button("Course work", "4")).to be_displayed
+    end
+
+    it "maintains pagination when switching filters" do
+      go_to_dashboard
+
+      filter_course_work_by(:date, "Next 14 days")
+      expect(widget_pagination_button("Course work", "5")).to be_displayed
+
+      filter_course_work_by(:date, "Missing")
+      expect(widget_pagination_button("Course work", "6")).to be_displayed
+
+      filter_course_work_by(:date, "Submitted")
+      expect(widget_pagination_button("Course work", "4")).to be_displayed
+      widget_pagination_button("Course work", "4").click
+      widget_pagination_button("Course work", "1").click
+      expect(widget_pagination_button("Course work", "4")).to be_displayed
+
+      filter_course_work_by(:date, "Next 3 days")
+      expect(element_exists?(widget_pagination_container_selector("Course work"))).to be_falsey
+
+      filter_course_work_by(:date, "Missing")
+      expect(widget_pagination_button("Course work", "6")).to be_displayed
     end
   end
 end
