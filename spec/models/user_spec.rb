@@ -2290,6 +2290,19 @@ describe User do
               expect(result).to eq unknown_url
             end
           end
+
+          context "with a bad url" do
+            it "doesn't error when url is nil" do
+              result = user.avatar_location(nil)
+              expect(result).to be_nil
+            end
+
+            it "doesn't error when a url is malformed" do
+              bad_url = "hi "
+              result = user.avatar_location(bad_url)
+              expect(result).to eq bad_url
+            end
+          end
         end
 
         context "when avatar_image_source is external" do
