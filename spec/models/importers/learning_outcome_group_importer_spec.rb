@@ -46,17 +46,6 @@ describe "Importing Learning Outcome Groups" do
     }.merge(overrides)
   end
 
-  it "processes attachment associations" do
-    aa_test_data = AttachmentAssociationsSpecHelper.new(@context.account, @context)
-    @migration.user = @teacher
-    log_data = group_data
-    log_data[:description] = aa_test_data.base_html
-    Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
-    expect(@context.learning_outcome_groups.count).to eq 2
-    expect(@context.learning_outcome_groups.last.attachment_associations.count).to eq 1
-    expect(@context.learning_outcome_groups.last.attachment_associations.first.attachment_id).to eq aa_test_data.attachment1.id
-  end
-
   it "does not import an outcome group if skip import enabled" do
     log_data = group_data
     expect do

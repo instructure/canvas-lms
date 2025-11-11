@@ -232,7 +232,6 @@ module Importers
       end
 
       item.saved_by = :migration
-      item.updating_user = migration.user
 
       # Putting date shift here since this is the first place where we save after the dates are set
       # This is important to avoid issues to try to put the shifted dates to the model and not update later
@@ -246,9 +245,6 @@ module Importers
       build_assignment = false
 
       import_questions(item, hash, context, migration, question_data, new_record)
-
-      # necessary to set again as the above can do item.reload
-      item.updating_user = migration.user
 
       if hash[:assignment]
         if hash[:assignment][:migration_id] && !hash[:assignment][:migration_id].start_with?(MasterCourses::MIGRATION_ID_PREFIX)

@@ -114,7 +114,6 @@ module Importers
       item ||= context.assignments.temp_record # new(:context => context)
 
       item.updating_user = migration.user
-      item.saving_user = migration.user
       item.saved_by = :migration
       item.mark_as_importing!(migration)
       master_migration = migration&.for_master_course_import? # propagate null dates only for blueprint syncs

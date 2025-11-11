@@ -125,8 +125,6 @@ describe Importers::CalendarEventImporter do
       expect(event.description).to match(aa_test_data.base_html)
       expect(event.description).to match("example.com")
       expect(event.blackout_date).to be_truthy
-      expect(event.attachment_associations.count).to eq 1
-      expect(event.attachment_associations.first.attachment_id).to eq aa_test_data.attachment1.id
     end
   end
 

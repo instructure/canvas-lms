@@ -1649,7 +1649,6 @@ class DiscussionTopicsController < ApplicationController
     end
     @topic.current_user = @current_user
     @topic.content_being_saved_by(@current_user)
-    @topic.saving_user = @current_user
 
     if discussion_topic_hash.key?(:message)
       discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])

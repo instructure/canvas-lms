@@ -1072,7 +1072,7 @@ describe ContentMigration do
         run_course_copy
         media_to = @copy_to.attachments.find_by(context: @copy_to, migration_id: mig_id(media))
         expect(@copy_to.media_objects.count).to eq 0
-        expect(@copy_to.syllabus_body).to include "/media_attachments_iframe/#{media_to.id}?type=video&amp;embedded=true"
+        expect(@copy_to.syllabus_body).to include "/media_attachments_iframe/#{media_to.id}?type=video&embedded=true"
         expect(@copy_to.attachment_associations.pluck(:attachment_id)).to include(media_to.id)
       end
 

@@ -38,21 +38,6 @@ describe "Importing wikis" do
     end
   end
 
-  it "processes attachment associations" do
-    data = get_import_data("bb9", "wiki")
-    context = get_import_context("bb9")
-    migration = context.content_migrations.create!
-    migration.user = @teacher
-
-    aa_test_data = AttachmentAssociationsSpecHelper.new(context.account, context)
-    data["text"] = aa_test_data.base_html
-    Importers::WikiPageImporter.import_from_migration(data, context, migration)
-
-    expect(context.wiki_pages.count).to eq 1
-    expect(context.wiki_pages.first.attachment_associations.count).to eq 1
-    expect(context.wiki_pages.first.attachment_associations.first.attachment_id).to eq aa_test_data.attachment1.id
-  end
-
   it "updates BB9 wiki page links to the correct url" do
     data = get_import_data("bb9", "wikis")
     context = get_import_context("bb9")
