@@ -20,9 +20,14 @@ import {renderHook, act} from '@testing-library/react-hooks/dom'
 import {usePeerReviewSettings, MAX_NUM_PEER_REVIEWS} from '../usePeerReviewSettings'
 
 describe('usePeerReviewSettings', () => {
-  const defaultProps = (): {peerReviewCount: number; submissionRequired: boolean} => ({
+  const defaultProps = (): {
+    peerReviewCount: number
+    submissionRequired: boolean
+    acrossSections: boolean
+  } => ({
     peerReviewCount: 0,
     submissionRequired: false,
+    acrossSections: true,
   })
 
   it('initializes with default values', () => {
@@ -33,7 +38,7 @@ describe('usePeerReviewSettings', () => {
     expect(result.current.totalPoints).toBe('0')
     expect(result.current.errorMessageReviewsRequired).toBeUndefined()
     expect(result.current.errorMessagePointsPerReview).toBeUndefined()
-    expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(false)
+    expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(true)
     expect(result.current.allowPeerReviewWithinGroups).toBe(false)
     expect(result.current.usePassFailGrading).toBe(false)
     expect(result.current.anonymousPeerReviews).toBe(false)
@@ -59,6 +64,20 @@ describe('usePeerReviewSettings', () => {
       usePeerReviewSettings({...defaultProps(), submissionRequired: true}),
     )
     expect(result.current.submissionsRequiredBeforePeerReviews).toBe(true)
+  })
+
+  it('sets initial allowPeerReviewAcrossMultipleSections to true when acrossSections is true', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), acrossSections: true}),
+    )
+    expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(true)
+  })
+
+  it('sets initial allowPeerReviewAcrossMultipleSections to false when acrossSections is false', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), acrossSections: false}),
+    )
+    expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(false)
   })
 
   describe('reviews required validation', () => {
@@ -647,7 +666,7 @@ describe('usePeerReviewSettings', () => {
 
       act(() => {
         result.current.handleCrossSectionsCheck({
-          target: {checked: true},
+          target: {checked: false},
         } as React.ChangeEvent<HTMLInputElement>)
         result.current.handleInterGroupCheck({
           target: {checked: true},
@@ -667,7 +686,7 @@ describe('usePeerReviewSettings', () => {
       expect(result.current.pointsPerReview).toBe('-5')
       expect(result.current.errorMessageReviewsRequired).toBeDefined()
       expect(result.current.errorMessagePointsPerReview).toBeDefined()
-      expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(true)
+      expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(false)
       expect(result.current.allowPeerReviewWithinGroups).toBe(true)
       expect(result.current.usePassFailGrading).toBe(true)
       expect(result.current.anonymousPeerReviews).toBe(true)
@@ -681,7 +700,7 @@ describe('usePeerReviewSettings', () => {
       expect(result.current.pointsPerReview).toBe('0')
       expect(result.current.errorMessageReviewsRequired).toBeUndefined()
       expect(result.current.errorMessagePointsPerReview).toBeUndefined()
-      expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(false)
+      expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(true)
       expect(result.current.allowPeerReviewWithinGroups).toBe(false)
       expect(result.current.usePassFailGrading).toBe(false)
       expect(result.current.anonymousPeerReviews).toBe(false)

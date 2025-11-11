@@ -1584,6 +1584,10 @@ EditView.prototype.getFormData = function () {
       'peer_reviews_submission_required_checkbox',
     )
     data.peer_review_submission_required = submissionRequiredInput?.checked
+    const acrossSectionsInput = document.getElementById(
+      'peer_reviews_across_sections_checkbox_hidden',
+    )
+    data.peer_review_across_sections = acrossSectionsInput?.value === 'true'
   }
   return data
 }

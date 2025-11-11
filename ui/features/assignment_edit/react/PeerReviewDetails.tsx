@@ -196,6 +196,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
   } = usePeerReviewSettings({
     peerReviewCount: assignment.peerReviewCount(),
     submissionRequired: assignment.peerReviewSubmissionRequired(),
+    acrossSections: assignment.peerReviewAcrossSections(),
   })
 
   const validatePeerReviewDetails = useCallback(() => {
@@ -292,6 +293,16 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
 
   return (
     <Flex as="div" direction="column" width="100%">
+      {peerReviewChecked && (
+        <Flex.Item>
+          <input
+            type="hidden"
+            id="peer_reviews_across_sections_checkbox_hidden"
+            name="peer_reviews_across_sections_hidden"
+            value={allowPeerReviewAcrossMultipleSections ? 'true' : 'false'}
+          />
+        </Flex.Item>
+      )}
       <Flex.Item>
         <Flex direction="column" padding="medium 0 medium x-small">
           <Flex.Item as="div" padding="xx-small">
