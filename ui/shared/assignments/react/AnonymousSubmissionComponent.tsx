@@ -41,10 +41,9 @@ export const AnonymousSubmissionComponent: React.FC<AnonymousSubmissionComponent
 
   return (
     <fieldset id="overrides-wrapper">
-      <div className="form-column-left" style={{ width: 'unset' }}>
+      <div className="form-column-left" style={{width: 'unset'}}>
         <label>{I18n.t('anonymous_submission', 'Anonymous Submission')}</label>
       </div>
-      <p>&nbsp;</p>
       <div className="overrides-column-right js-assignment-overrides overrideFormFlex border border-trbl border-round">
         <View as="div" padding="space24 space12" margin="0 0 0 space4">
           <Checkbox
@@ -62,7 +61,7 @@ export const AnonymousSubmissionComponent: React.FC<AnonymousSubmissionComponent
                 'Anonymity can only be changed when creating a new Survey',
               )}
             </Text>
-            <View as="div" margin='space12 0 0 0'>
+            <View as="div" margin="space12 0 0 0">
               <Text size="small">
                 {I18n.t(
                   'anonymous_submission_description2',
