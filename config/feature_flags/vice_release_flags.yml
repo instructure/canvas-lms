@@ -93,13 +93,6 @@ smart_alerts:
     Notify students in time of assignments that require their attention.
   applies_to: RootAccount
 
-show_push_notification_account_setting:
-  state: hidden
-  display_name: Allow push notification opt-out
-  description: |-
-    Enable an account setting which toggles push notifications for that account
-  applies_to: SiteAdmin
-
 apollo_caching:
   state: hidden
   display_name: Apollo caching
