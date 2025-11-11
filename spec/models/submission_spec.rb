@@ -3123,6 +3123,7 @@ describe Submission do
               state: originality_report.state,
               attachment_id: originality_report.attachment_id,
               report_url: originality_report.originality_report_url,
+              view_report_url: "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/originality_report/#{originality_report.asset_key}?attempt=#{submission.attempt}",
               status: originality_report.workflow_state,
               error_message: nil,
               created_at: originality_report.created_at,
@@ -3237,6 +3238,7 @@ describe Submission do
               attachment_id: attachment.id,
               state: originality_report.state,
               report_url: originality_report.originality_report_url,
+              view_report_url: "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/originality_report/#{originality_report.asset_key}?attempt=#{submission.attempt}",
               status: originality_report.workflow_state,
               error_message: nil,
               created_at: originality_report.created_at,
@@ -3280,6 +3282,7 @@ describe Submission do
                                                       attachment_id: nil,
                                                       state: originality_report.state,
                                                       report_url: originality_report.originality_report_url,
+                                                      view_report_url: "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/originality_report/#{originality_report.asset_key}?attempt=#{submission.attempt}",
                                                       status: originality_report.workflow_state,
                                                       error_message: nil,
                                                       created_at: originality_report.created_at,
@@ -3297,6 +3300,123 @@ describe Submission do
 
         it "includes the error message" do
           expect(subject[:error_message]).to eq error_message
+        end
+      end
+
+      describe "view_report_url" do
+        let(:tii_data) do
+          {
+            similarity_score: 10,
+            state: "acceptable",
+            report_url: "http://example.com",
+            status: "scored"
+          }
+        end
+
+        shared_examples_for "sets view_report_url with correct attempt" do |expected_attempt|
+          it "includes correct attempt query param in view_report_url" do
+            expect(submission.originality_data[attachment.asset_string][:view_report_url]).to include("attempt=#{expected_attempt}")
+          end
+        end
+
+        context "when only turnitin_data exists on submission" do
+          before { submission.turnitin_data[attachment.asset_string] = tii_data }
+
+          it "generates view_report_url with turnitin path" do
+            originality_data = submission.originality_data[attachment.asset_string]
+            expect(originality_data[:view_report_url]).to eq(
+              "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/turnitin/#{attachment.asset_string}?attempt=#{submission.attempt}"
+            )
+          end
+
+          it_behaves_like "sets view_report_url with correct attempt", 1
+
+          context "with attempt set to 3" do
+            before { submission.update!(attempt: 3) }
+
+            it_behaves_like "sets view_report_url with correct attempt", 3
+          end
+        end
+
+        context "when only originality data exists" do
+          before do
+            originality_report.originality_report_url = "http://example.com"
+            originality_report.save!
+          end
+
+          it "generates view_report_url with originality_report path" do
+            originality_data = submission.originality_data[attachment.asset_string]
+            expect(originality_data[:view_report_url]).to eq(
+              "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/originality_report/#{originality_report.asset_key}?attempt=#{submission.attempt}"
+            )
+          end
+
+          it_behaves_like "sets view_report_url with correct attempt", 1
+
+          context "with attempt set to 5" do
+            before { submission.update!(attempt: 5) }
+
+            it_behaves_like "sets view_report_url with correct attempt", 5
+          end
+        end
+
+        context "when both turnitin and originality data exist" do
+          before do
+            originality_report.originality_report_url = "http://example.com"
+            originality_report.save!
+            submission.turnitin_data[attachment.asset_string] = tii_data.merge(report_url: "http://example.com/tii", status: "pending")
+          end
+
+          it "generates view_report_url with originality_report path" do
+            originality_data = submission.originality_data[attachment.asset_string]
+            expect(originality_data[:view_report_url]).to eq(
+              "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/originality_report/#{originality_report.asset_key}?attempt=#{submission.attempt}"
+            )
+          end
+        end
+
+        context "with anonymous grading enabled" do
+          before do
+            submission.assignment.update!(anonymous_grading: true)
+            submission.update!(anonymous_id: "abc12")
+          end
+
+          context "when only turnitin_data exists" do
+            before { submission.turnitin_data[attachment.asset_string] = tii_data }
+
+            it "generates view_report_url with anonymous_submissions path and anonymous_id" do
+              originality_data = submission.originality_data[attachment.asset_string]
+              expect(originality_data[:view_report_url]).to eq(
+                "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/anonymous_submissions/#{submission.anonymous_id}/turnitin/#{attachment.asset_string}?attempt=#{submission.attempt}"
+              )
+            end
+          end
+
+          context "when only originality report exists" do
+            before do
+              originality_report.originality_report_url = "http://example.com"
+              originality_report.save!
+            end
+
+            it "generates view_report_url with anonymous_submissions path and anonymous_id" do
+              originality_data = submission.originality_data[attachment.asset_string]
+              expect(originality_data[:view_report_url]).to eq(
+                "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/anonymous_submissions/#{submission.anonymous_id}/originality_report/#{originality_report.asset_key}?attempt=#{submission.attempt}"
+              )
+            end
+          end
+        end
+
+        context "when vericite is enabled" do
+          before do
+            allow(submission.assignment).to receive(:vericite_enabled?).and_return(true)
+            submission.turnitin_data[attachment.asset_string] = tii_data
+          end
+
+          it "does not add view_report_url to originality data" do
+            originality_data = submission.originality_data[attachment.asset_string]
+            expect(originality_data).not_to have_key(:view_report_url)
+          end
         end
       end
     end

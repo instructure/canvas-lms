@@ -935,14 +935,35 @@ class Submission < ActiveRecord::Base
         state: originality_report.state,
         attachment_id: originality_report.attachment_id,
         report_url: originality_report.report_launch_path(assignment),
+        view_report_url: view_report_url("originality_report", originality_report.asset_key),
         status: originality_report.workflow_state,
         error_message: originality_report.error_message,
         created_at: originality_report.created_at,
         updated_at: originality_report.updated_at,
       }
     end
-    turnitin_data.except(:webhook_info, :provider, :last_processed_attempt).merge(data)
+
+    legacy_turnitin_data = turnitin_data.except(:webhook_info, :provider, :last_processed_attempt)
+    merged_data = legacy_turnitin_data.merge(data)
+
+    return merged_data if assignment.vericite_enabled?
+
+    legacy_turnitin_data.each_key do |asset_key|
+      next if merged_data[asset_key].key?(:view_report_url)
+
+      merged_data[asset_key][:view_report_url] = view_report_url("turnitin", asset_key)
+    end
+
+    merged_data
   end
+
+  def view_report_url(report_type, asset_key)
+    submission_identifier = assignment.anonymize_students? ? anonymous_id : user_id
+    url_path_prefix = assignment.anonymize_students? ? "anonymous_submissions" : "submissions"
+
+    "/courses/#{assignment.context_id}/assignments/#{assignment_id}/#{url_path_prefix}/#{submission_identifier}/#{report_type}/#{asset_key}?attempt=#{attempt}"
+  end
+  private :view_report_url
 
   # Returns an array of the versioned originality reports in a sorted order. The ordering goes
   # from least preferred report to most preferred reports, assuming there are reports that share
