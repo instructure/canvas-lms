@@ -123,6 +123,12 @@ class AssignmentsController < ApplicationController
       (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
   end
 
+  def render_a2_peer_review_student_view?
+    @current_user.present? && @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
+      @assignment.peer_reviews && @context.feature_enabled?(:peer_review_allocation) &&
+      (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
+  end
+
   def a2_active_student_and_enrollment
     return [@current_user, @context_enrollment] unless @context_enrollment&.observer?
 
@@ -240,6 +246,28 @@ class AssignmentsController < ApplicationController
            })
     css_bundle :assignments_2_student
     js_bundle :assignments_show_student
+    render html: "", layout: true
+  end
+
+  def render_a2_peer_review_student_view
+    student_to_view, = a2_active_student_and_enrollment
+    unless student_to_view.present?
+      flash[:notice] = t "No student is being observed."
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
+      return
+    end
+
+    js_env({
+             ASSIGNMENT_ID: @assignment.id,
+           })
+
+    if @context.root_account.feature_enabled?(:instui_nav)
+      add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+      add_crumb(t("Peer Reviews"))
+    end
+
+    css_bundle :assignments_2_student
+    js_bundle :assignments_peer_reviews_student
     render html: "", layout: true
   end
 
@@ -701,16 +729,21 @@ class AssignmentsController < ApplicationController
 
   def peer_reviews
     @assignment = @context.assignments.active.find(params[:assignment_id])
+
+    unless @assignment.has_peer_reviews?
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
+      return
+    end
+
+    if render_a2_peer_review_student_view?
+      return render_a2_peer_review_student_view
+    end
+
     js_env({
              ASSIGNMENT_ID: @assignment.id,
              COURSE_ID: @context.id
            })
     if authorized_action(@assignment, @current_user, :grade)
-      unless @assignment.has_peer_reviews?
-        redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
-        return
-      end
-
       if @context.root_account.feature_enabled?(:instui_nav)
         add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
         add_crumb(t("Peer Reviews"))

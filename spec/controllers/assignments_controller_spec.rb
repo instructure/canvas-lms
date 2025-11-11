@@ -3507,4 +3507,100 @@ describe AssignmentsController do
       end
     end
   end
+
+  describe "GET 'peer_reviews' with A2 student view" do
+    before :once do
+      @assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        workflow_state: "published",
+        peer_reviews: true,
+        submission_types: "text_entry"
+      )
+      @student2 = student_in_course(active_all: true).user
+      @assignment.assign_peer_review(@student, @student2)
+    end
+
+    context "when assignment does not have peer reviews enabled" do
+      it "redirects to the assignment page" do
+        @assignment.update!(peer_reviews: false)
+        user_session(@student)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to redirect_to(course_assignment_url(@course, @assignment))
+      end
+    end
+
+    context "when all conditions for A2 peer review student view are met" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation)
+        @course.enable_feature!(:assignments_2_student)
+        @course.enable_feature!(:peer_reviews_for_a2)
+      end
+
+      before do
+        user_session(@student)
+      end
+
+      it "renders the A2 peer review student view" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:ok)
+        expect(response).to render_template(layout: "layouts/application")
+      end
+
+      it "sets ASSIGNMENT_ID in js_env" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:js_env][:ASSIGNMENT_ID]).to eq(@assignment.id)
+      end
+    end
+
+    context "when user is a teacher" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation)
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "does not render A2 peer review student view" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:ok)
+        expect(assigns[:js_env][:ASSIGNMENT_ID]).to eq(@assignment.id)
+        expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
+        expect(assigns[:students_dropdown_list]).to be_present
+      end
+    end
+
+    context "when peer_review_allocation feature is disabled" do
+      before :once do
+        @course.disable_feature!(:peer_review_allocation)
+        @course.enable_feature!(:assignments_2_student)
+        @course.enable_feature!(:peer_reviews_for_a2)
+      end
+
+      before do
+        user_session(@student)
+      end
+
+      it "does not render A2 peer review student view" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "when assignments_2_student feature is disabled" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation)
+        @course.disable_feature!(:assignments_2_student)
+      end
+
+      before do
+        user_session(@student)
+      end
+
+      it "does not render A2 peer review student view" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
 end
