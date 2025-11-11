@@ -16,12 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom/client'
-import {App} from './react/App'
-
-const rootElement = document.getElementById('content')
-
-if (rootElement) {
-  const root = ReactDOM.createRoot(rootElement)
-  root.render(<App />)
-}
+export {AccessibilityWizard} from './AccessibilityWizard'

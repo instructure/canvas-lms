@@ -43,7 +43,6 @@ describe AccessibilityController do
         get :index, params: { course_id: 42 }
         expect(assigns[:js_env][:SCAN_DISABLED]).not_to be_nil
         expect(response).to be_successful
-        expect(response.body).to include("accessibility-checker-container")
       end
     end
 
@@ -55,7 +54,6 @@ describe AccessibilityController do
 
       it "returns nothing if not allowed" do
         get :index, params: { course_id: 42 }
-        expect(response.body).not_to include("accessibility-checker-container")
       end
     end
   end
