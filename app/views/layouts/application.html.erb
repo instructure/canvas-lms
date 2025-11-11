@@ -115,9 +115,6 @@ end
 <%if !@content_only && @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
   <div id="drawer-layout-mount-point"></div>
 <% end %>
-<%if @context&.is_a?(Course) && @context.a11y_checker_enabled? %>
-  <div id="a11y-checker-drawer-layout-mount-point"></div>
-<% end %>
 <div id="application" class="ic-app <%= 'content-only' if @content_only %>">
   <%= render(:partial => 'shared/new_nav_header') unless @headers == false || @content_only %>
 

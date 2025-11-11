@@ -116,17 +116,6 @@ describe('AccessibilityIssuesDrawerContent', () => {
     )
   })
 
-  it('calls onClose when close button is clicked', async () => {
-    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
-
-    const closeButton = screen
-      .getByTestId('close-button')
-      .querySelector('button') as HTMLButtonElement
-    fireEvent.click(closeButton)
-
-    expect(mockClose).toHaveBeenCalledTimes(1)
-  })
-
   describe('Save and Next button', () => {
     describe('is enabled', () => {
       it('when the issue is remediated', async () => {

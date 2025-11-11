@@ -355,12 +355,8 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   if (isRequestInFlight) return renderSpinner()
 
   return (
-    <View
-      position={pageView ? 'relative' : 'fixed'}
-      overflowY="auto"
-      width={pageView ? '100%' : 'auto'}
-    >
-      <Flex as="div" direction="column" height={pageView ? 'auto' : '100vh'} width="100%">
+    <View position={'relative'} width={pageView ? '100%' : 'auto'} overflowY="auto">
+      <Flex as="div" direction="column" height={pageView ? 'auto' : '100%'} width="100%">
         <Flex.Item
           as="header"
           padding="medium"
@@ -372,15 +368,6 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
             <Heading level="h2" variant="titleCardRegular">
               {current.resource.resourceName}
             </Heading>
-            {!window.ENV.FEATURES?.accessibility_issues_in_full_page && (
-              <CloseButton
-                placement="end"
-                data-testid="close-button"
-                margin="small"
-                screenReaderLabel={I18n.t('Close')}
-                onClick={onClose}
-              />
-            )}
           </View>
           <View>
             <Text size="large" variant="descriptionPage" as="h3">
@@ -393,7 +380,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
             </Text>
           </View>
         </Flex.Item>
-        <Flex.Item as="main" padding="x-small medium" shouldGrow={true}>
+        <Flex.Item as="main" padding="x-small medium" shouldGrow={true} overflowY="auto">
           <Flex justifyItems="space-between">
             <Text weight="weightImportant">{I18n.t('Problem area')}</Text>
             <Flex gap="small">
