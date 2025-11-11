@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface NutritionFactsProps {
-  aiInformation: {
+declare module '@instructure.ai/aiinfo' {
+  export interface AiInformation {
     data: Array<{
       featureName: string
       permissionLevel: string
@@ -29,15 +29,17 @@ export interface NutritionFactsProps {
       nutritionFactsModalTriggerText: string
     }>
   }
-  dataPermissionLevels: {
+
+  export interface DataPermissionLevel {
     data: Array<{
       level: string
       title: string
       description: string
-      highlighted?: boolean | undefined
+      highlighted?: boolean
     }>
   }
-  nutritionFacts: {
+
+  export interface NutritionFact {
     featureName: string
     data: Array<{
       blockTitle: string
@@ -49,14 +51,14 @@ export interface NutritionFactsProps {
       }>
     }>
   }
-  iconSize?: number
-  responsiveProps: ResponsiveProps
-}
 
-interface ResponsiveProps {
-  domElement: string
-  fullscreenModals: boolean
-  color: 'primary' | 'secondary'
-  buttonColor: 'primary' | 'primary-inverse'
-  withBackground: boolean
+  export interface FeatureInfo {
+    aiInformation: AiInformation
+    dataPermissionLevels: DataPermissionLevel
+    nutritionFacts: NutritionFact
+  }
+
+  export const AiInfo: {
+    [feature: string]: FeatureInfo
+  }
 }
