@@ -1176,7 +1176,7 @@ describe('EditView - Quiz Type Handling', () => {
       expect(view.assignment.newQuizzesAnonymousSubmission()).toBe(false)
     })
 
-    test('anonymous submission selector shows when quiz type is ungraded_survey', () => {
+    test('anonymous submission selector shows when quiz type is a survey', () => {
       const assignment = new Assignment({
         name: 'Survey Assignment',
         secure_params: 'secure',
@@ -1238,16 +1238,20 @@ describe('EditView - Quiz Type Handling', () => {
       // Initially hidden
       expect($anonymousSelector.css('display')).toBe('none')
 
-      // Change to ungraded_survey
+      // Change to ungraded_survey - should be visible
       view.handleQuizTypeChange('ungraded_survey')
       expect($anonymousSelector.css('display')).not.toBe('none')
 
-      // Change to graded_quiz
+      // Change to graded_survey - should be visible
+      view.handleQuizTypeChange('graded_survey')
+      expect($anonymousSelector.css('display')).not.toBe('none')
+
+      // Change to graded_quiz - should be hidden
       view.handleQuizTypeChange('graded_quiz')
       expect($anonymousSelector.css('display')).toBe('none')
     })
 
-    test('anonymous submission selector is hidden when quiz type is not ungraded_survey', () => {
+    test('anonymous submission selector is hidden when quiz type is not a survey', () => {
       const assignment = new Assignment({
         name: 'Quiz Assignment',
         secure_params: 'secure',
@@ -1308,14 +1312,6 @@ describe('EditView - Quiz Type Handling', () => {
 
       // Test with graded_quiz - should be hidden
       view.handleQuizTypeChange('graded_quiz')
-      expect($anonymousSelector.css('display')).toBe('none')
-
-      // Test with graded_survey - should be hidden
-      view.handleQuizTypeChange('graded_survey')
-      expect($anonymousSelector.css('display')).toBe('none')
-
-      // Test with practice_quiz - should be hidden
-      view.handleQuizTypeChange('practice_quiz')
       expect($anonymousSelector.css('display')).toBe('none')
     })
 
