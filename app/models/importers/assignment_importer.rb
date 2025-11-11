@@ -710,6 +710,13 @@ module Importers
     end
 
     def self.import_asset_processors(assignment, asset_processors_data, migration)
+      # for blueprint sync don't import if assignment has downstream changes and the assignment is not locked
+      if migration&.for_master_course_import?
+        content = assignment.discussion_topic? ? assignment.discussion_topic : assignment
+        content_tag = migration.master_course_subscription.content_tag_for(content)
+        return if content_tag&.downstream_changes&.any? && !content.editing_restricted?(:any)
+      end
+
       asset_processors_data.each do |ap_data|
         # Skip already existing APs: asset processors are immutable, so there's no need to update existing ones
         next if assignment.lti_asset_processors.where(migration_id: ap_data[:migration_id]).exists?

@@ -789,6 +789,10 @@ class ContentMigration < ActiveRecord::Base
 
   def process_master_deletions(deletions)
     deletions.each_key do |klass|
+      if MasterCourses::SUB_TYPES_FOR_DELETIONS.include?(klass)
+        process_master_deletion_for_subtypes(deletions[klass], klass) if deletions[klass].present?
+        next
+      end
       next unless MasterCourses::CONTENT_TYPES_FOR_DELETIONS.include?(klass)
 
       mig_ids = deletions[klass]
@@ -848,6 +852,33 @@ class ContentMigration < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def process_master_deletion_for_subtypes(migration_ids, klass)
+    return unless context.is_a?(Course) # blueprint syncs works only for courses
+    return if klass == "Lti::AssetProcessor" && !root_account.feature_enabled?(:lti_asset_processor)
+
+    item_scope = case klass
+                 when "Lti::AssetProcessor"
+                   Lti::AssetProcessor.active.where(migration_id: migration_ids, assignment: context.assignments)
+                 end
+    item_scope.each do |subcontent|
+      content = case klass
+                when "Lti::AssetProcessor"
+                  subcontent.assignment.discussion_topic? ? subcontent.assignment.discussion_topic : subcontent.assignment
+                end
+      if skip_blueprint_sync_deletion?(content)
+        Rails.logger.debug { "skipping deletion sync for #{klass} #{subcontent.migration_id} due to downstream changes" }
+        add_skipped_item(subcontent.migration_id)
+        next
+      end
+      subcontent.destroy
+    end
+  end
+
+  def skip_blueprint_sync_deletion?(content)
+    child_tag = master_course_subscription.content_tag_for(content)
+    child_tag&.downstream_changes&.any? && !content.editing_restricted?(:any)
   end
 
   def map_merge(old_item, new_item)
