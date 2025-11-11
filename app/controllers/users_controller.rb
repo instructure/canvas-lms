@@ -2932,7 +2932,7 @@ class UsersController < ApplicationController
         if user_saved
           invited_users << user_hash.merge(id: user.id, user_token: user.token)
         else
-          errored_users << user_hash.merge(user.errors.as_json)
+          errored_users << user_hash.merge(Api::Errors::Reporter.to_json(user.errors))
         end
       end
     end
