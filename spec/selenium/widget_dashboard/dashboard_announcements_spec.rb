@@ -40,7 +40,7 @@ describe "student dashboard announcements widget", :ignore_js_errors do
       go_to_dashboard
 
       expect(all_announcement_items.size).to eq(3)
-      widget_pagination_button("announcements", "2").click
+      widget_pagination_button("Announcements", "2").click
       expect(all_announcement_items.size).to eq(2)
 
       filter_announcements_list_by("Read")
@@ -48,9 +48,9 @@ describe "student dashboard announcements widget", :ignore_js_errors do
 
       filter_announcements_list_by("All")
       expect(all_announcement_items.size).to eq(3)
-      widget_pagination_button("announcements", "2").click
+      widget_pagination_button("Announcements", "2").click
       expect(all_announcement_items.size).to eq(3)
-      widget_pagination_button("announcements", "3").click
+      widget_pagination_button("Announcements", "3").click
       expect(all_announcement_items.size).to eq(1)
     end
 
@@ -131,6 +131,76 @@ describe "student dashboard announcements widget", :ignore_js_errors do
       go_to_dashboard
       expect(announcement_item(@announcement9.id)).to be_displayed
       expect(element_exists?(announcement_item_selector(@announcement8.id))).to be_falsey
+    end
+  end
+
+  context "announcements widget pagination" do
+    before :once do
+      pagination_announcement_setup # Creates 15 read and 11 unread announcements
+    end
+
+    it "displays all pagination link on initial load" do
+      go_to_dashboard
+      expect(widget_pagination_button("Announcements", "1")).to be_displayed
+      expect(widget_pagination_button("Announcements", "6")).to be_displayed
+      widget_pagination_button("Announcements", "6").click
+      widget_pagination_button("Announcements", "1").click
+      expect(widget_pagination_button("Announcements", "6")).to be_displayed
+
+      filter_announcements_list_by("All")
+      expect(widget_pagination_button("Announcements", "1")).to be_displayed
+      expect(widget_pagination_button("Announcements", "11")).to be_displayed
+      widget_pagination_button("Announcements", "11").click
+      widget_pagination_button("Announcements", "1").click
+      expect(widget_pagination_button("Announcements", "11")).to be_displayed
+
+      filter_announcements_list_by("Read")
+      expect(widget_pagination_button("Announcements", "1")).to be_displayed
+      expect(widget_pagination_button("Announcements", "6")).to be_displayed
+      widget_pagination_button("Announcements", "6").click
+      widget_pagination_button("Announcements", "1").click
+      expect(widget_pagination_button("Announcements", "6")).to be_displayed
+    end
+
+    it "maintains pagination when switching filters" do
+      go_to_dashboard
+      expect(widget_pagination_button("Announcements", "6")).to be_displayed
+      filter_announcements_list_by("All")
+      expect(widget_pagination_button("Announcements", "11")).to be_displayed
+      filter_announcements_list_by("Read")
+      expect(widget_pagination_button("Announcements", "6")).to be_displayed
+      filter_announcements_list_by("All")
+      expect(widget_pagination_button("Announcements", "11")).to be_displayed
+      filter_announcements_list_by("Unread")
+      expect(widget_pagination_button("Announcements", "6")).to be_displayed
+    end
+
+    it "navigates using prev and next button" do
+      go_to_dashboard
+
+      expect(widget_pagination_button("Announcements", "6")).to be_displayed
+      expect(element_exists?(widget_pagination_prev_button_selector("Announcements"))).to be_falsey
+      widget_pagination_next_button("Announcements").click
+      expect(widget_pagination_prev_button("Announcements")).to be_displayed
+      widget_pagination_next_button("Announcements").click
+      expect(widget_pagination_button("Announcements", "4")).to be_displayed
+      widget_pagination_next_button("Announcements").click
+      expect(widget_pagination_button("Announcements", "5")).to be_displayed
+      widget_pagination_next_button("Announcements").click
+      expect(widget_pagination_prev_button("Announcements")).to be_displayed
+      widget_pagination_next_button("Announcements").click
+      expect(element_exists?(widget_pagination_next_button_selector("Announcements"))).to be_falsey
+
+      widget_pagination_prev_button("Announcements").click
+      expect(widget_pagination_next_button("Announcements")).to be_displayed
+      widget_pagination_prev_button("Announcements").click
+      expect(widget_pagination_button("Announcements", "4")).to be_displayed
+      widget_pagination_prev_button("Announcements").click
+      expect(widget_pagination_button("Announcements", "3")).to be_displayed
+      widget_pagination_prev_button("Announcements").click
+      expect(widget_pagination_next_button("Announcements")).to be_displayed
+      widget_pagination_prev_button("Announcements").click
+      expect(element_exists?(widget_pagination_prev_button_selector("Announcements"))).to be_falsey
     end
   end
 end
