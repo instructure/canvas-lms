@@ -58,39 +58,38 @@ export const QuizTypeSelectorComponent: React.FC<QuizTypeSelectorComponentProps>
 
   return (
     <React.Fragment>
-        <div className="form-column-left no-group">
-          <label htmlFor="assignment_quiz_type">{I18n.t('quiz_type', 'Quiz Type')}</label>
-        </div>
-        <p>&nbsp;</p>
-        <div className='form-column-right' style={{width: 'unset', marginBottom: '12px'}}>
-          <Flex alignItems="center" gap="small">
-            <select
-              id="assignment_quiz_type"
-              name="new_quizzes_quiz_type"
-              value={quizType}
-              onChange={handleChange}
-              disabled={isExistingAssignment}
-              style={{ width: '392px', marginBottom: 'unset' }}
+      <div className="form-column-left no-group">
+        <label htmlFor="assignment_quiz_type">{I18n.t('quiz_type', 'Quiz Type')}</label>
+      </div>
+      <div className="form-column-right" style={{width: 'unset', marginBottom: '12px'}}>
+        <Flex alignItems="center" gap="small">
+          <select
+            id="assignment_quiz_type"
+            name="new_quizzes_quiz_type"
+            value={quizType}
+            onChange={handleChange}
+            disabled={isExistingAssignment}
+            style={{width: '392px', marginBottom: 'unset'}}
+          >
+            {quizTypeOptions.map(option => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          {isExistingAssignment && (
+            <Tooltip
+              renderTip={I18n.t(
+                'quiz_type_locked_tooltip',
+                'Quiz Type can only be set when creating a new assignment',
+              )}
+              placement="end"
             >
-              {quizTypeOptions.map(option => (
-                <option key={option.id} value={option.id}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            {isExistingAssignment && (
-                <Tooltip
-                  renderTip={I18n.t(
-                    'quiz_type_locked_tooltip',
-                    'Quiz Type can only be set when creating a new assignment',
-                  )}
-                  placement='end'
-                >
-                  <IconInfoLine />
-                </Tooltip>
-            )}
-          </Flex>
-        </div>
+              <IconInfoLine />
+            </Tooltip>
+          )}
+        </Flex>
+      </div>
     </React.Fragment>
   )
 }
