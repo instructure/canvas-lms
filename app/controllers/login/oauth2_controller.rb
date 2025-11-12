@@ -49,6 +49,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
       @aac.debug_set(:debugging, t("Received callback from identity provider"))
       @aac.instance_debugging = true
     end
+    attempts = 0
     timeout_protection do
       token = nil
       begin
@@ -56,13 +57,21 @@ class Login::OAuth2Controller < Login::OAuthBaseController
         token.options[:nonce] = jwt["nonce"]
       rescue => e
         @aac.debug_set(:get_token_response, e) if debugging
-        increment_statsd(:failure, reason: :get_token)
+        # counted below if it's a timeout
+        increment_statsd(:failure, reason: :get_token) unless e.is_a?(Timeout::Error)
         raise
       end
       process_token(token)
-    rescue Canvas::TimeoutCutoff
+    rescue Timeout::Error => e
+      # don't retry on circuit breaker-based timeouts
+      if attempts < @aac.settings[:oauth2_timeout_retries].to_i && !e.is_a?(Canvas::TimeoutCutoff)
+        attempts += 1
+        increment_statsd(:retry, reason: :timeout)
+        retry
+      end
+
       flash[:delegated_message] = t("A timeout occurred contacting external authentication service")
-      increment_statsd(:failure, reason: :timeout)
+      increment_statsd(:failure, reason: e.is_a?(Canvas::TimeoutCutoff) ? :circuit_breaker : :timeout)
       redirect_to login_url
       # don't re-raise; we don't actually want OAuthBaseContoller#timeout_protection to handle this,
       # otherwise it will overwrite the flash message
