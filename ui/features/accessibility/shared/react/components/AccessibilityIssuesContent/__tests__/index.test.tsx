@@ -34,14 +34,40 @@ const mockClose = jest.fn()
 
 const baseItem = multiIssueItem
 
+// Helper function to convert camelCase to snake_case
+// This mimics the backend API response format
+const convertToSnakeCase = (obj: any): any => {
+  if (Array.isArray(obj)) {
+    return obj.map(convertToSnakeCase)
+  } else if (obj !== null && typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [
+        key.replace(/([A-Z])/g, '_$1').toLowerCase(),
+        convertToSnakeCase(value),
+      ]),
+    )
+  }
+  return obj
+}
+
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
-  default: jest.fn(({path}) => {
+  default: jest.fn(({path, method}) => {
     if (path.includes('/preview?')) {
       return Promise.resolve({json: {content: '<div>Preview content</div>'}})
     }
     if (path.includes('/preview')) {
       return Promise.resolve({json: {content: '<div>Updated content</div>'}})
+    }
+    // Handle POST to accessibility/scan - return scan with one less issue
+    if (method === 'POST' && path.includes('/accessibility/scan')) {
+      const updatedScan = {
+        ...multiIssueItem,
+        issueCount: 1, // One issue remaining after saving
+        issues: [multiIssueItem.issues![1]], // Keep only the second issue
+      }
+      // Convert to snake_case because the real API returns snake_case
+      return Promise.resolve({json: convertToSnakeCase(updatedScan)})
     }
     return Promise.resolve({})
   }),
