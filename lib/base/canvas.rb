@@ -174,14 +174,15 @@ module Canvas
   def self.timeout_protection(service_name, options = {}, &)
     timeout = (Setting.get("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || 15).to_f
 
+    exception_class = options[:exception_class]
     if Canvas.redis_enabled?
       if timeout_protection_method(service_name) == "percentage"
-        percent_short_circuit_timeout(Canvas.redis, service_name, timeout, &)
+        percent_short_circuit_timeout(Canvas.redis, service_name, timeout, exception_class, &)
       else
-        short_circuit_timeout(Canvas.redis, service_name, timeout, &)
+        short_circuit_timeout(Canvas.redis, service_name, timeout, exception_class, &)
       end
     else
-      Timeout.timeout(timeout, &)
+      Timeout.timeout(timeout, exception_class, &)
     end
   rescue TimeoutCutoff, Timeout::Error => e
     log_message = if e.is_a?(TimeoutCutoff)
@@ -201,7 +202,7 @@ module Canvas
      Setting.get("service_generic_cutoff", 3.to_s)).to_i
   end
 
-  def self.short_circuit_timeout(redis, service_name, timeout, &)
+  def self.short_circuit_timeout(redis, service_name, timeout, exception_class, &)
     redis_key = "service:timeouts:#{service_name}:error_count"
     cutoff = timeout_protection_cutoff(service_name)
 
@@ -211,7 +212,7 @@ module Canvas
     end
 
     begin
-      Timeout.timeout(timeout, &)
+      Timeout.timeout(timeout, exception_class, &)
     rescue Timeout::Error
       error_ttl = timeout_protection_error_ttl(service_name)
       redis.pipelined(redis_key, failsafe: nil) do |pipeline|
@@ -237,7 +238,7 @@ module Canvas
      Setting.get("service_generic_min_samples", 100.to_s)).to_i
   end
 
-  def self.percent_short_circuit_timeout(redis, service_name, timeout, &)
+  def self.percent_short_circuit_timeout(redis, service_name, timeout, exception_class, &)
     redis_key = "service:timeouts:#{service_name}:percent_counter"
     cutoff = timeout_protection_failure_rate_cutoff(service_name)
 
@@ -266,7 +267,7 @@ module Canvas
 
     begin
       counter.increment_count
-      Timeout.timeout(timeout, &)
+      Timeout.timeout(timeout, exception_class, &)
     rescue Timeout::Error
       counter.increment_failure
       raise
