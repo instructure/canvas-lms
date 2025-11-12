@@ -19,7 +19,7 @@
 
 class PeerReview::GroupOverrideCreatorService < PeerReview::GroupOverrideCommonService
   def call
-    validate_override_dates(@override)
+    validate_peer_review_dates(@override)
 
     set_id = fetch_set_id
     validate_set_id_required(set_id)
@@ -39,6 +39,8 @@ class PeerReview::GroupOverrideCreatorService < PeerReview::GroupOverrideCommonS
     ActiveRecord::Base.transaction do
       parent_override = find_parent_override(set_id)
       validate_group_parent_override_exists(parent_override, set_id)
+
+      validate_override_dates_against_parent_override(@override, parent_override)
 
       create_override(group, parent_override)
     end

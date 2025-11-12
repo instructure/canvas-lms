@@ -19,7 +19,7 @@
 
 class PeerReview::SectionOverrideUpdaterService < PeerReview::SectionOverrideCommonService
   def call
-    validate_override_dates(@override)
+    validate_peer_review_dates(@override)
 
     override = find_override
     validate_override_exists(override)
@@ -37,6 +37,8 @@ class PeerReview::SectionOverrideUpdaterService < PeerReview::SectionOverrideCom
                           find_parent_override(section_id)
                         end
       validate_section_parent_override_exists(parent_override, section_id)
+
+      validate_override_dates_against_parent_override(@override, parent_override)
 
       update_override(override, section, parent_override)
     end

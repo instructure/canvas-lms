@@ -19,7 +19,7 @@
 
 class PeerReview::SectionOverrideCreatorService < PeerReview::SectionOverrideCommonService
   def call
-    validate_override_dates(@override)
+    validate_peer_review_dates(@override)
 
     section_id = fetch_set_id
     validate_set_id_required(section_id)
@@ -30,6 +30,8 @@ class PeerReview::SectionOverrideCreatorService < PeerReview::SectionOverrideCom
     ActiveRecord::Base.transaction do
       parent_override = find_parent_override(section_id)
       validate_section_parent_override_exists(parent_override, section_id)
+
+      validate_override_dates_against_parent_override(@override, parent_override)
 
       create_override(section, parent_override)
     end

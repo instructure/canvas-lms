@@ -60,17 +60,19 @@ module PeerReview::Validations
     end
   end
 
-  def validate_override_dates(override)
+  # Validates that peer review dates follow the restriction below
+  # peer review unlock_at < peer review due_at <= peer review lock_at
+  def validate_peer_review_dates(peer_review_dates)
     parsed_dates = {}
 
     %w[due_at unlock_at lock_at].each do |date_field|
-      date_value = override.fetch(date_field.to_sym, nil)
+      date_value = peer_review_dates.fetch(date_field.to_sym, nil)
       next unless date_value.present?
 
       # Accept both Time objects and ISO8601 strings for API compatibility
       if date_value.is_a?(String)
         unless Api::ISO8601_REGEX.match?(date_value)
-          raise PeerReview::InvalidOverrideDatesError, I18n.t("Invalid datetime format for %{attribute}", attribute: date_field)
+          raise PeerReview::InvalidDatesError, I18n.t("Invalid datetime format for %{attribute}", attribute: date_field)
         end
 
         parsed_dates[date_field.to_sym] = Time.zone.parse(date_value)
@@ -84,15 +86,82 @@ module PeerReview::Validations
     lock_at = parsed_dates[:lock_at]
 
     if due_at && unlock_at && due_at < unlock_at
-      raise PeerReview::InvalidOverrideDatesError, I18n.t("Due date cannot be before unlock date")
+      raise PeerReview::InvalidDatesError, I18n.t("Due date cannot be before unlock date")
     end
 
     if due_at && lock_at && due_at > lock_at
-      raise PeerReview::InvalidOverrideDatesError, I18n.t("Due date cannot be after lock date")
+      raise PeerReview::InvalidDatesError, I18n.t("Due date cannot be after lock date")
     end
 
     if unlock_at && lock_at && unlock_at > lock_at
-      raise PeerReview::InvalidOverrideDatesError, I18n.t("Unlock date cannot be after lock date")
+      raise PeerReview::InvalidDatesError, I18n.t("Unlock date cannot be after lock date")
+    end
+  end
+
+  # Validates that peer review override dates fall within parent assignment override dates
+  # assignment unlock_at <= peer review unlock_at < peer review due_at <= peer review lock_at <= assignment lock_at
+  def validate_override_dates_against_parent_override(peer_review_override, parent_override)
+    parent_unlock_at = parent_override.unlock_at_overridden ? parent_override.unlock_at : nil
+    parent_lock_at = parent_override.lock_at_overridden ? parent_override.lock_at : nil
+
+    validate_dates_within_parent_boundaries(
+      child_dates: peer_review_override,
+      parent_unlock_at:,
+      parent_lock_at:,
+      is_override: true
+    )
+  end
+
+  def validate_peer_review_dates_against_parent_assignment(peer_review_dates, parent_assignment)
+    validate_peer_review_dates(peer_review_dates)
+
+    validate_dates_within_parent_boundaries(
+      child_dates: peer_review_dates,
+      parent_unlock_at: parent_assignment.unlock_at,
+      parent_lock_at: parent_assignment.lock_at,
+      is_override: false
+    )
+  end
+
+  def parse_date(dates_hash, field)
+    date_value = dates_hash.fetch(field, nil)
+    return nil unless date_value.present?
+
+    if date_value.is_a?(String)
+      parsed = Time.zone.parse(date_value)
+      if parsed.nil?
+        raise PeerReview::InvalidDatesError,
+              I18n.t("Invalid date format for %{field}: %{value}", field:, value: date_value)
+      end
+      parsed
+    else
+      date_value
+    end
+  end
+
+  def validate_dates_within_parent_boundaries(child_dates:, parent_unlock_at:, parent_lock_at:, is_override: false)
+    child_unlock_at = parse_date(child_dates, :unlock_at)
+    child_due_at = parse_date(child_dates, :due_at)
+    child_lock_at = parse_date(child_dates, :lock_at)
+
+    if parent_unlock_at && child_unlock_at && parent_unlock_at > child_unlock_at
+      raise PeerReview::InvalidDatesError,
+            is_override ? I18n.t("Peer review override unlock date cannot be before parent override unlock date") : I18n.t("Peer review unlock date cannot be before assignment unlock date")
+    end
+
+    if parent_unlock_at && child_due_at && parent_unlock_at > child_due_at
+      raise PeerReview::InvalidDatesError,
+            is_override ? I18n.t("Peer review override due date cannot be before parent override unlock date") : I18n.t("Peer review due date cannot be before assignment unlock date")
+    end
+
+    if child_due_at && parent_lock_at && child_due_at > parent_lock_at
+      raise PeerReview::InvalidDatesError,
+            is_override ? I18n.t("Peer review override due date cannot be after parent override lock date") : I18n.t("Peer review due date cannot be after assignment lock date")
+    end
+
+    if child_lock_at && parent_lock_at && child_lock_at > parent_lock_at
+      raise PeerReview::InvalidDatesError,
+            is_override ? I18n.t("Peer review override lock date cannot be after parent override lock date") : I18n.t("Peer review lock date cannot be after assignment lock date")
     end
   end
 

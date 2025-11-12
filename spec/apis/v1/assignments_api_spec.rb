@@ -5005,7 +5005,7 @@ describe AssignmentsApiController, type: :request do
           peer_review_sub_assignment = double("peer_review_sub_assignment")
           allow(PeerReview::PeerReviewUpdaterService).to receive(:call).and_return(peer_review_sub_assignment)
           allow(PeerReview::DateOverriderService).to receive(:call)
-            .and_raise(PeerReview::InvalidOverrideDatesError.new(error_message))
+            .and_raise(PeerReview::InvalidDatesError.new(error_message))
 
           result = test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
 

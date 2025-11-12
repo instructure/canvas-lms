@@ -19,7 +19,7 @@
 
 class PeerReview::GroupOverrideUpdaterService < PeerReview::GroupOverrideCommonService
   def call
-    validate_override_dates(@override)
+    validate_peer_review_dates(@override)
 
     override = find_override
     validate_override_exists(override)
@@ -47,6 +47,8 @@ class PeerReview::GroupOverrideUpdaterService < PeerReview::GroupOverrideCommonS
                           find_parent_override(set_id)
                         end
       validate_group_parent_override_exists(parent_override, set_id)
+
+      validate_override_dates_against_parent_override(@override, parent_override)
 
       update_override(override, group, parent_override)
     end

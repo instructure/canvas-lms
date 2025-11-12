@@ -96,7 +96,7 @@ RSpec.describe PeerReview::CourseOverrideCommonService do
       expect(service).to respond_to(:validate_parent_assignment)
       expect(service).to respond_to(:validate_peer_reviews_enabled)
       expect(service).to respond_to(:validate_feature_enabled)
-      expect(service).to respond_to(:validate_override_dates)
+      expect(service).to respond_to(:validate_peer_review_dates)
     end
 
     it "responds to date override methods from PeerReview::DateOverrider" do

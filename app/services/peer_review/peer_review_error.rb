@@ -24,7 +24,7 @@ module PeerReview
   class InvalidAssignmentSubmissionTypesError < PeerReviewError; end
   class SubAssignmentExistsError < PeerReviewError; end
   class SubAssignmentNotExistError < PeerReviewError; end
-  class InvalidOverrideDatesError < PeerReviewError; end
+  class InvalidDatesError < PeerReviewError; end
   class SetTypeRequiredError < PeerReviewError; end
   class SetIdRequiredError < PeerReviewError; end
   class OverrideNotFoundError < PeerReviewError; end
