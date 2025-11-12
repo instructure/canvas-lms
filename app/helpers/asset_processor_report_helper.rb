@@ -19,7 +19,8 @@
 #
 module AssetProcessorReportHelper
   # Returns a hash of submission_id => [Lti::AssetReport1, Lti::AssetReport2] | [] | nil
-  def raw_asset_reports(submission_ids:, for_student:)
+  # for_student implies last_submission_attempt_only, because students can only see last attempt.
+  def raw_asset_reports(submission_ids:, for_student:, last_submission_attempt_only:)
     mate_submissions_by_primary = mate_submissions(submission_ids)
     all_submission_ids = [submission_ids, mate_submissions_by_primary.values].flatten.uniq
 
@@ -42,12 +43,11 @@ module AssetProcessorReportHelper
                         )"
                       )
 
-    if for_student
+    visible_reports = visible_reports.where(visible_to_owner: true) if for_student
+
+    if last_submission_attempt_only || for_student
       visible_reports = visible_reports.preload(asset: :submission)
                                        .preload(asset: { submission: :attachment_associations })
-      # Students can only see reports that are marked visible_to_owner
-      visible_reports = visible_reports.where(visible_to_owner: true)
-      # And reports of the last submission attempt
       visible_reports = visible_reports.filter do |report|
         submission = report.asset.submission
         next false if submission.blank?

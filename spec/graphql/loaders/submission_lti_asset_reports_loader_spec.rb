@@ -25,7 +25,7 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
 
     result = {}
     GraphQL::Batch.batch do
-      obj = described_class.for(is_student: false)
+      obj = described_class.for(for_student: false, latest: false)
 
       allow(obj).to receive(:fulfill) do |submission_id, reports|
         raise "called multiple times for the same submission_id" if result.key?(submission_id)
@@ -101,7 +101,7 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
 
       result = {}
       GraphQL::Batch.batch do
-        obj = described_class.for(is_student: false)
+        obj = described_class.for(for_student: false, latest: false)
 
         allow(obj).to receive(:fulfill) do |submission_id, reports|
           raise "called multiple times for the same submission_id" if result.key?(submission_id)
@@ -183,7 +183,7 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
     subject do
       result = {}
       GraphQL::Batch.batch do
-        obj = described_class.for(is_student: true)
+        obj = described_class.for(for_student: true, latest: true)
 
         allow(obj).to receive(:fulfill) do |submission_id, reports|
           raise "called multiple times for the same submission_id" if result.key?(submission_id)
@@ -198,7 +198,7 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
 
     before do
       allow_any_instance_of(described_class).to receive(:raw_asset_reports)
-        .with(submission_ids: [1, 2], for_student: true)
+        .with(submission_ids: [1, 2], for_student: true, last_submission_attempt_only: true)
         .and_return({ 1 => [1, 2], 2 => [3, 4] })
     end
 
@@ -212,11 +212,11 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
       result = {}
 
       allow_any_instance_of(described_class).to receive(:raw_asset_reports)
-        .with(submission_ids: [], for_student: true)
+        .with(submission_ids: [], for_student: true, last_submission_attempt_only: true)
         .and_return({})
 
       GraphQL::Batch.batch do
-        obj = described_class.for(is_student: true)
+        obj = described_class.for(for_student: true, latest: true)
 
         allow(obj).to receive(:fulfill) do |submission_id, reports|
           result[submission_id] = reports
@@ -226,6 +226,44 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
       end
 
       expect(result).to be_empty
+    end
+
+    it "raises ArgumentError when for_student: true with latest: false" do
+      expect do
+        GraphQL::Batch.batch do
+          described_class.for(for_student: true, latest: false)
+        end
+      end.to raise_error(ArgumentError)
+    end
+  end
+
+  context "when used for teacher access with latest: true" do
+    subject do
+      result = {}
+      GraphQL::Batch.batch do
+        obj = described_class.for(for_student: false, latest: true)
+
+        allow(obj).to receive(:fulfill) do |submission_id, reports|
+          raise "called multiple times for the same submission_id" if result.key?(submission_id)
+
+          result[submission_id] = reports
+        end
+
+        obj.perform([sub1.id, sub2.id])
+      end
+      result
+    end
+
+    before do
+      allow_any_instance_of(described_class).to receive(:raw_asset_reports)
+        .with(submission_ids: [sub1.id, sub2.id], for_student: false, last_submission_attempt_only: true)
+        .and_return({ sub1.id => [rep1a11], sub2.id => [rep2a11] })
+    end
+
+    it "returns only latest attempt reports for teachers when latest: true" do
+      expect(subject.keys).to match_array([sub1.id, sub2.id])
+      expect(subject[sub1.id]).to match_array([rep1a11])
+      expect(subject[sub2.id]).to match_array([rep2a11])
     end
   end
 end
