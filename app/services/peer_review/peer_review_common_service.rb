@@ -123,4 +123,11 @@ class PeerReview::PeerReviewCommonService < ApplicationService
       "online_text_entry"
     end
   end
+
+  def validate_dates
+    if @due_at || @unlock_at || @lock_at
+      peer_review_dates = { due_at: @due_at, unlock_at: @unlock_at, lock_at: @lock_at }
+      validate_peer_review_dates_against_parent_assignment(peer_review_dates, @parent_assignment)
+    end
+  end
 end

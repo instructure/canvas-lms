@@ -19,7 +19,7 @@
 
 class PeerReview::AdhocOverrideUpdaterService < PeerReview::AdhocOverrideCommonService
   def call
-    validate_override_dates(@override)
+    validate_peer_review_dates(@override)
 
     override = find_override
     validate_override_exists(override)
@@ -41,6 +41,8 @@ class PeerReview::AdhocOverrideUpdaterService < PeerReview::AdhocOverrideCommonS
                           find_parent_override(provided_student_ids_in_course)
                         end
       validate_adhoc_parent_override_exists(parent_override, provided_student_ids_in_course)
+
+      validate_override_dates_against_parent_override(@override, parent_override)
 
       destroy_override_students(override, student_ids_to_delete) if student_ids_to_delete.any?
       update_override(override, provided_student_ids_in_course, parent_override)
