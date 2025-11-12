@@ -367,6 +367,9 @@ nn:
   access_tokens_delete_8ffe05d: "Tilgangsnøkkel - slette"
   access_tokens_eea7e69f: Tilgangsnøklar
   access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: "Sjå emna og gruppene dine frå iOS eller Android einingar og finn meir informasjon i hjelpemenyen."
+  accessibility: 
+    titles: 
+      accessibility_checker: "Sjekk av universell utforming"
   accessibility_a662153d: Tilgjengeligheit
   accessibility_checker_b3af1f6c: "Sjekk av universell utforming"
   accessibility_checker_notifications_da5a49e6: "Varsel for tilgjengelegheitssjekk"
