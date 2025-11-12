@@ -30,7 +30,7 @@ module SupportHelpers
     PROCESSOR_ATTRS = %w[id title url context_external_tool_id workflow_state created_at updated_at].freeze
     TOOL_ATTRS = %w[id name description url domain workflow_state lti_version created_at updated_at].freeze
     HANDLER_ATTRS = %w[id context_external_tool_id notice_type url max_batch_size workflow_state created_at updated_at].freeze
-    ASSET_ATTRS = %w[id attachment_id submission_attempt created_at updated_at].freeze
+    ASSET_ATTRS = %w[id attachment_id submission_attempt uuid created_at updated_at].freeze
     REPORT_ATTRS = %w[
       id
       lti_asset_id
