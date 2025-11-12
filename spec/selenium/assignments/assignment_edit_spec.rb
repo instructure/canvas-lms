@@ -199,7 +199,8 @@ describe "assignment" do
         title: "Peer Review Assignment",
         points_possible: 10,
         submission_types: "online_text_entry",
-        peer_reviews: true
+        peer_reviews: true,
+        peer_review_submission_required: false
       )
     end
 

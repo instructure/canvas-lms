@@ -2632,15 +2632,15 @@ describe AssignmentsApiController, type: :request do
         expect(assignment.peer_review_submission_required).to be false
       end
 
-      it "defaults peer_review_submission_required to false when not provided" do
+      it "defaults peer_review_submission_required to true when not provided" do
         json = api_create_assignment_in_course(@course, {
                                                  "name" => "test assignment",
                                                  "peer_reviews" => true
                                                })
 
         assignment = Assignment.find(json["id"])
-        expect(json["peer_review_submission_required"]).to be false
-        expect(assignment.peer_review_submission_required).to be false
+        expect(json["peer_review_submission_required"]).to be true
+        expect(assignment.peer_review_submission_required).to be true
       end
 
       it "updates assignment peer_review_submission_required to true" do

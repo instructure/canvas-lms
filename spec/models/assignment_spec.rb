@@ -40,9 +40,9 @@ describe Assignment do
     expect(assignment.lti_context_id).to be_present
   end
 
-  it "defaults peer_review_submission_required to false" do
+  it "defaults peer_review_submission_required to true" do
     assignment = @course.assignments.create!(assignment_valid_attributes)
-    expect(assignment.peer_review_submission_required).to be false
+    expect(assignment.peer_review_submission_required).to be true
   end
 
   it "defaults peer_review_across_sections to true" do

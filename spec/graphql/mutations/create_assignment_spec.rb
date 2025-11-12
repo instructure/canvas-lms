@@ -245,7 +245,7 @@ describe Mutations::CreateAssignment do
       expect(assignment.peer_review_submission_required).to be false
     end
 
-    it "defaults submission_required to false when not specified" do
+    it "defaults submission_required to true when not specified" do
       result = execute_with_input <<~GQL
         courseId: "#{@course.to_param}"
         name: "peer review default submission required"
@@ -256,10 +256,10 @@ describe Mutations::CreateAssignment do
 
       expect(result["errors"]).to be_nil
       expect(result.dig("data", "createAssignment", "errors")).to be_nil
-      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "submissionRequired")).to be false
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "submissionRequired")).to be true
 
       assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
-      expect(assignment.peer_review_submission_required).to be false
+      expect(assignment.peer_review_submission_required).to be true
     end
   end
 

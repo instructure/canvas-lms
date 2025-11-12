@@ -245,7 +245,7 @@ describe Mutations::UpdateAssignment do
 
     it "can update submission_required to true" do
       assignment = Assignment.find(@assignment_id)
-      expect(assignment.peer_review_submission_required).to be false
+      assignment.update!(peer_review_submission_required: false)
 
       result = execute_with_input <<~GQL
         id: "#{@assignment_id}"
