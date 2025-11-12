@@ -2105,18 +2105,19 @@ class User < ActiveRecord::Base
     true
   end
 
-  def prefers_widget_dashboard?
+  def prefers_widget_dashboard?(domain_root_account, flag = nil)
     # Explicit preference takes priority
     return preferences[:widget_dashboard_user_preference] unless preferences[:widget_dashboard_user_preference].nil?
 
-    # Default based on feature flag state:
+    # Default based on feature flag state on the domain root account:
     # - "allowed" state: default to FALSE (opt-in required)
     # - "allowed_on" state: default to TRUE (opt-out available)
-    # Check if any associated account has the feature enabled (allowed_on or on states)
-    # Use EXISTS subquery to avoid N+1 queries for users with many accounts
-    associated_accounts
-      .where("EXISTS (SELECT 1 FROM #{FeatureFlag.quoted_table_name} WHERE context_type = 'Account' AND context_id = accounts.id AND feature = 'widget_dashboard' AND state IN ('on', 'allowed_on'))")
-      .exists?
+    # - "on" state: enabled for everyone
+    return false unless domain_root_account
+
+    # Use provided flag to avoid redundant lookups, or fetch if not provided
+    flag ||= domain_root_account.lookup_feature_flag(:widget_dashboard)
+    flag&.enabled? || false
   end
 
   def auto_show_cc?
@@ -3263,24 +3264,28 @@ class User < ActiveRecord::Base
   end
 
   def menu_courses(enrollment_uuid = nil, opts = {})
-    return @menu_courses if @menu_courses
+    # Only use cached @menu_courses if no limit override is specified
+    return @menu_courses if @menu_courses && opts[:limit].nil?
 
     can_favorite = proc { |c| !(c.elementary_subject_course? || c.elementary_homeroom_course?) || c.user_is_admin?(self) || roles(c.root_account).include?("teacher") }
     # this terribleness is so we try to make sure that the newest courses show up in the menu
+    limit = opts[:limit] || Setting.get("menu_course_limit", "20").to_i
     courses = courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid, opts)
               .sort_by { |c| [c.primary_enrollment_rank, Time.zone.now - (c.primary_enrollment_date || Time.zone.now)] }
-              .first(Setting.get("menu_course_limit", "20").to_i)
+              .first(limit)
               .sort_by { |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
     favorites = courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)
                 .select { |c| can_favorite.call(c) }
     # if favoritable courses (classic courses or k5 courses with admin enrollment) exist, show those and all non-favoritable courses
-    @menu_courses = if favorites.empty?
-                      courses
-                    else
-                      favorites + courses.reject { |c| can_favorite.call(c) }
-                    end
-    ActiveRecord::Associations.preload(@menu_courses, :enrollment_term)
-    @menu_courses.reject do |c|
+    menu_courses = if favorites.empty?
+                     courses
+                   else
+                     favorites + courses.reject { |c| can_favorite.call(c) }
+                   end
+    # Only cache if using default limit
+    @menu_courses = menu_courses if opts[:limit].nil?
+    ActiveRecord::Associations.preload(menu_courses, :enrollment_term)
+    menu_courses.reject do |c|
       c.horizon_course? && !c.grants_right?(self, :read_as_admin)
     end
   end

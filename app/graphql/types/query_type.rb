@@ -185,19 +185,26 @@ module Types
                      course_ids & user_course_ids
                    end
 
-      # Subquery approach required because distinct_on() breaks .count() for totalCount
-      subquery = Enrollment.joins(:user, :enrollment_state)
-                           .current
-                           .where(course_id: course_ids)
-                           .where(type: ["TeacherEnrollment", "TaEnrollment"])
-                           .where(enrollment_states: { restricted_access: false, state: "active" })
-                           .where(courses: { workflow_state: "available" })
-                           .where("courses.conclude_at IS NULL OR courses.conclude_at > ?", Time.now.utc)
-                           .select("enrollments.id")
-                           .order(:course_id, :user_id, Enrollment.state_by_date_rank_sql)
-                           .distinct_on(:course_id, :user_id)
+      # Optimized approach: use a subquery for deduplication, then sort for display
+      # This eliminates one level of joins compared to the previous double-subquery approach
+      deduplicated_ids = Enrollment
+                         .joins(:enrollment_state)
+                         .current
+                         .where(course_id: course_ids)
+                         .where(type: ["TeacherEnrollment", "TaEnrollment"])
+                         .where(enrollment_states: { restricted_access: false, state: "active" })
+                         .where(courses: { workflow_state: "available" })
+                         .where("courses.conclude_at IS NULL OR courses.conclude_at > ?", Time.now.utc)
+                         .select("DISTINCT ON (enrollments.course_id, enrollments.user_id) enrollments.id")
+                         .order(
+                           Arel.sql("enrollments.course_id"),
+                           Arel.sql("enrollments.user_id"),
+                           Enrollment.state_by_date_rank_sql,
+                           Arel.sql("enrollments.id")
+                         )
 
-      Enrollment.where(id: subquery)
+      # Now join to users and courses only once for the final result set
+      Enrollment.where(id: deduplicated_ids)
                 .joins(:user, :course)
                 .order("courses.name ASC, users.sortable_name ASC")
     end
