@@ -21,7 +21,7 @@ module Accessibility
   module Rules
     class ImgAltFilenameRule < Accessibility::Rule
       self.id = "img-alt-filename"
-      self.link = "https://www.w3.org/TR/WCAG20-TECHS/H37.html"
+      self.link = "https://www.w3.org/TR/WCAG20-TECHS/F30.html"
 
       # Accessibility::Rule methods
 
@@ -41,10 +41,10 @@ module Accessibility
       def form(elem)
         Accessibility::Forms::TextInputWithCheckboxField.new(
           checkbox_label: I18n.t("This image is decorative"),
-          checkbox_subtext: I18n.t("This image is for visual decoration only and screen readers can skip it."),
+          checkbox_subtext: I18n.t("Screen readers should skip purely decorative images."),
           undo_text: I18n.t("Alt text fixed"),
           input_label: I18n.t("Alt text"),
-          input_description: I18n.t("Describe what's on the picture."),
+          input_description: I18n.t("Describe what's in the picture."),
           input_max_length: ImgAltRuleHelper::MAX_LENGTH,
           can_generate_fix: true,
           generate_button_label: I18n.t("Generate alt text"),
