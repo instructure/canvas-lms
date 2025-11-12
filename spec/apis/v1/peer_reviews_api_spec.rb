@@ -826,4 +826,125 @@ describe PeerReviewsApiController, type: :request do
       end
     end
   end
+
+  describe "Post 'create' with peer_review_sub_assignment linking" do
+    before :once do
+      @assignment_with_peer_reviews = assignment_model(course: @course, peer_reviews: true)
+      @submission_for_pr = @assignment_with_peer_reviews.find_or_create_submission(@student1)
+      @reviewer = student_in_course(active_all: true, course: @course).user
+      @resource_path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment_with_peer_reviews.id}/submissions/#{@submission_for_pr.id}/peer_reviews"
+      @resource_params = { controller: "peer_reviews_api",
+                           action: "create",
+                           format: "json",
+                           course_id: @course.id,
+                           assignment_id: @assignment_with_peer_reviews.id,
+                           submission_id: @submission_for_pr.id }
+    end
+
+    context "when all conditions are met" do
+      before :once do
+        @course.enable_feature!(:peer_review_grading)
+        @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          title: "Test Peer Review",
+          context: @course,
+          parent_assignment: @assignment_with_peer_reviews
+        )
+      end
+
+      it "creates peer review linked to peer_review_sub_assignment" do
+        @user = @teacher
+        json = api_call(:post, @resource_path, @resource_params, { user_id: @reviewer.id })
+
+        created_request = AssessmentRequest.find(json["id"])
+        expect(created_request.peer_review_sub_assignment_id).to eq(@peer_review_sub_assignment.id)
+        expect(created_request.peer_review_sub_assignment).to eq(@peer_review_sub_assignment)
+      end
+
+      it "returns successfully when all conditions are met" do
+        @user = @teacher
+        json = api_call(:post, @resource_path, @resource_params, { user_id: @reviewer.id })
+
+        expect(json["workflow_state"]).to eq("assigned")
+        expect(json["assessor_id"]).to eq(@reviewer.id)
+        expect(json["user_id"]).to eq(@student1.id)
+      end
+    end
+
+    context "when peer_review_grading feature flag is disabled" do
+      before :once do
+        @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          title: "Test Peer Review",
+          context: @course,
+          parent_assignment: @assignment_with_peer_reviews
+        )
+      end
+
+      it "creates peer review without linking when feature flag is disabled" do
+        @user = @teacher
+        json = api_call(:post, @resource_path, @resource_params, { user_id: @reviewer.id })
+
+        expect(json["workflow_state"]).to eq("assigned")
+        expect(json["id"]).to be_present
+
+        created_request = AssessmentRequest.find(json["id"])
+        expect(created_request.peer_review_sub_assignment_id).to be_nil
+      end
+    end
+
+    context "when parent assignment does not have peer_reviews enabled" do
+      before :once do
+        @assignment_with_peer_reviews.update!(peer_reviews: false)
+        @course.enable_feature!(:peer_review_grading)
+        @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          title: "Test Peer Review",
+          context: @course,
+          parent_assignment: @assignment_with_peer_reviews
+        )
+      end
+
+      it "creates peer review without linking when peer_reviews is false" do
+        @user = @teacher
+        json = api_call(:post, @resource_path, @resource_params, { user_id: @reviewer.id })
+
+        created_request = AssessmentRequest.find(json["id"])
+        expect(created_request.peer_review_sub_assignment_id).to be_nil
+      end
+    end
+
+    context "when peer_review_sub_assignment does not exist" do
+      before :once do
+        @course.enable_feature!(:peer_review_grading)
+      end
+
+      it "creates peer review without linking when sub-assignment does not exist (graceful degradation)" do
+        @user = @teacher
+        json = api_call(:post, @resource_path, @resource_params, { user_id: @reviewer.id })
+
+        created_request = AssessmentRequest.find(json["id"])
+        expect(created_request).to be_persisted
+        expect(created_request.peer_review_sub_assignment_id).to be_nil
+      end
+
+      it "does not fail when sub-assignment does not exist" do
+        @user = @teacher
+
+        expect do
+          api_call(:post, @resource_path, @resource_params, { user_id: @reviewer.id })
+        end.not_to raise_error
+      end
+    end
+
+    context "with multiple conditions" do
+      it "does not link when only feature flag is enabled but other conditions are not met" do
+        @course.enable_feature!(:peer_review_grading)
+        @assignment_with_peer_reviews.update!(peer_reviews: false)
+
+        @user = @teacher
+        json = api_call(:post, @resource_path, @resource_params, { user_id: @reviewer.id })
+
+        created_request = AssessmentRequest.find(json["id"])
+        expect(created_request.peer_review_sub_assignment_id).to be_nil
+      end
+    end
+  end
 end

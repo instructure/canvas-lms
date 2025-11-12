@@ -2659,11 +2659,19 @@ class Submission < ActiveRecord::Base
     @assessment_request_count ||= 0
     @assessment_request_count += 1
     user = obj.try(:user)
-    association = AbstractAssignment.find(assignment_id).active_rubric_association? ? assignment.rubric_association : nil
+    assignment = AbstractAssignment.find(assignment_id)
+    association = assignment.active_rubric_association? ? assignment.rubric_association : nil
     res = assessment_requests.where(assessor_asset_id: obj.id, assessor_asset_type: obj.class.to_s, assessor_id: user.id, rubric_association_id: association.try(:id))
                              .first_or_initialize
     res.user_id = user_id
     res.workflow_state = "assigned" if res.new_record?
+
+    if res.new_record? && assignment.context.feature_enabled?(:peer_review_grading) &&
+       assignment.peer_reviews? &&
+       assignment.peer_review_sub_assignment.present?
+      res.peer_review_sub_assignment_id = assignment.peer_review_sub_assignment.id
+    end
+
     res.send_reminder! # this method also saves the assessment_request
     obj.assign_assessment(res) if obj.is_a?(Submission) && res.previously_new_record?
     res
