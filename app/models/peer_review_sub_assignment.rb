@@ -43,7 +43,7 @@ class PeerReviewSubAssignment < AbstractAssignment
             presence: true,
             uniqueness: { conditions: -> { where.not(workflow_state: "deleted") } },
             comparison: { other_than: :id, message: ->(_object, _data) { I18n.t("cannot reference self") }, allow_blank: true }
-  validates :has_sub_assignments, inclusion: { in: [false], message: I18n.t("cannot have sub assignments") }
+  validates :has_sub_assignments, inclusion: { in: [false], message: ->(_object, _data) { I18n.t("cannot have sub assignments") } }
   validates :sub_assignment_tag, absence: { message: ->(_object, _data) { I18n.t("cannot have sub assignment tag") } }
   validate  :context_matches_parent_assignment, if: :context_explicitly_provided?
   validate  :parent_assignment_not_discussion_topic_or_external_tool
