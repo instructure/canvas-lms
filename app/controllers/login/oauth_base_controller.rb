@@ -42,7 +42,7 @@ class Login::OAuthBaseController < ApplicationController
   end
 
   def timeout_protection
-    timeout_options = { raise_on_timeout: true, fallback_timeout_length: 10.seconds, exception_class: Timeout::Error }
+    timeout_options = { raise_on_timeout: true, fallback_timeout_length: 10.seconds }
 
     Canvas.timeout_protection("oauth:#{@aac.global_id}", timeout_options) do
       yield

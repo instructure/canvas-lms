@@ -262,9 +262,8 @@ describe Login::OAuth2Controller do
       session[:oauth2_nonce] = ["fred"]
       allow(Setting).to receive(:get).and_call_original
       allow(Setting).to receive(:get).with("service_oauth:#{aac.global_id}_timeout", nil).and_return(0.01)
-      expect_any_instantiation_of(aac).to receive(:get_token) do
-        sleep 1 # rubocop:disable Lint/NoSleep
-      end
+      aac.client_id = "invalid"
+      allow_any_instance_of(Net::HTTP).to receive(:start) { sleep 1 } # rubocop:disable Lint/NoSleep
       user_with_pseudonym(username: "user", active_all: 1)
       @pseudonym.authentication_provider = aac
       @pseudonym.save!
@@ -290,7 +289,7 @@ describe Login::OAuth2Controller do
 
     it "redirects to login when a circuit breaker timeout occurs" do
       session[:oauth2_nonce] = ["fred"]
-      expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Canvas::TimeoutCutoff.new(1))
+      expect(Canvas).to receive(:timeout_protection).and_raise(Canvas::TimeoutCutoff.new(1))
       expect(Canvas::Errors).not_to receive(:capture)
       user_with_pseudonym(username: "user", active_all: 1)
       @pseudonym.authentication_provider = aac
@@ -319,7 +318,7 @@ describe Login::OAuth2Controller do
     it "does not retry for circuit breaker timeouts" do
       session[:oauth2_nonce] = ["fred"]
       aac.settings[:oauth2_timeout_retries] = 1
-      expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Canvas::TimeoutCutoff.new(1)).once
+      allow(Canvas).to receive(:timeout_protection).and_raise(Canvas::TimeoutCutoff.new(1))
       user_with_pseudonym(username: "user", active_all: 1)
       @pseudonym.authentication_provider = aac
       @pseudonym.save!
