@@ -4900,6 +4900,288 @@ describe "Submissions API", type: :request do
     assert_forbidden
   end
 
+  describe "with peer_review parameter" do
+    before :once do
+      @peer_review_course = course_factory(active_all: true)
+      @peer_review_teacher = teacher_in_course(course: @peer_review_course, active_all: true).user
+      @peer_review_student = student_in_course(course: @peer_review_course, active_all: true).user
+      @peer_review_course.enable_feature!(:peer_review_allocation_and_grading)
+      @peer_review_sub_assignment = peer_review_model(course: @peer_review_course)
+      @parent_assignment = @peer_review_sub_assignment.parent_assignment
+      @api_params = {
+        controller: "submissions_api",
+        action: "update",
+        format: "json",
+        course_id: @peer_review_course.id.to_s,
+        assignment_id: @parent_assignment.id.to_s,
+        user_id: @peer_review_student.id.to_s
+      }
+      @api_url = "/api/v1/courses/#{@peer_review_course.id}/assignments/#{@parent_assignment.id}/submissions/#{@peer_review_student.id}.json"
+      @user = @peer_review_teacher
+    end
+
+    def update_submission_via_api(body = {})
+      api_call(
+        :put,
+        @api_url,
+        @api_params,
+        body
+      )
+    end
+
+    context "when all conditions are met" do
+      it "updates peer review sub assignment submission instead of parent assignment submission" do
+        json = update_submission_via_api(
+          {
+            submission: {
+              posted_grade: "8",
+              peer_review: true
+            }
+          }
+        )
+
+        expect(json["score"]).to eq 8.0
+        expect(json["assignment_id"]).to eq @peer_review_sub_assignment.id
+
+        parent_submission = @parent_assignment.submissions.find_by(user: @peer_review_student)
+        expect(parent_submission.score).to be_nil
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.score).to eq 8.0
+      end
+
+      it "handles excuse correctly" do
+        json = update_submission_via_api(
+          {
+            submission: {
+              excuse: true,
+              peer_review: true
+            }
+          }
+        )
+
+        expect(json["excused"]).to be true
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.excused?).to be true
+      end
+
+      it "handles comments correctly" do
+        update_submission_via_api(
+          {
+            comment: {
+              text_comment: "Great peer review work!"
+            },
+            submission: {
+              peer_review: true
+            }
+          }
+        )
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.submission_comments.last.comment).to eq "Great peer review work!"
+      end
+
+      it "handles late_policy_status correctly" do
+        update_submission_via_api(
+          {
+            submission: {
+              late_policy_status: "late",
+              peer_review: true
+            }
+          }
+        )
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.late_policy_status).to eq "late"
+      end
+
+      it "handles missing grade status correctly" do
+        update_submission_via_api(
+          {
+            submission: {
+              late_policy_status: "missing",
+              peer_review: true
+            }
+          }
+        )
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.late_policy_status).to eq "missing"
+        expect(peer_review_submission.missing?).to be true
+      end
+
+      it "handles extended grade status correctly" do
+        update_submission_via_api(
+          {
+            submission: {
+              late_policy_status: "extended",
+              peer_review: true
+            }
+          }
+        )
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.late_policy_status).to eq "extended"
+        expect(peer_review_submission.extended?).to be true
+      end
+
+      it "handles late status with seconds_late_override correctly" do
+        seconds_late_override = 3.days
+        json = update_submission_via_api(
+          {
+            submission: {
+              late_policy_status: "late",
+              seconds_late_override:,
+              peer_review: true
+            }
+          }
+        )
+
+        expect(json["late_policy_status"]).to eq "late"
+        expect(json["seconds_late"]).to eq seconds_late_override.to_i
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.late_policy_status).to eq "late"
+        expect(peer_review_submission.seconds_late).to eq seconds_late_override.to_i
+      end
+
+      it "updates seconds_late_override on existing late peer review submission" do
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        peer_review_submission.update!(late_policy_status: "late", seconds_late_override: 1.day.to_i)
+
+        new_seconds_late_override = 5.days
+        json = update_submission_via_api(
+          {
+            submission: {
+              seconds_late_override: new_seconds_late_override,
+              peer_review: true
+            }
+          }
+        )
+
+        expect(json["seconds_late"]).to eq new_seconds_late_override.to_i
+
+        peer_review_submission.reload
+        expect(peer_review_submission.seconds_late).to eq new_seconds_late_override.to_i
+        expect(peer_review_submission.late_policy_status).to eq "late"
+      end
+    end
+
+    context "when feature flag is disabled" do
+      before do
+        @peer_review_course.disable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "returns error" do
+        json = api_call(
+          :put,
+          @api_url,
+          @api_params,
+          {
+            submission: {
+              posted_grade: "8",
+              peer_review: true
+            }
+          },
+          {},
+          { expected_status: 422 }
+        )
+
+        expect(json["errors"]).to be_present
+        expect(json["errors"].first["message"]).to eq("Peer review allocation and grading feature is not enabled for this course")
+      end
+    end
+
+    context "when peer_reviews is disabled on assignment" do
+      before do
+        @parent_assignment.update!(peer_reviews: false)
+      end
+
+      it "returns error" do
+        json = api_call(
+          :put,
+          @api_url,
+          @api_params,
+          {
+            submission: {
+              posted_grade: "8",
+              peer_review: true
+            }
+          },
+          {},
+          { expected_status: 422 }
+        )
+
+        expect(json["errors"]).to be_present
+        expect(json["errors"].first["message"]).to eq("This assignment does not have peer reviews enabled")
+      end
+    end
+
+    context "when peer review sub assignment doesn't exist" do
+      before do
+        @peer_review_sub_assignment.destroy
+      end
+
+      it "returns error" do
+        json = api_call(
+          :put,
+          @api_url,
+          @api_params,
+          {
+            submission: {
+              posted_grade: "8",
+              peer_review: true
+            }
+          },
+          {},
+          { expected_status: 422 }
+        )
+
+        expect(json["errors"]).to be_present
+        expect(json["errors"].first["message"]).to eq("This assignment does not have a peer review sub assignment")
+      end
+    end
+
+    context "backward compatibility" do
+      it "updates parent assignment submission when peer_review parameter is absent" do
+        json = update_submission_via_api(
+          {
+            submission: {
+              posted_grade: "8"
+            }
+          }
+        )
+
+        expect(json["score"]).to eq 8.0
+        expect(json["assignment_id"]).to eq @parent_assignment.id
+
+        parent_submission = @parent_assignment.submissions.find_by(user: @peer_review_student)
+        expect(parent_submission.score).to eq 8.0
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission&.score).to be_nil
+      end
+
+      it "updates parent assignment submission when peer_review is false" do
+        json = update_submission_via_api(
+          {
+            submission: {
+              posted_grade: "8",
+              peer_review: false
+            }
+          }
+        )
+
+        expect(json["score"]).to eq 8.0
+        expect(json["assignment_id"]).to eq @parent_assignment.id
+
+        parent_submission = @parent_assignment.submissions.find_by(user: @peer_review_student)
+        expect(parent_submission.score).to eq 8.0
+      end
+    end
+  end
+
   context "moderated grading" do
     before do
       student_in_course(active_all: true)
