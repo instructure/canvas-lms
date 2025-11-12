@@ -22,6 +22,19 @@ require "spec_helper"
 RSpec.describe Accessibility::PreviewController do
   include Factories
 
+  describe "feature_flag" do
+    let(:course) { Course.create! }
+
+    context "when a11y_checker feature flag disabled" do
+      it "renders forbidden" do
+        allow(course).to receive(:a11y_checker_enabled?).and_return(false)
+
+        expect(controller).to receive(:render).with(status: :forbidden)
+        controller.send(:check_authorized_action)
+      end
+    end
+  end
+
   describe "#create" do
     let!(:course) { Course.create! }
     let!(:user) { User.create! }

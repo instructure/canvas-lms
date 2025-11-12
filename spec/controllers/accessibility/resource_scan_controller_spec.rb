@@ -58,6 +58,16 @@ describe Accessibility::ResourceScanController do
     )
   end
 
+  context "when a11y_checker feature flag disabled" do
+    it "renders forbidden" do
+      allow_any_instance_of(described_class).to receive(:check_authorized_action).and_call_original
+      allow(course).to receive(:a11y_checker_enabled?).and_return(false)
+
+      expect(controller).to receive(:render).with(status: :forbidden)
+      controller.send(:check_authorized_action)
+    end
+  end
+
   describe "GET #index" do
     %w[resource_name resource_type resource_workflow_state resource_updated_at issue_count].each do |sort_param|
       it "sorts by #{sort_param} ascending and descending" do
