@@ -274,6 +274,9 @@ tr:
   access_token_details_495d989: "Token Erişim Ayrıntıları"
   access_token_is_valid_until_d2f048cf: "Erişim dizgesi şu tarihe kadar geçerli"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Erişim Anahtarları diğer uygulamaların sizin adınıza API iletişimi kurmalarına izin vermek için kullanılır. Kendi entegrasyonlarınız için erişim anahtarları üretip *Canvas Açık API'yi de kullanabilirsiniz.*"
+  accessibility: 
+    titles: 
+      accessibility_checker: "Erişilebilirlik Kontrolü"
   accessibility_checker_b3af1f6c: "Erişilebilirlik Kontrolü"
   accessible_sidebar_menu_b30baf97: "Erişilebilir Kenar Çubuğu Menüsü"
   accordion_section_1_7888782d: "Akordiyon Bölüm 1"
