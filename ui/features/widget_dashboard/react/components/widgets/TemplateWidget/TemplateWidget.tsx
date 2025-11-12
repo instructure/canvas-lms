@@ -28,6 +28,7 @@ import {Pagination} from '@instructure/ui-pagination'
 import {IconDragHandleLine, IconTrashLine} from '@instructure/ui-icons'
 import type {BaseWidgetProps} from '../../../types'
 import {useResponsiveContext} from '../../../hooks/useResponsiveContext'
+import WidgetContextMenu from '../../shared/WidgetContextMenu'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -70,15 +71,19 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
 
   const editModeActions = (
     <Flex gap="x-small">
-      <IconButton
-        screenReaderLabel={I18n.t('Drag to reorder widget')}
-        size="small"
-        withBackground={false}
-        withBorder={false}
-        data-testid={`${widget.id}-drag-handle`}
-      >
-        <IconDragHandleLine />
-      </IconButton>
+      <WidgetContextMenu
+        trigger={
+          <IconButton
+            screenReaderLabel={I18n.t('Drag to reorder widget')}
+            size="small"
+            withBackground={false}
+            withBorder={false}
+            data-testid={`${widget.id}-drag-handle`}
+          >
+            <IconDragHandleLine />
+          </IconButton>
+        }
+      />
       <IconButton
         screenReaderLabel={I18n.t('Remove widget')}
         size="small"
