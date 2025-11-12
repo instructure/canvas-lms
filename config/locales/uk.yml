@@ -196,6 +196,9 @@ uk:
   access_token_3be22221: "Маркер доступу"
   access_token_count_access_token_count_dfb5463c: "Кількість маркерів доступу: %{access_token_count}"
   access_token_details_495d989: "Деталі маркерів доступу"
+  accessibility: 
+    titles: 
+      accessibility_checker: "Перевірка доступності"
   accessibility_checker_b3af1f6c: "Перевірка доступності"
   accordion_section_1_7888782d: "Координаційний розділ 1"
   accordion_section_2_e1812997: "Координаційний розділ 2"
