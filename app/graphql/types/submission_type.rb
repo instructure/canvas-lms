@@ -136,14 +136,9 @@ module Types
         next if object.submission_type == "discussion_topic" && !root_account.feature_enabled?(:lti_asset_processor_discussions)
 
         if object.assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
-          if latest
-            # This is used when the student Grades is visited by a grader. Not implemented yet.
-            next
-          else
-            Loaders::SubmissionLtiAssetReportsLoader.for(is_student: false).load(object.id)
-          end
+          Loaders::SubmissionLtiAssetReportsLoader.for(for_student: false, latest:).load(object.id)
         elsif object.user_can_read_grade?(current_user, for_plagiarism: true)
-          Loaders::SubmissionLtiAssetReportsLoader.for(is_student: true).load(object.id)
+          Loaders::SubmissionLtiAssetReportsLoader.for(for_student: true, latest: true).load(object.id)
         end
       end
     end

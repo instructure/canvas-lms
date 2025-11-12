@@ -25,13 +25,20 @@
 class Loaders::SubmissionLtiAssetReportsLoader < GraphQL::Batch::Loader
   include AssetProcessorReportHelper
 
-  def initialize(is_student:)
+  def initialize(for_student:, latest:)
     super()
-    @is_student = is_student
+    raise ArgumentError if for_student && !latest
+
+    @for_student = for_student
+    @last_submission_attempt_only = latest
   end
 
   def perform(submission_ids)
-    reports_by_submission = raw_asset_reports(submission_ids:, for_student: @is_student)
+    reports_by_submission = raw_asset_reports(
+      submission_ids:,
+      for_student: @for_student,
+      last_submission_attempt_only: @last_submission_attempt_only
+    )
 
     submission_ids.each do |sub_id|
       fulfill(sub_id, reports_by_submission[sub_id])

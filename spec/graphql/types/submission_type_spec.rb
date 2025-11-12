@@ -1384,9 +1384,18 @@ describe Types::SubmissionType do
         expect(result).to eq [lti_asset_report.id.to_s]
       end
 
-      it "returns nil when latest is true (not implemented yet)" do
+      it "returns LTI asset reports when latest is true" do
+        loader = instance_double(Loaders::SubmissionLtiAssetReportsLoader)
+        allow(Loaders::SubmissionLtiAssetReportsLoader).to receive(:for)
+          .with(for_student: false, latest: true)
+          .and_return(loader)
+        allow(loader).to receive(:load).with(submission.id).and_return(Promise.resolve([lti_asset_report]))
+
         result = submission_type.resolve("ltiAssetReportsConnection(latest: true) { nodes { _id } }")
-        expect(result).to be_nil
+
+        expect(Loaders::SubmissionLtiAssetReportsLoader).to have_received(:for).with(for_student: false, latest: true)
+        expect(loader).to have_received(:load).with(submission.id)
+        expect(result).to eq [lti_asset_report.id.to_s]
       end
     end
 

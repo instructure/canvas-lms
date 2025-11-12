@@ -93,7 +93,7 @@ describe AssetProcessorReportHelper do
       third_submission = @assignment.submit_homework(third_student)
 
       # Test multiple submissions where one has no reports
-      results = raw_asset_reports(submission_ids: [third_submission.id, second_submission.id], for_student: true)
+      results = raw_asset_reports(submission_ids: [third_submission.id, second_submission.id], for_student: true, last_submission_attempt_only: true)
 
       expect(results[third_submission.id]).to be_nil
       expect(results[second_submission.id]).to eq([])
@@ -191,7 +191,7 @@ describe AssetProcessorReportHelper do
     include_context "group assignment setup"
 
     it "includes reports from group mate submissions for students" do
-      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: true)
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: true, last_submission_attempt_only: true)
 
       expect(reports[group1_sub2.id]).to be_a(Array)
       expect(reports[group1_sub2.id]).to include(group1_student1_report, group1_student2_report)
@@ -199,7 +199,7 @@ describe AssetProcessorReportHelper do
     end
 
     it "includes reports from group mate submissions for teachers" do
-      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: false)
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: false, last_submission_attempt_only: false)
 
       expect(reports[group1_sub2.id]).to be_a(Array)
       expect(reports[group1_sub2.id]).to include(group1_student1_report, group1_student2_report)
@@ -207,7 +207,7 @@ describe AssetProcessorReportHelper do
     end
 
     it "returns reports for multiple group submissions" do
-      reports = raw_asset_reports(submission_ids: [group1_sub2.id, group2_sub2.id], for_student: true)
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id, group2_sub2.id], for_student: true, last_submission_attempt_only: true)
 
       expect(reports[group1_sub2.id]).to include(group1_student1_report, group1_student2_report)
       expect(reports[group1_sub2.id]).not_to include(group2_student1_report, group2_student2_report)
@@ -217,7 +217,7 @@ describe AssetProcessorReportHelper do
     end
 
     it "handles submissions not in groups" do
-      reports = raw_asset_reports(submission_ids: [@submission.id], for_student: true)
+      reports = raw_asset_reports(submission_ids: [@submission.id], for_student: true, last_submission_attempt_only: true)
 
       expect(reports[@submission.id]).to be_a(Array)
       expect(reports[@submission.id]).to include(@apreport1)
@@ -227,7 +227,7 @@ describe AssetProcessorReportHelper do
       group1_student1_report.update!(visible_to_owner: false)
       group1_student2_report.update!(visible_to_owner: false)
 
-      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: true)
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: true, last_submission_attempt_only: true)
       expect(reports[group1_sub2.id]).to be_nil
     end
 
@@ -235,7 +235,7 @@ describe AssetProcessorReportHelper do
       group1_student1_report.update!(visible_to_owner: false)
       group1_student2_report.update!(visible_to_owner: false)
 
-      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: false)
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: false, last_submission_attempt_only: false)
       expect(reports[group1_sub2.id]).to include(group1_student1_report, group1_student2_report)
     end
 
@@ -243,7 +243,7 @@ describe AssetProcessorReportHelper do
       group1_student1_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
       group1_student2_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
 
-      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: true)
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: true, last_submission_attempt_only: true)
       expect(reports[group1_sub2.id]).to eq([])
     end
 
@@ -251,8 +251,98 @@ describe AssetProcessorReportHelper do
       group1_student1_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
       group1_student2_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
 
-      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: false)
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: false, last_submission_attempt_only: false)
       expect(reports[group1_sub2.id]).to include(group1_student1_report, group1_student2_report)
+    end
+  end
+
+  describe "#raw_asset_reports with last_submission_attempt_only" do
+    before do
+      # Create a submission with multiple attempts using submission_attempt tracking
+      @multi_attempt_assignment = assignment_model(course: @course, submission_types: "online_text_entry")
+      @multi_ap = lti_asset_processor_model(tool: @tool, assignment: @multi_attempt_assignment, title: "Multi Attempt AP")
+
+      # Submit first attempt
+      @multi_submission = @multi_attempt_assignment.submit_homework(
+        @student,
+        submission_type: "online_text_entry",
+        body: "First attempt"
+      )
+      expect(@multi_submission.attempt).to eq(1)
+
+      # Find or create asset for first attempt using submission_attempt
+      @first_asset = Lti::Asset.find_or_create_by!(
+        submission_id: @multi_submission.id,
+        submission_attempt: 1
+      )
+      @first_report = lti_asset_report_model(
+        asset_processor: @multi_ap,
+        asset: @first_asset,
+        title: "First Attempt Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PENDING,
+        visible_to_owner: true
+      )
+
+      # Manually update submission to have a second attempt
+      @multi_submission.update!(attempt: 2, body: "Second attempt")
+
+      # Create asset for second attempt
+      @second_asset = Lti::Asset.find_or_create_by!(
+        submission_id: @multi_submission.id,
+        submission_attempt: 2
+      )
+      @second_report = lti_asset_report_model(
+        asset_processor: @multi_ap,
+        asset: @second_asset,
+        title: "Second Attempt Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: true
+      )
+      @third_report = lti_asset_report_model(
+        asset_processor: @multi_ap,
+        asset: @second_asset,
+        title: "Second Attempt Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSING,
+        visible_to_owner: true,
+        report_type: "somedifferenttype"
+      )
+    end
+
+    it "returns only latest attempt reports when last_submission_attempt_only: true for teachers" do
+      reports = raw_asset_reports(
+        submission_ids: [@multi_submission.id],
+        for_student: false,
+        last_submission_attempt_only: true
+      )
+
+      expect(reports[@multi_submission.id]).to be_a(Array)
+      expect(reports[@multi_submission.id]).to include(@second_report, @third_report)
+      expect(reports[@multi_submission.id]).not_to include(@first_report)
+    end
+
+    it "returns all attempt reports when last_submission_attempt_only: false for teachers" do
+      reports = raw_asset_reports(
+        submission_ids: [@multi_submission.id],
+        for_student: false,
+        last_submission_attempt_only: false
+      )
+
+      expect(reports[@multi_submission.id]).to be_a(Array)
+      expect(reports[@multi_submission.id]).to include(@first_report, @second_report, @third_report)
+    end
+
+    it "students always see only latest attempt, and only processed reports, regardless of last_submission_attempt_only" do
+      # for_student implies last_submission_attempt_only
+      reports = raw_asset_reports(
+        submission_ids: [@multi_submission.id],
+        for_student: true,
+        last_submission_attempt_only: false
+      )
+
+      expect(reports[@multi_submission.id]).to be_a(Array)
+      expect(reports[@multi_submission.id]).to include(@second_report)
+      expect(reports[@multi_submission.id]).not_to include(@first_report)
+      expect(reports[@multi_submission.id]).not_to include(@third_report)
     end
   end
 
@@ -286,7 +376,7 @@ describe AssetProcessorReportHelper do
       expect(text_submission.attachment_associations.count).to be > 0
       expect(text_submission.attachment_ids.to_s).to eq("")
 
-      reports = raw_asset_reports(submission_ids: [text_submission.id], for_student: true)[text_submission.id]
+      reports = raw_asset_reports(submission_ids: [text_submission.id], for_student: true, last_submission_attempt_only: true)[text_submission.id]
 
       expect(reports).to be_nil
     end
@@ -315,7 +405,7 @@ describe AssetProcessorReportHelper do
       attachment_ids_array = file_submission.attachment_ids&.presence&.split(",") || []
       expect(attachment_ids_array).to include(attachment.id.to_s)
 
-      reports = raw_asset_reports(submission_ids: [file_submission.id], for_student: true)[file_submission.id]
+      reports = raw_asset_reports(submission_ids: [file_submission.id], for_student: true, last_submission_attempt_only: true)[file_submission.id]
       expect(reports).not_to be_nil
       expect(reports.length).to eq(1)
       expect(reports.first[:title]).to eq("String Comparison Report")
