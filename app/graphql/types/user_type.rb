@@ -98,11 +98,12 @@ module Types
     end
 
     field :avatar_url, UrlType, null: true
-
     def avatar_url
-      Loaders::AssociationLoader.for(User, :pseudonym).load(object).then do
+      load_association(:pseudonym).then do
         if object.account.service_enabled?(:avatars)
-          AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: false)
+          load_association(:associated_root_accounts).then do
+            AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: false)
+          end
         else
           nil
         end
