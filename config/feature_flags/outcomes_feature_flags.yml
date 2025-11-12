@@ -200,7 +200,6 @@ default_to_learning_mastery_gradebook:
   applies_to: Course
   display_name: Student Grades Page Learning Mastery Default
   description: Student Grades Page Learning Mastery Default sets the Learning Mastery tab as the default view when students access their Grades page. This option helps students focus on progress toward course learning outcomes using both numerical scores and mastery levels.
-  shadow: true
   environments:
     development:
       state: allowed
