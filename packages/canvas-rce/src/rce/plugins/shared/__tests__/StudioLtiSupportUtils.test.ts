@@ -123,6 +123,7 @@ describe('parseStudioOptions', () => {
     expect(parseStudioOptions(null)).toEqual({
       resizable: false,
       convertibleToLink: false,
+      embedOptions: {},
     })
   })
 
@@ -131,6 +132,7 @@ describe('parseStudioOptions', () => {
     expect(parseStudioOptions(element)).toEqual({
       resizable: false,
       convertibleToLink: false,
+      embedOptions: {},
     })
   })
 
@@ -141,6 +143,7 @@ describe('parseStudioOptions', () => {
     expect(parseStudioOptions(element)).toEqual({
       resizable: false,
       convertibleToLink: false,
+      embedOptions: {},
     })
   })
 
@@ -151,6 +154,7 @@ describe('parseStudioOptions', () => {
     expect(parseStudioOptions(element)).toEqual({
       resizable: true,
       convertibleToLink: false,
+      embedOptions: {},
     })
   })
 
@@ -161,6 +165,7 @@ describe('parseStudioOptions', () => {
     expect(parseStudioOptions(element)).toEqual({
       resizable: false,
       convertibleToLink: true,
+      embedOptions: {},
     })
   })
 
@@ -171,6 +176,7 @@ describe('parseStudioOptions', () => {
     expect(parseStudioOptions(element)).toEqual({
       resizable: true,
       convertibleToLink: true,
+      embedOptions: {},
     })
   })
 })
@@ -500,7 +506,12 @@ describe('updateStudioIframeDimensions', () => {
 
   describe('dimension updates', () => {
     it('should update iframe width and height', () => {
-      updateStudioIframeDimensions(mockEditor, 800, 600, 'learn_embed')
+      updateStudioIframeDimensions(mockEditor, {
+        subject: 'studio.embedTypeChanged.response',
+        width: 800,
+        height: 600,
+        embedType: 'learn_embed',
+      })
 
       // Should set styles on parent shim
       expect(mockEditor.dom.setStyles).toHaveBeenCalledWith(mockParentElement, {
@@ -521,7 +532,12 @@ describe('updateStudioIframeDimensions', () => {
       const originalHref = 'https://studio.example.com/embed/thumbnail_embed/123'
       mockEditor.dom.getAttrib.mockReturnValue(originalHref)
 
-      updateStudioIframeDimensions(mockEditor, 800, 600, 'learn_embed')
+      updateStudioIframeDimensions(mockEditor, {
+        subject: 'studio.embedTypeChanged.response',
+        width: 800,
+        height: 600,
+        embedType: 'learn_embed',
+      })
 
       expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
         mockParentElement,
@@ -534,7 +550,12 @@ describe('updateStudioIframeDimensions', () => {
       const originalHref = 'https://studio.example.com/embed/learn_embed/123'
       mockEditor.dom.getAttrib.mockReturnValue(originalHref)
 
-      updateStudioIframeDimensions(mockEditor, 800, 600, 'collaboration_embed')
+      updateStudioIframeDimensions(mockEditor, {
+        subject: 'studio.embedTypeChanged.response',
+        width: 800,
+        height: 600,
+        embedType: 'collaboration_embed',
+      })
 
       expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
         mockParentElement,
@@ -547,7 +568,12 @@ describe('updateStudioIframeDimensions', () => {
       const originalHref = 'https://studio.example.com/embed/collaboration_embed/123'
       mockEditor.dom.getAttrib.mockReturnValue(originalHref)
 
-      updateStudioIframeDimensions(mockEditor, 800, 600, 'thumbnail_embed')
+      updateStudioIframeDimensions(mockEditor, {
+        subject: 'studio.embedTypeChanged.response',
+        width: 800,
+        height: 600,
+        embedType: 'thumbnail_embed',
+      })
 
       expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
         mockParentElement,
@@ -560,7 +586,12 @@ describe('updateStudioIframeDimensions', () => {
       const originalHref = 'https://studio.example.com/thumbnail_embed/path/thumbnail_embed'
       mockEditor.dom.getAttrib.mockReturnValue(originalHref)
 
-      updateStudioIframeDimensions(mockEditor, 800, 600, 'learn_embed')
+      updateStudioIframeDimensions(mockEditor, {
+        subject: 'studio.embedTypeChanged.response',
+        width: 800,
+        height: 600,
+        embedType: 'learn_embed',
+      })
 
       expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
         mockParentElement,
@@ -573,7 +604,12 @@ describe('updateStudioIframeDimensions', () => {
       const originalHref = 'https://studio.example.com/embed/123'
       mockEditor.dom.getAttrib.mockReturnValue(originalHref)
 
-      updateStudioIframeDimensions(mockEditor, 800, 600, 'learn_embed')
+      updateStudioIframeDimensions(mockEditor, {
+        subject: 'studio.embedTypeChanged.response',
+        width: 800,
+        height: 600,
+        embedType: 'learn_embed',
+      })
 
       expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
         mockParentElement,
@@ -585,7 +621,12 @@ describe('updateStudioIframeDimensions', () => {
 
   describe('event firing', () => {
     it('should fire ObjectResized event with correct data', () => {
-      updateStudioIframeDimensions(mockEditor, 800, 600, 'learn_embed')
+      updateStudioIframeDimensions(mockEditor, {
+        subject: 'studio.embedTypeChanged.response',
+        width: 800,
+        height: 600,
+        embedType: 'learn_embed',
+      })
 
       expect(mockEditor.fire).toHaveBeenCalledWith('ObjectResized', {
         target: mockIframe,
@@ -599,7 +640,13 @@ describe('updateStudioIframeDimensions', () => {
     it('should set resizable to true and remove data-mce-resize', () => {
       const removeAttributeSpy = jest.spyOn(mockParentElement, 'removeAttribute')
 
-      updateStudioIframeDimensions(mockEditor, 800, 600, 'learn_embed', true)
+      updateStudioIframeDimensions(mockEditor, {
+        subject: 'studio.embedTypeChanged.response',
+        width: 800,
+        height: 600,
+        embedType: 'learn_embed',
+        resizable: true,
+      })
 
       // Should update both the actual attribute and the TinyMCE prefixed version
       expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
@@ -620,7 +667,13 @@ describe('updateStudioIframeDimensions', () => {
     it('should set resizable to false and add data-mce-resize="false"', () => {
       const setAttributeSpy = jest.spyOn(mockParentElement, 'setAttribute')
 
-      updateStudioIframeDimensions(mockEditor, 800, 600, 'learn_embed', false)
+      updateStudioIframeDimensions(mockEditor, {
+        subject: 'studio.embedTypeChanged.response',
+        width: 800,
+        height: 600,
+        embedType: 'learn_embed',
+        resizable: false,
+      })
 
       // Should update both the actual attribute and the TinyMCE prefixed version
       expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
@@ -642,7 +695,13 @@ describe('updateStudioIframeDimensions', () => {
       const setAttributeSpy = jest.spyOn(mockParentElement, 'setAttribute')
       mockParentElement.setAttribute('data-studio-resizable', 'true')
 
-      updateStudioIframeDimensions(mockEditor, 800, 600, 'learn_embed', false)
+      updateStudioIframeDimensions(mockEditor, {
+        subject: 'studio.embedTypeChanged.response',
+        width: 800,
+        height: 600,
+        embedType: 'learn_embed',
+        resizable: false,
+      })
 
       expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
         mockParentElement,
@@ -659,7 +718,13 @@ describe('updateStudioIframeDimensions', () => {
       mockParentElement.setAttribute('data-studio-resizable', 'false')
       mockParentElement.setAttribute('data-mce-resize', 'false')
 
-      updateStudioIframeDimensions(mockEditor, 800, 600, 'learn_embed', true)
+      updateStudioIframeDimensions(mockEditor, {
+        subject: 'studio.embedTypeChanged.response',
+        width: 800,
+        height: 600,
+        embedType: 'learn_embed',
+        resizable: true,
+      })
 
       expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
         mockParentElement,

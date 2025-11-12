@@ -22,9 +22,7 @@ import {
   handleBeforeObjectSelected,
   notifyStudioEmbedTypeChange,
   updateStudioIframeDimensions,
-  isValidDimension,
-  isValidEmbedType,
-  isValidResizable,
+  validateStudioEmbedTypeChangeResponse,
 } from '../shared/StudioLtiSupportUtils'
 import VideoTrayController from '../instructure_record/VideoOptionsTray/TrayController'
 import formatMessage from '../../../format-message'
@@ -40,23 +38,17 @@ import {
 const studioTrayController = new VideoTrayController()
 
 const handleStudioMessage = (e: MessageEvent) => {
-  if (
-    e.data &&
-    e.data.subject === 'studio.embedTypeChanged.response' &&
-    isValidDimension(e.data.width) &&
-    isValidDimension(e.data.height) &&
-    isValidEmbedType(e.data.embedType)
-  ) {
-    // resizable is optional - only pass it if it's a valid boolean
-    const resizable = isValidResizable(e.data.resizable) ? e.data.resizable : undefined
+  // can be extended in the future to handle more message types from Studio LTI
+  switch (e.data?.subject) {
+    case 'studio.embedTypeChanged.response':
+      if (validateStudioEmbedTypeChangeResponse(e.data)) {
+        updateStudioIframeDimensions(tinymce.activeEditor, e.data)
+      }
 
-    updateStudioIframeDimensions(
-      tinymce.activeEditor,
-      e.data.width,
-      e.data.height,
-      e.data.embedType,
-      resizable,
-    )
+      break
+
+    default:
+      return
   }
 }
 
