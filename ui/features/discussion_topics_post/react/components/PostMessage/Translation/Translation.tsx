@@ -19,12 +19,13 @@
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {IconAiLine, IconWarningSolid, IconRefreshLine} from '@instructure/ui-icons'
-import {createContext, PropsWithChildren, useContext, useEffect} from 'react'
+import {createContext, PropsWithChildren, useContext, useEffect, useRef} from 'react'
 import {DiscussionManagerUtilityContext} from '../../../utils/constants'
 import {useTranslationStore} from '../../../hooks/useTranslationStore'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getTranslation} from '../../../utils'
 import {Link} from '@instructure/ui-link'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('discussion_topics_post')
 
@@ -65,9 +66,15 @@ const Translation = ({id, title, message, children}: PropsWithChildren<Translati
   const addEntry = useTranslationStore(state => state.addEntry)
   const removeEntry = useTranslationStore(state => state.removeEntry)
 
+  const previousLoadingRef = useRef(false)
+  const hasAnnouncedRef = useRef(false)
+
   const retryTranslation = async () => {
     const language = entryInfo?.language || activeLanguage
     if (!language) return
+
+    // Reset announcement tracking for retry
+    hasAnnouncedRef.current = false
 
     try {
       setTranslationStart(id)
@@ -89,6 +96,57 @@ const Translation = ({id, title, message, children}: PropsWithChildren<Translati
       }
     }
   }
+
+  // Screen reader announcements for single entry translations
+  useEffect(() => {
+    // Skip announcements if translating all (handled by DiscussionTranslationModuleContainer)
+    if (isTranslateAll) {
+      return
+    }
+
+    const isLoading = entryInfo?.loading || false
+    const hasError = !!entryInfo?.error
+    const hasTranslation = !!(entryInfo?.translatedMessage || entryInfo?.translatedTitle)
+
+    // Announce when translation starts loading
+    if (isLoading && !previousLoadingRef.current && !hasAnnouncedRef.current) {
+      showFlashAlert({
+        message: I18n.t('Translating Text'),
+        srOnly: true,
+        politeness: 'polite',
+      })
+      previousLoadingRef.current = true
+    }
+    // Announce when translation completes (loading finished)
+    else if (!isLoading && previousLoadingRef.current && !hasAnnouncedRef.current) {
+      if (hasError) {
+        showFlashAlert({
+          message: I18n.t('Translation failed'),
+          srOnly: true,
+          politeness: 'assertive',
+        })
+      } else if (hasTranslation && entryInfo?.language) {
+        const languageName =
+          translationLanguages?.current?.find((lang: any) => lang.id === entryInfo.language)
+            ?.name || entryInfo.language
+        showFlashAlert({
+          message: I18n.t('Text Translated to %{language}', {language: languageName}),
+          srOnly: true,
+          politeness: 'polite',
+        })
+      }
+      previousLoadingRef.current = false
+      hasAnnouncedRef.current = true
+    }
+  }, [
+    entryInfo?.loading,
+    entryInfo?.error,
+    entryInfo?.translatedMessage,
+    entryInfo?.translatedTitle,
+    entryInfo?.language,
+    isTranslateAll,
+    translationLanguages,
+  ])
 
   useEffect(() => {
     addEntry(id, {title, message})

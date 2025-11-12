@@ -24,6 +24,9 @@ import {DiscussionManagerUtilityContext} from '../../../utils/constants'
 import {MockedProvider} from '@apollo/client/testing'
 import {useTranslationStore} from '../../../hooks/useTranslationStore'
 import {ObserverContext} from '../../../utils/ObserverContext'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/alerts/react/FlashAlert')
 
 const mockContextValue = {
   setTranslateTargetLanguage: vi.fn(),
@@ -244,5 +247,234 @@ describe('DiscussionTranslationModuleContainer', () => {
 
     const input = screen.getByPlaceholderText('Select a language...')
     expect(input).toHaveValue('')
+  })
+
+  describe('screen reader announcements', () => {
+    beforeEach(() => {
+      showFlashAlert.mockClear()
+    })
+
+    it('announces when translation starts loading', async () => {
+      useTranslationStore.mockImplementation(selector => {
+        const state = {
+          ...defaultState,
+          entries: {
+            entry1: {loading: false},
+          },
+        }
+        return selector(state)
+      })
+
+      const {rerender} = setup()
+
+      // Start translation
+      const input = screen.getByPlaceholderText('Select a language...')
+      await userEvent.click(input)
+      const spanishOption = await screen.findByText('Spanish')
+      await userEvent.click(spanishOption)
+
+      const translateButton = screen.getByTestId('translate-discussion-button')
+      await userEvent.click(translateButton)
+
+      // Simulate loading state
+      useTranslationStore.mockImplementation(selector => {
+        const state = {
+          ...defaultState,
+          translateAll: true,
+          activeLanguage: 'es',
+          entries: {
+            entry1: {loading: true},
+          },
+        }
+        return selector(state)
+      })
+
+      rerender(
+        <MockedProvider mocks={defaultMocks}>
+          <ObserverContext.Provider
+            value={{
+              observerRef: {current: undefined},
+              nodesRef: {current: new Map()},
+              startObserving: jest.fn(),
+              stopObserving: jest.fn(),
+            }}
+          >
+            <DiscussionManagerUtilityContext.Provider value={mockContextValue}>
+              <DiscussionTranslationModuleContainer />
+            </DiscussionManagerUtilityContext.Provider>
+          </ObserverContext.Provider>
+        </MockedProvider>,
+      )
+
+      await waitFor(() => {
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'Translating Discussion',
+          srOnly: true,
+          politeness: 'polite',
+        })
+      })
+    })
+
+    it('announces when translation completes successfully', async () => {
+      useTranslationStore.mockImplementation(selector => {
+        const state = {
+          ...defaultState,
+          translateAll: true,
+          activeLanguage: 'es',
+          entries: {
+            entry1: {loading: true},
+          },
+        }
+        return selector(state)
+      })
+
+      const {rerender} = setup()
+
+      // Simulate translation completion
+      useTranslationStore.mockImplementation(selector => {
+        const state = {
+          ...defaultState,
+          translateAll: true,
+          activeLanguage: 'es',
+          entries: {
+            entry1: {
+              loading: false,
+              translatedMessage: 'Hola mundo',
+            },
+          },
+        }
+        return selector(state)
+      })
+
+      rerender(
+        <MockedProvider mocks={defaultMocks}>
+          <ObserverContext.Provider
+            value={{
+              observerRef: {current: undefined},
+              nodesRef: {current: new Map()},
+              startObserving: jest.fn(),
+              stopObserving: jest.fn(),
+            }}
+          >
+            <DiscussionManagerUtilityContext.Provider value={mockContextValue}>
+              <DiscussionTranslationModuleContainer />
+            </DiscussionManagerUtilityContext.Provider>
+          </ObserverContext.Provider>
+        </MockedProvider>,
+      )
+
+      await waitFor(() => {
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message:
+            'Discussion description translated to Spanish. Replies will translate as you navigate the page.',
+          srOnly: true,
+          politeness: 'polite',
+        })
+      })
+    })
+
+    it('announces error when there are translation errors', async () => {
+      useTranslationStore.mockImplementation(selector => {
+        const state = {
+          ...defaultState,
+          translateAll: true,
+          activeLanguage: 'es',
+          entries: {
+            entry1: {loading: true},
+          },
+        }
+        return selector(state)
+      })
+
+      const {rerender} = setup()
+
+      showFlashAlert.mockClear()
+
+      // Simulate translation error
+      useTranslationStore.mockImplementation(selector => {
+        const state = {
+          ...defaultState,
+          translateAll: true,
+          activeLanguage: 'es',
+          entries: {
+            entry1: {
+              loading: false,
+              error: {type: 'error', message: 'Translation failed'},
+            },
+          },
+        }
+        return selector(state)
+      })
+
+      rerender(
+        <MockedProvider mocks={defaultMocks}>
+          <ObserverContext.Provider
+            value={{
+              observerRef: {current: undefined},
+              nodesRef: {current: new Map()},
+              startObserving: jest.fn(),
+              stopObserving: jest.fn(),
+            }}
+          >
+            <DiscussionManagerUtilityContext.Provider value={mockContextValue}>
+              <DiscussionTranslationModuleContainer />
+            </DiscussionManagerUtilityContext.Provider>
+          </ObserverContext.Provider>
+        </MockedProvider>,
+      )
+
+      await waitFor(() => {
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'Discussion translation failed',
+          srOnly: true,
+          politeness: 'assertive',
+        })
+      })
+    })
+
+    it('announces when translation is reset', async () => {
+      setup()
+
+      const resetButton = screen.getByTestId('reset-translation-button')
+      await userEvent.click(resetButton)
+
+      await waitFor(() => {
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'Discussion Translation reset',
+          srOnly: true,
+          politeness: 'polite',
+        })
+      })
+    })
+
+    it('announces for announcements with correct content type', async () => {
+      render(
+        <MockedProvider mocks={defaultMocks}>
+          <ObserverContext.Provider
+            value={{
+              observerRef: {current: undefined},
+              nodesRef: {current: new Map()},
+              startObserving: jest.fn(),
+              stopObserving: jest.fn(),
+            }}
+          >
+            <DiscussionManagerUtilityContext.Provider value={mockContextValue}>
+              <DiscussionTranslationModuleContainer isAnnouncement={true} />
+            </DiscussionManagerUtilityContext.Provider>
+          </ObserverContext.Provider>
+        </MockedProvider>,
+      )
+
+      const resetButton = screen.getByTestId('reset-translation-button')
+      await userEvent.click(resetButton)
+
+      await waitFor(() => {
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'Announcement Translation reset',
+          srOnly: true,
+          politeness: 'polite',
+        })
+      })
+    })
   })
 })
