@@ -47,8 +47,8 @@ import {
   FormValue,
   IssueWorkflowState,
 } from '../../types'
-import {findById, replaceById} from '../../utils/apiData'
-import {getCourseBasedPath} from '../../utils/query'
+import {convertKeysToCamelCase, findById, replaceById} from '../../utils/apiData'
+import {getCourseBasedPath, getResourceScanPath} from '../../utils/query'
 import ApplyButton from './ApplyButton'
 import AccessibilityIssuesDrawerFooter from './Footer'
 import Form, {FormHandle} from './Form'
@@ -235,13 +235,16 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         }),
       })
 
-      const updatedIssues = issues.filter(issue => issue.id !== issueId)
-      setIssues(updatedIssues)
+      const newScanResponse = await doFetchApi({
+        path: getResourceScanPath(current.resource),
+        method: 'POST',
+      })
+      const newScan = convertKeysToCamelCase(newScanResponse.json!) as AccessibilityResourceScan
+      const issues = newScan.issues ?? []
+
+      setIssues(issues)
       if (accessibilityScans) {
-        const updatedOrderedTableData = updateCountPropertyForItem(
-          accessibilityScans,
-          current.resource,
-        )
+        const updatedOrderedTableData = updateCountPropertyForItem(accessibilityScans, newScan)
         setAccessibilityScans(updatedOrderedTableData)
         if (nextResource) {
           const nextItem: AccessibilityResourceScan = accessibilityScans[nextResource.index]
@@ -253,8 +256,8 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           }
         }
       }
-      updateAccessibilityIssues(updatedIssues)
-      setCurrentIssueIndex(prev => Math.max(0, Math.min(prev, updatedIssues.length - 1)))
+      updateAccessibilityIssues(issues)
+      setCurrentIssueIndex(0)
       doFetchAccessibilityIssuesSummary({})
     } catch (err: any) {
       console.error('Error saving accessibility issue. Error is: ' + err.message)
