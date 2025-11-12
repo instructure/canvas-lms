@@ -3409,7 +3409,7 @@ class ApplicationController < ActionController::Base
   end
 
   def recaptcha_enabled?(**)
-    DynamicSettings.find(tree: :private)["recaptcha_server_key", **].present? && @domain_root_account.self_registration_captcha?
+    Rails.application.credentials.recaptcha_keys.present? && @domain_root_account.self_registration_captcha?
   end
 
   def peer_reviews_for_a2_enabled?
@@ -3532,7 +3532,7 @@ class ApplicationController < ActionController::Base
 
   # Similar to Account#recaptcha_key, but does not check the `self_registration_captcha?` setting.
   def captcha_site_key
-    DynamicSettings.find(tree: :private)["recaptcha_client_key"]
+    Rails.application.credentials.dig(:recaptcha_keys, :client_key)
   end
   helper_method :captcha_site_key
 
