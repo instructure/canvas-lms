@@ -19,15 +19,18 @@
 #
 
 describe AuthenticationProvider::SAML do
+  include AccountDomainSpecHelper
+
   before do
     skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
-    allow_any_instance_of(Account).to receive(:environment_specific_domain)
+    stub_host_for_environment_specific_domain("test.host")
     @account = Account.create!(name: "account")
     @file_that_exists = File.expand_path(__FILE__)
   end
 
   it "sets the entity_id with the current domain" do
     allow(HostUrl).to receive(:default_host).and_return("bob.cody.instructure.com")
+    stub_host_for_environment_specific_domain("bob.cody.instructure.com")
     @aac = @account.authentication_providers.create!(auth_type: "saml")
     expect(@aac.entity_id).to eq "http://bob.cody.instructure.com/saml2"
     @account.reload
