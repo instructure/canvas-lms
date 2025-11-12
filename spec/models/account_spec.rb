@@ -38,12 +38,8 @@ describe Account do
       AccountDomain.create!(host: "canvas.instructure.com", account: root_account)
     end
 
-    it "retrieves correct beta domain" do
-      allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
-      expect(root_account.environment_specific_domain).to eq "canvas.beta.instructure.com"
-    end
-
     it "retrieves correct prod domain" do
+      # beta domains are handled in MRA
       allow(ApplicationController).to receive(:test_cluster_name).and_return(nil)
       expect(root_account.environment_specific_domain).to eq "canvas.instructure.com"
     end
