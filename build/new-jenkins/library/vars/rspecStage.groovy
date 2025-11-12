@@ -158,11 +158,11 @@ def tearDownNode() {
   }
 
   // Find and process skipped tests
-  findFiles(glob: "$destDir/skipped/**").each { skipFile ->
+  findFiles(glob: "$destDir/skipped/**/*.json").each { skipFile ->
     def skipReport = readJSON file: skipFile.path
 
     skipReport.pending?.each { test ->
-      buildSummaryReport.addSkippedTest(test.description, test)
+      buildSummaryReport.addSkippedTest(test.location, test)
     }
   }
 }
