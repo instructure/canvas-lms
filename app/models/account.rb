@@ -631,7 +631,7 @@ class Account < ActiveRecord::Base
   def recaptcha_key
     return nil unless root_account? && self_registration_captcha?
 
-    DynamicSettings.find(tree: "private")["recaptcha_client_key", failsafe: nil]
+    Rails.application.credentials.dig(:recaptcha_keys, :client_key)
   end
 
   def self_registration_allowed_for?(type)
