@@ -401,7 +401,8 @@ class Quizzes::QuizzesController < ApplicationController
         HAS_GRADING_PERIODS: @context.grading_periods?,
         MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,
         MAX_NAME_LENGTH: max_name_length,
-        IS_MODULE_ITEM: @quiz.is_module_item?
+        IS_MODULE_ITEM: @quiz.is_module_item?,
+        context_rubric_associations_url: context_url(@context, :context_rubric_associations_url)
       }
 
       set_section_list_js_env
