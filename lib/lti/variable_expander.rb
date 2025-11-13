@@ -745,6 +745,12 @@ module Lti
                        [],
                        -> { lti_helper.account.sis_source_id }
 
+    # returns true if the current account is a Horizon account
+    # @internal
+    register_expansion "Canvas.account.horizonMode",
+                       [],
+                       -> { lti_helper.account.horizon_account? }
+
     # returns the Root Account ID for the current context.
     # @example
     #   ```
@@ -1004,6 +1010,13 @@ module Lti
     register_expansion "Canvas.course.gradePassbackSetting",
                        [],
                        -> { lti_helper.course.grade_passback_setting },
+                       COURSE_GUARD
+
+    # returns true if the current course is a Horizon course
+    # @internal
+    register_expansion "Canvas.course.horizonMode",
+                       [],
+                       -> { lti_helper.course.horizon_course? },
                        COURSE_GUARD
 
     # returns the current course's term start date.
