@@ -17,7 +17,6 @@
  */
 
 import React, {useState, useEffect} from 'react'
-import {Flex} from '@instructure/ui-flex'
 import CanvasMultiSelect from '@canvas/multi-select'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconSearchLine} from '@instructure/ui-icons'
@@ -70,27 +69,25 @@ export const StudentSearch: React.FC<StudentSearchProps> = ({
   }, 500)
 
   return (
-    <Flex gap="small">
-      <CanvasMultiSelect
-        label={I18n.t('Student Names')}
-        onChange={handleSelectedUsersChange}
-        placeholder={I18n.t('Search Students')}
-        selectedOptionIds={selectedUserIds.map(id => String(id))}
-        customRenderBeforeInput={tags => [<IconSearchLine key="search-icon" />].concat(tags || [])}
-        customOnInputChange={handleInputChange}
-        isLoading={isLoading}
-      >
-        {students.map(student => (
-          <CanvasMultiSelect.Option
-            key={student.id}
-            id={student.id}
-            label={student.name}
-            value={student.id}
-          >
-            {student.name}
-          </CanvasMultiSelect.Option>
-        ))}
-      </CanvasMultiSelect>
-    </Flex>
+    <CanvasMultiSelect
+      label={I18n.t('Student Names')}
+      onChange={handleSelectedUsersChange}
+      placeholder={I18n.t('Search Students')}
+      selectedOptionIds={selectedUserIds.map(id => String(id))}
+      customRenderBeforeInput={tags => [<IconSearchLine key="search-icon" />].concat(tags || [])}
+      customOnInputChange={handleInputChange}
+      isLoading={isLoading}
+    >
+      {students.map(student => (
+        <CanvasMultiSelect.Option
+          key={student.id}
+          id={student.id}
+          label={student.name}
+          value={student.id}
+        >
+          {student.name}
+        </CanvasMultiSelect.Option>
+      ))}
+    </CanvasMultiSelect>
   )
 }
