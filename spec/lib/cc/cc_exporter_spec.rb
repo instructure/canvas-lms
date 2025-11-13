@@ -232,8 +232,8 @@ describe "Common Cartridge exporting" do
 
     it "creates a quizzes-only export" do
       att = attachment_model(uploaded_data: fixture_file_upload("test_image.jpg"))
-      @q1 = @course.quizzes.create!(title: "quiz1", description: %(<p><img src="/courses/#{@course.id}/files/#{att.id}/preview" width="150" height="150" /></p>"), saving_user: @user)
-      @q2 = @course.quizzes.create!(title: "quiz2", saving_user: @user)
+      @q1 = @course.quizzes.create!(title: "quiz1", description: %(<p><img src="/courses/#{@course.id}/files/#{att.id}/preview" width="150" height="150" /></p>"), updating_user: @user)
+      @q2 = @course.quizzes.create!(title: "quiz2", updating_user: @user)
 
       @ce.export_type = ContentExport::QTI
       @ce.selected_content = {
@@ -314,11 +314,11 @@ describe "Common Cartridge exporting" do
         "points_possible" => 10,
         "answers" => [{ "id" => 1 }, { "id" => 2 }],
       }
-      question = @bank.assessment_questions.create!(question_data:, current_user: @user)
+      question = @bank.assessment_questions.create!(question_data:, updating_user: @user)
       question.question_data = question_data.merge("question_text" => %(<p><img src="/courses/#{@course.id}/files/#{@attachment.id}/download"></p>))
       question.save!
       att = question.attachments.take
-      quiz_model(course: @course, saving_user: @user)
+      quiz_model(course: @course, updating_user: @user)
       @quiz.add_assessment_questions([question])
 
       @ce.export_type = ContentExport::QTI
@@ -344,7 +344,7 @@ describe "Common Cartridge exporting" do
       att = Attachment.create!(filename: "first.png", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
       att2 = Attachment.create!(filename: "second.jpg", uploaded_data: StringIO.new("ohais"), folder: Folder.unfiled_folder(@course), context: @course)
       user_att = Attachment.create!(filename: "user.png", uploaded_data: StringIO.new("user"), folder: Folder.root_folders(@user).first, context: @user)
-      q1 = @course.quizzes.create(title: "quiz1", saving_user: @user)
+      q1 = @course.quizzes.create(title: "quiz1", updating_user: @user)
 
       qq = q1.quiz_questions.create!
       question_text = <<~HTML.strip
@@ -368,7 +368,7 @@ describe "Common Cartridge exporting" do
         ]
       }.with_indifferent_access
       qq["question_data"] = data
-      qq.saving_user = @user
+      qq.updating_user = @user
       qq.save!
 
       @ce.export_type = ContentExport::QTI
@@ -400,7 +400,7 @@ describe "Common Cartridge exporting" do
 
     it "includes any files referenced in html for course export" do
       att1 = Attachment.create!(filename: "first.png", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
-      quiz = @course.quizzes.create(title: "quiz1", saving_user: @user)
+      quiz = @course.quizzes.create(title: "quiz1", updating_user: @user)
 
       qq = quiz.quiz_questions.create!
       data = { correct_comments: "",
@@ -416,7 +416,7 @@ describe "Common Cartridge exporting" do
                answers: [{ migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080 },
                          { migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279 }] }.with_indifferent_access
       qq["question_data"] = data
-      qq.saving_user = @user
+      qq.updating_user = @user
       qq.save!
 
       attachment_model(uploaded_data: stub_png_data)
@@ -428,7 +428,7 @@ describe "Common Cartridge exporting" do
         answers: [{ "migration_id" => "QUE_1018_A1", "text" => "True" }, { "migration_id" => "QUE_1019_A2", "text" => "False" }],
         question_text: %(<img src="/courses/#{@course.id}/files/#{@attachment.id}/download">)
       }
-      question = @bank.assessment_questions.create!(question_data:, current_user: @user)
+      question = @bank.assessment_questions.create!(question_data:, updating_user: @user)
       question.question_data = question_data
       question.save!
       quiz.add_assessment_questions([question])
@@ -465,7 +465,7 @@ describe "Common Cartridge exporting" do
         folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
         @linked_att = Attachment.create!(filename: "linked.png", uploaded_data: StringIO.new("1"), folder:, context: @course)
         Attachment.create!(filename: "not-linked.jpg", uploaded_data: StringIO.new("2"), folder:, context: @course)
-        @course.wiki_pages.create!(title: "paeg", body: "Image yo: <img src=\"/courses/#{@course.id}/files/#{@linked_att.id}/preview\">", saving_user: @user)
+        @course.wiki_pages.create!(title: "paeg", body: "Image yo: <img src=\"/courses/#{@course.id}/files/#{@linked_att.id}/preview\">", updating_user: @user)
         @ce.export_type = ContentExport::COMMON_CARTRIDGE
         @ce.save!
       end
@@ -527,7 +527,7 @@ describe "Common Cartridge exporting" do
     end
 
     it "includes media objects" do
-      @q1 = @course.quizzes.create(title: "quiz1", saving_user: @user)
+      @q1 = @course.quizzes.create(title: "quiz1", updating_user: @user)
       folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
       att = Attachment.create!(context: @course, folder:, media_entry_id: "some-kaltura-id", display_name: "test.mp4", filename: "test.mp4", uploaded_data: StringIO.new("media"))
       @media_object = @course.media_objects.create!(
@@ -562,7 +562,7 @@ describe "Common Cartridge exporting" do
                   }]
       }.with_indifferent_access
       qq["question_data"] = data
-      qq.saving_user = @user
+      qq.updating_user = @user
       qq.save!
 
       @ce.export_type = ContentExport::QTI
@@ -749,7 +749,7 @@ describe "Common Cartridge exporting" do
       @att.display_name = "not_actually_first.png"
       @att.save!
 
-      @q1 = @course.quizzes.create(title: "quiz1", saving_user: @user)
+      @q1 = @course.quizzes.create(title: "quiz1", updating_user: @user)
 
       qq = @q1.quiz_questions.create!
       data = { correct_comments: "",
@@ -765,7 +765,7 @@ describe "Common Cartridge exporting" do
                answers: [{ migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080 },
                          { migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279 }] }.with_indifferent_access
       qq["question_data"] = data
-      qq.saving_user = @user
+      qq.updating_user = @user
       qq.save!
 
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
@@ -789,7 +789,7 @@ describe "Common Cartridge exporting" do
 
     it "does not get confused by attachments with absolute paths" do
       @att = Attachment.create!(filename: "first.png", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
-      @q1 = @course.quizzes.create(title: "quiz1", description: %(<img src="https://example.com/files/#{@att.id}/download?download_frd=1">), saving_user: @user)
+      @q1 = @course.quizzes.create(title: "quiz1", description: %(<img src="https://example.com/files/#{@att.id}/download?download_frd=1">), updating_user: @user)
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       run_export
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_meta.xml"))
@@ -832,13 +832,13 @@ describe "Common Cartridge exporting" do
       @att = Attachment.create!(filename: "first.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
       link_thing = %(<a href="/courses/#{@course.id}/files/#{@att.id}/download?wrap=1">/courses/#{@course.id}/files/#{@att.id}/download?wrap=1</a>)
       @course.syllabus_body = link_thing
-      @course.saving_user = @user
+      @course.updating_user = @user
       @course.save!
       @ag = @course.assignment_groups.create!(name: "group1")
       @asmnt = @course.assignments.create!(title: "Assignment 1",
                                            points_possible: 10,
                                            assignment_group: @ag,
-                                           saving_user: @user,
+                                           updating_user: @user,
                                            description: link_thing)
       @ag2 = @course.assignment_groups.create!(name: "group2")
       @asmnt2 = @course.assignments.create!(title: "Assignment 2", points_possible: 10, assignment_group: @ag2)
@@ -1044,7 +1044,7 @@ describe "Common Cartridge exporting" do
       @course.assignments.create! name: "test assignment",
                                   description: %(<a href="/courses/#{@course.id}/files/#{@file.id}/preview">what?</a>),
                                   points_possible: 11,
-                                  saving_user: @user,
+                                  updating_user: @user,
                                   submission_types: "online_text_entry,online_upload,online_url"
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       @ce.save!

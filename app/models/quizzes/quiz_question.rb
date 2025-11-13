@@ -204,7 +204,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     if aq.editable_by?(self)
       aq.question_data = question_data
       aq.initial_context = quiz.context if quiz&.context
-      aq.current_user = updating_user
+      aq.updating_user = updating_user
       aq.save! if aq.new_record?
     end
 

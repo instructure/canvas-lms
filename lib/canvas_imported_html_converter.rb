@@ -62,8 +62,8 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
       replace_item_placeholders!(item_key, field_links)
 
       add_missing_link_warnings!(item_key, field_links)
-    rescue
-      @migration.add_warning("An error occurred while translating content links", $!)
+    rescue => e
+      @migration.add_warning("An error occurred while translating content links", e)
     end
   end
 

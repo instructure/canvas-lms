@@ -205,7 +205,7 @@ module Importers
               import_syllabus_from_migration(course, syllabus_body, migration) if syllabus_body
             end
 
-            course.saving_user = migration.user
+            course.updating_user = migration.user
             course.save! if course.changed?
 
             migration.resolve_content_links!
@@ -217,18 +217,12 @@ module Importers
               # Get all assessment questions that were part of this migration
               # We can't use migration.imported_migration_items_by_class because assessment questions
               # imported via raw SQL don't get tracked there
-              imported_aq_ids = migration.context.assessment_questions
-                                         .where.not(migration_id: nil)
-                                         .where(assessment_questions: { updated_at: migration.created_at.. })
-                                         .pluck(:id)
-
-              if imported_aq_ids.any?
-                imported_aq_ids.each do |aq_id|
-                  if (aq = AssessmentQuestion.find_by(id: aq_id))
-                    aq.current_user = migration.user
-                    aq.translate_links
-                  end
-                end
+              imported_aqs = migration.context.assessment_questions
+                                      .where.not(migration_id: nil)
+                                      .where(assessment_questions: { updated_at: migration.created_at.. })
+              imported_aqs.each do |aq|
+                aq.updating_user = migration.user
+                aq.translate_links
               end
             end
 
