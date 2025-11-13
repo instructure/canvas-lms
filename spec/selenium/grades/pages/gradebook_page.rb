@@ -20,6 +20,7 @@
 require_relative "../../common"
 require_relative "post_grades_tray_page"
 require_relative "hide_grades_tray_page"
+require_relative "gradebook_grade_detail_tray_page"
 
 module Gradebook
   extend SeleniumDependencies
