@@ -24,33 +24,83 @@ import {
   IconMoveUpLine,
   IconMoveDownLine,
   IconMoveDownBottomLine,
+  IconArrowStartLine,
+  IconArrowEndLine,
 } from '@instructure/ui-icons'
+import type {Widget, WidgetConfig} from '../../types'
+import {LEFT_COLUMN, RIGHT_COLUMN} from '../../constants'
 
 const I18n = createI18nScope('widget_dashboard')
 
 interface WidgetContextMenuProps {
   trigger: React.ReactElement
+  widget: Widget
+  config: WidgetConfig
   onSelect?: (action: string) => void
 }
 
-const WidgetContextMenu: React.FC<WidgetContextMenuProps> = ({trigger, onSelect}) => {
+const getWidgetConstraints = (widget: Widget, config: WidgetConfig) => {
+  const colWidgets = config.widgets.filter(w => w.position.col === widget.position.col)
+  const sortedColWidgets = [...colWidgets].sort((a, b) => a.position.row - b.position.row)
+  const widgetIndex = sortedColWidgets.findIndex(w => w.id === widget.id)
+
+  return {
+    isFirstInColumn: widgetIndex === 0,
+    isLastInColumn: widgetIndex === sortedColWidgets.length - 1,
+    isInLeftColumn: widget.position.col === LEFT_COLUMN,
+    isInRightColumn: widget.position.col === RIGHT_COLUMN,
+  }
+}
+
+const WidgetContextMenu: React.FC<WidgetContextMenuProps> = ({
+  trigger,
+  widget,
+  config,
+  onSelect,
+}) => {
   const handleSelect = (action: string) => {
     onSelect?.(action)
   }
 
+  const constraints = getWidgetConstraints(widget, config)
+
   return (
     <Menu placement="bottom start" trigger={trigger}>
-      <Menu.Item onSelect={() => handleSelect('move-to-top')}>
+      <Menu.Item
+        onSelect={() => handleSelect('move-to-top')}
+        disabled={constraints.isFirstInColumn}
+      >
         <IconMoveUpTopLine /> {I18n.t('Move to top')}
       </Menu.Item>
-      <Menu.Item onSelect={() => handleSelect('move-up')}>
+      <Menu.Item onSelect={() => handleSelect('move-up')} disabled={constraints.isFirstInColumn}>
         <IconMoveUpLine /> {I18n.t('Move up')}
       </Menu.Item>
-      <Menu.Item onSelect={() => handleSelect('move-down')}>
+      <Menu.Item onSelect={() => handleSelect('move-down')} disabled={constraints.isLastInColumn}>
         <IconMoveDownLine /> {I18n.t('Move down')}
       </Menu.Item>
-      <Menu.Item onSelect={() => handleSelect('move-to-bottom')}>
+      <Menu.Item
+        onSelect={() => handleSelect('move-to-bottom')}
+        disabled={constraints.isLastInColumn}
+      >
         <IconMoveDownBottomLine /> {I18n.t('Move to bottom')}
+      </Menu.Item>
+      <Menu.Item
+        onSelect={() => handleSelect('move-left-top')}
+        disabled={constraints.isInLeftColumn}
+      >
+        <IconArrowStartLine /> {I18n.t('Move left top')}
+      </Menu.Item>
+      <Menu.Item onSelect={() => handleSelect('move-left')} disabled={constraints.isInLeftColumn}>
+        <IconArrowStartLine /> {I18n.t('Move left bottom')}
+      </Menu.Item>
+      <Menu.Item
+        onSelect={() => handleSelect('move-right-top')}
+        disabled={constraints.isInRightColumn}
+      >
+        <IconArrowEndLine /> {I18n.t('Move right top')}
+      </Menu.Item>
+      <Menu.Item onSelect={() => handleSelect('move-right')} disabled={constraints.isInRightColumn}>
+        <IconArrowEndLine /> {I18n.t('Move right bottom')}
       </Menu.Item>
     </Menu>
   )

@@ -22,8 +22,40 @@ import userEvent from '@testing-library/user-event'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconDragHandleLine} from '@instructure/ui-icons'
 import WidgetContextMenu from '../WidgetContextMenu'
+import type {Widget, WidgetConfig} from '../../../types'
 
 describe('WidgetContextMenu', () => {
+  const mockWidget: Widget = {
+    id: 'test-widget',
+    type: 'test',
+    position: {col: 1, row: 1, relative: 1},
+    title: 'Test Widget',
+  }
+
+  const mockConfig: WidgetConfig = {
+    columns: 2,
+    widgets: [
+      {
+        id: 'test-widget',
+        type: 'test',
+        position: {col: 1, row: 1, relative: 1},
+        title: 'Test Widget',
+      },
+      {
+        id: 'other-widget',
+        type: 'test',
+        position: {col: 1, row: 2, relative: 2},
+        title: 'Other Widget',
+      },
+      {
+        id: 'right-widget',
+        type: 'test',
+        position: {col: 2, row: 1, relative: 3},
+        title: 'Right Widget',
+      },
+    ],
+  }
+
   const buildDefaultProps = (overrides = {}) => {
     return {
       trigger: (
@@ -31,6 +63,8 @@ describe('WidgetContextMenu', () => {
           <IconDragHandleLine />
         </IconButton>
       ),
+      widget: mockWidget,
+      config: mockConfig,
       onSelect: jest.fn(),
       ...overrides,
     }
@@ -55,12 +89,90 @@ describe('WidgetContextMenu', () => {
     expect(screen.getByText('Move up')).toBeInTheDocument()
     expect(screen.getByText('Move down')).toBeInTheDocument()
     expect(screen.getByText('Move to bottom')).toBeInTheDocument()
+    expect(screen.getByText('Move left top')).toBeInTheDocument()
+    expect(screen.getByText('Move left bottom')).toBeInTheDocument()
+    expect(screen.getByText('Move right top')).toBeInTheDocument()
+    expect(screen.getByText('Move right bottom')).toBeInTheDocument()
+  })
+
+  it('calls onSelect with "move-left" when Move left bottom is clicked', async () => {
+    const user = userEvent.setup()
+    const onSelect = jest.fn()
+    setup(
+      buildDefaultProps({
+        widget: {
+          id: 'right-widget',
+          type: 'test',
+          position: {col: 2, row: 1, relative: 3},
+          title: 'Right Widget',
+        },
+        onSelect,
+      }),
+    )
+
+    await user.click(screen.getByTestId('menu-trigger'))
+    await user.click(screen.getByText('Move left bottom'))
+
+    expect(onSelect).toHaveBeenCalledWith('move-left')
+  })
+
+  it('calls onSelect with "move-right" when Move right bottom is clicked', async () => {
+    const user = userEvent.setup()
+    const onSelect = jest.fn()
+    setup(buildDefaultProps({onSelect}))
+
+    await user.click(screen.getByTestId('menu-trigger'))
+    await user.click(screen.getByText('Move right bottom'))
+
+    expect(onSelect).toHaveBeenCalledWith('move-right')
+  })
+
+  it('calls onSelect with "move-left-top" when Move left top is clicked', async () => {
+    const user = userEvent.setup()
+    const onSelect = jest.fn()
+    setup(
+      buildDefaultProps({
+        widget: {
+          id: 'right-widget',
+          type: 'test',
+          position: {col: 2, row: 1, relative: 3},
+          title: 'Right Widget',
+        },
+        onSelect,
+      }),
+    )
+
+    await user.click(screen.getByTestId('menu-trigger'))
+    await user.click(screen.getByText('Move left top'))
+
+    expect(onSelect).toHaveBeenCalledWith('move-left-top')
+  })
+
+  it('calls onSelect with "move-right-top" when Move right top is clicked', async () => {
+    const user = userEvent.setup()
+    const onSelect = jest.fn()
+    setup(buildDefaultProps({onSelect}))
+
+    await user.click(screen.getByTestId('menu-trigger'))
+    await user.click(screen.getByText('Move right top'))
+
+    expect(onSelect).toHaveBeenCalledWith('move-right-top')
   })
 
   it('calls onSelect with "move-to-top" when Move to top is clicked', async () => {
     const user = userEvent.setup()
     const onSelect = jest.fn()
-    setup(buildDefaultProps({onSelect}))
+    setup(
+      buildDefaultProps({
+        widget: {
+          id: 'other-widget',
+          type: 'test',
+          position: {col: 1, row: 2, relative: 2},
+          title: 'Other Widget',
+        },
+        onSelect,
+      }),
+    )
 
     await user.click(screen.getByTestId('menu-trigger'))
     await user.click(screen.getByText('Move to top'))
@@ -71,7 +183,17 @@ describe('WidgetContextMenu', () => {
   it('calls onSelect with "move-up" when Move up is clicked', async () => {
     const user = userEvent.setup()
     const onSelect = jest.fn()
-    setup(buildDefaultProps({onSelect}))
+    setup(
+      buildDefaultProps({
+        widget: {
+          id: 'other-widget',
+          type: 'test',
+          position: {col: 1, row: 2, relative: 2},
+          title: 'Other Widget',
+        },
+        onSelect,
+      }),
+    )
 
     await user.click(screen.getByTestId('menu-trigger'))
     await user.click(screen.getByText('Move up'))
@@ -103,9 +225,111 @@ describe('WidgetContextMenu', () => {
 
   it('does not call onSelect if onSelect prop is not provided', async () => {
     const user = userEvent.setup()
-    setup(buildDefaultProps({onSelect: undefined}))
+    setup(
+      buildDefaultProps({
+        widget: {
+          id: 'other-widget',
+          type: 'test',
+          position: {col: 1, row: 2, relative: 2},
+          title: 'Other Widget',
+        },
+        onSelect: undefined,
+      }),
+    )
 
     await user.click(screen.getByTestId('menu-trigger'))
     await user.click(screen.getByText('Move to top'))
+  })
+
+  it('disables Move left top and Move left bottom when widget is in left column', async () => {
+    const user = userEvent.setup()
+    const onSelect = jest.fn()
+    setup(
+      buildDefaultProps({
+        widget: {...mockWidget, position: {col: 1, row: 1, relative: 1}},
+        onSelect,
+      }),
+    )
+
+    await user.click(screen.getByTestId('menu-trigger'))
+
+    expect(screen.getByText('Move left top')).toBeInTheDocument()
+    expect(screen.getByText('Move left bottom')).toBeInTheDocument()
+
+    await expect(user.click(screen.getByText('Move left top'))).rejects.toThrow()
+    await expect(user.click(screen.getByText('Move left bottom'))).rejects.toThrow()
+    expect(onSelect).not.toHaveBeenCalledWith('move-left-top')
+    expect(onSelect).not.toHaveBeenCalledWith('move-left')
+  })
+
+  it('disables Move right top and Move right bottom when widget is in right column', async () => {
+    const user = userEvent.setup()
+    const onSelect = jest.fn()
+    setup(
+      buildDefaultProps({
+        widget: {...mockWidget, position: {col: 2, row: 1, relative: 1}},
+        onSelect,
+      }),
+    )
+
+    await user.click(screen.getByTestId('menu-trigger'))
+
+    expect(screen.getByText('Move right top')).toBeInTheDocument()
+    expect(screen.getByText('Move right bottom')).toBeInTheDocument()
+
+    await expect(user.click(screen.getByText('Move right top'))).rejects.toThrow()
+    await expect(user.click(screen.getByText('Move right bottom'))).rejects.toThrow()
+    expect(onSelect).not.toHaveBeenCalledWith('move-right-top')
+    expect(onSelect).not.toHaveBeenCalledWith('move-right')
+  })
+
+  it('disables Move up and Move to top when widget is first in column', async () => {
+    const user = userEvent.setup()
+    const onSelect = jest.fn()
+    setup(
+      buildDefaultProps({
+        widget: {...mockWidget, position: {col: 1, row: 1, relative: 1}},
+        onSelect,
+      }),
+    )
+
+    await user.click(screen.getByTestId('menu-trigger'))
+
+    expect(screen.getByText('Move up')).toBeInTheDocument()
+    expect(screen.getByText('Move to top')).toBeInTheDocument()
+
+    await expect(user.click(screen.getByText('Move up'))).rejects.toThrow()
+    await expect(user.click(screen.getByText('Move to top'))).rejects.toThrow()
+
+    expect(onSelect).not.toHaveBeenCalledWith('move-up')
+    expect(onSelect).not.toHaveBeenCalledWith('move-to-top')
+  })
+
+  it('disables Move down and Move to bottom when widget is last in column', async () => {
+    const user = userEvent.setup()
+    const onSelect = jest.fn()
+    const lastWidget = {
+      id: 'other-widget',
+      type: 'test',
+      position: {col: 1, row: 2, relative: 2},
+      title: 'Last Widget',
+    }
+    setup(
+      buildDefaultProps({
+        widget: lastWidget,
+        onSelect,
+      }),
+    )
+
+    await user.click(screen.getByTestId('menu-trigger'))
+
+    expect(screen.getByText('Move down')).toBeInTheDocument()
+    expect(screen.getByText('Move to bottom')).toBeInTheDocument()
+
+    await expect(user.click(screen.getByText('Move down'))).rejects.toThrow()
+    await expect(user.click(screen.getByText('Move to bottom'))).rejects.toThrow()
+
+    expect(onSelect).not.toHaveBeenCalledWith('move-down')
+    expect(onSelect).not.toHaveBeenCalledWith('move-to-bottom')
   })
 })

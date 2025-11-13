@@ -26,6 +26,7 @@ import DashboardTab from '../DashboardTab'
 import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
 import {WidgetDashboardProvider} from '../../hooks/useWidgetDashboardContext'
 import {WidgetDashboardEditProvider} from '../../hooks/useWidgetDashboardEdit'
+import {WidgetConfigProvider} from '../../hooks/useWidgetConfig'
 type Props = Record<string, never> // DashboardTab has no props
 
 const mockStatisticsData = {
@@ -196,7 +197,9 @@ const setup = (props?: Props, envOverrides = {}, dashboardFeatures = {}) => {
     <QueryClientProvider client={queryClient}>
       <WidgetDashboardProvider dashboardFeatures={dashboardFeatures}>
         <WidgetDashboardEditProvider>
-          <DashboardTab {...buildDefaultProps(props)} />
+          <WidgetConfigProvider>
+            <DashboardTab {...buildDefaultProps(props)} />
+          </WidgetConfigProvider>
         </WidgetDashboardEditProvider>
       </WidgetDashboardProvider>
     </QueryClientProvider>,

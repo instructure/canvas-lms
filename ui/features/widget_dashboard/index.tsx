@@ -28,6 +28,7 @@ import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
 import {WidgetDashboardProvider} from './react/hooks/useWidgetDashboardContext'
 import {WidgetDashboardEditProvider} from './react/hooks/useWidgetDashboardEdit'
+import {WidgetConfigProvider} from './react/hooks/useWidgetConfig'
 import {Responsive} from '@instructure/ui-responsive'
 import {ResponsiveProvider} from './react/hooks/useResponsiveContext'
 
@@ -65,15 +66,17 @@ ready(() => {
             dashboardFeatures={ENV.DASHBOARD_FEATURES}
           >
             <WidgetDashboardEditProvider>
-              <Responsive
-                match="media"
-                query={RESPONSIVE_QUERY}
-                render={(_props, matches) => (
-                  <ResponsiveProvider matches={matches || ['desktop']}>
-                    <WidgetDashboardContainer />
-                  </ResponsiveProvider>
-                )}
-              />
+              <WidgetConfigProvider>
+                <Responsive
+                  match="media"
+                  query={RESPONSIVE_QUERY}
+                  render={(_props, matches) => (
+                    <ResponsiveProvider matches={matches || ['desktop']}>
+                      <WidgetDashboardContainer />
+                    </ResponsiveProvider>
+                  )}
+                />
+              </WidgetConfigProvider>
             </WidgetDashboardEditProvider>
           </WidgetDashboardProvider>
         </QueryClientProvider>

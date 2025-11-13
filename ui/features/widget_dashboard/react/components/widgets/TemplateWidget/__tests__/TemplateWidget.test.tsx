@@ -23,6 +23,8 @@ import TemplateWidget from '../TemplateWidget'
 import type {TemplateWidgetProps} from '../TemplateWidget'
 import type {Widget} from '../../../../types'
 import {ResponsiveProvider} from '../../../../hooks/useResponsiveContext'
+import {WidgetConfigProvider} from '../../../../hooks/useWidgetConfig'
+import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 const mockWidget: Widget = {
   id: 'test-widget',
@@ -46,9 +48,13 @@ const setup = (
   matches: string[] = ['desktop'],
 ) => {
   return render(
-    <ResponsiveProvider matches={matches}>
-      <TemplateWidget {...props}>{children}</TemplateWidget>
-    </ResponsiveProvider>,
+    <WidgetDashboardEditProvider>
+      <WidgetConfigProvider>
+        <ResponsiveProvider matches={matches}>
+          <TemplateWidget {...props}>{children}</TemplateWidget>
+        </ResponsiveProvider>
+      </WidgetConfigProvider>
+    </WidgetDashboardEditProvider>,
   )
 }
 

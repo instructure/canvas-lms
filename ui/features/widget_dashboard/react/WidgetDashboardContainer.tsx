@@ -34,6 +34,7 @@ import {useWidgetDashboard} from './hooks/useWidgetDashboardContext'
 import FeedbackQuestionTile from './components/FeedbackQuestionTile'
 import {useResponsiveContext} from './hooks/useResponsiveContext'
 import {useWidgetDashboardEdit} from './hooks/useWidgetDashboardEdit'
+import {useWidgetConfig} from './hooks/useWidgetConfig'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -42,6 +43,7 @@ const WidgetDashboardContainer: React.FC = () => {
     useWidgetDashboard()
   const {isMobile, isDesktop} = useResponsiveContext()
   const {isEditMode, isDirty, enterEditMode, exitEditMode, saveChanges} = useWidgetDashboardEdit()
+  const {resetConfig} = useWidgetConfig()
   const isCustomizationEnabled = dashboardFeatures.widget_dashboard_customization
 
   useEffect(() => {
@@ -67,6 +69,7 @@ const WidgetDashboardContainer: React.FC = () => {
       )
       if (!confirmed) return
     }
+    resetConfig()
     exitEditMode()
   }
 

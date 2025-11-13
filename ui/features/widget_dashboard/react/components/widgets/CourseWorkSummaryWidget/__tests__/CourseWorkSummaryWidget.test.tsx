@@ -24,6 +24,8 @@ import {graphql, HttpResponse} from 'msw'
 import CourseWorkSummaryWidget from '../CourseWorkSummaryWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
 import {defaultGraphQLHandlers, clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {WidgetConfigProvider} from '../../../../hooks/useWidgetConfig'
+import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 const mockCoursesData = [
   {
@@ -77,7 +79,11 @@ const setup = (props: Props = buildDefaultProps()) => {
 
   const result = render(
     <QueryClientProvider client={queryClient}>
-      <CourseWorkSummaryWidget {...props} />
+      <WidgetDashboardEditProvider>
+        <WidgetConfigProvider>
+          <CourseWorkSummaryWidget {...props} />
+        </WidgetConfigProvider>
+      </WidgetDashboardEditProvider>
     </QueryClientProvider>,
   )
 
@@ -276,7 +282,11 @@ describe('CourseWorkSummaryWidget', () => {
 
     const renderResult = render(
       <QueryClientProvider client={queryClient}>
-        <CourseWorkSummaryWidget {...buildDefaultProps()} />
+        <WidgetDashboardEditProvider>
+          <WidgetConfigProvider>
+            <CourseWorkSummaryWidget {...buildDefaultProps()} />
+          </WidgetConfigProvider>
+        </WidgetDashboardEditProvider>
       </QueryClientProvider>,
     )
 

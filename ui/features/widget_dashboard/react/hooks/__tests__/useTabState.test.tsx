@@ -26,6 +26,8 @@ import {useTabState} from '../useTabState'
 import {TAB_IDS} from '../../constants'
 import type {TabId} from '../../types'
 import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
+import {WidgetConfigProvider} from '../useWidgetConfig'
+import {WidgetDashboardEditProvider} from '../useWidgetDashboardEdit'
 
 type HookArgs = {
   defaultTab?: TabId
@@ -52,7 +54,11 @@ const createWrapper = () => {
     },
   })
   return ({children}: {children: React.ReactNode}) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <WidgetDashboardEditProvider>
+        <WidgetConfigProvider>{children}</WidgetConfigProvider>
+      </WidgetDashboardEditProvider>
+    </QueryClientProvider>
   )
 }
 

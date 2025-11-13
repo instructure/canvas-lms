@@ -26,6 +26,7 @@ import DashboardTabs from '../DashboardTabs'
 import {clearWidgetDashboardCache, defaultGraphQLHandlers} from '../../__tests__/testHelpers'
 import {WidgetDashboardProvider} from '../../hooks/useWidgetDashboardContext'
 import {WidgetDashboardEditProvider} from '../../hooks/useWidgetDashboardEdit'
+import {WidgetConfigProvider} from '../../hooks/useWidgetConfig'
 
 type Props = Record<string, never> // DashboardTabs has no props
 
@@ -164,7 +165,9 @@ const setup = (props?: Props, envOverrides = {}, preferencesOverrides = {}) => {
     <QueryClientProvider client={queryClient}>
       <WidgetDashboardProvider preferences={preferences}>
         <WidgetDashboardEditProvider>
-          <DashboardTabs {...buildDefaultProps(props)} />
+          <WidgetConfigProvider>
+            <DashboardTabs {...buildDefaultProps(props)} />
+          </WidgetConfigProvider>
         </WidgetDashboardEditProvider>
       </WidgetDashboardProvider>
     </QueryClientProvider>,
