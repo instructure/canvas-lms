@@ -69,6 +69,10 @@ module WidgetDashboardPage
     "[data-testid='widget-people-widget']"
   end
 
+  def instructor_list_item_selector(name)
+    "#{people_widget_selector} span[aria-label='#{name}']"
+  end
+
   def message_instructor_button_selector(account_id, course_id)
     "[data-testid='message-button-#{account_id}-#{course_id}']"
   end
@@ -224,6 +228,10 @@ module WidgetDashboardPage
 
   def all_message_buttons
     ff("[data-testid*='message-button-']")
+  end
+
+  def instructor_list_item(name)
+    f(instructor_list_item_selector(name))
   end
 
   def message_instructor_button(account_id, course_id)

@@ -131,8 +131,8 @@ describe Announcement do
 
       student_in_section(@section_a, user: @student_a)
       student_in_section(@section_b, user: @student_b)
-      student_in_section(@section_a, user: @student_ab)
-      student_in_section(@section_b, user: @student_ab)
+      @course.enroll_student(@student_ab, section: @section_a, enrollment_state: "active", allow_multiple_enrollments: true)
+      @course.enroll_student(@student_ab, section: @section_b, enrollment_state: "active", allow_multiple_enrollments: true)
     end
 
     it "announcement for section A+B is visible to students in either section" do
@@ -150,7 +150,6 @@ describe Announcement do
     end
 
     it "filters announcements correctly for student in multiple sections" do
-      skip "2025-11-12: Will unskip after fix LX-3497"
       ann_a = @course.announcements.create!(user: @teacher, message: "Section A only")
       ann_a.is_section_specific = true
       ann_a.course_sections = [@section_a]
@@ -166,7 +165,6 @@ describe Announcement do
       ann_c.course_sections = [@section_c]
       ann_c.save!
 
-      # Student in sections A+B should see A and B, but not C
       expect(ann_a.visible_for?(@student_ab)).to be_truthy
       expect(ann_b.visible_for?(@student_ab)).to be_truthy
       expect(ann_c.visible_for?(@student_ab)).to be_falsey
