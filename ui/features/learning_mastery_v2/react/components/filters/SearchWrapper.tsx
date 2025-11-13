@@ -19,25 +19,45 @@
 import React from 'react'
 import {StudentSearch} from './StudentSearch'
 import {Flex} from '@instructure/ui-flex'
+import {OutcomeSearch} from './OutcomeSearch'
 
 interface SearchWrapperProps {
   courseId: string
   selectedUserIds: number[]
   onSelectedUserIdsChange: (userIds: number[]) => void
+  selectedOutcomes?: string[]
+  onSelectOutcomes: (outcomeIds: string[]) => void
 }
 
 export const SearchWrapper: React.FC<SearchWrapperProps> = ({
   courseId,
   selectedUserIds,
   onSelectedUserIdsChange,
+  selectedOutcomes,
+  onSelectOutcomes,
 }) => {
   return (
-    <Flex gap="small" margin="small none">
-      <StudentSearch
-        courseId={courseId}
-        selectedUserIds={selectedUserIds}
-        onSelectedUserIdsChange={onSelectedUserIdsChange}
-      />
+    <Flex
+      width="100%"
+      alignItems="center"
+      gap="small"
+      wrap="no-wrap"
+      margin="small none medium none"
+    >
+      <Flex.Item shouldGrow={true} shouldShrink={true} size="45%">
+        <StudentSearch
+          courseId={courseId}
+          selectedUserIds={selectedUserIds}
+          onSelectedUserIdsChange={onSelectedUserIdsChange}
+        />
+      </Flex.Item>
+      <Flex.Item shouldGrow={true} shouldShrink={true} size="45%">
+        <OutcomeSearch
+          courseId={courseId}
+          selectedOutcomes={selectedOutcomes}
+          onSelectOutcomes={onSelectOutcomes}
+        />
+      </Flex.Item>
     </Flex>
   )
 }

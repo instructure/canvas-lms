@@ -56,6 +56,10 @@ interface UseRollupsReturn extends RollupData {
   error: null | string
   setCurrentPage: (page: number) => void
   sorting: Sorting
+  filter: {
+    selectedOutcomeIds: string[]
+    setSelectedOutcomeIds: (outcomeIds: string[]) => void
+  }
 }
 
 interface RollupData {
@@ -130,6 +134,7 @@ export default function useRollups({
   const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC)
   const [sortBy, setSortBy] = useState<SortBy>(SortBy.SortableName)
   const [sortOutcomeId, setSortOutcomeId] = useState<string | null>(null)
+  const [selectedOutcomeIds, setSelectedOutcomeIds] = useState<string[]>([])
 
   const needMasteryAndColorDefaults = !accountMasteryScalesEnabled
 
@@ -171,6 +176,7 @@ export default function useRollups({
           sortBy,
           sortOutcomeId || undefined,
           selectedUserIds,
+          selectedOutcomeIds,
         )) as RollupsResponse
         const {users: fetchedUsers, outcomes: fetchedOutcomes} = data.linked
         const students = getStudents(data.rollups, fetchedUsers)
@@ -206,6 +212,7 @@ export default function useRollups({
     settings,
     enabled,
     selectedUserIds,
+    selectedOutcomeIds,
   ])
 
   return {
@@ -225,6 +232,10 @@ export default function useRollups({
       setSortBy,
       sortOutcomeId,
       setSortOutcomeId,
+    },
+    filter: {
+      selectedOutcomeIds,
+      setSelectedOutcomeIds,
     },
   }
 }

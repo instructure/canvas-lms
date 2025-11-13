@@ -72,6 +72,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     pagination,
     setCurrentPage,
     sorting,
+    filter,
   } = useRollups({
     courseId,
     accountMasteryScalesEnabled: accountLevelMasteryScalesFF ?? false,
@@ -164,6 +165,8 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
             courseId={courseId}
             selectedUserIds={selectedUserIds}
             onSelectedUserIdsChange={setSelectedUserIds}
+            selectedOutcomes={filter.selectedOutcomeIds}
+            onSelectOutcomes={filter.setSelectedOutcomeIds}
           />
         )}
         <FilterWrapper pagination={pagination} onPerPageChange={handleUpdateStudentsPerPage} />

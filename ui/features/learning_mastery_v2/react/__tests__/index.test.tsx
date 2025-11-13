@@ -98,6 +98,10 @@ describe('LearningMastery', () => {
         sortOutcomeId: null,
         setSortOutcomeId: jest.fn(),
       },
+      filter: {
+        selectedOutcomeIds: [],
+        setSelectedOutcomeIds: jest.fn(),
+      },
     })
 
     const mockUseGradebookSettings = useGradebookSettings as jest.MockedFunction<
@@ -144,6 +148,10 @@ describe('LearningMastery', () => {
         setSortBy: jest.fn(),
         sortOutcomeId: null,
         setSortOutcomeId: jest.fn(),
+      },
+      filter: {
+        selectedOutcomeIds: [],
+        setSelectedOutcomeIds: jest.fn(),
       },
     } as ReturnType<typeof useRollups>)
     const {getByText} = render(<LearningMastery {...defaultProps()} />)
