@@ -1162,6 +1162,13 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       tinyapp.setAttribute('aria-label', formatMessage('Rich Content Editor'))
       tinyapp.setAttribute('role', 'document')
       tinyapp.setAttribute('tabIndex', '-1')
+
+      // tinyMCE browser detection is wrong for Edge tinymce.Env.browser.isEdge
+      const isEdge = /edg/i.test(navigator.userAgent)
+      if (isEdge) {
+        // Edge translation service breaks the editor
+        tinyapp.setAttribute('translate', 'no')
+      }
     }
 
     // remove role="aplication" attribute from the iframe body
