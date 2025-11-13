@@ -108,7 +108,8 @@ module LinkedAttachmentHandler
           if to_delete.any? && to_delete.include?(Shard.global_id_for(attachment.id))
             to_delete.delete(Shard.global_id_for(attachment.id)) if keep_associations?(attachment, session, user)
           else
-            next if exclude_cross_course_attachment_association?(attachment) || (!(user.nil? && skip_user_verification) && !attachment.grants_right?(user, session, :update))
+            next if exclude_cross_course_attachment_association?(attachment)
+            next unless skip_user_verification || attachment.grants_right?(user, session, :update)
 
             shard.activate do
               all_attachment_associations << {

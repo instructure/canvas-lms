@@ -66,6 +66,6 @@ class AssessmentQuestionsController < ApplicationController
   end
 
   def assessment_question_params
-    params.require(:assessment_question).permit(:name, form_question_data: strong_anything).merge(current_user: @current_user)
+    params.require(:assessment_question).permit(:name, form_question_data: strong_anything).merge(updating_user: @current_user)
   end
 end

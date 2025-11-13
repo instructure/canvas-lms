@@ -1257,10 +1257,10 @@ describe Attachment do
       @a2 = attachment_with_context(@course, display_name: "a2")
 
       data1 = { "name" => "Hi", "question_text" => "hey look <img src='/courses/#{@course.id}/files/#{@a1.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-      @aquestion1 = @bank.assessment_questions.create!(question_data: data1, current_user: @teacher)
+      @aquestion1 = @bank.assessment_questions.create!(question_data: data1, updating_user: @teacher)
       aq_att1 = @aquestion1.attachments.first
       data2 = { "name" => "Hi", "question_text" => "hey look <img src='/courses/#{@course.id}/files/#{@a2.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-      @aquestion2 = @bank.assessment_questions.create!(question_data: data2, current_user: @teacher)
+      @aquestion2 = @bank.assessment_questions.create!(question_data: data2, updating_user: @teacher)
       aq_att2 = @aquestion2.attachments.first
 
       quiz = @course.quizzes.create!

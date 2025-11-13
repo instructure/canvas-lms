@@ -172,7 +172,7 @@ describe Quizzes::QuizQuestionsController do
       question = assigns[:question]
       expect(question).not_to be_nil
       expect(question.assessment_question).not_to be_nil
-      expect(question.assessment_question.current_user).to eq(@teacher)
+      expect(question.assessment_question.updating_user).to eq(@teacher)
     end
 
     context "when adding questions from a bank" do
@@ -318,14 +318,14 @@ describe Quizzes::QuizQuestionsController do
                                                question_type: "essay_question",
                                                question_text: "File ref:<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">"
                                              },
-                                             current_user: @teacher)
+                                             updating_user: @teacher)
 
       translated_text = aq.reload.question_data["question_text"]
       expect(translated_text).to match %r{/assessment_questions/\d+/files/\d+}
       expect(translated_text).to match(/verifier=/)
 
       # add the first question directly onto the quiz, so it shouldn't get "randomly" selected from the group
-      linked_question = @quiz.quiz_questions.build(question_data: aq.question_data, saving_user: @teacher)
+      linked_question = @quiz.quiz_questions.build(question_data: aq.question_data, updating_user: @teacher)
       linked_question.assessment_question_id = aq.id
       linked_question.save!
 

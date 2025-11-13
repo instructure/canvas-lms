@@ -1550,7 +1550,7 @@ class Submission < ActiveRecord::Base
     return if @assignment_changed_not_sub
 
     if submission_type == "online_text_entry"
-      self.saving_user = user
+      self.updating_user = user
       super
     else
       association_ids = attachment_associations.pluck(:attachment_id)

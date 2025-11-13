@@ -285,7 +285,7 @@ describe Quizzes::QuizQuestion do
       )
 
       expect(quiz_question.assessment_question).not_to be_nil
-      expect(quiz_question.assessment_question.current_user).to eq(@teacher)
+      expect(quiz_question.assessment_question.updating_user).to eq(@teacher)
     end
 
     it "does not create assessment_question for text_only questions" do
