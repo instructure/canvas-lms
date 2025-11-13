@@ -109,6 +109,12 @@ shared_examples "Gradebook frontend/backend calculators" do |ff_enabled|
     end
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+  end
+
   8.times do |i|
     it "final grades match with unlucky#{i} and course#{i}" do
       user_session(@teacher)
