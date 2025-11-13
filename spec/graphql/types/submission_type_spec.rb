@@ -1789,4 +1789,62 @@ describe Types::SubmissionType do
       expect(submission_type.resolve("autoGradeSubmissionErrors")).to eq(["Test error"])
     end
   end
+
+  describe "submission_quiz_histories_connection" do
+    before(:once) do
+      quiz_with_submission
+      @quiz_assignment = @quiz.assignment
+      @quiz_submission = @quiz_assignment.submission_for_student(@student)
+    end
+
+    let(:quiz_submission_type) { GraphQLTypeTester.new(@quiz_submission, current_user: @teacher) }
+
+    it "returns nil for non-quiz submissions" do
+      expect(submission_type.resolve("submissionQuizHistoriesConnection { nodes { _id } }")).to be_nil
+    end
+
+    it "returns quiz submission versions" do
+      result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { _id } }")
+      expect(result).not_to be_nil
+      expect(result).not_to be_empty
+    end
+
+    it "returns quiz submission with attempt number" do
+      attempt_result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
+      expect(attempt_result.flatten).to include(@quiz.quiz_submissions.first.attempt)
+    end
+
+    it "returns quiz submission with score" do
+      score_result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { score } }")
+      expect(score_result.flatten).to include(@quiz.quiz_submissions.first.score)
+    end
+
+    it "returns quiz submission with workflow_state" do
+      state_result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { workflowState } }")
+      expect(state_result.flatten).to include(@quiz.quiz_submissions.first.workflow_state)
+    end
+
+    it "requires permission to view quiz submissions" do
+      other_student = student_in_course(active_all: true).user
+      expect(
+        quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { _id } }", current_user: other_student)
+      ).to be_nil
+    end
+
+    context "with multiple quiz attempts" do
+      before(:once) do
+        @quiz.update!(allowed_attempts: 3)
+        # Take quiz again
+        @quiz_submission_2 = @quiz.generate_submission(@student)
+        @quiz_submission_2.complete!
+      end
+
+      it "returns versions from all attempts" do
+        @quiz_submission.reload
+        result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
+        attempts = result.flatten
+        expect(attempts.length).to be > 1
+      end
+    end
+  end
 end

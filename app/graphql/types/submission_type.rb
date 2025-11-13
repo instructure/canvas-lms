@@ -205,5 +205,18 @@ module Types
         end
       end
     end
+
+    field :submission_quiz_histories_connection, Types::QuizSubmissionType.connection_type, null: true
+    def submission_quiz_histories_connection
+      load_association(:quiz_submission).then do |quiz_submission|
+        next nil unless quiz_submission
+
+        # Load all versions for this quiz submission
+        Loaders::AssociationLoader.for(Quizzes::QuizSubmission, :versions).load(quiz_submission).then do |versions|
+          # Map each version to its model representation
+          versions.map(&:model)
+        end
+      end
+    end
   end
 end
