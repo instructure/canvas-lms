@@ -1084,7 +1084,7 @@ class CoursesController < ApplicationController
     # DEPRECATED. Needs to stay separate from #users though, because this is un-paginated
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      proxy = @context.students.order_by_sortable_name
+      proxy = @context.students_visible_to(@current_user).order_by_sortable_name
       user_json_preloads(proxy, false)
       render json: proxy.map { |u| user_json(u, @current_user, session) }
     end
