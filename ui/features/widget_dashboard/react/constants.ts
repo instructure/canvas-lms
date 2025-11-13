@@ -39,6 +39,9 @@ export const WIDGET_TYPES = {
 
 export type WidgetType = (typeof WIDGET_TYPES)[keyof typeof WIDGET_TYPES]
 
+export const LEFT_COLUMN = 1
+export const RIGHT_COLUMN = 2
+
 export const DEFAULT_WIDGET_CONFIG = {
   columns: 2,
   widgets: [
