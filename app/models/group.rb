@@ -1048,7 +1048,7 @@ class Group < ActiveRecord::Base
       errors.add(:base, "Non-collaborative groups must belong to a course") unless context_type == "Course"
       errors.add(:base, "Non-collaborative groups cannot have a leader") if leader_id.present?
       errors.add(:base, "Non-collaborative groups must be private") if is_public
-      errors.add(:base, "Variant limit reached for tag") if new_record? && Group.active.non_collaborative.where(group_category_id:).count >= self.MAX_VARIANTS_PER_TAG_CATEGORY
+      errors.add(:base, "Variant limit reached for tag") if (new_record? || group_category_id_changed?) && Group.active.non_collaborative.where(group_category_id:).count >= self.MAX_VARIANTS_PER_TAG_CATEGORY
       errors.add(:base, "You have reached the tag limit for this course") if new_record? && self.group_category.max_diff_tag_validation_count >= GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE
     end
 
