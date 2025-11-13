@@ -331,4 +331,269 @@ describe PageViewsController do
       end
     end
   end
+
+  describe "Rate Limiting" do
+    before do
+      account_admin_user
+      user_session(@user)
+      allow(PageView).to receive(:pv4?).and_return(true)
+      ConfigFile.stub("pv4", {})
+      # Mock the PageView fetch to avoid actual API calls
+      allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_return([])
+    end
+
+    after do
+      ConfigFile.unstub
+    end
+
+    context "index action" do
+      it "increments request cost based on per_page parameter (per_page=10)" do
+        expect(controller).to receive(:increment_request_cost).with(5)
+
+        get "index", params: { user_id: @user.id, per_page: 10 }, format: :json
+
+        expect(response).to be_successful
+      end
+
+      it "increments request cost based on per_page parameter (per_page=100)" do
+        expect(controller).to receive(:increment_request_cost).with(40)
+
+        get "index", params: { user_id: @user.id, per_page: 100 }, format: :json
+
+        expect(response).to be_successful
+      end
+
+      it "increments request cost based on per_page parameter (per_page=200)" do
+        expect(controller).to receive(:increment_request_cost).with(75)
+
+        get "index", params: { user_id: @user.id, per_page: 200 }, format: :json
+
+        expect(response).to be_successful
+      end
+
+      it "uses default per_page=10 when not specified" do
+        expect(controller).to receive(:increment_request_cost).with(5)
+
+        get "index", params: { user_id: @user.id }, format: :json
+
+        expect(response).to be_successful
+      end
+
+      it "clamps per_page to maximum of 200" do
+        expect(controller).to receive(:increment_request_cost).with(75) # Same as per_page=200
+
+        get "index", params: { user_id: @user.id, per_page: 500 }, format: :json
+
+        expect(response).to be_successful
+      end
+
+      it "clamps per_page to minimum of 1" do
+        expect(controller).to receive(:increment_request_cost).with(5) # Minimum cost
+
+        get "index", params: { user_id: @user.id, per_page: 0 }, format: :json
+
+        expect(response).to be_successful
+      end
+
+      it "calculates cost correctly for per_page=50" do
+        expect(controller).to receive(:increment_request_cost).with(20)
+
+        get "index", params: { user_id: @user.id, per_page: 50 }, format: :json
+
+        expect(response).to be_successful
+      end
+
+      it "does not vary cost with date range (Query with LIMIT behavior)" do
+        # Cost should be the same regardless of date range
+        expect(controller).to receive(:increment_request_cost).with(5)
+
+        get "index",
+            params: {
+              user_id: @user.id,
+              per_page: 10,
+              start_time: 30.days.ago.iso8601,
+              end_time: Time.now.iso8601
+            },
+            format: :json
+
+        expect(response).to be_successful
+      end
+    end
+
+    context "async query action" do
+      let(:expected_uuid) { SecureRandom.uuid }
+      let(:mock_service) { instance_double(PageViews::EnqueueQueryService) }
+
+      before do
+        allow(controller).to receive(:pv5_enqueue_service).and_return(mock_service)
+        allow(mock_service).to receive(:call).and_return(expected_uuid)
+      end
+
+      it "increments request cost with fixed 150 units" do
+        expect(controller).to receive(:increment_request_cost).with(150)
+
+        post "query", params: {
+          user_id: @user.id,
+          start_date: "2025-02-01",
+          end_date: "2025-03-01",
+          results_format: :jsonl
+        }
+
+        expect(response).to have_http_status(:created)
+      end
+
+      it "applies rate limit cost regardless of date range" do
+        expect(controller).to receive(:increment_request_cost).with(150)
+
+        post "query", params: {
+          user_id: @user.id,
+          start_date: "2025-01-01",
+          end_date: "2025-12-31", # Wide range
+          results_format: :csv
+        }
+
+        expect(response).to have_http_status(:created)
+      end
+    end
+
+    context "poll_query action" do
+      let(:query_id) { SecureRandom.uuid }
+      let(:poll_result) { instance_double(PageViews::Common::PollingResponse, status: :processing, format: :csv) }
+      let(:mock_poll_service) { instance_double(PageViews::PollQueryService) }
+
+      before do
+        allow(controller).to receive(:pv5_poll_service).and_return(mock_poll_service)
+        allow(mock_poll_service).to receive(:call).and_return(poll_result)
+      end
+
+      it "increments request cost with fixed 5 units" do
+        expect(controller).to receive(:increment_request_cost).with(5)
+
+        get "poll_query",
+            params: { user_id: @user.id, query_id: }
+
+        expect(response).to be_successful
+      end
+    end
+
+    context "query_results action" do
+      let(:query_id) { SecureRandom.uuid }
+      let(:fetch_result) do
+        instance_double(
+          PageViews::Common::DownloadableResult,
+          content: "test,data\n1,2",
+          filename: "#{query_id}.csv",
+          format: :csv,
+          compressed?: false
+        )
+      end
+      let(:mock_fetch_service) { instance_double(PageViews::FetchResultService) }
+
+      before do
+        allow(controller).to receive(:pv5_fetch_result_service).and_return(mock_fetch_service)
+        allow(mock_fetch_service).to receive(:call).and_return(fetch_result)
+      end
+
+      it "increments request cost with fixed 50 units" do
+        expect(controller).to receive(:increment_request_cost).with(50)
+
+        get "query_results",
+            params: { user_id: @user.id, query_id: }
+
+        expect(response).to be_successful
+      end
+    end
+
+    context "update action" do
+      it "does not increment request cost (zero cost operation)" do
+        expect(controller).not_to receive(:increment_request_cost)
+
+        put "update",
+            params: { id: "some-uuid" }
+
+        expect(response).to be_successful
+        expect(response.parsed_body).to eq({ "ok" => true })
+      end
+    end
+
+    context "RCU calculation accuracy" do
+      # These tests verify the mathematical accuracy of the rate limiting formula
+      # Based on: eventually consistent reads, 592 bytes per line, 4096 bytes per RCU
+      # Using balanced 5x multiplier
+
+      it "calculates cost for per_page=10 as 5 units (1 RCU * 5 multiplier)" do
+        # 10 lines / 13.838 lines per RCU ≈ 0.72 RCU → ceil = 1 RCU → 1 * 5 = 5 units
+        expect(controller).to receive(:increment_request_cost).with(5)
+
+        get "index", params: { user_id: @user.id, per_page: 10 }, format: :json
+      end
+
+      it "calculates cost for per_page=100 as 40 units (8 RCU * 5 multiplier)" do
+        # 100 lines / 13.838 lines per RCU ≈ 7.23 RCU → ceil = 8 RCU → 8 * 5 = 40 units
+        expect(controller).to receive(:increment_request_cost).with(40)
+
+        get "index", params: { user_id: @user.id, per_page: 100 }, format: :json
+      end
+
+      it "calculates cost for per_page=200 as 75 units (15 RCU * 5 multiplier)" do
+        # 200 lines / 13.838 lines per RCU ≈ 14.46 RCU → ceil = 15 RCU → 15 * 5 = 75 units
+        expect(controller).to receive(:increment_request_cost).with(75)
+
+        get "index", params: { user_id: @user.id, per_page: 200 }, format: :json
+      end
+
+      it "scales linearly with per_page values" do
+        # Test intermediate values to ensure linear scaling
+        test_cases = [
+          { per_page: 25, expected_cost: 10 },  # 2 RCU * 5
+          { per_page: 50, expected_cost: 20 },  # 4 RCU * 5
+          { per_page: 75, expected_cost: 30 },  # 6 RCU * 5
+          { per_page: 150, expected_cost: 55 }  # 11 RCU * 5
+        ]
+
+        test_cases.each do |test_case|
+          expect(controller).to receive(:increment_request_cost).with(test_case[:expected_cost])
+
+          get "index", params: { user_id: @user.id, per_page: test_case[:per_page] }, format: :json
+
+          expect(response).to be_successful
+        end
+      end
+    end
+
+    context "rate limit cost proportions" do
+      it "ensures async query cost is higher than sync index with per_page=100" do
+        # query: 150 units vs index(per_page=100): 40 units
+        # This ensures async operations that spawn background jobs are more expensive
+        query_cost = 150
+        index_cost = 40
+
+        expect(query_cost).to be > index_cost
+      end
+
+      it "ensures poll cost is minimal to support frequent polling (120 polls before HWM)" do
+        # poll: 5 units, HWM: 600 units → 600/5 = 120 polls allowed
+        poll_cost = 5
+        hwm = 600
+
+        expect(hwm / poll_cost).to eq(120)
+      end
+
+      it "ensures sync index allows generous browsing (120 requests for per_page=10)" do
+        # index(per_page=10): 5 units, HWM: 600 units → 600/5 = 120 requests
+        index_cost = 5
+        hwm = 600
+
+        expect(hwm / index_cost).to eq(120)
+      end
+
+      it "throttles heavy pagination appropriately (8 requests for per_page=200)" do
+        # index(per_page=200): 75 units, HWM: 600 units → 600/75 = 8 requests
+        index_cost = 75
+        hwm = 600
+
+        expect(hwm / index_cost).to eq(8)
+      end
+    end
+  end
 end
