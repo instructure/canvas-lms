@@ -19,7 +19,7 @@
 
 module StudentDashboardCommon
   def set_widget_dashboard_flag(feature_status: true)
-    feature_status ? @course1.root_account.enable_feature!(:widget_dashboard) : @course1.root_account.disable_feature!(:widget_dashboard)
+    feature_status ? Account.default.root_account.enable_feature!(:widget_dashboard) : Account.default.root_account.disable_feature!(:widget_dashboard)
   end
 
   def dashboard_student_setup
@@ -177,5 +177,75 @@ module StudentDashboardCommon
     observer_enroll2.save!
     @course1.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student })
     @course1.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student_w_inactive })
+  end
+
+  def multi_section_course_setup
+    # Create a course with multiple sections and a instructor shared across all sections
+    @multi_course = course_factory(active_all: true, course_name: "Multi-Section Course")
+    @section1 = @multi_course.default_section
+    @section2 = @multi_course.course_sections.create!(name: "Section 2")
+    @section3 = @multi_course.course_sections.create!(name: "Section 3")
+    @section4 = @multi_course.course_sections.create!(name: "Section 4")
+
+    @multi_stu_sec1 = user_factory(active_all: true, name: "Student 2")
+    @multi_stu_sec2 = user_factory(active_all: true, name: "Student 3")
+    @shared_teacher = user_factory(active_all: true, name: "Shared Teacher")
+
+    @multi_course.enroll_student(@multi_stu_sec1, section: @section1, enrollment_state: "active", allow_multiple_enrollments: true)
+    @multi_course.enroll_student(@multi_stu_sec2, section: @section2, enrollment_state: "active", allow_multiple_enrollments: true)
+    @multi_course.enroll_teacher(@shared_teacher, section: @section1, enrollment_state: "active", allow_multiple_enrollments: true)
+    @multi_course.enroll_teacher(@shared_teacher, section: @section2, enrollment_state: "active", allow_multiple_enrollments: true)
+    @multi_course.enroll_teacher(@shared_teacher, section: @section3, enrollment_state: "active", allow_multiple_enrollments: true)
+  end
+
+  def section_specific_announcements_setup
+    @multi_course.enroll_student(@multi_stu_sec1, section: @section3, enrollment_state: "active", allow_multiple_enrollments: true)
+
+    @section1_ann1 = @multi_course.announcements.create!(title: "section 1", message: "section 1- specific", is_section_specific: true, course_sections: [@section1])
+    @section2_ann2 = @multi_course.announcements.create!(title: "section 2", message: "section 2- specific", is_section_specific: true, course_sections: [@section2])
+    @section3_ann3 = @multi_course.announcements.create!(title: "section 3", message: "section 3- specific", is_section_specific: true, course_sections: [@section3])
+    @section1_2_ann4 = @multi_course.announcements.create!(title: "section 1 & 2", message: "section 1 & 2 specific", is_section_specific: true, course_sections: [@section1, @section2])
+    @section2_3_ann5 = @multi_course.announcements.create!(title: "section 2 & 3", message: "section 2 & 3 specific", is_section_specific: true, course_sections: [@section2, @section3])
+    @section1_2_3_ann6 = @multi_course.announcements.create!(title: "section 1 & 2 & 3", message: "section 1 & 2 & 3 specific", is_section_specific: true, course_sections: [@section1, @section2, @section3])
+    @section2_4_ann7 = @multi_course.announcements.create!(title: "section 2 & 4", message: "section 2 & 4 specific", is_section_specific: true, course_sections: [@section2, @section4])
+  end
+
+  def section_specific_assignments_setup
+    @multi_course.enroll_student(@multi_stu_sec1, section: @section3, enrollment_state: "active", allow_multiple_enrollments: true)
+
+    @section1_hw1 = @multi_course.assignments.create!(name: "Section 1 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
+    @section2_hw2 = @multi_course.assignments.create!(name: "Section 2 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
+    @section3_hw3 = @multi_course.assignments.create!(name: "Section 3 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
+    @section1_2_hw4 = @multi_course.assignments.create!(name: "Section 1 & 2 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
+    @section2_3_hw5 = @multi_course.assignments.create!(name: "Section 2 & 3 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
+    @section1_2_3_hw6 = @multi_course.assignments.create!(name: "Section 1 & 2 & 3 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
+    @section2_4_hw7 = @multi_course.assignments.create!(name: "Section 2 & 4 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
+
+    create_section_override_for_assignment(@section1_hw1, course_section: @section1)
+    create_section_override_for_assignment(@section2_hw2, course_section: @section2)
+    create_section_override_for_assignment(@section3_hw3, course_section: @section3)
+    create_section_override_for_assignment(@section1_2_hw4, course_section: @section1)
+    create_section_override_for_assignment(@section1_2_hw4, course_section: @section2)
+    create_section_override_for_assignment(@section2_3_hw5, course_section: @section2)
+    create_section_override_for_assignment(@section2_3_hw5, course_section: @section3)
+    create_section_override_for_assignment(@section1_2_3_hw6, course_section: @section1)
+    create_section_override_for_assignment(@section1_2_3_hw6, course_section: @section2)
+    create_section_override_for_assignment(@section1_2_3_hw6, course_section: @section3)
+    create_section_override_for_assignment(@section2_4_hw7, course_section: @section2)
+    create_section_override_for_assignment(@section2_4_hw7, course_section: @section4)
+
+    @section1_hw1.update!(only_visible_to_overrides: true)
+    @section2_hw2.update!(only_visible_to_overrides: true)
+    @section3_hw3.update!(only_visible_to_overrides: true)
+    @section1_2_hw4.update!(only_visible_to_overrides: true)
+    @section2_3_hw5.update!(only_visible_to_overrides: true)
+    @section1_2_3_hw6.update!(only_visible_to_overrides: true)
+    @section2_4_hw7.update!(only_visible_to_overrides: true)
+  end
+
+  def observer_w_section_specific_course_setup
+    @multi_section_observer = user_factory(name: "Observer3", active_all: true)
+    @multi_course.enroll_user(@multi_section_observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @multi_stu_sec1, allow_multiple_enrollments: true)
+    @multi_course.enroll_user(@multi_section_observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @multi_stu_sec2, allow_multiple_enrollments: true)
   end
 end

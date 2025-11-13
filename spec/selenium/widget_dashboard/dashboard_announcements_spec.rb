@@ -110,30 +110,6 @@ describe "student dashboard announcements widget", :ignore_js_errors do
     end
   end
 
-  context "section specific announcements" do
-    before :once do
-      @section1 = @course1.default_section
-      @section2 = @course1.course_sections.create!(name: "test section 2")
-      student_in_section(@section2, user: @student)
-
-      @announcement8 = @course1.announcements.create!(title: "section 1 : announcement",
-                                                      message: "here is the announcement message for section 1",
-                                                      is_section_specific: true,
-                                                      course_sections: [@section1])
-
-      @announcement9 = @course1.announcements.create!(title: "section 2 : announcement",
-                                                      message: "here is the announcement message for section 2",
-                                                      is_section_specific: true,
-                                                      course_sections: [@section2])
-    end
-
-    it "displays section specific announcements" do
-      go_to_dashboard
-      expect(announcement_item(@announcement9.id)).to be_displayed
-      expect(element_exists?(announcement_item_selector(@announcement8.id))).to be_falsey
-    end
-  end
-
   context "announcements widget pagination" do
     before :once do
       pagination_announcement_setup # Creates 15 read and 11 unread announcements
