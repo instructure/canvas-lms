@@ -546,8 +546,12 @@ describe Assignment do
 
       context "for an assignment with an associated quiz" do
         it "updates the quiz when the assignment is updated normally" do
+          course_attachment = attachment_model(context: @course)
           expect do
-            assignment.update!(title: "a new and even better title")
+            assignment.title = "a new and even better title"
+            assignment.description = "<img src='/courses/#{@course.id}/attachments/#{course_attachment.id}' /> something something"
+            assignment.saving_user = @teacher
+            assignment.save!
           end.to change { quiz.reload.updated_at }
         end
 
