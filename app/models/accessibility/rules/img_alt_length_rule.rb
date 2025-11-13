@@ -21,7 +21,7 @@ module Accessibility
   module Rules
     class ImgAltLengthRule < Accessibility::Rule
       self.id = "img-alt-length"
-      self.link = "https://www.w3.org/TR/WCAG20-TECHS/H37.html"
+      self.link = nil
 
       def test(elem)
         return nil if elem.tag_name != "img"
