@@ -1395,6 +1395,7 @@ module Api::V1::Assignment
       # category is changing, remove overrides for old groups first so we don't
       # fail validation
       assignment.validate_assignment_overrides if assignment.will_save_change_to_group_category_id?
+      assignment.updating_user = user
       assignment.save_without_broadcasting!
       perform_batch_update_assignment_overrides(assignment, prepared_batch)
     end
