@@ -41,7 +41,11 @@ describe Accessibility::ResourceScannerService do
 
       it "enqueues a delayed job for scanning the resource" do
         expect(subject).to receive(:delay)
-          .with(singleton: "accessibility_scan_resource_#{wiki_page.global_id}")
+          .with(
+            n_strand: ["resource_accessibility_scan", course.account.global_id],
+            singleton: "resource_accessibility_scan_#{wiki_page.global_id}",
+            priority: 20
+          )
           .and_return(delay_mock)
         expect(delay_mock).to receive(:scan_resource)
 
@@ -73,7 +77,11 @@ describe Accessibility::ResourceScannerService do
 
       it "enqueues a delayed job for scanning the resource" do
         expect(subject).to receive(:delay)
-          .with(singleton: "accessibility_scan_resource_#{wiki_page.global_id}")
+          .with(
+            n_strand: ["resource_accessibility_scan", course.account.global_id],
+            singleton: "resource_accessibility_scan_#{wiki_page.global_id}",
+            priority: 20
+          )
           .and_return(delay_mock)
         expect(delay_mock).to receive(:scan_resource)
 
@@ -137,7 +145,8 @@ describe Accessibility::ResourceScannerService do
         scan = subject.call_sync
 
         expect(scan.workflow_state).to eq("failed")
-        expect(scan.error_message).to eq("Test failure")
+        expect(scan.error_message).to be_present
+        expect(scan.error_message).to match(/^\d+$/) # Error report ID
       end
     end
   end
@@ -260,7 +269,8 @@ describe Accessibility::ResourceScannerService do
       it "updates the scan with an error_message" do
         subject.scan_resource(scan:)
 
-        expect(scan.reload.error_message).to eq("Failure")
+        expect(scan.reload.error_message).to be_present
+        expect(scan.reload.error_message).to match(/^\d+$/) # Error report ID
       end
 
       it "logs the correct Datadog metrics for a failed scan" do
