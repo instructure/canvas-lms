@@ -3676,6 +3676,145 @@ describe Attachment do
     end
   end
 
+  describe "Pine deletion" do
+    let(:horizon_course) do
+      course = Course.create!
+      course.update!(horizon_course: true)
+      course.account.enable_feature!(:horizon_course_setting)
+      course.account.enable_feature!(:horizon_learning_object_ingestion_on_change)
+      course
+    end
+    let(:pdf_attachment) do
+      attachment_model(
+        context: horizon_course,
+        content_type: "application/pdf",
+        filename: "test.pdf",
+        file_state: "available"
+      )
+    end
+    let(:pine_client_mock) { double("PineClient") }
+    let(:null_user) { Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil) }
+
+    before do
+      allow(pine_client_mock).to receive_messages(
+        enabled?: true,
+        allowed_attachment_content_types: ["application/pdf", "text/plain"],
+        delete_document: true
+      )
+      stub_const("PineClient", pine_client_mock)
+    end
+
+    describe "#delete_from_pine" do
+      it "calls delay with correct parameters and delete_from_pine_job" do
+        expect(pdf_attachment).to receive(:delay).with(
+          n_strand: ["horizon_file_deletion", pdf_attachment.context.global_root_account_id],
+          singleton: "horizon_file_deletion:#{pdf_attachment.context.global_id}:#{pdf_attachment.id}",
+          max_attempts: 3
+        ).and_return(pdf_attachment)
+        expect(pdf_attachment).to receive(:delete_from_pine_job)
+
+        pdf_attachment.delete_from_pine
+      end
+
+      it "does not raise error if context is not a Course" do
+        user = User.create!
+        user_attachment = attachment_model(context: user)
+
+        expect { user_attachment.delete_from_pine }.not_to raise_error
+      end
+
+      it "logs error but does not raise if delay fails" do
+        allow(pdf_attachment).to receive(:delay).and_raise(StandardError.new("Delayed job error"))
+
+        expect(Rails.logger).to receive(:error).with(/Failed to queue Pine deletion for attachment/)
+        expect { pdf_attachment.delete_from_pine }.not_to raise_error
+      end
+    end
+
+    describe "#delete_from_pine_job" do
+      it "calls PineClient.delete_document with correct parameters" do
+        expect(pine_client_mock).to receive(:delete_document) do |**args|
+          expect(args[:source]).to eq("canvas")
+          expect(args[:source_id]).to eq(pdf_attachment.id.to_s)
+          expect(args[:source_type]).to eq("attachment")
+          expect(args[:feature_slug]).to eq("horizon-content-ingestion")
+          expect(args[:root_account_uuid]).to eq(horizon_course.root_account.uuid)
+          expect(args[:current_user]).to be_a(Struct)
+          expect(args[:current_user].uuid).to be_nil
+          expect(args[:current_user].global_id).to be_nil
+          true
+        end
+
+        pdf_attachment.delete_from_pine_job(null_user)
+      end
+
+      it "uses system deletion user with nil uuid and global_id" do
+        expect(pine_client_mock).to receive(:delete_document) do |**args|
+          user = args[:current_user]
+          expect(user.uuid).to be_nil
+          expect(user.global_id).to be_nil
+          true
+        end
+
+        pdf_attachment.delete_from_pine_job(null_user)
+      end
+
+      it "logs error and re-raises on failure" do
+        expect(pine_client_mock).to receive(:delete_document).and_raise(StandardError.new("API Error"))
+
+        expect(Rails.logger).to receive(:error).with(/Failed to delete attachment/)
+        expect { pdf_attachment.delete_from_pine_job(null_user) }.to raise_error(StandardError, "API Error")
+      end
+    end
+
+    describe "deletion triggers Pine cleanup" do
+      it "calls delete_from_pine when attachment is destroyed" do
+        expect(pdf_attachment).to receive(:delete_from_pine)
+        pdf_attachment.destroy
+      end
+
+      it "does not call delete_from_pine for non-eligible attachments" do
+        user = User.create!
+        user_attachment = attachment_model(context: user, content_type: "application/pdf")
+
+        expect(user_attachment).not_to receive(:delete_from_pine)
+        user_attachment.destroy
+      end
+
+      it "does not call delete_from_pine when PineClient is disabled" do
+        allow(PineClient).to receive(:enabled?).and_return(false)
+
+        expect(pdf_attachment).not_to receive(:delete_from_pine)
+        pdf_attachment.destroy
+      end
+
+      it "only deletes from Pine if file_state was available before deletion" do
+        # Create an attachment that's already deleted
+        deleted_attachment = attachment_model(
+          context: horizon_course,
+          content_type: "application/pdf",
+          filename: "deleted.pdf",
+          file_state: "deleted"
+        )
+
+        # Create an attachment that's hidden
+        hidden_attachment = attachment_model(
+          context: horizon_course,
+          content_type: "application/pdf",
+          filename: "hidden.pdf",
+          file_state: "hidden"
+        )
+
+        # Only the available attachment should trigger Pine deletion
+        expect(pdf_attachment).to receive(:delete_from_pine)
+        expect(deleted_attachment).not_to receive(:delete_from_pine)
+        expect(hidden_attachment).not_to receive(:delete_from_pine)
+
+        Attachment.batch_destroy([pdf_attachment, deleted_attachment, hidden_attachment])
+      end
+    end
+  end
+
   describe "#can_unpublish?" do
     context "published file" do
       it "returns true for basic published file" do
