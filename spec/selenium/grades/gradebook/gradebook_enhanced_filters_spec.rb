@@ -104,6 +104,12 @@ shared_examples "Enhanced Gradebook Filters" do |ff_enabled|
     @a5.grade_student(@student2, grade: 10, grader: @teacher)
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+  end
+
   describe "feature flag OFF" do
     before do
       Account.site_admin.disable_feature!(:enhanced_gradebook_filters)
