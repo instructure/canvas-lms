@@ -48,6 +48,7 @@ module RSpec
   # Output format:
   #   {
   #     "summary": {
+  #       "total_examples": 100,
   #       "total_pending": 2,
   #       "generated_at": "2025-01-15T12:34:56Z"
   #     },
@@ -81,7 +82,7 @@ module RSpec
         super(custom_output)
       else
         super
-        @existing_data = { pending: [] }
+        @existing_data = { pending: [], total: 0 }
       end
       @pending_examples = []
     end
@@ -123,9 +124,11 @@ module RSpec
     def close(_notification)
       # Merge current run with existing data (read in initialize)
       merged_pending = @existing_data[:pending] + @pending_examples
+      merged_total_count = @existing_data[:total] + @summary_data[:example_count]
 
       report = {
         summary: {
+          total_examples: merged_total_count,
           total_pending: merged_pending.count,
           generated_at: Time.now.iso8601
         },
@@ -140,18 +143,18 @@ module RSpec
 
     def read_existing_data_from_file(file_path)
       # Check if file exists and read its contents before we overwrite it
-      return { pending: [] } unless File.exist?(file_path)
+      return { pending: [], total: 0 } unless File.exist?(file_path)
 
       begin
         existing_content = File.read(file_path)
-        return { pending: [] } if existing_content.strip.empty?
+        return { pending: [], total: 0 } if existing_content.strip.empty?
 
         existing_json = JSON.parse(existing_content, symbolize_names: true)
-        { pending: existing_json[:pending] || [] }
+        { pending: existing_json[:pending] || [], total: existing_json[:summary][:total_examples] || 0 }
       rescue JSON::ParserError, Errno::ENOENT, Errno::EACCES => e
         # If file is corrupted, doesn't exist, or can't be read, return empty arrays
         warn "Warning: Could not read existing skip report from #{file_path}: #{e.message}"
-        { pending: [] }
+        { pending: [], total: 0 }
       end
     end
 
