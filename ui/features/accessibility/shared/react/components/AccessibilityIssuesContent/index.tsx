@@ -129,7 +129,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     [current.issue],
   )
 
-  const handleNext = useCallback(() => {
+  const handleSkip = useCallback(() => {
     setCurrentIssueIndex(prev => Math.min(prev + 1, issues.length - 1))
   }, [issues.length])
 
@@ -346,7 +346,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         title={current.resource.resourceName}
         nextResource={nextResource || defaultNextResource}
         onClose={onClose}
-        handleNext={handleNext}
+        handleSkip={handleSkip}
         handlePrevious={handlePrevious}
         handleNextResource={handleNextResource}
         assertiveAlertMessage={assertiveAlertMessage || ''}
@@ -470,11 +470,11 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         <Flex.Item as="footer">
           <AccessibilityIssuesDrawerFooter
             nextButtonName={I18n.t('Save & Next')}
-            onNext={handleNext}
+            onSkip={handleSkip}
             onBack={handlePrevious}
             onSaveAndNext={isApplyButtonHidden ? handleApplyAndSaveAndNext : handleSaveAndNext}
             isBackDisabled={currentIssueIndex === 0 || isFormLocked}
-            isNextDisabled={currentIssueIndex === issues.length - 1 || isFormLocked}
+            isSkipDisabled={currentIssueIndex === issues.length - 1 || isFormLocked}
             isSaveAndNextDisabled={
               (!isRemediated && !isApplyButtonHidden) ||
               isFormLocked ||

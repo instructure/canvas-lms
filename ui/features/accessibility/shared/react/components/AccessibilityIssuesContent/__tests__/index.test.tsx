@@ -92,7 +92,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
   it('disables "Back" on first issue and enables "Next"', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
     const back = screen.getByTestId('back-button')
-    const next = screen.getByTestId('next-button')
+    const next = screen.getByTestId('skip-button')
 
     expect(back).toBeDisabled()
     expect(next).toBeEnabled()
@@ -101,7 +101,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
   it('disables "Next" on last issue', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
 
-    const next = screen.getByTestId('next-button')
+    const next = screen.getByTestId('skip-button')
     fireEvent.click(next)
 
     await waitFor(() => {
