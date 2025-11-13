@@ -40,7 +40,12 @@ shared_examples "Student column header options" do |ff_enabled|
     init_course_with_students(3)
   end
 
-  before { user_session(@teacher) }
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+    user_session(@teacher)
+  end
 
   context "student name sort by" do
     before do
