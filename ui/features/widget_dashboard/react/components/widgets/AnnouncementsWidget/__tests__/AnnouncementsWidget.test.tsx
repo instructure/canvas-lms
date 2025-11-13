@@ -28,6 +28,8 @@ import {
   type SharedCourseData,
 } from '../../../../hooks/useWidgetDashboardContext'
 import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {WidgetConfigProvider} from '../../../../hooks/useWidgetConfig'
+import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 const mockWidget: Widget = {
   id: 'test-announcements-widget',
@@ -264,7 +266,9 @@ const setup = (
     wrapper: ({children}: {children: React.ReactNode}) => (
       <QueryClientProvider client={queryClient}>
         <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
-          {children}
+          <WidgetDashboardEditProvider>
+            <WidgetConfigProvider>{children}</WidgetConfigProvider>
+          </WidgetDashboardEditProvider>
         </WidgetDashboardProvider>
       </QueryClientProvider>
     ),

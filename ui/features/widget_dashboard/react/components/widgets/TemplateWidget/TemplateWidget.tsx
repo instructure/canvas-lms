@@ -28,6 +28,7 @@ import {Pagination} from '@instructure/ui-pagination'
 import {IconDragHandleLine, IconTrashLine} from '@instructure/ui-icons'
 import type {BaseWidgetProps} from '../../../types'
 import {useResponsiveContext} from '../../../hooks/useResponsiveContext'
+import {useWidgetConfig, type MoveAction} from '../../../hooks/useWidgetConfig'
 import WidgetContextMenu from '../../shared/WidgetContextMenu'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -66,8 +67,13 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   isEditMode = false,
 }) => {
   const {isMobile, isDesktop} = useResponsiveContext()
+  const {config, moveWidget} = useWidgetConfig()
   const widgetTitle = title || widget.title
   const headingId = `${widget.id}-heading`
+
+  const handleMenuSelect = (action: string) => {
+    moveWidget(widget.id, action as MoveAction)
+  }
 
   const editModeActions = (
     <Flex gap="x-small">
@@ -83,6 +89,9 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
             <IconDragHandleLine />
           </IconButton>
         }
+        widget={widget}
+        config={config}
+        onSelect={handleMenuSelect}
       />
       <IconButton
         screenReaderLabel={I18n.t('Remove widget')}
