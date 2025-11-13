@@ -49,6 +49,7 @@ class PeerReviewSubAssignment < AbstractAssignment
   validates :sub_assignment_tag, absence: { message: ->(_object, _data) { I18n.t("cannot have sub assignment tag") } }
   validate  :context_matches_parent_assignment, if: :context_explicitly_provided?
   validate  :parent_assignment_not_discussion_topic_or_external_tool
+  validate  :points_possible_changes_ok?
 
   after_initialize :set_default_context
   after_save :unlink_assessment_requests, if: :soft_deleted?
@@ -117,5 +118,15 @@ class PeerReviewSubAssignment < AbstractAssignment
 
   def unlink_assessment_requests
     assessment_requests.update_all(peer_review_sub_assignment_id: nil)
+  end
+
+  def points_possible_changes_ok?
+    return false unless persisted? && points_possible_changed?
+    return false unless parent_assignment&.peer_reviews? && parent_assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+
+    if parent_assignment.peer_review_submissions?
+      errors.add :points_possible,
+                 I18n.t("Students have already submitted peer reviews, so reviews required and points cannot be changed.")
+    end
   end
 end

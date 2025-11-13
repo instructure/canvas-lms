@@ -549,7 +549,10 @@ module Api::V1::Assignment
       attrs += [:peer_review_submission_required, :peer_review_across_sections]
     end
 
-    assignment.slice(*attrs)
+    params = assignment.slice(*attrs)
+    params[:has_peer_review_submissions] = assignment.peer_review_submissions? if allocation_and_grading_enabled
+
+    params
   end
 
   def turnitin_settings_json(assignment)

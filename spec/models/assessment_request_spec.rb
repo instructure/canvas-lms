@@ -554,4 +554,31 @@ describe AssessmentRequest do
       end
     end
   end
+
+  describe ".completed_for_assignment" do
+    it "returns completed assessment requests for a given assignment" do
+      completed_request = create_assessment_request(workflow_state: "completed")
+      _incomplete_request = create_assessment_request(workflow_state: "assigned")
+
+      results = AssessmentRequest.completed_for_assignment(@assignment.id)
+
+      expect(results).to include(completed_request)
+      expect(results.count).to eq(1)
+    end
+
+    it "does not return assessment requests from other assignments" do
+      other_assignment = @course.assignments.create!
+      _other_request = AssessmentRequest.create!(
+        user: @submission_student,
+        asset: other_assignment.find_or_create_submission(@submission_student),
+        assessor_asset: other_assignment.find_or_create_submission(@review_student),
+        assessor: @review_student,
+        workflow_state: "completed"
+      )
+
+      results = AssessmentRequest.completed_for_assignment(@assignment.id)
+
+      expect(results.count).to eq(0)
+    end
+  end
 end

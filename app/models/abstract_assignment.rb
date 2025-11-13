@@ -2092,6 +2092,13 @@ class AbstractAssignment < ActiveRecord::Base
     end
   end
 
+  # Returns false for SubAssignment and PeerReviewSubAssignment since they cannot have AssessmentRequests.
+  # Assignment overrides this with the real implementation that queries the database.
+  def peer_review_submissions?
+    false
+  end
+  attr_writer :peer_review_submissions
+
   set_policy do
     given { |user, session| context.grants_right?(user, session, :read) && published? }
     can :read and can :read_own_submission

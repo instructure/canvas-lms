@@ -144,6 +144,89 @@ RSpec.describe PeerReviewSubAssignment do
         expect(peer_review_sub_assignment).to be_valid
       end
     end
+
+    describe "#points_possible_changes_ok?" do
+      let(:peer_review_sub_assignment) do
+        PeerReviewSubAssignment.create!(
+          parent_assignment:,
+          points_possible: 10
+        )
+      end
+      let(:student) { user_model }
+      let(:assessor) { user_model }
+      let(:student_submission) { submission_model(assignment: parent_assignment, user: student) }
+      let(:assessor_submission) { submission_model(assignment: parent_assignment, user: assessor) }
+
+      before do
+        parent_assignment.update!(peer_reviews: true)
+        course.enable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "allows changes when peer_review_allocation_and_grading feature is disabled" do
+        course.disable_feature!(:peer_review_allocation_and_grading)
+        AssessmentRequest.create!(
+          user: student,
+          asset: student_submission,
+          assessor_asset: assessor_submission,
+          assessor:,
+          workflow_state: "completed"
+        )
+
+        peer_review_sub_assignment.points_possible = 20
+        expect(peer_review_sub_assignment).to be_valid
+      end
+
+      it "allows changes when peer_reviews is disabled" do
+        parent_assignment.update!(peer_reviews: false)
+        AssessmentRequest.create!(
+          user: student,
+          asset: student_submission,
+          assessor_asset: assessor_submission,
+          assessor:,
+          workflow_state: "completed"
+        )
+
+        peer_review_sub_assignment.points_possible = 20
+        expect(peer_review_sub_assignment).to be_valid
+      end
+
+      it "allows changes when no peer review submissions exist" do
+        peer_review_sub_assignment.points_possible = 20
+        expect(peer_review_sub_assignment).to be_valid
+      end
+
+      it "prevents changes when peer review submissions exist" do
+        AssessmentRequest.create!(
+          user: student,
+          asset: student_submission,
+          assessor_asset: assessor_submission,
+          assessor:,
+          workflow_state: "completed"
+        )
+
+        peer_review_sub_assignment.points_possible = 20
+        expect(peer_review_sub_assignment).not_to be_valid
+        expect(peer_review_sub_assignment.errors[:points_possible]).to include(
+          I18n.t("Students have already submitted peer reviews, so reviews required and points cannot be changed.")
+        )
+      end
+
+      it "allows creating a new record with points_possible set" do
+        AssessmentRequest.create!(
+          user: student,
+          asset: student_submission,
+          assessor_asset: assessor_submission,
+          assessor:,
+          workflow_state: "completed"
+        )
+
+        new_peer_review_sub = PeerReviewSubAssignment.new(
+          parent_assignment:,
+          points_possible: 100
+        )
+        expect(new_peer_review_sub).to be_valid
+      end
+    end
   end
 
   describe "#checkpoint?" do
