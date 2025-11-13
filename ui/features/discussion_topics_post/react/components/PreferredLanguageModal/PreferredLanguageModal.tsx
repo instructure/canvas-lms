@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useContext, useMemo, useState} from 'react'
+import {useContext, useState} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {useTranslationStore} from '../../hooks/useTranslationStore'
 import {Text} from '@instructure/ui-text'
@@ -25,11 +25,11 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import CanvasMultiSelect from '@canvas/multi-select/react'
 import {IconAiSolid} from '@instructure/ui-icons'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {useTranslation} from '../../hooks/useTranslation'
 import type {FormMessage} from '@instructure/ui-form-field'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 
 const I18n = createI18nScope('discussion_topics_post')
 
@@ -39,7 +39,6 @@ interface PreferredLanguageModalProps {
 
 const PreferredLanguageModal = ({discussionTopicId}: PreferredLanguageModalProps) => {
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null)
-  const [input, setInput] = useState('')
   const [messages, setMessages] = useState<FormMessage[]>([])
 
   // TODO: remove translationLanguages from context and move to zustand store
@@ -47,14 +46,20 @@ const PreferredLanguageModal = ({discussionTopicId}: PreferredLanguageModalProps
 
   const modalOpen = useTranslationStore(state => state.modalOpen)
   const handleClose = useTranslationStore(state => state.closeModal)
+  const activeLanguage = useTranslationStore(state => state.activeLanguage)
 
   const {savePreferredLanguage, updateLoading, forceTranslate} = useTranslation()
 
-  const handleSelect = (selectedArray: string[]) => {
-    const id = selectedArray[0]
-    const result = translationLanguages.current.find(({id: _id}: {id: string}) => _id === id)
+  const handleSelect = (
+    _event: React.SyntheticEvent<Element, Event>,
+    data: {value?: string | number; id?: string},
+  ) => {
+    const result = translationLanguages.current.find(
+      ({id: _id}: {id: string}) => _id === data.value,
+    )
 
-    setInput(result.name)
+    if (!result) return
+
     setSelectedLanguage(result.id)
     setMessages([])
   }
@@ -78,16 +83,6 @@ const PreferredLanguageModal = ({discussionTopicId}: PreferredLanguageModalProps
     forceTranslate(selectedLanguage)
     handleClose()
   }
-
-  const filteredLanguages = useMemo(() => {
-    if (!input) {
-      return translationLanguages.current
-    }
-
-    return translationLanguages.current.filter(({name}: {name: string}) =>
-      name.toLowerCase().startsWith(input.toLowerCase()),
-    )
-  }, [input, translationLanguages])
 
   return (
     <Modal
@@ -115,27 +110,25 @@ const PreferredLanguageModal = ({discussionTopicId}: PreferredLanguageModalProps
             )}
           </Text>
         </View>
+        <View as="div" margin="medium 0 x-small 0">
+          <label id="translate-text-select-label">
+            <Text weight="bold">{I18n.t('Translate to')}</Text>
+          </label>
+        </View>
         <View as="div">
-          <CanvasMultiSelect
-            label={I18n.t('Translate to')}
+          <SimpleSelect
+            renderLabel=""
             onChange={handleSelect}
-            inputValue={input}
-            onInputChange={e => setInput(e.target.value)}
             messages={messages}
+            value={selectedLanguage || activeLanguage || ''}
             placeholder={I18n.t('Select a language...')}
           >
-            {filteredLanguages.map(({id, name}: {id: string; name: string}) => (
-              <CanvasMultiSelect.Option
-                key={id}
-                id={id}
-                value={id}
-                label={name}
-                isSelected={id === selectedLanguage}
-              >
+            {translationLanguages.current.map(({id, name}: {id: string; name: string}) => (
+              <SimpleSelect.Option key={id} id={id} value={id}>
                 {name}
-              </CanvasMultiSelect.Option>
+              </SimpleSelect.Option>
             ))}
-          </CanvasMultiSelect>
+          </SimpleSelect>
         </View>
       </Modal.Body>
       <Modal.Footer>
