@@ -303,7 +303,9 @@ describe Login::OAuth2Controller do
 
     it "retries when an external timeout occurs" do
       session[:oauth2_nonce] = ["fred"]
-      aac.settings[:oauth2_timeout_retries] = 1
+      aac.settings["oauth2_timeout_retries"] = 1
+      aac.save!
+      aac.reload
       expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Timeout::Error.new).twice
       user_with_pseudonym(username: "user", active_all: 1)
       @pseudonym.authentication_provider = aac
@@ -317,7 +319,9 @@ describe Login::OAuth2Controller do
 
     it "does not retry for circuit breaker timeouts" do
       session[:oauth2_nonce] = ["fred"]
-      aac.settings[:oauth2_timeout_retries] = 1
+      aac.settings["oauth2_timeout_retries"] = 1
+      aac.save!
+      aac.reload
       allow(Canvas).to receive(:timeout_protection).and_raise(Canvas::TimeoutCutoff.new(1))
       user_with_pseudonym(username: "user", active_all: 1)
       @pseudonym.authentication_provider = aac
