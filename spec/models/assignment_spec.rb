@@ -9681,6 +9681,160 @@ describe Assignment do
     end
   end
 
+  describe "peer review count validation" do
+    before :once do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      @assignment = @course.assignments.create!(
+        name: "peer review assignment",
+        peer_reviews: true,
+        peer_review_count: 2
+      )
+      @student1 = student_in_course(active_all: true, course: @course).user
+      @student2 = student_in_course(active_all: true, course: @course).user
+    end
+
+    describe "#peer_review_submissions?" do
+      it "returns false when no peer reviews have been completed" do
+        expect(@assignment.peer_review_submissions?).to be false
+      end
+
+      it "returns false when peer reviews are assigned but not completed" do
+        submission1 = @assignment.find_or_create_submission(@student1)
+        submission2 = @assignment.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "assigned"
+        )
+
+        expect(@assignment.peer_review_submissions?).to be false
+      end
+
+      it "returns true when at least one peer review has been completed" do
+        submission1 = @assignment.find_or_create_submission(@student1)
+        submission2 = @assignment.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "completed"
+        )
+
+        expect(@assignment.peer_review_submissions?).to be true
+      end
+    end
+
+    it "allows changes to peer review count before peer reviews are submitted" do
+      @assignment.peer_review_count = 3
+      expect(@assignment).to be_valid
+    end
+
+    it "does not allow changes to peer review count after peer reviews are submitted" do
+      submission1 = @assignment.find_or_create_submission(@student1)
+      submission2 = @assignment.find_or_create_submission(@student2)
+      AssessmentRequest.create!(
+        user: @student1,
+        asset: submission1,
+        assessor_asset: submission2,
+        assessor: @student2,
+        workflow_state: "completed"
+      )
+
+      @assignment.peer_review_count = 3
+      expect(@assignment).not_to be_valid
+      expect(@assignment.errors[:peer_review_count]).to include(
+        "Students have already submitted peer reviews, so reviews required and points cannot be changed."
+      )
+    end
+
+    it "allows validation to pass when peer_review_count is not changed" do
+      submission1 = @assignment.find_or_create_submission(@student1)
+      submission2 = @assignment.find_or_create_submission(@student2)
+      AssessmentRequest.create!(
+        user: @student1,
+        asset: submission1,
+        assessor_asset: submission2,
+        assessor: @student2,
+        workflow_state: "completed"
+      )
+
+      @assignment.name = "updated name"
+      expect(@assignment).to be_valid
+    end
+
+    it "does not validate peer review count when feature flag is disabled" do
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      submission1 = @assignment.find_or_create_submission(@student1)
+      submission2 = @assignment.find_or_create_submission(@student2)
+      AssessmentRequest.create!(
+        user: @student1,
+        asset: submission1,
+        assessor_asset: submission2,
+        assessor: @student2,
+        workflow_state: "completed"
+      )
+
+      @assignment.peer_review_count = 3
+      expect(@assignment).to be_valid
+    end
+
+    describe ".assignment_ids_with_peer_review_submissions" do
+      it "returns assignment IDs that have completed peer reviews" do
+        submission1 = @assignment.find_or_create_submission(@student1)
+        submission2 = @assignment.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "completed"
+        )
+
+        assignment2 = @course.assignments.create!(title: "Assignment 2", peer_reviews: true)
+        ids = Assignment.assignment_ids_with_peer_review_submissions([@assignment.id, assignment2.id])
+        expect(ids).to eq([@assignment.id])
+      end
+
+      it "does not return assignments with only assigned peer reviews" do
+        submission1 = @assignment.find_or_create_submission(@student1)
+        submission2 = @assignment.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "assigned"
+        )
+
+        ids = Assignment.assignment_ids_with_peer_review_submissions([@assignment.id])
+        expect(ids).to be_empty
+      end
+    end
+
+    describe ".preload_peer_review_submissions" do
+      it "preloads peer review submission status for multiple assignments" do
+        submission1 = @assignment.find_or_create_submission(@student1)
+        submission2 = @assignment.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "completed"
+        )
+
+        assignment2 = @course.assignments.create!(title: "Assignment 2", peer_reviews: true)
+        Assignment.preload_peer_review_submissions([@assignment, assignment2])
+
+        expect(@assignment.peer_review_submissions?).to be true
+        expect(assignment2.peer_review_submissions?).to be false
+      end
+    end
+  end
+
   describe "anonymous grading validation" do
     before :once do
       @group_category = @course.group_categories.create! name: "groups"

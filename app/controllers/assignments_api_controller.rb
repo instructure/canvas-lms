@@ -1109,6 +1109,13 @@ class AssignmentsApiController < ApplicationController
 
       DatesOverridable.preload_override_data_for_objects(assignments)
 
+      if @context.feature_enabled?(:peer_review_allocation_and_grading)
+        # Only preload for Assignment instances since SubAssignment and PeerReviewSubAssignment
+        # cannot have AssessmentRequests
+        assignment_instances = assignments.select { |a| a.is_a?(Assignment) }
+        Assignment.preload_peer_review_submissions(assignment_instances) if assignment_instances.any?
+      end
+
       assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]

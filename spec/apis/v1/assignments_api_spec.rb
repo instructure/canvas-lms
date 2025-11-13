@@ -1734,6 +1734,66 @@ describe AssignmentsApiController, type: :request do
       expect(uri.path).to eq "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
       expect(uri.query).to include("assignment_id=")
     end
+
+    context "peer review preloading" do
+      before :once do
+        course_with_teacher(active_all: true)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "only preloads peer review submissions for Assignment instances" do
+        # Regular Assignment
+        regular_assignment = @course.assignments.create!(
+          title: "Regular Assignment",
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+        # Discussion Checkpoint Assignment & Sub Assignment
+        @course.account.enable_feature!(:discussion_checkpoints)
+        parent_assignment = @course.assignments.create!(
+          title: "Parent Assignment",
+          has_sub_assignments: true
+        )
+        sub_assignment = parent_assignment.sub_assignments.create!(
+          context: parent_assignment.context,
+          sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+          points_possible: 5
+        )
+        # Peer Review Assignment & Sub Assignment
+        peer_review_parent = @course.assignments.create!(
+          title: "Peer Review Parent",
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+        peer_review_sub = peer_review_parent.create_peer_review_sub_assignment!(
+          context: @course,
+          points_possible: 10
+        )
+
+        # Spy on Assignment.preload_peer_review_submissions to capture arguments
+        passed_assignments = nil
+        allow(Assignment).to receive(:preload_peer_review_submissions).and_wrap_original do |original_method, assignments|
+          passed_assignments = assignments
+          original_method.call(assignments)
+        end
+
+        # Call the API
+        api_get_assignments_index_from_course(@course)
+        expect(Assignment).to have_received(:preload_peer_review_submissions)
+        expect(passed_assignments).not_to be_nil
+
+        # All passed assignments should be Assignment instances (not SubAssignment or PeerReviewSubAssignment)
+        expect(passed_assignments).to all(be_an(Assignment))
+        expect(passed_assignments.map(&:class)).to all(eq(Assignment))
+
+        # None should be SubAssignment or PeerReviewSubAssignment
+        expect(passed_assignments).not_to include(sub_assignment)
+        expect(passed_assignments).not_to include(peer_review_sub)
+
+        # Should include regular assignments
+        expect(passed_assignments.map(&:id)).to include(regular_assignment.id, parent_assignment.id, peer_review_parent.id)
+      end
+    end
   end
 
   describe "GET /users/:user_id/courses/:course_id/assignments (#user_index)" do
@@ -5024,6 +5084,49 @@ describe AssignmentsApiController, type: :request do
             test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
           end.to raise_error(ActiveRecord::ConnectionNotEstablished, error_message)
         end
+
+        context "when model validations fail" do
+          let(:peer_review_sub_assignment) do
+            PeerReviewSubAssignment.create!(
+              parent_assignment:,
+              points_possible: 10
+            )
+          end
+          let(:student) { user_model }
+          let(:assessor) { user_model }
+          let(:student_submission) { submission_model(assignment: parent_assignment, user: student) }
+          let(:assessor_submission) { submission_model(assignment: parent_assignment, user: assessor) }
+
+          before do
+            parent_assignment.update!(peer_reviews: true)
+            peer_review_sub_assignment
+          end
+
+          it "raises ActiveRecord::RecordInvalid when points_possible validation fails" do
+            AssessmentRequest.create!(
+              user: student,
+              asset: student_submission,
+              assessor_asset: assessor_submission,
+              assessor:,
+              workflow_state: "completed"
+            )
+
+            params = { points_possible: 20 }
+
+            expect do
+              test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
+            end.to raise_error(ActiveRecord::RecordInvalid, /Points possible/)
+          end
+
+          it "allows points_possible update when no peer review submissions exist" do
+            params = { points_possible: 20 }
+
+            result = test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
+
+            expect(result).to be_a(PeerReviewSubAssignment)
+            expect(result.points_possible).to eq(20)
+          end
+        end
       end
     end
 
@@ -8216,6 +8319,121 @@ describe AssignmentsApiController, type: :request do
                  })
 
         expect(response).to be_successful
+      end
+
+      context "when updating points_possible on peer review sub assignment" do
+        before :once do
+          @assignment = @course.assignments.create!(
+            name: "Assignment with Peer Reviews",
+            points_possible: 100,
+            peer_reviews: true
+          )
+
+          @peer_review_sub = PeerReview::PeerReviewCreatorService.call(
+            parent_assignment: @assignment,
+            points_possible: 50,
+            grading_type: "points"
+          )
+
+          @student = User.create!(name: "Test Student")
+          @assessor = User.create!(name: "Test Assessor")
+          @student_submission = submission_model(assignment: @assignment, user: @student)
+          @assessor_submission = submission_model(assignment: @assignment, user: @assessor)
+          @user = @teacher
+        end
+
+        it "allows updating points_possible when no peer review submissions exist" do
+          api_call(:put,
+                   "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                   {
+                     controller: "assignments_api",
+                     action: "update",
+                     format: "json",
+                     course_id: @course.id.to_s,
+                     id: @assignment.to_param
+                   },
+                   {
+                     assignment: {
+                       peer_reviews: true,
+                       peer_review: {
+                         points_possible: 75
+                       }
+                     }
+                   })
+
+          expect(response).to be_successful
+          @peer_review_sub.reload
+          expect(@peer_review_sub.points_possible).to eq(75)
+        end
+
+        it "returns error when updating points_possible after peer review submissions exist" do
+          AssessmentRequest.create!(
+            user: @student,
+            asset: @student_submission,
+            assessor_asset: @assessor_submission,
+            assessor: @assessor,
+            workflow_state: "completed"
+          )
+
+          api_call(:put,
+                   "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                   {
+                     controller: "assignments_api",
+                     action: "update",
+                     format: "json",
+                     course_id: @course.id.to_s,
+                     id: @assignment.to_param
+                   },
+                   {
+                     assignment: {
+                       peer_reviews: true,
+                       peer_review: {
+                         points_possible: 75
+                       }
+                     }
+                   },
+                   {},
+                   expected_status: 400)
+
+          expect(response).to have_http_status(:bad_request)
+          json = JSON.parse(response.body)
+          expect(json["errors"]).to be_present
+        end
+
+        it "does not change points_possible when validation fails" do
+          AssessmentRequest.create!(
+            user: @student,
+            asset: @student_submission,
+            assessor_asset: @assessor_submission,
+            assessor: @assessor,
+            workflow_state: "completed"
+          )
+
+          original_points = @peer_review_sub.points_possible
+
+          api_call(:put,
+                   "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                   {
+                     controller: "assignments_api",
+                     action: "update",
+                     format: "json",
+                     course_id: @course.id.to_s,
+                     id: @assignment.to_param
+                   },
+                   {
+                     assignment: {
+                       peer_reviews: true,
+                       peer_review: {
+                         points_possible: 75
+                       }
+                     }
+                   },
+                   {},
+                   expected_status: 400)
+
+          @peer_review_sub.reload
+          expect(@peer_review_sub.points_possible).to eq(original_points)
+        end
       end
     end
 
