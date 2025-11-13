@@ -129,6 +129,8 @@ const portalRouter = createBrowserRouter(
           '/courses/:courseId/activity_builder/*',
           '/courses/:courseId/take/*',
           '/courses/:courseId/reports/*',
+          '/courses/:courseId/submission-confirmation/*',
+          '/courses/:courseId/submission-screen/*',
         ].map(path => (
           <Route
             key={`ams-route-${path}`}

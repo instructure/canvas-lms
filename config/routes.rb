@@ -422,6 +422,8 @@ CanvasRails::Application.routes.draw do
     get "activity_builder/*path" => "quizzes/quizzes#index"
     get "take/*path" => "quizzes/quizzes#index"
     get "reports/*path" => "quizzes/quizzes#index"
+    get "submission-confirmation/*path" => "quizzes/quizzes#index"
+    get "submission-screen/*path" => "quizzes/quizzes#index"
 
     post "quizzes/new" => "quizzes/quizzes#new" # use POST instead of GET (not idempotent)
     resources :quizzes, controller: "quizzes/quizzes", except: :new do
