@@ -40,7 +40,12 @@ shared_examples "Gradebook view menu" do |ff_enabled|
     gradebook_data_setup
   end
 
-  before { user_session(@teacher) }
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+    user_session(@teacher)
+  end
 
   context "sort by assignment group order" do
     before do
