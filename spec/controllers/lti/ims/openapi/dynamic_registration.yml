@@ -177,6 +177,40 @@ paths:
                     target_link_uri:
                       type: string
   /api/lti/registrations/:registration_id:
+    get:
+      summary: Get Dynamic Registration Configuration
+      description: >
+        Retrieves the LTI Dynamic Registration configuration for a given registration.
+        This endpoint provides the complete registration configuration including client details,
+        scopes, redirect URIs, and LTI tool configuration. Authentication is required via
+        developer key access token with appropriate LTI registration scopes.
+      parameters:
+        - in: path
+          name: registration_id
+          required: true
+          schema:
+            type: string
+          description: The ID of the LTI IMS Registration to retrieve configuration for
+      responses:
+        '200':
+          description: LTI Dynamic Registration configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/dynamicRegistrationConfiguration"
+        '401':
+          description: "Unauthorized - invalid or missing access token"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+        '404':
+          description: "Registration not found"
+      security:
+        - developerKeyAuth: []
     put:
       summary: Updates an existing tool registration.
       parameters:
@@ -339,6 +373,102 @@ components:
                     type: string
                   label:
                     type: string
-                  
-
-        
+    dynamicRegistrationConfiguration:
+      type: object
+      description: LTI Dynamic Registration configuration response
+      properties:
+        client_id:
+          type: string
+          description: The global developer key ID as a string
+        application_type:
+          type: string
+          enum: [web]
+          description: Always "web" for LTI registrations
+        grant_types:
+          type: array
+          items:
+            type: string
+          description: Array of supported OAuth2 grant types
+        initiate_login_uri:
+          type: string
+          description: URL for LTI login initiation
+        redirect_uris:
+          type: array
+          items:
+            type: string
+          description: Array of allowed redirect URIs after authentication
+        response_types:
+          type: array
+          items:
+            type: string
+            enum: [id_token]
+          description: Array of supported OAuth2 response types (always "id_token")
+        client_name:
+          type: string
+          description: Display name of the LTI tool
+        jwks_uri:
+          type: string
+          description: URL to the tool's JSON Web Key Set
+        logo_uri:
+          type: string
+          description: URL to the tool's logo/icon
+        token_endpoint_auth_method:
+          type: string
+          enum: [private_key_jwt]
+          description: Authentication method (always "private_key_jwt")
+        scope:
+          type: string
+          description: Space-separated string of OAuth2 scopes including LTI scopes and "openid"
+        https://purl.imsglobal.org/spec/lti-tool-configuration:
+          type: object
+          description: LTI tool configuration object with placements and Canvas-specific extensions
+          properties:
+            domain:
+              type: string
+            description:
+              type: string
+            target_link_uri:
+              type: string
+            claims:
+              type: array
+              items:
+                type: string
+            messages:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  placements:
+                    type: array
+                    items:
+                      type: string
+            https://canvas.instructure.com/lti/registration_config_url:
+              type: string
+              description: URL to view/manage the registration in Canvas
+        registration_client_uri:
+          type: string
+          description: URL to view/manage the registration in Canvas
+        deployment_id:
+          type: string
+          description: The deployment ID for the root account deployment (if exists)
+          nullable: true
+      required:
+        - client_id
+        - application_type
+        - grant_types
+        - initiate_login_uri
+        - redirect_uris
+        - response_types
+        - client_name
+        - jwks_uri
+        - token_endpoint_auth_method
+        - scope
+        - https://purl.imsglobal.org/spec/lti-tool-configuration
+        - registration_client_uri
+  securitySchemes:
+    developerKeyAuth:
+      type: http
+      scheme: bearer
+      description: Developer key access token with LTI registration scopes

@@ -3086,4 +3086,222 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
   end
+
+  describe "pending_update field inclusion" do
+    let_once(:registration) { lti_registration_model(account:) }
+    let_once(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
+
+    before do
+      account_binding
+      registration.manual_configuration = lti_tool_configuration_model
+    end
+
+    context "when lti_dr_registrations_update feature flag is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:lti_dr_registrations_update)
+      end
+
+      describe "GET list", type: :request do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations" }
+
+        it "includes pending_update as false" do
+          subject
+          expect(response).to be_successful
+          expect(response_data.first["pending_update"]).to be_nil
+        end
+      end
+
+      describe "GET show", type: :request do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}" }
+
+        it "includes pending_update as false" do
+          subject
+          expect(response).to be_successful
+          expect(response_json["pending_update"]).to be_nil
+        end
+      end
+    end
+
+    context "when lti_dr_registrations_update feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:lti_dr_registrations_update)
+      end
+
+      describe "GET list", type: :request do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations" }
+
+        context "without pending update requests" do
+          it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            expect(response_data.first["pending_update"]).to be_nil
+          end
+        end
+
+        context "with pending update request" do
+          before do
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin
+            )
+          end
+
+          it "includes pending_update as true" do
+            subject
+            expect(response).to be_successful
+            registration_data = response_data.find { |r| r["id"] == registration.id }
+            expect(registration_data["pending_update"]).to be_present
+          end
+        end
+
+        context "with multiple pending update requests" do
+          before do
+            # Create multiple pending requests, should use the most recent one
+            3.times do |i|
+              lti_ims_registration_update_request_model(
+                lti_registration: registration,
+                root_account: account,
+                uuid: SecureRandom.uuid,
+                created_by: admin,
+                created_at: i.hours.ago
+              )
+            end
+          end
+
+          it "includes pending_update as true" do
+            subject
+            expect(response).to be_successful
+            registration_data = response_data.find { |r| r["id"] == registration.id }
+            expect(registration_data["pending_update"]).to be_present
+          end
+        end
+
+        context "with accepted update request" do
+          before do
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              accepted_at: 1.hour.ago
+            )
+          end
+
+          it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            registration_data = response_data.find { |r| r["id"] == registration.id }
+            expect(registration_data["pending_update"]).to be_nil
+          end
+        end
+
+        context "with rejected update request" do
+          before do
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              rejected_at: 1.hour.ago
+            )
+          end
+
+          it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            registration_data = response_data.find { |r| r["id"] == registration.id }
+            expect(registration_data["pending_update"]).to be_nil
+          end
+        end
+      end
+
+      describe "GET show", type: :request do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}" }
+
+        context "without pending update requests" do
+          it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            expect(response_json["pending_update"]).to be_nil
+          end
+        end
+
+        context "with pending update request" do
+          before do
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin
+            )
+          end
+
+          it "includes pending_update as true" do
+            subject
+            expect(response).to be_successful
+            expect(response_json["pending_update"]).to be_present
+          end
+        end
+
+        context "with multiple pending update requests" do
+          before do
+            # Create multiple pending requests, should use the most recent one
+            3.times do |i|
+              lti_ims_registration_update_request_model(
+                lti_registration: registration,
+                root_account: account,
+                uuid: SecureRandom.uuid,
+                created_by: admin,
+                created_at: i.hours.ago
+              )
+            end
+          end
+
+          it "includes pending_update as true" do
+            subject
+            expect(response).to be_successful
+            expect(response_json["pending_update"]).to be_present
+          end
+        end
+
+        context "with accepted update request" do
+          before do
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              accepted_at: 1.hour.ago
+            )
+          end
+
+          it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            expect(response_json["pending_update"]).to be_nil
+          end
+        end
+
+        context "with rejected update request" do
+          before do
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              rejected_at: 1.hour.ago
+            )
+          end
+
+          it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            expect(response_json["pending_update"]).to be_nil
+          end
+        end
+      end
+    end
+  end
 end
