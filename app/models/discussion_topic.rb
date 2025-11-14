@@ -398,7 +398,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def update_attachment_associations
+  def update_attachment_associations(**args)
     return if root_topic_id.present? # skip for subtopics; associations are copied in refresh_subtopics
 
     super

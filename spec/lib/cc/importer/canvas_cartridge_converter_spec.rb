@@ -378,6 +378,7 @@ describe "Canvas Cartridge importing" do
     lo_g2 = @copy_from.learning_outcome_groups.new
     lo_g2.context = @copy_from
     lo_g2.title = "Empty Group"
+    lo_g2.description = "<p>Yo</p>"
     lo_g2.save!
 
     lo2 = @copy_from.created_learning_outcomes.new
@@ -713,7 +714,7 @@ describe "Canvas Cartridge importing" do
       <p><img src="/courses/#{@copy_from.id}/files/#{image.id}/preview"></p>
       <p><iframe src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" data-media-id="#{media.media_entry_id}"></iframe></p>
     HTML
-    @copy_from.saving_user = @from_teacher
+    @copy_from.updating_user = @from_teacher
     @copy_from.update!(syllabus_body: body)
 
     # export to html file

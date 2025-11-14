@@ -31,6 +31,7 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     discussion_topic: DiscussionTopic,
     quiz: Quizzes::Quiz,
     learning_outcome: LearningOutcome,
+    learning_outcome_group: LearningOutcomeGroup,
     wiki_page: WikiPage
   }.freeze
 
@@ -264,7 +265,7 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
       # from gems/canvas_link_migrator-1.0.18/lib/canvas_link_migrator/link_resolver.rb#121
       next if link[:link_type] == :media_object
 
-      link[:new_value] = aq.translate_file_link(link[:new_value])
+      link[:new_value] = aq.translate_file_link(link[:new_value], migration: @migration)
     end
 
     if LinkReplacer.recursively_sub_placeholders!(aq["question_data"], links)
@@ -280,6 +281,20 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     quiz = Quizzes::Quiz.where(id: qq.quiz_id).where.not(quiz_data: nil).first
     if quiz && LinkReplacer.recursively_sub_placeholders!(quiz["quiz_data"], links)
       quiz.update_columns(quiz_data: quiz["quiz_data"])
+    end
+  end
+
+  def create_attachment_associations
+    @migration.imported_migration_items.each do |item|
+      next unless item.respond_to?(:update_attachment_associations)
+
+      item.update_attachment_associations(migration: @migration)
+      (item.try(:assignment) || item.try(:discussion_topic) || item.try(:quiz))&.tap do |assoc_item|
+        assoc_item.update_attachment_associations(migration: @migration)
+      end
+      item.try(:quiz_questions)&.each do |question|
+        question.update_attachment_associations(migration: @migration)
+      end
     end
   end
 end

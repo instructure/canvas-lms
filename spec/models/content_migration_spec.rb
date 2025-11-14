@@ -1918,6 +1918,97 @@ describe ContentMigration do
     end
   end
 
+  context "creating attachment associations" do
+    include_context "course copy"
+
+    it "creates attachment associations during imports" do
+      @copy_to = @cm.context
+      mig_att = @copy_to.attachments.create(filename: "first", display_name: "first", uploaded_data: fixture_file_upload("migration/migration_example.imscc"))
+      user_att1 = @teacher.attachments.create(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"))
+      user_att2 = @teacher.attachments.create(id: 100_000_000_002, uploaded_data: fixture_file_upload("instructure.png"))
+      user_att3 = @teacher.attachments.create(id: 100_000_000_003, uploaded_data: fixture_file_upload("test_image.jpg"))
+      user_att4 = @teacher.attachments.create(id: 100_000_000_004, uploaded_data: fixture_file_upload("cn_image.jpg"))
+      run_import(mig_att.id)
+      course_att1 = @copy_to.attachments.find_by(migration_id: "ge928eec163f37c0b61e80a894e6fd1ba")
+      course_att2 = @copy_to.attachments.find_by(migration_id: "gd91205577b505bf54004413542b7bc8f")
+      course_att3 = @copy_to.attachments.find_by(migration_id: "g5e93e9ae3fda026e2dd50748c5e73be3")
+      course_att4 = @copy_to.attachments.find_by(migration_id: "gde8766ea2e0e0caec384afbd42abff7a")
+      aq_att1 = @copy_to.attachments.find_by(migration_id: "g1ff2608316adc0fea6b11d467802d489")
+      aq_att2 = @copy_to.attachments.find_by(migration_id: "gb2c45b1f7e46fdd4ff7f00667378c740")
+      aq_att3 = @copy_to.attachments.find_by(migration_id: "g7191e0c44af1be2f5bb3b3a06e5a08ee")
+      aq_att4 = @copy_to.attachments.find_by(migration_id: "gd9b1ab391754152b6a6ced71370b306a")
+
+      # Syllabus
+      expect(@copy_to.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+
+      # Announcements
+      announcement1 = @copy_to.announcements.find_by(migration_id: "g30b2d9e601dc05f254d87b77c1031a93")
+      announcement2 = @copy_to.announcements.find_by(migration_id: "g56c0929f69c2967a2651f95f89e5c9ba")
+      expect(announcement1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(announcement2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Assignments
+      assignment1 = @copy_to.assignments.find_by(migration_id: "g4ca1d58c8946b27f14e91181625a6d8e")
+      assignment2 = @copy_to.assignments.find_by(migration_id: "g19aade4d7fe339e69183df246429ac22")
+      expect(assignment1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(assignment2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Calendar Events
+      calendar_event1 = @copy_to.calendar_events.find_by(migration_id: "g178f17835368bb297554a3f7c63e5589")
+      calendar_event2 = @copy_to.calendar_events.find_by(migration_id: "g3b34792093f1bf6fc5a4bb47a036fe5d")
+      expect(calendar_event1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(calendar_event2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Discussion Topics
+      discussion1 = @copy_to.discussion_topics.find_by(migration_id: "g14c7dc3dd951b0307fd7313abd640a32")
+      discussion2 = @copy_to.discussion_topics.find_by(migration_id: "ga3d3feeba4b59114a04d14f4958d41bc")
+      expect(discussion1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(discussion1.assignment.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(discussion2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+      expect(discussion2.assignment.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Outcomes
+      outcome1 = @copy_to.learning_outcomes.find_by(migration_id: "g490cf41c1abd43daef779ba114f43d05")
+      outcome2 = @copy_to.learning_outcomes.find_by(migration_id: "g468bd697538ae5f8a2edabecae834430")
+      expect(outcome1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(outcome2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Outcome Groups
+      outcome_group1 = @copy_to.learning_outcome_groups.find_by(migration_id: "gfab89850a1b0ca6aebab2eb4267d0783")
+      outcome_group2 = @copy_to.learning_outcome_groups.find_by(migration_id: "g3b5c6d92ced0a73c668137478dc8bcb9")
+      expect(outcome_group1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(outcome_group2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Pages
+      page1 = @copy_to.wiki_pages.find_by(migration_id: "gd7317fea42eb13fb5bc92127baabdf8d")
+      page2 = @copy_to.wiki_pages.find_by(migration_id: "g5870e63ac70483ee49477ae0ee284d66")
+      expect(page1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(page2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Quizzes
+      quiz1 = @copy_to.quizzes.find_by(migration_id: "g16bf75ed6636a1c1ff52cd643355de37")
+      quiz2 = @copy_to.quizzes.find_by(migration_id: "g5937bf4cc9f3ff85f138215e21fb776a")
+      expect(quiz1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(quiz1.assignment.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(quiz2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+      expect(quiz2.assignment.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Quiz Questions
+      question1 = quiz1.quiz_questions.first
+      question2 = quiz2.quiz_questions.first
+      aq_question = @copy_to.quizzes.find_by(migration_id: "g7ac529a0e5f5a22a49d1076b16027515").quiz_questions.first
+      expect(question1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id, course_att2.id, course_att3.id, course_att4.id])
+      expect(question2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id, user_att2.id, user_att3.id, user_att4.id])
+      expect(aq_question.attachment_associations.pluck(:attachment_id)).to match_array([aq_att1.id, aq_att2.id, aq_att3.id, aq_att4.id])
+
+      # Assessment Questions
+      aq1 = @copy_to.assessment_questions.find { |aq| aq.migration_id == "g35ed128ee5141890513071a090a55ea1" }
+      aq2 = @copy_to.assessment_questions.find { |aq| aq.migration_id == "gaf93143a49786b1582443d81cd6e2b4a" }
+      expect(aq1.attachments.pluck(:display_name)).to match_array(%w[27.jpg ab.jpg basic_sql.png beavercode1.png])
+      expect(aq2.attachments.pluck(:display_name)).to match_array(%w[cn_image.jpg instructure.png test_image.jpg])
+    end
+  end
+
   context "syncing master deletions" do
     context "deleting module item" do
       def setup_master_course_deletion_test
