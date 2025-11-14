@@ -20,6 +20,7 @@
 
 class Announcement < DiscussionTopic
   belongs_to :context, polymorphic: [:course, :group]
+  has_many :attachment_associations, -> { where(context_type: "Announcement") }, foreign_key: :context_id, inverse_of: :context
 
   has_a_broadcast_policy
   include HasContentTags

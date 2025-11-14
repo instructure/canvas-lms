@@ -28,7 +28,7 @@ module Factories
     {
       title: "value for title",
       message: "value for message",
-      saving_user: @user || user_model
+      updating_user: @user || user_model
     }
   end
 end
