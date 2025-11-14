@@ -1599,6 +1599,57 @@ describe PlannerController do
         get :index, params: { observed_user_id: @student.to_param, context_codes: [@course.asset_string] }
         expect(response).to be_successful
       end
+
+      context "cross-shard account calendars" do
+        specs_require_sharding
+
+        it "handles account calendars correctly when observer and student are on different shards" do
+          # Enable auto subscription on the default account
+          Account.default.update!(
+            account_calendar_visible: true,
+            account_calendar_subscription_type: "auto"
+          )
+
+          # Create a remote account on shard 2 with auto subscription
+          @shard2.activate do
+            @remote_account = Account.create!(name: "Remote Account")
+            @remote_account.update!(
+              account_calendar_visible: true,
+              account_calendar_subscription_type: "auto"
+            )
+            @remote_course = @remote_account.courses.create!(workflow_state: "available")
+
+            # Create a student on shard 2
+            @remote_student = user_factory(active_all: true)
+            @remote_course.enroll_student(@remote_student, enrollment_state: "active")
+
+            # Enable account calendar for the student
+            local_account_id = Shard.relative_id_for(@remote_account.id, @remote_account.shard, @remote_student.shard)
+            @remote_student.set_preference(:enabled_account_calendars, [local_account_id])
+            @remote_student.save!
+          end
+
+          @local_observer = user_factory(active_all: true)
+
+          # Enroll observer to observe the student on shard 2
+          @shard2.activate do
+            @remote_course.enroll_user(
+              @local_observer,
+              "ObserverEnrollment",
+              enrollment_state: "active",
+              associated_user_id: @remote_student.id
+            )
+          end
+
+          Shard.default.activate do
+            get :index, params: {
+              observed_user_id: @remote_student.to_param,
+              include: %w[all_courses account_calendars]
+            }
+            expect(response).to be_successful
+          end
+        end
+      end
     end
   end
 end
