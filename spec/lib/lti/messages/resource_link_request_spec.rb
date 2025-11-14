@@ -21,6 +21,7 @@ require_relative "lti_advantage_shared_examples"
 
 describe Lti::Messages::ResourceLinkRequest do
   include_context "lti_advantage_shared_examples"
+  include AccountDomainSpecHelper
 
   let(:tool_override) { nil }
 
@@ -193,8 +194,7 @@ describe Lti::Messages::ResourceLinkRequest do
           )
         ).and_return("lti_line_item_show_url")
 
-        allow_any_instance_of(Account).to receive(:environment_specific_domain)
-          .and_return("test.host")
+        stub_host_for_environment_specific_domain("test.host")
       end
 
       shared_examples_for "an authorized launch" do
@@ -219,7 +219,7 @@ describe Lti::Messages::ResourceLinkRequest do
 
         describe "line_items and line_item urls" do
           before do
-            allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical-account-domain")
+            stub_host_for_environment_specific_domain("canonical-account-domain")
           end
 
           let(:line_items_url_params) { { host: "canonical-account-domain", course_id: course.id } }
