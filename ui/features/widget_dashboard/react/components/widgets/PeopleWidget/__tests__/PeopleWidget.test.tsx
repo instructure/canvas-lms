@@ -339,6 +339,7 @@ describe('PeopleWidget', () => {
 
   describe('GraphQL Errors', () => {
     beforeEach(() => {
+      jest.spyOn(console, 'error').mockImplementation()
       server.use(
         graphql.query('GetCourseInstructorsPaginated', () => {
           return HttpResponse.json({
@@ -346,6 +347,10 @@ describe('PeopleWidget', () => {
           })
         }),
       )
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
     })
 
     it('displays error message when query fails', async () => {
