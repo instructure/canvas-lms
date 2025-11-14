@@ -6205,6 +6205,7 @@ ko:
   full_article_9296bb6f: "전체 기사"
   gathering_files_933551d9: "파일 수집 중..."
   general_answer_comments_730136ba: "일반 답변 의견"
+  generate_44e33e72: 생성
   generate_token_393ab5b4: "토큰 생성"
   generating_token_42c29663: "토큰 생성 중..."
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "아래에 평점 값을 입력해서 모든 학생에게 *%{assignment.name}*에 대한 동일한 평점을 주십시오:"
