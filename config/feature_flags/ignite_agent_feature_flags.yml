@@ -1,5 +1,6 @@
 ignite_agent_enabled:
   state: hidden
+  shadow: true
   applies_to: RootAccount
   display_name: Ignite Agent
   description: Enables the Ignite Agent feature for the root account. The Ignite Agent is an AI companion for admins and teachers to help them with their day-to-day tasks in the Canvas LMS. This feature is currently in development and not yet available for general use.
