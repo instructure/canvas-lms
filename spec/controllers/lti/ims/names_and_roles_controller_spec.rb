@@ -23,6 +23,7 @@ require_relative "concerns/lti_services_shared_examples"
 
 describe Lti::IMS::NamesAndRolesController do
   include Lti::IMS::NamesAndRolesMatchers
+  include AccountDomainSpecHelper
 
   include_context "advantage services context"
 
@@ -357,7 +358,7 @@ describe Lti::IMS::NamesAndRolesController do
 
     describe "id field" do
       it "uses the Account#domain in the line item id" do
-        expect_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
+        stub_host_for_environment_specific_domain("canonical.host")
         send_request
         expect(json[:id]).to eq(
           "http://canonical.host/api/lti/courses/#{course.id}/names_and_roles"
