@@ -427,14 +427,20 @@ class PlannerController < ApplicationController
       @user_ids = [@user.id] if params.key?(:observed_user_id) && @user.grants_right?(@current_user, session, :read_as_parent)
     end
 
-    allowed_account_calendars = @user&.all_account_calendars&.map { |a| Shard.relative_id_for(a.id, Shard.current, @user.shard) } || []
-    enabled_account_calendars = @user&.enabled_account_calendars&.map { |a| Shard.relative_id_for(a.id, Shard.current, @user.shard) } || []
+    allowed_account_calendars = @user&.all_account_calendars&.map(&:id) || []
+    enabled_account_calendars = @user&.enabled_account_calendars&.map(&:id) || []
     if @include_account_calendars && !context_ids.nil? && context_ids["Account"].nil?
       @account_ids = enabled_account_calendars
     end
 
     # make IDs relative to the user's shard
     @course_ids, @group_ids, @user_ids, @account_ids = transpose_ids(Shard.current, @user.shard) if @user
+
+    # Also transpose allowed/enabled account calendars to match @user.shard format
+    if @user
+      allowed_account_calendars = allowed_account_calendars.map { |id| Shard.relative_id_for(id, Shard.current, @user.shard) }
+      enabled_account_calendars = enabled_account_calendars.map { |id| Shard.relative_id_for(id, Shard.current, @user.shard) }
+    end
 
     (@user&.shard || Shard.current).activate do
       original_course_ids = @course_ids || []
