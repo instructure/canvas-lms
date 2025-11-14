@@ -11020,6 +11020,7 @@ fa:
   general_answer_comments_730136ba: "نظرهای عمومی مربوط به پاسخ"
   general_eb111f34: عمومی
   general_locked_objects_6a9adafb: "موارد قفل‌شده عمومی"
+  generate_44e33e72: ایجاد
   generate_activity_for_user_2b0af749: "ایجاد فعالیت برای %{user}"
   generate_epub_80e89ea4: "ایجاد ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "ایجاد گزارش تحلیل مورد %{statusLabel}"
