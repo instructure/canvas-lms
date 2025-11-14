@@ -63,7 +63,6 @@ export const IssuesTableHeaderApiNames: Record<string, string> = {
 export const issueTypeOptions: {value: IssueRuleType; label: string}[] = [
   {value: 'adjacent-links', label: I18n.t('Duplicate links')},
   {value: 'headings-sequence', label: I18n.t('Headings sequence')},
-  {value: 'has-lang-entry', label: I18n.t('PDF language entry')},
   {value: 'headings-start-at-h2', label: I18n.t('Headings start at H2')},
   {value: 'img-alt', label: I18n.t('Image alt text missing')},
   {value: 'img-alt-filename', label: I18n.t('Image alt filename')},
@@ -80,11 +79,6 @@ export const issueTypeOptions: {value: IssueRuleType; label: string}[] = [
 export const artifactTypeOptions = [
   {value: 'wiki_page', label: I18n.t('Pages')},
   {value: 'assignment', label: I18n.t('Assignments')},
-  {value: 'attachment', label: I18n.t('Files: PDFs')},
-  // {value: 'doc', label: I18n.t('Files: Docs')},
-  // {value: 'image', label: I18n.t('Files: Images')},
-  // {value: 'pdf', label: I18n.t('Files: PDFs')},
-  // {value: 'media', label: I18n.t('Files: Media')},
 ]
 
 export const stateOptions = [
@@ -92,5 +86,3 @@ export const stateOptions = [
   {value: 'unpublished', label: I18n.t('Unpublished')},
   {value: 'archived', label: I18n.t('Archived')},
 ]
-
-// GroupedIssueSummary

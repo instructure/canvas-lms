@@ -109,7 +109,7 @@ module AccessibilityFilters
     return relation if resource_types.blank?
 
     resource_types = Array(resource_types).map(&:to_s)
-    valid_resource_types = %w[wiki_page assignment attachment]
+    valid_resource_types = %w[wiki_page assignment]
     valid_filters = resource_types & valid_resource_types
 
     return relation.none if valid_filters.empty?
@@ -117,7 +117,6 @@ module AccessibilityFilters
     conditions = []
     conditions << "accessibility_resource_scans.wiki_page_id IS NOT NULL" if valid_filters.include?("wiki_page")
     conditions << "accessibility_resource_scans.assignment_id IS NOT NULL" if valid_filters.include?("assignment")
-    conditions << "accessibility_resource_scans.attachment_id IS NOT NULL" if valid_filters.include?("attachment")
 
     return relation if conditions.empty?
 
