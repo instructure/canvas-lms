@@ -780,7 +780,7 @@ describe ContentMigration do
     expect(plain_text).to eq "This is &lt;b&gt;Bold&lt;/b&gt;"
   end
 
-  it "identifies and import compressed tarball archives" do
+  it "identifies and imports compressed tarball archives" do
     skip unless Qti.qti_enabled?
 
     cm = @cm
@@ -2598,11 +2598,9 @@ describe ContentMigration do
       converter.export
       @course_data = converter.course.with_indifferent_access
 
-      @course = course_factory
-      @migration = ContentMigration.create(context: @course)
-      @migration.migration_type = "canvas_cartridge_importer"
-      @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+      @cm.migration_type = "canvas_cartridge_importer"
+      @cm.migration_settings[:migration_ids_to_import] = { copy: {} }
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @cm)
       run_jobs
       expect(@course.attachments.last.media_entry_id).not_to eq("maybe")
       expect(@course.attachments.last.file_state).not_to eq("deleted")
