@@ -19,9 +19,9 @@
 import * as tz from '@instructure/moment-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
-import {IconButton} from '@instructure/ui-buttons'
+import {IconButton, Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconMoreLine, IconSearchLine} from '@instructure/ui-icons'
+import {IconMoreLine, IconSearchLine, IconRefreshLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Responsive, type ResponsivePropsObject} from '@instructure/ui-responsive'
 import {Table} from '@instructure/ui-table'
@@ -239,6 +239,37 @@ const Columns: ReadonlyArray<Column> = [
     ),
   },
   {
+    id: 'status',
+    header: I18n.t('Status'),
+    width: '140px',
+    sortable: true,
+    render: r => {
+      // Check if feature flag is enabled
+      if (!window.ENV.LTI_DR_REGISTRATIONS_UPDATE) {
+        return <div>{I18n.t('Up to date')}</div>
+      }
+
+      const pendingUpdate = r.pending_update
+      if (pendingUpdate) {
+        return (
+          <Button
+            color="secondary"
+            size="small"
+            renderIcon={() => <IconRefreshLine />}
+            data-pendo="lti-registrations-update-available-button"
+            onClick={() => {
+              // todo: initiate the update wizard
+            }}
+          >
+            {I18n.t('Update Available')}
+          </Button>
+        )
+      } else {
+        return <div>{I18n.t('Up to date')}</div>
+      }
+    },
+  },
+  {
     id: 'actions',
     width: '60px',
     render: (r, {deleteApp}) => {
@@ -326,7 +357,7 @@ const CondensedColumns: ReadonlyArray<Column> = [
   {
     id: 'name',
     header: I18n.t('App Name'),
-    width: '42%',
+    width: '32%',
     sortable: true,
     render: r => {
       const appName = (
@@ -357,7 +388,7 @@ const CondensedColumns: ReadonlyArray<Column> = [
   {
     id: 'nickname',
     header: I18n.t('Nickname'),
-    width: '40%',
+    width: '20%',
     sortable: true,
     render: r => (r.admin_nickname ? <Text wrap="break-word">{r.admin_nickname}</Text> : null),
   },
@@ -371,11 +402,42 @@ const CondensedColumns: ReadonlyArray<Column> = [
   {
     id: 'on',
     header: I18n.t('On/Off'),
-    width: '10%',
+    width: '8%',
     sortable: true,
     render: r => (
       <div>{r.account_binding?.workflow_state === 'on' ? I18n.t('On') : I18n.t('Off')}</div>
     ),
+  },
+  {
+    id: 'status',
+    header: I18n.t('Status'),
+    width: '32%',
+    sortable: true,
+    render: r => {
+      // Check if feature flag is enabled
+      if (!window.ENV.LTI_DR_REGISTRATIONS_UPDATE) {
+        return <div>{I18n.t('Up to date')}</div>
+      }
+
+      const pendingUpdate = r.pending_update
+      if (pendingUpdate) {
+        return (
+          <Button
+            color="secondary"
+            size="small"
+            renderIcon={() => <IconRefreshLine />}
+            data-pendo="lti-registrations-update-available-button"
+            onClick={() => {
+              // todo: initiate the update wizard
+            }}
+          >
+            {I18n.t('Update Available')}
+          </Button>
+        )
+      } else {
+        return <div>{I18n.t('Up to date')}</div>
+      }
+    },
   },
 ]
 

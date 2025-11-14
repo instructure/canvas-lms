@@ -56,9 +56,11 @@ module Lti
           overlays = preloaded_overlays(registrations)
         end
         account_bindings = preloaded_account_bindings(registrations)
+        pending_updates = preloaded_pending_updates(registrations)
         preloaded_associations = registrations.index_by(&:global_id).transform_values do |reg|
           acc = { account_binding: account_bindings[reg.global_id] }
           acc[:overlay] = overlays[reg.global_id] if preload_overlays
+          acc[:pending_update] = pending_updates[reg.global_id]&.first
 
           acc.compact
         end
@@ -82,6 +84,16 @@ module Lti
       account_bindings = Lti::RegistrationAccountBinding.where(account:, registration: registrations).preload(:created_by, :updated_by) +
                          Lti::RegistrationAccountBinding.find_all_in_site_admin(registrations)
       account_bindings.group_by(&:global_registration_id).transform_values(&:first)
+    end
+
+    def preloaded_pending_updates(registrations)
+      return {} unless Account.site_admin.feature_enabled?(:lti_dr_registrations_update)
+
+      Lti::RegistrationUpdateRequest.where(lti_registration: registrations)
+                                    .pending
+                                    .select("DISTINCT ON (lti_registration_id) *")
+                                    .order(:lti_registration_id, created_at: :desc)
+                                    .group_by { |u| Shard.global_id_for(u.lti_registration_id, Shard.current) }
     end
 
     # Get all registrations on this account, regardless of their bindings

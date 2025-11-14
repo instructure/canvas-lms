@@ -339,6 +339,7 @@ export type RootAccountFeatureId =
   | 'lti_link_to_apps_from_developer_keys'
   | 'lti_registrations_next'
   | 'lti_registrations_page'
+  | 'lti_dr_registrations_update'
   | 'lti_registrations_usage_data'
   | 'lti_registrations_usage_data_dev'
   | 'lti_registrations_usage_data_low_usage'
