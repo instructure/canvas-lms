@@ -20,7 +20,6 @@
 
 class AutoGradeOrchestrationService
   MAX_ATTEMPTS = 3
-  MULTIPLE_RATINGS_MSG = I18n.t("This work sits between two ratings for this criterion. The lower rating was applied for consistency.")
 
   def initialize(course:, current_user:)
     @course = course
@@ -96,7 +95,7 @@ class AutoGradeOrchestrationService
                     .map do |_, items|
                       if items.size > 1
                         lowest = items.min_by { |i| i.dig("rating", "rating").to_f }
-                        lowest["rating"]["reasoning"] = [lowest["rating"]["reasoning"], MULTIPLE_RATINGS_MSG].compact.join(" ")
+                        lowest["rating"]["reasoning"] = [lowest["rating"]["reasoning"], I18n.t("This work sits between two ratings for this criterion. The lower rating was applied for consistency.")].compact.join(" ")
                         lowest
                       else
                         items.first
