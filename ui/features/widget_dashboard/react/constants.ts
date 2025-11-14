@@ -156,3 +156,15 @@ export const UPDATE_LEARNER_DASHBOARD_TAB_SELECTION = gql`
     }
   }
 `
+
+export const UPDATE_WIDGET_DASHBOARD_CONFIG = gql`
+  mutation UpdateWidgetDashboardConfig($widgetId: String!, $filters: JSON) {
+    updateWidgetDashboardConfig(input: {widgetId: $widgetId, filters: $filters}) {
+      widgetId
+      filters
+      errors {
+        message
+      }
+    }
+  }
+`

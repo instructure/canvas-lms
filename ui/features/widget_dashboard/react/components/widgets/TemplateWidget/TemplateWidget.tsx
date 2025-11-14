@@ -28,7 +28,7 @@ import {Pagination} from '@instructure/ui-pagination'
 import {IconDragHandleLine, IconTrashLine} from '@instructure/ui-icons'
 import type {BaseWidgetProps} from '../../../types'
 import {useResponsiveContext} from '../../../hooks/useResponsiveContext'
-import {useWidgetConfig, type MoveAction} from '../../../hooks/useWidgetConfig'
+import {useWidgetLayout, type MoveAction} from '../../../hooks/useWidgetLayout'
 import WidgetContextMenu from '../../shared/WidgetContextMenu'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -67,7 +67,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   isEditMode = false,
 }) => {
   const {isMobile, isDesktop} = useResponsiveContext()
-  const {config, moveWidget} = useWidgetConfig()
+  const {config, moveWidget} = useWidgetLayout()
   const widgetTitle = title || widget.title
   const headingId = `${widget.id}-heading`
 

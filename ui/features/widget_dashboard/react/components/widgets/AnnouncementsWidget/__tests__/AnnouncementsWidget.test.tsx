@@ -27,8 +27,8 @@ import {
   WidgetDashboardProvider,
   type SharedCourseData,
 } from '../../../../hooks/useWidgetDashboardContext'
-import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
-import {WidgetConfigProvider} from '../../../../hooks/useWidgetConfig'
+import {clearWidgetDashboardCache, defaultGraphQLHandlers} from '../../../../__tests__/testHelpers'
+import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 const mockWidget: Widget = {
@@ -267,7 +267,7 @@ const setup = (
       <QueryClientProvider client={queryClient}>
         <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
           <WidgetDashboardEditProvider>
-            <WidgetConfigProvider>{children}</WidgetConfigProvider>
+            <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
           </WidgetDashboardEditProvider>
         </WidgetDashboardProvider>
       </QueryClientProvider>
@@ -334,7 +334,7 @@ const mockCourseGradesResponse = {
   },
 }
 
-const server = setupServer()
+const server = setupServer(...defaultGraphQLHandlers)
 
 const waitForLoadingToComplete = async () => {
   await waitFor(() => {

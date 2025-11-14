@@ -16,246 +16,250 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {act} from '@testing-library/react'
+import {act, waitFor} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks'
-import {WidgetConfigProvider, useWidgetConfig} from '../useWidgetConfig'
-import {WidgetDashboardEditProvider} from '../useWidgetDashboardEdit'
-import type {WidgetConfig} from '../../types'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import React from 'react'
+import {setupServer} from 'msw/node'
+import {graphql, HttpResponse} from 'msw'
+import {useWidgetConfig} from '../useWidgetConfig'
+import {WidgetDashboardProvider} from '../useWidgetDashboardContext'
 
-const wrapper = ({children}: {children: React.ReactNode}) => (
-  <WidgetDashboardEditProvider>
-    <WidgetConfigProvider>{children}</WidgetConfigProvider>
-  </WidgetDashboardEditProvider>
+const server = setupServer(
+  graphql.mutation('UpdateWidgetDashboardConfig', ({variables}) => {
+    return HttpResponse.json({
+      data: {
+        updateWidgetDashboardConfig: {
+          widgetId: variables.widgetId,
+          filters: variables.filters,
+          errors: null,
+        },
+      },
+    })
+  }),
 )
 
 describe('useWidgetConfig', () => {
-  it('provides initial config', () => {
-    const {result} = renderHook(() => useWidgetConfig(), {wrapper})
-    expect(result.current.config.widgets).toHaveLength(4)
+  let queryClient: QueryClient
+
+  beforeAll(() => {
+    server.listen({onUnhandledRequest: 'error'})
   })
 
-  describe('moveWidget', () => {
-    it('moves widget left from column 2 to column 1', () => {
-      const {result} = renderHook(() => useWidgetConfig(), {wrapper})
+  afterAll(() => {
+    server.close()
+  })
 
-      const widget = result.current.config.widgets.find(w => w.position.col === 2)!
-
-      act(() => {
-        result.current.moveWidget(widget.id, 'move-left')
-      })
-
-      const movedWidget = result.current.config.widgets.find(w => w.id === widget.id)!
-      expect(movedWidget.position.col).toBe(1)
-    })
-
-    it('moves widget right from column 1 to column 2', () => {
-      const {result} = renderHook(() => useWidgetConfig(), {wrapper})
-
-      const widget = result.current.config.widgets.find(w => w.position.col === 1)!
-
-      act(() => {
-        result.current.moveWidget(widget.id, 'move-right')
-      })
-
-      const movedWidget = result.current.config.widgets.find(w => w.id === widget.id)!
-      expect(movedWidget.position.col).toBe(2)
-    })
-
-    it('does not move widget left when already in column 1', () => {
-      const {result} = renderHook(() => useWidgetConfig(), {wrapper})
-
-      const widget = result.current.config.widgets.find(w => w.position.col === 1)!
-      const originalRow = widget.position.row
-
-      act(() => {
-        result.current.moveWidget(widget.id, 'move-left')
-      })
-
-      const movedWidget = result.current.config.widgets.find(w => w.id === widget.id)!
-      expect(movedWidget.position.col).toBe(1)
-      expect(movedWidget.position.row).toBe(originalRow)
-    })
-
-    it('does not move widget right when already in column 2', () => {
-      const {result} = renderHook(() => useWidgetConfig(), {wrapper})
-
-      const widget = result.current.config.widgets.find(w => w.position.col === 2)!
-      const originalRow = widget.position.row
-
-      act(() => {
-        result.current.moveWidget(widget.id, 'move-right')
-      })
-
-      const movedWidget = result.current.config.widgets.find(w => w.id === widget.id)!
-      expect(movedWidget.position.col).toBe(2)
-      expect(movedWidget.position.row).toBe(originalRow)
-    })
-
-    it('moves widget left top from column 2 to column 1 at row 1', () => {
-      const {result} = renderHook(() => useWidgetConfig(), {wrapper})
-
-      const widget = result.current.config.widgets.find(w => w.position.col === 2)!
-
-      act(() => {
-        result.current.moveWidget(widget.id, 'move-left-top')
-      })
-
-      const movedWidget = result.current.config.widgets.find(w => w.id === widget.id)!
-      expect(movedWidget.position.col).toBe(1)
-      expect(movedWidget.position.row).toBe(1)
-    })
-
-    it('moves widget right top from column 1 to column 2 at row 1', () => {
-      const {result} = renderHook(() => useWidgetConfig(), {wrapper})
-
-      const widget = result.current.config.widgets.find(w => w.position.col === 1)!
-
-      act(() => {
-        result.current.moveWidget(widget.id, 'move-right-top')
-      })
-
-      const movedWidget = result.current.config.widgets.find(w => w.id === widget.id)!
-      expect(movedWidget.position.col).toBe(2)
-      expect(movedWidget.position.row).toBe(1)
-    })
-
-    it('moves widget up in same column', () => {
-      const {result} = renderHook(() => useWidgetConfig(), {wrapper})
-
-      const col1Widgets = result.current.config.widgets
-        .filter(w => w.position.col === 1)
-        .sort((a, b) => a.position.row - b.position.row)
-
-      if (col1Widgets.length > 1) {
-        const secondWidget = col1Widgets[1]
-        const firstWidget = col1Widgets[0]
-
-        act(() => {
-          result.current.moveWidget(secondWidget.id, 'move-up')
-        })
-
-        const movedWidget = result.current.config.widgets.find(w => w.id === secondWidget.id)!
-        const otherWidget = result.current.config.widgets.find(w => w.id === firstWidget.id)!
-
-        expect(movedWidget.position.row).toBeLessThan(otherWidget.position.row)
-      }
-    })
-
-    it('moves widget down in same column', () => {
-      const {result} = renderHook(() => useWidgetConfig(), {wrapper})
-
-      const col1Widgets = result.current.config.widgets
-        .filter(w => w.position.col === 1)
-        .sort((a, b) => a.position.row - b.position.row)
-
-      if (col1Widgets.length > 1) {
-        const firstWidget = col1Widgets[0]
-        const secondWidget = col1Widgets[1]
-
-        act(() => {
-          result.current.moveWidget(firstWidget.id, 'move-down')
-        })
-
-        const movedWidget = result.current.config.widgets.find(w => w.id === firstWidget.id)!
-        const otherWidget = result.current.config.widgets.find(w => w.id === secondWidget.id)!
-
-        expect(movedWidget.position.row).toBeGreaterThan(otherWidget.position.row)
-      }
-    })
-
-    it('moves widget to top of column', () => {
-      const {result} = renderHook(() => useWidgetConfig(), {wrapper})
-
-      const col1Widgets = result.current.config.widgets
-        .filter(w => w.position.col === 1)
-        .sort((a, b) => a.position.row - b.position.row)
-
-      if (col1Widgets.length > 1) {
-        const lastWidget = col1Widgets[col1Widgets.length - 1]
-
-        act(() => {
-          result.current.moveWidget(lastWidget.id, 'move-to-top')
-        })
-
-        const movedWidget = result.current.config.widgets.find(w => w.id === lastWidget.id)!
-        expect(movedWidget.position.row).toBe(1)
-      }
-    })
-
-    it('moves widget to bottom of column', () => {
-      const {result} = renderHook(() => useWidgetConfig(), {wrapper})
-
-      const col1Widgets = result.current.config.widgets
-        .filter(w => w.position.col === 1)
-        .sort((a, b) => a.position.row - b.position.row)
-
-      if (col1Widgets.length > 1) {
-        const firstWidget = col1Widgets[0]
-        const maxRow = Math.max(...col1Widgets.map(w => w.position.row))
-
-        act(() => {
-          result.current.moveWidget(firstWidget.id, 'move-to-bottom')
-        })
-
-        const movedWidget = result.current.config.widgets.find(w => w.id === firstWidget.id)!
-        expect(movedWidget.position.row).toBe(maxRow)
-      }
-    })
-
-    it('recalculates relative positions after move', () => {
-      const {result} = renderHook(() => useWidgetConfig(), {wrapper})
-
-      const widget = result.current.config.widgets.find(w => w.position.col === 1)!
-
-      act(() => {
-        result.current.moveWidget(widget.id, 'move-right')
-      })
-
-      const relativePositions = result.current.config.widgets.map(w => w.position.relative)
-      const uniqueRelatives = new Set(relativePositions)
-
-      expect(uniqueRelatives.size).toBe(result.current.config.widgets.length)
-    })
-
-    it('normalizes row numbers after move', () => {
-      const {result} = renderHook(() => useWidgetConfig(), {wrapper})
-
-      const widget = result.current.config.widgets.find(w => w.position.col === 1)!
-
-      act(() => {
-        result.current.moveWidget(widget.id, 'move-to-bottom')
-      })
-
-      const col1Widgets = result.current.config.widgets
-        .filter(w => w.position.col === 1)
-        .sort((a, b) => a.position.row - b.position.row)
-
-      col1Widgets.forEach((w, index) => {
-        expect(w.position.row).toBe(index + 1)
-      })
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {retry: false},
+        mutations: {retry: false},
+      },
     })
   })
 
-  describe('resetConfig', () => {
-    it('resets config to default', () => {
-      const {result} = renderHook(() => useWidgetConfig(), {wrapper})
+  afterEach(() => {
+    server.resetHandlers()
+  })
 
-      const widget = result.current.config.widgets.find(w => w.position.col === 1)!
+  const createWrapper =
+    (widgetConfig?: Record<string, Record<string, unknown>>) =>
+    ({children}: {children: React.ReactNode}) => {
+      const preferences = widgetConfig
+        ? {
+            dashboard_view: 'cards',
+            hide_dashcard_color_overlays: false,
+            custom_colors: {},
+            widget_dashboard_config: {filters: widgetConfig},
+          }
+        : undefined
 
-      act(() => {
-        result.current.moveWidget(widget.id, 'move-right')
-      })
+      return (
+        <QueryClientProvider client={queryClient}>
+          <WidgetDashboardProvider preferences={preferences}>{children}</WidgetDashboardProvider>
+        </QueryClientProvider>
+      )
+    }
 
-      const movedWidget = result.current.config.widgets.find(w => w.id === widget.id)!
-      expect(movedWidget.position.col).toBe(2)
+  it('initializes with default value when no initial config provided', () => {
+    const {result} = renderHook(() => useWidgetConfig('test-widget', 'testKey', 'defaultValue'), {
+      wrapper: createWrapper(),
+    })
 
-      act(() => {
-        result.current.resetConfig()
-      })
+    expect(result.current[0]).toBe('defaultValue')
+  })
 
-      const resetWidget = result.current.config.widgets.find(w => w.id === widget.id)!
-      expect(resetWidget.position.col).toBe(1)
+  it('initializes with value from initial config when provided', () => {
+    const {result} = renderHook(() => useWidgetConfig('test-widget', 'testKey', 'defaultValue'), {
+      wrapper: createWrapper({'test-widget': {testKey: 'savedValue'}}),
+    })
+
+    expect(result.current[0]).toBe('savedValue')
+  })
+
+  it('updates config value and calls mutation', async () => {
+    const {result} = renderHook(() => useWidgetConfig('test-widget', 'testKey', 'defaultValue'), {
+      wrapper: createWrapper(),
+    })
+
+    act(() => {
+      result.current[1]('newValue')
+    })
+
+    expect(result.current[0]).toBe('newValue')
+
+    await waitFor(() => {
+      expect(queryClient.getMutationCache().getAll()).toHaveLength(1)
+    })
+  })
+
+  it('preserves existing config when updating', async () => {
+    const {result} = renderHook(() => useWidgetConfig('test-widget', 'newKey', 'defaultValue'), {
+      wrapper: createWrapper({'test-widget': {existingKey: 'existingValue'}}),
+    })
+
+    act(() => {
+      result.current[1]('newValue')
+    })
+
+    await waitFor(() => {
+      expect(queryClient.getMutationCache().getAll()).toHaveLength(1)
+    })
+  })
+
+  it('handles mutation errors gracefully', async () => {
+    server.use(
+      graphql.mutation('UpdateWidgetDashboardConfig', () => {
+        return HttpResponse.json({
+          errors: [{message: 'Network error'}],
+        })
+      }),
+    )
+
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+    const {result} = renderHook(() => useWidgetConfig('test-widget', 'testKey', 'defaultValue'), {
+      wrapper: createWrapper(),
+    })
+
+    act(() => {
+      result.current[1]('newValue')
+    })
+
+    await waitFor(() => {
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed to save widget config preference:',
+        expect.anything(),
+      )
+    })
+
+    expect(result.current[0]).toBe('newValue')
+    consoleErrorSpy.mockRestore()
+  })
+
+  it('transforms existing selectedCourse value when updating other config keys for course work widgets', async () => {
+    let capturedVariables: any = null
+    server.use(
+      graphql.mutation('UpdateWidgetDashboardConfig', ({variables}) => {
+        capturedVariables = variables
+        return HttpResponse.json({
+          data: {
+            updateWidgetDashboardConfig: {
+              widgetId: variables.widgetId,
+              filters: variables.filters,
+              errors: null,
+            },
+          },
+        })
+      }),
+    )
+
+    const {result} = renderHook(
+      () => useWidgetConfig('course-work-combined-widget', 'selectedDateFilter', 'all'),
+      {
+        wrapper: createWrapper({'course-work-combined-widget': {selectedCourse: '44'}}),
+      },
+    )
+
+    act(() => {
+      result.current[1]('next14days')
+    })
+
+    await waitFor(() => {
+      expect(capturedVariables).not.toBeNull()
+      expect(capturedVariables.filters.selectedCourse).toBe('course_44')
+      expect(capturedVariables.filters.selectedDateFilter).toBe('next14days')
+    })
+  })
+
+  it('does not modify selectedCourse if it already has course_ prefix', async () => {
+    let capturedVariables: any = null
+    server.use(
+      graphql.mutation('UpdateWidgetDashboardConfig', ({variables}) => {
+        capturedVariables = variables
+        return HttpResponse.json({
+          data: {
+            updateWidgetDashboardConfig: {
+              widgetId: variables.widgetId,
+              filters: variables.filters,
+              errors: null,
+            },
+          },
+        })
+      }),
+    )
+
+    const {result} = renderHook(
+      () => useWidgetConfig('course-work-combined-widget', 'selectedDateFilter', 'all'),
+      {
+        wrapper: createWrapper({'course-work-combined-widget': {selectedCourse: 'course_44'}}),
+      },
+    )
+
+    act(() => {
+      result.current[1]('next14days')
+    })
+
+    await waitFor(() => {
+      expect(capturedVariables).not.toBeNull()
+      expect(capturedVariables.filters.selectedCourse).toBe('course_44')
+      expect(capturedVariables.filters.selectedDateFilter).toBe('next14days')
+    })
+  })
+
+  it('does not modify selectedCourse if value is "all"', async () => {
+    let capturedVariables: any = null
+    server.use(
+      graphql.mutation('UpdateWidgetDashboardConfig', ({variables}) => {
+        capturedVariables = variables
+        return HttpResponse.json({
+          data: {
+            updateWidgetDashboardConfig: {
+              widgetId: variables.widgetId,
+              filters: variables.filters,
+              errors: null,
+            },
+          },
+        })
+      }),
+    )
+
+    const {result} = renderHook(
+      () => useWidgetConfig('course-work-combined-widget', 'selectedDateFilter', 'all'),
+      {
+        wrapper: createWrapper({'course-work-combined-widget': {selectedCourse: 'all'}}),
+      },
+    )
+
+    act(() => {
+      result.current[1]('next14days')
+    })
+
+    await waitFor(() => {
+      expect(capturedVariables).not.toBeNull()
+      expect(capturedVariables.filters.selectedCourse).toBe('all')
+      expect(capturedVariables.filters.selectedDateFilter).toBe('next14days')
     })
   })
 })

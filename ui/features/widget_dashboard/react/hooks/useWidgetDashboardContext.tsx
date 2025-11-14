@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createContext, useContext, useMemo} from 'react'
+import {createContext, useContext, useMemo, useState, useCallback} from 'react'
 
 interface ObservedUser {
   id: string
@@ -35,6 +35,9 @@ interface DashboardPreferences {
   hide_dashcard_color_overlays: boolean
   custom_colors: Record<string, string>
   learner_dashboard_tab_selection?: 'dashboard' | 'courses'
+  widget_dashboard_config?: {
+    filters?: Record<string, Record<string, unknown>>
+  }
 }
 
 export interface SharedCourseData {
@@ -59,6 +62,8 @@ const WidgetDashboardContext = createContext<{
   currentUserRoles: string[]
   sharedCourseData: SharedCourseData[]
   dashboardFeatures: DashboardFeatures
+  widgetConfig: Record<string, Record<string, unknown>>
+  updateWidgetConfig: (widgetId: string, config: Record<string, unknown>) => void
 }>({
   preferences: {
     dashboard_view: 'cards',
@@ -72,6 +77,8 @@ const WidgetDashboardContext = createContext<{
   currentUserRoles: [],
   sharedCourseData: [],
   dashboardFeatures: {},
+  widgetConfig: {},
+  updateWidgetConfig: () => {},
 })
 
 export const WidgetDashboardProvider = ({
@@ -95,6 +102,18 @@ export const WidgetDashboardProvider = ({
   sharedCourseData?: SharedCourseData[]
   dashboardFeatures?: DashboardFeatures
 }) => {
+  const [widgetConfig, setWidgetConfig] = useState<Record<string, Record<string, unknown>>>(() => {
+    const initialPrefs = preferences ?? widgetDashboardDefaultProps.preferences
+    return initialPrefs.widget_dashboard_config?.filters ?? {}
+  })
+
+  const updateWidgetConfig = useCallback((widgetId: string, config: Record<string, unknown>) => {
+    setWidgetConfig(prev => ({
+      ...prev,
+      [widgetId]: config,
+    }))
+  }, [])
+
   const contextValue = useMemo(
     () => ({
       preferences: preferences ?? widgetDashboardDefaultProps.preferences,
@@ -105,6 +124,8 @@ export const WidgetDashboardProvider = ({
       currentUserRoles: currentUserRoles ?? widgetDashboardDefaultProps.currentUserRoles,
       sharedCourseData: sharedCourseData ?? widgetDashboardDefaultProps.sharedCourseData,
       dashboardFeatures: dashboardFeatures ?? widgetDashboardDefaultProps.dashboardFeatures,
+      widgetConfig,
+      updateWidgetConfig,
     }),
     [
       preferences,
@@ -115,6 +136,8 @@ export const WidgetDashboardProvider = ({
       currentUserRoles,
       sharedCourseData,
       dashboardFeatures,
+      widgetConfig,
+      updateWidgetConfig,
     ],
   )
 
@@ -135,6 +158,9 @@ export const widgetDashboardDefaultProps = {
     hide_dashcard_color_overlays: false,
     custom_colors: {},
     learner_dashboard_tab_selection: 'dashboard' as const,
+    widget_dashboard_config: {
+      filters: {},
+    },
   },
   observedUsersList: [],
   canAddObservee: false,

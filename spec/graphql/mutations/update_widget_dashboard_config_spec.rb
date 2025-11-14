@@ -25,13 +25,15 @@ RSpec.describe Mutations::UpdateWidgetDashboardConfig do
     student_in_course(active_all: true)
   end
 
-  def mutation_str(config:)
+  def mutation_str
     <<~GQL
-      mutation {
+      mutation UpdateWidgetDashboardConfig($widgetId: String!, $filters: JSON!) {
         updateWidgetDashboardConfig(input: {
-          config: #{config.to_json.to_json}
+          widgetId: $widgetId
+          filters: $filters
         }) {
-          config
+          widgetId
+          filters
           errors {
             message
           }
@@ -42,7 +44,8 @@ RSpec.describe Mutations::UpdateWidgetDashboardConfig do
 
   def run_mutation(opts = {}, current_user = @student)
     result = CanvasSchema.execute(
-      mutation_str(**opts),
+      mutation_str,
+      variables: opts,
       context: {
         current_user:,
         request: ActionDispatch::TestRequest.create
@@ -51,79 +54,200 @@ RSpec.describe Mutations::UpdateWidgetDashboardConfig do
     result.to_h.with_indifferent_access
   end
 
-  it "updates the widget dashboard config preference" do
-    config = { "columns" => 2, "widgets" => [] }
-    result = run_mutation(config:)
-    expect(result.dig("data", "updateWidgetDashboardConfig", "config")).to eq(config.to_json)
-    expect(@student.get_preference(:widget_dashboard_config)).to eq(config)
-  end
+  it "saves widget filter preferences" do
+    filters = { "selectedCourse" => "all", "selectedDateFilter" => "next3days" }
+    result = run_mutation(widgetId: "course-work-widget", filters:)
 
-  it "stores a complete widget configuration" do
-    config = {
-      "columns" => 2,
-      "widgets" => [
-        {
-          "id" => "course-work-widget",
-          "type" => "course_work",
-          "position" => { "col" => 1, "row" => 1, "relative" => 1 },
-          "title" => "Course work"
-        }
-      ]
-    }
-    result = run_mutation(config:)
-    expect(result.dig("data", "updateWidgetDashboardConfig", "config")).to eq(config.to_json)
-    @student.reload
-    expect(@student.get_preference(:widget_dashboard_config)).to eq(config)
+    expect(result["errors"]).to be_nil, "GraphQL errors: #{result["errors"].inspect}"
+    expect(result.dig("data", "updateWidgetDashboardConfig", "widgetId")).to eq("course-work-widget"), "Full result: #{result.inspect}"
+
+    config = @student.get_preference(:widget_dashboard_config)
+    expect(config["filters"]["course-work-widget"]).to eq(filters)
   end
 
   it "persists the preference across requests" do
-    config = { "columns" => 3, "widgets" => [] }
-    run_mutation(config:)
+    filters = { "filter" => "unread" }
+    run_mutation(widgetId: "announcements-widget", filters:)
+
     @student.reload
-    expect(@student.get_preference(:widget_dashboard_config)).to eq(config)
+    config = @student.get_preference(:widget_dashboard_config)
+    expect(config["filters"]["announcements-widget"]).to eq(filters)
   end
 
-  it "updates an existing preference" do
-    old_config = { "columns" => 1, "widgets" => [] }
-    @student.set_preference(:widget_dashboard_config, old_config)
+  it "updates an existing filter preference" do
+    @student.set_preference(:widget_dashboard_config, { "filters" => { "course-work-widget" => { "selectedCourse" => "all" } } })
 
-    new_config = { "columns" => 2, "widgets" => [] }
-    result = run_mutation(config: new_config)
-    expect(result.dig("data", "updateWidgetDashboardConfig", "config")).to eq(new_config.to_json)
+    filters = { "selectedCourse" => "course_123", "selectedDateFilter" => "next7days" }
+    run_mutation(widgetId: "course-work-widget", filters:)
+
     @student.reload
-    expect(@student.get_preference(:widget_dashboard_config)).to eq(new_config)
+    config = @student.get_preference(:widget_dashboard_config)
+    expect(config["filters"]["course-work-widget"]).to eq(filters)
   end
 
-  it "clears the preference when given an empty string" do
-    old_config = { "columns" => 2, "widgets" => [] }
-    @student.set_preference(:widget_dashboard_config, old_config)
+  it "allows different filters for different widgets" do
+    filters1 = { "selectedCourse" => "course_123" }
+    filters2 = { "filter" => "read" }
 
-    result = run_mutation(config: "")
-    expect(result.dig("data", "updateWidgetDashboardConfig", "config")).to be_nil
+    run_mutation(widgetId: "course-work-widget", filters: filters1)
+    run_mutation(widgetId: "announcements-widget", filters: filters2)
+
     @student.reload
-    expect(@student.get_preference(:widget_dashboard_config)).to be_nil
+    config = @student.get_preference(:widget_dashboard_config)
+    expect(config["filters"]["course-work-widget"]).to eq(filters1)
+    expect(config["filters"]["announcements-widget"]).to eq(filters2)
   end
 
-  it "returns an error for invalid JSON" do
-    result = CanvasSchema.execute(
-      <<~GQL,
-        mutation {
-          updateWidgetDashboardConfig(input: {
-            config: "not valid json"
-          }) {
-            config
-            errors {
-              message
-            }
-          }
-        }
-      GQL
-      context: {
-        current_user: @student,
-        request: ActionDispatch::TestRequest.create
+  it "converts strong parameters to plain hash for storage" do
+    filters = { "selectedCourse" => "all", "selectedDateFilter" => "next3days" }
+    run_mutation(widgetId: "course-work-widget", filters:)
+
+    @student.reload
+    config = @student.get_preference(:widget_dashboard_config)
+    stored_filters = config["filters"]["course-work-widget"]
+
+    expect(stored_filters).to be_a(Hash)
+    expect(stored_filters).not_to be_a(ActionController::Parameters)
+    expect(stored_filters).to eq(filters)
+  end
+
+  it "rejects array filter values" do
+    result = run_mutation(widgetId: "course-work-widget", filters: ["invalid"])
+
+    expect(result.dig("data", "updateWidgetDashboardConfig")).to be_nil
+    expect(result["errors"]).not_to be_nil
+    expect(result["errors"][0]["message"]).to include("filters must be an object")
+  end
+
+  it "rejects string filter values" do
+    result = run_mutation(widgetId: "course-work-widget", filters: "invalid")
+
+    expect(result.dig("data", "updateWidgetDashboardConfig")).to be_nil
+    expect(result["errors"]).not_to be_nil
+    expect(result["errors"][0]["message"]).to include("filters must be an object")
+  end
+
+  it "rejects filters with empty string keys" do
+    result = run_mutation(widgetId: "course-work-widget", filters: { "" => "value" })
+
+    expect(result.dig("data", "updateWidgetDashboardConfig")).to be_nil
+    expect(result["errors"]).not_to be_nil
+    expect(result["errors"][0]["message"]).to include("filter keys must be non-empty strings")
+  end
+
+  context "announcements widget validation" do
+    it "accepts valid announcement filter values" do
+      %w[unread read all].each do |filter_value|
+        filters = { "filter" => filter_value }
+        result = run_mutation(widgetId: "announcements-widget", filters:)
+
+        expect(result["errors"]).to be_nil, "Expected no errors for filter value '#{filter_value}', got: #{result["errors"].inspect}"
+        expect(result.dig("data", "updateWidgetDashboardConfig", "widgetId")).to eq("announcements-widget")
+      end
+    end
+
+    it "rejects invalid announcement filter values" do
+      filters = { "filter" => "invalid" }
+      result = run_mutation(widgetId: "announcements-widget", filters:)
+
+      expect(result.dig("data", "updateWidgetDashboardConfig")).to be_nil
+      expect(result["errors"]).not_to be_nil
+      expect(result["errors"][0]["message"]).to include("filter must be one of: unread, read, all")
+    end
+
+    it "rejects invalid keys for announcements widget" do
+      filters = { "filter" => "unread", "invalidKey" => "value" }
+      result = run_mutation(widgetId: "announcements-widget", filters:)
+
+      expect(result.dig("data", "updateWidgetDashboardConfig")).to be_nil
+      expect(result["errors"]).not_to be_nil
+      expect(result["errors"][0]["message"]).to include("invalid filter keys for announcements widget")
+    end
+  end
+
+  context "course work widget validation" do
+    it "accepts valid selectedCourse values" do
+      %w[all course_123 course_456789].each do |course_value|
+        filters = { "selectedCourse" => course_value, "selectedDateFilter" => "next7days" }
+        result = run_mutation(widgetId: "course-work-widget", filters:)
+
+        expect(result["errors"]).to be_nil, "Expected no errors for selectedCourse '#{course_value}', got: #{result["errors"].inspect}"
+        expect(result.dig("data", "updateWidgetDashboardConfig", "widgetId")).to eq("course-work-widget")
+      end
+    end
+
+    it "rejects invalid selectedCourse values" do
+      filters = { "selectedCourse" => "invalid_format" }
+      result = run_mutation(widgetId: "course-work-widget", filters:)
+
+      expect(result.dig("data", "updateWidgetDashboardConfig")).to be_nil
+      expect(result["errors"]).not_to be_nil
+      expect(result["errors"][0]["message"]).to include("selectedCourse must be 'all' or 'course_{id}'")
+    end
+
+    it "accepts valid selectedDateFilter values" do
+      %w[all missing next3days next7days next14days submitted].each do |date_filter|
+        filters = { "selectedDateFilter" => date_filter }
+        result = run_mutation(widgetId: "course-work-widget", filters:)
+
+        expect(result["errors"]).to be_nil, "Expected no errors for selectedDateFilter '#{date_filter}', got: #{result["errors"].inspect}"
+        expect(result.dig("data", "updateWidgetDashboardConfig", "widgetId")).to eq("course-work-widget")
+      end
+    end
+
+    it "rejects invalid selectedDateFilter values" do
+      filters = { "selectedDateFilter" => "invalid" }
+      result = run_mutation(widgetId: "course-work-widget", filters:)
+
+      expect(result.dig("data", "updateWidgetDashboardConfig")).to be_nil
+      expect(result["errors"]).not_to be_nil
+      expect(result["errors"][0]["message"]).to include("selectedDateFilter must be one of")
+    end
+
+    it "rejects invalid keys for course work widget" do
+      filters = { "selectedCourse" => "all", "invalidKey" => "value" }
+      result = run_mutation(widgetId: "course-work-widget", filters:)
+
+      expect(result.dig("data", "updateWidgetDashboardConfig")).to be_nil
+      expect(result["errors"]).not_to be_nil
+      expect(result["errors"][0]["message"]).to include("invalid filter keys for course work widget")
+    end
+
+    it "works for course-work-combined-widget" do
+      filters = { "selectedCourse" => "all", "selectedDateFilter" => "next3days" }
+      result = run_mutation(widgetId: "course-work-combined-widget", filters:)
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateWidgetDashboardConfig", "widgetId")).to eq("course-work-combined-widget")
+    end
+
+    it "works for course-work-summary-widget" do
+      filters = { "selectedCourse" => "course_789", "selectedDateFilter" => "missing" }
+      result = run_mutation(widgetId: "course-work-summary-widget", filters:)
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateWidgetDashboardConfig", "widgetId")).to eq("course-work-summary-widget")
+    end
+  end
+
+  context "unknown widget types" do
+    it "accepts generic JSON structures for unknown widgets" do
+      filters = {
+        "stringValue" => "test",
+        "numberValue" => 123,
+        "booleanValue" => true,
+        "nullValue" => nil,
+        "arrayValue" => [1, 2, 3],
+        "nestedObject" => { "key" => "value" }
       }
-    )
-    result = result.to_h.with_indifferent_access
-    expect(result.dig("data", "updateWidgetDashboardConfig", "errors")).not_to be_empty
+      result = run_mutation(widgetId: "unknown-widget-type", filters:)
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateWidgetDashboardConfig", "widgetId")).to eq("unknown-widget-type")
+
+      @student.reload
+      config = @student.get_preference(:widget_dashboard_config)
+      expect(config["filters"]["unknown-widget-type"]).to eq(filters)
+    end
   end
 end

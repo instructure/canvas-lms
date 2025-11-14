@@ -26,7 +26,7 @@ import {
   type SharedCourseData,
 } from '../../../../hooks/useWidgetDashboardContext'
 import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
-import {WidgetConfigProvider} from '../../../../hooks/useWidgetConfig'
+import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 const mockWidget: Widget = {
@@ -92,9 +92,9 @@ const setup = (
     <QueryClientProvider client={queryClient}>
       <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
         <WidgetDashboardEditProvider>
-          <WidgetConfigProvider>
+          <WidgetLayoutProvider>
             <CourseGradesWidget {...defaultProps} />
-          </WidgetConfigProvider>
+          </WidgetLayoutProvider>
         </WidgetDashboardEditProvider>
       </WidgetDashboardProvider>
     </QueryClientProvider>,

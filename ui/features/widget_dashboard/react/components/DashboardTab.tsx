@@ -20,11 +20,11 @@ import React from 'react'
 import {View} from '@instructure/ui-view'
 import WidgetGrid from './WidgetGrid'
 import {useWidgetDashboardEdit} from '../hooks/useWidgetDashboardEdit'
-import {useWidgetConfig} from '../hooks/useWidgetConfig'
+import {useWidgetLayout} from '../hooks/useWidgetLayout'
 
 const DashboardTab: React.FC = () => {
   const {isEditMode} = useWidgetDashboardEdit()
-  const {config} = useWidgetConfig()
+  const {config} = useWidgetLayout()
 
   return (
     <View as="div" data-testid="dashboard-tab-content" padding="medium 0 0 0">

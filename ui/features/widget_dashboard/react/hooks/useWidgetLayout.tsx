@@ -31,13 +31,13 @@ export type MoveAction =
   | 'move-to-top'
   | 'move-to-bottom'
 
-interface WidgetConfigContextType {
+interface WidgetLayoutContextType {
   config: WidgetConfig
   moveWidget: (widgetId: string, action: MoveAction) => void
   resetConfig: () => void
 }
 
-const WidgetConfigContext = createContext<WidgetConfigContextType | null>(null)
+const WidgetLayoutContext = createContext<WidgetLayoutContextType | null>(null)
 
 const recalculateRelativePositions = (widgets: Widget[]): Widget[] => {
   const sortedWidgets = [...widgets].sort((a, b) => {
@@ -220,7 +220,7 @@ const moveWidgetToBottom = (widgets: Widget[], widgetId: string): Widget[] => {
   })
 }
 
-export const WidgetConfigProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
+export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
   const [config, setConfig] = useState<WidgetConfig>(DEFAULT_WIDGET_CONFIG)
   const {markDirty} = useWidgetDashboardEdit()
 
@@ -277,13 +277,13 @@ export const WidgetConfigProvider: React.FC<{children: React.ReactNode}> = ({chi
     resetConfig,
   }
 
-  return <WidgetConfigContext.Provider value={value}>{children}</WidgetConfigContext.Provider>
+  return <WidgetLayoutContext.Provider value={value}>{children}</WidgetLayoutContext.Provider>
 }
 
-export function useWidgetConfig() {
-  const context = useContext(WidgetConfigContext)
+export function useWidgetLayout() {
+  const context = useContext(WidgetLayoutContext)
   if (!context) {
-    throw new Error('useWidgetConfig must be used within WidgetConfigProvider')
+    throw new Error('useWidgetLayout must be used within WidgetLayoutProvider')
   }
   return context
 }

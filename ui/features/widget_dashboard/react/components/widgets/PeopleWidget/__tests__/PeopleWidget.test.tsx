@@ -25,7 +25,7 @@ import {graphql, HttpResponse} from 'msw'
 import PeopleWidget from '../PeopleWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
 import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
-import {WidgetConfigProvider} from '../../../../hooks/useWidgetConfig'
+import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 jest.mock('@canvas/message-students-modal/react', () => {
@@ -132,7 +132,7 @@ const renderWithQueryClient = (ui: React.ReactElement) => {
   return render(
     <QueryClientProvider client={queryClient}>
       <WidgetDashboardEditProvider>
-        <WidgetConfigProvider>{ui}</WidgetConfigProvider>
+        <WidgetLayoutProvider>{ui}</WidgetLayoutProvider>
       </WidgetDashboardEditProvider>
     </QueryClientProvider>,
   )

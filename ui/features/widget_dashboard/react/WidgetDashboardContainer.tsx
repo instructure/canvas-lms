@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
@@ -34,7 +34,7 @@ import {useWidgetDashboard} from './hooks/useWidgetDashboardContext'
 import FeedbackQuestionTile from './components/FeedbackQuestionTile'
 import {useResponsiveContext} from './hooks/useResponsiveContext'
 import {useWidgetDashboardEdit} from './hooks/useWidgetDashboardEdit'
-import {useWidgetConfig} from './hooks/useWidgetConfig'
+import {useWidgetLayout} from './hooks/useWidgetLayout'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -43,8 +43,10 @@ const WidgetDashboardContainer: React.FC = () => {
     useWidgetDashboard()
   const {isMobile, isDesktop} = useResponsiveContext()
   const {isEditMode, isDirty, enterEditMode, exitEditMode, saveChanges} = useWidgetDashboardEdit()
-  const {resetConfig} = useWidgetConfig()
+  const {resetConfig} = useWidgetLayout()
   const isCustomizationEnabled = dashboardFeatures.widget_dashboard_customization
+
+  const handleChangeObservedUser = useMemo(() => getHandleChangeObservedUser(), [])
 
   useEffect(() => {
     if (!isDirty) return
@@ -135,7 +137,7 @@ const WidgetDashboardContainer: React.FC = () => {
                 canAddObservee={canAddObservee}
                 currentUserRoles={currentUserRoles}
                 currentUser={currentUser}
-                handleChangeObservedUser={getHandleChangeObservedUser()}
+                handleChangeObservedUser={handleChangeObservedUser}
                 observedUsersList={observedUsersList}
                 renderLabel={I18n.t(
                   'Select a student to view. The page will refresh automatically.',
