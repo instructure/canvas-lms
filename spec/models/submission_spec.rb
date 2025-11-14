@@ -8036,6 +8036,26 @@ describe Submission do
         expect(history.first).to be_a Submission
       end
     end
+
+    it "ensures every returned submission has a distinct submitted_at" do
+      assignment = @course.assignments.create!(submission_types: "online_text_entry")
+      submission = assignment.submit_homework(student, body: "first")
+      timestamp = submission.submitted_at
+      submission.with_versioning(explicit: true) do
+        submission.submitted_at = 2.days.from_now(timestamp)
+        submission.body = "second"
+        submission.save!
+      end
+
+      submission.with_versioning(explicit: true) do
+        submission.submitted_at = timestamp
+        submission.body = "third"
+        submission.save!
+      end
+
+      history = submission.submission_history
+      expect(history.uniq(&:submitted_at).size).to eq history.size
+    end
   end
 
   context "draft comments" do
