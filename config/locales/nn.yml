@@ -12115,6 +12115,7 @@ nn:
   general_answer_comments_730136ba: "Generelle kommentarar"
   general_eb111f34: generelt
   general_locked_objects_6a9adafb: "Generelt låste objekt"
+  generate_44e33e72: Generer
   generate_activity_for_user_2b0af749: "Generer aktivitet for %{user}"
   generate_epub_80e89ea4: "Generer EPUB"
   generate_item_analysis_report_statuslabel_16e02c8: "Generer elementanalyserapport %{statusLabel}"
