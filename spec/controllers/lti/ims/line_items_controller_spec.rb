@@ -25,6 +25,7 @@ module Lti
   module IMS
     RSpec.describe LineItemsController do
       include_context "advantage services context"
+      include AccountDomainSpecHelper
 
       let(:context) { course }
       let(:unknown_context_id) { (Course.maximum(:id) || 0) + 1 }
@@ -55,8 +56,7 @@ module Lti
       let(:scope_to_remove) { "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem" }
 
       before do
-        allow_any_instance_of(Account).to receive(:environment_specific_domain)
-          .and_return("test.host")
+        stub_host_for_environment_specific_domain("test.host")
 
         assignment
       end
@@ -167,7 +167,7 @@ module Lti
           end
 
           it "uses the Account#domain in the line item id" do
-            allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
+            stub_host_for_environment_specific_domain("canonical.host")
             send_request
             expect(parsed_response_body["id"]).to start_with(
               "http://canonical.host/api/lti/courses/#{course.id}/line_items/"
