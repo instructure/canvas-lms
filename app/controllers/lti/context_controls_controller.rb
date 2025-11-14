@@ -278,6 +278,8 @@ module Lti
 
       control = Lti::ContextControlService.create_or_update(control_params, comment: params[:comment])
 
+      invalidate_navigation_cache_for_deployments(control.deployment)
+
       render json: lti_context_control_json(control, @current_user, session, @account, include_users: true), status: :created
     rescue Lti::ContextControlErrors => e
       render_errors(e.errors.full_messages)
@@ -421,6 +423,10 @@ module Lti
       controls = Lti::ContextControl.where(id: ids).preload(:account, :course, :created_by, :updated_by).order(id: :asc)
       calculated_attrs = Lti::ContextControlService.preload_calculated_attrs(controls)
 
+      invalidate_navigation_cache_for_deployments(
+        ContextExternalTool.where(id: deployments).preload(:context_external_tool_placements)
+      )
+
       json = controls.map do |control|
         lti_context_control_json(control, @current_user, session, @account, include_users: true, calculated_attrs: calculated_attrs[control.id])
       end
@@ -455,6 +461,8 @@ module Lti
         control.update!(available:)
       end
 
+      invalidate_navigation_cache_for_deployments(control.deployment)
+
       render json: lti_context_control_json(control, @current_user, session, @account, include_users: true)
     rescue => e
       report_error(e)
@@ -480,6 +488,7 @@ module Lti
       Lti::RegistrationHistoryEntry
         .track_control_changes(control:, current_user: @current_user, comment: params[:comment]) do
         if control.destroy
+          invalidate_navigation_cache_for_deployments(control.deployment)
           render json: lti_context_control_json(control, @current_user, session, @account, include_users: true)
         else
           render_errors(control.errors.full_messages, status: :unprocessable_entity)
@@ -580,6 +589,12 @@ module Lti
       unless @account.feature_enabled?(:lti_registrations_next)
         render json: { error: "The specified resource does not exist." }, status: :not_found
       end
+    end
+
+    def invalidate_navigation_cache_for_deployments(deployments)
+      return unless Array.wrap(deployments).any?(&:uses_cached_placements?)
+
+      Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
     end
   end
 end

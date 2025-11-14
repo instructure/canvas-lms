@@ -75,6 +75,40 @@ describe Lti::ContextControlsController, type: :request do
     end
   end
 
+  shared_examples "navigation cache invalidation" do
+    context "when the tool has navigation placements" do
+      let(:configuration_params) do
+        internal_lti_configuration.deep_merge({
+                                                placements: [
+                                                  { placement: "course_navigation", message_type: "LtiResourceLinkRequest" }
+                                                ]
+                                              })
+      end
+
+      it "invalidates the navigation cache" do
+        nav_cache = instance_double(Lti::NavigationCache)
+        allow(Lti::NavigationCache).to receive(:new).with(account).and_return(nav_cache)
+        expect(nav_cache).to receive(:invalidate_cache_key)
+        subject
+      end
+    end
+
+    context "when the tool does not have navigation placements" do
+      let(:configuration_params) do
+        internal_lti_configuration.deep_merge({
+                                                placements: [
+                                                  { placement: "assignment_selection", message_type: "LtiDeepLinkingRequest" }
+                                                ]
+                                              })
+      end
+
+      it "does not invalidate the navigation cache" do
+        expect(Lti::NavigationCache).not_to receive(:new)
+        subject
+      end
+    end
+  end
+
   describe "GET #index" do
     subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls", params: }
 
@@ -445,6 +479,8 @@ describe Lti::ContextControlsController, type: :request do
 
     before { root_deployment }
 
+    include_examples "navigation cache invalidation"
+
     it "creates a new control" do
       expect { subject }.to change { Lti::ContextControl.count }.by(1)
       expect(response).to be_successful
@@ -735,6 +771,8 @@ describe Lti::ContextControlsController, type: :request do
       let(:subaccount) { account_model(parent_account: account) }
       let(:subaccount2) { account_model(parent_account: account) }
       let(:subdeployment) { registration.new_external_tool(subaccount).tap(&:save!) }
+
+      include_examples "navigation cache invalidation"
 
       it "creates context controls" do
         subdeployment
@@ -1136,6 +1174,8 @@ describe Lti::ContextControlsController, type: :request do
     let(:registration_id) { registration.id }
 
     context "with the lti_registrations_next feature flag enabled" do
+      include_examples "navigation cache invalidation"
+
       it "updates the context control" do
         expect(control.available).to be true
         subject
@@ -1221,6 +1261,8 @@ describe Lti::ContextControlsController, type: :request do
     let(:control) { deployment.context_controls.create!(course:, registration:) }
     let(:registration_id) { registration.id }
     let(:control_id) { control.id }
+
+    include_examples "navigation cache invalidation"
 
     it "deletes and returns the context control" do
       subject
