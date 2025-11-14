@@ -3626,11 +3626,13 @@ class UsersController < ApplicationController
       # Get grade data if visible
       display_grade = nil
       grading_scheme = "percentage"
+      last_updated = nil
 
       if can_read_grades
         course_score = enrollment.find_score(course_score: true)
         if course_score
           display_grade = course_score.override_score.presence || course_score.current_score
+          last_updated = course_score.updated_at
         end
 
         if course.grading_standard_enabled? && course.grading_standard
@@ -3644,7 +3646,7 @@ class UsersController < ApplicationController
         courseName: course.name,
         currentGrade: display_grade,
         gradingScheme: grading_scheme,
-        lastUpdated: enrollment.updated_at.iso8601
+        lastUpdated: last_updated&.iso8601
       }
     end
 

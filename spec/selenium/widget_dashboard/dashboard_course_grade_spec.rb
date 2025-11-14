@@ -79,6 +79,38 @@ describe "student dashboard Course grade widget", :ignore_js_errors do
       course_gradebook_link(@course1.id).click
       expect(driver.current_url).to include("/courses/#{@course1.id}/grades")
     end
+
+    it "displays last updated timestamp from course score" do
+      # Get the enrollment and score and set it to 2 days ago
+      enrollment = @student.enrollments.find_by(course: @course1)
+      course_score = enrollment.find_score(course_score: true)
+      course_score.update_columns(updated_at: 2.days.ago)
+
+      go_to_dashboard
+
+      # Check that last updated is displayed and capture initial value
+      expect(course_last_updated(@course1.id)).to be_displayed
+      initial_last_updated_text = course_last_updated(@course1.id).text
+
+      # Update the score to trigger a new updated_at timestamp (now)
+      course_score.update!(current_score: 90.0)
+      refresh_page
+
+      # Verify the timestamp has changed
+      updated_last_updated_text = course_last_updated(@course1.id).text
+      expect(updated_last_updated_text).not_to eq(initial_last_updated_text)
+      expect(updated_last_updated_text).not_to be_empty
+    end
+
+    it "does not display last updated timestamp when grade is N/A" do
+      course_with_student(user: @student, active_all: true, course_name: "No Grades Course")
+      ungraded_course = @course
+
+      go_to_dashboard
+
+      expect(course_grade_text(ungraded_course.id).text).to eq("N/A")
+      expect(element_exists?(course_last_updated_selector(ungraded_course.id))).to be_falsey
+    end
   end
 
   context "Course grade widget pagination" do
