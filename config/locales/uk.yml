@@ -7979,6 +7979,7 @@ uk:
   gathering_files_933551d9: "Збір файлів ..."
   general_answer_comments_730136ba: "Загальні коментарі на відповіді"
   general_locked_objects_6a9adafb: "Загальні Заблоковані Об'єкти"
+  generate_44e33e72: Генерувати
   generate_activity_for_user_2b0af749: "Генерувати Завдання для %{user}"
   generate_epub_80e89ea4: "Згенерувати ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "Згенерувати пункт аналітичного звіту %{statusLabel}"
