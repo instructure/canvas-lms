@@ -28,6 +28,7 @@ module Importers
       Importers::LearningOutcomeImporter.process_migration(data, migration)
 
       migration.resolve_content_links!
+      migration.create_attachment_associations
 
       migration.progress = 100
       migration.workflow_state = :imported

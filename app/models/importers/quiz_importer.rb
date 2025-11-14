@@ -345,14 +345,6 @@ module Importers
         migration.find_imported_migration_item(Assignment, item.assignment.migration_id)&.needs_update_cached_due_dates = true
       end
 
-      Quizzes::QuizQuestion.where(quiz_id: item.id).find_in_batches(of: 50) do |batch|
-        batch.each do |qq|
-          qq.force_attachment_associations_update = true
-          qq.updating_user = migration.user
-          qq.update_attachment_associations
-        end
-      end
-
       migration.add_imported_item(item)
       item.saved_by = nil
 

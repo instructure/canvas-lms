@@ -64,12 +64,12 @@ module Importers
       item.workflow_state = "active" # restore deleted ones
       item.migration_id = hash[:migration_id]
       item.title = hash[:title]
-      item.description = hash[:description]
+      item.description = migration.convert_html(hash[:description], :learning_outcome_group, hash[:migration_id], :description)
       item.vendor_guid = hash[:vendor_guid]
       item.low_grade = hash[:low_grade]
       item.high_grade = hash[:high_grade]
 
-      item.saving_user = migration.user
+      item.updating_user = migration.user
 
       if hash[:source_outcome_group_id]
         source_group = LearningOutcomeGroup.active.find_by(id: hash[:source_outcome_group_id])
