@@ -17,14 +17,6 @@
 %>
 
 <% go_to_course_text = @course.elementary_enabled? ? t("Go to Subject") : t("buttons.go_to_course", "Go to the Course") %>
-<%
-  # Generate the appropriate course URL based on whether it's a horizon course
-  go_to_course_url = if @course.horizon_course?
-    horizon_course_url(@course, :registration_success => params[:just_created])
-  else
-    course_url(@course, :registration_success => params[:just_created])
-  end
-%>
 
 <div id="enroll_form">
   <p><%= mt :already_enrolled, "You have successfully enrolled in **%{course}**.", :course => @course.name %></p>
@@ -37,7 +29,7 @@
         <div class="ic-Self-enrollment-footer__Primary">
           <%= @extra_actions %>
           <a class="btn" href="<%= dashboard_url(:registration_success => params[:just_created]) %>" target="_top"><%= t "buttons.go_to_dashboard", "Go to your Dashboard" %></a>
-          <a class="btn btn-primary" href="<%= go_to_course_url %>" target="_top"><%= go_to_course_text %></a>
+          <a class="btn btn-primary" href="<%= course_url(@course, :registration_success => params[:just_created]) %>" target="_top"><%= go_to_course_text %></a>
         </div>
       </div>
     </div>
