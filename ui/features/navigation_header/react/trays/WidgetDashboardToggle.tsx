@@ -160,6 +160,7 @@ export default function WidgetDashboardToggle({isMobile}: WidgetDashboardToggleP
         readOnly={loading}
         onChange={toggleWidgetDashboard}
         aria-describedby={changed ? 'widget-dashboard-toggle-explainer' : undefined}
+        data-testid={enabled ? 'widget-dashboard-toggle-on' : 'widget-dashboard-toggle-off'}
       />
       {changed && (
         <Text id="widget-dashboard-toggle-explainer" size="small">
