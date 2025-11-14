@@ -1744,7 +1744,7 @@ class Submission < ActiveRecord::Base
     key = include_version ? :with_version : :without_version
     @submission_histories[key] ||= begin
       res = []
-      last_submitted_at = nil
+      seen_submitted_ats = Set.new
       versions.sort_by(&:created_at).reverse_each do |version|
         model = version.model
         # since vericite_data is a function, make sure you are cloning the most recent vericite_data_hash
@@ -1755,9 +1755,9 @@ class Submission < ActiveRecord::Base
           model.turnitin_data = originality_data
         end
 
-        if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
+        if model.submitted_at && !seen_submitted_ats.include?(model.submitted_at.to_i)
           res << (include_version ? { model:, version: } : model)
-          last_submitted_at = model.submitted_at
+          seen_submitted_ats << model.submitted_at.to_i
         end
       end
 
