@@ -76,13 +76,15 @@ describe Accessibility::Rules::ParagraphsForHeadingsRule do
 
   describe ".why" do
     it "returns the correct explanation" do
-      expected_message = I18n.t(
-        "Sighted users scan web pages by identifying headings. Similarly, screen reader users rely on headings" \
-        "to quickly understand and navigate your content. If a heading is too long, it can be confusing to scan," \
-        "harder to read aloud by assistive technology, and less effective for outlining your page. Keep headings" \
-        "short, specific, and meaningful, not full sentences or paragraphs."
-      )
-      expect(described_class.new.why).to eq(expected_message)
+      expected_messages = [
+        I18n.t(
+          "Sighted users scan web pages by identifying headings. Similarly, screen reader users rely on headings" \
+          "to quickly understand and navigate your content. If a heading is too long, it can be confusing to scan," \
+          "harder to read aloud by assistive technology, and less effective for outlining your page."
+        ),
+        I18n.t("Keep headings short, specific, and meaningful, not full sentences or paragraphs.")
+      ]
+      expect(described_class.new.why).to eq(expected_messages)
     end
   end
 end
