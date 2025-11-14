@@ -25,7 +25,7 @@ module NewQuizzes
     let_once(:course) { course_factory(account:) }
     let_once(:assignment) { assignment_model(course:) }
     let_once(:user) { user_model }
-    let(:tool) { external_tool_1_3_model(context: account, opts: { url: "https://tenant.quiz-lti-iad-prod.instructure.com/lti/launch" }) }
+    let(:tool) { external_tool_1_3_model(context: account, opts: { url: "https://account.quiz-lti-dub-prod.instructure.com/lti/launch" }) }
     let(:request) { double("request", host: "canvas.instructure.com", host_with_port: "canvas.instructure.com", params: {}) }
 
     subject(:builder) do
@@ -39,17 +39,17 @@ module NewQuizzes
     end
 
     describe "#build" do
-      it "includes backend_url extracted from tool URL" do
+      it "includes backend_url extracted from tool launch_url" do
         result = builder.build
-        expect(result[:backend_url]).to eq("https://tenant.quiz-lti-iad-prod.instructure.com")
+        expect(result[:backend_url]).to eq("https://account.quiz-lti-dub-prod.instructure.com")
       end
 
       context "when tool has domain instead of URL" do
-        let(:tool) { external_tool_1_3_model(context: account, opts: { url: nil, domain: "tenant.quiz-lti-iad-prod.instructure.com" }) }
+        let(:tool) { external_tool_1_3_model(context: account, opts: { url: nil, domain: "account.quiz-lti-dub-beta.instructure.com" }) }
 
         it "extracts backend_url from domain" do
           result = builder.build
-          expect(result[:backend_url]).to eq("https://tenant.quiz-lti-iad-prod.instructure.com")
+          expect(result[:backend_url]).to eq("https://account.quiz-lti-dub-beta.instructure.com")
         end
       end
 
@@ -236,7 +236,7 @@ module NewQuizzes
         external_tool_1_3_model(
           context: account,
           opts: {
-            url: "https://tenant.quiz-lti-iad-prod.instructure.com/lti/launch",
+            url: "https://account.quiz-lti-dub-prod.instructure.com/lti/launch",
             shared_secret: "test-secret-key-123"
           }
         )
@@ -256,7 +256,7 @@ module NewQuizzes
           custom_canvas_assignment_id: assignment.id,
           custom_canvas_course_id: course.id,
           custom_canvas_user_id: user.id,
-          backend_url: "https://tenant.quiz-lti-iad-prod.instructure.com"
+          backend_url: "https://account.quiz-lti-dub-prod.instructure.com"
         )
       end
 
@@ -304,7 +304,7 @@ module NewQuizzes
         let(:tool) do
           external_tool_1_3_model(
             context: account,
-            opts: { url: "https://tenant.quiz-lti-iad-prod.instructure.com/lti/launch" }
+            opts: { url: "https://account.quiz-lti-dub-prod.instructure.com/lti/launch" }
           )
         end
 
