@@ -25,6 +25,7 @@ require_relative "concerns/lti_services_shared_examples"
 module Lti::IMS
   RSpec.describe ScoresController do
     include_context "advantage services context"
+    include AccountDomainSpecHelper
 
     let(:admin) { account_admin_user }
     let(:context) { course }
@@ -81,7 +82,7 @@ module Lti::IMS
       it_behaves_like "advantage services"
       it_behaves_like "lti services"
 
-      shared_examples_for "a successful scores request" do
+      context "with valid params" do
         context "when the lti_id userId is used" do
           let(:userId) { user.lti_id }
 
@@ -97,7 +98,7 @@ module Lti::IMS
         end
 
         it "uses the Account#domain in the resultUrl" do
-          allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
+          stub_host_for_environment_specific_domain("canonical.host")
           send_request
           expect(json["resultUrl"]).to start_with(
             "http://canonical.host/api/lti/courses/#{course.id}/line_items/"
@@ -618,7 +619,7 @@ module Lti::IMS
               end
 
               it "returns a progress URL with the Account#domain" do
-                allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
+                stub_host_for_environment_specific_domain("canonical.host")
                 send_request
                 expect(actual_progress_url)
                   .to start_with("http://canonical.host/api/lti/courses/#{context_id}/progress/")
@@ -713,7 +714,7 @@ module Lti::IMS
               # that doesn't work well in a controller spec for this controller
 
               it "returns a progress url" do
-                allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
+                stub_host_for_environment_specific_domain("canonical.host")
                 send_request
                 progress_url =
                   json[Lti::Result::AGS_EXT_SUBMISSION]["content_items"].first["progress"]
@@ -1137,10 +1138,6 @@ module Lti::IMS
         end
       end
 
-      context "with valid params" do
-        it_behaves_like "a successful scores request"
-      end
-
       context "when activityProgress is set to Initialized" do
         let(:params_overrides) { super().merge(activityProgress: "Initialized") }
 
@@ -1192,7 +1189,28 @@ module Lti::IMS
           course_with_user("StudentViewEnrollment", course:, active_all: true).user
         end
 
-        it_behaves_like "a successful scores request"
+        let(:userId) { user.lti_id }
+
+        it "returns a valid resultUrl in the body" do
+          send_request
+          expect(json["resultUrl"]).to include "results"
+        end
+
+        context "when line_item is an assignment" do
+          let(:result) { lti_result_model line_item:, user: }
+
+          before do
+            allow(CanvasHttp).to receive(:get).with("https://getsamplefiles.com/download/txt/sample-1.txt").and_return("sample data")
+            allow(CanvasHttp).to receive(:get).with("https://getsamplefiles.com/download/txt/sample-2.txt").and_return("moar sample data")
+          end
+
+          it "increments attempt" do
+            submission_body = { submitted_at: 1.hour.ago, submission_type: "external_tool" }
+            attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
+            send_request
+            expect(result.submission.reload.attempt).to eq attempt + 1
+          end
+        end
       end
 
       context "with different activityProgress values" do
