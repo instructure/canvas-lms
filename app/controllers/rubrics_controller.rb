@@ -285,6 +285,8 @@ class RubricsController < ApplicationController
       generate_options.to_h
     )
 
+    InstStatsd::Statsd.distributed_increment("rubrics.ai_generated")
+
     render json: progress_json(progress, @current_user, session)
   end
 
@@ -349,6 +351,8 @@ class RubricsController < ApplicationController
       regenerate_options.to_h,
       orig_generate_options.to_h
     )
+
+    InstStatsd::Statsd.distributed_increment("rubrics.ai_regenerated")
 
     render json: progress_json(progress, @current_user, session)
   end
