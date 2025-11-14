@@ -388,6 +388,8 @@ module Importers
         item.turnitin_settings = settings
       end
 
+      import_new_quizzes_settings(hash, item)
+
       if item.context.root_account.feature_enabled?(:lti_asset_processor)
         if hash[:lti_context_id].present?
           Lti::ImportHistory.register(source_lti_id: hash[:lti_context_id], target_lti_id: item.lti_context_id, root_account: item.root_account)
@@ -431,6 +433,21 @@ module Importers
       item.post_policy.update!(post_manually: !!post_manually)
 
       item
+    end
+
+    def self.import_new_quizzes_settings(hash, item)
+      return unless Account.site_admin.feature_enabled?(:new_quizzes_surveys)
+
+      updates = {
+        "type" => hash[:new_quizzes_type],
+        "anonymous_participants" => ActiveModel::Type::Boolean.new.cast(hash[:new_quizzes_anonymous_participants])
+      }.compact
+
+      return if updates.empty?
+
+      item.settings ||= {}
+      item.settings["new_quizzes"] ||= {}
+      item.settings["new_quizzes"].merge!(updates)
     end
 
     def self.handle_sub_assignments(assignment_hash, parent_item, migration)

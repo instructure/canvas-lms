@@ -42,9 +42,19 @@ module CC::Importer::Canvas
         end
 
         parse_canvas_assignment_data(meta_node, html_node, assignment)
+        parse_canvas_new_quiz_assignment_data(meta_node, assignment)
       end
 
       assignments
+    end
+
+    def parse_canvas_new_quiz_assignment_data(meta_doc, assignment)
+      return unless Account.site_admin.feature_enabled?(:new_quizzes_surveys)
+
+      %w[new_quizzes_type new_quizzes_anonymous_participants].each do |string_type|
+        val = get_node_val(meta_doc, string_type)
+        assignment[string_type] = val unless val.nil?
+      end
     end
   end
 end

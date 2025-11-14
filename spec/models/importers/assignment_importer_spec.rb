@@ -2058,4 +2058,66 @@ describe "Importing assignments" do
       end
     end
   end
+
+  describe "#import_new_quizzes_settings" do
+    let(:assignment) { Assignment.new }
+
+    before do
+      allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+      allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
+    end
+
+    it "sets both type and anonymous_participants when provided" do
+      hash = { new_quizzes_type: "graded_survey", new_quizzes_anonymous_participants: true }
+      Importers::AssignmentImporter.import_new_quizzes_settings(hash, assignment)
+      expect(assignment.settings["new_quizzes"]["type"]).to eq("graded_survey")
+      expect(assignment.settings["new_quizzes"]["anonymous_participants"]).to be true
+    end
+
+    it "sets only type when anonymous_participants is not provided" do
+      hash = { new_quizzes_type: "graded_quiz" }
+      Importers::AssignmentImporter.import_new_quizzes_settings(hash, assignment)
+      expect(assignment.settings["new_quizzes"]["type"]).to eq("graded_quiz")
+      expect(assignment.settings["new_quizzes"]).not_to have_key("anonymous_participants")
+    end
+
+    it "sets only anonymous_participants when type is not provided" do
+      hash = { new_quizzes_anonymous_participants: false }
+      Importers::AssignmentImporter.import_new_quizzes_settings(hash, assignment)
+      expect(assignment.settings["new_quizzes"]["anonymous_participants"]).to be false
+      expect(assignment.settings["new_quizzes"]).not_to have_key("type")
+    end
+
+    it "does not modify settings when neither field is provided" do
+      hash = {}
+      Importers::AssignmentImporter.import_new_quizzes_settings(hash, assignment)
+      expect(assignment.settings).to be_nil
+    end
+
+    it "casts anonymous_participants string values to boolean" do
+      hash = { new_quizzes_anonymous_participants: "true" }
+      Importers::AssignmentImporter.import_new_quizzes_settings(hash, assignment)
+      expect(assignment.settings["new_quizzes"]["anonymous_participants"]).to be true
+    end
+
+    it "merges with existing new_quizzes settings" do
+      assignment.settings = { "new_quizzes" => { "existing_key" => "existing_value" } }
+      hash = { new_quizzes_type: "survey" }
+      Importers::AssignmentImporter.import_new_quizzes_settings(hash, assignment)
+      expect(assignment.settings["new_quizzes"]["type"]).to eq("survey")
+      expect(assignment.settings["new_quizzes"]["existing_key"]).to eq("existing_value")
+    end
+
+    context "when feature flag is disabled" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
+      end
+
+      it "does not import new_quizzes settings even when present" do
+        hash = { new_quizzes_type: "graded_quiz", new_quizzes_anonymous_participants: true }
+        Importers::AssignmentImporter.import_new_quizzes_settings(hash, assignment)
+        expect(assignment.settings).to be_nil
+      end
+    end
+  end
 end
