@@ -9053,6 +9053,7 @@ tr:
   gathering_files_933551d9: "Dosyalar Toplanıyor..."
   general_answer_comments_730136ba: "Genel cevap yorumları"
   general_locked_objects_6a9adafb: "Genel Kilitli Öğeler"
+  generate_44e33e72: Oluştur
   generate_activity_for_user_2b0af749: "%{user} İçin Etkinlik Oluştur"
   generate_epub_80e89ea4: "ePub Oluştur"
   generate_token_393ab5b4: "Token Üret"
