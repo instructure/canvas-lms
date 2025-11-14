@@ -11369,6 +11369,7 @@ hu:
   general_answer_comments_730136ba: "Általános válaszhoz kapcsolódó megjegyzések"
   general_eb111f34: általános
   general_locked_objects_6a9adafb: "Általános zárolt objektumok"
+  generate_44e33e72: Generálás
   generate_activity_for_user_2b0af749: "Tevékenység generálása %{user} számára"
   generate_epub_80e89ea4: "ePub generálása"
   generate_item_analysis_report_statuslabel_16e02c8: "Elemanalízis-jelentés generálása %{statusLabel}"

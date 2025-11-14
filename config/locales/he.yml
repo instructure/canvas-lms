@@ -8785,6 +8785,7 @@ he:
   gathering_files_933551d9: "אוסף קבצים..."
   general_answer_comments_730136ba: "הערות שאלה כלליות"
   general_locked_objects_6a9adafb: "פריטים כלליים שנעולים"
+  generate_44e33e72: יצירה
   generate_activity_for_user_2b0af749: "יצירת פעילות עבור %{user}"
   generate_epub_80e89ea4: "צור/י ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "הפקת דוח ניתוח פריטים %{statusLabel}"
