@@ -183,6 +183,14 @@ class TermsApiController < ApplicationController
                               self,
                               api_v1_enrollment_terms_url)
 
+        subaccount = if (subaccount_id = params[:subaccount_id]&.to_i)
+                       if subaccount_id == @context.id
+                         @context
+                       else
+                         @context.all_accounts.find(subaccount_id)
+                       end
+                     end
+
         render json: { enrollment_terms:
                          enrollment_terms_json(
                            @terms,
@@ -191,7 +199,7 @@ class TermsApiController < ApplicationController
                            @context.root_account,
                            nil,
                            Array(params[:include]),
-                           params[:subaccount_id] || nil
+                           subaccount
                          ) }
       end
     end
