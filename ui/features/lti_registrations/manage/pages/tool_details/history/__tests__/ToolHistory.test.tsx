@@ -16,14 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ZAccountId} from '@canvas/lti-apps/models/AccountId'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {render, screen, waitFor} from '@testing-library/react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import {ZLtiContextControlId} from '../../../../model/LtiContextControl'
 import type {LtiOverlayVersion} from '../../../../model/LtiOverlayVersion'
 import type {
   AvailabilityChangeHistoryEntry,
   LtiRegistrationHistoryEntry,
 } from '../../../../model/LtiRegistrationHistoryEntry'
+import {ZLtiRegistrationHistoryEntryId} from '../../../../model/LtiRegistrationHistoryEntry'
+import {ZLtiRegistrationId} from '../../../../model/LtiRegistrationId'
 import {
   mockLtiOverlayVersion,
   mockRegistrationWithAllInformation,
@@ -31,12 +36,7 @@ import {
 } from '../../../manage/__tests__/helpers'
 import {renderWithRouter} from '../../__tests__/helpers'
 import {ToolHistory} from '../ToolHistory'
-import {ZAccountId} from '@canvas/lti-apps/models/AccountId'
-import {ZLtiRegistrationHistoryEntryId} from '../../../../model/LtiRegistrationHistoryEntry'
 import {HISTORY_DISPLAY_LIMIT} from '../useHistory'
-import {ZLtiRegistrationId} from '../../../../model/LtiRegistrationId'
-import fakeENV from '@canvas/test-utils/fakeENV'
-import {ZLtiContextControlId} from '../../../../model/LtiContextControl'
 
 const server = setupServer()
 
@@ -283,49 +283,6 @@ describe('ToolHistory', () => {
         const renderedNames = screen.getAllByText(new RegExp(allNames.join('|')))
         expect(renderedNames).toHaveLength(6)
       })
-    })
-
-    it('limits display to 99 entries and shows message when there are more than 99 history items', async () => {
-      const entries: LtiRegistrationHistoryEntry[] = Array.from(
-        {length: HISTORY_DISPLAY_LIMIT + 1},
-        (_, index) => {
-          return mockLtiRegistrationHistoryEntry({
-            id: ZLtiRegistrationHistoryEntryId.parse(`${index + 1}`),
-            created_by: mockUser({overrides: {name: `User ${index + 1}`}}),
-          })
-        },
-      )
-
-      const registration = mockRegistrationWithAllInformation({
-        n: 'foo',
-        i: 1,
-      })
-
-      server.use(
-        http.get(
-          `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/history`,
-          () => {
-            return HttpResponse.json(entries)
-          },
-        ),
-      )
-
-      render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
-
-      await waitFor(() => {
-        expect(screen.getByText('Configuration Update History')).toBeInTheDocument()
-      })
-
-      const tableRows = screen.getAllByRole('row')
-      expect(tableRows).toHaveLength(HISTORY_DISPLAY_LIMIT + 1) // 99 data rows + 1 header row
-
-      expect(screen.getByText(/Showing the most recent 99 updates./)).toBeInTheDocument()
-
-      expect(screen.getByText('User 1')).toBeInTheDocument()
-
-      expect(screen.getByText('User 99')).toBeInTheDocument()
-
-      expect(screen.queryByText('User 100')).not.toBeInTheDocument()
     })
 
     it('renders Instructure as the name if the change was made by a Site Admin', async () => {

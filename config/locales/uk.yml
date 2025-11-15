@@ -196,6 +196,9 @@ uk:
   access_token_3be22221: "Маркер доступу"
   access_token_count_access_token_count_dfb5463c: "Кількість маркерів доступу: %{access_token_count}"
   access_token_details_495d989: "Деталі маркерів доступу"
+  accessibility: 
+    titles: 
+      accessibility_checker: "Перевірка доступності"
   accessibility_checker_b3af1f6c: "Перевірка доступності"
   accordion_section_1_7888782d: "Координаційний розділ 1"
   accordion_section_2_e1812997: "Координаційний розділ 2"
@@ -7976,6 +7979,7 @@ uk:
   gathering_files_933551d9: "Збір файлів ..."
   general_answer_comments_730136ba: "Загальні коментарі на відповіді"
   general_locked_objects_6a9adafb: "Загальні Заблоковані Об'єкти"
+  generate_44e33e72: Генерувати
   generate_activity_for_user_2b0af749: "Генерувати Завдання для %{user}"
   generate_epub_80e89ea4: "Згенерувати ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "Згенерувати пункт аналітичного звіту %{statusLabel}"
@@ -15674,6 +15678,7 @@ uk:
   save_11a80ec3: Зберегти
   save_alert_b64f9fa3: "Зберегти оповіщення"
   save_changes_698abe77: "Зберегти зміни"
+  save_changes_a63787eb: "Зберегти зміни"
   save_grading_period_daaaddea: "Зберегти період оцінювання"
   save_grading_period_set_e029fa88: "Зберегти налаштування періоду оцінювання"
   save_login_bba1272: "Зберегти логін"

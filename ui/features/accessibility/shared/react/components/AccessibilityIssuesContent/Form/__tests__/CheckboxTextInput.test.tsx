@@ -29,6 +29,9 @@ import {
   type AccessibilityCheckerContextType,
 } from '../../../../contexts/AccessibilityCheckerContext'
 import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
+import {useAccessibilityScansStore} from '../../../../stores/AccessibilityScansStore'
+
+jest.mock('../../../../stores/AccessibilityScansStore')
 
 // Create a fully typed mock context
 const mockContextValue: AccessibilityCheckerContextType = {
@@ -47,9 +50,12 @@ const mockContextValue: AccessibilityCheckerContextType = {
   setIsTrayOpen: jest.fn(),
 }
 
-// Reset mock implementation before each test
 beforeEach(() => {
   jest.resetAllMocks()
+  ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+    const state = {aiGenerationEnabled: true}
+    return selector(state)
+  })
 })
 
 describe('CheckboxTextInput', () => {
@@ -280,5 +286,61 @@ describe('CheckboxTextInput', () => {
     expect(onReload).not.toHaveBeenCalled()
     rerender(<CheckboxTextInput {...defaultProps} onReload={onReload} value="test value" />)
     expect(onReload).toHaveBeenCalledWith('test value')
+  })
+
+  describe('AI generation feature flag', () => {
+    it('shows generate button when feature flag is enabled', () => {
+      ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+        const state = {aiGenerationEnabled: true}
+        return selector(state)
+      })
+
+      const propsWithGenerateOption = {
+        ...defaultProps,
+        issue: {
+          ...defaultProps.issue,
+          form: {
+            ...defaultProps.issue.form,
+            canGenerateFix: true,
+            generateButtonLabel: 'Generate Alt Text',
+          },
+        },
+      }
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...propsWithGenerateOption} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      expect(screen.getByText('Generate Alt Text')).toBeInTheDocument()
+    })
+
+    it('hides generate button when feature flag is disabled', () => {
+      ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+        const state = {aiGenerationEnabled: false}
+        return selector(state)
+      })
+
+      const propsWithGenerateOption = {
+        ...defaultProps,
+        issue: {
+          ...defaultProps.issue,
+          form: {
+            ...defaultProps.issue.form,
+            canGenerateFix: true,
+            generateButtonLabel: 'Generate Alt Text',
+          },
+        },
+      }
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...propsWithGenerateOption} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      expect(screen.queryByText('Generate Alt Text')).not.toBeInTheDocument()
+    })
   })
 })

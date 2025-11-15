@@ -1333,22 +1333,26 @@ describe UsersController do
     end
 
     it "returns nil if there is no token" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => nil }))
+      allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return(nil)
+      allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :server_key).and_return(nil)
       expect(subject.send(:validate_recaptcha, nil)).to be_nil
     end
 
     it "returns nil for valid recaptcha submissions" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => "test-token" }))
+      allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return({ server_key: "test-token" })
+      allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :server_key).and_return("test-token")
       expect(subject.send(:validate_recaptcha, "valid-submit-key")).to be_nil
     end
 
     it "returns an error for missing recaptcha submissions" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => "test-token" }))
+      allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return({ server_key: "test-token" })
+      allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :server_key).and_return("test-token")
       expect(subject.send(:validate_recaptcha, nil)).not_to be_nil
     end
 
     it "returns an error for invalid recaptcha submissions" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => "test-token" }))
+      allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return({ server_key: "test-token" })
+      allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :server_key).and_return("test-token")
       expect(subject.send(:validate_recaptcha, "invalid-submit-key")).not_to be_nil
     end
   end
@@ -3334,6 +3338,24 @@ describe UsersController do
         expect(assigns[:js_env][:SHARED_COURSE_DATA].length).to eq 1
       end
 
+      it "includes widget_dashboard_customization in DASHBOARD_FEATURES when enabled" do
+        course_with_student_logged_in(active_all: true)
+        @user.preferences[:widget_dashboard_user_preference] = true
+        @user.save!
+        Account.site_admin.enable_feature!(:widget_dashboard_customization)
+        get "user_dashboard"
+        expect(assigns[:js_env][:DASHBOARD_FEATURES][:widget_dashboard_customization]).to be true
+      end
+
+      it "does not include widget_dashboard_customization in DASHBOARD_FEATURES when disabled" do
+        course_with_student_logged_in(active_all: true)
+        @user.preferences[:widget_dashboard_user_preference] = true
+        @user.save!
+        Account.site_admin.disable_feature!(:widget_dashboard_customization)
+        get "user_dashboard"
+        expect(assigns[:js_env][:DASHBOARD_FEATURES][:widget_dashboard_customization]).to be false
+      end
+
       describe "dashboard routing" do
         before :once do
           @observer = user_factory(active_all: true)
@@ -3426,63 +3448,6 @@ describe UsersController do
           user_session(@student)
           @student.preferences[:widget_dashboard_user_preference] = false
           @student.save!
-          get "user_dashboard"
-          expect(assigns[:js_bundles].flatten).to include :widget_dashboard
-        end
-      end
-
-      context "with sub-account widget_dashboard control" do
-        before :once do
-          @sub_account = Account.default.sub_accounts.create!(name: "Sub Account")
-          @course = course_factory(account: @sub_account, active_all: true)
-          @student = user_factory(active_all: true)
-          @course.enroll_student(@student, enrollment_state: "active")
-        end
-
-        before do
-          user_session(@student)
-        end
-
-        it "shows widget dashboard when sub-account enables it" do
-          @sub_account.enable_feature!(:widget_dashboard)
-
-          get "user_dashboard"
-          expect(assigns[:js_bundles].flatten).to include :widget_dashboard
-        end
-
-        it "does not show widget dashboard when root disables it" do
-          Account.default.disable_feature!(:widget_dashboard)
-
-          get "user_dashboard"
-          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
-        end
-
-        it "shows widget dashboard when enrolled in multiple accounts and one enables it" do
-          @sub_account2 = Account.default.sub_accounts.create!(name: "Sub Account 2")
-          @course2 = course_factory(account: @sub_account2, active_all: true)
-          @course2.enroll_student(@student, enrollment_state: "active")
-
-          @sub_account.enable_feature!(:widget_dashboard)
-          @sub_account2.disable_feature!(:widget_dashboard)
-
-          get "user_dashboard"
-          expect(assigns[:js_bundles].flatten).to include :widget_dashboard
-        end
-
-        it "respects user preference when at least one account allows override" do
-          @sub_account.allow_feature!(:widget_dashboard)
-          @student.preferences[:widget_dashboard_user_preference] = false
-          @student.save!
-
-          get "user_dashboard"
-          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
-        end
-
-        it "ignores user preference when any account locks feature on" do
-          @sub_account.enable_feature!(:widget_dashboard)
-          @student.preferences[:widget_dashboard_user_preference] = false
-          @student.save!
-
           get "user_dashboard"
           expect(assigns[:js_bundles].flatten).to include :widget_dashboard
         end

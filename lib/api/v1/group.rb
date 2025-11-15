@@ -67,7 +67,7 @@ module Api::V1::Group
 
       # Apply section restrictions to users list if applicable
       if user_has_section_restrictions?(group.context, user)
-        student_ids_in_sections = get_students_in_teacher_sections(group.context, user)
+        student_ids_in_sections = get_visible_student_ids_in_course(group.context, user)
         users = users.where(id: student_ids_in_sections)
       end
 
@@ -130,7 +130,7 @@ module Api::V1::Group
   private
 
   def count_visible_group_members(group, user)
-    visible_student_ids = get_students_in_teacher_sections(group.context, user)
+    visible_student_ids = get_visible_student_ids_in_course(group.context, user)
     group.users.where(id: visible_student_ids).count
   end
 end

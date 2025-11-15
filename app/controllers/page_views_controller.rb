@@ -258,16 +258,17 @@ class PageViewsController < ApplicationController
   # similar to the available CSV download. Page views are returned in
   # descending order, newest to oldest.
   #
-  # **Disclaimer**: The data is a best effort attempt, and is not guaranteed
-  # to be complete or wholly accurate. This data is meant to be used for
-  # rollups and analysis in the aggregate, not in isolation for auditing,
-  # or other high-stakes analysis involving examining single users or
-  # small samples. Page Views data is generated from the Canvas logs files,
-  # not a transactional database, there are many places along the way
-  # data can be lost and/or duplicated (though uncommon). Additionally,
-  # given the size of this data, our processes ensure that errors can be
-  # rectified at any point in time, with corrections integrated as soon as
-  # they are identified and processed.
+  # @hint info
+  #   **Disclaimer**: The data is a best effort attempt, and is not guaranteed
+  #   to be complete or wholly accurate. This data is meant to be used for
+  #   rollups and analysis in the aggregate, not in isolation for auditing,
+  #   or other high-stakes analysis involving examining single users or
+  #   small samples. Page Views data is generated from the Canvas logs files,
+  #   not a transactional database, there are many places along the way
+  #   data can be lost and/or duplicated (though uncommon). Additionally,
+  #   given the size of this data, our processes ensure that errors can be
+  #   rectified at any point in time, with corrections integrated as soon as
+  #   they are identified and processed.
   #
   # @argument start_time [DateTime]
   #   The beginning of the time range from which you want page views.

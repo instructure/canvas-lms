@@ -16,7 +16,7 @@
 
 <p><strong><%= asset.title %></strong></p>
 
-<p><em style="color: #00ae00;">
+<p><em>
   <% if !asset.start_at && !asset.end_at %>
     <%= t('no_time_set', 'No Time Set') %>
   <% elsif (asset.start_at == asset.end_at || !asset.end_at) %>

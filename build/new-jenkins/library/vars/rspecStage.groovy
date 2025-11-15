@@ -111,6 +111,7 @@ def tearDownNode() {
     rm -rf ./tmp && mkdir -p $destDir ${destDir}_rspec_results
     docker cp ${srcDir}/log/results ${destDir}_rspec_results/ || true
     docker cp ${srcDir}/log/spec_failures ${destDir}/spec_failures/ || true
+    docker cp ${srcDir}/log/skipped ${destDir}/skipped/ || true
 
     tar cvfz ${destDir}/rspec_results.tgz ${destDir}_rspec_results/
 
@@ -153,6 +154,15 @@ def tearDownNode() {
       buildSummaryReport.setFailureCategory(specTitle, buildSummaryReport.FAILURE_TYPE_TEST_NEVER_PASSED)
     } else {
       buildSummaryReport.setFailureCategoryUnlessExists(specTitle, buildSummaryReport.FAILURE_TYPE_TEST_PASSED_ON_RETRY)
+    }
+  }
+
+  // Find and process skipped tests
+  findFiles(glob: "$destDir/skipped/**/*.json").each { skipFile ->
+    def skipReport = readJSON file: skipFile.path
+
+    skipReport.pending?.each { test ->
+      buildSummaryReport.addSkippedTest(test.location, test)
     }
   }
 }

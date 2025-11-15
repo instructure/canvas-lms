@@ -531,3 +531,9 @@ export const diffHistoryEntry = (entry: LtiRegistrationHistoryEntry): LtiHistory
     }
   }
 }
+
+export const diffHistoryEntries = (
+  entries: LtiRegistrationHistoryEntry[],
+): LtiHistoryEntryWithDiff[] => {
+  return entries.map(diffHistoryEntry)
+}

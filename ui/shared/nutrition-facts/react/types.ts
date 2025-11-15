@@ -16,49 +16,47 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-interface AiPermissions {
-  name: string
-  title: string
-  description: string
-  highlighted?: boolean
-  level: string
+export interface NutritionFactsProps {
+  aiInformation: {
+    data: Array<{
+      featureName: string
+      permissionLevel: string
+      modelName: string
+      description: string
+      permissionLevelText: string
+      modelNameText: string
+      permissionLevelsModalTriggerText: string
+      nutritionFactsModalTriggerText: string
+    }>
+  }
+  dataPermissionLevels: {
+    data: Array<{
+      level: string
+      title: string
+      description: string
+      highlighted?: boolean | undefined
+    }>
+  }
+  nutritionFacts: {
+    featureName: string
+    data: Array<{
+      blockTitle: string
+      segmentData: Array<{
+        segmentTitle: string
+        value: string
+        description: string
+        valueDescription?: string
+      }>
+    }>
+  }
+  iconSize?: number
+  responsiveProps: ResponsiveProps
 }
 
-interface NutritionFactsSegment {
-  description: string
-  segmentTitle: string
-  value: string
-  valueDescription?: string
-}
-
-interface NutritionFactsBlock {
-  blockTitle: string
-  segmentData: NutritionFactsSegment[]
-}
-
-interface NutritionFacts {
-  name: string
-  description?: string
-  data: NutritionFactsBlock[]
-}
-
-interface AiInformation {
-  featureName: string
-  permissionLevelText: string
-  permissionLevel: string
-  description: string
-  permissionLevelsModalTriggerText: string
-  modelNameText: string
-  modelName: string
-  nutritionFactsModalTriggerText: string
-}
-
-export interface NutritionFactsExternalRoot {
-  id: string
-  sha256: string
-  lastUpdated: string
-  name: string
-  nutritionFacts: NutritionFacts
-  dataPermissionLevels: AiPermissions[]
-  AiInformation: AiInformation
+interface ResponsiveProps {
+  domElement: string
+  fullscreenModals: boolean
+  color: 'primary' | 'secondary'
+  buttonColor: 'primary' | 'primary-inverse'
+  withBackground: boolean
 }

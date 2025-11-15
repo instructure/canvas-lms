@@ -27,6 +27,7 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
 import {WidgetDashboardProvider} from './react/hooks/useWidgetDashboardContext'
+import {WidgetDashboardEditProvider} from './react/hooks/useWidgetDashboardEdit'
 import {Responsive} from '@instructure/ui-responsive'
 import {ResponsiveProvider} from './react/hooks/useResponsiveContext'
 
@@ -61,16 +62,19 @@ ready(() => {
             observedUserId={ENV.OBSERVED_USER_ID}
             currentUserRoles={ENV.current_user_roles}
             sharedCourseData={ENV.SHARED_COURSE_DATA}
+            dashboardFeatures={ENV.DASHBOARD_FEATURES}
           >
-            <Responsive
-              match="media"
-              query={RESPONSIVE_QUERY}
-              render={(_props, matches) => (
-                <ResponsiveProvider matches={matches || ['desktop']}>
-                  <WidgetDashboardContainer />
-                </ResponsiveProvider>
-              )}
-            />
+            <WidgetDashboardEditProvider>
+              <Responsive
+                match="media"
+                query={RESPONSIVE_QUERY}
+                render={(_props, matches) => (
+                  <ResponsiveProvider matches={matches || ['desktop']}>
+                    <WidgetDashboardContainer />
+                  </ResponsiveProvider>
+                )}
+              />
+            </WidgetDashboardEditProvider>
           </WidgetDashboardProvider>
         </QueryClientProvider>
       </ErrorBoundary>,

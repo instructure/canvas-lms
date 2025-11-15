@@ -19,6 +19,7 @@
 import React, {useContext, useEffect, useState} from 'react'
 import {DiscussionDueDatesContext} from '../../util/constants'
 import AssignToContent from '@canvas/due-dates/react/AssignToContent'
+import AssignToContent2 from '@canvas/due-dates/react/AssignToContent2'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {View} from '@instructure/ui-view'
 
@@ -120,7 +121,10 @@ export const ItemAssignToTrayWrapper = () => {
     }
     if (studentIds.length > 0) {
       outputObj.student_ids = studentIds
-      outputObj.students = inputObj.students?.map(student => ({...student, id: student._id}))
+      outputObj.students = inputObj.students?.map(student => ({
+        ...student,
+        id: student._id ? student._id : student.id,
+      }))
     }
 
     return outputObj
@@ -144,7 +148,7 @@ export const ItemAssignToTrayWrapper = () => {
       replyToTopicOverrideId: inputObj.replyToTopicOverrideId || null,
     }
 
-    if (inputObj.noop_id === '1') {
+    if (inputObj.noop_id === '1' || inputObj.noop_id === 1) {
       outputObj.assignedList.push('mastery_paths')
     } else if (inputObj.course_section_id) {
       if (inputObj.course_section_id === '0') {
@@ -157,7 +161,10 @@ export const ItemAssignToTrayWrapper = () => {
       inputObj.student_ids.forEach(id => {
         outputObj.assignedList.push('user_' + id)
       })
-      outputObj.students = inputObj.students?.map(student => ({...student, id: student._id}))
+      outputObj.students = inputObj.students?.map(student => ({
+        ...student,
+        id: student._id ? student._id : student.id,
+      }))
     } else if (inputObj.course_id) {
       outputObj.assignedList.push('course_' + inputObj.course_id)
     } else if (inputObj.group_id) {
@@ -196,9 +203,13 @@ export const ItemAssignToTrayWrapper = () => {
     return <LoadingIndicator />
   }
 
+  const AssignToComponent = ENV.FEATURES?.assign_to_in_edit_pages_rewrite
+    ? AssignToContent2
+    : AssignToContent
+
   return (
     <View as="div" maxWidth="478px">
-      <AssignToContent
+      <AssignToComponent
         onSync={onSync}
         overrides={overrides}
         setOverrides={setOverrides}

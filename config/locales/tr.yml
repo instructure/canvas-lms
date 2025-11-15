@@ -274,6 +274,9 @@ tr:
   access_token_details_495d989: "Token Erişim Ayrıntıları"
   access_token_is_valid_until_d2f048cf: "Erişim dizgesi şu tarihe kadar geçerli"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Erişim Anahtarları diğer uygulamaların sizin adınıza API iletişimi kurmalarına izin vermek için kullanılır. Kendi entegrasyonlarınız için erişim anahtarları üretip *Canvas Açık API'yi de kullanabilirsiniz.*"
+  accessibility: 
+    titles: 
+      accessibility_checker: "Erişilebilirlik Kontrolü"
   accessibility_checker_b3af1f6c: "Erişilebilirlik Kontrolü"
   accessible_sidebar_menu_b30baf97: "Erişilebilir Kenar Çubuğu Menüsü"
   accordion_section_1_7888782d: "Akordiyon Bölüm 1"
@@ -9050,6 +9053,7 @@ tr:
   gathering_files_933551d9: "Dosyalar Toplanıyor..."
   general_answer_comments_730136ba: "Genel cevap yorumları"
   general_locked_objects_6a9adafb: "Genel Kilitli Öğeler"
+  generate_44e33e72: Oluştur
   generate_activity_for_user_2b0af749: "%{user} İçin Etkinlik Oluştur"
   generate_epub_80e89ea4: "ePub Oluştur"
   generate_token_393ab5b4: "Token Üret"
@@ -17440,6 +17444,7 @@ tr:
   save_11a80ec3: Kaydet
   save_alert_b64f9fa3: "Uyarıyı Kaydet"
   save_changes_698abe77: "Değişiklikleri Kaydet"
+  save_changes_a63787eb: "Değişiklikleri kaydet"
   save_key_b4dede06: "Anahtarı Kaydet"
   save_learning_mastery_82889d8b: "Öğrenme Yeterliliğini Kaydet"
   save_login_bba1272: "Oturumu Kaydet"

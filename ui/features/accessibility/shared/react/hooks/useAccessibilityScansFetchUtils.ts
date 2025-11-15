@@ -153,7 +153,7 @@ export const useAccessibilityScansFetchUtils = () => {
         setLoading(true)
         setError(null)
 
-        const path = getCourseBasedPath('/accessibility_resource_scans')
+        const path = getCourseBasedPath('/accessibility/resource_scan')
         const data: DoFetchApiResults<AccessibilityResourceScan[]> = await doFetchApi({
           path,
           params,

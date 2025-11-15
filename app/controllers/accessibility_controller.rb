@@ -23,10 +23,13 @@ class AccessibilityController < ApplicationController
   before_action :check_authorized_action
 
   def index
+    @page_title = t("titles.accessibility_checker", "Accessibility Checker")
+    add_crumb(t("titles.accessibility_checker", "Accessibility Checker"))
+    @show_left_side = true
+    @collapse_course_menu = false
     js_bundle :accessibility_checker
     js_env(SCAN_DISABLED: @context.exceeds_accessibility_scan_limit?)
-
-    render html: '<div id="accessibility-checker-container"></div>'.html_safe, layout: true
+    render html: "".html_safe, layout: true
   end
 
   private

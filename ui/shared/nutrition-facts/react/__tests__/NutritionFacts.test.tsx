@@ -21,126 +21,168 @@ import {render, fireEvent} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import {NutritionFacts} from '../NutritionFacts'
-import {NutritionFactsExternalRoot} from '../types'
+
+const mockInfo = {
+  aiInformation: {
+    data: [
+      {
+        featureName: 'Canvas Course Translation',
+        permissionLevel: 'LEVEL 2',
+        modelName: 'OpenAI GPT-4',
+        description: 'Test description',
+        permissionLevelText: 'Permission Level:',
+        modelNameText: 'Base Model',
+        permissionLevelsModalTriggerText: 'Data Permission Levels',
+        nutritionFactsModalTriggerText: 'AI Nutrition Facts',
+      },
+    ],
+  },
+  dataPermissionLevels: {
+    data: [
+      {
+        level: 'LEVEL 1',
+        title: 'Descriptive Analytics and Research',
+        description: 'We leverage anonymized aggregate data',
+        highlighted: false,
+      },
+      {
+        level: 'LEVEL 2',
+        title: 'AI-Powered Features Without Data Training',
+        description: 'We utilize off-the-shelf AI models',
+        highlighted: true,
+      },
+    ],
+  },
+  nutritionFacts: {
+    featureName: 'Canvas Course Translation',
+    data: [
+      {
+        blockTitle: 'Model & Data',
+        segmentData: [
+          {
+            segmentTitle: 'Base Model',
+            value: 'OpenAI GPT-4',
+            description: 'The foundational AI',
+          },
+          {
+            segmentTitle: 'Trained with User Data',
+            value: 'No',
+            description: 'Indicates the AI model has been given customer data',
+          },
+        ],
+      },
+    ],
+  },
+  responsiveProps: {
+    fullscreenModals: false,
+    color: 'primary' as const,
+    buttonColor: 'primary' as const,
+    withBackground: false,
+    domElement: 'nutrition_facts_container',
+  },
+}
 
 injectGlobalAlertContainers()
 
 describe('Nutrition facts', () => {
-  const defaultProps: NutritionFactsExternalRoot = {
-    id: 'canvasCourseTranslation',
-    name: 'Discussions Translation',
-    sha256: 'stub-hash',
-    lastUpdated: '1234567890',
-    nutritionFacts: {
-      name: 'Discussions Translation',
-      description: 'Test description',
-      data: [
-        {
-          blockTitle: 'Model & Data',
-          segmentData: [
-            {
-              segmentTitle: 'Base Model',
-              description:
-                'The foundational AI on which further training and customizations are built.',
-              value: 'Haiku 3.0.0',
-              valueDescription: 'Internal platform routed model',
-            },
-            {
-              segmentTitle: 'Trained with User Data',
-              description:
-                'Indicates the AI model has been given customer data in order to improve its results.',
-              value: 'No',
-            },
-          ],
-        },
-        {
-          blockTitle: 'Second block',
-          segmentData: [
-            {
-              segmentTitle: 'Very useful info',
-              description: 'this info is super important',
-              value: '1==1',
-              valueDescription: "don't tell anyone",
-            },
-          ],
-        },
-      ],
-    },
-    dataPermissionLevels: [
-      {
-        name: 'Level 1',
-        title: 'Descriptive Analytics and Research',
-        description:
-          'We leverage anonymized aggregate data for detailed analytics to inform model development and product improvements. No AI models are used at this level.',
-        highlighted: true,
-        level: 'level_1',
-      },
-      {
-        name: 'Level 2',
-        title: 'AI-Powered Features Without Data Retention',
-        description:
-          'We utilize off-the-shelf AI models and customer data as input to provide AI-powered features. No data is used for training this model.',
-        level: 'level_2',
-      },
-    ],
-    AiInformation: {
-      featureName: 'Discussions Translation',
-      permissionLevelText: 'Permission Level',
-      permissionLevel: 'LEVEL 1',
-      description:
-        'We leverage anonymized aggregate data for detailed analytics to inform model development and product improvements. No AI models are used at this level.',
-      permissionLevelsModalTriggerText: 'Permission Levels',
-      modelNameText: 'Model Name',
-      modelName: 'Haiku 3',
-      nutritionFactsModalTriggerText: 'AI Nutrition Facts',
-    },
-  }
-
   it('renders without crashing', () => {
-    render(<NutritionFacts {...defaultProps} />)
+    render(<NutritionFacts {...mockInfo} />)
     expect(document.getElementById('nutrition_facts_trigger')).toBeInTheDocument()
   })
 
   it('renders correctly', () => {
-    const {getByText} = render(<NutritionFacts {...defaultProps} />)
+    const {getByText} = render(<NutritionFacts {...mockInfo} />)
     const trigger = document.getElementById('nutrition_facts_trigger') as HTMLButtonElement
     fireEvent.click(trigger)
-    expect(getByText(defaultProps.name)).toBeInTheDocument()
-    expect(getByText(defaultProps.AiInformation.permissionLevel)).toBeInTheDocument()
-    expect(getByText(defaultProps.AiInformation.modelName)).toBeInTheDocument()
+    expect(getByText(mockInfo.nutritionFacts.featureName)).toBeInTheDocument()
+    expect(getByText(mockInfo.aiInformation.data[0].permissionLevel)).toBeInTheDocument()
+    expect(getByText(mockInfo.aiInformation.data[0].modelName)).toBeInTheDocument()
   })
 
   it('renders permission level correctly', () => {
-    const {getByText} = render(<NutritionFacts {...defaultProps} />)
+    const {getByText, getAllByText} = render(<NutritionFacts {...mockInfo} />)
     const trigger = document.getElementById('nutrition_facts_trigger') as HTMLButtonElement
     fireEvent.click(trigger)
     fireEvent.click(getByText(/AI Nutrition Facts/i))
-    expect(getByText(defaultProps.nutritionFacts.data[0].blockTitle)).toBeInTheDocument()
+    expect(getByText(mockInfo.nutritionFacts.data[0].blockTitle)).toBeInTheDocument()
     expect(
-      getByText(defaultProps.nutritionFacts.data[0].segmentData[0].segmentTitle),
-    ).toBeInTheDocument()
+      getAllByText(mockInfo.nutritionFacts.data[0].segmentData[0].segmentTitle).length,
+    ).toBeGreaterThan(0)
   })
 
   it('renders ai nutrition fact correctly', () => {
-    const {getByText} = render(<NutritionFacts {...defaultProps} />)
+    const {getByText, getAllByText} = render(<NutritionFacts {...mockInfo} />)
     const trigger = document.getElementById('nutrition_facts_trigger') as HTMLButtonElement
     fireEvent.click(trigger)
     fireEvent.click(getByText(/AI Nutrition Facts/i))
-    expect(getByText(defaultProps.nutritionFacts.data[0].blockTitle)).toBeInTheDocument()
+    expect(getByText(mockInfo.nutritionFacts.data[0].blockTitle)).toBeInTheDocument()
     expect(
-      getByText(defaultProps.nutritionFacts.data[0].segmentData[0].segmentTitle),
-    ).toBeInTheDocument()
+      getAllByText(mockInfo.nutritionFacts.data[0].segmentData[0].segmentTitle).length,
+    ).toBeGreaterThan(0)
     expect(
-      getByText(defaultProps.nutritionFacts.data[0].segmentData[1].segmentTitle),
+      getByText(mockInfo.nutritionFacts.data[0].segmentData[1].segmentTitle),
     ).toBeInTheDocument()
-    expect(getByText(defaultProps.nutritionFacts.data[0].segmentData[1].value)).toBeInTheDocument()
+    expect(getByText(mockInfo.nutritionFacts.data[0].segmentData[1].value)).toBeInTheDocument()
   })
 
   it('renders permission level modal correctly', () => {
-    const {getByText} = render(<NutritionFacts {...defaultProps} />)
+    const {getByText} = render(<NutritionFacts {...mockInfo} />)
     const trigger = document.getElementById('nutrition_facts_trigger') as HTMLButtonElement
     fireEvent.click(trigger)
     fireEvent.click(getByText(/Permission Levels/i))
-    expect(getByText(defaultProps.dataPermissionLevels[0].title)).toBeInTheDocument()
+    expect(getByText(mockInfo.dataPermissionLevels.data[0].title)).toBeInTheDocument()
+  })
+
+  it('renders with mobile responsive props', () => {
+    const mobileProps = {
+      ...mockInfo,
+      responsiveProps: {
+        fullscreenModals: true,
+        color: 'secondary' as const,
+        buttonColor: 'primary' as const,
+        withBackground: false,
+        domElement: 'nutrition_facts_mobile_container',
+      },
+    }
+    render(<NutritionFacts {...mobileProps} />)
+    const trigger = document.getElementById('nutrition_facts_trigger')
+    expect(trigger).toBeInTheDocument()
+    // Verify the button exists and can be clicked (fullscreen modal behavior)
+    expect(trigger).toHaveAttribute('type', 'button')
+  })
+
+  it('renders with desktop responsive props', () => {
+    const desktopProps = {
+      ...mockInfo,
+      responsiveProps: {
+        fullscreenModals: false,
+        color: 'primary' as const,
+        buttonColor: 'primary-inverse' as const,
+        withBackground: false,
+        domElement: 'nutrition_facts_container',
+      },
+    }
+    render(<NutritionFacts {...desktopProps} />)
+    const trigger = document.getElementById('nutrition_facts_trigger')
+    expect(trigger).toBeInTheDocument()
+    expect(trigger).toHaveAttribute('type', 'button')
+  })
+
+  it('uses correct icon color based on responsive props', () => {
+    const {rerender} = render(<NutritionFacts {...mockInfo} />)
+    let trigger = document.getElementById('nutrition_facts_trigger')
+    expect(trigger).toBeInTheDocument()
+
+    // Test with secondary color (mobile)
+    const mobileProps = {
+      ...mockInfo,
+      responsiveProps: {
+        ...mockInfo.responsiveProps,
+        color: 'secondary' as const,
+      },
+    }
+    rerender(<NutritionFacts {...mobileProps} />)
+    trigger = document.getElementById('nutrition_facts_trigger')
+    expect(trigger).toBeInTheDocument()
   })
 })

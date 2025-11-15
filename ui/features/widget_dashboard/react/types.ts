@@ -72,6 +72,7 @@ export interface BaseWidgetProps {
   isLoading?: boolean
   error?: string | null
   onRetry?: () => void
+  isEditMode?: boolean
 }
 
 export interface WidgetRenderer {

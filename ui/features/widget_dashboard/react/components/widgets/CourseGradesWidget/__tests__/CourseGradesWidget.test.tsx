@@ -115,4 +115,74 @@ describe('CourseGradesWidget', () => {
       expect(screen.getByText('Course 2')).toBeInTheDocument()
     })
   })
+
+  it('displays N/A for courses with null grades', async () => {
+    const courseDataWithNullGrade: SharedCourseData[] = [
+      {
+        courseId: '1',
+        courseCode: 'CS101',
+        courseName: 'Course Without Grade',
+        currentGrade: null,
+        gradingScheme: 'percentage',
+        lastUpdated: '2025-01-01T00:00:00Z',
+      },
+    ]
+
+    setup({}, courseDataWithNullGrade)
+
+    await waitFor(() => {
+      expect(screen.getByText('Course Without Grade')).toBeInTheDocument()
+      expect(screen.getByText('N/A')).toBeInTheDocument()
+    })
+  })
+
+  it('displays grades when available', async () => {
+    const courseDataWithGrade: SharedCourseData[] = [
+      {
+        courseId: '1',
+        courseCode: 'CS101',
+        courseName: 'Course With Grade',
+        currentGrade: 92.5,
+        gradingScheme: 'percentage',
+        lastUpdated: '2025-01-01T00:00:00Z',
+      },
+    ]
+
+    setup({}, courseDataWithGrade)
+
+    await waitFor(() => {
+      expect(screen.getByText('Course With Grade')).toBeInTheDocument()
+      expect(screen.getByText('92%')).toBeInTheDocument()
+    })
+  })
+
+  it('handles mix of courses with and without grades', async () => {
+    const mixedCourseData: SharedCourseData[] = [
+      {
+        courseId: '1',
+        courseCode: 'CS101',
+        courseName: 'Course With Grade',
+        currentGrade: 85,
+        gradingScheme: 'percentage',
+        lastUpdated: '2025-01-01T00:00:00Z',
+      },
+      {
+        courseId: '2',
+        courseCode: 'MATH201',
+        courseName: 'Course Without Grade',
+        currentGrade: null,
+        gradingScheme: 'percentage',
+        lastUpdated: '2025-01-02T00:00:00Z',
+      },
+    ]
+
+    setup({}, mixedCourseData)
+
+    await waitFor(() => {
+      expect(screen.getByText('Course With Grade')).toBeInTheDocument()
+      expect(screen.getByText('Course Without Grade')).toBeInTheDocument()
+      expect(screen.getByText('85%')).toBeInTheDocument()
+      expect(screen.getByText('N/A')).toBeInTheDocument()
+    })
+  })
 })

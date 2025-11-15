@@ -87,6 +87,7 @@ class WikiPage < ActiveRecord::Base
               if: proc { context.try(:conditional_release?) }
   after_save :create_lookup, if: :should_create_lookup?
   after_save :delete_lookups, if: -> { !Account.site_admin.feature_enabled?(:permanent_page_links) && saved_change_to_workflow_state? && deleted? }
+  after_save :index_in_pine, if: :should_index_in_pine?
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
     # no assignment -> visible if wiki_page_visibilities has results
@@ -729,6 +730,28 @@ class WikiPage < ActiveRecord::Base
       page_ids_no_assignment = (no_assignment_page_visibilities[user_id] || []).map { |page_id, _| page_id }
       page_ids_with_assignment.concat(page_ids_no_assignment)
     end
+  end
+
+  # list of attributes tracked in Pine for Horizon course wiki pages
+  PINE_TRACKED_CHANGES = %w[title body workflow_state].freeze
+
+  def should_index_in_pine?
+    return false unless context.is_a?(Course)
+    return false unless context.horizon_course?
+    return false unless context.root_account.feature_enabled?(:horizon_learning_object_ingestion_on_change)
+    return false unless PineClient.enabled?
+    return false unless workflow_state == "active"
+
+    # Index if relevant fields changed
+    saved_changes.keys.intersect?(PINE_TRACKED_CHANGES)
+  end
+
+  def index_in_pine
+    delay(
+      n_strand: ["horizon_wiki_ingestion", context.global_root_account_id],
+      singleton: "horizon_wiki_ingestion:#{context.global_id}:#{id}",
+      max_attempts: 3
+    ).ingest_to_pine
   end
 
   def ingest_to_pine

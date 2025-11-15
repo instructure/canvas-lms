@@ -28,18 +28,18 @@ module SectionRestrictionsHelper
     enrollment.limit_privileges_to_course_section?
   end
 
-  # Get section IDs where the user is enrolled as teacher/TA
-  def get_teacher_section_ids(course, user)
+  def get_user_section_ids(course, user)
     course.enrollments
-          .where(user:, type: ["TeacherEnrollment", "TaEnrollment"])
+          .active_or_pending
+          .where(user:)
           .pluck(:course_section_id)
   end
 
-  def get_students_in_teacher_sections(course, user)
-    teacher_section_ids = get_teacher_section_ids(course, user)
+  def get_visible_student_ids_in_course(course, user)
+    user_section_ids = get_user_section_ids(course, user)
 
     course.enrollments
-          .where(course_section_id: teacher_section_ids,
+          .where(course_section_id: user_section_ids,
                  type: ["StudentEnrollment", "StudentViewEnrollment"])
           .pluck(:user_id)
   end

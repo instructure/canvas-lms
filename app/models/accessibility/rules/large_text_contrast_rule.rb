@@ -20,7 +20,7 @@
 module Accessibility
   module Rules
     class LargeTextContrastRule < Accessibility::Rule
-      extend Accessibility::CssAttributesHelper
+      include Accessibility::CssAttributesHelper
 
       CONTRAST_THRESHOLD = 3.0
       LARGE_TEXT_MIN_SIZE_PX = 18.5
@@ -40,11 +40,12 @@ module Accessibility
 
         style_str = elem.attribute("style")&.value.to_s
         return nil if style_str.include?("display: none") || style_str.include?("visibility: hidden")
+        return nil unless large_text?(style_str)
 
-        return nil unless self.class.large_text?(style_str)
+        foreground = extract_color(style_str, "color") || "000000"
+        background = extract_background_color(style_str)
 
-        foreground = self.class.extract_color(style_str, "color") || "000000"
-        background = self.class.extract_color(style_str, "background-color") || "FFFFFF"
+        return nil if background.nil?
 
         contrast_ratio = WCAGColorContrast.ratio(foreground, background)
 
@@ -55,13 +56,19 @@ module Accessibility
 
       def form(elem)
         style_str = elem.attribute("style")&.value.to_s
-        foreground = self.class.extract_color(style_str, "color") || "000000"
-        background = self.class.extract_color(style_str, "background-color") || "FFFFFF"
+        background = extract_background_color(style_str)
+
+        foreground = if WCAGColorContrast.ratio("000000", background) >= CONTRAST_THRESHOLD
+                       "000000"
+                     else
+                       "FFFFFF"
+                     end
 
         Accessibility::Forms::ColorPickerField.new(
           title_label: I18n.t("Contrast Ratio"),
           input_label: I18n.t("New text color"),
           label: I18n.t("Change text color"),
+          action: I18n.t("Change text color"),
           undo_text: I18n.t("Color changed"),
           options: ["large"],
           background_color: "##{background}",
@@ -77,26 +84,25 @@ module Accessibility
         styles["color"] = value
 
         new_style = styles.map { |k, v| "#{k.strip}: #{v.strip}" }.join("; ") + ";"
-        return nil if new_style == style_str
 
         elem.set_attribute("style", new_style)
 
-        foreground = self.class.extract_color(new_style, "color") || "000000"
-        background = self.class.extract_color(style_str, "background-color") || "FFFFFF"
+        foreground = extract_color(new_style, "color") || "000000"
+        background = extract_background_color(style_str)
 
         contrast_ratio = WCAGColorContrast.ratio(foreground, background)
 
-        raise StandardError, "Insufficient contrast ratio (#{contrast_ratio})." if contrast_ratio < CONTRAST_THRESHOLD
+        raise StandardError, "Insufficient contrast ratio (#{contrast_ratio.round(2)})" if contrast_ratio < CONTRAST_THRESHOLD
 
         elem
       end
 
       def display_name
-        I18n.t("Large text contrast")
+        I18n.t("Low contrast")
       end
 
       def message
-        I18n.t("Text larger than 18pt (or bold 14pt) should display a minimum contrast ratio of 3:1.")
+        I18n.t("This text doesn’t stand out enough from the background. Use a color that provides more contrast so it's easier to read.")
       end
 
       def why
@@ -105,7 +111,7 @@ module Accessibility
 
       # Helper methods
 
-      def self.large_text?(style_str)
+      def large_text?(style_str)
         font_size = extract_font_size(style_str) || 16
         font_weight = extract_font_weight(style_str) || "normal"
 
@@ -116,31 +122,6 @@ module Accessibility
                      else
                        LARGE_TEXT_MIN_SIZE_PX
                      end
-      end
-
-      def self.update_style(style_str, property, value)
-        style_str ||= ""
-
-        if style_str.include?("#{property}:")
-          style_str.gsub(/#{property}:[^;]+;?/, "#{property}: #{value};")
-        else
-          "#{style_str.chomp(";")};#{property}: #{value};"
-        end
-      end
-
-      def self.suggest_accessible_colors(foreground, background)
-        fg_rgb = WCAGColorContrast.hex_to_rgb(foreground)
-        bg_rgb = WCAGColorContrast.hex_to_rgb(background)
-
-        fg_lum = WCAGColorContrast.relative_luminance(fg_rgb)
-        bg_lum = WCAGColorContrast.relative_luminance(bg_rgb)
-
-        new_foreground = if fg_lum < bg_lum
-                           "#000000"
-                         else
-                           "#FFFFFF"
-                         end
-        { foreground: new_foreground, background: }
       end
     end
   end

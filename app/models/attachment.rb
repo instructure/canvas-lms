@@ -199,6 +199,7 @@ class Attachment < ActiveRecord::Base
   # That means you can't rely on these happening in the same transaction as the save.
   after_save_and_attachment_processing :touch_context_if_appropriate
   after_save_and_attachment_processing :ensure_media_object
+  after_save_and_attachment_processing :index_in_pine, if: :should_index_in_pine?
 
   # this mixin can be added to a has_many :attachments association, and it'll
   # handle finding replaced attachments. In other words, if an attachment found
@@ -608,7 +609,7 @@ class Attachment < ActiveRecord::Base
 
   def set_word_count
     if word_count.nil? && !deleted? && file_state != "broken" && word_count_supported?
-      delay(singleton: "attachment_set_word_count_#{global_id}").update_word_count
+      delay(run_at: 5.minutes.from_now, singleton: "attachment_set_word_count_#{global_id}").update_word_count
     end
   end
 
@@ -617,7 +618,12 @@ class Attachment < ActiveRecord::Base
   end
 
   def update_word_count
-    update_column(:word_count, calculate_words)
+    if word_count
+      InstStatsd::Statsd.distributed_increment("attachment.update_word_count", tags: { source: "DocViewer" })
+    else
+      InstStatsd::Statsd.distributed_increment("attachment.update_word_count", tags: { source: "Canvas" })
+      update_column(:word_count, calculate_words)
+    end
   end
 
   def namespace
@@ -2100,10 +2106,21 @@ class Attachment < ActiveRecord::Base
 
     if canvadocable?
       doc = canvadoc || create_canvadoc
-      doc.upload({
-                   annotatable: opts[:wants_annotation],
-                   preferred_plugins: opts[:preferred_plugins]
-                 })
+      upload_opts = {
+        annotatable: opts[:wants_annotation],
+        preferred_plugins: opts[:preferred_plugins]
+      }
+
+      # Add canvas_metadata for submission attachments to enable word count updates
+      if (submission = assignment_submissions.first)
+        assignment = submission.assignment
+        upload_opts[:canvas_metadata] = {
+          base_url: "#{HostUrl.protocol}://#{HostUrl.context_host(assignment.context)}",
+          attachment_jwt: CanvasSecurity.create_jwt({ id: }, 1.hour.from_now)
+        }
+      end
+
+      doc.upload(upload_opts)
       update_attribute(:workflow_state, "processing")
     end
   rescue => e
@@ -2682,6 +2699,25 @@ class Attachment < ActiveRecord::Base
     vl = context.files_visibility_option if vl == "inherit"
     vl = "context" if vl == context.class.name.downcase
     vl
+  end
+
+  def should_index_in_pine?
+    return false unless context.is_a?(Course)
+    return false unless context.horizon_course?
+    return false unless context.root_account.feature_enabled?(:horizon_learning_object_ingestion_on_change)
+    return false unless PineClient.enabled?
+    return false unless file_state == "available"
+    return false unless PineClient.allowed_attachment_content_types.include?(content_type)
+
+    true
+  end
+
+  def index_in_pine
+    delay(
+      n_strand: ["horizon_file_ingestion", context.global_root_account_id],
+      singleton: "horizon_file_ingestion:#{context.global_id}:#{id}",
+      max_attempts: 3
+    ).ingest_to_pine
   end
 
   private

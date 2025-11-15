@@ -16,13 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Flex } from '@instructure/ui-flex'
-import { Checkbox } from '@instructure/ui-checkbox'
+import {Flex} from '@instructure/ui-flex'
+import {Checkbox} from '@instructure/ui-checkbox'
 
-import React, { useState } from 'react'
-import { useScope as createI18nScope } from '@canvas/i18n'
+import {useState} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import TranslationOptions from './TranslationOptions'
 import useTranslationDisplay from '../../hooks/useTranslationDisplay'
+import {NutritionFacts} from '@canvas/nutrition-facts/react/NutritionFacts'
+import {AiInfo} from '@instructure.ai/aiinfo'
+
+declare const ENV: Global & {
+  cedar_translation?: boolean
+}
 
 const I18n = createI18nScope('conversations_2')
 
@@ -39,15 +45,17 @@ export interface Language {
 const TranslationControls = (props: TranslationControlsProps) => {
   const [includeTranslation, setIncludeTranslation] = useState(false)
 
-  const { handleIsPrimaryChange, primary } = useTranslationDisplay({
+  const {handleIsPrimaryChange, primary} = useTranslationDisplay({
     signature: props.signature,
     inboxSettingsFeature: props.inboxSettingsFeature,
-    includeTranslation
+    includeTranslation,
   })
+
+  const inboxTranslationInfo = AiInfo.canvasinboxtranslation
 
   return (
     <>
-      <Flex alignItems="start" padding="small small small">
+      <Flex alignItems="center" padding="small small small" gap="small">
         <Flex.Item>
           <Checkbox
             label={I18n.t('Include translated version of this message')}
@@ -57,12 +65,26 @@ const TranslationControls = (props: TranslationControlsProps) => {
             onChange={() => setIncludeTranslation(!includeTranslation)}
           />
         </Flex.Item>
+        {ENV?.cedar_translation && inboxTranslationInfo && (
+          <Flex.Item>
+            <NutritionFacts
+              aiInformation={inboxTranslationInfo.aiInformation}
+              dataPermissionLevels={inboxTranslationInfo.dataPermissionLevels}
+              nutritionFacts={inboxTranslationInfo.nutritionFacts}
+              iconSize={24}
+              responsiveProps={{
+                fullscreenModals: false,
+                color: 'primary',
+                buttonColor: 'primary',
+                withBackground: false,
+                domElement: 'inbox_nutrition_facts_container',
+              }}
+            />
+          </Flex.Item>
+        )}
       </Flex>
       {includeTranslation && (
-        <TranslationOptions
-          asPrimary={primary}
-          onSetPrimary={handleIsPrimaryChange}
-        />
+        <TranslationOptions asPrimary={primary} onSetPrimary={handleIsPrimaryChange} />
       )}
     </>
   )

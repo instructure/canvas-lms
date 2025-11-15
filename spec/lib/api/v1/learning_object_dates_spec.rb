@@ -137,8 +137,14 @@ describe Api::V1::LearningObjectDates do
 
       context "with overrides" do
         before do
+          @parent_override = assignment.assignment_overrides.create!(
+            course_section: section,
+            due_at: "2025-09-10T18:00:00Z",
+            due_at_overridden: true
+          )
           @peer_review_override = assignment.peer_review_sub_assignment.assignment_overrides.create!(
             course_section: section,
+            parent_override: @parent_override,
             due_at: "2025-09-12T18:00:00Z",
             unlock_at: "2025-09-07T08:00:00Z",
             lock_at: "2025-09-17T18:00:00Z",
@@ -168,8 +174,14 @@ describe Api::V1::LearningObjectDates do
 
       context "when assignment has inactive overrides" do
         before do
+          parent_override = assignment.assignment_overrides.create!(
+            course_section: section,
+            due_at: "2025-09-14T18:00:00Z",
+            workflow_state: "deleted"
+          )
           assignment.peer_review_sub_assignment.assignment_overrides.create!(
             course_section: section,
+            parent_override:,
             due_at: "2025-09-15T18:00:00Z",
             workflow_state: "deleted"
           )

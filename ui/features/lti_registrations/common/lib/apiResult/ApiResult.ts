@@ -154,7 +154,8 @@ export const formatApiResultError = (error: UnsuccessfulApiResult): string => {
 }
 
 /**
- * Applies a function to the data of an `ApiResult` if it is a success
+ * Applies a function to the data of an `ApiResult` if it is a success. If the mapped
+ * function throws, an UnsuccessfulApiResult is returned with the throw error.
  * @param result
  * @param f
  * @returns

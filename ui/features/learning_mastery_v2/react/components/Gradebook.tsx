@@ -149,7 +149,12 @@ export const Gradebook: React.FC<GradebookProps> = ({
           }}
           width={outcomes.length * COLUMN_WIDTH}
         >
-          <ScoresGrid students={students} outcomes={outcomes} rollups={rollups} />
+          <ScoresGrid
+            students={students}
+            outcomes={outcomes}
+            rollups={rollups}
+            scoreDisplayFormat={gradebookSettings.scoreDisplayFormat}
+          />
         </View>
       </View>
       {pagination && pagination.totalPages > 1 && (

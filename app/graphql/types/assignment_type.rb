@@ -101,6 +101,15 @@ module Types
 
         object.peer_review_submission_required
       end
+      field :across_sections,
+            Boolean,
+            "Boolean indicating if peer reviews can be assigned across different sections",
+            null: true
+      def across_sections
+        return nil unless object.context.feature_enabled?(:peer_review_allocation)
+
+        object.peer_review_across_sections
+      end
     end
 
     class AssignmentModeratedGrading < ApplicationObjectType
@@ -907,10 +916,14 @@ module Types
     def assigned_students(filter: {})
       return nil unless assignment.context.grants_right?(current_user, :manage_grades)
 
-      search_term = filter[:search_term].presence
-      scope = assignment.students_with_visibility(assignment.context.participating_students_by_date.not_fake_student)
+      base_scope = assignment.context.participating_students_by_date.not_fake_student
+      visible_students_subquery = assignment.context.apply_enrollment_visibility(base_scope, current_user)
+                                            .select("users.*")
 
-      if search_term
+      scope = User.from("(#{visible_students_subquery.to_sql}) AS users")
+      scope = assignment.students_with_visibility(scope)
+
+      if (search_term = filter[:search_term].presence)
         scope = scope.name_like(search_term, "peer_review")
       end
 

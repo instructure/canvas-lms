@@ -223,7 +223,7 @@ module Lti
 
     def concluded_course_enrollments
       @concluded_course_enrollments ||=
-        (course && @user) ? @user.enrollments.concluded.where(course_id: course.id).shard(course.shard) : []
+        (course && @user) ? @user.enrollments.completed_by_date.where(course_id: course.id).shard(course.shard) : []
     end
 
     def concluded_lis_roles

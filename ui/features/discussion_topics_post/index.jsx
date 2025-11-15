@@ -24,7 +24,6 @@ import ReactDOM from 'react-dom'
 import DiscussionTopicKeyboardShortcutModal from './react/KeyboardShortcuts/DiscussionTopicKeyboardShortcutModal'
 import {Portal} from '@instructure/ui-portal'
 import {mountNutritionFacts} from '@canvas/nutrition-facts'
-import {DISCUSSION_TRANSLATION_NUTRITION_DATA} from './discussionTranslationNutritionData'
 
 function DiscussionPageLayout({navbarHeight}) {
   return (
@@ -82,7 +81,7 @@ export const adjustFooter = () => {
 
 ready(() => {
   if (ENV?.cedar_translation) {
-    mountNutritionFacts(DISCUSSION_TRANSLATION_NUTRITION_DATA)
+    mountNutritionFacts('canvascoursetranslation')
   }
   document.querySelector('body')?.classList.add('full-width')
   document.querySelector('div.ic-Layout-contentMain')?.classList.remove('ic-Layout-contentMain')

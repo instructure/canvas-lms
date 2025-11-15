@@ -865,4 +865,198 @@ describe Assignment do
       end
     end
   end
+
+  describe "peer review sub assignment sync" do
+    before :once do
+      @course = course_factory(active_all: true)
+      @course.enable_feature!(:peer_review_grading)
+      @parent_assignment = @course.assignments.create!(
+        title: "Parent Assignment",
+        peer_reviews: true,
+        anonymous_peer_reviews: false,
+        automatic_peer_reviews: false
+      )
+      @peer_review_sub = PeerReviewSubAssignment.create!(
+        parent_assignment: @parent_assignment,
+        title: "Parent Assignment Peer Review"
+      )
+    end
+
+    describe "#should_sync_peer_review_sub_assignment?" do
+      it "returns false when feature flag is disabled" do
+        @course.disable_feature!(:peer_review_grading)
+        @parent_assignment.description = "New description"
+        @parent_assignment.save!
+        expect(@parent_assignment.send(:should_sync_peer_review_sub_assignment?)).to be false
+      end
+
+      it "returns false when peer_review_sub_assignment does not exist" do
+        assignment = @course.assignments.create!(title: "No Peer Review")
+        assignment.description = "New description"
+        assignment.save!
+        expect(assignment.send(:should_sync_peer_review_sub_assignment?)).to be false
+      end
+
+      it "returns false when no sync attributes changed" do
+        @parent_assignment.points_possible = 100
+        @parent_assignment.save!
+        expect(@parent_assignment.send(:should_sync_peer_review_sub_assignment?)).to be false
+      end
+
+      it "returns true when sync attributes changed and conditions met" do
+        @parent_assignment.description = "New description"
+        @parent_assignment.save!
+        expect(@parent_assignment.send(:should_sync_peer_review_sub_assignment?)).to be true
+      end
+    end
+
+    describe "#sync_peer_review_sub_assignment" do
+      it "syncs anonymous_peer_reviews when changed" do
+        @parent_assignment.update!(anonymous_peer_reviews: true)
+        expect(@peer_review_sub.reload.anonymous_peer_reviews).to be true
+      end
+
+      it "syncs automatic_peer_reviews when changed" do
+        @parent_assignment.update!(automatic_peer_reviews: true)
+        expect(@peer_review_sub.reload.automatic_peer_reviews).to be true
+      end
+
+      it "syncs description when changed" do
+        @parent_assignment.update!(description: "New description")
+        expect(@peer_review_sub.reload.description).to eq "New description"
+      end
+
+      it "syncs workflow_state when changed" do
+        @parent_assignment.update!(workflow_state: "deleted")
+        expect(@peer_review_sub.reload.workflow_state).to eq "deleted"
+      end
+
+      it "syncs peer_reviews_due_at when changed" do
+        due_date = 3.days.from_now
+        @parent_assignment.update!(peer_reviews_due_at: due_date)
+        expect(@peer_review_sub.reload.peer_reviews_due_at).to be_within(1.second).of(due_date)
+      end
+
+      it "syncs assignment_group_id when changed" do
+        new_group = @course.assignment_groups.create!(name: "New Group")
+        @parent_assignment.update!(assignment_group_id: new_group.id)
+        expect(@peer_review_sub.reload.assignment_group_id).to eq new_group.id
+      end
+
+      it "syncs group_category_id when changed" do
+        group_category = @course.group_categories.create!(name: "Test Category")
+        @parent_assignment.update!(group_category_id: group_category.id)
+        expect(@peer_review_sub.reload.group_category_id).to eq group_category.id
+      end
+
+      it "syncs context_id and context_type when changed" do
+        new_course = course_factory(active_all: true)
+        new_course.enable_feature!(:peer_review_grading)
+        @parent_assignment.update!(context: new_course)
+        @peer_review_sub.reload
+        expect(@peer_review_sub.context_id).to eq new_course.id
+        expect(@peer_review_sub.context_type).to eq "Course"
+      end
+
+      it "syncs intra_group_peer_reviews when changed" do
+        @parent_assignment.update!(intra_group_peer_reviews: true)
+        expect(@peer_review_sub.reload.intra_group_peer_reviews).to be true
+      end
+
+      it "syncs peer_review_count when changed" do
+        @parent_assignment.update!(peer_review_count: 5)
+        expect(@peer_review_sub.reload.peer_review_count).to eq 5
+      end
+
+      it "syncs peer_reviews when changed" do
+        @parent_assignment.update!(peer_reviews: false)
+        expect(@peer_review_sub.reload.peer_reviews).to be false
+      end
+
+      it "syncs peer_reviews_assigned when changed" do
+        @parent_assignment.update!(peer_reviews_assigned: true)
+        expect(@peer_review_sub.reload.peer_reviews_assigned).to be true
+      end
+
+      it "syncs title when parent title changes" do
+        @parent_assignment.update!(title: "Updated Assignment")
+        @peer_review_sub.reload
+        expect(@peer_review_sub.title).to eq "Updated Assignment Peer Review"
+      end
+
+      it "syncs multiple attributes at once" do
+        @parent_assignment.update!(
+          description: "New description",
+          anonymous_peer_reviews: true,
+          peer_review_count: 3
+        )
+        @peer_review_sub.reload
+        expect(@peer_review_sub.description).to eq "New description"
+        expect(@peer_review_sub.anonymous_peer_reviews).to be true
+        expect(@peer_review_sub.peer_review_count).to eq 3
+      end
+
+      it "does not sync points_possible" do
+        @peer_review_sub.update!(points_possible: 10)
+        @parent_assignment.update!(points_possible: 100)
+        expect(@peer_review_sub.reload.points_possible).to eq 10
+      end
+
+      it "does not sync grading_type" do
+        @peer_review_sub.update!(grading_type: "not_graded")
+        @parent_assignment.update!(grading_type: "letter_grade")
+        expect(@peer_review_sub.reload.grading_type).to eq "not_graded"
+      end
+
+      it "does not sync due_at" do
+        new_due = 5.days.from_now
+        @parent_assignment.update!(due_at: new_due)
+        expect(@peer_review_sub.reload.due_at).to be_nil
+      end
+
+      it "does not sync unlock_at" do
+        new_unlock = 1.day.from_now
+        @parent_assignment.update!(unlock_at: new_unlock)
+        expect(@peer_review_sub.reload.unlock_at).to be_nil
+      end
+
+      it "does not sync lock_at" do
+        new_lock = 10.days.from_now
+        @parent_assignment.update!(lock_at: new_lock)
+        expect(@peer_review_sub.reload.lock_at).to be_nil
+      end
+
+      it "does not sync when attributes have not actually changed" do
+        expect(@peer_review_sub).not_to receive(:update_columns)
+        @parent_assignment.update!(points_possible: 50)
+      end
+
+      it "handles multiple rapid updates correctly" do
+        @parent_assignment.update!(description: "First update")
+        @parent_assignment.update!(description: "Second update")
+        @parent_assignment.update!(description: "Third update")
+        expect(@peer_review_sub.reload.description).to eq "Third update"
+      end
+
+      it "works through any interface" do
+        @parent_assignment.description = "Updated via attribute"
+        @parent_assignment.save!
+        expect(@peer_review_sub.reload.description).to eq "Updated via attribute"
+
+        @parent_assignment.update_attribute(:anonymous_peer_reviews, true)
+        expect(@peer_review_sub.reload.anonymous_peer_reviews).to be true
+      end
+
+      it "rolls back parent changes when peer review sync fails" do
+        original_description = @parent_assignment.description
+        allow(PeerReview::PeerReviewUpdaterService).to receive(:call).and_raise(StandardError.new("Sync failed"))
+
+        expect do
+          @parent_assignment.update!(description: "New description")
+        end.to raise_error(StandardError, "Sync failed")
+
+        expect(@parent_assignment.reload.description).to eq original_description
+      end
+    end
+  end
 end

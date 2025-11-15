@@ -17,12 +17,22 @@
  */
 
 import {renderHook, act} from '@testing-library/react-hooks/dom'
-import {usePeerReviewSettings, MAX_NUM_PEER_REVIEWS} from '../usePeerReviewSettings'
+import {
+  usePeerReviewSettings,
+  MAX_NUM_PEER_REVIEWS,
+  type PeerReviewSettings,
+} from '../usePeerReviewSettings'
 
 describe('usePeerReviewSettings', () => {
-  const defaultProps = (): {peerReviewCount: number; submissionRequired: boolean} => ({
-    peerReviewCount: 0,
-    submissionRequired: false,
+  const defaultProps = (): PeerReviewSettings => ({
+    reviewsRequired: 1,
+    pointsPerReview: 0,
+    totalPoints: 0,
+    allowPeerReviewAcrossMultipleSections: true,
+    allowPeerReviewWithinGroups: false,
+    usePassFailGrading: false,
+    anonymousPeerReviews: false,
+    submissionRequiredBeforePeerReviews: false,
   })
 
   it('initializes with default values', () => {
@@ -33,32 +43,253 @@ describe('usePeerReviewSettings', () => {
     expect(result.current.totalPoints).toBe('0')
     expect(result.current.errorMessageReviewsRequired).toBeUndefined()
     expect(result.current.errorMessagePointsPerReview).toBeUndefined()
-    expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(false)
+    expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(true)
     expect(result.current.allowPeerReviewWithinGroups).toBe(false)
     expect(result.current.usePassFailGrading).toBe(false)
     expect(result.current.anonymousPeerReviews).toBe(false)
-    expect(result.current.submissionsRequiredBeforePeerReviews).toBe(false)
+    expect(result.current.submissionRequiredBeforePeerReviews).toBe(false)
   })
 
-  it('sets initial reviewsRequired based on peerReviewCount prop', () => {
+  it('sets initial reviewsRequired based on reviewsRequired prop', () => {
     const {result} = renderHook(() =>
-      usePeerReviewSettings({...defaultProps(), peerReviewCount: 3}),
+      usePeerReviewSettings({...defaultProps(), reviewsRequired: 3}),
     )
     expect(result.current.reviewsRequired).toBe('3')
   })
 
-  it('sets initial submissionsRequiredBeforePeerReviews to false when submissionRequired is false', () => {
+  it('sets initial submissionRequiredBeforePeerReviews to false when submissionRequired is false', () => {
     const {result} = renderHook(() =>
-      usePeerReviewSettings({...defaultProps(), submissionRequired: false}),
+      usePeerReviewSettings({...defaultProps(), submissionRequiredBeforePeerReviews: false}),
     )
-    expect(result.current.submissionsRequiredBeforePeerReviews).toBe(false)
+    expect(result.current.submissionRequiredBeforePeerReviews).toBe(false)
   })
 
-  it('sets initial submissionsRequiredBeforePeerReviews to true when submissionRequired is true', () => {
+  it('sets initial submissionRequiredBeforePeerReviews to true when submissionRequired is true', () => {
     const {result} = renderHook(() =>
-      usePeerReviewSettings({...defaultProps(), submissionRequired: true}),
+      usePeerReviewSettings({...defaultProps(), submissionRequiredBeforePeerReviews: true}),
     )
-    expect(result.current.submissionsRequiredBeforePeerReviews).toBe(true)
+    expect(result.current.submissionRequiredBeforePeerReviews).toBe(true)
+  })
+
+  it('sets initial pointsPerReview based on pointsPerReview prop', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), pointsPerReview: 15}),
+    )
+    expect(result.current.pointsPerReview).toBe('15')
+  })
+
+  describe('pointsPerReview formatting', () => {
+    it('formats initial pointsPerReview with 2 decimals when value has more decimals', () => {
+      const {result} = renderHook(() =>
+        usePeerReviewSettings({...defaultProps(), pointsPerReview: 1.123}),
+      )
+      expect(result.current.pointsPerReview).toBe('1.12')
+    })
+
+    it('rounds up to 2 decimals when third decimal is >= 5', () => {
+      const {result} = renderHook(() =>
+        usePeerReviewSettings({...defaultProps(), pointsPerReview: 1.126}),
+      )
+      expect(result.current.pointsPerReview).toBe('1.13')
+    })
+
+    it('formats initial pointsPerReview as integer when value rounds to whole number', () => {
+      const {result} = renderHook(() =>
+        usePeerReviewSettings({...defaultProps(), pointsPerReview: 7.999}),
+      )
+      expect(result.current.pointsPerReview).toBe('8')
+    })
+
+    it('formats zero as "0" without decimals', () => {
+      const {result} = renderHook(() =>
+        usePeerReviewSettings({...defaultProps(), pointsPerReview: 0}),
+      )
+      expect(result.current.pointsPerReview).toBe('0')
+    })
+
+    it('formats integer values without decimal places', () => {
+      const {result} = renderHook(() =>
+        usePeerReviewSettings({...defaultProps(), pointsPerReview: 5}),
+      )
+      expect(result.current.pointsPerReview).toBe('5')
+    })
+
+    it('formats value after validation on blur', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      // Simulate user entering a value with many decimals
+      act(() => {
+        result.current.handlePointsPerReviewChange(
+          {} as React.ChangeEvent<HTMLInputElement>,
+          '3.14159',
+        )
+      })
+
+      expect(result.current.pointsPerReview).toBe('3.14159') // Not formatted yet
+
+      act(() => {
+        const mockEvent = {
+          target: {
+            value: '3.14159',
+            validity: {valid: true},
+          },
+        } as React.FocusEvent<HTMLInputElement>
+        result.current.validatePointsPerReview(mockEvent)
+      })
+
+      expect(result.current.pointsPerReview).toBe('3.14') // Formatted to 2 decimals
+      expect(result.current.errorMessagePointsPerReview).toBeUndefined()
+    })
+
+    it('formats value that rounds to integer after validation', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handlePointsPerReviewChange(
+          {} as React.ChangeEvent<HTMLInputElement>,
+          '7.999',
+        )
+      })
+
+      act(() => {
+        const mockEvent = {
+          target: {
+            value: '7.999',
+            validity: {valid: true},
+          },
+        } as React.FocusEvent<HTMLInputElement>
+        result.current.validatePointsPerReview(mockEvent)
+      })
+
+      expect(result.current.pointsPerReview).toBe('8') // Formatted as integer, no decimals
+      expect(result.current.errorMessagePointsPerReview).toBeUndefined()
+    })
+
+    it('formats value when validation fails and shows error', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handlePointsPerReviewChange(
+          {} as React.ChangeEvent<HTMLInputElement>,
+          '-5.123',
+        )
+      })
+
+      act(() => {
+        const mockEvent = {
+          target: {
+            value: '-5.123',
+            validity: {valid: true},
+          },
+        } as React.FocusEvent<HTMLInputElement>
+        result.current.validatePointsPerReview(mockEvent)
+      })
+
+      expect(result.current.pointsPerReview).toBe('-5.12')
+      expect(result.current.errorMessagePointsPerReview).toBe(
+        'Points per review cannot be negative.',
+      )
+    })
+  })
+
+  it('calculates totalPoints based on initial reviewsRequired and pointsPerReview', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), reviewsRequired: 3, pointsPerReview: 10}),
+    )
+    expect(result.current.totalPoints).toBe('30')
+  })
+
+  it('sets initial allowPeerReviewAcrossMultipleSections to true', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), allowPeerReviewAcrossMultipleSections: true}),
+    )
+    expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(true)
+  })
+
+  it('sets initial allowPeerReviewAcrossMultipleSections to false', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), allowPeerReviewAcrossMultipleSections: false}),
+    )
+    expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(false)
+  })
+
+  it('sets initial allowPeerReviewWithinGroups to true', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), allowPeerReviewWithinGroups: true}),
+    )
+    expect(result.current.allowPeerReviewWithinGroups).toBe(true)
+  })
+
+  it('sets initial allowPeerReviewWithinGroups to false', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), allowPeerReviewWithinGroups: false}),
+    )
+    expect(result.current.allowPeerReviewWithinGroups).toBe(false)
+  })
+
+  it('sets initial usePassFailGrading to true', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), usePassFailGrading: true}),
+    )
+    expect(result.current.usePassFailGrading).toBe(true)
+  })
+
+  it('sets initial usePassFailGrading to false', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), usePassFailGrading: false}),
+    )
+    expect(result.current.usePassFailGrading).toBe(false)
+  })
+
+  it('sets initial anonymousPeerReviews to true', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), anonymousPeerReviews: true}),
+    )
+    expect(result.current.anonymousPeerReviews).toBe(true)
+  })
+
+  it('sets initial anonymousPeerReviews to false', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), anonymousPeerReviews: false}),
+    )
+    expect(result.current.anonymousPeerReviews).toBe(false)
+  })
+
+  it('sets multiple initial values at once', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({
+        reviewsRequired: 5,
+        pointsPerReview: 10,
+        totalPoints: 50,
+        allowPeerReviewAcrossMultipleSections: true,
+        allowPeerReviewWithinGroups: true,
+        usePassFailGrading: true,
+        anonymousPeerReviews: true,
+        submissionRequiredBeforePeerReviews: true,
+      }),
+    )
+    expect(result.current.reviewsRequired).toBe('5')
+    expect(result.current.pointsPerReview).toBe('10')
+    expect(result.current.totalPoints).toBe('50')
+    expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(true)
+    expect(result.current.allowPeerReviewWithinGroups).toBe(true)
+    expect(result.current.usePassFailGrading).toBe(true)
+    expect(result.current.anonymousPeerReviews).toBe(true)
+    expect(result.current.submissionRequiredBeforePeerReviews).toBe(true)
+  })
+
+  it('sets initial allowPeerReviewAcrossMultipleSections to true when acrossSections is true', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), allowPeerReviewAcrossMultipleSections: true}),
+    )
+    expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(true)
+  })
+
+  it('sets initial allowPeerReviewAcrossMultipleSections to false when acrossSections is false', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), allowPeerReviewAcrossMultipleSections: false}),
+    )
+    expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(false)
   })
 
   describe('reviews required validation', () => {
@@ -607,7 +838,7 @@ describe('usePeerReviewSettings', () => {
         } as React.ChangeEvent<HTMLInputElement>)
       })
 
-      expect(result.current.submissionsRequiredBeforePeerReviews).toBe(true)
+      expect(result.current.submissionRequiredBeforePeerReviews).toBe(true)
 
       act(() => {
         result.current.handleSubmissionRequiredCheck({
@@ -615,7 +846,7 @@ describe('usePeerReviewSettings', () => {
         } as React.ChangeEvent<HTMLInputElement>)
       })
 
-      expect(result.current.submissionsRequiredBeforePeerReviews).toBe(false)
+      expect(result.current.submissionRequiredBeforePeerReviews).toBe(false)
     })
   })
 
@@ -647,7 +878,7 @@ describe('usePeerReviewSettings', () => {
 
       act(() => {
         result.current.handleCrossSectionsCheck({
-          target: {checked: true},
+          target: {checked: false},
         } as React.ChangeEvent<HTMLInputElement>)
         result.current.handleInterGroupCheck({
           target: {checked: true},
@@ -667,11 +898,11 @@ describe('usePeerReviewSettings', () => {
       expect(result.current.pointsPerReview).toBe('-5')
       expect(result.current.errorMessageReviewsRequired).toBeDefined()
       expect(result.current.errorMessagePointsPerReview).toBeDefined()
-      expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(true)
+      expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(false)
       expect(result.current.allowPeerReviewWithinGroups).toBe(true)
       expect(result.current.usePassFailGrading).toBe(true)
       expect(result.current.anonymousPeerReviews).toBe(true)
-      expect(result.current.submissionsRequiredBeforePeerReviews).toBe(true)
+      expect(result.current.submissionRequiredBeforePeerReviews).toBe(true)
 
       act(() => {
         result.current.resetFields()
@@ -681,11 +912,11 @@ describe('usePeerReviewSettings', () => {
       expect(result.current.pointsPerReview).toBe('0')
       expect(result.current.errorMessageReviewsRequired).toBeUndefined()
       expect(result.current.errorMessagePointsPerReview).toBeUndefined()
-      expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(false)
+      expect(result.current.allowPeerReviewAcrossMultipleSections).toBe(true)
       expect(result.current.allowPeerReviewWithinGroups).toBe(false)
       expect(result.current.usePassFailGrading).toBe(false)
       expect(result.current.anonymousPeerReviews).toBe(false)
-      expect(result.current.submissionsRequiredBeforePeerReviews).toBe(false)
+      expect(result.current.submissionRequiredBeforePeerReviews).toBe(false)
     })
   })
 })

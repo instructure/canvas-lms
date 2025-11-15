@@ -26,6 +26,6 @@ module GitbookDecorator
   # @param text [String] the hint text
   # @return [String] the hint in Gitbook format
   def hint(hint_style, text)
-    "{% hint style=\"#{hint_style}\" %} #{text} {% endhint %}"
+    "{% hint style=\"#{hint_style}\" %}\n#{text}\n{% endhint %}"
   end
 end

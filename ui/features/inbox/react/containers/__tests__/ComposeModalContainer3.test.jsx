@@ -32,6 +32,7 @@ import * as uploadFileModule from '@canvas/upload-file'
 jest.mock('@canvas/upload-file')
 
 jest.mock('../../../util/utils', () => ({
+  ...jest.requireActual('../../../util/utils'),
   responsiveQuerySizes: jest.fn().mockReturnValue({
     desktop: {minWidth: '768px'},
   }),

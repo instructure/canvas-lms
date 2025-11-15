@@ -138,6 +138,37 @@ describe "Importers::QuizImporter" do
           expect(quiz.assignment.settings).to be_nil
         end
 
+        it "uses quiz migration_id for assignment when qti_new_quiz is true" do
+          quiz_migration_id = "quiz_migration_id_123"
+          assignment_migration_id = "assignment_migration_id_456"
+
+          data[:migration_id] = quiz_migration_id
+          data[:qti_new_quiz] = true
+          data[:assignment][:migration_id] = assignment_migration_id
+
+          Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+          quiz = Quizzes::Quiz.where(migration_id: quiz_migration_id).first
+
+          # The assignment should use the quiz's migration_id, not its own
+          expect(quiz.assignment.migration_id).to eq(quiz_migration_id)
+          expect(quiz.assignment.migration_id).not_to eq(assignment_migration_id)
+        end
+
+        it "uses assignment migration_id when qti_new_quiz is false" do
+          quiz_migration_id = "quiz_migration_id_123"
+          assignment_migration_id = "assignment_migration_id_456"
+
+          data[:migration_id] = quiz_migration_id
+          data[:qti_new_quiz] = false
+          data[:assignment][:migration_id] = assignment_migration_id
+
+          Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+          quiz = Quizzes::Quiz.where(migration_id: quiz_migration_id).first
+
+          # The assignment should keep its own migration_id
+          expect(quiz.assignment.migration_id).to eq(assignment_migration_id)
+        end
+
         context "is import_quizzes_next" do
           before do
             allow(@migration)

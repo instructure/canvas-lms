@@ -1225,9 +1225,9 @@ class AbstractAssignment < ActiveRecord::Base
       muted
       intra_group_peer_reviews
       anonymous_grading
-      peer_review_submission_required
       peer_review_across_sections
     ].each { |attr| self[attr] = false if self[attr].nil? }
+    self.peer_review_submission_required = true if peer_review_submission_required.nil?
     self.graders_anonymous_to_graders = false unless grader_comments_visible_to_graders
   end
   protected :default_values

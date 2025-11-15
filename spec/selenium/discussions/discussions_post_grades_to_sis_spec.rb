@@ -39,6 +39,9 @@ shared_examples "sync grades to sis" do |ff_enabled|
   end
 
   before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
     course_with_admin_logged_in
     mock_feature_flag(:post_grades, true)
     @course.sis_source_id = "xyz"

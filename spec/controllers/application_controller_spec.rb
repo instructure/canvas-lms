@@ -3842,19 +3842,26 @@ RSpec.describe ApplicationController, "#add_ignite_agent_bundle?" do
     expect(controller.send(:add_ignite_agent_bundle?)).to be false
   end
 
-  it "returns false when user lacks access_ignite_agent permission" do
-    account.enable_feature!(:ignite_agent_enabled)
-    expect(controller.send(:add_ignite_agent_bundle?)).to be false
-  end
-
-  it "returns true when user has access_ignite_agent permission" do
+  it "returns true when user has manage_account_settings permission" do
     account.enable_feature!(:ignite_agent_enabled)
     account.role_overrides.create!(
-      permission: :access_ignite_agent,
+      permission: :manage_account_settings,
       role: admin_role,
       enabled: true
     )
     account.account_users.create!(user:, role: admin_role)
+
+    expect(controller.send(:add_ignite_agent_bundle?)).to be true
+  end
+
+  it "returns false when user lacks manage_account_settings and ignite_agent_enabled_for_user feature flag" do
+    account.enable_feature!(:ignite_agent_enabled)
+    expect(controller.send(:add_ignite_agent_bundle?)).to be false
+  end
+
+  it "returns true when user has ignite_agent_enabled_for_user feature flag" do
+    account.enable_feature!(:ignite_agent_enabled)
+    user.enable_feature!(:ignite_agent_enabled_for_user)
 
     expect(controller.send(:add_ignite_agent_bundle?)).to be true
   end

@@ -97,12 +97,19 @@ module Types
       object.discussions_splitscreen_view?
     end
 
-    field :avatar_url, UrlType, null: true
+    field :widget_dashboard_config, String, null: true
+    def widget_dashboard_config
+      config = object.get_preference(:widget_dashboard_config)
+      config&.to_json
+    end
 
+    field :avatar_url, UrlType, null: true
     def avatar_url
-      Loaders::AssociationLoader.for(User, :pseudonym).load(object).then do
+      load_association(:pseudonym).then do
         if object.account.service_enabled?(:avatars)
-          AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: false)
+          load_association(:associated_root_accounts).then do
+            AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: false)
+          end
         else
           nil
         end
@@ -134,7 +141,11 @@ module Types
     field :email, String, null: true
 
     def email
-      return nil unless object.grants_all_rights?(context[:current_user], :read_profile, :read_email_addresses)
+      domain_root_account = context[:domain_root_account]
+      course = context[:course]
+      return unless domain_root_account.grants_right?(context[:current_user], :read_email_addresses) ||
+                    course&.grants_right?(context[:current_user], :read_email_addresses) ||
+                    object.grants_right?(context[:current_user], :read_email_addresses)
 
       return object.email if object.email_cached?
 

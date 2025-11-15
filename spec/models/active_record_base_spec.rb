@@ -1030,11 +1030,11 @@ describe ActiveRecord::Base do
       end
 
       it "invokes the create callbacks" do
-        user = User.new(workflow_state: 0)
+        account = Account.new(workflow_state: 0)
 
-        expect(user).to receive(:set_default_feature_flags)
+        expect(account).to receive(:create_default_objects)
 
-        user.insert
+        account.insert
       end
     end
 

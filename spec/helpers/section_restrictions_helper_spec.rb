@@ -96,53 +96,60 @@ describe SectionRestrictionsHelper do
     end
   end
 
-  describe "#get_teacher_section_ids" do
-    it "returns section IDs for single-section teacher" do
-      section_ids = get_teacher_section_ids(@course, @restricted_teacher)
+  describe "#get_user_section_ids" do
+    it "returns section IDs for single-section user" do
+      section_ids = get_user_section_ids(@course, @restricted_teacher)
       expect(section_ids).to eq([@section1.id])
     end
 
-    it "returns multiple section IDs for multi-section teacher" do
-      section_ids = get_teacher_section_ids(@course, @multi_section_teacher)
+    it "returns multiple section IDs for multi-section usre" do
+      section_ids = get_user_section_ids(@course, @multi_section_teacher)
       expect(section_ids).to match_array([@section1.id, @section2.id])
-    end
-
-    it "returns section IDs for TAs" do
-      section_ids = get_teacher_section_ids(@course, @ta)
-      expect(section_ids).to eq([@section2.id])
-    end
-
-    it "returns empty array for students" do
-      section_ids = get_teacher_section_ids(@course, @student1)
-      expect(section_ids).to be_empty
     end
 
     it "returns empty array for users not enrolled in course" do
       other_user = user_factory(active_all: true)
-      section_ids = get_teacher_section_ids(@course, other_user)
+      section_ids = get_user_section_ids(@course, other_user)
+      expect(section_ids).to be_empty
+    end
+
+    it "excludes deleted enrollments" do
+      deleted_user = user_factory(active_all: true)
+      enrollment = @course.enroll_teacher(deleted_user, section: @section1, enrollment_state: "active")
+      enrollment.destroy
+
+      section_ids = get_user_section_ids(@course, deleted_user)
+      expect(section_ids).to be_empty
+    end
+
+    it "excludes inactive enrollments" do
+      inactive_user = user_factory(active_all: true)
+      enrollment = @course.enroll_teacher(inactive_user, section: @section1, enrollment_state: "active")
+      enrollment.deactivate
+
+      section_ids = get_user_section_ids(@course, inactive_user)
+      expect(section_ids).to be_empty
+    end
+
+    it "excludes completed enrollments" do
+      completed_user = user_factory(active_all: true)
+      enrollment = @course.enroll_teacher(completed_user, section: @section1, enrollment_state: "active")
+      enrollment.complete!
+
+      section_ids = get_user_section_ids(@course, completed_user)
       expect(section_ids).to be_empty
     end
   end
 
-  describe "#get_students_in_teacher_sections" do
-    it "returns students from single section for restricted teacher" do
-      student_ids = get_students_in_teacher_sections(@course, @restricted_teacher)
+  describe "#get_visible_student_ids_in_course" do
+    it "returns students from single section for restricted user" do
+      student_ids = get_visible_student_ids_in_course(@course, @restricted_teacher)
       expect(student_ids).to eq([@student1.id])
     end
 
-    it "returns students from multiple sections for multi-section teacher" do
-      student_ids = get_students_in_teacher_sections(@course, @multi_section_teacher)
+    it "returns students from multiple sections for multi-section user" do
+      student_ids = get_visible_student_ids_in_course(@course, @multi_section_teacher)
       expect(student_ids).to match_array([@student1.id, @student2.id])
-    end
-
-    it "returns students from TA's section" do
-      student_ids = get_students_in_teacher_sections(@course, @ta)
-      expect(student_ids).to eq([@student2.id])
-    end
-
-    it "returns empty array for students" do
-      student_ids = get_students_in_teacher_sections(@course, @student1)
-      expect(student_ids).to be_empty
     end
 
     it "excludes non-student enrollment types" do
@@ -150,26 +157,26 @@ describe SectionRestrictionsHelper do
       other_teacher = user_factory(active_all: true)
       @course.enroll_teacher(other_teacher, section: @section1, enrollment_state: "active")
 
-      student_ids = get_students_in_teacher_sections(@course, @restricted_teacher)
+      student_ids = get_visible_student_ids_in_course(@course, @restricted_teacher)
       expect(student_ids).not_to include(other_teacher.id)
       expect(student_ids).to eq([@student1.id])
     end
   end
 
   context "edge cases" do
-    it "handles teacher with no enrollments gracefully" do
+    it "handles user with no enrollments gracefully" do
       user_with_no_enrollments = user_factory(active_all: true)
 
       expect(user_has_section_restrictions?(@course, user_with_no_enrollments)).to be false
-      expect(get_teacher_section_ids(@course, user_with_no_enrollments)).to be_empty
-      expect(get_students_in_teacher_sections(@course, user_with_no_enrollments)).to be_empty
+      expect(get_user_section_ids(@course, user_with_no_enrollments)).to be_empty
+      expect(get_visible_student_ids_in_course(@course, user_with_no_enrollments)).to be_empty
     end
 
     it "handles course with no sections gracefully" do
       empty_course = course_factory(active_all: true)
 
-      expect(get_teacher_section_ids(empty_course, @restricted_teacher)).to be_empty
-      expect(get_students_in_teacher_sections(empty_course, @restricted_teacher)).to be_empty
+      expect(get_user_section_ids(empty_course, @restricted_teacher)).to be_empty
+      expect(get_visible_student_ids_in_course(empty_course, @restricted_teacher)).to be_empty
     end
   end
 end

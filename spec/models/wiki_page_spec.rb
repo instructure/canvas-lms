@@ -1631,6 +1631,104 @@ describe WikiPage do
     let(:relevant_attributes_for_scan) { { body: "<p>Lorem ipsum</p>" } }
   end
 
+  describe "#should_index_in_pine?" do
+    let(:horizon_course) do
+      course = Course.create!
+      course.update!(horizon_course: true)
+      course.account.enable_feature!(:horizon_course_setting)
+      course.account.enable_feature!(:horizon_learning_object_ingestion_on_change)
+      course
+    end
+    let(:regular_course) { Course.create! }
+    let(:wiki_page) { horizon_course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }
+    let(:pine_client_mock) { double("PineClient") }
+
+    before do
+      allow(pine_client_mock).to receive(:enabled?).and_return(true)
+      stub_const("PineClient", pine_client_mock)
+    end
+
+    context "returns true when" do
+      it "title changes in active horizon course page" do
+        wiki_page.title = "Updated Title"
+        expect(wiki_page.should_index_in_pine?).to be true
+      end
+
+      it "body changes in active horizon course page" do
+        wiki_page.body = "<p>Updated content</p>"
+        expect(wiki_page.should_index_in_pine?).to be true
+      end
+
+      it "workflow_state changes to active (page is restored)" do
+        wiki_page.workflow_state = "deleted"
+        wiki_page.save!
+        wiki_page.workflow_state = "active"
+        expect(wiki_page.should_index_in_pine?).to be true
+      end
+    end
+
+    context "returns false when" do
+      it "context is not a Course" do
+        group = group_model
+        group_page = group.wiki_pages.create!(title: "Group Page", body: "Content")
+        expect(group_page.should_index_in_pine?).to be false
+      end
+
+      it "course is not a horizon course" do
+        regular_page = regular_course.wiki_pages.create!(title: "Page", body: "Content")
+        expect(regular_page.should_index_in_pine?).to be false
+      end
+
+      it "PineClient is disabled" do
+        allow(PineClient).to receive(:enabled?).and_return(false)
+        expect(wiki_page.should_index_in_pine?).to be false
+      end
+
+      it "page is deleted" do
+        wiki_page.workflow_state = "deleted"
+        expect(wiki_page.should_index_in_pine?).to be false
+      end
+
+      it "no relevant fields changed" do
+        wiki_page.save!
+        expect(wiki_page.should_index_in_pine?).to be false
+      end
+
+      it "feature flag is not enabled" do
+        horizon_course.account.disable_feature!(:horizon_learning_object_ingestion_on_change)
+        wiki_page.body = "Updated"
+        expect(wiki_page.should_index_in_pine?).to be false
+      end
+    end
+  end
+
+  describe "#index_in_pine" do
+    let(:horizon_course) do
+      course = Course.create!
+      course.update!(horizon_course: true)
+      course.account.enable_feature!(:horizon_course_setting)
+      course
+    end
+    let(:wiki_page) { horizon_course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }
+    let(:pine_client_mock) { double("PineClient") }
+
+    before do
+      allow(pine_client_mock).to receive(:enabled?).and_return(true)
+      stub_const("PineClient", pine_client_mock)
+    end
+
+    it "calls delay with correct parameters and ingest_to_pine" do
+      expect(wiki_page).to receive(:delay).with(
+        n_strand: ["horizon_wiki_ingestion", horizon_course.global_root_account_id],
+        singleton: "horizon_wiki_ingestion:#{horizon_course.global_id}:#{wiki_page.id}",
+        max_attempts: 3
+      ).and_return(wiki_page)
+      expect(wiki_page).to receive(:ingest_to_pine)
+
+      wiki_page.index_in_pine
+    end
+  end
+
   describe "#ingest_to_pine" do
     let(:course) { Course.create! }
     let(:wiki_page) { course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }

@@ -46,6 +46,9 @@ export interface FormComponentProps {
   error?: string | null
   onChangeValue: (formValue: FormValue) => void
   onReload?: (formValue: FormValue) => void
+  onValidationChange?: (isValid: boolean, errorMessage?: string) => void
+  actionButtons?: React.ReactNode
+  isDisabled?: boolean
 }
 
 interface FormProps {
@@ -53,6 +56,10 @@ interface FormProps {
   error?: string | null
   onReload?: (formValue: FormValue) => void
   onClearError?: () => void
+  onValidationChange?: (isValid: boolean, errorMessage?: string) => void
+  onFormValueChange?: (formValue: FormValue) => void
+  actionButtons?: React.ReactNode
+  isDisabled?: boolean
 }
 
 const FormTypeMap = {
@@ -65,46 +72,64 @@ const FormTypeMap = {
 const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
   FormHandle,
   FormProps
->(({issue, error, onReload, onClearError}: FormProps, ref) => {
-  const formRef = useRef<FormComponentHandle>(null)
-  const [value, setValue] = useState<FormValue>(issue.form.value || null)
+>(
+  (
+    {
+      issue,
+      error,
+      onReload,
+      onClearError,
+      onValidationChange,
+      onFormValueChange,
+      actionButtons,
+      isDisabled,
+    }: FormProps,
+    ref,
+  ) => {
+    const formRef = useRef<FormComponentHandle>(null)
+    const [value, setValue] = useState<FormValue>(issue.form.value || null)
 
-  const handleChange = useCallback(
-    (formValue: FormValue) => {
-      setValue(formValue)
+    const handleChange = useCallback(
+      (formValue: FormValue) => {
+        setValue(formValue)
+        onFormValueChange?.(formValue)
 
-      if (error) onClearError?.()
-    },
-    [setValue, error, onClearError],
-  )
+        if (error) onClearError?.()
+      },
+      [setValue, error, onClearError, onFormValueChange],
+    )
 
-  useEffect(() => {
-    setValue(issue.form.value || null)
-  }, [issue])
+    useEffect(() => {
+      setValue(issue.form.value || null)
+    }, [issue])
 
-  useImperativeHandle(ref, () => ({
-    getValue: () => {
-      if (issue.form.type === FormType.Button) return 'true'
-      return value
-    },
-    focus: () => {
-      formRef.current?.focus()
-    },
-  }))
+    useImperativeHandle(ref, () => ({
+      getValue: () => {
+        if (issue.form.type === FormType.Button) return 'true'
+        return value
+      },
+      focus: () => {
+        formRef.current?.focus()
+      },
+    }))
 
-  if (issue.form.type === FormType.Button) return null
+    if (issue.form.type === FormType.Button) return null
 
-  const FormComponent = FormTypeMap[issue.form.type]
-  return (
-    <FormComponent
-      ref={formRef}
-      issue={issue}
-      value={value}
-      error={error}
-      onChangeValue={handleChange}
-      onReload={onReload}
-    />
-  )
-})
+    const FormComponent = FormTypeMap[issue.form.type]
+    return (
+      <FormComponent
+        ref={formRef}
+        issue={issue}
+        value={value}
+        error={error}
+        onChangeValue={handleChange}
+        onReload={onReload}
+        onValidationChange={onValidationChange}
+        actionButtons={actionButtons}
+        isDisabled={isDisabled}
+      />
+    )
+  },
+)
 
 export default Form

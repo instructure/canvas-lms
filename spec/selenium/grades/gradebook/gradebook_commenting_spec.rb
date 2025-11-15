@@ -41,7 +41,12 @@ shared_examples "Gradebook" do |ff_enabled|
     @comment_text = "This is a new group comment!"
   end
 
-  before { user_session(@teacher) }
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+    user_session(@teacher)
+  end
 
   it "validates posting a comment to a graded assignment", priority: "1" do
     Gradebook.visit(@course)

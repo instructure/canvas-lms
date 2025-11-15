@@ -194,10 +194,17 @@ module GradebooksHelper
                      end
 
     if override_dates.count == 1
-      I18n.t("Due: %{assignment_due_date_time}", assignment_due_date_time: datetime_string(force_zone(override_dates.first)))
-    else
-      I18n.t("Due: No Due Date")
+      return I18n.t("Due: %{assignment_due_date_time}", assignment_due_date_time: datetime_string(force_zone(override_dates.first)))
     end
+
+    if assignment.has_sub_assignments?
+      latest_due_date = assignment.sub_assignments.active.maximum(:due_at)
+      if latest_due_date
+        return I18n.t("Due: %{assignment_due_date_time}", assignment_due_date_time: datetime_string(force_zone(latest_due_date)))
+      end
+    end
+
+    I18n.t("Due: No Due Date")
   end
 
   def show_message_students_with_observers_dialog?

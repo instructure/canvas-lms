@@ -17,8 +17,11 @@
  */
 import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('nutrition_facts')
+
+export const ICON_COLORS = {primary: '#273540', secondary: '#FFFFFF'}
+
 export const STATIC_TEXT = {
-  title: "",
+  title: '',
   dataPermissionLevelsTitle: I18n.t('Data Permission Levels'),
   dataPermissionLevelsCurrentFeatureText: I18n.t('Current Feature:'),
   dataPermissionLevelsCloseIconButtonScreenReaderLabel: I18n.t('Close'),

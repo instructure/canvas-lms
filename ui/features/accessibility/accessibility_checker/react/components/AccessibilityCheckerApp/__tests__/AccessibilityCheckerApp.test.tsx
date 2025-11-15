@@ -18,8 +18,24 @@
 
 import {render, screen} from '@testing-library/react'
 import '@testing-library/jest-dom'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import React from 'react'
 
 import {AccessibilityCheckerApp} from '../AccessibilityCheckerApp'
+
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        gcTime: 0,
+      },
+    },
+  })
+  return ({children}: {children: React.ReactNode}) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+}
 
 describe('AccessibilityCheckerApp', () => {
   beforeEach(() => {
@@ -27,7 +43,8 @@ describe('AccessibilityCheckerApp', () => {
   })
 
   it('renders without crashing - no scan limit exceeded Alert visible', () => {
-    render(<AccessibilityCheckerApp />)
+    const Wrapper = createWrapper()
+    render(<AccessibilityCheckerApp />, {wrapper: Wrapper})
     expect(screen.getByTestId('accessibility-checker-app')).toBeInTheDocument()
 
     const alert = screen.queryByTestId('accessibility-scan-disabled-alert')
@@ -36,7 +53,8 @@ describe('AccessibilityCheckerApp', () => {
 
   it('renders scan limit exceeded Alert, when SCAN_DISABLED is true', () => {
     window.ENV.SCAN_DISABLED = true
-    render(<AccessibilityCheckerApp />)
+    const Wrapper = createWrapper()
+    render(<AccessibilityCheckerApp />, {wrapper: Wrapper})
 
     const alert = screen.getByTestId('accessibility-scan-disabled-alert')
     expect(alert).toBeInTheDocument()

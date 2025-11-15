@@ -19,35 +19,45 @@
 import React from 'react'
 import {AiInformation} from '@instructure/ui-instructure'
 import {IconButton} from '@instructure/ui-buttons'
-import {NutritionFactsExternalRoot} from './types'
 import {STATIC_TEXT} from './constants'
 import {NutritionFactsIcon} from './NutritionFactsIcon'
+// TODO: We need IconAIInfoLine works by inheriting props.color from its parent
+// while waiting we use NutritionFactsIcon instead
+// import {IconAIInfoLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {NutritionFactsProps} from './types'
 
 const I18n = createI18nScope('nutrition_facts')
 
-export const NutritionFacts: React.FC<NutritionFactsExternalRoot> = props => {
+export const NutritionFacts: React.FC<NutritionFactsProps> = ({
+  aiInformation,
+  dataPermissionLevels,
+  nutritionFacts,
+  iconSize,
+  responsiveProps,
+}) => {
   return (
     <AiInformation
-      fullscreenModals={false}
+      fullscreenModals={responsiveProps.fullscreenModals}
       trigger={
         <IconButton
           id="nutrition_facts_trigger"
           screenReaderLabel={I18n.t('Nutrition facts')}
           margin={'none'}
-          withBackground={false}
+          withBackground={responsiveProps.withBackground}
           withBorder={false}
           shape="circle"
+          color={responsiveProps.buttonColor}
         >
-          <NutritionFactsIcon />
+          <NutritionFactsIcon size={iconSize} color={responsiveProps.color}/>
         </IconButton>
       }
       {...STATIC_TEXT}
-      data={[{...props.AiInformation}]}
-      dataPermissionLevelsData={props.dataPermissionLevels}
-      nutritionFactsData={props.nutritionFacts.data}
-      dataPermissionLevelsCurrentFeature={props.name}
-      nutritionFactsFeatureName={props.name}
+      data={aiInformation.data}
+      dataPermissionLevelsData={dataPermissionLevels.data}
+      nutritionFactsData={nutritionFacts.data}
+      dataPermissionLevelsCurrentFeature={nutritionFacts.featureName}
+      nutritionFactsFeatureName={nutritionFacts.featureName}
     />
   )
 }

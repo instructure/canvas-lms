@@ -310,7 +310,7 @@ class ApplicationController < ActionController::Base
           RAILS_ENVIRONMENT: Canvas.environment
         }
         @js_env[:use_dyslexic_font] = @current_user&.prefers_dyslexic_font? if @current_user&.can_see_dyslexic_font_feature_flag?(session) && !mobile_device?
-        @js_env[:widget_dashboard_overridable] = @current_user&.prefers_widget_dashboard? if widget_dashboard_allowed_for_user? && !mobile_device?
+        @js_env[:widget_dashboard_overridable] = @current_user&.prefers_widget_dashboard?(@domain_root_account) if @current_user && @domain_root_account&.feature_allowed?(:widget_dashboard) && !mobile_device?
         if @domain_root_account&.feature_enabled?(:restrict_student_access)
           @js_env[:current_user_has_teacher_enrollment] = @current_user&.teacher_enrollment?
         end
@@ -438,6 +438,7 @@ class ApplicationController < ActionController::Base
     account_level_blackout_dates
     assignment_edit_placement_not_on_announcements
     accessibility_issues_in_full_page
+    a11y_checker_ai_generation
     block_content_editor_toolbar_reorder
     commons_new_quizzes
     consolidated_media_player
@@ -452,6 +453,7 @@ class ApplicationController < ActionController::Base
     discussion_permalink
     enhanced_course_creation_account_fetching
     explicit_latex_typesetting
+    feature_flag_ui_sorting
     files_a11y_rewrite
     files_a11y_rewrite_toggle
     horizon_course_setting
@@ -473,10 +475,12 @@ class ApplicationController < ActionController::Base
     validate_call_to_action
     block_content_editor_ai_alt_text
     ux_list_concluded_courses_in_bp
+    assign_to_in_edit_pages_rewrite
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales
     ams_root_account_integration
+    ams_enhanced_rubrics
     api_rate_limits
     buttons_and_icons_root_account
     course_pace_allow_bulk_pace_assign
@@ -756,14 +760,6 @@ class ApplicationController < ActionController::Base
     @domain_root_account&.feature_enabled?(:k12)
   end
   helper_method :k12?
-
-  def widget_dashboard_allowed_for_user?
-    return false unless @current_user && @domain_root_account
-
-    # Check if the feature is allowed in any of the user's associated accounts
-    # This allows sub-accounts to independently enable the feature
-    @current_user.associated_accounts.any? { |account| account.feature_allowed?(:widget_dashboard) }
-  end
 
   def grading_periods?
     !!@context.try(:grading_periods?)
@@ -3415,7 +3411,7 @@ class ApplicationController < ActionController::Base
   end
 
   def recaptcha_enabled?(**)
-    DynamicSettings.find(tree: :private)["recaptcha_server_key", **].present? && @domain_root_account.self_registration_captcha?
+    Rails.application.credentials.recaptcha_keys.present? && @domain_root_account.self_registration_captcha?
   end
 
   def peer_reviews_for_a2_enabled?
@@ -3538,7 +3534,7 @@ class ApplicationController < ActionController::Base
 
   # Similar to Account#recaptcha_key, but does not check the `self_registration_captcha?` setting.
   def captcha_site_key
-    DynamicSettings.find(tree: :private)["recaptcha_client_key"]
+    Rails.application.credentials.dig(:recaptcha_keys, :client_key)
   end
   helper_method :captcha_site_key
 
@@ -3563,7 +3559,8 @@ class ApplicationController < ActionController::Base
 
   def add_ignite_agent_bundle?
     return false unless @domain_root_account&.feature_enabled?(:ignite_agent_enabled)
-    return false unless @domain_root_account&.grants_right?(@current_user, session, :access_ignite_agent)
+    return true if @domain_root_account&.grants_right?(@current_user, session, :manage_account_settings)
+    return false unless @current_user&.feature_enabled?(:ignite_agent_enabled_for_user)
 
     true
   end

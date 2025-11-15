@@ -274,12 +274,12 @@ module NewQuizzes
 
     def backend_url
       # Extract the backend URL from the tool's launch URL or domain
-      # The tool URL is typically: https://tenant.quiz-lti-region.instructure.com/lti/launch
-      # The tool domain might be just: tenant.quiz-lti-region.instructure.com
-      # We want to extract: https://tenant.quiz-lti-region.instructure.com
+      # The launch_url typically contains the environment (region-env format)
+      # Example: https://account.quiz-lti-region-env.instructure.com/lti/launch
+      # We want to extract: https://account.quiz-lti-region-env.instructure.com
       return nil unless @tool
 
-      tool_url = @tool.url
+      tool_url = @tool.launch_url
       tool_domain = @tool.domain
 
       # If we have a URL, parse it to get the origin

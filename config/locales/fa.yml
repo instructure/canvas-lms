@@ -11020,6 +11020,7 @@ fa:
   general_answer_comments_730136ba: "نظرهای عمومی مربوط به پاسخ"
   general_eb111f34: عمومی
   general_locked_objects_6a9adafb: "موارد قفل‌شده عمومی"
+  generate_44e33e72: ایجاد
   generate_activity_for_user_2b0af749: "ایجاد فعالیت برای %{user}"
   generate_epub_80e89ea4: "ایجاد ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "ایجاد گزارش تحلیل مورد %{statusLabel}"
@@ -21085,6 +21086,7 @@ fa:
   save_and_customize_19eb7a7b: "ذخیره و شخصی‌سازی"
   save_and_publish_1b765e7: "ذخیره و انتشار"
   save_changes_698abe77: "ذخیره سازی تغییرات"
+  save_changes_a63787eb: "ذخیره سازی تغییرها"
   save_customizations_dde779d8: "ذخیره تنظیمات شخص سازی شده"
   save_grading_period_daaaddea: "ذخیره سازی دوره نمره گذاری"
   save_grading_period_set_e029fa88: "ذخیره سازی مجموعه دوره نمره گذاری"

@@ -22,6 +22,10 @@ require "English"
 module Exporters
   class Quizzes2Exporter
     GROUP_NAME = "Migrated Quizzes"
+    QUIZ_TYPE_MAP = Hash.new("graded_quiz").merge(
+      "survey" => "ungraded_survey",
+      "graded_survey" => "graded_survey"
+    )
 
     attr_accessor :course, :quiz
 
@@ -97,10 +101,22 @@ module Exporters
         assignment_group: assignment_group(failed_assignment),
         workflow_state: new_quizzes_page_enabled? ? "migrating" : "unpublished",
         duplication_started_at: Time.zone.now,
-        migrate_from_id: @quiz.id
+        migrate_from_id: @quiz.id,
+        settings: assignment_settings
       }
       params[:position] = failed_assignment.position if failed_assignment.present?
       params
+    end
+
+    def assignment_settings
+      return {} unless Account.site_admin.feature_enabled?(:new_quizzes_surveys)
+
+      {
+        "new_quizzes" => {
+          "type" => QUIZ_TYPE_MAP[quiz.quiz_type],
+          "anonymous_participants" => quiz.anonymous_submissions,
+        }
+      }
     end
 
     def new_quizzes_page_enabled?

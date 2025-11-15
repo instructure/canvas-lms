@@ -367,6 +367,9 @@ nn:
   access_tokens_delete_8ffe05d: "Tilgangsnøkkel - slette"
   access_tokens_eea7e69f: Tilgangsnøklar
   access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: "Sjå emna og gruppene dine frå iOS eller Android einingar og finn meir informasjon i hjelpemenyen."
+  accessibility: 
+    titles: 
+      accessibility_checker: "Sjekk av universell utforming"
   accessibility_a662153d: Tilgjengeligheit
   accessibility_checker_b3af1f6c: "Sjekk av universell utforming"
   accessibility_checker_notifications_da5a49e6: "Varsel for tilgjengelegheitssjekk"
@@ -12112,6 +12115,7 @@ nn:
   general_answer_comments_730136ba: "Generelle kommentarar"
   general_eb111f34: generelt
   general_locked_objects_6a9adafb: "Generelt låste objekt"
+  generate_44e33e72: Generer
   generate_activity_for_user_2b0af749: "Generer aktivitet for %{user}"
   generate_epub_80e89ea4: "Generer EPUB"
   generate_item_analysis_report_statuslabel_16e02c8: "Generer elementanalyserapport %{statusLabel}"
@@ -23244,6 +23248,7 @@ nn:
   save_and_publish_1b765e7: "Lagre og publiser"
   save_as_draft_341d4577: "Lagre som utkast"
   save_changes_698abe77: "Lagre endringar"
+  save_changes_a63787eb: "Lagre endringar"
   save_criterion_cce60085: "Lagre kriterium"
   save_customizations_dde779d8: "Lagre tilpassingar"
   save_don_t_send_ba59fa2b: "Lagre og ikkje send"

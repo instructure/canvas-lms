@@ -42,6 +42,8 @@ import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
 import {FormComponentHandle, FormComponentProps} from './index'
+import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
+import {useShallow} from 'zustand/react/shallow'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -57,6 +59,9 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
       const {selectedItem} = useContext(
         AccessibilityCheckerContext,
       ) as Partial<AccessibilityCheckerContextType>
+      const isAiGenerationEnabled = useAccessibilityScansStore(
+        useShallow(state => state.aiGenerationEnabled),
+      )
 
       const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setChecked(e.target.checked)
@@ -184,39 +189,43 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               </Text>
             </Flex.Item>
           </Flex>
-          <Flex as="div" margin="small 0">
-            <Flex.Item>
-              <Button
-                color="ai-primary"
-                renderIcon={() => <IconAiSolid />}
-                onClick={handleGenerateClick}
-                disabled={generateLoading}
-              >
-                {issue.form.generateButtonLabel}
-              </Button>
-            </Flex.Item>
-            {generateLoading ? (
-              <Flex.Item>
-                <Spinner
-                  size="x-small"
-                  renderTitle={I18n.t('Generating...')}
-                  margin="0 small 0 0"
-                />
-              </Flex.Item>
-            ) : (
-              <></>
-            )}
-          </Flex>
-          {generationError !== null ? (
-            <Flex>
-              <Flex.Item>
-                <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
-                  {generationError}
-                </Alert>
-              </Flex.Item>
-            </Flex>
-          ) : (
-            <></>
+          {isAiGenerationEnabled && (
+            <>
+              <Flex as="div" margin="small 0">
+                <Flex.Item>
+                  <Button
+                    color="ai-primary"
+                    renderIcon={() => <IconAiSolid />}
+                    onClick={handleGenerateClick}
+                    disabled={generateLoading}
+                  >
+                    {issue.form.generateButtonLabel}
+                  </Button>
+                </Flex.Item>
+                {generateLoading ? (
+                  <Flex.Item>
+                    <Spinner
+                      size="x-small"
+                      renderTitle={I18n.t('Generating...')}
+                      margin="0 small 0 0"
+                    />
+                  </Flex.Item>
+                ) : (
+                  <></>
+                )}
+              </Flex>
+              {generationError !== null ? (
+                <Flex>
+                  <Flex.Item>
+                    <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
+                      {generationError}
+                    </Alert>
+                  </Flex.Item>
+                </Flex>
+              ) : (
+                <></>
+              )}
+            </>
           )}
         </>
       )

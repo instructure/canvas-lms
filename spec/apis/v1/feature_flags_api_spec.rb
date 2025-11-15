@@ -39,7 +39,6 @@ describe "Feature Flags API", type: :request do
   end
 
   before do
-    allow_any_instance_of(User).to receive(:set_default_feature_flags)
     allow(Feature).to receive(:definitions).and_return({
                                                          "root_account_feature" => Feature.new(feature: "root_account_feature", applies_to: "RootAccount", state: "allowed"),
                                                          "account_feature" => Feature.new(feature: "account_feature", applies_to: "Account", state: "on", display_name: -> { "Account Feature FRD" }, description: -> { "FRD!!" }, beta: true, autoexpand: true),

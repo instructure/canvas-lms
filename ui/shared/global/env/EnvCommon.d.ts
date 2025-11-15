@@ -281,6 +281,7 @@ export interface EnvCommon {
  */
 export type SiteAdminFeatureId =
   | 'accessibility_issues_in_full_page'
+  | 'a11y_checker_ai_generation'
   | 'account_calendar_events'
   | 'account_level_blackout_dates'
   | 'courses_popout_sisid'
@@ -289,6 +290,7 @@ export type SiteAdminFeatureId =
   | 'developer_key_user_agent_alert'
   | 'enhanced_course_creation_account_fetching'
   | 'explicit_latex_typesetting'
+  | 'feature_flag_ui_sorting'
   | 'files_a11y_rewrite'
   | 'files_a11y_rewrite_toggle'
   | 'instui_for_import_page'

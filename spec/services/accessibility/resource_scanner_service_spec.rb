@@ -41,7 +41,11 @@ describe Accessibility::ResourceScannerService do
 
       it "enqueues a delayed job for scanning the resource" do
         expect(subject).to receive(:delay)
-          .with(singleton: "accessibility_scan_resource_#{wiki_page.global_id}")
+          .with(
+            n_strand: ["resource_accessibility_scan", course.account.global_id],
+            singleton: "resource_accessibility_scan_#{wiki_page.global_id}",
+            priority: 20
+          )
           .and_return(delay_mock)
         expect(delay_mock).to receive(:scan_resource)
 
@@ -73,11 +77,76 @@ describe Accessibility::ResourceScannerService do
 
       it "enqueues a delayed job for scanning the resource" do
         expect(subject).to receive(:delay)
-          .with(singleton: "accessibility_scan_resource_#{wiki_page.global_id}")
+          .with(
+            n_strand: ["resource_accessibility_scan", course.account.global_id],
+            singleton: "resource_accessibility_scan_#{wiki_page.global_id}",
+            priority: 20
+          )
           .and_return(delay_mock)
         expect(delay_mock).to receive(:scan_resource)
 
         subject.call
+      end
+    end
+  end
+
+  describe "#call_sync" do
+    it "creates a scan for the resource" do
+      subject.call_sync
+
+      scan = AccessibilityResourceScan.where(context: wiki_page).first
+      expect(scan).to be_present
+    end
+
+    it "does not enqueue a delayed job" do
+      expect(subject).not_to receive(:delay)
+
+      subject.call_sync
+    end
+
+    it "calls scan_resource synchronously" do
+      expect(subject).to receive(:scan_resource).with(scan: kind_of(AccessibilityResourceScan)).and_call_original
+
+      subject.call_sync
+    end
+
+    it "returns the scan object" do
+      scan = subject.call_sync
+
+      expect(scan).to be_a(AccessibilityResourceScan)
+      expect(scan.context).to eq(wiki_page)
+    end
+
+    context "when the scan already exists" do
+      let!(:existing_scan) { accessibility_resource_scan_model(course:, context: wiki_page, workflow_state: "completed") }
+
+      it "updates the existing scan" do
+        scan = subject.call_sync
+
+        expect(scan.id).to eq(existing_scan.id)
+        expect(scan.workflow_state).to eq("completed")
+      end
+    end
+
+    context "when scan_resource completes successfully" do
+      it "updates the scan workflow_state to completed" do
+        scan = subject.call_sync
+
+        expect(scan.workflow_state).to eq("completed")
+      end
+    end
+
+    context "when scan_resource fails" do
+      before do
+        allow_any_instance_of(described_class).to receive(:scan_resource_for_issues).and_raise(StandardError, "Test failure")
+      end
+
+      it "marks the scan as failed" do
+        scan = subject.call_sync
+
+        expect(scan.workflow_state).to eq("failed")
+        expect(scan.error_message).to be_present
+        expect(scan.error_message).to match(/^\d+$/) # Error report ID
       end
     end
   end
@@ -200,7 +269,8 @@ describe Accessibility::ResourceScannerService do
       it "updates the scan with an error_message" do
         subject.scan_resource(scan:)
 
-        expect(scan.reload.error_message).to eq("Failure")
+        expect(scan.reload.error_message).to be_present
+        expect(scan.reload.error_message).to match(/^\d+$/) # Error report ID
       end
 
       it "logs the correct Datadog metrics for a failed scan" do

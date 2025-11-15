@@ -319,6 +319,7 @@ CanvasRails::Application.routes.draw do
           as: :anonymous_submission_vericite_report
 
       get :rubric
+      get :rubric_data
       resource :rubric_association, path: :rubric do
         resources :rubric_assessments, path: :assessments do
           collection do
@@ -421,6 +422,8 @@ CanvasRails::Application.routes.draw do
     get "activity_builder/*path" => "quizzes/quizzes#index"
     get "take/*path" => "quizzes/quizzes#index"
     get "reports/*path" => "quizzes/quizzes#index"
+    get "submission-confirmation/*path" => "quizzes/quizzes#index"
+    get "submission-screen/*path" => "quizzes/quizzes#index"
 
     post "quizzes/new" => "quizzes/quizzes#new" # use POST instead of GET (not idempotent)
     resources :quizzes, controller: "quizzes/quizzes", except: :new do
@@ -499,6 +502,7 @@ CanvasRails::Application.routes.draw do
       collection do
         post :reorder
         get :progressions
+        get "bulk_items_html" => "context_modules#bulk_items_html", :as => :bulk_items_html
       end
     end
 
@@ -558,13 +562,14 @@ CanvasRails::Application.routes.draw do
         post "preview" => "accessibility/preview#create"
         get "preview" => "accessibility/preview#show"
         post "generate" => "accessibility/generate#create"
-        get "scan" => "accessibility/scan#show"
-        post "scan" => "accessibility/scan#create"
+        get "course_scan" => "accessibility/course_scan#show"
+        post "course_scan" => "accessibility/course_scan#create"
+        get "resource_scan" => "accessibility/resource_scan#index"
+        get "resource_scan/poll" => "accessibility/resource_scan#poll"
         get "issue_summary" => "accessibility/issue_summary#show"
       end
     end
 
-    resources :accessibility_resource_scans, only: [:index]
     resources :accessibility_issues, only: [:update, :show]
 
     resources :ai_experiences, only: %i[index create new show edit update destroy]
@@ -1457,6 +1462,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/assignments/:assignment_id/duplicate", action: :duplicate
       post "courses/:course_id/assignments/:assignment_id/retry_alignment_clone", action: :retry_alignment_clone
       delete "courses/:course_id/assignments/:id", action: :destroy, controller: :assignments
+      post "courses/:course_id/assignments/:assignment_id/accessibility/scan", action: :accessibility_scan, as: "assignment_accessibility_scan"
     end
 
     scope(controller: "assignment_extensions") do
@@ -1472,6 +1478,7 @@ CanvasRails::Application.routes.draw do
       post "sections/:section_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews", action: :create
       delete "courses/:course_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews", action: :destroy
       delete "sections/:section_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews", action: :destroy
+      post "courses/:course_id/assignments/:assignment_id/allocate", action: :allocate, as: :allocate_peer_review
     end
 
     scope(controller: :moderation_set) do
@@ -2162,6 +2169,7 @@ CanvasRails::Application.routes.draw do
       delete "files/:id", action: :destroy
       put "files/:id", action: :api_update
       post "files/:id/reset_verifier", action: :reset_verifier
+      post "files/update_word_count", action: :update_word_count
       post "rce_linked_file_instfs_ids", action: :rce_linked_file_instfs_ids
 
       # exists as an alias of GET for backwards compatibility
@@ -2241,6 +2249,7 @@ CanvasRails::Application.routes.draw do
       get "groups/:group_id/page_title_availability", action: :check_title_availability, as: "group_page_title_availability"
       post "courses/:course_id/pages_ai/alt_text", action: :ai_generate_alt_text
       post "groups/:group_id/pages_ai/alt_text", action: :ai_generate_alt_text
+      post "courses/:course_id/pages/:url_or_id/accessibility/scan", action: :accessibility_scan, as: "pages_accessibility_scan"
     end
 
     scope(controller: :context_modules_api) do
@@ -3131,6 +3140,7 @@ CanvasRails::Application.routes.draw do
     # Asset Processor internal endpoints
     scope(controller: "lti/asset_processor") do
       post "asset_processors/:asset_processor_id/notices/:student_id/attempts/:attempt", action: :resubmit_notice, as: :lti_asset_processor_notice_resubmit
+      post "asset_processors/discussion_notices/:assignment_id/:student_id/resubmit_all", action: :resubmit_discussion_notices_all
     end
 
     # Dynamic Registration Service

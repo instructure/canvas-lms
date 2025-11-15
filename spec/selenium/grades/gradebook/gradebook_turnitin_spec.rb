@@ -37,7 +37,12 @@ shared_examples "Gradebook - turnitin" do |ff_enabled|
     gradebook_data_setup
   end
 
-  before { user_session(@teacher) }
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+    user_session(@teacher)
+  end
 
   it "shows turnitin data when the New Gradebook Plagiarism Indicator feature flag is enabled" do
     @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)

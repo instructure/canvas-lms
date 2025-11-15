@@ -65,6 +65,53 @@ const modules: Record<ModuleId, {items: string; api: string; link: string}> = {
 }
 
 const handlers = [
+  http.get<{courseId: string}>('/courses/:courseId/modules/bulk_items_html', ({request}) => {
+    const url = new URL(request.url)
+    const moduleIds = url.searchParams.getAll('module_ids[]')
+
+    if (moduleIds.length === 0) {
+      return new HttpResponse(null, {status: 400})
+    }
+
+    const result: Record<
+      string,
+      {
+        html: string
+        pagination: {current_page: number; total_pages: number; per_page: number} | null
+      }
+    > = {}
+    moduleIds.forEach(moduleId => {
+      // Handle bad module case
+      if (moduleId === badModule.moduleId) {
+        // Skip bad modules in bulk response
+        return
+      }
+
+      // Handle single page module case
+      if (moduleId === singlePageModules.moduleId) {
+        result[moduleId] = {
+          html: singlePageModules.items,
+          pagination: null,
+        }
+        return
+      }
+
+      // Handle regular modules (with pagination)
+      const moduleData = modules[moduleId]
+      if (moduleData) {
+        result[moduleId] = {
+          html: moduleData.items,
+          pagination: {
+            current_page: 1,
+            total_pages: 2, // Simulate 2 pages
+            per_page: pageSize,
+          },
+        }
+      }
+    })
+
+    return HttpResponse.json(result)
+  }),
   http.get<{courseId: string; moduleId: string}>(
     '/courses/:courseId/modules/:moduleId/items_html',
     ({params, request}) => {
@@ -232,32 +279,48 @@ describe('fetchModuleItems utility', () => {
       }
     })
 
-    it('constructs the api urls correctly', async () => {
+    it('constructs the bulk api url correctly for multiple modules', async () => {
       const requestSpy = jest.fn()
       server.events.on('request:match', requestSpy)
       try {
         await moduleItemsLazyLoader.fetchModuleItems(Object.keys(modules))
         const requestUrls = requestSpy.mock.calls.map(call => call[0].request.url)
-        Object.keys(modules).forEach(moduleId => {
-          expect(
-            requestUrls.some(url =>
-              url.includes(`/courses/${courseId}/modules/${moduleId}/items_html`),
-            ),
-          ).toBe(true)
-        })
+        expect(
+          requestUrls.some(url => url.includes(`/courses/${courseId}/modules/bulk_items_html`)),
+        ).toBe(true)
       } finally {
         server.events.removeListener('request:match', requestSpy)
       }
     })
 
-    it('fetches the items with correct query parameters', async () => {
+    it('uses individual endpoint for single module', async () => {
+      const requestSpy = jest.fn()
+      server.events.on('request:match', requestSpy)
+      try {
+        await moduleItemsLazyLoader.fetchModuleItems(['1083'])
+        const requestUrls = requestSpy.mock.calls.map(call => call[0].request.url)
+        expect(
+          requestUrls.some(url => url.includes(`/courses/${courseId}/modules/1083/items_html`)),
+        ).toBe(true)
+        expect(
+          requestUrls.some(url => url.includes(`/courses/${courseId}/modules/bulk_items_html`)),
+        ).toBe(false)
+      } finally {
+        server.events.removeListener('request:match', requestSpy)
+      }
+    })
+
+    it('fetches the items with correct query parameters for multiple modules', async () => {
       const requestSpy = jest.fn()
       server.events.on('request:match', requestSpy)
       try {
         await moduleItemsLazyLoader.fetchModuleItems(Object.keys(modules))
         const requestUrls = requestSpy.mock.calls.map(call => call[0].request.url)
-        requestUrls.forEach(url => {
-          expect(url).toContain(`page=1&per_page=${pageSize}`)
+        const bulkUrl = requestUrls.find(url => url.includes('bulk_items_html'))
+        expect(bulkUrl).toBeDefined()
+        expect(bulkUrl).toContain(`per_page=${pageSize}`)
+        Object.keys(modules).forEach(moduleId => {
+          expect(bulkUrl).toContain(`module_ids[]=${moduleId}`)
         })
       } finally {
         server.events.removeListener('request:match', requestSpy)
@@ -283,7 +346,7 @@ describe('fetchModuleItems utility', () => {
         )
       })
 
-      it("sets the loadstate to 'paginated' when there are multiple pages", async () => {
+      it("sets the loadstate to 'paginated' for single module with multiple pages", async () => {
         await moduleItemsLazyLoader.fetchModuleItems(['1083'])
         await waitFor(() => {
           const module = moduleFromId('1083')
@@ -296,6 +359,21 @@ describe('fetchModuleItems utility', () => {
         await moduleItemsLazyLoader.fetchModuleItems([singlePageModules.moduleId])
         const module = moduleFromId(singlePageModules.moduleId)
         expect(module?.dataset.loadstate).toBe('loaded')
+      })
+
+      it("sets the loadstate to 'loading' before the fetch starts", async () => {
+        const moduleId = '1083'
+        const fetchPromise = moduleItemsLazyLoader.fetchModuleItems([moduleId])
+
+        // Check loading state is set immediately
+        const module = moduleFromId(moduleId)
+        expect(module?.dataset.loadstate).toBe('loading')
+
+        // Wait for fetch to complete
+        await fetchPromise
+
+        // Should transition to paginated (since mock has 2 pages)
+        expect(module?.dataset.loadstate).toBe('paginated')
       })
 
       it('sets the loadstate to "error" when the fetch fails', async () => {

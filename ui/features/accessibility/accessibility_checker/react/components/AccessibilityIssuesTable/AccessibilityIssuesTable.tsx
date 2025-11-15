@@ -36,6 +36,7 @@ import {
   TableSortState,
 } from '../../../../shared/react/stores/AccessibilityScansStore'
 import {useAccessibilityScansFetchUtils} from '../../../../shared/react/hooks/useAccessibilityScansFetchUtils'
+import {useAccessibilityScansPolling} from '../../../../shared/react/hooks/useAccessibilityScansPolling'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -126,6 +127,8 @@ const ReverseOrderingFirst = [IssuesTableColumns.Issues, IssuesTableColumns.Last
 
 export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
   const {doFetchAccessibilityScanData} = useAccessibilityScansFetchUtils()
+
+  useAccessibilityScansPolling()
 
   const [error, loading, page, pageCount, accessibilityScans, tableSortState] =
     useAccessibilityScansStore(

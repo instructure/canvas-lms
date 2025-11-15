@@ -49,12 +49,28 @@ module WidgetDashboardPage
     "[data-testid='read-more-#{item_id}']"
   end
 
+  def widget_pagination_container_selector(widget)
+    "nav[aria-label='#{widget} pagination']"
+  end
+
   def widget_pagination_button_selector(widget, page_number)
-    "[data-testid='widget-#{widget}-widget'] [data-testid='pagination-container'] button:contains('#{page_number}')"
+    "#{widget_pagination_container_selector(widget)} button:contains('#{page_number}')"
+  end
+
+  def widget_pagination_next_button_selector(widget)
+    "#{widget_pagination_container_selector(widget)} button[data-direction='next']"
+  end
+
+  def widget_pagination_prev_button_selector(widget)
+    "#{widget_pagination_container_selector(widget)} button[data-direction='prev']"
   end
 
   def people_widget_selector
     "[data-testid='widget-people-widget']"
+  end
+
+  def instructor_list_item_selector(name)
+    "#{people_widget_selector} span[aria-label='#{name}']"
   end
 
   def message_instructor_button_selector(account_id, course_id)
@@ -198,12 +214,24 @@ module WidgetDashboardPage
     fj(widget_pagination_button_selector(widget, page_number))
   end
 
+  def widget_pagination_next_button(widget)
+    f(widget_pagination_next_button_selector(widget))
+  end
+
+  def widget_pagination_prev_button(widget)
+    f(widget_pagination_prev_button_selector(widget))
+  end
+
   def people_widget
     f(people_widget_selector)
   end
 
   def all_message_buttons
     ff("[data-testid*='message-button-']")
+  end
+
+  def instructor_list_item(name)
+    f(instructor_list_item_selector(name))
   end
 
   def message_instructor_button(account_id, course_id)

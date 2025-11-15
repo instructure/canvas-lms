@@ -39,6 +39,15 @@ function QuizEngineModal({setOpen, onDismiss}) {
   const [option, setOption] = useState()
   const [checked, setChecked] = useState(false)
   const authenticity_token = () => getCookie('_csrf_token')
+  const isNewQuizzesSurveyEnabled = ENV.FEATURES?.new_quizzes_surveys || false
+
+  const newQuizDescription = isNewQuizzesSurveyEnabled
+    ? I18n.t(
+        `This has more question types, enhanced moderation and accommodation features, and supports creating and managing surveys.`,
+      )
+    : I18n.t(
+        `This has more question types, enhanced moderation and accommodation features.`,
+      )
 
   const link = (
     <Link href={I18n.t('#community.new_quizzes_feature_comparison')}>
@@ -50,9 +59,7 @@ function QuizEngineModal({setOpen, onDismiss}) {
   const newDesc = (
     <div style={{paddingLeft: '1.75rem', maxWidth: '23.5rem'}}>
       <Text weight="light">
-        {I18n.t(`This has more question types like hotspot,
-        categorization, matching, and ordering. It also has
-        more moderation and accommodation features.`)}
+        {newQuizDescription}
       </Text>
     </div>
   )
@@ -173,12 +180,12 @@ function QuizEngineModal({setOpen, onDismiss}) {
           label={
             <span>
               {classicLabel}
-              <ScreenReaderContent>- {classicDesc}</ScreenReaderContent>
+              {!isNewQuizzesSurveyEnabled && <ScreenReaderContent>- {classicDesc}</ScreenReaderContent>}
             </span>
           }
           size="large"
         />
-        {classicDesc}
+        {!isNewQuizzesSurveyEnabled && classicDesc}
       </RadioInputGroup>
       <hr />
       <Checkbox

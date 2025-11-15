@@ -251,4 +251,28 @@ widget_dashboard:
   display_name: Widgets for Dashboard
   description: |-
     When enabled, this allows learners to add, remove, and rearrange dashboard widgets.
-  applies_to: Account
+  applies_to: RootAccount
+
+widget_dashboard_customization:
+  state: hidden
+  display_name: Widget Dashboard Customization
+  description: |-
+    When enabled, this allows additional customization options for dashboard widgets.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
+assign_to_in_edit_pages_rewrite:
+  state: hidden
+  display_name: Assign to in edit pages rewrite
+  description: |-
+    When enabled, uses the rewritten AssignToContent component in edit pages.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

@@ -129,7 +129,8 @@ module PeerReview::Validations
   def validate_set_type_supported(set_type, services)
     unless services.key?(set_type)
       supported_types = services.keys.join(", ")
-      raise PeerReview::SetTypeNotSupportedError, I18n.t("Set type '%{set_type}' is not supported. Supported types are: %{supported_types}", set_type:, supported_types:)
+      raise PeerReview::SetTypeNotSupportedError,
+            I18n.t("Set type '%{set_type}' is not supported. Supported types are: %{supported_types}", set_type:, supported_types:)
     end
   end
 
@@ -141,5 +142,33 @@ module PeerReview::Validations
 
   def validate_group_exists(group)
     raise PeerReview::GroupNotFoundError, I18n.t("Group does not exist") unless group.present?
+  end
+
+  def validate_adhoc_parent_override_exists(parent_override, student_ids)
+    unless parent_override.present?
+      raise PeerReview::ParentOverrideNotFoundError,
+            I18n.t("Parent assignment ADHOC override not found for students %{student_ids}", student_ids: student_ids.join(", "))
+    end
+  end
+
+  def validate_course_parent_override_exists(parent_override, course_id)
+    unless parent_override.present?
+      raise PeerReview::ParentOverrideNotFoundError,
+            I18n.t("Parent assignment Course override not found for course %{course_id}", course_id:)
+    end
+  end
+
+  def validate_group_parent_override_exists(parent_override, group_id)
+    unless parent_override.present?
+      raise PeerReview::ParentOverrideNotFoundError,
+            I18n.t("Parent assignment Group override not found for group %{group_id}", group_id:)
+    end
+  end
+
+  def validate_section_parent_override_exists(parent_override, section_id)
+    unless parent_override.present?
+      raise PeerReview::ParentOverrideNotFoundError,
+            I18n.t("Parent assignment Section override not found for section %{section_id}", section_id:)
+    end
   end
 end

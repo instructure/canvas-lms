@@ -60,6 +60,6 @@ module CaptchaValidation
   end
 
   def captcha_server_key
-    DynamicSettings.find(tree: :private)["recaptcha_server_key"]
+    Rails.application.credentials.dig(:recaptcha_keys, :server_key)
   end
 end

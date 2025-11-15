@@ -44,21 +44,7 @@ class PeerReview::PeerReviewCommonService < ApplicationService
   end
 
   def attributes_to_inherit_from_parent
-    %w[
-      anonymous_peer_reviews
-      assignment_group_id
-      automatic_peer_reviews
-      context_id
-      context_type
-      description
-      group_category_id
-      intra_group_peer_reviews
-      peer_review_count
-      peer_reviews
-      peer_reviews_assigned
-      peer_reviews_due_at
-      workflow_state
-    ]
+    PeerReviewSubAssignment::SYNCABLE_ATTRIBUTES - %w[title]
   end
 
   def inherited_attributes
@@ -67,7 +53,7 @@ class PeerReview::PeerReviewCommonService < ApplicationService
 
   def specific_attributes
     attrs = {
-      title: I18n.t("%{title} Peer Review", title: @parent_assignment.title),
+      title: generate_peer_review_title,
       parent_assignment_id: @parent_assignment.id,
       has_sub_assignments: false,
       submission_types: expected_submission_types
@@ -103,7 +89,7 @@ class PeerReview::PeerReviewCommonService < ApplicationService
     attrs[:lock_at] = @lock_at if @lock_at != peer_review_sub.lock_at
 
     # Title requires special handling
-    expected_title = I18n.t("%{title} Peer Review", title: @parent_assignment.title)
+    expected_title = generate_peer_review_title
     if expected_title != peer_review_sub.title
       attrs[:title] = expected_title
     end
@@ -118,6 +104,15 @@ class PeerReview::PeerReviewCommonService < ApplicationService
   def compute_due_dates_and_create_submissions(peer_review_sub_assignment)
     PeerReviewSubAssignment.clear_cache_keys(peer_review_sub_assignment, :availability)
     SubmissionLifecycleManager.recompute(peer_review_sub_assignment, update_grades: true, create_sub_assignment_submissions: false)
+  end
+
+  def generate_peer_review_title
+    count = @parent_assignment.peer_review_count
+    if count && count > 0
+      I18n.t("%{title} Peer Review (%{count})", title: @parent_assignment.title, count:)
+    else
+      I18n.t("%{title} Peer Review", title: @parent_assignment.title)
+    end
   end
 
   def expected_submission_types

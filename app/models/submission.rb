@@ -231,11 +231,11 @@ class Submission < ActiveRecord::Base
 
   scope :postable, lambda {
     all.primary_shard.activate do
-      graded.union(with_hidden_comments)
+      graded.union(with_hidden_comments).union(with_sticker)
     end
   }
   scope :with_hidden_comments, lambda {
-    where(SubmissionComment.where("submission_id = submissions.id AND hidden = true").arel.exists)
+    where(SubmissionComment.where("submission_id = submissions.id").where(hidden: true, draft: false).arel.exists)
   }
 
   # This should only be used in the course drop down to show assignments recently graded.
@@ -935,14 +935,35 @@ class Submission < ActiveRecord::Base
         state: originality_report.state,
         attachment_id: originality_report.attachment_id,
         report_url: originality_report.report_launch_path(assignment),
+        view_report_url: view_report_url("originality_report", originality_report.asset_key),
         status: originality_report.workflow_state,
         error_message: originality_report.error_message,
         created_at: originality_report.created_at,
         updated_at: originality_report.updated_at,
       }
     end
-    turnitin_data.except(:webhook_info, :provider, :last_processed_attempt).merge(data)
+
+    legacy_turnitin_data = turnitin_data.except(:webhook_info, :provider, :last_processed_attempt)
+    merged_data = legacy_turnitin_data.merge(data)
+
+    return merged_data if assignment.vericite_enabled?
+
+    legacy_turnitin_data.each_key do |asset_key|
+      next if merged_data[asset_key].key?(:view_report_url)
+
+      merged_data[asset_key][:view_report_url] = view_report_url("turnitin", asset_key)
+    end
+
+    merged_data
   end
+
+  def view_report_url(report_type, asset_key)
+    submission_identifier = assignment.anonymize_students? ? anonymous_id : user_id
+    url_path_prefix = assignment.anonymize_students? ? "anonymous_submissions" : "submissions"
+
+    "/courses/#{assignment.context_id}/assignments/#{assignment_id}/#{url_path_prefix}/#{submission_identifier}/#{report_type}/#{asset_key}?attempt=#{attempt}"
+  end
+  private :view_report_url
 
   # Returns an array of the versioned originality reports in a sorted order. The ordering goes
   # from least preferred report to most preferred reports, assuming there are reports that share
@@ -1723,7 +1744,7 @@ class Submission < ActiveRecord::Base
     key = include_version ? :with_version : :without_version
     @submission_histories[key] ||= begin
       res = []
-      last_submitted_at = nil
+      seen_submitted_ats = Set.new
       versions.sort_by(&:created_at).reverse_each do |version|
         model = version.model
         # since vericite_data is a function, make sure you are cloning the most recent vericite_data_hash
@@ -1734,9 +1755,9 @@ class Submission < ActiveRecord::Base
           model.turnitin_data = originality_data
         end
 
-        if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
+        if model.submitted_at && !seen_submitted_ats.include?(model.submitted_at.to_i)
           res << (include_version ? { model:, version: } : model)
-          last_submitted_at = model.submitted_at
+          seen_submitted_ats << model.submitted_at.to_i
         end
       end
 
@@ -2311,6 +2332,7 @@ class Submission < ActiveRecord::Base
   scope :with_assignment, -> { joins(:assignment).merge(Assignment.active) }
 
   scope :graded, -> { where("(submissions.score IS NOT NULL AND submissions.workflow_state = 'graded') or submissions.excused = true") }
+  scope :with_sticker, -> { where.not(sticker: nil) }
   scope :not_submitted_or_graded, -> { where(submission_type: nil).where("(submissions.score IS NULL OR submissions.workflow_state <> 'graded') AND submissions.excused IS NOT TRUE") }
 
   scope :ungraded, -> { where(grade: nil).preload(:assignment) }
@@ -2637,11 +2659,19 @@ class Submission < ActiveRecord::Base
     @assessment_request_count ||= 0
     @assessment_request_count += 1
     user = obj.try(:user)
-    association = AbstractAssignment.find(assignment_id).active_rubric_association? ? assignment.rubric_association : nil
+    assignment = AbstractAssignment.find(assignment_id)
+    association = assignment.active_rubric_association? ? assignment.rubric_association : nil
     res = assessment_requests.where(assessor_asset_id: obj.id, assessor_asset_type: obj.class.to_s, assessor_id: user.id, rubric_association_id: association.try(:id))
                              .first_or_initialize
     res.user_id = user_id
     res.workflow_state = "assigned" if res.new_record?
+
+    if res.new_record? && assignment.context.feature_enabled?(:peer_review_grading) &&
+       assignment.peer_reviews? &&
+       assignment.peer_review_sub_assignment.present?
+      res.peer_review_sub_assignment_id = assignment.peer_review_sub_assignment.id
+    end
+
     res.send_reminder! # this method also saves the assessment_request
     obj.assign_assessment(res) if obj.is_a?(Submission) && res.previously_new_record?
     res

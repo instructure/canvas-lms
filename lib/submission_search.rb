@@ -79,7 +79,21 @@ class SubmissionSearch
       # return all submissions for the selected group
       search_scope = search_scope.where(user_id: group_selection.initial_group.user_ids) if group_selection.initial_group.present?
     end
-    search_scope = if @course.grants_any_right?(@searcher, @session, :manage_grades, :view_all_grades) || @course.participating_observers.map(&:id).include?(@searcher.id)
+
+    can_manage_or_view_grades = @course.grants_any_right?(@searcher, @session, :manage_grades, :view_all_grades)
+
+    if @options[:posting_status].present? && can_manage_or_view_grades
+      case @options[:posting_status]
+      when :postable
+        search_scope = search_scope.postable.unposted
+      when :hideable
+        search_scope = search_scope.posted
+      else
+        raise "posting_status '#{@options[:posting_status]}' is not supported"
+      end
+    end
+
+    search_scope = if can_manage_or_view_grades || @course.participating_observers.map(&:id).include?(@searcher.id)
                      # a user with manage_grades, view_all_grades, or an observer can see other users' submissions
                      # TODO: may want to add a preloader for this
                      search_scope.where(user_id: allowed_users)
@@ -246,7 +260,10 @@ class SubmissionSearch
   end
 
   def representatives
-    @representatives ||= @assignment.representatives(user: @searcher, ignore_student_visibility: true, include_others: true)
+    includes = [:inactive]
+    settings = @searcher.get_preference(:gradebook_settings, @course.global_id) || {}
+    includes << :completed if settings["show_concluded_enrollments"] == "true"
+    @representatives ||= @assignment.representatives(user: @searcher, includes:, ignore_student_visibility: true, include_others: true)
   end
 
   def excluded_enrollment_states_from_gradebook_settings

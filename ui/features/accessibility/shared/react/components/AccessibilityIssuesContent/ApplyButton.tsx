@@ -26,10 +26,6 @@ import {IconPublishSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 
-export interface ApplyButtonHandle {
-  focus: () => void
-}
-
 interface ApplyButtonProps {
   children: string
   undoMessage?: string
@@ -37,6 +33,7 @@ interface ApplyButtonProps {
   onUndo: () => void
   isApplied: boolean
   isLoading: boolean
+  disabled?: boolean
 }
 
 const I18n = createI18nScope('accessibility_checker')
@@ -48,6 +45,7 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
   undoMessage,
   isApplied,
   isLoading,
+  disabled = false,
 }: ApplyButtonProps) => {
   const undoButtonRef = useRef<HTMLButtonElement | null>(null)
   const applyButtonRef = useRef<HTMLButtonElement | null>(null)
@@ -89,7 +87,7 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
           <CondensedButton
             data-testid="undo-button"
             elementRef={e => (undoButtonRef.current = e as HTMLButtonElement)}
-            interaction={isLoading ? 'disabled' : 'enabled'}
+            interaction={isLoading || disabled ? 'disabled' : 'enabled'}
             onClick={handleUndo}
           >
             {isLoading ? (
@@ -109,7 +107,7 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
         data-testid="apply-button"
         elementRef={e => (applyButtonRef.current = e as HTMLButtonElement)}
         color="primary"
-        interaction={isLoading ? 'disabled' : 'enabled'}
+        interaction={isLoading || disabled ? 'disabled' : 'enabled'}
         onClick={handleApply}
       >
         {isLoading ? (

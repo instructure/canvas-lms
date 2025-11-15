@@ -754,6 +754,18 @@ describe ApplicationHelper do
         @current_user.disable_feature!(:new_user_tutorial_on_off)
         expect(tutorials_enabled?).to be false
       end
+
+      it "returns true if the user has no explicit feature setting" do
+        expect(tutorials_enabled?).to be true
+      end
+
+      it "returns false if the user predates the tutorial feature flag, unless there is an explicit setting" do
+        @current_user.update_column(:created_at, Date.new(2017, 1, 1))
+        expect(tutorials_enabled?).to be false
+
+        @current_user.enable_feature!(:new_user_tutorial_on_off)
+        expect(tutorials_enabled?).to be true
+      end
     end
   end
 

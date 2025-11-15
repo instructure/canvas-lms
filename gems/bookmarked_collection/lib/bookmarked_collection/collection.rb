@@ -90,9 +90,6 @@ class BookmarkedCollection::Collection < Array
       end
     elsif page.to_s =~ /^\d+$/ && page.to_i > 1
       raise BookmarkedCollection::InvalidPage
-      # else
-      # not tagged as a bookmark
-      # nil
     end
   end
 

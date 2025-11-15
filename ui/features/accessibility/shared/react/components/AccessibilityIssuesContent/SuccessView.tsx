@@ -21,7 +21,6 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {CloseButton} from '@instructure/ui-buttons'
 import {Alert} from '@instructure/ui-alerts'
 import {Img} from '@instructure/ui-img'
 
@@ -37,7 +36,7 @@ interface SuccessViewProps {
   title: string
   nextResource: NextResource
   onClose: () => void
-  handleNext: () => void
+  handleSkip: () => void
   handlePrevious: () => void
   handleNextResource: () => void
   assertiveAlertMessage: string
@@ -48,7 +47,7 @@ const SuccessView: React.FC<SuccessViewProps> = ({
   title,
   nextResource,
   onClose,
-  handleNext,
+  handleSkip,
   handlePrevious,
   handleNextResource,
   assertiveAlertMessage,
@@ -72,13 +71,6 @@ const SuccessView: React.FC<SuccessViewProps> = ({
             <Heading level="h2" variant="titleCardRegular">
               {title}
             </Heading>
-            <CloseButton
-              placement="end"
-              data-testid="close-button"
-              margin="small"
-              screenReaderLabel={I18n.t('Close')}
-              onClick={onClose}
-            />
           </View>
           <View margin="large 0">
             <Text size="large" variant="descriptionPage" as="h3">
@@ -92,11 +84,11 @@ const SuccessView: React.FC<SuccessViewProps> = ({
         <Flex.Item as="footer">
           <AccessibilityIssuesDrawerFooter
             nextButtonName={nextResource?.index >= 0 ? I18n.t('Next resource') : I18n.t('Close')}
-            onNext={handleNext}
+            onSkip={handleSkip}
             onBack={handlePrevious}
             onSaveAndNext={nextResource?.index >= 0 ? handleNextResource : onClose}
             isBackDisabled={true}
-            isNextDisabled={true}
+            isSkipDisabled={true}
             isSaveAndNextDisabled={false}
           />
         </Flex.Item>

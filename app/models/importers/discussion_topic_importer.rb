@@ -106,6 +106,7 @@ module Importers
          allow_rating
          only_graders_can_rate
          sort_by_rating
+         sort_order
          sort_order_locked
          expanded
          expanded_locked
@@ -117,6 +118,7 @@ module Importers
       end
 
       item.reply_to_entry_required_count = options[:reply_to_entry_required_count] || 0
+      item.sort_order = DiscussionTopic::SortOrder::DEFAULT unless DiscussionTopic::SortOrder::TYPES.include?(item.sort_order)
 
       type = item.is_a?(Announcement) ? :announcement : :discussion_topic
       item.locked = options[:locked] if !options[:locked].nil? && type == :announcement

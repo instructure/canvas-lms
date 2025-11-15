@@ -27,16 +27,22 @@ class PeerReview::SectionOverrideCreatorService < PeerReview::SectionOverrideCom
     section = course_section(section_id)
     validate_section_exists(section)
 
-    create_override(section)
+    ActiveRecord::Base.transaction do
+      parent_override = find_parent_override(section_id)
+      validate_section_parent_override_exists(parent_override, section_id)
+
+      create_override(section, parent_override)
+    end
   end
 
   private
 
-  def create_override(section)
+  def create_override(section, parent_override)
     override = @peer_review_sub_assignment.assignment_overrides.build(
       set: section,
       dont_touch_assignment: true,
-      unassign_item: fetch_unassign_item
+      unassign_item: fetch_unassign_item,
+      parent_override:
     )
     apply_overridden_dates(override, @override)
 

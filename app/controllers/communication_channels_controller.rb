@@ -199,7 +199,7 @@ class CommunicationChannelsController < ApplicationController
       @pseudonym.generate_temporary_password
 
       unless @pseudonym.valid?
-        return render json: @pseudonym.errors.as_json, status: :bad_request
+        return render json: @pseudonym.errors, status: :bad_request
       end
     end
 
@@ -212,7 +212,7 @@ class CommunicationChannelsController < ApplicationController
 
     if !@cc.new_record? && !@cc.retired? && @cc.path_type != CommunicationChannel::TYPE_PUSH
       @cc.errors.add(:path, "unique!")
-      return render json: @cc.errors.as_json, status: :bad_request
+      return render json: @cc.errors, status: :bad_request
     end
 
     @cc.user = @user
@@ -235,7 +235,7 @@ class CommunicationChannelsController < ApplicationController
       flash[:notice] = t("profile.notices.contact_registered", "Contact method registered!")
       render json: communication_channel_json(@cc, @current_user, session)
     else
-      render json: @cc.errors.as_json, status: :bad_request
+      render json: @cc.errors, status: :bad_request
     end
   end
 

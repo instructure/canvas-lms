@@ -33,6 +33,8 @@ const mockedEditor = {
 
 jest.mock('../getPosition')
 
+let mockUseQuery = null
+
 jest.mock('@apollo/client', () => {
   const data = {
     legacyNode: {
@@ -111,7 +113,7 @@ jest.mock('@apollo/client', () => {
   return {
     __esModule: true,
     gql: originalGql,
-    useQuery: () => ({data}),
+    useQuery: jest.fn(() => mockUseQuery || {data, loading: false, fetchMore: jest.fn()}),
   }
 })
 
@@ -124,6 +126,7 @@ describe('Mention Dropdown', () => {
 
   beforeEach(() => {
     getPosition.mockClear()
+    mockUseQuery = null
     const editor = new FakeEditor()
     editor.getParam = () => {
       return 'LTR'
@@ -208,6 +211,176 @@ describe('Mention Dropdown', () => {
       fireEvent.click(menuItems[1].querySelector('li'))
 
       expect(spy).toHaveBeenCalled()
+    })
+  })
+
+  describe('Pagination', () => {
+    beforeEach(() => {
+      mockUseQuery = null
+    })
+
+    it('should show loading spinner when loading is true', () => {
+      mockUseQuery = {
+        data: {
+          legacyNode: {
+            id: 'Vxb',
+            mentionableUsersConnection: {
+              nodes: [],
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: null,
+              },
+              __typename: 'MessageableUserConnection',
+            },
+            __typename: 'Discussion',
+          },
+        },
+        loading: true,
+        fetchMore: jest.fn(),
+      }
+
+      const {getAllByText} = setup()
+      const loadingTexts = getAllByText('Loading mentionable users')
+      expect(loadingTexts.length).toBeGreaterThan(0)
+    })
+
+    it('should display Load More button when hasNextPage is true', () => {
+      mockUseQuery = {
+        data: {
+          legacyNode: {
+            id: 'Vxb',
+            mentionableUsersConnection: {
+              nodes: [
+                {
+                  _id: 'Aa',
+                  id: 1,
+                  name: 'Jeffrey Johnson',
+                  __typename: 'MessageableUser',
+                },
+                {
+                  _id: 'Ab',
+                  id: 2,
+                  name: 'Matthew Lemon',
+                  __typename: 'MessageableUser',
+                },
+              ],
+              pageInfo: {
+                hasNextPage: true,
+                endCursor: 'cursor123',
+              },
+              __typename: 'MessageableUserConnection',
+            },
+            __typename: 'Discussion',
+          },
+        },
+        loading: false,
+        fetchMore: jest.fn(),
+      }
+
+      const {getByText} = setup()
+      expect(getByText('Load More Users...')).toBeInTheDocument()
+    })
+
+    it('should not display Load More button when hasNextPage is false', () => {
+      mockUseQuery = {
+        data: {
+          legacyNode: {
+            id: 'Vxb',
+            mentionableUsersConnection: {
+              nodes: [
+                {
+                  _id: 'Aa',
+                  id: 1,
+                  name: 'Jeffrey Johnson',
+                  __typename: 'MessageableUser',
+                },
+              ],
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: null,
+              },
+              __typename: 'MessageableUserConnection',
+            },
+            __typename: 'Discussion',
+          },
+        },
+        loading: false,
+        fetchMore: jest.fn(),
+      }
+
+      const {queryByText} = setup()
+      expect(queryByText('Load More Users...')).not.toBeInTheDocument()
+    })
+
+    it('should call fetchMore when Load More is clicked', () => {
+      const fetchMoreMock = jest.fn().mockResolvedValue({})
+
+      mockUseQuery = {
+        data: {
+          legacyNode: {
+            id: 'Vxb',
+            mentionableUsersConnection: {
+              nodes: [
+                {
+                  _id: 'Aa',
+                  id: 1,
+                  name: 'Jeffrey Johnson',
+                  __typename: 'MessageableUser',
+                },
+              ],
+              pageInfo: {
+                hasNextPage: true,
+                endCursor: 'cursor123',
+              },
+              __typename: 'MessageableUserConnection',
+            },
+            __typename: 'Discussion',
+          },
+        },
+        loading: false,
+        fetchMore: fetchMoreMock,
+      }
+
+      const {getByText} = setup()
+      const loadMoreButton = getByText('Load More Users...')
+      fireEvent.click(loadMoreButton)
+
+      expect(fetchMoreMock).toHaveBeenCalledWith({
+        variables: {
+          after: 'cursor123',
+        },
+      })
+    })
+
+    it('should not display Load More button while loading', () => {
+      mockUseQuery = {
+        data: {
+          legacyNode: {
+            id: 'Vxb',
+            mentionableUsersConnection: {
+              nodes: [
+                {
+                  _id: 'Aa',
+                  id: 1,
+                  name: 'Jeffrey Johnson',
+                  __typename: 'MessageableUser',
+                },
+              ],
+              pageInfo: {
+                hasNextPage: true,
+                endCursor: 'cursor123',
+              },
+              __typename: 'MessageableUserConnection',
+            },
+            __typename: 'Discussion',
+          },
+        },
+        loading: true,
+        fetchMore: jest.fn(),
+      }
+
+      const {queryByText} = setup()
+      expect(queryByText('Load More Users...')).not.toBeInTheDocument()
     })
   })
 })

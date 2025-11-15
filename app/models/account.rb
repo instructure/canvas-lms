@@ -631,7 +631,7 @@ class Account < ActiveRecord::Base
   def recaptcha_key
     return nil unless root_account? && self_registration_captcha?
 
-    DynamicSettings.find(tree: "private")["recaptcha_client_key", failsafe: nil]
+    Rails.application.credentials.dig(:recaptcha_keys, :client_key)
   end
 
   def self_registration_allowed_for?(type)
@@ -982,6 +982,9 @@ class Account < ActiveRecord::Base
           @invalidations.each do |key|
             Rails.cache.delete([key, global_id].cache_key)
           end
+          # Prevent subsequent code using a stale Account object whose cached associations
+          # or inherited settings were just invalidated.
+          reload_if_cache_stale
           Account.delay_if_production(singleton: "Account.invalidate_inherited_caches_#{global_id}")
                  .invalidate_inherited_caches(self, @invalidations)
         end
@@ -1004,6 +1007,21 @@ class Account < ActiveRecord::Base
         EnrollmentState.invalidate_access_for_accounts([parent_account.id] + account_ids, access_keys)
       end
     end
+  end
+
+  def cache_stale?
+    return false unless persisted?
+
+    db_updated_at = self.class.unscoped.where(id:).pick(:updated_at)
+    db_updated_at && updated_at && updated_at < db_updated_at
+  end
+
+  def reload_if_cache_stale
+    return unless cache_stale?
+
+    reload
+  rescue => e
+    Rails.logger.debug { "reload_if_cache_stale failed for Account #{global_id}: #{e.class}: #{e.message}" }
   end
 
   DEFAULT_STORAGE_QUOTA = 500.decimal_megabytes

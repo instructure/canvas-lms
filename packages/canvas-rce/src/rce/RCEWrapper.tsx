@@ -1162,6 +1162,35 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       tinyapp.setAttribute('aria-label', formatMessage('Rich Content Editor'))
       tinyapp.setAttribute('role', 'document')
       tinyapp.setAttribute('tabIndex', '-1')
+
+      // tinyMCE browser detection is wrong for Edge tinymce.Env.browser.isEdge
+      const isEdge = /edg/i.test(navigator.userAgent)
+      if (isEdge) {
+        // Edge translation service breaks the editor
+        tinyapp.setAttribute('translate', 'no')
+      }
+    }
+
+    // remove role="aplication" attribute from the iframe body
+    // tinymce adds this when the editor is wrapped in an iframe
+    // which makes RCE input fields inaccessible to screen readers
+    const iframe = tinyapp?.querySelector('iframe')
+    const body = iframe?.contentDocument?.body
+    if (body) {
+      const observer = new MutationObserver(() => {
+        try {
+          if (body && body.getAttribute('role') === 'application') {
+            body.removeAttribute('role')
+          }
+        } catch (_) {
+          /* pass */
+        }
+      })
+
+      observer.observe(body, {attributes: true, childList: false, subtree: false})
+      body.setAttribute('data-role-checked', 'true') // to trigger observer
+
+      setTimeout(() => observer.disconnect(), 10000)
     }
 
     // Probably should do this in tinymce.scss, but we only want it in new rce

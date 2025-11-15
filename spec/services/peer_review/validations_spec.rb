@@ -842,6 +842,200 @@ RSpec.describe PeerReview::Validations do
     end
   end
 
+  describe "#validate_adhoc_parent_override_exists" do
+    let(:students) { create_users_in_course(course, 3, return_type: :record) }
+    let(:student_ids) { students.map(&:id) }
+    let(:mock_parent_override) { double("parent_override") }
+
+    it "does not raise an error when parent override is present" do
+      expect { service.validate_adhoc_parent_override_exists(mock_parent_override, student_ids) }.not_to raise_error
+    end
+
+    it "raises ParentOverrideNotFoundError when parent override is nil" do
+      expect { service.validate_adhoc_parent_override_exists(nil, student_ids) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError,
+        /Parent assignment ADHOC override not found for students/
+      )
+    end
+
+    it "includes student IDs in error message" do
+      expect { service.validate_adhoc_parent_override_exists(nil, student_ids) }.to raise_error do |error|
+        expect(error).to be_a(PeerReview::ParentOverrideNotFoundError)
+        student_ids.each do |id|
+          expect(error.message).to include(id.to_s)
+        end
+      end
+    end
+
+    it "formats student IDs as comma-separated list in error message" do
+      expect { service.validate_adhoc_parent_override_exists(nil, [1, 2, 3]) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError,
+        /1, 2, 3/
+      )
+    end
+
+    it "uses I18n.t for error message" do
+      expect(I18n).to receive(:t).with(
+        "Parent assignment ADHOC override not found for students %{student_ids}",
+        { student_ids: student_ids.join(", ") }
+      ).and_call_original
+
+      expect { service.validate_adhoc_parent_override_exists(nil, student_ids) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError
+      )
+    end
+
+    it "does not raise an error when parent override is false" do
+      expect { service.validate_adhoc_parent_override_exists(false, student_ids) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError
+      )
+    end
+  end
+
+  describe "#validate_course_parent_override_exists" do
+    let(:course_id) { course.id }
+    let(:mock_parent_override) { double("parent_override") }
+
+    it "does not raise an error when parent override is present" do
+      expect { service.validate_course_parent_override_exists(mock_parent_override, course_id) }.not_to raise_error
+    end
+
+    it "raises ParentOverrideNotFoundError when parent override is nil" do
+      expect { service.validate_course_parent_override_exists(nil, course_id) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError,
+        /Parent assignment Course override not found for course/
+      )
+    end
+
+    it "includes course ID in error message" do
+      expect { service.validate_course_parent_override_exists(nil, course_id) }.to raise_error do |error|
+        expect(error).to be_a(PeerReview::ParentOverrideNotFoundError)
+        expect(error.message).to include("course")
+      end
+    end
+
+    it "uses I18n.t for error message" do
+      expect(I18n).to receive(:t).with(
+        "Parent assignment Course override not found for course %{course_id}",
+        { course_id: }
+      ).and_call_original
+
+      expect { service.validate_course_parent_override_exists(nil, course_id) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError
+      )
+    end
+
+    it "raises error when parent override is false" do
+      expect { service.validate_course_parent_override_exists(false, course_id) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError
+      )
+    end
+
+    it "handles numeric course IDs" do
+      expect { service.validate_course_parent_override_exists(nil, 12_345) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError,
+        /course/
+      )
+    end
+  end
+
+  describe "#validate_group_parent_override_exists" do
+    let(:group_category) { course.group_categories.create!(name: "Project Groups") }
+    let(:group) { group_category.groups.create!(context: course, name: "Group 1") }
+    let(:group_id) { group.id }
+    let(:mock_parent_override) { double("parent_override") }
+
+    it "does not raise an error when parent override is present" do
+      expect { service.validate_group_parent_override_exists(mock_parent_override, group_id) }.not_to raise_error
+    end
+
+    it "raises ParentOverrideNotFoundError when parent override is nil" do
+      expect { service.validate_group_parent_override_exists(nil, group_id) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError,
+        /Parent assignment Group override not found for group/
+      )
+    end
+
+    it "includes group ID in error message" do
+      expect { service.validate_group_parent_override_exists(nil, group_id) }.to raise_error do |error|
+        expect(error).to be_a(PeerReview::ParentOverrideNotFoundError)
+        expect(error.message).to include("group")
+      end
+    end
+
+    it "uses I18n.t for error message" do
+      expect(I18n).to receive(:t).with(
+        "Parent assignment Group override not found for group %{group_id}",
+        { group_id: }
+      ).and_call_original
+
+      expect { service.validate_group_parent_override_exists(nil, group_id) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError
+      )
+    end
+
+    it "raises error when parent override is false" do
+      expect { service.validate_group_parent_override_exists(false, group_id) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError
+      )
+    end
+
+    it "handles numeric group IDs" do
+      expect { service.validate_group_parent_override_exists(nil, 54_321) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError,
+        /group/
+      )
+    end
+  end
+
+  describe "#validate_section_parent_override_exists" do
+    let(:section) { add_section("Test Section", course:) }
+    let(:section_id) { section.id }
+    let(:mock_parent_override) { double("parent_override") }
+
+    it "does not raise an error when parent override is present" do
+      expect { service.validate_section_parent_override_exists(mock_parent_override, section_id) }.not_to raise_error
+    end
+
+    it "raises ParentOverrideNotFoundError when parent override is nil" do
+      expect { service.validate_section_parent_override_exists(nil, section_id) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError,
+        /Parent assignment Section override not found for section/
+      )
+    end
+
+    it "includes section ID in error message" do
+      expect { service.validate_section_parent_override_exists(nil, section_id) }.to raise_error do |error|
+        expect(error).to be_a(PeerReview::ParentOverrideNotFoundError)
+        expect(error.message).to include("section")
+      end
+    end
+
+    it "uses I18n.t for error message" do
+      expect(I18n).to receive(:t).with(
+        "Parent assignment Section override not found for section %{section_id}",
+        { section_id: }
+      ).and_call_original
+
+      expect { service.validate_section_parent_override_exists(nil, section_id) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError
+      )
+    end
+
+    it "raises error when parent override is false" do
+      expect { service.validate_section_parent_override_exists(false, section_id) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError
+      )
+    end
+
+    it "handles numeric section IDs" do
+      expect { service.validate_section_parent_override_exists(nil, 99_999) }.to raise_error(
+        PeerReview::ParentOverrideNotFoundError,
+        /section/
+      )
+    end
+  end
+
   describe "integration with module inclusion" do
     it "includes the validation methods in the service class" do
       expect(service).to respond_to(:validate_parent_assignment)
@@ -858,6 +1052,10 @@ RSpec.describe PeerReview::Validations do
       expect(service).to respond_to(:validate_student_ids_required)
       expect(service).to respond_to(:validate_group_assignment_required)
       expect(service).to respond_to(:validate_group_exists)
+      expect(service).to respond_to(:validate_adhoc_parent_override_exists)
+      expect(service).to respond_to(:validate_course_parent_override_exists)
+      expect(service).to respond_to(:validate_group_parent_override_exists)
+      expect(service).to respond_to(:validate_section_parent_override_exists)
     end
 
     it "properly accesses instance variables set in the including class" do

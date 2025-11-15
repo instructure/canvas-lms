@@ -684,7 +684,7 @@ const CreateEditAllocationRuleModal = ({
               onChange={handleTargetSelection}
               name="target"
               defaultValue={targetType ?? TARGET_TYPES.REVIEWER}
-              description=""
+              description={I18n.t('Rule Type')}
               data-testid="target-type-radio-group"
             >
               <RadioInput
@@ -728,7 +728,7 @@ const CreateEditAllocationRuleModal = ({
           </Flex.Item>
           <Flex.Item padding="small">
             <FormFieldGroup
-              description=""
+              description={I18n.t('Review Requirement')}
               layout="stacked"
               rowSpacing="small"
               role="radiogroup"

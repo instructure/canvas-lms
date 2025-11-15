@@ -547,7 +547,8 @@ class UsersController < ApplicationController
                                    .profile
                                    .tabs_available(@current_user, root_account: @domain_root_account)
                                    .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES },
-               SHARED_COURSE_DATA: course_data_with_grades
+               SHARED_COURSE_DATA: course_data_with_grades,
+               DASHBOARD_FEATURES: { widget_dashboard_customization: Account.site_admin.feature_enabled?(:widget_dashboard_customization) }
              })
       return render html: "", layout: true
     end
@@ -2932,7 +2933,7 @@ class UsersController < ApplicationController
         if user_saved
           invited_users << user_hash.merge(id: user.id, user_token: user.token)
         else
-          errored_users << user_hash.merge(user.errors.as_json)
+          errored_users << user_hash.merge(Api::Errors::Reporter.to_json(user.errors))
         end
       end
     end
@@ -3519,7 +3520,7 @@ class UsersController < ApplicationController
     return nil unless @access_token.nil?
 
     response = CanvasHttp.post("https://www.google.com/recaptcha/api/siteverify", form_data: {
-                                 secret: DynamicSettings.find(tree: :private)["recaptcha_server_key"],
+                                 secret: Rails.application.credentials.dig(:recaptcha_keys, :server_key),
                                  response: recaptcha_response
                                })
 
@@ -3546,53 +3547,96 @@ class UsersController < ApplicationController
   end
 
   def fetch_courses_with_grades(observed_user = nil)
-    # Get current course IDs using shared filtering logic
     target_user = observed_user || @current_user
-    current_course_ids = if observed_user
-                           observer_courses = @current_user.cached_course_ids_for_observed_user(observed_user)
-                           observed_current_courses = observed_user.cached_current_course_ids_for_dashboard(domain_root_account: @domain_root_account)
-                           observer_courses & observed_current_courses
-                         else
-                           @current_user.cached_current_course_ids_for_dashboard(domain_root_account: @domain_root_account)
-                         end
 
-    return [] if current_course_ids.empty?
+    # Use menu_courses to get filtered course list (handles favorites, invited enrollments, etc.)
+    # Pass limit directly to menu_courses for thread-safe, request-isolated behavior
+    courses = target_user.menu_courses(nil, { observee_user: observed_user, limit: 50 })
 
-    # Get enrollments for current courses with scores preloaded
-    current_enrollments = target_user.enrollments
-                                     .not_deleted
-                                     .shard(target_user.in_region_associated_shards)
-                                     .where(course_id: current_course_ids)
-                                     .preload(:course, :scores)
-                                     .to_a
+    return [] if courses.empty?
 
-    course_data = current_enrollments.filter_map do |enrollment|
-      course = enrollment.course
+    # Preload enrollments and scores for efficient querying
+    course_ids = courses.map(&:id)
+    enrollments_by_course = target_user.enrollments
+                                       .not_deleted
+                                       .shard(target_user.in_region_associated_shards)
+                                       .where(course_id: course_ids)
+                                       .preload(:scores, :enrollment_state, :course_section)
+                                       .index_by(&:course_id)
 
-      can_read_grades = if (observed_user || @current_user).id == @current_user.id
+    # Filter courses for grade widget display
+    # While menu_courses provides navigation courses (includes invited, homerooms, etc.),
+    # the grade widget should only show courses with active enrollments and meaningful grades
+    courses = courses.reject do |course|
+      enrollment = enrollments_by_course[course.id]
+
+      # Exclude if no enrollment
+      next true if enrollment.nil?
+
+      # Exclude if enrollment is invited/pending
+      next true if %w[invited creation_pending].include?(enrollment.workflow_state)
+
+      # Exclude if enrollment dates are in the past
+      next true if enrollment.respond_to?(:section_or_course_date_in_past?) && enrollment.section_or_course_date_in_past?
+
+      # Exclude homeroom courses (no grades to display)
+      next true if course.homeroom_course?
+
+      false
+    end
+
+    # For observers: only show courses where observer has enrollment linked to this specific student
+    if observed_user
+      observer_linked_course_ids = @current_user.cached_course_ids_for_observed_user(observed_user)
+      courses = courses.select { |c| observer_linked_course_ids.include?(c.id) }
+    end
+
+    return [] if courses.empty?
+
+    # Update course_ids after filtering
+    course_ids = courses.map(&:id)
+
+    # For observers, get observer's enrollments to check read_grades permission
+    observer_enrollments_by_course = if target_user.id == @current_user.id
+                                       {}
+                                     else
+                                       @current_user.enrollments
+                                                    .not_deleted
+                                                    .shard(@current_user.in_region_associated_shards)
+                                                    .where(
+                                                      course_id: course_ids,
+                                                      type: "ObserverEnrollment",
+                                                      associated_user_id: observed_user.id
+                                                    )
+                                                    .index_by(&:course_id)
+                                     end
+
+    course_data = courses.filter_map do |course|
+      enrollment = enrollments_by_course[course.id]
+      next unless enrollment
+
+      # Check grade visibility
+      can_read_grades = if target_user.id == @current_user.id
                           !course.hide_final_grades? || course.grants_any_right?(@current_user, :view_all_grades, :manage_grades)
                         else
-                          enrollment.grants_right?(@current_user, :read_grades) || course.grants_any_right?(@current_user, :view_all_grades, :manage_grades)
+                          observer_enrollment = observer_enrollments_by_course[course.id]
+                          observer_enrollment&.grants_right?(@current_user, :read_grades) || course.grants_any_right?(@current_user, :view_all_grades, :manage_grades)
                         end
 
-      next unless can_read_grades
-
-      course_score = enrollment.find_score(course_score: true)
+      # Get grade data if visible
       display_grade = nil
+      grading_scheme = "percentage"
 
-      if course_score
-        if course_score.override_score.present?
-          display_grade = course_score.override_score
-        elsif course_score.current_score.present?
-          display_grade = course_score.current_score
+      if can_read_grades
+        course_score = enrollment.find_score(course_score: true)
+        if course_score
+          display_grade = course_score.override_score.presence || course_score.current_score
+        end
+
+        if course.grading_standard_enabled? && course.grading_standard
+          grading_scheme = course.grading_standard.data
         end
       end
-
-      grading_scheme = if course.grading_standard_enabled? && course.grading_standard
-                         course.grading_standard.data
-                       else
-                         "percentage"
-                       end
 
       {
         courseId: course.id.to_s,
@@ -3604,32 +3648,21 @@ class UsersController < ApplicationController
       }
     end
 
-    course_data.compact.uniq { |c| c[:courseId] }.sort_by { |course| course[:courseName].downcase }
+    course_data.sort_by { |course| course[:courseName].downcase }
   end
 
   def should_show_widget_dashboard?
     return false if k5_user?
 
-    flag = widget_dashboard_feature_flag
+    # Single feature flag lookup to avoid redundant queries
+    flag = @domain_root_account&.lookup_feature_flag(:widget_dashboard)
     return false unless flag
 
-    # If feature is locked on (cannot override), force widget dashboard for all eligible users
-    # If feature can be overridden (allowed or allowed_on), respect user preference
-    if flag.enabled? && !flag.can_override?
-      # Feature is locked on - show for all eligible users regardless of preference
-      if @current_user.observer_enrollments.active.any?
-        # only show widget dashboard if observer is actively observing a student
-        return true if @selected_observed_user && @selected_observed_user != @current_user
-      elsif !@current_user.non_student_enrollment?
-        return true
-      end
-      return false
-    end
+    # Check if feature is locked on (cannot be overridden)
+    force_on = flag.enabled? && !flag.can_override?
 
-    # Feature allows override (allowed or allowed_on) - check user preference
-    # For allowed_on, preference defaults to true; for allowed, it defaults to true
-    return false unless flag.can_override?
-    return false unless @current_user.prefers_widget_dashboard?
+    # If not forced on, check user preference (pass flag to avoid re-lookup)
+    return false unless force_on || @current_user.prefers_widget_dashboard?(@domain_root_account, flag)
 
     if @current_user.observer_enrollments.active.any?
       # only show widget dashboard if observer is actively observing a student
@@ -3638,29 +3671,5 @@ class UsersController < ApplicationController
       return true
     end
     false
-  end
-
-  def widget_dashboard_feature_flag
-    return nil unless @current_user
-
-    # Check all associated accounts and return the most permissive flag
-    # This allows any account in the user's hierarchy to enable the feature
-    flags = @current_user.associated_accounts.filter_map do |account|
-      flag = account.lookup_feature_flag(:widget_dashboard)
-      flag if flag && (flag.enabled? || flag.can_override?)
-    end
-
-    # Return the most enabling flag (prioritize locked-on > enabled > allowed)
-    flags.max_by do |flag|
-      if flag.enabled? && !flag.can_override?
-        3 # Locked on
-      elsif flag.enabled?
-        2 # Enabled
-      elsif flag.can_override?
-        1 # Allowed
-      else
-        0
-      end
-    end
   end
 end

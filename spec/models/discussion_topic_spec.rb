@@ -1234,6 +1234,91 @@ describe DiscussionTopic do
         @assignment.reload
         expect(@assignment.title).to eq original_name
       end
+
+      context "with attachment associations" do
+        before do
+          @course.root_account.enable_feature!(:file_association_access)
+
+          @attachment1 = attachment_with_context(@course)
+          @attachment2 = attachment_with_context(@course)
+
+          html_with_attachments = <<~HTML
+            <p>Discussion content</p>
+            <p><a href="/courses/#{@course.id}/files/#{@attachment1.id}/download">file 1</a></p>
+            <img src="/courses/#{@course.id}/files/#{@attachment2.id}/preview">
+          HTML
+
+          @topic.message = html_with_attachments
+          @topic.updating_user = @teacher
+          @topic.save!
+        end
+
+        it "creates attachment associations for parent topic" do
+          expect(AttachmentAssociation.where(context: @topic).count).to eq 2
+        end
+
+        it "skips update_attachment_associations callback when creating child topics" do
+          # this should not raise "User is required to update attachment links" error that is coming from #LinkedAttachmentHandler.associate_attachments_to_rce_object
+          expect { @topic.refresh_subtopics }.not_to raise_error
+
+          subtopics = @topic.reload.child_topics
+          expect(subtopics.size).to eq 2
+        end
+
+        it "copies attachment associations from parent to child topics" do
+          @topic.refresh_subtopics
+
+          subtopics = @topic.reload.child_topics
+          expect(subtopics.size).to eq 2
+
+          child_association_attachment_ids = AttachmentAssociation.where(context_type: "DiscussionTopic", context_id: subtopics)
+                                                                  .group(:context_id)
+                                                                  .pluck("array_agg(attachment_id) as attachment_ids")
+
+          child_association_attachment_ids.each do |attachment_ids|
+            expect(attachment_ids).to match_array([@attachment1.id, @attachment2.id])
+          end
+        end
+
+        it "preserves user_id from parent associations when copying to child topics" do
+          @topic.refresh_subtopics
+
+          subtopics = @topic.reload.child_topics
+          parent_associations = AttachmentAssociation.where(context: @topic)
+
+          expect(AttachmentAssociation.where(context: subtopics).pluck(:user_id).uniq).to match_array(parent_associations.pluck(:user_id).uniq)
+        end
+
+        it "updates child topic associations when parent attachments change" do
+          @topic.refresh_subtopics
+          subtopics = @topic.reload.child_topics
+
+          # initially each child has 2 associations after running line above
+          subtopics.each do |child|
+            expect(AttachmentAssociation.where(context: child).count).to eq 2
+          end
+
+          @attachment3 = attachment_with_context(@course)
+          new_html = <<~HTML
+            <p>Updated content</p>
+            <p><a href="/courses/#{@course.id}/files/#{@attachment3.id}/download">new file</a></p>
+          HTML
+
+          @topic.message = new_html
+          @topic.updating_user = @teacher
+          @topic.save!
+
+          @topic.refresh_subtopics
+
+          child_association_attachment_ids = AttachmentAssociation.where(context_type: "DiscussionTopic", context_id: subtopics)
+                                                                  .group(:context_id)
+                                                                  .pluck("array_agg(attachment_id) as attachment_ids")
+
+          child_association_attachment_ids.each do |attachment_ids|
+            expect(attachment_ids).to match_array([@attachment3.id])
+          end
+        end
+      end
     end
   end
 

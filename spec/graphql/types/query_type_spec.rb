@@ -1194,5 +1194,59 @@ describe Types::QueryType do
         expect(instructor_names).to eq((1..5).map { |i| "Instructor #{i}" })
       end
     end
+
+    context "multi-section scenarios" do
+      it "deduplicates instructors enrolled in multiple sections" do
+        # Create course with instructor teaching 3 sections
+        course = Course.create!(name: "Multi-Section Course", account: Account.default, workflow_state: "available")
+        section1 = course.default_section
+        section2 = course.course_sections.create!(name: "Section 2")
+        section3 = course.course_sections.create!(name: "Section 3")
+
+        student = User.create!(name: "Student")
+        course.enroll_student(student, section: section1, enrollment_state: "active")
+
+        shared_instructor = User.create!(name: "Shared Instructor")
+        [section1, section2, section3].each do |section|
+          enroll = Enrollment.create!(
+            user: shared_instructor,
+            course:,
+            course_section: section,
+            type: "TeacherEnrollment",
+            workflow_state: "active",
+            root_account_id: Account.default.id
+          )
+          enroll.enrollment_state.update!(state: "active", restricted_access: false)
+        end
+
+        result = CanvasSchema.execute(
+          query,
+          variables: { courseIds: [course.id.to_s] },
+          context: { current_user: student }
+        )
+
+        instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+        instructor_ids = instructors.pluck("user").pluck("_id")
+
+        # GraphQL uses DISTINCT ON (course_id, user_id) - instructor appears once despite 3 enrollments
+        expect(instructor_ids.count(shared_instructor.id.to_s)).to eq(1)
+        expect(instructor_ids.uniq).to eq(instructor_ids) # No duplicates
+      end
+
+      it "returns empty result for course with no instructors" do
+        course = Course.create!(name: "Empty Course", account: Account.default, workflow_state: "available")
+        student = User.create!(name: "Student")
+        course.enroll_student(student, section: course.default_section, enrollment_state: "active")
+
+        result = CanvasSchema.execute(
+          query,
+          variables: { courseIds: [course.id.to_s] },
+          context: { current_user: student }
+        )
+
+        instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+        expect(instructors).to be_empty
+      end
+    end
   end
 end

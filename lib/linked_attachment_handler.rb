@@ -22,6 +22,7 @@ module LinkedAttachmentHandler
   def self.included(klass)
     klass.send(:attr_accessor, :saving_user)
     klass.send(:attr_writer, :updating_user)
+    klass.send(:attr_accessor, :skip_attachment_association_update)
 
     klass.after_save :update_attachment_associations
     klass.extend(ClassMethods)
@@ -32,6 +33,7 @@ module LinkedAttachmentHandler
   end
 
   def update_attachment_associations
+    return if @skip_attachment_association_update
     return unless attachment_associations_creation_enabled?
 
     self.class.html_fields.each do |field|

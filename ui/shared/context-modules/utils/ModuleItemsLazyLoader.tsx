@@ -31,6 +31,14 @@ const BATCH_SIZE = 6
 
 type ModuleItems = string
 type ModuleItemsCallback = (moduleId: ModuleId, links?: Links) => void
+type BulkModuleItemsResponse = {
+  html: string
+  pagination: {
+    current_page: number
+    total_pages: number
+    per_page: number
+  } | null
+}
 
 class ModuleItemsLazyLoader {
   private static loadingData = new ModuleItemLoadingData()
@@ -208,16 +216,121 @@ class ModuleItemsLazyLoader {
   }
 
   async fetchModuleItems(moduleIds: ModuleId[], allPages?: boolean) {
-    for (let i = 0; i < moduleIds.length; i += BATCH_SIZE) {
-      const batch = moduleIds.slice(i, i + BATCH_SIZE)
-      await Promise.all(
-        batch.map(moduleId => {
-          return this.fetchModuleItemsHtml(moduleId, undefined, allPages).catch(error => {
-            console.error(`Error fetching module ${moduleId} items:`, error)
-            // swallow the error to ensure other fetches continue
-          })
-        }),
+    if (moduleIds.length === 0) return
+
+    const validModuleIds = moduleIds.filter(moduleId => moduleFromId(moduleId))
+    if (validModuleIds.length === 0) return
+
+    // For single module, use the individual endpoint to preserve full functionality
+    if (validModuleIds.length === 1) {
+      return await this.fetchModuleItemsHtml(validModuleIds[0], undefined, allPages).catch(
+        error => {
+          console.error('Error fetching module items for single module:', error)
+        },
       )
+    }
+
+    // For multiple modules, use bulk endpoint
+    // Backend limits to 40 modules per request - batch if needed
+    const MAX_BATCH_SIZE = 40
+    for (let i = 0; i < validModuleIds.length; i += MAX_BATCH_SIZE) {
+      const batch = validModuleIds.slice(i, i + MAX_BATCH_SIZE)
+      await this.fetchModuleItemsBatch(batch, allPages)
+    }
+  }
+
+  private async fetchModuleItemsBatch(moduleIds: ModuleId[], allPages?: boolean) {
+    // Set loading state for all modules before fetching
+    moduleIds.forEach(moduleId => {
+      const module = moduleFromId(moduleId)
+      if (!module) return
+
+      module.dataset.loadstate = 'loading'
+
+      const root = ModuleItemsLazyLoader.loadingData.getModuleRoot(moduleId)
+      if (!allPages) {
+        const paginationData = ModuleItemsLazyLoader.loadingData.getPaginationData(moduleId)
+        root?.render(
+          <ModuleItemPaging
+            moduleId={moduleId}
+            isLoading={true}
+            paginationData={paginationData}
+            onPageChange={this.onPageChange}
+            moduleName={this.getModuleName(module)}
+          />,
+        )
+      } else {
+        ModuleItemsLazyLoader.loadingData.removePaginationData(moduleId)
+        root?.render(<ModuleItemsLoadingSpinner isLoading={true} />)
+      }
+    })
+
+    try {
+      const pathParams = allPages ? 'no_pagination=1' : `per_page=${this.perPage}`
+      const moduleIdsParams = moduleIds.map(id => `module_ids[]=${id}`).join('&')
+
+      const result = await doFetchApi<Record<ModuleId, BulkModuleItemsResponse>>({
+        path: `/courses/${this.courseId}/modules/bulk_items_html?${pathParams}&${moduleIdsParams}`,
+        headers: {
+          accept: 'application/json',
+        },
+      })
+
+      if (result.json) {
+        for (const moduleId of moduleIds) {
+          const moduleData = result.json[moduleId]
+          if (moduleData) {
+            const html = moduleData.html
+            const pagination = moduleData.pagination
+
+            this.clearPageNumberIfAllPages(moduleId, allPages || false)
+            this.savePageNumber(moduleId, allPages || false, 1)
+            this.saveAllPage(moduleId, allPages || false)
+
+            // Convert pagination data to link format if provided
+            let links: Links | undefined
+            if (pagination && pagination.total_pages > 1) {
+              links = {
+                current: {
+                  page: pagination.current_page.toString(),
+                  url: '',
+                  rel: 'current',
+                },
+                first: {
+                  page: '1',
+                  url: '',
+                  rel: 'first',
+                },
+                last: {
+                  page: pagination.total_pages.toString(),
+                  url: '',
+                  rel: 'last',
+                },
+              }
+            }
+
+            this.renderResult(moduleId, html, links)
+            await this.callback(moduleId)
+          } else {
+            // Module wasn't in the response - handle as individual failure
+            const module = moduleFromId(moduleId)
+            if (module) {
+              module.dataset.loadstate = 'error'
+              this.renderError(moduleId, 1)
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching bulk module items:', error)
+      // Set error state for all modules when the entire request fails
+      moduleIds.forEach(moduleId => {
+        const module = moduleFromId(moduleId)
+        if (module) {
+          module.dataset.loadstate = 'error'
+          this.renderError(moduleId, 1)
+        }
+      })
     }
   }
 

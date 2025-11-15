@@ -2067,6 +2067,71 @@ describe GroupsController do
         get "users", params: { group_id: @collaborative_group.id }
         expect(response).to be_successful
       end
+
+      context "student section restrictions" do
+        it "allows students to see all group members in a single-section course" do
+          course_with_teacher(active_all: true)
+
+          @section1 = @course.course_sections.first
+
+          @student1 = user_factory(active_all: true, name: "Student 1")
+          @student2 = user_factory(active_all: true, name: "Student 2")
+
+          @course.enroll_student(@student1, section: @section1, enrollment_state: "active")
+          @course.enroll_student(@student2, section: @section1, enrollment_state: "active")
+
+          Enrollment.limit_privileges_to_course_section!(@course, @student1, true)
+
+          @group_category = @course.group_categories.create!(name: "Test Group Category")
+          @group = @course.groups.create!(name: "Student Group", group_category: @group_category)
+          @group.add_user(@student1)
+          @group.add_user(@student2)
+
+          user_session(@student1)
+
+          get :users, params: { group_id: @group.id }
+
+          expect(response).to be_successful
+          visible_users = response.parsed_body
+
+          visible_user_ids = visible_users.pluck("id")
+          expect(visible_user_ids).to include(@student1.id)
+          expect(visible_user_ids).to include(@student2.id)
+          expect(visible_users.count).to eq(2)
+        end
+
+        it "restricts section-restricted students to only see members from their section in multi-section course" do
+          course_with_teacher(active_all: true)
+
+          @section1 = @course.course_sections.create!(name: "Section 1")
+          @section2 = @course.course_sections.create!(name: "Section 2")
+
+          @student_section1 = user_factory(active_all: true, name: "Student Section 1")
+          @student_section2 = user_factory(active_all: true, name: "Student Section 2")
+
+          @course.enroll_student(@student_section1, section: @section1, enrollment_state: "active")
+          @course.enroll_student(@student_section2, section: @section2, enrollment_state: "active")
+
+          Enrollment.limit_privileges_to_course_section!(@course, @student_section1, true)
+
+          @group_category = @course.group_categories.create!(name: "Test Group Category")
+          @group = @course.groups.create!(name: "Mixed Section Group", group_category: @group_category)
+          @group.add_user(@student_section1)
+          @group.add_user(@student_section2)
+
+          user_session(@student_section1)
+
+          get :users, params: { group_id: @group.id }
+
+          expect(response).to be_successful
+          visible_users = response.parsed_body
+
+          visible_user_ids = visible_users.pluck("id")
+          expect(visible_user_ids).to include(@student_section1.id)
+          expect(visible_user_ids).not_to include(@student_section2.id)
+          expect(visible_users.count).to eq(1)
+        end
+      end
     end
 
     describe "GET 'permissions'" do

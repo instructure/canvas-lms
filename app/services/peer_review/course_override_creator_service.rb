@@ -24,15 +24,21 @@ class PeerReview::CourseOverrideCreatorService < PeerReview::CourseOverrideCommo
     course = @peer_review_sub_assignment.course
     validate_course_exists(course)
 
-    create_override(course)
+    ActiveRecord::Base.transaction do
+      parent_override = find_parent_override(course.id)
+      validate_course_parent_override_exists(parent_override, course.id)
+
+      create_override(course, parent_override)
+    end
   end
 
   private
 
-  def create_override(course)
+  def create_override(course, parent_override)
     override = @peer_review_sub_assignment.assignment_overrides.build(
       set: course,
-      dont_touch_assignment: true
+      dont_touch_assignment: true,
+      parent_override:
     )
     apply_overridden_dates(override, @override)
 

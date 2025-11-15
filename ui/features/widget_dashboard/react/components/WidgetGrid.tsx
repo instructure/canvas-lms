@@ -19,6 +19,8 @@
 import React, {useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import {IconAddLine} from '@instructure/ui-icons'
 import type {Widget, WidgetConfig} from '../types'
 import {getWidget} from './WidgetRegistry'
 import {useResponsiveContext} from '../hooks/useResponsiveContext'
@@ -51,9 +53,10 @@ const widgetsAsColumns = (widgets: Widget[]): Widget[][] => {
 
 interface WidgetGridProps {
   config: WidgetConfig
+  isEditMode?: boolean
 }
 
-const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
+const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => {
   const {matches} = useResponsiveContext()
   const sortedWidgets = useMemo(() => sortWidgetsForStacking(config.widgets), [config.widgets])
   const widgetsByColumn = useMemo(() => widgetsAsColumns(config.widgets), [config.widgets])
@@ -68,7 +71,38 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
     }
 
     const WidgetComponent = widgetRenderer.component
-    return <WidgetComponent widget={widget} />
+    return <WidgetComponent widget={widget} isEditMode={isEditMode} />
+  }
+
+  const renderAddWidgetPlaceholder = (position: string) => {
+    if (!isEditMode) return null
+
+    return (
+      <View
+        as="div"
+        padding="small"
+        textAlign="center"
+        borderRadius="medium"
+        borderWidth="small"
+        borderColor="brand"
+        background="transparent"
+        data-testid={`add-widget-placeholder-${position}`}
+        themeOverride={{
+          borderStyle: 'dashed',
+        }}
+      >
+        <Flex direction="row" justifyItems="center" alignItems="center" gap="x-small">
+          <Flex.Item>
+            <IconAddLine color="brand" />
+          </Flex.Item>
+          <Flex.Item>
+            <Text size="small" color="brand">
+              {I18n.t('Add widget')}
+            </Text>
+          </Flex.Item>
+        </Flex>
+      </View>
+    )
   }
 
   const renderWidgetInView = (widget: Widget, key?: string) => (
@@ -81,16 +115,30 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
     <Flex data-testid="widget-columns" direction="row" gap="x-small" alignItems="start">
       <Flex.Item shouldGrow shouldShrink width="66%">
         <Flex direction="column" gap="x-small" data-testid="widget-column-1" width="100%">
-          {widgetsByColumn[0].map(widget => (
-            <Flex.Item key={widget.id} data-testid={`widget-container-${widget.id}`}>
-              {renderWidget(widget)}
-            </Flex.Item>
+          {renderAddWidgetPlaceholder('col-1-top')}
+          {widgetsByColumn[0].map((widget, index) => (
+            <React.Fragment key={widget.id}>
+              <Flex.Item data-testid={`widget-container-${widget.id}`}>
+                {renderWidget(widget)}
+              </Flex.Item>
+              {index < widgetsByColumn[0].length - 1 &&
+                renderAddWidgetPlaceholder(`col-1-between-${index}`)}
+            </React.Fragment>
           ))}
+          {renderAddWidgetPlaceholder('col-1-bottom')}
         </Flex>
       </Flex.Item>
       <Flex.Item shouldGrow shouldShrink width="33%">
         <Flex direction="column" gap="x-small" data-testid="widget-column-2" width="100%">
-          {widgetsByColumn[1].map(widget => renderWidgetInView(widget))}
+          {renderAddWidgetPlaceholder('col-2-top')}
+          {widgetsByColumn[1].map((widget, index) => (
+            <React.Fragment key={widget.id}>
+              {renderWidgetInView(widget)}
+              {index < widgetsByColumn[1].length - 1 &&
+                renderAddWidgetPlaceholder(`col-2-between-${index}`)}
+            </React.Fragment>
+          ))}
+          {renderAddWidgetPlaceholder('col-2-bottom')}
         </Flex>
       </Flex.Item>
     </Flex>
@@ -104,7 +152,17 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
         overflowY="visible"
         width="100%"
       >
-        {sortedWidgets.map(widget => renderWidgetInView(widget))}
+        <Flex direction="column" gap="x-small" width="100%">
+          {renderAddWidgetPlaceholder('tablet-top')}
+          {sortedWidgets.map((widget, index) => (
+            <React.Fragment key={widget.id}>
+              {renderWidgetInView(widget)}
+              {index < sortedWidgets.length - 1 &&
+                renderAddWidgetPlaceholder(`tablet-between-${index}`)}
+            </React.Fragment>
+          ))}
+          {renderAddWidgetPlaceholder('tablet-bottom')}
+        </Flex>
       </Flex.Item>
     </Flex>
   )

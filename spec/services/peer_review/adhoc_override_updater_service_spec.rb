@@ -23,10 +23,16 @@ RSpec.describe PeerReview::AdhocOverrideUpdaterService do
   let(:course) { course_model(name: "Test Course") }
   let(:peer_review_sub_assignment) { peer_review_model(course:) }
   let(:students) { create_users_in_course(course, 4, return_type: :record) }
+  let(:initial_parent_override) do
+    parent_override = peer_review_sub_assignment.parent_assignment.assignment_overrides.build(set_type: AssignmentOverride::SET_TYPE_ADHOC)
+    [students[0], students[1]].each do |student|
+      parent_override.assignment_override_students.build(user: student)
+    end
+    parent_override.save!
+    parent_override
+  end
   let(:existing_override) do
-    override = assignment_override_model(assignment: peer_review_sub_assignment,
-                                         set_type: "ADHOC",
-                                         dont_touch_assignment: true)
+    override = assignment_override_model(assignment: peer_review_sub_assignment, set_type: "ADHOC", parent_override_id: initial_parent_override.id)
     override.assignment_override_students.create!(user: students[0])
     override.assignment_override_students.create!(user: students[1])
     override
@@ -78,6 +84,15 @@ RSpec.describe PeerReview::AdhocOverrideUpdaterService do
           peer_review_sub_assignment:,
           override: override_params
         )
+      end
+
+      before do
+        initial_parent_override.destroy
+        parent_override = peer_review_sub_assignment.parent_assignment.assignment_overrides.build(set_type: AssignmentOverride::SET_TYPE_ADHOC)
+        [students[0], students[2], students[3]].each do |student|
+          parent_override.assignment_override_students.build(user: student)
+        end
+        parent_override.save!
       end
 
       it "returns the updated override" do
@@ -211,6 +226,15 @@ RSpec.describe PeerReview::AdhocOverrideUpdaterService do
         )
       end
 
+      before do
+        initial_parent_override.destroy
+        parent_override = peer_review_sub_assignment.parent_assignment.assignment_overrides.build(set_type: AssignmentOverride::SET_TYPE_ADHOC)
+        [students[0], students[2]].each do |student|
+          parent_override.assignment_override_students.build(user: student)
+        end
+        parent_override.save!
+      end
+
       it "only includes valid course students" do
         service.call
         existing_override.reload
@@ -250,9 +274,21 @@ RSpec.describe PeerReview::AdhocOverrideUpdaterService do
     end
 
     context "when override exists but is not ADHOC type" do
+      let(:test_section) { add_section("Test Section", course:) }
+      let!(:parent_section_override) do
+        peer_review_sub_assignment.parent_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set: test_section,
+          title: "Section Override"
+        )
+      end
       let(:section_override) do
-        section = add_section("Test Section", course:)
-        create_section_override_for_assignment(peer_review_sub_assignment, course_section: section)
+        peer_review_sub_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set: test_section,
+          title: "Section Override",
+          parent_override: parent_section_override
+        )
       end
 
       let(:override_params) do
@@ -342,6 +378,15 @@ RSpec.describe PeerReview::AdhocOverrideUpdaterService do
         )
       end
 
+      before do
+        initial_parent_override.destroy
+        parent_override = peer_review_sub_assignment.parent_assignment.assignment_overrides.build(set_type: AssignmentOverride::SET_TYPE_ADHOC)
+        [students[0], students[2]].each do |student|
+          parent_override.assignment_override_students.build(user: student)
+        end
+        parent_override.save!
+      end
+
       it "rolls back if student deletion fails" do
         allow_any_instance_of(described_class).to receive(:destroy_override_students).and_raise(ActiveRecord::StatementInvalid.new("Database error"))
 
@@ -395,23 +440,43 @@ RSpec.describe PeerReview::AdhocOverrideUpdaterService do
   end
 
   describe "#find_override" do
-    let(:service) { described_class.new(peer_review_sub_assignment:) }
-
     it "finds the correct ADHOC override by ID" do
-      result = service.send(:find_override, existing_override.id)
+      service = described_class.new(
+        peer_review_sub_assignment:,
+        override: { id: existing_override.id }
+      )
+      result = service.send(:find_override)
       expect(result).to eq(existing_override)
     end
 
     it "returns nil for non-existent override ID" do
-      result = service.send(:find_override, 999_999)
+      service = described_class.new(
+        peer_review_sub_assignment:,
+        override: { id: 999_999 }
+      )
+      result = service.send(:find_override)
       expect(result).to be_nil
     end
 
     it "returns nil for override with different set_type" do
-      section = add_section("Test Section", course:)
-      section_override = create_section_override_for_assignment(peer_review_sub_assignment, course_section: section)
+      test_section = add_section("Test Section", course:)
+      parent_section_override = peer_review_sub_assignment.parent_assignment.assignment_overrides.create!(
+        set_type: "CourseSection",
+        set: test_section,
+        title: "Section Override"
+      )
+      section_override = peer_review_sub_assignment.assignment_overrides.create!(
+        set_type: "CourseSection",
+        set: test_section,
+        title: "Section Override",
+        parent_override: parent_section_override
+      )
 
-      result = service.send(:find_override, section_override.id)
+      service = described_class.new(
+        peer_review_sub_assignment:,
+        override: { id: section_override.id }
+      )
+      result = service.send(:find_override)
       expect(result).to be_nil
     end
   end
@@ -437,6 +502,154 @@ RSpec.describe PeerReview::AdhocOverrideUpdaterService do
         title = service.send(:override_title, [students[0].id])
         expected_title = AssignmentOverride.title_from_student_count(1)
         expect(title).to eq(expected_title)
+      end
+    end
+  end
+
+  describe "parent override tracking" do
+    let(:parent_assignment) { peer_review_sub_assignment.parent_assignment }
+    let(:parent_override_students) { [students[0], students[1]] }
+    let!(:parent_override) do
+      parent_override = peer_review_sub_assignment.parent_assignment.assignment_overrides.build(set_type: AssignmentOverride::SET_TYPE_ADHOC)
+      parent_override_students.each do |student|
+        parent_override.assignment_override_students.build(user: student)
+      end
+      parent_override.save!
+      parent_override
+    end
+
+    let!(:test_existing_override) do
+      override = peer_review_sub_assignment.assignment_overrides.build(set_type: AssignmentOverride::SET_TYPE_ADHOC, parent_override:)
+      parent_override_students.each do |student|
+        override.assignment_override_students.build(user: student)
+      end
+      override.save!
+      override
+    end
+
+    context "when student list doesn't change" do
+      let(:override_params) do
+        {
+          id: test_existing_override.id,
+          set_type: "ADHOC",
+          student_ids: [students[0].id, students[1].id],
+          due_at: 2.weeks.from_now
+        }
+      end
+
+      let(:service) do
+        described_class.new(
+          peer_review_sub_assignment:,
+          override: override_params
+        )
+      end
+
+      it "keeps the same parent_override" do
+        service.call
+        test_existing_override.reload
+        expect(test_existing_override.parent_override).to eq(parent_override)
+      end
+    end
+
+    context "when student list changes" do
+      let(:override_params) do
+        {
+          id: test_existing_override.id,
+          set_type: "ADHOC",
+          student_ids: [students[0].id, students[2].id]
+        }
+      end
+
+      let(:service) do
+        described_class.new(
+          peer_review_sub_assignment:,
+          override: override_params
+        )
+      end
+
+      context "when new parent override does not exist" do
+        it "raises ParentOverrideNotFoundError" do
+          expect { service.call }.to raise_error(
+            PeerReview::ParentOverrideNotFoundError,
+            /Parent assignment ADHOC override not found for students/
+          )
+        end
+      end
+    end
+
+    context "when no student_ids provided in params" do
+      let(:override_params) do
+        {
+          id: test_existing_override.id,
+          set_type: "ADHOC",
+          due_at: 2.weeks.from_now
+        }
+      end
+
+      let(:service) do
+        described_class.new(
+          peer_review_sub_assignment:,
+          override: override_params
+        )
+      end
+
+      it "validates the existing parent_override" do
+        service.call
+        test_existing_override.reload
+        expect(test_existing_override.parent_override).to eq(parent_override)
+      end
+    end
+
+    context "race condition protection" do
+      let(:test_students) { create_users_in_course(course, 3, return_type: :record) }
+      let(:test_parent_override) do
+        parent_override = peer_review_sub_assignment.parent_assignment.assignment_overrides.build(set_type: AssignmentOverride::SET_TYPE_ADHOC)
+        test_students.each do |student|
+          parent_override.assignment_override_students.build(user: student)
+        end
+        parent_override.save!
+        parent_override
+      end
+
+      let(:test_existing_override) do
+        override = assignment_override_model(assignment: peer_review_sub_assignment, set_type: "ADHOC", parent_override_id: test_parent_override.id)
+        test_students.each do |student|
+          override.assignment_override_students.create!(user: student)
+        end
+        override
+      end
+
+      let(:override_params) do
+        {
+          id: test_existing_override.id,
+          set_type: "ADHOC",
+          student_ids: test_students.map(&:id),
+          due_at: 3.weeks.from_now
+        }
+      end
+
+      let(:service) do
+        described_class.new(
+          peer_review_sub_assignment:,
+          override: override_params
+        )
+      end
+
+      it "validates parent override exists within transaction" do
+        test_existing_override
+        allow(service).to receive(:validate_adhoc_parent_override_exists).and_call_original
+
+        service.call
+
+        expect(service).to have_received(:validate_adhoc_parent_override_exists).once
+      end
+
+      it "uses a transaction to ensure atomicity of parent override lookup and update" do
+        test_existing_override
+
+        expect(ActiveRecord::Base).to receive(:transaction).and_call_original.at_least(:once)
+
+        service.call
       end
     end
   end

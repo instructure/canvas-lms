@@ -61,7 +61,6 @@ class User < ActiveRecord::Base
 
   before_save :infer_defaults
   before_validation :ensure_lti_id, on: :update
-  after_create :set_default_feature_flags
   after_update :clear_cached_short_name, if: ->(user) { user.saved_change_to_short_name? || (user["short_name"].nil? && user.saved_change_to_name?) }
   validate :preserve_lti_id, on: :update
 
@@ -557,19 +556,25 @@ class User < ActiveRecord::Base
   after_save :self_enroll_if_necessary
 
   def courses_for_enrollments(enrollment_scope, associated_user = nil, include_completed_courses = true)
+    # check if the enrollment_scope uses enrollment_states (ex. any scope ending in _by_date)
+    needs_enrollment_state_join = enrollment_scope.joins_values.include?(:enrollment_state)
+
     if associated_user && associated_user != self
       join = :observer_enrollments
       scope = Course.active.joins(join)
-                    .merge(enrollment_scope.except(:joins))
-                    .where(enrollments: { associated_user_id: associated_user.id })
+      scope = scope.joins(join => :enrollment_state) if needs_enrollment_state_join
+      scope = scope.merge(enrollment_scope.except(:joins))
+                   .where(enrollments: { associated_user_id: associated_user.id })
     else
       join = (associated_user == self) ? :enrollments_excluding_linked_observers : :all_enrollments
-      scope = Course.active.joins(join).merge(enrollment_scope.except(:joins)).distinct
+      scope = Course.active.joins(join)
+      scope = scope.joins(join => :enrollment_state) if needs_enrollment_state_join
+      scope = scope.merge(enrollment_scope.except(:joins)).distinct
     end
 
     unless include_completed_courses
-      scope = scope.joins(join => :enrollment_state)
-                   .where(enrollment_states: { restricted_access: false })
+      scope = scope.joins(join => :enrollment_state) unless needs_enrollment_state_join
+      scope = scope.where(enrollment_states: { restricted_access: false })
                    .where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')")
     end
     scope
@@ -584,11 +589,11 @@ class User < ActiveRecord::Base
   end
 
   def concluded_courses
-    courses_for_enrollments(enrollments.concluded)
+    courses_for_enrollments(enrollments.completed_by_date)
   end
 
   def current_and_concluded_courses
-    courses_for_enrollments(enrollments.current_and_concluded)
+    courses_for_enrollments(enrollments.active_or_completed_by_date)
   end
 
   # Returns course IDs for truly current enrollments, filtered the same way as the dashboard
@@ -1100,10 +1105,6 @@ class User < ActiveRecord::Base
     self.lti_id ||= SecureRandom.uuid
   end
 
-  def set_default_feature_flags
-    enable_feature!(:new_user_tutorial_on_off) unless Rails.env.test?
-  end
-
   def sortable_name
     self.sortable_name = super ||
                          User.last_name_first(self.name, likely_already_surname_first: false)
@@ -1390,7 +1391,7 @@ class User < ActiveRecord::Base
     # Look through the currently enrolled courses first.  This should
     # catch most of the calls.  If none of the current courses grant
     # the right then look at the concluded courses.
-    enrollments_to_check ||= enrollments.current_and_concluded
+    enrollments_to_check ||= enrollments.active_or_completed_by_date
 
     shards = associated_shards & user.associated_shards
     # search the current shard first
@@ -1814,18 +1815,21 @@ class User < ActiveRecord::Base
 
   def avatar_location(image_url)
     url = image_url
-    if associated_root_accounts.any? { |a| a.feature_enabled?(:file_association_access) } &&
-       %w[attachment external].include?(avatar_image_source)
-      uri = URI.parse(image_url)
-      attachment_id = get_attachment_id_from_known_avatar_paths(uri.path)
-      if attachment_id
-        params = URI.decode_www_form(uri.query || "")
-        params << ["location", "avatar_#{id}"]
-        uri.query = URI.encode_www_form(params)
-        url = uri.to_s
-      end
+    return url unless image_url &&
+                      %w[attachment external].include?(avatar_image_source) &&
+                      associated_root_accounts.any? { |a| a.feature_enabled?(:file_association_access) }
+
+    uri = URI.parse(image_url)
+    attachment_id = get_attachment_id_from_known_avatar_paths(uri.path)
+    if attachment_id
+      params = URI.decode_www_form(uri.query || "")
+      params << ["location", "avatar_#{id}"]
+      uri.query = URI.encode_www_form(params)
+      url = uri.to_s
     end
     url
+  rescue URI::InvalidURIError
+    image_url
   end
 
   # returns the attachment id specified in the path, or nil if there is no match
@@ -1937,6 +1941,18 @@ class User < ActiveRecord::Base
 
   def new_user_tutorial_statuses
     get_preference(:new_user_tutorial_statuses) || {}
+  end
+
+  # on this date we started creating an enabled :new_user_tutorial_on_off FF for every new user.
+  # changing the default to `allowed_on` let us avoid doing that (tbf this wasn't an option then)
+  TUTORIAL_FF_INTRO_DATE = Date.new(2017, 4, 22)
+  def show_new_user_tutorial?
+    if created_at < TUTORIAL_FF_INTRO_DATE
+      # avoid implicitly enabling the feature for old users (they need to explicitly toggle it on)
+      lookup_feature_flag(:new_user_tutorial_on_off)&.state == "on"
+    else
+      feature_enabled?(:new_user_tutorial_on_off)
+    end
   end
 
   def apply_contrast(colors)
@@ -2109,18 +2125,19 @@ class User < ActiveRecord::Base
     true
   end
 
-  def prefers_widget_dashboard?
+  def prefers_widget_dashboard?(domain_root_account, flag = nil)
     # Explicit preference takes priority
     return preferences[:widget_dashboard_user_preference] unless preferences[:widget_dashboard_user_preference].nil?
 
-    # Default based on feature flag state:
+    # Default based on feature flag state on the domain root account:
     # - "allowed" state: default to FALSE (opt-in required)
     # - "allowed_on" state: default to TRUE (opt-out available)
-    # Check if any associated account has the feature enabled (allowed_on or on states)
-    # Use EXISTS subquery to avoid N+1 queries for users with many accounts
-    associated_accounts
-      .where("EXISTS (SELECT 1 FROM #{FeatureFlag.quoted_table_name} WHERE context_type = 'Account' AND context_id = accounts.id AND feature = 'widget_dashboard' AND state IN ('on', 'allowed_on'))")
-      .exists?
+    # - "on" state: enabled for everyone
+    return false unless domain_root_account
+
+    # Use provided flag to avoid redundant lookups, or fetch if not provided
+    flag ||= domain_root_account.lookup_feature_flag(:widget_dashboard)
+    flag&.enabled? || false
   end
 
   def auto_show_cc?
@@ -2521,20 +2538,18 @@ class User < ActiveRecord::Base
   end
 
   def participating_current_and_concluded_course_ids
-    cached_course_ids("current_and_concluded") do |enrollments|
-      enrollments.current_and_concluded.not_inactive_by_date_ignoring_access
-    end
+    cached_course_ids("current_and_concluded", &:not_inactive_by_date_ignoring_access)
   end
 
   def participating_student_current_and_concluded_course_ids
     cached_course_ids("student_current_and_concluded") do |enrollments|
-      enrollments.current_and_concluded.not_inactive_by_date_ignoring_access.where(type: %w[StudentEnrollment StudentViewEnrollment])
+      enrollments.not_inactive_by_date_ignoring_access.where(type: %w[StudentEnrollment StudentViewEnrollment])
     end
   end
 
   def participating_student_current_and_unrestricted_concluded_course_ids
     cached_course_ids("student_current_and_concluded") do |enrollments|
-      enrollments.current_and_concluded.not_inactive_by_date.where(type: %w[StudentEnrollment StudentViewEnrollment])
+      enrollments.not_inactive_by_date.where(type: %w[StudentEnrollment StudentViewEnrollment])
     end
   end
 
@@ -2552,7 +2567,7 @@ class User < ActiveRecord::Base
 
   def participating_instructor_course_with_concluded_ids
     cached_course_ids("participating_instructor_with_concluded") do |enrollments|
-      enrollments.of_instructor_type.current_and_concluded.not_inactive_by_date
+      enrollments.of_instructor_type.not_inactive_by_date
     end
   end
 
@@ -2799,7 +2814,7 @@ class User < ActiveRecord::Base
     filter_after_db = !opts[:use_db_filter] &&
                       (context_codes.grep(/\Acourse_\d+\z/).count > Setting.get("filter_events_by_section_code_threshold", "25").to_i)
 
-    section_codes = section_context_codes(context_codes, filter_after_db)
+    section_codes = section_context_codes(context_codes, filter_after_db, include_concluded: false)
     limit = filter_after_db ? opts[:limit] * 2 : opts[:limit] # pull extra events just in case
     events = CalendarEvent.active.for_user_and_context_codes(self, context_codes, section_codes)
                           .between(now, opts[:end_at]).limit(limit).order(:start_at).to_a.reject(&:hidden?)
@@ -2810,7 +2825,7 @@ class User < ActiveRecord::Base
         section_ids = events.map(&:context_code).grep(/\Acourse_section_\d+\z/).map { |s| s.delete_prefix("course_section_").to_i }
         section_course_codes = Course.joins(:course_sections).where(course_sections: { id: section_ids })
                                      .pluck(:id).map { |id| "course_#{id}" }
-        visible_section_codes = section_context_codes(section_course_codes)
+        visible_section_codes = section_context_codes(section_course_codes, false, include_concluded: false)
         events.reject! { |e| e.context_code.start_with?("course_section_") && !visible_section_codes.include?(e.context_code) }
         events = events.first(opts[:limit]) # strip down to the original limit
       end
@@ -3033,7 +3048,7 @@ class User < ActiveRecord::Base
       end
 
       cc_rows = convert_global_id_rows(
-        Enrollment.joins(:course)
+        Enrollment.joins(:course, :enrollment_state)
             .where(User.enrollment_conditions(:completed))
             .where(user_id: users)
             .distinct.pluck(:user_id, :course_id)
@@ -3066,7 +3081,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def section_context_codes(context_codes, skip_visibility_filter = false)
+  def section_context_codes(context_codes, skip_visibility_filter = false, include_concluded: true)
     course_ids = context_codes.grep(/\Acourse_\d+\z/).map { |s| s.delete_prefix("course_").to_i }
     return [] unless course_ids.present?
 
@@ -3076,7 +3091,7 @@ class User < ActiveRecord::Base
     else
       full_course_ids = []
       Course.where(id: course_ids).each do |course|
-        result = course.course_section_visibility(self)
+        result = course.course_section_visibility(self, include_concluded:)
         case result
         when Array
           section_ids.concat(result)
@@ -3267,24 +3282,28 @@ class User < ActiveRecord::Base
   end
 
   def menu_courses(enrollment_uuid = nil, opts = {})
-    return @menu_courses if @menu_courses
+    # Only use cached @menu_courses if no limit override is specified
+    return @menu_courses if @menu_courses && opts[:limit].nil?
 
     can_favorite = proc { |c| !(c.elementary_subject_course? || c.elementary_homeroom_course?) || c.user_is_admin?(self) || roles(c.root_account).include?("teacher") }
     # this terribleness is so we try to make sure that the newest courses show up in the menu
+    limit = opts[:limit] || Setting.get("menu_course_limit", "20").to_i
     courses = courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid, opts)
               .sort_by { |c| [c.primary_enrollment_rank, Time.zone.now - (c.primary_enrollment_date || Time.zone.now)] }
-              .first(Setting.get("menu_course_limit", "20").to_i)
+              .first(limit)
               .sort_by { |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
     favorites = courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)
                 .select { |c| can_favorite.call(c) }
     # if favoritable courses (classic courses or k5 courses with admin enrollment) exist, show those and all non-favoritable courses
-    @menu_courses = if favorites.empty?
-                      courses
-                    else
-                      favorites + courses.reject { |c| can_favorite.call(c) }
-                    end
-    ActiveRecord::Associations.preload(@menu_courses, :enrollment_term)
-    @menu_courses.reject do |c|
+    menu_courses = if favorites.empty?
+                     courses
+                   else
+                     favorites + courses.reject { |c| can_favorite.call(c) }
+                   end
+    # Only cache if using default limit
+    @menu_courses = menu_courses if opts[:limit].nil?
+    ActiveRecord::Associations.preload(menu_courses, :enrollment_term)
+    menu_courses.reject do |c|
       c.horizon_course? && !c.grants_right?(self, :read_as_admin)
     end
   end

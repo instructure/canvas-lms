@@ -6,7 +6,7 @@ user from abusing the system and causing adverse effects for others. It
 works by having a rate limit, and a cost for every request. Each request
 subtracts from your quota, and the quota is automatically replenished over
 time. In the event that your API request is throttled, you will receive
-a `403 Forbidden (Rate Limit Exceeded)` response. Your application should
+a `429 Forbidden (Rate Limit Exceeded)` response. Your application should
 be prepared for this error, and retry the request at a later time.
 
 To assist applications with planning, every request will return a

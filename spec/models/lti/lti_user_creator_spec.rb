@@ -257,14 +257,17 @@ describe Lti::LtiUserCreator do
       end
 
       describe "#concluded_enrollments" do
-        it "correctly collects concluded student enrollments" do
+        it "correctly collects concluded enrollments" do
           student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true).conclude
+          es = teacher_in_course(user: canvas_user, course: canvas_course, active_enrollment: true).enrollment_state
+          # explicitly set enrollment_state to test soft-concluded (do not use in production code)
+          es.update(state: "completed")
           course_with_designer(user: canvas_user, course: canvas_course, active_enrollment: true)
           account_admin_user(user: canvas_user, account: canvas_course.account)
 
           enrollments = course_user_creator.convert.concluded_roles
 
-          expect(enrollments).to eq [LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER]
+          expect(enrollments).to include(LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER, LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR)
         end
 
         it "does not return any course enrollments when the context is an account" do

@@ -29,12 +29,6 @@ const mockContentItems: ContentItem[] = [
     description: 'Create and edit documents online',
     domain: 'docs.google.com',
     url: 'https://docs.google.com/launch',
-    placements: {
-      linkSelection: {
-        url: 'https://docs.google.com/launch',
-        title: 'Google Docs',
-      },
-    },
   },
   {
     id: '2',
@@ -47,19 +41,7 @@ const mockContentItems: ContentItem[] = [
         url: 'https://youtube.com/video/assignment_selection',
         title: 'Youtube Assignment',
       },
-      resourceSelection: {
-        url: 'https://youtube.com/video/resource_selection',
-        title: 'Youtube Resource',
-      },
     },
-  },
-  {
-    id: '3',
-    name: 'Dropbox',
-    description: 'Upload your files',
-    domain: 'dropbox.com',
-    url: 'https://dropbox.com',
-    placements: {},
   },
 ]
 
@@ -140,18 +122,6 @@ describe('ExternalItemForm', () => {
           expect(screen.getByText('Google Docs')).toBeInTheDocument()
           expect(screen.getByText('Youtube')).toBeInTheDocument()
         })
-      })
-
-      it('filters out tools without assignmentSelection or linkSelection placements', async () => {
-        await prepareExternalToolSelector()
-
-        await waitFor(() => {
-          expect(screen.getByText('Google Docs')).toBeInTheDocument()
-          expect(screen.getByText('Youtube')).toBeInTheDocument()
-        })
-
-        const dropbox = screen.queryByText('Dropbox')
-        expect(dropbox).not.toBeInTheDocument()
       })
 
       it('calls onChange with selected tool data', async () => {

@@ -2673,6 +2673,11 @@
   resolved "https://registry.yarnpkg.com/@inquirer/type/-/type-3.0.6.tgz#2500e435fc2014c5250eec3279f42b70b64089bd"
   integrity sha512-/mKVCtVpyBu3IDarv0G+59KC4stsD5mDsGpYh+GKs1NZT88Jh52+cuoA1AtLk2Q0r/quNl+1cSUyLRHBFeD0XA==
 
+"@instructure.ai/aiinfo@^2.0.0":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@instructure.ai/aiinfo/-/aiinfo-2.0.2.tgz#f77cab0ff1e420329e85e8aa5961d7b606ca2013"
+  integrity sha512-mFdHxbT/dmX3Ht3vvZw7QdMCoypsgUCxQ2b21gPEQtEFhKn6EIMuFW/Ob2AEfV+cO7l+9yOE2oEiQEr70R/MQQ==
+
 "@instructure/brandable_css@^3":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@instructure/brandable_css/-/brandable_css-3.0.1.tgz#029ff3cfa0b65887746c2d4fe6053d078b2ba8ef"

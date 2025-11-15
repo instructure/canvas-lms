@@ -91,6 +91,7 @@ export const DeleteDeploymentModal = ({
   })
 
   const rootContextControl = findRootContextControl(deployment)
+  const contextControls = deployment.context_controls || []
 
   return (
     <Modal
@@ -124,12 +125,12 @@ export const DeleteDeploymentModal = ({
                   other: 'Exceptions to be deleted:',
                 },
                 {
-                  count: deployment.context_controls.length,
+                  count: contextControls.length,
                 },
               )}
             </Heading>
             <List isUnstyled itemSpacing="small" margin="0">
-              {deployment.context_controls.map(control => (
+              {contextControls.map(control => (
                 <List.Item key={control.id}>
                   <ContextCard
                     context_name={control.context_name}
@@ -150,7 +151,7 @@ export const DeleteDeploymentModal = ({
                   />
                 </List.Item>
               ))}
-              {rootContextControl.child_control_count > deployment.context_controls.length && (
+              {rootContextControl.child_control_count > contextControls.length && (
                 <List.Item>
                   <Text>
                     {I18n.t(
@@ -159,9 +160,7 @@ export const DeleteDeploymentModal = ({
                         other: '%{count} additional exceptions not shown.',
                       },
                       {
-                        count:
-                          rootContextControl.child_control_count -
-                          deployment.context_controls.length,
+                        count: rootContextControl.child_control_count - contextControls.length,
                       },
                     )}
                   </Text>

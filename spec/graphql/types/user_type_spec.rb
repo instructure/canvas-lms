@@ -932,6 +932,41 @@ describe Types::UserType do
 
       expect(user_type.resolve("email")).to be_nil
     end
+
+    context "permission check priority" do
+      it "calls grants_any_right? on account with :read_email_addresses and :manage_email_addresses" do
+        expect(@course.account.root_account).to receive(:grants_right?)
+          .with(@admin, :read_email_addresses)
+          .and_call_original
+        expect(@course).not_to receive(:grants_any_right?)
+
+        tester = GraphQLTypeTester.new(
+          @student,
+          current_user: @admin,
+          domain_root_account: @course.account.root_account,
+          course: @course,
+          request: ActionDispatch::TestRequest.create
+        )
+
+        expect(tester.resolve("email")).to eq @student.email
+      end
+
+      it "calls grants_any_right? on course with :read_email_addresses and :manage_email_addresses" do
+        expect(@course).to receive(:grants_right?)
+          .with(@teacher, :read_email_addresses)
+          .and_call_original
+
+        tester = GraphQLTypeTester.new(
+          @student,
+          current_user: @teacher,
+          domain_root_account: @course.account.root_account,
+          course: @course,
+          request: ActionDispatch::TestRequest.create
+        )
+
+        expect(tester.resolve("email")).to eq @student.email
+      end
+    end
   end
 
   context "groups" do
@@ -3528,6 +3563,36 @@ describe Types::UserType do
         result = user_type_tester.resolve("peerReviewStatus { mustReviewCount }")
         expect(result).to be_nil
       end
+    end
+  end
+
+  context "widgetDashboardConfig" do
+    it "returns null when no preference is set" do
+      expect(student_user_type.resolve("widgetDashboardConfig")).to be_nil
+    end
+
+    it "returns the stored configuration as JSON" do
+      config = { "columns" => 2, "widgets" => [] }
+      @student.set_preference(:widget_dashboard_config, config)
+      result = student_user_type.resolve("widgetDashboardConfig")
+      expect(JSON.parse(result)).to eq(config)
+    end
+
+    it "returns a complete widget configuration" do
+      config = {
+        "columns" => 2,
+        "widgets" => [
+          {
+            "id" => "course-work-widget",
+            "type" => "course_work",
+            "position" => { "col" => 1, "row" => 1, "relative" => 1 },
+            "title" => "Course work"
+          }
+        ]
+      }
+      @student.set_preference(:widget_dashboard_config, config)
+      result = student_user_type.resolve("widgetDashboardConfig")
+      expect(JSON.parse(result)).to eq(config)
     end
   end
 end

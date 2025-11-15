@@ -49,23 +49,46 @@ class Login::OAuth2Controller < Login::OAuthBaseController
       @aac.debug_set(:debugging, t("Received callback from identity provider"))
       @aac.instance_debugging = true
     end
-    timeout_protection do
-      token = nil
-      begin
-        token = @aac.get_token(params[:code], oauth2_login_callback_url, params)
-        token.options[:nonce] = jwt["nonce"]
-      rescue => e
-        @aac.debug_set(:get_token_response, e) if debugging
-        increment_statsd(:failure, reason: :get_token)
-        raise
+    attempts = 0
+    timeout_options = { raise_on_timeout: true, fallback_timeout_length: 10.seconds, exception_class: Timeout::Error }
+    begin
+      Canvas.timeout_protection("oauth:#{@aac.global_id}", timeout_options) do
+        token = nil
+        begin
+          token = @aac.get_token(params[:code], oauth2_login_callback_url, params)
+          token.options[:nonce] = jwt["nonce"]
+        rescue => e
+          @aac.debug_set(:get_token_response, e) if debugging
+          # counted below if it's a timeout
+          increment_statsd(:failure, reason: :get_token) unless e.is_a?(Timeout::Error) || e.is_a?(Faraday::TimeoutError)
+          raise
+        end
+        process_token(token)
       end
-      process_token(token)
-    rescue Canvas::TimeoutCutoff
+    rescue Timeout::Error, Faraday::TimeoutError => e
+      if attempts < @aac.settings["oauth2_timeout_retries"].to_i && !e.is_a?(Canvas::TimeoutCutoff)
+        attempts += 1
+        increment_statsd(:retry, reason: :timeout)
+        retry
+      end
+
+      unless e.is_a?(Canvas::TimeoutCutoff)
+        Canvas::Errors.capture(e,
+                               type: :oauth_consumer,
+                               aac_id: @aac.global_id,
+                               account_id: @aac.global_account_id)
+      end
       flash[:delegated_message] = t("A timeout occurred contacting external authentication service")
-      increment_statsd(:failure, reason: :timeout)
+      increment_statsd(:failure, reason: e.is_a?(Canvas::TimeoutCutoff) ? :circuit_breaker : :timeout)
       redirect_to login_url
-      # don't re-raise; we don't actually want OAuthBaseContoller#timeout_protection to handle this,
-      # otherwise it will overwrite the flash message
+    rescue => e
+      Canvas::Errors.capture(e,
+                             type: :oauth_consumer,
+                             aac_id: @aac.global_id,
+                             account_id: @aac.global_account_id)
+      flash[:delegated_message] = t("There was a problem logging in at %{institution}",
+                                    institution: @domain_root_account.display_name)
+      redirect_to login_url
     end
   end
 

@@ -25,7 +25,8 @@ import type {LtiDeployment} from '../../../model/LtiDeployment'
  * @returns The root context control for the given deployment. Undefined if not found.
  */
 export const findRootContextControl = (deployment: LtiDeployment) => {
-  const rootControl = deployment.context_controls.find(cc => {
+  const contextControls = deployment.context_controls || []
+  const rootControl = contextControls.find(cc => {
     return (
       (deployment.context_type === 'Course' && cc.course_id === deployment.context_id) ||
       (deployment.context_type === 'Account' && cc.account_id === deployment.context_id)

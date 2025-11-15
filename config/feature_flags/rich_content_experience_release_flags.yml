@@ -362,6 +362,14 @@ a11y_checker_eap:
   visible_on: a11y_checker_flag_enabled
   custom_transition_proc: only_admins_can_enable_a11y_checker_during_eap
 
+a11y_checker_ai_generation:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Accessibility Checker AI Generation
+  description: |-
+    If enabled, the AI feature for generating text for the relevant rule such as alt text missing, table captions missing is displayed at the wizard.
+  shadow: true
+
 ux_list_concluded_courses_in_bp:
   state: hidden
   display_name: List concluded courses with Concluded pill in blueprint association modal

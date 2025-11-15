@@ -1601,8 +1601,18 @@ describe User do
       @concluded_course.grants_right?(@teacher2, :manage_wiki)
     end
 
+    it "checks soft-concluded courses" do
+      course_with_teacher(active_all: true)
+      es = course_with_student(course: @course, active_all: true).enrollment_state
+      # explicitly set enrollment_state to test soft-concluded (do not use in production code)
+      es.update(state: "completed")
+      teacher3 = @teacher
+      student3 = @student
+      expect(student3.check_courses_right?(teacher3, :manage_wiki_create)).to be_truthy
+    end
+
     it "allows for narrowing courses by enrollments" do
-      expect(@student2.check_courses_right?(@teacher2, :manage_account_memberships, @student2.enrollments.concluded)).to be_falsey
+      expect(@student2.check_courses_right?(@teacher2, :manage_account_memberships, @student2.enrollments.completed_by_date)).to be_falsey
     end
 
     context "sharding" do
@@ -1616,6 +1626,39 @@ describe User do
           expect(@student1.check_courses_right?(@teacher, :read_forum)).to be true
         end
       end
+    end
+  end
+
+  context "courses_for_enrollments" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @teacher1 = @teacher
+      @student1 = @student
+      @active_course = @course
+
+      @teacher2 = @teacher
+      @student2 = @student
+      @concluded_course = @course
+      @concluded_course.complete!
+    end
+
+    it "includes courses for soft-concluded enrollments" do
+      enrollment = course_with_teacher(active_all: true)
+      # explicitly set enrollment_state to test soft-concluded (do not use in production code)
+      enrollment.enrollment_state.update(state: "completed")
+      enrollment_scope = @teacher.enrollments.completed_by_date
+
+      courses = @teacher.courses_for_enrollments(enrollment_scope)
+      expect(courses).to eq [enrollment.course]
+    end
+
+    it "excludes completed courses when include_completed_courses is false" do
+      enrollment = course_with_teacher(active_all: true)
+      enrollment.course.complete!
+      enrollment_scope = @teacher.enrollments.completed_by_date
+
+      courses = @teacher.courses_for_enrollments(enrollment_scope, nil, false)
+      expect(courses).to be_empty
     end
   end
 
@@ -2245,6 +2288,19 @@ describe User do
             it "returns the original URL unchanged for unrecognized paths" do
               result = user.avatar_location(unknown_url)
               expect(result).to eq unknown_url
+            end
+          end
+
+          context "with a bad url" do
+            it "doesn't error when url is nil" do
+              result = user.avatar_location(nil)
+              expect(result).to be_nil
+            end
+
+            it "doesn't error when a url is malformed" do
+              bad_url = "hi "
+              result = user.avatar_location(bad_url)
+              expect(result).to eq bad_url
             end
           end
         end
@@ -2901,6 +2957,129 @@ describe User do
   end
 
   describe "event methods" do
+    describe "section_context_codes" do
+      it "filters out concluded enrollments when include_concluded is false" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (completed)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "completed",
+          course_section: section2,
+          course: @course
+        )
+
+        context_codes = ["course_#{@course.id}"]
+
+        # With include_concluded: false, should only see section 1
+        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        expect(section_codes).to include(section1.asset_string)
+        expect(section_codes).not_to include(section2.asset_string)
+
+        # With include_concluded: true (default), should see both sections
+        section_codes = @student.section_context_codes(context_codes, false, include_concluded: true)
+        expect(section_codes).to include(section1.asset_string)
+        expect(section_codes).to include(section2.asset_string)
+      end
+
+      it "filters out inactive enrollments when include_concluded is false" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (inactive)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "inactive",
+          course_section: section2,
+          course: @course
+        )
+
+        context_codes = ["course_#{@course.id}"]
+
+        # With include_concluded: false, should only see section 1
+        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        expect(section_codes).to include(section1.asset_string)
+        expect(section_codes).not_to include(section2.asset_string)
+      end
+
+      it "filters out rejected enrollments when include_concluded is false" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (rejected)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "rejected",
+          course_section: section2,
+          course: @course
+        )
+
+        context_codes = ["course_#{@course.id}"]
+
+        # With include_concluded: false, should only see section 1
+        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        expect(section_codes).to include(section1.asset_string)
+        expect(section_codes).not_to include(section2.asset_string)
+      end
+
+      it "filters out deleted enrollments when include_concluded is false" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (deleted)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "deleted",
+          course_section: section2,
+          course: @course
+        )
+
+        context_codes = ["course_#{@course.id}"]
+
+        # With include_concluded: false, should only see section 1
+        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        expect(section_codes).to include(section1.asset_string)
+        expect(section_codes).not_to include(section2.asset_string)
+      end
+    end
+
     describe "upcoming_events" do
       before(:once) { course_with_teacher(active_all: true) }
 
@@ -2963,6 +3142,141 @@ describe User do
           EnrollmentState.recalculate_expired_states # runs periodically in background
           expect(User.find(@user.id).upcoming_events).not_to include(event) # re-find user to clear cached_contexts
         end
+      end
+
+      it "doesn't include calendar events for sections with inactive enrollments" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (inactive)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "inactive",
+          course_section: section2,
+          course: @course
+        )
+
+        # Create event for section 1 (active enrollment)
+        event1 = @course.calendar_events.build(
+          title: "Section 1 Event",
+          child_event_data: {
+            "0" => {
+              start_at: 2.days.from_now,
+              end_at: 2.days.from_now + 1.hour,
+              context_code: section1.asset_string
+            }
+          }
+        )
+        event1.updating_user = @teacher
+        event1.save!
+
+        # Create event for section 2 (inactive enrollment)
+        event2 = @course.calendar_events.build(
+          title: "Section 2 Event",
+          child_event_data: {
+            "0" => {
+              start_at: 3.days.from_now,
+              end_at: 3.days.from_now + 1.hour,
+              context_code: section2.asset_string
+            }
+          }
+        )
+        event2.updating_user = @teacher
+        event2.save!
+
+        # Student should see event from section 1 but not section 2
+        events = @student.upcoming_events(end_at: 1.week.from_now)
+        expect(events).to include(event1.child_events.first)
+        expect(events).not_to include(event2.child_events.first)
+      end
+
+      it "doesn't include calendar events for sections with rejected enrollments" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (rejected)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "rejected",
+          course_section: section2,
+          course: @course
+        )
+
+        # Create event for section 2 (rejected enrollment)
+        event = @course.calendar_events.build(
+          title: "Section 2 Event",
+          child_event_data: {
+            "0" => {
+              start_at: 2.days.from_now,
+              end_at: 2.days.from_now + 1.hour,
+              context_code: section2.asset_string
+            }
+          }
+        )
+        event.updating_user = @teacher
+        event.save!
+
+        # Student should not see event from section 2 (rejected enrollment)
+        events = @student.upcoming_events(end_at: 1.week.from_now)
+        expect(events).not_to include(event.child_events.first)
+      end
+
+      it "doesn't include calendar events for sections with deleted enrollments" do
+        course_with_student(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        # Enroll student in section 1 (active)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Enroll student in section 2 (deleted)
+        StudentEnrollment.create!(
+          user: @student,
+          workflow_state: "deleted",
+          course_section: section2,
+          course: @course
+        )
+
+        # Create event for section 2 (deleted enrollment)
+        event = @course.calendar_events.build(
+          title: "Section 2 Event",
+          child_event_data: {
+            "0" => {
+              start_at: 2.days.from_now,
+              end_at: 2.days.from_now + 1.hour,
+              context_code: section2.asset_string
+            }
+          }
+        )
+        event.updating_user = @teacher
+        event.save!
+
+        # Student should not see event from section 2 (deleted enrollment)
+        events = @student.upcoming_events(end_at: 1.week.from_now)
+        expect(events).not_to include(event.child_events.first)
       end
 
       it "shows assignments assigned to a section in correct order" do
@@ -4746,6 +5060,72 @@ describe User do
     end
   end
 
+  describe "#prefers_widget_dashboard?" do
+    let(:root_account) { Account.default }
+    let(:user) { user_model }
+
+    it "returns false when no domain_root_account is provided" do
+      expect(user.prefers_widget_dashboard?(nil)).to be false
+    end
+
+    it "returns false by default when no feature flag is set" do
+      expect(user.prefers_widget_dashboard?(root_account)).to be false
+    end
+
+    context "when user has explicit preference set to true" do
+      before do
+        user.preferences[:widget_dashboard_user_preference] = true
+        user.save!
+      end
+
+      it "returns true regardless of feature flag state" do
+        expect(user.prefers_widget_dashboard?(root_account)).to be true
+      end
+    end
+
+    context "when user has explicit preference set to false" do
+      before do
+        user.preferences[:widget_dashboard_user_preference] = false
+        user.save!
+      end
+
+      it "returns false even if feature flag is enabled" do
+        root_account.enable_feature!(:widget_dashboard)
+        expect(user.prefers_widget_dashboard?(root_account)).to be false
+      end
+    end
+
+    context "when feature flag is in 'allowed_on' state" do
+      before do
+        root_account.set_feature_flag!(:widget_dashboard, "allowed_on")
+      end
+
+      it "returns true" do
+        expect(user.prefers_widget_dashboard?(root_account)).to be true
+      end
+    end
+
+    context "when feature flag is in 'on' state" do
+      before do
+        root_account.enable_feature!(:widget_dashboard)
+      end
+
+      it "returns true" do
+        expect(user.prefers_widget_dashboard?(root_account)).to be true
+      end
+    end
+
+    context "when feature flag is in 'allowed' state" do
+      before do
+        root_account.allow_feature!(:widget_dashboard)
+      end
+
+      it "returns false (requires opt-in)" do
+        expect(user.prefers_widget_dashboard?(root_account)).to be false
+      end
+    end
+  end
+
   describe "with_last_login" do
     it "does not double the users select if select values are already present" do
       expect(User.all.order_by_sortable_name.with_last_login.to_sql.scan(".*").count).to eq 1
@@ -4753,6 +5133,50 @@ describe User do
 
     it "still includes it if select values aren't present" do
       expect(User.all.with_last_login.to_sql.scan(".*").count).to eq 1
+    end
+  end
+
+  describe "#prefers_widget_dashboard? with cross-shard enrollments" do
+    specs_require_sharding
+
+    it "only checks domain_root_account and does not query cross-shard accounts" do
+      # This test ensures the fix for LX-3507 is correct
+      # Users with cross-shard enrollments were getting 500 errors because
+      # the old implementation queried feature_flags across all associated_accounts
+      # The fix changes the method to only check the domain_root_account parameter
+
+      user = nil
+      domain_root_account = nil
+      @shard1.activate do
+        domain_root_account = Account.create!(name: "Domain Root Account")
+        user = User.create!(name: "Cross-Shard User")
+      end
+
+      cross_shard_account = nil
+      @shard2.activate do
+        cross_shard_account = Account.create!(name: "Cross-Shard Account")
+        cross_shard_account.enable_feature!(:widget_dashboard)
+
+        course = Course.create!(account: cross_shard_account, workflow_state: "available")
+        course.enroll_student(user, enrollment_state: "active")
+      end
+
+      # NEW implementation: only checks the domain_root_account parameter
+      # This should return false since domain_root_account doesn't have the feature enabled
+      expect(user.prefers_widget_dashboard?(domain_root_account)).to be false
+
+      @shard1.activate do
+        domain_root_account.enable_feature!(:widget_dashboard)
+      end
+
+      # Now should return true based on domain_root_account only
+      # The cross-shard account's feature flag should be ignored
+      expect(user.prefers_widget_dashboard?(domain_root_account)).to be true
+
+      # Verify user preference override still works
+      user.preferences[:widget_dashboard_user_preference] = false
+      user.save!
+      expect(user.prefers_widget_dashboard?(domain_root_account)).to be false
     end
   end
 
