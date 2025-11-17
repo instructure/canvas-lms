@@ -2071,6 +2071,14 @@ BASE_PERMISSIONS = {
     account_only: true,
     account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) }
   },
+  manage_ask_questions_analytics_context: {
+    label: -> { I18n.t("Ask Your Data - Context Library") },
+    group: :view_advanced_analytics,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_only: true,
+    account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) }
+  },
   view_students_in_need: {
     label: -> { I18n.t("Students in Need of Attention") },
     group: :view_advanced_analytics,
