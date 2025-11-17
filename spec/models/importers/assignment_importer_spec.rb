@@ -1997,6 +1997,22 @@ describe "Importing assignments" do
           subject
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
+
+      it "clears the due_at when importing assignment with sub_assignments" do
+        assignment_hash[:due_at] = 1_401_947_999_000
+
+        expect(subject.due_at).to be_nil
+      end
+
+      it "clears the due_at even when sub_assignments have their own due dates" do
+        assignment_hash[:due_at] = 1_401_947_999_000
+        assignment_hash[:sub_assignments][0][:due_at] = 1_401_947_999_000
+        assignment_hash[:sub_assignments][1][:due_at] = 1_402_034_399_000
+
+        expect(subject.due_at).to be_nil
+        expect(subject.sub_assignments.first.due_at).not_to be_nil
+        expect(subject.sub_assignments.second.due_at).not_to be_nil
+      end
     end
 
     context "when the discussion_checkpoints feature flag is off" do
