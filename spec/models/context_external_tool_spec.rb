@@ -116,7 +116,7 @@ describe ContextExternalTool do
       expect(Sentry).to receive(:with_scope).and_yield(sentry_scope)
       expect(sentry_scope).to receive(:set_tags).with(context_id: account.global_id)
       expect(sentry_scope).to receive(:set_tags).with(lti_registration_id: tool.lti_registration.global_id)
-      expect(sentry_scope).to receive(:set_context).with("tool", tool.global_id)
+      expect(sentry_scope).to receive(:set_context).with("tool", { global_id: tool.global_id })
 
       expect(tool.available_in_context?(account)).to be true
     end

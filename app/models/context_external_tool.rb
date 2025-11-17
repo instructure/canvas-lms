@@ -166,7 +166,7 @@ class ContextExternalTool < ActiveRecord::Base
       Sentry.with_scope do |scope|
         scope.set_tags(context_id: context.global_id)
         scope.set_tags(lti_registration_id: lti_registration.global_id)
-        scope.set_context("tool", global_id)
+        scope.set_context("tool", { global_id: })
         Sentry.capture_message("ContextExternalTool#available_in_context", level: :warning)
       end
     end
