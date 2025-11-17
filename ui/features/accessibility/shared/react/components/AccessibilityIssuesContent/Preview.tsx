@@ -97,16 +97,29 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
         onSuccess?.()
       } catch (error: any) {
         let responseError = error?.message || error?.toString()
+        let hasContent = false
+
         if (error?.response?.json) {
           try {
             const json = await error.response.json()
             responseError = json.error || json.message || responseError
+
+            if (json.content) {
+              setContentResponse(json)
+              hasContent = true
+            }
           } catch {
             responseError = await error.response.statusText
           }
         }
+
         onError?.(responseError)
-        setError(errorMessage)
+
+        if (!hasContent) {
+          setError(errorMessage)
+        } else {
+          setError(null)
+        }
       } finally {
         setIsLoading(false)
       }

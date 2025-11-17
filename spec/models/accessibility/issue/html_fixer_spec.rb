@@ -122,13 +122,15 @@ describe Accessibility::Issue::HtmlFixer do
             )
           end
 
-          it "returns an error" do
+          it "returns an error with content" do
             result = html_fixer.preview_fix(element_only: false)
 
             expect(result).to eq(
               {
                 status: :bad_request,
                 json: {
+                  content: nil,
+                  path: nil,
                   error: "Element not found for path: invalid_path"
                 },
               }
@@ -173,13 +175,15 @@ describe Accessibility::Issue::HtmlFixer do
             )
           end
 
-          it "returns an error" do
+          it "returns an error with content" do
             result = html_fixer.preview_fix(element_only: true)
 
             expect(result).to eq(
               {
                 status: :bad_request,
                 json: {
+                  content: nil,
+                  path: nil,
                   error: "Element not found for path: invalid_path"
                 },
               }

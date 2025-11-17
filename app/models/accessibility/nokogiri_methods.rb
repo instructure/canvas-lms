@@ -26,6 +26,12 @@ module Accessibility
       [doc, body]
     end
 
+    def find_element_at_path(html_content, path)
+      doc, = parse_html_content(html_content)
+      absolute_path = path.sub(/^\./, "/html/body")
+      doc.at_xpath(absolute_path)
+    end
+
     def walk_dom_tree(node, &)
       return unless node
 
