@@ -41,9 +41,11 @@ module Loaders
 
         scope = scope.where(workflow_state: @filter[:state]) if @filter[:state].present?
 
-        # Remove any group memberships the executing user should not see
-        scope = scope.preload(:group).filter do |membership|
+        # Preload group_memberships on the groups to avoid N+1 queries when
+        # grants_right? checks has_member? for permission evaluation
+        scope = scope.preload(group: :group_memberships).filter do |membership|
           group = membership.group
+          # Remove any group memberships the executing user should not see
           next group.grants_right?(@executing_user, :read)
         end
 
