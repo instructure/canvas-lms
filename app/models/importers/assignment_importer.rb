@@ -311,6 +311,12 @@ module Importers
       end
 
       hash[:due_at] ||= hash[:due_date] if hash.key?(:due_date)
+
+      # Clear due_at for assignments with checkpoints
+      if hash[:sub_assignments].present? && context.discussion_checkpoints_enabled?
+        hash[:due_at] = nil
+      end
+
       %i[due_at lock_at unlock_at peer_reviews_due_at].each do |key|
         if hash.key?(key) && (master_migration || hash[key].present?)
           item.send :"#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key])
