@@ -17,6 +17,15 @@
     "add_one_9e34a6f8": {
         "message": "Bir tane ekle!"
     },
+    "additional_considerations_f3801683": {
+        "message": "Ek hususlar"
+    },
+    "afrikaans_da0fe6ee": {
+        "message": "Afrikaanca"
+    },
+    "albanian_21ed929e": {
+        "message": "Arnavutça"
+    },
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
@@ -71,8 +80,14 @@
     "apps_54d24a47": {
         "message": "Uygulamalar"
     },
+    "arabic_c5c87acd": {
+        "message": "Arapça"
+    },
     "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
         "message": "İptal etmek istediğinize emin misiniz? Yaptığınız değişiklikler kaydedilmeyebilir."
+    },
+    "armenian_12da6118": {
+        "message": "Ermenice"
     },
     "arrows_464a3e54": {
         "message": "Oklar"
@@ -95,8 +110,14 @@
     "available_folders_694d0436": {
         "message": "Mevcut klasörler"
     },
+    "background_1bc88842": {
+        "message": "Arka Plan"
+    },
     "basic_554cdc0a": {
         "message": "Temel"
+    },
+    "below_81d4dceb": {
+        "message": "Altında"
     },
     "blue_daf8fea9": {
         "message": "Mavi"
@@ -104,17 +125,35 @@
     "bottom_15a2a9be": {
         "message": "Alt"
     },
+    "brick_f2656265": {
+        "message": "Tuğla"
+    },
+    "bulgarian_feccab7e": {
+        "message": "Bulgarca"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
     "cancel_caeb1e68": {
         "message": "İptal"
     },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "Kullanıcının Genel Bakış (Overview) sekmesinde genel istatistikleri görmesine izin verir."
+    },
+    "catalan_16f6b78f": {
+        "message": "Kullanıcının bir hesabın Kişiler sayfasında hesap kullanıcılarını görüntülemesine izin verir."
+    },
+    "change_text_color_1aecb912": {
+        "message": "Kullanıcının Outcomes Mastery sekmesini görüntülemesine ve ders düzeyinde kazanım yeterlik ölçeklerini ayarlamasına izin verir."
+    },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Yaptığınız değişiklikler kaydedilmemiş olabilir."
     },
     "characters_9d897d1c": {
         "message": "Karakterler"
+    },
+    "check_accessibility_3c78211c": {
+        "message": "Kullanıcının Ders Ayarları''nda bir uygulamayı elle silmesine izin verir."
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Alt yazı dosyasını seçin"
@@ -149,6 +188,18 @@
     "color_a363e1b0": {
         "message": "Renk"
     },
+    "color_popup_af39810f": {
+        "message": "Bağlantı değiştirme mantığını yalnızca seçili öge listesine uygula;\nmetinlerin tümüne değil."
+    },
+    "column_e1ae5c64": {
+        "message": "Notu Notlandırılmamışlara Uygula"
+    },
+    "column_group_1c062368": {
+        "message": "Ayarları Uygula"
+    },
+    "compose_44c904f4": {
+        "message": "Ödevleri taşımak için bir Ödev Grubu gereklidir."
+    },
     "computer_1d7dfa6f": {
         "message": "Bilgisayar"
     },
@@ -166,6 +217,9 @@
     },
     "copyright_holder_66ee111": {
         "message": "Telif Sahibi:"
+    },
+    "count_40eced3b": {
+        "message": "Önce..."
     },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
@@ -194,6 +248,9 @@
     "creative_commons_license_725584ae": {
         "message": "Creative Commons Lisansı:"
     },
+    "croatian_d713d655": {
+        "message": "Kullanıcının Outcomes Calculations sekmesini görüntülemesine ve hesap ile ders düzeyinde kazanım yeterliliği hesaplamalarını ayarlamasına izin verir."
+    },
     "current_volume_level_c55ab825": {
         "message": "Mevcut Ses Seviyesi"
     },
@@ -203,8 +260,17 @@
     "cyan_c1d5f68a": {
         "message": "Cam göbeği"
     },
+    "czech_9aa2cbe4": {
+        "message": "Mevcut bir numara seçin"
+    },
+    "danish_c18cdac8": {
+        "message": "Birini seçin"
+    },
     "date_added_ed5ad465": {
         "message": "Eklendiği Tarih"
+    },
+    "decorative_image_fde98579": {
+        "message": "Dekoratif görsel"
     },
     "decrease_indent_d9cf469d": {
         "message": "İçerden başlatma sınırını azalt"
@@ -257,6 +323,9 @@
     "due_multiple_dates_cc0ee3f5": {
         "message": "Teslim Tarihi: Birden Çok Gün"
     },
+    "dutch_6d05cee5": {
+        "message": "Yöneticiler, bu ekran üzerinden kendi adlarına yeni kimlik doğrulama akışları tasarlayıp düzenleyebilir."
+    },
     "edit_c5fbea07": {
         "message": "Düzenle"
     },
@@ -275,11 +344,29 @@
     "english_c60612e2": {
         "message": "İngilizce"
     },
+    "enter_at_least_3_characters_to_search_4f037ee0": {
+        "message": "Hizmet belirteci kimliğini girin"
+    },
+    "enter_text_8b35c65b": {
+        "message": "Dışa aktarılacak dosya adını veya ön ekini girin"
+    },
+    "estonian_5e8e2fa4": {
+        "message": "Estonca"
+    },
+    "exit_fullscreen_b7eb0aa4": {
+        "message": "Sınavlar"
+    },
+    "external_tool_frame_70b32473": {
+        "message": "Harici araç içeriğini yüklemek için tıklayın"
+    },
     "external_tools_6e77821": {
         "message": "Harici Araçlar"
     },
     "extra_large_b6cdf1ff": {
         "message": "Ekstra Büyük"
+    },
+    "fail_544e5dde": {
+        "message": "BAŞARISIZ (FAIL)"
     },
     "file_name_8fd421ff": {
         "message": "Dosya adı"
@@ -299,11 +386,32 @@
     "finish_bc343002": {
         "message": "Tamamla"
     },
+    "finnish_4df2923d": {
+        "message": "Fince"
+    },
+    "fix_heading_hierarchy_f60884c4": {
+        "message": "Başlık hiyerarşisini düzelt"
+    },
+    "folder_tree_fbab0726": {
+        "message": "Klasör ağacı"
+    },
     "format_4247a9c5": {
         "message": "Format"
     },
+    "french_33881544": {
+        "message": "Fransızca"
+    },
+    "french_canada_c3d92fa6": {
+        "message": "Fransızca (Kanada)"
+    },
+    "fullscreen_873bf53f": {
+        "message": "Tam ekran"
+    },
     "generating_preview_45b53be0": {
         "message": "Oluşturma önizlemesi..."
+    },
+    "german_3ec99bbb": {
+        "message": "Almanca"
     },
     "grades_a61eba0a": {
         "message": "Notlar"
@@ -314,11 +422,17 @@
     "green_15af4778": {
         "message": "Yeşil"
     },
+    "group_files_4324f3df": {
+        "message": "Grup tartışması gönderimi sınırlı değil."
+    },
     "group_files_82e5dcdb": {
         "message": "Grup dosyaları"
     },
     "group_navigation_99f191a": {
         "message": "Grup Gezinme Menüsü"
+    },
+    "haitian_creole_7eb4195b": {
+        "message": "Canvas Android için"
     },
     "heading_2_5b84eed2": {
         "message": "Başlık 2"
@@ -329,8 +443,14 @@
     "heading_4_b2e74be7": {
         "message": "Başlık 4"
     },
+    "hebrew_88fbf778": {
+        "message": "Yardım konusu"
+    },
     "height_69b03e15": {
         "message": "Yükseklik"
+    },
+    "hindi_9bcd4b34": {
+        "message": "Hintçe"
     },
     "home_351838cd": {
         "message": "Ana Sayfa"
@@ -338,14 +458,23 @@
     "html_editor_fb2ab713": {
         "message": "HTML Düzenleyici"
     },
+    "hungarian_fc7d30c9": {
+        "message": "Macarca"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Bu dosyayı kullanmak için iznim var."
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Telif hakkı bendedir"
     },
+    "icelandic_9d6d35de": {
+        "message": "Canvas LMS''i kullanmayı planlamıyorum"
+    },
     "icon_215a1dc6": {
         "message": "Simge"
+    },
+    "icon_maker_icons_cc560f7e": {
+        "message": "Bu özelliği keşfetmeyi planlamıyorum"
     },
     "image_8ad06": {
         "message": "Görsel"
@@ -365,6 +494,21 @@
     "indigo_2035fc55": {
         "message": "Indigo"
     },
+    "indonesian_5f6accd6": {
+        "message": "Endonezce"
+    },
+    "input_field_for_alpha_678265fd": {
+        "message": "alfa için giriş alanı"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "mavi için giriş alanı"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "yeşil için giriş alanı"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "kırmızı için giriş alanı"
+    },
     "insert_593145ef": {
         "message": "Ekle"
     },
@@ -383,11 +527,26 @@
     "invalid_url_cbde79f": {
         "message": "Geçersiz bağlantı"
     },
+    "irish_567e109f": {
+        "message": "İrlandaca"
+    },
+    "italian_bd3c792d": {
+        "message": "İtalyanca"
+    },
+    "japanese_b5721ca7": {
+        "message": "Japonca"
+    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Klavye Kısayolları"
     },
+    "korean_da812d9": {
+        "message": "Korece"
+    },
     "large_9c5e80e7": {
         "message": "Büyük"
+    },
+    "latvian_2bbb6aab": {
+        "message": "Letonca"
     },
     "light_blue_5374f600": {
         "message": "Açık Mavi"
@@ -404,6 +563,12 @@
     "links_to_an_external_site_de74145d": {
         "message": "Harici bir siteye bağlantılar."
     },
+    "lists_cd1336fc": {
+        "message": "Listeler"
+    },
+    "lithuanian_5adcbe24": {
+        "message": "Kelimeler arasındaki boşlukları sayma"
+    },
     "load_more_35d33c7": {
         "message": "Daha Fazla Yükle"
     },
@@ -416,11 +581,38 @@
     "loading_failed_b3524381": {
         "message": "Yükleme Başarısız..."
     },
+    "loading_folders_d8b5869e": {
+        "message": "Klasörler yükleniyor"
+    },
     "locked_762f138b": {
         "message": "Kilitli"
     },
+    "macedonian_6ed541af": {
+        "message": "Makedonca"
+    },
+    "magenta_4a65993c": {
+        "message": "Macenta"
+    },
+    "malay_f5dddce4": {
+        "message": "Malayca"
+    },
+    "maltese_916925e8": {
+        "message": "Maltaca"
+    },
     "media_af190855": {
         "message": "Medya"
+    },
+    "medium_5a8e9ead": {
+        "message": "Üye"
+    },
+    "merge_links_2478df96": {
+        "message": "Bağlantıları birleştir"
+    },
+    "mic_a7f3d311": {
+        "message": "Mikrofon"
+    },
+    "microphone_disabled_15c83130": {
+        "message": "Mikrofon Devre Dışı"
     },
     "minimize_file_preview_da911944": {
         "message": "Dosya Ön İzlemesini Küçült"
@@ -430,6 +622,9 @@
     },
     "misc_3b692ea7": {
         "message": "Çeşitli"
+    },
+    "modify_6b0b13e3": {
+        "message": "Değiştir"
     },
     "module_90d9fd32": {
         "message": "Modül"
@@ -452,8 +647,14 @@
     "next_40e12421": {
         "message": "Sonraki"
     },
+    "no_accessibility_issues_were_detected_f8d3c875": {
+        "message": "Herhangi bir erişilebilirlik sorunu tespit edilmedi."
+    },
     "no_e16d9132": {
         "message": "Hayır"
+    },
+    "no_file_chosen_9a880793": {
+        "message": "Dosya seçilmedi"
     },
     "no_pages_created_yet_c379fa6e": {
         "message": "Sayfa henüz oluşturulmadı."
@@ -461,11 +662,17 @@
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Bu dosya için ön izleme bulunmamaktadır."
     },
+    "no_quizzes_found_c80c537a": {
+        "message": "Sınav bulunamadı."
+    },
     "no_results_940393cf": {
         "message": "Sonuç yok."
     },
     "no_results_found_58717065": {
         "message": "Sonuç bulunamadı"
+    },
+    "no_video_1ed00b26": {
+        "message": "Video Yok"
     },
     "none_3b5e34d2": {
         "message": "Yok"
