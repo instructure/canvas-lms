@@ -26,12 +26,14 @@ module Accessibility
       BULLET_MARKERS = ["*", "-"].map { |c| "\\#{c}" }.join("|")
       ORDERED_MARKERS = [".", ")"].map { |c| "\\#{c}" }.join("|")
 
-      HTML_TAG_PATTERN = /(?:<[^>]+>\\s*)*/
+      NUMBER_REGEX = /^[0-9]+$/
+      LOWERCASE_ALPHABET_REGEX = /^[a-z]+$/
+      UPPERCASE_ALPHABET_REGEX = /^[A-Z]+$/
+      ROMAN_NUMERAL_PATTERN_REGEX = /^(i{1,3}|iv|v|vi{1,3}|ix|x{1,3}|xi{1,3}|xiv|xv|xvi{1,3}|xix|xx)$/i
+
       UNORDERED_LIST_REGEX = /^\s*(?:[#{BULLET_MARKERS}])\s+/
       ORDERED_LIST_REGEX = /^\s*(?:(#{ORDERED_CHARS})[#{ORDERED_MARKERS}])\s+/
-
       LIST_LIKE_REGEX = /#{UNORDERED_LIST_REGEX.source}|#{ORDERED_LIST_REGEX.source}/
-      LIST_LIKE_REGEX_WITH_HTML_TAG = /#{HTML_TAG_PATTERN.source}#{LIST_LIKE_REGEX.source}/
 
       self.id = "list-structure"
       self.link = "https://www.w3.org/TR/2016/NOTE-WCAG20-TECHS-20161007/H48"
@@ -39,20 +41,21 @@ module Accessibility
       # Accessibility::Rule methods
 
       def test(elem)
-        is_list = self.class.list?(elem)
-        is_element = elem.is_a?(Nokogiri::XML::Element)
-        is_first = (is_element && elem.previous_element_sibling) ? !self.class.list?(elem.previous_element_sibling) : true
+        return nil unless self.class.list?(elem)
+        return nil unless elem.is_a?(Nokogiri::XML::Element)
 
-        return I18n.t("Lists shall be formatted as lists.") if is_first && is_list
+        prev = elem.previous_element_sibling
+        if prev && self.class.list?(prev)
+          return nil if same_list_type?(elem, prev)
+        end
 
-        nil
+        I18n.t("Lists shall be formatted as lists.")
       end
 
-      # TODO: define undo text
       def form(_elem)
         Accessibility::Forms::Button.new(
           label: I18n.t("Reformat"),
-          undo_text: I18n.t("List structure fixed"),
+          undo_text: I18n.t("List is now formatted correctly."),
           value: "false"
         )
       end
@@ -60,27 +63,22 @@ module Accessibility
       def fix!(elem, value)
         return nil unless self.class.list?(elem) && value == "true"
 
-        # Find the first and last consecutive list-like siblings
-        first_elem = elem
-        first_elem = first_elem.previous_element_sibling while first_elem.previous_element_sibling && self.class.list?(first_elem.previous_element_sibling)
-        list_elems = []
-        current_elem = first_elem
-        while current_elem && self.class.list?(current_elem)
-          list_elems << current_elem
-          current_elem = current_elem.next_element_sibling
-        end
+        fix_list_by_type(elem)
+      end
 
-        # Determine list type and start index
-        match_data = LIST_LIKE_REGEX.match(list_elems.first.content)
-        is_ordered = !!match_data&.captures&.first
-        start_index = is_ordered ? match_data.captures.first : nil
+      def fix_list_by_type(elem)
+        is_ordered, marker_type, start_value = determine_list_type(elem)
+        list_elems = collect_list_sequence(elem)
 
         list_tag = is_ordered ? "ol" : "ul"
 
         list_container = elem.document.create_element(list_tag)
         extend_nokogiri_element(list_container)
 
-        list_container["start"] = start_index if is_ordered && start_index =~ /^\d+$/ && start_index.to_i > 1
+        if is_ordered && marker_type
+          list_container["type"] = marker_type
+          list_container["start"] = start_value if marker_type == "1" && start_value.to_i > 1
+        end
 
         # Add <li> for each list-like element
         list_elems.each do |le|
@@ -107,7 +105,7 @@ module Accessibility
           end
         end
 
-        first_elem.add_previous_sibling(list_container)
+        list_elems.first.add_previous_sibling(list_container)
         list_elems.each(&:unlink)
 
         list_container
@@ -122,7 +120,11 @@ module Accessibility
       end
 
       def why
-        I18n.t("When markup is used that visually formats items as a list but does not indicate the list relationship, users may have difficulty in navigating the information.")
+        I18n.t("Using correct list formatting helps learners using screen readers understand the content.")
+      end
+
+      def issue_preview(elem)
+        collect_list_sequence(elem).map(&:to_html).join
       end
 
       # Helper methods
@@ -169,6 +171,64 @@ module Accessibility
         elsif node.element?
           node.children.each { |child| strip_list_marker_from_node(child) }
         end
+      end
+
+      private
+
+      def determine_list_type(elem)
+        match_data = LIST_LIKE_REGEX.match(elem.content)
+        is_ordered = !!match_data&.captures&.first
+
+        return [false, nil, nil] unless is_ordered
+
+        start_value = match_data.captures.first
+        marker_type = detect_marker_type(start_value)
+
+        [true, marker_type, start_value]
+      end
+
+      def detect_marker_type(value)
+        return "1" if value.match?(NUMBER_REGEX)
+        return value.match?(ROMAN_NUMERAL_PATTERN_REGEX) ? "i" : "a" if value.match?(LOWERCASE_ALPHABET_REGEX)
+        return value.match?(ROMAN_NUMERAL_PATTERN_REGEX) ? "I" : "A" if value.match?(UPPERCASE_ALPHABET_REGEX)
+
+        "1"
+      end
+
+      def same_list_type?(elem1, elem2)
+        determine_list_type(elem1).first(2) == determine_list_type(elem2).first(2)
+      end
+
+      def collect_list_sequence(elem)
+        first_elem = find_first_of_sequence(elem)
+
+        collect_forward(first_elem)
+      end
+
+      def find_first_of_sequence(elem)
+        first_elem = elem
+        while first_elem.previous_element_sibling && self.class.list?(first_elem.previous_element_sibling)
+          prev_elem = first_elem.previous_element_sibling
+
+          break unless same_list_type?(elem, prev_elem)
+
+          first_elem = prev_elem
+        end
+        first_elem
+      end
+
+      def collect_forward(first_elem)
+        list_elems = []
+        current_elem = first_elem
+
+        while current_elem && self.class.list?(current_elem)
+          break unless same_list_type?(first_elem, current_elem)
+
+          list_elems << current_elem
+          current_elem = current_elem.next_element_sibling
+        end
+
+        list_elems
       end
     end
   end
