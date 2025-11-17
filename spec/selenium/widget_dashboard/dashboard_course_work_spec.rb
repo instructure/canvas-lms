@@ -191,6 +191,33 @@ describe "student dashboard Course work widget", :ignore_js_errors do
     end
   end
 
+  context "date filter excludes assignments due earlier same day" do
+    before :once do
+      @due_this_morning = @course1.assignments.create!(
+        name: "Due 2 Hours Ago",
+        due_at: 2.hours.ago,
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+
+      @due_this_afternoon = @course1.assignments.create!(
+        name: "Due in 2 Hours",
+        due_at: 2.hours.from_now,
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+    end
+
+    it "does not show assignments due earlier that morning when filtering by next 3 days" do
+      go_to_dashboard
+
+      filter_course_work_by(:date, "Next 3 days")
+
+      expect(element_exists?(course_work_item_selector(@due_this_morning.id))).to be_falsey
+      expect(course_work_item(@due_this_afternoon.id)).to be_displayed
+    end
+  end
+
   context "Course work widget pagination" do
     before :once do
       dashboard_course_submission_setup

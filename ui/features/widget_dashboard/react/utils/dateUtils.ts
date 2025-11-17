@@ -39,11 +39,12 @@ export const getTomorrow = () => {
 
 export function convertDateFilterToParams(filter: DateFilterOption) {
   const today = startOfToday()
+  const now = new Date()
 
   switch (filter) {
     case 'next3days':
       return {
-        startDate: today.toISOString(),
+        startDate: now.toISOString(),
         endDate: addDays(today, 3).toISOString(),
         includeOverdue: false,
         includeNoDueDate: false,
@@ -51,7 +52,7 @@ export function convertDateFilterToParams(filter: DateFilterOption) {
       }
     case 'next7days':
       return {
-        startDate: today.toISOString(),
+        startDate: now.toISOString(),
         endDate: addDays(today, 7).toISOString(),
         includeOverdue: false,
         includeNoDueDate: false,
@@ -59,7 +60,7 @@ export function convertDateFilterToParams(filter: DateFilterOption) {
       }
     case 'next14days':
       return {
-        startDate: today.toISOString(),
+        startDate: now.toISOString(),
         endDate: addDays(today, 14).toISOString(),
         includeOverdue: false,
         includeNoDueDate: false,
