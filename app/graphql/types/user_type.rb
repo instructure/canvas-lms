@@ -141,6 +141,18 @@ module Types
     field :email, String, null: true
 
     def email
+      # IMPORTANT: The order of permission checks here is critical for performance.
+      # We check higher-level permissions (account/course) BEFORE user-level permissions
+      # to avoid N+1 queries. Checking object.grants_right? on the user requires loading
+      # all of the user's courses to verify permissions, which causes N+1s when
+      # resolving email for multiple users (e.g., in a course roster).
+      #
+      # By checking domain_root_account and course permissions first, we leverage context
+      # objects that are already loaded. Only when these context-level checks fail do we
+      # fall back to the expensive user-level permission check.
+      #
+      # This optimization prevents timeouts on initial requests and matches the pattern
+      # used in the REST API for similar permission checks.
       domain_root_account = context[:domain_root_account]
       course = context[:course]
       return unless domain_root_account.grants_right?(context[:current_user], :read_email_addresses) ||
