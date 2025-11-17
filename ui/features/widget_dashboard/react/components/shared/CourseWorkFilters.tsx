@@ -25,17 +25,18 @@ import {useResponsiveContext} from '../../hooks/useResponsiveContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
-export type DateFilterOption =
-  | 'all'
-  | 'missing'
-  | 'next3days'
-  | 'next7days'
-  | 'next14days'
-  | 'submitted'
+export type DateFilterOption = 'not_submitted' | 'missing' | 'submitted'
 
 export interface DateFilterConfig {
   id: DateFilterOption
   label: string
+}
+
+export function isValidDateFilterOption(value: unknown): value is DateFilterOption {
+  return (
+    typeof value === 'string' &&
+    (value === 'not_submitted' || value === 'missing' || value === 'submitted')
+  )
 }
 
 export interface CourseWorkFiltersProps {
@@ -50,7 +51,6 @@ export interface CourseWorkFiltersProps {
     data: {value?: string | number; id?: string},
   ) => void
   userCourses: CourseOption[]
-  statisticsOnly?: boolean
 }
 
 const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
@@ -59,7 +59,6 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
   onCourseChange,
   onDateFilterChange,
   userCourses,
-  statisticsOnly = false,
 }) => {
   const {isMobile} = useResponsiveContext()
 
@@ -68,17 +67,9 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
     [userCourses],
   )
 
-  const dateFilterOptions: DateFilterConfig[] = useMemo(
-    () => [
-      {id: 'next3days', label: I18n.t('Next 3 days')},
-      {id: 'next7days', label: I18n.t('Next 7 days')},
-      {id: 'next14days', label: I18n.t('Next 14 days')},
-    ],
-    [],
-  )
-
   const statusFilterOptions: DateFilterConfig[] = useMemo(
     () => [
+      {id: 'not_submitted', label: I18n.t('Not submitted')},
       {id: 'missing', label: I18n.t('Missing')},
       {id: 'submitted', label: I18n.t('Submitted')},
     ],
@@ -103,27 +94,16 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
       </Flex.Item>
       <Flex.Item shouldGrow overflowX="visible" overflowY="visible">
         <SimpleSelect
-          renderLabel={I18n.t('Assignment filter:')}
+          renderLabel={I18n.t('Submission status:')}
           value={selectedDateFilter}
           onChange={onDateFilterChange}
-          data-testid="date-filter-select"
+          data-testid="submission-status-filter-select"
         >
-          <SimpleSelect.Group renderLabel={I18n.t('Filter by date')}>
-            {dateFilterOptions.map(option => (
-              <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
-                {option.label}
-              </SimpleSelect.Option>
-            ))}
-          </SimpleSelect.Group>
-          {!statisticsOnly && (
-            <SimpleSelect.Group renderLabel={I18n.t('Filter by submission status')}>
-              {statusFilterOptions.map(option => (
-                <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
-                  {option.label}
-                </SimpleSelect.Option>
-              ))}
-            </SimpleSelect.Group>
-          )}
+          {statusFilterOptions.map(option => (
+            <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
+              {option.label}
+            </SimpleSelect.Option>
+          ))}
         </SimpleSelect>
       </Flex.Item>
     </Flex>

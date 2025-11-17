@@ -42,26 +42,10 @@ export function convertDateFilterToParams(filter: DateFilterOption) {
   const now = new Date()
 
   switch (filter) {
-    case 'next3days':
+    case 'not_submitted':
       return {
         startDate: now.toISOString(),
-        endDate: addDays(today, 3).toISOString(),
-        includeOverdue: false,
-        includeNoDueDate: false,
-        onlySubmitted: false,
-      }
-    case 'next7days':
-      return {
-        startDate: now.toISOString(),
-        endDate: addDays(today, 7).toISOString(),
-        includeOverdue: false,
-        includeNoDueDate: false,
-        onlySubmitted: false,
-      }
-    case 'next14days':
-      return {
-        startDate: now.toISOString(),
-        endDate: addDays(today, 14).toISOString(),
+        endDate: undefined,
         includeOverdue: false,
         includeNoDueDate: false,
         onlySubmitted: false,
@@ -97,37 +81,20 @@ export function convertDateFilterToStatisticsRange(filter: DateFilterOption) {
   const now = new Date()
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
 
-  // Helper function to create end of day for N days from today
   const endOfDays = (days: number) => {
     const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + days + 1)
-    endDate.setMilliseconds(-1) // Set to 23:59:59.999 of the last day
+    endDate.setMilliseconds(-1)
     return endDate
   }
 
   switch (filter) {
-    case 'next3days':
-      return {
-        startDate: startOfToday,
-        endDate: endOfDays(2), // Today + 2 more days = 3 days total
-      }
-    case 'next7days':
-      return {
-        startDate: startOfToday,
-        endDate: endOfDays(6), // Today + 6 more days = 7 days total
-      }
-    case 'next14days':
-      return {
-        startDate: startOfToday,
-        endDate: endOfDays(13), // Today + 13 more days = 14 days total
-      }
+    case 'not_submitted':
     case 'missing':
     case 'submitted':
-    case 'all':
     default:
-      // For missing/submitted/all, show all-time statistics
       return {
         startDate: startOfToday,
-        endDate: endOfDays(13), // Default to 14-day window for consistency
+        endDate: addDays(startOfToday, 90),
       }
   }
 }

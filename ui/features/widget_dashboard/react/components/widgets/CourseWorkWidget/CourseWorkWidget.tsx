@@ -23,7 +23,10 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
-import CourseWorkFilters, {type DateFilterOption} from '../../shared/CourseWorkFilters'
+import CourseWorkFilters, {
+  type DateFilterOption,
+  isValidDateFilterOption,
+} from '../../shared/CourseWorkFilters'
 import type {BaseWidgetProps, CourseOption} from '../../../types'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {useCourseWorkPaginated} from '../../../hooks/useCourseWork'
@@ -49,7 +52,8 @@ const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
   const [selectedDateFilter, setSelectedDateFilter] = useWidgetConfig<DateFilterOption>(
     widget.id,
     'selectedDateFilter',
-    'next3days',
+    'not_submitted',
+    isValidDateFilterOption,
   )
 
   // Fetch user's enrolled courses
