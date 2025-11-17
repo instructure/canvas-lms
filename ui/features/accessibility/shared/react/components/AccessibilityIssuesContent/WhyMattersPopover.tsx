@@ -72,11 +72,9 @@ const WhyMattersPopover = ({issue}: WhyMattersPopoverProps) => {
             <Flex.Item>
               <CloseButton
                 margin="x-small"
-                screenReaderLabel="close tooltip"
+                screenReaderLabel={I18n.t('Close')}
                 onClick={() => setIsShowingContent(false)}
-              >
-                {I18n.t('Close')}
-              </CloseButton>
+              />
             </Flex.Item>
           </Flex>
         </Flex.Item>
