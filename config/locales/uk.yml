@@ -2393,6 +2393,7 @@ uk:
   assignment_comments_e43ed898: "Коментарі до завдання"
   assignment_created_assignment_name_course_name_324a5639: "Завдання створене - %{assignment_name}, %{course_name}"
   assignment_d8387b78: завдання
+  assignment_details_bc488179: "Деталі завдання"
   assignment_details_collapsed_55b67150: "Деталі завдання зникли"
   assignment_details_dialog: 
     average_score: "Середній бал:"
@@ -17199,6 +17200,7 @@ uk:
       graded: оцінено
       submitted: відправлено
       unsubmitted: "не відправлено"
+  submission_7ca566e1: Матеріал
   submission_action_take_quiz: "Скласти %{title}"
   submission_action_turn_in_assignment: "Включити %{title}"
   submission_added_title_50ebdc85: "Завдання додано: %{title}"
