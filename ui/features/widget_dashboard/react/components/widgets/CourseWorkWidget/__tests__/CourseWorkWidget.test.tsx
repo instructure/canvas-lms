@@ -235,6 +235,33 @@ describe('CourseWorkWidget', () => {
     expect(screen.getByText(/40 pts/)).toBeInTheDocument()
   })
 
+  it('displays "Go to course" links for each course work item', async () => {
+    renderWithProviders(<CourseWorkWidget {...buildDefaultProps()} />)
+
+    await screen.findByText('Essay on Climate Change')
+
+    expect(screen.getByTestId('course-work-item-course-link-1')).toBeInTheDocument()
+    expect(screen.getByTestId('course-work-item-course-link-1')).toHaveAttribute(
+      'href',
+      '/courses/101',
+    )
+    expect(screen.getByTestId('course-work-item-course-link-2')).toBeInTheDocument()
+    expect(screen.getByTestId('course-work-item-course-link-2')).toHaveAttribute(
+      'href',
+      '/courses/102',
+    )
+    expect(screen.getByTestId('course-work-item-course-link-3')).toBeInTheDocument()
+    expect(screen.getByTestId('course-work-item-course-link-3')).toHaveAttribute(
+      'href',
+      '/courses/103',
+    )
+    expect(screen.getByTestId('course-work-item-course-link-4')).toBeInTheDocument()
+    expect(screen.getByTestId('course-work-item-course-link-4')).toHaveAttribute(
+      'href',
+      '/courses/104',
+    )
+  })
+
   it('sorts items by due date with soonest first', async () => {
     renderWithProviders(<CourseWorkWidget {...buildDefaultProps()} />)
 

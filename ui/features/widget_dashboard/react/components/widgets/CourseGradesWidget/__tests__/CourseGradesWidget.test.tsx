@@ -185,4 +185,18 @@ describe('CourseGradesWidget', () => {
       expect(screen.getByText('N/A')).toBeInTheDocument()
     })
   })
+
+  it('displays "Go to course" link for each course', async () => {
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+      expect(screen.getByText('Course 2')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('course-1-link')).toBeInTheDocument()
+    expect(screen.getByTestId('course-1-link')).toHaveAttribute('href', '/courses/1')
+    expect(screen.getByTestId('course-2-link')).toBeInTheDocument()
+    expect(screen.getByTestId('course-2-link')).toHaveAttribute('href', '/courses/2')
+  })
 })

@@ -92,14 +92,38 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
               </Text>
             </Flex.Item>
             <Flex.Item overflowX="visible" overflowY="visible">
-              <Link
-                href={`/courses/${courseId}/grades`}
-                isWithinText={false}
-                aria-label={I18n.t('View %{courseName} gradebook', {courseName})}
-                data-testid={`course-${courseId}-gradebook-link`}
-              >
-                <Text size="small">{I18n.t('View gradebook')}</Text>
-              </Link>
+              <Flex>
+                <Flex.Item overflowX="visible" overflowY="visible">
+                  <Link
+                    href={`/courses/${courseId}/grades`}
+                    isWithinText={false}
+                    aria-label={I18n.t('View %{courseName} gradebook', {courseName})}
+                    data-testid={`course-${courseId}-gradebook-link`}
+                  >
+                    <Text size="small">{I18n.t('View gradebook')}</Text>
+                  </Link>
+                </Flex.Item>
+                <Flex.Item padding="0 small" overflowX="visible" overflowY="visible">
+                  <Text
+                    color="secondary"
+                    themeOverride={{
+                      secondaryColor: '#E8EAEC',
+                    }}
+                  >
+                    |
+                  </Text>
+                </Flex.Item>
+                <Flex.Item overflowX="visible" overflowY="visible">
+                  <Link
+                    href={`/courses/${courseId}`}
+                    isWithinText={false}
+                    aria-label={I18n.t('Go to %{courseName}', {courseName})}
+                    data-testid={`course-${courseId}-link`}
+                  >
+                    <Text size="small">{I18n.t('Go to course')}</Text>
+                  </Link>
+                </Flex.Item>
+              </Flex>
             </Flex.Item>
           </Flex>
         </Flex.Item>
