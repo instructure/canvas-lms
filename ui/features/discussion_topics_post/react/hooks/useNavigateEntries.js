@@ -53,9 +53,9 @@ export default function useNavigateEntries({
 
   useEffect(() => {
     if (!studentEntriesQuery.isLoading && sort) {
-      studentEntriesQuery.refetch();
+      studentEntriesQuery.refetch()
     }
-  }, [sort, studentEntriesQuery]);
+  }, [sort, studentEntriesQuery])
 
   // Combine pages from your query and sort them based on `sort` ("asc"/"desc").
   const sortedStudentEntries = useMemo(() => {
@@ -166,6 +166,9 @@ export default function useNavigateEntries({
   // if highlightEntryId isn't in the list, pick the "first" item (per sorted order).
   useEffect(() => {
     if (!isInSpeedGrader || studentEntriesQuery.isLoading) return
+
+    // Don't auto-navigate if highlight was explicitly cleared (null/undefined/empty)
+    if (!highlightEntryId) return
 
     const currentEntryIndex = sortedStudentEntries.findIndex(e => e._id === highlightEntryId)
     if (currentEntryIndex < 0 && sortedStudentEntries.length > 0) {
