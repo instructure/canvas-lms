@@ -33,9 +33,8 @@ module CC::Exporter::Epub
     def add_files
       files.each do |file_data|
         File.open(file_data[:path_to_file]) do |file|
-          epub.add_item(file_data[:local_path], file, file_data[:identifier], {
-                          "media-type" => file_data[:media_type]
-                        })
+          href = file_data[:local_path]
+          epub.add_item(href, content: file, id: file_data[:identifier], media_type: file_data[:media_type])
         end
       end
     end
