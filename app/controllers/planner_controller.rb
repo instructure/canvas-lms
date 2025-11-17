@@ -412,7 +412,9 @@ class PlannerController < ApplicationController
       if !@include_context_codes && @include_all_courses
         opts = {}
         opts[:observee_user] = @user
+        opts[:limit] = 50
         context_codes = @current_user.menu_courses(nil, opts).pluck(:asset_string)
+        context_codes << @user.asset_string
       end
       context_ids = ActiveRecord::Base.parse_asset_string_list(context_codes)
       @course_ids = context_ids["Course"] || []
