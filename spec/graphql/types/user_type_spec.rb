@@ -3350,6 +3350,68 @@ describe Types::UserType do
         end
       end
     end
+
+    it "includes submissions marked as missing by teacher in includeOverdue filter even if graded" do
+      Timecop.freeze(@frozen_time) do
+        missing_assignment = @course.assignments.create!(
+          title: "Teacher Marked Missing Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+
+        # Create a submission where:
+        # - Student never submitted (submitted_at: nil)
+        # - Teacher graded it anyway (score, workflow_state = graded)
+        # - Teacher manually marked it as missing via late policy
+        submission = missing_assignment.submissions.find_or_create_by(user: @student)
+        submission.update!(
+          submitted_at: nil,
+          workflow_state: "graded",
+          submission_type: nil,
+          grader_id: @teacher.id,
+          score: 0,
+          late_policy_status: "missing"
+        )
+
+        expect(submission.missing?).to be true
+        missing_result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+        expect(missing_result).to include("Teacher Marked Missing Assignment")
+
+        submitted_result = student_user_type.resolve("courseWorkSubmissionsConnection(onlySubmitted: true) { edges { node { assignment { title } } } }")
+        expect(submitted_result).not_to include("Teacher Marked Missing Assignment")
+      end
+    end
+
+    it "excludes submissions that are calculated as missing (not explicitly marked) from submitted filter" do
+      Timecop.freeze(@frozen_time) do
+        calculated_missing_assignment = @course.assignments.create!(
+          title: "Calculated Missing Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+
+        # Create a submission that is missing by calculation, not by explicit late_policy_status
+        submission = calculated_missing_assignment.submissions.find_or_create_by(user: @student)
+        submission.update!(
+          submitted_at: nil,
+          workflow_state: "unsubmitted",
+          submission_type: nil,
+          grader_id: nil,
+          score: nil,
+          late_policy_status: nil
+        )
+
+        expect(submission.missing?).to be true
+
+        submitted_result = student_user_type.resolve("courseWorkSubmissionsConnection(onlySubmitted: true) { edges { node { assignment { title } } } }")
+        expect(submitted_result).not_to include("Calculated Missing Assignment")
+
+        missing_result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+        expect(missing_result).to include("Calculated Missing Assignment")
+      end
+    end
   end
 
   context "courseWorkSubmissionsConnection with observed user" do

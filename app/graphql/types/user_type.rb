@@ -704,11 +704,18 @@ module Types
       # Filter by submission status
       submissions_query = if only_submitted
                             # Include submitted, graded, or excused submissions
+                            # BUT exclude missing submissions (teacher marked or calculated)
                             submissions_query.where(<<~SQL.squish)
                               (submissions.excused = true
                               OR submissions.workflow_state IN ('submitted', 'pending_review')
                               OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded'))
                             SQL
+                                             .where.not(id: Submission.missing.where(user: user_for_submissions).select(:id))
+                          elsif include_overdue
+                            # For missing filter: only apply basic non-excused filter
+                            # The Submission.missing scope will handle the rest
+                            # Don't pre-filter graded submissions as they may be marked missing
+                            submissions_query.where("excused = FALSE OR excused IS NULL")
                           else
                             # Default: show unsubmitted, non-excused, non-graded assignments (actionable items)
                             # Match the logic in SubmissionStatisticsType.submissions_due_count
