@@ -117,6 +117,10 @@ new_quizzes_ai_quiz_generation:
   description: Enable IgniteAI Question Authoring for Quizzes feature
   state: allowed
   applies_to: Course
+  beta: true
+  environments:
+    production:
+      state: hidden
 new_quizzes_scanning_youtube_links:
   display_name: Scanning Youtube links in New Quizzes
   description: Enabling the YouTube Migration - New Quizzes feature adds the scanning ability and the convert option on Youtube embeddings in New Quizzes.
