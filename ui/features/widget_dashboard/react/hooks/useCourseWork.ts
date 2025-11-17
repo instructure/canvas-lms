@@ -328,7 +328,6 @@ export function useCourseWork(options: UseCourseWorkOptions = {}) {
         COURSE_WORK_KEY,
         pageSize,
         courseFilter,
-        startDate,
         endDate,
         includeOverdue?.toString(),
         includeNoDueDate?.toString(),
@@ -445,7 +444,6 @@ export function useCourseWorkPaginated(options: UseCourseWorkOptions = {}) {
     () =>
       JSON.stringify({
         courseFilter: options.courseFilter,
-        startDate: options.startDate,
         endDate: options.endDate,
         includeOverdue: options.includeOverdue,
         includeNoDueDate: options.includeNoDueDate,
@@ -454,7 +452,6 @@ export function useCourseWorkPaginated(options: UseCourseWorkOptions = {}) {
       }),
     [
       options.courseFilter,
-      options.startDate,
       options.endDate,
       options.includeOverdue,
       options.includeNoDueDate,
@@ -478,7 +475,6 @@ export function useCourseWorkPaginated(options: UseCourseWorkOptions = {}) {
     currentPageIndex,
     pageSize,
     options.courseFilter,
-    options.startDate,
     options.endDate,
     options.includeOverdue?.toString(),
     options.includeNoDueDate?.toString(),
