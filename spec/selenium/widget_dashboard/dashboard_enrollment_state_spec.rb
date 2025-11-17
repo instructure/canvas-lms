@@ -69,7 +69,6 @@ describe "student dashboard", :ignore_js_errors do
       go_to_dashboard
       expect(enrollment_invitation).to be_displayed
 
-      filter_course_work_by(:date, "Next 14 days")
       expect(course_work_summary_stats("Due").text).to eq("0\nDue")
       expect(course_work_summary_stats("Missing").text).to eq("0\nMissing")
       expect(course_work_summary_stats("Submitted").text).to eq("0\nSubmitted")

@@ -162,11 +162,11 @@ describe('CourseWorkSummaryWidget', () => {
     cleanup()
   })
 
-  it('renders date range filter dropdown', async () => {
+  it('renders submission status filter dropdown', async () => {
     const {cleanup} = setup(buildDefaultProps())
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue('Next 3 days')).toBeInTheDocument()
+      expect(screen.getByDisplayValue('Not submitted')).toBeInTheDocument()
     })
 
     cleanup()

@@ -73,19 +73,19 @@ module StudentDashboardCommon
   end
 
   def dashboard_course_assignment_setup
-    @due_graded_discussion = @course1.assignments.create!(name: "Course 1: due_graded_discussion", points_possible: "10", due_at: 6.days.from_now, submission_types: "discussion_topic")
-    @due_assignment = @course1.assignments.create!(name: "Course 1: due_assignment", points_possible: "10", due_at: 1.day.from_now, submission_types: "online_text_entry")
-    @due_quiz = @course1.assignments.create!(title: "Course 1: due_quiz", points_possible: "10", due_at: 13.days.from_now, submission_types: "online_quiz")
+    @due_graded_discussion = @course1.assignments.create!(name: "Course 1: due_graded_discussion", points_possible: "10", due_at: 6.days.from_now.end_of_day, submission_types: "discussion_topic")
+    @due_assignment = @course1.assignments.create!(name: "Course 1: due_assignment", points_possible: "10", due_at: 1.day.from_now.end_of_day, submission_types: "online_text_entry")
+    @due_quiz = @course1.assignments.create!(title: "Course 1: due_quiz", points_possible: "10", due_at: 13.days.from_now.end_of_day, submission_types: "online_quiz")
 
-    @missing_graded_discussion = @course1.assignments.create!(name: "Course 1: missing_graded_discussion", points_possible: "10", due_at: 2.days.ago, submission_types: "discussion_topic")
-    @missing_assignment = @course2.assignments.create!(name: "Course 2: missing_assignment", points_possible: "10", due_at: 3.days.ago, submission_types: "online_text_entry")
-    @missing_quiz = @course2.assignments.create!(title: "Course 2: missing_quiz", points_possible: "10", due_at: 4.days.ago, submission_types: "online_quiz")
+    @missing_graded_discussion = @course1.assignments.create!(name: "Course 1: missing_graded_discussion", points_possible: "10", due_at: 2.days.ago.end_of_day, submission_types: "discussion_topic")
+    @missing_assignment = @course2.assignments.create!(name: "Course 2: missing_assignment", points_possible: "10", due_at: 3.days.ago.end_of_day, submission_types: "online_text_entry")
+    @missing_quiz = @course2.assignments.create!(title: "Course 2: missing_quiz", points_possible: "10", due_at: 4.days.ago.end_of_day, submission_types: "online_quiz")
 
-    @graded_discussion = @course1.assignments.create!(name: "Course 1: graded_discussion", points_possible: "10", due_at: 5.days.ago, submission_types: "discussion_topic")
-    @graded_assignment = @course2.assignments.create!(name: "Course 2: graded_assignment", points_possible: "10", due_at: 3.days.ago, submission_types: "online_text_entry")
+    @graded_discussion = @course1.assignments.create!(name: "Course 1: graded_discussion", points_possible: "10", due_at: 5.days.ago.end_of_day, submission_types: "discussion_topic")
+    @graded_assignment = @course2.assignments.create!(name: "Course 2: graded_assignment", points_possible: "10", due_at: 3.days.ago.end_of_day, submission_types: "online_text_entry")
 
-    @submitted_discussion = @course2.assignments.create!(name: "Course 2: submitted_discussion", points_possible: "10", due_at: 2.days.ago, submission_types: "discussion_topic")
-    @submitted_assignment = @course1.assignments.create!(name: "Course 1: submitted_assignment", points_possible: "10", due_at: 1.day.from_now, submission_types: "online_text_entry")
+    @submitted_discussion = @course2.assignments.create!(name: "Course 2: submitted_discussion", points_possible: "10", due_at: 2.days.ago.end_of_day, submission_types: "discussion_topic")
+    @submitted_assignment = @course1.assignments.create!(name: "Course 1: submitted_assignment", points_possible: "10", due_at: 1.day.from_now.end_of_day, submission_types: "online_text_entry")
   end
 
   def dashboard_course_submission_setup
@@ -107,11 +107,11 @@ module StudentDashboardCommon
 
   def pagination_submission_setup
     14.times do |i|
-      assignment = @course1.assignments.create!(name: "Course1: HW due in #{i + 1} days", points_possible: "10", due_at: (i + 1).days.from_now, submission_types: "online_text_entry")
-      @course1.assignments.create!(name: "Course1: HW due in #{i + 2} days", points_possible: "10", due_at: (i + 2).days.from_now, submission_types: "online_text_entry")
-      @course2.assignments.create!(name: "Course2: HW due in #{i + 3} days", points_possible: "10", due_at: (i + 3).days.from_now, submission_types: "online_text_entry")
-      @course1.assignments.create!(name: "Course1: Missing HW #{i + 1} days", points_possible: "10", due_at: (i + 1).days.ago, submission_types: "online_text_entry")
-      @course2.assignments.create!(name: "Course2: Missing HW #{i + 1} days", points_possible: "10", due_at: (i + 1).days.ago, submission_types: "online_text_entry")
+      assignment = @course1.assignments.create!(name: "Course1: HW due in #{i + 1} days", points_possible: "10", due_at: (i + 1).days.from_now.end_of_day, submission_types: "online_text_entry")
+      @course1.assignments.create!(name: "Course1: HW due in #{i + 2} days", points_possible: "10", due_at: (i + 2).days.from_now.end_of_day, submission_types: "online_text_entry")
+      @course2.assignments.create!(name: "Course2: HW due in #{i + 3} days", points_possible: "10", due_at: (i + 3).days.from_now.end_of_day, submission_types: "online_text_entry")
+      @course1.assignments.create!(name: "Course1: Missing HW #{i + 1} days", points_possible: "10", due_at: (i + 1).days.ago.end_of_day, submission_types: "online_text_entry")
+      @course2.assignments.create!(name: "Course2: Missing HW #{i + 1} days", points_possible: "10", due_at: (i + 1).days.ago.end_of_day, submission_types: "online_text_entry")
 
       assignment.submit_homework(@student, submission_type: "online_text_entry")
     end
