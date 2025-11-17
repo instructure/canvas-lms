@@ -16457,6 +16457,7 @@ hy:
       graded: գնահատվող
       submitted: "ուղարկված է"
       unsubmitted: "ուղարկված չէ"
+  submission_7ca566e1: Ուղարկում
   submission_action_take_quiz: "Օգտագործել %{title}"
   submission_action_turn_in_assignment: "Ներառել %{title}-ում"
   submission_comment: 
