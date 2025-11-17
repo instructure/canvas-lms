@@ -1,0 +1,65 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import type {PlannerItem} from './types'
+
+export interface FetchPlannerItemsParams {
+  start_date?: string
+  end_date?: string
+  per_page?: number
+  order?: 'asc' | 'desc'
+}
+
+export interface FetchPlannerItemsResponse {
+  items: PlannerItem[]
+  nextUrl: string | null
+}
+
+export async function fetchPlannerItems(
+  params: FetchPlannerItemsParams,
+  nextUrl?: string | null,
+): Promise<FetchPlannerItemsResponse> {
+  let url: string
+
+  if (nextUrl) {
+    url = nextUrl
+  } else {
+    const queryParams = new URLSearchParams()
+
+    if (params.start_date) queryParams.append('start_date', params.start_date)
+    if (params.end_date) queryParams.append('end_date', params.end_date)
+    if (params.per_page) queryParams.append('per_page', params.per_page.toString())
+    if (params.order) queryParams.append('order', params.order)
+
+    url = `/api/v1/planner/items?${queryParams.toString()}`
+  }
+
+  const {json, link} = await doFetchApi<PlannerItem[]>({
+    path: url,
+    method: 'GET',
+  })
+
+  const items = json || []
+  const next = link?.next?.url || null
+
+  return {
+    items,
+    nextUrl: next,
+  }
+}

@@ -114,6 +114,10 @@ const server = setupServer(
       },
     ])
   }),
+  // Mock REST API for TodoListWidget - return empty array to avoid errors
+  http.get('/api/v1/planner/items', () => {
+    return HttpResponse.json([])
+  }),
   // Mock GraphQL mutation for tab selection
   graphql.mutation('UpdateLearnerDashboardTabSelection', () => {
     return HttpResponse.json({
