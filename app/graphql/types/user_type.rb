@@ -119,7 +119,11 @@ module Types
     field :email, String, null: true
 
     def email
-      return nil unless object.grants_all_rights?(context[:current_user], :read_profile, :read_email_addresses)
+      domain_root_account = context[:domain_root_account]
+      course = context[:course]
+      return unless domain_root_account.grants_right?(context[:current_user], :read_email_addresses) ||
+                    course&.grants_right?(context[:current_user], :read_email_addresses) ||
+                    object.grants_right?(context[:current_user], :read_email_addresses)
 
       return object.email if object.email_cached?
 
