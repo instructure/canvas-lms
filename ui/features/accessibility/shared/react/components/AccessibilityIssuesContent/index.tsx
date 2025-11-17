@@ -302,11 +302,17 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   }, [handleSaveAndNext, formRef, previewRef])
 
   const applyButtonText = useMemo(() => {
-    if (!current.issue) return null
-    if (current.issue.form.type === FormType.Button) {
-      return current.issue.form.label
+    const defaultApplyText = I18n.t('Apply')
+
+    if (!current.issue) {
+      return null
     }
-    return current.issue.form.action || I18n.t('Apply')
+
+    if (current.issue.form.type === FormType.Button) {
+      return current.issue.form.label || defaultApplyText
+    }
+
+    return current.issue.form.action || defaultApplyText
   }, [current.issue])
 
   const handleClearError = useCallback(() => {

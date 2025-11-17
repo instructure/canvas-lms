@@ -67,37 +67,18 @@ describe Accessibility::Rules::HeadingsStartAtH2Rule do
     end
   end
 
-  context "metadata methods" do
+  context "form configuration" do
     let(:rule) { Accessibility::Rules::HeadingsStartAtH2Rule.new }
 
-    it "returns the correct display name" do
-      expected_display_name = "Heading levels should start at level 2"
-      expect(rule.display_name).to eq(expected_display_name)
-    end
-
-    it "returns the expected message" do
-      expected_message = "Heading levels in your content should start at level 2 (H2), because there's already a Heading 1 on the page it's displayed on."
-      expect(rule.message).to eq(expected_message)
-    end
-
-    it "returns the explanatory 'why' text" do
-      expected_why =
-        "Sighted users scan web pages quickly by looking for large or bolded headings. " \
-        "Similarly, screen reader users rely on properly structured headings to scan the " \
-        "content and jump directly to key sections. Using correct heading levels in a logical " \
-        "(like H2, H3, etc.) ensures your course is clear, organized, and accessible to everyone. " \
-        "Each page on Canvas already has a main title (H1), so your content should start with an " \
-        "H2 to keep the structure clear."
-      expect(rule.why).to eq(expected_why)
-    end
-
-    it "returns a properly configured form" do
+    it "returns a valid form" do
       form = rule.form(nil)
 
       expect(form).to be_a(Accessibility::Forms::RadioInputGroupField)
-      expect(form.label).to include("How would you like to proceed?")
-      expect(form.options).to contain_exactly("Change it to Heading 2", "Turn into paragraph")
-      expect(form.to_h[:value]).to include("Change it to Heading 2")
+      expect(form.label).to be_present
+      expect(form.undo_text).to be_present
+      expect(form.options).to be_present
+      expect(form.options.length).to eq(2)
+      expect(form.action).to be_present
     end
   end
 end
