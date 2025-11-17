@@ -55,7 +55,7 @@ RSpec.describe Mutations::UpdateWidgetDashboardConfig do
   end
 
   it "saves widget filter preferences" do
-    filters = { "selectedCourse" => "all", "selectedDateFilter" => "next3days" }
+    filters = { "selectedCourse" => "all", "selectedDateFilter" => "not_submitted" }
     result = run_mutation(widgetId: "course-work-widget", filters:)
 
     expect(result["errors"]).to be_nil, "GraphQL errors: #{result["errors"].inspect}"
@@ -77,7 +77,7 @@ RSpec.describe Mutations::UpdateWidgetDashboardConfig do
   it "updates an existing filter preference" do
     @student.set_preference(:widget_dashboard_config, { "filters" => { "course-work-widget" => { "selectedCourse" => "all" } } })
 
-    filters = { "selectedCourse" => "course_123", "selectedDateFilter" => "next7days" }
+    filters = { "selectedCourse" => "course_123", "selectedDateFilter" => "not_submitted" }
     run_mutation(widgetId: "course-work-widget", filters:)
 
     @student.reload
@@ -99,7 +99,7 @@ RSpec.describe Mutations::UpdateWidgetDashboardConfig do
   end
 
   it "converts strong parameters to plain hash for storage" do
-    filters = { "selectedCourse" => "all", "selectedDateFilter" => "next3days" }
+    filters = { "selectedCourse" => "all", "selectedDateFilter" => "not_submitted" }
     run_mutation(widgetId: "course-work-widget", filters:)
 
     @student.reload
@@ -168,7 +168,7 @@ RSpec.describe Mutations::UpdateWidgetDashboardConfig do
   context "course work widget validation" do
     it "accepts valid selectedCourse values" do
       %w[all course_123 course_456789].each do |course_value|
-        filters = { "selectedCourse" => course_value, "selectedDateFilter" => "next7days" }
+        filters = { "selectedCourse" => course_value, "selectedDateFilter" => "not_submitted" }
         result = run_mutation(widgetId: "course-work-widget", filters:)
 
         expect(result["errors"]).to be_nil, "Expected no errors for selectedCourse '#{course_value}', got: #{result["errors"].inspect}"
@@ -186,7 +186,7 @@ RSpec.describe Mutations::UpdateWidgetDashboardConfig do
     end
 
     it "accepts valid selectedDateFilter values" do
-      %w[all missing next3days next7days next14days submitted].each do |date_filter|
+      %w[not_submitted missing submitted].each do |date_filter|
         filters = { "selectedDateFilter" => date_filter }
         result = run_mutation(widgetId: "course-work-widget", filters:)
 
@@ -214,7 +214,7 @@ RSpec.describe Mutations::UpdateWidgetDashboardConfig do
     end
 
     it "works for course-work-combined-widget" do
-      filters = { "selectedCourse" => "all", "selectedDateFilter" => "next3days" }
+      filters = { "selectedCourse" => "all", "selectedDateFilter" => "not_submitted" }
       result = run_mutation(widgetId: "course-work-combined-widget", filters:)
 
       expect(result["errors"]).to be_nil

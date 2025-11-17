@@ -37,13 +37,15 @@ interface UpdateDashboardConfigResponse {
  *
  * @param widgetId - Unique identifier for the widget
  * @param configKey - The key within the widget's config object (e.g., 'selectedCourse', 'selectedDateFilter')
- * @param defaultValue - Default value if no persisted value exists
+ * @param defaultValue - Default value if no persisted value exists or validation fails
+ * @param validator - Optional type guard function to validate persisted values (falls back to default if invalid)
  * @returns Tuple of [currentValue, setValue] similar to useState
  */
 export function useWidgetConfig<T>(
   widgetId: string,
   configKey: string,
   defaultValue: T,
+  validator?: (value: unknown) => value is T,
 ): [T, (value: T) => void] {
   const {widgetConfig, updateWidgetConfig, observedUserId} = useWidgetDashboard()
 
@@ -73,7 +75,11 @@ export function useWidgetConfig<T>(
   const [configValue, setConfigValue] = useState<T>(() => {
     const initialConfig = widgetConfig[widgetId]
     if (initialConfig && configKey in initialConfig) {
-      return transformFromBackend(initialConfig[configKey])
+      const transformedValue = transformFromBackend(initialConfig[configKey])
+      if (validator && !validator(transformedValue)) {
+        return defaultValue
+      }
+      return transformedValue
     }
     return defaultValue
   })
@@ -81,9 +87,14 @@ export function useWidgetConfig<T>(
   useEffect(() => {
     const initialConfig = widgetConfig[widgetId]
     if (initialConfig && configKey in initialConfig) {
-      setConfigValue(transformFromBackend(initialConfig[configKey]))
+      const transformedValue = transformFromBackend(initialConfig[configKey])
+      if (validator && !validator(transformedValue)) {
+        setConfigValue(defaultValue)
+      } else {
+        setConfigValue(transformedValue)
+      }
     }
-  }, [widgetConfig, widgetId, configKey, transformFromBackend])
+  }, [widgetConfig, widgetId, configKey, transformFromBackend, defaultValue, validator])
 
   const updateConfigMutation = useMutation({
     mutationFn: async (newConfig: Record<string, unknown>) => {

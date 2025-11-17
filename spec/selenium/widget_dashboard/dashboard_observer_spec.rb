@@ -40,17 +40,13 @@ describe "Student dashboard as observer", :ignore_js_errors do
   end
 
   context "Course work widget as observer" do
-    it "filter observed course items by dues" do
+    it "filter observed course items by not submitted" do
       go_to_dashboard
       select_observed_student(@student.name)
 
-      expect(all_course_work_items.size).to eq(1)
-      expect(course_work_summary_stats("Due").text).to eq("1\nDue")
-      expect(course_work_item(@due_assignment.id)).to be_displayed
-
-      filter_course_work_by(:date, "Next 14 days")
       expect(all_course_work_items.size).to eq(3)
       expect(course_work_summary_stats("Due").text).to eq("3\nDue")
+      expect(course_work_item(@due_assignment.id)).to be_displayed
       expect(course_work_item(@due_graded_discussion.id)).to be_displayed
       expect(course_work_item(@due_quiz.id)).to be_displayed
 

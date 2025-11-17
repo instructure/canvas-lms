@@ -134,7 +134,7 @@ module WidgetDashboardPage
   end
 
   def course_work_date_filter_select_selector
-    "[data-testid='date-filter-select']"
+    "[data-testid='submission-status-filter-select']"
   end
 
   def course_work_item_selector(item_id)

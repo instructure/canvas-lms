@@ -183,13 +183,13 @@ describe('useWidgetConfig', () => {
     )
 
     act(() => {
-      result.current[1]('next14days')
+      result.current[1]('not_submitted')
     })
 
     await waitFor(() => {
       expect(capturedVariables).not.toBeNull()
       expect(capturedVariables.filters.selectedCourse).toBe('course_44')
-      expect(capturedVariables.filters.selectedDateFilter).toBe('next14days')
+      expect(capturedVariables.filters.selectedDateFilter).toBe('not_submitted')
     })
   })
 
@@ -218,13 +218,13 @@ describe('useWidgetConfig', () => {
     )
 
     act(() => {
-      result.current[1]('next14days')
+      result.current[1]('not_submitted')
     })
 
     await waitFor(() => {
       expect(capturedVariables).not.toBeNull()
       expect(capturedVariables.filters.selectedCourse).toBe('course_44')
-      expect(capturedVariables.filters.selectedDateFilter).toBe('next14days')
+      expect(capturedVariables.filters.selectedDateFilter).toBe('not_submitted')
     })
   })
 
@@ -253,13 +253,13 @@ describe('useWidgetConfig', () => {
     )
 
     act(() => {
-      result.current[1]('next14days')
+      result.current[1]('not_submitted')
     })
 
     await waitFor(() => {
       expect(capturedVariables).not.toBeNull()
       expect(capturedVariables.filters.selectedCourse).toBe('all')
-      expect(capturedVariables.filters.selectedDateFilter).toBe('next14days')
+      expect(capturedVariables.filters.selectedDateFilter).toBe('not_submitted')
     })
   })
 })

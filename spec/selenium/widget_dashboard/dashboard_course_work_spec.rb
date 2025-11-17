@@ -40,25 +40,17 @@ describe "student dashboard Course work widget", :ignore_js_errors do
       dashboard_course_submission_setup
     end
 
-    it "can filter work items in dues" do
+    it "can filter work items in not submitted" do
       go_to_dashboard
       expect(course_work_summary_stats("Due")).to be_displayed
 
-      expect(all_course_work_items.size).to eq(1)
-      expect(course_work_summary_stats("Due").text).to eq("1\nDue")
-      expect(course_work_item(@due_assignment.id)).to be_displayed
-      expect(course_work_item_pill("due_soon", @due_assignment.id)).to be_displayed
-
-      filter_course_work_by(:date, "Next 7 days")
-      expect(all_course_work_items.size).to eq(2)
-      expect(course_work_summary_stats("Due").text).to eq("2\nDue")
-      expect(course_work_item(@due_graded_discussion.id)).to be_displayed
-      expect(course_work_item_pill("due_soon", @due_graded_discussion.id)).to be_displayed
-
-      filter_course_work_by(:date, "Next 14 days")
       expect(all_course_work_items.size).to eq(3)
       expect(course_work_summary_stats("Due").text).to eq("3\nDue")
+      expect(course_work_item(@due_assignment.id)).to be_displayed
+      expect(course_work_item(@due_graded_discussion.id)).to be_displayed
       expect(course_work_item(@due_quiz.id)).to be_displayed
+      expect(course_work_item_pill("due_soon", @due_assignment.id)).to be_displayed
+      expect(course_work_item_pill("due_soon", @due_graded_discussion.id)).to be_displayed
       expect(course_work_item_pill("due_soon", @due_quiz.id)).to be_displayed
     end
 
@@ -132,7 +124,6 @@ describe "student dashboard Course work widget", :ignore_js_errors do
       go_to_dashboard
       expect(course_work_summary_stats("Due")).to be_displayed
 
-      filter_course_work_by(:date, "Next 14 days")
       expect(all_course_work_items.size).to eq(6)
       expect(course_work_summary_stats("Due").text).to eq("7\nDue")
       widget_pagination_button("Course work", "2").click
@@ -164,8 +155,8 @@ describe "student dashboard Course work widget", :ignore_js_errors do
 
       expect(element_exists?(course_work_item_selector(@graded_unsubmitted_future.id))).to be_falsey
       expect(element_exists?(course_work_item_selector(@graded_unsubmitted_overdue.id))).to be_falsey
-      filter_course_work_by(:date, "Submitted")
 
+      filter_course_work_by(:date, "Submitted")
       expect(course_work_item(@graded_unsubmitted_future.id)).to be_displayed
       expect(course_work_item(@graded_unsubmitted_overdue.id)).to be_displayed
 
@@ -181,7 +172,7 @@ describe "student dashboard Course work widget", :ignore_js_errors do
       expect(all_course_work_items.size).to eq(2)
       expect(course_work_summary_stats("Submitted").text).to eq("2\nSubmitted")
 
-      filter_course_work_by(:date, "Next 14 days")
+      filter_course_work_by(:date, "Not submitted")
       expect(all_course_work_items.size).to eq(4)
       expect(course_work_summary_stats("Due").text).to eq("4\nDue")
 
@@ -191,7 +182,7 @@ describe "student dashboard Course work widget", :ignore_js_errors do
     end
   end
 
-  context "date filter excludes assignments due earlier same day" do
+  context "submission status filter shows upcoming work" do
     before :once do
       @due_this_morning = @course1.assignments.create!(
         name: "Due 2 Hours Ago",
@@ -208,10 +199,8 @@ describe "student dashboard Course work widget", :ignore_js_errors do
       )
     end
 
-    it "does not show assignments due earlier that morning when filtering by next 3 days" do
+    it "shows upcoming unsubmitted assignments" do
       go_to_dashboard
-
-      filter_course_work_by(:date, "Next 3 days")
 
       expect(element_exists?(course_work_item_selector(@due_this_morning.id))).to be_falsey
       expect(course_work_item(@due_this_afternoon.id)).to be_displayed
@@ -227,9 +216,8 @@ describe "student dashboard Course work widget", :ignore_js_errors do
     it "displays all pagination link on initial load" do
       go_to_dashboard
 
-      filter_course_work_by(:date, "Next 14 days")
-      expect(widget_pagination_button("Course work", "5")).to be_displayed
-      widget_pagination_button("Course work", "5").click
+      expect(widget_pagination_button("Course work", "6")).to be_displayed
+      widget_pagination_button("Course work", "6").click
       expect(widget_pagination_button("Course work", "1")).to be_displayed
 
       filter_course_work_by(:date, "Missing")
@@ -248,8 +236,7 @@ describe "student dashboard Course work widget", :ignore_js_errors do
     it "maintains pagination when switching filters" do
       go_to_dashboard
 
-      filter_course_work_by(:date, "Next 14 days")
-      expect(widget_pagination_button("Course work", "5")).to be_displayed
+      expect(widget_pagination_button("Course work", "6")).to be_displayed
 
       filter_course_work_by(:date, "Missing")
       expect(widget_pagination_button("Course work", "6")).to be_displayed
@@ -260,8 +247,8 @@ describe "student dashboard Course work widget", :ignore_js_errors do
       widget_pagination_button("Course work", "1").click
       expect(widget_pagination_button("Course work", "4")).to be_displayed
 
-      filter_course_work_by(:date, "Next 3 days")
-      expect(element_exists?(widget_pagination_container_selector("Course work"))).to be_falsey
+      filter_course_work_by(:date, "Not submitted")
+      expect(widget_pagination_button("Course work", "6")).to be_displayed
 
       filter_course_work_by(:date, "Missing")
       expect(widget_pagination_button("Course work", "6")).to be_displayed

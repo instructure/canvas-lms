@@ -23,7 +23,10 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconInfoLine} from '@instructure/ui-icons'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
-import CourseWorkFilters, {type DateFilterOption} from '../../shared/CourseWorkFilters'
+import CourseWorkFilters, {
+  type DateFilterOption,
+  isValidDateFilterOption,
+} from '../../shared/CourseWorkFilters'
 import StatisticsCardsGrid from '../../shared/StatisticsCardsGrid'
 import type {CourseOption, BaseWidgetProps} from '../../../types'
 import {useCourseWorkStatistics} from '../../../hooks/useCourseWorkStatistics'
@@ -42,7 +45,8 @@ const CourseWorkSummaryWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode 
   const [selectedDateRange, setSelectedDateRange] = useWidgetConfig<DateFilterOption>(
     widget.id,
     'selectedDateRange',
-    'next3days',
+    'not_submitted',
+    isValidDateFilterOption,
   )
 
   // Fetch user's enrolled courses
@@ -103,7 +107,6 @@ const CourseWorkSummaryWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode 
           onCourseChange={handleCourseChange}
           onDateFilterChange={handleDateRangeChange}
           userCourses={userCourses}
-          statisticsOnly={true}
         />
       }
     >
