@@ -66,7 +66,7 @@ describe('AttachmentAssetReportStatus', () => {
       />,
     )
 
-    expect(screen.getByText('Needs attention')).toBeInTheDocument()
+    expect(screen.getByText('Please review')).toBeInTheDocument()
     expect(mockUseLtiAssetProcessorsAndReportsForStudent).toHaveBeenCalledWith({
       submissionId: '1000',
       submissionType: 'online_upload',
@@ -83,7 +83,7 @@ describe('AttachmentAssetReportStatus', () => {
       />,
     )
 
-    screen.getByText('Needs attention').click()
+    screen.getByText('Please review').click()
 
     // Verify window.parent.postMessage was called with correct data
     expect(window.parent.postMessage).toHaveBeenCalledWith(

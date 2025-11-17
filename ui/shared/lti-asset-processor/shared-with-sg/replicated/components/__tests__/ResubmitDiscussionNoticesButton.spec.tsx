@@ -19,7 +19,7 @@
 import '../../../__tests__/mockedDependenciesShims'
 import {fireEvent, screen} from '@testing-library/react'
 import {renderComponent} from '../../../__tests__/renderingShims'
-import {describe, expect, it, fn} from '../../../__tests__/testPlatformShims'
+import {describe, expect, fn, it} from '../../../__tests__/testPlatformShims'
 import {useResubmitDiscussionNotices} from '../../../dependenciesShims'
 import {ResubmitDiscussionNoticesButton} from '../ResubmitDiscussionNoticesButton'
 
