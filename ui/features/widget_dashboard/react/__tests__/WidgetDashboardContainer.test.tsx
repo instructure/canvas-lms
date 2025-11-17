@@ -91,6 +91,9 @@ const server = setupServer(
   http.get('/api/v1/dashboard/dashboard_cards', () => {
     return HttpResponse.json([])
   }),
+  http.get('/api/v1/planner/items', () => {
+    return HttpResponse.json([])
+  }),
 )
 
 const setup = (contextProps = {}, envOverrides = {}) => {

@@ -520,7 +520,10 @@ describe('AnnouncementsWidget', () => {
       expect(screen.getByText('Test Announcement 2')).toBeInTheDocument()
     })
 
-    expect(callCount).toBe(2)
+    await waitFor(() => {
+      expect(callCount).toBe(2)
+    })
+
     cleanup()
   })
 
