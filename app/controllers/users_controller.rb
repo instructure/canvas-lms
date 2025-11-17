@@ -673,6 +673,7 @@ class UsersController < ApplicationController
   def dashboard_cards
     opts = {}
     opts[:observee_user] = User.find_by(id: params[:observed_user_id].to_i) || @current_user if params.key?(:observed_user_id)
+    opts[:limit] = 50
     dashboard_courses = map_courses_for_menu(@current_user.menu_courses(nil, opts), tabs: DASHBOARD_CARD_TABS)
     published, unpublished = dashboard_courses.partition { |course| course[:published] }
     Rails.cache.write(["last_known_dashboard_cards_published_count", @current_user.global_id].cache_key, published.count)
