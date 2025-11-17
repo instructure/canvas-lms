@@ -50,7 +50,7 @@ describe('LtiAssetReportsForStudentSubmission', () => {
     expect(container.firstChild).toBeNull()
   })
 
-  it('renders "Needs attention" status when reports have high priority', () => {
+  it('renders "Please review" status when reports have high priority', () => {
     // Set up query data with high priority reports
     const mockData = defaultGetLtiAssetProcessorsAndReportsForStudentResult({
       attachmentId: defaultProps.attachmentId,
@@ -68,10 +68,10 @@ describe('LtiAssetReportsForStudentSubmission', () => {
       </MockedQueryProvider>,
     )
 
-    expect(screen.getByText('Needs attention')).toBeInTheDocument()
+    expect(screen.getByText('Please review')).toBeInTheDocument()
   })
 
-  it('opens modal when "Needs attention" link is clicked', async () => {
+  it('opens modal when "Please review" link is clicked', async () => {
     const user = userEvent.setup()
 
     // Set up query data with reports and processors
@@ -92,8 +92,8 @@ describe('LtiAssetReportsForStudentSubmission', () => {
       </MockedQueryProvider>,
     )
 
-    // Click the "Needs attention" link
-    const needsAttentionLink = screen.getByText('Needs attention')
+    // Click the "Please review" link
+    const needsAttentionLink = screen.getByText('Please review')
     await user.click(needsAttentionLink)
 
     // Modal should be opened with the assignment name
@@ -121,7 +121,7 @@ describe('LtiAssetReportsForStudentSubmission', () => {
     )
 
     // Open the modal
-    await user.click(screen.getByText('Needs attention'))
+    await user.click(screen.getByText('Please review'))
 
     // Check that the modal contains report information
     expect(screen.getByText('Document Processors for Research Project')).toBeInTheDocument()
@@ -149,7 +149,7 @@ describe('LtiAssetReportsForStudentSubmission', () => {
     )
 
     // Open modal
-    await user.click(screen.getByText('Needs attention'))
+    await user.click(screen.getByText('Please review'))
     expect(screen.getByText('Document Processors for Test Assignment')).toBeInTheDocument()
 
     // Close modal (look for close button)
@@ -197,7 +197,7 @@ describe('LtiAssetReportsForStudentSubmission', () => {
     )
 
     // Should render status (the component filters by attachmentId internally)
-    expect(screen.getByText('Needs attention')).toBeInTheDocument()
+    expect(screen.getByText('Please review')).toBeInTheDocument()
   })
 
   it('renders "No result" when attachmentId has no matching reports', () => {

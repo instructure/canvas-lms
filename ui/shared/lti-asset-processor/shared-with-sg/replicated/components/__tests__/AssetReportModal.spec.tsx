@@ -228,8 +228,14 @@ describe('AssetReportModal', () => {
 
     it('shows Resubmit All Replies button for discussions', () => {
       const reports: LtiAssetReport[] = [
-        createDiscussionReport(0, {processorId: '1', resubmitAvailable: true}),
-        createDiscussionReport(1, {processorId: '2', resubmitAvailable: false}),
+        createDiscussionReport(0, {
+          processorId: '1',
+          resubmitAvailable: true,
+        }),
+        createDiscussionReport(1, {
+          processorId: '2',
+          resubmitAvailable: false,
+        }),
       ]
 
       renderComponent(
@@ -253,7 +259,12 @@ describe('AssetReportModal', () => {
     })
 
     it('hides button when studentIdForResubmission is not provided', () => {
-      const reports = [createDiscussionReport(0, {processorId: '1', resubmitAvailable: true})]
+      const reports = [
+        createDiscussionReport(0, {
+          processorId: '1',
+          resubmitAvailable: true,
+        }),
+      ]
 
       renderComponent(
         <AssetReportModal
@@ -275,7 +286,12 @@ describe('AssetReportModal', () => {
     })
 
     it('hides button when assignmentId is not provided', () => {
-      const reports = [createDiscussionReport(0, {processorId: '1', resubmitAvailable: true})]
+      const reports = [
+        createDiscussionReport(0, {
+          processorId: '1',
+          resubmitAvailable: true,
+        }),
+      ]
 
       renderComponent(
         <AssetReportModal
@@ -297,7 +313,12 @@ describe('AssetReportModal', () => {
     })
 
     it('hides button for non-discussion submissions', () => {
-      const reports = [createUploadReport(0, '10', {processorId: '1', resubmitAvailable: true})]
+      const reports = [
+        createUploadReport(0, '10', {
+          processorId: '1',
+          resubmitAvailable: true,
+        }),
+      ]
       const attachments = [{_id: '10', displayName: 'test.pdf'}]
 
       renderComponent(

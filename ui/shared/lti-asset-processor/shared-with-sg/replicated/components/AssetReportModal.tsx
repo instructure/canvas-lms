@@ -26,8 +26,8 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LtiAssetReportStatus from './LtiAssetReportStatus'
 import {LtiAssetReports, type LtiAssetReportsProps} from './LtiAssetReports'
-import TruncateWithTooltip from './TruncateWithTooltip'
 import {ResubmitDiscussionNoticesButton} from './ResubmitDiscussionNoticesButton'
+import TruncateWithTooltip from './TruncateWithTooltip'
 
 export type AssetReportModalProps = LtiAssetReportsProps & {
   modalTitle: string

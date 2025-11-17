@@ -191,7 +191,7 @@ describe('AssignmentRow', () => {
       const props = {...defaultProps, assignment, showDocumentProcessors: false}
       const {queryByText} = setup(props)
 
-      expect(queryByText('Needs attention')).not.toBeInTheDocument()
+      expect(queryByText('Please review')).not.toBeInTheDocument()
     })
 
     it('render No result when showDocumentProcessors is true but asset reports array is empty', () => {
@@ -263,7 +263,7 @@ describe('AssignmentRow', () => {
       const props = {...defaultProps, assignment, showDocumentProcessors: true}
       const {getByText} = setup(props)
 
-      expect(getByText('Needs attention')).toBeInTheDocument()
+      expect(getByText('Please review')).toBeInTheDocument()
     })
 
     it('does not render LtiAssetProcessorCell when assignment has no submissions', () => {
