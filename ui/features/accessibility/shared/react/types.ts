@@ -211,3 +211,9 @@ export type IssueSummaryGroup =
   | 'tables'
   | 'lists'
   | 'low-contrast'
+
+export type FilterGroupMapping = {
+  'alt-text': IssueRuleType[]
+  'heading-order': IssueRuleType[]
+  'text-contrast': IssueRuleType[]
+}
