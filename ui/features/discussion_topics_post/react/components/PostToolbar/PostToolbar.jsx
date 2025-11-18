@@ -320,7 +320,11 @@ const getMenuConfigs = props => {
     })
   }
 
-  if (ENV.ai_translation_improvements && !props.translateAll) {
+  if (
+    ENV.discussion_translation_available &&
+    ENV.ai_translation_improvements &&
+    !props.translateAll
+  ) {
     if (props.hasTranslation) {
       options.push({
         key: 'hideTranslation',

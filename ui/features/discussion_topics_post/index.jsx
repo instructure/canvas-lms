@@ -80,7 +80,7 @@ export const adjustFooter = () => {
 }
 
 ready(() => {
-  if (ENV?.cedar_translation) {
+  if (ENV?.discussion_translation_available && ENV?.cedar_translation) {
     mountNutritionFacts('canvascoursetranslation')
   }
   document.querySelector('body')?.classList.add('full-width')
