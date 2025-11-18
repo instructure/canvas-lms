@@ -2850,9 +2850,15 @@ class User < ActiveRecord::Base
       )
     end
 
-    if course_ids_with_checkpoints_enabled.any?
+    # Filter context_codes to only checkpoint-enabled courses (consistent with regular assignment filtering)
+    checkpoint_context_codes = context_codes.select do |code|
+      type, id = ActiveRecord::Base.parse_asset_string(code)
+      type == "Course" && course_ids_with_checkpoints_enabled.include?(id)
+    end
+
+    if checkpoint_context_codes.any?
       sub_assignments = SubAssignment.published
-                                     .for_course(course_ids_with_checkpoints_enabled)
+                                     .for_context_codes(checkpoint_context_codes)
                                      .due_between_with_overrides(now, opts[:end_at])
                                      .include_submitted_count.to_a
 

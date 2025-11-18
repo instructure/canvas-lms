@@ -3132,6 +3132,32 @@ describe User do
         expect(events).to match_array([reply_to_topic, reply_to_entry])
       end
 
+      it "only shows checkpoints in the course they belong to, not in all courses" do
+        # Create two courses with the same teacher
+        course_a = @course
+        course_b = course_factory(active_all: true)
+        course_b.enroll_teacher(@user, enrollment_state: "active")
+
+        # Enable checkpoints in both courses
+        course_a.account.enable_feature!(:discussion_checkpoints)
+        course_b.account.enable_feature!(:discussion_checkpoints)
+
+        # Create discussion checkpoint in Course A only
+        reply_to_topic_a, reply_to_entry_a = graded_discussion_topic_with_checkpoints(context: course_a)
+
+        # When querying upcoming_events for Course B only, checkpoints from Course A should NOT appear
+        context_codes_b = [course_b.asset_string]
+        events_b = @user.upcoming_events(context_codes: context_codes_b)
+        expect(events_b).not_to include(reply_to_topic_a)
+        expect(events_b).not_to include(reply_to_entry_a)
+
+        # When querying upcoming_events for Course A, checkpoints from Course A SHOULD appear
+        context_codes_a = [course_a.asset_string]
+        events_a = @user.upcoming_events(context_codes: context_codes_a)
+        expect(events_a).to include(reply_to_topic_a)
+        expect(events_a).to include(reply_to_entry_a)
+      end
+
       it "doesn't include events for enrollments that are inactive due to date" do
         @enrollment.start_at = 1.day.ago
         @enrollment.end_at = 2.days.from_now
