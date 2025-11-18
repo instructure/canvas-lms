@@ -419,6 +419,7 @@ module Types
 
     field :allow_google_docs_submission, Boolean, method: :allow_google_docs_submission?, null: true
     field :anonymize_students, Boolean, method: :anonymize_students?, null: true
+    field :new_quizzes_anonymous_participants, Boolean, method: :new_quizzes_anonymous_participants?, null: true
     field :expects_external_submission, Boolean, method: :expects_external_submission?, null: true
     field :expects_submission, Boolean, method: :expects_submission?, null: true
     field :grades_published_at, String, null: true

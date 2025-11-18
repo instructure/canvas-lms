@@ -68,8 +68,8 @@ describe('AssignmentPostingPolicyTray', () => {
   const getCancelButton = () => screen.getByTestId('assignment-posting-policy-cancel-button')
   const getCloseButton = () => screen.getByTestId('assignment-posting-policy-close-button').children[0]
   const getInput = (name: string) => {
-    return name === "Automatically" 
-      ? screen.getByTestId('assignment-posting-policy-automatic-radio') 
+    return name === "Automatically"
+      ? screen.getByTestId('assignment-posting-policy-automatic-radio')
       : screen.getByTestId('assignment-posting-policy-manual-radio')
   }
 
@@ -85,6 +85,7 @@ describe('AssignmentPostingPolicyTray', () => {
         name: 'Math 1.1',
         postManually: false,
         moderatedGrading: false,
+        newQuizzesAnonymousParticipants: false,
         gradesPublished: false,
         dueAt: '',
         htmlUrl: 'http://example.com',
@@ -141,7 +142,7 @@ describe('AssignmentPostingPolicyTray', () => {
 
       it('disables the "Automatically" input when grades are not published', async () => {
         context.assignment.gradesPublished = false
-        renderTray()  
+        renderTray()
         await waitFor(() => {
           expect(getInput('Automatically')).toBeDisabled()
         })
@@ -149,7 +150,7 @@ describe('AssignmentPostingPolicyTray', () => {
 
       it('enables the "Automatically" input when grades are published', async () => {
         context.assignment.gradesPublished = true
-        renderTray()  
+        renderTray()
         await waitFor(() => {
           expect(getInput('Automatically')).toBeEnabled()
         })
@@ -158,7 +159,7 @@ describe('AssignmentPostingPolicyTray', () => {
       it('always disables the "Automatically" input when the assignment is anonymous', async () => {
         context.assignment.anonymousGrading = true
         context.assignment.gradesPublished = true
-        renderTray()  
+        renderTray()
         await waitFor(() => {
           expect(getInput('Automatically')).toBeDisabled()
         })
@@ -440,7 +441,7 @@ describe('AssignmentPostingPolicyTray', () => {
       // Check the checkbox to enable scheduled release options
       await userEvent.click(checkbox)
       expect(checkbox).toBeChecked()
-      
+
       // Now the scheduled release options should be visible
       expect(scheduledReleasePolicy).toHaveTextContent('Grades & Comments Together')
       expect(scheduledReleasePolicy).toHaveTextContent('Separate Schedules')
@@ -579,7 +580,7 @@ describe('AssignmentPostingPolicyTray', () => {
 
       await enterNewDateTime(dateInputs[0], futureDateString1)
       await enterNewDateTime(dateInputs[1], futureDateString2)
-      
+
       const saveButton = getByTestId('assignment-posting-policy-save-button')
       expect(saveButton).toBeEnabled()
     })
@@ -612,7 +613,7 @@ describe('AssignmentPostingPolicyTray', () => {
       pastDate2.setDate(pastDate2.getDate() - 1)
       const pastDateString2 = pastDate2.toISOString().slice(0, 16)
 
-      
+
       await enterNewDateTime(dateInputs[0], pastDateString1) // Grade release date
       await enterNewDateTime(dateInputs[1], pastDateString2) // Comment release date
 

@@ -798,6 +798,7 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   ): SubmissionConnection
   name: String
   needsGradingCount: Int
+  newQuizzesAnonymousParticipants: Boolean
   nonDigitalSubmission: Boolean
 
   """
