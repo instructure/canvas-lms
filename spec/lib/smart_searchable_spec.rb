@@ -94,4 +94,29 @@ describe SmartSearchable do
       expect(@page.reload.embeddings.count).to eq 3
     end
   end
+
+  describe "error handling" do
+    before do
+      skip "not available" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
+    end
+
+    before :once do
+      course_factory
+      @course.enable_feature! :smart_search
+    end
+
+    it "raises an error for a 'successful' response with no embeddings" do
+      mock_resp = double("response",
+                         successful?: true,
+                         body: StringIO.new('{"did_it_work_frd": "nope"}'))
+      mock_client = double("bedrock_client")
+      allow(SmartSearch).to receive(:bedrock_client).and_return(mock_client)
+      expect(mock_client).to receive(:invoke_model).and_return(mock_resp)
+
+      wiki_page_model(title: "test", body: "foo")
+      run_jobs
+
+      expect(Delayed::Job::Failed.last.last_error).to match(/bedrock response missing embeddings/)
+    end
+  end
 end
