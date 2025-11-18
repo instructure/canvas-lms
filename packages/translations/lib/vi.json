@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Tên tập tin"
     },
+    "file_preview_21667a6e": {
+        "message": "Xem trước tập tin"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Chế độ xem trước tập tin cho { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Đã vượt quá hạn ngạch bộ nhớ tập tin"
     },

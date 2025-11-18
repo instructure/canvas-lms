@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Nome do arquivo"
     },
+    "file_preview_21667a6e": {
+        "message": "Pré-visualização do arquivo"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Pré-visualização do arquivo para { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Cota de armazenamento de arquivos excedida"
     },

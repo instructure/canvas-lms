@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "檔案名稱"
     },
+    "file_preview_21667a6e": {
+        "message": "檔案預覽"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "{ fileName } 的檔案預覽"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "已超過檔案儲存配額"
     },
