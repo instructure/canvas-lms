@@ -3,12 +3,14 @@ translation:
   state: hidden
   applies_to: Course
   display_name: IgniteAI Translations for Discussions & Announcements
+  root_opt_in: true
   description: AI translation controls for courses, currently limited to discussions and announcements.
   beta: true
 
 translate_inbox_messages:
   state: hidden
   applies_to: RootAccount
+  root_opt_in: true
   display_name: IgniteAI Translations for Inbox
   description: Enable translation software when composing messages. Translate inbound messages automatically into user's preferred language.
   beta: true
