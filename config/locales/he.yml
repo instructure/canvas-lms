@@ -19072,6 +19072,7 @@ he:
       graded: "התבצעה הערכה"
       submitted: הוגש
       unsubmitted: "לא הוגשה"
+  submission_7ca566e1: הגשה
   submission_action_take_quiz: "קח/י %{title}"
   submission_action_turn_in_assignment: "החזר  %{title}"
   submission_added_title_50ebdc85: "נתווספה הגשה: %{title}"
