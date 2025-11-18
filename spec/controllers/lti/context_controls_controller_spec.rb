@@ -859,6 +859,30 @@ describe Lti::ContextControlsController, type: :request do
         )
       end
 
+      context "and all of those controls need the same anchor control" do
+        let(:params) do
+          [
+            { course_id: course.id.to_s, available: false },
+            { course_id: other_course.id.to_s, available: true }
+          ]
+        end
+
+        let(:other_course) { course_model(account: subaccount) }
+
+        it "creates a single anchor control and doesn't error" do
+          subject
+          expect(response).to be_successful
+          expect(response_json.length).to eq(3)
+          expect(response_json.map(&:with_indifferent_access)).to match_array(
+            [
+              hash_including(course_id: other_course.id, available: true),
+              hash_including(course_id: course.id, available: false),
+              hash_including(account_id: subaccount.id, available: root_deployment.primary_context_control.available) # anchor
+            ]
+          )
+        end
+      end
+
       context "when anchor control already exists" do
         let(:anchor_control) { Lti::ContextControl.create!(account: other_subaccount, registration:, deployment: root_deployment, available: true) }
 
