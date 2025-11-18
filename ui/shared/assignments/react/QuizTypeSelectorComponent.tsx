@@ -117,6 +117,7 @@ export const QuizTypeSelectorComponent: React.FC<QuizTypeSelectorComponentProps>
       <div className="form-column-left no-group">
         <label htmlFor="assignment_quiz_type">{I18n.t('quiz_type', 'Quiz Type')}</label>
       </div>
+      {' ' /* to align with the existing form elements on the assignment edit page */}
       <QuizTypeSelectorContent
         quizType={quizType}
         isExistingAssignment={isExistingAssignment}

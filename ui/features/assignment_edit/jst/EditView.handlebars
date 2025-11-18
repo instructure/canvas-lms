@@ -72,17 +72,22 @@
       </label>
     </div>
 
-    <div class="form-column-right" style="display:inline-flex;flex-direction:column">
-      <input id="assignment_points_possible"
-        name="points_possible"
-        style="width: 95%;"
-        value="{{n pointsPossible}}"
-        type="text"
-        {{#ifAny inClosedGradingPeriod lockedItems.points cannotEditGrades}}
-          readonly
-        {{/ifAny}}
-        {{disabledIfIncludes frozenAttributes "points_possible"}}
-      ></input>
+    <div class="form-column-right" style="width: unset; margin-bottom: 12px;">
+      <div style="display:inline-flex;align-items:center;gap:8px;">
+        <input id="assignment_points_possible"
+          name="points_possible"
+          style="width: 374px; margin-bottom: unset;"
+          value="{{n pointsPossible}}"
+          type="text"
+          {{#ifAny inClosedGradingPeriod lockedItems.points cannotEditGrades}}
+            readonly
+          {{/ifAny}}
+          {{disabledIfIncludes frozenAttributes "points_possible"}}
+        ></input>
+        {{#if newQuizzesSurveysFFEnabled}}
+          <div id="points_tooltip"></div>
+        {{/if}}
+      </div>
       <div id="points_possible_errors"></div>
       {{#unless lockedItems.points}}
         <div aria-live="polite" role="alert">

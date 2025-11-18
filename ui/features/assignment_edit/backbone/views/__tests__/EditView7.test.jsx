@@ -18,13 +18,14 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
 import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector'
 import QuizTypeSelector from '@canvas/assignments/backbone/views/QuizTypeSelector'
 import AnonymousSubmissionSelector from '@canvas/assignments/backbone/views/AnonymousSubmissionSelector'
+import PointsTooltip from '@canvas/assignments/backbone/views/PointsTooltip'
 import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsSelector'
 import DueDateOverrideView from '@canvas/due-dates'
 import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
@@ -171,6 +172,9 @@ const createEditView = (assignmentOpts = {}) => {
   const anonymousSubmissionSelector = new AnonymousSubmissionSelector({
     parentModel: assignment,
   })
+  const pointsTooltip = new PointsTooltip({
+    parentModel: assignment,
+  })
   const groupCategorySelector = new GroupCategorySelector({
     parentModel: assignment,
     groupCategories: window.ENV?.GROUP_CATEGORIES || [],
@@ -184,6 +188,7 @@ const createEditView = (assignmentOpts = {}) => {
     gradingTypeSelector,
     quizTypeSelector,
     anonymousSubmissionSelector,
+    pointsTooltip,
     groupCategorySelector,
     peerReviewsSelector,
     views: {
@@ -686,6 +691,9 @@ describe('EditView - Quiz Type Handling', () => {
     const anonymousSubmissionSelector = new AnonymousSubmissionSelector({
       parentModel: assignment,
     })
+    const pointsTooltip = new PointsTooltip({
+      parentModel: assignment,
+    })
     const groupCategorySelector = new GroupCategorySelector({
       parentModel: assignment,
       groupCategories: [],
@@ -702,6 +710,7 @@ describe('EditView - Quiz Type Handling', () => {
       gradingTypeSelector,
       quizTypeSelector,
       anonymousSubmissionSelector,
+      pointsTooltip,
       groupCategorySelector,
       peerReviewsSelector,
       views: {
@@ -818,6 +827,104 @@ describe('EditView - Quiz Type Handling', () => {
     })
   })
 
+  describe('Points Tooltip', () => {
+    test('shows tooltip for graded_survey', async () => {
+      await act(async () => {
+        view.handleQuizTypeChange('graded_survey')
+      })
+
+      await waitFor(() => {
+        const tooltipWrapper = document.querySelector('#points_tooltip span')
+        expect(tooltipWrapper).toBeTruthy()
+        expect(tooltipWrapper.style.display).toBe('inline-block')
+      })
+    })
+
+    test('hides tooltip for graded_quiz', async () => {
+      await act(async () => {
+        view.handleQuizTypeChange('graded_quiz')
+      })
+
+      await waitFor(() => {
+        const tooltipWrapper = document.querySelector('#points_tooltip span')
+        expect(tooltipWrapper).toBeTruthy()
+        expect(tooltipWrapper.style.display).toBe('none')
+      })
+    })
+
+    test('hides tooltip for ungraded_survey', async () => {
+      await act(async () => {
+        view.handleQuizTypeChange('ungraded_survey')
+      })
+
+      await waitFor(() => {
+        const tooltipWrapper = document.querySelector('#points_tooltip span')
+        expect(tooltipWrapper).toBeTruthy()
+        expect(tooltipWrapper.style.display).toBe('none')
+      })
+    })
+
+    test('displays correct tooltip text on hover', async () => {
+      const user = userEvent.setup()
+      await act(async () => {
+        view.handleQuizTypeChange('graded_survey')
+      })
+
+      // Wait for the tooltip to be visible
+      await waitFor(() => {
+        const tooltipWrapper = document.querySelector('#points_tooltip span')
+        expect(tooltipWrapper).toBeTruthy()
+        expect(tooltipWrapper.style.display).toBe('inline-block')
+      })
+
+      const icon = document.querySelector('#points_tooltip svg')
+      await user.hover(icon)
+
+      await waitFor(() => {
+        // Find the tooltip connected to our specific icon via data-position attributes
+        const positionTarget = icon.getAttribute('data-position-target')
+        const tooltipContent = document.querySelector(`[data-position-content="${positionTarget}"]`)
+        expect(tooltipContent).toBeTruthy()
+        expect(tooltipContent.textContent).toContain(
+          'Points earned here reflect participation and effort.',
+        )
+        expect(tooltipContent.textContent).toContain('Responses will not be graded for accuracy.')
+      })
+    })
+
+    test('updates tooltip visibility when quiz type changes', async () => {
+      // Start with graded_quiz (tooltip hidden)
+      await act(async () => {
+        view.handleQuizTypeChange('graded_quiz')
+      })
+
+      await waitFor(() => {
+        const tooltipWrapper = document.querySelector('#points_tooltip span')
+        expect(tooltipWrapper.style.display).toBe('none')
+      })
+
+      // Change to graded_survey (tooltip should be visible)
+      await act(async () => {
+        view.handleQuizTypeChange('graded_survey')
+      })
+
+      await waitFor(() => {
+        const tooltipWrapper = document.querySelector('#points_tooltip span')
+        expect(tooltipWrapper.style.display).toBe('inline-block')
+      })
+
+      // Change back to graded_quiz (tooltip should be hidden again)
+      await act(async () => {
+        view.handleQuizTypeChange('graded_quiz')
+      })
+
+      await waitFor(() => {
+        const tooltipWrapper = document.querySelector('#points_tooltip span')
+        expect(tooltipWrapper.style.display).toBe('none')
+      })
+    })
+  })
+
   describe('Disabled State', () => {
     test('quiz type selector is not disabled for new assignments', async () => {
       const assignment = new Assignment({
@@ -849,6 +956,9 @@ describe('EditView - Quiz Type Handling', () => {
       const anonymousSubmissionSelector = new AnonymousSubmissionSelector({
         parentModel: assignment,
       })
+      const pointsTooltip = new PointsTooltip({
+        parentModel: assignment,
+      })
       const groupCategorySelector = new GroupCategorySelector({
         parentModel: assignment,
         groupCategories: [],
@@ -865,6 +975,7 @@ describe('EditView - Quiz Type Handling', () => {
         gradingTypeSelector,
         quizTypeSelector,
         anonymousSubmissionSelector,
+        pointsTooltip,
         groupCategorySelector,
         peerReviewsSelector,
         views: {
@@ -927,6 +1038,9 @@ describe('EditView - Quiz Type Handling', () => {
       const anonymousSubmissionSelector = new AnonymousSubmissionSelector({
         parentModel: assignment,
       })
+      const pointsTooltip = new PointsTooltip({
+        parentModel: assignment,
+      })
       const groupCategorySelector = new GroupCategorySelector({
         parentModel: assignment,
         groupCategories: [],
@@ -943,6 +1057,7 @@ describe('EditView - Quiz Type Handling', () => {
         gradingTypeSelector,
         quizTypeSelector,
         anonymousSubmissionSelector,
+        pointsTooltip,
         groupCategorySelector,
         peerReviewsSelector,
         views: {
@@ -1012,6 +1127,7 @@ describe('EditView - Quiz Type Handling', () => {
             <div class="control-group" style="display: block;">
               <label for="assignment_points_possible">Points</label>
               <input type="text" id="assignment_points_possible" value="10" />
+              <div id="points_tooltip"></div>
             </div>
             <div id="assignment_group_selector"></div>
             <div id="grading_type_selector"></div>
@@ -1070,6 +1186,9 @@ describe('EditView - Quiz Type Handling', () => {
       const anonymousSubmissionSelector = new AnonymousSubmissionSelector({
         parentModel: assignment,
       })
+      const pointsTooltip = new PointsTooltip({
+        parentModel: assignment,
+      })
       const groupCategorySelector = new GroupCategorySelector({
         parentModel: assignment,
         groupCategories: [],
@@ -1086,6 +1205,7 @@ describe('EditView - Quiz Type Handling', () => {
         gradingTypeSelector,
         quizTypeSelector,
         anonymousSubmissionSelector,
+        pointsTooltip,
         groupCategorySelector,
         peerReviewsSelector,
         views: {
@@ -1137,6 +1257,9 @@ describe('EditView - Quiz Type Handling', () => {
       const anonymousSubmissionSelector = new AnonymousSubmissionSelector({
         parentModel: assignment,
       })
+      const pointsTooltip = new PointsTooltip({
+        parentModel: assignment,
+      })
       const groupCategorySelector = new GroupCategorySelector({
         parentModel: assignment,
         groupCategories: [],
@@ -1153,6 +1276,7 @@ describe('EditView - Quiz Type Handling', () => {
         gradingTypeSelector,
         quizTypeSelector,
         anonymousSubmissionSelector,
+        pointsTooltip,
         groupCategorySelector,
         peerReviewsSelector,
         views: {
@@ -1206,6 +1330,9 @@ describe('EditView - Quiz Type Handling', () => {
       const anonymousSubmissionSelector = new AnonymousSubmissionSelector({
         parentModel: assignment,
       })
+      const pointsTooltip = new PointsTooltip({
+        parentModel: assignment,
+      })
       const groupCategorySelector = new GroupCategorySelector({
         parentModel: assignment,
         groupCategories: [],
@@ -1222,6 +1349,7 @@ describe('EditView - Quiz Type Handling', () => {
         gradingTypeSelector,
         quizTypeSelector,
         anonymousSubmissionSelector,
+        pointsTooltip,
         groupCategorySelector,
         peerReviewsSelector,
         views: {
@@ -1281,6 +1409,9 @@ describe('EditView - Quiz Type Handling', () => {
       const anonymousSubmissionSelector = new AnonymousSubmissionSelector({
         parentModel: assignment,
       })
+      const pointsTooltip = new PointsTooltip({
+        parentModel: assignment,
+      })
       const groupCategorySelector = new GroupCategorySelector({
         parentModel: assignment,
         groupCategories: [],
@@ -1297,6 +1428,7 @@ describe('EditView - Quiz Type Handling', () => {
         gradingTypeSelector,
         quizTypeSelector,
         anonymousSubmissionSelector,
+        pointsTooltip,
         groupCategorySelector,
         peerReviewsSelector,
         views: {
@@ -1348,6 +1480,9 @@ describe('EditView - Quiz Type Handling', () => {
       const anonymousSubmissionSelector = new AnonymousSubmissionSelector({
         parentModel: assignment,
       })
+      const pointsTooltip = new PointsTooltip({
+        parentModel: assignment,
+      })
       const groupCategorySelector = new GroupCategorySelector({
         parentModel: assignment,
         groupCategories: [],
@@ -1364,6 +1499,7 @@ describe('EditView - Quiz Type Handling', () => {
         gradingTypeSelector,
         quizTypeSelector,
         anonymousSubmissionSelector,
+        pointsTooltip,
         groupCategorySelector,
         peerReviewsSelector,
         views: {
@@ -1414,6 +1550,9 @@ describe('EditView - Quiz Type Handling', () => {
       const anonymousSubmissionSelector = new AnonymousSubmissionSelector({
         parentModel: assignment,
       })
+      const pointsTooltip = new PointsTooltip({
+        parentModel: assignment,
+      })
       const groupCategorySelector = new GroupCategorySelector({
         parentModel: assignment,
         groupCategories: [],
@@ -1430,6 +1569,7 @@ describe('EditView - Quiz Type Handling', () => {
         gradingTypeSelector,
         quizTypeSelector,
         anonymousSubmissionSelector,
+        pointsTooltip,
         groupCategorySelector,
         peerReviewsSelector,
         views: {
@@ -1498,6 +1638,9 @@ describe('EditView - Quiz Type Handling', () => {
       const anonymousSubmissionSelector = new AnonymousSubmissionSelector({
         parentModel: assignment,
       })
+      const pointsTooltip = new PointsTooltip({
+        parentModel: assignment,
+      })
       const groupCategorySelector = new GroupCategorySelector({
         parentModel: assignment,
         groupCategories: [],
@@ -1514,6 +1657,7 @@ describe('EditView - Quiz Type Handling', () => {
         gradingTypeSelector,
         quizTypeSelector,
         anonymousSubmissionSelector,
+        pointsTooltip,
         groupCategorySelector,
         peerReviewsSelector,
         views: {
