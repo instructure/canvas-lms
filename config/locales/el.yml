@@ -2055,6 +2055,7 @@ el:
   assignment_comments_e43ed898: "Σχόλια για αυτή την Εργασία"
   assignment_created_assignment_name_course_name_324a5639: "Η Εργασία Δημιουργήθηκε - %{assignment_name}, %{course_name}"
   assignment_d8387b78: εργασία
+  assignment_details_bc488179: "Λεπτομέρειες Εργασίας"
   assignment_details_dialog: 
     average_score: "Μέση Βαθμολογία:"
     count_of_submissions: "%{cnt} υποβολές"
@@ -14689,6 +14690,7 @@ el:
       graded: βαθμολογήθηκε/αν
       submitted: υποβλήθηκε
       unsubmitted: "δεν έχει υποβληθεί"
+  submission_7ca566e1: Υποβολές
   submission_action_take_quiz: "Επιλογή του %{title}"
   submission_action_turn_in_assignment: "Υποβολή %{title}"
   submission_comment: 
