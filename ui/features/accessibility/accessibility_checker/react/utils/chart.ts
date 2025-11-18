@@ -18,11 +18,20 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {issueTypeOptions, severityColors} from '../constants'
-import {IssueDataPoint} from '../../../shared/react/types'
+import {FILTER_GROUP_MAPPING, issueTypeOptions, severityColors} from '../constants'
+import {IssueDataPoint, IssueRuleType, FilterGroupMapping} from '../../../shared/react/types'
 import {getIssueSeverity} from '../../../shared/react/utils/apiData'
 
 const I18n = createI18nScope('accessibility_checker')
+
+export const getGroupedFilterForRuleType = (ruleType: IssueRuleType): string | null => {
+  const groupedFilters = Object.keys(FILTER_GROUP_MAPPING) as Array<keyof FilterGroupMapping>
+
+  return (
+    groupedFilters.find(groupedFilter => FILTER_GROUP_MAPPING[groupedFilter].includes(ruleType)) ||
+    null
+  )
+}
 
 export const processIssuesToChartData = (byRuleType?: Record<string, number>): IssueDataPoint[] => {
   if (!byRuleType || typeof byRuleType !== 'object') {
@@ -32,11 +41,21 @@ export const processIssuesToChartData = (byRuleType?: Record<string, number>): I
   const dataPoints: Record<string, IssueDataPoint> = {}
 
   Object.entries(byRuleType).forEach(([ruleType, count]: [string, number]) => {
-    dataPoints[ruleType] = {
-      id: ruleType,
-      count,
-      issue: issueTypeOptions.find(option => option.value === ruleType)?.label || ruleType, // displayName
-      severity: getIssueSeverity(count),
+    const groupedFilter = getGroupedFilterForRuleType(ruleType as IssueRuleType)
+    const displayId = groupedFilter || ruleType
+    const displayLabel =
+      issueTypeOptions.find(option => option.value === displayId)?.label || displayId
+
+    if (dataPoints[displayId]) {
+      dataPoints[displayId].count += count
+      dataPoints[displayId].severity = getIssueSeverity(dataPoints[displayId].count)
+    } else {
+      dataPoints[displayId] = {
+        id: displayId,
+        count,
+        issue: displayLabel,
+        severity: getIssueSeverity(count),
+      }
     }
   })
 

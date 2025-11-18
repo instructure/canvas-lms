@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {IssueRuleType, Severity} from '../../shared/react/types'
+import {IssueRuleType, Severity, FilterGroupMapping} from '../../shared/react/types'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -60,21 +60,24 @@ export const IssuesTableHeaderApiNames: Record<string, string> = {
   [IssuesTableColumns.LastEdited]: 'resource_updated_at',
 }
 
-export const issueTypeOptions: {value: IssueRuleType; label: string}[] = [
-  {value: 'adjacent-links', label: I18n.t('Duplicate links')},
-  {value: 'headings-sequence', label: I18n.t('Headings sequence')},
-  {value: 'headings-start-at-h2', label: I18n.t('Headings start at H2')},
-  {value: 'img-alt', label: I18n.t('Image alt text missing')},
-  {value: 'img-alt-filename', label: I18n.t('Image alt filename')},
-  {value: 'img-alt-length', label: I18n.t('Image alt text length')},
-  {value: 'large-text-contrast', label: I18n.t('Large text contrast')},
-  {value: 'small-text-contrast', label: I18n.t('Small text contrast')},
-  {value: 'list-structure', label: I18n.t('List structure')},
-  {value: 'paragraphs-for-headings', label: I18n.t('Paragraphs for headings')},
-  {value: 'table-caption', label: I18n.t('Table caption')},
-  {value: 'table-header', label: I18n.t('Table header')},
-  {value: 'table-header-scope', label: I18n.t('Table header scope')},
-]
+export const FILTER_GROUP_MAPPING: FilterGroupMapping = {
+  'alt-text': ['img-alt', 'img-alt-filename', 'img-alt-length'],
+  'heading-order': ['headings-sequence', 'headings-start-at-h2'],
+  'text-contrast': ['large-text-contrast', 'small-text-contrast'],
+}
+
+export const issueTypeOptions: {value: keyof FilterGroupMapping | IssueRuleType; label: string}[] =
+  [
+    {value: 'alt-text', label: I18n.t('Alt text')},
+    {value: 'heading-order', label: I18n.t('Heading order')},
+    {value: 'paragraphs-for-headings', label: I18n.t('Heading length')},
+    {value: 'adjacent-links', label: I18n.t('Duplicate links')},
+    {value: 'table-header', label: I18n.t('Missing table headers')},
+    {value: 'table-header-scope', label: I18n.t('Table headers set up incorrectly')},
+    {value: 'table-caption', label: I18n.t('Missing table caption')},
+    {value: 'list-structure', label: I18n.t('List formatting')},
+    {value: 'text-contrast', label: I18n.t('Text contrast')},
+  ]
 
 export const artifactTypeOptions = [
   {value: 'wiki_page', label: I18n.t('Pages')},

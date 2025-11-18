@@ -18,7 +18,13 @@
 
 import {mockIssuesSummary1} from '../../../../shared/react/stores/mockData'
 import {IssueDataPoint} from '../../../../shared/react/types'
-import {getChartData, getChartOptions, getSeverityCounts, processIssuesToChartData} from '../chart'
+import {
+  getChartData,
+  getChartOptions,
+  getGroupedFilterForRuleType,
+  getSeverityCounts,
+  processIssuesToChartData,
+} from '../chart'
 
 jest.mock('@canvas/i18n', () => ({
   useScope: () => ({
@@ -34,14 +40,14 @@ const sampleData: IssueDataPoint[] = [
 
 const parsedIssueDataPoints: IssueDataPoint[] = [
   {
-    id: 'headings-sequence',
-    issue: 'Headings sequence',
+    id: 'heading-order',
+    issue: 'Heading order',
     count: 1,
     severity: 'Low',
   },
   {
-    id: 'small-text-contrast',
-    issue: 'Small text contrast',
+    id: 'text-contrast',
+    issue: 'Text contrast',
     count: 10,
     severity: 'Medium',
   },
@@ -52,6 +58,40 @@ const parsedIssueDataPoints: IssueDataPoint[] = [
     severity: 'High',
   },
 ]
+
+describe('getGroupedFilterForRuleType', () => {
+  it('returns "alt-text" for img-alt rule type', () => {
+    expect(getGroupedFilterForRuleType('img-alt')).toBe('alt-text')
+  })
+
+  it('returns "alt-text" for img-alt-filename rule type', () => {
+    expect(getGroupedFilterForRuleType('img-alt-filename')).toBe('alt-text')
+  })
+
+  it('returns "alt-text" for img-alt-length rule type', () => {
+    expect(getGroupedFilterForRuleType('img-alt-length')).toBe('alt-text')
+  })
+
+  it('returns "heading-order" for headings-sequence rule type', () => {
+    expect(getGroupedFilterForRuleType('headings-sequence')).toBe('heading-order')
+  })
+
+  it('returns "heading-order" for headings-start-at-h2 rule type', () => {
+    expect(getGroupedFilterForRuleType('headings-start-at-h2')).toBe('heading-order')
+  })
+
+  it('returns "text-contrast" for large-text-contrast rule type', () => {
+    expect(getGroupedFilterForRuleType('large-text-contrast')).toBe('text-contrast')
+  })
+
+  it('returns "text-contrast" for small-text-contrast rule type', () => {
+    expect(getGroupedFilterForRuleType('small-text-contrast')).toBe('text-contrast')
+  })
+
+  it('returns null for rule types not in any group', () => {
+    expect(getGroupedFilterForRuleType('adjacent-links')).toBe(null)
+  })
+})
 
 describe('processIssuesToChartData', () => {
   it('returns empty array if input is null', () => {

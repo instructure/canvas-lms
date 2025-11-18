@@ -186,14 +186,15 @@ describe('FiltersPanel', () => {
 
       const issueTypeGroup = screen.getByTestId('issue-type-checkbox-group')
       const adjacentLinksCheckbox = within(issueTypeGroup).getByLabelText('Duplicate links')
-      const imgAltCheckbox = within(issueTypeGroup).getByLabelText('Image alt text missing')
-      const imgAltFilenameCheckbox = within(issueTypeGroup).getByLabelText('Image alt filename')
+      const altTextCheckbox = within(issueTypeGroup).getByLabelText('Alt text')
+      const missingTableHeaderCheckbox =
+        within(issueTypeGroup).getByLabelText('Missing table headers')
 
       await userEvent.click(adjacentLinksCheckbox)
 
       expect(adjacentLinksCheckbox).not.toBeChecked()
-      expect(imgAltCheckbox).toBeChecked()
-      expect(imgAltFilenameCheckbox).toBeChecked()
+      expect(altTextCheckbox).toBeChecked()
+      expect(missingTableHeaderCheckbox).toBeChecked()
     })
   })
 

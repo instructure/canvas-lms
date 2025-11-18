@@ -92,8 +92,8 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   const [isSaveButtonEnabled, setIsSaveButtonEnabled] = useState<boolean>(true)
 
   const {doFetchAccessibilityIssuesSummary} = useAccessibilityScansFetchUtils()
-  const [accessibilityScans, nextResource] = useAccessibilityScansStore(
-    useShallow(state => [state.accessibilityScans, state.nextResource]),
+  const [accessibilityScans, nextResource, filters] = useAccessibilityScansStore(
+    useShallow(state => [state.accessibilityScans, state.nextResource, state.filters]),
   )
   const [setAccessibilityScans, setNextResource] = useAccessibilityScansStore(
     useShallow(state => [state.setAccessibilityScans, state.setNextResource]),
@@ -259,7 +259,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       }
       updateAccessibilityIssues(issues)
       setCurrentIssueIndex(0)
-      doFetchAccessibilityIssuesSummary({})
+      doFetchAccessibilityIssuesSummary({filters})
     } catch (err: any) {
       console.error('Error saving accessibility issue. Error is: ' + err.message)
     } finally {
@@ -278,6 +278,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     setNextResource,
     updateCountPropertyForItem,
     doFetchAccessibilityIssuesSummary,
+    filters,
   ])
 
   const handleApplyAndSaveAndNext = useCallback(() => {
