@@ -4455,6 +4455,7 @@ class AbstractAssignment < ActiveRecord::Base
     value = settings&.dig("new_quizzes", "anonymous_participants")
     ActiveModel::Type::Boolean.new.cast(value) || false
   end
+  alias_method :new_quizzes_anonymous_participants?, :anonymous_participants?
 
   def new_quizzes_type=(type)
     self.settings ||= {}

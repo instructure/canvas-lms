@@ -53,6 +53,7 @@ export const transformAssignment = (it: Assignment): ApiAssignment => {
     module_positions: (it.moduleItems ?? []).map(moduleItem => moduleItem.position),
     muted: it.muted ?? false,
     name: it.name ?? '',
+    new_quizzes_anonymous_participants: it.newQuizzesAnonymousParticipants ?? false,
     omit_from_final_grade: it.omitFromFinalGrade ?? false,
     only_visible_to_overrides: it.onlyVisibleToOverrides,
     peer_reviews: it.peerReviews?.enabled ?? false,

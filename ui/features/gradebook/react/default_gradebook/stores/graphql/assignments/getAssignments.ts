@@ -108,6 +108,7 @@ const ZAssignment = z
       .nullable(),
     muted: z.boolean().nullable(),
     name: z.string().nullable(),
+    newQuizzesAnonymousParticipants: z.boolean().nullable(),
     omitFromFinalGrade: z.boolean().nullable(),
     onlyVisibleToOverrides: z.boolean(),
     peerReviews: z
