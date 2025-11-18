@@ -9046,6 +9046,24 @@ describe Course do
     end
   end
 
+  describe "#requirement_count_api_enabled?" do
+    it "returns true when horizon_course? is true" do
+      account = Account.create!
+      account.enable_feature!(:horizon_course_setting)
+      account.horizon_account = true
+      account.save!
+      course = account.courses.create!(horizon_course: true)
+
+      expect(course.requirement_count_api_enabled?).to be true
+    end
+
+    it "returns false when horizon_course? is false" do
+      course = course_model
+
+      expect(course.requirement_count_api_enabled?).to be false
+    end
+  end
+
   describe "#set_horizon_course" do
     it "does not set horizon_course when account is not a horizon account" do
       account = Account.create!
