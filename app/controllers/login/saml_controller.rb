@@ -84,6 +84,8 @@ class Login::SamlController < ApplicationController
                 end
     encrypted_xml = response.to_s if debugging
 
+    # NOTE: `valid_response?` decrypts and mutates the response object with decrypted versions
+    # of encrypted elements (`saml2:EncryptedAssertion` elements, for example)
     aac.sp_metadata(request.host_with_port).valid_response?(response,
                                                             aac.idp_metadata,
                                                             ignore_audience_condition: aac.settings["ignore_audience_condition"])
