@@ -94,7 +94,7 @@ module Translation
     end
 
     def available?(flags)
-      return false unless flags.values.any?
+      return false unless flags[:translation]
 
       translation_client(flags)&.available? || false
     end
