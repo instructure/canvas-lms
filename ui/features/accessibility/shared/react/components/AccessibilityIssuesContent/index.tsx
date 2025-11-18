@@ -378,7 +378,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       <Flex as="div" direction="column" height={pageView ? 'auto' : '100%'} width="100%">
         <Flex.Item
           as="header"
-          padding="small medium 0"
+          padding="small small 0"
           elementRef={(el: Element | null) => {
             regionRef.current = el as HTMLDivElement | null
           }}
@@ -411,7 +411,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <Flex.Item as="main" padding="x-small medium" shouldGrow={true} overflowY="auto">
+        <Flex.Item as="main" padding="x-small small" shouldGrow={true} overflowY="auto">
           <Flex justifyItems="space-between">
             <Text weight="weightImportant">{I18n.t('Problem area')}</Text>
             <Flex gap="small">
@@ -471,23 +471,23 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
             </View>
           )}
         </Flex.Item>
-        <Flex.Item as="footer">
-          <AccessibilityIssuesDrawerFooter
-            nextButtonName={I18n.t('Save & Next')}
-            onSkip={handleSkip}
-            onBack={handlePrevious}
-            onSaveAndNext={isApplyButtonHidden ? handleApplyAndSaveAndNext : handleSaveAndNext}
-            isBackDisabled={currentIssueIndex === 0 || isFormLocked}
-            isSkipDisabled={currentIssueIndex === issues.length - 1 || isFormLocked}
-            isSaveAndNextDisabled={
-              (!isRemediated && !isApplyButtonHidden) ||
-              isFormLocked ||
-              !!formError ||
-              !isSaveButtonEnabled
-            }
-          />
-        </Flex.Item>
       </Flex>
+      <View as="div" position="sticky" insetBlockEnd="0" style={{zIndex: 10}}>
+        <AccessibilityIssuesDrawerFooter
+          nextButtonName={I18n.t('Save & Next')}
+          onSkip={handleSkip}
+          onBack={handlePrevious}
+          onSaveAndNext={isApplyButtonHidden ? handleApplyAndSaveAndNext : handleSaveAndNext}
+          isBackDisabled={currentIssueIndex === 0 || isFormLocked}
+          isSkipDisabled={currentIssueIndex === issues.length - 1 || isFormLocked}
+          isSaveAndNextDisabled={
+            (!isRemediated && !isApplyButtonHidden) ||
+            isFormLocked ||
+            !!formError ||
+            !isSaveButtonEnabled
+          }
+        />
+      </View>
       <Alert screenReaderOnly={true} liveRegionPoliteness="assertive" liveRegion={getLiveRegion}>
         {assertiveAlertMessage || ''}
       </Alert>

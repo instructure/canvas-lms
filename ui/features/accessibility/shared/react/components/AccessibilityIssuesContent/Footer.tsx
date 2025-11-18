@@ -45,9 +45,9 @@ const Footer: React.FC<Props> = ({
 }: Props) => {
   return (
     <View as="footer" background="secondary">
-      <Flex justifyItems="space-between" alignItems="center" padding="x-small">
+      <Flex justifyItems="space-between" alignItems="center" padding="small">
         <Flex.Item>
-          <Flex gap="x-small">
+          <Flex gap="small">
             <Button data-testid="back-button" onClick={onBack} disabled={isBackDisabled}>
               {I18n.t('Back')}
             </Button>
