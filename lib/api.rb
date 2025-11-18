@@ -594,7 +594,7 @@ module Api
       attachments = if context.is_a?(User) || context.nil?
                       Attachment.where(id: attachment_ids)
                     else
-                      context.attachments.where(id: attachment_ids)
+                      context.attachments.not_deleted.where(id: attachment_ids)
                     end
 
       attachments.preload(:context).index_by(&:id)
