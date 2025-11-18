@@ -27,6 +27,7 @@ import {NutritionFacts} from '@canvas/nutrition-facts/react/NutritionFacts'
 import {AiInfo} from '@instructure.ai/aiinfo'
 
 declare const ENV: Global & {
+  inbox_translation_enabled?: boolean
   cedar_translation?: boolean
 }
 
@@ -52,6 +53,8 @@ const TranslationControls = (props: TranslationControlsProps) => {
   })
 
   const inboxTranslationInfo = AiInfo.canvasinboxtranslation
+  const showNutritionFacts =
+    ENV?.inbox_translation_enabled && ENV?.cedar_translation && inboxTranslationInfo
 
   return (
     <>
@@ -65,7 +68,7 @@ const TranslationControls = (props: TranslationControlsProps) => {
             onChange={() => setIncludeTranslation(!includeTranslation)}
           />
         </Flex.Item>
-        {ENV?.cedar_translation && inboxTranslationInfo && (
+        {showNutritionFacts && (
           <Flex.Item>
             <NutritionFacts
               aiInformation={inboxTranslationInfo.aiInformation}
