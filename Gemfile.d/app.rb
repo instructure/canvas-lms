@@ -101,7 +101,6 @@ gem "rss", "~> 0.3", require: false
 gem "ruby-duration", "3.2.3", require: false
 gem "rubycas-client", "2.3.9", require: false
   gem "pstore", "~> 0.2", require: false
-gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "~> 3.0", require: "zip"
 gem "saml2", "~> 3.1"
 gem "sanitize", "~> 7.0", require: false

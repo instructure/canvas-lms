@@ -10621,8 +10621,10 @@ describe Submission do
       submission_text = "Text based submission with some words"
       attachment1 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
       attachment2 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
+      # Simulate DocViewer setting word counts
+      attachment1.update_column(:word_count, 6)
+      attachment2.update_column(:word_count, 6)
       sub = @assignment.submit_homework(@student, attachments: [attachment1, attachment2])
-      Timecop.freeze(6.minutes.from_now) { run_jobs }
       expect(sub.reload.word_count).to eq 12
     end
 
@@ -10632,7 +10634,8 @@ describe Submission do
       attachment = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
       sub = @assignment.submit_homework(@student, attachments: [attachment])
       sub.update!(body: "")
-      Timecop.freeze(6.minutes.from_now) { run_jobs }
+      # Simulate DocViewer setting word counts
+      attachment.update_column(:word_count, 8)
       expect(sub.reload.word_count).to eq 8
     end
 
