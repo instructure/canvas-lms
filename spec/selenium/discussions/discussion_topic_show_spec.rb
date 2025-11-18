@@ -990,9 +990,14 @@ describe "Discussion Topic Show" do
   end
 
   context "nutrition facts functionality" do
+    before do
+      @course.enable_feature!(:translation)
+    end
+
     context "when cedar_translation feature flag is enabled" do
       before do
-        Account.site_admin.enable_feature!(:cedar_translation)
+        @course.root_account.enable_feature!(:cedar_translation)
+        allow(CedarClient).to receive(:enabled?).and_return(true)
       end
 
       it "loads nutrition facts element with content in the DOM" do
@@ -1004,7 +1009,7 @@ describe "Discussion Topic Show" do
 
     context "when cedar_translation feature flag is disabled" do
       before do
-        Account.site_admin.disable_feature!(:cedar_translation)
+        @course.root_account.disable_feature!(:cedar_translation)
       end
 
       it "does not mount nutrition facts content" do
