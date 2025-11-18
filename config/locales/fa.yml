@@ -23214,6 +23214,7 @@ fa:
       graded: "نمره گذاری شده"
       submitted: "ارسال شده"
       unsubmitted: "ارسال نشده"
+  submission_7ca566e1: ارسال
   submission_action_take_quiz: "دادن آزمون %{title}"
   submission_action_turn_in_assignment: "تحویل دادن %{title}"
   submission_added_title_50ebdc85: "ارسال‌ها اضافه شد: %{title}"
