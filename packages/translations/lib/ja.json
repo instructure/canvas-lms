@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "ファイル名"
     },
+    "file_preview_21667a6e": {
+        "message": "ファイルプレビュー"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "{ fileName }用のファイルプレビュー"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "ファイル保存のサイズを超過"
     },

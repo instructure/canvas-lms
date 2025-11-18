@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Bestandsnaam"
     },
+    "file_preview_21667a6e": {
+        "message": "Bestandsvoorbeeld"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Bestandsvoorbeeld voor { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Opslagquota voor bestanden overschreden"
     },

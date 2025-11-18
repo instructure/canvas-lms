@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Nazwa pliku"
     },
+    "file_preview_21667a6e": {
+        "message": "Podgląd pliku"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Podgląd pliku { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Przekroczono przydział magazynowania plików"
     },

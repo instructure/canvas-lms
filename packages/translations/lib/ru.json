@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Имя файла"
     },
+    "file_preview_21667a6e": {
+        "message": "Предпросмотр файла"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Предпросмотр файла для { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Квота на хранение файлов превышена"
     },

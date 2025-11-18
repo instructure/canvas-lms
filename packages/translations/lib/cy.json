@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Enw’r Ffeil"
     },
+    "file_preview_21667a6e": {
+        "message": "Rhagolwg o’r ffeil"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Rhagolwg o’r ffeil ar gyfer { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Wedi cyrraedd cwota storio ffeil"
     },

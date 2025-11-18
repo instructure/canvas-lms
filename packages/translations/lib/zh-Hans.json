@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "文件名称"
     },
+    "file_preview_21667a6e": {
+        "message": "文件预览"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "{ fileName } 文件预览"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "超出文件存储大小限制"
     },

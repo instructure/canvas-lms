@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Non fichye"
     },
+    "file_preview_21667a6e": {
+        "message": "Apèsi fichye"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Apèsi fichye pou { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Quota estokaj fichye a depase"
     },
