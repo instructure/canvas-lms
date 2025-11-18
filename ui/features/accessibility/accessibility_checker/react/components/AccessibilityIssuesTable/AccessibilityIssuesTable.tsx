@@ -58,23 +58,9 @@ const getNewTableSortState = (
     : 'ascending'
 
   if (existingSortState?.sortId === param.id) {
-    if (ReverseOrderingFirst.includes(param.id)) {
-      sortDirection =
-        existingSortState?.sortDirection === 'descending'
-          ? 'ascending'
-          : existingSortState?.sortDirection === 'ascending'
-            ? 'none'
-            : 'descending'
-    } else {
-      // If the same column is clicked, cycle the sort direction
-      sortDirection =
-        existingSortState?.sortDirection === 'ascending'
-          ? 'descending'
-          : existingSortState?.sortDirection === 'descending'
-            ? 'none'
-            : 'ascending'
-    }
+    sortDirection = existingSortState?.sortDirection === 'ascending' ? 'descending' : 'ascending'
   }
+
   return {
     sortId: param.id,
     sortDirection,

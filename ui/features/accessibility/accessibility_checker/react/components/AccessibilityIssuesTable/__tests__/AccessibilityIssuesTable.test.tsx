@@ -196,7 +196,7 @@ describe('AccessibilityIssuesTable', () => {
         expect.objectContaining({
           tableSortState: {
             sortId: 'resource-type-header',
-            sortDirection: 'none',
+            sortDirection: 'ascending',
           },
         }),
       )
