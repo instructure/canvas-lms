@@ -31,6 +31,7 @@ import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobal
 import fakeENV from '@canvas/test-utils/fakeENV'
 import StudentContent from '../StudentContent'
 import ContextModuleApi from '../../apis/ContextModuleApi'
+import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 
 injectGlobalAlertContainers()
 
@@ -43,6 +44,13 @@ jest.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
     initializeReaderButton: jest.fn(),
   }
 })
+
+jest.mock('@canvas/assignments/react/AssignmentExternalTools', () => ({
+  __esModule: true,
+  default: {
+    attach: jest.fn(),
+  },
+}))
 
 describe('Assignment Student Content View', () => {
   beforeEach(() => {
@@ -358,6 +366,72 @@ describe('Assignment Student Content View', () => {
       )
       fireEvent.click(getByText('Add Comment'))
       expect(getAllByTitle('Loading')[0]).toBeInTheDocument()
+    })
+  })
+
+  describe('assignment external tools', () => {
+    beforeEach(() => {
+      AssignmentExternalTools.attach.mockClear()
+      fakeENV.setup({
+        current_user: {id: '1'},
+        COURSE_ID: '123',
+        ASSIGNMENT_ID: '456',
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('renders the assignment_external_tools mount point', async () => {
+      const props = await mockAssignmentAndSubmission()
+      const {container} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>,
+      )
+
+      const mountPoint = container.querySelector('#assignment_external_tools')
+      expect(mountPoint).toBeInTheDocument()
+    })
+
+    it('attaches AssignmentExternalTools with correct parameters', async () => {
+      const props = await mockAssignmentAndSubmission()
+      const {container} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>,
+      )
+
+      await waitFor(() => {
+        expect(AssignmentExternalTools.attach).toHaveBeenCalledWith(
+          container.querySelector('#assignment_external_tools'),
+          'assignment_view',
+          123,
+          456,
+        )
+      })
+    })
+
+    it('attaches AssignmentExternalTools only once', async () => {
+      const props = await mockAssignmentAndSubmission()
+      const {rerender} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>,
+      )
+
+      await waitFor(() => {
+        expect(AssignmentExternalTools.attach).toHaveBeenCalledTimes(1)
+      })
+
+      rerender(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>,
+      )
+
+      expect(AssignmentExternalTools.attach).toHaveBeenCalledTimes(1)
     })
   })
 })

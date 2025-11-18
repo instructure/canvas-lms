@@ -46,6 +46,7 @@ import {arrayOf, func, bool} from 'prop-types'
 import {queryClient} from '@canvas/query'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {LtiToolIframe} from './LtiToolIframe'
+import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 import DocumentProcessorsSection from './DocumentProcessorsSection'
 import {SelfAssessmentButton} from './RubricSelfAssessment/SelfAssessmentButton'
 import {SelfAssessmentTrayClient} from './RubricSelfAssessment/SelfAssessmentTrayClient'
@@ -286,6 +287,7 @@ function renderContentBaseOnAvailability(
           />
         )}
         <LtiToolIframe assignment={assignment} submission={submission} />
+        <div id="assignment_external_tools" />
         {(ENV.enrollment_state === 'completed' || !ENV.can_submit_assignment_from_section) && (
           <EnrollmentConcludedNotice hasActiveEnrollment={ENV.enrollment_state === 'active'} />
         )}
@@ -333,6 +335,18 @@ function StudentContent(props) {
 
     setUpImmersiveReader()
   }, [description, name])
+
+  useEffect(() => {
+    const element = document.getElementById('assignment_external_tools')
+    if (element) {
+      AssignmentExternalTools.attach(
+        element,
+        'assignment_view',
+        parseInt(ENV.COURSE_ID, 10),
+        parseInt(ENV.ASSIGNMENT_ID, 10),
+      )
+    }
+  }, [])
 
   const onSuccessfulPeerReview = assignedAssessments => {
     setAssignedAssessments(assignedAssessments)
