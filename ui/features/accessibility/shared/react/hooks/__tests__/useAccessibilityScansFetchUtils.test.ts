@@ -74,8 +74,8 @@ describe('useAccessibilityScanFetchUtils', () => {
       }),
     )
 
-    expect(callObj.params).not.toHaveProperty('sort')
-    expect(callObj.params).not.toHaveProperty('direction')
+    expect(callObj.params).toHaveProperty('sort')
+    expect(callObj.params).toHaveProperty('direction')
 
     expect(storeResult.current.page).toBe(defaultStateToFetch.page)
     expect(storeResult.current.pageSize).toBe(defaultStateToFetch.pageSize)

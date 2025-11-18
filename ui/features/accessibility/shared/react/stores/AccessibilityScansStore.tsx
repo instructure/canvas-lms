@@ -19,8 +19,8 @@
 import {TableColHeaderProps} from '@instructure/ui-table'
 import {create} from 'zustand'
 import {devtools} from 'zustand/middleware'
-
 import {AccessibilityIssuesSummaryData, AccessibilityResourceScan, Filters} from '../types'
+import {IssuesTableColumns} from '../../../accessibility_checker/react/constants'
 
 export const USE_ACCESSIBILITY_SCANS_STORE = false
 
@@ -79,11 +79,16 @@ export type AccessibilityScansActions = {
 
 export const defaultNextResource: NextResource = {index: -1, item: null}
 
+const defaultTableSortState: TableSortState = {
+  sortId: IssuesTableColumns.Issues,
+  sortDirection: 'descending',
+}
+
 export const initialState: AccessibilityScansState = {
   page: 1,
   pageCount: 1,
   pageSize: 10,
-  tableSortState: null,
+  tableSortState: defaultTableSortState,
   search: null,
   filters: null,
   totalCount: 0,
@@ -100,7 +105,7 @@ export const initialState: AccessibilityScansState = {
 export const defaultStateToFetch: NewStateToFetch = {
   page: 1,
   pageSize: 10,
-  tableSortState: null,
+  tableSortState: defaultTableSortState,
   search: null,
   filters: null,
 }
