@@ -2125,6 +2125,14 @@ BASE_PERMISSIONS = {
     account_only: true,
     account_allows: ->(a) { a.feature_enabled?(:title_iv_financial_aid_report) }
   },
+  view_rsi_report: {
+    label: -> { I18n.t("Regular and Substantive Interaction") },
+    group: :view_advanced_analytics,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_only: true,
+    account_allows: ->(a) { a.feature_enabled?(:intelligent_insights_rsi_report) }
+  },
   access_ignite_agent: {
     label: -> { I18n.t("Ignite Agent - access") },
     available_to: %w[AccountAdmin AccountMembership],
