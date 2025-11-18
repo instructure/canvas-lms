@@ -603,23 +603,8 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  def set_word_count
-    if word_count.nil? && !deleted? && file_state != "broken" && word_count_supported?
-      delay(run_at: 5.minutes.from_now, singleton: "attachment_set_word_count_#{global_id}").update_word_count
-    end
-  end
-
   def remove_attachments_from_drafts
     submission_draft_attachments.destroy_all
-  end
-
-  def update_word_count
-    if word_count
-      InstStatsd::Statsd.distributed_increment("attachment.update_word_count", tags: { source: "DocViewer" })
-    else
-      InstStatsd::Statsd.distributed_increment("attachment.update_word_count", tags: { source: "Canvas" })
-      update_column(:word_count, calculate_words)
-    end
   end
 
   def namespace
@@ -2694,51 +2679,6 @@ class Attachment < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def calculate_words
-    MemoryLimit.apply(Setting.get("attachment_calculate_words_memory_limit", 4.gigabytes.to_s).to_i) do
-      Timeout.timeout(Setting.get("attachment_calculate_words_time_limit", 3.minutes.to_s).to_f) do
-        word_count_regex = /\S+/
-        @word_count ||= if mime_class == "pdf"
-                          reader = PDF::Reader.new(self.open)
-                          reader.pages.sum do |page|
-                            page.text.scan(word_count_regex).count
-                          end
-                        elsif [
-                          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                          "application/x-docx"
-                        ].include?(mimetype)
-                          doc = Docx::Document.open(self.open)
-                          doc.paragraphs.sum do |paragraph|
-                            paragraph.text.scan(word_count_regex).count
-                          end
-                        elsif [
-                          "application/rtf",
-                          "text/rtf"
-                        ].include?(mimetype)
-                          parser = RubyRTF::Parser.new(unknown_control_warning_enabled: false)
-                          parser.parse(self.open.read).sections.sum do |section|
-                            section[:text].scan(word_count_regex).count
-                          end
-                        elsif mime_class == "text"
-                          open.read.scan(word_count_regex).count
-                        else
-                          0
-                        end
-      end
-    end
-  rescue => e
-    # If there is an error processing the file just log the error and return 0
-    Canvas::Errors.capture_exception(:word_count, e, :info)
-    0
-  end
-
-  def word_count_supported?
-    ["application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-     "application/x-docx",
-     "application/rtf",
-     "text/rtf"].include?(mimetype) || ["pdf", "text"].include?(mime_class)
   end
 
   def self.context_supports_visibility?(context)
