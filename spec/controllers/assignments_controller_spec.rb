@@ -2608,6 +2608,52 @@ describe AssignmentsController do
       post "create", params: { course_id: @course.id, assignment: { important_dates: true } }
       expect(assigns[:assignment].important_dates).to be true
     end
+
+    context "New Quizzes Surveys" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+      end
+
+      it "sets new quizzes survey attributes if provided" do
+        post "create", params: {
+          course_id: @course.id,
+          assignment: {
+            new_quizzes_quiz_type: "graded_survey",
+            new_quizzes_anonymous_submission: true
+          },
+          quiz_lti: 1
+        }
+        assignment = assigns[:assignment]
+        expect(assignment).not_to be_nil
+        expect(assignment.new_quizzes_type).to eq("graded_survey")
+        expect(assignment.anonymous_participants?).to be true
+      end
+
+      it "does not set new quizzes survey attributes when feature flag is disabled" do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
+
+        post "create", params: {
+          course_id: @course.id,
+          assignment: {
+            new_quizzes_quiz_type: "graded_survey",
+            new_quizzes_anonymous_submission: true
+          },
+          quiz_lti: 1
+        }
+        assignment = assigns[:assignment]
+        expect(assignment).not_to be_nil
+        expect(assignment.new_quizzes_type).to eq("graded_quiz")
+        expect(assignment.anonymous_participants?).to be false
+      end
+    end
   end
 
   describe "GET 'edit'" do

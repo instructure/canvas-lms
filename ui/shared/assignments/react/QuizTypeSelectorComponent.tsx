@@ -30,9 +30,16 @@ interface QuizTypeSelectorComponentProps {
   quizType: QuizType
   isExistingAssignment: boolean
   onChange: (quizType: QuizType) => void
+  shouldRenderLabel?: boolean
 }
 
-export const QuizTypeSelectorComponent: React.FC<QuizTypeSelectorComponentProps> = ({
+interface QuizTypeSelectorContentProps {
+  quizType: QuizType
+  isExistingAssignment: boolean
+  onChange: (quizType: QuizType) => void
+}
+
+const QuizTypeSelectorContent: React.FC<QuizTypeSelectorContentProps> = ({
   quizType,
   isExistingAssignment,
   onChange,
@@ -57,39 +64,64 @@ export const QuizTypeSelectorComponent: React.FC<QuizTypeSelectorComponentProps>
   }
 
   return (
+    <div className="form-column-right" style={{width: 'unset', marginBottom: '12px'}}>
+      <Flex alignItems="center" gap="small">
+        <select
+          id="assignment_quiz_type"
+          name="new_quizzes_quiz_type"
+          value={quizType}
+          onChange={handleChange}
+          disabled={isExistingAssignment}
+          style={{width: '392px', marginBottom: 'unset'}}
+        >
+          {quizTypeOptions.map(option => (
+            <option key={option.id} value={option.id}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        {isExistingAssignment && (
+          <Tooltip
+            renderTip={I18n.t(
+              'quiz_type_locked_tooltip',
+              'Quiz Type can only be set when creating a new assignment',
+            )}
+            placement="end"
+          >
+            <IconInfoLine />
+          </Tooltip>
+        )}
+      </Flex>
+    </div>
+  )
+}
+
+export const QuizTypeSelectorComponent: React.FC<QuizTypeSelectorComponentProps> = ({
+  quizType,
+  isExistingAssignment,
+  onChange,
+  shouldRenderLabel = true,
+}) => {
+  if (!shouldRenderLabel) {
+    return (
+      <QuizTypeSelectorContent
+        quizType={quizType}
+        isExistingAssignment={isExistingAssignment}
+        onChange={onChange}
+      />
+    )
+  }
+
+  return (
     <React.Fragment>
       <div className="form-column-left no-group">
         <label htmlFor="assignment_quiz_type">{I18n.t('quiz_type', 'Quiz Type')}</label>
       </div>
-      <div className="form-column-right" style={{width: 'unset', marginBottom: '12px'}}>
-        <Flex alignItems="center" gap="small">
-          <select
-            id="assignment_quiz_type"
-            name="new_quizzes_quiz_type"
-            value={quizType}
-            onChange={handleChange}
-            disabled={isExistingAssignment}
-            style={{width: '392px', marginBottom: 'unset'}}
-          >
-            {quizTypeOptions.map(option => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          {isExistingAssignment && (
-            <Tooltip
-              renderTip={I18n.t(
-                'quiz_type_locked_tooltip',
-                'Quiz Type can only be set when creating a new assignment',
-              )}
-              placement="end"
-            >
-              <IconInfoLine />
-            </Tooltip>
-          )}
-        </Flex>
-      </div>
+      <QuizTypeSelectorContent
+        quizType={quizType}
+        isExistingAssignment={isExistingAssignment}
+        onChange={onChange}
+      />
     </React.Fragment>
   )
 }
