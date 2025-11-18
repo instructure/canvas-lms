@@ -25,6 +25,9 @@ import * as Api from '../Api'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import { CamelizedAssignment } from '@canvas/grading/grading'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {MockedProvider} from '@apollo/client/testing'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import {queryClient} from '@canvas/query'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 jest.mock('../Api')
@@ -48,7 +51,13 @@ describe('AssignmentPostingPolicyTray', () => {
   let tray: AssignmentPostingPolicyTray | null = null
 
   const renderTray = () => {
-    const component = render(<AssignmentPostingPolicyTray ref={ref => (tray = ref)} />)
+    const component = render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MockedQueryClientProvider client={queryClient}>
+          <AssignmentPostingPolicyTray ref={ref => (tray = ref)} />
+        </MockedQueryClientProvider>
+      </MockedProvider>
+    )
     tray?.show(context)
     return component
   }
@@ -399,7 +408,16 @@ describe('AssignmentPostingPolicyTray', () => {
       })
       context.assignment.postManually = true
       context.selectedPostManually = false
+
+      queryClient.setQueryData(['assignment_post_policy', context.assignment.id], null)
     })
+
+    const enterNewDateTime = async(dateTimeElement: HTMLElement, dateTimeString: string) => {
+      await userEvent.click(dateTimeElement)
+      await userEvent.clear(dateTimeElement)
+      await userEvent.paste(dateTimeString)
+      await userEvent.tab()
+    }
 
     it('renders the ScheduledReleasePolicy component when selectedPostManually is true', async () => {
       const { getByTestId } = renderTray()
@@ -498,9 +516,7 @@ describe('AssignmentPostingPolicyTray', () => {
       futureDate.setDate(futureDate.getDate() + 1)
       const futureDateString = futureDate.toISOString().slice(0, 16) // Format as "YYYY-MM-DDTHH:MM"
 
-      await userEvent.clear(sharedDateInput)
-      await userEvent.type(sharedDateInput, futureDateString)
-      await userEvent.tab()
+      await enterNewDateTime(sharedDateInput, futureDateString)
 
       const saveButton = getByTestId('assignment-posting-policy-save-button')
       expect(saveButton).toBeEnabled()
@@ -526,9 +542,7 @@ describe('AssignmentPostingPolicyTray', () => {
       pastDate.setDate(pastDate.getDate() - 1)
       const pastDateString = pastDate.toISOString().slice(0, 16) // Format as "YYYY-MM-DDTHH:MM"
 
-      await userEvent.clear(sharedDateInput)
-      await userEvent.type(sharedDateInput, pastDateString)
-      await userEvent.tab()
+      await enterNewDateTime(sharedDateInput, pastDateString)
 
       const saveButton = getByTestId('assignment-posting-policy-save-button')
       expect(saveButton).toBeDisabled()
@@ -563,14 +577,9 @@ describe('AssignmentPostingPolicyTray', () => {
       futureDate2.setDate(futureDate2.getDate() + 1)
       const futureDateString2 = futureDate2.toISOString().slice(0, 16)
 
-      await userEvent.clear(dateInputs[0])
-      await userEvent.type(dateInputs[0], futureDateString1)
-      await userEvent.tab()
-
-      await userEvent.clear(dateInputs[1])
-      await userEvent.type(dateInputs[1], futureDateString2)
-      await userEvent.tab()
-
+      await enterNewDateTime(dateInputs[0], futureDateString1)
+      await enterNewDateTime(dateInputs[1], futureDateString2)
+      
       const saveButton = getByTestId('assignment-posting-policy-save-button')
       expect(saveButton).toBeEnabled()
     })
@@ -603,13 +612,9 @@ describe('AssignmentPostingPolicyTray', () => {
       pastDate2.setDate(pastDate2.getDate() - 1)
       const pastDateString2 = pastDate2.toISOString().slice(0, 16)
 
-      await userEvent.clear(dateInputs[0])
-      await userEvent.type(dateInputs[0], pastDateString1)
-      await userEvent.tab()
-
-      await userEvent.clear(dateInputs[1])
-      await userEvent.type(dateInputs[1], pastDateString2)
-      await userEvent.tab()
+      
+      await enterNewDateTime(dateInputs[0], pastDateString1) // Grade release date
+      await enterNewDateTime(dateInputs[1], pastDateString2) // Comment release date
 
       const saveButton = getByTestId('assignment-posting-policy-save-button')
       expect(saveButton).toBeDisabled()
@@ -643,19 +648,117 @@ describe('AssignmentPostingPolicyTray', () => {
       const futureDate2 = new Date()
       futureDate2.setDate(futureDate2.getDate() + 1)
       const futureDateString2 = futureDate2.toISOString().slice(0, 16)
-      
-      await userEvent.clear(dateInputs[1])
-      await userEvent.type(dateInputs[1], futureDateString1)
-      await userEvent.tab() // Comment release date
 
-      await userEvent.clear(dateInputs[0])
-      await userEvent.type(dateInputs[0], futureDateString2)
-      await userEvent.tab() // Grade release date
+      await enterNewDateTime(dateInputs[1], futureDateString1)
+      await enterNewDateTime(dateInputs[0], futureDateString2)
 
       const saveButton = getByTestId('assignment-posting-policy-save-button')
       expect(saveButton).toBeDisabled()
       expect(screen.getByText('Grades release date must be the same or after comments release date')).toBeInTheDocument()
       expect(screen.getByText('Comments release date must be the same or before grades release date')).toBeInTheDocument()
+    })
+
+    it('does not show validation error for pre-existing grades date when only comments date is changed', async () => {
+      const pastDate = new Date()
+      pastDate.setDate(pastDate.getDate() - 1)
+      const pastDateString = pastDate.toISOString()
+
+      const futureDate = new Date()
+      futureDate.setDate(futureDate.getDate() + 1)
+      const futureDateString = futureDate.toISOString()
+
+      queryClient.setQueryData(['assignment_post_policy', context.assignment.id], {
+        postGradesAt: pastDateString,
+        postCommentsAt: futureDateString,
+      })
+
+      const { getAllByPlaceholderText, getByTestId } = renderTray()
+
+      const dateInputs = getAllByPlaceholderText('Select Date')
+      expect(dateInputs).toHaveLength(2)
+
+      const futureCommentsDate = new Date()
+      futureCommentsDate.setDate(futureCommentsDate.getDate() + 2)
+      const futureCommentsDateString = futureCommentsDate.toISOString().slice(0, 16)
+
+      await enterNewDateTime(dateInputs[1], futureCommentsDateString)
+
+      // The grades date should NOT show "Date must be in the future" error
+      // because we only changed the comments date and had a pre-existing past grades date
+      const errorMessages = screen.queryAllByText('Date must be in the future')
+      expect(errorMessages).toHaveLength(0)
+    })
+
+    it('does not show validation error for past comments date when only grades date is changed', async () => {
+      const pastDate = new Date()
+      pastDate.setDate(pastDate.getDate() - 1)
+      const pastDateString = pastDate.toISOString()
+
+      const futureDate = new Date()
+      futureDate.setDate(futureDate.getDate() + 1)
+      const futureDateString = futureDate.toISOString()
+
+      queryClient.setQueryData(['assignment_post_policy', context.assignment.id], {
+        postGradesAt: futureDateString,
+        postCommentsAt: pastDateString,
+      })
+
+      const { getAllByPlaceholderText } = renderTray()
+
+      const dateInputs = getAllByPlaceholderText('Select Date')
+      expect(dateInputs).toHaveLength(2)
+
+      // Change only the grades date to a future date
+      const futureGradesDate = new Date()
+      futureGradesDate.setDate(futureGradesDate.getDate() + 2)
+      const futureGradesDateString = futureGradesDate.toISOString().slice(0, 16)
+
+      await enterNewDateTime(dateInputs[0], futureGradesDateString)
+
+      // The comments date should NOT show "Date must be in the future" error
+      // because we only changed the grades date
+      const errorMessages = screen.queryAllByText('Date must be in the future')
+      expect(errorMessages).toHaveLength(0)
+    })
+
+    it('preserves existing validation errors when changing the other field', async () => {
+      const pastDate = new Date()
+      pastDate.setDate(pastDate.getDate() - 1)
+      const pastDateString = pastDate.toISOString()
+
+      const futureDate = new Date()
+      futureDate.setDate(futureDate.getDate() + 1)
+      const futureDateString = futureDate.toISOString()
+
+      queryClient.setQueryData(['assignment_post_policy', context.assignment.id], {
+        postGradesAt: futureDateString,
+        postCommentsAt: pastDateString,
+      })
+
+      const { getAllByPlaceholderText } = renderTray()
+
+      const dateInputs = getAllByPlaceholderText('Select Date')
+      expect(dateInputs).toHaveLength(2)
+
+      // First, set comments date to a past date to trigger an error
+      const pastCommentsDate = new Date()
+      pastCommentsDate.setDate(pastCommentsDate.getDate() - 1)
+      const pastCommentsDateString = pastCommentsDate.toISOString().slice(0, 16)
+
+      await enterNewDateTime(dateInputs[1], pastCommentsDateString)
+
+      // Verify the error appears
+      expect(screen.getByText('Date must be in the future')).toBeInTheDocument()
+
+      // Now change the grades date to a valid future date
+      const futureGradesDate = new Date()
+      futureGradesDate.setDate(futureGradesDate.getDate() + 1)
+      const futureGradesDateString = futureGradesDate.toISOString().slice(0, 16)
+
+      await enterNewDateTime(dateInputs[0], futureGradesDateString)
+
+      // The comments error should still be present
+      expect(screen.getByText('Date must be in the future')).toBeInTheDocument()
     })
   })
 })
