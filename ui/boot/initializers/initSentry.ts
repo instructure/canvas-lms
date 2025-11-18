@@ -31,13 +31,7 @@ export function initSentry() {
       ? [new RegExp(sentrySettings.url_deny_pattern)]
       : undefined
 
-    if (tracesSampleRate) {
-      integrations.push(
-        new BrowserTracing({
-          tracePropagationTargets: ['localhost', /^\//, new RegExp(`^${window.location.origin}`)],
-        }),
-      )
-    }
+    if (tracesSampleRate) integrations.push(new BrowserTracing() as Integration)
 
     init({
       dsn: sentrySettings.dsn,
