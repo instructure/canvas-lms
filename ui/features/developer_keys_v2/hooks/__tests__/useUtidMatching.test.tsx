@@ -102,7 +102,7 @@ describe('useUtidMatching', () => {
       method: 'GET',
       params: {
         redirect_uris: ['https://example.com/redirect', 'https://another.com/callback'],
-        sources: ['partner_provided'],
+        sources: ['partner_provided', 'manual'],
       },
     })
 
@@ -199,7 +199,7 @@ describe('useUtidMatching', () => {
           method: 'GET',
           params: {
             redirect_uris: ['https://example4.com'],
-            sources: ['partner_provided'],
+            sources: ['partner_provided', 'manual'],
           },
         })
       },
@@ -228,7 +228,7 @@ describe('useUtidMatching', () => {
       method: 'GET',
       params: {
         redirect_uris: ['https://example.com', 'https://another.com'],
-        sources: ['partner_provided'],
+        sources: ['partner_provided', 'manual'],
       },
     })
   })

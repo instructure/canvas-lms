@@ -354,7 +354,7 @@ class DeveloperKeysController < ApplicationController
   #   An array of redirect URI strings to match
   # @argument sources [Optional, Array]
   #   An array of sources to look up the redirect URIs from. Possible values are
-  #   `partner_provided` (default) and `manual`.
+  #   `partner_provided` and `manual` (defaults to both).
   #
   # @example_request
   #   {
