@@ -23,10 +23,11 @@ import {Flex} from '@instructure/ui-flex'
 import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {IconQuestionLine, IconWarningSolid} from '@instructure/ui-icons'
+import {IconExternalLinkLine, IconQuestionLine, IconWarningSolid} from '@instructure/ui-icons'
 import {AccessibilityIssue} from '../../types'
 import {Link} from '@instructure/ui-link'
 import canvas from '@instructure/ui-themes'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -95,7 +96,17 @@ const WhyMattersPopover = ({issue}: WhyMattersPopoverProps) => {
               <Flex.Item>
                 <Text variant="contentSmall">
                   {I18n.t('This is a')}{' '}
-                  <Link href={issue.issueUrl}>{I18n.t('WCAG requirement')}</Link>{' '}
+                  <Link
+                    href={issue.issueUrl}
+                    variant="standalone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    iconPlacement="end"
+                    renderIcon={<IconExternalLinkLine size="x-small" />}
+                  >
+                    {I18n.t('WCAG requirement')}{' '}
+                    <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
+                  </Link>{' '}
                   {I18n.t(
                     'and part of accessibility standards that educational content must meet to be\n' +
                       'inclusive for all learners, including those using screen readers.',

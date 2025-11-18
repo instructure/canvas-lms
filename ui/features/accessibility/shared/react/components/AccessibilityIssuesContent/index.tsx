@@ -30,6 +30,8 @@ import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {FormFieldMessage} from '@instructure/ui-form-field'
+import {IconExternalLinkLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
 import {useNextResource} from '../../hooks/useNextResource'
@@ -415,11 +417,25 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           <Flex justifyItems="space-between">
             <Text weight="weightImportant">{I18n.t('Problem area')}</Text>
             <Flex gap="small">
-              <Link href={current.resource.resourceUrl} variant="standalone">
+              <Link
+                href={current.resource.resourceUrl}
+                variant="standalone"
+                target="_blank"
+                iconPlacement="end"
+                renderIcon={<IconExternalLinkLine size="x-small" />}
+              >
                 {I18n.t('Open Page')}
+                <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
               </Link>
-              <Link href={`${current.resource.resourceUrl}/edit`} variant="standalone">
+              <Link
+                href={`${current.resource.resourceUrl}/edit`}
+                variant="standalone"
+                target="_blank"
+                iconPlacement="end"
+                renderIcon={<IconExternalLinkLine size="x-small" />}
+              >
                 {I18n.t('Edit Page')}
+                <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
               </Link>
             </Flex>
           </Flex>
