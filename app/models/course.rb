@@ -4658,6 +4658,10 @@ class Course < ActiveRecord::Base
     horizon_course && account&.feature_enabled?(:horizon_course_setting)
   end
 
+  def requirement_count_api_enabled?
+    horizon_course?
+  end
+
   def use_modules_rewrite_view?(user, session)
     if grants_right?(user, session, :read_as_admin)
       return root_account.feature_enabled?(:modules_page_rewrite)
