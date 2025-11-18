@@ -358,6 +358,37 @@ describe('ExceptionModal', () => {
     )
   })
 
+  it('displays subaccounts before courses in the browse popover', async () => {
+    const accountId = ZAccountId.parse('1')
+    const openState = {open: true, deployment: mockDeployment({})}
+    const onClose = jest.fn()
+    const onConfirm = jest.fn()
+    renderWithQueryClient(
+      <ExceptionModal
+        accountId={accountId}
+        registrationId={ZLtiRegistrationId.parse('1')}
+        openState={openState}
+        onClose={onClose}
+        onConfirm={onConfirm}
+      />,
+    )
+
+    // Open the browse popover
+    const browseBtn = screen.getByText(/browse sub-accounts or courses/i).closest('button')
+    await clickOrFail(browseBtn)
+
+    // Wait for the popover to appear
+    await screen.findByPlaceholderText(/search\.\.\./i)
+
+    const courseOption = await screen.findByText('Course 201')
+    const subaccountOption = await screen.findByText('Subaccount 101')
+
+    // Ensure subaccount appears before course
+    expect(subaccountOption.compareDocumentPosition(courseOption)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+  })
+
   it('does not call onConfirm when Save is clicked with no selected exceptions, but does call onClose', async () => {
     const accountId = ZAccountId.parse('1')
     const openState = {open: true, deployment: mockDeployment({})}
