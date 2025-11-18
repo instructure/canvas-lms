@@ -431,6 +431,65 @@ describe UserContent, type: :request do
                @course
              )).to eq({ a1.id => a1, a2.id => a2, a3.id => a3 })
     end
+
+    context "with deleted attachments" do
+      let(:tester) { Class.new { include Api }.new }
+
+      it "excludes deleted attachments from course context" do
+        attachment_1, attachment_2 = attachment_model(context: @course), attachment_model(context: @course)
+        attachment_2.destroy
+
+        html = <<~HTML
+          <a href="/courses/#{@course.id}/files/#{attachment_1.id}/download">File 1</a>
+          <a href="/courses/#{@course.id}/files/#{attachment_2.id}/download">File 2</a>
+        HTML
+
+        result = tester.api_bulk_load_user_content_attachments([html], @course)
+        expect(result).to eq({ attachment_1.id => attachment_1 })
+        expect(result).not_to have_key(attachment_2.id)
+      end
+
+      it "includes non-deleted attachments from course context" do
+        attachment_1, attachment_2 = attachment_model(context: @course), attachment_model(context: @course)
+
+        html = <<~HTML
+          <a href="/courses/#{@course.id}/files/#{attachment_1.id}/download">File 1</a>
+          <a href="/courses/#{@course.id}/files/#{attachment_2.id}/download">File 2</a>
+        HTML
+
+        result = tester.api_bulk_load_user_content_attachments([html], @course)
+        expect(result).to eq({ attachment_1.id => attachment_1, attachment_2.id => attachment_2 })
+      end
+
+      it "includes all attachments for user context regardless of deleted status" do
+        user = user_model
+        attachment_1 = attachment_model(context: user)
+        attachment_2 = attachment_model(context: user)
+        attachment_2.destroy
+
+        html = <<~HTML
+          <a href="/users/#{user.id}/files/#{attachment_1.id}/download">File 1</a>
+          <a href="/users/#{user.id}/files/#{attachment_2.id}/download">File 2</a>
+        HTML
+
+        result = tester.api_bulk_load_user_content_attachments([html], user)
+        expect(result.keys).to contain_exactly(attachment_1.id, attachment_2.id)
+      end
+
+      it "includes all attachments for nil context regardless of deleted status" do
+        attachment_1 = attachment_model
+        attachment_2 = attachment_model
+        attachment_2.destroy
+
+        html = <<~HTML
+          <a href="/files/#{attachment_1.id}/download">File 1</a>
+          <a href="/files/#{attachment_2.id}/download">File 2</a>
+        HTML
+
+        result = tester.api_bulk_load_user_content_attachments([html], nil)
+        expect(result.keys).to contain_exactly(attachment_1.id, attachment_2.id)
+      end
+    end
   end
 
   describe "latex_to_mathml" do
