@@ -107,6 +107,36 @@ RSpec.describe PeerReview::AllocationService do
         end
       end
 
+      context "when peer_review_submission_required is true" do
+        before do
+          assignment.update!(peer_review_submission_required: true)
+          assignment.submissions.find_by(user: student1).update!(workflow_state: "submitted")
+        end
+
+        it "returns error result when assessor has not submitted" do
+          result = service.allocate
+          expect(result[:success]).to be false
+          expect(result[:error_code]).to eq(:not_submitted)
+          expect(result[:message]).to include("must submit")
+          expect(result[:status]).to eq(:bad_request)
+        end
+      end
+
+      context "when peer_review_submission_required is false" do
+        before do
+          assignment.update!(peer_review_submission_required: false)
+          assignment.submit_homework(student1, body: "Student1 submission")
+        end
+
+        it "allows allocation even if assessor has not submitted" do
+          assignment.submit_homework(student2, body: "Student2 submission")
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_request]).to be_a(AssessmentRequest)
+          expect(result[:assessment_request].assessor_id).to eq(assessor.id)
+        end
+      end
+
       context "when assignment is locked" do
         before do
           assignment.update!(
