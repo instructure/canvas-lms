@@ -532,6 +532,19 @@ microsoft_group_enrollments_syncing:
     If enabled, syncing course enrollments to Microsoft Groups will be
     available. Account admins may enable this in account settings.
   applies_to: RootAccount
+nav_menu_links:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: "Nav Menu Links"
+  description: |-
+    Enables the creation of links at the account navigation, user navigation, and course navigation level.
+    This is a replacement of the Redirect Tool functionality.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 open_tools_in_new_tab:
   state: hidden
   shadow: true
