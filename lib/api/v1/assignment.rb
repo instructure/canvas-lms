@@ -494,6 +494,7 @@ module Api::V1::Assignment
     hash["post_manually"] = assignment.post_manually?
     hash["anonymous_grading"] = value_to_boolean(assignment.anonymous_grading)
     hash["anonymize_students"] = assignment.anonymize_students?
+    hash["new_quizzes_anonymous_participants"] = assignment.new_quizzes_anonymous_participants?
 
     hash["require_lockdown_browser"] = assignment.settings&.dig("lockdown_browser", "require_lockdown_browser") || false
 

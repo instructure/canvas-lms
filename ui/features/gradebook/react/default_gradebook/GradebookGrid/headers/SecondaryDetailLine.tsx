@@ -25,6 +25,7 @@ const I18n = createI18nScope('gradebook')
 type SecondaryDetailLineProps = {
   assignment: {
     anonymizeStudents: boolean
+    newQuizzesAnonymousParticipants: boolean
     pointsPossible?: number | null
     published: boolean
     postManually?: boolean
@@ -32,7 +33,9 @@ type SecondaryDetailLineProps = {
 }
 
 function SecondaryDetailLine(props: SecondaryDetailLineProps) {
-  const anonymous = props.assignment.anonymizeStudents
+  // Anonymized assignments should hide grades unless the assignment is a NQ with anonymous participants
+  const anonymous =
+    props.assignment.anonymizeStudents && !props.assignment.newQuizzesAnonymousParticipants
   const unpublished = !props.assignment.published
 
   if (anonymous || unpublished) {
