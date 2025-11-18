@@ -289,7 +289,7 @@ const ContextOptions = (props: ContextOptionsProps) => {
           context: a,
         }) as const,
     )
-  const contexts = [...courses, ...accounts]
+  const contexts = [...accounts, ...courses]
 
   if (contexts.length === 0) {
     return (
