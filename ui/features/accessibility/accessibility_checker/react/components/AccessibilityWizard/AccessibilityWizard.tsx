@@ -37,7 +37,7 @@ export const AccessibilityWizard = ({
   setSelectedItem: (item: AccessibilityResourceScan | null) => void
   setIsTrayOpen: (isOpen: boolean) => void
 }) => {
-  const trayTitle = I18n.t('Accessibility Issues')
+  const trayTitle = selectedItem?.resourceName || I18n.t('Accessibility Issues')
 
   const onDismiss = useCallback(() => {
     setSelectedItem(null)
