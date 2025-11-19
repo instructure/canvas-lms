@@ -2525,6 +2525,44 @@ RSpec.describe Lti::RegistrationsController do
             expect(course_json[:course_code]).to include("FOO101")
           end
         end
+
+        context "that matches course ID" do
+          let(:search_term) { course.id.to_s }
+
+          it "returns accounts and courses matching the search term" do
+            subject
+            # The account could coincidentally have an ID matching
+            # the course, so it may or may not be included.
+            expect(response_json[:courses].length).to eq(1)
+
+            course_json = response_json[:courses].first
+            expect(course_json[:id]).to eq(search_term)
+          end
+        end
+
+        context "that matches account ID" do
+          let(:search_term) { account.id.to_s }
+
+          it "returns accounts and courses matching the search term" do
+            subject
+            # The course could coincidentally have an ID matching
+            # the account, so it may or may not be included.
+            expect(response_json[:accounts].length).to eq(1)
+
+            account_json = response_json[:accounts].first
+            expect(account_json[:id]).to eq(search_term)
+          end
+
+          it "does not return accounts of different IDs" do
+            other_account = account_model
+
+            subject
+            expect(response_json[:accounts].length).to eq(1)
+
+            account_ids = response_json[:accounts].pluck("id")
+            expect(account_ids).not_to include(other_account.id.to_s)
+          end
+        end
       end
 
       context "with only_children_of" do

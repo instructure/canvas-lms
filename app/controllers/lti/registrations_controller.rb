@@ -1590,6 +1590,13 @@ class Lti::RegistrationsController < ApplicationController
       course_scope = course_scope.where("name ILIKE :s OR sis_source_id ILIKE :s OR course_code ILIKE :s", s: "%#{search_term}%")
     end
 
+    # If search_term can't be parsed as an integer, to_i returns zero.
+    search_term_int = search_term&.to_i
+    if search_term_int&.positive?
+      account_scope = account_scope.or(Account.active.where(id: search_term_int))
+      course_scope = course_scope.or(Course.active.where(id: search_term_int))
+    end
+
     accounts = account_scope.limit(20)
     courses = course_scope.limit(20)
 
