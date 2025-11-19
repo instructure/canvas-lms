@@ -850,6 +850,21 @@ describe AccountsController do
       expect(@account.reload.settings[:custom_help_links]).to be_nil
     end
 
+    it "validates and deduplicates available_to in help links" do
+      account_with_admin_logged_in
+      post "update", params: { id: @account.id,
+                               account: { custom_help_links: { "0" =>
+        { id: "instructor_question",
+          text: "Ask Your Instructor a Question",
+          subtext: "Questions are submitted to your instructor",
+          type: "default",
+          url: "#teacher_feedback",
+          available_to: %w[teacher teacher teacher student student ninja] } } } }
+      @account.reload
+      link = @account.settings[:custom_help_links].detect { |l| l["id"] == "instructor_question" }
+      expect(link["available_to"]).to match_array(%w[teacher student])
+    end
+
     it "allows updating services that appear in the ui for the current user" do
       AccountServices.register_service(:test1,
                                        { name: "test1", description: "", expose_to_ui: :setting, default: false })
