@@ -56,6 +56,20 @@ describe('useAssignmentQuery', () => {
         name: 'Peer Review Assignment',
         dueAt: '2025-12-31T23:59:59Z',
         description: '<p>Assignment description</p>',
+        assessmentRequestsForCurrentUser: [
+          {
+            _id: 'ar-1',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-01T00:00:00Z',
+          },
+          {
+            _id: 'ar-2',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-02T00:00:00Z',
+          },
+        ],
       },
     })
 
@@ -75,6 +89,20 @@ describe('useAssignmentQuery', () => {
       name: 'Peer Review Assignment',
       dueAt: '2025-12-31T23:59:59Z',
       description: '<p>Assignment description</p>',
+      assessmentRequestsForCurrentUser: [
+        {
+          _id: 'ar-1',
+          available: true,
+          workflowState: 'assigned',
+          createdAt: '2025-11-01T00:00:00Z',
+        },
+        {
+          _id: 'ar-2',
+          available: true,
+          workflowState: 'assigned',
+          createdAt: '2025-11-02T00:00:00Z',
+        },
+      ],
     })
     expect(result.current.isError).toBe(false)
   })
@@ -86,6 +114,7 @@ describe('useAssignmentQuery', () => {
         name: 'Assignment Without Due Date',
         dueAt: null,
         description: '<p>Description here</p>',
+        assessmentRequestsForCurrentUser: [],
       },
     })
 
@@ -108,6 +137,7 @@ describe('useAssignmentQuery', () => {
         name: 'Assignment Without Description',
         dueAt: '2025-12-31T23:59:59Z',
         description: null,
+        assessmentRequestsForCurrentUser: null,
       },
     })
 
@@ -144,6 +174,7 @@ describe('useAssignmentQuery', () => {
         name: 'Test Assignment',
         dueAt: null,
         description: null,
+        assessmentRequestsForCurrentUser: [],
       },
     })
 
