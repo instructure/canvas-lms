@@ -1,4 +1,9 @@
-<% assignment = asset.assignment %>
+<%
+  # For discussion checkpoints, use the parent assignment instead of the sub-assignment
+  # to ensure correct assignment IDs and URLs in notifications
+  assignment = asset.assignment
+  assignment = assignment.parent_assignment if assignment.checkpoint? && assignment.parent_assignment
+%>
 
 <% define_content :link do %>
   <%= polymorphic_url([assignment.context, assignment, asset]) %>
@@ -13,7 +18,7 @@
   <%= t :graded_date, "graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at) || t("No Date Set")) rescue t(:no_date_set, "No Date Set")) %>
 <% end %>
 
-<% if user.try(:send_scores_in_emails?, asset.assignment.context) %>
+<% if user.try(:send_scores_in_emails?, assignment.context) %>
   <% if asset.excused? %>
     <%= t :excused, "This assignment has been excused." %>
   <% elsif asset.score %>
