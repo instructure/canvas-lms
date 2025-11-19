@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Account::HelpLinks
+  USER_TYPES = %w[user student teacher admin observer unenrolled].freeze
+
   attr_reader :account
 
   def initialize(account)
@@ -128,6 +130,7 @@ class Account::HelpLinks
     links.each do |link|
       link[:is_featured] = Canvas::Plugin.value_to_boolean(link[:is_featured])
       link[:is_new] = Canvas::Plugin.value_to_boolean(link[:is_new])
+      link[:available_to] = link[:available_to] & USER_TYPES if link[:available_to].is_a?(Array)
     end
 
     links.map do |link|
