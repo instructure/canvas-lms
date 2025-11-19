@@ -96,7 +96,7 @@ class UserProfile < ActiveRecord::Base
             new_tab
           end
         insert_profile_tab(tabs, user, opts)
-        insert_eportfolios_tab(tabs, user)
+        insert_eportfolios_tab(tabs, user, opts)
         insert_content_shares_tab(tabs, user, opts)
         insert_lti_tool_tabs(tabs, user, opts) if user && opts[:root_account]
         tabs = tabs.slice(0, 2) if user&.fake_student?
@@ -122,12 +122,13 @@ class UserProfile < ActiveRecord::Base
     end
   end
 
-  def insert_eportfolios_tab(tabs, user)
+  def insert_eportfolios_tab(tabs, user, opts)
     if user.eportfolios_enabled?
+      deprecated = opts[:root_account]&.feature_enabled?(:eportfolio_deprecation_notice)
       tabs <<
         {
           id: TAB_EPORTFOLIOS,
-          label: I18n.t("#tabs.eportfolios", "ePortfolios"),
+          label: deprecated ? I18n.t("ePortfolios (Legacy)") : I18n.t("ePortfolios"),
           css_class: "eportfolios",
           href: :dashboard_eportfolios_path,
           no_args: true
