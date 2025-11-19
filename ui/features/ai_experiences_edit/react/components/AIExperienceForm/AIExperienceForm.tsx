@@ -16,29 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {View} from '@instructure/ui-view'
-import {Heading} from '@instructure/ui-heading'
-import {FormFieldGroup} from '@instructure/ui-form-field'
-import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
-import {
-  IconAiLine,
-  IconArrowOpenDownLine,
-  IconMoreLine,
-  IconPublishSolid,
-} from '@instructure/ui-icons'
-import {Menu} from '@instructure/ui-menu'
-import {Modal} from '@instructure/ui-modal'
-import {Pill} from '@instructure/ui-pill'
 import {Alert} from '@instructure/ui-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {AIExperience, AIExperienceFormData} from '../../../types'
+import PreviewConfirmationModal from './PreviewConfirmationModal'
+import DeleteConfirmationModal from './DeleteConfirmationModal'
+import FormHeader from './FormHeader'
+import ConfigurationSection from './ConfigurationSection'
+import FormActions from './FormActions'
 
 const I18n = createI18nScope('ai_experiences_edit')
 
@@ -88,6 +79,18 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
         ...prev,
         [field]: event.target.value,
       }))
+      // Clear error for this field when user starts typing
+      if (errors[field]) {
+        setErrors(prev => {
+          const newErrors = {...prev}
+          delete newErrors[field]
+          return newErrors
+        })
+        // Hide error banner if no errors remain
+        if (Object.keys(errors).length === 1) {
+          setShowErrorBanner(false)
+        }
+      }
     }
 
   const validateForm = (): Record<string, string> => {
@@ -159,14 +162,16 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
       })
       showFlashSuccess(I18n.t('AI Experience deleted successfully'))()
       window.location.href = `/courses/${courseId}/ai_experiences`
-    } catch (_error) {
-      showFlashError(I18n.t('Failed to delete AI Experience'))()
+    } catch (error: any) {
+      const errorMessage =
+        error?.message || I18n.t('An error occurred while deleting the AI Experience')
+      showFlashError(I18n.t('Failed to delete AI Experience: %{error}', {error: errorMessage}))()
       setIsDeleting(false)
       setShowDeleteModal(false)
     }
   }
 
-  const isEdit = !!aiExperience?.id
+  const isEdit = useMemo(() => !!aiExperience?.id, [aiExperience?.id])
 
   return (
     <View as="div" maxWidth="1000px" margin="0 auto" padding="medium">
@@ -183,35 +188,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
         </Alert>
       )}
 
-      <Flex justifyItems="space-between" alignItems="start" margin="0 0 large 0">
-        <Heading level="h1" margin="0">
-          {isEdit ? I18n.t('Edit AI Experience') : I18n.t('New AI Experience')}
-        </Heading>
-        <Flex gap="small" alignItems="center">
-          <IconPublishSolid color="secondary" />
-          <Text color="secondary">{I18n.t('Not published')}</Text>
-          <Menu
-            placement="bottom end"
-            trigger={
-              <IconButton
-                screenReaderLabel={I18n.t('More options')}
-                withBackground={false}
-                withBorder={false}
-              >
-                <IconMoreLine />
-              </IconButton>
-            }
-          >
-            <Menu.Item
-              data-testid="ai-experience-edit-delete-menu-item"
-              onClick={handleDeleteClick}
-              disabled={!isEdit}
-            >
-              {I18n.t('Delete')}
-            </Menu.Item>
-          </Menu>
-        </Flex>
-      </Flex>
+      <FormHeader isEdit={isEdit} onDeleteClick={handleDeleteClick} />
 
       <form onSubmit={handleSubmit} noValidate={true}>
         <View as="div" margin="0 0 large 0">
@@ -221,7 +198,6 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
             value={formData.title}
             onChange={handleInputChange('title')}
             isRequired
-            placeholder=""
             messages={showErrors && errors.title ? [{type: 'newError', text: errors.title}] : []}
           />
         </View>
@@ -233,222 +209,38 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
             value={formData.description}
             onChange={handleInputChange('description')}
             required
-            placeholder=""
             resize="vertical"
             height="120px"
           />
         </View>
 
-        <View as="div" margin="large 0 0 0">
-          <Heading level="h2" margin="0 0 small 0">
-            {I18n.t('Configurations')}
-          </Heading>
+        <ConfigurationSection
+          formData={formData}
+          onChange={handleInputChange}
+          showErrors={showErrors}
+          errors={errors}
+        />
 
-          <View
-            as="div"
-            borderWidth="small"
-            borderColor="primary"
-            borderRadius="medium"
-            padding="0"
-            margin="0"
-          >
-            <div
-              style={{
-                background: 'linear-gradient(135deg, #7B5FB3 0%, #5585C7 100%)',
-                padding: '1rem',
-              }}
-            >
-              <Flex gap="small" alignItems="center">
-                <IconAiLine color="primary-inverse" />
-                <View>
-                  <Text color="primary-inverse" weight="bold" size="large">
-                    {I18n.t('Learning design')}
-                  </Text>
-                  <br />
-                  <Text color="primary-inverse" size="small">
-                    {I18n.t('What should students know and how should the AI behave?')}
-                  </Text>
-                </View>
-              </Flex>
-            </div>
-
-            <View as="div" padding="medium">
-              <FormFieldGroup description="" layout="stacked">
-                <TextArea
-                  data-testid="ai-experience-edit-facts-input"
-                  label={I18n.t('Facts students should know')}
-                  value={formData.facts}
-                  onChange={handleInputChange('facts')}
-                  placeholder={I18n.t(
-                    'Key facts or details the student is expected to recall (e.g., Wright brothers, 1903, Kitty Hawk).',
-                  )}
-                  resize="vertical"
-                  height="120px"
-                />
-
-                <TextArea
-                  data-testid="ai-experience-edit-learning-objective-input"
-                  label={I18n.t('Learning objectives')}
-                  value={formData.learning_objective}
-                  onChange={handleInputChange('learning_objective')}
-                  required
-                  placeholder={I18n.t(
-                    'What the student should be able to explain or demonstrate after this activity.',
-                  )}
-                  resize="vertical"
-                  height="120px"
-                  messages={
-                    showErrors && errors.learning_objective
-                      ? [{type: 'newError', text: errors.learning_objective}]
-                      : []
-                  }
-                />
-
-                <TextArea
-                  data-testid="ai-experience-edit-pedagogical-guidance-input"
-                  label={I18n.t('Pedagogical guidance')}
-                  value={formData.pedagogical_guidance}
-                  onChange={handleInputChange('pedagogical_guidance')}
-                  required
-                  placeholder={I18n.t(
-                    'Describe the role or style of the AI (e.g., friendly guide, strict examiner, storyteller).',
-                  )}
-                  resize="vertical"
-                  height="120px"
-                  messages={
-                    showErrors && errors.pedagogical_guidance
-                      ? [{type: 'newError', text: errors.pedagogical_guidance}]
-                      : []
-                  }
-                />
-              </FormFieldGroup>
-            </View>
-          </View>
-        </View>
-
-        <Flex justifyItems="end" margin="large 0 0 0" gap="small">
-          <Button data-testid="ai-experience-edit-cancel-button" onClick={handleCancel}>
-            {I18n.t('Cancel')}
-          </Button>
-          <Menu
-            placement="top"
-            trigger={<Button renderIcon={<IconArrowOpenDownLine />}>{I18n.t('Preview')}</Button>}
-          >
-            <Menu.Item
-              data-testid="ai-experience-edit-preview-item"
-              onClick={handlePreviewExperience}
-            >
-              {I18n.t('Preview experience')}
-            </Menu.Item>
-            <Menu.Item disabled>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  gap: '0.5rem',
-                  paddingRight: '1rem',
-                }}
-              >
-                <span style={{whiteSpace: 'nowrap'}}>{I18n.t('Run chat simulation')}</span>
-                <Pill color="info">{I18n.t('Coming soon')}</Pill>
-              </div>
-            </Menu.Item>
-          </Menu>
-          <Button
-            data-testid="ai-experience-save-as-draft-item"
-            type="submit"
-            color="primary"
-            interaction={isLoading ? 'disabled' : 'enabled'}
-          >
-            {isLoading ? I18n.t('Saving...') : I18n.t('Save as draft')}
-          </Button>
-        </Flex>
+        <FormActions
+          isLoading={isLoading}
+          onCancel={handleCancel}
+          onPreview={handlePreviewExperience}
+        />
       </form>
 
-      <Modal
+      <PreviewConfirmationModal
         open={showPreviewModal}
         onDismiss={() => setShowPreviewModal(false)}
-        size="small"
-        label={I18n.t('Preview AI experience')}
-        shouldCloseOnDocumentClick
-      >
-        <Modal.Header>
-          <CloseButton
-            data-testid="ai-experience-edit-preview-close-preview-confirmation-button"
-            placement="end"
-            offset="small"
-            onClick={() => setShowPreviewModal(false)}
-            screenReaderLabel={I18n.t('Close')}
-          />
-          <Heading>{I18n.t('Preview AI experience')}</Heading>
-        </Modal.Header>
-        <Modal.Body>
-          <Text>
-            {I18n.t(
-              'We will save this experience as a draft so you can preview it. Please confirm to proceed.',
-            )}
-          </Text>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            data-testid="ai-experience-edit-cancel-preview-confirmation-button"
-            onClick={() => setShowPreviewModal(false)}
-            margin="0 x-small 0 0"
-          >
-            {I18n.t('Cancel')}
-          </Button>
-          <Button
-            data-testid="ai-experience-edit-confirm-preview-confirmation-button"
-            onClick={handleConfirmPreview}
-            color="primary"
-          >
-            {I18n.t('Confirm')}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        onConfirm={handleConfirmPreview}
+      />
 
-      <Modal
+      <DeleteConfirmationModal
         open={showDeleteModal}
         onDismiss={() => setShowDeleteModal(false)}
-        size="small"
-        label={I18n.t('Delete AI Experience')}
-        shouldCloseOnDocumentClick
-      >
-        <Modal.Header>
-          <CloseButton
-            data-testid="ai-experience-edit-close-delete-confirm-button"
-            placement="end"
-            offset="small"
-            onClick={() => setShowDeleteModal(false)}
-            screenReaderLabel={I18n.t('Close')}
-          />
-          <Heading>{I18n.t('Delete AI Experience')}</Heading>
-        </Modal.Header>
-        <Modal.Body>
-          <Text>
-            {I18n.t('Are you sure you want to delete "%{title}"? This action cannot be undone.', {
-              title: formData.title || I18n.t('this AI experience'),
-            })}
-          </Text>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            data-testid="ai-experience-edit-cancel-delete-confirm-button"
-            onClick={() => setShowDeleteModal(false)}
-            margin="0 x-small 0 0"
-          >
-            {I18n.t('Cancel')}
-          </Button>
-          <Button
-            data-testid="ai-experience-edit-confirm-delete-confirm-button"
-            onClick={handleConfirmDelete}
-            color="danger"
-            interaction={isDeleting ? 'disabled' : 'enabled'}
-          >
-            {isDeleting ? I18n.t('Deleting...') : I18n.t('Delete')}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        onConfirm={handleConfirmDelete}
+        title={formData.title}
+        isDeleting={isDeleting}
+      />
     </View>
   )
 }
