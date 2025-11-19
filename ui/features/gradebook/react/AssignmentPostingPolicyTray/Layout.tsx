@@ -76,6 +76,8 @@ export default function Layout(props: LayoutProps) {
       postGradesAt: scheduledPost?.postGradesAt || null,
       scheduledPostMode,
     })
+
+    setScheduledReleaseErrorMessages({grades: [], comments: []})
   }, [scheduledPost])
 
   const automaticallyPostLabel = (

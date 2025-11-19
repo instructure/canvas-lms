@@ -161,7 +161,7 @@ describe ScheduledPost do
         expect { ScheduledPost.process_scheduled_posts }.not_to change(Delayed::Job, :count)
       end
 
-      it "processes posts within 30 minutes in the future" do
+      it "processes posts within 40 minutes in the future" do
         near_future = 20.minutes.from_now
         scheduled_post = ScheduledPost.create!(
           assignment: @assignment,
@@ -179,6 +179,118 @@ describe ScheduledPost do
         scheduled_post.reload
         expect(scheduled_post.post_comments_ran_at).not_to be_nil
         expect(scheduled_post.post_grades_ran_at).not_to be_nil
+      end
+
+      it "processes posts exactly 40 minutes in the future" do
+        near_future = 40.minutes.from_now
+        scheduled_post = ScheduledPost.create!(
+          assignment: @assignment,
+          post_policy: @post_policy,
+          root_account_id: @root_account.id,
+          post_comments_at: near_future,
+          post_grades_at: near_future
+        )
+
+        expect { ScheduledPost.process_scheduled_posts }.to change(Delayed::Job, :count).by(1)
+
+        job = Delayed::Job.last
+        expect(job.tag).to eq("Assignment#post_scheduled_submissions")
+
+        scheduled_post.reload
+        expect(scheduled_post.post_comments_ran_at).not_to be_nil
+        expect(scheduled_post.post_grades_ran_at).not_to be_nil
+      end
+
+      context "with ids parameter" do
+        before do
+          @course2 = Course.create!
+          @assignment2 = @course2.assignments.create!(title: "Test Assignment 2")
+          @post_policy2 = @course2.post_policies.create!(post_manually: true)
+        end
+
+        it "processes only the specified scheduled posts when ids are provided" do
+          scheduled_post1 = ScheduledPost.create!(
+            assignment: @assignment,
+            post_policy: @post_policy,
+            root_account_id: @root_account.id,
+            post_comments_at: past_time,
+            post_grades_at: past_time
+          )
+
+          scheduled_post2 = ScheduledPost.create!(
+            assignment: @assignment2,
+            post_policy: @post_policy2,
+            root_account_id: @root_account.id,
+            post_comments_at: past_time,
+            post_grades_at: past_time
+          )
+
+          expect { ScheduledPost.process_scheduled_posts(ids: [scheduled_post1.id]) }.to change(Delayed::Job, :count).by(1)
+
+          scheduled_post1.reload
+          scheduled_post2.reload
+
+          expect(scheduled_post1.post_comments_ran_at).not_to be_nil
+          expect(scheduled_post1.post_grades_ran_at).not_to be_nil
+          expect(scheduled_post2.post_comments_ran_at).to be_nil
+          expect(scheduled_post2.post_grades_ran_at).to be_nil
+        end
+
+        it "processes all eligible posts when ids parameter is not provided" do
+          scheduled_post1 = ScheduledPost.create!(
+            assignment: @assignment,
+            post_policy: @post_policy,
+            root_account_id: @root_account.id,
+            post_comments_at: past_time,
+            post_grades_at: past_time
+          )
+
+          scheduled_post2 = ScheduledPost.create!(
+            assignment: @assignment2,
+            post_policy: @post_policy2,
+            root_account_id: @root_account.id,
+            post_comments_at: past_time,
+            post_grades_at: past_time
+          )
+
+          expect { ScheduledPost.process_scheduled_posts }.to change(Delayed::Job, :count).by(2)
+
+          scheduled_post1.reload
+          scheduled_post2.reload
+
+          expect(scheduled_post1.post_comments_ran_at).not_to be_nil
+          expect(scheduled_post1.post_grades_ran_at).not_to be_nil
+          expect(scheduled_post2.post_comments_ran_at).not_to be_nil
+          expect(scheduled_post2.post_grades_ran_at).not_to be_nil
+        end
+
+        it "processes multiple specified scheduled posts when multiple ids are provided" do
+          scheduled_post1 = ScheduledPost.create!(
+            assignment: @assignment,
+            post_policy: @post_policy,
+            root_account_id: @root_account.id,
+            post_comments_at: past_time,
+            post_grades_at: past_time
+          )
+
+          scheduled_post2 = ScheduledPost.create!(
+            assignment: @assignment2,
+            post_policy: @post_policy2,
+            root_account_id: @root_account.id,
+            post_comments_at: past_time,
+            post_grades_at: past_time
+          )
+
+          expect { ScheduledPost.process_scheduled_posts(ids: [scheduled_post1.id, scheduled_post2.id]) }.to change(Delayed::Job, :count).by(2)
+
+          scheduled_post1.reload
+          scheduled_post2.reload
+
+          expect(scheduled_post1.post_comments_ran_at).not_to be_nil
+          expect(scheduled_post1.post_grades_ran_at).not_to be_nil
+          expect(scheduled_post2.post_comments_ran_at).not_to be_nil
+          expect(scheduled_post2.post_grades_ran_at).not_to be_nil
+        end
       end
     end
   end
@@ -291,6 +403,222 @@ describe ScheduledPost do
       scheduled_post.touch
       expect(scheduled_post.post_comments_ran_at).to eq(run_time)
       expect(scheduled_post.post_grades_ran_at).to eq(run_time)
+    end
+  end
+
+  describe "#enqueue_immediate_processing" do
+    before do
+      @post_policy.update!(post_manually: true)
+    end
+
+    let(:scheduled_post) do
+      ScheduledPost.create!(
+        assignment: @assignment,
+        post_policy: @post_policy,
+        root_account_id: @root_account.id,
+        post_comments_at: 1.hour.from_now,
+        post_grades_at: 2.hours.from_now
+      )
+    end
+
+    context "when creating a new record" do
+      it "enqueues processing when post_comments_at is less than 30 minutes away" do
+        immediate_time = 20.minutes.from_now
+
+        expect do
+          ScheduledPost.create!(
+            assignment: @assignment,
+            post_policy: @post_policy,
+            root_account_id: @root_account.id,
+            post_comments_at: immediate_time,
+            post_grades_at: 1.hour.from_now
+          )
+        end.to change(Delayed::Job, :count).by(1)
+
+        job = Delayed::Job.last
+        expect(job.handler).to include("process_scheduled_posts")
+        expect(job.handler).to include("ids:")
+      end
+
+      it "enqueues processing when post_grades_at is less than 30 minutes away" do
+        immediate_time = 25.minutes.from_now
+
+        expect do
+          ScheduledPost.create!(
+            assignment: @assignment,
+            post_policy: @post_policy,
+            root_account_id: @root_account.id,
+            post_comments_at: 1.hour.ago,
+            post_grades_at: immediate_time
+          )
+        end.to change(Delayed::Job, :count).by(1)
+
+        job = Delayed::Job.last
+        expect(job.handler).to include("process_scheduled_posts")
+        expect(job.handler).to include("ids:")
+      end
+
+      it "enqueues processing when both timestamps are less than 30 minutes away" do
+        immediate_time = 15.minutes.from_now
+
+        expect do
+          ScheduledPost.create!(
+            assignment: @assignment,
+            post_policy: @post_policy,
+            root_account_id: @root_account.id,
+            post_comments_at: immediate_time,
+            post_grades_at: immediate_time
+          )
+        end.to change(Delayed::Job, :count).by(1)
+
+        job = Delayed::Job.last
+        expect(job.handler).to include("process_scheduled_posts")
+        expect(job.handler).to include("ids:")
+      end
+
+      it "does not enqueue processing when timestamps are more than 30 minutes away" do
+        future_time = 45.minutes.from_now
+
+        expect do
+          ScheduledPost.create!(
+            assignment: @assignment,
+            post_policy: @post_policy,
+            root_account_id: @root_account.id,
+            post_comments_at: future_time,
+            post_grades_at: future_time
+          )
+        end.not_to change(Delayed::Job, :count)
+      end
+
+      it "enqueues processing when created with past timestamps" do
+        past_time = 5.minutes.ago
+
+        expect do
+          ScheduledPost.create!(
+            assignment: @assignment,
+            post_policy: @post_policy,
+            root_account_id: @root_account.id,
+            post_comments_at: past_time,
+            post_grades_at: past_time
+          )
+        end.to change(Delayed::Job, :count).by(1)
+
+        job = Delayed::Job.last
+        expect(job.handler).to include("process_scheduled_posts")
+        expect(job.handler).to include("ids:")
+      end
+    end
+
+    context "when updating an existing record" do
+      it "enqueues processing when post_comments_at is updated to less than 30 minutes away" do
+        immediate_time = 20.minutes.from_now
+
+        expect do
+          scheduled_post.update!(post_comments_at: immediate_time)
+        end.to change(Delayed::Job, :count).by(1)
+
+        job = Delayed::Job.last
+        expect(job.handler).to include("process_scheduled_posts")
+        expect(job.handler).to include("ids:")
+        expect(job.handler).to include(scheduled_post.id.to_s)
+      end
+
+      it "enqueues processing when post_grades_at is updated to less than 30 minutes away" do
+        new_scheduled_post = ScheduledPost.create!(
+          assignment: @assignment,
+          post_policy: @post_policy,
+          root_account_id: @root_account.id,
+          post_comments_at: 2.hours.ago,
+          post_grades_at: 2.hours.from_now
+        )
+
+        immediate_time = 25.minutes.from_now
+
+        expect do
+          new_scheduled_post.update!(post_grades_at: immediate_time)
+        end.to change(Delayed::Job, :count).by(1)
+
+        job = Delayed::Job.last
+        expect(job.handler).to include("process_scheduled_posts")
+        expect(job.handler).to include("ids:")
+        expect(job.handler).to include(new_scheduled_post.id.to_s)
+      end
+
+      it "enqueues processing when both timestamps are updated to less than 30 minutes away" do
+        immediate_time = 15.minutes.from_now
+
+        expect do
+          scheduled_post.update!(
+            post_comments_at: immediate_time,
+            post_grades_at: immediate_time
+          )
+        end.to change(Delayed::Job, :count).by(1)
+
+        job = Delayed::Job.last
+        expect(job.handler).to include("process_scheduled_posts")
+        expect(job.handler).to include("ids:")
+        expect(job.handler).to include(scheduled_post.id.to_s)
+      end
+
+      it "does not enqueue processing when post_comments_at is updated to more than 30 minutes away" do
+        future_time = 45.minutes.from_now
+
+        expect do
+          scheduled_post.update!(post_comments_at: future_time)
+        end.not_to change(Delayed::Job, :count)
+      end
+
+      it "does not enqueue processing when post_grades_at is updated to more than 30 minutes away" do
+        new_scheduled_post = ScheduledPost.create!(
+          assignment: @assignment,
+          post_policy: @post_policy,
+          root_account_id: @root_account.id,
+          post_comments_at: 2.hours.ago,
+          post_grades_at: 2.hours.from_now
+        )
+
+        future_time = 50.minutes.from_now
+
+        expect do
+          new_scheduled_post.update!(post_grades_at: future_time)
+        end.not_to change(Delayed::Job, :count)
+      end
+
+      it "does not enqueue processing when neither timestamp is updated" do
+        expect do
+          scheduled_post.touch
+        end.not_to change(Delayed::Job, :count)
+      end
+
+      it "does not enqueue processing when timestamps are not changed" do
+        expect do
+          scheduled_post.update!(
+            post_comments_at: scheduled_post.post_comments_at,
+            post_grades_at: scheduled_post.post_grades_at
+          )
+        end.not_to change(Delayed::Job, :count)
+      end
+
+      it "enqueues processing when post_comments_at is updated to exactly 30 minutes away" do
+        immediate_time = 30.minutes.from_now
+
+        expect do
+          scheduled_post.update!(post_comments_at: immediate_time)
+        end.to change(Delayed::Job, :count).by(1)
+      end
+
+      it "enqueues processing when post_comments_at is updated to past time" do
+        past_time = 5.minutes.ago
+
+        expect do
+          scheduled_post.update!(post_comments_at: past_time)
+        end.to change(Delayed::Job, :count).by(1)
+
+        job = Delayed::Job.last
+        expect(job.handler).to include("process_scheduled_posts")
+        expect(job.handler).to include("ids:")
+        expect(job.handler).to include(scheduled_post.id.to_s)
+      end
     end
   end
 end
