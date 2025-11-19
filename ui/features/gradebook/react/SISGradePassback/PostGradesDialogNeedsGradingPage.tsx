@@ -34,7 +34,7 @@ type Props = {
 class PostGradesDialogNeedsGradingPage extends React.Component<Props> {
   // @ts-expect-error
   onClickRow = assignment_id => {
-    window.location.href = `gradebook/speed_grader?assignment_id=${assignment_id}`
+    window.open(`gradebook/speed_grader?assignment_id=${assignment_id}`, '_blank', 'noopener')
   }
 
   render() {

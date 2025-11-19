@@ -22,6 +22,7 @@ import {pick} from 'lodash'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 import {OutcomeHeader, OutcomeHeaderProps} from '../OutcomeHeader'
 import {Outcome} from '../../../types/rollup'
+import {SortOrder, SortBy} from '../../../utils/constants'
 
 describe('OutcomeHeader', () => {
   const outcome: Outcome = {
@@ -40,6 +41,14 @@ describe('OutcomeHeader', () => {
   const defaultProps = (): OutcomeHeaderProps => {
     return {
       outcome,
+      sorting: {
+        sortOrder: SortOrder.ASC,
+        setSortOrder: jest.fn(),
+        sortBy: SortBy.SortableName,
+        setSortBy: jest.fn(),
+        sortOutcomeId: null,
+        setSortOutcomeId: jest.fn(),
+      },
     }
   }
 
@@ -48,21 +57,22 @@ describe('OutcomeHeader', () => {
     expect(getByText('outcome 1')).toBeInTheDocument()
   })
 
-  it('renders a menu with various sorting options', () => {
+  it('renders a menu with various sorting and display options', () => {
     const {getByText} = render(<OutcomeHeader {...defaultProps()} />)
     fireEvent.click(getByText('Sort Outcome Column'))
-    expect(getByText('Sort By')).toBeInTheDocument()
-    expect(getByText('Default').closest('[role=menuitemradio]')).toBeChecked()
-    expect(getByText('Ascending')).toBeInTheDocument()
-    expect(getByText('Descending')).toBeInTheDocument()
-    expect(getByText('Show Contributing Scores')).toBeInTheDocument()
-    expect(getByText('Outcome Description')).toBeInTheDocument()
+    expect(getByText('Sort')).toBeInTheDocument()
+    expect(getByText('Ascending scores')).toBeInTheDocument()
+    expect(getByText('Descending scores')).toBeInTheDocument()
+    expect(getByText('Display')).toBeInTheDocument()
+    expect(getByText('Hide Contributing Scores')).toBeInTheDocument()
+    expect(getByText('Outcome Info')).toBeInTheDocument()
+    expect(getByText('Show Outcome Distribution')).toBeInTheDocument()
   })
 
   it('renders the outcome description modal when option is selected', () => {
     const {getByText, getByTestId} = render(<OutcomeHeader {...defaultProps()} />)
     fireEvent.click(getByText('Sort Outcome Column'))
-    fireEvent.click(getByText('Outcome Description'))
+    fireEvent.click(getByText('Outcome Info'))
     expect(getByTestId('outcome-description-modal')).toBeInTheDocument()
   })
 })

@@ -25,6 +25,8 @@ import {Text} from '@instructure/ui-text'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {Pill} from '@instructure/ui-pill'
+import {Flex} from '@instructure/ui-flex'
 import '@canvas/rails-flash-notifications'
 
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
@@ -179,7 +181,16 @@ export default class CoursePickerTable extends React.Component {
     )
   }
 
+  renderStatusPill(course) {
+    if (course.concluded) {
+      return <Pill color="info">{I18n.t('Concluded')}</Pill>
+    }
+    return null
+  }
+
   renderRows() {
+    const shouldRenderStatusPill = !!window.ENV.FEATURES.ux_list_concluded_courses_in_bp
+
     return this.props.courses.map(course => (
       <Table.Row id={`course_${course.id}`} key={course.id} data-testid="bca-table__course-row">
         <Table.Cell>
@@ -196,7 +207,12 @@ export default class CoursePickerTable extends React.Component {
             }
           />
         </Table.Cell>
-        <Table.Cell>{this.renderCellText(course.original_name || course.name)}</Table.Cell>
+        <Table.Cell>
+          <Flex direction="column" gap="x-small">
+            <Flex.Item>{this.renderCellText(course.original_name || course.name)}</Flex.Item>
+            {shouldRenderStatusPill && <Flex.Item>{this.renderStatusPill(course)}</Flex.Item>}
+          </Flex>
+        </Table.Cell>
         <Table.Cell>{this.renderCellText(course.course_code)}</Table.Cell>
         <Table.Cell>{this.renderCellText(course.term.name)}</Table.Cell>
         <Table.Cell>{this.renderCellText(course.sis_course_id)}</Table.Cell>

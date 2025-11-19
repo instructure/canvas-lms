@@ -29,10 +29,10 @@ describe Switchman::Shard do
     context "with sharding" do
       specs_require_sharding
 
-      include_examples "#activate!"
+      it_behaves_like "#activate!"
     end
 
-    include_examples "#activate!"
+    it_behaves_like "#activate!"
   end
 
   describe "maintenance_windows" do

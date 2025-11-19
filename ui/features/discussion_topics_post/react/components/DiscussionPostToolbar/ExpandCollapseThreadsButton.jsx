@@ -55,11 +55,16 @@ export const ExpandCollapseThreadsButton = props => {
       display="block"
       onClick={handleExpandCollapseClick}
       renderIcon={
-        props.expandedLocked || props.isExpanded ? <IconCollapseLine /> : <IconExpandLine />
+        props.expandedLocked || props.isExpanded ? (
+          <IconCollapseLine data-testid="collapse-icon" />
+        ) : (
+          <IconExpandLine data-testid="expand-icon" />
+        )
       }
       data-testid="ExpandCollapseThreads-button"
       data-action-state={props.isExpanded ? 'collapseButton' : 'expandButton'}
       disabled={props.disabled || false}
+      aria-expanded={props.isExpanded ? 'true' : 'false'}
     >
       {props.showText ? buttonText : null}
     </Button>

@@ -32,7 +32,7 @@ def calcBundleSizes() {
       continue
     }
 
-    reportToSplunk('webpack_bundle_size', [
+    reportBuildLog('webpack_bundle_size', [
       'fileName': records[0],
       'fileSize': records[1],
       'version': '3a',

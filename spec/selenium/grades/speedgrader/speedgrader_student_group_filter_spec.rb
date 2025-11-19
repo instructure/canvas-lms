@@ -73,6 +73,12 @@ shared_examples "filter SpeedGrader by student group" do |ff_enabled|
     @course.update!(filter_speed_grader_by_student_group: true)
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
+  end
+
   context "on assignments page" do
     before do
       user_session(@teacher)

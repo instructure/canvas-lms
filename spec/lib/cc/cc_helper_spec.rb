@@ -138,13 +138,13 @@ describe CC::CCHelper do
       context "with precise_link_replacements FF OFF" do
         before { Account.site_admin.disable_feature! :precise_link_replacements }
 
-        include_examples "media_attachments_iframes examples"
+        it_behaves_like "media_attachments_iframes examples"
       end
 
       context "with precise_link_replacements FF ON" do
         before { Account.site_admin.enable_feature! :precise_link_replacements }
 
-        include_examples "media_attachments_iframes examples"
+        it_behaves_like "media_attachments_iframes examples"
       end
     end
 

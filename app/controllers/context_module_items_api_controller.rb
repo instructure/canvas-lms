@@ -409,38 +409,72 @@ class ContextModuleItemsApiController < ApplicationController
   #       -d 'module_item[iframe][height]=200'
   #
   # @returns ModuleItem
+  PAGE_TYPES = ["Page", "WikiPage"].freeze
+
   def create
     @module = @context.context_modules.not_deleted.find(params[:module_id])
     if authorized_action(@module, @current_user, :update)
-      return render json: { message: "missing module item parameter" }, status: :bad_request unless params[:module_item]
+      return render json: { message: "missing module item parameter" }, status: :bad_request unless params[:module_item] || params[:module_items]
 
-      item_params = params[:module_item].slice(:title, :type, :indent, :new_tab, :position)
-      item_params[:id] = params[:module_item][:content_id]
-      if ["Page", "WikiPage"].include?(item_params[:type])
-        if (page_url = params[:module_item][:page_url])
-          if (wiki_page = @context.wiki_pages.not_deleted.where(url: page_url).first)
-            item_params[:id] = wiki_page.id
-          else
-            return render json: { message: "invalid page_url parameter" }, status: :bad_request
+      module_items = params[:module_items] || [params[:module_item]]
+      created_items = []
+      errors = []
+
+      ContextModule.transaction do
+        module_items.each_with_index do |module_item_params, index|
+          item_params = module_item_params.slice(:title, :type, :indent, :new_tab, :position)
+          item_params[:id] = module_item_params[:content_id]
+
+          if PAGE_TYPES.include?(item_params[:type])
+            if (page_url = module_item_params[:page_url])
+              if (wiki_page = @context.wiki_pages.not_deleted.where(url: page_url).first)
+                item_params[:id] = wiki_page.id
+              else
+                errors << { index:, message: "invalid page_url parameter" }
+                next
+              end
+            else
+              errors << { index:, message: "missing page_url parameter" }
+              next
+            end
           end
-        else
-          return render json: { message: "missing page_url parameter" }, status: :bad_request
+
+          item_params[:url] = module_item_params[:external_url]
+
+          if (iframe = module_item_params[:iframe])
+            item_params[:link_settings] = { selection_width: iframe[:width], selection_height: iframe[:height] }
+          end
+
+          @tag = @module.add_item(item_params, nil, resolve_conflicts: true)
+          if @tag&.persisted?
+            original_params = params[:module_item]
+            params[:module_item] = module_item_params
+            if set_position && set_completion_requirement
+              created_items << module_item_json(@tag, @current_user, session, @module, nil)
+            elsif @tag.errors.any?
+              errors << { index:, message: @tag.errors.full_messages.join(", ") }
+            end
+            params[:module_item] = original_params
+          elsif @tag
+            errors << { index:, message: @tag.errors.full_messages.join(", ") }
+          else
+            errors << { index:, message: t(:invalid_content, "Could not find content") }
+          end
         end
+
+        @module.touch if created_items.any?
       end
 
-      item_params[:url] = params[:module_item][:external_url]
-
-      if (iframe = params[:module_item][:iframe])
-        item_params[:link_settings] = { selection_width: iframe[:width], selection_height: iframe[:height] }
-      end
-
-      if (@tag = @module.add_item(item_params, nil, resolve_conflicts: true)) && set_position && set_completion_requirement
-        @module.touch
-        render json: module_item_json(@tag, @current_user, session, @module, nil)
+      if params[:module_items]
+        response = { created: created_items }
+        response[:errors] = errors if errors.any?
+        render json: response
+      elsif created_items.any?
+        render json: created_items.first
       elsif @tag
         render json: @tag.errors, status: :bad_request
       else
-        render status: :bad_request, json: { message: t(:invalid_content, "Could not find content") }
+        render json: { message: errors.first[:message] }, status: :bad_request
       end
     end
   end

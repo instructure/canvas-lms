@@ -309,4 +309,56 @@ describe('SpeedGrader Comment Rendering', () => {
     const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
     expect(renderedComment.find('.author_name').text().trim()).toBe('Grader 1')
   })
+
+  describe('group assignment comment filtering', () => {
+    it('does not render comments without group_comment_id when GROUP_GRADING_MODE is true and HAS_GROUPS is true', () => {
+      window.jsonData.GROUP_GRADING_MODE = true
+      window.jsonData.HAS_GROUPS = true
+
+      const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0]
+      const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
+
+      expect(renderedComment).toBeUndefined()
+    })
+
+    it('renders comments without group_comment_id when GROUP_GRADING_MODE is true but HAS_GROUPS is false', () => {
+      window.jsonData.GROUP_GRADING_MODE = true
+      window.jsonData.HAS_GROUPS = false
+
+      const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0]
+      const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
+
+      expect(renderedComment).toBeDefined()
+      expect(renderedComment.find('span.comment').text()).toBe('test')
+    })
+
+    it('renders comments without group_comment_id when GROUP_GRADING_MODE is false', () => {
+      window.jsonData.GROUP_GRADING_MODE = false
+      window.jsonData.HAS_GROUPS = false
+
+      const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0]
+      const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
+
+      expect(renderedComment).toBeDefined()
+      expect(renderedComment.find('span.comment').text()).toBe('test')
+    })
+
+    it('renders comments with group_comment_id when GROUP_GRADING_MODE is true and HAS_GROUPS is true', () => {
+      window.jsonData.GROUP_GRADING_MODE = true
+      window.jsonData.HAS_GROUPS = true
+
+      const commentWithGroupId = {
+        ...SpeedGrader.EG.currentStudent.submission.submission_comments[0],
+        group_comment_id: '123',
+      }
+
+      const renderedComment = SpeedGrader.EG.renderComment(
+        commentWithGroupId,
+        commentRenderingOptions,
+      )
+
+      expect(renderedComment).toBeDefined()
+      expect(renderedComment.find('span.comment').text()).toBe('test')
+    })
+  })
 })

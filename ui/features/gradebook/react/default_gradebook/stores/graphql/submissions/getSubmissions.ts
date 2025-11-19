@@ -241,7 +241,7 @@ export const getSubmissions = async (
   const query = buildGraphQLQuery(
     [courseNode],
     'query',
-    'getSubmissions',
+    'Gradebook__GetSubmissions',
     '$courseId: ID!, $states: [SubmissionState!]',
   )
   const data = await executeQuery<GetSubmissionsResult>(

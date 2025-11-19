@@ -110,6 +110,7 @@ describe('TeacherSavedView', () => {
       const assignment = createMockAssignment({
         peerReviews: {
           enabled: false,
+          count: 0,
         },
       })
 
@@ -123,6 +124,7 @@ describe('TeacherSavedView', () => {
       const assignment = createMockAssignment({
         peerReviews: {
           enabled: true,
+          count: 2,
         },
       })
 
@@ -135,6 +137,7 @@ describe('TeacherSavedView', () => {
       const assignment = createMockAssignment({
         peerReviews: {
           enabled: true,
+          count: 2,
         },
       })
 
@@ -164,6 +167,7 @@ describe('TeacherSavedView', () => {
         description: 'This is the assignment description',
         peerReviews: {
           enabled: false,
+          count: 0,
         },
       })
 
@@ -178,6 +182,7 @@ describe('TeacherSavedView', () => {
         description: 'Another description',
         peerReviews: {
           enabled: true,
+          count: 2,
         },
       })
 
@@ -191,6 +196,7 @@ describe('TeacherSavedView', () => {
         description: 'Description inside tabs',
         peerReviews: {
           enabled: true,
+          count: 2,
         },
       })
 
@@ -205,6 +211,7 @@ describe('TeacherSavedView', () => {
         description: '',
         peerReviews: {
           enabled: false,
+          count: 0,
         },
       })
 

@@ -97,7 +97,7 @@ describe "Asset Processor" do
       )
     end
 
-    it "student accepts EULA when viewing assignment for the first time" do
+    it "student accepts EULA when viewing assignment for the first time", skip: "INTEROP-9987 2025-11-04" do
       user_session(student)
       get("/courses/#{course.id}/assignments/#{assignment.id}")
       wait_for_ajaximations

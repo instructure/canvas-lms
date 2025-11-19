@@ -90,7 +90,11 @@ export const handleSpeedGrader = (
     content?.type?.toLowerCase().includes('assignment') ||
     content?.type?.toLowerCase().includes('quiz')
   ) {
-    window.location.href = `/courses/${courseId}/gradebook/speed_grader?assignment_id=${content._id}`
+    window.open(
+      `/courses/${courseId}/gradebook/speed_grader?assignment_id=${content._id}`,
+      '_blank',
+      'noopener',
+    )
   }
   if (setIsMenuOpen) {
     setIsMenuOpen(false)

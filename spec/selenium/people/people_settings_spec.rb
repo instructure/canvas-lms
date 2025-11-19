@@ -219,7 +219,7 @@ describe "course people" do
       f('a[data-event="editSections"]', cog).click
       wait_for_ajaximations
       yield
-      f(".ui-dialog-buttonpane .btn-primary").click
+      f("[data-testid='save-button']").click
       wait_for_ajaximations
     end
 

@@ -31,7 +31,7 @@ describe "new_files_added" do
   let(:message_data) { { data: { count: 5, display_names: file_names } } }
   let(:notification_name) { :new_files_added }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 
   describe ".email" do
     let(:path_type) { :email }

@@ -107,4 +107,36 @@ describe('ScopesGroup', () => {
 
     expect(screen.getByRole('button', {name: new RegExp(baseProps.name, 'i')})).toBeInTheDocument()
   })
+
+  describe('expanded prop', () => {
+    it('renders collapsed by default when expanded is not provided', () => {
+      renderScopesGroup()
+
+      // The toggle details should be collapsed - individual scopes should not be visible
+      expect(screen.queryByLabelText(/enable scope/i)).not.toBeInTheDocument()
+    })
+
+    it('renders collapsed when expanded is false', () => {
+      renderScopesGroup({expanded: false})
+
+      // The toggle details should be collapsed
+      expect(screen.queryByLabelText(/enable scope/i)).not.toBeInTheDocument()
+    })
+
+    it('renders expanded when expanded is true', () => {
+      renderScopesGroup({expanded: true})
+
+      // The toggle details should be expanded - individual scopes should be visible
+      expect(screen.getByLabelText(/enable scope/i)).toBeInTheDocument()
+    })
+
+    it('shows individual scopes when expanded is true', () => {
+      renderScopesGroup({expanded: true})
+
+      // Both scopes should be visible
+      const checkboxes = screen.getAllByRole('checkbox')
+      // Should have group checkbox + 2 scope checkboxes
+      expect(checkboxes.length).toBeGreaterThanOrEqual(3)
+    })
+  })
 })

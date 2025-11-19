@@ -150,6 +150,9 @@ module SectionTabHelper
         if context.elementary_homeroom_course?
           k << "homeroom_course"
         end
+        if context.a11y_checker_enabled?
+          k << "a11y_checker"
+        end
       end
 
       k.cache_key

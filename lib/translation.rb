@@ -17,8 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "aws-sdk-translate"
-require "cld"
-require "pragmatic_segmenter"
 require "nokogiri"
 
 module Translation
@@ -42,7 +40,6 @@ module Translation
 
   module TranslationType
     AWS_TRANSLATE = :aws_translate
-    SAGEMAKER = :sagemaker
     CEDAR = :cedar
     DISABLED = nil
   end
@@ -65,8 +62,6 @@ module Translation
       case current_translation_provider_type(flags)
       when TranslationType::AWS_TRANSLATE
         AwsTranslator.languages
-      when TranslationType::SAGEMAKER
-        SagemakerTranslator.languages
       when TranslationType::CEDAR
         CedarTranslator.languages
       else
@@ -79,10 +74,9 @@ module Translation
     def current_translation_provider_type(flags)
       return nil unless flags.key?(:translation) && flags[:translation]
 
-      return TranslationType::CEDAR if flags[:cedar_translation]
-      return TranslationType::AWS_TRANSLATE if flags[:ai_translation_improvements]
+      return TranslationType::AWS_TRANSLATE if flags[:ai_translation_improvements] && !flags[:cedar_translation]
 
-      TranslationType::SAGEMAKER
+      TranslationType::CEDAR
     end
 
     def translation_client(flags)
@@ -91,8 +85,6 @@ module Translation
         case provider_type
         when TranslationType::AWS_TRANSLATE
           AwsTranslator.new
-        when TranslationType::SAGEMAKER
-          SagemakerTranslator.new
         when TranslationType::CEDAR
           CedarTranslator.new
         else

@@ -59,12 +59,13 @@ class AttachmentAssociation < ActiveRecord::Base
   def self.verify_access(location_param, attachment, user, session = nil)
     return false if attachment.currently_locked
 
-    splat = location_param.split("_")
-    return false unless splat.length >= 2
+    context_type, _, context_id = location_param.rpartition("_")
+    return false unless context_type && context_id
 
-    context_id = splat.pop
-    context_type = splat.join("_").camelize
+    context_type = context_type.camelize
+    context_id = Shard.integral_id_for(context_id)
     context_concern = nil
+    permission_context = nil
 
     if context_type == "CourseSyllabus"
       context_concern = "syllabus_body"
@@ -75,17 +76,33 @@ class AttachmentAssociation < ActiveRecord::Base
       context_type = "Quizzes::QuizQuestion"
     elsif context_type == "QuizSubmission"
       context_type = "Quizzes::QuizSubmission"
+      submission = Quizzes::QuizSubmission.find_by(id: context_id)
+      return false unless submission&.quiz_data.present?
+
+      if (attachment.context_type == "Quizzes::QuizSubmission" && context_id == attachment.context_id) ||
+         (attachment.context_type == "AssessmentQuestion" && submission.quiz_data.pluck("assessment_question_id").include?(attachment.context_id))
+        permission_context = submission
+      end
+    elsif context_type == "AssessmentQuestion"
+      return false unless attachment.context_type == "AssessmentQuestion" && context_id == attachment.context_id
+
+      permission_context = AssessmentQuestion.find_by(id: context_id)
     end
 
-    association = Shard.shard_for(context_id).activate do
-      AttachmentAssociation.find_by(attachment:, context_id:, context_type:, context_concern:)
+    unless permission_context
+      association = Shard.shard_for(context_id).activate do
+        AttachmentAssociation.find_by(attachment:, context_id:, context_type:, context_concern:)
+      end
+
+      permission_context = if association&.context.is_a?(Quizzes::QuizQuestion)
+                             association.context.quiz
+                           else
+                             association&.context
+                           end
     end
+    return false unless permission_context
 
-    return false unless association
-
-    feature_is_on = association.context.attachment_associations_enabled?
-
-    feature_is_on && association.context&.access_for_attachment_association?(user, session, association)
+    permission_context.attachment_associations_enabled? && permission_context.access_for_attachment_association?(user, session, association)
   end
 
   def self.copy_associations(source, targets, source_context_concern = nil, target_context_concern = nil)

@@ -25,11 +25,13 @@ import '@canvas/rails-flash-notifications'
 import {Text} from '@instructure/ui-text'
 import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
-import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {IconXSolid} from '@instructure/ui-icons'
+import {Pill} from '@instructure/ui-pill'
+import {Flex} from '@instructure/ui-flex'
 
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import FocusManager from '../focusManager'
@@ -150,14 +152,28 @@ export default class AssociationsTable extends React.Component {
     )
   }
 
+  renderStatusPill(course) {
+    if (course.concluded) {
+      return <Pill color="info">{I18n.t('Concluded')}</Pill>
+    }
+    return null
+  }
+
   renderRows(associations) {
+    const shouldRenderStatusPill = !!window.ENV.FEATURES.ux_list_concluded_courses_in_bp
+
     return associations.map(course => {
       const focusNode = this.props.focusManager.allocateNext()
       const label = I18n.t('Remove course association %{name}', {name: course.name})
 
       return (
         <Table.Row id={`course_${course.id}`} key={course.id} data-testid="associations-course-row">
-          <Table.Cell>{this.renderCellText(course.name)}</Table.Cell>
+          <Table.Cell>
+            <Flex direction="column" gap="x-small">
+              <Flex.Item>{this.renderCellText(course.name)}</Flex.Item>
+              {shouldRenderStatusPill && <Flex.Item>{this.renderStatusPill(course)}</Flex.Item>}
+            </Flex>
+          </Table.Cell>
           <Table.Cell>{this.renderCellText(course.course_code)}</Table.Cell>
           <Table.Cell>{this.renderCellText(course.term.name)}</Table.Cell>
           <Table.Cell>{this.renderCellText(course.sis_course_id)}</Table.Cell>
@@ -187,13 +203,20 @@ export default class AssociationsTable extends React.Component {
   }
 
   renderToBeRemovedRows(associations) {
+    const shouldRenderStatusPill = !!window.ENV.FEATURES.ux_list_concluded_courses_in_bp
+
     return associations.map(course => {
       const focusNode = this.props.focusManager.allocateNext()
       const label = I18n.t('Undo remove course association %{name}', {name: course.name})
 
       return (
         <Table.Row key={course.id} data-testid="associations-course-row">
-          <Table.Cell>{this.renderCellText(course.name)}</Table.Cell>
+          <Table.Cell>
+            <Flex direction="column" gap="x-small">
+              <Flex.Item>{this.renderCellText(course.name)}</Flex.Item>
+              {shouldRenderStatusPill && <Flex.Item>{this.renderStatusPill(course)}</Flex.Item>}
+            </Flex>
+          </Table.Cell>
           <Table.Cell>{this.renderCellText(course.course_code)}</Table.Cell>
           <Table.Cell>{this.renderCellText(course.term.name)}</Table.Cell>
           <Table.Cell>{this.renderCellText(course.sis_course_id)}</Table.Cell>

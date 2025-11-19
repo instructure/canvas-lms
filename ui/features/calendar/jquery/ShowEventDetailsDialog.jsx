@@ -146,6 +146,7 @@ export default class ShowEventDetailsDialog {
       isRepeating: !!event.calendarEvent?.series_uuid,
       isSeriesHead: !!event.calendarEvent?.series_head,
       eventType: event.eventType,
+      isAppointmentGroup: event.isAppointmentGroupEvent() && !event.calendarEvent?.parent_event_id,
     })
   }
 

@@ -29,7 +29,7 @@ class PeerReview::DateOverriderService < ApplicationService
 
     @peer_review_sub_assignment = peer_review_sub_assignment
     @assignment = @peer_review_sub_assignment&.parent_assignment
-    @overrides = overrides || []
+    @overrides = format_overrides(overrides || [])
   end
 
   def call
@@ -44,6 +44,56 @@ class PeerReview::DateOverriderService < ApplicationService
     validate_feature_enabled(@assignment)
     validate_peer_reviews_enabled(@assignment)
     validate_peer_review_sub_assignment_exists(@assignment)
+  end
+
+  def format_overrides(overrides)
+    overrides.filter_map do |override|
+      if needs_formatting?(override)
+        format_api_override(override)
+      else
+        override
+      end
+    end
+  end
+
+  def needs_formatting?(override)
+    override[:course_section_id].present? ||
+      override[:group_id].present? ||
+      override[:course_id].present? ||
+      (override[:student_ids].present? && override[:set_type].blank?)
+  end
+
+  # Overrides coming from the API use different keys to specify the set_type and set_id
+  # Course Section Override: { course_section_id: 5 } instead of { set_type: "CourseSection", set_id: 5 }
+  # Group Override: { group_id: 10 } instead of { set_type: "Group", set_id: 10 }
+  # Course Override: { course_id: 3 } instead of { set_type: "Course", set_id: 3 }
+  # Adhoc Override: { student_ids: [1,2,3] } instead of { set_type: "ADHOC", student_ids: [1,2,3] }
+  # This method reformats such overrides to match the format expected by the service layer
+  def format_api_override(override)
+    formatted_override = {}
+
+    formatted_override[:id] = override[:id].to_i if override[:id].present?
+    formatted_override[:due_at] = override[:due_at] if override.key?(:due_at)
+    formatted_override[:unlock_at] = override[:unlock_at] if override.key?(:unlock_at)
+    formatted_override[:lock_at] = override[:lock_at] if override.key?(:lock_at)
+    formatted_override[:unassign_item] = override[:unassign_item] if override.key?(:unassign_item)
+
+    if override[:course_section_id].present?
+      formatted_override[:set_type] = "CourseSection"
+      formatted_override[:set_id] = override[:course_section_id].to_i
+    elsif override[:student_ids].present?
+      student_ids = Array(override[:student_ids]).map(&:to_i)
+      formatted_override[:set_type] = "ADHOC"
+      formatted_override[:student_ids] = student_ids
+    elsif override[:group_id].present?
+      formatted_override[:set_type] = "Group"
+      formatted_override[:set_id] = override[:group_id].to_i
+    elsif override[:course_id].present?
+      formatted_override[:set_type] = "Course"
+      formatted_override[:set_id] = override[:course_id].to_i
+    end
+
+    formatted_override
   end
 
   def create_or_update_peer_review_overrides

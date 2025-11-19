@@ -58,4 +58,50 @@ describe Accessibility::Rules::AdjacentLinksRule do
       expect(Accessibility::Rules::AdjacentLinksRule.new.form(nil).label).to eq("Merge links")
     end
   end
+
+  describe "#issue_preview" do
+    let(:rule) { Accessibility::Rules::AdjacentLinksRule.new }
+
+    context "when there are adjacent links with same href" do
+      it "returns HTML preview including both links" do
+        input_html = '<div><a href="https://example.com">Link 1</a><a href="https://example.com">Link 2</a></div>'
+        doc = Nokogiri::HTML::DocumentFragment.parse(input_html)
+        extend_nokogiri_with_dom_adapter(doc)
+        first_link = doc.at_css("a")
+
+        preview = rule.issue_preview(first_link)
+
+        expect(preview).to include("Link 1")
+        expect(preview).to include("Link 2")
+        expect(preview).to include('href="https://example.com"')
+      end
+    end
+
+    context "when there are intermediate nodes between links" do
+      it "includes intermediate nodes in the preview" do
+        input_html = '<div><a href="https://example.com">Link 1</a> - <a href="https://example.com">Link 2</a></div>'
+        doc = Nokogiri::HTML::DocumentFragment.parse(input_html)
+        extend_nokogiri_with_dom_adapter(doc)
+        first_link = doc.at_css("a")
+
+        preview = rule.issue_preview(first_link)
+
+        expect(preview).to include("Link 1")
+        expect(preview).to include(" - ")
+        expect(preview).to include("Link 2")
+      end
+    end
+
+    context "when the element does not have an adjacent link issue" do
+      it "returns nil" do
+        input_html = '<div><a href="https://example.com">Link 1</a><a href="https://other.com">Link 2</a></div>'
+        doc = Nokogiri::HTML::DocumentFragment.parse(input_html)
+        extend_nokogiri_with_dom_adapter(doc)
+        first_link = doc.at_css("a")
+        preview = rule.issue_preview(first_link)
+
+        expect(preview).to be_nil
+      end
+    end
+  end
 end

@@ -621,18 +621,20 @@ window.modules = (function () {
         const $assignToMenuItem = $item.find('.assign-to-option')
         if ($assignToMenuItem.length) {
           $assignToMenuItem.removeClass('hidden')
-          const $a = $assignToMenuItem.find('a')
-          $a.attr('data-item-id', data.id)
-          $a.attr('data-item-name', data.title)
-          $a.attr(
+          const $dataSpan = $assignToMenuItem.find('.assign-to-link-resources')
+          $dataSpan.attr('data-item-id', data.id)
+          $dataSpan.attr('data-item-name', data.title)
+          $dataSpan.attr(
             'data-item-type',
             data.quiz_lti ? 'lti-quiz' : data.content_type == 'Quizzes::Quiz' ? 'quiz' : data.type,
           )
-          $a.attr('data-item-context-id', data.context_id)
-          $a.attr('data-item-context-type', data.context_type)
-          $a.attr('data-item-content-id', data.content_id)
-          $a.attr('data-item-has-assignment', data.assignment_id ? 'true' : 'false')
-          $a.attr('data-item-has-assignment-checkpoint', data.is_checkpointed ? 'true' : 'false')
+          $dataSpan.attr('data-item-context-id', data.context_id)
+          $dataSpan.attr('data-item-content-id', data.content_id)
+          $dataSpan.attr('data-item-has-assignment', data.assignment_id ? 'true' : 'false')
+          $dataSpan.attr(
+            'data-item-has-assignment-checkpoint',
+            data.is_checkpointed ? 'true' : 'false',
+          )
         }
       }
 
@@ -1739,6 +1741,7 @@ modules.initModuleManagement = async function (duplicate) {
             $module.find('.context_module_items.ui-sortable').sortable('enable').sortable('refresh')
             initNewItemPublishButton($item, data.content_tag)
             initNewItemDirectShare($item, data.content_tag)
+            initNewItemMoveHandler($item)
             modules.updateAssignmentData()
             modules.updateEstimatedDurations()
 
@@ -1780,6 +1783,7 @@ modules.initModuleManagement = async function (duplicate) {
           const $item = modules.addItemToModule($module, data.content_tag)
           initNewItemPublishButton($item, data.content_tag)
           initNewItemDirectShare($item, data.content_tag)
+          initNewItemMoveHandler($item)
 
           modules.updateAssignmentData()
           modules.updateEstimatedDurations()
@@ -2092,38 +2096,8 @@ if (!ENV.FEATURE_MODULES_PERF || ENV.IS_STUDENT) {
 }
 
 // Post process lazy loaded module items ----------------------
-function initContextModuleItems(moduleId) {
-  const $module = moduleId ? $(`#context_module_${moduleId}`) : $('#context_modules')
-
-  if (ENV.IS_STUDENT) {
-    $module.find('.context_module_item .ig-row').addClass('student-view')
-  }
-
-  $module.find('.context_module_item').each((_i, $item) => {
-    modules.evaluateItemCyoe($item)
-  })
-
-  $module.find('.publish-icon').each((_index, el) => {
-    const $el = $(el)
-    if ($el.data('id')) {
-      const view = initPublishButton($el)
-      overrideModel({}, modules.relock_modules_dialog, view.model, view)
-    }
-  })
-
-  const opts = modules.sortable_module_options
-  opts.update = modules.updateModuleItemPositions
-  $module.find('.context_module_items').sortable(opts)
-  // NOTE: This takes an extraordinary amount of time, and without it
-  //       I have not seen any issues with drag-and-drop ordering
-  //       of module items
-  // $('#context_modules.ui-sortable').sortable('refresh')
-  // $('#context_modules .context_module .context_module_items.ui-sortable').each(function () {
-  //   $(this).sortable('refresh')
-  //   $(this).sortable('option', 'connectWith', '.context_module_items')
-  // })
-
-  $module.find('.move_module_item_link').on('click keyclick', function (event) {
+function initNewItemMoveHandler($item) {
+  $item.find('.move_module_item_link').on('click keyclick', function (event) {
     event.preventDefault()
 
     const currentItem = $(this).parents('.context_module_item')[0]
@@ -2180,6 +2154,34 @@ function initContextModuleItems(moduleId) {
     }
 
     renderTray(moveTrayProps, document.getElementById('not_right_side'))
+  })
+}
+
+function initContextModuleItems(moduleId) {
+  const $module = moduleId ? $(`#context_module_${moduleId}`) : $('#context_modules')
+
+  if (ENV.IS_STUDENT) {
+    $module.find('.context_module_item .ig-row').addClass('student-view')
+  }
+
+  $module.find('.context_module_item').each((_i, $item) => {
+    modules.evaluateItemCyoe($item)
+  })
+
+  $module.find('.publish-icon').each((_index, el) => {
+    const $el = $(el)
+    if ($el.data('id')) {
+      const view = initPublishButton($el)
+      overrideModel({}, modules.relock_modules_dialog, view.model, view)
+    }
+  })
+
+  const opts = modules.sortable_module_options
+  opts.update = modules.updateModuleItemPositions
+  $module.find('.context_module_items').sortable(opts)
+
+  $module.find('.context_module_item').each(function () {
+    initNewItemMoveHandler($(this))
   })
 
   if (ENV.FEATURE_MODULES_PERF) {
@@ -2692,13 +2694,18 @@ function initContextModules() {
   $(document).on('click keyclick', '.module-item-assign-to-link', function (event) {
     event.preventDefault()
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
-    const moduleItemId = event.target.getAttribute('data-item-id')
-    const moduleItemName = event.target.getAttribute('data-item-name')
-    const moduleItemType = event.target.getAttribute('data-item-type')
-    const courseId = event.target.getAttribute('data-item-context-id')
-    const moduleItemContentId = event.target.getAttribute('data-item-content-id')
-    const moduleItemHasAssignment = event.target.getAttribute('data-item-has-assignment')
-    const moduleItemHasCheckpoint = event.target.getAttribute('data-item-has-assignment-checkpoint')
+
+    // Get data from the inner span with translate="no"
+    const $link = $(event.target).closest('.module-item-assign-to-link')
+    const $dataSpan = $link.find('.assign-to-link-resources')
+
+    const moduleItemId = $dataSpan.attr('data-item-id')
+    const moduleItemName = $dataSpan.attr('data-item-name')
+    const moduleItemType = $dataSpan.attr('data-item-type')
+    const courseId = $dataSpan.attr('data-item-context-id')
+    const moduleItemContentId = $dataSpan.attr('data-item-content-id')
+    const moduleItemHasAssignment = $dataSpan.attr('data-item-has-assignment')
+    const moduleItemHasCheckpoint = $dataSpan.attr('data-item-has-assignment-checkpoint')
 
     const itemProps = parseModuleItemElement(
       document.getElementById(`context_module_item_${moduleItemId}`),

@@ -142,7 +142,7 @@ describe CalendarEventsController do
         expect(@controller.js_env.dig(:conferences, :conference_types).length).to eq 1
       end
 
-      include_examples "accepts web_conference" do
+      it_behaves_like "accepts web_conference" do
         let(:make_request) do
           ->(params) { get "new", params: { course_id: @course.id, web_conference: params } }
         end
@@ -171,7 +171,7 @@ describe CalendarEventsController do
       expect(assigns[:event].title).to eql("some event")
     end
 
-    include_examples "accepts web_conference" do
+    it_behaves_like "accepts web_conference" do
       let(:make_request) do
         lambda do |params|
           post "create",
@@ -254,7 +254,7 @@ describe CalendarEventsController do
       assert_status(302)
     end
 
-    include_examples "accepts web_conference" do
+    it_behaves_like "accepts web_conference" do
       let(:make_request) do
         lambda do |params|
           put "update",

@@ -232,6 +232,20 @@ blueprint_support_sync_for_folder_movement_to_root_folder:
     development:
       state: allowed_on
 
+syllabus_versioning:
+  state: hidden
+  display_name: Course Syllabus Versioning
+  description: |-
+    Enables full version history tracking for course syllabus content using SimplyVersioned.
+    Provides complete audit trail, recovery capabilities, and API access for syllabus changes.
+    Includes UI for viewing version history and reverting to previous versions.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
 widget_dashboard:
   state: hidden
   display_name: Widgets for Dashboard

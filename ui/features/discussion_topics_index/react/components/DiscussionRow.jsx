@@ -653,6 +653,8 @@ class DiscussionRow extends Component {
             href={`gradebook/speed_grader?assignment_id=${assignmentId}`}
             className="icon-speed-grader"
             style={{color: 'inherit', textDecoration: 'none'}}
+            target="_blank"
+            rel="noopener noreferrer"
           >
             {I18n.t('SpeedGrader')}
           </a>,

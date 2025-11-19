@@ -28,6 +28,7 @@ module Lti
 
     def notify_asset_processors(submission, asset_processor = nil, tool_id = nil)
       return unless submission.asset_processor_compatible?
+      return if submission.assignment.discussion_topic?
 
       asset_processors = submission.assignment.lti_asset_processors
       if asset_processor.present?

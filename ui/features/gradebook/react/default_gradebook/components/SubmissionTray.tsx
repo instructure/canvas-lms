@@ -177,7 +177,7 @@ const DEFAULT_CHECKPOINT_STATES = [
 // @ts-expect-error
 export const calculateCheckpointStates = (submission, latePolicy) => {
   // @ts-expect-error
-  return submission.subAssignmentSubmissions.map((subSubmission) => {
+  return submission.subAssignmentSubmissions.map(subSubmission => {
     let status = NONE
     let timeLate = '0'
     const secondsLate = subSubmission.seconds_late || 0
@@ -317,11 +317,15 @@ export default class SubmissionTray extends React.Component<
       disabled?: boolean
       href: string
       variant: 'link'
+      target?: string
+      rel?: string
       onClick?: (event: React.MouseEvent) => void
     } = {
       disabled: speedGraderProps.requireStudentGroup,
       href: speedGraderProps.speedGraderUrl,
       variant: 'link', // TODO: replace since this is deprecated with InstUI 8
+      target: '_blank',
+      rel: 'noopener',
     }
     if (speedGraderProps.anonymizeStudents) {
       buttonProps.onClick = e => {

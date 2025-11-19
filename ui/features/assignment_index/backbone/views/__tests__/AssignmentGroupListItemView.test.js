@@ -214,4 +214,54 @@ describe('AssignmentGroupListItemView', () => {
       expect(deleteButton).not.toHaveClass('disabled')
     })
   })
+
+  describe('renderCreateEditAssignmentModal focus management', () => {
+    beforeEach(() => {
+      const mountPoint = document.createElement('div')
+      mountPoint.id = 'create-edit-mount-point'
+      document.body.appendChild(mountPoint)
+
+      view = createView(model)
+    })
+
+    afterEach(() => {
+      const mountPoint = document.getElementById('create-edit-mount-point')
+      if (mountPoint) {
+        mountPoint.remove()
+      }
+    })
+
+    it('focuses on add assignment link when modal closes', () => {
+      const addAssignmentLink = document.createElement('a')
+      addAssignmentLink.id = `ag_${model.id}_add_assignment_link`
+      document.body.appendChild(addAssignmentLink)
+
+      const focusSpy = jest.spyOn(addAssignmentLink, 'focus')
+
+      let capturedOnClose
+      const mockRender = jest.fn(element => {
+        if (element && element.props && element.props.closeHandler) {
+          capturedOnClose = element.props.closeHandler
+        }
+      })
+      const mockRoot = {
+        render: mockRender,
+        unmount: jest.fn(),
+      }
+
+      jest.spyOn(require('react-dom/client'), 'createRoot').mockReturnValue(mockRoot)
+
+      view.renderCreateEditAssignmentModal()
+
+      expect(mockRoot.render).toHaveBeenCalled()
+
+      if (capturedOnClose) {
+        capturedOnClose()
+      }
+
+      expect(focusSpy).toHaveBeenCalled()
+
+      addAssignmentLink.remove()
+    })
+  })
 })

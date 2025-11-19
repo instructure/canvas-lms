@@ -34,4 +34,12 @@ describe('ExportCSVButton', () => {
     expect(getByTestId('export-button')).toBeInTheDocument()
     expect(getByTestId('csv-link')).toBeInTheDocument()
   })
+
+  it('hides csv-link from keyboard navigation and screen readers', () => {
+    const {getByTestId} = render(<ExportCSVButton {...defaultProps()} />)
+    const csvLink = getByTestId('csv-link')
+
+    expect(csvLink).toHaveAttribute('aria-hidden', 'true')
+    expect(csvLink).toHaveAttribute('tabIndex', '-1')
+  })
 })

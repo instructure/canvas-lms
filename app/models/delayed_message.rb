@@ -134,6 +134,32 @@ class DelayedMessage < ActiveRecord::Base
     context = delayed_messages.select(&:context).compact.first.try(:context)
     return nil unless context # the context for this message has already been deleted
 
+    # Filter out inactive enrollments
+    courses = delayed_messages.filter_map do |dm|
+      course_from_context(dm.context)
+    end
+    courses.uniq!
+
+    enrollments = {}
+    if courses.any?
+      # lets try a bulk query to avoid a O(n) situation
+      # group courses by shard to query each shard separately
+      courses.group_by(&:shard).each do |shard, shard_courses|
+        shard.activate do
+          Enrollment.where(user_id: user, course_id: shard_courses)
+                    .find_each { |e| enrollments[e.course_id] = e }
+        end
+      end
+    end
+
+    delayed_messages = delayed_messages.select do |dm|
+      course = course_from_context(dm.context)
+      # only active enrollments should result into a summary
+      course ? enrollments[course.local_id]&.workflow_state == "active" : true
+    end
+
+    return nil if delayed_messages.empty?
+
     notification = BroadcastPolicy.notification_finder.by_name("Summaries")
     path = HostUrl.outgoing_email_address
     root_account_id = delayed_messages.first.try(:root_account_id)
@@ -153,6 +179,17 @@ class DelayedMessage < ActiveRecord::Base
       message.delay_for = 0
       message.parse!
       message.save
+    end
+  end
+
+  def self.course_from_context(context)
+    return nil unless context
+
+    case context
+    when Course
+      context
+    else
+      context.context if context.respond_to?(:context) && context.context.is_a?(Course)
     end
   end
 

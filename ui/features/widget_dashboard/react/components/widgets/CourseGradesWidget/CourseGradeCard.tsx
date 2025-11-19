@@ -26,6 +26,7 @@ import {Button} from '@instructure/ui-buttons'
 import type {CourseGradeCardProps} from '../../../types'
 import {formatUpdatedDate, convertToLetterGrade} from './utils'
 import {CourseCode} from '../../shared/CourseCode'
+import {CourseName} from '../../shared/CourseName'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -77,11 +78,9 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
           />
         </Flex.Item>
 
-        <Flex.Item height="3rem" padding="0 0 0 xx-small">
+        <Flex.Item height="3rem" padding="0 0 0 xx-small" overflowY="hidden" overflowX="hidden">
           <View height="100%" overflowY="hidden">
-            <Text size="medium" weight="bold" lineHeight="condensed">
-              {courseName}
-            </Text>
+            <CourseName courseName={courseName} />
           </View>
         </Flex.Item>
 

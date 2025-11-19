@@ -282,12 +282,16 @@ describe CoursesController do
       context "on accessibility column" do
         before do
           account = Account.default
-          account.settings[:enable_content_a11y_checker] = true
-          account.save!
+          account.enable_feature!(:a11y_checker)
+          @course1.enable_feature!(:a11y_checker_eap)
+          @course2.enable_feature!(:a11y_checker_eap)
+
+          # Disable scan callbacks to avoid interference
+          allow_any_instance_of(Course).to receive(:a11y_checker_enabled?).and_return(false)
 
           wiki_page = wiki_page_model(course: @course1, title: "Wiki Page", body: "<div><h1>Document Title</h1></div>")
-          scan = AccessibilityResourceScan.where(context: wiki_page).first
-          scan.update!(
+          scan = AccessibilityResourceScan.create!(
+            context: wiki_page,
             course: @course1,
             workflow_state: "completed",
             resource_name: wiki_page.title,
@@ -301,6 +305,9 @@ describe CoursesController do
             rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
             node_path: "./div/h1"
           )
+
+          # Re-enable for the actual test
+          allow_any_instance_of(Course).to receive(:a11y_checker_enabled?).and_call_original
         end
 
         it "lists courses with less accessibility issues first" do
@@ -514,7 +521,7 @@ describe CoursesController do
       end
 
       describe "sorting" do
-        include_examples "sorting" do
+        it_behaves_like "sorting" do
           let(:type) { "current" }
           let(:sort_column) { "cc_sort" }
           let(:order_column) { "cc_order" }
@@ -794,7 +801,7 @@ describe CoursesController do
       end
 
       describe "sorting" do
-        include_examples "sorting" do
+        it_behaves_like "sorting" do
           let(:type) { "past" }
           let(:sort_column) { "pc_sort" }
           let(:order_column) { "pc_order" }
@@ -935,7 +942,7 @@ describe CoursesController do
       end
 
       describe "sorting" do
-        include_examples "sorting" do
+        it_behaves_like "sorting" do
           let(:type) { "future" }
           let(:sort_column) { "fc_sort" }
           let(:order_column) { "fc_order" }
@@ -5335,13 +5342,13 @@ describe CoursesController do
     describe "render ui" do
       subject { get :youtube_migration, params: { course_id: @course.id } }
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
     end
 
     describe "get last scan" do
       subject { get :youtube_migration_scan, params: { course_id: @course.id } }
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
 
       context "when ff is on" do
         before do
@@ -5452,7 +5459,7 @@ describe CoursesController do
     describe "post a new scan" do
       subject { post :start_youtube_migration_scan, params: { course_id: @course.id } }
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
     end
 
     describe "post a new convert" do
@@ -5477,7 +5484,7 @@ describe CoursesController do
         allow(service).to receive(:convert_embed).and_return(progress)
       end
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
 
       context "when authorized" do
         before do
@@ -5803,7 +5810,7 @@ describe CoursesController do
 
       let(:new_quizzes_scan_status) { "completed" }
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
 
       context "when feature flag is disabled" do
         before do
@@ -5993,6 +6000,91 @@ describe CoursesController do
           expect(response).to have_http_status(:unauthorized)
         end
       end
+    end
+  end
+
+  describe "#restore_version" do
+    before :once do
+      course_with_teacher(active_all: true)
+      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @account = @course.account
+      @account.enable_feature!(:allow_attachment_association_creation)
+      @account.enable_feature!(:file_association_access)
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "requires syllabus_versioning feature flag" do
+      Account.site_admin.disable_feature!(:syllabus_versioning)
+      post "restore_version", params: { course_id: @course.id, version_id: 1 }
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "requires manage_course_content_edit permission" do
+      student_in_course(course: @course, active_all: true)
+      user_session(@student)
+      post "restore_version", params: { course_id: @course.id, version_id: 1 }
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "restores a previous syllabus version" do
+      @course.update!(syllabus_body: "<p>Original content</p>")
+      version_1 = @course.versions.last.number
+
+      @course.update!(syllabus_body: "<p>Updated content</p>")
+
+      post "restore_version", params: { course_id: @course.id, version_id: version_1 }, format: :json
+      expect(response).to be_successful
+
+      @course.reload
+      expect(@course.syllabus_body).to include("Original content")
+    end
+
+    it "restores syllabus with images and creates attachment associations" do
+      attachment_model(context: @course)
+      syllabus_with_image = "<p><img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\"></p>"
+
+      @course.saving_user = @teacher
+      @course.update!(syllabus_body: syllabus_with_image)
+      version_with_image = @course.versions.last.number
+
+      @course.saving_user = @teacher
+      @course.update!(syllabus_body: "<p>No images here</p>")
+
+      expect do
+        post "restore_version", params: { course_id: @course.id, version_id: version_with_image }, format: :json
+      end.not_to raise_error
+
+      expect(response).to be_successful
+      @course.reload
+      expect(@course.syllabus_body).to include("files/#{@attachment.id}")
+      expect(@course.attachment_associations.where(context_concern: "syllabus_body").pluck(:attachment_id)).to include(@attachment.id)
+    end
+
+    it "sets the saving_user for attachment association tracking" do
+      attachment_model(context: @course)
+      syllabus_with_image = "<p><img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\"></p>"
+
+      @course.saving_user = @teacher
+      @course.update!(syllabus_body: syllabus_with_image)
+      version_with_image = @course.versions.last.number
+
+      @course.saving_user = @teacher
+      @course.update!(syllabus_body: "<p>No images</p>")
+
+      post "restore_version", params: { course_id: @course.id, version_id: version_with_image }, format: :json
+
+      expect(response).to be_successful
+      association = @course.attachment_associations.where(context_concern: "syllabus_body", attachment_id: @attachment.id).first
+      expect(association).not_to be_nil
+      expect(association.user_id).to eq(@teacher.id)
+    end
+
+    it "returns error for non-existent version" do
+      post "restore_version", params: { course_id: @course.id, version_id: 999 }, format: :json
+      expect(response).to have_http_status(:not_found)
     end
   end
 end

@@ -38,6 +38,12 @@ shared_examples "Gradebook" do |ff_enabled|
     end
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
+  end
+
   describe "complete/incomplete assignment grading" do
     before :once do
       assignments_with_grades_setup("pass_fail", "pass")

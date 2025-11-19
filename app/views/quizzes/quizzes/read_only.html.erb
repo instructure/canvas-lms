@@ -41,7 +41,7 @@
 
 <div style="margin-bottom: 25px;">
   <%= before_label(:quiz_instructions, "Quiz Instructions") %>
-  <%= user_content(@quiz.description) %>
+  <%= user_content(@quiz.description, location: "quiz_#{@quiz.id}") %>
 </div>
 <div style="margin-bottom: 5px;">
   <input type="checkbox" id="show_question_details"/> <label for="show_question_details"><%= t('labels.question_details', "Show Question Details") %></label>
@@ -51,7 +51,7 @@
     <% if question[:entry_type] == "quiz_group" %>
       <%= render :partial => "question_group", :object => question %>
     <% else %>
-      <%= render :partial => (@quiz.active_quiz_questions.size > 25 ? "question_teaser" : "display_question"), :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question['id']}"} %>
+      <%= render :partial => (@quiz.active_quiz_questions.size > 25 ? "question_teaser" : "display_question"), :object => question, :locals => { editing: true, asset_string: "quiz_question_#{question['id']}"} %>
     <% end %>
   <% end %>
 </div>
@@ -69,8 +69,8 @@
 
 </style>
 
-<%= render :partial => "question_teaser", :object => nil, :locals => {:editing => true } %>
-<%= render :partial => "display_question", :object => nil, :locals => {:editing => true } %>
+<%= render :partial => "question_teaser", :object => nil, :locals => { editing: true } %>
+<%= render :partial => "display_question", :object => nil, :locals => { editing: true } %>
 <%= render :partial => "display_answer", :object => nil %>
 <%= render :partial => "form_answer", :object => nil %>
 <%= render :partial => "form_question", :object => nil %>

@@ -68,6 +68,7 @@ type RenderToElementsOptions<T extends z.ZodType | undefined> = {
   datasetSchema: T
   flashErrorTitle: string
   withQueryClient: boolean
+  propsGetter?: T extends z.ZodType ? (element: HTMLElement) => z.infer<T> : never
 }
 
 /**
@@ -79,6 +80,7 @@ type RenderToElementsOptions<T extends z.ZodType | undefined> = {
  * @param datasetSchema - A Zod schema to validate the element's dataset against.
  * @param flashErrorTitle - The title to use in the flash error if rendering fails.
  * @param withQueryClient - If true, the component will be rendered with a QueryClientProvider.
+ * @param propsGetter - Optional function that takes element and returns props to use instead of dataset.
  * @returns The number of successfully rendered components.
  * @example
  * ```tsx
@@ -100,6 +102,7 @@ export function renderToElements<T extends z.ZodType | undefined>({
   datasetSchema,
   withQueryClient,
   flashErrorTitle,
+  propsGetter,
 }: RenderToElementsOptions<T>) {
   const containers = document.querySelectorAll<HTMLElement>(selector)
   let count = 0
@@ -111,6 +114,10 @@ export function renderToElements<T extends z.ZodType | undefined>({
       if (datasetSchema === undefined) {
         const CompWithNoAttrs: ComponentForZodSchema<undefined> = Component
         elem = <CompWithNoAttrs />
+      } else if (propsGetter !== undefined) {
+        // Use provided props getter function instead of dataset
+        const props = propsGetter(container)
+        elem = <Component {...props} />
       } else {
         const data = datasetSchema.safeParse(container.dataset)
         if (data.success) {
@@ -150,6 +157,7 @@ export function renderAPComponent<T extends z.ZodType | undefined>(
   selector: string,
   Component: ComponentForZodSchema<T>,
   datasetSchema?: T,
+  propsGetter?: T extends z.ZodType ? (element: HTMLElement) => z.infer<T> : never,
 ) {
   return renderToElements({
     selector,
@@ -157,6 +165,7 @@ export function renderAPComponent<T extends z.ZodType | undefined>(
     datasetSchema,
     withQueryClient: true,
     flashErrorTitle: I18n.t('Error loading Document Processors information'),
+    propsGetter,
   })
 }
 

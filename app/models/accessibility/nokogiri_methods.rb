@@ -19,6 +19,13 @@
 
 module Accessibility
   module NokogiriMethods
+    def parse_html_content(html_content)
+      doc = Nokogiri::HTML5(html_content, nil, **CanvasSanitize::SANITIZE[:parser_options])
+      body = doc.at_css("body")
+      extend_nokogiri_with_dom_adapter(body)
+      [doc, body]
+    end
+
     def walk_dom_tree(node, &)
       return unless node
 

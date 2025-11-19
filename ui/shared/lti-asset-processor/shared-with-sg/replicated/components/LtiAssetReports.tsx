@@ -19,35 +19,33 @@
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconArrowOpenDownSolid, IconArrowOpenUpSolid} from '@instructure/ui-icons'
-import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {useFormatDateTime, useResubmitLtiAssetReports} from '../../dependenciesShims'
+import {
+  type LtiAssetReportGroup,
+  reportsForAssetsByProcessors,
+} from '../lib/reportsForAssetsByProcessors'
+import {buildAPDisplayTitle} from '../lib/util'
+import {
+  type ResubmitLtiAssetReportsParams,
+  resubmitPath,
+} from '../mutations/resubmitLtiAssetReports'
+import type {LtiAssetProcessor} from '../types/LtiAssetProcessors'
+import type {AssetReportCompatibleSubmissionType, LtiAssetReport} from '../types/LtiAssetReports'
 import {LtiAssetReportsCard, LtiAssetReportsMissingReportsCard} from './LtiAssetReportsCard'
 import {ToolIconOrDefault} from './ToolIconOrDefault'
 import TruncateWithTooltip from './TruncateWithTooltip'
-import {buildAPDisplayTitle} from '../lib/util'
-import type {AssetReportCompatibleSubmissionType, LtiAssetReport} from '../types/LtiAssetReports'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {useResubmitLtiAssetReports} from '../../dependenciesShims'
-import {
-  reportsForAssetsByProcessors,
-  type LtiAssetReportGroup,
-} from '../lib/reportsForAssetsByProcessors'
-import type {LtiAssetProcessor} from '../types/LtiAssetProcessors'
-import {
-  resubmitPath,
-  type ResubmitLtiAssetReportsParams,
-} from '../mutations/resubmitLtiAssetReports'
 
 const I18n = createI18nScope('lti_asset_processor')
 
-type Attachment = {
+export type Attachment = {
   _id: string
   displayName: string
 }
 
 export type LtiAssetReportsProps = {
-  attachments: Attachment[]
+  attachments?: Attachment[]
   reports: LtiAssetReport[]
   assetProcessors: LtiAssetProcessor[]
   attempt: string
@@ -62,7 +60,7 @@ export type LtiAssetReportsProps = {
 
 function ltiAssetProcessorHeader(assetProcessor: LtiAssetProcessor) {
   return (
-    <Flex direction="row" gap="small">
+    <Flex direction="row" gap="small" margin="0 0 small 0">
       <Flex.Item>
         <ToolIconOrDefault
           size={24}
@@ -98,7 +96,7 @@ function LtiAssetReportsCardGroup({
   reports,
 }: LtiAssetReportsCardGroupProps) {
   return (
-    <Flex direction="column" gap="x-small">
+    <Flex direction="column" gap="x-small" margin="xx-small 0 0 0">
       {showDisplayName && displayName && (
         <View as="div" maxWidth="80%">
           <Heading level="h4">
@@ -158,42 +156,43 @@ export function LtiAssetReports({
   submissionType,
   showDocumentDisplayName,
 }: LtiAssetReportsProps): JSX.Element | null {
-  const assetSelector = {submissionType, attachments, attempt}
-  const groupedReports = reportsForAssetsByProcessors(reports, assetProcessors, assetSelector)
+  const assetSelector = {
+    submissionType,
+    attachments: attachments || [],
+    attempt,
+  }
+  const formatDateTime = useFormatDateTime()
+  const groupedReports = reportsForAssetsByProcessors(
+    reports,
+    assetProcessors,
+    assetSelector,
+    formatDateTime,
+  )
 
   return (
-    <View as="div" padding="small none none none">
+    <View as="div">
       <Flex direction="column" gap="small">
         {groupedReports.map(({processor, reportGroups}) => (
-          <ToggleDetails
-            summary={ltiAssetProcessorHeader(processor)}
-            key={processor._id}
-            iconPosition="end"
-            icon={() => <IconArrowOpenDownSolid />}
-            iconExpanded={() => <IconArrowOpenUpSolid />}
-            defaultExpanded
-            fluidWidth
-          >
-            <View as="div" padding="small none">
-              <Flex direction="column" gap="small">
-                {reportGroups.map(({key, displayName, reports}) => (
-                  <LtiAssetReportsCardGroup
-                    key={key}
-                    displayName={displayName}
-                    reports={reports}
-                    showDisplayName={showDocumentDisplayName}
-                  />
-                ))}
-                {studentIdForResubmission && shouldShowResubmitButton(reportGroups) && (
-                  <ResubmitButton
-                    processorId={processor._id}
-                    studentId={studentIdForResubmission}
-                    attempt={attempt}
-                  />
-                )}
-              </Flex>
-            </View>
-          </ToggleDetails>
+          <View as="div" padding="small none" key={processor._id}>
+            {ltiAssetProcessorHeader(processor)}
+            <Flex direction="column" gap="small">
+              {reportGroups.map(({key, displayName, reports}) => (
+                <LtiAssetReportsCardGroup
+                  key={key}
+                  displayName={displayName}
+                  reports={reports}
+                  showDisplayName={showDocumentDisplayName}
+                />
+              ))}
+              {studentIdForResubmission && shouldShowResubmitButton(reportGroups) && (
+                <ResubmitButton
+                  processorId={processor._id}
+                  studentId={studentIdForResubmission}
+                  attempt={attempt}
+                />
+              )}
+            </Flex>
+          </View>
         ))}
       </Flex>
     </View>

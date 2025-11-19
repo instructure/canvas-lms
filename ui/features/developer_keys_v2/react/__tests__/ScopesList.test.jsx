@@ -20,6 +20,12 @@ import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
 import DeveloperKeyScopesList from '../ScopesList'
 
+// Mock LazyLoad to render children immediately in tests
+jest.mock('react-lazy-load', () => ({
+  __esModule: true,
+  default: ({children}) => <div className="LazyLoad">{children}</div>,
+}))
+
 const scopes = {
   oauth: [
     {
@@ -158,16 +164,17 @@ const renderDeveloperKeyScopesList = props => {
 
 describe('DeveloperKeyScopesList', () => {
   it('renders each group', () => {
-    const {wrapper} = renderDeveloperKeyScopesList()
+    renderDeveloperKeyScopesList()
 
-    expect(wrapper.container.querySelectorAll('.LazyLoad')).toHaveLength(2)
+    expect(screen.getByText('oauth')).toBeInTheDocument()
+    expect(screen.getByText('account_domain_lookups')).toBeInTheDocument()
   })
 
   it('uses the correct handler the checkbox is checked', () => {
     const {ref} = renderDeveloperKeyScopesList()
     const stubbedHandler = jest.fn()
     const component = ref.current
-    const checkBox = screen.getByRole('checkbox')
+    const checkBox = screen.getByLabelText(/Enable all read only scopes/i)
 
     component.handleReadOnlySelected = stubbedHandler
     component.forceUpdate()
@@ -177,13 +184,132 @@ describe('DeveloperKeyScopesList', () => {
     expect(stubbedHandler).toHaveBeenCalled()
   })
 
-  it('only renders groups with names that match the fitler', () => {
-    const {wrapper} = renderDeveloperKeyScopesList({filter: 'Account'})
+  it('only renders groups with names that match the filter', () => {
+    renderDeveloperKeyScopesList({filter: 'Account'})
 
-    expect(wrapper.container.querySelectorAll('.LazyLoad')).toHaveLength(1)
+    expect(screen.getByText('account_domain_lookups')).toBeInTheDocument()
+    expect(screen.queryByText('oauth')).not.toBeInTheDocument()
   })
 
-  it('only renders 8 groups on the initaial render', () => {
+  describe('filtering', () => {
+    const scopesWithMultipleInGroup = {
+      ...baseProps.availableScopes,
+      assignments: [
+        {
+          resource: 'assignments',
+          verb: 'GET',
+          path: '/api/v1/courses/:course_id/assignments',
+          scope: 'url:GET|/api/v1/courses/:course_id/assignments',
+        },
+        {
+          resource: 'assignments',
+          verb: 'POST',
+          path: '/api/v1/courses/:course_id/assignments',
+          scope: 'url:POST|/api/v1/courses/:course_id/assignments',
+        },
+        {
+          resource: 'assignments',
+          verb: 'DELETE',
+          path: '/api/v1/courses/:course_id/assignments/:id',
+          scope: 'url:DELETE|/api/v1/courses/:course_id/assignments/:id',
+        },
+      ],
+    }
+
+    it('filters groups by name (case insensitive)', () => {
+      renderDeveloperKeyScopesList({
+        availableScopes: scopesWithMultipleInGroup,
+        filter: 'assign',
+      })
+
+      expect(screen.getByText('assignments')).toBeInTheDocument()
+      expect(screen.queryByText('oauth')).not.toBeInTheDocument()
+      expect(screen.queryByText('account_domain_lookups')).not.toBeInTheDocument()
+    })
+
+    it('filters individual scopes within groups', () => {
+      renderDeveloperKeyScopesList({
+        availableScopes: scopesWithMultipleInGroup,
+        filter: 'DELETE',
+      })
+
+      expect(screen.getByText('assignments')).toBeInTheDocument()
+      expect(screen.queryByText('oauth')).not.toBeInTheDocument()
+      expect(screen.queryByText('account_domain_lookups')).not.toBeInTheDocument()
+    })
+
+    it('shows only filtered scopes when group name does not match', () => {
+      const {wrapper} = renderDeveloperKeyScopesList({
+        availableScopes: scopesWithMultipleInGroup,
+        filter: 'DELETE',
+      })
+
+      expect(screen.getByText('assignments')).toBeInTheDocument()
+
+      const scopeElements = wrapper.container.querySelectorAll(
+        '[data-automation="developer-key-scope"]',
+      )
+      expect(scopeElements).toHaveLength(1)
+      expect(scopeElements[0].textContent).toContain('DELETE')
+      expect(scopeElements[0].textContent).toContain(
+        'url:DELETE|/api/v1/courses/:course_id/assignments/:id',
+      )
+    })
+
+    it('shows all scopes in a group when group name matches filter', () => {
+      const {wrapper} = renderDeveloperKeyScopesList({
+        availableScopes: scopesWithMultipleInGroup,
+        filter: 'assignments',
+      })
+
+      expect(screen.getByText('assignments')).toBeInTheDocument()
+      expect(screen.queryByText('oauth')).not.toBeInTheDocument()
+      expect(screen.queryByText('account_domain_lookups')).not.toBeInTheDocument()
+
+      expect(screen.getByLabelText(/All assignments scopes/i)).toBeInTheDocument()
+    })
+
+    it('hides groups that do not match filter at all', () => {
+      renderDeveloperKeyScopesList({
+        availableScopes: scopesWithMultipleInGroup,
+        filter: 'nonexistent',
+      })
+
+      expect(screen.queryByText('oauth')).not.toBeInTheDocument()
+      expect(screen.queryByText('account_domain_lookups')).not.toBeInTheDocument()
+      expect(screen.queryByText('assignments')).not.toBeInTheDocument()
+    })
+
+    it('shows all groups when filter is empty', () => {
+      renderDeveloperKeyScopesList({
+        availableScopes: scopesWithMultipleInGroup,
+        filter: '',
+      })
+
+      expect(screen.getByText('oauth')).toBeInTheDocument()
+      expect(screen.getByText('account_domain_lookups')).toBeInTheDocument()
+      expect(screen.getByText('assignments')).toBeInTheDocument()
+    })
+
+    it('performs case-insensitive filtering', () => {
+      const {unmount: unmount1} = render(
+        <DeveloperKeyScopesList {...defaultProps({filter: 'OAUTH'})} />,
+      )
+      expect(screen.getByText('oauth')).toBeInTheDocument()
+      unmount1()
+
+      const {unmount: unmount2} = render(
+        <DeveloperKeyScopesList {...defaultProps({filter: 'oauth'})} />,
+      )
+      expect(screen.getByText('oauth')).toBeInTheDocument()
+      unmount2()
+
+      render(<DeveloperKeyScopesList {...defaultProps({filter: 'OaUtH'})} />)
+      expect(screen.getByText('oauth')).toBeInTheDocument()
+    })
+  })
+
+  it('only renders 8 groups on the initial render', () => {
     const {ref} = renderDeveloperKeyScopesList({availableScopes: scopes})
 
     expect(ref.current.state.availableScopes).toHaveLength(8)

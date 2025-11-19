@@ -182,6 +182,11 @@
 #          "description": "Unused.",
 #          "example": "",
 #          "type": "string"
+#        },
+#        "unified_tool_id": {
+#          "description": "Correlates an API key to a product configuration.",
+#          "example": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+#          "type": "string"
 #        }
 #      }
 #    }
@@ -340,6 +345,34 @@ class DeveloperKeysController < ApplicationController
     raise e
   end
 
+  # @API Lookup LP API Registrations by Redirect URIs
+  # @internal
+  # Returns a list of matching Unified Tool IDs (UTIDs) from Learn Platform
+  # for the given redirect URIs.
+  #
+  # @argument redirect_uris [Required, Array]
+  #   An array of redirect URI strings to match
+  # @argument sources [Optional, Array]
+  #   An array of sources to look up the redirect URIs from. Possible values are
+  #   `partner_provided` (default) and `manual`.
+  #
+  # @example_request
+  #   {
+  #     "redirect_uris": ["https://example.com/redirect", "https://another.com/callback"]
+  #   }
+  #
+  # @returns [ApiRegistration]
+  def lookup_utids
+    redirect_uris = params.require(:redirect_uris)
+    sources = params.permit(sources: [])[:sources]
+
+    api_registrations = LearnPlatform::GlobalApi.lookup_api_registrations(redirect_uris, sources:)
+    render json: { api_registrations: }, status: :ok
+  rescue => e
+    report_error(e, :bad_request)
+    render json: { error: "Failed to match redirect URIs" }, status: :bad_request
+  end
+
   protected
 
   def set_navigation
@@ -431,6 +464,7 @@ class DeveloperKeysController < ApplicationController
       :notes,
       :redirect_uri,
       :redirect_uris,
+      :unified_tool_id,
       :vendor_code,
       :visible,
       :test_cluster_only,

@@ -392,6 +392,28 @@ lti_registrations_usage_data:
       state: allowed_on
     ci:
       state: allowed_on
+lti_registrations_usage_data_dev:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: LTI Apps - Monitor - In-Development Features
+  description: When enabled, the Monitor tab on the LTI Apps page will include in-development features.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+lti_registrations_usage_data_low_usage:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: LTI Apps - Monitor - Low Usage Alerts Preview
+  description: When enabled, the Monitor tab on the LTI Apps page will include the low usage alerts feature.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_registrations_usage_tab:
   state: hidden
   shadow: false

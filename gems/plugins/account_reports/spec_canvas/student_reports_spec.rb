@@ -905,5 +905,11 @@ describe "Student reports" do
       user3_row = parsed.detect { |row| row[0] == @user3.id.to_s }
       expect(user3_row.last).to be_nil
     end
+
+    it "doesn't duplicate rows for multiple pseudonyms" do
+      @user2.pseudonyms.create!(unique_id: "another_unique_id", account: @account)
+      parsed = read_report(@type, { order: 1 })
+      expect(parsed.length).to eq 2
+    end
   end
 end

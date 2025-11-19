@@ -95,12 +95,12 @@ const handlers = [
       // For pagination testing, handle module 2000 specially
       if (moduleId === '2000') {
         if (page === '2') {
-          // Simulate an empty page for page 2
+          // Simulate the page having become empty due to a deletion; the `last` link is now page 1
           return new HttpResponse('', {
             status: 200,
             headers: {
               'Content-Type': 'text/html',
-              Link: `</courses/${courseId}/modules/2000/items_html?page=2&per_page=2>; rel="next"`,
+              Link: `</courses/${courseId}/modules/2000/items_html?page=1&per_page=2>; rel="last"`,
             },
           })
         } else if (page === '1') {
@@ -109,7 +109,7 @@ const handlers = [
             status: 200,
             headers: {
               'Content-Type': 'text/html',
-              Link: `</courses/${courseId}/modules/2000/items_html?page=1&per_page=2>; rel="current",</courses/${courseId}/modules/2000/items_html?page=2&per_page=2>; rel="next",</courses/${courseId}/modules/2000/items_html?page=1&per_page=2>; rel="first",</courses/${courseId}/modules/2000/items_html?page=2&per_page=2>; rel="last"`,
+              Link: `</courses/${courseId}/modules/2000/items_html?page=1&per_page=2>; rel="current",</courses/${courseId}/modules/2000/items_html?page=1&per_page=2>; rel="first",</courses/${courseId}/modules/2000/items_html?page=1&per_page=2>; rel="last"`,
             },
           })
         }
@@ -658,7 +658,7 @@ describe('fetchModuleItems utility', () => {
         })
 
         it('should handle empty page response gracefully', async () => {
-          await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, 1, false)
+          await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, 2, false)
 
           const module = document.getElementById(`context_module_${moduleId}`)
           expect(module).not.toBeNull()

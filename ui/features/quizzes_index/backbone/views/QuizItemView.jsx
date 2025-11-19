@@ -204,10 +204,14 @@ export default class ItemView extends Backbone.View {
     e.preventDefault()
     const returnFocusTo = $(e.target).closest('ul').prev('.al-trigger')
 
-    const courseId = e.target.getAttribute('data-quiz-context-id')
-    const itemName = e.target.getAttribute('data-quiz-name')
-    const itemContentId = e.target.getAttribute('data-quiz-id')
-    const iconType = e.target.getAttribute('data-is-lti-quiz') ? 'lti-quiz' : 'quiz'
+    // Get data from the inner span with translate="no"
+    const $link = $(e.target).closest('.assign-to-link')
+    const $dataSpan = $link.find('.assign-to-link-resources')
+
+    const courseId = $dataSpan.attr('data-quiz-context-id')
+    const itemName = $dataSpan.attr('data-quiz-name')
+    const itemContentId = $dataSpan.attr('data-quiz-id')
+    const iconType = $dataSpan.attr('data-is-lti-quiz') ? 'lti-quiz' : 'quiz'
     const pointsPossible = this.model.get('points_possible')
     this.renderItemAssignToTray(true, returnFocusTo, {
       courseId,

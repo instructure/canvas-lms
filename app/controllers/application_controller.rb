@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   include Api::V1::WikiPage
   include LegalInformationHelper
   include ObserverEnrollmentsHelper
+  include NewQuizzesHelper
 
   helper :all
 
@@ -303,7 +304,7 @@ class ApplicationController < ActionController::Base
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
             can_add_pronouns: @domain_root_account&.can_add_pronouns?,
             show_sections_in_course_tray: @domain_root_account&.show_sections_in_course_tray?,
-            enable_content_a11y_checker: @domain_root_account&.enable_content_a11y_checker?,
+            enable_content_a11y_checker: @context.try(:a11y_checker_enabled?) || false,
             suppress_assignments: @domain_root_account&.suppress_assignments?
           },
           RAILS_ENVIRONMENT: Canvas.environment
@@ -437,6 +438,7 @@ class ApplicationController < ActionController::Base
     account_level_blackout_dates
     assignment_edit_placement_not_on_announcements
     accessibility_issues_in_full_page
+    block_content_editor_toolbar_reorder
     commons_new_quizzes
     consolidated_media_player
     courses_popout_sisid
@@ -459,6 +461,7 @@ class ApplicationController < ActionController::Base
     multiselect_gradebook_filters
     new_quizzes_media_type
     new_quizzes_navigation_updates
+    new_quizzes_surveys
     permanent_page_links
     rce_a11y_resize
     rce_find_replace
@@ -469,10 +472,12 @@ class ApplicationController < ActionController::Base
     top_navigation_placement_a11y_fixes
     validate_call_to_action
     block_content_editor_ai_alt_text
+    ux_list_concluded_courses_in_bp
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales
     ams_root_account_integration
+    api_rate_limits
     buttons_and_icons_root_account
     course_pace_allow_bulk_pace_assign
     course_pace_download_document
@@ -498,6 +503,8 @@ class ApplicationController < ActionController::Base
     lti_registrations_next
     lti_registrations_page
     lti_registrations_usage_data
+    lti_registrations_usage_data_dev
+    lti_registrations_usage_data_low_usage
     lti_registrations_usage_tab
     lti_toggle_placements
     mobile_offline_mode
@@ -2313,6 +2320,11 @@ class ApplicationController < ActionController::Base
 
       tag.context_module_action(@current_user, :read)
       if @tool
+        # Check if we should use native New Quizzes experience
+        if @tool.quiz_lti? && new_quizzes_native_experience_enabled?
+          return render_native_new_quizzes
+        end
+
         log_asset_access(@tool, "external_tools", "external_tools", overwrite: false)
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
@@ -3440,6 +3452,32 @@ class ApplicationController < ActionController::Base
 
   def new_quizzes_lti_tool?
     @tool&.quiz_lti?
+  end
+
+  def new_quizzes_native_experience_enabled?
+    return false unless @context.respond_to?(:root_account)
+
+    @context.root_account.feature_enabled?(:new_quizzes_native_experience)
+  end
+  helper_method :new_quizzes_native_experience_enabled?
+
+  def render_native_new_quizzes
+    add_new_quizzes_bundle
+
+    # Build launch data with HMAC signature for tamper protection
+    signed_launch_data = ::NewQuizzes::LaunchDataBuilder.new(
+      context: @context,
+      assignment: @assignment,
+      tool: @tool,
+      current_user: @current_user,
+      request:
+    ).build_with_signature
+
+    js_env(NEW_QUIZZES: signed_launch_data)
+
+    add_body_class("native-new-quizzes full-width")
+
+    render "assignments/native_new_quizzes", layout: "application"
   end
 
   def show_blueprint_button?

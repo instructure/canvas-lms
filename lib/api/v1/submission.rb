@@ -395,7 +395,13 @@ module Api::V1::Submission
     # If one is including the group in the submission response, we can
     # assume they want the information for identification and sorting
     # issues and not the full group object.
-    { id: attempt.group_id, name: attempt.group.try(:name) }
+    if attempt.group_id.present?
+      { id: attempt.group_id, name: attempt.group.try(:name) }
+    else
+      # Use attempt.user.groups (preloaded association) to avoid N+1 queries
+      group = attempt.user&.groups&.find { |g| g.group_category_id == attempt.assignment&.group_category_id }
+      { id: group&.id, name: group&.name }
+    end
   end
 
   def quiz_submission_attempt_json(attempt, assignment, user, session, context = nil, params)
@@ -447,7 +453,9 @@ module Api::V1::Submission
       "grade",
       "score",
       "user_id",
-      "grade_matches_current_submission"
+      "grade_matches_current_submission",
+      "submitted_at",
+      "points_deducted"
     )
     sub_assignment_json["sub_assignment_tag"] = assignment.sub_assignment_tag
     sub_assignment_json["published_grade"] = submission.published_grade

@@ -475,6 +475,9 @@ export default forwardRef(function ItemAssignToCard(
             disabledWithGradingPeriod={isInClosedGradingPeriod}
             disabledOptionIdsRef={disabledOptionIdsRef}
             itemType={itemType}
+            disabled={blueprintDateLocks?.some(
+              lock => lock === 'due_dates' || lock === 'availability_dates',
+            )}
           />
           {/* @ts-expect-error */}
           {!removeDueDateInput && (!isCheckpointed || !ENV.DISCUSSION_CHECKPOINTS_ENABLED) && (

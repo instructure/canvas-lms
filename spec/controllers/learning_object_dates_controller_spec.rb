@@ -1151,7 +1151,7 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", true
+      it_behaves_like "learning object updates", true
 
       it "returns bad_request if dates are invalid" do
         put :update, params: { **default_params, unlock_at: "2023-01-" }
@@ -1247,6 +1247,60 @@ describe LearningObjectDatesController do
           end
         end
       end
+
+      context "on blueprint child courses" do
+        before :once do
+          @child_course = @course
+          @child_assignment = learning_object
+          master_template = MasterCourses::MasterTemplate.set_as_master_course(course_model)
+          child_subscription = master_template.add_child_course!(@child_course)
+          MasterCourses::ChildContentTag.create!(child_subscription:, content: @child_assignment)
+          @mct = MasterCourses::MasterContentTag.create!(master_template:, content: assignment_model)
+          @child_assignment.update! migration_id: @mct.migration_id
+        end
+
+        it "returns unauthorized when due_dates are locked and updating overrides" do
+          @mct.update_attribute(:restrictions, { due_dates: true })
+          put :update, params: { **default_params,
+            assignment_overrides: [{ course_section_id: @course.default_section.id, due_at: "2024-01-02T05:00:00Z" }] }
+          expect(response).to be_unauthorized
+        end
+
+        it "returns unauthorized when availability_dates are locked and updating overrides" do
+          @mct.update_attribute(:restrictions, { availability_dates: true })
+          put :update, params: { **default_params,
+            assignment_overrides: [{ course_section_id: @course.default_section.id, unlock_at: "2024-01-01T05:00:00Z" }] }
+          expect(response).to be_unauthorized
+        end
+
+        it "allows updating due_dates when only availability_dates are locked" do
+          @mct.update_attribute(:restrictions, { availability_dates: true })
+          put :update, params: { **default_params,
+            assignment_overrides: [{ course_section_id: @child_course.default_section.id, due_at: "2024-01-02T05:00:00Z" }] }
+          expect(response).to be_successful
+        end
+
+        it "allows updating availability_dates when only due_dates are locked" do
+          @mct.update_attribute(:restrictions, { due_dates: true })
+          put :update, params: { **default_params,
+            assignment_overrides: [{ course_section_id: @child_course.default_section.id, unlock_at: "2024-01-01T05:00:00Z" }] }
+          expect(response).to be_successful
+        end
+
+        it "returns unauthorized when both are locked and updating due_dates" do
+          @mct.update_attribute(:restrictions, { due_dates: true, availability_dates: true })
+          put :update, params: { **default_params,
+            assignment_overrides: [{ course_section_id: @child_course.default_section.id, due_at: "2024-01-02T05:00:00Z" }] }
+          expect(response).to be_unauthorized
+        end
+
+        it "returns unauthorized when both are locked and updating availability_dates" do
+          @mct.update_attribute(:restrictions, { due_dates: true, availability_dates: true })
+          put :update, params: { **default_params,
+            assignment_overrides: [{ course_section_id: @child_course.default_section.id, unlock_at: "2024-01-01T05:00:00Z" }] }
+          expect(response).to be_unauthorized
+        end
+      end
     end
 
     context "quizzes" do
@@ -1269,7 +1323,7 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", true
+      it_behaves_like "learning object updates", true
 
       it "returns unauthorized if user doesn't have manage_assignments_edit permission" do
         RoleOverride.create!(context: @course.account, permission: "manage_assignments_edit", role: teacher_role, enabled: false)
@@ -1879,7 +1933,7 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", true
+      it_behaves_like "learning object updates", true
 
       it "removes base dates on DiscussionTopic object if it has any" do
         learning_object.update!(**default_availability_dates)
@@ -1914,8 +1968,8 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", false
-      include_examples "learning objects without due dates"
+      it_behaves_like "learning object updates", false
+      it_behaves_like "learning objects without due dates"
 
       it "removes section visibilities and changes 'is_section_specific' to false" do
         learning_object.discussion_topic_section_visibilities << DiscussionTopicSectionVisibility.new(
@@ -1958,8 +2012,8 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", false
-      include_examples "learning objects without due dates"
+      it_behaves_like "learning object updates", false
+      it_behaves_like "learning objects without due dates"
 
       it "creates an assignment if noop override is included and conditional release is enabled" do
         @course.conditional_release = true
@@ -2158,7 +2212,7 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", false
+      it_behaves_like "learning object updates", false
 
       it "does not remove the assignment if a noop override is removed" do
         @course.conditional_release = true
@@ -2206,8 +2260,8 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", false
-      include_examples "learning objects without due dates"
+      it_behaves_like "learning object updates", false
+      it_behaves_like "learning objects without due dates"
 
       it "returns unauthorized if user doesn't have manage_files_edit permission" do
         RoleOverride.create!(context: @course.account, permission: "manage_files_edit", role: teacher_role, enabled: false)

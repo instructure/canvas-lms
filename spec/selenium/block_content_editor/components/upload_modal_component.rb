@@ -32,11 +32,11 @@ class UploadModalComponent
   end
 
   def url_tab
-    fj('[role="tab"]:contains("Video URL")', @upload_modal)
+    fj('[role="tab"]:contains("URL")', @upload_modal)
   end
 
   def url_input
-    f('input[name="video-url"]', @upload_modal)
+    f('input[name$="url"]', @upload_modal)
   end
 
   def submit_button

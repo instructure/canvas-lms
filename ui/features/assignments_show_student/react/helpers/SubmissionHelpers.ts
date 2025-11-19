@@ -51,6 +51,8 @@ export function multipleTypesDrafted(submission: Submission) {
     submissionDraft?.meetsTextEntryCriteria,
     submissionDraft?.meetsUploadCriteria,
     submissionDraft?.meetsUrlCriteria,
+    submissionDraft?.meetsMediaRecordingCriteria,
+    submissionDraft?.meetsStudentAnnotationCriteria,
   ].filter(criteria => criteria === true)
 
   return matchingCriteria.length > 1

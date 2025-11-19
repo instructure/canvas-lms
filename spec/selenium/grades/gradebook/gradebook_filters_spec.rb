@@ -42,6 +42,12 @@ shared_examples "Filter" do |ff_enabled|
     end
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+  end
+
   context "by Module" do
     before(:once) do
       course_with_teacher(active_all: true)

@@ -28,7 +28,7 @@ describe "submission_graded" do
   let(:asset) { @submission }
   let(:notification_name) { :submission_graded }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 
   it "includes the submission's submitter name if receiver is not the submitter and has the setting turned on" do
     observer = user_model

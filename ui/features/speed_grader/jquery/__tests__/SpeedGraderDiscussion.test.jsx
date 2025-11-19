@@ -177,6 +177,7 @@ describe('SpeedGrader Discussion', () => {
 
   it('does not show private comments for a group assignment', async () => {
     window.jsonData.GROUP_GRADING_MODE = true
+    window.jsonData.HAS_GROUPS = true
     SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = null
     SpeedGrader.EG.showDiscussion()
     await awhile()
@@ -185,6 +186,7 @@ describe('SpeedGrader Discussion', () => {
 
   it('shows group comments for group assignments', async () => {
     window.jsonData.GROUP_GRADING_MODE = true
+    window.jsonData.HAS_GROUPS = true
     SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = 'hippo'
     SpeedGrader.EG.showDiscussion()
     await awhile()

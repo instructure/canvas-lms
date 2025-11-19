@@ -107,6 +107,13 @@ module CanvasSecurity
     end
   end
 
+  def self.reload
+    @config = nil
+    @encryption_key = nil
+    @encryption_keys = nil
+    @jwt_encryption_keys = nil
+  end
+
   def self.encrypt_data(data)
     nonce = SecureRandom.bytes(12)
     encryptor = OpenSSL::Cipher.new("aes-256-gcm").encrypt

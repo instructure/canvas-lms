@@ -85,7 +85,7 @@ class Announcement < DiscussionTopic
 
   set_broadcast_policy! do
     dispatch :new_announcement
-    to { users_with_permissions(active_participants_include_tas_and_teachers(true) - [user]) }
+    to { new_announcement_recipients }
     whenever do |record|
       is_new_announcement = (record.previously_new_record? and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished)
 
@@ -292,5 +292,18 @@ class Announcement < DiscussionTopic
     return if users_without_participants.empty?
 
     bulk_insert_participants(users_without_participants)
+  end
+
+  def new_announcement_recipients
+    potential_recipients = active_participants_include_tas_and_teachers(true).without(user)
+    recipients = users_with_permissions(potential_recipients)
+
+    # users_with_permissions checks :read_announcement permission
+    # but Admin-only announcements require :moderate_forum
+    if visible_to_admins_only?
+      context.filter_users_by_permission(recipients, :moderate_forum)
+    else
+      recipients
+    end
   end
 end

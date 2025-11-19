@@ -639,6 +639,7 @@ AssignmentGroupListItemView.prototype.renderCreateEditAssignmentModal = function
 
     // re-render the group view
     this.render()
+    document.getElementById(`ag_${this.model.id}_add_assignment_link`)?.focus()
   }
   root.render(<CreateAssignmentViewAdapter assignmentGroup={this.model} closeHandler={onClose} />)
 }

@@ -44,6 +44,7 @@ const BlockContentEditorWrapper = (props: BlockContentEditorProps) => {
 export type BlockContentEditorProps = BlockContentViewerProps & {
   onInit: ((handler: BlockContentEditorHandler) => void) | null
   aiAltTextGenerationURL: string | null
+  toolbarReorder: boolean
 }
 
 export const BlockContentEditor = (props: BlockContentEditorProps) => {
@@ -53,6 +54,7 @@ export const BlockContentEditor = (props: BlockContentEditorProps) => {
         <BlockContentEditorContext
           data={props.data}
           aiAltTextGenerationURL={props.aiAltTextGenerationURL}
+          toolbarReorder={props.toolbarReorder}
         >
           <BlockContentEditorWrapper {...props} />
         </BlockContentEditorContext>

@@ -77,6 +77,38 @@ module OutcomesService
         )
       end
 
+      def start_outcome_alignment_service_clone(context, original_assignment_id:, copied_assignment_id:, new_context_id:, original_context_id:)
+        return unless enabled_in_context?(context)
+
+        batch_clone_url = "#{url(context)}/api/alignment_sets/batch_clone"
+        payload = {
+          original_assignment_id:,
+          copied_assignment_id:,
+          new_context_id:,
+          original_context_id:
+        }
+
+        response = CanvasHttp.post(
+          batch_clone_url,
+          headers_for(context, "outcome_alignment_sets.batch_clone", payload),
+          body: payload.to_json,
+          content_type: "application/json"
+        )
+
+        case response&.code
+        when "200", "202"
+          JSON.parse(response.body) if response.body.present?
+        else
+          Canvas::Errors.capture(
+            "Unexpected response from Outcomes Service batch clone alignment sets",
+            status_code: response&.code,
+            body: response&.body,
+            payload:
+          )
+          nil
+        end
+      end
+
       private
 
       def headers_for(context, scope, overrides = {})

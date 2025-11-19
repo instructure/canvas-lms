@@ -48,7 +48,7 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
           })
           setAIExperience(json as AIExperience)
         } catch (error) {
-          console.error('Error fetching AI Experience:', error)
+          // TODO: Show flash alert to user for fetch error
         } finally {
           setIsInitialLoading(false)
         }
@@ -79,13 +79,6 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
         workflow_state: 'unpublished',
       }
 
-      console.log(`${isEdit ? 'Updating' : 'Creating'} AI experience:`, {
-        path,
-        method,
-        formData: dataToSubmit,
-        courseId,
-      })
-
       const {json} = await doFetchApi({
         path,
         method,
@@ -96,10 +89,6 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
 
       const updatedExperience = json as AIExperience
       setAIExperience(updatedExperience)
-      console.log(
-        `AI Experience ${isEdit ? 'updated' : 'created'} successfully:`,
-        updatedExperience,
-      )
 
       // Redirect to the show page, optionally with preview parameter
       if (updatedExperience.id) {
@@ -107,7 +96,7 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
         window.location.href = `/courses/${courseId}/ai_experiences/${updatedExperience.id}${previewParam}`
       }
     } catch (error) {
-      console.error('Error saving AI Experience:', error)
+      // TODO: Show flash alert to user for save error
     } finally {
       setIsLoading(false)
     }

@@ -31,15 +31,23 @@ class GradeSummaryAssignmentPresenter
     @originality_reports = @submission.originality_reports_for_display if @submission
   end
 
+  def attachments
+    @attachments ||= if submission
+                       (submission.preloaded_attachments || submission.attachments).to_a
+                     else
+                       []
+                     end
+  end
+
   def upload_status
     return unless submission
 
     # The sort here ensures that statuses received are in the failed,
     # pending and success order. With that security we can just pluck
     # first one.
-    submission.attachments
-              .map { |a| AttachmentUploadStatus.upload_status(a) }
-              .min
+    attachments
+      .map { |a| AttachmentUploadStatus.upload_status(a) }
+      .min
   end
 
   def originality_report?
@@ -47,7 +55,12 @@ class GradeSummaryAssignmentPresenter
   end
 
   def show_distribution_graph?
-    @assignment.score_statistic = @summary.assignment_stats[assignment.id] # Avoid another query
+    if preload_optimizations_enabled?
+      @assignment.association(:score_statistic).target = @summary.assignment_stats[assignment.id] # Avoid another query
+    else
+      @assignment.score_statistic = @summary.assignment_stats[assignment.id] # Avoid another query
+    end
+
     @assignment.can_view_score_statistics?(@current_user)
   end
 
@@ -283,7 +296,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def file
-    @file ||= submission.attachments.detect { |a| plagiarism_attachment?(a) }
+    @file ||= attachments.detect { |a| plagiarism_attachment?(a) }
   end
 
   def plagiarism_attachment?(a)
@@ -308,6 +321,12 @@ class GradeSummaryAssignmentPresenter
 
   def viewing_fake_student?
     @summary.student_enrollment.fake_student?
+  end
+
+  def preload_optimizations_enabled?
+    return @preload_optimizations_enabled if defined?(@preload_optimizations_enabled)
+
+    @preload_optimizations_enabled = Account.site_admin.feature_enabled?(:grade_summary_preload_optimizations)
   end
 
   FULLWIDTH = 150.0

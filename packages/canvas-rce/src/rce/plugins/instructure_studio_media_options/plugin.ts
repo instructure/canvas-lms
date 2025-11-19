@@ -24,6 +24,7 @@ import {
   updateStudioIframeDimensions,
   isValidDimension,
   isValidEmbedType,
+  isValidResizable,
 } from '../shared/StudioLtiSupportUtils'
 import VideoTrayController from '../instructure_record/VideoOptionsTray/TrayController'
 import formatMessage from '../../../format-message'
@@ -46,11 +47,15 @@ const handleStudioMessage = (e: MessageEvent) => {
     isValidDimension(e.data.height) &&
     isValidEmbedType(e.data.embedType)
   ) {
+    // resizable is optional - only pass it if it's a valid boolean
+    const resizable = isValidResizable(e.data.resizable) ? e.data.resizable : undefined
+
     updateStudioIframeDimensions(
       tinymce.activeEditor,
       e.data.width,
       e.data.height,
       e.data.embedType,
+      resizable,
     )
   }
 }

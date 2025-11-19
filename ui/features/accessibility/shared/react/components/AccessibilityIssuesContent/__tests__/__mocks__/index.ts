@@ -174,7 +174,7 @@ export const multiIssueItem: AccessibilityResourceScan = {
       id: 'issue-1',
       path: '/html/body/div[1]',
       ruleId: 'adjacent-links',
-      displayName: 'Adjacent links',
+      displayName: 'Duplicate links',
       message: 'This is a test issue',
       workflowState: IssueWorkflowState.Active,
       form: {

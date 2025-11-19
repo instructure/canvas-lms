@@ -30,5 +30,5 @@ describe "blueprint_sync_complete" do
   let(:asset) { @mm }
   let(:notification_name) { :blueprint_sync_complete }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

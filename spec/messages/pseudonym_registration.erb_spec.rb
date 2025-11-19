@@ -31,7 +31,7 @@ describe "pseudonym_registration" do
   end
   let(:notification_name) { :pseudonym_registration }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 
   it "removes profile url link" do
     include MessagesCommon

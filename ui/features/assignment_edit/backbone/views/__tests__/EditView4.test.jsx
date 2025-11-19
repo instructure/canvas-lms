@@ -38,6 +38,12 @@ import {waitFor} from '@testing-library/react'
 import {createRoot} from 'react-dom/client'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
+import {getUrlWithHorizonParams} from '@canvas/horizon/utils'
+
+// Mock the horizon utils module
+jest.mock('@canvas/horizon/utils', () => ({
+  getUrlWithHorizonParams: jest.fn(),
+}))
 
 jest.mock('jquery-ui', () => {
   const $ = require('jquery')
@@ -204,7 +210,18 @@ describe('EditView', () => {
       },
       context_asset_string: 'course_1',
       SETTINGS: {},
+      FEATURES: {},
     }
+
+    // Setup default mock for getUrlWithHorizonParams
+    getUrlWithHorizonParams.mockImplementation((url, additionalParams) => {
+      if (additionalParams && Object.keys(additionalParams).length > 0) {
+        const separator = url.includes('?') ? '&' : '?'
+        const params = new URLSearchParams(additionalParams).toString()
+        return `${url}${separator}${params}`
+      }
+      return url
+    })
 
     fetchMock.get('/api/v1/courses/1/settings', {})
     fetchMock.get('/api/v1/courses/1/sections?per_page=100', [])
@@ -227,6 +244,7 @@ describe('EditView', () => {
     fetchMock.reset()
     server.resetHandlers()
     jest.resetModules()
+    jest.clearAllMocks()
     window.ENV = null
   })
 

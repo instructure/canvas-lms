@@ -21,6 +21,20 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import Assignment from '../Assignment'
 
+// Mock the horizon utils module
+jest.mock('@canvas/horizon/utils', () => ({
+  getUrlWithHorizonParams: jest.fn((url, params) => {
+    if (params) {
+      const urlObj = new URL(url, 'http://example.com')
+      Object.entries(params).forEach(([key, value]) => {
+        urlObj.searchParams.set(key, value)
+      })
+      return urlObj.toString()
+    }
+    return url
+  }),
+}))
+
 describe('Assignment', () => {
   describe('#toView', () => {
     beforeEach(() => {
@@ -198,7 +212,7 @@ describe('Assignment', () => {
           is_quiz_lti_assignment: true,
         })
         ENV.PERMISSIONS = {manage: true}
-        expect(assignment.toView().htmlUrl).toBe('http://example.com/assignments/1/edit?quiz_lti')
+        expect(assignment.toView().htmlUrl).toBe('http://example.com/assignments/1/edit?quiz_lti=true')
         ENV.PERMISSIONS = {}
         ENV.FLAGS = {}
       })

@@ -47,7 +47,7 @@ const parsedIssueDataPoints: IssueDataPoint[] = [
   },
   {
     id: 'adjacent-links',
-    issue: 'Adjacent links',
+    issue: 'Duplicate links',
     count: 50,
     severity: 'High',
   },

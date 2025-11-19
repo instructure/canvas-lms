@@ -382,6 +382,27 @@ describe "Api::V1::Assignment" do
           expect(json["all_dates"].pluck(:due_at)).to contain_exactly(*due_dates)
         end
       end
+
+      it "returns empty all_dates array and all_dates_count when there are more than 25 overrides" do
+        course = course_model
+        teacher = teacher_in_course(course:, active_all: true).user
+        assignment = assignment_model(course:)
+
+        # Create 26 sections and one override for each section
+        26.times do |i|
+          section = course.course_sections.create!(name: "Section #{i + 1}")
+          assignment.assignment_overrides.create!(
+            set_type: "CourseSection",
+            set_id: section.id,
+            due_at: (i + 1).days.from_now
+          )
+        end
+
+        json = api.assignment_json(assignment, teacher, session, { include_all_dates: true })
+
+        expect(json["all_dates"]).to eq([])
+        expect(json["all_dates_count"]).to eq(26)
+      end
     end
 
     context "for a quiz" do
@@ -621,6 +642,21 @@ describe "Api::V1::Assignment" do
       it "returns estimated duration" do
         json = api.assignment_json(assignment, user, session, {})
         expect(json).to have_key("estimated_duration")
+      end
+    end
+
+    context "with peer_review_allocation feature flag enabled" do
+      before do
+        @assignment = assignment_model
+        @assignment.update_attribute(:peer_reviews, true)
+        @assignment.update_attribute(:peer_review_count, 2)
+        @assignment.course.enable_feature!(:peer_review_allocation)
+      end
+
+      it "includes peer_review_count" do
+        json = api.assignment_json(@assignment, user, session, {})
+        expect(json).to have_key("peer_review_count")
+        expect(json["peer_review_count"]).to eq 2
       end
     end
   end
@@ -1002,16 +1038,16 @@ describe "Api::V1::Assignment" do
     context "when workflow_state is 'duplicating'" do
       let(:workflow_state) { "duplicating" }
 
-      include_examples "retains the original publication state"
-      include_examples "falls back to 'unpublished' state"
-      include_examples "sets workflow_state to outcome_alignment_cloning"
+      it_behaves_like "retains the original publication state"
+      it_behaves_like "falls back to 'unpublished' state"
+      it_behaves_like "sets workflow_state to outcome_alignment_cloning"
     end
 
     context "when workflow_state is 'failed_to_duplicate'" do
       let(:workflow_state) { "failed_to_duplicate" }
 
-      include_examples "retains the original publication state"
-      include_examples "falls back to 'unpublished' state"
+      it_behaves_like "retains the original publication state"
+      it_behaves_like "falls back to 'unpublished' state"
     end
 
     context "when workflow_state is other that 'duplicating' or 'failed_to_duplicate'" do
@@ -1489,47 +1525,102 @@ describe "Api::V1::Assignment" do
           allow(assignment).to receive(:quiz_lti?).and_return(true)
         end
 
-        context "when new_quizzes_quiz_type param is not present" do
-          it "does not modify assignment settings" do
-            expect(assignment).not_to receive(:new_quizzes_type=)
-            api.update_new_quizzes_params(assignment, assignment_params)
+        context "when assignment is not a new record" do
+          before do
+            allow(assignment).to receive(:new_record?).and_return(false)
           end
-        end
 
-        context "when new_quizzes_quiz_type param is blank" do
           it "does not modify assignment settings" do
-            assignment_params[:new_quizzes_quiz_type] = ""
-
-            expect(assignment).not_to receive(:new_quizzes_type=)
-            api.update_new_quizzes_params(assignment, assignment_params)
-          end
-        end
-
-        context "when new_quizzes_quiz_type param is nil" do
-          it "does not modify assignment settings" do
-            assignment_params[:new_quizzes_quiz_type] = nil
+            assignment_params[:new_quizzes_quiz_type] = "ungraded_survey"
 
             expect(assignment).not_to receive(:new_quizzes_type=)
             api.update_new_quizzes_params(assignment, assignment_params)
           end
         end
 
-        context "when new_quizzes_quiz_type param has content" do
-          it "calls the #new_quizzes_type= method on assignment" do
-            assignment_params[:new_quizzes_quiz_type] = "quiz_type"
-
-            expect(assignment).to receive(:new_quizzes_type=).with("quiz_type")
-            api.update_new_quizzes_params(assignment, assignment_params)
+        context "when assignment is a new record" do
+          before do
+            allow(assignment).to receive(:new_record?).and_return(true)
           end
-        end
 
-        context "edge cases" do
-          it "ignores string keys in assignment_params" do
-            assignment_params["new_quizzes_quiz_type"] = "ungraded_survey"
+          context "when new_quizzes_quiz_type param is not present" do
+            it "does not modify assignment settings" do
+              expect(assignment).not_to receive(:new_quizzes_type=)
+              api.update_new_quizzes_params(assignment, assignment_params)
+            end
+          end
 
-            api.update_new_quizzes_params(assignment, assignment_params)
+          context "when new_quizzes_quiz_type param is blank" do
+            it "does not modify assignment settings" do
+              assignment_params[:new_quizzes_quiz_type] = ""
 
-            expect(assignment.settings).to be_nil
+              expect(assignment).not_to receive(:new_quizzes_type=)
+              api.update_new_quizzes_params(assignment, assignment_params)
+            end
+          end
+
+          context "when new_quizzes_quiz_type param is nil" do
+            it "does not modify assignment settings" do
+              assignment_params[:new_quizzes_quiz_type] = nil
+
+              expect(assignment).not_to receive(:new_quizzes_type=)
+              api.update_new_quizzes_params(assignment, assignment_params)
+            end
+          end
+
+          context "edge cases" do
+            it "ignores string keys in assignment_params" do
+              assignment_params["new_quizzes_quiz_type"] = "ungraded_survey"
+
+              api.update_new_quizzes_params(assignment, assignment_params)
+
+              # graded_quiz is the default value
+              expect(assignment.new_quizzes_type).to eq("graded_quiz")
+            end
+          end
+
+          context "when new_quizzes_quiz_type param has content" do
+            context "when quiz type is ungraded_survey" do
+              before do
+                assignment_params[:new_quizzes_quiz_type] = "ungraded_survey"
+              end
+
+              it "sets hide_in_gradebook and omit_from_final_grade to true" do
+                api.update_new_quizzes_params(assignment, assignment_params)
+
+                expect(assignment.new_quizzes_type).to eq "ungraded_survey"
+                expect(assignment.hide_in_gradebook).to be true
+                expect(assignment.omit_from_final_grade).to be true
+              end
+            end
+
+            context "when quiz type is graded_quiz" do
+              before do
+                assignment_params[:new_quizzes_quiz_type] = "graded_quiz"
+              end
+
+              it "does not set hide_in_gradebook and omit_from_final_grade to true" do
+                api.update_new_quizzes_params(assignment, assignment_params)
+
+                expect(assignment.new_quizzes_type).to eq "graded_quiz"
+                expect(assignment.hide_in_gradebook).to be false
+                expect(assignment.omit_from_final_grade).to be false
+              end
+            end
+
+            context "when quiz type is graded_survey" do
+              before do
+                assignment_params[:new_quizzes_quiz_type] = "graded_survey"
+              end
+
+              it "does not set hide_in_gradebook and omit_from_final_grade to true" do
+                api.update_new_quizzes_params(assignment, assignment_params)
+
+                expect(assignment.new_quizzes_type).to eq "graded_survey"
+                expect(assignment.hide_in_gradebook).to be false
+                expect(assignment.omit_from_final_grade).to be false
+              end
+            end
           end
         end
       end

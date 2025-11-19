@@ -47,6 +47,10 @@ describe CC::TopicResources do
     Nokogiri::XML(doc.target!)
   end
 
+  before do
+    allow_any_instance_of(Course).to receive(:a11y_checker_enabled?).and_return(false)
+  end
+
   let(:ccc_schema) { get_ccc_schema }
   let(:mock_course) { course_model }
   let(:mock_user) { user_model }

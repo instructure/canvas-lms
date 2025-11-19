@@ -1555,6 +1555,49 @@ describe Types::SubmissionType do
         checkpoint_submission_type.resolve("subAssignmentSubmissions { assignmentId }")
       end.to raise_error(Checkpoints::SubAssignmentSubmissionSerializer::MissingSubAssignmentSubmissionError, /Submission is missing for SubAssignment/)
     end
+
+    it "returns deducted_points for sub assignment submissions with late policy" do
+      @sub_submission1.update!(points_deducted: 1.5, late_policy_status: "late")
+      @sub_submission2.update!(points_deducted: 0, late_policy_status: nil)
+
+      checkpoint_submission_type = GraphQLTypeTester.new(@checkpoint_submission, current_user: @teacher)
+      result = checkpoint_submission_type.resolve("subAssignmentSubmissions { deductedPoints }")
+      expect(result).to contain_exactly(1.5, 0.0)
+    end
+
+    it "returns nil for deducted_points when post policies hide grades" do
+      @sub_submission1.update!(points_deducted: 1.5, late_policy_status: "late", posted_at: nil)
+      @sub_assignment1.ensure_post_policy(post_manually: true)
+
+      checkpoint_submission_type = GraphQLTypeTester.new(@checkpoint_submission, current_user: @student)
+      result = checkpoint_submission_type.resolve("subAssignmentSubmissions { deductedPoints }")
+      # Students can't see grades when posts are hidden
+      expect(result.first).to be_nil
+    end
+
+    it "returns submitted_at timestamp when sub assignment submissions have been submitted" do
+      submitted_time_1 = 2.hours.ago
+      submitted_time_2 = 1.hour.ago
+
+      @sub_assignment1.submit_homework(@student, body: "test", submitted_at: submitted_time_1)
+      @sub_assignment2.submit_homework(@student, body: "test", submitted_at: submitted_time_2)
+
+      checkpoint_submission_type = GraphQLTypeTester.new(@checkpoint_submission, current_user: @teacher)
+      result = checkpoint_submission_type.resolve("subAssignmentSubmissions { submittedAt }")
+
+      expect(result.length).to eq 2
+      expect(result).to contain_exactly(submitted_time_1.iso8601, submitted_time_2.iso8601)
+    end
+
+    it "returns nil for submitted_at when sub assignment submissions have not been submitted" do
+      @sub_submission1.update!(submitted_at: nil, workflow_state: "unsubmitted")
+      @sub_submission2.update!(submitted_at: nil, workflow_state: "unsubmitted")
+
+      checkpoint_submission_type = GraphQLTypeTester.new(@checkpoint_submission, current_user: @teacher)
+      result = checkpoint_submission_type.resolve("subAssignmentSubmissions { submittedAt }")
+
+      expect(result).to contain_exactly(nil, nil)
+    end
   end
 
   describe "provisionalGradesConnection" do
@@ -1606,6 +1649,36 @@ describe Types::SubmissionType do
       expect(submission_type.resolve("provisionalGradesConnection { nodes { _id } }")).to eq(
         @moderated_assignment.provisional_grades.where(scorer: @teacher1).map { |x| x.id.to_s }
       )
+    end
+
+    describe "provisional grading fields" do
+      it "returns true for hasProvisionalGradeByCurrentUser when user has provided a provisional grade with non-null score" do
+        submission_type = GraphQLTypeTester.new(@moderated_submission, current_user: @teacher1)
+        expect(submission_type.resolve("hasProvisionalGradeByCurrentUser")).to be true
+      end
+
+      it "returns false for hasProvisionalGradeByCurrentUser when user has not provided a provisional grade" do
+        submission_type = GraphQLTypeTester.new(@moderated_submission, current_user: @moderator)
+        expect(submission_type.resolve("hasProvisionalGradeByCurrentUser")).to be false
+      end
+
+      it "returns false for hasProvisionalGradeByCurrentUser when provisional grade has null score" do
+        @moderated_submission.provisional_grades.destroy_all
+        @moderated_submission.provisional_grades.create!(scorer: @teacher1, score: nil)
+        submission_type = GraphQLTypeTester.new(@moderated_submission, current_user: @teacher1)
+        expect(submission_type.resolve("hasProvisionalGradeByCurrentUser")).to be false
+      end
+
+      it "returns false for hasProvisionalGradeByCurrentUser on non-moderated assignments" do
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher1)
+        expect(submission_type.resolve("hasProvisionalGradeByCurrentUser")).to be false
+      end
+
+      it "returns false for hasProvisionalGradeByCurrentUser after grades are published" do
+        @moderated_assignment.update!(grades_published_at: Time.zone.now)
+        submission_type = GraphQLTypeTester.new(@moderated_submission, current_user: @teacher1)
+        expect(submission_type.resolve("hasProvisionalGradeByCurrentUser")).to be false
+      end
     end
   end
 

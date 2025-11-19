@@ -79,6 +79,7 @@ describe Mutations::UpdateAssignment do
               intraReviews
               anonymousReviews
               automaticReviews
+              submissionRequired
             }
             modules {
               _id
@@ -234,6 +235,64 @@ describe Mutations::UpdateAssignment do
     expect(assignment.intra_group_peer_reviews).to be true
     expect(assignment.anonymous_peer_reviews).to be true
     expect(assignment.automatic_peer_reviews).to be true
+  end
+
+  context "peer review submission_required" do
+    before do
+      @course.enable_feature!(:peer_review_allocation)
+    end
+
+    it "can update submission_required to true" do
+      assignment = Assignment.find(@assignment_id)
+      expect(assignment.peer_review_submission_required).to be false
+
+      result = execute_with_input <<~GQL
+        id: "#{@assignment_id}"
+        peerReviews: {
+          enabled: true
+          submissionRequired: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateAssignment", "errors")).to be_nil
+      expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "submissionRequired")).to be true
+      expect(Assignment.find(@assignment_id).peer_review_submission_required).to be true
+    end
+
+    it "can update submission_required to false" do
+      assignment = Assignment.find(@assignment_id)
+      assignment.update!(peer_review_submission_required: true)
+
+      result = execute_with_input <<~GQL
+        id: "#{@assignment_id}"
+        peerReviews: {
+          enabled: true
+          submissionRequired: false
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateAssignment", "errors")).to be_nil
+      expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "submissionRequired")).to be false
+      expect(Assignment.find(@assignment_id).peer_review_submission_required).to be false
+    end
+
+    it "returns nil for submission_required when feature flag is disabled" do
+      @course.disable_feature!(:peer_review_allocation)
+      assignment = Assignment.find(@assignment_id)
+      assignment.update!(peer_review_submission_required: true)
+
+      result = execute_with_input <<~GQL
+        id: "#{@assignment_id}"
+        peerReviews: {
+          enabled: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "submissionRequired")).to be_nil
+    end
   end
 
   it "enabling moderated grading sticks with other updates" do

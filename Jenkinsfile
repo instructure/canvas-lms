@@ -93,7 +93,7 @@ def postFn(status) {
     node('master') {
       def requestEndTime = System.currentTimeMillis()
 
-      reportToSplunk('node_request_time', [
+      reportBuildLog('node_request_time', [
         'nodeName': 'master',
         'nodeLabel': 'master',
         'requestTime': requestEndTime - requestStartTime,

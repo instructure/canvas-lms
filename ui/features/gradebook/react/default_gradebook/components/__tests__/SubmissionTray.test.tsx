@@ -292,6 +292,12 @@ describe('SubmissionTray', () => {
     expect(speedGraderLink()?.getAttribute('href')).toEqual(speedGraderUrl)
   })
 
+  test('SpeedGrader link opens in new tab', () => {
+    mountComponent()
+    expect(speedGraderLink()?.getAttribute('target')).toEqual('_blank')
+    expect(speedGraderLink()?.getAttribute('rel')).toEqual('noopener')
+  })
+
   test('invokes "onAnonymousSpeedGraderClick" when the SpeedGrader link is clicked if the assignment is anonymous', () => {
     props.assignment.anonymizeStudents = true
     props.assignment.name = 'Book Report'

@@ -6,6 +6,7 @@ ada_chatbot:
   description: Enable Panda Bot virtual assistant in the help menu
   applies_to: RootAccount
   shadow: true
+  after_state_change_proc: sync_with_salesforce
 allow_opt_out_of_inbox:
   type: setting
   state: hidden

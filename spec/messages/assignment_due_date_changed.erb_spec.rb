@@ -28,5 +28,5 @@ describe "assignment_due_date_changed" do
   let(:asset) { @assignment }
   let(:notification_name) { :assignment_due_date_changed }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

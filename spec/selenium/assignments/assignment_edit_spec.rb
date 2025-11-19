@@ -190,4 +190,70 @@ describe "assignment" do
       expect(@assignment.assignment_overrides.active.find_by(set_id: AssignmentOverride::NOOP_MASTERY_PATHS, set_type: AssignmentOverride::SET_TYPE_NOOP)).not_to be_present
     end
   end
+
+  describe "peer review submission required" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @course.enable_feature!(:peer_review_allocation)
+      @assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        points_possible: 10,
+        submission_types: "online_text_entry",
+        peer_reviews: true
+      )
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "loads the initial value of submission required when editing an assignment", custom_timeout: 30 do
+      @assignment.update!(peer_review_submission_required: true)
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      wait_for_ajaximations
+
+      fj("button:contains('Advanced Peer Review Configurations')").click
+      wait_for_ajaximations
+
+      submission_required_checkbox = f("#peer_reviews_submission_required_checkbox")
+      expect(submission_required_checkbox).to be_selected
+    end
+
+    it "allows toggling submission required and persists the value", custom_timeout: 40 do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      wait_for_ajaximations
+
+      fj("button:contains('Advanced Peer Review Configurations')").click
+      wait_for_ajaximations
+
+      submission_required_checkbox = f("#peer_reviews_submission_required_checkbox")
+      expect(submission_required_checkbox).not_to be_selected
+
+      force_click("#peer_reviews_submission_required_checkbox")
+      expect(submission_required_checkbox).to be_selected
+
+      find_button("Save").click
+      wait_for_ajaximations
+
+      expect(@assignment.reload.peer_review_submission_required).to be true
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      wait_for_ajaximations
+
+      fj("button:contains('Advanced Peer Review Configurations')").click
+      wait_for_ajaximations
+
+      submission_required_checkbox = f("#peer_reviews_submission_required_checkbox")
+      expect(submission_required_checkbox).to be_selected
+
+      force_click("#peer_reviews_submission_required_checkbox")
+      expect(submission_required_checkbox).not_to be_selected
+
+      find_button("Save").click
+      wait_for_ajaximations
+
+      expect(@assignment.reload.peer_review_submission_required).to be false
+    end
+  end
 end

@@ -55,6 +55,364 @@ RSpec.describe PeerReview::DateOverriderService do
     end
   end
 
+  describe "#format_overrides" do
+    context "when overrides are in standard format" do
+      it "returns overrides unchanged" do
+        overrides = [
+          { set_type: "CourseSection", set_id: 1, due_at: 1.week.from_now },
+          { set_type: "ADHOC", student_ids: [1, 2, 3], due_at: 2.weeks.from_now }
+        ]
+        service = described_class.new(peer_review_sub_assignment:, overrides:)
+        formatted = service.instance_variable_get(:@overrides)
+
+        expect(formatted).to eq(overrides)
+      end
+    end
+
+    context "when overrides are in REST API format" do
+      it "converts course_section_id to set_type and set_id" do
+        overrides = [
+          { course_section_id: 123, due_at: 1.week.from_now }
+        ]
+        service = described_class.new(peer_review_sub_assignment:, overrides:)
+        formatted = service.instance_variable_get(:@overrides)
+
+        expect(formatted).to eq([
+                                  { set_type: "CourseSection", set_id: 123, due_at: overrides[0][:due_at] }
+                                ])
+      end
+
+      it "converts group_id to set_type and set_id" do
+        overrides = [
+          { group_id: 456, due_at: 1.week.from_now }
+        ]
+        service = described_class.new(peer_review_sub_assignment:, overrides:)
+        formatted = service.instance_variable_get(:@overrides)
+
+        expect(formatted).to eq([
+                                  { set_type: "Group", set_id: 456, due_at: overrides[0][:due_at] }
+                                ])
+      end
+
+      it "converts course_id to set_type and set_id" do
+        overrides = [
+          { course_id: 789, due_at: 1.week.from_now }
+        ]
+        service = described_class.new(peer_review_sub_assignment:, overrides:)
+        formatted = service.instance_variable_get(:@overrides)
+
+        expect(formatted).to eq([
+                                  { set_type: "Course", set_id: 789, due_at: overrides[0][:due_at] }
+                                ])
+      end
+
+      it "converts student_ids to ADHOC set_type" do
+        overrides = [
+          { student_ids: [1, 2, 3], due_at: 1.week.from_now }
+        ]
+        service = described_class.new(peer_review_sub_assignment:, overrides:)
+        formatted = service.instance_variable_get(:@overrides)
+
+        expect(formatted).to eq([
+                                  { set_type: "ADHOC", student_ids: [1, 2, 3], due_at: overrides[0][:due_at] }
+                                ])
+      end
+
+      it "handles student_ids as strings and converts to integers" do
+        overrides = [
+          { student_ids: %w[10 20 30], due_at: 1.week.from_now }
+        ]
+        service = described_class.new(peer_review_sub_assignment:, overrides:)
+        formatted = service.instance_variable_get(:@overrides)
+
+        expect(formatted).to eq([
+                                  { set_type: "ADHOC", student_ids: [10, 20, 30], due_at: overrides[0][:due_at] }
+                                ])
+      end
+
+      it "preserves id when present" do
+        overrides = [
+          { id: "42", course_section_id: 123, due_at: 1.week.from_now }
+        ]
+        service = described_class.new(peer_review_sub_assignment:, overrides:)
+        formatted = service.instance_variable_get(:@overrides)
+
+        expect(formatted).to eq([
+                                  { id: 42, set_type: "CourseSection", set_id: 123, due_at: overrides[0][:due_at] }
+                                ])
+      end
+
+      it "preserves all date fields" do
+        due_at = 1.week.from_now
+        unlock_at = 1.day.from_now
+        lock_at = 2.weeks.from_now
+
+        overrides = [
+          { course_section_id: 123, due_at:, unlock_at:, lock_at: }
+        ]
+        service = described_class.new(peer_review_sub_assignment:, overrides:)
+        formatted = service.instance_variable_get(:@overrides)
+
+        expect(formatted).to eq([
+                                  { set_type: "CourseSection", set_id: 123, due_at:, unlock_at:, lock_at: }
+                                ])
+      end
+
+      it "preserves unassign_item flag" do
+        overrides = [
+          { course_section_id: 123, unassign_item: true }
+        ]
+        service = described_class.new(peer_review_sub_assignment:, overrides:)
+        formatted = service.instance_variable_get(:@overrides)
+
+        expect(formatted).to eq([
+                                  { set_type: "CourseSection", set_id: 123, unassign_item: true }
+                                ])
+      end
+
+      it "does not include unassign_item when not present" do
+        overrides = [
+          { course_section_id: 345, due_at: 1.week.from_now }
+        ]
+        service = described_class.new(peer_review_sub_assignment:, overrides:)
+        formatted = service.instance_variable_get(:@overrides)
+
+        expect(formatted).to eq([
+                                  { set_type: "CourseSection", set_id: 345, due_at: overrides[0][:due_at] }
+                                ])
+      end
+    end
+
+    context "with mixed format overrides" do
+      it "formats only overrides that need formatting" do
+        due_at1 = 1.week.from_now
+        due_at2 = 2.weeks.from_now
+
+        overrides = [
+          { set_type: "CourseSection", set_id: 1, due_at: due_at1 },
+          { course_section_id: 2, due_at: due_at2 }
+        ]
+        service = described_class.new(peer_review_sub_assignment:, overrides:)
+        formatted = service.instance_variable_get(:@overrides)
+
+        expect(formatted).to eq([
+                                  { set_type: "CourseSection", set_id: 1, due_at: due_at1 },
+                                  { set_type: "CourseSection", set_id: 2, due_at: due_at2 }
+                                ])
+      end
+    end
+
+    context "with empty or nil overrides" do
+      it "handles empty array" do
+        service = described_class.new(peer_review_sub_assignment:, overrides: [])
+        formatted = service.instance_variable_get(:@overrides)
+
+        expect(formatted).to eq([])
+      end
+
+      it "handles nil overrides" do
+        service = described_class.new(peer_review_sub_assignment:, overrides: nil)
+        formatted = service.instance_variable_get(:@overrides)
+
+        expect(formatted).to eq([])
+      end
+    end
+  end
+
+  describe "#needs_formatting?" do
+    it "returns true when course_section_id is present" do
+      service = described_class.new(peer_review_sub_assignment:)
+      override = { course_section_id: 123 }
+
+      expect(service.send(:needs_formatting?, override)).to be true
+    end
+
+    it "returns true when group_id is present" do
+      service = described_class.new(peer_review_sub_assignment:)
+      override = { group_id: 456 }
+
+      expect(service.send(:needs_formatting?, override)).to be true
+    end
+
+    it "returns true when course_id is present" do
+      service = described_class.new(peer_review_sub_assignment:)
+      override = { course_id: 789 }
+
+      expect(service.send(:needs_formatting?, override)).to be true
+    end
+
+    it "returns true when student_ids is present without set_type" do
+      service = described_class.new(peer_review_sub_assignment:)
+      override = { student_ids: [1, 2, 3] }
+
+      expect(service.send(:needs_formatting?, override)).to be true
+    end
+
+    it "returns false when student_ids has set_type" do
+      service = described_class.new(peer_review_sub_assignment:)
+      override = { student_ids: [1, 2, 3], set_type: "ADHOC" }
+
+      expect(service.send(:needs_formatting?, override)).to be false
+    end
+
+    it "returns false when override is in standard format" do
+      service = described_class.new(peer_review_sub_assignment:)
+      override = { set_type: "CourseSection", set_id: 123 }
+
+      expect(service.send(:needs_formatting?, override)).to be false
+    end
+  end
+
+  describe "#format_api_override" do
+    let(:service) { described_class.new(peer_review_sub_assignment:) }
+
+    context "with CourseSection override" do
+      it "converts course_section_id to set_type and set_id" do
+        override = { course_section_id: 123, due_at: 1.week.from_now }
+        result = service.send(:format_api_override, override)
+
+        expect(result).to include(
+          set_type: "CourseSection",
+          set_id: 123,
+          due_at: override[:due_at]
+        )
+      end
+    end
+
+    context "with Group override" do
+      it "converts group_id to set_type and set_id" do
+        override = { group_id: 456, due_at: 1.week.from_now }
+        result = service.send(:format_api_override, override)
+
+        expect(result).to include(
+          set_type: "Group",
+          set_id: 456,
+          due_at: override[:due_at]
+        )
+      end
+    end
+
+    context "with Course override" do
+      it "converts course_id to set_type and set_id" do
+        override = { course_id: 789, due_at: 1.week.from_now }
+        result = service.send(:format_api_override, override)
+
+        expect(result).to include(
+          set_type: "Course",
+          set_id: 789,
+          due_at: override[:due_at]
+        )
+      end
+    end
+
+    context "with ADHOC override" do
+      it "converts student_ids to set_type and student_ids array" do
+        override = { student_ids: [10, 20, 30], due_at: 1.week.from_now }
+        result = service.send(:format_api_override, override)
+
+        expect(result).to include(
+          set_type: "ADHOC",
+          student_ids: [10, 20, 30],
+          due_at: override[:due_at]
+        )
+      end
+
+      it "converts student_ids strings to integers" do
+        override = { student_ids: ["100", "200"], due_at: 1.week.from_now }
+        result = service.send(:format_api_override, override)
+
+        expect(result).to include(
+          set_type: "ADHOC",
+          student_ids: [100, 200]
+        )
+      end
+    end
+
+    context "with id field" do
+      it "includes id as integer" do
+        override = { id: "42", course_section_id: 123 }
+        result = service.send(:format_api_override, override)
+
+        expect(result[:id]).to eq(42)
+      end
+
+      it "does not include id when not present" do
+        override = { course_section_id: 123 }
+        result = service.send(:format_api_override, override)
+
+        expect(result).not_to have_key(:id)
+      end
+    end
+
+    context "with date fields" do
+      it "includes due_at when present" do
+        due_at = 1.week.from_now
+        override = { course_section_id: 123, due_at: }
+        result = service.send(:format_api_override, override)
+
+        expect(result[:due_at]).to eq(due_at)
+      end
+
+      it "includes unlock_at when present" do
+        unlock_at = 1.day.from_now
+        override = { course_section_id: 123, unlock_at: }
+        result = service.send(:format_api_override, override)
+
+        expect(result[:unlock_at]).to eq(unlock_at)
+      end
+
+      it "includes lock_at when present" do
+        lock_at = 2.weeks.from_now
+        override = { course_section_id: 123, lock_at: }
+        result = service.send(:format_api_override, override)
+
+        expect(result[:lock_at]).to eq(lock_at)
+      end
+
+      it "includes date fields with nil values" do
+        override = { course_section_id: 123, due_at: nil, unlock_at: nil, lock_at: nil }
+        result = service.send(:format_api_override, override)
+
+        expect(result).to have_key(:due_at)
+        expect(result).to have_key(:unlock_at)
+        expect(result).to have_key(:lock_at)
+        expect(result[:due_at]).to be_nil
+      end
+
+      it "excludes date fields when not present in override" do
+        override = { course_section_id: 123 }
+        result = service.send(:format_api_override, override)
+
+        expect(result).not_to have_key(:due_at)
+        expect(result).not_to have_key(:unlock_at)
+        expect(result).not_to have_key(:lock_at)
+      end
+    end
+
+    context "with unassign_item field" do
+      it "includes unassign_item when true" do
+        override = { course_section_id: 123, unassign_item: true }
+        result = service.send(:format_api_override, override)
+
+        expect(result[:unassign_item]).to be true
+      end
+
+      it "includes unassign_item when false" do
+        override = { course_section_id: 123, unassign_item: false }
+        result = service.send(:format_api_override, override)
+
+        expect(result[:unassign_item]).to be false
+      end
+
+      it "does not include unassign_item when not present" do
+        override = { course_section_id: 123 }
+        result = service.send(:format_api_override, override)
+
+        expect(result).not_to have_key(:unassign_item)
+      end
+    end
+  end
+
   describe "#call" do
     before do
       allow(service).to receive(:run_validations)

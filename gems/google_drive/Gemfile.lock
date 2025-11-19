@@ -58,7 +58,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.15.0)
-    jwt (2.10.1)
+    jwt (3.1.2)
       base64
     logger (1.7.0)
     mini_mime (1.1.5)

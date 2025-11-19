@@ -365,7 +365,7 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
       end
     end
 
-    context "discussion context temporary toggling", skip: "EGG-1031" do
+    context "discussion context temporary toggling", skip: "EGG-1031 2025-04-03" do
       it "toggles back and forth group discussions just fine", :ignore_js_errors do
         entry_text = "first student message in group1"
         root_topic = group_discussion_assignment

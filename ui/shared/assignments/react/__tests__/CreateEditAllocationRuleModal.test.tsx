@@ -22,8 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import CreateEditAllocationRuleModal from '../CreateEditAllocationRuleModal'
-import {CourseStudent} from '../../graphql/hooks/useAssignedStudents'
-import {AllocationRuleType} from '../../graphql/teacher/AssignmentTeacherTypes'
+import {CourseStudent, AllocationRuleType} from '../../graphql/teacher/AssignmentTeacherTypes'
 
 jest.mock('@canvas/graphql', () => ({
   executeQuery: jest.fn(),
@@ -33,14 +32,16 @@ const {executeQuery} = require('@canvas/graphql')
 const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
 
 const mockStudents: CourseStudent[] = [
-  {_id: '1', name: 'Student 1'},
-  {_id: '2', name: 'Student 2'},
-  {_id: '3', name: 'Student 3'},
+  {_id: '1', name: 'Student 1', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
+  {_id: '2', name: 'Student 2', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
+  {_id: '3', name: 'Student 3', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
 ]
 
 describe('CreateEditAllocationRuleModal', () => {
   const mockSetIsOpen = jest.fn()
   const defaultProps = {
+    assignmentId: '123',
+    requiredPeerReviewsCount: 2,
     isOpen: true,
     setIsOpen: mockSetIsOpen,
     refetchRules: jest.fn(),
@@ -49,11 +50,13 @@ describe('CreateEditAllocationRuleModal', () => {
   const assessor: CourseStudent = {
     _id: '1',
     name: 'Pikachu',
+    peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
   }
 
   const assessee: CourseStudent = {
     _id: '2',
     name: 'Piplup',
+    peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
   }
 
   const sampleRule: AllocationRuleType = {
@@ -291,7 +294,21 @@ describe('CreateEditAllocationRuleModal', () => {
 
   describe('Edit mode change detection', () => {
     it('closes modal without API call when no changes are made', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          assignedStudents: {
+            nodes: mockStudents,
+          },
+        },
+      })
+
       renderWithProviders({isEdit: true, rule: sampleRule})
+
+      // Clear the mock after the initial student fetching queries
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('Pikachu')).toBeInTheDocument()
+      })
+      mockExecuteQuery.mockClear()
 
       const saveButton = screen.getByTestId('save-button')
       await user.click(saveButton)
@@ -303,7 +320,21 @@ describe('CreateEditAllocationRuleModal', () => {
     })
 
     it('closes modal without API call when changes are reverted', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          assignedStudents: {
+            nodes: mockStudents,
+          },
+        },
+      })
+
       renderWithProviders({isEdit: true, rule: sampleRule})
+
+      // Clear the mock after the initial student fetching queries
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('Pikachu')).toBeInTheDocument()
+      })
+      mockExecuteQuery.mockClear()
 
       const shouldReviewRadio = screen.getByTestId('review-type-should-review')
       await user.click(shouldReviewRadio)

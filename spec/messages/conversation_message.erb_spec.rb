@@ -37,7 +37,7 @@ message")
   let(:notification_name) { :conversation_message }
   let(:asset) { @message }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 
   describe ".email" do
     let(:path_type) { :email }

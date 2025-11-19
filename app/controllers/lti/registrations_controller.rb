@@ -1959,6 +1959,12 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def inject_lti_usage_env
+    lti_usage_flags = {
+      isPremium: @account.root_account.feature_enabled?(:lti_usage_premium),
+      isDevelopment: @account.root_account.feature_enabled?(:lti_registrations_usage_data_dev),
+      isLowUsageAlerts: @account.root_account.feature_enabled?(:lti_registrations_usage_data_low_usage),
+    }
+
     js_env({
              LTI_USAGE: {
                env: Canvas.environment,
@@ -1968,7 +1974,8 @@ class Lti::RegistrationsController < ApplicationController
                locale: I18n.locale,
                rootAccountId: @account.root_account.id,
                rootAccountUuid: @account.root_account.uuid,
-               isPremiumAccount: @account.root_account.feature_enabled?(:lti_usage_premium)
+               isPremiumAccount: @account.root_account.feature_enabled?(:lti_usage_premium),
+               flags: lti_usage_flags,
              },
            })
 

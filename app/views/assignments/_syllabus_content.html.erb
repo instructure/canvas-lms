@@ -55,7 +55,17 @@ To add some comments, click the "Edit" link at the top.
     <a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a>
   <% end %>
   <% if can_do(@context, @current_user, :manage_course_content_edit) %>
-    <button class="edit_syllabus_link btn button-sidebar-wide" aria-expanded=”false”><i class="icon-edit"></i> <%= t 'links.edit_syllabus_description', "Edit" %></button>
+    <% if Account.site_admin.feature_enabled?(:syllabus_versioning) %>
+      <button
+        id="syllabus_revisions_btn"
+        class="btn btn-primary"
+        data-show-text="<%= t('View revision history') %>"
+        data-hide-text="<%= t('Hide revision history') %>"
+      >
+        <%= t('View revision history') %>
+      </button>
+    <% end %>
+    <button class="edit_syllabus_link btn button-sidebar-wide" aria-expanded="false"><i class="icon-edit"></i> <%= t 'links.edit_syllabus_description', "Edit" %></button>
   <% end %>
   </div>
 </div>

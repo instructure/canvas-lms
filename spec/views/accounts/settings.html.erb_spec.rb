@@ -139,13 +139,13 @@ describe "accounts/settings" do
     describe "Root Account Announcements" do
       let(:account) { Account.create!(name: "reading_rainbow") }
 
-      include_examples "account notifications", "This is a message from <b>reading_rainbow</b>"
+      it_behaves_like "account notifications", "This is a message from <b>reading_rainbow</b>"
     end
 
     describe "Site Admin Announcements" do
       let(:account) { Account.site_admin }
 
-      include_examples "account notifications", "This is a message from <b>Canvas Administration</b>"
+      it_behaves_like "account notifications", "This is a message from <b>Canvas Administration</b>"
     end
   end
 
@@ -175,29 +175,6 @@ describe "accounts/settings" do
         render
 
         expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names")
-      end
-    end
-
-    describe "allow_observers_in_appointment_groups setting" do
-      before do
-        account = Account.default
-        admin = account_admin_user
-        view_context(account, admin)
-        assign(:account, account)
-        assign(:announcements, AccountNotification.none.paginate)
-      end
-
-      let(:setting_label) { "Allow observers to sign-up for appointments when enabled by the teacher" }
-
-      it "renders the setting when the observer_appointment_groups feature is enabled" do
-        render
-        expect(rendered).to include(setting_label)
-      end
-
-      it "does not render the setting when the observer_appointment_groups feature is disabled" do
-        Account.site_admin.disable_feature!(:observer_appointment_groups)
-        render
-        expect(rendered).not_to include(setting_label)
       end
     end
 
@@ -322,6 +299,52 @@ describe "accounts/settings" do
         expect(response.body).not_to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
         expect(response.body).not_to include("Lock this setting for sub-accounts and courses")
       end
+    end
+  end
+
+  describe "allow_observers_in_appointment_groups setting" do
+    before do
+      account = Account.default
+      admin = account_admin_user
+      view_context(account, admin)
+      assign(:account, account)
+      assign(:announcements, AccountNotification.none.paginate)
+    end
+
+    let(:setting_label) { "Allow observers to sign-up for appointments when enabled by the teacher" }
+
+    it "renders the setting when the observer_appointment_groups feature is enabled" do
+      render
+      expect(rendered).to include(setting_label)
+    end
+
+    it "does not render the setting when the observer_appointment_groups feature is disabled" do
+      Account.site_admin.disable_feature!(:observer_appointment_groups)
+      render
+      expect(rendered).not_to include(setting_label)
+    end
+  end
+
+  describe "default_allow_observer_signup setting" do
+    before do
+      account = Account.default
+      admin = account_admin_user
+      view_context(account, admin)
+      assign(:account, account)
+      assign(:announcements, AccountNotification.none.paginate)
+    end
+
+    let(:setting_label) { "by default when creating new appointment groups" }
+
+    it "renders the setting when the observer_appointment_groups feature is enabled" do
+      render
+      expect(rendered).to include(setting_label)
+    end
+
+    it "does not render the setting when the observer_appointment_groups feature is disabled" do
+      Account.site_admin.disable_feature!(:observer_appointment_groups)
+      render
+      expect(rendered).not_to include(setting_label)
     end
   end
 

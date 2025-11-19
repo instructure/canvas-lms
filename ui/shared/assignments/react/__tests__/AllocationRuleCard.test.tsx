@@ -35,11 +35,13 @@ describe('AllocationRuleCard', () => {
   const assessor = {
     _id: '1',
     name: 'Pikachu',
+    peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
   }
 
   const assessee = {
     _id: '2',
     name: 'Piplup',
+    peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
   }
 
   const mockRefetchRules = jest.fn()
@@ -69,6 +71,7 @@ describe('AllocationRuleCard', () => {
     rule: defaultRule,
     canEdit: false,
     assignmentId: '123',
+    requiredPeerReviewsCount: 2,
     refetchRules: mockRefetchRules,
   }
 
@@ -285,7 +288,7 @@ describe('AllocationRuleCard', () => {
       expect(mockExecuteQuery).toHaveBeenCalledWith(expect.any(Object), {
         input: {ruleId: '1'},
       })
-      expect(mockHandleRuleDelete).toHaveBeenCalledWith('1')
+      expect(mockHandleRuleDelete).toHaveBeenCalledWith('1', 'Pikachu must review Piplup')
     })
 
     it('calls handleRuleDelete with error on delete failure', async () => {
@@ -304,7 +307,27 @@ describe('AllocationRuleCard', () => {
       expect(mockExecuteQuery).toHaveBeenCalledWith(expect.any(Object), {
         input: {ruleId: '1'},
       })
-      expect(mockHandleRuleDelete).toHaveBeenCalledWith('1', mockError)
+      expect(mockHandleRuleDelete).toHaveBeenCalledWith('1', undefined, mockError)
+    })
+
+    it('calls handleRuleDelete with full rule description for screen reader announcement', async () => {
+      const mockHandleRuleDelete = jest.fn()
+
+      mockExecuteQuery.mockResolvedValueOnce({
+        deleteAllocationRule: {
+          allocationRuleId: '1',
+        },
+      })
+
+      renderWithProviders({canEdit: true, handleRuleDelete: mockHandleRuleDelete})
+
+      const deleteButton = screen.getByTestId('delete-allocation-rule-button')
+      await user.click(deleteButton)
+
+      await screen.findByText('Pikachu')
+
+      // Verify handleRuleDelete is called with ruleId and full description
+      expect(mockHandleRuleDelete).toHaveBeenCalledWith('1', 'Pikachu must review Piplup')
     })
   })
 })

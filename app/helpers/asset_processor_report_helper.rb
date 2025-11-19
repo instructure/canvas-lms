@@ -85,50 +85,6 @@ module AssetProcessorReportHelper
     ret
   end
 
-  # Generally, we should prefer using graphql query instead of REST endpoints that use this helper function
-  def asset_reports_info_for_display(submission:, for_student: true)
-    return nil if submission.blank?
-    return nil unless submission.root_account&.feature_enabled?(:lti_asset_processor)
-
-    raw_reports = raw_asset_reports(submission_ids: [submission.id], for_student:)[submission.id]
-
-    discussion_entry_version_ids = raw_reports&.map(&:asset)&.filter_map(&:discussion_entry_version_id)&.uniq
-    if discussion_entry_version_ids&.any?
-      discussion_entry_versions =
-        DiscussionEntryVersion
-        .where(id: discussion_entry_version_ids)
-        .select(:id, :created_at, :message)
-        .index_by(&:id)
-    end
-
-    raw_reports&.map do |report|
-      report.info_for_display.merge(
-        {
-          processorId: report.lti_asset_processor_id&.to_s,
-          asset: {
-            attachmentId: report.asset.attachment_id&.to_s,
-            attachmentName: report.asset.attachment&.name,
-            submissionAttempt: report.asset.submission_attempt,
-            discussionEntryVersion:
-              discussion_entry_versions&.dig(report.asset.discussion_entry_version_id)&.then do |dev|
-                {
-                  _id: dev.id.to_s,
-                  createdAt: dev.created_at,
-                  messageIntro: dev.message_intro,
-                }
-              end,
-          }
-        }
-      )
-    end
-  end
-
-  def asset_processors(assignment:)
-    return nil unless assignment.root_account.feature_enabled?(:lti_asset_processor)
-
-    assignment.lti_asset_processors.info_for_display
-  end
-
   private
 
   def mate_submissions(submission_ids)

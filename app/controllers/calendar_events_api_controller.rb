@@ -1667,7 +1667,7 @@ class CalendarEventsApiController < ApplicationController
         context = Context.find_by_asset_string(c)
         @public_to_auth = true if context.is_a?(Course) && user && (context.public_syllabus_to_auth || context.public_syllabus || context.is_public || context.is_public_to_auth_users)
         @contexts.push context if context.is_a?(Course) && (context.is_public || context.public_syllabus || @public_to_auth)
-        @contexts.push context if context.is_a?(Account) && user.associated_accounts.active.where(id: context.id, account_calendar_visible: true).exists?
+        @contexts.push context if context.is_a?(Account) && user&.associated_accounts&.active&.where(id: context.id, account_calendar_visible: true)&.exists?
       end
 
       # filter the contexts to only the requested contexts

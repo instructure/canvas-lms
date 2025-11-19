@@ -2055,6 +2055,7 @@ el:
   assignment_comments_e43ed898: "Σχόλια για αυτή την Εργασία"
   assignment_created_assignment_name_course_name_324a5639: "Η Εργασία Δημιουργήθηκε - %{assignment_name}, %{course_name}"
   assignment_d8387b78: εργασία
+  assignment_details_bc488179: "Λεπτομέρειες Εργασίας"
   assignment_details_dialog: 
     average_score: "Μέση Βαθμολογία:"
     count_of_submissions: "%{cnt} υποβολές"
@@ -6740,6 +6741,7 @@ el:
   full_name_is_required_8efbdc84: "Απαιτείται πλήρες όνομα"
   gathering_files_933551d9: "Γίνεται συγκέντρωση Αρχείων..."
   general_answer_comments_730136ba: "Γενικά σχόλια απάντησης"
+  generate_44e33e72: Δημιουργία
   generate_epub_80e89ea4: "Δημιουργία ePub"
   generate_token_393ab5b4: "Δημιουργία Token"
   generated_f26ee56b: "Δημιουργήθηκε:"
@@ -13450,6 +13452,7 @@ el:
   save_11a80ec3: Αποθήκευση
   save_alert_b64f9fa3: "Αποθήκευση Συναγερμού"
   save_changes_698abe77: "Αποθήκευση Αλλαγών "
+  save_changes_a63787eb: "Αποθήκευση αλλαγών"
   save_grading_period_daaaddea: "Αποθήκευση Περιόδου Βαθμολόγησης"
   save_key_b4dede06: "Αποθήκευση Κλειδιού"
   save_login_bba1272: "Αποθήκευση Σύνδεσης"
@@ -14687,6 +14690,7 @@ el:
       graded: βαθμολογήθηκε/αν
       submitted: υποβλήθηκε
       unsubmitted: "δεν έχει υποβληθεί"
+  submission_7ca566e1: Υποβολές
   submission_action_take_quiz: "Επιλογή του %{title}"
   submission_action_turn_in_assignment: "Υποβολή %{title}"
   submission_comment: 

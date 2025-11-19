@@ -719,13 +719,17 @@ module CustomSeleniumActions
     "#flash_message_holder .flash-message-container"
   end
 
+  def flash_message_close_selector
+    "#flash_message_holder .flash-message-container > button"
+  end
+
   def dismiss_flash_messages
-    ff(flash_message_selector).each(&:click)
+    ff(flash_message_close_selector).each(&:click)
   end
 
   def dismiss_flash_messages_if_present
     unless find_all_with_jquery(flash_message_selector).empty?
-      find_all_with_jquery(flash_message_selector).each(&:click)
+      find_all_with_jquery(flash_message_close_selector).each(&:click)
     end
   end
 

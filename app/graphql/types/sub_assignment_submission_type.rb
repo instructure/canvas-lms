@@ -90,6 +90,13 @@ module Types
       protect_submission_grades(:entered_score)
     end
 
+    field :deducted_points, Float, "how many points are being deducted due to late policy", null: true
+    def deducted_points
+      protect_submission_grades(:points_deducted)
+    end
+
+    field :submitted_at, Types::DateTimeType, null: true
+
     def protect_submission_grades(attr)
       load_association(:assignment).then do
         object.send(attr) if object.user_can_read_grade?(current_user, session)

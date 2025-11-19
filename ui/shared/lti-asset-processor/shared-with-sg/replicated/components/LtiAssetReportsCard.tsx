@@ -59,12 +59,10 @@ function reportCommentAndInfoText(report: LtiAssetReport) {
   return {infoText: report.comment || defaultInfoText(progress)}
 }
 
-function defaultInfoText(progress: LtiAssetReport['processingProgress']) {
+function defaultInfoText(
+  progress: Exclude<LtiAssetReport['processingProgress'], 'Processed' | 'Failed'>,
+) {
   switch (progress) {
-    case 'Processed':
-    case 'Failed':
-      throw 'Unreachable'
-
     case 'Processing':
       return I18n.t('The content is being processed and the final report being generated.')
     case 'Pending':
@@ -88,7 +86,10 @@ function defaultInfoText(progress: LtiAssetReport['processingProgress']) {
 function TooltipIfTruncated({
   full,
   truncated,
-}: {full: string; truncated: string | undefined | null}) {
+}: {
+  full: string
+  truncated: string | undefined | null
+}) {
   if (truncated && full !== truncated) {
     return (
       <Tooltip renderTip={full}>
@@ -159,8 +160,9 @@ export function LtiAssetReportsCard({report}: {report: LtiAssetReport}): JSX.Ele
             <Flex direction="row" gap="x-small">
               {report.indicationColor != null ? (
                 <div
-                  title={report.indicationAlt || undefined}
+                  role="img"
                   aria-label={report.indicationAlt || undefined}
+                  title={report.indicationAlt || undefined}
                   style={{
                     backgroundColor: report.indicationColor,
                     borderRadius: '50%',

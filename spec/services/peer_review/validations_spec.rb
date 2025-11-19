@@ -171,9 +171,12 @@ RSpec.describe PeerReview::Validations do
       expect { service.validate_assignment_submission_types(parent_assignment) }.not_to raise_error
     end
 
-    it "does not raise an error for assignments with discussion_topic submission type" do
+    it "raises an error for assignments with discussion_topic submission type" do
       parent_assignment.update!(submission_types: "discussion_topic")
-      expect { service.validate_assignment_submission_types(parent_assignment) }.not_to raise_error
+      expect { service.validate_assignment_submission_types(parent_assignment) }.to raise_error(
+        PeerReview::InvalidAssignmentSubmissionTypesError,
+        "Peer reviews cannot be used with Discussion Topic assignments"
+      )
     end
   end
 

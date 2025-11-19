@@ -99,5 +99,11 @@ module Accessibility
     def why
       raise NotImplementedError, "#{self.class} must implement/override why"
     end
+
+    # Provides a preview of the issue for displaying in the UI
+    # @return [String, nil] HTML preview of the issue, or nil if no preview is available
+    def issue_preview(_elem)
+      nil
+    end
   end
 end

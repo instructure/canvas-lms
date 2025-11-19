@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import PeerReviewAllocationRulesTray from '../PeerReviewAllocationRulesTray'
-import {AllocationRule} from '../../graphql/hooks/useAllocationRules'
+import {AllocationRuleType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
 
 jest.mock('../images/pandasBalloon.svg', () => 'mock-pandas-balloon.svg')
 jest.mock('@canvas/graphql', () => ({
@@ -42,36 +42,61 @@ jest.mock('../CreateEditAllocationRuleModal', () => {
 const {executeQuery} = require('@canvas/graphql')
 const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
 
-const mockAllocationRules: AllocationRule[] = [
+const mockAllocationRules: AllocationRuleType[] = [
   {
     _id: '1',
     mustReview: true,
     reviewPermitted: true,
     appliesToAssessor: true,
-    assessor: {_id: 'assessor-1', name: 'John Smith'},
-    assessee: {_id: 'assessee-1', name: 'Jane Doe'},
+    assessor: {
+      _id: 'assessor-1',
+      name: 'John Smith',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+    },
+    assessee: {
+      _id: 'assessee-1',
+      name: 'Jane Doe',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+    },
   },
   {
     _id: '2',
     mustReview: false,
     reviewPermitted: true,
     appliesToAssessor: false,
-    assessor: {_id: 'assessor-2', name: 'Bob Johnson'},
-    assessee: {_id: 'assessee-2', name: 'Alice Brown'},
+    assessor: {
+      _id: 'assessor-2',
+      name: 'Bob Johnson',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+    },
+    assessee: {
+      _id: 'assessee-2',
+      name: 'Alice Brown',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+    },
   },
   {
     _id: '3',
     mustReview: true,
     reviewPermitted: false,
     appliesToAssessor: true,
-    assessor: {_id: 'assessor-3', name: 'Charlie Wilson'},
-    assessee: {_id: 'assessee-3', name: 'Diana Prince'},
+    assessor: {
+      _id: 'assessor-3',
+      name: 'Charlie Wilson',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+    },
+    assessee: {
+      _id: 'assessee-3',
+      name: 'Diana Prince',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+    },
   },
 ]
 
 describe('PeerReviewAllocationRulesTray', () => {
   const defaultProps = {
     assignmentId: '456',
+    requiredPeerReviewsCount: 2,
     isTrayOpen: true,
     closeTray: jest.fn(),
     canEdit: false,
@@ -391,8 +416,16 @@ describe('PeerReviewAllocationRulesTray', () => {
         mustReview: true,
         reviewPermitted: true,
         appliesToAssessor: true,
-        assessor: {_id: `assessor-${i + 1}`, name: `Assessor ${i + 1}`},
-        assessee: {_id: `assessee-${i + 1}`, name: `Assessee ${i + 1}`},
+        assessor: {
+          _id: `assessor-${i + 1}`,
+          name: `Assessor ${i + 1}`,
+          peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+        },
+        assessee: {
+          _id: `assessee-${i + 1}`,
+          name: `Assessee ${i + 1}`,
+          peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+        },
       }))
 
       mockExecuteQuery.mockResolvedValue({
@@ -454,8 +487,16 @@ describe('PeerReviewAllocationRulesTray', () => {
         mustReview: true,
         reviewPermitted: true,
         appliesToAssessor: true,
-        assessor: {_id: `assessor-${i + 1}`, name: `Assessor ${i + 1}`},
-        assessee: {_id: `assessee-${i + 1}`, name: `Assessee ${i + 1}`},
+        assessor: {
+          _id: `assessor-${i + 1}`,
+          name: `Assessor ${i + 1}`,
+          peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+        },
+        assessee: {
+          _id: `assessee-${i + 1}`,
+          name: `Assessee ${i + 1}`,
+          peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+        },
       }))
 
       mockExecuteQuery.mockResolvedValue({
@@ -532,70 +573,28 @@ describe('PeerReviewAllocationRulesTray', () => {
 
       expect(screen.queryByPlaceholderText('Type to search')).not.toBeInTheDocument()
     })
+  })
 
-    it('handles search input changes with debounce', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: mockAllocationRules,
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: mockAllocationRules.length,
-          },
-        },
-      })
-
-      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
-
-      await waitFor(() => {
-        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
-      })
-
-      const searchInput = screen.getByPlaceholderText('Type to search')
-      await user.type(searchInput, 'John')
-
-      expect(searchInput).toHaveValue('John')
+  describe('Screen reader alerts', () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+      HTMLElement.prototype.focus = jest.fn()
     })
 
-    it('shows error message for single character search', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: mockAllocationRules,
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: mockAllocationRules.length,
-          },
-        },
-      })
-
-      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
-
-      await waitFor(() => {
-        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
-      })
-
-      const searchInput = screen.getByPlaceholderText('Type to search')
-      await user.type(searchInput, 'J')
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Search term must be at least 2 characters long'),
-        ).toBeInTheDocument()
-      })
+    afterEach(() => {
+      jest.runOnlyPendingTimers()
+      jest.useRealTimers()
     })
 
-    it('displays clear search button when search term exists', async () => {
+    it('renders aria-live region with correct attributes', async () => {
       mockExecuteQuery.mockResolvedValue({
         assignment: {
           allocationRules: {
             rulesConnection: {
-              nodes: mockAllocationRules,
+              nodes: [],
               pageInfo: {hasNextPage: false, endCursor: null},
             },
-            count: mockAllocationRules.length,
+            count: 0,
           },
         },
       })
@@ -603,26 +602,23 @@ describe('PeerReviewAllocationRulesTray', () => {
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
+        expect(screen.getByText('Allocation Rules')).toBeInTheDocument()
       })
 
-      const searchInput = screen.getByPlaceholderText('Type to search')
-      await user.type(searchInput, 'John')
-
-      await waitFor(() => {
-        expect(screen.getByTestId('clear-search-button')).toBeInTheDocument()
-      })
+      const ariaLiveRegion = screen.getByTestId('allocation-rules-tray-alert')
+      expect(ariaLiveRegion).toBeInTheDocument()
+      expect(ariaLiveRegion).toHaveAttribute('aria-live', 'polite')
     })
 
-    it('clears search when clear button is clicked', async () => {
+    it('initially renders with empty screen reader announcement', async () => {
       mockExecuteQuery.mockResolvedValue({
         assignment: {
           allocationRules: {
             rulesConnection: {
-              nodes: mockAllocationRules,
+              nodes: [],
               pageInfo: {hasNextPage: false, endCursor: null},
             },
-            count: mockAllocationRules.length,
+            count: 0,
           },
         },
       })
@@ -630,19 +626,62 @@ describe('PeerReviewAllocationRulesTray', () => {
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
+        expect(screen.getByText('Allocation Rules')).toBeInTheDocument()
       })
 
-      const searchInput = screen.getByPlaceholderText('Type to search')
-      await user.type(searchInput, 'John')
+      const ariaLiveRegion = screen.getByTestId('allocation-rules-tray-alert')
+      expect(ariaLiveRegion.textContent).toBe('')
+    })
+
+    it('uses polite aria-live to avoid interrupting current screen reader speech', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: [],
+              pageInfo: {hasNextPage: false, endCursor: null},
+            },
+            count: 0,
+          },
+        },
+      })
+
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByTestId('clear-search-button')).toBeInTheDocument()
+        expect(screen.getByText('Allocation Rules')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('clear-search-button'))
+      const ariaLiveRegion = screen.getByTestId('allocation-rules-tray-alert')
+      expect(ariaLiveRegion).toHaveAttribute('aria-live', 'polite')
+      expect(ariaLiveRegion).not.toHaveAttribute('aria-live', 'assertive')
+    })
 
-      expect(searchInput).toHaveValue('')
+    it('clears timeout on unmount to prevent memory leaks', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: [],
+              pageInfo: {hasNextPage: false, endCursor: null},
+            },
+            count: 0,
+          },
+        },
+      })
+
+      const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
+
+      const {unmount} = renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('Allocation Rules')).toBeInTheDocument()
+      })
+
+      unmount()
+
+      expect(clearTimeoutSpy).toHaveBeenCalled()
+      clearTimeoutSpy.mockRestore()
     })
   })
 })

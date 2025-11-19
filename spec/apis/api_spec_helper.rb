@@ -104,7 +104,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
     end
     if @use_basic_auth
       user_session(@user)
-    else
+    elsif !opts[:skip_token_auth]
       headers["HTTP_AUTHORIZATION"] = headers["Authorization"] if headers.key?("Authorization")
       if !params.key?(:api_key) && !params.key?(:access_token) && !headers.key?("HTTP_AUTHORIZATION") && @user
         token = access_token_for_user(@user)

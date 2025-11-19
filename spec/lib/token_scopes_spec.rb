@@ -94,6 +94,19 @@ describe TokenScopes do
     end
   end
 
+  describe "api_routes_for_openapi_docs" do
+    it "formats routes in the correct format" do
+      # Arbitrarily choosing "account_domain_lookups#search" because it's currently
+      # first in the list. Just change this in the future if that endpoint is deleted.
+      key = "account_domain_lookups#search"
+      result = TokenScopes.api_routes_for_openapi_docs
+      expect(result).to include(key)
+      # result[key] should be an array of objects; each object should contain :method
+      # and :path
+      expect(result[key].first).to include(:method, :path)
+    end
+  end
+
   describe "testing scopes in sync with documentation and typescript scopes (via YAML file)" do
     let(:tools_intro_md_content) { Rails.root.join("doc/api/tools_intro.md").read }
 

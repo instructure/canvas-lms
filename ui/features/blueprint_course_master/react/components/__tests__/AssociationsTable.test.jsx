@@ -69,4 +69,66 @@ describe('AssociationsTable component', () => {
     expect(props.onRemoveAssociations).toHaveBeenCalledTimes(1)
     expect(props.onRemoveAssociations).toHaveBeenCalledWith(['1'])
   })
+
+  test('renders concluded pill when course is concluded', () => {
+    window.ENV = {FEATURES: {ux_list_concluded_courses_in_bp: true}}
+
+    const props = defaultProps()
+    props.existingAssociations = [
+      {
+        id: '1',
+        name: 'Concluded Course',
+        course_code: 'CONCLUDED101',
+        term: {id: '1', name: 'Term One'},
+        teachers: [{display_name: 'Teacher One'}],
+        sis_course_id: '1001',
+        concluded: true,
+      },
+    ]
+
+    const {getByText} = render(<AssociationsTable {...props} />)
+    const pill = getByText('Concluded')
+    expect(pill).toBeInTheDocument()
+  })
+
+  test('does not render pill when course is not concluded', () => {
+    const props = defaultProps()
+    props.existingAssociations = [
+      {
+        id: '1',
+        name: 'Active Course',
+        course_code: 'ACTIVE101',
+        term: {id: '1', name: 'Term One'},
+        teachers: [{display_name: 'Teacher One'}],
+        sis_course_id: '1001',
+        concluded: false,
+      },
+    ]
+
+    const {queryByText} = render(<AssociationsTable {...props} />)
+    const pill = queryByText('Concluded')
+    expect(pill).not.toBeInTheDocument()
+  })
+
+  test('renders concluded pill in removedAssociations when course is concluded', () => {
+    window.ENV = {FEATURES: {ux_list_concluded_courses_in_bp: true}}
+
+    const props = defaultProps()
+    props.existingAssociations = []
+    props.removedAssociations = [
+      {
+        id: '1',
+        name: 'Concluded Removed Course',
+        course_code: 'CONCLUDED101',
+        term: {id: '1', name: 'Term One'},
+        teachers: [{display_name: 'Teacher One'}],
+        sis_course_id: '1001',
+        concluded: true,
+      },
+    ]
+
+    const {getByText} = render(<AssociationsTable {...props} />)
+    const pill = getByText('Concluded')
+    expect(pill).toBeInTheDocument()
+  })
 })

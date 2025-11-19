@@ -545,7 +545,7 @@ const SubmissionManager = ({
     if (multipleTypesDrafted(submission)) {
       const confirmed = await showConfirmationDialog({
         body: I18n.t(
-          'You are submitting a %{submissionType} submission. Only one submission type is allowed. All other submission types will be deleted.',
+          "You are submitting a %{submissionType} submission. Only one submission type is allowed per submission. Submitting in this format will delete any work you've started in other submission types.",
           {submissionType: friendlyTypeName(activeSubmissionType)},
         ),
         confirmText: I18n.t('Okay'),

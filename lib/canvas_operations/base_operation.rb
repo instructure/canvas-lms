@@ -142,6 +142,7 @@ module CanvasOperations
       end
     rescue Errors::InvalidOperationTarget => e
       log_message("Operation failed due to invalid operation target: #{e.message}", level: :error)
+      log_message("Note that the above error is being rescued; if this is a migration, other migrations can still continue.", level: :info)
 
       fail_with_error!
     end

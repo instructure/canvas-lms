@@ -828,8 +828,11 @@ describe DeveloperKey do
     end
 
     it "rejects changes to routes.rb if it would break an existing scope" do
-      stub_const("CanvasRails::Application", TokenScopesHelper::SpecHelper::MockCanvasRails::Application)
       all_routes = Set.new(TokenScopes.api_routes.pluck(:verb, :path))
+
+      # Stubbing CanvasRails::Application may affect the routes only if it is the first spec
+      # to run and therefore has the potential to make specs flaky.
+      stub_const("CanvasRails::Application", TokenScopesHelper::SpecHelper::MockCanvasRails::Application)
 
       modified_scopes = TokenScopesHelper::SpecHelper.last_known_accepted_scopes.reject do |scope|
         all_routes.include? scope

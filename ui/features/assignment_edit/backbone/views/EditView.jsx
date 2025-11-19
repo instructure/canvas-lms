@@ -65,14 +65,18 @@ import {createRoot} from 'react-dom/client'
 import YAML from 'yaml'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
+import {getUrlWithHorizonParams} from '@canvas/horizon/utils'
 
 const I18n = createI18nScope('assignment_editview')
 
 const slice = [].slice
 
 const ASSIGNMENT_GROUP_SELECTOR = '#assignment_group_selector'
+const QUIZ_TYPE_SELECTOR = '#quiz_type_selector'
+const ANONYMOUS_SUBMISSION_SELECTOR = '#anonymous_submission_selector'
 const DESCRIPTION = '[name="description"]'
 const SUBMISSION_TYPE = '[name="submission_type"]'
+const SUBMISSION_TYPE_FIELDS = '#submission_type_fields'
 const ONLINE_SUBMISSION_TYPES = '#assignment_online_submission_types'
 const NAME = '[name="name"]'
 const ALLOW_FILE_UPLOADS = '#assignment_online_upload'
@@ -186,6 +190,7 @@ function EditView() {
   this.handleRemoveResource = this.handleRemoveResource.bind(this)
   this.handleSubmissionTypeChange = this.handleSubmissionTypeChange.bind(this)
   this.handleGradingTypeChange = this.handleGradingTypeChange.bind(this)
+  this.handleQuizTypeChange = this.handleQuizTypeChange.bind(this)
   this.handleRestrictFileUploadsChange = this.handleRestrictFileUploadsChange.bind(this)
   this.renderDefaultExternalTool = this.renderDefaultExternalTool.bind(this)
   this.renderAssignmentSubmissionTypeContainer =
@@ -238,6 +243,7 @@ EditView.prototype.els = {
     els['' + ASSIGNMENT_GROUP_SELECTOR] = '$assignmentGroupSelector'
     els['' + DESCRIPTION] = '$description'
     els['' + SUBMISSION_TYPE] = '$submissionType'
+    els['' + SUBMISSION_TYPE_FIELDS] = '$submissionTypeFields'
     els['' + ONLINE_SUBMISSION_TYPES] = '$onlineSubmissionTypes'
     els['' + NAME] = '$name'
     els['' + ALLOW_FILE_UPLOADS] = '$allowFileUploads'
@@ -327,6 +333,10 @@ EditView.prototype.events = {
 
 EditView.child('assignmentGroupSelector', '' + ASSIGNMENT_GROUP_SELECTOR)
 
+EditView.child('quizTypeSelector', '' + QUIZ_TYPE_SELECTOR)
+
+EditView.child('anonymousSubmissionSelector', '' + ANONYMOUS_SUBMISSION_SELECTOR)
+
 EditView.child('gradingTypeSelector', '' + GRADING_TYPE_SELECTOR)
 
 EditView.child('groupCategorySelector', '' + GROUP_CATEGORY_SELECTOR)
@@ -376,6 +386,15 @@ EditView.prototype.initialize = function (options) {
   this.gradingTypeSelector.on('change:gradingType', this.handleGradingTypeChange)
   if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
     this.gradingTypeSelector.on('change:gradingType', this.onChange)
+  }
+  if (this.quizTypeSelector) {
+    this.quizTypeSelector.on('change:quizType', this.handleQuizTypeChange)
+  }
+  if (this.anonymousSubmissionSelector) {
+    this.anonymousSubmissionSelector.on(
+      'change:anonymousSubmission',
+      this.handleAnonymousSubmissionChange,
+    )
   }
   this.lockedItems = options.lockedItems || {}
   return (this.cannotEditGrades = !options.canEditGrades)
@@ -1045,6 +1064,30 @@ EditView.prototype.handleGradingTypeChange = function (gradingType) {
   return this.handleSubmissionTypeChange(null)
 }
 
+EditView.prototype.handleQuizTypeChange = function (quizType) {
+  // Hide points field when ungraded survey is selected
+  const isUngradedSurvey = quizType === 'ungraded_survey'
+  this.$assignmentPointsPossible.closest('.control-group').toggleAccessibly(!isUngradedSurvey)
+
+  // Set points to 0 for ungraded surveys
+  if (isUngradedSurvey) {
+    this.$assignmentPointsPossible.val('0')
+  }
+
+  const isSurvey = quizType === 'graded_survey' || quizType === 'ungraded_survey'
+  // Hide Assignment Group, Display Grade as, Submission Type and Graded Assignment Fields for surveys
+  this.$assignmentGroupSelector.toggleAccessibly(!isSurvey)
+  this.$gradingTypeSelector.toggleAccessibly(!isSurvey)
+  this.$submissionTypeFields.toggleAccessibly(!isSurvey)
+  this.$gradedAssignmentFields.toggleAccessibly(!isSurvey)
+  this.anonymousSubmissionSelector.$el.closest('.control-group').toggleAccessibly(isSurvey)
+}
+
+EditView.prototype.handleAnonymousSubmissionChange = function (isAnonymous) {
+  // Store the value in the model
+  this.assignment.newQuizzesAnonymousSubmission(isAnonymous)
+}
+
 EditView.prototype.hasMasteryConnectData = function () {
   // Some places check for this data before clearing/overwriting...
   // It's not clear the reasoning behind this, but I'm for leaving as-is for now.
@@ -1351,11 +1394,34 @@ EditView.prototype.afterRender = function () {
   if (this.defaultExternalToolEnabled()) {
     this.renderDefaultExternalTool()
   }
+
+  // Hide Assignment Group, Display Grade as, and Submission Type for surveys on initial load
+  if (this.quizTypeSelector) {
+    const currentQuizType = this.assignment.newQuizzesType() || 'graded_quiz'
+
+    if (currentQuizType === 'graded_survey' || currentQuizType === 'ungraded_survey') {
+      this.$assignmentGroupSelector.toggleAccessibly(false)
+      this.$gradingTypeSelector.toggleAccessibly(false)
+      this.$submissionTypeFields.toggleAccessibly(false)
+      // Hide graded assignment fields for surveys
+      this.$gradedAssignmentFields.toggleAccessibly(false)
+      this.anonymousSubmissionSelector.$el.closest('.control-group').toggleAccessibly(true)
+    }
+
+    if (currentQuizType === 'ungraded_survey') {
+      this.$assignmentPointsPossible.closest('.control-group').toggleAccessibly(false)
+      this.$assignmentPointsPossible.val('0')
+    }
+  }
+
   return this
 }
 
 EditView.prototype.toJSON = function () {
   const data = this.assignment.toView()
+  const newQuizzesSurveysFFEnabled =
+    typeof ENV !== 'undefined' && ENV !== null && ENV.FEATURES && ENV.FEATURES.new_quizzes_surveys
+
   return Object.assign(data, {
     assignment_attempts:
       typeof ENV !== 'undefined' && ENV !== null ? ENV.assignment_attempts_enabled : void 0,
@@ -1389,6 +1455,12 @@ EditView.prototype.toJSON = function () {
         ? ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED
         : void 0) || false,
     is_horizon_course: !!ENV.horizon_course,
+    newQuizzesSurveysFFEnabled: newQuizzesSurveysFFEnabled && this.assignment.isQuizLTIAssignment(),
+    showAnonymousSubmissionSelector:
+      newQuizzesSurveysFFEnabled &&
+      this.assignment.isQuizLTIAssignment() &&
+      (this.assignment.newQuizzesType() === 'graded_survey' ||
+        this.assignment.newQuizzesType() === 'ungraded_survey'),
   })
 }
 
@@ -1508,6 +1580,10 @@ EditView.prototype.getFormData = function () {
   if (ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
     const checkedInput = document.getElementById('assignment_peer_reviews_checkbox')
     data.peer_reviews = checkedInput?.checked
+    const submissionRequiredInput = document.getElementById(
+      'peer_reviews_submission_required_checkbox',
+    )
+    data.peer_review_submission_required = submissionRequiredInput?.checked
   }
   return data
 }
@@ -1652,6 +1728,20 @@ EditView.prototype.showErrors = function (errors) {
   errors = this.sortErrorsByVerticalScreenPosition(errors)
   let shouldFocus = true
   Object.entries(errors).forEach(([key, value]) => {
+    if (key === 'peer_review_details') {
+      if ((ENV.PEER_REVIEW_GRADING_ENABLED || ENV.PEER_REVIEW_ALLOCATION_ENABLED) && shouldFocus) {
+        const peerReviewDetailsEl = document.getElementById(
+          'peer_reviews_allocation_and_grading_details',
+        )
+        if (peerReviewDetailsEl && typeof peerReviewDetailsEl.focusOnFirstError === 'function') {
+          peerReviewDetailsEl.focusOnFirstError()
+          shouldFocus = false
+        }
+      }
+      delete errors[key]
+      return
+    }
+
     // For this to function properly
     // the error containers must have an ID formatted as ${key}_errors.
     const errorsContainerID = `${key}_errors`
@@ -1736,7 +1826,12 @@ EditView.prototype.showErrors = function (errors) {
 EditView.prototype.sortErrorsByVerticalScreenPosition = function (errors) {
   return Object.entries(errors)
     .map(([errorKey, errorMessage]) => {
-      const errorElement = this.getElement(errorKey)
+      let errorElement = this.getElement(errorKey)
+
+      if (!errorElement && errorKey === 'peer_review_details') {
+        errorElement = document.getElementById('peer_reviews_allocation_and_grading_details')
+      }
+
       if (!errorElement) return null
 
       const elementRect = errorElement.getBoundingClientRect()
@@ -1844,6 +1939,25 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
   } else {
     delete errors.invalid_card
   }
+
+  if (ENV.PEER_REVIEW_GRADING_ENABLED || ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
+    const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
+    if (peerReviewCheckbox && peerReviewCheckbox.checked) {
+      const peerReviewDetailsEl = document.getElementById(
+        'peer_reviews_allocation_and_grading_details',
+      )
+      if (
+        peerReviewDetailsEl &&
+        typeof peerReviewDetailsEl.validatePeerReviewDetails === 'function'
+      ) {
+        const isValid = peerReviewDetailsEl.validatePeerReviewDetails()
+        if (!isValid) {
+          errors.peer_review_details = true
+        }
+      }
+    }
+  }
+
   return errors
 }
 
@@ -2151,15 +2265,17 @@ EditView.prototype.locationAfterSave = function (params) {
   }
 
   const htmlUrl = this.model.get('html_url')
+
+  const additionalParams = {}
   if (this.assignment.showBuildButton()) {
     let displayType = 'full_width'
     if (ENV.FEATURES.new_quizzes_navigation_updates) {
       displayType = 'full_width_with_nav'
     }
-    return htmlUrl + `?display=${displayType}`
-  } else {
-    return htmlUrl
+    additionalParams.display = displayType
   }
+
+  return getUrlWithHorizonParams(htmlUrl, additionalParams)
 }
 
 EditView.prototype.redirectAfterCancel = function () {

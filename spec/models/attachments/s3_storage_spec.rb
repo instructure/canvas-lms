@@ -78,5 +78,56 @@ describe Attachments::S3Storage do
         attachment.open(integrity_check: true)
       end
     end
+
+    context "when the S3 object is missing" do
+      let(:s3_error) { Aws::S3::Errors::NoSuchKey.new(double("ctx"), "no such key") }
+
+      before do
+        attachment.update!(file_state: "available")
+        allow_any_instance_of(Aws::S3::Object).to receive(:get).and_raise(s3_error)
+        allow(Canvas::Errors).to receive(:capture_exception)
+      end
+
+      it "returns nil" do
+        expect(attachment.open).to be_nil
+      end
+
+      it "sets in-memory file_state to broken" do
+        attachment.open
+        expect(attachment.file_state).to eq "broken"
+      end
+
+      it "persists file_state to broken" do
+        attachment.open
+        expect(attachment.reload.file_state).to eq "broken"
+      end
+
+      it "captures the exception" do
+        attachment.open
+        expect(Canvas::Errors).to have_received(:capture_exception).with(:attachment, s3_error, :warn)
+      end
+
+      it "does not perform integrity check even if requested" do
+        expect(attachment).not_to receive(:validate_hash)
+        attachment.open(integrity_check: true)
+      end
+
+      it "does not yield chunks when block given" do
+        yielded = false
+        attachment.open { |_chunk| yielded = true }
+        expect(yielded).to be false
+      end
+    end
+
+    context "when file_state is already broken" do
+      before do
+        attachment.update!(file_state: "broken")
+      end
+
+      it "returns nil immediately without calling S3 get" do
+        expect_any_instance_of(Aws::S3::Object).not_to receive(:get)
+        expect(attachment.open).to be_nil
+      end
+    end
   end
 end

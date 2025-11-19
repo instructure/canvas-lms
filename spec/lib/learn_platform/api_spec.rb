@@ -115,6 +115,14 @@ describe LearnPlatform::Api do
         api.products({ company_id: 2 })
       end
     end
+
+    it "does not cache LP error responses" do
+      enable_cache do
+        expect(CanvasHttp).to receive(:get).and_return(error_response).twice
+        api.products
+        api.products
+      end
+    end
   end
 
   describe "#products_by_category" do

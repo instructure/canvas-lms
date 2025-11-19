@@ -20,10 +20,10 @@
 import {useMutation} from '@apollo/client'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
-import {SpeedGrader_DeleteCommentBankItem} from '../graphql/mutations'
+import {SpeedGraderLegacy_DeleteCommentBankItem} from '../graphql/mutations'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {SpeedGrader_DeleteCommentBankItemMutation} from '@canvas/graphql/codegen/graphql'
+import {SpeedGraderLegacy_DeleteCommentBankItemMutation} from '@canvas/graphql/codegen/graphql'
 
 const I18n = createI18nScope('CommentLibrary')
 
@@ -33,10 +33,16 @@ type DeleteCommentIconButtonProps = {
   index: number
 }
 const DeleteCommentIconButton: React.FC<DeleteCommentIconButtonProps> = ({id, comment, index}) => {
-  const [deleteCommentBankItem, {loading}] = useMutation<SpeedGrader_DeleteCommentBankItemMutation>(
-    SpeedGrader_DeleteCommentBankItem,
-    {refetchQueries: ['SpeedGrader_CommentBankItems', 'SpeedGrader_CommentBankItemsCount']},
-  )
+  const [deleteCommentBankItem, {loading}] =
+    useMutation<SpeedGraderLegacy_DeleteCommentBankItemMutation>(
+      SpeedGraderLegacy_DeleteCommentBankItem,
+      {
+        refetchQueries: [
+          'SpeedGraderLegacy_CommentBankItems',
+          'SpeedGraderLegacy_CommentBankItemsCount',
+        ],
+      },
+    )
 
   const handleDeleteCommentBankItem = async () => {
     try {

@@ -18,8 +18,8 @@
 
 import {gql} from '@apollo/client'
 
-export const SpeedGrader_CreateCommentBankItem = gql`
-  mutation SpeedGrader_CreateCommentBankItem($courseId: ID!, $comment: String!) {
+export const SpeedGraderLegacy_CreateCommentBankItem = gql`
+  mutation SpeedGraderLegacy_CreateCommentBankItem($courseId: ID!, $comment: String!) {
     createCommentBankItem(input: { courseId: $courseId, comment: $comment }) {
       commentBankItem {
         id: _id
@@ -33,8 +33,8 @@ export const SpeedGrader_CreateCommentBankItem = gql`
   }
 `
 
-export const SpeedGrader_DeleteCommentBankItem = gql`
-  mutation SpeedGrader_DeleteCommentBankItem($id: ID!) {
+export const SpeedGraderLegacy_DeleteCommentBankItem = gql`
+  mutation SpeedGraderLegacy_DeleteCommentBankItem($id: ID!) {
     deleteCommentBankItem(input: {id: $id}) {
       commentBankItemId
       errors {
@@ -45,8 +45,8 @@ export const SpeedGrader_DeleteCommentBankItem = gql`
   }
 `
 
-export const SpeedGrader_UpdateCommentBankItem = gql`
-  mutation SpeedGrader_UpdateCommentBankItem($id: ID!, $comment: String!) {
+export const SpeedGraderLegacy_UpdateCommentBankItem = gql`
+  mutation SpeedGraderLegacy_UpdateCommentBankItem($id: ID!, $comment: String!) {
     updateCommentBankItem(input: {id: $id, comment: $comment}) {
       commentBankItem {
         id: _id

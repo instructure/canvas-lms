@@ -52,10 +52,10 @@ module BroadcastPolicies
         expect(policy.should_dispatch_updated_wiki_page?).to be_truthy
       end
 
-      it "is true when the changed_state inputs are true" do
+      it "is false when page is published without content changes" do
         allow(wiki_page).to receive(:wiki_page_changed).and_return(false)
         allow(wiki_page).to receive(:changed_state).with(:active).and_return(true)
-        expect(policy.should_dispatch_updated_wiki_page?).to be_truthy
+        expect(policy.should_dispatch_updated_wiki_page?).to be_falsey
       end
 
       def wont_send_when

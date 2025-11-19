@@ -33,6 +33,12 @@ import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
 import fetchMock from 'fetch-mock'
+import {getUrlWithHorizonParams} from '@canvas/horizon/utils'
+
+// Mock the horizon utils module
+jest.mock('@canvas/horizon/utils', () => ({
+  getUrlWithHorizonParams: jest.fn(),
+}))
 
 const s_params = 'some super secure params'
 const currentOrigin = window.location.origin
@@ -124,6 +130,17 @@ describe('EditView', () => {
       COURSE_ID: 1,
       USAGE_RIGHTS_REQUIRED: true,
       SETTINGS: {},
+      FEATURES: {},
+    })
+
+    // Setup default mock for getUrlWithHorizonParams
+    getUrlWithHorizonParams.mockImplementation((url, additionalParams) => {
+      if (additionalParams && Object.keys(additionalParams).length > 0) {
+        const separator = url.includes('?') ? '&' : '?'
+        const params = new URLSearchParams(additionalParams).toString()
+        return `${url}${separator}${params}`
+      }
+      return url
     })
 
     fetchMock.get('/api/v1/courses/1/settings', {})
@@ -141,6 +158,7 @@ describe('EditView', () => {
     $('.form-dialog').remove()
     fixtures.remove()
     fetchMock.reset()
+    jest.clearAllMocks()
   })
 
   it('routes to return_to', () => {

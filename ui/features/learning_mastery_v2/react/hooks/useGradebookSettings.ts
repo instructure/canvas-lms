@@ -23,6 +23,7 @@ import {
   GradebookSettings,
   DisplayFilter,
   SecondaryInfoDisplay,
+  NameDisplayFormat,
   DEFAULT_GRADEBOOK_SETTINGS,
 } from '../utils/constants'
 
@@ -75,6 +76,11 @@ export const useGradebookSettings = (courseId: string): UseGradebookSettingsRetu
               apiSettings.secondary_info_display ??
               (DEFAULT_GRADEBOOK_SETTINGS.secondaryInfoDisplay as SecondaryInfoDisplay),
             displayFilters: buildDisplayFilters(apiSettings),
+            nameDisplayFormat:
+              apiSettings.name_display_format ??
+              (DEFAULT_GRADEBOOK_SETTINGS.nameDisplayFormat as NameDisplayFormat),
+            studentsPerPage:
+              apiSettings.students_per_page ?? DEFAULT_GRADEBOOK_SETTINGS.studentsPerPage,
           }
 
           setSettings(loadedSettings)

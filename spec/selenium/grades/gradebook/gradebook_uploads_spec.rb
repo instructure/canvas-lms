@@ -36,6 +36,9 @@ shared_examples "Gradebook - uploads" do |ff_enabled|
   end
 
   before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
     course_with_teacher_logged_in(active_all: 1, username: "teacher@example.com")
     @student = user_factory(username: "student@example.com", active_all: 1)
     @course.enroll_student(@student).accept!

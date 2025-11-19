@@ -968,23 +968,27 @@ class AssignmentsApiController < ApplicationController
     target_assignment.workflow_state = "outcome_alignment_cloning"
     target_assignment.duplication_started_at = Time.zone.now
     target_assignment.save!
+
+    begin
+      OutcomesService::Service.start_outcome_alignment_service_clone(
+        target_course,
+        original_assignment_id: old_assignment.id,
+        copied_assignment_id: target_assignment.id,
+        new_context_id: target_course.id,
+        original_context_id: old_assignment.context.id
+      )
+    rescue => e
+      Rails.logger.error("Failed to retry outcome alignment service clone: #{e.message}")
+      target_assignment.workflow_state = "failed_to_clone_outcome_alignment"
+      target_assignment.save!
+    end
+
     result_json = if use_quiz_json?
                     quiz_json(target_assignment, @context, @current_user, session, {}, QuizzesNext::QuizSerializer)
                   else
                     assignment_json(target_assignment, @current_user, session)
                   end
     result_json["new_positions"] = { target_assignment.id => target_assignment.position }
-    Canvas::LiveEvents.outcomes_retry_outcome_alignment_clone(
-      {
-        original_course_uuid: old_assignment.context.uuid,
-        new_course_uuid: target_course.uuid,
-        new_course_resource_link_id: target_course.lti_context_id,
-        domain: target_course.root_account&.domain(ApplicationController.test_cluster_name),
-        original_assignment_resource_link_id: old_assignment.lti_resource_link_id,
-        new_assignment_resource_link_id: target_assignment.lti_resource_link_id,
-        status: "outcome_alignment_cloning"
-      }
-    )
     render json: result_json
   end
 
@@ -1034,7 +1038,7 @@ class AssignmentsApiController < ApplicationController
           scope = if @context.grants_right?(user, :read_as_admin)
                     scope.with_latest_due_date.reorder(Arel.sql("latest_due_date, #{Assignment.best_unicode_collation_key("assignments.title")}, assignment_groups.position, assignments.position, assignments.id"))
                   else
-                    scope.with_user_due_date(user).reorder(Arel.sql("user_due_date, #{Assignment.best_unicode_collation_key("assignments.title")}, assignment_groups.position, assignments.position, assignments.id"))
+                    scope.with_user_due_date(user).reorder(Arel.sql("submissions.cached_due_date, #{Assignment.best_unicode_collation_key("assignments.title")}, assignment_groups.position, assignments.position, assignments.id"))
                   end
         end
       end
@@ -1413,6 +1417,9 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[peer_review][unlock_at] [DateTime]
   #   The day/time the peer reviews are unlocked. Must be before the due date if there is a due date.
   #   Accepts times in ISO 8601 format, e.g. 2025-08-15T12:10:00Z.
+  #
+  # @argument assignment[peer_review][peer_review_overrides][] [AssignmentOverride]
+  #   List of overrides for the peer reviews.
   #
   # @returns Assignment
   def create

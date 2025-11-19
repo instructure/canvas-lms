@@ -28,5 +28,5 @@ describe "summaries" do
   let(:asset) { @user }
   let(:notification_name) { :summaries }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

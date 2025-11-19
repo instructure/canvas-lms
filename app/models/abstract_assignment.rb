@@ -279,7 +279,7 @@ class AbstractAssignment < ActiveRecord::Base
     self.group_category_id = nil
     self.rubric_association = nil
     self.submission_types = "online_text_entry" unless (submission_types_array - HORIZON_SUBMISSION_TYPES).empty?
-    self.workflow_state = "unpublished" if context_module_tags.none? { |t| t.tag_type == "context_module" && t.context_module&.published? }
+    self.workflow_state = "unpublished" if workflow_state == "published" && context_module_tags.none? { |t| t.tag_type == "context_module" && t.context_module&.published? }
   end
 
   def self.html_fields
@@ -396,7 +396,7 @@ class AbstractAssignment < ActiveRecord::Base
 
     # Default to the last position of all active assignments in the group.  Clients can still
     # override later.  Just helps to avoid duplicate positions.
-    result.position = Assignment.active.where(assignment_group:).maximum(:position) + 1
+    result.position = Assignment.active.where(assignment_group:).maximum(:position) + 1 if assignment_group
     result.title =
       opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), title)
 
@@ -499,11 +499,12 @@ class AbstractAssignment < ActiveRecord::Base
   def finish_duplicating
     return unless ["duplicating", "failed_to_duplicate"].include?(workflow_state)
 
-    self.workflow_state = if root_account.feature_enabled?(:course_copy_alignments)
-                            "outcome_alignment_cloning"
-                          else
-                            (duplicate_of&.workflow_state == "published" || !can_unpublish?) ? "published" : "unpublished"
-                          end
+    if root_account.feature_enabled?(:course_copy_alignments)
+      self.workflow_state = "outcome_alignment_cloning"
+      start_outcome_alignment_service_clone
+    else
+      self.workflow_state = (duplicate_of&.workflow_state == "published" || !can_unpublish?) ? "published" : "unpublished"
+    end
   end
 
   def finish_alignment_cloning
@@ -1224,6 +1225,7 @@ class AbstractAssignment < ActiveRecord::Base
       muted
       intra_group_peer_reviews
       anonymous_grading
+      peer_review_submission_required
     ].each { |attr| self[attr] = false if self[attr].nil? }
     self.graders_anonymous_to_graders = false unless grader_comments_visible_to_graders
   end
@@ -3057,6 +3059,10 @@ class AbstractAssignment < ActiveRecord::Base
     group_category_id.present?
   end
 
+  def has_groups?
+    has_group_category? && Group.active.where(group_category_id:).exists?
+  end
+
   def assign_peer_review(reviewer, reviewee)
     reviewer_submission = find_or_create_submission(reviewer)
     reviewee_submission = find_or_create_submission(reviewee)
@@ -3336,14 +3342,14 @@ class AbstractAssignment < ActiveRecord::Base
   }
 
   scope :due_between_for_user, lambda { |start, ending, user|
-    with_user_due_date(user).where(user_due_date: start..ending)
+    with_user_due_date(user).where(submissions: { cached_due_date: start..ending })
   }
 
   scope :with_user_due_date, lambda { |user|
-    from("(SELECT s.cached_due_date AS user_due_date, a.*
-          FROM #{Assignment.quoted_table_name} a
-          INNER JOIN #{Submission.quoted_table_name} AS s ON s.assignment_id = a.id
-          WHERE s.user_id = #{User.connection.quote(user.id_for_database)} AND s.workflow_state <> 'deleted') AS assignments").select(arel.projections, "user_due_date")
+    joins(:submissions)
+      .where(submissions: { user_id: user.id_for_database })
+      .where.not(submissions: { workflow_state: "deleted" })
+      .select(arel.projections, "submissions.cached_due_date")
   }
 
   scope :with_latest_due_date, lambda {
@@ -4129,6 +4135,8 @@ class AbstractAssignment < ActiveRecord::Base
   # If you're going to be checking this for multiple assignments, you may want
   # to call .preload_unposted_anonymous_submissions on the lot of them first
   def anonymize_students?
+    return true if anonymous_participants?
+
     return false unless anonymous_grading?
 
     # Only anonymize students for moderated assignments if grades have not been published.
@@ -4440,9 +4448,19 @@ class AbstractAssignment < ActiveRecord::Base
     settings&.dig("new_quizzes", "type") || "graded_quiz"
   end
 
+  def anonymous_participants?
+    value = settings&.dig("new_quizzes", "anonymous_participants")
+    ActiveModel::Type::Boolean.new.cast(value) || false
+  end
+
   def new_quizzes_type=(type)
     self.settings ||= {}
     self.settings["new_quizzes"] = (settings["new_quizzes"] || {}).merge({ "type" => type })
+  end
+
+  def anonymous_participants=(enabled)
+    self.settings ||= {}
+    self.settings["new_quizzes"] = (settings["new_quizzes"] || {}).merge({ "anonymous_participants" => ActiveModel::Type::Boolean.new.cast(enabled) || false })
   end
 
   private
@@ -4644,5 +4662,27 @@ class AbstractAssignment < ActiveRecord::Base
     progressions = ContextModuleProgression.for_course(context).where(current: true)
     progressions.in_batches(of: 10_000).update_all(current: false)
     User.where(id: progressions.pluck(:user_id)).touch_all
+  end
+
+  def start_outcome_alignment_service_clone
+    return unless duplicate_of && context
+
+    begin
+      delay_if_production(priority: Delayed::LOW_PRIORITY).call_outcome_alignment_service_clone
+    rescue => e
+      Rails.logger.error("Failed to start outcome alignment service clone: #{e.message}")
+      self.workflow_state = "failed_to_clone_outcome_alignment"
+      save
+    end
+  end
+
+  def call_outcome_alignment_service_clone
+    OutcomesService::Service.start_outcome_alignment_service_clone(
+      context,
+      original_assignment_id: duplicate_of.id,
+      copied_assignment_id: id,
+      new_context_id: context.id,
+      original_context_id: duplicate_of.course.id
+    )
   end
 end

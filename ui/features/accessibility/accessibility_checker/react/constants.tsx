@@ -61,7 +61,7 @@ export const IssuesTableHeaderApiNames: Record<string, string> = {
 }
 
 export const issueTypeOptions: {value: IssueRuleType; label: string}[] = [
-  {value: 'adjacent-links', label: I18n.t('Adjacent links')},
+  {value: 'adjacent-links', label: I18n.t('Duplicate links')},
   {value: 'headings-sequence', label: I18n.t('Headings sequence')},
   {value: 'has-lang-entry', label: I18n.t('PDF language entry')},
   {value: 'headings-start-at-h2', label: I18n.t('Headings start at H2')},

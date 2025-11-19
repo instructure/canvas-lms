@@ -124,5 +124,139 @@ describe AttachmentAssociation do
         end
       end
     end
+
+    context "with AssessmentQuestion context" do
+      before do
+        course_with_teacher
+        @course.root_account.enable_feature!(:file_association_access)
+        assessment_question_bank_model(course: @course)
+        assessment_question_bank_with_questions(count: 2)
+        @aq_att = attachment_with_context(@q1)
+        @q1.question_data[:description] = "<p>You are a locust! <a href=\"/assessment_questions/#{@q1.id}/files/#{@aq_att.id}/download\">Download</a></p>"
+        @q1.save!
+      end
+
+      it "returns true when all conditions are met" do
+        result = AttachmentAssociation.verify_access("assessment_question_#{@q1.id}", @aq_att, @teacher)
+        expect(result).to be_truthy
+      end
+
+      it "returns false when context_type doesn't match attachment context_type" do
+        other_attachment = attachment_with_context(@course)
+        result = AttachmentAssociation.verify_access("assessment_question_#{@q1.id}", other_attachment, @teacher)
+        expect(result).to be_falsey
+      end
+
+      it "returns false when context_id doesn't match" do
+        result = AttachmentAssociation.verify_access("assessment_question_#{@q2.id}", @aq_att, @teacher)
+        expect(result).to be_falsey
+      end
+
+      it "returns false when attachment_associations_enabled is false" do
+        @q1.root_account.disable_feature!(:file_association_access)
+        result = AttachmentAssociation.verify_access("assessment_question_#{@q1.id}", @aq_att, @teacher)
+        expect(result).to be_falsey
+      end
+
+      it "returns false when access_for_attachment_association returns false" do
+        other_user = user_with_pseudonym
+        result = AttachmentAssociation.verify_access("assessment_question_#{@q1.id}", @aq_att, other_user)
+        expect(result).to be_falsey
+      end
+    end
+
+    context "with QuizSubmissions" do
+      before do
+        course_with_teacher_and_student_enrolled({ active_all: true })
+        @course.root_account.enable_feature!(:file_association_access)
+
+        assessment_question_bank_model
+
+        @assessment_questions = []
+        @assessment_question_attachments = []
+        (1..4).each do |i|
+          q = @bank.assessment_questions.create!(
+            question_data: true_false_question_data
+          )
+          instance_variable_set(:"@aq#{i}", q)
+          @assessment_questions << q
+          aq_a = attachment_with_context(q)
+          @assessment_question_attachments << aq_a
+          q.question_data[:description] = "<p>Question #{i} description <a href=\"/assessment_questions/#{q.id}/files/#{aq_a.id}/download\">Download</a></p>"
+          q.save!
+          instance_variable_set(:"@aq_attachment#{i}", aq_a)
+        end
+
+        course_quiz(true)
+        @quiz_desc_att = attachment_with_context(@teacher)
+        @quiz.description = "<p>Quiz description <a href=\"/users/#{@teacher.id}/files/#{@quiz_desc_att.id}/download\">Download</a></p>"
+        @quiz.updating_user = @teacher
+        @quiz.save!
+
+        @group = @quiz.quiz_groups.create!(name: "question group", pick_count: 2, question_points: 5.0)
+        @group.assessment_question_bank = @bank
+        @group.save!
+
+        @question_att = attachment_with_context(@course)
+        @question = @quiz.quiz_questions.create!(
+          question_data: true_false_question_data.merge(question_text: "<p>Native question description <a href=\"/courses/#{@course.id}/files/#{@question_att.id}/download\">Download</a></p>"),
+          updating_user: @teacher
+        )
+
+        @quiz.generate_quiz_data
+        @quiz.save!
+        @quiz.reload
+
+        @qsub = @quiz.generate_submission(@student)
+        @qsub_user_attachment = attachment_with_context(@qsub)
+
+        @aq_attachments_in_submission = @qsub.quiz_data.filter_map do |q|
+          aq = @assessment_questions.find { |a| a.id == q[:assessment_question_id] }
+          next unless aq
+
+          @assessment_question_attachments.find { |a| a.context_id == aq.id }
+        end
+
+        @aq_attachments_not_in_submission = @assessment_question_attachments - @aq_attachments_in_submission
+      end
+
+      it "allows access to quiz description attachment" do
+        result = AttachmentAssociation.verify_access("quiz_submission_#{@qsub.id}", @quiz_desc_att, @student)
+        expect(result).to be_truthy
+      end
+
+      it "does not allow access to quiz description attachment for an unassociated user" do
+        other_user = user_with_pseudonym
+        result = AttachmentAssociation.verify_access("quiz_submission_#{@qsub.id}", @quiz_desc_att, other_user)
+        expect(result).to be_falsey
+      end
+
+      it "allows access to native question attachment" do
+        result = AttachmentAssociation.verify_access("quiz_submission_#{@qsub.id}", @question_att, @student)
+        expect(result).to be_truthy
+      end
+
+      it "allows access to an associated assessment question attachment" do
+        result = AttachmentAssociation.verify_access("quiz_submission_#{@qsub.id}", @aq_attachments_in_submission.first, @student)
+        expect(result).to be_truthy
+      end
+
+      it "does not allow access to an unassociated assessment question attachment" do
+        result = AttachmentAssociation.verify_access("quiz_submission_#{@qsub.id}", @aq_attachments_not_in_submission.first, @student)
+        expect(result).to be_falsey
+      end
+
+      it "allows access to quiz submission attachment" do
+        result = AttachmentAssociation.verify_access("quiz_submission_#{@qsub.id}", @qsub_user_attachment, @student)
+        expect(result).to be_truthy
+      end
+
+      it "does not allow access to quiz submission attachment with another submission id" do
+        other_qsub = @quiz.generate_submission(user_with_pseudonym)
+        other_qsub_user_attachment = attachment_with_context(other_qsub)
+        result = AttachmentAssociation.verify_access("quiz_submission_#{@qsub.id}", other_qsub_user_attachment, @student)
+        expect(result).to be_falsey
+      end
+    end
   end
 end

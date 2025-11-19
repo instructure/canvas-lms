@@ -20,7 +20,6 @@
 
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
-  include AssetProcessorReportHelper
   include GradebooksHelper
   include SubmissionCommentsHelper
   include KalturaHelper
@@ -140,14 +139,6 @@ class GradebooksController < ApplicationController
         json[:custom_grade_status_id] = submission.custom_grade_status_id if custom_gradebook_statuses_enabled
       end
 
-      if submission.user_can_read_grade?(@presenter.student, for_plagiarism: true) && (
-        submission.submission_type != "discussion_topic" || @context.root_account.feature_enabled?(:lti_asset_processor_discussions)
-      )
-        json[:asset_processors] = asset_processors(assignment: submission.assignment)
-        json[:asset_reports] = @presenter.user_has_elevated_permissions? ? nil : asset_reports_info_for_display(submission:)
-        json[:submission_type] = submission.submission_type
-      end
-
       json[:submission_comments] = submission.visible_submission_comments.map do |comment|
         comment_map = {
           id: comment.id,
@@ -166,6 +157,7 @@ class GradebooksController < ApplicationController
           updated_at: comment.updated_at,
           comment: comment.comment,
           display_updated_at: datetime_string(comment.updated_at),
+          # this is causing multiple N+1 query problems and should be fixed
           is_read: comment.read?(@current_user) || (!@presenter.student_is_user? && !@presenter.user_an_observer_of_student?),
         }
         if comment.media_comment? && (media_object = SubmissionComment.serialize_media_comment(comment.media_comment_id))
@@ -204,6 +196,7 @@ class GradebooksController < ApplicationController
       rubrics: rubrics_json(@presenter.rubrics, @current_user, session, style: "full"),
       save_assignment_order_url: course_save_assignment_order_url(@context),
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
+      default_student_grade_summary_tab:,
       student_id: @presenter.student_id,
       students: @presenter.students.as_json(include_root: false),
       outcome_proficiency:,
@@ -1661,6 +1654,22 @@ class GradebooksController < ApplicationController
     gradebook_settings(context.global_id)["gradebook_view"]
   end
 
+  def course_default_student_gradebook_view
+    @context.settings[:default_student_gradebook_view]
+  end
+
+  def default_student_grade_summary_tab
+    course_default = course_default_student_gradebook_view
+    default_lmgb_enabled = @context.feature_enabled?(:default_to_learning_mastery_gradebook)
+    student_og_enabled = @context.feature_enabled?(:student_outcome_gradebook)
+
+    if default_lmgb_enabled && student_og_enabled && course_default
+      "outcomes"
+    else
+      nil # Let frontend decide
+    end
+  end
+
   def update_preferred_gradebook_view!(gradebook_view)
     if ["learning_mastery", "default"].include?(gradebook_view)
       @current_user.set_preference(:gradebook_version, "gradebook")
@@ -1843,6 +1852,7 @@ class GradebooksController < ApplicationController
     courses << @context if courses.empty?
 
     courses.map do |course|
+      # this is causing an N+1 query problem and should be fixed
       grading_period_set_id = GradingPeriodGroup.for_course(course)&.id
 
       {
@@ -1902,8 +1912,12 @@ class GradebooksController < ApplicationController
   end
 
   def track_update_metrics(params, submission)
-    if params.dig(:submission, :grade) && params["submission"]["grade"].to_s != submission.grade.to_s && params["originator"] == "speed_grader"
-      InstStatsd::Statsd.distributed_increment("speedgrader.submission.posted_grade")
+    if params.dig(:submission, :grade) && params["submission"]["grade"].to_s != submission.grade.to_s
+      if params["originator"] == "speed_grader"
+        InstStatsd::Statsd.distributed_increment("speedgrader.submission.posted_grade")
+      elsif params["originator"] == "platform_speed_grader"
+        InstStatsd::Statsd.distributed_increment("platform_speedgrader.submission.posted_grade")
+      end
     end
   end
 

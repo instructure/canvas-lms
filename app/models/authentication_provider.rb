@@ -393,8 +393,11 @@ class AuthenticationProvider < ActiveRecord::Base
               cc.workflow_state = "unconfirmed"
             end
             if cc.changed?
-              cc.save!
-              cc.send_confirmation!(pseudonym.account) unless autoconfirm
+              if cc.save
+                cc.send_confirmation!(pseudonym.account) unless autoconfirm
+              else
+                logger.warn("Unable to save federated email #{email} for user #{user.id}: #{cc.errors.full_messages.join(", ")}")
+              end
             end
           end
         when "locale"

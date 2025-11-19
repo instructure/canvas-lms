@@ -295,8 +295,10 @@ class SectionsController < ApplicationController
     if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage)
       @section.uncrosslist(updating_user: @current_user, source:) if !params[:override_sis_stickiness] || value_to_boolean(params[:override_sis_stickiness])
       respond_to do |format|
-        flash[:notice] = t("section_decrosslisted", "Section successfully de-cross-listed!")
-        format.html { redirect_to named_context_url(@new_course, :context_section_url, @section.id) }
+        format.html do
+          flash[:notice] = t("Section successfully de-cross-listed!")
+          redirect_to named_context_url(@new_course, :context_section_url, @section.id)
+        end
         format.json { render json: (api_request? ? section_json(@section, @current_user, session, []) : @section) }
       end
     end

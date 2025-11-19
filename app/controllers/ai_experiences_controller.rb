@@ -73,12 +73,12 @@
 class AiExperiencesController < ApplicationController
   include Api::V1::AiExperience
 
-  protect_from_forgery except: %i[create update destroy continue_conversation], with: :exception
+  protect_from_forgery except: %i[create update destroy], with: :exception
 
   before_action :require_context
   before_action :check_ai_experiences_feature_flag
   before_action :require_manage_rights
-  before_action :load_experience, only: %i[show edit update destroy continue_conversation messages]
+  before_action :load_experience, only: %i[show edit update destroy]
 
   # @API List AI experiences
   #
@@ -231,114 +231,6 @@ class AiExperiencesController < ApplicationController
         format.json { render json: @experience.errors, status: :bad_request }
       end
     end
-  end
-
-  # @API Continue AI conversation
-  #
-  # Initialize or continue a conversation with the AI experience
-  #
-  # @argument messages [Optional, Array]
-  #   The conversation history. If empty, will return starting messages.
-  # @argument conversation_id [Optional, String]
-  #   The conversation ID from llm-conversation service. Required for continuing conversations.
-  # @argument restart [Optional, Boolean]
-  #   If true, marks existing conversation as completed and creates a new one.
-  #
-  # @returns {Object} Hash with conversation_id and messages array
-  def continue_conversation
-    # Check if user has an existing active conversation for this experience
-    existing_conversation = @experience.ai_conversations
-                                       .active
-                                       .for_user(@current_user.id)
-                                       .first
-
-    # If restart requested, mark existing conversation as completed
-    if params[:restart] && existing_conversation
-      existing_conversation.complete!
-      existing_conversation = nil
-    end
-
-    conversation_id = params[:conversation_id] || existing_conversation&.llm_conversation_id
-
-    # If we have a conversation_id but no messages, fetch existing messages
-    if conversation_id && params[:messages].blank?
-      client = LLMConversationClient.new(
-        current_user: @current_user,
-        root_account_uuid: @context.root_account.uuid,
-        facts: @experience.facts,
-        learning_objectives: @experience.learning_objective,
-        scenario: @experience.pedagogical_guidance,
-        conversation_id:
-      )
-
-      messages = client.messages
-      return render json: { conversation_id:, messages: }
-    end
-
-    service = LLMConversationClient.new(
-      current_user: @current_user,
-      root_account_uuid: @context.root_account.uuid,
-      facts: @experience.facts,
-      learning_objectives: @experience.learning_objective,
-      scenario: @experience.pedagogical_guidance,
-      conversation_id:
-    )
-
-    result = if params[:messages].present?
-               service.continue_conversation(
-                 messages: params[:messages],
-                 new_user_message: params[:new_user_message]
-               )
-             else
-               service.starting_messages
-             end
-
-    # Save the conversation record if it's new
-    if result[:conversation_id] && !existing_conversation
-      @experience.ai_conversations.create!(
-        llm_conversation_id: result[:conversation_id],
-        user: @current_user,
-        course: @context,
-        root_account: @context.root_account,
-        account: @context.account,
-        workflow_state: "active"
-      )
-    end
-
-    render json: result
-  rescue LlmConversation::Errors::ConversationError => e
-    render json: { error: e.message }, status: :service_unavailable
-  end
-
-  # @API Get conversation messages
-  #
-  # Retrieve messages from an existing conversation in llm-conversation service
-  #
-  # @argument conversation_id [Required, String]
-  #   The conversation ID from llm-conversation service
-  #
-  # @returns {Object} Hash with conversation_id and messages array
-  def messages
-    conversation_id = params[:conversation_id]
-
-    unless conversation_id.present?
-      return render json: { error: "conversation_id is required" }, status: :bad_request
-    end
-
-    client = LLMConversationClient.new(
-      current_user: @current_user,
-      root_account_uuid: @context.root_account.uuid,
-      facts: @experience.facts,
-      learning_objectives: @experience.learning_objective,
-      scenario: @experience.pedagogical_guidance,
-      conversation_id:
-    )
-
-    messages = client.messages
-
-    render json: { conversation_id:, messages: }
-  rescue LlmConversation::Errors::ConversationError => e
-    render json: { error: e.message }, status: :service_unavailable
   end
 
   private

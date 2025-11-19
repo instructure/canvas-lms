@@ -23,6 +23,7 @@ export const STUDENT_COLUMN_RIGHT_PADDING: number = 15
 export const COLUMN_PADDING: number = 2
 export const CELL_HEIGHT: number = 48
 
+export const DEFAULT_PAGE_NUMBER: number = 1
 export const DEFAULT_STUDENTS_PER_PAGE: number = 15
 export const STUDENTS_PER_PAGE_OPTIONS: number[] = [15, 30, 50, 100]
 
@@ -37,6 +38,7 @@ export enum SortBy {
   SisId = 'student_sis_id',
   IntegrationId = 'student_integration_id',
   LoginId = 'student_login_id',
+  Outcome = 'outcome',
 }
 
 export enum SecondaryInfoDisplay {
@@ -51,12 +53,21 @@ export enum DisplayFilter {
   SHOW_STUDENT_AVATARS = 'show_student_avatars',
 }
 
+export enum NameDisplayFormat {
+  FIRST_LAST = 'first_last',
+  LAST_FIRST = 'last_first',
+}
+
 export interface GradebookSettings {
   secondaryInfoDisplay: SecondaryInfoDisplay
   displayFilters: DisplayFilter[]
+  nameDisplayFormat: NameDisplayFormat
+  studentsPerPage: number
 }
 
 export const DEFAULT_GRADEBOOK_SETTINGS: GradebookSettings = {
   secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
   displayFilters: [DisplayFilter.SHOW_STUDENT_AVATARS, DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
+  nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+  studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
 }

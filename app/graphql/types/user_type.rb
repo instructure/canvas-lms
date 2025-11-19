@@ -41,6 +41,21 @@ module Types
     MD
   end
 
+  class PeerReviewStatusType < ApplicationObjectType
+    description "Peer review status for a student on an assignment"
+
+    field :completed_reviews_count, Int, null: false, description: "Number of peer reviews the student has completed"
+    field :must_review_count, Int, null: false, description: "Number of peer reviews the student has been allocated"
+
+    def must_review_count
+      object[:must_review_count] || 0
+    end
+
+    def completed_reviews_count
+      object[:completed_reviews_count] || 0
+    end
+  end
+
   class UserType < ApplicationObjectType
     #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -83,11 +98,12 @@ module Types
     end
 
     field :avatar_url, UrlType, null: true
-
     def avatar_url
-      Loaders::AssociationLoader.for(User, :pseudonym).load(object).then do
+      load_association(:pseudonym).then do
         if object.account.service_enabled?(:avatars)
-          AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: false)
+          load_association(:associated_root_accounts).then do
+            AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: false)
+          end
         else
           nil
         end
@@ -140,9 +156,7 @@ module Types
       if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
          context[:course]&.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
          object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
-        Loaders::AssociationLoader.for(User, :pseudonyms)
-                                  .load(object)
-                                  .then do
+        load_association(:pseudonyms).then do
           pseudonym = SisPseudonym.for(object,
                                        domain_root_account,
                                        type: :implicit,
@@ -160,9 +174,7 @@ module Types
       if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
          context[:course]&.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
          object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
-        Loaders::AssociationLoader.for(User, :pseudonyms)
-                                  .load(object)
-                                  .then do
+        load_association(:pseudonyms).then do
           pseudonym = SisPseudonym.for(object,
                                        domain_root_account,
                                        type: :implicit,
@@ -205,24 +217,23 @@ module Types
                required: false
     end
 
-    # TODO: handle N+1
     field :login_id, String, null: true
     def login_id
       course = context[:course]
       return nil unless course
       return nil unless course.grants_right?(current_user, session, :view_user_logins)
 
-      pseudonym = SisPseudonym.for(
-        object,
-        course,
-        type: :implicit,
-        require_sis: false,
-        root_account: context[:domain_root_account],
-        in_region: true
-      )
-      return nil unless pseudonym
-
-      pseudonym.unique_id
+      load_association(:pseudonyms).then do
+        pseudonym = SisPseudonym.for(
+          object,
+          course,
+          type: :implicit,
+          require_sis: false,
+          root_account: context[:domain_root_account],
+          in_region: true
+        )
+        pseudonym&.unique_id
+      end
     end
 
     def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {})
@@ -960,6 +971,23 @@ module Types
       return unless object == current_user
 
       object.inbox_labels
+    end
+
+    field :peer_review_status, PeerReviewStatusType, null: true do
+      description "Peer review status for assignments where peer reviews are enabled"
+    end
+    def peer_review_status
+      assignment_id = context[:assignment_id]
+      return nil unless assignment_id
+
+      assignment = Assignment.find_by(id: assignment_id)
+      return nil unless assignment
+
+      return nil unless assignment.grants_right?(current_user, :grade) &&
+                        assignment.context.feature_enabled?(:peer_review_allocation) &&
+                        assignment.peer_reviews
+
+      Loaders::PeerReviewStatusLoader.for(assignment_id).load(object.id)
     end
 
     field :activity_stream, ActivityStreamType, null: true do

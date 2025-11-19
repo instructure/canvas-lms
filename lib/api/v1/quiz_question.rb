@@ -95,13 +95,14 @@ module Api::V1::QuizQuestion
   #   the questions will be modified to use the fields found in that
   #   data. This is needed if you're rendering questions for a submission
   #   as each submission might have differen data.
-  def questions_json(questions, user, session, context = nil, includes = [], censored = false, quiz_data = nil, opts = {})
+  def questions_json(questions, user, session, context: nil, includes: [], censored: false, quiz_data: nil, shuffle_answers: false, location: nil)
     questions.map do |question|
-      question_json(question, user, session, context, includes, censored, quiz_data, opts)
+      this_location = location.nil? ? "quiz_question_#{question.id}" : location
+      question_json(question, user, session, context:, includes:, censored:, quiz_data:, shuffle_answers:, location: this_location)
     end
   end
 
-  def question_json(question, user, session, _context = nil, includes = [], censored = false, quiz_data = nil, opts = {})
+  def question_json(question, user, session, context: nil, includes: [], censored: false, quiz_data: nil, shuffle_answers: false, location: nil)
     hsh = api_json(question, user, session, API_ALLOWED_QUESTION_OUTPUT_FIELDS).tap do |json|
       API_ALLOWED_QUESTION_DATA_OUTPUT_FIELDS.each do |field|
         question_data = quiz_data&.find { |data_question| data_question[:id] == question[:id] } || question.question_data
@@ -111,10 +112,10 @@ module Api::V1::QuizQuestion
 
     user ||= @current_user
     unless includes.include?(:plain_html)
-      hsh = add_verifiers_to_question(hsh, @context, user)
+      hsh = handle_question_html_content(hsh, @context, user, location)
     end
 
-    if opts[:shuffle_answers] && Quizzes::Quiz.shuffleable_question_type?(hsh[:question_type])
+    if shuffle_answers && Quizzes::Quiz.shuffleable_question_type?(hsh[:question_type])
       hsh["answers"].shuffle!
     end
 
@@ -123,6 +124,10 @@ module Api::V1::QuizQuestion
       if censored
         q_data = hsh[:assessment_question][:question_data]
         hsh[:assessment_question][:question_data] = censor(q_data)
+      end
+
+      unless includes.include?(:plain_html)
+        hsh[:assessment_question][:question_data] = handle_question_html_content(hsh[:assessment_question][:question_data], @context, user, "assessment_question_#{question.assessment_question.id}")
       end
     end
 
@@ -135,15 +140,19 @@ module Api::V1::QuizQuestion
 
   private
 
-  def add_verifiers_to_question(question_hash, context, user)
-    if question_hash["question_text"]
-      question_hash["question_text"] = api_user_content(question_hash["question_text"], context, user)
+  def handle_question_html_content(question_hash, context, user, location = nil)
+    Quizzes::QuizQuestion::QUESTION_DATA_HTML_FIELDS.each do |field|
+      next unless question_hash[field].present?
+
+      question_hash[field] = api_user_content(question_hash[field], context, user, location:)
     end
 
-    question_hash["answers"].each do |a|
-      next unless a["html"].present?
+    question_hash["answers"]&.each do |a|
+      Quizzes::QuizQuestion::QUESTION_DATA_ANSWER_HTML_FIELDS.each do |field|
+        next unless a[field].present?
 
-      a["html"] = api_user_content(a["html"], context, user)
+        a[field] = api_user_content(a[field], context, user, location:)
+      end
     end
 
     question_hash

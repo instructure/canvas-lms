@@ -28,5 +28,5 @@ describe "grade_weight_changed" do
   let(:asset) { @course }
   let(:notification_name) { :grade_weight_changed }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

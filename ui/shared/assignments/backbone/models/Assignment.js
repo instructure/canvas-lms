@@ -31,6 +31,7 @@ import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 import * as tz from '@instructure/moment-utils'
 import numberHelper from '@canvas/i18n/numberHelper'
 import PandaPubPoller from '@canvas/panda-pub-poller'
+import {getUrlWithHorizonParams} from '@canvas/horizon/utils'
 import {matchingToolUrls} from './LtiAssignmentHelpers'
 
 const default_interval = 3000
@@ -165,6 +166,8 @@ function Assignment() {
   this.newQuizzesAssignmentBuildButtonEnabled =
     this.newQuizzesAssignmentBuildButtonEnabled.bind(this)
   this.newMasteryConnectIconEnabled = this.newMasteryConnectIconEnabled.bind(this)
+  this.newQuizzesType = this.newQuizzesType.bind(this)
+  this.newQuizzesAnonymousSubmission = this.newQuizzesAnonymousSubmission.bind(this)
   this.nonBaseDates = this.nonBaseDates.bind(this)
   this.notifyOfUpdate = this.notifyOfUpdate.bind(this)
   this.objectType = this.objectType.bind(this)
@@ -176,6 +179,7 @@ function Assignment() {
   this.peerReviewCount = this.peerReviewCount.bind(this)
   this.peerReviews = this.peerReviews.bind(this)
   this.peerReviewsAssignAt = this.peerReviewsAssignAt.bind(this)
+  this.peerReviewSubmissionRequired = this.peerReviewSubmissionRequired.bind(this)
   this.pointsPossible = this.pointsPossible.bind(this)
   this.pollUntilFinished = this.pollUntilFinished.bind(this)
   this.pollUntilFinishedCloningAlignment = this.pollUntilFinishedCloningAlignment.bind(this)
@@ -683,6 +687,13 @@ Assignment.prototype.peerReviewsAssignAt = function (date) {
   return this.set('peer_reviews_assign_at', date)
 }
 
+Assignment.prototype.peerReviewSubmissionRequired = function (submissionRequired) {
+  if (!(arguments.length > 0)) {
+    return this.get('peer_review_submission_required') || false
+  }
+  return this.set('peer_review_submission_required', submissionRequired)
+}
+
 Assignment.prototype.intraGroupPeerReviews = function () {
   return this.get('intra_group_peer_reviews')
 }
@@ -985,15 +996,17 @@ Assignment.prototype.objectTypeDisplayName = function () {
 }
 
 Assignment.prototype.htmlUrl = function () {
+  let url
   if (this.isQuizLTIAssignment() && canManage()) {
-    return this.htmlEditUrl() + '?quiz_lti'
+    url = getUrlWithHorizonParams(this.get('html_url') + '/edit', {quiz_lti: true})
   } else {
-    return this.get('html_url')
+    url = getUrlWithHorizonParams(this.get('html_url'))
   }
+  return url
 }
 
 Assignment.prototype.htmlEditUrl = function () {
-  return this.get('html_url') + '/edit'
+  return getUrlWithHorizonParams(this.get('html_url') + '/edit')
 }
 
 Assignment.prototype.htmlBuildUrl = function () {
@@ -1002,9 +1015,9 @@ Assignment.prototype.htmlBuildUrl = function () {
     if (ENV.FEATURES.new_quizzes_navigation_updates) {
       displayType = 'full_width_with_nav'
     }
-    return this.get('html_url') + `?display=${displayType}`
+    return getUrlWithHorizonParams(this.get('html_url'), {display: displayType})
   } else {
-    return this.get('html_url')
+    return getUrlWithHorizonParams(this.get('html_url'))
   }
 }
 
@@ -1054,6 +1067,36 @@ Assignment.prototype.newMasteryConnectIconEnabled = function () {
 
 Assignment.prototype.hideZeroPointQuizzesOptionEnabled = function () {
   return ENV.HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED
+}
+
+Assignment.prototype.newQuizzesType = function (type) {
+  const settings = this.get('settings') || {}
+  const newQuizzes = settings.new_quizzes || {}
+  if (!(arguments.length > 0)) {
+    return newQuizzes.type || 'graded_quiz'
+  }
+  return this.set('settings', {
+    ...settings,
+    new_quizzes: {
+      ...newQuizzes,
+      type,
+    },
+  })
+}
+
+Assignment.prototype.newQuizzesAnonymousSubmission = function (isAnonymous) {
+  const settings = this.get('settings') || {}
+  const newQuizzes = settings.new_quizzes || {}
+  if (!(arguments.length > 0)) {
+    return newQuizzes.anonymous_participants || false
+  }
+  return this.set('settings', {
+    ...settings,
+    new_quizzes: {
+      ...newQuizzes,
+      anonymous_participants: isAnonymous,
+    },
+  })
 }
 
 Assignment.prototype.showBuildButton = function () {

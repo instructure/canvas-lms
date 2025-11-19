@@ -113,11 +113,14 @@ new_quizzes_separators:
   state: allowed
   applies_to: SiteAdmin
 new_quizzes_ai_quiz_generation:
-  display_name: AI Quiz Generation
-  description: If enabled, the "Generate With AI" button will appear, allowing AI-based quiz creation for institutions in the Early Adopter Program
-  state: hidden
-  shadow: true
+  display_name: IgniteAI Question Authoring for Quizzes
+  description: Enable IgniteAI Question Authoring for Quizzes feature
+  state: allowed
   applies_to: Course
+  beta: true
+  environments:
+    production:
+      state: hidden
 new_quizzes_scanning_youtube_links:
   display_name: Scanning Youtube links in New Quizzes
   description: Enabling the YouTube Migration - New Quizzes feature adds the scanning ability and the convert option on Youtube embeddings in New Quizzes.
@@ -129,3 +132,9 @@ new_quizzes_surveys:
   state: hidden
   applies_to: SiteAdmin
   shadow: true
+new_quizzes_native_experience:
+  display_name: New Quizzes Native Experience
+  description: When enabled, New Quizzes opens directly within Canvas for a smoother experience.
+  state: hidden
+  shadow: true
+  applies_to: RootAccount

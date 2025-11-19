@@ -20,17 +20,19 @@ import React, {useState} from 'react'
 import {
   LtiAssetProcessor,
   LtiAssetReportForStudent,
+  shouldShowAssetReportCell,
   ZLtiAssetProcessor,
   ZLtiAssetReportForStudent,
 } from '@canvas/lti-asset-processor/model/LtiAssetReport'
 import {ZodType} from 'zod'
-import LtiAssetReportStatus from '@canvas/lti-asset-processor/react/LtiAssetReportStatus'
+import LtiAssetReportStatus from '@canvas/lti-asset-processor/shared-with-sg/replicated/components/LtiAssetReportStatus'
 import StudentLtiAssetReportModal from '@canvas/lti-asset-processor/react/StudentLtiAssetReportModal'
+import {AssetReportCompatibleSubmissionType} from '@canvas/lti-asset-processor/shared-with-sg/replicated/types/LtiAssetReports'
 
 interface AssetProcessorCellProps {
   assetProcessors: LtiAssetProcessor[] | undefined
   assetReports: LtiAssetReportForStudent[] | undefined
-  submissionType: 'online_upload' | 'online_text_entry'
+  submissionType: AssetReportCompatibleSubmissionType
   assignmentName: string
 }
 
@@ -61,9 +63,7 @@ export default function LtiAssetProcessorCell({
     [],
   )
 
-  if (!validatedProcessors.length || !Array.isArray(assetReports)) {
-    // Note that empty array means to still show, but show "No Reports"
-    // see AssetProcessorReportHelper#raw_asset_reports
+  if (!shouldShowAssetReportCell(assetProcessors, assetReports)) {
     return null
   }
 
@@ -92,13 +92,4 @@ function useZodMemo<T, U>(data: T, schema: ZodType<T>, fallback: U): T | U {
     }
     return result.data
   }, [data, schema, fallback])
-}
-
-export function shouldShowLtiAssetProcessorCellColumn(
-  assetProcessors: LtiAssetProcessor[] | undefined,
-  assetReports: LtiAssetReportForStudent[] | undefined,
-): boolean {
-  const hasProcessors = Array.isArray(assetProcessors) && assetProcessors.length > 0
-  const hasReports = Array.isArray(assetReports) && assetReports.length > 0
-  return hasProcessors && hasReports
 }

@@ -21,7 +21,7 @@ import {Popover} from '@instructure/ui-popover'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Button} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {AccessibilityIssue} from './types'
 import {NoIssuesContent} from './NoIssuesContent'
@@ -140,10 +140,17 @@ export const AccessibilityCheckerPopover = ({
       screenReaderLabel={I18n.t('Accessibility checker')}
     >
       <View as="div" width="30rem">
-        <Flex direction="column" justifyItems="space-between" padding="small medium">
-          <Heading level="h3" margin="0" data-testid="a11y-checker-popover-header">
-            {I18n.t('Accessibility checker')}
-          </Heading>
+        <Flex direction="column" justifyItems="space-between" padding="medium">
+          <Flex justifyItems="space-between">
+            <Heading level="h2" margin="0" data-testid="a11y-checker-popover-header">
+              {I18n.t('Accessibility checker')}
+            </Heading>
+            <CloseButton
+              screenReaderLabel={I18n.t('Close')}
+              onClick={onHideContent}
+              data-testid="a11y-checker-close-button"
+            />
+          </Flex>
 
           {totalIssues > 0 ? (
             <IssuesContent
@@ -157,7 +164,7 @@ export const AccessibilityCheckerPopover = ({
         </Flex>
 
         <View as="div" background="secondary" padding="small" borderRadius="medium">
-          <Flex alignItems="center" gap="small">
+          <Flex alignItems="center" gap="small" justifyItems="end">
             <Button
               size="small"
               data-testid="prev-button"

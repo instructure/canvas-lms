@@ -8785,6 +8785,7 @@ he:
   gathering_files_933551d9: "אוסף קבצים..."
   general_answer_comments_730136ba: "הערות שאלה כלליות"
   general_locked_objects_6a9adafb: "פריטים כלליים שנעולים"
+  generate_44e33e72: יצירה
   generate_activity_for_user_2b0af749: "יצירת פעילות עבור %{user}"
   generate_epub_80e89ea4: "צור/י ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "הפקת דוח ניתוח פריטים %{statusLabel}"
@@ -17375,6 +17376,7 @@ he:
   save_11a80ec3: שמירה
   save_alert_b64f9fa3: "שמירת התראה"
   save_changes_698abe77: "שמירת שינויים"
+  save_changes_a63787eb: "שמירת שינויים"
   save_grading_period_daaaddea: "שמירת תקופת הערכה"
   save_grading_period_set_e029fa88: "שמירת אוגדן תקופות הערכה"
   save_key_b4dede06: "שמירת מפתח"
@@ -19070,6 +19072,7 @@ he:
       graded: "התבצעה הערכה"
       submitted: הוגש
       unsubmitted: "לא הוגשה"
+  submission_7ca566e1: הגשה
   submission_action_take_quiz: "קח/י %{title}"
   submission_action_turn_in_assignment: "החזר  %{title}"
   submission_added_title_50ebdc85: "נתווספה הגשה: %{title}"

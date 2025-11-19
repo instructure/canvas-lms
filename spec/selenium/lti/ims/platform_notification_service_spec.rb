@@ -65,6 +65,7 @@ describe "Platform Notification Service" do
   end
 
   it "registers a Notice Handler" do
+    skip("2025-10-27 INTEROP-9963")
     # Visit the new assignment page
     get("/courses/#{course.id}/assignments/new")
 

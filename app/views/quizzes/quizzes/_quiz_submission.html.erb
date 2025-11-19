@@ -15,28 +15,29 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
+<% current_or_submission = @current_submission || @submission %>
+<% submission_location_tag = "quiz_submission_#{current_or_submission[:id]}" %>
 <div class="quiz-submission <%= "headless" if !@headers %>">
-<% if !(@current_submission || @submission).results_visible?(user: @current_user)%>
-  <h4><%= render_result_protection(@quiz, @current_submission || @submission) %></h4>
+<% if !current_or_submission.results_visible?(user: @current_user)%>
+  <h4><%= render_result_protection(@quiz, current_or_submission) %></h4>
 <% end %>
 
 <% js_env IS_SURVEY: @quiz.survey? %>
 <% unless show_correct_answers? %>
-  <% message = render_correct_answer_protection(@quiz, (@current_submission || @submission)) %>
+  <% message = render_correct_answer_protection(@quiz, current_or_submission) %>
   <div class="alert">
     <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
     <span><%= message %></span>
   </div>
 <% end %>
 
-<% if !(@current_submission || @submission) || (@current_submission || @submission).settings_only? %>
+<% if !current_or_submission || current_or_submission.settings_only? %>
   <% if @quiz.survey? %>
     <%= t(:survey_not_yet_taken, "The survey hasn't been taken yet.") %>
   <% else %>
     <%= t(:quiz_not_yet_taken, "The quiz hasn't been taken yet.") %>
   <% end %>
-<% elsif !(@current_submission || @submission).results_visible?(user: @current_user) %>
+<% elsif !current_or_submission.results_visible?(user: @current_user) %>
   <div class="quiz_score" style="<%= hidden if @quiz.ungraded? %>">
     <% if @quiz.allowed_attempts != 1 %>
       <%= before_label(:score_for_attempt, "Score for this attempt") %>
@@ -46,7 +47,7 @@
       <%= before_label(:score_for_quiz, "Score for this quiz") %>
     <% end %>
     <%= score_out_of_points_possible(@submission.score, params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible, :class => 'score_value') %>
-    <% if (@current_submission || @submission).try(:pending_review?) %>
+    <% if current_or_submission.try(:pending_review?) %>
       *
       <div class='question-not-graded-text'>
         <% if can_do(@quiz, @current_user, :grade) && !@quiz.survey? %>
@@ -133,7 +134,7 @@
 <% css_bundle :quizzes %>
 <% js_bundle 'quiz_submission' %>
 <div id="questions" class="assessment_results <%= 'survey_results' if @quiz.survey? %> <%= (show_correct_answers? ? 'show_correct_answers' : 'suppress_correct_answers') %>">
-  <%= render :partial => "display_question", :collection => submission_questions, :locals => {:assessment_results => true, :user_answer_hash => submission_data_hash, :editable => editable} %>
+  <%= render :partial => "display_question", :collection => submission_questions, :locals => { assessment_results: true, user_answer_hash: submission_data_hash, editable:, asset_string: submission_location_tag } %>
 </div>
 <% if !@headers && editable && @current_user.preferences[:enable_speedgrader_grade_by_question] %>
   <div id="speed_update_scores_container">

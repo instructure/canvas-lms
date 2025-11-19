@@ -124,7 +124,7 @@ class Lti::Overlay < ActiveRecord::Base
   def self.apply_to(overlay, internal_config, additive: true)
     return internal_config.with_indifferent_access if overlay.blank?
 
-    overlay = overlay.with_indifferent_access
+    overlay = overlay.deep_dup.with_indifferent_access
     internal_config = internal_config.deep_dup.with_indifferent_access
 
     internal_config.merge!(overlay.slice(*Schemas::Lti::Overlay::ROOT_KEYS))

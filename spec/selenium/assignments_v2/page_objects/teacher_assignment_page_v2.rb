@@ -274,5 +274,13 @@ class TeacherViewPageV2
       wait_for_transient_element('svg[role="img"] circle', &)
       wait_for_ajaximations
     end
+
+    def peer_review_status_hint
+      f("div[data-testid='peer-review-status-hint']")
+    end
+
+    def peer_review_status_hints
+      ff("div[data-testid='peer-review-status-hint']")
+    end
   end
 end

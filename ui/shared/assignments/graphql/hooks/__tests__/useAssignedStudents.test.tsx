@@ -20,7 +20,9 @@ import {renderHook} from '@testing-library/react-hooks'
 import {QueryClient} from '@tanstack/react-query'
 import React from 'react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {useAssignedStudents, ASSIGNED_STUDENTS_QUERY, CourseStudent} from '../useAssignedStudents'
+import {useAssignedStudents} from '../useAssignedStudents'
+import {ASSIGNED_STUDENTS_QUERY} from '../../teacher/Queries'
+import {CourseStudent} from '../../teacher/AssignmentTeacherTypes'
 
 jest.mock('@canvas/graphql', () => ({
   executeQuery: jest.fn(),
@@ -30,17 +32,17 @@ const {executeQuery} = require('@canvas/graphql')
 const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
 
 const mockAssignedStudents: CourseStudent[] = [
-  {_id: '1', name: 'Squirtle'},
-  {_id: '2', name: 'Mudkip'},
-  {_id: '3', name: 'Dragonite'},
+  {_id: '1', name: 'Squirtle', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
+  {_id: '2', name: 'Mudkip', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
+  {_id: '3', name: 'Dragonite', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
 ]
 
 const mockCourseStudents: CourseStudent[] = [
-  {_id: '1', name: 'Squirtle'},
-  {_id: '2', name: 'Mudkip'},
-  {_id: '3', name: 'Dragonite'},
-  {_id: '4', name: 'Snorlax'},
-  {_id: '5', name: 'Psyduck'},
+  {_id: '1', name: 'Squirtle', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
+  {_id: '2', name: 'Mudkip', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
+  {_id: '3', name: 'Dragonite', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
+  {_id: '4', name: 'Snorlax', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
+  {_id: '5', name: 'Psyduck', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
 ]
 
 const createWrapper = () => {

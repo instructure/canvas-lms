@@ -35,9 +35,7 @@ jest.mock('../dependenciesShims', () => ({
   })),
   useLtiAssetProcessors: jest.fn(),
   useLtiAssetReports: jest.fn(),
-  useScope(_scope: string) {
-    return {t: (key: string) => key}
-  },
+  useFormatDateTime: jest.fn(() => jest.fn((date: Date) => date.toISOString())),
 }))
 
 export function mockUseLtiAssetProcessors(data: GetLtiAssetProcessorsResult): void {

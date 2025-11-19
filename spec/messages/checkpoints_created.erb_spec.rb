@@ -52,7 +52,7 @@ describe "checkpoints_created" do
   let(:asset) { @reply_to_topic_checkpoint }
   let(:notification_name) { :checkpoints_created }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 
   describe "email" do
     let(:path_type) { :email }

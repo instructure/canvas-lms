@@ -42,6 +42,10 @@ module PeerReview::Validations
     if assignment.external_tool?
       raise PeerReview::InvalidAssignmentSubmissionTypesError, I18n.t("Peer reviews cannot be used with External Tool assignments")
     end
+
+    if assignment.submission_types == "discussion_topic"
+      raise PeerReview::InvalidAssignmentSubmissionTypesError, I18n.t("Peer reviews cannot be used with Discussion Topic assignments")
+    end
   end
 
   def validate_peer_review_sub_assignment_exists(assignment)

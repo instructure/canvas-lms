@@ -28,7 +28,7 @@ describe "new_discussion_topic" do
   let(:asset) { @topic }
   let(:notification_name) { :new_discussion_topic }
 
-  include_examples "a message"
+  it_behaves_like "a message"
   context "locked discussions" do
     it "sends locked notification if availibility date is locked for email" do
       @topic.update(

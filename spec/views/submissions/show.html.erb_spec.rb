@@ -386,6 +386,49 @@ describe "submissions/show" do
     end
   end
 
+  describe "SpeedGrader link" do
+    let(:html) { Nokogiri::HTML5.fragment(response.body) }
+
+    before(:once) do
+      @course = Course.create!
+      @student = @course.enroll_user(User.create!, "StudentEnrollment", active_all: true).user
+      @teacher = @course.enroll_user(User.create!, "TeacherEnrollment", active_all: true).user
+      @assignment = @course.assignments.create!
+      @submission = @assignment.submissions.find_by(user: @student)
+    end
+
+    before do
+      assign(:assignment, @assignment)
+      assign(:context, @course)
+      assign(:submission, @submission)
+    end
+
+    it "shows SpeedGrader link when user has manage_grades permission" do
+      assign(:current_user, @teacher)
+      render "submissions/show"
+      speedgrader_link = html.at_css('a[href*="speed_grader"]')
+      expect(speedgrader_link).to be_present
+      expect(speedgrader_link.text).to include("SpeedGrader")
+    end
+
+    it "shows SpeedGrader link when user has view_all_grades permission" do
+      @ta = @course.enroll_user(User.create!, "TaEnrollment", active_all: true).user
+      @course.account.role_overrides.create!(permission: "view_all_grades", role: ta_role, enabled: true)
+
+      assign(:current_user, @ta)
+      render "submissions/show"
+      speedgrader_link = html.at_css('a[href*="speed_grader"]')
+      expect(speedgrader_link).to be_present
+    end
+
+    it "does not show SpeedGrader link when user is a student" do
+      assign(:current_user, @student)
+      render "submissions/show"
+      speedgrader_link = html.at_css('a[href*="speed_grader"]')
+      expect(speedgrader_link).not_to be_present
+    end
+  end
+
   context "comments sidebar" do
     describe "non-owner comment visibility" do
       let(:student) { User.create! }

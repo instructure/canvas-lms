@@ -29,5 +29,5 @@ describe "report_generated" do
   let(:asset) { @object }
   let(:notification_name) { :report_generated }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

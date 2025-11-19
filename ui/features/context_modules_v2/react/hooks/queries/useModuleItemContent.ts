@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useQuery} from '@tanstack/react-query'
+import {useInfiniteQuery} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -52,6 +52,9 @@ export interface ContentItem {
   placements?: Record<string, placementContent>
   // Applies for quizzes
   quizType?: 'quiz' | 'assignment'
+  // Applies to assignments (for grouping)
+  groupId?: string
+  groupName?: string
 }
 
 // Common response structure for all queries
@@ -59,7 +62,9 @@ export interface ContentItemsResponse {
   items: ContentItem[]
   pageInfo?: {
     hasNextPage: boolean
+    hasPreviousPage: boolean
     endCursor: string | null
+    startCursor: string | null
   }
 }
 
@@ -74,10 +79,16 @@ export interface GraphQLResponse {
         submissionTypes?: string[]
         dueAt: string
         published: boolean
+        assignmentGroup?: {
+          _id: string
+          name: string
+        }
       }>
       pageInfo: {
         hasNextPage: boolean
+        hasPreviousPage: boolean
         endCursor: string | null
+        startCursor: string | null
       }
     }
     quizzesConnection?: {
@@ -90,7 +101,9 @@ export interface GraphQLResponse {
       }>
       pageInfo: {
         hasNextPage: boolean
+        hasPreviousPage: boolean
         endCursor: string | null
+        startCursor: string | null
       }
     }
     pagesConnection?: {
@@ -101,7 +114,9 @@ export interface GraphQLResponse {
       }>
       pageInfo: {
         hasNextPage: boolean
+        hasPreviousPage: boolean
         endCursor: string | null
+        startCursor: string | null
       }
     }
     discussionsConnection?: {
@@ -112,7 +127,9 @@ export interface GraphQLResponse {
       }>
       pageInfo: {
         hasNextPage: boolean
+        hasPreviousPage: boolean
         endCursor: string | null
+        startCursor: string | null
       }
     }
     externalToolsConnection?: {
@@ -125,7 +142,9 @@ export interface GraphQLResponse {
       }>
       pageInfo: {
         hasNextPage: boolean
+        hasPreviousPage: boolean
         endCursor: string | null
+        startCursor: string | null
       }
     }
     filesConnection?: {
@@ -136,10 +155,17 @@ export interface GraphQLResponse {
         contentType: string
         size: number
         published: boolean
+        folder?: {
+          _id: string
+          name: string
+          fullName: string
+        }
       }>
       pageInfo: {
         hasNextPage: boolean
+        hasPreviousPage: boolean
         endCursor: string | null
+        startCursor: string | null
       }
     }
   }
@@ -156,10 +182,10 @@ export interface GraphQLResponse {
 
 // Assignment query
 const ASSIGNMENTS_QUERY = gql`
-  query GetAssignmentsQuery($courseId: ID!, $searchTerm: String) {
+  query GetAssignmentsQuery($courseId: ID!, $searchTerm: String, $after: String) {
     course: legacyNode(_id: $courseId, type: Course) {
       ... on Course {
-        assignmentsConnection(first: 100, filter: {searchTerm: $searchTerm}) {
+        assignmentsConnection(first: 25, after: $after, filter: {searchTerm: $searchTerm}) {
           nodes {
             _id
             id
@@ -168,10 +194,16 @@ const ASSIGNMENTS_QUERY = gql`
             submissionTypes
             dueAt
             published
+            assignmentGroup {
+              _id
+              name
+            }
           }
           pageInfo {
             hasNextPage
+            hasPreviousPage
             endCursor
+            startCursor
           }
         }
       }
@@ -181,10 +213,10 @@ const ASSIGNMENTS_QUERY = gql`
 
 // Quiz query
 const QUIZZES_QUERY = gql`
-  query GetQuizzesQuery($courseId: ID!, $searchTerm: String) {
+  query GetQuizzesQuery($courseId: ID!, $searchTerm: String, $after: String) {
     course: legacyNode(_id: $courseId, type: Course) {
       ... on Course {
-        quizzesConnection(first: 100, filter: {searchTerm: $searchTerm}) {
+        quizzesConnection(first: 25, after: $after, filter: {searchTerm: $searchTerm}) {
           nodes {
             _id
             id
@@ -195,7 +227,9 @@ const QUIZZES_QUERY = gql`
           }
           pageInfo {
             hasNextPage
+            hasPreviousPage
             endCursor
+            startCursor
           }
         }
       }
@@ -205,10 +239,10 @@ const QUIZZES_QUERY = gql`
 
 // Files query
 const FILES_QUERY = gql`
-  query GetFilesQuery($courseId: ID!, $searchTerm: String) {
+  query GetFilesQuery($courseId: ID!, $searchTerm: String, $after: String) {
     course: legacyNode(_id: $courseId, type: Course) {
       ... on Course {
-        filesConnection(first: 100, filter: {searchTerm: $searchTerm}) {
+        filesConnection(first: 25, after: $after, filter: {searchTerm: $searchTerm}) {
           nodes {
             _id
             id
@@ -216,10 +250,17 @@ const FILES_QUERY = gql`
             contentType
             size
             published
+            folder {
+              _id
+              name
+              fullName
+            }
           }
           pageInfo {
             hasNextPage
+            hasPreviousPage
             endCursor
+            startCursor
           }
         }
       }
@@ -229,10 +270,10 @@ const FILES_QUERY = gql`
 
 // Pages query
 const PAGES_QUERY = gql`
-  query GetPagesQuery($courseId: ID!, $searchTerm: String) {
+  query GetPagesQuery($courseId: ID!, $searchTerm: String, $after: String) {
     course: legacyNode(_id: $courseId, type: Course) {
       ... on Course {
-        pagesConnection(first: 100, filter: {searchTerm: $searchTerm}) {
+        pagesConnection(first: 25, after: $after, filter: {searchTerm: $searchTerm}) {
           nodes {
             _id
             id
@@ -241,7 +282,9 @@ const PAGES_QUERY = gql`
           }
           pageInfo {
             hasNextPage
+            hasPreviousPage
             endCursor
+            startCursor
           }
         }
       }
@@ -251,10 +294,10 @@ const PAGES_QUERY = gql`
 
 // Discussions query
 const DISCUSSIONS_QUERY = gql`
-  query GetDiscussionsQuery($courseId: ID!, $searchTerm: String) {
+  query GetDiscussionsQuery($courseId: ID!, $searchTerm: String, $after: String) {
     course: legacyNode(_id: $courseId, type: Course) {
       ... on Course {
-        discussionsConnection(first: 100, filter: {searchTerm: $searchTerm}) {
+        discussionsConnection(first: 25, after: $after, filter: {searchTerm: $searchTerm}) {
           nodes {
             _id
             id
@@ -263,7 +306,9 @@ const DISCUSSIONS_QUERY = gql`
           }
           pageInfo {
             hasNextPage
+            hasPreviousPage
             endCursor
+            startCursor
           }
         }
       }
@@ -273,10 +318,10 @@ const DISCUSSIONS_QUERY = gql`
 
 // External tools query
 const EXTERNAL_TOOLS_QUERY = gql`
-  query GetExternalToolsQuery($courseId: ID!) {
+  query GetExternalToolsQuery($courseId: ID!, $after: String) {
     course: legacyNode(_id: $courseId, type: Course) {
       ... on Course {
-        externalToolsConnection(first: 100) {
+        externalToolsConnection(first: 25, after: $after) {
           nodes {
             _id
             name
@@ -308,7 +353,9 @@ const EXTERNAL_TOOLS_QUERY = gql`
           }
           pageInfo {
             hasNextPage
+            hasPreviousPage
             endCursor
+            startCursor
           }
         }
       }
@@ -366,6 +413,8 @@ function transformQueryResult(
             isQuiz: hasQuizSubmissionType(node?.submissionTypes),
             dueAt: node.dueAt,
             published: node.published,
+            groupId: node.assignmentGroup?._id,
+            groupName: node.assignmentGroup?.name,
           })) || [],
         pageInfo: course?.assignmentsConnection?.pageInfo,
       }
@@ -390,6 +439,8 @@ function transformQueryResult(
             contentType: node.contentType,
             size: node.size,
             published: node.published,
+            groupId: node.folder?._id,
+            groupName: node.folder?.fullName || node.folder?.name,
           })) || [],
         pageInfo: course?.filesConnection?.pageInfo,
       }
@@ -438,11 +489,8 @@ function transformQueryResult(
 }
 
 // Main function to fetch content items based on type
-export async function getModuleItemContent({
-  queryKey,
-}: {
-  queryKey: [string, ModuleItemContentType, string, string?]
-}): Promise<ContentItemsResponse> {
+export async function getModuleItemContent(context: any): Promise<ContentItemsResponse> {
+  const {queryKey, pageParam} = context
   const [, contentType, courseId, searchTerm] = queryKey
 
   // Special cases that don't require API calls
@@ -459,6 +507,7 @@ export async function getModuleItemContent({
     const result = await executeQuery<GraphQLResponse>(query, {
       courseId,
       searchTerm: searchTerm || '',
+      after: pageParam || null,
     })
 
     if (result.errors) {
@@ -484,11 +533,18 @@ export function useModuleItemContent(
   searchTerm?: string,
   enabled: boolean = true,
 ) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['moduleItemContent', contentType, courseId, searchTerm],
     queryFn: getModuleItemContent,
     enabled:
       enabled && contentType !== 'context_module_sub_header' && contentType !== 'external_url',
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 10 * 60 * 1000,
+    initialPageParam: undefined,
+    getNextPageParam: lastPage => {
+      if (lastPage.pageInfo?.hasNextPage && lastPage.pageInfo?.endCursor) {
+        return lastPage.pageInfo.endCursor
+      }
+      return undefined
+    },
   })
 }

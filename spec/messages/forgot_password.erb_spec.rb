@@ -32,5 +32,5 @@ describe "forgot_password" do
   let(:asset) { @object }
   let(:notification_name) { :forgot_password }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

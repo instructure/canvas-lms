@@ -20,7 +20,12 @@
 
 module Types
   class EligibilityIssueType < ApplicationObjectType
-    field :level, String, null: false
+    class EligibilityIssueLevelType < Types::BaseEnum
+      value "error"
+      value "warning"
+    end
+
+    field :level, EligibilityIssueLevelType, null: false
     field :message, String, null: false
   end
 end

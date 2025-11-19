@@ -132,11 +132,11 @@ describe "syllabus" do
       user_session(@user)
     end
 
-    include_examples "public syllabus for authenticated file verifiers"
+    it_behaves_like "public syllabus for authenticated file verifiers"
   end
 
   context "as an anonymous user" do
-    include_examples "public syllabus file verifiers"
+    it_behaves_like "public syllabus file verifiers"
   end
 
   context "as an authenticated non-course user" do
@@ -145,7 +145,7 @@ describe "syllabus" do
       user_session(@user)
     end
 
-    include_examples "public syllabus file verifiers"
+    it_behaves_like "public syllabus file verifiers"
   end
 
   it "as an authenticated non-course user with public_syllabus_to_auth true" do

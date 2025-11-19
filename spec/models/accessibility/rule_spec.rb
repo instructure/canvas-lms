@@ -105,4 +105,12 @@ describe Accessibility::Rule do
       end
     end
   end
+
+  describe ".issue_preview" do
+    context "when not overridden" do
+      it "returns nil by default" do
+        expect(described_class.new.issue_preview(nil)).to be_nil
+      end
+    end
+  end
 end

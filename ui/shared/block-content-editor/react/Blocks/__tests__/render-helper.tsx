@@ -33,7 +33,7 @@ const queryClient = new QueryClient({
 export function renderBlock<T>(Block: React.FC<T>, props: T & React.Attributes) {
   return render(
     <QueryClientProvider client={queryClient}>
-      <Provider store={createStore({aiAltTextGenerationURL: null})}>
+      <Provider store={createStore({aiAltTextGenerationURL: null, toolbarReorder: false})}>
         <Editor resolver={{[Block.name]: Block}}>
           <Frame>
             <Block {...props} />

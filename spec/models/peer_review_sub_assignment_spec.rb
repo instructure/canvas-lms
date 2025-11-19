@@ -122,6 +122,28 @@ RSpec.describe PeerReviewSubAssignment do
         expect(peer_review_sub_assignment.send(:context_explicitly_provided?)).to be false
       end
     end
+
+    describe "#parent_assignment_not_discussion_topic_or_external_tool" do
+      it "is not valid when parent assignment is a discussion topic" do
+        discussion_topic_assignment = assignment_model(course:, title: "Discussion Topic Assignment", submission_types: "discussion_topic")
+        peer_review_sub_assignment = PeerReviewSubAssignment.new(parent_assignment: discussion_topic_assignment)
+        expect(peer_review_sub_assignment).not_to be_valid
+        expect(peer_review_sub_assignment.errors[:parent_assignment]).to include(I18n.t("cannot be a discussion topic"))
+      end
+
+      it "is not valid when parent assignment is an external tool" do
+        external_tool_assignment = assignment_model(course:, title: "External Tool Assignment", submission_types: "external_tool")
+        peer_review_sub_assignment = PeerReviewSubAssignment.new(parent_assignment: external_tool_assignment)
+        expect(peer_review_sub_assignment).not_to be_valid
+        expect(peer_review_sub_assignment.errors[:parent_assignment]).to include(I18n.t("cannot be an external tool"))
+      end
+
+      it "is valid when parent assignment is not a discussion topic or external tool" do
+        regular_assignment = assignment_model(course:, title: "Regular Assignment", submission_types: "online_text_entry")
+        peer_review_sub_assignment = PeerReviewSubAssignment.new(parent_assignment: regular_assignment)
+        expect(peer_review_sub_assignment).to be_valid
+      end
+    end
   end
 
   describe "#checkpoint?" do

@@ -122,19 +122,20 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/all_courses/react/AllCoursesRoute')}
       />
 
-      {ENV.FEATURES.ams_root_account_integration && (
-        <Route
-          path="/courses/:courseId/quizzes/*"
-          lazy={() => import('../../features/ams/react/AmsRoute')}
-        />
-      )}
-
-      {ENV.FEATURES.ams_root_account_integration && (
-        <Route
-          path="/courses/:courseId/item_banks/*"
-          lazy={() => import('../../features/ams/react/AmsRoute')}
-        />
-      )}
+      {ENV.FEATURES.ams_root_account_integration &&
+        [
+          '/courses/:courseId/quizzes/*',
+          '/courses/:courseId/item_banks/*',
+          '/courses/:courseId/activity_builder/*',
+          '/courses/:courseId/take/*',
+          '/courses/:courseId/reports/*',
+        ].map(path => (
+          <Route
+            key={`ams-route-${path}`}
+            path={path}
+            lazy={() => import('../../features/ams/react/AmsRoute')}
+          />
+        ))}
 
       {accountGradingSettingsRoutes}
 

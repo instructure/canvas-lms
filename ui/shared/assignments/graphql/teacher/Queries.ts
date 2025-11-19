@@ -82,6 +82,7 @@ export const TEACHER_QUERY = gql`
       suppressAssignment
       peerReviews {
         enabled
+        count
       }
       lockInfo {
         isLocked
@@ -166,6 +167,61 @@ export const TEACHER_EDIT_QUERY = gql`
       hasSubmittedSubmissions
       course {
         lid: _id
+      }
+    }
+  }
+`
+
+export const ASSIGNED_STUDENTS_QUERY = gql`
+  query GetAssignedStudents($assignmentId: ID!, $filter: AssignedStudentsFilter) {
+    assignment(id: $assignmentId) {
+      assignedStudents(filter: $filter) {
+        nodes {
+          _id
+          name
+          peerReviewStatus {
+            mustReviewCount
+            completedReviewsCount
+          }
+        }
+      }
+    }
+  }
+`
+
+export const ALLOCATION_RULES_QUERY = gql`
+  query GetAllocationRules($assignmentId: ID!, $after: String, $searchTerm: String) {
+    assignment(id: $assignmentId) {
+      allocationRules {
+        rulesConnection(first: 20, after: $after, filter: { searchTerm: $searchTerm }) {
+          nodes {
+            _id
+            mustReview
+            reviewPermitted
+            appliesToAssessor
+            assessor {
+              _id
+              name
+              peerReviewStatus {
+                mustReviewCount
+                completedReviewsCount
+              }
+            }
+            assessee {
+              _id
+              name
+              peerReviewStatus {
+                mustReviewCount
+                completedReviewsCount
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+        count(filter: { searchTerm: $searchTerm })
       }
     }
   }

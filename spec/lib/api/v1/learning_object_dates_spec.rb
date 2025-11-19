@@ -63,11 +63,9 @@ describe Api::V1::LearningObjectDates do
       context "when assignment is a discussion topic" do
         let(:discussion_assignment) { graded_discussion_topic(context: course).assignment }
 
-        it "returns false even with peer reviews enabled" do
+        it "returns false for discussion topics" do
           discussion_assignment.update!(peer_reviews: true)
           course.enable_feature!(:peer_review_grading)
-          PeerReview::PeerReviewCreatorService.new(parent_assignment: discussion_assignment).call
-          discussion_assignment.reload
 
           expect(harness.send(:peer_review_overrides_supported?, discussion_assignment)).to be false
         end

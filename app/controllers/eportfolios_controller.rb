@@ -29,6 +29,7 @@ class EportfoliosController < ApplicationController
   before_action :verified_user_check, only: %i[index user_index create]
   before_action :load_canvas_career, only: %i[user_index]
   before_action :find_eportfolio, except: %i[index user_index create]
+  before_action :set_eportfolio_deprecation_notice
 
   def index
     user_index
@@ -39,6 +40,7 @@ class EportfoliosController < ApplicationController
     return unless tab_enabled?(UserProfile::TAB_EPORTFOLIOS)
 
     rce_js_env
+    js_env(show_eportfolio_deprecation_notice: @show_eportfolio_deprecation_notice)
     set_active_tab "eportfolios"
     add_crumb(@current_user.short_name, user_profile_url(@current_user))
     add_crumb(t(:crumb, "ePortfolios"))
@@ -61,6 +63,7 @@ class EportfoliosController < ApplicationController
       @page = @category.eportfolio_entries.first
       @owner_view = @portfolio.user == @current_user && params[:view] != "preview"
       hash[:owner_view] = @owner_view
+      hash[:show_eportfolio_deprecation_notice] = @show_eportfolio_deprecation_notice
       js_env(hash)
       if @owner_view
         @used_submission_ids = []
@@ -283,6 +286,11 @@ class EportfoliosController < ApplicationController
   end
 
   protected
+
+  def set_eportfolio_deprecation_notice
+    @show_eportfolio_deprecation_notice = @domain_root_account.settings[:enable_eportfolios] == true &&
+                                          @domain_root_account.feature_enabled?(:eportfolio_deprecation_notice)
+  end
 
   def eportfolio_params
     params.require(:eportfolio).permit(:name, :public)

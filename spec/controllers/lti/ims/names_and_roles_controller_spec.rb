@@ -100,7 +100,6 @@ describe Lti::IMS::NamesAndRolesController do
       context "and when the page index parameter is too large" do
         let(:rqst_page) { total_items + 1 } # cant have more pages than there are items
         let(:rsp_page) { rqst_page }
-        let(:effective_page_size) { 30 } # don't know why, Api just does this
         let(:rsp_page_size) { 0 }
 
         it "returns an empty members array, with the correct size and proper navigation links" do
@@ -1435,9 +1434,8 @@ describe Lti::IMS::NamesAndRolesController do
       "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{total_pages}&per_page=#{effective_page_size}>; rel=\"last\""
     ]
 
-    expected_links.reject! { |el| el.include?('rel="next"') } if rsp_page == total_pages
+    expected_links.reject! { |el| el.include?('rel="next"') } if rsp_page >= total_pages
     expected_links.reject! { |el| el.include?('rel="prev"') } if rsp_page <= 1
-    expected_links.reject! { |el| el.include?('rel="last"') } if rsp_page > total_pages
     match_array(expected_links)
   end
 

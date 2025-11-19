@@ -80,6 +80,7 @@ describe Mutations::CreateAssignment do
               intraReviews
               anonymousReviews
               automaticReviews
+              submissionRequired
             }
             modules {
               _id
@@ -200,6 +201,65 @@ describe Mutations::CreateAssignment do
     expect(assignment.intra_group_peer_reviews).to be true
     expect(assignment.anonymous_peer_reviews).to be true
     expect(assignment.automatic_peer_reviews).to be true
+  end
+
+  context "peer review submission_required" do
+    before do
+      @course.enable_feature!(:peer_review_allocation)
+    end
+
+    it "creates an assignment with submission_required set to true" do
+      result = execute_with_input <<~GQL
+        courseId: "#{@course.to_param}"
+        name: "peer review with submission required"
+        peerReviews: {
+          enabled: true
+          submissionRequired: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createAssignment", "errors")).to be_nil
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "submissionRequired")).to be true
+
+      assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+      expect(assignment.peer_review_submission_required).to be true
+    end
+
+    it "creates an assignment with submission_required set to false" do
+      result = execute_with_input <<~GQL
+        courseId: "#{@course.to_param}"
+        name: "peer review without submission required"
+        peerReviews: {
+          enabled: true
+          submissionRequired: false
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createAssignment", "errors")).to be_nil
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "submissionRequired")).to be false
+
+      assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+      expect(assignment.peer_review_submission_required).to be false
+    end
+
+    it "defaults submission_required to false when not specified" do
+      result = execute_with_input <<~GQL
+        courseId: "#{@course.to_param}"
+        name: "peer review default submission required"
+        peerReviews: {
+          enabled: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createAssignment", "errors")).to be_nil
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "submissionRequired")).to be false
+
+      assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+      expect(assignment.peer_review_submission_required).to be false
+    end
   end
 
   it "creates an assignment in an assignment group" do

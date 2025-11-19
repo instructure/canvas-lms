@@ -26,6 +26,7 @@ import type {GradebookOptions} from './gradebook.d'
 import PerformanceControls from './PerformanceControls'
 import {RequestDispatch} from '@canvas/network'
 import useStore from './stores/index'
+import {shouldUseGraphQL} from './utils/forceGqlParam'
 
 type Props = {
   actionMenuNode: HTMLSpanElement
@@ -103,6 +104,7 @@ export default function GradebookData(props: Props) {
 
   const currentGradingPeriodId = findFilterValuesOfType('grading-period', appliedFilters)[0]
   const gradingPeriodSet = props.gradebookEnv.grading_period_set
+  const useGraphQL = shouldUseGraphQL(props.gradebookEnv.performance_improvements_for_gradebook)
 
   // Initial state
   useEffect(() => {
@@ -151,7 +153,7 @@ export default function GradebookData(props: Props) {
       fetchSisOverrides()
     }
     fetchCustomColumns()
-    loadStudentData(props.gradebookEnv.performance_improvements_for_gradebook)
+    loadStudentData(useGraphQL)
   }, [
     fetchCustomColumns,
     fetchFilters,
@@ -166,21 +168,21 @@ export default function GradebookData(props: Props) {
     props.gradebookEnv.post_grades_feature,
     props.gradebookEnv.settings.filter_columns_by,
     props.gradebookEnv.settings.filter_rows_by,
-    props.gradebookEnv.performance_improvements_for_gradebook,
+    useGraphQL,
   ])
 
   useEffect(() => {
     if (gradingPeriodSet) {
       fetchGradingPeriodAssignments().then(() => {
         loadAssignmentGroups({
-          useGraphQL: props.gradebookEnv.performance_improvements_for_gradebook,
+          useGraphQL,
           hideZeroPointQuizzes: props.gradebookEnv.hide_zero_point_quizzes,
           currentGradingPeriodId,
         })
       })
     } else {
       loadAssignmentGroups({
-        useGraphQL: props.gradebookEnv.performance_improvements_for_gradebook,
+        useGraphQL,
         hideZeroPointQuizzes: props.gradebookEnv.hide_zero_point_quizzes,
       })
     }
@@ -190,12 +192,12 @@ export default function GradebookData(props: Props) {
     fetchGradingPeriodAssignments,
     loadAssignmentGroups,
     props.gradebookEnv.hide_zero_point_quizzes,
-    props.gradebookEnv.performance_improvements_for_gradebook,
+    useGraphQL,
   ])
 
   const reloadStudentData = useCallback(() => {
-    loadStudentData(props.gradebookEnv.performance_improvements_for_gradebook)
-  }, [loadStudentData, props.gradebookEnv.performance_improvements_for_gradebook])
+    loadStudentData(useGraphQL)
+  }, [loadStudentData, useGraphQL])
 
   return (
     <Gradebook

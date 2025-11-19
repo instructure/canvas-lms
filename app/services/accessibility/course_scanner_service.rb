@@ -18,23 +18,68 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Accessibility::CourseScannerService < ApplicationService
+  SCAN_TAG = "course_accessibility_scan"
+
+  class ScanLimitExceededError < StandardError; end
+
+  def self.last_accessibility_scan_progress_by_course(course)
+    Progress.where(tag: SCAN_TAG, context: course).last
+  end
+
+  def self.queue_scan_course(course)
+    progress = Progress.where(tag: SCAN_TAG, context_type: "Course", context_id: course.id).last
+    return progress if progress&.pending?
+
+    if course.exceeds_accessibility_scan_limit?
+      raise ScanLimitExceededError, "Course exceeds accessibility scan limit"
+    end
+
+    progress = Progress.create!(tag: SCAN_TAG, context: course)
+
+    # By default this will be 1 concurrent run / course, which is fine
+    n_strand = [SCAN_TAG, course.global_id]
+    progress.process_job(self, :scan, { n_strand: })
+    progress
+  end
+
+  def self.scan(progress)
+    service = new(course: progress.context)
+    service.scan_course
+    progress.set_results({})
+    progress.complete!
+  rescue => e
+    progress.fail!
+    ErrorReport.log_exception(
+      SCAN_TAG,
+      e,
+      {
+        progress_id: progress.id,
+        course_id: progress.context.id,
+        course_name: progress.context.name
+      }
+    )
+    Sentry.with_scope do |scope|
+      scope.set_context(
+        SCAN_TAG,
+        {
+          progress_id: progress.global_id,
+          course_id: progress.context.global_id,
+          course_name: progress.context.name,
+          workflow_state: progress.workflow_state
+        }
+      )
+
+      Sentry.capture_exception(e, level: :error)
+    end
+    raise
+  end
+
   def initialize(course:)
     super()
     @course = course
   end
 
-  def call
-    delay(singleton: "accessibility_scan_course_#{@course.global_id}").scan_course
-  end
-
   def scan_course
-    if @course.exceeds_accessibility_scan_limit?
-      Rails.logger.warn(
-        "[A11Y Scan] Skipped scanning the course #{@course.name} (ID: #{@course.id}) due to exceeding the size limit."
-      )
-      return
-    end
-
     @course.wiki_pages.not_deleted.find_each do |resource|
       Accessibility::ResourceScannerService.call(resource:)
     end

@@ -18,43 +18,81 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 RSpec.describe Accessibility::ScanController do
-  describe "#create" do
-    let!(:course) { Course.create! }
-    let!(:user) { User.create! }
+  let!(:course) { course_model }
 
-    before do
-      allow(controller).to receive_messages(check_authorized_action: true, require_user: true)
-      controller.instance_variable_set(:@current_user, user)
+  before do
+    allow_any_instance_of(described_class).to receive(:require_user).and_return(true)
+    allow_any_instance_of(described_class).to receive(:check_authorized_action).and_return(true)
+    allow_any_instance_of(Course).to receive(:exceeds_accessibility_scan_limit?).and_return(false)
+  end
+
+  describe "#show" do
+    context "when no scan exists" do
+      it "returns not found" do
+        get :show, params: { course_id: course.id }
+
+        expect(response).to have_http_status(:not_found)
+      end
     end
 
-    it "calls the service" do
-      allow(Accessibility::CourseScannerService).to receive(:call).with(course:).and_return(true)
+    context "when a scan exists" do
+      let!(:progress) do
+        Progress.create!(tag: "course_accessibility_scan", context: course, workflow_state: "queued")
+      end
+
+      it "returns the progress information" do
+        get :show, params: { course_id: course.id }
+
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body
+        expect(json["id"]).to eq(progress.id)
+        expect(json["workflow_state"]).to eq("queued")
+      end
+    end
+  end
+
+  describe "#create" do
+    it "queues a scan and returns the progress" do
+      post :create, params: { course_id: course.id }
+
+      expect(response).to have_http_status(:ok)
+      json = response.parsed_body
+      expect(json["id"]).to be_present
+      expect(json["workflow_state"]).to eq("queued")
+
+      # Verify a progress record was created
+      progress = Progress.find(json["id"])
+      expect(progress.tag).to eq("course_accessibility_scan")
+      expect(progress.context).to eq(course)
+    end
+
+    it "returns existing progress if scan is already queued" do
+      existing_progress = Accessibility::CourseScannerService.queue_scan_course(course)
 
       post :create, params: { course_id: course.id }
 
       expect(response).to have_http_status(:ok)
-    end
-
-    context "when the course exists" do
-      it "calls the CourseScannerService and returns success" do
-        allow(controller).to receive(:check_authorized_action).and_return(true)
-        expect(Accessibility::CourseScannerService).to receive(:call).with(course:)
-
-        post :create, params: { course_id: course.id }
-
-        expect(response).to have_http_status(:ok)
-      end
+      json = response.parsed_body
+      expect(json["id"]).to eq(existing_progress.id)
     end
 
     context "when the course does not exist" do
-      let(:params) { { course_id: -1 } }
-
       it "returns a not found error" do
-        allow(controller).to receive(:check_authorized_action).and_return(true)
-
         post :create, params: { course_id: -1 }
 
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when the course exceeds scan limit" do
+      it "returns a bad request error" do
+        allow_any_instance_of(Course).to receive(:exceeds_accessibility_scan_limit?).and_return(true)
+
+        post :create, params: { course_id: course.id }
+
+        expect(response).to have_http_status(:bad_request)
+        json = response.parsed_body
+        expect(json["error"]).to eq("Course exceeds accessibility scan limit")
       end
     end
   end

@@ -730,4 +730,32 @@ class WikiPage < ActiveRecord::Base
       page_ids_with_assignment.concat(page_ids_no_assignment)
     end
   end
+
+  def ingest_to_pine
+    return unless workflow_state == "active" && body.present?
+    return unless context.is_a?(Course) && context.root_account.present?
+
+    metadata = {
+      course_id: context.id.to_s,
+      title:
+    }
+
+    # PineClient requires a user object with uuid and global_id, but we don't have a user in this context
+    # and the action is more of a system-initiated action than a user-initiated action
+    null_user = Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil)
+
+    PineClient.ingest_html(
+      html_content: body,
+      metadata:,
+      source: "canvas",
+      source_id: id.to_s,
+      source_type: "wiki_page",
+      feature_slug: "horizon-content-ingestion",
+      root_account_uuid: context.root_account.uuid,
+      current_user: null_user
+    )
+  rescue => e
+    Rails.logger.error("Failed to ingest wiki page #{id} for context #{context.class.name}:#{context.id}: #{e.message}")
+    raise
+  end
 end

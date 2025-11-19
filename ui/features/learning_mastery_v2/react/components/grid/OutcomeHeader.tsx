@@ -19,25 +19,42 @@ import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
-import {IconArrowOpenDownLine} from '@instructure/ui-icons'
+import {IconArrowOpenDownLine, IconArrowUpLine, IconArrowDownLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {CELL_HEIGHT, COLUMN_WIDTH} from '../../utils/constants'
+import {CELL_HEIGHT, COLUMN_WIDTH, SortBy, SortOrder} from '../../utils/constants'
 import {Outcome} from '../../types/rollup'
+import {Sorting} from '../../types/shapes'
 import {OutcomeDescriptionModal} from '../modals/OutcomeDescriptionModal'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
 export interface OutcomeHeaderProps {
   outcome: Outcome
+  sorting: Sorting
 }
 
-export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({outcome}) => {
+export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({outcome, sorting}) => {
   // OD => OutcomeDescription
   const [isODModalOpen, openODModal, closeODModal] = useModal() as [boolean, () => void, () => void]
+
+  const isCurrentlySelected =
+    sorting.sortBy === SortBy.Outcome && sorting.sortOutcomeId === String(outcome.id)
+
+  const handleSortAscending = () => {
+    sorting.setSortBy(SortBy.Outcome)
+    sorting.setSortOutcomeId(String(outcome.id))
+    sorting.setSortOrder(SortOrder.ASC)
+  }
+
+  const handleSortDescending = () => {
+    sorting.setSortBy(SortBy.Outcome)
+    sorting.setSortOutcomeId(String(outcome.id))
+    sorting.setSortOrder(SortOrder.DESC)
+  }
 
   return (
     <>
@@ -68,14 +85,31 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({outcome}) => {
                 </IconButton>
               }
             >
-              <Menu.Group label={I18n.t('Sort By')}>
-                <Menu.Item defaultSelected={true}>{I18n.t('Default')}</Menu.Item>
-                <Menu.Item>{I18n.t('Ascending')}</Menu.Item>
-                <Menu.Item>{I18n.t('Descending')}</Menu.Item>
-              </Menu.Group>
+              <Menu.Group label={I18n.t('Sort')}></Menu.Group>
+              <Menu.Item
+                onClick={handleSortAscending}
+                selected={isCurrentlySelected && sorting.sortOrder === SortOrder.ASC}
+              >
+                <Flex gap="x-small">
+                  <IconArrowUpLine spacing="small" />
+                  {I18n.t('Ascending scores')}
+                </Flex>
+              </Menu.Item>
+              <Menu.Item
+                onClick={handleSortDescending}
+                selected={isCurrentlySelected && sorting.sortOrder === SortOrder.DESC}
+              >
+                <Flex gap="x-small">
+                  <IconArrowDownLine spacing="small" />
+                  {I18n.t('Descending scores')}
+                </Flex>
+              </Menu.Item>
               <Menu.Separator />
-              <Menu.Item>{I18n.t('Show Contributing Scores')}</Menu.Item>
-              <Menu.Item onClick={openODModal}>{I18n.t('Outcome Description')}</Menu.Item>
+              <Menu.Group label={I18n.t('Display')}>
+                <Menu.Item>{I18n.t('Hide Contributing Scores')}</Menu.Item>
+                <Menu.Item onClick={openODModal}>{I18n.t('Outcome Info')}</Menu.Item>
+                <Menu.Item>{I18n.t('Show Outcome Distribution')}</Menu.Item>
+              </Menu.Group>
             </Menu>
           </Flex.Item>
         </Flex>

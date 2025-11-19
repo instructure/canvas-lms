@@ -289,7 +289,7 @@ describe OverrideListPresenter do
         end
 
         it "includes the module overrides" do
-          expect(visible_due_dates.detect { |due_date| due_date[:due_for] == "1 Section" })
+          expect(visible_due_dates.detect { |due_date| due_date[:due_for] == "section 1" })
             .not_to be_nil
         end
 
@@ -300,7 +300,7 @@ describe OverrideListPresenter do
           @visible_due_dates = @presenter.visible_due_dates
 
           expect(visible_due_dates.length).to eq 1
-          expect(visible_due_dates.first[:due_for]).to eq "1 Section"
+          expect(visible_due_dates.first[:due_for]).to eq "section 1"
           expect(visible_due_dates.first[:due_at]).to_not be_nil
         end
 
@@ -310,7 +310,7 @@ describe OverrideListPresenter do
 
           @visible_due_dates = @presenter.visible_due_dates
           expect(visible_due_dates.length).to eq 1
-          expect(visible_due_dates.first[:due_for]).to eq "1 Section"
+          expect(visible_due_dates.first[:due_for]).to eq "section 1"
         end
 
         it "includes Course overrides" do
@@ -326,134 +326,6 @@ describe OverrideListPresenter do
           end)
             .not_to be_nil
         end
-      end
-    end
-  end
-
-  describe "#formatted_due_for" do
-    context "with everyone option" do
-      it "returns 'Everyone' when no other due dates exist" do
-        formatted_override = { options: ["Course"] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("Everyone")
-      end
-
-      it "returns 'Everyone else' when other due dates exist" do
-        formatted_override = { options: ["Course"] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: true)
-        expect(result).to eq("Everyone else")
-      end
-
-      it "handles nil option as everyone" do
-        formatted_override = { options: [nil] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("Everyone")
-      end
-    end
-
-    context "with section options" do
-      it "returns singular section count" do
-        formatted_override = { options: ["CourseSection"] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("1 Section")
-      end
-
-      it "returns plural section count" do
-        formatted_override = { options: %w[CourseSection CourseSection CourseSection] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("3 Sections")
-      end
-    end
-
-    context "with group options" do
-      it "returns singular group count" do
-        formatted_override = { options: ["Group"] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("1 Group")
-      end
-
-      it "returns plural group count" do
-        formatted_override = { options: ["Group", "Group"] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("2 Groups")
-      end
-    end
-
-    context "with tag options" do
-      it "returns singular tag count" do
-        formatted_override = { options: ["Tag"] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("1 Tag")
-      end
-
-      it "returns plural tag count" do
-        formatted_override = { options: %w[Tag Tag Tag] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("3 Tags")
-      end
-    end
-
-    context "with student options" do
-      it "returns singular student count" do
-        formatted_override = { options: ["student1"] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("1 Student")
-      end
-
-      it "returns plural student count" do
-        formatted_override = { options: ["student5"] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("5 Students")
-      end
-
-      it "sums multiple student counts" do
-        formatted_override = { options: ["student3", "student2"] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("5 Students")
-      end
-
-      it "handles student options without numbers" do
-        formatted_override = { options: ["student"] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("")
-      end
-    end
-
-    context "with mastery paths option" do
-      it "returns mastery paths text" do
-        formatted_override = { options: ["Noop"] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("Mastery Paths")
-      end
-    end
-
-    context "with mixed options" do
-      it "combines multiple option types correctly" do
-        formatted_override = { options: %w[Course CourseSection Group Tag student3 Noop] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: true)
-        expect(result).to eq("Everyone else, 1 Section, 1 Group, 1 Tag, 3 Students, Mastery Paths")
-      end
-
-      it "combines multiple counts of same type" do
-        formatted_override = { options: %w[CourseSection CourseSection Group Group Group] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("2 Sections, 3 Groups")
-      end
-    end
-
-    context "with no options" do
-      it "returns empty string" do
-        formatted_override = { options: [] }
-        result = presenter.formatted_due_for(formatted_override)
-        expect(result).to eq("")
-      end
-    end
-
-    context "with invalid/unknown options" do
-      it "ignores unknown options" do
-        formatted_override = { options: %w[UnknownType CourseSection InvalidOption] }
-        result = presenter.formatted_due_for(formatted_override, other_due_dates_exist: false)
-        expect(result).to eq("1 Section")
       end
     end
   end

@@ -31,5 +31,5 @@ describe "new_student_organized_group" do
   let(:asset) { @object }
   let(:notification_name) { :new_student_organized_group }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

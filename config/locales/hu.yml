@@ -341,6 +341,9 @@ hu:
   access_token_manage_a626f071: "Hozzáférési Token – kezelés"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "A hozzáférési token arra használható, hogy egyes alkalmazások API hívásokat kezdeményezhessenek az Ön nevében. Önnek lehetősége van hozzáférési token generálására és *Canvas Open API* használatára a saját integrációs megoldások fejlesztése során."
   access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: "Bármely iOS vagy Android mobileszközzel elérheti kurzusait és csoportjait, és további információkat találhat a Súgó menüben."
+  accessibility: 
+    titles: 
+      accessibility_checker: "Akadálymentesség ellenőrző"
   accessibility_checker_b3af1f6c: "Akadálymentesség ellenőrző"
   accessibility_checker_notifications_da5a49e6: "Kisegítő lehetőségek ellenőrző értesítései"
   accessible_sidebar_menu_b30baf97: "Elérhető oldalsávmenü"
@@ -3571,6 +3574,7 @@ hu:
   assignment_d8387b78: feladat
   assignment_dates_dccc98de: "Feladat dátumai"
   assignment_dates_saved_successfully_78e0f355: "A Feladat dátumok sikeresen elmentve."
+  assignment_details_bc488179: "Feladat részletek"
   assignment_details_collapsed_55b67150: "feladat részletei elrejtve"
   assignment_details_dialog: 
     average_score: "Átlagos pontszám:"
@@ -11366,6 +11370,7 @@ hu:
   general_answer_comments_730136ba: "Általános válaszhoz kapcsolódó megjegyzések"
   general_eb111f34: általános
   general_locked_objects_6a9adafb: "Általános zárolt objektumok"
+  generate_44e33e72: Generálás
   generate_activity_for_user_2b0af749: "Tevékenység generálása %{user} számára"
   generate_epub_80e89ea4: "ePub generálása"
   generate_item_analysis_report_statuslabel_16e02c8: "Elemanalízis-jelentés generálása %{statusLabel}"
@@ -21796,6 +21801,7 @@ hu:
   save_and_publish_1b765e7: "Mentés és közzététel"
   save_as_draft_341d4577: "Mentés vázlatként"
   save_changes_698abe77: "Módosítások mentése"
+  save_changes_a63787eb: "Módosítások mentése"
   save_criterion_cce60085: "Kritérium mentése"
   save_don_t_send_ba59fa2b: "Mentés és ne küldje el"
   save_failed_463cb2a8: "A mentés sikertelen."
@@ -24026,6 +24032,7 @@ hu:
       graded: értékelve
       submitted: beadva
       unsubmitted: "nincs beadva"
+  submission_7ca566e1: Beadás
   submission_action_take_quiz: "%{title} kitöltése"
   submission_action_turn_in_assignment: "%{title} bekapcsolása"
   submission_added_title_50ebdc85: "beadandó hozzáadva:%{title}"

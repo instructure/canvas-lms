@@ -31,7 +31,12 @@ describe Quizzes::QuizSubmission do
       aq1.question_data["question_text"] = "<p>Attachment: <a href=\"/assessment_questions/#{aq1.id}/files/#{@aq_attachment.id}/download\">file</a></p>"
       aq1.save!
 
-      @quiz = @course.quizzes.create!(title: "new quiz")
+      @q_desc_attachment = attachment_with_context(@course)
+      @quiz = @course.quizzes.create!(
+        title: "new quiz",
+        saving_user: @teacher,
+        description: "<p>Attachment: <a href=\"/courses/#{@course.id}/files/#{@q_desc_attachment.id}/download\">file</a></p>"
+      )
       @quiz_group = @quiz.quiz_groups.create!(assessment_question_bank: @bank, pick_count: 2)
       @qq_attachment = attachment_with_context(@course)
       @quiz_question = @quiz.quiz_questions.create!(question_data: {
@@ -71,7 +76,7 @@ describe Quizzes::QuizSubmission do
       @submission.reload
 
       associated_ids = @submission.attachment_associations.pluck(:attachment_id)
-      expect(associated_ids).to match_array([@qq_attachment.id, essay_attachment.id])
+      expect(associated_ids).to match_array([@qq_attachment.id, @q_desc_attachment.id, essay_attachment.id])
     end
   end
 

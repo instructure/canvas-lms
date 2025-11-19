@@ -16,13 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from '@canvas/axios'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {QueryFunctionContext} from '@tanstack/react-query'
+import {Enrollment} from 'api'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+import type {EnvCourseSettings} from '@canvas/global/env/EnvCourse'
+
+declare const ENV: GlobalEnv & EnvCourseSettings
 
 type FetchSectionsOptions = {
   exclude: string[]
   searchTerm?: string
-  courseId: number
+  courseId: string
 }
 
 export type ResponseSection = {
@@ -36,12 +41,34 @@ export async function fetchSections({
   queryKey,
 }: QueryFunctionContext<[string, FetchSectionsOptions]>): Promise<ResponseSection[]> {
   const [, {exclude, searchTerm, courseId}] = queryKey
-  const response = await axios.get(`/courses/${courseId}/sections/user_count`, {
+  const {json} = await doFetchApi<{sections: ResponseSection[]}>({
+    path: `/courses/${courseId}/sections/user_count`,
     params: {
       exclude,
       search: searchTerm,
     },
   })
+  return json!.sections
+}
 
-  return response.data.sections
+export async function deleteExistingSectionEnrollments(enrollmentsForDeletion: string[]) {
+  const promises = enrollmentsForDeletion.map(async id => {
+    return await doFetchApi({
+      method: 'DELETE',
+      path: `${ENV.COURSE_ROOT_URL}/unenroll/${id}`,
+    })
+  })
+  await Promise.all(promises)
+}
+
+export async function createSectionEnrollments(newSections: string[], enrollmentForm: FormData) {
+  const promises = newSections.map(async sectionId => {
+    const {json} = await doFetchApi<Enrollment>({
+      method: 'POST',
+      path: `/api/v1/sections/${sectionId}/enrollments`,
+      body: enrollmentForm,
+    })
+    return {...json, can_be_removed: true}
+  })
+  return await Promise.all(promises)
 }

@@ -26,9 +26,14 @@ import {useEditorMode} from '../../hooks/useEditorMode'
 
 const mockSetMode = jest.fn()
 
-function renderToolbar() {
+function renderToolbar(toolbarReorder = false) {
   return render(
-    <Provider store={createStore({aiAltTextGenerationURL: null})}>
+    <Provider
+      store={createStore({
+        aiAltTextGenerationURL: null,
+        toolbarReorder,
+      })}
+    >
       <Editor>
         <Toolbar />
       </Editor>
@@ -104,6 +109,82 @@ describe('Toolbar', () => {
       await user.click(previewButton)
 
       expect(mockSetMode).toHaveBeenCalledWith('default')
+    })
+  })
+
+  describe('reorder blocks button', () => {
+    beforeEach(() => {
+      mockStore.mockReturnValue({
+        editor: {mode: 'default'},
+        accessibility: {
+          a11yIssues: new Map(),
+        },
+        toolbarReorder: false,
+      })
+    })
+
+    it('does not show reorder button when feature flag is false', () => {
+      const {queryByTestId} = renderToolbar(false)
+      expect(queryByTestId('reorder-blocks-button')).not.toBeInTheDocument()
+    })
+
+    it('shows reorder button when feature flag is true', () => {
+      mockStore.mockReturnValue({
+        editor: {mode: 'default'},
+        accessibility: {
+          a11yIssues: new Map(),
+        },
+        toolbarReorder: true,
+      })
+
+      const {getByTestId} = renderToolbar(true)
+      expect(getByTestId('reorder-blocks-button')).toBeInTheDocument()
+    })
+
+    it('does not show reorder button in preview mode', () => {
+      mockStore.mockReturnValue({
+        editor: {mode: 'preview'},
+        toolbarReorder: true,
+      })
+
+      const {queryByTestId} = renderToolbar(true)
+      expect(queryByTestId('reorder-blocks-button')).not.toBeInTheDocument()
+    })
+
+    it('shows reorder button after undo/redo buttons', () => {
+      mockStore.mockReturnValue({
+        editor: {mode: 'default'},
+        accessibility: {
+          a11yIssues: new Map(),
+        },
+        toolbarReorder: true,
+      })
+
+      const {getByTestId} = renderToolbar(true)
+      const undoButton = getByTestId('undo-button')
+      const redoButton = getByTestId('redo-button')
+      const reorderButton = getByTestId('reorder-blocks-button')
+
+      expect(undoButton).toBeInTheDocument()
+      expect(redoButton).toBeInTheDocument()
+      expect(reorderButton).toBeInTheDocument()
+    })
+
+    it('shows reorder button before accessibility checker', () => {
+      mockStore.mockReturnValue({
+        editor: {mode: 'default'},
+        accessibility: {
+          a11yIssues: new Map(),
+        },
+        toolbarReorder: true,
+      })
+
+      const {getByTestId} = renderToolbar(true)
+      const reorderButton = getByTestId('reorder-blocks-button')
+      const a11yButton = getByTestId('accessibility-button')
+
+      expect(reorderButton).toBeInTheDocument()
+      expect(a11yButton).toBeInTheDocument()
     })
   })
 })

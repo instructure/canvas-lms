@@ -326,10 +326,12 @@ export default class ModuleSequenceFooter {
       this.next.url = masteryPath.modules_url
       this.next.tooltipText = tooltipText
     }
-    // xsslint safeString.property tooltipText
-    this.next.tooltip = `<i class='${htmlEscape(this.iconClasses.ModuleItem)}'/> ${
-      this.next.tooltipText
-    }`
+
+    this.next.tooltip = (
+      <>
+        <i className={this.iconClasses.ModuleItem} /> {this.next.tooltipText}
+      </>
+    )
   }
 
   buildNextData() {

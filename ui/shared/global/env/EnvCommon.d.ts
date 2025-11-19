@@ -261,17 +261,6 @@ export interface EnvCommon {
     >
   >
 
-  /**
-   * Referenced by ui/shared/rails-flash-notifications/jquery/index.ts but doesn't appear to be defined anywhere.
-   * Perhaps some rails magic?
-   */
-  notices?: Array<{
-    content?: {
-      timeout?: number
-    }
-    type?: string
-    classes?: string
-  }>
   breadcrumbs?: {name: string; url: string}[]
   enhanced_rubrics_enabled?: boolean
   enhanced_rubrics_copy_to?: boolean
@@ -309,6 +298,7 @@ export type SiteAdminFeatureId =
   | 'media_links_use_attachment_id'
   | 'multiselect_gradebook_filters'
   | 'new_quizzes_navigation_updates'
+  | 'new_quizzes_surveys'
   | 'permanent_page_links'
   | 'render_both_to_do_lists'
   | 'scheduled_feedback_releases'
@@ -318,12 +308,14 @@ export type SiteAdminFeatureId =
   | 'validate_call_to_action'
   | 'youtube_migration'
   | 'youtube_overlay'
+  | 'ux_list_concluded_courses_in_bp'
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
 export type RootAccountFeatureId =
   | 'account_level_mastery_scales'
   | 'ams_root_account_integration'
+  | 'api_rate_limits'
   | 'buttons_and_icons_root_account'
   | 'course_pace_allow_bulk_pace_assign'
   | 'course_pace_download_document'
@@ -346,6 +338,8 @@ export type RootAccountFeatureId =
   | 'lti_registrations_next'
   | 'lti_registrations_page'
   | 'lti_registrations_usage_data'
+  | 'lti_registrations_usage_data_dev'
+  | 'lti_registrations_usage_data_low_usage'
   | 'lti_registrations_usage_tab'
   | 'mobile_offline_mode'
   | 'modules_requirements_allow_percentage'

@@ -262,10 +262,14 @@ $('.assign-to-link').on('click keyclick', function (event) {
   event.preventDefault()
   const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
 
-  const courseId = event.target.getAttribute('data-assignment-context-id')
-  const itemName = event.target.getAttribute('data-assignment-name')
-  const itemContentId = event.target.getAttribute('data-assignment-id')
-  const pointsString = event.target.getAttribute('data-assignment-points-possible')
+  // Get data from the inner span with translate="no"
+  const $button = $(event.target).closest('.assign-to-link')
+  const $dataSpan = $button.find('.assign-to-link-resources')
+
+  const courseId = $dataSpan.attr('data-assignment-context-id')
+  const itemName = $dataSpan.attr('data-assignment-name')
+  const itemContentId = $dataSpan.attr('data-assignment-id')
+  const pointsString = $dataSpan.attr('data-assignment-points-possible')
   const pointsPossible = pointsString ? parseFloat(pointsString) : undefined
   renderItemAssignToTray(true, returnFocusTo, {
     courseId,

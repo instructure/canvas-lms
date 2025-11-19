@@ -85,9 +85,7 @@
 </div>
 <div id="questions" class="<%= 'uneditable' unless can_do(@bank, @current_user, :manage) %> question_editing brief question_bank show_correct_answers mathjax_ignore">
   <% if @questions.total_pages <= 1 %>
-    <% @questions.each do |question| %>
-      <%= render :partial => "quizzes/quizzes/display_question", :object => question.data, :locals => {:question_bank_id => @bank.id, :editing => true, :asset_string => question.asset_string} %>
-    <% end %>
+    <%= render :partial => "quizzes/quizzes/display_question", :collection => @questions.map(&:data), :locals => { question_bank_id: @bank.id, editing: true } %>
   <% else %>
     <%= render :partial => "question_teaser", :collection => @questions %>
   <% end %>

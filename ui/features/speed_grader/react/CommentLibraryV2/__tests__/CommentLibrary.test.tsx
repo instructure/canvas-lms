@@ -22,7 +22,10 @@ import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import {CommentLibraryContent} from '../CommentLibrary'
 import {InMemoryCache} from '@apollo/client'
-import {SpeedGrader_CommentBankItemsCount, SpeedGrader_CommentBankItems} from '../graphql/queries'
+import {
+  SpeedGraderLegacy_CommentBankItemsCount,
+  SpeedGraderLegacy_CommentBankItems,
+} from '../graphql/queries'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
@@ -38,7 +41,7 @@ describe('CommentLibrary', () => {
 
   const createCountMock = (userId: string, totalCount: number) => ({
     request: {
-      query: SpeedGrader_CommentBankItemsCount,
+      query: SpeedGraderLegacy_CommentBankItemsCount,
       variables: {userId},
     },
     result: {
@@ -67,7 +70,7 @@ describe('CommentLibrary', () => {
     ],
   ) => ({
     request: {
-      query: SpeedGrader_CommentBankItems,
+      query: SpeedGraderLegacy_CommentBankItems,
       variables: {userId, courseId, first: 20, after: ''},
     },
     result: {
@@ -97,7 +100,7 @@ describe('CommentLibrary', () => {
     ],
   ) => ({
     request: {
-      query: SpeedGrader_CommentBankItems,
+      query: SpeedGraderLegacy_CommentBankItems,
       variables: {userId, query, first: 5},
     },
     result: {
@@ -267,7 +270,7 @@ describe('CommentLibrary', () => {
       const mocks = [
         {
           request: {
-            query: SpeedGrader_CommentBankItemsCount,
+            query: SpeedGraderLegacy_CommentBankItemsCount,
             variables: {userId: defaultUserId},
           },
           error: new Error('GraphQL error'),
@@ -693,7 +696,7 @@ describe('CommentLibrary', () => {
           createCountMock(defaultUserId, 10),
           {
             request: {
-              query: SpeedGrader_CommentBankItems,
+              query: SpeedGraderLegacy_CommentBankItems,
               variables: {userId: defaultUserId, query: 'test', first: 5},
             },
             result: {

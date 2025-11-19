@@ -22,7 +22,9 @@ import {
   totalAllowedAttempts,
   activeTypeMeetsCriteria,
   getPointsValue,
+  multipleTypesDrafted,
 } from '../SubmissionHelpers'
+import {Submission} from '../../../assignments_show_student'
 
 describe('totalAllowedAttempts', () => {
   it('returns null if allowedAttempts on the assignment is null', () => {
@@ -129,5 +131,79 @@ describe('getPointsValue', () => {
   })
   it('returns undefined if points is undefined', () => {
     expect(getPointsValue()).toBeUndefined()
+  })
+})
+
+describe('multipleTypesDrafted', () => {
+  const createSubmission = (criteria: Record<string, boolean | undefined> = {}) =>
+    ({
+      submissionDraft: {
+        meetsBasicLtiLaunchCriteria: false,
+        meetsTextEntryCriteria: false,
+        meetsUploadCriteria: false,
+        meetsUrlCriteria: false,
+        meetsMediaRecordingCriteria: false,
+        meetsStudentAnnotationCriteria: false,
+        ...criteria,
+      },
+    }) as Submission
+
+  it('returns false for invalid inputs', () => {
+    expect(multipleTypesDrafted(undefined as any)).toBe(false)
+    expect(multipleTypesDrafted({} as any)).toBe(false)
+    expect(multipleTypesDrafted({submissionDraft: {}} as any)).toBe(false)
+  })
+
+  it('returns false when no criteria are met', () => {
+    expect(multipleTypesDrafted(createSubmission())).toBe(false)
+  })
+
+  it('returns false when only one criteria is met', () => {
+    expect(multipleTypesDrafted(createSubmission({meetsTextEntryCriteria: true}))).toBe(false)
+    expect(multipleTypesDrafted(createSubmission({meetsUploadCriteria: true}))).toBe(false)
+  })
+
+  it('returns true when multiple criteria are met', () => {
+    expect(
+      multipleTypesDrafted(
+        createSubmission({
+          meetsStudentAnnotationCriteria: true,
+          meetsMediaRecordingCriteria: true,
+        }),
+      ),
+    ).toBe(true)
+
+    expect(
+      multipleTypesDrafted(
+        createSubmission({
+          meetsBasicLtiLaunchCriteria: true,
+          meetsTextEntryCriteria: true,
+          meetsMediaRecordingCriteria: true,
+        }),
+      ),
+    ).toBe(true)
+  })
+
+  it('returns false with undefined values', () => {
+    expect(
+      multipleTypesDrafted(
+        createSubmission({
+          meetsBasicLtiLaunchCriteria: undefined,
+          meetsTextEntryCriteria: undefined,
+        }),
+      ),
+    ).toBe(false)
+  })
+
+  it('returns true with a mix of true and undefined values', () => {
+    expect(
+      multipleTypesDrafted(
+        createSubmission({
+          meetsBasicLtiLaunchCriteria: true,
+          meetsUploadCriteria: true,
+          meetsTextEntryCriteria: undefined,
+        }),
+      ),
+    ).toBe(true)
   })
 })

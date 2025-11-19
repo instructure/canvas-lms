@@ -234,9 +234,10 @@ class Quizzes::QuizQuestionsController < ApplicationController
       render json: question_json(@question,
                                  @current_user,
                                  session,
-                                 @context,
-                                 parse_includes,
-                                 censored?)
+                                 context: @context,
+                                 includes: parse_includes,
+                                 censored: censored?,
+                                 location: "quiz_question_#{@question.id}")
     end
   end
 
@@ -295,7 +296,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       guard_against_big_fields do
         @question = @quiz.quiz_questions.create(quiz_group: @group, question_data:, updating_user: @current_user)
         @quiz.did_edit if @quiz.created?
-        render json: question_json(@question, @current_user, session, @context, [:assessment_question, :plain_html])
+        render json: question_json(@question, @current_user, session, context: @context, includes: [:assessment_question, :plain_html], location: "quiz_question_#{@question.id}")
       end
 
     end
@@ -308,7 +309,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       @questions = @quiz.add_assessment_questions(@assessment_questions, @group)
       bank_outcome_ids = @bank.learning_outcome_alignments.select(:learning_outcome_id)
       LearningOutcome.ensure_presence_in_context(bank_outcome_ids, @context)
-      render json: questions_json(@questions, @current_user, session, [:assessment_question])
+      render json: questions_json(@questions, @current_user, session, includes: [:assessment_question])
     end
   end
   protected :add_questions
@@ -378,7 +379,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
         @question.question_data = question_data
         @question.save
         @quiz.did_edit if @quiz.created?
-        render json: question_json(@question, @current_user, session, @context, [:assessment_question, :plain_html])
+        render json: question_json(@question, @current_user, session, context: @context, includes: [:assessment_question, :plain_html], location: "quiz_question_#{@question.id}")
       end
     end
   end
@@ -461,15 +462,17 @@ class Quizzes::QuizQuestionsController < ApplicationController
   def render_question_set(scope, quiz_data = nil)
     api_route = polymorphic_url([:api, :v1, @context, :quiz_questions], { quiz_id: @quiz })
     questions = Api.paginate(scope, self, api_route)
+    location = quiz_data ? "quiz_submission_#{@quiz_submission.id}" : nil
 
     render json: questions_json(questions,
                                 @current_user,
                                 session,
-                                @context,
-                                parse_includes,
-                                censored?,
-                                quiz_data,
-                                shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user))
+                                context: @context,
+                                includes: parse_includes,
+                                censored: censored?,
+                                quiz_data:,
+                                shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user),
+                                location:)
   end
 
   def process_answer_html_content(question_data)

@@ -821,5 +821,81 @@ describe DeveloperKeysController do
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
     end
+
+    describe "POST 'lookup_utids'" do
+      let(:root_account) { account_model }
+      let(:admin_user) { account_admin_user(account: root_account) }
+      let(:redirect_uris) { ["https://example.com/redirect", "https://another.com/callback"] }
+      let(:api_registrations) do
+        [
+          {
+            unified_tool_id: "550e8400-e29b-41d4-a716-446655440000",
+            global_product_id: "e8f9a0b1-c2d3-4567-e890-123456789abc",
+            tool_name: "Math Learning Platform",
+            tool_id: 789,
+            company_id: 456,
+            company_name: "Educational Tech Solutions",
+            source: "partner_provided"
+          },
+          {
+            unified_tool_id: "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+            global_product_id: "d7e8f9a0-b1c2-4345-d678-90abcdef1234",
+            tool_name: "Science Lab Simulator",
+            tool_id: 321,
+            company_id: 654,
+            company_name: "STEM Education Corp",
+            source: "manual"
+          }
+        ]
+      end
+
+      before do
+        @controller.request.env["canvas.domain_root_account"] = root_account
+        user_session(admin_user)
+        allow(LearnPlatform::GlobalApi).to receive(:lookup_api_registrations).and_return(api_registrations)
+      end
+
+      it "returns matching UTIDs for given redirect URIs" do
+        post "lookup_utids", params: { account_id: root_account.id, redirect_uris: }, format: :json
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["api_registrations"]).to eq(JSON.parse(api_registrations.to_json))
+      end
+
+      it "calls LearnPlatform::GlobalApi.lookup_api_registrations with correct params" do
+        expect(LearnPlatform::GlobalApi).to receive(:lookup_api_registrations).with(redirect_uris, sources: nil)
+        post "lookup_utids", params: { account_id: root_account.id, redirect_uris: }, format: :json
+      end
+
+      it "passes sources parameter when provided" do
+        sources = ["partner_provided", "manual"]
+        expect(LearnPlatform::GlobalApi).to receive(:lookup_api_registrations).with(redirect_uris, sources:)
+        post "lookup_utids", params: { account_id: root_account.id, redirect_uris:, sources: }, format: :json
+      end
+
+      it "handles errors gracefully" do
+        allow(LearnPlatform::GlobalApi).to receive(:lookup_api_registrations).and_raise(StandardError, "API error")
+        post "lookup_utids", params: { account_id: root_account.id, redirect_uris: }, format: :json
+        expect(response).to have_http_status(:bad_request)
+        json_response = json_parse(response.body)
+        expect(json_response["error"]).to eq("Failed to match redirect URIs")
+      end
+
+      context "without proper permissions" do
+        it "requires authorization" do
+          user_model
+          user_session(@user)
+          post "lookup_utids", params: { account_id: root_account.id, redirect_uris: }, format: :json
+          expect(response).to be_forbidden
+        end
+      end
+
+      context "when redirect_uris is missing" do
+        it "returns bad request" do
+          post "lookup_utids", params: { account_id: root_account.id }, format: :json
+          expect(response).to have_http_status(:bad_request)
+        end
+      end
+    end
   end
 end

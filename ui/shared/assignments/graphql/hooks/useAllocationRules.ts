@@ -17,86 +17,15 @@
  */
 
 import {useQuery, useQueryClient, QueryClient} from '@tanstack/react-query'
-import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
 import {useCallback} from 'react'
-
-export interface AllocationRule {
-  _id: string
-  mustReview: boolean
-  reviewPermitted: boolean
-  appliesToAssessor: boolean
-  assessor: {
-    _id: string
-    name: string
-  }
-  assessee: {
-    _id: string
-    name: string
-  }
-}
-
-interface PageInfo {
-  hasNextPage: boolean
-  endCursor: string | null
-}
-
-export interface AllocationRulesData {
-  assignment: {
-    allocationRules: {
-      rulesConnection: {
-        nodes: AllocationRule[]
-        pageInfo: PageInfo
-      }
-      count: number | null
-    }
-  }
-}
-
-interface GraphQLPageData {
-  rules: AllocationRule[]
-  hasNextPage: boolean
-  endCursor: string | null
-  totalCount: number | null
-}
-
-export interface UseAllocationRulesResult {
-  rules: AllocationRule[]
-  totalCount: number | null
-  loading: boolean
-  error: any
-  refetch: (page: number) => Promise<{rules: AllocationRule[]; totalCount: number | null}>
-}
-
-const ALLOCATION_RULES_QUERY = gql`
-  query GetAllocationRules($assignmentId: ID!, $after: String, $searchTerm: String) {
-    assignment(id: $assignmentId) {
-      allocationRules {
-        rulesConnection(first: 20, after: $after, filter: { searchTerm: $searchTerm }) {
-          nodes {
-            _id
-            mustReview
-            reviewPermitted
-            appliesToAssessor
-            assessor {
-              _id
-              name
-            }
-            assessee {
-              _id
-              name
-            }
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-        }
-        count(filter: { searchTerm: $searchTerm })
-      }
-    }
-  }
-`
+import {ALLOCATION_RULES_QUERY} from '../teacher/Queries'
+import {
+  AllocationRulesData,
+  AllocationRuleType,
+  GraphQLPageData,
+  UseAllocationRulesResult,
+} from '../teacher/AssignmentTeacherTypes'
 
 async function fetchGraphQLPage(
   assignmentId: string,
@@ -153,7 +82,7 @@ async function getAllocationRulesPage(
   queryClient: QueryClient,
   searchTerm: string = '',
   forceRefresh: boolean = false,
-): Promise<{rules: AllocationRule[]; totalCount: number | null}> {
+): Promise<{rules: AllocationRuleType[]; totalCount: number | null}> {
   const graphQLPageSize = 20
   const startIndex = (page - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage - 1
@@ -161,7 +90,7 @@ async function getAllocationRulesPage(
   const startGraphQLPage = Math.floor(startIndex / graphQLPageSize)
   const endGraphQLPage = Math.floor(endIndex / graphQLPageSize)
 
-  const allRules: AllocationRule[] = []
+  const allRules: AllocationRuleType[] = []
   let totalCount: number | null = null
   let cursor: string | null = null
 
@@ -225,7 +154,7 @@ export const useAllocationRules = (
   const finalSearchTerm = trimmedSearchTerm || undefined
 
   const {data, isLoading, error} = useQuery<
-    {rules: AllocationRule[]; totalCount: number | null},
+    {rules: AllocationRuleType[]; totalCount: number | null},
     Error
   >({
     queryKey: ['allocationRules', assignmentId, page, itemsPerPage, finalSearchTerm],

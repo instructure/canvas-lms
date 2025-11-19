@@ -26,7 +26,7 @@ ui/
 - **TypeScript** - All new code should be TypeScript
 - **InstUI** - Instructure UI component library
 - **Apollo Client** - GraphQL client (@apollo/client)
-- **React Query** - Server state management (@tanstack/react-query)
+- **Tanstack Query** - Server state management (@tanstack/react-query)
 - **React Router** - Client-side routing (react-router-dom)
 
 ### Testing
@@ -93,11 +93,6 @@ I18n.t('Welcome, %{name}', {name: userName})
 I18n.t({one: '1 item', other: '%{count} items'}, {count: itemCount})
 ```
 
-### Avoid
-- Don't use inline styles unless absolutely necessary
-- Don't use CSS modules
-- Minimize custom CSS; prefer InstUI props
-
 ## What to Avoid
 
 ### Don't Use
@@ -108,6 +103,13 @@ I18n.t({one: '1 item', other: '%{count} items'}, {count: itemCount})
 - ❌ Default exports for utility functions - Use named exports
 - ❌ Enzyme - Use Testing Library
 - ❌ `any` type - Use proper TypeScript types
+- ❌ Bare `fetch` or Axios or `$.ajaxJSON` for API calls - always use `doFetchApi` even in a Tanstack Query query function (does not apply to components using GraphQL)
+
+### Behaviors and patterns to avoid
+- Don't use inline styles unless absolutely necessary
+- Don't use CSS modules
+- Minimize custom CSS; use InstUI props
+- When simulating API calls in a test, do not mock `doFetchApi` — use MSW to emulate server responses and test `doFetchApi` behavior directly in the test
 
 ### Avoid When Possible
 - jQuery wrappers (only for legacy integration)

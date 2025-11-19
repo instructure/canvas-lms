@@ -31,5 +31,5 @@ describe "new_context_group_membership" do
   let(:asset) { @membership }
   let(:notification_name) { :new_context_group_membership }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

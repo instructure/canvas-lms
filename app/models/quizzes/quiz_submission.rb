@@ -96,7 +96,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     return if non_aq_question_ids.empty?
 
     to_create = []
-    AttachmentAssociation.where(context_type: "Quizzes::QuizQuestion", context_id: non_aq_question_ids).find_each do |assoc|
+    AttachmentAssociation
+      .where(context_type: "Quizzes::QuizQuestion", context_id: non_aq_question_ids)
+      .or(AttachmentAssociation.where(context_type: "Quizzes::Quiz", context_id: quiz_id))
+      .find_each do |assoc|
       to_create << {
         context_type: "Quizzes::QuizSubmission",
         context_id: id,

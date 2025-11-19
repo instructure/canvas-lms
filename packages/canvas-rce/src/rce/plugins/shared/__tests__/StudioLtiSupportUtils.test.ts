@@ -28,6 +28,7 @@ import {
   updateStudioIframeDimensions,
   isValidEmbedType,
   isValidDimension,
+  isValidResizable,
 } from '../StudioLtiSupportUtils'
 import {EditorEvent, Events} from 'tinymce'
 import {createDeepMockProxy} from '../../../../util/__tests__/deepMockProxy'
@@ -593,6 +594,83 @@ describe('updateStudioIframeDimensions', () => {
       })
     })
   })
+
+  describe('resizable attribute updates', () => {
+    it('should set resizable to true and remove data-mce-resize', () => {
+      const removeAttributeSpy = jest.spyOn(mockParentElement, 'removeAttribute')
+
+      updateStudioIframeDimensions(mockEditor, 800, 600, 'learn_embed', true)
+
+      // Should update both the actual attribute and the TinyMCE prefixed version
+      expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
+        mockParentElement,
+        'data-studio-resizable',
+        'true',
+      )
+      expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
+        mockParentElement,
+        'data-mce-p-data-studio-resizable',
+        'true',
+      )
+      expect(removeAttributeSpy).toHaveBeenCalledWith('data-mce-resize')
+
+      removeAttributeSpy.mockRestore()
+    })
+
+    it('should set resizable to false and add data-mce-resize="false"', () => {
+      const setAttributeSpy = jest.spyOn(mockParentElement, 'setAttribute')
+
+      updateStudioIframeDimensions(mockEditor, 800, 600, 'learn_embed', false)
+
+      // Should update both the actual attribute and the TinyMCE prefixed version
+      expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
+        mockParentElement,
+        'data-studio-resizable',
+        'false',
+      )
+      expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
+        mockParentElement,
+        'data-mce-p-data-studio-resizable',
+        'false',
+      )
+      expect(setAttributeSpy).toHaveBeenCalledWith('data-mce-resize', 'false')
+
+      setAttributeSpy.mockRestore()
+    })
+
+    it('should handle switching from resizable to non-resizable', () => {
+      const setAttributeSpy = jest.spyOn(mockParentElement, 'setAttribute')
+      mockParentElement.setAttribute('data-studio-resizable', 'true')
+
+      updateStudioIframeDimensions(mockEditor, 800, 600, 'learn_embed', false)
+
+      expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
+        mockParentElement,
+        'data-studio-resizable',
+        'false',
+      )
+      expect(setAttributeSpy).toHaveBeenCalledWith('data-mce-resize', 'false')
+
+      setAttributeSpy.mockRestore()
+    })
+
+    it('should handle switching from non-resizable to resizable', () => {
+      const removeAttributeSpy = jest.spyOn(mockParentElement, 'removeAttribute')
+      mockParentElement.setAttribute('data-studio-resizable', 'false')
+      mockParentElement.setAttribute('data-mce-resize', 'false')
+
+      updateStudioIframeDimensions(mockEditor, 800, 600, 'learn_embed', true)
+
+      expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
+        mockParentElement,
+        'data-studio-resizable',
+        'true',
+      )
+      expect(removeAttributeSpy).toHaveBeenCalledWith('data-mce-resize')
+
+      removeAttributeSpy.mockRestore()
+    })
+  })
 })
 
 describe('Studio Media Options Utils', () => {
@@ -661,6 +739,25 @@ describe('Studio Media Options Utils', () => {
       expect(isValidDimension(Number.MAX_SAFE_INTEGER)).toBe(true)
       expect(isValidDimension(Number.MIN_VALUE)).toBe(true)
       expect(isValidDimension(1e-10)).toBe(true)
+    })
+  })
+
+  describe('isValidResizable', () => {
+    it('returns true for boolean values', () => {
+      expect(isValidResizable(true)).toBe(true)
+      expect(isValidResizable(false)).toBe(true)
+    })
+
+    it('returns false for non-boolean values', () => {
+      expect(isValidResizable(null)).toBe(false)
+      expect(isValidResizable(undefined)).toBe(false)
+      expect(isValidResizable(0)).toBe(false)
+      expect(isValidResizable(1)).toBe(false)
+      expect(isValidResizable('true')).toBe(false)
+      expect(isValidResizable('false')).toBe(false)
+      expect(isValidResizable({})).toBe(false)
+      expect(isValidResizable([])).toBe(false)
+      expect(isValidResizable(() => {})).toBe(false)
     })
   })
 })

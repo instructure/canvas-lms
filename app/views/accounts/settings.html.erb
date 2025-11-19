@@ -447,6 +447,15 @@
                       </td>
                     </tr>
                   <% end %>
+                  <%= settings.fields_for :default_allow_observer_signup do |r| %>
+                    <% hash = @account.default_allow_observer_signup %>
+                    <tr>
+                      <td colspan="2" class="sub_checkbox">
+                        <%= r.check_box :value, checked: hash[:value] %>
+                        <%= r.label :value, t("Check 'Allow observers to sign-up' by default when creating new appointment groups") %>
+                      </td>
+                    </tr>
+                  <% end %>
                 <% end %>
 
                 <% if Account.site_admin.feature_enabled?(:gradebook_show_first_last_names) %>
@@ -648,16 +657,6 @@
                 </div>
               </div>
             </div>
-
-            <% if @account.primary_settings_root_account? &&
-                  !@account.site_admin? &&
-                  Account.site_admin.grants_right?(@current_user, session, :read) &&  # Until the end of the EAP, only Instructure will be able to see this option.
-                  @account.grants_right?(@current_user, :manage_account_settings) %>
-              <div>
-                <%= settings.check_box :enable_content_a11y_checker, :checked => @account.settings[:enable_content_a11y_checker] %>
-                <%= settings.label :enable_content_a11y_checker, :en => "Content Accessibility Checker" %>
-              </div>
-            <% end %>
 
             <% if !@account.site_admin? %>
               <div>

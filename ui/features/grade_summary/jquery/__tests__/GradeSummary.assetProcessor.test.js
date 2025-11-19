@@ -20,6 +20,13 @@ import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import GradeSummary from '../index'
+import {renderAPComponent} from '@canvas/lti-asset-processor/react/util/renderToElements'
+import {
+  LtiAssetProcessorCellWithData,
+  AssetProcessorHeaderForGrades,
+  ZLtiAssetProcessorCellWithDataProps,
+} from '../../react/LtiAssetProcessorCellWithData'
+import {ZUseCourseAssignmentsAssetReportsParams} from '@canvas/lti-asset-processor/react/hooks/useCourseAssignmentsAssetReports'
 
 const I18n = createI18nScope('gradebooks')
 
@@ -29,6 +36,10 @@ jest.mock('react-dom/client', () => ({
   createRoot: jest.fn(() => ({
     render: mockRender,
   })),
+}))
+
+jest.mock('@canvas/lti-asset-processor/react/util/renderToElements', () => ({
+  renderAPComponent: jest.fn(),
 }))
 
 describe('GradeSummary - Asset Processor functionality', () => {
@@ -41,6 +52,11 @@ describe('GradeSummary - Asset Processor functionality', () => {
 
     fakeENV.setup({
       submissions: [],
+      FEATURES: {
+        lti_asset_processor: true,
+      },
+      course_id: 'course123',
+      student_id: 'student456',
     })
   })
 
@@ -52,6 +68,7 @@ describe('GradeSummary - Asset Processor functionality', () => {
   describe('addAssetProcessorToLegacyTable', () => {
     beforeEach(() => {
       mockRender.mockClear()
+      renderAPComponent.mockClear()
 
       $fixtures.innerHTML = `
         <table id="grades_summary">
@@ -72,78 +89,88 @@ describe('GradeSummary - Asset Processor functionality', () => {
       `
     })
 
-    it('returns early when asset_processors_header element is not found', () => {
-      document.getElementById('asset_processors_header').remove()
+    it('returns early when lti_asset_processor feature flag is disabled', () => {
+      ENV.FEATURES.lti_asset_processor = false
 
       GradeSummary.addAssetProcessorToLegacyTable()
-      // Should not throw any errors
+
+      expect(renderAPComponent).not.toHaveBeenCalled()
     })
 
-    it('returns early when no submissions have asset_reports', () => {
-      ENV.submissions = [
-        {assignment_id: '123', asset_reports: null},
-        {assignment_id: '789', asset_reports: undefined},
-      ]
+    it('returns early when courseId is missing', () => {
+      ENV.course_id = null
 
       GradeSummary.addAssetProcessorToLegacyTable()
 
-      expect(document.getElementById('asset_processors_header').textContent).toBe('')
-      document
-        .querySelectorAll('.asset_processors_cell')
-        .forEach(cell => expect(cell.children).toHaveLength(0))
+      expect(renderAPComponent).not.toHaveBeenCalled()
     })
 
-    it('sets the header text when submissions with asset_reports exist', () => {
-      ENV.submissions = [
-        {
-          assignment_id: '123',
-          asset_reports: [{id: 1, priority: 0}],
-          asset_processors: [{id: 1, title: 'Test Processor', tool_id: 1, tool_name: 't1'}],
-        },
-      ]
+    it('returns early when studentId is missing', () => {
+      ENV.student_id = null
 
       GradeSummary.addAssetProcessorToLegacyTable()
 
-      const assetProcessorCells = document.querySelectorAll('.asset_processors_cell')
-      expect(assetProcessorCells).toHaveLength(2)
-      expect(mockRender).toHaveBeenCalledTimes(1)
-      expect(document.getElementById('asset_processors_header').textContent).toBe(
-        I18n.t('Document Processors'),
+      expect(renderAPComponent).not.toHaveBeenCalled()
+    })
+
+    it('renders header and cell components when feature flag is enabled and IDs are present', () => {
+      GradeSummary.addAssetProcessorToLegacyTable()
+
+      expect(renderAPComponent).toHaveBeenCalledTimes(2)
+      expect(renderAPComponent).toHaveBeenCalledWith(
+        '#asset_processors_header',
+        AssetProcessorHeaderForGrades,
+        ZUseCourseAssignmentsAssetReportsParams,
+        expect.any(Function),
+      )
+      expect(renderAPComponent).toHaveBeenCalledWith(
+        '.asset_processors_cell',
+        LtiAssetProcessorCellWithData,
+        ZLtiAssetProcessorCellWithDataProps,
+        expect.any(Function),
       )
     })
 
-    it('skips cells without assignment_id or submission_id', () => {
-      $fixtures.innerHTML = `
-        <table id="grades_summary">
-          <thead>
-            <tr>
-              <th id="asset_processors_header"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="asset_processors_cell" data-assignment-id="123"></td>
-            </tr>
-            <tr>
-              <td class="asset_processors_cell" data-submission-id="456"></td>
-            </tr>
-          </tbody>
-        </table>
-      `
-
-      ENV.submissions = [
-        {
-          assignment_id: '123',
-          asset_reports: [{id: 1}],
-          asset_processors: [],
-        },
-      ]
+    it('passes courseId, studentId, and gradingPeriodId to header component', () => {
+      ENV.current_grading_period_id = 'gp123'
 
       GradeSummary.addAssetProcessorToLegacyTable()
 
-      const incompleteCells = document.querySelectorAll('.asset_processors_cell')
-      incompleteCells.forEach(cell => {
-        expect(cell.children).toHaveLength(0)
+      const headerCall = renderAPComponent.mock.calls.find(
+        call => call[0] === '#asset_processors_header',
+      )
+      expect(headerCall).toBeDefined()
+
+      const propsGenerator = headerCall[3]
+      const props = propsGenerator(document.createElement('div'))
+
+      expect(props).toEqual({
+        courseId: 'course123',
+        gradingPeriodId: 'gp123',
+        studentId: 'student456',
+      })
+    })
+
+    it('passes assignmentId, courseId, studentId, and gradingPeriodId to cell components', () => {
+      ENV.current_grading_period_id = 'gp789'
+
+      GradeSummary.addAssetProcessorToLegacyTable()
+
+      const cellCall = renderAPComponent.mock.calls.find(
+        call => call[0] === '.asset_processors_cell',
+      )
+      expect(cellCall).toBeDefined()
+
+      const propsGenerator = cellCall[3]
+      const mockElement = document.createElement('div')
+      mockElement.dataset.assignmentId = '999'
+      const props = propsGenerator(mockElement)
+
+      expect(props).toEqual({
+        assignmentId: '999',
+        courseId: 'course123',
+        gradingPeriodId: 'gp789',
+        studentId: 'student456',
       })
     })
   })

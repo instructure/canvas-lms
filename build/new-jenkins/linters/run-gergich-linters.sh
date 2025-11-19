@@ -52,6 +52,15 @@ if ! git diff HEAD~1 --exit-code -GENV -- 'packages/canvas-rce/**/*.js' 'package
   gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
 fi
 
+if ! git diff-tree --no-commit-id --name-only --diff-filter=D -r --no-renames --exit-code HEAD -- 'db/migrate'; then
+  # We have deleted migrations, make sure we made a new migration integrity version
+  if git diff-tree --no-commit-id --name-only --diff-filter=A -r --no-renames --exit-code HEAD -- 'db/migrate/*_validate_migration_integrity.rb'; then
+    # No new migration integrity commit was added
+    message="Migrations were deleted (likely squashed) without the integrity migration being updated. Rename ValidateMigrationIntegrity to a new version and update last_squashed_migration_version to reflect the last removed migration."
+    gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
+  fi
+fi
+
 ruby script/stylelint
 ruby script/rlint --no-fail-on-offense
 ruby script/lint_commit_message

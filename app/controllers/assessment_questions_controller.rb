@@ -30,7 +30,7 @@ class AssessmentQuestionsController < ApplicationController
 
       @question = @bank.assessment_questions.build(assessment_question_params)
       if @question.with_versioning(&:save)
-        render json: question_json(@question, @current_user, session, [:assessment_question])
+        render json: question_json(@question, @current_user, session, location: "assessment_question_#{@question.id}")
       else
         render json: @question.errors, status: :bad_request
       end
@@ -44,7 +44,7 @@ class AssessmentQuestionsController < ApplicationController
       params[:assessment_question][:form_question_data] ||= params[:question]
       @question.edited_independent_of_quiz_question
       if @question.with_versioning { @question.update(assessment_question_params) }
-        render json: question_json(@question, @current_user, session, [:assessment_question])
+        render json: question_json(@question, @current_user, session, location: "assessment_question_#{@question.id}")
       else
         render json: @question.errors, status: :bad_request
       end

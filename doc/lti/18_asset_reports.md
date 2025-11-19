@@ -27,11 +27,16 @@ Paths below are relative to `canvas-lms` or `canvas-lms/ui/shared/lti-asset-proc
   New Student Submission AP)
 
 ### Old Student Grades
-* Full data flow:
-  1. Controller `app/controllers/gradebooks_controller.rb` sets `js_env` `submissions`
-  2. Non-AP, non-React `ui/features/grade_summary/jquery/index.jsx` uses ENV and renders --
-  3. AP component `ui/features/grade_summary/react/LtiAssetProcessorCell.tsx` which uses --
+* Frontend:
+  1. Non-AP, non-React `ui/features/grade_summary/jquery/index.jsx` renders --
+  2. AP component `ui/features/grade_summary/react/LtiAssetProcessorCellWithData.tsx` which uses --
+  3. AP component `ui/features/grade_summary/react/LtiAssetProcessorCell.tsx`, which uses --
   4. AP components `LtiAssetReportStatus` and `LtiStudentAssetReportModal`
+
+* Data: `ui/features/grade_summary/react/LtiAssetProcessorCellWithData.tsx` uses
+  `ui/shared/lti-asset-processor/react/hooks/useCourseAssignmentsAssetReports.ts` which use
+  Tanstack Query + GraphQL to get all Asset Processors and Asset Reports for
+  the student and course.
 
 ### New student Submission
 * Frontend 1 -- single attachment or RCE content:

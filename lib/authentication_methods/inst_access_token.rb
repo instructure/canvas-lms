@@ -96,6 +96,27 @@ module AuthenticationMethods
       false
     end
 
+    def self.token_matches_tenant?(token, domain_root_account)
+      # The token was not scoped to a single tenant, return true
+      result = true if token.account_uuid.blank?
+
+      result ||= token.account_uuid == domain_root_account.uuid
+      return result if Account.site_admin.feature_enabled? :enforce_service_token_tenant_matching
+
+      unless result
+        InstStatsd::Statsd.event(
+          "Service user authorization tenant mismatch",
+          "Token account UUID #{token.account_uuid} does not match domain root account UUID #{domain_root_account.uuid} for client #{token.client_id}",
+          tags: Utils::InstStatsdUtils::Tags.tags_for(domain_root_account.shard),
+          type: "tenant_mismatch",
+          alert_type: :error
+        )
+      end
+
+      # When the feature flag is disabled, always return true
+      true
+    end
+
     def self.blocked?(request)
       blocked_token?(verified_token_for(request))
     end

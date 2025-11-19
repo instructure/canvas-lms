@@ -57,6 +57,45 @@ describe "courses/_recent_event" do
     expect(response.body).to_not include(@course.name)
   end
 
+  it "updates the course code when it changes" do
+    enable_cache do
+      course_with_student
+      @course.update!(course_code: "MATH-101")
+      event = @course.calendar_events.create(title: "some assignment", start_at: Time.zone.now)
+
+      render partial: "courses/recent_event", object: event, locals: { is_hidden: false, show_context: true }
+      expect(response.body).to include("MATH-101")
+
+      @course.update!(course_code: "MATH-102")
+
+      render partial: "courses/recent_event", object: event, locals: { is_hidden: false, show_context: true }
+      expect(response.body).to include("MATH-102")
+    end
+  end
+
+  it "renders calendar events with CourseSection context" do
+    course_with_student
+    section = @course.course_sections.create!(name: "Section A")
+    event = section.calendar_events.create(title: "Section Event", start_at: Time.zone.now)
+
+    render partial: "courses/recent_event", object: event, locals: { is_hidden: false }
+
+    expect(response).not_to be_nil
+    expect(response.body).to include("Section Event")
+  end
+
+  it "renders calendar events with CourseSection context showing the course code" do
+    course_with_student
+    @course.update!(course_code: "MATH-101")
+    section = @course.course_sections.create!(name: "Section A")
+    event = section.calendar_events.create(title: "Section Event", start_at: Time.zone.now)
+
+    render partial: "courses/recent_event", object: event, locals: { is_hidden: false, show_context: true }
+
+    expect(response.body).to include("MATH-101")
+    expect(response.body).to include("Section Event")
+  end
+
   context "assignments" do
     before do
       course_with_student(active_all: true)

@@ -78,6 +78,15 @@ block_content_editor_ai_alt_text:
     If enabled, the AI feature for generating an Alt text will be displayed in the Block Content Editor's block settings tray, where images are present.
   shadow: true
 
+block_content_editor_toolbar_reorder:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Block Content Editor Toolbar Reorder
+  description: |-
+    Enables the new reorder blocks functionality in the Block Content Editor toolbar.
+    When enabled, users can access a new popover to drag and reorder blocks within the editor.
+  shadow: true
+
 consolidated_media_player:
   applies_to: SiteAdmin
   state: hidden
@@ -293,6 +302,18 @@ visibility_performance_improvements:
     development:
       state: allowed_on
 
+n_plus_one_index_wiki_page_api:
+  state: hidden
+  display_name: Wiki Pages API N+1 Query Fix
+  description: |-
+    Eliminates N+1 queries in the wiki pages API index endpoint by preloading associations.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
 youtube_migration:
   applies_to: Course
   state: hidden
@@ -318,6 +339,36 @@ youtube_overlay:
   display_name: YouTube content overlay
   description: |-
     In rich content strings, add an overlay to iframes that embed videos from YouTube.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+a11y_checker:
+  applies_to: Account
+  state: hidden
+  display_name: Accessibility Checker
+  description: |-
+    Enable the new Accessibility Checker.
+  shadow: true
+
+a11y_checker_eap:
+  applies_to: Course
+  state: allowed
+  display_name: Accessibility Checker EAP
+  description: |-
+    Enable the new Accessibility Checker in EAP. The flag is allowed only for root account admins.
+  visible_on: a11y_checker_flag_enabled
+  custom_transition_proc: only_admins_can_enable_a11y_checker_during_eap
+
+ux_list_concluded_courses_in_bp:
+  state: hidden
+  display_name: List concluded courses with Concluded pill in blueprint association modal
+  description: |-
+    List concluded courses with Concluded pill in blueprint association modal
+  applies_to: SiteAdmin
+  shadow: true
   environments:
     ci:
       state: allowed_on

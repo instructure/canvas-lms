@@ -108,7 +108,7 @@ module BasicLTI
     class LtiResponse
       include TextHelper
 
-      attr_accessor :code_major, :severity, :description, :body, :error_code
+      attr_accessor :code_major, :severity, :description, :body, :error_code, :assignment, :user
 
       def initialize(lti_request)
         @lti_request = lti_request
@@ -227,7 +227,7 @@ module BasicLTI
         source_id = sourcedid
 
         begin
-          assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id)
+          self.assignment, self.user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id)
         rescue Errors::InvalidSourceId => e
           report_failure(e.code, e.to_s)
           self.body = "<#{operation_ref_identifier}Response />"

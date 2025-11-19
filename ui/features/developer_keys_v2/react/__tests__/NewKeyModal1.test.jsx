@@ -268,8 +268,21 @@ describe('NewKeyModal', () => {
       })
     })
 
-    it('sends form content without scopes and require_scopes set to false when not require_scopes', async () => {
+    it('sends form content with require_scopes set to true by default when not explicitly set', async () => {
       const sentDevKey = await submitForm(editDeveloperKeyState)
+
+      expect(sentDevKey).toEqual({
+        ...developerKey,
+        require_scopes: true,
+        scopes: selectedScopes,
+        test_cluster_only: false,
+      })
+    })
+
+    it('sends form content without scopes when require_scopes is explicitly false', async () => {
+      const developerKey2 = {...developerKey, require_scopes: false}
+      const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
+      const sentDevKey = await submitForm(editDeveloperKeyState2)
 
       expect(sentDevKey).toEqual({
         ...developerKey,

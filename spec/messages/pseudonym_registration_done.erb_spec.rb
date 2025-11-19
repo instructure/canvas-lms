@@ -31,5 +31,5 @@ describe "pseudonym_registration_done" do
   end
   let(:notification_name) { :pseudonym_registration_done }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

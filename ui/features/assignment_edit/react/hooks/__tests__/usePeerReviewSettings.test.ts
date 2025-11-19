@@ -20,8 +20,13 @@ import {renderHook, act} from '@testing-library/react-hooks/dom'
 import {usePeerReviewSettings, MAX_NUM_PEER_REVIEWS} from '../usePeerReviewSettings'
 
 describe('usePeerReviewSettings', () => {
+  const defaultProps = (): {peerReviewCount: number; submissionRequired: boolean} => ({
+    peerReviewCount: 0,
+    submissionRequired: false,
+  })
+
   it('initializes with default values', () => {
-    const {result} = renderHook(() => usePeerReviewSettings())
+    const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
     expect(result.current.reviewsRequired).toBe('1')
     expect(result.current.pointsPerReview).toBe('0')
@@ -35,9 +40,30 @@ describe('usePeerReviewSettings', () => {
     expect(result.current.submissionsRequiredBeforePeerReviews).toBe(false)
   })
 
+  it('sets initial reviewsRequired based on peerReviewCount prop', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), peerReviewCount: 3}),
+    )
+    expect(result.current.reviewsRequired).toBe('3')
+  })
+
+  it('sets initial submissionsRequiredBeforePeerReviews to false when submissionRequired is false', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), submissionRequired: false}),
+    )
+    expect(result.current.submissionsRequiredBeforePeerReviews).toBe(false)
+  })
+
+  it('sets initial submissionsRequiredBeforePeerReviews to true when submissionRequired is true', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), submissionRequired: true}),
+    )
+    expect(result.current.submissionsRequiredBeforePeerReviews).toBe(true)
+  })
+
   describe('reviews required validation', () => {
     it('handles valid numeric input', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '5')
@@ -48,7 +74,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('clears error message when value becomes valid', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '-1')
@@ -74,7 +100,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('requires input when empty and valid', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '')
@@ -95,7 +121,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('validates non-integer input', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '2.5')
@@ -117,7 +143,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('validates negative input', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '-1')
@@ -133,7 +159,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('validates input exceeding maximum', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '15')
@@ -155,7 +181,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('validates non-numeric input', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, 'abc')
@@ -175,7 +201,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('validates zero as invalid input', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '0')
@@ -195,7 +221,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('validates browser-rejected invalid input', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '')
@@ -213,11 +239,57 @@ describe('usePeerReviewSettings', () => {
 
       expect(result.current.errorMessageReviewsRequired).toBe('Please enter a valid number.')
     })
+
+    it('returns undefined when field is valid', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '5')
+      })
+
+      let errorMessage
+      const mockEvent = {
+        target: {
+          validity: {valid: true},
+        },
+      } as React.FocusEvent<HTMLInputElement>
+
+      act(() => {
+        errorMessage = result.current.validateReviewsRequired(mockEvent)
+      })
+
+      expect(errorMessage).toBeUndefined()
+      expect(result.current.errorMessageReviewsRequired).toBeUndefined()
+    })
+
+    it('returns error message when field is invalid', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '-1')
+      })
+
+      let errorMessage
+      const mockEvent = {
+        target: {
+          validity: {valid: true},
+        },
+      } as React.FocusEvent<HTMLInputElement>
+
+      act(() => {
+        errorMessage = result.current.validateReviewsRequired(mockEvent)
+      })
+
+      expect(errorMessage).toBe('Number of peer reviews cannot be negative.')
+      expect(result.current.errorMessageReviewsRequired).toBe(
+        'Number of peer reviews cannot be negative.',
+      )
+    })
   })
 
   describe('points per review validation', () => {
     it('handles valid numeric input', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '10')
@@ -228,7 +300,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('clears error message when value becomes valid', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '-5')
@@ -256,7 +328,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('validates negative input', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '-5')
@@ -278,7 +350,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('does not set error for valid zero value', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '0')
@@ -289,7 +361,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('does not set error for valid decimal value', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '2.5')
@@ -300,7 +372,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('validates browser-rejected invalid input', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '')
@@ -318,11 +390,57 @@ describe('usePeerReviewSettings', () => {
 
       expect(result.current.errorMessagePointsPerReview).toBe('Please enter a valid number.')
     })
+
+    it('returns undefined when field is valid', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '10')
+      })
+
+      let errorMessage
+      const mockEvent = {
+        target: {
+          validity: {valid: true},
+        },
+      } as React.FocusEvent<HTMLInputElement>
+
+      act(() => {
+        errorMessage = result.current.validatePointsPerReview(mockEvent)
+      })
+
+      expect(errorMessage).toBeUndefined()
+      expect(result.current.errorMessagePointsPerReview).toBeUndefined()
+    })
+
+    it('returns error message when field is invalid', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '-5')
+      })
+
+      let errorMessage
+      const mockEvent = {
+        target: {
+          validity: {valid: true},
+        },
+      } as React.FocusEvent<HTMLInputElement>
+
+      act(() => {
+        errorMessage = result.current.validatePointsPerReview(mockEvent)
+      })
+
+      expect(errorMessage).toBe('Points per review cannot be negative.')
+      expect(result.current.errorMessagePointsPerReview).toBe(
+        'Points per review cannot be negative.',
+      )
+    })
   })
 
   describe('total points calculation', () => {
     it('calculates total points correctly for whole numbers', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '3')
@@ -333,7 +451,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('calculates total points correctly for decimal results', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '3')
@@ -347,7 +465,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('returns zero when reviews required is zero', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '0')
@@ -358,7 +476,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('returns zero when points per review is zero', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '3')
@@ -369,7 +487,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('returns zero when there are validation errors', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '-1')
@@ -388,7 +506,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('returns zero for invalid numeric inputs', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, 'abc')
@@ -401,7 +519,7 @@ describe('usePeerReviewSettings', () => {
 
   describe('checkbox handlers', () => {
     it('handles cross sections checkbox change', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleCrossSectionsCheck({
@@ -421,7 +539,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('handles inter group checkbox change', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleInterGroupCheck({
@@ -441,7 +559,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('handles pass/fail grading checkbox change', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleUsePassFailCheck({
@@ -461,7 +579,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('handles anonymity checkbox change', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleAnonymityCheck({
@@ -481,7 +599,7 @@ describe('usePeerReviewSettings', () => {
     })
 
     it('handles submission required checkbox change', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleSubmissionRequiredCheck({
@@ -503,7 +621,7 @@ describe('usePeerReviewSettings', () => {
 
   describe('resetFields', () => {
     it('resets all field values and error messages to defaults', () => {
-      const {result} = renderHook(() => usePeerReviewSettings())
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '-1')

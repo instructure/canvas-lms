@@ -24,6 +24,7 @@ import {
   SortBy,
   DisplayFilter,
   SecondaryInfoDisplay,
+  NameDisplayFormat,
 } from '../utils/constants'
 
 jest.mock('@canvas/axios')
@@ -117,6 +118,8 @@ describe('apiClient', () => {
           DisplayFilter.SHOW_STUDENT_AVATARS,
           DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
         ],
+        nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+        studentsPerPage: 15,
       }
 
       await saveLearningMasteryGradebookSettings('123', settings)
@@ -128,6 +131,8 @@ describe('apiClient', () => {
             secondary_info_display: 'sis_id',
             show_student_avatars: true,
             show_students_with_no_results: true,
+            name_display_format: 'first_last',
+            students_per_page: 15,
           },
         },
       )
@@ -137,6 +142,8 @@ describe('apiClient', () => {
       const settings = {
         secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
         displayFilters: [],
+        nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+        studentsPerPage: 30,
       }
 
       await saveLearningMasteryGradebookSettings('456', settings)
@@ -148,6 +155,8 @@ describe('apiClient', () => {
             secondary_info_display: 'none',
             show_student_avatars: false,
             show_students_with_no_results: false,
+            name_display_format: 'first_last',
+            students_per_page: 30,
           },
         },
       )
@@ -157,6 +166,8 @@ describe('apiClient', () => {
       const settings = {
         secondaryInfoDisplay: SecondaryInfoDisplay.SIS_ID,
         displayFilters: [],
+        nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+        studentsPerPage: 50,
       }
 
       await saveLearningMasteryGradebookSettings(789, settings)
@@ -168,6 +179,8 @@ describe('apiClient', () => {
             secondary_info_display: 'sis_id',
             show_student_avatars: false,
             show_students_with_no_results: false,
+            name_display_format: 'first_last',
+            students_per_page: 50,
           },
         },
       )
@@ -177,6 +190,8 @@ describe('apiClient', () => {
       const settings = {
         secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
         displayFilters: [DisplayFilter.SHOW_STUDENT_AVATARS],
+        nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+        studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
       }
 
       await saveLearningMasteryGradebookSettings('123', settings)
@@ -188,6 +203,32 @@ describe('apiClient', () => {
             secondary_info_display: 'none',
             show_student_avatars: true,
             show_students_with_no_results: false,
+            name_display_format: 'first_last',
+            students_per_page: 15,
+          },
+        },
+      )
+    })
+
+    it('includes name_display_format in the request body when set to LAST_FIRST', async () => {
+      const settings = {
+        secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
+        displayFilters: [],
+        nameDisplayFormat: NameDisplayFormat.LAST_FIRST,
+        studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
+      }
+
+      await saveLearningMasteryGradebookSettings('123', settings)
+
+      expect(mockedAxios.put).toHaveBeenCalledWith(
+        '/api/v1/courses/123/learning_mastery_gradebook_settings',
+        {
+          learning_mastery_gradebook_settings: {
+            secondary_info_display: 'none',
+            show_student_avatars: false,
+            show_students_with_no_results: false,
+            name_display_format: 'last_first',
+            students_per_page: 15,
           },
         },
       )

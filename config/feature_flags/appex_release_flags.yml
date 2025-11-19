@@ -39,3 +39,16 @@ force_login_after_logout:
   description:
     After logging out of Canvas, instruct identity providers to re-authenticate the user on their next login attempt.
     This can prevent unexpected login loops.
+enforce_service_token_tenant_matching:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Enforce Service Token Tenant Matching
+  description: |-
+    Enforce that service tokens can only be used within the tenant they were issued for.
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden

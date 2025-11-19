@@ -221,6 +221,13 @@ module Lti::IMS
               expect(result.submission.reload.submission_type).to eq "external_tool"
             end
 
+            it "logs asset access for participation tracking" do
+              send_request
+              accessed_asset = assigns[:accessed_asset]
+              expect(accessed_asset[:level]).to eq "participate"
+              expect(accessed_asset[:category]).to eq "assignments"
+            end
+
             it_behaves_like "creates a new submission"
           end
 
@@ -1290,6 +1297,25 @@ module Lti::IMS
           let(:user) { ta_in_course(course:, active_all: true).user }
 
           it_behaves_like "an unprocessable entity"
+        end
+
+        context "when user's enrollment is completed and grading happens" do
+          let(:user) do
+            student_in_course(course:, active_all: true, enrollment_state: :completed).user
+          end
+          let(:params_overrides) { super().merge(scoreGiven: 10, scoreMaximum: 10) }
+
+          before do
+            user.enrollments.find_by(course:).update!(workflow_state: "completed")
+          end
+
+          it_behaves_like "an unprocessable entity"
+
+          it "includes error message" do
+            result
+            send_request
+            expect(response.body).to include("Student must be enrolled in the course as a student to be graded")
+          end
         end
 
         context "when timestamp is a timestamp, but not an iso8601 timestamp" do

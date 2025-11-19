@@ -34,7 +34,7 @@ describe "manually_created_access_token_created" do
   end
   let(:notification_name) { :manually_created_access_token_created }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 
   it "removes notification settings url link" do
     msg = generate_message(notification_name, :email, asset, message_data)

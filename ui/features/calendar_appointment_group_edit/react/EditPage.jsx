@@ -28,6 +28,9 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.instructure_forms'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
@@ -95,6 +98,7 @@ class EditPage extends React.Component {
       },
       contexts: [],
       isDeleting: false,
+      showDeleteModal: false,
       eventDataSource: null,
       selectedContexts: new Set(),
       selectedSubContexts: new Set(),
@@ -187,7 +191,21 @@ class EditPage extends React.Component {
           ?.allow_observers_in_appointment_groups,
     )
 
-  deleteGroup = () => {
+  openDeleteModal = () => {
+    this.setState({showDeleteModal: true})
+  }
+
+  closeDeleteModal = () => {
+    this.setState({showDeleteModal: false})
+  }
+
+  confirmDelete = () => {
+    this.setState({showDeleteModal: false}, () => {
+      this.performDelete()
+    })
+  }
+
+  performDelete = () => {
     if (!this.state.isDeleting) {
       this.setState({isDeleting: true}, () => {
         axios
@@ -201,6 +219,10 @@ class EditPage extends React.Component {
           })
       })
     }
+  }
+
+  deleteGroup = () => {
+    this.openDeleteModal()
   }
 
   handleSave = () => {
@@ -436,6 +458,36 @@ class EditPage extends React.Component {
             <AppointmentGroupList appointmentGroup={this.state.appointmentGroup} />
           </FormFieldGroup>
         </FormFieldGroup>
+        <CanvasModal
+          open={this.state.showDeleteModal}
+          onDismiss={this.closeDeleteModal}
+          size="small"
+          label={I18n.t('Delete for everyone?')}
+          data-testid="delete-appointment-group-modal"
+          footer={
+            <>
+              <Button onClick={this.closeDeleteModal} data-testid="cancel-delete-button">
+                {I18n.t('Cancel')}
+              </Button>
+              <Button
+                color="danger"
+                margin="0 0 0 small"
+                onClick={this.confirmDelete}
+                data-testid="confirm-delete-button"
+              >
+                {I18n.t('Delete')}
+              </Button>
+            </>
+          }
+        >
+          <View as="div" margin="0 small" data-testid="delete-modal-content">
+            <Text>
+              {I18n.t(
+                'If you delete this appointment group, all course teachers will lose access, and all student signups will be permanently deleted.',
+              )}
+            </Text>
+          </View>
+        </CanvasModal>
       </div>
     )
   }

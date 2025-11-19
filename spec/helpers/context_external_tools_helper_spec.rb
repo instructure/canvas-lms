@@ -103,12 +103,12 @@ describe ContextExternalToolsHelper do
       ]
     end
 
-    it "includes data-tool-launch-method" do
-      expect(@parsed_html.css("[data-tool-launch-method='tray']").count).to eq 1
+    it_behaves_like "#external_tools_menu_items" do
+      it "includes data-tool-launch-method" do
+        expect(@parsed_html.css("[data-tool-launch-method='tray']").count).to eq 1
+      end
     end
-
-    include_examples "#external_tools_menu_items"
-    include_examples "#external_tools_menu_items_raw"
+    it_behaves_like "#external_tools_menu_items_raw"
   end
 
   context "With tools" do
@@ -174,8 +174,8 @@ describe ContextExternalToolsHelper do
       tool_3.save!
     end
 
-    include_examples "#external_tools_menu_items"
-    include_examples "#external_tools_menu_items_raw"
+    it_behaves_like "#external_tools_menu_items"
+    it_behaves_like "#external_tools_menu_items_raw"
   end
 
   context "external_tools_menu_items_grouped_json" do

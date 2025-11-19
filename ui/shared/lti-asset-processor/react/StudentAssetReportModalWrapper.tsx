@@ -31,7 +31,7 @@ export function sendOpenAssetReportModalMessage(data: AssetReportModalEventData)
 
 /**
  * The AttachmentAssetReportStatus which, when clicked, triggers opening the
- * StudentAssetReportModal, is in an iframe, so it cannot launch the modal
+ * StudentLtiAssetReportModal, is in an iframe, so it cannot launch the modal
  * directly in the main content window. This wrapper is rendered in the main
  * content window and provides a postMessage listener to listen to the message
  * sent by AttachmentAssetReportStatus to open the modal.

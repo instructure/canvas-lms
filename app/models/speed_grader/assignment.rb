@@ -487,6 +487,7 @@ module SpeedGrader
         end
 
       res[:GROUP_GRADING_MODE] = assignment.grade_as_group?
+      res[:HAS_GROUPS] = assignment.has_groups?
       res[:quiz_lti] = assignment.quiz_lti?
 
       StringifyIds.recursively_stringify_ids(res)

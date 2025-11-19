@@ -696,7 +696,7 @@ describe "people" do
       f(".StudentEnrollment .icon-more").click
       fln("Edit Sections").click
       CoursePeople.select_from_section_autocomplete("section2")
-      ff(".ui-button-text")[1].click
+      f("[data-testid='save-button']").click
       wait_for_ajaximations
       expect(ff(".StudentEnrollment")[0]).to include_text("section2")
     end
@@ -709,7 +709,7 @@ describe "people" do
       f(".StudentEnrollment .icon-more").click
       fln("Edit Sections").click
       find_button("Remove user from section2").click
-      ff(".ui-button-text")[1].click
+      f("[data-testid='save-button']").click
       wait_for_ajaximations
       expect(ff(".StudentEnrollment")[0]).not_to include_text("section2")
     end
@@ -721,7 +721,7 @@ describe "people" do
       f(".DesignerEnrollment .icon-more").click
       fln("Edit Sections").click
       CoursePeople.select_from_section_autocomplete("section2")
-      ff(".ui-button-text")[1].click
+      f("[data-testid='save-button']").click
       wait_for_ajaximations
       expect(ff(".DesignerEnrollment")[0]).to include_text("section2")
     end
@@ -758,7 +758,7 @@ describe "people" do
       CoursePeople.select_from_section_autocomplete("section2")
       find_button("Remove user from section2")
       expect(find_button("Remove user from section2")).not_to be_nil
-      f(".ui-dialog-buttonset .btn-primary").click
+      f("[data-testid='save-button']").click
       wait_for_ajaximations
 
       ff(".icon-more")[1].click

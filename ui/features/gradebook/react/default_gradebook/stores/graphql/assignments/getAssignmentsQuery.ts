@@ -19,7 +19,7 @@
 import {gql} from '@apollo/client'
 
 export const GET_ASSIGNMENTS_QUERY = gql`
-query getAssignments($assignmentGroupId: ID!, $gradingPeriodId: ID, $after: String) {
+query Gradebook__GetAssignments($assignmentGroupId: ID!, $gradingPeriodId: ID, $after: String) {
   assignmentGroup(id: $assignmentGroupId) {
     assignmentsConnection(
       filter: {

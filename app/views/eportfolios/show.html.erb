@@ -17,6 +17,10 @@
 %>
 <div id="eportfolio_portal_mount"></div>
 
+<% if @show_eportfolio_deprecation_notice %>
+  <div id="eportfolio_deprecation_notice_mount"></div>
+<% end %>
+
 <% provide :page_title do %><%= join_title @page.name, @category.name, @portfolio.name %><% end %>
 
 <% provide :left_side do %>

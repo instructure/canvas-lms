@@ -17,17 +17,10 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Modal} from '@instructure/ui-modal'
-import {Heading} from '@instructure/ui-heading'
-import {CloseButton} from '@instructure/ui-buttons'
-import {Flex, FlexItem} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
-import TruncateWithTooltip from '../../lti-apps/components/common/TruncateWithTooltip'
-import LtiAssetReportStatus from './LtiAssetReportStatus'
-import {View} from '@instructure/ui-view'
-import {LtiAssetProcessor, LtiAssetReportForStudent} from '../model/LtiAssetReport'
-import {LtiAssetReports} from '../shared-with-sg/replicated/components/LtiAssetReports'
+import {AssetReportModal} from '../shared-with-sg/replicated/components/AssetReportModal'
 import {AssetReportCompatibleSubmissionType} from '../shared-with-sg/replicated/types/LtiAssetReports'
+import {LtiAssetProcessor} from '../shared-with-sg/replicated/types/LtiAssetProcessors'
+import {LtiAssetReportForStudent} from '../model/LtiAssetReport'
 
 export interface StudentLtiAssetReportModalProps {
   assetProcessors: LtiAssetProcessor[]
@@ -60,67 +53,27 @@ export default function StudentLtiAssetReportModal({
   reports,
   submissionType,
 }: StudentLtiAssetReportModalProps) {
-  const assetProcessorsWithReports = assetProcessors.filter(assetProcessor =>
-    reports.some(report => report.processorId === assetProcessor._id),
-  )
   const {attachments, mainTitle, showDocumentDisplayName} = mapData(reports, submissionType)
 
   // This is only needed for online_text_entry, so can be empty for other types
   const attempt =
     reports.find(r => r.asset.submissionAttempt)?.asset.submissionAttempt?.toString() ?? ''
 
+  const modalTitle = t('Document Processors for %{assignmentName}', {assignmentName})
+
   return (
-    <Modal
-      label={t('Document Processors for %{assignmentName}', {assignmentName})}
-      open={true}
+    <AssetReportModal
+      assetProcessors={assetProcessors}
+      modalTitle={modalTitle}
+      attachments={attachments}
+      attempt={attempt}
+      mainTitle={mainTitle}
       onClose={onClose}
-      onDismiss={onClose}
-      size="medium"
-    >
-      <Modal.Header>
-        <Heading>{t('Document Processors for %{assignmentName}', {assignmentName})}</Heading>
-        <CloseButton
-          placement="end"
-          offset="medium"
-          onClick={onClose}
-          screenReaderLabel={t('Close')}
-          elementRef={el => {
-            el?.setAttribute('data-pendo', 'asset-processors-student-view-modal-close')
-          }}
-        />
-      </Modal.Header>
-      <Modal.Body>
-        <Flex justifyItems="space-between" alignItems="center" margin="0 0 medium 0" gap="medium">
-          {mainTitle && (
-            <FlexItem>
-              <View maxWidth="30em" as="div">
-                <Text size="descriptionPage" weight="weightImportant">
-                  <TruncateWithTooltip
-                    linesAllowed={1}
-                    horizontalOffset={0}
-                    backgroundColor="primary-inverse"
-                  >
-                    {mainTitle}
-                  </TruncateWithTooltip>
-                </Text>
-              </View>
-            </FlexItem>
-          )}
-          <FlexItem>
-            <LtiAssetReportStatus reports={reports} />
-          </FlexItem>
-        </Flex>
-        <LtiAssetReports
-          assetProcessors={assetProcessorsWithReports}
-          attempt={attempt}
-          reports={reports}
-          studentIdForResubmission={undefined}
-          attachments={attachments || []}
-          submissionType={submissionType}
-          showDocumentDisplayName={showDocumentDisplayName}
-        />
-      </Modal.Body>
-    </Modal>
+      reports={reports}
+      showDocumentDisplayName={showDocumentDisplayName}
+      studentIdForResubmission={undefined}
+      submissionType={submissionType}
+    />
   )
 }
 

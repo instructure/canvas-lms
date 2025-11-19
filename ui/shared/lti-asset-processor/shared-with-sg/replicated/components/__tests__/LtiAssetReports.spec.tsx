@@ -16,20 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {describe, expect, it, fn, clearAllMocks} from '../../../__tests__/testPlatformShims'
-import {LtiAssetReports} from '../LtiAssetReports'
 import {fireEvent, waitFor} from '@testing-library/react'
+import {HttpResponse, http} from 'msw'
+import {setupServer} from 'msw/node'
 import {renderComponent} from '../../../__tests__/renderingShims'
-import type {LtiAssetReport} from '../../types/LtiAssetReports'
+import {clearAllMocks, describe, expect, fn, it} from '../../../__tests__/testPlatformShims'
 import {defaultLtiAssetProcessors} from '../../__fixtures__/default/ltiAssetProcessors'
 import {
-  makeMockReport,
   defaultLtiAssetReportsForDiscussion,
+  makeMockReport,
 } from '../../__fixtures__/default/ltiAssetReports'
-
-import {setupServer} from 'msw/node'
-import {http, HttpResponse} from 'msw'
 import type {ResubmitLtiAssetReportsParams} from '../../mutations/resubmitLtiAssetReports'
+import type {LtiAssetReport} from '../../types/LtiAssetReports'
+import {LtiAssetReports} from '../LtiAssetReports'
 
 const server = setupServer()
 
@@ -241,7 +240,7 @@ describe('LtiAssetReports', () => {
 
       const btn = resubmitButtons[0]
       if (!btn) {
-        throw 'no resubmit button'
+        throw new Error('no resubmit button')
       }
       fireEvent.click(btn)
 
@@ -290,7 +289,7 @@ describe('LtiAssetReports', () => {
     it('shows a resubmit button per AP', () => {
       // file2-AP1001-report1 still missing, another AP 1000 report is resubmittable
       const rep = reports.find(r => r.title === 'file2-AP1000-report1')
-      if (!rep) throw 'bad test setup'
+      if (!rep) throw new Error('bad test setup')
       rep.resubmitAvailable = true
 
       const {getAllByText} = setup('online_upload')

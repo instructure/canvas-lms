@@ -38,8 +38,10 @@ global.ENV = {
 
 const createMockAssignment = (overrides = {}) => ({
   peerReviews: jest.fn(() => false),
+  peerReviewCount: jest.fn(() => 1),
   courseID: jest.fn(() => '123'),
   getId: jest.fn(() => '456'),
+  peerReviewSubmissionRequired: jest.fn(() => false),
   ...overrides,
 })
 
@@ -91,6 +93,30 @@ describe('PeerReviewDetails', () => {
 
       const checkbox = screen.getByTestId('peer-review-checkbox')
       expect(checkbox).toBeDisabled()
+    })
+
+    it('loads initial value of submission required as checked when set to true in assignment', async () => {
+      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviewSubmissionRequired = jest.fn(() => true)
+
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
+      const submissionRequiredCheckbox = screen.getByTestId('submission-required-checkbox')
+      expect(submissionRequiredCheckbox).toBeChecked()
+    })
+
+    it('defaults submission required to unchecked when not set in assignment', async () => {
+      assignment.peerReviews = jest.fn(() => true)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
+      const submissionRequiredCheckbox = screen.getByTestId('submission-required-checkbox')
+      expect(submissionRequiredCheckbox).not.toBeChecked()
     })
   })
 
@@ -458,6 +484,98 @@ describe('PeerReviewDetails', () => {
         expect(screen.queryByText('Anonymity')).not.toBeInTheDocument()
         expect(screen.queryByText('Submission required')).not.toBeInTheDocument()
       })
+
+      describe('validatePeerReviewDetails function', () => {
+        it('returns true when all fields are valid', async () => {
+          const container = document.createElement('div')
+          container.id = 'peer_reviews_allocation_and_grading_details'
+          document.body.appendChild(container)
+
+          const client = new QueryClient()
+          render(
+            <MockedQueryClientProvider client={client}>
+              <PeerReviewDetails assignment={assignment} />
+            </MockedQueryClientProvider>,
+            {container},
+          )
+          const checkbox = screen.getByTestId('peer-review-checkbox')
+          await user.click(checkbox)
+
+          const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
+          await user.clear(reviewsRequiredInput)
+          await user.type(reviewsRequiredInput, '5')
+
+          const validateFn = (container as any).validatePeerReviewDetails
+          expect(validateFn).toBeDefined()
+
+          const isValid = validateFn()
+          expect(isValid).toBe(true)
+
+          document.body.removeChild(container)
+        })
+
+        it('returns false when reviewsRequired field is invalid', async () => {
+          const container = document.createElement('div')
+          container.id = 'peer_reviews_allocation_and_grading_details'
+          document.body.appendChild(container)
+
+          const client = new QueryClient()
+          render(
+            <MockedQueryClientProvider client={client}>
+              <PeerReviewDetails assignment={assignment} />
+            </MockedQueryClientProvider>,
+            {container},
+          )
+          const checkbox = screen.getByTestId('peer-review-checkbox')
+          await user.click(checkbox)
+
+          const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
+          await user.clear(reviewsRequiredInput)
+          await user.type(reviewsRequiredInput, '-1')
+          await user.tab()
+
+          const validateFn = (container as any).validatePeerReviewDetails
+          const isValid = validateFn()
+
+          expect(isValid).toBe(false)
+          expect(screen.getByText('Number of peer reviews cannot be negative.')).toBeInTheDocument()
+
+          document.body.removeChild(container)
+        })
+
+        it('returns false when pointsPerReview field is invalid', async () => {
+          const container = document.createElement('div')
+          container.id = 'peer_reviews_allocation_and_grading_details'
+          document.body.appendChild(container)
+
+          const client = new QueryClient()
+          render(
+            <MockedQueryClientProvider client={client}>
+              <PeerReviewDetails assignment={assignment} />
+            </MockedQueryClientProvider>,
+            {container},
+          )
+          const checkbox = screen.getByTestId('peer-review-checkbox')
+          await user.click(checkbox)
+
+          const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
+          await user.clear(reviewsRequiredInput)
+          await user.type(reviewsRequiredInput, '5')
+
+          const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
+          await user.clear(pointsPerReviewInput)
+          await user.type(pointsPerReviewInput, '-5')
+          await user.tab()
+
+          const validateFn = (container as any).validatePeerReviewDetails
+          const isValid = validateFn()
+
+          expect(isValid).toBe(false)
+          expect(screen.getByText('Points per review cannot be negative.')).toBeInTheDocument()
+
+          document.body.removeChild(container)
+        })
+      })
     })
 
     describe('when only PEER_REVIEW_ALLOCATION_ENABLED is true', () => {
@@ -505,6 +623,66 @@ describe('PeerReviewDetails', () => {
         expect(screen.queryByText('Grading')).not.toBeInTheDocument()
         expect(screen.queryByTestId('pass-fail-grading-checkbox')).not.toBeInTheDocument()
       })
+
+      it('validates only reviewsRequired when grading is disabled', async () => {
+        const container = document.createElement('div')
+        container.id = 'peer_reviews_allocation_and_grading_details'
+        document.body.appendChild(container)
+
+        const client = new QueryClient()
+        render(
+          <MockedQueryClientProvider client={client}>
+            <PeerReviewDetails assignment={assignment} />
+          </MockedQueryClientProvider>,
+          {container},
+        )
+        const checkbox = screen.getByTestId('peer-review-checkbox')
+        await user.click(checkbox)
+
+        const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
+        await user.clear(reviewsRequiredInput)
+        await user.type(reviewsRequiredInput, '5')
+
+        const validateFn = (container as any).validatePeerReviewDetails
+        expect(validateFn).toBeDefined()
+
+        const isValid = validateFn()
+        expect(isValid).toBe(true)
+
+        document.body.removeChild(container)
+      })
+
+      it('focuses only on reviewsRequired field when grading is disabled', async () => {
+        const container = document.createElement('div')
+        container.id = 'peer_reviews_allocation_and_grading_details'
+        document.body.appendChild(container)
+
+        const client = new QueryClient()
+        render(
+          <MockedQueryClientProvider client={client}>
+            <PeerReviewDetails assignment={assignment} />
+          </MockedQueryClientProvider>,
+          {container},
+        )
+        const checkbox = screen.getByTestId('peer-review-checkbox')
+        await user.click(checkbox)
+
+        const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
+        await user.clear(reviewsRequiredInput)
+        await user.type(reviewsRequiredInput, '-1')
+        await user.tab()
+
+        expect(screen.getByText('Number of peer reviews cannot be negative.')).toBeInTheDocument()
+
+        const focusFn = (container as any).focusOnFirstError
+        expect(focusFn).toBeDefined()
+
+        focusFn()
+
+        expect(document.activeElement).toBe(reviewsRequiredInput)
+
+        document.body.removeChild(container)
+      })
     })
 
     describe('when both flags are enabled', () => {
@@ -534,6 +712,157 @@ describe('PeerReviewDetails', () => {
         expect(screen.getByText('Anonymity')).toBeInTheDocument()
         expect(screen.getByText('Submission required')).toBeInTheDocument()
       })
+
+      describe('validatePeerReviewDetails function', () => {
+        it('validates both reviewsRequired and pointsPerReview when both flags enabled', async () => {
+          const container = document.createElement('div')
+          container.id = 'peer_reviews_allocation_and_grading_details'
+          document.body.appendChild(container)
+
+          const client = new QueryClient()
+          render(
+            <MockedQueryClientProvider client={client}>
+              <PeerReviewDetails assignment={assignment} />
+            </MockedQueryClientProvider>,
+            {container},
+          )
+          const checkbox = screen.getByTestId('peer-review-checkbox')
+          await user.click(checkbox)
+
+          const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
+          await user.clear(reviewsRequiredInput)
+          await user.type(reviewsRequiredInput, '5')
+
+          const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
+          await user.clear(pointsPerReviewInput)
+          await user.type(pointsPerReviewInput, '10')
+
+          const validateFn = (container as any).validatePeerReviewDetails
+          expect(validateFn).toBeDefined()
+
+          const isValid = validateFn()
+          expect(isValid).toBe(true)
+
+          document.body.removeChild(container)
+        })
+
+        it('returns false when pointsPerReview is invalid with both flags enabled', async () => {
+          const container = document.createElement('div')
+          container.id = 'peer_reviews_allocation_and_grading_details'
+          document.body.appendChild(container)
+
+          const client = new QueryClient()
+          render(
+            <MockedQueryClientProvider client={client}>
+              <PeerReviewDetails assignment={assignment} />
+            </MockedQueryClientProvider>,
+            {container},
+          )
+          const checkbox = screen.getByTestId('peer-review-checkbox')
+          await user.click(checkbox)
+
+          const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
+          await user.clear(reviewsRequiredInput)
+          await user.type(reviewsRequiredInput, '5')
+
+          const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
+          await user.clear(pointsPerReviewInput)
+          await user.type(pointsPerReviewInput, '-5')
+          await user.tab()
+
+          const validateFn = (container as any).validatePeerReviewDetails
+          const isValid = validateFn()
+
+          expect(isValid).toBe(false)
+          expect(screen.getByText('Points per review cannot be negative.')).toBeInTheDocument()
+
+          document.body.removeChild(container)
+        })
+      })
+    })
+  })
+
+  describe('Function attachment and cleanup', () => {
+    it('attaches validatePeerReviewDetails function to DOM element on mount', async () => {
+      const container = document.createElement('div')
+      container.id = 'peer_reviews_allocation_and_grading_details'
+      document.body.appendChild(container)
+
+      const client = new QueryClient()
+      render(
+        <MockedQueryClientProvider client={client}>
+          <PeerReviewDetails assignment={assignment} />
+        </MockedQueryClientProvider>,
+        {container},
+      )
+
+      expect((container as any).validatePeerReviewDetails).toBeDefined()
+      expect(typeof (container as any).validatePeerReviewDetails).toBe('function')
+
+      document.body.removeChild(container)
+    })
+
+    it('cleans up validatePeerReviewDetails function on unmount', async () => {
+      const container = document.createElement('div')
+      container.id = 'peer_reviews_allocation_and_grading_details'
+      document.body.appendChild(container)
+
+      const client = new QueryClient()
+      const {unmount} = render(
+        <MockedQueryClientProvider client={client}>
+          <PeerReviewDetails assignment={assignment} />
+        </MockedQueryClientProvider>,
+        {container},
+      )
+
+      expect((container as any).validatePeerReviewDetails).toBeDefined()
+
+      unmount()
+
+      expect((container as any).validatePeerReviewDetails).toBeUndefined()
+
+      document.body.removeChild(container)
+    })
+
+    it('attaches focusOnFirstError function to DOM element on mount', async () => {
+      const container = document.createElement('div')
+      container.id = 'peer_reviews_allocation_and_grading_details'
+      document.body.appendChild(container)
+
+      const client = new QueryClient()
+      render(
+        <MockedQueryClientProvider client={client}>
+          <PeerReviewDetails assignment={assignment} />
+        </MockedQueryClientProvider>,
+        {container},
+      )
+
+      expect((container as any).focusOnFirstError).toBeDefined()
+      expect(typeof (container as any).focusOnFirstError).toBe('function')
+
+      document.body.removeChild(container)
+    })
+
+    it('cleans up focusOnFirstError function on unmount', async () => {
+      const container = document.createElement('div')
+      container.id = 'peer_reviews_allocation_and_grading_details'
+      document.body.appendChild(container)
+
+      const client = new QueryClient()
+      const {unmount} = render(
+        <MockedQueryClientProvider client={client}>
+          <PeerReviewDetails assignment={assignment} />
+        </MockedQueryClientProvider>,
+        {container},
+      )
+
+      expect((container as any).focusOnFirstError).toBeDefined()
+
+      unmount()
+
+      expect((container as any).focusOnFirstError).toBeUndefined()
+
+      document.body.removeChild(container)
     })
   })
 })

@@ -20,201 +20,222 @@
 require "spec_helper"
 
 describe Accessibility::ContentLoader do
-  let(:context) { double("Context") }
-  let(:assignment_id) { 1 }
-  let(:page_id) { 2 }
+  include Factories
+
+  let(:course) { course_model }
+  let(:assignment) { assignment_model(course:, description: assignment_content) }
+  let(:wiki_page) { wiki_page_model(course:, title: "Test Page", body: page_content) }
   let(:assignment_content) { "<div><h1>Assignment Title</h1><p>Assignment description</p></div>" }
   let(:page_content) { "<div><h2>Page Title</h2><p>Page body content</p></div>" }
 
   describe "#content" do
     context "for Assignments" do
-      let(:content_loader) { described_class.new(context:, type: "Assignment", id: assignment_id) }
-      let(:assignments_double) { double("Assignments") }
-      let(:assignment) { double("Assignment", description: assignment_content) }
+      let!(:issue) { accessibility_issue_model(course:, context: assignment, node_path: nil) }
+      let(:content_loader) { described_class.new(issue_id: issue.id) }
 
-      before do
-        allow(context).to receive(:assignments).and_return(assignments_double)
-      end
+      it "returns assignment description" do
+        result = content_loader.content
 
-      context "when assignment exists" do
-        before do
-          allow(assignments_double).to receive(:exists?).with(assignment_id).and_return(true)
-          allow(assignments_double).to receive(:find_by).with(id: assignment_id).and_return(assignment)
-        end
-
-        it "returns assignment description with ok status" do
-          result = content_loader.content
-
-          expect(result[:status]).to eq(:ok)
-          expect(result[:json][:content]).to eq(assignment_content)
-        end
-      end
-
-      context "when assignment does not exist" do
-        before do
-          allow(assignments_double).to receive(:exists?).with(assignment_id).and_return(false)
-        end
-
-        it "returns not found error" do
-          result = content_loader.content
-
-          expect(result[:status]).to eq(:not_found)
-          expect(result[:json][:error]).to eq("Resource 'Assignment' with id '#{assignment_id}' was not found.")
-        end
+        expect(result).to eq(assignment_content)
       end
     end
 
     context "for Pages" do
-      let(:content_loader) { described_class.new(context:, type: "Page", id: page_id) }
-      let(:wiki_pages_double) { double("WikiPages") }
-      let(:page) { double("Page", body: page_content) }
+      let!(:issue) { accessibility_issue_model(course:, context: wiki_page, node_path: nil) }
+      let(:content_loader) { described_class.new(issue_id: issue.id) }
 
-      before do
-        allow(context).to receive(:wiki_pages).and_return(wiki_pages_double)
-      end
+      it "returns page body" do
+        result = content_loader.content
 
-      context "when page exists" do
-        before do
-          allow(wiki_pages_double).to receive(:exists?).with(page_id).and_return(true)
-          allow(wiki_pages_double).to receive(:find_by).with(id: page_id).and_return(page)
-        end
-
-        it "returns page body with ok status" do
-          result = content_loader.content
-
-          expect(result[:status]).to eq(:ok)
-          expect(result[:json][:content]).to eq(page_content)
-        end
-      end
-
-      context "when page does not exist" do
-        before do
-          allow(wiki_pages_double).to receive(:exists?).with(page_id).and_return(false)
-        end
-
-        it "returns not found error" do
-          result = content_loader.content
-
-          expect(result[:status]).to eq(:not_found)
-          expect(result[:json][:error]).to eq("Resource 'Page' with id '#{page_id}' was not found.")
-        end
+        expect(result).to eq(page_content)
       end
     end
 
     context "for unknown content type" do
-      let(:content_loader) { described_class.new(context:, type: "UnknownType", id: 1) }
+      let!(:issue) { accessibility_issue_model(course:, context: wiki_page, node_path: nil) }
+      let(:content_loader) { described_class.new(issue_id: issue.id) }
 
-      it "returns unprocessable entity error" do
-        result = content_loader.content
+      it "raises UnsupportedResourceTypeError" do
+        # Mock the resource to simulate an unsupported type
+        allow(content_loader).to receive(:resource_html_content).and_raise(
+          Accessibility::ContentLoader::UnsupportedResourceTypeError.new("Unsupported resource type: Course")
+        )
 
-        expect(result[:status]).to eq(:unprocessable_entity)
-        expect(result[:json][:error]).to eq("Unknown content type: UnknownType")
-      end
-
-      it "logs the error" do
-        expect(Rails.logger).to receive(:error).with("Unknown content type: UnknownType")
-
-        content_loader.content
+        expect do
+          content_loader.content
+        end.to raise_error(Accessibility::ContentLoader::UnsupportedResourceTypeError, "Unsupported resource type: Course")
       end
     end
   end
 
   describe "#extract_element_from_content" do
-    let(:content_loader) { described_class.new(context:, type: "Page", id: page_id) }
-    let(:wiki_pages_double) { double("WikiPages") }
-    let(:page) { double("Page", body: page_content) }
-    let(:xpath) { ".//h2" }
-
-    before do
-      allow(context).to receive(:wiki_pages).and_return(wiki_pages_double)
-      allow(wiki_pages_double).to receive(:exists?).with(page_id).and_return(true)
-      allow(wiki_pages_double).to receive(:find_by).with(id: page_id).and_return(page)
-    end
+    let!(:issue) { accessibility_issue_model(course:, context: wiki_page, node_path: xpath) }
+    let(:content_loader) { described_class.new(issue_id: issue.id) }
 
     context "when element exists in content" do
+      let(:xpath) { ".//h2" }
+
       it "returns the element's HTML" do
-        result = content_loader.extract_element_from_content(".//h2")
+        result = content_loader.content
 
-        expect(result[:status]).to eq(:ok)
-        expect(result[:json][:content]).to eq("<h2>Page Title</h2>")
+        expect(result).to eq("<h2>Page Title</h2>")
       end
+    end
 
-      it "returns the first h2 element specifically" do
-        result = content_loader.extract_element_from_content(".//h2[1]")
+    context "when extracting first h2 element specifically" do
+      let(:xpath) { ".//h2[1]" }
 
-        expect(result[:status]).to eq(:ok)
-        expect(result[:json][:content]).to eq("<h2>Page Title</h2>")
+      it "returns the first h2 element" do
+        result = content_loader.content
+
+        expect(result).to eq("<h2>Page Title</h2>")
       end
+    end
+
+    context "when extracting paragraph content" do
+      let(:xpath) { ".//p" }
 
       it "returns paragraph content" do
-        result = content_loader.extract_element_from_content(".//p")
+        result = content_loader.content
 
-        expect(result[:status]).to eq(:ok)
-        expect(result[:json][:content]).to eq("<p>Page body content</p>")
+        expect(result).to eq("<p>Page body content</p>")
       end
+    end
+
+    context "when extracting div content with all children" do
+      let(:xpath) { ".//div" }
 
       it "returns div content with all children" do
-        result = content_loader.extract_element_from_content(".//div")
+        result = content_loader.content
 
-        expect(result[:status]).to eq(:ok)
-        expect(result[:json][:content]).to eq("<div><h2>Page Title</h2><p>Page body content</p></div>")
+        expect(result).to eq("<div><h2>Page Title</h2><p>Page body content</p></div>")
       end
     end
 
     context "when element does not exist in content" do
       let(:xpath) { ".//nonexistent" }
 
-      it "returns element not found error" do
-        result = content_loader.extract_element_from_content(xpath)
-
-        expect(result[:status]).to eq(:not_found)
-        expect(result[:json][:error]).to eq("Element not found")
+      it "raises ElementNotFoundError" do
+        expect do
+          content_loader.content
+        end.to raise_error(Accessibility::ContentLoader::ElementNotFoundError, /Element not found at path/)
       end
     end
 
     context "when path is nil" do
-      it "returns full content when path is nil" do
-        result = content_loader.extract_element_from_content(nil)
+      let(:xpath) { nil }
 
-        expect(result[:status]).to eq(:ok)
-        expect(result[:json][:content]).to eq(page_content)
+      it "returns full content" do
+        result = content_loader.content
+
+        expect(result).to eq(page_content)
       end
     end
 
-    context "when content loading fails" do
-      before do
-        allow(wiki_pages_double).to receive(:exists?).with(page_id).and_return(false)
-      end
+    context "when path is empty string" do
+      let(:xpath) { "" }
 
-      it "returns the content error without trying to extract element" do
-        result = content_loader.extract_element_from_content(xpath)
+      it "returns full content" do
+        result = content_loader.content
 
-        expect(result[:status]).to eq(:not_found)
-        expect(result[:json][:error]).to eq("Resource 'Page' with id '#{page_id}' was not found.")
+        expect(result).to eq(page_content)
       end
     end
 
     context "with empty content" do
       let(:empty_content) { "" }
-      let(:page) { double("Page", body: empty_content) }
+      let(:wiki_page) { wiki_page_model(course:, title: "Empty Page", body: empty_content) }
+      let(:xpath) { "//p" }
 
-      it "handles empty content" do
-        xpath = "//p"
-        result = content_loader.extract_element_from_content(xpath)
-
-        expect(result[:status]).to eq(:not_found)
-        expect(result[:json][:error]).to eq("Element not found")
+      it "raises ElementNotFoundError" do
+        expect do
+          content_loader.content
+        end.to raise_error(Accessibility::ContentLoader::ElementNotFoundError)
       end
     end
   end
 
   describe "#initialize" do
-    it "sets instance variables correctly" do
-      content_loader = described_class.new(context:, type: "Page", id: 123)
+    let!(:issue) { accessibility_issue_model(course:, context: wiki_page, rule_type: "img-alt", node_path: ".//div") }
 
-      expect(content_loader.instance_variable_get(:@context)).to eq(context)
-      expect(content_loader.instance_variable_get(:@type)).to eq("Page")
-      expect(content_loader.instance_variable_get(:@id)).to eq(123)
+    it "sets instance variables correctly" do
+      content_loader = described_class.new(issue_id: issue.id)
+
+      expect(content_loader.instance_variable_get(:@issue)).to eq(issue)
+      expect(content_loader.instance_variable_get(:@resource)).to eq(wiki_page)
+      expect(content_loader.instance_variable_get(:@rule_id)).to eq("img-alt")
+      expect(content_loader.instance_variable_get(:@path)).to eq(".//div")
+    end
+  end
+
+  describe "issue preview with rule_id" do
+    let(:test_content) do
+      "<html><body><div><h1>Test Element</h1></div></body></html>"
+    end
+    let(:wiki_page) { wiki_page_model(course:, title: "Test Page", body: test_content) }
+    let(:mock_rule_instance) { double("RuleInstance") }
+    let(:mock_rule_registry) { { "img-alt" => mock_rule_instance } }
+
+    context "when rule_id is provided and rule exists" do
+      let!(:issue) { accessibility_issue_model(course:, context: wiki_page, rule_type: "img-alt", node_path: ".//h1") }
+      let(:content_loader) { described_class.new(issue_id: issue.id) }
+
+      before do
+        allow(Accessibility::Rule).to receive(:registry).and_return(mock_rule_registry)
+      end
+
+      it "uses the rule's issue_preview method to generate preview" do
+        allow(mock_rule_instance).to receive(:issue_preview).and_return("<h1>Test Element</h1><p>Extra context</p>")
+
+        result = content_loader.content
+
+        expect(mock_rule_instance).to have_received(:issue_preview)
+        expect(result).to eq("<h1>Test Element</h1><p>Extra context</p>")
+      end
+    end
+
+    context "when rule_id is provided but rule does not exist" do
+      let!(:issue) { accessibility_issue_model(course:, context: wiki_page, rule_type: "img-alt", node_path: ".//h1") }
+      let(:content_loader) { described_class.new(issue_id: issue.id) }
+
+      before do
+        allow(Accessibility::Rule).to receive(:registry).and_return({})
+      end
+
+      it "falls back to returning the element's HTML" do
+        result = content_loader.content
+
+        expect(result).to eq("<h1>Test Element</h1>")
+      end
+    end
+
+    context "when rule_id is not provided" do
+      let!(:issue) { accessibility_issue_model(course:, context: wiki_page, rule_type: "img-alt", node_path: ".//h1") }
+      let(:content_loader) { described_class.new(issue_id: issue.id) }
+
+      it "returns the element's HTML without using issue_preview" do
+        result = content_loader.content
+
+        expect(result).to eq("<h1>Test Element</h1>")
+      end
+    end
+
+    context "when rule's issue_preview returns nil" do
+      let!(:issue) { accessibility_issue_model(course:, context: wiki_page, rule_type: "img-alt", node_path: ".//h1") }
+      let(:content_loader) { described_class.new(issue_id: issue.id) }
+
+      before do
+        allow(Accessibility::Rule).to receive(:registry).and_return(mock_rule_registry)
+      end
+
+      it "falls back to element's HTML when issue_preview returns nil" do
+        allow(mock_rule_instance).to receive(:issue_preview).and_return(nil)
+
+        result = content_loader.content
+
+        expect(mock_rule_instance).to have_received(:issue_preview)
+        expect(result).to eq("<h1>Test Element</h1>")
+      end
     end
   end
 end

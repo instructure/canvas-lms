@@ -18,13 +18,19 @@
 import {useReducer} from 'react'
 import {ModuleItemContentType} from '../queries/useModuleItemContent'
 import {useContextModule} from '../useModuleContext'
-import {prepareModuleItemData} from '../../handlers/addItemHandlers'
+import {prepareModuleItemData, submitModuleItems} from '../../handlers/addItemHandlers'
 import {useInlineSubmission, submitItemData} from './useInlineSubmission'
 import {useDefaultCourseFolder} from '../../hooks/mutations/useDefaultCourseFolder'
 import type {ContentItem} from '../queries/useModuleItemContent'
 import {useModules} from '../queries/useModules'
 import {ExternalToolUrl, ExternalUrl, FormState, NewItem} from '../../utils/types'
 import {navigateToLastPage} from '../../utils/pageNavigation'
+import {queryClient} from '@canvas/query'
+import {MODULE_ITEMS, MODULE_ITEMS_ALL, MODULES} from '../../utils/constants'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('context_modules_v2')
 
 const initialState: FormState = {
   indentation: 0,
@@ -39,6 +45,8 @@ const initialState: FormState = {
   newItem: {name: '', assignmentGroup: '', file: null, folder: ''},
   selectedItemId: '',
   selectedItem: null,
+  selectedItemIds: [],
+  selectedItems: [],
   tabIndex: 0,
   isLoading: false,
 }
@@ -51,6 +59,8 @@ export type Action =
   | {type: 'SET_NEW_ITEM'; field: keyof NewItem; value: string | File | null}
   | {type: 'SET_SELECTED_ITEM_ID'; value: string}
   | {type: 'SET_SELECTED_ITEM'; value: ContentItem | null}
+  | {type: 'SET_SELECTED_ITEM_IDS'; value: string[]}
+  | {type: 'SET_SELECTED_ITEMS'; value: ContentItem[]}
   | {type: 'SET_TAB_INDEX'; value: number}
   | {type: 'SET_LOADING'; value: boolean}
   | {type: 'RESET'}
@@ -82,6 +92,10 @@ function reducer(state: FormState, action: Action): FormState {
       return {...state, selectedItemId: action.value}
     case 'SET_SELECTED_ITEM':
       return {...state, selectedItem: action.value}
+    case 'SET_SELECTED_ITEM_IDS':
+      return {...state, selectedItemIds: action.value}
+    case 'SET_SELECTED_ITEMS':
+      return {...state, selectedItems: action.value}
     case 'SET_TAB_INDEX':
       return {...state, tabIndex: action.value}
     case 'SET_LOADING':
@@ -120,7 +134,8 @@ export function useAddModuleItem({
   const handleSubmit = async () => {
     dispatch({type: 'SET_LOADING', value: true})
 
-    const {externalUrl, externalTool, textHeader, indentation, tabIndex, newItem} = state
+    const {externalUrl, externalTool, textHeader, indentation, tabIndex, newItem, selectedItems} =
+      state
 
     if (
       itemType === 'external_url' &&
@@ -138,37 +153,92 @@ export function useAddModuleItem({
       return
     }
 
-    const selectedItemId =
-      itemType === 'external_tool' ? state.externalTool.selectedToolId : state.selectedItemId
-
-    const selectedItem =
-      state.selectedItem || contentItems.find(item => item.id === selectedItemId) || null
-
-    const {name, url, newTab} = itemType === 'external_tool' ? externalTool : externalUrl
-
-    const itemData = prepareModuleItemData(moduleId, {
-      type: itemType,
-      itemCount: totalCount,
-      indentation,
-      quizEngine,
-      selectedTabIndex: tabIndex,
-      textHeaderValue: textHeader,
-      externalUrlName: name,
-      externalUrlValue: url,
-      externalUrlNewTab: newTab,
-      selectedItem,
-    })
-
     const isSimple = ['context_module_sub_header', 'external_url', 'external_tool'].includes(
       itemType,
     )
-    const isExistingItem = tabIndex === 0 && selectedItem
 
     try {
-      if (isSimple || isExistingItem) {
+      if (tabIndex === 0 && selectedItems.length > 0) {
+        const itemsData = selectedItems.map((selectedItem, index) => {
+          return prepareModuleItemData(moduleId, {
+            type: itemType,
+            itemCount: totalCount + index,
+            indentation,
+            quizEngine,
+            selectedTabIndex: tabIndex,
+            textHeaderValue: textHeader,
+            externalUrlName: '',
+            externalUrlValue: '',
+            externalUrlNewTab: false,
+            selectedItem,
+          })
+        })
+
+        const response = await submitModuleItems(courseId, moduleId, itemsData)
+
+        if (!response) {
+          showFlashError(I18n.t('Error adding items to module.'))()
+        } else if (response.errors && response.errors.length > 0) {
+          showFlashError(
+            I18n.t('Some items could not be added: %{errors}', {
+              errors: response.errors.map(e => e.message).join(', '),
+            }),
+          )()
+        }
+
+        queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+        queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, moduleId || '']})
+        queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
+
+        onRequestClose?.()
+        navigateToLastPage(moduleId, totalCount + selectedItems.length)
+      } else if (isSimple) {
+        const selectedItemId =
+          itemType === 'external_tool' ? state.externalTool.selectedToolId : state.selectedItemId
+
+        const selectedItem =
+          state.selectedItem || contentItems.find(item => item.id === selectedItemId) || null
+
+        const {name, url, newTab} = itemType === 'external_tool' ? externalTool : externalUrl
+
+        const itemData = prepareModuleItemData(moduleId, {
+          type: itemType,
+          itemCount: totalCount,
+          indentation,
+          quizEngine,
+          selectedTabIndex: tabIndex,
+          textHeaderValue: textHeader,
+          externalUrlName: name,
+          externalUrlValue: url,
+          externalUrlNewTab: newTab,
+          selectedItem,
+        })
+
         await submitItemData(courseId, moduleId, itemData, onRequestClose)
+        navigateToLastPage(moduleId, totalCount + 1)
       } else if (tabIndex === 1) {
         if (itemType !== 'file' || newItem.file) {
+          const selectedItemId =
+            itemType === 'external_tool' ? state.externalTool.selectedToolId : state.selectedItemId
+
+          const selectedItem =
+            state.selectedItem || contentItems.find(item => item.id === selectedItemId) || null
+
+          const {name, url, newTab} = itemType === 'external_tool' ? externalTool : externalUrl
+
+          const itemData = prepareModuleItemData(moduleId, {
+            type: itemType,
+            itemCount: totalCount,
+            indentation,
+            quizEngine,
+            selectedTabIndex: tabIndex,
+            textHeaderValue: textHeader,
+            externalUrlName: name,
+            externalUrlValue: url,
+            externalUrlNewTab: newTab,
+            selectedItem,
+          })
+
           await submitInlineItem({
             moduleId,
             itemType,
@@ -179,11 +249,10 @@ export function useAddModuleItem({
             itemData,
             onRequestClose,
           })
+
+          navigateToLastPage(moduleId, totalCount + 1)
         }
       }
-
-      // Navigate to the last page after adding an item
-      navigateToLastPage(moduleId, totalCount + 1)
     } finally {
       dispatch({type: 'SET_LOADING', value: false})
     }

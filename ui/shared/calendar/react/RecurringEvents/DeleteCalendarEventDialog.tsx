@@ -48,6 +48,7 @@ type Props = {
   readonly isSeriesHead: boolean
   readonly eventType: string
   readonly testIdPrefix?: string
+  readonly isAppointmentGroup?: boolean
 }
 
 const DeleteCalendarEventDialog = ({
@@ -61,6 +62,7 @@ const DeleteCalendarEventDialog = ({
   isSeriesHead,
   eventType,
   testIdPrefix,
+  isAppointmentGroup,
 }: Props) => {
   const [which, setWhich] = useState<Which>('one')
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
@@ -181,19 +183,25 @@ const DeleteCalendarEventDialog = ({
   }
 
   const renderOne = (): JSX.Element => {
-    return (
-      <Text>
-        {eventType === 'assignment'
-          ? I18n.t(
-              'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment.',
-            )
-          : subAssignmentOrOverride(eventType)
-            ? I18n.t(
-                'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment and other checkpoints associated with the assignment.',
-              )
-            : I18n.t('Are you sure you want to delete this event?')}
-      </Text>
-    )
+    let message: string
+
+    if (isAppointmentGroup) {
+      message = I18n.t(
+        'If you delete this appointment group, all course teachers will lose access, and all student signups will be permanently deleted.',
+      )
+    } else if (eventType === 'assignment') {
+      message = I18n.t(
+        'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment.',
+      )
+    } else if (subAssignmentOrOverride(eventType)) {
+      message = I18n.t(
+        'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment and other checkpoints associated with the assignment.',
+      )
+    } else {
+      message = I18n.t('Are you sure you want to delete this event?')
+    }
+
+    return <Text>{message}</Text>
   }
 
   return (
@@ -202,7 +210,7 @@ const DeleteCalendarEventDialog = ({
       onDismiss={handleCancel}
       onSubmit={handleDelete}
       size="small"
-      label={I18n.t('Confirm Deletion')}
+      label={isAppointmentGroup ? I18n.t('Delete for everyone?') : I18n.t('Confirm Deletion')}
       footer={renderFooter}
       data-testid={`${testIdPrefix || ''}dialog`}
     >

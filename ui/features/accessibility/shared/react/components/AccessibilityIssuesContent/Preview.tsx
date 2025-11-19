@@ -118,9 +118,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
     async (onSuccess?: () => void, onError?: (error?: string) => void) => {
       const base = getCourseBasedPath(`/accessibility`)
       const params = new URLSearchParams({
-        content_type: getAsContentItemType(itemType)!,
-        content_id: String(resourceId),
-        ...(issue.path && {path: issue.path}),
+        issue_id: issue.id,
       })
 
       await handleApiRequest(
@@ -134,7 +132,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
         onError,
       )
     },
-    [handleApiRequest, resourceId, itemType, issue.path],
+    [handleApiRequest, issue.id],
   )
 
   const performPostRequest = useCallback(

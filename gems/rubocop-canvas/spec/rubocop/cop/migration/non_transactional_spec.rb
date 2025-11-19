@@ -297,4 +297,108 @@ describe RuboCop::Cop::Migration::NonTransactional do
     RUBY
     expect(offenses.size).to eq(0)
   end
+
+  describe "#change_table" do
+    it "complains about if_not_exists" do
+      offenses = inspect_source(<<~RUBY)
+        class TestMigration < ActiveRecord::Migration
+          disable_ddl_transaction!
+
+          def up
+            change_table :table do |t|
+              t.integer :column, if_not_exists: true
+            end
+          end
+        end
+      RUBY
+      expect(offenses.size).to eq(1)
+      expect(offenses.first.message).to match(/if_not_exists/)
+      expect(offenses.first.message).to match(/unless/)
+      expect(offenses.first.severity.name).to eq(:error)
+    end
+
+    it "complains about missing unless" do
+      offenses = inspect_source(<<~RUBY)
+        class TestMigration < ActiveRecord::Migration
+          disable_ddl_transaction!
+
+          def up
+            change_table :table do |t|
+              t.integer :column
+            end
+          end
+        end
+      RUBY
+      expect(offenses.size).to eq(1)
+      expect(offenses.first.message).not_to match(/if_not_exists/)
+      expect(offenses.first.message).to match(/unless/)
+      expect(offenses.first.severity.name).to eq(:error)
+    end
+
+    it "does not complain with unless" do
+      offenses = inspect_source(<<~RUBY)
+        class TestMigration < ActiveRecord::Migration
+          disable_ddl_transaction!
+
+          def up
+            change_table :table do |t|
+              t.integer :column unless t.column_exists?(:column)
+            end
+          end
+        end
+      RUBY
+      expect(offenses.size).to eq(0)
+    end
+
+    it "complains about if_exists" do
+      offenses = inspect_source(<<~RUBY)
+        class TestMigration < ActiveRecord::Migration
+          disable_ddl_transaction!
+
+          def up
+            change_table :table do |t|
+              t.remove :remove, if_exists: true
+            end
+          end
+        end
+      RUBY
+      expect(offenses.size).to eq(1)
+      expect(offenses.first.message).to match(/if_exists/)
+      expect(offenses.first.message).to match(/if/)
+      expect(offenses.first.severity.name).to eq(:error)
+    end
+
+    it "complains about missing if" do
+      offenses = inspect_source(<<~RUBY)
+        class TestMigration < ActiveRecord::Migration
+          disable_ddl_transaction!
+
+          def up
+            change_table :table do |t|
+              t.remove :column
+            end
+          end
+        end
+      RUBY
+      expect(offenses.size).to eq(1)
+      expect(offenses.first.message).not_to match(/if_exists/)
+      expect(offenses.first.message).to match(/if/)
+      expect(offenses.first.severity.name).to eq(:error)
+    end
+
+    it "does not complain with if" do
+      offenses = inspect_source(<<~RUBY)
+        class TestMigration < ActiveRecord::Migration
+          disable_ddl_transaction!
+
+          def up
+            change_table :table do |t|
+              t.remove :column if t.column_exists?(:column)
+            end
+          end
+        end
+      RUBY
+      expect(offenses.size).to eq(0)
+    end
+  end
 end

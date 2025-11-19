@@ -721,5 +721,27 @@ PERMISSION_GROUPS = {
   view_advanced_analytics: {
     label: -> { I18n.t("Intelligent Insights") },
     subtitle: -> { I18n.t("ask your data / students in need / course readiness / financial aid") },
+  },
+  manage_rate_limiting: {
+    label: -> { I18n.t("Site Admin - Rate Limiting") },
+    subtitle: -> { I18n.t("add / edit / delete rate limits for external tools") },
+    account_details: [
+      { title: -> { I18n.t("Rate Limiting - add") },
+        description: -> { I18n.t("Allows user to create new rate limit settings for external tools and integrations.") } },
+      { title: -> { I18n.t("Rate Limiting - edit") },
+        description: -> { I18n.t("Allows user to modify existing rate limit settings, including changing rate limit values and comments.") } },
+      { title: -> { I18n.t("Rate Limiting - delete") },
+        description: -> { I18n.t("Allows user to remove rate limit settings for external tools and integrations.") } },
+      { title: -> { I18n.t("Rate Limiting - view") },
+        description: -> { I18n.t("Allows user to view all rate limit settings and their details.") } }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Site Admin Only") },
+        description: -> { I18n.t("This permission is only available to Site Admin users and requires the api_rate_limits feature flag to be enabled.") } },
+      { title: -> { I18n.t("External Tools") },
+        description: -> { I18n.t("Rate limiting settings apply to external tools and integrations that use OAuth client configurations with throttling parameters.") } },
+      { title: -> { I18n.t("UTID Integration") },
+        description: -> { I18n.t("This feature supports UTID (Unified Tool ID) based rate limiting for partner tools and products.") } }
+    ]
   }
 }.freeze

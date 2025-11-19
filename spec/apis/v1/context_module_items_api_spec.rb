@@ -869,6 +869,107 @@ describe "Module Items API", type: :request do
 
           expect(json["errors"]["completion_requirement"].count).to eq 1
         end
+
+        context "bulk creation with module_items" do
+          it "creates multiple module items" do
+            assignment1 = @course.assignments.create!(name: "Assignment 1", submission_types: ["online_text_entry"])
+            assignment2 = @course.assignments.create!(name: "Assignment 2", submission_types: ["online_text_entry"])
+            assignment3 = @course.assignments.create!(name: "Assignment 3", submission_types: ["online_text_entry"])
+
+            initial_count = @module1.content_tags.count
+
+            json = api_call(:post,
+                            "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                            { controller: "context_module_items_api",
+                              action: "create",
+                              format: "json",
+                              course_id: @course.id.to_s,
+                              module_id: @module1.id.to_s },
+                            { module_items: [
+                              { type: "Assignment", content_id: assignment1.id, indent: 0 },
+                              { type: "Assignment", content_id: assignment2.id, indent: 1 },
+                              { type: "Assignment", content_id: assignment3.id, indent: 0 }
+                            ] })
+
+            expect(json["created"]).to be_an(Array)
+            expect(json["created"].length).to eq 3
+            expect(json["created"][0]["title"]).to eq "Assignment 1"
+            expect(json["created"][1]["title"]).to eq "Assignment 2"
+            expect(json["created"][2]["title"]).to eq "Assignment 3"
+            expect(json["created"][1]["indent"]).to eq 1
+
+            @module1.reload
+            expect(@module1.content_tags.count).to eq initial_count + 3
+          end
+
+          it "returns partial success when some items fail" do
+            assignment1 = @course.assignments.create!(name: "Assignment 1", submission_types: ["online_text_entry"])
+            wiki_page = @course.wiki_pages.create!(title: "Valid Page")
+
+            json = api_call(:post,
+                            "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                            { controller: "context_module_items_api",
+                              action: "create",
+                              format: "json",
+                              course_id: @course.id.to_s,
+                              module_id: @module1.id.to_s },
+                            { module_items: [
+                              { type: "Assignment", content_id: assignment1.id },
+                              { type: "Page", page_url: "invalid_page_url" },
+                              { type: "Page", page_url: wiki_page.url }
+                            ] })
+
+            expect(json["created"]).to be_an(Array)
+            expect(json["created"].length).to eq 2
+            expect(json["errors"]).to be_an(Array)
+            expect(json["errors"].length).to eq 1
+            expect(json["errors"][0]["index"]).to eq 1
+            expect(json["errors"][0]["message"]).to include("invalid page_url")
+          end
+
+          it "returns all errors when all items fail" do
+            json = api_call(:post,
+                            "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                            { controller: "context_module_items_api",
+                              action: "create",
+                              format: "json",
+                              course_id: @course.id.to_s,
+                              module_id: @module1.id.to_s },
+                            { module_items: [
+                              { type: "Page", page_url: "invalid1" },
+                              { type: "Page", page_url: "invalid2" }
+                            ] })
+
+            expect(json["created"]).to be_an(Array)
+            expect(json["created"].length).to eq 0
+            expect(json["errors"]).to be_an(Array)
+            expect(json["errors"].length).to eq 2
+          end
+
+          it "wraps operations in a transaction" do
+            assignment1 = @course.assignments.create!(name: "Assignment 1", submission_types: ["online_text_entry"])
+
+            initial_count = @module1.content_tags.count
+
+            allow_any_instance_of(ContentTag).to receive(:save).and_return(true)
+            allow_any_instance_of(ContentTag).to receive(:persisted?).and_return(true, false)
+
+            api_call(:post,
+                     "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                     { controller: "context_module_items_api",
+                       action: "create",
+                       format: "json",
+                       course_id: @course.id.to_s,
+                       module_id: @module1.id.to_s },
+                     { module_items: [
+                       { type: "Assignment", content_id: assignment1.id },
+                       { type: "Assignment", content_id: assignment1.id }
+                     ] })
+
+            @module1.reload
+            expect(@module1.content_tags.count).to be >= initial_count
+          end
+        end
       end
     end
 

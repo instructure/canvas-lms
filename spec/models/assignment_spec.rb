@@ -40,6 +40,11 @@ describe Assignment do
     expect(assignment.lti_context_id).to be_present
   end
 
+  it "defaults peer_review_submission_required to false" do
+    assignment = @course.assignments.create!(assignment_valid_attributes)
+    expect(assignment.peer_review_submission_required).to be false
+  end
+
   it "has a useful state machine" do
     assignment_model(course: @course)
     expect(@a.state).to be(:published)
@@ -1346,6 +1351,23 @@ describe Assignment do
         end
       end
     end
+
+    context "when anonymous_participants is used" do
+      it "students should be anonym" do
+        @assignment.settings = { "new_quizzes" => { "anonymous_participants" => true } }
+        expect(@assignment).to be_anonymize_students
+      end
+
+      it "students should not be anonym" do
+        @assignment.settings = { "new_quizzes" => { "anonymous_participants" => false } }
+        expect(@assignment).not_to be_anonymize_students
+      end
+
+      it "nil should be handled gracefully" do
+        @assignment.settings = { "new_quizzes" => { "anonymous_participants" => nil } }
+        expect(@assignment).not_to be_anonymize_students
+      end
+    end
   end
 
   describe "#can_read_assignment?" do
@@ -1803,6 +1825,16 @@ describe Assignment do
       expect(new_assignment.peer_reviews_assigned).to be false
     end
 
+    it "copies peer_review_submission_required value" do
+      assignment = @course.assignments.create!(title: "test assignment", points_possible: 100)
+      assignment.update!(peer_review_submission_required: true)
+
+      new_assignment = assignment.duplicate
+      new_assignment.save!
+
+      expect(new_assignment.peer_review_submission_required).to be true
+    end
+
     context "with an assignment that can't be duplicated" do
       let(:assignment) { @course.assignments.create!(assignment_valid_attributes) }
 
@@ -2191,6 +2223,36 @@ describe Assignment do
         duplicating_assignment.finish_duplicating
         expect(duplicating_assignment.workflow_state).to eq "unpublished"
       end
+
+      context "with course_copy_alignments feature flag enabled" do
+        before do
+          @course.root_account.enable_feature!(:course_copy_alignments)
+        end
+
+        it "sets workflow_state to outcome_alignment_cloning" do
+          expect(duplicating_assignment.workflow_state).to eq "duplicating"
+          expect(duplicating_assignment).to receive(:start_outcome_alignment_service_clone)
+          duplicating_assignment.finish_duplicating
+          expect(duplicating_assignment.workflow_state).to eq "outcome_alignment_cloning"
+        end
+
+        it "calls start_outcome_alignment_service_clone" do
+          expect(duplicating_assignment).to receive(:start_outcome_alignment_service_clone)
+          duplicating_assignment.finish_duplicating
+        end
+      end
+
+      context "with course_copy_alignments feature flag disabled" do
+        before do
+          @course.root_account.disable_feature!(:course_copy_alignments)
+        end
+
+        it "sets workflow_state to unpublished without calling outcomes service" do
+          expect(duplicating_assignment).not_to receive(:start_outcome_alignment_service_clone)
+          duplicating_assignment.finish_duplicating
+          expect(duplicating_assignment.workflow_state).to eq "unpublished"
+        end
+      end
     end
 
     describe ".fail_to_duplicate" do
@@ -2209,6 +2271,86 @@ describe Assignment do
         duplicating_assignment.finish_duplicating
         expect(duplicating_assignment.workflow_state).to eq "unpublished"
       end
+    end
+  end
+
+  describe "#start_outcome_alignment_service_clone" do
+    let(:original_course) { course_factory }
+    let(:original_assignment) { original_course.assignments.create!(assignment_valid_attributes) }
+    let(:new_course) { course_factory }
+    let(:duplicated_assignment) do
+      new_course.assignments.create!(
+        workflow_state: "outcome_alignment_cloning",
+        duplicate_of: original_assignment,
+        **assignment_valid_attributes
+      )
+    end
+
+    before do
+      allow(OutcomesService::Service).to receive(:start_outcome_alignment_service_clone)
+    end
+
+    context "when duplicate_of and context are present" do
+      it "calls delay_if_production with LOW_PRIORITY and call_outcome_alignment_service_clone" do
+        delayed_object = double("delayed")
+        expect(duplicated_assignment).to receive(:delay_if_production).with(priority: Delayed::LOW_PRIORITY).and_return(delayed_object)
+        expect(delayed_object).to receive(:call_outcome_alignment_service_clone)
+        duplicated_assignment.send(:start_outcome_alignment_service_clone)
+      end
+
+      it "logs error and sets failed state when exception occurs" do
+        allow(duplicated_assignment).to receive(:delay_if_production).and_raise(StandardError.new("API Error"))
+        expect(Rails.logger).to receive(:error).with("Failed to start outcome alignment service clone: API Error")
+        expect(duplicated_assignment).to receive(:save)
+
+        duplicated_assignment.send(:start_outcome_alignment_service_clone)
+        expect(duplicated_assignment.workflow_state).to eq "failed_to_clone_outcome_alignment"
+      end
+    end
+
+    context "when duplicate_of is missing" do
+      let(:assignment_without_duplicate) { new_course.assignments.create!(assignment_valid_attributes) }
+
+      it "does not call outcomes service" do
+        expect(assignment_without_duplicate).not_to receive(:delay_if_production)
+        assignment_without_duplicate.send(:start_outcome_alignment_service_clone)
+      end
+    end
+
+    context "when context is missing" do
+      let(:assignment_without_context) do
+        Assignment.new(duplicate_of: original_assignment, **assignment_valid_attributes)
+      end
+
+      it "does not call outcomes service" do
+        expect(assignment_without_context).not_to receive(:delay_if_production)
+        assignment_without_context.send(:start_outcome_alignment_service_clone)
+      end
+    end
+  end
+
+  describe "#call_outcome_alignment_service_clone" do
+    let(:original_course) { course_factory }
+    let(:original_assignment) { original_course.assignments.create!(assignment_valid_attributes) }
+    let(:new_course) { course_factory }
+    let(:duplicated_assignment) do
+      new_course.assignments.create!(
+        workflow_state: "outcome_alignment_cloning",
+        duplicate_of: original_assignment,
+        **assignment_valid_attributes
+      )
+    end
+
+    it "calls OutcomesService::Service.start_outcome_alignment_service_clone with correct parameters" do
+      expect(OutcomesService::Service).to receive(:start_outcome_alignment_service_clone).with(
+        duplicated_assignment.context,
+        original_assignment_id: original_assignment.id,
+        copied_assignment_id: duplicated_assignment.id,
+        new_context_id: new_course.id,
+        original_context_id: original_course.id
+      )
+
+      duplicated_assignment.send(:call_outcome_alignment_service_clone)
     end
   end
 
@@ -12875,6 +13017,13 @@ describe Assignment do
       expect(@assignment.peer_review_count).to eq 0
       expect(@assignment.automatic_peer_reviews).to be false
     end
+
+    it "allows assignment deletion" do
+      @assignment = assignment_model(course: @course)
+      @assignment.destroy
+      expect(@assignment.workflow_state).to eq("deleted")
+      expect(@assignment.reload.workflow_state).to eq("deleted")
+    end
   end
 
   describe "rubric_self_assessment_enabled?" do
@@ -13190,6 +13339,96 @@ describe Assignment do
         expect(@assignment.settings).to eq({ "new_quizzes" => { "other_key" => "other_value", "type" => "graded_survey" } })
         expect(@assignment).to be_valid
       end
+    end
+  end
+
+  describe "anonymous_participants?" do
+    before :once do
+      assignment_model(submission_types: "online_quiz", course: @course)
+      tool = @c.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+      @assignment.external_tool_tag_attributes = { content: tool }
+      @assignment.quiz_lti! && @assignment.save!
+    end
+
+    it "returns false when settings is nil" do
+      @assignment.settings = nil
+      expect(@assignment.anonymous_participants?).to be false
+    end
+
+    it "returns false when settings exists but new_quizzes key does not exist" do
+      @assignment.settings = {}
+      expect(@assignment.anonymous_participants?).to be false
+    end
+
+    it "returns false when new_quizzes exists but anonymous_participants does not exist" do
+      @assignment.settings = { "new_quizzes" => {} }
+      expect(@assignment.anonymous_participants?).to be false
+    end
+
+    it "returns true when anonymous_participants is set to true" do
+      @assignment.settings = { "new_quizzes" => { "anonymous_participants" => true } }
+      expect(@assignment.anonymous_participants?).to be true
+    end
+
+    it "returns false when anonymous_participants is set to false" do
+      @assignment.settings = { "new_quizzes" => { "anonymous_participants" => false } }
+      expect(@assignment.anonymous_participants?).to be false
+    end
+  end
+
+  describe "anonymous_participants=" do
+    before :once do
+      assignment_model(submission_types: "online_quiz", course: @course)
+      tool = @c.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+      @assignment.external_tool_tag_attributes = { content: tool }
+      @assignment.quiz_lti! && @assignment.save!
+    end
+
+    it "sets the settings->new_quizzes->anonymous_participants attribute when settings is nil" do
+      @assignment.settings = nil
+      @assignment.anonymous_participants = true
+      expect(@assignment.anonymous_participants?).to be true
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "anonymous_participants" => true } })
+    end
+
+    it "sets the settings->new_quizzes->anonymous_participants attribute when new_quizzes key does not exist" do
+      @assignment.settings = {}
+      @assignment.anonymous_participants = true
+      expect(@assignment.anonymous_participants?).to be true
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "anonymous_participants" => true } })
+    end
+
+    it "sets the settings->new_quizzes->anonymous_participants attribute when new_quizzes key already exists and empty" do
+      @assignment.settings = { "new_quizzes" => nil }
+      @assignment.anonymous_participants = false
+      expect(@assignment.anonymous_participants?).to be false
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "anonymous_participants" => false } })
+    end
+
+    it "leaves the existing other keys in tact" do
+      @assignment.settings = { "another_key" => 123, "new_quizzes" => { "other_key" => "other_value" } }
+      @assignment.anonymous_participants = true
+      expect(@assignment.anonymous_participants?).to be true
+      expect(@assignment.settings).to eq({ "another_key" => 123, "new_quizzes" => { "other_key" => "other_value", "anonymous_participants" => true } })
+    end
+
+    it "overwrites existing anonymous_participants with new value" do
+      @assignment.settings = { "new_quizzes" => { "anonymous_participants" => false, "other_key" => "other_value" } }
+      @assignment.anonymous_participants = true
+      expect(@assignment.anonymous_participants?).to be true
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "other_key" => "other_value", "anonymous_participants" => true } })
     end
   end
 

@@ -293,7 +293,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
     })
 
     if (!data.name || $.trim(data.name.toString()).length === 0) {
-      errors['assignment[name]'] = [{message: I18n.t('name_is_required', 'Name is required!')}]
+      errors['assignment[name]'] = [{message: I18n.t('title_is_required', 'Title is required!')}]
     } else if (validationHelper.nameTooLong()) {
       errors['assignment[name]'] = [
         {

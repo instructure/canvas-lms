@@ -22,11 +22,17 @@ import apiClient, {
   DEFAULT_BLUEPRINT_ASSOCIATED_PARAM,
   DEFAULT_TERM_INCLUDE_PARAM,
   DEFAULT_TEACHERS_INCLUDE_PARAM,
+  DEFAULT_CONCLUDED_INCLUDE_PARAM,
   DEFAULT_TEACHERS_LIMIT_PARAM,
 } from '../apiClient'
 import axios from '@canvas/axios'
 
-jest.mock('@canvas/axios')
+jest.mock('@canvas/axios', () => ({
+  __esModule: true,
+  default: {
+    get: jest.fn(),
+  },
+}))
 
 const mockBaseDomain = 'http://canvas.docker'
 const accountParams = {accountId: 1}
@@ -36,11 +42,17 @@ const getCourseParams = {
 }
 
 describe('Blueprint Course apiClient', () => {
+  beforeEach(() => {
+    axios.get = jest.fn()
+  })
+
   afterEach(() => {
     jest.clearAllMocks()
   })
 
   test('getCourse generated uri', async () => {
+    window.ENV = {FEATURES: {ux_list_concluded_courses_in_bp: true}}
+
     axios.get.mockResolvedValue({
       data: [],
       headers: {
@@ -57,6 +69,7 @@ describe('Blueprint Course apiClient', () => {
     expect(url.searchParams.get('blueprint_associated')).toBe(DEFAULT_BLUEPRINT_ASSOCIATED_PARAM)
     expect(url.searchParams.getAll('include[]')[0]).toBe(DEFAULT_TERM_INCLUDE_PARAM)
     expect(url.searchParams.getAll('include[]')[1]).toBe(DEFAULT_TEACHERS_INCLUDE_PARAM)
+    expect(url.searchParams.getAll('include[]')[2]).toBe(DEFAULT_CONCLUDED_INCLUDE_PARAM)
     expect(url.searchParams.get('teacher_limit')).toBe(DEFAULT_TEACHERS_LIMIT_PARAM)
     expect(url.searchParams.get('search_term')).toBe(getCourseParams.search)
     expect(url.searchParams.get('enrollment_term_id')).toBe(getCourseParams.term)

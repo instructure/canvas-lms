@@ -363,7 +363,7 @@ class PageViewsController < ApplicationController
   #   The end date for the page views query in YYYY-MM-DD format. Must be the first day of a month and after start_date.
   #
   # @argument results_format [String]
-  #   The desired format for the query results. Supported formats: "csv", "json"
+  #   The desired format for the query results. Supported formats: "csv", "jsonl"
   #
   # @returns AsyncQueryResponse
   # @returns AsyncApiErrorResponse
@@ -394,17 +394,21 @@ class PageViewsController < ApplicationController
   #     "error": "Page Views rate limit exceeded. Please wait and try again."
   #   }
   def query
-    @user = api_find(User, params[:user_id])
+    user_id, start_date, end_date, results_format = params.require(%i[user_id start_date end_date results_format])
+    @user = api_find(User, user_id)
     return unless authorized_action(@user, @current_user, :view_statistics)
 
     query_id = pv5_enqueue_service.call(
-      params[:start_date],
-      params[:end_date],
+      start_date,
+      end_date,
       @user,
-      params[:results_format]
+      results_format
     )
     poll_url = api_v1_page_views_poll_query_status_path(query_id:)
     render json: { poll_url: }, status: :created
+  rescue ActionController::ParameterMissing => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("Parameter %{param} is missing.", param: e.param) }, status: :bad_request
   rescue ArgumentError => e
     Canvas::Errors.capture_exception(:pv5, e, :warn)
     render json: { error: t("Page Views received an invalid or malformed request.") }, status: :bad_request

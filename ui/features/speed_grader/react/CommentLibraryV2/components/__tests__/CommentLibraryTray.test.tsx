@@ -22,7 +22,7 @@ import {MockedProvider} from '@apollo/client/testing'
 import {InMemoryCache} from '@apollo/client'
 import {CommentLibraryTray} from '../CommentLibraryTray'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import {SpeedGrader_CommentBankItems} from '../../graphql/queries'
+import {SpeedGraderLegacy_CommentBankItems} from '../../graphql/queries'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
@@ -53,7 +53,7 @@ describe('CommentLibraryTray', () => {
     after?: string
   } = {}) => ({
     request: {
-      query: SpeedGrader_CommentBankItems,
+      query: SpeedGraderLegacy_CommentBankItems,
       variables: {userId, courseId, first: 20, after},
     },
     result: {
@@ -228,7 +228,7 @@ describe('CommentLibraryTray', () => {
       const mocks = [
         {
           request: {
-            query: SpeedGrader_CommentBankItems,
+            query: SpeedGraderLegacy_CommentBankItems,
             variables: {userId: '1', courseId: '1', first: 5, after: ''},
           },
           error: new Error('GraphQL error'),

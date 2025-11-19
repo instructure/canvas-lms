@@ -52,6 +52,7 @@ export default function PeerReviewDetailsView({
       <Flex.Item>
         <PeerReviewAllocationRulesTray
           assignmentId={assignment.id}
+          requiredPeerReviewsCount={assignment.peerReviews?.count || 1}
           canEdit={canEdit}
           isTrayOpen={showRuleTray}
           closeTray={() => setShowRuleTray(false)}

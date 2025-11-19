@@ -312,6 +312,71 @@ export const submitModuleItem = async (
   }
 }
 
+const transformToApiFormat = (
+  itemData: Record<string, string | number | string[] | undefined | boolean>,
+): Record<string, string | number | boolean | undefined> => {
+  const apiData: Record<string, string | number | boolean | undefined> = {}
+
+  Object.entries(itemData).forEach(([key, value]) => {
+    if (value === undefined) return
+
+    if (key === 'item[id]') {
+      apiData.content_id = value as string | number
+    } else if (key === 'item[type]') {
+      apiData.type = value as string
+    } else if (key === 'item[title]') {
+      apiData.title = value as string
+    } else if (key === 'item[position]') {
+      apiData.position = value as number
+    } else if (key === 'item[indent]') {
+      apiData.indent = value as number
+    } else if (key === 'item[url]') {
+      apiData.external_url = value as string
+    } else if (key === 'item[new_tab]') {
+      apiData.new_tab = value as string | boolean
+    }
+  })
+
+  return apiData
+}
+
+export const submitModuleItems = async (
+  courseId: string,
+  moduleId: string,
+  itemsData: Array<Record<string, string | number | string[] | undefined | boolean>>,
+): Promise<{
+  created: Record<string, any>[]
+  errors?: Array<{index: number; message: string}>
+} | null> => {
+  try {
+    const formData = new FormData()
+
+    itemsData.forEach((itemData, index) => {
+      const apiData = transformToApiFormat(itemData)
+
+      Object.entries(apiData).forEach(([key, value]) => {
+        if (value !== undefined) {
+          formData.append(`module_items[][${key}]`, String(value))
+        }
+      })
+    })
+
+    const response = await doFetchApi({
+      path: `/api/v1/courses/${courseId}/modules/${moduleId}/items`,
+      method: 'POST',
+      body: formData,
+    })
+
+    return response.json as {
+      created: Record<string, any>[]
+      errors?: Array<{index: number; message: string}>
+    }
+  } catch (error) {
+    console.error('Error submitting module items:', error)
+    return null
+  }
+}
+
 export function sharedHandleFileDrop(
   accepted: ArrayLike<File | DataTransferItem>,
   {

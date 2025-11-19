@@ -1691,6 +1691,7 @@ ko:
     titles: 
       assignment_rubric_details: "과제 루브릭 세부 정보"
   assignment_976578a8: 과제
+  assignment_details_bc488179: "과제 세부 정보"
   assignment_details_dialog: 
     average_score: "평균 점수:"
     count_of_submissions: "제출물 %{cnt}개"
@@ -6205,6 +6206,7 @@ ko:
   full_article_9296bb6f: "전체 기사"
   gathering_files_933551d9: "파일 수집 중..."
   general_answer_comments_730136ba: "일반 답변 의견"
+  generate_44e33e72: 생성
   generate_token_393ab5b4: "토큰 생성"
   generating_token_42c29663: "토큰 생성 중..."
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "아래에 평점 값을 입력해서 모든 학생에게 *%{assignment.name}*에 대한 동일한 평점을 주십시오:"
@@ -12468,6 +12470,7 @@ ko:
   running_totals_d6f45b6b: "누적 합계"
   save_11a80ec3: 저장
   save_alert_b64f9fa3: "알림 저장"
+  save_changes_a63787eb: "변경 내용 저장"
   save_key_b4dede06: "키 저장"
   save_login_bba1272: "로그인 저장"
   save_settings_cafe79a5: "설정 저장"
@@ -13602,6 +13605,7 @@ ko:
       graded: 평가됨
       submitted: 제출됨
       unsubmitted: "제출 안 됨"
+  submission_7ca566e1: 제출물
   submission_action_take_quiz: "%{title} 보기"
   submission_action_turn_in_assignment: "%{title} 제출"
   submission_comment: 

@@ -24,7 +24,18 @@ class InstAccessSupport
     if conf
       service_jwks = JSON::JWK::Set.new
       conf[:service_keys]&.each do |kid, key|
-        service_jwks << JSON::JWK.new(kid: kid.to_s, k: key[:secret], kty: key[:key_type]) if key[:secret] && key[:key_type]
+        key_type = key[:key_type]
+        base_jwk = { kid: kid.to_s, kty: key[:key_type] }
+
+        service_jwks <<
+          case key_type
+          when "oct"
+            JSON::JWK.new(**base_jwk, k: key[:secret])
+          when "RSA"
+            JSON::JWK.new(**base_jwk, **key.slice(:n, :e))
+          else
+            raise ArgumentError, "Key type #{key[:key_type].inspect} not supported for InstAccess Token"
+          end
       end
 
       InstAccess.configure(

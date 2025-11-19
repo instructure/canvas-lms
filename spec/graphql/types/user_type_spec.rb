@@ -3451,4 +3451,118 @@ describe Types::UserType do
       expect(assignment_names).not_to include("Other Assignment")
     end
   end
+
+  describe "peer_review_status field" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        points_possible: 10,
+        peer_reviews: true,
+        peer_review_count: 2
+      )
+      @student1 = user_factory(name: "Student One")
+      @student2 = user_factory(name: "Student Two")
+
+      @course.enroll_student(@student1, enrollment_state: "active")
+      @course.enroll_student(@student2, enrollment_state: "active")
+
+      @course.enable_feature!(:peer_review_allocation)
+
+      AllocationRule.create!(
+        assignment: @assignment,
+        course: @course,
+        assessor: @student1,
+        assessee: @student2,
+        must_review: true
+      )
+
+      submission1 = @assignment.submit_homework(@student1, {
+                                                  submission_type: "online_text_entry",
+                                                  body: "Student 1 submission"
+                                                })
+      submission2 = @assignment.submit_homework(@student2, {
+                                                  submission_type: "online_text_entry",
+                                                  body: "Student 2 submission"
+                                                })
+      AssessmentRequest.create!(
+        asset: submission2,
+        assessor_asset: submission1,
+        user: @student2,
+        assessor: @student1,
+        workflow_state: "completed"
+      )
+    end
+
+    it "loads peer review status using the loader" do
+      user_type_tester = GraphQLTypeTester.new(
+        @student1,
+        current_user: @teacher,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create,
+        assignment_id: @assignment.id
+      )
+
+      must_review_count = user_type_tester.resolve("peerReviewStatus { mustReviewCount }")
+      completed_reviews_count = user_type_tester.resolve("peerReviewStatus { completedReviewsCount }")
+      expect(must_review_count).to eq(1)
+      expect(completed_reviews_count).to eq(1)
+    end
+
+    it "returns nil when assignment_id is not in context" do
+      user_type_tester = GraphQLTypeTester.new(
+        @student1,
+        current_user: @teacher,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+
+      result = user_type_tester.resolve("peerReviewStatus { mustReviewCount }")
+      expect(result).to be_nil
+    end
+
+    context "with permission and feature checks" do
+      it "returns nil when user lacks grade permission" do
+        student_type_tester = GraphQLTypeTester.new(
+          @student1,
+          current_user: @student2,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create,
+          assignment_id: @assignment.id
+        )
+
+        result = student_type_tester.resolve("peerReviewStatus { mustReviewCount }")
+        expect(result).to be_nil
+      end
+
+      it "returns nil when feature is not enabled" do
+        @assignment.context.disable_feature!(:peer_review_allocation)
+
+        user_type_tester = GraphQLTypeTester.new(
+          @student1,
+          current_user: @teacher,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create,
+          assignment_id: @assignment.id
+        )
+
+        result = user_type_tester.resolve("peerReviewStatus { mustReviewCount }")
+        expect(result).to be_nil
+      end
+
+      it "returns nil when peer reviews are not enabled on assignment" do
+        @assignment.update!(peer_reviews: false)
+
+        user_type_tester = GraphQLTypeTester.new(
+          @student1,
+          current_user: @teacher,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create,
+          assignment_id: @assignment.id
+        )
+        result = user_type_tester.resolve("peerReviewStatus { mustReviewCount }")
+        expect(result).to be_nil
+      end
+    end
+  end
 end

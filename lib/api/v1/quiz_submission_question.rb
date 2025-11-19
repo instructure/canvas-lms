@@ -44,11 +44,12 @@ module Api::V1::QuizSubmissionQuestion
       data[:quiz_questions] = questions_json(quiz_questions,
                                              meta[:user],
                                              meta[:session],
-                                             nil,
-                                             [],
-                                             meta[:censored],
-                                             quiz_submission.quiz_data,
-                                             shuffle_answers: meta[:shuffle_answers])
+                                             context: nil,
+                                             includes: [],
+                                             censored: meta[:censored],
+                                             quiz_data: quiz_submission.quiz_data,
+                                             shuffle_answers: meta[:shuffle_answers],
+                                             location: "quiz_submission_#{quiz_submission.id}")
     end
 
     unless includes.empty?
@@ -91,11 +92,12 @@ module Api::V1::QuizSubmissionQuestion
     data = question_json(qq,
                          meta[:user],
                          meta[:session],
-                         nil,
-                         meta[:includes],
-                         meta[:censored],
-                         qs[:quiz_data],
-                         shuffle_answers: meta[:shuffle_answers])
+                         context: nil,
+                         includes: meta[:includes],
+                         censored: meta[:censored],
+                         quiz_data: qs[:quiz_data],
+                         shuffle_answers: meta[:shuffle_answers],
+                         location: "quiz_submission_#{qs.id}")
 
     if qs.submission_data.is_a? Hash # ungraded
       data[:flagged] = to_boolean(qs.submission_data["question_#{qq.id}_marked"])

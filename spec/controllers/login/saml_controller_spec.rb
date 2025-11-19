@@ -740,7 +740,7 @@ describe Login::SamlController do
           message, = SAML2::Bindings::HTTPRedirect.decode(response.location)
           expect(message).to be_a(SAML2::LogoutResponse)
           expect(message.status).not_to be_a_success
-          expect(message.status.message).to eql ["No current session"]
+          expect(message.status.message).to eql "No current session"
         end
 
         it "redirects an error response to idp if a different user is logged in" do
@@ -760,7 +760,7 @@ describe Login::SamlController do
           message, = SAML2::Bindings::HTTPRedirect.decode(response.location)
           expect(message).to be_a(SAML2::LogoutResponse)
           expect(message.status).not_to be_a_success
-          expect(message.status.message).to eql ["NameID does not match current session"]
+          expect(message.status.message).to eql "NameID does not match current session"
         end
 
         it "redirects a response to idp on logout with a SAMLRequest parameter" do

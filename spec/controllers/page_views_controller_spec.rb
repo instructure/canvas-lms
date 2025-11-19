@@ -76,7 +76,7 @@ describe PageViewsController do
       Setting.set("enable_page_views", true)
     end
 
-    include_examples "GET 'index' as csv"
+    it_behaves_like "GET 'index' as csv"
   end
 
   context "pv4" do
@@ -193,12 +193,23 @@ describe PageViewsController do
 
         post "query", params: {
           user_id: @user.id,
-          year: 2025,
-          month: 2,
-          format: :jsonl
+          start_date: "2025-02-01",
+          end_date: "2025-03-01",
+          results_format: :jsonl
         }
 
         expect(response).to be_successful
+      end
+
+      it "returns 400 Bad Request response when required parameters are missing" do
+        post "query", params: {
+          user_id: @user.id,
+          start_time: "2024-12-01", # should be start_date and end_date
+          end_time: "2025-01-10",
+          results_format: :jsonl
+        }
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Parameter start_date is missing.")
       end
 
       it "returns a 400 Bad Request response when the request is invalid" do
@@ -218,9 +229,9 @@ describe PageViewsController do
 
         post "query", params: {
           user_id: @user.id,
-          year: 2025,
-          month: 2,
-          format: :jsonl
+          start_date: "2024-01-01",
+          end_date: "2024-02-01",
+          results_format: :jsonl
         }
 
         expect(response).to have_http_status(:too_many_requests)

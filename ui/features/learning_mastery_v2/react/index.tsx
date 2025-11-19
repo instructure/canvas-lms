@@ -20,6 +20,7 @@ import React, {useState, useCallback} from 'react'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {Gradebook} from './components/Gradebook'
 import useRollups from './hooks/useRollups'
 import LMGBContext, {
@@ -28,12 +29,13 @@ import LMGBContext, {
 } from '@canvas/outcomes/react/contexts/LMGBContext'
 import {FilterWrapper} from './components/filters/FilterWrapper'
 import {Toolbar} from './components/toolbar/Toolbar'
-import {getSearchParams, setSearchParams} from './utils/ManageURLSearchParams'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import {GradebookSettings} from './utils/constants'
+import {GradebookSettings, NameDisplayFormat} from './utils/constants'
 import {saveLearningMasteryGradebookSettings} from './apiClient'
 import {useGradebookSettings} from './hooks/useGradebookSettings'
+
+const queryClient = new QueryClient()
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -66,20 +68,14 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     outcomes,
     rollups,
     pagination,
-    currentPage,
     setCurrentPage,
-    studentsPerPage,
-    setStudentsPerPage,
     sorting,
   } = useRollups({
     courseId,
     accountMasteryScalesEnabled: accountLevelMasteryScalesFF ?? false,
     enabled: !isLoadingSettings,
     settings: gradebookSettings,
-    ...getSearchParams(),
   })
-
-  setSearchParams(currentPage, studentsPerPage, sorting)
 
   const handleGradebookSettingsChange = useCallback(
     async (settings: GradebookSettings) => {
@@ -105,6 +101,23 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     [courseId, updateSettings],
   )
 
+  const handleNameDisplayFormatChange = useCallback(
+    async (format: NameDisplayFormat) => {
+      const newSettings = {...gradebookSettings, nameDisplayFormat: format}
+      await handleGradebookSettingsChange(newSettings)
+    },
+    [gradebookSettings, handleGradebookSettingsChange],
+  )
+
+  const handleUpdateStudentsPerPage = useCallback(
+    async (studentsPerPage: number) => {
+      const newSettings = {...gradebookSettings, studentsPerPage}
+
+      handleGradebookSettingsChange(newSettings)
+    },
+    [gradebookSettings, handleGradebookSettingsChange],
+  )
+
   const renderBody = () => {
     if (error !== null)
       return (
@@ -126,24 +139,27 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
         setCurrentPage={setCurrentPage}
         sorting={sorting}
         gradebookSettings={gradebookSettings}
+        onChangeNameDisplayFormat={handleNameDisplayFormatChange}
         data-testid="gradebook-body"
       />
     )
   }
 
   return (
-    <LMGBContext.Provider value={contextValues}>
-      <Toolbar
-        courseId={courseId}
-        contextURL={contextURL}
-        showDataDependentControls={error === null && !isLoadingSettings}
-        gradebookSettings={gradebookSettings}
-        setGradebookSettings={handleGradebookSettingsChange}
-        isSavingSettings={isSavingSettings}
-      />
-      <FilterWrapper pagination={pagination} onPerPageChange={setStudentsPerPage} />
-      {renderBody()}
-    </LMGBContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <LMGBContext.Provider value={contextValues}>
+        <Toolbar
+          courseId={courseId}
+          contextURL={contextURL}
+          showDataDependentControls={error === null && !isLoadingSettings}
+          gradebookSettings={gradebookSettings}
+          setGradebookSettings={handleGradebookSettingsChange}
+          isSavingSettings={isSavingSettings}
+        />
+        <FilterWrapper pagination={pagination} onPerPageChange={handleUpdateStudentsPerPage} />
+        {renderBody()}
+      </LMGBContext.Provider>
+    </QueryClientProvider>
   )
 }
 

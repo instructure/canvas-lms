@@ -46,9 +46,13 @@ export type BlockContentEditorStore = {
     nodeId: string | null
   }
   aiAltTextGenerationURL: string | null
+  toolbarReorder: boolean
 }
 
-export const createStore = (props: {aiAltTextGenerationURL: string | null}) =>
+export const createStore = (props: {
+  aiAltTextGenerationURL: string | null
+  toolbarReorder: boolean
+}) =>
   configureStore<BlockContentEditorStore>({
     addBlockModal: {
       isOpen: false,
@@ -75,6 +79,7 @@ export const createStore = (props: {aiAltTextGenerationURL: string | null}) =>
       nodeId: null,
     },
     aiAltTextGenerationURL: props.aiAltTextGenerationURL,
+    toolbarReorder: props.toolbarReorder ?? false,
   })
 
 export const useAppSelector = useSelector.withType<BlockContentEditorStore>()

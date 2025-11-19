@@ -125,5 +125,28 @@ describe CanvasSecurity::JWTWorkflow do
         expect(state[:use_high_contrast]).to be false
       end
     end
+
+    describe ":scone" do
+      it "sets can_manage_course to true when user has manage rights" do
+        expect(@c).to receive(:grants_right?).with(@u, :manage).and_return(true)
+        state = described_class.state_for(%i[scone], @c, @u)
+        expect(state[:can_manage_course]).to be true
+      end
+
+      it "sets can_manage_course to false when user does not have manage rights" do
+        expect(@c).to receive(:grants_right?).with(@u, :manage).and_return(false)
+        state = described_class.state_for(%i[scone], @c, @u)
+        expect(state[:can_manage_course]).to be false
+      end
+
+      it "returns empty hash when context is not a Course" do
+        state = described_class.state_for(%i[scone], @a, @u)
+        expect(state).to be_empty
+      end
+
+      it "requires a context" do
+        expect(CanvasSecurity::JWTWorkflow.workflow_requires_context?(:scone)).to be true
+      end
+    end
   end
 end
