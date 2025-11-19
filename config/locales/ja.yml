@@ -5181,7 +5181,7 @@ ja:
     edit: 
       edit_assignment: 課題の編集
       links: 
-        add_rubric: ルービック
+        add_rubric: ルーブリック
     edit_header_view: 
       buttons: 
         not_published: 未公開
@@ -6057,13 +6057,13 @@ ja:
   available_date_must_be_before_the_until_date_9ccc52b: 「利用可能日」は、「終了日」の日付の前でなければなりません
   available_folders_694d0436: 使用可能なフォルダ
   available_for_24e90749: 利用可能な対象：
-  available_from_587ce92f: 開始日時
+  available_from_587ce92f: 公開日時
   available_from_availabledate_b8cb93ef: "%{availableDate}から利用可能"
   available_from_availabledate_until_untildate_f27b70aa: "%{availableDate}から%{untilDate}まで利用可能"
   available_from_date_43b5e11d: 利用可能期間の開始日付
   available_from_date_afc594fa: "日付から利用可能:"
   available_from_date_must_precede_available_until_c9f9e533: 「この日から利用可能」日は、「この日まで利用可能」日の前でなければなりません
-  available_from_f84e4611: 開始日時
+  available_from_f84e4611: 公開日時
   available_from_field_for_styleguide_7ced3861: スタイルガイドの欄から使用できます
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "次の日付けから- このような形式で YYYY-MM-DD hh:mm"
   available_from_from_date_a76800e7: "%{from_date}から利用可能"
@@ -13190,7 +13190,7 @@ ja:
   due_date_2c6e4cfb: "期限%{date}"
   due_date_5d0a953c: "期日:"
   due_date_6a281fe3: "期限：%{date}"
-  due_date_822625d8: 期日
+  due_date_822625d8: 提出期限
   due_date_at_time_3ec54b07: "%{date}、%{time} 期限"
   due_date_bf4eaf46: "期限%{date} "
   due_date_cannot_be_after_course_end_fd128a14: 期日をコース終了日より後にすることはできません
@@ -13219,7 +13219,7 @@ ja:
     due_at: "期限: %{assignment_due_date_time}"
     multiple_due_dates: "期限: 複数の期日"
     no_due_date: "期限: 期日なし"
-  due_dates_520a6c08: 期日
+  due_dates_520a6c08: 提出期限
   due_dates_are_being_compressed_based_on_your_start_917df12d: 開始日と終了日に基づいて期日が圧縮されています
   due_dates_are_being_compressed_based_on_your_start_c6db279e: 開始日と終了日に基づいて期日を圧縮。
   due_dates_cannot_be_blank_when_post_to_sis_is_chec_7cf302cb: SISへの投稿がチェックされている場合、期日は空白にできません
@@ -13239,7 +13239,7 @@ ja:
   due_multiple_due_dates_d1b141b: "期限: 複数の期日"
   due_no_due_date_2b226d2c: "期限:期日なし"
   due_no_due_date_3c1d1651: "期限:期日なし"
-  due_on_date_5ffb2182: 期日
+  due_on_date_5ffb2182: 提出期限
   due_reply_to_topic_assignment_due_date_time_eec6a6f5: "期限超過：トピックに返信する：%{assignment_due_date_time}"
   due_time_9acd6b69: "期限 %{time}"
   due_to_the_size_of_your_course_you_must_select_a_s_f834ba66: "\n\
@@ -13892,11 +13892,11 @@ ja:
     assignment_order_assignment_groups: 課題グループおよび職位順
     assignment_order_due_date: 期日ごと
     avg_score: 平均スコア
-    high_score: 高スコア
+    high_score: 最高得点
     invalid_group_warning: 
       one: "注意：可能なポイントがないため、グループ%{list_of_group_names}の課題はスコアには含まれません。"
       other: "注意：可能なポイントがないため、グループ%{list_of_group_names}の課題はスコアには含まれません。"
-    low_score: 低スコア
+    low_score: 最低得点
     notes: メモ
   enhanced_individual_gradebook_4e825077: 強化された個人評定ブック
   enhanced_rce_paste_from_clipboard_30ddb011: クリップボードからのRCEペーストの強化
@@ -15786,7 +15786,7 @@ ja:
   first_reviewer_sortorder_e2184140: "最初の評価者%{sortOrder}"
   first_student_reply_3b27725f: 最初の学生の返信
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}と %{others_count} その他"
-  fix_21c3f51c: 固定
+  fix_21c3f51c: 修正
   fix_heading_hierarchy_f60884c4: 見出し階層を修正する
   fix_issues_for_name_5e0888bb: "%{name}の問題を解決する"
   fix_missing_policy_applicator_gradebook_history_f3e62bc1: ポリシーアプリケーターの不足を修正
@@ -17969,13 +17969,13 @@ ja:
       ハイコントラストは、UI（テキスト、ボタンなど）の色のコントラストを強調し、それらの項目をより
       はっきりと識別しやすくします。注記：教育機関のブランド設定は無効になります。
   high_low_826694e3: "高い < 低い"
-  high_score_267b6641: 高スコア
+  high_score_267b6641: 最高得点
   high_score_47924c1a: "高：%{score}"
   high_water_mark_a1e2f279: ハイウォーターマーク
   high_water_mark_maximum_will_be_200_less_32cd2bf7: ハイウォーターマーク（最大値は200減）
   higher_education_7cba049c: 高等教育
   highest_28ad71e6: 最高
-  highest_score_e080551e: 最高スコア
+  highest_score_e080551e: 最高得点
   highlight_color_bab316ff: ハイライトカラー
   highlight_color_should_have_sufficient_contrast_wi_529a0e5e: "ハイライトカラーは背景色と十分なコントラスト（最低3:1の比率）を持つ必要があります。"
   highlight_color_with_background_colors_that_have_p_45529b6a: 親要素とのコントラストが不十分な背景色やハイライトカラーは区別が難しく、ハイライトされたコンテンツの可読性が低下し、視覚障害のあるユーザーにとってアクセシビリティが低下します。
@@ -20650,7 +20650,7 @@ ja:
   low_f1831924: 低：
   low_high_a709235f: "低い < 高い"
   low_score_4eeb95b2: "低：%{score}"
-  low_score_6d05905b: 低スコア
+  low_score_6d05905b: 最低得点
   lower_bound_ed528347: 下限
   lower_bound_to_upper_bound_48d093c2: "%{lower_bound} から %{upper_bound}まで"
   lower_limit_of_range_6ddd4983: 範囲の下限
@@ -20669,7 +20669,7 @@ ja:
       new_tab_loaded: このツールは、新しいブラウザウィンドウで正常に読み込まれました。ツールに再度アクセスするには、ページを再読み込みしてください。
     lti_message: 
       links: 
-        add_rubric: ルービック
+        add_rubric: ルーブリック
       load_tool_new_tab_button: "%{tool} を新しいウィンドウに読み込む"
       new_tab: このツールは、ブラウザの別ウィンドウに読み込む必要があります
       new_tab_expired: このツールのセッションが期限切れです。ページを再読み込みして、もう一度ツールにアクセスしてください
@@ -24600,7 +24600,7 @@ ja:
       course_content: コースの内容
       discussion: ディスカッション
       discussion_entry: "ディスカッション エントリ"
-      due_date: 期日
+      due_date: 提出期限
       files: ファイル
       grading: 採点
       grading_policies: 採点方針
@@ -24659,7 +24659,7 @@ ja:
     discussion_post_display: 新規返信
     due_date_description: 課題の期日が変更されました
     due_date_description_legend: 課題の期日が変更されました
-    due_date_display: 期日
+    due_date_display: 提出期限
     files_description: コースに新しいファイルが追加されました
     files_description_legend: コースに新しいファイルが追加されました
     files_display: ファイル
@@ -28038,8 +28038,8 @@ ja:
       avg_time: 平均時間
       chart_brushing_tip: "ヒント: カーソルで選択すると、グラフの特定の部分に焦点を当てることができます。"
       chart_title: スコアの百分位数グラフ
-      high_score: 高スコア
-      low_score: 低スコア
+      high_score: 最高得点
+      low_score: 最低得点
       mean: 平均スコア
       not_available_abbrev: N/A
       quiz_summary: 小テストの概要
@@ -28820,7 +28820,7 @@ ja:
           one: "%{count} 分"
           other: "%{count} 分"
         unlimited: 無制限
-        until: 提出終了日時
+        until: 公開終了日時
         view_responses: 自回答を表示
       quiz_submission: 
         attempt_duration: "今回の試行は %{duration} かかりました。"
@@ -29550,7 +29550,7 @@ ja:
   refreshing_f10c76be: 更新中・・・
   regardless_of_whether_this_permission_is_enabled_o_437ee269: この権限が有効か無効かにかかわらず、ユーザーは引き続き個人の予定表でイベントを管理できます。
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: この権限が有効か無効かにかかわらず、ユーザーは引き続き個人のカレンダーでイベントを管理できます。
-  regenerate_3e4679f8: 再発生
+  regenerate_3e4679f8: 再生成
   regenerate_alt_text_1be48296: 代替テキストを再生成する
   regenerate_criteria_7301f7fc: 基準を再生成
   regenerate_criterion_8a7d4a61: 基準項目を再生成
@@ -30446,7 +30446,7 @@ ja:
   rubric_duplicated_successfully_952ece8: ルーブリックを正常に複製
   rubric_enhancements_73bf351c: ルーブリックの強化
   rubric_export_is_not_supported_for_assignments_wit_9b2a85e9: 匿名評価の課題では、ルーブリックのエクスポートはサポートされていません
-  rubric_fc39da76: ルービック
+  rubric_fc39da76: ルーブリック
   rubric_import_is_not_supported_for_assignments_wit_7ec7abdb: 匿名採点の課題では、ルーブリックのインポートはサポートされていません
   rubric_import_started_this_may_take_a_few_seconds__1ad00da9: ルーブリックのインポートが開始しました。これは、完了するまでに2、3秒かかります。
   rubric_imports_and_exports_3413ea9d: ルーブリックのインポートとエクスポート
@@ -30531,7 +30531,7 @@ ja:
   rubrics_do_not_auto_populate_grades_for_checkpoint_662af9d8: ルーブリックにチェックポイントの評定が自動入力されません。
   rubrics_export_report_76d30288: "ルーブリック エクスポート レポート"
   rubrics_in_course_navigation_539ea536: コースナビゲーションの規定
-  rubrics_speedgrader_a6ebec57: ルービック、SpeedGrader
+  rubrics_speedgrader_a6ebec57: ルーブリック、SpeedGrader
   rubrics_tutorial_tray_be65d10d: ルーブリックチュートリアルトレイ
   rule_41977990: "+ ルール"
   rule_for_a_reviewer_55ced0be: レビュー担当者向けルール
@@ -37490,7 +37490,7 @@ ja:
   unsynced_changes_4ddaec76: 同期されていない変更内容
   unsynched_changes_867a1790: 同期されていない変更
   untag_1514df5a: タグを外す
-  until_4a1f8cda: 終了日時
+  until_4a1f8cda: 公開終了日時
   until_6437a827: まで
   until_8bdea3de: まで
   until_date_949017c4: "%{date} まで"
@@ -39463,6 +39463,7 @@ ja:
   you_can_reply_to_this_message_in_canvas_by_replyin_c9f9abb: "直接このメールアドレウに変身するか、このリンクをクリックすると、Canvas 内ででこのメッセージに返信することができます：%{link}.  添付ファイルを含める必要がある場合には、Canvas にログインして受信箱から返信してください。"
   you_can_reply_to_this_message_in_canvas_by_replyin_fa33638d: "この電子メールに直接返信することで、Canvas 内でこのメッセージに返信できます: %{link}"
   you_can_request_a_new_export_once_the_current_one__a74c19b3: 現在のエクスポートが完了次第、新しいエクスポートをリクエストできます。
+  you_can_review_any_current_calls_without_a_user_ag_57c90252: "施行日まで、*レポートページ*でテストおよび本番環境において User-Agent が設定されていない現在の呼び出しをすべて確認できます。変更に関する詳細は、当社の**ブログ**をご覧ください。"
   you_can_review_the_submission_details_by_clicking__58a7753: 下記のリンクを使用して提出の詳細を確認することができます：
   you_can_review_the_submission_details_by_clicking__9abc5515: "このリンクをクリックして、提出物の詳細をレビューできます: %{link}"
   you_can_review_the_submission_details_using_the_li_c25dd615: 下記のリンクを使用して提出の詳細を確認することができます。
