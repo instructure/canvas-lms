@@ -471,13 +471,49 @@ module Importers
 
         parent_item.sub_assignments << sub_assignment
       end
+
+      create_missing_sub_assignment_submissions(parent_item)
     end
 
     def self.find_or_create_sub_assignment(sub_assignment_hash, parent_item)
       sub_item ||= SubAssignment.where(context_type: parent_item.context.class.to_s, context_id: parent_item.context, id: sub_assignment_hash[:id]).first
       sub_item ||= SubAssignment.where(context_type: parent_item.context.class.to_s, context_id: parent_item.context, migration_id: sub_assignment_hash[:migration_id]).first if sub_assignment_hash[:migration_id]
+      # If we still haven't found it, check by parent_assignment_id and sub_assignment_tag
+      # This handles re-imports where a sub_assignment was created without a migration_id
+      sub_item ||= parent_item.sub_assignments.active.find_by(sub_assignment_tag: sub_assignment_hash[:tag]) if sub_assignment_hash[:tag]
 
       sub_item || parent_item.sub_assignments.temp_record
+    end
+
+    def self.create_missing_sub_assignment_submissions(parent_item)
+      parent_item.sub_assignments.reload
+
+      students = parent_item.students_with_visibility
+
+      parent_item.sub_assignments.active.each do |sub_assignment|
+        # Load all existing submissions for this sub_assignment into a set for fast lookup
+        existing_submission_user_ids = sub_assignment.all_submissions
+                                                     .where(user: students)
+                                                     .pluck(:user_id)
+                                                     .to_set
+
+        students.find_each do |student|
+          next if existing_submission_user_ids.include?(student.id)
+
+          begin
+            sub_assignment.find_or_create_submission(student)
+          rescue ActiveRecord::RecordNotUnique
+            # Submission already exists, continue
+            next
+          rescue => e
+            Rails.logger.error(
+              "AssignmentImporter - Error creating submission for SubAssignment #{sub_assignment.id}, " \
+              "User #{student.id}: #{e.message}"
+            )
+            next
+          end
+        end
+      end
     end
 
     def self.import_similarity_detection_tool(hash, context, migration, item)
