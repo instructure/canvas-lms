@@ -1,4 +1,9 @@
-<% assignment = asset.assignment %>
+<%
+  # For discussion checkpoints, use the parent assignment instead of the sub-assignment
+  # to ensure correct assignment IDs and URLs in notifications
+  assignment = asset.assignment
+  assignment = assignment.parent_assignment if assignment.checkpoint? && assignment.parent_assignment
+%>
 
 <% define_content :link do %>
   <%= polymorphic_url([asset.context, assignment, asset]) %>
