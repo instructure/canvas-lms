@@ -39,6 +39,11 @@ describe('renderLtiAssetReports', () => {
     jest.clearAllMocks()
     // @ts-expect-error
     window.ENV = {FEATURES: {lti_asset_processor: true}}
+    // @ts-expect-error - Reset window.jsonData for each test
+    window.jsonData = {
+      submission_types: 'online_text_entry',
+      has_sub_assignments: false,
+    }
   })
 
   afterEach(() => {
@@ -50,9 +55,7 @@ describe('renderLtiAssetReports', () => {
     user_id: '123',
   }
 
-  const jsonData = {
-    lti_asset_processors: [],
-  }
+  const jsonData = {}
 
   const attachment: Attachment = {
     canvadoc_url: null,
@@ -106,5 +109,97 @@ describe('renderLtiAssetReports', () => {
     renderLtiAssetReports(submission, historicalSubmission, jsonData)
     expect(ReactDOM.render).not.toHaveBeenCalled()
     expect(ReactDOM.unmountComponentAtNode).toHaveBeenCalledWith(mountPoint)
+  })
+
+  describe('checkpointed discussions', () => {
+    it('should render with discussion_topic submission type for checkpointed discussions', () => {
+      const checkpointedJsonData = {
+        ...jsonData,
+        submission_types: 'discussion_topic',
+        has_sub_assignments: true,
+      }
+      // @ts-expect-error
+      window.jsonData = checkpointedJsonData
+
+      const historicalSubmission: HistoricalSubmission = {
+        attempt: 2,
+        submission_type: null, // Checkpointed discussions can have null submission_type
+        versioned_attachments: [{attachment}],
+      }
+
+      renderLtiAssetReports(submission, historicalSubmission)
+      expect(ReactDOM.render).toHaveBeenCalled()
+
+      const component = (ReactDOM.render as jest.Mock).mock.calls[0][0] as React.Component
+      const expected: LtiAssetReportsForSpeedgraderProps = {
+        assignmentId: '12',
+        attachments: [{_id: '456', displayName: 'student-essay-doc'}],
+        attempt: 1, // Fixed attempt for checkpointed discussions
+        studentAnonymousId: null,
+        studentUserId: '123',
+        submissionType: 'discussion_topic',
+      }
+      expect(component.props).toEqual(expected)
+    })
+
+    it('should use historical submission data for non-checkpointed discussions', () => {
+      const regularDiscussionJsonData = {
+        ...jsonData,
+        submission_types: 'discussion_topic',
+        has_sub_assignments: false, // Not checkpointed
+      }
+      // @ts-expect-error
+      window.jsonData = regularDiscussionJsonData
+
+      const historicalSubmission: HistoricalSubmission = {
+        attempt: 3,
+        submission_type: 'discussion_topic',
+        versioned_attachments: [{attachment}],
+      }
+
+      renderLtiAssetReports(submission, historicalSubmission)
+      expect(ReactDOM.render).toHaveBeenCalled()
+
+      const component = (ReactDOM.render as jest.Mock).mock.calls[0][0] as React.Component
+      const expected: LtiAssetReportsForSpeedgraderProps = {
+        assignmentId: '12',
+        attachments: [{_id: '456', displayName: 'student-essay-doc'}],
+        attempt: 3, // Use historical attempt for regular discussions
+        studentAnonymousId: null,
+        studentUserId: '123',
+        submissionType: 'discussion_topic',
+      }
+      expect(component.props).toEqual(expected)
+    })
+
+    it('should use historical submission data for non-discussion assignments', () => {
+      const regularJsonData = {
+        ...jsonData,
+        submission_types: 'online_upload',
+        has_sub_assignments: false,
+      }
+      // @ts-expect-error
+      window.jsonData = regularJsonData
+
+      const historicalSubmission: HistoricalSubmission = {
+        attempt: 3,
+        submission_type: 'online_upload',
+        versioned_attachments: [{attachment}],
+      }
+
+      renderLtiAssetReports(submission, historicalSubmission)
+      expect(ReactDOM.render).toHaveBeenCalled()
+
+      const component = (ReactDOM.render as jest.Mock).mock.calls[0][0] as React.Component
+      const expected: LtiAssetReportsForSpeedgraderProps = {
+        assignmentId: '12',
+        attachments: [{_id: '456', displayName: 'student-essay-doc'}],
+        attempt: 3,
+        studentAnonymousId: null,
+        studentUserId: '123',
+        submissionType: 'online_upload',
+      }
+      expect(component.props).toEqual(expected)
+    })
   })
 })

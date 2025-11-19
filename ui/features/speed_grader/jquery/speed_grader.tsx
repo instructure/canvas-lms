@@ -1053,9 +1053,19 @@ export function renderLtiAssetReports(
     student = {studentUserId: null, studentAnonymousId: submission.anonymous_id}
   }
 
-  const {attempt, submission_type} = historicalSubmission
   const assignmentId = submission.assignment_id
-  const submissionType = ensureCompatibleSubmissionType(submission_type)
+  let attempt, submissionType
+  const jsonData = window.jsonData
+  // Submissions for checkpointed discussions won't have a submission type
+  // until the student has met both checkpooint criteria, but they can still
+  // have asset reports. So pretend the type is discussion_topic:
+  if (jsonData.submission_types.includes('discussion_topic') && jsonData.has_sub_assignments) {
+    attempt = 1 // dummy value, irrelevant for discussion topics
+    submissionType = 'discussion_topic'
+  } else {
+    attempt = historicalSubmission.attempt
+    submissionType = ensureCompatibleSubmissionType(historicalSubmission.submission_type)
+  }
 
   if (student && assignmentId && attempt && submissionType) {
     const attachments = (historicalSubmission.versioned_attachments || []).map(({attachment}) => ({
