@@ -1,4 +1,9 @@
-<% assignment = asset.assignment %>
+<%
+  # For discussion checkpoints, use the parent assignment instead of the sub-assignment
+  # to ensure correct assignment IDs and URLs in notifications
+  assignment = asset.assignment
+  assignment = assignment.parent_assignment if assignment.checkpoint? && assignment.parent_assignment
+%>
 
 <% define_content :link do %>
   <%= polymorphic_url([assignment.context, assignment, asset]) %>
@@ -12,10 +17,10 @@
 <% end %>
 
 <% if asset.score && user.try(:send_scores_in_emails?, assignment.context) %>
-  <% if asset.assignment.restrict_quantitative_data?(user)%>
-    <%=t :grade, "grade: %{letter_grade}", :letter_grade => asset.assignment.score_to_grade(asset.score, asset.grade, true)%>
+  <% if assignment.restrict_quantitative_data?(user)%>
+    <%=t :grade, "grade: %{letter_grade}", :letter_grade => assignment.score_to_grade(asset.score, asset.grade, true)%>
   <% else %>
-    <%= t :score, "score: %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %>
+    <%= t :score, "score: %{score} out of %{total}", :score => asset.score, :total => (assignment.points_possible || t(:not_applicable, "N/A")) %>
   <% end %>
 <% end %>
 
