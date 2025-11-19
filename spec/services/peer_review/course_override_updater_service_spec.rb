@@ -55,7 +55,7 @@ RSpec.describe PeerReview::CourseOverrideUpdaterService do
   end
 
   before do
-    course.enable_feature!(:peer_review_grading)
+    course.enable_feature!(:peer_review_allocation_and_grading)
   end
 
   describe "#initialize" do

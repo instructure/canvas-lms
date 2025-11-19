@@ -47,7 +47,7 @@ RSpec.describe PeerReview::PeerReviewSubmitterService do
   let(:service) { described_class.new(parent_assignment:, assessor:) }
 
   before do
-    course.enable_feature!(:peer_review_grading)
+    course.enable_feature!(:peer_review_allocation_and_grading)
     create_enrollment(course, assessor, enrollment_state: "active")
     create_enrollment(course, student1, enrollment_state: "active")
     create_enrollment(course, student2, enrollment_state: "active")
@@ -254,7 +254,7 @@ RSpec.describe PeerReview::PeerReviewSubmitterService do
       end
 
       it "returns nil when feature is disabled" do
-        course.disable_feature!(:peer_review_grading)
+        course.disable_feature!(:peer_review_allocation_and_grading)
         expect(service.call).to be_nil
       end
     end
@@ -383,7 +383,7 @@ RSpec.describe PeerReview::PeerReviewSubmitterService do
       end
 
       it "returns false when feature is disabled" do
-        course.disable_feature!(:peer_review_grading)
+        course.disable_feature!(:peer_review_allocation_and_grading)
         expect(service.send(:feature_enabled?)).to be false
       end
     end
@@ -424,7 +424,7 @@ RSpec.describe PeerReview::PeerReviewSubmitterService do
       end
 
       it "returns false when feature is disabled" do
-        course.disable_feature!(:peer_review_grading)
+        course.disable_feature!(:peer_review_allocation_and_grading)
         expect(service.send(:peer_review_submission_supported?)).to be false
       end
     end

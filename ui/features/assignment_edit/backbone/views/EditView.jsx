@@ -1582,7 +1582,7 @@ EditView.prototype.getFormData = function () {
   if ($grader_count.length > 0) {
     data.grader_count = numberHelper.parse($grader_count[0].value)
   }
-  if (ENV.PEER_REVIEW_ALLOCATION_ENABLED || ENV.PEER_REVIEW_GRADING_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
     const checkedInput = document.getElementById('assignment_peer_reviews_checkbox')
     data.peer_reviews = checkedInput?.checked
 
@@ -1783,7 +1783,7 @@ EditView.prototype.showErrors = function (errors) {
   let shouldFocus = true
   Object.entries(errors).forEach(([key, value]) => {
     if (key === 'peer_review_details') {
-      if ((ENV.PEER_REVIEW_GRADING_ENABLED || ENV.PEER_REVIEW_ALLOCATION_ENABLED) && shouldFocus) {
+      if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && shouldFocus) {
         const peerReviewDetailsEl = document.getElementById(
           'peer_reviews_allocation_and_grading_details',
         )
@@ -1994,7 +1994,7 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
     delete errors.invalid_card
   }
 
-  if (ENV.PEER_REVIEW_GRADING_ENABLED || ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
     const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
     if (peerReviewCheckbox && peerReviewCheckbox.checked) {
       const peerReviewDetailsEl = document.getElementById(
@@ -2445,7 +2445,7 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
     this.hideErrors('final_grader_id_errors')
   }
   let isPeerReviewEnabled
-  if (ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
     const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
     if (peerReviewCheckbox) {
       isPeerReviewEnabled = peerReviewCheckbox.checked

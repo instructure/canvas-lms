@@ -33,8 +33,8 @@ module PeerReview::Validations
   end
 
   def validate_feature_enabled(assignment)
-    unless assignment.context.feature_enabled?(:peer_review_grading)
-      raise PeerReview::FeatureDisabledError, I18n.t("Peer Review Grading feature flag is disabled")
+    unless assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      raise PeerReview::FeatureDisabledError, I18n.t("Peer Review Allocation and Grading feature flag is disabled")
     end
   end
 

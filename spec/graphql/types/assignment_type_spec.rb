@@ -1734,7 +1734,7 @@ describe Types::AssignmentType do
         @student1 = student_in_course(course: @peer_review_course, name: "Student One", active_all: true).user
         @student2 = student_in_course(course: @peer_review_course, name: "Student Two", active_all: true).user
 
-        @peer_review_course.enable_feature!(:peer_review_allocation)
+        @peer_review_course.enable_feature!(:peer_review_allocation_and_grading)
 
         AllocationRule.create!(
           assignment: @peer_review_assignment,
@@ -1780,7 +1780,7 @@ describe Types::AssignmentType do
       end
 
       it "returns nil for peer review status when feature is disabled" do
-        @peer_review_course.disable_feature!(:peer_review_allocation)
+        @peer_review_course.disable_feature!(:peer_review_allocation_and_grading)
 
         result = peer_review_assignment_type.resolve("assignedStudents { nodes { peerReviewStatus { mustReviewCount } } }")
 
@@ -2143,7 +2143,7 @@ describe Types::AssignmentType do
     let(:observer) { observer_in_course(course:, active_all: true).user }
 
     before do
-      course.enable_feature!(:peer_review_allocation)
+      course.enable_feature!(:peer_review_allocation_and_grading)
 
       @allocation_rule_1 = AllocationRule.create!(
         course:,
@@ -2229,7 +2229,7 @@ describe Types::AssignmentType do
 
     context "when feature flag is disabled" do
       before do
-        course.disable_feature!(:peer_review_allocation)
+        course.disable_feature!(:peer_review_allocation_and_grading)
       end
 
       it "returns nil even for teachers" do

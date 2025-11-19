@@ -50,7 +50,7 @@ RSpec.describe PeerReview::Validations do
   let(:service) { test_service_class.new(parent_assignment:) }
 
   before do
-    course.enable_feature!(:peer_review_grading)
+    course.enable_feature!(:peer_review_allocation_and_grading)
   end
 
   describe "#validate_parent_assignment" do
@@ -127,18 +127,18 @@ RSpec.describe PeerReview::Validations do
     end
 
     it "raises an error when feature is disabled" do
-      course.disable_feature!(:peer_review_grading)
+      course.disable_feature!(:peer_review_allocation_and_grading)
       expect { service.validate_feature_enabled(parent_assignment) }.to raise_error(
         PeerReview::FeatureDisabledError,
-        "Peer Review Grading feature flag is disabled"
+        "Peer Review Allocation and Grading feature flag is disabled"
       )
     end
 
     it "raises an error when feature is not available for the context" do
-      allow(parent_assignment.context).to receive(:feature_enabled?).with(:peer_review_grading).and_return(false)
+      allow(parent_assignment.context).to receive(:feature_enabled?).with(:peer_review_allocation_and_grading).and_return(false)
       expect { service.validate_feature_enabled(parent_assignment) }.to raise_error(
         PeerReview::FeatureDisabledError,
-        "Peer Review Grading feature flag is disabled"
+        "Peer Review Allocation and Grading feature flag is disabled"
       )
     end
   end
@@ -502,8 +502,8 @@ RSpec.describe PeerReview::Validations do
     end
 
     it "calls I18n.t for feature disabled error" do
-      course.disable_feature!(:peer_review_grading)
-      expect(I18n).to receive(:t).with("Peer Review Grading feature flag is disabled").and_call_original
+      course.disable_feature!(:peer_review_allocation_and_grading)
+      expect(I18n).to receive(:t).with("Peer Review Allocation and Grading feature flag is disabled").and_call_original
 
       expect { service.validate_feature_enabled(parent_assignment) }.to raise_error(
         PeerReview::FeatureDisabledError

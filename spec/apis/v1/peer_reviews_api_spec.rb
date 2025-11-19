@@ -474,7 +474,7 @@ describe PeerReviewsApiController, type: :request do
   describe "Post 'allocate'" do
     before :once do
       # Enable feature flag for allocation endpoint
-      @course.enable_feature!(:peer_review_allocation)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
 
       @assignment2 = @course.assignments.create!(
         title: "Peer Review Assignment",
@@ -508,7 +508,7 @@ describe PeerReviewsApiController, type: :request do
       end
 
       it "returns error when feature flag is not enabled" do
-        @course.disable_feature!(:peer_review_allocation)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
         @user = @student1
         @assignment2.submit_homework(@student1, body: "My submission")
         @assignment2.submit_homework(@student2, body: "Student2 submission")
@@ -522,7 +522,7 @@ describe PeerReviewsApiController, type: :request do
         expect(json["errors"]["base"]).to include("feature is not enabled")
 
         # Re-enable for other tests
-        @course.enable_feature!(:peer_review_allocation)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
       end
 
       it "returns error when assignment does not have peer reviews enabled" do
@@ -843,7 +843,7 @@ describe PeerReviewsApiController, type: :request do
 
     context "when all conditions are met" do
       before :once do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
           title: "Test Peer Review",
           context: @course,
@@ -870,7 +870,7 @@ describe PeerReviewsApiController, type: :request do
       end
     end
 
-    context "when peer_review_grading feature flag is disabled" do
+    context "when peer_review_allocation_and_grading feature flag is disabled" do
       before :once do
         @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
           title: "Test Peer Review",
@@ -894,7 +894,7 @@ describe PeerReviewsApiController, type: :request do
     context "when parent assignment does not have peer_reviews enabled" do
       before :once do
         @assignment_with_peer_reviews.update!(peer_reviews: false)
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
           title: "Test Peer Review",
           context: @course,
@@ -913,7 +913,7 @@ describe PeerReviewsApiController, type: :request do
 
     context "when peer_review_sub_assignment does not exist" do
       before :once do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
       end
 
       it "creates peer review without linking when sub-assignment does not exist (graceful degradation)" do
@@ -936,7 +936,7 @@ describe PeerReviewsApiController, type: :request do
 
     context "with multiple conditions" do
       it "does not link when only feature flag is enabled but other conditions are not met" do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @assignment_with_peer_reviews.update!(peer_reviews: false)
 
         @user = @teacher

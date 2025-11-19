@@ -29,7 +29,7 @@ RSpec.describe Mutations::DeleteAllocationRule, type: :graphql do
   end
 
   before do
-    @course.enable_feature!(:peer_review_allocation)
+    @course.enable_feature!(:peer_review_allocation_and_grading)
     @rule = AllocationRule.create!(
       course: @course,
       assignment: @assignment,
@@ -68,15 +68,15 @@ RSpec.describe Mutations::DeleteAllocationRule, type: :graphql do
   end
 
   context "error handling" do
-    it "raises an error if peer_review_allocation is disabled" do
-      @course.disable_feature!(:peer_review_allocation)
+    it "raises an error if peer_review_allocation_and_grading is disabled" do
+      @course.disable_feature!(:peer_review_allocation_and_grading)
       query = <<~GQL
         ruleId: "#{@rule.id}"
       GQL
 
       result = execute_with_input(query)
       expect(result["errors"]).to be_present
-      expect(result["errors"].first["message"]).to eq "peer_review_allocation feature flag is not enabled for this course"
+      expect(result["errors"].first["message"]).to eq "peer_review_allocation_and_grading feature flag is not enabled for this course"
     end
 
     it "raises an error if the rule does not exist" do

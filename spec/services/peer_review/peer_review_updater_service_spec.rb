@@ -81,7 +81,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
   end
 
   before do
-    course.enable_feature!(:peer_review_grading)
+    course.enable_feature!(:peer_review_allocation_and_grading)
   end
 
   describe "#initialize" do
@@ -189,7 +189,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
       it "syncs context_id and context_type from parent assignment" do
         new_course = course_factory(active_all: true)
-        new_course.enable_feature!(:peer_review_grading)
+        new_course.enable_feature!(:peer_review_allocation_and_grading)
 
         # Move the parent assignment to a new context
         # (This is unusual but testing the sync mechanism)
@@ -272,10 +272,10 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
       end
 
       it "raises error when feature is disabled" do
-        course.disable_feature!(:peer_review_grading)
+        course.disable_feature!(:peer_review_allocation_and_grading)
         expect { service.call }.to raise_error(
           PeerReview::FeatureDisabledError,
-          "Peer Review Grading feature flag is disabled"
+          "Peer Review Allocation and Grading feature flag is disabled"
         )
       end
 

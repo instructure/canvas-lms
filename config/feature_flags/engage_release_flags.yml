@@ -27,18 +27,12 @@ deprecate_context_groups_old_view:
   applies_to: SiteAdmin
   display_name: Deprecate Legacy View of Context Groups
   description: Removes dead code from the context groups view that is no longer used.
-peer_review_allocation:
+peer_review_allocation_and_grading:
   state: hidden
   applies_to: Course
   shadow: true
-  display_name: Peer Review Allocation
-  description: Enable dynamic peer review allocation for a streamlined experience.
-peer_review_grading:
-  state: hidden
-  applies_to: Course
-  shadow: true
-  display_name: Peer Review Grading
-  description: Enable separate due dates and grading for peer reviews on assignments.
+  display_name: Peer Review Allocation and Grading
+  description: Enable dynamic peer review allocation and separate due dates and grading for a streamlined, flexible review experience.
 ai_experiences:
   state: hidden
   applies_to: Course

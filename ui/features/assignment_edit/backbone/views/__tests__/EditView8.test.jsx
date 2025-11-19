@@ -158,8 +158,7 @@ describe('EditView - Peer Review Integration', () => {
         suppress_assignments: false,
       },
       GROUP_CATEGORIES: [],
-      PEER_REVIEW_GRADING_ENABLED: true,
-      PEER_REVIEW_ALLOCATION_ENABLED: true,
+      PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: true,
     })
 
     view = editView()
@@ -220,9 +219,8 @@ describe('EditView - Peer Review Integration', () => {
       expect(errors.peer_review_details).toBeUndefined()
     })
 
-    it('does not call validatePeerReviewDetails when both feature flags are disabled', () => {
-      ENV.PEER_REVIEW_GRADING_ENABLED = false
-      ENV.PEER_REVIEW_ALLOCATION_ENABLED = false
+    it('does not call validatePeerReviewDetails when feature flag is disabled', () => {
+      ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
 
       const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
       peerReviewCheckbox.checked = true
@@ -236,44 +234,6 @@ describe('EditView - Peer Review Integration', () => {
       const errors = view.validateBeforeSave({}, {})
 
       expect(mockValidate).not.toHaveBeenCalled()
-      expect(errors.peer_review_details).toBeUndefined()
-    })
-
-    it('calls validatePeerReviewDetails when only grading flag is enabled', () => {
-      ENV.PEER_REVIEW_GRADING_ENABLED = true
-      ENV.PEER_REVIEW_ALLOCATION_ENABLED = false
-
-      const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
-      peerReviewCheckbox.checked = true
-
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      const mockValidate = jest.fn().mockReturnValue(true)
-      peerReviewDetailsEl.validatePeerReviewDetails = mockValidate
-
-      const errors = view.validateBeforeSave({}, {})
-
-      expect(mockValidate).toHaveBeenCalledTimes(1)
-      expect(errors.peer_review_details).toBeUndefined()
-    })
-
-    it('calls validatePeerReviewDetails when only allocation flag is enabled', () => {
-      ENV.PEER_REVIEW_GRADING_ENABLED = false
-      ENV.PEER_REVIEW_ALLOCATION_ENABLED = true
-
-      const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
-      peerReviewCheckbox.checked = true
-
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      const mockValidate = jest.fn().mockReturnValue(true)
-      peerReviewDetailsEl.validatePeerReviewDetails = mockValidate
-
-      const errors = view.validateBeforeSave({}, {})
-
-      expect(mockValidate).toHaveBeenCalledTimes(1)
       expect(errors.peer_review_details).toBeUndefined()
     })
 
@@ -320,9 +280,8 @@ describe('EditView - Peer Review Integration', () => {
       expect(mockFocus).toHaveBeenCalledTimes(1)
     })
 
-    it('does not call focusOnFirstError when both feature flags are disabled', () => {
-      ENV.PEER_REVIEW_GRADING_ENABLED = false
-      ENV.PEER_REVIEW_ALLOCATION_ENABLED = false
+    it('does not call focusOnFirstError when feature flag is disabled', () => {
+      ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
 
       const peerReviewDetailsEl = document.getElementById(
         'peer_reviews_allocation_and_grading_details',
@@ -334,38 +293,6 @@ describe('EditView - Peer Review Integration', () => {
       view.showErrors(errors)
 
       expect(mockFocus).not.toHaveBeenCalled()
-    })
-
-    it('calls focusOnFirstError when only grading flag is enabled', () => {
-      ENV.PEER_REVIEW_GRADING_ENABLED = true
-      ENV.PEER_REVIEW_ALLOCATION_ENABLED = false
-
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      const mockFocus = jest.fn()
-      peerReviewDetailsEl.focusOnFirstError = mockFocus
-
-      const errors = {peer_review_details: true}
-      view.showErrors(errors)
-
-      expect(mockFocus).toHaveBeenCalledTimes(1)
-    })
-
-    it('calls focusOnFirstError when only allocation flag is enabled', () => {
-      ENV.PEER_REVIEW_GRADING_ENABLED = false
-      ENV.PEER_REVIEW_ALLOCATION_ENABLED = true
-
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      const mockFocus = jest.fn()
-      peerReviewDetailsEl.focusOnFirstError = mockFocus
-
-      const errors = {peer_review_details: true}
-      view.showErrors(errors)
-
-      expect(mockFocus).toHaveBeenCalledTimes(1)
     })
 
     it('does not call focusOnFirstError when focusOnFirstError function is not defined', () => {

@@ -46,8 +46,8 @@ class PeerReview::AllocationService < ApplicationService
 
   def validate
     # Validation: Feature flag must be enabled
-    unless @assignment.context.feature_enabled?(:peer_review_allocation)
-      return error_result(:feature_disabled, I18n.t("Peer review allocation feature is not enabled"), :bad_request)
+    unless @assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      return error_result(:feature_disabled, I18n.t("Peer review allocation and grading feature is not enabled"), :bad_request)
     end
 
     # Validation: Assignment must have peer reviews enabled
