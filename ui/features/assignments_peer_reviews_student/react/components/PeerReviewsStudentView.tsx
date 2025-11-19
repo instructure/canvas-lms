@@ -26,6 +26,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import AssignmentDescription from '@canvas/assignments/react/AssignmentDescription'
 import {useAssignmentQuery} from '../hooks/useAssignmentQuery'
+import {PeerReviewSelector} from './PeerReviewSelector'
 
 const I18n = createI18nScope('peer_reviews_student')
 
@@ -35,6 +36,7 @@ interface PeerReviewsStudentViewProps {
 
 const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignmentId}) => {
   const [selectedTab, setSelectedTab] = useState<'details' | 'submission'>('details')
+  const [selectedAssessmentIndex, setSelectedAssessmentIndex] = useState(0)
   const {data, isLoading, isError} = useAssignmentQuery(assignmentId)
 
   if (isLoading) {
@@ -80,6 +82,15 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignme
           </Flex>
         </Flex.Item>
       </Flex>
+      {assignment && (
+        <View as="div" margin="0 0 medium 0">
+          <PeerReviewSelector
+            assessmentRequests={assignment.assessmentRequestsForCurrentUser || []}
+            selectedIndex={selectedAssessmentIndex}
+            onSelectionChange={setSelectedAssessmentIndex}
+          />
+        </View>
+      )}
       <Tabs
         margin="medium 0"
         onRequestTabChange={(_event, {index}) => {
