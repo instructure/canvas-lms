@@ -18,7 +18,8 @@
 
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
+import {queryClient} from '@canvas/query'
 import PeerReviewsStudentView from '../PeerReviewsStudentView'
 
 jest.mock('@canvas/graphql', () => ({
@@ -32,33 +33,34 @@ jest.mock('@canvas/util/jquery/apiUserContent', () => ({
 const {executeQuery} = require('@canvas/graphql')
 const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
 
-const createWrapper = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  })
+type PeerReviewsStudentViewProps = React.ComponentProps<typeof PeerReviewsStudentView>
 
-  return ({children}: {children: React.ReactNode}) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+const buildDefaultProps = (
+  overrides: Partial<PeerReviewsStudentViewProps> = {},
+): PeerReviewsStudentViewProps => ({
+  assignmentId: '1',
+  ...overrides,
+})
+
+function setup(props: Partial<PeerReviewsStudentViewProps> = {}) {
+  const defaultProps = buildDefaultProps(props)
+  return render(
+    <MockedQueryProvider>
+      <PeerReviewsStudentView {...defaultProps} />
+    </MockedQueryProvider>,
   )
 }
 
 describe('PeerReviewsStudentView', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    queryClient.clear()
   })
 
   it('renders loading state initially', () => {
     mockExecuteQuery.mockImplementation(() => new Promise(() => {}))
 
-    const {getByText} = render(
-      <QueryClientProvider client={new QueryClient()}>
-        <PeerReviewsStudentView assignmentId="1" />
-      </QueryClientProvider>,
-    )
+    const {getByText} = setup()
 
     expect(getByText('Loading assignment details')).toBeInTheDocument()
   })
@@ -66,12 +68,7 @@ describe('PeerReviewsStudentView', () => {
   it('renders error state when query fails', async () => {
     mockExecuteQuery.mockRejectedValueOnce(new Error('Failed to fetch'))
 
-    const Wrapper = createWrapper()
-    const {getByText} = render(
-      <Wrapper>
-        <PeerReviewsStudentView assignmentId="1" />
-      </Wrapper>,
-    )
+    const {getByText} = setup()
 
     await waitFor(() => {
       expect(getByText('Failed to load assignment details')).toBeInTheDocument()
@@ -88,12 +85,7 @@ describe('PeerReviewsStudentView', () => {
       },
     })
 
-    const Wrapper = createWrapper()
-    const {getByTestId, getByText} = render(
-      <Wrapper>
-        <PeerReviewsStudentView assignmentId="1" />
-      </Wrapper>,
-    )
+    const {getByTestId, getByText} = setup()
 
     await waitFor(() => {
       expect(getByTestId('title')).toHaveTextContent('Test Peer Review Assignment')
@@ -113,12 +105,7 @@ describe('PeerReviewsStudentView', () => {
       },
     })
 
-    const Wrapper = createWrapper()
-    const {getByTestId, queryByTestId} = render(
-      <Wrapper>
-        <PeerReviewsStudentView assignmentId="2" />
-      </Wrapper>,
-    )
+    const {getByTestId, queryByTestId} = setup({assignmentId: '2'})
 
     await waitFor(() => {
       expect(getByTestId('title')).toHaveTextContent('Assignment Without Due Date')
@@ -137,12 +124,7 @@ describe('PeerReviewsStudentView', () => {
       },
     })
 
-    const Wrapper = createWrapper()
-    const {getByTestId, getByText} = render(
-      <Wrapper>
-        <PeerReviewsStudentView assignmentId="3" />
-      </Wrapper>,
-    )
+    const {getByTestId, getByText} = setup({assignmentId: '3'})
 
     await waitFor(() => {
       expect(getByTestId('title')).toHaveTextContent('Assignment Without Description')
@@ -161,17 +143,63 @@ describe('PeerReviewsStudentView', () => {
       },
     })
 
-    const Wrapper = createWrapper()
-    const {getByText} = render(
-      <Wrapper>
-        <PeerReviewsStudentView assignmentId="5" />
-      </Wrapper>,
-    )
+    const {getByText} = setup({assignmentId: '5'})
 
     await waitFor(() => {
       expect(getByText('Assignment Details')).toBeInTheDocument()
     })
 
     expect(getByText('Submission')).toBeInTheDocument()
+  })
+
+  it('renders peer review selector when assessment requests exist', async () => {
+    mockExecuteQuery.mockResolvedValueOnce({
+      assignment: {
+        _id: '6',
+        name: 'Peer Review Assignment',
+        dueAt: '2025-12-31T23:59:59Z',
+        description: '<p>Assignment description</p>',
+        assessmentRequestsForCurrentUser: [
+          {
+            _id: 'ar-1',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-01T00:00:00Z',
+          },
+          {
+            _id: 'ar-2',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-02T00:00:00Z',
+          },
+        ],
+      },
+    })
+
+    const {getByTestId} = setup({assignmentId: '6'})
+
+    await waitFor(() => {
+      expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+    })
+  })
+
+  it('renders peer review selector with no reviews message when assessment requests are null', async () => {
+    mockExecuteQuery.mockResolvedValueOnce({
+      assignment: {
+        _id: '8',
+        name: 'Assignment No Reviews',
+        dueAt: '2025-12-31T23:59:59Z',
+        description: '<p>Description</p>',
+        assessmentRequestsForCurrentUser: null,
+      },
+    })
+
+    const {getByTestId} = setup({assignmentId: '8'})
+
+    await waitFor(() => {
+      const selector = getByTestId('peer-review-selector')
+      expect(selector).toBeInTheDocument()
+      expect(selector).toHaveAttribute('value', 'No peer reviews available')
+    })
   })
 })
