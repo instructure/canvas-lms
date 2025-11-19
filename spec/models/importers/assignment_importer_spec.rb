@@ -1998,6 +1998,53 @@ describe "Importing assignments" do
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
 
+      it "is idempotent on re-import (does not duplicate sub_assignments)" do
+        # First import with checkpoints
+        first_import = Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+        expect(first_import.sub_assignments.count).to eq(2)
+
+        # Re-import the same assignment with checkpoints
+        second_import = Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+        expect(second_import.sub_assignments.count).to eq(2)
+        expect(second_import.id).to eq(first_import.id)
+      end
+
+      it "handles re-import after enabling checkpoints (migrating from no checkpoints to checkpoints)" do
+        # First import without checkpoints
+        assignment_hash_without_checkpoints = assignment_hash.except(:sub_assignments)
+        first_import = Importers::AssignmentImporter.import_from_migration(assignment_hash_without_checkpoints, course, migration)
+        expect(first_import.sub_assignments.count).to eq(0)
+        expect(first_import.has_sub_assignments).to be_falsey
+
+        # Re-import with checkpoints enabled
+        second_import = Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+        expect(second_import.sub_assignments.count).to eq(2)
+        expect(second_import.has_sub_assignments).to be_truthy
+        expect(second_import.id).to eq(first_import.id)
+      end
+
+      it "creates missing submissions when checkpoints are added to assignment with enrolled students" do
+        # Enroll a student
+        student = User.create!
+        course.enroll_student(student, enrollment_state: "active")
+
+        # First import without checkpoints
+        assignment_hash_without_checkpoints = assignment_hash.except(:sub_assignments)
+        first_import = Importers::AssignmentImporter.import_from_migration(assignment_hash_without_checkpoints, course, migration)
+        expect(first_import.sub_assignments.count).to eq(0)
+
+        # Re-import with checkpoints enabled
+        second_import = Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+        expect(second_import.sub_assignments.count).to eq(2)
+
+        # Verify submissions were created for the student
+        second_import.sub_assignments.each do |sub_assignment|
+          submission = sub_assignment.submissions.where(user: student).first
+          expect(submission).to be_present
+          expect(submission.workflow_state).to eq("unsubmitted")
+        end
+      end
+
       it "clears the due_at when importing assignment with sub_assignments" do
         assignment_hash[:due_at] = 1_401_947_999_000
 
