@@ -649,34 +649,18 @@ describe "Api::V1::Assignment" do
       end
     end
 
-    context "with peer_review_allocation feature flag enabled" do
+    context "with peer_review_allocation_and_grading feature flag enabled" do
       before do
         @assignment = assignment_model
         @assignment.update_attribute(:peer_reviews, true)
         @assignment.update_attribute(:peer_review_count, 2)
-        @assignment.course.enable_feature!(:peer_review_allocation)
+        @assignment.course.enable_feature!(:peer_review_allocation_and_grading)
       end
 
       it "includes peer_review_count" do
         json = api.assignment_json(@assignment, user, session, {})
         expect(json).to have_key("peer_review_count")
         expect(json["peer_review_count"]).to eq 2
-      end
-    end
-
-    context "with peer_review_grading feature flag enabled" do
-      before do
-        @assignment = assignment_model
-        @assignment.update_attribute(:peer_reviews, true)
-        @assignment.update_attribute(:peer_review_count, 3)
-        @assignment.course.enable_feature!(:peer_review_grading)
-        @assignment.course.disable_feature!(:peer_review_allocation)
-      end
-
-      it "includes peer_review_count" do
-        json = api.assignment_json(@assignment, user, session, {})
-        expect(json).to have_key("peer_review_count")
-        expect(json["peer_review_count"]).to eq 3
       end
     end
   end

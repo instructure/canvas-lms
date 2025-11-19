@@ -518,7 +518,7 @@ module Api::V1::Assignment
       hash["estimated_duration"] = estimated_duration_json(assignment.estimated_duration, user, session)
     end
 
-    if opts[:include_peer_review] && assignment.context.feature_enabled?(:peer_review_grading)
+    if opts[:include_peer_review] && assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
       peer_review_sub_assignment = assignment.peer_review_sub_assignment
       if peer_review_sub_assignment
         # Exclude recursive peer_review_sub_assignment
@@ -537,15 +537,14 @@ module Api::V1::Assignment
 
     context = assignment.context
     automatic_peer_reviews = assignment.automatic_peer_reviews?
-    allocation_enabled = context.feature_enabled?(:peer_review_allocation)
-    grading_enabled = context.feature_enabled?(:peer_review_grading)
+    allocation_and_grading_enabled = context.feature_enabled?(:peer_review_allocation_and_grading)
 
-    return unless automatic_peer_reviews || allocation_enabled || grading_enabled
+    return unless automatic_peer_reviews || allocation_and_grading_enabled
 
     attrs = [:peer_review_count]
     if automatic_peer_reviews
       attrs += [:peer_reviews_assign_at, :intra_group_peer_reviews]
-    elsif allocation_enabled
+    elsif allocation_and_grading_enabled
       attrs += [:peer_review_submission_required, :peer_review_across_sections]
     end
 
@@ -647,7 +646,7 @@ module Api::V1::Assignment
     return false unless prepared_create[:valid]
 
     response = :created
-    has_peer_reviews = prepared_create[:assignment].peer_reviews && prepared_create[:assignment].context.feature_enabled?(:peer_review_grading)
+    has_peer_reviews = prepared_create[:assignment].peer_reviews && prepared_create[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
 
     Assignment.suspend_due_date_caching do
       assignment.quiz_lti! if assignment_params.key?(:quiz_lti) || assignment&.quiz_lti?
@@ -711,9 +710,9 @@ module Api::V1::Assignment
     response = :ok
 
     has_peer_reviews = prepared_update[:assignment].peer_reviews
-    peer_review_grading_enabled = prepared_update[:assignment].context.feature_enabled?(:peer_review_grading)
+    peer_review_grading_enabled = prepared_update[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
 
-    prepared_update[:assignment].skip_peer_review_sub_assignment_sync = true if prepared_update[:assignment].context.feature_enabled?(:peer_review_grading)
+    prepared_update[:assignment].skip_peer_review_sub_assignment_sync = true if prepared_update[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
 
     Assignment.suspend_due_date_caching do
       if peer_review_grading_enabled
@@ -849,7 +848,7 @@ module Api::V1::Assignment
       end
     end
 
-    if prepared_update[:assignment].context.feature_enabled?(:peer_review_grading)
+    if prepared_update[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
       prepared_update[:assignment].skip_peer_review_sub_assignment_sync = false
     end
 
@@ -1553,7 +1552,7 @@ module Api::V1::Assignment
       { "ab_guid" => strong_anything },
       ({ "suppress_assignment" => strong_anything } if assignment.root_account.suppress_assignments?),
       ({ "estimated_duration_attributes" => strong_anything } if estimated_duration_enabled?(assignment)),
-      (if assignment.context.feature_enabled?(:peer_review_grading)
+      (if assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
          { "peer_review" => (%w[points_possible grading_type due_at unlock_at lock_at] +
                              [{ "peer_review_overrides" => strong_anything }]) }
        end),

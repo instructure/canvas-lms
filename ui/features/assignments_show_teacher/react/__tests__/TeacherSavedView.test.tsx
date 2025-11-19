@@ -103,7 +103,7 @@ describe('TeacherSavedView', () => {
 
   describe('Peer Review Tabs', () => {
     beforeEach(() => {
-      window.ENV.PEER_REVIEW_ALLOCATION_ENABLED = true
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
     })
 
     it('does not render AssignmentTabs when peer reviews are disabled', () => {
@@ -119,8 +119,8 @@ describe('TeacherSavedView', () => {
       expect(screen.queryByTestId('peer-review-tab')).not.toBeInTheDocument()
     })
 
-    it('does not render AssignmentTabs when PEER_REVIEW_ALLOCATION_ENABLED is false', () => {
-      window.ENV.PEER_REVIEW_ALLOCATION_ENABLED = false
+    it('does not render AssignmentTabs when PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED is false', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
       const assignment = createMockAssignment({
         peerReviews: {
           enabled: true,
@@ -133,7 +133,7 @@ describe('TeacherSavedView', () => {
       expect(screen.queryByTestId('peer-review-tab')).not.toBeInTheDocument()
     })
 
-    it('renders AssignmentTabs when peer reviews are enabled and PEER_REVIEW_ALLOCATION_ENABLED is true', () => {
+    it('renders AssignmentTabs when peer reviews are enabled and PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED is true', () => {
       const assignment = createMockAssignment({
         peerReviews: {
           enabled: true,
@@ -159,7 +159,7 @@ describe('TeacherSavedView', () => {
 
   describe('Assignment Details View', () => {
     beforeEach(() => {
-      window.ENV.PEER_REVIEW_ALLOCATION_ENABLED = true
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
     })
 
     it('renders AssignmentDetailsView when peer reviews are disabled', () => {
@@ -176,8 +176,8 @@ describe('TeacherSavedView', () => {
       expect(screen.getByText('This is the assignment description')).toBeInTheDocument()
     })
 
-    it('renders AssignmentDetailsView when PEER_REVIEW_ALLOCATION_ENABLED is false', () => {
-      window.ENV.PEER_REVIEW_ALLOCATION_ENABLED = false
+    it('renders AssignmentDetailsView when PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED is false', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
       const assignment = createMockAssignment({
         description: 'Another description',
         peerReviews: {

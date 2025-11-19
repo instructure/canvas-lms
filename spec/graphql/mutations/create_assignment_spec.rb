@@ -206,7 +206,7 @@ describe Mutations::CreateAssignment do
 
   context "peer review submission_required" do
     before do
-      @course.enable_feature!(:peer_review_allocation)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
     end
 
     it "creates an assignment with submission_required set to true" do
@@ -265,7 +265,7 @@ describe Mutations::CreateAssignment do
 
   context "peer review across_sections" do
     before do
-      @course.enable_feature!(:peer_review_allocation)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
     end
 
     it "creates an assignment with across_sections set to true" do
@@ -323,7 +323,7 @@ describe Mutations::CreateAssignment do
 
     context "when feature flag is off" do
       before do
-        @course.disable_feature!(:peer_review_allocation)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
       end
 
       it "returns null for acrossSections in the response" do

@@ -39,7 +39,7 @@ module Factories
     @parent_assignment.peer_reviews = true unless @parent_assignment.peer_reviews?
     @parent_assignment.save!
 
-    course.enable_feature!(:peer_review_grading)
+    course.enable_feature!(:peer_review_allocation_and_grading)
 
     @peer_review_sub_assignment = PeerReview::PeerReviewCreatorService.call(
       parent_assignment: @parent_assignment,

@@ -432,7 +432,7 @@ describe AssignmentGroupsController, type: :request do
 
     context "with feature flag enabled" do
       before :once do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
       end
 
       it "includes peer review sub assignment data when peer_review is included" do

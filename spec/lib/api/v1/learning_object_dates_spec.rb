@@ -65,7 +65,7 @@ describe Api::V1::LearningObjectDates do
 
         it "returns false for discussion topics" do
           discussion_assignment.update!(peer_reviews: true)
-          course.enable_feature!(:peer_review_grading)
+          course.enable_feature!(:peer_review_allocation_and_grading)
 
           expect(harness.send(:peer_review_overrides_supported?, discussion_assignment)).to be false
         end
@@ -74,7 +74,7 @@ describe Api::V1::LearningObjectDates do
       context "when assignment has peer reviews and peer_review_sub_assignment" do
         before do
           assignment.update!(peer_reviews: true)
-          course.enable_feature!(:peer_review_grading)
+          course.enable_feature!(:peer_review_allocation_and_grading)
           PeerReview::PeerReviewCreatorService.new(parent_assignment: assignment).call
           assignment.reload
         end
@@ -84,7 +84,7 @@ describe Api::V1::LearningObjectDates do
         end
 
         it "returns false when feature is disabled" do
-          course.disable_feature!(:peer_review_grading)
+          course.disable_feature!(:peer_review_allocation_and_grading)
           expect(harness.send(:peer_review_overrides_supported?, assignment)).to be false
         end
       end
@@ -108,7 +108,7 @@ describe Api::V1::LearningObjectDates do
 
       before do
         assignment.update!(peer_reviews: true)
-        course.enable_feature!(:peer_review_grading)
+        course.enable_feature!(:peer_review_allocation_and_grading)
         PeerReview::PeerReviewCreatorService.new(
           parent_assignment: assignment,
           due_at: "2025-09-10T18:00:00Z",

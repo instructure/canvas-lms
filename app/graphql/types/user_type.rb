@@ -1009,7 +1009,7 @@ module Types
       return nil unless assignment
 
       return nil unless assignment.grants_right?(current_user, :grade) &&
-                        assignment.context.feature_enabled?(:peer_review_allocation) &&
+                        assignment.context.feature_enabled?(:peer_review_allocation_and_grading) &&
                         assignment.peer_reviews
 
       Loaders::PeerReviewStatusLoader.for(assignment_id).load(object.id)

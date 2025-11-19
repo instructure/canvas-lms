@@ -169,8 +169,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
   const reviewsRequiredInputRef = useRef<HTMLInputElement | null>(null)
   const pointsPerReviewInputRef = useRef<HTMLInputElement | null>(null)
 
-  const gradingEnabled = ENV.PEER_REVIEW_GRADING_ENABLED
-  const allocationEnabled = ENV.PEER_REVIEW_ALLOCATION_ENABLED
   const peerReviewSubAssignment = assignment.peerReviewSubAssignment?.()
   const reviewsRequiredCount = assignment.peerReviewCount?.() || 1
   const totalPointsFromDB = peerReviewSubAssignment?.points_possible || 0
@@ -221,7 +219,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
       if (err) valid = false
     }
 
-    if (gradingEnabled && pointsPerReviewInputRef.current) {
+    if (pointsPerReviewInputRef.current) {
       const err = validatePointsPerReview({
         target: pointsPerReviewInputRef.current,
       } as React.FocusEvent<HTMLInputElement>)
@@ -229,15 +227,15 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
     }
 
     return valid
-  }, [validateReviewsRequired, validatePointsPerReview, gradingEnabled])
+  }, [validateReviewsRequired, validatePointsPerReview])
 
   const focusOnFirstError = useCallback(() => {
     if (reviewsRequiredInputRef.current && errorMessageReviewsRequired) {
       reviewsRequiredInputRef.current.focus()
-    } else if (gradingEnabled && pointsPerReviewInputRef.current && errorMessagePointsPerReview) {
+    } else if (pointsPerReviewInputRef.current && errorMessagePointsPerReview) {
       pointsPerReviewInputRef.current.focus()
     }
-  }, [errorMessageReviewsRequired, errorMessagePointsPerReview, gradingEnabled])
+  }, [errorMessageReviewsRequired, errorMessagePointsPerReview])
 
   const handleMouseOut = (e: React.MouseEvent<HTMLDivElement>) => {
     const relatedTarget = e.relatedTarget as HTMLElement
@@ -411,55 +409,47 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
               }
             />
           </LabeledInput>
-          {gradingEnabled && (
-            <>
-              <LabeledInput
-                label={I18n.t('Points per Peer Review')}
-                padding="x-small 0 0 0"
-                errorMessage={errorMessagePointsPerReview}
-              >
-                <NumberInput
-                  id="assignment_peer_reviews_max_input"
-                  data-testid="points-per-review-input"
-                  width="4.5rem"
-                  showArrows={false}
-                  size="medium"
-                  onChange={handlePointsPerReviewChange}
-                  onBlur={validatePointsPerReview}
-                  themeOverride={inputOverride}
-                  value={pointsPerReview}
-                  inputRef={(el: HTMLInputElement | null) => {
-                    pointsPerReviewInputRef.current = el
-                  }}
-                  renderLabel={
-                    <ScreenReaderContent>
-                      {I18n.t('Number of Points per Peer Review')}
-                    </ScreenReaderContent>
-                  }
-                />
-              </LabeledInput>
-              <Flex.Item as="div" padding="x-small 0 medium 0">
-                <FlexRow>
-                  <Flex.Item as="div" margin="0 0 0 large">
-                    <Text size="contentSmall" weight="bold">
-                      {I18n.t('Total Points for Peer Review(s)')}
-                    </Text>
-                  </Flex.Item>
-                  <Flex.Item as="div" padding="0 small 0 0">
-                    <View as="div" padding="0 x-small 0 0">
-                      <Text
-                        size="contentSmall"
-                        weight="bold"
-                        data-testid="total-peer-review-points"
-                      >
-                        {totalPoints}
-                      </Text>
-                    </View>
-                  </Flex.Item>
-                </FlexRow>
+          <LabeledInput
+            label={I18n.t('Points per Peer Review')}
+            padding="x-small 0 0 0"
+            errorMessage={errorMessagePointsPerReview}
+          >
+            <NumberInput
+              id="assignment_peer_reviews_max_input"
+              data-testid="points-per-review-input"
+              width="4.5rem"
+              showArrows={false}
+              size="medium"
+              onChange={handlePointsPerReviewChange}
+              onBlur={validatePointsPerReview}
+              themeOverride={inputOverride}
+              value={pointsPerReview}
+              inputRef={(el: HTMLInputElement | null) => {
+                pointsPerReviewInputRef.current = el
+              }}
+              renderLabel={
+                <ScreenReaderContent>
+                  {I18n.t('Number of Points per Peer Review')}
+                </ScreenReaderContent>
+              }
+            />
+          </LabeledInput>
+          <Flex.Item as="div" padding="x-small 0 medium 0">
+            <FlexRow>
+              <Flex.Item as="div" margin="0 0 0 large">
+                <Text size="contentSmall" weight="bold">
+                  {I18n.t('Total Points for Peer Review(s)')}
+                </Text>
               </Flex.Item>
-            </>
-          )}
+              <Flex.Item as="div" padding="0 small 0 0">
+                <View as="div" padding="0 x-small 0 0">
+                  <Text size="contentSmall" weight="bold" data-testid="total-peer-review-points">
+                    {totalPoints}
+                  </Text>
+                </View>
+              </Flex.Item>
+            </FlexRow>
+          </Flex.Item>
 
           <Flex.Item as="div" padding="small">
             <ToggleDetails
@@ -471,87 +461,76 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
               <Flex direction="column">
                 <hr style={{margin: '0.5rem 0 1rem'}} aria-hidden="true"></hr>
 
-                {allocationEnabled && (
-                  <>
-                    <SectionHeader title={I18n.t('Allocations')} padding="0" />
-                    <Flex.Item as="div" overflowY="visible" margin="small 0">
-                      <ToggleCheckbox
-                        testId="across-sections-checkbox"
-                        name="peer_reviews_across_sections"
-                        id="peer_reviews_across_sections_checkbox"
-                        checked={allowPeerReviewAcrossMultipleSections}
-                        onChange={handleCrossSectionsCheck}
-                        label={I18n.t('Allow peer reviews across sections')}
-                        srLabel={I18n.t('Allow peer reviews to be assigned across course sections')}
-                      />
-                    </Flex.Item>
+                <SectionHeader title={I18n.t('Allocations')} padding="0" />
+                <Flex.Item as="div" overflowY="visible" margin="small 0">
+                  <ToggleCheckbox
+                    testId="across-sections-checkbox"
+                    name="peer_reviews_across_sections"
+                    id="peer_reviews_across_sections_checkbox"
+                    checked={allowPeerReviewAcrossMultipleSections}
+                    onChange={handleCrossSectionsCheck}
+                    label={I18n.t('Allow peer reviews across sections')}
+                    srLabel={I18n.t('Allow peer reviews to be assigned across course sections')}
+                  />
+                </Flex.Item>
 
-                    {isGroupAssignment && (
-                      <Flex.Item as="div" overflowY="visible">
-                        <ToggleCheckbox
-                          testId="within-groups-checkbox"
-                          name="peer_reviews_prevent_friends"
-                          id="peer_reviews_within_groups_checkbox"
-                          checked={allowPeerReviewWithinGroups}
-                          onChange={handleInterGroupCheck}
-                          label={I18n.t('Allow peer reviews within groups')}
-                          srLabel={I18n.t('Allow peer reviews within student groups')}
-                        />
-                      </Flex.Item>
+                {isGroupAssignment && (
+                  <Flex.Item as="div" overflowY="visible">
+                    <ToggleCheckbox
+                      testId="within-groups-checkbox"
+                      name="peer_reviews_prevent_friends"
+                      id="peer_reviews_within_groups_checkbox"
+                      checked={allowPeerReviewWithinGroups}
+                      onChange={handleInterGroupCheck}
+                      label={I18n.t('Allow peer reviews within groups')}
+                      srLabel={I18n.t('Allow peer reviews within student groups')}
+                    />
+                  </Flex.Item>
+                )}
+
+                <SectionHeader title={I18n.t('Grading')} padding="small 0 0 0" />
+
+                <Flex.Item overflowY="visible" margin="small 0">
+                  <ToggleCheckbox
+                    testId="pass-fail-grading-checkbox"
+                    name="peer_reviews_manual_grading"
+                    id="peer_reviews_pass_fail_grading_checkbox"
+                    checked={usePassFailGrading}
+                    onChange={handleUsePassFailCheck}
+                    label={I18n.t('Use complete/incomplete instead of points for grading')}
+                    srLabel={I18n.t('Use complete/incomplete instead of points for grading')}
+                  />
+                </Flex.Item>
+
+                <SectionHeader title={I18n.t('Anonymity')} padding="medium 0 0 0" />
+
+                <Flex.Item overflowY="visible" margin="small 0">
+                  <ToggleCheckbox
+                    testId="anonymity-checkbox"
+                    name="peer_reviews_hide_reviewer_names"
+                    id="peer_reviews_anonymity_checkbox"
+                    checked={anonymousPeerReviews}
+                    onChange={handleAnonymityCheck}
+                    label={I18n.t('Reviewers do not see who they review')}
+                    srLabel={I18n.t('Reviewers do not see who they review')}
+                  />
+                </Flex.Item>
+
+                <SectionHeader title={I18n.t('Submission required')} padding="medium 0 0 0" />
+
+                <Flex.Item overflowY="visible" margin="small 0">
+                  <ToggleCheckbox
+                    testId="submission-required-checkbox"
+                    name="peer_reviews_submission_required"
+                    id="peer_reviews_submission_required_checkbox"
+                    checked={submissionRequiredBeforePeerReviews}
+                    onChange={handleSubmissionRequiredCheck}
+                    srLabel={I18n.t('Students must submit to see peer reviews')}
+                    label={I18n.t(
+                      'Reviewers must submit their assignment before they can be allocated reviews',
                     )}
-                  </>
-                )}
-
-                {gradingEnabled && (
-                  <>
-                    <SectionHeader title={I18n.t('Grading')} padding="small 0 0 0" />
-
-                    <Flex.Item overflowY="visible" margin="small 0">
-                      <ToggleCheckbox
-                        testId="pass-fail-grading-checkbox"
-                        name="peer_reviews_manual_grading"
-                        id="peer_reviews_pass_fail_grading_checkbox"
-                        checked={usePassFailGrading}
-                        onChange={handleUsePassFailCheck}
-                        label={I18n.t('Use complete/incomplete instead of points for grading')}
-                        srLabel={I18n.t('Use complete/incomplete instead of points for grading')}
-                      />
-                    </Flex.Item>
-                  </>
-                )}
-                {allocationEnabled && (
-                  <>
-                    <SectionHeader title={I18n.t('Anonymity')} padding="medium 0 0 0" />
-
-                    <Flex.Item overflowY="visible" margin="small 0">
-                      <ToggleCheckbox
-                        testId="anonymity-checkbox"
-                        name="peer_reviews_hide_reviewer_names"
-                        id="peer_reviews_anonymity_checkbox"
-                        checked={anonymousPeerReviews}
-                        onChange={handleAnonymityCheck}
-                        label={I18n.t('Reviewers do not see who they review')}
-                        srLabel={I18n.t('Reviewers do not see who they review')}
-                      />
-                    </Flex.Item>
-
-                    <SectionHeader title={I18n.t('Submission required')} padding="medium 0 0 0" />
-
-                    <Flex.Item overflowY="visible" margin="small 0">
-                      <ToggleCheckbox
-                        testId="submission-required-checkbox"
-                        name="peer_reviews_submission_required"
-                        id="peer_reviews_submission_required_checkbox"
-                        checked={submissionRequiredBeforePeerReviews}
-                        onChange={handleSubmissionRequiredCheck}
-                        srLabel={I18n.t('Students must submit to see peer reviews')}
-                        label={I18n.t(
-                          'Reviewers must submit their assignment before they can be allocated reviews',
-                        )}
-                      />
-                    </Flex.Item>
-                  </>
-                )}
+                  />
+                </Flex.Item>
               </Flex>
             </ToggleDetails>
           </Flex.Item>

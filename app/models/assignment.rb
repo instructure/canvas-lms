@@ -246,7 +246,7 @@ class Assignment < AbstractAssignment
 
   def should_sync_peer_review_sub_assignment?
     return false if skip_peer_review_sub_assignment_sync
-    return false unless context.feature_enabled?(:peer_review_grading)
+    return false unless context.feature_enabled?(:peer_review_allocation_and_grading)
     return false unless peer_review_sub_assignment.present?
 
     previous_changes.keys.intersect?(PeerReviewSubAssignment::SYNCABLE_ATTRIBUTES)

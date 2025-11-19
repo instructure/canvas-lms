@@ -3529,7 +3529,7 @@ describe Types::UserType do
       @course.enroll_student(@student1, enrollment_state: "active")
       @course.enroll_student(@student2, enrollment_state: "active")
 
-      @course.enable_feature!(:peer_review_allocation)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
 
       AllocationRule.create!(
         assignment: @assignment,
@@ -3598,7 +3598,7 @@ describe Types::UserType do
       end
 
       it "returns nil when feature is not enabled" do
-        @assignment.context.disable_feature!(:peer_review_allocation)
+        @assignment.context.disable_feature!(:peer_review_allocation_and_grading)
 
         user_type_tester = GraphQLTypeTester.new(
           @student1,

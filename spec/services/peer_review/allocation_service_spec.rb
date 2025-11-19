@@ -50,7 +50,7 @@ RSpec.describe PeerReview::AllocationService do
     course.enroll_student(student3, enrollment_state: :active)
 
     # Enable feature flag at course level by default
-    course.enable_feature!(:peer_review_allocation)
+    course.enable_feature!(:peer_review_allocation_and_grading)
   end
 
   describe "#initialize" do
@@ -67,7 +67,7 @@ RSpec.describe PeerReview::AllocationService do
     context "when validation fails" do
       context "when feature flag is not enabled" do
         before do
-          course.disable_feature!(:peer_review_allocation)
+          course.disable_feature!(:peer_review_allocation_and_grading)
         end
 
         it "returns error result" do
