@@ -2176,6 +2176,9 @@ class Account < ActiveRecord::Base
 
   def tabs_available(user = nil, opts = {})
     manage_settings = user && grants_right?(user, :manage_account_settings)
+    eportfolios_deprecated = root_account.settings[:enable_eportfolios] == true &&
+                             root_account.feature_enabled?(:eportfolio_deprecation_notice)
+
     tabs = []
     if root_account.site_admin?
       tabs << { id: TAB_USERS, label: t("People"), css_class: "users", href: :account_users_path } if user && grants_right?(user, :read_roster)
@@ -2244,7 +2247,7 @@ class Account < ActiveRecord::Base
     if user && grants_right?(user, :moderate_user_content)
       tabs << {
         id: TAB_EPORTFOLIO_MODERATION,
-        label: t("ePortfolio Moderation"),
+        label: eportfolios_deprecated ? t("ePortfolio Moderation (Legacy)") : t("ePortfolio Moderation"),
         css_class: "eportfolio_moderation",
         href: :account_eportfolio_moderation_path
       }
