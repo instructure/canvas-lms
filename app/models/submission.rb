@@ -3475,6 +3475,19 @@ class Submission < ActiveRecord::Base
     false
   end
 
+  # Incomplete submissions for discussions with checkpoints have null
+  # submission_type, but they can still have Asset Reports (LTI Asset Processor
+  # spec), so we need to pretend these are of type "discussion_topic"
+  def submission_type_for_asset_reports
+    return submission_type if submission_type
+
+    if assignment.submission_types == "discussion_topic" && assignment.has_sub_assignments?
+      "discussion_topic"
+    else
+      nil
+    end
+  end
+
   # For large body text, this can be SLOW. Call this method in a delayed job.
   def calc_body_word_count
     return 0 if body.nil?

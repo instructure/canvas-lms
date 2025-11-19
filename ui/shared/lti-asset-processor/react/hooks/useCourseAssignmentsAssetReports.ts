@@ -29,10 +29,6 @@ import {
   LtiAssetReport,
   shouldShowAssetReportCell,
 } from '@canvas/lti-asset-processor/model/LtiAssetReport'
-import {
-  AssetReportCompatibleSubmissionType,
-  ensureCompatibleSubmissionType,
-} from '@canvas/lti-asset-processor/shared-with-sg/replicated/types/LtiAssetReports'
 import {z} from 'zod'
 import {executeQueryAndValidate} from './graphqlQueryHooks'
 
@@ -51,7 +47,7 @@ export type UseCourseAssignmentsAssetReportsParams = z.infer<
 export type AssignmentReportData = {
   assetProcessors: LtiAssetProcessor[]
   assetReports: LtiAssetReport[]
-  submissionType: AssetReportCompatibleSubmissionType
+  submissionType: string | undefined
   assignmentName: string
 }
 
@@ -70,20 +66,19 @@ function indexByAssignmentId(data: {
       const assetReports = submission?.ltiAssetReportsConnection?.nodes?.filter(
         r => r !== null && r !== undefined,
       )
-      const submissionType = ensureCompatibleSubmissionType(submission?.submissionType)
       const assignmentName = assignment.name
 
       if (
         assetProcessors &&
         assetReports &&
         assignmentName &&
-        submissionType &&
         shouldShowAssetReportCell(assetProcessors, assetReports)
       ) {
         byAssignmentId.set(assignment._id, {
           assetProcessors,
           assetReports,
-          submissionType,
+          // submissionType may be undefined for checkpointed discussions (we infer the type later)
+          submissionType: submission?.submissionType || undefined,
           assignmentName,
         })
       }
