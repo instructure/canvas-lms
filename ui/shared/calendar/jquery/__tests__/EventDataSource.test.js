@@ -115,7 +115,9 @@ describe('EventDataSource', () => {
         const context = ENV.CALENDAR?.CONTEXTS?.find(
           ctx => ctx.asset_string === assignment.context_code,
         )
-        return !context?.course_pacing_enabled || context?.user_is_student
+        return (
+          !context?.course_pacing_enabled || context?.user_is_student || context?.user_is_observer
+        )
       })
 
       if (filteredAssignments.length > 0) {
@@ -212,6 +214,22 @@ describe('EventDataSource', () => {
       server.addAssignment('course_1', '1', date1.toISOString())
       source.getEvents(date1, date2, ['course_1'], list => {
         expect(list).toHaveLength(0)
+      })
+    })
+
+    it('shows course pacing assignments for students', () => {
+      window.ENV.CALENDAR.CONTEXTS[0].user_is_student = true
+      server.addAssignment('course_1', '1', date1.toISOString())
+      source.getEvents(date1, date2, ['course_1'], list => {
+        expect(list).toHaveLength(1)
+      })
+    })
+
+    it('shows course pacing assignments for observers', () => {
+      window.ENV.CALENDAR.CONTEXTS[0].user_is_observer = true
+      server.addAssignment('course_1', '1', date1.toISOString())
+      source.getEvents(date1, date2, ['course_1'], list => {
+        expect(list).toHaveLength(1)
       })
     })
   })
