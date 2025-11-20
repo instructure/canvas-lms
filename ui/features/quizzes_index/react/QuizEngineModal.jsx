@@ -45,22 +45,22 @@ function QuizEngineModal({setOpen, onDismiss}) {
     ? I18n.t(
         `This has more question types, enhanced moderation and accommodation features, and supports creating and managing surveys.`,
       )
-    : I18n.t(
-        `This has more question types, enhanced moderation and accommodation features.`,
-      )
+    : I18n.t(`This has more question types, enhanced moderation and accommodation features.`)
 
   const link = (
     <Link href={I18n.t('#community.new_quizzes_feature_comparison')}>
       {I18n.t('Learn more about the differences.')}
     </Link>
   )
-  const newQuizLabel = <Text weight="bold">{I18n.t('New Quizzes')}</Text>
+  const newQuizLabelText = isNewQuizzesSurveyEnabled
+    ? I18n.t('New Quizzes/Surveys')
+    : I18n.t('New Quizzes')
+
+  const newQuizLabel = <Text weight="bold">{newQuizLabelText}</Text>
   const classicLabel = <Text weight="bold">{I18n.t('Classic Quizzes')}</Text>
   const newDesc = (
     <div style={{paddingLeft: '1.75rem', maxWidth: '23.5rem'}}>
-      <Text weight="light">
-        {newQuizDescription}
-      </Text>
+      <Text weight="light">{newQuizDescription}</Text>
     </div>
   )
   const classicDesc = (
@@ -180,7 +180,9 @@ function QuizEngineModal({setOpen, onDismiss}) {
           label={
             <span>
               {classicLabel}
-              {!isNewQuizzesSurveyEnabled && <ScreenReaderContent>- {classicDesc}</ScreenReaderContent>}
+              {!isNewQuizzesSurveyEnabled && (
+                <ScreenReaderContent>- {classicDesc}</ScreenReaderContent>
+              )}
             </span>
           }
           size="large"
