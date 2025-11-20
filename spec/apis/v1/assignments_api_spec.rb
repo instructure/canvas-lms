@@ -3673,6 +3673,80 @@ describe AssignmentsApiController, type: :request do
 
         expect(response).to be_successful
       end
+
+      it "syncs peer_review_submission_required from parent to sub assignment when updated via API" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          name: "Test Assignment",
+          points_possible: 100,
+          peer_reviews: true,
+          peer_review_submission_required: true
+        )
+        peer_review_sub = PeerReview::PeerReviewCreatorService.call(parent_assignment: assignment)
+
+        expect(peer_review_sub.peer_review_submission_required).to be true
+
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+                 { controller: "assignments_api", action: "update", format: "json", course_id: @course.id.to_s, id: assignment.id.to_s },
+                 { assignment: { peer_review_submission_required: false } })
+
+        expect(response).to be_successful
+        peer_review_sub.reload
+        expect(peer_review_sub.peer_review_submission_required).to be false
+      end
+
+      it "syncs peer_review_across_sections from parent to sub assignment when updated via API" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          name: "Test Assignment",
+          points_possible: 100,
+          peer_reviews: true,
+          peer_review_across_sections: true
+        )
+        peer_review_sub = PeerReview::PeerReviewCreatorService.call(parent_assignment: assignment)
+
+        expect(peer_review_sub.peer_review_across_sections).to be true
+
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+                 { controller: "assignments_api", action: "update", format: "json", course_id: @course.id.to_s, id: assignment.id.to_s },
+                 { assignment: { peer_review_across_sections: false } })
+
+        expect(response).to be_successful
+        peer_review_sub.reload
+        expect(peer_review_sub.peer_review_across_sections).to be false
+      end
+
+      it "syncs both peer review fields together when parent is updated via API" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          name: "Test Assignment",
+          points_possible: 100,
+          peer_reviews: true,
+          peer_review_submission_required: false,
+          peer_review_across_sections: false
+        )
+        peer_review_sub = PeerReview::PeerReviewCreatorService.call(parent_assignment: assignment)
+
+        expect(peer_review_sub.peer_review_submission_required).to be false
+        expect(peer_review_sub.peer_review_across_sections).to be false
+
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+                 { controller: "assignments_api", action: "update", format: "json", course_id: @course.id.to_s, id: assignment.id.to_s },
+                 {
+                   assignment: {
+                     peer_review_submission_required: true,
+                     peer_review_across_sections: true
+                   }
+                 })
+
+        expect(response).to be_successful
+        peer_review_sub.reload
+        expect(peer_review_sub.peer_review_submission_required).to be true
+        expect(peer_review_sub.peer_review_across_sections).to be true
+      end
     end
 
     describe "#create_api_peer_review_sub_assignment" do

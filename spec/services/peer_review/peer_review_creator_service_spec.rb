@@ -123,6 +123,17 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
         expect(result.intra_group_peer_reviews).to eq(parent_assignment.intra_group_peer_reviews)
       end
 
+      it "inherits peer_review_submission_required and peer_review_across_sections from parent" do
+        parent_assignment.update!(
+          peer_review_submission_required: true,
+          peer_review_across_sections: false
+        )
+
+        result = service.call
+        expect(result.peer_review_submission_required).to be true
+        expect(result.peer_review_across_sections).to be false
+      end
+
       it "inherits group_category_id from parent" do
         group_category = course.group_categories.create!(name: "Test Group Category")
         parent_assignment.update!(group_category_id: group_category.id)
