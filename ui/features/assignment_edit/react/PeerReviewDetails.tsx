@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React, {useState, useEffect, useRef, useCallback} from 'react'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
@@ -25,23 +24,21 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {NumberInput} from '@instructure/ui-number-input'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {Alert} from '@instructure/ui-alerts'
 import {canvasHighContrast, canvas} from '@instructure/ui-themes'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {createRoot} from 'react-dom/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 import {usePeerReviewSettings} from './hooks/usePeerReviewSettings'
-
 const I18n = createI18nScope('peer_review_details')
 const baseTheme = ENV.use_high_contrast ? canvasHighContrast : canvas
 const {colors: instui10Colors} = baseTheme
 const inputOverride = {mediumHeight: '1.75rem', mediumFontSize: '0.875rem'}
-
 const roots = new Map()
 function createOrUpdateRoot(elementId: string, component: React.ReactNode) {
   const container = document.getElementById(elementId)
   if (!container) return
-
   let root = roots.get(elementId)
   if (!root) {
     root = createRoot(container)
@@ -49,22 +46,17 @@ function createOrUpdateRoot(elementId: string, component: React.ReactNode) {
   }
   root.render(component)
 }
-
 const hasValidGroupCategory = (assignment: Assignment): boolean => {
   const groupCategoryId = assignment.groupCategoryId()
   return !!groupCategoryId && groupCategoryId !== 'blank'
 }
-
 const getIsGroupAssignment = (assignment: Assignment): boolean => {
   const hasGroupCategoryCheckbox = document.getElementById('has_group_category') as HTMLInputElement
-
   if (hasGroupCategoryCheckbox) {
     return hasGroupCategoryCheckbox.checked
   }
-
   return hasValidGroupCategory(assignment)
 }
-
 export const renderPeerReviewDetails = (assignment: Assignment) => {
   const $mountPoint = document.getElementById('peer_reviews_allocation_and_grading_details')
   if ($mountPoint) {
@@ -77,13 +69,11 @@ export const renderPeerReviewDetails = (assignment: Assignment) => {
     )
   }
 }
-
 const FlexRow = ({children, ...props}: {children: React.ReactNode} & any) => (
   <Flex as="div" justifyItems="space-between" wrap="no-wrap" {...props}>
     {children}
   </Flex>
 )
-
 const LabeledInput = ({
   label,
   children,
@@ -115,7 +105,6 @@ const LabeledInput = ({
     )}
   </>
 )
-
 const ToggleCheckbox = ({
   testId,
   name,
@@ -152,7 +141,6 @@ const ToggleCheckbox = ({
     </Flex.Item>
   </FlexRow>
 )
-
 const SectionHeader = ({title, padding = 'small'}: {title: string; padding?: string}) => (
   <Flex.Item as="div" padding={padding}>
     <Text weight="bold" size="content">
@@ -160,20 +148,19 @@ const SectionHeader = ({title, padding = 'small'}: {title: string; padding?: str
     </Text>
   </Flex.Item>
 )
-
 const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
   const [peerReviewChecked, setPeerReviewChecked] = useState(assignment.peerReviews() || false)
   const [peerReviewEnabled, setPeerReviewEnabled] = useState(!assignment.moderatedGrading())
   const [isGroupAssignment, setIsGroupAssignment] = useState(hasValidGroupCategory(assignment))
-
   const reviewsRequiredInputRef = useRef<HTMLInputElement | null>(null)
   const pointsPerReviewInputRef = useRef<HTMLInputElement | null>(null)
-
   const peerReviewSubAssignment = assignment.peerReviewSubAssignment?.()
   const reviewsRequiredCount = assignment.peerReviewCount?.() || 1
   const totalPointsFromDB = peerReviewSubAssignment?.points_possible || 0
   const pointsPerReviewCalculated =
     reviewsRequiredCount > 0 ? totalPointsFromDB / reviewsRequiredCount : 0
+  const hasPeerReviewSubmissions =
+    ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && assignment.hasPeerReviewSubmissions?.()
 
   const initialValues = {
     reviewsRequired: reviewsRequiredCount,
@@ -185,7 +172,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
     anonymousPeerReviews: assignment.anonymousPeerReviews?.() || false,
     submissionRequiredBeforePeerReviews: assignment.peerReviewSubmissionRequired?.() || false,
   }
-
   const {
     reviewsRequired,
     handleReviewsRequiredChange,
@@ -208,27 +194,22 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
     handleSubmissionRequiredCheck,
     resetFields,
   } = usePeerReviewSettings(initialValues)
-
   const validatePeerReviewDetails = useCallback(() => {
     let valid = true
-
     if (reviewsRequiredInputRef.current) {
       const err = validateReviewsRequired({
         target: reviewsRequiredInputRef.current,
       } as React.FocusEvent<HTMLInputElement>)
       if (err) valid = false
     }
-
     if (pointsPerReviewInputRef.current) {
       const err = validatePointsPerReview({
         target: pointsPerReviewInputRef.current,
       } as React.FocusEvent<HTMLInputElement>)
       if (err) valid = false
     }
-
     return valid
   }, [validateReviewsRequired, validatePointsPerReview])
-
   const focusOnFirstError = useCallback(() => {
     if (reviewsRequiredInputRef.current && errorMessageReviewsRequired) {
       reviewsRequiredInputRef.current.focus()
@@ -236,24 +217,19 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
       pointsPerReviewInputRef.current.focus()
     }
   }, [errorMessageReviewsRequired, errorMessagePointsPerReview])
-
   const handleMouseOut = (e: React.MouseEvent<HTMLDivElement>) => {
     const relatedTarget = e.relatedTarget as HTMLElement
     const currentTarget = e.currentTarget
-
     // Does not trigger validation if relatedTarget is within the peer review section
     if (relatedTarget && currentTarget.contains(relatedTarget)) {
       return
     }
-
     validatePeerReviewDetails()
   }
-
   useEffect(() => {
     const handlePeerReviewToggle = (event: MessageEvent) => {
       if (event.data?.subject === 'ASGMT.togglePeerReviews') {
         setPeerReviewEnabled(event.data.enabled)
-
         if (!event.data.enabled) {
           setPeerReviewChecked(false)
         }
@@ -265,7 +241,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
       window.removeEventListener('message', handlePeerReviewToggle as EventListener)
     }
   }, [])
-
   useEffect(() => {
     const handleGroupCategoryChange = () => {
       setIsGroupAssignment(getIsGroupAssignment(assignment))
@@ -275,7 +250,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
       document.removeEventListener('group_category_changed', handleGroupCategoryChange)
     }
   }, [assignment])
-
   useEffect(() => {
     const mountPoint = document.getElementById('peer_reviews_allocation_and_grading_details')
     if (mountPoint) {
@@ -289,18 +263,15 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
       }
     }
   }, [validatePeerReviewDetails, focusOnFirstError])
-
   const handlePeerReviewCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPeerReviewChecked(e.target.checked)
     if (!e.target.checked) {
       resetFields()
     }
   }
-
   const advancedConfigLabel = (
     <Text size="content">{I18n.t('Advanced Peer Review Configurations')}</Text>
   )
-
   return (
     <Flex as="div" direction="column" width="100%">
       {/* Hidden inputs to preserve values when Advanced Configuration is collapsed or peer reviews disabled */}
@@ -384,7 +355,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
         /* eslint-disable-next-line jsx-a11y/mouse-events-have-key-events */
         <div onMouseOut={handleMouseOut}>
           <SectionHeader title={I18n.t('Review Settings')} padding="none small small small" />
-
           <LabeledInput
             label={I18n.t('Reviews Required*')}
             padding="x-small 0 0 0"
@@ -401,6 +371,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
               onBlur={validateReviewsRequired}
               themeOverride={inputOverride}
               value={reviewsRequired}
+              interaction={hasPeerReviewSubmissions ? 'disabled' : 'enabled'}
               inputRef={(el: HTMLInputElement | null) => {
                 reviewsRequiredInputRef.current = el
               }}
@@ -424,6 +395,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
               onBlur={validatePointsPerReview}
               themeOverride={inputOverride}
               value={pointsPerReview}
+              interaction={hasPeerReviewSubmissions ? 'disabled' : 'enabled'}
               inputRef={(el: HTMLInputElement | null) => {
                 pointsPerReviewInputRef.current = el
               }}
@@ -434,7 +406,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
               }
             />
           </LabeledInput>
-          <Flex.Item as="div" padding="x-small 0 medium 0">
+          <Flex.Item as="div" padding="x-small 0 small 0">
             <FlexRow>
               <Flex.Item as="div" margin="0 0 0 large">
                 <Text size="contentSmall" weight="bold">
@@ -451,6 +423,16 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
             </FlexRow>
           </Flex.Item>
 
+          {hasPeerReviewSubmissions && (
+            <Flex.Item as="div" padding="small">
+              <Alert variant="warning">
+                {I18n.t(
+                  'Students have already submitted peer reviews, so reviews required and points cannot be changed.',
+                )}
+              </Alert>
+            </Flex.Item>
+          )}
+
           <Flex.Item as="div" padding="small">
             <ToggleDetails
               summary={advancedConfigLabel}
@@ -460,7 +442,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
             >
               <Flex direction="column">
                 <hr style={{margin: '0.5rem 0 1rem'}} aria-hidden="true"></hr>
-
                 <SectionHeader title={I18n.t('Allocations')} padding="0" />
                 <Flex.Item as="div" overflowY="visible" margin="small 0">
                   <ToggleCheckbox
@@ -473,7 +454,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
                     srLabel={I18n.t('Allow peer reviews to be assigned across course sections')}
                   />
                 </Flex.Item>
-
                 {isGroupAssignment && (
                   <Flex.Item as="div" overflowY="visible">
                     <ToggleCheckbox
@@ -487,9 +467,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
                     />
                   </Flex.Item>
                 )}
-
                 <SectionHeader title={I18n.t('Grading')} padding="small 0 0 0" />
-
                 <Flex.Item overflowY="visible" margin="small 0">
                   <ToggleCheckbox
                     testId="pass-fail-grading-checkbox"
@@ -501,9 +479,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
                     srLabel={I18n.t('Use complete/incomplete instead of points for grading')}
                   />
                 </Flex.Item>
-
                 <SectionHeader title={I18n.t('Anonymity')} padding="medium 0 0 0" />
-
                 <Flex.Item overflowY="visible" margin="small 0">
                   <ToggleCheckbox
                     testId="anonymity-checkbox"
@@ -515,9 +491,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
                     srLabel={I18n.t('Reviewers do not see who they review')}
                   />
                 </Flex.Item>
-
                 <SectionHeader title={I18n.t('Submission required')} padding="medium 0 0 0" />
-
                 <Flex.Item overflowY="visible" margin="small 0">
                   <ToggleCheckbox
                     testId="submission-required-checkbox"
@@ -539,5 +513,4 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
     </Flex>
   )
 }
-
 export default PeerReviewDetails

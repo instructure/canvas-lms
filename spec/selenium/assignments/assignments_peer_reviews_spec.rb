@@ -216,6 +216,70 @@ describe "assignments" do
     end
   end
 
+  context "preventing edits after submissions" do
+    before :once do
+      Account.site_admin.enable_feature!(:peer_review_allocation_and_grading)
+      course_factory(active_course: true)
+      @teacher = teacher_in_course(active_all: true).user
+      @student1 = student_in_course(active_all: true).user
+      @student2 = student_in_course(active_all: true).user
+
+      @assignment = assignment_model({
+                                       course: @course,
+                                       peer_reviews: true,
+                                       automatic_peer_reviews: false,
+                                       peer_review_count: 2
+                                     })
+
+      submission1 = @assignment.find_or_create_submission(@student1)
+      submission1.submission_type = "online_text_entry"
+      submission1.save!
+
+      submission2 = @assignment.find_or_create_submission(@student2)
+      submission2.submission_type = "online_text_entry"
+      submission2.save!
+
+      AssessmentRequest.create!(
+        user: @student1,
+        asset: submission1,
+        assessor_asset: submission2,
+        assessor: @student2,
+        workflow_state: "completed"
+      )
+
+      AssessmentRequest.create!(
+        user: @student2,
+        asset: submission2,
+        assessor_asset: submission1,
+        assessor: @student1,
+        workflow_state: "completed"
+      )
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "displays alert and disables fields when peer review submissions exist", priority: "1" do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      wait_for_ajaximations
+
+      wait_for(method: nil, timeout: 10) do
+        element_exists?("#peer_reviews_allocation_and_grading_details")
+      end
+
+      expect(element_exists?("div[role='alert']")).to be true
+      alert_message = f("div[role='alert']")
+      expect(alert_message).to be_displayed
+
+      reviews_required_input = f("#assignment_peer_reviews_count")
+      expect(reviews_required_input.attribute("disabled")).to eq("true")
+
+      points_per_review_input = f("#assignment_peer_reviews_max_input")
+      expect(points_per_review_input.attribute("disabled")).to eq("true")
+    end
+  end
+
   describe "auto assign" do
     before do
       course_with_teacher_logged_in

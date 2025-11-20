@@ -33,7 +33,7 @@ class Assignment < AbstractAssignment
 
   validates :parent_assignment_id, :sub_assignment_tag, absence: true
   validate :unpublish_ok?, if: -> { will_save_change_to_workflow_state?(to: "unpublished") }
-  validate :peer_review_count_changes_ok?
+  validate :peer_review_count_changes_ok?, if: :peer_review_count_changed?
 
   before_save :before_soft_delete, if: -> { will_save_change_to_workflow_state?(to: "deleted") }
 
@@ -237,7 +237,7 @@ class Assignment < AbstractAssignment
   end
 
   def peer_review_count_changes_ok?
-    return false unless peer_reviews? && context.feature_enabled?(:peer_review_allocation_and_grading) && peer_review_count_changed?
+    return false unless peer_reviews? && context.feature_enabled?(:peer_review_allocation_and_grading)
 
     if peer_review_submissions?
       errors.add :peer_review_count,
