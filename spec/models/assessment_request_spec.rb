@@ -533,7 +533,10 @@ describe AssessmentRequest do
 
     context "consistency with PeerReviewCreatorService" do
       it "produces the same linking behavior as PeerReviewCreatorService for new requests" do
-        @course.enable_feature!(:peer_review_grading)
+        # There seems to be some weird issue with feature_flags_cache
+        # (triggered by something as simple as an `account.account_domains`) if
+        # we enable the flag directly on @course
+        @assignment.context.enable_feature!(:peer_review_grading)
 
         assessment_request = @assignment.assign_peer_review(reviewer, reviewee)
         expect(assessment_request.peer_review_sub_assignment_id).to be_nil
