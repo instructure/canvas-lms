@@ -14208,23 +14208,6 @@ i18next@^24.2.1:
   dependencies:
     "@babel/runtime" "^7.23.2"
 
-ic-ajax@~2.0.1:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/ic-ajax/-/ic-ajax-2.0.2.tgz#50c8ab1c494320fac66830ce1ee3990ab827f596"
-  integrity sha1-UMirHElDIPrGaDDOHuOZCrgn9ZY=
-
-ic-styled@^1.1.6:
-  version "1.1.7"
-  resolved "https://registry.yarnpkg.com/ic-styled/-/ic-styled-1.1.7.tgz#45b4411b58c592dab2784fa2979082e93e46bda7"
-  integrity sha1-RbRBG1jFktqyeE+il5CC6T5Gvac=
-
-ic-tabs@0.1.3:
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/ic-tabs/-/ic-tabs-0.1.3.tgz#36b37aacfc5eb37a752a655f8bb30abc10e5fb74"
-  integrity sha1-NrN6rPxes3p1KmVfi7MKvBDl+3Q=
-  dependencies:
-    ic-styled "^1.1.6"
-
 iconv-lite@0.4.24, iconv-lite@^0.4.24:
   version "0.4.24"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
