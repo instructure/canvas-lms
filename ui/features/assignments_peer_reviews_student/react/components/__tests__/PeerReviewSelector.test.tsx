@@ -91,4 +91,102 @@ describe('PeerReviewSelector', () => {
 
     expect(mockOnChange).toHaveBeenCalledWith(2)
   })
+
+  it('groups assessments into ready to review and completed sections', async () => {
+    const mockOnChange = jest.fn()
+    const user = userEvent.setup()
+    const mixedAssessments: AssessmentRequest[] = [
+      {
+        _id: 'ar-1',
+        available: true,
+        workflowState: 'assigned',
+        createdAt: '2025-11-01T00:00:00Z',
+      },
+      {
+        _id: 'ar-2',
+        available: true,
+        workflowState: 'assigned',
+        createdAt: '2025-11-02T00:00:00Z',
+      },
+      {
+        _id: 'ar-3',
+        available: true,
+        workflowState: 'completed',
+        createdAt: '2025-11-03T00:00:00Z',
+      },
+    ]
+
+    render(
+      <PeerReviewSelector
+        assessmentRequests={mixedAssessments}
+        selectedIndex={0}
+        onSelectionChange={mockOnChange}
+      />,
+    )
+
+    const selector = screen.getByTestId('peer-review-selector')
+    await user.click(selector)
+
+    expect(screen.getByText('Ready to Review')).toBeInTheDocument()
+    expect(screen.getByText('Completed Peer Reviews')).toBeInTheDocument()
+  })
+
+  it('only shows ready to review group when no completed assessments', async () => {
+    const mockOnChange = jest.fn()
+    const user = userEvent.setup()
+
+    render(
+      <PeerReviewSelector
+        assessmentRequests={mockAssessmentRequests}
+        selectedIndex={0}
+        onSelectionChange={mockOnChange}
+      />,
+    )
+
+    const selector = screen.getByTestId('peer-review-selector')
+    await user.click(selector)
+
+    expect(screen.getByText('Ready to Review')).toBeInTheDocument()
+    expect(screen.queryByText('Completed Peer Reviews')).not.toBeInTheDocument()
+  })
+
+  it('filters out unavailable items and shows only available in selector with correct numbering when item is unavailable', async () => {
+    const mockOnChange = jest.fn()
+    const user = userEvent.setup()
+    const assessmentsWithUnavailableFirst: AssessmentRequest[] = [
+      {
+        _id: 'ar-1',
+        available: false,
+        workflowState: 'assigned',
+        createdAt: '2025-11-01T00:00:00Z',
+      },
+      {
+        _id: 'ar-2',
+        available: true,
+        workflowState: 'assigned',
+        createdAt: '2025-11-02T00:00:00Z',
+      },
+      {
+        _id: 'ar-3',
+        available: true,
+        workflowState: 'assigned',
+        createdAt: '2025-11-03T00:00:00Z',
+      },
+    ]
+
+    render(
+      <PeerReviewSelector
+        assessmentRequests={assessmentsWithUnavailableFirst}
+        selectedIndex={0}
+        onSelectionChange={mockOnChange}
+      />,
+    )
+
+    const selector = screen.getByTestId('peer-review-selector')
+    await user.click(selector)
+
+    expect(screen.getByText('Peer Review (1 of 2)')).toBeInTheDocument()
+    expect(screen.getByText('Peer Review (2 of 2)')).toBeInTheDocument()
+    expect(screen.queryByText('Peer Review (1 of 3)')).not.toBeInTheDocument()
+  })
 })

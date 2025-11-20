@@ -19,6 +19,7 @@
 import React from 'react'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {IconCompleteLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {AssessmentRequest} from '../hooks/useAssignmentQuery'
 
@@ -35,11 +36,81 @@ export const PeerReviewSelector = ({
   selectedIndex,
   onSelectionChange,
 }: PeerReviewSelectorProps) => {
-  const hasAssessments = assessmentRequests && assessmentRequests.length > 0
+  const availableAssessments = (assessmentRequests ?? []).filter(
+    assessment => assessment.available === true,
+  )
+  const hasAssessments = availableAssessments.length > 0
 
   const handleChange = (_event: React.SyntheticEvent, data: {value?: string | number}) => {
     const index = Number(data.value)
     onSelectionChange(index)
+  }
+
+  const readyToReview = availableAssessments.filter(
+    assessment => assessment.workflowState === 'assigned',
+  )
+
+  const completedReviews = availableAssessments.filter(
+    assessment => assessment.workflowState === 'completed',
+  )
+
+  const renderChildren = () => {
+    if (!hasAssessments) {
+      return (
+        <SimpleSelect.Option id="no-peer-reviews" value="no-peer-reviews">
+          {I18n.t('No peer reviews available')}
+        </SimpleSelect.Option>
+      )
+    }
+
+    const children: React.ReactNode[] = []
+
+    if (readyToReview.length > 0) {
+      children.push(
+        <SimpleSelect.Group key="ready-group" renderLabel={I18n.t('Ready to Review')}>
+          {readyToReview.map(assessment => {
+            const index = availableAssessments.indexOf(assessment)
+            return (
+              <SimpleSelect.Option
+                key={assessment._id}
+                id={`peer-review-option-${index}`}
+                value={String(index)}
+              >
+                {I18n.t('Peer Review (%{number} of %{total})', {
+                  number: index + 1,
+                  total: availableAssessments.length,
+                })}
+              </SimpleSelect.Option>
+            )
+          })}
+        </SimpleSelect.Group>,
+      )
+    }
+
+    if (completedReviews.length > 0) {
+      children.push(
+        <SimpleSelect.Group key="completed-group" renderLabel={I18n.t('Completed Peer Reviews')}>
+          {completedReviews.map(assessment => {
+            const index = availableAssessments.indexOf(assessment)
+            return (
+              <SimpleSelect.Option
+                key={assessment._id}
+                id={`peer-review-option-${index}`}
+                value={String(index)}
+                renderBeforeLabel={<IconCompleteLine />}
+              >
+                {I18n.t('Peer Review (%{number} of %{total})', {
+                  number: index + 1,
+                  total: availableAssessments.length,
+                })}
+              </SimpleSelect.Option>
+            )
+          })}
+        </SimpleSelect.Group>,
+      )
+    }
+
+    return children
   }
 
   return (
@@ -51,24 +122,7 @@ export const PeerReviewSelector = ({
       width="15rem"
       assistiveText={I18n.t('Use arrow keys to navigate options. Press Enter to select.')}
     >
-      {hasAssessments ? (
-        assessmentRequests.map((assessment, index) => (
-          <SimpleSelect.Option
-            key={assessment._id}
-            id={`peer-review-option-${index}`}
-            value={String(index)}
-          >
-            {I18n.t('Peer Review (%{number} of %{total})', {
-              number: index + 1,
-              total: assessmentRequests.length,
-            })}
-          </SimpleSelect.Option>
-        ))
-      ) : (
-        <SimpleSelect.Option id="no-peer-reviews" value="no-peer-reviews">
-          {I18n.t('No peer reviews available')}
-        </SimpleSelect.Option>
-      )}
+      {renderChildren()}
     </SimpleSelect>
   )
 }
