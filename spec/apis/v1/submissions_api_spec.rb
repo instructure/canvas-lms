@@ -7291,6 +7291,54 @@ describe "Submissions API", type: :request do
       expect(json.size).to eq 1
       expect(json[0]["id"]).to eq section_student.id
     end
+
+    it "only returns assignment_ids for requested assignments even when students have access to more" do
+      @assignment3 = @course.assignments.create!(title: "Third Assignment", points_possible: 10)
+      @assignment4 = @course.assignments.create!(title: "Fourth Assignment", points_possible: 10)
+
+      requested_params = { controller: "submissions_api",
+                           action: "multiple_gradeable_students",
+                           format: "json",
+                           course_id: @course.to_param,
+                           assignment_ids: [@assignment1.to_param, @assignment2.to_param] }
+
+      json = api_call_as_user(@teacher, :get, @path, requested_params)
+
+      expect(json.pluck("id")).to match_array([@student1.id, @student2.id])
+
+      json.each do |student_json|
+        expect(student_json["assignment_ids"]).to match_array([@assignment1.id, @assignment2.id])
+        expect(student_json["assignment_ids"]).not_to include(@assignment3.id)
+        expect(student_json["assignment_ids"]).not_to include(@assignment4.id)
+      end
+    end
+
+    it "filters assignment_ids based on differentiated access for requested assignments" do
+      section = add_section("Restricted Section")
+      section_student = student_in_section(section, active_all: true)
+
+      @assignment3 = @course.assignments.create!(title: "Section Only Assignment", only_visible_to_overrides: true)
+      @assignment3.assignment_overrides.create!(set: section)
+
+      requested_params = { controller: "submissions_api",
+                           action: "multiple_gradeable_students",
+                           format: "json",
+                           course_id: @course.to_param,
+                           assignment_ids: [@assignment1.to_param, @assignment2.to_param, @assignment3.to_param] }
+
+      json = api_call_as_user(@teacher, :get, @path, requested_params)
+
+      student1_data = json.find { |s| s["id"] == @student1.id }
+      student2_data = json.find { |s| s["id"] == @student2.id }
+      section_student_data = json.find { |s| s["id"] == section_student.id }
+
+      expect(student1_data["assignment_ids"]).to match_array([@assignment1.id, @assignment2.id])
+      expect(student2_data["assignment_ids"]).to match_array([@assignment1.id, @assignment2.id])
+      expect(section_student_data["assignment_ids"]).to match_array([@assignment1.id, @assignment2.id, @assignment3.id])
+
+      expect(student1_data["assignment_ids"]).not_to include(@assignment3.id)
+      expect(student2_data["assignment_ids"]).not_to include(@assignment3.id)
+    end
   end
 
   describe "#index" do

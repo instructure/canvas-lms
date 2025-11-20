@@ -1299,10 +1299,15 @@ class SubmissionsApiController < ApplicationController
 
       students = Api.paginate(student_scope, self, api_v1_multiple_assignments_gradeable_students_url(@context))
 
+      visibility_by_user = AssignmentVisibility::AssignmentVisibilityService.visible_assignment_ids_in_course_by_user(
+        user_ids: students.map(&:id),
+        course_ids: @context.id,
+        assignment_ids:
+      )
+
       student_displays = students.map do |student|
         user_display = user_display_json(student, @context)
-        visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids:, user_ids: student.id).map(&:assignment_id)
-        user_display["assignment_ids"] = visible_assignment_ids
+        user_display["assignment_ids"] = visibility_by_user[student.id] || []
         user_display
       end
 

@@ -22,8 +22,8 @@ module AssignmentVisibility
     extend VisibilityHelpers::Common
 
     class << self
-      def visible_assignment_ids_in_course_by_user(user_ids:, course_ids:, use_global_id: false)
-        vis_hash = assignments_visible_to_students(user_ids:, course_ids:)
+      def visible_assignment_ids_in_course_by_user(user_ids:, course_ids:, use_global_id: false, assignment_ids: nil)
+        vis_hash = assignments_visible_to_students(user_ids:, course_ids:, assignment_ids:)
                    .group_by(&:user_id)
                    .transform_values { |a| a.map(&:assignment_id) }
         vis_hash.transform_keys! { |k| Shard.global_id_for(k) } if use_global_id
