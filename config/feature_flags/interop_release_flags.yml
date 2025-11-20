@@ -261,6 +261,21 @@ lti_asset_processor_course:
       state: allowed_on
     ci:
       state: allowed_on
+lti_asset_processor_tii_migration:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: LTI Asset Processor Turnitin Migration
+  description: |-
+    Enables migration of LTI 2.0 (Canvas Plagiarism Framework) Turnitin ToolProxy instances to LTI 1.3 deployments with
+    Asset Processors.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_before_assignment_results:
   state: hidden
   display_name: Display LTI placement before assignment description after submitting.
