@@ -650,6 +650,38 @@ describe ContextModulesController do
         end
       end
     end
+
+    context "student viewing modules" do
+      before :once do
+        course_with_student(active_all: true)
+        @module1 = @course.context_modules.create!(name: "Module 1")
+        @module2 = @course.context_modules.create!(name: "Module 2")
+        @module3 = @course.context_modules.create!(name: "Module 3")
+      end
+
+      it "does not trigger N+1 queries when evaluating module progressions" do
+        [@module1, @module2, @module3].each { |m| m.evaluate_for(@student) }
+        user_session(@student)
+
+        expect do
+          get "index", params: { course_id: @course.id }
+        end.to make_database_queries(count: 0..1, matching: /SELECT.*context_module_progressions.*WHERE.*context_module_id.*=/)
+      end
+
+      it "preloads progressions in a single query" do
+        [@module1, @module2, @module3].each { |m| m.evaluate_for(@student) }
+        user_session(@student)
+
+        query_count = 0
+        allow(ContextModuleProgression).to receive(:where).and_wrap_original do |method, *args|
+          query_count += 1 if args.any? { |arg| arg.is_a?(Hash) && arg.key?(:context_module_id) }
+          method.call(*args)
+        end
+
+        get "index", params: { course_id: @course.id }
+        expect(query_count).to eq 1
+      end
+    end
   end
 
   describe "PUT 'update'" do

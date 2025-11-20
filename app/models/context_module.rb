@@ -998,6 +998,15 @@ class ContextModule < ActiveRecord::Base
     progressions.uniq
   end
 
+  def self.preload_progressions_for_user(modules, user)
+    return {} unless user && modules.any?
+
+    module_ids = modules.map(&:id)
+    ContextModuleProgression
+      .where(user_id: user.id, context_module_id: module_ids)
+      .index_by(&:context_module_id)
+  end
+
   def find_or_create_progression(user)
     return nil unless user
 
