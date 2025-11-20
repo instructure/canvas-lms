@@ -81,10 +81,6 @@ describe Loaders::UserLoaders::GroupMembershipsLoader do
     @course2.update(workflow_state: "available")
   end
 
-  after do
-    Loaders::UserLoaders::GroupMembershipsLoader.clear_cache
-  end
-
   it "loads all group memberships for multiple users" do
     GraphQL::Batch.batch do
       loader = Loaders::UserLoaders::GroupMembershipsLoader.for(executing_user: @teacher)
@@ -203,9 +199,9 @@ describe Loaders::UserLoaders::GroupMembershipsLoader do
       @course1.enroll_student(@user4, enrollment_state: "active")
       @group1.add_user(@user4)
 
-      loader = Loaders::UserLoaders::GroupMembershipsLoader.for(executing_user: @user1, filter: { yeet: "yeet" })
-
       GraphQL::Batch.batch do
+        loader = Loaders::UserLoaders::GroupMembershipsLoader.for(executing_user: @user1, filter: { yeet: "yeet" })
+
         loader.load(@user1.id).then do |memberships|
           # user 1 can see their own memberships in collaborative groups
           expect(memberships.length).to eq 3
