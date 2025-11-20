@@ -774,5 +774,44 @@ module Lti
         tool_proxy.destroy
       end
     end
+
+    describe "#migrated_to_context_external_tool association" do
+      let(:account) { Account.create! }
+      let(:tool_proxy) { create_tool_proxy(context: account) }
+      let(:context_external_tool) do
+        external_tool_1_3_model(context: account, opts: { name: "migrated tool" })
+      end
+
+      it "allows associating a ContextExternalTool" do
+        tool_proxy.update!(migrated_to_context_external_tool: context_external_tool)
+        expect(tool_proxy.reload.migrated_to_context_external_tool).to eq context_external_tool
+      end
+
+      it "allows nil association" do
+        tool_proxy.update!(migrated_to_context_external_tool: nil)
+        expect(tool_proxy.reload.migrated_to_context_external_tool).to be_nil
+      end
+
+      describe "when ContextExternalTool is hard deleted" do
+        it "nullifies the reference on ToolProxy" do
+          tool_proxy.update!(migrated_to_context_external_tool: context_external_tool)
+          expect(tool_proxy.reload.migrated_to_context_external_tool).to eq context_external_tool
+
+          context_external_tool.destroy_permanently!
+          expect(tool_proxy.reload.migrated_to_context_external_tool_id).to be_nil
+        end
+      end
+
+      describe "when ToolProxy is deleted" do
+        it "does not affect the associated ContextExternalTool" do
+          tool_proxy.update!(migrated_to_context_external_tool: context_external_tool)
+          expect(tool_proxy.reload.migrated_to_context_external_tool).to eq context_external_tool
+
+          tool_proxy.destroy
+          expect(ContextExternalTool.find_by(id: context_external_tool.id)).to eq context_external_tool
+          expect(context_external_tool.reload.workflow_state).to eq "anonymous"
+        end
+      end
+    end
   end
 end

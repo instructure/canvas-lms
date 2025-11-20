@@ -27,6 +27,7 @@ module Lti
 
     belongs_to :context, polymorphic: [:course, :account]
     belongs_to :product_family, class_name: "Lti::ProductFamily"
+    belongs_to :migrated_to_context_external_tool, class_name: "ContextExternalTool", optional: true
 
     after_save :manage_subscription
     before_destroy :delete_subscription
