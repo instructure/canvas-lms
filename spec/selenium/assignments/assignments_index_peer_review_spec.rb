@@ -221,5 +221,46 @@ describe "assignments index peer reviews" do
 
       expect(selector.attribute("value")).to eq("No peer reviews available")
     end
+
+    it "groups peer review assessments into ready to review and completed sections", custom_timeout: 30 do
+      student4 = student_in_course(name: "Student 4", course: @course, enrollment_state: :active).user
+      completed_assessment = @peer_review_assignment.assign_peer_review(@student1, student4)
+
+      @peer_review_assignment.submit_homework(
+        @student1,
+        body: "student 1 attempt",
+        submission_type: "online_text_entry"
+      )
+      @peer_review_assignment.submit_homework(
+        @student2,
+        body: "student 2 attempt",
+        submission_type: "online_text_entry"
+      )
+      @peer_review_assignment.submit_homework(
+        @student3,
+        body: "student 3 attempt",
+        submission_type: "online_text_entry"
+      )
+      @peer_review_assignment.submit_homework(
+        student4,
+        body: "student 4 attempt",
+        submission_type: "online_text_entry"
+      )
+
+      completed_assessment.complete!
+
+      get "/courses/#{@course.id}/assignments/#{@peer_review_assignment.id}/peer_reviews"
+      selector = f("input[data-testid='peer-review-selector']")
+      expect(selector).to be_present
+
+      options = INSTUI_Select_options(selector)
+      option_texts = options.map(&:text)
+
+      peer_review_options = option_texts.select { |text| text.include?("Peer Review") }
+      expect(peer_review_options.count).to eq(3)
+
+      expect(f("body")).to include_text("Ready to Review")
+      expect(f("body")).to include_text("Completed Peer Reviews")
+    end
   end
 end
