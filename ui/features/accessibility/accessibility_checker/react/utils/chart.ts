@@ -18,9 +18,10 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {FILTER_GROUP_MAPPING, issueTypeOptions, severityColors} from '../constants'
+import {FILTER_GROUP_MAPPING, issueTypeOptions} from '../constants'
 import {IssueDataPoint, IssueRuleType, FilterGroupMapping} from '../../../shared/react/types'
 import {getIssueSeverity} from '../../../shared/react/utils/apiData'
+import {primitives} from '@instructure/ui-themes'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -62,21 +63,35 @@ export const processIssuesToChartData = (byRuleType?: Record<string, number>): I
   return Object.values(dataPoints)
 }
 
-const wrapLabel = (label: string): string[] => label.split(' ')
+const wrapLabel = (label: string, maxWidth: number = 70): string[] => {
+  const words = label.split(' ')
+  const lines: string[] = []
+  const charsPerLine = Math.floor(maxWidth / 6) // using 6px as an average character width
+  let currentLine = ''
 
-export const getChartData = (issuesData: IssueDataPoint[], containerWidth: number) => {
-  // Adaptive labels depending on container size
-  const datasetData = issuesData.map(d => d.count)
-  const labels = issuesData.map(d => {
-    if (containerWidth > 600) {
-      return wrapLabel(d.issue) // multi-line labels
+  words.forEach(word => {
+    const testLine = currentLine ? `${currentLine} ${word}` : word
+
+    if (testLine.length <= charsPerLine) {
+      currentLine = testLine
     } else {
-      const maxLength = 5
-      return d.issue.length > maxLength ? d.issue.substring(0, maxLength) + '…' : d.issue
+      if (currentLine) lines.push(currentLine)
+      currentLine = word
     }
   })
 
-  const barColors = issuesData.map(d => severityColors[d.severity])
+  if (currentLine) lines.push(currentLine)
+
+  return lines
+}
+
+export const getChartData = (issuesData: IssueDataPoint[], containerWidth: number) => {
+  const barWidth = (containerWidth / issuesData.length) * 0.8 * 0.9 // 80% for bars, 90% for padding
+  const datasetData = issuesData.map(d => d.count)
+  const labels = issuesData.map(d => {
+    const labelWithCount = `${d.issue} (${d.count})`
+    return wrapLabel(labelWithCount, barWidth)
+  })
 
   return {
     labels,
@@ -84,7 +99,7 @@ export const getChartData = (issuesData: IssueDataPoint[], containerWidth: numbe
       {
         label: I18n.t('Issues'),
         data: datasetData,
-        backgroundColor: barColors,
+        backgroundColor: primitives.red45,
         borderRadius: 4,
       },
     ],

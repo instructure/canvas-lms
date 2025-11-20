@@ -18,15 +18,9 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {IssueRuleType, Severity, FilterGroupMapping} from '../../shared/react/types'
+import {IssueRuleType, FilterGroupMapping} from '../../shared/react/types'
 
 const I18n = createI18nScope('accessibility_checker')
-
-export const severityColors: Record<Severity, string> = {
-  High: '#9B181C', // Red82
-  Medium: '#E62429', // red45
-  Low: '#F06E26', // orange30
-}
 
 export const LIMIT_EXCEEDED_MESSAGE = I18n.t(
   'The Course Accessibility Checker is not yet available for courses with more than 1,000 resources (pages and assignments combined).',
