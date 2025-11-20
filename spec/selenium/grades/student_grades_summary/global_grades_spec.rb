@@ -208,8 +208,8 @@ describe "Global Grades" do
       # find link for Second Course and click
       wait_for_new_page_load { GlobalGrades.click_course_link(@course_with_gp) }
 
-      # verify url has correct course id
-      expect(driver.current_url).to eq app_url + "/courses/#{@course_with_gp.id}/gradebook"
+      # verify url has correct course id (ignore query parameters)
+      expect(URI.parse(driver.current_url).path).to eq "/courses/#{@course_with_gp.id}/gradebook"
       # verify assignment score is correct
       expect(Gradebook::Cells.get_total_grade(@student)).to eq("#{grade_current_gp.round(2)}%")
     end
