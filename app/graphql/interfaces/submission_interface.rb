@@ -666,7 +666,8 @@ module Interfaces::SubmissionInterface
         assignment_id: submission.assignment_id,
         url: submission.external_tool_url(query_params: submission.tool_default_query_params(current_user)),
         display: "borderless",
-        host: context[:request].host_with_port
+        host: context[:request].host_with_port,
+        resource_link_lookup_uuid: submission.resource_link_lookup_uuid
       )
     else
       Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
