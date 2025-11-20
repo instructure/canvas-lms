@@ -1246,6 +1246,28 @@ describe Types::SubmissionType do
         )
         expect(query_params[:url]).not_to include "grade_by_question_enabled"
       end
+
+      it "includes resource_link_lookup_uuid when present" do
+        uuid = SecureRandom.uuid
+        @assignment.submit_homework(
+          @student,
+          submission_type: "basic_lti_launch",
+          url: "http://anexternaltoolsubmission.com",
+          resource_link_lookup_uuid: uuid
+        )
+        expect(query_params[:resource_link_lookup_uuid]).to eq uuid
+        expect(preview_url).to include "resource_link_lookup_uuid=#{uuid}"
+      end
+
+      it "excludes resource_link_lookup_uuid when not present" do
+        @assignment.submit_homework(
+          @student,
+          submission_type: "basic_lti_launch",
+          url: "http://anexternaltoolsubmission.com"
+        )
+        expect(query_params[:resource_link_lookup_uuid]).to be_nil
+        expect(preview_url).not_to include "resource_link_lookup_uuid"
+      end
     end
 
     it "includes a 'version' query param that corresponds to the attempt number - 1 (and NOT the associated submission version number)" do
