@@ -710,6 +710,10 @@ Assignment.prototype.peerReviewSubAssignment = function () {
   return this.get('peer_review_sub_assignment')
 }
 
+Assignment.prototype.hasPeerReviewSubmissions = function () {
+  return this.get('has_peer_review_submissions')
+}
+
 Assignment.prototype.notifyOfUpdate = function (notifyOfUpdateBoolean) {
   if (!(arguments.length > 0)) {
     return this.get('notify_of_update')

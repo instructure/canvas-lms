@@ -9765,6 +9765,43 @@ describe Assignment do
       expect(@assignment).to be_valid
     end
 
+    it "allows updating various assignment properties when peer review submissions exist" do
+      submission1 = @assignment.find_or_create_submission(@student1)
+      submission2 = @assignment.find_or_create_submission(@student2)
+      AssessmentRequest.create!(
+        user: @student1,
+        asset: submission1,
+        assessor_asset: submission2,
+        assessor: @student2,
+        workflow_state: "completed"
+      )
+
+      expect(@assignment.peer_review_submissions?).to be true
+
+      @assignment.name = "Updated Assignment Title"
+      expect(@assignment.save).to be true
+      expect(@assignment.errors).to be_empty
+
+      @assignment.description = "Updated description"
+      expect(@assignment.save).to be true
+      expect(@assignment.errors).to be_empty
+
+      @assignment.due_at = 1.week.from_now
+      expect(@assignment.save).to be true
+      expect(@assignment.errors).to be_empty
+
+      @assignment.points_possible = 150
+      expect(@assignment.save).to be true
+      expect(@assignment.errors).to be_empty
+
+      expect(@assignment.peer_review_count).to eq(2)
+      @assignment.peer_review_count = 3
+      expect(@assignment.save).to be false
+      expect(@assignment.errors[:peer_review_count]).to include(
+        "Students have already submitted peer reviews, so reviews required and points cannot be changed."
+      )
+    end
+
     it "does not validate peer review count when feature flag is disabled" do
       @course.disable_feature!(:peer_review_allocation_and_grading)
       submission1 = @assignment.find_or_create_submission(@student1)

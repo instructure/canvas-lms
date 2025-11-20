@@ -44,6 +44,7 @@ const createMockAssignment = (overrides = {}) => ({
   peerReviewSubmissionRequired: jest.fn(() => false),
   groupCategoryId: jest.fn(() => null),
   peerReviewAcrossSections: jest.fn(() => true),
+  hasPeerReviewSubmissions: jest.fn(() => false),
   ...overrides,
 })
 
@@ -1262,6 +1263,94 @@ describe('PeerReviewDetails', () => {
 
       const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
       expect(pointsPerReviewInput).toHaveValue(0)
+    })
+  })
+
+  describe('Disabled state when peer review submissions exist', () => {
+    beforeEach(() => {
+      assignment.peerReviews = jest.fn(() => true)
+      assignment.hasPeerReviewSubmissions = jest.fn(() => true)
+    })
+
+    it('shows alert message when peer review submissions exist', () => {
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      expect(
+        screen.getByText(
+          'Students have already submitted peer reviews, so reviews required and points cannot be changed.',
+        ),
+      ).toBeInTheDocument()
+    })
+
+    it('disables reviews required input when peer review submissions exist', () => {
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
+      expect(reviewsRequiredInput).toBeDisabled()
+    })
+
+    it('disables points per review input when peer review submissions exist', () => {
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
+      expect(pointsPerReviewInput).toBeDisabled()
+    })
+
+    it('does not show alert or disable fields when peer review submissions do not exist', () => {
+      assignment.hasPeerReviewSubmissions = jest.fn(() => false)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      expect(
+        screen.queryByText(
+          'Students have already submitted peer reviews, so reviews required and points cannot be changed.',
+        ),
+      ).not.toBeInTheDocument()
+
+      const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
+      const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
+
+      expect(reviewsRequiredInput).not.toBeDisabled()
+      expect(pointsPerReviewInput).not.toBeDisabled()
+    })
+
+    it('does not show alert or disable fields when PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED is false', () => {
+      // @ts-expect-error
+      global.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
+
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      expect(
+        screen.queryByText(
+          'Students have already submitted peer reviews, so reviews required and points cannot be changed.',
+        ),
+      ).not.toBeInTheDocument()
+
+      const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
+      expect(reviewsRequiredInput).not.toBeDisabled()
+
+      // @ts-expect-error
+      global.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
+    })
+
+    it('does not show alert or disable fields when hasPeerReviewSubmissions method does not exist', () => {
+      const assignmentWithoutMethod = createMockAssignment({
+        peerReviews: jest.fn(() => true),
+      })
+      delete (assignmentWithoutMethod as any).hasPeerReviewSubmissions
+
+      renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithoutMethod as any} />)
+
+      expect(
+        screen.queryByText(
+          'Students have already submitted peer reviews, so reviews required and points cannot be changed.',
+        ),
+      ).not.toBeInTheDocument()
+
+      const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
+      const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
+
+      expect(reviewsRequiredInput).not.toBeDisabled()
+      expect(pointsPerReviewInput).not.toBeDisabled()
     })
   })
 })
