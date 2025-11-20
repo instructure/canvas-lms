@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Filnamn"
     },
+    "file_preview_21667a6e": {
+        "message": "Förhandsgranskning av fil"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Förhandsgranskning av fil för { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Kvoten för fillagring har överskridits"
     },

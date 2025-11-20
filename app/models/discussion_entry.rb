@@ -852,7 +852,7 @@ class DiscussionEntry < ActiveRecord::Base
       Lti::AssetProcessorDiscussionNotifier.delay_if_production.notify_asset_processors_of_discussion(
         assignment: discussion_topic.assignment,
         submission:,
-        discussion_entry_version: discussion_entry_versions.first,
+        discussion_entry_versions: [discussion_entry_versions.first],
         contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::DELETED,
         current_user:
       )
@@ -862,7 +862,7 @@ class DiscussionEntry < ActiveRecord::Base
       Lti::AssetProcessorDiscussionNotifier.delay_if_production.notify_asset_processors_of_discussion(
         assignment: discussion_topic.assignment,
         submission:,
-        discussion_entry_version: discussion_entry_versions.first,
+        discussion_entry_versions: [discussion_entry_versions.first],
         contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
         current_user: saving_user
       )

@@ -22,22 +22,13 @@ module Accessibility
     class ParagraphsForHeadingsRule < Accessibility::Rule
       MAX_HEADING_LENGTH = 120
 
-      IS_HEADING = {
-        "h1" => true,
-        "h2" => true,
-        "h3" => true,
-        "h4" => true,
-        "h5" => true,
-        "h6" => true
-      }.freeze
-
       self.id = "paragraphs-for-headings"
-      self.link = "https://www.w3.org/TR/WCAG20-TECHS/G141.html"
+      self.link = nil
 
       # Accessibility::Rule methods
 
       def test(elem)
-        return nil unless IS_HEADING[elem.tag_name.downcase]
+        return nil unless self.class.h_tag?(elem)
 
         if elem.text_content.length > MAX_HEADING_LENGTH
           I18n.t("Heading shall be shorter than %{value}.", { value: MAX_HEADING_LENGTH })
@@ -50,6 +41,10 @@ module Accessibility
           undo_text: I18n.t("Formatted as paragraph"),
           value: "false"
         )
+      end
+
+      def self.h_tag?(elem)
+        elem&.tag_name&.downcase&.match?(/^h[1-6]$/)
       end
 
       def fix!(elem, value)
@@ -68,12 +63,12 @@ module Accessibility
       end
 
       def why
-        I18n.t(
+        [I18n.t(
           "Sighted users scan web pages by identifying headings. Similarly, screen reader users rely on headings" \
           "to quickly understand and navigate your content. If a heading is too long, it can be confusing to scan," \
-          "harder to read aloud by assistive technology, and less effective for outlining your page. Keep headings" \
-          "short, specific, and meaningful, not full sentences or paragraphs."
-        )
+          "harder to read aloud by assistive technology, and less effective for outlining your page."
+        ),
+         I18n.t("Keep headings short, specific, and meaningful, not full sentences or paragraphs.")]
       end
     end
   end

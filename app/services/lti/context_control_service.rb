@@ -241,7 +241,7 @@ module Lti
           available: parent_availability,
           path:,
         }
-      end
+      end.uniq { [it[:account_id], it[:deployment_id]] }
     end
 
     # Calculate attributes in bulk for a collection of Lti::ContextControls.

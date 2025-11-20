@@ -24,7 +24,12 @@ import {
   type LtiRegistrationWithLegacyConfiguration,
   ZLtiRegistrationWithAllInformation,
 } from '../model/LtiRegistration'
-import {type ApiResult, parseFetchResult, mapApiResult} from '../../common/lib/apiResult/ApiResult'
+import {
+  type ApiResult,
+  parseFetchResult,
+  mapApiResult,
+  exception,
+} from '../../common/lib/apiResult/ApiResult'
 import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 import type {AccountId} from '../model/AccountId'
 import {defaultFetchOptions} from '@canvas/util/xhr'
@@ -46,6 +51,11 @@ import {doFetchWithSchema} from '@canvas/do-fetch-api-effect'
 import {getAccountId} from '../../common/lib/getAccountId'
 import {ZPaginatedList} from './PaginatedList'
 import {queryClient} from '@canvas/query'
+import {
+  diffHistoryEntries,
+  diffHistoryEntry,
+  LtiHistoryEntryWithDiff,
+} from '../pages/tool_details/history/differ'
 
 export type AppsSortProperty =
   | 'name'
@@ -248,7 +258,10 @@ export const useDeleteRegistration = () => {
     mutationFn: ({
       registrationId,
       accountId,
-    }: {registrationId: LtiRegistrationId; accountId: AccountId}) =>
+    }: {
+      registrationId: LtiRegistrationId
+      accountId: AccountId
+    }) =>
       doFetchWithSchema(
         {
           method: 'DELETE',
@@ -453,14 +466,32 @@ export const fetchLtiRegistrationOverlayHistory = (
     ),
   )
 
-export const fetchLtiRegistrationHistory = (
-  accountId: AccountId,
-  ltiRegistrationId: LtiRegistrationId,
-  per_page: number,
-): Promise<ApiResult<LtiRegistrationHistoryEntry[]>> =>
-  parseFetchResult(z.array(ZLtiRegistrationHistoryEntry))(
-    fetch(
-      `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/history?per_page=${per_page}`,
-      defaultFetchOptions(),
-    ),
-  )
+export type FetchLtiRegistrationHistoryArgs =
+  | {
+      accountId: AccountId
+      ltiRegistrationId: LtiRegistrationId
+    }
+  | {
+      url: string
+    }
+
+export const fetchLtiRegistrationHistory = async (
+  args: FetchLtiRegistrationHistoryArgs,
+): Promise<ApiResult<LtiHistoryEntryWithDiff[]>> => {
+  let url: string
+  if ('url' in args) {
+    url = args.url
+  } else {
+    url = `/api/v1/accounts/${args.accountId}/lti_registrations/${args.ltiRegistrationId}/history`
+  }
+  return parseFetchResult(z.array(ZLtiRegistrationHistoryEntry))(fetch(url, defaultFetchOptions()))
+    .then(r => mapApiResult(r, diffHistoryEntries))
+    .catch(e => {
+      console.error('Error fetching LTI registration history:', e)
+      if (e instanceof Error) {
+        return exception(e)
+      } else {
+        return exception(new Error('Encountered an unknown error diffing history entries'))
+      }
+    })
+}

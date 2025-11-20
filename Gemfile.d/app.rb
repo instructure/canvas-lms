@@ -117,6 +117,7 @@ gem "twilio-ruby", "~> 7.0", require: false
 gem "vault", "~> 0.17", require: false
 gem "vericite_api", "1.5.3"
 gem "wcag_color_contrast", "0.1.0"
+gem "css_parser", "~> 1.17"
 
 path "../gems" do
   gem "activesupport-suspend_callbacks"

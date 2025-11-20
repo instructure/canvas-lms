@@ -28,12 +28,13 @@ import React from 'react'
 import {ConversationContext} from '../../../util/constants'
 import * as utils from '../../../util/utils'
 import * as uploadFileModule from '@canvas/upload-file'
-import {graphql} from 'msw'
+import {graphql, HttpResponse} from 'msw'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/upload-file')
 
 jest.mock('../../../util/utils', () => ({
+  ...jest.requireActual('../../../util/utils'),
   responsiveQuerySizes: jest.fn().mockReturnValue({
     desktop: {minWidth: '768px'},
   }),
@@ -222,6 +223,195 @@ describe('ComposeModalContainer', () => {
           expect(button).toBeInTheDocument()
         },
         {timeout: 3000},
+      )
+    })
+
+    it('should fetch all observers when button is clicked (single page)', async () => {
+      const onSelectedIdsChange = jest.fn()
+
+      // Setup MSW handler for single page response
+      server.use(
+        graphql.query('GetRecipientsObservers', ({variables}) => {
+          return HttpResponse.json({
+            data: {
+              legacyNode: {
+                id: 'VXNlci0x',
+                __typename: 'User',
+                recipientsObservers: {
+                  nodes: [
+                    {
+                      id: 'observer_3',
+                      name: 'Observer 1',
+                      __typename: 'MessageableUser',
+                      _id: '3',
+                    },
+                    {
+                      id: 'observer_4',
+                      name: 'Observer 2',
+                      __typename: 'MessageableUser',
+                      _id: '4',
+                    },
+                  ],
+                  pageInfo: {
+                    hasNextPage: false,
+                    endCursor: null,
+                    __typename: 'PageInfo',
+                  },
+                },
+              },
+            },
+          })
+        }),
+      )
+
+      const component = render(
+        <ApolloProvider client={mswClient}>
+          <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+            <ConversationContext.Provider value={{isSubmissionCommentsType: false}}>
+              <ComposeModalManager
+                open={true}
+                onDismiss={jest.fn()}
+                selectedIds={[
+                  {id: 'user_1', _id: '1', name: 'Student 1'},
+                  {id: 'user_2', _id: '2', name: 'Student 2'},
+                ]}
+                onSelectedIdsChange={onSelectedIdsChange}
+                activeCourseFilterID="course_1"
+              />
+            </ConversationContext.Provider>
+          </AlertManagerContext.Provider>
+        </ApolloProvider>,
+      )
+
+      await waitForApolloLoading()
+
+      // Find and click the include observers button
+      const button = await component.findByTestId('include-observer-button')
+      expect(button).toBeInTheDocument()
+      fireEvent.click(button)
+
+      // Wait for observers to be fetched and onSelectedIdsChange to be called
+      await waitFor(
+        () => {
+          expect(onSelectedIdsChange).toHaveBeenCalled()
+          const callArgs =
+            onSelectedIdsChange.mock.calls[onSelectedIdsChange.mock.calls.length - 1][0]
+          // Should have original 2 recipients plus 2 observers = 4 total
+          expect(callArgs).toHaveLength(4)
+          // Check that observers were added
+          const observerIds = callArgs.map(r => r._id)
+          expect(observerIds).toContain('3')
+          expect(observerIds).toContain('4')
+        },
+        {timeout: 3000},
+      )
+    })
+
+    it('should fetch all observers across multiple pages when button is clicked', async () => {
+      let callCount = 0
+      const onSelectedIdsChange = jest.fn()
+
+      // Setup MSW handler for multi-page response
+      server.use(
+        graphql.query('GetRecipientsObservers', ({variables}) => {
+          callCount++
+
+          // First page
+          if (!variables.after || variables.after === null) {
+            return HttpResponse.json({
+              data: {
+                legacyNode: {
+                  id: 'VXNlci0x',
+                  __typename: 'User',
+                  recipientsObservers: {
+                    nodes: Array.from({length: 20}, (_, i) => ({
+                      id: `observer_${i + 1}`,
+                      name: `Observer ${i + 1}`,
+                      __typename: 'MessageableUser',
+                      _id: `${i + 1}`,
+                    })),
+                    pageInfo: {
+                      hasNextPage: true,
+                      endCursor: 'cursor1',
+                      __typename: 'PageInfo',
+                    },
+                  },
+                },
+              },
+            })
+          }
+
+          // Second page
+          if (variables.after === 'cursor1') {
+            return HttpResponse.json({
+              data: {
+                legacyNode: {
+                  id: 'VXNlci0x',
+                  __typename: 'User',
+                  recipientsObservers: {
+                    nodes: Array.from({length: 10}, (_, i) => ({
+                      id: `observer_${i + 21}`,
+                      name: `Observer ${i + 21}`,
+                      __typename: 'MessageableUser',
+                      _id: `${i + 21}`,
+                    })),
+                    pageInfo: {
+                      hasNextPage: false,
+                      endCursor: null,
+                      __typename: 'PageInfo',
+                    },
+                  },
+                },
+              },
+            })
+          }
+        }),
+      )
+
+      const component = render(
+        <ApolloProvider client={mswClient}>
+          <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+            <ConversationContext.Provider value={{isSubmissionCommentsType: false}}>
+              <ComposeModalManager
+                open={true}
+                onDismiss={jest.fn()}
+                selectedIds={[
+                  {id: 'user_100', _id: '100', name: 'Student 1'},
+                  {id: 'user_101', _id: '101', name: 'Student 2'},
+                ]}
+                onSelectedIdsChange={onSelectedIdsChange}
+                activeCourseFilterID="course_1"
+              />
+            </ConversationContext.Provider>
+          </AlertManagerContext.Provider>
+        </ApolloProvider>,
+      )
+
+      await waitForApolloLoading()
+
+      // Find and click the include observers button
+      const button = await component.findByTestId('include-observer-button')
+      expect(button).toBeInTheDocument()
+      fireEvent.click(button)
+
+      // Wait for all observers to be fetched across pages
+      await waitFor(
+        () => {
+          expect(onSelectedIdsChange).toHaveBeenCalled()
+          // Verify multiple pages were fetched
+          expect(callCount).toBeGreaterThanOrEqual(2)
+
+          const callArgs =
+            onSelectedIdsChange.mock.calls[onSelectedIdsChange.mock.calls.length - 1][0]
+          // Should have original 2 recipients plus 30 observers = 32 total
+          expect(callArgs).toHaveLength(32)
+
+          // Check that observers from both pages were added
+          const observerIds = callArgs.map(r => r._id)
+          expect(observerIds).toContain('1') // from first page
+          expect(observerIds).toContain('30') // from second page
+        },
+        {timeout: 5000},
       )
     })
   })

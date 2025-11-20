@@ -452,6 +452,7 @@ class Account < ActiveRecord::Base
 
   add_setting :decimal_separator, inheritable: true
   add_setting :thousand_separator, inheritable: true
+  add_setting :early_access_program, boolean: true, default: false, root_only: true, inheritable: true
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -631,7 +632,7 @@ class Account < ActiveRecord::Base
   def recaptcha_key
     return nil unless root_account? && self_registration_captcha?
 
-    DynamicSettings.find(tree: "private")["recaptcha_client_key", failsafe: nil]
+    Rails.application.credentials.dig(:recaptcha_keys, :client_key)
   end
 
   def self_registration_allowed_for?(type)
@@ -982,6 +983,9 @@ class Account < ActiveRecord::Base
           @invalidations.each do |key|
             Rails.cache.delete([key, global_id].cache_key)
           end
+          # Prevent subsequent code using a stale Account object whose cached associations
+          # or inherited settings were just invalidated.
+          reload_if_cache_stale
           Account.delay_if_production(singleton: "Account.invalidate_inherited_caches_#{global_id}")
                  .invalidate_inherited_caches(self, @invalidations)
         end
@@ -1004,6 +1008,21 @@ class Account < ActiveRecord::Base
         EnrollmentState.invalidate_access_for_accounts([parent_account.id] + account_ids, access_keys)
       end
     end
+  end
+
+  def cache_stale?
+    return false unless persisted?
+
+    db_updated_at = self.class.unscoped.where(id:).pick(:updated_at)
+    db_updated_at && updated_at && updated_at < db_updated_at
+  end
+
+  def reload_if_cache_stale
+    return unless cache_stale?
+
+    reload
+  rescue => e
+    Rails.logger.debug { "reload_if_cache_stale failed for Account #{global_id}: #{e.class}: #{e.message}" }
   end
 
   DEFAULT_STORAGE_QUOTA = 500.decimal_megabytes
@@ -2157,6 +2176,9 @@ class Account < ActiveRecord::Base
 
   def tabs_available(user = nil, opts = {})
     manage_settings = user && grants_right?(user, :manage_account_settings)
+    eportfolios_deprecated = root_account.settings[:enable_eportfolios] == true &&
+                             root_account.feature_enabled?(:eportfolio_deprecation_notice)
+
     tabs = []
     if root_account.site_admin?
       tabs << { id: TAB_USERS, label: t("People"), css_class: "users", href: :account_users_path } if user && grants_right?(user, :read_roster)
@@ -2225,7 +2247,7 @@ class Account < ActiveRecord::Base
     if user && grants_right?(user, :moderate_user_content)
       tabs << {
         id: TAB_EPORTFOLIO_MODERATION,
-        label: t("ePortfolio Moderation"),
+        label: eportfolios_deprecated ? t("ePortfolio Moderation (Legacy)") : t("ePortfolio Moderation"),
         css_class: "eportfolio_moderation",
         href: :account_eportfolio_moderation_path
       }

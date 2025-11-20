@@ -26,7 +26,6 @@ describe "threaded discussions", :ignore_js_errors do
   include DiscussionsCommon
 
   before :once do
-    Account.site_admin.enable_feature! :discussion_create
     course_with_teacher(active_course: true, active_all: true, name: "teacher")
     @topic_title = "threaded discussion topic"
     @topic = create_discussion(@topic_title, "threaded")

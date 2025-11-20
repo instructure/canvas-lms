@@ -22,14 +22,13 @@ import {View} from '@instructure/ui-view'
 
 import {useAccessibilityScansFetchUtils} from '../../../../shared/react/hooks/useAccessibilityScansFetchUtils'
 import {useAccessibilityScansStore} from '../../../../shared/react/stores/AccessibilityScansStore'
-import {AccessibilityResourceScan, ParsedFilters} from '../../../../shared/react/types'
+import {AccessibilityResourceScan, Filters} from '../../../../shared/react/types'
 import {parseFetchParams} from '../../../../shared/react/utils/query'
 import {AccessibilityIssuesSummary} from '../AccessibilityIssuesSummary/AccessibilityIssuesSummary'
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
 import {SearchIssue} from './Search/SearchIssue'
 import {useDeepCompareEffect} from './useDeepCompareEffect'
 import {AccessibilityCheckerHeader} from './AccessibilityCheckerHeader'
-import {getUnparsedFilters} from '../../../../shared/react/utils/apiData'
 import {FiltersPanel} from './Filter'
 import {getAppliedFilters} from '../../utils/filter'
 import {useAccessibilityIssueSelect} from '../../../../shared/react/hooks/useAccessibilityIssueSelect'
@@ -53,7 +52,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
   useEffect(() => {
     const parsedFetchParams = parseFetchParams()
     if (parsedFetchParams.filters && !filters) {
-      setFilters(getUnparsedFilters(parsedFetchParams.filters as ParsedFilters))
+      setFilters(parsedFetchParams.filters as Filters)
     }
   }, [])
 
@@ -62,7 +61,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
     if (fetchParams.filters && !filters) return // wait for filters to be set from query params
 
     if (!accessibilityScanDisabled) {
-      const parsedFetchParams = {...fetchParams, filters}
+      const parsedFetchParams = {...fetchParams, filters, page: 1}
       doFetchAccessibilityScanData(parsedFetchParams)
       doFetchAccessibilityIssuesSummary(parsedFetchParams)
     } else {
@@ -82,7 +81,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
       const newSearch = value
       setSearch(newSearch)
       if (newSearch.length >= 0) {
-        const params = {...parseFetchParams(), search: newSearch, filters}
+        const params = {...parseFetchParams(), search: newSearch, filters, page: 1}
         await Promise.all([
           doFetchAccessibilityIssuesSummary(params),
           doFetchAccessibilityScanData(params),

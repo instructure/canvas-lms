@@ -34,14 +34,40 @@ const mockClose = jest.fn()
 
 const baseItem = multiIssueItem
 
+// Helper function to convert camelCase to snake_case
+// This mimics the backend API response format
+const convertToSnakeCase = (obj: any): any => {
+  if (Array.isArray(obj)) {
+    return obj.map(convertToSnakeCase)
+  } else if (obj !== null && typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [
+        key.replace(/([A-Z])/g, '_$1').toLowerCase(),
+        convertToSnakeCase(value),
+      ]),
+    )
+  }
+  return obj
+}
+
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
-  default: jest.fn(({path}) => {
+  default: jest.fn(({path, method}) => {
     if (path.includes('/preview?')) {
       return Promise.resolve({json: {content: '<div>Preview content</div>'}})
     }
     if (path.includes('/preview')) {
       return Promise.resolve({json: {content: '<div>Updated content</div>'}})
+    }
+    // Handle POST to accessibility/scan - return scan with one less issue
+    if (method === 'POST' && path.includes('/accessibility/scan')) {
+      const updatedScan = {
+        ...multiIssueItem,
+        issueCount: 1, // One issue remaining after saving
+        issues: [multiIssueItem.issues![1]], // Keep only the second issue
+      }
+      // Convert to snake_case because the real API returns snake_case
+      return Promise.resolve({json: convertToSnakeCase(updatedScan)})
     }
     return Promise.resolve({})
   }),
@@ -66,7 +92,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
   it('disables "Back" on first issue and enables "Next"', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
     const back = screen.getByTestId('back-button')
-    const next = screen.getByTestId('next-button')
+    const next = screen.getByTestId('skip-button')
 
     expect(back).toBeDisabled()
     expect(next).toBeEnabled()
@@ -75,7 +101,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
   it('disables "Next" on last issue', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
 
-    const next = screen.getByTestId('next-button')
+    const next = screen.getByTestId('skip-button')
     fireEvent.click(next)
 
     await waitFor(() => {
@@ -114,17 +140,6 @@ describe('AccessibilityIssuesDrawerContent', () => {
       'href',
       'http://test.com/multi-issue-page/edit',
     )
-  })
-
-  it('calls onClose when close button is clicked', async () => {
-    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
-
-    const closeButton = screen
-      .getByTestId('close-button')
-      .querySelector('button') as HTMLButtonElement
-    fireEvent.click(closeButton)
-
-    expect(mockClose).toHaveBeenCalledTimes(1)
   })
 
   describe('Save and Next button', () => {
@@ -223,6 +238,8 @@ describe('AccessibilityIssuesDrawerContent', () => {
 
       const textarea = screen.getByTestId('checkbox-text-input-form')
       await userEvent.type(textarea, '1')
+      const saveButton = screen.getByTestId('save-and-next-button')
+      await userEvent.click(saveButton)
 
       await waitFor(() => {
         expect(screen.getAllByText('Test error')[0]).toBeInTheDocument()

@@ -122,7 +122,7 @@ module Interfaces::SubmissionInterface
 
   field :anonymous_id, ID, null: true
 
-  field :assignment, Types::AssignmentType, null: true
+  field :assignment, Types::AssignmentType, null: false
   def assignment
     load_association(:assignment)
   end
@@ -355,7 +355,10 @@ module Interfaces::SubmissionInterface
         null: true
   field :late, Boolean, method: :late?
   field :late_policy_status, Types::LatePolicyStatusType, null: true
-  field :missing, Boolean, method: :missing?
+  field :missing, Boolean
+  def missing
+    load_association(:assignment).then { object.missing? }
+  end
   field :submission_type, Types::AssignmentSubmissionType, null: true
 
   field :attachment, Types::FileType, null: true

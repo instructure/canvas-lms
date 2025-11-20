@@ -257,6 +257,20 @@ export function setExpandAllButtonHandler(lazy_load_callback) {
     $(this).data('expand', !shouldExpand)
     $(this).attr('aria-expanded', shouldExpand ? 'true' : 'false')
 
+    const collapsedModuleIds = []
+    if (shouldExpand) {
+      $('.context_module.collapsed_module:not(#context_module_blank)').each(function () {
+        const $module = $(this)
+        // Only fetch if module has no items loaded yet (same logic as individual expand)
+        const hasNoItems =
+          $module.find('.content .context_module_items').children().length === 0 &&
+          $module.find('.module_dnd').length === 0
+        if (hasNoItems) {
+          collapsedModuleIds.push($module.data('module-id'))
+        }
+      })
+    }
+
     $('.context_module:not(#context_module_blank)').each(function () {
       const $module = $(this)
       if (
@@ -285,7 +299,7 @@ export function setExpandAllButtonHandler(lazy_load_callback) {
     const collapse = shouldExpand ? '0' : '1'
     $.ajaxJSON(url, 'POST', {collapse}, _data => {
       if (shouldExpand && lazy_load_callback) {
-        lazy_load_callback(shouldExpand)
+        lazy_load_callback(shouldExpand, collapsedModuleIds)
       } else {
         $(this).prop('disabled', false)
       }

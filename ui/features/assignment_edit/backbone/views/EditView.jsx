@@ -1577,14 +1577,55 @@ EditView.prototype.getFormData = function () {
   if ($grader_count.length > 0) {
     data.grader_count = numberHelper.parse($grader_count[0].value)
   }
-  if (ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_ENABLED || ENV.PEER_REVIEW_GRADING_ENABLED) {
     const checkedInput = document.getElementById('assignment_peer_reviews_checkbox')
     data.peer_reviews = checkedInput?.checked
-    const submissionRequiredInput = document.getElementById(
-      'peer_reviews_submission_required_checkbox',
+
+    // Read from hidden inputs to preserve values when Advanced Configuration is collapsed
+    const withinGroupsHidden = document.getElementById('peer_reviews_within_groups_checkbox_hidden')
+    data.intra_group_peer_reviews = withinGroupsHidden?.value === 'true'
+
+    const anonymityHidden = document.getElementById('peer_reviews_anonymity_checkbox_hidden')
+    data.anonymous_peer_reviews = anonymityHidden?.value === 'true'
+
+    const peerReviewCountHidden = document.getElementById('assignment_peer_reviews_count_hidden')
+    if (peerReviewCountHidden?.value) {
+      const reviewsCount = numberHelper.parse(peerReviewCountHidden.value)
+      if (!isNaN(reviewsCount)) {
+        data.peer_review_count = reviewsCount
+      }
+    }
+
+    const reviewsRequiredHidden = document.getElementById('assignment_peer_reviews_count_hidden')
+    const pointsPerReviewHidden = document.getElementById(
+      'assignment_peer_reviews_max_input_hidden',
     )
-    data.peer_review_submission_required = submissionRequiredInput?.checked
+
+    const acrossSectionsInput = document.getElementById(
+      'peer_reviews_across_sections_checkbox_hidden',
+    )
+    data.peer_review_across_sections = acrossSectionsInput?.value === 'true'
+
+    const passFailHidden = document.getElementById('peer_reviews_pass_fail_grading_checkbox_hidden')
+
+    if (reviewsRequiredHidden && pointsPerReviewHidden) {
+      const reviewsRequired = numberHelper.parse(reviewsRequiredHidden.value)
+      const pointsPerReview = numberHelper.parse(pointsPerReviewHidden.value)
+
+      if (!isNaN(reviewsRequired) && !isNaN(pointsPerReview)) {
+        data.peer_review = {
+          points_possible: round(reviewsRequired * pointsPerReview, 2),
+          grading_type: passFailHidden?.value === 'true' ? 'pass_fail' : 'points',
+        }
+      }
+    }
+
+    const submissionRequiredHidden = document.getElementById(
+      'peer_reviews_submission_required_checkbox_hidden',
+    )
+    data.peer_review_submission_required = submissionRequiredHidden?.value === 'true'
   }
+
   return data
 }
 
@@ -1665,6 +1706,14 @@ EditView.prototype.handleSave = function (event) {
 EditView.prototype.onSaveFail = function (xhr) {
   this.shouldPublish = false
   this.disableWhileLoadingOpts = {}
+
+  if (xhr?.responseJSON?.errors && typeof xhr.responseJSON.errors === 'string') {
+    showFlashAlert({
+      message: xhr.responseJSON.errors,
+      type: 'error',
+    })
+  }
+
   return EditView.__super__.onSaveFail.call(this, xhr)
 }
 
@@ -1934,7 +1983,7 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
   // for the case stated in EGG-1507, ad-hoc overrides outside of the course availability
   // dates show no visible error, but a the card is invalid, the card should be valid
   // so it should save like everywhere else. until then, we can rely on existence of showError.
-  if (invalidInput && this.showError) {
+  if (invalidInput && (ENV.FEATURES?.assign_to_in_edit_pages_rewrite || this.showError)) {
     errors.invalid_card = {$input: null, showError: this.showError}
   } else {
     delete errors.invalid_card

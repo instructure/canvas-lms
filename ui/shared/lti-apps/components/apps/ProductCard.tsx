@@ -56,7 +56,7 @@ const ProductCard = (props: ProductCardProps) => {
         <Flex direction="column" height="100%">
           <Flex gap="small" margin="0 0 medium 0">
             <div style={{borderRadius: '8px', overflow: 'hidden', minWidth: '48px'}}>
-              <Img src={product.logo_url} width={48} height={48} />
+              <Img src={product.logo_url} width={48} />
             </div>
             <div>
               <Text weight="bold" size="medium" color="primary">

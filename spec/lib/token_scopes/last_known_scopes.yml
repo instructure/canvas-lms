@@ -155,6 +155,8 @@
   path: '/api/v1/accounts/:account_id/external_tools/top_nav_favorites/:id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/features'
+- verb: POST
+  path: '/api/v1/accounts/:account_id/features/early_access_program'
 - verb: GET
   path: '/api/v1/accounts/:account_id/features/enabled'
 - verb: DELETE
@@ -639,6 +641,10 @@
   path: '/api/v1/courses/:course_id/assignments'
 - verb: POST
   path: '/api/v1/courses/:course_id/assignments'
+- verb: POST
+  path: '/api/v1/courses/:course_id/assignments/:assignment_id/accessibility/scan'
+- verb: POST
+  path: '/api/v1/courses/:course_id/assignments/:assignment_id/allocate'
 - verb: GET
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/anonymous_provisional_grades/status'
 - verb: GET
@@ -1289,6 +1295,8 @@
   path: '/api/v1/courses/:course_id/pages/:url_or_id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/pages/:url_or_id'
+- verb: POST
+  path: '/api/v1/courses/:course_id/pages/:url_or_id/accessibility/scan'
 - verb: GET
   path: '/api/v1/courses/:course_id/pages/:url_or_id/date_details'
 - verb: PUT
@@ -1603,6 +1611,8 @@
   path: '/api/v1/files/:id/reset_verifier'
 - verb: POST
   path: '/api/v1/files/capture'
+- verb: POST
+  path: '/api/v1/files/update_word_count'
 - verb: POST
   path: '/api/v1/folders/:dest_folder_id/copy_file'
 - verb: POST

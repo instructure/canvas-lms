@@ -15,7 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {forwardRef, useImperativeHandle, useRef, useState, useContext} from 'react'
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+  useContext,
+  useEffect,
+} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -30,22 +37,42 @@ import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
 import {FormComponentProps, FormComponentHandle} from './index'
+import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
+import {useShallow} from 'zustand/react/shallow'
 
 const I18n = createI18nScope('accessibility_checker')
 
 const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
-    ({issue, error, value, onChangeValue}: FormComponentProps, ref) => {
+    (
+      {
+        issue,
+        error,
+        value,
+        onChangeValue,
+        actionButtons,
+        isDisabled,
+        onValidationChange,
+      }: FormComponentProps,
+      ref,
+    ) => {
       const [generateLoading, setGenerateLoading] = useState(false)
       const {selectedItem} = useContext(AccessibilityCheckerContext)
       const inputRef = useRef<HTMLInputElement | null>(null)
       const [generationError, setGenerationError] = useState<string | null>(null)
+      const isAiGenerationEnabled = useAccessibilityScansStore(
+        useShallow(state => state.aiGenerationEnabled),
+      )
 
       useImperativeHandle(ref, () => ({
         focus: () => {
           inputRef.current?.focus()
         },
       }))
+
+      useEffect(() => {
+        onValidationChange?.(value?.trim()?.length > 0, I18n.t('Caption cannot be empty.'))
+      }, [value, onValidationChange])
 
       const handleGenerateClick = () => {
         setGenerateLoading(true)
@@ -97,18 +124,22 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             onChange={(_, value) => onChangeValue(value)}
             inputRef={el => (inputRef.current = el)}
             messages={error ? [{text: error, type: 'newError'}] : []}
+            interaction={isDisabled ? 'disabled' : 'enabled'}
           />
-          <Flex as="div" margin="small 0">
-            <Flex.Item>
-              <Button
-                color="ai-primary"
-                renderIcon={() => <IconAiSolid />}
-                onClick={handleGenerateClick}
-                disabled={generateLoading}
-              >
-                {issue.form.generateButtonLabel}
-              </Button>
-            </Flex.Item>
+          <Flex as="div" margin="medium 0" gap="small">
+            {isAiGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
+              <Flex.Item>
+                <Button
+                  color="ai-primary"
+                  renderIcon={() => <IconAiSolid />}
+                  onClick={handleGenerateClick}
+                  disabled={generateLoading || isDisabled}
+                >
+                  {issue.form.generateButtonLabel}
+                </Button>
+              </Flex.Item>
+            )}
+            {actionButtons && <Flex.Item>{actionButtons}</Flex.Item>}
             {generateLoading ? (
               <Flex.Item>
                 <Spinner

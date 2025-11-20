@@ -164,7 +164,7 @@ export const DiscussionThreadContainer = props => {
         },
       })
     }
-  }, [props.highlightEntryId])
+  }, [props.highlightEntryId, props.discussionEntry._id, props.discussionEntry.createdAt])
 
   useEffect(() => {
     return () => {

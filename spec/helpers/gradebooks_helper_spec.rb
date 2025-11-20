@@ -339,5 +339,25 @@ describe GradebooksHelper do
       assignment.reload
       expect(translated_due_date_for_speedgrader(assignment)).to eq "Due: Apr 15, 2021 at 10pm"
     end
+
+    it "produces a translated due date for checkpointed assignment based on latest checkpoint" do
+      @course.account.enable_feature!(:discussion_checkpoints)
+      parent = @course.assignments.create!(
+        title: "Checkpointed Assignment",
+        has_sub_assignments: true,
+        workflow_state: "published"
+      )
+      parent.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+        due_at: "2021-04-15T22:00:24Z"
+      )
+      parent.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+        due_at: "2021-04-22T22:00:24Z"
+      )
+      expect(translated_due_date_for_speedgrader(parent)).to eq "Due: Apr 22, 2021 at 10pm"
+    end
   end
 end

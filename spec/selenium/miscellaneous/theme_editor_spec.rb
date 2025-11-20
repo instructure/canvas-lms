@@ -67,7 +67,7 @@ describe "Theme Editor" do
     expect(driver.title).to include "Theme Editor"
 
     fj('.Theme__header button:contains("Exit")').click
-    driver.switch_to.alert.accept
+    f('[data-testid="cancel-theme-editor-proceed-button"]').click
     # validations
     assert_flash_notice_message("Theme editor changes have been cancelled")
     expect(driver.current_url).to end_with("/accounts/#{Account.default.id}/brand_configs")
@@ -90,7 +90,7 @@ describe "Theme Editor" do
 
     exit_btn = fj('.Theme__header button:contains("Exit")')
     exit_btn.click
-    driver.switch_to.alert.accept
+    f('[data-testid="cancel-theme-editor-proceed-button"]').click
     assert_flash_notice_message("Theme editor changes have been cancelled")
     expect(driver.current_url).to end_with("/accounts/#{Account.default.id}/brand_configs")
     expect(f("#left-side #section-tabs .brand_configs").text).to eq "Themes"
@@ -220,7 +220,7 @@ describe "Theme Editor" do
       apply_btn.click
       true
     end
-    driver.switch_to.alert.accept
+    f('[data-testid="apply-theme-proceed-button"]').click
 
     # wait for the popup
     wait_for_ajaximations

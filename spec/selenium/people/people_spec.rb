@@ -211,11 +211,34 @@ describe "people" do
       expect(dropdown_item_visible?("resendInvitation", "tr[id=user_#{@student_1.id}]")).to be true
     end
 
-    it "focuses on the + Group Set button after the tabs" do
+    it "focuses on the + Group Set button before the tabs", custom_timeout: 30 do
       get "/courses/#{@course.id}/users"
-      driver.execute_script("$('.collectionViewItems > li:last a').focus()")
-      active = driver.execute_script("return document.activeElement")
-      active.send_keys(:tab)
+      f("#people-options .Button").click
+      close_dropdown_menu
+      f("body").send_keys(:tab)
+      check_element_has_focus(f(".group-categories-actions .btn-primary"))
+      f("body").send_keys(:tab)
+      check_element_has_focus(f(".collectionViewItems > li:first-child"))
+    end
+
+    it "focuses on the + Group Set button before the tabs on groups page", custom_timeout: 30 do
+      GroupCategory.create(name: "Test Group", context: @course)
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      # Click on the group tab to ensure we're on the groups page
+      group_tab = f(".collectionViewItems > li:nth-child(2)")
+      group_tab.click
+      wait_for_ajaximations
+
+      # Tab from the group tab to verify next focus is on group tab content, not button
+      # This verifies the button comes BEFORE tabs in DOM
+      f("body").send_keys(:tab)
+      # Should focus on something in the tab content area, not the button
+      # The button should only be reachable by shift+tab
+      f("body").send_keys([:shift, :tab])
+      check_element_has_focus(f(".collectionViewItems > li:nth-child(2)"))
+      f("body").send_keys([:shift, :tab])
       check_element_has_focus(f(".group-categories-actions .btn-primary"))
     end
 
@@ -974,6 +997,34 @@ describe "people" do
 
       expect_new_page_load { group_link.click }
       expect(driver.current_url).to include("/courses/#{@course.id}/groups")
+    end
+
+    it "navigates to groups page using right arrow key", custom_timeout: 30 do
+      user_session(@teacher)
+
+      get "/courses/#{@course.id}/users"
+
+      everyone_tab = f(".collectionViewItems > li:first-child")
+      everyone_tab.click
+      expect_new_page_load { everyone_tab.send_keys(:arrow_right) }
+      expect(driver.current_url).to include("/courses/#{@course.id}/groups")
+    end
+
+    it "navigates to users page using left arrow key from group tab", custom_timeout: 30 do
+      user_session(@teacher)
+
+      GroupCategory.create(name: "Test Group", context: @course)
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      # Click on the first group category tab
+      group_tab = f(".collectionViewItems > li:nth-child(2)")
+      group_tab.click
+      wait_for_ajaximations
+
+      # Press left arrow to navigate back to users page
+      expect_new_page_load { group_tab.send_keys(:arrow_left) }
+      expect(driver.current_url).to include("/courses/#{@course.id}/users")
     end
 
     context "student tray" do

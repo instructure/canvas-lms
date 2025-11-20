@@ -21,6 +21,9 @@ require_relative "block_component"
 require_relative "../settings_tray/block_settings/separator_block_settings"
 
 class SeparatorBlockComponent < BlockComponent
+  BLOCK_TYPE = "Separator line"
+  BLOCK_SELECTOR = "[data-testid='separator-line']"
+
   def settings
     @settings ||= SeparatorBlockSettings.new
   end

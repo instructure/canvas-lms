@@ -107,9 +107,16 @@ describe Accessibility::Rule do
   end
 
   describe ".issue_preview" do
-    context "when not overridden" do
-      it "returns nil by default" do
+    context "when element is nil" do
+      it "returns nil" do
         expect(described_class.new.issue_preview(nil)).to be_nil
+      end
+    end
+
+    context "when element is provided" do
+      it "returns the element's HTML" do
+        element = double("Element", to_html: "<div>Test</div>")
+        expect(described_class.new.issue_preview(element)).to eq("<div>Test</div>")
       end
     end
   end

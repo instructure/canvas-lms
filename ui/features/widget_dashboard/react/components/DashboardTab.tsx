@@ -18,13 +18,17 @@
 
 import React from 'react'
 import {View} from '@instructure/ui-view'
-import {DEFAULT_WIDGET_CONFIG} from '../constants'
 import WidgetGrid from './WidgetGrid'
+import {useWidgetDashboardEdit} from '../hooks/useWidgetDashboardEdit'
+import {useWidgetLayout} from '../hooks/useWidgetLayout'
 
 const DashboardTab: React.FC = () => {
+  const {isEditMode} = useWidgetDashboardEdit()
+  const {config} = useWidgetLayout()
+
   return (
     <View as="div" data-testid="dashboard-tab-content" padding="medium 0 0 0">
-      <WidgetGrid config={DEFAULT_WIDGET_CONFIG} />
+      <WidgetGrid config={config} isEditMode={isEditMode} />
     </View>
   )
 }

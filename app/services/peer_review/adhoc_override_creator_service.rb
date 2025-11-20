@@ -28,7 +28,10 @@ class PeerReview::AdhocOverrideCreatorService < PeerReview::AdhocOverrideCommonS
     validate_student_ids_in_course(provided_student_ids_in_course)
 
     ActiveRecord::Base.transaction do
-      override = build_override(provided_student_ids_in_course)
+      parent_override = find_parent_override(provided_student_ids_in_course)
+      validate_adhoc_parent_override_exists(parent_override, provided_student_ids_in_course)
+
+      override = build_override(provided_student_ids_in_course, parent_override)
       build_override_students(override, provided_student_ids_in_course)
 
       override.save!
@@ -38,13 +41,14 @@ class PeerReview::AdhocOverrideCreatorService < PeerReview::AdhocOverrideCommonS
 
   private
 
-  def build_override(student_ids)
+  def build_override(student_ids, parent_override)
     override = @peer_review_sub_assignment.assignment_overrides.build(
       set_id: nil,
       set_type: AssignmentOverride::SET_TYPE_ADHOC,
       dont_touch_assignment: true,
       title: override_title(student_ids),
-      unassign_item: fetch_unassign_item
+      unassign_item: fetch_unassign_item,
+      parent_override:
     )
     apply_overridden_dates(override, @override)
 

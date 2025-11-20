@@ -17,9 +17,9 @@
  */
 
 import {ApolloClient, HttpLink} from '@apollo/client'
-import {InMemoryCache} from '@apollo/client/cache'
+import {createCache} from '@canvas/apollo-v3'
 
-const cache = new InMemoryCache()
+const cache = createCache()
 
 const link = new HttpLink({
   uri: 'http://localhost:3000/graphql',

@@ -2069,7 +2069,13 @@ BASE_PERMISSIONS = {
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
     account_only: true,
-    account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) }
+    account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) },
+    account_details: [
+      { title: -> { I18n.t("Account Settings") },
+        description: -> { I18n.t("Allows users to access the Ask Your Data feature of Intelligent Insights.") } },
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Provides a scoped access to the Ask Your Data feature.") } }
+    ]
   },
   manage_ask_questions_analytics_context: {
     label: -> { I18n.t("Ask Your Data - Context Library") },
@@ -2077,7 +2083,17 @@ BASE_PERMISSIONS = {
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
     account_only: true,
-    account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) }
+    account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) },
+    account_details: [
+      { title: -> { I18n.t("Account Settings") },
+        description: -> { I18n.t("Allows Ask Your Data users to access and manage the product's Context Library feature, to influence and tailor AI responses for all users.") } },
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Not available at the subaccount level.") } }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Account Settings") },
+        description: -> { I18n.t("Requires Ask Your Data permission to use.") } }
+    ]
   },
   view_students_in_need: {
     label: -> { I18n.t("Students in Need of Attention") },
@@ -2124,6 +2140,14 @@ BASE_PERMISSIONS = {
     true_for: %w[AccountAdmin],
     account_only: true,
     account_allows: ->(a) { a.feature_enabled?(:title_iv_financial_aid_report) }
+  },
+  view_rsi_report: {
+    label: -> { I18n.t("Regular and Substantive Interaction") },
+    group: :view_advanced_analytics,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_only: true,
+    account_allows: ->(a) { a.feature_enabled?(:intelligent_insights_rsi_report) }
   },
   access_ignite_agent: {
     label: -> { I18n.t("Ignite Agent - access") },

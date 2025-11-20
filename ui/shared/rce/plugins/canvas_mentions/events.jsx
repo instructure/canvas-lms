@@ -35,7 +35,7 @@ let currentMentionsSelection
 function shouldRestoreFromKeyEvent(event, editor) {
   const {which} = event
 
-  // Enter key was pressed
+  // Enter or Tab key was pressed
   if (which === KEY_CODES.enter || which === KEY_CODES.tab) {
     const activeDescendant = editor.dom
       .select(MARKER_SELECTOR)[0]
@@ -43,11 +43,17 @@ function shouldRestoreFromKeyEvent(event, editor) {
 
     // If an active descendant is present, the user currently
     // has a user in the mentions suggestion component active.
-    //
-    // In this case, "enter" should select the user from the
-    // list, not restore editability to the tinymce body
     if (activeDescendant) {
       event.preventDefault()
+
+      // Only Enter triggers Load More (not Tab)
+      if (which === KEY_CODES.enter && activeDescendant.includes('__LOAD_MORE__')) {
+        // Broadcast Enter to React component to handle Load More
+        broadcastMessage(navigationMessage(event), [editor.getWin(), window])
+        return false
+      }
+
+      // For regular users or Tab key, insert the mention
       return onMentionsExit(editor, true)
     }
   }
@@ -154,11 +160,11 @@ export const onKeyDown = e => {
       return onMentionsExit(editor)
     }
 
-    // Do nothing if the user was selecting a suggestion
-    if (e.which === KEY_CODES.enter || e.which === KEY_CODES.tab) return
-
-    // Broadcast the event to mentions components
-    broadcastMessage(navigationMessage(e), [editor.getWin(), window])
+    // Broadcast navigation events (up/down arrows)
+    // Enter/Tab are handled in shouldRestoreFromKeyEvent
+    if (e.which !== KEY_CODES.enter && e.which !== KEY_CODES.tab) {
+      broadcastMessage(navigationMessage(e), [editor.getWin(), window])
+    }
   }
 }
 

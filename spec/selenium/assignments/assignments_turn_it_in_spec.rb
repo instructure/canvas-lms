@@ -89,7 +89,7 @@ describe "assignments turn it in" do
   end
 
   it "displays validation errors for small matches inputs" do
-    skip_if_chrome("issue with change_turnitin_settings method")
+    skip("EGG-2147 2025-01-28 issue with change_turnitin_settings method")
     assignment = @course.assignments.create!(
       name: "test assignment",
       due_at: (Time.now.utc + 2.days),

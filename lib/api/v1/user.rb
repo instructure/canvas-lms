@@ -273,6 +273,28 @@ module Api::V1::User
     end
   end
 
+  def enrollments_json(enrollments, user, session, includes: [], opts: {}, excludes: [])
+    ActiveRecord::Associations.preload(enrollments, %i[user course course_section root_account sis_pseudonym])
+    # for Enrollment#find_score
+    ActiveRecord::Associations.preload(enrollments, :scores)
+    # for Enrollment#enrollment_state
+    ActiveRecord::Associations.preload(enrollments, :enrollment_state)
+    # for associated_user
+    if includes.include?("observed_users")
+      ActiveRecord::Associations.preload(enrollments, :associated_user)
+    end
+    # for User#profile
+    if @domain_root_account&.enable_profiles?
+      ActiveRecord::Associations.preload(enrollments, user: :profile)
+    end
+    # for Enrollment#temporary_enrollment_source_user
+    if includes.include?("temporary_enrollment_providers")
+      ActiveRecord::Associations.preload(enrollments, :temporary_enrollment_pairing)
+    end
+
+    enrollments.map { |e| enrollment_json(e, user, session, includes:, opts:) }
+  end
+
   API_ENROLLMENT_JSON_OPTS = %i[id
                                 root_account_id
                                 user_id
@@ -296,10 +318,13 @@ module Api::V1::User
       only = only.without(:temporary_enrollment_source_user_id, :temporary_enrollment_pairing_id)
     end
     api_json(enrollment, user, session, only:).tap do |json|
-      json[:enrollment_state] = json.delete("workflow_state")
-      if enrollment.course.workflow_state == "deleted" || enrollment.course_section.workflow_state == "deleted"
-        json[:enrollment_state] = "deleted"
-      end
+      json[:enrollment_state] = if enrollment.course.workflow_state == "deleted" || enrollment.course_section.workflow_state == "deleted"
+                                  "deleted"
+                                elsif json[:workflow_state] != enrollment.enrollment_state.state
+                                  enrollment.state_based_on_date
+                                else
+                                  json.delete("workflow_state")
+                                end
       json[:role] = enrollment.role.name
       json[:role_id] = enrollment.role_id
       if enrollment.user == user || enrollment.course.grants_right?(user, session, :read_reports)

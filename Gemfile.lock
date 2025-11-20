@@ -480,6 +480,8 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
+    css_parser (1.21.1)
+      addressable
     csv (3.3.5)
     database_cleaner (2.1.0)
       database_cleaner-active_record (>= 2, < 3)
@@ -884,7 +886,7 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    pg (1.5.9)
+    pg (1.6.2)
     pg_query (6.1.0)
       google-protobuf (>= 3.25.3)
     pp (0.6.3)
@@ -1323,6 +1325,7 @@ DEPENDENCIES
   colorize (~> 1.0)
   config_file!
   crystalball!
+  css_parser (~> 1.17)
   csv_diff!
   database_cleaner (~> 2.0)
   datadog (~> 2.1)
@@ -1396,7 +1399,7 @@ DEPENDENCIES
   paginated_collection!
   parallel (~> 1.23)
   pdf-reader (~> 2.11)
-  pg (~> 1.5)
+  pg (~> 1.6)
   pg_query (~> 6.0)
   prawn-emoji (~> 6.0)
   prawn-rails (~> 1.4)

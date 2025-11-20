@@ -63,7 +63,7 @@ export default function LtiAssetProcessorCell({
     [],
   )
 
-  if (!shouldShowAssetReportCell(assetProcessors, assetReports)) {
+  if (!submissionType || !shouldShowAssetReportCell(assetProcessors, assetReports)) {
     return null
   }
 

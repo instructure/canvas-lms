@@ -2606,4 +2606,115 @@ RSpec.describe YoutubeMigrationService do
       end
     end
   end
+
+  describe "skip_attachment_association_update flag" do
+    before do
+      studio_tool
+      stub_request(:post, "https://arc.instructure.com/api/internal/youtube_embed")
+        .to_return(
+          status: 200,
+          body: studio_api_response.to_json,
+          headers: { "Content-Type" => "application/json" }
+        )
+    end
+
+    let(:original_html) do
+      '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" width="560" height="315"></iframe>'
+    end
+
+    let(:new_html) do
+      '<iframe class="lti-embed" src="/courses/123/external_tools/retrieve"></iframe>'
+    end
+
+    shared_examples "skips attachment association creation" do |resource_type, model_factory, field|
+      it "sets skip_attachment_association_update flag for #{resource_type}" do
+        resource = send(model_factory)
+        embed = youtube_embed.merge(id: resource.id, resource_type:, field:)
+
+        expect_any_instance_of(resource.class).to receive(:skip_attachment_association_update=).with(true).and_call_original
+
+        service.update_resource_content(embed, new_html)
+
+        resource.reload
+        expect(resource.send(field)).to include("lti-embed")
+        expect(resource.send(field)).not_to include("youtube.com")
+      end
+
+      it "prevents AttachmentAssociation creation during update" do
+        resource = send(model_factory)
+        embed = youtube_embed.merge(id: resource.id, resource_type:, field:)
+
+        expect { service.update_resource_content(embed, new_html) }.not_to change { AttachmentAssociation.count }
+
+        resource.reload
+        expect(resource.send(field)).to include("lti-embed")
+      end
+    end
+
+    context "with WikiPage" do
+      let(:wiki_page_with_embed) do
+        wiki_page_model(course:, body: original_html)
+      end
+
+      include_examples "skips attachment association creation", "WikiPage", :wiki_page_with_embed, :body
+    end
+
+    context "with Assignment" do
+      let(:assignment_with_embed) do
+        assignment_model(course:, description: original_html)
+      end
+
+      include_examples "skips attachment association creation", "Assignment", :assignment_with_embed, :description
+    end
+
+    context "with DiscussionTopic" do
+      let(:discussion_topic_with_embed) do
+        discussion_topic_model(context: course, message: original_html)
+      end
+
+      include_examples "skips attachment association creation", "DiscussionTopic", :discussion_topic_with_embed, :message
+    end
+
+    context "with Announcement" do
+      let(:announcement_with_embed) do
+        course.announcements.create!(title: "Test", message: original_html)
+      end
+
+      include_examples "skips attachment association creation", "Announcement", :announcement_with_embed, :message
+    end
+
+    context "with DiscussionEntry" do
+      let(:discussion_entry_with_embed) do
+        topic = discussion_topic_model(context: course)
+        topic.discussion_entries.create!(message: original_html, user: @teacher)
+      end
+
+      include_examples "skips attachment association creation", "DiscussionEntry", :discussion_entry_with_embed, :message
+    end
+
+    context "with CalendarEvent" do
+      let(:calendar_event_with_embed) do
+        calendar_event_model(context: course, description: original_html)
+      end
+
+      include_examples "skips attachment association creation", "CalendarEvent", :calendar_event_with_embed, :description
+    end
+
+    context "with Quizzes::Quiz" do
+      let(:quiz_with_embed) do
+        quiz_model(course:, description: original_html)
+      end
+
+      include_examples "skips attachment association creation", "Quizzes::Quiz", :quiz_with_embed, :description
+    end
+
+    context "with Course syllabus" do
+      let(:course_with_syllabus) do
+        course.update!(syllabus_body: original_html)
+        course
+      end
+
+      include_examples "skips attachment association creation", "Course", :course_with_syllabus, :syllabus_body
+    end
+  end
 end

@@ -233,6 +233,157 @@ describe Lti::AssetProcessorController do
     end
   end
 
+  describe "#resubmit_discussion_notices_all" do
+    let(:course) { course_model }
+    let(:discussion_topic) { graded_discussion_topic(context: course) }
+    let(:assignment) { discussion_topic.assignment }
+    let(:student) { course_with_student(course:, active_all: true).user }
+    let(:teacher) { course_with_teacher(course:, active_all: true).user }
+    let(:tool) { external_tool_1_3_model(context: course, placements: ["ActivityAssetProcessorContribution"]) }
+    let(:asset_processor1) { lti_asset_processor_model(assignment:, tool:) }
+    let(:asset_processor2) { lti_asset_processor_model(assignment:, tool:) }
+
+    let(:params) { { assignment_id: assignment.id, student_id: student.id } }
+
+    context "when the user has proper permissions" do
+      before do
+        user_session(teacher)
+      end
+
+      context "with discussion entries" do
+        before do
+          @entry1 = discussion_topic.discussion_entries.create!(
+            user: student,
+            message: "First entry"
+          )
+          @entry2 = discussion_topic.discussion_entries.create!(
+            user: student,
+            message: "Second entry"
+          )
+          asset_processor1
+          asset_processor2
+        end
+
+        it "notifies all asset processors for each latest discussion entry version" do
+          expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion).once do |args|
+            expect(args[:assignment]).to eq(assignment)
+            expect(args[:submission]).to eq(assignment.submission_for_student(student))
+            expect(args[:current_user]).to eq(student)
+            expect(args[:asset_processor]).to be_nil
+            expect(args[:tool_id]).to be_nil
+            expect(args[:contribution_status]).to eq(Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED)
+            expect(args[:discussion_entry_versions]).to match_array([@entry1.discussion_entry_versions.first, @entry2.discussion_entry_versions.first])
+          end
+
+          post(:resubmit_discussion_notices_all, params:)
+          expect(response).to have_http_status(:no_content)
+        end
+
+        context "when entries have multiple versions" do
+          before do
+            @entry1.update!(message: "Updated first entry")
+            @entry2.update!(message: "Updated second entry")
+          end
+
+          it "only notifies for the latest version of each entry" do
+            expect(@entry1.discussion_entry_versions.count).to eq(2)
+            expect(@entry2.discussion_entry_versions.count).to eq(2)
+
+            expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion).once do |args|
+              expect(args[:discussion_entry_versions]).to all(have_attributes(version: 2))
+            end
+
+            post(:resubmit_discussion_notices_all, params:)
+            expect(response).to have_http_status(:no_content)
+          end
+        end
+      end
+
+      context "when student has no discussion entries" do
+        it "returns no content without calling notifier" do
+          expect(Lti::AssetProcessorDiscussionNotifier).not_to receive(:notify_asset_processors_of_discussion)
+
+          post(:resubmit_discussion_notices_all, params:)
+          expect(response).to have_http_status(:no_content)
+        end
+      end
+
+      context "when assignment is not a discussion" do
+        let(:assignment) { assignment_model(course:, submission_types: "online_upload") }
+
+        it "returns unprocessable entity" do
+          post(:resubmit_discussion_notices_all, params:)
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.parsed_body["error"]).to eq("Not a discussion assignment")
+        end
+      end
+
+      context "when no asset processors are configured" do
+        before do
+          discussion_topic.discussion_entries.create!(
+            user: student,
+            message: "Entry without APs"
+          )
+        end
+
+        it "returns no content without errors" do
+          post(:resubmit_discussion_notices_all, params:)
+          expect(response).to have_http_status(:no_content)
+        end
+      end
+    end
+
+    context "when testing before_actions" do
+      context "require_feature_enabled" do
+        before do
+          Account.site_admin.disable_feature!(:lti_asset_processor)
+          user_session(teacher)
+        end
+
+        it "returns not found when feature is disabled" do
+          post(:resubmit_discussion_notices_all, params:)
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+
+      context "require_user" do
+        it "redirects to login when user is not authenticated" do
+          post(:resubmit_discussion_notices_all, params:)
+          expect(response).to redirect_to(login_url)
+        end
+      end
+
+      context "require_access_to_context" do
+        before do
+          user_session(student)
+        end
+
+        it "returns forbidden when user doesn't have manage_grades permission" do
+          post(:resubmit_discussion_notices_all, params:)
+          expect(response).to have_http_status(:forbidden)
+          expect(response.body).to eq("invalid_request")
+        end
+      end
+
+      context "require_submission" do
+        before do
+          user_session(teacher)
+        end
+
+        it "returns not found when student doesn't exist" do
+          post :resubmit_discussion_notices_all, params: { assignment_id: assignment.id, student_id: "nonexistent" }
+          expect(response).to have_http_status(:not_found)
+        end
+
+        it "returns not found when student is not enrolled" do
+          other_student = user_model
+          post :resubmit_discussion_notices_all, params: { assignment_id: assignment.id, student_id: other_student.id }
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+  end
+
   describe "helper methods" do
     let(:course) { course_model }
     let(:assignment) { assignment_model(course:) }
@@ -252,6 +403,15 @@ describe Lti::AssetProcessorController do
       it "returns the assignment associated with the asset processor" do
         controller.params = params
         expect(controller.send(:assignment)).to eq(asset_processor.assignment)
+      end
+
+      context "when assignment_id param is provided" do
+        let(:params) { { assignment_id: assignment.id } }
+
+        it "finds assignment by assignment_id param" do
+          controller.params = params
+          expect(controller.send(:assignment)).to eq(assignment)
+        end
       end
     end
 

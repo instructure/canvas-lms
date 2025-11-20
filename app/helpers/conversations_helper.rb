@@ -79,14 +79,59 @@ module ConversationsHelper
       automated:
     )
 
-    if conversation.should_process_immediately?
+    force_individual_messages = context.is_a?(Course) &&
+                                context.root_account.feature_enabled?(:restrict_student_access) &&
+                                context.user_is_instructor?(current_user)
+
+    if force_individual_messages && recipients && !recipients.empty?
+      existing_participant_ids = conversation.conversation.participants.reject { |p| p.id == current_user.id }.map(&:id)
+
+      new_recipient_ids = recipients.map(&:id) - existing_participant_ids
+
+      if new_recipient_ids.any?
+        messages = []
+        recipients_count = 0
+
+        recipients.each do |recipient|
+          individual_conversation = current_user.initiate_conversation([recipient])
+          individual_conversation.conversation.update(context:) if context
+
+          individual_tags = infer_tags(
+            recipients: individual_conversation.conversation.participants.pluck(:id),
+            context_code:
+          )
+
+          if individual_conversation.should_process_immediately?
+            message = individual_conversation.process_new_message(message_args, nil, message_ids, individual_tags)
+          else
+            individual_conversation.delay(strand: "add_message_#{individual_conversation.global_conversation_id}").process_new_message(message_args, nil, message_ids, individual_tags)
+            message = Conversation.build_message(*message_args)
+            message.id = 0
+            message.conversation_id = individual_conversation.conversation_id
+            message.created_at = Time.now.utc
+          end
+          messages << message
+
+          recipients_count += 1
+        end
+
+        { message: messages.first, recipients_count:, status: :ok }
+      elsif conversation.should_process_immediately?
+        message = conversation.process_new_message(message_args, nil, message_ids, tags)
+        { message:, recipients_count: existing_participant_ids.size, status: :ok }
+      else
+        conversation.delay(strand: "add_message_#{conversation.global_conversation_id}").process_new_message(message_args, nil, message_ids, tags)
+        message = Conversation.build_message(*message_args)
+        message.id = 0
+        message.conversation_id = conversation.conversation_id
+        message.created_at = Time.now.utc
+        { message:, recipients_count: existing_participant_ids.size, status: :accepted }
+      end
+    elsif conversation.should_process_immediately?
       message = conversation.process_new_message(message_args, recipients, message_ids, tags)
       { message:, recipients_count: recipients ? recipients.count : 0, status: :ok }
     else
       conversation.delay(strand: "add_message_#{conversation.global_conversation_id}").process_new_message(message_args, recipients, message_ids, tags)
-      # The message is delayed and will be processed later so there is nothing to return
-      # right now. If there is no error, success can be assumed.
-      # for displaying purposed, a preview of the processed message is created
       message = Conversation.build_message(*message_args)
       message.id = 0
       message.conversation_id = conversation.conversation_id
@@ -185,7 +230,7 @@ module ConversationsHelper
       known.concat(current_user.address_book.known_in_context(ctxt, include_concluded: false))
     end
     @recipients = known.uniq(&:id)
-    @recipients.reject! { |u| u.id == current_user.id } unless @recipients == [current_user] && recipients.count == 1
+    @recipients.reject! { |u| u.id == current_user.id } unless @recipients == [current_user] && recipients.one?
     @recipients
   end
 

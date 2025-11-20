@@ -46,10 +46,36 @@ export const parsedStudioOptionsPropType = shape({
 export type ParsedStudioOptions = {
   resizable: boolean
   convertibleToLink: boolean
+  embedOptions: StudioEmbedOptions
+}
+
+type ValidStudioEmbedType = 'thumbnail_embed' | 'learn_embed' | 'collaboration_embed'
+
+export type StudioEmbedTypeChangedResponse = {
+  subject: 'studio.embedTypeChanged.response'
+  width: number
+  height: number
+  embedType: ValidStudioEmbedType
+  resizable?: boolean
 }
 
 export function isStudioContentItemCustomJson(input: any): input is StudioContentItemCustomJson {
   return typeof input === 'object' && input.source === 'studio'
+}
+
+export const isValidEmbedType = (embedType: any): embedType is ValidStudioEmbedType => {
+  return (
+    typeof embedType === 'string' &&
+    ['thumbnail_embed', 'learn_embed', 'collaboration_embed'].includes(embedType)
+  )
+}
+
+export const isValidDimension = (value: any): value is number => {
+  return typeof value === 'number' && !isNaN(value) && isFinite(value) && value > 0
+}
+
+export const isValidResizable = (value: any): value is boolean => {
+  return typeof value === 'boolean'
 }
 
 export function studioAttributesFrom(
@@ -85,10 +111,27 @@ export function isStudioEmbeddedMedia(element: Element): boolean {
 
 export function parseStudioOptions(element: Element | null): ParsedStudioOptions {
   const tinymceIframeShim = element?.tagName === 'IFRAME' ? element?.parentElement : element
+
+  const embedOptions = {} as StudioEmbedOptions;
+  const href = tinymceIframeShim?.getAttribute('data-mce-p-src')
+
+  if (href) {
+    // parse out embed options from url params
+    const urlMatch = href.match(/url=([^&]*)$/)
+    const url = new URL(decodeURIComponent(urlMatch ? urlMatch[1] : ''))
+    const params = url.searchParams
+
+    embedOptions['enableMediaDownload'] = params.get('custom_arc_display_download') === 'true'
+    embedOptions['enableTranscriptDownload'] = params.get('custom_arc_transcript_downloadable') === 'true'
+    embedOptions['lockSpeed']= params.get('custom_arc_lock_speed') === 'true'
+    embedOptions['isExternal']= params.get('custom_arc_is_external') === 'true'
+  }
+
   return {
     resizable: tinymceIframeShim?.getAttribute('data-mce-p-data-studio-resizable') === 'true',
     convertibleToLink:
       tinymceIframeShim?.getAttribute('data-mce-p-data-studio-convertible-to-link') === 'true',
+    embedOptions,
   }
 }
 
@@ -118,6 +161,7 @@ export function findStudioLtiIframeFromSelection(selectedNode: Node): HTMLIFrame
   }
 
   if (!outerIframe) {
+    // eslint-disable-next-line no-console
     console.error('No outer iframe found')
     return null
   }
@@ -145,6 +189,7 @@ export function findStudioLtiIframeFromSelection(selectedNode: Node): HTMLIFrame
       }
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('>> Cannot access outer iframe content (cross-origin):', error)
     // Return the outer iframe as fallback since we can't access its contents
     return outerIframe
@@ -153,9 +198,11 @@ export function findStudioLtiIframeFromSelection(selectedNode: Node): HTMLIFrame
   return outerIframe
 }
 
+export type EmbedType = 'thumbnail_embed' | 'learn_embed' | 'collaboration_embed'
+
 export const notifyStudioEmbedTypeChange = (
   editor: Editor,
-  embedType: 'thumbnail_embed' | 'learn_embed' | 'collaboration_embed',
+  embedType: EmbedType,
 ) => {
   const studioIframe = findStudioLtiIframeFromSelection(editor.selection.getNode())
 
@@ -171,15 +218,22 @@ export const notifyStudioEmbedTypeChange = (
   }
 }
 
-export type EmbedType = 'thumbnail_embed' | 'learn_embed' | 'collaboration_embed'
+export const validateStudioEmbedTypeChangeResponse = (
+  data: any,
+): data is StudioEmbedTypeChangedResponse => {
+  return (
+    isValidDimension(data.width) &&
+    isValidDimension(data.height) &&
+    isValidEmbedType(data.embedType)
+  )
+}
 
 export const updateStudioIframeDimensions = (
   editor: Editor,
-  width: number,
-  height: number,
-  embedType: EmbedType,
-  resizable?: boolean,
+  data: StudioEmbedTypeChangedResponse,
 ) => {
+  const {width, height, embedType, resizable} = data
+
   const selectedNode = editor.selection.getNode()
   const videoContainer = findMediaPlayerIframe(selectedNode)
 
@@ -189,7 +243,7 @@ export const updateStudioIframeDimensions = (
 
   const tinymceIframeShim = videoContainer.parentElement
 
-  if (!tinymceIframeShim) {
+  if (!tinymceIframeShim || !videoContainer) {
     return
   }
 
@@ -197,12 +251,13 @@ export const updateStudioIframeDimensions = (
     width: `${width}px`,
     height: `${height}px`,
   })
+
   editor.dom.setStyles(videoContainer, {
     width: `${width}px`,
     height: `${height}px`,
   })
 
-  if (resizable !== undefined) {
+  if (resizable !== undefined && isValidResizable(resizable)) {
     // Update both the actual attribute and the TinyMCE prefixed version
     // This ensures they stay in sync when content is saved and reloaded
     editor.dom.setAttrib(tinymceIframeShim, 'data-studio-resizable', String(resizable))
@@ -240,19 +295,60 @@ export const updateStudioIframeDimensions = (
   })
 }
 
-type ValidStudioEmbedType = 'thumbnail_embed' | 'learn_embed' | 'collaboration_embed'
+export type StudioEmbedOptions = {
+  enableMediaDownload: boolean
+  enableTranscriptDownload: boolean
+  lockSpeed: boolean
+  isExternal: boolean
+}
 
-export const isValidEmbedType = (embedType: any): embedType is ValidStudioEmbedType => {
+const embedOptionsKeyMap: {[key in keyof StudioEmbedOptions]: string} = {
+  enableMediaDownload: 'custom_arc_display_download',
+  enableTranscriptDownload: 'custom_arc_transcript_downloadable',
+  lockSpeed: 'custom_arc_lock_speed',
+  isExternal: 'custom_arc_is_external',
+}
+
+export function validateStudioEmbedOptions(input: any): input is StudioEmbedOptions {
   return (
-    typeof embedType === 'string' &&
-    ['thumbnail_embed', 'learn_embed', 'collaboration_embed'].includes(embedType)
+    typeof input === 'object' && (
+      Object.keys(input).length === 0 ||
+      typeof input.enableMediaDownload === 'boolean' ||
+      typeof input.enableTranscriptDownload === 'boolean' ||
+      typeof input.lockSpeed === 'boolean'
+    )
   )
 }
 
-export const isValidDimension = (value: any): value is number => {
-  return typeof value === 'number' && !isNaN(value) && isFinite(value) && value > 0
-}
+export function updateStudioEmbedOptions (editor: Editor, embedOptions: StudioEmbedOptions) {
+  const container = editor.getContainer()
+  const iframe = container.querySelector('iframe');
+  const mcseShim = iframe?.contentDocument?.querySelector('.mce-shim');
+  const tinymceIframeShim = mcseShim?.parentElement;
 
-export const isValidResizable = (value: any): value is boolean => {
-  return typeof value === 'boolean'
+  if (!tinymceIframeShim) {
+    return
+  }
+
+  const href = editor.dom.getAttrib(tinymceIframeShim, 'data-mce-p-src')
+
+  if (!href) {
+    return
+  }
+
+  const urlMatch = href.match(/url=([^&]*)$/)
+  const url = new URL(decodeURIComponent(urlMatch ? urlMatch[1] : ''))
+  const params = url.searchParams
+
+  for (const [option, param] of Object.entries(embedOptionsKeyMap)) {
+    const optionValue = embedOptions[option as keyof StudioEmbedOptions]
+    if (optionValue) {
+      params.set(param, 'true')
+    } else if (params.has(param)) {
+      params.delete(param)
+    }
+  }
+
+  const newHref = href.replace(/(url=)(.*)$/, `$1${encodeURIComponent(url.toString())}`)
+  editor.dom.setAttrib(tinymceIframeShim, 'data-mce-p-src', newHref)
 }

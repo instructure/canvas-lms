@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Filnavn"
     },
+    "file_preview_21667a6e": {
+        "message": "Filforhåndsvisning"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Filforhåndsvisning for { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Kvote for fillagring er overskredet"
     },

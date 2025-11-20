@@ -16,8 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import '../../../__tests__/mockedDependenciesShims'
+import {screen} from '@testing-library/react'
+import {renderComponent} from '../../../__tests__/renderingShims'
 import {fn} from '../../../__tests__/testPlatformShims'
+import {useResubmitDiscussionNotices} from '../../../dependenciesShims'
 import type {LtiAssetProcessor} from '../../types/LtiAssetProcessors'
 import type {LtiAssetReport} from '../../types/LtiAssetReports'
 import {AssetReportModal} from '../AssetReportModal'
@@ -99,6 +102,12 @@ describe('AssetReportModal', () => {
 
   beforeEach(() => {
     mockOnClose.mockClear()
+    ;(useResubmitDiscussionNotices as any).mockReturnValue({
+      mutate: fn(),
+      isIdle: true,
+      isError: false,
+      variables: undefined,
+    })
   })
 
   it('filters asset processors to only include those with reports', () => {
@@ -109,7 +118,7 @@ describe('AssetReportModal', () => {
 
     const attachments = [{_id: '10', displayName: 'test.pdf'}]
 
-    render(
+    renderComponent(
       <AssetReportModal
         assetProcessors={mockAssetProcessors}
         modalTitle="Test Modal"
@@ -132,7 +141,7 @@ describe('AssetReportModal', () => {
     const reports = [createUploadReport(0, '10', {processorId: '1'})]
     const attachments = [{_id: '10', displayName: 'test.pdf'}]
 
-    render(
+    renderComponent(
       <AssetReportModal
         assetProcessors={mockAssetProcessors}
         modalTitle="Test Modal"
@@ -148,7 +157,7 @@ describe('AssetReportModal', () => {
     )
 
     // There should be two close buttons - one in header (X) and one in footer
-    const closeButtons = screen.getAllByRole('button', {name: /close/i})
+    const closeButtons = screen.getAllByText('Close')
     expect(closeButtons).toHaveLength(2)
   })
 
@@ -156,7 +165,7 @@ describe('AssetReportModal', () => {
     const reports = [createUploadReport(0, '10', {processorId: '1'})]
     const attachments = [{_id: '10', displayName: 'test.pdf'}]
 
-    render(
+    renderComponent(
       <AssetReportModal
         assetProcessors={mockAssetProcessors}
         modalTitle="Test Modal"
@@ -172,7 +181,7 @@ describe('AssetReportModal', () => {
     )
 
     expect(mockOnClose).toHaveBeenCalledTimes(0)
-    const closeButtons = screen.getAllByRole('button', {name: /close/i})
+    const closeButtons = screen.getAllByText('Close')
     // Click the footer close button (the second one)
     closeButtons[1]?.click()
     expect(mockOnClose).toHaveBeenCalledTimes(1)
@@ -182,7 +191,7 @@ describe('AssetReportModal', () => {
     const reports = [createUploadReport(0, '10', {processorId: '1'})]
     const attachments = [{_id: '10', displayName: 'test.pdf'}]
 
-    render(
+    renderComponent(
       <AssetReportModal
         assetProcessors={mockAssetProcessors}
         modalTitle="Test Modal"
@@ -198,5 +207,118 @@ describe('AssetReportModal', () => {
     )
 
     expect(screen.getByText('Assignment Title')).toBeInTheDocument()
+  })
+
+  describe('Resubmit All Replies button', () => {
+    const createDiscussionReport = (
+      priority: number = 0,
+      overrides: Partial<LtiAssetReport> = {},
+    ): LtiAssetReport =>
+      createBaseReport(
+        priority,
+        {
+          discussionEntryVersion: {
+            _id: 'entry_123',
+            createdAt: '2025-01-15T16:45:00Z',
+            messageIntro: 'Test discussion entry',
+          },
+        },
+        overrides,
+      )
+
+    it('shows Resubmit All Replies button for discussions', () => {
+      const reports: LtiAssetReport[] = [
+        createDiscussionReport(0, {processorId: '1', resubmitAvailable: true}),
+        createDiscussionReport(1, {processorId: '2', resubmitAvailable: false}),
+      ]
+
+      renderComponent(
+        <AssetReportModal
+          assetProcessors={mockAssetProcessors}
+          modalTitle="Test Modal"
+          onClose={mockOnClose}
+          attachments={[]}
+          attempt=""
+          mainTitle={undefined}
+          reports={reports}
+          showDocumentDisplayName={false}
+          studentIdForResubmission="456"
+          submissionType="discussion_topic"
+          assignmentId="123"
+        />,
+      )
+
+      expect(screen.getByText('Resubmit All Replies')).toBeInTheDocument()
+      expect(screen.queryByText('Resubmit All Files')).not.toBeInTheDocument()
+    })
+
+    it('hides button when studentIdForResubmission is not provided', () => {
+      const reports = [createDiscussionReport(0, {processorId: '1', resubmitAvailable: true})]
+
+      renderComponent(
+        <AssetReportModal
+          assetProcessors={mockAssetProcessors}
+          modalTitle="Test Modal"
+          onClose={mockOnClose}
+          attachments={[]}
+          attempt=""
+          mainTitle={undefined}
+          reports={reports}
+          showDocumentDisplayName={false}
+          studentIdForResubmission={undefined}
+          submissionType="discussion_topic"
+          assignmentId="123"
+        />,
+      )
+
+      expect(screen.queryByText('Resubmit All Replies')).not.toBeInTheDocument()
+    })
+
+    it('hides button when assignmentId is not provided', () => {
+      const reports = [createDiscussionReport(0, {processorId: '1', resubmitAvailable: true})]
+
+      renderComponent(
+        <AssetReportModal
+          assetProcessors={mockAssetProcessors}
+          modalTitle="Test Modal"
+          onClose={mockOnClose}
+          attachments={[]}
+          attempt=""
+          mainTitle={undefined}
+          reports={reports}
+          showDocumentDisplayName={false}
+          studentIdForResubmission="456"
+          submissionType="discussion_topic"
+          assignmentId={undefined}
+        />,
+      )
+
+      expect(screen.queryByText('Resubmit All Replies')).not.toBeInTheDocument()
+    })
+
+    it('hides button for non-discussion submissions', () => {
+      const reports = [createUploadReport(0, '10', {processorId: '1', resubmitAvailable: true})]
+      const attachments = [{_id: '10', displayName: 'test.pdf'}]
+
+      renderComponent(
+        <AssetReportModal
+          assetProcessors={mockAssetProcessors}
+          modalTitle="Test Modal"
+          onClose={mockOnClose}
+          attachments={attachments}
+          attempt=""
+          mainTitle={undefined}
+          reports={reports}
+          showDocumentDisplayName={false}
+          studentIdForResubmission="456"
+          submissionType="online_upload"
+          assignmentId="123"
+        />,
+      )
+
+      expect(screen.queryByText('Resubmit All Replies')).not.toBeInTheDocument()
+      // Should show the regular resubmit button instead
+      expect(screen.getByText('Resubmit All Files')).toBeInTheDocument()
+    })
   })
 })

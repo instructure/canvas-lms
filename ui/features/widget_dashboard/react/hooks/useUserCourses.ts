@@ -166,7 +166,7 @@ function transformEnrollmentToCourseGrade(enrollment: UserEnrollment): CourseGra
     courseName: enrollment.course.name,
     currentGrade: displayGrade,
     gradingScheme,
-    lastUpdated: new Date(enrollment.updatedAt || new Date().toISOString()),
+    lastUpdated: enrollment.updatedAt ? new Date(enrollment.updatedAt) : null,
   }
 }
 
@@ -234,8 +234,8 @@ export function usePaginatedCoursesWithGrades(
               bValue = b.courseId
               break
             case 'updated':
-              aValue = a.lastUpdated
-              bValue = b.lastUpdated
+              aValue = a.lastUpdated || new Date(0)
+              bValue = b.lastUpdated || new Date(0)
               break
             default:
               return 0

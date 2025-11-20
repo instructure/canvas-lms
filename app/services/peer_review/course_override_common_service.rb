@@ -36,4 +36,15 @@ class PeerReview::CourseOverrideCommonService < ApplicationService
   def fetch_id
     @override.fetch(:id, nil)
   end
+
+  def find_parent_override(course_id)
+    parent_assignment.active_assignment_overrides.find_by(
+      set_id: course_id,
+      set_type: AssignmentOverride::SET_TYPE_COURSE
+    )
+  end
+
+  def parent_assignment
+    @peer_review_sub_assignment.parent_assignment
+  end
 end

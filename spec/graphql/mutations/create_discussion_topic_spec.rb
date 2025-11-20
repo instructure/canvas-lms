@@ -75,11 +75,11 @@ describe Mutations::CreateDiscussionTopic do
         }
       }
     GQL
-    context = { current_user:, request: ActionDispatch::TestRequest.create }
+    context = { current_user:, request: ActionDispatch::TestRequest.create, in_app: true }
     CanvasSchema.execute(mutation_command, context:)
   end
 
-  def execute_with_input_with_assignment(create_input, current_user = @teacher)
+  def execute_with_input_with_assignment(create_input, current_user = @teacher, in_app: true)
     mutation_command = <<~GQL
       mutation {
         createDiscussionTopic(input: {
@@ -151,7 +151,7 @@ describe Mutations::CreateDiscussionTopic do
         }
       }
     GQL
-    context = { current_user:, request: ActionDispatch::TestRequest.create }
+    context = { current_user:, request: ActionDispatch::TestRequest.create, in_app: }
     CanvasSchema.execute(mutation_command, context:)
   end
 
@@ -1168,6 +1168,30 @@ describe Mutations::CreateDiscussionTopic do
         expect(result["errors"]).to be_nil
         expect(Assignment.last.lti_asset_processors.count).to eq 0
       end.to change { Assignment.count }.by(1)
+    end
+
+    it "prevents creating LTI asset processors via API token authentication" do
+      tool = lti_registration_with_tool(account: @course.account).deployments.first
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: Course
+        title: "Discussion"
+        assignment: {
+          courseId: "#{@course.id}"
+          name: "Discussion"
+          assetProcessors: [
+            {
+              newContentItem: {
+                contextExternalToolId: #{tool.id}
+              }
+            }
+          ]
+        }
+      GQL
+      expect do
+        execute_with_input_with_assignment(query, @teacher, in_app: false)
+      end.to raise_error(RequestError, /LTI Deep Linking/)
     end
 
     it "student fails to create graded discussion topic" do

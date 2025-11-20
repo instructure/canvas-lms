@@ -18,6 +18,8 @@
 
 import {fireEvent, render, screen} from '@testing-library/react'
 import {act, renderHook} from '@testing-library/react-hooks'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import React from 'react'
 
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable'
 import {
@@ -32,6 +34,20 @@ jest.mock('../../../../../shared/react/hooks/useAccessibilityScansFetchUtils', (
 }))
 
 const mockDoFetch = jest.fn()
+
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        gcTime: 0,
+      },
+    },
+  })
+  return ({children}: {children: React.ReactNode}) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+}
 
 describe('AccessibilityIssuesTable', () => {
   const mockState = {
@@ -54,7 +70,8 @@ describe('AccessibilityIssuesTable', () => {
       result.current.setAccessibilityScans(null)
     })
 
-    const {rerender} = render(<AccessibilityIssuesTable />)
+    const Wrapper = createWrapper()
+    const {rerender} = render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
     expect(screen.getByTestId('accessibility-issues-table')).toBeInTheDocument()
 
     act(() => {
@@ -73,7 +90,8 @@ describe('AccessibilityIssuesTable', () => {
       result.current.setAccessibilityScans(null)
     })
 
-    const {rerender} = render(<AccessibilityIssuesTable />)
+    const Wrapper = createWrapper()
+    const {rerender} = render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
     expect(screen.getByTestId('loading-row')).toBeInTheDocument()
 
     act(() => {
@@ -92,7 +110,8 @@ describe('AccessibilityIssuesTable', () => {
       result.current.setAccessibilityScans(mockScanData)
     })
 
-    render(<AccessibilityIssuesTable />)
+    const Wrapper = createWrapper()
+    render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
     expect(screen.getAllByTestId(/^issue-row-/)).toHaveLength(mockScanData.length)
   })
 
@@ -105,7 +124,8 @@ describe('AccessibilityIssuesTable', () => {
       result.current.setAccessibilityScans(null)
     })
 
-    const {rerender} = render(<AccessibilityIssuesTable />)
+    const Wrapper = createWrapper()
+    const {rerender} = render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
     expect(screen.getByTestId('error-row')).toBeInTheDocument()
     expect(screen.getByText(errorMessage)).toBeInTheDocument()
 
@@ -122,7 +142,8 @@ describe('AccessibilityIssuesTable', () => {
   describe('- sorting -', () => {
     it('calls doFetchAccessibilityScanData with the proper tableSortState values when a column header is clicked', () => {
       const {result} = renderHook(() => useAccessibilityScansStore())
-      render(<AccessibilityIssuesTable />)
+      const Wrapper = createWrapper()
+      render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
 
       act(() => {
         screen.getByText('Resource Type').click()
@@ -175,7 +196,7 @@ describe('AccessibilityIssuesTable', () => {
         expect.objectContaining({
           tableSortState: {
             sortId: 'resource-type-header',
-            sortDirection: 'none',
+            sortDirection: 'ascending',
           },
         }),
       )
@@ -191,7 +212,8 @@ describe('AccessibilityIssuesTable', () => {
         result.current.setPageCount(1)
       })
 
-      render(<AccessibilityIssuesTable />)
+      const Wrapper = createWrapper()
+      render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
       expect(screen.queryByTestId('accessibility-issues-table-pagination')).not.toBeInTheDocument()
     })
 
@@ -203,7 +225,8 @@ describe('AccessibilityIssuesTable', () => {
         result.current.setPageCount(5)
       })
 
-      render(<AccessibilityIssuesTable />)
+      const Wrapper = createWrapper()
+      render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
       expect(screen.getByTestId('accessibility-issues-table-pagination')).toBeInTheDocument()
       const buttonPage5 = screen.getAllByText(/5/i)[0]
       expect(buttonPage5).toBeInTheDocument()
@@ -217,7 +240,8 @@ describe('AccessibilityIssuesTable', () => {
         result.current.setPageCount(5)
       })
 
-      render(<AccessibilityIssuesTable />)
+      const Wrapper = createWrapper()
+      render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
       const buttons = screen.getAllByText(/5/i)
       fireEvent.click(buttons[0])
 

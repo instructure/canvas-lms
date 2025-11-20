@@ -136,14 +136,9 @@ module Types
         next if object.submission_type == "discussion_topic" && !root_account.feature_enabled?(:lti_asset_processor_discussions)
 
         if object.assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
-          if latest
-            # This is used when the student Grades is visited by a grader. Not implemented yet.
-            next
-          else
-            Loaders::SubmissionLtiAssetReportsLoader.for(is_student: false).load(object.id)
-          end
+          Loaders::SubmissionLtiAssetReportsLoader.for(for_student: false, latest:).load(object.id)
         elsif object.user_can_read_grade?(current_user, for_plagiarism: true)
-          Loaders::SubmissionLtiAssetReportsLoader.for(is_student: true).load(object.id)
+          Loaders::SubmissionLtiAssetReportsLoader.for(for_student: true, latest: true).load(object.id)
         end
       end
     end
@@ -207,6 +202,19 @@ module Types
           end
         else
           nil
+        end
+      end
+    end
+
+    field :submission_quiz_histories_connection, Types::QuizSubmissionType.connection_type, null: true
+    def submission_quiz_histories_connection
+      load_association(:quiz_submission).then do |quiz_submission|
+        next nil unless quiz_submission
+
+        # Load all versions for this quiz submission
+        Loaders::AssociationLoader.for(Quizzes::QuizSubmission, :versions).load(quiz_submission).then do |versions|
+          # Map each version to its model representation
+          versions.map(&:model)
         end
       end
     end

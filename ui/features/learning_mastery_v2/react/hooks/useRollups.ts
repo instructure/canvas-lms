@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import {groupBy} from 'lodash'
 import {loadRollups} from '../apiClient'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -70,6 +70,7 @@ const getRow = (studentRollups: StudentRollup[], outcomes: Outcome[]): OutcomeRo
     const rating = findRating(outcome.ratings, score.score)
     return {
       outcomeId: outcome.id,
+      score: score.score,
       rating: {
         ...rating,
         color: `#` + rating.color,
@@ -128,11 +129,31 @@ export default function useRollups({
 
   const needMasteryAndColorDefaults = !accountMasteryScalesEnabled
 
+  // Track previous studentsPerPage to detect changes
+  const prevStudentsPerPageRef = useRef(settings?.studentsPerPage)
+
   useEffect(() => {
     if (!enabled) {
       setIsLoading(true)
       return
     }
+
+    const currentStudentsPerPage = settings?.studentsPerPage
+
+    // If studentsPerPage changed and we're not on page 1, reset to page 1
+    // and skip this effect run to prevent double API calls
+    if (
+      prevStudentsPerPageRef.current !== undefined &&
+      prevStudentsPerPageRef.current !== currentStudentsPerPage &&
+      currentPage !== DEFAULT_PAGE_NUMBER
+    ) {
+      prevStudentsPerPageRef.current = currentStudentsPerPage
+      setCurrentPage(DEFAULT_PAGE_NUMBER)
+      return
+    }
+
+    prevStudentsPerPageRef.current = currentStudentsPerPage
+
     ;(async () => {
       try {
         setIsLoading(true)

@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "cgi"
+require "uri"
 require_relative "../graphql_spec_helper"
 
 describe Types::FileType do
@@ -159,7 +161,7 @@ describe Types::FileType do
   context "submission preview url" do
     before(:once) do
       @assignment = assignment_model(course: @course)
-      @student_file = attachment_with_context(@student, content_type: "application/pdf")
+      @student_file = attachment_with_context(@course, content_type: "application/pdf", user: @student)
       @submission = @assignment.submit_homework(
         @student,
         body: "Attempt 1",
@@ -219,6 +221,58 @@ describe Types::FileType do
       allow(Canvadocs).to receive(:enabled?).and_return true
       resp = @resolver.resolve("submissionPreviewUrl")
       expect(resp).to be_nil
+    end
+
+    context "when assignment has anonymous_instructor_annotations is enabled" do
+      def get_blob_json_from_url(url)
+        qs = URI.parse(url).query
+        params = CGI.parse(qs)
+        blob = params["blob"].first
+        decoded_blob = CGI.unescape(blob)
+        JSON.parse(decoded_blob)
+      end
+
+      before(:once) do
+        @course.account.enable_feature!(:anonymous_instructor_annotations)
+        @course.enable_feature!(:anonymous_instructor_annotations)
+        @assignment.update!(anonymous_instructor_annotations: true)
+      end
+
+      before do
+        allow(Canvadocs).to receive(:enabled?).and_return true
+      end
+
+      it "teacher can anonymize annotations" do
+        resp = @resolver.resolve(
+          'submissionPreviewUrl(submissionId: "' + @submission.id.to_s + '")',
+          current_user: @teacher
+        )
+
+        expect(resp).not_to be_nil
+        blob_json = get_blob_json_from_url(resp)
+        expect(blob_json).to include("anonymous_instructor_annotations" => true)
+      end
+
+      it "teacher without :manage_grades permission can't anonymize annotations" do
+        ta = ta_in_course(course: @course).user
+        @course.account.role_overrides.create!(permission: "manage_grades", role: ta_role, enabled: false)
+        resp = @resolver.resolve(
+          'submissionPreviewUrl(submissionId: "' + @submission.id.to_s + '")',
+          current_user: ta
+        )
+
+        expect(resp).not_to be_nil
+        blob_json = get_blob_json_from_url(resp)
+        expect(blob_json).to include("anonymous_instructor_annotations" => false)
+      end
+
+      it "student can't anonymize annotations" do
+        resp = @resolver.resolve('submissionPreviewUrl(submissionId: "' + @submission.id.to_s + '")')
+
+        expect(resp).not_to be_nil
+        blob_json = get_blob_json_from_url(resp)
+        expect(blob_json).to include("anonymous_instructor_annotations" => false)
+      end
     end
   end
 end

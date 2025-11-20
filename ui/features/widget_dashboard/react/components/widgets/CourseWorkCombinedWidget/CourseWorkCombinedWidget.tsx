@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useCallback} from 'react'
+import React, {useCallback} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -35,6 +35,7 @@ import {
 } from '../../../utils/dateUtils'
 import {CourseWorkItem as CourseWorkItemComponent} from '../../shared/CourseWorkItem'
 import {DEFAULT_PAGE_SIZE} from '../../../constants/pagination'
+import {useWidgetConfig} from '../../../hooks/useWidgetConfig'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -43,9 +44,18 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
   isLoading: externalIsLoading,
   error: externalError,
   onRetry,
+  isEditMode = false,
 }) => {
-  const [selectedCourse, setSelectedCourse] = useState<string>('all')
-  const [selectedDateFilter, setSelectedDateFilter] = useState<DateFilterOption>('next3days')
+  const [selectedCourse, setSelectedCourse] = useWidgetConfig<string>(
+    widget.id,
+    'selectedCourse',
+    'all',
+  )
+  const [selectedDateFilter, setSelectedDateFilter] = useWidgetConfig<DateFilterOption>(
+    widget.id,
+    'selectedDateFilter',
+    'next3days',
+  )
 
   const {data: courseGrades = []} = useSharedCourses({limit: 1000})
   const userCourses: CourseOption[] = courseGrades.map(courseGrade => ({
@@ -53,7 +63,7 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
     name: courseGrade.courseName,
   }))
 
-  const courseFilter = selectedCourse === 'all' ? undefined : selectedCourse.replace('course_', '')
+  const courseFilter = selectedCourse === 'all' ? undefined : selectedCourse
   const dateParams = convertDateFilterToParams(selectedDateFilter)
   const statisticsDateRange = convertDateFilterToStatisticsRange(selectedDateFilter)
 
@@ -101,7 +111,7 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
         setSelectedCourse(data.value)
       }
     },
-    [],
+    [setSelectedCourse],
   )
 
   const handleDateFilterChange = useCallback(
@@ -110,7 +120,7 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
         setSelectedDateFilter(data.value as DateFilterOption)
       }
     },
-    [],
+    [setSelectedDateFilter],
   )
 
   return (
@@ -119,6 +129,7 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
       isLoading={isLoading}
       error={error ? I18n.t('Failed to load course work. Please try again.') : null}
       onRetry={handleRetry}
+      isEditMode={isEditMode}
       pagination={{
         currentPage: currentPageIndex + 1,
         totalPages,

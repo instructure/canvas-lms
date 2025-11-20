@@ -85,21 +85,51 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
         </Flex.Item>
 
         <Flex.Item shouldGrow padding="0 0 0 xx-small" overflowY="visible">
-          <Flex direction="column" gap="0">
-            <Flex.Item>
-              <Text size="small" color="secondary">
-                {formatUpdatedDate(lastUpdated)}
-              </Text>
+          <Flex direction="column" gap="0" height="100%">
+            <Flex.Item height="1.5rem">
+              {lastUpdated && currentGrade !== null && (
+                <Text
+                  size="small"
+                  color="secondary"
+                  data-testid={`course-${courseId}-last-updated`}
+                >
+                  {formatUpdatedDate(lastUpdated)}
+                </Text>
+              )}
             </Flex.Item>
             <Flex.Item overflowX="visible" overflowY="visible">
-              <Link
-                href={`/courses/${courseId}/grades`}
-                isWithinText={false}
-                aria-label={I18n.t('View %{courseName} gradebook', {courseName})}
-                data-testid={`course-${courseId}-gradebook-link`}
-              >
-                <Text size="small">{I18n.t('View gradebook')}</Text>
-              </Link>
+              <Flex>
+                <Flex.Item overflowX="visible" overflowY="visible">
+                  <Link
+                    href={`/courses/${courseId}/grades`}
+                    isWithinText={false}
+                    aria-label={I18n.t('View %{courseName} gradebook', {courseName})}
+                    data-testid={`course-${courseId}-gradebook-link`}
+                  >
+                    <Text size="small">{I18n.t('View gradebook')}</Text>
+                  </Link>
+                </Flex.Item>
+                <Flex.Item padding="0 small" overflowX="visible" overflowY="visible">
+                  <Text
+                    color="secondary"
+                    themeOverride={{
+                      secondaryColor: '#E8EAEC',
+                    }}
+                  >
+                    |
+                  </Text>
+                </Flex.Item>
+                <Flex.Item overflowX="visible" overflowY="visible">
+                  <Link
+                    href={`/courses/${courseId}`}
+                    isWithinText={false}
+                    aria-label={I18n.t('Go to %{courseName}', {courseName})}
+                    data-testid={`course-${courseId}-link`}
+                  >
+                    <Text size="small">{I18n.t('Go to course')}</Text>
+                  </Link>
+                </Flex.Item>
+              </Flex>
             </Flex.Item>
           </Flex>
         </Flex.Item>

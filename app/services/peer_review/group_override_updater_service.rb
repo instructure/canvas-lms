@@ -40,13 +40,23 @@ class PeerReview::GroupOverrideUpdaterService < PeerReview::GroupOverrideCommonS
             end
     validate_group_exists(group)
 
-    update_override(override, group)
+    ActiveRecord::Base.transaction do
+      parent_override = if set_id == override.set_id
+                          override.parent_override
+                        else
+                          find_parent_override(set_id)
+                        end
+      validate_group_parent_override_exists(parent_override, set_id)
+
+      update_override(override, group, parent_override)
+    end
   end
 
   private
 
-  def update_override(override, group)
+  def update_override(override, group, parent_override)
     override.set = group if group.id != override.set_id
+    override.parent_override = parent_override
     apply_overridden_dates(override, @override)
 
     override.save! if override.changed?
@@ -54,7 +64,7 @@ class PeerReview::GroupOverrideUpdaterService < PeerReview::GroupOverrideCommonS
   end
 
   def find_override
-    @peer_review_sub_assignment.assignment_overrides.find_by(
+    @peer_review_sub_assignment.active_assignment_overrides.find_by(
       id: fetch_id,
       set_type: AssignmentOverride::SET_TYPE_GROUP
     )

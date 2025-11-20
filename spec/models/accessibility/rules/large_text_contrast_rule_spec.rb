@@ -65,6 +65,58 @@ describe Accessibility::Rules::LargeTextContrastRule do
     end
   end
 
+  context "when testing with background shorthand property" do
+    it "detects contrast issues with background shorthand containing hex color" do
+      input_html = '<h1 style="color: #BBBBBB; background: #FFFFFF; font-size: 24px;">Low contrast heading</h1>'
+
+      issues = find_issues(:large_text_contrast, input_html, "page-123")
+
+      expect(issues).not_to be_empty
+    end
+
+    it "skips elements with background-image property" do
+      input_html = '<h1 style="color: #FFFFFF; background-image: url(test.jpg); font-size: 24px;">White text</h1>'
+
+      issues = find_issues(:large_text_contrast, input_html, "page-123")
+
+      expect(issues).to be_empty
+    end
+
+    it "skips elements with background containing url()" do
+      input_html = '<h1 style="color: #FFFFFF; background: url(test.jpg) no-repeat; font-size: 24px;">White text</h1>'
+
+      issues = find_issues(:large_text_contrast, input_html, "page-123")
+
+      expect(issues).to be_empty
+    end
+
+    it "skips elements with background containing gradient" do
+      input_html = '<h1 style="color: #FFFFFF; background: linear-gradient(red, blue); font-size: 24px;">White text</h1>'
+
+      issues = find_issues(:large_text_contrast, input_html, "page-123")
+
+      expect(issues).to be_empty
+    end
+  end
+
+  context "when testing with pt font-size units" do
+    it "detects large text with pt units (24pt = 32px)" do
+      input_html = '<span style="color: #BBBBBB; background-color: #FFFFFF; font-size: 24pt;">Low contrast text</span>'
+
+      issues = find_issues(:large_text_contrast, input_html, "page-123")
+
+      expect(issues).not_to be_empty
+    end
+
+    it "detects large text at minimum threshold (18.5px = ~14pt)" do
+      input_html = '<span style="color: #BBBBBB; background-color: #FFFFFF; font-size: 14pt;">Low contrast text</span>'
+
+      issues = find_issues(:large_text_contrast, input_html, "page-123")
+
+      expect(issues).not_to be_empty
+    end
+  end
+
   context "when fixing large text contrast" do
     it "updates the text color to meet contrast requirements" do
       input_html = '<h1 style="color: #BBBBBB; background-color: #FFFFFF; font-size: 24px;">Low contrast heading</h1>'
@@ -72,6 +124,13 @@ describe Accessibility::Rules::LargeTextContrastRule do
 
       expect(fixed_html).to include("color: #000000")
       expect(fixed_html).to include("background-color: #FFFFFF")
+    end
+
+    it "works with background shorthand" do
+      input_html = '<h1 style="color: #BBBBBB; background: #FFFFFF; font-size: 24px;">Low contrast heading</h1>'
+      fixed_html = fix_issue(:large_text_contrast, input_html, "./*", "#000000")
+
+      expect(fixed_html).to include("color: #000000")
     end
   end
 end

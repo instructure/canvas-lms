@@ -210,7 +210,7 @@ describe('ImageTextBlockSettings', () => {
         aiAltTextGenerationURL: null,
       })
       const component = renderBlock(ImageTextBlockSettings, defaultProps)
-      expect(component.queryByText(/Regenerate Alt Text/i)).not.toBeInTheDocument()
+      expect(component.queryByText(/\(Re\)generate Alt Text/i)).not.toBeInTheDocument()
     })
 
     it('does not show when AI alt text URL is empty string', () => {
@@ -218,7 +218,7 @@ describe('ImageTextBlockSettings', () => {
         aiAltTextGenerationURL: '',
       })
       const component = renderBlock(ImageTextBlockSettings, defaultProps)
-      expect(component.queryByText(/Regenerate Alt Text/i)).not.toBeInTheDocument()
+      expect(component.queryByText(/\(Re\)generate Alt Text/i)).not.toBeInTheDocument()
     })
 
     it('shows when AI alt text URL is provided', () => {
@@ -226,7 +226,7 @@ describe('ImageTextBlockSettings', () => {
         aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
       })
       const component = renderBlock(ImageTextBlockSettings, defaultProps)
-      expect(component.getByText(/Regenerate Alt Text/i)).toBeInTheDocument()
+      expect(component.queryByText(/\(Re\)generate Alt Text/i)).toBeInTheDocument()
     })
 
     it('is disabled when image is decorative', () => {
@@ -237,7 +237,7 @@ describe('ImageTextBlockSettings', () => {
         ...defaultProps,
         decorativeImage: true,
       })
-      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+      const button = component.getByTestId('generate-alt-text-button')
       expect(button).toBeDisabled()
     })
 
@@ -249,7 +249,7 @@ describe('ImageTextBlockSettings', () => {
         ...defaultProps,
         attachmentId: undefined,
       })
-      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+      const button = component.getByTestId('generate-alt-text-button')
       expect(button).toBeDisabled()
     })
 
@@ -258,7 +258,7 @@ describe('ImageTextBlockSettings', () => {
         aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
       })
       const component = renderBlock(ImageTextBlockSettings, {...defaultProps, fileName: ''})
-      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+      const button = component.getByTestId('generate-alt-text-button')
       expect(button).toBeDisabled()
     })
 
@@ -272,7 +272,7 @@ describe('ImageTextBlockSettings', () => {
         ...defaultProps,
         altText: 'Original alt text',
       })
-      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+      const button = component.getByTestId('generate-alt-text-button')
       const altTextInput = component.getByRole('textbox', {name: /Alt text/i}) as HTMLInputElement
 
       expect(altTextInput.value).toBe('Original alt text')
@@ -309,14 +309,14 @@ describe('ImageTextBlockSettings', () => {
       )
 
       const component = renderBlock(ImageTextBlockSettings, defaultProps)
-      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+      const button = component.getByTestId('generate-alt-text-button')
 
       await userEvent.click(button)
 
-      expect(component.getByText(/Generating\.\.\./i)).toBeInTheDocument()
+      expect(component.getByText('Generating Alt Text...')).toBeInTheDocument()
 
       await waitFor(() => {
-        expect(component.getByText(/Regenerate Alt Text/i)).toBeInTheDocument()
+        expect(component.queryByText(/\(Re\)generate Alt Text/i)).toBeInTheDocument()
       })
     })
   })

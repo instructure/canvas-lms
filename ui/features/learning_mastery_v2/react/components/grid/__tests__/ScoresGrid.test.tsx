@@ -20,6 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {ScoresGrid, ScoresGridProps} from '../ScoresGrid'
 import {Student, Outcome, StudentRollupData} from '../../../types/rollup'
+import {ScoreDisplayFormat} from '../../../utils/constants'
 
 describe('ScoresGrid', () => {
   const defaultProps = (props: Partial<ScoresGridProps> = {}): ScoresGridProps => {
@@ -30,6 +31,7 @@ describe('ScoresGrid', () => {
           outcomeRollups: [
             {
               outcomeId: '1',
+              score: 3,
               rating: {
                 points: 3,
                 color: 'green',
@@ -79,5 +81,23 @@ describe('ScoresGrid', () => {
   it('renders each outcome rollup', () => {
     const {getByText} = render(<ScoresGrid {...defaultProps()} />)
     expect(getByText(/mastery/)).toBeInTheDocument()
+  })
+
+  it('passes scoreDisplayFormat prop to StudentOutcomeScore components', () => {
+    const {getByText} = render(
+      <ScoresGrid {...defaultProps()} scoreDisplayFormat={ScoreDisplayFormat.ICON_AND_POINTS} />,
+    )
+    expect(getByText('3')).toBeInTheDocument()
+  })
+
+  it('uses ICON_ONLY as default scoreDisplayFormat', () => {
+    const {getByText} = render(<ScoresGrid {...defaultProps()} />)
+    const srContent = getByText('mastery')
+    expect(srContent).toBeInTheDocument()
+  })
+
+  it('renders correct test-id for student-outcome-score cells', () => {
+    const {getByTestId} = render(<ScoresGrid {...defaultProps()} />)
+    expect(getByTestId('student-outcome-score-1-1')).toBeInTheDocument()
   })
 })

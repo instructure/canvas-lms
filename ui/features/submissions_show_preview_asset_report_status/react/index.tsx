@@ -39,6 +39,18 @@ const I18n = createI18nScope('lti_asset_reports_for_student')
  * (ui/features/submissions/react/StudentLtiAssetReportModalWrapper.tsx)
  */
 
+/* 
+  We don't want to render the Asset Reports in the preview inside SpeedGrader, 
+  since SpeedGrader show them in the right panel. 
+*/
+function isInSpeedgrader(): boolean {
+  try {
+    return window.top?.location.href?.includes('/gradebook/speed_grader') || false
+  } catch (_) {
+    return false
+  }
+}
+
 const ZAttachmentAssetReportStatusProps = z.object({
   submissionId: z.string(),
   submissionType: z.string(),
@@ -63,6 +75,10 @@ function DocumentProcessorsHeader(submission: z.infer<typeof ZDocumentProcessors
 }
 
 ready(() => {
+  if (isInSpeedgrader()) {
+    return
+  }
+
   const nRendered = renderAPComponent(
     '.asset-report-status-container',
     AttachmentAssetReportStatus,

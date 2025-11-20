@@ -2431,6 +2431,28 @@ describe ContextExternalTool do
       end
     end
 
+    describe "#uses_cached_placements?" do
+      it "returns true when tool has course_navigation placement" do
+        tool = external_tool_model(context: @course, placements: [:course_navigation])
+        expect(tool.uses_cached_placements?).to be true
+      end
+
+      it "returns true when tool has account_navigation placement" do
+        tool = external_tool_model(context: @course, placements: [:account_navigation])
+        expect(tool.uses_cached_placements?).to be true
+      end
+
+      it "returns true when tool has user_navigation placement" do
+        tool = external_tool_model(context: @course, placements: [:user_navigation])
+        expect(tool.uses_cached_placements?).to be true
+      end
+
+      it "returns false when tool has no navigation placements" do
+        tool = external_tool_model(context: @course, placements: [:assignment_selection, :editor_button])
+        expect(tool.uses_cached_placements?).to be false
+      end
+    end
+
     describe ".visible?" do
       let(:u) { user_factory }
       let(:admin) { account_admin_user(account: c.root_account) }

@@ -391,9 +391,17 @@ class DiscussionTopic < ActiveRecord::Base
     end
 
     shard.activate do
+      # copy attachment associations from parent after save
+      AttachmentAssociation.copy_associations(self, sub_topics) if sub_topics.any?
       # delete any lingering child topics
       DiscussionTopic.where(root_topic_id: self).where.not(id: sub_topics).update_all(workflow_state: "deleted")
     end
+  end
+
+  def update_attachment_associations(**args)
+    return if root_topic_id.present? # skip for subtopics; associations are copied in refresh_subtopics
+
+    super
   end
 
   def ensure_child_topic_for(group)

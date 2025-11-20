@@ -61,9 +61,19 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   const [screenReaderAnnouncement, setScreenReaderAnnouncement] = useState('')
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    lastMessageElement?.scrollIntoView({behavior: 'smooth', block: 'start'})
+    if (lastMessageElement && messagesContainerRef.current) {
+      const container = messagesContainerRef.current
+      const messageRect = lastMessageElement.getBoundingClientRect()
+      const containerRect = container.getBoundingClientRect()
+
+      // Only scroll if message is outside the visible area
+      if (messageRect.bottom > containerRect.bottom || messageRect.top < containerRect.top) {
+        lastMessageElement.scrollIntoView({behavior: 'smooth', block: 'nearest'})
+      }
+    }
   }, [messages, lastMessageElement])
 
   useEffect(() => {
@@ -336,6 +346,9 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
           padding="xx-small"
           role="log"
           aria-label={I18n.t('Conversation messages')}
+          elementRef={el => {
+            messagesContainerRef.current = el as HTMLDivElement | null
+          }}
         >
           {isInitializing ? (
             <Flex justifyItems="center" alignItems="center" height="100%">

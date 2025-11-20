@@ -579,6 +579,12 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
+    it "sets context_rubric_associations_url in js_env" do
+      user_session(@teacher)
+      get "edit", params: { course_id: @course.id, id: @quiz.id }
+      expect(assigns[:js_env][:context_rubric_associations_url]).to eq("/courses/#{@course.id}/rubric_associations")
+    end
+
     context "assign to differentiation tags" do
       before do
         @course.account.tap do |a|

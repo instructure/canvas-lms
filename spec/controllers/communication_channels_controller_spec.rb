@@ -72,6 +72,22 @@ describe CommunicationChannelsController do
       expect(response).not_to be_successful
     end
 
+    it "renders ActiveModel::Errors via ApplicationController#render json casting" do
+      existing = @user.communication_channels.create!(path: "dup@example.com", path_type: "email", workflow_state: "active")
+      expect(existing).to be_active
+      user_session(@user)
+
+      post "create", params: { user_id: @user.id, communication_channel: { address: "dup@example.com", type: "email" } }
+
+      expect(response).to have_http_status(:bad_request)
+      body = response.parsed_body
+      expect(body).to have_key("errors")
+      expect(body["errors"]).to have_key("path")
+      expect(body["errors"]["path"]).to be_an(Array)
+      # One of the error messages should indicate uniqueness (via existing active channel)
+      expect(body["errors"]["path"].join).to match(/unique/i)
+    end
+
     it "prevents CC from being created if at the maximum number of CCs allowed" do
       domain_root_account = Account.default
       domain_root_account.settings[:max_communication_channels] = 1
@@ -1494,7 +1510,6 @@ describe CommunicationChannelsController do
               token: "asdasd123123", type: "push"
             }
           }
-          ap(response.parsed_body)
           expect(response).to be_successful
         end
 

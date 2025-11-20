@@ -22,8 +22,6 @@ class AssessmentQuestion < ActiveRecord::Base
   extend RootAccountResolver
   include Workflow
 
-  attr_accessor :current_user
-
   has_many :quiz_questions, class_name: "Quizzes::QuizQuestion"
   has_many :attachments, as: :context, inverse_of: :context
 
@@ -129,7 +127,7 @@ class AssessmentQuestion < ActiveRecord::Base
     @file_substitutions ||= {}
   end
 
-  def translate_file_link(link, match_data = nil)
+  def translate_file_link(link, match_data = nil, migration: nil)
     match_data ||= link.match(translate_link_regex)
     return link unless match_data
 
@@ -143,9 +141,8 @@ class AssessmentQuestion < ActiveRecord::Base
       end
 
       begin
-        unless Current.in_migration?
-          raise "User does not have access to file" unless current_user && file&.grants_right?(current_user, nil, :create)
-        end
+        raise "User does not have access to file" unless migration || (updating_user && file&.grants_right?(updating_user, nil, :create))
+
         new_file = file.try(:clone_for, self)
       rescue => e
         new_file = nil

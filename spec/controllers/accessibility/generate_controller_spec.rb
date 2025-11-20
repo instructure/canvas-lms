@@ -33,6 +33,8 @@ RSpec.describe Accessibility::GenerateController do
       allow(Accessibility::Issue).to receive(:new).with(context: course).and_return(accessibility_issue_instance)
       allow(LLMConfigs).to receive(:config_for).with("alt_text_generate").and_return({})
       allow(InstLLMHelper).to receive(:with_rate_limit).and_yield
+      allow(course).to receive(:a11y_checker_enabled?).and_return(true)
+      Account.site_admin.enable_feature!(:a11y_checker_ai_generation)
     end
 
     context "for a wiki page" do
@@ -164,18 +166,27 @@ RSpec.describe Accessibility::GenerateController do
       controller.instance_variable_set(:@context, course)
       controller.instance_variable_set(:@current_user, user)
       allow(controller).to receive(:authorized_action).and_return(true)
+      allow(course).to receive(:a11y_checker_enabled?).and_return(true)
     end
 
-    it "renders unauthorized if tab is not enabled" do
-      allow(controller).to receive(:tab_enabled?).with(Course::TAB_ACCESSIBILITY).and_return(false)
+    it "renders forbidden if a11y_checker_enabled is not enabled" do
+      allow(course).to receive(:a11y_checker_enabled?).and_return(false)
 
-      expect(controller).to receive(:render_unauthorized_action)
+      expect(controller).to receive(:render).with(status: :forbidden)
 
       controller.send(:check_authorized_action)
     end
 
-    it "calls authorized_action if tab is enabled" do
-      allow(controller).to receive(:tab_enabled?).with(Course::TAB_ACCESSIBILITY).and_return(true)
+    it "renders forbidden if AI generation feature flag is disabled" do
+      Account.site_admin.disable_feature!(:a11y_checker_ai_generation)
+
+      expect(controller).to receive(:render).with(status: :forbidden)
+
+      controller.send(:check_authorized_action)
+    end
+
+    it "calls authorized_action if a11y checker and ai generation is enabled" do
+      Account.site_admin.enable_feature!(:a11y_checker_ai_generation)
 
       expect(controller).to receive(:authorized_action).with(course, user, [:read, :update]).and_return(true)
 

@@ -199,6 +199,7 @@ class Attachment < ActiveRecord::Base
   # That means you can't rely on these happening in the same transaction as the save.
   after_save_and_attachment_processing :touch_context_if_appropriate
   after_save_and_attachment_processing :ensure_media_object
+  after_save_and_attachment_processing :index_in_pine, if: :should_index_in_pine?
 
   # this mixin can be added to a has_many :attachments association, and it'll
   # handle finding replaced attachments. In other words, if an attachment found
@@ -239,10 +240,7 @@ class Attachment < ActiveRecord::Base
 
       return att unless att.deleted? && owner
 
-      include_hidden_files = Account.site_admin.feature_enabled?(:hidden_attachments_replacement_chain)
-      file_states = include_hidden_files ? %w[available hidden] : "available"
-
-      new_att = owner.attachments.where(id: att.replacement_attachment_id, file_state: file_states).first if att.replacement_attachment_id
+      new_att = owner.attachments.where(id: att.replacement_attachment_id, file_state: %w[available hidden]).first if att.replacement_attachment_id
       new_att ||= Folder.find_attachment_in_context_with_path(owner, att.full_display_path)
       new_att || att
     end
@@ -608,7 +606,7 @@ class Attachment < ActiveRecord::Base
 
   def set_word_count
     if word_count.nil? && !deleted? && file_state != "broken" && word_count_supported?
-      delay(singleton: "attachment_set_word_count_#{global_id}").update_word_count
+      delay(run_at: 5.minutes.from_now, singleton: "attachment_set_word_count_#{global_id}").update_word_count
     end
   end
 
@@ -617,7 +615,12 @@ class Attachment < ActiveRecord::Base
   end
 
   def update_word_count
-    update_column(:word_count, calculate_words)
+    if word_count
+      InstStatsd::Statsd.distributed_increment("attachment.update_word_count", tags: { source: "DocViewer" })
+    else
+      InstStatsd::Statsd.distributed_increment("attachment.update_word_count", tags: { source: "Canvas" })
+      update_column(:word_count, calculate_words)
+    end
   end
 
   def namespace
@@ -1775,9 +1778,17 @@ class Attachment < ActiveRecord::Base
         batch = Attachment.where(id: attachments)
         array_batch = attachments
       end
+      # Check which attachments were available before deletion (for Pine cleanup)
+      attachments_to_delete_from_pine = array_batch.select do |attach|
+        attach.file_state == "available" && attach.eligible_for_pine_indexing?
+      end
+
       batch.update_all(file_state: "deleted", deleted_at: delete_time, updated_at: delete_time, modified_at: delete_time)
       array_batch.each { |attach| attach.mark_downstream_changes(%w[manually_deleted deleted_at updated_at modified_at]) }
       Canvas::LiveEvents.delay_if_production.attachments_bulk_deleted(array_batch.map(&:id))
+
+      # Delete from Pine for attachments that were available before deletion
+      attachments_to_delete_from_pine.each(&:delete_from_pine)
       break if array_batch.length < 1000
     end
     attachments
@@ -2100,10 +2111,21 @@ class Attachment < ActiveRecord::Base
 
     if canvadocable?
       doc = canvadoc || create_canvadoc
-      doc.upload({
-                   annotatable: opts[:wants_annotation],
-                   preferred_plugins: opts[:preferred_plugins]
-                 })
+      upload_opts = {
+        annotatable: opts[:wants_annotation],
+        preferred_plugins: opts[:preferred_plugins]
+      }
+
+      # Add canvas_metadata for submission attachments to enable word count updates
+      if (submission = assignment_submissions.first)
+        assignment = submission.assignment
+        upload_opts[:canvas_metadata] = {
+          base_url: "#{HostUrl.protocol}://#{HostUrl.context_host(assignment.context)}",
+          attachment_jwt: CanvasSecurity.create_jwt({ id: }, 1.hour.from_now)
+        }
+      end
+
+      doc.upload(upload_opts)
       update_attribute(:workflow_state, "processing")
     end
   rescue => e
@@ -2432,7 +2454,15 @@ class Attachment < ActiveRecord::Base
   private :preview_params
 
   def can_unpublish?
-    false
+    # Only allow if file is in a simple "published" state with no special restrictions
+    return false if locked?
+
+    has_complex_state = file_state != "available" ||
+                        lock_at.present? ||
+                        unlock_at.present? ||
+                        (visibility_level.present? && visibility_level != "inherit")
+
+    !has_complex_state
   end
 
   def self.copy_attachments_to_submissions_folder(assignment_context, attachments)
@@ -2674,6 +2704,59 @@ class Attachment < ActiveRecord::Base
     vl = context.files_visibility_option if vl == "inherit"
     vl = "context" if vl == context.class.name.downcase
     vl
+  end
+
+  def should_index_in_pine?
+    eligible_for_pine_indexing? && file_state == "available"
+  end
+
+  def index_in_pine
+    delay(
+      n_strand: ["horizon_file_ingestion", context.global_root_account_id],
+      singleton: "horizon_file_ingestion:#{context.global_id}:#{id}",
+      max_attempts: 3
+    ).ingest_to_pine
+  end
+
+  def eligible_for_pine_indexing?
+    return false unless context.is_a?(Course)
+    return false unless context.horizon_course?
+    return false unless context.root_account.feature_enabled?(:horizon_learning_object_ingestion_on_change)
+    return false unless PineClient.enabled?
+    return false unless PineClient.allowed_attachment_content_types.include?(content_type)
+
+    true
+  end
+
+  def delete_from_pine
+    return unless context.is_a?(Course) && context.root_account.present?
+
+    # PineClient requires a user object with uuid and global_id, but we don't have a user in this context
+    # and the action is more of a system-initiated action than a user-initiated action
+    null_user = Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil)
+
+    delay(
+      n_strand: ["horizon_file_deletion", context.global_root_account_id],
+      singleton: "horizon_file_deletion:#{context.global_id}:#{id}",
+      max_attempts: 3
+    ).delete_from_pine_job(null_user)
+  rescue => e
+    Rails.logger.error("Failed to queue Pine deletion for attachment #{id} for context #{context.class.name}:#{context.id}: #{e.message}")
+    # Don't raise - we don't want to block the deletion if Pine is down
+  end
+
+  def delete_from_pine_job(null_user)
+    PineClient.delete_document(
+      source: "canvas",
+      source_id: id.to_s,
+      source_type: "attachment",
+      feature_slug: "horizon-content-ingestion",
+      root_account_uuid: context.root_account.uuid,
+      current_user: null_user
+    )
+  rescue => e
+    Rails.logger.error("Failed to delete attachment #{id} from Pine for context #{context.class.name}:#{context.id}: #{e.message}")
+    raise
   end
 
   private

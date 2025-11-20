@@ -74,8 +74,8 @@ describe('useAccessibilityScanFetchUtils', () => {
       }),
     )
 
-    expect(callObj.params).not.toHaveProperty('sort')
-    expect(callObj.params).not.toHaveProperty('direction')
+    expect(callObj.params).toHaveProperty('sort')
+    expect(callObj.params).toHaveProperty('direction')
 
     expect(storeResult.current.page).toBe(defaultStateToFetch.page)
     expect(storeResult.current.pageSize).toBe(defaultStateToFetch.pageSize)
@@ -91,10 +91,10 @@ describe('useAccessibilityScanFetchUtils', () => {
       response: {
         headers: new Headers({
           link:
-            '</courses/1/accessibility_resource_scans?page=1&per_page=10>; rel="current",' +
-            '</courses/1/accessibility_resource_scans?page=2&per_page=10>; rel="next",' +
-            '</courses/1/accessibility_resource_scans?page=1&per_page=10>; rel="first",' +
-            '</courses/1/accessibility_resource_scans?page=5&per_page=10>; rel="last"', // PageCount calculated from last link
+            '</courses/1/accessibility/resource_scan?page=1&per_page=10>; rel="current",' +
+            '</courses/1/accessibility/resource_scan?page=2&per_page=10>; rel="next",' +
+            '</courses/1/accessibility/resource_scan?page=1&per_page=10>; rel="first",' +
+            '</courses/1/accessibility/resource_scan?page=5&per_page=10>; rel="last"', // PageCount calculated from last link
         }),
       },
     })

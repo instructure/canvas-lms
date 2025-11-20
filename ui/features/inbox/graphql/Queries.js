@@ -376,20 +376,24 @@ export const SUBMISSION_COMMENTS_QUERY = gql`
 `
 
 export const RECIPIENTS_OBSERVERS_QUERY = gql`
-  query GetRecipientsObservers($userID: ID!, $contextCode: String!, $recipientIds: [String!]!) {
+  query GetRecipientsObservers($userID: ID!, $contextCode: String!, $recipientIds: [String!]!, $after: String) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
         id
-        recipientsObservers(contextCode: $contextCode, recipientIds: $recipientIds) {
+        recipientsObservers(contextCode: $contextCode, recipientIds: $recipientIds, first: 20, after: $after) {
           nodes {
             id
             name
             _id
           }
+          pageInfo {
+            ...PageInfo
+          }
         }
       }
     }
   }
+  ${PageInfo.fragment}
 `
 
 export const INBOX_SETTINGS_QUERY = gql`

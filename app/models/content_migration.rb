@@ -1152,7 +1152,7 @@ class ContentMigration < ActiveRecord::Base
     blocks_json.each_value { |block| convert_block(block, context, migration_id) }
   end
 
-  delegate :resolve_content_links!, to: :html_converter
+  delegate :resolve_content_links!, :create_attachment_associations, to: :html_converter
 
   def add_warning_for_missing_content_links(type, field, missing_links, fix_issue_url)
     add_warning(t(:missing_content_links_title, "Missing links found in imported content") + " - #{type} #{field}",

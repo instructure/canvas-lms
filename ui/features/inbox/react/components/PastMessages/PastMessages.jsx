@@ -26,28 +26,32 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {decodeHTMLAuthor} from '../../../util/utils'
 
 const I18n = createI18nScope('conversations_2')
 
-const PastMessage = props => (
-  <View as="div" borderWidth="small none none none">
-    <Flex direction="column" margin="medium">
-      <Flex.Item>
-        <Flex wrap="wrap">
-          <Flex.Item shouldShrink={true} shouldGrow={true}>
-            <Text>{props?.author?.name || I18n.t('DELETED USER')}</Text>
-          </Flex.Item>
-          <Flex.Item>
-            <Text weight="light">{DateHelper.formatDatetimeForDisplay(props.createdAt)}</Text>
-          </Flex.Item>
-        </Flex>
-      </Flex.Item>
-      <Flex.Item margin="x-small 0 0 0">
-        <Text weight="light">{props.body}</Text>
-      </Flex.Item>
-    </Flex>
-  </View>
-)
+const PastMessage = props => {
+  const decodedAuthor = decodeHTMLAuthor(props?.author)
+  return (
+    <View as="div" borderWidth="small none none none">
+      <Flex direction="column" margin="medium">
+        <Flex.Item>
+          <Flex wrap="wrap">
+            <Flex.Item shouldShrink={true} shouldGrow={true}>
+              <Text>{decodedAuthor?.name || I18n.t('DELETED USER')}</Text>
+            </Flex.Item>
+            <Flex.Item>
+              <Text weight="light">{DateHelper.formatDatetimeForDisplay(props.createdAt)}</Text>
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+        <Flex.Item margin="x-small 0 0 0">
+          <Text weight="light">{props.body}</Text>
+        </Flex.Item>
+      </Flex>
+    </View>
+  )
+}
 
 export const PastMessages = props => {
   return (

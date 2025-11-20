@@ -53,9 +53,10 @@ describe('WidgetDashboardToggle', () => {
     })
 
     it('shows a toggle in the "off" position', () => {
-      const {getByRole} = render(<WidgetDashboardToggle />)
+      const {getByRole, getByTestId} = render(<WidgetDashboardToggle />)
       const toggle = getByRole('checkbox')
       expect(toggle).not.toBeChecked()
+      expect(getByTestId('widget-dashboard-toggle-off')).toBeInTheDocument()
     })
 
     it('makes an API call to turn on widget dashboard if the toggle is clicked', async () => {
@@ -70,12 +71,13 @@ describe('WidgetDashboardToggle', () => {
     })
 
     it('shows the explainer after a successful return, and flips the toggle on', async () => {
-      const {getByRole, findByText} = render(<WidgetDashboardToggle />)
+      const {getByRole, findByText, getByTestId} = render(<WidgetDashboardToggle />)
       const toggle = getByRole('checkbox')
       await userEvent.click(toggle)
       await findByText(/reload the page or navigate/i)
       expect(toggle).toBeChecked()
       expect(window.ENV.widget_dashboard_overridable).toBe(true)
+      expect(getByTestId('widget-dashboard-toggle-on')).toBeInTheDocument()
     })
   })
 
@@ -95,9 +97,10 @@ describe('WidgetDashboardToggle', () => {
     })
 
     it('shows a toggle in the "on" position', () => {
-      const {getByRole} = render(<WidgetDashboardToggle />)
+      const {getByRole, getByTestId} = render(<WidgetDashboardToggle />)
       const toggle = getByRole('checkbox')
       expect(toggle).toBeChecked()
+      expect(getByTestId('widget-dashboard-toggle-on')).toBeInTheDocument()
     })
 
     it('makes an API call to turn off widget dashboard if the toggle is clicked', async () => {
@@ -112,12 +115,13 @@ describe('WidgetDashboardToggle', () => {
     })
 
     it('shows the explainer after a successful return, and flips the toggle off', async () => {
-      const {getByRole, findByText} = render(<WidgetDashboardToggle />)
+      const {getByRole, findByText, getByTestId} = render(<WidgetDashboardToggle />)
       const toggle = getByRole('checkbox')
       await userEvent.click(toggle)
       await findByText(/reload the page or navigate/i)
       expect(toggle).not.toBeChecked()
       expect(window.ENV.widget_dashboard_overridable).toBe(false)
+      expect(getByTestId('widget-dashboard-toggle-off')).toBeInTheDocument()
     })
   })
 

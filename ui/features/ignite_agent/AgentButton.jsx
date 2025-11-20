@@ -30,23 +30,38 @@ import React from 'react'
  * A button component for the Ignite Agent that shows a loading state.
  * @param {object} props - The component props.
  * @param {Function} props.onClick - The function to execute when the button is clicked.
- * @param {boolean} [props.isLoading=false] - If true, shows a spinner and disables the button.
+ * @param {boolean} [props.isLoading=false] - If true, shows a spinner overlay and disables the button.
  */
 export function AgentButton({onClick, isLoading = false}) {
   return (
     <View display="inline-block" shadow="above" borderRadius="circle">
-      <IconButton
-        onClick={onClick}
-        screenReaderLabel={isLoading ? I18n.t('Loading IgniteAI') : 'IgniteAI'}
-        renderIcon={() =>
-          isLoading ? <Spinner renderTitle={'Agent is loading'} /> : <IconAiSolid />
-        }
-        color="ai-primary"
-        shape="circle"
-        size="large"
-        withBackground
-        disabled={isLoading} // Disable the button while in the loading state
-      />
+      <div style={{position: 'relative'}}>
+        <IconButton
+          onClick={onClick}
+          screenReaderLabel={isLoading ? I18n.t('Loading IgniteAI') : 'IgniteAI'}
+          renderIcon={() => <IconAiSolid />}
+          color="ai-primary"
+          shape="circle"
+          size="large"
+          withBackground
+          disabled={isLoading}
+        />
+        {isLoading && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: '0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              borderRadius: '50%',
+            }}
+          >
+            <Spinner renderTitle={I18n.t('Agent is loading')} size="small" />
+          </div>
+        )}
+      </div>
     </View>
   )
 }

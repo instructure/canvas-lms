@@ -90,7 +90,17 @@ class AutoGradeOrchestrationService
 
       # Merge new grade data with existing data
       existing_data = auto_grade_result.grade_data || []
-      merged_data = existing_data + grade_data
+      merged_data = (existing_data + grade_data)
+                    .group_by { |item| item["description"] }
+                    .map do |_, items|
+                      if items.size > 1
+                        lowest = items.min_by { |i| i.dig("rating", "rating").to_f }
+                        lowest["rating"]["reasoning"] = [lowest["rating"]["reasoning"], I18n.t("This work sits between two ratings for this criterion. The lower rating was applied for consistency.")].compact.join(" ")
+                        lowest
+                      else
+                        items.first
+                      end
+                    end
 
       auto_grade_result.update!(
         root_account_id: submission.course.root_account_id,

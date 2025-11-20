@@ -21,7 +21,7 @@ module Accessibility
   module Rules
     class TableHeaderRule < Accessibility::Rule
       self.id = "table-header"
-      self.link = "https://www.w3.org/TR/WCAG20-TECHS/H51.html"
+      self.link = "https://www.w3.org/TR/WCAG20-TECHS/H43.html"
 
       # Accessibility::Rule methods
 

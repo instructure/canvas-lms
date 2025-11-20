@@ -1159,7 +1159,7 @@ class ContextExternalTool < ActiveRecord::Base
   # @param domain_root_account [Account] The root account to invalidate the cache for
   # @return [void]
   def self.invalidate_nav_tabs_cache(tool, domain_root_account)
-    if tool.has_placement?(:user_navigation) || tool.has_placement?(:course_navigation) || tool.has_placement?(:account_navigation)
+    if tool.uses_cached_placements?
       Lti::NavigationCache.new(domain_root_account).invalidate_cache_key
     end
   end
@@ -1170,6 +1170,12 @@ class ContextExternalTool < ActiveRecord::Base
     shard.activate do
       lti_context_id = context_id_for(asset, shard)
       Lti::V1p1::Asset.set_asset_context_id(asset, lti_context_id, context:)
+    end
+  end
+
+  def uses_cached_placements?
+    %i[user_navigation course_navigation account_navigation].any? do |placement|
+      has_placement?(placement)
     end
   end
 

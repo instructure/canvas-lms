@@ -38,6 +38,9 @@ shared_examples "Gradebook" do |ff_enabled|
   end
 
   before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
     @page_size = 5
     stub_const("Api::MAX_PER_PAGE", @page_size)
     user_session(@teacher)
@@ -46,6 +49,8 @@ shared_examples "Gradebook" do |ff_enabled|
   def test_n_students(n)
     create_users_in_course @course, n
     Gradebook.visit(@course)
+    # Wait for students to load in the gradebook before interacting with search
+    expect(ff(".student-name").size).to be > 0
     f("#gradebook-student-search input").send_keys "user #{n}"
     f("#gradebook-student-search input").send_keys(:return)
     expect(ff(".student-name")).to have_size 1

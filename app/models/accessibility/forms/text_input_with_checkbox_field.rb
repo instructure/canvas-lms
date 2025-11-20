@@ -63,7 +63,7 @@ module Accessibility
           input_description: @input_description,
           input_max_length: @input_max_length,
           value: @value,
-          generate_button_label: @generate_button_label
+          generate_button_label: @generate_button_label,
         }.compact)
       end
     end

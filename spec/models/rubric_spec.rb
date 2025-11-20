@@ -591,363 +591,6 @@ describe Rubric do
         end
       end
     end
-
-    describe "criteria_via_llm" do
-      before do
-        @inst_llm = double("InstLLM::Client")
-        allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
-      end
-
-      it "creates criteria via LLM if requested" do
-        assignment.update!(description: "Write a well argued essay about whether milk is better than cheese")
-        llm_rubric = course.rubrics.build
-        llm_rubric.user = teacher
-        rubric_params = { title: "Test LLM Rubric", criteria_via_llm: "true" }
-        association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
-
-        llm_response = {
-          criteria: [
-            { name: "n1", description: "d1", ratings: [{ title: "rt1.1", description: "rd1.1" }, { title: "rt1.2", description: "rd1.2" }, { title: "rt1.3", description: "rd1.3" }] },
-            { name: "n2", description: "d2", ratings: [{ title: "rt2.1", description: "rd2.1" }, { title: "rt2.2", description: "rd2.2" }, { title: "rt2.3", description: "rd2.3" }] },
-            { name: "n3", description: "d3", ratings: [{ title: "rt3.1", description: "rd3.1" }, { title: "rt3.2", description: "rd3.2" }, { title: "rt3.3", description: "rd3.3" }] },
-          ]
-        }
-        expect(@inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "model",
-            message: { role: :assistant, content: llm_response.to_json[1..] },
-            stop_reason: "stop_reason",
-            usage: {
-              input_tokens: 10,
-              output_tokens: 20,
-            }
-          )
-        )
-        expect(Rubric).to receive(:ai_rubrics_enabled?).and_return(true)
-
-        association = nil
-        expect do
-          association = llm_rubric.update_with_association(teacher, rubric_params, course, association_params)
-        end.to change { LLMResponse.count }.by(1)
-
-        expect(association).to be_present
-        expect(llm_rubric.data[0][:description]).to eq "n1"
-        expect(llm_rubric.data[0][:ratings][0][:long_description]).to eq "rd1.1"
-        expect(llm_rubric.data[0][:ratings][1][:points]).to eq 10 # halfway between 20 (per-criteria default) and 0
-      end
-
-      it "still creates the normal way if requested" do
-        assignment.update!(description: "Write a well argued essay about whether milk is better than cheese")
-        llm_rubric = course.rubrics.build
-        llm_rubric.user = teacher
-        rubric_params = {
-          title: "Test LLM Rubric",
-          criteria_via_llm: "false",
-          criteria: {
-            "0" => {
-              "id" => "1742228963899",
-              "description" => "Test 1",
-              "long_description" => "Test first criteria",
-              "points" => "4",
-              "ignore_for_scoring" => "false",
-              "criterion_use_range" => "false",
-              "ratings" => {
-                "0" => { "description" => "Exceeds", "long_description" => "", "points" => "4", "id" => "1" },
-                "1" => { "description" => "Mastery", "long_description" => "", "points" => "3", "id" => "2" },
-                "2" => { "description" => "Near", "long_description" => "", "points" => "2", "id" => "3" },
-                "3" => { "description" => "Below", "long_description" => "", "points" => "1", "id" => "4" },
-                "4" => { "description" => "No Evidence", "long_description" => "", "points" => "0", "id" => "5" }
-              }
-            }
-          }.with_indifferent_access
-        }
-        association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
-
-        expect(Rubric).not_to receive(:ai_rubrics_enabled?)
-
-        association = llm_rubric.update_with_association(teacher, rubric_params, course, association_params)
-
-        expect(association).to be_present
-        expect(llm_rubric.data[0][:description]).to eq "Test 1"
-      end
-    end
-
-    describe "regenerate_criteria_via_llm" do
-      let(:existing_criteria) do
-        [
-          {
-            id: "c1",
-            description: "Old desc 1",
-            long_description: "Old long desc 1",
-            points: 20,
-            ratings: [
-              { id: "r1", description: "Old rating 1", long_description: "Old long desc", points: 20 }
-            ]
-          }
-        ]
-      end
-
-      before do
-        @inst_llm = double("InstLLM::Client")
-        allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
-      end
-
-      context "extra failure paths" do
-        it "raises if no updates applied for the given criterion_id" do
-          llm_response_text = <<~TEXT
-            <RUBRIC_DATA>
-            # note: no lines touching c1
-            criterion:c2:description=Other Criterion
-            criterion:c2:long_description=Other description
-            </RUBRIC_DATA>
-          TEXT
-
-          expect(@inst_llm).to receive(:chat).and_return(
-            InstLLM::Response::ChatResponse.new(
-              model: "model",
-              message: { role: :assistant, content: llm_response_text },
-              stop_reason: "stop",
-              usage: { input_tokens: 5, output_tokens: 10 }
-            )
-          )
-
-          rubric = course.rubrics.build(user: teacher)
-          rubric.data = existing_criteria
-
-          expect do
-            rubric.regenerate_criteria_via_llm(
-              assignment,
-              { criteria: existing_criteria, criterion_id: "c1" },
-              { criteria_count: 1, rating_count: 1 }
-            )
-          end.to raise_error(/No updates applied for criterion_id=c1/)
-        end
-
-        it "raises if a blank or underscore ID is given in criterion regeneration" do
-          llm_response_text = <<~TEXT
-            <RUBRIC_DATA>
-            criterion:_:description=Invalid Criterion
-            </RUBRIC_DATA>
-          TEXT
-
-          expect(@inst_llm).to receive(:chat).and_return(
-            InstLLM::Response::ChatResponse.new(
-              model: "model",
-              message: { role: :assistant, content: llm_response_text },
-              stop_reason: "stop",
-              usage: { input_tokens: 5, output_tokens: 10 }
-            )
-          )
-
-          rubric = course.rubrics.build(user: teacher)
-          rubric.data = existing_criteria
-
-          expect do
-            rubric.regenerate_criteria_via_llm(
-              assignment,
-              { criteria: existing_criteria, criterion_id: "c1" },
-              { criteria_count: 1, rating_count: 1 }
-            )
-          end.to raise_error(/Invalid blank ID/)
-        end
-
-        it "raises if a blank or underscore ID is given in rubric regeneration" do
-          llm_response_text = <<~TEXT
-            <RUBRIC_DATA>
-            criterion::description=Broken Criterion
-            </RUBRIC_DATA>
-          TEXT
-
-          expect(@inst_llm).to receive(:chat).and_return(
-            InstLLM::Response::ChatResponse.new(
-              model: "model",
-              message: { role: :assistant, content: llm_response_text },
-              stop_reason: "stop",
-              usage: { input_tokens: 5, output_tokens: 10 }
-            )
-          )
-
-          rubric = course.rubrics.build(user: teacher)
-          rubric.data = existing_criteria
-
-          expect do
-            rubric.regenerate_criteria_via_llm(
-              assignment,
-              { criteria: existing_criteria },
-              { criteria_count: 1, rating_count: 1 }
-            )
-          end.to raise_error(/Invalid blank ID/)
-        end
-
-        it "raises if a rating appears before any criterion" do
-          llm_response_text = <<~TEXT
-            <RUBRIC_DATA>
-            rating:rX:description=Floating rating
-            rating:rX:long_description=Appears before criterion
-            </RUBRIC_DATA>
-          TEXT
-
-          expect(@inst_llm).to receive(:chat).and_return(
-            InstLLM::Response::ChatResponse.new(
-              model: "model",
-              message: { role: :assistant, content: llm_response_text },
-              stop_reason: "stop",
-              usage: { input_tokens: 5, output_tokens: 10 }
-            )
-          )
-
-          rubric = course.rubrics.build(user: teacher)
-          rubric.data = existing_criteria
-
-          expect do
-            rubric.regenerate_criteria_via_llm(
-              assignment,
-              { criteria: existing_criteria },
-              { criteria_count: 1, rating_count: 1 }
-            )
-          end.to raise_error(/Rating before criterion/)
-        end
-
-        it "merges multiple lines for the same rating ID into a single rating" do
-          llm_response_text = <<~TEXT
-            <RUBRIC_DATA>
-            criterion:c1:description=Criterion 1
-            rating:r1:description=First rating
-            rating:r1:long_description=Extra details
-            </RUBRIC_DATA>
-          TEXT
-
-          expect(@inst_llm).to receive(:chat).and_return(
-            InstLLM::Response::ChatResponse.new(
-              model: "model",
-              message: { role: :assistant, content: llm_response_text },
-              stop_reason: "stop",
-              usage: { input_tokens: 5, output_tokens: 10 }
-            )
-          )
-
-          rubric = course.rubrics.build(user: teacher)
-          rubric.data = existing_criteria
-
-          new_criteria = rubric.regenerate_criteria_via_llm(
-            assignment,
-            { criteria: existing_criteria },
-            { criteria_count: 1, rating_count: 1 }
-          )
-
-          rating = new_criteria.first[:ratings].first
-          expect(rating[:description]).to eq("First rating")
-          expect(rating[:long_description]).to eq("Extra details")
-        end
-
-        it "ignores updates to unrelated criteria when regenerating a single criterion" do
-          llm_response_text = <<~TEXT
-            <RUBRIC_DATA>
-            criterion:c1:description=Updated Criterion 1
-            criterion:c2:description=Should be ignored
-            </RUBRIC_DATA>
-          TEXT
-
-          expect(@inst_llm).to receive(:chat).and_return(
-            InstLLM::Response::ChatResponse.new(
-              model: "model",
-              message: { role: :assistant, content: llm_response_text },
-              stop_reason: "stop",
-              usage: { input_tokens: 5, output_tokens: 10 }
-            )
-          )
-
-          rubric = course.rubrics.build(user: teacher)
-          rubric.data = existing_criteria
-
-          new_criteria = rubric.regenerate_criteria_via_llm(
-            assignment,
-            { criteria: existing_criteria, criterion_id: "c1" },
-            { criteria_count: 1, rating_count: 1 }
-          )
-
-          expect(new_criteria.first[:description]).to eq("Updated Criterion 1")
-          expect(new_criteria.any? { |c| c[:id] == "c2" }).to be_falsey
-        end
-
-        it "round-trips multiline descriptions via escaped newlines" do
-          original = {
-            criteria: [
-              {
-                id: "c1",
-                description: "Simple criterion",
-                long_description: "First line\nSecond line",
-                ratings: [
-                  { id: "r1", description: "Good", long_description: "One\nTwo", points: 5 }
-                ]
-              }
-            ]
-          }.to_json
-
-          rubric = Rubric.new
-          text = rubric.rubric_to_text(original)
-
-          expect(text).to include("\\n")
-
-          regenerated = rubric.text_to_rubric(text, original, 1, 20, false)
-          parsed = JSON.parse(regenerated)
-
-          expect(parsed["criteria"][0]["long_description"]).to eq("First line\nSecond line")
-          expect(parsed["criteria"][0]["ratings"][0]["long_description"]).to eq("One\nTwo")
-        end
-
-        it "round-trips values with backslashes, tabs, and carriage returns" do
-          original = {
-            criteria: [
-              {
-                id: "c1",
-                description: "Path with backslash C:\\Users\\Test",
-                long_description: "Line1\rLine2\tTabbed",
-                ratings: [
-                  { id: "r1", description: "Has = sign", long_description: "Escapes correctly", points: 5 }
-                ]
-              }
-            ]
-          }.to_json
-
-          rubric = Rubric.new
-          text = rubric.rubric_to_text(original)
-          regenerated = rubric.text_to_rubric(text, original, 1, 20, false)
-          parsed = JSON.parse(regenerated)
-
-          crit = parsed["criteria"][0]
-          expect(crit["description"]).to eq("Path with backslash C:\\Users\\Test")
-          expect(crit["long_description"]).to eq("Line1\rLine2\tTabbed")
-          expect(crit["ratings"][0]["description"]).to eq("Has = sign")
-        end
-
-        it "round-trips values containing colons and equals signs" do
-          original = {
-            criteria: [
-              {
-                id: "c1",
-                description: "This:has:colons=and=equals",
-                long_description: "Colon: inside and equals=inside",
-                ratings: [
-                  { id: "r1", description: "Rating:one=1", long_description: "Details:with=equals", points: 5 }
-                ]
-              }
-            ]
-          }.to_json
-
-          rubric = Rubric.new
-          text = rubric.rubric_to_text(original)
-          regenerated = rubric.text_to_rubric(text, original, 1, 20, false)
-          parsed = JSON.parse(regenerated)
-
-          crit = parsed["criteria"][0]
-          expect(crit["description"]).to eq("This:has:colons=and=equals")
-          expect(crit["long_description"]).to eq("Colon: inside and equals=inside")
-          expect(crit["ratings"][0]["description"]).to eq("Rating:one=1")
-          expect(crit["ratings"][0]["long_description"]).to eq("Details:with=equals")
-        end
-      end
-    end
   end
 
   it "normalizes criteria for comparison" do
@@ -981,90 +624,6 @@ describe Rubric do
              "criterion_id" => "45_392",
              "id" => "blank_2" }] }]
     )
-  end
-
-  describe "#build_structure_directives_for_llm" do
-    let(:rubric) { Rubric.new }
-
-    def rating(id, points = 0)
-      { id:, description: "Rating #{id}", points: }
-    end
-
-    it "returns instruction to create new criteria when fewer exist than required" do
-      existing = []
-      output = rubric.build_structure_directives_for_llm(
-        existing_criteria: existing,
-        required_criteria_count: 2,
-        required_rating_count: 3
-      )
-
-      expect(output).to include("Criteria count: current=0, required=2.")
-      expect(output).to include("You must create exactly the following 2 criteria")
-      expect(output).to include("- criterion:_new_c_1 (with exactly 3 ratings).")
-      expect(output).to include("- criterion:_new_c_2 (with exactly 3 ratings).")
-      expect(output).to include("Do not reorder existing criteria")
-    end
-
-    it "returns instruction to append criteria when some exist but fewer than required" do
-      existing = [{ id: "crit_1", ratings: [rating("r1"), rating("r2")] }]
-      output = rubric.build_structure_directives_for_llm(
-        existing_criteria: existing,
-        required_criteria_count: 2,
-        required_rating_count: 2
-      )
-
-      expect(output).to include("Criteria count: current=1, required=2.")
-      expect(output).to include("You must append exactly 1 new criteria at the end:")
-      expect(output).to include("- criterion:_new_c_2 (with exactly 2 ratings).")
-    end
-
-    it "returns instruction to remove criteria when more exist than required" do
-      existing = [
-        { id: "crit_1", ratings: [] },
-        { id: "crit_2", ratings: [] },
-        { id: "crit_3", ratings: [] }
-      ]
-      output = rubric.build_structure_directives_for_llm(
-        existing_criteria: existing,
-        required_criteria_count: 2,
-        required_rating_count: 0
-      )
-
-      expect(output).to include("Criteria count: current=3, required=2. Remove 1 criteria")
-    end
-
-    it "returns instruction to add ratings when a criterion has too few" do
-      existing = [{ id: "crit_1", ratings: [rating("r1")] }]
-      output = rubric.build_structure_directives_for_llm(
-        existing_criteria: existing,
-        required_criteria_count: 1,
-        required_rating_count: 3
-      )
-
-      expect(output).to include("Ratings for crit_1: current=1, required=3. Create 2 new ratings.")
-    end
-
-    it "returns instruction to remove ratings when a criterion has too many" do
-      existing = [{ id: "crit_1", ratings: [rating("r1"), rating("r2"), rating("r3"), rating("r4")] }]
-      output = rubric.build_structure_directives_for_llm(
-        existing_criteria: existing,
-        required_criteria_count: 1,
-        required_rating_count: 2
-      )
-
-      expect(output).to include("Ratings for crit_1: current=4, required=2. Remove 2 ratings.")
-    end
-
-    it "returns stable message when everything matches" do
-      existing = [{ id: "crit_1", ratings: [rating("r1"), rating("r2")] }]
-      output = rubric.build_structure_directives_for_llm(
-        existing_criteria: existing,
-        required_criteria_count: 1,
-        required_rating_count: 2
-      )
-
-      expect(output).to eq("Keep the structure, criterion count, rating count and order as given.")
-    end
   end
 
   describe "#update_criteria" do
@@ -1366,5 +925,329 @@ describe Rubric do
     @rubric.button_display = "points"
     @rubric.save!
     expect(@rubric.button_display).to eq "points"
+  end
+
+  describe ".ai_rubrics_enabled?" do
+    let(:course) { Course.create! }
+    let(:account) { Account.create! }
+    let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+    let(:assignment) { course.assignments.create!(anonymous_grading: true) }
+    let(:rubric) { Rubric.create!(title: "hi", context: course) }
+
+    context "with course context" do
+      it "checks feature flag combinations" do
+        [
+          { enhanced: true, ai: true, expected: true, description: "both enabled" },
+          { enhanced: false, ai: true, expected: false, description: "enhanced disabled" },
+          { enhanced: true, ai: false, expected: false, description: "ai disabled" },
+          { enhanced: false, ai: false, expected: false, description: "both disabled" }
+        ].each do |test_case|
+          if test_case[:enhanced]
+            course.enable_feature!(:enhanced_rubrics)
+          else
+            course.disable_feature!(:enhanced_rubrics)
+          end
+
+          if test_case[:ai]
+            course.enable_feature!(:ai_rubrics)
+          else
+            course.disable_feature!(:ai_rubrics)
+          end
+
+          result = Rubric.ai_rubrics_enabled?(course)
+          expect(result).to be(test_case[:expected]),
+                            "Expected #{test_case[:expected]} when #{test_case[:description]}, got #{result}"
+        end
+      end
+
+      it "handles feature flag inheritance from root account" do
+        # Enable at root account level but not course level
+        course.root_account.enable_feature!(:enhanced_rubrics)
+        course.root_account.enable_feature!(:ai_rubrics)
+        course.disable_feature!(:enhanced_rubrics)
+        course.disable_feature!(:ai_rubrics)
+
+        expect(Rubric.ai_rubrics_enabled?(course)).to be false
+      end
+    end
+
+    context "with non-course context" do
+      it "returns false for account context even with features enabled" do
+        account.enable_feature!(:enhanced_rubrics)
+        account.enable_feature!(:ai_rubrics)
+
+        expect(Rubric.ai_rubrics_enabled?(account)).to be false
+      end
+
+      it "returns false for user context" do
+        user = User.create!
+
+        expect(Rubric.ai_rubrics_enabled?(user)).to be false
+      end
+
+      it "returns false for nil context" do
+        expect(Rubric.ai_rubrics_enabled?(nil)).to be false
+      end
+    end
+
+    context "feature flag edge cases" do
+      it "raises NoMethodError when course doesn't have feature_enabled method" do
+        # Create a mock object that responds to is_a?(Course) but doesn't have feature_enabled?
+        mock_course = double("MockCourse")
+        allow(mock_course).to receive(:is_a?).with(Course).and_return(true)
+        allow(mock_course).to receive(:feature_enabled?).and_raise(NoMethodError)
+
+        # The method should raise the NoMethodError since there's no error handling
+        expect { Rubric.ai_rubrics_enabled?(mock_course) }.to raise_error(NoMethodError)
+      end
+
+      it "handles course subclasses" do
+        # Test with a class that inherits from Course
+        course_subclass = Class.new(Course) do
+          def self.name
+            "CourseSubclass"
+          end
+        end
+
+        instance = course_subclass.create!
+        instance.enable_feature!(:enhanced_rubrics)
+        instance.enable_feature!(:ai_rubrics)
+
+        expect(Rubric.ai_rubrics_enabled?(instance)).to be true
+      end
+    end
+
+    describe "criteria_via_llm integration" do
+      it "delegates to RubricLLMService when criteria_via_llm is requested" do
+        assignment.update!(description: "Write a well argued essay about whether milk is better than cheese")
+        llm_rubric = course.rubrics.build
+        llm_rubric.user = teacher
+        rubric_params = { title: "Test LLM Rubric", criteria_via_llm: "true" }
+        association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
+
+        # Mock the service and feature flag check
+        service = double("RubricLLMService")
+        expect(RubricLLMService).to receive(:new).with(llm_rubric).and_return(service)
+        expect(service).to receive(:generate_criteria_via_llm).with(assignment).and_return([
+                                                                                             { id: "c1", description: "Generated Criterion", points: 20, ratings: [] }
+                                                                                           ])
+        expect(Rubric).to receive(:ai_rubrics_enabled?).with(course).and_return(true)
+
+        association = llm_rubric.update_with_association(teacher, rubric_params, course, association_params)
+
+        expect(association).to be_present
+        expect(llm_rubric.data[0][:description]).to eq "Generated Criterion"
+      end
+
+      it "uses normal criteria generation when criteria_via_llm is false" do
+        llm_rubric = course.rubrics.build
+        llm_rubric.user = teacher
+        rubric_params = {
+          title: "Test Normal Rubric",
+          criteria_via_llm: "false",
+          criteria: {
+            "0" => {
+              "id" => "1742228963899",
+              "description" => "Manual Criterion",
+              "long_description" => "Manual long description",
+              "points" => "4",
+              "ignore_for_scoring" => "false",
+              "criterion_use_range" => "false",
+              "ratings" => {
+                "0" => { "description" => "Excellent", "long_description" => "", "points" => "4", "id" => "1" },
+                "1" => { "description" => "Good", "long_description" => "", "points" => "3", "id" => "2" },
+                "2" => { "description" => "Poor", "long_description" => "", "points" => "1", "id" => "3" },
+                "3" => { "description" => "No Evidence", "long_description" => "", "points" => "0", "id" => "4" }
+              }
+            }
+          }.with_indifferent_access
+        }
+        association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
+
+        # Should not call RubricLLMService
+        expect(RubricLLMService).not_to receive(:new)
+
+        association = llm_rubric.update_with_association(teacher, rubric_params, course, association_params)
+
+        expect(association).to be_present
+        expect(llm_rubric.data[0][:description]).to eq "Manual Criterion"
+      end
+    end
+
+    describe "Progress API integration class methods" do
+      let(:progress) { Progress.create!(user: teacher, context: course, tag: "rubric_llm_generation") }
+      let(:generate_options) { { criteria_count: 3, rating_count: 4, points_per_criterion: 20, use_range: false, grade_level: "higher-ed" } }
+      let(:regenerate_options) { { criteria: existing_criteria, criterion_id: "c1" } }
+      let(:orig_generate_options) { { criteria_count: 2, rating_count: 3 } }
+      let(:existing_criteria) do
+        [
+          {
+            id: "c1",
+            description: "Old Criterion",
+            points: 20,
+            ratings: [{ id: "r1", description: "Rating", points: 20 }]
+          }
+        ]
+      end
+
+      shared_examples "handles LLM service errors" do |method_name|
+        it "handles InstLLM service quota exceeded error" do
+          method_to_mock = (method_name == :process_generate_criteria_via_llm) ? :generate_criteria_via_llm : :regenerate_criteria_via_llm
+          allow_any_instance_of(RubricLLMService).to receive(method_to_mock).and_raise(InstLLM::ServiceQuotaExceededError)
+          progress.start
+
+          if method_name == :process_generate_criteria_via_llm
+            Rubric.send(method_name, progress, course, teacher, assignment, generate_options)
+          else
+            Rubric.send(method_name, progress, course, teacher, assignment, regenerate_options, orig_generate_options)
+          end
+
+          progress.reload
+          expect(progress.workflow_state).to eq "failed"
+          expect(progress.results[:error]).to eq "There was an error with generation capacity. Please try again later."
+        end
+
+        it "handles InstLLM throttling error" do
+          method_to_mock = (method_name == :process_generate_criteria_via_llm) ? :generate_criteria_via_llm : :regenerate_criteria_via_llm
+          allow_any_instance_of(RubricLLMService).to receive(method_to_mock).and_raise(InstLLM::ThrottlingError)
+          progress.start
+
+          if method_name == :process_generate_criteria_via_llm
+            Rubric.send(method_name, progress, course, teacher, assignment, generate_options)
+          else
+            Rubric.send(method_name, progress, course, teacher, assignment, regenerate_options, orig_generate_options)
+          end
+
+          progress.reload
+          expect(progress.workflow_state).to eq "failed"
+          expect(progress.results[:error]).to eq "There was an error with generation capacity. Please try again later."
+        end
+
+        it "handles InstLLMHelper rate limit exceeded error" do
+          method_to_mock = (method_name == :process_generate_criteria_via_llm) ? :generate_criteria_via_llm : :regenerate_criteria_via_llm
+          allow_any_instance_of(RubricLLMService).to receive(method_to_mock).and_raise(InstLLMHelper::RateLimitExceededError.new(limit: 10))
+          progress.start
+
+          if method_name == :process_generate_criteria_via_llm
+            Rubric.send(method_name, progress, course, teacher, assignment, generate_options)
+          else
+            Rubric.send(method_name, progress, course, teacher, assignment, regenerate_options, orig_generate_options)
+          end
+
+          progress.reload
+          expect(progress.workflow_state).to eq "failed"
+          expect(progress.results[:error]).to eq "You have made too many criteria generation requests. Please try again later."
+        end
+
+        it "handles generic errors" do
+          method_to_mock = (method_name == :process_generate_criteria_via_llm) ? :generate_criteria_via_llm : :regenerate_criteria_via_llm
+          operation_name = (method_name == :process_generate_criteria_via_llm) ? "generation" : "regeneration"
+          allow_any_instance_of(RubricLLMService).to receive(method_to_mock).and_raise(StandardError, "Generic error")
+          progress.start
+
+          if method_name == :process_generate_criteria_via_llm
+            Rubric.send(method_name, progress, course, teacher, assignment, generate_options)
+          else
+            Rubric.send(method_name, progress, course, teacher, assignment, regenerate_options, orig_generate_options)
+          end
+
+          progress.reload
+          expect(progress.workflow_state).to eq "failed"
+          expect(progress.results[:error]).to eq "There was an error with the criteria #{operation_name}. Please try again later."
+        end
+      end
+
+      shared_examples "checks user permissions" do |method_name|
+        it "checks user permissions before processing" do
+          other_user = User.create!(name: "Other User")
+          course.enroll_teacher(other_user, active_all: true)
+
+          # Don't give the other user rubric permissions
+          allow_any_instance_of(Rubric).to receive(:grants_right?).with(other_user, :update).and_return(false)
+
+          if method_name == :process_generate_criteria_via_llm
+            Rubric.send(method_name, progress, course, other_user, assignment, generate_options)
+          else
+            Rubric.send(method_name, progress, course, other_user, assignment, regenerate_options, orig_generate_options)
+          end
+
+          progress.reload
+          expect(progress.workflow_state).to eq "queued" # Should not complete
+          expect(progress.results).to be_blank
+        end
+      end
+
+      describe ".process_generate_criteria_via_llm" do
+        context "successful generation" do
+          before do
+            allow_any_instance_of(RubricLLMService).to receive(:generate_criteria_via_llm).and_return([
+                                                                                                        {
+                                                                                                          id: "c1",
+                                                                                                          description: "Generated Criterion",
+                                                                                                          points: 20,
+                                                                                                          ratings: [{ id: "r1", description: "Rating", points: 20 }]
+                                                                                                        }
+                                                                                                      ])
+          end
+
+          it "processes generation successfully and completes progress" do
+            expect(progress.workflow_state).to eq "queued"
+            progress.start
+            progress.reload
+            expect(progress.workflow_state).to eq "running"
+
+            Rubric.process_generate_criteria_via_llm(progress, course, teacher, assignment, generate_options)
+
+            progress.reload
+            expect(progress.workflow_state).to eq "completed"
+            expect(progress.results).to have_key(:criteria)
+            expect(progress.results[:criteria]).to be_an(Array)
+            expect(progress.results[:criteria].first[:description]).to eq "Generated Criterion"
+          end
+
+          include_examples "checks user permissions", :process_generate_criteria_via_llm
+        end
+
+        context "error handling" do
+          include_examples "handles LLM service errors", :process_generate_criteria_via_llm
+        end
+      end
+
+      describe ".process_regenerate_criteria_via_llm" do
+        context "successful regeneration" do
+          before do
+            allow_any_instance_of(RubricLLMService).to receive(:regenerate_criteria_via_llm).and_return([
+                                                                                                          {
+                                                                                                            id: "c1",
+                                                                                                            description: "Regenerated Criterion",
+                                                                                                            points: 20,
+                                                                                                            ratings: [{ id: "r1", description: "Rating", points: 20 }]
+                                                                                                          }
+                                                                                                        ])
+          end
+
+          it "processes regeneration successfully and completes progress" do
+            expect(progress.workflow_state).to eq "queued"
+            progress.start
+            progress.reload
+            expect(progress.workflow_state).to eq "running"
+
+            Rubric.process_regenerate_criteria_via_llm(progress, course, teacher, assignment, regenerate_options, orig_generate_options)
+
+            progress.reload
+            expect(progress.workflow_state).to eq "completed"
+            expect(progress.results).to have_key(:criteria)
+            expect(progress.results[:criteria]).to be_an(Array)
+            expect(progress.results[:criteria].first[:description]).to eq "Regenerated Criterion"
+          end
+
+          include_examples "checks user permissions", :process_regenerate_criteria_via_llm
+        end
+
+        context "error handling" do
+          include_examples "handles LLM service errors", :process_regenerate_criteria_via_llm
+        end
+      end
+    end
   end
 end

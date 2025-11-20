@@ -31,6 +31,7 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     discussion_topic: DiscussionTopic,
     quiz: Quizzes::Quiz,
     learning_outcome: LearningOutcome,
+    learning_outcome_group: LearningOutcomeGroup,
     wiki_page: WikiPage
   }.freeze
 
@@ -62,8 +63,8 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
       replace_item_placeholders!(item_key, field_links)
 
       add_missing_link_warnings!(item_key, field_links)
-    rescue
-      @migration.add_warning("An error occurred while translating content links", $!)
+    rescue => e
+      @migration.add_warning("An error occurred while translating content links", e)
     end
   end
 
@@ -138,7 +139,7 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
 
     case item_type
     when :block_editor, :block_editor_text
-      process_block_editor_record(item_key, field_links)
+      process_block_editor_record(item_key[:item], field_links)
     when :syllabus
       syllabus = context.syllabus_body
       if LinkReplacer.sub_placeholders!(syllabus, field_links.values.flatten)
@@ -149,12 +150,11 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     when :quiz_question
       process_quiz_question!(item_key[:item], field_links.values.flatten)
     else
-      process_html_record(item_key, field_links, skip_associations)
+      process_html_record(item_key[:item], field_links, skip_associations)
     end
   end
 
-  def process_html_record(item_key, field_links, skip_associations)
-    item = item_key[:item]
+  def process_html_record(item, field_links, skip_associations)
     return unless item
 
     item_updates = {}
@@ -166,7 +166,7 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
       end
     end
     if item_updates.present?
-      item.class.where(id: item.id).update_all(item_updates)
+      item.update_columns(item_updates)
       rewrite_item_version!(item) # we don't want the placeholders sticking around in any version we've created.
     end
     unless skip_associations
@@ -174,8 +174,7 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     end
   end
 
-  def process_block_editor_record(item_key, field_links)
-    item = item_key[:item]
+  def process_block_editor_record(item, field_links)
     updated_blocks = replaced_block_editor_record(field_links, item.block_editor.blocks)
 
     updated_blocks.each_value do |block|
@@ -240,7 +239,7 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     quiz_ids = []
     Quizzes::QuizQuestion.where(assessment_question_id: aq.id).find_each do |qq|
       if LinkReplacer.recursively_sub_placeholders!(qq["question_data"], links)
-        Quizzes::QuizQuestion.where(id: qq.id).update_all(question_data: qq["question_data"])
+        qq.update_columns(question_data: qq["question_data"])
         quiz_ids << qq.quiz_id
       end
     end
@@ -248,7 +247,7 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     if quiz_ids.any?
       Quizzes::Quiz.where(id: quiz_ids.uniq).where.not(quiz_data: nil).find_each do |quiz|
         if LinkReplacer.recursively_sub_placeholders!(quiz["quiz_data"], links)
-          Quizzes::Quiz.where(id: quiz.id).update_all(quiz_data: quiz["quiz_data"])
+          quiz.update_columns(quiz_data: quiz["quiz_data"])
         end
       end
     end
@@ -266,22 +265,36 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
       # from gems/canvas_link_migrator-1.0.18/lib/canvas_link_migrator/link_resolver.rb#121
       next if link[:link_type] == :media_object
 
-      link[:new_value] = aq.translate_file_link(link[:new_value])
+      link[:new_value] = aq.translate_file_link(link[:new_value], migration: @migration)
     end
 
     if LinkReplacer.recursively_sub_placeholders!(aq["question_data"], links)
-      AssessmentQuestion.where(id: aq.id).update_all(question_data: aq["question_data"])
+      aq.update_columns(question_data: aq["question_data"])
     end
   end
 
   def process_quiz_question!(qq, links)
     if LinkReplacer.recursively_sub_placeholders!(qq["question_data"], links)
-      Quizzes::QuizQuestion.where(id: qq.id).update_all(question_data: qq["question_data"])
+      qq.update_columns(question_data: qq["question_data"])
     end
 
     quiz = Quizzes::Quiz.where(id: qq.quiz_id).where.not(quiz_data: nil).first
     if quiz && LinkReplacer.recursively_sub_placeholders!(quiz["quiz_data"], links)
-      Quizzes::Quiz.where(id: quiz.id).update_all(quiz_data: quiz["quiz_data"])
+      quiz.update_columns(quiz_data: quiz["quiz_data"])
+    end
+  end
+
+  def create_attachment_associations
+    @migration.imported_migration_items.each do |item|
+      next unless item.respond_to?(:update_attachment_associations)
+
+      item.update_attachment_associations(migration: @migration)
+      (item.try(:assignment) || item.try(:discussion_topic) || item.try(:quiz))&.tap do |assoc_item|
+        assoc_item.update_attachment_associations(migration: @migration)
+      end
+      item.try(:quiz_questions)&.each do |question|
+        question.update_attachment_associations(migration: @migration)
+      end
     end
   end
 end

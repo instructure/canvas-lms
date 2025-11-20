@@ -141,7 +141,7 @@ class Enrollment
                      end
                    when :deleted then          "enrollments.workflow_state = 'deleted'"
                    when :rejected then         "enrollments.workflow_state = 'rejected'"
-                   when :completed then        "enrollments.workflow_state = 'completed'"
+                   when :completed then        "(enrollment_states.state='completed' OR enrollments.workflow_state='completed')"
                    when :creation_pending then "enrollments.workflow_state = 'creation_pending'"
                    when :inactive then         "enrollments.workflow_state = 'inactive'"
                    end

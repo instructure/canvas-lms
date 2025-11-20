@@ -368,11 +368,15 @@ const DiscussionTopicManager = props => {
 
   useEffect(() => {
     if (highlightEntryId && !isPersistEnabled) {
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         setHighlightEntryId(null)
       }, HIGHLIGHT_TIMEOUT)
+
+      return () => {
+        clearTimeout(timeoutId)
+      }
     }
-  }, [highlightEntryId, discussionTopicQuery.loading, isPersistEnabled])
+  }, [highlightEntryId, isPersistEnabled])
 
   useNavigateEntries({
     highlightEntryId,
@@ -388,7 +392,7 @@ const DiscussionTopicManager = props => {
 
   useEffect(() => {
     setIsGradedDiscussion(!!discussionTopicQuery?.data?.legacyNode?.assignment)
-  }, [discussionTopicQuery])
+  }, [discussionTopicQuery?.data?.legacyNode?.assignment])
 
   const getSubmissionObject = (submissionsArray, submissionTag) => {
     return submissionsArray.find(node => node.subAssignmentTag === submissionTag) || {}

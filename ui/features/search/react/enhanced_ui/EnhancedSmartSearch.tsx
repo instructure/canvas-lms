@@ -53,7 +53,7 @@ export default function EnhancedSmartSearch(props: Props) {
         <Flex justifyItems="center" alignItems="center" margin="space12 0 0">
           <>
             <Alert screenReaderOnly isLiveRegionAtomic liveRegion={getLiveRegion}>
-              {I18n.t('Smart search is in progress')}
+              {I18n.t('IgniteAI Search is in progress')}
             </Alert>
             <Spinner renderTitle={I18n.t('Searching')} />
           </>
@@ -81,7 +81,7 @@ export default function EnhancedSmartSearch(props: Props) {
       return (
         <>
           <Alert screenReaderOnly isLiveRegionAtomic liveRegion={getLiveRegion}>
-            {I18n.t('Smart search results loaded.')}
+            {I18n.t('IgniteAI Search results loaded.')}
           </Alert>
           <BestResults
             searchTerm={previousSearch.current}

@@ -450,6 +450,33 @@ describe Lti::ContextControlService do
       end
     end
 
+    context "multiple controls that all need the same anchor control" do
+      let(:controls) do
+        [
+          { course_id: subaccount_course.id, deployment_id: deployment.id },
+          { course_id: subaccount_other_course.id, deployment_id: deployment.id }
+        ]
+      end
+      let(:subaccount_other_course) { course_model(account: subaccount) }
+      let(:course_account_ids) do
+        ac = super()
+        ac[subaccount_other_course.id] = subaccount.id
+        ac
+      end
+
+      it "creates a single anchor control" do
+        expect(subject).to eq([
+                                {
+                                  account_id: subaccount.id,
+                                  course_id: nil,
+                                  path: "a#{root_account.id}.a#{subaccount.id}.",
+                                  deployment_id: deployment.id,
+                                  available: deployment.primary_context_control.available
+                                }
+                              ])
+      end
+    end
+
     context "multiple controls that include primary control" do
       let(:controls) do
         [

@@ -25,10 +25,16 @@ import 'jquery-migrate'
 import {BODY_MAX_LENGTH} from '../../../utils/constants'
 import WikiPage from '../../models/WikiPage'
 import WikiPageEditView from '../WikiPageEditView'
+import {renderAssignToTray} from '../../../react/renderAssignToTray'
 
 // Mock the horizon utils module
 jest.mock('@canvas/horizon/utils', () => ({
   redirectWithHorizonParams: jest.fn(),
+}))
+
+// Mock the renderAssignToTray module
+jest.mock('../../../react/renderAssignToTray', () => ({
+  renderAssignToTray: jest.fn(),
 }))
 
 const createView = opts => {
@@ -178,6 +184,75 @@ describe('WikiPageEditView', () => {
       view.trigger('success')
 
       expect(redirectWithHorizonParams).toHaveBeenCalledWith('https://example.com/pages/test')
+    })
+  })
+
+  describe('renderAssignToTray integration', () => {
+    beforeEach(() => {
+      ENV.COURSE_ID = '1'
+      ENV.WIKI_RIGHTS = {manage_assign_to: true}
+
+      const mountPoint = document.createElement('div')
+      mountPoint.id = 'assign-to-mount-point-edit-page'
+      container.appendChild(mountPoint)
+      renderAssignToTray.mockClear()
+    })
+
+    test('remaps model.id of 0 (number) to undefined when calling renderAssignToTray', () => {
+      const model = new WikiPage({
+        page_id: 0,
+        title: 'Test Page',
+        editor: 'block_editor',
+      })
+
+      createView({model})
+
+      expect(renderAssignToTray).toHaveBeenCalledWith(
+        expect.any(HTMLElement),
+        expect.objectContaining({
+          pageId: undefined,
+          pageName: 'Test Page',
+          onSync: expect.any(Function),
+        }),
+      )
+    })
+
+    test('remaps model.id of "0" (string) to undefined when calling renderAssignToTray', () => {
+      const model = new WikiPage({
+        page_id: '0',
+        title: 'Test Page',
+        editor: 'block_editor',
+      })
+
+      createView({model})
+
+      expect(renderAssignToTray).toHaveBeenCalledWith(
+        expect.any(HTMLElement),
+        expect.objectContaining({
+          pageId: undefined,
+          pageName: 'Test Page',
+          onSync: expect.any(Function),
+        }),
+      )
+    })
+
+    test('passes through valid model.id unchanged when calling renderAssignToTray', () => {
+      const model = new WikiPage({
+        page_id: '123',
+        title: 'Test Page',
+        editor: 'block_editor',
+      })
+
+      createView({model})
+
+      expect(renderAssignToTray).toHaveBeenCalledWith(
+        expect.any(HTMLElement),
+        expect.objectContaining({
+          pageId: '123',
+          pageName: 'Test Page',
+          onSync: expect.any(Function),
+        }),
+      )
     })
   })
 })

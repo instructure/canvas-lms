@@ -21,19 +21,25 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {StudentOutcomeScore} from './StudentOutcomeScore'
 import {Student, Outcome, StudentRollupData, OutcomeRollup} from '../../types/rollup'
-import {COLUMN_WIDTH, COLUMN_PADDING, CELL_HEIGHT} from '../../utils/constants'
+import {COLUMN_WIDTH, COLUMN_PADDING, CELL_HEIGHT, ScoreDisplayFormat} from '../../utils/constants'
 
 export interface ScoresGridProps {
   students: Student[]
   outcomes: Outcome[]
   rollups: StudentRollupData[]
+  scoreDisplayFormat?: ScoreDisplayFormat
 }
 
 interface ExtendedOutcomeRollup extends OutcomeRollup {
   studentId: string | number
 }
 
-export const ScoresGrid: React.FC<ScoresGridProps> = ({students, outcomes, rollups}) => {
+export const ScoresGrid: React.FC<ScoresGridProps> = ({
+  students,
+  outcomes,
+  rollups,
+  scoreDisplayFormat = ScoreDisplayFormat.ICON_ONLY,
+}) => {
   const rollupsByStudentAndOutcome = useMemo(() => {
     const outcomeRollups = rollups.flatMap(r =>
       r.outcomeRollups.map(or => ({
@@ -52,7 +58,7 @@ export const ScoresGrid: React.FC<ScoresGridProps> = ({students, outcomes, rollu
           {outcomes.map((outcome, index) => (
             <Flex.Item
               size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}
-              key={`${student.id}${outcome.id}${index}`}
+              key={`${student.id}-${outcome.id}-${index}`}
               data-testid={`student-outcome-score-${student.id}-${outcome.id}`}
             >
               <View
@@ -65,6 +71,7 @@ export const ScoresGrid: React.FC<ScoresGridProps> = ({students, outcomes, rollu
                 <StudentOutcomeScore
                   rollup={rollupsByStudentAndOutcome[`${student.id}_${outcome.id}`]}
                   outcome={outcome}
+                  scoreDisplayFormat={scoreDisplayFormat}
                 />
               </View>
             </Flex.Item>

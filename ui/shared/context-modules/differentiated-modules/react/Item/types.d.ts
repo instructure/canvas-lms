@@ -73,6 +73,7 @@ export interface DateDetailsOverride {
   context_module_name?: string | null
   noop_id?: number
   unassign_item: boolean
+  non_collaborative?: boolean
 }
 
 export interface ItemAssignToCardSpec {

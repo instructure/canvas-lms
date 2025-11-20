@@ -1631,6 +1631,104 @@ describe WikiPage do
     let(:relevant_attributes_for_scan) { { body: "<p>Lorem ipsum</p>" } }
   end
 
+  describe "#should_index_in_pine?" do
+    let(:horizon_course) do
+      course = Course.create!
+      course.update!(horizon_course: true)
+      course.account.enable_feature!(:horizon_course_setting)
+      course.account.enable_feature!(:horizon_learning_object_ingestion_on_change)
+      course
+    end
+    let(:regular_course) { Course.create! }
+    let(:wiki_page) { horizon_course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }
+    let(:pine_client_mock) { double("PineClient") }
+
+    before do
+      allow(pine_client_mock).to receive(:enabled?).and_return(true)
+      stub_const("PineClient", pine_client_mock)
+    end
+
+    context "returns true when" do
+      it "title changes in active horizon course page" do
+        wiki_page.title = "Updated Title"
+        expect(wiki_page.should_index_in_pine?).to be true
+      end
+
+      it "body changes in active horizon course page" do
+        wiki_page.body = "<p>Updated content</p>"
+        expect(wiki_page.should_index_in_pine?).to be true
+      end
+
+      it "workflow_state changes to active (page is restored)" do
+        wiki_page.workflow_state = "deleted"
+        wiki_page.save!
+        wiki_page.workflow_state = "active"
+        expect(wiki_page.should_index_in_pine?).to be true
+      end
+    end
+
+    context "returns false when" do
+      it "context is not a Course" do
+        group = group_model
+        group_page = group.wiki_pages.create!(title: "Group Page", body: "Content")
+        expect(group_page.should_index_in_pine?).to be false
+      end
+
+      it "course is not a horizon course" do
+        regular_page = regular_course.wiki_pages.create!(title: "Page", body: "Content")
+        expect(regular_page.should_index_in_pine?).to be false
+      end
+
+      it "PineClient is disabled" do
+        allow(PineClient).to receive(:enabled?).and_return(false)
+        expect(wiki_page.should_index_in_pine?).to be false
+      end
+
+      it "page is deleted" do
+        wiki_page.workflow_state = "deleted"
+        expect(wiki_page.should_index_in_pine?).to be false
+      end
+
+      it "no relevant fields changed" do
+        wiki_page.save!
+        expect(wiki_page.should_index_in_pine?).to be false
+      end
+
+      it "feature flag is not enabled" do
+        horizon_course.account.disable_feature!(:horizon_learning_object_ingestion_on_change)
+        wiki_page.body = "Updated"
+        expect(wiki_page.should_index_in_pine?).to be false
+      end
+    end
+  end
+
+  describe "#index_in_pine" do
+    let(:horizon_course) do
+      course = Course.create!
+      course.update!(horizon_course: true)
+      course.account.enable_feature!(:horizon_course_setting)
+      course
+    end
+    let(:wiki_page) { horizon_course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }
+    let(:pine_client_mock) { double("PineClient") }
+
+    before do
+      allow(pine_client_mock).to receive(:enabled?).and_return(true)
+      stub_const("PineClient", pine_client_mock)
+    end
+
+    it "calls delay with correct parameters and ingest_to_pine" do
+      expect(wiki_page).to receive(:delay).with(
+        n_strand: ["horizon_wiki_ingestion", horizon_course.global_root_account_id],
+        singleton: "horizon_wiki_ingestion:#{horizon_course.global_id}:#{wiki_page.id}",
+        max_attempts: 3
+      ).and_return(wiki_page)
+      expect(wiki_page).to receive(:ingest_to_pine)
+
+      wiki_page.index_in_pine
+    end
+  end
+
   describe "#ingest_to_pine" do
     let(:course) { Course.create! }
     let(:wiki_page) { course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }
@@ -1707,6 +1805,126 @@ describe WikiPage do
       expect(pine_client_mock).not_to receive(:ingest_html)
 
       group_page.ingest_to_pine
+    end
+  end
+
+  describe "Pine deletion" do
+    let(:horizon_course) do
+      course = Course.create!
+      course.update!(horizon_course: true)
+      course.account.enable_feature!(:horizon_course_setting)
+      course.account.enable_feature!(:horizon_learning_object_ingestion_on_change)
+      course
+    end
+    let(:wiki_page) { horizon_course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }
+    let(:pine_client_mock) { double("PineClient") }
+    let(:null_user) { Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil) }
+
+    before do
+      allow(pine_client_mock).to receive_messages(enabled?: true, delete_document: true)
+      stub_const("PineClient", pine_client_mock)
+    end
+
+    describe "#delete_from_pine" do
+      it "calls delay with correct parameters and delete_from_pine_job" do
+        expect(wiki_page).to receive(:delay).with(
+          n_strand: ["horizon_wiki_deletion", horizon_course.global_root_account_id],
+          singleton: "horizon_wiki_deletion:#{horizon_course.global_id}:#{wiki_page.id}",
+          max_attempts: 3
+        ).and_return(wiki_page)
+        expect(wiki_page).to receive(:delete_from_pine_job)
+
+        wiki_page.delete_from_pine
+      end
+
+      it "does not raise error if context is not a Course" do
+        group = group_model
+        group_page = group.wiki_pages.create!(title: "Group Page", body: "Content")
+
+        expect { group_page.delete_from_pine }.not_to raise_error
+      end
+
+      it "logs error but does not raise if delay fails" do
+        allow(wiki_page).to receive(:delay).and_raise(StandardError.new("Delayed job error"))
+
+        expect(Rails.logger).to receive(:error).with(/Failed to queue Pine deletion for wiki page/)
+        expect { wiki_page.delete_from_pine }.not_to raise_error
+      end
+    end
+
+    describe "#delete_from_pine_job" do
+      it "calls PineClient.delete_document with correct parameters" do
+        expect(pine_client_mock).to receive(:delete_document) do |**args|
+          expect(args[:source]).to eq("canvas")
+          expect(args[:source_id]).to eq(wiki_page.id.to_s)
+          expect(args[:source_type]).to eq("wiki_page")
+          expect(args[:feature_slug]).to eq("horizon-content-ingestion")
+          expect(args[:root_account_uuid]).to eq(horizon_course.root_account.uuid)
+          expect(args[:current_user]).to be_a(Struct)
+          expect(args[:current_user].uuid).to be_nil
+          expect(args[:current_user].global_id).to be_nil
+          true
+        end
+
+        wiki_page.delete_from_pine_job(null_user)
+      end
+
+      it "uses system deletion user with nil uuid and global_id" do
+        expect(pine_client_mock).to receive(:delete_document) do |**args|
+          user = args[:current_user]
+          expect(user.uuid).to be_nil
+          expect(user.global_id).to be_nil
+          true
+        end
+
+        wiki_page.delete_from_pine_job(null_user)
+      end
+
+      it "logs error and re-raises on failure" do
+        expect(pine_client_mock).to receive(:delete_document).and_raise(StandardError.new("API Error"))
+
+        expect(Rails.logger).to receive(:error).with(/Failed to delete wiki page/)
+        expect { wiki_page.delete_from_pine_job(null_user) }.to raise_error(StandardError, "API Error")
+      end
+    end
+
+    describe "deletion triggers Pine cleanup" do
+      it "calls delete_from_pine when wiki page is destroyed" do
+        # Ensure the page is eligible before destroying
+        expect(wiki_page.eligible_for_pine_indexing?).to be true
+
+        # Mock the delay chain to avoid actual delayed job
+        allow(wiki_page).to receive(:delay).and_return(wiki_page)
+        allow(wiki_page).to receive(:delete_from_pine_job)
+
+        # Expect delete_from_pine to be called
+        expect(wiki_page).to receive(:delete_from_pine).and_call_original
+
+        wiki_page.destroy
+      end
+
+      it "does not call delete_from_pine for non-eligible wiki pages" do
+        group = group_model
+        group_page = group.wiki_pages.create!(title: "Group Page", body: "Content")
+
+        expect(group_page).not_to receive(:delete_from_pine)
+        group_page.destroy
+      end
+
+      it "does not call delete_from_pine when PineClient is disabled" do
+        allow(PineClient).to receive(:enabled?).and_return(false)
+
+        expect(wiki_page).not_to receive(:delete_from_pine)
+        wiki_page.destroy
+      end
+
+      it "does not call delete_from_pine for non-horizon courses" do
+        regular_course = Course.create!
+        regular_page = regular_course.wiki_pages.create!(title: "Regular Page", body: "Content")
+
+        expect(regular_page).not_to receive(:delete_from_pine)
+        regular_page.destroy
+      end
     end
   end
 end

@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Nama file"
     },
+    "file_preview_21667a6e": {
+        "message": "Pratinjau file"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Pratinjau file untuk { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Kuota penyimpanan file terlampaui"
     },

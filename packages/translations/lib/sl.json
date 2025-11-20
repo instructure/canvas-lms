@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Ime datoteke"
     },
+    "file_preview_21667a6e": {
+        "message": "Predogled datoteke"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Predogled datoteke za { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Kvota prostora na disku je presežena"
     },

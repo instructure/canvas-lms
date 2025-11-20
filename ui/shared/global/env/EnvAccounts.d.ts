@@ -24,6 +24,8 @@ export type EnvAccounts = Partial<EnvAccountsAdminTools>
 export interface EnvAccountsAdminTools {
   ROOT_ACCOUNT_NAME: string
   ACCOUNT_ID: string
+  CONTEXT_BASE_URL: string
+  EARLY_ACCESS_PROGRAM: boolean
   PERMISSIONS: {
     can_manage_user_details: boolean
     can_allow_course_admin_actions: boolean

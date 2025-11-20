@@ -786,6 +786,202 @@ describe ConversationsController do
         expect(response.body).to include("invalid")
       end
     end
+
+    describe "restrict_student_access feature" do
+      before :once do
+        course_with_teacher(active_all: true)
+        student_in_course(active_all: true, course: @course)
+        @student2 = @student
+        student_in_course(active_all: true, course: @course)
+      end
+
+      context "when restrict_student_access feature is enabled" do
+        before do
+          @course.root_account.enable_feature!(:restrict_student_access)
+          user_session(@teacher)
+        end
+
+        it "forces individual messages when teacher sends to multiple recipients" do
+          expect(Conversation.count).to eq(0)
+
+          post "create", params: {
+            recipients: [@student.id.to_s, @student2.id.to_s],
+            body: "Test message to multiple students",
+            context_code: @course.asset_string
+          }
+
+          expect(response).to be_successful
+          expect(Conversation.count).to eq(2)
+
+          [@student, @student2].each do |student|
+            conversation = student.conversations.first
+            expect(conversation.other_participants.map(&:id)).to eq([@teacher.id])
+          end
+        end
+
+        it "does not affect behavior when teacher sends to single recipient" do
+          expect(Conversation.count).to eq(0)
+
+          post "create", params: {
+            recipients: [@student.id.to_s],
+            body: "Test message to single student",
+            context_code: @course.asset_string
+          }
+
+          expect(response).to be_successful
+          expect(Conversation.count).to eq(1)
+        end
+
+        it "does not affect non-teacher users" do
+          user_session(@student)
+          expect(Conversation.count).to eq(0)
+
+          post "create", params: {
+            recipients: [@teacher.id.to_s, @student2.id.to_s],
+            body: "Test message from student",
+            context_code: @course.asset_string,
+            group_conversation: true
+          }
+
+          expect(response).to be_successful
+          expect(Conversation.count).to eq(1)
+        end
+
+        it "does not affect messaging outside course context" do
+          other_user = user_factory
+
+          post "create", params: {
+            recipients: [@student.id.to_s, other_user.id.to_s],
+            body: "Test message without course context",
+            group_conversation: true
+            # No context_code provided
+          }
+
+          expect(response).to be_successful
+          expect(Conversation.count).to eq(1)
+        end
+
+        it "forces individual messages when teacher replies to existing conversation with new recipients" do
+          expect(Conversation.count).to eq(0)
+
+          post "create", params: {
+            recipients: [@student.id.to_s],
+            body: "Initial message",
+            context_code: @course.asset_string
+          }
+
+          expect(response).to be_successful
+          expect(Conversation.count).to eq(1)
+
+          conversation_id = Conversation.first.id
+
+          post "add_message", params: {
+            conversation_id:,
+            body: "Reply with additional recipient",
+            recipients: [@student.id.to_s, @student2.id.to_s],
+            context_code: @course.asset_string
+          }
+
+          expect(response).to be_successful
+          expect(Conversation.count).to eq(3)
+
+          [@student, @student2].each do |student|
+            student_conversations = student.conversations.map(&:conversation)
+            expect(student_conversations.any? { |c| c.participants.map(&:id).sort == [@teacher.id, student.id].sort }).to be true
+          end
+        end
+
+        it "ensures new recipients don't see original conversation history when added" do
+          expect(Conversation.count).to eq(0)
+
+          post "create", params: {
+            recipients: [@student.id.to_s],
+            body: "Original private message",
+            context_code: @course.asset_string
+          }
+
+          expect(response).to be_successful
+          expect(Conversation.count).to eq(1)
+
+          conversation_id = Conversation.first.id
+
+          post "add_message", params: {
+            conversation_id:,
+            body: "Reply with new student added",
+            recipients: [@student.id.to_s, @student2.id.to_s],
+            context_code: @course.asset_string
+          }
+
+          expect(response).to be_successful
+          expect(Conversation.count).to eq(3)
+
+          student2_conversation = @student2.conversations.first.conversation
+          expect(student2_conversation.conversation_messages.count).to eq(1)
+          expect(student2_conversation.conversation_messages.first.body).to eq("Reply with new student added")
+
+          student1_new_conversation = @student.conversations.find { |conv| conv.conversation.conversation_messages.one? }
+          expect(student1_new_conversation).not_to be_nil
+          expect(student1_new_conversation.conversation.conversation_messages.first.body).to eq("Reply with new student added")
+
+          original_conversation = Conversation.find(conversation_id)
+          expect(original_conversation.conversation_messages.count).to eq(1)
+          expect(original_conversation.conversation_messages.first.body).to eq("Original private message")
+        end
+
+        it "allows normal replies to existing conversation without adding new recipients" do
+          expect(Conversation.count).to eq(0)
+
+          post "create", params: {
+            recipients: [@student.id.to_s],
+            body: "Initial message",
+            context_code: @course.asset_string
+          }
+
+          expect(response).to be_successful
+          expect(Conversation.count).to eq(1)
+
+          conversation_id = Conversation.first.id
+
+          post "add_message", params: {
+            conversation_id:,
+            body: "Reply to existing conversation",
+            context_code: @course.asset_string
+          }
+
+          expect(response).to be_successful
+          expect(Conversation.count).to eq(1)
+
+          conversation = Conversation.first
+          expect(conversation.conversation_messages.count).to eq(2)
+        end
+      end
+
+      context "when restrict_student_access feature is disabled" do
+        before do
+          @course.account.disable_feature!(:restrict_student_access)
+          user_session(@teacher)
+        end
+
+        it "allows normal group conversation behavior for teachers" do
+          expect(Conversation.count).to eq(0)
+
+          post "create", params: {
+            recipients: [@student.id.to_s, @student2.id.to_s],
+            body: "Test message to multiple students",
+            context_code: @course.asset_string,
+            group_conversation: true
+          }
+
+          expect(response).to be_successful
+          expect(Conversation.count).to eq(1)
+
+          conversation = Conversation.first
+          participant_ids = conversation.conversation_participants.map(&:user_id).sort
+          expected_ids = [@teacher.id, @student.id, @student2.id].sort
+          expect(participant_ids).to eq(expected_ids)
+        end
+      end
+    end
   end
 
   describe "POST 'update'" do

@@ -97,7 +97,7 @@ describe('api actions', () => {
 
       await Actions.sendFetchRequest({
         fromMoment,
-        getState: () => ({loading: {}}),
+        getState: () => ({loading: {}, singleCourse: true}),
       })
 
       const url = new URL(capturedUrl)
@@ -144,7 +144,7 @@ describe('api actions', () => {
       await Actions.sendFetchRequest({
         fromMoment,
         mode: 'past',
-        getState: () => ({loading: {}}),
+        getState: () => ({loading: {}, singleCourse: true}),
       })
 
       const url = new URL(capturedUrl)

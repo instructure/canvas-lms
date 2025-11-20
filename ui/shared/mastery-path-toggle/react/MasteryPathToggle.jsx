@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Checkbox} from '@instructure/ui-checkbox'
 import uid from '@instructure/uid'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import { itemTypeToApiURL } from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
+import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = createI18nScope('shared_due_dates_react_mastery_paths_toggle_in_course_pacing')
@@ -30,20 +30,30 @@ const I18n = createI18nScope('shared_due_dates_react_mastery_paths_toggle_in_cou
 const MAX_PAGES = 10
 const makeCardId = () => uid('assign-to-card', 12)
 
-const MasteryPathToggle = ({ overrides, useCards, onSync, courseId, itemType, itemContentId, fetchOwnOverrides }) => {
+const MasteryPathToggle = ({
+  overrides,
+  useCards,
+  onSync,
+  courseId,
+  itemType,
+  itemContentId,
+  fetchOwnOverrides,
+}) => {
   const [_overrides, setOverrides] = useState([])
   const effectiveOverrides = fetchOwnOverrides ? _overrides : overrides
-  const effectiveSetOverrides = (newOverrides) => {
+  const effectiveSetOverrides = newOverrides => {
     setOverrides(newOverrides)
     onSync(newOverrides)
   }
   const masteryPathsEnabled = useMemo(() => {
-    if (itemType === "discussionTopic") {
-      return effectiveOverrides.some(({assignedList}) => assignedList.includes("mastery_paths"))
+    if (itemType === 'discussionTopic') {
+      return effectiveOverrides.some(({assignedList}) => assignedList.includes('mastery_paths'))
     } else if (!useCards) {
-      return effectiveOverrides.some(override => override.noop_id == "1" || override.noop_id == 1)
+      return effectiveOverrides.some(override => override.noop_id == '1' || override.noop_id == 1)
     } else {
-      return effectiveOverrides.some(override => override.selectedAssigneeIds.includes("mastery_paths"))
+      return effectiveOverrides.some(override =>
+        override.selectedAssigneeIds.includes('mastery_paths'),
+      )
     }
   }, [_overrides, overrides, useCards])
 
@@ -55,7 +65,6 @@ const MasteryPathToggle = ({ overrides, useCards, onSync, courseId, itemType, it
     }
 
     const fetchAllPages = async () => {
-
       let url = itemTypeToApiURL(courseId, itemType, itemContentId)
       const allResponses = []
 
@@ -78,7 +87,7 @@ const MasteryPathToggle = ({ overrides, useCards, onSync, courseId, itemType, it
         const combinedResponse = allResponses.reduce(
           (acc, response) => ({
             ...response,
-            overrides: [...(acc.overrides || []), ...(response.overrides || [])]
+            overrides: [...(acc.overrides || []), ...(response.overrides || [])],
           }),
           {},
         )
@@ -88,39 +97,39 @@ const MasteryPathToggle = ({ overrides, useCards, onSync, courseId, itemType, it
         } else {
           const cards = []
 
-          combinedResponse.overrides.forEach((override) => {
+          combinedResponse.overrides.forEach(override => {
             const filteredStudents = override.students
-              const studentOverrides =
-                filteredStudents?.map(student => ({
-                  id: `student-${student.id}`,
-                  value: student.name,
-                  group: 'Students',
-                })) ?? []
-              const initialAssigneeOptions = studentOverrides
-              const defaultOptions = studentOverrides.map(option => option.id)
-              if (override.noop_id) {
-                defaultOptions.push('mastery_paths')
-              }
-              if (override.course_section_id) {
-                defaultOptions.push(`section-${override.course_section_id}`)
-                initialAssigneeOptions.push({
-                  id: `section-${override.course_section_id}`,
-                  value: override.title,
-                  group: 'Sections',
-                })
-              }
-              if (override.course_id) {
-                defaultOptions.push('everyone')
-              }
-              if (override.group_id) {
-                defaultOptions.push(`group-${override.group_id}`)
-                initialAssigneeOptions.push({
-                  id: `group-${override.group_id}`,
-                  value: override.title,
-                  groupCategoryId: override.group_category_id,
-                  group: 'Groups',
-                })
-              }
+            const studentOverrides =
+              filteredStudents?.map(student => ({
+                id: `student-${student.id}`,
+                value: student.name,
+                group: 'Students',
+              })) ?? []
+            const initialAssigneeOptions = studentOverrides
+            const defaultOptions = studentOverrides.map(option => option.id)
+            if (override.noop_id) {
+              defaultOptions.push('mastery_paths')
+            }
+            if (override.course_section_id) {
+              defaultOptions.push(`section-${override.course_section_id}`)
+              initialAssigneeOptions.push({
+                id: `section-${override.course_section_id}`,
+                value: override.title,
+                group: 'Sections',
+              })
+            }
+            if (override.course_id) {
+              defaultOptions.push('everyone')
+            }
+            if (override.group_id) {
+              defaultOptions.push(`group-${override.group_id}`)
+              initialAssigneeOptions.push({
+                id: `group-${override.group_id}`,
+                value: override.title,
+                groupCategoryId: override.group_category_id,
+                group: 'Groups',
+              })
+            }
             cards.push({
               key: makeCardId(),
               isValid: true,
@@ -140,8 +149,7 @@ const MasteryPathToggle = ({ overrides, useCards, onSync, courseId, itemType, it
 
           effectiveSetOverrides(cards)
         }
-
-      } catch(e) {
+      } catch (e) {
         showFlashError()()
         throw e
       } finally {
@@ -150,58 +158,71 @@ const MasteryPathToggle = ({ overrides, useCards, onSync, courseId, itemType, it
     }
 
     !hasFetched && fetchAllPages()
-
   }, [useCards, itemContentId, courseId, itemType])
 
-  const onChange = (evt) => {
+  const onChange = evt => {
     if (evt.target.checked) {
       if (useCards) {
-        effectiveSetOverrides([{
-          key: makeCardId(),
-          isValid: true,
-          hasAssignees: true,
-          reply_to_topic_due_at: null,
-          required_replies_due_at: null,
-          due_at: null,
-          unlock_at: null,
-          lock_at: null,
-          contextModuleId: null,
-          contextModuleName: null,
-          selectedAssigneeIds: ["mastery_paths"],
-          isEdited: true,
-          hasInitialOverride: false,
-          highlightCard: true
-        }])
-      } else if (itemType === "wiki_page") {
-        effectiveSetOverrides([{
-          noop_id: 1,
-          due_at: null,
-          lock_at: null,
-          title: I18n.t('Mastery Paths'),
-          unassign_item: false,
-          unlock_at: null
-        }])
-      } else if (itemType === "discussionTopic") { 
+        effectiveSetOverrides([
+          {
+            key: makeCardId(),
+            isValid: true,
+            hasAssignees: true,
+            reply_to_topic_due_at: null,
+            required_replies_due_at: null,
+            due_at: null,
+            unlock_at: null,
+            lock_at: null,
+            contextModuleId: null,
+            contextModuleName: null,
+            selectedAssigneeIds: ['mastery_paths'],
+            isEdited: true,
+            hasInitialOverride: false,
+            highlightCard: true,
+          },
+        ])
+      } else if (itemType === 'wiki_page') {
+        effectiveSetOverrides([
+          {
+            noop_id: 1,
+            due_at: null,
+            lock_at: null,
+            title: I18n.t('Mastery Paths'),
+            unassign_item: false,
+            unlock_at: null,
+          },
+        ])
+      } else if (itemType === 'discussionTopic') {
         const rowKey = uid()
-        effectiveSetOverrides([{
-          dueDateId: rowKey,
-          unassign_item: false,
-          stagedOverrideId: rowKey,
-          assignedList: ["mastery_paths"]
-        }])
+        effectiveSetOverrides([
+          {
+            dueDateId: rowKey,
+            unassign_item: false,
+            stagedOverrideId: rowKey,
+            assignedList: ['mastery_paths'],
+          },
+        ])
       } else {
-        effectiveSetOverrides([{
-          noop_id: "1",
-          stagedOverrideId: uid(),
-          title: I18n.t('Mastery Paths'),
-          rowKey: effectiveOverrides.length
-        }])
+        effectiveSetOverrides([
+          {
+            noop_id: '1',
+            stagedOverrideId: uid(),
+            title: I18n.t('Mastery Paths'),
+            rowKey: effectiveOverrides.length,
+          },
+        ])
       }
     } else {
       if (useCards) {
-        const withoutMasteryPaths = effectiveOverrides.filter(({selectedAssigneeIds}) => !selectedAssigneeIds.includes('mastery_paths'))
+        const withoutMasteryPaths = effectiveOverrides.filter(
+          ({selectedAssigneeIds}) => !selectedAssigneeIds.includes('mastery_paths'),
+        )
 
-        if (!withoutMasteryPaths.some(({selectedAssigneeIds}) => selectedAssigneeIds.includes("everyone"))) {
+        if (
+          !withoutMasteryPaths.some(({selectedAssigneeIds}) =>
+            selectedAssigneeIds.includes('everyone'),
+          )
+        ) {
           withoutMasteryPaths.push({
             key: makeCardId(),
             isValid: true,
@@ -213,37 +234,41 @@ const MasteryPathToggle = ({ overrides, useCards, onSync, courseId, itemType, it
             lock_at: null,
             contextModuleId: null,
             contextModuleName: null,
-            selectedAssigneeIds: ["everyone"],
+            selectedAssigneeIds: ['everyone'],
             isEdited: true,
             hasInitialOverride: false,
-            highlightCard: true
+            highlightCard: true,
           })
         }
         effectiveSetOverrides(withoutMasteryPaths)
-      } else if (itemType === "wiki_page") {
+      } else if (itemType === 'wiki_page') {
         const withoutMasteryPaths = effectiveOverrides.filter(({noop_id}) => noop_id != 1)
         effectiveSetOverrides(withoutMasteryPaths)
-      } else if (itemType === "discussionTopic") {
-        const withoutMasteryPaths = effectiveOverrides.filter(({assignedList}) => !assignedList.includes("mastery_paths"))
-        if (!withoutMasteryPaths.some(({assignedList}) => assignedList.includes("everyone"))) {
+      } else if (itemType === 'discussionTopic') {
+        const withoutMasteryPaths = effectiveOverrides.filter(
+          ({assignedList}) => !assignedList.includes('mastery_paths'),
+        )
+        if (!withoutMasteryPaths.some(({assignedList}) => assignedList.includes('everyone'))) {
           const rowKey = uid()
           withoutMasteryPaths.push({
             dueDateId: rowKey,
             unassign_item: false,
             stagedOverrideId: rowKey,
-            assignedList: ["everyone"]
+            assignedList: ['everyone'],
           })
         }
         effectiveSetOverrides(withoutMasteryPaths)
       } else {
-        const withoutMasteryPaths = effectiveOverrides.filter(({noop_id}) => noop_id !== "1")
+        const withoutMasteryPaths = effectiveOverrides.filter(
+          ({noop_id}) => noop_id !== '1' && noop_id !== 1,
+        )
 
-        if (!withoutMasteryPaths.some(({course_section_id}) => course_section_id === "0")) {
+        if (!withoutMasteryPaths.some(({course_section_id}) => course_section_id === '0')) {
           withoutMasteryPaths.push({
             due_at: null,
             lock_at: null,
             unlock_at: null,
-            course_section_id: "0",
+            course_section_id: '0',
             due_at_overridden: false,
             all_day: false,
             all_day_date: null,

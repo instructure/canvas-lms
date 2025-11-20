@@ -16,6 +16,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# We don't currently import context controls, as that would allow teachers to modify
+# Context Controls, which they shouldn't have permission to do! We might revisit this
+# in the future and let admins make this a toggleable feature, but for now it is
+# always disabled.
 module Importers
   class LtiContextControlImporter < Importer
     self.item_class = Lti::ContextControl

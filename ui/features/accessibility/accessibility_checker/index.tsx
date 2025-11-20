@@ -17,39 +17,11 @@
  */
 
 import ReactDOM from 'react-dom/client'
-import ready from '../../../../packages/ready'
+import {App} from './react/App'
 
-import AccessibilityCheckerDrawer from './react/components/AccessibilityCheckerDrawer/AccessibilityCheckerDrawer'
+const rootElement = document.getElementById('content')
 
-ready(() => {
-  const drawerLayoutMountPoint = document.getElementById('a11y-checker-drawer-layout-mount-point')
-  const topNavToolsDrawerLayoutMountPoint = document.getElementById('drawer-layout-mount-point')
-  const canvasApplicationBody = document.getElementById('application')
-  const container = document.getElementById('accessibility-checker-container')
-
-  if (!drawerLayoutMountPoint || !canvasApplicationBody || !container) {
-    return
-  }
-
-  const courseId = window.ENV.current_context?.id
-  if (!courseId) {
-    return
-  }
-
-  const scanDisabled = !!window.ENV.SCAN_DISABLED
-
-  // Hides the old React root container from ui/features/top_navigation_tools/index.tsx
-  if (topNavToolsDrawerLayoutMountPoint) {
-    topNavToolsDrawerLayoutMountPoint.style.display = 'none'
-  }
-
-  const root = ReactDOM.createRoot(drawerLayoutMountPoint)
-  root.render(
-    <AccessibilityCheckerDrawer
-      pageContent={canvasApplicationBody}
-      container={container}
-      courseId={courseId}
-      scanDisabled={scanDisabled}
-    />,
-  )
-})
+if (rootElement) {
+  const root = ReactDOM.createRoot(rootElement)
+  root.render(<App />)
+}

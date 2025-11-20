@@ -65,6 +65,12 @@ describe "Enrollment::QueryBuilder" do
         }
       end)
 
+      create_records(EnrollmentState,
+                     matrix.each_with_index.map do |(e_state, _, _), i|
+                       { enrollment_id: enrollment_ids[i], state: e_state, root_account_id: account_id }
+                     end,
+                     :nil)
+
       enrollment_ids.each_with_index do |id, i|
         enrollment_map[id] = matrix[i]
       end
@@ -93,7 +99,7 @@ describe "Enrollment::QueryBuilder" do
           options[:course_workflow_state] = "unknown"
           options[:enforce_course_workflow_state] = true
 
-          result = enrollments.where(conditions)
+          result = enrollments.joins(:enrollment_state).where(conditions)
           expect(result).to be_empty
         end
       end
@@ -259,6 +265,30 @@ describe "Enrollment::QueryBuilder" do
       it_behaves_like "enforce_course_workflow_state"
     end
 
+    context "with :completed" do
+      let(:state) { :completed }
+
+      it "respects enrollment_state for soft-concluded enrollments" do
+        create_enrollments(
+          %w[active available StudentEnrollment],
+          %w[completed claimed TeacherEnrollment],
+          %w[active available TaEnrollment]
+        )
+
+        # update TA enrollment to have an enrollment state of completed
+        ta_state = enrollments.find_by(type: "TaEnrollment").enrollment_state
+        ta_state.update(state: "completed")
+        ta_state.save!
+
+        result = enrollments.joins(:enrollment_state).where(conditions)
+        expect(result).to be_present
+        expect(matches_for(result)).to eq [
+          %w[active available TaEnrollment],
+          %w[completed claimed TeacherEnrollment]
+        ]
+      end
+    end
+
     %i[deleted rejected completed creation_pending inactive].each do |state|
       context "with #{state.inspect}" do
         let(:state) { state }
@@ -269,7 +299,7 @@ describe "Enrollment::QueryBuilder" do
             [state.to_s, "available", "StudentEnrollment"]
           )
 
-          result = enrollments.where(conditions)
+          result = enrollments.joins(:enrollment_state).where(conditions)
           expect(result).to be_present
           expect(matches_for(result)).to eq [
             [state.to_s, "available", "StudentEnrollment"]
@@ -350,7 +380,7 @@ describe "Enrollment::QueryBuilder" do
           %w[completed available StudentEnrollment]
         )
 
-        result = enrollments.where(conditions)
+        result = enrollments.joins(:enrollment_state).where(conditions)
         expect(matches_for(result)).to eq [
           %w[active available StudentEnrollment],
           %w[active available TeacherEnrollment],

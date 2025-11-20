@@ -38,12 +38,8 @@ describe Account do
       AccountDomain.create!(host: "canvas.instructure.com", account: root_account)
     end
 
-    it "retrieves correct beta domain" do
-      allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
-      expect(root_account.environment_specific_domain).to eq "canvas.beta.instructure.com"
-    end
-
     it "retrieves correct prod domain" do
+      # beta domains are handled in MRA
       allow(ApplicationController).to receive(:test_cluster_name).and_return(nil)
       expect(root_account.environment_specific_domain).to eq "canvas.instructure.com"
     end
@@ -3065,9 +3061,8 @@ describe Account do
     end
 
     it "returns the recaptcha_client_key when root_account? and self_registration_captcha? are true" do
-      allow(DynamicSettings).to receive(:find).with(tree: "private").and_return(
-        instance_double(DynamicSettings::PrefixProxy, :[] => "test_key")
-      )
+      allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return({ server_key: "test_key" })
+      allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :client_key).and_return("test_key")
       expect(root_account.recaptcha_key).to eq("test_key")
     end
 
@@ -3082,9 +3077,8 @@ describe Account do
     end
 
     it "returns nil if recaptcha_client_key is not present in DynamicSettings" do
-      allow(DynamicSettings).to receive(:find).with(tree: "private").and_return(
-        instance_double(DynamicSettings::PrefixProxy, :[] => nil)
-      )
+      allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return(nil)
+      allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :client_key).and_return(nil)
       expect(root_account.recaptcha_key).to be_nil
     end
 
@@ -3307,6 +3301,49 @@ describe Account do
 
       expect(root_account).not_to receive(:save!)
       root_account.denormalize_horizon_account_if_changed
+    end
+  end
+
+  describe "cache staleness and conditional reload" do
+    let(:account) { Account.create!(name: "Original") }
+
+    describe "#cache_stale?" do
+      it "returns false on a freshly loaded record" do
+        expect(account.cache_stale?).to be false
+      end
+
+      it "returns true when the DB updated_at is newer than the in-memory record" do
+        # Force an update directly in SQL so the in-memory object does not see the updated timestamp
+        future_time = 2.minutes.from_now
+        Account.where(id: account).update_all(updated_at: future_time)
+        expect(account.cache_stale?).to be true
+      end
+    end
+
+    describe "#reload_if_cache_stale" do
+      it "reloads the record when stale" do
+        Account.where(id: account).update_all(name: "Changed", updated_at: 1.minute.from_now)
+        expect(account.name).to eq "Original" # still old in-memory value
+        account.reload_if_cache_stale
+        expect(account.name).to eq "Changed"
+      end
+
+      it "does not reload when not stale" do
+        expect(account.cache_stale?).to be false
+        expect(account).not_to receive(:reload)
+        account.reload_if_cache_stale
+        expect(account.name).to eq "Original"
+      end
+    end
+
+    describe "callback invocation in invalidate_caches_if_changed" do
+      it "invokes reload_if_cache_stale after invalidations are committed" do
+        allow(account).to receive(:reload_if_cache_stale).and_call_original
+        # Change an inheritable setting to populate @invalidations
+        account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        account.save!
+        expect(account).to have_received(:reload_if_cache_stale)
+      end
     end
   end
 end

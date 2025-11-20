@@ -880,6 +880,20 @@ describe Group do
       expect(users.length).to eq 1
       expect(users.first.id).to eq @user.id
     end
+
+    it "includes pending_active students when course has not started yet" do
+      course_with_student(active_all: true)
+      @course.start_at = 1.week.from_now
+      @course.conclude_at = 2.weeks.from_now
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+
+      group = @course.groups.create(name: "test_group")
+      group.add_user(@student, "accepted")
+
+      users = group.participating_users_in_context
+      expect(users).to include(@student)
+    end
   end
 
   describe "usage_rights_required" do
@@ -1118,6 +1132,18 @@ describe Group do
 
         expect(group).not_to be_valid
         expect(group.errors[:base]).to include("Variant limit reached for tag")
+      end
+
+      it "does not allow to move a tag to a tag set that has reached the variant limit" do
+        # c1 already has 10 variants (the limit)
+        expect(Group.active.non_collaborative.where(group_category_id: @c1.id).count).to eq Group.MAX_VARIANTS_PER_TAG_CATEGORY
+
+        # Try to move a tag from c2 to c1
+        group_to_move = Group.where(group_category: @c2).first
+        group_to_move.group_category = @c1
+
+        expect(group_to_move).not_to be_valid
+        expect(group_to_move.errors[:base]).to include("Variant limit reached for tag")
       end
 
       it "leaves out soft deleted tags" do

@@ -113,7 +113,7 @@ class RubricsController < ApplicationController
   #
   # Returns the rubric with the given id.
   #
-  # Unfortuantely this endpoint does not return a standard Rubric object,
+  # Unfortunately this endpoint does not return a standard Rubric object,
   # instead it returns a hash that looks like
   #   { 'rubric': Rubric, 'rubric_association': RubricAssociation }
   #
@@ -158,7 +158,7 @@ class RubricsController < ApplicationController
   #
   # Returns the rubric with the given id.
   #
-  # Unfortuantely this endpoint does not return a standard Rubric object,
+  # Unfortunately this endpoint does not return a standard Rubric object,
   # instead it returns a hash that looks like
   #   { 'rubric': Rubric, 'rubric_association': RubricAssociation }
   #
@@ -247,7 +247,13 @@ class RubricsController < ApplicationController
   MAX_LLM_INPUT_CHARS = 1000
   ALLOWED_GENERATE_PARAMS = %w[criteria_count rating_count points_per_criterion use_range additional_prompt_info grade_level standard].freeze
   def llm_criteria
+    return render_unauthorized_action unless Rubric.ai_rubrics_enabled?(context)
+
     association_object = RubricAssociation.get_association_object(params[:rubric_association])
+    return render_unauthorized_action unless association_object
+
+    return unless can_manage_rubrics_or_association_object?(association_object)
+
     generate_options = (params[:generate_options] || {}).permit(*ALLOWED_GENERATE_PARAMS)
     generate_options[:use_range] = value_to_boolean(generate_options[:use_range])
     generate_options[:additional_prompt_info] = generate_options[:additional_prompt_info].presence
@@ -264,33 +270,35 @@ class RubricsController < ApplicationController
       return render json: { error: "standard must be less than 1000 characters" }, status: :bad_request
     end
 
-    return render_unauthorized_action unless Rubric.ai_rubrics_enabled?(context)
+    progress = Progress.create!(context: association_object, user: @current_user, tag: "llm_rubric_generation")
+    progress.process_job(
+      Rubric,
+      :process_generate_criteria_via_llm,
+      {
+        priority: Delayed::NORMAL_PRIORITY,
+        n_strand: ["Rubric.process_generate_criteria_via_llm", @domain_root_account.global_id],
+        max_attempts: 3,
+      },
+      @context,
+      @current_user,
+      association_object,
+      generate_options.to_h
+    )
 
-    @rubric = @context.rubrics.build(user: @current_user)
-    if can_manage_rubrics_or_association_object?(association_object) && authorized_action(@rubric, @current_user, :update)
-      progress = Progress.create!(context: association_object, user: @current_user, tag: "llm_rubric_generation")
-      progress.process_job(
-        Rubric,
-        :process_generate_criteria_via_llm,
-        {
-          priority: Delayed::NORMAL_PRIORITY,
-          n_strand: ["Rubric.process_generate_criteria_via_llm", @domain_root_account.global_id],
-          max_attempts: 3,
-        },
-        @context,
-        @current_user,
-        association_object,
-        generate_options.to_h
-      )
+    InstStatsd::Statsd.distributed_increment("rubrics.ai_generated")
 
-      render json: progress_json(progress, @current_user, session)
-    end
+    render json: progress_json(progress, @current_user, session)
   end
 
   ALLOWED_REGENERATE_PARAMS = %w[criterion_id additional_user_prompt standard].freeze
   ALLOWED_ORIG_GENERATE_PARAMS = %w[criteria_count rating_count points_per_criterion use_range grade_level additional_prompt_info].freeze
   def llm_regenerate_criteria
+    return render_unauthorized_action unless Rubric.ai_rubrics_enabled?(context)
+
     association_object = RubricAssociation.get_association_object(params[:rubric_association])
+    return render_unauthorized_action unless association_object
+
+    return unless can_manage_rubrics_or_association_object?(association_object)
 
     criteria_params = params.fetch(:criteria, {}).values.map do |crit|
       crit.permit(
@@ -301,6 +309,10 @@ class RubricsController < ApplicationController
         :criterion_use_range,
         ratings: %i[id criterion_id description long_description points]
       )
+    end
+
+    if criteria_params.empty?
+      return render json: { error: "criteria must be provided" }, status: :bad_request
     end
 
     regenerate_options = params.fetch(:regenerate_options, {}).permit(*ALLOWED_REGENERATE_PARAMS)
@@ -324,28 +336,25 @@ class RubricsController < ApplicationController
       return render json: { error: "additional_prompt_info must be less than 1000 characters" }, status: :bad_request
     end
 
-    return render_unauthorized_action unless Rubric.ai_rubrics_enabled?(context)
+    progress = Progress.create!(context: association_object, user: @current_user, tag: "llm_rubric_regeneration")
+    progress.process_job(
+      Rubric,
+      :process_regenerate_criteria_via_llm,
+      {
+        priority: Delayed::NORMAL_PRIORITY,
+        n_strand: ["Rubric.process_regenerate_criteria_via_llm", @domain_root_account.global_id],
+        max_attempts: 3,
+      },
+      @context,
+      @current_user,
+      association_object,
+      regenerate_options.to_h,
+      orig_generate_options.to_h
+    )
 
-    @rubric = @context.rubrics.build(user: @current_user)
-    if can_manage_rubrics_or_association_object?(association_object) && authorized_action(@rubric, @current_user, :update)
-      progress = Progress.create!(context: association_object, user: @current_user, tag: "llm_rubric_regeneration")
-      progress.process_job(
-        Rubric,
-        :process_regenerate_criteria_via_llm,
-        {
-          priority: Delayed::NORMAL_PRIORITY,
-          n_strand: ["Rubric.process_regenerate_criteria_via_llm", @domain_root_account.global_id],
-          max_attempts: 3,
-        },
-        @context,
-        @current_user,
-        association_object,
-        regenerate_options.to_h,
-        orig_generate_options.to_h
-      )
+    InstStatsd::Statsd.distributed_increment("rubrics.ai_regenerated")
 
-      render json: progress_json(progress, @current_user, session)
-    end
+    render json: progress_json(progress, @current_user, session)
   end
 
   # @API Delete a single

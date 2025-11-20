@@ -580,7 +580,7 @@ describe AssignmentOverride do
       it "requires a parent_override for new overrides" do
         override = AssignmentOverride.new(assignment: sub_assignment)
         expect(override).not_to be_valid
-        expect(override.errors[:parent_override_id]).to include("must be present for sub-assignment overrides")
+        expect(override.errors[:parent_override_id]).to include("must be present for overrides belonging to SubAssignment or PeerReviewSubAssignment")
       end
 
       it "is valid with a parent_override" do
@@ -592,7 +592,7 @@ describe AssignmentOverride do
         override = AssignmentOverride.create!(assignment: sub_assignment, parent_override:)
         override.parent_override = nil
         expect(override).not_to be_valid
-        expect(override.errors[:parent_override_id]).to include("must be present for sub-assignment overrides")
+        expect(override.errors[:parent_override_id]).to include("must be present for overrides belonging to SubAssignment or PeerReviewSubAssignment")
       end
 
       it "marks the child_override as deleted when the parent_override is destroyed" do
@@ -1504,6 +1504,47 @@ describe AssignmentOverride do
       checkpoint = topic.reply_to_topic_checkpoint
       override = create_group_override_for_assignment(checkpoint, { group: })
       expect(checkpoint.assignment_overrides).to include override
+    end
+  end
+
+  describe "peer review sub assignments" do
+    before :once do
+      course_model
+      @peer_review_sub_assignment = peer_review_model(course: @course)
+      @parent_assignment = @peer_review_sub_assignment.parent_assignment
+      @parent_override = @parent_assignment.assignment_overrides.create!
+    end
+
+    it "requires a parent override for new peer review sub assignment override" do
+      override = AssignmentOverride.new(assignment: @peer_review_sub_assignment)
+      expect(override).not_to be_valid
+      expect(override.errors[:parent_override_id]).to include("must be present for overrides belonging to SubAssignment or PeerReviewSubAssignment")
+    end
+
+    it "is valid with a parent override" do
+      override = AssignmentOverride.new(assignment: @peer_review_sub_assignment, parent_override: @parent_override)
+      expect(override).to be_valid
+    end
+
+    it "does not allow removing parent override from existing peer review sub assignment override" do
+      override = AssignmentOverride.create!(assignment: @peer_review_sub_assignment, parent_override: @parent_override)
+      override.parent_override = nil
+      expect(override).not_to be_valid
+      expect(override.errors[:parent_override_id]).to include("must be present for overrides belonging to SubAssignment or PeerReviewSubAssignment")
+    end
+
+    it "allows setting parent_override_id to another valid override" do
+      another_parent_override = @parent_assignment.assignment_overrides.create!
+      override = AssignmentOverride.create!(assignment: @peer_review_sub_assignment, parent_override: @parent_override)
+      override.parent_override = another_parent_override
+      expect(override).to be_valid
+    end
+
+    it "rejects parent_override_id on non-SubAssignment or non-PeerReviewSubAssignment overrides" do
+      regular_assignment = @course.assignments.create!
+      override = AssignmentOverride.new(assignment: regular_assignment, parent_override: @parent_override)
+      expect(override).not_to be_valid
+      expect(override.errors[:parent_override_id]).to include("can only be set for overrides belonging to SubAssignment or PeerReviewSubAssignment")
     end
   end
 end

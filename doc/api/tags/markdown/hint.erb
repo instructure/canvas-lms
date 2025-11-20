@@ -1,0 +1,7 @@
+<% for tag in object.tags(:hint) %>
+<% parts = tag.text.split("\n", 2) %>
+<% hint_style = parts[0].strip %>
+<% hint_text = parts[1]&.strip || "" %>
+<%= hint(hint_style, hint_text) %>
+
+<% end %>

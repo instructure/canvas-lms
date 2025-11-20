@@ -26,6 +26,7 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
   VALID_SECONDARY_INFO_DISPLAY_VALUES = %w[none sis_id integration_id login_id].freeze
   VALID_NAME_DISPLAY_FORMAT_VALUES = %w[first_last last_first].freeze
   VALID_STUDENTS_PER_PAGE_VALUES = [15, 30, 50, 100].freeze
+  VALID_SCORE_DISPLAY_FORMAT_VALUES = %w[icon_only icon_and_points icon_and_label].freeze
 
   # @API Get Learning Mastery Gradebook Settings
   #
@@ -69,7 +70,8 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
       :show_students_with_no_results,
       :show_student_avatars,
       :name_display_format,
-      :students_per_page
+      :students_per_page,
+      :score_display_format
     )
   end
 
@@ -125,6 +127,13 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
       value = settings[:students_per_page]
       unless VALID_STUDENTS_PER_PAGE_VALUES.include?(value.to_i)
         errors << "Invalid students_per_page ('#{value}'). Valid values are: #{VALID_STUDENTS_PER_PAGE_VALUES.join(", ")}"
+      end
+    end
+
+    if settings.key?(:score_display_format)
+      value = settings[:score_display_format]
+      unless VALID_SCORE_DISPLAY_FORMAT_VALUES.include?(value)
+        errors << "Invalid score_display_format ('#{value}'). Valid values are: #{VALID_SCORE_DISPLAY_FORMAT_VALUES.join(", ")}"
       end
     end
 

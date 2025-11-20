@@ -36,6 +36,7 @@ import {
   TableSortState,
 } from '../../../../shared/react/stores/AccessibilityScansStore'
 import {useAccessibilityScansFetchUtils} from '../../../../shared/react/hooks/useAccessibilityScansFetchUtils'
+import {useAccessibilityScansPolling} from '../../../../shared/react/hooks/useAccessibilityScansPolling'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -57,23 +58,9 @@ const getNewTableSortState = (
     : 'ascending'
 
   if (existingSortState?.sortId === param.id) {
-    if (ReverseOrderingFirst.includes(param.id)) {
-      sortDirection =
-        existingSortState?.sortDirection === 'descending'
-          ? 'ascending'
-          : existingSortState?.sortDirection === 'ascending'
-            ? 'none'
-            : 'descending'
-    } else {
-      // If the same column is clicked, cycle the sort direction
-      sortDirection =
-        existingSortState?.sortDirection === 'ascending'
-          ? 'descending'
-          : existingSortState?.sortDirection === 'descending'
-            ? 'none'
-            : 'ascending'
-    }
+    sortDirection = existingSortState?.sortDirection === 'ascending' ? 'descending' : 'ascending'
   }
+
   return {
     sortId: param.id,
     sortDirection,
@@ -126,6 +113,8 @@ const ReverseOrderingFirst = [IssuesTableColumns.Issues, IssuesTableColumns.Last
 
 export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
   const {doFetchAccessibilityScanData} = useAccessibilityScansFetchUtils()
+
+  useAccessibilityScansPolling()
 
   const [error, loading, page, pageCount, accessibilityScans, tableSortState] =
     useAccessibilityScansStore(

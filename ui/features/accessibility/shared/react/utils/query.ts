@@ -24,6 +24,7 @@ import {
   TableSortState,
 } from '../stores/AccessibilityScansStore'
 import {IssuesTableColumns} from '../../../accessibility_checker/react/constants'
+import {AccessibilityResourceScan} from '../types'
 
 /**
  * Use only with the AccessibilityScansStore!
@@ -100,6 +101,14 @@ export const stripQueryString = (href: string): string => {
 export const getCourseBasedPath = (newPath = ''): string => {
   const base = window.location.pathname.replace(/\/accessibility.*/, newPath)
   return base === '/' ? '' : base.replace(/\/$/, '')
+}
+
+/**
+ * Gets the resource scan path for a given resource scan
+ * @returns - the resource scan path (e.g. /courses/1/pages/1/accessibility/scan)
+ */
+export const getResourceScanPath = (resourceScan: AccessibilityResourceScan): string => {
+  return `/api/v1/${resourceScan.resourceUrl}/accessibility/scan`.replaceAll('//', '/')
 }
 
 /**

@@ -190,13 +190,6 @@ files_a11y_rewrite_toggle:
     ci:
       state: allowed_on
 
-hidden_attachments_replacement_chain:
-  applies_to: SiteAdmin
-  state: hidden
-  display_name: Hidden Attachments Replacement Chain
-  description: |-
-    Enables that hidden attachments will be included into the replacement chain.
-
 media_links_use_attachment_id:
   state: hidden
   display_name: Use Attachment IDs in Media Links
@@ -361,6 +354,14 @@ a11y_checker_eap:
     Enable the new Accessibility Checker in EAP. The flag is allowed only for root account admins.
   visible_on: a11y_checker_flag_enabled
   custom_transition_proc: only_admins_can_enable_a11y_checker_during_eap
+
+a11y_checker_ai_generation:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Accessibility Checker AI Generation
+  description: |-
+    If enabled, the AI feature for generating text for the relevant rule such as alt text missing, table captions missing is displayed at the wizard.
+  shadow: true
 
 ux_list_concluded_courses_in_bp:
   state: hidden

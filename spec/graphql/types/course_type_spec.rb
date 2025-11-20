@@ -19,6 +19,7 @@
 #
 
 require_relative "../graphql_spec_helper"
+require "lti_1_3_tool_configuration_spec_helper"
 
 describe Types::CourseType do
   let_once(:course) do
@@ -2702,6 +2703,156 @@ describe Types::CourseType do
 
         expect(result).to be_nil
       end
+    end
+  end
+
+  describe "External Tools Connection" do
+    include_context "lti_1_3_tool_configuration_spec_helper"
+
+    let_once(:developer_key) do
+      dk = lti_developer_key_model(account: course.root_account)
+      dk.developer_key_account_bindings.first.update! workflow_state: "on"
+      dk
+    end
+
+    let_once(:tool_json_definitions) do
+      [
+        {
+          name: "Tool 1",
+          url: "https://example.com/tool1",
+          workflow_state: "public",
+          lti_version: "1.3",
+          not_selectable: false,
+          placement_type: "link_selection"
+        },
+        {
+          name: "Tool 2",
+          url: "https://example.com/tool2",
+          workflow_state: "public",
+          lti_version: "1.3",
+          not_selectable: false,
+          placement_type: "homework_submission"
+        },
+        {
+          name: "Tool 3",
+          url: "https://example.com/tool2",
+          workflow_state: "email_only",
+          lti_version: "1.3",
+          not_selectable: false,
+          placement_type: "resource_selection"
+        },
+        {
+          name: "Tool 4",
+          url: "https://example.com/tool4",
+          workflow_state: "email_only",
+          lti_version: "1.1",
+          not_selectable: false,
+          placement_type: "homework_submission"
+        },
+        {
+          name: "Tool 5",
+          url: "https://example.com/tool5",
+          workflow_state: "email_only",
+          lti_version: "1.1",
+          not_selectable: true,
+          placement_type: "homework_submission"
+        }
+      ]
+    end
+
+    def create_tool(tool_json_definition)
+      tool = course.context_external_tools.create!(
+        name: tool_json_definition[:name],
+        shared_secret: "test_secret",
+        developer_key:,
+        consumer_key: "test_key",
+        domain: "example.com",
+        not_selectable: tool_json_definition[:not_selectable],
+        url: tool_json_definition[:url],
+        workflow_state: tool_json_definition[:workflow_state],
+        lti_version: tool_json_definition[:lti_version]
+      )
+      tool.context_external_tool_placements.create(placement_type: tool_json_definition[:placement_type])
+
+      control = tool.context_controls.new(registration: tool.developer_key.lti_registration, available: true)
+      control.course = course
+      control.save!
+      tool
+    end
+
+    before(:once) do
+      @teacher = course.enroll_teacher(user_factory).user
+
+      tool_json_definitions.each do |tool_json_definition|
+        create_tool(tool_json_definition)
+      end
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "no placement filter for external tools" do
+      result_array = tool_json_definitions.pluck(:name)
+
+      expect(
+        course_type.resolve(<<~GQL, current_user: @teacher)
+          externalToolsConnection { edges { node { name } } }
+        GQL
+      ).to match_array result_array
+    end
+
+    it "placement filter for external tools" do
+      result_array = tool_json_definitions.select { |tool| tool[:placement_type] == "homework_submission" }.pluck(:name)
+
+      expect(
+        course_type.resolve(<<~GQL, current_user: @teacher)
+          externalToolsConnection(filter: { placement: homework_submission }) { edges { node { name } } }
+        GQL
+      ).to match_array result_array
+    end
+
+    it "placement list filter includes LTI 1.1 tools with not_selectable false when legacy placements requested" do
+      result_array = tool_json_definitions.select { |tool| ["link_selection", "resource_selection"].include?(tool[:placement_type]) || (tool[:lti_version] == "1.1" && tool[:not_selectable] == false) }.pluck(:name)
+
+      expect(
+        course_type.resolve(<<~GQL, current_user: @teacher)
+          externalToolsConnection(filter: { placementList: [link_selection, resource_selection] }) { edges { node { name } } }
+        GQL
+      ).to match_array result_array
+    end
+
+    it "verifies LTI version filtering behavior with legacy placements" do
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        externalToolsConnection(filter: { placementList: [link_selection, resource_selection] }) { edges { node { name } } }
+      GQL
+
+      expect(result).to include("Tool 1")
+      expect(result).to include("Tool 3")
+      expect(result).to include("Tool 4")
+      expect(result).not_to include("Tool 2")
+      expect(result).not_to include("Tool 5")
+    end
+
+    it "includes all tools with explicit non-legacy placement regardless of not_selectable" do
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        externalToolsConnection(filter: { placement: homework_submission }) { edges { node { name } } }
+      GQL
+
+      expect(result).to include("Tool 2")
+      expect(result).to include("Tool 4")
+      expect(result).to include("Tool 5")
+      expect(result).not_to include("Tool 1")
+      expect(result).not_to include("Tool 3")
+    end
+
+    it "state filter for external tools" do
+      result_array = tool_json_definitions.select { |tool| tool[:workflow_state] == "email_only" }.pluck(:name)
+      expect(
+        course_type.resolve(<<~GQL, current_user: @teacher)
+          externalToolsConnection(filter: { state: email_only }) { edges { node { name } } }
+        GQL
+      ).to match_array result_array
     end
   end
 end

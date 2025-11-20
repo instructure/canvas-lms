@@ -26,6 +26,7 @@ module Api::V1::FeatureFlag
     hash = feature.as_json.slice("feature",
                                  "applies_to",
                                  "root_opt_in",
+                                 "early_access_program",
                                  "beta",
                                  "release_notes_url",
                                  "autoexpand",

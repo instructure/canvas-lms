@@ -1968,7 +1968,8 @@ describe "Submissions API", type: :request do
           student_overlap: 100,
           state: "failure",
           similarity_score: 100,
-          object_id: "123345"
+          object_id: "123345",
+          view_report_url: "/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}/turnitin/attachment_504177?attempt=#{@submission.attempt}"
         }
       }
       @submission.update(turnitin_data: sample_turnitin_data)

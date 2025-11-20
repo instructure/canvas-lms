@@ -24,6 +24,7 @@ import {
   DisplayFilter,
   SecondaryInfoDisplay,
   NameDisplayFormat,
+  ScoreDisplayFormat,
 } from '../../utils/constants'
 
 jest.mock('../../apiClient')
@@ -201,6 +202,53 @@ describe('useGradebookSettings', () => {
     expect(result.current.isLoading).toBe(false)
   })
 
+  it('sets scoreDisplayFormat from API response', async () => {
+    const mockSettings = {
+      secondary_info_display: SecondaryInfoDisplay.SIS_ID,
+      show_student_avatars: true,
+      show_students_with_no_results: true,
+      score_display_format: ScoreDisplayFormat.ICON_AND_POINTS,
+    }
+    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {},
+      data: {learning_mastery_gradebook_settings: mockSettings},
+    })
+
+    const {result, waitForNextUpdate} = renderHook(() => useGradebookSettings(courseId))
+    await waitForNextUpdate()
+
+    expect(result.current.settings.scoreDisplayFormat).toBe(ScoreDisplayFormat.ICON_AND_POINTS)
+    expect(result.current.error).toBeNull()
+    expect(result.current.isLoading).toBe(false)
+  })
+
+  it('sets scoreDisplayFormat to default when missing in the response', async () => {
+    const mockSettings = {
+      secondary_info_display: SecondaryInfoDisplay.SIS_ID,
+      show_student_avatars: true,
+      show_students_with_no_results: true,
+    }
+    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {},
+      data: {learning_mastery_gradebook_settings: mockSettings},
+    })
+
+    const {result, waitForNextUpdate} = renderHook(() => useGradebookSettings(courseId))
+    await waitForNextUpdate()
+
+    expect(result.current.settings.scoreDisplayFormat).toBe(
+      DEFAULT_GRADEBOOK_SETTINGS.scoreDisplayFormat,
+    )
+    expect(result.current.error).toBeNull()
+    expect(result.current.isLoading).toBe(false)
+  })
+
   it('updateSettings updates settings', async () => {
     jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
@@ -223,11 +271,13 @@ describe('useGradebookSettings', () => {
         displayFilters: [DisplayFilter.SHOW_STUDENT_AVATARS],
         nameDisplayFormat: NameDisplayFormat.LAST_FIRST,
         studentsPerPage: 15,
+        scoreDisplayFormat: ScoreDisplayFormat.ICON_AND_LABEL,
       })
     })
     expect(result.current.settings.secondaryInfoDisplay).toBe(SecondaryInfoDisplay.INTEGRATION_ID)
     expect(result.current.settings.displayFilters).toEqual([DisplayFilter.SHOW_STUDENT_AVATARS])
     expect(result.current.settings.nameDisplayFormat).toBe(NameDisplayFormat.LAST_FIRST)
     expect(result.current.settings.studentsPerPage).toBe(15)
+    expect(result.current.settings.scoreDisplayFormat).toBe(ScoreDisplayFormat.ICON_AND_LABEL)
   })
 })

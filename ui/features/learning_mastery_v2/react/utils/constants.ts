@@ -58,11 +58,18 @@ export enum NameDisplayFormat {
   LAST_FIRST = 'last_first',
 }
 
+export enum ScoreDisplayFormat {
+  ICON_ONLY = 'icon_only',
+  ICON_AND_POINTS = 'icon_and_points',
+  ICON_AND_LABEL = 'icon_and_label',
+}
+
 export interface GradebookSettings {
   secondaryInfoDisplay: SecondaryInfoDisplay
   displayFilters: DisplayFilter[]
   nameDisplayFormat: NameDisplayFormat
   studentsPerPage: number
+  scoreDisplayFormat: ScoreDisplayFormat
 }
 
 export const DEFAULT_GRADEBOOK_SETTINGS: GradebookSettings = {
@@ -70,4 +77,5 @@ export const DEFAULT_GRADEBOOK_SETTINGS: GradebookSettings = {
   displayFilters: [DisplayFilter.SHOW_STUDENT_AVATARS, DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
   nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
   studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
+  scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
 }

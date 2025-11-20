@@ -29,6 +29,7 @@ class ScheduledPost < ActiveRecord::Base
   validate :post_grades_at_not_before_post_comments_at
 
   before_save :reset_ran_at_timestamps
+  after_save :enqueue_immediate_processing
 
   scope :pending_comments_posting, ->(time) { where(post_comments_ran_at: nil, post_comments_at: ..time) }
   scope :pending_grades_posting, ->(time) { where(post_grades_ran_at: nil, post_grades_at: ..time) }
@@ -38,6 +39,24 @@ class ScheduledPost < ActiveRecord::Base
 
     self.post_comments_ran_at = nil if will_save_change_to_post_comments_at?
     self.post_grades_ran_at = nil if will_save_change_to_post_grades_at?
+  end
+
+  def enqueue_immediate_processing
+    thirty_minutes_from_now = 30.minutes.from_now
+
+    # For new records, check if timestamps are immediate
+    # For updates, check if timestamps were changed and are immediate
+    if saved_change_to_id?
+      comments_immediate = post_comments_at <= thirty_minutes_from_now
+      grades_immediate = post_grades_at <= thirty_minutes_from_now
+    else
+      comments_immediate = saved_change_to_post_comments_at? && post_comments_at <= thirty_minutes_from_now
+      grades_immediate = saved_change_to_post_grades_at? && post_grades_at <= thirty_minutes_from_now
+    end
+
+    return unless comments_immediate || grades_immediate
+
+    self.class.delay.process_scheduled_posts(ids: [id])
   end
 
   def post_grades_at_not_before_post_comments_at
@@ -60,11 +79,12 @@ class ScheduledPost < ActiveRecord::Base
     post_comments_at <= max_run_time && post_comments_ran_at.nil?
   end
 
-  def self.process_scheduled_posts
-    thirty_minutes_from_now = 30.minutes.from_now
+  def self.process_scheduled_posts(ids: nil)
+    forty_minutes_from_now = 40.minutes.from_now
     run_time = Time.current
 
-    scheduled_posts_to_process = pending_comments_posting(thirty_minutes_from_now).or(pending_grades_posting(thirty_minutes_from_now))
+    scheduled_posts_to_process = pending_comments_posting(forty_minutes_from_now).or(pending_grades_posting(forty_minutes_from_now))
+    scheduled_posts_to_process = scheduled_posts_to_process.where(id: ids) if ids.present?
 
     scheduled_posts_to_process
       .preload(
@@ -89,13 +109,13 @@ class ScheduledPost < ActiveRecord::Base
         next
       end
 
-      if scheduled_post.should_post_grades?(thirty_minutes_from_now)
+      if scheduled_post.should_post_grades?(forty_minutes_from_now)
         progress = course.progresses.new(tag: "scheduled_post_assignment_grades:#{assignment.id}")
         process_assignment_posting(assignment:, progress:, run_at: scheduled_post.post_grades_at)
         scheduled_post.update(post_grades_ran_at: run_time)
       end
 
-      next unless scheduled_post.should_post_comments?(thirty_minutes_from_now)
+      next unless scheduled_post.should_post_comments?(forty_minutes_from_now)
 
       progress = course.progresses.new(tag: "scheduled_post_assignment_comments:#{assignment.id}")
       process_comments_posting(assignment:, progress:, run_at: scheduled_post.post_comments_at)

@@ -92,6 +92,18 @@ describe Accessibility::Issue::HtmlFixer do
           }
         )
       end
+
+      it "does not trigger accessibility scan when saving the fix" do
+        wiki_page
+
+        account = course.root_account
+        account.enable_feature!(:a11y_checker)
+        course.enable_feature!(:a11y_checker_eap)
+
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        html_fixer.apply_fix!
+      end
     end
   end
 
@@ -110,13 +122,15 @@ describe Accessibility::Issue::HtmlFixer do
             )
           end
 
-          it "returns an error" do
+          it "returns an error with content" do
             result = html_fixer.preview_fix(element_only: false)
 
             expect(result).to eq(
               {
                 status: :bad_request,
                 json: {
+                  content: nil,
+                  path: nil,
                   error: "Element not found for path: invalid_path"
                 },
               }
@@ -161,13 +175,15 @@ describe Accessibility::Issue::HtmlFixer do
             )
           end
 
-          it "returns an error" do
+          it "returns an error with content" do
             result = html_fixer.preview_fix(element_only: true)
 
             expect(result).to eq(
               {
                 status: :bad_request,
                 json: {
+                  content: nil,
+                  path: nil,
                   error: "Element not found for path: invalid_path"
                 },
               }

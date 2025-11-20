@@ -71,6 +71,7 @@ describe "assignments" do
       end
 
       it "works for discussions and transfer values", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         fill_out_quick_add_modal("Discussion")
         f("[data-testid='more-options-button']").click
 

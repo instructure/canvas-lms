@@ -91,17 +91,26 @@ module Api::V1::Rubric
     end
 
     rubrics_hash = {
-      ACCOUNT_LEVEL_MASTERY_SCALES: @context.root_account.feature_enabled?(:account_level_mastery_scales),
       ASSIGNMENT_ID: assignment.id,
       ASSIGNMENT_POINTS: assignment.points_possible,
-      COURSE_ID: @context.id,
-      ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
-      ai_rubrics_enabled: Rubric.ai_rubrics_enabled?(@context),
       assigned_rubric:,
       rubric_association:,
+      rubric_self_assessment_enabled: assignment.rubric_self_assessment_enabled?,
+      can_update_rubric_self_assessment: assignment.can_update_rubric_self_assessment?
+    }
+    js_env(rubrics_hash)
+    enhanced_rubrics_context_js_env
+  end
+
+  def enhanced_rubrics_context_js_env
+    return unless Rubric.enhanced_rubrics_assignments_enabled?(@context)
+
+    rubrics_hash = {
+      ACCOUNT_LEVEL_MASTERY_SCALES: @context.root_account.feature_enabled?(:account_level_mastery_scales),
+      COURSE_ID: @context.id,
+      ai_rubrics_enabled: Rubric.ai_rubrics_enabled?(@context),
       rubric_self_assessment_ff_enabled: Rubric.rubric_self_assessment_enabled?(@context),
-      rubric_self_assessment_enabled: @assignment.rubric_self_assessment_enabled?,
-      can_update_rubric_self_assessment: @assignment.can_update_rubric_self_assessment?,
+      ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
     }
     js_env(rubrics_hash)
   end

@@ -140,6 +140,15 @@ title_iv_financial_aid_report:
   root_opt_in: true
   beta: true
   shadow: true
+intelligent_insights_rsi_report:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Regular and Substantive Interaction
+  description:
+    intelligent-insights-rsi-report: Enables the Intelligent Insights - Regular and Substantive Interaction feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
 k20_improved_criteria_builder:
   state: hidden
   applies_to: Account

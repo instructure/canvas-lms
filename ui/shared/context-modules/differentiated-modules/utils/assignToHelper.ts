@@ -67,6 +67,7 @@ const getSectionOverrides = (sectionAssignees: AssigneeOption[]) => {
 
 const differentiationTagOverridePayload = (tag: AssigneeOption): AssignmentOverridePayload => ({
   group_id: tag.id.split('-')[1],
+  ...(tag.groupCategoryId && {group_category_id: tag.groupCategoryId}),
   id: tag.overrideId,
 })
 
@@ -217,8 +218,14 @@ const createSectionOverride = (
     card?.defaultOptions?.[0]?.includes(section) && card.overrideId !== everyoneCard?.overrideId
   const shouldUpdate = isDefaultSectionOverride && !isUpdatedModuleOverride
   const overrideId = shouldUpdate ? card.overrideId : undefined
+
+  // Look up the section title from initialAssigneeOptions to preserve it
+  const sectionOption = card.initialAssigneeOptions?.find(option => option.id === section)
+  const title = sectionOption?.value
+
   return {
     course_section_id: section.split('-')[1],
+    ...(title && {title}),
     ...createOverride(overrideId, card),
   }
 }
@@ -258,7 +265,9 @@ const generateGroupOverrides = (
   const groupAssignees = getAssigneesByType(card.selectedAssigneeIds, groupType)
   groupAssignees.map(group => {
     if (shouldCreateGroupOverride(card, group, hasModuleOverrides)) {
-      overrides.push(createGroupOverride(card, group, isUpdatedModuleOverride))
+      overrides.push(
+        createGroupOverride(card, group, isUpdatedModuleOverride, isDifferentiationTag),
+      )
     }
   })
   return overrides
@@ -268,12 +277,22 @@ const createGroupOverride = (
   card: ItemAssignToCardSpec,
   group: string,
   isUpdatedModuleOverride: boolean,
+  isDifferentiationTag: boolean = false,
 ): DateDetailsOverride => {
   const isDefaultGroupOverride = card.defaultOptions?.[0]?.includes(group)
   const overrideId =
     isDefaultGroupOverride && !isUpdatedModuleOverride ? card.overrideId : undefined
+
+  // Look up the group title and category from initialAssigneeOptions to preserve it
+  const groupAssignee = card.initialAssigneeOptions?.find(option => option.id === group)
+  const groupCategoryId = groupAssignee?.groupCategoryId
+  const title = groupAssignee?.value
+
   return {
     group_id: group.split('-')[1],
+    ...(groupCategoryId && {group_category_id: groupCategoryId}),
+    ...(title && {title}),
+    non_collaborative: isDifferentiationTag,
     ...createOverride(overrideId, card),
   }
 }
@@ -300,8 +319,19 @@ const createStudentOverride = (
   const {studentIds, isDefaultAdhocOverride} = parseStudentIds(card, studentAssignees)
   const overrideId =
     isDefaultAdhocOverride && !isUpdatedModuleOverride ? card.overrideId : undefined
+
+  const students = studentIds
+    .map(studentId => {
+      const studentOption = card.initialAssigneeOptions?.find(
+        opt => opt.id === `student-${studentId}`,
+      )
+      return studentOption ? {id: studentId, name: studentOption.value} : null
+    })
+    .filter((s): s is {id: string; name: string} => s !== null)
+
   return {
     student_ids: studentIds,
+    ...(students.length > 0 && {students}),
     ...createOverride(overrideId, card),
   }
 }

@@ -26,14 +26,20 @@ const I18n = createI18nScope('accessibility_checker')
 
 const ColorPickerForm: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
-    ({issue, error, onChangeValue}: FormComponentProps, ref) => {
+    ({issue, error, onChangeValue, onValidationChange}: FormComponentProps, ref) => {
       const colorPickerInputRef = useRef<HTMLInputElement | null>(null)
+      const errorMessage = I18n.t('Insufficient contrast, pick another color.')
 
       useImperativeHandle(ref, () => ({
         focus: () => {
           colorPickerInputRef.current?.focus()
         },
       }))
+
+      const handleColorChange = (value: string, isValid: boolean) => {
+        onChangeValue(value)
+        onValidationChange?.(isValid, errorMessage)
+      }
 
       return (
         <ContrastRatioForm
@@ -43,7 +49,7 @@ const ColorPickerForm: React.FC<FormComponentProps & React.RefAttributes<FormCom
           backgroundColor={issue.form.backgroundColor}
           foregroundColor={issue.form.value}
           description={issue.message || I18n.t('Invalid Contrast Ratio.')}
-          onChange={onChangeValue}
+          onChange={handleColorChange}
           inputRef={el => (colorPickerInputRef.current = el)}
           messages={error ? [{text: error, type: 'newError'}] : []}
         />

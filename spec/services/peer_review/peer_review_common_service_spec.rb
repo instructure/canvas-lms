@@ -20,6 +20,8 @@
 require "spec_helper"
 
 RSpec.describe PeerReview::PeerReviewCommonService do
+  include PeerReviewHelpers
+
   let(:course) { course_model(name: "Course with Assignment") }
   let(:parent_assignment) do
     assignment_model(
@@ -97,7 +99,7 @@ RSpec.describe PeerReview::PeerReviewCommonService do
       expect(attributes[:workflow_state]).to eq(parent_assignment.workflow_state)
 
       expect(attributes[:has_sub_assignments]).to be(false)
-      expect(attributes[:title]).to eq("#{parent_assignment.title} Peer Review")
+      expect(attributes[:title]).to eq(expected_peer_review_title(parent_assignment.title, parent_assignment.peer_review_count))
       expect(attributes[:submission_types]).to eq("online_text_entry")
       expect(attributes[:parent_assignment_id]).to eq(parent_assignment.id)
       expect(attributes[:points_possible]).to eq(peer_review_points_possible)
@@ -138,7 +140,7 @@ RSpec.describe PeerReview::PeerReviewCommonService do
         specific = service.send(:specific_attributes)
 
         expect(specific[:has_sub_assignments]).to be(false)
-        expect(specific[:title]).to eq("#{parent_assignment.title} Peer Review")
+        expect(specific[:title]).to eq(expected_peer_review_title(parent_assignment.title, parent_assignment.peer_review_count))
         expect(specific[:submission_types]).to eq("online_text_entry")
         expect(specific[:parent_assignment_id]).to eq(parent_assignment.id)
         expect(specific[:points_possible]).to eq(peer_review_points_possible)
@@ -156,7 +158,7 @@ RSpec.describe PeerReview::PeerReviewCommonService do
         specific = minimal_service.send(:specific_attributes)
 
         expect(specific[:has_sub_assignments]).to be(false)
-        expect(specific[:title]).to eq("#{parent_assignment.title} Peer Review")
+        expect(specific[:title]).to eq(expected_peer_review_title(parent_assignment.title, parent_assignment.peer_review_count))
         expect(specific[:submission_types]).to eq("online_text_entry")
         expect(specific[:parent_assignment_id]).to eq(parent_assignment.id)
         expect(specific).not_to have_key(:points_possible)
@@ -167,10 +169,21 @@ RSpec.describe PeerReview::PeerReviewCommonService do
       end
     end
 
-    it "creates peer review title from parent assignment title appended with Peer Review" do
-      expected_title = I18n.t("%{title} Peer Review", title: parent_assignment.title)
+    it "creates peer review title from parent assignment title with peer review count" do
       attributes = service.send(:specific_attributes)
-      expect(attributes[:title]).to eq(expected_title)
+      expect(attributes[:title]).to eq(expected_peer_review_title(parent_assignment.title, parent_assignment.peer_review_count))
+    end
+
+    it "creates peer review title without count when peer_review_count is nil" do
+      parent_assignment.update!(peer_review_count: nil)
+      attributes = service.send(:specific_attributes)
+      expect(attributes[:title]).to eq(expected_peer_review_title(parent_assignment.title, parent_assignment.peer_review_count))
+    end
+
+    it "creates peer review title without count when peer_review_count is zero" do
+      parent_assignment.update!(peer_review_count: 0)
+      attributes = service.send(:specific_attributes)
+      expect(attributes[:title]).to eq(expected_peer_review_title(parent_assignment.title, parent_assignment.peer_review_count))
     end
 
     context "submission types based on grading type" do
@@ -335,10 +348,12 @@ RSpec.describe PeerReview::PeerReviewCommonService do
 
     context "when inherited attributes have changed on parent" do
       before do
+        parent_assignment.skip_peer_review_sub_assignment_sync = true
         parent_assignment.update!(
           description: "Updated description",
           peer_review_count: 3
         )
+        parent_assignment.skip_peer_review_sub_assignment_sync = false
       end
 
       it "includes inherited attributes that differ from the peer review sub assignment" do
@@ -351,10 +366,12 @@ RSpec.describe PeerReview::PeerReviewCommonService do
 
     context "when both inherited and specific attributes have changed" do
       before do
+        parent_assignment.skip_peer_review_sub_assignment_sync = true
         parent_assignment.update!(
           description: "New description",
           peer_review_count: 5
         )
+        parent_assignment.skip_peer_review_sub_assignment_sync = false
       end
 
       let(:service) do
@@ -383,16 +400,15 @@ RSpec.describe PeerReview::PeerReviewCommonService do
           peer_review_sub_assignment.update!(title: "Old Incorrect Title")
         end
 
-        it "includes the correct title in the attributes to update" do
+        it "includes the correct title with count in the attributes to update" do
           attributes = service.send(:peer_review_attributes_to_update)
-          expect(attributes[:title]).to eq("Parent Assignment Peer Review")
+          expect(attributes[:title]).to eq(expected_peer_review_title(parent_assignment.title, parent_assignment.peer_review_count))
         end
       end
 
       context "when peer review sub assignment title matches expected title" do
         before do
-          expected_title = I18n.t("%{title} Peer Review", title: parent_assignment.title)
-          peer_review_sub_assignment.update!(title: expected_title)
+          peer_review_sub_assignment.update!(title: expected_peer_review_title(parent_assignment.title, parent_assignment.peer_review_count))
         end
 
         it "does not include title in the attributes to update" do
@@ -404,14 +420,29 @@ RSpec.describe PeerReview::PeerReviewCommonService do
 
       context "when parent assignment title changes" do
         before do
-          initial_title = I18n.t("%{title} Peer Review", title: parent_assignment.title)
-          peer_review_sub_assignment.update!(title: initial_title)
+          peer_review_sub_assignment.update!(title: expected_peer_review_title(parent_assignment.title, parent_assignment.peer_review_count))
+          parent_assignment.skip_peer_review_sub_assignment_sync = true
           parent_assignment.update!(title: "Updated Parent Assignment")
+          parent_assignment.skip_peer_review_sub_assignment_sync = false
         end
 
         it "includes the updated title based on new parent title" do
           attributes = service.send(:peer_review_attributes_to_update)
-          expect(attributes[:title]).to eq("Updated Parent Assignment Peer Review")
+          expect(attributes[:title]).to eq(expected_peer_review_title("Updated Parent Assignment", parent_assignment.peer_review_count))
+        end
+      end
+
+      context "when parent assignment peer_review_count changes" do
+        before do
+          peer_review_sub_assignment.update!(title: expected_peer_review_title(parent_assignment.title, parent_assignment.peer_review_count), peer_review_count: parent_assignment.peer_review_count)
+          parent_assignment.skip_peer_review_sub_assignment_sync = true
+          parent_assignment.update!(peer_review_count: 5)
+          parent_assignment.skip_peer_review_sub_assignment_sync = false
+        end
+
+        it "includes the updated title with new count" do
+          attributes = service.send(:peer_review_attributes_to_update)
+          expect(attributes[:title]).to eq(expected_peer_review_title(parent_assignment.title, 5))
         end
       end
     end

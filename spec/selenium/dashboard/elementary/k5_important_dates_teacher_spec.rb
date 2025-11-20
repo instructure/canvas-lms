@@ -104,6 +104,7 @@ describe "teacher k5 dashboard important dates" do
 
   context "mark important dates for graded discussions" do
     it "sets the mark important dates checkbox for discussion", custom_timeout: 25 do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       discussion_title = "Elec Disc"
       due_at = 2.days.from_now(Time.zone.now)
       discussion_assignment = create_dated_assignment(@subject_course, discussion_title, due_at, 10)

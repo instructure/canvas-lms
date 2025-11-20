@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React, {useCallback, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
 import {Alert} from '@instructure/ui-alerts'
@@ -24,10 +25,15 @@ import {IconNoLine} from '@instructure/ui-icons'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {RenderApiResult} from '../../../../common/lib/apiResult/RenderApiResult'
 import type {AccountId} from '../../../model/AccountId'
 import type {LtiRegistrationId} from '../../../model/LtiRegistrationId'
-import {useRegistrationHistory, HISTORY_DISPLAY_LIMIT} from './useHistory'
+import {useRegistrationHistory} from './useHistory'
+import {HistoryDiffModal} from './HistoryDiffModal'
+import {LtiHistoryEntryWithDiff} from './differ'
+import {RenderInfiniteApiResult} from '../../../../common/lib/apiResult/RenderInfiniteApiResult'
+import {Button} from '@instructure/ui-buttons'
+import {Spinner} from '@instructure/ui-spinner'
+import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -36,13 +42,54 @@ export type RegistrationHistoryViewProps = {
   registrationId: LtiRegistrationId
 }
 
+/**
+ * Generate a summary of affected fields for display in the table
+ */
+const getAffectedFieldsSummary = (diff: LtiHistoryEntryWithDiff): string => {
+  if ('contextControls' in diff) {
+    return I18n.t('Availability & Exceptions')
+  }
+
+  const categories: string[] = []
+  if (diff.internalConfig?.launchSettings) categories.push(I18n.t('Launch Settings'))
+  if (diff.internalConfig?.permissions) categories.push(I18n.t('Permissions'))
+  if (diff.internalConfig?.privacyLevel) categories.push(I18n.t('Privacy Level'))
+  if (diff.internalConfig?.placements) categories.push(I18n.t('Placements'))
+  if (diff.internalConfig?.naming) categories.push(I18n.t('Naming'))
+  if (diff.internalConfig?.icons) categories.push(I18n.t('Icons'))
+
+  if (categories.length === 0) {
+    return I18n.t('Unknown')
+  }
+
+  const formatter = new Intl.ListFormat(I18n.currentLocale(), {
+    style: 'narrow',
+    type: 'conjunction',
+  })
+  return formatter.format(categories)
+}
+
 export const RegistrationHistoryView = (props: RegistrationHistoryViewProps) => {
   const historyQuery = useRegistrationHistory(props.accountId, props.registrationId)
+  const [selectedEntry, setSelectedEntry] = useState<LtiHistoryEntryWithDiff | null>(null)
+
+  const handleOpenModal = useCallback(
+    (entry: LtiHistoryEntryWithDiff) => {
+      setSelectedEntry(entry)
+    },
+    [setSelectedEntry],
+  )
+
+  const handleCloseModal = useCallback(() => {
+    setSelectedEntry(null)
+  }, [setSelectedEntry])
 
   return (
-    <RenderApiResult
+    <RenderInfiniteApiResult
       query={historyQuery}
-      onSuccess={({data: history}) => {
+      onSuccess={({pages, fetchingMore, hasNextPage}) => {
+        const history = pages.flat()
+
         if (history.length === 0) {
           return (
             <Flex direction="column" alignItems="center" padding="large 0">
@@ -64,53 +111,46 @@ export const RegistrationHistoryView = (props: RegistrationHistoryViewProps) => 
         } else {
           return (
             <>
+              <HistoryDiffModal
+                entry={selectedEntry}
+                isOpen={selectedEntry !== null}
+                onClose={handleCloseModal}
+              />
               <Table caption={I18n.t('Configuration Update History')}>
                 <Table.Head>
                   <Table.Row>
-                    <Table.ColHeader id="Status" width="25%">
+                    <Table.ColHeader id="Status" width="20%">
                       {I18n.t('Status')}
                     </Table.ColHeader>
-                    <Table.ColHeader id="UpdatedOn" width="25%">
+                    <Table.ColHeader id="UpdatedOn" width="20%">
                       {I18n.t('Updated On')}
                     </Table.ColHeader>
-                    <Table.ColHeader id="UpdatedBy" width="50%">
+                    <Table.ColHeader id="UpdatedBy" width="30%">
                       {I18n.t('Updated By')}
+                    </Table.ColHeader>
+                    <Table.ColHeader id="AffectedFields" width="30%">
+                      {I18n.t('Affected Fields')}
                     </Table.ColHeader>
                   </Table.Row>
                 </Table.Head>
                 <Table.Body>
-                  {history.slice(0, HISTORY_DISPLAY_LIMIT).map((entry, index) => {
-                    const status = I18n.t('Updated')
-                    const createdAt = entry.created_at
-                    const createdBy =
-                      entry.created_by === 'Instructure'
-                        ? I18n.t('Instructure')
-                        : entry.created_by.name
-
-                    return (
-                      <Table.Row key={index}>
-                        <Table.Cell>{status}</Table.Cell>
-                        <Table.Cell>{tz.format(createdAt, 'date.formats.full')}</Table.Cell>
-                        <Table.Cell>{createdBy}</Table.Cell>
-                      </Table.Row>
-                    )
-                  })}
+                  {history.map(entry => (
+                    <TableRow
+                      key={entry.id}
+                      entry={entry}
+                      onAffectedFieldsClick={handleOpenModal}
+                    />
+                  ))}
                 </Table.Body>
               </Table>
-              <Flex direction="row" textAlign="center" padding="small 0 0 0">
-                <Flex.Item shouldGrow={true}>
-                  <Text fontStyle="italic" size="small">
-                    {history.length > HISTORY_DISPLAY_LIMIT
-                      ? I18n.t('Showing the most recent %{count} updates.', {
-                          count: HISTORY_DISPLAY_LIMIT,
-                        }) + ' '
-                      : undefined}
-                    {I18n.t(
-                      `Not all changes are shown here. To see which fields are tracked, view the documentation`,
-                    )}
-                  </Text>
-                </Flex.Item>
-              </Flex>
+              {hasNextPage && !fetchingMore && (
+                <Button onClick={() => historyQuery.fetchNextPage()}>{I18n.t('Load More')}</Button>
+              )}
+              {fetchingMore && (
+                <Flex direction="column" alignItems="center" padding="large 0">
+                  <Spinner renderTitle={I18n.t('Loading')} />
+                </Flex>
+              )}
             </>
           )
         }
@@ -118,3 +158,31 @@ export const RegistrationHistoryView = (props: RegistrationHistoryViewProps) => 
     />
   )
 }
+
+const TableRow = React.memo(
+  ({
+    entry,
+    onAffectedFieldsClick,
+  }: {
+    entry: LtiHistoryEntryWithDiff
+    onAffectedFieldsClick: (entry: LtiHistoryEntryWithDiff) => void
+  }) => {
+    const status = I18n.t('Updated')
+    const createdAt = entry.created_at
+    const createdBy =
+      entry.created_by === 'Instructure' ? I18n.t('Instructure') : entry.created_by.name
+
+    const affectedFields = getAffectedFieldsSummary(entry)
+
+    return (
+      <Table.Row>
+        <Table.Cell>{status}</Table.Cell>
+        <Table.Cell>{tz.format(createdAt, 'date.formats.full')}</Table.Cell>
+        <Table.Cell>{createdBy}</Table.Cell>
+        <Table.Cell>
+          <Link onClick={() => onAffectedFieldsClick(entry)}>{affectedFields}</Link>
+        </Table.Cell>
+      </Table.Row>
+    )
+  },
+)

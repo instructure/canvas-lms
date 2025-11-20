@@ -491,9 +491,29 @@ RSpec.describe PeerReview::DateOverriderService do
     let(:existing_section2) { add_section("Existing Section 2", course:) }
     let(:existing_section3) { add_section("Existing Section 3", course:) }
 
-    let(:existing_override1) { assignment_override_model(assignment: peer_review_sub_assignment, set: existing_section1) }
-    let(:existing_override2) { assignment_override_model(assignment: peer_review_sub_assignment, set: existing_section2) }
-    let(:existing_override3) { assignment_override_model(assignment: peer_review_sub_assignment, set: existing_section3) }
+    let(:parent_existing_override1) do
+      assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: existing_section1)
+    end
+
+    let(:parent_existing_override2) do
+      assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: existing_section2)
+    end
+
+    let(:parent_existing_override3) do
+      assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: existing_section3)
+    end
+
+    let(:existing_override1) do
+      assignment_override_model(assignment: peer_review_sub_assignment, set: existing_section1, parent_override: parent_existing_override1)
+    end
+
+    let(:existing_override2) do
+      assignment_override_model(assignment: peer_review_sub_assignment, set: existing_section2, parent_override: parent_existing_override2)
+    end
+
+    let(:existing_override3) do
+      assignment_override_model(assignment: peer_review_sub_assignment, set: existing_section3, parent_override: parent_existing_override3)
+    end
 
     let(:update_override1) do
       {
@@ -686,9 +706,29 @@ RSpec.describe PeerReview::DateOverriderService do
     let(:destroy_section2) { add_section("Destroy Section 2", course:) }
     let(:destroy_section3) { add_section("Destroy Section 3", course:) }
 
-    let(:override1) { assignment_override_model(assignment: peer_review_sub_assignment, set: destroy_section1) }
-    let(:override2) { assignment_override_model(assignment: peer_review_sub_assignment, set: destroy_section2) }
-    let(:override3) { assignment_override_model(assignment: peer_review_sub_assignment, set: destroy_section3) }
+    let(:parent_destroy_override1) do
+      assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: destroy_section1)
+    end
+
+    let(:parent_destroy_override2) do
+      assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: destroy_section2)
+    end
+
+    let(:parent_destroy_override3) do
+      assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: destroy_section3)
+    end
+
+    let(:override1) do
+      assignment_override_model(assignment: peer_review_sub_assignment, set: destroy_section1, parent_override: parent_destroy_override1)
+    end
+
+    let(:override2) do
+      assignment_override_model(assignment: peer_review_sub_assignment, set: destroy_section2, parent_override: parent_destroy_override2)
+    end
+
+    let(:override3) do
+      assignment_override_model(assignment: peer_review_sub_assignment, set: destroy_section3, parent_override: parent_destroy_override3)
+    end
 
     before do
       override1

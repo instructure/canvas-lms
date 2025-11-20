@@ -3494,6 +3494,30 @@ describe CoursesController, type: :request do
                         { controller: "courses", action: "students", course_id: @course.id.to_s, format: "json" })
         expect(json.count).to eq num
       end
+
+      it "respects section visibility restrictions for students" do
+        course_with_teacher(active_all: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+
+        student1 = user_factory(name: "Student 1")
+        student2 = user_factory(name: "Student 2")
+
+        enrollment1 = @course.enroll_student(student1, section: section1, enrollment_state: "active")
+        enrollment1.update!(limit_privileges_to_course_section: true)
+
+        enrollment2 = @course.enroll_student(student2, section: section2, enrollment_state: "active")
+        enrollment2.update!(limit_privileges_to_course_section: true)
+
+        @user = student1
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/students.json",
+                        { controller: "courses", action: "students", course_id: @course.id.to_s, format: "json" })
+
+        expect(json.length).to eq 1
+        expect(json[0]["id"]).to eq student1.id
+        expect(json.pluck("id")).not_to include(student2.id)
+      end
     end
 
     describe "users" do
@@ -4553,6 +4577,7 @@ describe CoursesController, type: :request do
           outcomes
           quizzes
           modules
+          ai_experiences
           settings
           rubrics
         ]

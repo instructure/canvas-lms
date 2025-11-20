@@ -66,6 +66,7 @@ describe('StudentCellPopover', () => {
       outcomeRollups: [
         {
           outcomeId: '1',
+          score: 2,
           rating: {
             color: 'green',
             description: 'Exceeds',
@@ -75,6 +76,7 @@ describe('StudentCellPopover', () => {
         },
         {
           outcomeId: '2',
+          score: 5,
           rating: {
             color: 'green',
             description: 'Mastery',
@@ -615,6 +617,7 @@ describe('StudentCellPopover', () => {
           outcomeRollups: [
             {
               outcomeId: '1',
+              score: 2,
               rating: {points: 5, color: 'green'},
             },
           ],
@@ -638,10 +641,12 @@ describe('StudentCellPopover', () => {
           outcomeRollups: [
             {
               outcomeId: '1',
+              score: 2,
               rating: {points: 10, color: 'green'}, // 10 - 5 = +5 (exceeds)
             },
             {
               outcomeId: '2',
+              score: 2,
               rating: {points: 3, color: 'green'}, // 3 - 3 = 0 (mastery)
             },
           ],
@@ -664,6 +669,7 @@ describe('StudentCellPopover', () => {
           outcomeRollups: [
             {
               outcomeId: '1',
+              score: 2,
               rating: {points: 4.5, color: 'yellow'}, // 4.5 - 5 = -0.5 (near mastery)
             },
           ],
@@ -684,6 +690,7 @@ describe('StudentCellPopover', () => {
           outcomeRollups: [
             {
               outcomeId: '1',
+              score: 2,
               rating: {points: 2, color: 'red'}, // 2 - 5 = -3 (remediation)
             },
           ],
@@ -704,6 +711,7 @@ describe('StudentCellPopover', () => {
           outcomeRollups: [
             {
               outcomeId: '1',
+              score: 2,
               rating: {points: 5, color: 'green'},
             },
           ],
@@ -724,10 +732,12 @@ describe('StudentCellPopover', () => {
           outcomeRollups: [
             {
               outcomeId: '1',
+              score: 2,
               rating: {points: 5, color: 'green'},
             },
             {
               outcomeId: '999', // Non-existent outcome
+              score: 2,
               rating: {points: 10, color: 'green'},
             },
           ],
@@ -749,6 +759,7 @@ describe('StudentCellPopover', () => {
           outcomeRollups: [
             {
               outcomeId: '1',
+              score: 2,
               rating: {points: 10, color: 'green'},
             },
           ],
@@ -770,14 +781,17 @@ describe('StudentCellPopover', () => {
           outcomeRollups: [
             {
               outcomeId: '1',
+              score: 2,
               rating: {points: 10, color: 'green'}, // +5 exceeds
             },
             {
               outcomeId: '2',
+              score: 2,
               rating: {points: 3, color: 'green'}, // 0 mastery
             },
             {
               outcomeId: '3',
+              score: 2,
               rating: {points: 3, color: 'yellow'}, // 3 - 4 = -1 (near mastery)
             },
           ],
@@ -802,6 +816,7 @@ describe('StudentCellPopover', () => {
           outcomeRollups: [
             {
               outcomeId: '1',
+              score: 2,
               rating: {points: 10, color: 'green'}, // +5 exceeds
             },
           ],

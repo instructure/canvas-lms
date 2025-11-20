@@ -158,7 +158,7 @@ class GradeSummaryPresenter
                    :quiz,
                    :wiki_page,
                    { external_tool_tag: :content },
-                   { sub_assignments: %i[context discussion_topic quiz] }
+                   { sub_assignments: [{ context: :active_course_sections }, :discussion_topic, :quiz] }
                  ]
                else
                  [:assignment_overrides, :post_policy]

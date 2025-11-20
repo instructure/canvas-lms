@@ -76,7 +76,7 @@ export function useUtidMatching(
         const response = await doFetchApi<UtidLookupResponse>({
           path: `/api/v1/accounts/${id}/developer_keys/lookup_utids`,
           method: 'GET',
-          params: {redirect_uris: uris, sources: ['partner_provided']},
+          params: {redirect_uris: uris, sources: ['partner_provided', 'manual']},
         })
         return response.json?.api_registrations ?? []
       },

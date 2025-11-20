@@ -76,7 +76,8 @@ describe CareerController do
             horizon_learning_library: false,
             horizon_course_navigation: false,
             horizon_course_redesign: false,
-            horizon_course_index_page: false
+            horizon_course_index_page: false,
+            horizon_chart_view: false
           )
         end
 

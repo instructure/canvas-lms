@@ -21,7 +21,7 @@ module Lti
   class AssetProcessorController < ApplicationController
     before_action { require_feature_enabled :lti_asset_processor }
     before_action :require_user
-    before_action :require_asset_processor
+    before_action :require_asset_processor, except: [:resubmit_discussion_notices_all]
     before_action :require_context
     before_action :require_access_to_context
     before_action :require_submission
@@ -47,8 +47,48 @@ module Lti
              status: :not_found
     end
 
+    def resubmit_discussion_notices_all
+      topic = assignment.discussion_topic
+      return render json: { error: "Not a discussion assignment" }, status: :unprocessable_entity unless topic
+      return render status: :forbidden, plain: "invalid_request" unless context.grants_any_right?(@current_user, session, :manage_grades)
+
+      entry_ids = topic.discussion_entries.active.where(user_id: student.id).pluck(:id)
+      return head :no_content if entry_ids.empty?
+
+      submission = assignment.submission_for_student(student)
+
+      GuardRail.activate(:secondary) do
+        DiscussionEntryVersion
+          .where(discussion_entry_id: entry_ids)
+          .select("DISTINCT ON (discussion_entry_id) discussion_entry_versions.*")
+          .order(:discussion_entry_id, version: :desc)
+          .preload(:discussion_entry, :user, :root_account)
+          .find_in_batches(batch_size: 100) do |versions|
+          Lti::AssetProcessorDiscussionNotifier.delay_if_production.notify_asset_processors_of_discussion(
+            assignment:,
+            submission:,
+            discussion_entry_versions: versions,
+            contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
+            current_user: student,
+            asset_processor: nil,
+            tool_id: nil
+          )
+        end
+      end
+
+      head :no_content
+    end
+
+    def assignment_id
+      params[:assignment_id] || asset_processor&.assignment_id
+    end
+
     def assignment
-      asset_processor.assignment
+      @assignment ||= if params[:assignment_id]
+                        Assignment.find(params[:assignment_id])
+                      else
+                        asset_processor.assignment
+                      end
     end
 
     def asset_processor_id

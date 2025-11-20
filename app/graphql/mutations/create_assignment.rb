@@ -53,7 +53,7 @@ class Mutations::CreateAssignment < Mutations::AssignmentBase::Mutation
       submittable.assignment = @working_assignment
     end
 
-    api_proxy = ApiProxy.new(context[:request], @working_assignment, context[:session], current_user)
+    api_proxy = ApiProxy.new(context[:request], @working_assignment, context[:session], current_user, in_app: context[:in_app])
 
     validate_for_checkpoints(input_hash)
     if input_hash[:for_checkpoints]

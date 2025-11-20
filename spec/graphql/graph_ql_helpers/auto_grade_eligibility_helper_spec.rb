@@ -216,7 +216,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
 
         bad_attachment = instance_double(Attachment, mimetype: "application/pdf")
         allow(submission).to receive_messages(attachments: [bad_attachment], extract_text_from_upload?: true, attachment_contains_images: true, word_count: 50)
-        allow(submission).to receive(:contains_images).and_return(true)
+        allow(submission).to receive(:read_extracted_text).and_return({ contains_images: true })
 
         issues = described_class.validate_submission(submission:)
         expect(issues).to eq({ level: "warning", message: "Please note that AI Grading Assistance for this submission will ignore any embedded images and only evaluate the text portion of the submission." })
@@ -238,6 +238,60 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
 
         issues = described_class.validate_submission(submission:)
         expect(issues).to eq({ level: "error", message: "No essay submission found." })
+      end
+    end
+
+    context "when submission is an upload with no cached extracted text" do
+      it "does not return the images warning (no issues)" do
+        Account.site_admin.enable_feature!(:grading_assistance_file_uploads)
+
+        submission = submission_model(
+          user: @student,
+          assignment:,
+          body: "This is a valid essay.",
+          submission_type: "online_text_entry",
+          attachments: []
+        )
+
+        attachment = instance_double(Attachment, mimetype: "application/pdf")
+        allow(submission).to receive_messages(
+          attachments: [attachment],
+          extract_text_from_upload?: true
+        )
+
+        allow(submission).to receive(:read_extracted_text).and_return({ text: "", contains_images: false })
+
+        issues = described_class.validate_submission(submission:)
+        expect(issues).to be_nil
+      end
+    end
+
+    context "when submission is an upload with cached extracted text indicating images" do
+      it "returns a warning about embedded images" do
+        Account.site_admin.enable_feature!(:grading_assistance_file_uploads)
+
+        submission = submission_model(
+          user: @student,
+          assignment:,
+          submission_type: "online_upload",
+          attachments: []
+        )
+
+        attachment = instance_double(Attachment, mimetype: "application/pdf")
+        allow(submission).to receive_messages(
+          attachments: [attachment],
+          extract_text_from_upload?: true
+        )
+
+        allow(submission).to receive(:read_extracted_text).and_return({ text: "Some text", contains_images: true })
+
+        issues = described_class.validate_submission(submission:)
+        expect(issues).to eq(
+          {
+            level: "warning",
+            message: "Please note that AI Grading Assistance for this submission will ignore any embedded images and only evaluate the text portion of the submission."
+          }
+        )
       end
     end
   end

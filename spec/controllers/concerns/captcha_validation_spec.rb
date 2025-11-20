@@ -27,15 +27,15 @@ describe CaptchaValidation do
   end
 
   before do
-    allow(DynamicSettings).to receive(:find).and_return(
-      DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => "test_key" })
-    )
+    allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return({ server_key: "test_key" })
+    allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :server_key).and_return("test_key")
     controller.instance_variable_set(:@domain_root_account, root_account)
   end
 
   describe "#validate_captcha" do
     it "returns nil when captcha key is not configured" do
-      allow(DynamicSettings).to receive(:find).and_return(DynamicSettings::FallbackProxy.new({}))
+      allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return(nil)
+      allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :server_key).and_return(nil)
       expect(controller.send(:validate_captcha)).to be_nil
     end
 

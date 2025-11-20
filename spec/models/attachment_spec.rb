@@ -1257,10 +1257,10 @@ describe Attachment do
       @a2 = attachment_with_context(@course, display_name: "a2")
 
       data1 = { "name" => "Hi", "question_text" => "hey look <img src='/courses/#{@course.id}/files/#{@a1.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-      @aquestion1 = @bank.assessment_questions.create!(question_data: data1, current_user: @teacher)
+      @aquestion1 = @bank.assessment_questions.create!(question_data: data1, updating_user: @teacher)
       aq_att1 = @aquestion1.attachments.first
       data2 = { "name" => "Hi", "question_text" => "hey look <img src='/courses/#{@course.id}/files/#{@a2.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-      @aquestion2 = @bank.assessment_questions.create!(question_data: data2, current_user: @teacher)
+      @aquestion2 = @bank.assessment_questions.create!(question_data: data2, updating_user: @teacher)
       aq_att2 = @aquestion2.attachments.first
 
       quiz = @course.quizzes.create!
@@ -3316,6 +3316,26 @@ describe Attachment do
         expect(Canvas::Errors).to receive(:capture_exception).with(:word_count, an_instance_of(Timeout::Error), :info)
         @attachment.calculate_words
       end
+
+      it "sends metrics" do
+        attachment_model(filename: "test.txt", uploaded_data: fixture_file_upload("amazing_file.txt", "text/plain"))
+        expect(InstStatsd::Statsd).to receive(:distributed_increment).with("attachment.update_word_count", tags: { source: "Canvas" })
+        @attachment.update_word_count
+      end
+
+      context "when word_count is already set" do
+        it "skips counting the words" do
+          attachment_model(filename: "test.txt", uploaded_data: fixture_file_upload("amazing_file.txt", "text/plain"), word_count: 1234)
+          @attachment.update_word_count
+          expect(@attachment.word_count).to eq 1234
+        end
+
+        it "sends metrics" do
+          attachment_model(filename: "test.txt", uploaded_data: fixture_file_upload("amazing_file.txt", "text/plain"), word_count: 1234)
+          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("attachment.update_word_count", tags: { source: "DocViewer" })
+          @attachment.update_word_count
+        end
+      end
     end
   end
 
@@ -3484,6 +3504,117 @@ describe Attachment do
     end
   end
 
+  describe "#should_index_in_pine?" do
+    let(:horizon_course) do
+      course = Course.create!
+      course.update!(horizon_course: true)
+      course.account.enable_feature!(:horizon_course_setting)
+      course.account.enable_feature!(:horizon_learning_object_ingestion_on_change)
+      course
+    end
+    let(:regular_course) { Course.create! }
+    let(:pdf_attachment) do
+      attachment_model(
+        context: horizon_course,
+        content_type: "application/pdf",
+        filename: "test.pdf",
+        file_state: "available"
+      )
+    end
+    let(:pine_client_mock) { double("PineClient") }
+
+    before do
+      allow(pine_client_mock).to receive_messages(
+        enabled?: true,
+        allowed_attachment_content_types: ["application/pdf", "text/plain"]
+      )
+      stub_const("PineClient", pine_client_mock)
+    end
+
+    context "returns true when" do
+      it "attachment is available in a horizon course with allowed content type" do
+        expect(pdf_attachment.should_index_in_pine?).to be true
+      end
+    end
+
+    context "returns false when" do
+      it "context is not a Course" do
+        user = User.create!
+        user_attachment = attachment_model(context: user, content_type: "application/pdf")
+        expect(user_attachment.should_index_in_pine?).to be false
+      end
+
+      it "course is not a horizon course" do
+        regular_attachment = attachment_model(
+          context: regular_course,
+          content_type: "application/pdf",
+          file_state: "available"
+        )
+        expect(regular_attachment.should_index_in_pine?).to be false
+      end
+
+      it "PineClient is disabled" do
+        allow(PineClient).to receive(:enabled?).and_return(false)
+        expect(pdf_attachment.should_index_in_pine?).to be false
+      end
+
+      it "file_state is not available" do
+        pdf_attachment.file_state = "deleted"
+        expect(pdf_attachment.should_index_in_pine?).to be false
+      end
+
+      it "content_type is not allowed" do
+        image_attachment = attachment_model(
+          context: horizon_course,
+          content_type: "image/jpeg",
+          file_state: "available"
+        )
+        expect(image_attachment.should_index_in_pine?).to be false
+      end
+
+      it "feature flag is not enabled" do
+        horizon_course.account.disable_feature!(:horizon_learning_object_ingestion_on_change)
+        expect(pdf_attachment.should_index_in_pine?).to be false
+      end
+    end
+  end
+
+  describe "#index_in_pine" do
+    let(:horizon_course) do
+      course = Course.create!
+      course.update!(horizon_course: true)
+      course.account.enable_feature!(:horizon_course_setting)
+      course
+    end
+    let(:pdf_attachment) do
+      attachment_model(
+        context: horizon_course,
+        content_type: "application/pdf",
+        filename: "test.pdf"
+      )
+    end
+    let(:pine_client_mock) { double("PineClient") }
+
+    before do
+      allow(pine_client_mock).to receive_messages(
+        enabled?: true,
+        allowed_attachment_content_types: ["application/pdf", "text/plain"]
+      )
+      stub_const("PineClient", pine_client_mock)
+    end
+
+    it "calls delay with correct parameters and ingest_to_pine" do
+      expect(pdf_attachment).to receive(:delay).with(
+        n_strand: ["horizon_file_ingestion", pdf_attachment.context.global_root_account_id],
+        singleton: "horizon_file_ingestion:#{pdf_attachment.context.global_id}:#{pdf_attachment.id}",
+        max_attempts: 3
+      ).and_return(pdf_attachment)
+      expect(pdf_attachment).to receive(:ingest_to_pine)
+
+      pdf_attachment.index_in_pine
+    end
+  end
+
   describe "#ingest_to_pine" do
     let(:course) { Course.create! }
     let(:public_download_url) { "https://s3.amazonaws.com/bucket/file.pdf" }
@@ -3542,6 +3673,269 @@ describe Attachment do
       expect(pine_client_mock).not_to receive(:ingest_url)
 
       user_attachment.ingest_to_pine
+    end
+  end
+
+  describe "Pine deletion" do
+    let(:horizon_course) do
+      course = Course.create!
+      course.update!(horizon_course: true)
+      course.account.enable_feature!(:horizon_course_setting)
+      course.account.enable_feature!(:horizon_learning_object_ingestion_on_change)
+      course
+    end
+    let(:pdf_attachment) do
+      attachment_model(
+        context: horizon_course,
+        content_type: "application/pdf",
+        filename: "test.pdf",
+        file_state: "available"
+      )
+    end
+    let(:pine_client_mock) { double("PineClient") }
+    let(:null_user) { Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil) }
+
+    before do
+      allow(pine_client_mock).to receive_messages(
+        enabled?: true,
+        allowed_attachment_content_types: ["application/pdf", "text/plain"],
+        delete_document: true
+      )
+      stub_const("PineClient", pine_client_mock)
+    end
+
+    describe "#delete_from_pine" do
+      it "calls delay with correct parameters and delete_from_pine_job" do
+        expect(pdf_attachment).to receive(:delay).with(
+          n_strand: ["horizon_file_deletion", pdf_attachment.context.global_root_account_id],
+          singleton: "horizon_file_deletion:#{pdf_attachment.context.global_id}:#{pdf_attachment.id}",
+          max_attempts: 3
+        ).and_return(pdf_attachment)
+        expect(pdf_attachment).to receive(:delete_from_pine_job)
+
+        pdf_attachment.delete_from_pine
+      end
+
+      it "does not raise error if context is not a Course" do
+        user = User.create!
+        user_attachment = attachment_model(context: user)
+
+        expect { user_attachment.delete_from_pine }.not_to raise_error
+      end
+
+      it "logs error but does not raise if delay fails" do
+        allow(pdf_attachment).to receive(:delay).and_raise(StandardError.new("Delayed job error"))
+
+        expect(Rails.logger).to receive(:error).with(/Failed to queue Pine deletion for attachment/)
+        expect { pdf_attachment.delete_from_pine }.not_to raise_error
+      end
+    end
+
+    describe "#delete_from_pine_job" do
+      it "calls PineClient.delete_document with correct parameters" do
+        expect(pine_client_mock).to receive(:delete_document) do |**args|
+          expect(args[:source]).to eq("canvas")
+          expect(args[:source_id]).to eq(pdf_attachment.id.to_s)
+          expect(args[:source_type]).to eq("attachment")
+          expect(args[:feature_slug]).to eq("horizon-content-ingestion")
+          expect(args[:root_account_uuid]).to eq(horizon_course.root_account.uuid)
+          expect(args[:current_user]).to be_a(Struct)
+          expect(args[:current_user].uuid).to be_nil
+          expect(args[:current_user].global_id).to be_nil
+          true
+        end
+
+        pdf_attachment.delete_from_pine_job(null_user)
+      end
+
+      it "uses system deletion user with nil uuid and global_id" do
+        expect(pine_client_mock).to receive(:delete_document) do |**args|
+          user = args[:current_user]
+          expect(user.uuid).to be_nil
+          expect(user.global_id).to be_nil
+          true
+        end
+
+        pdf_attachment.delete_from_pine_job(null_user)
+      end
+
+      it "logs error and re-raises on failure" do
+        expect(pine_client_mock).to receive(:delete_document).and_raise(StandardError.new("API Error"))
+
+        expect(Rails.logger).to receive(:error).with(/Failed to delete attachment/)
+        expect { pdf_attachment.delete_from_pine_job(null_user) }.to raise_error(StandardError, "API Error")
+      end
+    end
+
+    describe "deletion triggers Pine cleanup" do
+      it "calls delete_from_pine when attachment is destroyed" do
+        expect(pdf_attachment).to receive(:delete_from_pine)
+        pdf_attachment.destroy
+      end
+
+      it "does not call delete_from_pine for non-eligible attachments" do
+        user = User.create!
+        user_attachment = attachment_model(context: user, content_type: "application/pdf")
+
+        expect(user_attachment).not_to receive(:delete_from_pine)
+        user_attachment.destroy
+      end
+
+      it "does not call delete_from_pine when PineClient is disabled" do
+        allow(PineClient).to receive(:enabled?).and_return(false)
+
+        expect(pdf_attachment).not_to receive(:delete_from_pine)
+        pdf_attachment.destroy
+      end
+
+      it "only deletes from Pine if file_state was available before deletion" do
+        # Create an attachment that's already deleted
+        deleted_attachment = attachment_model(
+          context: horizon_course,
+          content_type: "application/pdf",
+          filename: "deleted.pdf",
+          file_state: "deleted"
+        )
+
+        # Create an attachment that's hidden
+        hidden_attachment = attachment_model(
+          context: horizon_course,
+          content_type: "application/pdf",
+          filename: "hidden.pdf",
+          file_state: "hidden"
+        )
+
+        # Only the available attachment should trigger Pine deletion
+        expect(pdf_attachment).to receive(:delete_from_pine)
+        expect(deleted_attachment).not_to receive(:delete_from_pine)
+        expect(hidden_attachment).not_to receive(:delete_from_pine)
+
+        Attachment.batch_destroy([pdf_attachment, deleted_attachment, hidden_attachment])
+      end
+    end
+  end
+
+  describe "#can_unpublish?" do
+    context "published file" do
+      it "returns true for basic published file" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available"
+        )
+        expect(attachment.can_unpublish?).to be true
+      end
+
+      it "returns true for file with inherit visibility" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          visibility_level: "inherit"
+        )
+        expect(attachment.can_unpublish?).to be true
+      end
+    end
+
+    context "file with complex permissions" do
+      it "returns false for hidden file" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "hidden"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for public file" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "public"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with lock_at date" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          lock_at: 1.day.from_now
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with unlock_at date" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          unlock_at: 1.day.ago
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with context visibility" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          visibility_level: "context"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with institution visibility" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          visibility_level: "institution"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with public visibility" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          visibility_level: "public"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+    end
+
+    context "already unpublished file" do
+      it "returns false for locked file" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: true,
+          file_state: "available"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
     end
   end
 end

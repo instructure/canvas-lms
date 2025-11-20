@@ -106,9 +106,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_discussion_entries_read_state, mutation: Mutations::UpdateDiscussionEntriesReadState
   field :update_discussion_entry, mutation: Mutations::UpdateDiscussionEntry
   field :update_discussion_entry_participant, mutation: Mutations::UpdateDiscussionEntryParticipant
-  field :update_discussion_expanded, mutation: Mutations::UpdateDiscussionExpanded
   field :update_discussion_read_state, mutation: Mutations::UpdateDiscussionReadState
-  field :update_discussion_sort_order, mutation: Mutations::UpdateDiscussionSortOrder
   field :update_discussion_thread_read_state, mutation: Mutations::UpdateDiscussionThreadReadState
   field :update_discussion_topic, mutation: Mutations::UpdateDiscussionTopic
   field :update_discussion_topic_participant, mutation: Mutations::UpdateDiscussionTopicParticipant
@@ -130,6 +128,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_submission_student_entered_score, mutation: Mutations::UpdateSubmissionStudentEnteredScore
   field :update_submissions_read_state, mutation: Mutations::UpdateSubmissionsReadState
   field :update_user_discussions_splitscreen_view, mutation: Mutations::UpdateUserDiscussionsSplitscreenView
+  field :update_widget_dashboard_config, mutation: Mutations::UpdateWidgetDashboardConfig
   field :upsert_custom_grade_status, mutation: Mutations::UpsertCustomGradeStatus
   field :upsert_standard_grade_status, mutation: Mutations::UpsertStandardGradeStatus
 

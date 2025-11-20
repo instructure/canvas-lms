@@ -20,6 +20,7 @@
 class Accessibility::ResourceScannerService < ApplicationService
   include Accessibility::Issue::ContentChecker
 
+  SCAN_TAG = "resource_accessibility_scan"
   MAX_HTML_SIZE = 125.kilobytes
   MAX_PDF_SIZE = 5.megabytes
 
@@ -31,9 +32,24 @@ class Accessibility::ResourceScannerService < ApplicationService
   def call
     return if scan_already_queued_or_in_progress?
 
+    scan = first_or_initialize_scan
+    delay(
+      n_strand: [SCAN_TAG, @resource.course.account.global_id],
+      singleton: "#{SCAN_TAG}_#{@resource.global_id}",
+      priority: Delayed::LOW_PRIORITY
+    ).scan_resource(scan:)
+  end
+
+  def call_sync
+    scan = first_or_initialize_scan
+    scan_resource(scan:)
+    scan
+  end
+
+  def first_or_initialize_scan
     scan = AccessibilityResourceScan.where(context: @resource).first_or_initialize
     scan.assign_attributes(
-      course: @resource.course,
+      course_id: @resource.course.id,
       workflow_state: "queued",
       resource_name: @resource.try(:title),
       resource_workflow_state:,
@@ -42,8 +58,7 @@ class Accessibility::ResourceScannerService < ApplicationService
       error_message: nil
     )
     scan.save!
-
-    delay(singleton: "accessibility_scan_resource_#{@resource.global_id}").scan_resource(scan:)
+    scan
   end
 
   def scan_resource(scan:)
@@ -63,7 +78,29 @@ class Accessibility::ResourceScannerService < ApplicationService
     )
     log_to_datadog(scan)
   rescue => e
-    handle_scan_failure(scan, e)
+    error_report = ErrorReport.log_exception(
+      SCAN_TAG,
+      e,
+      {
+        progress_id: scan.id,
+        course_id: scan.course.id,
+        course_name: scan.course.name
+      }
+    )
+    handle_scan_failure(scan, error_report)
+    Sentry.with_scope do |scope|
+      scope.set_context(
+        SCAN_TAG,
+        {
+          progress_id: scan.id,
+          course_id: scan.course.id,
+          course_name: scan.course.name,
+          workflow_state: scan.workflow_state
+        }
+      )
+
+      Sentry.capture_exception(e, level: :error)
+    end
   end
 
   private
@@ -153,7 +190,7 @@ class Accessibility::ResourceScannerService < ApplicationService
 
   def build_issue_attributes(issue)
     {
-      course: @resource.course,
+      course_id: @resource.course.id,
       context: @resource,
       rule_type: issue[:rule_id],
       node_path: issue[:path],
@@ -164,9 +201,8 @@ class Accessibility::ResourceScannerService < ApplicationService
     }
   end
 
-  def handle_scan_failure(scan, error)
-    Rails.logger.warn("[A11Y Scan] Failed to scan resource #{@resource&.id}: #{error.message}")
-    scan&.update(workflow_state: "failed", error_message: error.message)
+  def handle_scan_failure(scan, error_report)
+    scan&.update(workflow_state: "failed", error_message: error_report.id)
     log_to_datadog(scan)
   end
 end

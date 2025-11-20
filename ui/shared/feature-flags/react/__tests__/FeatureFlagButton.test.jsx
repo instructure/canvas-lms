@@ -254,4 +254,47 @@ describe('feature_flags::FeatureFlagButton', () => {
       await waitFor(() => expect(fetchMock.calls(route)).toHaveLength(1))
     })
   })
+
+  describe('early access program', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        ...fakeENV.ENV,
+        CONTEXT_BASE_URL: '/accounts/1',
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+      jest.clearAllMocks()
+    })
+
+    it('skips the API update when checkEarlyAccessProgram returns false', async () => {
+      const user = userEvent.setup()
+      const featureFlagRoute = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature1`
+      const checkEarlyAccessProgram = jest.fn()
+
+      fetchMock.put(featureFlagRoute, sampleData.onFeature.feature_flag)
+      checkEarlyAccessProgram.mockResolvedValue(false)
+
+      const {container, getByText} = render(
+        <FeatureFlagButton
+          featureFlag={sampleData.allowedFeature.feature_flag}
+          displayName="Early Access Feature"
+          checkEarlyAccessProgram={checkEarlyAccessProgram}
+        />,
+      )
+
+      await user.click(container.querySelector('button'))
+      await user.click(getByText('Enabled'))
+
+      await waitFor(() => {
+        expect(checkEarlyAccessProgram).toHaveBeenCalledWith(
+          sampleData.allowedFeature.feature_flag,
+          'allowed_on',
+        )
+      })
+
+      expect(fetchMock.called(featureFlagRoute)).toBe(false)
+    })
+  })
 })

@@ -54,17 +54,15 @@ module Importers
       assignments_by_lookup_uuid = assignments.group_by { |assignment| assignment["resource_link_lookup_uuid"] }
 
       lti_resource_links.select do |lti_resource_link|
-        # Rule 3: If the resource link is associated with a course, keep it
-        if lti_resource_link["context_type"] == "Course"
-          true
-        # Rule 2: If it is associated with an assignment, check if the assignment is being imported
-        elsif lti_resource_link["assignment_migration_id"].present?
+        # Rule 3: If the resource link is associated with an assignment, check if the assignment is being imported
+        if lti_resource_link["assignment_migration_id"].present?
           migration.import_object?("assignments", lti_resource_link["assignment_migration_id"])
-        # Rule 1: If the resource link is not associated with an assignment, but matches an assignment's resource_link_lookup_uuid, include it
+        # Rule 2: If the resource link is not associated with an assignment, but matches an assignment's resource_link_lookup_uuid, include it
         elsif assignments_by_lookup_uuid[lti_resource_link["lookup_uuid"]].present?
           migration.import_object?("assignments", assignments_by_lookup_uuid[lti_resource_link["lookup_uuid"]].first&.dig("migration_id"))
+        # Rule 1: If the resource link does not belong to an Assignment (so usually Course) we want to import it
         else
-          false
+          lti_resource_link["assignment_migration_id"].nil?
         end
       end
     end

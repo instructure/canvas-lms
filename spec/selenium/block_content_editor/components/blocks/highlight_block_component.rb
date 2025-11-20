@@ -21,6 +21,9 @@ require_relative "block_component"
 require_relative "../settings_tray/block_settings/highlight_block_settings"
 
 class HighlightBlockComponent < BlockComponent
+  BLOCK_TYPE = "Highlight"
+  BLOCK_SELECTOR = "[data-testid='highlight-block']"
+
   def settings
     @settings ||= HighlightBlockSettings.new
   end

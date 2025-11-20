@@ -26,10 +26,6 @@ import {IconPublishSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 
-export interface ApplyButtonHandle {
-  focus: () => void
-}
-
 interface ApplyButtonProps {
   children: string
   undoMessage?: string

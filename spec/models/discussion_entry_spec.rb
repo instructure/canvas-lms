@@ -73,9 +73,10 @@ describe DiscussionEntry do
       let(:regular_topic) { discussion_topic_model(course: @course) }
 
       def expect_notification(expected_user:, expected_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED)
-        expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion) do |current_user:, discussion_entry_version:, assignment:, contribution_status:, **|
+        expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion) do |current_user:, discussion_entry_versions:, assignment:, contribution_status:, **|
           expect(current_user).to eq expected_user
-          expect(discussion_entry_version).to be_a(DiscussionEntryVersion)
+          expect(discussion_entry_versions).to be_an(Array)
+          expect(discussion_entry_versions.first).to be_a(DiscussionEntryVersion)
           expect(assignment).to eq graded_topic.assignment
           expect(contribution_status).to eq expected_status
         end

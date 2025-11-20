@@ -81,6 +81,7 @@ describe Mutations::CreateAssignment do
               anonymousReviews
               automaticReviews
               submissionRequired
+              acrossSections
             }
             modules {
               _id
@@ -244,7 +245,7 @@ describe Mutations::CreateAssignment do
       expect(assignment.peer_review_submission_required).to be false
     end
 
-    it "defaults submission_required to false when not specified" do
+    it "defaults submission_required to true when not specified" do
       result = execute_with_input <<~GQL
         courseId: "#{@course.to_param}"
         name: "peer review default submission required"
@@ -255,10 +256,90 @@ describe Mutations::CreateAssignment do
 
       expect(result["errors"]).to be_nil
       expect(result.dig("data", "createAssignment", "errors")).to be_nil
-      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "submissionRequired")).to be false
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "submissionRequired")).to be true
 
       assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
-      expect(assignment.peer_review_submission_required).to be false
+      expect(assignment.peer_review_submission_required).to be true
+    end
+  end
+
+  context "peer review across_sections" do
+    before do
+      @course.enable_feature!(:peer_review_allocation)
+    end
+
+    it "creates an assignment with across_sections set to true" do
+      result = execute_with_input <<~GQL
+        courseId: "#{@course.to_param}"
+        name: "peer review across sections"
+        peerReviews: {
+          enabled: true
+          acrossSections: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createAssignment", "errors")).to be_nil
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "acrossSections")).to be true
+
+      assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+      expect(assignment.peer_review_across_sections).to be true
+    end
+
+    it "creates an assignment with across_sections set to false" do
+      result = execute_with_input <<~GQL
+        courseId: "#{@course.to_param}"
+        name: "peer review not across sections"
+        peerReviews: {
+          enabled: true
+          acrossSections: false
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createAssignment", "errors")).to be_nil
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "acrossSections")).to be false
+
+      assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+      expect(assignment.peer_review_across_sections).to be false
+    end
+
+    it "defaults across_sections to true when not specified" do
+      result = execute_with_input <<~GQL
+        courseId: "#{@course.to_param}"
+        name: "peer review default across sections"
+        peerReviews: {
+          enabled: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createAssignment", "errors")).to be_nil
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "acrossSections")).to be true
+
+      assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+      expect(assignment.peer_review_across_sections).to be true
+    end
+
+    context "when feature flag is off" do
+      before do
+        @course.disable_feature!(:peer_review_allocation)
+      end
+
+      it "returns null for acrossSections in the response" do
+        result = execute_with_input <<~GQL
+          courseId: "#{@course.to_param}"
+          name: "peer review without feature flag"
+          peerReviews: {
+            enabled: true
+            acrossSections: true
+          }
+        GQL
+
+        expect(result["errors"]).to be_nil
+        expect(result.dig("data", "createAssignment", "errors")).to be_nil
+        expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "acrossSections")).to be_nil
+      end
     end
   end
 

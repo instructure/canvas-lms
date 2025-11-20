@@ -262,7 +262,10 @@ export default class WikiPageEditView extends ValidatedFormView {
 
     if (this.enableAssignTo) {
       const pageName = this.model.get('title')
-      const pageId = this.model.id
+      // for Backbone models 0 is required to issue PUT requests instead of POST
+      // see wiki_page_json helper method, but we need to avoid unnecessary HTTP
+      // requests at AssignToTray. That is why '0' should be mapped to undefined
+      const pageId = this.model.id === '0' || this.model.id === 0 ? undefined : this.model.id
       const mountElement = document.getElementById('assign-to-mount-point-edit-page')
       const onSync = payload => {
         this.overrides = payload

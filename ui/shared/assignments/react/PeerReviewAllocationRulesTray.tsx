@@ -19,6 +19,7 @@
 import React, {useState, useRef, useEffect, useCallback, useMemo} from 'react'
 import AllocationRuleCard from './AllocationRuleCard'
 import CreateEditAllocationRuleModal from './CreateEditAllocationRuleModal'
+import {formatFullRuleDescription} from './utils/formatRuleDescription'
 import {Alert} from '@instructure/ui-alerts'
 import {useAllocationRules} from '../graphql/hooks/useAllocationRules'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -35,16 +36,19 @@ import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
+import {List} from '@instructure/ui-list'
 import {debounce} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import pandasBalloonUrl from './images/pandasBalloon.svg'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {
+  SCREENREADER_ALERT_TIMEOUT,
+  SEARCH_RESULT_ANNOUNCEMENT_DELAY,
+  CARD_HEIGHT,
+  SEARCH_DEBOUNCE_DELAY,
+} from './peerReviewConstants'
 
 const I18n = createI18nScope('peer_review_allocation_rules_tray')
-
-// We allow 5000ms for the screen reader to finish reading the label of the focused element before
-// announcing the screen reader alert. Otherwise, the focus announcement steals the alert announcement.
-const SCREENREADER_ALERT_TIMEOUT = 5000
 
 const NoResultsFound = ({searchTerm}: {searchTerm: string}) => (
   <Flex.Item as="div" padding="x-small medium" data-testid="no-search-results">
@@ -65,7 +69,7 @@ const EmptyState = () => (
   >
     <Img
       src={pandasBalloonUrl}
-      alt="Pandas Balloon"
+      alt=""
       style={{width: '160px', height: 'auto', marginBottom: '1rem'}}
     />
     <Heading level="h3" margin="medium 0">
@@ -147,6 +151,8 @@ const PeerReviewAllocationRulesTray = ({
     searchTerm,
   )
 
+  const prevLoadingRef = useRef(loading)
+  const prevSearchTermRef = useRef(searchTerm)
   const totalPages = totalCount ? Math.ceil(totalCount / itemsPerPage) : 0
 
   const handlePageChange = useCallback((newPage: number) => {
@@ -268,7 +274,7 @@ const PeerReviewAllocationRulesTray = ({
         } else {
           setSearchTerm(value)
         }
-      }, 300),
+      }, SEARCH_DEBOUNCE_DELAY),
     [setSearchTerm],
   )
 
@@ -277,7 +283,7 @@ const PeerReviewAllocationRulesTray = ({
       return
     }
 
-    let cardHeight = 120
+    let cardHeight = CARD_HEIGHT
     const cardElement = containerRef.current.querySelector(
       '[data-testid="allocation-rule-card-wrapper"]',
     )
@@ -334,6 +340,20 @@ const PeerReviewAllocationRulesTray = ({
       debouncedSearch.cancel()
     }
   }, [searchInputValue, debouncedSearch])
+
+  useEffect(() => {
+    const wasLoading = prevLoadingRef.current && !loading
+    const searchTermChanged = prevSearchTermRef.current !== searchTerm
+
+    if (searchTerm && (wasLoading || searchTermChanged)) {
+      setTimeout(() => {
+        setScreenReaderAnnouncement(I18n.t('Search Results for "%{searchTerm}"', {searchTerm}))
+      }, SEARCH_RESULT_ANNOUNCEMENT_DELAY)
+    }
+
+    prevLoadingRef.current = loading
+    prevSearchTermRef.current = searchTerm
+  }, [loading, searchTerm])
 
   useEffect(() => {
     if (totalCount !== null) {
@@ -504,24 +524,28 @@ const PeerReviewAllocationRulesTray = ({
 
     return (
       <Flex direction="column" height="100%" elementRef={setContainerRef}>
-        <Flex.Item overflowY="hidden" shouldGrow shouldShrink>
-          {rules.map(rule => (
-            <Flex.Item
-              as="div"
-              padding="x-small medium"
-              key={rule._id}
-              data-testid="allocation-rule-card-wrapper"
-            >
-              <AllocationRuleCard
-                rule={rule}
-                canEdit={canEdit}
-                assignmentId={assignmentId}
-                refetchRules={handleRuleSave}
-                handleRuleDelete={handleRuleDelete}
-                requiredPeerReviewsCount={requiredPeerReviewsCount}
-              />
-            </Flex.Item>
-          ))}
+        <Flex.Item shouldGrow shouldShrink>
+          <List isUnstyled margin="none" data-testid="allocation-rules-list">
+            {rules.map(rule => (
+              <List.Item key={rule._id} aria-label={formatFullRuleDescription(rule)}>
+                <View
+                  as="div"
+                  padding="x-small 0"
+                  margin="0 medium"
+                  data-testid="allocation-rule-card-wrapper"
+                >
+                  <AllocationRuleCard
+                    rule={rule}
+                    canEdit={canEdit}
+                    assignmentId={assignmentId}
+                    refetchRules={handleRuleSave}
+                    handleRuleDelete={handleRuleDelete}
+                    requiredPeerReviewsCount={requiredPeerReviewsCount}
+                  />
+                </View>
+              </List.Item>
+            ))}
+          </List>
         </Flex.Item>
       </Flex>
     )
@@ -532,7 +556,12 @@ const PeerReviewAllocationRulesTray = ({
       <View as="div" role="alert" aria-live="polite" data-testid="allocation-rules-tray-alert">
         <ScreenReaderContent>{screenReaderAnnouncement}</ScreenReaderContent>
       </View>
-      <Tray label={I18n.t('Allocation Rules')} open={isTrayOpen} placement="end">
+      <Tray
+        label={I18n.t('Allocation Rules')}
+        open={isTrayOpen}
+        onDismiss={closeTray}
+        placement="end"
+      >
         <Flex direction="column" height="100vh">
           <Flex.Item>
             <Flex as="div" padding="medium">
@@ -556,7 +585,7 @@ const PeerReviewAllocationRulesTray = ({
               <Text>
                 {I18n.t('For peer review configuration return to ')}
                 <Link
-                  isWithinText={false}
+                  isWithinText={true}
                   href={`/courses/${ENV.COURSE_ID}/assignments/${assignmentId}/edit?scrollTo=assignment_peer_reviews_fields`}
                 >
                   {I18n.t('Edit Assignment')}
@@ -611,7 +640,7 @@ const PeerReviewAllocationRulesTray = ({
               </Flex.Item>
             )}
           </Flex.Item>
-          <Flex.Item overflowY="hidden" shouldGrow shouldShrink>
+          <Flex.Item size={`${CARD_HEIGHT}px`} shouldGrow shouldShrink>
             {renderContent()}
           </Flex.Item>
           <Flex.Item as="div" padding="small medium">

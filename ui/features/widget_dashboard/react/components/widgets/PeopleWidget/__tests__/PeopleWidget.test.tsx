@@ -25,6 +25,8 @@ import {graphql, HttpResponse} from 'msw'
 import PeopleWidget from '../PeopleWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
 import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
+import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 jest.mock('@canvas/message-students-modal/react', () => {
   return function MockMessageStudents({onRequestClose, title, recipients, contextCode}: any) {
@@ -127,7 +129,13 @@ const renderWithQueryClient = (ui: React.ReactElement) => {
     },
   })
 
-  return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <WidgetDashboardEditProvider>
+        <WidgetLayoutProvider>{ui}</WidgetLayoutProvider>
+      </WidgetDashboardEditProvider>
+    </QueryClientProvider>,
+  )
 }
 
 describe('PeopleWidget', () => {
@@ -339,6 +347,7 @@ describe('PeopleWidget', () => {
 
   describe('GraphQL Errors', () => {
     beforeEach(() => {
+      jest.spyOn(console, 'error').mockImplementation()
       server.use(
         graphql.query('GetCourseInstructorsPaginated', () => {
           return HttpResponse.json({
@@ -346,6 +355,10 @@ describe('PeopleWidget', () => {
           })
         }),
       )
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
     })
 
     it('displays error message when query fails', async () => {

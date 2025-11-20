@@ -426,4 +426,129 @@ describe AssessmentRequest do
       expect(request.assessment_request_was_completed?).to be false
     end
   end
+
+  describe "linking to peer_review_sub_assignment on creation" do
+    before :once do
+      @assignment.update!(peer_reviews: true)
+    end
+
+    let(:reviewer) { student_in_course(active_all: true, course: @course).user }
+    let(:reviewee) { student_in_course(active_all: true, course: @course).user }
+
+    context "when all conditions are met" do
+      before :once do
+        @course.enable_feature!(:peer_review_grading)
+        @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          title: "Test Peer Review",
+          context: @course,
+          parent_assignment: @assignment
+        )
+      end
+
+      it "links assessment request to peer_review_sub_assignment when created via assign_peer_review" do
+        assessment_request = @assignment.assign_peer_review(reviewer, reviewee)
+
+        expect(assessment_request.peer_review_sub_assignment_id).to eq(@peer_review_sub_assignment.id)
+        expect(assessment_request.peer_review_sub_assignment).to eq(@peer_review_sub_assignment)
+      end
+
+      it "sets peer_review_sub_assignment_id during creation process" do
+        assessment_request = @assignment.assign_peer_review(reviewer, reviewee)
+
+        expect(assessment_request).to be_persisted
+        expect(assessment_request.peer_review_sub_assignment_id).to eq(@peer_review_sub_assignment.id)
+      end
+    end
+
+    context "when peer_review_grading feature flag is disabled" do
+      before :once do
+        @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          title: "Test Peer Review",
+          context: @course,
+          parent_assignment: @assignment
+        )
+      end
+
+      it "does not link assessment request when feature flag is disabled" do
+        assessment_request = @assignment.assign_peer_review(reviewer, reviewee)
+
+        expect(assessment_request.peer_review_sub_assignment_id).to be_nil
+      end
+    end
+
+    context "when parent assignment does not have peer_reviews enabled" do
+      before :once do
+        @assignment.update!(peer_reviews: false)
+        @course.enable_feature!(:peer_review_grading)
+        @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          title: "Test Peer Review",
+          context: @course,
+          parent_assignment: @assignment
+        )
+      end
+
+      it "does not link assessment request when peer_reviews is false" do
+        assessment_request = @assignment.assign_peer_review(reviewer, reviewee)
+
+        expect(assessment_request.peer_review_sub_assignment_id).to be_nil
+      end
+    end
+
+    context "when peer_review_sub_assignment does not exist" do
+      before :once do
+        @course.enable_feature!(:peer_review_grading)
+      end
+
+      it "creates assessment request without linking when sub-assignment does not exist" do
+        assessment_request = @assignment.assign_peer_review(reviewer, reviewee)
+
+        expect(assessment_request).to be_persisted
+        expect(assessment_request.peer_review_sub_assignment_id).to be_nil
+      end
+
+      it "does not raise an error when sub-assignment does not exist" do
+        expect { @assignment.assign_peer_review(reviewer, reviewee) }.not_to raise_error
+      end
+    end
+
+    context "when an existing assessment request exists" do
+      before :once do
+        @course.enable_feature!(:peer_review_grading)
+        @existing_request = @assignment.assign_peer_review(reviewer, reviewee)
+      end
+
+      it "does not retroactively link existing requests when sub-assignment is created later" do
+        expect(@existing_request.peer_review_sub_assignment_id).to be_nil
+
+        PeerReviewSubAssignment.create!(
+          title: "Test Peer Review",
+          context: @course,
+          parent_assignment: @assignment
+        )
+
+        @existing_request.reload
+        expect(@existing_request.peer_review_sub_assignment_id).to be_nil
+      end
+    end
+
+    context "consistency with PeerReviewCreatorService" do
+      it "produces the same linking behavior as PeerReviewCreatorService for new requests" do
+        @course.enable_feature!(:peer_review_grading)
+
+        assessment_request = @assignment.assign_peer_review(reviewer, reviewee)
+        expect(assessment_request.peer_review_sub_assignment_id).to be_nil
+
+        service = PeerReview::PeerReviewCreatorService.new(parent_assignment: @assignment)
+        peer_review_sub = service.call
+
+        assessment_request.reload
+        expect(assessment_request.peer_review_sub_assignment_id).to eq(peer_review_sub.id)
+
+        new_reviewer = student_in_course(active_all: true, course: @course).user
+        new_assessment_request = @assignment.assign_peer_review(new_reviewer, reviewee)
+
+        expect(new_assessment_request.peer_review_sub_assignment_id).to eq(peer_review_sub.id)
+      end
+    end
+  end
 end

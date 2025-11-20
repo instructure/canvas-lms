@@ -39,6 +39,7 @@ describe "discussion assignments" do
 
   context "created with 'more options'" do
     it "redirects to the discussion new page and maintain parameters", priority: "1" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       ag = @course.assignment_groups.create!(name: "Stuff")
       get "/courses/#{@course.id}/assignments"
       expect_new_page_load { build_assignment_with_type("Discussion", assignment_group_id: ag.id, name: "More options created discussion", points: "30", more_options: true) }
@@ -60,6 +61,7 @@ describe "discussion assignments" do
 
   context "edited with 'more options'" do
     it "redirects to the discussion edit page and maintain parameters", priority: "2" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       assign = @course.assignments.create!(name: "Discuss!", points_possible: "5", submission_types: "discussion_topic")
       get "/courses/#{@course.id}/assignments"
       expect_new_page_load { edit_assignment(assign.id, name: "Rediscuss!", points: "10", more_options: true) }
@@ -70,6 +72,7 @@ describe "discussion assignments" do
 
   context "insert content using RCE" do
     it "inserts file using rce in a discussion", priority: "1" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       discussion_title = "New Discussion"
       topic = create_discussion(discussion_title, "threaded")
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}/edit"

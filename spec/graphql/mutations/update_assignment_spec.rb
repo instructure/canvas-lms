@@ -80,6 +80,7 @@ describe Mutations::UpdateAssignment do
               anonymousReviews
               automaticReviews
               submissionRequired
+              acrossSections
             }
             modules {
               _id
@@ -244,7 +245,7 @@ describe Mutations::UpdateAssignment do
 
     it "can update submission_required to true" do
       assignment = Assignment.find(@assignment_id)
-      expect(assignment.peer_review_submission_required).to be false
+      assignment.update!(peer_review_submission_required: false)
 
       result = execute_with_input <<~GQL
         id: "#{@assignment_id}"
@@ -292,6 +293,63 @@ describe Mutations::UpdateAssignment do
 
       expect(result["errors"]).to be_nil
       expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "submissionRequired")).to be_nil
+    end
+  end
+
+  context "peer review across_sections" do
+    before do
+      @course.enable_feature!(:peer_review_allocation)
+    end
+
+    it "can update across_sections to false" do
+      assignment = Assignment.find(@assignment_id)
+      expect(assignment.peer_review_across_sections).to be true
+
+      result = execute_with_input <<~GQL
+        id: "#{@assignment_id}"
+        peerReviews: {
+          enabled: true
+          acrossSections: false
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateAssignment", "errors")).to be_nil
+      expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "acrossSections")).to be false
+      expect(Assignment.find(@assignment_id).peer_review_across_sections).to be false
+    end
+
+    it "can update across_sections to true" do
+      Assignment.find(@assignment_id)
+
+      result = execute_with_input <<~GQL
+        id: "#{@assignment_id}"
+        peerReviews: {
+          enabled: true
+          acrossSections: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateAssignment", "errors")).to be_nil
+      expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "acrossSections")).to be true
+      expect(Assignment.find(@assignment_id).peer_review_across_sections).to be true
+    end
+
+    it "returns nil for across_sections when feature flag is disabled" do
+      @course.disable_feature!(:peer_review_allocation)
+      assignment = Assignment.find(@assignment_id)
+      assignment.update!(peer_review_across_sections: true)
+
+      result = execute_with_input <<~GQL
+        id: "#{@assignment_id}"
+        peerReviews: {
+          enabled: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "acrossSections")).to be_nil
     end
   end
 

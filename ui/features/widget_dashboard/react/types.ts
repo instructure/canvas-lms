@@ -72,6 +72,7 @@ export interface BaseWidgetProps {
   isLoading?: boolean
   error?: string | null
   onRetry?: () => void
+  isEditMode?: boolean
 }
 
 export interface WidgetRenderer {
@@ -90,7 +91,7 @@ export interface CourseGrade {
   courseName: string
   currentGrade: number | null
   gradingScheme: 'percentage' | GradingStandardData
-  lastUpdated: Date
+  lastUpdated?: Date | null
 }
 
 export interface CourseGradeCardProps {
@@ -99,7 +100,7 @@ export interface CourseGradeCardProps {
   courseName: string
   currentGrade: number | null
   gradingScheme: 'percentage' | GradingStandardData
-  lastUpdated: Date
+  lastUpdated?: Date | null
   onShowGradebook: () => void
   gridIndex?: number
   globalGradeVisibility?: boolean

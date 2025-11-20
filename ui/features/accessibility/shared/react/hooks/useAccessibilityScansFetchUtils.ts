@@ -29,7 +29,12 @@ import {
   API_FETCH_ERROR_MESSAGE_PREFIX,
   IssuesTableHeaderApiNames,
 } from '../../../accessibility_checker/react/constants'
-import {AccessibilityIssuesSummaryData, AccessibilityResourceScan, Filters} from '../types'
+import {
+  AccessibilityIssuesSummaryData,
+  AccessibilityResourceScan,
+  Filters,
+  ParsedFilters,
+} from '../types'
 import {convertKeysToCamelCase, getParsedFilters} from '../utils/apiData'
 import {getCourseBasedPath, updateQueryParams} from '../utils/query'
 
@@ -147,13 +152,17 @@ export const useAccessibilityScansFetchUtils = () => {
           tableSortState: tableSortState || defaultStateToFetch.tableSortState,
         }
 
-        Object.assign(newStateToFetch, requestedStateChange, {filters: parsedFilters})
+        const {filters: _, ...requestedWithoutFilters} = requestedStateChange
+        Object.assign(newStateToFetch, requestedWithoutFilters)
 
         const params = getFetchScansRequestParams(newStateToFetch)
+        if (parsedFilters) {
+          params.filters = parsedFilters
+        }
         setLoading(true)
         setError(null)
 
-        const path = getCourseBasedPath('/accessibility_resource_scans')
+        const path = getCourseBasedPath('/accessibility/resource_scan')
         const data: DoFetchApiResults<AccessibilityResourceScan[]> = await doFetchApi({
           path,
           params,
@@ -171,7 +180,7 @@ export const useAccessibilityScansFetchUtils = () => {
         setFilters(filterData || null)
         setTableSortState(newStateToFetch.tableSortState!)
 
-        updateQueryParams(newStateToFetch)
+        updateQueryParams({...newStateToFetch, filters: filterData})
       } catch (err: any) {
         setError(API_FETCH_ERROR_MESSAGE_PREFIX + err.message)
       } finally {
@@ -206,9 +215,13 @@ export const useAccessibilityScansFetchUtils = () => {
         const filterData = requestedStateChange.filters || filters || null
         const parsedFilters = filterData ? getParsedFilters(filterData as Filters) : undefined
 
-        Object.assign(newStateToFetch, requestedStateChange, {filters: parsedFilters})
+        const {filters: _, ...requestedWithoutFilters} = requestedStateChange
+        Object.assign(newStateToFetch, requestedWithoutFilters)
 
         const params = getFetchSummaryRequestParams(newStateToFetch)
+        if (parsedFilters) {
+          params.filters = parsedFilters
+        }
 
         setLoadingOfSummary(true)
         setErrorOfSummary(null)

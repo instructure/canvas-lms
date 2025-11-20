@@ -534,12 +534,15 @@ class UsersController < ApplicationController
       observed_user = (@selected_observed_user && @selected_observed_user != @current_user) ? @selected_observed_user : nil
       course_data_with_grades = fetch_courses_with_grades(observed_user)
 
+      widget_dashboard_config = @current_user.get_preference(:widget_dashboard_config) || {}
+
       js_env({
                PREFERENCES: {
                  dashboard_view: @current_user.dashboard_view(@domain_root_account),
                  hide_dashcard_color_overlays: @current_user.preferences[:hide_dashcard_color_overlays],
                  custom_colors: @current_user.custom_colors,
-                 learner_dashboard_tab_selection: @current_user.get_preference(:learner_dashboard_tab_selection) || "dashboard"
+                 learner_dashboard_tab_selection: @current_user.get_preference(:learner_dashboard_tab_selection) || "dashboard",
+                 widget_dashboard_config:
                },
                OBSERVED_USERS_LIST: observed_users_list,
                OBSERVED_USER_ID: observed_user&.id,
@@ -547,7 +550,8 @@ class UsersController < ApplicationController
                                    .profile
                                    .tabs_available(@current_user, root_account: @domain_root_account)
                                    .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES },
-               SHARED_COURSE_DATA: course_data_with_grades
+               SHARED_COURSE_DATA: course_data_with_grades,
+               DASHBOARD_FEATURES: { widget_dashboard_customization: Account.site_admin.feature_enabled?(:widget_dashboard_customization) }
              })
       return render html: "", layout: true
     end
@@ -672,6 +676,7 @@ class UsersController < ApplicationController
   def dashboard_cards
     opts = {}
     opts[:observee_user] = User.find_by(id: params[:observed_user_id].to_i) || @current_user if params.key?(:observed_user_id)
+    opts[:limit] = 50
     dashboard_courses = map_courses_for_menu(@current_user.menu_courses(nil, opts), tabs: DASHBOARD_CARD_TABS)
     published, unpublished = dashboard_courses.partition { |course| course[:published] }
     Rails.cache.write(["last_known_dashboard_cards_published_count", @current_user.global_id].cache_key, published.count)
@@ -2932,7 +2937,7 @@ class UsersController < ApplicationController
         if user_saved
           invited_users << user_hash.merge(id: user.id, user_token: user.token)
         else
-          errored_users << user_hash.merge(user.errors.as_json)
+          errored_users << user_hash.merge(Api::Errors::Reporter.to_json(user.errors))
         end
       end
     end
@@ -3519,7 +3524,7 @@ class UsersController < ApplicationController
     return nil unless @access_token.nil?
 
     response = CanvasHttp.post("https://www.google.com/recaptcha/api/siteverify", form_data: {
-                                 secret: DynamicSettings.find(tree: :private)["recaptcha_server_key"],
+                                 secret: Rails.application.credentials.dig(:recaptcha_keys, :server_key),
                                  response: recaptcha_response
                                })
 
@@ -3625,11 +3630,13 @@ class UsersController < ApplicationController
       # Get grade data if visible
       display_grade = nil
       grading_scheme = "percentage"
+      last_updated = nil
 
       if can_read_grades
         course_score = enrollment.find_score(course_score: true)
         if course_score
           display_grade = course_score.override_score.presence || course_score.current_score
+          last_updated = course_score.updated_at
         end
 
         if course.grading_standard_enabled? && course.grading_standard
@@ -3643,7 +3650,7 @@ class UsersController < ApplicationController
         courseName: course.name,
         currentGrade: display_grade,
         gradingScheme: grading_scheme,
-        lastUpdated: enrollment.updated_at.iso8601
+        lastUpdated: last_updated&.iso8601
       }
     end
 
