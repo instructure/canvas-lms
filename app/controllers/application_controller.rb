@@ -3561,6 +3561,8 @@ class ApplicationController < ActionController::Base
   end
 
   def add_ignite_agent_bundle?
+    return false if params[:preview] == "true"
+    return false if controller_name == "oauth2_provider"
     return false unless @domain_root_account&.feature_enabled?(:ignite_agent_enabled)
     return true if @domain_root_account&.grants_right?(@current_user, session, :manage_account_settings)
     return false unless @current_user&.feature_enabled?(:ignite_agent_enabled_for_user)
