@@ -1132,6 +1132,15 @@ class Lti::RegistrationsController < ApplicationController
              })
     end
 
+    if @account.root_account.feature_enabled?(:lti_asset_processor_tii_migration)
+      turnitin_devkey_id = Setting.get("turnitin_asset_processor_client_id", "")
+      if turnitin_devkey_id.present?
+        js_env({
+                 turnitinAPClientId: turnitin_devkey_id
+               })
+      end
+    end
+
     # Inject feature flags for LTI registrations
     js_env({
              LTI_REGISTRATIONS_HISTORY: @account.root_account.feature_enabled?(:lti_registrations_history),

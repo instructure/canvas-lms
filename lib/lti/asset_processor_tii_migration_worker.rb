@@ -20,6 +20,9 @@
 
 module Lti
   class AssetProcessorTiiMigrationWorker
+    TII_TOOL_VENDOR_CODE = "turnitin.com"
+    TII_TOOL_PRODUCT_CODE = "turnitin-lti"
+
     def initialize(account, email = nil)
       @account = account
       @email = email
@@ -53,7 +56,7 @@ module Lti
                           .joins("INNER JOIN #{Lti::ProductFamily.quoted_table_name} ON lti_product_families.id = lti_tool_proxies.product_family_id")
                           .joins("INNER JOIN #{Account.quoted_table_name} ON lti_tool_proxy_bindings.context_type = 'Account' AND lti_tool_proxy_bindings.context_id = accounts.id")
                           .where(lti_tool_proxy_bindings: { enabled: true })
-                          .where(lti_product_families: { vendor_code: "turnitin.com", product_code: "turnitin-lti" })
+                          .where(lti_product_families: { vendor_code: TII_TOOL_VENDOR_CODE, product_code: TII_TOOL_PRODUCT_CODE })
                           .where(accounts: { id: @account.id })
 
       course_level_tps = Lti::ToolProxy
@@ -62,7 +65,7 @@ module Lti
                          .joins("INNER JOIN #{Lti::ProductFamily.quoted_table_name} ON lti_product_families.id = lti_tool_proxies.product_family_id")
                          .joins("INNER JOIN #{Course.quoted_table_name} ON lti_tool_proxy_bindings.context_type = 'Course' AND lti_tool_proxy_bindings.context_id = courses.id")
                          .where(lti_tool_proxy_bindings: { enabled: true })
-                         .where(lti_product_families: { vendor_code: "turnitin.com", product_code: "turnitin-lti" })
+                         .where(lti_product_families: { vendor_code: TII_TOOL_VENDOR_CODE, product_code: TII_TOOL_PRODUCT_CODE })
                          .where(courses: { account_id: @account.id })
 
       account_level_tps.to_a + course_level_tps.to_a
