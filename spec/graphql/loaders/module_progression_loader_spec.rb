@@ -47,135 +47,33 @@ describe ModuleProgressionLoader do
     RSpec::Mocks.space.reset_all
   end
 
-  describe "#get_enrolled_modules" do
-    let(:loader) { ModuleProgressionLoader.new(student, nil, course) }
-
-    context "with mixed enrolled and unenrolled modules" do
-      let(:modules) { [enrolled_module, unenrolled_module] }
-
-      it "returns only enrolled modules using database query" do
-        enrolled_modules_relation = loader.send(:get_enrolled_modules, modules)
-        expect(enrolled_modules_relation).to be_a(ActiveRecord::Relation)
-        expect(enrolled_modules_relation.to_a).to eq [enrolled_module]
-        expect(enrolled_modules_relation.to_a).not_to include(unenrolled_module)
-      end
-
-      it "uses efficient database query instead of loading enrollments into memory" do
-        with_query_counter do
-          loader.send(:get_enrolled_modules, modules)
-
-          # Should use a single JOIN query instead of loading all enrollments
-          # The exact count may vary, but should be minimal (typically 1-2 queries)
-          expect(@query_count).to be <= 2
-        end
-      end
-
-      it "handles empty module list" do
-        enrolled_modules_relation = loader.send(:get_enrolled_modules, [])
-        expect(enrolled_modules_relation).to be_a(ActiveRecord::Relation)
-        expect(enrolled_modules_relation.to_a).to eq []
-      end
-
-      it "handles case where user is not enrolled in any modules" do
-        unenrolled_user = User.create!
-        unenrolled_loader = ModuleProgressionLoader.new(unenrolled_user, nil, course)
-
-        enrolled_modules_relation = unenrolled_loader.send(:get_enrolled_modules, [enrolled_module])
-        expect(enrolled_modules_relation).to be_a(ActiveRecord::Relation)
-        expect(enrolled_modules_relation.to_a).to eq []
-      end
-    end
-
-    context "with no user" do
-      let(:no_user_loader) { ModuleProgressionLoader.new(nil, nil, course) }
-
-      it "returns empty relation when user is nil" do
-        enrolled_modules_relation = no_user_loader.send(:get_enrolled_modules, [enrolled_module])
-        expect(enrolled_modules_relation).to be_a(ActiveRecord::Relation)
-        expect(enrolled_modules_relation.to_a).to eq []
-      end
-    end
-
-    context "with no context" do
-      let(:no_context_loader) { ModuleProgressionLoader.new(student, nil, nil) }
-
-      it "returns empty relation when context is nil" do
-        enrolled_modules_relation = no_context_loader.send(:get_enrolled_modules, [enrolled_module])
-        expect(enrolled_modules_relation).to be_a(ActiveRecord::Relation)
-        expect(enrolled_modules_relation.to_a).to eq []
-      end
-    end
-  end
-
-  describe "#batch_create_progressions" do
-    let(:loader) { ModuleProgressionLoader.new(student, nil, course) }
-
-    context "with enrolled modules" do
-      it "creates progressions for enrolled modules" do
-        enrolled_relation = ContextModule.where(id: enrolled_module.id)
-        expect do
-          loader.send(:batch_create_progressions, enrolled_relation)
-        end.to change { ContextModuleProgression.count }.by(1)
-
-        progression = ContextModuleProgression.find_by(user: student, context_module: enrolled_module)
-        expect(progression).to be_present
-      end
-
-      it "handles empty module list" do
-        empty_relation = ContextModule.none
-        expect do
-          loader.send(:batch_create_progressions, empty_relation)
-        end.not_to change { ContextModuleProgression.count }
-      end
-
-      it "handles duplicate progression creation gracefully" do
-        # Create initial progression
-        ContextModuleProgression.create!(user: student, context_module: enrolled_module)
-        initial_count = ContextModuleProgression.count
-
-        # Attempt to create again - should not fail or create duplicates
-        enrolled_relation = ContextModule.where(id: enrolled_module.id)
-        expect do
-          loader.send(:batch_create_progressions, enrolled_relation)
-        end.not_to change { ContextModuleProgression.count }.from(initial_count)
-      end
-
-      it "activates correct shard for each module" do
-        enrolled_relation = ContextModule.where(id: enrolled_module.id)
-        expect(enrolled_module.shard).to receive(:activate).at_least(:once).and_yield
-        loader.send(:batch_create_progressions, enrolled_relation)
-      end
-    end
-
-    context "with no user" do
-      let(:no_user_loader) { ModuleProgressionLoader.new(nil, nil, course) }
-
-      it "does not create progressions when user is nil" do
-        enrolled_relation = ContextModule.where(id: enrolled_module.id)
-        expect do
-          no_user_loader.send(:batch_create_progressions, enrolled_relation)
-        end.not_to change { ContextModuleProgression.count }
-      end
-    end
-  end
-
   describe "#perform" do
     let(:loader) { ModuleProgressionLoader.new(student, nil, course) }
 
     context "for student users" do
-      it "batches progression creation to avoid N+1 queries" do
+      it "preloads progressions to avoid N+1 queries" do
         modules = [enrolled_module]
 
-        expect(loader).to receive(:get_enrolled_modules).with(modules).and_call_original
-        expect(loader).to receive(:batch_create_progressions).and_call_original
+        expect(ContextModule).to receive(:preload_progressions_for_user).with(modules, student).and_call_original
 
         GraphQL::Batch.batch do
           loader.load(enrolled_module)
         end
       end
 
-      it "evaluates modules after creating progressions" do
+      it "evaluates modules without progressions using evaluate_for" do
         expect(enrolled_module).to receive(:evaluate_for).with(student)
+
+        GraphQL::Batch.batch do
+          loader.load(enrolled_module)
+        end
+      end
+
+      it "evaluates existing progressions using evaluate!" do
+        enrolled_module.evaluate_for(student)
+
+        expect_any_instance_of(ContextModuleProgression).to receive(:evaluate!)
+        expect(enrolled_module).not_to receive(:evaluate_for)
 
         GraphQL::Batch.batch do
           loader.load(enrolled_module)
@@ -200,9 +98,8 @@ describe ModuleProgressionLoader do
     context "for non-student users" do
       let(:teacher_loader) { ModuleProgressionLoader.new(teacher, nil, course) }
 
-      it "does not create progressions for teachers" do
-        expect(teacher_loader).not_to receive(:get_enrolled_modules)
-        expect(teacher_loader).not_to receive(:batch_create_progressions)
+      it "does not evaluate progressions for teachers" do
+        expect(ContextModule).not_to receive(:preload_progressions_for_user)
         expect(enrolled_module).not_to receive(:evaluate_for)
 
         GraphQL::Batch.batch do
@@ -215,15 +112,33 @@ describe ModuleProgressionLoader do
       let(:modules) { Array.new(5) { course.context_modules.create!(name: "Module #{rand(1000)}") } }
 
       it "uses efficient database queries for multiple modules" do
+        modules.each { |mod| mod.evaluate_for(student) }
+
         with_query_counter do
           GraphQL::Batch.batch do
             modules.each { |mod| loader.load(mod) }
           end
 
-          # Should use batched queries, not individual queries per module
-          # Exact count may vary but should be reasonable for batched operations
-          expect(@query_count).to be <= modules.count * 2
+          expect(@query_count).to be <= 10
         end
+      end
+
+      it "does not trigger N+1 queries when loading progressions" do
+        modules.each { |mod| mod.evaluate_for(student) }
+
+        query_log = []
+        allow(ActiveRecord::Base.connection).to receive(:exec_query).and_wrap_original do |method, *args|
+          sql = args[0]
+          query_log << sql if sql.include?("context_module_progressions") && sql.include?("WHERE")
+          method.call(*args)
+        end
+
+        GraphQL::Batch.batch do
+          modules.each { |mod| loader.load(mod) }
+        end
+
+        progression_queries = query_log.grep(/context_module_id.*=/)
+        expect(progression_queries.count).to be <= 2
       end
     end
   end

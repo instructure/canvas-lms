@@ -280,7 +280,17 @@ class ContextModulesController < ApplicationController
       if @is_student
         return unless tab_enabled?(@context.class::TAB_MODULES)
 
-        @modules.each { |m| m.evaluate_for(@current_user) }
+        progressions_by_module_id = ContextModule.preload_progressions_for_user(@modules, @current_user)
+        @modules.each do |m|
+          existing_progression = progressions_by_module_id[m.id]
+          if existing_progression
+            existing_progression.context_module = m
+            existing_progression.user = @current_user
+            existing_progression.evaluate!
+          else
+            m.evaluate_for(@current_user)
+          end
+        end
         session[:module_progressions_initialized] = true
       end
       add_body_class("padless-content")

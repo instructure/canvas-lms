@@ -2445,4 +2445,44 @@ describe ContextModule do
       expect(@module.only_visible_to_overrides).to be false
     end
   end
+
+  describe ".preload_progressions_for_user" do
+    before :once do
+      course_with_student(active_all: true)
+      @module1 = @course.context_modules.create!(name: "Module 1")
+      @module2 = @course.context_modules.create!(name: "Module 2")
+      @module3 = @course.context_modules.create!(name: "Module 3")
+      @progression1 = @module1.find_or_create_progression(@student)
+      @progression2 = @module2.find_or_create_progression(@student)
+    end
+
+    it "returns a hash of module_id to progression" do
+      result = ContextModule.preload_progressions_for_user([@module1, @module2, @module3], @student)
+      expect(result).to be_a(Hash)
+      expect(result[@module1.id]).to eq @progression1
+      expect(result[@module2.id]).to eq @progression2
+      expect(result[@module3.id]).to be_nil
+    end
+
+    it "returns empty hash when no modules provided" do
+      result = ContextModule.preload_progressions_for_user([], @student)
+      expect(result).to eq({})
+    end
+
+    it "returns empty hash when no user provided" do
+      result = ContextModule.preload_progressions_for_user([@module1, @module2], nil)
+      expect(result).to eq({})
+    end
+
+    it "loads progressions in a single query" do
+      query_count = 0
+      allow(ContextModuleProgression).to receive(:where).and_wrap_original do |method, *args|
+        query_count += 1
+        method.call(*args)
+      end
+
+      ContextModule.preload_progressions_for_user([@module1, @module2, @module3], @student)
+      expect(query_count).to eq 1
+    end
+  end
 end
