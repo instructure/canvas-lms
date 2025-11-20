@@ -136,7 +136,6 @@
     "emoji-mart": "^3.0.1",
     "export-from-json": "^1.6.0",
     "final-form": "^4.20.2",
-    "formdata-polyfill": "^3.0.9",
     "fullcalendar": "3.10.5",
     "graphiql": "3.2.2",
     "graphiql-explorer": "^0.4.2",
