@@ -3895,4 +3895,20 @@ RSpec.describe ApplicationController, "#add_ignite_agent_bundle?" do
 
     expect(controller.send(:add_ignite_agent_bundle?)).to be true
   end
+
+  it "returns false when preview param is true" do
+    account.enable_feature!(:ignite_agent_enabled)
+    user.enable_feature!(:ignite_agent_enabled_for_user)
+    allow(controller).to receive(:params).and_return({ preview: "true" })
+
+    expect(controller.send(:add_ignite_agent_bundle?)).to be false
+  end
+
+  it "returns false on oauth2_provider confirm page" do
+    account.enable_feature!(:ignite_agent_enabled)
+    user.enable_feature!(:ignite_agent_enabled_for_user)
+    allow(controller).to receive_messages(controller_name: "oauth2_provider", action_name: "confirm", params: {})
+
+    expect(controller.send(:add_ignite_agent_bundle?)).to be false
+  end
 end
