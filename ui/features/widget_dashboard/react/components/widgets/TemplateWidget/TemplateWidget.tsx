@@ -67,12 +67,16 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   isEditMode = false,
 }) => {
   const {isMobile, isDesktop} = useResponsiveContext()
-  const {config, moveWidget} = useWidgetLayout()
+  const {config, moveWidget, removeWidget} = useWidgetLayout()
   const widgetTitle = title || widget.title
   const headingId = `${widget.id}-heading`
 
   const handleMenuSelect = (action: string) => {
     moveWidget(widget.id, action as MoveAction)
+  }
+
+  const handleRemove = () => {
+    removeWidget(widget.id)
   }
 
   const editModeActions = (
@@ -98,6 +102,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
         size="small"
         withBackground={false}
         withBorder={false}
+        onClick={handleRemove}
         data-testid={`${widget.id}-remove-button`}
       >
         <IconTrashLine />
