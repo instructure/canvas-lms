@@ -21,7 +21,6 @@
 require "spec_helper"
 require_relative "../../app/services/auto_grade_orchestration_service"
 require_relative "../../app/services/grade_service"
-require_relative "../../app/services/comments_service"
 require_relative "../factory_bot_spec_helper"
 
 RSpec.describe AutoGradeOrchestrationService do
@@ -280,100 +279,6 @@ RSpec.describe AutoGradeOrchestrationService do
 
         expect(result.grade_data).to eq(initial_data)
         expect(agr.reload.grading_attempts).to eq(1)
-      end
-    end
-  end
-
-  describe "#generate_comments" do
-    context "when generating comments for a submission" do
-      before do
-        allow(CedarClient).to receive(:enabled?).and_return(true)
-        submission.attempt = 1
-        submission.save!
-        rubric_association
-      end
-
-      it "generates comments for all criteria in the rubric" do
-        service = AutoGradeOrchestrationService.new(course:, current_user: user)
-        comment_service = instance_double(CommentsService)
-
-        auto_grade_result = AutoGradeResult.create!(
-          submission:,
-          attempt: submission.attempt,
-          grade_data: [
-            { "description" => "Content", "rating" => 8, "comments" => "Good content" },
-            { "description" => "Grammar", "rating" => 4 }, # Missing comments
-            { "description" => "Organization", "rating" => 3 } # Missing comments
-          ],
-          root_account_id: root_account.id,
-          grading_attempts: 1
-        )
-
-        allow(CommentsService).to receive(:new).and_return(comment_service)
-        allow(comment_service).to receive(:call).and_return(
-          [
-            { "description" => "Grammar", "rating" => 4, "comments" => "Good grammar" },
-            { "description" => "Organization", "rating" => 3, "comments" => "Well organized" }
-          ]
-        )
-
-        result = service.generate_comments(
-          assignment_text:,
-          root_account_uuid:,
-          submission:,
-          auto_grade_result:,
-          progress:
-        )
-
-        missing_criteria_data = [
-          { "description" => "Grammar", "rating" => 4 },
-          { "description" => "Organization", "rating" => 3 }
-        ]
-
-        expect(CommentsService).to have_received(:new).with(
-          assignment: assignment_text,
-          grade_data: missing_criteria_data,
-          root_account_uuid:,
-          current_user: user
-        )
-        expect(comment_service).to have_received(:call)
-        expect(result.grade_data.all? { |item| item["comments"].present? }).to be true
-      end
-
-      it "raises error when comments are missing for some criteria" do
-        service = AutoGradeOrchestrationService.new(course:, current_user: user)
-        comment_service = instance_double(CommentsService)
-
-        auto_grade_result = AutoGradeResult.create!(
-          submission:,
-          attempt: submission.attempt,
-          grade_data: [
-            { "description" => "Content", "rating" => 8, "comments" => "Good content" },
-            { "description" => "Grammar", "rating" => 4 }, # Missing comments
-            { "description" => "Organization", "rating" => 3 } # Missing comments
-          ],
-          root_account_id: root_account.id,
-          grading_attempts: 1
-        )
-
-        allow(CommentsService).to receive(:new).and_return(comment_service)
-        allow(comment_service).to receive(:call).and_return([
-                                                              { "description" => "Grammar", "rating" => 4, "comments" => "Good grammar" }
-                                                            ])
-
-        allow(service).to receive(:get_criteria_missing_comments)
-          .with(any_args)
-          .and_return(["Organization"])
-
-        expect do
-          service.generate_comments(
-            assignment_text:,
-            root_account_uuid:,
-            submission:,
-            auto_grade_result:,
-            progress:
-          )
-        end.to raise_error(Delayed::RetriableError, /Number of comments.*is less than the number of rubric criteria/)
       end
     end
   end
