@@ -22,6 +22,15 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import GradebookData from '../GradebookData'
 import {defaultGradebookEnv, defaultGradebookProps} from './GradebookSpecHelper'
+import useStore from '../stores'
+
+// Mock urlHelpers before importing
+jest.mock('../utils/urlHelpers', () => ({
+  addCorrelationIdToUrl: jest.fn(),
+}))
+
+// Import the mocked module to get reference to the mock
+import * as urlHelpers from '../utils/urlHelpers'
 
 const defaultProps = {
   ...defaultGradebookProps,
@@ -36,10 +45,44 @@ const defaultProps = {
 window.ENV.SETTINGS = {}
 
 describe('GradebookData', () => {
+  const mockAddCorrelationIdToUrl = urlHelpers.addCorrelationIdToUrl as jest.Mock
+
+  beforeEach(() => {
+    mockAddCorrelationIdToUrl.mockClear()
+  })
+
   it('renders', () => {
     render(<GradebookData {...defaultProps} />)
     expect(screen.getByTitle(/Loading Gradebook/i)).toBeInTheDocument()
     expect(screen.getByText(/Student Names/i)).toBeInTheDocument()
     expect(screen.getByText(/Assignment Names/i)).toBeInTheDocument()
+  })
+
+  it('adds correlationId to URL before loading data', () => {
+    // Spy on store data loading methods to verify they're called after URL update
+    const loadStudentDataSpy = jest.spyOn(useStore.getState(), 'loadStudentData')
+    const loadAssignmentGroupsSpy = jest.spyOn(useStore.getState(), 'loadAssignmentGroups')
+
+    render(<GradebookData {...defaultProps} />)
+
+    // Verify addCorrelationIdToUrl was called with a UUID
+    expect(mockAddCorrelationIdToUrl).toHaveBeenCalledTimes(1)
+    expect(mockAddCorrelationIdToUrl).toHaveBeenCalledWith(expect.stringMatching(/^[0-9a-f-]{36}$/))
+
+    // Verify data loading functions were called
+    expect(loadStudentDataSpy).toHaveBeenCalled()
+    expect(loadAssignmentGroupsSpy).toHaveBeenCalled()
+
+    // Verify URL was updated before any data loading using Jest's invocation order tracking
+    const urlUpdateCallOrder = mockAddCorrelationIdToUrl.mock.invocationCallOrder[0]
+    const loadStudentDataCallOrder = loadStudentDataSpy.mock.invocationCallOrder[0]
+    const loadAssignmentGroupsCallOrder = loadAssignmentGroupsSpy.mock.invocationCallOrder[0]
+
+    expect(urlUpdateCallOrder).toBeLessThan(loadStudentDataCallOrder)
+    expect(urlUpdateCallOrder).toBeLessThan(loadAssignmentGroupsCallOrder)
+
+    // Cleanup
+    loadStudentDataSpy.mockRestore()
+    loadAssignmentGroupsSpy.mockRestore()
   })
 })
