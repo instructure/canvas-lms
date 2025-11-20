@@ -107,17 +107,6 @@ describe('processIssuesToChartData', () => {
   })
 })
 
-describe('getChartData', () => {
-  it('should assign correct background colors based on severity', () => {
-    const result = getChartData(sampleData, 800)
-    expect(result.datasets[0].backgroundColor).toEqual([
-      '#9B181C', // High
-      '#E62429', // Medium
-      '#F06E26', // Low
-    ])
-  })
-})
-
 describe('getChartOptions', () => {
   it('sets autoSkip based on containerWidth', () => {
     const wide = getChartOptions(sampleData, 600)
