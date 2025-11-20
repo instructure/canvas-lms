@@ -583,12 +583,12 @@ export default class EventDataSource {
 
   assignmentParams(params, subAssignment = false) {
     // We only want to see assignments from courses that do not use Course Pacing, unless the
-    // user is a student in the course. In that case, they should see their assignments on the calendar
+    // user is a student or observer in the course. In that case, they should see their assignments on the calendar
     if (ENV.CALENDAR?.CONTEXTS) {
       params.context_codes = ENV.CALENDAR.CONTEXTS.filter(
         context =>
           params.context_codes.includes(context.asset_string) &&
-          (!context.course_pacing_enabled || context.user_is_student),
+          (!context.course_pacing_enabled || context.user_is_student || context.user_is_observer),
       ).map(context => context.asset_string)
     }
     const type = subAssignment ? 'sub_assignment' : 'assignment'
