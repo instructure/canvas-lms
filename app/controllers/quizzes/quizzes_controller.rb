@@ -162,7 +162,8 @@ class Quizzes::QuizzesController < ApplicationController
           # TODO: remove this since it's set in application controller
           # Will need to update consumers of this in the UI to bring down
           # this permissions check as well
-          DIRECT_SHARE_ENABLED: @context.grants_right?(@current_user, session, :direct_share)
+          DIRECT_SHARE_ENABLED: @context.grants_right?(@current_user, session, :direct_share),
+          new_quizzes_surveys_enabled: Account.site_admin.feature_enabled?(:new_quizzes_surveys),
         },
         quiz_menu_tools: external_tools_display_hashes(:quiz_menu),
         quiz_index_menu_tools: external_tools_display_hashes(:quiz_index_menu),
