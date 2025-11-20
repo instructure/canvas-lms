@@ -97,7 +97,6 @@
     "@instructure/uid": "10.26.3",
     "@instructure/updown": "^1.3",
     "@microsoft/immersive-reader-sdk": "^1.1.0",
-    "@ns0m/hermite-resize": "^2.2.10",
     "@peculiar/asn1-schema": "^2.3.6",
     "@peculiar/x509": "^1.9.3",
     "@pendo/agent": "^2.278.0",
