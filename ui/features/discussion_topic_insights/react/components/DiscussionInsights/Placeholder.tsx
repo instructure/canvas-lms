@@ -21,7 +21,7 @@ import EmptyDesert from '@canvas/images/react/EmptyDesert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
-import {IconAiLine,IconRefreshLine} from '@instructure/ui-icons'
+import {IconAiLine, IconRefreshLine} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
@@ -68,7 +68,11 @@ const Template = ({
     </View>
     {buttonText && (
       <View as="div">
-        <Link data-testid="placeholder-action-button" onClick={onClick} renderIcon={Icon || IconAiLine}>
+        <Link
+          data-testid="placeholder-action-button"
+          onClick={onClick}
+          renderIcon={Icon || IconAiLine}
+        >
           {buttonText}
         </Link>
       </View>
@@ -103,7 +107,6 @@ const NoData = ({onClick}: {onClick: () => void}) => (
       </View>
     }
     title={I18n.t('You haven’t generated any insights yet')}
-    description={I18n.t('Try adding a specific prompt or just generate without one')}
     buttonText={I18n.t('Generate Insights')}
     onClick={onClick}
   />
