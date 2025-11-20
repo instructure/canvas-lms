@@ -245,6 +245,34 @@ RSpec.describe ApplicationController do
             expect(controller.js_env[:current_user_is_admin]).to be_truthy
           end
         end
+
+        context "widget_dashboard_overridable" do
+          it "is not set when feature flag is off" do
+            expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+          end
+
+          it "is not set when feature flag is in 'allowed' state" do
+            Account.default.allow_feature!(:widget_dashboard)
+            expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+          end
+
+          it "is set to true when feature flag is in 'allowed_on' state and user has no preference" do
+            Account.default.set_feature_flag!(:widget_dashboard, "allowed_on")
+            expect(controller.js_env[:widget_dashboard_overridable]).to be true
+          end
+
+          it "is not set when feature flag is in 'on' state" do
+            Account.default.enable_feature!(:widget_dashboard)
+            expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+          end
+
+          it "respects user preference when feature is in 'allowed_on' state" do
+            Account.default.set_feature_flag!(:widget_dashboard, "allowed_on")
+            @user.preferences[:widget_dashboard_user_preference] = false
+            @user.save!
+            expect(controller.js_env[:widget_dashboard_overridable]).to be false
+          end
+        end
       end
 
       describe "ENV.DIRECT_SHARE_ENABLED" do
@@ -392,7 +420,8 @@ RSpec.describe ApplicationController do
                               cache_key: "key",
                               uuid: "bleh",
                               salesforce_id: "blah",
-                              suppress_assignments?: false)
+                              suppress_assignments?: false,
+                              lookup_feature_flag: nil)
         context = double(a11y_checker_enabled?: true)
         allow(context).to receive(:grants_any_right?).and_return(false)
         allow(root_account).to receive(:kill_joy?).and_return(false)
@@ -420,7 +449,8 @@ RSpec.describe ApplicationController do
                               uuid: "blah",
                               salesforce_id: "bleh",
                               enable_content_a11y_checker?: false,
-                              suppress_assignments?: false)
+                              suppress_assignments?: false,
+                              lookup_feature_flag: nil)
         allow(root_account).to receive(:kill_joy?).and_return(true)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
