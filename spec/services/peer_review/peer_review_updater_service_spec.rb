@@ -203,6 +203,40 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
         expect(existing_peer_review_sub_assignment.context_id).to eq(new_course.id)
         expect(existing_peer_review_sub_assignment.context_type).to eq("Course")
       end
+
+      it "updates peer_review_submission_required when parent assignment changes" do
+        existing_peer_review_sub_assignment.update!(peer_review_submission_required: true)
+        parent_assignment.update!(peer_review_submission_required: false)
+
+        result = service.call
+
+        expect(result.peer_review_submission_required).to be false
+      end
+
+      it "updates peer_review_across_sections when parent assignment changes" do
+        existing_peer_review_sub_assignment.update!(peer_review_across_sections: true)
+        parent_assignment.update!(peer_review_across_sections: false)
+
+        result = service.call
+
+        expect(result.peer_review_across_sections).to be false
+      end
+
+      it "updates both peer_review_submission_required and peer_review_across_sections together" do
+        existing_peer_review_sub_assignment.update!(
+          peer_review_submission_required: false,
+          peer_review_across_sections: false
+        )
+        parent_assignment.update!(
+          peer_review_submission_required: true,
+          peer_review_across_sections: true
+        )
+
+        result = service.call
+
+        expect(result.peer_review_submission_required).to be true
+        expect(result.peer_review_across_sections).to be true
+      end
     end
 
     context "with partial updates" do

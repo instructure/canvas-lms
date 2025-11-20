@@ -31,7 +31,9 @@ class PeerReviewSubAssignment < AbstractAssignment
     description
     group_category_id
     intra_group_peer_reviews
+    peer_review_across_sections
     peer_review_count
+    peer_review_submission_required
     peer_reviews
     peer_reviews_assigned
     peer_reviews_due_at
