@@ -23,7 +23,6 @@ import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 import customPropTypes from '@canvas/files/react/modules/customPropTypes'
 import updateAPIQuerySortParams from '../util/updateAPIQuerySortParams'
 import getAllPages from '../util/getAllPages'
-import 'location-origin'
 
 const I18n = createI18nScope('react_files')
 

@@ -155,7 +155,6 @@
     "jquery.elastic": "1.0.0",
     "jquery3": "npm:jquery@^3.7.1",
     "localforage": "^1.10.0",
-    "location-origin": "^1.1.4",
     "lodash": "^4.17.21",
     "md5": "^2.2.1",
     "mediaelement": "https://github.com/instructure/mediaelement.git#master",
