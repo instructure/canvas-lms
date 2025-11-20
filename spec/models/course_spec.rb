@@ -1689,24 +1689,8 @@ describe Course do
           @deleted_attachment.save!
         end
 
-        context "when the hidden_attachments_replacement_chain site admin flag is enabled" do
-          before do
-            Account.site_admin.enable_feature! :hidden_attachments_replacement_chain
-          end
-
-          it "returns the replacement attachment" do
-            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq new_attachment.id
-          end
-        end
-
-        context "when the hidden_attachments_replacement_chain site admin flag is disabled" do
-          before do
-            Account.site_admin.disable_feature! :hidden_attachments_replacement_chain
-          end
-
-          it "returns the original attachment" do
-            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
-          end
+        it "returns the replacement attachment" do
+          expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq new_attachment.id
         end
       end
 
@@ -1726,24 +1710,8 @@ describe Course do
           @deleted_attachment.save!
         end
 
-        context "when the hidden_attachments_replacement_chain site admin flag is enabled" do
-          before do
-            Account.site_admin.enable_feature! :hidden_attachments_replacement_chain
-          end
-
-          it "returns the original attachment" do
-            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
-          end
-        end
-
-        context "when the hidden_attachments_replacement_chain site admin flag is disabled" do
-          before do
-            Account.site_admin.disable_feature! :hidden_attachments_replacement_chain
-          end
-
-          it "returns the original attachment" do
-            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
-          end
+        it "returns the original attachment" do
+          expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
         end
       end
     end

@@ -240,10 +240,7 @@ class Attachment < ActiveRecord::Base
 
       return att unless att.deleted? && owner
 
-      include_hidden_files = Account.site_admin.feature_enabled?(:hidden_attachments_replacement_chain)
-      file_states = include_hidden_files ? %w[available hidden] : "available"
-
-      new_att = owner.attachments.where(id: att.replacement_attachment_id, file_state: file_states).first if att.replacement_attachment_id
+      new_att = owner.attachments.where(id: att.replacement_attachment_id, file_state: %w[available hidden]).first if att.replacement_attachment_id
       new_att ||= Folder.find_attachment_in_context_with_path(owner, att.full_display_path)
       new_att || att
     end
