@@ -94,7 +94,7 @@ module Lti
                                .joins("INNER JOIN #{Account.quoted_table_name} ON lti_tool_proxy_bindings.context_type = 'Account' AND lti_tool_proxy_bindings.context_id = accounts.id")
                                .where(lti_tool_proxy_bindings: { enabled: true })
                                .where(lti_tool_proxies: { workflow_state: "active" })
-                               .where(lti_product_families: { vendor_code: "turnitin.com", product_code: "turnitin-lti" })
+                               .where(lti_product_families: { vendor_code: Lti::AssetProcessorTiiMigrationWorker::TII_TOOL_VENDOR_CODE, product_code: Lti::AssetProcessorTiiMigrationWorker::TII_TOOL_PRODUCT_CODE })
                                .where.not(accounts: { workflow_state: "deleted" })
                                .where("accounts.id = ? OR accounts.root_account_id = ?", root_account_id, root_account_id)
                                .distinct
@@ -106,7 +106,7 @@ module Lti
                               .joins("INNER JOIN #{Course.quoted_table_name} ON lti_tool_proxy_bindings.context_type = 'Course' AND lti_tool_proxy_bindings.context_id = courses.id")
                               .where(lti_tool_proxy_bindings: { enabled: true })
                               .where(lti_tool_proxies: { workflow_state: "active" })
-                              .where(lti_product_families: { vendor_code: "turnitin.com", product_code: "turnitin-lti" })
+                              .where(lti_product_families: { vendor_code: Lti::AssetProcessorTiiMigrationWorker::TII_TOOL_VENDOR_CODE, product_code: Lti::AssetProcessorTiiMigrationWorker::TII_TOOL_PRODUCT_CODE })
                               .where.not(courses: { workflow_state: "deleted" })
                               .where(courses: { root_account_id: })
                               .distinct
@@ -119,7 +119,7 @@ module Lti
     def batch_count_tii_assignments(account_ids)
       account_ids.index_with do |account_id|
         AssignmentConfigurationToolLookup
-          .where(tool_vendor_code: "turnitin.com", tool_product_code: "turnitin-lti")
+          .where(tool_vendor_code: Lti::AssetProcessorTiiMigrationWorker::TII_TOOL_VENDOR_CODE, tool_product_code: Lti::AssetProcessorTiiMigrationWorker::TII_TOOL_PRODUCT_CODE)
           .joins(assignment: :course)
           .where(courses: { account_id: })
           .where.not(courses: { workflow_state: "deleted" })

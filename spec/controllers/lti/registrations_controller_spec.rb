@@ -185,6 +185,21 @@ RSpec.describe Lti::RegistrationsController do
         end
       end
     end
+
+    context "with lti_asset_processor_tii_migration enabled" do
+      let(:turnitin_client_id) { "12345" }
+
+      before do
+        account.root_account.enable_feature!(:lti_asset_processor_tii_migration)
+        allow(Setting).to receive(:get).and_call_original
+        allow(Setting).to receive(:get).with("turnitin_asset_processor_client_id", "").and_return(turnitin_client_id)
+      end
+
+      it "sets turnitinAPClientId in js_env" do
+        get :index, params: { account_id: account.id }
+        expect(assigns.dig(:js_env, :turnitinAPClientId)).to eq(turnitin_client_id)
+      end
+    end
   end
 
   describe "GET list", type: :request do
