@@ -408,27 +408,14 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           <Flex direction="column" gap="small">
             <Flex.Item>
               <View>
-                <Heading level="h2" variant="titleCardRegular">
-                  {item.resourceName}
-                </Heading>
-              </View>
-            </Flex.Item>
-            <Flex.Item>
-              <View>
-                <Flex alignItems="center" gap="xx-small">
-                  <Flex.Item>
-                    <Text size="large" variant="descriptionPage" as="h3">
-                      {I18n.t('Issue %{current}/%{total}: %{message}', {
-                        current: currentIssueIndex + 1,
-                        total: issues.length,
-                        message: currentIssue.displayName,
-                      })}
-                    </Text>
-                  </Flex.Item>
-                  <Flex.Item>
-                    <WhyMattersPopover issue={currentIssue} />
-                  </Flex.Item>
-                </Flex>
+                <Text size="large" variant="descriptionPage" as="h3">
+                  {I18n.t('Issue %{current}/%{total}: %{message}', {
+                    current: currentIssueIndex + 1,
+                    total: issues.length,
+                    message: currentIssue.displayName,
+                  })}{' '}
+                  <WhyMattersPopover issue={currentIssue} />
+                </Text>
               </View>
             </Flex.Item>
           </Flex>

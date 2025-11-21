@@ -83,9 +83,8 @@ describe('AccessibilityIssuesDrawerContent', () => {
     jest.clearAllMocks()
   })
 
-  it('renders the title and issue counter', async () => {
+  it('renders the issue counter', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
-    expect(await screen.findByText('Multi Issue Test Page')).toBeInTheDocument()
     expect(screen.getByText(/Issue 1\/2:/)).toBeInTheDocument()
   })
 

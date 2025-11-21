@@ -30,7 +30,7 @@ export const AccessibilityWizard = () => {
   const {selectedItem, setSelectedItem, setIsTrayOpen, isTrayOpen} =
     useAccessibilityCheckerContext()
 
-  const trayTitle = selectedItem?.resourceName || I18n.t('Accessibility Issues')
+  const trayTitle = selectedItem?.resourceName ?? ''
 
   const onDismiss = useCallback(() => {
     setSelectedItem(null)
