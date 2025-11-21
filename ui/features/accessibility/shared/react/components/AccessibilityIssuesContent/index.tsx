@@ -341,6 +341,13 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   )
 
   useEffect(() => {
+    // issues are saved into local state, so the state does not update when "item" changes.
+    // this effect ensures that issues state is updated on external "item" prop change.
+    setIssues(item.issues || [])
+    setCurrentIssueIndex(0)
+  }, [item, setIssues, setCurrentIssueIndex])
+
+  useEffect(() => {
     setIsRemediated(false)
     setIsFormLocked(false)
     setAssertiveAlertMessage(null)
