@@ -70,7 +70,11 @@ module.exports = {
   // https://rspack.dev/guide/tech/css
   experiments: {
     css: true,
+    nativeWatcher: true,
+    parallelLoader: true,
+    cache: isDev ? {type: 'memory'} : undefined,
   },
+  cache: isDev,
 
   // infer platform and ES-features from @instructure/browserslist-config-canvas-lms
   target: ['browserslist'],
@@ -163,6 +167,7 @@ module.exports = {
     hashFunction: 'xxhash64',
     filename: '[name]-entry-[contenthash].js',
     chunkFilename: '[name]-chunk-[contenthash].js',
+    pathinfo: 'verbose',
   },
 
   resolve: {
