@@ -341,6 +341,114 @@ describe AuthenticationMethods::InstAccessToken do
     end
   end
 
+  describe ".settings" do
+    before do
+      described_class.instance_variable_set(:@settings, nil)
+    end
+
+    after do
+      described_class.instance_variable_set(:@settings, nil)
+    end
+
+    it "loads settings from DynamicSettings" do
+      allow(DynamicSettings).to receive(:find).and_call_original
+      allow(DynamicSettings).to receive(:find)
+        .with(tree: :private)
+        .and_return(DynamicSettings::FallbackProxy.new({
+                                                         "inst_access_token.yml" => {
+                                                           "log_tenant_mismatches" => true
+                                                         }.to_yaml
+                                                       }))
+
+      settings = described_class.settings
+      expect(settings["log_tenant_mismatches"]).to be true
+    end
+
+    it "caches the settings result" do
+      allow(DynamicSettings).to receive(:find).and_call_original
+      allow(DynamicSettings).to receive(:find)
+        .with(tree: :private)
+        .and_return(DynamicSettings::FallbackProxy.new({
+                                                         "inst_access_token.yml" => {
+                                                           "log_tenant_mismatches" => false
+                                                         }.to_yaml
+                                                       }))
+
+      described_class.settings
+      described_class.settings
+
+      expect(DynamicSettings).to have_received(:find).with(tree: :private).once
+    end
+
+    it "returns empty hash when yml is nil" do
+      allow(DynamicSettings).to receive(:find).and_call_original
+      allow(DynamicSettings).to receive(:find)
+        .with(tree: :private)
+        .and_return(DynamicSettings::FallbackProxy.new({}))
+
+      settings = described_class.settings
+      expect(settings).to eq({})
+    end
+
+    it "parses YAML correctly" do
+      allow(DynamicSettings).to receive(:find).and_call_original
+      allow(DynamicSettings).to receive(:find)
+        .with(tree: :private)
+        .and_return(DynamicSettings::FallbackProxy.new({
+                                                         "inst_access_token.yml" => {
+                                                           "log_tenant_mismatches" => true,
+                                                           "other_setting" => "value"
+                                                         }.to_yaml
+                                                       }))
+
+      settings = described_class.settings
+      expect(settings["log_tenant_mismatches"]).to be true
+      expect(settings["other_setting"]).to eq("value")
+    end
+  end
+
+  describe ".reload" do
+    before do
+      allow(DynamicSettings).to receive(:find).and_call_original
+      allow(DynamicSettings).to receive(:find)
+        .with(tree: :private)
+        .and_return(DynamicSettings::FallbackProxy.new({
+                                                         "inst_access_token.yml" => {
+                                                           "log_tenant_mismatches" => true
+                                                         }.to_yaml
+                                                       }))
+    end
+
+    after do
+      described_class.instance_variable_set(:@settings, nil)
+    end
+
+    it "clears the cached settings" do
+      described_class.settings
+      expect(described_class.instance_variable_get(:@settings)).not_to be_nil
+
+      described_class.reload
+      expect(described_class.instance_variable_get(:@settings)).to be_nil
+    end
+
+    it "allows settings to be reloaded" do
+      described_class.settings
+
+      allow(DynamicSettings).to receive(:find)
+        .with(tree: :private)
+        .and_return(DynamicSettings::FallbackProxy.new({
+                                                         "inst_access_token.yml" => {
+                                                           "log_tenant_mismatches" => false
+                                                         }.to_yaml
+                                                       }))
+
+      described_class.reload
+      new_settings = described_class.settings
+
+      expect(new_settings["log_tenant_mismatches"]).to be false
+    end
+  end
+
   describe ".token_matches_tenant?" do
     specs_require_sharding
 
@@ -377,54 +485,132 @@ describe AuthenticationMethods::InstAccessToken do
       context "with feature flag DISABLED (shadow mode)" do
         before do
           Account.site_admin.feature_flags.where(feature: :enforce_service_token_tenant_matching).destroy_all
+          described_class.instance_variable_set(:@settings, nil)
         end
 
-        it "returns true (allows authentication)" do
-          expect(subject).to be true
+        after do
+          described_class.instance_variable_set(:@settings, nil)
         end
 
-        it "sends an InstStatsd event for monitoring" do
-          expect(InstStatsd::Statsd).to receive(:event).with(
-            "Service user authorization tenant mismatch",
-            "Token account UUID #{different_account.uuid} does not match domain root account UUID #{account.uuid} for client ",
-            hash_including(
-              type: "tenant_mismatch",
-              alert_type: :error
-            )
-          )
-          subject
-        end
-
-        it "includes shard tags in the event" do
-          expect(InstStatsd::Statsd).to receive(:event).with(
-            anything,
-            anything,
-            hash_including(:tags)
-          )
-          subject
-        end
-
-        context "when token has a client_id" do
-          let(:developer_key) { DeveloperKey.create!(name: "key", account:) }
-          let(:token) do
-            InstAccess::Token.for_user(
-              user_uuid: user.uuid,
-              account_uuid: different_account.uuid,
-              client_id: developer_key.global_id
-            )
+        context "when log_tenant_mismatches is true" do
+          before do
+            allow(DynamicSettings).to receive(:find).and_call_original
+            allow(DynamicSettings).to receive(:find)
+              .with(tree: :private)
+              .and_return(DynamicSettings::FallbackProxy.new({
+                                                               "inst_access_token.yml" => {
+                                                                 "log_tenant_mismatches" => true
+                                                               }.to_yaml
+                                                             }))
           end
 
-          it "includes client_id in the event message" do
+          it "returns true (allows authentication)" do
+            expect(subject).to be true
+          end
+
+          it "sends an InstStatsd event for monitoring" do
             expect(InstStatsd::Statsd).to receive(:event).with(
-              anything,
-              "Token account UUID #{different_account.uuid} does not match domain root account UUID #{account.uuid} for client #{developer_key.global_id}",
-              anything
+              "Service user authorization tenant mismatch",
+              "Token account UUID #{different_account.uuid} does not match domain root account UUID #{account.uuid} for client ",
+              hash_including(
+                type: "tenant_mismatch",
+                alert_type: :error
+              )
             )
             subject
           end
 
-          it "still returns true in shadow mode" do
+          it "includes shard tags in the event" do
+            expect(InstStatsd::Statsd).to receive(:event).with(
+              anything,
+              anything,
+              hash_including(:tags)
+            )
+            subject
+          end
+
+          context "when token has a client_id" do
+            let(:developer_key) { DeveloperKey.create!(name: "key", account:) }
+            let(:token) do
+              InstAccess::Token.for_user(
+                user_uuid: user.uuid,
+                account_uuid: different_account.uuid,
+                client_id: developer_key.global_id
+              )
+            end
+
+            it "includes client_id in the event message" do
+              expect(InstStatsd::Statsd).to receive(:event).with(
+                anything,
+                "Token account UUID #{different_account.uuid} does not match domain root account UUID #{account.uuid} for client #{developer_key.global_id}",
+                anything
+              )
+              subject
+            end
+
+            it "still returns true in shadow mode" do
+              expect(subject).to be true
+            end
+          end
+        end
+
+        context "when log_tenant_mismatches is false" do
+          before do
+            allow(DynamicSettings).to receive(:find).and_call_original
+            allow(DynamicSettings).to receive(:find)
+              .with(tree: :private)
+              .and_return(DynamicSettings::FallbackProxy.new({
+                                                               "inst_access_token.yml" => {
+                                                                 "log_tenant_mismatches" => false
+                                                               }.to_yaml
+                                                             }))
+          end
+
+          it "returns true (allows authentication)" do
             expect(subject).to be true
+          end
+
+          it "does not send an InstStatsd event" do
+            expect(InstStatsd::Statsd).not_to receive(:event)
+            subject
+          end
+        end
+
+        context "when log_tenant_mismatches is nil" do
+          before do
+            allow(DynamicSettings).to receive(:find).and_call_original
+            allow(DynamicSettings).to receive(:find)
+              .with(tree: :private)
+              .and_return(DynamicSettings::FallbackProxy.new({
+                                                               "inst_access_token.yml" => {}.to_yaml
+                                                             }))
+          end
+
+          it "returns true (allows authentication)" do
+            expect(subject).to be true
+          end
+
+          it "does not send an InstStatsd event" do
+            expect(InstStatsd::Statsd).not_to receive(:event)
+            subject
+          end
+        end
+
+        context "when settings yml is missing" do
+          before do
+            allow(DynamicSettings).to receive(:find).and_call_original
+            allow(DynamicSettings).to receive(:find)
+              .with(tree: :private)
+              .and_return(DynamicSettings::FallbackProxy.new({}))
+          end
+
+          it "returns true (allows authentication)" do
+            expect(subject).to be true
+          end
+
+          it "does not send an InstStatsd event" do
+            expect(InstStatsd::Statsd).not_to receive(:event)
+            subject
           end
         end
       end

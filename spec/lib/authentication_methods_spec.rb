@@ -418,6 +418,11 @@ describe AuthenticationMethods do
           context "with feature flag DISABLED (shadow mode)" do
             before do
               Account.site_admin.feature_flags.where(feature: :enforce_service_token_tenant_matching).destroy_all
+              AuthenticationMethods::InstAccessToken.reload
+            end
+
+            after do
+              AuthenticationMethods::InstAccessToken.reload
             end
 
             it "allows authentication" do
@@ -433,6 +438,15 @@ describe AuthenticationMethods do
             end
 
             it "sends an InstStatsd event for monitoring" do
+              allow(DynamicSettings).to receive(:find).and_call_original
+              allow(DynamicSettings).to receive(:find)
+                .with(tree: :private)
+                .and_return(DynamicSettings::FallbackProxy.new({
+                                                                 "inst_access_token.yml" => {
+                                                                   "log_tenant_mismatches" => true
+                                                                 }.to_yaml
+                                                               }))
+
               expect(InstStatsd::Statsd).to receive(:event).with(
                 "Service user authorization tenant mismatch",
                 anything,
