@@ -39,11 +39,11 @@ export const IssuesTableColumns = {
 }
 
 export const IssuesTableColumnHeaders = [
-  {id: IssuesTableColumns.ResourceName, name: I18n.t('Resource Name')},
+  {id: IssuesTableColumns.ResourceName, name: I18n.t('Resource')},
   {id: IssuesTableColumns.Issues, name: I18n.t('Issues')},
-  {id: IssuesTableColumns.ResourceType, name: I18n.t('Resource Type')},
+  {id: IssuesTableColumns.ResourceType, name: I18n.t('Type')},
   {id: IssuesTableColumns.State, name: I18n.t('State')},
-  {id: IssuesTableColumns.LastEdited, name: I18n.t('Last Edited')},
+  {id: IssuesTableColumns.LastEdited, name: I18n.t('Last edited')},
 ]
 
 export const IssuesTableHeaderApiNames: Record<string, string> = {
