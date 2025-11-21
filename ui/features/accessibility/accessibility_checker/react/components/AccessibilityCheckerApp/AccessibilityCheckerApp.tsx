@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useMemo, useEffect} from 'react'
+import {useCallback, useMemo, useEffect, useRef} from 'react'
 import {useShallow} from 'zustand/react/shallow'
 import {View} from '@instructure/ui-view'
 
@@ -48,17 +48,24 @@ export const AccessibilityCheckerApp: React.FC = () => {
   const appliedFilters = useMemo(() => getAppliedFilters(filters || {}), [filters])
 
   const accessibilityScanDisabled = window.ENV.SCAN_DISABLED
+  const hasInitializedFilters = useRef(false)
 
   useEffect(() => {
     const parsedFetchParams = parseFetchParams()
     if (parsedFetchParams.filters && !filters) {
       setFilters(parsedFetchParams.filters as Filters)
+    } else {
+      hasInitializedFilters.current = true
     }
   }, [])
 
   useDeepCompareEffect(() => {
     const fetchParams = parseFetchParams()
-    if (fetchParams.filters && !filters) return // wait for filters to be set from query params
+    if (fetchParams.filters && !filters && !hasInitializedFilters.current) {
+      return // wait for filters to be set from query params on initial load
+    }
+
+    hasInitializedFilters.current = true
 
     if (!accessibilityScanDisabled) {
       const parsedFetchParams = {...fetchParams, filters, page: 1}
