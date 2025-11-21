@@ -84,7 +84,7 @@ module Api::V1::PlannerItem
         # TODO: We don't currently have an html_url for individual planner items.
         # hash[:html_url] = ???
       elsif item.is_a?(Quizzes::Quiz) || (item.respond_to?(:quiz?) && item.quiz?)
-        hash[:plannable_date] = item[:user_due_date] || item.due_at
+        hash[:plannable_date] = item[:cached_due_date] || item[:user_due_date] || item.due_at
         quiz = item.is_a?(Quizzes::Quiz) ? item : item.quiz
         hash[:plannable_id] = quiz.id
         hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(quiz.class_name)
