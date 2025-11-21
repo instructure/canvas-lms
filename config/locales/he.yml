@@ -18420,6 +18420,7 @@ he:
         page_name: "שם העמוד"
         quiz_group: קבוצה
         quiz_name: "שם בוחן"
+        quiz_type: "סוג הבוחן"
         topic_name: "שם נושא"
         url: "כתובת דף"
         wiki_page_name: "שם העמוד"

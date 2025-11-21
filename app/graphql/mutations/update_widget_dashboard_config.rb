@@ -51,7 +51,7 @@ class Mutations::UpdateWidgetDashboardConfig < Mutations::BaseMutation
   ].freeze
 
   VALID_ANNOUNCEMENT_FILTERS = %w[unread read all].freeze
-  VALID_DATE_FILTERS = %w[all missing next3days next7days next14days submitted].freeze
+  VALID_DATE_FILTERS = %w[not_submitted missing submitted].freeze
 
   private
 

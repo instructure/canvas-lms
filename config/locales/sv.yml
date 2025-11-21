@@ -17841,7 +17841,7 @@ sv:
   helpers: 
     accessible_date_format: "ÅÅÅÅ-MM-DD hh:mm"
     accessible_date_only_format: ÅÅÅÅ-MM-DD
-    accessible_date_prompt: "Formatera Gilla"
+    accessible_date_prompt: "Format enligt"
     accessible_time_only_format: "hh:mm"
     account_time: Konto
     button: 
@@ -34377,7 +34377,7 @@ sv:
         unspecified: "när som helst"
       timespan: "%{start_at} *till* %{end_at}"
   terms_35d91184: "Terminer: "
-  terms_4d979628: Villkor
+  terms_4d979628: Terminer
   terms_api: 
     index: 
       page_title: "%{account} Terminer"

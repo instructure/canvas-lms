@@ -25402,6 +25402,7 @@ tr:
         other: "*%{count} Seviye İçerden Başlat*"
         zero: "*İçerden Başlatma*"
       labels: 
+        anonymous_submission: "Anonim Gönderim"
         assignment_name: "Ödev Adı"
         file: Dosya
         files: Dosyalar
@@ -25411,6 +25412,7 @@ tr:
         page_name: "Sayfa Adı"
         quiz_group: Grup
         quiz_name: "Kısa Sınav Adı"
+        quiz_type: "Kısa Sınav Türü"
         topic_name: "Konu Adı"
         url: URL
         wiki_page_name: "Sayfa Adı"
