@@ -249,6 +249,8 @@ class ContextModuleItemsApiController < ApplicationController
   include Api::V1::ContextModule
   include PlannerApiHelper
 
+  PAGE_TYPES = ["Page", "WikiPage"].freeze
+
   # @API List module items
   #
   # A paginated list of the items in a module
@@ -409,8 +411,6 @@ class ContextModuleItemsApiController < ApplicationController
   #       -d 'module_item[iframe][height]=200'
   #
   # @returns ModuleItem
-  PAGE_TYPES = ["Page", "WikiPage"].freeze
-
   def create
     @module = @context.context_modules.not_deleted.find(params[:module_id])
     if authorized_action(@module, @current_user, :update)
