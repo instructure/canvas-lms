@@ -3414,12 +3414,7 @@ describe CoursesController do
 
     context "when Sentry is enabled on the frontend" do
       before do
-        ConfigFile.stub("sentry", { dsn: "dummy-dsn", frontend_dsn: "dummy-frontend-dsn" })
-      end
-
-      after do
-        ConfigFile.unstub
-        SentryExtensions::Settings.reset_settings
+        stub_consul_config("sentry", { dsn: "dummy-dsn", frontend_dsn: "dummy-frontend-dsn" })
       end
 
       context "given a standard route" do
