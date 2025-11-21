@@ -13207,6 +13207,7 @@ ko:
         page_name: "페이지 이름"
         quiz_group: 그룹
         quiz_name: "퀴즈 이름"
+        quiz_type: "퀴즈 유형"
         topic_name: "주제 이름"
         url: URL
         wiki_page_name: "페이지 이름"
