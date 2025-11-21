@@ -275,7 +275,9 @@ end
     <%= render :partial => 'shared/embedded_chat' %>
   <% end %>
 
-  <%= render :partial => 'shared/ada_embed' if @domain_root_account&.feature_enabled?(:ada_chatbot) %>
+  <% if @domain_root_account&.feature_enabled?(:ada_chatbot) %>
+    <%= render :partial => 'shared/ada_embed' %>
+  <% end %>
 
   <% if @show_fixed_bottom %>
     <%= render :partial => 'layouts/fixed_bottom' %>

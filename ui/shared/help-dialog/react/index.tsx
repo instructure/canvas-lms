@@ -43,7 +43,7 @@ function HelpDialog({onFormSubmit}: Props) {
     case '#teacher_feedback':
       return <TeacherFeedbackForm onCancel={handleCancelClick} onSubmit={onFormSubmit} />
     case '#ada_chatbot':
-      return <AdaChatbot onSubmit={onFormSubmit} />
+      return <AdaChatbot onDialogClose={onFormSubmit} />
     default:
       return <HelpLinks onClick={handleLinkClick} />
   }
