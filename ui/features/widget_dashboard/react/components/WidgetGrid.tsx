@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
+import React, {useMemo, useCallback} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -24,7 +24,9 @@ import {IconAddLine} from '@instructure/ui-icons'
 import type {Widget, WidgetConfig} from '../types'
 import {getWidget} from './WidgetRegistry'
 import {useResponsiveContext} from '../hooks/useResponsiveContext'
+import {useWidgetLayout} from '../hooks/useWidgetLayout'
 import {Flex} from '@instructure/ui-flex'
+import {DragDropContext, Droppable, Draggable, type DropResult} from 'react-beautiful-dnd'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -58,10 +60,35 @@ interface WidgetGridProps {
 
 const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => {
   const {matches} = useResponsiveContext()
+  const {moveWidgetToPosition} = useWidgetLayout()
   const sortedWidgets = useMemo(() => sortWidgetsForStacking(config.widgets), [config.widgets])
   const widgetsByColumn = useMemo(() => widgetsAsColumns(config.widgets), [config.widgets])
 
-  const renderWidget = (widget: Widget) => {
+  const handleDragEnd = useCallback(
+    (result: DropResult) => {
+      if (!result.destination) return
+
+      const sourceCol = parseInt(result.source.droppableId.replace('column-', ''), 10)
+      const destCol = parseInt(result.destination.droppableId.replace('column-', ''), 10)
+      const destIndex = result.destination.index
+
+      const destColWidgets = config.widgets
+        .filter(w => w.position.col === destCol)
+        .sort((a, b) => a.position.row - b.position.row)
+
+      const targetRow =
+        destIndex < destColWidgets.length
+          ? destColWidgets[destIndex].position.row
+          : destColWidgets.length > 0
+            ? Math.max(...destColWidgets.map(w => w.position.row)) + 1
+            : 1
+
+      moveWidgetToPosition(result.draggableId, destCol, targetRow)
+    },
+    [moveWidgetToPosition, config.widgets],
+  )
+
+  const renderWidget = (widget: Widget, dragHandleProps?: any) => {
     const widgetRenderer = getWidget(widget.type)
 
     if (!widgetRenderer) {
@@ -71,10 +98,12 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
     }
 
     const WidgetComponent = widgetRenderer.component
-    return <WidgetComponent widget={widget} isEditMode={isEditMode} />
+    return (
+      <WidgetComponent widget={widget} isEditMode={isEditMode} dragHandleProps={dragHandleProps} />
+    )
   }
 
-  const renderAddWidgetPlaceholder = (position: string) => {
+  const renderAddWidgetPlaceholder = () => {
     if (!isEditMode) return null
 
     return (
@@ -86,7 +115,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
         borderWidth="small"
         borderColor="brand"
         background="transparent"
-        data-testid={`add-widget-placeholder-${position}`}
+        margin="x-small 0"
         themeOverride={{
           borderStyle: 'dashed',
         }}
@@ -111,38 +140,112 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
     </Flex.Item>
   )
 
-  const renderDesktopGrid = () => (
-    <Flex data-testid="widget-columns" direction="row" gap="x-small" alignItems="start">
-      <Flex.Item shouldGrow shouldShrink width="66%">
-        <Flex direction="column" gap="x-small" data-testid="widget-column-1" width="100%">
-          {renderAddWidgetPlaceholder('col-1-top')}
-          {widgetsByColumn[0].map((widget, index) => (
-            <React.Fragment key={widget.id}>
-              <Flex.Item data-testid={`widget-container-${widget.id}`}>
-                {renderWidget(widget)}
-              </Flex.Item>
-              {index < widgetsByColumn[0].length - 1 &&
-                renderAddWidgetPlaceholder(`col-1-between-${index}`)}
-            </React.Fragment>
-          ))}
-          {renderAddWidgetPlaceholder('col-1-bottom')}
+  const renderDesktopGrid = () => {
+    return (
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Flex data-testid="widget-columns" direction="row" gap="x-small" alignItems="start">
+          <Flex.Item shouldGrow shouldShrink width="66%">
+            {isEditMode ? (
+              <Droppable droppableId="column-1">
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    style={{minHeight: '100px'}}
+                  >
+                    <Flex
+                      direction="column"
+                      gap="x-small"
+                      data-testid="widget-column-1"
+                      width="100%"
+                    >
+                      {renderAddWidgetPlaceholder()}
+                      {widgetsByColumn[0].map((widget, index) => (
+                        <React.Fragment key={widget.id}>
+                          <Draggable draggableId={widget.id} index={index}>
+                            {provided => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                data-testid={`widget-container-${widget.id}`}
+                              >
+                                {renderWidget(widget, provided.dragHandleProps)}
+                              </div>
+                            )}
+                          </Draggable>
+                          {renderAddWidgetPlaceholder()}
+                        </React.Fragment>
+                      ))}
+                      {provided.placeholder}
+                    </Flex>
+                  </div>
+                )}
+              </Droppable>
+            ) : (
+              <Flex direction="column" gap="x-small" data-testid="widget-column-1" width="100%">
+                {widgetsByColumn[0].map(widget => (
+                  <Flex.Item key={widget.id} data-testid={`widget-container-${widget.id}`}>
+                    {renderWidget(widget)}
+                  </Flex.Item>
+                ))}
+                {/* Ensure Flex renders even when empty */}
+                {null}
+              </Flex>
+            )}
+          </Flex.Item>
+          <Flex.Item shouldGrow shouldShrink width="33%">
+            {isEditMode ? (
+              <Droppable droppableId="column-2">
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    style={{minHeight: '100px'}}
+                  >
+                    <Flex
+                      direction="column"
+                      gap="x-small"
+                      data-testid="widget-column-2"
+                      width="100%"
+                    >
+                      {renderAddWidgetPlaceholder()}
+                      {widgetsByColumn[1].map((widget, index) => (
+                        <React.Fragment key={widget.id}>
+                          <Draggable draggableId={widget.id} index={index}>
+                            {provided => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                data-testid={`widget-container-${widget.id}`}
+                              >
+                                {renderWidget(widget, provided.dragHandleProps)}
+                              </div>
+                            )}
+                          </Draggable>
+                          {renderAddWidgetPlaceholder()}
+                        </React.Fragment>
+                      ))}
+                      {provided.placeholder}
+                    </Flex>
+                  </div>
+                )}
+              </Droppable>
+            ) : (
+              <Flex direction="column" gap="x-small" data-testid="widget-column-2" width="100%">
+                {widgetsByColumn[1].map(widget => (
+                  <Flex.Item key={widget.id} data-testid={`widget-container-${widget.id}`}>
+                    {renderWidget(widget)}
+                  </Flex.Item>
+                ))}
+                {/* Ensure Flex renders even when empty */}
+                {null}
+              </Flex>
+            )}
+          </Flex.Item>
         </Flex>
-      </Flex.Item>
-      <Flex.Item shouldGrow shouldShrink width="33%">
-        <Flex direction="column" gap="x-small" data-testid="widget-column-2" width="100%">
-          {renderAddWidgetPlaceholder('col-2-top')}
-          {widgetsByColumn[1].map((widget, index) => (
-            <React.Fragment key={widget.id}>
-              {renderWidgetInView(widget)}
-              {index < widgetsByColumn[1].length - 1 &&
-                renderAddWidgetPlaceholder(`col-2-between-${index}`)}
-            </React.Fragment>
-          ))}
-          {renderAddWidgetPlaceholder('col-2-bottom')}
-        </Flex>
-      </Flex.Item>
-    </Flex>
-  )
+      </DragDropContext>
+    )
+  }
 
   const renderTabletStack = () => (
     <Flex data-testid="widget-columns" width="100%">
@@ -153,15 +256,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
         width="100%"
       >
         <Flex direction="column" gap="x-small" width="100%">
-          {renderAddWidgetPlaceholder('tablet-top')}
-          {sortedWidgets.map((widget, index) => (
-            <React.Fragment key={widget.id}>
-              {renderWidgetInView(widget)}
-              {index < sortedWidgets.length - 1 &&
-                renderAddWidgetPlaceholder(`tablet-between-${index}`)}
-            </React.Fragment>
-          ))}
-          {renderAddWidgetPlaceholder('tablet-bottom')}
+          {sortedWidgets.map(widget => renderWidgetInView(widget))}
         </Flex>
       </Flex.Item>
     </Flex>

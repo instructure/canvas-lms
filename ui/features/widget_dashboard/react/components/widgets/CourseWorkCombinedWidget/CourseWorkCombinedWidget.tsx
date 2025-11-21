@@ -48,6 +48,7 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
   error: externalError,
   onRetry,
   isEditMode = false,
+  dragHandleProps,
 }) => {
   const [selectedCourse, setSelectedCourse] = useWidgetConfig<string>(
     widget.id,
@@ -134,6 +135,7 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
       error={error ? I18n.t('Failed to load course work. Please try again.') : null}
       onRetry={handleRetry}
       isEditMode={isEditMode}
+      dragHandleProps={dragHandleProps}
       pagination={{
         currentPage: currentPageIndex + 1,
         totalPages,
