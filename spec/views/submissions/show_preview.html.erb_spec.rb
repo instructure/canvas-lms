@@ -52,6 +52,94 @@ describe "submissions/show_preview" do
     expect(response.body).to match(/No Preview Available/)
   end
 
+  context "New Quizzes (quiz_lti)" do
+    before(:once) do
+      course_with_student
+    end
+
+    before do
+      view_context
+      @quiz_lti_tool = @course.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+    end
+
+    context "with quiz_lti assignment" do
+      before do
+        @assignment = @course.assignments.create!(
+          title: "New Quiz",
+          submission_types: "external_tool"
+        )
+        @assignment.external_tool_tag = ContentTag.new(
+          url: "http://example.com/launch",
+          new_tab: false,
+          content_type: "ContextExternalTool",
+          content_id: @quiz_lti_tool.id
+        )
+        @assignment.external_tool_tag.save!
+        assign(:assignment, @assignment)
+      end
+
+      it "redirects to tool launch URL when unsubmitted" do
+        @submission = @assignment.submissions.find_or_create_by!(user: @student)
+        assign(:submission, @submission)
+        render "submissions/show_preview"
+
+        expect(response.body).to match(/meta HTTP-EQUIV="REFRESH"/i)
+        expect(response.body).to match(%r{courses/#{@course.id}/external_tools/retrieve})
+        expect(response.body).to match(/display=borderless/)
+        expect(response.body).not_to match(/No Preview Available/)
+      end
+
+      it "redirects to tool launch URL when submitted" do
+        @submission = @assignment.submit_homework(
+          @student,
+          submission_type: "basic_lti_launch",
+          url: "http://example.com/quiz/result"
+        )
+        assign(:submission, @submission)
+        render "submissions/show_preview"
+
+        expect(response.body).to match(/meta HTTP-EQUIV="REFRESH"/i)
+        expect(response.body).to match(%r{courses/#{@course.id}/external_tools/retrieve})
+        expect(response.body).to match(/example\.com/)
+      end
+    end
+
+    it "still shows 'No Preview Available' for non-quiz external_tool assignments" do
+      regular_tool = @course.context_external_tools.create!(
+        name: "Some Other Tool",
+        consumer_key: "key",
+        shared_secret: "secret",
+        url: "http://other-tool.com/launch"
+      )
+
+      assignment = @course.assignments.create!(
+        title: "External Tool Assignment",
+        submission_types: "external_tool"
+      )
+      assignment.external_tool_tag = ContentTag.new(
+        url: "http://other-tool.com/launch",
+        new_tab: false,
+        content_type: "ContextExternalTool",
+        content_id: regular_tool.id
+      )
+      assignment.external_tool_tag.save!
+
+      submission = assignment.submissions.find_or_create_by!(user: @student)
+
+      assign(:assignment, assignment)
+      assign(:submission, submission)
+      render "submissions/show_preview"
+
+      expect(response.body).to match(/No Preview Available/)
+    end
+  end
+
   context "when assignment involves DocViewer" do
     before(:once) do
       course_with_student
