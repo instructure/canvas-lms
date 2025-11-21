@@ -44,7 +44,7 @@ class AbstractAssignment < ActiveRecord::Base
   POINTED_GRADING_TYPES = %w[points percent letter_grade gpa_scale].to_set.freeze
 
   OFFLINE_SUBMISSION_TYPES = %i[on_paper external_tool none not_graded wiki_page].freeze
-  SUBMITTABLE_TYPES = %w[online_quiz discussion_topic wiki_page].freeze
+  SUBMITTABLE_TYPES = %w[online_quiz discussion_topic wiki_page ams].freeze
   LTI_EULA_SERVICE = "vnd.Canvas.Eula"
   AUDITABLE_ATTRIBUTES = %w[
     muted

@@ -746,7 +746,7 @@ describe SpeedGrader::Assignment do
                                              })
             json = SpeedGrader::Assignment.new(@assignment, @teacher).json
             json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments, :fake_student) }
-            students = @course.students.as_json(include_root: false, only: %i[id name sortable_name])
+            students = @course.students.as_json(include_root: false, only: %i[id name sortable_name uuid])
             StringifyIds.recursively_stringify_ids(students)
             expect(json_students).to match_array(students)
           end
@@ -764,7 +764,7 @@ describe SpeedGrader::Assignment do
           it "returns only students that belong to the first group" do
             json = SpeedGrader::Assignment.new(@assignment, @teacher).json
             json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments, :fake_student) }
-            group_students = group.users.as_json(include_root: false, only: %i[id name sortable_name])
+            group_students = group.users.as_json(include_root: false, only: %i[id name sortable_name uuid])
             StringifyIds.recursively_stringify_ids(group_students)
             expect(json_students).to match_array(group_students)
           end
@@ -778,7 +778,7 @@ describe SpeedGrader::Assignment do
               json = SpeedGrader::Assignment.new(@assignment, @teacher).json
               json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments, :fake_student) }
               group_students = group.users.where.not(id: first_student)
-                                    .as_json(include_root: false, only: %i[id name sortable_name])
+                                    .as_json(include_root: false, only: %i[id name sortable_name uuid])
               StringifyIds.recursively_stringify_ids(group_students)
               expect(json_students).to match_array(group_students)
             end
@@ -793,7 +793,7 @@ describe SpeedGrader::Assignment do
                                                })
               json = SpeedGrader::Assignment.new(@assignment, @teacher).json
               json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments, :fake_student) }
-              group_students = group.users.as_json(include_root: false, only: %i[id name sortable_name])
+              group_students = group.users.as_json(include_root: false, only: %i[id name sortable_name uuid])
               StringifyIds.recursively_stringify_ids(group_students)
               expect(json_students).to match_array(group_students)
             end
@@ -804,7 +804,7 @@ describe SpeedGrader::Assignment do
                                                })
               json = SpeedGrader::Assignment.new(@assignment, @teacher).json
               json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments, :fake_student) }
-              group_students = group.users.as_json(include_root: false, only: %i[id name sortable_name])
+              group_students = group.users.as_json(include_root: false, only: %i[id name sortable_name uuid])
               StringifyIds.recursively_stringify_ids(group_students)
               expect(json_students).to match_array(group_students)
             end
@@ -821,7 +821,7 @@ describe SpeedGrader::Assignment do
 
               json = SpeedGrader::Assignment.new(@assignment, @teacher).json
               json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments, :fake_student) }
-              course_students = @course.students.as_json(include_root: false, only: %i[id name sortable_name])
+              course_students = @course.students.as_json(include_root: false, only: %i[id name sortable_name uuid])
               StringifyIds.recursively_stringify_ids(course_students)
               expect(json_students).to match_array(course_students)
             end

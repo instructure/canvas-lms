@@ -872,6 +872,7 @@ module Api::V1::Assignment
     "not_graded",
     "wiki_page",
     "student_annotation",
+    "ams",
     ""
   ].freeze
 
