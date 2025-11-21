@@ -24660,6 +24660,7 @@ nn:
         quiz_engine: Quizverktøy
         quiz_group: Gruppe
         quiz_name: Quiznamn
+        quiz_type: Quiztype
         topic_name: Emnenamn
         url: URL-adresse
         wiki_page_name: Sidenamn
