@@ -132,30 +132,10 @@ exports.webpackManifest = new WebpackManifestPlugin({
 })
 
 exports.minimizeCode = new SwcJsMinimizerRspackPlugin({
-  compress: {
-    sequences: false, // prevents it from combining a bunch of statements with ","s so it is easier to set breakpoints
-    // these are all things that terser does by default but we turn
-    // them off because they don't reduce file size enough to justify the
-    // time they take, especially after gzip:
-    // see: https://slack.engineering/keep-webpack-fast-a-field-guide-for-better-build-performance-f56a5995e8f1
-    booleans: false,
-    collapse_vars: false,
-    comparisons: false,
-    computed_props: false,
-    hoist_props: false,
-    if_return: false,
-    join_vars: false,
-    keep_infinity: true,
-    loops: false,
-    negate_iife: false,
-    properties: false,
-    reduce_funcs: false,
-    reduce_vars: false,
-    typeofs: false,
-  },
-  output: {
-    comments: false,
-    semicolons: false, // prevents everything being on one line so it's easier to view in devtools
+  minimizerOptions: {
+    compress: {
+      sequences: false, // prevents it from combining a bunch of statements with ","s so it is easier to set breakpoints
+    },
   },
 })
 
@@ -168,6 +148,7 @@ exports.buildCacheOptions = {
 
 exports.moduleFederation = new ModuleFederationPlugin({
   name: 'canvas',
+  dev: process.env.NODE_ENV === 'development',
   remotes: {
     analyticshub: `promise new Promise(${fetchAnalyticsHub.toString()})`,
     speedgrader: `promise new Promise(${fetchSpeedGraderLibrary.toString()})`,
@@ -180,4 +161,5 @@ exports.moduleFederation = new ModuleFederationPlugin({
   exposes: {},
   shared: {},
   dts: false,
+  manifest: false,
 })
