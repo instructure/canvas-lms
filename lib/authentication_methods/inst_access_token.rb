@@ -23,6 +23,18 @@ module AuthenticationMethods
   # defined in the canvas_security gem and the
   # canvas domain itself (users, pseudonyms, accounts, etc)
   module InstAccessToken
+    Canvas::Reloader.on_reload { reload }
+
+    def self.reload
+      @settings = nil
+    end
+
+    def self.settings
+      @settings ||= YAML.safe_load(
+        DynamicSettings.find(tree: :private)["inst_access_token.yml", failsafe: nil] || "{}"
+      )
+    end
+
     # given a POTENTIAL token string, this will validate
     # it as being an InstAccess token and return
     # the token ruby object.
@@ -103,7 +115,7 @@ module AuthenticationMethods
       result ||= token.account_uuid == domain_root_account.uuid
       return result if Account.site_admin.feature_enabled? :enforce_service_token_tenant_matching
 
-      unless result
+      unless result || !settings["log_tenant_mismatches"]
         InstStatsd::Statsd.event(
           "Service user authorization tenant mismatch",
           "Token account UUID #{token.account_uuid} does not match domain root account UUID #{domain_root_account.uuid} for client #{token.client_id}",
