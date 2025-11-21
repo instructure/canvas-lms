@@ -169,13 +169,11 @@ describe('FiltersPanel', () => {
       const stateGroup = screen.getByTestId('state-checkbox-group')
       const publishedCheckbox = within(stateGroup).getByLabelText('Published')
       const unpublishedCheckbox = within(stateGroup).getByLabelText('Unpublished')
-      const archivedCheckbox = within(stateGroup).getByLabelText('Archived')
 
       await userEvent.click(publishedCheckbox)
 
       expect(publishedCheckbox).not.toBeChecked()
       expect(unpublishedCheckbox).toBeChecked()
-      expect(archivedCheckbox).toBeChecked()
     })
 
     it('handle issue type selection', async () => {
