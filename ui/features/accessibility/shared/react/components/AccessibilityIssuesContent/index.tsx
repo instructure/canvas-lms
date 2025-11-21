@@ -241,9 +241,10 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         method: 'POST',
       })
       const newScan = convertKeysToCamelCase(newScanResponse.json!) as AccessibilityResourceScan
-      const issues = newScan.issues ?? []
+      const newScanIssues = newScan.issues ?? []
 
-      setIssues(issues)
+      setIssues(newScanIssues)
+
       if (accessibilityScans) {
         const updatedOrderedTableData = updateCountPropertyForItem(accessibilityScans, newScan)
         setAccessibilityScans(updatedOrderedTableData)
@@ -257,8 +258,8 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           }
         }
       }
-      updateAccessibilityIssues(issues)
-      setCurrentIssueIndex(0)
+      updateAccessibilityIssues(newScanIssues)
+      setCurrentIssueIndex(prev => Math.min(prev, Math.max(0, newScanIssues.length - 1)))
       doFetchAccessibilityIssuesSummary({filters})
     } catch (err: any) {
       console.error('Error saving accessibility issue. Error is: ' + err.message)
@@ -269,7 +270,6 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     formRef,
     current.issue,
     current.resource,
-    issues,
     updateAccessibilityIssues,
     accessibilityScans,
     nextResource,
