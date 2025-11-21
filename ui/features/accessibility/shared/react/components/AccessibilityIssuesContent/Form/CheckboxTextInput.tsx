@@ -21,7 +21,6 @@ import React, {
   useRef,
   useImperativeHandle,
   useCallback,
-  useContext,
   useEffect,
 } from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -36,8 +35,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 
-import {AccessibilityCheckerContext} from '../../../contexts/AccessibilityCheckerContext'
-import type {AccessibilityCheckerContextType} from '../../../contexts/AccessibilityCheckerContext'
+import {useAccessibilityCheckerContext} from '../../../hooks/useAccessibilityCheckerContext'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
@@ -55,9 +53,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
       const [isChecked, setChecked] = useState(false)
       const [generateLoading, setGenerateLoading] = useState(false)
       const [generationError, setGenerationError] = useState<string | null>(null)
-      const {selectedItem} = useContext(
-        AccessibilityCheckerContext,
-      ) as Partial<AccessibilityCheckerContextType>
+      const {selectedItem} = useAccessibilityCheckerContext()
       const isAiGenerationEnabled = useAccessibilityScansStore(
         useShallow(state => state.aiGenerationEnabled),
       )

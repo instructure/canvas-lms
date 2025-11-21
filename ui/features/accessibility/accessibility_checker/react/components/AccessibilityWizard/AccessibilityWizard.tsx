@@ -22,21 +22,14 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasTray from '@canvas/trays/react/Tray'
 import AccessibilityIssuesContent from '../../../../shared/react/components/AccessibilityIssuesContent'
-import {AccessibilityResourceScan} from '../../../../shared/react/types'
+import {useAccessibilityCheckerContext} from '../../../../shared/react/hooks/useAccessibilityCheckerContext'
 
 const I18n = createI18nScope('accessibility_checker')
 
-export const AccessibilityWizard = ({
-  selectedItem,
-  isTrayOpen,
-  setSelectedItem,
-  setIsTrayOpen,
-}: {
-  selectedItem: AccessibilityResourceScan | null
-  isTrayOpen: boolean
-  setSelectedItem: (item: AccessibilityResourceScan | null) => void
-  setIsTrayOpen: (isOpen: boolean) => void
-}) => {
+export const AccessibilityWizard = () => {
+  const {selectedItem, setSelectedItem, setIsTrayOpen, isTrayOpen} =
+    useAccessibilityCheckerContext()
+
   const trayTitle = selectedItem?.resourceName || I18n.t('Accessibility Issues')
 
   const onDismiss = useCallback(() => {
@@ -58,15 +51,13 @@ export const AccessibilityWizard = ({
       size="regular"
       shouldCloseOnDocumentClick={false}
     >
-      <>
-        {selectedItem ? (
-          <AccessibilityIssuesContent item={selectedItem} onClose={onDismiss} />
-        ) : (
-          <View margin="auto">
-            <Spinner renderTitle={I18n.t('Loading accessibility issues...')} />
-          </View>
-        )}
-      </>
+      {selectedItem ? (
+        <AccessibilityIssuesContent item={selectedItem} onClose={onDismiss} />
+      ) : (
+        <View margin="auto">
+          <Spinner renderTitle={I18n.t('Loading accessibility issues...')} />
+        </View>
+      )}
     </CanvasTray>
   )
 }
