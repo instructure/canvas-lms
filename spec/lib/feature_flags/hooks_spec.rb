@@ -290,6 +290,13 @@ describe FeatureFlags::Hooks do
       allow(root_account).to receive(:account_users).and_return(account_users)
     end
 
+    def stub_subaccount_membership(account, is_member)
+      where_relation = double("where_relation", exists?: is_member)
+      active_relation = double("active_relation", where: where_relation)
+      account_users = double("account_users", active: active_relation)
+      allow(account).to receive(:account_users).and_return(account_users)
+    end
+
     def expect_all_transitions_locked(transitions)
       expect(transitions["on"]).to be_present
       expect(transitions["off"]).to be_present
@@ -334,6 +341,31 @@ describe FeatureFlags::Hooks do
         it "does not lock transitions for Account context" do
           allow(account).to receive(:feature_enabled?).with(:a11y_checker).and_return(true)
           allow(account).to receive(:root_account).and_return(root_account)
+
+          FeatureFlags::Hooks.only_admins_can_enable_a11y_checker_during_eap(user, account, nil, transitions)
+
+          expect(transitions).to be_empty
+        end
+      end
+
+      context "when user is subaccount admin" do
+        before do
+          allow(Account.site_admin).to receive(:grants_right?).with(user, :read).and_return(false)
+          stub_root_account_membership(root_account, false)
+        end
+
+        it "does not lock transitions for Course context" do
+          stub_subaccount_membership(course.account, true)
+
+          FeatureFlags::Hooks.only_admins_can_enable_a11y_checker_during_eap(user, course, nil, transitions)
+
+          expect(transitions).to be_empty
+        end
+
+        it "does not lock transitions for Account context" do
+          allow(account).to receive(:feature_enabled?).with(:a11y_checker).and_return(true)
+          allow(account).to receive(:root_account).and_return(root_account)
+          stub_subaccount_membership(account, true)
 
           FeatureFlags::Hooks.only_admins_can_enable_a11y_checker_during_eap(user, account, nil, transitions)
 
@@ -397,6 +429,31 @@ describe FeatureFlags::Hooks do
         it "locks all transitions for Account context" do
           allow(account).to receive(:feature_enabled?).with(:a11y_checker).and_return(false)
           allow(account).to receive(:root_account).and_return(root_account)
+
+          FeatureFlags::Hooks.only_admins_can_enable_a11y_checker_during_eap(user, account, nil, transitions)
+
+          expect_all_transitions_locked(transitions)
+        end
+      end
+
+      context "when user is subaccount admin" do
+        before do
+          allow(Account.site_admin).to receive(:grants_right?).with(user, :read).and_return(false)
+          stub_root_account_membership(root_account, false)
+        end
+
+        it "locks all transitions for Course context" do
+          stub_subaccount_membership(course.account, true)
+
+          FeatureFlags::Hooks.only_admins_can_enable_a11y_checker_during_eap(user, course, nil, transitions)
+
+          expect_all_transitions_locked(transitions)
+        end
+
+        it "locks all transitions for Account context" do
+          allow(account).to receive(:feature_enabled?).with(:a11y_checker).and_return(false)
+          allow(account).to receive(:root_account).and_return(root_account)
+          stub_subaccount_membership(account, true)
 
           FeatureFlags::Hooks.only_admins_can_enable_a11y_checker_during_eap(user, account, nil, transitions)
 
