@@ -23053,6 +23053,7 @@ hu:
         quiz_engine: "Kvíz motor"
         quiz_group: Csoport
         quiz_name: "Kvíz neve"
+        quiz_type: "Kvíz típusa"
         topic_name: "Téma neve"
         url: Link
         wiki_page_name: "Oldal neve"
