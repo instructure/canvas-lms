@@ -73,7 +73,7 @@ class Mutations::PostAssignmentGrades < Mutations::BaseMutation
       progress.process_job(
         assignment,
         :post_submissions,
-        { preserve_method_args: true },
+        { preserve_method_args: true, priority: Delayed::HIGH_PRIORITY },
         progress:,
         submission_ids:,
         posting_params:,
