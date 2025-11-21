@@ -141,4 +141,98 @@ describe('useWidgetLayout', () => {
       expect(remainingRightColumnWidgets).toHaveLength(rightColumnWidgets.length - 1)
     })
   })
+
+  describe('moveWidgetToPosition', () => {
+    it('moves widget to new position in same column', () => {
+      const {result} = renderHook(() => useWidgetLayout(), {wrapper: createWrapper})
+
+      const widget = result.current.config.widgets[0]
+      const targetCol = widget.position.col
+      const targetRow = 3
+
+      act(() => {
+        result.current.moveWidgetToPosition(widget.id, targetCol, targetRow)
+      })
+
+      const movedWidget = result.current.config.widgets.find(w => w.id === widget.id)
+      expect(movedWidget?.position.col).toBe(targetCol)
+    })
+
+    it('moves widget to different column', () => {
+      const {result} = renderHook(() => useWidgetLayout(), {wrapper: createWrapper})
+
+      const widget = result.current.config.widgets.find(w => w.position.col === 1)
+      if (!widget) return
+
+      act(() => {
+        result.current.moveWidgetToPosition(widget.id, 2, 1)
+      })
+
+      const movedWidget = result.current.config.widgets.find(w => w.id === widget.id)
+      expect(movedWidget?.position.col).toBe(2)
+    })
+
+    it('shifts widgets down when inserting at specific position', () => {
+      const {result} = renderHook(() => useWidgetLayout(), {wrapper: createWrapper})
+
+      const widget = result.current.config.widgets.find(w => w.position.col === 1)
+      if (!widget) return
+
+      const col2WidgetsBefore = result.current.config.widgets.filter(w => w.position.col === 2)
+
+      act(() => {
+        result.current.moveWidgetToPosition(widget.id, 2, 1)
+      })
+
+      const col2WidgetsAfter = result.current.config.widgets.filter(w => w.position.col === 2)
+      expect(col2WidgetsAfter).toHaveLength(col2WidgetsBefore.length + 1)
+
+      const widgetsAtOrAfterRow1 = col2WidgetsAfter.filter(w => w.position.row >= 1)
+      expect(widgetsAtOrAfterRow1.length).toBeGreaterThan(0)
+    })
+
+    it('normalizes row numbers after move', () => {
+      const {result} = renderHook(() => useWidgetLayout(), {wrapper: createWrapper})
+
+      const widget = result.current.config.widgets[0]
+
+      act(() => {
+        result.current.moveWidgetToPosition(widget.id, widget.position.col, 10)
+      })
+
+      const colWidgets = result.current.config.widgets
+        .filter(w => w.position.col === widget.position.col)
+        .sort((a, b) => a.position.row - b.position.row)
+
+      colWidgets.forEach((w, index) => {
+        expect(w.position.row).toBe(index + 1)
+      })
+    })
+
+    it('recalculates relative positions after move', () => {
+      const {result} = renderHook(() => useWidgetLayout(), {wrapper: createWrapper})
+
+      const widget = result.current.config.widgets[0]
+
+      act(() => {
+        result.current.moveWidgetToPosition(widget.id, 2, 1)
+      })
+
+      result.current.config.widgets.forEach((w, index) => {
+        expect(w.position.relative).toBeGreaterThan(0)
+      })
+    })
+
+    it('handles moving non-existent widget gracefully', () => {
+      const {result} = renderHook(() => useWidgetLayout(), {wrapper: createWrapper})
+
+      const initialConfig = JSON.stringify(result.current.config)
+
+      act(() => {
+        result.current.moveWidgetToPosition('non-existent-widget', 1, 1)
+      })
+
+      expect(JSON.stringify(result.current.config)).toBe(initialConfig)
+    })
+  })
 })

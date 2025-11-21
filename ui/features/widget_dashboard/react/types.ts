@@ -73,6 +73,7 @@ export interface BaseWidgetProps {
   error?: string | null
   onRetry?: () => void
   isEditMode?: boolean
+  dragHandleProps?: any
 }
 
 export interface WidgetRenderer {

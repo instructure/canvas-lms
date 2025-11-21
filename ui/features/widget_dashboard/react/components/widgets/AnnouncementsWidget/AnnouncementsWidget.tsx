@@ -33,7 +33,11 @@ import {useWidgetConfig} from '../../../hooks/useWidgetConfig'
 
 const I18n = createI18nScope('widget_dashboard')
 
-const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false}) => {
+const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({
+  widget,
+  isEditMode = false,
+  dragHandleProps,
+}) => {
   const {sharedCourseData} = useWidgetDashboard()
 
   const [filter, setFilter] = useWidgetConfig<FilterOption>(widget.id, 'filter', 'unread')
@@ -140,6 +144,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = fa
     <TemplateWidget
       widget={widget}
       isEditMode={isEditMode}
+      dragHandleProps={dragHandleProps}
       isLoading={isLoading}
       error={error ? I18n.t('Failed to load announcements. Please try again.') : null}
       onRetry={refetch}

@@ -34,6 +34,7 @@ export type MoveAction =
 interface WidgetLayoutContextType {
   config: WidgetConfig
   moveWidget: (widgetId: string, action: MoveAction) => void
+  moveWidgetToPosition: (widgetId: string, targetCol: number, targetRow: number) => void
   removeWidget: (widgetId: string) => void
   resetConfig: () => void
 }
@@ -268,6 +269,34 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
     [markDirty],
   )
 
+  const moveWidgetToPosition = useCallback(
+    (widgetId: string, targetCol: number, targetRow: number) => {
+      setConfig(prevConfig => {
+        const widget = prevConfig.widgets.find(w => w.id === widgetId)
+        if (!widget) return prevConfig
+
+        const updatedWidgets = prevConfig.widgets.map(w => {
+          if (w.id === widgetId) {
+            return {...w, position: {...w.position, col: targetCol, row: targetRow}}
+          }
+          if (w.position.col === targetCol && w.position.row >= targetRow && w.id !== widgetId) {
+            return {...w, position: {...w.position, row: w.position.row + 1}}
+          }
+          return w
+        })
+
+        const normalizedWidgets = normalizeRowNumbers(
+          normalizeRowNumbers(updatedWidgets, LEFT_COLUMN),
+          RIGHT_COLUMN,
+        )
+        const finalWidgets = recalculateRelativePositions(normalizedWidgets)
+        return {...prevConfig, widgets: finalWidgets}
+      })
+      markDirty()
+    },
+    [markDirty],
+  )
+
   const removeWidget = useCallback(
     (widgetId: string) => {
       setConfig(prevConfig => {
@@ -291,6 +320,7 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
   const value = {
     config,
     moveWidget,
+    moveWidgetToPosition,
     removeWidget,
     resetConfig,
   }
