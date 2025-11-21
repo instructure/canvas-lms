@@ -36,9 +36,16 @@ interface AmsModule {
 
 interface AmsLoaderProps {
   containerId: string
+  gradingContext?: {
+    assignmentId?: string
+    studentId?: string
+    studentUuid?: string
+    submissionId?: string
+    [key: string]: any
+  }
 }
 
-export function AmsLoader({containerId}: AmsLoaderProps): JSX.Element | null {
+export function AmsLoader({containerId, gradingContext}: AmsLoaderProps): JSX.Element | null {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const moduleRef = useRef<AmsModule | null>(null)
 
@@ -74,6 +81,7 @@ export function AmsLoader({containerId}: AmsLoaderProps): JSX.Element | null {
             rubrics: {
               createController: createRubricController,
             },
+            ...(gradingContext && {gradingContext}),
           })
         }
       })
@@ -87,7 +95,7 @@ export function AmsLoader({containerId}: AmsLoaderProps): JSX.Element | null {
         moduleRef.current.unmount(containerRef.current)
       }
     }
-  }, [containerId])
+  }, [containerId, gradingContext])
 
   return null
 }

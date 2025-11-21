@@ -294,7 +294,7 @@ class Submission < ActiveRecord::Base
             /* we expect a digital submission */
             AND NOT (
               cached_quiz_lti IS NOT TRUE AND
-              assignments.submission_types IN ('', 'none', 'not_graded', 'on_paper', 'wiki_page', 'external_tool')
+              assignments.submission_types IN ('', 'none', 'not_graded', 'on_paper', 'wiki_page', 'external_tool', 'ams')
             )
             AND assignments.submission_types IS NOT NULL
             AND NOT (

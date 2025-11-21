@@ -158,6 +158,7 @@ import {windowAlert} from '@canvas/util/globalUtils'
 import replaceTags from '@canvas/util/replaceTags'
 import {isPreviewable} from '@instructure/canvas-rce/es/rce/plugins/shared/Previewable'
 import {createRoot} from 'react-dom/client'
+import {AmsLoader} from '@canvas/ams/react/AmsLoader'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
 import {SpeedGraderDiscussionsNavigation2} from '../react/SpeedGraderDiscussionsNavigation2'
@@ -236,6 +237,8 @@ let fileIndex: number
 let $add_attachment: JQuery
 let $submissions_container: JQuery
 let $iframe_holder: JQuery
+let $ams_grading_container: JQuery
+let amsGradingRoot: ReturnType<typeof createRoot> | null = null
 let $avatar_image: JQuery
 let $x_of_x_students: JQuery
 let $grded_so_far: JQuery
@@ -3275,6 +3278,8 @@ EG = {
       $this_student_has_a_submission.show()
     } else if (attachment) {
       this.renderAttachment(attachment)
+    } else if (submission && submission.submission_type === 'ams') {
+      this.renderAmsGrading(submission)
     } else if (submission && submission.submission_type === 'basic_lti_launch') {
       if (
         !ENV.SINGLE_NQ_SESSION_ENABLED ||
@@ -3288,6 +3293,7 @@ EG = {
         $iframe_holder.show()
       }
     } else {
+      this.unmountAmsGrading()
       this.renderSubmissionPreview()
     }
   },
@@ -3295,6 +3301,7 @@ EG = {
   emptyIframeHolder(elem?: JQuery) {
     elem = elem || $iframe_holder
     elem.empty()
+    this.unmountAmsGrading()
   },
 
   // load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
@@ -3387,6 +3394,45 @@ EG = {
       allowfullscreen: true,
     })
     $div.html(iframe).show()
+  },
+
+  renderAmsGrading(submission: HistoricalSubmission) {
+    this.emptyIframeHolder()
+    this.unmountAmsGrading()
+
+    if (!window.REMOTES?.ams?.launch_url) {
+      console.error('AMS not configured')
+      return
+    }
+
+    const container = document.getElementById('ams_grading_container')
+    if (!container) {
+      console.error('AMS grading container not found')
+      return
+    }
+
+    amsGradingRoot = createRoot(container)
+    amsGradingRoot.render(
+      <AmsLoader
+        containerId="ams_grading_container"
+        gradingContext={{
+          assignmentId: String(window.jsonData.id),
+          studentId: String(this.currentStudent.id),
+          studentUuid: this.currentStudent.uuid,
+          submissionId: String(submission.id),
+        }}
+      />,
+    )
+
+    $ams_grading_container.show()
+  },
+
+  unmountAmsGrading() {
+    if (amsGradingRoot) {
+      amsGradingRoot.unmount()
+      amsGradingRoot = null
+    }
+    $ams_grading_container.hide()
   },
 
   generateWarningTimings(numHours: number): number[] {
@@ -4922,6 +4968,7 @@ function setupSelectors() {
   $grading_box_selected_grader = $('#grading-box-selected-grader')
   $grded_so_far = $('#x_of_x_graded')
   $iframe_holder = $('#iframe_holder')
+  $ams_grading_container = $('#ams_grading_container')
   $left_side = $('#left_side')
   $multiple_submissions = $('#multiple_submissions')
   $new_screen_capture_indicator_wrapper = $('#new-studio-media-indicator-wrapper')
