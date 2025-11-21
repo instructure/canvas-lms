@@ -15924,6 +15924,7 @@ hy:
         page_name: "Էջի անվանում"
         quiz_group: Խումբ
         quiz_name: "Թեստի անվանում"
+        quiz_type: "Թեստի տեսակ"
         topic_name: "Թեմայի անվանում"
         url: "URL հասցե"
         wiki_page_name: "Էջի անվանում"
