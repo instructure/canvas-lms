@@ -23,10 +23,12 @@ import {Text} from '@instructure/ui-text'
 import {IconButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
-import {IconCheckPlusLine} from '@instructure/ui-icons'
+import {IconCheckPlusLine, IconCheckLine} from '@instructure/ui-icons'
+import {Spinner} from '@instructure/ui-spinner'
 import CourseCode from '../../shared/CourseCode'
 import type {PlannerItem} from './types'
 import {formatDate, getPlannableTypeLabel, isOverdue} from './utils'
+import {usePlannerOverride} from './hooks/usePlannerOverride'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -38,6 +40,16 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
   const dateText = formatDate(item.plannable_date)
   const isItemOverdue = isOverdue(item.plannable_date)
   const typeLabel = getPlannableTypeLabel(item.plannable_type)
+  const {toggleComplete, isLoading} = usePlannerOverride()
+
+  const isMarkedComplete = item.planner_override?.marked_complete ?? false
+
+  const handleCheckboxClick = () => {
+    toggleComplete({
+      item,
+      markedComplete: !isMarkedComplete,
+    })
+  }
 
   return (
     <View
@@ -67,7 +79,9 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
                 isWithinText={false}
                 data-testid={`todo-link-${item.plannable_id}`}
               >
-                <Text weight="bold">{item.plannable.title}</Text>
+                <Text weight="bold" color={isMarkedComplete ? 'secondary' : undefined}>
+                  {item.plannable.title}
+                </Text>
               </Link>
             </Flex.Item>
 
@@ -129,13 +143,25 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
         </Flex.Item>
 
         <Flex.Item>
-          <IconButton
-            screenReaderLabel={`Mark ${item.plannable.title} as complete`}
-            interaction="disabled"
-            data-testid={`todo-checkbox-${item.plannable_id}`}
-          >
-            <IconCheckPlusLine />
-          </IconButton>
+          {isLoading ? (
+            <Spinner
+              renderTitle={I18n.t('Updating...')}
+              size="x-small"
+              data-testid={`todo-checkbox-loading-${item.plannable_id}`}
+            />
+          ) : (
+            <IconButton
+              screenReaderLabel={
+                isMarkedComplete
+                  ? I18n.t('Mark %{title} as incomplete', {title: item.plannable.title})
+                  : I18n.t('Mark %{title} as complete', {title: item.plannable.title})
+              }
+              onClick={handleCheckboxClick}
+              data-testid={`todo-checkbox-${item.plannable_id}`}
+            >
+              {isMarkedComplete ? <IconCheckLine color="success" /> : <IconCheckPlusLine />}
+            </IconButton>
+          )}
         </Flex.Item>
       </Flex>
     </View>

@@ -292,7 +292,7 @@ describe('TodoListWidget', () => {
   })
 
   describe('checkboxes', () => {
-    it('renders checkboxes as disabled', async () => {
+    it('renders checkboxes as enabled', async () => {
       renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
 
       await waitFor(() => {
@@ -300,7 +300,7 @@ describe('TodoListWidget', () => {
       })
 
       const checkbox = screen.getByTestId('todo-checkbox-1')
-      expect(checkbox).toBeDisabled()
+      expect(checkbox).toBeEnabled()
     })
   })
 })

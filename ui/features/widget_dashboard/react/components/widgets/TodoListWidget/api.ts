@@ -17,7 +17,7 @@
  */
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import type {PlannerItem} from './types'
+import type {PlannerItem, PlannerOverride} from './types'
 
 export interface FetchPlannerItemsParams {
   start_date?: string
@@ -62,4 +62,47 @@ export async function fetchPlannerItems(
     items,
     nextUrl: next,
   }
+}
+
+export interface CreatePlannerOverrideParams {
+  plannable_type: string
+  plannable_id: string
+  marked_complete: boolean
+}
+
+export async function createPlannerOverride(
+  params: CreatePlannerOverrideParams,
+): Promise<PlannerOverride> {
+  const {json} = await doFetchApi<PlannerOverride>({
+    path: '/api/v1/planner/overrides',
+    method: 'POST',
+    body: params,
+  })
+
+  if (!json) {
+    throw new Error('Failed to create planner override')
+  }
+
+  return json
+}
+
+export interface UpdatePlannerOverrideParams {
+  marked_complete: boolean
+}
+
+export async function updatePlannerOverride(
+  overrideId: number,
+  params: UpdatePlannerOverrideParams,
+): Promise<PlannerOverride> {
+  const {json} = await doFetchApi<PlannerOverride>({
+    path: `/api/v1/planner/overrides/${overrideId}`,
+    method: 'PUT',
+    body: params,
+  })
+
+  if (!json) {
+    throw new Error('Failed to update planner override')
+  }
+
+  return json
 }
