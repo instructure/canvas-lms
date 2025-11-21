@@ -81,5 +81,4 @@ export const artifactTypeOptions = [
 export const stateOptions = [
   {value: 'published', label: I18n.t('Published')},
   {value: 'unpublished', label: I18n.t('Unpublished')},
-  {value: 'archived', label: I18n.t('Archived')},
 ]

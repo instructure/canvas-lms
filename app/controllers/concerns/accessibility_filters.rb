@@ -55,25 +55,10 @@ module AccessibilityFilters
   def apply_search_term_filter(relation, search_term)
     return relation if search_term.blank?
 
-    matching_rule_types = rule_types_from_label_search(search_term)
-    term = "%#{search_term.downcase.strip}%"
+    sanitized_term = ActiveRecord::Base.sanitize_sql_like(search_term.strip)
+    term = "%#{sanitized_term.downcase}%"
 
-    conditions = [
-      "accessibility_resource_scans.resource_name ILIKE :term",
-      "accessibility_resource_scans.resource_workflow_state ILIKE :term",
-      "accessibility_resource_scans.error_message ILIKE :term"
-    ]
-
-    if matching_rule_types.any?
-      relation = relation.joins(:accessibility_issues).distinct
-      conditions << "accessibility_issues.rule_type IN (:matching_rule_types)"
-    end
-
-    relation.where(
-      conditions.join(" OR "),
-      term:,
-      matching_rule_types:
-    )
+    relation.where("accessibility_resource_scans.resource_name ILIKE :term", term:)
   end
 
   private
@@ -139,8 +124,8 @@ module AccessibilityFilters
   # @param to_date [Time, nil] end date for filtering
   # @return [ActiveRecord::Relation] the filtered query
   def apply_date_range_filter(relation, from_date, to_date)
-    relation = relation.where(resource_updated_at: from_date..) if from_date.present?
-    relation = relation.where(resource_updated_at: ..to_date) if to_date.present?
+    relation = relation.where(resource_updated_at: from_date.beginning_of_day..) if from_date.present?
+    relation = relation.where(resource_updated_at: ..to_date.end_of_day) if to_date.present?
     relation
   end
 

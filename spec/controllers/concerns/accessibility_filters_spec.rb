@@ -267,8 +267,8 @@ describe AccessibilityFilters do
     end
 
     context "with date filters" do
-      it "returns scans from before today" do
-        filters = { toDate: today.beginning_of_day.iso8601 }
+      it "returns scans up to and including yesterday" do
+        filters = { toDate: yesterday.iso8601 }
         result = controller.apply_accessibility_filters(base_relation, filters)
 
         expected_scans = [
@@ -281,8 +281,8 @@ describe AccessibilityFilters do
         expect(result.to_a).to match_array(expected_scans)
       end
 
-      it "returns scans from after yesterday" do
-        filters = { fromDate: yesterday.end_of_day.iso8601 }
+      it "returns scans from today onwards" do
+        filters = { fromDate: today.iso8601 }
         result = controller.apply_accessibility_filters(base_relation, filters)
 
         expected_scans = [
@@ -297,8 +297,8 @@ describe AccessibilityFilters do
 
       it "returns scans between yesterday and today" do
         filters = {
-          fromDate: yesterday.beginning_of_day.iso8601,
-          toDate: today.end_of_day.iso8601
+          fromDate: yesterday.iso8601,
+          toDate: today.iso8601
         }
         result = controller.apply_accessibility_filters(base_relation, filters)
 
@@ -319,7 +319,7 @@ describe AccessibilityFilters do
       it "returns empty when date range excludes all scans" do
         filters = {
           fromDate: 2.days.ago.iso8601,
-          toDate: 2.days.ago.end_of_day.iso8601
+          toDate: 2.days.ago.iso8601
         }
         result = controller.apply_accessibility_filters(base_relation, filters)
 
@@ -344,8 +344,8 @@ describe AccessibilityFilters do
       it "applies date and rule type filters together" do
         filters = {
           ruleTypes: [heading_sequence_rule],
-          fromDate: yesterday.beginning_of_day.iso8601,
-          toDate: yesterday.end_of_day.iso8601
+          fromDate: yesterday.iso8601,
+          toDate: yesterday.iso8601
         }
         result = controller.apply_accessibility_filters(base_relation, filters)
 
@@ -364,12 +364,96 @@ describe AccessibilityFilters do
           ruleTypes: [list_structure_rule],
           artifactTypes: ["wiki_page"],
           workflowStates: ["unpublished"],
-          fromDate: yesterday.beginning_of_day.iso8601,
-          toDate: yesterday.end_of_day.iso8601
+          fromDate: yesterday.iso8601,
+          toDate: yesterday.iso8601
         }
         result = controller.apply_accessibility_filters(base_relation, filters)
 
         expect(result.to_a).to be_empty
+      end
+    end
+
+    context "with search term" do
+      let!(:specific_page) do
+        page = wiki_page_model(course:, title: "Unique Search Test Page")
+        create_scan(page, "published", today)
+      end
+
+      let!(:assignment_with_underscores) do
+        assignment = assignment_model(course:, title: "Test_Assignment_With_Underscores")
+        create_scan(assignment, "published", today)
+      end
+
+      let!(:page_with_percent) do
+        page = wiki_page_model(course:, title: "50% Complete Page")
+        create_scan(page, "published", today)
+      end
+
+      it "returns scans matching resource_name" do
+        result = controller.apply_accessibility_filters(base_relation, {}, "Unique Search Test")
+
+        expect(result.to_a).to match_array([specific_page])
+      end
+
+      it "performs case-insensitive search" do
+        result = controller.apply_accessibility_filters(base_relation, {}, "UNIQUE SEARCH TEST")
+
+        expect(result.to_a).to match_array([specific_page])
+      end
+
+      it "returns scans with partial name match" do
+        result = controller.apply_accessibility_filters(base_relation, {}, "Page 1")
+
+        expect(result.to_a).to match_array([page_published_today_list])
+      end
+
+      it "returns empty when search term does not match any resource_name" do
+        result = controller.apply_accessibility_filters(base_relation, {}, "NonExistentResource")
+
+        expect(result.to_a).to be_empty
+      end
+
+      it "escapes underscore wildcards in search term" do
+        result = controller.apply_accessibility_filters(base_relation, {}, "Test_Assignment")
+
+        expect(result.to_a).to match_array([assignment_with_underscores])
+      end
+
+      it "escapes percent wildcards in search term" do
+        result = controller.apply_accessibility_filters(base_relation, {}, "50%")
+
+        expect(result.to_a).to match_array([page_with_percent])
+      end
+
+      it "trims whitespace from search term" do
+        result = controller.apply_accessibility_filters(base_relation, {}, "  Page 1  ")
+
+        expect(result.to_a).to match_array([page_published_today_list])
+      end
+
+      it "returns all scans when search term is blank" do
+        result = controller.apply_accessibility_filters(base_relation, {}, "")
+
+        expect(result.to_a.size).to eq(all_scans.size + 3)
+      end
+
+      it "returns all scans when search term is nil" do
+        result = controller.apply_accessibility_filters(base_relation, {}, nil)
+
+        expect(result.to_a.size).to eq(all_scans.size + 3)
+      end
+
+      it "combines search with other filters" do
+        filters = { workflowStates: ["published"] }
+        result = controller.apply_accessibility_filters(base_relation, filters, "Assignment")
+
+        expected_scans = [
+          assignment_published_today_list,
+          assignment_published_yesterday_heading,
+          assignment_with_underscores
+        ]
+
+        expect(result.to_a).to match_array(expected_scans)
       end
     end
   end
@@ -380,6 +464,7 @@ describe AccessibilityFilters do
     accessibility_resource_scan_model(
       course:,
       context: resource,
+      resource_name: resource.title,
       resource_workflow_state: workflow_state,
       resource_updated_at: date
     )
