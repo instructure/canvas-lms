@@ -186,7 +186,7 @@ module FeatureFlags
     end
 
     def self.only_admins_can_enable_a11y_checker_during_eap(user, context, from_state, transitions)
-      only_admins_can_enable_during_eap(user, context, :a11y_checker, from_state, transitions)
+      only_admins_can_enable_during_eap(user, context, :a11y_checker, from_state, transitions, allow_subaccount_admins: true)
     end
 
     # Private helper methods
@@ -202,12 +202,23 @@ module FeatureFlags
     end
     private_class_method :shadow_flag_enabled?
 
-    def self.only_admins_can_enable_during_eap(user, context, flag_name, _from_state, transitions)
+    def self.only_admins_can_enable_during_eap(user, context, flag_name, _from_state, transitions, allow_subaccount_admins: false)
       flag_enabled = shadow_flag_enabled?(context, flag_name)
-      user_is_site_admin = Account.site_admin.grants_right?(user, :read)
-      user_is_root_admin = (context.is_a?(Course) || context.is_a?(Account)) && context.root_account.account_users.active.where(user_id: user&.id).exists?
 
-      return if (user_is_site_admin || user_is_root_admin) && flag_enabled
+      user_is_site_admin = Account.site_admin.grants_right?(user, :read)
+      user_is_root_admin = false
+      user_is_subaccount_admin = false
+
+      if context.is_a?(Course) || context.is_a?(Account)
+        user_is_root_admin = context.root_account.account_users.active.where(user_id: user&.id).exists?
+
+        if allow_subaccount_admins
+          account = context.is_a?(Account) ? context : context.account
+          user_is_subaccount_admin = account.account_users.active.where(user_id: user&.id).exists?
+        end
+      end
+
+      return if flag_enabled && (user_is_site_admin || user_is_root_admin || user_is_subaccount_admin)
 
       transitions["on"] ||= {}
       transitions["off"] ||= {}
