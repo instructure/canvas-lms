@@ -142,7 +142,7 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
   }
 
   return (
-    <View as="div" margin="0 0 large 0" data-testid="contrast-ratio-form">
+    <View as="div" data-testid="contrast-ratio-form">
       <ColorContrast
         firstColor={backgroundColor}
         secondColor={selectedColor}

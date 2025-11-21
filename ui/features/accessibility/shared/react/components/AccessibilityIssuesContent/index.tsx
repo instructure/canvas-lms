@@ -24,7 +24,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
-import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
@@ -421,39 +420,41 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           </Flex>
         </Flex.Item>
         <Flex.Item as="main" padding="x-small small" shouldGrow={true} overflowY="auto">
-          <Flex justifyItems="space-between">
-            <Text weight="weightImportant">{I18n.t('Problem area')}</Text>
-            <Flex gap="small">
-              <Link
-                href={item.resourceUrl}
-                variant="standalone"
-                target="_blank"
-                iconPlacement="end"
-                renderIcon={<IconExternalLinkLine size="x-small" />}
-              >
-                {I18n.t('Open Page')}
-                <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
-              </Link>
-              <Link
-                href={`${item.resourceUrl}/edit`}
-                variant="standalone"
-                target="_blank"
-                iconPlacement="end"
-                renderIcon={<IconExternalLinkLine size="x-small" />}
-              >
-                {I18n.t('Edit Page')}
-                <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
-              </Link>
+          <Flex padding="0 medium 0 0" gap="x-small" direction="column">
+            <Flex justifyItems="space-between">
+              <Text weight="weightImportant">{I18n.t('Problem area')}</Text>
+              <Flex gap="small">
+                <Link
+                  href={item.resourceUrl}
+                  variant="standalone"
+                  target="_blank"
+                  iconPlacement="end"
+                  renderIcon={<IconExternalLinkLine size="x-small" />}
+                >
+                  {I18n.t('Open Page')}
+                  <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
+                </Link>
+                <Link
+                  href={`${item.resourceUrl}/edit`}
+                  variant="standalone"
+                  target="_blank"
+                  iconPlacement="end"
+                  renderIcon={<IconExternalLinkLine size="x-small" />}
+                >
+                  {I18n.t('Edit Page')}
+                  <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
+                </Link>
+              </Flex>
             </Flex>
+            <View as="div">
+              <Preview
+                ref={previewRef}
+                issue={currentIssue}
+                resourceId={item.resourceId}
+                itemType={item.resourceType}
+              />
+            </View>
           </Flex>
-          <View as="div" margin="medium 0">
-            <Preview
-              ref={previewRef}
-              issue={currentIssue}
-              resourceId={item.resourceId}
-              itemType={item.resourceType}
-            />
-          </View>
           {currentIssue.form.type !== FormType.ColorPicker && (
             <View as="section" margin="medium 0">
               <Text weight="weightImportant">{I18n.t('Issue description')}</Text>
@@ -461,7 +462,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
               <Text weight="weightRegular">{currentIssue.message}</Text>
             </View>
           )}
-          <View as="section" margin="large 0 medium 0">
+          <View as="section" margin="medium 0">
             <Form
               ref={formRef}
               issue={currentIssue}
