@@ -19,12 +19,6 @@
 #
 
 class RubricLLMService
-  # Default knobs used when the caller doesn't supply options for generation.
-  # - criteria_count: how many criteria the rubric should contain
-  # - rating_count: how many ratings per criterion
-  # - points_per_criterion: max points at the top rating for each criterion
-  # - use_range: whether the rubric uses point ranges (UI toggle downstream)
-  # - grade_level: text hint for tone/expectations
   DEFAULT_GENERATE_OPTIONS = {
     criteria_count: 5,
     rating_count: 4,
@@ -32,10 +26,10 @@ class RubricLLMService
     use_range: false,
     grade_level: "higher-ed"
   }.freeze
+  GENERATE_FEATURE_SLUG = "rubric-generate"
+  REGENERATE_CRITERIA_FEATURE_SLUG = "rubric-regenerate-criteria"
+  REGENERATE_CRITERION_FEATURE_SLUG = "rubric-regenerate-criterion"
 
-  # Initialize the service with a Rubric instance.
-  #
-  # @param rubric [Rubric] the (unsaved) rubric that will own generated criteria
   def initialize(rubric)
     @rubric = rubric
     @used_ids = {}
@@ -45,54 +39,31 @@ class RubricLLMService
   # LLM Generation
   # -----------------------------
 
-  # Generate rubric criteria end-to-end via the configured LLM.
-  #
-  # Flow:
-  # 1) Validate inputs (only works for Assignments and a present user).
-  # 2) Look up the LLM config "rubric_create" (YAML-backed).
-  # 3) Build the dynamic prompt payload from the assignment + options.
-  # 4) Call the LLM with a prefill "{" to bias JSON output.
-  # 5) Persist the raw LLM response (observability).
-  # 6) Parse JSON and transform to Canvas rubric structure (IDs, points, order).
-  #
-  # @param association_object [AbstractAssignment] the assignment we build a rubric for
-  # @param generate_options [Hash] optional overrides for defaults
-  # @return [Array<Hash>] array of normalized criterion hashes ready for Rubric#data
-  #
-  # Example transformation (points ladder):
-  #   given points_per_criterion=20 and 4 ratings, the rating points become:
-  #   [20, 13, 7, 0]  (descending, evenly spaced, rounded)
   def generate_criteria_via_llm(association_object, generate_options = {})
-    validate_generate_inputs(association_object)
+    validate_rubric_and_association_object(association_object)
 
     assignment = association_object
     llm_config = LLMConfigs.config_for("rubric_create")
     raise "No LLM config found for rubric creation" if llm_config.nil?
 
     dynamic_content = build_generate_dynamic_content(assignment, generate_options)
-    prompt, options = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
+    prompt, = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
 
-    response, time = call_llm_with_prefill(llm_config, prompt, options)
-    persist_llm_response_generate(response, assignment, llm_config, dynamic_content, time)
+    response, time = call_llm_with_prefill(llm_config, prompt, assignment.root_account.uuid)
+    persist_llm_response(response, assignment, llm_config, dynamic_content, time)
 
     parse_and_transform_generated_criteria(response, generate_options)
   end
 
   private
 
-  # Guardrails for generation inputs.
-  # - Must be called with an AbstractAssignment
-  # - The rubric must have a user owner (used for rate limits / audit)
-  def validate_generate_inputs(association_object)
+  def validate_rubric_and_association_object(association_object)
     unless association_object.is_a?(AbstractAssignment)
       raise "LLM generation is only available for rubrics associated with an Assignment"
     end
     raise "User must be associated to rubric before LLM generation" unless @rubric.user
   end
 
-  # Build the substitution hash consumed by the "rubric_create" prompt template.
-  #
-  # @return [Hash] keys match placeholders in rubric_create.yml
   def build_generate_dynamic_content(assignment, generate_options)
     {
       CONTENT: {
@@ -110,56 +81,39 @@ class RubricLLMService
     }
   end
 
-  # Execute the LLM call with a prefill "{" to encourage valid JSON.
-  #
-  # @return [Array(response, Benchmark::Tms)]
-  def call_llm_with_prefill(llm_config, prompt, options)
+  def call_llm_with_prefill(llm_config, prompt, root_account_uuid)
     response = nil
     time = Benchmark.measure do
-      InstLLMHelper.with_rate_limit(user: @rubric.user, llm_config:) do
-        response = InstLLMHelper.client(llm_config.model_id).chat(
-          [{ role: "user", content: prompt },
-           { role: "assistant", content: "{" }], # ⚠️ prefill for generation
-          **options.symbolize_keys
-        )
-      end
+      response = CedarClient.conversation(
+        messages:
+         [{ role: "User", text: prompt },
+          { role: "Assistant", text: "{" }],
+        model: llm_config.model_id,
+        feature_slug: GENERATE_FEATURE_SLUG,
+        root_account_uuid:,
+        current_user: @rubric.user
+      ).response
     end
     [response, time]
   end
 
-  # Store the raw LLM response and key telemetry for later analysis.
-  def persist_llm_response_generate(response, assignment, llm_config, dynamic_content, time)
+  def persist_llm_response(response, assignment, llm_config, dynamic_content, time)
     LLMResponse.create!(
       associated_assignment: assignment,
       user: @rubric.user,
       prompt_name: llm_config.name,
       prompt_model_id: llm_config.model_id,
       prompt_dynamic_content: dynamic_content,
-      raw_response: response.message[:content],
-      input_tokens: response.usage[:input_tokens],
-      output_tokens: response.usage[:output_tokens],
+      raw_response: response,
+      input_tokens: 0,
+      output_tokens: 0,
       response_time: time.real.round(2),
       root_account_id: assignment.root_account_id
     )
   end
 
-  # Parse and normalize the rubric JSON returned from the LLM.
-  #
-  # Expected response.message[:content] starts right after the prefixed "{"
-  # so we reconstruct the full JSON string with "{" + content, then:
-  # - Map LLM schema → Canvas schema
-  # - Generate unique IDs for criteria/ratings
-  # - Compute evenly spaced points per rating (descending)
-  #
-  # @return [Array<Hash>] normalized criteria
-  #
-  # Example input (LLM):
-  #   { "criteria": [ { "name":"Clarity", "description":"...", "ratings":[{ "title":"Exemplary", ... }, ...] } ] }
-  #
-  # Example output (Canvas):
-  #   [{ id:"c_123", description:"Clarity", long_description:"...", ratings:[{ id:"r_1", points:20, ...}, ...], points:20 }]
   def parse_and_transform_generated_criteria(response, generate_options)
-    ai_rubric = JSON.parse("{" + response.message[:content], symbolize_names: true)
+    ai_rubric = JSON.parse("{" + response, symbolize_names: true)
 
     ai_rubric[:criteria].map do |criterion_data|
       build_criterion_from_llm(criterion_data, generate_options)
@@ -230,7 +184,7 @@ class RubricLLMService
   #   criterion:c1:description="Clarity"
   #   rating:r1:description="Exemplary"
   def regenerate_criteria_via_llm(association_object, regenerate_options = {}, orig_generate_options = {})
-    validate_regenerate_inputs(association_object)
+    validate_rubric_and_association_object(association_object)
 
     assignment = association_object
     incoming_criteria, existing_criteria_json, criteria_as_text =
@@ -256,9 +210,9 @@ class RubricLLMService
       current_criteria_count
     )
 
-    prompt, options = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
-    response, time = call_llm_without_prefill(llm_config, prompt, options)
-    persist_llm_response_regenerate(response, assignment, llm_config, dynamic_content, time)
+    prompt, = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
+    response, time = call_llm_without_prefill(llm_config, prompt, assignment, feature_slug: criterion_id.present? ? REGENERATE_CRITERION_FEATURE_SLUG : REGENERATE_CRITERIA_FEATURE_SLUG)
+    persist_llm_response(response, assignment, llm_config, dynamic_content, time)
 
     parse_and_transform_regenerated_criteria(
       response,
@@ -270,15 +224,6 @@ class RubricLLMService
   end
 
   private
-
-  # Guardrails for regeneration inputs.
-  # - Requires an AbstractAssignment and rubric.user present
-  def validate_regenerate_inputs(association_object)
-    unless association_object.is_a?(AbstractAssignment)
-      raise "LLM regeneration is only available for rubrics associated with an Assignment"
-    end
-    raise "User must be associated to rubric before LLM regeneration" unless @rubric.user
-  end
 
   # Normalize :criteria payload and produce two representations:
   # - existing_criteria_json: JSON blob of the incoming criteria
@@ -348,34 +293,18 @@ class RubricLLMService
     }
   end
 
-  # Execute the LLM call for regeneration (no prefill, output is tag-wrapped text).
-  def call_llm_without_prefill(llm_config, prompt, options)
+  def call_llm_without_prefill(llm_config, prompt, assignment, feature_slug:)
     response = nil
     time = Benchmark.measure do
-      InstLLMHelper.with_rate_limit(user: @rubric.user, llm_config:) do
-        response = InstLLMHelper.client(llm_config.model_id).chat(
-          [{ role: "user", content: prompt }],
-          **options.symbolize_keys
-        )
-      end
+      response = CedarClient.prompt(
+        prompt:,
+        model: llm_config.model_id,
+        feature_slug:,
+        root_account_uuid: assignment.root_account.uuid,
+        current_user: @rubric.user
+      ).response
     end
     [response, time]
-  end
-
-  # Persist the raw LLM response from regeneration (telemetry).
-  def persist_llm_response_regenerate(response, assignment, llm_config, dynamic_content, time)
-    LLMResponse.create!(
-      associated_assignment: assignment,
-      user: @rubric.user,
-      prompt_name: llm_config.name,
-      prompt_model_id: llm_config.model_id,
-      prompt_dynamic_content: dynamic_content,
-      raw_response: response.message[:content],
-      input_tokens: response.usage[:input_tokens],
-      output_tokens: response.usage[:output_tokens],
-      response_time: time.real.round(2),
-      root_account_id: assignment.root_account_id
-    )
   end
 
   # Parse the <RUBRIC_DATA>...</RUBRIC_DATA> block, then:
@@ -394,7 +323,7 @@ class RubricLLMService
     orig_generate_options,
     criterion_id
   )
-    ai_rubric_data = extract_text_from_response(response.message[:content], tag: "RUBRIC_DATA")
+    ai_rubric_data = extract_text_from_response(response, tag: "RUBRIC_DATA")
     raise "No valid rubric data found in LLM response" if ai_rubric_data.nil?
 
     ai_rubric_json =
