@@ -16,17 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useContext} from 'react'
-import {AccessibilityCheckerContext} from '../contexts/AccessibilityCheckerContext'
+import {useCallback} from 'react'
 import {useNextResource} from '../hooks/useNextResource'
+import {useAccessibilityCheckerContext} from './useAccessibilityCheckerContext'
 import {useAccessibilityScansStore} from '../stores/AccessibilityScansStore'
 import {findById} from '../utils/apiData'
 import {AccessibilityResourceScan} from '../types'
 import {useShallow} from 'zustand/react/shallow'
 
 export function useAccessibilityIssueSelect() {
-  const context = useContext(AccessibilityCheckerContext)
-  const {setSelectedItem, setIsTrayOpen} = context
+  const {setSelectedItem, setIsTrayOpen} = useAccessibilityCheckerContext()
 
   const {getNextResource} = useNextResource()
 

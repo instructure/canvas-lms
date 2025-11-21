@@ -76,13 +76,6 @@ export const AccessibilityCheckerApp: React.FC = () => {
     }
   }, [accessibilityScanDisabled, setLoading, filters])
 
-  const handleRowClick = useCallback(
-    (item: AccessibilityResourceScan) => {
-      selectIssue(item, true)
-    },
-    [selectIssue],
-  )
-
   const handleSearchChange = useCallback(
     async (value: string) => {
       const newSearch = value
@@ -108,7 +101,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
       <View as="div" margin={appliedFilters.length === 0 ? 'medium 0' : 'small 0'}>
         <AccessibilityIssuesSummary />
       </View>
-      <AccessibilityIssuesTable onRowClick={handleRowClick} />
+      <AccessibilityIssuesTable />
     </View>
   )
 }
