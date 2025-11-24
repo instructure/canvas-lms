@@ -140,5 +140,88 @@ describe Accessibility::CourseScanService do
         expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: assignment2)
       end
     end
+
+    context "when determining if resources need scanning" do
+      let!(:wiki_page) { wiki_page_model(course:) }
+      let!(:assignment) { assignment_model(course:) }
+
+      context "when there is no previous scan" do
+        it "scans the wiki page" do
+          subject.scan_course
+          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: wiki_page)
+        end
+
+        it "scans the assignment" do
+          subject.scan_course
+          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: assignment)
+        end
+      end
+
+      context "when resource has not been updated since last scan" do
+        before do
+          Timecop.freeze(wiki_page.updated_at + 1.hour) do
+            AccessibilityResourceScan.create!(
+              course:,
+              context: wiki_page,
+              workflow_state: :completed,
+              resource_workflow_state: :published,
+              issue_count: 0
+            )
+          end
+          Timecop.freeze(assignment.updated_at + 1.hour) do
+            AccessibilityResourceScan.create!(
+              course:,
+              context: assignment,
+              workflow_state: :completed,
+              resource_workflow_state: :published,
+              issue_count: 0
+            )
+          end
+        end
+
+        it "does not scan the wiki page" do
+          subject.scan_course
+          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: wiki_page)
+        end
+
+        it "does not scan the assignment" do
+          subject.scan_course
+          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: assignment)
+        end
+      end
+
+      context "when resource has been updated since last scan" do
+        before do
+          Timecop.freeze(wiki_page.updated_at - 1.hour) do
+            AccessibilityResourceScan.create!(
+              course:,
+              context: wiki_page,
+              workflow_state: :completed,
+              resource_workflow_state: :published,
+              issue_count: 0
+            )
+          end
+          Timecop.freeze(assignment.updated_at - 1.hour) do
+            AccessibilityResourceScan.create!(
+              course:,
+              context: assignment,
+              workflow_state: :completed,
+              resource_workflow_state: :published,
+              issue_count: 0
+            )
+          end
+        end
+
+        it "scans the wiki page" do
+          subject.scan_course
+          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: wiki_page)
+        end
+
+        it "scans the assignment" do
+          subject.scan_course
+          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: assignment)
+        end
+      end
+    end
   end
 end
