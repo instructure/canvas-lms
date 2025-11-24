@@ -2112,6 +2112,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/lti_registrations/:id/overlay_history", action: :overlay_history
       get "accounts/:account_id/lti_registrations/:id/history", action: :history, as: :lti_registration_history
       get "accounts/:account_id/lti_registration_by_client_id/:client_id", action: :show_by_client_id
+      get "accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id", action: :show_registration_update_request, as: "lti_registration_update_request"
       put "accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id/apply", action: :apply_registration_update_request, as: "apply_lti_registration_update_request"
       put "accounts/:account_id/lti_registrations/:id", action: :update
       put "accounts/:account_id/lti_registrations/:id/reset", action: :reset

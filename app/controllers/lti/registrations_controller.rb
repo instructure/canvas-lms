@@ -1057,6 +1057,7 @@ class Lti::RegistrationsController < ApplicationController
 
   include Api::V1::Lti::Registration
   include Api::V1::Lti::RegistrationHistoryEntry
+  include Api::V1::Lti::RegistrationUpdateRequest
 
   def index
     set_active_tab "apps"
@@ -1712,6 +1713,40 @@ class Lti::RegistrationsController < ApplicationController
   rescue => e
     report_error(e)
     raise e
+  end
+
+  # @API Get LTI Registration Update Request
+  # Retrieves details about a specific registration update request.
+  #
+  # @argument id [Integer] The id of the registration.
+  # @argument update_request_id [Integer] The id of the registration update request to retrieve.
+  # @argument include [String] Array of additional information to include ["configuration", "lti_registration"]
+  # @returns Lti::RegistrationUpdateRequest
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<id>/update_requests/<update_request_id>' \
+  #        -H "Authorization: Bearer <token>"
+  def show_registration_update_request
+    registration_update_request = Lti::RegistrationUpdateRequest.find_by(
+      id: params[:update_request_id],
+      lti_registration: registration
+    )
+    raise ActiveRecord::RecordNotFound unless registration_update_request
+
+    unless registration.account == @context
+      return render json: { errors: "registration does not belong to account" }, status: :bad_request
+    end
+
+    includes = Array(params[:include]).map(&:to_sym) & [:configuration, :lti_registration]
+
+    render json: lti_registration_update_request_json(
+      registration_update_request,
+      @current_user,
+      session,
+      @context,
+      includes:
+    )
   end
 
   # @API Apply LTI Registration Update Requst

@@ -18,6 +18,8 @@
 import {parseFetchResult} from '../../common/lib/apiResult/ApiResult'
 import {ZDynamicRegistrationToken} from '../model/DynamicRegistrationToken'
 import type {AccountId} from '../model/AccountId'
+import {useQuery} from '@tanstack/react-query'
+import {doFetchWithSchema} from '@canvas/do-fetch-api-effect'
 import type {DynamicRegistrationTokenUUID} from '../model/DynamicRegistrationTokenUUID'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
@@ -108,6 +110,55 @@ export const getLtiRegistrationUpdateRequestByUUID = (
       defaultFetchOptions(),
     ),
   )
+
+/**
+ * Retrieve a registration update request by its ID.
+ *
+ * @param accountId
+ * @param registrationUpdateRequestId ID of the registration update request
+ * @returns
+ */
+export const getLtiRegistrationUpdateRequestById = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+  registrationUpdateRequestId: LtiRegistrationUpdateRequestId,
+) =>
+  parseFetchResult(ZLtiRegistrationUpdateRequest)(
+    fetch(
+      `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/update_requests/${registrationUpdateRequestId}`,
+      defaultFetchOptions(),
+    ),
+  )
+
+/**
+ * React Query hook to fetch a registration update request by its ID
+ * @param accountId
+ * @param registrationId
+ * @param registrationUpdateRequestId
+ * @returns React Query result
+ */
+export const useRegistrationUpdateRequest = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+  registrationUpdateRequestId: LtiRegistrationUpdateRequestId,
+) => {
+  return useQuery({
+    queryKey: [
+      accountId,
+      'lti_registration_update_request',
+      registrationId,
+      registrationUpdateRequestId,
+    ],
+    queryFn: () =>
+      doFetchWithSchema(
+        {
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/update_requests/${registrationUpdateRequestId}`,
+        },
+        ZLtiRegistrationUpdateRequest,
+      ),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
 
 /**
  * Retrieve a registration by its ID. Useful for managing a registration

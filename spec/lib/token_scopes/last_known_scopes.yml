@@ -239,6 +239,8 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/overlay_history'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/reset'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id/apply'
 - verb: GET

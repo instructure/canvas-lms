@@ -2984,6 +2984,161 @@ RSpec.describe Lti::RegistrationsController do
     end
   end
 
+  describe "GET show_registration_update_request", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/update_requests/#{registration_update_request.id}", params:, as: :json }
+
+    let_once(:registration) do
+      ims_reg = lti_ims_registration_model(account:)
+      ims_reg.lti_registration
+    end
+    let_once(:registration_update_request) { lti_ims_registration_update_request_model(lti_registration: registration, root_account: account) }
+    let(:params) { {} }
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_registrations_page) }
+
+      it "returns 404" do
+        subject
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when registration update request does not exist" do
+      it "returns 404" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/update_requests/#{Lti::RegistrationUpdateRequest.last.id + 1}", as: :json
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when registration does not belong to account" do
+      let_once(:other_account) { account_model }
+      let_once(:other_registration) { lti_registration_model(account: other_account) }
+      let_once(:other_registration_update_request) { lti_ims_registration_update_request_model(lti_registration: other_registration, root_account: other_account) }
+
+      it "returns 400" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{other_registration.id}/update_requests/#{other_registration_update_request.id}", as: :json
+        expect(response).to have_http_status(:bad_request)
+        expect(response_json["errors"]).to eq("registration does not belong to account")
+      end
+    end
+
+    context "when registration update request belongs to different registration" do
+      let_once(:other_registration) { lti_registration_model(account:) }
+      let_once(:registration_update_request) { lti_ims_registration_update_request_model(lti_registration: other_registration, root_account: account) }
+
+      it "returns 404" do
+        subject
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "with valid request" do
+      it "returns the registration update request" do
+        subject
+        expect(response).to have_http_status(:ok)
+        expect(response_json).to include(
+          "id" => registration_update_request.id,
+          "lti_registration_id" => registration.id,
+          "root_account_id" => account.id,
+          "uuid" => registration_update_request.uuid,
+          "status" => "pending"
+        )
+      end
+
+      it "includes created_at and updated_at timestamps" do
+        subject
+        expect(response_json).to have_key("created_at")
+        expect(response_json).to have_key("updated_at")
+      end
+
+      it "includes created_by information when present" do
+        registration_update_request.update!(created_by: admin)
+        subject
+        expect(response_json).to have_key("created_by")
+        expect(response_json["created_by"]).to include("id" => admin.id)
+      end
+
+      context "with status variations" do
+        it "returns 'applied' status for accepted request" do
+          registration_update_request.update!(accepted_at: 1.hour.ago)
+          subject
+          expect(response_json["status"]).to eq("applied")
+        end
+
+        it "returns 'rejected' status for rejected request" do
+          registration_update_request.update!(rejected_at: 1.hour.ago)
+          subject
+          expect(response_json["status"]).to eq("rejected")
+        end
+      end
+
+      context "with include parameter" do
+        context "when including configuration" do
+          let(:params) { { include: ["configuration"] } }
+
+          it "includes configuration in response" do
+            subject
+            expect(response_json).to have_key("configuration")
+          end
+        end
+
+        context "when including lti_registration" do
+          let(:params) { { include: ["lti_registration"] } }
+
+          it "includes lti_registration in response" do
+            subject
+            expect(response_json).to have_key("lti_registration")
+            expect(response_json["lti_registration"]).to include(
+              "id" => registration.id,
+              "name" => registration.name,
+              "workflow_state" => registration.workflow_state
+            )
+          end
+        end
+
+        context "when including both configuration and lti_registration" do
+          let(:params) { { include: ["configuration", "lti_registration"] } }
+
+          it "includes both in response" do
+            subject
+            expect(response_json).to have_key("configuration")
+            expect(response_json).to have_key("lti_registration")
+          end
+        end
+
+        context "when including invalid include parameter" do
+          let(:params) { { include: ["invalid", "configuration"] } }
+
+          it "only includes valid parameters" do
+            subject
+            expect(response_json).to have_key("configuration")
+            expect(response_json).not_to have_key("invalid")
+          end
+        end
+      end
+    end
+  end
+
   describe "PUT apply_registration_update_request", type: :request do
     subject { put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/update_requests/#{registration_update_request.id}/apply", params:, as: :json }
 
