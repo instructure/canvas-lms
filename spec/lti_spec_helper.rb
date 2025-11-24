@@ -19,26 +19,41 @@
 #
 module LtiSpecHelper
   def create_tool_proxy(opts = {})
+    create_binding = opts.delete(:create_binding)
+
     default_opts = {
       shared_secret: "shared_secret",
       guid: SecureRandom.uuid,
       product_version: "1.0beta",
       lti_version: "LTI-2p0",
-      product_family: find_or_create_product_family,
       workflow_state: "active",
       raw_data: "some raw data",
       name: (0...8).map { rand(65..90).chr }.join,
     }
     combined_opts = default_opts.merge(opts)
     combined_opts[:context] = Account.create!(name: "Test Account") unless combined_opts.key?(:context)
-    combined_opts[:product_family] = find_or_create_product_family(combined_opts[:context]) unless combined_opts.key?(:product_family)
-    Lti::ToolProxy.create!(combined_opts)
+    combined_opts[:product_family] = find_or_create_product_family(combined_opts) unless combined_opts.key?(:product_family)
+    tool_proxy = Lti::ToolProxy.create!(combined_opts)
+
+    # Create binding if create_binding option is true
+    if create_binding
+      Lti::ToolProxyBinding.create!(
+        tool_proxy:,
+        context: combined_opts[:context],
+        enabled: true
+      )
+    end
+
+    tool_proxy
   end
 
   def find_or_create_product_family(opts = {})
+    # Only keep product family attributes
+    product_family_attrs = opts.slice(:vendor_code, :product_code, :vendor_name, :vendor_description, :website, :vendor_email, :root_account, :root_account_id)
+
     default_opts = { vendor_code: "123", product_code: "abc", vendor_name: "acme" }
-    default_opts[:root_account_id] = Account.create!(name: "Test Account") unless opts.key?(:root_account_id)
-    Lti::ProductFamily.where(default_opts.merge(opts)).first_or_create
+    default_opts[:root_account_id] = Account.create!(name: "Test Account") unless product_family_attrs.key?(:root_account_id) || product_family_attrs.key?(:root_account)
+    Lti::ProductFamily.where(default_opts.merge(product_family_attrs)).first_or_create
   end
 
   def create_resource_handler(tool_proxy, opts = {})

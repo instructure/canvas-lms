@@ -2149,6 +2149,11 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/lti_resource_links/:id", action: :destroy
     end
 
+    scope(controller: "lti/asset_processor_tii_migrations_api") do
+      get "accounts/:account_id/asset_processors/tii_migrations", action: :index
+      post "accounts/:account_id/asset_processors/tii_migrations", action: :create
+    end
+
     scope(controller: :immersive_reader) do
       get "immersive_reader/authenticate", action: :authenticate
     end
