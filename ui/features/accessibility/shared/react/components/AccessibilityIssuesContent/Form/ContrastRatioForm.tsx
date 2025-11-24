@@ -220,6 +220,7 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
               firstColor: backgroundColor,
             },
           }}
+          popoverButtonScreenReaderLabel={I18n.t('New text color picker')}
         />
       </View>
       {backgroundColor.toUpperCase() === '#FFFFFF' && (
