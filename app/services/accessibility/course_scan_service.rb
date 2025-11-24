@@ -80,11 +80,32 @@ class Accessibility::CourseScanService < ApplicationService
   end
 
   def scan_course
-    @course.wiki_pages.not_deleted.find_each do |resource|
+    scan_resources(@course.wiki_pages.not_deleted, :wiki_page_id)
+    scan_resources(@course.assignments.active.except(:order), :assignment_id)
+  end
+
+  private
+
+  def scan_resources(resources, column_name)
+    resource_ids = resources.pluck(:id)
+
+    scans_by_resource_id = AccessibilityResourceScan
+                           .where(column_name => resource_ids)
+                           .index_by(&column_name)
+
+    resources.find_each do |resource|
+      last_scan = scans_by_resource_id[resource.id]
+      next unless needs_scan?(resource, last_scan)
+
       Accessibility::ResourceScannerService.call(resource:)
     end
-    @course.assignments.active.except(:order).find_each do |resource|
-      Accessibility::ResourceScannerService.call(resource:)
-    end
+  end
+
+  def needs_scan?(resource, last_scan)
+    return true if last_scan.nil?
+
+    # last_scan.resource_updated_at is not used here purposefully to avoid issues with clock skew
+    # when after_commit triggers scans on updates. Instead, we rely on the scan's updated_at timestamp.
+    resource.updated_at > last_scan.updated_at
   end
 end
