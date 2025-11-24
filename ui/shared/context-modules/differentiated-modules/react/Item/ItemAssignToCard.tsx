@@ -465,8 +465,7 @@ export default forwardRef(function ItemAssignToCard(
             size="medium"
             messages={showValidations ? error : []}
             disabledOptionIds={disabledOptionIdsRef?.current}
-            // @ts-expect-error
-            disableFetch={!isOpenRef?.current ?? false}
+            disableFetch={!(isOpenRef?.current ?? true)}
             customAllOptions={customAllOptions}
             customIsLoading={customIsLoading}
             customSetSearchTerm={customSetSearchTerm}
