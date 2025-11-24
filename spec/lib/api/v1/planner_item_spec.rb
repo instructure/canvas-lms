@@ -110,6 +110,41 @@ describe Api::V1::PlannerItem do
       expect(api.planner_item_json(@assignment, @student, session)[:context_image]).to eq "path/to/course/image.png"
     end
 
+    it "returns plannable_date for quizzes with differentiated due dates using cached_due_date" do
+      section = @course.course_sections.create!(name: "Test Section")
+      @student.enrollments.first.update!(course_section: section)
+
+      # Create a quiz with only_visible_to_overrides
+      quiz = Quizzes::Quiz.create!(
+        context: @course,
+        title: "Quiz with Override",
+        quiz_type: "assignment",
+        workflow_state: "available"
+      )
+      assignment = quiz.assignment
+      assignment.update!(
+        only_visible_to_overrides: true,
+        workflow_state: "published"
+      )
+
+      # Create an override for the section with a specific due date
+      override_due_at = 3.days.from_now
+      assignment.assignment_overrides.create!(
+        set_type: "CourseSection",
+        set_id: section.id,
+        due_at: override_due_at,
+        due_at_overridden: true
+      )
+
+      assignment_with_submission = Assignment.with_user_due_date(@student)
+                                             .find(assignment.id)
+
+      quiz_hash = api.planner_item_json(assignment_with_submission, @student, session)
+
+      expect(quiz_hash[:plannable_date]).not_to be_nil
+      expect(quiz_hash[:plannable_date].to_date).to eq override_due_at.to_date
+    end
+
     describe "calendar events with an online meeting url" do
       before(:once) do
         @meeting_urls = ["https://myschool.zoom.us/123456", "https://myschool.zoom.us/j/123456", "https://myschool.zoom.us/my/123456"]
