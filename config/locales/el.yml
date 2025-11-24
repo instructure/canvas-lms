@@ -14229,6 +14229,7 @@ el:
         page_name: "Όνομα Σελίδας"
         quiz_group: Ομάδα
         quiz_name: "Ονομασία Κουίζ"
+        quiz_type: "Τύπος Κουίζ"
         topic_name: "Όνομα Θέματος"
         url: URL
         wiki_page_name: "Όνομα Σελίδας"
