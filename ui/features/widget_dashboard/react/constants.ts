@@ -39,6 +39,9 @@ export const WIDGET_TYPES = {
 
 export type WidgetType = (typeof WIDGET_TYPES)[keyof typeof WIDGET_TYPES]
 
+export const LEFT_COLUMN = 1
+export const RIGHT_COLUMN = 2
+
 export const DEFAULT_WIDGET_CONFIG = {
   columns: 2,
   widgets: [
@@ -147,6 +150,18 @@ export const UPDATE_LEARNER_DASHBOARD_TAB_SELECTION = gql`
   mutation UpdateLearnerDashboardTabSelection($tab: LearnerDashboardTabType!) {
     updateLearnerDashboardTabSelection(input: {tab: $tab}) {
       tab
+      errors {
+        message
+      }
+    }
+  }
+`
+
+export const UPDATE_WIDGET_DASHBOARD_CONFIG = gql`
+  mutation UpdateWidgetDashboardConfig($widgetId: String!, $filters: JSON) {
+    updateWidgetDashboardConfig(input: {widgetId: $widgetId, filters: $filters}) {
+      widgetId
+      filters
       errors {
         message
       }

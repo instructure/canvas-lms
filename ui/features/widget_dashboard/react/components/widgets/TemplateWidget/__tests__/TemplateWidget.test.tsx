@@ -18,9 +18,13 @@
 
 import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import TemplateWidget from '../TemplateWidget'
 import type {TemplateWidgetProps} from '../TemplateWidget'
 import type {Widget} from '../../../../types'
+import {ResponsiveProvider} from '../../../../hooks/useResponsiveContext'
+import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
+import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 const mockWidget: Widget = {
   id: 'test-widget',
@@ -38,8 +42,20 @@ const buildDefaultProps = (overrides: Partial<Props> = {}): Props => {
   return {...defaultProps, ...overrides}
 }
 
-const setup = (props: Props = buildDefaultProps(), children = <div>Test content</div>) => {
-  return render(<TemplateWidget {...props}>{children}</TemplateWidget>)
+const setup = (
+  props: Props = buildDefaultProps(),
+  children = <div>Test content</div>,
+  matches: string[] = ['desktop'],
+) => {
+  return render(
+    <WidgetDashboardEditProvider>
+      <WidgetLayoutProvider>
+        <ResponsiveProvider matches={matches}>
+          <TemplateWidget {...props}>{children}</TemplateWidget>
+        </ResponsiveProvider>
+      </WidgetLayoutProvider>
+    </WidgetDashboardEditProvider>,
+  )
 }
 
 describe('TemplateWidget', () => {
@@ -216,7 +232,77 @@ describe('TemplateWidget', () => {
     expect(widget).not.toHaveAttribute('aria-label')
     expect(widget).toHaveAttribute('role', 'region')
 
-    // Should not render header when title is empty
     expect(screen.queryByRole('heading')).not.toBeInTheDocument()
+  })
+
+  describe('Edit Mode', () => {
+    it('does not show edit mode icons when isEditMode is false', () => {
+      const props = buildDefaultProps({isEditMode: false})
+      setup(props)
+
+      expect(screen.queryByTestId('test-widget-drag-handle')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('test-widget-remove-button')).not.toBeInTheDocument()
+    })
+
+    it('shows drag handle and remove button when isEditMode is true in desktop mode', () => {
+      const props = buildDefaultProps({isEditMode: true})
+      setup(props, <div>Test content</div>, ['desktop'])
+
+      expect(screen.getByTestId('test-widget-drag-handle')).toBeInTheDocument()
+      expect(screen.getByTestId('test-widget-remove-button')).toBeInTheDocument()
+    })
+
+    it('does not show edit mode icons in mobile mode even when isEditMode is true', () => {
+      const props = buildDefaultProps({isEditMode: true})
+      setup(props, <div>Test content</div>, ['mobile'])
+
+      expect(screen.queryByTestId('test-widget-drag-handle')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('test-widget-remove-button')).not.toBeInTheDocument()
+    })
+
+    it('shows context menu when drag handle is clicked', async () => {
+      const user = userEvent.setup()
+      const props = buildDefaultProps({isEditMode: true})
+      setup(props, <div>Test content</div>, ['desktop'])
+
+      await user.click(screen.getByTestId('test-widget-drag-handle'))
+
+      expect(screen.getByText('Move to top')).toBeInTheDocument()
+      expect(screen.getByText('Move up')).toBeInTheDocument()
+      expect(screen.getByText('Move down')).toBeInTheDocument()
+      expect(screen.getByText('Move to bottom')).toBeInTheDocument()
+    })
+
+    it('does not include "Remove tile" option in context menu', async () => {
+      const user = userEvent.setup()
+      const props = buildDefaultProps({isEditMode: true})
+      setup(props, <div>Test content</div>, ['desktop'])
+
+      await user.click(screen.getByTestId('test-widget-drag-handle'))
+
+      expect(screen.queryByText('Remove tile')).not.toBeInTheDocument()
+      expect(screen.queryByRole('menuitem', {name: /remove/i})).not.toBeInTheDocument()
+    })
+
+    it('removes widget when remove button is clicked', async () => {
+      const user = userEvent.setup()
+      const props = buildDefaultProps({isEditMode: true})
+      const {rerender} = setup(props, <div>Test content</div>, ['desktop'])
+
+      const removeButton = screen.getByTestId('test-widget-remove-button')
+      await user.click(removeButton)
+
+      rerender(
+        <WidgetDashboardEditProvider>
+          <WidgetLayoutProvider>
+            <ResponsiveProvider matches={['desktop']}>
+              <TemplateWidget {...props}>
+                <div>Test content</div>
+              </TemplateWidget>
+            </ResponsiveProvider>
+          </WidgetLayoutProvider>
+        </WidgetDashboardEditProvider>,
+      )
+    })
   })
 })

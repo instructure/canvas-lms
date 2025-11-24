@@ -48,6 +48,9 @@ describe('useWidgetDashboardContext', () => {
         hide_dashcard_color_overlays: false,
         custom_colors: {},
         learner_dashboard_tab_selection: 'dashboard',
+        widget_dashboard_config: {
+          filters: {},
+        },
       }),
     )
     expect(getByTestId('observed-users')).toHaveTextContent('[]')
@@ -189,6 +192,9 @@ describe('useWidgetDashboardContext', () => {
         hide_dashcard_color_overlays: false,
         custom_colors: {},
         learner_dashboard_tab_selection: 'dashboard',
+        widget_dashboard_config: {
+          filters: {},
+        },
       }),
     )
     expect(getByTestId('observed-users')).toHaveTextContent('[]')

@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {Button} from '@instructure/ui-buttons'
+import {IconConfigureLine} from '@instructure/ui-icons'
 import DashboardTabs from './components/DashboardTabs'
 import DashboardNotifications from './components/DashboardNotifications'
 import ObserverOptions from '@canvas/observer-picker'
@@ -31,25 +33,92 @@ import {
 import {useWidgetDashboard} from './hooks/useWidgetDashboardContext'
 import FeedbackQuestionTile from './components/FeedbackQuestionTile'
 import {useResponsiveContext} from './hooks/useResponsiveContext'
+import {useWidgetDashboardEdit} from './hooks/useWidgetDashboardEdit'
+import {useWidgetLayout} from './hooks/useWidgetLayout'
 
 const I18n = createI18nScope('widget_dashboard')
 
 const WidgetDashboardContainer: React.FC = () => {
-  const {observedUsersList, canAddObservee, currentUser, currentUserRoles} = useWidgetDashboard()
-  const {isMobile} = useResponsiveContext()
+  const {observedUsersList, canAddObservee, currentUser, currentUserRoles, dashboardFeatures} =
+    useWidgetDashboard()
+  const {isMobile, isDesktop} = useResponsiveContext()
+  const {isEditMode, isDirty, enterEditMode, exitEditMode, saveChanges} = useWidgetDashboardEdit()
+  const {resetConfig} = useWidgetLayout()
+  const isCustomizationEnabled = dashboardFeatures.widget_dashboard_customization
+
+  const handleChangeObservedUser = useMemo(() => getHandleChangeObservedUser(), [])
+
+  useEffect(() => {
+    if (!isDirty) return
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [isDirty])
+
+  const handleSave = () => {
+    saveChanges()
+  }
+
+  const handleCancel = () => {
+    resetConfig()
+    exitEditMode()
+  }
 
   return (
     <View as="div">
       <DashboardNotifications />
       <Flex margin="0 0 medium" alignItems="center">
         <Flex.Item shouldGrow>
-          <Flex gap="small" direction={isMobile ? 'column' : 'row'}>
+          <Flex gap="small" direction={isMobile ? 'column' : 'row'} alignItems="center">
             <Flex.Item shouldGrow>
               <Heading level="h1" margin="0" data-testid="dashboard-heading">
                 {I18n.t('Dashboard')}
               </Heading>
             </Flex.Item>
-            <Flex.Item padding="small">
+            {isCustomizationEnabled && isDesktop && (
+              <>
+                {isEditMode ? (
+                  <>
+                    <Flex.Item>
+                      <Button
+                        onClick={handleCancel}
+                        margin="0 small 0 0"
+                        data-testid="cancel-customize-button"
+                      >
+                        {I18n.t('Cancel')}
+                      </Button>
+                    </Flex.Item>
+                    <Flex.Item>
+                      <Button
+                        color="primary"
+                        onClick={handleSave}
+                        data-testid="save-customize-button"
+                      >
+                        {I18n.t('Save changes')}
+                      </Button>
+                    </Flex.Item>
+                  </>
+                ) : (
+                  <Flex.Item>
+                    <Button
+                      onClick={enterEditMode}
+                      renderIcon={<IconConfigureLine />}
+                      withBackground={false}
+                      color="primary"
+                      data-testid="customize-dashboard-button"
+                    >
+                      {I18n.t('Customize dashboard')}
+                    </Button>
+                  </Flex.Item>
+                )}
+              </>
+            )}
+            <Flex.Item>
               <FeedbackQuestionTile />
             </Flex.Item>
           </Flex>
@@ -62,7 +131,7 @@ const WidgetDashboardContainer: React.FC = () => {
                 canAddObservee={canAddObservee}
                 currentUserRoles={currentUserRoles}
                 currentUser={currentUser}
-                handleChangeObservedUser={getHandleChangeObservedUser()}
+                handleChangeObservedUser={handleChangeObservedUser}
                 observedUsersList={observedUsersList}
                 renderLabel={I18n.t(
                   'Select a student to view. The page will refresh automatically.',

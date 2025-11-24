@@ -50,7 +50,7 @@ module Types
       return 0 unless current_user
 
       submissions.count do |submission|
-        submission.submitted? || submission.graded? || submission.excused?
+        !submission.missing? && (submission.submitted? || submission.graded? || submission.excused?)
       end
     end
 
@@ -122,7 +122,7 @@ module Types
       end
 
       filtered_submissions.count do |submission|
-        submission.submitted? || submission.graded? || submission.excused?
+        !submission.missing? && (submission.submitted? || submission.graded? || submission.excused?)
       end
     end
   end

@@ -252,3 +252,15 @@ widget_dashboard:
   description: |-
     When enabled, this allows learners to add, remove, and rearrange dashboard widgets.
   applies_to: RootAccount
+
+widget_dashboard_customization:
+  state: hidden
+  display_name: Widget Dashboard Customization
+  description: |-
+    When enabled, this allows additional customization options for dashboard widgets.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

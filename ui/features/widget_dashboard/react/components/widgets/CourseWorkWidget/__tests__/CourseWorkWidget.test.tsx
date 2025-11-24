@@ -24,6 +24,8 @@ import {http, HttpResponse} from 'msw'
 import CourseWorkWidget from '../CourseWorkWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
 import {defaultGraphQLHandlers, clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
+import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 const tomorrow = new Date()
 tomorrow.setDate(tomorrow.getDate() + 1)
@@ -179,7 +181,13 @@ const renderWithProviders = (component: React.ReactElement) => {
     defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
   })
 
-  return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>)
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <WidgetDashboardEditProvider>
+        <WidgetLayoutProvider>{component}</WidgetLayoutProvider>
+      </WidgetDashboardEditProvider>
+    </QueryClientProvider>,
+  )
 }
 
 beforeAll(() => {
@@ -233,6 +241,33 @@ describe('CourseWorkWidget', () => {
     expect(screen.getByText(/25 pts/)).toBeInTheDocument()
     expect(screen.getByText(/15 pts/)).toBeInTheDocument()
     expect(screen.getByText(/40 pts/)).toBeInTheDocument()
+  })
+
+  it('displays "Go to course" links for each course work item', async () => {
+    renderWithProviders(<CourseWorkWidget {...buildDefaultProps()} />)
+
+    await screen.findByText('Essay on Climate Change')
+
+    expect(screen.getByTestId('course-work-item-course-link-1')).toBeInTheDocument()
+    expect(screen.getByTestId('course-work-item-course-link-1')).toHaveAttribute(
+      'href',
+      '/courses/101',
+    )
+    expect(screen.getByTestId('course-work-item-course-link-2')).toBeInTheDocument()
+    expect(screen.getByTestId('course-work-item-course-link-2')).toHaveAttribute(
+      'href',
+      '/courses/102',
+    )
+    expect(screen.getByTestId('course-work-item-course-link-3')).toBeInTheDocument()
+    expect(screen.getByTestId('course-work-item-course-link-3')).toHaveAttribute(
+      'href',
+      '/courses/103',
+    )
+    expect(screen.getByTestId('course-work-item-course-link-4')).toBeInTheDocument()
+    expect(screen.getByTestId('course-work-item-course-link-4')).toHaveAttribute(
+      'href',
+      '/courses/104',
+    )
   })
 
   it('sorts items by due date with soonest first', async () => {

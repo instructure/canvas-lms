@@ -19,10 +19,13 @@
 
 require_relative "page_objects/widget_dashboard_page"
 require_relative "page_objects/course_tab_page"
+require_relative "../helpers/student_dashboard_common"
+
 describe "student dashboard", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include WidgetDashboardPage
   include CourseTabPage
+  include StudentDashboardCommon
 
   before :once do
     dashboard_student_setup
@@ -66,7 +69,6 @@ describe "student dashboard", :ignore_js_errors do
       go_to_dashboard
       expect(enrollment_invitation).to be_displayed
 
-      filter_course_work_by(:date, "Next 14 days")
       expect(course_work_summary_stats("Due").text).to eq("0\nDue")
       expect(course_work_summary_stats("Missing").text).to eq("0\nMissing")
       expect(course_work_summary_stats("Submitted").text).to eq("0\nSubmitted")

@@ -3334,6 +3334,24 @@ describe UsersController do
         expect(assigns[:js_env][:SHARED_COURSE_DATA].length).to eq 1
       end
 
+      it "includes widget_dashboard_customization in DASHBOARD_FEATURES when enabled" do
+        course_with_student_logged_in(active_all: true)
+        @user.preferences[:widget_dashboard_user_preference] = true
+        @user.save!
+        Account.site_admin.enable_feature!(:widget_dashboard_customization)
+        get "user_dashboard"
+        expect(assigns[:js_env][:DASHBOARD_FEATURES][:widget_dashboard_customization]).to be true
+      end
+
+      it "does not include widget_dashboard_customization in DASHBOARD_FEATURES when disabled" do
+        course_with_student_logged_in(active_all: true)
+        @user.preferences[:widget_dashboard_user_preference] = true
+        @user.save!
+        Account.site_admin.disable_feature!(:widget_dashboard_customization)
+        get "user_dashboard"
+        expect(assigns[:js_env][:DASHBOARD_FEATURES][:widget_dashboard_customization]).to be false
+      end
+
       describe "dashboard routing" do
         before :once do
           @observer = user_factory(active_all: true)

@@ -18,10 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "page_objects/widget_dashboard_page"
+require_relative "../helpers/student_dashboard_common"
 
 describe "student dashboard Course grade widget", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include WidgetDashboardPage
+  include StudentDashboardCommon
 
   before :once do
     dashboard_student_setup # Creates 2 courses and a student enrolled in both
@@ -78,25 +80,68 @@ describe "student dashboard Course grade widget", :ignore_js_errors do
       expect(driver.current_url).to include("/courses/#{@course1.id}/grades")
     end
 
-    it "displays course grades in pagination" do
-      @course3 = course_factory(active_all: true, course_name: "Course 3")
-      @course4 = course_factory(active_all: true, course_name: "Course 4")
-      @course5 = course_factory(active_all: true, course_name: "Course 5")
-      @course6 = course_factory(active_all: true, course_name: "Course 6")
-      @course7 = course_factory(active_all: true, course_name: "Course 7")
-
-      @course3.enroll_student(@student, enrollment_state: :active)
-      @course4.enroll_student(@student, enrollment_state: :active)
-      @course5.enroll_student(@student, enrollment_state: :active)
-      @course6.enroll_student(@student, enrollment_state: :active)
-      @course7.enroll_student(@student, enrollment_state: :active)
+    it "displays last updated timestamp from course score" do
+      # Get the enrollment and score and set it to 2 days ago
+      enrollment = @student.enrollments.find_by(course: @course1)
+      course_score = enrollment.find_score(course_score: true)
+      course_score.update_columns(updated_at: 2.days.ago)
 
       go_to_dashboard
 
+      # Check that last updated is displayed and capture initial value
+      expect(course_last_updated(@course1.id)).to be_displayed
+      initial_last_updated_text = course_last_updated(@course1.id).text
+
+      # Update the score to trigger a new updated_at timestamp (now)
+      course_score.update!(current_score: 90.0)
+      refresh_page
+
+      # Verify the timestamp has changed
+      updated_last_updated_text = course_last_updated(@course1.id).text
+      expect(updated_last_updated_text).not_to eq(initial_last_updated_text)
+      expect(updated_last_updated_text).not_to be_empty
+    end
+
+    it "does not display last updated timestamp when grade is N/A" do
+      course_with_student(user: @student, active_all: true, course_name: "No Grades Course")
+      ungraded_course = @course
+
+      go_to_dashboard
+
+      expect(course_grade_text(ungraded_course.id).text).to eq("N/A")
+      expect(element_exists?(course_last_updated_selector(ungraded_course.id))).to be_falsey
+    end
+  end
+
+  context "Course grade widget pagination" do
+    before :once do
+      pagination_course_setup # Creates 20 additional courses
+    end
+
+    it "displays all pagination link on initial load" do
+      go_to_dashboard
+
       expect(all_course_grade_items.size).to eq(6)
-      expect(course_grade_text(@course3.id).text).to eq("N/A")
-      widget_pagination_button("course-grades", "2").click
-      expect(all_course_grade_items.size).to eq(1)
+      expect(widget_pagination_button("Course grades", "1")).to be_displayed
+      expect(widget_pagination_button("Course grades", "4")).to be_displayed
+      widget_pagination_button("Course grades", "4").click
+      expect(all_course_grade_items.size).to eq(4)
+      widget_pagination_button("Course grades", "1").click
+      expect(all_course_grade_items.size).to eq(6)
+    end
+
+    it "maintains pagination when switching all grades toggle" do
+      go_to_dashboard
+
+      expect(hide_all_grades_checkbox).to be_displayed
+      force_click_native(hide_all_grades_checkbox_selector)
+      expect(show_all_grades_checkbox).to be_displayed
+      expect(widget_pagination_button("Course grades", "1")).to be_displayed
+      expect(widget_pagination_button("Course grades", "4")).to be_displayed
+      widget_pagination_button("Course grades", "4").click
+      expect(show_all_grades_checkbox).to be_displayed
+      widget_pagination_button("Course grades", "1").click
+      expect(show_all_grades_checkbox).to be_displayed
     end
   end
 end

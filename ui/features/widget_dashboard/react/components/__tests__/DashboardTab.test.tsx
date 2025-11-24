@@ -17,12 +17,16 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render, waitFor, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import DashboardTab from '../DashboardTab'
 import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
+import {WidgetDashboardProvider} from '../../hooks/useWidgetDashboardContext'
+import {WidgetDashboardEditProvider} from '../../hooks/useWidgetDashboardEdit'
+import {WidgetLayoutProvider} from '../../hooks/useWidgetLayout'
 type Props = Record<string, never> // DashboardTab has no props
 
 const mockStatisticsData = {
@@ -172,8 +176,7 @@ const buildDefaultProps = (overrides = {}): Props => {
   return {...defaultProps, ...overrides}
 }
 
-const setup = (props?: Props, envOverrides = {}) => {
-  // Set up Canvas ENV with current_user_id
+const setup = (props?: Props, envOverrides = {}, dashboardFeatures = {}) => {
   const originalEnv = window.ENV
   window.ENV = {
     ...originalEnv,
@@ -181,7 +184,6 @@ const setup = (props?: Props, envOverrides = {}) => {
     ...envOverrides,
   }
 
-  // Create new QueryClient for each test
   queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -193,7 +195,13 @@ const setup = (props?: Props, envOverrides = {}) => {
 
   const result = render(
     <QueryClientProvider client={queryClient}>
-      <DashboardTab {...buildDefaultProps(props)} />
+      <WidgetDashboardProvider dashboardFeatures={dashboardFeatures}>
+        <WidgetDashboardEditProvider>
+          <WidgetLayoutProvider>
+            <DashboardTab {...buildDefaultProps(props)} />
+          </WidgetLayoutProvider>
+        </WidgetDashboardEditProvider>
+      </WidgetDashboardProvider>
     </QueryClientProvider>,
   )
 

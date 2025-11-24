@@ -326,7 +326,14 @@ describe UsersController do
       it "returns correct data structure" do
         course = course_factory(active_all: true, account: @account)
         course.update!(name: "Test Course", course_code: "TEST 101")
-        course.enroll_student(@student, enrollment_state: "active")
+        enrollment = course.enroll_student(@student, enrollment_state: "active")
+
+        Score.create!(
+          enrollment:,
+          grading_period: nil,
+          current_score: 85.0,
+          workflow_state: "active"
+        )
 
         result = controller.send(:fetch_courses_with_grades)
 
@@ -334,7 +341,7 @@ describe UsersController do
           courseId: course.id.to_s,
           courseCode: "TEST 101",
           courseName: "Test Course",
-          currentGrade: nil,
+          currentGrade: 85.0,
           gradingScheme: "percentage"
         )
         expect(result.first[:lastUpdated]).to be_present

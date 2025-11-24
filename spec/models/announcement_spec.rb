@@ -118,6 +118,59 @@ describe Announcement do
     end
   end
 
+  context "multi-section announcement visibility" do
+    before(:once) do
+      course_with_teacher(active_course: true)
+      @section_a = @course.default_section
+      @section_b = @course.course_sections.create!(name: "Section B")
+      @section_c = @course.course_sections.create!(name: "Section C")
+
+      @student_a = user_factory(name: "Student A", active_all: true)
+      @student_b = user_factory(name: "Student B", active_all: true)
+      @student_ab = user_factory(name: "Student AB", active_all: true)
+
+      student_in_section(@section_a, user: @student_a)
+      student_in_section(@section_b, user: @student_b)
+      @course.enroll_student(@student_ab, section: @section_a, enrollment_state: "active", allow_multiple_enrollments: true)
+      @course.enroll_student(@student_ab, section: @section_b, enrollment_state: "active", allow_multiple_enrollments: true)
+    end
+
+    it "announcement for section A+B is visible to students in either section" do
+      announcement = @course.announcements.create!(
+        user: @teacher,
+        message: "For sections A and B"
+      )
+      announcement.is_section_specific = true
+      announcement.course_sections = [@section_a, @section_b]
+      announcement.save!
+
+      expect(announcement.visible_for?(@student_a)).to be_truthy
+      expect(announcement.visible_for?(@student_b)).to be_truthy
+      expect(announcement.visible_for?(@student_ab)).to be_truthy
+    end
+
+    it "filters announcements correctly for student in multiple sections" do
+      ann_a = @course.announcements.create!(user: @teacher, message: "Section A only")
+      ann_a.is_section_specific = true
+      ann_a.course_sections = [@section_a]
+      ann_a.save!
+
+      ann_b = @course.announcements.create!(user: @teacher, message: "Section B only")
+      ann_b.is_section_specific = true
+      ann_b.course_sections = [@section_b]
+      ann_b.save!
+
+      ann_c = @course.announcements.create!(user: @teacher, message: "Section C only")
+      ann_c.is_section_specific = true
+      ann_c.course_sections = [@section_c]
+      ann_c.save!
+
+      expect(ann_a.visible_for?(@student_ab)).to be_truthy
+      expect(ann_b.visible_for?(@student_ab)).to be_truthy
+      expect(ann_c.visible_for?(@student_ab)).to be_falsey
+    end
+  end
+
   context "permissions" do
     it "does not allow announcements on a course" do
       course_with_student(active_user: 1)

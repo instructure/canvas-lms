@@ -26,6 +26,8 @@ import {
   type SharedCourseData,
 } from '../../../../hooks/useWidgetDashboardContext'
 import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
+import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 const mockWidget: Widget = {
   id: 'test-course-grades-widget',
@@ -89,7 +91,11 @@ const setup = (
   return render(
     <QueryClientProvider client={queryClient}>
       <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
-        <CourseGradesWidget {...defaultProps} />
+        <WidgetDashboardEditProvider>
+          <WidgetLayoutProvider>
+            <CourseGradesWidget {...defaultProps} />
+          </WidgetLayoutProvider>
+        </WidgetDashboardEditProvider>
       </WidgetDashboardProvider>
     </QueryClientProvider>,
   )
@@ -184,5 +190,19 @@ describe('CourseGradesWidget', () => {
       expect(screen.getByText('85%')).toBeInTheDocument()
       expect(screen.getByText('N/A')).toBeInTheDocument()
     })
+  })
+
+  it('displays "Go to course" link for each course', async () => {
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+      expect(screen.getByText('Course 2')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('course-1-link')).toBeInTheDocument()
+    expect(screen.getByTestId('course-1-link')).toHaveAttribute('href', '/courses/1')
+    expect(screen.getByTestId('course-2-link')).toBeInTheDocument()
+    expect(screen.getByTestId('course-2-link')).toHaveAttribute('href', '/courses/2')
   })
 })

@@ -18,10 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "page_objects/widget_dashboard_page"
+require_relative "../helpers/student_dashboard_common"
 
 describe "student dashboard Course work widget", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include WidgetDashboardPage
+  include StudentDashboardCommon
 
   before :once do
     dashboard_student_setup # Creates 2 courses and a student enrolled in both
@@ -38,25 +40,17 @@ describe "student dashboard Course work widget", :ignore_js_errors do
       dashboard_course_submission_setup
     end
 
-    it "can filter work items in dues" do
+    it "can filter work items in not submitted" do
       go_to_dashboard
       expect(course_work_summary_stats("Due")).to be_displayed
 
-      expect(all_course_work_items.size).to eq(1)
-      expect(course_work_summary_stats("Due").text).to eq("1\nDue")
-      expect(course_work_item(@due_assignment.id)).to be_displayed
-      expect(course_work_item_pill("due_soon", @due_assignment.id)).to be_displayed
-
-      filter_course_work_by(:date, "Next 7 days")
-      expect(all_course_work_items.size).to eq(2)
-      expect(course_work_summary_stats("Due").text).to eq("2\nDue")
-      expect(course_work_item(@due_graded_discussion.id)).to be_displayed
-      expect(course_work_item_pill("due_soon", @due_graded_discussion.id)).to be_displayed
-
-      filter_course_work_by(:date, "Next 14 days")
       expect(all_course_work_items.size).to eq(3)
       expect(course_work_summary_stats("Due").text).to eq("3\nDue")
+      expect(course_work_item(@due_assignment.id)).to be_displayed
+      expect(course_work_item(@due_graded_discussion.id)).to be_displayed
       expect(course_work_item(@due_quiz.id)).to be_displayed
+      expect(course_work_item_pill("due_soon", @due_assignment.id)).to be_displayed
+      expect(course_work_item_pill("due_soon", @due_graded_discussion.id)).to be_displayed
       expect(course_work_item_pill("due_soon", @due_quiz.id)).to be_displayed
     end
 
@@ -130,10 +124,9 @@ describe "student dashboard Course work widget", :ignore_js_errors do
       go_to_dashboard
       expect(course_work_summary_stats("Due")).to be_displayed
 
-      filter_course_work_by(:date, "Next 14 days")
       expect(all_course_work_items.size).to eq(6)
       expect(course_work_summary_stats("Due").text).to eq("7\nDue")
-      widget_pagination_button("course-work-combined", "2").click
+      widget_pagination_button("Course work", "2").click
       expect(all_course_work_items.size).to eq(1)
     end
   end
@@ -162,8 +155,8 @@ describe "student dashboard Course work widget", :ignore_js_errors do
 
       expect(element_exists?(course_work_item_selector(@graded_unsubmitted_future.id))).to be_falsey
       expect(element_exists?(course_work_item_selector(@graded_unsubmitted_overdue.id))).to be_falsey
-      filter_course_work_by(:date, "Submitted")
 
+      filter_course_work_by(:date, "Submitted")
       expect(course_work_item(@graded_unsubmitted_future.id)).to be_displayed
       expect(course_work_item(@graded_unsubmitted_overdue.id)).to be_displayed
 
@@ -179,13 +172,86 @@ describe "student dashboard Course work widget", :ignore_js_errors do
       expect(all_course_work_items.size).to eq(2)
       expect(course_work_summary_stats("Submitted").text).to eq("2\nSubmitted")
 
-      filter_course_work_by(:date, "Next 14 days")
+      filter_course_work_by(:date, "Not submitted")
       expect(all_course_work_items.size).to eq(4)
       expect(course_work_summary_stats("Due").text).to eq("4\nDue")
 
       filter_course_work_by(:date, "Missing")
       expect(all_course_work_items.size).to eq(6)
       expect(course_work_summary_stats("Missing").text).to eq("6\nMissing")
+    end
+  end
+
+  context "submission status filter shows upcoming work" do
+    before :once do
+      @due_this_morning = @course1.assignments.create!(
+        name: "Due 2 Hours Ago",
+        due_at: 2.hours.ago,
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+
+      @due_this_afternoon = @course1.assignments.create!(
+        name: "Due in 2 Hours",
+        due_at: 2.hours.from_now,
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+    end
+
+    it "shows upcoming unsubmitted assignments" do
+      go_to_dashboard
+
+      expect(element_exists?(course_work_item_selector(@due_this_morning.id))).to be_falsey
+      expect(course_work_item(@due_this_afternoon.id)).to be_displayed
+    end
+  end
+
+  context "Course work widget pagination" do
+    before :once do
+      dashboard_course_submission_setup
+      pagination_submission_setup # Creates 70 assignments
+    end
+
+    it "displays all pagination link on initial load" do
+      go_to_dashboard
+
+      expect(widget_pagination_button("Course work", "6")).to be_displayed
+      widget_pagination_button("Course work", "6").click
+      expect(widget_pagination_button("Course work", "1")).to be_displayed
+
+      filter_course_work_by(:date, "Missing")
+      expect(widget_pagination_button("Course work", "6")).to be_displayed
+      widget_pagination_button("Course work", "6").click
+      expect(widget_pagination_button("Course work", "1")).to be_displayed
+
+      filter_course_work_by(:date, "Submitted")
+      expect(widget_pagination_button("Course work", "4")).to be_displayed
+      widget_pagination_button("Course work", "4").click
+      expect(widget_pagination_button("Course work", "1")).to be_displayed
+      widget_pagination_button("Course work", "1").click
+      expect(widget_pagination_button("Course work", "4")).to be_displayed
+    end
+
+    it "maintains pagination when switching filters" do
+      go_to_dashboard
+
+      expect(widget_pagination_button("Course work", "6")).to be_displayed
+
+      filter_course_work_by(:date, "Missing")
+      expect(widget_pagination_button("Course work", "6")).to be_displayed
+
+      filter_course_work_by(:date, "Submitted")
+      expect(widget_pagination_button("Course work", "4")).to be_displayed
+      widget_pagination_button("Course work", "4").click
+      widget_pagination_button("Course work", "1").click
+      expect(widget_pagination_button("Course work", "4")).to be_displayed
+
+      filter_course_work_by(:date, "Not submitted")
+      expect(widget_pagination_button("Course work", "6")).to be_displayed
+
+      filter_course_work_by(:date, "Missing")
+      expect(widget_pagination_button("Course work", "6")).to be_displayed
     end
   end
 end
