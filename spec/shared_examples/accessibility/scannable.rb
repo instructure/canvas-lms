@@ -17,6 +17,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 RSpec.shared_examples "an accessibility scannable resource" do
+  describe "#a11y_scannable_attributes" do
+    it "returns valid attribute names" do
+      resource = described_class.new
+      attributes = resource.send(:a11y_scannable_attributes)
+      attributes.each do |attr|
+        expect(resource).to respond_to(attr)
+        expect(resource).to respond_to("#{attr}_changed?")
+      end
+    end
+  end
+
   describe "callbacks" do
     describe "#trigger_accessibility_scan_on_create" do
       let(:resource_class) { described_class }
@@ -28,11 +39,25 @@ RSpec.shared_examples "an accessibility scannable resource" do
           course.enable_feature!(:a11y_checker_eap)
         end
 
-        it "triggers the scanner service" do
-          expect(Accessibility::ResourceScannerService).to receive(:call)
-            .with(resource: instance_of(resource_class))
+        context "when there is a successful course scan" do
+          before do
+            Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
+          end
 
-          resource_class.create!(valid_attributes)
+          it "triggers the scanner service" do
+            expect(Accessibility::ResourceScannerService).to receive(:call)
+              .with(resource: instance_of(resource_class))
+
+            resource_class.create!(valid_attributes)
+          end
+        end
+
+        context "when there is no successful course scan" do
+          it "does not trigger the scanner service" do
+            expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+            resource_class.create!(valid_attributes)
+          end
         end
       end
 
@@ -56,28 +81,50 @@ RSpec.shared_examples "an accessibility scannable resource" do
           resource.context.reload
         end
 
-        context "when relevant attribute is changed" do
-          it "triggers the scanner service" do
-            expect(Accessibility::ResourceScannerService).to receive(:call)
-              .with(resource:)
+        context "when there is a successful course scan" do
+          before do
+            Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
+          end
+
+          context "when relevant attribute is changed" do
+            it "triggers the scanner service" do
+              expect(Accessibility::ResourceScannerService).to receive(:call)
+                .with(resource:)
+
+              resource.update!(relevant_attributes_for_scan)
+            end
+          end
+
+          context "when irrelevant attribute is changed" do
+            it "does not trigger the scanner service" do
+              expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+              resource.update!(irrelevant_attributes_for_scan)
+            end
+          end
+
+          context "when resource is deleted" do
+            it "does not trigger the scanner service" do
+              expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+              resource.destroy
+            end
+          end
+
+          context "when workflow_state is set to deleted" do
+            it "does not trigger the scanner service" do
+              expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+              resource.update!(workflow_state: "deleted")
+            end
+          end
+        end
+
+        context "when there is no successful course scan" do
+          it "does not trigger the scanner service" do
+            expect(Accessibility::ResourceScannerService).not_to receive(:call)
 
             resource.update!(relevant_attributes_for_scan)
-          end
-        end
-
-        context "when resource is deleted" do
-          it "does not trigger the scanner service" do
-            expect(Accessibility::ResourceScannerService).not_to receive(:call)
-
-            resource.destroy
-          end
-        end
-
-        context "when workflow_state is set to deleted" do
-          it "does not trigger the scanner service" do
-            expect(Accessibility::ResourceScannerService).not_to receive(:call)
-
-            resource.update!(workflow_state: "deleted")
           end
         end
       end
@@ -109,6 +156,7 @@ RSpec.shared_examples "an accessibility scannable resource" do
       account.enable_feature!(:a11y_checker)
       resource.context.enable_feature!(:a11y_checker_eap)
       resource.context.reload
+      Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
     end
 
     it "saves the resource without triggering accessibility scan" do
@@ -143,6 +191,7 @@ RSpec.shared_examples "an accessibility scannable resource" do
       account.enable_feature!(:a11y_checker)
       resource.context.enable_feature!(:a11y_checker_eap)
       resource.context.reload
+      Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
     end
 
     it "saves the resource without triggering accessibility scan" do

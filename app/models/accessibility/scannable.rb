@@ -21,15 +21,15 @@ module Accessibility
     extend ActiveSupport::Concern
 
     included do
+      before_save :capture_content_changes
+
       after_commit :trigger_accessibility_scan_on_create,
                    on: :create,
-                   unless: -> { skip_accessibility_scan },
-                   if: :a11y_checker_enabled?
+                   if: :should_run_accessibility_scan?
 
       after_commit :trigger_accessibility_scan_on_update,
                    on: :update,
-                   unless: -> { deleted? || skip_accessibility_scan },
-                   if: :a11y_checker_enabled?
+                   if: :should_run_accessibility_scan?
 
       after_commit :remove_accessibility_scan,
                    on: :update,
@@ -54,8 +54,30 @@ module Accessibility
 
     private
 
+    def capture_content_changes
+      # Capture content changes before they're lost by subsequent touch operations.
+      # Rails' dirty tracking gets cleared when associations touch the parent record,
+      # so we store the change state here to check later in after_commit.
+      @content_changed = if a11y_scannable_attributes.present?
+                           a11y_scannable_attributes.any? { |attr| send("#{attr}_changed?") }
+                         else
+                           false
+                         end
+    end
+
+    def should_run_accessibility_scan?
+      a11y_checker_enabled? &&
+        !deleted? &&
+        !skip_accessibility_scan &&
+        any_completed_accessibility_scan?
+    end
+
     def a11y_checker_enabled?
       context.is_a?(Course) && context.a11y_checker_enabled?
+    end
+
+    def any_completed_accessibility_scan?
+      Accessibility::CourseScanService.last_accessibility_course_scan(course)&.completed? || false
     end
 
     def trigger_accessibility_scan_on_create
@@ -63,23 +85,17 @@ module Accessibility
     end
 
     def trigger_accessibility_scan_on_update
-      return unless scan_relevant_attribute_changed?
+      return unless @content_changed.present?
 
       Accessibility::ResourceScannerService.call(resource: self)
     end
 
-    def scan_relevant_attribute_changed?
-      case self
-      when WikiPage
-        saved_change_to_body? || saved_change_to_title?
-      else
-        # TODO: ADD ASSIGNMENT CHECKING HERE
-        true
-      end
-    end
-
     def remove_accessibility_scan
       AccessibilityResourceScan.where(context: self).destroy_all
+    end
+
+    def a11y_scannable_attributes
+      raise NotImplementedError, "#{self.class.name} must implement #a11y_scannable_attributes"
     end
   end
 end

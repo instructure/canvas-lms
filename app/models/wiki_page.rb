@@ -819,4 +819,10 @@ class WikiPage < ActiveRecord::Base
     Rails.logger.error("Failed to delete wiki page #{id} from Pine for context #{context.class.name}:#{context.id}: #{e.message}")
     raise
   end
+
+  def a11y_scannable_attributes
+    # We need to run the scan on title and workflow_state change as well otherwise AccessibilityResourceScan will be out of date
+    # TODO: RCX-4463 remove title and workflow_state
+    %i[title body workflow_state]
+  end
 end
