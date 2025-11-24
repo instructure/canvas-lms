@@ -61,6 +61,7 @@ module SIS
                      user_observer].freeze
 
       HEADERS_TO_EXCLUDE_FOR_DOWNLOAD = %w[password ssha_password].freeze
+      DEDUP_THRESHOLD = 100
 
       def initialize(root_account, opts = {})
         opts = opts.with_indifferent_access
@@ -123,13 +124,18 @@ module SIS
               next if File.directory?(fn) || !!(fn =~ IGNORE_FILES)
 
               file_name = fn[(tmp_dir.size + 1)..]
-              att = create_batch_attachment(File.join(tmp_dir, file_name))
-              process_file(tmp_dir, file_name, att)
+              dir, file_name = dedup_csv(tmp_dir, file_name)
+              att = create_batch_attachment(File.join(dir, file_name))
+              process_file(dir, file_name, att)
             end
           when ".csv"
-            att = @batch.attachment if @batch.attachment && File.extname(@batch.attachment.filename).casecmp?(".csv")
+            dir, file_name = dedup_csv(File.dirname(file), File.basename(file))
+
+            att = create_batch_attachment File.join(dir, file_name) if File.join(dir, file_name) != file
+            att ||= @batch.attachment if @batch.attachment && File.extname(@batch.attachment.filename).casecmp?(".csv")
             att ||= create_batch_attachment file
-            process_file(File.dirname(file), File.basename(file), att)
+
+            process_file(dir, file_name, att)
           end
         end
         remove_instance_variable(:@files)
@@ -447,6 +453,29 @@ module SIS
           new_csv.close
           create_batch_attachment(path)
         end
+      end
+
+      def dedup_csv(dir, file_name)
+        return [dir, file_name] unless File.extname(file_name).casecmp?(".csv")
+
+        begin
+          original_lines = ::CSV.readlines(File.join(dir, file_name))
+        rescue ::CSV::MalformedCSVError
+          return [dir, file_name] # allow downstream error handling manage malformed CSVs
+        end
+
+        unique_lines = original_lines.reverse.uniq.reverse # reverse -> uniq -> reverse keeps the last duplicate entry
+        return [dir, file_name] if original_lines.length - unique_lines.length < DEDUP_THRESHOLD
+
+        # Creating a temp dir under the given dir to avoid potential file name collision
+        dedup_dir = Dir.mktmpdir(nil, dir)
+        dedup_filename = file_name.sub(/\.csv$/i, "_deduplicated.csv")
+
+        ::CSV.open(File.join(dedup_dir, dedup_filename), "w") do |csv|
+          unique_lines.each { |line| csv << line }
+        end
+
+        [dedup_dir, dedup_filename]
       end
     end
   end
