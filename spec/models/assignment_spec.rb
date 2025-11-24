@@ -13113,6 +13113,7 @@ describe Assignment do
     let(:course) { course_model }
     let(:valid_attributes) { { title: "Test Assignment", course: } }
     let(:relevant_attributes_for_scan) { { description: "<p>Lorem ipsum</p>" } }
+    let(:irrelevant_attributes_for_scan) { { points_possible: 100 } }
   end
 
   describe "peer_review_sub_assignment association" do

@@ -1629,6 +1629,7 @@ describe WikiPage do
     let(:course) { course_model }
     let(:valid_attributes) { { title: "Test Page", course: } }
     let(:relevant_attributes_for_scan) { { body: "<p>Lorem ipsum</p>" } }
+    let(:irrelevant_attributes_for_scan) { { could_be_locked: true } }
   end
 
   describe "#should_index_in_pine?" do

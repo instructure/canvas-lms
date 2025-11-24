@@ -283,4 +283,10 @@ class Assignment < AbstractAssignment
   def delete_allocation_rules
     allocation_rules.update_all(workflow_state: "deleted")
   end
+
+  def a11y_scannable_attributes
+    # We need to run the scan on title and workflow_state change as well otherwise AccessibilityResourceScan will be out of date
+    # TODO: RCX-4463 remove title and workflow_state
+    %i[title description workflow_state]
+  end
 end
