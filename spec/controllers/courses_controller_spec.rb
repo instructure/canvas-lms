@@ -6161,4 +6161,34 @@ describe CoursesController do
       expect(response).to have_http_status(:not_found)
     end
   end
+
+  describe "GET user_index" do
+    before do
+      @course = course_factory(name: "basic_course")
+      @course.enroll_teacher(@teacher = user_factory)
+      user_session(@teacher)
+    end
+
+    it "returns list of courses the user is enrolled in" do
+      get :user_index, params: { user_id: @teacher.id }
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json).to be_an(Array)
+      expect(json.length).to eq(1)
+      expect(json.first["id"]).to eq(@course.id)
+    end
+
+    it "returns list of completed courses" do
+      completed_course = course_factory(account: @course.account)
+      completed_course.enroll_teacher(@teacher)
+      completed_course.complete!
+
+      get :user_index, params: { user_id: @teacher.id, state: ["completed"] }
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json).to be_an(Array)
+      expect(json.length).to eq(1)
+      expect(json.first["id"]).to eq(completed_course.id)
+    end
+  end
 end
