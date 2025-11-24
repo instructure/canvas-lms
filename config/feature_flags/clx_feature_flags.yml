@@ -25,6 +25,13 @@ horizon_root_experience:
   display_name: "Canvas Career: Root Account Experience"
   description: |-
     Enables the optimized root account experience in Canvas Career.
+horizon_role_dashboards:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Role Dashboards"
+  description: |-
+    Enables role-based dashboards in Canvas Career.
 horizon_dashboard_ai_widgets:
   applies_to: RootAccount
   state: hidden
