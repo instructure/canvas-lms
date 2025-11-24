@@ -63,6 +63,7 @@ module Api::V1::Lti::Registration
       json["dynamic_registration"] = true if registration.dynamic_registration?
       json["developer_key_id"] = registration.developer_key&.global_id
       json["ims_registration_id"] = registration.ims_registration&.id
+      json["dynamic_registration_url"] = registration.ims_registration&.registration_url
       json["manual_configuration_id"] = registration.manual_configuration&.id
 
       if registration.site_admin?

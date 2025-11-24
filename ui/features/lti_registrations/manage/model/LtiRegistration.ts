@@ -52,6 +52,7 @@ export const ZLtiRegistration = z.object({
   account_binding: ZLtiRegistrationAccountBinding.nullable().optional(),
   overlay: ZLtiOverlay.nullable().optional(),
   pending_update: ZLtiRegistrationUpdateRequestId.nullable().optional(),
+  dynamic_registration_url: z.string().nullable().optional(),
 })
 
 export type LtiRegistration = z.infer<typeof ZLtiRegistration>
