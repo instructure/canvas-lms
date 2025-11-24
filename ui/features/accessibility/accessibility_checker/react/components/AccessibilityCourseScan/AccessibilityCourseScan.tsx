@@ -84,6 +84,13 @@ export const AccessibilityCourseScan: React.FC<CourseScanProps> = ({
 
   const handleCourseScan = () => {
     setIsMutationLoading(true)
+
+    const url = new URL(window.location.href)
+    if (url.searchParams.has('page')) {
+      url.searchParams.delete('page')
+      window.history.replaceState({}, '', url.toString())
+    }
+
     mutation.mutate({courseId})
   }
 
