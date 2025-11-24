@@ -1578,4 +1578,48 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(result["errors"][0]["message"]).to match(/Cannot set default thread state locked, when threads are collapsed/)
     end
   end
+
+  context "delayed_post_at workflow state" do
+    it "updates workflow_state to post_delayed when editing active announcement with future delayed_post_at" do
+      announcement = @course.announcements.create!(
+        title: "Test Announcement",
+        message: "Test message",
+        user: @teacher,
+        posted_at: Time.zone.now,
+        workflow_state: "active"
+      )
+      expect(announcement.workflow_state).to eq("active")
+
+      future_date = 1.hour.from_now
+      result = run_mutation(id: announcement.id, published: true, delayed_post_at: future_date.iso8601)
+
+      expect(result["errors"]).to be_nil
+      announcement.reload
+      expect(announcement.workflow_state).to eq("post_delayed")
+      expect(announcement.delayed_post_at).to be_within(1.second).of(future_date)
+    end
+
+    it "sends notification when delayed_post event is triggered from post_delayed state" do
+      announcement = @course.announcements.create!(
+        title: "Test Announcement",
+        message: "Test message",
+        user: @teacher,
+        posted_at: Time.zone.now,
+        workflow_state: "active"
+      )
+
+      future_date = 1.hour.from_now
+      run_mutation(id: announcement.id, published: true, delayed_post_at: future_date.iso8601)
+
+      announcement.reload
+      expect(announcement.workflow_state).to eq("post_delayed")
+
+      Timecop.freeze(future_date + 1.minute) do
+        announcement.update_based_on_date
+        announcement.reload
+        expect(announcement.workflow_state).to eq("active")
+        expect(announcement.notify_users).to be true
+      end
+    end
+  end
 end

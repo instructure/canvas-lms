@@ -84,7 +84,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       if input[:published] && !was_published
         discussion_topic.publish!
       elsif input[:published] && was_published
-        discussion_topic.edit!
+        discussion_topic.last_reply_at = Time.zone.now
       else
         discussion_topic.unpublish!
       end
