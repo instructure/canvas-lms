@@ -23,92 +23,88 @@
 # Used to populate JS_ENV for the federated app
 module NewQuizzes
   class LaunchDataBuilder
-    def initialize(context:, assignment:, tool:, current_user:, request:)
+    def initialize(context:, assignment:, tool:, current_user:, controller:, request:, variable_expander:, placement: nil)
       @context = context
       @assignment = assignment
       @tool = tool
       @current_user = current_user
+      @controller = controller
       @request = request
+      @variable_expander = variable_expander
+      @placement = placement # e.g., "course_navigation", "account_navigation" for Item Banks
     end
 
     def build
-      {
-        # Canvas instance
-        custom_canvas_api_domain: @request.host,
+      base_params = build_base_params
+      custom_params = build_custom_params
 
-        # LTI Resource Link ID
-        lti_resource_link_id: resource_link_id,
+      base_params.merge(custom_params).compact
+    end
 
-        # Assignment context
-        custom_canvas_assignment_id: @assignment.id,
-        custom_canvas_assignment_title: @assignment.title,
-        custom_canvas_assignment_due_at: @assignment.due_at&.iso8601,
-        custom_canvas_assignment_unlock_at: @assignment.unlock_at&.iso8601,
-        custom_canvas_assignment_lock_at: @assignment.lock_at&.iso8601,
-        custom_canvas_assignment_points_possible: @assignment.points_possible,
-        custom_canvas_assignment_anonymous_grading: @assignment.anonymous_grading?,
-        custom_canvas_assignment_omit_from_final_grade: @assignment.omit_from_final_grade,
-        custom_canvas_assignment_hide_in_gradebook: @assignment.hide_in_gradebook?,
-        custom_canvas_assignment_restrict_quantitative_data: restrict_quantitative_data?,
-        custom_canvas_assignment_ldb_enabled: @assignment.settings&.dig("lockdown_browser", "require_lockdown_browser") || false,
+    def build_base_params
+      # Get standard LIS parameters from variable expander
+      standard_params = @variable_expander.enabled_capability_params([
+                                                                       "Context.title",
+                                                                       "com.instructure.contextLabel",
+                                                                       "Person.name.full",
+                                                                       "Person.name.given",
+                                                                       "Person.name.family",
+                                                                       "Person.email.primary",
+                                                                       "User.image",
+                                                                       "Message.locale",
+                                                                     ])
 
-        # Course context
-        custom_canvas_course_id: @context.id,
-        custom_canvas_course_uuid: @context.uuid,
-        custom_canvas_course_workflow_state: @context.workflow_state,
-        custom_canvas_course_grading_scheme: grading_scheme,
-        custom_canvas_course_ai_quiz_generation: ai_quiz_generation_enabled?,
-        context_title: @context.name,
-        context_label: @context.course_code,
-
-        # User context
-        custom_canvas_user_id: @current_user.id,
-        custom_canvas_user_uuid: @current_user.uuid,
-        custom_canvas_user_login_id: @current_user.pseudonyms&.first&.unique_id,
-        custom_canvas_user_current_uuid: @current_user.uuid,
-        custom_canvas_user_student_view: @current_user.fake_student?,
-        lis_person_name_full: @current_user.name,
-        lis_person_name_given: @current_user.first_name,
-        lis_person_name_family: @current_user.last_name,
-        lis_person_contact_email_primary: @current_user.email,
-        user_image: @current_user.avatar_url,
-
-        # Context identifiers
-        custom_canvas_context_uuid: @context.uuid,
-        custom_canvas_global_context_id: @context.global_id,
-
-        # Tool context
-        custom_canvas_tool_id: @tool&.global_id,
-
-        # Enrollment and permissions
-        custom_canvas_enrollment_state: enrollment_state,
-        custom_canvas_permissions: permissions,
+      params = {
+        # Non-custom params that are always included
+        lti_resource_link_id:,
+        backend_url:,
         roles:,
         ext_roles:,
 
-        # Rich Content Service
-        custom_canvas_rcs_host: rcs_host,
-        custom_canvas_rcs_service_jwt: rcs_jwt,
+        # Platform identifier
+        ext_platform: "canvas",
 
-        # Locale and formatting
-        custom_canvas_timezone_name: Time.zone.tzinfo.name,
-        custom_canvas_high_contrast_setting: @current_user.prefers_high_contrast?,
-        custom_canvas_decimal_separator: decimal_separator,
-        custom_canvas_thousand_separator: thousand_separator,
-        custom_canvas_instui_nav: @context.root_account.feature_enabled?(:instui_nav),
+        # Tool consumer information
+        tool_consumer_info_product_family_code: "canvas",
+        tool_consumer_info_version: "cloud",
+        tool_consumer_instance_guid: @context.root_account.lti_guid,
+        tool_consumer_instance_name: @context.root_account.name,
+      }.merge(standard_params)
 
-        # Usage metrics
-        custom_usage_metrics_enabled: usage_metrics_enabled?,
+      # Assignment-specific outcome service parameters
+      if @assignment
+        # Only include result sourcedid for learners
+        if learner?
+          params[:lis_result_sourcedid] = encode_source_id(@assignment)
+        end
 
-        # Module context (if launched from module)
-        custom_canvas_module_id: module_id,
-        custom_canvas_module_item_id: module_item_id,
+        # Outcome service URLs
+        params[:lis_outcome_service_url] = outcome_service_url
+        params[:ext_ims_lis_basic_outcome_url] = legacy_outcome_service_url
 
-        # Backend URL - extracted from the tool's launch URL
-        # This allows the native app to connect to the correct tenant-specific backend
-        backend_url:,
-        locale:,
-      }.compact # Remove nil values
+        # Basic outcomes extensions
+        params[:ext_outcome_data_values_accepted] = @assignment.submission_types_array.map { |type| Lti::LtiAssignmentCreator::SUBMISSION_TYPES_MAP[type] }.flatten.compact.join(",")
+        params[:ext_outcome_result_total_score_accepted] = true
+        params[:ext_outcome_submission_submitted_at_accepted] = true
+        params[:ext_outcome_submission_needs_additional_review_accepted] = true
+        params[:ext_outcome_submission_prioritize_non_tool_grade_accepted] = true
+
+        # Turnitin outcomes placement URL
+        params[:ext_outcomes_tool_placement_url] = lti_turnitin_outcomes_placement_url if lti_turnitin_outcomes_placement_url
+      end
+
+      params
+    end
+
+    def build_custom_params
+      return {} unless @tool
+
+      # Get unexpanded custom fields from tool
+      # Pass placement to include placement-specific custom fields (e.g., item_banks: course)
+      unexpanded_fields = @tool.set_custom_fields(@placement)
+
+      # Expand all variables
+      @variable_expander.expand_variables!(unexpanded_fields)
     end
 
     # Builds launch data with HMAC signature for tamper protection
@@ -123,14 +119,16 @@ module NewQuizzes
 
     private
 
-    def resource_link_id
-      # Get the LTI resource link ID from the assignment's line items
-      # This matches what Canvas sends in LTI 1.3 launches
-      # Fallback to lti_context_id which is the assignment's unique LTI identifier
-      if @assignment.submission_types == "external_tool" && @assignment.line_items.present?
-        @assignment.line_items.first&.resource_link&.resource_link_uuid
+    def lti_resource_link_id
+      # For assignments: use the resource link UUID from line items, or fall back to variable expander
+      # For Item Banks (no assignment): use the context's opaque identifier (same as standard LTI launch)
+
+      if @assignment
+        # Try to get from variable expander first (handles assignment resource links properly)
+        @assignment.lti_resource_link_id
       else
-        @assignment.lti_context_id
+        # For Item Banks: use context's opaque identifier (same as standard LTI launch)
+        Lti::V1p1::Asset.opaque_identifier_for(@context)
       end
     end
 
@@ -325,16 +323,102 @@ module NewQuizzes
     # Creates a canonical string representation of parameters for consistent signing
     # Uses query-string format with URL encoding to match OAuth standards
     def canonical_params_string(params)
-      URI.encode_www_form(params.sort.map do |k, v|
-        value = (v.is_a?(Float) && v == v.to_i) ? v.to_i : v
-        [k, value]
-      end)
+      # Convert all values to strings for consistent sorting and encoding
+      normalized_params = params.map do |k, v|
+        value = normalize_value(v)
+        [k.to_s, value]
+      end
+
+      # Sort by key for consistent ordering
+      sorted_params = normalized_params.sort_by { |k, _v| k }
+
+      URI.encode_www_form(sorted_params)
+    end
+
+    # Normalize parameter values to strings for signing
+    def normalize_value(value)
+      case value
+      when Float
+        # Convert floats to integers if they're whole numbers
+        (value == value.to_i) ? value.to_i.to_s : value.to_s
+      when Array, Hash
+        # Convert complex types to JSON strings
+        value.to_json
+      else
+        # Convert booleans, nil, and everything else to strings
+        # (nil becomes empty string)
+        value.to_s
+      end
     end
 
     # Gets the tool's shared secret from the ContextExternalTool
     # This is the same secret used for LTI OAuth signature verification
     def tool_shared_secret
       @tool&.shared_secret
+    end
+
+    # Check if current user is a learner (student) in the context
+    def learner?
+      return false unless @current_user && @context
+
+      @context.enrollments.where(user_id: @current_user).active.any?(StudentEnrollment)
+    end
+
+    # Generate outcome service URL for grade passback
+    def outcome_service_url
+      return nil unless @assignment && @context
+
+      @controller&.lti_grade_passback_api_url(@tool)
+    end
+
+    # Generate legacy outcome service URL
+    def legacy_outcome_service_url
+      return nil unless @assignment && @context
+
+      @controller&.blti_legacy_grade_passback_api_url(@tool)
+    end
+
+    # Get assignment return types (for outcome data values accepted)
+    def assignment_return_types
+      return nil unless @assignment
+
+      source_id = encode_source_id(@assignment)
+      lti_assignment = Lti::LtiAssignmentCreator.new(@assignment, source_id).convert
+      return_types = lti_assignment.return_types
+
+      # return_types is a proc, so call it to get the actual array
+      return_types.is_a?(Proc) ? return_types.call.join(",") : return_types.join(",")
+    end
+
+    # Encode source ID for LTI assignment
+    # This is the lis_result_sourcedid field in the launch, and the
+    # sourcedGUID/sourcedId in BLTI basic outcome requests.
+    # It's a secure signature of the (tool, course, assignment, user). Combined with
+    # the pre-determined shared secret that the tool signs requests with, this
+    # ensures that only this launch of the tool can modify the score.
+    def encode_source_id(assignment)
+      return nil unless assignment && @tool && @context && @current_user
+
+      @tool.shard.activate do
+        if @context.root_account.feature_enabled?(:encrypted_sourcedids)
+          BasicLTI::Sourcedid.new(@tool, @context, assignment, @current_user).to_s
+        else
+          payload = [@tool.id, @context.id, assignment.id, @current_user.id].join("-")
+          "#{payload}-#{Canvas::Security.hmac_sha1(payload)}"
+        end
+      end
+    end
+
+    # Generate Turnitin outcomes placement URL
+    def lti_turnitin_outcomes_placement_url
+      return nil unless @assignment && @context
+
+      # This is only used for Turnitin integrations
+      # For New Quizzes, this is typically not needed, but include it for completeness
+      @controller&.lti_turnitin_outcomes_placement_url(@tool)
+    rescue
+      # If the method doesn't exist on controller, return nil
+      nil
     end
   end
 end
