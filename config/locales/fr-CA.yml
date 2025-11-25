@@ -10595,7 +10595,7 @@ fr-CA:
         apps: Applications
         apps_new: "Applications (Nouveau)"
         details: "Informations du cours"
-        feature_options: "Options de la fonction"
+        feature_options: Fonctionnalités
         feature_previews: "Aperçus des fonctionnalités"
         grade_publishing: "Publication des notes"
         grade_syncing: "Synchronisation des notes"
@@ -17102,7 +17102,7 @@ fr-CA:
   hide_sub_accounts_for_account_name_a6de98bd: "Masquer les sous-comptes pour %{account_name}"
   hide_text_no_question_has_moved_to_a_stimulus_warn_6f387915: "Masquer le texte « Aucune question n’a été déplacée » vers un avertissement Stimulus après la migration du questionnaire."
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Masquer le bouton « Importer les acquis d’apprentissage » en fonction des autorisations de l’utilisateur"
-  hide_total_and_override_columns_6fde3e25: "Masquer les colonnes Total et Annulation"
+  hide_total_and_override_columns_6fde3e25: "Masquer les colonnes Total et Surclassement"
   hide_total_column_6911831e: "Masquer la colonne Total"
   hide_translate_text_1003ba9e: "Cacher le texte à traduire"
   hide_translation_66385567: "Masquer la traduction"
