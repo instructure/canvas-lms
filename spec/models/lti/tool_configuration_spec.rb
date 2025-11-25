@@ -506,56 +506,6 @@ module Lti
       end
     end
 
-    describe "verify_placements" do
-      subject { tool_configuration.verify_placements }
-
-      before do
-        tool_configuration.save!
-      end
-
-      %w[submission_type_selection].each do |placement|
-        it "returns nil when there are no #{placement} placements" do
-          expect(subject).to be_nil
-        end
-
-        context "when the configuration has a #{placement} placement" do
-          let(:tool_configuration) do
-            super().tap do |tc|
-              tc.placements << make_placement(placement, "LtiResourceLinkRequest")
-            end
-          end
-
-          it { is_expected.to include("Warning").and include(placement) }
-
-          context "when the tool is allowed to use the #{placement} placement through it's dev key" do
-            before do
-              Setting.set("#{placement}_allowed_dev_keys", tool_configuration.developer_key.global_id.to_s)
-            end
-
-            it { is_expected.to be_nil }
-          end
-
-          context "when the tool is allowed to use the #{placement} placement through it's domain" do
-            before do
-              Setting.set("#{placement}_allowed_launch_domains", tool_configuration.domain)
-            end
-
-            it { is_expected.to be_nil }
-          end
-
-          context "when the tool has no domain and domain list is containing an empty space" do
-            before do
-              allow(tool_configuration).to receive_messages(domain: "", developer_key_id: nil)
-              Setting.set("#{placement}_allowed_launch_domains", ", ,,")
-              Setting.set("#{placement}_allowed_dev_keys", ", ,,")
-            end
-
-            it { is_expected.to include("Warning").and include(placement) }
-          end
-        end
-      end
-    end
-
     describe "placement_warnings" do
       subject { tool_configuration.placement_warnings }
       context "when the tool does not have resource_selection placement" do
@@ -571,16 +521,6 @@ module Lti
 
         it "contains a warning message about deprecation" do
           expect(subject[0]).to include("Warning").and include("deprecated").and include("resource_selection")
-        end
-      end
-
-      context "when the tool has submission_type_selection placement" do
-        before do
-          placements << make_placement(:submission_type_selection, "LtiResourceLinkRequest")
-        end
-
-        it "contains a warning message about approved LTI tools" do
-          expect(subject[0]).to include("Warning").and include("submission_type_selection")
         end
       end
     end
