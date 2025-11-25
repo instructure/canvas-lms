@@ -3147,6 +3147,15 @@ class Submission < ActiveRecord::Base
   def visible_rubric_assessments_for(viewing_user, attempt: nil, include_provisional: false, provisional_assessments: nil)
     return [] unless assignment.active_rubric_association?
 
+    # When grades are published in moderated grading, only show the selected rubric assessment
+    if assignment.moderated_grading? && assignment.grades_published?
+      selected_assessment = rubric_assessments_for_attempt(attempt:).find do |a|
+        a.assessment_type == "grading" &&
+          a.rubric_association == assignment.rubric_association
+      end
+      return selected_assessment ? [selected_assessment] : []
+    end
+
     unless posted? || grants_right?(viewing_user, :read_grade)
       assessments = rubric_assessments_for_attempt(attempt:)
 
