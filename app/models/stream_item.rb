@@ -188,8 +188,22 @@ class StreamItem < ActiveRecord::Base
     when DiscussionTopic
       res = object.attributes
       res["user_ids_that_can_see_responses"] = object.user_ids_who_have_posted_and_admins if object.require_initial_post?
-      res["total_root_discussion_entries"] = object.root_discussion_entries.active.count
-      res[:root_discussion_entries] = object.root_discussion_entries.active.order(created_at: :desc).limit(LATEST_ENTRY_LIMIT).to_a.reverse.map do |entry|
+      res["total_root_discussion_entries"] = if object.association(:root_discussion_entries).loaded?
+                                               object.root_discussion_entries.count { |e| e.workflow_state != "deleted" }
+                                             else
+                                               object.root_discussion_entries.active.size
+                                             end
+      entries = if object.association(:root_discussion_entries).loaded?
+                  object.root_discussion_entries
+                        .reject { |e| e.workflow_state == "deleted" }
+                        .sort_by(&:created_at)
+                        .reverse
+                        .take(LATEST_ENTRY_LIMIT)
+                        .reverse
+                else
+                  object.root_discussion_entries.active.order(created_at: :desc).limit(LATEST_ENTRY_LIMIT).to_a.reverse
+                end
+      res[:root_discussion_entries] = entries.map do |entry|
         hash = entry.attributes
         hash["user_short_name"] = entry.user.short_name if entry.user
         hash["message"] = hash["message"][0, 4.kilobytes] if hash["message"].present?
@@ -330,9 +344,9 @@ class StreamItem < ActiveRecord::Base
   def self.prepare_object_for_unread(object)
     case object
     when DiscussionEntry
-      ActiveRecord::Associations.preload(object, :discussion_entry_participants)
+      ActiveRecord::Associations.preload(object, :discussion_entry_participants) unless object.association(:discussion_entry_participants).loaded?
     when DiscussionTopic
-      ActiveRecord::Associations.preload(object, :discussion_topic_participants)
+      ActiveRecord::Associations.preload(object, :discussion_topic_participants) unless object.association(:discussion_topic_participants).loaded?
     end
   end
 
