@@ -272,6 +272,7 @@ describe Quizzes::QuizzesController do
       expect(controller.remote_env[:ams][:API_URL]).to eq(Services::Ams.api_url)
 
       expect(controller.js_env[:QUIZZES]).to be_nil
+      expect(controller.js_env[:context_url]).to eq("/courses/#{@course.id}/quizzes")
     end
 
     context "assign to differentiation tags" do
@@ -741,6 +742,7 @@ describe Quizzes::QuizzesController do
         expect(controller.remote_env[:ams]).to_not be_nil
 
         expect(controller.js_env[:QUIZZES]).to be_nil
+        expect(controller.js_env[:context_url]).to eq("/courses/#{@course.id}/quizzes")
       end
 
       it "uses the ams service logic without a valid quiz id" do
@@ -749,6 +751,70 @@ describe Quizzes::QuizzesController do
         expect(controller.remote_env[:ams]).to_not be_nil
 
         expect(controller.js_env[:QUIZZES]).to be_nil
+      end
+
+      context "shard aware urls" do
+        specs_require_sharding
+
+        let(:cross_shard_course) { @cross_shard_course }
+        let(:cross_shard_quiz) { @cross_shard_quiz }
+        let(:cross_shard_teacher) { @cross_shard_teacher }
+        let(:shard_id) { @shard_id }
+        let(:local_course_id) { @local_course_id }
+
+        before do
+          @shard1.activate do
+            cross_shard_account = Account.create!
+            @cross_shard_course = Course.create!(account: cross_shard_account, workflow_state: "available")
+            @cross_shard_teacher = User.create!
+            @cross_shard_course.enroll_teacher(@cross_shard_teacher, enrollment_state: "active")
+            @cross_shard_quiz = @cross_shard_course.quizzes.create!(title: "Cross Shard Quiz")
+            @cross_shard_quiz.publish!
+
+            cross_shard_account.enable_feature!(:ams_root_account_integration)
+            @cross_shard_course.enable_feature!(:ams_course_integration)
+
+            @shard_id = Shard.current.id
+            @local_course_id = @cross_shard_course.local_id
+          end
+        end
+
+        it "generates context_url with shard-aware ID format for cross-shard courses in show action" do
+          # Access from default shard - this is when shard-aware IDs are used
+          user_session(cross_shard_teacher)
+          get "show", params: { course_id: cross_shard_course.global_id, id: cross_shard_quiz.global_id }
+
+          expect(response).to be_successful
+          # The context_url should contain the shard-aware ID format: shard_id~local_id
+          expect(controller.js_env[:context_url]).to eq("/courses/#{shard_id}~#{local_course_id}/quizzes")
+          # Verify it contains the shard prefix (format: <shard_id>~<course_id>)
+          expect(controller.js_env[:context_url]).to match(%r{^/courses/\d+~\d+/quizzes$})
+          expect(controller.remote_env[:ams]).to_not be_nil
+        end
+
+        it "generates context_url with shard-aware ID format for cross-shard courses in index action" do
+          # Access from default shard - this is when shard-aware IDs are used
+          user_session(cross_shard_teacher)
+          get "index", params: { course_id: cross_shard_course.global_id }
+
+          expect(response).to be_successful
+          # The context_url should contain the shard-aware ID format: shard_id~local_id
+          expect(controller.js_env[:context_url]).to eq("/courses/#{shard_id}~#{local_course_id}/quizzes")
+          # Verify it contains the shard prefix (format: <shard_id>~<course_id>)
+          expect(controller.js_env[:context_url]).to match(%r{^/courses/\d+~\d+/quizzes$})
+          expect(controller.remote_env[:ams]).to_not be_nil
+        end
+
+        it "generates regular context_url without shard prefix for same-shard courses" do
+          # This test verifies that courses on the same shard don't get the shard prefix
+          user_session(@teacher)
+          get "show", params: { course_id: @course.id, id: @quiz.id }
+
+          expect(response).to be_successful
+          # Should NOT have shard prefix since it's on the same shard
+          expect(controller.js_env[:context_url]).to eq("/courses/#{@course.id}/quizzes")
+          expect(controller.js_env[:context_url]).not_to match(/~/)
+        end
       end
     end
 
@@ -1070,6 +1136,7 @@ describe Quizzes::QuizzesController do
 
         @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
         @quiz.generate_quiz_data
+
         @quiz.only_visible_to_overrides = true
         @quiz.save!
 

@@ -1162,7 +1162,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def render_ams_service
     js_env(
-      context_url: context_url(@context, :context_quizzes_url),
+      context_url: named_context_url(@context, :context_quizzes_url),
       PERMISSIONS: { manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics) }
     )
     enhanced_rubrics_context_js_env
