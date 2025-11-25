@@ -21,7 +21,9 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
+import {Responsive} from '@instructure/ui-responsive'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {responsiveQuerySizes} from '@canvas/breakpoints'
 
 const I18n = createI18nScope('accessibility_scan')
 
@@ -38,23 +40,47 @@ export const ScanHandler: React.FC<CourseScanWrapperProps> = ({
 }) => {
   return (
     <View as="div">
-      <Flex>
-        <Flex.Item padding="x-small 0" shouldShrink shouldGrow>
-          <Heading level="h1" as="h2" margin="0 0 x-small">
-            {I18n.t('Course Accessibility Checker')}
-          </Heading>
-        </Flex.Item>
-        <Flex.Item align="start">
-          <Button
-            color="primary"
-            margin="small 0"
-            disabled={scanButtonDisabled}
-            onClick={handleCourseScan}
-          >
-            {I18n.t('Scan Course')}
-          </Button>
-        </Flex.Item>
-      </Flex>
+      <Responsive
+        query={responsiveQuerySizes({mobile: true, desktop: true})}
+        props={{
+          mobile: {
+            direction: 'column',
+            buttonDisplay: 'block',
+            buttonWidth: '100%',
+            flexItemWidth: '100%',
+          },
+          desktop: {
+            direction: 'row',
+            buttonDisplay: 'inline-block',
+            buttonWidth: 'auto',
+            flexItemWidth: 'auto',
+          },
+        }}
+        render={props => {
+          if (!props) return null
+          return (
+            <Flex direction={props.direction} gap="medium">
+              <Flex.Item padding="x-small 0" shouldShrink shouldGrow>
+                <Heading level="h1" as="h1" margin="0 0 x-small">
+                  {I18n.t('Course Accessibility Checker')}
+                </Heading>
+              </Flex.Item>
+              <Flex.Item align="start" overflowX="visible" width={props.flexItemWidth}>
+                <Button
+                  color="primary"
+                  margin="small 0"
+                  disabled={scanButtonDisabled}
+                  onClick={handleCourseScan}
+                  display={props.buttonDisplay}
+                  width={props.buttonWidth}
+                >
+                  {I18n.t('Scan Course')}
+                </Button>
+              </Flex.Item>
+            </Flex>
+          )
+        }}
+      />
       {children}
     </View>
   )
