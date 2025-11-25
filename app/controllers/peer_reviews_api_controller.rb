@@ -167,7 +167,7 @@ class PeerReviewsApiController < ApplicationController
 
     if result[:success]
       includes = Set.new(Array(params[:include]))
-      render json: assessment_request_json(result[:assessment_request], @current_user, session, includes)
+      render json: assessment_requests_json(result[:assessment_requests], @current_user, session, includes)
     else
       status_code = result[:status] || :bad_request
       render json: { errors: { base: result[:message] } }, status: status_code
