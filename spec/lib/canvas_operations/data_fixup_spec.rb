@@ -103,6 +103,21 @@ RSpec.describe CanvasOperations::DataFixup do
     end
   end
 
+  shared_context "batch data fixup with restrictive scope" do
+    before do
+      stub_const("RestrictiveScopeDataFixup", Class.new(described_class) do
+        self.mode = :batch
+        self.progress_tracking = false
+
+        scope { User.where(name: "Target User") }
+
+        def process_batch(records)
+          records.update_all(name: "Fixed User")
+        end
+      end)
+    end
+  end
+
   describe "settings" do
     it "includes settings for batching and sleeping" do
       expect(described_class.range_batch_size).to eq(5_000)
@@ -212,6 +227,32 @@ RSpec.describe CanvasOperations::DataFixup do
         expect(id_ranges.length).to eq 2
         expect(id_ranges.first).to include(user_one.id)
         expect(id_ranges.second).to include(user_two.id)
+      end
+
+      context "with restrictive scope" do
+        include_context "batch data fixup with restrictive scope"
+
+        before do
+          RestrictiveScopeDataFixup.range_batch_size = 1
+        end
+
+        it "does not enqueue process_range when process_batch? returns false" do
+          # Create users that don't match the restrictive scope (name: "Target User")
+          user_one = user_model(name: "User One")
+          User.create!(
+            id: user_one.id + 10,
+            name: "User Two"
+          )
+
+          fixup_instance = RestrictiveScopeDataFixup.new
+          job_scope = Delayed::Job.where(tag: "RestrictiveScopeDataFixup#process_range")
+
+          allow(Rails.env).to receive(:production?).and_return(true)
+
+          # No jobs should be enqueued because process_batch? will return false
+          # since no users in the ID ranges match the scope's where clause
+          expect { fixup_instance.send(:execute) }.not_to change { job_scope.count }
+        end
       end
 
       it "invokes the batch processing handler for each batch" do
