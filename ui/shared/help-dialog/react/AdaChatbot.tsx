@@ -22,13 +22,15 @@ type AdaEmbed = {
   start: (config: any) => Promise<void>
   getInfo: () => Promise<{isChatOpen: boolean; hasActiveChatter: boolean}>
   toggle: () => void
+  subscribeEvent: (eventKey: string, callback: (data: any) => void) => Promise<number>
 }
 
 type AdaChatbotProps = {
   onDialogClose: () => void
 }
 
-const PERSIST_KEY = 'persistedAdaClosed'
+const CHAT_CLOSED_KEY = 'persistedAdaClosed' // User explicitly ended conversation
+const DRAWER_OPEN_KEY = 'persistedAdaDrawerOpen' // Drawer was open (vs minimized)
 
 let initializationPromise: Promise<void> | null = null
 let initializedAdaEmbed: AdaEmbed | null = null
@@ -38,15 +40,27 @@ function getAdaEmbed(): AdaEmbed | null {
 }
 
 function wasClosedByUser(): boolean {
-  return localStorage.getItem(PERSIST_KEY) === 'true'
-}
-
-function markChatOpen(): void {
-  localStorage.setItem(PERSIST_KEY, 'false')
+  return localStorage.getItem(CHAT_CLOSED_KEY) === 'true'
 }
 
 function markChatClosed(): void {
-  localStorage.setItem(PERSIST_KEY, 'true')
+  localStorage.setItem(CHAT_CLOSED_KEY, 'true')
+}
+
+function markChatActive(): void {
+  localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+}
+
+function wasDrawerOpen(): boolean {
+  return localStorage.getItem(DRAWER_OPEN_KEY) === 'true'
+}
+
+function markDrawerOpen(): void {
+  localStorage.setItem(DRAWER_OPEN_KEY, 'true')
+}
+
+function markDrawerClosed(): void {
+  localStorage.setItem(DRAWER_OPEN_KEY, 'false')
 }
 
 async function initializeAda(): Promise<void> {
@@ -64,14 +78,33 @@ async function initializeAda(): Promise<void> {
   initializationPromise = adaEmbed.start({
     ...((window as any).adaSettings || {}),
     handle: 'instructure-gen',
-    hideMascot: true,
+    onAdaEmbedLoaded: () => {
+      adaEmbed.subscribeEvent('ada:end_conversation', () => {
+        markChatClosed()
+        markDrawerClosed()
+      })
+    },
     adaReadyCallback: async () => {
       try {
         const info = await adaEmbed.getInfo()
+        const shouldRestoreDrawer = !wasClosedByUser() && wasDrawerOpen()
 
-        if (info.isChatOpen || (info.hasActiveChatter && !wasClosedByUser())) {
-          if (!info.isChatOpen) adaEmbed.toggle()
-          markChatOpen()
+        if (info.hasActiveChatter) {
+          ;(window as any).adaSettings = {
+            ...(window as any).adaSettings,
+            hideMask: true,
+          }
+        }
+
+        if (shouldRestoreDrawer && !info.isChatOpen) {
+          adaEmbed.toggle()
+        }
+
+        if (info.isChatOpen || shouldRestoreDrawer) {
+          markChatActive()
+          markDrawerOpen()
+        } else {
+          markDrawerClosed()
         }
       } catch (error) {
         console.warn('Ada ready callback failed:', error)
@@ -79,9 +112,10 @@ async function initializeAda(): Promise<void> {
     },
     toggleCallback: (isOpen: boolean) => {
       if (isOpen) {
-        markChatOpen()
+        markChatActive()
+        markDrawerOpen()
       } else {
-        markChatClosed()
+        markDrawerClosed()
       }
     },
   })
@@ -100,7 +134,8 @@ async function openAda(onDialogClose?: () => void): Promise<void> {
     if (!info.isChatOpen) {
       adaEmbed.toggle()
     }
-    markChatOpen()
+    markChatActive()
+    markDrawerOpen()
   } catch (error) {
     console.error('Failed to open Ada chatbot:', error)
   } finally {
