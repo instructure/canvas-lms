@@ -396,7 +396,13 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
 
   return (
     <View position={'relative'} width={pageView ? '100%' : 'auto'} overflowY="auto">
-      <Flex as="div" direction="column" height={pageView ? 'auto' : '100%'} width="100%">
+      <Flex
+        as="div"
+        direction="column"
+        height={pageView ? 'auto' : '100%'}
+        width="100%"
+        margin="0 0 medium 0"
+      >
         <Flex.Item
           as="header"
           padding="small small 0"
