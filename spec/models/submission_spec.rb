@@ -7535,6 +7535,39 @@ describe Submission do
         assessments = @moderated_submission.visible_rubric_assessments_for(@other_grader, include_provisional: true, provisional_assessments: @all_provisional_assessments)
         expect(assessments).to contain_exactly(@other_assessment)
       end
+
+      context "when grades are published" do
+        before(:once) do
+          @final_assessment = @moderated_rubric_association.assess({
+                                                                     user: @student,
+                                                                     assessor: @final_grader,
+                                                                     artifact: @moderated_submission,
+                                                                     assessment: { assessment_type: "grading", criterion_crit1: { points: 9 } }
+                                                                   })
+          @moderated_assignment.update!(grades_published_at: Time.zone.now)
+        end
+
+        it "returns only the selected rubric assessment when grades are published" do
+          assessments = @moderated_submission.visible_rubric_assessments_for(@final_grader)
+          expect(assessments).to contain_exactly(@final_assessment)
+        end
+
+        it "returns only the selected rubric assessment for provisional graders when grades are published" do
+          assessments = @moderated_submission.visible_rubric_assessments_for(@provisional_grader)
+          expect(assessments).to contain_exactly(@final_assessment)
+        end
+
+        it "returns only the selected rubric assessment for students when grades are published" do
+          assessments = @moderated_submission.visible_rubric_assessments_for(@student)
+          expect(assessments).to contain_exactly(@final_assessment)
+        end
+
+        it "does not return provisional assessments when grades are published" do
+          assessments = @moderated_submission.visible_rubric_assessments_for(@final_grader, include_provisional: true, provisional_assessments: @all_provisional_assessments)
+          expect(assessments).to contain_exactly(@final_assessment)
+          expect(assessments).not_to include(@provisional_assessment, @other_assessment)
+        end
+      end
     end
 
     context "anonymous peer reviews" do
