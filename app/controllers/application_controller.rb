@@ -692,7 +692,6 @@ class ApplicationController < ActionController::Base
         tool.feature_flag_enabled?(context)
     end
 
-    tools.select! { |tool| tool.placement_allowed?(type) }
     tools.map do |tool|
       external_tool_display_hash(tool, type, {}, context, custom_settings)
     end

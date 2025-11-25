@@ -1380,20 +1380,6 @@ class ContextExternalTool < ActiveRecord::Base
     )
   end
 
-  def placement_allowed?(placement)
-    return true unless Lti::ResourcePlacement::RESTRICTED_PLACEMENTS.include? placement.to_sym
-
-    allowed_domains = Setting.get("#{placement}_allowed_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
-    allowed_dev_keys = Setting.get("#{placement}_allowed_dev_keys", "").split(",").map(&:strip).reject(&:empty?)
-
-    allowed_dev_keys.include?(global_developer_key_id.to_s) ||
-      allowed_domains.include?(domain) ||
-      allowed_domains.any? do |allowed_domain|
-        # wildcard domains: allowed_domain "*.foo.com" -> domain.end_with? ".foo.com"
-        allowed_domain.start_with?("*.") && domain&.end_with?(allowed_domain[1..])
-      end
-  end
-
   def on_by_default?(on_by_default_ids)
     on_by_default_ids.include?(global_developer_key_id)
   end
