@@ -2285,4 +2285,182 @@ describe OutcomeResultsController do
       end
     end
   end
+
+  describe "#contributing_scores" do
+    before :once do
+      @course = outcome_course
+      @teacher = outcome_teacher
+      @student1 = outcome_student
+      @student2 = student_in_course(active_all: true, course: @course, name: "Student 2").user
+
+      outcome_rubric
+      @assignment = @course.assignments.create!(title: "Test Assignment", points_possible: 10)
+      @alignment = @outcome.align(@assignment, @course, mastery_score: 3)
+      @rubric_association = @rubric.associate_with(@assignment, @course, purpose: "grading")
+      @result1 = create_result(@student1.id, @outcome, @assignment, 8)
+      @result2 = create_result(@student2.id, @outcome, @assignment, 6)
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "returns contributing scores for specified outcome and users" do
+      alignments = @outcome.alignments.where(context: @course, content_type: "Assignment")
+      expect(alignments.count).to be > 0, "Expected to find alignments for outcome"
+
+      get :contributing_scores,
+          params: {
+            course_id: @course.id,
+            outcome_id: @outcome.id,
+            user_ids: [@student1.id, @student2.id]
+          },
+          format: :json
+
+      expect(response).to be_successful
+      json = response.parsed_body
+
+      expect(json).to have_key("outcome")
+      expect(json).to have_key("alignments")
+      expect(json).to have_key("scores")
+
+      expect(json["outcome"]["id"]).to eq(@outcome.id.to_s)
+      expect(json["outcome"]["title"]).to eq(@outcome.title)
+
+      expect(json["alignments"]).to be_an(Array)
+      expect(json["alignments"].length).to be > 0
+
+      alignment = json["alignments"].first
+      expect(alignment).to have_key("alignment_id")
+      expect(alignment).to have_key("associated_asset_id")
+      expect(alignment).to have_key("associated_asset_name")
+      expect(alignment).to have_key("associated_asset_type")
+      expect(alignment["associated_asset_id"]).to be_present
+      expect(alignment["associated_asset_name"]).to be_present
+      expect(alignment["associated_asset_type"]).to be_present
+      expect(alignment["alignment_id"]).to match(/^(D|I|E)_\d+/)
+
+      expect(json["scores"]).to be_an(Array)
+
+      if json["scores"].any?
+        score = json["scores"].first
+        expect(score).to have_key("user_id")
+        expect(score).to have_key("alignment_id")
+        expect(score).to have_key("score")
+        expect(score["alignment_id"]).to match(/^(D|I|E)_\d+/)
+
+        user_ids = json["scores"].pluck("user_id")
+        expect(user_ids).to include(@student1.id.to_s, @student2.id.to_s)
+      end
+    end
+
+    it "returns empty scores for users with no results" do
+      @student3 = student_in_course(active_all: true, course: @course, name: "Student 3").user
+
+      get :contributing_scores,
+          params: {
+            course_id: @course.id,
+            outcome_id: @outcome.id,
+            user_ids: [@student3.id]
+          },
+          format: :json
+
+      expect(response).to be_successful
+      json = response.parsed_body
+
+      expect(json["scores"]).to be_an(Array)
+      expect(json["scores"].length).to eq(0)
+    end
+
+    it "requires outcome to exist in context" do
+      other_outcome = LearningOutcome.create!(title: "Other Outcome")
+
+      get :contributing_scores,
+          params: {
+            course_id: @course.id,
+            outcome_id: other_outcome.id,
+            user_ids: [@student1.id]
+          },
+          format: :json
+
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    it "requires proper permissions" do
+      @student_session = user_session(@student1)
+
+      get :contributing_scores,
+          params: {
+            course_id: @course.id,
+            outcome_id: @outcome.id,
+            user_ids: [@student1.id]
+          },
+          format: :json
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    context "with only_assignment_alignments parameter" do
+      before :once do
+        @quiz = @course.quizzes.create!(title: "Test Quiz")
+        @quiz_alignment = @outcome.align(@quiz, @course, mastery_score: 3)
+      end
+
+      it "returns only assignment alignments when only_assignment_alignments is true" do
+        get :contributing_scores,
+            params: {
+              course_id: @course.id,
+              outcome_id: @outcome.id,
+              user_ids: [@student1.id, @student2.id],
+              only_assignment_alignments: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        expect(json["alignments"]).to be_an(Array)
+        expect(json["alignments"].length).to be > 0
+
+        json["alignments"].each do |alignment|
+          expect(alignment["associated_asset_type"]).to eq("Assignment")
+        end
+      end
+
+      it "returns all alignments when only_assignment_alignments is false" do
+        get :contributing_scores,
+            params: {
+              course_id: @course.id,
+              outcome_id: @outcome.id,
+              user_ids: [@student1.id, @student2.id],
+              only_assignment_alignments: false
+            },
+            format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        expect(json["alignments"]).to be_an(Array)
+        alignment_types = json["alignments"].pluck("associated_asset_type").uniq
+        expect(alignment_types.length).to be > 1
+      end
+
+      it "returns all alignments when only_assignment_alignments is not provided" do
+        get :contributing_scores,
+            params: {
+              course_id: @course.id,
+              outcome_id: @outcome.id,
+              user_ids: [@student1.id, @student2.id]
+            },
+            format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        expect(json["alignments"]).to be_an(Array)
+        alignment_types = json["alignments"].pluck("associated_asset_type").uniq
+        expect(alignment_types.length).to be > 1
+      end
+    end
+  end
 end
