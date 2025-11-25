@@ -1203,12 +1203,12 @@ class DiscussionTopic < ActiveRecord::Base
     can_unpublish?(opts)
   end
 
-  def should_send_to_stream
+  def should_send_to_stream(topic_ids_in_unpublished_modules: nil)
     published? &&
       !not_available_yet? &&
       !cloned_item_id &&
       !(root_topic_id && has_group_category?) &&
-      !in_unpublished_module? &&
+      !in_unpublished_module?(topic_ids_in_unpublished_modules:) &&
       !locked_by_module?
   end
 
@@ -1227,13 +1227,22 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   # This is manually called for module publishing
-  def send_items_to_stream
-    if should_send_to_stream
+  def send_items_to_stream(topic_ids_in_unpublished_modules: nil)
+    if should_send_to_stream(topic_ids_in_unpublished_modules:)
       queue_create_stream_items
     end
   end
 
-  def in_unpublished_module?
+  def in_unpublished_module?(topic_ids_in_unpublished_modules: nil)
+    return topic_ids_in_unpublished_modules.include?(id) if topic_ids_in_unpublished_modules
+
+    if association(:context_module_tags).loaded?
+      return true if context_module_tags.any? { |tag| tag.workflow_state == "unpublished" }
+      if context_module_tags.all? { |tag| tag.association(:context_module).loaded? }
+        return context_module_tags.any? { |tag| tag.context_module.workflow_state == "unpublished" }
+      end
+    end
+
     return true if ContentTag.where(content_type: "DiscussionTopic", content_id: self, workflow_state: "unpublished").exists?
 
     ContextModule.joins(:content_tags).where(content_tags: { content_type: "DiscussionTopic", content_id: self }, workflow_state: "unpublished").exists?
@@ -1242,7 +1251,7 @@ class DiscussionTopic < ActiveRecord::Base
   def locked_by_module?
     return false unless context_module_tags.any?
 
-    ContentTag.where(content_type: "DiscussionTopic", content_id: self, workflow_state: "active").all? { |tag| tag.context_module.unlock_at&.future? }
+    context_module_tags.select { |tag| tag.workflow_state == "active" }.all? { |tag| tag.context_module.unlock_at&.future? }
   end
 
   def should_clear_all_stream_items?
@@ -1757,7 +1766,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def active_participants_with_visibility
-    return active_participants_include_tas_and_teachers unless for_assignment? || assignment_overrides.active.any?
+    has_active_overrides = association(:assignment_overrides).loaded? ? assignment_overrides.any?(&:active?) : assignment_overrides.active.any?
+    return active_participants_include_tas_and_teachers unless for_assignment? || has_active_overrides
 
     users_with_visibility = for_assignment? ? assignment.students_with_visibility.pluck(:id) : []
 
