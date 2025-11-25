@@ -210,7 +210,8 @@ module AttachmentHelper
                                        host_and_shard: @safer_domain_host,
                                        verifier:,
                                        download: !inline,
-                                       authorization: @attachment_authorization)
+                                       authorization: @attachment_authorization,
+                                       query_params: options.slice(:location))
     elsif attachment.stored_locally?
       @headers = false if @files_domain
       send_file(attachment.full_filename, type: attachment.content_type_with_encoding, disposition: (inline ? "inline" : "attachment"), filename: attachment.display_name)

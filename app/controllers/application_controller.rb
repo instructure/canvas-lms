@@ -2568,7 +2568,7 @@ class ApplicationController < ActionController::Base
 
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
-  def safe_domain_file_url(attachment, host_and_shard: nil, verifier: nil, download: false, return_url: nil, fallback_url: nil, authorization: nil)
+  def safe_domain_file_url(attachment, host_and_shard: nil, verifier: nil, download: false, return_url: nil, fallback_url: nil, authorization: nil, query_params: {})
     host_and_shard ||= HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
     host, shard = host_and_shard
     config = DynamicSettings.find(tree: :private, cluster: attachment.shard.database_server.id)
@@ -2600,6 +2600,8 @@ class ApplicationController < ActionController::Base
         # comment below for why we'd want to set :download
         opts[:inline] = 1
       end
+
+      opts.merge!(query_params)
 
       if @context && Attachment.relative_context?(@context.class.base_class) && @context == attachment.context
         # so yeah, this is right. :inline=>1 wants :download=>1 to go along with

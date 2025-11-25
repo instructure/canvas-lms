@@ -879,6 +879,7 @@ class FilesController < ApplicationController
 
     options = {}
     options[:fallback_url] = @access_verifier[:fallback_url] if @access_verifier
+    options[:location] = params[:location] if params[:location]
     render_or_redirect_to_stored_file(
       attachment:,
       verifier: params[:verifier],
