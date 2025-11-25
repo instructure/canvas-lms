@@ -934,37 +934,103 @@ describe Types::UserType do
     end
 
     context "permission check priority" do
-      it "calls grants_any_right? on account with :read_email_addresses and :manage_email_addresses" do
-        expect(@course.account.root_account).to receive(:grants_right?)
-          .with(@admin, :read_email_addresses)
-          .and_call_original
-        expect(@course).not_to receive(:grants_any_right?)
-
-        tester = GraphQLTypeTester.new(
-          @student,
-          current_user: @admin,
-          domain_root_account: @course.account.root_account,
-          course: @course,
-          request: ActionDispatch::TestRequest.create
-        )
-
-        expect(tester.resolve("email")).to eq @student.email
+      before(:once) do
+        @other_student = student_in_course(course: @course).user
       end
 
-      it "calls grants_any_right? on course with :read_email_addresses and :manage_email_addresses" do
-        expect(@course).to receive(:grants_right?)
-          .with(@teacher, :read_email_addresses)
-          .and_call_original
-
-        tester = GraphQLTypeTester.new(
+      before do
+        @resolver = GraphQLTypeTester.new(
           @student,
-          current_user: @teacher,
+          current_user: @other_student,
           domain_root_account: @course.account.root_account,
-          course: @course,
           request: ActionDispatch::TestRequest.create
         )
+      end
 
-        expect(tester.resolve("email")).to eq @student.email
+      context "with course context" do
+        before do
+          # Object level permissions should be never called if course is in context
+          expect(@student).not_to receive(:grants_right?)
+        end
+
+        it "checks account-level permission first" do
+          expect(@course.account.root_account).to receive(:grants_right?)
+            .with(@admin, :read_email_addresses)
+            .and_call_original
+          expect(@course).not_to receive(:grants_right?)
+
+          expect(@resolver.resolve("email", current_user: @admin, course: @course)).to eq @student.email
+        end
+
+        it "checks course-level permission if account-level fails" do
+          expect(@course.account.root_account).to receive(:grants_right?)
+            .with(@teacher, :read_email_addresses)
+            .and_call_original
+          expect(@course).to receive(:grants_right?)
+            .with(@teacher, :read_email_addresses)
+            .and_call_original
+
+          expect(@resolver.resolve("email", current_user: @teacher, course: @course)).to eq @student.email
+        end
+
+        it "returns nil account-level and course-level permission checks fail" do
+          expect(@course.account.root_account).to receive(:grants_right?)
+            .with(@other_student, :read_email_addresses)
+            .and_call_original
+          expect(@course).to receive(:grants_right?)
+            .with(@other_student, :read_email_addresses)
+            .and_call_original
+
+          expect(@resolver.resolve("email", course: @course)).to be_nil
+        end
+      end
+
+      context "without course context" do
+        before do
+          # Course-level permissions should be never called if course is not in context
+          expect(@course).not_to receive(:grants_right?)
+        end
+
+        it "checks account-level permission first" do
+          expect(@course.account.root_account).to receive(:grants_right?)
+            .with(@admin, :read_email_addresses)
+            .and_call_original
+          expect(@student).not_to receive(:grants_right?)
+
+          expect(@resolver.resolve("email", current_user: @admin)).to eq @student.email
+        end
+
+        it "checks object-level permission if account-level fails" do
+          expect(@course.account.root_account).to receive(:grants_right?)
+            .with(@teacher, :read_email_addresses)
+            .and_call_original
+
+          # Must use any_instance_of because GraphQL's IDLoader reloads User from DB (new instance)
+          # allow_any_instance_of: lets ALL grants_right? calls proceed (e.g., :read_full_profile checks)
+          # expect_any_instance_of: verifies our specific :read_email_addresses call happens
+          allow_any_instance_of(User).to receive(:grants_right?).and_call_original
+          expect_any_instance_of(User).to receive(:grants_right?)
+            .with(@teacher, :read_email_addresses)
+            .and_call_original
+
+          expect(@resolver.resolve("email", current_user: @teacher)).to eq @student.email
+        end
+
+        it "returns nil account-level and object-level permission checks fail" do
+          expect(@course.account.root_account).to receive(:grants_right?)
+            .with(@other_student, :read_email_addresses)
+            .and_call_original
+
+          # Must use any_instance_of because GraphQL's IDLoader reloads User from DB (new instance)
+          # allow_any_instance_of: lets ALL grants_right? calls proceed (e.g., :read_full_profile checks)
+          # expect_any_instance_of: verifies our specific :read_email_addresses call happens
+          allow_any_instance_of(User).to receive(:grants_right?).and_call_original
+          expect_any_instance_of(User).to receive(:grants_right?)
+            .with(@other_student, :read_email_addresses)
+            .and_call_original
+
+          expect(@resolver.resolve("email")).to be_nil
+        end
       end
     end
   end

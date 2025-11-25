@@ -151,13 +151,23 @@ module Types
       # objects that are already loaded. Only when these context-level checks fail do we
       # fall back to the expensive user-level permission check.
       #
+      # When a course context is present, we skip the object-level permission check entirely
+      # and only check account/course level permissions for better performance.
+      #
       # This optimization prevents timeouts on initial requests and matches the pattern
       # used in the REST API for similar permission checks.
+
       domain_root_account = context[:domain_root_account]
-      course = context[:course]
-      return unless domain_root_account.grants_right?(context[:current_user], :read_email_addresses) ||
-                    course&.grants_right?(context[:current_user], :read_email_addresses) ||
-                    object.grants_right?(context[:current_user], :read_email_addresses)
+      unless domain_root_account.grants_right?(context[:current_user], :read_email_addresses)
+        course = context[:course]
+        has_permission = if course
+                           course.grants_right?(context[:current_user], :read_email_addresses)
+                         else
+                           object.grants_right?(context[:current_user], :read_email_addresses)
+                         end
+
+        return unless has_permission
+      end
 
       return object.email if object.email_cached?
 
