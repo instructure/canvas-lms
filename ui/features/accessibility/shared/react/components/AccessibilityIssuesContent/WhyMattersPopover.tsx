@@ -47,6 +47,7 @@ const WhyMattersPopover = ({issue}: WhyMattersPopoverProps) => {
       shouldCloseOnDocumentClick={true}
       onHideContent={() => setIsShowingContent(false)}
       on="click"
+      screenReaderLabel={I18n.t('Why it matters')}
       renderTrigger={() => (
         <IconButton
           onClick={() => setIsShowingContent(!isShowingContent)}
