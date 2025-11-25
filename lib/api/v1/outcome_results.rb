@@ -21,6 +21,7 @@
 module Api::V1::OutcomeResults
   include Api::V1::Outcome
   include Outcomes::OutcomeFriendlyDescriptionResolver
+  include AlignmentsHelper
 
   # Public: Serializes OutcomeResults
   #
@@ -292,5 +293,113 @@ module Api::V1::OutcomeResults
         csv << row
       end
     end
+  end
+
+  # Public: Serializes contributing scores for a specific outcome and users
+  #
+  # outcome - The learning outcome
+  # alignments - Array of AlignmentWithMetadata objects for this outcome
+  # results - The learning outcome results (includes both Canvas and external results)
+  # only_assignment_alignments - Optional boolean to filter only assignment alignments (default: false)
+  #
+  # Returns a hash with outcome, alignments, and scores
+  def contributing_scores_json(outcome, alignments, results, only_assignment_alignments: false)
+    filtered_alignments = only_assignment_alignments ? filter_assignment_alignments(alignments) : alignments
+    alignment_lookup = build_alignment_lookup(filtered_alignments)
+
+    {
+      outcome: outcome_summary_json(outcome),
+      alignments: alignments_json(filtered_alignments),
+      scores: scores_json(results, alignment_lookup)
+    }
+  end
+
+  private
+
+  # Filters alignments to only include Assignment type
+  #
+  # alignments - Array of AlignmentWithMetadata objects
+  #
+  # Returns filtered array containing only Assignment alignments
+  def filter_assignment_alignments(alignments)
+    alignments.select { |alignment| alignment.content_type == "Assignment" }
+  end
+
+  # Builds a hash for efficient alignment lookup
+  #
+  # alignments - Array of AlignmentWithMetadata objects
+  #
+  # Returns a hash with two lookup strategies:
+  #   - By ContentTag ID (for Canvas results with persisted alignments)
+  #   - By assignment ID (for external results without persisted alignments)
+  def build_alignment_lookup(alignments)
+    lookup = { by_tag_id: {}, by_assignment_id: {} }
+
+    alignments.each do |alignment|
+      # Index by ContentTag ID if it exists (direct alignments)
+      lookup[:by_tag_id][alignment.id] = alignment if alignment.id
+
+      # Index by assignment ID for external/indirect alignment matching
+      if alignment.content.is_a?(Assignment)
+        lookup[:by_assignment_id][alignment.content_id] = alignment
+      end
+    end
+
+    lookup
+  end
+
+  def outcome_summary_json(outcome)
+    {
+      id: outcome.id.to_s,
+      title: outcome.title
+    }
+  end
+
+  def alignments_json(alignments)
+    alignments.filter_map do |alignment|
+      content = alignment.content
+      next unless content
+
+      {
+        alignment_id: alignment.prefixed_id,
+        associated_asset_id: content.id.to_s,
+        associated_asset_name: content.title,
+        associated_asset_type: alignment.content_type,
+        html_url: outcome_alignment_html_url(content),
+      }
+    end
+  end
+
+  def scores_json(results, alignment_lookup)
+    results.filter_map do |result|
+      alignment = find_alignment_for_result(result, alignment_lookup)
+      next unless alignment
+
+      {
+        user_id: result.user_id.to_s,
+        alignment_id: alignment.prefixed_id,
+        score: result.score
+      }
+    end
+  end
+
+  # Finds the matching alignment for a result
+  #
+  # result - LearningOutcomeResult
+  # alignment_lookup - Hash with lookup indices
+  #
+  # Returns AlignmentWithMetadata or nil
+  def find_alignment_for_result(result, alignment_lookup)
+    if result.associated_asset.is_a?(Assignment)
+      return alignment_lookup[:by_assignment_id][result.associated_asset.id]
+    elsif result.associated_asset.is_a?(Quizzes::Quiz)
+      return alignment_lookup[:by_assignment_id][result.associated_asset.assignment_id]
+    end
+
+    if result.alignment&.id
+      return alignment_lookup[:by_tag_id][result.alignment.id]
+    end
+
+    nil
   end
 end
