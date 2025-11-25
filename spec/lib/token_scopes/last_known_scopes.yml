@@ -137,10 +137,10 @@
   path: '/api/v1/accounts/:account_id/external_tools'
 - verb: DELETE
   path: '/api/v1/accounts/:account_id/external_tools/:external_tool_id'
-- verb: GET
-  path: '/api/v1/accounts/:account_id/external_tools/:external_tool_id'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/external_tools/:external_tool_id'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/external_tools/:external_tool_id(/*full_path)'
 - verb: GET
   path: '/api/v1/accounts/:account_id/external_tools/:external_tool_id/migration_info'
 - verb: DELETE
@@ -1023,10 +1023,10 @@
   path: '/api/v1/courses/:course_id/external_tools'
 - verb: DELETE
   path: '/api/v1/courses/:course_id/external_tools/:external_tool_id'
-- verb: GET
-  path: '/api/v1/courses/:course_id/external_tools/:external_tool_id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/external_tools/:external_tool_id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/external_tools/:external_tool_id(/*full_path)'
 - verb: GET
   path: '/api/v1/courses/:course_id/external_tools/:external_tool_id/migration_info'
 - verb: GET

@@ -30,8 +30,7 @@ module Services
         .with(tree: :private)
         .and_return(DynamicSettings::FallbackProxy.new({
                                                          "new_quizzes.yml" => {
-                                                           "launch_url" => "https://test.instructure.com/quizzes",
-                                                           "backend_url" => "https://api.test.instructure.com/quizzes"
+                                                           "launch_url" => "https://test.instructure.com/quizzes"
                                                          }.to_yaml
                                                        }))
     end
@@ -51,12 +50,6 @@ module Services
       end
     end
 
-    describe ".backend_url" do
-      it "returns the backend URL from the dynamic settings" do
-        expect(NewQuizzes.backend_url).to eq("https://api.test.instructure.com/quizzes")
-      end
-    end
-
     context "when dynamic settings are not available" do
       before do
         # Reset the cached config for this context
@@ -71,10 +64,6 @@ module Services
 
       it "returns nil for launch_url" do
         expect(NewQuizzes.launch_url).to be_nil
-      end
-
-      it "returns nil for backend_url" do
-        expect(NewQuizzes.backend_url).to be_nil
       end
     end
   end

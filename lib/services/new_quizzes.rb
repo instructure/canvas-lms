@@ -24,10 +24,6 @@ module Services
       config["launch_url"]
     end
 
-    def self.backend_url
-      config["backend_url"]
-    end
-
     class << self
       private
 
