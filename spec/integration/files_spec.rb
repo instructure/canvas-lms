@@ -233,6 +233,40 @@ describe FilesController do
     end
   end
 
+  it "allows access to files linked in the public syllabus granted by attachment_association/location on the safe files domain" do
+    enable_cache do
+      Account.site_admin.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+      course_model(name: "Public Course", public_syllabus: true, is_public: false)
+      @course.offer!
+      host!("test.host")
+      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
+      att1 = attachment_model(uploaded_data: stub_png_data, content_type: "image/png", context: @teacher)
+      att2 = attachment_model(uploaded_data: stub_png_data, content_type: "image/png", context: @course)
+      @course.syllabus_body = <<~HTML.strip
+        <p><a href="http://test.host/users/#{@teacher.id}/files/#{att1.id}/preview">File 1</a></p>
+        <p><a href="http://test.host/courses/#{@course.id}/files/#{att2.id}/preview">File 2</a></p>
+      HTML
+      @course.updating_user = @teacher
+      @course.save!
+
+      get "http://test.host/users/#{@teacher.id}/files/#{att1.id}/download", params: { download_frd: "1", location: "course_syllabus_#{@course.id}" }
+      expect(response).to be_redirect
+      uri = Addressable::URI.parse response["Location"]
+      expect(uri.host).to eq "files-test.host"
+      uri.query_values = uri.query_values.except("location")
+      get uri.to_s
+      expect(response.status).to be_in [200, 302]
+
+      get "http://test.host/courses/#{@course.id}/files/#{att2.id}/download", params: { download_frd: "1", location: "course_syllabus_#{@course.id}" }
+      expect(response).to be_redirect
+      uri = Addressable::URI.parse response["Location"]
+      expect(uri.host).to eq "files-test.host"
+      uri.query_values = uri.query_values.except("location")
+      get uri.to_s
+      expect(response.status).to be_in [200, 302]
+    end
+  end
+
   it "falls back to try to get another verifier if we get an expired one for some reason" do
     course_with_teacher_logged_in(active_all: true, user: @user)
     host!("test.host")
