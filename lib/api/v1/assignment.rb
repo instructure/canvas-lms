@@ -1623,11 +1623,11 @@ module Api::V1::Assignment
     peer_review_params = {}
 
     unless params.nil?
-      peer_review_params[:points_possible] = params[:points_possible] if params[:points_possible].present?
-      peer_review_params[:grading_type] = params[:grading_type] if params[:grading_type].present?
-      peer_review_params[:due_at] = params[:due_at] if params[:due_at].present?
-      peer_review_params[:unlock_at] = params[:unlock_at] if params[:unlock_at].present?
-      peer_review_params[:lock_at] = params[:lock_at] if params[:lock_at].present?
+      # Use .key? to allow explicit nil, but also check for present? to filter blank strings
+      %i[points_possible grading_type due_at unlock_at lock_at].each do |key|
+        peer_review_params[key] = params[key] if params.key?(key) && (params[key].nil? || params[key].present?)
+      end
+
       if params.key?(:peer_review_overrides)
         overrides = params[:peer_review_overrides]
         # Form-encoded empty arrays come through as [""] (array with empty string)

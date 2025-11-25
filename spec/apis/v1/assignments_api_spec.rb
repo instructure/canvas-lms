@@ -3899,7 +3899,8 @@ describe AssignmentsApiController, type: :request do
           expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
             parent_assignment:,
             points_possible: 30,
-            due_at: params[:due_at]
+            due_at: params[:due_at],
+            lock_at: nil
           ).and_return(double("peer_review_sub_assignment"))
 
           test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
@@ -4250,7 +4251,7 @@ describe AssignmentsApiController, type: :request do
           expect(result).to eq({})
         end
 
-        it "ignores nil values" do
+        it "includes explicit nil values for clearing" do
           params = {
             points_possible: nil,
             grading_type: nil,
@@ -4261,23 +4262,31 @@ describe AssignmentsApiController, type: :request do
 
           result = test_object.send(:prepare_peer_review_params, params)
 
-          expect(result).to eq({})
+          # All nil values are included to support explicit clearing
+          expect(result).to eq({
+                                 points_possible: nil,
+                                 grading_type: nil,
+                                 due_at: nil,
+                                 unlock_at: nil,
+                                 lock_at: nil
+                               })
         end
 
-        it "ignores only blank values while preserving present ones" do
+        it "ignores blank strings while preserving present values and explicit nil" do
           params = {
             points_possible: 100,
-            grading_type: "",
+            grading_type: "",       # blank string - excluded
             due_at: 1.week.from_now,
-            unlock_at: nil,
-            lock_at: ""
+            unlock_at: nil,         # explicit nil - included for clearing
+            lock_at: ""             # blank string - excluded
           }
 
           result = test_object.send(:prepare_peer_review_params, params)
 
           expect(result).to eq({
                                  points_possible: 100,
-                                 due_at: params[:due_at]
+                                 due_at: params[:due_at],
+                                 unlock_at: nil
                                })
         end
       end
@@ -4302,13 +4311,13 @@ describe AssignmentsApiController, type: :request do
       end
 
       context "when params contains mixed valid and invalid values" do
-        it "extracts only valid present values" do
+        it "extracts valid present values and explicit nil for clearing" do
           params = {
             points_possible: 0, # zero is valid
             grading_type: "pass_fail",
-            due_at: "",
+            due_at: "",              # blank string - excluded
             unlock_at: 1.day.from_now,
-            lock_at: nil,
+            lock_at: nil,            # explicit nil - included for clearing
             invalid_param: "ignored"
           }
 
@@ -4317,7 +4326,25 @@ describe AssignmentsApiController, type: :request do
           expect(result).to eq({
                                  points_possible: 0,
                                  grading_type: "pass_fail",
-                                 unlock_at: params[:unlock_at]
+                                 unlock_at: params[:unlock_at],
+                                 lock_at: nil
+                               })
+        end
+
+        it "distinguishes between blank strings, explicit nil, and missing keys" do
+          params = {
+            points_possible: 50,     # present value - include
+            grading_type: "",        # blank string - exclude
+            due_at: nil,             # explicit nil - include for clearing
+            # unlock_at: missing     # not in params - exclude
+            lock_at: "  " # whitespace - exclude
+          }
+
+          result = test_object.send(:prepare_peer_review_params, params)
+
+          expect(result).to eq({
+                                 points_possible: 50,
+                                 due_at: nil
                                })
         end
       end
@@ -5047,6 +5074,99 @@ describe AssignmentsApiController, type: :request do
           result = test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
 
           expect(result).to eq(peer_review_sub_assignment)
+        end
+      end
+
+      context "date preservation and clearing" do
+        let!(:peer_review_sub) do
+          parent_assignment.create_peer_review_sub_assignment!(
+            title: "Peer Review",
+            points_possible: 10,
+            due_at: 5.days.from_now,
+            unlock_at: 3.days.from_now,
+            lock_at: 1.week.from_now,
+            submission_types: "online_text_entry"
+          )
+        end
+
+        it "preserves dates when updating without date params" do
+          original_due_at = peer_review_sub.due_at
+          original_unlock_at = peer_review_sub.unlock_at
+          original_lock_at = peer_review_sub.lock_at
+
+          params = { points_possible: 15 }
+
+          test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
+          peer_review_sub.reload
+
+          expect(peer_review_sub.due_at).to eq(original_due_at)
+          expect(peer_review_sub.unlock_at).to eq(original_unlock_at)
+          expect(peer_review_sub.lock_at).to eq(original_lock_at)
+          expect(peer_review_sub.points_possible).to eq(15)
+        end
+
+        it "clears dates when explicitly set to nil" do
+          params = {
+            due_at: nil,
+            unlock_at: nil,
+            lock_at: nil
+          }
+
+          test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
+          peer_review_sub.reload
+
+          expect(peer_review_sub.due_at).to be_nil
+          expect(peer_review_sub.unlock_at).to be_nil
+          expect(peer_review_sub.lock_at).to be_nil
+        end
+
+        it "updates dates when explicitly provided new values" do
+          new_due_at = 10.days.from_now
+          new_unlock_at = 8.days.from_now
+          new_lock_at = 15.days.from_now
+
+          params = {
+            due_at: new_due_at,
+            unlock_at: new_unlock_at,
+            lock_at: new_lock_at
+          }
+
+          test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
+          peer_review_sub.reload
+
+          expect(peer_review_sub.due_at).to be_within(1.second).of(new_due_at)
+          expect(peer_review_sub.unlock_at).to be_within(1.second).of(new_unlock_at)
+          expect(peer_review_sub.lock_at).to be_within(1.second).of(new_lock_at)
+        end
+
+        it "preserves dates when only clearing one date" do
+          original_due_at = peer_review_sub.due_at
+          original_unlock_at = peer_review_sub.unlock_at
+
+          params = { lock_at: nil }
+
+          test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
+          peer_review_sub.reload
+
+          expect(peer_review_sub.due_at).to eq(original_due_at)
+          expect(peer_review_sub.unlock_at).to eq(original_unlock_at)
+          expect(peer_review_sub.lock_at).to be_nil
+        end
+
+        it "handles mix of updates and clears" do
+          new_due_at = 6.days.from_now
+
+          params = {
+            due_at: new_due_at,
+            lock_at: nil,
+          }
+
+          test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
+          peer_review_sub.reload
+
+          expect(peer_review_sub.due_at).to be_within(1.second).of(new_due_at)
+          expect(peer_review_sub.unlock_at).to be_within(1.second).of(3.days.from_now)
+          expect(peer_review_sub.lock_at).to be_nil
         end
       end
 
