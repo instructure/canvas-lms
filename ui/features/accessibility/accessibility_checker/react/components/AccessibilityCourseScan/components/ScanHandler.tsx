@@ -61,7 +61,7 @@ export const ScanHandler: React.FC<CourseScanWrapperProps> = ({
           return (
             <Flex direction={props.direction} gap="medium">
               <Flex.Item padding="x-small 0" shouldShrink shouldGrow>
-                <Heading level="h1" as="h1" margin="0 0 x-small">
+                <Heading level="h1" margin="0 0 x-small">
                   {I18n.t('Course Accessibility Checker')}
                 </Heading>
               </Flex.Item>
