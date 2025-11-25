@@ -358,7 +358,7 @@ class SubmissionsApiController < ApplicationController
   #   Determines whether ordered results are returned in ascending or descending
   #   order.  Defaults to "ascending".  Doesn't affect results for "grouped" mode.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"submission_html_comments"|"rubric_assessment"|"assignment"|"total_scores"|"visibility"|"course"|"user"|"sub_assignment_submissions"|"student_entered_score"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"submission_html_comments"|"rubric_assessment"|"assignment"|"total_scores"|"visibility"|"course"|"user"|"sub_assignment_submissions"|"peer_review_submissions"|"student_entered_score"]
   #   Associations to include with the group. `total_scores` requires the
   #   `grouped` argument.
   #
@@ -456,6 +456,9 @@ class SubmissionsApiController < ApplicationController
     assignment_scope = @context.assignments.published.preload(:quiz, :discussion_topic, :post_policy)
     if includes.include?("sub_assignment_submissions") && @context.discussion_checkpoints_enabled?
       assignment_scope = assignment_scope.preload(:sub_assignments)
+    end
+    if includes.include?("peer_review_submissions") && @context.feature_enabled?(:peer_review_allocation_and_grading)
+      assignment_scope = assignment_scope.preload(:peer_review_sub_assignment)
     end
 
     assignment_scope = assignment_scope.where(post_to_sis: true) if value_to_boolean(params[:post_to_sis])
@@ -760,11 +763,12 @@ class SubmissionsApiController < ApplicationController
   #   Attach files to this comment that were previously uploaded using the
   #   Submission Comment API's files action
   #
-  # @argument include[] [String, "submission_comments"|"visibility"|"sub_assignment_submissions"|"provisional_grades"|"group"]
+  # @argument include[] [String, "submission_comments"|"visibility"|"sub_assignment_submissions"|"peer_review_submissions"|"provisional_grades"|"group"]
   #   Associations to include with the submission. "submission_comments" is always included by default.
   #   - "submission_comments": Comments on the submission (always included)
   #   - "visibility": Whether the assignment is visible to the owner of the submission
   #   - "sub_assignment_submissions": Sub-assignment submissions for discussion checkpoints
+  #   - "peer_review_submissions": Peer review submission data when peer review allocation and grading is enabled
   #   - "provisional_grades": Provisional grades (only available for moderated assignments)
   #   - "group": Group information (id and name) for group assignments
   #
@@ -1051,7 +1055,7 @@ class SubmissionsApiController < ApplicationController
       Submission.bulk_load_attachments_and_previews([@submission])
 
       includes = %w[submission_comments]
-      includes.concat(Array.wrap(params[:include]) & %w[visibility sub_assignment_submissions])
+      includes.concat(Array.wrap(params[:include]) & %w[visibility sub_assignment_submissions peer_review_submissions])
       includes << "provisional_grades" if submission[:provisional]
       visiblity_included = includes.include?("visibility")
       if visiblity_included
@@ -1124,11 +1128,12 @@ class SubmissionsApiController < ApplicationController
   #   Attach files to this comment that were previously uploaded using the
   #   Submission Comment API's files action
   #
-  # @argument include[] [String, "submission_comments"|"visibility"|"sub_assignment_submissions"|"provisional_grades"|"group"]
+  # @argument include[] [String, "submission_comments"|"visibility"|"sub_assignment_submissions"|"peer_review_submissions"|"provisional_grades"|"group"]
   #   Associations to include with the submission. "submission_comments" is always included by default.
   #   - "submission_comments": Comments on the submission (always included)
   #   - "visibility": Whether the assignment is visible to the owner of the submission
   #   - "sub_assignment_submissions": Sub-assignment submissions for discussion checkpoints
+  #   - "peer_review_submissions": Peer review submission data when peer review allocation and grading is enabled
   #   - "provisional_grades": Provisional grades (only available for moderated assignments)
   #   - "group": Group information (id and name) for group assignments
   #

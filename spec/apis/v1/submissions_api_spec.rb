@@ -906,6 +906,189 @@ describe "Submissions API", type: :request do
     end
   end
 
+  describe "peer_review_submissions include" do
+    before do
+      course_with_teacher(active_all: true)
+      @student1 = student_in_course(course: @course, active_enrollment: true).user
+      @student2 = student_in_course(course: @course, active_enrollment: true).user
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+
+      @assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        peer_reviews: true,
+        peer_review_count: 2
+      )
+
+      @peer_review_sub_assignment = @assignment.create_peer_review_sub_assignment!(
+        peer_reviews: true,
+        peer_review_count: 2
+      )
+
+      # Student1 submits to the main assignment
+      @parent_submission = @assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "My work")
+
+      # Student2 reviews student1's work
+      @assessment_request = @assignment.assign_peer_review(@student1, @student2)
+      @assessment_request.complete!
+
+      # Create a second assessment request for student1
+      @assessment_request2 = @assignment.assign_peer_review(@student2, @student1)
+      @assessment_request2.complete!
+
+      # This triggers creation of peer review submission for student1
+      @peer_review_submission = @peer_review_sub_assignment.submit_homework(
+        @student1,
+        submission_type: "online_text_entry",
+        body: "peer_review"
+      )
+    end
+
+    it "returns peer_review_submission when it exists" do
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student1.id.to_s },
+                      include: %w[peer_review_submissions])
+
+      expect(json["has_peer_review_submission"]).to be true
+      expect(json["peer_review_submission"]).not_to be_nil
+      expect(json["peer_review_submission"]["assignment_id"]).to eq @peer_review_sub_assignment.id
+      expect(json["peer_review_submission"]["user_id"]).to eq @student1.id
+    end
+
+    it "returns nil for peer_review_submission when it does not exist" do
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student2.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student2.id.to_s },
+                      include: %w[peer_review_submissions])
+
+      expect(json["has_peer_review_submission"]).to be false
+      expect(json["peer_review_submission"]).to be_nil
+    end
+
+    it "returns nil for peer_review_submission when it is deleted" do
+      @peer_review_submission.update!(workflow_state: "deleted")
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student1.id.to_s },
+                      include: %w[peer_review_submissions])
+
+      expect(json["has_peer_review_submission"]).to be false
+      expect(json["peer_review_submission"]).to be_nil
+    end
+
+    it "does not include peer_review_submission when feature is disabled" do
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student1.id.to_s },
+                      include: %w[peer_review_submissions])
+
+      expect(json).not_to have_key("has_peer_review_submission")
+      expect(json).not_to have_key("peer_review_submission")
+    end
+
+    it "does not include peer_review_submission when peer reviews are disabled" do
+      @assignment.update!(peer_reviews: false)
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student1.id.to_s },
+                      include: %w[peer_review_submissions])
+
+      # When peer reviews are disabled, the parameter is ignored per Jira requirements
+      expect(json).not_to have_key("has_peer_review_submission")
+      expect(json).not_to have_key("peer_review_submission")
+    end
+
+    it "returns false when peer_reviews is enabled but no peer_review_sub_assignment exists" do
+      # Simulate old peer review (before feature) by destroying the sub assignment
+      @peer_review_sub_assignment.destroy
+      @assignment.reload
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student1.id.to_s },
+                      include: %w[peer_review_submissions])
+
+      expect(json["has_peer_review_submission"]).to be false
+      expect(json["peer_review_submission"]).to be_nil
+    end
+
+    context "for_students endpoint" do
+      before do
+        # Switch to teacher user for for_students endpoint
+        @user = @teacher
+      end
+
+      it "works with for_students endpoint when peer review submission exists" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/students/submissions.json",
+                        { controller: "submissions_api",
+                          action: "for_students",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          student_ids: [@student1.id.to_s],
+                          assignment_ids: [@assignment.id.to_s] },
+                        include: %w[peer_review_submissions])
+
+        expect(json).to be_an(Array)
+        submission = json.find { |s| s["user_id"] == @student1.id }
+        expect(submission["has_peer_review_submission"]).to be true
+        expect(submission["peer_review_submission"]).not_to be_nil
+        expect(submission["peer_review_submission"]["assignment_id"]).to eq @peer_review_sub_assignment.id
+      end
+
+      it "works with for_students endpoint when peer review submission does not exist" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/students/submissions.json",
+                        { controller: "submissions_api",
+                          action: "for_students",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          student_ids: [@student2.id.to_s],
+                          assignment_ids: [@assignment.id.to_s] },
+                        include: %w[peer_review_submissions])
+
+        expect(json).to be_an(Array)
+        submission = json.find { |s| s["user_id"] == @student2.id }
+        expect(submission["has_peer_review_submission"]).to be false
+        expect(submission["peer_review_submission"]).to be_nil
+      end
+    end
+  end
+
   def submission_with_comment
     @student = user_factory(active_all: true)
     course_with_teacher(active_all: true)
