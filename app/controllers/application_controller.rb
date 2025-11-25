@@ -399,6 +399,7 @@ class ApplicationController < ActionController::Base
         if @context&.grants_any_right?(@current_user, session, :read, :read_as_admin)
           @js_env[:current_context] = {
             id: @context.id,
+            global_id: @context.global_id,
             name: @context.name,
             type: @context.class.name,
             url: named_context_url(@context, :context_url, include_host: true)
