@@ -134,7 +134,9 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
         summary={
           <Flex gap="small">
             <Flex.Item shouldGrow={false} shouldShrink={false}>
-              <Text variant="contentImportant">{I18n.t('Filter resources')}</Text>
+              <Heading level="h2" variant="label">
+                {I18n.t('Filter resources')}
+              </Heading>
             </Flex.Item>
             <Flex.Item shouldGrow={true} shouldShrink={true}>
               <AppliedFilters appliedFilters={appliedFilters} setFilters={onFilterChange} />
