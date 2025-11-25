@@ -218,9 +218,7 @@ class DeveloperKeysController < ApplicationController
           accountEndpoint: api_v1_account_developer_keys_path(@context),
           enableTestClusterChecks: DeveloperKey.test_cluster_checks_enabled?,
           validLtiScopes:
-            TokenScopes.public_lti_scopes_hash_for_account(@domain_root_account),
-          validLtiPlacements:
-            Lti::ResourcePlacement.public_placements(@domain_root_account)
+            TokenScopes.public_lti_scopes_hash_for_account(@domain_root_account)
         )
 
         render :index

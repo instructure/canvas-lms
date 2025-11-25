@@ -29,7 +29,6 @@ const defaultProps = (overrides = {}) => ({
   },
   toolConfigurationUrl: 'https://www.test.com/config.json',
   validScopes: {},
-  validPlacements: [],
   editing: false,
   showRequiredMessages: false,
   dispatch: jest.fn(),

@@ -115,7 +115,6 @@ describe('DeveloperKeyFormFields', () => {
   beforeEach(() => {
     fakeENV.setup({
       FEATURES: {api_rate_limits: true},
-      validLtiPlacements: ['course_navigation', 'account_navigation'],
       validLtiScopes: {},
     })
   })
