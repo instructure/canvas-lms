@@ -579,4 +579,63 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
       expect(class_result).to be_a(PeerReviewSubAssignment)
     end
   end
+
+  describe "explicit nil values during creation" do
+    let(:assignment) do
+      course.assignments.create!(
+        title: "Parent Assignment",
+        points_possible: 50,
+        peer_reviews: true,
+        submission_types: "online_text_entry"
+      )
+    end
+
+    context "when dates are explicitly set to nil" do
+      let(:service_with_nil_dates) do
+        described_class.new(
+          parent_assignment: assignment,
+          due_at: nil,
+          unlock_at: nil,
+          lock_at: nil,
+          points_possible: 10
+        )
+      end
+
+      it "creates peer review without due_at" do
+        peer_review_sub = service_with_nil_dates.call
+        expect(peer_review_sub.due_at).to be_nil
+      end
+
+      it "creates peer review without unlock_at" do
+        peer_review_sub = service_with_nil_dates.call
+        expect(peer_review_sub.unlock_at).to be_nil
+      end
+
+      it "creates peer review without lock_at" do
+        peer_review_sub = service_with_nil_dates.call
+        expect(peer_review_sub.lock_at).to be_nil
+      end
+
+      it "sets other provided attributes" do
+        peer_review_sub = service_with_nil_dates.call
+        expect(peer_review_sub.points_possible).to eq(10)
+      end
+    end
+
+    context "when grading_type parameter is explicitly set to nil" do
+      let(:service_with_nil_grading_type) do
+        described_class.new(
+          parent_assignment: assignment,
+          grading_type: nil,
+          points_possible: 10
+        )
+      end
+
+      it "creates peer review with default grading type" do
+        peer_review_sub = service_with_nil_grading_type.call
+        expect(peer_review_sub).to be_persisted
+        expect(peer_review_sub.grading_type).not_to be_nil
+      end
+    end
+  end
 end

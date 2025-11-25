@@ -72,13 +72,13 @@ RSpec.describe PeerReview::PeerReviewCommonService do
       expect(service.instance_variable_get(:@lock_at)).to eq(custom_lock_at)
     end
 
-    it "allows nil values for optional parameters" do
+    it "allows NOT_PROVIDED values for optional parameters" do
       simple_service = described_class.new(parent_assignment:)
-      expect(simple_service.instance_variable_get(:@points_possible)).to be_nil
-      expect(simple_service.instance_variable_get(:@grading_type)).to be_nil
-      expect(simple_service.instance_variable_get(:@due_at)).to be_nil
-      expect(simple_service.instance_variable_get(:@unlock_at)).to be_nil
-      expect(simple_service.instance_variable_get(:@lock_at)).to be_nil
+      expect(simple_service.instance_variable_get(:@points_possible)).to eq(PeerReview::PeerReviewCommonService::NOT_PROVIDED)
+      expect(simple_service.instance_variable_get(:@grading_type)).to eq(PeerReview::PeerReviewCommonService::NOT_PROVIDED)
+      expect(simple_service.instance_variable_get(:@due_at)).to eq(PeerReview::PeerReviewCommonService::NOT_PROVIDED)
+      expect(simple_service.instance_variable_get(:@unlock_at)).to eq(PeerReview::PeerReviewCommonService::NOT_PROVIDED)
+      expect(simple_service.instance_variable_get(:@lock_at)).to eq(PeerReview::PeerReviewCommonService::NOT_PROVIDED)
     end
   end
 
@@ -593,7 +593,7 @@ RSpec.describe PeerReview::PeerReviewCommonService do
         )
 
         expect(service).to receive(:validate_peer_review_dates_against_parent_assignment)
-          .with({ due_at: custom_due_at, unlock_at: nil, lock_at: nil }, parent_assignment)
+          .with({ due_at: custom_due_at }, parent_assignment)
 
         service.send(:validate_dates)
       end
@@ -607,7 +607,7 @@ RSpec.describe PeerReview::PeerReviewCommonService do
         )
 
         expect(service).to receive(:validate_peer_review_dates_against_parent_assignment)
-          .with({ due_at: nil, unlock_at: custom_unlock_at, lock_at: nil }, parent_assignment)
+          .with({ unlock_at: custom_unlock_at }, parent_assignment)
 
         service.send(:validate_dates)
       end
@@ -621,7 +621,7 @@ RSpec.describe PeerReview::PeerReviewCommonService do
         )
 
         expect(service).to receive(:validate_peer_review_dates_against_parent_assignment)
-          .with({ due_at: nil, unlock_at: nil, lock_at: custom_lock_at }, parent_assignment)
+          .with({ lock_at: custom_lock_at }, parent_assignment)
 
         service.send(:validate_dates)
       end
@@ -633,6 +633,65 @@ RSpec.describe PeerReview::PeerReviewCommonService do
 
         expect(service).not_to receive(:validate_peer_review_dates_against_parent_assignment)
 
+        service.send(:validate_dates)
+      end
+    end
+
+    context "when all dates are NOT_PROVIDED" do
+      it "does not call validation" do
+        service = described_class.new(
+          parent_assignment:,
+          due_at: described_class::NOT_PROVIDED,
+          unlock_at: described_class::NOT_PROVIDED,
+          lock_at: described_class::NOT_PROVIDED
+        )
+
+        expect(service).not_to receive(:validate_peer_review_dates_against_parent_assignment)
+        service.send(:validate_dates)
+      end
+    end
+
+    context "when some dates are NOT_PROVIDED and others are provided" do
+      it "only validates provided dates" do
+        service = described_class.new(
+          parent_assignment:,
+          due_at: custom_due_at,
+          unlock_at: described_class::NOT_PROVIDED,
+          lock_at: described_class::NOT_PROVIDED
+        )
+
+        expect(service).to receive(:validate_peer_review_dates_against_parent_assignment)
+          .with({ due_at: custom_due_at }, parent_assignment)
+        service.send(:validate_dates)
+      end
+    end
+
+    context "when dates include explicit nil for clearing" do
+      it "includes nil in validation hash" do
+        service = described_class.new(
+          parent_assignment:,
+          due_at: nil,
+          unlock_at: nil,
+          lock_at: nil
+        )
+
+        expect(service).to receive(:validate_peer_review_dates_against_parent_assignment)
+          .with({ due_at: nil, unlock_at: nil, lock_at: nil }, parent_assignment)
+        service.send(:validate_dates)
+      end
+    end
+
+    context "when mixing NOT_PROVIDED and explicit nil" do
+      it "only includes explicit nil values in validation hash" do
+        service = described_class.new(
+          parent_assignment:,
+          due_at: nil,
+          unlock_at: described_class::NOT_PROVIDED,
+          lock_at: custom_lock_at
+        )
+
+        expect(service).to receive(:validate_peer_review_dates_against_parent_assignment)
+          .with({ due_at: nil, lock_at: custom_lock_at }, parent_assignment)
         service.send(:validate_dates)
       end
     end
