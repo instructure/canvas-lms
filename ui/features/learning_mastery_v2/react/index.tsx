@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useCallback} from 'react'
+import React, {useState, useCallback, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -67,7 +67,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     isLoading: isLoadingGradebook,
     error,
     students,
-    outcomes,
+    outcomes: initialOutcomes,
     rollups,
     pagination,
     setCurrentPage,
@@ -80,6 +80,12 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     settings: gradebookSettings,
     selectedUserIds,
   })
+
+  const [outcomes, setOutcomes] = useState(initialOutcomes)
+
+  useEffect(() => {
+    setOutcomes(initialOutcomes)
+  }, [initialOutcomes])
 
   const handleGradebookSettingsChange = useCallback(
     async (settings: GradebookSettings) => {
@@ -122,6 +128,10 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     [gradebookSettings, handleGradebookSettingsChange],
   )
 
+  const handleOutcomesReorder = useCallback((reorderedOutcomes: typeof outcomes) => {
+    setOutcomes(reorderedOutcomes)
+  }, [])
+
   const renderBody = () => {
     if (error !== null)
       return (
@@ -144,6 +154,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
         sorting={sorting}
         gradebookSettings={gradebookSettings}
         onChangeNameDisplayFormat={handleNameDisplayFormatChange}
+        onOutcomesReorder={handleOutcomesReorder}
         data-testid="gradebook-body"
       />
     )

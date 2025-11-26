@@ -87,6 +87,24 @@ describe('Gradebook', () => {
     })
   })
 
+  it('renders outcomes in the order they are provided', () => {
+    const customOutcomes = [
+      {...MOCK_OUTCOMES[0], id: '1', title: 'First Outcome'},
+      {...MOCK_OUTCOMES[0], id: '2', title: 'Second Outcome'},
+      {...MOCK_OUTCOMES[0], id: '4', title: 'Fourth Outcome'},
+      {...MOCK_OUTCOMES[0], id: '3', title: 'Third Outcome'},
+    ]
+    const props = defaultProps({outcomes: customOutcomes})
+    const {container} = renderWithQueryClient(<Gradebook {...props} />)
+    const outcomeHeaders = container.querySelectorAll('[data-testid="outcome-header"]')
+
+    expect(outcomeHeaders).toHaveLength(4)
+    expect(outcomeHeaders[0]).toHaveTextContent('First Outcome')
+    expect(outcomeHeaders[1]).toHaveTextContent('Second Outcome')
+    expect(outcomeHeaders[2]).toHaveTextContent('Fourth Outcome')
+    expect(outcomeHeaders[3]).toHaveTextContent('Third Outcome')
+  })
+
   describe('pagination', () => {
     it('does not render pagination controls when there is only one page', () => {
       const props = defaultProps({pagination: {currentPage: 1, perPage: 10, totalPages: 1}})
