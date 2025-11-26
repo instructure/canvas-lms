@@ -10718,6 +10718,32 @@ describe Submission do
           comments = @submission.visible_provisional_comments(@teacher)
           expect(comments).to include(@second_ta_comment)
         end
+
+        context "when grader comments are not visible to graders" do
+          before(:once) do
+            @assignment.update!(grader_comments_visible_to_graders: false)
+          end
+
+          it "allows graders to see their own comments" do
+            comments = @submission.visible_provisional_comments(@second_ta)
+            expect(comments).to include(@second_ta_comment)
+          end
+
+          it "allows graders to see moderator comments after grades are published" do
+            comments = @submission.visible_provisional_comments(@second_ta)
+            expect(comments).to include(@final_grader_comment)
+          end
+
+          it "does not allow graders to see other graders' comments" do
+            comments = @submission.visible_provisional_comments(@second_ta)
+            expect(comments).not_to include(@first_ta_comment)
+          end
+
+          it "allows moderators to see all comments" do
+            comments = @submission.visible_provisional_comments(@teacher)
+            expect(comments).to match_array([@second_ta_comment, @final_grader_comment])
+          end
+        end
       end
     end
   end
