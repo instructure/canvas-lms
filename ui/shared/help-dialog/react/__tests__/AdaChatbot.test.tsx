@@ -299,4 +299,75 @@ describe('AdaChatbot', () => {
     expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('true')
     expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('false')
   })
+
+  describe('autoRestoreAda', () => {
+    it('initializes Ada when not closed by user', async () => {
+      jest.isolateModules(() => {
+        localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+        const {autoRestoreAda} = require('../AdaChatbot')
+
+        autoRestoreAda()
+      })
+
+      await waitFor(() => {
+        expect(mockAdaEmbed.start).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    it('does not initialize Ada when closed by user', async () => {
+      jest.isolateModules(() => {
+        localStorage.setItem(CHAT_CLOSED_KEY, 'true')
+        const {autoRestoreAda} = require('../AdaChatbot')
+
+        autoRestoreAda()
+      })
+
+      await waitFor(() => {
+        expect(mockAdaEmbed.start).not.toHaveBeenCalled()
+      })
+    })
+
+    it('only runs once even when called multiple times', async () => {
+      jest.isolateModules(() => {
+        localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+        const {autoRestoreAda} = require('../AdaChatbot')
+
+        autoRestoreAda()
+        autoRestoreAda()
+        autoRestoreAda()
+      })
+
+      await waitFor(() => {
+        expect(mockAdaEmbed.start).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    it('handles initialization errors gracefully', async () => {
+      let errorSpy: jest.SpyInstance
+
+      jest.isolateModules(() => {
+        localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+
+        // Set up the mock to reject before importing the module
+        const failingAdaEmbed = {
+          start: jest.fn().mockRejectedValue(new Error('Init failed')),
+          toggle: jest.fn(),
+          getInfo: jest.fn().mockResolvedValue({isChatOpen: false, hasActiveChatter: false}),
+          subscribeEvent: jest.fn().mockResolvedValue(1),
+        }
+        ;(window as any).adaEmbed = failingAdaEmbed
+
+        errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const {autoRestoreAda} = require('../AdaChatbot')
+
+        autoRestoreAda()
+      })
+
+      await waitFor(() => {
+        expect(errorSpy!).toHaveBeenCalledWith('Failed to auto-restore Ada:', expect.any(Error))
+      })
+
+      errorSpy!.mockRestore()
+    })
+  })
 })
