@@ -440,4 +440,57 @@ describe('CheckboxTextInput', () => {
       expect(screen.queryByText('Generate Alt Text')).not.toBeInTheDocument()
     })
   })
+
+  describe('action buttons', () => {
+    it('renders custom action buttons when provided', () => {
+      const actionButtons = <button data-testid="custom-action-button">Custom Action</button>
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...defaultProps} actionButtons={actionButtons} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      expect(screen.getByTestId('custom-action-button')).toBeInTheDocument()
+      expect(screen.getByText('Custom Action')).toBeInTheDocument()
+    })
+
+    it('renders action buttons alongside generate button', () => {
+      const actionButtons = <button data-testid="custom-action-button">Custom Action</button>
+      const propsWithGenerateOption = {
+        ...defaultProps,
+        issue: {
+          ...defaultProps.issue,
+          form: {
+            ...defaultProps.issue.form,
+            canGenerateFix: true,
+            generateButtonLabel: 'Generate Alt Text',
+          },
+        },
+        actionButtons,
+      }
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...propsWithGenerateOption} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      expect(screen.getByText('Generate Alt Text')).toBeInTheDocument()
+      expect(screen.getByTestId('custom-action-button')).toBeInTheDocument()
+    })
+  })
+
+  describe('isDisabled prop', () => {
+    it('disables textarea when isDisabled is true', () => {
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...defaultProps} isDisabled={true} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      const textarea = screen.getByTestId('checkbox-text-input-form')
+      expect(textarea).toBeDisabled()
+    })
+  })
 })
