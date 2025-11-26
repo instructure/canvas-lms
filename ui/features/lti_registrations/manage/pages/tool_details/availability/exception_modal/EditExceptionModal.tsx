@@ -29,7 +29,7 @@ import {View} from '@instructure/ui-view'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
 import {useMutation} from '@tanstack/react-query'
-import {useRef, useState} from 'react'
+import {useState} from 'react'
 import {isUnsuccessful} from '../../../../../common/lib/apiResult/ApiResult'
 import {toUndefined} from '../../../../../common/lib/toUndefined'
 import {UpdateContextControl} from '../../../../api/contextControls'
@@ -57,7 +57,6 @@ export const EditExceptionModal = ({
   availableInParentContext,
 }: EditExceptionModalProps) => {
   const [available, setAvailable] = useState(!control.available)
-  const selectorRef = useRef<HTMLInputElement | null>(null)
 
   const updateMutation = useMutation({
     mutationKey: ['lti_registrations', 'update_exception_availability'],
@@ -85,7 +84,6 @@ export const EditExceptionModal = ({
       open={true}
       label={I18n.t('Edit Exception')}
       size="medium"
-      defaultFocusElement={() => selectorRef.current}
       shouldCloseOnDocumentClick={true}
       onDismiss={onClose}
     >
@@ -139,7 +137,6 @@ export const EditExceptionModal = ({
                   <Flex.Item>→</Flex.Item>
                   <Flex.Item shouldShrink shouldGrow={false}>
                     <SimpleSelect
-                      inputRef={ref => (selectorRef.current = ref)}
                       renderLabel={''}
                       value={available ? 'available' : 'unavailable'}
                       onChange={(_, {value}) => setAvailable(value === 'available')}
