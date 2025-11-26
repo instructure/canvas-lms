@@ -97,11 +97,17 @@ export const AccessTokensSection = ({userId}: AccessTokensTableProps) => {
       <Table caption={I18n.t('User Generated Access Tokens')} margin="small 0" layout="fixed">
         <Table.Head>
           <Table.Row>
+            <Table.ColHeader id="token-id" width="5%">
+              {I18n.t('ID')}
+            </Table.ColHeader>
+            <Table.ColHeader id="visible-token" width="15%">
+              {I18n.t('Token')}
+            </Table.ColHeader>
             <Table.ColHeader id="purpose">{I18n.t('Purpose')}</Table.ColHeader>
             <Table.ColHeader id="created">{I18n.t('Created')}</Table.ColHeader>
             <Table.ColHeader id="last-used">{I18n.t('Last Used')}</Table.ColHeader>
             <Table.ColHeader id="expires">{I18n.t('Expires')}</Table.ColHeader>
-            <Table.ColHeader id="remove" width="5rem">
+            <Table.ColHeader id="remove" width="7%">
               {I18n.t('Remove')}
             </Table.ColHeader>
           </Table.Row>
@@ -186,6 +192,12 @@ const TokenRow = memo(({token}: TokenRowProps) => {
 
   return (
     <Table.Row>
+      <Table.Cell>
+        <Text>{token.id}</Text>
+      </Table.Cell>
+      <Table.Cell>
+        <Text wrap="break-word">{token.visible_token}</Text>
+      </Table.Cell>
       <Table.Cell>
         <TruncateWithTooltip>
           <Text>{token.purpose || I18n.t('User Generated')}</Text>
