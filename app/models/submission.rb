@@ -1670,6 +1670,9 @@ class Submission < ActiveRecord::Base
     if media_comment_id && (media_comment_id_changed? || !media_object_id)
       mo = MediaObject.by_media_id(media_comment_id).first
       self.media_object_id = mo && mo.id
+      if mo && submission_type == "media_recording" && mo.attachment_id
+        self.attachment_id = mo.attachment_id
+      end
     end
     self.media_comment_type = nil unless media_comment_id
     if self.submitted_at
