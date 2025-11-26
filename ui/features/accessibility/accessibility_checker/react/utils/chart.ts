@@ -63,10 +63,10 @@ export const processIssuesToChartData = (byRuleType?: Record<string, number>): I
   return Object.values(dataPoints)
 }
 
-const wrapLabel = (label: string, maxWidth: number = 70): string[] => {
+const wrapLabel = (label: string, maxWidth: number = 70, avgCharWidth = 6): string[] => {
   const words = label.split(' ')
   const lines: string[] = []
-  const charsPerLine = Math.floor(maxWidth / 6) // using 6px as an average character width
+  const charsPerLine = Math.floor(maxWidth / avgCharWidth)
   let currentLine = ''
 
   words.forEach(word => {
@@ -85,12 +85,16 @@ const wrapLabel = (label: string, maxWidth: number = 70): string[] => {
   return lines
 }
 
-export const getChartData = (issuesData: IssueDataPoint[], containerWidth: number) => {
+export const getChartData = (
+  issuesData: IssueDataPoint[],
+  containerWidth: number,
+  avgCharWidth: number,
+) => {
   const barWidth = (containerWidth / issuesData.length) * 0.8 * 0.9 // 80% for bars, 90% for padding
   const datasetData = issuesData.map(d => d.count)
   const labels = issuesData.map(d => {
     const labelWithCount = `${d.issue} (${d.count})`
-    return wrapLabel(labelWithCount, barWidth)
+    return wrapLabel(labelWithCount, barWidth, avgCharWidth)
   })
 
   return {
