@@ -148,6 +148,46 @@ describe Submission do
         end
       end
     end
+
+    describe "attachment_id for media_recording submissions" do
+      let(:submission) { @assignment.submissions.build(user: @student) }
+      let(:attachment) { @course.attachments.create!(filename: "test.mp4", uploaded_data: StringIO.new("test")) }
+      let(:media_object) do
+        MediaObject.create!(
+          media_id: "test_media_id_123",
+          media_type: "video",
+          context: @course,
+          user: @student,
+          attachment_id: attachment.id
+        )
+      end
+
+      before do
+        submission.assignment = @assignment
+        submission.user = @student
+        submission.submission_type = "media_recording"
+        submission.media_comment_id = media_object.media_id
+        submission.submitted_at = Time.zone.now
+      end
+
+      it "sets attachment_id from media_object when media_comment_id is present" do
+        expect(submission.attachment_id).to be_nil
+        submission.infer_values
+        expect(submission.attachment_id).to eq(attachment.id)
+      end
+
+      it "does not set attachment_id if media_object has no attachment_id" do
+        media_object.update_column(:attachment_id, nil)
+        submission.infer_values
+        expect(submission.attachment_id).to be_nil
+      end
+
+      it "does not set attachment_id if submission_type is not media_recording" do
+        submission.submission_type = "online_text_entry"
+        submission.infer_values
+        expect(submission.attachment_id).to be_nil
+      end
+    end
   end
 
   describe ".json_serialization_full_parameters" do
