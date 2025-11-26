@@ -20,8 +20,10 @@ import React from 'react'
 import {IconConfirmation} from '../../registration_wizard_forms/IconConfirmation'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
+import type {LtiRegistrationUpdateRequest} from '../../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
+import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
 
 export type IconConfirmationWrapperProps = {
   reviewing: boolean
@@ -29,12 +31,16 @@ export type IconConfirmationWrapperProps = {
   internalConfig: InternalLtiConfiguration
   includeFooter?: boolean
   hasClickedNext?: boolean
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
+  existingRegistration?: LtiRegistrationWithConfiguration
 }
 
 export const IconConfirmationWrapper = ({
   overlayStore,
   internalConfig,
   hasClickedNext,
+  registrationUpdateRequest,
+  existingRegistration,
 }: IconConfirmationWrapperProps) => {
   const {state, ...actions} = overlayStore()
 
@@ -54,6 +60,8 @@ export const IconConfirmationWrapper = ({
         defaultIconUrl={state.icons.defaultIconUrl}
         setDefaultIconUrl={actions.setDefaultIconUrl}
         hasSubmitted={hasClickedNext ?? false}
+        registrationUpdateRequest={registrationUpdateRequest}
+        existingRegistration={existingRegistration}
       />
     </RegistrationModalBody>
   )

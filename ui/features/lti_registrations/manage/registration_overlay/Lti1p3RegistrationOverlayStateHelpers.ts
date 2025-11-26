@@ -31,11 +31,12 @@ export const initialOverlayStateFromInternalConfig = (
   internalConfig: InternalLtiConfiguration,
   adminNickname?: string,
   existingOverlay?: LtiConfigurationOverlay,
+  additive?: boolean,
 ): Lti1p3RegistrationOverlayState => {
   const placements = internalConfig.placements
     .map(p => p.placement)
     .filter(p => !existingOverlay?.disabled_placements?.includes(p))
-    .concat(keys(existingOverlay?.placements))
+    .concat(additive ? keys(existingOverlay?.placements) : [])
     .filter((value, index, array) => array.indexOf(value) === index) // unique values
 
   const courseNavigationDefaultDisabled = existingOverlay?.placements?.course_navigation?.default

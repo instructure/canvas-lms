@@ -1,0 +1,135 @@
+ @startuml
+  !theme plain
+
+  ' Root Modal Component
+  component RegistrationWizardModal
+
+  ' Core Wrapper Components
+  component ResponsiveWrapper
+  component ModalBodyWrapper
+  component InitializationModal
+
+  ' Main Wizard Components
+  component DynamicRegistrationWizard
+  component Lti1p3RegistrationWizard
+  component EditLti1p3RegistrationWizard
+  component RegistrationUpdateWizard
+
+  ' Shared Form Components
+  component RegistrationModalBody
+  component Header
+  component Footer
+  component RegistrationUpdateWizardInner
+
+  ' Dynamic Registration Wrapper Components
+  component IconConfirmationWrapper_Dyn as "IconConfirmationWrapper\n(Dynamic)"
+  component NamingConfirmationWrapper_Dyn as "NamingConfirmationWrapper\n(Dynamic)"
+  component PermissionConfirmationWrapper_Dyn as "PermissionConfirmationWrapper\n(Dynamic)"
+  component PlacementsConfirmationWrapper_Dyn as "PlacementsConfirmationWrapper\n(Dynamic)"
+  component PrivacyConfirmationWrapper_Dyn as "PrivacyConfirmationWrapper\n(Dynamic)"
+  component ReviewScreenWrapper_Dyn as "ReviewScreenWrapper\n(Dynamic)"
+
+  ' LTI 1.3 Wrapper Components
+  component LaunchSettingsConfirmationWrapper
+  component PermissionConfirmationWrapper_Lti as "PermissionConfirmationWrapper\n(LTI 1.3)"
+  component PrivacyConfirmationWrapper_Lti as "PrivacyConfirmationWrapper\n(LTI 1.3)"
+  component PlacementsConfirmationWrapper_Lti as "PlacementsConfirmationWrapper\n(LTI 1.3)"
+  component LaunchTypeSpecificSettingsConfirmationWrapper
+  component OverrideURIsConfirmationWrapper
+  component NamingConfirmationWrapper_Lti as "NamingConfirmationWrapper\n(LTI 1.3)"
+  component IconConfirmationWrapper_Lti as "IconConfirmationWrapper\n(LTI 1.3)"
+  component ReviewScreenWrapper_Lti as "ReviewScreenWrapper\n(LTI 1.3)"
+
+  ' Base Form Components
+  component IconConfirmation
+  component ReviewScreen
+  component LaunchSettingsConfirmation
+  component PermissionConfirmation
+  component PrivacyConfirmation
+  component PlacementsConfirmation
+  component LaunchTypeSpecificSettingsConfirmation
+  component OverrideURIsConfirmation
+  component NamingConfirmation
+
+  ' Main relationships
+  RegistrationWizardModal --> ResponsiveWrapper
+  RegistrationWizardModal --> ModalBodyWrapper
+
+  ModalBodyWrapper --> DynamicRegistrationWizard
+  ModalBodyWrapper --> Lti1p3RegistrationWizard
+  ModalBodyWrapper --> EditLti1p3RegistrationWizard
+  ModalBodyWrapper --> InitializationModal
+
+  InitializationModal --> Header
+  InitializationModal --> RegistrationModalBody
+
+  ' ResponsiveWrapper usage
+  Header --> ResponsiveWrapper
+
+  ' DynamicRegistrationWizard relationships
+  DynamicRegistrationWizard --> Header
+  DynamicRegistrationWizard --> RegistrationModalBody
+  DynamicRegistrationWizard --> Footer
+  DynamicRegistrationWizard --> IconConfirmationWrapper_Dyn
+  DynamicRegistrationWizard --> NamingConfirmationWrapper_Dyn
+  DynamicRegistrationWizard --> PermissionConfirmationWrapper_Dyn
+  DynamicRegistrationWizard --> PlacementsConfirmationWrapper_Dyn
+  DynamicRegistrationWizard --> PrivacyConfirmationWrapper_Dyn
+  DynamicRegistrationWizard --> ReviewScreenWrapper_Dyn
+
+  ' Dynamic wrapper to base form relationships
+  IconConfirmationWrapper_Dyn --> RegistrationModalBody
+  IconConfirmationWrapper_Dyn --> Footer
+  IconConfirmationWrapper_Dyn --> IconConfirmation
+  NamingConfirmationWrapper_Dyn --> NamingConfirmation
+  PermissionConfirmationWrapper_Dyn --> PermissionConfirmation
+  PrivacyConfirmationWrapper_Dyn --> PrivacyConfirmation
+  PlacementsConfirmationWrapper_Dyn --> PlacementsConfirmation
+
+  ReviewScreenWrapper_Dyn --> ReviewScreen
+
+  ' LTI 1.3 Wizard relationships
+  Lti1p3RegistrationWizard --> Header
+  Lti1p3RegistrationWizard --> Footer
+  Lti1p3RegistrationWizard --> RegistrationModalBody
+  Lti1p3RegistrationWizard --> LaunchSettingsConfirmationWrapper
+  Lti1p3RegistrationWizard --> PermissionConfirmationWrapper_Lti
+  Lti1p3RegistrationWizard --> PrivacyConfirmationWrapper_Lti
+  Lti1p3RegistrationWizard --> PlacementsConfirmationWrapper_Lti
+  Lti1p3RegistrationWizard --> LaunchTypeSpecificSettingsConfirmationWrapper
+  Lti1p3RegistrationWizard --> OverrideURIsConfirmationWrapper
+  Lti1p3RegistrationWizard --> NamingConfirmationWrapper_Lti
+  Lti1p3RegistrationWizard --> IconConfirmationWrapper_Lti
+  Lti1p3RegistrationWizard --> ReviewScreenWrapper_Lti
+
+  ' Edit wizard relationship
+  EditLti1p3RegistrationWizard --> RegistrationModalBody
+  EditLti1p3RegistrationWizard --> Lti1p3RegistrationWizard
+
+  ' RegistrationUpdateWizard relationships
+  RegistrationUpdateWizard --> Header
+  RegistrationUpdateWizard --> RegistrationModalBody
+  RegistrationUpdateWizard --> RegistrationUpdateWizardInner
+
+  ' RegistrationUpdateWizardInner relationships
+  RegistrationUpdateWizardInner --> Header
+  RegistrationUpdateWizardInner --> RegistrationModalBody
+  RegistrationUpdateWizardInner --> Footer
+  RegistrationUpdateWizardInner --> PermissionConfirmationWrapper_Dyn
+  RegistrationUpdateWizardInner --> PrivacyConfirmationWrapper_Dyn
+  RegistrationUpdateWizardInner --> PlacementsConfirmationWrapper_Dyn
+  RegistrationUpdateWizardInner --> NamingConfirmationWrapper_Dyn
+  RegistrationUpdateWizardInner --> IconConfirmationWrapper_Dyn
+
+  ' LTI 1.3 wrapper to base form relationships
+  LaunchSettingsConfirmationWrapper --> LaunchSettingsConfirmation
+  PermissionConfirmationWrapper_Lti --> PermissionConfirmation
+  PrivacyConfirmationWrapper_Lti --> PrivacyConfirmation
+  PlacementsConfirmationWrapper_Lti --> PlacementsConfirmation
+  LaunchTypeSpecificSettingsConfirmationWrapper --> LaunchTypeSpecificSettingsConfirmation
+  OverrideURIsConfirmationWrapper --> OverrideURIsConfirmation
+  NamingConfirmationWrapper_Lti --> NamingConfirmation
+  IconConfirmationWrapper_Lti --> IconConfirmation
+  ReviewScreenWrapper_Lti --> ReviewScreen
+
+  @enduml

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {createStore, type StoreApi} from 'zustand/vanilla'
+import {createStore, StoreApi} from 'zustand/vanilla'
 import {subscribeWithSelector} from 'zustand/middleware'
 import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import type {LtiPlacement} from '../model/LtiPlacement'
@@ -28,6 +28,7 @@ import type {
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import {toUndefined} from '../../common/lib/toUndefined'
 import type {InternalPlacementConfiguration} from '../model/internal_lti_configuration/placement_configuration/InternalPlacementConfiguration'
+import {LtiRegistrationUpdateRequest} from '../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 
 export interface DynamicRegistrationOverlayActions {
   updateDevKeyName: (name: string) => void
@@ -124,6 +125,7 @@ export type DynamicRegistrationOverlayStore = StoreApi<
 export const createDynamicRegistrationOverlayStore = (
   developerKeyName: string | null,
   ltiRegistration: LtiRegistrationWithConfiguration,
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest,
 ): StoreApi<
   {
     state: DynamicRegistrationOverlayState
@@ -135,6 +137,7 @@ export const createDynamicRegistrationOverlayStore = (
         ltiRegistration,
         ltiRegistration.overlay?.data,
         developerKeyName,
+        registrationUpdateRequest,
       ),
       updateDevKeyName: (name: string) =>
         set(state => {
@@ -167,6 +170,7 @@ const initialOverlayStateFromLtiRegistration = (
   registration: LtiRegistrationWithConfiguration,
   overlay?: LtiConfigurationOverlay | null,
   developerKeyName?: string | null,
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest,
 ): DynamicRegistrationOverlayState => {
   return {
     adminNickname: toUndefined(registration.admin_nickname),

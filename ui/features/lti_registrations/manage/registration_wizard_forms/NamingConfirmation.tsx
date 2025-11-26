@@ -26,6 +26,12 @@ import {View} from '@instructure/ui-view'
 import React from 'react'
 import type {LtiPlacement} from '../model/LtiPlacement'
 import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
+import {LtiRegistrationUpdateRequest} from '../model/lti_ims_registration/LtiRegistrationUpdateRequest'
+import {Pill} from '@instructure/ui-pill'
+import {IconAddSolid} from '@instructure/ui-icons'
+import {isPlacementEnabledByFeatureFlag} from '@canvas/lti/model/LtiPlacementFilter'
+import {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
+import {diffPlacements} from '../model/placementDiffer'
 
 const I18n = createI18nScope('lti_registration.wizard')
 
@@ -38,6 +44,9 @@ export type NamingConfirmationProps = {
   onUpdateDescription: (value: string) => void
   placements: {placement: LtiPlacement; label: string; defaultValue?: string}[]
   onUpdatePlacementLabel: (placement: LtiPlacement, value: string) => void
+  defaultDescription?: string
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
+  existingRegistration?: LtiRegistrationWithConfiguration
 }
 
 export const NamingConfirmation = React.memo(
@@ -50,7 +59,47 @@ export const NamingConfirmation = React.memo(
     onUpdateDescription,
     placements,
     onUpdatePlacementLabel,
+    defaultDescription,
+    registrationUpdateRequest,
+    existingRegistration,
   }: NamingConfirmationProps) => {
+    const updatedDescription =
+      registrationUpdateRequest?.internal_lti_configuration?.description ?? undefined
+
+    // Compute added and removed placements using the differ utility
+    const {added: addedPlacements} = React.useMemo(
+      () => diffPlacements(existingRegistration, registrationUpdateRequest),
+      [existingRegistration, registrationUpdateRequest],
+    )
+
+    // Filter placements to only include those in the registration update request
+    // (i.e., exclude placements that are being removed)
+    const updateRequestPlacementTypes = React.useMemo(
+      () =>
+        registrationUpdateRequest?.internal_lti_configuration?.placements.map(p => p.placement) ??
+        [],
+      [registrationUpdateRequest],
+    )
+
+    const visiblePlacements = React.useMemo(
+      () =>
+        // If this is an update request, only show placements that are in the update request
+        registrationUpdateRequest
+          ? placements.filter(p => updateRequestPlacementTypes.includes(p.placement))
+          : placements,
+      [placements, updateRequestPlacementTypes, registrationUpdateRequest],
+    )
+
+    const existingPlacements = React.useMemo(
+      () => visiblePlacements.filter(p => !addedPlacements.includes(p.placement)),
+      [visiblePlacements, addedPlacements],
+    )
+
+    const newlyAddedPlacements = React.useMemo(
+      () => visiblePlacements.filter(p => addedPlacements.includes(p.placement)),
+      [visiblePlacements, addedPlacements],
+    )
+
     return (
       <Flex direction="column">
         <>
@@ -94,26 +143,67 @@ export const NamingConfirmation = React.memo(
               onUpdateDescription(e.target.value)
             }}
           />
+          {updatedDescription !== undefined &&
+            defaultDescription !== undefined &&
+            updatedDescription !== description &&
+            updatedDescription !== defaultDescription && (
+              <>
+                <Pill color="success">New</Pill>
+                <Text size="small" fontStyle="italic">
+                  {I18n.t('Changed to:')}
+                </Text>
+                <Text size="small" fontStyle="italic">
+                  {updatedDescription}
+                </Text>
+              </>
+            )}
         </View>
-        {placements.length > 0 && (
+        {(existingPlacements.length > 0 || newlyAddedPlacements.length > 0) && (
           <>
             <Heading level="h3" margin="0 0 x-small 0">
               {I18n.t('Placement Names')}
             </Heading>
             <Text>{I18n.t('Choose a name override for each placement (optional).')}</Text>
-            <Flex direction="column" gap="medium" margin="medium 0 medium 0">
-              {placements.map(placement => {
-                return (
-                  <MemoPlacementLabelInput
-                    key={placement.placement}
-                    placement={placement.placement}
-                    label={placement.label}
-                    defaultValue={placement.defaultValue}
-                    onChange={onUpdatePlacementLabel}
-                  />
-                )
-              })}
-            </Flex>
+            {existingPlacements.length > 0 && (
+              <Flex direction="column" gap="medium" margin="medium 0 medium 0">
+                {existingPlacements.map(placement => {
+                  return (
+                    <MemoPlacementLabelInput
+                      key={placement.placement}
+                      placement={placement.placement}
+                      label={placement.label}
+                      defaultValue={placement.defaultValue}
+                      onChange={onUpdatePlacementLabel}
+                      registrationUpdateRequest={registrationUpdateRequest}
+                    />
+                  )
+                })}
+              </Flex>
+            )}
+            {newlyAddedPlacements.length > 0 && (
+              <Flex direction="column" alignItems="start" gap="small" margin="small 0 medium 0">
+                <Heading level="h4" margin="0 0 x-small 0">
+                  <Flex direction="row" gap="small">
+                    <IconAddSolid />
+                    {I18n.t('Added')}
+                  </Flex>
+                </Heading>
+                <Flex direction="column" gap="medium" width="100%">
+                  {newlyAddedPlacements.map(placement => {
+                    return (
+                      <MemoPlacementLabelInput
+                        key={placement.placement}
+                        placement={placement.placement}
+                        label={placement.label}
+                        defaultValue={placement.defaultValue}
+                        onChange={onUpdatePlacementLabel}
+                        registrationUpdateRequest={registrationUpdateRequest}
+                      />
+                    )
+                  })}
+                </Flex>
+              </Flex>
+            )}
           </>
         )}
       </Flex>
@@ -127,19 +217,42 @@ const MemoPlacementLabelInput = React.memo(
     label,
     onChange,
     defaultValue,
+    registrationUpdateRequest,
   }: {
     placement: LtiPlacement
     label: string
     onChange: (placement: LtiPlacement, value: string) => void
     defaultValue?: string
+    registrationUpdateRequest?: LtiRegistrationUpdateRequest
   }) => {
+    const updatedPlacementLabel =
+      registrationUpdateRequest?.internal_lti_configuration?.placements?.find(
+        p => p.placement === placement,
+      )?.text ?? undefined
+
     return (
-      <TextInput
-        placeholder={defaultValue}
-        renderLabel={i18nLtiPlacement(placement)}
-        value={label}
-        onChange={(_, value) => onChange(placement, value)}
-      />
+      <>
+        <TextInput
+          placeholder={defaultValue}
+          renderLabel={i18nLtiPlacement(placement)}
+          value={label}
+          onChange={(_, value) => onChange(placement, value)}
+        />
+        {updatedPlacementLabel !== undefined &&
+          defaultValue !== undefined &&
+          updatedPlacementLabel !== label &&
+          updatedPlacementLabel !== defaultValue && (
+            <>
+              <Pill color="success">New</Pill>
+              <Text size="small" fontStyle="italic">
+                {I18n.t('Changed to:')}
+              </Text>
+              <Text size="small" fontStyle="italic">
+                {updatedPlacementLabel}
+              </Text>
+            </>
+          )}
+      </>
     )
   },
 )

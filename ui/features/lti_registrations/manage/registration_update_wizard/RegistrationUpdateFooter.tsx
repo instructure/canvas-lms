@@ -23,57 +23,63 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('lti_registrations')
 
-export type FooterProps = {
-  updating?: boolean
-  reviewing: boolean
+export type RegistrationUpdateFooterProps = {
   currentScreen: 'first' | 'intermediate' | 'last'
-  disableNextButton?: boolean
-  nextButtonText?: string
-  hideFooter?: boolean
+  disableButtons?: boolean
   onPreviousClicked: () => void
   onNextClicked: () => void
+  onAcceptAllClicked: () => void
+  onEditUpdatesClicked: () => void
 }
 
-export const Footer = ({
-  reviewing,
+export const RegistrationUpdateFooter = ({
   currentScreen,
-  disableNextButton = false,
-  updating = false,
-  nextButtonText,
-  hideFooter = false,
-  onNextClicked,
+  disableButtons = false,
   onPreviousClicked,
-}: FooterProps) => {
-  if (hideFooter) {
-    return null
+  onNextClicked,
+  onAcceptAllClicked,
+  onEditUpdatesClicked,
+}: RegistrationUpdateFooterProps) => {
+  const isFirstScreen = currentScreen === 'first'
+  const isLastScreen = currentScreen === 'last'
+
+  // First screen shows Accept All Updates and Edit Updates buttons
+  if (isFirstScreen) {
+    return (
+      <Modal.Footer>
+        <Button
+          onClick={onAcceptAllClicked}
+          margin="0 xx-small 0 0"
+          interaction={disableButtons ? 'disabled' : 'enabled'}
+        >
+          {I18n.t('Accept All Updates')}
+        </Button>
+        <Button
+          onClick={onEditUpdatesClicked}
+          color="primary"
+          interaction={disableButtons ? 'disabled' : 'enabled'}
+        >
+          {I18n.t('Edit Updates')}
+        </Button>
+      </Modal.Footer>
+    )
   }
 
-  const onLastScreen = currentScreen === 'last'
-  let nextButtonLabel: string
-  if (nextButtonText) {
-    nextButtonLabel = nextButtonText
-  } else {
-    if (onLastScreen && !updating) {
-      nextButtonLabel = I18n.t('Install App')
-    } else if (onLastScreen && updating) {
-      nextButtonLabel = I18n.t('Update')
-    } else if (reviewing) {
-      nextButtonLabel = I18n.t('Back to Review')
-    } else {
-      nextButtonLabel = I18n.t('Next')
-    }
-  }
+  // Regular wizard navigation for intermediate and last screens
+  const nextButtonLabel = isLastScreen ? I18n.t('Update') : I18n.t('Next')
+  const previousButtonLabel = I18n.t('Previous')
+
   return (
     <Modal.Footer>
       <Button onClick={onPreviousClicked} margin="0 xx-small 0 0">
-        {currentScreen === 'first' ? I18n.t('Cancel') : I18n.t('Previous')}
+        {previousButtonLabel}
       </Button>
       <Button
         onClick={onNextClicked}
         color="primary"
         margin="0 0 0 xx-small"
-        interaction={disableNextButton ? 'disabled' : 'enabled'}
-        id={onLastScreen ? 'lti-registration-install-tool-button' : undefined}
+        interaction={disableButtons ? 'disabled' : 'enabled'}
+        id={isLastScreen ? 'lti-registration-update-tool-button' : undefined}
       >
         {nextButtonLabel}
       </Button>

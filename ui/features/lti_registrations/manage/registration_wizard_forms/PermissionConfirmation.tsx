@@ -24,6 +24,10 @@ import {Text} from '@instructure/ui-text'
 import React from 'react'
 import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
+import {LtiRegistrationUpdateRequest} from '../model/lti_ims_registration/LtiRegistrationUpdateRequest'
+import {Pill} from '@instructure/ui-pill'
+import {View} from '@instructure/ui-view'
+import {IconAddSolid, IconNeutralSolid} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('lti_registration.wizard')
 
@@ -58,6 +62,7 @@ export type PermissionConfirmationProps = {
    * Whether or not we are creating or editing a registration
    */
   mode: 'new' | 'edit'
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
 }
 
 export const PermissionConfirmation = React.memo((props: PermissionConfirmationProps) => {
@@ -78,8 +83,18 @@ const renderBody = ({
   onScopeToggled,
   showAllSettings,
   mode,
+  registrationUpdateRequest,
 }: PermissionConfirmationProps): React.ReactElement => {
-  const empty = scopesSupported.length === 0
+  // registrationUpdateRequest?.internal_lti_configuration?.scopes ?? scopesSupported
+  const updateRequestScopes = registrationUpdateRequest?.internal_lti_configuration?.scopes ?? []
+  const newlyAddedScopes = registrationUpdateRequest
+    ? updateRequestScopes.filter(scope => !scopesSupported.includes(scope))
+    : []
+  const removedScopes = registrationUpdateRequest
+    ? scopesSupported.filter(scope => !updateRequestScopes.includes(scope))
+    : []
+
+  const empty = scopesSupported.length === 0 && updateRequestScopes.length === 0
 
   if (empty && mode === 'new') {
     return (
@@ -124,9 +139,34 @@ const renderBody = ({
             }}
           />
         )}
+
         <Flex direction="column" alignItems="center" gap="small" margin="medium 0 medium 0">
-          {scopesSupported.map(scope => {
-            return (
+          {scopesSupported
+            .filter(s => !removedScopes.includes(s))
+            .map(scope => {
+              return (
+                <Checkbox
+                  data-testid={scope}
+                  key={scope}
+                  variant="toggle"
+                  label={i18nLtiScope(scope)}
+                  checked={scopesSelected.includes(scope)}
+                  onChange={() => {
+                    onScopeToggled(scope)
+                  }}
+                />
+              )
+            })}
+        </Flex>
+        {newlyAddedScopes.length > 0 && (
+          <Flex direction="column" alignItems="start" gap="small" margin="small 0 medium 0">
+            <Heading level="h4" margin="0 0 x-small 0">
+              <Flex direction="row" gap="small">
+                <IconAddSolid />
+                {I18n.t('Added')}
+              </Flex>
+            </Heading>
+            {newlyAddedScopes.map(scope => (
               <Checkbox
                 data-testid={scope}
                 data-pendo="lti-permission-toggle"
@@ -138,9 +178,32 @@ const renderBody = ({
                   onScopeToggled(scope)
                 }}
               />
-            )
-          })}
-        </Flex>
+            ))}
+          </Flex>
+        )}
+        {removedScopes.length > 0 && (
+          <Flex direction="column" alignItems="start" gap="small" margin="small 0 0 0">
+            <Heading level="h4" margin="0 0 x-small 0">
+              <Flex direction="row" gap="small">
+                <IconNeutralSolid />
+                {I18n.t('Removed')}
+              </Flex>
+            </Heading>
+            {removedScopes.map(scope => (
+              <Checkbox
+                data-testid={scope}
+                key={scope}
+                disabled
+                variant="toggle"
+                label={i18nLtiScope(scope)}
+                checked={false}
+                onChange={() => {
+                  onScopeToggled(scope)
+                }}
+              />
+            ))}
+          </Flex>
+        )}
       </>
     )
   }

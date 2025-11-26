@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {PrivacyConfirmation} from '../../../../manage/registration_wizard_forms/PrivacyConfirmation'
+import {LtiPrivacyLevel} from '../../../model/LtiPrivacyLevel'
 import {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
 import {Lti1p3RegistrationOverlayStore} from '../../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import React from 'react'
@@ -23,6 +24,7 @@ import React from 'react'
 type PrivacyConfirmationPerfWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
   registration: LtiRegistrationWithAllInformation
+  defaultPrivacyLevel?: LtiPrivacyLevel
 }
 
 /**
@@ -40,7 +42,7 @@ type PrivacyConfirmationPerfWrapperProps = {
  * @returns
  */
 export const PrivacyConfirmationPerfWrapper = React.memo(
-  ({overlayStore, registration}: PrivacyConfirmationPerfWrapperProps) => {
+  ({overlayStore, registration, defaultPrivacyLevel}: PrivacyConfirmationPerfWrapperProps) => {
     const {selectedPrivacyLevel, privacyLevelOnChange} = overlayStore(s => ({
       selectedPrivacyLevel: s.state.data_sharing.privacy_level || 'anonymous',
       privacyLevelOnChange: s.setPrivacyLevel,
@@ -50,6 +52,7 @@ export const PrivacyConfirmationPerfWrapper = React.memo(
         appName={registration.name}
         selectedPrivacyLevel={selectedPrivacyLevel}
         privacyLevelOnChange={privacyLevelOnChange}
+        defaultPrivacyLevel={defaultPrivacyLevel}
       />
     )
   },

@@ -44,6 +44,8 @@ import {InlineList} from '@instructure/ui-list'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import theme from '@instructure/canvas-theme'
 import {TurnitinAPMigrationModal} from './tii_migration/TurnitinAPMigrationModal'
+import {openDynamicRegistrationWizard} from '../../registration_wizard/RegistrationWizardModalState'
+import {useRegistrationUpdateWizardModalState} from '../../registration_update_wizard/RegistrationUpdateWizardModalState'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -274,6 +276,8 @@ export const ToolDetailsInner = ({
     !!registration.developer_key_id &&
     window.ENV.turnitinAPClientId === registration.developer_key_id
 
+  const dynamicRegistrationUrl = registration.dynamic_registration_url
+
   return (
     <>
       {tiiMigrationAvailable && tiiMigrationModalShowing && (
@@ -364,6 +368,11 @@ export const ToolDetailsInner = ({
                     color="secondary"
                     data-pendo="lti-registrations-update-available-button"
                     renderIcon={() => <IconRefreshLine />}
+                    onClick={() => {
+                      useRegistrationUpdateWizardModalState
+                        .getState()
+                        .open(registration, pendingUpdate)
+                    }}
                   >
                     {I18n.t('Update Available')}
                   </Button>
@@ -381,6 +390,23 @@ export const ToolDetailsInner = ({
                     {I18n.t('Migrate from LTI 2.0')}
                   </Button>
                 )}
+
+                {typeof dynamicRegistrationUrl === 'string' ? (
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      openDynamicRegistrationWizard(
+                        dynamicRegistrationUrl,
+                        undefined,
+                        undefined,
+                        registration.id,
+                      )
+                    }}
+                    margin="0 small 0 0"
+                  >
+                    {I18n.t('Reinstall App')}
+                  </Button>
+                ) : null}
               </Flex>
             </Flex>
           </Flex>
