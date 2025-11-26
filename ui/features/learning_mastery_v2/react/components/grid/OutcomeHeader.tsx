@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
@@ -29,15 +29,22 @@ import {CELL_HEIGHT, COLUMN_WIDTH, SortBy, SortOrder} from '../../utils/constant
 import {Outcome} from '../../types/rollup'
 import {Sorting} from '../../types/shapes'
 import {OutcomeDescriptionModal} from '../modals/OutcomeDescriptionModal'
+import {DragDropConnectorProps} from './DragDropWrapper'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
-export interface OutcomeHeaderProps {
+export interface OutcomeHeaderProps extends DragDropConnectorProps {
   outcome: Outcome
   sorting: Sorting
 }
 
-export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({outcome, sorting}) => {
+export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
+  outcome,
+  sorting,
+  connectDragSource,
+  connectDropTarget,
+  isDragging,
+}) => {
   // OD => OutcomeDescription
   const [isODModalOpen, openODModal, closeODModal] = useModal() as [boolean, () => void, () => void]
 
@@ -56,8 +63,17 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({outcome, sorting}) 
     sorting.setSortOrder(SortOrder.DESC)
   }
 
-  return (
-    <>
+  const headerStyle = useMemo(
+    () => ({
+      opacity: isDragging ? 0.5 : 1,
+      cursor: 'grab',
+      transition: 'opacity 0.15s ease-in-out',
+    }),
+    [isDragging],
+  )
+
+  const headerContent = (
+    <div style={headerStyle}>
       <View
         background="secondary"
         as="div"
@@ -114,6 +130,15 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({outcome, sorting}) 
           </Flex.Item>
         </Flex>
       </View>
+    </div>
+  )
+
+  return (
+    <>
+      {connectDragSource && connectDropTarget
+        ? connectDragSource(connectDropTarget(headerContent))
+        : headerContent}
+
       <OutcomeDescriptionModal
         outcome={outcome}
         isOpen={isODModalOpen}
