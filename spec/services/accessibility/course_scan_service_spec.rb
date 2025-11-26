@@ -126,6 +126,7 @@ describe Accessibility::CourseScanService do
     context "when scanning assignments" do
       let!(:assignment1) { assignment_model(course:) }
       let!(:assignment2) { assignment_model(course:) }
+      let!(:quiz_lti_assignment) { new_quizzes_assignment(course:) }
 
       before do
         assignment2.destroy!
@@ -138,6 +139,10 @@ describe Accessibility::CourseScanService do
 
       it "does not scan the deleted assignment" do
         expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: assignment2)
+      end
+
+      it "does not scan the New Quizzes assignment" do
+        expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: quiz_lti_assignment)
       end
     end
 

@@ -219,4 +219,66 @@ RSpec.shared_examples "an accessibility scannable resource" do
       expect(resource.skip_accessibility_scan).to be_falsey
     end
   end
+
+  describe "#excluded_from_accessibility_scan?" do
+    context "when resource is not excluded" do
+      it "returns false by default" do
+        resource = described_class.create!(valid_attributes)
+        expect(resource.send(:excluded_from_accessibility_scan?)).to be false
+      end
+    end
+
+    context "when resource is a New Quizzes assignment" do
+      before do
+        skip "Not applicable for non-Assignment resources" unless described_class == Assignment
+      end
+
+      let(:quiz_lti_assignment) { new_quizzes_assignment(course:) }
+
+      it "returns true" do
+        expect(quiz_lti_assignment.send(:excluded_from_accessibility_scan?)).to be true
+      end
+
+      it "prevents #should_run_accessibility_scan? from returning true" do
+        account = course.root_account
+        account.enable_feature!(:a11y_checker)
+        course.enable_feature!(:a11y_checker_eap)
+        Progress.create!(
+          tag: Accessibility::CourseScanService::SCAN_TAG,
+          context: course,
+          workflow_state: "completed"
+        )
+
+        expect(quiz_lti_assignment.send(:should_run_accessibility_scan?)).to be false
+      end
+
+      context "with accessibility features enabled" do
+        before do
+          account = course.root_account
+          account.enable_feature!(:a11y_checker)
+          course.enable_feature!(:a11y_checker_eap)
+          Progress.create!(
+            tag: Accessibility::CourseScanService::SCAN_TAG,
+            context: course,
+            workflow_state: "completed"
+          )
+        end
+
+        it "does not trigger accessibility scan on create" do
+          assignment = new_quizzes_assignment(course:)
+
+          expect(assignment.send(:excluded_from_accessibility_scan?)).to be true
+          expect(assignment.send(:should_run_accessibility_scan?)).to be false
+        end
+
+        it "does not trigger accessibility scan on update" do
+          assignment = quiz_lti_assignment
+          assignment.reload
+
+          expect(Accessibility::ResourceScannerService).not_to receive(:call)
+          assignment.update!(relevant_attributes_for_scan)
+        end
+      end
+    end
+  end
 end
