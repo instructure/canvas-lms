@@ -289,4 +289,8 @@ class Assignment < AbstractAssignment
     # TODO: RCX-4463 remove title and workflow_state
     %i[title description workflow_state]
   end
+
+  def excluded_from_accessibility_scan?
+    quiz_lti?
+  end
 end

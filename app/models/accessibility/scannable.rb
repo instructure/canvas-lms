@@ -69,6 +69,7 @@ module Accessibility
       a11y_checker_enabled? &&
         !deleted? &&
         !skip_accessibility_scan &&
+        !excluded_from_accessibility_scan? &&
         any_completed_accessibility_scan?
     end
 
@@ -96,6 +97,10 @@ module Accessibility
 
     def a11y_scannable_attributes
       raise NotImplementedError, "#{self.class.name} must implement #a11y_scannable_attributes"
+    end
+
+    def excluded_from_accessibility_scan?
+      false
     end
   end
 end
