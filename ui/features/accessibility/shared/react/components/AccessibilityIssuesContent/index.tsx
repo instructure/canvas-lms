@@ -25,6 +25,7 @@ import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
@@ -418,17 +419,19 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
                     current: currentIssueIndex + 1,
                     total: issues.length,
                     message: currentIssue.displayName,
-                  })}{' '}
+                  })}
                   <WhyMattersPopover issue={currentIssue} />
                 </Text>
               </View>
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <Flex.Item as="main" padding="x-small small" shouldGrow={true} overflowY="auto">
+        <Flex.Item padding="x-small small" shouldGrow={true} overflowY="auto">
           <Flex padding="0 medium 0 0" gap="x-small" direction="column">
             <Flex justifyItems="space-between">
-              <Text weight="weightImportant">{I18n.t('Problem area')}</Text>
+              <Heading level="h4" variant="titleCardMini">
+                {I18n.t('Problem area')}
+              </Heading>
               <Flex gap="small">
                 <Link
                   href={item.resourceUrl}
@@ -463,7 +466,9 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           </Flex>
           {currentIssue.form.type !== FormType.ColorPicker && (
             <View as="section" margin="medium 0">
-              <Text weight="weightImportant">{I18n.t('Issue description')}</Text>
+              <Heading level="h4" variant="titleCardMini">
+                {I18n.t('Issue description')}
+              </Heading>
               <br aria-hidden={true} />
               <Text weight="weightRegular">{currentIssue.message}</Text>
             </View>
