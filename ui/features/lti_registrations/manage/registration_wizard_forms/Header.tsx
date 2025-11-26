@@ -26,10 +26,11 @@ const I18n = createI18nScope('lti_registrations')
 
 export type HeaderProps = {
   onClose: () => void
+  headerText?: string
   editing?: boolean
 }
 
-export const Header = ({onClose, editing = false}: HeaderProps) => {
+export const Header = ({onClose, editing = false, headerText}: HeaderProps) => {
   return (
     <ResponsiveWrapper
       render={modalProps => (
@@ -41,7 +42,13 @@ export const Header = ({onClose, editing = false}: HeaderProps) => {
             screenReaderLabel={I18n.t('Close')}
             data-testid="header-close-button"
           />
-          <Heading>{editing ? I18n.t('Edit App') : I18n.t('Install App')}</Heading>
+          <Heading>
+            {typeof headerText !== 'undefined'
+              ? headerText
+              : editing
+                ? I18n.t('Edit App')
+                : I18n.t('Install App')}
+          </Heading>
         </Modal.Header>
       )}
     />

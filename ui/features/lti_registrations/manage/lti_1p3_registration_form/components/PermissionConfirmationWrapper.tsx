@@ -19,6 +19,7 @@
 import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {PermissionConfirmation} from '../../registration_wizard_forms/PermissionConfirmation'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
+import type {LtiRegistrationUpdateRequest} from '../../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 import {LtiScope, LtiScopes} from '@canvas/lti/model/LtiScope'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 
@@ -27,6 +28,7 @@ export type PermissionConfirmationWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
   scopesSupported?: Array<LtiScope>
   showAllSettings: boolean
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
 }
 
 export const PermissionConfirmationWrapper = ({
@@ -34,6 +36,7 @@ export const PermissionConfirmationWrapper = ({
   internalConfig,
   showAllSettings,
   scopesSupported,
+  registrationUpdateRequest,
 }: PermissionConfirmationWrapperProps) => {
   const {state, ...actions} = overlayStore()
 
@@ -46,6 +49,7 @@ export const PermissionConfirmationWrapper = ({
         scopesSelected={state.permissions.scopes ?? []}
         scopesSupported={scopesSupported ? scopesSupported : [...Object.values(LtiScopes)]}
         onScopeToggled={actions.toggleScope}
+        registrationUpdateRequest={registrationUpdateRequest}
       />
     </RegistrationModalBody>
   )

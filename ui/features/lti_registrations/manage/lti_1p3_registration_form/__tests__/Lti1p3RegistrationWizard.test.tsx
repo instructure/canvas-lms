@@ -112,7 +112,7 @@ describe('Lti1p3RegistrationWizard', () => {
     for (let i = 0; i < 7; i++) {
       await userEvent.click(findNextButton())
     }
-    await userEvent.click(screen.getByText('Update App').closest('button')!)
+    await userEvent.click(screen.getByText('Update').closest('button')!)
     expect(screen.getAllByText('Updating App')[0]).toBeInTheDocument()
   })
 
@@ -140,7 +140,7 @@ describe('Lti1p3RegistrationWizard', () => {
     await userEvent.click(findNextButton())
     await userEvent.click(findNextButton())
 
-    await userEvent.click(screen.getByText('Update App').closest('button')!)
+    await userEvent.click(screen.getByText('Update').closest('button')!)
 
     expect(screen.getByText(/sorry, something broke/i)).toBeInTheDocument()
   })

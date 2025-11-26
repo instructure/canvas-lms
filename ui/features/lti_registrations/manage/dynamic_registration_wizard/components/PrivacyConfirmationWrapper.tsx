@@ -20,21 +20,25 @@ import type {DynamicRegistrationOverlayStore} from '../DynamicRegistrationOverla
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import {PrivacyConfirmation} from '../../registration_wizard_forms/PrivacyConfirmation'
 import {LtiPrivacyLevels} from '../../model/LtiPrivacyLevel'
+import {LtiRegistrationUpdateRequest} from '../../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 
 export type PrivacyConfirmationWrapperProps = {
   toolName: string
   overlayStore: DynamicRegistrationOverlayStore
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
 }
 
 export const PrivacyConfirmationWrapper = ({
   toolName,
   overlayStore,
+  registrationUpdateRequest,
 }: PrivacyConfirmationWrapperProps) => {
   const [state, actions] = useOverlayStore(overlayStore)
 
   return (
     <PrivacyConfirmation
       appName={toolName}
+      registrationUpdateRequest={registrationUpdateRequest}
       privacyLevelOnChange={level => actions.updatePrivacyLevel(level)}
       selectedPrivacyLevel={state.overlay.privacy_level || LtiPrivacyLevels.Anonymous}
     />

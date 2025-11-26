@@ -120,7 +120,7 @@ module Api::V1::Lti::Registration
       end
 
       # Include pending update information if available
-      json["pending_update"] = pending_update&.global_id&.to_s
+      json["pending_update"] = pending_update&.id&.to_s
     end
   end
 end
