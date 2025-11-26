@@ -1382,6 +1382,27 @@ describe ContentExportsApiController, type: :request do
         expect(json["export_type"]).to eql "zip"
       end
 
+      it "returns download URLs with the correct host for test environments" do
+        Attachment.current_root_account = @course.root_account
+        user_data_export = past_export(t_student, t_student, "user_data")
+
+        # Override the request host for this test
+        allow_any_instance_of(ContentExportsApiController).to receive(:request).and_wrap_original do |m, *args|
+          req = m.call(*args)
+          allow(req).to receive(:host_with_port).and_return("some-school.beta.instructure.com")
+          req
+        end
+
+        json = api_call_as_user(t_student,
+                                :get,
+                                "/api/v1/users/#{t_student.id}/content_exports/#{user_data_export.id}",
+                                { controller: "content_exports_api", action: "show", format: "json", user_id: t_student.to_param, id: user_data_export.to_param })
+
+        expect(json["id"]).to eql user_data_export.id
+        expect(json["export_type"]).to eql "user_data"
+        expect(json["attachment"]["url"]).to include("some-school.beta.instructure.com")
+      end
+
       it "does not show another user's export" do
         zip_export = past_export(t_student, t_student, "zip")
         api_call_as_user(t_teacher,
