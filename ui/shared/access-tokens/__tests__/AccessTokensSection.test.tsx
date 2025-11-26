@@ -131,6 +131,7 @@ describe('AccessTokensSection', () => {
       ).toBeInTheDocument()
     })
 
+    expect(screen.getByText('abc123')).toBeInTheDocument()
     expect(screen.getByText('Test Token 1')).toBeInTheDocument()
     expect(screen.getByText('Test Token 2')).toBeInTheDocument()
     expect(screen.getByText(/Jan 1, 2025/)).toBeInTheDocument()
@@ -144,6 +145,8 @@ describe('AccessTokensSection', () => {
     renderWithQueryClient(<AccessTokensSection userId={userId} />)
 
     await waitFor(() => {
+      expect(screen.getByText('ID')).toBeInTheDocument()
+      expect(screen.getByText('Token')).toBeInTheDocument()
       expect(screen.getByText('Purpose')).toBeInTheDocument()
     })
 
