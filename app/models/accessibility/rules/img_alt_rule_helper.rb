@@ -21,7 +21,7 @@ module Accessibility
   module Rules
     class ImgAltRuleHelper
       DEFAULT_REPEAT_COUNT = 3
-      MAX_LENGTH = 120
+      MAX_LENGTH = 200
       IMAGE_FILENAME_PATTERN = /[^\s]+(.*?)\.(jpg|jpeg|png|gif|svg|bmp|webp)$/i
 
       def self.generate_alt_text(image_url, config_name: "alt_text_generate", try_counter: DEFAULT_REPEAT_COUNT)

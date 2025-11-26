@@ -51,13 +51,13 @@ describe Accessibility::Rules::ImgAltRuleHelper do
       expect(described_class.alt_text_valid?(nil)).to be false
     end
 
-    it "returns false for alt text longer than 120 characters" do
-      long_text = "a" * 121
+    it "returns false for alt text longer than MAX_LENGTH characters" do
+      long_text = "a" * (Accessibility::Rules::ImgAltRuleHelper::MAX_LENGTH + 1)
       expect(described_class.alt_text_valid?(long_text)).to be false
     end
 
-    it "returns true for alt text exactly 120 characters" do
-      text = "a" * 120
+    it "returns true for alt text exactly MAX_LENGTH characters" do
+      text = "a" * Accessibility::Rules::ImgAltRuleHelper::MAX_LENGTH
       expect(described_class.alt_text_valid?(text)).to be true
     end
   end
