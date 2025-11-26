@@ -99,7 +99,7 @@ describe('RubricAssignmentContainer Tests', () => {
         courseId="1"
         canManageRubrics={true}
         rubricSelfAssessmentFFEnabled={true}
-        aiRubricsEnabled={true}
+        aiRubricsEnabled={false}
         {...props}
       />,
     )
@@ -160,6 +160,16 @@ describe('RubricAssignmentContainer Tests', () => {
       })
     }
 
+    it('should render the edit modal with Rubric Generator title when AI Rubrics is enabled', () => {
+      const {getByTestId} = renderComponent({
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+        aiRubricsEnabled: true,
+      })
+      fireEvent.click(getByTestId('create-assignment-rubric-button'))
+      expect(getByTestId('rubric-assignment-create-modal')).toHaveTextContent('Create Rubric')
+      expect(getByTestId('rubric-criteria-builder-header')).toHaveTextContent('Rubric Generator')
+    })
+
     it('will render the rubric title, edit, preview, and remove buttons when rubric is attached to assignment', () => {
       const {getByTestId, getByText} = getAssociatedComponent()
       expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
@@ -186,6 +196,7 @@ describe('RubricAssignmentContainer Tests', () => {
       })
       fireEvent.click(getByTestId('edit-assignment-rubric-button'))
       expect(getByTestId('rubric-assignment-create-modal')).toHaveTextContent('Edit Rubric')
+      expect(getByTestId('rubric-criteria-builder-header')).toHaveTextContent('Criteria Builder')
       expect(getByTestId('rubric-form-title')).toHaveValue('Rubric 1')
     })
 
