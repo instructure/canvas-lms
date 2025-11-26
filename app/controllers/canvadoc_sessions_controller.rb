@@ -121,7 +121,7 @@ class CanvadocSessionsController < ApplicationController
         return render(plain: "unauthorized", status: :unauthorized) if opts[:enrollment_type].blank?
 
         # If we're doing annotations, DocViewer needs additional information to send notifications
-        opts[:canvas_base_url] = assignment.course.root_account.domain
+        opts[:canvas_base_url] = assignment.course.root_account.environment_specific_domain
         opts[:user_id] = @current_user.id
         opts[:submission_user_ids] = submission.group_id ? submission.group.users.pluck(:id) : [submission.user_id]
         opts[:course_id] = assignment.context_id
