@@ -37,7 +37,7 @@ module Accessibility
         Accessibility::Forms::TextInputWithCheckboxField.new(
           checkbox_label: I18n.t("This image is decorative"),
           checkbox_subtext: I18n.t("Screen readers should skip purely decorative images."),
-          undo_text: I18n.t("Alt text fixed"),
+          undo_text: I18n.t("Alt text updated"),
           input_label: I18n.t("Alt text"),
           input_description: I18n.t("Describe what's in the picture."),
           input_max_length: ImgAltRuleHelper::MAX_LENGTH,

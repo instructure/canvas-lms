@@ -132,11 +132,6 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     )
   }, 1000)
 
-  const isApplyButtonHidden = useMemo(
-    () => (currentIssue ? [FormType.CheckboxTextInput].includes(currentIssue.form.type) : false),
-    [currentIssue],
-  )
-
   const handleSkip = useCallback(() => {
     setCurrentIssueIndex(prev => Math.min(prev + 1, issues.length - 1))
   }, [issues.length])
@@ -161,6 +156,11 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   }, [accessibilityScans, nextResource, setSelectedItem, setNextResource, getNextResource])
 
   const handleApply = useCallback(() => {
+    if (formError) {
+      formRef.current?.focus()
+      return
+    }
+
     setIsFormLocked(true)
     const formValue = formRef.current?.getValue()
     previewRef.current?.update(
@@ -181,7 +181,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         setIsFormLocked(false)
       },
     )
-  }, [formRef, previewRef, currentIssue])
+  }, [formError, currentIssue?.form?.undoText])
 
   const handleUndo = useCallback(() => {
     setIsFormLocked(true)
@@ -477,12 +477,9 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
               onClearError={handleClearError}
               onValidationChange={handleValidationChange}
               isDisabled={isRemediated}
-              actionButtons={
-                !isApplyButtonHidden && currentIssue.form.canGenerateFix ? applyButton : undefined
-              }
+              actionButtons={currentIssue.form.canGenerateFix ? applyButton : undefined}
             />
-            {!isApplyButtonHidden &&
-              currentIssue.form.canGenerateFix &&
+            {currentIssue.form.canGenerateFix &&
               formError &&
               currentIssue.form.type === FormType.Button && (
                 <View as="div" margin="x-small 0">
@@ -490,7 +487,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
                 </View>
               )}
           </View>
-          {!isApplyButtonHidden && !currentIssue.form.canGenerateFix && (
+          {!currentIssue.form.canGenerateFix && (
             <View as="section" margin="medium 0">
               {applyButton}
               {formError && currentIssue.form.type === FormType.Button && (
@@ -507,14 +504,11 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           nextButtonName={I18n.t('Save & Next')}
           onSkip={handleSkip}
           onBack={handlePrevious}
-          onSaveAndNext={isApplyButtonHidden ? handleApplyAndSaveAndNext : handleSaveAndNext}
+          onSaveAndNext={handleApplyAndSaveAndNext}
           isBackDisabled={currentIssueIndex === 0 || isFormLocked}
           isSkipDisabled={currentIssueIndex === issues.length - 1 || isFormLocked}
           isSaveAndNextDisabled={
-            (!isRemediated && !isApplyButtonHidden) ||
-            isFormLocked ||
-            !!formError ||
-            !isSaveButtonEnabled
+            !isRemediated || isFormLocked || !!formError || !isSaveButtonEnabled
           }
         />
       </View>
