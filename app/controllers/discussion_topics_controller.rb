@@ -407,6 +407,9 @@ class DiscussionTopicsController < ApplicationController
       end
 
       if states.present?
+        if states.include?("locked") || states.include?("unlocked")
+          ActiveRecord::Associations.preload(@topics, context_module_tags: :context_module)
+        end
         @topics.reject! { |t| t.locked_for?(@current_user) } if states.include?("unlocked")
         @topics.select! { |t| t.locked_for?(@current_user) } if states.include?("locked")
       end
@@ -457,14 +460,19 @@ class DiscussionTopicsController < ApplicationController
 
         assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
+        side_comment_scope = @context.active_discussion_topics.only_discussion_topics
+                                     .where(discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT)
+        side_comment_count = Account.site_admin.feature_enabled?(:disallow_threaded_replies_manage) ? side_comment_scope.count : 0
+        has_side_comments = Account.site_admin.feature_enabled?(:disallow_threaded_replies_fix_alert) && side_comment_count > 0
+
         hash = {
           USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
           FEATURE_FLAGS_URL: feature_flags_url,
           ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
           CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
           DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
-          HAS_SIDE_COMMENT_DISCUSSIONS: Account.site_admin.feature_enabled?(:disallow_threaded_replies_fix_alert) ? @context.active_discussion_topics.only_discussion_topics.where(discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT).exists? : false,
-          AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS: Account.site_admin.feature_enabled?(:disallow_threaded_replies_manage) ? @context.active_discussion_topics.only_discussion_topics.where(discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT).count : 0,
+          HAS_SIDE_COMMENT_DISCUSSIONS: has_side_comments,
+          AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS: side_comment_count,
           totalDiscussions: scope.count,
           permissions: {
             create: @context.discussion_topics.temp_record.grants_right?(@current_user, session, :create),
