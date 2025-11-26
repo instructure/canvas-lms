@@ -2538,6 +2538,10 @@ describe FilesController do
     it "leaves other content types alone" do
       expect(controller.send(:process_content_type_from_instfs, "application/pdf", "file.pdf")).to eq "application/pdf"
     end
+
+    it "fixes sql files" do
+      expect(controller.send(:process_content_type_from_instfs, "audio/mpeg", "file.sql")).to eq "text/x-sql"
+    end
   end
 
   describe "PUT 'api_update'" do
