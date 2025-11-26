@@ -321,18 +321,27 @@ module AccountReports
       headers = []
       headers << "user id"
       headers << "user name"
+      headers << "id"
+      headers << "purpose"
       headers << "token hint"
+      headers << "visible token"
+      headers << "creation"
       headers << "expiration"
       headers << "last used"
+      headers << "status"
       headers << "dev key id"
       headers << "dev key name"
 
       columns = []
       columns << "access_tokens.user_id"
       columns << "users.sortable_name"
+      columns << "access_tokens.id"
+      columns << "access_tokens.purpose"
       columns << "access_tokens.token_hint"
+      columns << "access_tokens.created_at"
       columns << "access_tokens.permanent_expires_at"
       columns << "access_tokens.last_used_at"
+      columns << "access_tokens.workflow_state"
       columns << "access_tokens.developer_key_id"
 
       user_tokens = AccessToken.joins(:user)
@@ -350,9 +359,14 @@ module AccountReports
           row = []
           row << token[:user_id]
           row << token[:sortable_name]
-          row << token[:token_hint]
+          row << token[:id]
+          row << token[:purpose]
+          row << token[:token_hint] # exclude shard on purpose
+          row << token.visible_token
+          row << (token[:created_at] ? default_timezone_format(token[:created_at]) : "never")
           row << (token[:permanent_expires_at] ? default_timezone_format(token[:permanent_expires_at]) : "never")
           row << (token[:last_used_at] ? default_timezone_format(token[:last_used_at]) : "never")
+          row << token[:workflow_state]
           row << token[:developer_key_id]
           row << dev_key&.name
           csv << row
