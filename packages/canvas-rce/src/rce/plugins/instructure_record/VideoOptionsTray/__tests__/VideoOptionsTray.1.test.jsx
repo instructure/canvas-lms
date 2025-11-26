@@ -229,6 +229,71 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
     })
   })
 
+  describe('when rce_studio_embed_improvements feature flag is enabled', () => {
+    beforeEach(() => {
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({rce_studio_embed_improvements: true})
+    })
+
+    describe('Studio Embed Options', () => {
+      describe('when the media is a Studio media', () => {
+        beforeEach(() => {
+          props.studioOptions = {
+            resizable: true,
+            convertibleToLink: true,
+            embedOptions: {
+              enableMediaDownload: false,
+              enableTranscriptDownload: false,
+              lockSpeed: false,
+              isExternal: false,
+            },
+          }
+        })
+
+        it('shows the checkbox group', () => {
+          renderComponent()
+          expect(screen.getByText('Embed Options')).toBeInTheDocument()
+        })
+
+        it('shows the "Allow media download" checkbox', () => {
+          renderComponent()
+          expect(screen.getByLabelText('Allow media download')).toBeInTheDocument()
+        })
+
+        it('shows the "Allow transcript download" checkbox', () => {
+          renderComponent()
+          expect(screen.getByLabelText('Allow transcript download')).toBeInTheDocument()
+        })
+
+        it('shows the "Lock speed at 1x" checkbox', () => {
+          renderComponent()
+          expect(screen.getByLabelText('Lock speed at 1x')).toBeInTheDocument()
+        })
+
+        describe('and the media is external', () => {
+          beforeEach(() => {
+            props.studioOptions.embedOptions.isExternal = true
+          });
+
+          it('does not show the "Allow media download" checkbox', () => {
+            renderComponent()
+            expect(screen.queryByLabelText('Allow media download')).not.toBeInTheDocument()
+          })
+        });
+      });
+
+      describe('when the media is not a Studio media', () => {
+        beforeEach(() => {
+          props.studioOptions = null
+        });
+
+        it('does not show the checkbox group', () => {
+          renderComponent()
+          expect(screen.queryByText('Embed Options')).not.toBeInTheDocument()
+        })
+      });
+    })
+  })
+
   describe('"Done" button', () => {
     describe('when Title Text is present', () => {
       beforeEach(() => {

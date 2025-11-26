@@ -102,7 +102,7 @@ export interface AccessibilityIssue {
   ruleId: string
   displayName: string
   message: string
-  why: string
+  why: string | string[]
   element: string
   path: string
   issueUrl?: string
@@ -211,3 +211,9 @@ export type IssueSummaryGroup =
   | 'tables'
   | 'lists'
   | 'low-contrast'
+
+export type FilterGroupMapping = {
+  'alt-text': IssueRuleType[]
+  'heading-order': IssueRuleType[]
+  'text-contrast': IssueRuleType[]
+}

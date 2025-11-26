@@ -48,6 +48,8 @@ class AIExperiencesReportGenerator
     @account_cache = {}
     @user_cache = {}
     @all_conversations_cache = {}
+    @conversation_metadata = {} # Maps conversation_id => {account:, shard:, user_id:}
+    @region_base_urls = nil # Cache region URLs
 
     @bearer_token = ENV["LLM_CONVERSATION_BEARER_TOKEN"] || LLMConversationClient.bearer_token
 
@@ -64,6 +66,8 @@ class AIExperiencesReportGenerator
     # Initialize output files
     conversations_file = File.join(@output_dir, "conversations_summary_#{@start_date}_#{@end_date}.csv")
     messages_file = File.join(@output_dir, "messages_detail_#{@start_date}_#{@end_date}.csv")
+    users_file = File.join(@output_dir, "users_#{@start_date}_#{@end_date}.csv")
+    accounts_file = File.join(@output_dir, "root_accounts_#{@start_date}_#{@end_date}.csv")
     metrics_file = File.join(@output_dir, "summary_metrics_#{@start_date}_#{@end_date}.json")
     errors_file = File.join(@output_dir, "errors_#{@start_date}_#{@end_date}.log")
 
@@ -75,66 +79,123 @@ class AIExperiencesReportGenerator
       total_conversations: 0,
       total_messages: 0,
       failed_conversations: 0,
+      employee_conversations: 0,
+      non_employee_conversations: 0,
+      total_message_characters: 0,
       accounts: Hash.new(0),
       users: Hash.new(0),
+      employee_users: Set.new,
+      non_employee_users: Set.new,
+      employee_sandbox_accounts: Set.new,
+      non_employee_sandbox_accounts: Set.new,
       date_range: { start: @start_date.to_s, end: @end_date.to_s }
     }
+
+    # Track unique users and accounts for separate files
+    users_data = {}
+    accounts_data = {}
 
     # Open CSV files
     CSV.open(conversations_file, "wb") do |conv_csv|
       CSV.open(messages_file, "wb") do |msg_csv|
-        File.open(errors_file, "w") do |error_log|
-          # Write headers
-          conv_csv << %w[
-            conversation_uuid
-            root_account_name
-            root_account_id
-            user_name
-            user_id
-            created_at
-            updated_at
-            message_count
-            user_message_count
-            assistant_message_count
-          ]
+        CSV.open(users_file, "wb") do |users_csv|
+          CSV.open(accounts_file, "wb") do |accounts_csv|
+            File.open(errors_file, "w") do |error_log|
+              # Write headers
+              conv_csv << %w[
+                conversation_uuid
+                root_account_name
+                root_account_id
+                user_name
+                user_id
+                is_employee
+                created_at
+                updated_at
+                message_count
+                user_message_count
+                assistant_message_count
+              ]
 
-          msg_csv << %w[
-            conversation_uuid
-            message_uuid
-            root_account_name
-            user_name
-            seq_num
-            role
-            created_at
-            text_length
-            text_preview
-          ]
+              msg_csv << %w[
+                conversation_uuid
+                message_uuid
+                root_account_name
+                user_name
+                seq_num
+                role
+                created_at
+                text_length
+                text_preview
+              ]
 
-          # Fetch and process conversations
-          offset = 0
-          loop do
-            puts "Fetching conversations #{offset} to #{offset + BATCH_SIZE}..."
+              users_csv << %w[
+                user_id
+                user_uuid
+                user_name
+                is_employee
+                conversation_count
+              ]
 
-            conversations = fetch_conversations(offset)
-            break if conversations.empty?
+              accounts_csv << %w[
+                account_id
+                account_uuid
+                account_name
+                external_status
+                conversation_count
+              ]
 
-            conversations.each_with_index do |conv, idx|
-              process_conversation(conv, conv_csv, msg_csv, metrics)
+              # Fetch and process conversations
+              offset = 0
+              loop do
+                puts "Fetching conversations #{offset} to #{offset + BATCH_SIZE}..."
 
-              if (offset + idx + 1) % 50 == 0
-                puts "  Processed #{offset + idx + 1} conversations..."
+                conversations = fetch_conversations(offset)
+                break if conversations.empty?
+
+                # Pre-fetch metadata (accounts and shards) for this batch
+                prefetch_metadata(conversations)
+
+                conversations.each_with_index do |conv, idx|
+                  process_conversation(conv, conv_csv, msg_csv, metrics, users_data, accounts_data)
+
+                  if (offset + idx + 1) % 50 == 0
+                    puts "  Processed #{offset + idx + 1} conversations..."
+                  end
+
+                  sleep(RATE_LIMIT_DELAY) if RATE_LIMIT_DELAY > 0 # rubocop:disable Lint/NoSleep
+                rescue => e
+                  metrics[:failed_conversations] += 1
+                  error_log.puts "[#{Time.zone.now}] Error processing conversation #{conv["id"]}: #{e.message}"
+                  error_log.puts e.backtrace.join("\n  ")
+                  puts "  WARNING: Failed to process conversation #{conv["id"]}"
+                end
+
+                offset += BATCH_SIZE
+                break if conversations.size < BATCH_SIZE
               end
 
-              sleep(RATE_LIMIT_DELAY) if RATE_LIMIT_DELAY > 0 # rubocop:disable Lint/NoSleep
-            rescue => e
-              metrics[:failed_conversations] += 1
-              error_log.puts "[#{Time.zone.now}] Error processing conversation #{conv["id"]}: #{e.message}"
-              error_log.puts e.backtrace.join("\n  ")
-              puts "  WARNING: Failed to process conversation #{conv["id"]}"
-            end
+              # Write users data
+              users_data.values.sort_by { |u| -u[:conversation_count] }.each do |user_info|
+                users_csv << [
+                  user_info[:id],
+                  user_info[:uuid],
+                  user_info[:name],
+                  user_info[:is_employee],
+                  user_info[:conversation_count]
+                ]
+              end
 
-            offset += BATCH_SIZE
-            break if conversations.size < BATCH_SIZE
+              # Write accounts data
+              accounts_data.values.sort_by { |a| -a[:conversation_count] }.each do |account_info|
+                accounts_csv << [
+                  account_info[:id],
+                  account_info[:uuid],
+                  account_info[:name],
+                  account_info[:external_status],
+                  account_info[:conversation_count]
+                ]
+              end
+            end
           end
         end
       end
@@ -144,6 +205,13 @@ class AIExperiencesReportGenerator
     metrics[:avg_messages_per_conversation] =
       if metrics[:total_conversations] > 0
         (metrics[:total_messages].to_f / metrics[:total_conversations]).round(2)
+      else
+        0
+      end
+
+    metrics[:avg_message_length] =
+      if metrics[:total_messages] > 0
+        (metrics[:total_message_characters].to_f / metrics[:total_messages]).round(2)
       else
         0
       end
@@ -158,9 +226,20 @@ class AIExperiencesReportGenerator
                           .first(10)
                           .map { |name, count| { name:, conversation_count: count } }
 
-    # Remove raw counts
+    # Convert sets to counts
+    metrics[:employee_users_count] = metrics[:employee_users].size
+    metrics[:non_employee_users_count] = metrics[:non_employee_users].size
+    metrics[:employee_sandbox_accounts_count] = metrics[:employee_sandbox_accounts].size
+    metrics[:non_employee_sandbox_accounts_count] = metrics[:non_employee_sandbox_accounts].size
+
+    # Remove raw counts and sets
     metrics.delete(:accounts)
     metrics.delete(:users)
+    metrics.delete(:employee_users)
+    metrics.delete(:non_employee_users)
+    metrics.delete(:employee_sandbox_accounts)
+    metrics.delete(:non_employee_sandbox_accounts)
+    metrics.delete(:total_message_characters)
 
     # Write metrics file
     File.write(metrics_file, JSON.pretty_generate(metrics))
@@ -177,6 +256,8 @@ class AIExperiencesReportGenerator
     puts "Output files:"
     puts "  Conversations: #{conversations_file}"
     puts "  Messages: #{messages_file}"
+    puts "  Users: #{users_file}"
+    puts "  Root Accounts: #{accounts_file}"
     puts "  Metrics: #{metrics_file}"
     puts "  Errors: #{errors_file}" if metrics[:failed_conversations] > 0
   end
@@ -189,19 +270,22 @@ class AIExperiencesReportGenerator
   end
 
   def region_base_urls
-    # Get all configured region URLs
-    # Check for all llm_conversation_base_url settings
-    regions = Setting.where("name LIKE ?", "llm_conversation_base_url%").map do |setting|
-      { name: setting.name, url: setting.value }
-    end
+    @region_base_urls ||= begin
+      # Get all configured region URLs (prod only)
+      # Check for all llm_conversation_base_url settings
+      regions = Setting.where("name LIKE ?", "llm_conversation_base_url%").map do |setting|
+        { name: setting.name, url: setting.value }
+      end
 
-    # If no region-specific URLs, use default
-    if regions.empty?
-      default_url = Setting.get("llm_conversation_base_url", nil)
-      regions << { name: "default", url: default_url } if default_url
-    end
+      # Filter to only production URLs (must contain "-prod")
+      regions.select! do |region|
+        region[:url]&.include?("-prod")
+      end
 
-    regions
+      raise "No production llm_conversation_base_url settings found" if regions.empty?
+
+      regions
+    end
   end
 
   def fetch_conversations(offset)
@@ -234,8 +318,11 @@ class AIExperiencesReportGenerator
           data = JSON.parse(response.body)
           conversations = data["data"] || []
 
-          # Tag each conversation with its region for debugging
-          conversations.each { |conv| conv["_region"] = region_config[:name] }
+          # Tag each conversation with its region and URL
+          conversations.each do |conv|
+            conv["_region"] = region_config[:name]
+            conv["_base_url"] = base_url
+          end
 
           all_regions_conversations.concat(conversations)
           puts "    Found #{conversations.size} conversations"
@@ -246,10 +333,11 @@ class AIExperiencesReportGenerator
         puts "    ERROR: Failed to fetch from #{region_config[:name]}: #{e.message}"
       end
 
-      # Filter by date range in memory
+      # Filter by date range and exclude test users
+      test_user_ids = %w[user_jedi user_trekkie user_emperor]
       filtered = all_regions_conversations.select do |conv|
         created_at = Time.zone.parse(conv["created_at"])
-        created_at.between?(@start_date, @end_date + 1)
+        created_at.between?(@start_date, @end_date + 1) && !test_user_ids.include?(conv["user_id"])
       end
 
       puts ""
@@ -264,9 +352,9 @@ class AIExperiencesReportGenerator
     @all_conversations[offset, BATCH_SIZE] || []
   end
 
-  def fetch_messages(conversation_id, root_account_uuid)
-    # Determine which region this root account belongs to
-    base_url = get_base_url_for_account(root_account_uuid)
+  def fetch_messages(conversation_id, _root_account_uuid, conversation_base_url)
+    # Use the same base URL that the conversation was fetched from
+    base_url = conversation_base_url
 
     uri = URI("#{base_url}/conversations/#{conversation_id}/messages")
 
@@ -286,32 +374,15 @@ class AIExperiencesReportGenerator
     data["data"] || []
   end
 
-  def get_base_url_for_account(root_account_uuid)
-    # Find the account to determine its region
-    account = lookup_account(root_account_uuid)
+  def process_conversation(conv, conv_csv, msg_csv, metrics, users_data, accounts_data)
+    # Get cached metadata
+    metadata = @conversation_metadata[conv["id"]] || {}
+    account = metadata[:account]
+    user = metadata[:user]
+    is_employee = metadata[:is_employee]
 
-    return Setting.get("llm_conversation_base_url", nil) unless account
-
-    # Try to get region-specific URL based on account's shard
-    shard = account.shard
-    region = shard&.database_server&.id
-
-    if region
-      url = Setting.get("llm_conversation_base_url_#{region}", nil)
-      return url if url
-    end
-
-    # Fallback to default
-    Setting.get("llm_conversation_base_url", nil)
-  end
-
-  def process_conversation(conv, conv_csv, msg_csv, metrics)
-    # Lookup Canvas data
-    account = lookup_account(conv["root_account_id"])
-    user = lookup_user(conv["user_id"])
-
-    # Fetch messages (region-aware)
-    messages = fetch_messages(conv["id"], conv["root_account_id"])
+    # Fetch messages from the same region URL that the conversation came from
+    messages = fetch_messages(conv["id"], conv["root_account_id"], conv["_base_url"])
 
     # Count messages by role
     user_message_count = messages.count { |m| !m["is_llm_message"] }
@@ -324,6 +395,7 @@ class AIExperiencesReportGenerator
       account&.id || "N/A",
       user&.name || "Unknown",
       user&.id || "N/A",
+      is_employee,
       conv["created_at"],
       conv["updated_at"],
       messages.size,
@@ -352,34 +424,128 @@ class AIExperiencesReportGenerator
     metrics[:total_messages] += messages.size
     metrics[:accounts][account&.name || "Unknown"] += 1
     metrics[:users][user&.name || "Unknown"] += 1
+
+    # Track employee vs non-employee
+    if is_employee
+      metrics[:employee_conversations] += 1
+    else
+      metrics[:non_employee_conversations] += 1
+    end
+
+    # Track message character count
+    messages.each do |msg|
+      text = msg["text"] || ""
+      metrics[:total_message_characters] += text.length
+    end
+
+    # Track unique users by employee status
+    if user
+      if is_employee
+        metrics[:employee_users].add(user.uuid)
+      else
+        metrics[:non_employee_users].add(user.uuid)
+      end
+    end
+
+    # Track unique accounts by sandbox status
+    if account
+      if account.external_status == "employee_sandbox"
+        metrics[:employee_sandbox_accounts].add(account.uuid)
+      else
+        metrics[:non_employee_sandbox_accounts].add(account.uuid)
+      end
+    end
+
+    # Track user data
+    if user
+      user_key = user.uuid
+      users_data[user_key] ||= {
+        id: user.id,
+        uuid: user.uuid,
+        name: user.name,
+        is_employee:,
+        conversation_count: 0
+      }
+      users_data[user_key][:conversation_count] += 1
+    end
+
+    # Track account data
+    if account
+      account_key = account.uuid
+      accounts_data[account_key] ||= {
+        id: account.id,
+        uuid: account.uuid,
+        name: account.name,
+        external_status: account.external_status,
+        conversation_count: 0
+      }
+      accounts_data[account_key][:conversation_count] += 1
+    end
+  end
+
+  # Pre-fetch accounts and users for a batch of conversations
+  # Groups by shard to minimize shard activations and enable batch queries
+  def prefetch_metadata(conversations)
+    puts "  Pre-fetching metadata for #{conversations.size} conversations..."
+
+    # Step 1: Fetch all accounts (batch) and group conversations by shard
+    account_uuids = conversations.filter_map { |c| c["root_account_id"] if c["root_account_id"] != "default" }.uniq
+    accounts_by_uuid = Account.where(uuid: account_uuids).index_by(&:uuid)
+
+    # Cache accounts
+    accounts_by_uuid.each { |uuid, account| @account_cache[uuid] = account }
+
+    # Step 2: Group conversations by shard based on their account
+    conversations_by_shard = Hash.new { |h, k| h[k] = [] }
+
+    conversations.each do |conv|
+      account = lookup_account(conv["root_account_id"])
+      shard = account&.shard || Shard.default
+
+      conversations_by_shard[shard] << conv
+
+      @conversation_metadata[conv["id"]] = {
+        account:,
+        shard:,
+        user_id: conv["user_id"],
+        user: nil, # Will be populated in step 3
+        is_employee: account&.external_status == "employee_sandbox" # Check account first
+      }
+    end
+
+    # Step 3: Batch-fetch users per shard and check if they're site admins
+    conversations_by_shard.each do |shard, shard_conversations|
+      user_uuids = shard_conversations.filter_map { |c| c["user_id"] if c["user_id"] != "anonymous" }.uniq
+      next if user_uuids.empty?
+
+      users_by_uuid = shard.activate do
+        User.where(uuid: user_uuids).index_by(&:uuid)
+      end
+
+      # Update metadata with users and check site admin status
+      shard_conversations.each do |conv|
+        user_uuid = conv["user_id"]
+        user = users_by_uuid[user_uuid]
+        @user_cache[user_uuid] = user if user
+        @conversation_metadata[conv["id"]][:user] = user
+
+        # Check if user is a site admin (employee) - only if not already marked as employee
+        next unless user && !@conversation_metadata[conv["id"]][:is_employee]
+
+        is_site_admin = Account.site_admin.shard.activate do
+          Account.site_admin.users.where(id: user.id).exists?
+        end
+        @conversation_metadata[conv["id"]][:is_employee] = is_site_admin
+      end
+    end
+
+    puts "    Loaded #{accounts_by_uuid.size} accounts and #{@user_cache.size} users across #{conversations_by_shard.size} shards"
   end
 
   def lookup_account(uuid)
     return nil if uuid.nil? || uuid == "default"
 
-    @account_cache[uuid] ||= begin
-      # Search across all shards for the account
-      account = nil
-      Shard.with_each_shard do
-        account = Account.find_by(uuid:)
-        break if account
-      end
-      account
-    end
-  end
-
-  def lookup_user(uuid)
-    return nil if uuid.nil? || uuid == "anonymous"
-
-    @user_cache[uuid] ||= begin
-      # Search across all shards for the user
-      user = nil
-      Shard.with_each_shard do
-        user = User.find_by(uuid:)
-        break if user
-      end
-      user
-    end
+    @account_cache[uuid] ||= Account.find_by(uuid:)
   end
 end
 

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useMemo} from 'react'
+import React, {useEffect, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -29,11 +29,18 @@ import type {BaseWidgetProps, Announcement} from '../../../types'
 import {useAnnouncementsPaginated} from '../../../hooks/useAnnouncements'
 import {useWidgetDashboard} from '../../../hooks/useWidgetDashboardContext'
 import {FilterOption} from './utils'
+import {useWidgetConfig} from '../../../hooks/useWidgetConfig'
 
 const I18n = createI18nScope('widget_dashboard')
 
-const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false}) => {
-  const [filter, setFilter] = useState<FilterOption>('unread')
+const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({
+  widget,
+  isEditMode = false,
+  dragHandleProps,
+}) => {
+  const {sharedCourseData} = useWidgetDashboard()
+
+  const [filter, setFilter] = useWidgetConfig<FilterOption>(widget.id, 'filter', 'unread')
 
   const {
     currentPage,
@@ -56,8 +63,6 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = fa
   const handleFilterChange = (newFilter: FilterOption) => {
     setFilter(newFilter)
   }
-
-  const {sharedCourseData} = useWidgetDashboard()
 
   const enrichedAnnouncements = useMemo(() => {
     const filteredAnnouncements = currentPage?.announcements || []
@@ -139,6 +144,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = fa
     <TemplateWidget
       widget={widget}
       isEditMode={isEditMode}
+      dragHandleProps={dragHandleProps}
       isLoading={isLoading}
       error={error ? I18n.t('Failed to load announcements. Please try again.') : null}
       onRetry={refetch}

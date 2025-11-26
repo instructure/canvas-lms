@@ -45,7 +45,7 @@ function SubAccountProgressBar({message, completion}) {
 }
 SubAccountProgressBar.propTypes = {
   message: PropTypes.string,
-  completion: ProgressBar.propTypes.completion,
+  completion: ProgressBar.propTypes.progress,
 }
 
 export default function ThemeEditorModal(props) {
@@ -78,8 +78,8 @@ export default function ThemeEditorModal(props) {
           <div>
             <p>{I18n.t('Changes will still apply if you leave this page.')}</p>
             <ul className="unstyled_list">
-              {props.activeSubAccountProgresses.map(progressData => (
-                <SubAccountProgressBar {...progressData} />
+              {props.activeSubAccountProgresses.map((progressData, i) => (
+                <SubAccountProgressBar key={i} {...progressData} />
               ))}
             </ul>
           </div>

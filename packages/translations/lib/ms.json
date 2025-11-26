@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Nama fail"
     },
+    "file_preview_21667a6e": {
+        "message": "Pratonton fail"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Pratonton fail untuk { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Melebihi kuota storan fail"
     },

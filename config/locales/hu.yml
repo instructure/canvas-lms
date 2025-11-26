@@ -3574,6 +3574,7 @@ hu:
   assignment_d8387b78: feladat
   assignment_dates_dccc98de: "Feladat dátumai"
   assignment_dates_saved_successfully_78e0f355: "A Feladat dátumok sikeresen elmentve."
+  assignment_details_bc488179: "Feladat részletek"
   assignment_details_collapsed_55b67150: "feladat részletei elrejtve"
   assignment_details_dialog: 
     average_score: "Átlagos pontszám:"
@@ -23052,6 +23053,7 @@ hu:
         quiz_engine: "Kvíz motor"
         quiz_group: Csoport
         quiz_name: "Kvíz neve"
+        quiz_type: "Kvíz típusa"
         topic_name: "Téma neve"
         url: Link
         wiki_page_name: "Oldal neve"
@@ -24031,6 +24033,7 @@ hu:
       graded: értékelve
       submitted: beadva
       unsubmitted: "nincs beadva"
+  submission_7ca566e1: Beadás
   submission_action_take_quiz: "%{title} kitöltése"
   submission_action_turn_in_assignment: "%{title} bekapcsolása"
   submission_added_title_50ebdc85: "beadandó hozzáadva:%{title}"

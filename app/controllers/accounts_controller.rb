@@ -1573,6 +1573,10 @@ class AccountsController < ApplicationController
                }
              })
       js_env(edit_help_links_env, true)
+      if @account.root_account?
+        js_env(EARLY_ACCESS_PROGRAM: @account.early_access_program[:value] ||
+                                     @account.grants_right?(@current_user, :manage_site_settings))
+      end
     end
   end
 

@@ -389,6 +389,44 @@ describe('api actions', () => {
       expect(capturedUrls[3]).toMatch(expectedParams)
     })
 
+    it('adds account calendars and all_courses flags for regular dashboard users (no observee, no singleCourse)', async () => {
+      const today = moment.tz('UTC').startOf('day')
+      const capturedUrls = []
+
+      server.use(
+        http.get(/\/api\/v1\/planner\/items/, ({request}) => {
+          capturedUrls.push(request.url)
+          return HttpResponse.json([{plannable_date: '2017-05-01T:00:00:00Z'}])
+        }),
+        http.get(/dashboard_cards/, ({request}) => {
+          capturedUrls.push(request.url)
+          return HttpResponse.json([
+            {id: '11', assetString: 'course_11'},
+            {id: '12', assetString: 'course_12'},
+          ])
+        }),
+      )
+
+      const mockUiManager = {
+        setStore: jest.fn(),
+        handleAction: jest.fn(),
+        uiStateUnchanged: jest.fn(),
+      }
+
+      const store = configureStore(mockUiManager, {
+        ...getBasicState(),
+        selectedObservee: null,
+        singleCourse: false,
+      })
+
+      await store.dispatch(Actions.getWeeklyPlannerItems(today))
+
+      const expectedParams = /include%5B%5D=account_calendars&include%5B%5D=all_courses/
+      expect(capturedUrls[1]).toMatch(expectedParams)
+      expect(capturedUrls[2]).toMatch(expectedParams)
+      expect(capturedUrls[3]).toMatch(expectedParams)
+    })
+
     it('does not add the account calendars flag if state contains selected observee in singleCourse mode', async () => {
       const today = moment.tz('UTC').startOf('day')
       const capturedUrls = []

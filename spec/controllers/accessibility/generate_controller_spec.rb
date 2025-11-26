@@ -169,18 +169,18 @@ RSpec.describe Accessibility::GenerateController do
       allow(course).to receive(:a11y_checker_enabled?).and_return(true)
     end
 
-    it "renders unauthorized if a11y_checker_enabled is not enabled" do
+    it "renders forbidden if a11y_checker_enabled is not enabled" do
       allow(course).to receive(:a11y_checker_enabled?).and_return(false)
 
-      expect(controller).to receive(:render_unauthorized_action)
+      expect(controller).to receive(:render).with(status: :forbidden)
 
       controller.send(:check_authorized_action)
     end
 
-    it "renders unauthorized if AI generation feature flag is disabled" do
+    it "renders forbidden if AI generation feature flag is disabled" do
       Account.site_admin.disable_feature!(:a11y_checker_ai_generation)
 
-      expect(controller).to receive(:render_unauthorized_action)
+      expect(controller).to receive(:render).with(status: :forbidden)
 
       controller.send(:check_authorized_action)
     end

@@ -975,6 +975,95 @@ describe AssignmentVisibility::AssignmentVisibilityService do
       let(:second_student) { User.create! }
       let(:fake_student) { User.create! }
 
+      describe ".visible_assignment_ids_in_course_by_user" do
+        let(:assignment_only_visible_to_overrides) do
+          assignment = course.assignments.create!({
+                                                    only_visible_to_overrides: true,
+                                                    points_possible: 5,
+                                                    submission_types: "online_text_entry",
+                                                    title: "assignment only visible to overrides"
+                                                  })
+          override = assignment.assignment_overrides.create!(set_type: "ADHOC")
+          override.assignment_override_students.create!(user: first_student)
+          assignment.publish
+          assignment.save!
+          assignment
+        end
+
+        let(:third_assignment) do
+          assignment = course.assignments.create!({
+                                                    only_visible_to_overrides: false,
+                                                    points_possible: 10,
+                                                    submission_types: "online_text_entry",
+                                                    title: "third assignment"
+                                                  })
+          assignment.publish
+          assignment.save!
+          assignment
+        end
+
+        it "returns all visible assignment ids when assignment_ids parameter is not provided" do
+          assignment
+          assignment_only_visible_to_overrides
+          third_assignment
+
+          result = AssignmentVisibility::AssignmentVisibilityService
+                   .visible_assignment_ids_in_course_by_user(
+                     user_ids: [first_student.id, second_student.id],
+                     course_ids: course.id
+                   )
+
+          expect(result[first_student.id]).to match_array([assignment.id, assignment_only_visible_to_overrides.id, third_assignment.id])
+          expect(result[second_student.id]).to match_array([assignment.id, third_assignment.id])
+        end
+
+        it "filters visible assignment ids when assignment_ids parameter is provided" do
+          assignment
+          assignment_only_visible_to_overrides
+          third_assignment
+
+          result = AssignmentVisibility::AssignmentVisibilityService
+                   .visible_assignment_ids_in_course_by_user(
+                     user_ids: [first_student.id, second_student.id],
+                     course_ids: course.id,
+                     assignment_ids: [assignment.id, assignment_only_visible_to_overrides.id]
+                   )
+
+          expect(result[first_student.id]).to match_array([assignment.id, assignment_only_visible_to_overrides.id])
+          expect(result[second_student.id]).to match_array([assignment.id])
+          expect(result[first_student.id]).not_to include(third_assignment.id)
+          expect(result[second_student.id]).not_to include(third_assignment.id)
+        end
+
+        it "returns empty arrays for users with no visibility to requested assignments" do
+          assignment_only_visible_to_overrides
+
+          result = AssignmentVisibility::AssignmentVisibilityService
+                   .visible_assignment_ids_in_course_by_user(
+                     user_ids: [second_student.id],
+                     course_ids: course.id,
+                     assignment_ids: [assignment_only_visible_to_overrides.id]
+                   )
+
+          expect(result[second_student.id]).to eq([])
+        end
+
+        it "handles users with access to some but not all requested assignments" do
+          assignment
+          assignment_only_visible_to_overrides
+
+          result = AssignmentVisibility::AssignmentVisibilityService
+                   .visible_assignment_ids_in_course_by_user(
+                     user_ids: [first_student.id, second_student.id],
+                     course_ids: course.id,
+                     assignment_ids: [assignment.id, assignment_only_visible_to_overrides.id]
+                   )
+
+          expect(result[first_student.id]).to match_array([assignment.id, assignment_only_visible_to_overrides.id])
+          expect(result[second_student.id]).to match_array([assignment.id])
+        end
+      end
+
       describe ".assignments_with_user_visibilities" do
         let(:assignment_only_visible_to_overrides) do
           assignment = course.assignments.create!({

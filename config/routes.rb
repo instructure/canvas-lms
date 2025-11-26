@@ -2552,6 +2552,7 @@ CanvasRails::Application.routes.draw do
         put "#{prefix}/flags/:feature", action: :update
         delete "#{prefix}/flags/:feature", action: :delete
       end
+      post "accounts/:account_id/features/early_access_program", action: :accept_early_access_terms
       get "features/environment", action: :environment
     end
 
@@ -3155,6 +3156,7 @@ CanvasRails::Application.routes.draw do
       get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
       post "registrations", action: :create, as: :create_lti_registration
       put "registrations/:registration_id", action: :update, as: :update_lti_registration
+      get "registrations/:registration_id", action: :show_configuration, as: :get_lti_registration
     end
 
     # Public JWK Service

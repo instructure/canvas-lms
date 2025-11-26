@@ -15,14 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-  useState,
-  useContext,
-  useEffect,
-} from 'react'
+import React, {forwardRef, useImperativeHandle, useRef, useState, useEffect} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -32,7 +25,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {AccessibilityCheckerContext} from '../../../contexts/AccessibilityCheckerContext'
+import {useAccessibilityCheckerContext} from '../../../hooks/useAccessibilityCheckerContext'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
@@ -57,7 +50,7 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
       ref,
     ) => {
       const [generateLoading, setGenerateLoading] = useState(false)
-      const {selectedItem} = useContext(AccessibilityCheckerContext)
+      const {selectedItem} = useAccessibilityCheckerContext()
       const inputRef = useRef<HTMLInputElement | null>(null)
       const [generationError, setGenerationError] = useState<string | null>(null)
       const isAiGenerationEnabled = useAccessibilityScansStore(

@@ -21,6 +21,7 @@ import type {ConfirmationStateType} from '../DynamicRegistrationWizardState'
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import {ReviewScreen} from '../../registration_wizard_forms/ReviewScreen'
 import type {LtiPlacement} from '../../model/LtiPlacement'
+import {filterPlacementObjectsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
 export type ReviewScreenWrapperProps = {
   registration: LtiRegistrationWithConfiguration
@@ -41,10 +42,12 @@ export const ReviewScreenWrapper = ({
   // optional, not nullable, so we have to do this weird thing to make TS happy.
   const privacyLevel =
     overlayState.overlay.privacy_level ?? registration.configuration.privacy_level ?? 'anonymous'
+
+  const enabledPlacements = registration.configuration.placements.filter(
+    p => !overlayState.overlay.disabled_placements?.includes(p.placement),
+  )
   const placements =
-    registration.configuration.placements
-      .filter(p => !overlayState.overlay.disabled_placements?.includes(p.placement))
-      ?.map(p => p.placement) ?? []
+    filterPlacementObjectsByFeatureFlags(enabledPlacements)?.map(p => p.placement) ?? []
 
   const toolName = overlayState.adminNickname ?? registration.name ?? ''
   const description = overlayState.overlay.description ?? undefined

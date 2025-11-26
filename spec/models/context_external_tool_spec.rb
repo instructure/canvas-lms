@@ -116,7 +116,7 @@ describe ContextExternalTool do
       expect(Sentry).to receive(:with_scope).and_yield(sentry_scope)
       expect(sentry_scope).to receive(:set_tags).with(context_id: account.global_id)
       expect(sentry_scope).to receive(:set_tags).with(lti_registration_id: tool.lti_registration.global_id)
-      expect(sentry_scope).to receive(:set_context).with("tool", tool.global_id)
+      expect(sentry_scope).to receive(:set_context).with("tool", { global_id: tool.global_id })
 
       expect(tool.available_in_context?(account)).to be true
     end
@@ -2428,6 +2428,28 @@ describe ContextExternalTool do
         }
         tool.save!
         expect(tool.has_placement?(:link_selection)).to be true
+      end
+    end
+
+    describe "#uses_cached_placements?" do
+      it "returns true when tool has course_navigation placement" do
+        tool = external_tool_model(context: @course, placements: [:course_navigation])
+        expect(tool.uses_cached_placements?).to be true
+      end
+
+      it "returns true when tool has account_navigation placement" do
+        tool = external_tool_model(context: @course, placements: [:account_navigation])
+        expect(tool.uses_cached_placements?).to be true
+      end
+
+      it "returns true when tool has user_navigation placement" do
+        tool = external_tool_model(context: @course, placements: [:user_navigation])
+        expect(tool.uses_cached_placements?).to be true
+      end
+
+      it "returns false when tool has no navigation placements" do
+        tool = external_tool_model(context: @course, placements: [:assignment_selection, :editor_button])
+        expect(tool.uses_cached_placements?).to be false
       end
     end
 

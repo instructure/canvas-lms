@@ -1075,6 +1075,7 @@ class Lti::RegistrationsController < ApplicationController
     # Inject feature flags for LTI registrations
     js_env({
              LTI_REGISTRATIONS_HISTORY: @account.root_account.feature_enabled?(:lti_registrations_history),
+             LTI_DR_REGISTRATIONS_UPDATE: @account.root_account.feature_enabled?(:lti_dr_registrations_update),
              ACCOUNT_GLOBAL_ID: @account.global_id
            })
     render :index
@@ -1237,13 +1238,24 @@ class Lti::RegistrationsController < ApplicationController
       includes = [:account_binding, :configuration] + Array(params[:include]).map(&:to_sym)
       account_binding = registration.account_binding_for(@context)
       overlay = registration.overlay_for(@context) if includes.include?(:overlay)
+
+      # Load pending update information if feature flag is enabled
+      pending_update = nil
+      if Account.site_admin.feature_enabled?(:lti_dr_registrations_update)
+        pending_update = Lti::RegistrationUpdateRequest.where(lti_registration: registration)
+                                                       .pending
+                                                       .order(created_at: :desc)
+                                                       .first
+      end
+
       render json: lti_registration_json(registration,
                                          @current_user,
                                          session,
                                          @context,
                                          includes:,
                                          account_binding:,
-                                         overlay:)
+                                         overlay:,
+                                         pending_update:)
     end
   rescue => e
     report_error(e)
@@ -1590,6 +1602,13 @@ class Lti::RegistrationsController < ApplicationController
       course_scope = course_scope.where("name ILIKE :s OR sis_source_id ILIKE :s OR course_code ILIKE :s", s: "%#{search_term}%")
     end
 
+    # If search_term can't be parsed as an integer, to_i returns zero.
+    search_term_int = search_term&.to_i
+    if search_term_int&.positive?
+      account_scope = account_scope.or(Account.active.where(id: search_term_int))
+      course_scope = course_scope.or(Course.active.where(id: search_term_int))
+    end
+
     accounts = account_scope.limit(20)
     courses = course_scope.limit(20)
 
@@ -1832,7 +1851,7 @@ class Lti::RegistrationsController < ApplicationController
     render_error("invalid_page", "page param should be an integer") unless params[:page].nil? || params[:page].to_i > 0
     render_error("invalid_dir", "dir param should be asc, desc, or empty") unless ["asc", "desc", nil].include?(params[:dir])
 
-    valid_sort_fields = %w[name nickname lti_version installed installed_by updated_by updated on]
+    valid_sort_fields = %w[name nickname lti_version installed installed_by updated_by updated on status]
     render_error("invalid_sort", "#{params[:sort]} is not a valid field for sorting") unless [*valid_sort_fields, nil].include?(params[:sort])
   end
 

@@ -211,6 +211,7 @@ describe('PlacementsConfirmation', () => {
       fakeENV.setup({
         FEATURES: {
           increased_top_nav_pane_size: true,
+          top_navigation_placement: true,
         },
       })
     })
@@ -361,5 +362,71 @@ describe('PlacementsConfirmation', () => {
     for (const placement of placements) {
       expect(screen.getByText(i18nLtiPlacement(placement))).toBeInTheDocument()
     }
+  })
+
+  describe('when top_navigation_placement feature flag is disabled', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {
+          top_navigation_placement: false,
+        },
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('does not show top_navigation placement even if tool requested it', () => {
+      const config = mockConfigWithPlacements([
+        LtiPlacements.TopNavigation,
+        LtiPlacements.CourseNavigation,
+      ])
+      const reg = mockRegistration({}, config)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
+
+      render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
+
+      // Top Navigation should not appear but Course Navigation should still appear
+      expect(
+        screen.queryByLabelText(i18nLtiPlacement(LtiPlacements.TopNavigation)),
+      ).not.toBeInTheDocument()
+      expect(
+        screen.getByLabelText(i18nLtiPlacement(LtiPlacements.CourseNavigation)),
+      ).toBeInTheDocument()
+    })
+  })
+
+  describe('when top_navigation_placement feature flag is enabled', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {
+          top_navigation_placement: true,
+        },
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('shows top_navigation placement when tool requests it', () => {
+      const config = mockConfigWithPlacements([
+        LtiPlacements.TopNavigation,
+        LtiPlacements.CourseNavigation,
+      ])
+      const reg = mockRegistration({}, config)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
+
+      render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
+
+      // Both placements should appear
+      expect(
+        screen.getByLabelText(i18nLtiPlacement(LtiPlacements.TopNavigation)),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByLabelText(i18nLtiPlacement(LtiPlacements.CourseNavigation)),
+      ).toBeInTheDocument()
+    })
   })
 })

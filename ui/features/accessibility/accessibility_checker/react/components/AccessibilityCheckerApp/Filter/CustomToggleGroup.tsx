@@ -32,7 +32,7 @@ import type {ExpandableToggleProps} from '@instructure/ui-expandable'
 import {isActiveElement} from '@instructure/ui-dom-utils'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import {IconArrowOpenEndSolid, IconArrowOpenDownSolid} from '@instructure/ui-icons'
+import {IconArrowOpenUpSolid, IconArrowOpenDownSolid} from '@instructure/ui-icons'
 import {ToggleGroup, type ToggleGroupProps} from '@instructure/ui-toggle-details'
 
 // Adapted from @instructure/ui-toggle-details/src/ToggleGroup/index.tsx
@@ -43,8 +43,8 @@ class CustomToggleGroup extends Component<ToggleGroupProps> {
 
   static defaultProps = {
     size: 'medium',
-    icon: IconArrowOpenEndSolid,
-    iconExpanded: IconArrowOpenDownSolid,
+    icon: IconArrowOpenDownSolid,
+    iconExpanded: IconArrowOpenUpSolid,
     defaultExpanded: false,
     transition: true,
     as: 'span',

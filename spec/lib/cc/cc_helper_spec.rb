@@ -368,10 +368,10 @@ describe CC::CCHelper do
           "points_possible" => 10,
           "answers" => [{ "id" => 1 }, { "id" => 2 }],
         }
-        @question = @bank.assessment_questions.create!(question_data:, current_user: @teacher)
+        @question = @bank.assessment_questions.create!(question_data:, updating_user: @teacher)
         @question.question_data = question_data.merge("question_text" => %(<p><img src="/courses/#{@course.id}/files/#{@attachment.id}/download"></p>))
         @question.save!
-        quiz_model(course: @course, saving_user: @teacher)
+        quiz_model(course: @course, updating_user: @teacher)
         @quiz.add_assessment_questions([@question])
       end
 
@@ -390,7 +390,7 @@ describe CC::CCHelper do
         qb_attachment = @question.attachments.take
         question_text = %(<p><img src="/assessment_questions/#{@question.id}/files/#{qb_attachment.id}/download?verifier=#{qb_attachment.uuid}&amp;verifier=random_other_att_verifier" alt="5e9toe-2.jpeg" /></p>)
         @question.question_data = @question.question_data = question_data.merge("question_text" => question_text)
-        @question.current_user = @teacher
+        @question.updating_user = @teacher
         @question.save!
         translated = @exporter.html_content(question_text)
         expect(translated).to match %r{\$IMS-CC-FILEBASE\$/assessment_questions/test%20my%20file\?%20hai!&amp;.png}

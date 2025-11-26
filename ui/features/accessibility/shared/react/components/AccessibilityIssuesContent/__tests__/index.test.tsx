@@ -83,9 +83,8 @@ describe('AccessibilityIssuesDrawerContent', () => {
     jest.clearAllMocks()
   })
 
-  it('renders the title and issue counter', async () => {
+  it('renders the issue counter', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
-    expect(await screen.findByText('Multi Issue Test Page')).toBeInTheDocument()
     expect(screen.getByText(/Issue 1\/2:/)).toBeInTheDocument()
   })
 
@@ -238,6 +237,8 @@ describe('AccessibilityIssuesDrawerContent', () => {
 
       const textarea = screen.getByTestId('checkbox-text-input-form')
       await userEvent.type(textarea, '1')
+      const saveButton = screen.getByTestId('save-and-next-button')
+      await userEvent.click(saveButton)
 
       await waitFor(() => {
         expect(screen.getAllByText('Test error')[0]).toBeInTheDocument()

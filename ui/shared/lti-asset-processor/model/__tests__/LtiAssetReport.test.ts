@@ -77,6 +77,10 @@ describe('GetLtiAssetReportsResult', () => {
             title: '',
           },
         ],
+        pageInfo: {
+          hasNextPage: false,
+          __typename: 'PageInfo',
+        },
       },
     },
   }

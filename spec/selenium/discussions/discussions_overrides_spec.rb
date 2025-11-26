@@ -116,7 +116,6 @@ describe "discussions overrides" do
 
   describe "Differentiation Tags" do
     before do
-      Account.site_admin.enable_feature! :discussion_create
       course_with_teacher_logged_in
       @course.account.tap do |a|
         a.settings[:allow_assign_to_differentiation_tags] = { value: true }

@@ -101,7 +101,7 @@ describe('ImageBlockSettings', () => {
   describe('alt text', () => {
     it('integrates, changing the state', async () => {
       const component = renderBlock(ImageBlockSettings, {...defaultProps, altText: 'text'})
-      const input = component.getByRole('textbox', {name: /Alt text/i}) as HTMLInputElement
+      const input = component.getByTestId('image-alt-text-input') as HTMLInputElement
       expect(input.value).toBe('text')
       await userEvent.clear(input)
       await userEvent.type(input, 'New text')
@@ -179,7 +179,7 @@ describe('ImageBlockSettings', () => {
         }),
       )
       const component = renderBlock(ImageBlockSettings, defaultProps)
-      expect(component.queryByText(/Regenerate Alt Text/i)).not.toBeInTheDocument()
+      expect(component.queryByText(/\(Re\)generate Alt Text/i)).not.toBeInTheDocument()
     })
 
     it('does not show when AI alt text URL is empty string', () => {
@@ -189,7 +189,7 @@ describe('ImageBlockSettings', () => {
         }),
       )
       const component = renderBlock(ImageBlockSettings, defaultProps)
-      expect(component.queryByText(/Regenerate Alt Text/i)).not.toBeInTheDocument()
+      expect(component.queryByText(/\(Re\)generate Alt Text/i)).not.toBeInTheDocument()
     })
 
     it('shows when AI alt text URL is available', () => {
@@ -199,7 +199,7 @@ describe('ImageBlockSettings', () => {
         }),
       )
       const component = renderBlock(ImageBlockSettings, defaultProps)
-      expect(component.getByText(/Regenerate Alt Text/i)).toBeInTheDocument()
+      expect(component.getByText(/\(Re\)generate Alt Text/i)).toBeInTheDocument()
     })
 
     it('is disabled when image is decorative', () => {
@@ -209,7 +209,7 @@ describe('ImageBlockSettings', () => {
         }),
       )
       const component = renderBlock(ImageBlockSettings, {...defaultProps, decorativeImage: true})
-      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+      const button = component.getByTestId('generate-alt-text-button')
       expect(button).toBeDisabled()
     })
 
@@ -220,7 +220,7 @@ describe('ImageBlockSettings', () => {
         }),
       )
       const component = renderBlock(ImageBlockSettings, {...defaultProps, attachmentId: undefined})
-      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+      const button = component.getByTestId('generate-alt-text-button')
       expect(button).toBeDisabled()
     })
 
@@ -231,7 +231,7 @@ describe('ImageBlockSettings', () => {
         }),
       )
       const component = renderBlock(ImageBlockSettings, {...defaultProps, fileName: ''})
-      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+      const button = component.getByTestId('generate-alt-text-button')
       expect(button).toBeDisabled()
     })
 
@@ -247,8 +247,8 @@ describe('ImageBlockSettings', () => {
         ...defaultProps,
         altText: 'Original alt text',
       })
-      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
-      const altTextInput = component.getByRole('textbox', {name: /Alt text/i}) as HTMLInputElement
+      const button = component.getByTestId('generate-alt-text-button')
+      const altTextInput = component.getByTestId('image-alt-text-input') as HTMLInputElement
 
       expect(altTextInput.value).toBe('Original alt text')
 
@@ -285,14 +285,14 @@ describe('ImageBlockSettings', () => {
       )
 
       const component = renderBlock(ImageBlockSettings, defaultProps)
-      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+      const button = component.getByTestId('generate-alt-text-button')
 
       await userEvent.click(button)
 
-      expect(component.getByText(/Generating\.\.\./i)).toBeInTheDocument()
+      expect(button).toHaveTextContent(/Generating Alt Text\.\.\./i)
 
       await waitFor(() => {
-        expect(component.getByText(/Regenerate Alt Text/i)).toBeInTheDocument()
+        expect(button).toHaveTextContent(/\(Re\)generate Alt Text/i)
       })
     })
   })

@@ -68,6 +68,11 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "early_access_program": {
+#           "description": "Indicates the feature is part of the Early Access Program.",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "autoexpand": {
 #           "description": "Whether the details of the feature are autoexpanded on page load vs. the user clicking to expand.",
 #            "example": true,
@@ -274,6 +279,15 @@ class FeatureFlagsController < ApplicationController
         prior_state = current_flag.state
       end
 
+      # check whether the feature is early access (and the EAP has not been accepted)
+      if feature_def.early_access_program &&
+         params[:state] != "off" &&
+         @context.respond_to?(:root_account) &&
+         !@context.root_account.early_access_program[:value] &&
+         !@context.root_account.grants_right?(@current_user, :manage_site_settings)
+        return render json: { message: "This feature requires acceptance of the terms of the Early Access Program. See #{account_settings_url(anchor: "tab-features")}" }, status: :forbidden
+      end
+
       # require site admin privileges to unhide a hidden feature
       if !current_flag && feature_def.hidden?
         return render json: { message: "invalid feature" }, status: :bad_request unless Account.site_admin.grants_right?(@current_user, session, :read)
@@ -301,6 +315,20 @@ class FeatureFlagsController < ApplicationController
         render json: feature_flag_json(new_flag, @context, @current_user, session)
       else
         render json: new_flag.errors, status: :bad_request
+      end
+    end
+  end
+
+  # @{not an}API Accept Early Access Program Terms and Conditions
+  def accept_early_access_terms
+    raise ActiveRecord::RecordNotFound unless @context.is_a?(Account) && @context.root_account?
+
+    if authorized_action(@context, @current_user, :manage_feature_flags)
+      @context.settings[:early_access_program] = { value: true }
+      if @context.save
+        render json: { early_access_program: true }
+      else
+        render json: { errors: @context.errors }, status: :unprocessable_entity
       end
     end
   end

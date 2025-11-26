@@ -47,6 +47,7 @@ module MasterCourses
 
   CONTENT_TYPES_FOR_DELETIONS = (ALLOWED_CONTENT_TYPES - ["Wiki"]).freeze
   CONTENT_TYPES_FOR_UNSYNCED_CHANGES = (ALLOWED_CONTENT_TYPES - ["Wiki"] + ["Folder"]).freeze
+  SUB_TYPES_FOR_DELETIONS = ["Lti::AssetProcessor"].freeze
 
   MIGRATION_ID_PREFIX = "mastercourse_"
 

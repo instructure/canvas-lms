@@ -197,6 +197,19 @@ export const defaultGraphQLHandlers = [
       },
     })
   }),
+
+  // Handle UpdateWidgetDashboardConfig mutation
+  graphql.mutation('UpdateWidgetDashboardConfig', ({variables}) => {
+    return HttpResponse.json({
+      data: {
+        updateWidgetDashboardConfig: {
+          widgetId: variables.widgetId,
+          filters: variables.filters,
+          errors: null,
+        },
+      },
+    })
+  }),
 ]
 
 // Helper to create empty responses

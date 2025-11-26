@@ -95,7 +95,7 @@
 #           "type": "string"
 #         },
 #         "peer_review_sub_assignment": {
-#           "description": "peer review sub assignment details, only present when include_peer_review=true is specified, assignment has peer reviews enabled, and peer_review_grading feature flag is enabled",
+#           "description": "peer review sub assignment details, only present when include_peer_review=true is specified, assignment has peer reviews enabled, and peer_review_allocation_and_grading feature flag is enabled",
 #           "type": "object",
 #           "properties": {
 #             "id": {"type": "integer"},
@@ -133,7 +133,7 @@ class LearningObjectDatesController < ApplicationController
   #
   # @argument include_peer_review [Boolean]
   #   If true, includes peer review sub assignment information and overrides in the response.
-  #   Requires the peer_review_grading feature flag to be enabled.
+  #   Requires the peer_review_allocation_and_grading feature flag to be enabled.
   #
   # @returns LearningObjectDates
   def show

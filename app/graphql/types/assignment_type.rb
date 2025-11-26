@@ -97,7 +97,7 @@ module Types
             "Boolean indicating if students must submit their assignment before they can do peer reviews",
             null: true
       def submission_required
-        return nil unless object.context.feature_enabled?(:peer_review_allocation)
+        return nil unless object.context.feature_enabled?(:peer_review_allocation_and_grading)
 
         object.peer_review_submission_required
       end
@@ -106,7 +106,7 @@ module Types
             "Boolean indicating if peer reviews can be assigned across different sections",
             null: true
       def across_sections
-        return nil unless object.context.feature_enabled?(:peer_review_allocation)
+        return nil unless object.context.feature_enabled?(:peer_review_allocation_and_grading)
 
         object.peer_review_across_sections
       end
@@ -419,6 +419,7 @@ module Types
 
     field :allow_google_docs_submission, Boolean, method: :allow_google_docs_submission?, null: true
     field :anonymize_students, Boolean, method: :anonymize_students?, null: true
+    field :new_quizzes_anonymous_participants, Boolean, method: :new_quizzes_anonymous_participants?, null: true
     field :expects_external_submission, Boolean, method: :expects_external_submission?, null: true
     field :expects_submission, Boolean, method: :expects_submission?, null: true
     field :grades_published_at, String, null: true
@@ -951,7 +952,7 @@ module Types
     end
     def allocation_rules
       return nil unless assignment.grants_right?(current_user, :grade) &&
-                        assignment.context.feature_enabled?(:peer_review_allocation) &&
+                        assignment.context.feature_enabled?(:peer_review_allocation_and_grading) &&
                         assignment.peer_reviews
 
       context.scoped_set!(:assignment_id, assignment.id)

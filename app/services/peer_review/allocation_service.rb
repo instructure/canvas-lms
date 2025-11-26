@@ -46,8 +46,8 @@ class PeerReview::AllocationService < ApplicationService
 
   def validate
     # Validation: Feature flag must be enabled
-    unless @assignment.context.feature_enabled?(:peer_review_allocation)
-      return error_result(:feature_disabled, I18n.t("Peer review allocation feature is not enabled"), :bad_request)
+    unless @assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      return error_result(:feature_disabled, I18n.t("Peer review allocation and grading feature is not enabled"), :bad_request)
     end
 
     # Validation: Assignment must have peer reviews enabled
@@ -55,10 +55,12 @@ class PeerReview::AllocationService < ApplicationService
       return error_result(:peer_reviews_not_enabled, I18n.t("Assignment does not have peer reviews enabled"), :bad_request)
     end
 
-    # Validation: Student must have submitted the assignment
-    student_submission = @assignment.submissions.find_by(user: @assessor)
-    unless student_submission && %w[submitted graded complete].include?(student_submission.workflow_state)
-      return error_result(:not_submitted, I18n.t("You must submit the assignment before requesting peer reviews"), :bad_request)
+    # Validation: Check submission requirement based on assignment configuration
+    if @assignment.peer_review_submission_required
+      student_submission = @assignment.submissions.find_by(user: @assessor)
+      unless student_submission && %w[submitted graded complete].include?(student_submission.workflow_state)
+        return error_result(:not_submitted, I18n.t("You must submit the assignment before requesting peer reviews"), :bad_request)
+      end
     end
 
     # Validation: Check if assignment is locked or not yet available

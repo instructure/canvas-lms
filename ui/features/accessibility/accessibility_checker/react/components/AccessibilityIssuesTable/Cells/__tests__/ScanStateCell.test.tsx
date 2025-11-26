@@ -25,7 +25,17 @@ import {
   ScanWorkflowState,
 } from '../../../../../../shared/react/types'
 
+const mockSelectIssue = jest.fn()
+
+jest.mock('../../../../../../shared/react/hooks/useAccessibilityIssueSelect', () => ({
+  useAccessibilityIssueSelect: jest.fn(() => ({selectIssue: mockSelectIssue})),
+}))
+
 describe('ScanStateCell', () => {
+  beforeEach(() => {
+    mockSelectIssue.mockClear()
+  })
+
   describe('Unfinished Scans - ', () => {
     it('renders in progress scan state', () => {
       render(
@@ -47,8 +57,6 @@ describe('ScanStateCell', () => {
   })
 
   describe('Finished Scans, with issues - ', () => {
-    const handleClick = jest.fn()
-
     describe('Fixable - ', () => {
       const baseItem = {
         workflowState: ScanWorkflowState.Completed,
@@ -57,25 +65,20 @@ describe('ScanStateCell', () => {
       } as AccessibilityResourceScan
 
       it('renders the correct number of issues', () => {
-        render(<ScanStateCell item={baseItem} onClick={handleClick} />)
+        render(<ScanStateCell item={baseItem} />)
         expect(screen.getByTestId('issue-count-badge')).toHaveTextContent('5')
       })
 
       it('renders the correct overflow number if issueCount exceeds the visual limit', () => {
-        render(<ScanStateCell item={{...baseItem, issueCount: 2000}} onClick={handleClick} />)
+        render(<ScanStateCell item={{...baseItem, issueCount: 2000}} />)
         expect(screen.getByTestId('issue-count-badge')).toHaveTextContent('99+')
       })
 
       it('renders a working fix button', () => {
-        render(<ScanStateCell item={baseItem} onClick={handleClick} />)
+        render(<ScanStateCell item={baseItem} />)
         expect(screen.getByTestId('issue-remediation-button')).toBeInTheDocument()
         screen.getByTestId('issue-remediation-button').click()
-        expect(handleClick).toHaveBeenCalledWith(expect.objectContaining(baseItem))
-      })
-
-      it('does not render a fix button, if there is no onClick specified', () => {
-        render(<ScanStateCell item={baseItem} />)
-        expect(screen.queryByTestId('issue-remediation-button')).not.toBeInTheDocument()
+        expect(mockSelectIssue).toHaveBeenCalledWith(expect.objectContaining(baseItem))
       })
     })
 
@@ -87,10 +90,10 @@ describe('ScanStateCell', () => {
       } as AccessibilityResourceScan
 
       it('renders a working review button', () => {
-        render(<ScanStateCell item={baseItem} onClick={handleClick} />)
+        render(<ScanStateCell item={baseItem} />)
         expect(screen.getByTestId('issue-review-button')).toBeInTheDocument()
         screen.getByTestId('issue-review-button').click()
-        expect(handleClick).toHaveBeenCalledWith(expect.objectContaining(baseItem))
+        expect(mockSelectIssue).toHaveBeenCalledWith(expect.objectContaining(baseItem))
       })
     })
   })

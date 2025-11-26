@@ -70,7 +70,7 @@ RSpec.describe PeerReview::DateOverrideUpdaterService do
     let(:section) { add_section("Section 1", course:) }
 
     before do
-      course.enable_feature!(:peer_review_grading)
+      course.enable_feature!(:peer_review_allocation_and_grading)
     end
 
     context "with ADHOC override" do
@@ -278,7 +278,7 @@ RSpec.describe PeerReview::DateOverrideUpdaterService do
     let(:section) { add_section("Section 1", course:) }
 
     before do
-      course.enable_feature!(:peer_review_grading)
+      course.enable_feature!(:peer_review_allocation_and_grading)
     end
 
     it "responds to the call class method" do

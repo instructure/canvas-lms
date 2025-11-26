@@ -242,6 +242,7 @@ export type Assignment = Readonly<{
 }> & {
   anonymize_students: boolean
   assignment_visibility: string[]
+  new_quizzes_anonymous_participants: boolean
   post_manually: boolean
 } & Partial<{
     assignment_group: AssignmentGroup

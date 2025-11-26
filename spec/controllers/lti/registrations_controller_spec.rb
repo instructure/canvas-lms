@@ -2525,6 +2525,44 @@ RSpec.describe Lti::RegistrationsController do
             expect(course_json[:course_code]).to include("FOO101")
           end
         end
+
+        context "that matches course ID" do
+          let(:search_term) { course.id.to_s }
+
+          it "returns accounts and courses matching the search term" do
+            subject
+            # The account could coincidentally have an ID matching
+            # the course, so it may or may not be included.
+            expect(response_json[:courses].length).to eq(1)
+
+            course_json = response_json[:courses].first
+            expect(course_json[:id]).to eq(search_term)
+          end
+        end
+
+        context "that matches account ID" do
+          let(:search_term) { account.id.to_s }
+
+          it "returns accounts and courses matching the search term" do
+            subject
+            # The course could coincidentally have an ID matching
+            # the account, so it may or may not be included.
+            expect(response_json[:accounts].length).to eq(1)
+
+            account_json = response_json[:accounts].first
+            expect(account_json[:id]).to eq(search_term)
+          end
+
+          it "does not return accounts of different IDs" do
+            other_account = account_model
+
+            subject
+            expect(response_json[:accounts].length).to eq(1)
+
+            account_ids = response_json[:accounts].pluck("id")
+            expect(account_ids).not_to include(other_account.id.to_s)
+          end
+        end
       end
 
       context "with only_children_of" do
@@ -2731,9 +2769,9 @@ RSpec.describe Lti::RegistrationsController do
   end
 
   describe "GET history", type: :request do
-    let(:account) { Account.default }
-    let(:user) { account_admin_user(account:) }
-    let(:registration) { lti_registration_with_tool(account:) }
+    let_once(:account) { Account.default }
+    let_once(:user) { account_admin_user(account:) }
+    let_once(:registration) { lti_registration_with_tool(account:) }
     let(:history_entry) do
       Lti::RegistrationHistoryEntry.track_changes(lti_registration: registration, current_user: user, context: account, comment: "Test update") do
         registration.update!(name: "New Name")
@@ -2741,100 +2779,207 @@ RSpec.describe Lti::RegistrationsController do
       Lti::RegistrationHistoryEntry.last
     end
 
-    before do
-      user_session(user)
+    before(:once) do
       account.enable_feature!(:lti_registrations_page)
       account.enable_feature!(:lti_registrations_history)
     end
 
-    describe "GET history" do
-      it "returns the registration history entries in the correct format" do
-        old_name = registration.name
-        history_entry
+    before do
+      user_session(user)
+    end
+
+    it "returns the registration history entries in the correct format" do
+      old_name = registration.name
+      history_entry
+
+      get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
+
+      expect(response).to be_successful
+      json = response.parsed_body
+      # One to deploy the tool, another from our update
+      expect(json.length).to eq(2)
+
+      entry = json.find { |e| e["id"] == history_entry.id }
+
+      expect(entry["id"]).to eq(history_entry.id)
+      expect(entry["diff"]).to eq({ "registration" => [["~", ["name"], old_name, "New Name"]] })
+      expect(entry["update_type"]).to eq("manual_edit")
+      expect(entry["comment"]).to eq("Test update")
+    end
+
+    it "returns empty array when no history entries exist" do
+      Lti::RegistrationHistoryEntry.where(lti_registration: registration).destroy_all
+
+      get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
+
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json).to eq([])
+    end
+
+    it "supports pagination with per_page parameter" do
+      5.times do |i|
+        Lti::RegistrationHistoryEntry.track_changes(lti_registration: registration, current_user: user, context: account) do
+          registration.update!(name: "New Name #{i}")
+        end
+      end
+
+      get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history?per_page=3"
+
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json.length).to eq(3)
+      expect(response.headers["Link"]).to be_present
+    end
+
+    it "requires the lti_registrations_history feature flag" do
+      account.disable_feature!(:lti_registrations_history)
+
+      get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
+
+      expect(response).to be_not_found
+    end
+
+    it "requires manage_lti_registrations permission" do
+      account_admin_user_with_role_changes(account:, role_changes: { manage_lti_registrations: false })
+
+      get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
+
+      expect(response).to be_forbidden
+    end
+
+    context "with a site admin registration and multiple accounts on the same shard" do
+      let(:registration) { lti_registration_with_tool(account: Account.site_admin) }
+      let(:other_account) { account_model }
+      let(:reg_history_entry) do
+        Lti::RegistrationHistoryEntry.track_changes(lti_registration: registration, current_user: user, context: account) do
+          registration.update!(name: "Account Name")
+        end
+        Lti::RegistrationHistoryEntry.where(root_account: account).last
+      end
+      let(:other_reg_history_entry) do
+        Lti::RegistrationHistoryEntry.track_changes(lti_registration: registration, current_user: user, context: other_account) do
+          registration.update!(name: "Other Account Name")
+        end
+        Lti::RegistrationHistoryEntry.where(root_account: other_account).last
+      end
+
+      it "only returns history entries for the specified root account" do
+        reg_history_entry
+        other_reg_history_entry
+        user_session(user)
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
+
+        expect(response).to be_successful
+
+        ids = response.parsed_body.pluck("id")
+        expect(ids).to eql([reg_history_entry.id])
+      end
+    end
+
+    context "with context control changes" do
+      let_once(:deployment) { registration.deployments.first }
+      let_once(:sub_account) { account_model(root_account: account, name: "Sub Account") }
+      let_once(:course) { course_model(account: sub_account, name: "Test Course") }
+
+      it "includes serialized attributes in context controls" do
+        control = Lti::ContextControl.create!(
+          registration:,
+          deployment:,
+          context: sub_account,
+          available: true,
+          workflow_state: "active"
+        )
+
+        # Now track changes to the existing control
+        Lti::RegistrationHistoryEntry.track_control_changes(control:, current_user: user) do
+          control.update!(available: false)
+        end
+
+        entry_id = Lti::RegistrationHistoryEntry.last.id
 
         get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
 
         expect(response).to be_successful
         json = response.parsed_body
-        # One to deploy the tool, another from our update
-        expect(json.length).to eq(2)
 
-        entry = json.find { |e| e["id"] == history_entry.id }
+        entry = json.find { |e| e["id"] == entry_id }
+        expect(entry).to be_present
 
-        expect(entry["id"]).to eq(history_entry.id)
-        expect(entry["diff"]).to eq({ "registration" => [["~", ["name"], old_name, "New Name"]] })
-        expect(entry["update_type"]).to eq("manual_edit")
-        expect(entry["comment"]).to eq("Test update")
+        expected_keys = %w[display_path depth subaccount_count course_count child_control_count]
+
+        expect(entry["old_controls_by_deployment"].length).to be(1)
+        old_deployment = entry["old_controls_by_deployment"].first
+        expect(old_deployment["deployment_id"]).to eq(deployment.deployment_id)
+        expect(old_deployment["context_controls"].length).to be(1)
+        old_control = old_deployment["context_controls"].first
+        expect(old_control["context_name"]).to eq("Sub Account")
+        expect(old_control["available"]).to be true
+        expect(old_control.keys).to include(*expected_keys)
+
+        expect(entry["new_controls_by_deployment"].length).to be(1)
+        new_deployment = entry["new_controls_by_deployment"].first
+        expect(new_deployment["deployment_id"]).to eq(deployment.deployment_id)
+        expect(new_deployment["context_controls"].length).to be(1)
+        new_control = new_deployment["context_controls"].first
+        expect(new_control["context_name"]).to eq("Sub Account")
+        expect(new_control["available"]).to be false
+        expect(new_control.keys).to include(*expected_keys)
       end
 
-      it "returns empty array when no history entries exist" do
-        Lti::RegistrationHistoryEntry.where(lti_registration: registration).destroy_all
+      it "groups controls by multiple deployments" do
+        deployment = registration.new_external_tool(account)
+        control = deployment.primary_context_control
+        second_deployment = registration.new_external_tool(course)
+        second_control = second_deployment.primary_context_control
+
+        Lti::RegistrationHistoryEntry.track_bulk_control_changes(
+          control_params: [
+            { deployment_id: deployment.id, account_id: account.id },
+            { deployment_id: second_deployment.id, course_id: course.id }
+          ],
+          lti_registration: registration,
+          root_account: account,
+          current_user: user
+        ) do
+          control.update!(available: false)
+          second_control.update!(available: false)
+        end
+
+        entry_id = Lti::RegistrationHistoryEntry.last.id
 
         get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
 
         expect(response).to be_successful
         json = response.parsed_body
-        expect(json).to eq([])
-      end
 
-      it "supports pagination with per_page parameter" do
-        5.times do |i|
-          Lti::RegistrationHistoryEntry.track_changes(lti_registration: registration, current_user: user, context: account) do
-            registration.update!(name: "New Name #{i}")
-          end
-        end
+        entry = json.find { |e| e["id"] == entry_id }
+        expect(entry).to be_present
 
-        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history?per_page=3"
+        old_deployments = entry["old_controls_by_deployment"].index_by { |d| d["deployment_id"] }
+        expect(old_deployments.keys).to match_array([deployment.deployment_id, second_deployment.deployment_id])
 
-        expect(response).to be_successful
-        json = response.parsed_body
-        expect(json.length).to eq(3)
-        expect(response.headers["Link"]).to be_present
-      end
+        old_deployment1 = old_deployments[deployment.deployment_id]
+        expect(old_deployment1["context_controls"].length).to be(1)
+        expect(old_deployment1["context_controls"].first["context_name"]).to eq(account.name)
+        expect(old_deployment1["context_controls"].first["available"]).to be(true)
 
-      it "requires the lti_registrations_history feature flag" do
-        account.disable_feature!(:lti_registrations_history)
+        old_deployment2 = old_deployments[second_deployment.deployment_id]
+        expect(old_deployment2["context_controls"].length).to be(1)
+        expect(old_deployment2["context_controls"].first).to include("context_name" => course.name, "available" => true)
 
-        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
+        new_deployments = entry["new_controls_by_deployment"].index_by { |d| d["deployment_id"] }
+        expect(new_deployments.keys).to match_array([deployment.deployment_id, second_deployment.deployment_id])
 
-        expect(response).to be_not_found
-      end
+        new_deployment1 = new_deployments[deployment.deployment_id]
+        expect(new_deployment1["context_controls"].length).to be(1)
+        expect(new_deployment1["context_controls"].first["context_name"]).to eq(account.name)
+        expect(new_deployment1["context_controls"].first["available"]).to be(false)
 
-      it "requires manage_lti_registrations permission" do
-        account_admin_user_with_role_changes(account:, role_changes: { manage_lti_registrations: false })
-
-        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
-
-        expect(response).to be_forbidden
-      end
-
-      context "with a site admin registration and multiple accounts on the same shard" do
-        let(:registration) { lti_registration_with_tool(account: Account.site_admin) }
-        let(:other_account) { account_model }
-        let(:reg_history_entry) do
-          Lti::RegistrationHistoryEntry.track_changes(lti_registration: registration, current_user: user, context: account) do
-            registration.update!(name: "Account Name")
-          end
-          Lti::RegistrationHistoryEntry.where(root_account: account).last
-        end
-        let(:other_reg_history_entry) do
-          Lti::RegistrationHistoryEntry.track_changes(lti_registration: registration, current_user: user, context: other_account) do
-            registration.update!(name: "Other Account Name")
-          end
-          Lti::RegistrationHistoryEntry.where(root_account: other_account).last
-        end
-
-        it "only returns history entries for the specified root account" do
-          reg_history_entry
-          other_reg_history_entry
-          user_session(user)
-          get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
-
-          expect(response).to be_successful
-
-          ids = response.parsed_body.pluck("id")
-          expect(ids).to eql([reg_history_entry.id])
-        end
+        new_deployment2 = new_deployments[second_deployment.deployment_id]
+        expect(new_deployment2["context_controls"].length).to be(1)
+        expect(new_deployment2["context_controls"].first["context_name"]).to eq(course.name)
+        expect(new_deployment2["context_controls"].first["available"]).to be(false)
       end
     end
   end
@@ -2938,6 +3083,224 @@ RSpec.describe Lti::RegistrationsController do
         expect { subject }.not_to change { registration_update_request.reload.accepted_at }
         expect(response).to have_http_status(:bad_request)
         expect(response_json["errors"]).to eq("accepted parameter is required")
+      end
+    end
+  end
+
+  describe "pending_update field inclusion" do
+    let_once(:registration) { lti_registration_model(account:) }
+    let_once(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
+
+    before do
+      account_binding
+      registration.manual_configuration = lti_tool_configuration_model
+    end
+
+    context "when lti_dr_registrations_update feature flag is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:lti_dr_registrations_update)
+      end
+
+      describe "GET list", type: :request do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations" }
+
+        it "includes pending_update as false" do
+          subject
+          expect(response).to be_successful
+          expect(response_data.first["pending_update"]).to be_nil
+        end
+      end
+
+      describe "GET show", type: :request do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}" }
+
+        it "includes pending_update as false" do
+          subject
+          expect(response).to be_successful
+          expect(response_json["pending_update"]).to be_nil
+        end
+      end
+    end
+
+    context "when lti_dr_registrations_update feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:lti_dr_registrations_update)
+      end
+
+      describe "GET list", type: :request do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations" }
+
+        context "without pending update requests" do
+          it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            expect(response_data.first["pending_update"]).to be_nil
+          end
+        end
+
+        context "with pending update request" do
+          before do
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin
+            )
+          end
+
+          it "includes pending_update as true" do
+            subject
+            expect(response).to be_successful
+            registration_data = response_data.find { |r| r["id"] == registration.id }
+            expect(registration_data["pending_update"]).to be_present
+          end
+        end
+
+        context "with multiple pending update requests" do
+          before do
+            # Create multiple pending requests, should use the most recent one
+            3.times do |i|
+              lti_ims_registration_update_request_model(
+                lti_registration: registration,
+                root_account: account,
+                uuid: SecureRandom.uuid,
+                created_by: admin,
+                created_at: i.hours.ago
+              )
+            end
+          end
+
+          it "includes pending_update as true" do
+            subject
+            expect(response).to be_successful
+            registration_data = response_data.find { |r| r["id"] == registration.id }
+            expect(registration_data["pending_update"]).to be_present
+          end
+        end
+
+        context "with accepted update request" do
+          before do
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              accepted_at: 1.hour.ago
+            )
+          end
+
+          it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            registration_data = response_data.find { |r| r["id"] == registration.id }
+            expect(registration_data["pending_update"]).to be_nil
+          end
+        end
+
+        context "with rejected update request" do
+          before do
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              rejected_at: 1.hour.ago
+            )
+          end
+
+          it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            registration_data = response_data.find { |r| r["id"] == registration.id }
+            expect(registration_data["pending_update"]).to be_nil
+          end
+        end
+      end
+
+      describe "GET show", type: :request do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}" }
+
+        context "without pending update requests" do
+          it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            expect(response_json["pending_update"]).to be_nil
+          end
+        end
+
+        context "with pending update request" do
+          before do
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin
+            )
+          end
+
+          it "includes pending_update as true" do
+            subject
+            expect(response).to be_successful
+            expect(response_json["pending_update"]).to be_present
+          end
+        end
+
+        context "with multiple pending update requests" do
+          before do
+            # Create multiple pending requests, should use the most recent one
+            3.times do |i|
+              lti_ims_registration_update_request_model(
+                lti_registration: registration,
+                root_account: account,
+                uuid: SecureRandom.uuid,
+                created_by: admin,
+                created_at: i.hours.ago
+              )
+            end
+          end
+
+          it "includes pending_update as true" do
+            subject
+            expect(response).to be_successful
+            expect(response_json["pending_update"]).to be_present
+          end
+        end
+
+        context "with accepted update request" do
+          before do
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              accepted_at: 1.hour.ago
+            )
+          end
+
+          it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            expect(response_json["pending_update"]).to be_nil
+          end
+        end
+
+        context "with rejected update request" do
+          before do
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              rejected_at: 1.hour.ago
+            )
+          end
+
+          it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            expect(response_json["pending_update"]).to be_nil
+          end
+        end
       end
     end
   end

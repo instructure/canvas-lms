@@ -42,10 +42,7 @@ module Accessibility
     def extract_element_from_content
       html_content = resource_html_content
 
-      doc, _ = parse_html_content(html_content)
-
-      absolute_path = @path.sub(/^\./, "/html/body")
-      element = doc.at_xpath(absolute_path)
+      element = find_element_at_path(html_content, @path)
 
       raise ElementNotFoundError, "Element not found at path: #{@path}" unless element
 

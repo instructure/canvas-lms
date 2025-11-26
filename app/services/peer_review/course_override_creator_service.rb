@@ -19,7 +19,7 @@
 
 class PeerReview::CourseOverrideCreatorService < PeerReview::CourseOverrideCommonService
   def call
-    validate_override_dates(@override)
+    validate_peer_review_dates(@override)
 
     course = @peer_review_sub_assignment.course
     validate_course_exists(course)
@@ -27,6 +27,8 @@ class PeerReview::CourseOverrideCreatorService < PeerReview::CourseOverrideCommo
     ActiveRecord::Base.transaction do
       parent_override = find_parent_override(course.id)
       validate_course_parent_override_exists(parent_override, course.id)
+
+      validate_override_dates_against_parent_override(@override, parent_override)
 
       create_override(course, parent_override)
     end

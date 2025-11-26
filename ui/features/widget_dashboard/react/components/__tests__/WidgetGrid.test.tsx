@@ -16,11 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render} from '@testing-library/react'
-import WidgetGrid from '../WidgetGrid'
-import type {WidgetConfig} from '../../types'
-import {ResponsiveProvider} from '../../hooks/useResponsiveContext'
+// Mock react-beautiful-dnd FIRST before any imports
+jest.mock('react-beautiful-dnd', () => ({
+  DragDropContext: ({children}: any) => <div data-testid="drag-drop-context">{children}</div>,
+  Droppable: ({children, droppableId}: any) => (
+    <div data-testid={`droppable-${droppableId}`}>
+      {children(
+        {
+          innerRef: jest.fn(),
+          droppableProps: {'data-rbd-droppable-id': droppableId},
+          placeholder: null,
+        },
+        {isDraggingOver: false},
+      )}
+    </div>
+  ),
+  Draggable: ({children, draggableId, index}: any) => (
+    <div data-testid={`draggable-${draggableId}`} data-rbd-draggable-id={draggableId}>
+      {children(
+        {
+          innerRef: jest.fn(),
+          draggableProps: {'data-rbd-draggable-id': draggableId},
+          dragHandleProps: {'data-rbd-drag-handle-draggable-id': draggableId},
+        },
+        {isDragging: false},
+      )}
+    </div>
+  ),
+}))
 
 // Mock the WidgetRegistry to avoid dependency issues
 jest.mock('../WidgetRegistry', () => ({
@@ -31,16 +54,28 @@ jest.mock('../WidgetRegistry', () => ({
   })),
 }))
 
+import React from 'react'
+import {render, screen} from '@testing-library/react'
+import WidgetGrid from '../WidgetGrid'
+import type {WidgetConfig} from '../../types'
+import {ResponsiveProvider} from '../../hooks/useResponsiveContext'
+import {WidgetLayoutProvider} from '../../hooks/useWidgetLayout'
+import {WidgetDashboardEditProvider} from '../../hooks/useWidgetDashboardEdit'
+
 type Props = {
   config: WidgetConfig
   matches?: string[]
 }
 
-const setUp = (props: Props) => {
+const setUp = (props: Props, isEditMode = false) => {
   const {matches = ['desktop'], ...gridProps} = props
   return render(
     <ResponsiveProvider matches={matches}>
-      <WidgetGrid {...gridProps} />
+      <WidgetDashboardEditProvider>
+        <WidgetLayoutProvider>
+          <WidgetGrid {...gridProps} isEditMode={isEditMode} />
+        </WidgetLayoutProvider>
+      </WidgetDashboardEditProvider>
     </ResponsiveProvider>,
   )
 }

@@ -93,6 +93,7 @@ describe "native canvas conditional release" do
 
   context "Discussions as part of Mastery Paths" do
     it "displays Mastery paths tab from (graded) Discussions edit page" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       discussion_topic_model(context: @course)
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"

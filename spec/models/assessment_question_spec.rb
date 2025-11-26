@@ -55,7 +55,7 @@ describe AssessmentQuestion do
   it "translates links to be readable when creating the assessment question" do
     @attachment = attachment_in_course(@course)
     data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+    @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
 
@@ -65,7 +65,7 @@ describe AssessmentQuestion do
   it "translates links relative path url" do
     @attachment = attachment_in_course(@course)
     data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+    @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
 
@@ -77,7 +77,7 @@ describe AssessmentQuestion do
     data = { "name" => "Hi",
              "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg?wrap=1'>",
              "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+    @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
 
@@ -88,7 +88,7 @@ describe AssessmentQuestion do
     @attachment = attachment_in_course(@course)
 
     data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+    @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
 
@@ -99,7 +99,7 @@ describe AssessmentQuestion do
     user_file = @teacher.attachments.create!(uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", true))
     data = { "name" => "Hi", "question_text" => "Translate this: <img src='/users/#{@teacher.id}/files/#{user_file.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
 
-    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+    @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
     @clone = @question.attachments.where(root_attachment: user_file).first
     expect(@question.reload.question_data["question_text"]).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
   end
@@ -109,7 +109,7 @@ describe AssessmentQuestion do
     user_file = @teacher.attachments.create!(uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", true))
     data = { "name" => "Hi", "question_text" => "Translate this: <img src='/users/#{@teacher.id}/files/#{user_file.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
 
-    @question = @bank.assessment_questions.create!(question_data: data, current_user: other_user)
+    @question = @bank.assessment_questions.create!(question_data: data, updating_user: other_user)
     @clone = @question.attachments.where(root_attachment: user_file).first
     expect(@clone).to be_nil
   end
@@ -117,7 +117,7 @@ describe AssessmentQuestion do
   it "only creates one clone when same attachment appears multiple times" do
     @attachment = attachment_in_course(@course)
     data = { "name" => "Hi", "question_text" => "First: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> Second: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> Third: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+    @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
 
     clones = @question.attachments.where(root_attachment: @attachment)
     expect(clones.count).to eq 1
@@ -201,7 +201,7 @@ describe AssessmentQuestion do
       @attachment.root_account.enable_feature!(:disable_file_verifier_access)
 
       data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-      @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+      @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
 
       @clone = @question.attachments.where(root_attachment: @attachment).first
 
@@ -213,7 +213,7 @@ describe AssessmentQuestion do
       data = { "name" => "Hi", "question_text" => "Translate this: <img src='/users/#{@teacher.id}/files/#{user_file.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
       user_file.root_account.enable_feature!(:disable_file_verifier_access)
 
-      @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+      @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
       @clone = @question.attachments.where(root_attachment: user_file).first
       expect(@question.reload.question_data["question_text"]).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download'>"
     end
@@ -252,7 +252,7 @@ describe AssessmentQuestion do
 
     serialized_data_before = Marshal.dump(data)
 
-    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+    @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
 
     @attachment_clones = @attachments.transform_values { |ary| ary.map { |a| @question.attachments.where(root_attachment_id: a).first } }
 
@@ -286,7 +286,7 @@ describe AssessmentQuestion do
       }
     }
 
-    question = bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+    question = bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
     expect(question.question_data[:points_possible]).to eq "10"
     data[:points_possible] = "50"
     question.form_question_data = data
@@ -398,7 +398,7 @@ describe AssessmentQuestion do
         "answers" => [{ "id" => 1 }, { "id" => 2 }]
       }
 
-      @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+      @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
       @clone = @question.attachments.where(root_attachment: @media_attachment).first
 
       expected_url = "/media_attachments_iframe/#{@clone.id}?verifier=#{@clone.uuid}&embedded=true&type=video"
@@ -415,7 +415,7 @@ describe AssessmentQuestion do
         "answers" => [{ "id" => 1 }, { "id" => 2 }]
       }
 
-      @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+      @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
       @clone1 = @question.attachments.where(root_attachment: @media_attachment1).first
       @clone2 = @question.attachments.where(root_attachment: @media_attachment2).first
 
@@ -434,7 +434,7 @@ describe AssessmentQuestion do
         "answers" => [{ "id" => 1 }, { "id" => 2 }]
       }
 
-      @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+      @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
       @file_clone = @question.attachments.where(root_attachment: @attachment).first
       @media_clone = @question.attachments.where(root_attachment: @media_attachment).first
 
@@ -455,7 +455,7 @@ describe AssessmentQuestion do
           "answers" => [{ "id" => 1 }, { "id" => 2 }]
         }
 
-        @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+        @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
         @clone = @question.attachments.where(root_attachment: @media_attachment).first
 
         expected_url = "/media_attachments_iframe/#{@clone.id}?embedded=true"
@@ -487,7 +487,7 @@ describe AssessmentQuestion do
         ]
       }
 
-      @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+      @question = @bank.assessment_questions.create!(question_data: data, updating_user: @teacher)
       @clone = @question.attachments.where(root_attachment: @media_attachment).first
 
       answer_html = @question.reload.question_data["answers"][0]["html"]

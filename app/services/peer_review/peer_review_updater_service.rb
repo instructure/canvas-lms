@@ -32,6 +32,7 @@ class PeerReview::PeerReviewUpdaterService < PeerReview::PeerReviewCommonService
     validate_assignment_submission_types(@parent_assignment)
     validate_feature_enabled(@parent_assignment)
     validate_peer_review_sub_assignment_exists(@parent_assignment)
+    validate_dates
   end
 
   def update_peer_review_sub_assignment

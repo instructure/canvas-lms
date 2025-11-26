@@ -249,7 +249,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       unless deleted?
         assignment.workflow_state = published? ? "published" : "unpublished"
       end
-      assignment.saving_user = saving_user if saving_user
+      assignment.updating_user = updating_user
       assignment.save
       self.assignment_id = assignment.id
     end
@@ -510,7 +510,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       a.submission_types = "online_quiz"
       a.assignment_group_id = self.assignment_group_id
       a.saved_by = :quiz
-      a.saving_user = saving_user if saving_user
+      a.updating_user = updating_user
       if saved_by == :migration && a.update_cached_due_dates?
         a.needs_update_cached_due_dates = true
       end
@@ -1580,7 +1580,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     quiz_students = if visible_user_ids.any?
                       context_students.where(id: visible_user_ids)
                     else
-                      none
+                      context_students.none
                     end
 
     # empty quiz_students means the quiz is for everyone

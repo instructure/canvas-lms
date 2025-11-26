@@ -38,6 +38,7 @@ export interface FormHandle {
 
 export interface FormComponentHandle {
   focus: () => void
+  getValue?: () => FormValue
 }
 
 export interface FormComponentProps {
@@ -106,6 +107,9 @@ const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
     useImperativeHandle(ref, () => ({
       getValue: () => {
         if (issue.form.type === FormType.Button) return 'true'
+        if (formRef.current?.getValue) {
+          return formRef.current.getValue()
+        }
         return value
       },
       focus: () => {

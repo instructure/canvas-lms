@@ -25,7 +25,7 @@ import {FormComponentHandle, FormComponentProps} from './index'
 
 const RadioInputGroupForm: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
-    ({issue, value, error, onChangeValue}: FormComponentProps, _) => {
+    ({issue, value, error, onChangeValue, isDisabled}: FormComponentProps, _) => {
       const handleChange = useCallback(
         (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
           onChangeValue(value)
@@ -47,6 +47,7 @@ const RadioInputGroupForm: React.FC<FormComponentProps & React.RefAttributes<For
           value={value}
           onChange={handleChange}
           messages={error ? [{text: error, type: 'newError'}] : []}
+          disabled={isDisabled}
         >
           {issue.form.options.map(option => (
             <RadioInput

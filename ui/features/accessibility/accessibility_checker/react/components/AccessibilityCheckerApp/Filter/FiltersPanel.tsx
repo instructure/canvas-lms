@@ -104,8 +104,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
         setDate(null)
         return
       }
-      const label = dateFieldId === 'fromDate' ? I18n.t('From') : I18n.t('To')
-      setDate({label: `${label}: ${dateFormatter(date)}`, value: date.toISOString()})
+      setDate({label: dateFormatter(date), value: date.toISOString()})
     },
     [dateFormatter],
   )

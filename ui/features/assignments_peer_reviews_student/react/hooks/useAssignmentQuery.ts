@@ -20,11 +20,19 @@ import {useQuery} from '@tanstack/react-query'
 import {executeQuery} from '@canvas/graphql'
 import {PEER_REVIEW_ASSIGNMENT_QUERY} from '../queries'
 
+export interface AssessmentRequest {
+  _id: string
+  available: boolean | null
+  workflowState: string
+  createdAt: string
+}
+
 export interface Assignment {
   _id: string
   name: string
   dueAt: string | null
   description: string | null
+  assessmentRequestsForCurrentUser: AssessmentRequest[] | null
 }
 
 interface AssignmentQueryData {

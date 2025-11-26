@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2021 - present Instructure, Inc.
+# Copyright (C) 2025 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,18 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Current < ActiveSupport::CurrentAttributes
-  attribute :in_migration_context
+class AddPartialIndexForOrphanedSubAssignments < ActiveRecord::Migration[8.0]
+  tag :predeploy
+  disable_ddl_transaction!
 
-  def self.in_migration?
-    in_migration_context == true
-  end
-
-  def self.with_migration_context(&)
-    previous_value = in_migration_context
-    self.in_migration_context = true
-    yield
-  ensure
-    self.in_migration_context = previous_value
+  def change
+    add_index :assignments,
+              :type,
+              where: "type = 'SubAssignment' AND parent_assignment_id IS NULL AND workflow_state != 'deleted'",
+              name: "index_assignments_on_null_parent_for_subassignments",
+              algorithm: :concurrently,
+              if_not_exists: true
   end
 end

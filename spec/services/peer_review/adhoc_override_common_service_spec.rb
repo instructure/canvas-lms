@@ -192,7 +192,7 @@ RSpec.describe PeerReview::AdhocOverrideCommonService do
       expect(service).to respond_to(:validate_parent_assignment)
       expect(service).to respond_to(:validate_peer_reviews_enabled)
       expect(service).to respond_to(:validate_feature_enabled)
-      expect(service).to respond_to(:validate_override_dates)
+      expect(service).to respond_to(:validate_peer_review_dates)
       expect(service).to respond_to(:validate_student_ids_required)
       expect(service).to respond_to(:validate_student_ids_in_course)
       expect(service).to respond_to(:validate_override_exists)

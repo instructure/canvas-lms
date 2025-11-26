@@ -247,7 +247,7 @@ const ItemAssignToTrayContent = ({
         initialLoadRef.current = true
       }
     }
-    !hasFetched && fetchAllPages()
+    if (!hasFetched) fetchAllPages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

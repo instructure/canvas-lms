@@ -561,34 +561,77 @@ describe('Preview', () => {
         ).not.toBeInTheDocument()
       })
     })
-  })
 
-  it('clears error when itemId changes', async () => {
-    const mockResponse: PreviewResponse = {
-      content: '<div>Test content</div>',
-      path: '//div',
-    }
+    it('displays content when error response includes content', async () => {
+      const mockErrorWithContent = {
+        response: {
+          json: async () => ({
+            content: '<div>Error content</div>',
+            path: '//div',
+            error: 'Element not found for path: invalid_path',
+          }),
+        },
+      }
 
-    // First call fails
-    mockDoFetchApi.mockRejectedValueOnce({})
+      mockDoFetchApi.mockRejectedValueOnce(mockErrorWithContent)
 
-    const {rerender} = render(<Preview {...defaultProps} />)
+      const ref = React.createRef<PreviewHandle>()
+      render(<Preview {...defaultProps} ref={ref} />)
 
-    await waitFor(() => {
-      expect(screen.getByText('Error previewing fixed accessibility issue.')).toBeInTheDocument()
-    })
+      await waitFor(() => {
+        expect(screen.getByText('Error content')).toBeInTheDocument()
+      })
 
-    // @ts-expect-error
-    mockDoFetchApi.mockResolvedValueOnce({
-      json: mockResponse,
-    })
-
-    rerender(<Preview {...defaultProps} resourceId={2} />)
-
-    await waitFor(() => {
       expect(
         screen.queryByText('Error previewing fixed accessibility issue.'),
       ).not.toBeInTheDocument()
+    })
+
+    it('shows error overlay when error response has no content', async () => {
+      const mockErrorWithoutContent = {
+        response: {
+          json: async () => ({
+            error: 'Something went wrong',
+          }),
+        },
+      }
+
+      mockDoFetchApi.mockRejectedValueOnce(mockErrorWithoutContent)
+
+      render(<Preview {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('Error previewing fixed accessibility issue.')).toBeInTheDocument()
+      })
+    })
+
+    it('clears error when itemId changes', async () => {
+      const mockResponse: PreviewResponse = {
+        content: '<div>Test content</div>',
+        path: '//div',
+      }
+
+      // First call fails
+      mockDoFetchApi.mockRejectedValueOnce({})
+
+      const {rerender} = render(<Preview {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('Error previewing fixed accessibility issue.')).toBeInTheDocument()
+      })
+
+      // @ts-expect-error
+      mockDoFetchApi.mockResolvedValueOnce({
+        json: mockResponse,
+      })
+
+      rerender(<Preview {...defaultProps} resourceId={2} />)
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Error previewing fixed accessibility issue.'),
+        ).not.toBeInTheDocument()
+      })
     })
   })
 })

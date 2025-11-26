@@ -357,7 +357,7 @@ describe AssessmentRequest do
 
     before :once do
       @assignment.update!(peer_reviews: true)
-      @assignment.context.enable_feature!(:peer_review_grading)
+      @assignment.context.enable_feature!(:peer_review_allocation_and_grading)
       peer_review_sub_assignment = PeerReviewSubAssignment.create!(parent_assignment: @assignment)
       @request.peer_review_sub_assignment = peer_review_sub_assignment
       @request.save!
@@ -437,7 +437,7 @@ describe AssessmentRequest do
 
     context "when all conditions are met" do
       before :once do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
           title: "Test Peer Review",
           context: @course,
@@ -460,7 +460,7 @@ describe AssessmentRequest do
       end
     end
 
-    context "when peer_review_grading feature flag is disabled" do
+    context "when peer_review_allocation_and_grading feature flag is disabled" do
       before :once do
         @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
           title: "Test Peer Review",
@@ -479,7 +479,7 @@ describe AssessmentRequest do
     context "when parent assignment does not have peer_reviews enabled" do
       before :once do
         @assignment.update!(peer_reviews: false)
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
           title: "Test Peer Review",
           context: @course,
@@ -496,7 +496,7 @@ describe AssessmentRequest do
 
     context "when peer_review_sub_assignment does not exist" do
       before :once do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
       end
 
       it "creates assessment request without linking when sub-assignment does not exist" do
@@ -513,7 +513,7 @@ describe AssessmentRequest do
 
     context "when an existing assessment request exists" do
       before :once do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @existing_request = @assignment.assign_peer_review(reviewer, reviewee)
       end
 
@@ -533,7 +533,10 @@ describe AssessmentRequest do
 
     context "consistency with PeerReviewCreatorService" do
       it "produces the same linking behavior as PeerReviewCreatorService for new requests" do
-        @course.enable_feature!(:peer_review_grading)
+        # There seems to be some weird issue with feature_flags_cache
+        # (triggered by something as simple as an `account.account_domains`) if
+        # we enable the flag directly on @course
+        @assignment.context.enable_feature!(:peer_review_allocation_and_grading)
 
         assessment_request = @assignment.assign_peer_review(reviewer, reviewee)
         expect(assessment_request.peer_review_sub_assignment_id).to be_nil

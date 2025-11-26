@@ -35,9 +35,13 @@ export const WIDGET_TYPES = {
   COURSE_GRADES: 'course_grades',
   ANNOUNCEMENTS: 'announcements',
   PEOPLE: 'people',
+  TODO_LIST: 'todo_list',
 } as const
 
 export type WidgetType = (typeof WIDGET_TYPES)[keyof typeof WIDGET_TYPES]
+
+export const LEFT_COLUMN = 1
+export const RIGHT_COLUMN = 2
 
 export const DEFAULT_WIDGET_CONFIG = {
   columns: 2,
@@ -48,10 +52,16 @@ export const DEFAULT_WIDGET_CONFIG = {
       position: {col: 1, row: 1, relative: 1},
       title: I18n.t('Course work'),
     },
+    // {
+    //   id: 'todo-list-widget',
+    //   type: WIDGET_TYPES.TODO_LIST,
+    //   position: {col: 2, row: 1, relative: 2},
+    //   title: I18n.t('To-do list'),
+    // },
     {
       id: 'announcements-widget',
       type: WIDGET_TYPES.ANNOUNCEMENTS,
-      position: {col: 2, row: 1, relative: 2},
+      position: {col: 2, row: 2, relative: 3},
       title: I18n.t('Announcements'),
     },
     {
@@ -63,7 +73,7 @@ export const DEFAULT_WIDGET_CONFIG = {
     {
       id: 'people-widget',
       type: WIDGET_TYPES.PEOPLE,
-      position: {col: 2, row: 2, relative: 3},
+      position: {col: 2, row: 3, relative: 5},
       title: I18n.t('People'),
     },
   ],
@@ -147,6 +157,18 @@ export const UPDATE_LEARNER_DASHBOARD_TAB_SELECTION = gql`
   mutation UpdateLearnerDashboardTabSelection($tab: LearnerDashboardTabType!) {
     updateLearnerDashboardTabSelection(input: {tab: $tab}) {
       tab
+      errors {
+        message
+      }
+    }
+  }
+`
+
+export const UPDATE_WIDGET_DASHBOARD_CONFIG = gql`
+  mutation UpdateWidgetDashboardConfig($widgetId: String!, $filters: JSON) {
+    updateWidgetDashboardConfig(input: {widgetId: $widgetId, filters: $filters}) {
+      widgetId
+      filters
       errors {
         message
       }

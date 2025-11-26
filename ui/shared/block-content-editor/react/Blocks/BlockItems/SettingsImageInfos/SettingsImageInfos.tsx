@@ -28,6 +28,7 @@ import {ChangeEvent} from 'react'
 import {SettingsImageProps} from './types'
 import {useGenerateAiAltText} from '../../../hooks/useGenerateAiAltText'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showScreenReaderAlert} from '../../../utilities/accessibility'
 import {useAppSelector} from '../../../store'
 
 const I18n = createI18nScope('block_content_editor')
@@ -68,7 +69,8 @@ export const SettingsImageInfos = ({
   }
 
   const handleGenerateAltText = async () => {
-    if (attachmentId) {
+    if (attachmentId && !generateAltTextMutation.isPending) {
+      showScreenReaderAlert(I18n.t('Generating alt text...'))
       try {
         const altText = await generateAltTextMutation.generate(attachmentId)
         if (!altText) {
@@ -76,6 +78,7 @@ export const SettingsImageInfos = ({
           return
         }
         onAltTextChange(altText)
+        showScreenReaderAlert(I18n.t('Alt text is generated.'))
       } catch (error: any) {
         if (error?.name === 'AbortError') return
         showFlashError(I18n.t('Failed to generate alt text.'))()
@@ -84,11 +87,14 @@ export const SettingsImageInfos = ({
   }
 
   const isAIEnabled = !!aiAltTextGenerationURL
+  const isGenerateAltTextButtonInteractionDisabled =
+    disabled || decorativeImage || !attachmentId || !fileName
 
   return (
     <>
       <View as="div" margin="0 0 medium 0">
         <TextInput
+          data-testid="image-alt-text-input"
           renderLabel={
             <Text as="span">
               {I18n.t('Alt text')}
@@ -116,22 +122,19 @@ export const SettingsImageInfos = ({
         {isAIEnabled && (
           <View as="div" margin="small 0 0 0">
             <Button
+              data-testid="generate-alt-text-button"
               color="secondary"
               display="block"
               renderIcon={<IconAiColoredSolid />}
               margin="0"
-              disabled={
-                disabled ||
-                decorativeImage ||
-                !attachmentId ||
-                !fileName ||
-                generateAltTextMutation.isPending
-              }
               onClick={handleGenerateAltText}
+              interaction={isGenerateAltTextButtonInteractionDisabled ? 'disabled' : 'enabled'}
+              aria-disabled={generateAltTextMutation.isPending}
+              aria-busy={generateAltTextMutation.isPending}
             >
               {generateAltTextMutation.isPending
-                ? I18n.t('Generating...')
-                : I18n.t('Regenerate Alt Text')}
+                ? I18n.t('Generating Alt Text...')
+                : I18n.t('(Re)generate Alt Text')}
             </Button>
           </View>
         )}

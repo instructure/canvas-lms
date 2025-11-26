@@ -76,6 +76,7 @@ function FeatureFlagButton({
   displayName,
   appliesTo,
   onStateChange = () => {},
+  checkEarlyAccessProgram = async (_featureFlag, _state) => true,
 }) {
   const [updatedFlag, setUpdatedFlag] = useState(undefined)
   const [apiBusy, setApiBusy] = useState(false)
@@ -85,12 +86,18 @@ function FeatureFlagButton({
 
   async function updateFlag(state) {
     if (apiBusy) return
+
     if (ENV.ACCOUNT?.site_admin && ENV.RAILS_ENVIRONMENT !== 'development') {
       const confirmSave = await confirmSaveIfSiteAdmin(displayName)
       if (!confirmSave) {
         return
       }
     }
+
+    if (!(await checkEarlyAccessProgram(featureFlag, state))) {
+      return
+    }
+
     setApiBusy(true)
     try {
       if (flagUtils.shouldDelete(effectiveFlag, allowsDefaults, state)) {
@@ -222,6 +229,7 @@ FeatureFlagButton.propTypes = {
   disableDefaults: bool,
   appliesTo: string,
   onStateChange: func,
+  checkEarlyAccessProgram: func,
 }
 
 export default React.memo(FeatureFlagButton)

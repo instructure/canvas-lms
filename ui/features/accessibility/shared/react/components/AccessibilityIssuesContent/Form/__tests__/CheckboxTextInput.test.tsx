@@ -102,7 +102,7 @@ describe('CheckboxTextInput', () => {
     expect(screen.getByText('Test checkbox subtext')).toBeInTheDocument()
     expect(screen.getByText('Test TextArea Label')).toBeInTheDocument()
     expect(screen.getByText('Test input description')).toBeInTheDocument()
-    expect(screen.getByText('0/100')).toBeInTheDocument()
+    expect(screen.getByText('0/100 characters')).toBeInTheDocument()
   })
 
   it('toggles checkbox and disables/enables textarea accordingly', () => {
@@ -111,7 +111,9 @@ describe('CheckboxTextInput', () => {
         <CheckboxTextInput {...defaultProps} />
       </AccessibilityCheckerContext.Provider>,
     )
-    const checkbox = screen.getByLabelText('Test Checkbox Label')
+    const checkbox = screen.getByRole('checkbox', {
+      name: 'Test Checkbox Label Test checkbox subtext',
+    })
     const textarea = screen.getByTestId('checkbox-text-input-form')
 
     expect(checkbox).not.toBeChecked()
@@ -136,7 +138,9 @@ describe('CheckboxTextInput', () => {
         <CheckboxTextInput {...propsWithValue} />
       </AccessibilityCheckerContext.Provider>,
     )
-    const checkbox = screen.getByLabelText('Test Checkbox Label')
+    const checkbox = screen.getByRole('checkbox', {
+      name: 'Test Checkbox Label Test checkbox subtext',
+    })
 
     fireEvent.click(checkbox)
     expect(defaultProps.onChangeValue).toHaveBeenCalledWith('')
@@ -274,18 +278,111 @@ describe('CheckboxTextInput', () => {
     consoleErrorSpy.mockRestore()
   })
 
-  it('does not call onReload on initial mount', () => {
-    const onReload = jest.fn()
-    render(<CheckboxTextInput {...defaultProps} onReload={onReload} />)
-    expect(onReload).not.toHaveBeenCalled()
-  })
+  describe('onValidationChange callback', () => {
+    it('calls onValidationChange when user types valid text', async () => {
+      const onValidationChange = jest.fn()
+      const onChangeValue = jest.fn()
 
-  it('calls onReload when the value changes', async () => {
-    const onReload = jest.fn()
-    const {rerender} = render(<CheckboxTextInput {...defaultProps} onReload={onReload} />)
-    expect(onReload).not.toHaveBeenCalled()
-    rerender(<CheckboxTextInput {...defaultProps} onReload={onReload} value="test value" />)
-    expect(onReload).toHaveBeenCalledWith('test value')
+      const {rerender} = render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput
+            {...defaultProps}
+            onValidationChange={onValidationChange}
+            onChangeValue={onChangeValue}
+          />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      onValidationChange.mockClear()
+
+      const textarea = screen.getByTestId('checkbox-text-input-form')
+      fireEvent.change(textarea, {target: {value: 'Valid alt text'}})
+
+      rerender(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput
+            {...defaultProps}
+            value="Valid alt text"
+            onValidationChange={onValidationChange}
+            onChangeValue={onChangeValue}
+          />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      await waitFor(() => {
+        expect(onValidationChange).toHaveBeenCalledWith(true, undefined)
+      })
+    })
+
+    it('calls onValidationChange when text exceeds max length', async () => {
+      const onValidationChange = jest.fn()
+      const onChangeValue = jest.fn()
+
+      const {rerender} = render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput
+            {...defaultProps}
+            onValidationChange={onValidationChange}
+            onChangeValue={onChangeValue}
+          />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      onValidationChange.mockClear()
+
+      const longText = 'a'.repeat(150)
+      const textarea = screen.getByTestId('checkbox-text-input-form')
+      fireEvent.change(textarea, {target: {value: longText}})
+
+      rerender(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput
+            {...defaultProps}
+            value={longText}
+            onValidationChange={onValidationChange}
+            onChangeValue={onChangeValue}
+          />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      await waitFor(() => {
+        expect(onValidationChange).toHaveBeenCalledWith(
+          false,
+          'Keep alt text under 100 characters.',
+        )
+      })
+    })
+
+    it('calls onValidationChange when checkbox is checked (decorative image)', async () => {
+      const onValidationChange = jest.fn()
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...defaultProps} onValidationChange={onValidationChange} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      onValidationChange.mockClear()
+
+      const checkbox = screen.getByRole('checkbox', {
+        name: 'Test Checkbox Label Test checkbox subtext',
+      })
+      fireEvent.click(checkbox)
+
+      expect(onValidationChange).toHaveBeenCalledWith(true, undefined)
+    })
+
+    it('calls onValidationChange when textarea is empty', async () => {
+      const onValidationChange = jest.fn()
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...defaultProps} onValidationChange={onValidationChange} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      expect(onValidationChange).toHaveBeenCalledWith(false, 'Alt text is required.')
+    })
   })
 
   describe('AI generation feature flag', () => {

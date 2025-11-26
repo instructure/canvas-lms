@@ -26,6 +26,7 @@ import StatusPill from './StatusPill'
 import FeatureFlagButton from './FeatureFlagButton'
 import {isEnabled, isLocked, doesAllowDefaults} from './util'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import EarlyAccessModal from './EarlyAccessModal'
 
 const I18n = createI18nScope('feature_flags')
 
@@ -34,6 +35,9 @@ const {Head, Body, ColHeader, Row, Cell} = Table
 function FeatureFlagTable({title, rows, disableDefaults}) {
   const [stateChanges, setStateChanges] = useState({})
   const [sortConfig, setSortConfig] = useState({key: 'display_name', direction: 'ascending'})
+  const [acceptedEarlyAccess, setAcceptedEarlyAccess] = useState(ENV.EARLY_ACCESS_PROGRAM)
+  const [showEarlyAccessModal, setShowEarlyAccessModal] = useState(false)
+  const [resolveEAP, setResolveEAP] = useState(null)
 
   const getStatusArray = feature => {
     const statuses = []
@@ -115,6 +119,39 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
     },
     [setStateChanges],
   )
+
+  const checkEarlyAccessProgram = useCallback(
+    async (featureFlag, state) => {
+      const feature = rows.find(row => row.feature_flag.feature === featureFlag.feature)
+
+      if (feature?.early_access_program && !acceptedEarlyAccess && state !== 'off') {
+        return new Promise(resolve => {
+          setResolveEAP(() => resolve)
+          setShowEarlyAccessModal(true)
+        })
+      }
+
+      return true
+    },
+    [acceptedEarlyAccess, rows],
+  )
+
+  const handleEarlyAccessAccept = () => {
+    setAcceptedEarlyAccess(true)
+    setShowEarlyAccessModal(false)
+    if (resolveEAP) {
+      resolveEAP(true)
+      setResolveEAP(null)
+    }
+  }
+
+  const handleEarlyAccessCancel = () => {
+    setShowEarlyAccessModal(false)
+    if (resolveEAP) {
+      resolveEAP(false)
+      setResolveEAP(null)
+    }
+  }
 
   return (
     <>
@@ -208,6 +245,7 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
               updatedState={stateChanges[feature.feature]}
               onStateChange={handleStateChange}
               disableDefaults={disableDefaults}
+              checkEarlyAccessProgram={checkEarlyAccessProgram}
             />
           ))}
         </Body>
@@ -223,33 +261,42 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
           direction: translateSortDirection(sortConfig.direction),
         })}
       </Alert>
+
+      <EarlyAccessModal
+        isOpen={showEarlyAccessModal}
+        onAccept={handleEarlyAccessAccept}
+        onCancel={handleEarlyAccessCancel}
+      />
     </>
   )
 }
 
-const FeatureFlagRow = React.memo(({feature, updatedState, onStateChange, disableDefaults}) => {
-  return (
-    <Row key={feature.feature} data-testid="ff-table-row">
-      <Cell>
-        <ToggleDetails summary={feature.display_name} defaultExpanded={feature.autoexpand}>
-          <div dangerouslySetInnerHTML={{__html: feature.description}} />
-        </ToggleDetails>
-      </Cell>
-      <Cell>
-        <StatusPill feature={feature} updatedState={updatedState} />
-      </Cell>
-      <Cell>
-        <FeatureFlagButton
-          displayName={feature.display_name}
-          featureFlag={feature.feature_flag}
-          disableDefaults={disableDefaults}
-          appliesTo={feature.applies_to}
-          onStateChange={newState => onStateChange(feature.feature, newState)}
-        />
-      </Cell>
-    </Row>
-  )
-})
+const FeatureFlagRow = React.memo(
+  ({feature, updatedState, onStateChange, disableDefaults, checkEarlyAccessProgram}) => {
+    return (
+      <Row key={feature.feature} data-testid="ff-table-row">
+        <Cell>
+          <ToggleDetails summary={feature.display_name} defaultExpanded={feature.autoexpand}>
+            <div dangerouslySetInnerHTML={{__html: feature.description}} />
+          </ToggleDetails>
+        </Cell>
+        <Cell>
+          <StatusPill feature={feature} updatedState={updatedState} />
+        </Cell>
+        <Cell>
+          <FeatureFlagButton
+            displayName={feature.display_name}
+            featureFlag={feature.feature_flag}
+            disableDefaults={disableDefaults}
+            appliesTo={feature.applies_to}
+            onStateChange={newState => onStateChange(feature.feature, newState)}
+            checkEarlyAccessProgram={checkEarlyAccessProgram}
+          />
+        </Cell>
+      </Row>
+    )
+  },
+)
 
 const translateSortKey = key => {
   if (key === 'display_name') {

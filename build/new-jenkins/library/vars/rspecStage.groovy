@@ -159,10 +159,46 @@ def tearDownNode() {
 
   // Find and process skipped tests
   findFiles(glob: "$destDir/skipped/**/*.json").each { skipFile ->
-    def skipReport = readJSON file: skipFile.path
+    // Skip empty files to avoid JSON parse errors
+    if (skipFile.length == 0) {
+      echo "Skipping empty file: ${skipFile.path}"
+      return
+    }
 
-    skipReport.pending?.each { test ->
-      buildSummaryReport.addSkippedTest(test.location, test)
+    try {
+      def skipReport = readJSON file: skipFile.path
+
+      skipReport.pending?.each { test ->
+        buildSummaryReport.addSkippedTest(test.location, test)
+      }
+
+      // Explicitly extract fields to avoid Jenkins readJSON LazyMap serialization issues
+      def eventData = [
+        summary: [
+          total_examples: skipReport.summary?.total_examples,
+          total_pending: skipReport.summary?.total_pending,
+          generated_at: skipReport.summary?.generated_at
+        ],
+        pending: skipReport.pending?.collect { test ->
+          [
+            description: test.description,
+            location: test.location,
+            file_path: test.file_path,
+            line_number: test.line_number,
+            execution_result: test.execution_result,
+            reason: test.reason,
+            pending_fixed: test.pending_fixed,
+            jira_number: test.jira_number,
+            skip_date: test.skip_date,
+            timestamp: test.timestamp
+          ]
+        } ?: []
+      ]
+
+      reportBuildLog("rspecq_test_data", eventData, "observe-test-tracking-token")
+    } catch (Exception e) {
+      echo "Failed to process skip report file ${skipFile.path}: ${e.message}"
+      // Continue processing other files
     }
   }
 }

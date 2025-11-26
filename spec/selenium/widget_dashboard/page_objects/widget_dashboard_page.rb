@@ -121,6 +121,10 @@ module WidgetDashboardPage
     "[data-testid='course-#{course_id}-grade']"
   end
 
+  def course_last_updated_selector(course_id)
+    "[data-testid='course-#{course_id}-last-updated']"
+  end
+
   def course_work_summary_stats_selector(label)
     "[data-testid='statistics-card-#{label}']"
   end
@@ -130,7 +134,7 @@ module WidgetDashboardPage
   end
 
   def course_work_date_filter_select_selector
-    "[data-testid='date-filter-select']"
+    "[data-testid='submission-status-filter-select']"
   end
 
   def course_work_item_selector(item_id)
@@ -280,6 +284,10 @@ module WidgetDashboardPage
 
   def course_grade_text(course_id)
     f(course_grade_text_selector(course_id))
+  end
+
+  def course_last_updated(course_id)
+    f(course_last_updated_selector(course_id))
   end
 
   def all_course_grade_items

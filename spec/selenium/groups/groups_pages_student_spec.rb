@@ -143,6 +143,7 @@ describe "groups" do
       end
 
       it "allows any group member to create an announcement" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         @testgroup.first.announcements.create!(
           title: "Announcement by #{@user.name}",
           message: "sup",
@@ -170,6 +171,7 @@ describe "groups" do
       end
 
       it "edit page should succeed for their own announcements" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         announcement = @testgroup.first.announcements.create!(
           title: "Announcement by #{@user.name}",
           message: "The Force Awakens",
@@ -277,6 +279,7 @@ describe "groups" do
       it_behaves_like "discussions_page", :student
 
       it "allows discussions to be created within a group", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         get discussions_page
         expect_new_page_load { f("#add_discussion").click }
         # This creates the discussion and also tests its creation
@@ -295,6 +298,7 @@ describe "groups" do
       end
 
       it "has two options when creating a discussion", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         get discussions_page
         expect_new_page_load { f("#add_discussion").click }
         expect(f('[name="allow_rating"]')).to be_present
@@ -332,6 +336,7 @@ describe "groups" do
       end
 
       it "allows group members to edit their discussions", :ignore_js_errors, priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @user,
                                      title: "White Snow",

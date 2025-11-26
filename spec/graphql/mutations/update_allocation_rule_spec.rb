@@ -22,7 +22,7 @@ require_relative "../graphql_spec_helper"
 RSpec.describe Mutations::UpdateAllocationRule, type: :graphql do
   before(:once) do
     @course = course_factory(active_all: true)
-    @course.enable_feature!(:peer_review_allocation)
+    @course.enable_feature!(:peer_review_allocation_and_grading)
     @teacher = teacher_in_course(course: @course, active_all: true).user
     @student1 = student_in_course(name: "Student 1", course: @course, active_all: true).user
     @student2 = student_in_course(name: "Student 2", course: @course, active_all: true).user
@@ -621,9 +621,9 @@ RSpec.describe Mutations::UpdateAllocationRule, type: :graphql do
       )
     end
 
-    context "when peer_review_allocation feature is disabled" do
+    context "when peer_review_allocation_and_grading feature is disabled" do
       it "returns error when feature flag is not enabled" do
-        @course.disable_feature!(:peer_review_allocation)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
 
         query = <<~GQL
           ruleId: "#{@rule.id}"
@@ -634,7 +634,7 @@ RSpec.describe Mutations::UpdateAllocationRule, type: :graphql do
         result = execute_with_input(query)
 
         expect(result["errors"]).not_to be_empty
-        expect(result["errors"].first["message"]).to eq("peer_review_allocation feature flag is not enabled for this course")
+        expect(result["errors"].first["message"]).to eq("peer_review_allocation_and_grading feature flag is not enabled for this course")
         expect(result["errors"].first["path"]).to eq(["updateAllocationRule"])
       end
     end

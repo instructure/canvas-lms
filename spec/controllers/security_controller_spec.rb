@@ -242,6 +242,25 @@ RSpec.describe SecurityController, type: :request do
       end
     end
 
+    context "when the top_navigation_placement feature flag is off" do
+      before do
+        Account.default.disable_feature!(:top_navigation_placement)
+      end
+
+      it "does not include top_navigation in the placements" do
+        messages.each do |message|
+          message["placements"] -= ["https://canvas.instructure.com/lti/top_navigation"] if message["placements"]
+        end
+
+        get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
+
+        expect(response).to have_http_status :ok
+        parsed_body = response.parsed_body
+        lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
+        expect(lti_platform_configuration["messages_supported"]).to eq messages
+      end
+    end
+
     context "when running locally" do
       before do
         allow(Lti::Oidc).to receive(:auth_domain).and_call_original

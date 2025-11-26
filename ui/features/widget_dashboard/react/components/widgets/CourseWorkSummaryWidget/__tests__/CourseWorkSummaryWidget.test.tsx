@@ -24,6 +24,8 @@ import {graphql, HttpResponse} from 'msw'
 import CourseWorkSummaryWidget from '../CourseWorkSummaryWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
 import {defaultGraphQLHandlers, clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
+import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 const mockCoursesData = [
   {
@@ -77,7 +79,11 @@ const setup = (props: Props = buildDefaultProps()) => {
 
   const result = render(
     <QueryClientProvider client={queryClient}>
-      <CourseWorkSummaryWidget {...props} />
+      <WidgetDashboardEditProvider>
+        <WidgetLayoutProvider>
+          <CourseWorkSummaryWidget {...props} />
+        </WidgetLayoutProvider>
+      </WidgetDashboardEditProvider>
     </QueryClientProvider>,
   )
 
@@ -156,11 +162,11 @@ describe('CourseWorkSummaryWidget', () => {
     cleanup()
   })
 
-  it('renders date range filter dropdown', async () => {
+  it('renders submission status filter dropdown', async () => {
     const {cleanup} = setup(buildDefaultProps())
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue('Next 3 days')).toBeInTheDocument()
+      expect(screen.getByDisplayValue('Not submitted')).toBeInTheDocument()
     })
 
     cleanup()
@@ -276,7 +282,11 @@ describe('CourseWorkSummaryWidget', () => {
 
     const renderResult = render(
       <QueryClientProvider client={queryClient}>
-        <CourseWorkSummaryWidget {...buildDefaultProps()} />
+        <WidgetDashboardEditProvider>
+          <WidgetLayoutProvider>
+            <CourseWorkSummaryWidget {...buildDefaultProps()} />
+          </WidgetLayoutProvider>
+        </WidgetDashboardEditProvider>
       </QueryClientProvider>,
     )
 

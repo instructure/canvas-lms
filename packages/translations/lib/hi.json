@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "फ़ाइल नाम"
     },
+    "file_preview_21667a6e": {
+        "message": "फ़ाइल पूर्वावलोकन"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "{ fileName } के लिए फ़ाइल पूर्वावलोकन"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "फ़ाइल भंडारण कोटा सीमा से अधिक हुआ"
     },

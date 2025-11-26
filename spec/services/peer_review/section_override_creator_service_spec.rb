@@ -193,8 +193,8 @@ RSpec.describe PeerReview::SectionOverrideCreatorService do
           }
         end
 
-        it "raises InvalidOverrideDatesError" do
-          expect { service.call }.to raise_error(PeerReview::InvalidOverrideDatesError, "Due date cannot be before unlock date")
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(PeerReview::InvalidDatesError, "Due date cannot be before unlock date")
         end
       end
 
@@ -207,8 +207,8 @@ RSpec.describe PeerReview::SectionOverrideCreatorService do
           }
         end
 
-        it "raises InvalidOverrideDatesError" do
-          expect { service.call }.to raise_error(PeerReview::InvalidOverrideDatesError, "Due date cannot be after lock date")
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(PeerReview::InvalidDatesError, "Due date cannot be after lock date")
         end
       end
 
@@ -221,8 +221,163 @@ RSpec.describe PeerReview::SectionOverrideCreatorService do
           }
         end
 
-        it "raises InvalidOverrideDatesError" do
-          expect { service.call }.to raise_error(PeerReview::InvalidOverrideDatesError, "Unlock date cannot be after lock date")
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(PeerReview::InvalidDatesError, "Unlock date cannot be after lock date")
+        end
+      end
+    end
+
+    context "validation against parent override dates" do
+      let(:parent_assignment) { peer_review_sub_assignment.parent_assignment }
+
+      context "when peer review dates fall within parent override dates" do
+        before do
+          assignment_override_model(
+            assignment: parent_assignment,
+            set: section,
+            unlock_at: 1.day.from_now,
+            lock_at: 3.weeks.from_now
+          )
+        end
+
+        let(:override_params) do
+          {
+            set_id: section.id,
+            unlock_at: 2.days.from_now.change(hour: due_hour),
+            due_at: 1.week.from_now.change(hour: due_hour),
+            lock_at: 2.weeks.from_now.change(hour: due_hour)
+          }
+        end
+
+        it "creates the override successfully" do
+          expect { service.call }.to change { peer_review_sub_assignment.assignment_overrides.count }.by(1)
+        end
+      end
+
+      context "when peer review unlock_at is before parent unlock_at" do
+        before do
+          assignment_override_model(
+            assignment: parent_assignment,
+            set: section,
+            unlock_at: 2.days.from_now,
+            lock_at: 3.weeks.from_now
+          )
+        end
+
+        let(:override_params) do
+          {
+            set_id: section.id,
+            unlock_at: 1.day.from_now.change(hour: due_hour),
+            due_at: 1.week.from_now.change(hour: due_hour),
+            lock_at: 2.weeks.from_now.change(hour: due_hour)
+          }
+        end
+
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review override unlock date cannot be before parent override unlock date/
+          )
+        end
+      end
+
+      context "when peer review due_at is after parent lock_at" do
+        before do
+          assignment_override_model(
+            assignment: parent_assignment,
+            set: section,
+            unlock_at: 1.day.from_now,
+            lock_at: 2.weeks.from_now
+          )
+        end
+
+        let(:override_params) do
+          {
+            set_id: section.id,
+            unlock_at: 2.days.from_now.change(hour: due_hour),
+            due_at: 3.weeks.from_now.change(hour: due_hour),
+            lock_at: 4.weeks.from_now.change(hour: due_hour)
+          }
+        end
+
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review override due date cannot be after parent override lock date/
+          )
+        end
+      end
+
+      context "when peer review lock_at is after parent lock_at" do
+        before do
+          assignment_override_model(
+            assignment: parent_assignment,
+            set: section,
+            unlock_at: 1.day.from_now,
+            lock_at: 2.weeks.from_now
+          )
+        end
+
+        let(:override_params) do
+          {
+            set_id: section.id,
+            unlock_at: 2.days.from_now.change(hour: due_hour),
+            due_at: 1.week.from_now.change(hour: due_hour),
+            lock_at: 3.weeks.from_now.change(hour: due_hour)
+          }
+        end
+
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review override lock date cannot be after parent override lock date/
+          )
+        end
+      end
+
+      context "when parent override has no unlock_at" do
+        before do
+          assignment_override_model(
+            assignment: parent_assignment,
+            set: section,
+            lock_at: 2.weeks.from_now
+          )
+        end
+
+        let(:override_params) do
+          {
+            set_id: section.id,
+            unlock_at: 1.day.ago.change(hour: due_hour),
+            due_at: 1.week.from_now.change(hour: due_hour),
+            lock_at: 10.days.from_now.change(hour: due_hour)
+          }
+        end
+
+        it "does not validate against parent unlock_at" do
+          expect { service.call }.to change { peer_review_sub_assignment.assignment_overrides.count }.by(1)
+        end
+      end
+
+      context "when parent override has no lock_at" do
+        before do
+          assignment_override_model(
+            assignment: parent_assignment,
+            set: section,
+            unlock_at: 1.day.from_now
+          )
+        end
+
+        let(:override_params) do
+          {
+            set_id: section.id,
+            unlock_at: 2.days.from_now.change(hour: due_hour),
+            due_at: 1.month.from_now.change(hour: due_hour),
+            lock_at: 2.months.from_now.change(hour: due_hour)
+          }
+        end
+
+        it "does not validate against parent lock_at" do
+          expect { service.call }.to change { peer_review_sub_assignment.assignment_overrides.count }.by(1)
         end
       end
     end

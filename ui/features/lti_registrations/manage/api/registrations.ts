@@ -66,6 +66,7 @@ export type AppsSortProperty =
   | 'installed_by'
   | 'updated_by'
   | 'on'
+  | 'status'
 
 export type AppsSortDirection = 'asc' | 'desc'
 

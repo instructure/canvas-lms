@@ -355,7 +355,10 @@ module Interfaces::SubmissionInterface
         null: true
   field :late, Boolean, method: :late?
   field :late_policy_status, Types::LatePolicyStatusType, null: true
-  field :missing, Boolean, method: :missing?
+  field :missing, Boolean
+  def missing
+    load_association(:assignment).then { object.missing? }
+  end
   field :submission_type, Types::AssignmentSubmissionType, null: true
 
   field :attachment, Types::FileType, null: true
@@ -663,7 +666,8 @@ module Interfaces::SubmissionInterface
         assignment_id: submission.assignment_id,
         url: submission.external_tool_url(query_params: submission.tool_default_query_params(current_user)),
         display: "borderless",
-        host: context[:request].host_with_port
+        host: context[:request].host_with_port,
+        resource_link_lookup_uuid: submission.resource_link_lookup_uuid
       )
     else
       Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|

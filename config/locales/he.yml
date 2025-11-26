@@ -18420,6 +18420,7 @@ he:
         page_name: "שם העמוד"
         quiz_group: קבוצה
         quiz_name: "שם בוחן"
+        quiz_type: "סוג הבוחן"
         topic_name: "שם נושא"
         url: "כתובת דף"
         wiki_page_name: "שם העמוד"
@@ -19072,6 +19073,7 @@ he:
       graded: "התבצעה הערכה"
       submitted: הוגש
       unsubmitted: "לא הוגשה"
+  submission_7ca566e1: הגשה
   submission_action_take_quiz: "קח/י %{title}"
   submission_action_turn_in_assignment: "החזר  %{title}"
   submission_added_title_50ebdc85: "נתווספה הגשה: %{title}"

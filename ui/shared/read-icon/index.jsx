@@ -24,5 +24,5 @@ const readSvg = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xml
 </svg>`
 
 export default function ReadIcon() {
-  return <SVGIcon src={readSvg} title="read" color="inherit" />
+  return <SVGIcon src={readSvg} color="inherit" />
 }

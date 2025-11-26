@@ -138,7 +138,7 @@ module Lti
                                         registration:,
                                         user: created_by,
                                         overwrite_created_by: true,
-                                        **binding_params)
+                                        **binding_params.deep_symbolize_keys)
 
         if account.feature_enabled?(:lti_registrations_next)
           registration.new_external_tool(account, current_user: created_by, available: false)

@@ -219,6 +219,19 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:FLAGS][:migrate_quiz_enabled]).to be(true)
     end
 
+    it "js_env new_quizzes_surveys_enabled is true when new_quizzes_surveys feature is enabled" do
+      user_session(@teacher)
+      Account.site_admin.enable_feature!(:new_quizzes_surveys)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:FLAGS][:new_quizzes_surveys_enabled]).to be true
+    end
+
+    it "js_env new_quizzes_surveys_enabled is false when new_quizzes_surveys feature is disabled" do
+      user_session(@teacher)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:FLAGS][:new_quizzes_surveys_enabled]).to be false
+    end
+
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
@@ -577,6 +590,12 @@ describe Quizzes::QuizzesController do
       allow(AssignmentUtil).to receive(:assignment_max_name_length).and_return(15)
       get "edit", params: { course_id: @course.id, id: @quiz.id }
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
+    end
+
+    it "sets context_rubric_associations_url in js_env" do
+      user_session(@teacher)
+      get "edit", params: { course_id: @course.id, id: @quiz.id }
+      expect(assigns[:js_env][:context_rubric_associations_url]).to eq("/courses/#{@course.id}/rubric_associations")
     end
 
     context "assign to differentiation tags" do

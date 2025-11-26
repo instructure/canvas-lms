@@ -146,7 +146,7 @@ describe('AccessibilityIssuesTable', () => {
       render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
 
       act(() => {
-        screen.getByText('Resource Type').click()
+        screen.getByText('Type').click()
       })
 
       expect(mockDoFetch).toHaveBeenCalledTimes(1)
@@ -167,7 +167,7 @@ describe('AccessibilityIssuesTable', () => {
       })
 
       act(() => {
-        screen.getByText('Resource Type').click()
+        screen.getByText('Type').click()
       })
 
       expect(mockDoFetch).toHaveBeenCalledTimes(2)
@@ -188,7 +188,7 @@ describe('AccessibilityIssuesTable', () => {
       })
 
       act(() => {
-        screen.getByText('Resource Type').click()
+        screen.getByText('Type').click()
       })
 
       expect(mockDoFetch).toHaveBeenCalledTimes(3)
@@ -196,7 +196,7 @@ describe('AccessibilityIssuesTable', () => {
         expect.objectContaining({
           tableSortState: {
             sortId: 'resource-type-header',
-            sortDirection: 'none',
+            sortDirection: 'ascending',
           },
         }),
       )

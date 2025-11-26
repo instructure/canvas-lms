@@ -1246,6 +1246,28 @@ describe Types::SubmissionType do
         )
         expect(query_params[:url]).not_to include "grade_by_question_enabled"
       end
+
+      it "includes resource_link_lookup_uuid when present" do
+        uuid = SecureRandom.uuid
+        @assignment.submit_homework(
+          @student,
+          submission_type: "basic_lti_launch",
+          url: "http://anexternaltoolsubmission.com",
+          resource_link_lookup_uuid: uuid
+        )
+        expect(query_params[:resource_link_lookup_uuid]).to eq uuid
+        expect(preview_url).to include "resource_link_lookup_uuid=#{uuid}"
+      end
+
+      it "excludes resource_link_lookup_uuid when not present" do
+        @assignment.submit_homework(
+          @student,
+          submission_type: "basic_lti_launch",
+          url: "http://anexternaltoolsubmission.com"
+        )
+        expect(query_params[:resource_link_lookup_uuid]).to be_nil
+        expect(preview_url).not_to include "resource_link_lookup_uuid"
+      end
     end
 
     it "includes a 'version' query param that corresponds to the attempt number - 1 (and NOT the associated submission version number)" do
@@ -1384,9 +1406,18 @@ describe Types::SubmissionType do
         expect(result).to eq [lti_asset_report.id.to_s]
       end
 
-      it "returns nil when latest is true (not implemented yet)" do
+      it "returns LTI asset reports when latest is true" do
+        loader = instance_double(Loaders::SubmissionLtiAssetReportsLoader)
+        allow(Loaders::SubmissionLtiAssetReportsLoader).to receive(:for)
+          .with(for_student: false, latest: true)
+          .and_return(loader)
+        allow(loader).to receive(:load).with(submission.id).and_return(Promise.resolve([lti_asset_report]))
+
         result = submission_type.resolve("ltiAssetReportsConnection(latest: true) { nodes { _id } }")
-        expect(result).to be_nil
+
+        expect(Loaders::SubmissionLtiAssetReportsLoader).to have_received(:for).with(for_student: false, latest: true)
+        expect(loader).to have_received(:load).with(submission.id)
+        expect(result).to eq [lti_asset_report.id.to_s]
       end
     end
 
@@ -1778,6 +1809,64 @@ describe Types::SubmissionType do
       @course.enable_feature!(:project_lhotse)
       expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
       expect(submission_type.resolve("autoGradeSubmissionErrors")).to eq(["Test error"])
+    end
+  end
+
+  describe "submission_quiz_histories_connection" do
+    before(:once) do
+      quiz_with_submission
+      @quiz_assignment = @quiz.assignment
+      @quiz_submission = @quiz_assignment.submission_for_student(@student)
+    end
+
+    let(:quiz_submission_type) { GraphQLTypeTester.new(@quiz_submission, current_user: @teacher) }
+
+    it "returns nil for non-quiz submissions" do
+      expect(submission_type.resolve("submissionQuizHistoriesConnection { nodes { _id } }")).to be_nil
+    end
+
+    it "returns quiz submission versions" do
+      result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { _id } }")
+      expect(result).not_to be_nil
+      expect(result).not_to be_empty
+    end
+
+    it "returns quiz submission with attempt number" do
+      attempt_result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
+      expect(attempt_result.flatten).to include(@quiz.quiz_submissions.first.attempt)
+    end
+
+    it "returns quiz submission with score" do
+      score_result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { score } }")
+      expect(score_result.flatten).to include(@quiz.quiz_submissions.first.score)
+    end
+
+    it "returns quiz submission with workflow_state" do
+      state_result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { workflowState } }")
+      expect(state_result.flatten).to include(@quiz.quiz_submissions.first.workflow_state)
+    end
+
+    it "requires permission to view quiz submissions" do
+      other_student = student_in_course(active_all: true).user
+      expect(
+        quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { _id } }", current_user: other_student)
+      ).to be_nil
+    end
+
+    context "with multiple quiz attempts" do
+      before(:once) do
+        @quiz.update!(allowed_attempts: 3)
+        # Take quiz again
+        @quiz_submission_2 = @quiz.generate_submission(@student)
+        @quiz_submission_2.complete!
+      end
+
+      it "returns versions from all attempts" do
+        @quiz_submission.reload
+        result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
+        attempts = result.flatten
+        expect(attempts.length).to be > 1
+      end
     end
   end
 end

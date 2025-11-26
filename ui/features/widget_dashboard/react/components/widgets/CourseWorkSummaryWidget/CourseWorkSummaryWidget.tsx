@@ -16,25 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useMemo} from 'react'
+import React, {useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconInfoLine} from '@instructure/ui-icons'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
-import CourseWorkFilters, {type DateFilterOption} from '../../shared/CourseWorkFilters'
+import CourseWorkFilters, {
+  type DateFilterOption,
+  isValidDateFilterOption,
+} from '../../shared/CourseWorkFilters'
 import StatisticsCardsGrid from '../../shared/StatisticsCardsGrid'
 import type {CourseOption, BaseWidgetProps} from '../../../types'
 import {useCourseWorkStatistics} from '../../../hooks/useCourseWorkStatistics'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {convertDateFilterToStatisticsRange} from '../../../utils/dateUtils'
+import {useWidgetConfig} from '../../../hooks/useWidgetConfig'
 
 const I18n = createI18nScope('widget_dashboard')
 
 const CourseWorkSummaryWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false}) => {
-  const [selectedCourse, setSelectedCourse] = useState<string>('all')
-  const [selectedDateRange, setSelectedDateRange] = useState<DateFilterOption>('next3days')
+  const [selectedCourse, setSelectedCourse] = useWidgetConfig<string>(
+    widget.id,
+    'selectedCourse',
+    'all',
+  )
+  const [selectedDateRange, setSelectedDateRange] = useWidgetConfig<DateFilterOption>(
+    widget.id,
+    'selectedDateRange',
+    'not_submitted',
+    isValidDateFilterOption,
+  )
 
   // Fetch user's enrolled courses
   const {data: courseGrades = []} = useSharedCourses({limit: 1000})
@@ -49,7 +62,7 @@ const CourseWorkSummaryWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode 
     if (selectedCourse === 'all') {
       return undefined
     }
-    return selectedCourse.replace('course_', '')
+    return selectedCourse
   }, [selectedCourse])
 
   const {
@@ -94,7 +107,6 @@ const CourseWorkSummaryWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode 
           onCourseChange={handleCourseChange}
           onDateFilterChange={handleDateRangeChange}
           userCourses={userCourses}
-          statisticsOnly={true}
         />
       }
     >

@@ -26,6 +26,7 @@ import {
   getInputIdForField,
   validateIconUris,
 } from '../../registration_overlay/validateLti1p3RegistrationOverlayState'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 
 export type IconConfirmationWrapperProps = {
   onNextButtonClicked: () => void
@@ -56,13 +57,18 @@ export const IconConfirmationWrapper = ({
     setHasSubmitted(true)
   }, [onNextButtonClicked, overlayStore])
 
+  const filteredPlacements = React.useMemo(
+    () => filterPlacementsByFeatureFlags(state.placements.placements ?? []),
+    [state.placements.placements],
+  )
+
   return (
     <>
       <RegistrationModalBody>
         <IconConfirmation
           internalConfig={internalConfig}
           name={internalConfig.title}
-          allPlacements={state.placements.placements ?? []}
+          allPlacements={filteredPlacements}
           placementIconOverrides={state.icons.placements}
           setPlacementIconUrl={actions.setPlacementIconUrl}
           hasSubmitted={hasSubmitted}

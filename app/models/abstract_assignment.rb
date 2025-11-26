@@ -1300,6 +1300,7 @@ class AbstractAssignment < ActiveRecord::Base
       quiz.workflow_state = "created" if quiz.deleted?
       quiz.saved_by = :assignment
       quiz.workflow_state = published? ? "available" : "unpublished"
+      quiz.updating_user = updating_user
       quiz.save if quiz.changed?
     elsif self.submission_types == "discussion_topic" && !%i[discussion_topic sub_assignment].include?(@saved_by)
       topic = discussion_topic || context.discussion_topics.build(user: @updating_user)
@@ -1315,6 +1316,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def save_submittable(submittable)
+    submittable.updating_user = updating_user
     submittable.assignment_id = id
     submittable.title = self.title
     submittable.saved_by = :assignment
@@ -4453,6 +4455,7 @@ class AbstractAssignment < ActiveRecord::Base
     value = settings&.dig("new_quizzes", "anonymous_participants")
     ActiveModel::Type::Boolean.new.cast(value) || false
   end
+  alias_method :new_quizzes_anonymous_participants?, :anonymous_participants?
 
   def new_quizzes_type=(type)
     self.settings ||= {}

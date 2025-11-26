@@ -24,6 +24,7 @@ import {graphql, http, HttpResponse} from 'msw'
 import WidgetDashboardContainer from '../WidgetDashboardContainer'
 import {WidgetDashboardProvider} from '../hooks/useWidgetDashboardContext'
 import {WidgetDashboardEditProvider} from '../hooks/useWidgetDashboardEdit'
+import {WidgetLayoutProvider} from '../hooks/useWidgetLayout'
 import {ResponsiveProvider} from '../hooks/useResponsiveContext'
 import {defaultGraphQLHandlers, clearWidgetDashboardCache} from './testHelpers'
 
@@ -90,6 +91,9 @@ const server = setupServer(
   http.get('/api/v1/dashboard/dashboard_cards', () => {
     return HttpResponse.json([])
   }),
+  http.get('/api/v1/planner/items', () => {
+    return HttpResponse.json([])
+  }),
 )
 
 const setup = (contextProps = {}, envOverrides = {}) => {
@@ -115,9 +119,11 @@ const setup = (contextProps = {}, envOverrides = {}) => {
     <QueryClientProvider client={queryClient}>
       <WidgetDashboardProvider {...contextProps}>
         <WidgetDashboardEditProvider>
-          <ResponsiveProvider matches={['desktop']}>
-            <WidgetDashboardContainer />
-          </ResponsiveProvider>
+          <WidgetLayoutProvider>
+            <ResponsiveProvider matches={['desktop']}>
+              <WidgetDashboardContainer />
+            </ResponsiveProvider>
+          </WidgetLayoutProvider>
         </WidgetDashboardEditProvider>
       </WidgetDashboardProvider>
     </QueryClientProvider>,

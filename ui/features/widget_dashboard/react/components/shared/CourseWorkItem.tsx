@@ -80,9 +80,22 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
                 </Link>
               </Flex.Item>
               <Flex.Item>
-                <Text size="x-small" color="secondary">
-                  {item.course.name}
-                </Text>
+                <Flex direction="row" gap="x-small" alignItems="center">
+                  <Text size="x-small" color="secondary">
+                    {item.course.name}
+                  </Text>
+                  <Text size="x-small" color="secondary">
+                    |
+                  </Text>
+                  <Link
+                    href={`/courses/${item.course.id}`}
+                    isWithinText={false}
+                    aria-label={I18n.t('Go to %{courseName}', {courseName: item.course.name})}
+                    data-testid={`course-work-item-course-link-${item.id}`}
+                  >
+                    <Text size="x-small">{I18n.t('Go to course')}</Text>
+                  </Link>
+                </Flex>
               </Flex.Item>
               <Flex.Item>
                 <Text size="x-small" color="secondary">

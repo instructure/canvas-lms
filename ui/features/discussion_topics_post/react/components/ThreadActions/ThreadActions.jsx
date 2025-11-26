@@ -248,7 +248,11 @@ const getMenuConfigs = props => {
     })
   }
 
-  if (window.ENV.ai_translation_improvements && !props.translateAll) {
+  if (
+    window.ENV.discussion_translation_available &&
+    window.ENV.ai_translation_improvements &&
+    !props.translateAll
+  ) {
     options.push({
       key: 'separator2',
       separator: true,

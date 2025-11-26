@@ -1335,6 +1335,25 @@ describe GroupsController do
         json = json_parse(response.body)
         expect(json.first["is_inactive"]).to be_nil
       end
+
+      it "marks user with deleted enrollment and inactive enrollment as inactive" do
+        course_with_teacher(active_all: true)
+        student = create_users_in_course(@course, 1, return_type: :record).first
+        category = @course.group_categories.create(name: "test category")
+        group = @course.groups.create(name: "test group", group_category: category)
+        group.add_user(student)
+
+        @course.enroll_ta(student, enrollment_state: "deleted")
+        student_enrollment = student.enrollments.where(course: @course, type: "StudentEnrollment").first
+        student_enrollment.deactivate
+
+        user_session(@teacher)
+        get "users", params: { group_id: group.id, include: ["active_status"] }
+        json = json_parse(response.body)
+
+        student_json = json.detect { |r| r["id"] == student.id }
+        expect(student_json["is_inactive"]).to be_truthy
+      end
     end
 
     context "teacher section restrictions in group users API" do

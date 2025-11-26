@@ -67,6 +67,7 @@ describe CareerController do
 
           expect(assigns[:js_env][:CANVAS_CAREER][:FEATURES]).to include(
             horizon_root_experience: false,
+            horizon_role_dashboards: false,
             horizon_dashboard_ai_widgets: false,
             horizon_hris_integrations: false,
             horizon_user_profile_page: false,
@@ -76,7 +77,8 @@ describe CareerController do
             horizon_learning_library: false,
             horizon_course_navigation: false,
             horizon_course_redesign: false,
-            horizon_course_index_page: false
+            horizon_course_index_page: false,
+            horizon_chart_view: false
           )
         end
 

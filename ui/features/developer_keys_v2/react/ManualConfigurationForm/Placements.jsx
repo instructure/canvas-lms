@@ -32,8 +32,13 @@ const I18n = createI18nScope('react_developer_keys')
 export default class Placements extends React.Component {
   constructor(props) {
     super(props)
+    // Filter out placements that are feature-flagged off
+    const validPlacementNames = new Set(props.validPlacements)
+    const filteredPlacements = (props.placements || []).filter(p =>
+      validPlacementNames.has(p.placement),
+    )
     this.state = {
-      placements: this.props.placements,
+      placements: filteredPlacements,
     }
     this.placementRefs = {}
   }

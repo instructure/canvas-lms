@@ -350,6 +350,7 @@ describe('ThreadActions', () => {
 
   describe('Translate text button', () => {
     beforeAll(() => {
+      window.ENV.discussion_translation_available = true
       window.ENV.ai_translation_improvements = true
     })
 
@@ -372,6 +373,7 @@ describe('ThreadActions', () => {
       expect(queryByText('Translate Text')).toBeFalsy()
 
       window.ENV.ai_translation_improvements = true
+      window.ENV.discussion_translation_available = true
     })
 
     it('displays if the feature flag is on', () => {

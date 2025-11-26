@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Nome file"
     },
+    "file_preview_21667a6e": {
+        "message": "Anteprima file"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Anteprima file per { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Quota spazio di archiviazione file superata"
     },

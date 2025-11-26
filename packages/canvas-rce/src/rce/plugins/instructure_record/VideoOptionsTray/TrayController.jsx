@@ -23,7 +23,7 @@ import bridge from '../../../../bridge'
 import {asVideoElement} from '../../shared/ContentSelection'
 import {findMediaPlayerIframe} from '../../shared/iframeUtils'
 import VideoOptionsTray from '.'
-import {isStudioEmbeddedMedia, parseStudioOptions} from '../../shared/StudioLtiSupportUtils'
+import {isStudioEmbeddedMedia, parseStudioOptions, updateStudioEmbedOptions, validateStudioEmbedOptions} from '../../shared/StudioLtiSupportUtils'
 import RCEGlobals from '../../../RCEGlobals'
 
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
@@ -38,6 +38,14 @@ export const videoDefaultSize = () => {
   }
 
   return VIDEO_SIZE_DEFAULT
+}
+
+function onStudioEmbedOptionChanged(editor) {
+  return embedOptions => {
+    if (validateStudioEmbedOptions(embedOptions)) {
+      updateStudioEmbedOptions(editor, embedOptions)
+    }
+  }
 }
 
 export default class TrayController {
@@ -234,6 +242,7 @@ export default class TrayController {
             : null
         }
         requestSubtitlesFromIframe={cb => this.requestSubtitlesFromIframe(cb)}
+        onStudioEmbedOptionChanged={onStudioEmbedOptionChanged(this._editor)}
       />
     )
     ReactDOM.render(element, this.$container)

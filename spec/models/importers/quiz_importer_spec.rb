@@ -257,23 +257,6 @@ describe "Importers::QuizImporter" do
     expect(quiz.quiz_questions.active.first.question_data[:question_name]).to eq "Rocket Bee!"
   end
 
-  it "imports questions with attachments" do
-    context = get_import_context
-    @migration.user = @teacher
-    aa_test_data = AttachmentAssociationsSpecHelper.new(context.account, context)
-    question_data = import_example_questions
-    data = get_import_data ["vista", "quiz"], "simple_quiz_data"
-    data["description"] = aa_test_data.base_html
-    question_data[:aq_data]["4393906433391"]["question_text"] = aa_test_data.replaced_html
-    Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
-    quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
-    expect(quiz.quiz_questions.active.count).to eq 1
-    expect(quiz.attachment_associations.count).to eq 1
-    expect(quiz.attachment_associations.first.attachment_id).to eq aa_test_data.attachment1.id
-    expect(quiz.quiz_questions.first.attachment_associations.count).to eq 1
-    expect(quiz.quiz_questions.first.attachment_associations.first.attachment_id).to eq aa_test_data.attachment2.id
-  end
-
   it "imports a text only question" do
     context = get_import_context
     question_data = import_example_questions

@@ -24660,6 +24660,7 @@ nn:
         quiz_engine: Quizverktøy
         quiz_group: Gruppe
         quiz_name: Quiznamn
+        quiz_type: Quiztype
         topic_name: Emnenamn
         url: URL-adresse
         wiki_page_name: Sidenamn
@@ -25689,6 +25690,7 @@ nn:
       graded: vurdert
       submitted: levert
       unsubmitted: "ikkje levert"
+  submission_7ca566e1: Innlevering
   submission_action_take_quiz: "Ta %{title}"
   submission_action_turn_in_assignment: "Lever %{title}"
   submission_added_title_50ebdc85: "innlevering lagt til: %{title}"

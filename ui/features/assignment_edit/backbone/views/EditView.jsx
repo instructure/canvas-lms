@@ -113,6 +113,7 @@ const EXTERNAL_TOOLS_CUSTOM_PARAMS = '#assignment_external_tool_tag_attributes_c
 const EXTERNAL_TOOLS_LINE_ITEM = '#assignment_external_tool_tag_attributes_line_item'
 const ASSIGNMENT_POINTS_POSSIBLE = '#assignment_points_possible'
 const ASSIGNMENT_POINTS_CHANGE_WARN = '#point_change_warning'
+const POINTS_TOOLTIP = '#points_tooltip'
 const SECURE_PARAMS = '#secure_params'
 const PEER_REVIEWS_BOX = '#assignment_peer_reviews'
 const PEER_REVIEWS_ALLOCATION_AND_GRADING_BOX = '#assignment_peer_reviews_checkbox'
@@ -334,6 +335,8 @@ EditView.prototype.events = {
 EditView.child('assignmentGroupSelector', '' + ASSIGNMENT_GROUP_SELECTOR)
 
 EditView.child('quizTypeSelector', '' + QUIZ_TYPE_SELECTOR)
+
+EditView.child('pointsTooltip', '' + POINTS_TOOLTIP)
 
 EditView.child('anonymousSubmissionSelector', '' + ANONYMOUS_SUBMISSION_SELECTOR)
 
@@ -1081,6 +1084,8 @@ EditView.prototype.handleQuizTypeChange = function (quizType) {
   this.$submissionTypeFields.toggleAccessibly(!isSurvey)
   this.$gradedAssignmentFields.toggleAccessibly(!isSurvey)
   this.anonymousSubmissionSelector.$el.closest('.control-group').toggleAccessibly(isSurvey)
+
+  this.pointsTooltip.updateComponent(quizType)
 }
 
 EditView.prototype.handleAnonymousSubmissionChange = function (isAnonymous) {
@@ -1577,7 +1582,7 @@ EditView.prototype.getFormData = function () {
   if ($grader_count.length > 0) {
     data.grader_count = numberHelper.parse($grader_count[0].value)
   }
-  if (ENV.PEER_REVIEW_ALLOCATION_ENABLED || ENV.PEER_REVIEW_GRADING_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
     const checkedInput = document.getElementById('assignment_peer_reviews_checkbox')
     data.peer_reviews = checkedInput?.checked
 
@@ -1778,7 +1783,7 @@ EditView.prototype.showErrors = function (errors) {
   let shouldFocus = true
   Object.entries(errors).forEach(([key, value]) => {
     if (key === 'peer_review_details') {
-      if ((ENV.PEER_REVIEW_GRADING_ENABLED || ENV.PEER_REVIEW_ALLOCATION_ENABLED) && shouldFocus) {
+      if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && shouldFocus) {
         const peerReviewDetailsEl = document.getElementById(
           'peer_reviews_allocation_and_grading_details',
         )
@@ -1989,7 +1994,7 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
     delete errors.invalid_card
   }
 
-  if (ENV.PEER_REVIEW_GRADING_ENABLED || ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
     const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
     if (peerReviewCheckbox && peerReviewCheckbox.checked) {
       const peerReviewDetailsEl = document.getElementById(
@@ -2440,7 +2445,7 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
     this.hideErrors('final_grader_id_errors')
   }
   let isPeerReviewEnabled
-  if (ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
     const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
     if (peerReviewCheckbox) {
       isPeerReviewEnabled = peerReviewCheckbox.checked

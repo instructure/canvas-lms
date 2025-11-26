@@ -19,6 +19,7 @@ import * as React from 'react'
 import {IconConfirmation} from '../../../registration_wizard_forms/IconConfirmation'
 import {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
 import {Lti1p3RegistrationOverlayStore} from '../../../registration_overlay/Lti1p3RegistrationOverlayStore'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 
 type IconConfirmationPerfWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
@@ -50,11 +51,16 @@ export const IconConfirmationPerfWrapper = React.memo(
       }),
     )
 
+    const filteredPlacements = React.useMemo(
+      () => filterPlacementsByFeatureFlags(allPlacements),
+      [allPlacements],
+    )
+
     return (
       <IconConfirmation
         internalConfig={registration.configuration}
         name={registration.name}
-        allPlacements={allPlacements}
+        allPlacements={filteredPlacements}
         placementIconOverrides={placementIconOverrides}
         setPlacementIconUrl={setPlacementIconUrl}
         hasSubmitted={hasSubmitted}

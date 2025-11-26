@@ -886,7 +886,7 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    pg (1.5.9)
+    pg (1.6.2)
     pg_query (6.1.0)
       google-protobuf (>= 3.25.3)
     pp (0.6.3)
@@ -1399,7 +1399,7 @@ DEPENDENCIES
   paginated_collection!
   parallel (~> 1.23)
   pdf-reader (~> 2.11)
-  pg (~> 1.5)
+  pg (~> 1.6)
   pg_query (~> 6.0)
   prawn-emoji (~> 6.0)
   prawn-rails (~> 1.4)

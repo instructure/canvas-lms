@@ -26,6 +26,7 @@ import DashboardTabs from '../DashboardTabs'
 import {clearWidgetDashboardCache, defaultGraphQLHandlers} from '../../__tests__/testHelpers'
 import {WidgetDashboardProvider} from '../../hooks/useWidgetDashboardContext'
 import {WidgetDashboardEditProvider} from '../../hooks/useWidgetDashboardEdit'
+import {WidgetLayoutProvider} from '../../hooks/useWidgetLayout'
 
 type Props = Record<string, never> // DashboardTabs has no props
 
@@ -113,6 +114,10 @@ const server = setupServer(
       },
     ])
   }),
+  // Mock REST API for TodoListWidget - return empty array to avoid errors
+  http.get('/api/v1/planner/items', () => {
+    return HttpResponse.json([])
+  }),
   // Mock GraphQL mutation for tab selection
   graphql.mutation('UpdateLearnerDashboardTabSelection', () => {
     return HttpResponse.json({
@@ -164,7 +169,9 @@ const setup = (props?: Props, envOverrides = {}, preferencesOverrides = {}) => {
     <QueryClientProvider client={queryClient}>
       <WidgetDashboardProvider preferences={preferences}>
         <WidgetDashboardEditProvider>
-          <DashboardTabs {...buildDefaultProps(props)} />
+          <WidgetLayoutProvider>
+            <DashboardTabs {...buildDefaultProps(props)} />
+          </WidgetLayoutProvider>
         </WidgetDashboardEditProvider>
       </WidgetDashboardProvider>
     </QueryClientProvider>,

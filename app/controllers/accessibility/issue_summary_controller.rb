@@ -27,7 +27,7 @@ module Accessibility
 
     before_action :require_context
     before_action :require_user
-    before_action :validate_allowed
+    before_action :check_authorized_action
 
     def show
       summary_data = calculate_issue_summary
@@ -36,8 +36,8 @@ module Accessibility
 
     private
 
-    def validate_allowed
-      return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY)
+    def check_authorized_action
+      return render status: :forbidden unless @context.try(:a11y_checker_enabled?)
 
       authorized_action(@context, @current_user, [:read, :update])
     end

@@ -356,8 +356,240 @@ RSpec.describe PeerReview::AdhocOverrideUpdaterService do
           )
         end
 
-        it "raises InvalidOverrideDatesError" do
-          expect { service.call }.to raise_error(PeerReview::InvalidOverrideDatesError, "Due date cannot be before unlock date")
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(PeerReview::InvalidDatesError, "Due date cannot be before unlock date")
+        end
+      end
+    end
+
+    context "validation against parent override dates" do
+      let(:parent_assignment) { peer_review_sub_assignment.parent_assignment }
+
+      context "when updated peer review dates fall within parent override dates" do
+        before do
+          initial_parent_override.destroy
+          parent_override = assignment_override_model(
+            assignment: parent_assignment,
+            set_type: AssignmentOverride::SET_TYPE_ADHOC,
+            unlock_at: 1.day.from_now,
+            lock_at: 4.weeks.from_now
+          )
+          parent_override.assignment_override_students.create!(user: students[0])
+          existing_override.update!(parent_override:)
+        end
+
+        let(:override_params) do
+          {
+            id: existing_override.id,
+            set_type: "ADHOC",
+            student_ids: [students[0].id],
+            unlock_at: 2.days.from_now,
+            due_at: 2.weeks.from_now,
+            lock_at: 3.weeks.from_now
+          }
+        end
+
+        let(:service) do
+          described_class.new(
+            peer_review_sub_assignment:,
+            override: override_params
+          )
+        end
+
+        it "updates the override successfully" do
+          result = service.call
+          expect(result.due_at).to eq(override_params[:due_at])
+          expect(result.unlock_at).to eq(override_params[:unlock_at])
+          expect(result.lock_at).to eq(override_params[:lock_at])
+        end
+      end
+
+      context "when updated peer review unlock_at is before parent unlock_at" do
+        before do
+          initial_parent_override.destroy
+          parent_override = assignment_override_model(
+            assignment: parent_assignment,
+            set_type: AssignmentOverride::SET_TYPE_ADHOC,
+            unlock_at: 3.days.from_now,
+            lock_at: 4.weeks.from_now
+          )
+          parent_override.assignment_override_students.create!(user: students[0])
+          existing_override.update!(parent_override:)
+        end
+
+        let(:override_params) do
+          {
+            id: existing_override.id,
+            set_type: "ADHOC",
+            student_ids: [students[0].id],
+            unlock_at: 1.day.from_now,
+            due_at: 2.weeks.from_now,
+            lock_at: 3.weeks.from_now
+          }
+        end
+
+        let(:service) do
+          described_class.new(
+            peer_review_sub_assignment:,
+            override: override_params
+          )
+        end
+
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review override unlock date cannot be before parent override unlock date/
+          )
+        end
+      end
+
+      context "when updated peer review due_at is after parent lock_at" do
+        before do
+          initial_parent_override.destroy
+          parent_override = assignment_override_model(
+            assignment: parent_assignment,
+            set_type: AssignmentOverride::SET_TYPE_ADHOC,
+            unlock_at: 1.day.from_now,
+            lock_at: 2.weeks.from_now
+          )
+          parent_override.assignment_override_students.create!(user: students[0])
+          existing_override.update!(parent_override:)
+        end
+
+        let(:override_params) do
+          {
+            id: existing_override.id,
+            set_type: "ADHOC",
+            student_ids: [students[0].id],
+            unlock_at: 2.days.from_now,
+            due_at: 3.weeks.from_now,
+            lock_at: 4.weeks.from_now
+          }
+        end
+
+        let(:service) do
+          described_class.new(
+            peer_review_sub_assignment:,
+            override: override_params
+          )
+        end
+
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review override due date cannot be after parent override lock date/
+          )
+        end
+      end
+
+      context "when updated peer review lock_at is after parent lock_at" do
+        before do
+          initial_parent_override.destroy
+          parent_override = assignment_override_model(
+            assignment: parent_assignment,
+            set_type: AssignmentOverride::SET_TYPE_ADHOC,
+            unlock_at: 1.day.from_now,
+            lock_at: 2.weeks.from_now
+          )
+          parent_override.assignment_override_students.create!(user: students[0])
+          existing_override.update!(parent_override:)
+        end
+
+        let(:override_params) do
+          {
+            id: existing_override.id,
+            set_type: "ADHOC",
+            student_ids: [students[0].id],
+            unlock_at: 2.days.from_now,
+            due_at: 1.week.from_now,
+            lock_at: 3.weeks.from_now
+          }
+        end
+
+        let(:service) do
+          described_class.new(
+            peer_review_sub_assignment:,
+            override: override_params
+          )
+        end
+
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review override lock date cannot be after parent override lock date/
+          )
+        end
+      end
+
+      context "when parent override has no unlock_at" do
+        before do
+          initial_parent_override.destroy
+          parent_override = assignment_override_model(
+            assignment: parent_assignment,
+            set_type: AssignmentOverride::SET_TYPE_ADHOC,
+            lock_at: 2.weeks.from_now
+          )
+          parent_override.assignment_override_students.create!(user: students[0])
+          existing_override.update!(parent_override:)
+        end
+
+        let(:override_params) do
+          {
+            id: existing_override.id,
+            set_type: "ADHOC",
+            student_ids: [students[0].id],
+            unlock_at: 1.day.ago,
+            due_at: 1.week.from_now,
+            lock_at: 10.days.from_now
+          }
+        end
+
+        let(:service) do
+          described_class.new(
+            peer_review_sub_assignment:,
+            override: override_params
+          )
+        end
+
+        it "does not validate against parent unlock_at" do
+          result = service.call
+          expect(result.unlock_at).to eq(override_params[:unlock_at])
+        end
+      end
+
+      context "when parent override has no lock_at" do
+        before do
+          initial_parent_override.destroy
+          parent_override = assignment_override_model(
+            assignment: parent_assignment,
+            set_type: AssignmentOverride::SET_TYPE_ADHOC,
+            unlock_at: 1.day.from_now
+          )
+          parent_override.assignment_override_students.create!(user: students[0])
+          existing_override.update!(parent_override:)
+        end
+
+        let(:override_params) do
+          {
+            id: existing_override.id,
+            set_type: "ADHOC",
+            student_ids: [students[0].id],
+            unlock_at: 2.days.from_now,
+            due_at: 1.month.from_now,
+            lock_at: 2.months.from_now
+          }
+        end
+
+        let(:service) do
+          described_class.new(
+            peer_review_sub_assignment:,
+            override: override_params
+          )
+        end
+
+        it "does not validate against parent lock_at" do
+          result = service.call
+          expect(result.lock_at).to eq(override_params[:lock_at])
         end
       end
     end

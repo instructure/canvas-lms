@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useCallback} from 'react'
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -52,7 +52,14 @@ import {getTrayHeight} from '../../shared/trayUtils'
 import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 import {parsedStudioOptionsPropType} from '../../shared/StudioLtiSupportUtils'
 import RCEGlobals from '../../../../rce/RCEGlobals'
+import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
+
+function mapStudioEmbedOptions(embedOptions) {
+  return embedOptions
+    ? Object.entries(embedOptions).filter(([, v]) => v).map(([k]) => k)
+    : [];
+}
 
 export default function VideoOptionsTray({
   videoOptions,
@@ -66,8 +73,10 @@ export default function VideoOptionsTray({
   id = 'video-options-tray',
   studioOptions = null,
   forBlockEditorUse = false,
+  onStudioEmbedOptionChanged = () => { },
 }) {
   const isConsolidatedMediaPlayer = RCEGlobals.getFeatures()?.consolidated_media_player
+  const isEmbedImprovements = RCEGlobals.getFeatures()?.rce_studio_embed_improvements
   const {naturalHeight, naturalWidth} = videoOptions
   const currentHeight = videoOptions.appliedHeight || naturalHeight
   const currentWidth = videoOptions.appliedWidth || naturalWidth
@@ -86,6 +95,10 @@ export default function VideoOptionsTray({
   const [minPercentage] = useState(MIN_PERCENTAGE)
   const [editLocked, setEditLocked] = useState(null)
   const [loading, setLoading] = useState(true)
+
+  const [studioEmbedOptions, setStudioEmbedOptions] = useState(
+    () => mapStudioEmbedOptions(studioOptions?.embedOptions)
+  );
 
   const isStudio = !!studioOptions
   const showDisplayOptions = (!isStudio || studioOptions.convertibleToLink) && !forBlockEditorUse
@@ -141,6 +154,19 @@ export default function VideoOptionsTray({
   function handleUpdateSubtitles(new_subtitles) {
     setSubtitles(new_subtitles)
   }
+
+  const handleEmbedOptionChange = useCallback((options) => {
+    const mappedOptions = options
+      .reduce(
+        (a, c) => {
+          a[c] = options.includes(c)
+          return a
+        },
+        {},
+      )
+    setStudioEmbedOptions(options)
+    onStudioEmbedOptionChanged(mappedOptions)
+  }, [onStudioEmbedOptionChanged]);
 
   function handleSave(event, updateMediaObject) {
     event.preventDefault()
@@ -344,6 +370,34 @@ export default function VideoOptionsTray({
                           </FormFieldGroup>
                         </Flex.Item>
                       )}
+                      {isStudio && isEmbedImprovements ? (
+                        <Flex.Item padding="small">
+                          <CheckboxGroup name="studio-embed-options"
+                            onChange={handleEmbedOptionChange}
+                            value={studioEmbedOptions}
+                            description={formatMessage("Embed Options")}
+                          >
+                            <Text variant="contentSmall">{formatMessage('Changes will apply after you save this page.')}</Text>
+                            <Checkbox
+                              label={formatMessage('Lock speed at 1x')}
+                              value="lockSpeed"
+                              variant='toggle'
+                            />
+                            {!studioOptions?.embedOptions?.isExternal ? (
+                              <Checkbox
+                                label={formatMessage('Allow media download')}
+                                value="enableMediaDownload"
+                                variant='toggle'
+                              />
+                            ) : null}
+                            <Checkbox
+                              label={formatMessage('Allow transcript download')}
+                              value="enableTranscriptDownload"
+                              variant='toggle'
+                            />
+                          </CheckboxGroup>
+                        </Flex.Item>
+                      ) : null}
                     </Flex>
                   </Flex.Item>
                   <Flex.Item
@@ -396,4 +450,5 @@ VideoOptionsTray.propTypes = {
   id: string,
   studioOptions: parsedStudioOptionsPropType,
   requestSubtitlesFromIframe: func,
+  onStudioEmbedOptionChanged: func,
 }

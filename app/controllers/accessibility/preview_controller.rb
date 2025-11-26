@@ -42,7 +42,7 @@ module Accessibility
     private
 
     def check_authorized_action
-      return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY)
+      return render status: :forbidden unless @context.try(:a11y_checker_enabled?)
 
       authorized_action(@context, @current_user, [:read, :update])
     end

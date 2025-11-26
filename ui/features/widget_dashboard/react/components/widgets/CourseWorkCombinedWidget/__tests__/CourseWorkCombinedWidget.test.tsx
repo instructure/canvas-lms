@@ -24,6 +24,8 @@ import {http, HttpResponse, graphql} from 'msw'
 import CourseWorkCombinedWidget from '../CourseWorkCombinedWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
 import {defaultGraphQLHandlers, clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
+import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 const tomorrow = new Date()
 tomorrow.setDate(tomorrow.getDate() + 1)
@@ -203,7 +205,13 @@ const renderWithProviders = (component: React.ReactElement) => {
     defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
   })
 
-  return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>)
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <WidgetDashboardEditProvider>
+        <WidgetLayoutProvider>{component}</WidgetLayoutProvider>
+      </WidgetDashboardEditProvider>
+    </QueryClientProvider>,
+  )
 }
 
 beforeAll(() => {

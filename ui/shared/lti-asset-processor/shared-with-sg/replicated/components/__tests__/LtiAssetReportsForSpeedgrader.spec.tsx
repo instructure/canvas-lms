@@ -18,11 +18,11 @@
 
 // This import needs to be first to ensure that the mocked dependencies are set up before any other imports.
 
+import {fireEvent, screen} from '@testing-library/react'
 import {
   mockUseLtiAssetProcessors,
   mockUseLtiAssetReports,
 } from '../../../__tests__/mockedDependenciesShims'
-import {fireEvent, screen} from '@testing-library/react'
 import {renderComponent} from '../../../__tests__/renderingShims'
 import {describe, expect, fn, it} from '../../../__tests__/testPlatformShims'
 import {useLtiAssetProcessors, useLtiAssetReports} from '../../../dependenciesShims'
@@ -96,6 +96,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: multipleReports,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })
@@ -114,7 +117,7 @@ describe('LtiAssetReportsForSpeedgrader', () => {
       expect(screen.getByText('All comments')).toBeInTheDocument()
       expect(screen.getByText('Reports')).toBeInTheDocument()
       expect(screen.getByText('View reports')).toBeInTheDocument()
-      expect(screen.getByText('Needs attention')).toBeInTheDocument()
+      expect(screen.getByText('Please review')).toBeInTheDocument()
     })
 
     it('opens modal when View reports button is clicked', () => {
@@ -127,6 +130,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: multipleReports,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })
@@ -161,6 +167,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: multipleReports,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })
@@ -186,6 +195,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: reports,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })
@@ -214,6 +226,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: multipleReports,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })
@@ -256,6 +271,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: multipleReports,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })
@@ -289,6 +307,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: singleReport,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })

@@ -175,7 +175,7 @@ describe('StudentLtiAssetReportModal', () => {
     )
 
     expect(screen.getByText('test.pdf')).toBeInTheDocument()
-    expect(screen.getByText('Needs attention')).toBeInTheDocument()
+    expect(screen.getByText('Please review')).toBeInTheDocument()
     expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
   })
 
@@ -225,7 +225,7 @@ describe('StudentLtiAssetReportModal', () => {
     expect(screen.getByText('Test Processor · Test Processor Title')).toBeInTheDocument()
 
     // Should show the overall status reflecting the highest priority (3 = high priority)
-    expect(screen.getByText('Needs attention')).toBeInTheDocument()
+    expect(screen.getByText('Please review')).toBeInTheDocument()
     expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
   })
 

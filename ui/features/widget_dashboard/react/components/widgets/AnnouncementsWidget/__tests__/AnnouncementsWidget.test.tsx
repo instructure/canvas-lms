@@ -27,7 +27,9 @@ import {
   WidgetDashboardProvider,
   type SharedCourseData,
 } from '../../../../hooks/useWidgetDashboardContext'
-import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {clearWidgetDashboardCache, defaultGraphQLHandlers} from '../../../../__tests__/testHelpers'
+import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
+import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 const mockWidget: Widget = {
   id: 'test-announcements-widget',
@@ -264,7 +266,9 @@ const setup = (
     wrapper: ({children}: {children: React.ReactNode}) => (
       <QueryClientProvider client={queryClient}>
         <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
-          {children}
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
         </WidgetDashboardProvider>
       </QueryClientProvider>
     ),
@@ -330,7 +334,7 @@ const mockCourseGradesResponse = {
   },
 }
 
-const server = setupServer()
+const server = setupServer(...defaultGraphQLHandlers)
 
 const waitForLoadingToComplete = async () => {
   await waitFor(() => {
@@ -516,7 +520,10 @@ describe('AnnouncementsWidget', () => {
       expect(screen.getByText('Test Announcement 2')).toBeInTheDocument()
     })
 
-    expect(callCount).toBe(2)
+    await waitFor(() => {
+      expect(callCount).toBe(2)
+    })
+
     cleanup()
   })
 

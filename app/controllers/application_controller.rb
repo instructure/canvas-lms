@@ -310,7 +310,8 @@ class ApplicationController < ActionController::Base
           RAILS_ENVIRONMENT: Canvas.environment
         }
         @js_env[:use_dyslexic_font] = @current_user&.prefers_dyslexic_font? if @current_user&.can_see_dyslexic_font_feature_flag?(session) && !mobile_device?
-        @js_env[:widget_dashboard_overridable] = @current_user&.prefers_widget_dashboard?(@domain_root_account) if @current_user && @domain_root_account&.feature_allowed?(:widget_dashboard) && !mobile_device?
+        widget_dashboard_flag = @domain_root_account&.lookup_feature_flag(:widget_dashboard)
+        @js_env[:widget_dashboard_overridable] = @current_user&.prefers_widget_dashboard?(@domain_root_account, widget_dashboard_flag) if @current_user && widget_dashboard_flag&.enabled? && widget_dashboard_flag.can_override? && !mobile_device?
         if @domain_root_account&.feature_enabled?(:restrict_student_access)
           @js_env[:current_user_has_teacher_enrollment] = @current_user&.teacher_enrollment?
         end
@@ -2567,7 +2568,7 @@ class ApplicationController < ActionController::Base
 
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
-  def safe_domain_file_url(attachment, host_and_shard: nil, verifier: nil, download: false, return_url: nil, fallback_url: nil, authorization: nil)
+  def safe_domain_file_url(attachment, host_and_shard: nil, verifier: nil, download: false, return_url: nil, fallback_url: nil, authorization: nil, query_params: {})
     host_and_shard ||= HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
     host, shard = host_and_shard
     config = DynamicSettings.find(tree: :private, cluster: attachment.shard.database_server.id)
@@ -2599,6 +2600,8 @@ class ApplicationController < ActionController::Base
         # comment below for why we'd want to set :download
         opts[:inline] = 1
       end
+
+      opts.merge!(query_params)
 
       if @context && Attachment.relative_context?(@context.class.base_class) && @context == attachment.context
         # so yeah, this is right. :inline=>1 wants :download=>1 to go along with

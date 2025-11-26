@@ -26,6 +26,28 @@ describe Announcement do
     @context.announcements.create!(valid_announcement_attributes)
   end
 
+  context "with attachment associations" do
+    before do
+      course_model
+      @course.root_account.enable_feature!(:file_association_access)
+
+      @attachment1 = attachment_with_context(@course)
+      @attachment2 = attachment_with_context(@course)
+
+      html_with_attachments = <<~HTML.strip
+        <p>Announcement content</p>
+        <p><a href="/courses/#{@course.id}/files/#{@attachment1.id}/download">file 1</a></p>
+        <img src="/courses/#{@course.id}/files/#{@attachment2.id}/preview">
+      HTML
+
+      announcement_model(context: @course, message: html_with_attachments, updating_user: @teacher)
+    end
+
+    it "creates attachment associations for parent topic" do
+      expect(@a.attachment_associations.count).to eq 2
+    end
+  end
+
   describe "locking" do
     it "locks if its course has the lock_all_announcements setting" do
       course_with_student(active_all: true)

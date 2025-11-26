@@ -23,6 +23,12 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('assignment_scheduled_release_policy')
+const GRADES_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR = I18n.t(
+  'Grades release date must be the same or after comments release date'
+)
+const COMMENTS_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR = I18n.t(
+  'Comments release date must be the same or before grades release date'
+)
 
 type SeparateScheduledReleaseProps = {
   gradeErrorMessages: FormMessage[]
@@ -40,33 +46,52 @@ export const SeparateScheduledRelease = ({
   handleChange,
   handleErrorMessages,
 }: SeparateScheduledReleaseProps) => {
-  const validateReleaseDates = (gradesDateString: string | null, commentsDateString: string | null) => {
+  const filterRelationshipErrors = (messages: FormMessage[]) => {
+    const relationshipErrorTexts = [
+      GRADES_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
+      COMMENTS_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
+    ]
+    return messages.filter(msg => !relationshipErrorTexts.includes(msg.text))
+  }
+
+  const validateReleaseDates = (
+    gradesDateString: string | null,
+    commentsDateString: string | null,
+    changedField: 'grades' | 'comments'
+  ) => {
     const gradeMessages: FormMessage[] = []
     const commentMessages: FormMessage[] = []
 
     const gradesDate = gradesDateString ? new Date(gradesDateString) : null
     const commentsDate = commentsDateString ? new Date(commentsDateString) : null
 
-    if (gradesDate && gradesDate < new Date()) {
+    if (changedField === 'grades' && gradesDate && gradesDate < new Date()) {
       gradeMessages.push({text: I18n.t('Date must be in the future'), type: 'error'})
     }
 
-    if (commentsDate && commentsDate < new Date()) {
+    if (changedField === 'comments' && commentsDate && commentsDate < new Date()) {
       commentMessages.push({text: I18n.t('Date must be in the future'), type: 'error'})
     }
 
     if (gradesDate && commentsDate && gradesDate < commentsDate) {
       gradeMessages.push({
-        text: I18n.t('Grades release date must be the same or after comments release date'),
+        text: GRADES_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
         type: 'error',
       })
       commentMessages.push({
-        text: I18n.t('Comments release date must be the same or before grades release date'),
+        text: COMMENTS_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
         type: 'error',
       })
     }
 
-    handleErrorMessages(gradeMessages, commentMessages)
+    // Preserve existing errors from the unchanged field (excluding relationship errors)
+    const preservedGradeErrors = changedField === 'comments' ? filterRelationshipErrors(gradeErrorMessages) : []
+    const preservedCommentErrors = changedField === 'grades' ? filterRelationshipErrors(commentErrorMessages) : []
+
+    handleErrorMessages(
+      [...preservedGradeErrors, ...gradeMessages],
+      [...preservedCommentErrors, ...commentMessages]
+    )
   }
 
   const onChangeGradeReleaseDate = (_e: React.SyntheticEvent, isoDate?: string) => {
@@ -75,11 +100,11 @@ export const SeparateScheduledRelease = ({
 
     if (!isoDate) {
       messages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
-      handleErrorMessages(messages, commentErrorMessages)
+      handleErrorMessages(messages, filterRelationshipErrors(commentErrorMessages))
       return
     }
 
-    validateReleaseDates(isoDate, postCommentsAt || null)
+    validateReleaseDates(isoDate, postCommentsAt || null, 'grades')
   }
 
   const onChangeCommentReleaseDate = (_e: React.SyntheticEvent, isoDate?: string) => {
@@ -88,11 +113,11 @@ export const SeparateScheduledRelease = ({
 
     if (!isoDate) {
       messages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
-      handleErrorMessages(gradeErrorMessages, messages)
+      handleErrorMessages(filterRelationshipErrors(gradeErrorMessages), messages)
       return
     }
 
-    validateReleaseDates(postGradesAt || null, isoDate)
+    validateReleaseDates(postGradesAt || null, isoDate, 'comments')
   }
 
   return (

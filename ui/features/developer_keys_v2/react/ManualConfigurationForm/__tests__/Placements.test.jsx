@@ -107,3 +107,31 @@ it('adds new placements to output', () => {
   expect(toolConfig).toHaveLength(2)
   expect(toolConfig[1].placement).toEqual('course_navigation')
 })
+
+it('filters out placements that are not in validPlacements when initializing', () => {
+  const ref = React.createRef()
+  const propsWithInvalidPlacement = props({
+    ref,
+    validPlacements: ['account_navigation'],
+    placements: [
+      {
+        placement: 'account_navigation',
+        target_link_uri: 'http://example.com',
+        message_type: 'LtiResourceLinkRequest',
+      },
+      {
+        placement: 'top_navigation',
+        target_link_uri: 'http://example.com',
+        message_type: 'LtiResourceLinkRequest',
+      },
+    ],
+  })
+  render(<Placements {...propsWithInvalidPlacement} />)
+  // Only account_navigation should be rendered
+  expect(screen.getByRole('combobox', {name: /Account Navigation/i})).toBeInTheDocument()
+  expect(screen.queryByRole('combobox', {name: /Top Navigation/i})).not.toBeInTheDocument()
+  // Tool config should only have 1 placement
+  const toolConfig = ref.current.generateToolConfigurationPart()
+  expect(toolConfig).toHaveLength(1)
+  expect(toolConfig[0].placement).toEqual('account_navigation')
+})

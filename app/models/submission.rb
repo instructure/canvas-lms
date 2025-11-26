@@ -1550,7 +1550,7 @@ class Submission < ActiveRecord::Base
     return if @assignment_changed_not_sub
 
     if submission_type == "online_text_entry"
-      self.saving_user = user
+      self.updating_user = user
       super
     else
       association_ids = attachment_associations.pluck(:attachment_id)
@@ -2666,7 +2666,7 @@ class Submission < ActiveRecord::Base
     res.user_id = user_id
     res.workflow_state = "assigned" if res.new_record?
 
-    if res.new_record? && assignment.context.feature_enabled?(:peer_review_grading) &&
+    if res.new_record? && assignment.context.feature_enabled?(:peer_review_allocation_and_grading) &&
        assignment.peer_reviews? &&
        assignment.peer_review_sub_assignment.present?
       res.peer_review_sub_assignment_id = assignment.peer_review_sub_assignment.id

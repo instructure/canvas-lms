@@ -46,7 +46,7 @@ export type RegistrationHistoryViewProps = {
  * Generate a summary of affected fields for display in the table
  */
 const getAffectedFieldsSummary = (diff: LtiHistoryEntryWithDiff): string => {
-  if ('contextControls' in diff) {
+  if ('deploymentDiffs' in diff) {
     return I18n.t('Availability & Exceptions')
   }
 

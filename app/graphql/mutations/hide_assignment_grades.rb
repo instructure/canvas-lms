@@ -62,7 +62,7 @@ class Mutations::HideAssignmentGrades < Mutations::BaseMutation
       progress.process_job(
         assignment,
         :hide_submissions,
-        { preserve_method_args: true },
+        { preserve_method_args: true, priority: Delayed::HIGH_PRIORITY },
         progress:,
         submission_ids: submissions_scope.pluck(:id),
         skip_content_participation_refresh: false

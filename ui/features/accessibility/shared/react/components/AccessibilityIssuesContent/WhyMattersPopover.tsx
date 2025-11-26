@@ -23,10 +23,11 @@ import {Flex} from '@instructure/ui-flex'
 import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {IconQuestionLine, IconWarningSolid} from '@instructure/ui-icons'
+import {IconExternalLinkLine, IconQuestionLine, IconWarningSolid} from '@instructure/ui-icons'
 import {AccessibilityIssue} from '../../types'
 import {Link} from '@instructure/ui-link'
 import canvas from '@instructure/ui-themes'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -36,6 +37,7 @@ interface WhyMattersPopoverProps {
 
 const WhyMattersPopover = ({issue}: WhyMattersPopoverProps) => {
   const [isShowingContent, setIsShowingContent] = useState(false)
+  const why = typeof issue.why === 'string' ? [issue.why] : issue.why
 
   return (
     <Popover
@@ -77,29 +79,43 @@ const WhyMattersPopover = ({issue}: WhyMattersPopoverProps) => {
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <Flex.Item>
-          <Text variant="content">{issue.why}</Text>
-        </Flex.Item>
-        <Flex.Item>
-          <Flex direction="column">
-            <Flex.Item>
-              <IconWarningSolid fontSize={canvas.typography.legend} color="warning" />{' '}
-              <Text color="warning" weight="bold" size="legend">
-                {I18n.t('IMPORTANT')}
-              </Text>
-            </Flex.Item>
-            <Flex.Item>
-              <Text variant="contentSmall">
-                {I18n.t('This is a')}{' '}
-                <Link href={issue.issueUrl}>{I18n.t('WCAG requirement')}</Link>{' '}
-                {I18n.t(
-                  'and part of accessibility standards that educational content must meet to be\n' +
-                    'inclusive for all learners, including those using screen readers.',
-                )}
-              </Text>
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
+        {why.map((paragraph, index) => (
+          <Flex.Item key={index} margin="0 0 x-small 0">
+            <Text variant="content">{paragraph}</Text>
+          </Flex.Item>
+        ))}
+        {issue.issueUrl && (
+          <Flex.Item>
+            <Flex direction="column">
+              <Flex.Item>
+                <IconWarningSolid fontSize={canvas.typography.legend} color="warning" />{' '}
+                <Text color="warning" weight="bold" size="legend">
+                  {I18n.t('IMPORTANT')}
+                </Text>
+              </Flex.Item>
+              <Flex.Item>
+                <Text variant="contentSmall">
+                  {I18n.t('This is a')}{' '}
+                  <Link
+                    href={issue.issueUrl}
+                    variant="standalone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    iconPlacement="end"
+                    renderIcon={<IconExternalLinkLine size="x-small" />}
+                  >
+                    {I18n.t('WCAG requirement')}{' '}
+                    <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
+                  </Link>{' '}
+                  {I18n.t(
+                    'and part of accessibility standards that educational content must meet to be\n' +
+                      'inclusive for all learners, including those using screen readers.',
+                  )}
+                </Text>
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+        )}
       </Flex>
     </Popover>
   )

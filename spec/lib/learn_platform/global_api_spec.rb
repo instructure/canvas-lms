@@ -451,7 +451,7 @@ describe LearnPlatform::GlobalApi do
     context "when enabled" do
       it "sends redirect_uris in the GET query parameters" do
         expect(CanvasHttp).to receive(:get).with(
-          "#{endpoint}#{LearnPlatform::GlobalApi::GET_API_LOOKUP_ENDPOINT}?redirect_urls%5B%5D=https%3A%2F%2Fexample.com%2Fredirect&redirect_urls%5B%5D=https%3A%2F%2Fanother.com%2Fcallback&sources%5B%5D=partner_provided",
+          "#{endpoint}#{LearnPlatform::GlobalApi::GET_API_LOOKUP_ENDPOINT}?redirect_urls%5B%5D=https%3A%2F%2Fexample.com%2Fredirect&redirect_urls%5B%5D=https%3A%2F%2Fanother.com%2Fcallback&sources%5B%5D=partner_provided&sources%5B%5D=manual",
           anything
         )
         subject

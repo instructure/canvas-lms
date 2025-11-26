@@ -15924,6 +15924,7 @@ hy:
         page_name: "Էջի անվանում"
         quiz_group: Խումբ
         quiz_name: "Թեստի անվանում"
+        quiz_type: "Թեստի տեսակ"
         topic_name: "Թեմայի անվանում"
         url: "URL հասցե"
         wiki_page_name: "Էջի անվանում"
@@ -16457,6 +16458,7 @@ hy:
       graded: գնահատվող
       submitted: "ուղարկված է"
       unsubmitted: "ուղարկված չէ"
+  submission_7ca566e1: Ուղարկում
   submission_action_take_quiz: "Օգտագործել %{title}"
   submission_action_turn_in_assignment: "Ներառել %{title}-ում"
   submission_comment: 

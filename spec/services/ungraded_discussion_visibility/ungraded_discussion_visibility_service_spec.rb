@@ -105,4 +105,59 @@ describe "UngradedDiscussionVisibility" do
       expect(assignment_ids_visible_to_user(@student2)).to contain_exactly(@discussion2.assignment.id)
     end
   end
+
+  describe ".invalidate_cache" do
+    it "raises an error when neither course_ids nor discussion_topic_ids are provided" do
+      expect do
+        UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.invalidate_cache(user_ids: [@student1.id])
+      end.to raise_error(ArgumentError, "at least one non nil course_id or discussion_topic_id is required (for query performance reasons)")
+    end
+
+    it "deletes the cache when called with course_ids" do
+      UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(
+        course_ids: [@course.id],
+        user_ids: [@student1.id],
+        discussion_topic_ids: [@discussion1.id]
+      )
+
+      expect(Rails.cache).to receive(:delete).and_call_original
+
+      UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.invalidate_cache(
+        course_ids: [@course.id],
+        user_ids: [@student1.id],
+        discussion_topic_ids: [@discussion1.id]
+      )
+    end
+
+    it "deletes the cache when called with discussion_topic_ids only" do
+      UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(
+        discussion_topic_ids: [@discussion1.id, @discussion2.id]
+      )
+
+      expect(Rails.cache).to receive(:delete).and_call_original
+
+      UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.invalidate_cache(
+        discussion_topic_ids: [@discussion1.id, @discussion2.id]
+      )
+    end
+
+    it "accepts include_concluded parameter" do
+      expect do
+        UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.invalidate_cache(
+          course_ids: [@course.id],
+          include_concluded: false
+        )
+      end.not_to raise_error
+    end
+
+    it "works with multiple user_ids" do
+      expect(Rails.cache).to receive(:delete).and_call_original
+
+      UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.invalidate_cache(
+        course_ids: [@course.id],
+        user_ids: [@student1.id, @student2.id],
+        discussion_topic_ids: [@discussion1.id]
+      )
+    end
+  end
 end

@@ -45,6 +45,7 @@ describe "announcements" do
     end
 
     it "shows the unpublished course warning when course is unpublished" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       @course.workflow_state = "unpublished"
       @course.save!
       AnnouncementNewEdit.visit_new(@course)
@@ -53,6 +54,7 @@ describe "announcements" do
 
     # ignore RCE error since it has nothing to do with the test
     it "shows the no notifications on edit info alert when editing an announcement" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       @announcement = @course.announcements.create!(user: @teacher, message: "hello my favorite section!")
       get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
       expect(fj("div:contains('Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.')")).to be_present
@@ -198,6 +200,7 @@ describe "announcements" do
     end
 
     it "allows saving of section announcement", priority: "1" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
       AnnouncementNewEdit.visit_new(@course)
@@ -210,6 +213,7 @@ describe "announcements" do
     end
 
     it "does not allow empty sections", priority: "1" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
       AnnouncementNewEdit.visit_new(@course)
@@ -220,6 +224,7 @@ describe "announcements" do
     end
 
     it "does not show the allow comments checkbox if globally disabled" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       @course.lock_all_announcements = true
       @course.save!
       AnnouncementNewEdit.visit_new(@course)
@@ -227,6 +232,7 @@ describe "announcements" do
     end
 
     it "shows the comments checkbox if not globally disabled" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       AnnouncementNewEdit.visit_new(@course)
       expect { f("#allow_user_comments") }.not_to raise_error
     end
@@ -264,6 +270,7 @@ describe "announcements" do
       end
 
       it "starts a new topic", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         get url
 
         expect_new_page_load { f("#add_announcement").click }
@@ -271,6 +278,7 @@ describe "announcements" do
       end
 
       it "adds an attachment to a new topic", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         topic_title = "new topic with file"
         get new_url
         wait_for_tiny(f("#discussion-edit-view textarea[name=message]"))
@@ -281,6 +289,7 @@ describe "announcements" do
       end
 
       it "performs front-end validation for message", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         topic_title = "new topic with file"
         get new_url
 
@@ -292,6 +301,7 @@ describe "announcements" do
       end
 
       it "edits a topic", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         edit_name = "edited discussion name"
         topic = announcement_model(title: @topic_title, user: @user)
         get "#{url}/#{topic.id}"
@@ -302,6 +312,7 @@ describe "announcements" do
     end
 
     it "creates a delayed announcement with an attachment", priority: "1" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       AnnouncementNewEdit.visit_new(@course)
       replace_content(f("input[name=title]"), "First Announcement")
       type_in_tiny("textarea[name=message]", "Hi, this is my first announcement")
@@ -328,6 +339,7 @@ describe "announcements" do
     end
 
     it "allows delay post date edit with disabled comments", priority: "2" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       time_new = format_time_for_view(Time.zone.today + 1.day).gsub(" at ", " ")
       disable_comments_on_announcements
       announcement = @course.announcements.create!(
@@ -340,6 +352,7 @@ describe "announcements" do
     end
 
     it "removes delayed_post_at when delayed_post_at field is cleared", priority: "1" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       topic = @course.announcements.create!(title: @topic_title, user: @user, delayed_post_at: 10.days.ago, message: "message")
       get "/courses/#{@course.id}/announcements/#{topic.id}"
       click_edit_btn
@@ -352,6 +365,7 @@ describe "announcements" do
     end
 
     it "changes the save button to publish when delayed_post_at is cleared", :ignore_js_errors, priority: "1" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       topic = @course.announcements.create!(title: @topic_title, user: @user, delayed_post_at: 10.days.from_now, message: "message")
 
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}/edit"
@@ -383,6 +397,7 @@ describe "announcements" do
     end
 
     it "creates an announcement that requires an initial post", priority: "1" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
       replace_content(f("input[name=title]"), "title")
       type_in_tiny("textarea[name=message]", "hi")

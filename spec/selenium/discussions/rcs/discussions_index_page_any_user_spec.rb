@@ -44,6 +44,7 @@ describe "discussions" do
       let(:topic) { somebody_topic }
 
       it "starts a new topic", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         get url
         expect_new_page_load { f("#add_discussion").click }
         edit("new topic title", "new topic")

@@ -473,6 +473,63 @@ describe GroupMembership do
         )
         @dt_membership.destroy
       end
+
+      it "clears cache for wiki pages with overrides when membership workflow_state changes" do
+        student = user_factory
+        wiki_page = @course.wiki_pages.create!(title: "Test Page")
+        wiki_page.assignment_overrides.create!(set: @diff_tag)
+
+        membership = @diff_tag.group_memberships.create(user: student, workflow_state: "invited")
+        original_updated_at = wiki_page.updated_at
+        membership.update!(workflow_state: "accepted")
+
+        expect(wiki_page.reload.updated_at).to be > original_updated_at
+      end
+
+      it "clears cache for discussion topics with overrides when membership workflow_state changes" do
+        student = user_factory
+        discussion_topic = @course.discussion_topics.create!(title: "Test Discussion")
+        discussion_topic.assignment_overrides.create!(set: @diff_tag)
+
+        membership = @diff_tag.group_memberships.create(user: student, workflow_state: "invited")
+        original_updated_at = discussion_topic.updated_at
+        membership.update!(workflow_state: "accepted")
+
+        expect(discussion_topic.reload.updated_at).to be > original_updated_at
+      end
+
+      it "handles multiple content types (assignments, wiki pages, discussion topics) in one update" do
+        student = user_factory
+        wiki_page = @course.wiki_pages.create!(title: "Test Page")
+        wiki_page.assignment_overrides.create!(set: @diff_tag)
+
+        discussion_topic = @course.discussion_topics.create!(title: "Test Discussion")
+        discussion_topic.assignment_overrides.create!(set: @diff_tag)
+
+        membership = @diff_tag.group_memberships.create(user: student, workflow_state: "invited")
+
+        original_wiki_updated_at = wiki_page.updated_at
+        original_discussion_updated_at = discussion_topic.updated_at
+
+        membership.update!(workflow_state: "accepted")
+
+        expect(wiki_page.reload.updated_at).to be > original_wiki_updated_at
+        expect(discussion_topic.reload.updated_at).to be > original_discussion_updated_at
+      end
+
+      it "does not clear cache when workflow_state does not change" do
+        student = user_factory
+        wiki_page = @course.wiki_pages.create!(title: "Test Page")
+        wiki_page.assignment_overrides.create!(set: @diff_tag)
+
+        membership = @diff_tag.group_memberships.create(user: student, workflow_state: "accepted")
+
+        expect(WikiPage).not_to receive(:where)
+        expect(DiscussionTopic).not_to receive(:where)
+        expect(SubmissionLifecycleManager).not_to receive(:recompute_users_for_course)
+
+        membership.save # No changes
+      end
     end
   end
 
@@ -518,6 +575,124 @@ describe GroupMembership do
       end.not_to change {
         GroupMembership.find(membership.id).root_account_id
       }
+    end
+  end
+
+  describe "visibility cache invalidation" do
+    let(:course) { course_model }
+    let(:student) { user_model }
+    let(:group_category) { course.group_categories.create!(name: "Project Groups", non_collaborative: true) }
+    let(:group) { group_category.groups.create!(context: course) }
+
+    before do
+      course.enroll_student(student, enrollment_state: "active")
+    end
+
+    context "with non-collaborative group using assignment overrides" do
+      let(:discussion_topic) { course.discussion_topics.create!(title: "Group Discussion") }
+      let(:wiki_page) { course.wiki_pages.create!(title: "Group Page") }
+
+      before do
+        @discussion_override = discussion_topic.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+        @wiki_override = wiki_page.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+      end
+
+      it "invalidates discussion visibility cache when group membership changes" do
+        membership = group.group_memberships.create!(user: student)
+
+        allow(UngradedDiscussionVisibility::UngradedDiscussionVisibilityService).to receive(:invalidate_cache)
+
+        membership.destroy
+
+        expect(UngradedDiscussionVisibility::UngradedDiscussionVisibilityService).to have_received(:invalidate_cache).with(
+          hash_including(
+            course_ids: [course.id],
+            user_ids: [student.id],
+            discussion_topic_ids: [discussion_topic.id],
+            include_concluded: true
+          )
+        ).at_least(:once)
+
+        expect(UngradedDiscussionVisibility::UngradedDiscussionVisibilityService).to have_received(:invalidate_cache).with(
+          hash_including(
+            course_ids: [course.id],
+            user_ids: [student.id],
+            discussion_topic_ids: [discussion_topic.id],
+            include_concluded: false
+          )
+        ).at_least(:once)
+      end
+
+      it "invalidates wiki page visibility cache when group membership changes" do
+        membership = group.group_memberships.create!(user: student)
+
+        allow(WikiPageVisibility::WikiPageVisibilityService).to receive(:invalidate_cache)
+
+        membership.destroy
+
+        expect(WikiPageVisibility::WikiPageVisibilityService).to have_received(:invalidate_cache).with(
+          hash_including(
+            course_ids: [course.id],
+            user_ids: [student.id],
+            wiki_page_ids: [wiki_page.id],
+            include_concluded: true
+          )
+        ).at_least(:once)
+
+        expect(WikiPageVisibility::WikiPageVisibilityService).to have_received(:invalidate_cache).with(
+          hash_including(
+            course_ids: [course.id],
+            user_ids: [student.id],
+            wiki_page_ids: [wiki_page.id],
+            include_concluded: false
+          )
+        ).at_least(:once)
+      end
+
+      it "invalidates both caches when both wiki pages and discussions exist" do
+        membership = group.group_memberships.create!(user: student)
+
+        allow(UngradedDiscussionVisibility::UngradedDiscussionVisibilityService).to receive(:invalidate_cache)
+        allow(WikiPageVisibility::WikiPageVisibilityService).to receive(:invalidate_cache)
+
+        membership.destroy
+
+        expect(UngradedDiscussionVisibility::UngradedDiscussionVisibilityService).to have_received(:invalidate_cache).with(
+          hash_including(
+            course_ids: [course.id],
+            user_ids: [student.id],
+            discussion_topic_ids: [discussion_topic.id],
+            include_concluded: true
+          )
+        ).at_least(:once)
+
+        expect(UngradedDiscussionVisibility::UngradedDiscussionVisibilityService).to have_received(:invalidate_cache).with(
+          hash_including(
+            course_ids: [course.id],
+            user_ids: [student.id],
+            discussion_topic_ids: [discussion_topic.id],
+            include_concluded: false
+          )
+        ).at_least(:once)
+
+        expect(WikiPageVisibility::WikiPageVisibilityService).to have_received(:invalidate_cache).with(
+          hash_including(
+            course_ids: [course.id],
+            user_ids: [student.id],
+            wiki_page_ids: [wiki_page.id],
+            include_concluded: true
+          )
+        ).at_least(:once)
+
+        expect(WikiPageVisibility::WikiPageVisibilityService).to have_received(:invalidate_cache).with(
+          hash_including(
+            course_ids: [course.id],
+            user_ids: [student.id],
+            wiki_page_ids: [wiki_page.id],
+            include_concluded: false
+          )
+        ).at_least(:once)
+      end
     end
   end
 end

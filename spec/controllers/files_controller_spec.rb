@@ -723,6 +723,24 @@ describe FilesController do
       expect(response).to be_redirect
     end
 
+    it "preserves location parameter when redirecting to files domain for preview" do
+      user_session(@teacher)
+      # create an HTML file to trigger inline content check
+      html_file = @course.attachments.create!(
+        uploaded_data: StringIO.new("<html><body>test</body></html>"),
+        filename: "test.html",
+        content_type: "text/html"
+      )
+
+      allow_any_instance_of(FilesController).to receive(:safer_domain_available?).and_return(true)
+      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files.example.com", Shard.default])
+
+      get "show", params: { course_id: @course.id, id: html_file.id, preview: 1, location: "course_syllabus_#{@course.id}" }
+
+      expect(response).to be_redirect
+      expect(response.location).to include("location=course_syllabus_#{@course.id}")
+    end
+
     it "forces download when download_frd is set" do
       user_session(@teacher)
       # this call should happen inside of FilesController#send_attachment

@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "Dateiname"
     },
+    "file_preview_21667a6e": {
+        "message": "Dateivorschau"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Dateivorschau für { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Dateispeicherquote überschritten"
     },

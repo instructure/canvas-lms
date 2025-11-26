@@ -24,6 +24,7 @@ import CourseWorkCombinedWidget from './widgets/CourseWorkCombinedWidget/CourseW
 import CourseGradesWidget from './widgets/CourseGradesWidget/CourseGradesWidget'
 import AnnouncementsWidget from './widgets/AnnouncementsWidget/AnnouncementsWidget'
 import PeopleWidget from './widgets/PeopleWidget/PeopleWidget'
+import TodoListWidget from './widgets/TodoListWidget/TodoListWidget'
 
 const widgetRegistry: WidgetRegistry = {
   [WIDGET_TYPES.COURSE_WORK_SUMMARY]: {
@@ -55,6 +56,11 @@ const widgetRegistry: WidgetRegistry = {
     component: PeopleWidget,
     displayName: 'People',
     description: 'View and contact your course instructors and teaching assistants',
+  },
+  [WIDGET_TYPES.TODO_LIST]: {
+    component: TodoListWidget,
+    displayName: 'To-do list',
+    description: 'View and manage your planner items and upcoming tasks',
   },
 }
 

@@ -19,7 +19,7 @@
 
 class PeerReview::AdhocOverrideCreatorService < PeerReview::AdhocOverrideCommonService
   def call
-    validate_override_dates(@override)
+    validate_peer_review_dates(@override)
 
     provided_student_ids = fetch_student_ids
     validate_student_ids_required(provided_student_ids)
@@ -30,6 +30,8 @@ class PeerReview::AdhocOverrideCreatorService < PeerReview::AdhocOverrideCommonS
     ActiveRecord::Base.transaction do
       parent_override = find_parent_override(provided_student_ids_in_course)
       validate_adhoc_parent_override_exists(parent_override, provided_student_ids_in_course)
+
+      validate_override_dates_against_parent_override(@override, parent_override)
 
       override = build_override(provided_student_ids_in_course, parent_override)
       build_override_students(override, provided_student_ids_in_course)

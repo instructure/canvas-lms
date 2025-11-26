@@ -41,6 +41,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
   isLoading: externalIsLoading,
   error: externalError,
   onRetry,
+  dragHandleProps,
 }) => {
   const [selectedCourse, setSelectedCourse] = useState<string>('all')
   const [selectedRecipient, setSelectedRecipient] = useState<{
@@ -114,6 +115,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
     <TemplateWidget
       widget={widget}
       isEditMode={isEditMode}
+      dragHandleProps={dragHandleProps}
       isLoading={isLoading}
       error={error}
       onRetry={onRetry}

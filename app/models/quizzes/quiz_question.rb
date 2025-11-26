@@ -76,8 +76,6 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   scope :not_deleted, -> { where.not(workflow_state: "deleted").or(where(workflow_state: nil)) }
   scope :without_assessment_question_association, -> { where(assessment_question_id: nil) }
 
-  attr_accessor :force_attachment_associations_update
-
   QUESTION_DATA_HTML_FIELDS = %i[
     question_text
     comments_html
@@ -92,9 +90,9 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     comments_html
   ].freeze
 
-  def update_attachment_associations
+  def update_attachment_associations(migration: nil)
     return unless attachment_associations_creation_enabled?
-    return if !saved_change_to_attribute?(:question_data) && !force_attachment_associations_update
+    return unless migration || saved_change_to_attribute?(:question_data)
 
     all_html = []
 
@@ -109,7 +107,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
       end
     end
 
-    associate_attachments_to_rce_object(all_html.compact.join("\n"), updating_user)
+    associate_attachments_to_rce_object(all_html.compact.join("\n"), updating_user, migration:)
   end
 
   def access_for_attachment_association?(user, session, _association)
@@ -204,7 +202,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     if aq.editable_by?(self)
       aq.question_data = question_data
       aq.initial_context = quiz.context if quiz&.context
-      aq.current_user = updating_user
+      aq.updating_user = updating_user
       aq.save! if aq.new_record?
     end
 

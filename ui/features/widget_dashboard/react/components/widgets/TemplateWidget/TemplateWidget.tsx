@@ -28,6 +28,7 @@ import {Pagination} from '@instructure/ui-pagination'
 import {IconDragHandleLine, IconTrashLine} from '@instructure/ui-icons'
 import type {BaseWidgetProps} from '../../../types'
 import {useResponsiveContext} from '../../../hooks/useResponsiveContext'
+import {useWidgetLayout, type MoveAction} from '../../../hooks/useWidgetLayout'
 import WidgetContextMenu from '../../shared/WidgetContextMenu'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -49,6 +50,7 @@ export interface TemplateWidgetProps extends BaseWidgetProps {
   loadingText?: string
   pagination?: PaginationProps
   isEditMode?: boolean
+  dragHandleProps?: any
 }
 
 const TemplateWidget: React.FC<TemplateWidgetProps> = ({
@@ -64,36 +66,60 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   loadingText,
   pagination,
   isEditMode = false,
+  dragHandleProps,
 }) => {
   const {isMobile, isDesktop} = useResponsiveContext()
+  const {config, moveWidget, removeWidget} = useWidgetLayout()
   const widgetTitle = title || widget.title
   const headingId = `${widget.id}-heading`
 
+  const handleMenuSelect = (action: string) => {
+    moveWidget(widget.id, action as MoveAction)
+  }
+
+  const handleRemove = () => {
+    removeWidget(widget.id)
+  }
+
   const editModeActions = (
-    <Flex gap="x-small">
+    <div style={{display: 'flex', gap: '0.5rem', alignItems: 'center'}}>
       <WidgetContextMenu
         trigger={
-          <IconButton
-            screenReaderLabel={I18n.t('Drag to reorder widget')}
-            size="small"
-            withBackground={false}
-            withBorder={false}
+          <button
+            {...dragHandleProps}
             data-testid={`${widget.id}-drag-handle`}
+            style={{
+              ...dragHandleProps?.style,
+              cursor: 'grab',
+              display: 'flex',
+              alignItems: 'center',
+              border: 'none',
+              background: 'transparent',
+              padding: '0.375rem',
+              margin: 0,
+              lineHeight: 1,
+            }}
+            type="button"
+            aria-label={I18n.t('Drag to reorder or click for options')}
           >
             <IconDragHandleLine />
-          </IconButton>
+          </button>
         }
+        widget={widget}
+        config={config}
+        onSelect={handleMenuSelect}
       />
       <IconButton
         screenReaderLabel={I18n.t('Remove widget')}
         size="small"
         withBackground={false}
         withBorder={false}
+        onClick={handleRemove}
         data-testid={`${widget.id}-remove-button`}
       >
         <IconTrashLine />
       </IconButton>
-    </Flex>
+    </div>
   )
 
   const renderContent = () => {
@@ -161,19 +187,19 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
                 {headerActions && (
                   <Flex.Item padding="x-small 0 x-small x-small">{headerActions}</Flex.Item>
                 )}
-                {isEditMode && isDesktop && editModeActions && (
+                {isEditMode && isDesktop && (
                   <Flex.Item padding="x-small 0 x-small x-small">{editModeActions}</Flex.Item>
                 )}
               </Flex>
             ) : (
-              <Flex direction="row" alignItems="center" justifyItems="space-between">
+              <Flex direction="row" alignItems="center" justifyItems="space-between" wrap="wrap">
                 <Flex.Item shouldGrow>
                   <Heading level="h2" variant="titleCardSection" margin="0" id={headingId}>
                     {widgetTitle}
                   </Heading>
                 </Flex.Item>
                 {headerActions && <Flex.Item shouldGrow={false}>{headerActions}</Flex.Item>}
-                {isEditMode && isDesktop && editModeActions && (
+                {isEditMode && isDesktop && (
                   <Flex.Item margin="0 0 0 small" shouldGrow={false}>
                     {editModeActions}
                   </Flex.Item>

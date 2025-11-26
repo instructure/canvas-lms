@@ -44,6 +44,7 @@ import {Footer} from '../registration_wizard_forms/Footer'
 import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 import {Header} from '../registration_wizard_forms/Header'
 import {isLtiPlacementWithIcon} from '../model/LtiPlacement'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -334,7 +335,9 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                 const placements = state.registration.configuration.placements.map(p => p.placement)
                 const disabledPlacements =
                   state.overlayStore.getState().state.overlay.disabled_placements ?? []
-                const enabledPlacements = placements.filter(p => !disabledPlacements.includes(p))
+                const enabledPlacements = filterPlacementsByFeatureFlags(
+                  placements.filter(p => !disabledPlacements.includes(p)),
+                )
 
                 if (enabledPlacements.some(p => isLtiPlacementWithIcon(p))) {
                   dynamicRegistrationWizardState.transitionToConfirmationState(
@@ -384,7 +387,9 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
               const placements = state.registration.configuration.placements.map(p => p.placement)
               const disabledPlacements =
                 state.overlayStore.getState().state.overlay.disabled_placements ?? []
-              const enabledPlacements = placements.filter(p => !disabledPlacements.includes(p))
+              const enabledPlacements = filterPlacementsByFeatureFlags(
+                placements.filter(p => !disabledPlacements.includes(p)),
+              )
 
               if (enabledPlacements.some(p => isLtiPlacementWithIcon(p))) {
                 dynamicRegistrationWizardState.transitionToConfirmationState(

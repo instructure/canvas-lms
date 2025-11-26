@@ -241,11 +241,13 @@ module Lti
           available: parent_availability,
           path:,
         }
-      end
+      end.uniq { [it[:account_id], it[:deployment_id]] }
     end
 
     # Calculate attributes in bulk for a collection of Lti::ContextControls.
     # Avoids N+1 queries for API responses that include multiple context controls.
+    # Make sure that you preload :account, :course, :created_by, :updated_by before calling
+    # this method to avoid even more N+1s!
     #
     # @param controls [Array<Lti::ContextControl>] the context controls to preload attributes for
     # @return [Hash] a hash mapping control IDs to their calculated attributes

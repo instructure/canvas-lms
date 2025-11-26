@@ -35,7 +35,7 @@ module Accessibility
     private
 
     def check_authorized_action
-      return render_unauthorized_action unless @context.try(:a11y_checker_enabled?) && ai_text_generation_enabled?
+      return render status: :forbidden unless @context.try(:a11y_checker_enabled?) && ai_text_generation_enabled?
 
       authorized_action(@context, @current_user, [:read, :update])
     end

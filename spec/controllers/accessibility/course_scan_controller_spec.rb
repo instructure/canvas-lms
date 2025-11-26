@@ -26,6 +26,16 @@ RSpec.describe Accessibility::CourseScanController do
     allow_any_instance_of(Course).to receive(:exceeds_accessibility_scan_limit?).and_return(false)
   end
 
+  context "when a11y_checker feature flag disabled" do
+    it "renders forbidden" do
+      allow_any_instance_of(described_class).to receive(:check_authorized_action).and_call_original
+      allow(course).to receive(:a11y_checker_enabled?).and_return(false)
+
+      expect(controller).to receive(:render).with(status: :forbidden)
+      controller.send(:check_authorized_action)
+    end
+  end
+
   describe "#show" do
     context "when no scan exists" do
       it "returns not found" do

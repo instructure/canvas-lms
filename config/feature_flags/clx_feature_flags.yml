@@ -25,6 +25,13 @@ horizon_root_experience:
   display_name: "Canvas Career: Root Account Experience"
   description: |-
     Enables the optimized root account experience in Canvas Career.
+horizon_role_dashboards:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Role Dashboards"
+  description: |-
+    Enables role-based dashboards in Canvas Career.
 horizon_dashboard_ai_widgets:
   applies_to: RootAccount
   state: hidden
@@ -95,6 +102,13 @@ horizon_course_index_page:
   display_name: "Canvas Career: Course Index Page"
   description: |-
     Enables native course index page in Canvas Career.
+horizon_chart_view:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Chart View"
+  description: |-
+    Enables chart view in Canvas Career.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:

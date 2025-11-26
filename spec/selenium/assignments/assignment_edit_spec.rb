@@ -194,8 +194,7 @@ describe "assignment" do
   context "peer review allocation and grading" do
     before(:once) do
       @pr_course = course_factory(name: "Peer Review Course", active_course: true)
-      @pr_course.enable_feature!(:peer_review_grading)
-      @pr_course.enable_feature!(:peer_review_allocation)
+      @pr_course.enable_feature!(:peer_review_allocation_and_grading)
       @pr_teacher = teacher_in_course(name: "PR Teacher", course: @pr_course, enrollment_state: :active).user
     end
 
@@ -649,214 +648,76 @@ describe "assignment" do
         expect(pr_assignment.intra_group_peer_reviews).to be false
       end
     end
-  end
 
-  context "peer review with only allocation enabled" do
-    before(:once) do
-      @allocation_course = course_factory(name: "Allocation Only Course", active_course: true)
-      @allocation_course.enable_feature!(:peer_review_allocation)
-      @allocation_course.disable_feature!(:peer_review_grading)
-      @allocation_teacher = teacher_in_course(name: "Allocation Teacher", course: @allocation_course, enrollment_state: :active).user
-    end
-
-    before do
-      user_session(@allocation_teacher)
-    end
-
-    context "data loading from existing assignment" do
+    describe "peer review across sections" do
       before(:once) do
-        # Create a group category for testing within-groups toggle
-        @allocation_group_category = @allocation_course.group_categories.create!(name: "Allocation Group Category")
-
-        @allocation_assignment = @allocation_course.assignments.create!(
-          name: "Allocation Only Assignment",
+        @pr_assignment_sections = @pr_course.assignments.create!(
+          title: "Peer Review Assignment",
           points_possible: 10,
           submission_types: "online_text_entry",
-          peer_reviews: true,
-          peer_review_count: 3,
-          intra_group_peer_reviews: true,
-          anonymous_peer_reviews: true,
-          peer_review_submission_required: true,
-          group_category: @allocation_group_category
+          peer_reviews: true
         )
       end
 
-      it "loads peer_review_count correctly from database" do
-        get "/courses/#{@allocation_course.id}/assignments/#{@allocation_assignment.id}/edit"
-        wait_for_ajaximations
+      it "loads the initial value of allow across sections when editing an assignment", custom_timeout: 30 do
+        @pr_assignment_sections.update!(peer_review_across_sections: false)
 
-        expect(f("[data-testid='peer-review-checkbox']")).to be_checked
-
-        reviews_required_input = f("input[data-testid='reviews-required-input']")
-        expect(reviews_required_input.attribute("value")).to eq("3")
-      end
-
-      it "shows allocation-specific fields" do
-        get "/courses/#{@allocation_course.id}/assignments/#{@allocation_assignment.id}/edit"
+        get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment_sections.id}/edit"
         wait_for_ajaximations
 
         fj("button:contains('Advanced Peer Review Configurations')").click
         wait_for_ajaximations
 
-        within_groups_checkbox = f("#peer_reviews_within_groups_checkbox")
-        expect(within_groups_checkbox).to be_displayed
-        expect(within_groups_checkbox).to be_selected
-
-        anonymity_checkbox = f("#peer_reviews_anonymity_checkbox")
-        expect(anonymity_checkbox).to be_displayed
-        expect(anonymity_checkbox).to be_selected
-
-        submission_required_checkbox = f("#peer_reviews_submission_required_checkbox")
-        expect(submission_required_checkbox).to be_displayed
-        expect(submission_required_checkbox).to be_selected
-      end
-    end
-  end
-
-  context "peer review with only grading enabled" do
-    before(:once) do
-      @grading_course = course_factory(name: "Grading Only Course", active_course: true)
-      @grading_course.disable_feature!(:peer_review_allocation)
-      @grading_course.enable_feature!(:peer_review_grading)
-      @grading_teacher = teacher_in_course(name: "Grading Teacher", course: @grading_course, enrollment_state: :active).user
-    end
-
-    before do
-      user_session(@grading_teacher)
-    end
-
-    context "data loading from existing assignment" do
-      before(:once) do
-        @grading_assignment = @grading_course.assignments.create!(
-          name: "Grading Only Assignment",
-          points_possible: 10,
-          submission_types: "online_text_entry",
-          peer_reviews: true,
-          peer_review_count: 3
-        )
-
-        @grading_peer_review_sub = PeerReview::PeerReviewCreatorService.call(
-          parent_assignment: @grading_assignment,
-          points_possible: 15, # 3 reviews * 5 points each
-          grading_type: "points"
-        )
+        across_sections_checkbox = f("#peer_reviews_across_sections_checkbox")
+        expect(across_sections_checkbox).not_to be_selected
       end
 
-      it "loads peer_review_count correctly from database" do
-        get "/courses/#{@grading_course.id}/assignments/#{@grading_assignment.id}/edit"
-        wait_for_ajaximations
-
-        expect(f("[data-testid='peer-review-checkbox']")).to be_checked
-
-        reviews_required_input = f("input[data-testid='reviews-required-input']")
-        expect(reviews_required_input.attribute("value")).to eq("3")
-      end
-
-      it "shows grading-specific fields with correct values" do
-        get "/courses/#{@grading_course.id}/assignments/#{@grading_assignment.id}/edit"
-        wait_for_ajaximations
-
-        expect(f("[data-testid='peer-review-checkbox']")).to be_checked
-
-        reviews_required_input = f("input[data-testid='reviews-required-input']")
-        expect(reviews_required_input.attribute("value")).to eq("3")
-
-        # Points per review should be calculated: 15 / 3 = 5
-        points_per_review_input = f("input[data-testid='points-per-review-input']")
-        expect(points_per_review_input.attribute("value")).to eq("5")
-
-        total_points_display = f("span[data-testid='total-peer-review-points']")
-        expect(total_points_display.text).to eq("15")
-      end
-
-      it "shows grading toggle in advanced settings" do
-        get "/courses/#{@grading_course.id}/assignments/#{@grading_assignment.id}/edit"
+      it "allows toggling allow across sections and persists the value", custom_timeout: 40 do
+        get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment_sections.id}/edit"
         wait_for_ajaximations
 
         fj("button:contains('Advanced Peer Review Configurations')").click
         wait_for_ajaximations
 
-        pass_fail_checkbox = f("[data-testid='pass-fail-grading-checkbox']")
-        expect(pass_fail_checkbox).to be_displayed
-        expect(pass_fail_checkbox).not_to be_selected
+        f("[data-testid='across-sections-checkbox'] + label").click
+
+        find_button("Save").click
+        wait_for_ajaximations
+
+        expect(@pr_assignment_sections.reload.peer_review_across_sections).to be false
+
+        get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment_sections.id}/edit"
+        wait_for_ajaximations
+
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        f("[data-testid='across-sections-checkbox'] + label").click
+
+        find_button("Save").click
+        wait_for_ajaximations
+
+        expect(@pr_assignment_sections.reload.peer_review_across_sections).to be true
       end
-    end
-  end
 
-  describe "peer review across sections" do
-    before(:once) do
-      course_with_teacher(active_all: true)
-      @course.enable_feature!(:peer_review_allocation)
-      @assignment = @course.assignments.create!(
-        title: "Peer Review Assignment",
-        points_possible: 10,
-        submission_types: "online_text_entry",
-        peer_reviews: true
-      )
-    end
+      it "persists disabled state after collapsing Advanced Configuration section", custom_timeout: 40 do
+        get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment_sections.id}/edit"
+        wait_for_ajaximations
 
-    before do
-      user_session(@teacher)
-    end
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
 
-    it "loads the initial value of allow across sections when editing an assignment", custom_timeout: 30 do
-      @assignment.update!(peer_review_across_sections: false)
+        f("[data-testid='across-sections-checkbox'] + label").click
 
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      wait_for_ajaximations
+        # Collapse the Advanced Configuration section
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
 
-      fj("button:contains('Advanced Peer Review Configurations')").click
-      wait_for_ajaximations
+        find_button("Save").click
+        wait_for_ajaximations
 
-      across_sections_checkbox = f("#peer_reviews_across_sections_checkbox")
-      expect(across_sections_checkbox).not_to be_selected
-    end
-
-    it "allows toggling allow across sections and persists the value", custom_timeout: 40 do
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      wait_for_ajaximations
-
-      fj("button:contains('Advanced Peer Review Configurations')").click
-      wait_for_ajaximations
-
-      f("[data-testid='across-sections-checkbox'] + label").click
-
-      find_button("Save").click
-      wait_for_ajaximations
-
-      expect(@assignment.reload.peer_review_across_sections).to be false
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      wait_for_ajaximations
-
-      fj("button:contains('Advanced Peer Review Configurations')").click
-      wait_for_ajaximations
-
-      f("[data-testid='across-sections-checkbox'] + label").click
-
-      find_button("Save").click
-      wait_for_ajaximations
-
-      expect(@assignment.reload.peer_review_across_sections).to be true
-    end
-
-    it "persists disabled state after collapsing Advanced Configuration section", custom_timeout: 40 do
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      wait_for_ajaximations
-
-      fj("button:contains('Advanced Peer Review Configurations')").click
-      wait_for_ajaximations
-
-      f("[data-testid='across-sections-checkbox'] + label").click
-
-      # Collapse the Advanced Configuration section
-      fj("button:contains('Advanced Peer Review Configurations')").click
-      wait_for_ajaximations
-
-      find_button("Save").click
-      wait_for_ajaximations
-
-      expect(@assignment.reload.peer_review_across_sections).to be false
+        expect(@pr_assignment_sections.reload.peer_review_across_sections).to be false
+      end
     end
   end
 end

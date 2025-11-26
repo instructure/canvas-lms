@@ -318,8 +318,8 @@ describe SearchController do
 
   describe "GET 'all_courses'" do
     before(:once) do
-      @c1 = course_factory(course_name: "foo", active_course: true)
-      @c2 = course_factory(course_name: "bar", active_course: true)
+      @c1 = course_factory(course_name: "foo", course_code: "foo-101", active_course: true)
+      @c2 = course_factory(course_name: "bar", sis_source_id: "xyzzy", active_course: true)
       @c2.update_attribute(:indexed, true)
       ra = @c1.root_account
       ra.settings[:enable_course_catalog] = true
@@ -331,10 +331,26 @@ describe SearchController do
       expect(assigns[:courses].map(&:id)).to eq [@c2.id]
     end
 
-    it "searches" do
+    it "searches by name" do
       @c1.update_attribute(:indexed, true)
       get "all_courses", params: { search: "foo" }
       expect(assigns[:courses].map(&:id)).to eq [@c1.id]
+    end
+
+    it "searches by sis id" do
+      get "all_courses", params: { search: "yzzy" }
+      expect(assigns[:courses].map(&:id)).to eq [@c2.id]
+    end
+
+    it "searches by course code" do
+      @c1.update_attribute(:indexed, true)
+      get "all_courses", params: { search: "foo-101" }
+      expect(assigns[:courses].map(&:id)).to eq [@c1.id]
+    end
+
+    it "searches by id" do
+      get "all_courses", params: { search: @c2.id.to_s }
+      expect(assigns[:courses].map(&:id)).to eq [@c2.id]
     end
 
     it "doesn't explode with non-string searches" do

@@ -2605,7 +2605,7 @@ describe AssignmentsApiController, type: :request do
 
     describe "peer_review_submission_required" do
       before do
-        @course.root_account.enable_feature!(:peer_review_allocation)
+        @course.root_account.enable_feature!(:peer_review_allocation_and_grading)
       end
 
       it "creates assignment with peer_review_submission_required set to true" do
@@ -2686,7 +2686,7 @@ describe AssignmentsApiController, type: :request do
 
     describe "peer_review_across_sections" do
       before do
-        @course.enable_feature!(:peer_review_allocation)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
       end
 
       it "creates assignment with peer_review_across_sections set to true" do
@@ -2766,7 +2766,7 @@ describe AssignmentsApiController, type: :request do
 
       context "when feature flag is off" do
         before do
-          @course.disable_feature!(:peer_review_allocation)
+          @course.disable_feature!(:peer_review_allocation_and_grading)
         end
 
         it "does not include peer_review_across_sections in the API response" do
@@ -2799,7 +2799,7 @@ describe AssignmentsApiController, type: :request do
 
     context "create_api_assignment: peer review sub assignment creation logic" do
       before do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @group = @course.assignment_groups.create!(name: "test group")
       end
 
@@ -2923,7 +2923,7 @@ describe AssignmentsApiController, type: :request do
           end
 
           it "does not call create_api_peer_review_sub_assignment when feature is disabled" do
-            @course.disable_feature!(:peer_review_grading)
+            @course.disable_feature!(:peer_review_allocation_and_grading)
             assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
 
             expect_any_instance_of(Api::V1::Assignment).not_to receive(:create_api_peer_review_sub_assignment)
@@ -3174,7 +3174,7 @@ describe AssignmentsApiController, type: :request do
 
       describe "API integration tests for peer review overrides" do
         before do
-          @course.enable_feature!(:peer_review_grading)
+          @course.enable_feature!(:peer_review_allocation_and_grading)
           @section1 = @course.course_sections.create!(name: "Section 1")
           @section2 = @course.course_sections.create!(name: "Section 2")
 
@@ -3649,7 +3649,7 @@ describe AssignmentsApiController, type: :request do
 
     context "PeerReviewUpdaterService call verification" do
       before do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @group = @course.assignment_groups.create!(name: "test group")
       end
 
@@ -3673,6 +3673,80 @@ describe AssignmentsApiController, type: :request do
 
         expect(response).to be_successful
       end
+
+      it "syncs peer_review_submission_required from parent to sub assignment when updated via API" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          name: "Test Assignment",
+          points_possible: 100,
+          peer_reviews: true,
+          peer_review_submission_required: true
+        )
+        peer_review_sub = PeerReview::PeerReviewCreatorService.call(parent_assignment: assignment)
+
+        expect(peer_review_sub.peer_review_submission_required).to be true
+
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+                 { controller: "assignments_api", action: "update", format: "json", course_id: @course.id.to_s, id: assignment.id.to_s },
+                 { assignment: { peer_review_submission_required: false } })
+
+        expect(response).to be_successful
+        peer_review_sub.reload
+        expect(peer_review_sub.peer_review_submission_required).to be false
+      end
+
+      it "syncs peer_review_across_sections from parent to sub assignment when updated via API" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          name: "Test Assignment",
+          points_possible: 100,
+          peer_reviews: true,
+          peer_review_across_sections: true
+        )
+        peer_review_sub = PeerReview::PeerReviewCreatorService.call(parent_assignment: assignment)
+
+        expect(peer_review_sub.peer_review_across_sections).to be true
+
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+                 { controller: "assignments_api", action: "update", format: "json", course_id: @course.id.to_s, id: assignment.id.to_s },
+                 { assignment: { peer_review_across_sections: false } })
+
+        expect(response).to be_successful
+        peer_review_sub.reload
+        expect(peer_review_sub.peer_review_across_sections).to be false
+      end
+
+      it "syncs both peer review fields together when parent is updated via API" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          name: "Test Assignment",
+          points_possible: 100,
+          peer_reviews: true,
+          peer_review_submission_required: false,
+          peer_review_across_sections: false
+        )
+        peer_review_sub = PeerReview::PeerReviewCreatorService.call(parent_assignment: assignment)
+
+        expect(peer_review_sub.peer_review_submission_required).to be false
+        expect(peer_review_sub.peer_review_across_sections).to be false
+
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+                 { controller: "assignments_api", action: "update", format: "json", course_id: @course.id.to_s, id: assignment.id.to_s },
+                 {
+                   assignment: {
+                     peer_review_submission_required: true,
+                     peer_review_across_sections: true
+                   }
+                 })
+
+        expect(response).to be_successful
+        peer_review_sub.reload
+        expect(peer_review_sub.peer_review_submission_required).to be true
+        expect(peer_review_sub.peer_review_across_sections).to be true
+      end
     end
 
     describe "#create_api_peer_review_sub_assignment" do
@@ -3681,7 +3755,7 @@ describe AssignmentsApiController, type: :request do
       let(:test_object) { Object.new.extend(Api::V1::Assignment) }
 
       before do
-        course.enable_feature!(:peer_review_grading)
+        course.enable_feature!(:peer_review_allocation_and_grading)
       end
 
       context "with valid parameters" do
@@ -4312,7 +4386,7 @@ describe AssignmentsApiController, type: :request do
         let(:prepared_update) { { assignment: } }
 
         before do
-          course.enable_feature!(:peer_review_grading)
+          course.enable_feature!(:peer_review_allocation_and_grading)
           allow(test_object).to receive(:prepare_assignment_create_or_update).and_return(prepared_update.merge(valid: true))
           allow(SubmissionLifecycleManager).to receive(:recompute)
         end
@@ -4382,9 +4456,9 @@ describe AssignmentsApiController, type: :request do
           end
         end
 
-        context "when peer review grading feature is disabled" do
+        context "when peer review allocation and grading feature is disabled" do
           before do
-            course.disable_feature!(:peer_review_grading)
+            course.disable_feature!(:peer_review_allocation_and_grading)
             allow(test_object).to receive(:update_api_assignment_with_overrides).and_return(:ok)
           end
 
@@ -4562,7 +4636,7 @@ describe AssignmentsApiController, type: :request do
             allow(PeerReview::DateOverriderService).to receive(:call)
           end
 
-          it "wraps assignment update and peer review update in transaction when peer_review_grading is enabled" do
+          it "wraps assignment update and peer review update in transaction when peer_review_allocation_and_grading is enabled" do
             expect(Assignment).to receive(:transaction).at_least(:once).and_call_original
 
             allow(assignment.association(:peer_review_sub_assignment)).to receive(:reload)
@@ -4729,7 +4803,7 @@ describe AssignmentsApiController, type: :request do
       let(:test_object) { Object.new.extend(Api::V1::Assignment) }
 
       before do
-        course.enable_feature!(:peer_review_grading)
+        course.enable_feature!(:peer_review_allocation_and_grading)
       end
 
       context "with valid parameters" do
@@ -4931,7 +5005,7 @@ describe AssignmentsApiController, type: :request do
           peer_review_sub_assignment = double("peer_review_sub_assignment")
           allow(PeerReview::PeerReviewUpdaterService).to receive(:call).and_return(peer_review_sub_assignment)
           allow(PeerReview::DateOverriderService).to receive(:call)
-            .and_raise(PeerReview::InvalidOverrideDatesError.new(error_message))
+            .and_raise(PeerReview::InvalidDatesError.new(error_message))
 
           result = test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
 
@@ -8104,7 +8178,7 @@ describe AssignmentsApiController, type: :request do
     context "PeerReviewUpdaterService call verification" do
       before :once do
         course_with_teacher(active_all: true)
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
       end
 
       it "calls PeerReviewUpdaterService exactly once when updating an assignment with peer reviews" do
@@ -9361,7 +9435,7 @@ describe AssignmentsApiController, type: :request do
 
       context "when include_peer_review is false" do
         it "does not include peer_review_sub_assignment in JSON" do
-          @course.enable_feature!(:peer_review_grading)
+          @course.enable_feature!(:peer_review_allocation_and_grading)
           PeerReviewSubAssignment.create!(
             title: "Peer Review Sub Assignment",
             context: @course,
@@ -9377,7 +9451,7 @@ describe AssignmentsApiController, type: :request do
 
       context "when include_peer_review is not provided" do
         it "does not include peer_review_sub_assignment" do
-          @course.enable_feature!(:peer_review_grading)
+          @course.enable_feature!(:peer_review_allocation_and_grading)
           PeerReviewSubAssignment.create!(
             title: "Peer Review Sub Assignment",
             context: @course,
@@ -9394,7 +9468,7 @@ describe AssignmentsApiController, type: :request do
       context "when include_peer_review is true" do
         context "when feature flag is disabled" do
           before do
-            @course.disable_feature!(:peer_review_grading)
+            @course.disable_feature!(:peer_review_allocation_and_grading)
           end
 
           it "does not include peer_review_sub_assignment in JSON" do
@@ -9406,7 +9480,7 @@ describe AssignmentsApiController, type: :request do
 
         context "when feature flag is enabled" do
           before do
-            @course.enable_feature!(:peer_review_grading)
+            @course.enable_feature!(:peer_review_allocation_and_grading)
           end
 
           context "when peer review sub assignment exists" do

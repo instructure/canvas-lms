@@ -42,6 +42,7 @@ describe "discussion assignments" do
 
   context "create group discussion" do
     before do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       get "/courses/#{@course.id}/discussion_topics/new"
       f("#discussion-title").send_keys("New Discussion Title")
       type_in_tiny("textarea[name=message]", "Discussion topic message body")

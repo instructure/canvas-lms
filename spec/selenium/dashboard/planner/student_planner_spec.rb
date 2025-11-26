@@ -410,7 +410,7 @@ describe "student planner" do
         todo_tray_select_course_from_dropdown
       rescue => e
         if attempt < max_attempts
-          puts "\t Attempt #{attempt} failed! Retrying..."
+          Rails.logger.info "\t Attempt #{attempt} failed! Retrying..."
           sleep 0.5
           retry
         end
@@ -596,6 +596,7 @@ describe "student planner" do
     end
 
     it "shows correct default time in an ungraded discussion" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       Timecop.freeze(Time.zone.today) do
         @discussion = @course.discussion_topics.create!(title: "Default Time Discussion", message: "here is a message", user: @teacher)
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")

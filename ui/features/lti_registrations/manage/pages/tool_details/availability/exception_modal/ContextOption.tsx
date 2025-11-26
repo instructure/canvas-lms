@@ -53,7 +53,7 @@ export const ContextOption = React.memo(
                   {course_code ? (
                     <EllipsifiedItem>
                       <View>
-                        {I18n.t('Course ID: %{course_code}', {
+                        {I18n.t('Course Code: %{course_code}', {
                           course_code: course_code,
                         })}
                       </View>
@@ -78,7 +78,10 @@ export const ContextOption = React.memo(
 const EllipsifiedItem = ({
   children,
   style,
-}: {children: React.ReactNode; style?: React.CSSProperties}) => (
+}: {
+  children: React.ReactNode
+  style?: React.CSSProperties
+}) => (
   <div
     style={{
       overflow: 'hidden',

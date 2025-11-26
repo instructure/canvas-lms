@@ -38,13 +38,16 @@ module Api::V1::EnrollmentTerm
     end
   end
 
-  def enrollment_terms_json(enrollment_terms, user, session, root_account, enrollments = [], includes = [], subaccount_id = nil)
+  def enrollment_terms_json(enrollment_terms, user, session, root_account, enrollments = [], includes = [], subaccount = nil)
     if includes.include?("overrides")
       ActiveRecord::Associations.preload(enrollment_terms, :enrollment_dates_overrides)
     end
     filtered_terms = nil
-    if subaccount_id
-      filtered_term_ids = Account.find(subaccount_id).associated_courses.pluck(:enrollment_term_id).uniq
+    if subaccount
+      filtered_term_ids = EnrollmentTerm.where(id: enrollment_terms)
+                                        .where(subaccount.associated_courses
+                                                         .where("courses.enrollment_term_id=enrollment_terms.id")
+                                                         .arel.exists).ids
       default_id = root_account.default_enrollment_term.id
       filtered_term_ids.append(default_id)
       filtered_terms = filtered_term_ids.to_set

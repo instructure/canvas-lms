@@ -118,7 +118,7 @@ describe('DiscussionInsights', () => {
     })
 
     render(<DiscussionInsights />)
-    const searchInput = screen.getByPlaceholderText('Search...')
+    const searchInput = screen.getByPlaceholderText('Search students...')
     fireEvent.change(searchInput, {target: {value: 'Jane'}})
 
     await waitFor(() => {
@@ -201,7 +201,7 @@ describe('Screen Reader Announcements', () => {
 
     render(<DiscussionInsights />)
 
-    const searchInput = screen.getByPlaceholderText('Search...')
+    const searchInput = screen.getByPlaceholderText('Search students...')
     fireEvent.change(searchInput, {target: {value: 'John'}})
 
     await waitFor(() => {

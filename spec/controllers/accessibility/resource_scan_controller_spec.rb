@@ -58,6 +58,16 @@ describe Accessibility::ResourceScanController do
     )
   end
 
+  context "when a11y_checker feature flag disabled" do
+    it "renders forbidden" do
+      allow_any_instance_of(described_class).to receive(:check_authorized_action).and_call_original
+      allow(course).to receive(:a11y_checker_enabled?).and_return(false)
+
+      expect(controller).to receive(:render).with(status: :forbidden)
+      controller.send(:check_authorized_action)
+    end
+  end
+
   describe "GET #index" do
     %w[resource_name resource_type resource_workflow_state resource_updated_at issue_count].each do |sort_param|
       it "sorts by #{sort_param} ascending and descending" do
@@ -154,10 +164,10 @@ describe Accessibility::ResourceScanController do
               "rule_id" => "headings-start-at-h2",
               "element" => "h1",
               "display_name" => "Heading levels should start at level 2",
-              "message" => "Heading levels in your content should start at level 2 (H2), because there's already a Heading 1 on the page it's displayed on.",
-              "why" => "Sighted users scan web pages quickly by looking for large or bolded headings. Similarly, screen reader users rely on properly structured headings to scan the content and jump directly to key sections. Using correct heading levels in a logical (like H2, H3, etc.) ensures your course is clear, organized, and accessible to everyone. Each page on Canvas already has a main title (H1), so your content should start with an H2 to keep the structure clear.",
+              "message" => "This text is styled as a Heading 1, but there should only be one H1 on a web page — the page title. Use Heading 2 or lower (H2, H3, etc.) for your content headings instead.",
+              "why" => ["Sighted users scan web pages quickly by looking for large or bolded headings. Similarly, screen reader users rely on properly structured headings to scan the content and jump directly to key sections. Using correct heading levels in a logical order (like H2, H3, etc.) ensures your course is clear, organized, and accessible to everyone.", "Each page on Canvas already has a main title (H1), so your content should start with an H2 to keep the structure clear."],
               "path" => "./div/h1",
-              "issue_url" => "https://www.w3.org/WAI/tutorials/page-structure/headings/",
+              "issue_url" => "https://www.w3.org/TR/WCAG20-TECHS/G141.html",
               "form" => { "type" => "radio_input_group" }
             }
           ]

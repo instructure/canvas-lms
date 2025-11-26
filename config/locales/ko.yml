@@ -1691,6 +1691,7 @@ ko:
     titles: 
       assignment_rubric_details: "과제 루브릭 세부 정보"
   assignment_976578a8: 과제
+  assignment_details_bc488179: "과제 세부 정보"
   assignment_details_dialog: 
     average_score: "평균 점수:"
     count_of_submissions: "제출물 %{cnt}개"
@@ -13206,6 +13207,7 @@ ko:
         page_name: "페이지 이름"
         quiz_group: 그룹
         quiz_name: "퀴즈 이름"
+        quiz_type: "퀴즈 유형"
         topic_name: "주제 이름"
         url: URL
         wiki_page_name: "페이지 이름"
@@ -13604,6 +13606,7 @@ ko:
       graded: 평가됨
       submitted: 제출됨
       unsubmitted: "제출 안 됨"
+  submission_7ca566e1: 제출물
   submission_action_take_quiz: "%{title} 보기"
   submission_action_turn_in_assignment: "%{title} 제출"
   submission_comment: 

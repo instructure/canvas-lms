@@ -150,7 +150,7 @@ module Types
 
     def get_canvadoc_url(course, assignment, submission)
       opts = {
-        anonymous_instructor_annotations: course.grants_right?(current_user, :manage_grade) && assignment.anonymous_instructor_annotations,
+        anonymous_instructor_annotations: assignment.anonymous_instructor_annotations && course.grants_right?(current_user, :manage_grades),
         moderated_grading_allow_list: submission.moderated_grading_allow_list,
         submission_id: submission.id,
         enable_annotations: true,

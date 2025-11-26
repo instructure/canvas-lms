@@ -19,6 +19,7 @@
 
 describe Lti::Messages::JwtMessage do
   include_context "key_storage_helper"
+  include AccountDomainSpecHelper
 
   let(:return_url) { "http://www.platform.com/return_url" }
   let(:user) { @student }
@@ -621,7 +622,7 @@ describe Lti::Messages::JwtMessage do
 
     shared_examples "names and roles claim check" do
       it "sets the NRPS url using the Account#domain" do
-        allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("account_host")
+        stub_host_for_environment_specific_domain("account_host")
         expect(lti_advantage_service_claim["context_memberships_url"]).to eq "polymorphic_url"
         expect(controller).to have_received(:polymorphic_url).with(
           [anything, :names_and_roles], host: "account_host"
@@ -661,7 +662,7 @@ describe Lti::Messages::JwtMessage do
     let(:lti_advantage_service_claim_group) { :assignment_and_grade_service }
 
     before do
-      allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical_domain")
+      stub_host_for_environment_specific_domain("canonical_domain")
     end
 
     shared_examples "assignment and grade service claim check" do
@@ -704,7 +705,7 @@ describe Lti::Messages::JwtMessage do
     let(:lti_advantage_service_claim_group) { :platform_notification_service }
 
     before do
-      allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical_domain")
+      stub_host_for_environment_specific_domain("canonical_domain")
       allow(controller).to receive(:lti_notice_handlers_url)
         .with({ host: "canonical_domain", context_external_tool_id: lti_advantage_tool.id })
         .and_return("lti_notice_handlers_url")

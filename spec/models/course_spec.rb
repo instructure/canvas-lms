@@ -1689,24 +1689,8 @@ describe Course do
           @deleted_attachment.save!
         end
 
-        context "when the hidden_attachments_replacement_chain site admin flag is enabled" do
-          before do
-            Account.site_admin.enable_feature! :hidden_attachments_replacement_chain
-          end
-
-          it "returns the replacement attachment" do
-            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq new_attachment.id
-          end
-        end
-
-        context "when the hidden_attachments_replacement_chain site admin flag is disabled" do
-          before do
-            Account.site_admin.disable_feature! :hidden_attachments_replacement_chain
-          end
-
-          it "returns the original attachment" do
-            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
-          end
+        it "returns the replacement attachment" do
+          expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq new_attachment.id
         end
       end
 
@@ -1726,24 +1710,8 @@ describe Course do
           @deleted_attachment.save!
         end
 
-        context "when the hidden_attachments_replacement_chain site admin flag is enabled" do
-          before do
-            Account.site_admin.enable_feature! :hidden_attachments_replacement_chain
-          end
-
-          it "returns the original attachment" do
-            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
-          end
-        end
-
-        context "when the hidden_attachments_replacement_chain site admin flag is disabled" do
-          before do
-            Account.site_admin.disable_feature! :hidden_attachments_replacement_chain
-          end
-
-          it "returns the original attachment" do
-            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
-          end
+        it "returns the original attachment" do
+          expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
         end
       end
     end
@@ -9075,6 +9043,24 @@ describe Course do
     it "only includes active groups in active associations" do
       expect(@course.active_groups).to contain_exactly(@collaborative_group)
       expect(@course.active_differentiation_tags).to contain_exactly(@differentiation_tag)
+    end
+  end
+
+  describe "#requirement_count_api_enabled?" do
+    it "returns true when horizon_course? is true" do
+      account = Account.create!
+      account.enable_feature!(:horizon_course_setting)
+      account.horizon_account = true
+      account.save!
+      course = account.courses.create!(horizon_course: true)
+
+      expect(course.requirement_count_api_enabled?).to be true
+    end
+
+    it "returns false when horizon_course? is false" do
+      course = course_model
+
+      expect(course.requirement_count_api_enabled?).to be false
     end
   end
 

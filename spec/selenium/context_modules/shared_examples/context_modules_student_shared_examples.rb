@@ -306,10 +306,6 @@ shared_examples "context modules for students" do
       end
 
       before :once do
-        Account.site_admin.enable_feature!(:discussion_create)
-      end
-
-      before :once do
         @course = course_model.tap(&:offer!)
         @discussion1 = @course.discussion_topics.create!(title: "Test Discussion 1", message: "Discussion Content 1")
         @discussion2 = @course.discussion_topics.create!(title: "Test Discussion 2", message: "Discussion Content 2")

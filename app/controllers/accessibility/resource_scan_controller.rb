@@ -69,7 +69,7 @@ module Accessibility
     private
 
     def check_authorized_action
-      return render_unauthorized_action unless @context.is_a?(Course) && @context.a11y_checker_enabled?
+      return render status: :forbidden unless @context.try(:a11y_checker_enabled?)
 
       authorized_action(@context, @current_user, [:read, :update])
     end

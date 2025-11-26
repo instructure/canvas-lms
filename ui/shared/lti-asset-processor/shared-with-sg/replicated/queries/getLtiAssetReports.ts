@@ -65,9 +65,12 @@ export const LTI_ASSET_REPORT_FOR_STUDENT_FRAGMENT: GqlTemplateStringType = gql`
 export const LTI_ASSET_REPORTS_QUERY: GqlTemplateStringType = gql`
   query SpeedGrader_LtiAssetReportsQuery($assignmentId: ID!, $studentUserId: ID, $studentAnonymousId: ID) {
     submission(assignmentId: $assignmentId, userId: $studentUserId, anonymousId: $studentAnonymousId) {
-      ltiAssetReportsConnection(first: 20) {
+      ltiAssetReportsConnection(first: 100) {
         nodes {
           ...LtiAssetReportCommonFields
+        }
+        pageInfo {
+          hasNextPage
         }
       }
     }

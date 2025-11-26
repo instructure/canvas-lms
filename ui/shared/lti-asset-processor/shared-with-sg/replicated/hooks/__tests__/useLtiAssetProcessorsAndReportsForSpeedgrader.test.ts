@@ -53,7 +53,12 @@ describe('useLtiAssetProcessorsAndReportsForSpeedgrader', () => {
       })
 
       mockUseLtiAssetReports({
-        submission: {ltiAssetReportsConnection: {nodes: []}},
+        submission: {
+          ltiAssetReportsConnection: {
+            nodes: [],
+            pageInfo: {hasNextPage: false},
+          },
+        },
       })
 
       const {result} = renderHook(() => useLtiAssetProcessorsAndReportsForSpeedgrader(mockParams))
@@ -100,6 +105,7 @@ describe('useLtiAssetProcessorsAndReportsForSpeedgrader', () => {
           defaultGetLtiAssetProcessorsResult?.assignment?.ltiAssetProcessorsConnection?.nodes,
         assetReports: reportsResult?.submission?.ltiAssetReportsConnection?.nodes,
         compatibleSubmissionType: 'online_upload',
+        hasNextPage: false,
       })
     })
   })

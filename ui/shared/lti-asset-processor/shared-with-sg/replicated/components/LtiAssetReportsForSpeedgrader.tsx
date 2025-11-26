@@ -137,7 +137,8 @@ export function LtiAssetReportsForSpeedgrader(
   if (!processorsAndReports) {
     return null
   }
-  const {assetProcessors, assetReports, compatibleSubmissionType} = processorsAndReports
+  const {assetProcessors, assetReports, compatibleSubmissionType, hasNextPage} =
+    processorsAndReports
 
   const childProps = {
     attachments: props.attachments,
@@ -147,6 +148,7 @@ export function LtiAssetReportsForSpeedgrader(
     submissionType: compatibleSubmissionType,
     studentIdForResubmission: studentIdForResubmission(props) ?? undefined,
     showDocumentDisplayName: true,
+    hasNextPage,
   }
 
   return (

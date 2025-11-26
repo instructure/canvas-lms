@@ -23,7 +23,7 @@ import {weekendIntegers} from '../../shared/api/backend_serializer'
 import * as tz from '@instructure/moment-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {START_DATE_CAPTIONS, END_DATE_CAPTIONS} from '../../../constants'
-import { CoursePace, OptionalDate, Pace } from '../../types'
+import {CoursePace, OptionalDate, Pace} from '../../types'
 
 const I18n = createI18nScope('course_paces_app')
 
@@ -128,11 +128,11 @@ export const inBlackoutDate = (
   date: moment.Moment | string,
   blackoutDates: BlackoutDate[],
 ): boolean => {
-  date = moment(date)
+  date = moment(date).startOf('day')
 
   return blackoutDates.some(blackoutDate => {
-    const blackoutStart = blackoutDate.start_date
-    const blackoutEnd = blackoutDate.end_date
+    const blackoutStart = moment(blackoutDate.start_date).startOf('day')
+    const blackoutEnd = moment(blackoutDate.end_date).startOf('day')
     return date >= blackoutStart && date <= blackoutEnd
   })
 }
@@ -199,12 +199,16 @@ export const getEndDateValue = (coursePace: CoursePace, plannedEndDate: Optional
   }
 }
 
-const getStartDateCaption = (startDateValue: OptionalDate, coursePace: CoursePace, contextType: string) => {
+const getStartDateCaption = (
+  startDateValue: OptionalDate,
+  coursePace: CoursePace,
+  contextType: string,
+) => {
   if (startDateValue && coursePace.start_date_context !== 'hypothetical') {
-
-    const contextTypeValue: string = contextType === 'enrollment' && window.ENV.FEATURES.course_pace_time_selection
-      ? 'enrollment_time_selection'
-      : contextType
+    const contextTypeValue: string =
+      contextType === 'enrollment' && window.ENV.FEATURES.course_pace_time_selection
+        ? 'enrollment_time_selection'
+        : contextType
 
     // @ts-expect-error
     return START_DATE_CAPTIONS[contextTypeValue]
@@ -212,7 +216,11 @@ const getStartDateCaption = (startDateValue: OptionalDate, coursePace: CoursePac
   return START_DATE_CAPTIONS.empty
 }
 
-const getEndDateCaption = (endDateValue: OptionalDate, coursePace: CoursePace, contextType: string) => {
+const getEndDateCaption = (
+  endDateValue: OptionalDate,
+  coursePace: CoursePace,
+  contextType: string,
+) => {
   if (endDateValue && coursePace.end_date_context !== 'hypothetical') {
     // @ts-expect-error
     return END_DATE_CAPTIONS[contextType]
@@ -224,10 +232,10 @@ export const generateDatesCaptions = (
   coursePace: CoursePace,
   startDateValue: OptionalDate,
   endDateValue: OptionalDate,
-  appliedPace: Pace
+  appliedPace: Pace,
 ) => {
   const contextType = coursePace.context_type.toLocaleLowerCase()
-  const captions = { startDate: START_DATE_CAPTIONS.empty, endDate: END_DATE_CAPTIONS.empty }
+  const captions = {startDate: START_DATE_CAPTIONS.empty, endDate: END_DATE_CAPTIONS.empty}
   captions.startDate = getStartDateCaption(startDateValue, coursePace, contextType)
 
   if (contextType === 'enrollment') {

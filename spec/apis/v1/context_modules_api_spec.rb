@@ -1136,6 +1136,125 @@ describe "Modules API", type: :request do
         expect(new_module.require_sequential_progress).to be true
       end
 
+      context "with requirement_count" do
+        context "in a horizon course" do
+          before :once do
+            @course.account.enable_feature!(:horizon_course_setting)
+            @course.update!(horizon_course: true)
+          end
+
+          it "creates a module with requirement_count" do
+            json = api_call(:post,
+                            "/api/v1/courses/#{@course.id}/modules",
+                            { controller: "context_modules_api",
+                              action: "create",
+                              format: "json",
+                              course_id: @course.id.to_s },
+                            { module: { name: "test module", requirement_count: 2 } })
+
+            new_module = @course.context_modules.find(json["id"])
+            expect(new_module.requirement_count).to eq 2
+          end
+
+          it "updates a module with requirement_count" do
+            mod = @course.context_modules.create!(name: "test")
+            api_call(:put,
+                     "/api/v1/courses/#{@course.id}/modules/#{mod.id}",
+                     { controller: "context_modules_api",
+                       action: "update",
+                       format: "json",
+                       course_id: @course.id.to_s,
+                       id: mod.id.to_s },
+                     { module: { requirement_count: 3 } })
+
+            mod.reload
+            expect(mod.requirement_count).to eq 3
+          end
+
+          it "includes requirement_count in list" do
+            @course.context_modules.create!(name: "test", requirement_count: 2)
+            json = api_call(:get,
+                            "/api/v1/courses/#{@course.id}/modules",
+                            controller: "context_modules_api",
+                            action: "index",
+                            format: "json",
+                            course_id: @course.id.to_s)
+
+            expect(json[0]["requirement_count"]).to eq 2
+          end
+
+          it "includes requirement_count in show" do
+            mod = @course.context_modules.create!(name: "test", requirement_count: 2)
+            json = api_call(:get,
+                            "/api/v1/courses/#{@course.id}/modules/#{mod.id}",
+                            controller: "context_modules_api",
+                            action: "show",
+                            format: "json",
+                            course_id: @course.id.to_s,
+                            id: mod.id.to_s)
+
+            expect(json["requirement_count"]).to eq 2
+          end
+        end
+
+        context "in a non-horizon course" do
+          it "ignores requirement_count on create" do
+            json = api_call(:post,
+                            "/api/v1/courses/#{@course.id}/modules",
+                            { controller: "context_modules_api",
+                              action: "create",
+                              format: "json",
+                              course_id: @course.id.to_s },
+                            { module: { name: "test module", requirement_count: 2 } })
+
+            expect(json).not_to have_key("requirement_count")
+            new_module = @course.context_modules.find(json["id"])
+            expect(new_module.requirement_count).not_to eq 2
+          end
+
+          it "ignores requirement_count on update" do
+            mod = @course.context_modules.create!(name: "test", requirement_count: 1)
+            json = api_call(:put,
+                            "/api/v1/courses/#{@course.id}/modules/#{mod.id}",
+                            { controller: "context_modules_api",
+                              action: "update",
+                              format: "json",
+                              course_id: @course.id.to_s,
+                              id: mod.id.to_s },
+                            { module: { requirement_count: 5 } })
+
+            expect(json).not_to have_key("requirement_count")
+            mod.reload
+            expect(mod.requirement_count).to eq 1
+          end
+
+          it "does not include requirement_count in list" do
+            @course.context_modules.create!(name: "test", requirement_count: 2)
+            json = api_call(:get,
+                            "/api/v1/courses/#{@course.id}/modules",
+                            controller: "context_modules_api",
+                            action: "index",
+                            format: "json",
+                            course_id: @course.id.to_s)
+
+            expect(json[0]).not_to have_key("requirement_count")
+          end
+
+          it "does not include requirement_count in show" do
+            mod = @course.context_modules.create!(name: "test", requirement_count: 2)
+            json = api_call(:get,
+                            "/api/v1/courses/#{@course.id}/modules/#{mod.id}",
+                            controller: "context_modules_api",
+                            action: "show",
+                            format: "json",
+                            course_id: @course.id.to_s,
+                            id: mod.id.to_s)
+
+            expect(json).not_to have_key("requirement_count")
+          end
+        end
+      end
+
       it "requires a name" do
         api_call(:post,
                  "/api/v1/courses/#{@course.id}/modules",

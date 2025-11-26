@@ -2517,6 +2517,44 @@ describe Quizzes::Quiz do
         end
       end
     end
+
+    context "visible_students_with_da" do
+      before :once do
+        course_with_teacher(active_all: true)
+        @student1, @student2 = create_users(2, return_type: :record)
+        @course.enroll_student(@student1, enrollment_state: "active")
+        @course.enroll_student(@student2, enrollment_state: "active")
+        @quiz = Quizzes::Quiz.create!({
+                                        context: @course,
+                                        description: "quiz for differentiated tags",
+                                        only_visible_to_overrides: true,
+                                        title: "Quiz with tags"
+                                      })
+        @quiz.publish
+        @quiz.save!
+      end
+
+      it "returns all students when no students are specifically visible" do
+        context_students = @course.students
+        result = @quiz.visible_students_with_da(context_students)
+        expect(result.to_a).to eq(context_students.to_a)
+      end
+
+      it "returns visible students when they are assigned via overrides" do
+        context_students = @course.students
+        section = @course.course_sections.create!(name: "test section")
+        student_in_section(section, user: @student1)
+        create_section_override_for_assignment(@quiz.assignment, { course_section: section })
+        result = @quiz.visible_students_with_da(context_students)
+        expect(result).to include(@student1)
+        expect(result).not_to include(@student2)
+      end
+
+      it "does not raise an error when visible_user_ids is empty" do
+        context_students = @course.students
+        expect { @quiz.visible_students_with_da(context_students) }.not_to raise_error
+      end
+    end
   end
 
   context "due_between_with_overrides" do
