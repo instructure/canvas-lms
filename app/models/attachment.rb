@@ -2117,10 +2117,9 @@ class Attachment < ActiveRecord::Base
       }
 
       # Add canvas_metadata for submission attachments to enable word count updates
-      if (submission = assignment_submissions.first)
-        assignment = submission.assignment
+      if assignment_submissions.present?
         upload_opts[:canvas_metadata] = {
-          base_url: "#{HostUrl.protocol}://#{HostUrl.context_host(assignment.context)}",
+          base_url: "#{HostUrl.protocol}://#{root_account.environment_specific_domain}",
           attachment_jwt: CanvasSecurity.create_jwt({ id: }, 1.hour.from_now)
         }
       end
