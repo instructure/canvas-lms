@@ -21,10 +21,11 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-
+import {Responsive} from '@instructure/ui-responsive'
 import {useAccessibilityScansStore} from '../../../../shared/react/stores/AccessibilityScansStore'
 import {IssuesByTypeChart} from './IssuesByTypeChart'
 import {IssuesCounter} from './IssuesCounter'
+import {responsiveQuerySizes} from '@canvas/breakpoints'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -46,17 +47,39 @@ export const AccessibilityIssuesSummary = () => {
   if (loadingOfSummary) return renderLoading()
 
   return (
-    <Flex margin="0" gap="small" alignItems="stretch" data-testid="accessibility-issues-summary">
-      <Flex.Item>
-        <View as="div" padding="medium" borderWidth="small" borderRadius="medium" height="100%">
-          <IssuesCounter count={issuesSummary?.total ?? 0} />
-        </View>
-      </Flex.Item>
-      <Flex.Item shouldGrow shouldShrink>
-        <View as="div" padding="x-small" borderWidth="small" borderRadius="medium" height="100%">
-          <IssuesByTypeChart />
-        </View>
-      </Flex.Item>
-    </Flex>
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({desktop: true, tablet: true})}
+      props={{
+        tablet: {direction: 'column', isMobile: true},
+        desktop: {direction: 'row', isMobile: false},
+      }}
+    >
+      {props => (
+        <Flex
+          gap="medium"
+          alignItems="stretch"
+          direction={props?.direction}
+          data-testid="accessibility-issues-summary"
+        >
+          <Flex.Item>
+            <View as="div" padding="medium" borderWidth="small" borderRadius="medium" height="100%">
+              <IssuesCounter count={issuesSummary?.total ?? 0} />
+            </View>
+          </Flex.Item>
+          <Flex.Item shouldGrow shouldShrink>
+            <View
+              as="div"
+              padding="x-small"
+              borderWidth="small"
+              borderRadius="medium"
+              height="100%"
+            >
+              <IssuesByTypeChart isMobile={props?.isMobile} />
+            </View>
+          </Flex.Item>
+        </Flex>
+      )}
+    </Responsive>
   )
 }
