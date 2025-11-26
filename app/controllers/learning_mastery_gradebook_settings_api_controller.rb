@@ -27,6 +27,7 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
   VALID_NAME_DISPLAY_FORMAT_VALUES = %w[first_last last_first].freeze
   VALID_STUDENTS_PER_PAGE_VALUES = [15, 30, 50, 100].freeze
   VALID_SCORE_DISPLAY_FORMAT_VALUES = %w[icon_only icon_and_points icon_and_label].freeze
+  VALID_BOOLEAN_VALUES = [true, false, "true", "false"].freeze
 
   # @API Get Learning Mastery Gradebook Settings
   #
@@ -68,6 +69,7 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
     params.require(:learning_mastery_gradebook_settings).permit(
       :secondary_info_display,
       :show_students_with_no_results,
+      :show_outcomes_with_no_results,
       :show_student_avatars,
       :name_display_format,
       :students_per_page,
@@ -102,16 +104,23 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
       end
     end
 
+    if settings.key?(:show_outcomes_with_no_results)
+      value = settings[:show_outcomes_with_no_results]
+      unless VALID_BOOLEAN_VALUES.include?(value)
+        errors << "Invalid show_outcomes_with_no_results ('#{value}'). Valid values are: [true, false]"
+      end
+    end
+
     if settings.key?(:show_students_with_no_results)
       value = settings[:show_students_with_no_results]
-      unless [true, false, "true", "false"].include?(value)
+      unless VALID_BOOLEAN_VALUES.include?(value)
         errors << "Invalid show_students_with_no_results ('#{value}'). Valid values are: [true, false]"
       end
     end
 
     if settings.key?(:show_student_avatars)
       value = settings[:show_student_avatars]
-      unless [true, false, "true", "false"].include?(value)
+      unless VALID_BOOLEAN_VALUES.include?(value)
         errors << "Invalid show_student_avatars ('#{value}'). Valid values are: [true, false]"
       end
     end

@@ -527,6 +527,51 @@ describe "Outcome Results API", type: :request do
             CSV
           end
 
+          context "outcomes without results" do
+            before do
+              # Create an additional outcome with no results
+              outcome_model(context: outcome_course, title: "unassessed outcome")
+            end
+
+            it "doesn't display outcomes without result when exclude[]=missing_outcome_results is present" do
+              user_session @user
+              get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=missing_outcome_results"
+              expect(response).to be_successful
+              expect(response.body).to eq <<~CSV
+                Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+                #{@concluded_student.name},#{@concluded_student.id},N/A,3.0,3.0
+                #{@inactive_student.name},#{@inactive_student.id},N/A,3.0,3.0
+                #{outcome_student.name},#{outcome_student.id},N/A,3.0,3.0
+                #{@no_results_student.name},#{@no_results_student.id},N/A,,3.0
+              CSV
+            end
+
+            it "displays outcomes without result when exclude[]=missing_outcome_results is not present" do
+              user_session @user
+              get "/courses/#{@course.id}/outcome_rollups.csv"
+              expect(response).to be_successful
+              expect(response.body).to eq <<~CSV
+                Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points,unassessed outcome result,unassessed outcome mastery points
+                #{@concluded_student.name},#{@concluded_student.id},N/A,3.0,3.0,,3.0
+                #{@inactive_student.name},#{@inactive_student.id},N/A,3.0,3.0,,3.0
+                #{outcome_student.name},#{outcome_student.id},N/A,3.0,3.0,,3.0
+                #{@no_results_student.name},#{@no_results_student.id},N/A,,3.0,,3.0
+              CSV
+            end
+
+            it "displays outcomes without result when exclude[]=missing_user_rollups is present" do
+              user_session @user
+              get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=missing_user_rollups"
+              expect(response).to be_successful
+              expect(response.body).to eq <<~CSV
+                Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points,unassessed outcome result,unassessed outcome mastery points
+                #{@concluded_student.name},#{@concluded_student.id},N/A,3.0,3.0,,3.0
+                #{@inactive_student.name},#{@inactive_student.id},N/A,3.0,3.0,,3.0
+                #{outcome_student.name},#{outcome_student.id},N/A,3.0,3.0,,3.0
+              CSV
+            end
+          end
+
           context "users with multiple enrollments" do
             before do
               @section1 = add_section "s1", course: outcome_course
