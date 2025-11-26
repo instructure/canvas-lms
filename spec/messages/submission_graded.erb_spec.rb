@@ -94,5 +94,46 @@ describe "submission_graded" do
       sms = generate_message(:submission_graded, :sms, submission, user: @student)
       expect(sms.body).to include("Reply To Topic")
     end
+
+    it "uses parent assignment ID in URLs for discussion checkpoint submissions" do
+      @course.account.enable_feature!(:discussion_checkpoints)
+      @teacher = User.create!(name: "teacher")
+      @course.enroll_teacher(@teacher)
+
+      # Create a graded discussion with checkpoints
+      discussion_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
+      parent_assignment = discussion_topic.assignment
+
+      # Create checkpoints
+      reply_to_topic_checkpoint = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic:,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 1.day.from_now }],
+        points_possible: 5
+      )
+
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic:,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 2.days.from_now }],
+        points_possible: 5,
+        replies_required: 2
+      )
+
+      # Student submits to the checkpoint
+      sub_assignment = reply_to_topic_checkpoint
+      submission = sub_assignment.grade_student(@student, { grade: "4", grader: @teacher }).first
+      submission.workflow_state = "submitted"
+      submission.save!
+
+      # Test all message formats
+      email = generate_message(:submission_graded, :email, submission, user: @student)
+      expect(email.url).to include("assignments/#{parent_assignment.id}")
+      expect(email.url).not_to include("assignments/#{sub_assignment.id}")
+
+      summary = generate_message(:submission_graded, :summary, submission, user: @student)
+      expect(summary.url).to include("assignments/#{parent_assignment.id}")
+      expect(summary.url).not_to include("assignments/#{sub_assignment.id}")
+    end
   end
 end

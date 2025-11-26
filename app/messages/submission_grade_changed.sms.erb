@@ -1,17 +1,23 @@
+<%
+  # For discussion checkpoints, use the parent assignment instead of the sub-assignment
+  # to ensure correct assignment IDs and URLs in notifications
+  assignment = asset.assignment
+  assignment = assignment.parent_assignment if assignment.checkpoint? && assignment.parent_assignment
+%>
 <% if send_student_names(asset, user) %>
-<%= t "The grade for %{title} in %{context} for %{name} just changed.", :title => asset.assignment.title, :context => asset.assignment.context.name, name: asset.user.name %>
+<%= t "The grade for %{title} in %{context} for %{name} just changed.", :title => assignment.title, :context => assignment.context.name, name: asset.user.name %>
 <% else %>
-  <%= t :body_sms, "Your grade for %{title} in %{context} just changed.", :title => asset.assignment.title, :context => asset.assignment.context.name %>
+  <%= t :body_sms, "Your grade for %{title} in %{context} just changed.", :title => assignment.title, :context => assignment.context.name %>
 <% end %>
 
 <%= t :regraded_date, "re-graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %>
-<% if asset.score && user.try(:send_scores_in_emails?, asset.assignment.context) %>
-  <% if asset.assignment.restrict_quantitative_data?(user)%>
-    <%=t :grade, "grade: %{letter_grade}", :letter_grade => asset.assignment.score_to_grade(asset.score, asset.grade, true)%>
+<% if asset.score && user.try(:send_scores_in_emails?, assignment.context) %>
+  <% if assignment.restrict_quantitative_data?(user)%>
+    <%=t :grade, "grade: %{letter_grade}", :letter_grade => assignment.score_to_grade(asset.score, asset.grade, true)%>
   <% else %>
-    <%= t :score, "score: %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %>
+    <%= t :score, "score: %{score} out of %{total}", :score => asset.score, :total => (assignment.points_possible || t(:not_applicable, "N/A")) %>
   <% end %>
 <% end %>
 <%= t(:score_pending, "score pending review by the teacher") if asset.pending_review? %>
 
-<%= t :more_info, "More info at %{url}", :url => HostUrl.context_host(asset.assignment.context) %>
+<%= t :more_info, "More info at %{url}", :url => HostUrl.context_host(assignment.context) %>
