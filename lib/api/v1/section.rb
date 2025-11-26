@@ -48,7 +48,11 @@ module Api::V1::Section
     end
 
     if includes.include?("user_count")
-      res["user_count"] = GuardRail.activate(:secondary) { section.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
+      res["user_count"] = if options[:section_user_counts]
+                            options[:section_user_counts][section.id] || 0
+                          else
+                            GuardRail.activate(:secondary) { section.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
+                          end
     end
 
     if includes.include?("permissions")
