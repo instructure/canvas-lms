@@ -26,11 +26,14 @@ export interface Rating {
 export interface Outcome {
   id: string | number
   title: string
+  context_type?: string
+  context_id?: string
   description?: string
   display_name?: string
   friendly_description?: string
   calculation_method: string
   calculation_int?: number
+  points_possible: number
   mastery_points: number
   ratings: Rating[]
 }

@@ -32,6 +32,7 @@ describe('OutcomeHeader', () => {
     display_name: 'Friendly outcome name',
     calculation_method: 'decaying_average',
     calculation_int: 65,
+    points_possible: 5,
     mastery_points: defaultMasteryPoints,
     ratings: defaultRatings.map(rating =>
       pick(rating, ['description', 'points', 'color', 'mastery']),
