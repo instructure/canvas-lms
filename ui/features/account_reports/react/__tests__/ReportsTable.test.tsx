@@ -109,5 +109,6 @@ describe('ReportsTable', () => {
         'https://example.com/updated_report_1.csv?download_frd=1',
       )
     })
+    expect(within(report1_row).getByText('Completed')).toBeInTheDocument()
   })
 })

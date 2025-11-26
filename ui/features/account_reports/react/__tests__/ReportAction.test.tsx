@@ -163,7 +163,7 @@ describe('ReportAction', () => {
       status: 200,
     })
 
-    const {getByText} = renderWithQueryClient(
+    const {getByTestId} = renderWithQueryClient(
       <ReportAction
         accountId="123"
         report={reportWithParameters}
@@ -172,7 +172,7 @@ describe('ReportAction', () => {
       />,
     )
 
-    const cancelButton = getByText('Cancel report').closest('button')
+    const cancelButton = getByTestId('cancel-report-button')
     await user.click(cancelButton!)
     await waitFor(() => {
       expect(spy).toHaveBeenCalledWith(canceledReport)
