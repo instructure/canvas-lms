@@ -93,6 +93,7 @@ describe('AccessibilityIssuesTable', () => {
     const Wrapper = createWrapper()
     const {rerender} = render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
     expect(screen.getByTestId('loading-row')).toBeInTheDocument()
+    expect(screen.queryByTestId('no-issues-row')).not.toBeInTheDocument()
 
     act(() => {
       result.current.setLoading(false)
