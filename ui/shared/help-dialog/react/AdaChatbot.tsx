@@ -143,9 +143,17 @@ async function openAda(onDialogClose?: () => void): Promise<void> {
   }
 }
 
-// Auto-restore Ada if it was open in a previous session
-if (!wasClosedByUser()) {
-  initializeAda().catch(error => console.error('Failed to auto-restore Ada:', error))
+/**
+ * Auto-restore Ada if it was open in a previous session.
+ * This should be called after the main app initialization.
+ */
+
+let hasAutoRestored = false
+export function autoRestoreAda(): void {
+  if (!hasAutoRestored && !wasClosedByUser()) {
+    hasAutoRestored = true
+    initializeAda().catch(error => console.error('Failed to auto-restore Ada:', error))
+  }
 }
 
 /**
