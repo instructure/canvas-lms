@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {OutcomeDescriptionModal} from '../OutcomeDescriptionModal'
 import {Outcome} from '../../../types/rollup'
 import LMGBContext from '@canvas/outcomes/react/contexts/LMGBContext'
@@ -42,11 +43,14 @@ describe('OutcomeDescriptionModal', () => {
   const defaultOutcome: Outcome = {
     id: '1',
     title: 'Outcome',
+    context_type: 'Course',
+    context_id: '1',
     description: '<p>Outcome Description</p>',
     display_name: 'Friendly Outcome Name',
     friendly_description: 'Friendly Description',
     calculation_method: 'decaying_average',
     calculation_int: 65,
+    points_possible: 5,
     mastery_points: defaultMasteryPoints,
     ratings: defaultRatings.map(rating =>
       pick(rating, ['description', 'points', 'color', 'mastery']),
@@ -56,10 +60,13 @@ describe('OutcomeDescriptionModal', () => {
   const outcomeNoFriendlyDescription: Outcome = {
     id: '1',
     title: 'Outcome',
+    context_type: 'Course',
+    context_id: '1',
     description: '<p>Outcome Description</p>',
     display_name: 'Friendly Outcome Name',
     calculation_method: 'decaying_average',
     calculation_int: 65,
+    points_possible: 5,
     mastery_points: defaultMasteryPoints,
     ratings: defaultRatings.map(rating =>
       pick(rating, ['description', 'points', 'color', 'mastery']),
@@ -69,10 +76,13 @@ describe('OutcomeDescriptionModal', () => {
   const outcomeEmpty: Outcome = {
     id: '1',
     title: 'Outcome',
+    context_type: 'Course',
+    context_id: '1',
     description: '',
     display_name: '',
     calculation_method: 'decaying_average',
     calculation_int: 65,
+    points_possible: 5,
     mastery_points: defaultMasteryPoints,
     ratings: defaultRatings.map(rating =>
       pick(rating, ['description', 'points', 'color', 'mastery']),
@@ -120,82 +130,84 @@ describe('OutcomeDescriptionModal', () => {
   })
 
   it('shows modal if isOpen prop is true', () => {
-    const {getByTestId} = renderWithProvider()
-    expect(getByTestId('outcome-description-modal')).toBeInTheDocument()
+    renderWithProvider()
+    expect(screen.getByTestId('outcome-description-modal')).toBeInTheDocument()
   })
 
   it('does not show modal if isOpen prop is false', () => {
-    const {queryByTestId} = renderWithProvider({overrides: {isOpen: false}})
-    expect(queryByTestId('outcome-description-modal')).not.toBeInTheDocument()
+    renderWithProvider({overrides: {isOpen: false}})
+    expect(screen.queryByTestId('outcome-description-modal')).not.toBeInTheDocument()
   })
 
-  it('calls onCloseHandler when closing the modal', () => {
-    const {getByRole} = renderWithProvider()
-    fireEvent.click(getByRole('button'))
+  it('calls onCloseHandler when closing the modal', async () => {
+    const user = userEvent.setup()
+    renderWithProvider()
+    await user.click(screen.getByRole('button'))
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
   it('correctly renders outcome information in modal', () => {
-    const {getByTestId} = renderWithProvider()
-    expect(getByTestId('outcome-display-name')).toBeInTheDocument()
-    expect(getByTestId('calculation-method')).toBeInTheDocument()
-    expect(getByTestId('outcome-description')).toBeInTheDocument()
+    renderWithProvider()
+    expect(screen.getByTestId('outcome-display-name')).toBeInTheDocument()
+    expect(screen.getByText('Calculation Method')).toBeInTheDocument()
+    expect(screen.getByText('Mastery Scale')).toBeInTheDocument()
+    expect(screen.getByTestId('outcome-description')).toBeInTheDocument()
   })
 
   it('renders "empty outcome" information when given an outcome with no display name, description, or friendly description', () => {
-    const {getByTestId} = renderWithProvider({outcome: outcomeEmpty})
-    expect(getByTestId('outcome-empty-title')).toBeInTheDocument()
-    expect(getByTestId('outcome-empty-description')).toBeInTheDocument()
+    renderWithProvider({outcome: outcomeEmpty})
+    expect(screen.getByTestId('outcome-empty-title')).toBeInTheDocument()
+    expect(screen.getByTestId('outcome-empty-description')).toBeInTheDocument()
   })
 
   describe('Outcome Calculation Methods', () => {
     it("renders correctly when given an outcome with 'decaying_average' calculation method", () => {
-      const {getByText} = renderWithProvider({
+      renderWithProvider({
         outcome: setCalculationMethod(defaultOutcome, 'decaying_average', 65),
       })
-      expect(getByText('65/35 Weighted Average')).toBeInTheDocument()
+      expect(screen.getByText('Weighted Average')).toBeInTheDocument()
     })
 
     it("renders correctly when given an outcome with 'standard_decaying_average' calculation method", () => {
-      const {getByText} = renderWithProvider({
+      renderWithProvider({
         outcome: setCalculationMethod(defaultOutcome, 'standard_decaying_average', 65),
       })
-      expect(getByText('65/35 Decaying Average')).toBeInTheDocument()
+      expect(screen.getByText('Decaying Average')).toBeInTheDocument()
     })
 
     it("renders correctly when given an outcome with 'n_mastery' calculation method", () => {
-      const {getByText} = renderWithProvider({
+      renderWithProvider({
         outcome: setCalculationMethod(defaultOutcome, 'n_mastery', 5),
       })
-      expect(getByText('Number of Times (5)')).toBeInTheDocument()
+      expect(screen.getByText('Number of Times')).toBeInTheDocument()
     })
 
     it("renders correctly when given an outcome with 'highest' calculation method", () => {
-      const {getByText} = renderWithProvider({
+      renderWithProvider({
         outcome: setCalculationMethod(defaultOutcome, 'highest'),
       })
-      expect(getByText('Highest')).toBeInTheDocument()
+      expect(screen.getByText('Highest')).toBeInTheDocument()
     })
 
     it("renders correctly when given an outcome with 'latest' calculation method", () => {
-      const {getByText} = renderWithProvider({
+      renderWithProvider({
         outcome: setCalculationMethod(defaultOutcome, 'latest'),
       })
-      expect(getByText('Most Recent Score')).toBeInTheDocument()
+      expect(screen.getByText('Most Recent Score')).toBeInTheDocument()
     })
 
     it("renders correctly when given an outcome with 'average' calculation method", () => {
-      const {getByText} = renderWithProvider({
+      renderWithProvider({
         outcome: setCalculationMethod(defaultOutcome, 'average'),
       })
-      expect(getByText('Average')).toBeInTheDocument()
+      expect(screen.getByText('Average')).toBeInTheDocument()
     })
 
     it("renders 'Average' when given an outcome with invalid calculation method", () => {
-      const {getByText} = renderWithProvider({
+      renderWithProvider({
         outcome: setCalculationMethod(defaultOutcome, 'not_a_calculation_method'),
       })
-      expect(getByText('Average')).toBeInTheDocument()
+      expect(screen.getByText('Average')).toBeInTheDocument()
     })
   })
 
@@ -209,21 +221,58 @@ describe('OutcomeDescriptionModal', () => {
     }
 
     it('does not render friendly description if FF is disabled', () => {
-      const {queryByTestId} = renderWithProvider()
-      expect(queryByTestId('outcome-friendly-description')).not.toBeInTheDocument()
+      renderWithProvider()
+      expect(screen.queryByTestId('outcome-friendly-description')).not.toBeInTheDocument()
     })
 
     it('renders friendly description if FF is enabled', () => {
-      const {getByTestId} = renderWithProvider({env: friendlyEnv})
-      expect(getByTestId('outcome-friendly-description')).toBeInTheDocument()
+      renderWithProvider({env: friendlyEnv})
+      expect(screen.getByTestId('outcome-friendly-description')).toBeInTheDocument()
     })
 
     it('does not render friendly description if FF is enabled but no friendly description is given', () => {
-      const {queryByTestId} = renderWithProvider({
+      renderWithProvider({
         outcome: outcomeNoFriendlyDescription,
         env: friendlyEnv,
       })
-      expect(queryByTestId('outcome-friendly-description')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('outcome-friendly-description')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Mastery Scale', () => {
+    it('renders mastery scale with points_possible', () => {
+      renderWithProvider()
+      expect(screen.getByText('5 Point')).toBeInTheDocument()
+    })
+
+    it('renders mastery scale with different points_possible value', () => {
+      const outcomeWithDifferentPoints = {...defaultOutcome, points_possible: 10}
+      renderWithProvider({outcome: outcomeWithDifferentPoints})
+      expect(screen.getByText('10 Point')).toBeInTheDocument()
+    })
+  })
+
+  describe('Conditional Rendering', () => {
+    it('does not render display_name when it is missing', () => {
+      const outcomeNoDisplayName = {...defaultOutcome, display_name: undefined}
+      renderWithProvider({outcome: outcomeNoDisplayName})
+      expect(screen.queryByTestId('outcome-display-name')).not.toBeInTheDocument()
+    })
+
+    it('does not render description when it is missing', () => {
+      const outcomeNoDescription = {...defaultOutcome, description: undefined}
+      renderWithProvider({outcome: outcomeNoDescription})
+      expect(screen.queryByTestId('outcome-description')).not.toBeInTheDocument()
+    })
+
+    it('renders display_name when it exists', () => {
+      renderWithProvider()
+      expect(screen.getByTestId('outcome-display-name')).toBeInTheDocument()
+    })
+
+    it('renders description when it exists', () => {
+      renderWithProvider()
+      expect(screen.getByTestId('outcome-description')).toBeInTheDocument()
     })
   })
 })
