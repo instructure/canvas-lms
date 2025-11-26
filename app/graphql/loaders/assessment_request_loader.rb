@@ -33,6 +33,10 @@ class Loaders::AssessmentRequestLoader < GraphQL::Batch::Loader
     assignments_by_shard.each do |shard, assignments|
       assignments.each_slice(1000) do |assignment_slice|
         all_reviews = @current_user.assigned_submission_assessments.shard(shard).for_assignment(assignment_slice)
+
+        # Preload associations to prevent N+1 queries in the individual loaders
+        ActiveRecord::Associations.preload(all_reviews, %i[asset submission_comments rubric_assessment])
+
         reviews_by_assignment = all_reviews.group_by { |r| r.submission.assignment_id }
 
         unless reviews_by_assignment.empty?

@@ -430,6 +430,21 @@ type AssessmentRequest implements LegacyIDInterface & Timestamped {
   assetSubmissionType: String
   available: Boolean
   createdAt: DateTime
+
+  """
+  Assessor's rubric assessment for the submission being peer reviewed
+  """
+  rubricAssessment: RubricAssessment
+
+  """
+  The submission being peer reviewed
+  """
+  submission: Submission
+
+  """
+  Assessor's comments for the submission being peer reviewed
+  """
+  submissionComments: [SubmissionComment!]
   updatedAt: DateTime
   user: User!
   workflowState: String!
@@ -494,6 +509,11 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   anonymousInstructorAnnotations: Boolean
   anonymousStudentIdentities: [AnonymousStudentIdentity!]
   assessmentRequestsForCurrentUser: [AssessmentRequest!]
+
+  """
+  Assessment requests for a specific user where they are the assessor (peer reviewer)
+  """
+  assessmentRequestsForUser(userId: ID!): [AssessmentRequest!]
   assignedStudents(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -812,6 +832,7 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   """
   onlyVisibleToOverrides: Boolean!
   originalityReportVisibility: String
+  peerReviewSubAssignment: Assignment
   peerReviews: PeerReviews
 
   """
