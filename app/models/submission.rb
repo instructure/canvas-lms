@@ -2901,15 +2901,23 @@ class Submission < ActiveRecord::Base
       provisional_comments = provisional_comments.reject { |comment| comment.author_id == current_grader_id }
     end
 
-    # Return appropriate comments based on user role and permissions
     if current_user.id == user_id
-      # Students can't see provisional comments
       []
     elsif !can_moderate && !comments_visible_to_graders
-      # Regular graders can only see their own comments when comments aren't visible to graders
-      provisional_comments.select { |comment| comment.author_id == current_user.id }
+      if grades_published
+        author_ids = provisional_comments.map(&:author_id).uniq
+        authors = User.where(id: author_ids).index_by(&:id)
+        moderator_ids = author_ids.select do |author_id|
+          assignment.permits_moderation?(authors[author_id])
+        end
+
+        provisional_comments.select do |comment|
+          comment.author_id == current_user.id || moderator_ids.include?(comment.author_id)
+        end
+      else
+        provisional_comments.select { |comment| comment.author_id == current_user.id }
+      end
     else
-      # Moderators and graders (when comments are visible) can see all provisional comments
       provisional_comments
     end
   end
