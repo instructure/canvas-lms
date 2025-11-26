@@ -53,6 +53,12 @@ const buildDisplayFilters = (apiSettings: any): DisplayFilter[] => {
   ) {
     displayFilters.push(DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS)
   }
+  if (
+    apiSettings.show_outcomes_with_no_results ??
+    DEFAULT_GRADEBOOK_SETTINGS.displayFilters.includes(DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS)
+  ) {
+    displayFilters.push(DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS)
+  }
 
   return displayFilters
 }

@@ -23,5 +23,8 @@ export const mapSettingsToFilters = (settings?: GradebookSettings | null): strin
   if (settings && !settings.displayFilters.includes(DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS)) {
     filters.push('missing_user_rollups')
   }
+  if (settings && !settings.displayFilters.includes(DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS)) {
+    filters.push('missing_outcome_results')
+  }
   return filters
 }

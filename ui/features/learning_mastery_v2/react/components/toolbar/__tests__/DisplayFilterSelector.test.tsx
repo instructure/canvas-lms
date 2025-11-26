@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {DisplayFilter} from '../../../utils/constants'
 import {DisplayFilterSelector, DisplayFilterSelectorProps} from '../DisplayFilterSelector'
@@ -32,49 +32,58 @@ describe('DisplayFilterSelector', () => {
   })
 
   it('renders checkbox group with correct name and description', () => {
-    const {getByText} = render(<DisplayFilterSelector {...defaultProps} />)
-    expect(getByText('Display')).toBeInTheDocument()
+    render(<DisplayFilterSelector {...defaultProps} />)
+    expect(screen.getByText('Display')).toBeInTheDocument()
   })
 
   it('renders all checkbox options', () => {
-    const {getByLabelText} = render(<DisplayFilterSelector {...defaultProps} />)
-    expect(getByLabelText('Students with no results')).toBeInTheDocument()
-    expect(getByLabelText('Avatars in student list')).toBeInTheDocument()
+    render(<DisplayFilterSelector {...defaultProps} />)
+    expect(screen.getByLabelText('Students with no results')).toBeInTheDocument()
+    expect(screen.getByLabelText('Avatars in student list')).toBeInTheDocument()
+    expect(screen.getByLabelText('Outcomes with no results')).toBeInTheDocument()
   })
 
   it('renders checkboxes with correct values', () => {
-    const {getByLabelText} = render(<DisplayFilterSelector {...defaultProps} />)
-    const studentsCheckbox = getByLabelText('Students with no results')
-    const avatarsCheckbox = getByLabelText('Avatars in student list')
+    render(<DisplayFilterSelector {...defaultProps} />)
+    const studentsCheckbox = screen.getByLabelText('Students with no results')
+    const avatarsCheckbox = screen.getByLabelText('Avatars in student list')
+    const outcomesCheckbox = screen.getByLabelText('Outcomes with no results')
 
     expect(studentsCheckbox).toHaveAttribute('value', DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS)
     expect(avatarsCheckbox).toHaveAttribute('value', DisplayFilter.SHOW_STUDENT_AVATARS)
+    expect(outcomesCheckbox).toHaveAttribute('value', DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS)
   })
 
   it('displays checkboxes as checked when values are provided', () => {
     const props = {
       ...defaultProps,
-      values: [DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS, DisplayFilter.SHOW_STUDENT_AVATARS],
+      values: [
+        DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
+        DisplayFilter.SHOW_STUDENT_AVATARS,
+        DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS,
+      ],
     }
-    const {getByLabelText} = render(<DisplayFilterSelector {...props} />)
+    render(<DisplayFilterSelector {...props} />)
 
-    expect(getByLabelText('Students with no results')).toBeChecked()
-    expect(getByLabelText('Avatars in student list')).toBeChecked()
+    expect(screen.getByLabelText('Students with no results')).toBeChecked()
+    expect(screen.getByLabelText('Avatars in student list')).toBeChecked()
+    expect(screen.getByLabelText('Outcomes with no results')).toBeChecked()
   })
 
   it('displays checkboxes as unchecked when values are empty', () => {
-    const {getByLabelText} = render(<DisplayFilterSelector {...defaultProps} />)
+    render(<DisplayFilterSelector {...defaultProps} />)
 
-    expect(getByLabelText('Students with no results')).not.toBeChecked()
-    expect(getByLabelText('Avatars in student list')).not.toBeChecked()
+    expect(screen.getByLabelText('Students with no results')).not.toBeChecked()
+    expect(screen.getByLabelText('Avatars in student list')).not.toBeChecked()
+    expect(screen.getByLabelText('Outcomes with no results')).not.toBeChecked()
   })
 
   it('calls onChange with updated values when checkbox is clicked', async () => {
     const user = userEvent.setup()
     const onChange = jest.fn()
-    const {getByLabelText} = render(<DisplayFilterSelector {...defaultProps} onChange={onChange} />)
+    render(<DisplayFilterSelector {...defaultProps} onChange={onChange} />)
 
-    const studentsCheckbox = getByLabelText('Students with no results')
+    const studentsCheckbox = screen.getByLabelText('Students with no results')
     await user.click(studentsCheckbox)
 
     expect(onChange).toHaveBeenCalledWith([DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS])
@@ -83,18 +92,25 @@ describe('DisplayFilterSelector', () => {
   it('calls onChange with multiple values when multiple checkboxes are selected', async () => {
     const user = userEvent.setup()
     const onChange = jest.fn()
-    const {getByLabelText} = render(<DisplayFilterSelector {...defaultProps} onChange={onChange} />)
+    render(<DisplayFilterSelector {...defaultProps} onChange={onChange} />)
 
-    const studentsCheckbox = getByLabelText('Students with no results')
-    const avatarsCheckbox = getByLabelText('Avatars in student list')
+    const studentsCheckbox = screen.getByLabelText('Students with no results')
+    const avatarsCheckbox = screen.getByLabelText('Avatars in student list')
+    const outcomesCheckbox = screen.getByLabelText('Outcomes with no results')
 
     await user.click(studentsCheckbox)
     await user.click(avatarsCheckbox)
+    await user.click(outcomesCheckbox)
 
     expect(onChange).toHaveBeenCalledWith([DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS])
     expect(onChange).toHaveBeenCalledWith([
       DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
       DisplayFilter.SHOW_STUDENT_AVATARS,
+    ])
+    expect(onChange).toHaveBeenCalledWith([
+      DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
+      DisplayFilter.SHOW_STUDENT_AVATARS,
+      DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS,
     ])
   })
 
@@ -106,9 +122,9 @@ describe('DisplayFilterSelector', () => {
       values: [DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
       onChange,
     }
-    const {getByLabelText} = render(<DisplayFilterSelector {...props} />)
+    render(<DisplayFilterSelector {...props} />)
 
-    const studentsCheckbox = getByLabelText('Students with no results')
+    const studentsCheckbox = screen.getByLabelText('Students with no results')
     await user.click(studentsCheckbox)
 
     expect(onChange).toHaveBeenCalledWith([])
@@ -119,16 +135,20 @@ describe('DisplayFilterSelector', () => {
     const onChange = jest.fn()
     const props = {
       ...defaultProps,
-      values: [DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
+      values: [
+        DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
+        DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS,
+      ],
       onChange,
     }
-    const {getByLabelText} = render(<DisplayFilterSelector {...props} />)
+    render(<DisplayFilterSelector {...props} />)
 
-    const avatarsCheckbox = getByLabelText('Avatars in student list')
+    const avatarsCheckbox = screen.getByLabelText('Avatars in student list')
     await user.click(avatarsCheckbox)
 
     expect(onChange).toHaveBeenCalledWith([
       DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
+      DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS,
       DisplayFilter.SHOW_STUDENT_AVATARS,
     ])
   })

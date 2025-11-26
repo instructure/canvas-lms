@@ -45,6 +45,7 @@ describe('useGradebookSettings', () => {
       secondary_info_display: SecondaryInfoDisplay.SIS_ID,
       show_student_avatars: true,
       show_students_with_no_results: true,
+      show_outcomes_with_no_results: true,
     }
     jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
@@ -61,6 +62,7 @@ describe('useGradebookSettings', () => {
     expect(result.current.settings.displayFilters).toEqual([
       DisplayFilter.SHOW_STUDENT_AVATARS,
       DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
+      DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS,
     ])
     expect(result.current.isLoading).toBe(false)
     expect(result.current.error).toBeNull()
@@ -108,6 +110,7 @@ describe('useGradebookSettings', () => {
     expect(result.current.settings.secondaryInfoDisplay).toBe(mockSettings.secondary_info_display)
     expect(result.current.settings.displayFilters).toEqual([
       DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
+      DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS,
     ])
     expect(result.current.error).toBeNull()
     expect(result.current.isLoading).toBe(false)

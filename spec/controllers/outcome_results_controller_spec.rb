@@ -561,6 +561,31 @@ describe OutcomeResultsController do
       expect(json["meta"]["pagination"]["count"]).to be 1
     end
 
+    it "exclude outcomes without results" do
+      user_session(@teacher)
+
+      outcome1 = @outcome
+      outcome2 = outcome_model(context: outcome_course)
+      # Explicitly create a result for outcome1 to ensure it has results
+      create_result(@student.id, outcome1, outcome_assignment, 3)
+      get "rollups",
+          params: { context_id: @course.id,
+                    course_id: @course.id,
+                    context_type: "Course",
+                    user_ids: [@student.id],
+                    outcome_ids: [outcome1.id, outcome2.id],
+                    exclude: ["missing_outcome_results"],
+                    include: ["outcomes"] },
+          format: "json"
+      json = parse_response(response)
+      # should only include the outcome with results (outcome1)
+      # and exclude outcome2 which has no results
+      outcome_ids = json["linked"]["outcomes"].pluck("id")
+      expect(outcome_ids).to include(outcome1.id)
+      expect(outcome_ids).not_to include(outcome2.id)
+      expect(json["linked"]["outcomes"].length).to be 1
+    end
+
     context "user lmgb outcome orderings" do
       def get_response_ordering(outcomes)
         outcomes.pluck("id")
@@ -1092,7 +1117,7 @@ describe OutcomeResultsController do
               # already existing results for @student1 & @student2
               # creating result for @student
               create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(nil)
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(nil)
               json = parse_response(get_rollups(sort_by: "student",
                                                 sort_order: "desc",
                                                 exclude: ["missing_user_rollups"],
@@ -1109,7 +1134,7 @@ describe OutcomeResultsController do
               LearningOutcomeResult.where(user_id: @student2.id).update(workflow_state: "deleted")
               student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
               mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(
                 [mocked_results]
               )
               # per_page is the number of students to display on 1 page of results
@@ -1128,7 +1153,7 @@ describe OutcomeResultsController do
               # results are already created for @student2 in Canvas
               student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
               mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(
                 [mocked_results]
               )
               # per_page is the number of students to display on 1 page of results
@@ -1150,7 +1175,7 @@ describe OutcomeResultsController do
               # and will not create results for this student
               student_in_course(active_all: true, course: outcome_course)
               mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(
                 [mocked_results]
               )
               # per_page is the number of students to display on 1 page of results
@@ -1320,6 +1345,109 @@ describe OutcomeResultsController do
                   expect(user["status"]).not_to eq("completed")
                 end
               end
+            end
+          end
+        end
+
+        context "remove_outcomes_with_no_results" do
+          context "enabled" do
+            it "No OS results found" do
+              outcome1 = @outcome
+              outcome2 = outcome_model(context: outcome_course, title: "unassessed outcome")
+              # already existing results for @student1 & @student2 for outcome1
+              # creating result for @student for outcome1
+              create_result(@student.id, outcome1, outcome_assignment, 2, { possible: 5 })
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(nil)
+              json = parse_response(get_rollups(sort_by: "student",
+                                                sort_order: "desc",
+                                                exclude: ["missing_outcome_results"],
+                                                include: ["outcomes"],
+                                                per_page: 5,
+                                                page: 1))
+              # should only include outcome1, not outcome2
+              outcome_ids = json["linked"]["outcomes"].pluck("id")
+              expect(outcome_ids).to include(outcome1.id)
+              expect(outcome_ids).not_to include(outcome2.id)
+              expect(json["linked"]["outcomes"].length).to be 1
+            end
+
+            it "OS results found - no Canvas results found" do
+              outcome1 = @outcome
+              outcome2 = outcome_model(context: outcome_course, title: "OS only outcome")
+              # removing LearningOutcomeResults for outcome1 in Canvas
+              LearningOutcomeResult.where(learning_outcome_id: outcome1.id).update(workflow_state: "deleted")
+              # Mock OS results for outcome2
+              mocked_results = mock_os_lor_results(@student, outcome2, outcome_assignment, 2)
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(
+                [mocked_results]
+              )
+              json = parse_response(get_rollups(sort_by: "student",
+                                                sort_order: "desc",
+                                                exclude: ["missing_outcome_results"],
+                                                include: ["outcomes"],
+                                                per_page: 5,
+                                                page: 1))
+              # should only include outcome2 which has OS results
+              outcome_ids = json["linked"]["outcomes"].pluck("id")
+              expect(outcome_ids).to include(outcome2.id)
+              expect(outcome_ids).not_to include(outcome1.id)
+              expect(json["linked"]["outcomes"].length).to be 1
+            end
+
+            it "Canvas and OS results found" do
+              outcome1 = @outcome
+              outcome2 = outcome_model(context: outcome_course, title: "OS outcome")
+              # outcome1 already has Canvas results for @student1 & @student2
+              # creating result for @student for outcome1
+              create_result(@student.id, outcome1, outcome_assignment, 2, { possible: 5 })
+              # Mock OS results for outcome2
+              mocked_results = mock_os_lor_results(@student, outcome2, outcome_assignment, 2)
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(
+                [mocked_results]
+              )
+              json = parse_response(get_rollups(sort_by: "student",
+                                                sort_order: "desc",
+                                                exclude: ["missing_outcome_results"],
+                                                include: ["outcomes"],
+                                                per_page: 5,
+                                                page: 1))
+              # should include both outcomes
+              outcome_ids = json["linked"]["outcomes"].pluck("id")
+              expect(outcome_ids).to include(outcome1.id)
+              expect(outcome_ids).to include(outcome2.id)
+              expect(json["linked"]["outcomes"].length).to be 2
+            end
+
+            it "removes outcomes with no results" do
+              outcome1 = @outcome
+              outcome2 = outcome_model(context: outcome_course, title: "unassessed outcome")
+              outcome3 = outcome_model(context: outcome_course, title: "OS results outcome")
+              outcome4 = outcome_model(context: outcome_course, title: "Canvas results outcome")
+              # outcome1 already has Canvas results for @student1 & @student2
+              # creating result for @student for outcome1
+              create_result(@student.id, outcome1, outcome_assignment, 2, { possible: 5 })
+              # Create Canvas result for outcome4
+              create_result(@student.id, outcome4, outcome_assignment, 2, { possible: 5 })
+              # Mock OS results for outcome3 only
+              mocked_results = mock_os_lor_results(@student, outcome3, outcome_assignment, 2)
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(
+                [mocked_results]
+              )
+              json = parse_response(get_rollups(sort_by: "student",
+                                                sort_order: "desc",
+                                                exclude: ["missing_outcome_results"],
+                                                outcome_ids: [outcome1.id, outcome2.id, outcome3.id, outcome4.id],
+                                                include: ["outcomes"],
+                                                per_page: 5,
+                                                page: 1))
+              # should include outcome1 (Canvas), outcome3 (OS), and outcome4 (Canvas)
+              # should exclude outcome2 (no results)
+              outcome_ids = json["linked"]["outcomes"].pluck("id")
+              expect(outcome_ids).to include(outcome1.id)
+              expect(outcome_ids).to include(outcome3.id)
+              expect(outcome_ids).to include(outcome4.id)
+              expect(outcome_ids).not_to include(outcome2.id)
+              expect(json["linked"]["outcomes"].length).to be 3
             end
           end
         end
