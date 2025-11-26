@@ -4090,8 +4090,8 @@ fr-CA:
   an_export_is_already_in_progress_54270f01: "Une exportation est déjà en cours."
   an_external_identity_provider_is_enabled_7859c6fb: "Un fournisseur d’identités externe est activé"
   an_external_identity_provider_is_enabled_and_users_126c6c46: |-
-      Un four’isseur d'identité externe est activé, et les utilisateurs créés par l’entre’ise de l'inscription ouverte peuvent ne pas être en mesure de se connecter à moins que
-            le formulaire de connexion du four’isseur d'identité externe ait un lien vers *%{url}*.
+      Un fournisseur d'identité externe est activé, et les utilisateurs créés par l’entreprise de l'inscription ouverte peuvent ne pas être en mesure de se connecter à moins que
+            le formulaire de connexion du fournisseur d'identité externe ait un lien vers *%{url}*.
   an_file_named_filename_already_exists_in_this_loca_8769e7ca: "Un fichier nommé « %{fileName} » existe déjà à cet emplacement. Désirez-vous remplacer le fichier existant?"
   an_image_showing_the_placement_placement_within_ca_42eb6187: "Une image montrant l’emplacement de %{placement} dans Canvas"
   an_in_progress_working_prototype_of_the_learner_pa_3a48568b: "Un prototype fonctionnel en cours de la fonctionnalité du passeport de l’élève, Version 2."
@@ -5810,9 +5810,9 @@ fr-CA:
   author_login_id_57aaec4f: author_login_id
   author_name_12d871ff: author_name
   author_name_4ff42608: "Nom de l’auteur"
-  author_name_just_made_a_new_annotation_on_the_subm_a1b55e62: "%{author_name} vient d’ajouter un annotations sur l’envoi de pour %{user_name} pour %{assignment_title}"
-  author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} vient d’ajouter un commentaire sur l’envoi de  pour %{user_name} pour %{assignment_title}"
-  author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} vient d’ajouter un commentaire sur l’envoi de %{user_name} pour %{assignment_title}."
+  author_name_just_made_a_new_annotation_on_the_subm_a1b55e62: "%{author_name} vient d’ajouter une annotation sur l’envoi à %{user_name} pour %{assignment_title}"
+  author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} vient d’ajouter un commentaire sur l’envoi à %{user_name} pour %{assignment_title}"
+  author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} vient d’ajouter un commentaire sur l’envoi à %{user_name} pour %{assignment_title}."
   author_s_name_b35e905a: "Nom de l’auteur"
   author_sis_id_b59b62af: author_sis_id
   authorize_e3f25bb4: Autoriser
@@ -31736,7 +31736,7 @@ fr-CA:
   student_name_b446c661: "nom d’étudiant"
   student_name_c45b2a7: "Nom de l’étudiant"
   student_name_options_cb029725: "Options du nom d’étudiant"
-  student_names_ea4b671a: "Noms de l’étudiant"
+  student_names_ea4b671a: "Noms des étudiants"
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Le nom des étudiants doit être masqué car la notation anonyme est requise."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Le nom des étudiants doit être masqué car il s'agit d'une enquête anonyme."
   student_number_db6f06c1: "Étudiant %{number}"
