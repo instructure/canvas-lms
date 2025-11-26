@@ -1802,6 +1802,12 @@ class FilesController < ApplicationController
       when ".kml" then "application/vnd.google-earth.kml+xml"
       else content_type
       end
+    # sql files are sometimes detected as audio/mpeg by the above mentioned NPM package
+    when "audio/mpeg"
+      case ext
+      when ".sql" then "text/x-sql"
+      else content_type
+      end
     else
       content_type
     end
