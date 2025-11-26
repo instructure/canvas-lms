@@ -371,6 +371,32 @@ module Types
       Loaders::AssessmentRequestLoader.for(current_user:).load(assignment)
     end
 
+    field :peer_review_sub_assignment, AssignmentType, null: true
+    def peer_review_sub_assignment
+      return nil unless assignment.grants_right?(current_user, session, :grade)
+      return nil unless assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      return nil unless assignment.peer_reviews
+
+      load_association(:peer_review_sub_assignment)
+    end
+
+    field :assessment_requests_for_user, [AssessmentRequestType], null: true do
+      description "Assessment requests for a specific user where they are the assessor (peer reviewer)"
+      argument :user_id,
+               ID,
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("User")
+    end
+    def assessment_requests_for_user(user_id:)
+      return nil unless assignment.grants_right?(current_user, session, :grade)
+
+      Loaders::IDLoader.for(User).load(user_id).then do |assessor|
+        next nil unless assessor
+
+        Loaders::AssessmentRequestLoader.for(current_user: assessor).load(assignment)
+      end
+    end
+
     field :moderated_grading, AssignmentModeratedGrading, null: true
     def moderated_grading
       assignment

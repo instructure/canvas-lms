@@ -281,6 +281,114 @@ describe Types::AssignmentType do
     expect(result[0]).to eq student.name
   end
 
+  describe "assessmentRequestsForUser" do
+    let(:student2) { student_in_course(course:, name: "Matthew Lemon", active_all: true).user }
+    let(:student3) { student_in_course(course:, name: "Rob Orton", active_all: true).user }
+
+    before do
+      assignment.assign_peer_review(student, student2)
+      assignment.assign_peer_review(student2, student3)
+      assignment.assign_peer_review(student, student3)
+    end
+
+    context "when current user has grade permission" do
+      it "returns assessment requests for specified user" do
+        result = teacher_assignment_type.resolve("assessmentRequestsForUser(userId: \"#{student.id}\") { user { name } }")
+        expect(result.count).to eq 2
+        expect(result).to contain_exactly(student2.name, student3.name)
+      end
+
+      it "returns empty array when user has no assessment requests" do
+        result = teacher_assignment_type.resolve("assessmentRequestsForUser(userId: \"#{student3.id}\") { user { name } }")
+        expect(result).to eq([])
+      end
+
+      it "accepts relay-style user IDs" do
+        relay_id = GraphQL::Schema::UniqueWithinType.encode("User", student.id)
+        result = teacher_assignment_type.resolve("assessmentRequestsForUser(userId: \"#{relay_id}\") { user { name } }")
+        expect(result.count).to eq 2
+      end
+
+      it "accepts legacy user IDs" do
+        result = teacher_assignment_type.resolve("assessmentRequestsForUser(userId: \"#{student.id}\") { user { name } }")
+        expect(result.count).to eq 2
+      end
+
+      it "returns nil for non-existent user" do
+        result = teacher_assignment_type.resolve("assessmentRequestsForUser(userId: \"999999\") { user { name } }")
+        expect(result).to be_nil
+      end
+    end
+
+    context "when current user lacks grade permission" do
+      it "returns nil" do
+        result = assignment_type.resolve("assessmentRequestsForUser(userId: \"#{student2.id}\") { user { name } }")
+        expect(result).to be_nil
+      end
+    end
+
+    context "with non-participating students" do
+      it "filters out assessment requests for deleted enrollments" do
+        student2.enrollments.where(course:).destroy_all
+        result = teacher_assignment_type.resolve("assessmentRequestsForUser(userId: \"#{student.id}\") { user { name } }")
+        expect(result).not_to include(student2.name)
+      end
+    end
+
+    context "with concluded enrollments" do
+      it "filters out assessment requests for concluded enrollments" do
+        enrollment = student2.enrollments.where(course:).first
+        enrollment.conclude
+        result = teacher_assignment_type.resolve("assessmentRequestsForUser(userId: \"#{student.id}\") { user { name } }")
+        expect(result).to be_an(Array)
+        expect(result).not_to include(student2.name)
+      end
+    end
+  end
+
+  describe "peerReviewSubAssignment" do
+    context "when current user has grade permission" do
+      context "when peer_review_allocation_and_grading feature is enabled" do
+        before do
+          course.enable_feature!(:peer_review_allocation_and_grading)
+          assignment.update!(peer_reviews: true)
+        end
+
+        it "returns the peer review sub assignment" do
+          peer_review_sub_assignment = peer_review_model(parent_assignment: assignment)
+          result = teacher_assignment_type.resolve("peerReviewSubAssignment { _id }")
+          expect(result).to eq peer_review_sub_assignment.id.to_s
+        end
+
+        it "returns nil when no peer review sub assignment exists" do
+          result = teacher_assignment_type.resolve("peerReviewSubAssignment { _id }")
+          expect(result).to be_nil
+        end
+      end
+
+      context "when peer_review_allocation_and_grading feature is disabled" do
+        it "returns nil" do
+          peer_review_model(parent_assignment: assignment)
+          course.disable_feature!(:peer_review_allocation_and_grading)
+          result = teacher_assignment_type.resolve("peerReviewSubAssignment { _id }")
+          expect(result).to be_nil
+        end
+      end
+    end
+
+    context "when current user lacks grade permission" do
+      before do
+        course.enable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "returns nil for students" do
+        peer_review_model(parent_assignment: assignment)
+        result = assignment_type.resolve("peerReviewSubAssignment { _id }")
+        expect(result).to be_nil
+      end
+    end
+  end
+
   it "works with timezone stuffs" do
     assignment.time_zone_edited = "Mountain Time (US & Canada)"
     assignment.save!
