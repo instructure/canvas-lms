@@ -120,7 +120,6 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       formValue,
       () => {
         setFormError(null)
-        setAssertiveAlertMessage(null)
         setIsRemediated(true)
       },
       error => {
@@ -156,7 +155,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     }
   }, [accessibilityScans, nextResource, setSelectedItem, setNextResource, getNextResource])
 
-  const handleApply = useCallback(() => {
+  const handlePreviewApply = useCallback(() => {
     if (formError) {
       formRef.current?.focus()
       return
@@ -168,9 +167,13 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       formValue,
       () => {
         setFormError(null)
-        setAssertiveAlertMessage(currentIssue?.form?.undoText ?? I18n.t('Issue fixed'))
         setIsRemediated(true)
         setIsFormLocked(false)
+
+        setTimeout(
+          () => setAssertiveAlertMessage(I18n.t('Issue preview updated with fixed version')),
+          1500,
+        )
       },
       error => {
         if (error) {
@@ -182,16 +185,17 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         setIsFormLocked(false)
       },
     )
-  }, [formError, currentIssue?.form?.undoText])
+  }, [formRef, previewRef])
 
-  const handleUndo = useCallback(() => {
+  const handlePreviewUndo = useCallback(() => {
     setIsFormLocked(true)
     previewRef.current?.reload(
       () => {
         setFormError(null)
-        setAssertiveAlertMessage(I18n.t('Issue undone'))
         setIsRemediated(false)
         setIsFormLocked(false)
+
+        setTimeout(() => setAssertiveAlertMessage(I18n.t('Issue preview fix undone')), 1500)
       },
       error => {
         if (error) {
@@ -241,6 +245,10 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           value: formValue,
         }),
       })
+
+      setTimeout(() => {
+        setAssertiveAlertMessage(I18n.t('Issue fix applied successfully'))
+      }, 1500)
 
       const newScanResponse = await doFetchApi({
         path: getResourceScanPath(item),
@@ -295,7 +303,6 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       formValue,
       () => {
         setFormError(null)
-        setAssertiveAlertMessage(null)
         setIsRemediated(true)
         setIsFormLocked(false)
         handleSaveAndNext()
@@ -350,6 +357,16 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   )
 
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (assertiveAlertMessage !== null) {
+        setAssertiveAlertMessage(null)
+      }
+    }, 3000)
+
+    return () => clearTimeout(timeout)
+  }, [assertiveAlertMessage, setAssertiveAlertMessage])
+
+  useEffect(() => {
     // issues are saved into local state, so the state does not update when "item" changes.
     // this effect ensures that issues state is updated on external "item" prop change.
     setIssues(item.issues || [])
@@ -359,23 +376,31 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   useEffect(() => {
     setIsRemediated(false)
     setIsFormLocked(false)
-    setAssertiveAlertMessage(null)
     setFormError(null)
     setIsSaveButtonEnabled(true)
   }, [currentIssue])
 
   if (!currentIssue) {
     return (
-      <SuccessView
-        title={item.resourceName}
-        nextResource={nextResource || defaultNextResource}
-        onClose={onClose}
-        handleSkip={handleSkip}
-        handlePrevious={handlePrevious}
-        handleNextResource={handleNextResource}
-        assertiveAlertMessage={assertiveAlertMessage || ''}
-        getLiveRegion={getLiveRegion}
-      />
+      <>
+        <SuccessView
+          title={item.resourceName}
+          nextResource={nextResource || defaultNextResource}
+          onClose={onClose}
+          handleSkip={handleSkip}
+          handlePrevious={handlePrevious}
+          handleNextResource={handleNextResource}
+        />
+        {assertiveAlertMessage && (
+          <Alert
+            screenReaderOnly={true}
+            liveRegionPoliteness="assertive"
+            liveRegion={getLiveRegion}
+          >
+            {assertiveAlertMessage}
+          </Alert>
+        )}
+      </>
     )
   }
 
@@ -383,10 +408,10 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     return renderSpinner()
   }
 
-  const applyButton = (
+  const previewActionButton = (
     <ApplyButton
-      onApply={handleApply}
-      onUndo={handleUndo}
+      onApply={handlePreviewApply}
+      onUndo={handlePreviewUndo}
       undoMessage={currentIssue.form.undoText}
       isApplied={isRemediated}
       isLoading={isFormLocked}
@@ -482,7 +507,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
               onClearError={handleClearError}
               onValidationChange={handleValidationChange}
               isDisabled={isRemediated}
-              actionButtons={currentIssue.form.canGenerateFix ? applyButton : undefined}
+              actionButtons={currentIssue.form.canGenerateFix ? previewActionButton : undefined}
             />
             {currentIssue.form.canGenerateFix &&
               formError &&
@@ -494,7 +519,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           </View>
           {!currentIssue.form.canGenerateFix && (
             <View as="section" margin="medium 0">
-              {applyButton}
+              {previewActionButton}
               {formError && currentIssue.form.type === FormType.Button && (
                 <View as="div" margin="x-small 0">
                   <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
@@ -517,9 +542,16 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           }
         />
       </View>
-      <Alert screenReaderOnly={true} liveRegionPoliteness="assertive" liveRegion={getLiveRegion}>
-        {assertiveAlertMessage || ''}
-      </Alert>
+      {assertiveAlertMessage && (
+        <Alert
+          isLiveRegionAtomic
+          liveRegionPoliteness="assertive"
+          liveRegion={getLiveRegion}
+          screenReaderOnly={true}
+        >
+          {assertiveAlertMessage}
+        </Alert>
+      )}
     </View>
   )
 }

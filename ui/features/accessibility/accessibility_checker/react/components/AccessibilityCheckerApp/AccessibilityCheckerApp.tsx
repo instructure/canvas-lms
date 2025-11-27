@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 
 import {useAccessibilityScansFetchUtils} from '../../../../shared/react/hooks/useAccessibilityScansFetchUtils'
 import {useAccessibilityScansStore} from '../../../../shared/react/stores/AccessibilityScansStore'
-import {AccessibilityResourceScan, Filters} from '../../../../shared/react/types'
+import {Filters} from '../../../../shared/react/types'
 import {parseFetchParams} from '../../../../shared/react/utils/query'
 import {AccessibilityIssuesSummary} from '../AccessibilityIssuesSummary/AccessibilityIssuesSummary'
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
@@ -31,11 +31,8 @@ import {useDeepCompareEffect} from './useDeepCompareEffect'
 import {AccessibilityCheckerHeader} from './AccessibilityCheckerHeader'
 import {FiltersPanel} from './Filter'
 import {getAppliedFilters} from '../../utils/filter'
-import {useAccessibilityIssueSelect} from '../../../../shared/react/hooks/useAccessibilityIssueSelect'
 
 export const AccessibilityCheckerApp: React.FC = () => {
-  const {selectIssue} = useAccessibilityIssueSelect()
-
   const {doFetchAccessibilityScanData, doFetchAccessibilityIssuesSummary} =
     useAccessibilityScansFetchUtils()
 
@@ -77,16 +74,21 @@ export const AccessibilityCheckerApp: React.FC = () => {
   }, [accessibilityScanDisabled, setLoading, filters])
 
   const handleSearchChange = useCallback(
-    async (value: string) => {
+    async (value: string): Promise<boolean> => {
       const newSearch = value
       setSearch(newSearch)
       if (newSearch.length >= 0) {
         const params = {...parseFetchParams(), search: newSearch, filters, page: 1}
-        await Promise.all([
+
+        const results = await Promise.allSettled([
           doFetchAccessibilityIssuesSummary(params),
           doFetchAccessibilityScanData(params),
         ])
+
+        return results.every(result => result.status === 'fulfilled')
       }
+
+      return false
     },
     [setSearch, doFetchAccessibilityScanData, doFetchAccessibilityIssuesSummary, filters],
   )

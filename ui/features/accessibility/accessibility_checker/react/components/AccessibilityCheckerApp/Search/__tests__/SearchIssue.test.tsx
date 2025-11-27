@@ -37,7 +37,7 @@ describe('SearchIssue Component', () => {
   })
 
   it('should call onSearchChange when the input value changes', async () => {
-    const mockOnSearchChange = jest.fn()
+    const mockOnSearchChange = jest.fn().mockResolvedValue(true)
     render(<SearchIssue onSearchChange={mockOnSearchChange} />)
 
     const input = screen.getByTestId('issue-search-input')
@@ -65,7 +65,7 @@ describe('SearchIssue Component', () => {
   })
 
   it('should call onSearchChange when input has 3 or more characters', async () => {
-    const mockOnSearchChange = jest.fn()
+    const mockOnSearchChange = jest.fn().mockResolvedValue(true)
     render(<SearchIssue onSearchChange={mockOnSearchChange} />)
     const input = screen.getByTestId('issue-search-input')
 
@@ -78,7 +78,7 @@ describe('SearchIssue Component', () => {
   })
 
   it('should call onSearchChange when input is cleared to empty string', async () => {
-    const mockOnSearchChange = jest.fn()
+    const mockOnSearchChange = jest.fn().mockResolvedValue(true)
     render(<SearchIssue onSearchChange={mockOnSearchChange} />)
     const input = screen.getByTestId('issue-search-input')
 
@@ -121,7 +121,7 @@ describe('SearchIssue Component', () => {
   })
 
   it('should clear search input when clear button is clicked', async () => {
-    const mockOnSearchChange = jest.fn()
+    const mockOnSearchChange = jest.fn().mockResolvedValue(true)
     render(<SearchIssue onSearchChange={mockOnSearchChange} />)
 
     const input = screen.getByTestId('issue-search-input')
