@@ -1399,7 +1399,10 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.mime_class(content_type)
-    valid_content_types_hash[content_type] || "file"
+    # Strip MIME parameters (charset, boundary, etc.) before lookup
+    # Similar to what File.mime_type does in canvas_mimetype_fu gem
+    base_type = content_type&.split(";")&.first&.strip
+    valid_content_types_hash[base_type] || "file"
   end
 
   def mime_class
