@@ -17,25 +17,25 @@
  */
 
 import React, {useState, useEffect, useCallback} from 'react'
-import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconXLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
-import {Heading} from '@instructure/ui-heading'
 import {Responsive} from '@instructure/ui-responsive'
-
+import {Heading} from '@instructure/ui-heading'
 import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 import {artifactTypeOptions, issueTypeOptions, stateOptions} from '../../../constants'
 import {AppliedFilter, FilterOption, Filters} from '../../../../../shared/react/types'
-import {getFilters} from '../../../utils'
+import {getAppliedFilters, getFilters} from '../../../utils'
 import {responsiveQuerySizes} from '@canvas/breakpoints'
 import FilterCheckboxGroup from './FilterCheckboxGroup'
 import AppliedFilters from './AppliedFilters'
 import CustomToggleGroup from './CustomToggleGroup'
+import {Alert} from '@instructure/ui-alerts'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -59,6 +59,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
   const [fromDate, setFromDate] = useState<FilterOption | null>(null)
   const [toDate, setToDate] = useState<FilterOption | null>(null)
   const [filterCount, setFilterCount] = useState(0)
+  const [alertMessage, setAlertMessage] = useState<string | null>(null)
 
   const dateFormatter = useDateTimeFormat('date.formats.medium_with_weekday')
 
@@ -72,6 +73,16 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
     setFilterCount(appliedFilters.length)
   }, [appliedFilters])
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (alertMessage !== null) {
+        setAlertMessage(null)
+      }
+    }, 3000)
+
+    return () => clearTimeout(timeout)
+  }, [alertMessage, setAlertMessage])
+
   const getFilterSelections = useCallback((): Filters => {
     return {
       ruleTypes: selectedIssues,
@@ -82,6 +93,22 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
     }
   }, [fromDate, toDate, selectedArtifactType, selectedIssues, selectedState])
 
+  const handleFilterChange = useCallback(
+    (filters: Filters | null) => {
+      onFilterChange(filters)
+
+      const appliedFilters = getAppliedFilters(filters || {})
+
+      const msg =
+        appliedFilters.length > 0
+          ? I18n.t('Filters applied. Accessibility issues updated.')
+          : I18n.t('Filters cleared. Accessibility issues updated.')
+
+      setTimeout(() => setAlertMessage(msg), 3000)
+    },
+    [onFilterChange],
+  )
+
   const handleReset = useCallback(() => {
     setSelectedIssues([{label: 'all', value: 'all'}])
     setSelectedArtifactType([{label: 'all', value: 'all'}])
@@ -89,16 +116,16 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
     setFromDate(null)
     setToDate(null)
     setFilterCount(0)
-    onFilterChange(null)
+    handleFilterChange(null)
     setIsOpen(false)
-  }, [onFilterChange])
+  }, [handleFilterChange])
 
   const handleApply = useCallback(() => {
     const filters = getFilterSelections()
     setFilterCount(appliedFilters.length)
-    onFilterChange(filters)
+    handleFilterChange(filters)
     setIsOpen(false)
-  }, [appliedFilters, onFilterChange, getFilterSelections])
+  }, [appliedFilters, handleFilterChange, getFilterSelections])
 
   const handleDateChange = useCallback(
     (dateFieldId: 'fromDate' | 'toDate') => (date: Date | null) => {
@@ -139,7 +166,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
               </Heading>
             </Flex.Item>
             <Flex.Item shouldGrow={true} shouldShrink={true}>
-              <AppliedFilters appliedFilters={appliedFilters} setFilters={onFilterChange} />
+              <AppliedFilters appliedFilters={appliedFilters} setFilters={handleFilterChange} />
             </Flex.Item>
             {filterCount > 0 && (
               <Flex.Item shouldGrow={false} shouldShrink={false}>
@@ -263,6 +290,16 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
           }}
         />
       </CustomToggleGroup>
+      {alertMessage && (
+        <Alert
+          liveRegion={getLiveRegion}
+          liveRegionPoliteness="assertive"
+          isLiveRegionAtomic
+          screenReaderOnly
+        >
+          {alertMessage}
+        </Alert>
+      )}
     </View>
   )
 }

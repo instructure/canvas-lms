@@ -21,7 +21,6 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {Alert} from '@instructure/ui-alerts'
 import {Img} from '@instructure/ui-img'
 
 import AccessibilityIssuesDrawerFooter from './Footer'
@@ -39,8 +38,6 @@ interface SuccessViewProps {
   handleSkip: () => void
   handlePrevious: () => void
   handleNextResource: () => void
-  assertiveAlertMessage: string
-  getLiveRegion: () => HTMLElement
 }
 
 const SuccessView: React.FC<SuccessViewProps> = ({
@@ -50,8 +47,6 @@ const SuccessView: React.FC<SuccessViewProps> = ({
   handleSkip,
   handlePrevious,
   handleNextResource,
-  assertiveAlertMessage,
-  getLiveRegion,
 }) => {
   const regionRef = useRef<HTMLDivElement | null>(null)
   return (
@@ -93,9 +88,6 @@ const SuccessView: React.FC<SuccessViewProps> = ({
           />
         </Flex.Item>
       </Flex>
-      <Alert screenReaderOnly={true} liveRegionPoliteness="assertive" liveRegion={getLiveRegion}>
-        {assertiveAlertMessage}
-      </Alert>
     </View>
   )
 }
