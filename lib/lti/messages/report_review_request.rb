@@ -38,6 +38,7 @@ module Lti::Messages
       add_assetreport_type_claim!
       add_for_user_claim!
       add_asset_claim!
+      add_legacy_custom_sourcedid_claim!
       super(validate_launch: true)
     end
 
@@ -57,6 +58,11 @@ module Lti::Messages
 
     def add_asset_claim!
       @message.asset.id = @asset_report.asset.uuid
+    end
+
+    def add_legacy_custom_sourcedid_claim!
+      legacy_custom_sourced_id = @asset_report.extensions&.dig("https://www.instructure.com/legacy_custom_sourcedid")
+      add_extension("legacy_custom_sourcedid", legacy_custom_sourced_id) if legacy_custom_sourced_id
     end
 
     def submission
