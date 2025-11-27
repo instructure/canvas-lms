@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IgniteAgentSessionStorage} from '../IgniteAgentSessionStorage'
+import {readFromSession, writeToSession} from '../IgniteAgentSessionStorage'
 
 describe('IgniteAgentSessionStorage', () => {
   const SESSION_STORAGE_KEY = 'igniteAgent'
@@ -24,126 +24,205 @@ describe('IgniteAgentSessionStorage', () => {
   beforeEach(() => {
     sessionStorage.clear()
     jest.clearAllMocks()
+    jest.restoreAllMocks()
   })
 
   afterEach(() => {
     sessionStorage.clear()
   })
 
-  describe('getState', () => {
-    it('returns null when sessionStorage is empty', () => {
-      const result = IgniteAgentSessionStorage.getState()
-      expect(result).toBeNull()
+  describe('readFromSession', () => {
+    it('returns undefined when sessionStorage is empty', () => {
+      const result = readFromSession('isOpen')
+      expect(result).toBeUndefined()
     })
 
-    it('returns the parsed session state when valid JSON exists', () => {
+    it('returns undefined when key does not exist in session state', () => {
+      const mockState = {sessionId: '123'}
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(mockState))
+
+      const result = readFromSession('isOpen')
+      expect(result).toBeUndefined()
+    })
+
+    it('returns the value when key exists in session state', () => {
       const mockState = {isOpen: true, sessionId: '123'}
       sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(mockState))
 
-      const result = IgniteAgentSessionStorage.getState()
-      expect(result).toEqual(mockState)
+      const result = readFromSession('isOpen')
+      expect(result).toBe(true)
     })
 
-    it('returns null when sessionStorage contains invalid JSON', () => {
+    it('returns complex values correctly', () => {
+      const mockState = {
+        buttonRelativeVerticalPosition: 0,
+        user: {id: 1, name: 'Test User'},
+        messages: ['msg1', 'msg2'],
+      }
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(mockState))
+
+      expect(readFromSession('buttonRelativeVerticalPosition')).toBe(0)
+      expect(readFromSession('user')).toEqual({id: 1, name: 'Test User'})
+      expect(readFromSession('messages')).toEqual(['msg1', 'msg2'])
+    })
+
+    it('returns undefined and logs error when sessionStorage contains invalid JSON', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
       sessionStorage.setItem(SESSION_STORAGE_KEY, 'invalid-json{')
 
-      const result = IgniteAgentSessionStorage.getState()
-      expect(result).toBeNull()
+      const result = readFromSession('isOpen')
+      expect(result).toBeUndefined()
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        '[Ignite Agent] Could not read from sessionStorage:',
+        '[Ignite Agent] Error parsing session data. Returning undefined.',
         expect.any(Error),
       )
 
       consoleErrorSpy.mockRestore()
     })
 
-    it('handles complex nested state objects', () => {
-      const mockState = {
-        isOpen: false,
-        sessionId: '456',
-        user: {
-          id: 1,
-          name: 'Test User',
-        },
-        messages: ['msg1', 'msg2'],
-      }
+    it('returns false when value is explicitly false', () => {
+      const mockState = {isOpen: false}
       sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(mockState))
 
-      const result = IgniteAgentSessionStorage.getState()
-      expect(result).toEqual(mockState)
+      const result = readFromSession('isOpen')
+      expect(result).toBe(false)
+    })
+
+    it('returns null when value is explicitly null', () => {
+      const mockState = {sessionId: null}
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(mockState))
+
+      const result = readFromSession('sessionId')
+      expect(result).toBeNull()
+    })
+
+    it('returns 0 when value is 0', () => {
+      const mockState = {count: 0}
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(mockState))
+
+      const result = readFromSession('count')
+      expect(result).toBe(0)
     })
   })
 
-  describe('setAgentState', () => {
-    it('sets isOpen to true when state exists and true is passed', () => {
+  describe('writeToSession', () => {
+    it('creates new session state when sessionStorage is empty', () => {
+      writeToSession('isOpen', true)
+
+      const state = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
+      expect(state.isOpen).toBe(true)
+    })
+
+    it('updates existing value in session state', () => {
       const mockState = {isOpen: false, sessionId: '123'}
       sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(mockState))
 
-      IgniteAgentSessionStorage.setAgentState(true)
+      writeToSession('isOpen', true)
 
-      const updatedState = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
-      expect(updatedState.isOpen).toBe(true)
-      expect(updatedState.sessionId).toBe('123')
+      const state = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
+      expect(state.isOpen).toBe(true)
+      expect(state.sessionId).toBe('123')
     })
 
-    it('sets isOpen to false when state exists and false is passed', () => {
-      const mockState = {isOpen: true, sessionId: '123'}
+    it('adds new property to existing session state', () => {
+      const mockState = {isOpen: true}
       sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(mockState))
 
-      IgniteAgentSessionStorage.setAgentState(false)
+      writeToSession('sessionId', 'abc123')
 
-      const updatedState = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
-      expect(updatedState.isOpen).toBe(false)
-      expect(updatedState.sessionId).toBe('123')
+      const state = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
+      expect(state.isOpen).toBe(true)
+      expect(state.sessionId).toBe('abc123')
     })
 
-    it('preserves other properties when setting to true', () => {
+    it('preserves all existing properties when updating', () => {
       const mockState = {
         isOpen: false,
         sessionId: '123',
+        buttonRelativeVerticalPosition: 0,
         otherProp: 'value',
-        nestedProp: {key: 'value'},
       }
       sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(mockState))
 
-      IgniteAgentSessionStorage.setAgentState(true)
+      writeToSession('isOpen', true)
 
-      const updatedState = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
-      expect(updatedState.isOpen).toBe(true)
-      expect(updatedState.sessionId).toBe('123')
-      expect(updatedState.otherProp).toBe('value')
-      expect(updatedState.nestedProp).toEqual({key: 'value'})
+      const state = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
+      expect(state.isOpen).toBe(true)
+      expect(state.sessionId).toBe('123')
+      expect(state.buttonRelativeVerticalPosition).toBe(0)
+      expect(state.otherProp).toBe('value')
     })
 
-    it('preserves other properties when setting to false', () => {
-      const mockState = {
-        isOpen: true,
-        sessionId: '456',
-        otherProp: 'value',
-        nestedProp: {key: 'value'},
-      }
-      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(mockState))
+    it('handles writing complex values', () => {
+      writeToSession('user', {id: 1, name: 'Test User'})
 
-      IgniteAgentSessionStorage.setAgentState(false)
-
-      const updatedState = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
-      expect(updatedState.isOpen).toBe(false)
-      expect(updatedState.sessionId).toBe('456')
-      expect(updatedState.otherProp).toBe('value')
-      expect(updatedState.nestedProp).toEqual({key: 'value'})
+      const state = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
+      expect(state.user).toEqual({id: 1, name: 'Test User'})
     })
 
-    it('logs error when sessionStorage read fails', () => {
+    it('handles writing false value', () => {
+      writeToSession('isOpen', false)
+
+      const state = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
+      expect(state.isOpen).toBe(false)
+    })
+
+    it('handles writing null value', () => {
+      writeToSession('sessionId', null)
+
+      const state = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
+      expect(state.sessionId).toBeNull()
+    })
+
+    it('handles writing 0 value', () => {
+      writeToSession('count', 0)
+
+      const state = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
+      expect(state.count).toBe(0)
+    })
+
+    it('uses default state when existing data is invalid JSON', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
       sessionStorage.setItem(SESSION_STORAGE_KEY, 'invalid-json{')
 
-      IgniteAgentSessionStorage.setAgentState(true)
+      writeToSession('customKey', 'testValue')
 
+      const state = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
+      expect(state.customKey).toBe('testValue')
+      expect(state.isOpen).toBe(false) // Default is false
+      expect(state.sessionId).toBeNull()
+      expect(state.buttonRelativeVerticalPosition).toBe(0)
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        '[Ignite Agent] Could not write to sessionStorage:',
+        '[Ignite Agent] Error parsing existing session data. Starting fresh.',
         expect.any(Error),
       )
+
+      consoleErrorSpy.mockRestore()
+    })
+
+    it('handles error when sessionStorage.setItem fails', () => {
+      // Suppress console.error for this test since we're intentionally causing an error
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const mockError = new Error('Storage quota exceeded')
+
+      // Get the descriptor to properly mock the property
+      const descriptor = Object.getOwnPropertyDescriptor(window.Storage.prototype, 'setItem')
+      Object.defineProperty(window.Storage.prototype, 'setItem', {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: jest.fn(() => {
+          throw mockError
+        }),
+      })
+
+      // The critical behavior: function should handle error gracefully without throwing
+      expect(() => writeToSession('isOpen', true)).not.toThrow()
+
+      // Restore original setItem
+      if (descriptor) {
+        Object.defineProperty(window.Storage.prototype, 'setItem', descriptor)
+      }
 
       consoleErrorSpy.mockRestore()
     })
@@ -152,25 +231,20 @@ describe('IgniteAgentSessionStorage', () => {
   describe('edge cases', () => {
     it('handles empty string in sessionStorage', () => {
       sessionStorage.setItem(SESSION_STORAGE_KEY, '')
-      const result = IgniteAgentSessionStorage.getState()
-      expect(result).toBeNull()
+      const result = readFromSession('isOpen')
+      expect(result).toBeUndefined()
     })
 
-    it('handles null value in sessionStorage', () => {
+    it('handles empty object in sessionStorage', () => {
+      sessionStorage.setItem(SESSION_STORAGE_KEY, '{}')
+      const result = readFromSession('isOpen')
+      expect(result).toBeUndefined()
+    })
+
+    it('handles string "null" in sessionStorage', () => {
       sessionStorage.setItem(SESSION_STORAGE_KEY, 'null')
-      const result = IgniteAgentSessionStorage.getState()
-      expect(result).toBeNull()
-    })
-
-    it('handles boolean values in session state', () => {
-      const mockState = {isOpen: false}
-      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(mockState))
-
-      IgniteAgentSessionStorage.setAgentState(true)
-
-      const updatedState = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
-      expect(updatedState.isOpen).toBe(true)
-      expect(typeof updatedState.isOpen).toBe('boolean')
+      const result = readFromSession('isOpen')
+      expect(result).toBeUndefined()
     })
   })
 })
