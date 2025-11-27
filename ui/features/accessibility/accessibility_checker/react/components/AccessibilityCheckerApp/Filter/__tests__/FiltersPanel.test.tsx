@@ -35,7 +35,8 @@ describe('FiltersPanel', () => {
 
   it('renders the filter panel with correct title', () => {
     render(<FiltersPanel {...defaultProps} />)
-    expect(screen.getByText('Filter resources')).toBeInTheDocument()
+    const filterResourcesHeading = screen.getAllByText('Filter resources')[0]
+    expect(filterResourcesHeading).toBeInTheDocument()
   })
 
   it('renders with closed state by default', () => {
@@ -62,7 +63,7 @@ describe('FiltersPanel', () => {
     it('opens the filter panel when clicked', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
 
       expect(screen.queryByTestId('apply-filters-button')).toBeInTheDocument()
@@ -74,7 +75,7 @@ describe('FiltersPanel', () => {
     it('closes the filter panel when toggled again', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
       expect(screen.queryByTestId('apply-filters-button')).toBeInTheDocument()
 
@@ -87,7 +88,7 @@ describe('FiltersPanel', () => {
     it('render when panel is open', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
 
       expect(screen.getByLabelText(/Last edited from/i)).toBeInTheDocument()
@@ -97,7 +98,7 @@ describe('FiltersPanel', () => {
     it('handle from date selection', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
 
       const fromDateInput = screen.getByLabelText(/Last edited from/i)
@@ -109,7 +110,7 @@ describe('FiltersPanel', () => {
     it('handle to date selection', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
 
       const toDateInput = screen.getByLabelText(/Last edited to/i)
@@ -121,7 +122,7 @@ describe('FiltersPanel', () => {
     it('handle clearing date inputs', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
 
       const fromDateInput = screen.getByLabelText(/Last edited from/i)
@@ -136,7 +137,7 @@ describe('FiltersPanel', () => {
     it('render when panel is open', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
 
       expect(screen.getByTestId('resource-type-checkbox-group')).toBeInTheDocument()
@@ -147,7 +148,7 @@ describe('FiltersPanel', () => {
     it('handle resource type selection', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
 
       const resourceTypeGroup = screen.getByTestId('resource-type-checkbox-group')
@@ -163,7 +164,7 @@ describe('FiltersPanel', () => {
     it('handle state selection', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
 
       const stateGroup = screen.getByTestId('state-checkbox-group')
@@ -179,7 +180,7 @@ describe('FiltersPanel', () => {
     it('handle issue type selection', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
 
       const issueTypeGroup = screen.getByTestId('issue-type-checkbox-group')
@@ -200,7 +201,7 @@ describe('FiltersPanel', () => {
     it('calls onFilterChange with current filter selections when apply is clicked', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
 
       const applyButton = screen.getByTestId('apply-filters-button')
@@ -218,7 +219,7 @@ describe('FiltersPanel', () => {
     it('closes the panel when apply is clicked', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
 
       const applyButton = screen.getByTestId('apply-filters-button')
@@ -230,7 +231,7 @@ describe('FiltersPanel', () => {
     it('applies filters when panel is closed', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
 
       const resourceTypeGroup = screen.getByTestId('resource-type-checkbox-group')

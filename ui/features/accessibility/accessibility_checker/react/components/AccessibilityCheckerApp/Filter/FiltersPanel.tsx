@@ -130,7 +130,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
       <CustomToggleGroup
         size="small"
         border={false}
-        toggleLabel={isOpen ? I18n.t('Close filter controls') : I18n.t('Open filter controls')}
+        toggleLabel={I18n.t('Filter resources')}
         summary={
           <Flex gap="small">
             <Flex.Item shouldGrow={false} shouldShrink={false}>
