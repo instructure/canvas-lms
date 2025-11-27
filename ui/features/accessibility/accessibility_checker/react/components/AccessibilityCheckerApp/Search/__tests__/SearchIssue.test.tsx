@@ -32,7 +32,7 @@ describe('SearchIssue Component', () => {
     const mockOnSearchChange = jest.fn()
     render(<SearchIssue onSearchChange={mockOnSearchChange} />)
 
-    const input = screen.getByPlaceholderText('Search...')
+    const input = screen.getByTestId('issue-search-input')
     expect(input).toHaveValue('test')
   })
 
@@ -40,12 +40,63 @@ describe('SearchIssue Component', () => {
     const mockOnSearchChange = jest.fn()
     render(<SearchIssue onSearchChange={mockOnSearchChange} />)
 
-    const input = screen.getByPlaceholderText('Search...')
+    const input = screen.getByTestId('issue-search-input')
     fireEvent.change(input, {target: {value: 'new search'}})
 
     await waitFor(() => {
       expect(mockOnSearchChange).toHaveBeenCalledWith('new search')
     })
     expect(input).toHaveValue('new search')
+  })
+
+  it('should not show clear button when search is empty', () => {
+    const mockOnSearchChange = jest.fn()
+    render(<SearchIssue onSearchChange={mockOnSearchChange} />)
+
+    const input = screen.getByTestId('issue-search-input')
+    fireEvent.change(input, {target: {value: ''}})
+
+    const clearButton = screen.queryByTestId('clear-search-button')
+    expect(clearButton).not.toBeInTheDocument()
+  })
+
+  it('should show clear button when search has value', () => {
+    const mockOnSearchChange = jest.fn()
+    render(<SearchIssue onSearchChange={mockOnSearchChange} />)
+
+    const input = screen.getByTestId('issue-search-input')
+    fireEvent.change(input, {target: {value: 'test search'}})
+
+    const clearButton = screen.getByTestId('clear-search-button')
+    expect(clearButton).toBeInTheDocument()
+  })
+
+  it('should clear search input when clear button is clicked', async () => {
+    const mockOnSearchChange = jest.fn()
+    render(<SearchIssue onSearchChange={mockOnSearchChange} />)
+
+    const input = screen.getByTestId('issue-search-input')
+    fireEvent.change(input, {target: {value: 'test search'}})
+
+    const clearButton = screen.getByTestId('clear-search-button')
+    fireEvent.click(clearButton)
+
+    expect(input).toHaveValue('')
+    await waitFor(() => {
+      expect(mockOnSearchChange).toHaveBeenCalledWith('')
+    })
+  })
+
+  it('should hide clear button after clearing search', () => {
+    const mockOnSearchChange = jest.fn()
+    render(<SearchIssue onSearchChange={mockOnSearchChange} />)
+
+    const input = screen.getByPlaceholderText('Search...')
+    fireEvent.change(input, {target: {value: 'test search'}})
+
+    const clearButton = screen.getByTestId('clear-search-button')
+    fireEvent.click(clearButton)
+
+    expect(screen.queryByTestId('clear-search-button')).not.toBeInTheDocument()
   })
 })

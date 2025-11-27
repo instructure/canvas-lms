@@ -93,6 +93,7 @@ describe('AccessibilityIssuesTable', () => {
     const Wrapper = createWrapper()
     const {rerender} = render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
     expect(screen.getByTestId('loading-row')).toBeInTheDocument()
+    expect(screen.queryByTestId('no-issues-row')).not.toBeInTheDocument()
 
     act(() => {
       result.current.setLoading(false)
@@ -146,7 +147,7 @@ describe('AccessibilityIssuesTable', () => {
       render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
 
       act(() => {
-        screen.getByText('Resource Type').click()
+        screen.getByText('Type').click()
       })
 
       expect(mockDoFetch).toHaveBeenCalledTimes(1)
@@ -167,7 +168,7 @@ describe('AccessibilityIssuesTable', () => {
       })
 
       act(() => {
-        screen.getByText('Resource Type').click()
+        screen.getByText('Type').click()
       })
 
       expect(mockDoFetch).toHaveBeenCalledTimes(2)
@@ -188,7 +189,7 @@ describe('AccessibilityIssuesTable', () => {
       })
 
       act(() => {
-        screen.getByText('Resource Type').click()
+        screen.getByText('Type').click()
       })
 
       expect(mockDoFetch).toHaveBeenCalledTimes(3)

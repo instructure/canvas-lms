@@ -83,9 +83,8 @@ describe('AccessibilityIssuesDrawerContent', () => {
     jest.clearAllMocks()
   })
 
-  it('renders the title and issue counter', async () => {
+  it('renders the issue counter', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
-    expect(await screen.findByText('Multi Issue Test Page')).toBeInTheDocument()
     expect(screen.getByText(/Issue 1\/2:/)).toBeInTheDocument()
   })
 
@@ -155,13 +154,23 @@ describe('AccessibilityIssuesDrawerContent', () => {
         expect(saveAndNext).toBeEnabled()
       })
 
-      it('when the form type is CheckboxTextInput (apply button hidden)', () => {
+      it('when the form type is CheckboxTextInput', async () => {
         render(
           <AccessibilityIssuesDrawerContent item={checkboxTextInputRuleItem} onClose={mockClose} />,
         )
 
         const saveAndNext = screen.getByTestId('save-and-next-button')
-        expect(saveAndNext).toBeEnabled()
+        expect(saveAndNext).toBeDisabled()
+
+        const textarea = screen.getByTestId('checkbox-text-input-form')
+        await userEvent.type(textarea, 'alt text')
+
+        const apply = screen.getByTestId('apply-button')
+        await userEvent.click(apply)
+
+        await waitFor(() => {
+          expect(saveAndNext).toBeEnabled()
+        })
       })
     })
 
@@ -238,8 +247,9 @@ describe('AccessibilityIssuesDrawerContent', () => {
 
       const textarea = screen.getByTestId('checkbox-text-input-form')
       await userEvent.type(textarea, '1')
-      const saveButton = screen.getByTestId('save-and-next-button')
-      await userEvent.click(saveButton)
+
+      const apply = screen.getByTestId('apply-button')
+      await userEvent.click(apply)
 
       await waitFor(() => {
         expect(screen.getAllByText('Test error')[0]).toBeInTheDocument()

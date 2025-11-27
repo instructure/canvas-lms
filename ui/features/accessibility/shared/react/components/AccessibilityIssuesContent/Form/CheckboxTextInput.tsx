@@ -21,7 +21,6 @@ import React, {
   useRef,
   useImperativeHandle,
   useCallback,
-  useContext,
   useEffect,
 } from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -36,8 +35,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 
-import {AccessibilityCheckerContext} from '../../../contexts/AccessibilityCheckerContext'
-import type {AccessibilityCheckerContextType} from '../../../contexts/AccessibilityCheckerContext'
+import {useAccessibilityCheckerContext} from '../../../hooks/useAccessibilityCheckerContext'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
@@ -49,15 +47,24 @@ const I18n = createI18nScope('accessibility_checker')
 
 const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
-    ({issue, value, error, onChangeValue, onValidationChange}: FormComponentProps, ref) => {
+    (
+      {
+        issue,
+        value,
+        error,
+        onChangeValue,
+        onValidationChange,
+        actionButtons,
+        isDisabled,
+      }: FormComponentProps,
+      ref,
+    ) => {
       const checkboxRef = useRef<HTMLInputElement | null>(null)
       const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
       const [isChecked, setChecked] = useState(false)
       const [generateLoading, setGenerateLoading] = useState(false)
       const [generationError, setGenerationError] = useState<string | null>(null)
-      const {selectedItem} = useContext(
-        AccessibilityCheckerContext,
-      ) as Partial<AccessibilityCheckerContextType>
+      const {selectedItem} = useAccessibilityCheckerContext()
       const isAiGenerationEnabled = useAccessibilityScansStore(
         useShallow(state => state.aiGenerationEnabled),
       )
@@ -180,6 +187,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               inputRef={el => (checkboxRef.current = el)}
               label={issue.form.checkboxLabel}
               checked={isChecked}
+              disabled={isDisabled}
               messages={[
                 {
                   text: (
@@ -200,7 +208,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               data-testid="checkbox-text-input-form"
               textareaRef={el => (textAreaRef.current = el)}
               label={issue.form.label}
-              disabled={isChecked}
+              disabled={isChecked || isDisabled}
               value={isChecked ? '' : value || ''}
               onChange={handleTextAreaChange}
               messages={shouldShowError ? [{text: error, type: 'newError'}] : []}
@@ -218,43 +226,42 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               </Text>
             </Flex.Item>
           </Flex>
-          {isAiGenerationEnabled && (
-            <>
-              <Flex as="div" margin="small 0">
-                <Flex.Item>
-                  <Button
-                    color="ai-primary"
-                    renderIcon={() => <IconAiSolid />}
-                    onClick={handleGenerateClick}
-                    disabled={generateLoading}
-                  >
-                    {issue.form.generateButtonLabel}
-                  </Button>
-                </Flex.Item>
-                {generateLoading ? (
-                  <Flex.Item>
-                    <Spinner
-                      size="x-small"
-                      renderTitle={I18n.t('Generating...')}
-                      margin="0 small 0 0"
-                    />
-                  </Flex.Item>
-                ) : (
-                  <></>
-                )}
-              </Flex>
-              {generationError !== null ? (
-                <Flex>
-                  <Flex.Item>
-                    <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
-                      {generationError}
-                    </Alert>
-                  </Flex.Item>
-                </Flex>
-              ) : (
-                <></>
-              )}
-            </>
+          <Flex as="div" margin="medium 0" gap="small">
+            {isAiGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
+              <Flex.Item>
+                <Button
+                  color="ai-primary"
+                  renderIcon={() => <IconAiSolid />}
+                  onClick={handleGenerateClick}
+                  disabled={generateLoading || isDisabled}
+                >
+                  {issue.form.generateButtonLabel}
+                </Button>
+              </Flex.Item>
+            )}
+            {actionButtons && <Flex.Item>{actionButtons}</Flex.Item>}
+            {generateLoading ? (
+              <Flex.Item>
+                <Spinner
+                  size="x-small"
+                  renderTitle={I18n.t('Generating...')}
+                  margin="0 small 0 0"
+                />
+              </Flex.Item>
+            ) : (
+              <></>
+            )}
+          </Flex>
+          {generationError !== null ? (
+            <Flex>
+              <Flex.Item>
+                <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
+                  {generationError}
+                </Alert>
+              </Flex.Item>
+            </Flex>
+          ) : (
+            <></>
           )}
         </>
       )

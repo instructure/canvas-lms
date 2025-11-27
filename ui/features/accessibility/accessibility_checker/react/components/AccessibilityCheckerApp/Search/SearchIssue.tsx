@@ -18,9 +18,10 @@
 
 import React, {useEffect, useState} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
-import {IconSearchLine} from '@instructure/ui-icons'
+import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useDebouncedCallback} from 'use-debounce'
+import {IconButton} from '@instructure/ui-buttons'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -50,15 +51,40 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
     debouncedOnSearchChange(newSearch)
   }
 
+  const handleClear = () => {
+    setSearch('')
+    onSearchChange('')
+  }
+
+  const clearButton = () => {
+    if (!search.length) return null
+
+    return (
+      <IconButton
+        type="button"
+        size="small"
+        withBackground={false}
+        withBorder={false}
+        screenReaderLabel={I18n.t('Clear search')}
+        onClick={handleClear}
+        data-testid="clear-search-button"
+      >
+        <IconTroubleLine />
+      </IconButton>
+    )
+  }
+
   return (
     <TextInput
       id="issueSearchInput"
       value={search}
       renderBeforeInput={() => <IconSearchLine inline={false} />}
+      renderAfterInput={clearButton}
       renderLabel={''}
       onChange={handleSearchChange}
       placeholder={I18n.t('Search...')}
       width="100%"
+      data-testid="issue-search-input"
     />
   )
 }

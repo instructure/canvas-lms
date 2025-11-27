@@ -16,28 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {canvasThemeLocal} from '@instructure/ui-themes'
 import {useCallback} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {Tray} from '@instructure/ui-tray'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import CanvasTray from '@canvas/trays/react/Tray'
 import AccessibilityIssuesContent from '../../../../shared/react/components/AccessibilityIssuesContent'
-import {AccessibilityResourceScan} from '../../../../shared/react/types'
+import {useAccessibilityCheckerContext} from '../../../../shared/react/hooks/useAccessibilityCheckerContext'
+import {WizardHeader} from './WizardHeader/WizardHeader'
+import {WizardErrorBoundary} from './WizardErrorBoundary/WizardErrorBoundary'
 
 const I18n = createI18nScope('accessibility_checker')
 
-export const AccessibilityWizard = ({
-  selectedItem,
-  isTrayOpen,
-  setSelectedItem,
-  setIsTrayOpen,
-}: {
-  selectedItem: AccessibilityResourceScan | null
-  isTrayOpen: boolean
-  setSelectedItem: (item: AccessibilityResourceScan | null) => void
-  setIsTrayOpen: (isOpen: boolean) => void
-}) => {
-  const trayTitle = selectedItem?.resourceName || I18n.t('Accessibility Issues')
+export const AccessibilityWizard = () => {
+  const {selectedItem, setSelectedItem, setIsTrayOpen, isTrayOpen} =
+    useAccessibilityCheckerContext()
+
+  const trayTitle = selectedItem?.resourceName ?? ''
 
   const onDismiss = useCallback(() => {
     setSelectedItem(null)
@@ -45,28 +42,51 @@ export const AccessibilityWizard = ({
   }, [setIsTrayOpen, setSelectedItem])
 
   return (
-    <CanvasTray
+    <Tray
       label={trayTitle}
-      title={trayTitle}
       open={isTrayOpen}
       onDismiss={onDismiss}
       onClose={onDismiss}
-      padding="0"
-      headerPadding="small small 0 small"
-      contentPadding="0"
       placement="end"
       size="regular"
-      shouldCloseOnDocumentClick={false}
     >
-      <>
-        {selectedItem ? (
-          <AccessibilityIssuesContent item={selectedItem} onClose={onDismiss} />
-        ) : (
-          <View margin="auto">
-            <Spinner renderTitle={I18n.t('Loading accessibility issues...')} />
+      <View
+        as="div"
+        padding="0"
+        position="absolute"
+        insetBlockStart="0"
+        insetBlockEnd="0"
+        insetInlineStart="0"
+        insetInlineEnd="0"
+      >
+        <Flex direction="column" width="100%" height="100%">
+          <View
+            as="div"
+            position="sticky"
+            insetBlockStart="0"
+            elementRef={(el: Element | null) => {
+              if (el instanceof HTMLElement) {
+                el.style.zIndex = '10'
+                el.style.background = canvasThemeLocal.colors.contrasts.white1010
+                el.style.borderBottom = `1px solid ${canvasThemeLocal.colors.contrasts.grey1214}`
+              }
+            }}
+          >
+            <WizardHeader title={trayTitle} onDismiss={onDismiss} />
           </View>
-        )}
-      </>
-    </CanvasTray>
+          <View as="div" width="100%" height="100%">
+            <WizardErrorBoundary>
+              {selectedItem ? (
+                <AccessibilityIssuesContent item={selectedItem} onClose={onDismiss} />
+              ) : (
+                <View margin="auto">
+                  <Spinner renderTitle={I18n.t('Loading accessibility issues...')} />
+                </View>
+              )}
+            </WizardErrorBoundary>
+          </View>
+        </Flex>
+      </View>
+    </Tray>
   )
 }

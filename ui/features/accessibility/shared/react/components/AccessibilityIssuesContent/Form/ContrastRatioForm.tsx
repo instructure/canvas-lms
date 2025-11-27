@@ -19,6 +19,7 @@
 import React, {useState, useRef, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 import {ColorPicker, ColorContrast} from '@instructure/ui-color-picker'
 import {FormMessage} from '@instructure/ui-form-field'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -142,7 +143,7 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
   }
 
   return (
-    <View as="div" margin="0 0 large 0" data-testid="contrast-ratio-form">
+    <View as="div" data-testid="contrast-ratio-form">
       <ColorContrast
         firstColor={backgroundColor}
         secondColor={selectedColor}
@@ -163,7 +164,9 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
       />
       <View as="section" margin="medium 0 large 0">
         <View as="div" margin="x-small 0">
-          <Text weight="weightImportant">{I18n.t('Issue description')}</Text>
+          <Heading level="h4" variant="titleCardMini">
+            {I18n.t('Issue description')}
+          </Heading>
         </View>
         <Text weight="weightRegular">{description}</Text>
       </View>

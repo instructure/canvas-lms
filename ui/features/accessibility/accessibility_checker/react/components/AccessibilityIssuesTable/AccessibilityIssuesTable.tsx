@@ -40,10 +40,6 @@ import {useAccessibilityScansPolling} from '../../../../shared/react/hooks/useAc
 
 const I18n = createI18nScope('accessibility_checker')
 
-type Props = {
-  onRowClick?: (item: AccessibilityResourceScan) => void
-}
-
 const headerThemeOverride: TableColHeaderProps['themeOverride'] = _componentTheme => ({
   padding: '0.875rem 0.75rem', // Make column header height 3rem
 })
@@ -70,9 +66,9 @@ const getNewTableSortState = (
 const renderTableData = (
   scans?: AccessibilityResourceScan[] | null,
   error?: string | null,
-  onRowClick?: (item: AccessibilityResourceScan) => void,
+  loading?: boolean,
 ) => {
-  if (error) return
+  if (error || loading) return
 
   return (
     <>
@@ -84,11 +80,7 @@ const renderTableData = (
         </Table.Row>
       ) : (
         scans.map(item => (
-          <AccessibilityIssuesTableRow
-            key={`${item.resourceType}-${item.id}`}
-            item={item}
-            onRowClick={onRowClick}
-          />
+          <AccessibilityIssuesTableRow key={`${item.resourceType}-${item.id}`} item={item} />
         ))
       )}
     </>
@@ -111,7 +103,7 @@ const renderLoading = () => {
 // If these columns are sorted, a reverse cycle is more convenient
 const ReverseOrderingFirst = [IssuesTableColumns.Issues, IssuesTableColumns.LastEdited]
 
-export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
+export const AccessibilityIssuesTable = () => {
   const {doFetchAccessibilityScanData} = useAccessibilityScansFetchUtils()
 
   useAccessibilityScansPolling()
@@ -204,7 +196,7 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
                 </Table.Cell>
               </Table.Row>
             )}
-            {renderTableData(accessibilityScans, error, onRowClick)}
+            {renderTableData(accessibilityScans, error, loading)}
           </Table.Body>
         </Table>
       </View>

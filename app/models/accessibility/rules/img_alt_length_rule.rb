@@ -41,7 +41,7 @@ module Accessibility
           checkbox_label: I18n.t("This image is decorative"),
           checkbox_subtext: I18n.t("This image is for visual decoration only and screen readers can skip it."),
           input_label: I18n.t("Alt text"),
-          undo_text: I18n.t("Alt text fixed"),
+          undo_text: I18n.t("Alt text updated"),
           input_description: I18n.t("Describe what's on the picture."),
           input_max_length: ImgAltRuleHelper::MAX_LENGTH,
           can_generate_fix: true,
@@ -67,13 +67,11 @@ module Accessibility
       end
 
       def message
-        I18n.t("The alt text is too long. Alt text should ideally be under 120 characters,
-        so people using screen readers can quickly understand the important content of the image.")
+        I18n.t("Recommended alt text length is under %{max_length} characters. Concise descriptions help screen reader users scan pages efficiently.", max_length: ImgAltRuleHelper::MAX_LENGTH)
       end
 
       def why
-        I18n.t("Alt text should be concise. When it's unnecessarily long, it can break the flow of screen reader users.
-        Unless the image conveys complex information, aim for 120 characters or fewer.")
+        I18n.t("This description is over %{max_length} characters. Long alt text can cause \"audio fatigue\" because screen readers cannot pause or navigate through it. Recommendation: Consider summarising the image here. If the image needs a detailed description (like a chart), place that text in the document body or a caption instead.", max_length: ImgAltRuleHelper::MAX_LENGTH)
       end
     end
   end
