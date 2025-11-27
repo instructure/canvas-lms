@@ -28,7 +28,6 @@ describe('NewKeyModal', () => {
 
   beforeEach(() => {
     fakeENV.setup({
-      validLtiPlacements: [],
       validLtiScopes: {},
       RAILS_ENVIRONMENT: 'production',
     })

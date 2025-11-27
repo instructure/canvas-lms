@@ -18,7 +18,8 @@ import React from 'react'
 import {render, cleanup, waitFor} from '@testing-library/react'
 import AdaChatbot from '../AdaChatbot'
 
-const PERSIST_KEY = 'persistedAdaClosed'
+const CHAT_CLOSED_KEY = 'persistedAdaClosed'
+const DRAWER_OPEN_KEY = 'persistedAdaDrawerOpen'
 
 describe('AdaChatbot', () => {
   const mockOnDialogClose = jest.fn()
@@ -36,6 +37,7 @@ describe('AdaChatbot', () => {
       start: jest.fn().mockResolvedValue(undefined),
       toggle: jest.fn(),
       getInfo: jest.fn().mockResolvedValue({isChatOpen: false, hasActiveChatter: false}),
+      subscribeEvent: jest.fn().mockResolvedValue(1),
     }
 
     ;(window as any).adaEmbed = mockAdaEmbed
@@ -80,7 +82,7 @@ describe('AdaChatbot', () => {
     expect(mockAdaEmbed.start).toHaveBeenCalledWith(
       expect.objectContaining({
         handle: 'instructure-gen',
-        hideMascot: true,
+        onAdaEmbedLoaded: expect.any(Function),
         adaReadyCallback: expect.any(Function),
         toggleCallback: expect.any(Function),
       }),
@@ -117,7 +119,6 @@ describe('AdaChatbot', () => {
     expect(passedConfig.metaFields).toEqual(globalSettings.metaFields)
     expect(passedConfig.crossWindowPersistence).toBe(true)
     expect(passedConfig.handle).toBe('instructure-gen')
-    expect(passedConfig.hideMascot).toBe(true)
     expect(globalSettings.handle).toBe('should-be-overridden')
   })
 
@@ -143,17 +144,18 @@ describe('AdaChatbot', () => {
     expect(mockAdaEmbed.toggle).not.toHaveBeenCalled()
   })
 
-  it('marks chat as open in localStorage when opened', async () => {
+  it('marks chat as active and drawer open when opened', async () => {
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
 
     await waitFor(() => {
       expect(mockAdaEmbed.toggle).toHaveBeenCalled()
     })
 
-    expect(localStorage.getItem(PERSIST_KEY)).toBe('false')
+    expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('false')
+    expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('true')
   })
 
-  it('marks chat as closed in localStorage via toggleCallback', async () => {
+  it('does not mark chat closed when minimizing via toggleCallback', async () => {
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
 
     await waitFor(() => {
@@ -164,10 +166,11 @@ describe('AdaChatbot', () => {
 
     toggleCallback(false)
 
-    expect(localStorage.getItem(PERSIST_KEY)).toBe('true')
+    expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('false')
+    expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('false')
   })
 
-  it('marks chat as open in localStorage via toggleCallback', async () => {
+  it('marks chat as active and drawer open via toggleCallback', async () => {
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
 
     await waitFor(() => {
@@ -178,10 +181,13 @@ describe('AdaChatbot', () => {
 
     toggleCallback(true)
 
-    expect(localStorage.getItem(PERSIST_KEY)).toBe('false')
+    expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('false')
+    expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('true')
   })
 
-  it('restores chat when hasActiveChatter and not closed by user', async () => {
+  it('restores drawer open only when it was previously open and not closed by user', async () => {
+    // Simulate user had drawer open previously
+    localStorage.setItem(DRAWER_OPEN_KEY, 'true')
     mockAdaEmbed.getInfo.mockResolvedValue({isChatOpen: false, hasActiveChatter: true})
 
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
@@ -196,8 +202,9 @@ describe('AdaChatbot', () => {
     expect(mockAdaEmbed.toggle).toHaveBeenCalled()
   })
 
-  it('does not restore chat when hasActiveChatter but was closed by user', async () => {
-    localStorage.setItem(PERSIST_KEY, 'true')
+  it('does not restore drawer when chat was explicitly closed by user', async () => {
+    localStorage.setItem(CHAT_CLOSED_KEY, 'true')
+    localStorage.setItem(DRAWER_OPEN_KEY, 'true')
     mockAdaEmbed.getInfo
       .mockResolvedValueOnce({isChatOpen: false, hasActiveChatter: true}) // First call from openAda
       .mockResolvedValueOnce({isChatOpen: true, hasActiveChatter: true}) // After toggle
@@ -265,6 +272,102 @@ describe('AdaChatbot', () => {
 
     await waitFor(() => {
       expect(mockAdaEmbed.start).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it('marks chat closed and drawer closed on end conversation event', async () => {
+    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+
+    await waitFor(() => {
+      expect(mockAdaEmbed.start).toHaveBeenCalled()
+    })
+
+    const {onAdaEmbedLoaded} = mockAdaEmbed.start.mock.calls[0][0]
+    onAdaEmbedLoaded()
+
+    // Simulate end conversation event by invoking the callback passed to subscribeEvent
+    type SubscribeArgs = [eventKey: string, callback: () => void]
+    const subscribeCall = (mockAdaEmbed.subscribeEvent.mock.calls as SubscribeArgs[]).find(
+      (call: SubscribeArgs) => call[0] === 'ada:end_conversation',
+    )
+
+    if (subscribeCall) {
+      const callback = subscribeCall[1]
+      callback()
+    }
+
+    expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('true')
+    expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('false')
+  })
+
+  describe('autoRestoreAda', () => {
+    it('initializes Ada when not closed by user', async () => {
+      jest.isolateModules(() => {
+        localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+        const {autoRestoreAda} = require('../AdaChatbot')
+
+        autoRestoreAda()
+      })
+
+      await waitFor(() => {
+        expect(mockAdaEmbed.start).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    it('does not initialize Ada when closed by user', async () => {
+      jest.isolateModules(() => {
+        localStorage.setItem(CHAT_CLOSED_KEY, 'true')
+        const {autoRestoreAda} = require('../AdaChatbot')
+
+        autoRestoreAda()
+      })
+
+      await waitFor(() => {
+        expect(mockAdaEmbed.start).not.toHaveBeenCalled()
+      })
+    })
+
+    it('only runs once even when called multiple times', async () => {
+      jest.isolateModules(() => {
+        localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+        const {autoRestoreAda} = require('../AdaChatbot')
+
+        autoRestoreAda()
+        autoRestoreAda()
+        autoRestoreAda()
+      })
+
+      await waitFor(() => {
+        expect(mockAdaEmbed.start).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    it('handles initialization errors gracefully', async () => {
+      let errorSpy: jest.SpyInstance
+
+      jest.isolateModules(() => {
+        localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+
+        // Set up the mock to reject before importing the module
+        const failingAdaEmbed = {
+          start: jest.fn().mockRejectedValue(new Error('Init failed')),
+          toggle: jest.fn(),
+          getInfo: jest.fn().mockResolvedValue({isChatOpen: false, hasActiveChatter: false}),
+          subscribeEvent: jest.fn().mockResolvedValue(1),
+        }
+        ;(window as any).adaEmbed = failingAdaEmbed
+
+        errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const {autoRestoreAda} = require('../AdaChatbot')
+
+        autoRestoreAda()
+      })
+
+      await waitFor(() => {
+        expect(errorSpy!).toHaveBeenCalledWith('Failed to auto-restore Ada:', expect.any(Error))
+      })
+
+      errorSpy!.mockRestore()
     })
   })
 })

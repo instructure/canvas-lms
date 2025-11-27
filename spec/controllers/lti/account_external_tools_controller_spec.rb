@@ -99,19 +99,22 @@ describe Lti::AccountExternalToolsController do
   end
 
   describe "#create" do
+    let(:action) { :create }
     let(:params_overrides) do
       { account_id: root_account.lti_context_id, client_id: tool_configuration.developer_key.id }
     end
 
     it_behaves_like "lti services" do
-      let(:action) { :create }
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_external_tools/scope/create" }
     end
 
-    context "error handling" do
-      let(:action) { :create }
+    it "sets the correct workflow_state" do
+      send_request
+      expect(ContextExternalTool.last.workflow_state).to eq(tool_configuration.privacy_level)
+    end
 
+    context "error handling" do
       context "with invalid client id" do
         let(:params_overrides) do
           { account_id: root_account.lti_context_id, client_id: "bad client id" }

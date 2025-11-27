@@ -2874,7 +2874,6 @@ describe AssignmentsController do
         end
 
         let(:tool_in_js_env) do
-          Setting.set("submission_type_selection_allowed_launch_domains", domain)
           tool
           subject
           assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0]
@@ -2889,7 +2888,7 @@ describe AssignmentsController do
           )
         end
 
-        describe "require_resourse_selection property" do
+        describe "require_resource_selection property" do
           context "when not given in the settings" do
             it "is not set in the js_env tool" do
               expect(tool_in_js_env).to_not include(:require_resource_selection)

@@ -141,11 +141,6 @@ describe "external tool assignments" do
         tool.submission_type_selection = { text: "link to #{tool.name} or whatever" }
         tool.save!
       end
-      Setting.set("submission_type_selection_allowed_launch_domains", "justanexamplenotarealwebsite.com")
-    end
-
-    after do
-      Setting.remove("submission_type_selection_allowed_launch_domains")
     end
 
     it "is able to select the tool directly from the submission type drop-down" do

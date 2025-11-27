@@ -109,7 +109,12 @@ Breadcrumbs.renderDynamicCrumbs = function () {
 
 Breadcrumbs.render = function () {
   return (
-    <nav aria-label="breadcrumbs" role="navigation" id="breadcrumbs" ref={this.breadcrumbsRef}>
+    <nav
+      aria-label={I18n.t('breadcrumbs')}
+      role="navigation"
+      id="breadcrumbs"
+      ref={this.breadcrumbsRef}
+    >
       <ol>
         <li className="home">
           <a href="/">

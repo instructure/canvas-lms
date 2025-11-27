@@ -20,8 +20,7 @@ module SentryExtensions
   module Settings
     class << self
       def settings
-        @sentry_settings ||= ConfigFile.load("sentry")
-
+        @sentry_settings ||= build_settings
         @sentry_settings.presence || {}
       end
 
@@ -33,6 +32,35 @@ module SentryExtensions
 
       def reset_settings
         @sentry_settings = nil
+      end
+
+      private
+
+      def build_settings
+        raw_settings = Canvas.load_config_from_consul("sentry")
+        return {} if raw_settings.blank?
+
+        region = Canvas.region_code
+
+        processed_settings = {}
+        if region.present?
+          processed_settings[:dsn] = raw_settings[:dsn]&.gsub("{region}", region) if raw_settings[:dsn].present?
+          processed_settings[:frontend_dsn] = raw_settings[:frontend_dsn]&.gsub("{region}", region) if raw_settings[:frontend_dsn].present?
+        else
+          processed_settings[:dsn] = raw_settings[:dsn] if raw_settings[:dsn].present?
+          processed_settings[:frontend_dsn] = raw_settings[:frontend_dsn] if raw_settings[:frontend_dsn].present?
+        end
+
+        processed_settings[:tags] = build_tags
+
+        raw_settings.except(:dsn, :frontend_dsn, :tags).merge(processed_settings).compact
+      end
+
+      def build_tags
+        {
+          "aws_region" => Canvas.region,
+          "availability_zone" => Canvas.availability_zone
+        }.compact
       end
     end
   end

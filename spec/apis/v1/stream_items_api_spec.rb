@@ -917,6 +917,49 @@ describe UsersController, type: :request do
     expect(json).to eq []
   end
 
+  it "formats discussion checkpoint submission with parent assignment ID" do
+    @course.root_account.enable_feature!(:discussion_checkpoints)
+    @teacher = User.create!(name: "teacher")
+    @course.enroll_teacher(@teacher)
+
+    # Create a graded discussion with checkpoints
+    @discussion_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
+    parent_assignment = @discussion_topic.assignment
+
+    # Create checkpoints
+    reply_to_topic_checkpoint = Checkpoints::DiscussionCheckpointCreatorService.call(
+      discussion_topic: @discussion_topic,
+      checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+      dates: [{ type: "everyone", due_at: 1.day.from_now }],
+      points_possible: 5
+    )
+
+    Checkpoints::DiscussionCheckpointCreatorService.call(
+      discussion_topic: @discussion_topic,
+      checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+      dates: [{ type: "everyone", due_at: 2.days.from_now }],
+      points_possible: 5,
+      replies_required: 2
+    )
+
+    # Student submits to the checkpoint
+    sub_assignment = reply_to_topic_checkpoint
+    @sub = sub_assignment.grade_student(@user, { grade: "4", grader: @teacher }).first
+    @sub.workflow_state = "submitted"
+    @sub.submission_comments.create!(comment: "Great work!", author: @teacher)
+    @sub.save!
+
+    # Call activity stream API
+    json = api_call(:get,
+                    "/api/v1/users/activity_stream.json",
+                    { controller: "users", action: "activity_stream", format: "json" })
+
+    # Verify the response uses parent assignment ID, not sub-assignment ID
+    expect(json.first["assignment_id"]).to eq parent_assignment.id
+    expect(json.first["html_url"]).to include("assignments/#{parent_assignment.id}")
+    expect(json.first["html_url"]).not_to include("assignments/#{sub_assignment.id}")
+  end
+
   it "formats Collaboration" do
     google_docs_collaboration_model(user_id: @user.id, title: "hey")
     json = api_call(:get,

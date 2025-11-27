@@ -36,7 +36,7 @@ module CanvasCrummy
       return render_k5_crumbs if @k5_details_view
 
       if crumbs.length > 1
-        content_tag(:nav, :id => "breadcrumbs", :role => "navigation", "aria-label" => "breadcrumbs") do
+        content_tag(:nav, :id => "breadcrumbs", :role => "navigation", "aria-label" => t("breadcrumbs")) do
           content_tag(:ol, nil, nil, false) do
             crumbs.each_with_index.map do |crumb, index|
               options = crumb[2] || {}

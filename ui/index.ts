@@ -133,10 +133,11 @@ function afterDocumentReady() {
   // Only import the module if the persisted state indicates it
   // should be open, to avoid unnecessary loading
   if (localStorage.getItem('persistedAdaClosed') === 'false') {
-    // Import triggers the auto-restore logic in the module
-    import('./shared/help-dialog/react/AdaChatbot').catch(error =>
-      console.error('Failed to load AdaChatbot:', error),
-    )
+    import('./shared/help-dialog/react/AdaChatbot')
+      .then(module => {
+        module.autoRestoreAda()
+      })
+      .catch(error => console.error('Failed to load AdaChatbot:', error))
   }
 }
 

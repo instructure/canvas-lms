@@ -506,8 +506,6 @@ RSpec.describe ApplicationController do
 
         before do
           controller.instance_variable_set(:@context, Account.default)
-          Setting.set("top_navigation_allowed_dev_keys", developer_key.id.to_s)
-          Setting.set("top_navigation_allowed_launch_domains", domain)
           allow(Lti::ContextToolFinder).to receive(:all_tools_for).and_return([devkey_tool, domain_tool, unauth_tool])
           allow(controller).to receive(:polymorphic_url).and_return(domain)
           Account.site_admin.disable_feature!(:top_navigation_placement)
@@ -1974,31 +1972,6 @@ RSpec.describe ApplicationController do
         external_tools = controller.external_tools_display_hashes(:account_navigation, @account)
         expect(external_tools).to include({ id: tool.id, title: "Admin Analytics", base_url: "http://admin_analytics.example.com/", icon_url: nil, canvas_icon_class: "icon-analytics", tool_id: ContextExternalTool::ADMIN_ANALYTICS })
       end
-
-      context "LTI tool has a submission_type_selection placement" do
-        let(:developer_key) { DeveloperKey.create! }
-        let(:domain) { "http://example.com" }
-        let(:tool1) { external_tool_1_3_model(developer_key:, opts: { domain:, settings: { submission_type_selection: {} } }) }
-        let(:tool2) { external_tool_1_3_model(developer_key:, opts: { domain:, settings: { submission_type_selection: {} } }) }
-
-        before do
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:instructure_identity_global_flag)
-        end
-
-        def setup_tools
-          allow(Lti::ContextToolFinder).to receive(:all_tools_for).and_return([tool1, tool2])
-          allow(controller).to receive(:polymorphic_url).and_return(domain)
-        end
-
-        it "is filtering out not allowed placements" do
-          setup_tools
-          expect(tool1).to receive(:placement_allowed?).and_return(true)
-          expect(tool2).to receive(:placement_allowed?).and_return(false)
-          external_tools = controller.send(:external_tools_display_hashes, :submission_type_selection)
-          expect(external_tools).to include({ id: tool1.id, title: "a", base_url: domain, icon_url: nil, canvas_icon_class: nil })
-          expect(external_tools).to_not include({ id: tool2.id, title: "a", base_url: domain, icon_url: nil, canvas_icon_class: nil })
-        end
-      end
     end
 
     describe "external_tool_display_hash" do
@@ -3441,12 +3414,7 @@ describe CoursesController do
 
     context "when Sentry is enabled on the frontend" do
       before do
-        ConfigFile.stub("sentry", { dsn: "dummy-dsn", frontend_dsn: "dummy-frontend-dsn" })
-      end
-
-      after do
-        ConfigFile.unstub
-        SentryExtensions::Settings.reset_settings
+        stub_consul_config("sentry", { dsn: "dummy-dsn", frontend_dsn: "dummy-frontend-dsn" })
       end
 
       context "given a standard route" do
@@ -3894,5 +3862,21 @@ RSpec.describe ApplicationController, "#add_ignite_agent_bundle?" do
     user.enable_feature!(:ignite_agent_enabled_for_user)
 
     expect(controller.send(:add_ignite_agent_bundle?)).to be true
+  end
+
+  it "returns false when preview param is true" do
+    account.enable_feature!(:ignite_agent_enabled)
+    user.enable_feature!(:ignite_agent_enabled_for_user)
+    allow(controller).to receive(:params).and_return({ preview: "true" })
+
+    expect(controller.send(:add_ignite_agent_bundle?)).to be false
+  end
+
+  it "returns false on oauth2_provider confirm page" do
+    account.enable_feature!(:ignite_agent_enabled)
+    user.enable_feature!(:ignite_agent_enabled_for_user)
+    allow(controller).to receive_messages(controller_name: "oauth2_provider", action_name: "confirm", params: {})
+
+    expect(controller.send(:add_ignite_agent_bundle?)).to be false
   end
 end

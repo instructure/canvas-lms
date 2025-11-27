@@ -10977,4 +10977,66 @@ describe Submission do
       end
     end
   end
+
+  describe "#submission_type_for_asset_reports" do
+    let(:course) { @course }
+    let(:assignment) { @assignment }
+    let(:student) { @student }
+    let(:submission) { assignment.submissions.find_by(user: student) }
+
+    context "when submission has a submission_type" do
+      it "returns the actual submission_type" do
+        assignment.update!(submission_types: "online_text_entry")
+        submission.update!(submission_type: "online_text_entry")
+        expect(submission.submission_type_for_asset_reports).to eq("online_text_entry")
+      end
+    end
+
+    context "with checkpointed discussions" do
+      let(:checkpointed_topic) { DiscussionTopic.create_graded_topic!(course:, title: "checkpointed discussion") }
+      let(:checkpointed_assignment) { checkpointed_topic.assignment }
+      let(:submission) { checkpointed_assignment.submissions.find_by(user: student) }
+
+      before do
+        # Create checkpoint sub-assignments
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: checkpointed_topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 3
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: checkpointed_topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 5.days.from_now }],
+          points_possible: 7
+        )
+      end
+
+      it "returns 'discussion_topic' when submission_type is nil for checkpointed discussion" do
+        # Checkpointed discussions have nil submission_type until fully submitted
+        submission.update!(submission_type: nil)
+        expect(submission.submission_type_for_asset_reports).to eq("discussion_topic")
+      end
+    end
+
+    context "with non-checkpointed discussion" do
+      let(:discussion_topic) { DiscussionTopic.create_graded_topic!(course:, title: "regular discussion") }
+      let(:discussion_assignment) { discussion_topic.assignment }
+      let(:submission) { discussion_assignment.submissions.find_by(user: student) }
+
+      it "returns nil when submission_type is nil" do
+        submission.update!(submission_type: nil)
+        expect(submission.submission_type_for_asset_reports).to be_nil
+      end
+    end
+
+    context "with other assignment types" do
+      it "returns nil when submission_type is nil" do
+        assignment.update!(submission_types: "online_upload")
+        submission.update!(submission_type: nil)
+        expect(submission.submission_type_for_asset_reports).to be_nil
+      end
+    end
+  end
 end

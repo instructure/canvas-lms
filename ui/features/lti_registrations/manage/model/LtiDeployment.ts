@@ -29,7 +29,7 @@ export const ZLtiDeployment = z.object({
   root_account_deployment: z.boolean(),
   context_type: z.enum(['Course', 'Account']),
   context_name: z.string(),
-  workflow_state: z.enum(['active', 'deleted']),
+  workflow_state: z.enum(['active', 'disabled', 'deleted']),
   context_controls: z.optional(z.array(ZLtiContextControl)),
 })
 

@@ -1,21 +1,26 @@
 # LTI Asset Processor
 
 ## Asset Reports usage in Canvas
-As of September 2025, Asset Reports (LTI Asset Processor storage) are shown in 6 places, listed below.
+As of November 2025, Asset Reports (LTI Asset Processor storage) are shown in 6 places, listed below.
 
 Paths below are relative to `canvas-lms` or `canvas-lms/ui/shared/lti-asset-processor`
 
 ### New Speedgrader
+* Shown when FF `platform_service_speedgrader` is on
 * separate repo. See `dependenciesShims.ts`
 
 ### Old Speedgrader
+* Shown when FF `platform_service_speedgrader` is off
 * Frontend:
   1. Non-AP, non-React `ui/features/speed_grader/jquery/speed_grader.tsx` renders
   2. AP component `LtiAssetReportsForSpeedgraderWrapper.tsx`
-
 * See also `dependenciesShims.ts`
 
 ### New Student Grades
+* Example URL: `http://canvas-web.inseng.test/courses/1/grades/2` (where 2 is student user id)
+* Visible by teacher and student.
+* Shown when SiteAdmin FF `student_grade_summary_upgrade` is on.
+
 * Frontend:
   1. Non-AP component `ui/features/grade_summary/react/GradeSummary/AssignmentTableRows/AssignmentRow.jsx`, which uses --
   2. AP component `ui/features/grade_summary/react/LtiAssetProcessorCell.tsx`, which uses --
@@ -27,11 +32,16 @@ Paths below are relative to `canvas-lms` or `canvas-lms/ui/shared/lti-asset-proc
   New Student Submission AP)
 
 ### Old Student Grades
+* Example URL: `http://canvas-web.inseng.test/courses/1/grades/2` (where 2 is student user id)
+* Visible by teacher and student.
+* Shown when SiteAdmin FF `student_grade_summary_upgrade` is off
+
 * Frontend:
-  1. Non-AP, non-React `ui/features/grade_summary/jquery/index.jsx` renders --
-  2. AP component `ui/features/grade_summary/react/LtiAssetProcessorCellWithData.tsx` which uses --
-  3. AP component `ui/features/grade_summary/react/LtiAssetProcessorCell.tsx`, which uses --
-  4. AP components `LtiAssetReportStatus` and `LtiStudentAssetReportModal`
+  1. View `app/views/gradebooks/grade_summary.html.erb` renders placeholder divs `#asset_processors_header` and `.asset_processors_cell`
+  2. Non-AP, non-React `ui/features/grade_summary/jquery/index.jsx` renders --
+  3. AP component `ui/features/grade_summary/react/LtiAssetProcessorCellWithData.tsx` which uses --
+  4. AP component `ui/features/grade_summary/react/LtiAssetProcessorCell.tsx`, which uses --
+  5. AP components `LtiAssetReportStatus` and `LtiStudentAssetReportModal`
 
 * Data: `ui/features/grade_summary/react/LtiAssetProcessorCellWithData.tsx` uses
   `ui/shared/lti-asset-processor/react/hooks/useCourseAssignmentsAssetReports.ts` which use
@@ -39,6 +49,8 @@ Paths below are relative to `canvas-lms` or `canvas-lms/ui/shared/lti-asset-proc
   the student and course.
 
 ### New student Submission
+* FF `assignments_2_student` on
+* Note: not applicable for discussion topic assignments.
 * Frontend 1 -- single attachment or RCE content:
   * `ui/features/assignments_show_student/react/components/StudentContent.jsx` renders --
   * `ui/features/assignments_show_student/react/components/DocumentProcessorsSection.tsx`
@@ -56,6 +68,11 @@ Paths below are relative to `canvas-lms` or `canvas-lms/ui/shared/lti-asset-proc
     GraphQL to fetch data
 
 ### Old Student Submission
+* Example URL:
+  `http://canvas-web.inseng.test/courses/1/assignments/2/submissions/3`
+  (where 3 is student user id). Visible for student and teacher.
+* Shown when FF `assignments_2_student` off.
+
 * Frontend 1 -- Text Entry or Discussion Entry
   1. View `app/views/submissions/show.html.erb` renders container div `asset_report_status_container`
   2. `ui/features/submissions/jquery/index.jsx` (non-React) renders `TextEntryAssetReportStatusLink` into that container div.

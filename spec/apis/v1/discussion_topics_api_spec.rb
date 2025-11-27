@@ -3569,6 +3569,26 @@ describe DiscussionTopicsController, type: :request do
                      topic_id: topic.id.to_s })
     end
 
+    it "does not expose other users' read states" do
+      student1 = student_in_course(active_all: true).user
+      student2 = student_in_course(active_all: true).user
+
+      @user = student1
+      call_mark_topic_read(@course, @topic)
+      assert_status(204)
+
+      @user = student2
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                      { controller: "discussion_topics",
+                        action: "index",
+                        format: "json",
+                        course_id: @course.id.to_s })
+
+      expect(json.first["read_state"]).to eq "unread"
+      expect(json.first["unread_count"]).to eq 2
+    end
+
     it "sets the read state for a topic" do
       student_in_course(active_all: true)
       call_mark_topic_read(@course, @topic)

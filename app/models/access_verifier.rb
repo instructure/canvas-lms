@@ -65,7 +65,7 @@ module AccessVerifier
   end
 
   def self.required_claims_present?(claims)
-    claims[:user].present? || (claims[:developer_key].present? && claims[:authorization].present?)
+    claims[:user].present? || ((claims.dig(:authorization, :attachment) || claims[:attachment_id]).present? && (claims.dig(:authorization, :permission) || claims[:permission]).present?)
   end
 
   def self.validate(params)
@@ -75,7 +75,7 @@ module AccessVerifier
     raise JtiReused if claims[:jti].present? && !Rails.cache.delete("sf_verifier:#{claims[:jti]}")
 
     user, real_user = user_access(claims)
-    raise InvalidVerifier unless (user && real_user) || developer_key_claims?(claims)
+    raise InvalidVerifier unless (user && real_user) || required_claims_present?(claims)
 
     if claims[:attachment_id].present?
       attachment_id = params[:attachment_id] || params[:file_id] || params[:id]

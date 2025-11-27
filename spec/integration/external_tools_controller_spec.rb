@@ -65,6 +65,17 @@ describe ExternalToolsController do
       tool = assigns[:tool]
       expect(tool.settings[:custom_fields]["Complex!@#$^*(){}[]KEY"]).to eq 'Complex!@#$^*;(){}[]½Value'
     end
+
+    it "creates a tool with the expected workflow_state" do
+      user_session(@teacher)
+      post(
+        "/api/v1/courses/#{@course.id}/external_tools",
+        params: post_body,
+        headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }
+      )
+      # the CET's workflow_state should match the privacy_level given in the configuration
+      expect(ContextExternalTool.last.workflow_state).to eq("name_only")
+    end
   end
 
   describe "PUT 'update'" do

@@ -63,8 +63,12 @@ const getNewTableSortState = (
   }
 }
 
-const renderTableData = (scans?: AccessibilityResourceScan[] | null, error?: string | null) => {
-  if (error) return
+const renderTableData = (
+  scans?: AccessibilityResourceScan[] | null,
+  error?: string | null,
+  loading?: boolean,
+) => {
+  if (error || loading) return
 
   return (
     <>
@@ -192,7 +196,7 @@ export const AccessibilityIssuesTable = () => {
                 </Table.Cell>
               </Table.Row>
             )}
-            {renderTableData(accessibilityScans, error)}
+            {renderTableData(accessibilityScans, error, loading)}
           </Table.Body>
         </Table>
       </View>

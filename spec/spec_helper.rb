@@ -505,6 +505,7 @@ RSpec.configure do |config|
     Rails.logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.current_root_account = nil
     DynamicSettings.reset_cache!
+    SentryExtensions::Settings.reset_settings
     ActiveRecord::Migration.verbose = false
     RequestStore.clear!
     MultiCache.reset

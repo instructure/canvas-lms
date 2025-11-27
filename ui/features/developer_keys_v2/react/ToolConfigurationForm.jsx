@@ -192,7 +192,6 @@ export default class ToolConfigurationForm extends React.Component {
         ref={this.setManualConfigRef}
         toolConfiguration={this.props.toolConfiguration}
         validScopes={this.props.validScopes}
-        validPlacements={this.props.validPlacements}
       />
     </div>
   )
@@ -253,7 +252,6 @@ ToolConfigurationForm.propTypes = {
   toolConfiguration: PropTypes.object.isRequired,
   toolConfigurationUrl: PropTypes.string,
   validScopes: PropTypes.object.isRequired,
-  validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
   editing: PropTypes.bool.isRequired,
   showRequiredMessages: PropTypes.bool.isRequired,
   updateToolConfigurationUrl: PropTypes.func.isRequired,

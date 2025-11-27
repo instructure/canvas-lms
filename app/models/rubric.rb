@@ -523,10 +523,7 @@ class Rubric < ActiveRecord::Base
   def self.process_llm_criteria_with_error_handling(progress, operation_name)
     yield
     progress.complete!
-  rescue InstLLM::ServiceQuotaExceededError, InstLLM::ThrottlingError
-    progress.set_results({ error: t("There was an error with generation capacity. Please try again later.") })
-    progress.fail!
-  rescue InstLLMHelper::RateLimitExceededError
+  rescue InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError
     progress.set_results({ error: t("You have made too many criteria generation requests. Please try again later.") })
     progress.fail!
   rescue => e

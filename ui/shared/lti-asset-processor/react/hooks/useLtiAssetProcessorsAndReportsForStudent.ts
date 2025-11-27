@@ -93,7 +93,7 @@ function unpackGqlQueryResult(
   const reports = submission?.ltiAssetReportsConnection?.nodes?.filter(r => r !== null)
   const attempt = submission?.attempt
 
-  if (assignmentName && assetProcessors.length > 0 && reports && attempt) {
+  if (assignmentName && assetProcessors.length > 0 && reports) {
     return {assignmentName, assetProcessors, reports, attempt}
   }
 
