@@ -2365,9 +2365,9 @@ describe FilesController do
         user_session @teacher
       end
 
-      it "fails if no submission_id is given" do
+      it "allows a teacher to download an attachment if no submission_id is given" do
         get "public_url", params: { id: @attachment.id }
-        assert_unauthorized
+        expect(json_parse).to eq({ "public_url" => @attachment.public_url(secure: false) })
       end
 
       it "allows a teacher to download a student's submission" do

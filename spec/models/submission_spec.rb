@@ -2749,6 +2749,20 @@ describe Submission do
         expect(@submission.grants_right?(@student, :comment)).to be false
       end
     end
+
+    describe "can :download" do
+      before(:once) do
+        @course = Course.create!
+        @teacher = @course.enroll_teacher(User.create!, enrollment_state: "active").user
+        @student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+        @assignment = @course.assignments.create!(submission_types: "online_text_entry")
+        @submission = @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "test submission")
+      end
+
+      it "allows teachers to download submission attachments" do
+        expect(@submission.grants_right?(@teacher, :download)).to be true
+      end
+    end
   end
 
   describe "computation of scores" do
