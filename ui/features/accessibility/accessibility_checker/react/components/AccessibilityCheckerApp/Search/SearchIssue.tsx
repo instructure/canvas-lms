@@ -24,6 +24,7 @@ import {useDebouncedCallback} from 'use-debounce'
 import {IconButton} from '@instructure/ui-buttons'
 import {Alert} from '@instructure/ui-alerts'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -94,25 +95,31 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
 
   return (
     <>
-      <TextInput
-        id="issueSearchInput"
-        value={searchInput}
-        renderBeforeInput={() => <IconSearchLine inline={false} />}
-        renderAfterInput={clearButton}
-        renderLabel={''}
-        onChange={event => handleChange(event.target.value)}
-        messages={[
-          {
-            type: 'hint',
-            text: I18n.t(
-              'Start typing to search. Results will update automatically after 3 characters.',
-            ),
-          },
-        ]}
-        placeholder={I18n.t('Search resource titles...')}
-        width="100%"
-        data-testid="issue-search-input"
-      />
+      <View as="div" margin="medium 0">
+        {/* Wrap search input in form with role="search" for accessibility landmark navigation */}
+        <form role="search" onSubmit={e => e.preventDefault()}>
+
+          <TextInput
+            id="issueSearchInput"
+            value={searchInput}
+            renderBeforeInput={() => <IconSearchLine inline={false} />}
+            renderAfterInput={clearButton}
+            renderLabel={''}
+            onChange={event => handleChange(event.target.value)}
+            messages={[
+              {
+                type: 'hint',
+                text: I18n.t(
+                  'Start typing to search. Results will update automatically after 3 characters.',
+                ),
+              },
+            ]}
+            placeholder={I18n.t('Search resource titles...')}
+            width="100%"
+            data-testid="issue-search-input"
+          />
+        </form>
+      </View>
       {alertMessage && (
         <Alert
           liveRegion={getLiveRegion}

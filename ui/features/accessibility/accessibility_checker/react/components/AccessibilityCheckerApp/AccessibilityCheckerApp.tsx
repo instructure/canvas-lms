@@ -96,9 +96,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
   return (
     <View as="div" data-testid="accessibility-checker-app">
       <AccessibilityCheckerHeader />
-      <View as="div" margin="medium 0">
-        <SearchIssue onSearchChange={handleSearchChange} />
-      </View>
+      <SearchIssue onSearchChange={handleSearchChange} />
       <FiltersPanel appliedFilters={appliedFilters} onFilterChange={setFilters} />
       <View as="div" margin={appliedFilters.length === 0 ? 'medium 0' : 'small 0'}>
         <AccessibilityIssuesSummary />
