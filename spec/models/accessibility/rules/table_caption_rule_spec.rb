@@ -78,6 +78,18 @@ describe Accessibility::Rules::TableCaptionRule do
 
       expect(updated_html.delete("\n")).to eq(expected_html)
     end
+
+    it "updates an empty caption with content and returns the table for preview" do
+      doc = Nokogiri::HTML::DocumentFragment.parse('<table border="1"><caption></caption><tbody><tr><th>Day</th><th>Mushroom</th></tr><tr><td>Monday</td><td>Morel</td></tr></tbody></table>')
+      table_element = doc.at_css("table")
+      rule = Accessibility::Rules::TableCaptionRule.new
+
+      result = rule.fix!(table_element, "Weekly Mushroom Schedule")
+
+      expect(result).not_to be_nil
+      expect(result).to eq(table_element)
+      expect(result.at_css("caption").content).to eq("Weekly Mushroom Schedule")
+    end
   end
 
   context "form" do
