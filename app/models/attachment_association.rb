@@ -58,7 +58,7 @@ class AttachmentAssociation < ActiveRecord::Base
   after_save :set_word_count
 
   def self.verify_access(location_param, attachment, user, session = nil)
-    return false if attachment.currently_locked
+    return false if attachment.locked_for?(user)
 
     context_type, _, context_id = location_param.rpartition("_")
     return false unless context_type && context_id
