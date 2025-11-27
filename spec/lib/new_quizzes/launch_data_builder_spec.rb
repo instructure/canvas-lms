@@ -81,6 +81,26 @@ module NewQuizzes
         end
       end
 
+      context "locale parameter" do
+        it "includes locale in the build output" do
+          result = builder.build
+          expect(result[:locale]).to be_present
+        end
+
+        it "returns current I18n locale" do
+          I18n.with_locale(:es) do
+            result = builder.build
+            expect(result[:locale]).to eq(:es)
+          end
+        end
+
+        it "returns default locale when I18n.locale is nil" do
+          allow(I18n).to receive(:locale).and_return(nil)
+          result = builder.build
+          expect(result[:locale]).to eq(I18n.default_locale)
+        end
+      end
+
       context "roles parameter" do
         it "includes roles in the build output" do
           course.enroll_teacher(user, enrollment_state: "active")
@@ -256,7 +276,8 @@ module NewQuizzes
           custom_canvas_assignment_id: assignment.id,
           custom_canvas_course_id: course.id,
           custom_canvas_user_id: user.id,
-          backend_url: "https://account.quiz-lti-dub-prod.instructure.com"
+          backend_url: "https://account.quiz-lti-dub-prod.instructure.com",
+          locale: I18n.locale
         )
       end
 
