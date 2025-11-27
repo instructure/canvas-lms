@@ -77,10 +77,7 @@ module Accessibility
         raise StandardError, "Caption cannot be empty." if value.blank?
 
         caption = elem.at_css("caption")
-        if caption
-          return nil if (caption.content = value)
-
-        else
+        unless caption
           caption = elem.document.create_element("caption")
           self.class.prepend(elem, caption)
         end
