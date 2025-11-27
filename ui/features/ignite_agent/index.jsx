@@ -23,8 +23,9 @@ import {getCurrentTheme} from '@instructure/theme-registry'
 import {Portal} from '@instructure/ui-portal'
 import ready from '@instructure/ready'
 import {AgentButton} from './AgentButton'
+import {AgentContainerProvider} from './AgentContainerContext'
 import {FallbackChatOverlay} from './FallbackChatOverlay'
-import {IgniteAgentSessionStorage} from './IgniteAgentSessionStorage'
+import {readFromSession, writeToSession} from './IgniteAgentSessionStorage'
 
 // Define constants for DOM element IDs
 const AGENT_CONTAINER_ID = 'ignite-agent-root'
@@ -45,7 +46,7 @@ function IgniteAgent(props) {
 
   useEffect(() => {
     // Check session storage to see if agent should be opened
-    if (IgniteAgentSessionStorage.getState()?.isOpen) {
+    if (readFromSession('isOpen') ?? false) {
       console.log('[Ignite Agent] Session state is "open", loading module directly.')
       handleLoadAgent()
     }
@@ -68,7 +69,7 @@ function IgniteAgent(props) {
     setError(null)
 
     // Set session storage state to "open"
-    IgniteAgentSessionStorage.setAgentState(true)
+    writeToSession('isOpen', true)
 
     try {
       console.log("[Ignite Agent] Importing remote 'igniteagent/appInjector'...")
@@ -89,7 +90,7 @@ function IgniteAgent(props) {
       captureException(loadError)
       setError(loadError)
       setIsOpen(false)
-      IgniteAgentSessionStorage.setAgentState(false)
+      writeToSession('isOpen', false)
     } finally {
       setIsLoading(false)
     }
@@ -110,7 +111,9 @@ function IgniteAgent(props) {
   return (
     <>
       <Portal mountNode={buttonMountPoint.current} open={shouldShowButton}>
-        <AgentButton isLoading={isLoading} onClick={handleLoadAgent} />
+        <AgentContainerProvider buttonMountPoint={buttonMountPoint.current}>
+          <AgentButton isLoading={isLoading} onClick={handleLoadAgent} />
+        </AgentContainerProvider>
       </Portal>
       <Portal mountPoint={chatOverlayMountPoint.current} open={error !== null}>
         <FallbackChatOverlay error={error} onClose={handleCloseError} />
@@ -135,12 +138,7 @@ function initIgniteAgent() {
   if (!buttonMountPoint) {
     buttonMountPoint = document.createElement('div')
     buttonMountPoint.id = BUTTON_CONTAINER_ID
-    Object.assign(buttonMountPoint.style, {
-      position: 'fixed',
-      bottom: '40px',
-      right: '20px',
-      zIndex: '9998',
-    })
+    // Positioning is handled by the AgentButton component itself
     document.body.appendChild(buttonMountPoint)
   }
   let chatOverlayMountPoint = document.getElementById(CHAT_OVERLAY_CONTAINER_ID)
