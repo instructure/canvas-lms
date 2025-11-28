@@ -23,6 +23,8 @@ import ReactDOM from 'react-dom'
 import FileSelectBox from '../react/components/FileSelectBox'
 import UploadForm from '@canvas/files/react/components/UploadForm'
 import CurrentUploads from '@canvas/files/react/components/CurrentUploads'
+import {QuizTypeSelectorComponent} from '@canvas/assignments/react/QuizTypeSelectorComponent'
+import {AnonymousSubmissionComponent} from '@canvas/assignments/react/AnonymousSubmissionComponent'
 import splitAssetString from '@canvas/util/splitAssetString'
 import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
 import BaseUploader from '@canvas/files/react/modules/BaseUploader'
@@ -100,6 +102,12 @@ const SelectContentDialog = {}
 
 let fileSelectBox: FileSelectBox | undefined
 let upload_form: UploadForm | undefined
+let currentQuizType: 'graded_quiz' | 'graded_survey' | 'ungraded_survey' = 'graded_quiz'
+let isAnonymousSubmission = false
+
+const isNewQuizzesSurveysEnabled = () => {
+  return ENV?.FEATURES?.new_quizzes_surveys === true
+}
 
 export const externalContentReadyHandler = (event: MessageEvent, tool: LtiLaunchDefinition) => {
   const item = event.data.contentItems[0]
@@ -761,6 +769,8 @@ $(document).ready(function () {
             'assignment[title]'?: string
             'assignment[assignment_group_id]'?: string
             'assignment[post_to_sis]'?: boolean
+            'assignment[new_quizzes_quiz_type]'?: string
+            'assignment[new_quizzes_anonymous_submission]'?: boolean
             quiz_lti?: number
           }>()
           if (quiz_lti) {
@@ -768,6 +778,13 @@ $(document).ready(function () {
               'assignment[title]': data['quiz[title]'],
               'assignment[assignment_group_id]': data['quiz[assignment_group_id]'],
               quiz_lti: 1,
+            }
+            // Only include New Quizzes params when New Quizzes is selected and feature flag is enabled
+            const isNewQuizzesSelected =
+              $('input[name=quiz_engine_selection]:checked').val() === 'assignment'
+            if (isNewQuizzesSelected && isNewQuizzesSurveysEnabled()) {
+              data['assignment[new_quizzes_quiz_type]'] = currentQuizType
+              data['assignment[new_quizzes_anonymous_submission]'] = isAnonymousSubmission
             }
           }
           const process_upload = function (udata: any, done = true) {
@@ -1000,6 +1017,41 @@ $(document).ready(function () {
       $(this).parents('.module_item_option').find('.new').hide()
     }
   })
+
+  // Handle quiz engine radio button changes
+  $('input[name=quiz_engine_selection]').on('change', function (this: HTMLInputElement) {
+    if (!isNewQuizzesSurveysEnabled()) {
+      return
+    }
+
+    const isNewQuizzes = $(this).val() === 'assignment'
+    const $quizTypeSelectorRow = $('#quiz_type_selector_row')
+    const $anonymousSubmissionRow = $('#anonymous_submission_selector_row')
+
+    if (isNewQuizzes) {
+      $quizTypeSelectorRow.show()
+      renderQuizTypeSelector()
+    } else {
+      // Hide both quiz type selector and anonymous submission selector
+      $quizTypeSelectorRow.hide()
+      $anonymousSubmissionRow.hide()
+      unmountQuizTypeSelector()
+      unmountAnonymousSubmissionSelector()
+
+      // Reset state
+      currentQuizType = 'graded_quiz'
+      isAnonymousSubmission = false
+    }
+  })
+
+  // Initialize quiz type selector if New Quizzes is already selected on page load
+  if (isNewQuizzesSurveysEnabled()) {
+    const isNewQuizzesChecked = $('#new_quizzes_radio').is(':checked')
+    if (isNewQuizzesChecked) {
+      $('#quiz_type_selector_row').show()
+      renderQuizTypeSelector()
+    }
+  }
 })
 
 $('#module_attachment_uploaded_data').on('change', function (event) {
@@ -1112,6 +1164,83 @@ function renderCurrentUploads() {
     <CurrentUploads onUploadChange={handleUploadOnChange} />,
     $('#module_attachment_upload_progress')[0],
   )
+}
+
+function renderQuizTypeSelector() {
+  const mountPoint = $('#quiz_type_selector_mount_point')[0]
+  if (!mountPoint) {
+    console.warn('Quiz type selector mount point not found')
+    return
+  }
+
+  const handleQuizTypeChange = (quizType: 'graded_quiz' | 'graded_survey' | 'ungraded_survey') => {
+    currentQuizType = quizType
+
+    // Show/hide anonymous submission selector based on quiz type
+    const isSurvey = quizType === 'graded_survey' || quizType === 'ungraded_survey'
+    const $anonymousSubmissionRow = $('#anonymous_submission_selector_row')
+
+    if (isSurvey) {
+      $anonymousSubmissionRow.show()
+      renderAnonymousSubmissionSelector()
+    } else {
+      $anonymousSubmissionRow.hide()
+      unmountAnonymousSubmissionSelector()
+      // Reset anonymous submission state when switching to non-survey
+      isAnonymousSubmission = false
+    }
+
+    // Re-render to update the component with new state
+    renderQuizTypeSelector()
+  }
+
+  ReactDOM.render(
+    <QuizTypeSelectorComponent
+      quizType={currentQuizType}
+      isExistingAssignment={false}
+      onChange={handleQuizTypeChange}
+      shouldRenderLabel={false}
+    />,
+    mountPoint,
+  )
+}
+
+function unmountQuizTypeSelector() {
+  const mountPoint = $('#quiz_type_selector_mount_point')[0]
+  if (mountPoint) {
+    ReactDOM.unmountComponentAtNode(mountPoint)
+  }
+}
+
+function renderAnonymousSubmissionSelector() {
+  const mountPoint = $('#anonymous_submission_selector_mount_point')[0]
+  if (!mountPoint) {
+    console.warn('Anonymous submission selector mount point not found')
+    return
+  }
+
+  const handleAnonymousChange = (isAnonymous: boolean) => {
+    isAnonymousSubmission = isAnonymous
+    // Re-render to update the component with new state
+    renderAnonymousSubmissionSelector()
+  }
+
+  ReactDOM.render(
+    <AnonymousSubmissionComponent
+      isAnonymous={isAnonymousSubmission}
+      disabled={false}
+      onChange={handleAnonymousChange}
+      shouldRenderLabel={false}
+    />,
+    mountPoint,
+  )
+}
+
+function unmountAnonymousSubmissionSelector() {
+  const mountPoint = $('#anonymous_submission_selector_mount_point')[0]
+  if (mountPoint) {
+    ReactDOM.unmountComponentAtNode(mountPoint)
+  }
 }
 
 export default SelectContentDialog

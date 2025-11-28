@@ -85,6 +85,7 @@ query Gradebook__GetAssignments($assignmentGroupId: ID!, $gradingPeriodId: ID, $
         moduleItems { position module { _id } }
         muted
         name
+        newQuizzesAnonymousParticipants
         omitFromFinalGrade
         onlyVisibleToOverrides
         peerReviews {

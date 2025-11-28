@@ -119,6 +119,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
       id: assignment.id,
       muted: assignment.muted,
       name: assignment.name,
+      newQuizzesAnonymousParticipants: assignment.new_quizzes_anonymous_participants,
       pointsPossible: assignment.points_possible,
       postManually: assignment.post_manually,
       published: assignment.published,
@@ -230,7 +231,7 @@ export default class AssignmentColumnHeaderRenderer {
   // @ts-expect-error
   render(column: Column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
-     
+
     ReactDOM.render(<AssignmentColumnHeader {...props} />, $container)
   }
 

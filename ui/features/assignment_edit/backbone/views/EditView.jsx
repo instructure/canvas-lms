@@ -113,6 +113,7 @@ const EXTERNAL_TOOLS_CUSTOM_PARAMS = '#assignment_external_tool_tag_attributes_c
 const EXTERNAL_TOOLS_LINE_ITEM = '#assignment_external_tool_tag_attributes_line_item'
 const ASSIGNMENT_POINTS_POSSIBLE = '#assignment_points_possible'
 const ASSIGNMENT_POINTS_CHANGE_WARN = '#point_change_warning'
+const POINTS_TOOLTIP = '#points_tooltip'
 const SECURE_PARAMS = '#secure_params'
 const PEER_REVIEWS_BOX = '#assignment_peer_reviews'
 const PEER_REVIEWS_ALLOCATION_AND_GRADING_BOX = '#assignment_peer_reviews_checkbox'
@@ -334,6 +335,8 @@ EditView.prototype.events = {
 EditView.child('assignmentGroupSelector', '' + ASSIGNMENT_GROUP_SELECTOR)
 
 EditView.child('quizTypeSelector', '' + QUIZ_TYPE_SELECTOR)
+
+EditView.child('pointsTooltip', '' + POINTS_TOOLTIP)
 
 EditView.child('anonymousSubmissionSelector', '' + ANONYMOUS_SUBMISSION_SELECTOR)
 
@@ -1081,6 +1084,8 @@ EditView.prototype.handleQuizTypeChange = function (quizType) {
   this.$submissionTypeFields.toggleAccessibly(!isSurvey)
   this.$gradedAssignmentFields.toggleAccessibly(!isSurvey)
   this.anonymousSubmissionSelector.$el.closest('.control-group').toggleAccessibly(isSurvey)
+
+  this.pointsTooltip.updateComponent(quizType)
 }
 
 EditView.prototype.handleAnonymousSubmissionChange = function (isAnonymous) {

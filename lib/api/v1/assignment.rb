@@ -494,6 +494,7 @@ module Api::V1::Assignment
     hash["post_manually"] = assignment.post_manually?
     hash["anonymous_grading"] = value_to_boolean(assignment.anonymous_grading)
     hash["anonymize_students"] = assignment.anonymize_students?
+    hash["new_quizzes_anonymous_participants"] = assignment.new_quizzes_anonymous_participants?
 
     hash["require_lockdown_browser"] = assignment.settings&.dig("lockdown_browser", "require_lockdown_browser") || false
 
@@ -1155,13 +1156,14 @@ module Api::V1::Assignment
   def update_new_quizzes_params(assignment, assignment_params)
     return unless Account.site_admin.feature_enabled?(:new_quizzes_surveys) && assignment.quiz_lti? && assignment.new_record?
 
-    type = assignment_params[:new_quizzes_quiz_type]
+    type = assignment_params&.[](:new_quizzes_quiz_type)
     if type.present?
       assignment.new_quizzes_type = type
       assignment.hide_in_gradebook = (type == "ungraded_survey")
       assignment.omit_from_final_grade = (type == "ungraded_survey")
     end
-    assignment.anonymous_participants = assignment_params[:new_quizzes_anonymous_submission]
+    anonymous_submissions = assignment_params&.[](:new_quizzes_anonymous_submission)
+    assignment.anonymous_participants = anonymous_submissions if anonymous_submissions.present?
   end
 
   def turnitin_settings_hash(assignment_params)

@@ -72,6 +72,7 @@ describe "Api::V1::Assignment" do
       json = api.assignment_json(assignment, user, session, { override_dates: false })
       expect(json["needs_grading_count"]).to eq(0)
       expect(json["needs_grading_count_by_section"]).to be_nil
+      expect(json["new_quizzes_anonymous_participants"]).to be false
     end
 
     it "includes section-based counts when grading flag is passed" do
@@ -82,6 +83,14 @@ describe "Api::V1::Assignment" do
                                  { override_dates: false, needs_grading_count_by_section: true })
       expect(json["needs_grading_count"]).to eq(0)
       expect(json["needs_grading_count_by_section"]).to eq []
+    end
+
+    it "includes new_quizzes_anonymous_participants when set to true" do
+      assignment.settings = { "new_quizzes" => { "anonymous_participants" => true } }
+      assignment.save!
+
+      json = api.assignment_json(assignment, user, session)
+      expect(json["new_quizzes_anonymous_participants"]).to be true
     end
 
     it "includes an associated planner override when flag is passed" do

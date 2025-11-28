@@ -834,6 +834,7 @@ class AssignmentsController < ApplicationController
     end
 
     @assignment.quiz_lti! if params.key?(:quiz_lti) || params[:assignment][:quiz_lti]
+    update_new_quizzes_params(@assignment, params[:assignment])
 
     @assignment.workflow_state = "unpublished"
     @assignment.updating_user = @current_user
