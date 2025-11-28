@@ -76,6 +76,10 @@ improved_lmgb:
       state: disabled
     beta:
       state: disabled
+    ci:
+      state: allowed
+    development:
+      state: allowed
 menu_option_for_outcome_details_page:
   type: setting
   state: hidden
