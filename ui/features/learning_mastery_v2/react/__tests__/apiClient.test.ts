@@ -22,6 +22,7 @@ import {
   exportCSV,
   saveLearningMasteryGradebookSettings,
   loadCourseUsers,
+  saveOutcomeOrder,
 } from '../apiClient'
 import {
   DEFAULT_STUDENTS_PER_PAGE,
@@ -41,6 +42,7 @@ describe('apiClient', () => {
     jest.clearAllMocks()
     mockedAxios.get.mockResolvedValue({data: {}, status: 200})
     mockedAxios.put.mockResolvedValue({data: {}, status: 200})
+    mockedAxios.post.mockResolvedValue({data: {}, status: 200})
   })
 
   describe('loadRollups', () => {
@@ -369,6 +371,60 @@ describe('apiClient', () => {
 
       expect(response.data).toEqual(mockStudents)
       expect(response.status).toBe(200)
+    })
+  })
+
+  describe('saveOutcomeOrder', () => {
+    it('calls the correct endpoint with outcome order data', async () => {
+      const outcomes = [
+        {
+          id: '1',
+          title: 'Outcome 1',
+          calculation_method: 'highest',
+          mastery_points: 3,
+          ratings: [],
+        },
+        {
+          id: '2',
+          title: 'Outcome 2',
+          calculation_method: 'highest',
+          mastery_points: 3,
+          ratings: [],
+        },
+        {
+          id: '3',
+          title: 'Outcome 3',
+          calculation_method: 'highest',
+          mastery_points: 3,
+          ratings: [],
+        },
+      ]
+
+      await saveOutcomeOrder('123', outcomes)
+
+      expect(mockedAxios.post).toHaveBeenCalledWith('/api/v1/courses/123/assign_outcome_order', [
+        {outcome_id: 1, position: 0},
+        {outcome_id: 2, position: 1},
+        {outcome_id: 3, position: 2},
+      ])
+    })
+
+    it('accepts numeric courseId', async () => {
+      const outcomes = [
+        {id: 42, title: 'Outcome', calculation_method: 'highest', mastery_points: 3, ratings: []},
+      ]
+
+      await saveOutcomeOrder(456, outcomes)
+
+      expect(mockedAxios.post).toHaveBeenCalledWith('/api/v1/courses/456/assign_outcome_order', [
+        {outcome_id: 42, position: 0},
+      ])
+    })
+
+    it('handles empty outcome array', async () => {
+      await saveOutcomeOrder('123', [])
+
+      expect(mockedAxios.post).toHaveBeenCalledWith('/api/v1/courses/123/assign_outcome_order', [])
     })
   })
 })

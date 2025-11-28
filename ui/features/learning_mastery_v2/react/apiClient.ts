@@ -24,7 +24,7 @@ import {
   GradebookSettings,
   DisplayFilter,
 } from './utils/constants'
-import {Student} from './types/rollup'
+import {Student, Outcome} from './types/rollup'
 
 /**
  * Parameters for outcome rollups API
@@ -180,4 +180,22 @@ export const loadCourseUsers = (
   }
 
   return axios.get(`/api/v1/courses/${courseId}/users`, params)
+}
+
+/**
+ * Save learning mastery gradebook outcome order
+ * @param courseId - The ID of the course
+ * @param outcomes - Array of outcomes in the desired order
+ * @returns A promise that resolves to the API response
+ */
+export const saveOutcomeOrder = (
+  courseId: string | number,
+  outcomes: Outcome[],
+): Promise<AxiosResponse> => {
+  const outcomeOrder = outcomes.map((outcome, index) => ({
+    outcome_id: Number(outcome.id),
+    position: index,
+  }))
+
+  return axios.post(`/api/v1/courses/${courseId}/assign_outcome_order`, outcomeOrder)
 }

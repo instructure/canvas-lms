@@ -19,22 +19,24 @@
 import React, {useState, useCallback, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import {Gradebook} from './components/Gradebook'
-import useRollups from './hooks/useRollups'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LMGBContext, {
   getLMGBContext,
   LMGBContextType,
 } from '@canvas/outcomes/react/contexts/LMGBContext'
+import GenericErrorPage from '@canvas/generic-error-page/react'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {Gradebook} from './components/Gradebook'
 import {FilterWrapper} from './components/filters/FilterWrapper'
 import {SearchWrapper} from './components/filters/SearchWrapper'
 import {Toolbar} from './components/toolbar/Toolbar'
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {GradebookSettings, NameDisplayFormat} from './utils/constants'
-import {saveLearningMasteryGradebookSettings} from './apiClient'
+import useRollups from './hooks/useRollups'
 import {useGradebookSettings} from './hooks/useGradebookSettings'
+import {saveLearningMasteryGradebookSettings, saveOutcomeOrder} from './apiClient'
+import {Outcome} from './types/rollup'
 
 const queryClient = new QueryClient()
 
@@ -128,9 +130,23 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     [gradebookSettings, handleGradebookSettingsChange],
   )
 
-  const handleOutcomesReorder = useCallback((reorderedOutcomes: typeof outcomes) => {
-    setOutcomes(reorderedOutcomes)
-  }, [])
+  const handleOutcomesReorder = useCallback(
+    async (reorderedOutcomes: Outcome[]) => {
+      const originalOutcomes = outcomes
+      setOutcomes(reorderedOutcomes)
+
+      try {
+        await saveOutcomeOrder(courseId, reorderedOutcomes)
+      } catch {
+        setOutcomes(originalOutcomes)
+        showFlashAlert({
+          type: 'error',
+          message: I18n.t('Failed to save outcome order'),
+        })
+      }
+    },
+    [courseId, outcomes],
+  )
 
   const renderBody = () => {
     if (error !== null)
