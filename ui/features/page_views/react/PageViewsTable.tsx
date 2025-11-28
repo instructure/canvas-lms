@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React from 'react'
 import {useScope as i18nScope} from '@canvas/i18n'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {Text} from '@instructure/ui-text'
@@ -24,19 +24,11 @@ import {Alert} from '@instructure/ui-alerts'
 import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useInfiniteQuery, type QueryFunctionContext, type InfiniteData} from '@tanstack/react-query'
-import {
-  type APIPageView,
-  type PageView,
-  formatURL,
-  formatInteractionTime,
-  formatParticipated,
-  formatUserAgent,
-} from './utils'
 import {Pagination} from '@instructure/ui-pagination'
 import {Flex} from '@instructure/ui-flex'
 import ConfusedPanda from '@canvas/images/ConfusedPanda.svg'
+import type {PageView} from './utils'
+import {useQueryPageViewsPaginated} from './hooks/useQueryPageViewsPaginated'
 
 export interface PageViewsTableProps {
   userId: string
@@ -44,13 +36,6 @@ export interface PageViewsTableProps {
   endDate?: Date
   onEmpty?: () => void
   pageSize?: number
-}
-
-type APIQueryParams = {
-  page: string
-  per_page: string
-  start_time?: string
-  end_time?: string
 }
 
 const I18n = i18nScope('page_views')
@@ -91,99 +76,36 @@ function EmptyState(): React.JSX.Element {
 
 export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
   const formatDate = useDateTimeFormat('time.formats.short')
+  const pageSize = props.pageSize ?? 10
 
-  const [visiblePage, setVisiblePage] = useState(0)
-  const visiblePageSize = props.pageSize ?? 10
-
-  async function fetchPageViews({
-    pageParam = '1',
-  }: QueryFunctionContext<[string, string, Date?, Date?], string>): Promise<{
-    views: Array<PageView>
-    nextPage: string | null
-  }> {
-    const params: APIQueryParams = {
-      page: typeof pageParam === 'string' ? pageParam : '1',
-      per_page: '256',
-    }
-    if (props.startDate) {
-      if (!props.endDate) throw new RangeError('endDate must be set if startDate is set')
-      params.start_time = props.startDate.toISOString()
-      params.end_time = props.endDate.toISOString()
-    }
-    const path = `/api/v1/users/${props.userId}/page_views`
-    const {json, link} = await doFetchApi<Array<APIPageView>>({path, params})
-    if (typeof json === 'undefined') return {views: [], nextPage: null}
-    const views: Array<PageView> = json.map(v => ({
-      id: v.id,
-      url: formatURL(v),
-      createdAt: new Date(v.created_at),
-      participated: formatParticipated(v),
-      interactionSeconds: formatInteractionTime(v),
-      rawUserAgentString: v.user_agent,
-      userAgent: formatUserAgent(v),
-    }))
-    const nextPage = link?.next ? link.next.page : null
-    if (pageParam === '1') setVisiblePage(0) // reset to first page when changing filters
-    return {views, nextPage}
-  }
-
-  const {data, fetchNextPage, isFetching, isFetchingNextPage, hasNextPage, isSuccess, error} =
-    useInfiniteQuery<
-      {views: Array<PageView>; nextPage: string | null},
-      Error,
-      InfiniteData<{views: Array<PageView>; nextPage: string | null}>,
-      [string, string, Date?, Date?],
-      string
-    >({
-      queryKey: ['page_views', props.userId, props.startDate, props.endDate],
-      queryFn: fetchPageViews,
-      staleTime: 10 * 60 * 1000, // 10 minutes
-      getNextPageParam: lastPage => lastPage.nextPage,
-      initialPageParam: '1',
-    })
-
-  // Automatically fetch next page when user has viewed all available data
-  useEffect(() => {
-    if (data && isSuccess && hasNextPage && !isFetchingNextPage) {
-      // Calculate total unique views across all pages
-      const uniqueViews: Record<string, PageView> = {}
-      data.pages.forEach(page => {
-        page.views.forEach(view => {
-          uniqueViews[view.id] = view
-        })
-      })
-      const totalViews = Object.keys(uniqueViews).length
-
-      // Check if we need more data to fill the current visible page
-      const hasNextVisiblePage = (visiblePage + 1) * visiblePageSize < totalViews
-
-      if (!hasNextVisiblePage) {
-        void fetchNextPage()
-      }
-    }
-  }, [
-    data,
+  // Single hook for paginated data management
+  const {
+    views,
+    isFetching,
     isSuccess,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-    visiblePage,
-    visiblePageSize,
-  ])
+    error,
+    currentPage,
+    totalPages,
+    hasReachedEnd,
+    setCurrentPage,
+  } = useQueryPageViewsPaginated({
+    userId: props.userId,
+    startDate: props.startDate,
+    endDate: props.endDate,
+    pageSize,
+  })
 
-  if (isFetching && !isFetchingNextPage) return <Spinner renderTitle={I18n.t('Loading')} />
+  // Loading state
+  if (isFetching) return <Spinner renderTitle={I18n.t('Loading')} />
 
+  // Error handling
   if (!isSuccess) {
-    // if we have an error, then the query failed, display an alert
     if (error) {
-      let errorText: string
-      const {response} = error as any // a response means an error from doFetchApi
-      if (typeof response !== 'undefined')
-        errorText = `API error: ${response.status} ${response.statusText}, fetching ${response.url}`
-      else {
-        const err = error as Error
-        errorText = `Error formatting table: ${err.name}, ${err.message}`
-      }
+      const {response} = error as any
+      const errorText = response
+        ? `API error: ${response.status} ${response.statusText}, fetching ${response.url}`
+        : `Error formatting table: ${(error as Error).name}, ${(error as Error).message}`
+
       return (
         <Alert variant="error" margin="small">
           <p>
@@ -194,35 +116,20 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
         </Alert>
       )
     }
-    // if there is no error, then the query is still loading / retrying / something else
-    // all we know is that an API fetch is not in progress but we still don't have data yet
-    else return <Spinner renderTitle={I18n.t('Loading')} />
+    return <Spinner renderTitle={I18n.t('Loading')} />
   }
 
-  function pageNumberRenderer(page: number) {
-    if (page < totalVisiblePages) return page
-    if (hasNextPage) return page + '+'
-    return page
-  }
-
-  const uniqueViews: Record<string, PageView> = {}
-
-  data.pages.forEach(page => {
-    page.views.forEach(view => {
-      uniqueViews[view.id] = view
-    })
-  })
-  const viewKeys = Object.keys(uniqueViews)
-  const visibleKeys = viewKeys.slice(
-    visiblePage * visiblePageSize,
-    (visiblePage + 1) * visiblePageSize,
-  )
-  const totalVisiblePages = Math.ceil(viewKeys.length / visiblePageSize)
-
-  if (viewKeys.length === 0 && props.onEmpty) {
-    // We bubble this up so the parent can hide any sub filtering controls, which would again return nothing
+  // Empty state
+  if (views.length === 0 && props.onEmpty) {
     props.onEmpty()
     return <EmptyState />
+  }
+
+  // UI handlers for pagination
+  const renderPageNumber = (page: number): string | number => {
+    // Only show '+' for the last page if we haven't reached the end (more pages might exist)
+    if (!hasReachedEnd && page === totalPages) return page + '+'
+    return page
   }
 
   return (
@@ -244,22 +151,19 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
               </Table.Row>
             </Table.Head>
             <Table.Body data-testid="page-views-table-body">
-              {visibleKeys.map(id => {
-                const v = uniqueViews[id]
-                return (
-                  <Table.Row data-testid="page-view-row" key={id}>
-                    <Table.Cell>
-                      <Text size="small">{v.url}</Text>
-                    </Table.Cell>
-                    <Table.Cell>{formatDate(v.createdAt)}</Table.Cell>
-                    <Table.Cell textAlign="center">{v.participated}</Table.Cell>
-                    <Table.Cell textAlign="end">{v.interactionSeconds}</Table.Cell>
-                    <Table.Cell>
-                      <UserAgentCell view={v} />
-                    </Table.Cell>
-                  </Table.Row>
-                )
-              })}
+              {views.map(view => (
+                <Table.Row data-testid="page-view-row" key={view.id}>
+                  <Table.Cell>
+                    <Text size="small">{view.url}</Text>
+                  </Table.Cell>
+                  <Table.Cell>{formatDate(view.createdAt)}</Table.Cell>
+                  <Table.Cell textAlign="center">{view.participated}</Table.Cell>
+                  <Table.Cell textAlign="end">{view.interactionSeconds}</Table.Cell>
+                  <Table.Cell>
+                    <UserAgentCell view={view} />
+                  </Table.Cell>
+                </Table.Row>
+              ))}
             </Table.Body>
           </Table>
         </div>
@@ -272,19 +176,15 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
           variant="compact"
           labelNext={I18n.t('Next Page')}
           labelPrev={I18n.t('Previous Page')}
-          currentPage={visiblePage + 1}
-          totalPageNumber={totalVisiblePages}
-          onPageChange={nextPage => setVisiblePage(nextPage - 1)}
+          currentPage={currentPage}
+          totalPageNumber={totalPages}
+          onPageChange={setCurrentPage}
           withFirstAndLastButton
-          renderPageIndicator={page => pageNumberRenderer(page)}
+          renderPageIndicator={renderPageNumber}
+          data-testid="page-views-pagination"
+          siblingCount={4}
         />
       </Flex.Item>
-
-      {isFetchingNextPage && (
-        <Flex.Item>
-          <Spinner size="small" renderTitle={I18n.t('Loading')} />
-        </Flex.Item>
-      )}
     </Flex>
   )
 }
