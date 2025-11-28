@@ -1387,4 +1387,44 @@ describe SIS::CSV::EnrollmentImporter do
       end
     end
   end
+
+  describe "enrollments in concluded courses" do
+    before do
+      @course = course_factory(account: @account, sis_source_id: "concluded_course")
+      @student = user_with_managed_pseudonym(account: @account, sis_user_id: "student1")
+      @teacher = user_with_managed_pseudonym(account: @account, sis_user_id: "teacher1")
+      @course.enroll_student(@student, enrollment_state: "active")
+      @course.enroll_teacher(@teacher, enrollment_state: "active")
+      @course.start_at = 2.months.ago
+      @course.conclude_at = 2.days.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+    end
+
+    context "when the import runs with 'deleted_last_completed' status" do
+      it "set the completed_at timestamp to the end date of the course" do
+        process_csv_data_cleanly(
+          "course_id,user_id,role,status",
+          "concluded_course,student1,student,deleted_last_completed,"
+        )
+
+        student_enrollment = @course.enrollments.find_by(user: @student)
+        expect(student_enrollment.workflow_state).to eq "completed"
+        expect(student_enrollment.completed_at).to eq @course.conclude_at
+      end
+    end
+
+    context "when the import runs with 'completed' status" do
+      it "set the completed_at timestamp to the end date of the course" do
+        process_csv_data_cleanly(
+          "course_id,user_id,role,status",
+          "concluded_course,student1,student,completed,"
+        )
+
+        student_enrollment = @course.enrollments.find_by(user: @student)
+        expect(student_enrollment.workflow_state).to eq "completed"
+        expect(student_enrollment.completed_at).to eq @course.conclude_at
+      end
+    end
+  end
 end
