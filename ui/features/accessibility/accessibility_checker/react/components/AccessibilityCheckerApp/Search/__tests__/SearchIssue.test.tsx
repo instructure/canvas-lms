@@ -49,6 +49,55 @@ describe('SearchIssue Component', () => {
     expect(input).toHaveValue('new search')
   })
 
+  it('should not call onSearchChange when input has 1 character', async () => {
+    const mockOnSearchChange = jest.fn()
+    render(<SearchIssue onSearchChange={mockOnSearchChange} />)
+    const input = screen.getByTestId('issue-search-input')
+
+    fireEvent.change(input, {target: {value: 'a'}})
+
+    jest.advanceTimersByTime(300)
+
+    await waitFor(() => {
+      expect(mockOnSearchChange).not.toHaveBeenCalled()
+    })
+    expect(input).toHaveValue('a')
+  })
+
+  it('should call onSearchChange when input has 3 or more characters', async () => {
+    const mockOnSearchChange = jest.fn()
+    render(<SearchIssue onSearchChange={mockOnSearchChange} />)
+    const input = screen.getByTestId('issue-search-input')
+
+    fireEvent.change(input, {target: {value: 'testing'}})
+
+    await waitFor(() => {
+      expect(mockOnSearchChange).toHaveBeenCalledWith('testing')
+    })
+    expect(input).toHaveValue('testing')
+  })
+
+  it('should call onSearchChange when input is cleared to empty string', async () => {
+    const mockOnSearchChange = jest.fn()
+    render(<SearchIssue onSearchChange={mockOnSearchChange} />)
+    const input = screen.getByTestId('issue-search-input')
+
+    fireEvent.change(input, {target: {value: 'testing'}})
+    await waitFor(() => {
+      expect(mockOnSearchChange).toHaveBeenCalledWith('testing')
+    })
+    expect(input).toHaveValue('testing')
+
+    mockOnSearchChange.mockClear()
+
+    fireEvent.change(input, {target: {value: ''}})
+
+    await waitFor(() => {
+      expect(mockOnSearchChange).toHaveBeenCalledWith('')
+    })
+    expect(input).toHaveValue('')
+  })
+
   it('should not show clear button when search is empty', () => {
     const mockOnSearchChange = jest.fn()
     render(<SearchIssue onSearchChange={mockOnSearchChange} />)
@@ -91,7 +140,7 @@ describe('SearchIssue Component', () => {
     const mockOnSearchChange = jest.fn()
     render(<SearchIssue onSearchChange={mockOnSearchChange} />)
 
-    const input = screen.getByPlaceholderText('Search...')
+    const input = screen.getByPlaceholderText('Search resource titles...')
     fireEvent.change(input, {target: {value: 'test search'}})
 
     const clearButton = screen.getByTestId('clear-search-button')
