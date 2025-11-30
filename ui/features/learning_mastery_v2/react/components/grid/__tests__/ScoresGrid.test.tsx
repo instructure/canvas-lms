@@ -21,8 +21,21 @@ import {render} from '@testing-library/react'
 import {ScoresGrid, ScoresGridProps} from '../ScoresGrid'
 import {Student, Outcome, StudentRollupData} from '../../../types/rollup'
 import {ScoreDisplayFormat} from '../../../utils/constants'
+import {ContributingScoresManager} from '../../../hooks/useContributingScores'
 
 describe('ScoresGrid', () => {
+  const mockContributingScores: ContributingScoresManager = {
+    forOutcome: jest.fn(() => ({
+      isVisible: () => false,
+      toggleVisibility: jest.fn(),
+      data: undefined,
+      alignments: undefined,
+      scoresForUser: jest.fn(() => []),
+      isLoading: false,
+      error: undefined,
+    })),
+  }
+
   const defaultProps = (props: Partial<ScoresGridProps> = {}): ScoresGridProps => {
     return {
       rollups: [
@@ -63,12 +76,25 @@ describe('ScoresGrid', () => {
             {
               points: 5,
               color: 'green',
-              description: 'Description',
+              description: 'excellent',
               mastery: true,
+            },
+            {
+              points: 3,
+              color: 'green',
+              description: 'mastery',
+              mastery: false,
+            },
+            {
+              points: 1,
+              color: 'red',
+              description: 'needs improvement',
+              mastery: false,
             },
           ],
         },
       ] as Outcome[],
+      contributingScores: mockContributingScores,
       ...props,
     }
   }

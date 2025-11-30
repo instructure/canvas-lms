@@ -37,6 +37,7 @@ import useRollups from './hooks/useRollups'
 import {useGradebookSettings} from './hooks/useGradebookSettings'
 import {saveLearningMasteryGradebookSettings, saveOutcomeOrder} from './apiClient'
 import {Outcome} from './types/rollup'
+import {useContributingScores} from './hooks/useContributingScores'
 
 const queryClient = new QueryClient()
 
@@ -52,10 +53,17 @@ interface LearningMasteryProps {
   courseId: string
 }
 
-const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
-  const contextValues = getLMGBContext() as LMGBContextType
-  const {contextURL, accountLevelMasteryScalesFF} = contextValues.env
+interface LearningMasteryContentProps {
+  courseId: string
+  contextURL: string
+  accountLevelMasteryScalesFF: boolean
+}
 
+const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
+  courseId,
+  contextURL,
+  accountLevelMasteryScalesFF,
+}) => {
   const {
     settings: gradebookSettings,
     isLoading: isLoadingSettings,
@@ -88,6 +96,17 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
   useEffect(() => {
     setOutcomes(initialOutcomes)
   }, [initialOutcomes])
+
+  const {
+    isLoading: isLoadingContributingScores,
+    error: contributingScoresError,
+    contributingScores,
+  } = useContributingScores({
+    enabled: !isLoadingSettings && !isLoadingGradebook,
+    courseId,
+    studentIds: students.map(student => student.id),
+    outcomeIds: outcomes.map(outcome => outcome.id),
+  })
 
   const handleGradebookSettingsChange = useCallback(
     async (settings: GradebookSettings) => {
@@ -149,16 +168,19 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
   )
 
   const renderBody = () => {
-    if (error !== null)
+    if (error !== null || contributingScoresError !== null)
       return (
         <GenericErrorPage
-          errorMessage={error}
+          errorMessage={error || contributingScoresError}
           imageUrl={errorShipUrl}
           errorSubject={I18n.t('Error loading rollups')}
           errorCategory={I18n.t('Learning Mastery Gradebook Error Page')}
         />
       )
-    if (isLoadingGradebook || isLoadingSettings) return renderLoader()
+
+    if (isLoadingGradebook || isLoadingSettings || isLoadingContributingScores)
+      return renderLoader()
+
     return (
       <Gradebook
         courseId={courseId}
@@ -171,33 +193,49 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
         gradebookSettings={gradebookSettings}
         onChangeNameDisplayFormat={handleNameDisplayFormatChange}
         onOutcomesReorder={handleOutcomesReorder}
+        contributingScores={contributingScores}
         data-testid="gradebook-body"
       />
     )
   }
 
   return (
+    <>
+      <Toolbar
+        courseId={courseId}
+        contextURL={contextURL}
+        showDataDependentControls={error === null && !isLoadingSettings}
+        gradebookSettings={gradebookSettings}
+        setGradebookSettings={handleGradebookSettingsChange}
+        isSavingSettings={isSavingSettings}
+      />
+      {pagination && (
+        <SearchWrapper
+          courseId={courseId}
+          selectedUserIds={selectedUserIds}
+          onSelectedUserIdsChange={setSelectedUserIds}
+          selectedOutcomes={filter.selectedOutcomeIds}
+          onSelectOutcomes={filter.setSelectedOutcomeIds}
+        />
+      )}
+      <FilterWrapper pagination={pagination} onPerPageChange={handleUpdateStudentsPerPage} />
+      {renderBody()}
+    </>
+  )
+}
+
+const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
+  const contextValues = getLMGBContext() as LMGBContextType
+  const {contextURL, accountLevelMasteryScalesFF} = contextValues.env
+
+  return (
     <QueryClientProvider client={queryClient}>
       <LMGBContext.Provider value={contextValues}>
-        <Toolbar
+        <LearningMasteryContent
           courseId={courseId}
-          contextURL={contextURL}
-          showDataDependentControls={error === null && !isLoadingSettings}
-          gradebookSettings={gradebookSettings}
-          setGradebookSettings={handleGradebookSettingsChange}
-          isSavingSettings={isSavingSettings}
+          contextURL={contextURL ?? ''}
+          accountLevelMasteryScalesFF={accountLevelMasteryScalesFF ?? false}
         />
-        {pagination && (
-          <SearchWrapper
-            courseId={courseId}
-            selectedUserIds={selectedUserIds}
-            onSelectedUserIdsChange={setSelectedUserIds}
-            selectedOutcomes={filter.selectedOutcomeIds}
-            onSelectOutcomes={filter.setSelectedOutcomeIds}
-          />
-        )}
-        <FilterWrapper pagination={pagination} onPerPageChange={handleUpdateStudentsPerPage} />
-        {renderBody()}
       </LMGBContext.Provider>
     </QueryClientProvider>
   )

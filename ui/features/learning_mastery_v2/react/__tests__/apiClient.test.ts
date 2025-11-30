@@ -382,24 +382,24 @@ describe('apiClient', () => {
           title: 'Outcome 1',
           calculation_method: 'highest',
           mastery_points: 3,
-          ratings: [],
           points_possible: 3,
+          ratings: [],
         },
         {
           id: '2',
           title: 'Outcome 2',
           calculation_method: 'highest',
           mastery_points: 3,
-          ratings: [],
           points_possible: 3,
+          ratings: [],
         },
         {
           id: '3',
           title: 'Outcome 3',
           calculation_method: 'highest',
           mastery_points: 3,
-          ratings: [],
           points_possible: 3,
+          ratings: [],
         },
       ]
 
@@ -419,8 +419,8 @@ describe('apiClient', () => {
           title: 'Outcome',
           calculation_method: 'highest',
           mastery_points: 3,
-          ratings: [],
           points_possible: 3,
+          ratings: [],
         },
       ]
 

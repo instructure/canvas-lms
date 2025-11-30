@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useRef, useEffect, useState, useCallback} from 'react'
+import React, {useRef, useEffect, useState, useCallback, Fragment} from 'react'
 import {DragDropContext} from 'react-dnd'
 import ReactDnDHTML5Backend from 'react-dnd-html5-backend'
 import {View} from '@instructure/ui-view'
@@ -40,6 +40,8 @@ import {Student, Outcome, StudentRollupData, Pagination as PaginationType} from 
 import {GradebookPagination} from './pagination/GradebookPagination'
 import {Sorting} from '../types/shapes'
 import DragDropWrapper from './grid/DragDropWrapper'
+import {ContributingScoreAlignment, ContributingScoresManager} from '../hooks/useContributingScores'
+import {ContributingScoreHeader} from './grid/ContributingScoreHeader'
 
 export interface GradebookProps {
   courseId: string
@@ -52,6 +54,7 @@ export interface GradebookProps {
   gradebookSettings?: GradebookSettings
   onChangeNameDisplayFormat: (format: NameDisplayFormat) => void
   onOutcomesReorder?: (orderedOutcomes: Outcome[]) => void
+  contributingScores: ContributingScoresManager
 }
 
 const GradebookComponent: React.FC<GradebookProps> = ({
@@ -65,6 +68,7 @@ const GradebookComponent: React.FC<GradebookProps> = ({
   gradebookSettings = DEFAULT_GRADEBOOK_SETTINGS,
   onChangeNameDisplayFormat,
   onOutcomesReorder,
+  contributingScores,
 }) => {
   const headerRow = useRef<HTMLElement | null>(null)
   const gridRef = useRef<HTMLElement | null>(null)
@@ -140,20 +144,38 @@ const GradebookComponent: React.FC<GradebookProps> = ({
                 }
               }}
             >
-              {outcomes.map((outcome, index) => (
-                <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`} key={outcome.id}>
-                  <DragDropWrapper
-                    component={OutcomeHeader}
-                    type="outcome-header"
-                    itemId={outcome.id}
-                    index={index}
-                    outcome={outcome}
-                    sorting={sorting}
-                    onMove={handleOutcomeMove}
-                    onDragEnd={handleOutcomeDragEnd}
-                  />
-                </Flex.Item>
-              ))}
+              {outcomes.map((outcome, index) => {
+                const contributingScoreForOutcome = contributingScores.forOutcome(outcome.id)
+                return (
+                  <Fragment key={outcome.id}>
+                    <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}>
+                      <DragDropWrapper
+                        component={OutcomeHeader}
+                        type="outcome-header"
+                        itemId={outcome.id}
+                        index={index}
+                        outcome={outcome}
+                        sorting={sorting}
+                        contributingScoresForOutcome={contributingScoreForOutcome}
+                        onMove={handleOutcomeMove}
+                        onDragEnd={handleOutcomeDragEnd}
+                      />
+                    </Flex.Item>
+
+                    {contributingScoreForOutcome.isVisible() &&
+                      (contributingScoreForOutcome.alignments || []).map(
+                        (alignment: ContributingScoreAlignment) => (
+                          <Flex.Item
+                            key={`alignment-${alignment.alignment_id}`}
+                            size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}
+                          >
+                            <ContributingScoreHeader label={alignment.associated_asset_name} />
+                          </Flex.Item>
+                        ),
+                      )}
+                  </Fragment>
+                )
+              })}
             </View>
           )}
         </OutcomeHeadersContainer>
@@ -193,13 +215,13 @@ const GradebookComponent: React.FC<GradebookProps> = ({
               gridRef.current = el
             }
           }}
-          width={outcomes.length * COLUMN_WIDTH}
         >
           <ScoresGrid
             students={students}
             outcomes={outcomes}
             rollups={rollups}
             scoreDisplayFormat={gradebookSettings.scoreDisplayFormat}
+            contributingScores={contributingScores}
           />
         </View>
       </View>
