@@ -23,6 +23,7 @@ import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks
 import {OutcomeHeader, OutcomeHeaderProps} from '../OutcomeHeader'
 import {Outcome} from '../../../types/rollup'
 import {SortOrder, SortBy} from '../../../utils/constants'
+import {ContributingScoresForOutcome} from '../../../hooks/useContributingScores'
 
 describe('OutcomeHeader', () => {
   const outcome: Outcome = {
@@ -39,6 +40,16 @@ describe('OutcomeHeader', () => {
     ),
   }
 
+  const mockContributingScoresForOutcome: ContributingScoresForOutcome = {
+    isVisible: () => false,
+    toggleVisibility: jest.fn(),
+    data: undefined,
+    alignments: undefined,
+    scoresForUser: jest.fn(() => []),
+    isLoading: false,
+    error: undefined,
+  }
+
   const defaultProps = (): OutcomeHeaderProps => {
     return {
       outcome,
@@ -50,6 +61,7 @@ describe('OutcomeHeader', () => {
         sortOutcomeId: null,
         setSortOutcomeId: jest.fn(),
       },
+      contributingScoresForOutcome: mockContributingScoresForOutcome,
     }
   }
 
@@ -65,7 +77,7 @@ describe('OutcomeHeader', () => {
     expect(getByText('Ascending scores')).toBeInTheDocument()
     expect(getByText('Descending scores')).toBeInTheDocument()
     expect(getByText('Display')).toBeInTheDocument()
-    expect(getByText('Hide Contributing Scores')).toBeInTheDocument()
+    expect(getByText('Show Contributing Scores')).toBeInTheDocument()
     expect(getByText('Outcome Info')).toBeInTheDocument()
     expect(getByText('Show Outcome Distribution')).toBeInTheDocument()
   })

@@ -238,7 +238,7 @@ describe('useRollups', () => {
             {
               outcomeId: '1',
               score: 0,
-              rating: {...mockedRatings[1], color: `#${mockedRatings[1].color}`},
+              rating: {...mockedRatings[2], color: `#${mockedRatings[2].color}`},
             },
           ],
         },

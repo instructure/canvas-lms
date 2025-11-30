@@ -21,43 +21,50 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import SVGWrapper from '@canvas/svg-wrapper'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Outcome, OutcomeRollup} from '../../types/rollup'
+import {Outcome, Rating} from '../../types/rollup'
 import {svgUrl} from '../../utils/icons'
 import {ScoreDisplayFormat} from '../../utils/constants'
+import {findRating} from '../../utils/ratings'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
 export interface StudentOutcomeScoreProps {
   outcome: Outcome
-  rollup?: OutcomeRollup
+  score?: number
   scoreDisplayFormat?: ScoreDisplayFormat
 }
 
 interface RenderLabelProps {
   scoreDisplayFormat: ScoreDisplayFormat
-  rollup?: OutcomeRollup
+  score?: number
+  rating?: Rating
 }
 
-const StudentOutcomeScoreLabel: React.FC<RenderLabelProps> = ({scoreDisplayFormat, rollup}) => {
+const StudentOutcomeScoreLabel: React.FC<RenderLabelProps> = ({
+  scoreDisplayFormat,
+  score,
+  rating,
+}) => {
   if (scoreDisplayFormat === ScoreDisplayFormat.ICON_AND_LABEL) {
-    return <Text size="legend">{rollup?.rating?.description || I18n.t('Unassessed')}</Text>
+    return <Text size="legend">{rating?.description || I18n.t('Unassessed')}</Text>
   }
 
   if (scoreDisplayFormat === ScoreDisplayFormat.ICON_AND_POINTS) {
-    return <Text size="legend">{rollup?.score}</Text>
+    return <Text size="legend">{score}</Text>
   }
 
-  return (
-    <ScreenReaderContent>{rollup?.rating?.description || I18n.t('Unassessed')}</ScreenReaderContent>
-  )
+  return <ScreenReaderContent>{rating?.description || I18n.t('Unassessed')}</ScreenReaderContent>
 }
 
 export const StudentOutcomeScore: React.FC<StudentOutcomeScoreProps> = ({
   outcome,
-  rollup,
+  score,
   scoreDisplayFormat = ScoreDisplayFormat.ICON_ONLY,
 }) => {
   const justifyItems = scoreDisplayFormat === ScoreDisplayFormat.ICON_ONLY ? 'center' : 'start'
+
+  // Find the appropriate rating based on the score
+  const rating = score !== undefined ? findRating(outcome.ratings, score) : undefined
 
   return (
     <Flex
@@ -69,11 +76,15 @@ export const StudentOutcomeScore: React.FC<StudentOutcomeScoreProps> = ({
       padding="none medium-small"
     >
       <SVGWrapper
-        fillColor={rollup?.rating?.color}
-        url={svgUrl(rollup?.rating?.points, outcome.mastery_points)}
+        fillColor={rating?.color}
+        url={svgUrl(rating?.points, outcome.mastery_points)}
         style={{display: 'flex', alignItems: 'center', justifyItems: 'center', padding: '0px'}}
       />
-      <StudentOutcomeScoreLabel scoreDisplayFormat={scoreDisplayFormat} rollup={rollup} />
+      <StudentOutcomeScoreLabel
+        scoreDisplayFormat={scoreDisplayFormat}
+        score={score}
+        rating={rating}
+      />
     </Flex>
   )
 }
