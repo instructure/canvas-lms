@@ -95,6 +95,19 @@ describe('FiltersPanel', () => {
       expect(screen.getByLabelText(/Last edited to/i)).toBeInTheDocument()
     })
 
+    it('passes distinct screenReaderLabels to date inputs', async () => {
+      render(<FiltersPanel {...defaultProps} />)
+
+      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      await userEvent.click(toggleButton!)
+
+      const fromDateCalendarButton = screen.getByText(/Choose a date for Last edited from/i)
+      const toDateCalendarButton = screen.getByText(/Choose a date for Last edited to/i)
+
+      expect(fromDateCalendarButton).toBeInTheDocument()
+      expect(toDateCalendarButton).toBeInTheDocument()
+    })
+
     it('handle from date selection', async () => {
       render(<FiltersPanel {...defaultProps} />)
 

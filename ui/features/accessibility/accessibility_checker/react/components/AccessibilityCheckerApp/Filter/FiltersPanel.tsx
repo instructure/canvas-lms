@@ -195,6 +195,9 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                         formatDate={dateFormatter}
                         interaction="enabled"
                         renderLabel={I18n.t('Last edited from')}
+                        screenReaderLabels={{
+                          calendarIcon: I18n.t('Choose a date for Last edited from'),
+                        }}
                         onSelectedDateChange={handleDateChange('fromDate')}
                       />
                     </Flex.Item>
@@ -206,6 +209,9 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                         interaction="enabled"
                         formatDate={dateFormatter}
                         renderLabel={I18n.t('Last edited to')}
+                        screenReaderLabels={{
+                          calendarIcon: I18n.t('Choose a date for Last edited to'),
+                        }}
                         onSelectedDateChange={handleDateChange('toDate')}
                       />
                     </Flex.Item>
