@@ -20,7 +20,10 @@ import React from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
+import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {getAllWidgets} from '../WidgetRegistry'
+import WidgetCard from './WidgetCard'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -56,7 +59,21 @@ const AddWidgetModal: React.FC<AddWidgetModalProps> = ({
         <Heading data-testid="modal-heading">{I18n.t('Add widget')}</Heading>
       </Modal.Header>
       <Modal.Body>
-        <div>Modal content coming soon...</div>
+        <Flex direction="row" wrap="wrap" gap="small" alignItems="stretch">
+          {Object.entries(getAllWidgets()).map(([type, renderer]) => (
+            <Flex.Item key={type} width="calc(50% - 0.5rem)">
+              <WidgetCard
+                type={type}
+                displayName={renderer.displayName}
+                description={renderer.description}
+                onAdd={() => {
+                  console.log('Add widget:', type)
+                }}
+                disabled={false}
+              />
+            </Flex.Item>
+          ))}
+        </Flex>
       </Modal.Body>
     </Modal>
   )

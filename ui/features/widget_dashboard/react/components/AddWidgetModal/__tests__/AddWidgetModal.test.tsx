@@ -48,9 +48,57 @@ describe('AddWidgetModal', () => {
     expect(screen.getByTestId('modal-heading')).toHaveTextContent('Add widget')
   })
 
-  it('displays placeholder content', () => {
+  it('displays all available widgets from registry', () => {
     render(<AddWidgetModal {...defaultProps} />)
-    expect(screen.getByText('Modal content coming soon...')).toBeInTheDocument()
+
+    expect(screen.getByTestId('widget-card-course_work_summary')).toBeInTheDocument()
+    expect(screen.getByTestId('widget-card-course_work')).toBeInTheDocument()
+    expect(screen.getByTestId('widget-card-course_work_combined')).toBeInTheDocument()
+    expect(screen.getByTestId('widget-card-course_grades')).toBeInTheDocument()
+    expect(screen.getByTestId('widget-card-announcements')).toBeInTheDocument()
+    expect(screen.getByTestId('widget-card-people')).toBeInTheDocument()
+    expect(screen.getByTestId('widget-card-todo_list')).toBeInTheDocument()
+  })
+
+  it('displays correct widget display names', () => {
+    render(<AddWidgetModal {...defaultProps} />)
+
+    expect(screen.getByText("Today's course work")).toBeInTheDocument()
+    expect(screen.getByText('Course work')).toBeInTheDocument()
+    expect(screen.getByText('Course grades')).toBeInTheDocument()
+    expect(screen.getByText('Announcements')).toBeInTheDocument()
+  })
+
+  it('displays correct widget descriptions', () => {
+    render(<AddWidgetModal {...defaultProps} />)
+
+    expect(
+      screen.getByText('Shows summary of upcoming assignments and course work'),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText('Track your grades and academic progress across all courses'),
+    ).toBeInTheDocument()
+  })
+
+  it('renders Add buttons for all widgets', () => {
+    render(<AddWidgetModal {...defaultProps} />)
+
+    const addButtons = screen.getAllByRole('button', {name: 'Add'})
+    expect(addButtons).toHaveLength(7)
+  })
+
+  it('logs to console when Add button is clicked', async () => {
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
+    const user = userEvent.setup()
+    render(<AddWidgetModal {...defaultProps} />)
+
+    const addButtons = screen.getAllByRole('button', {name: 'Add'})
+    await user.click(addButtons[0])
+
+    expect(consoleSpy).toHaveBeenCalled()
+    expect(consoleSpy.mock.calls[0][0]).toBe('Add widget:')
+
+    consoleSpy.mockRestore()
   })
 
   it('calls onClose when close button is clicked', async () => {
