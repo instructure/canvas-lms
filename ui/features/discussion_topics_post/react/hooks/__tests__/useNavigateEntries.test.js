@@ -45,6 +45,7 @@ describe('useNavigateEntries', () => {
     // Default mock implementations
     jest.spyOn(useSpeedGraderModule, 'default').mockReturnValue({
       isInSpeedGrader: true,
+      postMessageEntryIds: jest.fn(),
       handleCommentKeyPress: jest.fn(),
       handleGradeKeyPress: jest.fn(),
     })
@@ -156,6 +157,7 @@ describe('useNavigateEntries', () => {
     it('should NOT auto-navigate when not in SpeedGrader', async () => {
       jest.spyOn(useSpeedGraderModule, 'default').mockReturnValue({
         isInSpeedGrader: false,
+        postMessageEntryIds: jest.fn(),
         handleCommentKeyPress: jest.fn(),
         handleGradeKeyPress: jest.fn(),
       })
