@@ -235,4 +235,92 @@ describe('useWidgetLayout', () => {
       expect(JSON.stringify(result.current.config)).toBe(initialConfig)
     })
   })
+
+  describe('addWidget', () => {
+    it('adds widget to config with correct properties', () => {
+      const {result} = renderHook(() => useWidgetLayout(), {wrapper: createWrapper})
+
+      const initialWidgetCount = result.current.config.widgets.length
+
+      act(() => {
+        result.current.addWidget('course_work_summary', "Today's course work", 1, 2)
+      })
+
+      expect(result.current.config.widgets).toHaveLength(initialWidgetCount + 1)
+
+      const addedWidget = result.current.config.widgets.find(w =>
+        w.id.startsWith('course_work_summary-widget-'),
+      )
+
+      expect(addedWidget).toBeDefined()
+      expect(addedWidget?.type).toBe('course_work_summary')
+      expect(addedWidget?.position.col).toBe(1)
+      expect(addedWidget?.title).toBe("Today's course work")
+    })
+
+    it('generates unique IDs for widgets', () => {
+      const {result} = renderHook(() => useWidgetLayout(), {wrapper: createWrapper})
+
+      const initialCount = result.current.config.widgets.length
+
+      act(() => {
+        result.current.addWidget('course_work_summary', 'Course Work Summary', 1, 1)
+        result.current.addWidget('announcements', 'Announcements', 1, 2)
+      })
+
+      expect(result.current.config.widgets).toHaveLength(initialCount + 2)
+
+      const addedWidgets = result.current.config.widgets.slice(initialCount)
+      const firstId = addedWidgets[0]?.id
+      const secondId = addedWidgets[1]?.id
+
+      expect(firstId).toBeDefined()
+      expect(secondId).toBeDefined()
+      expect(firstId).not.toBe(secondId)
+    })
+
+    it('normalizes row numbers after adding widget', () => {
+      const {result} = renderHook(() => useWidgetLayout(), {wrapper: createWrapper})
+
+      act(() => {
+        result.current.addWidget('course_work_summary', 'Course Work Summary', 1, 1)
+      })
+
+      const widgetsInColumn1 = result.current.config.widgets.filter(w => w.position.col === 1)
+
+      widgetsInColumn1.forEach((widget, index) => {
+        expect(widget.position.row).toBe(index + 1)
+      })
+    })
+
+    it('recalculates relative positions after adding widget', () => {
+      const {result} = renderHook(() => useWidgetLayout(), {wrapper: createWrapper})
+
+      act(() => {
+        result.current.addWidget('course_work_summary', 'Course Work Summary', 1, 1)
+      })
+
+      result.current.config.widgets.forEach((widget, index) => {
+        expect(widget.position.relative).toBe(index + 1)
+      })
+    })
+
+    it('can add widgets to different columns', () => {
+      const {result} = renderHook(() => useWidgetLayout(), {wrapper: createWrapper})
+
+      act(() => {
+        result.current.addWidget('course_work_summary', 'Course Work Summary', 1, 1)
+        result.current.addWidget('announcements', 'Announcements', 2, 1)
+      })
+
+      const col1Widgets = result.current.config.widgets.filter(w => w.position.col === 1)
+      const col2Widgets = result.current.config.widgets.filter(w => w.position.col === 2)
+
+      const addedToCol1 = col1Widgets.find(w => w.id.startsWith('course_work_summary-widget-'))
+      const addedToCol2 = col2Widgets.find(w => w.id.startsWith('announcements-widget-'))
+
+      expect(addedToCol1).toBeDefined()
+      expect(addedToCol2).toBeDefined()
+    })
+  })
 })
