@@ -151,12 +151,17 @@ class CustomToggleGroup extends Component<ToggleGroupProps> {
               background="primary"
               borderColor={styles?.borderColor}
             >
-              <Flex padding={this.props.size === 'small' ? 'x-small' : 'small x-small small small'}>
-                <Flex.Item shouldGrow shouldShrink padding="0 x-small 0 0">
-                  {this.props.summary}
-                </Flex.Item>
-                <Flex.Item>{this.renderToggle(getToggleProps(), expanded)}</Flex.Item>
-              </Flex>
+              <View
+                as="div"
+                padding={this.props.size === 'small' ? 'x-small' : 'small x-small small small'}
+              >
+                <Flex alignItems="center">
+                  <Flex.Item shouldGrow shouldShrink padding="0 x-small 0 0">
+                    {this.props.summary}
+                  </Flex.Item>
+                  <Flex.Item>{this.renderToggle(getToggleProps(), expanded)}</Flex.Item>
+                </Flex>
+              </View>
               {expanded ? this.renderDetails(getDetailsProps()) : <span {...getDetailsProps()} />}
             </View>
           )
