@@ -383,6 +383,7 @@ describe('apiClient', () => {
           calculation_method: 'highest',
           mastery_points: 3,
           ratings: [],
+          points_possible: 3,
         },
         {
           id: '2',
@@ -390,6 +391,7 @@ describe('apiClient', () => {
           calculation_method: 'highest',
           mastery_points: 3,
           ratings: [],
+          points_possible: 3,
         },
         {
           id: '3',
@@ -397,6 +399,7 @@ describe('apiClient', () => {
           calculation_method: 'highest',
           mastery_points: 3,
           ratings: [],
+          points_possible: 3,
         },
       ]
 
@@ -411,7 +414,14 @@ describe('apiClient', () => {
 
     it('accepts numeric courseId', async () => {
       const outcomes = [
-        {id: 42, title: 'Outcome', calculation_method: 'highest', mastery_points: 3, ratings: []},
+        {
+          id: 42,
+          title: 'Outcome',
+          calculation_method: 'highest',
+          mastery_points: 3,
+          ratings: [],
+          points_possible: 3,
+        },
       ]
 
       await saveOutcomeOrder(456, outcomes)
