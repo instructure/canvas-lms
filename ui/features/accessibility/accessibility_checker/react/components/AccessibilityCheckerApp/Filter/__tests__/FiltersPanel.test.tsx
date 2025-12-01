@@ -98,7 +98,7 @@ describe('FiltersPanel', () => {
     it('passes distinct screenReaderLabels to date inputs', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
-      const toggleButton = screen.getByText('Open filter controls').closest('button')
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
       await userEvent.click(toggleButton!)
 
       const fromDateCalendarButton = screen.getByText(/Choose a date for Last edited from/i)
