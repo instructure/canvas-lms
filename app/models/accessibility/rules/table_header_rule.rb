@@ -38,7 +38,7 @@ module Accessibility
           value: I18n.t("The top row"),
           options: [
             I18n.t("The top row"),
-            I18n.t("The left column"),
+            I18n.t("The first column"),
             I18n.t("Both")
           ],
           action: I18n.t("Set headings")
@@ -58,7 +58,7 @@ module Accessibility
           end
         end
 
-        if [I18n.t("The left column"), I18n.t("Both")].include?(value)
+        if [I18n.t("The first column"), I18n.t("Both")].include?(value)
           elem.query_selector_all("tr").each_with_index do |row, index|
             next if index == 0 # Skip the first row
 

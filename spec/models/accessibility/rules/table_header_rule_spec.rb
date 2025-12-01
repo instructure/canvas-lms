@@ -61,7 +61,7 @@ describe Accessibility::Rules::TableHeaderRule do
       input_html = "<table><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
       expected_html = "<table><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><th scope=\"row\">Data 1</th><td>Data 2</td></tr></table>"
 
-      fixed_html = fix_issue(:table_header, input_html, "./*", "The left column")
+      fixed_html = fix_issue(:table_header, input_html, "./*", "The first column")
 
       expect(fixed_html.delete("\n")).to eq(expected_html)
     end
