@@ -688,6 +688,11 @@ describe AuthenticationProvider do
       expect(p.user.name).to eq "unique_id"
     end
 
+    it "uses an override default name if present" do
+      p = auth_provider.provision_user("unique_id", {}, "Default Name")
+      expect(p.user.name).to eq "Default Name"
+    end
+
     it "assigns the user's actual name" do
       auth_provider.federated_attributes = { "name" => "name" }
       auth_provider.save!
