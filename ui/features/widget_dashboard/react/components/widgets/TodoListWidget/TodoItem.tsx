@@ -44,6 +44,9 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
 
   const isMarkedComplete = item.planner_override?.marked_complete ?? false
 
+  // For planner notes, course_id may be in plannable.course_id instead of item.course_id
+  const courseId = item.course_id || item.plannable.course_id
+
   const handleCheckboxClick = () => {
     toggleComplete({
       item,
@@ -93,11 +96,11 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
               </Flex.Item>
             )}
 
-            {item.course_id && (
+            {courseId && (
               <Flex.Item>
                 <Flex gap="x-small" alignItems="center" wrap="wrap">
                   <Flex.Item>
-                    <CourseCode courseId={item.course_id} size="small" useCustomColors={true} />
+                    <CourseCode courseId={courseId} size="small" useCustomColors={true} />
                   </Flex.Item>
                   <Flex.Item>
                     <Text size="small" color="secondary">
@@ -106,7 +109,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
                   </Flex.Item>
                   <Flex.Item>
                     <Link
-                      href={`/courses/${item.course_id}`}
+                      href={`/courses/${courseId}`}
                       isWithinText={false}
                       data-testid={`todo-item-course-link-${item.plannable_id}`}
                     >

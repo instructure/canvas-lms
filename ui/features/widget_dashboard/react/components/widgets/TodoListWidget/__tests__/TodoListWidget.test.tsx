@@ -27,9 +27,11 @@ import {
   plannerItemsHandlers,
   emptyPlannerItemsHandler,
   errorPlannerItemsHandler,
+  plannerNoteHandlers,
 } from './mocks/handlers'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
+import {WidgetDashboardProvider} from '../../../../hooks/useWidgetDashboardContext'
 import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
 
 const mockWidget: Widget = {
@@ -46,9 +48,33 @@ const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidget
   }
 }
 
-const server = setupServer(...plannerItemsHandlers)
+const server = setupServer(...plannerItemsHandlers, ...plannerNoteHandlers)
 
-beforeAll(() => server.listen())
+const mockSharedCourseData = [
+  {
+    courseId: '1',
+    courseCode: 'TC1',
+    courseName: 'Test Course 1',
+    currentGrade: null,
+    gradingScheme: 'percentage' as const,
+    lastUpdated: new Date().toISOString(),
+  },
+  {
+    courseId: '2',
+    courseCode: 'TC2',
+    courseName: 'Test Course 2',
+    currentGrade: null,
+    gradingScheme: 'percentage' as const,
+    lastUpdated: new Date().toISOString(),
+  },
+]
+
+beforeAll(() => {
+  server.listen()
+  window.ENV = window.ENV || ({} as any)
+  window.ENV.LOCALE = 'en'
+  window.ENV.TIMEZONE = 'America/Denver'
+})
 beforeEach(() => {
   clearWidgetDashboardCache()
 })
@@ -67,9 +93,11 @@ const renderWithClient = (ui: React.ReactElement) => {
   })
   return render(
     <QueryClientProvider client={queryClient}>
-      <WidgetDashboardEditProvider>
-        <WidgetLayoutProvider>{ui}</WidgetLayoutProvider>
-      </WidgetDashboardEditProvider>
+      <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
+        <WidgetDashboardEditProvider>
+          <WidgetLayoutProvider>{ui}</WidgetLayoutProvider>
+        </WidgetDashboardEditProvider>
+      </WidgetDashboardProvider>
     </QueryClientProvider>,
   )
 }
@@ -102,7 +130,7 @@ describe('TodoListWidget', () => {
       expect(screen.getByText('To-do list')).toBeInTheDocument()
     })
 
-    it('renders "New" button as disabled', async () => {
+    it('renders "+ New" button as enabled', async () => {
       renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
 
       await waitFor(() => {
@@ -110,7 +138,8 @@ describe('TodoListWidget', () => {
       })
 
       const newButton = screen.getByTestId('new-todo-button')
-      expect(newButton).toBeDisabled()
+      expect(newButton).toBeEnabled()
+      expect(newButton).toHaveTextContent('+ New')
     })
   })
 
@@ -301,6 +330,68 @@ describe('TodoListWidget', () => {
 
       const checkbox = screen.getByTestId('todo-checkbox-1')
       expect(checkbox).toBeEnabled()
+    })
+  })
+
+  describe('create todo modal', () => {
+    it('opens modal when "+ New" button is clicked', async () => {
+      const user = userEvent.setup()
+      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+      })
+
+      const newButton = screen.getByTestId('new-todo-button')
+      await user.click(newButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Add To Do')).toBeInTheDocument()
+      })
+    })
+
+    it('closes modal when cancel button is clicked', async () => {
+      const user = userEvent.setup()
+      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+      })
+
+      const newButton = screen.getByTestId('new-todo-button')
+      await user.click(newButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Add To Do')).toBeInTheDocument()
+      })
+
+      const cancelButton = screen.getByTestId('create-todo-cancel-button')
+      await user.click(cancelButton)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Add To Do')).not.toBeInTheDocument()
+      })
+    })
+
+    it('renders create todo modal with all fields', async () => {
+      const user = userEvent.setup()
+      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+      })
+
+      const newButton = screen.getByTestId('new-todo-button')
+      await user.click(newButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Add To Do')).toBeInTheDocument()
+      })
+
+      expect(screen.getByTestId('create-todo-title-input')).toBeInTheDocument()
+      expect(screen.getByTestId('create-todo-date-input')).toBeInTheDocument()
+      expect(screen.getByTestId('create-todo-course-select')).toBeInTheDocument()
+      expect(screen.getByTestId('create-todo-details-input')).toBeInTheDocument()
     })
   })
 })
