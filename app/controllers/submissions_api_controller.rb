@@ -937,6 +937,9 @@ class SubmissionsApiController < ApplicationController
           submission[:submission_type] = params[:submission][:submission_type]
           submission[:url] = params[:submission][:url]
         end
+        if params[:submission][:submission_type] == "ams" && !@submission.has_submission?
+          submission[:submission_type] = params[:submission][:submission_type]
+        end
         submission[:prefer_points_over_scheme] = value_to_boolean(params[:prefer_points_over_scheme])
       end
 
