@@ -221,6 +221,7 @@ describe "Account Reports API", type: :request do
         expect(report).to have_key("status")
         expect(report).to have_key("progress")
         expect(report).to have_key("file_url")
+        expect(report.dig("user", "id")).to eq @admin.id
       end
     end
 
