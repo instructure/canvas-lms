@@ -16,17 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo, useCallback} from 'react'
+import React, {useMemo, useCallback, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
 import {IconAddLine} from '@instructure/ui-icons'
+import {Button} from '@instructure/ui-buttons'
 import type {Widget, WidgetConfig} from '../types'
 import {getWidget} from './WidgetRegistry'
 import {useResponsiveContext} from '../hooks/useResponsiveContext'
 import {useWidgetLayout} from '../hooks/useWidgetLayout'
 import {Flex} from '@instructure/ui-flex'
 import {DragDropContext, Droppable, Draggable, type DropResult} from 'react-beautiful-dnd'
+import AddWidgetModal from './AddWidgetModal/AddWidgetModal'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -63,6 +64,8 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
   const {moveWidgetToPosition} = useWidgetLayout()
   const sortedWidgets = useMemo(() => sortWidgetsForStacking(config.widgets), [config.widgets])
   const widgetsByColumn = useMemo(() => widgetsAsColumns(config.widgets), [config.widgets])
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [addPosition, setAddPosition] = useState<{col: number; row: number} | null>(null)
 
   const handleDragEnd = useCallback(
     (result: DropResult) => {
@@ -103,18 +106,19 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
     )
   }
 
-  const renderAddWidgetPlaceholder = () => {
+  const renderAddWidgetPlaceholder = (col: number, row: number) => {
     if (!isEditMode) return null
 
     return (
-      <View
-        as="div"
-        padding="small"
+      <Button
+        onClick={() => {
+          setAddPosition({col, row})
+          setAddModalOpen(true)
+        }}
+        display="block"
         textAlign="center"
-        borderRadius="medium"
-        borderWidth="small"
-        borderColor="brand"
-        background="transparent"
+        withBackground={false}
+        color="primary"
         margin="x-small 0"
         themeOverride={{
           borderStyle: 'dashed',
@@ -122,15 +126,13 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
       >
         <Flex direction="row" justifyItems="center" alignItems="center" gap="x-small">
           <Flex.Item>
-            <IconAddLine color="brand" />
+            <IconAddLine />
           </Flex.Item>
           <Flex.Item>
-            <Text size="small" color="brand">
-              {I18n.t('Add widget')}
-            </Text>
+            <Text size="small">{I18n.t('Add widget')}</Text>
           </Flex.Item>
         </Flex>
-      </View>
+      </Button>
     )
   }
 
@@ -159,7 +161,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
                       data-testid="widget-column-1"
                       width="100%"
                     >
-                      {renderAddWidgetPlaceholder()}
+                      {renderAddWidgetPlaceholder(1, 1)}
                       {widgetsByColumn[0].map((widget, index) => (
                         <React.Fragment key={widget.id}>
                           <Draggable draggableId={widget.id} index={index}>
@@ -173,7 +175,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
                               </div>
                             )}
                           </Draggable>
-                          {renderAddWidgetPlaceholder()}
+                          {renderAddWidgetPlaceholder(1, widget.position.row + 1)}
                         </React.Fragment>
                       ))}
                       {provided.placeholder}
@@ -208,7 +210,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
                       data-testid="widget-column-2"
                       width="100%"
                     >
-                      {renderAddWidgetPlaceholder()}
+                      {renderAddWidgetPlaceholder(2, 1)}
                       {widgetsByColumn[1].map((widget, index) => (
                         <React.Fragment key={widget.id}>
                           <Draggable draggableId={widget.id} index={index}>
@@ -222,7 +224,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
                               </div>
                             )}
                           </Draggable>
-                          {renderAddWidgetPlaceholder()}
+                          {renderAddWidgetPlaceholder(2, widget.position.row + 1)}
                         </React.Fragment>
                       ))}
                       {provided.placeholder}
@@ -264,13 +266,31 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
 
   const renderMobileStack = renderTabletStack
 
+  let gridContent
   if (matches.includes('mobile')) {
-    return renderMobileStack()
+    gridContent = renderMobileStack()
   } else if (matches.includes('tablet')) {
-    return renderTabletStack()
+    gridContent = renderTabletStack()
   } else {
-    return renderDesktopGrid()
+    gridContent = renderDesktopGrid()
   }
+
+  return (
+    <>
+      {gridContent}
+      {addPosition && (
+        <AddWidgetModal
+          open={addModalOpen}
+          onClose={() => {
+            setAddModalOpen(false)
+            setAddPosition(null)
+          }}
+          targetColumn={addPosition.col}
+          targetRow={addPosition.row}
+        />
+      )}
+    </>
+  )
 }
 
 export default WidgetGrid

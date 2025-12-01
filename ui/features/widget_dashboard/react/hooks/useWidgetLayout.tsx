@@ -36,6 +36,7 @@ interface WidgetLayoutContextType {
   moveWidget: (widgetId: string, action: MoveAction) => void
   moveWidgetToPosition: (widgetId: string, targetCol: number, targetRow: number) => void
   removeWidget: (widgetId: string) => void
+  addWidget: (type: string, displayName: string, col: number, row: number) => void
   resetConfig: () => void
 }
 
@@ -313,6 +314,30 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
     [markDirty],
   )
 
+  const addWidget = useCallback(
+    (type: string, displayName: string, col: number, row: number) => {
+      setConfig(prevConfig => {
+        const newWidget: Widget = {
+          id: `${type}-widget-${crypto.randomUUID()}`,
+          type,
+          position: {col, row, relative: 0},
+          title: displayName,
+        }
+
+        const updatedWidgets = [...prevConfig.widgets, newWidget]
+        const normalizedWidgets = normalizeRowNumbers(
+          normalizeRowNumbers(updatedWidgets, LEFT_COLUMN),
+          RIGHT_COLUMN,
+        )
+        const finalWidgets = recalculateRelativePositions(normalizedWidgets)
+
+        return {...prevConfig, widgets: finalWidgets}
+      })
+      markDirty()
+    },
+    [markDirty],
+  )
+
   const resetConfig = useCallback(() => {
     setConfig(DEFAULT_WIDGET_CONFIG)
   }, [])
@@ -322,6 +347,7 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
     moveWidget,
     moveWidgetToPosition,
     removeWidget,
+    addWidget,
     resetConfig,
   }
 
