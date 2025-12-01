@@ -65,12 +65,19 @@ export enum ScoreDisplayFormat {
   ICON_AND_LABEL = 'icon_and_label',
 }
 
+export enum OutcomeArrangement {
+  ALPHABETICAL = 'alphabetical',
+  CUSTOM = 'custom',
+  UPLOAD_ORDER = 'upload_order',
+}
+
 export interface GradebookSettings {
   secondaryInfoDisplay: SecondaryInfoDisplay
   displayFilters: DisplayFilter[]
   nameDisplayFormat: NameDisplayFormat
   studentsPerPage: number
   scoreDisplayFormat: ScoreDisplayFormat
+  outcomeArrangement: OutcomeArrangement
 }
 
 export const DEFAULT_GRADEBOOK_SETTINGS: GradebookSettings = {
@@ -83,4 +90,5 @@ export const DEFAULT_GRADEBOOK_SETTINGS: GradebookSettings = {
   nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
   studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
   scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
+  outcomeArrangement: OutcomeArrangement.UPLOAD_ORDER,
 }

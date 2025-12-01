@@ -27,6 +27,7 @@ import {GradebookSettings} from '../../utils/constants'
 import {SecondaryInfoSelector} from './SecondaryInfoSelector'
 import {DisplayFilterSelector} from './DisplayFilterSelector'
 import {ScoreDisplayFormatSelector} from './ScoreDisplayFormatSelector'
+import {OutcomeArrangementSelector} from './OutcomeArrangementSelector'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -50,15 +51,18 @@ export const SettingsTray: React.FC<SettingsTrayProps> = ({
   )
   const [displayFilters, setDisplayFilters] = useState(gradebookSettings.displayFilters)
   const [scoreDisplayFormat, setScoreDisplayFormat] = useState(gradebookSettings.scoreDisplayFormat)
+  const [outcomeArrangement, setOutcomeArrangement] = useState(gradebookSettings.outcomeArrangement)
 
   const resetForm = useCallback(() => {
     setSecondaryInfoDisplay(gradebookSettings.secondaryInfoDisplay)
     setDisplayFilters(gradebookSettings.displayFilters)
     setScoreDisplayFormat(gradebookSettings.scoreDisplayFormat)
+    setOutcomeArrangement(gradebookSettings.outcomeArrangement)
   }, [
     gradebookSettings.secondaryInfoDisplay,
     gradebookSettings.displayFilters,
     gradebookSettings.scoreDisplayFormat,
+    gradebookSettings.outcomeArrangement,
   ])
 
   const saveSettings = async () => {
@@ -67,6 +71,7 @@ export const SettingsTray: React.FC<SettingsTrayProps> = ({
       secondaryInfoDisplay,
       displayFilters,
       scoreDisplayFormat,
+      outcomeArrangement,
     }
 
     const result = await setGradebookSettings(newSettings)
@@ -118,6 +123,10 @@ export const SettingsTray: React.FC<SettingsTrayProps> = ({
         <ScoreDisplayFormatSelector
           value={scoreDisplayFormat}
           onChange={format => setScoreDisplayFormat(format)}
+        />
+        <OutcomeArrangementSelector
+          value={outcomeArrangement}
+          onChange={arrangement => setOutcomeArrangement(arrangement)}
         />
         <Flex gap="small" alignItems="stretch" direction="column">
           <Button color="primary" onClick={saveSettings} disabled={isSavingSettings}>

@@ -32,6 +32,7 @@ import {
   SecondaryInfoDisplay,
   NameDisplayFormat,
   ScoreDisplayFormat,
+  OutcomeArrangement,
 } from '../utils/constants'
 
 jest.mock('@canvas/axios')
@@ -181,6 +182,7 @@ describe('apiClient', () => {
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
         studentsPerPage: 15,
         scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
+        outcomeArrangement: OutcomeArrangement.UPLOAD_ORDER,
       }
 
       await saveLearningMasteryGradebookSettings('123', settings)
@@ -196,6 +198,7 @@ describe('apiClient', () => {
             name_display_format: 'first_last',
             students_per_page: 15,
             score_display_format: 'icon_only',
+            outcome_arrangement: 'upload_order',
           },
         },
       )
@@ -208,6 +211,7 @@ describe('apiClient', () => {
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
         studentsPerPage: 30,
         scoreDisplayFormat: ScoreDisplayFormat.ICON_AND_LABEL,
+        outcomeArrangement: OutcomeArrangement.ALPHABETICAL,
       }
 
       await saveLearningMasteryGradebookSettings('456', settings)
@@ -223,6 +227,7 @@ describe('apiClient', () => {
             name_display_format: 'first_last',
             students_per_page: 30,
             score_display_format: 'icon_and_label',
+            outcome_arrangement: 'alphabetical',
           },
         },
       )
@@ -235,6 +240,7 @@ describe('apiClient', () => {
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
         studentsPerPage: 50,
         scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
+        outcomeArrangement: OutcomeArrangement.CUSTOM,
       }
 
       await saveLearningMasteryGradebookSettings(789, settings)
@@ -250,6 +256,7 @@ describe('apiClient', () => {
             name_display_format: 'first_last',
             students_per_page: 50,
             score_display_format: 'icon_only',
+            outcome_arrangement: 'custom',
           },
         },
       )
@@ -262,6 +269,7 @@ describe('apiClient', () => {
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
         studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
         scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
+        outcomeArrangement: OutcomeArrangement.UPLOAD_ORDER,
       }
 
       await saveLearningMasteryGradebookSettings('123', settings)
@@ -277,6 +285,7 @@ describe('apiClient', () => {
             name_display_format: 'first_last',
             students_per_page: 15,
             score_display_format: 'icon_only',
+            outcome_arrangement: 'upload_order',
           },
         },
       )
@@ -289,6 +298,7 @@ describe('apiClient', () => {
         nameDisplayFormat: NameDisplayFormat.LAST_FIRST,
         studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
         scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
+        outcomeArrangement: OutcomeArrangement.UPLOAD_ORDER,
       }
 
       await saveLearningMasteryGradebookSettings('123', settings)
@@ -304,6 +314,7 @@ describe('apiClient', () => {
             name_display_format: 'last_first',
             students_per_page: 15,
             score_display_format: 'icon_only',
+            outcome_arrangement: 'upload_order',
           },
         },
       )
@@ -316,6 +327,7 @@ describe('apiClient', () => {
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
         studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
         scoreDisplayFormat: ScoreDisplayFormat.ICON_AND_POINTS,
+        outcomeArrangement: OutcomeArrangement.UPLOAD_ORDER,
       }
 
       await saveLearningMasteryGradebookSettings('123', settings)
@@ -331,6 +343,7 @@ describe('apiClient', () => {
             name_display_format: 'first_last',
             students_per_page: 15,
             score_display_format: 'icon_and_points',
+            outcome_arrangement: 'upload_order',
           },
         },
       )
