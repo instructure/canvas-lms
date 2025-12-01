@@ -163,7 +163,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
         summary={
           <Flex gap="small">
             <Flex.Item shouldGrow={false} shouldShrink={false}>
-              <Heading level="h2" variant="label">
+              <Heading level="h2" variant="label" margin="small 0">
                 {I18n.t('Filter resources')}
               </Heading>
             </Flex.Item>
@@ -174,7 +174,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
               <Flex.Item shouldGrow={false} shouldShrink={false}>
                 <Button
                   data-testid="clear-filters-button"
-                  size={isOpen ? 'medium' : 'small'}
+                  size="medium"
                   onClick={handleReset}
                   renderIcon={<IconXLine />}
                   color="secondary"
@@ -185,7 +185,12 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
             )}
             {isOpen && (
               <Flex.Item shouldGrow={false} shouldShrink={false}>
-                <Button data-testid="apply-filters-button" onClick={handleApply} color="primary">
+                <Button
+                  data-testid="apply-filters-button"
+                  size="medium"
+                  onClick={handleApply}
+                  color="primary"
+                >
                   {I18n.t('Apply filters')}
                 </Button>
               </Flex.Item>
