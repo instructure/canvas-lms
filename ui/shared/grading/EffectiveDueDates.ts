@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {forEach, sortBy} from 'es-toolkit/compat'
 import * as timezone from '@instructure/moment-utils'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
 import type {CamelizedGradingPeriod} from './grading.d'
@@ -29,7 +29,7 @@ export function scopeToUser(
   const scopedData: {
     [assignmentId: string]: DueDate
   } = {}
-  _.forEach(
+  forEach(
     dueDateDataByAssignmentId,
     (dueDateDataByUserId: UserDueDateMap, assignmentId: string) => {
       if (dueDateDataByUserId[userId]) {
@@ -46,7 +46,7 @@ export function updateWithSubmissions(
   gradingPeriods: CamelizedGradingPeriod[] = [],
 ): AssignmentUserDueDateMap {
   const helper = new GradingPeriodsHelper(gradingPeriods)
-  const sortedPeriods: CamelizedGradingPeriod[] = _.sortBy<CamelizedGradingPeriod>(
+  const sortedPeriods: CamelizedGradingPeriod[] = sortBy<CamelizedGradingPeriod>(
     gradingPeriods,
     'startDate',
   )

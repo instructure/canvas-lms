@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {reject, maxBy, isEmpty, partition, minBy} from 'lodash'
+import {reject, maxBy, partition, minBy, isEmpty} from 'es-toolkit/compat'
 import fcUtil from './fcUtil'
 import commonEventFactory from './CommonEvent/index'
 import '@canvas/jquery/jquery.ajaxJSON'

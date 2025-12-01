@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {map} from 'lodash'
+import {map} from 'es-toolkit/compat'
 import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import {updateAlignments, attachPageEvents} from './jquery/index'

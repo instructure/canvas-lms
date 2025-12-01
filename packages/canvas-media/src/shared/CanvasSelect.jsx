@@ -49,7 +49,7 @@
 
 import React from 'react'
 import {func, node, string, shape, oneOfType, element} from 'prop-types'
-import {compact, castArray, isEqual} from 'lodash'
+import {compact, castArray, isEqual} from 'es-toolkit/compat'
 import formatMessage from 'format-message'
 import {Select} from '@instructure/ui-select'
 import {Alert} from '@instructure/ui-alerts'

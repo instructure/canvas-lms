@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {assignIn, isNumber} from 'lodash'
+import {assignIn, isNumber} from 'es-toolkit/compat'
 
 import Outcome from '@canvas/outcomes/backbone/models/Outcome'
 

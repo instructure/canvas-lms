@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {map, reduce} from 'lodash'
+import {map, reduce} from 'es-toolkit/compat'
 import Big from 'big.js'
 
 export function add(a: number, b: number): Big {

@@ -23,7 +23,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import {DEFAULT_SEARCH_DELAY} from '../utils/constants'
 
 const I18n = createI18nScope('discussion_topics_post')

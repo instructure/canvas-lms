@@ -18,7 +18,7 @@
 import Backbone from '@canvas/backbone'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {extend} from 'lodash'
+import {extend} from 'es-toolkit/compat'
 import Entry from './models/Entry'
 import htmlEscape from '@instructure/html-escape'
 import replyAttachmentTemplate from '../jst/_reply_attachment.handlebars'

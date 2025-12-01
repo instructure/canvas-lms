@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {groupBy} from 'lodash'
+import {groupBy} from 'es-toolkit/compat'
 import Folder from '../backbone/models/Folder'
 import File from '../backbone/models/File'
 import ModuleFile from '../backbone/models/ModuleFile'

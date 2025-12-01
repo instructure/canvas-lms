@@ -19,7 +19,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {render, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import ConfirmOutcomeEditModal, {showConfirmOutcomeEdit} from '../ConfirmOutcomeEditModal'
 
 const defaultProps = (props = {}) =>

@@ -23,7 +23,7 @@ import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
-import {each, some, extend as lodashExtend} from 'lodash'
+import {each, some, extend as lodashExtend} from 'es-toolkit/compat'
 import DialogFormView, {getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import assignmentSettingsTemplate from '../../jst/AssignmentSettings.handlebars'
@@ -58,7 +58,7 @@ AssignmentSettingsView.prototype.events = lodashExtend(
     'click .dialog_closer': 'cancel',
     'click #apply_assignment_group_weights': 'toggleTableByClick',
     'keyup .group_weight_value': 'updateTotalWeight',
-    'click #assignment_groups_weights button': 'updateTotalWeight'
+    'click #assignment_groups_weights button': 'updateTotalWeight',
   },
 )
 
@@ -77,12 +77,14 @@ AssignmentSettingsView.prototype.validateFormData = function () {
   const errors = {}
   let shouldFocus = true
   const weightInputs = document.querySelectorAll('.group_weight_value')
-  weightInputs.forEach((input) => {
+  weightInputs.forEach(input => {
     if (input.value && isNaN(numberHelper.parse(input.value))) {
-      errors[input.id] = [{
-        type: 'number',
-        message: I18n.t('Must be a valid number '),
-      }]
+      errors[input.id] = [
+        {
+          type: 'number',
+          message: I18n.t('Must be a valid number '),
+        },
+      ]
       if (shouldFocus) {
         input.focus()
         shouldFocus = false

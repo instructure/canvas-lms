@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
-import {map, maxBy, isEqual, isNaN, extend as lodashExtend} from 'lodash'
+import {map, maxBy, isNaN, isEqual, extend as lodashExtend} from 'es-toolkit/compat'
 import OutcomeContentBase from './OutcomeContentBase'
 import CalculationMethodFormView from './CalculationMethodFormView'
 import outcomeTemplate from '../../jst/outcome.handlebars'

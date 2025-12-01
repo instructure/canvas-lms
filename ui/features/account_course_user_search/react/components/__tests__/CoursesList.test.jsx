@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {omit} from 'lodash'
+import {omit} from 'es-toolkit/compat'
 import CoursesList from '../CoursesList'
 
 describe('Account Course User Search CoursesList Sorting', () => {

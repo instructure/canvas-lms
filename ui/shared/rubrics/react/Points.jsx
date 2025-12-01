@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import _ from 'lodash'
+import {get} from 'es-toolkit/compat'
 import PropTypes from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
@@ -84,7 +84,7 @@ const Points = props => {
   if (assessment === null) {
     return <div className="react-rubric-cell graded-points">{possibleString(pointsPossible)}</div>
   } else {
-    const points = _.get(assessment, 'points')
+    const points = get(assessment, 'points')
     if (!assessing) {
       return (
         <div className="react-rubric-cell graded-points">{scoreString(points, pointsPossible)}</div>

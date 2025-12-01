@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from 'backbone'
-import {isFunction} from 'lodash'
+import {isFunction} from 'es-toolkit/compat'
 
 // normalize (i.e. I18n) and filter errors we get from the API
 Backbone.Model.prototype.normalizeErrors = function (errors, validationPolicy) {

@@ -17,7 +17,7 @@
  */
 
 import {render, screen} from '@testing-library/react'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import React from 'react'
 import {DiscussionRow} from '../DiscussionRow'
 import fakeENV from '@canvas/test-utils/fakeENV'

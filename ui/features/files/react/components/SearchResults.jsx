@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {indexOf} from 'lodash'
+import {indexOf} from 'es-toolkit/compat'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import SearchResults from '../legacy/components/SearchResults'

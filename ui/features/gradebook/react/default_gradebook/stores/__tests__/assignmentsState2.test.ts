@@ -23,7 +23,7 @@
 import store from '../index'
 import {AssignmentGroup as GraphAssignmentGroup} from '../graphql/assignmentGroups/getAssignmentGroups'
 import {getAllAssignments} from '../graphql/assignments/getAllAssignments'
-import {flatten} from 'lodash'
+import {flatten} from 'es-toolkit/compat'
 import {getAllAssignmentGroups} from '../graphql/assignmentGroups/getAllAssignmentGroups'
 import {GetAssignmentsParams} from '../graphql/assignments/getAssignments'
 import {v4 as uuidv4} from 'uuid'
@@ -241,7 +241,9 @@ describe('Gradebook', () => {
       ;(getAllAssignments as jest.Mock).mockImplementation(
         ({
           queryParams: {assignmentGroupId, gradingPeriodId},
-        }: {queryParams: Pick<GetAssignmentsParams, 'assignmentGroupId' | 'gradingPeriodId'>}) => {
+        }: {
+          queryParams: Pick<GetAssignmentsParams, 'assignmentGroupId' | 'gradingPeriodId'>
+        }) => {
           return Promise.resolve({
             data: createGetAllAssignmentsResponse({assignmentGroupId, gradingPeriodId}),
           })

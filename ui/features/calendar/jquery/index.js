@@ -22,7 +22,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {map, defaults, filter, omit, each, has, last, includes} from 'lodash'
+import {map, filter, each, last, includes, omit, has, defaults} from 'es-toolkit/compat'
 import * as tz from '@instructure/moment-utils'
 import {encodeQueryString} from '@instructure/query-string-encoding'
 import moment from 'moment'

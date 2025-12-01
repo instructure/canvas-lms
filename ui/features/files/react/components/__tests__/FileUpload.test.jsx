@@ -20,7 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import FileUpload from '../FileUpload'
 import Folder from '@canvas/files/backbone/models/Folder'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 
 describe('FileUpload', () => {
   let addEventListenerSpy

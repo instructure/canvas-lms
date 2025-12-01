@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash'
+import {isNil, has, keyBy, set, get, uniq, cloneDeep} from 'es-toolkit/compat'
 
 export const defaultCriteria = id => ({
   criterion_id: id,
@@ -24,8 +24,8 @@ export const defaultCriteria = id => ({
 
 const fillCriteria = criterion => {
   const {comments, points} = criterion
-  const hasPoints = !_.isNil(points)
-  const hasComments = !_.isNil(comments) && comments.length > 0
+  const hasPoints = !isNil(points)
+  const hasComments = !isNil(comments) && comments.length > 0
   return {
     ...criterion,
     points: {
@@ -38,27 +38,27 @@ const fillCriteria = criterion => {
 }
 
 export const fillAssessment = (rubric, partialAssessment, assessmentDefaults) => {
-  const prior = _.keyBy(_.cloneDeep(partialAssessment.data), c => c.criterion_id)
+  const prior = keyBy(cloneDeep(partialAssessment.data), c => c.criterion_id)
 
   return {
     score: 0,
     ...assessmentDefaults,
     ...partialAssessment,
     data: rubric.criteria.map(c =>
-      _.has(prior, c.id) ? fillCriteria(prior[c.id]) : defaultCriteria(c.id),
+      has(prior, c.id) ? fillCriteria(prior[c.id]) : defaultCriteria(c.id),
     ),
   }
 }
 
 const savedCommentPath = id => ['summary_data', 'saved_comments', id]
 export const getSavedComments = (association, id) =>
-  _.get(association, savedCommentPath(id), undefined)
+  get(association, savedCommentPath(id), undefined)
 
 export const updateAssociationData = (association, assessment) => {
   assessment.data
     .filter(({saveCommentsForLater}) => saveCommentsForLater)
     .forEach(({criterion_id: id, comments}) => {
       const prior = getSavedComments(association, id) || []
-      _.set(association, savedCommentPath(id), _.uniq([...prior, comments]))
+      set(association, savedCommentPath(id), uniq([...prior, comments]))
     })
 }

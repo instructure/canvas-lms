@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isUndefined, each} from 'lodash'
+import {isUndefined, each} from 'es-toolkit/compat'
 import * as tz from '@instructure/moment-utils'
 import {datetimeString, dateString, discussionsDatetimeString} from './date-functions'
 

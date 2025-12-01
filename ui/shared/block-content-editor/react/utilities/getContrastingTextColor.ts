@@ -18,7 +18,7 @@
 
 import tinycolor, {WCAG2Options} from 'tinycolor2'
 import {colors} from '@instructure/canvas-theme'
-import {memoize} from 'lodash'
+import {memoize} from 'es-toolkit/compat'
 
 const GRAY_COLORS = [colors.primitives.grey11, colors.primitives.grey125]
 

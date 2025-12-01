@@ -21,7 +21,7 @@ import {act, render as testingLibraryRender, waitFor} from '@testing-library/rea
 import K5Dashboard from '../K5Dashboard'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import {cloneDeep} from 'lodash'
+import {cloneDeep} from 'es-toolkit/compat'
 import {resetPlanner} from '@canvas/planner'
 import {MOCK_CARDS, MOCK_CARDS_2, MOCK_PLANNER_ITEM} from '@canvas/k5/react/__tests__/fixtures'
 import {

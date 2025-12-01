@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {map} from 'lodash'
+import {map} from 'es-toolkit/compat'
 
 interface DisabledTokenInputProps {
   tokens?: string[]

@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import {each, isEmpty, extend as lodashExtend} from 'lodash'
+import {each, isEmpty, extend as lodashExtend} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import MarkAsReadWatcher from '../MarkAsReadWatcher'
 import walk from '../../array-walk'

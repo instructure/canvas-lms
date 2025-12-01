@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {omit} from 'lodash'
+import {omit} from 'es-toolkit/compat'
 import {Model} from '@canvas/backbone'
 
 extend(Course, Model)

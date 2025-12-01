@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
-import {find, flatten, groupBy, map, sortBy} from 'lodash'
+import {groupBy, sortBy, flatten, find, map} from 'es-toolkit/compat'
 import {arrayOf, func, shape, string} from 'prop-types'
 import customTypes from '@canvas/theme-editor/react/PropTypes'
 import {submitHtmlForm} from '@canvas/theme-editor/submitHtmlForm'

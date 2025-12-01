@@ -21,7 +21,7 @@ import React from 'react'
 
 import CanvasMultiSelect from '@canvas/multi-select'
 import {capitalizeFirstLetter} from '@instructure/ui-utils'
-import difference from 'lodash/difference'
+import {difference} from 'es-toolkit/compat'
 import filter from 'lodash/filter'
 
 import Placement from './Placement'

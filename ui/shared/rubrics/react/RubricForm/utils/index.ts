@@ -24,7 +24,7 @@ import type {
 } from '@canvas/rubrics/react/types/rubric'
 import type {RubricQueryResponse} from '../queries/RubricFormQueries'
 import type {RubricFormProps} from '../types/RubricForm'
-import {isEqual} from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 
 export const translateRubricQueryResponse = (fields: RubricQueryResponse): RubricFormProps => {
   return {

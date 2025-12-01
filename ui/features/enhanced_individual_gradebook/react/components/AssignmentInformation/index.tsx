@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useMemo, useState} from 'react'
-import {intersection, some} from 'lodash'
+import {intersection, some} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'

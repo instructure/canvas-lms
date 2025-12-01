@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {escape as lodashEscape} from 'lodash'
+import {escape as lodashEscape} from 'es-toolkit/compat'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import type Gradebook from '../../Gradebook'
 import useStore from '../../stores'

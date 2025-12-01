@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {find, isArray} from 'lodash'
+import {find, isArray} from 'es-toolkit/compat'
 import parseLinkHeader from '@canvas/parse-link-header'
 import deferPromise from '@instructure/defer-promise'
 

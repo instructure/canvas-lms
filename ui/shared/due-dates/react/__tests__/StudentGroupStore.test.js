@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {values, keyBy} from 'es-toolkit/compat'
 import StudentGroupStore from '../StudentGroupStore'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {setupServer} from 'msw/node'
@@ -152,7 +152,7 @@ describe('StudentGroupStore', () => {
     const arrayOfGroups = [{id: 2, title: 'group 2'}]
     StudentGroupStore.setState({groups: initialGroups})
     StudentGroupStore.addGroups(arrayOfGroups)
-    expect(StudentGroupStore.getGroups()).toEqual(_.keyBy([g1, g2], 'id'))
+    expect(StudentGroupStore.getGroups()).toEqual(keyBy([g1, g2], 'id'))
   })
 
   // ==================
@@ -192,7 +192,7 @@ describe('StudentGroupStore', () => {
       checkComplete()
     })
 
-    expect(_.values(StudentGroupStore.getGroups())).toHaveLength(4)
+    expect(values(StudentGroupStore.getGroups())).toHaveLength(4)
     expect(StudentGroupStore.fetchComplete()).toBe(true)
   })
 })

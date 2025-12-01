@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $, {type} from 'jquery'
-import {map, sortBy, filter, forEach, find} from 'lodash'
+import {sortBy, map, filter, forEach, find} from 'es-toolkit/compat'
 import createStore from './createStoreJestCompatible'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import '@canvas/rails-flash-notifications'

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {isEmpty} from 'es-toolkit/compat'
 import ProcessGradebookUpload from '../process_gradebook_upload'
 
 // Define constants
@@ -61,14 +61,14 @@ describe('ProcessGradebookUpload.populateGradeDataPerSubmission', () => {
     const gradeData = {}
     ProcessGradebookUpload.populateGradeDataPerSubmission(submissionIgnored, 0, [], gradeData)
 
-    expect(_.isEmpty(gradeData)).toBe(true)
+    expect(isEmpty(gradeData)).toBe(true)
   })
 
   test('does not alter a grade that requires no change', () => {
     const gradeData = {}
     ProcessGradebookUpload.populateGradeDataPerSubmission(submissionOld1NoChange, 0, [], gradeData)
 
-    expect(_.isEmpty(gradeData)).toBe(true)
+    expect(isEmpty(gradeData)).toBe(true)
   })
 
   test('alters a grade on a new assignment', () => {
@@ -139,7 +139,7 @@ describe('ProcessGradebookUpload.populateGradeDataPerSubmission', () => {
 
     // When grade is numeric and original_grade is also numeric and they're equal,
     // no change should be recorded
-    expect(_.isEmpty(gradeData)).toBe(true)
+    expect(isEmpty(gradeData)).toBe(true)
   })
 })
 

@@ -21,7 +21,7 @@ import React, {Component, Fragment} from 'react'
 import {arrayOf, func} from 'prop-types'
 import {connect} from 'react-redux'
 import $ from 'jquery'
-import {maxBy} from 'lodash'
+import {maxBy} from 'es-toolkit/compat'
 // For screenreaderFlashMessageExclusive  Maybe there's a better way
 import '@canvas/rails-flash-notifications'
 

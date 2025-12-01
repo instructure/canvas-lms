@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {sortBy} from 'lodash'
+import {sortBy} from 'es-toolkit/compat'
 import preventDefault from '../preventDefault'
 import 'jqueryui/dialog'
 

@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {each, clone, indexOf, find, last} from 'lodash'
+import {each, clone, indexOf, find, last} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import Outcome from '../../../backbone/models/Outcome'
 import OutcomeGroup from '../../../backbone/models/OutcomeGroup'

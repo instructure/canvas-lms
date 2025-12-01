@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import _ from 'lodash'
 import 'jquery-migrate'
 import axios from '@canvas/axios'
 import numberHelper from '@canvas/i18n/numberHelper'

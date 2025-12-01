@@ -17,7 +17,7 @@
  */
 
 import round from '@canvas/round'
-import {escape as lodashEscape} from 'lodash'
+import {escape as lodashEscape} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {scoreToGrade} from '@instructure/grading-utils'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'

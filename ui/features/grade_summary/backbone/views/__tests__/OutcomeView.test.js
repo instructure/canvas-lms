@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {isUndefined} from 'lodash'
+import {isUndefined} from 'es-toolkit/compat'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
 import OutcomePopoverView from '../OutcomePopoverView'
 import OutcomeDialogView from '../OutcomeDialogView'

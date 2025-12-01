@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {find} from 'lodash'
+import {find} from 'es-toolkit/compat'
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 import MoveDialog from './react/components/MoveDialog'

@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
-import {isArray, difference} from 'lodash'
+import {difference, isArray} from 'es-toolkit/compat'
 
 extend(UniqueDropdownCollection, Backbone.Collection)
 

@@ -31,7 +31,7 @@ import {
   sortBy,
   union,
   without,
-} from 'lodash'
+} from 'es-toolkit/compat'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
 import {PresentationContent} from '@instructure/ui-a11y-content'

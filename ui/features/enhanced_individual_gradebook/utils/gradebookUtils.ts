@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {uniq, sortBy} from 'lodash'
+import {sortBy} from 'es-toolkit/compat'
+import {uniq} from 'es-toolkit'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {
   AssignmentGroupCriteriaMap,

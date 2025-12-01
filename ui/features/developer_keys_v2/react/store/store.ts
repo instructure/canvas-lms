@@ -18,7 +18,7 @@
 
 import {createStore, applyMiddleware, combineReducers} from 'redux'
 import {thunk} from 'redux-thunk'
-import _ from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import listDeveloperKeysReducer from '../reducers/listDeveloperKeysReducer'
 import deactivateDeveloperKeyReducer from '../reducers/deactivateReducer'
 import activateDeveloperKeyReducer from '../reducers/activateReducer'
@@ -53,7 +53,7 @@ const developerKeysReducer = combineReducers({
 
 export default (initialStateOverrides = {}) => {
   let defaultState = developerKeysReducer({} as any, {} as any)
-  defaultState = _.merge(defaultState, initialStateOverrides)
+  defaultState = merge(defaultState, initialStateOverrides)
 
   return createStoreWithMiddleware(developerKeysReducer, defaultState)
 }

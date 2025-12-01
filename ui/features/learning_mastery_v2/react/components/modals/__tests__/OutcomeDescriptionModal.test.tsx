@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {OutcomeDescriptionModal} from '../OutcomeDescriptionModal'
 import {Outcome} from '../../../types/rollup'
 import LMGBContext from '@canvas/outcomes/react/contexts/LMGBContext'
-import {pick} from 'lodash'
+import {pick} from 'es-toolkit/compat'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 
 describe('OutcomeDescriptionModal', () => {

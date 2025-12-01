@@ -16,7 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {difference, chunk, keyBy, groupBy, cloneDeep, setWith as lodashSetWith} from 'lodash'
+import {
+  chunk,
+  cloneDeep,
+  difference,
+  groupBy,
+  keyBy,
+  setWith as lodashSetWith,
+} from 'es-toolkit/compat'
 import type {StoreApi} from 'zustand'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {GradebookStore} from './index'

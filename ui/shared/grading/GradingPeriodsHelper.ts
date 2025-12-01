@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {find, forEach, isArray, isDate, isString, sortBy} from 'lodash'
+import {sortBy, find, forEach, isArray, isDate, isString} from 'es-toolkit/compat'
 import type {CamelizedGradingPeriod} from './grading.d'
 
 // @ts-expect-error

@@ -18,7 +18,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import GroupCategoryDetailView from './GroupCategoryDetailView'
 import GroupsView from './GroupsView'
 import UnassignedUsersView from './UnassignedUsersView'
@@ -123,13 +123,17 @@ export default class GroupCategoryView extends View {
         message = null
       }
 
-      if (message && message.type === "import_groups") {
+      if (message && message.type === 'import_groups') {
         if (status === 'completed') {
           if (message.groups > 0) {
-            $.flashMessage(I18n.t("Your %{groups} groups and %{users} students were successfully uploaded",
-            { groups: message.groups, users: message.users }))
+            $.flashMessage(
+              I18n.t('Your %{groups} groups and %{users} students were successfully uploaded', {
+                groups: message.groups,
+                users: message.users,
+              }),
+            )
           } else {
-            $.flashError(I18n.t("No groups were found in the uploaded file."))
+            $.flashError(I18n.t('No groups were found in the uploaded file.'))
           }
         }
         if (status === 'failed') {

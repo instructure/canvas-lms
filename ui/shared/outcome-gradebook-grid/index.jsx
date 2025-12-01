@@ -25,7 +25,6 @@ import {
   includes,
   isObject,
   reject,
-  chain,
   some,
   isNumber,
   pick,
@@ -39,7 +38,7 @@ import {
   zip,
   extend as lodashExtend,
   escape as lodashEscape,
-} from 'lodash'
+} from 'es-toolkit/compat'
 import HeaderFilterView from './react/HeaderFilterView'
 import OutcomeFilterView from './react/OutcomeFilterView'
 import OutcomeColumnView from './backbone/views/OutcomeColumnView'
@@ -441,7 +440,7 @@ const Grid = {
       return ['rating_3', '#E62429', I18n.t('Well Below Mastery')]
     },
     getColumnResults(data, column) {
-      return chain(data).map(column.field).filter(isObject).value()
+      return map(data, column.field).filter(isObject)
     },
     headerRowCell({node, column, grid}, score) {
       if (column.field === 'student') {

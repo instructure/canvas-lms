@@ -33,7 +33,7 @@ import PeopleFilter from '@canvas/differentiation-tags/react/PeopleFilter/People
 import MessageBus from '@canvas/util/MessageBus'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
-import {union} from 'lodash'
+import {union} from 'es-toolkit/compat'
 
 const I18n = createI18nScope('RosterView')
 

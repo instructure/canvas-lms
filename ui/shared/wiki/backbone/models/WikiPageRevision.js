@@ -23,7 +23,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 import $ from 'jquery'
-import {pick, has, omit, throttle} from 'lodash'
+import {throttle, pick, omit, has} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'

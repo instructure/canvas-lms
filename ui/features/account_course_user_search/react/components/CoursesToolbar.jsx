@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {arrayOf, string, bool, func, shape, oneOf} from 'prop-types'
-import {isEqual, groupBy, map, compact} from 'lodash'
+import {compact, groupBy, isEqual, map} from 'es-toolkit/compat'
 import {IconPlusLine, IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'

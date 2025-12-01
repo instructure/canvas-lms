@@ -18,7 +18,7 @@
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {uniqueId} from 'lodash'
+import {uniqueId} from 'es-toolkit/compat'
 import htmlEscape from '@instructure/html-escape'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import RichContentEditor from '@canvas/rce/RichContentEditor'

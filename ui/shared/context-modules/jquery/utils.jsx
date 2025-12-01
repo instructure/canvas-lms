@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {some} from 'lodash'
+import {some} from 'es-toolkit/compat'
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 import {useScope as createI18nScope} from '@canvas/i18n'

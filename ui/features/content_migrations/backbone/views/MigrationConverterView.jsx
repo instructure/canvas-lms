@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import {extend as lodashExtend, defer} from 'lodash'
+import {defer, extend as lodashExtend} from 'es-toolkit/compat'
 import template from '../../jst/MigrationConverter.handlebars'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import {useScope as createI18nScope} from '@canvas/i18n'

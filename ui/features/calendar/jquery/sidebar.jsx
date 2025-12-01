@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {intersection} from 'lodash'
+import {intersection} from 'es-toolkit/compat'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'

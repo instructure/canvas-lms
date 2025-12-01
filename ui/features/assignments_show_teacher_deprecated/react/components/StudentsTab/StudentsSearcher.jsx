@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import _ from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import {func} from 'prop-types'
 
 import {
@@ -95,7 +95,7 @@ export default class StudentsSearcher extends React.Component {
     this.debouncedHandleNameFilterChange(event.target.value)
   }
 
-  debouncedHandleNameFilterChange = _.debounce(newSearchValue => {
+  debouncedHandleNameFilterChange = debounce(newSearchValue => {
     this.setState({debouncedSearchValue: newSearchValue})
   }, STUDENT_SEARCH_DELAY)
 

@@ -17,7 +17,7 @@
  */
 
 import {expect} from '@jest/globals'
-import {reject} from 'lodash'
+import {reject} from 'es-toolkit/compat'
 import axe from 'axe-core'
 
 export function isVisible($el) {

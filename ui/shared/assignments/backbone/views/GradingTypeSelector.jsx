@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {includes} from 'lodash'
+import {includes} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'

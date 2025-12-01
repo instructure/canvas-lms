@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {find, sortBy, filter as lodashFilter} from 'lodash'
+import {sortBy, find, filter as lodashFilter} from 'es-toolkit/compat'
 import createStore from './createStoreJestCompatible'
 import ExternalAppsStore from './ExternalAppsStore'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
@@ -96,7 +96,6 @@ store.findAppByShortName = function (shortName) {
 }
 
 store.flagAppAsInstalled = function (shortName) {
-  // eslint-disable-next-line lodash/collection-return, , lodash/collection-method-value
   find(this.getState().apps, app => {
     if (app.short_name === shortName) {
       app.is_installed = true

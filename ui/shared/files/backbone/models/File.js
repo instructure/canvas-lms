@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
-import _, {clone, keys} from 'lodash'
+import {clone, find, pick, keys} from 'es-toolkit/compat'
 import $ from 'jquery'
 import FilesystemObject from './FilesystemObject'
 import {uploadFile} from '@canvas/upload-file'
@@ -107,13 +105,9 @@ File.prototype.toJSON = function () {
   if (!this.get('file')) {
     return File.__super__.toJSON.apply(this, arguments)
   }
-   
-  return _.pick.apply(
-    _,
-    [this.attributes, 'file'].concat(
-      slice.call(keys((ref = this.uploadParams) != null ? ref : {})),
-    ),
-  )
+
+  const pickKeys = ['file'].concat(slice.call(keys((ref = this.uploadParams) != null ? ref : {})))
+  return pick(this.attributes, ...pickKeys)
 }
 
 File.prototype.present = function () {
@@ -123,7 +117,7 @@ File.prototype.present = function () {
 File.prototype.externalToolEnabled = function (tool) {
   if (tool.accept_media_types && tool.accept_media_types.length > 0) {
     const content_type = this.get('content-type')
-    return _.find(tool.accept_media_types.split(','), function (t) {
+    return find(tool.accept_media_types.split(','), function (t) {
       const regex = new RegExp('^' + t.replace('*', '.*') + '$')
       return content_type.match(regex)
     })

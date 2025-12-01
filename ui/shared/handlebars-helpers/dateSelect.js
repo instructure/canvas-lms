@@ -18,7 +18,7 @@
 import I18n from '@canvas/i18n'
 import $ from 'jquery'
 import h from '@instructure/html-escape'
-import {clone, defaults} from 'lodash'
+import {clone, defaults} from 'es-toolkit/compat'
 
 /*
 xsslint safeString.identifier i

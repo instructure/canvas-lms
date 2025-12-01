@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {Component} from 'react'
-import _ from 'lodash'
+import {isEqual, cloneDeep} from 'es-toolkit/compat'
 import {View} from '@instructure/ui-view'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -56,7 +56,7 @@ export class UpdateItemTray_ extends Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (!_.isEqual(this.props.noteItem, nextProps.noteItem)) {
+    if (!isEqual(this.props.noteItem, nextProps.noteItem)) {
       const updates = this.getNoteUpdates(nextProps)
       this.setState({updates}, this.updateMessages)
     }
@@ -67,7 +67,7 @@ export class UpdateItemTray_ extends Component {
   }
 
   getNoteUpdates(props) {
-    const updates = _.cloneDeep(props.noteItem) || {}
+    const updates = cloneDeep(props.noteItem) || {}
     if (updates.context) {
       updates.courseId = updates.context.id
       delete updates.context

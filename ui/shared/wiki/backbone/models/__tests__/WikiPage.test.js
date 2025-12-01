@@ -17,7 +17,7 @@
  */
 
 import WikiPage from '../WikiPage'
-import _ from 'lodash'
+import {isObject} from 'es-toolkit/compat'
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (a, b) => expect(a).toEqual(b)
@@ -96,7 +96,7 @@ describe('WikiPage', () => {
       const namespacedObj = {}
       namespacedObj.wiki_page = wikiPageObj()
       const parseResponse = wikiPage.parse(namespacedObj)
-      ok(!_.isObject(parseResponse.wiki_page), 'Removes the wiki_page namespace')
+      ok(!isObject(parseResponse.wiki_page), 'Removes the wiki_page namespace')
     })
 
     test('present includes the context information', () => {

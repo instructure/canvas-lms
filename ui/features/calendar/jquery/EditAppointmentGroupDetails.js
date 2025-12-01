@@ -19,7 +19,8 @@
 import $ from 'jquery'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import _, {some} from 'lodash'
+import {some} from 'es-toolkit/compat'
+import {chain} from 'lodash'
 import htmlEscape from '@instructure/html-escape'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import TimeBlockList from './TimeBlockList'
@@ -404,7 +405,7 @@ export default class EditAppointmentGroupDetails {
       }
       if (sectionCodes.length > 0) {
         const sectionCode = sectionCodes[0]
-        const section = _.chain(this.contexts)
+        const section = chain(this.contexts)
           .map('course_sections')
           .flatten()
           .find(s => s.asset_string === sectionCode)

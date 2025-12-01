@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {reject} from 'lodash'
+import {reject} from 'es-toolkit/compat'
 import axe from 'axe-core'
 
 const isAccessible = async (element, options = {}) => {
@@ -60,7 +60,6 @@ const isAccessible = async (element, options = {}) => {
       )
       .join('\n')
 
-     
     console.error('Accessibility violations:', err)
   }
 

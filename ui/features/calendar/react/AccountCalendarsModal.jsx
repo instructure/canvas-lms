@@ -27,7 +27,7 @@ import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {debounce, isEqual} from 'lodash'
+import {isEqual, debounce} from 'es-toolkit/compat'
 import AccountCalendarResultsArea from './AccountCalendarsResultsArea'
 import {useScope as createI18nScope} from '@canvas/i18n'
 

@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {extend as lodashExtend} from 'lodash'
+import {extend as lodashExtend} from 'es-toolkit/compat'
 import $ from 'jquery'
 import CollectionView from '@canvas/backbone-collection-view'
 import 'jqueryui/sortable'

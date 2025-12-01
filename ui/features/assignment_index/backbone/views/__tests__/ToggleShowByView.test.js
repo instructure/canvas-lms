@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'lodash'
+import {each} from 'es-toolkit/compat'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
 import Course from '@canvas/courses/backbone/models/Course'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
@@ -145,7 +145,7 @@ describe('ToggleShowByView', function () {
     equal(view.assignmentGroups.length, 4)
     view.assignmentGroups.each(group => {
       const assignments = group.get('assignments').models
-      _.each(assignments, as => equal(group.name(), as.name()))
+      each(assignments, as => equal(group.name(), as.name()))
     })
   })
 

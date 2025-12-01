@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import {find, forEach} from 'lodash'
+import {find, forEach} from 'es-toolkit/compat'
 import * as tz from '@instructure/moment-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from './GradingPeriodsHelper'

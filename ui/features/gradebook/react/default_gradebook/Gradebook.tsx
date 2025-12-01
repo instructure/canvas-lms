@@ -32,7 +32,7 @@ import {
   reduce,
   reject,
   some,
-} from 'lodash'
+} from 'es-toolkit/compat'
 import * as tz from '@instructure/moment-utils'
 import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'

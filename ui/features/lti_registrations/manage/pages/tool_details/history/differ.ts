@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isEqual} from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 import {InternalLtiConfiguration} from '../../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {InternalPlacementConfiguration} from '../../../model/internal_lti_configuration/placement_configuration/InternalPlacementConfiguration'
 import {InternalBaseLaunchSettings} from '../../../model/internal_lti_configuration/InternalBaseLaunchSettings'

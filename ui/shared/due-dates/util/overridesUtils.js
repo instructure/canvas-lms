@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import {map} from 'lodash'
+import {map} from 'es-toolkit/compat'
 
 export const sortedRowKeys = rows => {
   const {datedKeys, numberedKeys} = _.chain(rows)

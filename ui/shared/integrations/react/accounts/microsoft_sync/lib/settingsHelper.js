@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {pick} from 'lodash'
+import {pick} from 'es-toolkit/compat'
 
 const I18n = createI18nScope('account_settings_jsx_bundle')
 

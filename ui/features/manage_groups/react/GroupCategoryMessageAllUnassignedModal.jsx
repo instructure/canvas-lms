@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {chunk} from 'es-toolkit/compat'
 import React, {useEffect, useState, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
@@ -50,7 +50,7 @@ export default function GroupCategoryMessageAllUnassignedModal({
   const [message, setMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState([])
   const [status, setStatus] = useState(null)
-  const messageTextAreaRef = useRef<HTMLElement | null>(null)
+  const messageTextAreaRef = useRef(null)
 
   const contextAssetString = ENV.context_asset_string
   const chunkSize = ENV.MAX_GROUP_CONVERSATION_SIZE || 100
@@ -71,16 +71,13 @@ export default function GroupCategoryMessageAllUnassignedModal({
   }
 
   function handleSend() {
-    if(message.trim().length === 0 ) {
-      setErrorMessage([
-        {type: 'newError', text: I18n.t('Message text is required')},
-      ])
-      if(messageTextAreaRef.current)
-        messageTextAreaRef.current.focus()
+    if (message.trim().length === 0) {
+      setErrorMessage([{type: 'newError', text: I18n.t('Message text is required')}])
+      if (messageTextAreaRef.current) messageTextAreaRef.current.focus()
       return
     }
     setStatus('info')
-    const chunks = _.chunk(payload.recipients, chunkSize)
+    const chunks = chunk(payload.recipients, chunkSize)
     const promiseArray = []
 
     chunks.forEach(chunk => {
@@ -163,7 +160,7 @@ export default function GroupCategoryMessageAllUnassignedModal({
         <TextArea
           id="message_all_unassigned"
           data-testid="message_all_unassigned_textarea"
-          ref={ref => messageTextAreaRef.current = ref}
+          ref={ref => (messageTextAreaRef.current = ref)}
           label={
             <ScreenReaderContent>
               {I18n.t('Required input. Message all unassigned students.')}
@@ -173,7 +170,7 @@ export default function GroupCategoryMessageAllUnassignedModal({
           height="200px"
           value={message}
           messages={errorMessage}
-          onChange={e =>{
+          onChange={e => {
             setErrorMessage([])
             setMessage(e.target.value)
           }}

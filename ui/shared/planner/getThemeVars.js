@@ -17,7 +17,7 @@
  */
 
 import {getRegistry} from '@instructure/theme-registry'
-import {merge, cloneDeep} from 'lodash'
+import {merge, cloneDeep} from 'es-toolkit/compat'
 
 // In case we are running a test and there is absolutely no theme data available
 // (happens often)

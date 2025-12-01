@@ -17,7 +17,7 @@
  */
 
 import {getRegistry} from '@instructure/theme-registry'
-import {merge, cloneDeep} from 'lodash'
+import {merge, cloneDeep} from 'es-toolkit/compat'
 
 // The running theme is the running theme for this page load, and it never
 // changes, so there's no point in doing the work more than once.

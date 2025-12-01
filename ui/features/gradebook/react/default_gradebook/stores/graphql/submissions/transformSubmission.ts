@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {keyBy, mapValues} from 'lodash'
+import {keyBy} from 'es-toolkit/compat'
+import {mapValues} from 'es-toolkit/compat'
 import {Submission as ApiSubmission, GradingType, WorkflowState} from 'api.d'
 import {SubmissionWithOriginalityReport} from '@canvas/grading/grading'
 import {Submission} from './getSubmissions'

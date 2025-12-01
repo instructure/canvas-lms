@@ -22,7 +22,7 @@ import '@testing-library/jest-dom/extend-expect'
 import {DEFAULT_SEARCH_DELAY} from '../utils/constants'
 import userEvent from '@testing-library/user-event'
 
-jest.mock('lodash', () => ({
+jest.mock('es-toolkit/compat', () => ({
   debounce: fn => {
     fn.cancel = jest.fn()
     return fn

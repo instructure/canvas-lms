@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef} from 'react'
-import {debounce} from 'lodash'
+import React, {useRef, useMemo} from 'react'
+import {debounce} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('SearchGradingPeriodsField')
@@ -25,9 +25,13 @@ const I18n = createI18nScope('SearchGradingPeriodsField')
 const SearchGradingPeriodsField = ({changeSearchText}) => {
   const inputRef = useRef(null)
 
-  const search = debounce(trimmedText => {
-    changeSearchText(trimmedText)
-  }, 200)
+  const search = useMemo(
+    () =>
+      debounce(trimmedText => {
+        changeSearchText(trimmedText)
+      }, 200),
+    [changeSearchText],
+  )
 
   const onChange = event => {
     const trimmedText = event.target.value.trim()

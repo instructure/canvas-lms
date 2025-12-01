@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {reduce, filter, values, map, groupBy, keyBy} from 'lodash'
+import {groupBy, keyBy, reduce, filter, values, map} from 'es-toolkit/compat'
 import AssignmentGroupGradeCalculator from './AssignmentGroupGradeCalculator'
 import {
   bigSum,

@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
 import 'jquery-migrate'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {useScope as createI18nScope} from '@canvas/i18n'

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {keys} from 'es-toolkit/compat'
 import MessageStudentsWhoHelper from '../messageStudentsWhoHelper'
 import axios from '@canvas/axios'
 
@@ -264,7 +264,7 @@ describe('MessageStudentsWhoHelper', () => {
       }
       const settingsFn = MessageStudentsWhoHelper.settings.bind(self)
       const settings = settingsFn(assignment, students)
-      const settingsKeys = _.keys(settings)
+      const settingsKeys = keys(settings)
       const expectedKeys = [
         'options',
         'title',
@@ -287,7 +287,7 @@ describe('MessageStudentsWhoHelper', () => {
       }
       const settingsFn = MessageStudentsWhoHelper.settings.bind(self)
       const settings = settingsFn(assignment, students)
-      const settingsKeys = _.keys(settings)
+      const settingsKeys = keys(settings)
       const expectedKeys = [
         'options',
         'title',

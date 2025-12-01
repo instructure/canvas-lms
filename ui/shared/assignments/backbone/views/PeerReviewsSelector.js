@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import {extend} from '@canvas/backbone/utils'
-import {includes} from 'lodash'
+import {includes} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import numberHelper from '@canvas/i18n/numberHelper'
 import template from '../../jst/PeerReviewsSelector.handlebars'

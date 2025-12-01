@@ -21,8 +21,8 @@ import {render, cleanup} from '@testing-library/react'
 import SearchGradingPeriodsField from '../SearchGradingPeriodsField'
 import userEvent from '@testing-library/user-event'
 
-jest.mock('lodash', () => ({
-  ...jest.requireActual('lodash'),
+jest.mock('es-toolkit/compat', () => ({
+  ...jest.requireActual('es-toolkit/compat'),
   debounce: jest.fn(fn => fn),
 }))
 

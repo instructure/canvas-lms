@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import {reject} from 'lodash'
+import {reject} from 'es-toolkit/compat'
 import template from '../../jst/FindFlickrImageView.handlebars'
 import resultTemplate from '../../jst/FindFlickrImageResult.handlebars'
 

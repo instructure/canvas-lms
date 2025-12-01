@@ -26,7 +26,7 @@ import React from 'react'
 import {render, waitFor, fireEvent, act} from '@testing-library/react'
 import {queries as domQueries, screen} from '@testing-library/dom'
 import CanvasStudioPlayer, {formatTracksForMediaPlayer} from '../CanvasStudioPlayer'
-import {uniqueId} from 'lodash'
+import {uniqueId} from 'es-toolkit/compat'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
