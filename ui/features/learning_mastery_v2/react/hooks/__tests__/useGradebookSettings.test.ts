@@ -25,6 +25,7 @@ import {
   SecondaryInfoDisplay,
   NameDisplayFormat,
   ScoreDisplayFormat,
+  OutcomeArrangement,
 } from '../../utils/constants'
 
 jest.mock('../../apiClient')
@@ -252,6 +253,53 @@ describe('useGradebookSettings', () => {
     expect(result.current.isLoading).toBe(false)
   })
 
+  it('sets outcomeArrangement from API response', async () => {
+    const mockSettings = {
+      secondary_info_display: SecondaryInfoDisplay.SIS_ID,
+      show_student_avatars: true,
+      show_students_with_no_results: true,
+      outcome_arrangement: OutcomeArrangement.CUSTOM,
+    }
+    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {},
+      data: {learning_mastery_gradebook_settings: mockSettings},
+    })
+
+    const {result, waitForNextUpdate} = renderHook(() => useGradebookSettings(courseId))
+    await waitForNextUpdate()
+
+    expect(result.current.settings.outcomeArrangement).toBe(OutcomeArrangement.CUSTOM)
+    expect(result.current.error).toBeNull()
+    expect(result.current.isLoading).toBe(false)
+  })
+
+  it('sets outcomeArrangement to default when missing in the response', async () => {
+    const mockSettings = {
+      secondary_info_display: SecondaryInfoDisplay.SIS_ID,
+      show_student_avatars: true,
+      show_students_with_no_results: true,
+    }
+    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {},
+      data: {learning_mastery_gradebook_settings: mockSettings},
+    })
+
+    const {result, waitForNextUpdate} = renderHook(() => useGradebookSettings(courseId))
+    await waitForNextUpdate()
+
+    expect(result.current.settings.outcomeArrangement).toBe(
+      DEFAULT_GRADEBOOK_SETTINGS.outcomeArrangement,
+    )
+    expect(result.current.error).toBeNull()
+    expect(result.current.isLoading).toBe(false)
+  })
+
   it('updateSettings updates settings', async () => {
     jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
@@ -275,6 +323,7 @@ describe('useGradebookSettings', () => {
         nameDisplayFormat: NameDisplayFormat.LAST_FIRST,
         studentsPerPage: 15,
         scoreDisplayFormat: ScoreDisplayFormat.ICON_AND_LABEL,
+        outcomeArrangement: OutcomeArrangement.UPLOAD_ORDER,
       })
     })
     expect(result.current.settings.secondaryInfoDisplay).toBe(SecondaryInfoDisplay.INTEGRATION_ID)
@@ -282,5 +331,6 @@ describe('useGradebookSettings', () => {
     expect(result.current.settings.nameDisplayFormat).toBe(NameDisplayFormat.LAST_FIRST)
     expect(result.current.settings.studentsPerPage).toBe(15)
     expect(result.current.settings.scoreDisplayFormat).toBe(ScoreDisplayFormat.ICON_AND_LABEL)
+    expect(result.current.settings.outcomeArrangement).toBe(OutcomeArrangement.UPLOAD_ORDER)
   })
 })

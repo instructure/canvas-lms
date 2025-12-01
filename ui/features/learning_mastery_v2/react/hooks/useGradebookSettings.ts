@@ -25,6 +25,7 @@ import {
   SecondaryInfoDisplay,
   NameDisplayFormat,
   ScoreDisplayFormat,
+  OutcomeArrangement,
   DEFAULT_GRADEBOOK_SETTINGS,
 } from '../utils/constants'
 
@@ -91,6 +92,9 @@ export const useGradebookSettings = (courseId: string): UseGradebookSettingsRetu
             scoreDisplayFormat:
               apiSettings.score_display_format ??
               (DEFAULT_GRADEBOOK_SETTINGS.scoreDisplayFormat as ScoreDisplayFormat),
+            outcomeArrangement:
+              apiSettings.outcome_arrangement ??
+              (DEFAULT_GRADEBOOK_SETTINGS.outcomeArrangement as OutcomeArrangement),
           }
 
           setSettings(loadedSettings)
