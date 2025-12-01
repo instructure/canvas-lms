@@ -34,17 +34,17 @@ const widgetRegistry: WidgetRegistry = {
   },
   [WIDGET_TYPES.COURSE_WORK]: {
     component: CourseWorkWidget,
-    displayName: 'Course Work',
+    displayName: 'Course work',
     description: 'View and manage all your course assignments and tasks',
   },
   [WIDGET_TYPES.COURSE_WORK_COMBINED]: {
     component: CourseWorkCombinedWidget,
-    displayName: 'Course Work Combined',
+    displayName: 'Course work combined',
     description: 'View course work statistics and assignments in one comprehensive view',
   },
   [WIDGET_TYPES.COURSE_GRADES]: {
     component: CourseGradesWidget,
-    displayName: 'Course Grades',
+    displayName: 'Course grades',
     description: 'Track your grades and academic progress across all courses',
   },
   [WIDGET_TYPES.ANNOUNCEMENTS]: {
