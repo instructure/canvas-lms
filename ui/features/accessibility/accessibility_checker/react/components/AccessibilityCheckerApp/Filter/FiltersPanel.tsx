@@ -29,6 +29,7 @@ import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 import {artifactTypeOptions, issueTypeOptions, stateOptions} from '../../../constants'
 import {AppliedFilter, FilterOption, Filters} from '../../../../../shared/react/types'
+import {useDateFormatPattern} from '../../../../../shared/react/hooks/useDateFormatPattern'
 import {getAppliedFilters, getFilters} from '../../../utils'
 import {responsiveQuerySizes} from '@canvas/breakpoints'
 import FilterCheckboxGroup from './FilterCheckboxGroup'
@@ -62,6 +63,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
   const [alertMessage, setAlertMessage] = useState<string | null>(null)
 
   const dateFormatter = useDateTimeFormat('date.formats.medium_with_weekday')
+  const dateFormatHint = useDateFormatPattern()
 
   useEffect(() => {
     const filters = getFilters(appliedFilters)
@@ -217,6 +219,12 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                     <Flex.Item overflowY="visible" height="auto">
                       <CanvasDateInput2
                         placeholder={I18n.t('From')}
+                        messages={[
+                          {
+                            type: 'hint',
+                            text: I18n.t('Expected format: %{format}', {format: dateFormatHint}),
+                          },
+                        ]}
                         width="100%"
                         selectedDate={fromDate?.value ?? null}
                         formatDate={dateFormatter}
@@ -231,6 +239,12 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                     <Flex.Item overflowY="visible" height="auto">
                       <CanvasDateInput2
                         placeholder={I18n.t('To')}
+                        messages={[
+                          {
+                            type: 'hint',
+                            text: I18n.t('Expected format: %{format}', {format: dateFormatHint}),
+                          },
+                        ]}
                         width="100%"
                         selectedDate={toDate?.value ?? null}
                         interaction="enabled"
