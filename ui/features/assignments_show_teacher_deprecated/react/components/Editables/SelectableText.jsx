@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, string, func, element, oneOf, oneOfType, arrayOf, shape} from 'prop-types'
-import isEqual from 'lodash/isEqual'
+import {isEqual} from 'es-toolkit/compat'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'

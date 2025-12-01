@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import DiscussionSettings from '../DiscussionSettings'
-import merge from 'lodash/merge'
+import {merge} from 'es-toolkit/compat'
 
 const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
 

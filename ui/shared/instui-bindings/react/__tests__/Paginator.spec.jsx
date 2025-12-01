@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import merge from 'lodash/merge'
+import {merge} from 'es-toolkit/compat'
 import Paginator from '../Paginator'
 
 const makeProps = (props = {}) =>

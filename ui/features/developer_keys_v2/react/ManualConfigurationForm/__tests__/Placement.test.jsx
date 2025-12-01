@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import get from 'lodash/get'
+import {get} from 'es-toolkit/compat'
 
 import Placement from '../Placement'
 
