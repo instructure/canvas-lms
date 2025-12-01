@@ -106,3 +106,36 @@ export async function updatePlannerOverride(
 
   return json
 }
+
+export interface CreatePlannerNoteParams {
+  title: string
+  todo_date: string
+  details?: string
+  course_id?: string
+}
+
+export interface PlannerNote {
+  id: number
+  title: string
+  description: string
+  user_id: number
+  workflow_state: string
+  course_id: number | null
+  todo_date: string
+  created_at: string
+  updated_at: string
+}
+
+export async function createPlannerNote(params: CreatePlannerNoteParams): Promise<PlannerNote> {
+  const {json} = await doFetchApi<PlannerNote>({
+    path: '/api/v1/planner_notes',
+    method: 'POST',
+    body: params,
+  })
+
+  if (!json) {
+    throw new Error('Failed to create planner note')
+  }
+
+  return json
+}

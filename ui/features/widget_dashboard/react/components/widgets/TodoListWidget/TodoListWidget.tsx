@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
+import React, {useMemo, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
@@ -24,14 +24,20 @@ import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import TodoItem from './TodoItem'
+import CreateTodoModal from './CreateTodoModal'
 import type {BaseWidgetProps} from '../../../types'
 import {usePlannerItems} from './hooks/usePlannerItems'
+import {useCreatePlannerNote} from './hooks/useCreatePlannerNote'
+import {useWidgetDashboard} from '../../../hooks/useWidgetDashboardContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
 const TodoListWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false}) => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   const dateRange = useMemo(() => {
     const twoWeeksAgo = new Date()
     twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
@@ -51,6 +57,46 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false})
       startDate: dateRange.startDate,
       endDate: dateRange.endDate,
     })
+
+  const {mutate: createPlannerNote, isPending: isCreating} = useCreatePlannerNote()
+  const {sharedCourseData} = useWidgetDashboard()
+
+  const handleCreateTodo = (data: {
+    title: string
+    todo_date: string
+    details?: string
+    course_id?: string
+  }) => {
+    createPlannerNote(data, {
+      onSuccess: () => {
+        setIsModalOpen(false)
+        showFlashAlert({
+          message: I18n.t('To-do item created successfully'),
+          type: 'success',
+        })
+      },
+      onError: () => {
+        showFlashAlert({
+          message: I18n.t('Failed to create to-do item. Please try again.'),
+          type: 'error',
+        })
+      },
+    })
+  }
+
+  // Transform shared course data to the format expected by CreateTodoModal
+  const courses = useMemo(
+    () =>
+      sharedCourseData.map(course => ({
+        id: course.courseId,
+        longName: course.courseName,
+        is_student: true,
+      })),
+    [sharedCourseData],
+  )
+
+  const locale = window.ENV?.LOCALE || 'en'
+  const timeZone = window.ENV?.TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone
 
   const renderContent = () => {
     if (currentPage.length === 0) {
@@ -77,28 +123,39 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false})
   }
 
   return (
-    <TemplateWidget
-      widget={widget}
-      isEditMode={isEditMode}
-      isLoading={isLoading}
-      error={error ? I18n.t('Failed to load to-do items. Please try again.') : null}
-      onRetry={refetch}
-      loadingText={I18n.t('Loading to-do items...')}
-      headerActions={
-        <Button size="small" disabled data-testid="new-todo-button">
-          {I18n.t('+ New')}
-        </Button>
-      }
-      pagination={{
-        currentPage: currentPageIndex + 1,
-        totalPages,
-        onPageChange: goToPage,
-        isLoading,
-        ariaLabel: I18n.t('To-do list pagination'),
-      }}
-    >
-      {renderContent()}
-    </TemplateWidget>
+    <>
+      <TemplateWidget
+        widget={widget}
+        isEditMode={isEditMode}
+        isLoading={isLoading}
+        error={error ? I18n.t('Failed to load to-do items. Please try again.') : null}
+        onRetry={refetch}
+        loadingText={I18n.t('Loading to-do items...')}
+        headerActions={
+          <Button size="small" onClick={() => setIsModalOpen(true)} data-testid="new-todo-button">
+            {I18n.t('+ New')}
+          </Button>
+        }
+        pagination={{
+          currentPage: currentPageIndex + 1,
+          totalPages,
+          onPageChange: goToPage,
+          isLoading,
+          ariaLabel: I18n.t('To-do list pagination'),
+        }}
+      >
+        {renderContent()}
+      </TemplateWidget>
+      <CreateTodoModal
+        open={isModalOpen}
+        onDismiss={() => setIsModalOpen(false)}
+        onSubmit={handleCreateTodo}
+        isCreating={isCreating}
+        courses={courses}
+        locale={locale}
+        timeZone={timeZone}
+      />
+    </>
   )
 }
 

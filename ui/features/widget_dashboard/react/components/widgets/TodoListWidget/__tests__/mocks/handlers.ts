@@ -122,3 +122,38 @@ export const errorCreateOverrideHandler = http.post('/api/v1/planner/overrides',
 export const errorUpdateOverrideHandler = http.put('/api/v1/planner/overrides/:id', () => {
   return HttpResponse.json({errors: [{message: 'Failed to update override'}]}, {status: 500})
 })
+
+let plannerNoteIdCounter = 2000
+
+export const plannerNoteHandlers = [
+  http.post('/api/v1/planner_notes', async ({request}) => {
+    const body = (await request.json()) as {
+      title: string
+      todo_date: string
+      details?: string
+      course_id?: string
+    }
+
+    const plannerNote = {
+      id: plannerNoteIdCounter++,
+      title: body.title,
+      description: body.details || '',
+      user_id: 1,
+      workflow_state: 'active',
+      course_id: body.course_id ? parseInt(body.course_id, 10) : null,
+      todo_date: body.todo_date,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+
+    return HttpResponse.json(plannerNote, {status: 201})
+  }),
+]
+
+export const errorCreatePlannerNoteHandler = http.post('/api/v1/planner_notes', () => {
+  return HttpResponse.json({errors: [{message: 'Failed to create planner note'}]}, {status: 500})
+})
+
+export const validationErrorPlannerNoteHandler = http.post('/api/v1/planner_notes', () => {
+  return HttpResponse.json({errors: {title: [{message: 'Title is required'}]}}, {status: 400})
+})

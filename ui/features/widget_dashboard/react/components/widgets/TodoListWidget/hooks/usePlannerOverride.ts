@@ -47,75 +47,12 @@ export function usePlannerOverride() {
         })
       }
     },
-    onMutate: async ({item, markedComplete}: ToggleCompleteParams) => {
-      await queryClient.cancelQueries({queryKey: [PLANNER_ITEMS_QUERY_KEY]})
-
-      const previousData = queryClient.getQueriesData({queryKey: [PLANNER_ITEMS_QUERY_KEY]})
-
-      queryClient.setQueriesData({queryKey: [PLANNER_ITEMS_QUERY_KEY]}, (old: any) => {
-        if (!old) return old
-
-        return {
-          ...old,
-          items: old.items?.map((plannerItem: PlannerItem) => {
-            if (
-              plannerItem.plannable_id === item.plannable_id &&
-              plannerItem.plannable_type === item.plannable_type
-            ) {
-              return {
-                ...plannerItem,
-                planner_override: item.planner_override
-                  ? {...item.planner_override, marked_complete: markedComplete}
-                  : {
-                      id: -1,
-                      plannable_type: item.plannable_type,
-                      plannable_id: item.plannable_id,
-                      user_id: -1,
-                      workflow_state: 'active',
-                      marked_complete: markedComplete,
-                      dismissed: false,
-                      deleted_at: null,
-                      created_at: new Date().toISOString(),
-                      updated_at: new Date().toISOString(),
-                    },
-              }
-            }
-            return plannerItem
-          }),
-        }
-      })
-
-      return {previousData}
+    onSuccess: () => {
+      // Invalidate queries to trigger a refetch with updated data
+      queryClient.invalidateQueries({queryKey: [PLANNER_ITEMS_QUERY_KEY]})
     },
-    onError: (error, variables, context) => {
-      if (context?.previousData) {
-        context.previousData.forEach(([queryKey, data]) => {
-          queryClient.setQueryData(queryKey, data)
-        })
-      }
-
+    onError: () => {
       showFlashError(I18n.t('Failed to update item. Please try again.'))()
-    },
-    onSuccess: (updatedOverride: PlannerOverride, {item}: ToggleCompleteParams) => {
-      queryClient.setQueriesData({queryKey: [PLANNER_ITEMS_QUERY_KEY]}, (old: any) => {
-        if (!old) return old
-
-        return {
-          ...old,
-          items: old.items?.map((plannerItem: PlannerItem) => {
-            if (
-              plannerItem.plannable_id === item.plannable_id &&
-              plannerItem.plannable_type === item.plannable_type
-            ) {
-              return {
-                ...plannerItem,
-                planner_override: updatedOverride,
-              }
-            }
-            return plannerItem
-          }),
-        }
-      })
     },
   })
 
