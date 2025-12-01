@@ -138,4 +138,15 @@ describe('WhyMattersPopover', () => {
     expect(dialog).toHaveAttribute('role', 'dialog')
     expect(dialog).toHaveAttribute('aria-label', 'Why it matters')
   })
+
+  it('renders IMPORTANT as a heading for screen reader navigation', async () => {
+    const user = userEvent.setup()
+    render(<WhyMattersPopover issue={mockIssue} />)
+
+    const button = screen.getByTestId('why-it-matters-button')
+    await user.click(button)
+
+    const importantHeading = screen.getByText('IMPORTANT').closest('h4')
+    expect(importantHeading).toBeInTheDocument()
+  })
 })
