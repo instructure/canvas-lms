@@ -713,6 +713,7 @@ class Submission < ActiveRecord::Base
 
   def user_can_read_grade?(user, session = nil, for_plagiarism: false)
     # improves performance by checking permissions on the assignment before the submission
+    # for asset reports permissions, see also app/graphql/types/submission_type.rb#lti_asset_reports_connection
     return true if assignment.user_can_read_grades?(user, session)
     return false if hide_grade_from_student?(for_plagiarism:)
     return true if user && user.id == user_id # this is fast, so skip the policy cache check if possible
