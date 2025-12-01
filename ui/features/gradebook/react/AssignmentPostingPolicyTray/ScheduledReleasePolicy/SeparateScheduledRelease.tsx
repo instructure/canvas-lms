@@ -24,10 +24,10 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('assignment_scheduled_release_policy')
 const GRADES_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR = I18n.t(
-  'Grades release date must be the same or after comments release date'
+  'Grades release date must be the same or after comments release date',
 )
 const COMMENTS_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR = I18n.t(
-  'Comments release date must be the same or before grades release date'
+  'Comments release date must be the same or before grades release date',
 )
 
 type SeparateScheduledReleaseProps = {
@@ -57,7 +57,7 @@ export const SeparateScheduledRelease = ({
   const validateReleaseDates = (
     gradesDateString: string | null,
     commentsDateString: string | null,
-    changedField: 'grades' | 'comments'
+    changedField: 'grades' | 'comments',
   ) => {
     const gradeMessages: FormMessage[] = []
     const commentMessages: FormMessage[] = []
@@ -85,12 +85,14 @@ export const SeparateScheduledRelease = ({
     }
 
     // Preserve existing errors from the unchanged field (excluding relationship errors)
-    const preservedGradeErrors = changedField === 'comments' ? filterRelationshipErrors(gradeErrorMessages) : []
-    const preservedCommentErrors = changedField === 'grades' ? filterRelationshipErrors(commentErrorMessages) : []
+    const preservedGradeErrors =
+      changedField === 'comments' ? filterRelationshipErrors(gradeErrorMessages) : []
+    const preservedCommentErrors =
+      changedField === 'grades' ? filterRelationshipErrors(commentErrorMessages) : []
 
     handleErrorMessages(
       [...preservedGradeErrors, ...gradeMessages],
-      [...preservedCommentErrors, ...commentMessages]
+      [...preservedCommentErrors, ...commentMessages],
     )
   }
 
@@ -124,7 +126,7 @@ export const SeparateScheduledRelease = ({
     <View as="div" margin="0 medium 0">
       <View as="div" margin="medium 0" data-testid="separate-scheduled-post-datetime-grade">
         <DateTimeInput
-          description={<ScreenReaderContent>{I18n.t('Pick a date and time')}</ScreenReaderContent>}
+          description={<ScreenReaderContent>{I18n.t('Grades Release Date')}</ScreenReaderContent>}
           datePlaceholder={I18n.t('Select Date')}
           dateRenderLabel={I18n.t('Grades Release Date')}
           timeRenderLabel={I18n.t('Time')}
@@ -142,7 +144,7 @@ export const SeparateScheduledRelease = ({
       </View>
       <View as="div" margin="medium 0" data-testid="separate-scheduled-post-datetime-comment">
         <DateTimeInput
-          description={<ScreenReaderContent>{I18n.t('Pick a date and time')}</ScreenReaderContent>}
+          description={<ScreenReaderContent>{I18n.t('Comments Release Date')}</ScreenReaderContent>}
           datePlaceholder={I18n.t('Select Date')}
           dateRenderLabel={I18n.t('Comments Release Date')}
           timeRenderLabel={I18n.t('Time')}
