@@ -138,6 +138,7 @@ describe('OutcomeSearch', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    jest.useFakeTimers()
     jest.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
       outcomes: mockOutcomes,
       outcomesCount: mockOutcomes.length,
@@ -150,6 +151,8 @@ describe('OutcomeSearch', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+    jest.runOnlyPendingTimers()
+    jest.useRealTimers()
   })
 
   it('renders OutcomeSearch with CanvasMultiSelect', () => {
@@ -223,15 +226,16 @@ describe('OutcomeSearch', () => {
       input.dispatchEvent(new Event('input', {bubbles: true}))
     })
 
-    await waitFor(
-      () => {
-        expect(useOutcomesHook.useOutcomes).toHaveBeenCalledWith({
-          courseId: '123',
-          searchTerm: 'Search Result',
-        })
-      },
-      {timeout: 1000},
-    )
+    act(() => {
+      jest.advanceTimersByTime(750)
+    })
+
+    await waitFor(() => {
+      expect(useOutcomesHook.useOutcomes).toHaveBeenCalledWith({
+        courseId: '123',
+        searchTerm: 'Search Result',
+      })
+    })
   })
 
   it('renders component when useOutcomes hook returns error', () => {
@@ -306,30 +310,32 @@ describe('OutcomeSearch', () => {
       input.dispatchEvent(new Event('input', {bubbles: true}))
     })
 
-    await waitFor(
-      () => {
-        expect(useOutcomesHook.useOutcomes).toHaveBeenCalledWith({
-          courseId: '123',
-          searchTerm: 'Search',
-        })
-      },
-      {timeout: 1000},
-    )
+    act(() => {
+      jest.advanceTimersByTime(750)
+    })
+
+    await waitFor(() => {
+      expect(useOutcomesHook.useOutcomes).toHaveBeenCalledWith({
+        courseId: '123',
+        searchTerm: 'Search',
+      })
+    })
 
     act(() => {
       Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(input, '')
       input.dispatchEvent(new Event('input', {bubbles: true}))
     })
 
-    await waitFor(
-      () => {
-        expect(useOutcomesHook.useOutcomes).toHaveBeenCalledWith({
-          courseId: '123',
-          searchTerm: '',
-        })
-      },
-      {timeout: 1000},
-    )
+    act(() => {
+      jest.advanceTimersByTime(750)
+    })
+
+    await waitFor(() => {
+      expect(useOutcomesHook.useOutcomes).toHaveBeenCalledWith({
+        courseId: '123',
+        searchTerm: '',
+      })
+    })
 
     expect(screen.getByText('Outcomes')).toBeInTheDocument()
   })
@@ -365,15 +371,16 @@ describe('OutcomeSearch', () => {
       input.dispatchEvent(new Event('input', {bubbles: true}))
     })
 
-    await waitFor(
-      () => {
-        expect(useOutcomesHook.useOutcomes).toHaveBeenCalledWith({
-          courseId: '123',
-          searchTerm: 'Search',
-        })
-      },
-      {timeout: 1000},
-    )
+    act(() => {
+      jest.advanceTimersByTime(750)
+    })
+
+    await waitFor(() => {
+      expect(useOutcomesHook.useOutcomes).toHaveBeenCalledWith({
+        courseId: '123',
+        searchTerm: 'Search',
+      })
+    })
 
     expect(screen.getByText('Outcomes')).toBeInTheDocument()
   })
