@@ -84,6 +84,10 @@
 #           "description": "This is the current line count being written to the report. It updates every 1000 records.",
 #           "example": "12000",
 #           "type": "integer"
+#         },
+#         "user": {
+#           "description": "The user that initiated the account report. See the Users API for details.",
+#           "$ref": "User"
 #         }
 #       }
 #     }
