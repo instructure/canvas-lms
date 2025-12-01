@@ -64,7 +64,7 @@ module Accessibility
       end
 
       def message
-        I18n.t("Add a description for screen readers so people who are blind or have low vision can understand what's in the image.")
+        I18n.t("Add a description (alt text) for screen reader users and instances where the image fails to load.")
       end
 
       def issue_preview(elem)
