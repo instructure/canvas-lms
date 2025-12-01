@@ -464,6 +464,56 @@ module Lti
         tool_proxy.save!
         expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_falsey
       end
+
+      context "with lti_asset_processor_tii_migration feature flag" do
+        before do
+          allow_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:create_subscription).and_return("subscription_id")
+          account.root_account.enable_feature!(:lti_asset_processor_tii_migration)
+        end
+
+        it "returns true for non-migrated tool proxies with the capability" do
+          tool_proxy.raw_data["enabled_capability"] = [placement]
+          tool_proxy.save!
+          expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_truthy
+        end
+
+        it "returns false for migrated tool proxies with the capability" do
+          migrated_tool = external_tool_1_3_model(context: course, opts: { name: "migrated tool" })
+          tool_proxy.update!(migrated_to_context_external_tool: migrated_tool)
+          tool_proxy.raw_data["enabled_capability"] = [placement]
+          tool_proxy.save!
+          expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_falsey
+        end
+
+        it "returns true when non-migrated tool has capability and migrated tool does not" do
+          tp1 = create_tool_proxy(course)
+          rh1 = Lti::ResourceHandler.create!(resource_type_code: "code1", name: "resource1", tool_proxy: tp1)
+          mh1 = Lti::MessageHandler.create!(message_type: "basic-lti-launch-request", launch_path: "https://launch1/blti", resource_handler: rh1, tool_proxy: tp1)
+          mh1.update!(capabilities: [placement])
+
+          tp2 = create_tool_proxy(course)
+          migrated_tool = external_tool_1_3_model(context: course, opts: { name: "migrated tool" })
+          tp2.update!(migrated_to_context_external_tool: migrated_tool)
+          tp2.raw_data["enabled_capability"] = [placement]
+          tp2.save!
+
+          expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_truthy
+        end
+
+        it "returns false when all tools with capability are migrated" do
+          migrated_tool = external_tool_1_3_model(context: course, opts: { name: "migrated tool" })
+          tool_proxy.update!(migrated_to_context_external_tool: migrated_tool)
+          tool_proxy.raw_data["enabled_capability"] = [placement]
+          tool_proxy.save!
+
+          tp2 = create_tool_proxy(course)
+          rh2 = Lti::ResourceHandler.create!(resource_type_code: "code2", name: "resource2", tool_proxy: tp2)
+          mh2 = Lti::MessageHandler.create!(message_type: "basic-lti-launch-request", launch_path: "https://launch2/blti", resource_handler: rh2, tool_proxy: tp2)
+          mh2.update!(capabilities: [])
+
+          expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_falsey
+        end
+      end
     end
 
     describe "#matching_tool_profile?" do
