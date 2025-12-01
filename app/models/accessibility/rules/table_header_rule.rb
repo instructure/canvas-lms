@@ -40,7 +40,8 @@ module Accessibility
             I18n.t("The top row"),
             I18n.t("The left column"),
             I18n.t("Both")
-          ]
+          ],
+          action: I18n.t("Set headings")
         )
       end
 
