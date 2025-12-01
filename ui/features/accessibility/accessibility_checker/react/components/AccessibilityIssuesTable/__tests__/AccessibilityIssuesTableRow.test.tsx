@@ -27,7 +27,7 @@ describe('AccessibilityIssuesTableRow', () => {
     render(
       <Table caption="Test table">
         <Table.Body>
-          <AccessibilityIssuesTableRow item={mockScan1} />
+          <AccessibilityIssuesTableRow item={mockScan1} isMobile={false} />
         </Table.Body>
       </Table>,
     )

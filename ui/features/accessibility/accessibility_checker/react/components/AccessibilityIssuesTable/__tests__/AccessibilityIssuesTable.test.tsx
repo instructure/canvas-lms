@@ -33,6 +33,14 @@ jest.mock('../../../../../shared/react/hooks/useAccessibilityScansFetchUtils', (
   useAccessibilityScansFetchUtils: jest.fn(),
 }))
 
+// Mock breakpoints to always return desktop queries for sortable table
+jest.mock('@canvas/breakpoints', () => ({
+  ...jest.requireActual('@canvas/breakpoints'),
+  responsiveQuerySizes: () => ({
+    desktop: {minWidth: '0px'},
+  }),
+}))
+
 const mockDoFetch = jest.fn()
 
 const createWrapper = () => {
