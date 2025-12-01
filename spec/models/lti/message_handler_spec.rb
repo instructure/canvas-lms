@@ -125,6 +125,49 @@ module Lti
       end
     end
 
+    describe "scope #for_non_migrated_tool_proxies" do
+      before :once do
+        @account = Account.create!
+        @tp1 = create_tool_proxy(context: @account)
+        @tp2 = create_tool_proxy(context: @account)
+        @tp3 = create_tool_proxy(context: @account)
+        @rh1 = create_resource_handler(@tp1)
+        @rh2 = create_resource_handler(@tp2)
+        @rh3 = create_resource_handler(@tp3)
+        @mh1 = create_message_handler(@rh1)
+        @mh2 = create_message_handler(@rh2)
+        @mh3 = create_message_handler(@rh3)
+      end
+
+      it "returns message handlers for tool proxies without migration" do
+        handlers = described_class.for_non_migrated_tool_proxies
+        expect(handlers.count).to eq 3
+        expect(handlers).to include(@mh1, @mh2, @mh3)
+      end
+
+      it "excludes message handlers for migrated tool proxies" do
+        migrated_tool = external_tool_1_3_model(context: @account, opts: { name: "migrated tool" })
+        @tp2.update!(migrated_to_context_external_tool: migrated_tool)
+
+        handlers = described_class.for_non_migrated_tool_proxies
+        expect(handlers.count).to eq 2
+        expect(handlers).to include(@mh1, @mh3)
+        expect(handlers).not_to include(@mh2)
+      end
+
+      it "includes only message handlers where tool_proxy has nil migrated_to_context_external_tool_id" do
+        migrated_tool1 = external_tool_1_3_model(context: @account, opts: { name: "migrated tool 1" })
+        migrated_tool2 = external_tool_1_3_model(context: @account, opts: { name: "migrated tool 2" })
+        @tp1.update!(migrated_to_context_external_tool: migrated_tool1)
+        @tp2.update!(migrated_to_context_external_tool: migrated_tool2)
+
+        handlers = described_class.for_non_migrated_tool_proxies
+        expect(handlers.count).to eq 1
+        expect(handlers).to include(@mh3)
+        expect(handlers).not_to include(@mh1, @mh2)
+      end
+    end
+
     describe "#lti_apps_tabs" do
       before :once do
         @tp = create_tool_proxy

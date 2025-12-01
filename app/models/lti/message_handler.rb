@@ -49,6 +49,11 @@ module Lti
                 .arel.exists)
     }
 
+    scope :for_non_migrated_tool_proxies, lambda {
+      joins(resource_handler: :tool_proxy)
+        .where(lti_tool_proxies: { migrated_to_context_external_tool: nil })
+    }
+
     def self.lti_apps_tabs(context, placements, _opts)
       apps = Lti::MessageHandler.for_context(context)
                                 .has_placements(*placements)
