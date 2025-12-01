@@ -49,7 +49,11 @@ export const ScheduledReleasePolicy = ({
   handleErrorMessages,
 }: ScheduledReleasePolicyProps) => {
   const inputs = [
-    {value: 'shared', label: I18n.t('Grades & Comments Together'), dataTestId: 'shared-scheduled-post'},
+    {
+      value: 'shared',
+      label: I18n.t('Grades & Comments Together'),
+      dataTestId: 'shared-scheduled-post',
+    },
     {value: 'separate', label: I18n.t('Separate Schedules'), dataTestId: 'separate-scheduled-post'},
   ]
 
@@ -69,8 +73,12 @@ export const ScheduledReleasePolicy = ({
   }
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedValue(event.target.value)
-    const postCommentsAtDate = event.target.value === 'shared' ? postGradesAt : postCommentsAt 
-    handleChange({scheduledPostMode: event.target.value, postCommentsAt: postCommentsAtDate, postGradesAt})
+    const postCommentsAtDate = event.target.value === 'shared' ? postGradesAt : postCommentsAt
+    handleChange({
+      scheduledPostMode: event.target.value,
+      postCommentsAt: postCommentsAtDate,
+      postGradesAt,
+    })
   }
   return (
     <View as="div" margin="medium 0 0 medium" data-testid="scheduled-release-policy">
@@ -87,16 +95,15 @@ export const ScheduledReleasePolicy = ({
             onChange={handleRadioChange}
             name="scheduled_release_policy"
             value={selectedValue ?? undefined}
-            description={
-              <ScreenReaderContent>
-                {I18n.t(
-                  'When the assignment is released, grades and comments will be posted together or separately.',
-                )}
-              </ScreenReaderContent>
-            }
+            description={I18n.t('Release Options')}
           >
             {inputs.map(input => (
-              <RadioInput key={input.value} value={input.value} label={input.label} data-testid={input.dataTestId} />
+              <RadioInput
+                key={input.value}
+                value={input.value}
+                label={input.label}
+                data-testid={input.dataTestId}
+              />
             ))}
           </RadioInputGroup>
           {selectedValue === 'shared' && (
