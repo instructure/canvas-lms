@@ -156,7 +156,9 @@ export const AccessibilityIssuesTable = () => {
       <View as="div" margin="medium 0 0 0" borderWidth="small" borderRadius="medium">
         <Table
           caption={
-            <ScreenReaderContent>{I18n.t('Content with accessibility issues')}</ScreenReaderContent>
+            <ScreenReaderContent>
+              {I18n.t('Resources with accessibility issues')}
+            </ScreenReaderContent>
           }
           hover
           data-testid="accessibility-issues-table"
