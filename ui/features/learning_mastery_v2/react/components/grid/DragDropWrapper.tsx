@@ -27,7 +27,7 @@ import {
   ConnectDragSource,
   ConnectDropTarget,
 } from 'react-dnd'
-import {flowRight as compose} from 'lodash'
+import {flowRight as compose} from 'es-toolkit/compat'
 
 interface DragItem {
   id: string | number

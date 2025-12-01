@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import merge from 'lodash/merge'
+import {merge} from 'es-toolkit/compat'
 import ConfirmDeleteModal from '../ConfirmDeleteModal'
 
 const container = document.createElement('div')

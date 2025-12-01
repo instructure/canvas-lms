@@ -18,8 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {createActions} from 'redux-actions'
-import isEqual from 'lodash/isEqual'
-import range from 'lodash/range'
+import {isEqual, range} from 'es-toolkit/compat'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 

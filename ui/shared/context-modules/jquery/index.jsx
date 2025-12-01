@@ -34,7 +34,7 @@ import Publishable from '../backbone/models/Publishable'
 import PublishButtonView from '@canvas/publish-button-view'
 // eslint-disable-next-line import/no-named-as-default
 import htmlEscape from '@instructure/html-escape'
-import get from 'lodash/get'
+import {get} from 'es-toolkit/compat'
 import axios from '@canvas/axios'
 import {showFlashError, showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import '@canvas/jquery/jquery.ajaxJSON'

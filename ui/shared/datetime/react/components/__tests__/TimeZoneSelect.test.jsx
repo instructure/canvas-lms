@@ -19,7 +19,7 @@
 import React from 'react'
 import TimeZoneSelect from '../TimeZoneSelect'
 import {render} from '@testing-library/react'
-import isEqual from 'lodash/isEqual'
+import {isEqual} from 'es-toolkit/compat'
 
 let liveRegion = null
 beforeAll(() => {
