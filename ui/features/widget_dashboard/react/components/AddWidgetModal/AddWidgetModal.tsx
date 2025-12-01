@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getAllWidgets} from '../WidgetRegistry'
+import {useWidgetLayout} from '../../hooks/useWidgetLayout'
 import WidgetCard from './WidgetCard'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -40,6 +41,23 @@ const AddWidgetModal: React.FC<AddWidgetModalProps> = ({
   targetColumn,
   targetRow,
 }) => {
+  const {addWidget, config} = useWidgetLayout()
+
+  const isWidgetOnDashboard = useCallback(
+    (widgetType: string): boolean => {
+      return config.widgets.some(w => w.type === widgetType)
+    },
+    [config.widgets],
+  )
+
+  const handleAddWidget = useCallback(
+    (widgetType: string, displayName: string) => {
+      addWidget(widgetType, displayName, targetColumn, targetRow)
+      onClose()
+    },
+    [addWidget, targetColumn, targetRow, onClose],
+  )
+
   return (
     <Modal
       open={open}
@@ -66,10 +84,8 @@ const AddWidgetModal: React.FC<AddWidgetModalProps> = ({
                 type={type}
                 displayName={renderer.displayName}
                 description={renderer.description}
-                onAdd={() => {
-                  console.log('Add widget:', type)
-                }}
-                disabled={false}
+                onAdd={() => handleAddWidget(type, renderer.displayName)}
+                disabled={isWidgetOnDashboard(type)}
               />
             </Flex.Item>
           ))}

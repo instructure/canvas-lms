@@ -20,8 +20,14 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AddWidgetModal from '../AddWidgetModal'
+import {useWidgetLayout} from '../../../hooks/useWidgetLayout'
+
+jest.mock('../../../hooks/useWidgetLayout')
+
+const mockUseWidgetLayout = useWidgetLayout as jest.MockedFunction<typeof useWidgetLayout>
 
 describe('AddWidgetModal', () => {
+  const mockAddWidget = jest.fn()
   const defaultProps = {
     open: true,
     onClose: jest.fn(),
@@ -31,6 +37,14 @@ describe('AddWidgetModal', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockUseWidgetLayout.mockReturnValue({
+      config: {widgets: []},
+      addWidget: mockAddWidget,
+      moveWidget: jest.fn(),
+      moveWidgetToPosition: jest.fn(),
+      removeWidget: jest.fn(),
+      resetConfig: jest.fn(),
+    } as any)
   })
 
   it('renders when open is true', () => {
@@ -87,18 +101,29 @@ describe('AddWidgetModal', () => {
     expect(addButtons).toHaveLength(7)
   })
 
-  it('logs to console when Add button is clicked', async () => {
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
+  it('calls addWidget with correct parameters when Add button is clicked', async () => {
     const user = userEvent.setup()
     render(<AddWidgetModal {...defaultProps} />)
 
     const addButtons = screen.getAllByRole('button', {name: 'Add'})
     await user.click(addButtons[0])
 
-    expect(consoleSpy).toHaveBeenCalled()
-    expect(consoleSpy.mock.calls[0][0]).toBe('Add widget:')
+    expect(mockAddWidget).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.any(String),
+      defaultProps.targetColumn,
+      defaultProps.targetRow,
+    )
+  })
 
-    consoleSpy.mockRestore()
+  it('closes modal after adding widget', async () => {
+    const user = userEvent.setup()
+    render(<AddWidgetModal {...defaultProps} />)
+
+    const addButtons = screen.getAllByRole('button', {name: 'Add'})
+    await user.click(addButtons[0])
+
+    expect(defaultProps.onClose).toHaveBeenCalledTimes(1)
   })
 
   it('calls onClose when close button is clicked', async () => {
@@ -116,5 +141,86 @@ describe('AddWidgetModal', () => {
     render(<AddWidgetModal {...defaultProps} />)
     const modal = screen.getByTestId('add-widget-modal')
     expect(modal).toHaveAttribute('aria-label', 'Add widget')
+  })
+
+  it('disables Add button for widgets already on dashboard', () => {
+    mockUseWidgetLayout.mockReturnValue({
+      config: {
+        widgets: [
+          {
+            id: 'course_work_summary-widget-1',
+            type: 'course_work_summary',
+            position: {col: 1, row: 1, relative: 1},
+            title: "Today's course work",
+          },
+        ],
+      },
+      addWidget: mockAddWidget,
+      moveWidget: jest.fn(),
+      moveWidgetToPosition: jest.fn(),
+      removeWidget: jest.fn(),
+      resetConfig: jest.fn(),
+    } as any)
+
+    render(<AddWidgetModal {...defaultProps} />)
+
+    const addedButton = screen.getByRole('button', {name: 'Added'})
+    expect(addedButton).toBeDisabled()
+  })
+
+  it('enables Add button for widgets not on dashboard', () => {
+    mockUseWidgetLayout.mockReturnValue({
+      config: {
+        widgets: [
+          {
+            id: 'course_work_summary-widget-1',
+            type: 'course_work_summary',
+            position: {col: 1, row: 1, relative: 1},
+            title: "Today's course work",
+          },
+        ],
+      },
+      addWidget: mockAddWidget,
+      moveWidget: jest.fn(),
+      moveWidgetToPosition: jest.fn(),
+      removeWidget: jest.fn(),
+      resetConfig: jest.fn(),
+    } as any)
+
+    render(<AddWidgetModal {...defaultProps} />)
+
+    const addButtons = screen.getAllByRole('button', {name: 'Add'})
+    addButtons.forEach(button => {
+      expect(button).not.toBeDisabled()
+    })
+  })
+
+  it('does not call addWidget when clicking disabled button', async () => {
+    mockUseWidgetLayout.mockReturnValue({
+      config: {
+        widgets: [
+          {
+            id: 'course_work_summary-widget-1',
+            type: 'course_work_summary',
+            position: {col: 1, row: 1, relative: 1},
+            title: "Today's course work",
+          },
+        ],
+      },
+      addWidget: mockAddWidget,
+      moveWidget: jest.fn(),
+      moveWidgetToPosition: jest.fn(),
+      removeWidget: jest.fn(),
+      resetConfig: jest.fn(),
+    } as any)
+
+    const user = userEvent.setup()
+    render(<AddWidgetModal {...defaultProps} />)
+
+    const addedButton = screen.getByRole('button', {name: 'Added'})
+    await user.click(addedButton)
+
+    expect(mockAddWidget).not.toHaveBeenCalled()
+    expect(defaultProps.onClose).not.toHaveBeenCalled()
   })
 })
