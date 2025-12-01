@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import $ from 'jquery'
 import updateSubnavMenuToggle from './updateSubnavMenuToggle'
 

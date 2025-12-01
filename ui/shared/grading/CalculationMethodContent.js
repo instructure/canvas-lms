@@ -14,7 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {mixin, reduce, each, max, last, filter, sum} from 'lodash'
+import {reduce, each, max, last, filter, sum} from 'es-toolkit/compat'
+import {mixin} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import numberFormat from '@canvas/i18n/numberFormat'
 

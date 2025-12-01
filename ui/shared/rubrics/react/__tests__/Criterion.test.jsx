@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash'
+import {toPairs} from 'es-toolkit/compat'
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -27,7 +27,7 @@ const criteriaTypes = ['custom', 'outcome']
 
 const subComponents = ['Threshold', 'OutcomeIcon', 'LongDescription', 'LongDescriptionDialog']
 
-_.toPairs(rubrics).forEach(([key, rubric]) => {
+toPairs(rubrics).forEach(([key, rubric]) => {
   const assessment = assessments[key]
 
   describe(rubric.title, () => {

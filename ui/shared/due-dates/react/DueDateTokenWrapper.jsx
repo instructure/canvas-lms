@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {chain, debounce, find, map, groupBy, isEmpty, some, union} from 'lodash'
+import {debounce, groupBy, isEmpty, union, find, map, some} from 'es-toolkit/compat'
+import {chain} from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
 import OverrideStudentStore from './OverrideStudentStore'

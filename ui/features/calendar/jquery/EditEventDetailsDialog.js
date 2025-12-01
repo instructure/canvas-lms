@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {some, filter} from 'lodash'
+import {some, filter} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import EditCalendarEventDetails from './EditCalendarEventDetails'
 import EditAssignmentDetails from '../backbone/views/EditAssignmentDetails'

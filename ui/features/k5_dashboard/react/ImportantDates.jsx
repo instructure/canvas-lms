@@ -36,7 +36,7 @@ import FilterCalendarsModal, {ImportantDatesContextsShape} from './FilterCalenda
 import ImportantDatesEmpty from './ImportantDatesEmpty'
 import ImportantDateSection from './ImportantDateSection'
 import {groupImportantDates} from '@canvas/k5/react/utils'
-import _ from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 
 const I18n = createI18nScope('important_dates')
 
@@ -65,7 +65,7 @@ const ImportantDates = ({
     if (
       contexts &&
       (!previousContextsRef.current ||
-        (observerMode && !_.isEqual(previousContextsRef.current, contexts)))
+        (observerMode && !isEqual(previousContextsRef.current, contexts)))
     ) {
       previousContextsRef.current = contexts
       // If the user has no selected contexts saved already, default them to the first X contexts

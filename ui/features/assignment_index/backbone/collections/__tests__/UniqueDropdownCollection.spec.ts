@@ -18,7 +18,7 @@
 
 import UniqueDropdownCollection from '../UniqueDropdownCollection'
 import Backbone from '@canvas/backbone'
-import _ from 'lodash'
+import {map} from 'es-toolkit/compat'
 
 describe('UniqueDropdownCollection', () => {
   let records: Backbone.Model[], coll: UniqueDropdownCollection
@@ -33,7 +33,7 @@ describe('UniqueDropdownCollection', () => {
     })()
     coll = new UniqueDropdownCollection(records, {
       propertyName: 'state',
-      possibleValues: _.map([1, 2, 3, 4], i => i.toString()),
+      possibleValues: map([1, 2, 3, 4], i => i.toString()),
     })
   })
 
@@ -119,7 +119,7 @@ describe('UniqueDropdownCollection, lazy setup', () => {
     })()
     coll = new UniqueDropdownCollection([], {
       propertyName: 'state',
-      possibleValues: _.map([1, 2, 3, 4], i => i.toString()),
+      possibleValues: map([1, 2, 3, 4], i => i.toString()),
     })
   })
 

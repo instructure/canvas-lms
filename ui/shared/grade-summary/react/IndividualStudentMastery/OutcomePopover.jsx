@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import _ from 'lodash'
+import {memoize, sortBy, last, find} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -60,16 +60,16 @@ class OutcomePopover extends React.Component {
       const maxRating = outcomeProficiency.ratings[0].points
       const scaledScore = maxRating * percentage
       return (
-        _.find(outcomeProficiency.ratings, r => scaledScore >= r.points) ||
-        _.last(outcomeProficiency.ratings)
+        find(outcomeProficiency.ratings, r => scaledScore >= r.points) ||
+        last(outcomeProficiency.ratings)
       )
     } else if (hasScore) {
-      return _.find(this.defaultProficiency(mastery_points).ratings, r => score >= r.points)
+      return find(this.defaultProficiency(mastery_points).ratings, r => score >= r.points)
     }
     return null
   }
 
-  defaultProficiency = _.memoize(mastery_points => ({
+  defaultProficiency = memoize(mastery_points => ({
     ratings: [
       {points: mastery_points * 1.5, color: '02672D', description: I18n.t('Exceeds Mastery')},
       {points: mastery_points, color: '03893D', description: I18n.t('Meets Mastery')},
@@ -81,7 +81,7 @@ class OutcomePopover extends React.Component {
   latestTime() {
     const {outcome} = this.props
     if (outcome.results.length > 0) {
-      return _.sortBy(outcome.results, r => -r.submitted_or_assessed_at)[0].submitted_or_assessed_at
+      return sortBy(outcome.results, r => -r.submitted_or_assessed_at)[0].submitted_or_assessed_at
     }
     return null
   }

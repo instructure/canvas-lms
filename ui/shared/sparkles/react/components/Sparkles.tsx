@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import _ from 'lodash'
+import {sample, random, uniqueId} from 'es-toolkit/compat'
 import Sparkle from './Sparkle'
 import useRandomInterval from '@canvas/use-random-interval-hook'
 
@@ -55,17 +55,17 @@ const CONSTANTS = {
 const generateSparkle = (size: Size) => {
   const colors = ['hsl(50deg, 100%, 65%)', 'hsl(210deg, 100%, 65%)', 'hsl(340deg, 100%, 60%)']
   const randomPlacement = () =>
-    `${_.random(CONSTANTS.PLACEMENT_MIN_PERCENT, CONSTANTS.PLACEMENT_MAX_PERCENT)}%`
+    `${random(CONSTANTS.PLACEMENT_MIN_PERCENT, CONSTANTS.PLACEMENT_MAX_PERCENT)}%`
   const min = size === 'small' ? CONSTANTS.SMALL_SIZE_MIN_PX : CONSTANTS.MEDIUM_SIZE_MIN_PX
   const max = size === 'small' ? CONSTANTS.SMALL_SIZE_MAX_PX : CONSTANTS.MEDIUM_SIZE_MAX_PX
   const props = {
-    color: _.sample(colors) as string,
-    key: _.uniqueId('sparkle-'),
-    size: _.random(min, max),
+    color: sample(colors) as string,
+    key: uniqueId('sparkle-'),
+    size: random(min, max),
     style: {
       top: randomPlacement(),
       left: randomPlacement(),
-      zIndex: _.sample([Layer.Lower, Layer.Upper, Layer.Upper]), // 1/3 behind, 2/3 in front
+      zIndex: sample([Layer.Lower, Layer.Upper, Layer.Upper]), // 1/3 behind, 2/3 in front
     },
   }
 

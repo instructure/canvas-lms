@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
 import CourseGradeCalculator from '../CourseGradeCalculator'
 
 const equal = (x, y) => expect(x).toBe(y)
@@ -259,19 +258,22 @@ describe('CourseGradeCalculator.calculate with some assignments and submissions'
     equal(grades.assignmentGroups[301].final.possible, 91)
   })
 
-  test('includes assignments that are anonymizing students in total calculations when' +
-    '"grade calc ignore unposted anonymous" flag is disabled', () => {
-    assignments[0].anonymize_students = true
-    const grades = calculateWithoutGradingPeriods('points', false)
-    equal(grades.assignmentGroups[301].current.score, 142)
-    equal(grades.assignmentGroups[301].final.score, 142)
-    equal(grades.assignmentGroups[301].current.possible, 191)
-    equal(grades.assignmentGroups[301].final.possible, 191)
-    equal(grades.assignmentGroups[302].current.score, 17)
-    equal(grades.assignmentGroups[302].final.score, 17)
-    equal(grades.assignmentGroups[302].current.possible, 93)
-    equal(grades.assignmentGroups[302].final.possible, 1093)
-  })
+  test(
+    'includes assignments that are anonymizing students in total calculations when' +
+      '"grade calc ignore unposted anonymous" flag is disabled',
+    () => {
+      assignments[0].anonymize_students = true
+      const grades = calculateWithoutGradingPeriods('points', false)
+      equal(grades.assignmentGroups[301].current.score, 142)
+      equal(grades.assignmentGroups[301].final.score, 142)
+      equal(grades.assignmentGroups[301].current.possible, 191)
+      equal(grades.assignmentGroups[301].final.possible, 191)
+      equal(grades.assignmentGroups[302].current.score, 17)
+      equal(grades.assignmentGroups[302].final.score, 17)
+      equal(grades.assignmentGroups[302].current.possible, 93)
+      equal(grades.assignmentGroups[302].final.possible, 1093)
+    },
+  )
 
   test('includes all assignment group grades regardless of weight', () => {
     assignmentGroups[0].group_weight = 200

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {cloneDeep} from 'lodash'
+import {cloneDeep} from 'es-toolkit/compat'
 import React from 'react'
 import {render, screen, within} from '@testing-library/react'
 import DuplicateSection from '../duplicate_section'

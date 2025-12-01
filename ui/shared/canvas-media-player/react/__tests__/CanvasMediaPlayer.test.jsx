@@ -28,7 +28,7 @@ import CanvasMediaPlayer, {
   getAutoTrack,
   formatTracksForMediaPlayer,
 } from '../CanvasMediaPlayer'
-import {uniqueId} from 'lodash'
+import {uniqueId} from 'es-toolkit/compat'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import fakeENV from '@canvas/test-utils/fakeENV'

@@ -17,7 +17,8 @@
  */
 
 import {useEffect, useMemo, useState} from 'react'
-import {uniqBy, uniq} from 'lodash'
+import {uniq} from 'es-toolkit'
+import {uniqBy} from 'es-toolkit/compat'
 import {useApolloClient, useQuery} from '@apollo/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -226,14 +227,14 @@ const useTreeBrowser = queryVariables => {
       contextId: id,
       contextType: 'LearningOutcomeGroup',
     })
-    .then(({data}) => {
-      setSelectedParentGroupId(data.context.parentOutcomeGroup?._id)
-      addGroups(extractGroups(data.context))
-      addLoadedGroups([id])
-    })
-    .catch(err => {
-      setError(err.message)
-    })
+      .then(({data}) => {
+        setSelectedParentGroupId(data.context.parentOutcomeGroup?._id)
+        addGroups(extractGroups(data.context))
+        addLoadedGroups([id])
+      })
+      .catch(err => {
+        setError(err.message)
+      })
   }
 
   const refetchGroup = id => {
@@ -242,13 +243,13 @@ const useTreeBrowser = queryVariables => {
       contextId: id,
       contextType: 'LearningOutcomeGroup',
     })
-    .then(({data}) => {
-      addGroups(extractGroups(data.context))
-      addLoadedGroups([id])
-    })
-    .catch(err => {
-      setError(err.message)
-    })
+      .then(({data}) => {
+        addGroups(extractGroups(data.context))
+        addLoadedGroups([id])
+      })
+      .catch(err => {
+        setError(err.message)
+      })
   }
   const refetchGroupOutcome = (groupId, contextId, contextType) => {
     client.query({
@@ -408,41 +409,41 @@ export const useManageOutcomes = ({
         contextId: initialGroupId,
         contextType: 'LearningOutcomeGroup',
       })
-      .then(({data}) => {
-        setSelectedParentGroupId(data.context.parentOutcomeGroup?._id)
-        addGroups(extractGroups(data.context))
-        addLoadedGroups([initialGroupId])
-      })
-      .catch(err => {
-        setError(err.message)
-      })
+        .then(({data}) => {
+          setSelectedParentGroupId(data.context.parentOutcomeGroup?._id)
+          addGroups(extractGroups(data.context))
+          addLoadedGroups([initialGroupId])
+        })
+        .catch(err => {
+          setError(err.message)
+        })
     } else {
       getAllChildGroups({
         client,
         contextId,
         contextType,
       })
-      .then(({data}) => {
-        const rootGroup = data.context.rootOutcomeGroup
-        client.writeQuery({
-          query: CONTEXT_GROUPS_QUERY,
-          variables: {
-            contextId,
-            contextType,
-          },
-          data: {
-            rootGroupId: rootGroup._id,
-          },
+        .then(({data}) => {
+          const rootGroup = data.context.rootOutcomeGroup
+          client.writeQuery({
+            query: CONTEXT_GROUPS_QUERY,
+            variables: {
+              contextId,
+              contextType,
+            },
+            data: {
+              rootGroupId: rootGroup._id,
+            },
+          })
+          saveRootGroupId(rootGroup._id)
+          addGroups(extractGroups({...rootGroup, isRootGroup: true}))
+          if (lhsGroupId && lhsGroupId !== rootGroup._id && loadedGroups.includes(lhsGroupId)) {
+            removeFromLoadedGroups([lhsGroupId])
+          }
         })
-        saveRootGroupId(rootGroup._id)
-        addGroups(extractGroups({...rootGroup, isRootGroup: true}))
-        if (lhsGroupId && lhsGroupId !== rootGroup._id && loadedGroups.includes(lhsGroupId)) {
-          removeFromLoadedGroups([lhsGroupId])
-        }
-      })
-      .catch(err => {
-        setError(err.message)
-      })
+        .catch(err => {
+          setError(err.message)
+        })
     }
   }
 
@@ -558,67 +559,67 @@ export const useFindOutcomeModal = open => {
       rootGroupId: globalRootId || '0',
       includeGlobalRootGroup: !!globalRootId,
     })
-    .then(({data}) => {
-      const {context, globalRootGroup} = data
-      let accounts
-      if (isCourse) {
-        accounts = [...context.account.parentAccountsConnection.nodes, context.account]
-      } else {
-        accounts = context.parentAccountsConnection.nodes
-      }
+      .then(({data}) => {
+        const {context, globalRootGroup} = data
+        let accounts
+        if (isCourse) {
+          accounts = [...context.account.parentAccountsConnection.nodes, context.account]
+        } else {
+          accounts = context.parentAccountsConnection.nodes
+        }
 
-      const rootGroups = accounts.map(account => account.rootOutcomeGroup)
-      const childGroups = []
+        const rootGroups = accounts.map(account => account.rootOutcomeGroup)
+        const childGroups = []
 
-      if (rootGroups.length > 0) {
-        childGroups.push({
-          _id: ACCOUNT_GROUP_ID,
-          title: I18n.t('Account Standards'),
-          isRootGroup: true,
-        })
-      }
-
-      if (globalRootGroup) {
-        childGroups.push({
-          ...globalRootGroup,
-          isRootGroup: true,
-          title: I18n.t('State Standards'),
-          // add a different typename than LearningOutcomeGroup
-          // because useDetail will load this group with a title
-          // of "ROOT" and will update this cache. We don't want
-          // to update cache for this group
-          __typename: 'BuildGroup',
-        })
-      }
-
-      const groups = [
-        ...rootGroups.flatMap(g =>
-          extractGroups({
-            ...g,
+        if (rootGroups.length > 0) {
+          childGroups.push({
+            _id: ACCOUNT_GROUP_ID,
+            title: I18n.t('Account Standards'),
             isRootGroup: true,
-            parentOutcomeGroup: {
-              _id: ACCOUNT_GROUP_ID,
-              __typename: 'LearningOutcomeGroup',
+          })
+        }
+
+        if (globalRootGroup) {
+          childGroups.push({
+            ...globalRootGroup,
+            isRootGroup: true,
+            title: I18n.t('State Standards'),
+            // add a different typename than LearningOutcomeGroup
+            // because useDetail will load this group with a title
+            // of "ROOT" and will update this cache. We don't want
+            // to update cache for this group
+            __typename: 'BuildGroup',
+          })
+        }
+
+        const groups = [
+          ...rootGroups.flatMap(g =>
+            extractGroups({
+              ...g,
+              isRootGroup: true,
+              parentOutcomeGroup: {
+                _id: ACCOUNT_GROUP_ID,
+                __typename: 'LearningOutcomeGroup',
+              },
+            }),
+          ),
+          ...extractGroups({
+            _id: ROOT_GROUP_ID,
+            isRootGroup: true,
+            title: I18n.t('Root Learning Outcome Groups'),
+            childGroups: {
+              nodes: childGroups,
             },
           }),
-        ),
-        ...extractGroups({
-          _id: ROOT_GROUP_ID,
-          isRootGroup: true,
-          title: I18n.t('Root Learning Outcome Groups'),
-          childGroups: {
-            nodes: childGroups,
-          },
-        }),
-      ]
+        ]
 
-      addLoadedGroups([ACCOUNT_GROUP_ID, ROOT_GROUP_ID])
-      setRootId(ROOT_GROUP_ID)
-      addGroups(groups)
-    })
-    .catch(err => {
-      setError(err.message)
-    })
+        addLoadedGroups([ACCOUNT_GROUP_ID, ROOT_GROUP_ID])
+        setRootId(ROOT_GROUP_ID)
+        addGroups(groups)
+      })
+      .catch(err => {
+        setError(err.message)
+      })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
@@ -661,8 +662,7 @@ const getAllPage = async (queryFn, pickFn) => {
   const connection = pickFn(initialData)
 
   while (connection?.pageInfo?.hasNextPage && connection?.pageInfo?.endCursor) {
-    const after = connection?.pageInfo?.hasNextPage
-        && connection?.pageInfo?.endCursor
+    const after = connection?.pageInfo?.hasNextPage && connection?.pageInfo?.endCursor
 
     const {data: pagedData} = await queryFn(after)
 
@@ -675,12 +675,12 @@ const getAllPage = async (queryFn, pickFn) => {
 }
 
 export const getAllChildGroups = async ({client, contextId, contextType}) => {
-
-  const pickFn = {
-    'LearningOutcomeGroup': data => data.context.childGroups,
-    'Course': data => data.context.rootOutcomeGroup.childGroups,
-    'Account': data => data.context.rootOutcomeGroup.childGroups,
-  }[contextType] || (data => data)
+  const pickFn =
+    {
+      LearningOutcomeGroup: data => data.context.childGroups,
+      Course: data => data.context.rootOutcomeGroup.childGroups,
+      Account: data => data.context.rootOutcomeGroup.childGroups,
+    }[contextType] || (data => data)
 
   const query = after => {
     return client.query({
@@ -698,17 +698,17 @@ export const getAllChildGroups = async ({client, contextId, contextType}) => {
 }
 
 export const getAllParentAccounts = async ({
-    client,
-    contextId,
-    contextType,
-    rootGroupId,
-    includeGlobalRootGroup,
+  client,
+  contextId,
+  contextType,
+  rootGroupId,
+  includeGlobalRootGroup,
 }) => {
-
-  const pickFn = {
-    'Account': data => data.context.parentAccountsConnection,
-    'Course': data => data.context.account.parentAccountsConnection,
-  }[contextType] || (data => data)
+  const pickFn =
+    {
+      Account: data => data.context.parentAccountsConnection,
+      Course: data => data.context.account.parentAccountsConnection,
+    }[contextType] || (data => data)
 
   const query = after => {
     return client.query({

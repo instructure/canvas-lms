@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {mergeWith, head, groupBy, fromPairs, sortBy, toPairs, filter} from 'es-toolkit/compat'
 import {formatDayKey} from './dateUtils'
 
 export function mergeNewItemsIntoDays(days, newItems) {
@@ -44,7 +44,7 @@ export function mergeDays(oldDays, newDays) {
 
 export function mergeDaysHashes(oldDaysHash, newDaysHash) {
   oldDaysHash = {...oldDaysHash}
-  const mergedDaysHash = _.mergeWith(oldDaysHash, newDaysHash, (oldDayItems, newDayItems) => {
+  const mergedDaysHash = mergeWith(oldDaysHash, newDaysHash, (oldDayItems, newDayItems) => {
     if (oldDayItems == null) oldDayItems = []
     // this is only called when necessary to merge new items into old items.
     // that way we avoid sorting items that have already been sorted.
@@ -54,19 +54,17 @@ export function mergeDaysHashes(oldDaysHash, newDaysHash) {
 }
 
 export function itemsToDaysHash(items) {
-  return _.groupBy(items, item => formatDayKey(item.dateBucketMoment))
+  return groupBy(items, item => formatDayKey(item.dateBucketMoment))
 }
 
 export function daysToDaysHash(days) {
-  return _.fromPairs(days)
+  return fromPairs(days)
 }
 
 export function daysHashToDays(days) {
-  return _.chain(days)
-    .toPairs()
-    .filter(d => d[1] && d[1].length) // discard any day with no items
-    .sortBy(_.head)
-    .value()
+  const pairs = toPairs(days)
+  const filtered = filter(pairs, d => d[1] && d[1].length) // discard any day with no items
+  return sortBy(filtered, head)
 }
 
 export function itemsToDays(items) {

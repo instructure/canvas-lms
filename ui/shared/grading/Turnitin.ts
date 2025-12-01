@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {max, invert} from 'lodash'
+import {max, invert} from 'es-toolkit/compat'
 import {originalityReportSubmissionKey} from './originalityReportHelper'
 import type {SubmissionOriginalityData, SubmissionWithOriginalityReport} from './grading.d'
 

@@ -22,7 +22,7 @@ import '@canvas/files/mockFilesENV'
 import ShowFolder from '../ShowFolder'
 import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 import Folder from '@canvas/files/backbone/models/Folder'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 
 const defaultProps = (props = {}) => {
   const ref = document.createElement('div')

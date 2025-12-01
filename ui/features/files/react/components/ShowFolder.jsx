@@ -18,7 +18,7 @@
 
 import React from 'react'
 import createReactClass from 'create-react-class'
-import {indexOf} from 'lodash'
+import {indexOf} from 'es-toolkit/compat'
 import classnames from 'classnames'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ShowFolder from '../legacy/components/ShowFolder'

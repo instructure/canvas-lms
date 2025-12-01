@@ -18,7 +18,7 @@
 
 import {extend as backboneExtend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import {extend, filter, map} from 'lodash'
+import {filter, map, extend} from 'es-toolkit/compat'
 import {View} from '@canvas/backbone'
 import Group from '@canvas/groups/backbone/models/Group'
 import User from '@canvas/users/backbone/models/User'

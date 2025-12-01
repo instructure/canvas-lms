@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 import $ from 'jquery'
-import {without} from 'lodash'
+import {without} from 'es-toolkit/compat'
 import {htmlEscape, raw} from '@instructure/html-escape'
 import '@canvas/jquery/jquery.toJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
@@ -136,8 +134,8 @@ export default {
     return $input.attr(
       'aria-describedby',
       errorDescriptionField.description.attr('id') +
-      ' ' +
-      errorDescriptionField.originalDescriptionIds,
+        ' ' +
+        errorDescriptionField.originalDescriptionIds,
     )
   },
   findOrCreateDescriptionField($input) {

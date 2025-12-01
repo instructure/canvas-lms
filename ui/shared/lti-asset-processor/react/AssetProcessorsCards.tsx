@@ -29,7 +29,7 @@ import {IconExternalLinkLine, IconMoreLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {isNil} from 'lodash'
+import {isNil} from 'es-toolkit/compat'
 import {useState} from 'react'
 
 const I18n = createI18nScope('asset_processors_selection')
@@ -212,51 +212,51 @@ export const AssetProcessorsCard = ({
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
-    <Flex direction="column" height="100%">
-      <Flex
-        margin="0"
-        {...{
-          alignItems: description ? 'start' : undefined,
-        }}
-      >
-        <div style={{borderRadius: '8px', overflow: 'hidden', flex: 'none'}}>
-          <ToolIconOrDefault
-            size={36}
-            toolId={icon.toolId}
-            margin={1}
-            marginRight="1.4em"
-            toolName={icon.toolName}
-            iconUrl={icon.url}
-          />
-        </div>
-        <div style={{overflow: 'hidden', flex: 1}}>
-          <div style={{marginRight: '1.4em'}}>
-            <TruncateWithTooltip
-              linesAllowed={2}
-              horizontalOffset={0}
-              backgroundColor="primary-inverse"
-            >
-              <Text weight="bold" size="medium">
-                {title}
-              </Text>
-            </TruncateWithTooltip>
+      <Flex direction="column" height="100%">
+        <Flex
+          margin="0"
+          {...{
+            alignItems: description ? 'start' : undefined,
+          }}
+        >
+          <div style={{borderRadius: '8px', overflow: 'hidden', flex: 'none'}}>
+            <ToolIconOrDefault
+              size={36}
+              toolId={icon.toolId}
+              margin={1}
+              marginRight="1.4em"
+              toolName={icon.toolName}
+              iconUrl={icon.url}
+            />
           </div>
-          {description ? (
+          <div style={{overflow: 'hidden', flex: 1}}>
             <div style={{marginRight: '1.4em'}}>
               <TruncateWithTooltip
-                linesAllowed={4}
+                linesAllowed={2}
                 horizontalOffset={0}
                 backgroundColor="primary-inverse"
               >
-                {description}
+                <Text weight="bold" size="medium">
+                  {title}
+                </Text>
               </TruncateWithTooltip>
             </div>
-          ) : null}
-          {children}
-        </div>
-        {extraColumns}
+            {description ? (
+              <div style={{marginRight: '1.4em'}}>
+                <TruncateWithTooltip
+                  linesAllowed={4}
+                  horizontalOffset={0}
+                  backgroundColor="primary-inverse"
+                >
+                  {description}
+                </TruncateWithTooltip>
+              </div>
+            ) : null}
+            {children}
+          </div>
+          {extraColumns}
+        </Flex>
       </Flex>
-    </Flex>
-  </View>
+    </View>
   )
 }

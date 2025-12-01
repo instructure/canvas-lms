@@ -18,7 +18,7 @@
 
 import React from 'react'
 import _ from 'underscore'
-import {map} from 'lodash'
+import {map} from 'es-toolkit/compat'
 import {getOverriddenAssignees} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
@@ -179,8 +179,10 @@ export const getParsedOverrides = (stagedOverrides, cards, groupCategoryId, defa
 // Differentiation tag overrides are valid but they use 'group_category_id'
 // Differentiation tag overrides will pass the filter because of the non_collaborative check
 const getValidOverrides = (stagedOverrides, groupCategoryId) => {
-  return stagedOverrides.filter(override =>
-    [undefined, groupCategoryId].includes(override.group_category_id) || override.non_collaborative === true,
+  return stagedOverrides.filter(
+    override =>
+      [undefined, groupCategoryId].includes(override.group_category_id) ||
+      override.non_collaborative === true,
   )
 }
 

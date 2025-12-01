@@ -21,7 +21,7 @@ import {Editor} from '@tinymce/tinymce-react'
 
 import tinymce from 'tinymce'
 import type {Editor as TinyMCEEditor} from 'tinymce'
-import _ from 'lodash'
+import {uniqBy} from 'es-toolkit/compat'
 import {StoreProvider} from './plugins/shared/StoreContext'
 
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
@@ -2022,7 +2022,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     alert.id = alertIdValue++
     this.setState(state => {
       let messages = state.messages.concat(alert)
-      messages = _.uniqBy(messages, 'text') // Don't show the same message twice
+      messages = uniqBy(messages, 'text') // Don't show the same message twice
       return {messages}
     })
   }

@@ -18,7 +18,7 @@
 
 import ACTION_NAMES from '../actions/developerKeysActions'
 import type {DeveloperKey} from '../../model/api/DeveloperKey'
-import _ from 'lodash'
+import {omit} from 'es-toolkit/compat'
 import {makeReducer} from './makeReducer'
 
 export interface ListDeveloperKeysState {
@@ -164,7 +164,7 @@ export default makeReducer(initialState, {
         return developerKey
       }
       if (Object.keys(previousAccountBinding).length === 0) {
-        return _.omit(developerKey, 'developer_key_account_binding')
+        return omit(developerKey, 'developer_key_account_binding')
       }
       return {...developerKey, developer_key_account_binding: previousAccountBinding}
     })
@@ -174,7 +174,7 @@ export default makeReducer(initialState, {
         return developerKey
       }
       if (Object.keys(previousAccountBinding).length === 0) {
-        return _.omit(developerKey, 'developer_key_account_binding')
+        return omit(developerKey, 'developer_key_account_binding')
       }
       return {...developerKey, developer_key_account_binding: previousAccountBinding}
     })

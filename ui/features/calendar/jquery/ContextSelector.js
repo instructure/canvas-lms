@@ -17,7 +17,8 @@
  */
 
 import $ from 'jquery'
-import {map, chain} from 'lodash'
+import {map} from 'es-toolkit/compat'
+import {chain} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import contextSelectorTemplate from '../jst/contextSelector.handlebars'
 import contextSelectorItemTemplate from '../jst/contextSelectorItem.handlebars'

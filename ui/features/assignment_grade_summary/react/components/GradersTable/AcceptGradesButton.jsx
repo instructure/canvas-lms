@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
-import {omit} from 'lodash'
+import {omit} from 'es-toolkit/compat'
 import {Button} from '@instructure/ui-buttons'
 import {IconCheckMarkSolid} from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'

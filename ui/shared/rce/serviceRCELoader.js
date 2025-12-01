@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {reduce, pick} from 'lodash'
+import {reduce, pick} from 'es-toolkit/compat'
 import editorOptions from './editorOptions'
 import loadEventListeners from './loadEventListeners'
 import polyfill from './polyfill'

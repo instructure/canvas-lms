@@ -20,7 +20,7 @@ import {
   canvasThemeLocal as canvasBaseTheme,
   canvasHighContrastThemeLocal as canvasHighContrastTheme,
 } from '@instructure/ui-themes'
-import {memoize} from 'lodash'
+import {memoize} from 'es-toolkit/compat'
 
 const EMPTY_OBJ = {}
 

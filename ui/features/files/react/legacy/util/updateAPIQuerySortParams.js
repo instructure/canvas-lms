@@ -19,7 +19,7 @@
 // if you change which column to order by or wheather to to sort asc or desc,
 // use this to change the api url of the collection
 import {param} from 'jquery'
-import {extend} from 'lodash'
+import {extend} from 'es-toolkit/compat'
 import deparam from 'deparam'
 
 export default function updateAPIQuerySortParams(collection, queryParams) {

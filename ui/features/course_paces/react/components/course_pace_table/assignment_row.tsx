@@ -19,7 +19,7 @@
 import React, {KeyboardEvent, MouseEvent} from 'react'
 import {connect} from 'react-redux'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {debounce, pick} from 'lodash'
+import {debounce, pick} from 'es-toolkit/compat'
 import moment from 'moment-timezone'
 
 import {InstUISettingsProvider} from '@instructure/emotion'
@@ -32,7 +32,7 @@ import {
   IconPublishSolid,
   IconQuizLine,
   IconUnpublishedLine,
-  IconWarningLine
+  IconWarningLine,
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
@@ -50,7 +50,7 @@ import {
   getSelectedDaysToSkip,
 } from '../../reducers/course_paces'
 import {actions} from '../../actions/course_pace_items'
-import { coursePaceActions } from '../../actions/course_paces'
+import {coursePaceActions} from '../../actions/course_paces'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 import {
   getShowProjections,
@@ -63,7 +63,7 @@ import type {Change} from '../../utils/change_tracking'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import {Link} from '@instructure/ui-link'
 import {Pill} from '@instructure/ui-pill'
-import { Tooltip } from '@instructure/ui-tooltip'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('course_paces_assignment_row')
 
@@ -230,7 +230,11 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
     if (!Number.isNaN(duration)) {
       if (window.ENV.FEATURES.course_pace_time_selection) {
-        this.props.setPaceItemDurationTimeToCompleteCalendarDays(this.props.coursePaceItem.module_item_id, duration, this.props.blackoutDates)
+        this.props.setPaceItemDurationTimeToCompleteCalendarDays(
+          this.props.coursePaceItem.module_item_id,
+          duration,
+          this.props.blackoutDates,
+        )
       } else {
         this.props.setPaceItemDuration(this.props.coursePaceItem.module_item_id, duration)
       }
@@ -329,22 +333,24 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
               </Text>
             </div>
           )}
-          {
-            ENV.FEATURES.course_pace_pacing_with_mastery_paths && this.props.coursePaceItem.unreleased && (
+          {ENV.FEATURES.course_pace_pacing_with_mastery_paths &&
+            this.props.coursePaceItem.unreleased && (
               <div>
                 <Text size="x-small" color="danger">
-                  <IconWarningLine size="x-small" /> {I18n.t("Based on Mastery Path results this assignment may not be assigned to this student.")}
+                  <IconWarningLine size="x-small" />{' '}
+                  {I18n.t(
+                    'Based on Mastery Path results this assignment may not be assigned to this student.',
+                  )}
                 </Text>
               </div>
-            )
-          }
+            )}
         </div>
       </Flex>
     )
   }
 
   renderSubmissionStatus = () => {
-    const { submission_status } = this.props.coursePaceItem
+    const {submission_status} = this.props.coursePaceItem
     const isFeatureEnabled = window.ENV.FEATURES.course_pace_pacing_status_labels
 
     // Not submittable or not due yet, no label needed
@@ -355,15 +361,15 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     let status: string = ''
     switch (submission_status) {
       case 'late':
-        status = I18n.t("Late Submission")
+        status = I18n.t('Late Submission')
         break
       case 'missing':
-        status = I18n.t("No Submission")
+        status = I18n.t('No Submission')
         break
     }
 
     return status ? (
-      <div style={{whiteSpace: "nowrap", marginTop: 5}}>
+      <div style={{whiteSpace: 'nowrap', marginTop: 5}}>
         <Text color="danger">
           <IconWarningLine size="x-small" /> {status}
         </Text>
@@ -371,20 +377,23 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     ) : null
   }
 
-  renderMasteryPathsInfo({ isTrigger, releasedLabel }: MasteryPathsData, moduleItemId: string) {
-    if (!isTrigger && !releasedLabel) return null;
+  renderMasteryPathsInfo({isTrigger, releasedLabel}: MasteryPathsData, moduleItemId: string) {
+    if (!isTrigger && !releasedLabel) return null
 
     return (
       <Flex gap="small" data-testid={`mastery-paths-data-${moduleItemId}`}>
-        {
-          ENV.FEATURES.course_pace_pacing_with_mastery_paths && this.props.coursePaceItem.unreleased && (
+        {ENV.FEATURES.course_pace_pacing_with_mastery_paths &&
+          this.props.coursePaceItem.unreleased && (
             <Flex.Item>
-              <Tooltip renderTip={I18n.t("This student may not have visibility to this assignment based on their Mastery path assessment results.")}>
+              <Tooltip
+                renderTip={I18n.t(
+                  'This student may not have visibility to this assignment based on their Mastery path assessment results.',
+                )}
+              >
                 <IconOffLine size="x-small" />
               </Tooltip>
             </Flex.Item>
-          )
-        }
+          )}
         {isTrigger && moduleItemId && (
           <Flex.Item>
             <Link href={`${ENV.CONTEXT_URL_ROOT}/modules/items/${moduleItemId}/edit_mastery_paths`}>
@@ -400,7 +409,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
           </Flex.Item>
         )}
       </Flex>
-    );
+    )
   }
 
   render() {
@@ -413,8 +422,11 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     }
     const contextType = this.props.context_type
 
-    const coursePaceItem = this.props.coursePaceItem;
-    const masteryPathsData: MasteryPathsData = CyoeHelper.getItemData(coursePaceItem.assignment_id, true);
+    const coursePaceItem = this.props.coursePaceItem
+    const masteryPathsData: MasteryPathsData = CyoeHelper.getItemData(
+      coursePaceItem.assignment_id,
+      true,
+    )
 
     return (
       <InstUISettingsProvider theme={{componentOverrides}}>
@@ -431,7 +443,9 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
                 <View margin={labelMargin}>{this.renderTitle()}</View>
               </Flex.Item>
               <Flex.Item>
-                {masteryPathsData && ENV.FEATURES.course_pace_pacing_with_mastery_paths && this.renderMasteryPathsInfo(masteryPathsData, coursePaceItem.module_item_id)}
+                {masteryPathsData &&
+                  ENV.FEATURES.course_pace_pacing_with_mastery_paths &&
+                  this.renderMasteryPathsInfo(masteryPathsData, coursePaceItem.module_item_id)}
               </Flex.Item>
             </Flex>
           </Table.Cell>
@@ -484,7 +498,8 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
 
 const ConnectedAssignmentRow = connect(mapStateToProps, {
   setPaceItemDuration: actions.setPaceItemDuration,
-  setPaceItemDurationTimeToCompleteCalendarDays: coursePaceActions.setPaceItemDurationTimeToCompleteCalendarDays
+  setPaceItemDurationTimeToCompleteCalendarDays:
+    coursePaceActions.setPaceItemDurationTimeToCompleteCalendarDays,
 })(AssignmentRow)
 
 // This hack allows AssignmentRow to be rendered inside an InstUI Table.Body

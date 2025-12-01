@@ -35,7 +35,7 @@ import {
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import axios from '@canvas/axios'
-import {uniqBy} from 'lodash'
+import {uniqBy} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import UserLink from './UserLink'
 import AddPeopleApp from '@canvas/add-people'

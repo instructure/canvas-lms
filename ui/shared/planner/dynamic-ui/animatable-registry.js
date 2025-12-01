@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {minBy, maxBy, flatMap} from 'es-toolkit/compat'
+import {sortedUniqBy} from '@canvas/util/sortedUniqBy'
 
 export class AnimatableRegistry {
   constructor() {
@@ -60,21 +61,21 @@ export class AnimatableRegistry {
   getFirstComponent(type, componentIds) {
     this.validateType(type)
     const registry = this.registries[type]
-    const minItemId = _.minBy(componentIds, componentId => registry[componentId].index)
+    const minItemId = minBy(componentIds, componentId => registry[componentId].index)
     return registry[minItemId]
   }
 
   getLastComponent(type, componentIds) {
     this.validateType(type)
     const registry = this.registries[type]
-    const maxItemId = _.maxBy(componentIds, componentId => registry[componentId].index)
+    const maxItemId = maxBy(componentIds, componentId => registry[componentId].index)
     return registry[maxItemId]
   }
 
   getUniqSortedComponents(type, componentIds) {
     this.validateType(type)
     const components = componentIds.map(componentId => this.registries[type][componentId])
-    return _.chain(components).sortBy('index').sortedUniqBy('index').value()
+    return sortedUniqBy(components, 'index')
   }
 
   // Gets all non-negative indexed components from the given registry in indexed order. Negative
@@ -83,19 +84,16 @@ export class AnimatableRegistry {
   // duplicate indexes registered (with different ids).
   getSortedComponents(type) {
     this.validateType(type)
-    return _.chain(this.registries[type])
-      .values()
-      .sortBy('index')
-      .sortedUniqBy('index')
-      .filter(entryValue => entryValue.index >= 0)
-      .value()
+    return sortedUniqBy(Object.values(this.registries[type]), 'index').filter(
+      entryValue => entryValue.index >= 0,
+    )
   }
 
   getAllGroupsSorted() {
     // get list of days sorted as they appear in the interface.
     const sortedDays = this.getSortedComponents('day')
     // get sorted groups for each sorted day, then flatten into one list of interface sorted groups.
-    const sortedGroups = _.flatMap(sortedDays, day =>
+    const sortedGroups = flatMap(sortedDays, day =>
       this.getUniqSortedComponents('group', day.componentIds),
     )
     return sortedGroups
@@ -105,7 +103,7 @@ export class AnimatableRegistry {
   getAllItemsSorted() {
     const sortedGroups = this.getAllGroupsSorted()
     // get sorted items for each group, then flatten into one list of interface sorted items
-    const sortedItems = _.flatMap(sortedGroups, group =>
+    const sortedItems = flatMap(sortedGroups, group =>
       this.getUniqSortedComponents('item', group.componentIds),
     )
     return sortedItems
@@ -118,11 +116,11 @@ export class AnimatableRegistry {
 
   getAllNewActivityIndicatorsSorted() {
     const sortedGroups = this.getAllGroupsSorted()
-    const sortedNewActivityIndicators = _.chain(sortedGroups)
-      .flatMap(group => this.getUniqSortedComponents('new-activity-indicator', group.componentIds))
-      // not every group has a new activity indicator, so remove the undefined components
-      .filter(nai => nai != null)
-      .value()
+    const mapped = flatMap(sortedGroups, group =>
+      this.getUniqSortedComponents('new-activity-indicator', group.componentIds),
+    )
+    // not every group has a new activity indicator, so remove the undefined components
+    const sortedNewActivityIndicators = mapped.filter(nai => nai != null)
     return sortedNewActivityIndicators
   }
 }

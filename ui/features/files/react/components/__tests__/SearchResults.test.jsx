@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 import Folder from '@canvas/files/backbone/models/Folder'
 import SearchResults from '../SearchResults'

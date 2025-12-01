@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import $ from 'jquery'
-import {omit} from 'lodash'
+import {omit} from 'es-toolkit/compat'
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import splitAssetString from '@canvas/util/splitAssetString'

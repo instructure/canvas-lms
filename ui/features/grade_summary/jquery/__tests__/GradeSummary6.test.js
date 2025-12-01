@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import _ from 'lodash'
 import 'jquery-migrate'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers'

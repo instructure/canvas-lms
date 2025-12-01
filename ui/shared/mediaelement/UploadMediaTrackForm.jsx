@@ -19,7 +19,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import template from './jst/UploadMediaTrackForm.handlebars'
 import {languageCodes} from './mediaLanguageCodes'
 import $ from 'jquery'
-import {map} from 'lodash'
+import {map} from 'es-toolkit/compat'
 
 import CopyToClipboard from '@canvas/copy-to-clipboard'
 import React from 'react'
@@ -29,7 +29,13 @@ const I18n = createI18nScope('UploadMediaTrackForm')
 
 export default class UploadMediaTrackForm {
   // video url needs to be the url to mp4 version of the video.
-  constructor(mediaCommentId, video_url, attachmentId = null, lockedMediaAttachment = false, zIndex = 1000) {
+  constructor(
+    mediaCommentId,
+    video_url,
+    attachmentId = null,
+    lockedMediaAttachment = false,
+    zIndex = 1000,
+  ) {
     this.mediaCommentId = mediaCommentId
     this.video_url = video_url
     this.attachmentId = attachmentId
@@ -83,10 +89,9 @@ export default class UploadMediaTrackForm {
 
         if (!params.content || !params.locale) return submitDfd.reject()
 
-        const url =
-          this.attachmentId
-            ? `/media_attachments/${this.attachmentId}/media_tracks`
-            : `/media_objects/${this.mediaCommentId}/media_tracks`
+        const url = this.attachmentId
+          ? `/media_attachments/${this.attachmentId}/media_tracks`
+          : `/media_objects/${this.mediaCommentId}/media_tracks`
         return $.ajaxJSON(
           url,
           'POST',

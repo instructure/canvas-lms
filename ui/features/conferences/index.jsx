@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {clone} from 'lodash'
+import {clone} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import CollectionView from '@canvas/backbone-collection-view'
 import ConferenceCollection from './backbone/collections/ConferenceCollection'

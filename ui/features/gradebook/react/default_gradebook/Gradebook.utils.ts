@@ -23,7 +23,7 @@ import LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import getTextWidth from '../shared/helpers/TextMeasure'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import _ from 'lodash'
+import {values, intersection, difference} from 'es-toolkit/compat'
 import htmlEscape, {unescape} from '@instructure/html-escape'
 import filterTypes from './constants/filterTypes'
 import type {
@@ -224,7 +224,7 @@ export function hiddenStudentIdsForAssignment(
   studentIds: string[],
   assignment: Pick<Assignment, 'assignment_visibility'>,
 ) {
-  return _.difference(studentIds, assignment.assignment_visibility)
+  return difference(studentIds, assignment.assignment_visibility)
 }
 
 export function getColumnTypeForColumnId(columnId: string): string {
@@ -252,7 +252,7 @@ export function getDefaultSettingKeyForColumnType(columnType: string): SortRowsS
 }
 
 export function sectionList(sections: {[id: string]: Pick<Section, 'name' | 'id'>}) {
-  const x: Pick<Section, 'name' | 'id'>[] = _.values(sections)
+  const x: Pick<Section, 'name' | 'id'>[] = values(sections)
   return x
     .sort((a, b) => a.id.localeCompare(b.id))
     .map(section => {
@@ -790,7 +790,7 @@ export const filterStudentBySectionFn = (
       .map(enrollment => enrollment.enrollment_state)
     return student.sections
       ? enrollmentStates.length > 0 &&
-          _.intersection(enrollmentStates, includedEnrollmentStates).length > 0
+          intersection(enrollmentStates, includedEnrollmentStates).length > 0
       : false
   }
 }

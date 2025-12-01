@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {map} from 'es-toolkit/compat'
 import OverrideStudentStore from '../OverrideStudentStore'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {setupServer} from 'msw/node'
@@ -220,7 +220,7 @@ describe('OverrideStudentStore', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([2, 5, 8])
     await waitFor(() => {
-      const results = _.map(OverrideStudentStore.getStudents(), student => student.id)
+      const results = map(OverrideStudentStore.getStudents(), student => student.id)
       expect(results).toEqual(['2', '5', '8'])
     })
   })
@@ -242,7 +242,7 @@ describe('OverrideStudentStore', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([2, 5, 8])
     await waitFor(() => {
-      const sections = _.map(OverrideStudentStore.getStudents(), student => student.sections)
+      const sections = map(OverrideStudentStore.getStudents(), student => student.sections)
       expect(sections).toEqual([['2'], ['4'], ['4']])
     })
   })
@@ -251,7 +251,7 @@ describe('OverrideStudentStore', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([2, 5, 8])
     await waitFor(() => {
-      const groups = _.map(OverrideStudentStore.getStudents(), student => student.group_ids)
+      const groups = map(OverrideStudentStore.getStudents(), student => student.group_ids)
       expect(groups).toEqual([['1', '9'], ['3'], ['4']])
     })
   })
@@ -260,7 +260,7 @@ describe('OverrideStudentStore', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([2, 5, 8, 7, 9])
     await waitFor(() => {
-      const results = _.map(OverrideStudentStore.getStudents(), student => student.id)
+      const results = map(OverrideStudentStore.getStudents(), student => student.id)
       expect(results).toEqual(['2', '5', '7', '8', '9'])
     })
   })
@@ -319,7 +319,7 @@ describe('OverrideStudentStore', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByName('publiu')
     await waitFor(() => {
-      const sections = _.map(OverrideStudentStore.getStudents(), student => student.sections)
+      const sections = map(OverrideStudentStore.getStudents(), student => student.sections)
       expect(sections).toEqual([['2'], ['4'], ['4']])
     })
   })
@@ -328,7 +328,7 @@ describe('OverrideStudentStore', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByName('publiu')
     await waitFor(() => {
-      const groups = _.map(OverrideStudentStore.getStudents(), student => student.group_ids)
+      const groups = map(OverrideStudentStore.getStudents(), student => student.group_ids)
       expect(groups).toEqual([['1', '9'], ['3'], ['4']])
     })
   })
@@ -374,7 +374,7 @@ describe('OverrideStudentStore', () => {
     )
     OverrideStudentStore.fetchStudentsForCourse()
     await waitFor(() => {
-      const results = _.map(OverrideStudentStore.getStudents(), student => student.id)
+      const results = map(OverrideStudentStore.getStudents(), student => student.id)
       expect(results.sort()).toEqual(['2', '5', '7', '8', '9'])
     })
   })

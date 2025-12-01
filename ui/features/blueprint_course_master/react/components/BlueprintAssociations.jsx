@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'

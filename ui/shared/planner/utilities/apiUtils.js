@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import moment from 'moment-timezone'
-import _ from 'lodash'
+import {partial, isEqual, findKey} from 'es-toolkit/compat'
 import parseLinkHeader from '@canvas/parse-link-header'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -107,7 +107,7 @@ const getItemType = plannableType => {
 }
 
 const getApiItemType = overrideType => {
-  return _.findKey(TYPE_MAPPING, _.partial(_.isEqual, overrideType))
+  return findKey(TYPE_MAPPING, partial(isEqual, overrideType))
 }
 
 export function findNextLink(response) {

@@ -21,7 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
-import _, {each, find, keys, includes, forEach, filter} from 'lodash'
+import {each, find, keys, includes, forEach, filter, pick} from 'es-toolkit/compat'
 import $, {param} from 'jquery'
 import pluralize from '@canvas/util/stringPluralize'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -660,10 +660,9 @@ EditView.prototype.setDefaultsIfNew = function () {
 }
 
 EditView.prototype.cacheAssignmentSettings = function () {
-  const new_assignment_settings = _.pick.apply(
-    _,
-    [this.getFormData()].concat(slice.call(this.settingsToCache())),
-  )
+  const formData = this.getFormData()
+  const keys = slice.call(this.settingsToCache())
+  const new_assignment_settings = pick(formData, ...keys)
   return userSettings.contextSet('new_assignment_settings', new_assignment_settings)
 }
 

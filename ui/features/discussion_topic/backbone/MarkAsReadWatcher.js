@@ -17,7 +17,7 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import _, {extend, throttle} from 'lodash'
+import {extend, throttle, without} from 'es-toolkit/compat'
 
 // An entry needs to be in the viewport for 2 consecutive secods for it to be marked as read
 // if you are scrolling quickly down the page and it comes in and out of the viewport in less
@@ -56,7 +56,7 @@ class MarkAsReadWatcher {
 
   markAsRead = () => {
     this.view.model.markAsRead()
-    MarkAsReadWatcher.unread = _(MarkAsReadWatcher.unread).without(this)
+    MarkAsReadWatcher.unread = without(MarkAsReadWatcher.unread, this)
     return MarkAsReadWatcher.trigger('markAsRead', this.view.model)
   }
 

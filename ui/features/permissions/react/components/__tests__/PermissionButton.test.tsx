@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {noop} from 'lodash'
+import {noop} from 'es-toolkit/compat'
 import {render} from '@testing-library/react'
 import {EnabledState} from '../types'
 import * as reduxHooks from 'react-redux'

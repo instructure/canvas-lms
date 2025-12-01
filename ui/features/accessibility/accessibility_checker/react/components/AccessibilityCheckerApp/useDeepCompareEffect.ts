@@ -17,12 +17,12 @@
  */
 
 import {useRef, useEffect} from 'react'
-import _ from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 
 function useDeepCompareMemoize<T>(value: T): T {
   const ref = useRef<T>(value)
 
-  if (!_.isEqual(ref.current, value)) {
+  if (!isEqual(ref.current, value)) {
     ref.current = value
   }
 

@@ -22,7 +22,7 @@
  */
 
 import $ from 'jquery'
-import {sumBy} from 'lodash'
+import {sumBy} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import I18n from '@canvas/i18n'
 import OutcomeResultCollection from '../collections/OutcomeResultCollection'

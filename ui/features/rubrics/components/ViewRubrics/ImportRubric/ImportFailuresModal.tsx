@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import _ from 'lodash'
+import {uniq} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
@@ -78,7 +78,7 @@ export const ImportFailuresModal = ({
         </View>
         <View as="div" margin="x-small 0 0 0">
           <List margin="0 0 medium">
-            {_.uniq(messages).map(message => (
+            {uniq(messages).map(message => (
               <List.Item data-testid="import-failure-message" key={`${message}`}>
                 {/* @ts-expect-error */}
                 {message}

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useMemo} from 'react'
-import {keyBy} from 'lodash'
+import {keyBy} from 'es-toolkit/compat'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {StudentOutcomeScore} from './StudentOutcomeScore'

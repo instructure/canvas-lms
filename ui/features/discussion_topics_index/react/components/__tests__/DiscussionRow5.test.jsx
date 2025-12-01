@@ -19,7 +19,7 @@
 import {assignLocation} from '@canvas/util/globalUtils'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import React from 'react'
 import {DiscussionRow} from '../DiscussionRow'
 

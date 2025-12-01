@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {map, find, extend as lodashExtend} from 'lodash'
+import {map, find, extend as lodashExtend} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 

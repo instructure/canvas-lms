@@ -19,7 +19,8 @@
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import _, {map, find} from 'lodash'
+import {find, map} from 'es-toolkit/compat'
+import {chain} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import template from '../../../jst/subviews/CourseFindSelect.handlebars'
@@ -65,7 +66,7 @@ CourseFindSelectView.prototype.render = function () {
       (function (_this) {
         return function (data) {
           _this.courses = data
-          _this.coursesByTerms = _.chain(_this.courses)
+          _this.coursesByTerms = chain(_this.courses)
             .groupBy(function (course) {
               return course.term
             })
@@ -152,7 +153,7 @@ CourseFindSelectView.prototype.toggleConcludedCourses = function () {
 // refining the search term
 CourseFindSelectView.prototype.manageableCourseUrl = function () {
   const params = {
-    current_course_id: ENV.COURSE_ID
+    current_course_id: ENV.COURSE_ID,
   }
   if (this.includeConcludedCourses) {
     params['include[]'] = 'concluded'

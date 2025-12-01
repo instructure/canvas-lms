@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {find, map} from 'lodash'
+import {find, map} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'

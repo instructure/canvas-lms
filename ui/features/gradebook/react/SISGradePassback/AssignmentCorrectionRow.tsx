@@ -17,8 +17,7 @@
  */
 
 import $ from 'jquery'
-// @ts-expect-error
-import {where, isEmpty} from 'lodash'
+import {isEmpty, filter} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {datetimeString} from '@canvas/datetime/date-functions'
@@ -109,7 +108,12 @@ class AssignmentCorrectionRow extends React.Component<Props> {
   // @ts-expect-error
   currentSectionforOverride = a => {
     if (
-      isEmpty(where(a.overrides, {course_section_id: a.currentlySelected.id.toString()})) ||
+      isEmpty(
+        filter(
+          a.overrides,
+          override => override.course_section_id === a.currentlySelected.id.toString(),
+        ),
+      ) ||
       a.currentlySelected.type === 'course'
     ) {
       return true

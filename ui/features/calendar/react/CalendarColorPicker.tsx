@@ -29,7 +29,7 @@ import {showFlashError, showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {Button} from '@instructure/ui-buttons'
 import forceScreenreaderToReparse from 'force-screenreader-to-reparse'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {set} from 'lodash'
+import {set} from 'es-toolkit/compat'
 
 const I18n = createI18nScope('calendar_sidebar')
 

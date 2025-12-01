@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {each, isEmpty, includes, extend as lodashExtend} from 'lodash'
+import {each, includes, isEmpty, extend as lodashExtend} from 'es-toolkit/compat'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DialogFormView, {
   isSmallTablet,

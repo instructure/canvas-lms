@@ -18,7 +18,7 @@
 import {encodeQueryString} from '@instructure/query-string-encoding'
 import $ from 'jquery'
 import 'jquery.cookie'
-import {clone, throttle} from 'lodash'
+import {clone, throttle} from 'es-toolkit/compat'
 
 // A class to setup kaltura analytics listeners on a mediaElement player
 // for a specific video being played

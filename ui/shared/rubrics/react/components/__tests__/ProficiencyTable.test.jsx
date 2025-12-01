@@ -21,7 +21,7 @@
         Remove when feature flag account_level_mastery_scales is enabled
 */
 
-import _ from 'lodash'
+import {assign} from 'es-toolkit/compat'
 import $ from 'jquery'
 import React from 'react'
 import axios from '@canvas/axios'
@@ -70,7 +70,7 @@ let getSpy
 
 describe('default proficiency', () => {
   beforeEach(() => {
-    const err = _.assign(new Error(), {response: {status: 404}})
+    const err = assign(new Error(), {response: {status: 404}})
     getSpy = jest.spyOn(axios, 'get').mockImplementation(() => Promise.reject(err))
   })
 

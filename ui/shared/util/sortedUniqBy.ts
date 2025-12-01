@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {sortBy, uniqBy} from 'es-toolkit'
+import {sortBy, uniqBy} from 'es-toolkit/compat'
 
 /**
  * Creates an array that is sorted and has unique elements based on the iteratee.
@@ -24,21 +24,28 @@ import {sortBy, uniqBy} from 'es-toolkit'
  *
  * @template T
  * @param {T[]} array - The array to process
- * @param {keyof T | ((item: T) => unknown)} iteratee - The iteratee to determine uniqueness (property key or function)
+ * @param {keyof T | string | ((item: T) => unknown)} iteratee - The iteratee to determine uniqueness (property key, nested path, or function)
  * @returns {T[]} Returns the new sorted array of unique values
  *
  * @example
  * const items = [{id: 2, name: 'b'}, {id: 1, name: 'a'}, {id: 2, name: 'c'}]
  * sortedUniqBy(items, 'id')
  * // => [{id: 1, name: 'a'}, {id: 2, name: 'b'}]
+ *
+ * @example
+ * const enrollments = [{course: {_id: '2'}}, {course: {_id: '1'}}]
+ * sortedUniqBy(enrollments, 'course._id')
+ * // => [{course: {_id: '1'}}, {course: {_id: '2'}}]
  */
 export function sortedUniqBy<T extends object>(
   array: T[],
-  iteratee: keyof T | ((item: T) => unknown)
+  iteratee: keyof T | string | ((item: T) => unknown),
 ): T[] {
-  // Both sortBy and uniqBy only accept functions, so convert property keys to functions
-  const getterFn = typeof iteratee === 'function' ? iteratee : (item: T) => item[iteratee]
-  // sortBy expects an array of criteria functions
-  const sorted = sortBy(array, [getterFn])
-  return uniqBy(sorted, getterFn)
+  // es-toolkit/compat supports both functions and string paths (including nested paths like 'a.b.c')
+  // Pass strings directly to leverage this built-in support
+  const sorted = sortBy(
+    array,
+    typeof iteratee === 'function' ? [iteratee] : [iteratee as any],
+  ) as T[]
+  return uniqBy(sorted, iteratee as any) as T[]
 }

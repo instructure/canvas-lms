@@ -19,7 +19,7 @@
 import React from 'react'
 import {shape, func, string, arrayOf} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {debounce, isEmpty} from 'lodash'
+import {debounce, isEmpty} from 'es-toolkit/compat'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import UsersList from './UsersList'
 import UsersToolbar from './UsersToolbar'

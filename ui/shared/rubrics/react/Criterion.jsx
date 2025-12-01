@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import _ from 'lodash'
+import {get, isNil, find} from 'es-toolkit/compat'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Dialog} from '@instructure/ui-dialog'
 import {CloseButton} from '@instructure/ui-buttons'
@@ -140,7 +140,7 @@ export default class Criterion extends React.Component {
       // the tier description and ID will be added based off the point value upon saving in the
       // rubric_association model
       if (typeof tier === 'string') {
-        tier = _.find(criterion.ratings, rating => rating.points.toString() === tier) || {
+        tier = find(criterion.ratings, rating => rating.points.toString() === tier) || {
           points: tier,
         }
       }
@@ -196,9 +196,9 @@ export default class Criterion extends React.Component {
       />
     )
 
-    const hasComments = (_.get(assessment, 'comments') || '').length > 0
-    const editingComments = hasComments || freeForm || _.get(assessment, 'editComments', false)
-    const commentFocus = _.get(assessment, 'commentFocus', false)
+    const hasComments = (get(assessment, 'comments') || '').length > 0
+    const editingComments = hasComments || freeForm || get(assessment, 'editComments', false)
+    const commentFocus = get(assessment, 'commentFocus', false)
 
     const ratingsFooter = () => {
       if (editingComments) {
@@ -215,8 +215,8 @@ export default class Criterion extends React.Component {
         footer={isSummary ? summaryFooter() : ratingsFooter()}
         tiers={criterion.ratings}
         onPointChange={onPointChange}
-        points={_.get(assessment, 'points.value')}
-        selectedRatingId={_.get(assessment, 'id')}
+        points={get(assessment, 'points.value')}
+        selectedRatingId={get(assessment, 'id')}
         pointsPossible={pointsPossible}
         defaultMasteryThreshold={isOutcome ? criterion.mastery_points : criterion.points}
         isSummary={isSummary}
@@ -254,7 +254,7 @@ export default class Criterion extends React.Component {
               open={dialogOpen}
             />
           </div>
-          {!(hidePoints || _.isNil(threshold)) ? <Threshold threshold={threshold} /> : null}
+          {!(hidePoints || isNil(threshold)) ? <Threshold threshold={threshold} /> : null}
         </Table.RowHeader>
         <Table.Cell>{ratings}</Table.Cell>
         {!ENV.restrict_quantitative_data && hasPointsColumn && (

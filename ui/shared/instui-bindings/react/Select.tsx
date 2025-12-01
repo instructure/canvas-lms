@@ -43,7 +43,7 @@
 */
 
 import React, {type ReactElement, type ChangeEvent, type SyntheticEvent} from 'react'
-import {compact, castArray, isEqual} from 'lodash'
+import {castArray, isEqual, compact} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Select} from '@instructure/ui-select'
 import {Text} from '@instructure/ui-text'

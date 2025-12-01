@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {extend} from 'lodash'
+import {extend} from 'es-toolkit/compat'
 import OutcomeContentBase from './OutcomeContentBase'
 import outcomeGroupTemplate from '../../jst/outcomeGroup.handlebars'
 import outcomeGroupFormTemplate from '../../jst/outcomeGroupForm.handlebars'

@@ -23,7 +23,8 @@ import update from 'immutability-helper'
 import DataRow from './dataRow'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {chain, map, some} from 'lodash'
+import {map, some} from 'es-toolkit/compat'
+import {chain} from 'lodash'
 import splitAssetString from '@canvas/util/splitAssetString'
 
 const I18n = createI18nScope('gradinggradingStandard')

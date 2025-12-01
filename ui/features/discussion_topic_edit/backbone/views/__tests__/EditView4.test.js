@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import {defer} from 'lodash'
+import {defer} from 'es-toolkit/compat'
 import EditView from '../EditView'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'

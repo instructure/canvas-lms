@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mapValues} from 'lodash'
+import {mapValues} from 'es-toolkit/compat'
 import {NextPageInfo} from './PaginatedResult'
 
 export type GetAllPagesCallbacks<TPage, TError = unknown> = {

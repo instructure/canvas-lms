@@ -20,7 +20,7 @@ import React from 'react'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {map, filter, clone} from 'lodash'
+import {map, filter, clone} from 'es-toolkit/compat'
 import ValidatorResultsRow from './ValidatorResultsRow'
 
 const I18n = createI18nScope('link_validator')

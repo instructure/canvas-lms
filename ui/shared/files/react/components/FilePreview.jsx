@@ -19,7 +19,7 @@
 import React, {Suspense} from 'react'
 import page from 'page'
 import $ from 'jquery'
-import {each, find} from 'lodash'
+import {each, find} from 'es-toolkit/compat'
 import classnames from 'classnames'
 import {Mask, Overlay} from '@instructure/ui-overlays'
 import FilePreviewInfoPanel from './FilePreviewInfoPanel'

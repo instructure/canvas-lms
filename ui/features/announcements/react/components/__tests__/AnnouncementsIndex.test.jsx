@@ -20,7 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Provider} from 'react-redux'
-import _ from 'lodash'
+import {merge} from 'es-toolkit/compat'
 
 import AnnouncementsIndex from '../AnnouncementsIndex'
 
@@ -51,7 +51,7 @@ const announcements = [
 ]
 
 const makeProps = (props = {}) =>
-  _.merge(
+  merge(
     {
       announcements: [],
       announcementsPage: 1,

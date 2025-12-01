@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isObject} from 'lodash'
+import {isObject} from 'es-toolkit/compat'
 
 export const handleActions = (actionHandler, def) => {
   return (state, action) => {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isEmpty} from 'lodash'
+import {isEmpty} from 'es-toolkit/compat'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'

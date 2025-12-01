@@ -16,7 +16,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import _ from 'lodash'
+import {cloneDeep} from 'es-toolkit/compat'
 import $ from 'jquery'
 import axios from '@canvas/axios'
 import minimatch from 'minimatch'
@@ -170,7 +170,7 @@ class FileBrowser extends React.Component {
 
   populateCollectionsList = (folderList, opts = {}) => {
     this.setState(function ({collections}) {
-      const newCollections = _.cloneDeep(collections)
+      const newCollections = cloneDeep(collections)
       folderList.forEach(folder => {
         const collection = this.formatFolderInfo(folder, opts)
         newCollections[collection.id] = collection
@@ -205,8 +205,8 @@ class FileBrowser extends React.Component {
 
   populateItemsList = fileList => {
     this.setState(function ({items, collections}) {
-      const newItems = _.cloneDeep(items)
-      const newCollections = _.cloneDeep(collections)
+      const newItems = cloneDeep(items)
+      const newCollections = cloneDeep(collections)
       fileList.forEach(file => {
         if (this.contentTypeIsAllowed(file['content-type'])) {
           const item = this.formatFileInfo(file)

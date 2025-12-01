@@ -17,7 +17,7 @@
  */
 
 import produce, {Draft} from 'immer'
-import {isEqual} from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 import {useRef, createContext, useContext, useSyncExternalStore, PropsWithChildren} from 'react'
 
 interface Store<T> {

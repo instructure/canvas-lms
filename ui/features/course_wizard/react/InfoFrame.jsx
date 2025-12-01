@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {find} from 'lodash'
+import {find} from 'es-toolkit/compat'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'

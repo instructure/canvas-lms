@@ -22,7 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {getEveryoneOption} from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import _ from 'underscore'
-import {forEach, map} from 'lodash'
+import {forEach, map} from 'es-toolkit/compat'
 import CardActions from '../util/differentiatedModulesCardActions'
 import {string, func, array, number, oneOfType, bool} from 'prop-types'
 import {

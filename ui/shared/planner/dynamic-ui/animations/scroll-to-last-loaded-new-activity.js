@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {intersection} from 'lodash'
+import {intersection} from 'es-toolkit/compat'
 import Animation from '../animation'
 import {daysToItems} from '../../utilities/daysUtils'
 import {isNewActivityItem} from '../../utilities/statusUtils'

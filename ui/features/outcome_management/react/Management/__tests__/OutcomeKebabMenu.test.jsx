@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import OutcomeKebabMenu from '../OutcomeKebabMenu'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 

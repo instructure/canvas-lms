@@ -19,7 +19,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Spinner} from '@instructure/ui-spinner'
 import $ from 'jquery'
-import _ from 'lodash'
+import {pick, each, find, compact, filter, map} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -46,7 +46,7 @@ export default class CalendarEvent extends Backbone.Model {
   dateAttributes = ['created_at', 'end_at', 'start_at', 'updated_at']
 
   _filterAttributes(obj) {
-    const filtered = _.pick(obj, [
+    const filtered = pick(obj, [
       'start_at',
       'end_at',
       'title',
@@ -64,11 +64,9 @@ export default class CalendarEvent extends Backbone.Model {
     ])
 
     if (obj.use_section_dates && obj.child_event_data) {
-      filtered.child_event_data = _.chain(obj.child_event_data)
-        .compact()
-        .filter(this._hasValidInputs)
-        .map(this._filterAttributes)
-        .value()
+      const compacted = compact(obj.child_event_data)
+      const filtered_data = filter(compacted, this._hasValidInputs)
+      filtered.child_event_data = map(filtered_data, this._filterAttributes)
     }
     return filtered
   }
@@ -174,11 +172,11 @@ export default class CalendarEvent extends Backbone.Model {
   static mergeSectionsIntoCalendarEvent(eventData = {}, sections) {
     eventData.course_sections = sections
     eventData.use_section_dates = !!(eventData.child_events && eventData.child_events.length)
-    _(eventData.child_events).each((child, index) => {
+    each(eventData.child_events, (child, index) => {
       // 'parse' turns string dates into Date objects
       child = eventData.child_events[index] = CalendarEvent.prototype.parse(child)
       const sectionId = splitAssetString(child.context_code)[1]
-      const section = _(sections).find(section => section.id === sectionId)
+      const section = find(sections, section => section.id === sectionId)
       section.event = child
     })
     return eventData

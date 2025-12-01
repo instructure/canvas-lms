@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {throttle} from 'lodash'
+import {throttle} from 'es-toolkit/compat'
 import Progress from '@canvas/progress/backbone/models/Progress'
 import Folder from '@canvas/files/backbone/models/Folder'
 import {assignLocation} from '@canvas/util/globalUtils'

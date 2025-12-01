@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {extend, pick} from 'lodash'
+import {extend, pick} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import {raw} from '@instructure/html-escape'
 

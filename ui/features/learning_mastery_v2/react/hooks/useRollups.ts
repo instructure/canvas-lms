@@ -17,7 +17,7 @@
  */
 
 import {useState, useEffect, useRef} from 'react'
-import {groupBy} from 'lodash'
+import {groupBy} from 'es-toolkit/compat'
 import {loadRollups} from '../apiClient'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {

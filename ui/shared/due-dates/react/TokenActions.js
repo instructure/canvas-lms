@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {chain, difference, find, isEmpty, union} from 'lodash'
+import {difference, isEmpty, union, find} from 'es-toolkit/compat'
+import {chain} from 'lodash'
 import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride'
 import Section from '@canvas/sections/backbone/models/Section'
 

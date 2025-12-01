@@ -18,7 +18,7 @@
 import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {get, isUndefined, keyBy, max, sum} from 'lodash'
+import {keyBy, get, isUndefined, max, sum} from 'es-toolkit/compat'
 import PropTypes from 'prop-types'
 import React, {useEffect, useRef, useState} from 'react'
 import Criterion from './Criterion'

@@ -18,7 +18,7 @@
 
 import React, {useState, useRef} from 'react'
 import PropTypes from 'prop-types'
-import {groupBy, isDate} from 'lodash'
+import {groupBy, isDate} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Select} from '@instructure/ui-select'
 import {Tag} from '@instructure/ui-tag'

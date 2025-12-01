@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'

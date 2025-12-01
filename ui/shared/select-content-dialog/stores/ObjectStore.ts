@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {clone} from 'lodash'
+import {clone} from 'es-toolkit/compat'
 import createStore, {type CanvasStore} from '@canvas/backbone/createStore'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import '@canvas/rails-flash-notifications'

@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {map, each, isEmpty, compact} from 'lodash'
+import {map, each, isEmpty, compact} from 'es-toolkit/compat'
 import $ from 'jquery'
 import React from 'react'
 import createReactClass from 'create-react-class'

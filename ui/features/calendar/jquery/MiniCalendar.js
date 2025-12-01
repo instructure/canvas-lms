@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {defaults} from 'lodash'
+import {defaults} from 'es-toolkit/compat'
 import calendarDefaults from '../CalendarDefaults'
 import 'jquery-tinypubsub'
 

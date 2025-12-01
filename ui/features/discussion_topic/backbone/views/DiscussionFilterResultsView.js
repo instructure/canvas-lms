@@ -17,7 +17,7 @@
 
 import noResultsTemplate from '../../jst/noResults.handlebars'
 import $ from 'jquery'
-import {filter} from 'lodash'
+import {filter} from 'es-toolkit/compat'
 import FilterEntryView from './FilterEntryView'
 import EntryCollectionView from './EntryCollectionView'
 import EntryCollection from '../collections/EntryCollection'

@@ -18,7 +18,7 @@
 
 import {AssignmentGroup as ApiAssignmentGroup} from 'api.d'
 import {AssignmentGroup} from './getAssignmentGroups'
-import {isNil, omitBy} from 'lodash'
+import {isNil, omitBy} from 'es-toolkit/compat'
 
 export const transformAssignmentGroup = (it: AssignmentGroup): ApiAssignmentGroup => {
   const rules = {

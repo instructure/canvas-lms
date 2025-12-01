@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect} from 'react'
-import _ from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 import {bool, func} from 'prop-types'
 import {Button, type ButtonProps} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -185,14 +185,14 @@ export default function Layout(props: LayoutProps) {
       : [...scheduledReleaseErrorMessages.grades, ...scheduledReleaseErrorMessages.comments]
 
   const hasScheduledReleaseChanged =
-    !_.isEqual(
+    !isEqual(
       {
-        postCommentsAt: updatedScheduledPost?.postCommentsAt ?? undefined,
-        postGradesAt: updatedScheduledPost?.postGradesAt ?? undefined,
+        postCommentsAt: updatedScheduledPost?.postCommentsAt ?? null,
+        postGradesAt: updatedScheduledPost?.postGradesAt ?? null,
       },
       {
-        postCommentsAt: scheduledPost?.postCommentsAt ?? undefined,
-        postGradesAt: scheduledPost?.postGradesAt ?? undefined,
+        postCommentsAt: scheduledPost?.postCommentsAt ?? null,
+        postGradesAt: scheduledPost?.postGradesAt ?? null,
       },
     ) && !scheduledReleaseErrors.length
 

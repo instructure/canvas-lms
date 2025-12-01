@@ -917,6 +917,32 @@ describe('transformInternalToApiOverride', () => {
       marked_complete: false,
     })
   })
+
+  it('correctly maps all item types to API types', () => {
+    const typeMap = [
+      {internal: 'Quiz', api: 'quiz'},
+      {internal: 'Discussion', api: 'discussion_topic'},
+      {internal: 'Assignment', api: 'assignment'},
+      {internal: 'Discussion Checkpoint', api: 'sub_assignment'},
+      {internal: 'Page', api: 'wiki_page'},
+      {internal: 'Announcement', api: 'announcement'},
+      {internal: 'To Do', api: 'planner_note'},
+      {internal: 'Calendar Event', api: 'calendar_event'},
+      {internal: 'Peer Review', api: 'assessment_request'},
+    ]
+
+    typeMap.forEach(({internal, api}) => {
+      const internalItem = {
+        id: '42',
+        overrideId: null,
+        type: internal,
+        overrideAssignId: null,
+        completed: false,
+      }
+      const result = transformInternalToApiOverride(internalItem, '1')
+      expect(result.plannable_type).toBe(api)
+    })
+  })
 })
 
 describe('transformPlannerNoteApiToInternalItem', () => {

@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {forEach} from 'lodash'
+import {forEach} from 'es-toolkit/compat'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import {completeUpload} from '@canvas/upload-file'

@@ -22,7 +22,7 @@ import ReactDOM from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import Popover from 'jquery-popover'
-import _, {find, every} from 'lodash'
+import {find, every, reject} from 'es-toolkit/compat'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import {renderDeleteCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/DeleteCalendarEventDialog'
@@ -295,7 +295,8 @@ export default class ShowEventDetailsDialog {
       },
       prepareData: $dialog => ({cancel_reason: $dialog.find('#cancel_reason').val()}),
       success: () => {
-        this.event.object.child_events = _(this.event.object.child_events).reject(
+        this.event.object.child_events = reject(
+          this.event.object.child_events,
           e => e.url === $appt.data('url'),
         )
         $appt.remove()

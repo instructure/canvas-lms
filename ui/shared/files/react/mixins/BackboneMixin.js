@@ -19,7 +19,7 @@
 // this is just https://github.com/usepropeller/react.backbone but without the UMD wrapper.
 
 import Backbone from '@canvas/backbone'
-import {debounce, identity} from 'lodash'
+import {identity, debounce} from 'es-toolkit/compat'
 
 const collectionBehavior = {
   changeOptions: 'add remove reset sort',

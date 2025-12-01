@@ -18,7 +18,6 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'lodash'
 
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'

@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {omit, defer, pick} from 'lodash'
+import {defer, omit, pick} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
 import moment from 'moment-timezone'

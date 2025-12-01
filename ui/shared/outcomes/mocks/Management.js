@@ -31,7 +31,7 @@ import {
   SEARCH_OUTCOME_ALIGNMENTS,
 } from '../graphql/Management'
 import {defaultRatings, defaultMasteryPoints} from '../react/hooks/useRatings'
-import {pick, uniq, flattenDeep} from 'lodash'
+import {flattenDeep, pick, uniq} from 'es-toolkit/compat'
 import {jest} from '@jest/globals'
 
 const testRatings = defaultRatings.map(rating => pick(rating, ['description', 'points']))

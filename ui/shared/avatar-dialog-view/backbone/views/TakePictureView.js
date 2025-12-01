@@ -17,7 +17,7 @@
 //
 
 import $ from 'jquery'
-import {once, min} from 'lodash'
+import {once, min} from 'es-toolkit/compat'
 import BaseView from './AvatarUploadBaseView'
 import template from '../../jst/takePictureView.handlebars'
 import BlobFactory from '../../BlobFactory'

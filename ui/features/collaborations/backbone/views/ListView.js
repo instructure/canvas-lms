@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import {each, extend as lodashExtend, flatten, reject} from 'lodash'
+import {each, reject, extend as lodashExtend, flatten} from 'es-toolkit/compat'
 import PaginatedView from '@canvas/pagination/backbone/views/PaginatedView'
 import UserCollection from '@canvas/users/backbone/collections/UserCollection'
 import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection'
