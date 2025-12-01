@@ -324,9 +324,16 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
           title: displayName,
         }
 
-        const updatedWidgets = [...prevConfig.widgets, newWidget]
+        const updatedWidgets = prevConfig.widgets.map(w => {
+          if (w.position.col === col && w.position.row >= row) {
+            return {...w, position: {...w.position, row: w.position.row + 1}}
+          }
+          return w
+        })
+
+        const allWidgets = [...updatedWidgets, newWidget]
         const normalizedWidgets = normalizeRowNumbers(
-          normalizeRowNumbers(updatedWidgets, LEFT_COLUMN),
+          normalizeRowNumbers(allWidgets, LEFT_COLUMN),
           RIGHT_COLUMN,
         )
         const finalWidgets = recalculateRelativePositions(normalizedWidgets)
