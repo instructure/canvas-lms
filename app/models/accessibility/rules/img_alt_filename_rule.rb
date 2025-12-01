@@ -69,8 +69,7 @@ module Accessibility
       end
 
       def message
-        I18n.t("The alt text is just the file name. Add a description for screen readers
-        so people who are blind or have low vision can understand what's in the image.")
+        I18n.t("This text (alt text) is read by screen readers and displayed if the image fails to load. Replace the filename with a meaningful description.")
       end
 
       def why

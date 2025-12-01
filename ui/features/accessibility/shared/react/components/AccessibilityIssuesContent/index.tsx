@@ -455,7 +455,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
                 </Link>
               </Flex>
             </Flex>
-            <View as="div">
+            <View as="section" aria-label={I18n.t('Issue preview')}>
               <Preview
                 ref={previewRef}
                 issue={currentIssue}

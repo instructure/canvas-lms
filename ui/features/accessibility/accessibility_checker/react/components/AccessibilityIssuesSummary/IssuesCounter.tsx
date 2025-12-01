@@ -49,6 +49,7 @@ export const IssuesCounter: React.FC<IssuesCounterProps> = ({count}: IssuesCount
       >
         <Flex.Item>
           <Heading
+            level="h2"
             data-testid="counter-number"
             themeOverride={(_componentTheme, currentTheme) => ({
               primaryColor:
@@ -63,7 +64,15 @@ export const IssuesCounter: React.FC<IssuesCounterProps> = ({count}: IssuesCount
           </Heading>
         </Flex.Item>
         <Flex.Item>
-          <Text data-testid="counter-description" variant="descriptionSection">
+          <Heading
+            level="h2"
+            data-testid="counter-description"
+            themeOverride={{
+              h2FontSize: '1rem',
+              h2FontWeight: 400,
+              lineHeight: '1.5rem',
+            }}
+          >
             {I18n.t(
               {
                 one: 'Total Issue',
@@ -72,7 +81,7 @@ export const IssuesCounter: React.FC<IssuesCounterProps> = ({count}: IssuesCount
               },
               {count},
             )}
-          </Text>
+          </Heading>
         </Flex.Item>
       </Flex>
     </AccessibleContent>

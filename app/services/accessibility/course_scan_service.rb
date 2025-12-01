@@ -81,7 +81,7 @@ class Accessibility::CourseScanService < ApplicationService
 
   def scan_course
     scan_resources(@course.wiki_pages.not_deleted, :wiki_page_id)
-    scan_resources(@course.assignments.active.except(:order), :assignment_id)
+    scan_resources(@course.assignments.active.not_type_quiz_lti.except(:order), :assignment_id)
   end
 
   private

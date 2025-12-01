@@ -142,6 +142,15 @@ export type CanvasDateInput2Props = {
    * Provides a ref to the underlying input element.
    */
   inputRef?: (element: HTMLInputElement | null) => void
+  /**
+   * Custom screen reader labels for the date input. Allows overriding the default
+   * "Choose a date" label for the calendar icon button with a more descriptive label.
+   */
+  screenReaderLabels?: {
+    calendarIcon?: string
+    prevMonthButton?: string
+    nextMonthButton?: string
+  }
 }
 
 export default function CanvasDateInput2({
@@ -161,6 +170,7 @@ export default function CanvasDateInput2({
   onSelectedDateChange,
   placeholder = '',
   renderLabel = <span>{I18n.t('Choose a date')}</span>,
+  screenReaderLabels,
   selectedDate,
   timezone = ENV?.TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone,
   width,
@@ -314,9 +324,9 @@ export default function CanvasDateInput2({
       placeholder={placeholder}
       dateFormat={{formatter: d => d.toISOString(), parser: parseDate(timezone)}}
       screenReaderLabels={{
-        calendarIcon: I18n.t('Choose a date'),
-        prevMonthButton: I18n.t('Previous month'),
-        nextMonthButton: I18n.t('Next month'),
+        calendarIcon: screenReaderLabels?.calendarIcon || I18n.t('Choose a date'),
+        prevMonthButton: screenReaderLabels?.prevMonthButton || I18n.t('Previous month'),
+        nextMonthButton: screenReaderLabels?.nextMonthButton || I18n.t('Next month'),
       }}
       inputRef={inputRef}
     />
