@@ -318,7 +318,6 @@
     "jsdom": "25.0.1",
     "jsdom-global": "^3.0.2",
     "lint-staged": "^9",
-    "loader-utils": "^1",
     "merge-stream": "^2",
     "micromatch": "^4.0.4",
     "mkdirp": "^1.0.4",
