@@ -126,6 +126,7 @@ export default function ReportsTable({accountId, reports}: Props) {
         <ReportHistoryModal
           accountId={accountId}
           report={historyReport.report}
+          updatedReport={updatedReports[historyReport.report]}
           closeModal={() => setHistoryReport(null)}
         />
       )}
