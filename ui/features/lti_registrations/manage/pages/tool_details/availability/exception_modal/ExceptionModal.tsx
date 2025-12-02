@@ -38,6 +38,7 @@ import {ContextSearchOption} from './ContextSearchOption'
 import {Spinner} from '@instructure/ui-spinner'
 import {ContextBrowse} from './ContextBrowse'
 import {LtiRegistrationId} from '../../../../model/LtiRegistrationId'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -115,7 +116,25 @@ export const ExceptionModal = ({
   const [browserOpen, setBrowserOpen] = React.useState(false)
 
   return (
-    <Modal open={openState.open} label={I18n.t('Add Availability and Exceptions')} size="medium">
+    <Modal
+      open={openState.open}
+      label={I18n.t('Add Availability and Exceptions')}
+      size="medium"
+      onExited={() => {
+        // We have to do the flash alert here and it must be polite, otherwise Modal's
+        // built-in focus management will trample over our alert and it won't get
+        // read out.
+        if (confirmHandler.isSuccess) {
+          showFlashAlert({
+            message: I18n.t('%{count} exception(s) were successfully added.', {
+              count: contextControlForm.length,
+            }),
+            type: 'success',
+            politeness: 'polite',
+          })
+        }
+      }}
+    >
       <Modal.Header>
         <CloseButton placement="end" offset="small" onClick={close} screenReaderLabel="Close" />
         <Heading>{I18n.t('Add Availability and Exceptions')}</Heading>
