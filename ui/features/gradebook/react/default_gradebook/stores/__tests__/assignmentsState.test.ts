@@ -393,6 +393,7 @@ describe('Gradebook', () => {
           'post_manually',
           'checkpoints',
           'has_rubric',
+          'peer_review',
           'module_ids', // This should be included because hasModules is true
         ]),
         hide_zero_point_quizzes: false,
@@ -446,6 +447,7 @@ describe('Gradebook', () => {
           'post_manually',
           'checkpoints',
           'has_rubric',
+          'peer_review',
         ]),
         hide_zero_point_quizzes: false,
       })

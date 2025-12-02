@@ -395,4 +395,37 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
       })
     })
   })
+
+  describe('Peer Review Sub Assignments', () => {
+    function getSpeedGraderLink() {
+      return [...document.querySelectorAll('a')].find(
+        link => link.textContent.trim() === 'SpeedGrader',
+      )
+    }
+
+    beforeEach(() => {
+      props.assignment.parentAssignmentId = '2300'
+      props.assignment.htmlUrl = 'http://localhost/assignments/2300'
+    })
+
+    test('SpeedGrader link includes peer_review parameter for peer review sub assignments', () => {
+      mountAndOpenOptionsMenu()
+      const speedGraderLink = getSpeedGraderLink()
+      expect(speedGraderLink).toBeDefined()
+      expect(speedGraderLink.href).toMatch(/peer_review=true/)
+    })
+
+    test('SpeedGrader link uses parent assignment ID for peer review sub assignments', () => {
+      mountAndOpenOptionsMenu()
+      const speedGraderLink = getSpeedGraderLink()
+      expect(speedGraderLink).toBeDefined()
+      expect(speedGraderLink.href).toMatch(/assignment_id=2300/)
+    })
+
+    test('assignment link points to parent assignment for peer review sub assignments', () => {
+      mountComponent()
+      const assignmentLink = getAssignmentLink()
+      expect(assignmentLink.href).toBe('http://localhost/assignments/2300')
+    })
+  })
 })

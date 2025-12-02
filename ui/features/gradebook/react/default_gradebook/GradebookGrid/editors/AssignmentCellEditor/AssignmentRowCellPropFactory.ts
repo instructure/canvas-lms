@@ -78,6 +78,7 @@ export default class AssignmentRowCellPropFactory {
 
     const pendingGradeInfo = this.gradebook.getPendingGradeInfo(cleanSubmission)
     const gradingScheme = this.gradebook.getAssignmentGradingScheme(assignment.id)
+    const isPeerReviewAssignment = Boolean(assignment.parent_assignment_id)
 
     return {
       assignment: {
@@ -92,12 +93,22 @@ export default class AssignmentRowCellPropFactory {
       pointsBasedGradingScheme: gradingScheme?.pointsBased,
       scalingFactor: gradingScheme?.scalingFactor,
       isSubmissionTrayOpen: isTrayOpen(this.gradebook, student, assignment),
+      isPeerReviewAssignment,
 
       onToggleSubmissionTrayOpen: () => {
-        this.gradebook.toggleSubmissionTrayOpen(student.id, assignment.id)
+        const submissionTrayAssignmentId = isPeerReviewAssignment
+          ? (assignment.parent_assignment_id as string)
+          : assignment.id
+
+        this.gradebook.toggleSubmissionTrayOpen(
+          student.id,
+          submissionTrayAssignmentId,
+          isPeerReviewAssignment ? assignment.id : null,
+        )
       },
 
       onGradeSubmission: this.gradebook.gradeSubmission,
+      peerReviewAssignment: isPeerReviewAssignment ? assignment : null,
       pendingGradeInfo,
       student,
       submission: cleanSubmission,

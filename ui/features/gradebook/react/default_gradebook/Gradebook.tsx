@@ -769,9 +769,26 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   updateFilterAssignmentIds = () => {
-    this.filteredAssignmentIds = this.filterAssignments(Object.values(this.assignments)).map(
-      assignment => assignment.id,
-    )
+    const filteredAssignments = this.filterAssignments(Object.values(this.assignments))
+    const assignmentIds: string[] = []
+
+    const filteredAssignmentIds = new Set(filteredAssignments.map(a => a.id))
+
+    filteredAssignments.forEach(assignment => {
+      assignmentIds.push(assignment.id)
+
+      if (assignment.peer_review_sub_assignment) {
+        const peerReviewId = assignment.peer_review_sub_assignment.id
+        const peerReviewExists = this.assignments[peerReviewId]
+        const peerReviewFiltered = filteredAssignmentIds.has(peerReviewId)
+
+        if (peerReviewExists && peerReviewFiltered) {
+          assignmentIds.push(peerReviewId)
+        }
+      }
+    })
+
+    this.filteredAssignmentIds = [...new Set(assignmentIds)]
   }
 
   // Assignment Group Data & Lifecycle Methods
@@ -816,6 +833,33 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         this.assignments[assignment.id] = assignment
         if (!group.assignments.some(a => a.id === assignment.id)) {
           group.assignments.push(assignment)
+        }
+
+        if (
+          ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED &&
+          assignment.peer_review_sub_assignment &&
+          assignment.peer_reviews
+        ) {
+          const peerReview = {
+            ...assignment.peer_review_sub_assignment,
+            assignment_group: group,
+            assignment_group_id: assignment.assignment_group_id,
+            parent_assignment_id: assignment.id,
+            parent_assignment: assignment,
+          } as Assignment
+
+          if (window.ENV.SETTINGS.suppress_assignments) {
+            if (!assignment.suppress_assignment) {
+              this.addAssignmentColumnDefinition(peerReview)
+            }
+          } else {
+            this.addAssignmentColumnDefinition(peerReview)
+          }
+
+          this.assignments[peerReview.id] = peerReview
+          if (!group.assignments.some(a => a.id === peerReview.id)) {
+            group.assignments.push(peerReview)
+          }
         }
       })
     })
@@ -3587,6 +3631,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const rowDelta = direction === 'next' ? 1 : -1
     const newRowIdx = location.row + rowDelta
     const student = this.listRows()[newRowIdx]
+    const {assignmentId, peerReviewAssignmentId} = this.getSubmissionTrayState()
     if (!student) {
       return
     }
@@ -3594,7 +3639,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       row: newRowIdx,
       cell: location.cell,
     })
-    this.setSubmissionTrayState(true, student.id)
+    this.setSubmissionTrayState(true, student.id, assignmentId, peerReviewAssignmentId)
     return this.updateRowAndRenderSubmissionTray(student.id)
   }
 
@@ -3607,11 +3652,31 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (!assignment) {
       return
     }
-    this.setSubmissionTrayState(true, studentId, assignment.assignmentId)
+
+    let rawAssignment
+
+    if (assignment.assignmentId) {
+      rawAssignment = this.getAssignment(assignment.assignmentId)
+    }
+
+    if (rawAssignment?.parent_assignment_id) {
+      this.setSubmissionTrayState(
+        true,
+        studentId,
+        rawAssignment.parent_assignment_id,
+        assignment.assignmentId,
+      )
+    } else {
+      this.setSubmissionTrayState(true, studentId, assignment.assignmentId)
+    }
+
     return this.updateRowAndRenderSubmissionTray(studentId)
   }
 
-  getSubmissionTrayProps = (student: null | Student = null): SubmissionTrayProps => {
+  getSubmissionTrayProps = (
+    student: null | Student = null,
+    peerReviewAssignmentId: string | null = null,
+  ): SubmissionTrayProps => {
     if (!this.gradebookGrid?.gridSupport) throw new Error('grid is not initialized')
     const {open, studentId, assignmentId, editedCommentId} = this.getSubmissionTrayState()
     if (!studentId) {
@@ -3687,6 +3752,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         assignment.omit_from_final_grade ||
         (this.options.group_weighting_scheme === 'percent' && isGroupWeightZero),
       isOpen: open,
+      isPeerReviewAssignment: Boolean(peerReviewAssignmentId),
       latePolicy: this.courseContent.latePolicy,
       locale: this.props.locale,
       onAnonymousSpeedGraderClick: this.showAnonymousSpeedGraderAlertForURL,
@@ -3694,6 +3760,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       onGradeSubmission: this.gradeSubmission,
       onStickerChange: this.handleStickerChanged,
       onRequestClose: this.closeSubmissionTray,
+      peerReviewAssignment: peerReviewAssignmentId
+        ? camelizeProperties(this.getAssignment(peerReviewAssignmentId))
+        : null,
       pendingGradeInfo: this.getPendingGradeInfo({
         assignmentId,
         userId: studentId,
@@ -3750,11 +3819,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   renderSubmissionTray = (student: Student | null = null) => {
-    const {open, studentId, assignmentId} = this.getSubmissionTrayState()
+    const {open, studentId, assignmentId, peerReviewAssignmentId} = this.getSubmissionTrayState()
     if (!assignmentId) throw new Error('assignmentId missing')
     if (!studentId) throw new Error('studentId missing')
     const mountPoint = document.getElementById('StudentTray__Container')
-    const props = this.getSubmissionTrayProps(student)
+    const props = this.getSubmissionTrayProps(student, peerReviewAssignmentId)
     if (!this.getSubmissionCommentsLoaded() && open) {
       this.loadSubmissionComments(assignmentId, studentId)
     }
@@ -3780,8 +3849,17 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.renderSubmissionTray(this.student(studentId))
   }
 
-  toggleSubmissionTrayOpen = (studentId: string, assignmentId: string) => {
-    this.setSubmissionTrayState(!this.getSubmissionTrayState().open, studentId, assignmentId)
+  toggleSubmissionTrayOpen = (
+    studentId: string,
+    assignmentId: string,
+    peerReviewAssignmentId: string | null = null,
+  ) => {
+    this.setSubmissionTrayState(
+      !this.getSubmissionTrayState().open,
+      studentId,
+      assignmentId,
+      peerReviewAssignmentId,
+    )
     return this.updateRowAndRenderSubmissionTray(studentId)
   }
 
@@ -3804,6 +3882,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     open: boolean,
     studentId: string | null = null,
     assignmentId: string | null = null,
+    peerReviewAssignmentId: string | null = null,
   ) => {
     this.gridDisplaySettings.submissionTray.open = open
     if (studentId) {
@@ -3812,6 +3891,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (assignmentId) {
       this.gridDisplaySettings.submissionTray.assignmentId = assignmentId
     }
+    this.gridDisplaySettings.submissionTray.peerReviewAssignmentId = peerReviewAssignmentId
     if (open) {
       return this.gradebookGrid?.gridSupport?.helper.commitCurrentEdit()
     }

@@ -100,6 +100,7 @@ export function getInitialGridDisplaySettings(
       commentsLoaded: false,
       commentsUpdating: false,
       editedCommentId: null,
+      peerReviewAssignmentId: null,
     },
     showUnpublishedAssignments: settings.show_unpublished_assignments === 'true',
     showSeparateFirstLastNames: settings.show_separate_first_last_names === 'true',

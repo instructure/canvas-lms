@@ -171,6 +171,7 @@ describe('Gradebook#renderSubmissionTray', () => {
         comments: [],
         commentsUpdating: false,
         editedCommentId: null,
+        peerReviewAssignmentId: null,
       })
     })
 
@@ -550,6 +551,7 @@ describe('Gradebook#renderSubmissionTray', () => {
         comments: [],
         commentsUpdating: false,
         editedCommentId: null,
+        peerReviewAssignmentId: null,
       }
 
       expect(gradebook.gridDisplaySettings.submissionTray).toEqual(expected)
@@ -580,6 +582,7 @@ describe('Gradebook#renderSubmissionTray', () => {
         comments: [],
         commentsUpdating: false,
         editedCommentId: null,
+        peerReviewAssignmentId: null,
       }
 
       expect(gradebook.getSubmissionTrayState()).toEqual(expected)
@@ -598,6 +601,7 @@ describe('Gradebook#renderSubmissionTray', () => {
         comments: [],
         commentsUpdating: false,
         editedCommentId: null,
+        peerReviewAssignmentId: null,
       }
 
       expect(gradebook.getSubmissionTrayState()).toEqual(expected)
@@ -1226,6 +1230,171 @@ describe('Gradebook#renderSubmissionTray', () => {
       gradebook.renderSubmissionTray(gradebook.student('1101'))
       expect(loadSubmissionCommentsStub).not.toHaveBeenCalled()
     })
+  })
+})
+
+describe('Gradebook#loadTrayStudent', () => {
+  let gradebook
+
+  beforeEach(() => {
+    global.ENV = {
+      current_user_id: '1',
+      GRADEBOOK_OPTIONS: {
+        proxy_submissions_allowed: false,
+        custom_grade_statuses: [],
+      },
+    }
+
+    gradebook = createGradebook()
+    gradebook.gradebookGrid = {
+      gridSupport: {
+        state: {
+          getActiveLocation: () => ({region: 'body', cell: 0, row: 0}),
+          setActiveLocation: jest.fn(),
+        },
+        helper: {
+          commitCurrentEdit: jest.fn(),
+        },
+      },
+    }
+
+    gradebook.students = {
+      1100: {id: '1100', name: 'Student 1'},
+      1101: {id: '1101', name: 'Student 2'},
+    }
+
+    jest
+      .spyOn(gradebook, 'listRows')
+      .mockReturnValue([gradebook.students[1100], gradebook.students[1101]])
+    jest.spyOn(gradebook, 'updateRowAndRenderSubmissionTray').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    delete global.ENV
+  })
+
+  it('preserves assignmentId and peerReviewAssignmentId when navigating to next student', () => {
+    gradebook.setSubmissionTrayState(true, '1100', '2301', '2302')
+    jest.spyOn(gradebook, 'setSubmissionTrayState')
+
+    gradebook.loadTrayStudent('next')
+
+    expect(gradebook.setSubmissionTrayState).toHaveBeenCalledWith(true, '1101', '2301', '2302')
+  })
+
+  it('preserves assignmentId and peerReviewAssignmentId when navigating to previous student', () => {
+    gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
+      region: 'body',
+      cell: 0,
+      row: 1,
+    })
+    gradebook.setSubmissionTrayState(true, '1101', '2301', '2302')
+    jest.spyOn(gradebook, 'setSubmissionTrayState')
+
+    gradebook.loadTrayStudent('previous')
+
+    expect(gradebook.setSubmissionTrayState).toHaveBeenCalledWith(true, '1100', '2301', '2302')
+  })
+
+  it('handles navigation without peerReviewAssignmentId', () => {
+    gradebook.setSubmissionTrayState(true, '1100', '2301')
+    jest.spyOn(gradebook, 'setSubmissionTrayState')
+
+    gradebook.loadTrayStudent('next')
+
+    expect(gradebook.setSubmissionTrayState).toHaveBeenCalledWith(true, '1101', '2301', null)
+  })
+})
+
+describe('Gradebook#loadTrayAssignment', () => {
+  let gradebook
+
+  beforeEach(() => {
+    global.ENV = {
+      current_user_id: '1',
+      GRADEBOOK_OPTIONS: {
+        proxy_submissions_allowed: false,
+        custom_grade_statuses: [],
+      },
+    }
+
+    gradebook = createGradebook()
+
+    gradebook.gradebookGrid = {
+      gridSupport: {
+        state: {
+          getActiveLocation: () => ({region: 'body', cell: 0, row: 0}),
+        },
+        helper: {
+          commitCurrentEdit: jest.fn(),
+        },
+      },
+    }
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+
+    jest.spyOn(gradebook, 'updateRowAndRenderSubmissionTray').mockImplementation(() => {})
+    jest.spyOn(gradebook, 'navigateAssignment').mockImplementation(direction => {
+      if (direction === 'next') {
+        return {assignmentId: '2302'}
+      }
+      return {assignmentId: '2300'}
+    })
+  })
+
+  afterEach(() => {
+    delete global.ENV
+  })
+
+  it('sets parent assignment ID and peer review assignment ID for peer review sub-assignments', () => {
+    gradebook.setAssignments({
+      2302: {
+        id: '2302',
+        parent_assignment_id: '2300',
+        name: 'Peer Review Sub-assignment',
+      },
+      2300: {
+        id: '2300',
+        name: 'Parent Assignment',
+      },
+    })
+
+    jest.spyOn(gradebook, 'setSubmissionTrayState')
+
+    gradebook.loadTrayAssignment('next')
+
+    expect(gradebook.setSubmissionTrayState).toHaveBeenCalledWith(true, '1101', '2300', '2302')
+  })
+
+  it('sets only assignment ID for regular assignments', () => {
+    gradebook.setAssignments({
+      2302: {
+        id: '2302',
+        name: 'Regular Assignment',
+      },
+    })
+
+    jest.spyOn(gradebook, 'setSubmissionTrayState')
+
+    gradebook.loadTrayAssignment('next')
+
+    expect(gradebook.setSubmissionTrayState).toHaveBeenCalledWith(true, '1101', '2302')
+  })
+
+  it('handles assignments without parent_assignment_id', () => {
+    gradebook.setAssignments({
+      2302: {
+        id: '2302',
+        parent_assignment_id: null,
+        name: 'Assignment without parent',
+      },
+    })
+
+    jest.spyOn(gradebook, 'setSubmissionTrayState')
+
+    gradebook.loadTrayAssignment('next')
+
+    expect(gradebook.setSubmissionTrayState).toHaveBeenCalledWith(true, '1101', '2302')
   })
 })
 

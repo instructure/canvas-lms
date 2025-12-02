@@ -185,6 +185,7 @@ export default (
       'post_manually',
       'checkpoints',
       'has_rubric',
+      'peer_review',
     ]
 
     if (get().hasModules) {
