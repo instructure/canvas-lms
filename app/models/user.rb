@@ -3942,4 +3942,8 @@ class User < ActiveRecord::Base
   def pseudonym_for_restoration_in(account)
     account.pseudonyms.where(user_id: self).order(deleted_at: :desc).first!
   end
+
+  def all_attachments_frd
+    Attachment.where(user: self).or(Attachment.where(context: self))
+  end
 end
