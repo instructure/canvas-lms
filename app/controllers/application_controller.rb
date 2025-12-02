@@ -485,6 +485,7 @@ class ApplicationController < ActionController::Base
     ams_enhanced_rubrics
     api_rate_limits
     buttons_and_icons_root_account
+    canvas_apps_sub_account_access
     course_pace_allow_bulk_pace_assign
     course_pace_download_document
     course_pace_draft_state
