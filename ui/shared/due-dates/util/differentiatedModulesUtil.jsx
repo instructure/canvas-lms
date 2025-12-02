@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import _ from 'underscore'
-import {map} from 'es-toolkit/compat'
+import {compact, flatMap, groupBy, map} from 'es-toolkit/compat'
 import {getOverriddenAssignees} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
@@ -40,11 +39,10 @@ export const combinedDates = override => {
 }
 
 export const sortedRowKeys = rows => {
-  const {datedKeys, numberedKeys} = _.chain(rows)
-    .keys()
-    .groupBy(key => (key.length > 11 ? 'datedKeys' : 'numberedKeys'))
-    .value()
-  return _.chain([datedKeys, numberedKeys]).flatten().compact().value()
+  const {datedKeys, numberedKeys} = groupBy(Object.keys(rows), key =>
+    key.length > 11 ? 'datedKeys' : 'numberedKeys',
+  )
+  return compact([datedKeys, numberedKeys].flat())
 }
 
 export const datesFromOverride = override => ({
@@ -57,17 +55,14 @@ export const datesFromOverride = override => ({
 
 export const getAllOverridesFromCards = givenCards => {
   const cards = givenCards
-  return _.chain(cards)
-    .values()
-    .map(card =>
+  return compact(
+    flatMap(Object.values(cards), card =>
       map(card.overrides, override => {
         override.persisted = card.persisted
         return override
       }),
-    )
-    .flatten()
-    .compact()
-    .value()
+    ),
+  )
 }
 
 export const areCardsEqual = (preSavedCard, currentCard) => {
