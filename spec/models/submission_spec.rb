@@ -3447,6 +3447,45 @@ describe Submission do
           end
         end
 
+        it "merges turnitin_data with originality report data when no report in turnitin_data" do
+          submission.turnitin_data = {
+            eula_agreement_timestamp: "1725631351175",
+            webhook_info: {
+              product_code: "turnitin-lti",
+              vendor_code: "turnitin.com",
+              resource_type_code: "abc-cba-settings",
+              tool_proxy_id: 273,
+              tool_proxy_created_at: Time.zone.parse("2020-07-09 09:31:59.543183000 EDT"),
+              tool_proxy_updated_at: Time.zone.parse("2022-09-29 11:26:41.957018000 EDT"),
+              tool_proxy_name: "Turnitin Originality",
+              tool_proxy_context_type: "Account",
+              tool_proxy_context_id: 416,
+              subscription_id: "22a61zd9-3bca-2281-1373-21gb64292c2b"
+            }
+          }
+
+          originality_report.update!(
+            originality_score: 53.0,
+            workflow_state: "scored",
+            created_at: Time.zone.parse("2024-10-06 21:05:06.383483000 +0000"),
+            updated_at: Time.zone.parse("2024-10-07 22:30:13.686426000 +0000")
+          )
+
+          result = submission.originality_data
+
+          expect(result[attachment.asset_string]).to include(
+            similarity_score: 53.0,
+            state: originality_report.state,
+            attachment_id: originality_report.attachment_id,
+            status: "scored",
+            error_message: nil
+          )
+
+          expect(result).to include(:eula_agreement_timestamp)
+          expect(result[:eula_agreement_timestamp]).to eq("1725631351175")
+          expect(result).not_to include(:webhook_info)
+        end
+
         context "when vericite is enabled" do
           before do
             allow(submission.assignment).to receive(:vericite_enabled?).and_return(true)
