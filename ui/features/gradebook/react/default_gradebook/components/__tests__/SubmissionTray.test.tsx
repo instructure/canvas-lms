@@ -811,4 +811,90 @@ describe('SubmissionTray', () => {
     reactRef.current.cancelCommenting()
     expect(editSubmissionComment).toHaveBeenCalledWith(null)
   })
+
+  describe('Peer Review Sub Assignments', () => {
+    test('SpeedGrader link includes peer_review parameter for peer review sub assignments', () => {
+      const assignment = {
+        ...props.assignment,
+        parentAssignmentId: '29',
+      }
+      const submission = {
+        ...props.submission,
+        assignmentId: '29',
+      }
+      const {getByText} = render(
+        <SubmissionTray
+          {...props}
+          assignment={assignment}
+          submission={submission}
+          isPeerReviewAssignment={true}
+        />,
+      )
+      const speedGraderLink = getByText('SpeedGrader').closest('a')
+      expect(speedGraderLink?.href).toMatch(/peer_review=true/)
+    })
+
+    test('SpeedGrader link uses parent assignment ID for peer review sub assignments', () => {
+      const assignment = {
+        ...props.assignment,
+        parentAssignmentId: '29',
+      }
+      const submission = {
+        ...props.submission,
+        assignmentId: '29',
+      }
+      const {getByText} = render(
+        <SubmissionTray
+          {...props}
+          assignment={assignment}
+          submission={submission}
+          isPeerReviewAssignment={true}
+        />,
+      )
+      const speedGraderLink = getByText('SpeedGrader').closest('a')
+      expect(speedGraderLink?.href).toMatch(/assignment_id=29/)
+    })
+
+    test('assignment link uses parent assignment htmlUrl for peer review sub assignments', () => {
+      const assignment = {
+        ...props.assignment,
+        parentAssignmentId: '29',
+        htmlUrl: 'http://parent-assignment-url/',
+      }
+      const {getByText} = render(<SubmissionTray {...props} assignment={assignment} />)
+      const assignmentLink = getByText('Book Report').closest('a')
+      expect(assignmentLink?.href).toBe('http://parent-assignment-url/')
+    })
+
+    test('displays peer review assignment name when isPeerReviewAssignment is true', () => {
+      const assignment = {
+        ...props.assignment,
+        name: 'Main Assignment',
+      }
+      const peerReviewAssignment = {
+        id: '31',
+        name: 'Peer Review',
+      }
+      const {getByText} = render(
+        <SubmissionTray
+          {...props}
+          assignment={assignment}
+          isPeerReviewAssignment={true}
+          peerReviewAssignment={peerReviewAssignment}
+        />,
+      )
+      expect(getByText('Peer Review')).toBeInTheDocument()
+    })
+
+    test('falls back to assignment name when peerReviewAssignment is not provided', () => {
+      const assignment = {
+        ...props.assignment,
+        name: 'Main Assignment',
+      }
+      const {getByText} = render(
+        <SubmissionTray {...props} assignment={assignment} isPeerReviewAssignment={true} />,
+      )
+      expect(getByText('Main Assignment')).toBeInTheDocument()
+    })
+  })
 })

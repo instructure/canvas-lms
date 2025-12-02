@@ -224,6 +224,9 @@ export type Assignment = Readonly<{
   original_lti_resource_link_id: null | string
   original_quiz_id: null | string
   peer_reviews: boolean
+  peer_review_sub_assignment: PeerReviewSubAssignment | null
+  parent_assignment_id?: string
+  parent_assignment?: Assignment
   points_possible: number | null
   position: number
   post_to_sis: boolean
@@ -251,6 +254,18 @@ export type Assignment = Readonly<{
     inClosedGradingPeriod: boolean
     overrides: Override[]
   }>
+
+export type PeerReviewSubAssignment = Readonly<{
+  id: string
+  name: string
+  html_url: string
+  points_possible: number | null
+  grading_type: GradingType
+  submission_types: string[]
+  workflow_state: WorkflowState
+  published: boolean
+  assignment_group_id: string
+}>
 
 export type AssignmentMap = {
   [assignmentId: string]: Assignment

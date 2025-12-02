@@ -48,6 +48,8 @@ type Props = {
   editorOptions: {
     column: {
       assignmentId: string
+      isPeerReviewAssignment: boolean
+      peerReviewAssignment: CamelizedAssignment | null
     }
     grid: {}
     item: {
@@ -180,7 +182,12 @@ export default class AssignmentRowCell extends Component<Props> {
 
   handleToggleTrayButtonClick = () => {
     const options = this.props.editorOptions
-    this.props.onToggleSubmissionTrayOpen(options.item.id, options.column.assignmentId)
+
+    const submissionTrayAssignmentId = options.column.isPeerReviewAssignment
+      ? (options.column.peerReviewAssignment as CamelizedAssignment).id
+      : options.column.assignmentId
+
+    this.props.onToggleSubmissionTrayOpen(options.item.id, submissionTrayAssignmentId)
   }
 
   focus() {

@@ -57,6 +57,7 @@ export const transformAssignment = (it: Assignment): ApiAssignment => {
     omit_from_final_grade: it.omitFromFinalGrade ?? false,
     only_visible_to_overrides: it.onlyVisibleToOverrides,
     peer_reviews: it.peerReviews?.enabled ?? false,
+    peer_review_sub_assignment: undefined as any,
     points_possible: it.pointsPossible,
     position: it.position ?? 0,
     post_manually: it.postManually ?? false,

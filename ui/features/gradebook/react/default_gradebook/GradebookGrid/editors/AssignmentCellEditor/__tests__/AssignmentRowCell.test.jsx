@@ -43,6 +43,8 @@ describe('GradebookGrid AssignmentRowCell', () => {
       editorOptions: {
         column: {
           assignmentId: '2301',
+          isPeerReviewAssignment: false,
+          peerReviewAssignment: null,
           field: 'assignment_2301',
           object: {
             grading_type: 'points',
@@ -546,6 +548,18 @@ describe('GradebookGrid AssignmentRowCell', () => {
       })
 
       test('calls onToggleSubmissionTrayOpen with the student id and assignment id', () => {
+        props.onToggleSubmissionTrayOpen = jest.fn()
+        wrapper = render(<AssignmentRowCell {...props} />)
+        wrapper.container.querySelector(buttonSelector).click()
+        expect(props.onToggleSubmissionTrayOpen).toHaveBeenCalledWith('1101', '2301')
+      })
+
+      test('calls onToggleSubmissionTrayOpen with parent assignment ID for peer review sub assignments', () => {
+        props.editorOptions.column.isPeerReviewAssignment = true
+        props.editorOptions.column.peerReviewAssignment = {
+          id: '2301',
+          name: 'Parent Assignment',
+        }
         props.onToggleSubmissionTrayOpen = jest.fn()
         wrapper = render(<AssignmentRowCell {...props} />)
         wrapper.container.querySelector(buttonSelector).click()

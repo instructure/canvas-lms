@@ -115,6 +115,7 @@ export type SubmissionTrayProps = {
   isNotCountedForScore: boolean
   enterGradesAs: GradeEntryMode
   isOpen: boolean
+  isPeerReviewAssignment: boolean
   isFirstStudent: boolean
   isLastStudent: boolean
   latePolicy?: LatePolicyCamelized
@@ -145,6 +146,7 @@ export type SubmissionTrayProps = {
   customGradeStatuses: GradeStatus[]
   customGradeStatusesEnabled: boolean
   contentRef?: React.RefObject<HTMLDivElement>
+  peerReviewAssignment: CamelizedAssignment | null
 }
 
 export type CheckpointState = {
@@ -453,11 +455,12 @@ export default class SubmissionTray extends React.Component<
     const {name, avatarUrl} = this.props.student
     const assignmentParam = `assignment_id=${this.props.submission.assignmentId}`
     const studentParam = `student_id=${this.props.student.id}`
+    const peerReviewParam = this.props.isPeerReviewAssignment ? '&peer_review=true' : ''
     const speedGraderUrlParams = this.props.assignment.anonymizeStudents
       ? assignmentParam
       : `${assignmentParam}&${studentParam}`
     const speedGraderUrl = encodeURI(
-      `/courses/${this.props.courseId}/gradebook/speed_grader?${speedGraderUrlParams}`,
+      `/courses/${this.props.courseId}/gradebook/speed_grader?${speedGraderUrlParams}${peerReviewParam}`,
     )
 
     const submissionCommentsProps = {
@@ -658,6 +661,10 @@ export default class SubmissionTray extends React.Component<
       this.props.assignment,
     )
 
+    const assignmentDisplayName = this.props.isPeerReviewAssignment
+      ? this.props.peerReviewAssignment?.name || this.props.assignment.name
+      : this.props.assignment.name
+
     return (
       <ApolloProvider client={createClient()}>
         <Tray
@@ -718,7 +725,7 @@ export default class SubmissionTray extends React.Component<
                     theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
                   >
                     <Link href={this.props.assignment.htmlUrl} isWithinText={false}>
-                      {this.props.assignment.name}
+                      {assignmentDisplayName}
                     </Link>
                   </InstUISettingsProvider>
                 </Carousel>

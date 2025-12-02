@@ -154,6 +154,7 @@ export type GridDisplaySettings = {
     commentsLoaded: boolean
     commentsUpdating: boolean
     editedCommentId: string | null
+    peerReviewAssignmentId: string | null
   }
   viewUngradedAsZero: boolean
   showUnpublishedAssignments: boolean
