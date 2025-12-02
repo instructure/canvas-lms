@@ -68,9 +68,9 @@ class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
     end
   end
 
-  def to_csv
+  def to_csv(csv_options = {})
     @csv ||=
-      CSV.generate do |csv|
+      CSVWithI18n.generate(**csv_options) do |csv|
         stats = summary_stats_for_quiz
         headers = [
           I18n.t("csv.question.id", "Question Id"),
