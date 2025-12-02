@@ -14,18 +14,11 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {reduce, each, max, last, filter, sum} from 'es-toolkit/compat'
-import {mixin} from 'lodash'
+import {each, max, last, filter, sum} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import numberFormat from '@canvas/i18n/numberFormat'
 
 const I18n = createI18nScope('CalculationMethodContent')
-
-mixin({
-  sum(array, accessor = null, start = 0) {
-    return reduce(array, (memo, el) => (accessor != null ? accessor(el) : el) + memo, start)
-  },
-})
 
 const eachCons = (array, num) => {
   return Array.from({length: array.length - num + 1}, (_, i) => array.slice(i, i + num))
