@@ -10030,6 +10030,13 @@ describe Assignment do
       info = @assignment.context_module_tag_info(@student, @course, has_submission: true)
       expect(info[:past_due]).to be_falsey
     end
+
+    it "does not return past_due for excused assignments even if due date is in the past" do
+      submission = @assignment.submissions.find_by(user: @student)
+      submission.update!(excused: true)
+      info = @assignment.context_module_tag_info(@student, @course, has_submission: false)
+      expect(info[:past_due]).to be_falsey
+    end
   end
 
   describe "#touch_submissions_if_muted" do
