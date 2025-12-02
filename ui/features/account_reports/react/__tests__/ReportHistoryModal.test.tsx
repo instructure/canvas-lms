@@ -37,6 +37,13 @@ const mockHistory = [
     file_url: 'https://example.com/report_1.csv',
     progress: 100,
     message: 'Report completed successfully',
+    started_at: '2025-01-01T00:00:01Z',
+    ended_at: '2025-01-01T00:05:00Z',
+    user: {
+      id: '42',
+      display_name: 'Test User',
+      html_url: 'https://example.com/users/42',
+    },
   },
   {
     id: '2',
@@ -45,6 +52,12 @@ const mockHistory = [
     created_at: '2025-01-02T00:00:00Z',
     progress: 0,
     message: 'Report failed to complete',
+    started_at: '2025-01-01T00:00:01Z',
+    user: {
+      id: '43',
+      display_name: 'Sad User',
+      html_url: 'https://example.com/users/43',
+    },
   },
 ]
 
@@ -68,10 +81,13 @@ describe('ReportHistoryModal', () => {
     expect(downloadLink).toHaveAttribute('href', 'https://example.com/report_1.csv?download_frd=1')
     expect(within(history1).getByText('Completed')).toBeInTheDocument()
     expect(within(history1).getByText('Report completed successfully')).toBeInTheDocument()
+    expect(within(history1).getByText('Finished:')).toBeInTheDocument()
+    expect(within(history1).getByText('Test User')).toBeInTheDocument()
 
     const history2 = getByTestId('report_history_2')
     expect(within(history2).getByText('Failed')).toBeInTheDocument()
     expect(within(history2).getByText('Report failed to complete')).toBeInTheDocument()
+    expect(within(history2).getByText('Sad User')).toBeInTheDocument()
   })
 
   it('renders a loading spinner while fetching', async () => {
