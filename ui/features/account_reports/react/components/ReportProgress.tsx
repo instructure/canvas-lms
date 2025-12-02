@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 import {IconXSolid} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {ProgressCircle} from '@instructure/ui-progress'
@@ -51,7 +51,11 @@ export default function ReportProgress({accountId, reportRun, onStateChange}: Pr
       })
       onStateChange(json!)
     } catch (error) {
-      showFlashError(I18n.t('Error canceling report'))(error as Error)
+      // the cancel API uses the created_or_running scope, so a 404 means the report already finished
+      const already_finished = error instanceof FetchApiError && error.response.status === 404
+      if (!already_finished) {
+        showFlashError(I18n.t('Error canceling report'))(error as Error)
+      }
       setCanceling(false)
     }
   }
