@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "Toutes les applications"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "Autoriser le téléchargement de support"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Autoriser le téléchargement de transcription"
+    },
     "alpha_15d59033": {
         "message": "Alpha"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Modifier la couleur du texte"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Les modifications s''appliqueront après l''enregistrement de cette page."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Les changements effectués ne seront peut-être pas enregistrés."
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "Incorporer l’image"
+    },
+    "embed_options_44c4cba8": {
+        "message": "Options intégrées"
     },
     "embed_video_a97a64af": {
         "message": "Intégrer la vidéo"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "Chargement de l’aperçu"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Vitesse de verrouillage à 1x"
     },
     "locked_762f138b": {
         "message": "Verrouillé"

@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "सभी ऐप्स"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "मीडिया डाउनलोड की अनुमति दें"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "ट्रांसक्रिप्ट डाउनलोड की अनुमति दें"
+    },
     "alpha_15d59033": {
         "message": "अल्फ़ा"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "पाठ रंग बदलें"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "इस पेज को सहेजने के बाद बदलाव लागू हो जाएंगे।"
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "हो सकता है आपके द्वारा किए गए परिवर्तन सहेजे नहीं जा सकें।"
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "छवि एम्बेड करें"
+    },
+    "embed_options_44c4cba8": {
+        "message": "एम्बेड विकल्प"
     },
     "embed_video_a97a64af": {
         "message": "वीडियो एम्बेड करें"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "पूर्वावलोकन लोड किया जा रहा है"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "1x पर गति लॉक कर दें"
     },
     "locked_762f138b": {
         "message": "लॉक किया गया"

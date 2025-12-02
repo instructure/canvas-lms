@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "Alle apps"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "Tillad download af medier"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Tillad download af transskription"
+    },
     "alpha_15d59033": {
         "message": "Alfa"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Skift tekstfarve"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Ændringerne træder i kraft, når du har gemt denne side."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Ændringer, du har foretaget, kan ikke blive gemt."
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "Integrer billede"
+    },
+    "embed_options_44c4cba8": {
+        "message": "Indlejringsindstillinger"
     },
     "embed_video_a97a64af": {
         "message": "Indlejr video"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "Indlæser forhåndsvisning"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Lås hastighed ved 1x"
     },
     "locked_762f138b": {
         "message": "Låst"

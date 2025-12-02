@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "Ngā Raraunga Katoa"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "Tukua te tango pāpāho"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Tukua te tango tuhinga"
+    },
     "alpha_15d59033": {
         "message": "Arepa"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Huria te tae o te kuputuhi"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Ka pā ngā huringa i muri i tō tiaki i tēnei whārangi."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Kaore pea e tiakina ngā huringa i mahia e koe."
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "Tāmau Āhua"
+    },
+    "embed_options_44c4cba8": {
+        "message": "Ngā kōwhiringa whakauru"
     },
     "embed_video_a97a64af": {
         "message": "Whakauru Ataata"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "Uta ana arokite"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Tere maukati i te 1x"
     },
     "locked_762f138b": {
         "message": "Kua rakaina"

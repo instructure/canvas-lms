@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "すべてのアプリ"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "メディアのダウンロードを許可する"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "成績証明書のダウンロードを許可する"
+    },
     "alpha_15d59033": {
         "message": "アルファ"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "テキストの色を変更する"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "変更は、このページを保存した後に適用されます。"
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "行われた変更は保存されません。"
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "画像の埋め込み"
+    },
+    "embed_options_44c4cba8": {
+        "message": "埋め込みオプション"
     },
     "embed_video_a97a64af": {
         "message": "ビデオを埋め込む"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "プレビュー読み込み中"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "速度を1倍速に固定する"
     },
     "locked_762f138b": {
         "message": "ロックされています"

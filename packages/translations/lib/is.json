@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "Öll forrit"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "Leyfa niðurhal margmiðlunarefnis"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Leyfa niðurhal á eftirritun"
+    },
     "alpha_15d59033": {
         "message": "Alfa"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Breyta lit á texta"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Breytingar gilda eftir að þú vistar þessa síðu."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Breytingar verða hugsanlega ekki vistaðar."
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "Fella inn mynd"
+    },
+    "embed_options_44c4cba8": {
+        "message": "Fella inn valkosti"
     },
     "embed_video_a97a64af": {
         "message": "Fella inn myndband"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "Hlaða forskoðun"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Læsa hraða við 1x"
     },
     "locked_762f138b": {
         "message": "Læst"
