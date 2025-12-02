@@ -949,6 +949,7 @@ class Submission < ActiveRecord::Base
     return merged_data if assignment.vericite_enabled?
 
     legacy_turnitin_data.each_key do |asset_key|
+      next unless merged_data[asset_key].is_a?(Hash)
       next if merged_data[asset_key].key?(:view_report_url)
 
       merged_data[asset_key][:view_report_url] = view_report_url("turnitin", asset_key)
