@@ -21,12 +21,19 @@ export interface AccountReport {
   report: string
   status: 'created' | 'running' | 'compiling' | 'complete' | 'error' | 'aborted'
   created_at: string
+  started_at?: string
+  ended_at?: string
   progress: number
   run_time: number
   file_url?: string
   message?: string
   parameters?: {
     extra_text?: string
+  }
+  user?: {
+    id: string
+    display_name: string
+    html_url: string
   }
 }
 

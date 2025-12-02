@@ -23,6 +23,7 @@ import {IconDownloadSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
+import {InlineList} from '@instructure/ui-list'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 import ReportStatusPill from './ReportStatusPill'
@@ -50,8 +51,38 @@ export default function ReportRun({reportRun}: Props) {
       borderWidth="none none small none"
     >
       <Flex alignItems="start" justifyItems="space-between">
-        <Flex.Item>
-          <Text>{formatDate(reportRun.created_at)}</Text>
+        <Flex.Item shouldGrow>
+          <View as="div" margin="none none small none">
+            <Text weight="bold">{formatDate(reportRun.created_at)}</Text>
+            <View as="div">
+              <InlineList delimiter="pipe" size="small">
+                {reportRun.user && (
+                  <InlineList.Item>
+                    <Text size="small" color="secondary">
+                      <Text weight="bold">{I18n.t('Initiator:')}</Text>{' '}
+                      <Link href={reportRun.user.html_url}>{reportRun.user.display_name}</Link>
+                    </Text>
+                  </InlineList.Item>
+                )}
+                {reportRun.started_at && (
+                  <InlineList.Item>
+                    <Text size="small" color="secondary">
+                      <Text weight="bold">{I18n.t('Started:')}</Text>{' '}
+                      {formatDate(reportRun.started_at)}
+                    </Text>
+                  </InlineList.Item>
+                )}
+                {reportRun.ended_at && (
+                  <InlineList.Item>
+                    <Text size="small" color="secondary">
+                      <Text weight="bold">{I18n.t('Finished:')}</Text>{' '}
+                      {formatDate(reportRun.ended_at)}
+                    </Text>
+                  </InlineList.Item>
+                )}
+              </InlineList>
+            </View>
+          </View>
         </Flex.Item>
         <Flex.Item>
           {reportRun.file_url && (
