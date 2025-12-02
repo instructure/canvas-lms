@@ -25,6 +25,7 @@ import CourseGradesWidget from './widgets/CourseGradesWidget/CourseGradesWidget'
 import AnnouncementsWidget from './widgets/AnnouncementsWidget/AnnouncementsWidget'
 import PeopleWidget from './widgets/PeopleWidget/PeopleWidget'
 import TodoListWidget from './widgets/TodoListWidget/TodoListWidget'
+import RecentGradesWidget from './widgets/RecentGradesWidget/RecentGradesWidget'
 
 const widgetRegistry: WidgetRegistry = {
   [WIDGET_TYPES.COURSE_WORK_SUMMARY]: {
@@ -61,6 +62,11 @@ const widgetRegistry: WidgetRegistry = {
     component: TodoListWidget,
     displayName: 'To-do list',
     description: 'View and manage your planner items and upcoming tasks',
+  },
+  [WIDGET_TYPES.RECENT_GRADES]: {
+    component: RecentGradesWidget,
+    displayName: 'Recent grades & feedback',
+    description: 'View your recently graded assignments and submissions',
   },
 }
 

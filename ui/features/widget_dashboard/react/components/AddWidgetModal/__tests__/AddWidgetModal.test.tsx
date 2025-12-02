@@ -98,7 +98,7 @@ describe('AddWidgetModal', () => {
     render(<AddWidgetModal {...defaultProps} />)
 
     const addButtons = screen.getAllByRole('button', {name: 'Add'})
-    expect(addButtons).toHaveLength(7)
+    expect(addButtons).toHaveLength(8)
   })
 
   it('calls addWidget with correct parameters when Add button is clicked', async () => {
