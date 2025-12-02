@@ -599,7 +599,8 @@ class GradebooksController < ApplicationController
     js_env({
              EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
              EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
-             GRADEBOOK_OPTIONS: gradebook_options
+             GRADEBOOK_OPTIONS: gradebook_options,
+             PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
            })
   end
 
