@@ -21,8 +21,7 @@ import enrollmentName from './enrollmentName'
 import _Handlebars from 'handlebars/runtime'
 import I18nObj, {useScope as createI18nScope} from '@canvas/i18n' //  'i18nObj' gets the extended I18n object with all the extra functions (interpolate, strftime, ...)
 import $ from 'jquery'
-import {isDate, map, reduce, defaults} from 'es-toolkit/compat'
-import {chain} from 'lodash'
+import {isDate, map, reduce, defaults, drop} from 'es-toolkit/compat'
 import htmlEscape, {raw} from '@instructure/html-escape'
 import semanticDateRange from '@canvas/datetime/semanticDateRange'
 import dateSelect from './dateSelect'
@@ -649,10 +648,8 @@ const object = {
 
     const bracketNotation =
       splitPropertyName[0] +
-      chain(splitPropertyName)
-        .drop()
+      drop(splitPropertyName, 1)
         .map(prop => `[${prop}]`)
-        .value()
         .join('')
     const inputProps = {
       type: 'checkbox',

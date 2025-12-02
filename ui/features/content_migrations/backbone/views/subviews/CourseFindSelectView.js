@@ -19,8 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import {find, map} from 'es-toolkit/compat'
-import {chain} from 'lodash'
+import {find, groupBy, map} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import template from '../../../jst/subviews/CourseFindSelect.handlebars'
@@ -66,17 +65,13 @@ CourseFindSelectView.prototype.render = function () {
       (function (_this) {
         return function (data) {
           _this.courses = data
-          _this.coursesByTerms = chain(_this.courses)
-            .groupBy(function (course) {
-              return course.term
-            })
-            .map(function (value, key) {
-              return {
-                term: key,
-                courses: value.sort(natcompare.byKey('label')),
-              }
-            })
-            .sort(function (a, b) {
+          const grouped = groupBy(_this.courses, course => course.term)
+          _this.coursesByTerms = Object.entries(grouped)
+            .map(([key, value]) => ({
+              term: key,
+              courses: value.sort(natcompare.byKey('label')),
+            }))
+            .sort((a, b) => {
               const astart = a.courses[0].enrollment_start
               const bstart = b.courses[0].enrollment_start
               let val = 0
@@ -88,7 +83,6 @@ CourseFindSelectView.prototype.render = function () {
               }
               return val
             })
-            .value()
           return CourseFindSelectView.__super__.render.apply(_this, arguments)
         }
       })(this),

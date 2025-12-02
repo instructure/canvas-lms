@@ -23,8 +23,7 @@ import update from 'immutability-helper'
 import DataRow from './dataRow'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {map, some} from 'es-toolkit/compat'
-import {chain} from 'lodash'
+import {map, some, compact, uniq} from 'es-toolkit/compat'
 import splitAssetString from '@canvas/util/splitAssetString'
 
 const I18n = createI18nScope('gradinggradingStandard')
@@ -132,7 +131,7 @@ class GradingStandard extends React.Component {
   rowDataIsValid = () => {
     if (this.state.editingStandard.data.length <= 1) return true
     const rowValues = map(this.state.editingStandard.data, dataRow => String(dataRow[1]).trim())
-    const sanitizedRowValues = chain(rowValues).compact().uniq().value()
+    const sanitizedRowValues = uniq(compact(rowValues))
     const inputsAreUniqueAndNonEmpty = sanitizedRowValues.length === rowValues.length
     const valuesDoNotOverlap = !some(this.state.editingStandard.data, (element, index, list) => {
       if (index < 1) return false
@@ -146,7 +145,7 @@ class GradingStandard extends React.Component {
 
   rowNamesAreValid = () => {
     const rowNames = map(this.state.editingStandard.data, dataRow => dataRow[0].trim())
-    const sanitizedRowNames = chain(rowNames).compact().uniq().value()
+    const sanitizedRowNames = uniq(compact(rowNames))
     return sanitizedRowNames.length === rowNames.length
   }
 

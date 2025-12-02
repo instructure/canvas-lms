@@ -17,7 +17,6 @@
  */
 
 import {difference, isEmpty, union, find} from 'es-toolkit/compat'
-import {chain} from 'lodash'
 import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride'
 
 const CardActions = {
@@ -96,7 +95,7 @@ const CardActions = {
     const newOverride = {...existingOverride, student_ids: newStudentIds, students: newStudents}
     delete newOverride.title
 
-    return chain(overridesFromRow).difference([existingOverride]).union([newOverride]).value()
+    return union(difference(overridesFromRow, [existingOverride]), [newOverride])
   },
 
   createNewAdhocOverrideForRow(assignee, overridesFromRow) {
@@ -183,7 +182,7 @@ const CardActions = {
     }
     delete newOverride.title
 
-    return chain(overridesFromRow).difference([adhocOverride]).union([newOverride]).value()
+    return union(difference(overridesFromRow, [adhocOverride]), [newOverride])
   },
 
   setOverrideInitializer(rowKey, dates) {
