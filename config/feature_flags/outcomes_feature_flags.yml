@@ -72,10 +72,6 @@ improved_lmgb:
   description: Improvements made to enhance the user experience within the Learning Mastery Gradebook.
   beta: true
   environments:
-    production:
-      state: disabled
-    beta:
-      state: disabled
     ci:
       state: allowed
     development:
