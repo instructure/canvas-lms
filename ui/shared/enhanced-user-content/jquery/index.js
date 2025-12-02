@@ -691,6 +691,12 @@ function showFilePreviewInOverlayHandler({file_id, verifier, access_token, instf
 }
 
 function wireUpFilePreview() {
+  if (
+    ENV?.PLATFORM_SERVICE_SPEEDGRADER_ENABLED &&
+    window.location.href.includes('gradebook/speed_grader')
+  ) {
+    return
+  }
   window.addEventListener('message', event => {
     if (event.data.subject === 'preview_file') {
       showFilePreviewInOverlayHandler(event.data)
