@@ -501,6 +501,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
               )}
               <View as="section" margin="medium 0">
                 <Form
+                  key={currentIssue.id}
                   ref={formRef}
                   issue={currentIssue}
                   error={formError}
