@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "Todas las aplicaciones"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "Permitir la descarga de contenido multimedia"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Permitir la descarga de transcripciones"
+    },
     "alpha_15d59033": {
         "message": "Alfa"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Cambiar color del texto"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Los cambios se aplicarán después de que guardes esta página."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Los cambios que hayas realizado no se guardarán."
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "Insertar imagen"
+    },
+    "embed_options_44c4cba8": {
+        "message": "Opciones de inserción"
     },
     "embed_video_a97a64af": {
         "message": "Insertar vídeo"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "Cargando vista"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Bloquear la velocidad a 1x"
     },
     "locked_762f138b": {
         "message": "Bloqueado"

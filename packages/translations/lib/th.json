@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "แอพทั้งหมด"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "อนุญาตให้ดาวน์โหลดมีเดีย"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "อนุญาตให้ดาวน์โหลดทรานสคริปต์"
+    },
     "alpha_15d59033": {
         "message": "อัลฟ่า"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "เปลี่ยนสีข้อความ"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "การเปลี่ยนแปลงจะมีผลหลังจากบันทึกเพจนี้"
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "การเปลี่ยนแปลงที่คุณทำขึ้นอาจไม่ถูกบันทึกไว้"
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "ผนวกภาพ"
+    },
+    "embed_options_44c4cba8": {
+        "message": "ตัวเลือกในการผนวก"
     },
     "embed_video_a97a64af": {
         "message": "ผนวกวิดีโอ"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "กำลังโหลดตัวอย่าง"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "ล็อความเร็วที่ 1x"
     },
     "locked_762f138b": {
         "message": "ล็อคแล้ว"

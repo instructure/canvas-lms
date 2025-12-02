@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "كافة التطبيقات"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "السماح بتنزيل الوسائط"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "السماح بتنزيل البرنامج النصي"
+    },
     "alpha_15d59033": {
         "message": "Alpha"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "تغيير لون النص"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "سيتم تطبيق التغييرات بعد حفظ هذه الصفحة."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "قد لا يتم حفظ التغييرات التي أجريتها."
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "تضمين صورة"
+    },
+    "embed_options_44c4cba8": {
+        "message": "تضمين خيارات"
     },
     "embed_video_a97a64af": {
         "message": "تضمين الفيديو"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "جارٍ تحميل المعاينة"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "تأمين السرعة عند 1x"
     },
     "locked_762f138b": {
         "message": "مؤمّن"

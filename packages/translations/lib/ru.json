@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "Все приложения"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "Разрешить скачивание мультимедиа"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Разрешить скачивание стенограммы"
+    },
     "alpha_15d59033": {
         "message": "Альфа"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Изменить цвет текста"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Изменения будут применены после сохранения этой страницы"
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Внесенные вами изменения не могут быть сохранены."
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "Вставить изображение"
+    },
+    "embed_options_44c4cba8": {
+        "message": "Вставить варианты"
     },
     "embed_video_a97a64af": {
         "message": "Вставить видео"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "Загрузка предпросмотра"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Блокировка скорости на 1x"
     },
     "locked_762f138b": {
         "message": "Заблокировано"

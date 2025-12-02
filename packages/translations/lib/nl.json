@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "Alle apps"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "Downloaden media toestaan"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Downloaden transcript toestaan"
+    },
     "alpha_15d59033": {
         "message": "Alfa"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Tekstkleur wijzigen"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Wijzigingen worden toegepast nadat je deze pagina opslaat."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Je wijzigingen worden niet opgeslagen."
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "Afbeelding insluiten"
+    },
+    "embed_options_44c4cba8": {
+        "message": "Opties voor insluiten"
     },
     "embed_video_a97a64af": {
         "message": "Video insluiten"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "Voorbeeld laden"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Snelheid vergrendelen op 1x"
     },
     "locked_762f138b": {
         "message": "Vergrendeld"

@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "All Apps"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "Allow media download"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Allow transcript download"
+    },
     "alpha_15d59033": {
         "message": "Alpha"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Change text color"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Changes will apply after you save this page."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Changes you made may not be saved."
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "Embed Image"
+    },
+    "embed_options_44c4cba8": {
+        "message": "Embed Options"
     },
     "embed_video_a97a64af": {
         "message": "Embed Video"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "Loading preview"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Lock speed at 1x"
     },
     "locked_762f138b": {
         "message": "Locked"

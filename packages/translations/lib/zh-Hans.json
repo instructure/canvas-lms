@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "所有应用"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "允许下载媒体"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "允许下载文字记录"
+    },
     "alpha_15d59033": {
         "message": "Alpha"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "更改文本颜色"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "保存此页面后，更改将生效。"
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "您做出的变更可能无法保存。"
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "嵌入图片"
+    },
+    "embed_options_44c4cba8": {
+        "message": "嵌入式选项"
     },
     "embed_video_a97a64af": {
         "message": "嵌入视频"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "加载预览"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "锁定 1 倍速度"
     },
     "locked_762f138b": {
         "message": "已锁定"
