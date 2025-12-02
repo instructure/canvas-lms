@@ -49,6 +49,7 @@ export interface TemplateWidgetProps extends BaseWidgetProps {
   headerActions?: React.ReactNode
   loadingText?: string
   pagination?: PaginationProps
+  footerActions?: React.ReactNode
   isEditMode?: boolean
   dragHandleProps?: any
 }
@@ -65,6 +66,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   onRetry,
   loadingText,
   pagination,
+  footerActions,
   isEditMode = false,
   dragHandleProps,
 }) => {
@@ -233,6 +235,12 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
                 aria-label={pagination.ariaLabel}
               />
             </Flex>
+          </View>
+        )}
+
+        {footerActions && !isLoading && !error && (
+          <View as="div" margin="small 0 0">
+            {footerActions}
           </View>
         )}
       </Flex>

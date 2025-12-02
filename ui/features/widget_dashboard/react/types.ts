@@ -126,3 +126,30 @@ export interface Announcement {
   } | null
   isRead?: boolean
 }
+
+export interface RecentGradeSubmission {
+  _id: string
+  submittedAt: string | null
+  gradedAt: string | null
+  score: number | null
+  grade: string | null
+  state: string
+  assignment: {
+    _id: string
+    name: string
+    htmlUrl: string
+    pointsPossible: number | null
+    submissionTypes: string[]
+    quiz: {_id: string; title: string} | null
+    discussion: {_id: string; title: string} | null
+    course: {
+      _id: string
+      name: string
+      courseCode?: string
+    }
+  }
+}
+
+export interface GradeItemProps {
+  submission: RecentGradeSubmission
+}

@@ -17,18 +17,9 @@
  */
 
 import React from 'react'
-import {
-  IconAssignmentLine,
-  IconQuizLine,
-  IconDiscussionLine,
-  IconDocumentLine,
-  IconCalendarClockLine,
-  IconCheckMarkLine,
-  IconWarningLine,
-} from '@instructure/ui-icons'
+import {IconCalendarClockLine, IconCheckMarkLine, IconWarningLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {startOfToday, getTomorrow} from '../../../utils/dateUtils'
-import type {CourseWorkItem} from '../../../hooks/useCourseWork'
 
 const I18n = createI18nScope('widget_dashboard')
 export interface SubmissionStatus {
@@ -66,38 +57,6 @@ export function formatDueDate(dueAt: string | null): string {
     date: dueDate.toLocaleDateString(),
     time: dueDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
   })
-}
-
-export function getTypeIcon(type: CourseWorkItem['type'], isMobile: boolean) {
-  const iconSize = isMobile ? 'x-small' : 'small'
-  switch (type) {
-    case 'assignment':
-      return (
-        <IconAssignmentLine
-          title={I18n.t('Assignment')}
-          size={iconSize}
-          data-testid="assignment-icon"
-        />
-      )
-    case 'quiz':
-      return <IconQuizLine title={I18n.t('Quiz')} size={iconSize} data-testid="quiz-icon" />
-    case 'discussion':
-      return (
-        <IconDiscussionLine
-          title={I18n.t('Discussion')}
-          size={iconSize}
-          data-testid="discussion-icon"
-        />
-      )
-    default:
-      return (
-        <IconDocumentLine
-          title={I18n.t('Course Work Item')}
-          size={iconSize}
-          data-testid="document-icon"
-        />
-      )
-  }
 }
 
 interface SubmissionStatusColors {
