@@ -3465,9 +3465,9 @@ class ApplicationController < ActionController::Base
   end
 
   def new_quizzes_native_experience_enabled?
-    return false unless @context.respond_to?(:root_account)
+    return false unless @context.respond_to?(:feature_enabled?)
 
-    @context.root_account.feature_enabled?(:new_quizzes_native_experience)
+    @context.feature_enabled?(:new_quizzes_native_experience)
   end
   helper_method :new_quizzes_native_experience_enabled?
 

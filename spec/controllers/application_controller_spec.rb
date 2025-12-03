@@ -3013,12 +3013,12 @@ RSpec.describe ApplicationController do
       expect(controller.send(:new_quizzes_native_experience_enabled?)).to be false
     end
 
-    it "returns true when the feature flag is enabled on the root account" do
-      @course.root_account.enable_feature!(:new_quizzes_native_experience)
+    it "returns true when the feature flag is enabled on the course" do
+      @course.enable_feature!(:new_quizzes_native_experience)
       expect(controller.send(:new_quizzes_native_experience_enabled?)).to be true
     end
 
-    it "returns false when context does not respond to root_account" do
+    it "returns false when context does not respond to feature_enabled?" do
       controller.instance_variable_set(:@context, Object.new)
       expect(controller.send(:new_quizzes_native_experience_enabled?)).to be false
     end
