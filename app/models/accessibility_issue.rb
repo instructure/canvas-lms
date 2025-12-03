@@ -30,4 +30,13 @@ class AccessibilityIssue < ActiveRecord::Base
 
   validates :course, :workflow_state, presence: true
   validates :rule_type, presence: true, inclusion: { in: Accessibility::Rule.registry.keys }
+
+  # For some rules, a nil param_value is acceptable (e.g., decorative images)
+  # We can extend this list as needed for other rules.
+  def allow_nil_param_value?
+    [
+      Accessibility::Rules::ImgAltRule.id,
+      Accessibility::Rules::ImgAltLengthRule.id,
+    ].include? rule_type
+  end
 end

@@ -18,22 +18,32 @@
 
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {success} from '../../../../../common/lib/apiResult/ApiResult'
+import type {ApiResult} from '../../../../../common/lib/apiResult/ApiResult'
 import type {FetchControlsByDeployment} from '../../../../api/contextControls'
 import {ZAccountId} from '../../../../model/AccountId'
 import {ZCourseId} from '../../../../model/CourseId'
 import {ZLtiContextControlId} from '../../../../model/LtiContextControl'
 import {ZLtiDeploymentId} from '../../../../model/LtiDeploymentId'
+import type {LtiDeployment} from '../../../../model/LtiDeployment'
 import {ZLtiRegistrationId} from '../../../../model/LtiRegistrationId'
 import {mockRegistrationWithAllInformation} from '../../../manage/__tests__/helpers'
 import {renderAppWithRegistration} from '../../configuration/__tests__/helpers'
 import {ToolAvailability} from '../ToolAvailability'
 import {mockContextControl, mockDeployment} from './helpers'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {createDeployment} from '../../../../api/deployments'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+  showFlashSuccess: jest.fn(() => jest.fn()),
+  showFlashError: jest.fn(() => jest.fn()),
+}))
+const mockFlash = showFlashAlert as jest.MockedFunction<typeof showFlashAlert>
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => {
+jest.mock('../../../../api/deployments', () => {
   return {
-    ...jest.requireActual('@canvas/alerts/react/FlashAlert'),
-    showFlashAlert: jest.fn().mockReturnValue(jest.fn()),
+    ...jest.requireActual('../../../../api/deployments'),
+    createDeployment: jest.fn(),
   }
 })
 
@@ -143,9 +153,166 @@ describe('ToolAvailability', () => {
     expect(fetchControlsByDeployment).toHaveBeenCalled()
 
     await screen.findByText(/Control Test App's availability/)
-    expect(
-      screen.queryByText('This tool has not been deployed to any sub-accounts or courses.'),
-    ).toBeInTheDocument()
+    const alertText = await screen.findByText(
+      /This tool hasn't been deployed to any sub-accounts or courses./,
+    )
+    expect(alertText).toBeInTheDocument()
+  })
+
+  it('renders a Create Deployment button that calls the create deployment endpoint', async () => {
+    const reg = mockRegistrationWithAllInformation({
+      n: 'Test App',
+      i: 1,
+    })
+    const newDeployment = mockDeployment({
+      id: ZLtiDeploymentId.parse('new-dep-1'),
+      context_name: 'Test Account',
+      context_id: reg.account_id,
+      context_type: 'Account',
+      registration_id: ZLtiRegistrationId.parse(reg.id),
+      context_controls: [
+        mockContextControl({
+          id: ZLtiContextControlId.parse('cc-new-1'),
+          account_id: ZAccountId.parse(reg.account_id),
+          context_name: 'Test Account',
+          path: `a${reg.account_id}.`,
+        }),
+      ],
+    })
+
+    const mockCreateDeployment = createDeployment as jest.MockedFunction<typeof createDeployment>
+    mockCreateDeployment.mockResolvedValue(success(newDeployment))
+
+    const fetchControlsByDeployment = jest.fn()
+    // First call returns empty, second call (after create) returns the new deployment
+    fetchControlsByDeployment
+      .mockResolvedValueOnce(success([]))
+      .mockResolvedValueOnce(success([newDeployment]))
+
+    const accountId = ZAccountId.parse(reg.account_id)
+    const utils = renderAppWithRegistration(reg)(
+      <ToolAvailability
+        deleteDeployment={jest.fn()}
+        editContextControl={jest.fn()}
+        accountId={accountId}
+        fetchControlsByDeployment={fetchControlsByDeployment}
+        deleteContextControl={jest.fn()}
+      />,
+    )
+
+    // Wait for initial render with no deployments
+    await utils.findByText(/Control Test App's availability/)
+
+    // Verify the Create Deployment button is visible
+    const button = await utils.findByText('Create Deployment')
+    expect(button).toBeInTheDocument()
+
+    fireEvent.click(button)
+
+    // Verify createDeployment was called with correct params
+    await waitFor(() => {
+      expect(mockCreateDeployment).toHaveBeenCalledWith({
+        registrationId: reg.id,
+        accountId: accountId,
+        available: false,
+      })
+    })
+
+    // Verify the query was refetched to show the new deployment
+    expect(fetchControlsByDeployment).toHaveBeenCalledTimes(2)
+
+    // Check that the deployment list is now showing
+    await waitFor(() => {
+      expect(utils.getByText('Installed in Test Account')).toBeInTheDocument()
+    })
+  })
+
+  it('shows an error when creating a deployment fails', async () => {
+    const reg = mockRegistrationWithAllInformation({
+      n: 'Test App',
+      i: 1,
+    })
+
+    const mockCreateDeployment = createDeployment as jest.MockedFunction<typeof createDeployment>
+    mockCreateDeployment.mockResolvedValue({
+      _type: 'GenericError' as const,
+      message: 'Failed to create deployment',
+    })
+
+    const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([]))
+    const accountId = ZAccountId.parse(reg.account_id)
+
+    const utils = renderAppWithRegistration(reg)(
+      <ToolAvailability
+        deleteDeployment={jest.fn()}
+        editContextControl={jest.fn()}
+        accountId={accountId}
+        fetchControlsByDeployment={fetchControlsByDeployment}
+        deleteContextControl={jest.fn()}
+      />,
+    )
+
+    // Wait for initial render
+    await utils.findByText(/Control Test App's availability/)
+
+    const button = await utils.findByText('Create Deployment')
+    fireEvent.click(button)
+
+    // Verify error message was shown
+    await waitFor(() => {
+      expect(mockFlash).toHaveBeenCalledWith({
+        type: 'error',
+        message: 'There was an error when creating the deployment',
+      })
+    })
+
+    // Verify the query was not refetched
+    expect(fetchControlsByDeployment).toHaveBeenCalledTimes(1)
+  })
+
+  it('disables the Create Deployment button while creating', async () => {
+    const reg = mockRegistrationWithAllInformation({
+      n: 'Test App',
+      i: 1,
+    })
+
+    const mockCreateDeployment = createDeployment as jest.MockedFunction<typeof createDeployment>
+    let resolveCreate: () => void = () => {}
+    const createPromise = new Promise<ApiResult<LtiDeployment>>(resolve => {
+      resolveCreate = () => resolve(success(mockDeployment()))
+    })
+    mockCreateDeployment.mockReturnValue(createPromise)
+
+    const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([]))
+    const accountId = ZAccountId.parse(reg.account_id)
+
+    const utils = renderAppWithRegistration(reg)(
+      <ToolAvailability
+        deleteDeployment={jest.fn()}
+        editContextControl={jest.fn()}
+        accountId={accountId}
+        fetchControlsByDeployment={fetchControlsByDeployment}
+        deleteContextControl={jest.fn()}
+      />,
+    )
+
+    const button = await utils.findByText('Create Deployment')
+    expect(button).not.toBeDisabled()
+
+    fireEvent.click(button)
+
+    // Button should be disabled while creating
+    await waitFor(() => {
+      expect(button.closest('button')).toBeDisabled()
+    })
+
+    // Resolve the promise
+    resolveCreate()
+
+    // Button should be enabled again after creation
+    await waitFor(() => {
+      expect(fetchControlsByDeployment).toHaveBeenCalledTimes(2)
+    })
   })
 
   it('renders all deployments', async () => {
@@ -309,7 +476,7 @@ describe('ToolAvailability', () => {
         expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument()
       })
 
-      const control = deployment.context_controls[1]
+      const control = deployment.context_controls![1]
 
       fireEvent.click(document.getElementById(`edit-exception-${control.id}`)!)
 
@@ -380,7 +547,7 @@ describe('ToolAvailability', () => {
         expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument()
       })
 
-      const control = deployment.context_controls[1]
+      const control = deployment.context_controls![1]
 
       fireEvent.click(document.getElementById(`edit-exception-${control.id}`)!)
 
@@ -437,7 +604,7 @@ describe('ToolAvailability', () => {
         expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument(),
       )
 
-      const control = deployment.context_controls[1]
+      const control = deployment.context_controls![1]
 
       fireEvent.click(document.getElementById(`edit-exception-${control.id}`)!)
 
@@ -565,7 +732,7 @@ describe('ToolAvailability', () => {
         expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument()
       })
 
-      const control = deployment.context_controls[1]
+      const control = deployment.context_controls![1]
 
       fireEvent.click(document.getElementById(`delete-exception-${control.id}`)!)
 
@@ -630,7 +797,7 @@ describe('ToolAvailability', () => {
         expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument(),
       )
 
-      const control = deployment.context_controls[1]
+      const control = deployment.context_controls![1]
 
       fireEvent.click(document.getElementById(`delete-exception-${control.id}`)!)
 
@@ -688,7 +855,7 @@ describe('ToolAvailability', () => {
         expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument(),
       )
 
-      const control = deployment.context_controls[1]
+      const control = deployment.context_controls![1]
 
       fireEvent.click(document.getElementById(`delete-exception-${control.id}`)!)
 
@@ -760,7 +927,7 @@ describe('ToolAvailability', () => {
         {timeout: 2000},
       )
 
-      const control = deployment.context_controls[1]
+      const control = deployment.context_controls![1]
 
       fireEvent.click(document.getElementById(`delete-exception-${control.id}`)!)
 

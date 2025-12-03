@@ -21,6 +21,8 @@ module Accessibility
   module Rules
     class ImgAltRuleHelper
       DEFAULT_REPEAT_COUNT = 3
+      MAX_LENGTH = 200
+      IMAGE_FILENAME_PATTERN = /[^\s]+(.*?)\.(jpg|jpeg|png|gif|svg|bmp|webp)$/i
 
       def self.generate_alt_text(image_url, config_name: "alt_text_generate", try_counter: DEFAULT_REPEAT_COUNT)
         return nil if image_url.blank?
@@ -74,9 +76,52 @@ module Accessibility
       end
 
       def self.alt_text_valid?(alt_text)
-        return false if alt_text.blank? || alt_text.length > 120
+        return false if alt_text.blank? || alt_text.length > MAX_LENGTH
 
         true
+      end
+
+      def self.filename_like?(text)
+        return false if text.blank?
+
+        IMAGE_FILENAME_PATTERN.match?(text)
+      end
+
+      def self.adjust_img_style(elem)
+        fixed_elem = elem.dup
+        fixed_elem["style"] = "max-width: 100%; max-height: 13rem; object-fit: contain;"
+        fixed_elem.to_html
+      end
+
+      def self.validation_error_missing
+        I18n.t("Alt text is required.")
+      end
+
+      def self.validation_error_filename
+        I18n.t("Alt text can not be a filename.")
+      end
+
+      def self.validation_error_too_long
+        I18n.t("Keep alt text under %{max_length} characters.", max_length: MAX_LENGTH)
+      end
+
+      def self.fix_alt_text!(elem, value)
+        if value.blank?
+          elem["role"] = "presentation"
+          elem["alt"] = ""
+          return [elem, adjust_img_style(elem)]
+        end
+
+        if filename_like?(value)
+          raise StandardError, validation_error_filename
+        end
+
+        if value.length > MAX_LENGTH
+          raise StandardError, validation_error_too_long
+        end
+
+        elem["alt"] = value
+        [elem, adjust_img_style(elem)]
       end
     end
   end

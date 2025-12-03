@@ -1645,21 +1645,9 @@ class Course < ActiveRecord::Base
 
     pages = wiki_pages.active
 
-    files.find_each do |file|
-      file.delay(
-        n_strand: ["horizon_file_ingestion", global_root_account_id],
-        singleton: "horizon_file_ingestion:#{global_id}:#{file.id}",
-        max_attempts: 3
-      ).ingest_to_pine
-    end
+    files.find_each(&:index_in_pine)
 
-    pages.find_each do |page|
-      page.delay(
-        n_strand: ["horizon_wiki_ingestion", global_root_account_id],
-        singleton: "horizon_wiki_ingestion:#{global_id}:#{page.id}",
-        max_attempts: 3
-      ).ingest_to_pine
-    end
+    pages.find_each(&:index_in_pine)
   end
 
   def handle_syllabus_changes_for_master_migration
@@ -3061,7 +3049,12 @@ class Course < ActiveRecord::Base
   ADMIN_TYPES = %w[TeacherEnrollment TaEnrollment DesignerEnrollment].freeze
   def section_visibilities_for(user, opts = {})
     fetch_on_enrollments("section_visibilities_for", user, opts) do
-      workflow_not = opts[:excluded_workflows] || "deleted"
+      include_concluded = opts.fetch(:include_concluded, true)
+      workflow_not = if include_concluded
+                       opts[:excluded_workflows] || %w[deleted rejected inactive]
+                     else
+                       opts[:excluded_workflows] || %w[completed deleted rejected inactive]
+                     end
 
       enrollment_rows = all_enrollments
                         .where(user:)
@@ -3520,7 +3513,7 @@ class Course < ActiveRecord::Base
       default_tabs.insert(1,
                           {
                             id: TAB_SEARCH,
-                            label: t("#tabs.search", "Smart Search"),
+                            label: t("IgniteAI Search"),
                             css_class: "search",
                             href: :course_search_path
                           })
@@ -3606,6 +3599,15 @@ class Course < ActiveRecord::Base
       smart_search_tab = default_tabs.detect { |t| t[:id] == TAB_SEARCH }
       tabs.insert(1, default_tabs.delete(smart_search_tab)) if smart_search_tab && !tabs.empty?
 
+      # since TAB_AI_EXPERIENCES is added dynamically, insert it before Settings if not already configured
+      # If it was configured by the user, it will have been removed from default_tabs by the mapping above
+      ai_experiences_tab = default_tabs.detect { |t| t[:id] == TAB_AI_EXPERIENCES }
+      if ai_experiences_tab && !tabs.empty?
+        settings_index = tabs.index { |t| t[:id] == TAB_SETTINGS }
+        settings_index ||= tabs.length
+        tabs.insert(settings_index, default_tabs.delete(ai_experiences_tab))
+      end
+
       tabs += default_tabs
       tabs += external_tabs
 
@@ -3626,8 +3628,9 @@ class Course < ActiveRecord::Base
 
       tabs.delete_if { |t| t[:id] == TAB_SETTINGS }
       if course_subject_tabs
-        # Don't show Settings, ensure that all external tools are at the bottom (with the exception of Groups, which
+        # Don't show Settings or AI Experiences, ensure that all external tools are at the bottom (with the exception of Groups, which
         # should stick to the end unless it has been re-ordered)
+        tabs.delete_if { |t| t[:id] == TAB_AI_EXPERIENCES }
         lti_tabs = tabs.filter { |t| t[:external] }
         tabs -= lti_tabs
         groups_tab = tabs.pop if tabs.last&.dig(:id) == TAB_GROUPS && !opts[:for_reordering]
@@ -4653,6 +4656,10 @@ class Course < ActiveRecord::Base
 
   def horizon_course?
     horizon_course && account&.feature_enabled?(:horizon_course_setting)
+  end
+
+  def requirement_count_api_enabled?
+    horizon_course?
   end
 
   def use_modules_rewrite_view?(user, session)

@@ -22,6 +22,8 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconXLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
+import {Heading} from '@instructure/ui-heading'
+import {Responsive} from '@instructure/ui-responsive'
 
 import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -29,7 +31,8 @@ import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 import {artifactTypeOptions, issueTypeOptions, stateOptions} from '../../../constants'
 import {AppliedFilter, FilterOption, Filters} from '../../../../../shared/react/types'
-import {getFilters} from '../../../utils/filter'
+import {getFilters} from '../../../utils'
+import {responsiveQuerySizes} from '@canvas/breakpoints'
 import FilterCheckboxGroup from './FilterCheckboxGroup'
 import AppliedFilters from './AppliedFilters'
 import CustomToggleGroup from './CustomToggleGroup'
@@ -104,8 +107,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
         setDate(null)
         return
       }
-      const label = dateFieldId === 'fromDate' ? I18n.t('From') : I18n.t('To')
-      setDate({label: `${label}: ${dateFormatter(date)}`, value: date.toISOString()})
+      setDate({label: dateFormatter(date), value: date.toISOString()})
     },
     [dateFormatter],
   )
@@ -128,11 +130,13 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
       <CustomToggleGroup
         size="small"
         border={false}
-        toggleLabel={isOpen ? I18n.t('Close filter controls') : I18n.t('Open filter controls')}
+        toggleLabel={I18n.t('Filter resources')}
         summary={
           <Flex gap="small">
             <Flex.Item shouldGrow={false} shouldShrink={false}>
-              <Text variant="contentImportant">{I18n.t('Filter resources')}</Text>
+              <Heading level="h2" variant="label">
+                {I18n.t('Filter resources')}
+              </Heading>
             </Flex.Item>
             <Flex.Item shouldGrow={true} shouldShrink={true}>
               <AppliedFilters appliedFilters={appliedFilters} setFilters={onFilterChange} />
@@ -162,62 +166,102 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
         onToggle={handleToggle}
         expanded={isOpen}
       >
-        <Flex as="div" direction="row" gap="medium" alignItems="start" padding="x-small">
-          <Flex.Item>
-            <View as="div" margin="none none medium none">
-              <CanvasDateInput2
-                placeholder={I18n.t('From')}
-                width="100%"
-                selectedDate={fromDate?.value ?? null}
-                formatDate={dateFormatter}
-                interaction="enabled"
-                renderLabel={I18n.t('Last edited from')}
-                onSelectedDateChange={handleDateChange('fromDate')}
-              />
-            </View>
-            <View as="div">
-              <CanvasDateInput2
-                placeholder={I18n.t('To')}
-                width="100%"
-                selectedDate={toDate?.value ?? null}
-                interaction="enabled"
-                formatDate={dateFormatter}
-                renderLabel={I18n.t('Last edited to')}
-                onSelectedDateChange={handleDateChange('toDate')}
-              />
-            </View>
-          </Flex.Item>
-          <Flex.Item>
-            <FilterCheckboxGroup
-              data-testid="resource-type-checkbox-group"
-              name="resource-type-checkbox-group"
-              description={I18n.t('Resource type')}
-              options={artifactTypeOptions}
-              selected={selectedArtifactType}
-              onUpdate={setSelectedArtifactType}
-            />
-          </Flex.Item>
-          <Flex.Item>
-            <FilterCheckboxGroup
-              data-testid="state-checkbox-group"
-              name="state-checkbox-group"
-              description={I18n.t('State')}
-              options={stateOptions}
-              selected={selectedState}
-              onUpdate={setSelectedState}
-            />
-          </Flex.Item>
-          <Flex.Item>
-            <FilterCheckboxGroup
-              data-testid="issue-type-checkbox-group"
-              name="issue-type-checkbox-group"
-              description={I18n.t('With issues of')}
-              options={issueTypeOptions}
-              selected={selectedIssues}
-              onUpdate={setSelectedIssues}
-            />
-          </Flex.Item>
-        </Flex>
+        <Responsive
+          match="media"
+          query={responsiveQuerySizes({tablet: true, desktop: true})}
+          props={{
+            tablet: {outerDirection: 'column', checkboxDirection: 'column'},
+            desktop: {outerDirection: 'row', checkboxDirection: 'row'},
+          }}
+          render={props => {
+            if (!props) return null
+            return (
+              <Flex
+                as="div"
+                direction={props.outerDirection}
+                gap="medium"
+                wrap="wrap"
+                alignItems="start"
+                padding="x-small"
+              >
+                {/* Date inputs group - always vertical */}
+                <Flex.Item height="auto" overflowY="visible">
+                  <Flex direction="column" gap="medium">
+                    <Flex.Item overflowY="visible" height="auto">
+                      <CanvasDateInput2
+                        placeholder={I18n.t('From')}
+                        width="100%"
+                        selectedDate={fromDate?.value ?? null}
+                        formatDate={dateFormatter}
+                        interaction="enabled"
+                        renderLabel={I18n.t('Last edited from')}
+                        screenReaderLabels={{
+                          calendarIcon: I18n.t('Choose a date for Last edited from'),
+                        }}
+                        onSelectedDateChange={handleDateChange('fromDate')}
+                      />
+                    </Flex.Item>
+                    <Flex.Item overflowY="visible" height="auto">
+                      <CanvasDateInput2
+                        placeholder={I18n.t('To')}
+                        width="100%"
+                        selectedDate={toDate?.value ?? null}
+                        interaction="enabled"
+                        formatDate={dateFormatter}
+                        renderLabel={I18n.t('Last edited to')}
+                        screenReaderLabels={{
+                          calendarIcon: I18n.t('Choose a date for Last edited to'),
+                        }}
+                        onSelectedDateChange={handleDateChange('toDate')}
+                      />
+                    </Flex.Item>
+                  </Flex>
+                </Flex.Item>
+
+                {/* Checkbox group - responsive direction */}
+                <Flex.Item shouldGrow height="auto">
+                  <Flex
+                    direction={props.checkboxDirection}
+                    gap="medium"
+                    wrap="wrap"
+                    alignItems="start"
+                  >
+                    <Flex.Item>
+                      <FilterCheckboxGroup
+                        data-testid="resource-type-checkbox-group"
+                        name="resource-type-checkbox-group"
+                        description={I18n.t('Resource type')}
+                        options={artifactTypeOptions}
+                        selected={selectedArtifactType}
+                        onUpdate={setSelectedArtifactType}
+                      />
+                    </Flex.Item>
+                    <Flex.Item>
+                      <FilterCheckboxGroup
+                        data-testid="state-checkbox-group"
+                        name="state-checkbox-group"
+                        description={I18n.t('State')}
+                        options={stateOptions}
+                        selected={selectedState}
+                        onUpdate={setSelectedState}
+                      />
+                    </Flex.Item>
+                    <Flex.Item>
+                      <FilterCheckboxGroup
+                        data-testid="issue-type-checkbox-group"
+                        name="issue-type-checkbox-group"
+                        description={I18n.t('With issues of')}
+                        options={issueTypeOptions}
+                        selected={selectedIssues}
+                        onUpdate={setSelectedIssues}
+                      />
+                    </Flex.Item>
+                  </Flex>
+                </Flex.Item>
+              </Flex>
+            )
+          }}
+        />
       </CustomToggleGroup>
     </View>
   )

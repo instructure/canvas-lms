@@ -40,7 +40,7 @@ module Accessibility
           value: "",
           action: I18n.t("Add caption"),
           can_generate_fix: true,
-          generate_button_label: I18n.t("Generate caption")
+          generate_button_label: I18n.t("Generate")
         )
       end
 
@@ -77,10 +77,7 @@ module Accessibility
         raise StandardError, "Caption cannot be empty." if value.blank?
 
         caption = elem.at_css("caption")
-        if caption
-          return nil if (caption.content = value)
-
-        else
+        unless caption
           caption = elem.document.create_element("caption")
           self.class.prepend(elem, caption)
         end
@@ -97,7 +94,7 @@ module Accessibility
       end
 
       def why
-        I18n.t("Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table.")
+        I18n.t("Tables should have a table caption, a title for the table to help learners understand what the table is about.")
       end
 
       # Helper methods

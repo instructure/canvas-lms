@@ -20,7 +20,6 @@
 
 # @API Users
 #
-#
 # @model PageView
 #     {
 #       "id": "PageView",
@@ -258,16 +257,17 @@ class PageViewsController < ApplicationController
   # similar to the available CSV download. Page views are returned in
   # descending order, newest to oldest.
   #
-  # **Disclaimer**: The data is a best effort attempt, and is not guaranteed
-  # to be complete or wholly accurate. This data is meant to be used for
-  # rollups and analysis in the aggregate, not in isolation for auditing,
-  # or other high-stakes analysis involving examining single users or
-  # small samples. Page Views data is generated from the Canvas logs files,
-  # not a transactional database, there are many places along the way
-  # data can be lost and/or duplicated (though uncommon). Additionally,
-  # given the size of this data, our processes ensure that errors can be
-  # rectified at any point in time, with corrections integrated as soon as
-  # they are identified and processed.
+  # @hint info
+  #   **Disclaimer**: The data is a best effort attempt, and is not guaranteed
+  #   to be complete or wholly accurate. This data is meant to be used for
+  #   rollups and analysis in the aggregate, not in isolation for auditing,
+  #   or other high-stakes analysis involving examining single users or
+  #   small samples. Page Views data is generated from the Canvas logs files,
+  #   not a transactional database, there are many places along the way
+  #   data can be lost and/or duplicated (though uncommon). Additionally,
+  #   given the size of this data, our processes ensure that errors can be
+  #   rectified at any point in time, with corrections integrated as soon as
+  #   they are identified and processed.
   #
   # @argument start_time [DateTime]
   #   The beginning of the time range from which you want page views.
@@ -302,6 +302,18 @@ class PageViewsController < ApplicationController
         format.any { render plain: t("end_time must be after start_time"), status: :bad_request }
       end
     end
+
+    # Add rate limiting cost for page view index queries
+    # Cost is purely based on per_page limit since DynamoDB Query with LIMIT stops at per_page items
+    # Date range is irrelevant - Query reads sequentially until LIMIT is reached, then stops
+    # RCU formula: DynamoDB uses eventually consistent reads (50% cost of strongly consistent)
+    # Eventually consistent: 1 RCU per 8192 bytes, avg line = 592 bytes, lines per RCU ≈ 13.838
+    # Rate limit cost = actual RCU * 5 multiplier (balanced: permissive but protective)
+    per_page = (params[:per_page] || 10).to_i.clamp(1, 200)
+    actual_rcu = (per_page * 0.0723).ceil
+    final_cost = actual_rcu * 5
+
+    increment_request_cost(final_cost)
 
     date_options[:viewer] = @current_user
 
@@ -394,6 +406,12 @@ class PageViewsController < ApplicationController
   #     "error": "Page Views rate limit exceeded. Please wait and try again."
   #   }
   def query
+    # Add rate limiting cost for initiating async queries
+    # Async endpoints have orders of magnitude lower usage than sync endpoints
+    # Cost (150 units) still provides protection while being proportional to actual usage
+    # Allows 4 queries before hitting HWM (700), then 70-second cooldown
+    increment_request_cost(150)
+
     user_id, start_date, end_date, results_format = params.require(%i[user_id start_date end_date results_format])
     @user = api_find(User, user_id)
     return unless authorized_action(@user, @current_user, :view_statistics)
@@ -459,6 +477,12 @@ class PageViewsController < ApplicationController
   #     "error": "The query was not found."
   #   }
   def poll_query
+    # Add minimal rate limiting cost for polling queries
+    # Polling is lightweight (Redis/DB check only, no DynamoDB query)
+    # Very low cost (5 units) allows up to 140 polls before hitting HWM
+    # Supports extended polling patterns without penalizing async workflow
+    increment_request_cost(5)
+
     validate_query_id!
     result = pv5_poll_service.call(params[:query_id])
     results_url = api_v1_page_views_get_query_results_path(params[:user_id], params[:query_id]) if result.status == :finished
@@ -513,6 +537,12 @@ class PageViewsController < ApplicationController
   #     "error": "An unexpected error occurred."
   #   }
   def query_results
+    # Add rate limiting cost for fetching query results
+    # Async endpoints have low usage; cost reflects S3 file retrieval
+    # Low cost (50 units) allows 14 downloads before hitting HWM
+    # Proportional to low async usage while preventing abuse
+    increment_request_cost(50)
+
     validate_query_id!
     result = pv5_fetch_result_service.call(params[:query_id])
     response.set_header("Content-Encoding", "gzip") if result.compressed?

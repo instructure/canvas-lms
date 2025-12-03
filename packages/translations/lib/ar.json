@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "اسم الملف"
     },
+    "file_preview_21667a6e": {
+        "message": "معاينة الملف"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "معاينة الملف لـ { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "تم تجاوز حصة تخزين الملفات"
     },

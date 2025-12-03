@@ -88,6 +88,9 @@ module Api::V1::StreamItem
       when "Submission"
         submission = stream_item.asset
         assignment = submission.assignment
+        # For discussion checkpoints, use the parent assignment instead of the sub-assignment
+        # to ensure correct assignment IDs and URLs in notifications
+        assignment = assignment.parent_assignment if assignment.checkpoint? && assignment.parent_assignment
         includes = %w[submission_comments assignment course html_url user]
         json = submission_json(submission, assignment, current_user, session, nil, includes, params)
         json.delete("id")

@@ -20,10 +20,8 @@
 module Accessibility
   module Rules
     class ImgAltFilenameRule < Accessibility::Rule
-      IMAGE_FILENAME_PATTERN = /[^\s]+(.*?)\.(jpg|jpeg|png|gif|svg|bmp|webp)$/i
-
       self.id = "img-alt-filename"
-      self.link = "https://www.w3.org/TR/WCAG20-TECHS/H37.html"
+      self.link = "https://www.w3.org/TR/WCAG20-TECHS/F30.html"
 
       # Accessibility::Rule methods
 
@@ -37,19 +35,17 @@ module Accessibility
         return nil if alt == "" && role == "presentation"
         return nil if alt.blank?
 
-        filename_like = IMAGE_FILENAME_PATTERN.match?(alt)
-
-        I18n.t("Image filenames should not be used as the alt attribute.") if filename_like
+        ImgAltRuleHelper.validation_error_filename if ImgAltRuleHelper.filename_like?(alt)
       end
 
       def form(elem)
         Accessibility::Forms::TextInputWithCheckboxField.new(
           checkbox_label: I18n.t("This image is decorative"),
-          checkbox_subtext: I18n.t("This image is for visual decoration only and screen readers can skip it."),
-          undo_text: I18n.t("Alt text fixed"),
+          checkbox_subtext: I18n.t("Screen readers should skip purely decorative images."),
+          undo_text: I18n.t("Alt text updated"),
           input_label: I18n.t("Alt text"),
-          input_description: I18n.t("Describe what's on the picture."),
-          input_max_length: 120,
+          input_description: I18n.t("Describe what's in the picture."),
+          input_max_length: ImgAltRuleHelper::MAX_LENGTH,
           can_generate_fix: true,
           generate_button_label: I18n.t("Generate alt text"),
           value: elem.get_attribute("alt") || ""
@@ -65,16 +61,7 @@ module Accessibility
       end
 
       def fix!(elem, value)
-        if value.blank?
-          elem["role"] = "presentation"
-        elsif IMAGE_FILENAME_PATTERN.match?(value)
-          raise StandardError, I18n.t("Image filenames should not be used as the alt attribute.")
-        end
-
-        return elem if elem["alt"] == value
-
-        elem["alt"] = value
-        elem
+        ImgAltRuleHelper.fix_alt_text!(elem, value)
       end
 
       def display_name
@@ -82,8 +69,7 @@ module Accessibility
       end
 
       def message
-        I18n.t("The alt text is just the file name. Add a description for screen readers
-        so people who are blind or have low vision can understand what's in the image.")
+        I18n.t("This text (alt text) is read by screen readers and displayed if the image fails to load. Replace the filename with a meaningful description.")
       end
 
       def why

@@ -903,6 +903,36 @@ describe Types::DiscussionType do
     end
   end
 
+  context "unpublished group discussions" do
+    before do
+      course_factory(active_all: true)
+      @student = student_in_course(course: @course, active_enrollment: true).user
+      @teacher = teacher_in_course(course: @course, active_enrollment: true).user
+
+      group_category = @course.group_categories.create!(name: "Project Groups")
+      @group1 = @course.groups.create!(name: "Group A", group_category:)
+      @group2 = @course.groups.create!(name: "Group B", group_category:)
+
+      @discussion = @course.discussion_topics.build(title: "Group Discussion")
+      @discussion.group_category = group_category
+      @discussion.workflow_state = "unpublished"
+      @discussion.save!
+
+      @teacher_type = GraphQLTypeTester.new(@discussion, current_user: @teacher)
+      @student_type = GraphQLTypeTester.new(@discussion, current_user: @student)
+    end
+
+    it "allows teachers to see unpublished child_topics" do
+      child_topics = @teacher_type.resolve("childTopics { contextName }")
+      expect(child_topics).to match_array(["Group A", "Group B"])
+    end
+
+    it "does not allow students to see unpublished child_topics" do
+      child_topics = @student_type.resolve("childTopics { contextName }")
+      expect(child_topics || []).to be_empty
+    end
+  end
+
   context "announcement" do
     let(:discussion) { announcement_model(delayed_post_at: 1.day.from_now) }
     let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }

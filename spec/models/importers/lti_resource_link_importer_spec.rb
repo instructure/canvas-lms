@@ -220,12 +220,11 @@ describe Importers::LtiResourceLinkImporter do
       end
     end
 
-    context "when lti_resource_link does not have an associated assignemnt context" do
+    context "when lti_resource_link's context_type is not Assignment (no assignment_migration_id)" do
       let!(:lti_resource_links) do
         [
           {
-            "lookup_uuid" => "11111111-2222-1111-2222-111111111111",
-            "context_type" => "Course",
+            "lookup_uuid" => "11111111-2222-1111-2222-111111111111"
           }
         ]
       end
@@ -303,6 +302,57 @@ describe Importers::LtiResourceLinkImporter do
           expect(filtered_lti_resource_links).not_to include(
             hash_including("assignment_migration_id" => assignment2_migration_id)
           )
+        end
+      end
+    end
+
+    context "when lti_resource_link has no assignment association and no matching assignment" do
+      let!(:lookup_uuid_without_assignment) { "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee" }
+      let!(:assignments) { [] }
+
+      context "when resource link has no assignment_migration_id (course-level resource link)" do
+        let!(:lti_resource_links) do
+          [
+            {
+              "lookup_uuid" => lookup_uuid_without_assignment,
+              "assignment_migration_id" => nil
+            }
+          ]
+        end
+
+        before do
+          allow(migration).to receive_messages(
+            import_everything?: false,
+            import_object?: false
+          )
+        end
+
+        it "includes the course-level resource link" do
+          filtered_lti_resource_links = subject.filter_by_assignment_context(lti_resource_links.dup, assignments, migration)
+          expect(filtered_lti_resource_links).to include(lti_resource_links.first)
+        end
+      end
+
+      context "when resource link has an assignment_migration_id but assignment not selected" do
+        let!(:lti_resource_links) do
+          [
+            {
+              "lookup_uuid" => lookup_uuid_without_assignment,
+              "assignment_migration_id" => "some_assignment_id"
+            }
+          ]
+        end
+
+        before do
+          allow(migration).to receive_messages(
+            import_everything?: false,
+            import_object?: false
+          )
+        end
+
+        it "filters out the assignment-level resource link" do
+          filtered_lti_resource_links = subject.filter_by_assignment_context(lti_resource_links.dup, assignments, migration)
+          expect(filtered_lti_resource_links).not_to include(lti_resource_links.first)
         end
       end
     end

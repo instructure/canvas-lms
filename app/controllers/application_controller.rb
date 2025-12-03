@@ -439,6 +439,7 @@ class ApplicationController < ActionController::Base
     account_level_blackout_dates
     assignment_edit_placement_not_on_announcements
     accessibility_issues_in_full_page
+    a11y_checker_ai_generation
     block_content_editor_toolbar_reorder
     commons_new_quizzes
     consolidated_media_player
@@ -453,6 +454,7 @@ class ApplicationController < ActionController::Base
     discussion_permalink
     enhanced_course_creation_account_fetching
     explicit_latex_typesetting
+    feature_flag_ui_sorting
     files_a11y_rewrite
     files_a11y_rewrite_toggle
     horizon_course_setting
@@ -474,10 +476,12 @@ class ApplicationController < ActionController::Base
     validate_call_to_action
     block_content_editor_ai_alt_text
     ux_list_concluded_courses_in_bp
+    assign_to_in_edit_pages_rewrite
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales
     ams_root_account_integration
+    ams_enhanced_rubrics
     api_rate_limits
     buttons_and_icons_root_account
     course_pace_allow_bulk_pace_assign
@@ -2024,6 +2028,7 @@ class ApplicationController < ActionController::Base
   rescue_from CanvasHttp::CircuitBreakerError, with: :rescue_expected_error_type
   rescue_from InstFS::ServiceError, with: :rescue_expected_error_type
   rescue_from InstFS::BadRequestError, with: :rescue_expected_error_type
+  rescue_from BookmarkedCollection::InvalidPage, with: :rescue_expected_error_type
 
   def rescue_expected_error_type(error)
     rescue_exception(error, level: :info)
@@ -2180,6 +2185,8 @@ class ApplicationController < ActionController::Base
       data = { errors: [{ message: "Insufficient scopes on access token." }] }
     when ActionController::ParameterMissing
       data = { errors: [{ message: "#{exception.param} is missing" }] }
+    when BookmarkedCollection::InvalidPage
+      data = { status: :bad_request, errors: [{ page: "Invalid page; please restart iteration and follow `next` links" }] }
     when BasicLTI::BasicOutcomes::Unauthorized,
         BasicLTI::BasicOutcomes::InvalidRequest
       data = { errors: [{ message: exception.message }] }
@@ -3405,7 +3412,7 @@ class ApplicationController < ActionController::Base
   end
 
   def recaptcha_enabled?(**)
-    DynamicSettings.find(tree: :private)["recaptcha_server_key", **].present? && @domain_root_account.self_registration_captcha?
+    Rails.application.credentials.recaptcha_keys.present? && @domain_root_account.self_registration_captcha?
   end
 
   def peer_reviews_for_a2_enabled?
@@ -3528,7 +3535,7 @@ class ApplicationController < ActionController::Base
 
   # Similar to Account#recaptcha_key, but does not check the `self_registration_captcha?` setting.
   def captcha_site_key
-    DynamicSettings.find(tree: :private)["recaptcha_client_key"]
+    Rails.application.credentials.dig(:recaptcha_keys, :client_key)
   end
   helper_method :captcha_site_key
 

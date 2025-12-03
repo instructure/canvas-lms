@@ -1156,5 +1156,305 @@ describe "Block Content Editor", :ignore_js_errors do
         end
       end
     end
+
+    context "Button block" do
+      before do
+        add_a_block("Interactive element", "Button")
+      end
+
+      include_examples "editing block title"
+      include_examples "editing background color"
+
+      it "displays a single button with 'Button' text by default" do
+        expect(blocks.first.buttons.size).to eq(1)
+        expect(blocks.first.buttons.first.text).to eq("Button")
+      end
+
+      it "enters edit mode when a button is clicked in edit preview mode" do
+        blocks.first.buttons.first.click
+        wait_for_ajaximations
+
+        expect(blocks.first.block_title.title_input).to be_displayed
+      end
+
+      it "opens the settings tray when a button is clicked in edit mode" do
+        blocks.first.buttons.first.click
+        wait_for_ajaximations
+
+        blocks.first.buttons.first.click
+        wait_for_ajaximations
+
+        expect(blocks.first.settings_tray).to be_displayed
+      end
+
+      it "displays full width buttons when toggled in settings tray" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        blocks.first.settings.full_width_buttons_toggle.click
+        wait_for_ajaximations
+
+        expect(blocks.first.buttons.first.size.width).to eq(blocks.first.block_title.title.size.width)
+      end
+
+      it "arranges buttons horizontally when layout is set to horizontal" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        blocks.first.settings.new_button.click
+        wait_for_ajaximations
+
+        blocks.first.settings.button_layout_radio_option("Horizontal").click
+        wait_for_ajaximations
+
+        buttons = blocks.first.buttons
+        first_button_y = buttons.first.location.y
+        buttons.each do |button|
+          expect(button.location.y).to be_within(5).of(first_button_y)
+        end
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        buttons.each do |button|
+          expect(button.location.y).to be_within(5).of(first_button_y)
+        end
+      end
+
+      it "arranges buttons vertically when layout is set to vertical" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        blocks.first.settings.new_button.click
+        wait_for_ajaximations
+
+        blocks.first.settings.button_layout_radio_option("Vertical").click
+        wait_for_ajaximations
+
+        buttons = blocks.first.buttons
+        buttons.each_cons(2) do |button1, button2|
+          expect(button2.location.y).to be > button1.location.y
+        end
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        buttons.each_cons(2) do |button1, button2|
+          expect(button2.location.y).to be > button1.location.y
+        end
+      end
+
+      it "displays a maximum of 5 buttons" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        4.times do
+          blocks.first.settings.new_button.click
+          wait_for_ajaximations
+        end
+
+        expect(blocks.first.settings.new_button).to be_disabled
+        expect(blocks.first.buttons.size).to eq(5)
+      end
+
+      it "displays a minimum of 1 button" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings.individual_button_settings(1)
+        expect(settings.delete_button).to be_disabled
+      end
+
+      it "changes button text" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings.individual_button_settings(1)
+        settings.expand_button.click
+        wait_for_ajaximations
+
+        settings.button_text_input.clear
+        settings.button_text_input.send_keys("Click Here")
+        wait_for_ajaximations
+
+        expect(blocks.first.buttons.first.text).to eq("Click Here")
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        expect(blocks.first.buttons.first.text).to eq("Click Here")
+      end
+
+      it "changes button color" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings.individual_button_settings(1)
+        settings.expand_button.click
+        wait_for_ajaximations
+
+        settings.change_button_color("FF5733")
+
+        button = blocks.first.buttons.first
+        expect(blocks.first.button_background_color(button)).to eq("rgba(255, 87, 51, 1)")
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        expect(blocks.first.button_background_color(button)).to eq("rgba(255, 87, 51, 1)")
+      end
+
+      it "changes button text color" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings.individual_button_settings(1)
+        settings.expand_button.click
+        wait_for_ajaximations
+
+        settings.change_text_color("0000ff")
+
+        button = blocks.first.buttons.first
+        expect(blocks.first.button_text_color(button)).to eq("rgba(0, 0, 255, 1)")
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        expect(blocks.first.button_text_color(button)).to eq("rgba(0, 0, 255, 1)")
+      end
+
+      it "hides text color setting when button style is outlined" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings.individual_button_settings(1)
+        settings.expand_button.click
+        wait_for_ajaximations
+
+        expect(settings.text_color_setting_present?).to be true
+
+        settings.button_style_dropdown.click
+        wait_for_ajaximations
+        settings.select_button_style("Outlined").click
+        wait_for_ajaximations
+
+        expect(settings.text_color_setting_present?).to be false
+      end
+
+      it "sets button URL" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings.individual_button_settings(1)
+        settings.expand_button.click
+        wait_for_ajaximations
+
+        expected_url = "https://example.com/"
+        settings.url_input.send_keys(expected_url)
+        wait_for_ajaximations
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        toolbar_component.preview_button.click
+        wait_for_ajaximations
+
+        button = blocks.first.buttons.first
+        expect(button.attribute("href")).to eq(expected_url)
+
+        button.click
+        wait_for_ajaximations
+
+        driver.switch_to.window(driver.window_handles.last)
+        expect(driver.current_url).to eq(expected_url)
+      end
+
+      it "sets link target to open in new tab" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings.individual_button_settings(1)
+        settings.expand_button.click
+        wait_for_ajaximations
+
+        expected_url = "https://example.com/"
+        settings.url_input.send_keys(expected_url)
+        wait_for_ajaximations
+
+        settings.how_to_open_link_dropdown.click
+        wait_for_ajaximations
+        settings.select_how_to_open_link("Open in a new tab").click
+        wait_for_ajaximations
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        toolbar_component.preview_button.click
+        wait_for_ajaximations
+
+        initial_window_count = driver.window_handles.length
+        blocks.first.buttons.first.click
+        wait_for_ajaximations
+
+        expect(driver.window_handles.length).to eq(initial_window_count + 1)
+
+        driver.switch_to.window(driver.window_handles.last)
+        expect(driver.current_url).to eq(expected_url)
+      end
+
+      it "sets link target to open in current tab" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings.individual_button_settings(1)
+        settings.expand_button.click
+        wait_for_ajaximations
+
+        expected_url = "https://example.com/"
+        settings.url_input.send_keys(expected_url)
+        wait_for_ajaximations
+
+        settings.how_to_open_link_dropdown.click
+        wait_for_ajaximations
+        settings.select_how_to_open_link("Open in the current tab").click
+        wait_for_ajaximations
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        toolbar_component.preview_button.click
+        wait_for_ajaximations
+
+        initial_window_count = driver.window_handles.length
+        begin
+          blocks.first.buttons.first.click
+        rescue Selenium::WebDriver::Error::StaleElementReferenceError
+          # Handles the case in which navigation is happening before the click operation completes
+        end
+        wait_for_ajaximations
+
+        expect(driver.window_handles.length).to eq(initial_window_count)
+        expect(driver.current_url).to eq(expected_url)
+      end
+
+      it "deletes a button" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        blocks.first.settings.new_button.click
+        wait_for_ajaximations
+        expect(blocks.first.buttons.size).to eq(2)
+
+        settings = blocks.first.settings.individual_button_settings(1)
+        settings.delete_button.click
+        wait_for_ajaximations
+        expect(blocks.first.buttons.size).to eq(1)
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        expect(blocks.first.buttons.size).to eq(1)
+      end
+    end
   end
 end

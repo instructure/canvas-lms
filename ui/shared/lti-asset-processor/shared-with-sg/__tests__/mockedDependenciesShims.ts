@@ -31,7 +31,16 @@ import {
 jest.mock('../dependenciesShims', () => ({
   gql: jest.fn(),
   useResubmitLtiAssetReports: jest.fn(() => ({
-    resubmitLtiAssetReports: jest.fn(),
+    mutate: jest.fn(),
+    isIdle: true,
+    isError: false,
+    variables: undefined,
+  })),
+  useResubmitDiscussionNotices: jest.fn(() => ({
+    mutate: jest.fn(),
+    isIdle: true,
+    isError: false,
+    variables: undefined,
   })),
   useLtiAssetProcessors: jest.fn(),
   useLtiAssetReports: jest.fn(),

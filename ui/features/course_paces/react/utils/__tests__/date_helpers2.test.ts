@@ -48,6 +48,26 @@ describe('date_helpers', () => {
       ]
       expect(inBlackoutDate('2022-05-03T00:00:00-06:00', blackouts)).toBeTruthy()
     })
+
+    it('correctly handles blackout dates with time components', () => {
+      // This test verifies the fix for the bug where calendar events have timestamps
+      // (e.g., 14:00:00) that were breaking date comparisons. The inBlackoutDate function
+      // now strips time components to midnight before comparing.
+      const blackouts = [
+        {
+          event_title: 'Fall Break',
+          start_date: moment('2022-11-26T14:00:00'), // 2pm on Nov 26
+          end_date: moment('2022-11-28T23:59:59'), // 11:59pm on Nov 28
+        },
+      ]
+
+      expect(inBlackoutDate('2022-11-26T00:00:00-07:00', blackouts)).toBeTruthy()
+      expect(inBlackoutDate('2022-11-27T00:00:00-07:00', blackouts)).toBeTruthy()
+      expect(inBlackoutDate('2022-11-28T00:00:00-07:00', blackouts)).toBeTruthy()
+
+      expect(inBlackoutDate('2022-11-25T00:00:00-07:00', blackouts)).toBeFalsy()
+      expect(inBlackoutDate('2022-11-29T00:00:00-07:00', blackouts)).toBeFalsy()
+    })
   })
 
   describe('getEndDateValue', () => {

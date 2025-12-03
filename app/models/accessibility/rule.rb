@@ -101,9 +101,10 @@ module Accessibility
     end
 
     # Provides a preview of the issue for displaying in the UI
+    # @param elem [Nokogiri::XML::Element] The element to preview
     # @return [String, nil] HTML preview of the issue, or nil if no preview is available
-    def issue_preview(_elem)
-      nil
+    def issue_preview(elem)
+      elem&.to_html
     end
   end
 end

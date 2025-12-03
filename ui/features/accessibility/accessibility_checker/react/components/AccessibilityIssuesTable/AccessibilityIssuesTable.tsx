@@ -36,12 +36,9 @@ import {
   TableSortState,
 } from '../../../../shared/react/stores/AccessibilityScansStore'
 import {useAccessibilityScansFetchUtils} from '../../../../shared/react/hooks/useAccessibilityScansFetchUtils'
+import {useAccessibilityScansPolling} from '../../../../shared/react/hooks/useAccessibilityScansPolling'
 
 const I18n = createI18nScope('accessibility_checker')
-
-type Props = {
-  onRowClick?: (item: AccessibilityResourceScan) => void
-}
 
 const headerThemeOverride: TableColHeaderProps['themeOverride'] = _componentTheme => ({
   padding: '0.875rem 0.75rem', // Make column header height 3rem
@@ -57,23 +54,9 @@ const getNewTableSortState = (
     : 'ascending'
 
   if (existingSortState?.sortId === param.id) {
-    if (ReverseOrderingFirst.includes(param.id)) {
-      sortDirection =
-        existingSortState?.sortDirection === 'descending'
-          ? 'ascending'
-          : existingSortState?.sortDirection === 'ascending'
-            ? 'none'
-            : 'descending'
-    } else {
-      // If the same column is clicked, cycle the sort direction
-      sortDirection =
-        existingSortState?.sortDirection === 'ascending'
-          ? 'descending'
-          : existingSortState?.sortDirection === 'descending'
-            ? 'none'
-            : 'ascending'
-    }
+    sortDirection = existingSortState?.sortDirection === 'ascending' ? 'descending' : 'ascending'
   }
+
   return {
     sortId: param.id,
     sortDirection,
@@ -83,9 +66,9 @@ const getNewTableSortState = (
 const renderTableData = (
   scans?: AccessibilityResourceScan[] | null,
   error?: string | null,
-  onRowClick?: (item: AccessibilityResourceScan) => void,
+  loading?: boolean,
 ) => {
-  if (error) return
+  if (error || loading) return
 
   return (
     <>
@@ -97,11 +80,7 @@ const renderTableData = (
         </Table.Row>
       ) : (
         scans.map(item => (
-          <AccessibilityIssuesTableRow
-            key={`${item.resourceType}-${item.id}`}
-            item={item}
-            onRowClick={onRowClick}
-          />
+          <AccessibilityIssuesTableRow key={`${item.resourceType}-${item.id}`} item={item} />
         ))
       )}
     </>
@@ -124,8 +103,10 @@ const renderLoading = () => {
 // If these columns are sorted, a reverse cycle is more convenient
 const ReverseOrderingFirst = [IssuesTableColumns.Issues, IssuesTableColumns.LastEdited]
 
-export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
+export const AccessibilityIssuesTable = () => {
   const {doFetchAccessibilityScanData} = useAccessibilityScansFetchUtils()
+
+  useAccessibilityScansPolling()
 
   const [error, loading, page, pageCount, accessibilityScans, tableSortState] =
     useAccessibilityScansStore(
@@ -175,7 +156,9 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
       <View as="div" margin="medium 0 0 0" borderWidth="small" borderRadius="medium">
         <Table
           caption={
-            <ScreenReaderContent>{I18n.t('Content with accessibility issues')}</ScreenReaderContent>
+            <ScreenReaderContent>
+              {I18n.t('Resources with accessibility issues')}
+            </ScreenReaderContent>
           }
           hover
           data-testid="accessibility-issues-table"
@@ -215,7 +198,7 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
                 </Table.Cell>
               </Table.Row>
             )}
-            {renderTableData(accessibilityScans, error, onRowClick)}
+            {renderTableData(accessibilityScans, error, loading)}
           </Table.Body>
         </Table>
       </View>

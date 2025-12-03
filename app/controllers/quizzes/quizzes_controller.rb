@@ -162,7 +162,8 @@ class Quizzes::QuizzesController < ApplicationController
           # TODO: remove this since it's set in application controller
           # Will need to update consumers of this in the UI to bring down
           # this permissions check as well
-          DIRECT_SHARE_ENABLED: @context.grants_right?(@current_user, session, :direct_share)
+          DIRECT_SHARE_ENABLED: @context.grants_right?(@current_user, session, :direct_share),
+          new_quizzes_surveys_enabled: Account.site_admin.feature_enabled?(:new_quizzes_surveys),
         },
         quiz_menu_tools: external_tools_display_hashes(:quiz_menu),
         quiz_index_menu_tools: external_tools_display_hashes(:quiz_index_menu),
@@ -401,7 +402,8 @@ class Quizzes::QuizzesController < ApplicationController
         HAS_GRADING_PERIODS: @context.grading_periods?,
         MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,
         MAX_NAME_LENGTH: max_name_length,
-        IS_MODULE_ITEM: @quiz.is_module_item?
+        IS_MODULE_ITEM: @quiz.is_module_item?,
+        context_rubric_associations_url: context_url(@context, :context_rubric_associations_url)
       }
 
       set_section_list_js_env
@@ -1159,12 +1161,18 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def render_ams_service
-    js_env(context_url: context_url(@context, :context_quizzes_url))
+    js_env(
+      context_url: context_url(@context, :context_quizzes_url),
+      PERMISSIONS: { manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics) }
+    )
+    enhanced_rubrics_context_js_env
     remote_env(ams:
       {
         launch_url: Services::Ams.launch_url,
         api_url: Services::Ams.api_url
       })
+
+    css_bundle :enhanced_rubrics
     render html: '<div id="ams_container"></div>'.html_safe, layout: true
   end
 

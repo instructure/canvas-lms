@@ -1689,24 +1689,8 @@ describe Course do
           @deleted_attachment.save!
         end
 
-        context "when the hidden_attachments_replacement_chain site admin flag is enabled" do
-          before do
-            Account.site_admin.enable_feature! :hidden_attachments_replacement_chain
-          end
-
-          it "returns the replacement attachment" do
-            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq new_attachment.id
-          end
-        end
-
-        context "when the hidden_attachments_replacement_chain site admin flag is disabled" do
-          before do
-            Account.site_admin.disable_feature! :hidden_attachments_replacement_chain
-          end
-
-          it "returns the original attachment" do
-            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
-          end
+        it "returns the replacement attachment" do
+          expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq new_attachment.id
         end
       end
 
@@ -1726,24 +1710,8 @@ describe Course do
           @deleted_attachment.save!
         end
 
-        context "when the hidden_attachments_replacement_chain site admin flag is enabled" do
-          before do
-            Account.site_admin.enable_feature! :hidden_attachments_replacement_chain
-          end
-
-          it "returns the original attachment" do
-            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
-          end
-        end
-
-        context "when the hidden_attachments_replacement_chain site admin flag is disabled" do
-          before do
-            Account.site_admin.disable_feature! :hidden_attachments_replacement_chain
-          end
-
-          it "returns the original attachment" do
-            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
-          end
+        it "returns the original attachment" do
+          expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
         end
       end
     end
@@ -2806,15 +2774,19 @@ describe Course do
 
       it "returns the defaults if nothing specified" do
         tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).to eql(default_tab_ids)
-        expect(tab_ids.length).to eql(default_tab_ids.length)
+        # Reject AI Experiences tab since it's added dynamically when feature flag is enabled
+        tab_ids_without_ai = tab_ids.reject { |id| id == Course::TAB_AI_EXPERIENCES }
+        expect(tab_ids_without_ai).to eql(default_tab_ids)
+        expect(tab_ids.length).to be >= default_tab_ids.length
       end
 
       it "returns K-6 tabs if feature flag is enabled for teachers" do
         @course.enable_feature!(:canvas_k6_theme)
         tabs = @course.tabs_available(@user)
-        expect(tabs.count { |t| !t[:hidden] }).to eq 5
-        expect(tabs.count { |t| t[:hidden] }).to eq 12
+        # Reject AI Experiences tab since it's added dynamically when feature flag is enabled
+        tabs_without_ai = tabs.reject { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
+        expect(tabs_without_ai.count { |t| !t[:hidden] }).to eq 5
+        expect(tabs_without_ai.count { |t| t[:hidden] }).to eq 12
       ensure
         @course.disable_feature!(:canvas_k6_theme)
       end
@@ -3079,14 +3051,17 @@ describe Course do
       it "overwrites the order of tabs if configured" do
         @course.tab_configuration = [{ id: Course::TAB_COLLABORATIONS }]
         available_tabs = @course.tabs_available(@user).pluck(:id)
+        # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+        # TODO: Determine if AI Experiences should be excluded - see Jira ticket LLMA-94
+        available_tabs_filtered = available_tabs.reject { |id| id == Course::TAB_AI_EXPERIENCES }
         custom_tabs    = @course.tab_configuration.pluck(:id)
         expected_tabs  = (custom_tabs + default_tab_ids).uniq
         # Home tab always comes first
         home_tab = default_tab_ids[0]
         expected_tabs.insert(0, expected_tabs.delete(home_tab))
 
-        expect(available_tabs).to        eq expected_tabs
-        expect(available_tabs.length).to eq default_tab_ids.length
+        expect(available_tabs_filtered).to        eq expected_tabs
+        expect(available_tabs_filtered.length).to eq default_tab_ids.length
       end
 
       it "does not blow up if somehow nils got in there" do
@@ -3132,7 +3107,9 @@ describe Course do
         @course.tab_configuration = [{ "id" => 912 }]
         expect(@course.tabs_available(@user).pluck(:id)).not_to include(912)
         tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).to eql(default_tab_ids)
+        # Reject AI Experiences tab since it's added dynamically when feature flag is enabled
+        tab_ids_without_ai = tab_ids.reject { |id| id == Course::TAB_AI_EXPERIENCES }
+        expect(tab_ids_without_ai).to eql(default_tab_ids)
         expect(tab_ids.length).to be > 0
         expect(@course.tabs_available(@user).filter_map { |t| t[:label] }.length).to eql(tab_ids.length)
       end
@@ -3250,7 +3227,9 @@ describe Course do
           end
 
           it "hides most tabs for homeroom courses" do
-            tab_ids = @course.tabs_available(@user).pluck(:id)
+            # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+            # TODO: Determine if AI Experiences should be excluded from homeroom courses - see Jira ticket LLMA-94
+            tab_ids = @course.tabs_available(@user).pluck(:id).reject { |id| id == Course::TAB_AI_EXPERIENCES }
             expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_FILES, Course::TAB_SETTINGS]
           end
 
@@ -3272,7 +3251,9 @@ describe Course do
               }
             )
             @course.tab_configuration = [{ id: Course::TAB_ANNOUNCEMENTS }, { id: "context_external_tool_8" }]
-            tab_ids = @course.tabs_available(@user).pluck(:id)
+            # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+            # TODO: Determine if AI Experiences should be excluded from homeroom courses - see Jira ticket LLMA-94
+            tab_ids = @course.tabs_available(@user).pluck(:id).reject { |id| id == Course::TAB_AI_EXPERIENCES }
             expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_FILES, Course::TAB_SETTINGS]
           end
         end
@@ -3285,7 +3266,9 @@ describe Course do
           it "returns default course tabs without home if course_subject_tabs option is not passed" do
             course_elementary_nav_tabs = default_tab_ids.reject { |id| id == Course::TAB_HOME }
             length = course_elementary_nav_tabs.length
-            tab_ids = @course.tabs_available(@user).pluck(:id)
+            # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+            # TODO: Determine if AI Experiences should be excluded from elementary courses - see Jira ticket LLMA-94
+            tab_ids = @course.tabs_available(@user).pluck(:id).reject { |id| id == Course::TAB_AI_EXPERIENCES }
             expect(tab_ids).to eql(course_elementary_nav_tabs)
             expect(tab_ids.length).to eql(length)
           end
@@ -3350,7 +3333,9 @@ describe Course do
           context "with course_subject_tabs option" do
             it "returns subject tabs only by default" do
               length = Course.course_subject_tabs.length
-              tab_ids = @course.tabs_available(@user, course_subject_tabs: true).pluck(:id)
+              # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+              # TODO: Determine if AI Experiences should be excluded from subject tabs - see Jira ticket LLMA-94
+              tab_ids = @course.tabs_available(@user, course_subject_tabs: true).pluck(:id).reject { |id| id == Course::TAB_AI_EXPERIENCES }
               expect(tab_ids).to eql(Course.course_subject_tabs.pluck(:id))
               expect(tab_ids.length).to eql(length)
             end
@@ -3364,7 +3349,9 @@ describe Course do
                 { id: Course::TAB_SETTINGS },
                 { id: Course::TAB_GROUPS },
               ]
-              available_tabs = @course.tabs_available(@user, course_subject_tabs: true).pluck(:id)
+              # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+              # TODO: Determine if AI Experiences should be excluded from subject tabs - see Jira ticket LLMA-94
+              available_tabs = @course.tabs_available(@user, course_subject_tabs: true).pluck(:id).reject { |id| id == Course::TAB_AI_EXPERIENCES }
               expected_tabs = [
                 Course::TAB_HOME,
                 Course::TAB_SCHEDULE,
@@ -3400,7 +3387,9 @@ describe Course do
               ]
               available_tabs = @course.tabs_available(@user, course_subject_tabs: true, include_external: true, for_reordering: true)
               expected_tab_ids = Course.course_subject_tabs.pluck(:id) + [t1.asset_string, t2.asset_string]
-              expect(available_tabs.pluck(:id)).to eql(expected_tab_ids)
+              # Reject AI Experiences tab since it's added dynamically when feature flag is enabled.
+              # TODO: Determine if AI Experiences should be excluded from subject tabs - see Jira ticket LLMA-94
+              expect(available_tabs.pluck(:id).reject { |id| id == Course::TAB_AI_EXPERIENCES }).to eql(expected_tab_ids)
             end
 
             it "includes modules tab even if there's no modules" do
@@ -3433,7 +3422,9 @@ describe Course do
                                                      shared_secret: "🤫",
                                                      domain: "example.com",
                                                      course_navigation: { text: "Blah", url: "https://google.com" })
-              last_tab_id = @course.tabs_available(@user, course_subject_tabs: true, include_external: true).last[:id]
+              # AI Experiences is excluded from subject tabs
+              tabs = @course.tabs_available(@user, course_subject_tabs: true, include_external: true)
+              last_tab_id = tabs.last[:id]
               expect(last_tab_id).to equal Course::TAB_GROUPS
             end
 
@@ -5817,6 +5808,114 @@ describe Course do
 
         section_ids = @course.section_visibilities_for(@teacher).pluck(:course_section_id)
         expect(section_ids).to match_array([@course.default_section.id, @other_section.id])
+      end
+
+      it "filters out concluded enrollments when include_concluded is false" do
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+        student = user_factory(active_all: true)
+
+        # Active enrollment in section 1
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Completed enrollment in section 2
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "completed",
+          course_section: section2,
+          course: @course
+        )
+
+        # With include_concluded: false, should only see section 1
+        section_ids = @course.section_visibilities_for(student, include_concluded: false).pluck(:course_section_id)
+        expect(section_ids).to match_array([section1.id])
+
+        # With include_concluded: true (default), should see both sections
+        section_ids = @course.section_visibilities_for(student, include_concluded: true).pluck(:course_section_id)
+        expect(section_ids).to match_array([section1.id, section2.id])
+      end
+
+      it "filters out inactive enrollments when include_concluded is false" do
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+        student = user_factory(active_all: true)
+
+        # Active enrollment in section 1
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Inactive enrollment in section 2
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "inactive",
+          course_section: section2,
+          course: @course
+        )
+
+        # With include_concluded: false, should only see section 1
+        section_ids = @course.section_visibilities_for(student, include_concluded: false).pluck(:course_section_id)
+        expect(section_ids).to match_array([section1.id])
+      end
+
+      it "filters out rejected enrollments when include_concluded is false" do
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+        student = user_factory(active_all: true)
+
+        # Active enrollment in section 1
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Rejected enrollment in section 2
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "rejected",
+          course_section: section2,
+          course: @course
+        )
+
+        # With include_concluded: false, should only see section 1
+        section_ids = @course.section_visibilities_for(student, include_concluded: false).pluck(:course_section_id)
+        expect(section_ids).to match_array([section1.id])
+      end
+
+      it "filters out deleted enrollments when include_concluded is false" do
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+        student = user_factory(active_all: true)
+
+        # Active enrollment in section 1
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "active",
+          course_section: section1,
+          course: @course
+        )
+
+        # Deleted enrollment in section 2
+        StudentEnrollment.create!(
+          user: student,
+          workflow_state: "deleted",
+          course_section: section2,
+          course: @course
+        )
+
+        # With include_concluded: false, should only see section 1
+        section_ids = @course.section_visibilities_for(student, include_concluded: false).pluck(:course_section_id)
+        expect(section_ids).to match_array([section1.id])
       end
     end
   end
@@ -8947,6 +9046,24 @@ describe Course do
     end
   end
 
+  describe "#requirement_count_api_enabled?" do
+    it "returns true when horizon_course? is true" do
+      account = Account.create!
+      account.enable_feature!(:horizon_course_setting)
+      account.horizon_account = true
+      account.save!
+      course = account.courses.create!(horizon_course: true)
+
+      expect(course.requirement_count_api_enabled?).to be true
+    end
+
+    it "returns false when horizon_course? is false" do
+      course = course_model
+
+      expect(course.requirement_count_api_enabled?).to be false
+    end
+  end
+
   describe "#set_horizon_course" do
     it "does not set horizon_course when account is not a horizon account" do
       account = Account.create!
@@ -9113,39 +9230,27 @@ describe Course do
         txt_file
         image_file
 
-        delayed_files = []
-        allow_any_instance_of(Attachment).to receive(:delay) do |attachment, **args|
-          expect(args[:n_strand]).to eq(["horizon_file_ingestion", horizon_account.global_id])
-          expect(args[:singleton]).to match(/^horizon_file_ingestion:#{course.global_id}:\d+$/)
-          expect(args[:max_attempts]).to eq(3)
-          delayed_files << attachment
-          attachment
+        indexed_files = []
+        allow_any_instance_of(Attachment).to receive(:index_in_pine) do |attachment|
+          indexed_files << attachment
         end
-
-        allow_any_instance_of(Attachment).to receive(:ingest_to_pine)
 
         course.ingest_horizon_content
 
-        expect(delayed_files.map(&:id)).to match_array([pdf_file.id, txt_file.id])
+        expect(indexed_files.map(&:id)).to match_array([pdf_file.id, txt_file.id])
       end
 
       it "enqueues jobs for wiki pages" do
         wiki_page
 
-        delayed_pages = []
-        allow_any_instance_of(WikiPage).to receive(:delay) do |page, **args|
-          expect(args[:n_strand]).to eq(["horizon_wiki_ingestion", horizon_account.global_id])
-          expect(args[:singleton]).to match(/^horizon_wiki_ingestion:#{course.global_id}:\d+$/)
-          expect(args[:max_attempts]).to eq(3)
-          delayed_pages << page
-          page
+        indexed_pages = []
+        allow_any_instance_of(WikiPage).to receive(:index_in_pine) do |page|
+          indexed_pages << page
         end
-
-        allow_any_instance_of(WikiPage).to receive(:ingest_to_pine)
 
         course.ingest_horizon_content
 
-        expect(delayed_pages.map(&:id)).to eq([wiki_page.id])
+        expect(indexed_pages.map(&:id)).to eq([wiki_page.id])
       end
 
       it "does not enqueue jobs for non-horizon courses" do

@@ -21,6 +21,9 @@ require_relative "block_component"
 require_relative "../settings_tray/block_settings/image_block_settings"
 
 class ImageBlockComponent < BlockComponent
+  BLOCK_TYPE = "Full width image"
+  BLOCK_SELECTOR = "figure img"
+
   attr_reader :block_title
 
   def initialize(block)

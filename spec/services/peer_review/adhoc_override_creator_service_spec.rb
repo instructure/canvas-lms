@@ -45,6 +45,15 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
     )
   end
 
+  def create_adhoc_override_for_parent_assignment(student_list)
+    parent_override = peer_review_sub_assignment.parent_assignment.assignment_overrides.build(set_type: AssignmentOverride::SET_TYPE_ADHOC)
+    student_list.each do |student|
+      parent_override.assignment_override_students.build(user: student)
+    end
+    parent_override.save!
+    parent_override
+  end
+
   describe "#initialize" do
     it "sets the instance variables correctly" do
       expect(service.instance_variable_get(:@peer_review_sub_assignment)).to eq(peer_review_sub_assignment)
@@ -58,6 +67,10 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
 
   describe "#call" do
     context "with valid parameters" do
+      before do
+        create_adhoc_override_for_parent_assignment(students)
+      end
+
       it "creates an assignment override for the students" do
         expect { service.call }.to change { peer_review_sub_assignment.assignment_overrides.count }.by(1)
       end
@@ -121,6 +134,10 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
         }
       end
 
+      before do
+        create_adhoc_override_for_parent_assignment(students)
+      end
+
       it "sets unassign_item to true on the override" do
         override = service.call
         expect(override.unassign_item).to be(true)
@@ -134,6 +151,10 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
           student_ids: students.map(&:id),
           due_at:
         }
+      end
+
+      before do
+        create_adhoc_override_for_parent_assignment(students)
       end
 
       it "only applies the provided dates" do
@@ -153,6 +174,10 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
           set_type: "ADHOC",
           student_ids: students.map(&:id) + [non_course_student.id, 999_999]
         }
+      end
+
+      before do
+        create_adhoc_override_for_parent_assignment(students)
       end
 
       it "only creates override students for valid course students" do
@@ -270,6 +295,10 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
     end
 
     context "transaction rollback scenarios" do
+      before do
+        create_adhoc_override_for_parent_assignment(students)
+      end
+
       it "rolls back if save fails" do
         allow_any_instance_of(AssignmentOverride).to receive(:save!).and_raise(ActiveRecord::RecordInvalid.new(AssignmentOverride.new))
 
@@ -317,6 +346,126 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
         title = service.send(:override_title, students.map(&:id))
         expected_title = AssignmentOverride.title_from_student_count(3)
         expect(title).to eq(expected_title)
+      end
+    end
+  end
+
+  describe "parent override tracking" do
+    let(:parent_assignment) { peer_review_sub_assignment.parent_assignment }
+    let!(:parent_override) { create_adhoc_override_for_parent_assignment(students) }
+
+    it "sets the parent_override on the created override" do
+      override = service.call
+      expect(override.parent_override).to eq(parent_override)
+      expect(override.parent_override_id).to eq(parent_override.id)
+    end
+
+    it "finds the correct parent override based on student IDs" do
+      override = service.call
+      expect(override.parent_override.assignment_override_students.map(&:user_id).sort).to eq(students.map(&:id).sort)
+    end
+
+    context "when parent override does not exist" do
+      before do
+        parent_override.destroy
+      end
+
+      it "raises ParentOverrideNotFoundError" do
+        expect { service.call }.to raise_error(
+          PeerReview::ParentOverrideNotFoundError,
+          /Parent assignment ADHOC override not found for students/
+        )
+      end
+
+      it "includes the student IDs in the error message" do
+        service.call
+      rescue PeerReview::ParentOverrideNotFoundError => e
+        students.each do |student|
+          expect(e.message).to include(student.id.to_s)
+        end
+      end
+    end
+
+    context "when parent override exists but for different students" do
+      let(:other_students) { create_users_in_course(course, 2, return_type: :record) }
+      let(:different_parent_override) { create_adhoc_override_for_parent_assignment(other_students) }
+
+      before do
+        parent_override.destroy
+      end
+
+      it "raises ParentOverrideNotFoundError" do
+        expect { service.call }.to raise_error(
+          PeerReview::ParentOverrideNotFoundError,
+          /Parent assignment ADHOC override not found for students/
+        )
+      end
+    end
+
+    context "when parent override matches subset of students" do
+      let(:override_params_subset) do
+        {
+          set_type: "ADHOC",
+          student_ids: students.map(&:id),
+          due_at:,
+          unlock_at:,
+          lock_at:,
+          unassign_item: false
+        }
+      end
+
+      let(:service_subset) do
+        described_class.new(
+          peer_review_sub_assignment:,
+          override: override_params_subset
+        )
+      end
+
+      before do
+        parent_override.assignment_override_students.last.destroy
+      end
+
+      it "raises ParentOverrideNotFoundError because student lists don't match exactly" do
+        expect { service_subset.call }.to raise_error(
+          PeerReview::ParentOverrideNotFoundError,
+          /Parent assignment ADHOC override not found for students/
+        )
+      end
+    end
+
+    context "transaction protection for parent override lookup" do
+      it "validates parent override exists within transaction" do
+        allow(service).to receive(:validate_adhoc_parent_override_exists).and_call_original
+
+        service.call
+
+        expect(service).to have_received(:validate_adhoc_parent_override_exists).once
+      end
+
+      it "uses a transaction to ensure atomicity of parent override lookup and creation" do
+        expect(ActiveRecord::Base).to receive(:transaction).and_call_original.at_least(:once)
+
+        service.call
+      end
+
+      it "rolls back if parent override validation fails during transaction" do
+        allow(service).to receive(:validate_adhoc_parent_override_exists).and_raise(PeerReview::ParentOverrideNotFoundError, "Test error")
+
+        expect { service.call }.to raise_error(PeerReview::ParentOverrideNotFoundError)
+        expect(peer_review_sub_assignment.assignment_overrides.count).to eq(0)
+      end
+
+      it "finds parent override inside the transaction block" do
+        find_parent_called_in_transaction = false
+
+        allow(service).to receive(:find_parent_override).and_wrap_original do |method, *args|
+          find_parent_called_in_transaction = ActiveRecord::Base.connection.transaction_open?
+          method.call(*args)
+        end
+
+        service.call
+
+        expect(find_parent_called_in_transaction).to be true
       end
     end
   end

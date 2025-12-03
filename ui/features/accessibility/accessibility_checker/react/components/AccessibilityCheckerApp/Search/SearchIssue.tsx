@@ -18,9 +18,10 @@
 
 import React, {useEffect, useState} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
-import {IconSearchLine} from '@instructure/ui-icons'
+import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useDebouncedCallback} from 'use-debounce'
+import {IconButton} from '@instructure/ui-buttons'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -40,8 +41,15 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
     }
   }, [])
 
+  const shouldSearch = (searchString: string) => {
+    const searchQueryLength = searchString.trim().length
+    return searchQueryLength === 0 || searchQueryLength >= 3
+  }
+
   const debouncedOnSearchChange = useDebouncedCallback((value: string) => {
-    onSearchChange(value)
+    if (shouldSearch(value)) {
+      onSearchChange(value)
+    }
   }, 300)
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,15 +58,48 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
     debouncedOnSearchChange(newSearch)
   }
 
+  const handleClear = () => {
+    setSearch('')
+    onSearchChange('')
+  }
+
+  const clearButton = () => {
+    if (!search.length) return null
+
+    return (
+      <IconButton
+        type="button"
+        size="small"
+        withBackground={false}
+        withBorder={false}
+        screenReaderLabel={I18n.t('Clear search')}
+        onClick={handleClear}
+        data-testid="clear-search-button"
+      >
+        <IconTroubleLine />
+      </IconButton>
+    )
+  }
+
   return (
     <TextInput
       id="issueSearchInput"
       value={search}
       renderBeforeInput={() => <IconSearchLine inline={false} />}
+      renderAfterInput={clearButton}
       renderLabel={''}
       onChange={handleSearchChange}
-      placeholder={I18n.t('Search...')}
+      messages={[
+        {
+          type: 'hint',
+          text: I18n.t(
+            'Start typing to search. Results will update automatically after 3 characters.',
+          ),
+        },
+      ]}
+      placeholder={I18n.t('Search resource titles...')}
       width="100%"
+      data-testid="issue-search-input"
     />
   )
 }

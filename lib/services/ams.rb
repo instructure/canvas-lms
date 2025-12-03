@@ -28,6 +28,10 @@ module Services
       config["api_url"]
     end
 
+    def self.item_management_launch_url
+      config["item_management_launch_url"]
+    end
+
     class << self
       private
 

@@ -27,6 +27,7 @@ import {renderCreateDialog} from '@canvas/groups/react/CreateOrEditSetModal'
 import 'jqueryui/tabs'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {setupTabKeyboardNavigation} from '@canvas/util/tabKeyboardNavigation'
 
 const I18n = createI18nScope('GroupCategoriesView')
 export default class GroupCategoriesView extends CollectionView {
@@ -66,6 +67,10 @@ export default class GroupCategoriesView extends CollectionView {
     initializeTopNavPortalWithDefaults({
       getBreadCrumbSetter: handleBreadCrumbSetter,
     })
+  }
+
+  getUrlEndString(url) {
+    return url.slice(url.lastIndexOf('/') + 1)
   }
 
   render() {
@@ -118,11 +123,20 @@ export default class GroupCategoriesView extends CollectionView {
       this.$tabs.hide()
     }
     this.$tabs.find('li.static a').unbind()
-    return this.$tabs.on('keydown', 'li.static', function (event) {
-      event.stopPropagation()
-      if (event.keyCode === 13 || event.keyCode === 32) {
-        return (window.location.href = $(this).find('a').attr('href'))
-      }
+
+    // Check if we came from internal navigation (groups or users page)
+    const referrerEnd = this.getUrlEndString(document.referrer)
+    const isInternalNavigation =
+      document.referrer && new URL(document.referrer).origin === window.location.origin
+    const needsVoiceOverDelay =
+      (referrerEnd === 'groups' || referrerEnd === 'users') && isInternalNavigation
+
+    // Set up W3C ARIA-compliant keyboard navigation for tabs
+    // Arrow keys navigate AND load pages automatically
+    setupTabKeyboardNavigation(this.$tabs, {
+      autoActivate: true,
+      handleHashNavigation: true,
+      useVoiceOverDelay: needsVoiceOverDelay,
     })
   }
 

@@ -798,6 +798,7 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   ): SubmissionConnection
   name: String
   needsGradingCount: Int
+  newQuizzesAnonymousParticipants: Boolean
   nonDigitalSubmission: Boolean
 
   """
@@ -1263,6 +1264,7 @@ Objects that can be assigned overridden dates
 union AssignmentOverrideSet = AdhocStudents | Course | Group | Noop | Section
 
 input AssignmentPeerReviewsUpdate {
+  acrossSections: Boolean
   anonymousReviews: Boolean
   automaticReviews: Boolean
   count: Int
@@ -2012,7 +2014,7 @@ type ConversationParticipantEdge {
   node: ConversationParticipant
 }
 
-type Course implements AssetString & AssignmentsConnectionInterface & DiscussionsConnectionInterface & FilesConnectionInterface & LegacyIDInterface & Node & PagesConnectionInterface & QuizzesConnectionInterface & Timestamped {
+type Course implements AssetString & AssignmentsConnectionInterface & DiscussionsConnectionInterface & ExternalToolsConnectionInterface & FilesConnectionInterface & LegacyIDInterface & Node & PagesConnectionInterface & QuizzesConnectionInterface & Timestamped {
   """
   legacy canvas id
   """
@@ -2203,6 +2205,10 @@ type Course implements AssetString & AssignmentsConnectionInterface & Discussion
     """
     last: Int
   ): EnrollmentConnection
+
+  """
+  returns a list of external tools.
+  """
   externalToolsConnection(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -4714,6 +4720,7 @@ type ExternalToolEdge {
 
 input ExternalToolFilterInput {
   placement: ExternalToolPlacement = null
+  placementList: [ExternalToolPlacement!] = null
   state: ExternalToolState = null
 }
 
@@ -4723,6 +4730,8 @@ Placements that an External Tool can have
 enum ExternalToolPlacement {
   ActivityAssetProcessor
   homework_submission
+  link_selection
+  resource_selection
 }
 
 type ExternalToolPlacements {
@@ -4749,6 +4758,34 @@ enum ExternalToolState {
   email_only
   name_only
   public
+}
+
+interface ExternalToolsConnectionInterface {
+  """
+  returns a list of external tools.
+  """
+  externalToolsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: ExternalToolFilterInput = {}
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): ExternalToolConnection
 }
 
 type ExternalUrl implements LegacyIDInterface & ModuleItemInterface & Timestamped {
@@ -7109,24 +7146,12 @@ type Mutation {
     """
     input: UpdateDiscussionEntryParticipantInput!
   ): UpdateDiscussionEntryParticipantPayload
-  updateDiscussionExpanded(
-    """
-    Parameters for UpdateDiscussionExpanded
-    """
-    input: UpdateDiscussionExpandedInput!
-  ): UpdateDiscussionExpandedPayload
   updateDiscussionReadState(
     """
     Parameters for UpdateDiscussionReadState
     """
     input: UpdateDiscussionReadStateInput!
   ): UpdateDiscussionReadStatePayload
-  updateDiscussionSortOrder(
-    """
-    Parameters for UpdateDiscussionSortOrder
-    """
-    input: UpdateDiscussionSortOrderInput!
-  ): UpdateDiscussionSortOrderPayload
   updateDiscussionThreadReadState(
     """
     Parameters for UpdateDiscussionThreadReadState
@@ -7747,6 +7772,11 @@ type PeerReviewStatus {
 Settings for Peer Reviews on an Assignment
 """
 type PeerReviews {
+  """
+  Boolean indicating if peer reviews can be assigned across different sections
+  """
+  acrossSections: Boolean
+
   """
   Boolean representing whether or not peer reviews are anonymous
   """
@@ -8520,6 +8550,62 @@ input QuizFilter {
 type QuizItem {
   _id: ID!
   title: String!
+}
+
+type QuizSubmission implements LegacyIDInterface & Timestamped {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  attempt: Int
+  createdAt: DateTime
+  extraAttempts: Int
+  extraTime: Int
+  finishedAt: DateTime
+  fudgePoints: Float
+  keptScore: Float
+  manuallyScored: Boolean
+  quizPointsPossible: Float
+  quizVersion: Int
+  score: Float
+  startedAt: DateTime
+  updatedAt: DateTime
+  workflowState: String!
+}
+
+"""
+The connection type for QuizSubmission.
+"""
+type QuizSubmissionConnection {
+  """
+  A list of edges.
+  """
+  edges: [QuizSubmissionEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [QuizSubmission]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type QuizSubmissionEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: QuizSubmission
 }
 
 interface QuizzesConnectionInterface {
@@ -9338,7 +9424,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   _id: ID!
   anonymousId: ID
   assignedAssessments: [AssessmentRequest!]
-  assignment: Assignment
+  assignment: Assignment!
   assignmentId: ID!
   attachment: File
   attachments: [File!]
@@ -9613,6 +9699,27 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
     last: Int
     orderBy: SubmissionHistoryOrder
   ): SubmissionHistoryConnection!
+  submissionQuizHistoriesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): QuizSubmissionConnection
   submissionStatus: String
   submissionType: SubmissionType
   submittedAt: DateTime
@@ -9780,7 +9887,7 @@ enum SubmissionGradingStatus {
 type SubmissionHistory implements SubmissionInterface & Timestamped {
   anonymousId: ID
   assignedAssessments: [AssessmentRequest!]
-  assignment: Assignment
+  assignment: Assignment!
   assignmentId: ID!
   attachment: File
   attachments: [File!]
@@ -10006,7 +10113,7 @@ Types for submission or submission history
 interface SubmissionInterface {
   anonymousId: ID
   assignedAssessments: [AssessmentRequest!]
-  assignment: Assignment
+  assignment: Assignment!
   assignmentId: ID!
   attachment: File
   attachments: [File!]
@@ -10170,6 +10277,11 @@ enum SubmissionOrderField {
   gradedAt
 }
 
+enum SubmissionPostingStatus {
+  hideable
+  postable
+}
+
 input SubmissionRubricAssessmentFilterInput {
   """
   it will return all rubric assessments for the current submission
@@ -10233,6 +10345,12 @@ input SubmissionSearchFilterInput {
   Limit results to submissions that are late
   """
   late: Boolean
+
+  """
+  Filter submissions by their posting status. Valid values: postable, hideable.
+  Ignored if the current user cannot manage or view all grades for the assignment.
+  """
+  postingStatus: SubmissionPostingStatus
 
   """
   For group assignments, include submissions for group representatives only.
@@ -10641,22 +10759,6 @@ type UpdateDiscussionEntryPayload {
 }
 
 """
-Autogenerated input type of UpdateDiscussionExpanded
-"""
-input UpdateDiscussionExpandedInput {
-  discussionTopicId: ID!
-  expanded: Boolean!
-}
-
-"""
-Autogenerated return type of UpdateDiscussionExpanded.
-"""
-type UpdateDiscussionExpandedPayload {
-  discussionTopic: Discussion!
-  errors: [ValidationError!]
-}
-
-"""
 Autogenerated input type of UpdateDiscussionReadState
 """
 input UpdateDiscussionReadStateInput {
@@ -10668,22 +10770,6 @@ input UpdateDiscussionReadStateInput {
 Autogenerated return type of UpdateDiscussionReadState.
 """
 type UpdateDiscussionReadStatePayload {
-  discussionTopic: Discussion!
-  errors: [ValidationError!]
-}
-
-"""
-Autogenerated input type of UpdateDiscussionSortOrder
-"""
-input UpdateDiscussionSortOrderInput {
-  discussionTopicId: ID!
-  sortOrder: DiscussionSortOrderType!
-}
-
-"""
-Autogenerated return type of UpdateDiscussionSortOrder.
-"""
-type UpdateDiscussionSortOrderPayload {
   discussionTopic: Discussion!
   errors: [ValidationError!]
 }

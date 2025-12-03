@@ -32,14 +32,16 @@ RSpec.describe PeerReview::SectionOverrideUpdaterService do
   let(:updated_unlock_at) { 2.days.from_now.change(hour: due_hour) }
   let(:updated_lock_at) { 3.weeks.from_now.change(hour: due_hour) }
 
-  let!(:existing_override) do
-    peer_review_sub_assignment.assignment_overrides.create!(
-      set: section1,
-      due_at: existing_due_at,
-      lock_at: existing_lock_at,
-      unlock_at: existing_unlock_at,
-      unassign_item: false
-    )
+  let(:parent_override1) do
+    assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: section1)
+  end
+
+  let(:existing_override) do
+    assignment_override_model(assignment: peer_review_sub_assignment, set: section1, due_at: existing_due_at, lock_at: existing_lock_at, unlock_at: existing_unlock_at, unassign_item: false, parent_override: parent_override1)
+  end
+
+  let(:parent_override2) do
+    assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: section2)
   end
 
   let(:override_data) do
@@ -77,6 +79,11 @@ RSpec.describe PeerReview::SectionOverrideUpdaterService do
   end
 
   describe "#call" do
+    before do
+      existing_override
+      parent_override2
+    end
+
     context "when override exists and validations pass" do
       it "updates the existing override" do
         result = service.call
@@ -182,10 +189,130 @@ RSpec.describe PeerReview::SectionOverrideUpdaterService do
   end
 
   describe "integration with ApplicationService" do
+    before do
+      existing_override
+      parent_override2
+    end
+
     it "can be called via the class method" do
       result = described_class.call(peer_review_sub_assignment:, override: override_data)
       expect(result).to be_a(AssignmentOverride)
       expect(result).to eq(existing_override)
+    end
+  end
+
+  describe "parent override tracking" do
+    let(:parent_assignment) { peer_review_sub_assignment.parent_assignment }
+    let!(:parent_override_section1) do
+      assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: section1)
+    end
+    let!(:parent_override_section2) do
+      assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: section2)
+    end
+
+    let!(:tracking_existing_override) do
+      assignment_override_model(assignment: peer_review_sub_assignment, set: section1, due_at: existing_due_at, lock_at: existing_lock_at, unlock_at: existing_unlock_at, unassign_item: false, parent_override: parent_override_section1)
+    end
+
+    let(:tracking_override_data) do
+      {
+        id: tracking_existing_override.id,
+        set_id: section2.id,
+        set_type: "CourseSection",
+        due_at: updated_due_at,
+        lock_at: updated_lock_at,
+        unlock_at: updated_unlock_at,
+        unassign_item: true
+      }
+    end
+
+    let(:tracking_service) do
+      described_class.new(
+        peer_review_sub_assignment:,
+        override: tracking_override_data
+      )
+    end
+
+    context "when section doesn't change" do
+      let(:same_section_override_data) do
+        {
+          id: tracking_existing_override.id,
+          set_id: section1.id,
+          set_type: "CourseSection",
+          due_at: updated_due_at
+        }
+      end
+
+      let(:same_section_service) do
+        described_class.new(
+          peer_review_sub_assignment:,
+          override: same_section_override_data
+        )
+      end
+
+      it "keeps the same parent_override" do
+        same_section_service.call
+        tracking_existing_override.reload
+        expect(tracking_existing_override.parent_override).to eq(parent_override_section1)
+      end
+
+      it "validates parent_override still exists" do
+        parent_override_section1.destroy
+        expect { same_section_service.call }.to raise_error(
+          PeerReview::OverrideNotFoundError,
+          "Override does not exist"
+        )
+      end
+    end
+
+    context "when section changes" do
+      it "updates to the new parent_override" do
+        tracking_service.call
+        tracking_existing_override.reload
+        expect(tracking_existing_override.parent_override).to eq(parent_override_section2)
+        expect(tracking_existing_override.parent_override_id).to eq(parent_override_section2.id)
+      end
+
+      it "finds parent override based on new section ID" do
+        tracking_service.call
+        tracking_existing_override.reload
+        expect(tracking_existing_override.parent_override.set).to eq(section2)
+        expect(tracking_existing_override.parent_override.set_type).to eq(AssignmentOverride::SET_TYPE_COURSE_SECTION)
+      end
+
+      context "when new parent override does not exist" do
+        before do
+          parent_override_section2.destroy
+        end
+
+        it "raises ParentOverrideNotFoundError" do
+          expect { tracking_service.call }.to raise_error(
+            PeerReview::ParentOverrideNotFoundError,
+            /Parent assignment Section override not found for section [\d,]+/
+          )
+        end
+      end
+    end
+
+    it "wraps the operation in a transaction" do
+      expect(ActiveRecord::Base).to receive(:transaction).at_least(:once).and_call_original
+      tracking_service.call
+    end
+
+    context "race condition protection" do
+      it "validates parent override within transaction" do
+        allow(tracking_service).to receive(:validate_section_parent_override_exists).and_call_original
+
+        tracking_service.call
+
+        expect(tracking_service).to have_received(:validate_section_parent_override_exists).once
+      end
+
+      it "uses a transaction to ensure atomicity of parent override lookup and update" do
+        expect(ActiveRecord::Base).to receive(:transaction).and_call_original.at_least(:once)
+
+        tracking_service.call
+      end
     end
   end
 end

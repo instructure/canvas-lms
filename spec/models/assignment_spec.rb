@@ -40,9 +40,14 @@ describe Assignment do
     expect(assignment.lti_context_id).to be_present
   end
 
-  it "defaults peer_review_submission_required to false" do
+  it "defaults peer_review_submission_required to true" do
     assignment = @course.assignments.create!(assignment_valid_attributes)
-    expect(assignment.peer_review_submission_required).to be false
+    expect(assignment.peer_review_submission_required).to be true
+  end
+
+  it "defaults peer_review_across_sections to true" do
+    assignment = @course.assignments.create!(assignment_valid_attributes)
+    expect(assignment.peer_review_across_sections).to be true
   end
 
   it "has a useful state machine" do
@@ -541,8 +546,12 @@ describe Assignment do
 
       context "for an assignment with an associated quiz" do
         it "updates the quiz when the assignment is updated normally" do
+          course_attachment = attachment_model(context: @course)
           expect do
-            assignment.update!(title: "a new and even better title")
+            assignment.title = "a new and even better title"
+            assignment.description = "<img src='/courses/#{@course.id}/attachments/#{course_attachment.id}' /> something something"
+            assignment.saving_user = @teacher
+            assignment.save!
           end.to change { quiz.reload.updated_at }
         end
 
@@ -1833,6 +1842,16 @@ describe Assignment do
       new_assignment.save!
 
       expect(new_assignment.peer_review_submission_required).to be true
+    end
+
+    it "copies peer_review_across_sections value" do
+      assignment = @course.assignments.create!(title: "test assignment", points_possible: 100)
+      assignment.update!(peer_review_across_sections: false)
+
+      new_assignment = assignment.duplicate
+      new_assignment.save!
+
+      expect(new_assignment.peer_review_across_sections).to be false
     end
 
     context "with an assignment that can't be duplicated" do
@@ -13094,6 +13113,7 @@ describe Assignment do
     let(:course) { course_model }
     let(:valid_attributes) { { title: "Test Assignment", course: } }
     let(:relevant_attributes_for_scan) { { description: "<p>Lorem ipsum</p>" } }
+    let(:irrelevant_attributes_for_scan) { { points_possible: 100 } }
   end
 
   describe "peer_review_sub_assignment association" do

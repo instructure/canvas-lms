@@ -479,4 +479,90 @@ describe WikiPagesApiController, type: :request do
       end
     end
   end
+
+  describe "POST accessibility_scan" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @student = student_in_course(active_all: true).user
+      @wiki_page = @course.wiki_pages.create!(
+        title: "Test Page",
+        body: "<h1>Title</h1><p>Content</p>"
+      )
+    end
+
+    def accessibility_scan_request(user, page_url, expected_status: 200)
+      url = "/api/v1/courses/#{@course.id}/pages/#{page_url}/accessibility/scan"
+      path = {
+        controller: "wiki_pages_api",
+        action: "accessibility_scan",
+        format: "json",
+        course_id: @course.id.to_s,
+        url_or_id: page_url
+      }
+      api_call_as_user(user, :post, url, path, {}, {}, { expected_status: })
+    end
+
+    context "when a11y_checker feature is enabled" do
+      before do
+        @course.account.enable_feature!(:a11y_checker)
+        @course.enable_feature!(:a11y_checker_eap)
+      end
+
+      it "requires manage course content permissions" do
+        accessibility_scan_request(@student, @wiki_page.url, expected_status: 403)
+      end
+
+      it "runs a synchronous accessibility scan and returns scan results" do
+        json = accessibility_scan_request(@teacher, @wiki_page.url)
+
+        expect(json["id"]).to be_present
+        expect(json["resource_type"]).to eq("WikiPage")
+        expect(json["resource_name"]).to eq("Test Page")
+        expect(json["workflow_state"]).to eq("completed")
+        expect(json["issue_count"]).to be >= 0
+        expect(json["issues"]).to be_an(Array)
+      end
+
+      it "returns 404 for non-existent page" do
+        accessibility_scan_request(@teacher, "nonexistent-page", expected_status: 404)
+      end
+
+      it "calls ResourceScannerService with the wiki page" do
+        service_double = instance_double(Accessibility::ResourceScannerService)
+        scan_double = instance_double(AccessibilityResourceScan,
+                                      id: 1,
+                                      context: @wiki_page,
+                                      resource_name: "Test Page",
+                                      resource_workflow_state: "active",
+                                      resource_updated_at: Time.zone.now,
+                                      context_url: "/courses/#{@course.id}/pages/#{@wiki_page.id}",
+                                      workflow_state: "completed",
+                                      error_message: nil,
+                                      issue_count: 0,
+                                      accessibility_issues: double(select: []))
+
+        expect(Accessibility::ResourceScannerService).to receive(:new)
+          .with(resource: @wiki_page)
+          .and_return(service_double)
+        expect(service_double).to receive(:call_sync).and_return(scan_double)
+
+        accessibility_scan_request(@teacher, @wiki_page.url)
+      end
+    end
+
+    context "when a11y_checker feature is disabled" do
+      before do
+        @course.account.disable_feature!(:a11y_checker)
+        @course.disable_feature!(:a11y_checker_eap)
+      end
+
+      it "returns forbidden even for teachers" do
+        accessibility_scan_request(@teacher, @wiki_page.url, expected_status: 403)
+      end
+
+      it "returns forbidden for students" do
+        accessibility_scan_request(@student, @wiki_page.url, expected_status: 403)
+      end
+    end
+  end
 end

@@ -34,7 +34,17 @@ describe Accessibility::IssueSummaryController do
   before do
     course.enroll_teacher(teacher, enrollment_state: "active")
     user_session(teacher)
-    allow(controller).to receive(:tab_enabled?).with(Course::TAB_ACCESSIBILITY).and_return(true)
+    allow_any_instance_of(described_class).to receive(:check_authorized_action).and_return(true)
+  end
+
+  context "when a11y_checker feature flag disabled" do
+    it "renders forbidden" do
+      allow_any_instance_of(described_class).to receive(:check_authorized_action).and_call_original
+      allow(course).to receive(:a11y_checker_enabled?).and_return(false)
+
+      expect(controller).to receive(:render).with(status: :forbidden)
+      controller.send(:check_authorized_action)
+    end
   end
 
   describe "GET #show" do

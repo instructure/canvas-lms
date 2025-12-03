@@ -1,0 +1,8 @@
+{
+  "name": "@canvas/breakpoints",
+  "version": "1.0.0",
+  "description": "Standard responsive breakpoints for Canvas",
+  "main": "index.ts",
+  "author": "Instructure, Inc.",
+  "license": "AGPL-3.0"
+}

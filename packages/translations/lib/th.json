@@ -836,6 +836,12 @@
     "file_name_8fd421ff": {
         "message": "ชื่อไฟล์"
     },
+    "file_preview_21667a6e": {
+        "message": "แสดงตัวอย่างไฟล์"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "แสดงตัวอย่างไฟล์สำหรับ { fileName }"
+    },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "เกินโควต้าพื้นที่จัดเก็บไฟล์"
     },

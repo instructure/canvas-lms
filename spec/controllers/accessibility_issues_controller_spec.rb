@@ -96,7 +96,7 @@ describe AccessibilityIssuesController do
     end
 
     context "when workflow_state is 'resolved'" do
-      context "when value is not provided" do
+      context "when value key is not provided" do
         before do
           patch :update,
                 params: {
@@ -113,6 +113,81 @@ describe AccessibilityIssuesController do
 
         it "renders an error message" do
           expect(response.parsed_body["error"]).to eq("Value is required for resolved state")
+        end
+      end
+
+      context "when value is an empty string" do
+        before do
+          patch :update,
+                params: {
+                  course_id: course.id,
+                  id: issue.id,
+                  workflow_state: "resolved",
+                  value: ""
+                },
+                format: :json
+        end
+
+        it "returns a 422 status" do
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it "renders an error message" do
+          expect(response.parsed_body["error"]).to eq("Value is required for resolved state")
+        end
+      end
+
+      context "when value is whitespace only" do
+        before do
+          patch :update,
+                params: {
+                  course_id: course.id,
+                  id: issue.id,
+                  workflow_state: "resolved",
+                  value: "   "
+                },
+                format: :json
+        end
+
+        it "returns a 422 status" do
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it "renders an error message" do
+          expect(response.parsed_body["error"]).to eq("Value is required for resolved state")
+        end
+      end
+
+      context "when value is nil for a rule that allows it" do
+        let(:img_wiki_page) do
+          wiki_page_model(course:, title: "Image Wiki Page", body: "<div><img src='test.jpg' /></div>")
+        end
+        let(:img_scan) { accessibility_resource_scan_model(course:, context: img_wiki_page, issue_count: 1) }
+        let(:img_issue) do
+          accessibility_issue_model(
+            course:,
+            accessibility_resource_scan: img_scan,
+            rule_type: Accessibility::Rules::ImgAltRule.id,
+            node_path: ".//img"
+          )
+        end
+
+        before do
+          patch :update,
+                params: {
+                  course_id: course.id,
+                  id: img_issue.id
+                },
+                body: { workflow_state: "resolved", value: nil }.to_json,
+                as: :json
+        end
+
+        it "updates the workflow_state" do
+          expect(img_issue.reload.workflow_state).to eq "resolved"
+        end
+
+        it "returns a no content status" do
+          expect(response).to have_http_status(:no_content)
         end
       end
 

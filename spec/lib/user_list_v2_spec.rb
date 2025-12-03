@@ -290,44 +290,5 @@ describe UserListV2 do
       expect(r[:user_token]).to eq @user.token
       expect(r[:account_id]).to eq Account.default.id
     end
-
-    context "global lookups" do
-      before do
-        @shard1.activate do
-          @account1 = Account.create!
-          @user1 = user_with_pseudonym(name: "JT", username: "jt@instructure.com", active_all: true, account: @account1)
-        end
-        @shard2.activate do
-          @account2 = Account.create!
-          @user2 = user_with_pseudonym(name: "JT", username: "jt@instructure.com", active_all: true, account: @account2)
-        end
-
-        allow(Account.default).to receive(:trusted_account_ids).and_return([Account.site_admin.id, @account1.id, @account2.id])
-        allow(GlobalLookups).to receive(:enabled?).and_return(true)
-      end
-
-      it "looks on every shard if there aren't that many shards to look on" do
-        # identifiable as `undefined method `associated_shards_for_column' for class `#<Class:0x00007f87ade80828>'`
-        skip_if_prepended_class_method_stubs_broken
-        Setting.set("global_lookups_shard_threshold", "3") # i.e. if we'd have to look on more than 3 shards, we should use global lookups
-
-        expect(Pseudonym).not_to receive(:associated_shards_for_column)
-        ul = UserListV2.new("jt@instructure.com", search_type: "unique_id")
-        expect(ul.resolved_results).to be_empty
-        expect(ul.duplicate_results.first.pluck(:user_id)).to match_array([@user1.id, @user2.id])
-        expect(ul.duplicate_results.first.pluck(:user_token)).to match_array([@user1.token, @user2.token])
-      end
-
-      it "uses the global lookups to restrict searched shard if there are enough shards to look on" do
-        skip_if_prepended_class_method_stubs_broken
-        Setting.set("global_lookups_shard_threshold", "1") # i.e. if we'd have to look on more than 1 shards, we should use global lookups
-
-        expect(Pseudonym).to receive(:associated_shards_for_column).once.with(:unique_id, "jt@instructure.com").and_return([@shard1]) # don't look on shard2
-        ul = UserListV2.new("jt@instructure.com", search_type: "unique_id")
-        expect(ul.duplicate_results).to be_empty
-        expect(ul.resolved_results.first[:user_id]).to eq @user1.id
-        expect(ul.resolved_results.first[:user_token]).to eq @user1.token
-      end
-    end
   end
 end

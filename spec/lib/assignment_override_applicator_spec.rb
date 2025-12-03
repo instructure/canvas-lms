@@ -730,6 +730,34 @@ describe AssignmentOverrideApplicator do
           expect(result).to eq [@override]
         end
 
+        it "returns group overrides for ungraded group discussions" do
+          @category = group_category(name: "ungraded_discussion_group")
+          @group = @category.groups.create!(context: @course)
+
+          @discussion_topic = @course.discussion_topics.create!(
+            message: "ungraded group discussion",
+            group_category_id: @category.id
+          )
+
+          @override = @discussion_topic.assignment_overrides.create!
+          @override.set = @group
+          @override.save!
+
+          @membership = @group.add_user(@student)
+
+          result = AssignmentOverrideApplicator.group_overrides(@discussion_topic, @student)
+          expect(result).to eq [@override]
+        end
+
+        it "returns nil for ungraded non group discussions" do
+          @discussion_topic = @course.discussion_topics.create!(
+            message: "ungraded discussion without groups"
+          )
+
+          result = AssignmentOverrideApplicator.group_overrides(@discussion_topic, @student)
+          expect(result).to be_nil
+        end
+
         it "does not include group override for groups other than the user's" do
           @override.set = @category.groups.create!(context: @course)
           @override.save!
@@ -780,6 +808,25 @@ describe AssignmentOverrideApplicator do
           result = AssignmentOverrideApplicator.group_overrides(@assignment, @teacher)
           expect(result).to eq [@override]
         end
+
+        it "works for ungraded group discussions" do
+          teacher_in_course
+
+          @category = group_category(name: "ungraded_discussion_group")
+          @group = @category.groups.create!(context: @course)
+
+          @discussion_topic = @course.discussion_topics.create!(
+            message: "ungraded group discussion",
+            group_category_id: @category.id
+          )
+
+          @override = @discussion_topic.assignment_overrides.create!
+          @override.set = @group
+          @override.save!
+
+          result = AssignmentOverrideApplicator.group_overrides(@discussion_topic, @teacher)
+          expect(result).to eq [@override]
+        end
       end
 
       describe "for observers" do
@@ -796,6 +843,26 @@ describe AssignmentOverrideApplicator do
           account_admin_user
           user_session(@admin)
           result = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
+          expect(result).to eq [@override]
+        end
+
+        it "works for ungraded group discussions" do
+          account_admin_user
+          user_session(@admin)
+
+          @category = group_category(name: "ungraded_discussion_group")
+          @group = @category.groups.create!(context: @course)
+
+          @discussion_topic = @course.discussion_topics.create!(
+            message: "ungraded group discussion",
+            group_category_id: @category.id
+          )
+
+          @override = @discussion_topic.assignment_overrides.create!
+          @override.set = @group
+          @override.save!
+
+          result = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@discussion_topic, @admin)
           expect(result).to eq [@override]
         end
       end

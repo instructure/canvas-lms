@@ -30,10 +30,11 @@ class ItemBanksController < ApplicationController
     js_env(context_url: context_url(@context, :context_item_banks_url))
     remote_env(ams:
       {
-        launch_url: Services::Ams.launch_url,
+        launch_url: Services::Ams.item_management_launch_url,
         api_url: Services::Ams.api_url
       })
 
+    @body_classes << "full-width padless-content"
     render html: '<div id="ams_container"></div>'.html_safe, layout: true
   end
 

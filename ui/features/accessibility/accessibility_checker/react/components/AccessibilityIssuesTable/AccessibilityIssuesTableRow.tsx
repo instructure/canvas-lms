@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {IconPublishSolid, IconUnpublishedSolid} from '@instructure/ui-icons'
@@ -36,67 +35,54 @@ const baseCellThemeOverride: TableCellProps['themeOverride'] = _componentTheme =
 
 type Props = {
   item: AccessibilityResourceScan
-  // Could be renamed to onIssueRemediationClick for clarity
-  onRowClick?: (item: AccessibilityResourceScan) => void
 }
 
-export const AccessibilityIssuesTableRow = ({item, onRowClick}: Props) => {
-  const handleRowClick = useCallback(
-    (item: AccessibilityResourceScan) => {
-      if (onRowClick) {
-        onRowClick(item)
-      }
-    },
-    [onRowClick],
-  )
-
-  return (
-    <Table.Row key={`${item.resourceType}-${item.id}`} data-testid={`issue-row-${item.id}`}>
-      <Table.Cell themeOverride={baseCellThemeOverride} textAlign="start">
-        <Link href={item.resourceUrl}>
-          <Text lineHeight="lineHeight150">{item.resourceName}</Text>
-        </Link>
-      </Table.Cell>
-      <Table.Cell textAlign="center">
-        <ScanStateCell item={item} onClick={handleRowClick} />
-      </Table.Cell>
-      <Table.Cell>
-        <ContentTypeCell item={item} />
-      </Table.Cell>
-      <Table.Cell>
-        <Flex alignItems="center">
-          {item.resourceWorkflowState === ResourceWorkflowState.Published ? (
-            <>
-              <Flex.Item margin="0 x-small 0 0">
-                <IconPublishSolid color="success" />
-              </Flex.Item>
-              <Flex.Item>
-                <Text>{I18n.t('Published')}</Text>
-              </Flex.Item>
-            </>
-          ) : (
-            <>
-              <Flex.Item margin="0 x-small 0 0">
-                <IconUnpublishedSolid color="secondary" />
-              </Flex.Item>
-              <Flex.Item>
-                <Text>{I18n.t('Unpublished')}</Text>
-              </Flex.Item>
-            </>
-          )}
-        </Flex>
-      </Table.Cell>
-      <Table.Cell themeOverride={baseCellThemeOverride}>
-        <Text lineHeight="lineHeight150">
-          {item.resourceUpdatedAt
-            ? new Intl.DateTimeFormat('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: '2-digit',
-              }).format(new Date(item.resourceUpdatedAt))
-            : '-'}
-        </Text>
-      </Table.Cell>
-    </Table.Row>
-  )
-}
+export const AccessibilityIssuesTableRow = ({item}: Props) => (
+  <Table.Row key={`${item.resourceType}-${item.id}`} data-testid={`issue-row-${item.id}`}>
+    <Table.Cell themeOverride={baseCellThemeOverride} textAlign="start">
+      <Link href={item.resourceUrl}>
+        <Text lineHeight="lineHeight150">{item.resourceName}</Text>
+      </Link>
+    </Table.Cell>
+    <Table.Cell textAlign="center">
+      <ScanStateCell item={item} />
+    </Table.Cell>
+    <Table.Cell>
+      <ContentTypeCell item={item} />
+    </Table.Cell>
+    <Table.Cell>
+      <Flex alignItems="center">
+        {item.resourceWorkflowState === ResourceWorkflowState.Published ? (
+          <>
+            <Flex.Item margin="0 x-small 0 0">
+              <IconPublishSolid color="success" />
+            </Flex.Item>
+            <Flex.Item>
+              <Text>{I18n.t('Published')}</Text>
+            </Flex.Item>
+          </>
+        ) : (
+          <>
+            <Flex.Item margin="0 x-small 0 0">
+              <IconUnpublishedSolid color="secondary" />
+            </Flex.Item>
+            <Flex.Item>
+              <Text>{I18n.t('Unpublished')}</Text>
+            </Flex.Item>
+          </>
+        )}
+      </Flex>
+    </Table.Cell>
+    <Table.Cell themeOverride={baseCellThemeOverride}>
+      <Text lineHeight="lineHeight150">
+        {item.resourceUpdatedAt
+          ? new Intl.DateTimeFormat('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: '2-digit',
+            }).format(new Date(item.resourceUpdatedAt))
+          : '-'}
+      </Text>
+    </Table.Cell>
+  </Table.Row>
+)

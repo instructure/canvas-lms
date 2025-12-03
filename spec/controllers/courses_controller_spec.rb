@@ -4861,6 +4861,80 @@ describe CoursesController do
         expect(json.length).to eq(3)
       end
     end
+
+    describe "filters by section ids" do
+      it "when requested with a string" do
+        user_session(teacher)
+        course.enroll_student(student1, section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          section_ids: section1.id.to_s
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(1)
+        expect(json[0]).to include({ "id" => student1.id })
+      end
+
+      it "when requested with an array of strings" do
+        user_session(teacher)
+
+        course.enroll_student(student1, section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student_in_course(course:, active_all: true).user, section: section3, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          section_ids: [section1.id.to_s, section2.id.to_s]
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(2)
+      end
+
+      it "doesn't duplicate users enrolled in multiple sections" do
+        user_session(teacher)
+        course.enroll_student(student1, section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section3, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          section_ids: [section1.id.to_s, section2.id.to_s, section3.id.to_s]
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(2)
+      end
+
+      it "filters by section with search term" do
+        user_session(teacher)
+        student1.update(name: "Bob Johnson")
+        student2.update(name: "Bob Smith")
+        course.enroll_student(student1, section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          section_ids: section1.id.to_s,
+          search_term: "bob"
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(1)
+        expect(json[0]).to include({ "id" => student1.id })
+      end
+    end
   end
 
   describe "#content_share_users" do
@@ -6085,6 +6159,36 @@ describe CoursesController do
     it "returns error for non-existent version" do
       post "restore_version", params: { course_id: @course.id, version_id: 999 }, format: :json
       expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "GET user_index" do
+    before do
+      @course = course_factory(name: "basic_course")
+      @course.enroll_teacher(@teacher = user_factory)
+      user_session(@teacher)
+    end
+
+    it "returns list of courses the user is enrolled in" do
+      get :user_index, params: { user_id: @teacher.id }
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json).to be_an(Array)
+      expect(json.length).to eq(1)
+      expect(json.first["id"]).to eq(@course.id)
+    end
+
+    it "returns list of completed courses" do
+      completed_course = course_factory(account: @course.account)
+      completed_course.enroll_teacher(@teacher)
+      completed_course.complete!
+
+      get :user_index, params: { user_id: @teacher.id, state: ["completed"] }
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json).to be_an(Array)
+      expect(json.length).to eq(1)
+      expect(json.first["id"]).to eq(completed_course.id)
     end
   end
 end

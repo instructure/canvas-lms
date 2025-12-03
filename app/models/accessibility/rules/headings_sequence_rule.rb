@@ -71,7 +71,7 @@ module Accessibility
       end
 
       def display_name
-        I18n.t("Skipped heading level")
+        I18n.t("Heading order")
       end
 
       def message
@@ -82,25 +82,16 @@ module Accessibility
       end
 
       def why
-        I18n.t(
-          "When heading levels are skipped (for example, from an H2 to an H4, skipping H3), " \
-          "screen reader users may have difficulty understanding the page structure. " \
-          "This creates a confusing outline of the page for assistive technology users."
-        )
+        [I18n.t(
+          "Sighted users scan web pages quickly by looking for large or bolded headings. Similarly, screen reader users rely on properly structured headings to scan the content and jump directly to key sections. Using correct heading levels in a logical order (like H2, H3, etc.) ensures your course is clear, organized, and accessible to everyone."
+        ),
+         I18n.t("Tip: Each page already has a main title (H1), so start your content with an H2 to keep the structure clear.")]
       end
 
       # Helper methods
 
       def self.h_tag?(elem)
-        all_h_tags = {
-          "h1" => true,
-          "h2" => true,
-          "h3" => true,
-          "h4" => true,
-          "h5" => true,
-          "h6" => true
-        }
-        elem && all_h_tags[elem.tag_name.downcase] == true
+        elem&.tag_name&.downcase&.match?(/^h[1-6]$/)
       end
 
       def self.get_highest_order_h_for_elem(elem)

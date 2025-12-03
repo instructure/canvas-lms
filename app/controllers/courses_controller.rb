@@ -1084,7 +1084,7 @@ class CoursesController < ApplicationController
     # DEPRECATED. Needs to stay separate from #users though, because this is un-paginated
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      proxy = @context.students.order_by_sortable_name
+      proxy = @context.students_visible_to(@current_user).order_by_sortable_name
       user_json_preloads(proxy, false)
       render json: proxy.map { |u| user_json(u, @current_user, session) }
     end
@@ -1116,6 +1116,9 @@ class CoursesController < ApplicationController
   #   {api:RoleOverridesController#add_role Add Role API} or a built_in role id with type
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
+  #
+  # @argument section_ids[] [Integer]
+  #   When set, only return users who are enrolled in the given section(s).
   #
   # @argument include[] [String, "enrollments"|"locked"|"avatar_url"|"test_student"|"bio"|"custom_links"|"current_grading_period_scores"|"uuid"]
   #   - "enrollments":
@@ -1161,7 +1164,7 @@ class CoursesController < ApplicationController
         # backcompat limit param
         params[:per_page] ||= params[:limit]
 
-        search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state, :sort, :differentiation_tag_id)
+        search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state, :sort, :differentiation_tag_id, :section_ids)
         include_inactive = @context.grants_right?(@current_user, session, :read_as_admin) && value_to_boolean(params[:include_inactive])
 
         search_params[:include_inactive_enrollments] = true if include_inactive
@@ -4244,7 +4247,9 @@ class CoursesController < ApplicationController
       conditions = states.filter_map do |state|
         Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
       end.join(" OR ")
-      enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user.in_region_associated_shards)
+      enrollments = user.enrollments
+      enrollments = enrollments.joins(:enrollment_state) if states.include?("completed")
+      enrollments = enrollments.eager_load(:course).where(conditions).shard(user.in_region_associated_shards)
 
       if params[:enrollment_role]
         enrollments = enrollments.joins(:role).where(roles: { name: params[:enrollment_role] })

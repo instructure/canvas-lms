@@ -223,7 +223,7 @@ describe "teacher k5 course dashboard" do
       get "/courses/#{@subject_course.id}/settings#tab-navigation"
 
       navigation_list = navigation_items
-
+      # AI Experiences is excluded from subject tabs
       expect(navigation_list.count).to eq(7)
 
       navigation_names.count.times do |x|

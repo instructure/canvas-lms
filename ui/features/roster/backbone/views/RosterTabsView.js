@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/rosterTabs.handlebars'
+import {setupTabKeyboardNavigation} from '@canvas/util/tabKeyboardNavigation'
 import 'jqueryui/tabs'
 
 export default class RosterTabsView extends Backbone.View {
@@ -28,22 +29,6 @@ export default class RosterTabsView extends Backbone.View {
     this.prototype.tagName = 'li'
     this.prototype.className =
       'collectionViewItems ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all'
-  }
-
-  replaceHashAndFocus(tabHref) {
-    const activeTab = $('#group_categories_tabs')
-      .find('li')
-      .filter(function () {
-        return /ui-(state|tabs)-active/.test(this.className)
-      })
-    const activeItemHref = tabHref || activeTab.not('.static').find('a').attr('href')
-    if (activeItemHref) {
-      window.history.replaceState({}, document.title, activeItemHref)
-    }
-    if (activeTab) {
-      activeTab.trigger('focus')
-      activeTab.find('a').trigger('focus')
-    }
   }
 
   isStudent() {
@@ -67,52 +52,32 @@ export default class RosterTabsView extends Backbone.View {
 
   render() {
     super.render(...arguments)
-    // If the referrer is any groups tab
-    const referrerEnd = this.getUrlEndString(document.referrer)
-    if (referrerEnd === 'groups' || referrerEnd === 'users') {
-      requestAnimationFrame(() => {
-        this.replaceHashAndFocus()
-      })
-    }
     if (this.isStudent()) {
       requestAnimationFrame(() => {
-        return this.refreshTabs()
+        this.refreshTabs()
       })
     } else {
-      return this.refreshTabs()
+      this.refreshTabs()
     }
   }
 
   refreshTabs() {
     const $tabs = $('#group_categories_tabs')
     $tabs.tabs().show()
-    $tabs.tabs({
-      beforeActivate: (event, ui) => {
-        return ui.newTab.hasClass('static')
-      },
-    })
 
-    const $groupTabs = $tabs.find('li')
-    $groupTabs.find('a').off()
-    const oldTab = $tabs.find('li.ui-state-active')
-    const newTab = $groupTabs.not('li.ui-state-active')
-    $groupTabs.on('click keyup', function (event) {
-      event.stopPropagation()
-      const $activeItemHref = $(this).find('a').attr('href')
-      window.history.replaceState({}, document.title, $activeItemHref)
-      const newTabHref = newTab.find('a').attr('href')
-      const referrerEnd = newTabHref.slice(newTabHref.lastIndexOf('/') + 1)
-      if (event.type === 'click' || event.key === 'Enter' || event.key === ' ') {
-        window.location.href = $activeItemHref
-        window.location.reload()
-      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-        if (newTab.length <= 1 && (referrerEnd === 'groups' || referrerEnd === 'users')) {
-          oldTab.removeClass('ui-state-active ui-tabs-active')
-          newTab.addClass('ui-state-active ui-tabs-active')
-          newTab.find('a').trigger('focus')
-          window.location.href = newTab.find('a').attr('href')
-        }
-      }
+    // Check if we came from internal navigation (groups or users page)
+    const referrerEnd = this.getUrlEndString(document.referrer)
+    const isInternalNavigation =
+      document.referrer && new URL(document.referrer).origin === window.location.origin
+    const needsVoiceOverDelay =
+      (referrerEnd === 'groups' || referrerEnd === 'users') && isInternalNavigation
+
+    // Set up W3C ARIA-compliant keyboard navigation for tabs
+    // Arrow keys navigate AND load pages automatically
+    setupTabKeyboardNavigation($tabs, {
+      autoActivate: true,
+      handleHashNavigation: true,
+      useVoiceOverDelay: needsVoiceOverDelay,
     })
   }
 

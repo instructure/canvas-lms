@@ -70,8 +70,7 @@ class PeerReview::DateOverrideCommonService < ApplicationService
     return if existing_ids.empty?
 
     @peer_review_sub_assignment
-      .assignment_overrides
-      .active
+      .active_assignment_overrides
       .where(id: existing_ids)
       .index_by(&:id)
   end

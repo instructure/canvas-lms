@@ -25,7 +25,13 @@ RSpec.describe PeerReview::DateOverrideCommonService do
   let(:section1) { add_section("Section 1", course:) }
   let(:section2) { add_section("Section 2", course:) }
 
-  let!(:existing_section_override) { assignment_override_model(assignment: peer_review_sub_assignment, set: section1) }
+  let!(:parent_section_override) do
+    assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: section1)
+  end
+
+  let!(:existing_section_override) do
+    assignment_override_model(assignment: peer_review_sub_assignment, set: section1, parent_override: parent_section_override)
+  end
 
   before do
     course.enable_feature!(:peer_review_grading)
@@ -115,7 +121,8 @@ RSpec.describe PeerReview::DateOverrideCommonService do
       end
 
       it "processes multiple overrides of the same type" do
-        second_section_override = assignment_override_model(assignment: peer_review_sub_assignment, set: section2)
+        parent_section2_override = assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: section2)
+        second_section_override = assignment_override_model(assignment: peer_review_sub_assignment, set: section2, parent_override: parent_section2_override)
 
         duplicate_section_data = [
           override_data[0],
@@ -279,7 +286,14 @@ RSpec.describe PeerReview::DateOverrideCommonService do
     end
 
     context "when overrides have existing ids" do
-      let(:second_override) { assignment_override_model(assignment: peer_review_sub_assignment, set: section2) }
+      let(:parent_section2_override) do
+        assignment_override_model(assignment: peer_review_sub_assignment.parent_assignment, set: section2)
+      end
+
+      let(:second_override) do
+        assignment_override_model(assignment: peer_review_sub_assignment, set: section2, parent_override: parent_section2_override)
+      end
+
       let(:override_data) do
         [
           { id: existing_section_override.id, due_at: 1.week.from_now },

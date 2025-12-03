@@ -371,8 +371,10 @@ function getWayFutureItem(fromMoment) {
       } else {
         params.context_codes = getContextCodesFromState(state)
       }
+    } else if (state.singleCourse) {
+      params.context_codes = getContextCodesFromState(state)
     } else {
-      params.context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
+      include = ['account_calendars', 'all_courses']
     }
     const futureMoment = fromMoment.clone().tz('UTC').startOf('day').add(1, 'year')
     const url = buildURL('/api/v1/planner/items', {
@@ -408,8 +410,10 @@ function getWayPastItem(fromMoment) {
       } else {
         params.context_codes = getContextCodesFromState(state)
       }
+    } else if (state.singleCourse) {
+      params.context_codes = getContextCodesFromState(state)
     } else {
-      params.context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
+      include = ['account_calendars', 'all_courses']
     }
     const pastMoment = fromMoment.clone().tz('UTC').startOf('day').add(-1, 'year')
 
@@ -483,6 +487,8 @@ function fetchParams(loadingOptions) {
         params.context_codes = observedUserContextCodes(loadingOptions.getState())
       }
       params.observed_user_id = observeeId
+    } else if (!loadingOptions.getState().singleCourse) {
+      params.include = ['account_calendars', 'all_courses']
     }
 
     return ['/api/v1/planner/items', {params}]

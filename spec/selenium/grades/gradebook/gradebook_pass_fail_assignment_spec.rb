@@ -37,6 +37,12 @@ shared_examples "Gradebook" do |ff_enabled|
     end
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+  end
+
   context "pass/fail assignment grading" do
     before :once do
       init_course_with_students 1

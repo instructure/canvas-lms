@@ -1,13 +1,19 @@
+<%
+  # For discussion checkpoints, use the parent assignment instead of the sub-assignment
+  # to ensure correct assignment IDs and URLs in notifications
+  assignment = asset.assignment
+  assignment = assignment.parent_assignment if assignment.checkpoint? && assignment.parent_assignment
+%>
 <% define_content :link do %>
-  <% if asset.assignment.context.feature_enabled?(:assignments_2_student) %>
-    <%= course_assignment_url(asset.assignment.context, asset.assignment) %>
+  <% if assignment.context.feature_enabled?(:assignments_2_student) %>
+    <%= course_assignment_url(assignment.context, assignment) %>
   <% else %>
-    <%= course_assignment_submission_url(asset.assignment.context, asset.assignment, asset.user_id) %>
+    <%= course_assignment_submission_url(assignment.context, assignment, asset.user_id) %>
   <% end %>
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "Assignment Graded: %{assignment}, %{context}", :assignment => asset.assignment.title, :context => asset.assignment.context.name %>
+  <%= t :subject, "Assignment Graded: %{assignment}, %{context}", :assignment => assignment.title, :context => assignment.context.name %>
 <% end %>
 
 <% define_content :footer_link do %>
@@ -28,7 +34,7 @@
               ''
           end
   end
-  assignment_title = "#{asset.assignment.title} #{tag}".strip
+  assignment_title = "#{assignment.title} #{tag}".strip
 %>
 <% if send_student_names(asset, user) %>
 <%= t "%{assignment} has been graded for %{name}.", assignment: assignment_title, name: asset.user.name %>
@@ -38,14 +44,14 @@
 
 <p><%= t :graded_date, "graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %></p>
 
-<% if user.try(:send_scores_in_emails?, asset.assignment.context) %>
+<% if user.try(:send_scores_in_emails?, assignment.context) %>
   <% if asset.excused? %>
     <p><%= t :excused, "This assignment has been excused." %></p>
   <% elsif asset.score %>
-    <% if asset.assignment.restrict_quantitative_data?(user)%>
-      <p><%=t :grade, "grade: %{letter_grade}", :letter_grade => asset.assignment.score_to_grade(asset.score, asset.grade, true)%></p>
+    <% if assignment.restrict_quantitative_data?(user)%>
+      <p><%=t :grade, "grade: %{letter_grade}", :letter_grade => assignment.score_to_grade(asset.score, asset.grade, true)%></p>
     <% else %>
-      <p><%= t :score, "score: %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %></p>
+      <p><%= t :score, "score: %{score} out of %{total}", :score => asset.score, :total => (assignment.points_possible || t(:not_applicable, "N/A")) %></p>
     <% end %>
   <% end %>
 <% end %>

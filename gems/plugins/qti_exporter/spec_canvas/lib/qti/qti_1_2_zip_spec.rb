@@ -46,6 +46,7 @@ if Qti.migration_executable
       quiz = @course.quizzes.first
       expect(quiz.title).to eq "Quiz"
       expect(quiz.quiz_questions.count).to eq 10
+      expect(AttachmentAssociation.where(context: quiz.quiz_questions).count).to be 4
     end
 
     it "converts the questions" do

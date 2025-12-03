@@ -264,13 +264,14 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     "{ #{args.join(", ")} }"
   end
 
-  def run_mutation(opts = {}, current_user = @teacher)
+  def run_mutation(current_user: @teacher, in_app: true, **)
     result = CanvasSchema.execute(
-      mutation_str(**opts),
+      mutation_str(**),
       context: {
         current_user:,
         domain_root_account: @course.account.root_account,
-        request: ActionDispatch::TestRequest.create
+        request: ActionDispatch::TestRequest.create,
+        in_app:
       }
     )
     result.to_h.with_indifferent_access
@@ -296,7 +297,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       delayed_post_at: delayed_post_at.to_s,
       lock_at: lock_at.to_s
     }
-    result = run_mutation(updated_params)
+    result = run_mutation(**updated_params)
 
     expect(result["errors"]).to be_nil
     @topic.reload
@@ -312,7 +313,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
   context "attachments" do
     it "removes a discussion topic attachment" do
       expect(@topic.attachment).to eq(@attachment)
-      result = run_mutation({ id: @topic.id, remove_attachment: true })
+      result = run_mutation(id: @topic.id, remove_attachment: true)
 
       expect(result["errors"]).to be_nil
       expect(@topic.reload.attachment).to be_nil
@@ -321,7 +322,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     it "replaces a discussion topic attachment" do
       attachment = attachment_with_context(@teacher)
       attachment.update!(user: @teacher)
-      result = run_mutation({ id: @topic.id, file_id: attachment.id })
+      result = run_mutation(id: @topic.id, file_id: attachment.id)
 
       expect(result["errors"]).to be_nil
       expect(@topic.reload.attachment_id).to eq attachment.id
@@ -331,7 +332,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       teacher2 = teacher_in_course.user
 
       # The frontend sends the file_id always, as a string
-      result = run_mutation({ id: @topic.id, title: "Updated Title", file_id: @attachment.id.to_s }, teacher2)
+      result = run_mutation(id: @topic.id, title: "Updated Title", file_id: @attachment.id.to_s, current_user: teacher2)
 
       expect(result["errors"]).to be_nil
       expect(@topic.reload.title).to eq "Updated Title"
@@ -342,7 +343,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     it "allow to update the anonymous state if there is no reply" do
       @topic.anonymous_state = nil
       @topic.save!
-      result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity" })
+      result = run_mutation(id: @topic.id, anonymous_state: "full_anonymity")
       expect(result["errors"]).to be_nil
       expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to eq "full_anonymity"
       @topic.reload
@@ -352,7 +353,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     it "should save the anonymous state as NULL when the input value is 'off'" do
       @topic.anonymous_state = "full_anonymity"
       @topic.save!
-      result = run_mutation({ id: @topic.id, anonymous_state: "off" })
+      result = run_mutation(id: @topic.id, anonymous_state: "off")
       expect(result["errors"]).to be_nil
       expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to be_nil
       @topic.reload
@@ -362,7 +363,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     it "should keep the previous anonymous state if the input value is nil" do
       @topic.anonymous_state = "full_anonymity"
       @topic.save!
-      result = run_mutation({ id: @topic.id, anonymous_state: nil })
+      result = run_mutation(id: @topic.id, anonymous_state: nil)
       expect(result["errors"]).to be_nil
       expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to eq "full_anonymity"
       @topic.reload
@@ -373,7 +374,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       create_valid_discussion_entry
       @topic.anonymous_state = nil
       @topic.save!
-      result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity" })
+      result = run_mutation(id: @topic.id, anonymous_state: "full_anonymity")
       expect(result.dig("data", "updateDiscussionTopic", "discussionTopic")).to be_nil
       expect(@topic.anonymous_state).to be_nil
     end
@@ -381,7 +382,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     context "group discussion" do
       it "does not allow to set the anonymous state to 'full_anonymity' if the discussion is changed to group" do
         gc = @course.group_categories.create!(name: "My Group Category")
-        result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity", group_category_id: gc.id })[:data][:updateDiscussionTopic]
+        result = run_mutation(id: @topic.id, anonymous_state: "full_anonymity", group_category_id: gc.id)[:data][:updateDiscussionTopic]
         expect(result["discussionTopic"]).to be_nil
         expect(result["errors"][0]["message"]).to eq "Anonymity settings are locked for group and/or graded discussions"
       end
@@ -389,7 +390,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       it "allows to set the anonymous state to 'full_anonymity' if the discussion is changed to ungrouped" do
         gc = @course.group_categories.create!(name: "My Group Category")
         @topic.update!(group_category: gc)
-        result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity", group_category_id: nil })[:data][:updateDiscussionTopic]
+        result = run_mutation(id: @topic.id, anonymous_state: "full_anonymity", group_category_id: nil)[:data][:updateDiscussionTopic]
         expect(result["errors"]).to be_nil
         expect(result.dig("discussionTopic", "anonymousState")).to eq "full_anonymity"
         @topic.reload
@@ -399,13 +400,11 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
 
     context "graded discussion" do
       it "does not allow to set the anonymous state to 'full_anonymity' if the discussion is graded" do
-        result = run_mutation({
-                                id: @topic.id,
-                                anonymous_state: "full_anonymity",
-                                assignment: {
-                                  title: "Graded Topic 1",
-                                  setAssignment: true,
-                                }
+        result = run_mutation(id: @topic.id,
+                              anonymous_state: "full_anonymity",
+                              assignment: {
+                                title: "Graded Topic 1",
+                                setAssignment: true,
                               })[:data][:updateDiscussionTopic]
         expect(result["discussionTopic"]).to be_nil
         expect(result["errors"][0]["message"]).to eq "Anonymity settings are locked for group and/or graded discussions"
@@ -418,7 +417,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
         )
         @topic = @discussion_assignment.discussion_topic
 
-        result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity", assignment: { setAssignment: false } })[:data][:updateDiscussionTopic]
+        result = run_mutation(id: @topic.id, anonymous_state: "full_anonymity", assignment: { setAssignment: false })[:data][:updateDiscussionTopic]
         expect(result["errors"]).to be_nil
         expect(result.dig("discussionTopic", "anonymousState")).to eq "full_anonymity"
         @topic.reload
@@ -432,7 +431,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     expect(@topic.published?).to be false
     expected_title = @topic.title
 
-    result = run_mutation({ id: @topic.id, published: true })
+    result = run_mutation(id: @topic.id, published: true)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
     @topic.reload
@@ -444,7 +443,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     @topic.publish!
     expect(@topic.published?).to be true
 
-    result = run_mutation({ id: @topic.id, published: false })
+    result = run_mutation(id: @topic.id, published: false)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be false
     @topic.reload
@@ -455,7 +454,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     @topic.unpublish!
     expect(@topic.published?).to be false
 
-    result = run_mutation({ id: @topic.id, published: true })
+    result = run_mutation(id: @topic.id, published: true)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
     @topic.reload
@@ -470,7 +469,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     original_posted_at = @topic.posted_at
 
     sleep 2 # Ensure there is a noticeable time difference
-    result = run_mutation({ id: @topic.id, published: true })
+    result = run_mutation(id: @topic.id, published: true)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
     @topic.reload
@@ -810,6 +809,27 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(asset_processors.map(&:id)).to_not include(ap1.id)
       expect(asset_processors.map(&:title)).to include("Episode IV: A New AP", ap2.title)
       expect(ap1.reload.workflow_state).to eq "deleted"
+    end
+
+    it "prevents adding new asset processors via API token authentication" do
+      tool = lti_registration_with_tool(account: @course.account).deployments.first
+      expect do
+        run_mutation(
+          id: @topic.id,
+          assignment: {
+            assetProcessors: [
+              {
+                newContentItem: {
+                  contextExternalToolId: tool.id,
+                  title: "New AP",
+                }
+              },
+            ]
+          },
+          current_user: @teacher,
+          in_app: false
+        )
+      end.to raise_error(RequestError, /LTI Deep Linking/)
     end
 
     it "updates the group category id" do
@@ -1177,7 +1197,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(@checkpoint2.reload.published?).to be false
 
       # check publish topic,
-      result = run_mutation({ id: @graded_topic.id, published: true })
+      result = run_mutation(id: @graded_topic.id, published: true)
       expect(result["errors"]).to be_nil
       expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
       @graded_topic.reload
@@ -1189,7 +1209,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(@checkpoint2.published?).to be true
 
       # check unpublish topic
-      result = run_mutation({ id: @graded_topic.id, published: false })
+      result = run_mutation(id: @graded_topic.id, published: false)
 
       @graded_topic.reload
       @checkpoint1.reload
@@ -1536,25 +1556,25 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
 
   context "discussion_default_expand and discussion_default_sort" do
     it "updates the default sort order" do
-      result = run_mutation({ id: @topic.id, sort_order: :asc })[:data][:updateDiscussionTopic]
+      result = run_mutation(id: @topic.id, sort_order: :asc)[:data][:updateDiscussionTopic]
       expect(result["errors"]).to be_nil
       expect(result[:discussionTopic][:sortOrder]).to eq("asc")
-      result = run_mutation({ id: @topic.id, sort_order_locked: true })[:data][:updateDiscussionTopic]
+      result = run_mutation(id: @topic.id, sort_order_locked: true)[:data][:updateDiscussionTopic]
       expect(result["errors"]).to be_nil
       expect(result[:discussionTopic][:sortOrderLocked]).to be true
     end
 
     it "updates the default expand fields" do
-      result = run_mutation({ id: @topic.id, expanded: true })[:data][:updateDiscussionTopic]
+      result = run_mutation(id: @topic.id, expanded: true)[:data][:updateDiscussionTopic]
       expect(result["errors"]).to be_nil
       expect(@topic.reload.expanded).to be true
-      result = run_mutation({ id: @topic.id, expanded_locked: true })[:data][:updateDiscussionTopic]
+      result = run_mutation(id: @topic.id, expanded_locked: true)[:data][:updateDiscussionTopic]
       expect(result["errors"]).to be_nil
       expect(@topic.reload.expanded_locked).to be true
     end
 
     it "fails to update, if default_expand = false and default_expand_locked = true" do
-      result = run_mutation({ id: @topic.id, expanded: false, expanded_locked: true })[:data][:updateDiscussionTopic]
+      result = run_mutation(id: @topic.id, expanded: false, expanded_locked: true)[:data][:updateDiscussionTopic]
       expect(result["errors"][0]["message"]).to match(/Cannot set default thread state locked, when threads are collapsed/)
     end
   end

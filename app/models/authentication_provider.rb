@@ -301,7 +301,7 @@ class AuthenticationProvider < ActiveRecord::Base
     time_zone
   ].freeze
 
-  def provision_user(unique_ids, provider_attributes = {})
+  def provision_user(unique_ids, provider_attributes = {}, default_name = nil)
     unique_id = nil
     User.transaction(requires_new: true) do
       if unique_ids.is_a?(Hash)
@@ -310,7 +310,7 @@ class AuthenticationProvider < ActiveRecord::Base
         unique_id = unique_ids
         unique_ids = {}
       end
-      user = User.new(default_name: unique_id, workflow_state: "registered")
+      user = User.new(default_name: default_name || unique_id, workflow_state: "registered")
       pseudonym = account.pseudonyms.build
       pseudonym.user = user
       pseudonym.authentication_provider = self

@@ -1806,6 +1806,85 @@ describe Types::AssignmentType do
         expect(result.first).to eq(1)
       end
     end
+
+    describe "section-limited visibility" do
+      before(:once) do
+        @section1 = course.course_sections.create!(name: "Section 1")
+        @section2 = course.course_sections.create!(name: "Section 2")
+
+        @student_section1 = user_factory(name: "Student Section 1", account: @account)
+        student_in_course(course:, user: @student_section1, section: @section1, active_all: true)
+
+        @student_section2 = user_factory(name: "Student Section 2", account: @account)
+        student_in_course(course:, user: @student_section2, section: @section2, active_all: true)
+
+        @section_limited_teacher = user_factory(name: "Section Limited Teacher", account: @account)
+        teacher_in_course(
+          course:,
+          user: @section_limited_teacher,
+          section: @section1,
+          active_all: true,
+          limit_privileges_to_course_section: true
+        )
+      end
+
+      it "returns only students from teacher's section when teacher has limited section privileges" do
+        resolver = GraphQLTypeTester.new(regular_assignment, current_user: @section_limited_teacher)
+        result = resolver.resolve("assignedStudents { nodes { _id } }")
+        expect(result).to include(@student_section1.id.to_s)
+        expect(result).not_to include(@student_section2.id.to_s)
+      end
+
+      it "returns all students when teacher has no section limits" do
+        resolver = GraphQLTypeTester.new(regular_assignment, current_user: teacher)
+        result = resolver.resolve("assignedStudents { nodes { _id } }")
+        expect(result).to include(@student_section1.id.to_s)
+        expect(result).to include(@student_section2.id.to_s)
+      end
+
+      it "respects both section visibility and differentiated assignments" do
+        create_adhoc_override_for_assignment(regular_assignment, @student_section1)
+        regular_assignment.update!(only_visible_to_overrides: true)
+
+        resolver = GraphQLTypeTester.new(regular_assignment, current_user: @section_limited_teacher)
+        result = resolver.resolve("assignedStudents { nodes { _id } }")
+        expect(result).to eq([@student_section1.id.to_s])
+        expect(result).not_to include(@student_section2.id.to_s)
+      end
+
+      it "filters by search term within section-limited scope" do
+        resolver = GraphQLTypeTester.new(regular_assignment, current_user: @section_limited_teacher)
+        result = resolver.resolve("assignedStudents (filter: { searchTerm: \"Section 1\" }) { nodes { name } }")
+        expect(result).to eq([@student_section1.name])
+        expect(result).not_to include(@student_section2.name)
+      end
+
+      it "returns empty when section-limited teacher has no students in their section assigned to the assignment" do
+        create_adhoc_override_for_assignment(regular_assignment, @student_section2)
+        regular_assignment.update!(only_visible_to_overrides: true)
+
+        resolver = GraphQLTypeTester.new(regular_assignment, current_user: @section_limited_teacher)
+        result = resolver.resolve("assignedStudents { nodes { _id } }")
+        expect(result).to be_empty
+      end
+
+      it "excludes students with enrollments that are not active by date" do
+        course.update!(
+          conclude_at: 1.day.ago,
+          restrict_enrollments_to_course_dates: true
+        )
+        course.reload
+
+        @student_concluded = user_factory(name: "Student Concluded", account: @account)
+        student_in_course(course:, user: @student_concluded, active_all: true)
+
+        resolver = GraphQLTypeTester.new(regular_assignment, current_user: teacher)
+        result = resolver.resolve("assignedStudents { nodes { _id } }")
+
+        expect(result).not_to include(@student_concluded.id.to_s)
+        expect(result).not_to include(student.id.to_s)
+      end
+    end
   end
 
   describe "graderIdentitiesConnection" do
@@ -2454,6 +2533,311 @@ describe Types::AssignmentType do
     it "returns 'not_applicable' for allowProvisionalGrading after grades are published (non-provisional grader)" do
       @moderated_assignment.update!(grades_published_at: Time.zone.now)
       expect(moderated_assignment_type_for_student.resolve("allowProvisionalGrading")).to eq "not_applicable"
+    end
+  end
+
+  describe "postable submission counts" do
+    let(:manually_posted_assignment) do
+      assignment = course.assignments.create!(
+        title: "Test Assignment",
+        points_possible: 10,
+        submission_types: ["online_text_entry"],
+        workflow_state: "published"
+      )
+      assignment.ensure_post_policy(post_manually: true)
+      assignment
+    end
+
+    let(:manually_posted_assignment_type) { GraphQLTypeTester.new(manually_posted_assignment, current_user: teacher) }
+
+    let_once(:student2) { student_in_course(course:, active_all: true).user }
+
+    def postable_count_query(assignment_type = manually_posted_assignment_type)
+      query = <<~GQL
+        submissionsConnection(filter: { postingStatus: postable, includeUnsubmitted: true }) {
+          pageInfo {
+            totalCount
+          }
+        }
+      GQL
+      assignment_type.resolve(query)
+    end
+
+    it "excludes submissions without any activity on them" do
+      expect(postable_count_query).to eq 0
+    end
+
+    it "excludes already posted submissions with feedback" do
+      submission = manually_posted_assignment.grade_student(student, grade: 8, grader: teacher).first
+
+      expect do
+        manually_posted_assignment.post_submissions(submission_ids: [submission.id])
+      end.to change { postable_count_query }.from(1).to(0)
+    end
+
+    it "excludes submissions where the student has turned in work but there's no feedback" do
+      expect do
+        manually_posted_assignment.submit_homework(student, body: "my submission", submission_type: "online_text_entry")
+      end.not_to change { postable_count_query }.from(0)
+    end
+
+    it "includes unposted graded submissions" do
+      expect do
+        manually_posted_assignment.grade_student(student, grade: 8, grader: teacher)
+      end.to change { postable_count_query }.from(0).to(1)
+    end
+
+    it "excludes unposted graded submissions for deactivated students" do
+      manually_posted_assignment.grade_student(student, grade: 8, grader: teacher)
+      expect do
+        course.enrollments.find_by(user: student).deactivate
+      end.to change { postable_count_query }.from(1).to(0)
+    end
+
+    it "excludes unposted graded submissions for concluded students" do
+      manually_posted_assignment.grade_student(student, grade: 8, grader: teacher)
+      expect do
+        course.enrollments.find_by(user: student).conclude
+      end.to change { postable_count_query }.from(1).to(0)
+    end
+
+    it "includes unposted excused submissions" do
+      expect do
+        manually_posted_assignment.grade_student(student, excused: true, grader: teacher)
+      end.to change { postable_count_query }.from(0).to(1)
+    end
+
+    it "includes unposted submissions with a sticker" do
+      submission = manually_posted_assignment.submissions.find_by(user: student)
+
+      expect do
+        submission.update!(sticker: "star")
+      end.to change { postable_count_query }.from(0).to(1)
+    end
+
+    it "includes submissions with unposted non-draft comments" do
+      submission = manually_posted_assignment.submissions.find_by(user: student)
+
+      expect do
+        submission.submission_comments.create!(
+          author: teacher,
+          comment: "hidden comment",
+          hidden: true
+        )
+      end.to change { postable_count_query }.from(0).to(1)
+    end
+
+    it "excludes submissions with unposted draft comments" do
+      submission = manually_posted_assignment.submissions.find_by(user: student)
+      expect do
+        submission.submission_comments.create!(
+          author: teacher,
+          comment: "draft comment",
+          hidden: true,
+          draft: true
+        )
+      end.not_to change { postable_count_query }.from(0)
+    end
+
+    context "section-limited teachers" do
+      before do
+        @original_teacher = teacher
+        @original_student = student
+        @limited_section = course.course_sections.create!(name: "Limited Access Section")
+        @limited_teacher = teacher_in_course(course:, section: @limited_section, active_all: true).user
+        @limited_student = student_in_course(course:, section: @limited_section, active_all: true).user
+        Enrollment.limit_privileges_to_course_section!(@course, @limited_teacher, true)
+      end
+
+      let(:limited_teacher_assignment_type) { GraphQLTypeTester.new(manually_posted_assignment, current_user: @limited_teacher) }
+
+      it "includes submissions for students in a visible section" do
+        expect do
+          manually_posted_assignment.grade_student(@limited_student, grade: 8, grader: @original_teacher)
+        end.to change { postable_count_query }.from(0).to(1)
+      end
+
+      it "excludes submissions for students in a non-visible section" do
+        expect do
+          manually_posted_assignment.grade_student(@original_student, grade: 8, grader: @original_teacher)
+        end.not_to change { postable_count_query(limited_teacher_assignment_type) }.from(0)
+      end
+    end
+
+    it "treats test (fake) students just like regular students. No special treatment" do
+      fake_student = course.student_view_student
+      expect do
+        manually_posted_assignment.grade_student(fake_student, score: 10, grader: teacher)
+      end.to change { postable_count_query }.from(0).to(1)
+    end
+
+    it "includes submissions graded with 0" do
+      expect do
+        manually_posted_assignment.grade_student(student, score: 0, grader: teacher)
+      end.to change { postable_count_query }.from(0).to(1)
+    end
+
+    it "excludes submissions when their original grade is removed" do
+      manually_posted_assignment.grade_student(student, score: 5, grader: teacher)
+
+      expect do
+        manually_posted_assignment.grade_student(student, score: nil, grader: teacher)
+      end.to change { postable_count_query }.from(1).to(0)
+    end
+
+    it "returns 0 when an assignment is assigned to no students" do
+      empty_course = course_factory(active_all: true)
+      empty_teacher = teacher_in_course(active_all: true, course: empty_course).user
+      empty_assignment = empty_course.assignments.create!(
+        title: "Empty Assignment",
+        points_possible: 10,
+        workflow_state: "published"
+      )
+      empty_type = GraphQLTypeTester.new(empty_assignment, current_user: empty_teacher)
+
+      expect(postable_count_query(empty_type)).to eq 0
+    end
+
+    it "excludes students with feedback that were originally assigned and then got unassigned" do
+      manually_posted_assignment.grade_student(student, grade: 8, grader: teacher).first
+
+      expect do
+        manually_posted_assignment.update!(only_visible_to_overrides: true)
+        adhoc_override = manually_posted_assignment.assignment_overrides.create!(set_type: "ADHOC")
+        adhoc_override.assignment_override_students.create!(user: student2)
+        run_jobs
+      end.to change { postable_count_query }.from(1).to(0)
+    end
+  end
+
+  describe "hideable submission counts" do
+    let(:manually_posted_assignment) do
+      assignment = course.assignments.create!(
+        title: "Test Assignment",
+        points_possible: 10,
+        submission_types: ["online_text_entry"],
+        workflow_state: "published"
+      )
+      assignment.ensure_post_policy(post_manually: true)
+      assignment
+    end
+
+    let(:manually_posted_assignment_type) { GraphQLTypeTester.new(manually_posted_assignment, current_user: teacher) }
+
+    let_once(:student2) { student_in_course(course:, active_all: true).user }
+
+    def hideable_count_query(assignment_type = manually_posted_assignment_type)
+      query = <<~GQL
+        submissionsConnection(filter: { postingStatus: hideable, includeUnsubmitted: true }) {
+          pageInfo {
+            totalCount
+          }
+        }
+      GQL
+      assignment_type.resolve(query)
+    end
+
+    it "includes posted submissions" do
+      submission = manually_posted_assignment.grade_student(student, grade: 8, grader: teacher).first
+
+      expect do
+        manually_posted_assignment.post_submissions(submission_ids: [submission.id])
+      end.to change { hideable_count_query }.from(0).to(1)
+    end
+
+    it "excludes unposted submissions" do
+      manually_posted_assignment.grade_student(student, grade: 8, grader: teacher)
+
+      expect(hideable_count_query).to eq 0
+    end
+
+    it "excludes posted submissions for deactivated students" do
+      submission = manually_posted_assignment.grade_student(student, grade: 8, grader: teacher).first
+      manually_posted_assignment.post_submissions(submission_ids: [submission.id])
+
+      expect do
+        course.enrollments.find_by(user: student).deactivate
+      end.to change { hideable_count_query }.from(1).to(0)
+    end
+
+    it "excludes posted submissions for concluded students" do
+      submission = manually_posted_assignment.grade_student(student, grade: 8, grader: teacher).first
+      manually_posted_assignment.post_submissions(submission_ids: [submission.id])
+
+      expect do
+        course.enrollments.find_by(user: student).conclude
+      end.to change { hideable_count_query }.from(1).to(0)
+    end
+
+    context "section-limited teachers" do
+      before do
+        @original_teacher = teacher
+        @original_student = student
+        @limited_section = course.course_sections.create!(name: "Limited Access Section")
+        @limited_teacher = teacher_in_course(course:, section: @limited_section, active_all: true).user
+        @limited_student = student_in_course(course:, section: @limited_section, active_all: true).user
+        Enrollment.limit_privileges_to_course_section!(@course, @limited_teacher, true)
+      end
+
+      let(:limited_teacher_assignment_type) { GraphQLTypeTester.new(manually_posted_assignment, current_user: @limited_teacher) }
+
+      it "includes posted submissions for students in a visible section" do
+        submission = manually_posted_assignment.grade_student(@limited_student, grade: 8, grader: @original_teacher).first
+
+        expect do
+          manually_posted_assignment.post_submissions(submission_ids: [submission.id])
+        end.to change { hideable_count_query }.from(0).to(1)
+      end
+
+      it "excludes posted submissions for students in a non-visible section" do
+        submission = manually_posted_assignment.grade_student(@original_student, grade: 8, grader: @original_teacher).first
+        manually_posted_assignment.post_submissions(submission_ids: [submission.id])
+
+        expect(hideable_count_query(limited_teacher_assignment_type)).to eq 0
+      end
+    end
+
+    it "treats test (fake) students just like regular students. No special treatment" do
+      fake_student = course.student_view_student
+      submission = manually_posted_assignment.grade_student(fake_student, score: 10, grader: teacher).first
+
+      expect do
+        manually_posted_assignment.post_submissions(submission_ids: [submission.id])
+      end.to change { hideable_count_query }.from(0).to(1)
+    end
+
+    it "includes posted submissions even when their grade is removed" do
+      submission = manually_posted_assignment.grade_student(student, score: 5, grader: teacher).first
+      manually_posted_assignment.post_submissions(submission_ids: [submission.id])
+
+      expect do
+        manually_posted_assignment.grade_student(student, score: nil, grader: teacher)
+      end.not_to change { hideable_count_query }.from(1)
+    end
+
+    it "returns 0 when an assignment is assigned to no students" do
+      empty_course = course_factory(active_all: true)
+      empty_teacher = teacher_in_course(active_all: true, course: empty_course).user
+      empty_assignment = empty_course.assignments.create!(
+        title: "Empty Assignment",
+        points_possible: 10,
+        workflow_state: "published"
+      )
+      empty_type = GraphQLTypeTester.new(empty_assignment, current_user: empty_teacher)
+
+      expect(hideable_count_query(empty_type)).to eq 0
+    end
+
+    it "excludes posted students that were originally assigned and then got unassigned" do
+      submission = manually_posted_assignment.grade_student(student, grade: 8, grader: teacher).first
+      manually_posted_assignment.post_submissions(submission_ids: [submission.id])
+
+      expect do
+        manually_posted_assignment.update!(only_visible_to_overrides: true)
+        adhoc_override = manually_posted_assignment.assignment_overrides.create!(set_type: "ADHOC")
+        adhoc_override.assignment_override_students.create!(user: student2)
+        run_jobs
+      end.to change { hideable_count_query }.from(1).to(0)
     end
   end
 end

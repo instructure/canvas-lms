@@ -50,6 +50,10 @@ shared_examples "Gradebook - group weights" do |ff_enabled|
   end
 
   before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+
     course_with_teacher_logged_in
     student_in_course
     @course.update(group_weighting_scheme: "percent")

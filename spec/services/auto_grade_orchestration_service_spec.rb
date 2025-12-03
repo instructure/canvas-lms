@@ -123,8 +123,8 @@ RSpec.describe AutoGradeOrchestrationService do
 
         allow(GradeService).to receive(:new).and_return(grade_service)
         allow(grade_service).to receive(:call).and_return([
-                                                            { "description" => "Grammar", "points" => 4, "comments" => "Good grammar" },
-                                                            { "description" => "Organization", "points" => 3, "comments" => "Well organized" }
+                                                            { "description" => "Grammar", "rating" => 4, "comments" => "Good grammar" },
+                                                            { "description" => "Organization", "rating" => 3, "comments" => "Well organized" }
                                                           ])
 
         service.get_grade_data(
@@ -150,7 +150,16 @@ RSpec.describe AutoGradeOrchestrationService do
 
         allow(GradeService).to receive(:new).and_return(grade_service)
         allow(grade_service).to receive(:call).and_return([
-                                                            { "description" => "Grammar", "points" => 4, "comments" => "Some grammar issues" }
+                                                            {
+                                                              "id" => "grammar_criterion_id",
+                                                              "description" => "Grammar",
+                                                              "rating" => {
+                                                                "id" => "grammar_rating_id",
+                                                                "description" => "Some grammar issues",
+                                                                "rating" => 4.0,
+                                                                "reasoning" => "Some grammar issues"
+                                                              }
+                                                            }
                                                           ])
 
         expect do
@@ -161,6 +170,116 @@ RSpec.describe AutoGradeOrchestrationService do
             progress:
           )
         end.to raise_error(Delayed::RetriableError, /Number of graded criteria.*is less than the number of rubric criteria/)
+      end
+
+      it "deduplicates duplicate items from GradeService by description" do
+        allow(CedarClient).to receive(:enabled?).and_return(true)
+        submission.update!(attempt: 1)
+        rubric_association
+
+        agr = AutoGradeResult.find_by!(submission:, attempt: submission.attempt)
+        agr.update!(
+          grade_data: [
+            {
+              "id" => "content_criterion_id",
+              "description" => "Content",
+              "rating" => {
+                "id" => "content_rating_id",
+                "description" => "Good content",
+                "rating" => 8.0,
+                "reasoning" => "Good content"
+              }
+            }
+          ]
+        )
+
+        service = AutoGradeOrchestrationService.new(course:, current_user: user)
+        grade_service = instance_double(GradeService)
+
+        allow(GradeService).to receive(:new).and_return(grade_service)
+        allow(grade_service).to receive(:call).and_return([
+                                                            {
+                                                              "id" => "grammar_criterion_id",
+                                                              "description" => "Grammar",
+                                                              "rating" => {
+                                                                "id" => "grammar_rating_high",
+                                                                "description" => "Good grammar (a)",
+                                                                "rating" => 4.0,
+                                                                "reasoning" => "Good grammar (a)."
+                                                              }
+                                                            },
+                                                            {
+                                                              "id" => "grammar_criterion_id",
+                                                              "description" => "Grammar",
+                                                              "rating" => {
+                                                                "id" => "grammar_rating_low",
+                                                                "description" => "Good grammar (b)",
+                                                                "rating" => 3.0,
+                                                                "reasoning" => "Good grammar (b)."
+                                                              }
+                                                            },
+                                                            {
+                                                              "id" => "organization_criterion_id",
+                                                              "description" => "Organization",
+                                                              "rating" => {
+                                                                "id" => "organization_rating_id",
+                                                                "description" => "Well organized",
+                                                                "rating" => 3.0,
+                                                                "reasoning" => "Well organized."
+                                                              }
+                                                            }
+                                                          ])
+
+        result = service.get_grade_data(
+          assignment_text:,
+          root_account_uuid:,
+          submission:,
+          progress:
+        )
+
+        grammar_records = result.grade_data.select { |item| item["description"] == "Grammar" }
+        expect(grammar_records.length).to eq(1)
+        grammar_record = grammar_records.first
+
+        expect(grammar_record).not_to be_nil
+        expect(grammar_record["rating"]["rating"]).to eq(3)
+        expect(grammar_record["rating"]["description"]).to eq("Good grammar (b)")
+        expect(grammar_record["rating"]["reasoning"]).to eq("Good grammar (b). This work sits between two ratings for this criterion. The lower rating was applied for consistency.")
+      end
+    end
+
+    context "when there are no missing criteria" do
+      it "does not call GradeService and leaves grade_data unchanged" do
+        allow(CedarClient).to receive(:enabled?).and_return(true)
+        submission.update!(attempt: 1)
+        rubric_association
+
+        initial_data = [
+          { "description" => "Content", "rating" => 8, "comments" => "Good content" },
+          { "description" => "Grammar", "rating" => 4, "comments" => "Good grammar" },
+          { "description" => "Organization", "rating" => 3, "comments" => "Well organized" }
+        ]
+        agr = AutoGradeResult.create!(
+          submission:,
+          attempt: submission.attempt,
+          grade_data: initial_data,
+          root_account_id: root_account.id,
+          grading_attempts: 1
+        )
+
+        service = AutoGradeOrchestrationService.new(course:, current_user: user)
+
+        expect(GradeService).not_to receive(:new)
+
+        result = service.get_grade_data(
+          assignment_text:,
+          root_account_uuid:,
+          submission:,
+          progress:
+        )
+
+        expect(result.grade_data).to eq(initial_data)
+        expect(agr.reload.grading_attempts).to eq(1)
       end
     end
   end
@@ -182,9 +301,9 @@ RSpec.describe AutoGradeOrchestrationService do
           submission:,
           attempt: submission.attempt,
           grade_data: [
-            { "description" => "Content", "points" => 8, "comments" => "Good content" },
-            { "description" => "Grammar", "points" => 4 }, # Missing comments
-            { "description" => "Organization", "points" => 3 } # Missing comments
+            { "description" => "Content", "rating" => 8, "comments" => "Good content" },
+            { "description" => "Grammar", "rating" => 4 }, # Missing comments
+            { "description" => "Organization", "rating" => 3 } # Missing comments
           ],
           root_account_id: root_account.id,
           grading_attempts: 1
@@ -193,8 +312,8 @@ RSpec.describe AutoGradeOrchestrationService do
         allow(CommentsService).to receive(:new).and_return(comment_service)
         allow(comment_service).to receive(:call).and_return(
           [
-            { "description" => "Grammar", "points" => 4, "comments" => "Good grammar" },
-            { "description" => "Organization", "points" => 3, "comments" => "Well organized" }
+            { "description" => "Grammar", "rating" => 4, "comments" => "Good grammar" },
+            { "description" => "Organization", "rating" => 3, "comments" => "Well organized" }
           ]
         )
 
@@ -207,8 +326,8 @@ RSpec.describe AutoGradeOrchestrationService do
         )
 
         missing_criteria_data = [
-          { "description" => "Grammar", "points" => 4 },
-          { "description" => "Organization", "points" => 3 }
+          { "description" => "Grammar", "rating" => 4 },
+          { "description" => "Organization", "rating" => 3 }
         ]
 
         expect(CommentsService).to have_received(:new).with(
@@ -229,9 +348,9 @@ RSpec.describe AutoGradeOrchestrationService do
           submission:,
           attempt: submission.attempt,
           grade_data: [
-            { "description" => "Content", "points" => 8, "comments" => "Good content" },
-            { "description" => "Grammar", "points" => 4 }, # Missing comments
-            { "description" => "Organization", "points" => 3 } # Missing comments
+            { "description" => "Content", "rating" => 8, "comments" => "Good content" },
+            { "description" => "Grammar", "rating" => 4 }, # Missing comments
+            { "description" => "Organization", "rating" => 3 } # Missing comments
           ],
           root_account_id: root_account.id,
           grading_attempts: 1
@@ -239,7 +358,7 @@ RSpec.describe AutoGradeOrchestrationService do
 
         allow(CommentsService).to receive(:new).and_return(comment_service)
         allow(comment_service).to receive(:call).and_return([
-                                                              { "description" => "Grammar", "points" => 4, "comments" => "Good grammar" }
+                                                              { "description" => "Grammar", "rating" => 4, "comments" => "Good grammar" }
                                                             ])
 
         allow(service).to receive(:get_criteria_missing_comments)

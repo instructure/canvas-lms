@@ -676,6 +676,7 @@ class UsersController < ApplicationController
   def dashboard_cards
     opts = {}
     opts[:observee_user] = User.find_by(id: params[:observed_user_id].to_i) || @current_user if params.key?(:observed_user_id)
+    opts[:limit] = 50
     dashboard_courses = map_courses_for_menu(@current_user.menu_courses(nil, opts), tabs: DASHBOARD_CARD_TABS)
     published, unpublished = dashboard_courses.partition { |course| course[:published] }
     Rails.cache.write(["last_known_dashboard_cards_published_count", @current_user.global_id].cache_key, published.count)
@@ -2936,7 +2937,7 @@ class UsersController < ApplicationController
         if user_saved
           invited_users << user_hash.merge(id: user.id, user_token: user.token)
         else
-          errored_users << user_hash.merge(user.errors.as_json)
+          errored_users << user_hash.merge(Api::Errors::Reporter.to_json(user.errors))
         end
       end
     end
@@ -3523,7 +3524,7 @@ class UsersController < ApplicationController
     return nil unless @access_token.nil?
 
     response = CanvasHttp.post("https://www.google.com/recaptcha/api/siteverify", form_data: {
-                                 secret: DynamicSettings.find(tree: :private)["recaptcha_server_key"],
+                                 secret: Rails.application.credentials.dig(:recaptcha_keys, :server_key),
                                  response: recaptcha_response
                                })
 

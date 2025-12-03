@@ -418,7 +418,7 @@ describe "Module Items API", type: :request do
                            "indent" => 0,
                            "url" => "http://www.example.com/api/v1/courses/#{@course.id}/files/#{@attachment.id}",
                            "published" => false,
-                           "unpublishable" => false,
+                           "unpublishable" => true,
                            "module_id" => @module2.id,
                            "quiz_lti" => false
                          })

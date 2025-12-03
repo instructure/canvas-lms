@@ -19,6 +19,7 @@
 import React, {useState, useRef, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 import {ColorPicker, ColorContrast} from '@instructure/ui-color-picker'
 import {FormMessage} from '@instructure/ui-form-field'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -33,12 +34,12 @@ interface ContrastRatioFormProps {
   backgroundColor?: string
   foregroundColor?: string
   description?: string
-  onChange: (value: string) => void
+  onChange: (value: string, isValid: boolean) => void
   inputRef?: (inputElement: HTMLInputElement | null) => void
 }
 
 const SUGGESTION_MESSAGE = I18n.t(
-  'For text on white background we recommend that you use the black color above. This changes to white when displayed on a dark background in dark mode, so text will remain accessible.',
+  "Tip: Only #0000 will automatically update to white if the user's background is in dark mode.",
 )
 const SUGGESTED_COLORS = ['#000000', '#248029', '#9242B4', '#2063C1', '#B50000']
 
@@ -101,13 +102,48 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
     })
   }, [options])
 
+  const calculateValidity = (contrastData: {
+    contrast: number
+    isValidNormalText: boolean
+    isValidLargeText: boolean
+    isValidGraphicsText: boolean
+    firstColor: string
+    secondColor: string
+  }) => {
+    let valid = true
+    for (const option of options) {
+      if (option === 'normal' && !contrastData.isValidNormalText) {
+        valid = false
+        break
+      }
+      if (option === 'large' && !contrastData.isValidLargeText) {
+        valid = false
+        break
+      }
+    }
+    return valid
+  }
+
+  const handleContrastChange = (contrastData: {
+    contrast: number
+    isValidNormalText: boolean
+    isValidLargeText: boolean
+    isValidGraphicsText: boolean
+    firstColor: string
+    secondColor: string
+  }) => {
+    const valid = calculateValidity(contrastData)
+    onChange(contrastData.secondColor, valid)
+    // inst-ui function signature requires returning null
+    return null
+  }
+
   const handleColorChange = (newColor: string) => {
     setSelectedColor(newColor)
-    onChange(newColor)
   }
 
   return (
-    <View as="div" margin="0 0 large 0" data-testid="contrast-ratio-form">
+    <View as="div" data-testid="contrast-ratio-form">
       <ColorContrast
         firstColor={backgroundColor}
         secondColor={selectedColor}
@@ -119,6 +155,7 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
         graphicsTextLabel={I18n.t('GRAPHICS TEXT')}
         firstColorLabel={I18n.t('Background')}
         secondColorLabel={I18n.t('Foreground')}
+        onContrastChange={handleContrastChange}
         elementRef={r => {
           if (r instanceof HTMLDivElement || r === null) {
             contrastForm.current = r
@@ -127,11 +164,13 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
       />
       <View as="section" margin="medium 0 large 0">
         <View as="div" margin="x-small 0">
-          <Text weight="weightImportant">{I18n.t('Issue description')}</Text>
+          <Heading level="h4" variant="titleCardMini">
+            {I18n.t('Issue description')}
+          </Heading>
         </View>
         <Text weight="weightRegular">{description}</Text>
       </View>
-      <View as="div" margin="medium 0">
+      <View as="div" margin="medium 0" style={{overflow: 'visible'}}>
         <ColorPicker
           id="a11y-color-picker"
           data-testid="color-picker"

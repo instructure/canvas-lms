@@ -135,6 +135,7 @@ export const saveLearningMasteryGradebookSettings = (
       ),
       name_display_format: settings.nameDisplayFormat,
       students_per_page: settings.studentsPerPage,
+      score_display_format: settings.scoreDisplayFormat,
     },
   }
 

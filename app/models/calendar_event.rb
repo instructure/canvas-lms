@@ -46,7 +46,7 @@ class CalendarEvent < ActiveRecord::Base
     %w[description]
   end
 
-  def update_attachment_associations
+  def update_attachment_associations(**args)
     return if series_uuid.present? && !series_head
 
     super
@@ -139,13 +139,11 @@ class CalendarEvent < ActiveRecord::Base
     @child_event_data.each do |data|
       if (event = current_events.delete(data[:context_code])&.first)
         event.updating_user = @updating_user
-        event.saving_user = @updating_user
         event.update(start_at: data[:start_at], end_at: data[:end_at])
       else
         context = @child_event_contexts[data[:context_code]][0]
         event = child_events.build(start_at: data[:start_at], end_at: data[:end_at])
         event.updating_user = @updating_user
-        event.saving_user = @updating_user
         event.context = context
         event.skip_sync_parent_event = true
         event.save

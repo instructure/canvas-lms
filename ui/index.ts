@@ -129,6 +129,16 @@ function afterDocumentReady() {
   if (!ENV.FEATURES.explicit_latex_typesetting) {
     setupMathML()
   }
+
+  // Only import the module if the persisted state indicates it
+  // should be open, to avoid unnecessary loading
+  if (localStorage.getItem('persistedAdaClosed') === 'false') {
+    import('./shared/help-dialog/react/AdaChatbot')
+      .then(module => {
+        module.autoRestoreAda()
+      })
+      .catch(error => console.error('Failed to load AdaChatbot:', error))
+  }
 }
 
 const RCE_HTML_EDITOR_CLASS = 'RceHtmlEditor'

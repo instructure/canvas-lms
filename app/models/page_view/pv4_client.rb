@@ -73,11 +73,19 @@ class PageView
 
       json["page_views"].map! do |pv|
         pv["session_id"] = pv.delete("sessionid")
-        pv["url"] = "#{HostUrl.protocol}://#{pv.delete("vhost")}#{pv.delete("http_request")}"
+        vhost = pv.delete("vhost")
+        http_request = pv.delete("http_request")
+        pv["url"] = if vhost.present? && http_request.present?
+                      "#{HostUrl.protocol}://#{vhost}#{http_request}"
+                    elsif http_request.present?
+                      "#{HostUrl.protocol}:#{http_request}"
+                    elsif vhost.present?
+                      "#{HostUrl.protocol}://#{vhost}"
+                    end
         pv["context_id"] = pv.delete("canvas_context_id")
         pv["context_type"] = pv.delete("canvas_context_type")
         pv["updated_at"] = pv["created_at"] = pv.delete("timestamp")
-        pv["user_agent"] = pv.delete("agent")
+        pv["user_agent"] = pv.delete("agent").presence
         pv["account_id"] = pv.delete("root_account_id")
         pv["remote_ip"] = pv.delete("client_ip")
         pv["render_time"] = pv.delete("microseconds").to_f / 1_000_000

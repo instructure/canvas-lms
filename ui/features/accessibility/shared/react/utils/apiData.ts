@@ -29,6 +29,7 @@ import {
   ScanWorkflowState,
   Severity,
 } from '../types'
+import {FILTER_GROUP_MAPPING} from '../../../accessibility_checker/react/constants'
 
 const snakeToCamel = function (str: string): string {
   return str.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
@@ -114,7 +115,7 @@ export const calculateTotalIssuesCount = (data?: AccessibilityResourceScan[] | n
   }, 0)
 }
 
-const formatDateFilter = (label: string, date?: string) => {
+const formatDateFilter = (date?: string) => {
   if (date) {
     const dateFormatter = new Intl.DateTimeFormat('en-US', {
       weekday: 'short',
@@ -124,7 +125,7 @@ const formatDateFilter = (label: string, date?: string) => {
     }).format
 
     return {
-      label: `${label}: ${dateFormatter(new Date(date))}`,
+      label: dateFormatter(new Date(date)),
       value: new Date(date).toISOString(),
     }
   }
@@ -141,8 +142,8 @@ export const getUnparsedFilters = (parsedFilters: ParsedFilters): Filters => {
     ruleTypes: toFilterOptionArray(parsedFilters.ruleTypes),
     artifactTypes: toFilterOptionArray(parsedFilters.artifactTypes),
     workflowStates: toFilterOptionArray(parsedFilters.workflowStates),
-    fromDate: formatDateFilter('From Date', parsedFilters.fromDate),
-    toDate: formatDateFilter('To Date', parsedFilters.toDate),
+    fromDate: formatDateFilter(parsedFilters.fromDate),
+    toDate: formatDateFilter(parsedFilters.toDate),
   }
 }
 
@@ -156,9 +157,24 @@ export const getParsedFilters = (filters: Filters | null): ParsedFilters => {
     return hasAll(opts) ? undefined : opts.map(o => o.value)
   }
 
+  const expandRuleTypes = (ruleTypes?: string[]): string[] | undefined => {
+    if (!ruleTypes) return undefined
+
+    const expanded: string[] = []
+    for (const ruleType of ruleTypes) {
+      if (ruleType in FILTER_GROUP_MAPPING) {
+        expanded.push(...FILTER_GROUP_MAPPING[ruleType as keyof typeof FILTER_GROUP_MAPPING])
+      } else {
+        expanded.push(ruleType)
+      }
+    }
+    return expanded
+  }
+
   const parsed: ParsedFilters = {}
   const ruleTypes = toValueArray(filters.ruleTypes)
-  if (ruleTypes) parsed.ruleTypes = ruleTypes
+  const expandedRuleTypes = expandRuleTypes(ruleTypes)
+  if (expandedRuleTypes) parsed.ruleTypes = expandedRuleTypes
 
   const artifactTypes = toValueArray(filters.artifactTypes)
   if (artifactTypes) parsed.artifactTypes = artifactTypes

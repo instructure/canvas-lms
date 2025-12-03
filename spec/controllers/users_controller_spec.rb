@@ -1333,22 +1333,26 @@ describe UsersController do
     end
 
     it "returns nil if there is no token" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => nil }))
+      allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return(nil)
+      allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :server_key).and_return(nil)
       expect(subject.send(:validate_recaptcha, nil)).to be_nil
     end
 
     it "returns nil for valid recaptcha submissions" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => "test-token" }))
+      allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return({ server_key: "test-token" })
+      allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :server_key).and_return("test-token")
       expect(subject.send(:validate_recaptcha, "valid-submit-key")).to be_nil
     end
 
     it "returns an error for missing recaptcha submissions" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => "test-token" }))
+      allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return({ server_key: "test-token" })
+      allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :server_key).and_return("test-token")
       expect(subject.send(:validate_recaptcha, nil)).not_to be_nil
     end
 
     it "returns an error for invalid recaptcha submissions" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => "test-token" }))
+      allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return({ server_key: "test-token" })
+      allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :server_key).and_return("test-token")
       expect(subject.send(:validate_recaptcha, "invalid-submit-key")).not_to be_nil
     end
   end

@@ -230,7 +230,7 @@ new_user_tutorial:
   root_opt_in: true
 new_user_tutorial_on_off:
   type: setting
-  state: allowed
+  state: allowed_on
   display_name: Course Set-up Tutorial
   description: Course set-up tutorial provides tips on how to leverage the feature
     opportunities on each page in Canvas. It is especially useful when you are new

@@ -25,16 +25,16 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
     "application/x-docx"
   ].freeze
 
-  NO_SUBMISSION_MSG               = I18n.t("No essay submission found.")
-  IMAGE_UPLOAD_MSG                = I18n.t("Please note that AI Grading Assistance for this submission will ignore any embedded images and only evaluate the text portion of the submission.")
-  INVALID_FILE_MSG                = I18n.t("Only PDF and DOCX files are supported.")
-  INVALID_TYPE_MSG                = I18n.t("Submission must be a text entry type or file upload.")
-  SHORT_ESSAY_MSG                 = I18n.t("Submission must be at least 5 words.")
-  MISSING_RATING_MSG              = I18n.t("Rubric is missing rating description.")
-  FILE_UPLOADS_DISABLED_MSG       = I18n.t("Grading assistance is disabled for file uploads.")
-  GRADING_ASSISTANCE_DISABLED_MSG = I18n.t("Grading assistance is not available right now.")
-  NO_RUBRIC_MSG                   = I18n.t("No rubric is attached to this assignment.")
-  RATING_DESCRIPTION_MISSING_MSG  = I18n.t("Rubric is missing rating description.")
+  NO_SUBMISSION_MSG               = -> { I18n.t("No essay submission found.") }
+  IMAGE_UPLOAD_MSG                = -> { I18n.t("Please note that AI Grading Assistance for this submission will ignore any embedded images and only evaluate the text portion of the submission.") }
+  INVALID_FILE_MSG                = -> { I18n.t("Only PDF and DOCX files are supported.") }
+  INVALID_TYPE_MSG                = -> { I18n.t("Submission must be a text entry type or file upload.") }
+  SHORT_ESSAY_MSG                 = -> { I18n.t("Submission must be at least 5 words.") }
+  MISSING_RATING_MSG              = -> { I18n.t("Rubric is missing rating description.") }
+  FILE_UPLOADS_DISABLED_MSG       = -> { I18n.t("Grading assistance is disabled for file uploads.") }
+  GRADING_ASSISTANCE_DISABLED_MSG = -> { I18n.t("Grading assistance is not available right now.") }
+  NO_RUBRIC_MSG                   = -> { I18n.t("No rubric is attached to this assignment.") }
+  RATING_DESCRIPTION_MISSING_MSG  = -> { I18n.t("Rubric is missing rating description.") }
 
   def self.missing_rubric?(assignment)
     assignment&.rubric.nil?
@@ -62,7 +62,7 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
   def self.validate_assignment(assignment:)
     ASSIGNMENT_CHECKS.each do |entry|
       if entry[:check].call(assignment)
-        return { level: entry[:level], message: entry[:message] }
+        return { level: entry[:level], message: entry[:message].call }
       end
     end
     nil
@@ -76,7 +76,8 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
   end
 
   def self.contains_images?(submission)
-    submission.contains_images
+    extracted_text = submission.read_extracted_text
+    extracted_text.fetch(:contains_images, false)
   end
 
   def self.invalid_file?(submission)
@@ -111,7 +112,7 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
   def self.validate_submission(submission:)
     SUBMISSION_CHECKS.each do |entry|
       if entry[:check].call(submission)
-        return { level: entry[:level], message: entry[:message] }
+        return { level: entry[:level], message: entry[:message].call }
       end
     end
     nil

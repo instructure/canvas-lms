@@ -34,14 +34,40 @@ const mockClose = jest.fn()
 
 const baseItem = multiIssueItem
 
+// Helper function to convert camelCase to snake_case
+// This mimics the backend API response format
+const convertToSnakeCase = (obj: any): any => {
+  if (Array.isArray(obj)) {
+    return obj.map(convertToSnakeCase)
+  } else if (obj !== null && typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [
+        key.replace(/([A-Z])/g, '_$1').toLowerCase(),
+        convertToSnakeCase(value),
+      ]),
+    )
+  }
+  return obj
+}
+
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
-  default: jest.fn(({path}) => {
+  default: jest.fn(({path, method}) => {
     if (path.includes('/preview?')) {
       return Promise.resolve({json: {content: '<div>Preview content</div>'}})
     }
     if (path.includes('/preview')) {
       return Promise.resolve({json: {content: '<div>Updated content</div>'}})
+    }
+    // Handle POST to accessibility/scan - return scan with one less issue
+    if (method === 'POST' && path.includes('/accessibility/scan')) {
+      const updatedScan = {
+        ...multiIssueItem,
+        issueCount: 1, // One issue remaining after saving
+        issues: [multiIssueItem.issues![1]], // Keep only the second issue
+      }
+      // Convert to snake_case because the real API returns snake_case
+      return Promise.resolve({json: convertToSnakeCase(updatedScan)})
     }
     return Promise.resolve({})
   }),
@@ -57,16 +83,15 @@ describe('AccessibilityIssuesDrawerContent', () => {
     jest.clearAllMocks()
   })
 
-  it('renders the title and issue counter', async () => {
+  it('renders the issue counter', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
-    expect(await screen.findByText('Multi Issue Test Page')).toBeInTheDocument()
     expect(screen.getByText(/Issue 1\/2:/)).toBeInTheDocument()
   })
 
   it('disables "Back" on first issue and enables "Next"', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
     const back = screen.getByTestId('back-button')
-    const next = screen.getByTestId('next-button')
+    const next = screen.getByTestId('skip-button')
 
     expect(back).toBeDisabled()
     expect(next).toBeEnabled()
@@ -75,7 +100,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
   it('disables "Next" on last issue', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
 
-    const next = screen.getByTestId('next-button')
+    const next = screen.getByTestId('skip-button')
     fireEvent.click(next)
 
     await waitFor(() => {
@@ -116,15 +141,11 @@ describe('AccessibilityIssuesDrawerContent', () => {
     )
   })
 
-  it('calls onClose when close button is clicked', async () => {
+  it('wraps Preview component in a semantic region for screen reader navigation', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
 
-    const closeButton = screen
-      .getByTestId('close-button')
-      .querySelector('button') as HTMLButtonElement
-    fireEvent.click(closeButton)
-
-    expect(mockClose).toHaveBeenCalledTimes(1)
+    const issuePreviewRegion = screen.getByRole('region', {name: 'Issue preview'})
+    expect(issuePreviewRegion).toBeInTheDocument()
   })
 
   describe('Save and Next button', () => {
@@ -140,13 +161,23 @@ describe('AccessibilityIssuesDrawerContent', () => {
         expect(saveAndNext).toBeEnabled()
       })
 
-      it('when the form type is CheckboxTextInput (apply button hidden)', () => {
+      it('when the form type is CheckboxTextInput', async () => {
         render(
           <AccessibilityIssuesDrawerContent item={checkboxTextInputRuleItem} onClose={mockClose} />,
         )
 
         const saveAndNext = screen.getByTestId('save-and-next-button')
-        expect(saveAndNext).toBeEnabled()
+        expect(saveAndNext).toBeDisabled()
+
+        const textarea = screen.getByTestId('checkbox-text-input-form')
+        await userEvent.type(textarea, 'alt text')
+
+        const apply = screen.getByTestId('apply-button')
+        await userEvent.click(apply)
+
+        await waitFor(() => {
+          expect(saveAndNext).toBeEnabled()
+        })
       })
     })
 
@@ -223,6 +254,9 @@ describe('AccessibilityIssuesDrawerContent', () => {
 
       const textarea = screen.getByTestId('checkbox-text-input-form')
       await userEvent.type(textarea, '1')
+
+      const apply = screen.getByTestId('apply-button')
+      await userEvent.click(apply)
 
       await waitFor(() => {
         expect(screen.getAllByText('Test error')[0]).toBeInTheDocument()

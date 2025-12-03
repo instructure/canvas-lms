@@ -779,6 +779,7 @@ class AssignmentsApiController < ApplicationController
   include Api::V1::AssignmentOverride
   include Api::V1::Quiz
   include Api::V1::Progress
+  include Api::V1::AccessibilityResourceScan
 
   # @API List assignments
   # Returns the paginated list of assignments for the current course or assignment group.
@@ -1399,6 +1400,11 @@ class AssignmentsApiController < ApplicationController
   #
   #   Only applies when submission_types includes "student_annotation".
   #
+  # @argument assignment[asset_processors][] [Array]
+  #   Document processors for this assignment. New document processors can only be added
+  #   via the interactive LTI Deep Linking flow (in a browser), not via API token or JWT authentication.
+  #   Deletion of document processors (passing an empty array) is allowed via API.
+  #
   # @argument assignment[peer_review][points_possible] [Float]
   #   The maximum points possible for peer reviews.
   #
@@ -1635,6 +1641,11 @@ class AssignmentsApiController < ApplicationController
   #
   #   Only applies when submission_types includes "student_annotation".
   #
+  # @argument assignment[asset_processors][] [Array]
+  #   Document processors for this assignment. New document processors can only be added
+  #   via the interactive LTI Deep Linking flow (in a browser), not via API token or JWT authentication.
+  #   Deletion of document processors (passing an empty array) is allowed via API.
+  #
   # @argument assignment[force_updated_at] [Boolean]
   #   If true, updated_at will be set even if no changes were made.
   #
@@ -1656,6 +1667,13 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[peer_review][unlock_at] [DateTime]
   #   The day/time the peer reviews are unlocked. Must be before the due date if there is a due date.
   #   Accepts times in ISO 8601 format, e.g. 2025-08-15T12:10:00Z.
+  #
+  # @argument assignment[peer_review][peer_review_overrides][] [AssignmentOverride]
+  #   List of overrides for the peer reviews.
+  #   When updating overrides:
+  #   - Include "id" to update an existing override
+  #   - Omit "id" to create a new override
+  #   - Omit an override from the list to delete it
   #
   # @returns Assignment
   def update
@@ -1740,6 +1758,15 @@ class AssignmentsApiController < ApplicationController
     render json: progress_json(progress, @current_user, session)
   end
 
+  def accessibility_scan
+    return render_unauthorized_action unless @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    return render_unauthorized_action unless @context.a11y_checker_enabled?
+
+    @assignment = api_find(@context.active_assignments, params[:assignment_id])
+    scan = Accessibility::ResourceScannerService.new(resource: @assignment).call_sync
+    render json: accessibility_resource_scan_json(scan)
+  end
+
   private
 
   def assignment_json_opts
@@ -1754,14 +1781,10 @@ class AssignmentsApiController < ApplicationController
     if [:created, :ok].include?(result)
       render json: assignment_json(@assignment, @current_user, session, opts), status: result
     else
-      if result == :peer_review_error
-        status = :bad_request
-        errors = I18n.t("Failed to create or update peer review sub assignment")
-      else
-        status = (result == :forbidden) ? :forbidden : :bad_request
-        errors = ::Api::Errors::Reporter.to_json(@assignment.errors)[:errors]
-        errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
-      end
+      status = (result == :forbidden) ? :forbidden : :bad_request
+      errors = ::Api::Errors::Reporter.to_json(@assignment.errors)[:errors]
+      errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
+
       render json: { errors: }, status:
     end
   end

@@ -20,6 +20,8 @@
 require "spec_helper"
 
 RSpec.describe PeerReview::PeerReviewCreatorService do
+  include PeerReviewHelpers
+
   let(:course) { course_model(name: "Course with Assignment") }
   let(:parent_assignment) do
     assignment_model(
@@ -86,10 +88,9 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
         expect(result.parent_assignment_id).to eq(parent_assignment.id)
       end
 
-      it "sets the correct title" do
+      it "sets the correct title with peer review count" do
         result = service.call
-        expected_title = I18n.t("%{title} Peer Review", title: parent_assignment.title)
-        expect(result.title).to eq(expected_title)
+        expect(result.title).to eq(expected_peer_review_title(parent_assignment.title, parent_assignment.peer_review_count))
       end
 
       it "sets the custom points_possible when provided" do

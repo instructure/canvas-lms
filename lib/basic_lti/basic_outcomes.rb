@@ -107,6 +107,7 @@ module BasicLTI
 
     class LtiResponse
       include TextHelper
+      include Lti::GradePassbackEligibility
 
       attr_accessor :code_major, :severity, :description, :body, :error_code, :assignment, :user
 
@@ -165,14 +166,6 @@ module BasicLTI
 
       def needs_additional_review?
         @lti_request&.at_css("imsx_POXBody > replaceResultRequest > submissionDetails > needsAdditionalReview").present?
-      end
-
-      def user_enrollment_active?(course, user)
-        course.student_enrollments.where(user_id: user).active_or_pending_by_date.any?
-      end
-
-      def course_concluded?(course)
-        course.completed? || course.soft_concluded_for_all?(["TeacherEnrollment", "TaEnrollment"])
       end
 
       def to_xml
@@ -242,7 +235,7 @@ module BasicLTI
         # Write results are disabled for concluded users, read results are still allowed
         # If a teacher term access ends after the normal term end date, grading is allowed
         course = assignment.context
-        if op != "read_result" && !user_enrollment_active?(course, user) && course_concluded?(course)
+        if op != "read_result" && !grade_passback_allowed?(course, user)
           report_failure(:course_not_available, "Course not available for student")
           self.body = "<#{operation_ref_identifier}Response />"
           true

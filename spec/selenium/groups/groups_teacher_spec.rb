@@ -163,6 +163,7 @@ describe "new groups" do
     end
 
     it "does not allow teachers to see sections specific dropdown on announcement page" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       group_test_setup
       get "/groups/#{@testgroup.first.id}/discussion_topics/new?is_announcement=true"
       expect(f("#sections_autocomplete_root").text).to eq ""

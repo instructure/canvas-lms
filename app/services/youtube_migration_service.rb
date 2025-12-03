@@ -604,31 +604,39 @@ class YoutubeMigrationService
     when "WikiPage"
       page = course.wiki_pages.find(resource_id)
       page.body = replace_youtube_embed_in_html(page.body, embed, new_html)
+      page.skip_attachment_association_update = true
       page.save!
     when "Assignment"
       assignment = course.assignments.find(resource_id)
       assignment.description = replace_youtube_embed_in_html(assignment.description, embed, new_html)
+      assignment.skip_attachment_association_update = true
       assignment.save!
     when "DiscussionTopic"
       topic = course.discussion_topics.find(resource_id)
       topic.message = replace_youtube_embed_in_html(topic.message, embed, new_html)
+      topic.skip_attachment_association_update = true
       topic.save!
     when "Announcement"
       announcement = course.announcements.find(resource_id)
       announcement.message = replace_youtube_embed_in_html(announcement.message, embed, new_html)
+      announcement.skip_attachment_association_update = true
       announcement.save!
     when "DiscussionEntry"
       entry = DiscussionEntry.find(resource_id)
       entry.message = replace_youtube_embed_in_html(entry.message, embed, new_html)
+      entry.skip_attachment_association_update = true
       entry.save!
     when "CalendarEvent"
       event = course.calendar_events.find(resource_id)
       event.description = replace_youtube_embed_in_html(event.description, embed, new_html)
+      event.skip_attachment_association_update = true
       event.save!
     when "Course"
       course.syllabus_body = replace_youtube_embed_in_html(course.syllabus_body, embed, new_html)
+      course.skip_attachment_association_update = true
       course.save!
     when "AssessmentQuestion"
+      # AssessmentQuestion does not include LinkedAttachmentHandler
       assessment_question = course.assessment_questions.find(resource_id)
       question_data = assessment_question.question_data.dup
       question_data[field] = replace_youtube_embed_in_html(question_data[field], embed, new_html) if question_data[field]
@@ -639,11 +647,13 @@ class YoutubeMigrationService
       question_data = quiz_question.question_data.dup
       question_data[field] = replace_youtube_embed_in_html(question_data[field], embed, new_html) if question_data[field]
       quiz_question.question_data = question_data
+      quiz_question.skip_attachment_association_update = true
       quiz_question.save!
     when "Quizzes::Quiz"
       quiz = course.quizzes.find(resource_id)
       if field == :description
         quiz.description = replace_youtube_embed_in_html(quiz.description, embed, new_html)
+        quiz.skip_attachment_association_update = true
         quiz.save!
       else
         raise "Quiz field #{field} not supported for conversion"

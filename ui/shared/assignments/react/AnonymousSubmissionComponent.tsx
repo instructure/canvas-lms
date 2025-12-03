@@ -28,9 +28,16 @@ interface AnonymousSubmissionComponentProps {
   isAnonymous: boolean
   disabled: boolean
   onChange: (isAnonymous: boolean) => void
+  shouldRenderLabel?: boolean
 }
 
-export const AnonymousSubmissionComponent: React.FC<AnonymousSubmissionComponentProps> = ({
+interface AnonymousSubmissionContentProps {
+  isAnonymous: boolean
+  disabled: boolean
+  onChange: (isAnonymous: boolean) => void
+}
+
+const AnonymousSubmissionContent: React.FC<AnonymousSubmissionContentProps> = ({
   isAnonymous,
   disabled,
   onChange,
@@ -40,38 +47,66 @@ export const AnonymousSubmissionComponent: React.FC<AnonymousSubmissionComponent
   }
 
   return (
+    <div
+      className="overrides-column-right js-assignment-overrides overrideFormFlex border border-trbl border-round"
+      style={{marginBottom: '12px'}}
+    >
+      <View as="div" padding="space24 space12" margin="0 0 0 space4">
+        <Checkbox
+          label={I18n.t('keep_submission_anonymous', 'Keep Submission Anonymous')}
+          checked={isAnonymous}
+          onChange={handleChange}
+          name="new_quizzes_anonymous_submission"
+          value="1"
+          disabled={disabled}
+        />
+        <View as="div" display="block" margin="space12 0 0 space24" padding="0 0 0 space4">
+          <Text as="div" size="small">
+            {I18n.t(
+              'anonymous_submission_description',
+              'Anonymity can only be changed when creating a new Survey',
+            )}
+          </Text>
+          <View as="div" margin="space12 0 0 0">
+            <Text size="small">
+              {I18n.t(
+                'anonymous_submission_description2',
+                'To ensure complete anonymity, student responses will be shown in random order.',
+              )}
+            </Text>
+          </View>
+        </View>
+      </View>
+    </div>
+  )
+}
+
+export const AnonymousSubmissionComponent: React.FC<AnonymousSubmissionComponentProps> = ({
+  isAnonymous,
+  disabled,
+  onChange,
+  shouldRenderLabel = true,
+}) => {
+  if (!shouldRenderLabel) {
+    return (
+      <AnonymousSubmissionContent
+        isAnonymous={isAnonymous}
+        disabled={disabled}
+        onChange={onChange}
+      />
+    )
+  }
+
+  return (
     <fieldset id="overrides-wrapper">
       <div className="form-column-left" style={{width: 'unset'}}>
         <label>{I18n.t('anonymous_submission', 'Anonymous Submission')}</label>
       </div>
-      <div className="overrides-column-right js-assignment-overrides overrideFormFlex border border-trbl border-round">
-        <View as="div" padding="space24 space12" margin="0 0 0 space4">
-          <Checkbox
-            label={I18n.t('keep_submission_anonymous', 'Keep Submission Anonymous')}
-            checked={isAnonymous}
-            onChange={handleChange}
-            name="new_quizzes_anonymous_submission"
-            value="1"
-            disabled={disabled}
-          />
-          <View as="div" display="block" margin="space12 0 0 space24" padding="0 0 0 space4">
-            <Text as="div" size="small">
-              {I18n.t(
-                'anonymous_submission_description',
-                'Anonymity can only be changed when creating a new Survey',
-              )}
-            </Text>
-            <View as="div" margin="space12 0 0 0">
-              <Text size="small">
-                {I18n.t(
-                  'anonymous_submission_description2',
-                  'To ensure complete anonymity, student responses will be shown in random order.',
-                )}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </div>
+      <AnonymousSubmissionContent
+        isAnonymous={isAnonymous}
+        disabled={disabled}
+        onChange={onChange}
+      />
     </fieldset>
   )
 }

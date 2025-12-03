@@ -20,6 +20,8 @@
 require "spec_helper"
 
 RSpec.describe PeerReview::PeerReviewUpdaterService do
+  include PeerReviewHelpers
+
   let(:course) { course_model(name: "Course with Assignment") }
   let(:parent_assignment) do
     assignment_model(
@@ -165,7 +167,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
         result = service.call
 
-        expect(result.title).to eq("Updated Parent Assignment Peer Review")
+        expect(result.title).to eq(expected_peer_review_title("Updated Parent Assignment", parent_assignment.peer_review_count))
       end
 
       it "updates title even when peer review sub assignment has incorrect title" do
@@ -173,7 +175,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
         result = service.call
 
-        expect(result.title).to eq("Parent Assignment Peer Review")
+        expect(result.title).to eq(expected_peer_review_title(parent_assignment.title, parent_assignment.peer_review_count))
       end
 
       it "updates group_category_id when parent assignment group_category_id changes" do
@@ -183,6 +185,23 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
         result = service.call
 
         expect(result.group_category_id).to eq(group_category.id)
+      end
+
+      it "syncs context_id and context_type from parent assignment" do
+        new_course = course_factory(active_all: true)
+        new_course.enable_feature!(:peer_review_grading)
+
+        # Move the parent assignment to a new context
+        # (This is unusual but testing the sync mechanism)
+        parent_assignment.update!(context: new_course)
+
+        # Call the updater service to trigger the sync
+        PeerReview::PeerReviewUpdaterService.call(parent_assignment:)
+
+        # Now check that the peer review sub assignment was synced
+        existing_peer_review_sub_assignment.reload
+        expect(existing_peer_review_sub_assignment.context_id).to eq(new_course.id)
+        expect(existing_peer_review_sub_assignment.context_type).to eq("Course")
       end
     end
 

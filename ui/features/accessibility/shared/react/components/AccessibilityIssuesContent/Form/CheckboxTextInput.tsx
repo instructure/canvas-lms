@@ -17,12 +17,11 @@
  */
 import React, {
   useState,
-  useEffect,
   forwardRef,
   useRef,
   useImperativeHandle,
   useCallback,
-  useContext,
+  useEffect,
 } from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextArea} from '@instructure/ui-text-area'
@@ -36,31 +35,79 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 
-import {AccessibilityCheckerContext} from '../../../contexts/AccessibilityCheckerContext'
-import type {AccessibilityCheckerContextType} from '../../../contexts/AccessibilityCheckerContext'
+import {useAccessibilityCheckerContext} from '../../../hooks/useAccessibilityCheckerContext'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
 import {FormComponentHandle, FormComponentProps} from './index'
+import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
+import {useShallow} from 'zustand/react/shallow'
 
 const I18n = createI18nScope('accessibility_checker')
 
 const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
-    ({issue, value, error, onChangeValue, onReload}: FormComponentProps, ref) => {
+    (
+      {
+        issue,
+        value,
+        error,
+        onChangeValue,
+        onValidationChange,
+        actionButtons,
+        isDisabled,
+      }: FormComponentProps,
+      ref,
+    ) => {
       const checkboxRef = useRef<HTMLInputElement | null>(null)
       const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
-      const isFirstRender = useRef(true)
       const [isChecked, setChecked] = useState(false)
       const [generateLoading, setGenerateLoading] = useState(false)
       const [generationError, setGenerationError] = useState<string | null>(null)
-      const {selectedItem} = useContext(
-        AccessibilityCheckerContext,
-      ) as Partial<AccessibilityCheckerContextType>
+      const {selectedItem} = useAccessibilityCheckerContext()
+      const isAiGenerationEnabled = useAccessibilityScansStore(
+        useShallow(state => state.aiGenerationEnabled),
+      )
 
-      const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setChecked(e.target.checked)
-      }, [])
+      const validateValue = useCallback(
+        (currentValue: string | null, checked: boolean) => {
+          if (checked) {
+            return {isValid: true, errorMessage: undefined}
+          }
+          if (currentValue && currentValue.trim()) {
+            if (
+              !issue.form.inputMaxLength ||
+              currentValue.trim().length <= issue.form.inputMaxLength
+            ) {
+              return {isValid: true, errorMessage: undefined}
+            }
+            return {
+              isValid: false,
+              errorMessage: I18n.t('Keep alt text under %{maxLength} characters.', {
+                maxLength: issue.form.inputMaxLength,
+              }),
+            }
+          }
+          return {isValid: false, errorMessage: I18n.t('Alt text is required.')}
+        },
+        [issue.form.inputMaxLength],
+      )
+
+      // Trigger validation on value or checkbox changes
+      useEffect(() => {
+        const {isValid, errorMessage} = validateValue(value, isChecked)
+        onValidationChange?.(isValid, errorMessage)
+      }, [value, isChecked, onValidationChange, validateValue])
+
+      const handleCheckboxValueChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+          setChecked(e.target.checked)
+          if (e.target.checked) {
+            onChangeValue('')
+          }
+        },
+        [onChangeValue],
+      )
 
       const handleTextAreaChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -69,39 +116,27 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
         [onChangeValue],
       )
 
-      useImperativeHandle(ref, () => ({
-        focus: () => {
-          if (isChecked) {
-            checkboxRef.current?.focus()
-          } else {
-            textAreaRef.current?.focus()
-          }
-        },
-      }))
+      const shouldShowError = error && !isChecked
 
-      useEffect(() => {
-        isFirstRender.current = true
-      }, [issue])
-
-      useEffect(() => {
-        if (isChecked && value) {
-          onChangeValue('')
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [isChecked])
-
-      useEffect(() => {
-        // Skip the first render to avoid calling onReload on initial mount
-        if (isFirstRender.current) {
-          isFirstRender.current = false
-          return
-        }
-
-        // Since the checkbox text input does not have an apply button
-        // we need to reload the preview when the value changes
-        onReload?.(value)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [value])
+      useImperativeHandle(
+        ref,
+        () => ({
+          focus: () => {
+            if (isChecked) {
+              checkboxRef.current?.focus()
+            } else {
+              textAreaRef.current?.focus()
+            }
+          },
+          getValue: () => {
+            if (isChecked) {
+              return null
+            }
+            return value || ''
+          },
+        }),
+        [isChecked, value],
+      )
 
       const handleGenerateClick = () => {
         setGenerateLoading(true)
@@ -152,27 +187,34 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               inputRef={el => (checkboxRef.current = el)}
               label={issue.form.checkboxLabel}
               checked={isChecked}
-              onChange={handleChange}
-              messages={error && isChecked ? [{text: error, type: 'newError'}] : []}
+              disabled={isDisabled}
+              messages={[
+                {
+                  text: (
+                    <View as="div" margin="0 0 0 medium" themeOverride={{marginMedium: '1.8rem'}}>
+                      <Text size="small" color="secondary">
+                        {issue.form.checkboxSubtext}
+                      </Text>
+                    </View>
+                  ),
+                  type: 'hint',
+                },
+              ]}
+              onChange={handleCheckboxValueChange}
             />
-          </View>
-          <View as="div" margin="small 0 medium">
-            <Text size="small" color="secondary">
-              {issue.form.checkboxSubtext}
-            </Text>
           </View>
           <View as="div" margin="small 0">
             <TextArea
               data-testid="checkbox-text-input-form"
               textareaRef={el => (textAreaRef.current = el)}
               label={issue.form.label}
-              disabled={isChecked}
-              value={value || ''}
+              disabled={isChecked || isDisabled}
+              value={isChecked ? '' : value || ''}
               onChange={handleTextAreaChange}
-              messages={error && !isChecked ? [{text: error, type: 'newError'}] : []}
+              messages={shouldShowError ? [{text: error, type: 'newError'}] : []}
             />
           </View>
-          <Flex as="div" justifyItems="space-between" margin="small small">
+          <Flex as="div" justifyItems="space-between" margin="small 0">
             <Flex.Item>
               <Text size="small" color="secondary">
                 {issue.form.inputDescription}
@@ -180,21 +222,24 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
             </Flex.Item>
             <Flex.Item>
               <Text size="small" color="secondary">
-                {value?.length || 0}/{issue.form.inputMaxLength}
+                {value?.length || 0}/{issue.form.inputMaxLength} {I18n.t('characters')}
               </Text>
             </Flex.Item>
           </Flex>
-          <Flex as="div" margin="small 0">
-            <Flex.Item>
-              <Button
-                color="ai-primary"
-                renderIcon={() => <IconAiSolid />}
-                onClick={handleGenerateClick}
-                disabled={generateLoading}
-              >
-                {issue.form.generateButtonLabel}
-              </Button>
-            </Flex.Item>
+          <Flex as="div" margin="medium 0" gap="small">
+            {isAiGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
+              <Flex.Item>
+                <Button
+                  color="ai-primary"
+                  renderIcon={() => <IconAiSolid />}
+                  onClick={handleGenerateClick}
+                  disabled={generateLoading || isDisabled}
+                >
+                  {issue.form.generateButtonLabel}
+                </Button>
+              </Flex.Item>
+            )}
+            {actionButtons && <Flex.Item>{actionButtons}</Flex.Item>}
             {generateLoading ? (
               <Flex.Item>
                 <Spinner

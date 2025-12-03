@@ -18,6 +18,9 @@
 
 @import "base/environment";
 
+// clamping font size for a more readable table
+$responsive-font: clamp(0.6rem, 1.5vw, 1rem);
+
 .page_header {
   @include page_header;
 }
@@ -26,8 +29,14 @@
 }
 
 .course-list-table {
+  min-width: 600px;
+  width: 100%;
   table-layout: fixed;
   white-space: nowrap;
+
+  .course-list-table-row {
+    font-size: $responsive-font;
+  }
 
   /* Column widths are based on these cells */
   .course-list-star-column {
@@ -72,6 +81,21 @@
   .course-list-table-row:hover {
     background-color: $lightBackground;
   }
+
+  th {
+    // required to prevent sort icon from overflowing
+    padding-right: 1.2rem;
+    a, i[class*="icon-"] {
+      font-size: $responsive-font;
+    }
+  }
+}
+
+.table-overflow-container {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+  contain: layout;
 }
 
 .course-list-table td {

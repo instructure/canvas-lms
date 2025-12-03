@@ -370,6 +370,19 @@ describe('CreateEditAllocationRuleModal', () => {
       renderWithProviders()
     })
 
+    it('has exactly two radio groups: target type and review type', () => {
+      expect(screen.getByTestId('target-type-radio-group')).toBeInTheDocument()
+      expect(screen.getByTestId('review-type-group')).toBeInTheDocument()
+    })
+
+    it('displays "Rule Type" description for target type radio group', () => {
+      expect(screen.getByText('Rule Type')).toBeInTheDocument()
+    })
+
+    it('displays "Review Requirement" description for review type group', () => {
+      expect(screen.getByText('Review Requirement')).toBeInTheDocument()
+    })
+
     it('provides correct aria-label for add subject button based on target type', async () => {
       const addButton = screen.getByTestId('add-subject-button')
       expect(addButton).toHaveAttribute('aria-label', 'Add another recipient name')
@@ -396,7 +409,7 @@ describe('CreateEditAllocationRuleModal', () => {
 
       await waitFor(() => {
         const deleteButton = screen.getByTestId('delete-additional-subject-field-1-button')
-        expect(deleteButton).toHaveTextContent('Delete additional empty subject field')
+        expect(deleteButton).toHaveTextContent('Delete additional empty recipient')
       })
     })
   })

@@ -39,27 +39,30 @@ import {
   ScanWorkflowState,
 } from '../../../../../shared/react/types'
 import {IssueCountBadge} from '../../../../../shared/react/components/IssueCountBadge/IssueCountBadge'
-
+import {useAccessibilityIssueSelect} from '../../../../../shared/react/hooks/useAccessibilityIssueSelect'
 const I18n = createI18nScope('accessibility_checker')
 
 interface ScanStateCellProps {
   item: AccessibilityResourceScan
-  onClick?: (item: AccessibilityResourceScan) => void
 }
 
 const ISSUES_COUNT_OFFSET = '2.75rem'
 
-const FixOrReviewAction = ({item, onClick}: ScanStateCellProps) => {
-  const handleClick = useCallback(() => onClick?.(item), [item, onClick])
+const FixOrReviewAction = ({item}: ScanStateCellProps) => {
+  const {selectIssue} = useAccessibilityIssueSelect()
+
   const canFix = item.resourceType !== ResourceType.Attachment
   const dataTestId = canFix ? 'issue-remediation-button' : 'issue-review-button'
   const text = canFix ? I18n.t('Fix') : I18n.t('Review')
   const altText = canFix
     ? I18n.t('Fix issues for %{name}', {name: item.resourceName})
     : I18n.t('Review issues for %{name}', {name: item.resourceName})
-  const renderIcon = canFix ? <IconEditLine /> : null
 
+  const renderIcon = canFix ? <IconEditLine /> : null
   const courseId = window.ENV.current_context?.id ?? null
+
+  const handleClick = useCallback(() => selectIssue(item), [item, selectIssue])
+
   return (
     <Flex.Item textAlign="start">
       {window.ENV.FEATURES?.accessibility_issues_in_full_page && courseId ? (
@@ -81,16 +84,14 @@ const FixOrReviewAction = ({item, onClick}: ScanStateCellProps) => {
   )
 }
 
-const IssueCountAndAction = ({item, onClick}: ScanStateCellProps) => {
-  return (
-    <Flex gap="x-small">
-      <Flex.Item textAlign="end" size={ISSUES_COUNT_OFFSET}>
-        <IssueCountBadge issueCount={item.issueCount} />
-      </Flex.Item>
-      {onClick && <FixOrReviewAction item={item} onClick={onClick} />}
-    </Flex>
-  )
-}
+const IssueCountAndAction = ({item}: ScanStateCellProps) => (
+  <Flex gap="x-small">
+    <Flex.Item textAlign="end" size={ISSUES_COUNT_OFFSET}>
+      <IssueCountBadge issueCount={item.issueCount} />
+    </Flex.Item>
+    <FixOrReviewAction item={item} />
+  </Flex>
+)
 
 interface ScanStateWithIconProps {
   icon: React.ReactNode
@@ -185,10 +186,7 @@ const ScanWithError = ({item}: {item: AccessibilityResourceScan}) => (
   />
 )
 
-export const ScanStateCell: React.FC<ScanStateCellProps> = ({
-  item,
-  onClick,
-}: ScanStateCellProps) => {
+export const ScanStateCell: React.FC<ScanStateCellProps> = ({item}: ScanStateCellProps) => {
   switch (item.workflowState) {
     case ScanWorkflowState.Queued:
     case ScanWorkflowState.InProgress: {
@@ -196,7 +194,7 @@ export const ScanStateCell: React.FC<ScanStateCellProps> = ({
     }
     case ScanWorkflowState.Completed: {
       if (item.issueCount > 0) {
-        return <IssueCountAndAction item={item} onClick={onClick} />
+        return <IssueCountAndAction item={item} />
       } else if (item.issueCount === 0) {
         return <NoIssuesText />
       }

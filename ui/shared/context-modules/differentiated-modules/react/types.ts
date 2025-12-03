@@ -21,7 +21,7 @@ export const sizeShape = PropTypes.oneOf(['small', 'medium', 'large'])
 
 type RequirementType = 'view' | 'mark' | 'submit' | 'score' | 'contribute' | 'percentage'
 
-export type PointsInputMessages=  Array<{requirementId: string, message: string}>
+export type PointsInputMessages = Array<{requirementId: string; message: string}>
 
 export type ScoreType = 'score' | 'percentage'
 
@@ -77,6 +77,7 @@ interface StudentsOverride {
 interface DifferentiationTagOverride {
   id?: string
   group_id: string | undefined
+  group_category_id?: string | undefined
 }
 
 export type ItemType =
@@ -99,7 +100,7 @@ export type IconType =
   | null
 
 export type AssignmentOverridePayload =
-  | SectionOverride 
+  | SectionOverride
   | StudentsOverride
   | DifferentiationTagOverride
 

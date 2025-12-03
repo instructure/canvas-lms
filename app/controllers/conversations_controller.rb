@@ -427,17 +427,23 @@ class ConversationsController < ApplicationController
       context_id = context.id
     end
 
+    allowed_recipient_types = [nil, "students", "observers"].freeze
     params[:recipients].each do |recipient|
       return render_error("recipients", "invalid") unless recipient.is_a?(String)
 
-      if recipient =~ /\A(course_\d+)(?:_([a-z]+))?$/ && [nil, "students", "observers"].include?($2) &&
+      if recipient =~ /\A(course_\d+)(?:_([a-z]+))?$/ && allowed_recipient_types.include?($2) &&
          !Context.find_by_asset_string($1).try(:grants_right?, @current_user, session, :send_messages_all)
         return render_error("recipients", "restricted by role")
       end
     end
 
-    group_conversation     = value_to_boolean(params[:group_conversation])
-    batch_private_messages = !group_conversation && @recipients.size > 1
+    group_conversation = value_to_boolean(params[:group_conversation])
+
+    force_individual_messages = context.is_a?(Course) &&
+                                context.root_account.feature_enabled?(:restrict_student_access) &&
+                                context.user_is_instructor?(@current_user)
+
+    batch_private_messages = (!group_conversation && @recipients.size > 1) || force_individual_messages
     batch_group_messages   = (group_conversation && value_to_boolean(params[:bulk_message])) || value_to_boolean(params[:force_new])
     message                = build_message
 

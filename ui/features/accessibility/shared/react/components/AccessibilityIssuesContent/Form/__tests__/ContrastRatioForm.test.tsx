@@ -51,14 +51,17 @@ describe('ContrastRatioForm', () => {
     expect(screen.getByText('#FFFFFF')).toBeInTheDocument()
   })
 
-  it('calls onChange when ColorPicker changes color', async () => {
+  it('calls onChange with color value and validity when ColorPicker changes color', async () => {
     render(<ContrastRatioForm {...defaultProps} />)
 
     const input = screen.getByLabelText(/new text color/i)
     await user.clear(input)
     await user.type(input, '#ff0000')
 
-    expect(mockOnChange).toHaveBeenCalledWith('#ff0000')
+    expect(mockOnChange).toHaveBeenCalled()
+    const lastCall = mockOnChange.mock.calls[mockOnChange.mock.calls.length - 1]
+    expect(lastCall[0]).toBe('#ff0000')
+    expect(typeof lastCall[1]).toBe('boolean')
   })
 
   it('renders text types based on options', async () => {
@@ -111,11 +114,84 @@ describe('ContrastRatioForm', () => {
     render(<ContrastRatioForm {...defaultProps} />)
 
     expect(screen.getByTestId('suggestion-message')).toBeInTheDocument()
+    expect(screen.getByText(/Only #0000 will automatically update to white/i)).toBeInTheDocument()
   })
 
   it('does not render suggestion message when background is not white', () => {
     render(<ContrastRatioForm {...defaultProps} backgroundColor="#CF4A00" />)
 
     expect(screen.queryByTestId('suggestion-message')).not.toBeInTheDocument()
+  })
+
+  it('calls onChange with valid=true when contrast meets normal text requirements', async () => {
+    const propsWithNormal = {
+      ...defaultProps,
+      options: ['normal'],
+      backgroundColor: '#FFFFFF',
+      foregroundColor: '#000000',
+    }
+    render(<ContrastRatioForm {...propsWithNormal} />)
+
+    const input = screen.getByLabelText(/new text color/i)
+    await user.clear(input)
+    await user.type(input, '#000000')
+
+    const calls = mockOnChange.mock.calls.filter(call => call[0] === '#000000')
+    expect(calls.length).toBeGreaterThan(0)
+    expect(calls[calls.length - 1][1]).toBe(true)
+  })
+
+  it('calls onChange with valid=false when contrast does not meet normal text requirements', async () => {
+    const propsWithNormal = {
+      ...defaultProps,
+      options: ['normal'],
+      backgroundColor: '#FFFFFF',
+      foregroundColor: '#000000',
+    }
+    render(<ContrastRatioForm {...propsWithNormal} />)
+
+    const input = screen.getByLabelText(/new text color/i)
+    await user.clear(input)
+    await user.type(input, '#CCCCCC')
+
+    const calls = mockOnChange.mock.calls.filter(call => call[0] === '#CCCCCC')
+    expect(calls.length).toBeGreaterThan(0)
+    expect(calls[calls.length - 1][1]).toBe(false)
+  })
+
+  it('calls onChange with valid=true when contrast meets large text requirements', async () => {
+    const propsWithLarge = {
+      ...defaultProps,
+      options: ['large'],
+      backgroundColor: '#FFFFFF',
+      foregroundColor: '#777777',
+    }
+    render(<ContrastRatioForm {...propsWithLarge} />)
+
+    const input = screen.getByLabelText(/new text color/i)
+    await user.clear(input)
+    await user.type(input, '#777777')
+
+    const calls = mockOnChange.mock.calls.filter(call => call[0] === '#777777')
+    expect(calls.length).toBeGreaterThan(0)
+    expect(calls[calls.length - 1][1]).toBe(true)
+  })
+
+  it('validates against all specified options', async () => {
+    const propsWithBoth = {
+      ...defaultProps,
+      options: ['normal', 'large'],
+      backgroundColor: '#FFFFFF',
+      foregroundColor: '#000000',
+    }
+    render(<ContrastRatioForm {...propsWithBoth} />)
+
+    const input = screen.getByLabelText(/new text color/i)
+    await user.clear(input)
+    await user.type(input, '#888888') // Mid-gray
+
+    const calls = mockOnChange.mock.calls.filter(call => call[0] === '#888888')
+    expect(calls.length).toBeGreaterThan(0)
+    expect(typeof calls[calls.length - 1][1]).toBe('boolean')
   })
 })

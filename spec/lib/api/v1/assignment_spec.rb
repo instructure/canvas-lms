@@ -52,6 +52,10 @@ class AssignmentApiHarness
   def grading_periods?
     false
   end
+
+  def in_app?
+    true
+  end
 end
 
 describe "Api::V1::Assignment" do
@@ -68,6 +72,7 @@ describe "Api::V1::Assignment" do
       json = api.assignment_json(assignment, user, session, { override_dates: false })
       expect(json["needs_grading_count"]).to eq(0)
       expect(json["needs_grading_count_by_section"]).to be_nil
+      expect(json["new_quizzes_anonymous_participants"]).to be false
     end
 
     it "includes section-based counts when grading flag is passed" do
@@ -78,6 +83,14 @@ describe "Api::V1::Assignment" do
                                  { override_dates: false, needs_grading_count_by_section: true })
       expect(json["needs_grading_count"]).to eq(0)
       expect(json["needs_grading_count_by_section"]).to eq []
+    end
+
+    it "includes new_quizzes_anonymous_participants when set to true" do
+      assignment.settings = { "new_quizzes" => { "anonymous_participants" => true } }
+      assignment.save!
+
+      json = api.assignment_json(assignment, user, session)
+      expect(json["new_quizzes_anonymous_participants"]).to be true
     end
 
     it "includes an associated planner override when flag is passed" do
@@ -657,6 +670,22 @@ describe "Api::V1::Assignment" do
         json = api.assignment_json(@assignment, user, session, {})
         expect(json).to have_key("peer_review_count")
         expect(json["peer_review_count"]).to eq 2
+      end
+    end
+
+    context "with peer_review_grading feature flag enabled" do
+      before do
+        @assignment = assignment_model
+        @assignment.update_attribute(:peer_reviews, true)
+        @assignment.update_attribute(:peer_review_count, 3)
+        @assignment.course.enable_feature!(:peer_review_grading)
+        @assignment.course.disable_feature!(:peer_review_allocation)
+      end
+
+      it "includes peer_review_count" do
+        json = api.assignment_json(@assignment, user, session, {})
+        expect(json).to have_key("peer_review_count")
+        expect(json["peer_review_count"]).to eq 3
       end
     end
   end
@@ -1248,6 +1277,19 @@ describe "Api::V1::Assignment" do
           expect(subject.lti_asset_processors.count).to eq 0
         end
       end
+
+      context "when not in app (API token authentication)" do
+        before do
+          allow(api).to receive(:in_app?).and_return(false)
+        end
+
+        it "raises RequestError with forbidden status" do
+          expect { subject }.to raise_error(RequestError) do |error|
+            expect(error.response_status).to eq(403)
+            expect(error.message).to include("LTI Deep Linking flow")
+          end
+        end
+      end
     end
   end
 
@@ -1414,6 +1456,42 @@ describe "Api::V1::Assignment" do
         it "deletes any previous asset processors" do
           assignment_update_params[:submission_types] = ["online_url"]
           expect { subject }.to change { assignment.lti_asset_processors.count }.from(2).to(0)
+        end
+      end
+
+      context "when not in app (API token authentication)" do
+        before do
+          allow(api).to receive(:in_app?).and_return(false)
+        end
+
+        context "when creating new asset processors" do
+          it "raises RequestError with forbidden status" do
+            expect { subject }.to raise_error(RequestError) do |error|
+              expect(error.response_status).to eq(403)
+              expect(error.message).to include("LTI Deep Linking flow")
+            end
+          end
+        end
+
+        context "when deleting asset processors" do
+          let(:content_items) { [] }
+
+          it "allows deletion" do
+            expect { subject }.to change { assignment.lti_asset_processors.count }.from(2).to(0)
+          end
+        end
+
+        context "when only keeping existing asset processors" do
+          let(:content_items) do
+            [
+              { "existing_id" => existing_ap1.id }
+            ]
+          end
+
+          it "allows keeping existing processors" do
+            expect { subject }.not_to raise_error
+            expect(assignment.lti_asset_processors.pluck(:title)).to eq(["Existing1"])
+          end
         end
       end
     end

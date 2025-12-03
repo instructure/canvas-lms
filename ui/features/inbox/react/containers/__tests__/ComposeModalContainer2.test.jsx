@@ -33,6 +33,7 @@ import {graphql} from 'msw'
 jest.mock('@canvas/upload-file')
 
 jest.mock('../../../util/utils', () => ({
+  ...jest.requireActual('../../../util/utils'),
   responsiveQuerySizes: jest.fn().mockReturnValue({
     desktop: {minWidth: '768px'},
   }),

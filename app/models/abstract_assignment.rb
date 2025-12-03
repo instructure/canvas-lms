@@ -1225,8 +1225,9 @@ class AbstractAssignment < ActiveRecord::Base
       muted
       intra_group_peer_reviews
       anonymous_grading
-      peer_review_submission_required
+      peer_review_across_sections
     ].each { |attr| self[attr] = false if self[attr].nil? }
+    self.peer_review_submission_required = true if peer_review_submission_required.nil?
     self.graders_anonymous_to_graders = false unless grader_comments_visible_to_graders
   end
   protected :default_values
@@ -1299,6 +1300,7 @@ class AbstractAssignment < ActiveRecord::Base
       quiz.workflow_state = "created" if quiz.deleted?
       quiz.saved_by = :assignment
       quiz.workflow_state = published? ? "available" : "unpublished"
+      quiz.updating_user = updating_user
       quiz.save if quiz.changed?
     elsif self.submission_types == "discussion_topic" && !%i[discussion_topic sub_assignment].include?(@saved_by)
       topic = discussion_topic || context.discussion_topics.build(user: @updating_user)
@@ -1314,6 +1316,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def save_submittable(submittable)
+    submittable.updating_user = updating_user
     submittable.assignment_id = id
     submittable.title = self.title
     submittable.saved_by = :assignment
@@ -4452,6 +4455,7 @@ class AbstractAssignment < ActiveRecord::Base
     value = settings&.dig("new_quizzes", "anonymous_participants")
     ActiveModel::Type::Boolean.new.cast(value) || false
   end
+  alias_method :new_quizzes_anonymous_participants?, :anonymous_participants?
 
   def new_quizzes_type=(type)
     self.settings ||= {}
@@ -4637,6 +4641,8 @@ class AbstractAssignment < ActiveRecord::Base
     self.automatic_peer_reviews = false
     self.anonymous_peer_reviews = false
     self.intra_group_peer_reviews = false
+    self.peer_review_submission_required = false
+    self.peer_review_across_sections = false
   end
 
   def instructor_selectable_states

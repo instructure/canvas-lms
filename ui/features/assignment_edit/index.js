@@ -29,6 +29,7 @@ import AssignmentGroupSelector from '@canvas/assignments/backbone/views/Assignme
 import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector'
 import QuizTypeSelector from '@canvas/assignments/backbone/views/QuizTypeSelector'
 import AnonymousSubmissionSelector from '@canvas/assignments/backbone/views/AnonymousSubmissionSelector'
+import PointsTooltip from '@canvas/assignments/backbone/views/PointsTooltip'
 import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector'
 import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsSelector'
 import '@canvas/grading-standards'
@@ -89,6 +90,9 @@ function loadBackboneComponents() {
     const anonymousSubmissionSelector = new AnonymousSubmissionSelector({
       parentModel: assignment,
     })
+    const pointsTooltip = new PointsTooltip({
+      parentModel: assignment,
+    })
     const groupCategorySelector = new GroupCategorySelector({
       parentModel: assignment,
       groupCategories:
@@ -107,6 +111,7 @@ function loadBackboneComponents() {
       gradingTypeSelector,
       quizTypeSelector,
       anonymousSubmissionSelector,
+      pointsTooltip,
       ...(!ENV.horizon_course && {groupCategorySelector}),
       ...(!ENV.horizon_course && {peerReviewsSelector}),
       views: {

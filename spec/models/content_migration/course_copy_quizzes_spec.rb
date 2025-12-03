@@ -500,7 +500,7 @@ describe ContentMigration do
         link to some other course: <a href="/courses/#{@copy_from.id + @copy_to.id}">Cool Course</a>
         canvas image: <img style="max-width: 723px;" src="/images/preview.png" alt="">
       HTML
-      @question = @bank.assessment_questions.create!(question_data: data, current_user: @user)
+      @question = @bank.assessment_questions.create!(question_data: data, updating_user: @user)
       expect(@question.reload.question_data["question_text"]).to match %r{/assessment_questions/}
 
       run_course_copy
@@ -519,7 +519,7 @@ describe ContentMigration do
         media comment: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
         media object: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/0_l4l5n0wt?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>
       HTML
-      @question = @bank.assessment_questions.create!(question_data: data, current_user: @user)
+      @question = @bank.assessment_questions.create!(question_data: data, updating_user: @user)
 
       run_course_copy
 
@@ -561,7 +561,7 @@ describe ContentMigration do
                          { migration_id: "QUE_1017_A2", html: "<strong>html answer 2</strong>", comments_html: "<i>comment</i>", text: "", weight: 0, id: 2279 }] }.with_indifferent_access
 
       q1 = @copy_from.quizzes.create!(title: "quiz1")
-      q1.quiz_questions.create!(question_data: data, saving_user: @user)
+      q1.quiz_questions.create!(question_data: data, updating_user: @user)
 
       run_course_copy
 
@@ -1232,7 +1232,7 @@ describe ContentMigration do
         "answers" => [{ "id" => 1, "text" => "Correct", "weight" => 100 },
                       { "id" => 2, "text" => "inorrect", "weight" => 0 }],
       }
-      aq = bank1.assessment_questions.create!(question_data: data, current_user: @user)
+      aq = bank1.assessment_questions.create!(question_data: data, updating_user: @user)
 
       run_course_copy
 

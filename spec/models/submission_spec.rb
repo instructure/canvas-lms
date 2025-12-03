@@ -3123,6 +3123,7 @@ describe Submission do
               state: originality_report.state,
               attachment_id: originality_report.attachment_id,
               report_url: originality_report.originality_report_url,
+              view_report_url: "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/originality_report/#{originality_report.asset_key}?attempt=#{submission.attempt}",
               status: originality_report.workflow_state,
               error_message: nil,
               created_at: originality_report.created_at,
@@ -3237,6 +3238,7 @@ describe Submission do
               attachment_id: attachment.id,
               state: originality_report.state,
               report_url: originality_report.originality_report_url,
+              view_report_url: "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/originality_report/#{originality_report.asset_key}?attempt=#{submission.attempt}",
               status: originality_report.workflow_state,
               error_message: nil,
               created_at: originality_report.created_at,
@@ -3280,6 +3282,7 @@ describe Submission do
                                                       attachment_id: nil,
                                                       state: originality_report.state,
                                                       report_url: originality_report.originality_report_url,
+                                                      view_report_url: "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/originality_report/#{originality_report.asset_key}?attempt=#{submission.attempt}",
                                                       status: originality_report.workflow_state,
                                                       error_message: nil,
                                                       created_at: originality_report.created_at,
@@ -3297,6 +3300,162 @@ describe Submission do
 
         it "includes the error message" do
           expect(subject[:error_message]).to eq error_message
+        end
+      end
+
+      describe "view_report_url" do
+        let(:tii_data) do
+          {
+            similarity_score: 10,
+            state: "acceptable",
+            report_url: "http://example.com",
+            status: "scored"
+          }
+        end
+
+        shared_examples_for "sets view_report_url with correct attempt" do |expected_attempt|
+          it "includes correct attempt query param in view_report_url" do
+            expect(submission.originality_data[attachment.asset_string][:view_report_url]).to include("attempt=#{expected_attempt}")
+          end
+        end
+
+        context "when only turnitin_data exists on submission" do
+          before { submission.turnitin_data[attachment.asset_string] = tii_data }
+
+          it "generates view_report_url with turnitin path" do
+            originality_data = submission.originality_data[attachment.asset_string]
+            expect(originality_data[:view_report_url]).to eq(
+              "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/turnitin/#{attachment.asset_string}?attempt=#{submission.attempt}"
+            )
+          end
+
+          it_behaves_like "sets view_report_url with correct attempt", 1
+
+          context "with attempt set to 3" do
+            before { submission.update!(attempt: 3) }
+
+            it_behaves_like "sets view_report_url with correct attempt", 3
+          end
+        end
+
+        context "when only originality data exists" do
+          before do
+            originality_report.originality_report_url = "http://example.com"
+            originality_report.save!
+          end
+
+          it "generates view_report_url with originality_report path" do
+            originality_data = submission.originality_data[attachment.asset_string]
+            expect(originality_data[:view_report_url]).to eq(
+              "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/originality_report/#{originality_report.asset_key}?attempt=#{submission.attempt}"
+            )
+          end
+
+          it_behaves_like "sets view_report_url with correct attempt", 1
+
+          context "with attempt set to 5" do
+            before { submission.update!(attempt: 5) }
+
+            it_behaves_like "sets view_report_url with correct attempt", 5
+          end
+        end
+
+        context "when both turnitin and originality data exist" do
+          before do
+            originality_report.originality_report_url = "http://example.com"
+            originality_report.save!
+            submission.turnitin_data[attachment.asset_string] = tii_data.merge(report_url: "http://example.com/tii", status: "pending")
+          end
+
+          it "generates view_report_url with originality_report path" do
+            originality_data = submission.originality_data[attachment.asset_string]
+            expect(originality_data[:view_report_url]).to eq(
+              "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/originality_report/#{originality_report.asset_key}?attempt=#{submission.attempt}"
+            )
+          end
+        end
+
+        context "with anonymous grading enabled" do
+          before do
+            submission.assignment.update!(anonymous_grading: true)
+            submission.update!(anonymous_id: "abc12")
+          end
+
+          context "when only turnitin_data exists" do
+            before { submission.turnitin_data[attachment.asset_string] = tii_data }
+
+            it "generates view_report_url with anonymous_submissions path and anonymous_id" do
+              originality_data = submission.originality_data[attachment.asset_string]
+              expect(originality_data[:view_report_url]).to eq(
+                "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/anonymous_submissions/#{submission.anonymous_id}/turnitin/#{attachment.asset_string}?attempt=#{submission.attempt}"
+              )
+            end
+          end
+
+          context "when only originality report exists" do
+            before do
+              originality_report.originality_report_url = "http://example.com"
+              originality_report.save!
+            end
+
+            it "generates view_report_url with anonymous_submissions path and anonymous_id" do
+              originality_data = submission.originality_data[attachment.asset_string]
+              expect(originality_data[:view_report_url]).to eq(
+                "/courses/#{submission.assignment.context_id}/assignments/#{submission.assignment_id}/anonymous_submissions/#{submission.anonymous_id}/originality_report/#{originality_report.asset_key}?attempt=#{submission.attempt}"
+              )
+            end
+          end
+        end
+
+        it "merges turnitin_data with originality report data when no report in turnitin_data" do
+          submission.turnitin_data = {
+            eula_agreement_timestamp: "1725631351175",
+            webhook_info: {
+              product_code: "turnitin-lti",
+              vendor_code: "turnitin.com",
+              resource_type_code: "abc-cba-settings",
+              tool_proxy_id: 273,
+              tool_proxy_created_at: Time.zone.parse("2020-07-09 09:31:59.543183000 EDT"),
+              tool_proxy_updated_at: Time.zone.parse("2022-09-29 11:26:41.957018000 EDT"),
+              tool_proxy_name: "Turnitin Originality",
+              tool_proxy_context_type: "Account",
+              tool_proxy_context_id: 416,
+              subscription_id: "22a61zd9-3bca-2281-1373-21gb64292c2b"
+            }
+          }
+
+          originality_report.update!(
+            originality_score: 53.0,
+            workflow_state: "scored",
+            created_at: Time.zone.parse("2024-10-06 21:05:06.383483000 +0000"),
+            updated_at: Time.zone.parse("2024-10-07 22:30:13.686426000 +0000")
+          )
+
+          result = submission.originality_data
+
+          expect(result[attachment.asset_string]).to include(
+            similarity_score: 53.0,
+            state: originality_report.state,
+            attachment_id: originality_report.attachment_id,
+            status: "scored",
+            error_message: nil
+          )
+
+          expect(result).to include(:eula_agreement_timestamp)
+          expect(result[:eula_agreement_timestamp]).to eq("1725631351175")
+          expect(result).not_to include(:webhook_info)
+        end
+
+        context "when vericite is enabled" do
+          before do
+            allow(submission.assignment).to receive(:vericite_enabled?).and_return(true)
+            submission.turnitin_data[attachment.asset_string] = tii_data
+          end
+
+          it "does not add view_report_url to originality data" do
+            originality_data = submission.originality_data[attachment.asset_string]
+            expect(originality_data).not_to have_key(:view_report_url)
+          end
         end
       end
     end
@@ -4741,7 +4900,7 @@ describe Submission do
       assignment.ensure_post_policy(post_manually: true)
     end
 
-    it "does not include submissions that neither have grades nor hidden comments" do
+    it "does not include submissions that neither have grades nor hidden comments nor stickers" do
       submission.add_comment(author: @teacher, comment: "good job!", hidden: false)
       expect(subject).not_to include(submission)
     end
@@ -4751,6 +4910,11 @@ describe Submission do
       expect(subject).to include(submission)
     end
 
+    it "does not include submissions with only draft hidden comments" do
+      submission.add_comment(author: @teacher, comment: "draft comment", hidden: true, draft_comment: true)
+      expect(subject).not_to include(submission)
+    end
+
     it "includes submissions with a grade" do
       assignment.grade_student(@student, grader: @teacher, grade: 10)
       expect(subject).to include(submission)
@@ -4758,6 +4922,11 @@ describe Submission do
 
     it "includes submissions that are excused" do
       assignment.grade_student(@student, grader: @teacher, excused: true)
+      expect(subject).to include(submission)
+    end
+
+    it "includes submissions with a sticker" do
+      submission.update!(sticker: "star")
       expect(subject).to include(submission)
     end
   end
@@ -7906,6 +8075,26 @@ describe Submission do
         expect(history.first).to be_a Submission
       end
     end
+
+    it "ensures every returned submission has a distinct submitted_at" do
+      assignment = @course.assignments.create!(submission_types: "online_text_entry")
+      submission = assignment.submit_homework(student, body: "first")
+      timestamp = submission.submitted_at
+      submission.with_versioning(explicit: true) do
+        submission.submitted_at = 2.days.from_now(timestamp)
+        submission.body = "second"
+        submission.save!
+      end
+
+      submission.with_versioning(explicit: true) do
+        submission.submitted_at = timestamp
+        submission.body = "third"
+        submission.save!
+      end
+
+      history = submission.submission_history
+      expect(history.uniq(&:submitted_at).size).to eq history.size
+    end
   end
 
   context "draft comments" do
@@ -10017,7 +10206,7 @@ describe Submission do
       attachment1 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
       attachment2 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
       sub = @assignment.submit_homework(@student, attachments: [attachment1, attachment2])
-      run_jobs
+      Timecop.freeze(6.minutes.from_now) { run_jobs }
       expect(sub.reload.word_count).to eq 12
     end
 
@@ -10027,7 +10216,7 @@ describe Submission do
       attachment = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
       sub = @assignment.submit_homework(@student, attachments: [attachment])
       sub.update!(body: "")
-      run_jobs
+      Timecop.freeze(6.minutes.from_now) { run_jobs }
       expect(sub.reload.word_count).to eq 8
     end
 

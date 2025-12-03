@@ -23,6 +23,24 @@ ags_score_trigger_needs_grading_after_submitted:
       state: allowed_on
     ci:
       state: allowed_on
+ags_improved_course_concluded_check:
+  state: hidden
+  shadow: true
+  display_name: Improved LTI AGS Course Concluded Check
+  description: |-
+    If enabled, grading will be allowed if the student is participating in a section which is still active even if the course is concluded (by term or course dates).
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
+    beta:
+      state: allowed_on
+    production:
+      state: allowed_on
 assignment_edit_placement_not_on_announcements:
   state: hidden
   applies_to: SiteAdmin
@@ -117,6 +135,17 @@ external_tool_drawer:
     development:
       state: allowed_on
     test:
+      state: allowed_on
+    ci:
+      state: allowed_on
+feature_flag_ui_sorting:
+  state: hidden
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: Feature Flag UI Sorting
+  description: When enabled, allows users to sort by any of the available columns in the feature flags UI.
+  environments:
+    development:
       state: allowed_on
     ci:
       state: allowed_on
@@ -503,6 +532,19 @@ microsoft_group_enrollments_syncing:
     If enabled, syncing course enrollments to Microsoft Groups will be
     available. Account admins may enable this in account settings.
   applies_to: RootAccount
+nav_menu_links:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: "Nav Menu Links"
+  description: |-
+    Enables the creation of links at the account navigation, user navigation, and course navigation level.
+    This is a replacement of the Redirect Tool functionality.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 open_tools_in_new_tab:
   state: hidden
   shadow: true

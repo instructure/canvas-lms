@@ -2588,4 +2588,179 @@ describe FilesController do
       expect { get :show_thumbnail, params: { id: thumbnail.id, location: "avatar_#{@teacher.id}" } }.not_to raise_error
     end
   end
+
+  describe "POST 'update_word_count'" do
+    let(:user) { user_factory }
+    let(:course) { course_factory }
+    let(:assignment) { course.assignments.create!(title: "Test Assignment") }
+    let(:submission) { assignment.submit_homework(user, submission_type: "online_upload") }
+    let(:attachment) { user.attachments.create!(uploaded_data: stub_file_data("test.pdf", "application/pdf", "pdf"), context: user) }
+
+    before do
+      user_session(user)
+    end
+
+    def generate_valid_jwt(attachment_id)
+      CanvasSecurity.create_jwt({ id: attachment_id }, 1.hour.from_now)
+    end
+
+    describe "successful update" do
+      it "updates the word count with valid JWT and word_count" do
+        jwt = generate_valid_jwt(attachment.id)
+
+        post :update_word_count, params: {
+          attachment_jwt: jwt,
+          word_count: 1234
+        }
+
+        expect(response).to have_http_status(:no_content)
+        expect(attachment.reload.word_count).to eq(1234)
+      end
+
+      it "updates word count to 0" do
+        jwt = generate_valid_jwt(attachment.id)
+
+        post :update_word_count, params: {
+          attachment_jwt: jwt,
+          word_count: 0
+        }
+
+        expect(response).to have_http_status(:no_content)
+        expect(attachment.reload.word_count).to eq(0)
+      end
+
+      it "accepts word_count as string and converts to integer" do
+        jwt = generate_valid_jwt(attachment.id)
+
+        post :update_word_count, params: {
+          attachment_jwt: jwt,
+          word_count: "5678"
+        }
+
+        expect(response).to have_http_status(:no_content)
+        expect(attachment.reload.word_count).to eq(5678)
+      end
+    end
+
+    describe "parameter validation" do
+      it "returns 400 when attachment_jwt is missing" do
+        post :update_word_count, params: {
+          word_count: 1234
+        }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(json_parse(response.body)["message"]).to eq("Missing attachment_jwt param")
+      end
+
+      it "returns 400 when attachment_jwt is empty string" do
+        post :update_word_count, params: {
+          attachment_jwt: "",
+          word_count: 1234
+        }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(json_parse(response.body)["message"]).to eq("Missing attachment_jwt param")
+      end
+
+      it "returns 400 when word_count is missing" do
+        jwt = generate_valid_jwt(attachment.id)
+
+        post :update_word_count, params: {
+          attachment_jwt: jwt
+        }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(json_parse(response.body)["message"]).to eq("Missing word_count param")
+      end
+
+      it "returns 400 when word_count is empty string" do
+        jwt = generate_valid_jwt(attachment.id)
+
+        post :update_word_count, params: {
+          attachment_jwt: jwt,
+          word_count: ""
+        }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(json_parse(response.body)["message"]).to eq("Missing word_count param")
+      end
+
+      it "returns 400 when word_count is not a valid integer" do
+        jwt = generate_valid_jwt(attachment.id)
+
+        post :update_word_count, params: {
+          attachment_jwt: jwt,
+          word_count: "not_a_number"
+        }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(json_parse(response.body)["message"]).to eq("Invalid word_count param")
+      end
+
+      it "returns 400 when word_count is a float" do
+        jwt = generate_valid_jwt(attachment.id)
+
+        post :update_word_count, params: {
+          attachment_jwt: jwt,
+          word_count: "123.45"
+        }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(json_parse(response.body)["message"]).to eq("Invalid word_count param")
+      end
+    end
+
+    describe "JWT validation" do
+      it "returns 400 with expired JWT" do
+        # Create an expired JWT (expires in the past)
+        expired_jwt = CanvasSecurity.create_jwt({ id: attachment.id }, 1.hour.ago)
+
+        post :update_word_count, params: {
+          attachment_jwt: expired_jwt,
+          word_count: 1234
+        }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(json_parse(response.body)["message"]).to eq("Invalid attachment_jwt param")
+      end
+
+      it "returns 404 when JWT payload is missing id claim" do
+        # Create JWT without id claim
+        jwt = CanvasSecurity.create_jwt({ some_other_field: "value" }, 1.hour.from_now)
+
+        post :update_word_count, params: {
+          attachment_jwt: jwt,
+          word_count: 1234
+        }
+
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "handles JWT with extra claims correctly" do
+        # Create JWT with extra claims
+        jwt = CanvasSecurity.create_jwt({ id: attachment.id, extra_claim: "extra_value" }, 1.hour.from_now)
+
+        post :update_word_count, params: {
+          attachment_jwt: jwt,
+          word_count: 1234
+        }
+
+        expect(response).to have_http_status(:no_content)
+        expect(attachment.reload.word_count).to eq(1234)
+      end
+    end
+
+    describe "attachment not found" do
+      it "returns 404 when attachment does not exist" do
+        jwt = generate_valid_jwt(999_999_999)
+
+        post :update_word_count, params: {
+          attachment_jwt: jwt,
+          word_count: 1234
+        }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end

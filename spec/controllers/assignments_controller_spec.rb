@@ -2608,6 +2608,52 @@ describe AssignmentsController do
       post "create", params: { course_id: @course.id, assignment: { important_dates: true } }
       expect(assigns[:assignment].important_dates).to be true
     end
+
+    context "New Quizzes Surveys" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+      end
+
+      it "sets new quizzes survey attributes if provided" do
+        post "create", params: {
+          course_id: @course.id,
+          assignment: {
+            new_quizzes_quiz_type: "graded_survey",
+            new_quizzes_anonymous_submission: true
+          },
+          quiz_lti: 1
+        }
+        assignment = assigns[:assignment]
+        expect(assignment).not_to be_nil
+        expect(assignment.new_quizzes_type).to eq("graded_survey")
+        expect(assignment.anonymous_participants?).to be true
+      end
+
+      it "does not set new quizzes survey attributes when feature flag is disabled" do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
+
+        post "create", params: {
+          course_id: @course.id,
+          assignment: {
+            new_quizzes_quiz_type: "graded_survey",
+            new_quizzes_anonymous_submission: true
+          },
+          quiz_lti: 1
+        }
+        assignment = assigns[:assignment]
+        expect(assignment).not_to be_nil
+        expect(assignment.new_quizzes_type).to eq("graded_quiz")
+        expect(assignment.anonymous_participants?).to be false
+      end
+    end
   end
 
   describe "GET 'edit'" do
@@ -3413,6 +3459,194 @@ describe AssignmentsController do
 
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body.size).to eq(2)
+    end
+  end
+
+  describe "GET 'rubric_data'" do
+    before do
+      user_session(@teacher)
+      @rubric = @course.rubrics.create!(user: @teacher, data: [])
+      rubric_association_params = {
+        purpose: "grading",
+        use_for_grading: "1",
+        association_object: @assignment
+      }
+      @assignment.rubric_association = RubricAssociation.generate(@teacher, @rubric, @course, rubric_association_params)
+      @assignment.save!
+    end
+
+    it "returns rubric data when assignment has an active rubric association" do
+      get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+      expect(response).to have_http_status(:ok)
+      json = response.parsed_body
+      expect(json["assigned_rubric"]).to be_present
+      expect(json["assigned_rubric"]["id"]).to eq @rubric.id
+      expect(json["rubric_association"]).to be_present
+      expect(json["rubric_association"]["id"]).to eq @assignment.rubric_association.id
+    end
+
+    it "returns nil rubric data when assignment has no rubric association" do
+      @assignment.rubric_association.destroy
+      get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+      expect(response).to have_http_status(:ok)
+      json = response.parsed_body
+      expect(json["assigned_rubric"]).to be_nil
+      expect(json["rubric_association"]).to be_nil
+    end
+
+    it "includes can_update permission in rubric data" do
+      get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+      expect(response).to have_http_status(:ok)
+      json = response.parsed_body
+      expect(json["assigned_rubric"]["can_update"]).to be_truthy
+    end
+
+    it "includes association_count in rubric data" do
+      get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+      expect(response).to have_http_status(:ok)
+      json = response.parsed_body
+      expect(json["assigned_rubric"]["association_count"]).to eq 1
+    end
+
+    it "returns 404 for non-existent assignment" do
+      get :rubric_data, params: { course_id: @course.id, assignment_id: 99_999 }, format: :json
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    context "as a student" do
+      it "denies students access to rubric data" do
+        user_session(@student)
+        get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    context "as a TA with grading permissions" do
+      it "allows TAs with update permission to view rubric data" do
+        ta = user_factory(active_all: true)
+        @course.enroll_ta(ta, enrollment_state: "active")
+        user_session(ta)
+
+        get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body
+        expect(json["assigned_rubric"]).to be_present
+      end
+    end
+
+    context "without update permission" do
+      it "denies access to users without update permission" do
+        observer = user_factory(active_all: true)
+        @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active")
+        user_session(observer)
+
+        get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
+
+  describe "GET 'peer_reviews' with A2 student view" do
+    before :once do
+      @assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        workflow_state: "published",
+        peer_reviews: true,
+        submission_types: "text_entry"
+      )
+      @student2 = student_in_course(active_all: true).user
+      @assignment.assign_peer_review(@student, @student2)
+    end
+
+    context "when assignment does not have peer reviews enabled" do
+      it "redirects to the assignment page" do
+        @assignment.update!(peer_reviews: false)
+        user_session(@student)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to redirect_to(course_assignment_url(@course, @assignment))
+      end
+    end
+
+    context "when all conditions for A2 peer review student view are met" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation)
+        @course.enable_feature!(:assignments_2_student)
+        @course.enable_feature!(:peer_reviews_for_a2)
+      end
+
+      before do
+        user_session(@student)
+      end
+
+      it "renders the A2 peer review student view" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:ok)
+        expect(response).to render_template(layout: "layouts/application")
+      end
+
+      it "sets ASSIGNMENT_ID in js_env" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:js_env][:ASSIGNMENT_ID]).to eq(@assignment.id)
+      end
+    end
+
+    context "when user is a teacher" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation)
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "does not render A2 peer review student view" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:ok)
+        expect(assigns[:js_env][:ASSIGNMENT_ID]).to eq(@assignment.id)
+        expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
+        expect(assigns[:students_dropdown_list]).to be_present
+      end
+    end
+
+    context "when peer_review_allocation feature is disabled" do
+      before :once do
+        @course.disable_feature!(:peer_review_allocation)
+        @course.enable_feature!(:assignments_2_student)
+        @course.enable_feature!(:peer_reviews_for_a2)
+      end
+
+      before do
+        user_session(@student)
+      end
+
+      it "does not render A2 peer review student view" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "when assignments_2_student feature is disabled" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation)
+        @course.disable_feature!(:assignments_2_student)
+      end
+
+      before do
+        user_session(@student)
+      end
+
+      it "does not render A2 peer review student view" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
   end
 end

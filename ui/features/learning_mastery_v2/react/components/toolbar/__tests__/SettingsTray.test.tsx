@@ -20,6 +20,7 @@ import {SettingsTray, SettingsTrayProps} from '../SettingsTray'
 import {
   DEFAULT_GRADEBOOK_SETTINGS,
   DisplayFilter,
+  ScoreDisplayFormat,
   SecondaryInfoDisplay,
 } from '../../../utils/constants'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -160,6 +161,29 @@ describe('SettingsTray', () => {
       expect(props.setGradebookSettings).toHaveBeenCalledWith({
         ...props.gradebookSettings,
         displayFilters: [DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
+      })
+    })
+  })
+
+  describe('ScoreDisplayFormatSelector', () => {
+    it('renders ScoreDisplayFormatSelector', () => {
+      const {getByText} = render(<SettingsTray {...makeProps({open: true})} />)
+      expect(getByText('Scoring')).toBeInTheDocument()
+    })
+
+    it('updates scoreDisplayFormat on change', async () => {
+      const props = makeProps({
+        open: true,
+        setGradebookSettings: jest.fn().mockReturnValue(Promise.resolve({success: true})),
+      })
+      const {getByText, getByLabelText} = render(<SettingsTray {...props} />)
+      getByLabelText('Icons + Descriptor').click()
+      getByText('Apply').click()
+      await waitFor(() => {
+        expect(props.setGradebookSettings).toHaveBeenCalledWith({
+          ...props.gradebookSettings,
+          scoreDisplayFormat: ScoreDisplayFormat.ICON_AND_LABEL,
+        })
       })
     })
   })

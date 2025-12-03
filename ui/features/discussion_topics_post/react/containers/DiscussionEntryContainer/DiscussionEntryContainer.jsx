@@ -21,7 +21,7 @@ import {AuthorInfo} from '../../components/AuthorInfo/AuthorInfo'
 import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
-import React, {useContext, useEffect, useRef, useCallback} from 'react'
+import React, {useContext, useEffect, useRef, useCallback, useMemo, useState} from 'react'
 import {getDisplayName, userNameToShow} from '../../utils'
 import {SearchContext} from '../../utils/constants'
 import {Attachment} from '../../../graphql/Attachment'
@@ -46,6 +46,56 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
   const replyRefs = useHighlightStore(state => state.replyRefs)
   const clearHighlighted = useHighlightStore(state => state.clearHighlighted)
   const highlightEl = useHighlightStore(state => state.highlightEl)
+
+  const [urlSearch, setUrlSearch] = useState(window.location.search)
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      setUrlSearch(window.location.search)
+    }
+
+    window.addEventListener('popstate', handleUrlChange)
+    const originalPushState = window.history.pushState
+    const originalReplaceState = window.history.replaceState
+
+    window.history.pushState = function (...args) {
+      originalPushState.apply(this, args)
+      handleUrlChange()
+    }
+
+    window.history.replaceState = function (...args) {
+      originalReplaceState.apply(this, args)
+      handleUrlChange()
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange)
+      window.history.pushState = originalPushState
+      window.history.replaceState = originalReplaceState
+    }
+  }, [])
+
+  const targetEntryId = useMemo(() => {
+    return new URLSearchParams(urlSearch).get('entry_id')
+  }, [urlSearch])
+
+  useEffect(() => {
+    if (
+      props.discussionEntry?._id &&
+      focusableElementRef.current &&
+      targetEntryId &&
+      props.discussionEntry._id === targetEntryId
+    ) {
+      const timeoutId = setTimeout(() => {
+        focusableElementRef.current.focus()
+        focusableElementRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
+      }, 100)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [props.discussionEntry?._id, targetEntryId])
 
   useEffect(() => {
     // TODO: Check the root entry if this is necessary to keep track of

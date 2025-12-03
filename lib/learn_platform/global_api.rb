@@ -105,7 +105,7 @@ module LearnPlatform
       end
     end
 
-    def self.lookup_api_registrations(redirect_uris, sources: [:partner_provided])
+    def self.lookup_api_registrations(redirect_uris, sources: [:partner_provided, :manual])
       return [] unless enabled?
       return [] if redirect_uris.blank? || redirect_uris.empty?
 

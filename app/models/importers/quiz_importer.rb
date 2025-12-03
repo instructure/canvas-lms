@@ -232,7 +232,7 @@ module Importers
       end
 
       item.saved_by = :migration
-      item.saving_user = migration.user
+      item.updating_user = migration.user
 
       # Putting date shift here since this is the first place where we save after the dates are set
       # This is important to avoid issues to try to put the shifted dates to the model and not update later
@@ -248,7 +248,7 @@ module Importers
       import_questions(item, hash, context, migration, question_data, new_record)
 
       # necessary to set again as the above can do item.reload
-      item.saving_user = migration.user
+      item.updating_user = migration.user
 
       if hash[:assignment]
         if hash[:assignment][:migration_id] && !hash[:assignment][:migration_id].start_with?(MasterCourses::MIGRATION_ID_PREFIX)
@@ -256,7 +256,14 @@ module Importers
         end
         item.assignment = nil if item.assignment&.quiz && item.assignment.quiz.id != item.id
         item.assignment ||= context.assignments.temp_record
-        item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
+
+        # For Quizzes.next, use the quiz's migration_id instead of the assignment's
+        assignment_hash = hash[:assignment].dup
+        if hash[:qti_new_quiz]
+          assignment_hash[:migration_id] = hash[:migration_id]
+        end
+
+        item.assignment = ::Importers::AssignmentImporter.import_from_migration(assignment_hash, context, migration, item.assignment, item)
         if migration.cc_qti_migration? && (migration.import_quizzes_next? || !!hash[:qti_new_quiz])
           migration.migration_settings[:quiz_next_imported] = true
           migration.save if migration.changed?
@@ -336,14 +343,6 @@ module Importers
       item.assignment.save_without_broadcasting if item.assignment&.changed?
       if recache_due_dates
         migration.find_imported_migration_item(Assignment, item.assignment.migration_id)&.needs_update_cached_due_dates = true
-      end
-
-      Quizzes::QuizQuestion.where(quiz_id: item.id).find_in_batches(of: 50) do |batch|
-        batch.each do |qq|
-          qq.force_attachment_associations_update = true
-          qq.saving_user = migration.user
-          qq.update_attachment_associations
-        end
       end
 
       migration.add_imported_item(item)

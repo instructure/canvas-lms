@@ -108,6 +108,39 @@ describe ContentMigration do
       expect(new_topic2.sort_by_rating).to be true
     end
 
+    it "copies sort order settings" do
+      topic1 = @copy_from.discussion_topics.create!(title: "ascending topic",
+                                                    message: "test",
+                                                    sort_order: "asc",
+                                                    sort_order_locked: true)
+      topic2 = @copy_from.discussion_topics.create!(title: "descending topic",
+                                                    message: "test",
+                                                    sort_order: "desc",
+                                                    sort_order_locked: false)
+      run_course_copy
+
+      new_topic1 = @copy_to.discussion_topics.where(migration_id: mig_id(topic1)).first
+      expect(new_topic1.sort_order).to eq "asc"
+      expect(new_topic1.sort_order_locked).to be true
+
+      new_topic2 = @copy_to.discussion_topics.where(migration_id: mig_id(topic2)).first
+      expect(new_topic2.sort_order).to eq "desc"
+      expect(new_topic2.sort_order_locked).to be false
+    end
+
+    it "does not propogate invalid sort order settings" do
+      topic = @copy_from.discussion_topics.create!(title: "ascending topic",
+                                                   message: "test",
+                                                   sort_order: "asc",
+                                                   sort_order_locked: true)
+      topic.update_column(:sort_order, "invalid")
+      run_course_copy
+
+      new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
+      expect(new_topic.sort_order).to eq "desc"
+      expect(new_topic.sort_order_locked).to be true
+    end
+
     describe "migrate_assignment_group_categories" do
       before :once do
         @group_category = @copy_from.group_categories.create!(name: "blah")

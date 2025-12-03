@@ -2942,6 +2942,7 @@ hu:
   allows_users_to_use_average_as_a_calculation_metho_874f4b25: "Engedélyezi a felhasználók számára, hogy egy adott tanulási eredményhez az átlagot használják számítási módszerként."
   allows_users_to_use_new_decaying_average_as_a_calc_9c285038: "Engedélyezi a felhasználók számára, hogy egy adott tanulási eredményhez új, csökkenő átlagot használjanak számítási módszerként."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Engedélyezi, hogy a nemzetközi telefonszámmal rendelkező hallgatók szöveges üzeneteket kapjanak a Canvas-tól."
+  alphabetical_55b5b4e0: Betűrendben
   alphabetically_60ab47e4: "Betűrend szerint"
   already_belongs_to_an_assignment_override_99fc6f36: "már egy hozzárendelés felülbírálásához tartozik"
   already_have_a_canvas_account_c4368ac9: "Már van Canvas-fiókja?"
@@ -23053,6 +23054,7 @@ hu:
         quiz_engine: "Kvíz motor"
         quiz_group: Csoport
         quiz_name: "Kvíz neve"
+        quiz_type: "Kvíz típusa"
         topic_name: "Téma neve"
         url: Link
         wiki_page_name: "Oldal neve"

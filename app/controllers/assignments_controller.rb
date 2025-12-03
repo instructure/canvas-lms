@@ -123,6 +123,12 @@ class AssignmentsController < ApplicationController
       (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
   end
 
+  def render_a2_peer_review_student_view?
+    @current_user.present? && @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
+      @assignment.peer_reviews && @context.feature_enabled?(:peer_review_allocation) &&
+      (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
+  end
+
   def a2_active_student_and_enrollment
     return [@current_user, @context_enrollment] unless @context_enrollment&.observer?
 
@@ -240,6 +246,28 @@ class AssignmentsController < ApplicationController
            })
     css_bundle :assignments_2_student
     js_bundle :assignments_show_student
+    render html: "", layout: true
+  end
+
+  def render_a2_peer_review_student_view
+    student_to_view, = a2_active_student_and_enrollment
+    unless student_to_view.present?
+      flash[:notice] = t "No student is being observed."
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
+      return
+    end
+
+    js_env({
+             ASSIGNMENT_ID: @assignment.id,
+           })
+
+    if @context.root_account.feature_enabled?(:instui_nav)
+      add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+      add_crumb(t("Peer Reviews"))
+    end
+
+    css_bundle :assignments_2_student
+    js_bundle :assignments_peer_reviews_student
     render html: "", layout: true
   end
 
@@ -578,6 +606,27 @@ class AssignmentsController < ApplicationController
     end
   end
 
+  # Provides an assignment's rubric to initialize enhanced rubric component
+  def rubric_data
+    assignment = @context.assignments.find(params[:assignment_id])
+
+    return unless authorized_action(assignment, @current_user, :update)
+
+    rubric_association = nil
+    assigned_rubric = nil
+    if assignment.active_rubric_association?
+      rubric_association = assignment.rubric_association
+      can_update_rubric = can_do(rubric_association.rubric, @current_user, :update)
+      assigned_rubric = rubric_json(rubric_association.rubric, @current_user, session, style: "full")
+      assigned_rubric[:unassessed] = Rubric.active.unassessed.where(id: rubric_association.rubric.id).exists?
+      assigned_rubric[:can_update] = can_update_rubric
+      assigned_rubric[:association_count] = RubricAssociation.active.where(rubric_id: rubric_association.rubric.id, association_type: "Assignment").count
+      rubric_association = rubric_association_json(rubric_association, @current_user, session)
+    end
+
+    render json: { assigned_rubric:, rubric_association: }
+  end
+
   def assign_peer_reviews
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
@@ -680,16 +729,21 @@ class AssignmentsController < ApplicationController
 
   def peer_reviews
     @assignment = @context.assignments.active.find(params[:assignment_id])
+
+    unless @assignment.has_peer_reviews?
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
+      return
+    end
+
+    if render_a2_peer_review_student_view?
+      return render_a2_peer_review_student_view
+    end
+
     js_env({
              ASSIGNMENT_ID: @assignment.id,
              COURSE_ID: @context.id
            })
     if authorized_action(@assignment, @current_user, :grade)
-      unless @assignment.has_peer_reviews?
-        redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
-        return
-      end
-
       if @context.root_account.feature_enabled?(:instui_nav)
         add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
         add_crumb(t("Peer Reviews"))
@@ -780,6 +834,7 @@ class AssignmentsController < ApplicationController
     end
 
     @assignment.quiz_lti! if params.key?(:quiz_lti) || params[:assignment][:quiz_lti]
+    update_new_quizzes_params(@assignment, params[:assignment])
 
     @assignment.workflow_state = "unpublished"
     @assignment.updating_user = @current_user
@@ -933,7 +988,7 @@ class AssignmentsController < ApplicationController
       end
 
       hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @assignment.new_record?
-      hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
+      hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false, include_peer_review: @context.feature_enabled?(:peer_review_grading))
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
       hash[:CANCEL_TO] = set_cancel_to_url

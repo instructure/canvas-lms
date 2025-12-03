@@ -36,15 +36,21 @@ class PeerReview::GroupOverrideCreatorService < PeerReview::GroupOverrideCommonS
             end
     validate_group_exists(group)
 
-    create_override(group)
+    ActiveRecord::Base.transaction do
+      parent_override = find_parent_override(set_id)
+      validate_group_parent_override_exists(parent_override, set_id)
+
+      create_override(group, parent_override)
+    end
   end
 
   private
 
-  def create_override(group)
+  def create_override(group, parent_override)
     override = @peer_review_sub_assignment.assignment_overrides.build(
       set: group,
-      dont_touch_assignment: true
+      dont_touch_assignment: true,
+      parent_override:
     )
     apply_overridden_dates(override, @override)
 

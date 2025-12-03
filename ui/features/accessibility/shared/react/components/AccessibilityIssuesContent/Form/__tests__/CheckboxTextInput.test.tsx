@@ -29,6 +29,9 @@ import {
   type AccessibilityCheckerContextType,
 } from '../../../../contexts/AccessibilityCheckerContext'
 import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
+import {useAccessibilityScansStore} from '../../../../stores/AccessibilityScansStore'
+
+jest.mock('../../../../stores/AccessibilityScansStore')
 
 // Create a fully typed mock context
 const mockContextValue: AccessibilityCheckerContextType = {
@@ -47,9 +50,12 @@ const mockContextValue: AccessibilityCheckerContextType = {
   setIsTrayOpen: jest.fn(),
 }
 
-// Reset mock implementation before each test
 beforeEach(() => {
   jest.resetAllMocks()
+  ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+    const state = {aiGenerationEnabled: true}
+    return selector(state)
+  })
 })
 
 describe('CheckboxTextInput', () => {
@@ -96,7 +102,7 @@ describe('CheckboxTextInput', () => {
     expect(screen.getByText('Test checkbox subtext')).toBeInTheDocument()
     expect(screen.getByText('Test TextArea Label')).toBeInTheDocument()
     expect(screen.getByText('Test input description')).toBeInTheDocument()
-    expect(screen.getByText('0/100')).toBeInTheDocument()
+    expect(screen.getByText('0/100 characters')).toBeInTheDocument()
   })
 
   it('toggles checkbox and disables/enables textarea accordingly', () => {
@@ -105,7 +111,9 @@ describe('CheckboxTextInput', () => {
         <CheckboxTextInput {...defaultProps} />
       </AccessibilityCheckerContext.Provider>,
     )
-    const checkbox = screen.getByLabelText('Test Checkbox Label')
+    const checkbox = screen.getByRole('checkbox', {
+      name: 'Test Checkbox Label Test checkbox subtext',
+    })
     const textarea = screen.getByTestId('checkbox-text-input-form')
 
     expect(checkbox).not.toBeChecked()
@@ -130,7 +138,9 @@ describe('CheckboxTextInput', () => {
         <CheckboxTextInput {...propsWithValue} />
       </AccessibilityCheckerContext.Provider>,
     )
-    const checkbox = screen.getByLabelText('Test Checkbox Label')
+    const checkbox = screen.getByRole('checkbox', {
+      name: 'Test Checkbox Label Test checkbox subtext',
+    })
 
     fireEvent.click(checkbox)
     expect(defaultProps.onChangeValue).toHaveBeenCalledWith('')
@@ -268,17 +278,219 @@ describe('CheckboxTextInput', () => {
     consoleErrorSpy.mockRestore()
   })
 
-  it('does not call onReload on initial mount', () => {
-    const onReload = jest.fn()
-    render(<CheckboxTextInput {...defaultProps} onReload={onReload} />)
-    expect(onReload).not.toHaveBeenCalled()
+  describe('onValidationChange callback', () => {
+    it('calls onValidationChange when user types valid text', async () => {
+      const onValidationChange = jest.fn()
+      const onChangeValue = jest.fn()
+
+      const {rerender} = render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput
+            {...defaultProps}
+            onValidationChange={onValidationChange}
+            onChangeValue={onChangeValue}
+          />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      onValidationChange.mockClear()
+
+      const textarea = screen.getByTestId('checkbox-text-input-form')
+      fireEvent.change(textarea, {target: {value: 'Valid alt text'}})
+
+      rerender(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput
+            {...defaultProps}
+            value="Valid alt text"
+            onValidationChange={onValidationChange}
+            onChangeValue={onChangeValue}
+          />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      await waitFor(() => {
+        expect(onValidationChange).toHaveBeenCalledWith(true, undefined)
+      })
+    })
+
+    it('calls onValidationChange when text exceeds max length', async () => {
+      const onValidationChange = jest.fn()
+      const onChangeValue = jest.fn()
+
+      const {rerender} = render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput
+            {...defaultProps}
+            onValidationChange={onValidationChange}
+            onChangeValue={onChangeValue}
+          />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      onValidationChange.mockClear()
+
+      const longText = 'a'.repeat(150)
+      const textarea = screen.getByTestId('checkbox-text-input-form')
+      fireEvent.change(textarea, {target: {value: longText}})
+
+      rerender(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput
+            {...defaultProps}
+            value={longText}
+            onValidationChange={onValidationChange}
+            onChangeValue={onChangeValue}
+          />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      await waitFor(() => {
+        expect(onValidationChange).toHaveBeenCalledWith(
+          false,
+          'Keep alt text under 100 characters.',
+        )
+      })
+    })
+
+    it('calls onValidationChange when checkbox is checked (decorative image)', async () => {
+      const onValidationChange = jest.fn()
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...defaultProps} onValidationChange={onValidationChange} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      onValidationChange.mockClear()
+
+      const checkbox = screen.getByRole('checkbox', {
+        name: 'Test Checkbox Label Test checkbox subtext',
+      })
+      fireEvent.click(checkbox)
+
+      expect(onValidationChange).toHaveBeenCalledWith(true, undefined)
+    })
+
+    it('calls onValidationChange when textarea is empty', async () => {
+      const onValidationChange = jest.fn()
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...defaultProps} onValidationChange={onValidationChange} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      expect(onValidationChange).toHaveBeenCalledWith(false, 'Alt text is required.')
+    })
   })
 
-  it('calls onReload when the value changes', async () => {
-    const onReload = jest.fn()
-    const {rerender} = render(<CheckboxTextInput {...defaultProps} onReload={onReload} />)
-    expect(onReload).not.toHaveBeenCalled()
-    rerender(<CheckboxTextInput {...defaultProps} onReload={onReload} value="test value" />)
-    expect(onReload).toHaveBeenCalledWith('test value')
+  describe('AI generation feature flag', () => {
+    it('shows generate button when feature flag is enabled', () => {
+      ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+        const state = {aiGenerationEnabled: true}
+        return selector(state)
+      })
+
+      const propsWithGenerateOption = {
+        ...defaultProps,
+        issue: {
+          ...defaultProps.issue,
+          form: {
+            ...defaultProps.issue.form,
+            canGenerateFix: true,
+            generateButtonLabel: 'Generate Alt Text',
+          },
+        },
+      }
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...propsWithGenerateOption} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      expect(screen.getByText('Generate Alt Text')).toBeInTheDocument()
+    })
+
+    it('hides generate button when feature flag is disabled', () => {
+      ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+        const state = {aiGenerationEnabled: false}
+        return selector(state)
+      })
+
+      const propsWithGenerateOption = {
+        ...defaultProps,
+        issue: {
+          ...defaultProps.issue,
+          form: {
+            ...defaultProps.issue.form,
+            canGenerateFix: true,
+            generateButtonLabel: 'Generate Alt Text',
+          },
+        },
+      }
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...propsWithGenerateOption} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      expect(screen.queryByText('Generate Alt Text')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('action buttons', () => {
+    it('renders custom action buttons when provided', () => {
+      const actionButtons = <button data-testid="custom-action-button">Custom Action</button>
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...defaultProps} actionButtons={actionButtons} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      expect(screen.getByTestId('custom-action-button')).toBeInTheDocument()
+      expect(screen.getByText('Custom Action')).toBeInTheDocument()
+    })
+
+    it('renders action buttons alongside generate button', () => {
+      const actionButtons = <button data-testid="custom-action-button">Custom Action</button>
+      const propsWithGenerateOption = {
+        ...defaultProps,
+        issue: {
+          ...defaultProps.issue,
+          form: {
+            ...defaultProps.issue.form,
+            canGenerateFix: true,
+            generateButtonLabel: 'Generate Alt Text',
+          },
+        },
+        actionButtons,
+      }
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...propsWithGenerateOption} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      expect(screen.getByText('Generate Alt Text')).toBeInTheDocument()
+      expect(screen.getByTestId('custom-action-button')).toBeInTheDocument()
+    })
+  })
+
+  describe('isDisabled prop', () => {
+    it('disables textarea when isDisabled is true', () => {
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...defaultProps} isDisabled={true} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      const textarea = screen.getByTestId('checkbox-text-input-form')
+      expect(textarea).toBeDisabled()
+    })
   })
 })

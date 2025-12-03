@@ -62,13 +62,13 @@ module Outcomes
       progress.process_job(self,
                            :perform_rollup_calculation,
                            {
-                             account_id:,
-                             outcome_id:,
                              priority: Delayed::LOW_PRIORITY,
                              singleton: singleton_key,
                              on_conflict: :use_earliest,
                              max_attempts: MAX_ATTEMPTS
-                           })
+                           },
+                           account_id:,
+                           outcome_id:)
 
       progress
     end
@@ -130,7 +130,7 @@ module Outcomes
     # @param course_batch [Array<Course>] Batch of courses to process
     def process_course_batch(course_batch)
       course_batch.each do |course|
-        StudentOutcomeRollupCalculationService.calculate_for_course_outcome(
+        CourseOutcomeRollupCalculationService.calculate_for_course_outcome(
           course_id: course.id,
           outcome_id: outcome.id
         )

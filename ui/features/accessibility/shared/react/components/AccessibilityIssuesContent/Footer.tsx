@@ -26,33 +26,33 @@ const I18n = createI18nScope('accessibility_checker')
 
 interface Props {
   nextButtonName: string
-  onNext: () => void
+  onSkip: () => void
   onSaveAndNext: () => void
   onBack?: () => void
   isBackDisabled?: boolean
-  isNextDisabled?: boolean
+  isSkipDisabled?: boolean
   isSaveAndNextDisabled?: boolean
 }
 
 const Footer: React.FC<Props> = ({
   nextButtonName,
-  onNext,
+  onSkip,
   onSaveAndNext,
   onBack,
   isBackDisabled,
-  isNextDisabled,
+  isSkipDisabled,
   isSaveAndNextDisabled,
 }: Props) => {
   return (
     <View as="footer" background="secondary">
-      <Flex justifyItems="space-between" alignItems="center" padding="x-small">
+      <Flex justifyItems="space-between" alignItems="center" padding="small">
         <Flex.Item>
-          <Flex gap="x-small">
+          <Flex gap="small">
             <Button data-testid="back-button" onClick={onBack} disabled={isBackDisabled}>
               {I18n.t('Back')}
             </Button>
-            <Button data-testid="next-button" onClick={onNext} disabled={isNextDisabled}>
-              {I18n.t('Next')}
+            <Button data-testid="skip-button" onClick={onSkip} disabled={isSkipDisabled}>
+              {I18n.t('Skip')}
             </Button>
           </Flex>
         </Flex.Item>

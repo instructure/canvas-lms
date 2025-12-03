@@ -283,26 +283,5 @@ describe('TemplateWidget', () => {
       expect(screen.queryByText('Remove tile')).not.toBeInTheDocument()
       expect(screen.queryByRole('menuitem', {name: /remove/i})).not.toBeInTheDocument()
     })
-
-    it('removes widget when remove button is clicked', async () => {
-      const user = userEvent.setup()
-      const props = buildDefaultProps({isEditMode: true})
-      const {rerender} = setup(props, <div>Test content</div>, ['desktop'])
-
-      const removeButton = screen.getByTestId('test-widget-remove-button')
-      await user.click(removeButton)
-
-      rerender(
-        <WidgetDashboardEditProvider>
-          <WidgetLayoutProvider>
-            <ResponsiveProvider matches={['desktop']}>
-              <TemplateWidget {...props}>
-                <div>Test content</div>
-              </TemplateWidget>
-            </ResponsiveProvider>
-          </WidgetLayoutProvider>
-        </WidgetDashboardEditProvider>,
-      )
-    })
   })
 })

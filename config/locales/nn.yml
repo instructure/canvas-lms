@@ -3304,6 +3304,7 @@ nn:
   allows_users_to_use_average_as_a_calculation_metho_874f4b25: "Lar brukarar bruke gjennomsnitt som berekningsmetode for læringsmål"
   allows_users_to_use_new_decaying_average_as_a_calc_9c285038: "Lar brukarar bruke nye avtakande gjennomsnitt som berekningsmetode for læringsmål."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gjer at brukarar med internasjonale telefonnummer kan ta imot tekstmeldingar frå Canvas."
+  alphabetical_55b5b4e0: Alfabetisk
   alphabetically_60ab47e4: Alfabetisk
   already_belongs_to_an_assignment_override_99fc6f36: "Tilhøyrer allereie til ei overstyring av oppgåve"
   already_have_a_canvas_account_c4368ac9: "Har du allereie ein Canvas brukar?"
@@ -24660,6 +24661,7 @@ nn:
         quiz_engine: Quizverktøy
         quiz_group: Gruppe
         quiz_name: Quiznamn
+        quiz_type: Quiztype
         topic_name: Emnenamn
         url: URL-adresse
         wiki_page_name: Sidenamn

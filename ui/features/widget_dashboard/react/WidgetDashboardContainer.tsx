@@ -65,6 +65,12 @@ const WidgetDashboardContainer: React.FC = () => {
   }
 
   const handleCancel = () => {
+    if (isDirty) {
+      const confirmed = window.confirm(
+        I18n.t('You have unsaved changes. Are you sure you want to cancel?'),
+      )
+      if (!confirmed) return
+    }
     resetConfig()
     exitEditMode()
   }

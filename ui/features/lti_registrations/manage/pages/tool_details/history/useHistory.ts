@@ -18,12 +18,13 @@
 
 import type {AccountId} from '../../../model/AccountId'
 import type {LtiRegistrationId} from '../../../model/LtiRegistrationId'
-import {useQuery} from '@tanstack/react-query'
+import {useInfiniteQuery, useQuery} from '@tanstack/react-query'
 import {queryify} from '@canvas/query/queryify'
 import {
   fetchLtiRegistrationOverlayHistory,
   fetchLtiRegistrationHistory,
 } from '../../../api/registrations'
+import {LinkInfo} from '@canvas/parse-link-header/parseLinkHeader'
 
 /**
  * The number of history entries to display in the UI.
@@ -42,15 +43,28 @@ export const useOverlayHistory = (accountId: AccountId, registrationId: LtiRegis
 }
 
 /**
- * Fetches the registration history for a given registration. Note that while the underlying query
- * supports pagination, the UI currently does not.
+ * Fetches the registration history for a given registration.
  * @param accountId The account ID to use when fetching the registration history
  * @param registrationId The registration ID to use when fetching the registration history
  * @returns
  */
 export const useRegistrationHistory = (accountId: AccountId, registrationId: LtiRegistrationId) => {
-  return useQuery({
-    queryKey: ['ltiRegistrationHistoryNew', accountId, registrationId, HISTORY_DISPLAY_LIMIT + 1],
-    queryFn: queryify(fetchLtiRegistrationHistory),
+  return useInfiniteQuery({
+    queryKey: ['ltiRegistrationHistoryNew', accountId, registrationId] as const,
+    queryFn: ({pageParam, queryKey: [, accountId, ltiRegistrationId]}) => {
+      if (pageParam !== null) {
+        return fetchLtiRegistrationHistory({url: pageParam.url})
+      } else {
+        return fetchLtiRegistrationHistory({accountId, ltiRegistrationId})
+      }
+    },
+    getNextPageParam: lastPage => {
+      if ('links' in lastPage && lastPage.links !== undefined && 'next' in lastPage.links) {
+        return lastPage.links.next
+      } else {
+        return null
+      }
+    },
+    initialPageParam: null as LinkInfo | null,
   })
 }

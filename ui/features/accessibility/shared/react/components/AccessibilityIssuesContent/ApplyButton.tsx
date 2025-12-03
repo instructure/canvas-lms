@@ -26,10 +26,6 @@ import {IconPublishSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 
-export interface ApplyButtonHandle {
-  focus: () => void
-}
-
 interface ApplyButtonProps {
   children: string
   undoMessage?: string
@@ -76,31 +72,25 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
 
   if (isApplied) {
     return (
-      <Flex gap="x-small">
-        <Flex.Item>
-          <PresentationContent>
-            <IconPublishSolid color="success" />
-          </PresentationContent>
-        </Flex.Item>
-        <Flex.Item>
-          <Text>{undoMessage || I18n.t('Issue fixed')}</Text>
-        </Flex.Item>
-        <Flex.Item>
-          <CondensedButton
-            data-testid="undo-button"
-            elementRef={e => (undoButtonRef.current = e as HTMLButtonElement)}
-            interaction={isLoading ? 'disabled' : 'enabled'}
-            onClick={handleUndo}
-          >
-            {isLoading ? (
-              <>
-                {I18n.t('Undo')} <Spinner size="x-small" renderTitle={I18n.t('Loading...')} />
-              </>
-            ) : (
-              I18n.t('Undo')
-            )}
-          </CondensedButton>
-        </Flex.Item>
+      <Flex gap="x-small" alignItems="center" display="inline-flex">
+        <PresentationContent>
+          <IconPublishSolid color="success" />
+        </PresentationContent>
+        <Text>{undoMessage || I18n.t('Issue fixed')}</Text>
+        <CondensedButton
+          data-testid="undo-button"
+          elementRef={e => (undoButtonRef.current = e as HTMLButtonElement)}
+          interaction={isLoading ? 'disabled' : 'enabled'}
+          onClick={handleUndo}
+        >
+          {isLoading ? (
+            <>
+              {I18n.t('Undo')} <Spinner size="x-small" renderTitle={I18n.t('Loading...')} />
+            </>
+          ) : (
+            I18n.t('Undo')
+          )}
+        </CondensedButton>
       </Flex>
     )
   } else {

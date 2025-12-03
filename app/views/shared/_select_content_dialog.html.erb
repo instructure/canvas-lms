@@ -270,7 +270,18 @@
             <tr>
               <td><%= before_label :quiz_name, "Quiz Name" %></td>
               <td><input type="text" name="quiz[title]" class="item_title" aria-label="<%= before_label :quiz_name, "Quiz Name" %>"/></td>
-            </tr><tr>
+            </tr>
+            <% if Account.site_admin.feature_enabled?(:new_quizzes_surveys) %>
+              <tr id="quiz_type_selector_row" style="display: none;">
+                <td style="vertical-align: top; text-align: left;"><%= before_label :quiz_type, "Quiz Type" %></td>
+                <td><div id="quiz_type_selector_mount_point"></div></td>
+              </tr>
+              <tr id="anonymous_submission_selector_row" style="display: none;">
+                <td style="vertical-align: top; text-align: left; width: 80px;"><%= before_label :anonymous_submission, "Anonymous Submission" %></td>
+                <td><div id="anonymous_submission_selector_mount_point"></div></td>
+              </tr>
+            <% end %>
+            <tr>
               <td><%= before_label :quiz_group, "Group" %></td>
               <td>
                 <select name="quiz[assignment_group_id]" aria-label="<%= before_label :quiz_group, "Group" %>">

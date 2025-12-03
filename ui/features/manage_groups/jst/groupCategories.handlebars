@@ -57,8 +57,6 @@
     {{/if}}
   </div>
 <div id="group_categories_tabs" class="ui-tabs-minimal">
-  <ul class='collectionViewItems'>
-  </ul>
   {{#if ENV.permissions.can_add_groups}}
     {{#unless ENV.horizon_course}}
     <div class='pull-right group-categories-actions'>
@@ -66,6 +64,8 @@
     </div>
     {{/unless}}
   {{/if}}
+  <ul class='collectionViewItems'>
+  </ul>
   <!--panels get inserted dynamically-->
 </div>
 

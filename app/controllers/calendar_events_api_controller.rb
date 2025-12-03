@@ -1679,7 +1679,7 @@ class CalendarEventsApiController < ApplicationController
     @section_codes = []
     if user
       @is_admin = user.roles(@domain_root_account).include?("admin") # if we're an admin - don't try to figure out which sections we belong to; just include all of them
-      @section_codes = user.section_context_codes(@context_codes, @is_admin)
+      @section_codes = user.section_context_codes(@context_codes, @is_admin, include_concluded: false)
     end
 
     if @type == :event && @start_date && user
@@ -1813,7 +1813,8 @@ class CalendarEventsApiController < ApplicationController
         next if contexts.empty?
 
         context_codes = contexts.map(&:asset_string)
-        relation = relation.for_user_and_context_codes(user, context_codes, user.section_context_codes(context_codes, @is_admin))
+        section_codes = user.section_context_codes(context_codes, @is_admin, include_concluded: false)
+        relation = relation.for_user_and_context_codes(user, context_codes, section_codes)
         relation = yield relation if block_given?
         relation = relation.send(*date_scope_and_args) unless @all_events
         relation = relation.with_important_dates if @important_dates

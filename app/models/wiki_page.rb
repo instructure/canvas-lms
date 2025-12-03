@@ -82,11 +82,13 @@ class WikiPage < ActiveRecord::Base
   before_validation :ensure_unique_title
   before_create :set_root_account_id
 
+  after_destroy :delete_from_pine, if: :eligible_for_pine_indexing?
   after_save  :touch_context
   after_save  :update_assignment,
               if: proc { context.try(:conditional_release?) }
   after_save :create_lookup, if: :should_create_lookup?
   after_save :delete_lookups, if: -> { !Account.site_admin.feature_enabled?(:permanent_page_links) && saved_change_to_workflow_state? && deleted? }
+  after_save :index_in_pine, if: :should_index_in_pine?
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
     # no assignment -> visible if wiki_page_visibilities has results
@@ -731,6 +733,25 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
+  # list of attributes tracked in Pine for Horizon course wiki pages
+  PINE_TRACKED_CHANGES = %w[title body workflow_state].freeze
+
+  def should_index_in_pine?
+    return false unless eligible_for_pine_indexing?
+    return false unless workflow_state == "active"
+
+    # Index if relevant fields changed
+    saved_changes.keys.intersect?(PINE_TRACKED_CHANGES)
+  end
+
+  def index_in_pine
+    delay(
+      n_strand: ["horizon_wiki_ingestion", context.global_root_account_id],
+      singleton: "horizon_wiki_ingestion:#{context.global_id}:#{id}",
+      max_attempts: 3
+    ).ingest_to_pine
+  end
+
   def ingest_to_pine
     return unless workflow_state == "active" && body.present?
     return unless context.is_a?(Course) && context.root_account.present?
@@ -757,5 +778,51 @@ class WikiPage < ActiveRecord::Base
   rescue => e
     Rails.logger.error("Failed to ingest wiki page #{id} for context #{context.class.name}:#{context.id}: #{e.message}")
     raise
+  end
+
+  def eligible_for_pine_indexing?
+    return false unless context.is_a?(Course)
+    return false unless context.horizon_course?
+    return false unless context.root_account.feature_enabled?(:horizon_learning_object_ingestion_on_change)
+    return false unless PineClient.enabled?
+
+    true
+  end
+
+  def delete_from_pine
+    return unless context.is_a?(Course) && context.root_account.present?
+
+    # PineClient requires a user object with uuid and global_id, but we don't have a user in this context
+    # and the action is more of a system-initiated action than a user-initiated action
+    null_user = Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil)
+
+    delay(
+      n_strand: ["horizon_wiki_deletion", context.global_root_account_id],
+      singleton: "horizon_wiki_deletion:#{context.global_id}:#{id}",
+      max_attempts: 3
+    ).delete_from_pine_job(null_user)
+  rescue => e
+    Rails.logger.error("Failed to queue Pine deletion for wiki page #{id} for context #{context.class.name}:#{context.id}: #{e.message}")
+    # Don't raise - we don't want to block the deletion if Pine is down
+  end
+
+  def delete_from_pine_job(null_user)
+    PineClient.delete_document(
+      source: "canvas",
+      source_id: id.to_s,
+      source_type: "wiki_page",
+      feature_slug: "horizon-content-ingestion",
+      root_account_uuid: context.root_account.uuid,
+      current_user: null_user
+    )
+  rescue => e
+    Rails.logger.error("Failed to delete wiki page #{id} from Pine for context #{context.class.name}:#{context.id}: #{e.message}")
+    raise
+  end
+
+  def a11y_scannable_attributes
+    # We need to run the scan on title and workflow_state change as well otherwise AccessibilityResourceScan will be out of date
+    # TODO: RCX-4463 remove title and workflow_state
+    %i[title body workflow_state]
   end
 end

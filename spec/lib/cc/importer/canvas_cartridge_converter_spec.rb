@@ -35,10 +35,7 @@ describe "Canvas Cartridge importing" do
     @exporter = CC::CCExporter.new(nil, course: @copy_from, user: @from_teacher, for_course_copy: true)
     manifest = CC::Manifest.new(@exporter)
     @resource = CC::Resource.new(manifest, nil)
-    @migration = ContentMigration.new
-    @migration.context = @copy_to
-    @migration.user = @user
-    @migration.save
+    @migration = ContentMigration.create!(context: @copy_to, user: @user)
   end
 
   it "imports assignment groups" do
@@ -381,6 +378,7 @@ describe "Canvas Cartridge importing" do
     lo_g2 = @copy_from.learning_outcome_groups.new
     lo_g2.context = @copy_from
     lo_g2.title = "Empty Group"
+    lo_g2.description = "<p>Yo</p>"
     lo_g2.save!
 
     lo2 = @copy_from.created_learning_outcomes.new
@@ -676,13 +674,15 @@ describe "Canvas Cartridge importing" do
                                            folder: Folder.unfiled_folder(@copy_to),
                                            context: @copy_to,
                                            migration_id: "ohai")
-    body_with_link = %{<p>Watup? <strong>eh?</strong>
-      <a href="/courses/%s/files/%s/preview">Preview File</a>
-      <a href="/courses/%s/files/%s/download">Download File</a>
-      <a href="/courses/%s/files/%s/download?wrap=1">Download (wrap) File</a>
-      <a href="/courses/%s/files/%s/bogus?someattr=1">Download (wrap) File</a>
-      </p>}
-    page = @copy_from.wiki_pages.create!(title: "some page", body: body_with_link % ([@copy_from.id, attachment.id] * 4), saving_user: @from_teacher)
+    body_with_link = <<~HTML.strip
+      <p>Watup? <strong>eh?</strong>
+        <a href="/courses/%{c}/files/%{f}/preview">Preview File</a>
+        <a href="/courses/%{c}/files/%{f}/download">Download File</a>
+        <a href="/courses/%{c}/files/%{f}/download?wrap=1">Download (wrap) File</a>
+        <a href="/courses/%{c}/files/%{f}/bogus?someattr=1">Download (wrap) File</a>
+      </p>
+    HTML
+    page = @copy_from.wiki_pages.create!(title: "some page", body: format(body_with_link, c: @copy_from.id, f: attachment.id), updating_user: @from_teacher)
     @copy_from.save!
 
     # export to html file
@@ -700,7 +700,7 @@ describe "Canvas Cartridge importing" do
     page_2 = @copy_to.wiki_pages.where(migration_id:).first
     expect(page_2.title).to eq page.title
     expect(page_2.url).to eq page.url
-    expect(page_2.body).to eq body_with_link % ([@copy_to.id, attachment_import.id] * 4)
+    expect(page_2.body).to eq format(body_with_link, c: @copy_to.id, f: attachment_import.id)
   end
 
   it "creates attachment_associations for syllabus attachment links on import" do
@@ -714,7 +714,7 @@ describe "Canvas Cartridge importing" do
       <p><img src="/courses/#{@copy_from.id}/files/#{image.id}/preview"></p>
       <p><iframe src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" data-media-id="#{media.media_entry_id}"></iframe></p>
     HTML
-    @copy_from.saving_user = @from_teacher
+    @copy_from.updating_user = @from_teacher
     @copy_from.update!(syllabus_body: body)
 
     # export to html file
@@ -858,18 +858,22 @@ describe "Canvas Cartridge importing" do
       path = @to_att.full_display_path.gsub("course files/", "")
       @migration.attachment_path_id_lookup = { path => @to_att.migration_id }
 
-      @body_with_link = %(<p>Watup? <strong>eh?</strong>
-        <a href="/courses/%s/assignments">Assignments</a>
-        <a href="/courses/%s/file_contents/course%%20files/tbe_banner.jpg">Some file</a>
-        <a href="/courses/%s/pages/#{CC::CCHelper.create_key(@page)}">Assignments wiki link</a>
-        <a href="/courses/%s/modules">Modules</a>
-        <a href="/courses/%s/modules/%s">some module</a>
-        <img src="/courses/%s/files/%s/preview" alt="picture.png" /></p>
+      @body_with_link = <<~HTML.strip
+        <p>Watup? <strong>eh?</strong>
+          <a href="/courses/%{c}/assignments">Assignments</a>
+          <a href="/courses/%{c}/file_contents/course%%20files/tbe_banner.jpg">Some file</a>
+          <a href="/courses/%{c}/pages/#{CC::CCHelper.create_key(@page)}">Assignments wiki link</a>
+          <a href="/courses/%{c}/modules">Modules</a>
+          <a href="/courses/%{c}/modules/%{m}">some module</a>
+          <img src="/courses/%{c}/files/%{a}/preview" alt="picture.png" />
+        </p>
         <div>
           <div><img src="http://www.instructure.com/images/header-logo.png"></div>
           <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-        </div>)
-      @page = @copy_from.wiki_pages.create!(title: "some page", body: @body_with_link % [@copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @mod.id, @copy_from.id, from_att.id], editing_roles: "teachers", notify_of_update: true, saving_user: @user)
+        </div>
+      HTML
+      @page = @copy_from.wiki_pages.create!(title: "some page", editing_roles: "teachers", notify_of_update: true, updating_user: @user)
+      @page.body = format(@body_with_link, c: @copy_from.id, m: @mod.id, a: from_att.id)
       @page.workflow_state = "unpublished"
       @copy_from.save!
 
@@ -899,7 +903,7 @@ describe "Canvas Cartridge importing" do
       expect(page_2.url).to eq @page.url
       expect(page_2.editing_roles).to eq @page.editing_roles
       expect(page_2.notify_of_update).to eq @page.notify_of_update
-      expect(page_2.body).to eq (@body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @mod2.id, @copy_to.id, @to_att.id]).gsub(%r{png" />}, 'png">')
+      expect(page_2.body).to eq(format(@body_with_link, c: @copy_to.id, m: @mod2.id, a: @to_att.id).gsub(%r{png" />}, 'png">'))
       expect(page_2.unpublished?).to be true
     end
 
@@ -921,7 +925,7 @@ describe "Canvas Cartridge importing" do
       expect(page_2.url).to eq @page.url
       expect(page_2.editing_roles).to eq @page.editing_roles
       expect(page_2.notify_of_update).to eq @page.notify_of_update
-      expect(page_2.body).to eq (@body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @mod2.id, @copy_to.id, @to_att.id]).gsub(%r{png" />}, 'png">')
+      expect(page_2.body).to eq(format(@body_with_link, c: @copy_to.id, m: @mod2.id, a: @to_att.id).gsub(%r{png" />}, 'png">'))
       expect(page_2.unpublished?).to be true
     end
 
@@ -997,11 +1001,14 @@ describe "Canvas Cartridge importing" do
                                                                        "description" => "yes",
                                                                        "grading_type" => "yes" })
 
-    body_with_link = %(<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
-<div>
-  <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-  <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-</div>)
+    body_with_link = <<~HTML.strip
+      <p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
+      <div>
+        <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+        <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+      </div>
+    HTML
+
     asmnt = @copy_from.assignments.new
     asmnt.title = "Nothing Assignment"
     asmnt.description = body_with_link % @copy_from.id
@@ -1240,8 +1247,8 @@ describe "Canvas Cartridge importing" do
     group2.save!
     hash[:group_id] = group2.migration_id
 
-    cm = ContentMigration.new(context: @copy_to, copy_options: { everything: "1" })
-    Importers::DiscussionTopicImporter.process_discussion_topics_migration([hash], cm)
+    @migration.copy_options = { everything: "1" }
+    Importers::DiscussionTopicImporter.process_discussion_topics_migration([hash], @migration)
 
     dt_2 = group2.discussion_topics.where(migration_id:).first
     expect(dt_2.title).to eq dt.title
@@ -1351,9 +1358,8 @@ describe "Canvas Cartridge importing" do
 
     data = { "assignments" => [assignment_hash], "assessments" => { "assessments" => [quiz_hash] } }
 
-    migration = ContentMigration.create(context: @copy_to)
-    migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
-    Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+    @migration.copy_options = { everything: "1" }
+    Importers::CourseContentImporter.import_content(@copy_to, data, nil, @migration)
 
     q = @copy_to.quizzes.where(migration_id: "quizmigrationid").first
     a = @copy_to.assignments.where(migration_id: "assignmentmigrationid").first
@@ -1405,16 +1411,15 @@ describe "Canvas Cartridge importing" do
       }
     }.with_indifferent_access
 
-    migration = ContentMigration.create(context: @copy_to)
-    allow(migration).to receive(:canvas_import?).and_return(true)
-    migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
-    Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+    allow(@migration).to receive(:canvas_import?).and_return(true)
+    @migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
+    Importers::CourseContentImporter.import_content(@copy_to, data, nil, @migration)
 
     expect(mo.media_tracks.where(locale: "en").first.content).to eql("pretend this is a track file")
     expect(mo.media_tracks.where(locale: "tlh").first.content).to eql("Qapla'")
     expect(mo.media_tracks.where(locale: "bad").first).to be_nil
 
-    expect(migration.migration_issues.map(&:description)).to include "Subtitles (bad) could not be imported for media.flv"
+    expect(@migration.migration_issues.map(&:description)).to include "Subtitles (bad) could not be imported for media.flv"
 
     expect(@copy_to.attachments.where(migration_id: "abc").first).to be_deleted
     expect(@copy_to.attachments.where(migration_id: "def").first).to be_deleted
@@ -1436,12 +1441,11 @@ describe "Canvas Cartridge importing" do
         ]
       }
     end
-    let(:migration) { ContentMigration.create(context: @copy_to) }
 
     it "process migration from LtiResourceLinkImporter" do
-      expect(Importers::LtiResourceLinkImporter).to receive(:process_migration).once.with(data, migration)
+      expect(Importers::LtiResourceLinkImporter).to receive(:process_migration).once.with(data, @migration)
 
-      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, @migration)
     end
   end
 
@@ -1463,15 +1467,14 @@ describe "Canvas Cartridge importing" do
         }
       }.with_indifferent_access
 
-      migration = ContentMigration.create(context: @copy_to)
-      migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
-      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+      @migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, @migration)
 
       bank = @copy_to.assessment_question_banks.first
       question = @copy_to.assessment_questions.first
 
-      expect(migration.migration_issues.count).to eq 1
-      warning = migration.migration_issues.first
+      expect(@migration.migration_issues.count).to eq 1
+      warning = @migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
       expect(warning.description.start_with?("Missing links found in imported content")).to be true
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/question_banks/#{bank.id}#question_#{question.id}_question_text"
@@ -1498,14 +1501,13 @@ describe "Canvas Cartridge importing" do
         }]
       }.with_indifferent_access
 
-      migration = ContentMigration.create(context: @copy_to)
-      migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
-      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+      @migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, @migration)
 
       a = @copy_to.assignments.first
 
-      expect(migration.migration_issues.count).to eq 1
-      warning = migration.migration_issues.first
+      expect(@migration.migration_issues.count).to eq 1
+      warning = @migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
       expect(warning.description.start_with?("Missing links found in imported content")).to be true
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/assignments/#{a.id}"
@@ -1554,12 +1556,11 @@ describe "Canvas Cartridge importing" do
         }
       }.with_indifferent_access
 
-      migration = ContentMigration.create(context: @copy_to)
-      migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
-      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+      @migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, @migration)
 
-      expect(migration.migration_issues.count).to eq 1
-      warning = migration.migration_issues.first
+      expect(@migration.migration_issues.count).to eq 1
+      warning = @migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
       expect(warning.description.start_with?("Missing links found in imported content")).to be true
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/assignments/syllabus"
@@ -1587,16 +1588,15 @@ describe "Canvas Cartridge importing" do
                                 }]
       }.with_indifferent_access
 
-      migration = ContentMigration.create(context: @copy_to)
-      migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
-      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+      @migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, @migration)
 
       topic1 = @copy_to.discussion_topics.where(migration_id: "iaccaf448c9f5218ff2a89d1d846b5224").first
       topic2 = @copy_to.discussion_topics.where(migration_id: "iaccaf448c9f5218ff2a89d1d846b52242").first
 
-      expect(migration.migration_issues.count).to eq 2
+      expect(@migration.migration_issues.count).to eq 2
 
-      warnings = migration.migration_issues.sort_by(&:fix_issue_html_url)
+      warnings = @migration.migration_issues.sort_by(&:fix_issue_html_url)
       warning1 = warnings[0]
       expect(warning1.issue_type).to eq "warning"
       expect(warning1.description.start_with?("Missing links found in imported content")).to be true
@@ -1638,14 +1638,13 @@ describe "Canvas Cartridge importing" do
         }
       }.with_indifferent_access
 
-      migration = ContentMigration.create(context: @copy_to)
-      migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
-      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+      @migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, @migration)
 
       quiz = @copy_to.quizzes.first
 
-      expect(migration.migration_issues.count).to eq 1
-      warning = migration.migration_issues.first
+      expect(@migration.migration_issues.count).to eq 1
+      warning = @migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
       expect(warning.description.start_with?("Missing links found in imported content")).to be true
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/quizzes/#{quiz.id}"
@@ -1689,14 +1688,13 @@ describe "Canvas Cartridge importing" do
         }
       }.with_indifferent_access
 
-      migration = ContentMigration.create(context: @copy_to)
-      migration.migration_settings[:migration_ids_to_import] = { copy: { "all_quizzes" => 1 } }
-      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+      @migration.migration_settings[:migration_ids_to_import] = { copy: { "all_quizzes" => 1 } }
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, @migration)
 
       quiz = @copy_to.quizzes.first
 
-      expect(migration.migration_issues.count).to eq 1
-      warning = migration.migration_issues.first
+      expect(@migration.migration_issues.count).to eq 1
+      warning = @migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
       expect(warning.description.start_with?("Missing links found in imported content")).to be true
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/quizzes/#{quiz.id}/edit"
@@ -1715,104 +1713,103 @@ describe "Canvas Cartridge importing" do
         }]
       }.with_indifferent_access
 
-      migration = ContentMigration.create(context: @copy_to)
-      migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
-      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+      @migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, @migration)
 
       wiki = @copy_to.wiki_pages.where(migration_id: "i642b8969dbfa332fd96ec9029e96156a").first
-      expect(migration.migration_issues.count).to eq 1
-      warning = migration.migration_issues.first
+      expect(@migration.migration_issues.count).to eq 1
+      warning = @migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
       expect(warning.description.start_with?("Missing links found in imported content")).to be true
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/pages/#{wiki.url}"
       expect(warning.error_message).to include("body")
     end
   end
-end
 
-describe "cc assignment extensions" do
-  before(:once) do
-    archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_assignment_extension.zip")
-    unzipped_file_path = create_temp_dir!
-    converter = CC::Importer::Canvas::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
-    converter.export
-    @course_data = converter.course.with_indifferent_access
+  describe "cc assignment extensions" do
+    before(:once) do
+      archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_assignment_extension.zip")
+      unzipped_file_path = create_temp_dir!
+      converter = CC::Importer::Canvas::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
+      converter.export
+      @course_data = converter.course.with_indifferent_access
+    end
 
-    @course = course_factory
-    @migration = ContentMigration.create(context: @course)
-    @migration.migration_type = "canvas_cartridge_importer"
-    @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
-    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+    before do
+      @migration.migration_type = "canvas_cartridge_importer"
+      @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+    end
+
+    it "parses canvas data from cc extension" do
+      expect(@migration.migration_issues.count).to eq 0
+
+      att = @course.attachments.where(migration_id: "ieee173de6109d169c627d07bedae0595").first
+
+      # see common_cartridge_converter_spec
+      # should get all the cc assignments
+      expect(@course.assignments.count).to eq 3
+      assignment1 = @course.assignments.where(migration_id: "icd613a5039d9a1539e100058efe44242").first
+      expect(assignment1.grading_type).to eq "pass_fail"
+      expect(assignment1.points_possible).to eq 20
+      expect(assignment1.description).to include("<img src=\"/courses/#{@course.id}/files/#{att.id}/preview\" alt=\"dana_small.png\">")
+      expect(assignment1.submission_types).to eq "online_text_entry,online_url,media_recording,online_upload" # overridden
+
+      assignment2 = @course.assignments.where(migration_id: "icd613a5039d9a1539e100058efe44242copy").first
+      expect(assignment2.grading_type).to eq "points"
+      expect(assignment2.points_possible).to eq 21
+      expect(assignment2.description).to include("hi, the canvas meta stuff does not have submission types")
+      expect(assignment2.submission_types).to eq "online_upload,online_text_entry,online_url"
+
+      # and the canvas only one as well
+      assignment3 = @course.assignments.where(migration_id: "ifb359e06083b6eb3a294a7ac2c69e451").first
+      expect(assignment3.description).to include("This is left to all custom canvas stuff.")
+      expect(assignment3.workflow_state).to eq "unpublished"
+    end
   end
 
-  it "parses canvas data from cc extension" do
-    expect(@migration.migration_issues.count).to eq 0
-
-    att = @course.attachments.where(migration_id: "ieee173de6109d169c627d07bedae0595").first
-
-    # see common_cartridge_converter_spec
-    # should get all the cc assignments
-    expect(@course.assignments.count).to eq 3
-    assignment1 = @course.assignments.where(migration_id: "icd613a5039d9a1539e100058efe44242").first
-    expect(assignment1.grading_type).to eq "pass_fail"
-    expect(assignment1.points_possible).to eq 20
-    expect(assignment1.description).to include("<img src=\"/courses/#{@course.id}/files/#{att.id}/preview\" alt=\"dana_small.png\">")
-    expect(assignment1.submission_types).to eq "online_text_entry,online_url,media_recording,online_upload" # overridden
-
-    assignment2 = @course.assignments.where(migration_id: "icd613a5039d9a1539e100058efe44242copy").first
-    expect(assignment2.grading_type).to eq "points"
-    expect(assignment2.points_possible).to eq 21
-    expect(assignment2.description).to include("hi, the canvas meta stuff does not have submission types")
-    expect(assignment2.submission_types).to eq "online_upload,online_text_entry,online_url"
-
-    # and the canvas only one as well
-    assignment3 = @course.assignments.where(migration_id: "ifb359e06083b6eb3a294a7ac2c69e451").first
-    expect(assignment3.description).to include("This is left to all custom canvas stuff.")
-    expect(assignment3.workflow_state).to eq "unpublished"
-  end
-end
-
-describe "matching question reordering" do
-  before(:once) do
-    skip unless Qti.qti_enabled?
-    archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/canvas_matching_reorder.zip")
-    unzipped_file_path = create_temp_dir!
-    converter = CC::Importer::Canvas::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
-    converter.export
-    @course_data = converter.course.with_indifferent_access
-
-    @course = course_factory
-    @migration = ContentMigration.create(context: @course)
-    @migration.migration_type = "common_cartridge_importer"
-    @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
-    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
-  end
-
-  it "reorders matching question answers with images if possible (and warn otherwise)" do
-    expect(@migration.migration_issues.count).to eq 2
-    expect(@course.assessment_questions.count).to eq 3
-
-    broken1 = @course.assessment_questions.where(migration_id: "m20b544d870a086de6e59b79e6dd9186cf_quiz_question").first
-    mi1 = @migration.migration_issues.detect do |mi|
-      mi.description ==
-        "Imported matching question contains images on both sides, which is unsupported"
+  describe "matching question reordering" do
+    before(:once) do
+      skip unless Qti.qti_enabled?
+      archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/canvas_matching_reorder.zip")
+      unzipped_file_path = create_temp_dir!
+      converter = CC::Importer::Canvas::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
+      converter.export
+      @course_data = converter.course.with_indifferent_access
     end
-    expect(mi1.fix_issue_html_url.include?("question_#{broken1.id}_question_text")).to be true
 
-    broken2 = @course.assessment_questions.where(migration_id: "m22b544d870a086de6e59b79e6dd9186be_quiz_question").first
-    mi2 = @migration.migration_issues.detect do |mi|
-      mi.description ==
-        "Imported matching question contains images inside the choices, and could not be fixed because it also contains distractors"
+    before do
+      @migration.migration_type = "common_cartridge_importer"
+      @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
-    expect(mi2.fix_issue_html_url.include?("question_#{broken2.id}_question_text")).to be true
 
-    fixed = @course.assessment_questions.where(migration_id: "m21e0c78d05b78dc312bbc0dc77b963781_quiz_question").first
-    fixed.question_data[:answers].each do |answer|
-      expect(Nokogiri::HTML5(answer[:left_html]).at_css("img")).to be_present
-      expect(Nokogiri::HTML5(answer[:right]).at_css("img")).to be_blank
-    end
-    fixed.question_data[:matches].each do |match|
-      expect(Nokogiri::HTML5(match[:text]).at_css("img")).to be_blank
+    it "reorders matching question answers with images if possible (and warn otherwise)" do
+      expect(@migration.migration_issues.count).to eq 2
+      expect(@course.assessment_questions.count).to eq 3
+
+      broken1 = @course.assessment_questions.where(migration_id: "m20b544d870a086de6e59b79e6dd9186cf_quiz_question").first
+      mi1 = @migration.migration_issues.detect do |mi|
+        mi.description ==
+          "Imported matching question contains images on both sides, which is unsupported"
+      end
+      expect(mi1.fix_issue_html_url.include?("question_#{broken1.id}_question_text")).to be true
+
+      broken2 = @course.assessment_questions.where(migration_id: "m22b544d870a086de6e59b79e6dd9186be_quiz_question").first
+      mi2 = @migration.migration_issues.detect do |mi|
+        mi.description ==
+          "Imported matching question contains images inside the choices, and could not be fixed because it also contains distractors"
+      end
+      expect(mi2.fix_issue_html_url.include?("question_#{broken2.id}_question_text")).to be true
+
+      fixed = @course.assessment_questions.where(migration_id: "m21e0c78d05b78dc312bbc0dc77b963781_quiz_question").first
+      fixed.question_data[:answers].each do |answer|
+        expect(Nokogiri::HTML5(answer[:left_html]).at_css("img")).to be_present
+        expect(Nokogiri::HTML5(answer[:right]).at_css("img")).to be_blank
+      end
+      fixed.question_data[:matches].each do |match|
+        expect(Nokogiri::HTML5(match[:text]).at_css("img")).to be_blank
+      end
     end
   end
 
@@ -1823,9 +1820,9 @@ describe "matching question reordering" do
       converter = CC::Importer::Canvas::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
       converter.export
       @course_data = converter.course.with_indifferent_access
+    end
 
-      @course = course_factory
-      @migration = ContentMigration.create(context: @course)
+    before do
       @migration.migration_type = "canvas_cartridge_importer"
     end
 
