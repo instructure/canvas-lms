@@ -2387,6 +2387,11 @@ type Course implements AssetString & AssignmentsConnectionInterface & Discussion
   course cards)
   """
   imageUrl: URL
+
+  """
+  Returns module progression statistics for the current user
+  """
+  moduleProgressionStatistics: ModuleProgressionStatistics
   modulesConnection(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -6615,6 +6620,13 @@ type ModuleProgressionEdge {
   The item at the end of the edge.
   """
   node: ModuleProgression
+}
+
+type ModuleProgressionStatistics {
+  completedModulesCount: Int!
+  inProgressModulesCount: Int!
+  lockedModulesCount: Int!
+  totalModulesCount: Int!
 }
 
 type ModuleStatistics {
