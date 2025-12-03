@@ -143,7 +143,9 @@ class GradeSummaryPresenter
     @assignments ||= begin
       visible_assignments = assignments_for_student
       overridden_assignments = assignments_overridden_for_student(visible_assignments)
-      sorted_assignments(overridden_assignments)
+      peer_reviews = peer_review_assignments_for_student(overridden_assignments)
+      all_assignments = overridden_assignments + peer_reviews
+      sorted_assignments(all_assignments)
     end
   end
 
@@ -202,6 +204,26 @@ class GradeSummaryPresenter
       end
       assignment.overridden_for(student)
     end
+  end
+
+  def peer_review_assignments_for_student(assignments)
+    return [] unless @context.feature_enabled?(:peer_review_allocation_and_grading)
+
+    parent_with_reviews = assignments.select(&:peer_reviews?)
+    return [] if parent_with_reviews.blank?
+
+    parent_assignment_ids = parent_with_reviews.map(&:id)
+
+    includes = %i[assignment_overrides context post_policy]
+    includes += [:discussion_topic, :grading_standard, :rubric_association, :quiz, :wiki_page, { external_tool_tag: :content }] if preload_optimizations_enabled?
+
+    peer_reviews = PeerReviewSubAssignment
+                   .where(parent_assignment_id: parent_assignment_ids)
+                   .active
+                   .preload(*includes)
+                   .to_a
+
+    assignments_overridden_for_student(peer_reviews)
   end
 
   def sorted_assignments(assignments)
