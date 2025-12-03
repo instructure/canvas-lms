@@ -602,6 +602,14 @@ module Types
       end
     end
 
+    field :module_progression_statistics, ModuleProgressionStatisticsType, "Returns module progression statistics for the current user", null: true
+    def module_progression_statistics
+      return nil unless course.grants_right?(current_user, :read)
+      return nil unless current_user
+
+      Loaders::CourseModuleProgressionDataLoader.for(current_user:).load(course)
+    end
+
     field :allow_final_grade_override, Boolean, null: true
     def allow_final_grade_override
       course.allow_final_grade_override?
