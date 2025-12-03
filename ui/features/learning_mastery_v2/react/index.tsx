@@ -38,6 +38,7 @@ import {useGradebookSettings} from './hooks/useGradebookSettings'
 import {saveLearningMasteryGradebookSettings, saveOutcomeOrder} from './apiClient'
 import {Outcome} from './types/rollup'
 import {useContributingScores} from './hooks/useContributingScores'
+import {StudentAssignmentDetailTray} from './components/trays/StudentAssignmentDetailTray'
 
 const queryClient = new QueryClient()
 
@@ -72,6 +73,13 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
 
   const [isSavingSettings, setIsSavingSettings] = useState(false)
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
+  const [studentAssignmentTrayState, setStudentAssignmentTrayState] = useState<{
+    isOpen: boolean
+    outcome: Outcome | null
+  }>({
+    isOpen: false,
+    outcome: null,
+  })
 
   const {
     isLoading: isLoadingGradebook,
@@ -167,6 +175,20 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     [courseId, outcomes],
   )
 
+  const handleOpenStudentAssignmentTray = useCallback((outcome: Outcome) => {
+    setStudentAssignmentTrayState({
+      isOpen: true,
+      outcome,
+    })
+  }, [])
+
+  const handleCloseStudentAssignmentTray = useCallback(() => {
+    setStudentAssignmentTrayState({
+      isOpen: false,
+      outcome: null,
+    })
+  }, [])
+
   const renderBody = () => {
     if (error !== null || contributingScoresError !== null)
       return (
@@ -194,6 +216,7 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
         onChangeNameDisplayFormat={handleNameDisplayFormatChange}
         onOutcomesReorder={handleOutcomesReorder}
         contributingScores={contributingScores}
+        onOpenStudentAssignmentTray={handleOpenStudentAssignmentTray}
         data-testid="gradebook-body"
       />
     )
@@ -220,6 +243,13 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
       )}
       <FilterWrapper pagination={pagination} onPerPageChange={handleUpdateStudentsPerPage} />
       {renderBody()}
+      {studentAssignmentTrayState.isOpen && studentAssignmentTrayState.outcome && (
+        <StudentAssignmentDetailTray
+          open={studentAssignmentTrayState.isOpen}
+          onDismiss={handleCloseStudentAssignmentTray}
+          outcome={studentAssignmentTrayState.outcome}
+        />
+      )}
     </>
   )
 }

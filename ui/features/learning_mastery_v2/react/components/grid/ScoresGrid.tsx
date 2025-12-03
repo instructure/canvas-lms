@@ -17,12 +17,12 @@
  */
 import React, {useMemo, Fragment} from 'react'
 import {keyBy} from 'es-toolkit/compat'
-import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {StudentOutcomeScore} from './StudentOutcomeScore'
 import {Student, Outcome, StudentRollupData, OutcomeRollup} from '../../types/rollup'
-import {COLUMN_WIDTH, COLUMN_PADDING, CELL_HEIGHT, ScoreDisplayFormat} from '../../utils/constants'
+import {ScoreDisplayFormat} from '../../utils/constants'
 import {ContributingScoresManager} from '../../hooks/useContributingScores'
+import {Cell} from './Cell'
 
 export interface ScoresGridProps {
   students: Student[]
@@ -30,6 +30,7 @@ export interface ScoresGridProps {
   rollups: StudentRollupData[]
   scoreDisplayFormat?: ScoreDisplayFormat
   contributingScores: ContributingScoresManager
+  onOpenStudentAssignmentTray?: (outcome: Outcome) => void
 }
 
 interface ExtendedOutcomeRollup extends OutcomeRollup {
@@ -41,6 +42,7 @@ interface ContributingScoreCellsProps {
   student: Student
   contributingScores: ContributingScoresManager
   outcome: Outcome
+  onScoreClick?: () => void
 }
 
 const ContributingScoreCells: React.FC<ContributingScoreCellsProps> = ({
@@ -48,6 +50,7 @@ const ContributingScoreCells: React.FC<ContributingScoreCellsProps> = ({
   student,
   outcome,
   scoreDisplayFormat,
+  onScoreClick,
 }) => {
   const contributingScoresForOutcome = contributingScores.forOutcome(outcome.id)
   const isVisible = contributingScoresForOutcome.isVisible()
@@ -56,37 +59,30 @@ const ContributingScoreCells: React.FC<ContributingScoreCellsProps> = ({
     <Fragment>
       {isVisible &&
         scores.map((score, scoreIndex) => (
-          <Flex.Item
-            size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}
+          <Cell
+            background="secondary"
             data-testid={`contributing-score-${student.id}-${outcome.id}-${scoreIndex}`}
             key={`contributing-score-${student.id}-${outcome.id}-${scoreIndex}`}
           >
-            <View
-              as="div"
-              height={CELL_HEIGHT}
-              borderWidth="0 0 small 0"
-              width={COLUMN_WIDTH}
-              overflowX="auto"
-              background="secondary"
-            >
-              <StudentOutcomeScore
-                score={score}
-                outcome={outcome}
-                scoreDisplayFormat={scoreDisplayFormat}
-              />
-            </View>
-          </Flex.Item>
+            <StudentOutcomeScore
+              score={score}
+              outcome={outcome}
+              scoreDisplayFormat={scoreDisplayFormat}
+              onScoreClick={onScoreClick}
+            />
+          </Cell>
         ))}
     </Fragment>
   )
 }
 
-export const ScoresGrid: React.FC<ScoresGridProps> = ({
+const ScoresGridComponent: React.FC<ScoresGridProps> = ({
   students,
   outcomes,
   rollups,
   scoreDisplayFormat = ScoreDisplayFormat.ICON_ONLY,
   contributingScores,
+  onOpenStudentAssignmentTray,
 }) => {
   const rollupsByStudentAndOutcome = useMemo(() => {
     const outcomeRollups = rollups.flatMap(r =>
@@ -96,7 +92,10 @@ export const ScoresGrid: React.FC<ScoresGridProps> = ({
       })),
     ) as ExtendedOutcomeRollup[]
 
-    return keyBy(outcomeRollups, ({studentId, outcomeId}) => `${studentId}_${outcomeId}`)
+    return keyBy(
+      outcomeRollups,
+      ({studentId, outcomeId}: ExtendedOutcomeRollup) => `${studentId}_${outcomeId}`,
+    )
   }, [rollups])
 
   return (
@@ -105,29 +104,23 @@ export const ScoresGrid: React.FC<ScoresGridProps> = ({
         <Flex direction="row" key={student.id}>
           {outcomes.map((outcome, index) => (
             <Fragment key={`${student.id}-${outcome.id}-${index}`}>
-              <Flex.Item
-                size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}
-                data-testid={`student-outcome-score-${student.id}-${outcome.id}`}
-              >
-                <View
-                  as="div"
-                  height={CELL_HEIGHT}
-                  borderWidth="0 0 small 0"
-                  width={COLUMN_WIDTH}
-                  overflowX="auto"
-                >
-                  <StudentOutcomeScore
-                    score={rollupsByStudentAndOutcome[`${student.id}_${outcome.id}`]?.score}
-                    outcome={outcome}
-                    scoreDisplayFormat={scoreDisplayFormat}
-                  />
-                </View>
-              </Flex.Item>
+              <Cell data-testid={`student-outcome-score-${student.id}-${outcome.id}`}>
+                <StudentOutcomeScore
+                  score={rollupsByStudentAndOutcome[`${student.id}_${outcome.id}`]?.score}
+                  outcome={outcome}
+                  scoreDisplayFormat={scoreDisplayFormat}
+                />
+              </Cell>
               <ContributingScoreCells
                 contributingScores={contributingScores}
                 student={student}
                 outcome={outcome}
                 scoreDisplayFormat={scoreDisplayFormat}
+                onScoreClick={
+                  onOpenStudentAssignmentTray
+                    ? () => onOpenStudentAssignmentTray(outcome)
+                    : undefined
+                }
               />
             </Fragment>
           ))}
@@ -136,3 +129,5 @@ export const ScoresGrid: React.FC<ScoresGridProps> = ({
     </Flex>
   )
 }
+
+export const ScoresGrid = React.memo(ScoresGridComponent)

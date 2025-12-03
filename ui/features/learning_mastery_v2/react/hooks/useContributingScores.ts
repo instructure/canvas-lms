@@ -50,7 +50,7 @@ export interface ContributingScoresForOutcome {
   alignments?: ContributingScoreAlignment[]
   scoresForUser: (userId: string) => (number | undefined)[]
   isLoading: boolean
-  error?: unknown
+  error?: Error | null
 }
 
 export interface ContributingScoresManager {

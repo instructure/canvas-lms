@@ -55,6 +55,7 @@ export interface GradebookProps {
   onChangeNameDisplayFormat: (format: NameDisplayFormat) => void
   onOutcomesReorder?: (orderedOutcomes: Outcome[]) => void
   contributingScores: ContributingScoresManager
+  onOpenStudentAssignmentTray?: (outcome: Outcome) => void
 }
 
 const GradebookComponent: React.FC<GradebookProps> = ({
@@ -69,6 +70,7 @@ const GradebookComponent: React.FC<GradebookProps> = ({
   onChangeNameDisplayFormat,
   onOutcomesReorder,
   contributingScores,
+  onOpenStudentAssignmentTray,
 }) => {
   const headerRow = useRef<HTMLElement | null>(null)
   const gridRef = useRef<HTMLElement | null>(null)
@@ -222,6 +224,7 @@ const GradebookComponent: React.FC<GradebookProps> = ({
             rollups={rollups}
             scoreDisplayFormat={gradebookSettings.scoreDisplayFormat}
             contributingScores={contributingScores}
+            onOpenStudentAssignmentTray={onOpenStudentAssignmentTray}
           />
         </View>
       </View>
