@@ -176,3 +176,14 @@ export const UPDATE_WIDGET_DASHBOARD_CONFIG = gql`
     }
   }
 `
+
+export const UPDATE_WIDGET_DASHBOARD_LAYOUT = gql`
+  mutation UpdateWidgetDashboardLayout($layout: String!) {
+    updateWidgetDashboardLayout(input: {layout: $layout}) {
+      layout
+      errors {
+        message
+      }
+    }
+  }
+`

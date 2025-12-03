@@ -56,11 +56,13 @@ jest.mock('../WidgetRegistry', () => ({
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import WidgetGrid from '../WidgetGrid'
 import type {WidgetConfig} from '../../types'
 import {ResponsiveProvider} from '../../hooks/useResponsiveContext'
 import {WidgetLayoutProvider} from '../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../hooks/useWidgetDashboardEdit'
+import {WidgetDashboardProvider} from '../../hooks/useWidgetDashboardContext'
 
 type Props = {
   config: WidgetConfig
@@ -69,14 +71,25 @@ type Props = {
 
 const setUp = (props: Props, isEditMode = false) => {
   const {matches = ['desktop'], ...gridProps} = props
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {retry: false},
+      mutations: {retry: false},
+    },
+  })
+
   return render(
-    <ResponsiveProvider matches={matches}>
-      <WidgetDashboardEditProvider>
-        <WidgetLayoutProvider>
-          <WidgetGrid {...gridProps} isEditMode={isEditMode} />
-        </WidgetLayoutProvider>
-      </WidgetDashboardEditProvider>
-    </ResponsiveProvider>,
+    <QueryClientProvider client={queryClient}>
+      <WidgetDashboardProvider>
+        <ResponsiveProvider matches={matches}>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>
+              <WidgetGrid {...gridProps} isEditMode={isEditMode} />
+            </WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </ResponsiveProvider>
+      </WidgetDashboardProvider>
+    </QueryClientProvider>,
   )
 }
 

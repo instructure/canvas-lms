@@ -19,14 +19,27 @@
 import {act} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks'
 import React from 'react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {WidgetLayoutProvider, useWidgetLayout} from '../useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../useWidgetDashboardEdit'
+import {WidgetDashboardProvider} from '../useWidgetDashboardContext'
 
 const createWrapper = ({children}: {children: React.ReactNode}) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {retry: false},
+      mutations: {retry: false},
+    },
+  })
+
   return (
-    <WidgetDashboardEditProvider>
-      <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
-    </WidgetDashboardEditProvider>
+    <QueryClientProvider client={queryClient}>
+      <WidgetDashboardProvider>
+        <WidgetDashboardEditProvider>
+          <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
+        </WidgetDashboardEditProvider>
+      </WidgetDashboardProvider>
+    </QueryClientProvider>
   )
 }
 
