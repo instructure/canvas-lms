@@ -19,13 +19,28 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import CourseWorkFilters from '../CourseWorkFilters'
-import type {CourseOption} from '../../../types'
+import {WidgetDashboardProvider} from '../../../hooks/useWidgetDashboardContext'
 
 describe('CourseWorkFilters', () => {
-  const mockCourses: CourseOption[] = [
-    {id: 'course_1', name: 'Course 1'},
-    {id: 'course_2', name: 'Course 2'},
+  const mockSharedCourseData = [
+    {
+      courseId: 'course_1',
+      courseCode: 'C1',
+      courseName: 'Course 1',
+      currentGrade: 95,
+      gradingScheme: 'percentage' as const,
+      lastUpdated: '2025-01-01T00:00:00Z',
+    },
+    {
+      courseId: 'course_2',
+      courseCode: 'C2',
+      courseName: 'Course 2',
+      currentGrade: 88,
+      gradingScheme: 'percentage' as const,
+      lastUpdated: '2025-01-01T00:00:00Z',
+    },
   ]
 
   const defaultProps = {
@@ -33,23 +48,38 @@ describe('CourseWorkFilters', () => {
     selectedDateFilter: 'not_submitted' as const,
     onCourseChange: jest.fn(),
     onDateFilterChange: jest.fn(),
-    userCourses: mockCourses,
+  }
+
+  const renderWithProviders = (ui: React.ReactElement) => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {retry: false},
+      },
+    })
+
+    return render(
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
+          {ui}
+        </WidgetDashboardProvider>
+      </QueryClientProvider>,
+    )
   }
 
   it('renders course filter label', () => {
-    render(<CourseWorkFilters {...defaultProps} />)
+    renderWithProviders(<CourseWorkFilters {...defaultProps} />)
     expect(screen.getByText('Course filter:')).toBeInTheDocument()
     expect(screen.getByTestId('course-filter-select')).toBeInTheDocument()
   })
 
   it('renders submission status filter with correct label', () => {
-    render(<CourseWorkFilters {...defaultProps} />)
+    renderWithProviders(<CourseWorkFilters {...defaultProps} />)
     expect(screen.getByText('Submission status:')).toBeInTheDocument()
   })
 
   it('renders submission status filter options', async () => {
     const user = userEvent.setup()
-    render(<CourseWorkFilters {...defaultProps} />)
+    renderWithProviders(<CourseWorkFilters {...defaultProps} />)
 
     const submissionStatusSelect = screen.getByTestId('submission-status-filter-select')
     await user.click(submissionStatusSelect)
@@ -61,7 +91,7 @@ describe('CourseWorkFilters', () => {
 
   it('does not render date filter options', async () => {
     const user = userEvent.setup()
-    render(<CourseWorkFilters {...defaultProps} />)
+    renderWithProviders(<CourseWorkFilters {...defaultProps} />)
 
     const submissionStatusSelect = screen.getByTestId('submission-status-filter-select')
     await user.click(submissionStatusSelect)
@@ -75,7 +105,9 @@ describe('CourseWorkFilters', () => {
     const user = userEvent.setup()
     const onDateFilterChange = jest.fn()
 
-    render(<CourseWorkFilters {...defaultProps} onDateFilterChange={onDateFilterChange} />)
+    renderWithProviders(
+      <CourseWorkFilters {...defaultProps} onDateFilterChange={onDateFilterChange} />,
+    )
 
     const submissionStatusSelect = screen.getByTestId('submission-status-filter-select')
     await user.click(submissionStatusSelect)
@@ -90,7 +122,7 @@ describe('CourseWorkFilters', () => {
     const user = userEvent.setup()
     const onCourseChange = jest.fn()
 
-    render(<CourseWorkFilters {...defaultProps} onCourseChange={onCourseChange} />)
+    renderWithProviders(<CourseWorkFilters {...defaultProps} onCourseChange={onCourseChange} />)
 
     const courseSelect = screen.getByTestId('course-filter-select')
     await user.click(courseSelect)

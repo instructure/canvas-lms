@@ -27,8 +27,7 @@ import CourseWorkFilters, {
   type DateFilterOption,
   isValidDateFilterOption,
 } from '../../shared/CourseWorkFilters'
-import type {BaseWidgetProps, CourseOption} from '../../../types'
-import {useSharedCourses} from '../../../hooks/useSharedCourses'
+import type {BaseWidgetProps} from '../../../types'
 import {useCourseWorkPaginated} from '../../../hooks/useCourseWork'
 import {convertDateFilterToParams} from '../../../utils/dateUtils'
 import {CourseWorkItem as CourseWorkItemComponent} from '../../shared/CourseWorkItem'
@@ -55,13 +54,6 @@ const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
     'not_submitted',
     isValidDateFilterOption,
   )
-
-  // Fetch user's enrolled courses
-  const {data: courseGrades = []} = useSharedCourses({limit: 1000})
-  const userCourses: CourseOption[] = courseGrades.map(courseGrade => ({
-    id: courseGrade.courseId,
-    name: courseGrade.courseName,
-  }))
 
   // Convert frontend filter values to backend parameters
   const courseFilter = selectedCourse === 'all' ? undefined : selectedCourse
@@ -136,7 +128,6 @@ const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
             selectedDateFilter={selectedDateFilter}
             onCourseChange={handleCourseChange}
             onDateFilterChange={handleDateFilterChange}
-            userCourses={userCourses}
           />
         </Flex.Item>
         <Flex.Item shouldGrow>

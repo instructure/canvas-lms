@@ -20,11 +20,169 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import RecentGradesWidget from '../RecentGradesWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 import {ResponsiveProvider} from '../../../../hooks/useResponsiveContext'
+import {WidgetDashboardProvider} from '../../../../hooks/useWidgetDashboardContext'
+import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+
+const server = setupServer()
+
+beforeAll(() => {
+  server.listen()
+})
+
+afterEach(() => {
+  server.resetHandlers()
+})
+
+afterAll(() => {
+  server.close()
+})
+
+beforeEach(() => {
+  window.ENV = {current_user_id: '1'} as any
+  clearWidgetDashboardCache()
+})
+
+const mockGradedSubmissions = [
+  {
+    _id: 'sub1',
+    score: 95,
+    grade: 'A',
+    submittedAt: '2025-11-28T10:00:00Z',
+    gradedAt: '2025-11-30T14:30:00Z',
+    state: 'graded',
+    assignment: {
+      _id: '101',
+      name: 'Introduction to React Hooks',
+      htmlUrl: '/courses/1/assignments/101',
+      pointsPossible: 100,
+      submissionTypes: ['online_text_entry'],
+      quiz: null,
+      discussion: null,
+      course: {
+        _id: '1',
+        name: 'Advanced Web Development',
+        courseCode: 'CS-401',
+      },
+    },
+  },
+  {
+    _id: 'sub2',
+    score: 88,
+    grade: 'B+',
+    submittedAt: '2025-11-27T09:00:00Z',
+    gradedAt: '2025-11-29T16:45:00Z',
+    state: 'graded',
+    assignment: {
+      _id: '102',
+      name: 'Data Structures Quiz',
+      htmlUrl: '/courses/2/assignments/102',
+      pointsPossible: 100,
+      submissionTypes: ['online_quiz'],
+      quiz: {_id: '102', title: 'Data Structures Quiz'},
+      discussion: null,
+      course: {
+        _id: '2',
+        name: 'Computer Science 101',
+        courseCode: 'CS-101',
+      },
+    },
+  },
+  {
+    _id: 'sub3',
+    score: 92,
+    grade: 'A-',
+    submittedAt: '2025-11-26T11:30:00Z',
+    gradedAt: '2025-11-28T10:15:00Z',
+    state: 'graded',
+    assignment: {
+      _id: '103',
+      name: 'Essay on Modern Literature',
+      htmlUrl: '/courses/3/assignments/103',
+      pointsPossible: 100,
+      submissionTypes: ['online_text_entry'],
+      quiz: null,
+      discussion: null,
+      course: {
+        _id: '3',
+        name: 'English Literature 201',
+        courseCode: 'ENG-201',
+      },
+    },
+  },
+  {
+    _id: 'sub4',
+    score: 78,
+    grade: 'C+',
+    submittedAt: '2025-11-25T15:00:00Z',
+    gradedAt: '2025-11-27T09:00:00Z',
+    state: 'graded',
+    assignment: {
+      _id: '104',
+      name: 'Calculus Problem Set 5',
+      htmlUrl: '/courses/4/assignments/104',
+      pointsPossible: 100,
+      submissionTypes: ['online_text_entry'],
+      quiz: null,
+      discussion: null,
+      course: {
+        _id: '4',
+        name: 'Mathematics 301',
+        courseCode: 'MATH-301',
+      },
+    },
+  },
+  {
+    _id: 'sub5',
+    score: 90,
+    grade: 'A-',
+    submittedAt: '2025-11-24T13:00:00Z',
+    gradedAt: '2025-11-26T11:30:00Z',
+    state: 'graded',
+    assignment: {
+      _id: '105',
+      name: 'Lab Report: Chemical Reactions',
+      htmlUrl: '/courses/5/assignments/105',
+      pointsPossible: 100,
+      submissionTypes: ['online_upload'],
+      quiz: null,
+      discussion: null,
+      course: {
+        _id: '5',
+        name: 'Chemistry 202',
+        courseCode: 'CHEM-202',
+      },
+    },
+  },
+  {
+    _id: 'sub6',
+    score: 85,
+    grade: 'B',
+    submittedAt: '2025-11-23T10:00:00Z',
+    gradedAt: '2025-11-25T14:00:00Z',
+    state: 'graded',
+    assignment: {
+      _id: '106',
+      name: 'History Presentation',
+      htmlUrl: '/courses/6/assignments/106',
+      pointsPossible: 100,
+      submissionTypes: ['online_upload'],
+      quiz: null,
+      discussion: null,
+      course: {
+        _id: '6',
+        name: 'World History 101',
+        courseCode: 'HIST-101',
+      },
+    },
+  },
+]
 
 const mockWidget: Widget = {
   id: 'recent-grades-widget',
@@ -40,6 +198,33 @@ const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidget
   }
 }
 
+const mockSharedCourseData = [
+  {
+    courseId: '1',
+    courseCode: 'CS-401',
+    courseName: 'Advanced Web Development',
+    currentGrade: 95,
+    gradingScheme: 'percentage' as const,
+    lastUpdated: '2025-11-30T14:30:00Z',
+  },
+  {
+    courseId: '2',
+    courseCode: 'CS-101',
+    courseName: 'Computer Science 101',
+    currentGrade: 88,
+    gradingScheme: 'percentage' as const,
+    lastUpdated: '2025-11-29T16:45:00Z',
+  },
+  {
+    courseId: '3',
+    courseCode: 'ENG-201',
+    courseName: 'English Literature 201',
+    currentGrade: 92,
+    gradingScheme: 'percentage' as const,
+    lastUpdated: '2025-11-28T10:15:00Z',
+  },
+]
+
 const setup = (props: Partial<BaseWidgetProps> = {}, matches: string[] = ['desktop']) => {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -53,37 +238,74 @@ const setup = (props: Partial<BaseWidgetProps> = {}, matches: string[] = ['deskt
   return render(
     <QueryClientProvider client={queryClient}>
       <ResponsiveProvider matches={matches}>
-        <WidgetDashboardEditProvider>
-          <WidgetLayoutProvider>
-            <RecentGradesWidget {...defaultProps} />
-          </WidgetLayoutProvider>
-        </WidgetDashboardEditProvider>
+        <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>
+              <RecentGradesWidget {...defaultProps} />
+            </WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </WidgetDashboardProvider>
       </ResponsiveProvider>
     </QueryClientProvider>,
   )
 }
 
 describe('RecentGradesWidget', () => {
+  beforeEach(() => {
+    server.use(
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetRecentGrades')) {
+          const {after} = body.variables
+          const startIndex = after ? parseInt(atob(after), 10) : 0
+          const submissions = mockGradedSubmissions.slice(startIndex, startIndex + 5)
+
+          return HttpResponse.json({
+            data: {
+              legacyNode: {
+                _id: '1',
+                courseWorkSubmissionsConnection: {
+                  nodes: submissions,
+                  pageInfo: {
+                    hasNextPage: startIndex + 5 < mockGradedSubmissions.length,
+                    hasPreviousPage: startIndex > 0,
+                    endCursor: submissions.length > 0 ? btoa(String(startIndex + 5)) : null,
+                    startCursor: startIndex > 0 ? btoa(String(startIndex)) : null,
+                    totalCount: mockGradedSubmissions.length,
+                  },
+                },
+              },
+            },
+          })
+        }
+      }),
+    )
+  })
+
   it('renders widget with title', () => {
     setup()
     expect(screen.getByText('Recent grades & feedback')).toBeInTheDocument()
   })
 
-  // TODO: update when GraphQL query is integrated
-  it('displays list of recent grades', () => {
+  it('displays list of recent grades', async () => {
     setup()
-    expect(screen.getByTestId('recent-grades-list')).toBeInTheDocument()
-    expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
-    expect(screen.getByText('Data Structures Quiz')).toBeInTheDocument()
+
+    await waitFor(() => {
+      expect(screen.getByTestId('recent-grades-list')).toBeInTheDocument()
+      expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
+      expect(screen.getByText('Data Structures Quiz')).toBeInTheDocument()
+    })
   })
 
-  // TODO: update when GraphQL query is integrated
-  it('displays grade items with correct information', () => {
+  it('displays grade items with correct information', async () => {
     setup()
-    expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
-    expect(screen.getByText('CS-401')).toBeInTheDocument()
-    expect(screen.getByTestId('grade-status-badge-1')).toBeInTheDocument()
-    expect(screen.getByTestId('grade-status-badge-1')).toHaveTextContent('Graded')
+
+    await waitFor(() => {
+      expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
+      expect(screen.getByText('CS-401')).toBeInTheDocument()
+      expect(screen.getByTestId('grade-status-badge-sub1')).toBeInTheDocument()
+      expect(screen.getByTestId('grade-status-badge-sub1')).toHaveTextContent('Graded')
+    })
   })
 
   it('displays pagination controls', async () => {
@@ -93,13 +315,14 @@ describe('RecentGradesWidget', () => {
     })
   })
 
-  // TODO: update when GraphQL query is integrated
   it('paginates through grade items', async () => {
     const user = userEvent.setup()
     setup()
 
-    expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
-    expect(screen.queryByText('History Presentation')).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
+      expect(screen.queryByText('History Presentation')).not.toBeInTheDocument()
+    })
 
     await waitFor(() => {
       expect(screen.getByTestId('pagination-container')).toBeInTheDocument()
@@ -120,18 +343,81 @@ describe('RecentGradesWidget', () => {
     }
   })
 
-  it('displays course filter placeholder', () => {
+  it('displays course filter with courses', async () => {
     setup()
-    expect(screen.getByTestId('course-filter-select')).toBeInTheDocument()
-    expect(screen.getByTestId('course-filter-select')).toHaveAttribute('disabled')
+
+    await waitFor(() => {
+      expect(screen.getByTestId('course-filter-select')).toBeInTheDocument()
+    })
+
+    const select = screen.getByTestId('course-filter-select')
+    await userEvent.click(select)
+
+    await waitFor(() => {
+      expect(screen.getByText('Advanced Web Development')).toBeInTheDocument()
+      expect(screen.getByText('Computer Science 101')).toBeInTheDocument()
+    })
   })
 
-  // TODO: update when GraphQL query is integrated
-  it('displays assignment titles as text', () => {
+  it('filters grades by course when course is selected', async () => {
+    server.use(
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetRecentGrades')) {
+          const {courseFilter} = body.variables
+          const filteredSubmissions = courseFilter
+            ? mockGradedSubmissions.filter(sub => sub.assignment.course._id === courseFilter)
+            : mockGradedSubmissions
+
+          return HttpResponse.json({
+            data: {
+              legacyNode: {
+                _id: '1',
+                courseWorkSubmissionsConnection: {
+                  nodes: filteredSubmissions.slice(0, 5),
+                  pageInfo: {
+                    hasNextPage: false,
+                    hasPreviousPage: false,
+                    endCursor: null,
+                    startCursor: null,
+                    totalCount: filteredSubmissions.length,
+                  },
+                },
+              },
+            },
+          })
+        }
+      }),
+    )
+
     setup()
-    const assignmentTitle = screen.getByTestId('assignment-title-1')
-    expect(assignmentTitle).toBeInTheDocument()
-    expect(assignmentTitle).toHaveTextContent('Introduction to React Hooks')
+
+    await waitFor(() => {
+      expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
+    })
+
+    const select = screen.getByTestId('course-filter-select')
+    await userEvent.click(select)
+
+    await waitFor(() => {
+      expect(screen.getByText('Advanced Web Development')).toBeInTheDocument()
+    })
+
+    await userEvent.click(screen.getByText('Advanced Web Development'))
+
+    await waitFor(() => {
+      expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
+    })
+  })
+
+  it('displays assignment titles', async () => {
+    setup()
+
+    await waitFor(() => {
+      const assignmentTitle = screen.getByTestId('assignment-title-sub1')
+      expect(assignmentTitle).toBeInTheDocument()
+      expect(assignmentTitle).toHaveTextContent('Introduction to React Hooks')
+    })
   })
 
   it('handles loading state', () => {
@@ -159,23 +445,78 @@ describe('RecentGradesWidget', () => {
     expect(onRetry).toHaveBeenCalledTimes(1)
   })
 
-  // TODO: update when GraphQL query is integrated
-  it('displays correct number of items per page', () => {
+  it('displays correct number of items per page', async () => {
     setup()
-    const gradeItems = screen.getAllByTestId(/^grade-item-/)
-    expect(gradeItems).toHaveLength(5)
+
+    await waitFor(() => {
+      const gradeItems = screen.getAllByTestId(/^grade-item-/)
+      expect(gradeItems).toHaveLength(5)
+    })
   })
 
-  // TODO: update when GraphQL query is integrated
-  it('displays grading status badges correctly', () => {
+  it('displays grading status badges correctly', async () => {
     setup()
-    const badge = screen.getByTestId('grade-status-badge-1')
-    expect(badge).toHaveTextContent('Graded')
+
+    await waitFor(() => {
+      const badge = screen.getByTestId('grade-status-badge-sub1')
+      expect(badge).toHaveTextContent('Graded')
+    })
   })
 
-  // TODO: update when GraphQL query is integrated
-  it('displays timestamps for each grade', () => {
+  it('displays timestamps for each grade', async () => {
     setup()
-    expect(screen.getByTestId('grade-timestamp-1')).toBeInTheDocument()
+
+    await waitFor(() => {
+      expect(screen.getByTestId('grade-timestamp-sub1')).toBeInTheDocument()
+    })
+  })
+
+  it('handles empty submissions gracefully', async () => {
+    server.use(
+      http.post('/api/graphql', async () => {
+        return HttpResponse.json({
+          data: {
+            legacyNode: {
+              _id: '1',
+              courseWorkSubmissionsConnection: {
+                nodes: [],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  endCursor: null,
+                  startCursor: null,
+                  totalCount: 0,
+                },
+              },
+            },
+          },
+        })
+      }),
+    )
+
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('No recent grades available')).toBeInTheDocument()
+    })
+  })
+
+  it('handles GraphQL errors', async () => {
+    server.use(
+      http.post('/api/graphql', async () => {
+        return HttpResponse.json(
+          {
+            errors: [{message: 'Failed to fetch submissions'}],
+          },
+          {status: 500},
+        )
+      }),
+    )
+
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText(/GraphQL Error/i)).toBeInTheDocument()
+    })
   })
 })

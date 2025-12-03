@@ -3030,6 +3030,21 @@ input CourseUsersSortInputType {
 }
 
 """
+Fields to order course work submissions by
+"""
+enum CourseWorkSubmissionsOrderField {
+  """
+  Order by due date
+  """
+  due_at
+
+  """
+  Order by graded date
+  """
+  graded_at
+}
+
+"""
 States that Courses can be in
 """
 enum CourseWorkflowState {
@@ -11337,6 +11352,11 @@ type User implements LegacyIDInterface & Node & Timestamped {
     Show only submitted assignments
     """
     onlySubmitted: Boolean
+
+    """
+    Field to order results by
+    """
+    orderBy: CourseWorkSubmissionsOrderField
 
     """
     Start date for due date range filter
