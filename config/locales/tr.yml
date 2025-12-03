@@ -3290,6 +3290,7 @@ tr:
   allows_users_to_use_new_decaying_average_as_a_calc_9c285038: "Kullanıcıların belirli bir kazanım için hesaplama yöntemi olarak yeni azalan ortalamayı (new decaying average) kullanmasına izin verir."
   allows_users_to_view_add_modify_and_delete_lti_1_3_2c707d2f: "Kullanıcıların yeni Uygulamalar (Apps) sayfasında LTI 1.3 araç kayıtlarını görüntülemesine, eklemesine, değiştirmesine ve silmesine izin verir."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Uluslararası cep telefonu numarası olan kullanıcıların Canvas'tan metin mesajları almasına izin verir."
+  alphabetical_55b5b4e0: Alfabetik
   alphabetically_60ab47e4: Alfabetik
   already_belongs_to_an_assignment_override_99fc6f36: "zaten bir ödev istisnasına (assignment override) ait."
   already_has_a_rubric_1e05ef65: "(Zaten bir rubriği var)"
