@@ -10012,13 +10012,13 @@ ca:
   datadog_rum_js_agent_4c3bea75: "Datadog RUM JS Agent"
   date: 
     abbr_day_names: 
-      - Diumenge
-      - Dilluns
-      - Dimarts
-      - Dimecres
-      - Dijous
-      - Divendres
-      - Dissabte
+      - dg.
+      - dl.
+      - dt.
+      - dc.
+      - dj.
+      - dv.
+      - ds.
     abbr_month_names: 
       - ~
       - Gen
@@ -13625,7 +13625,7 @@ ca:
   french_canada_c3d92fa6: "Francès (Canadà)"
   frequency_87077a39: freqüència
   frequently_used_21a3eb8e: "S’utilitza freqüentment"
-  fri_e2451e74: Divendres
+  fri_e2451e74: dv.
   friday_2c4f6d5a: Divendres
   friendly_description_57f7fdde: "Descripció imparcial"
   friendly_description_for_parent_student_display_e608ecf3: "Descripció imparcial (perquè els pares o l’estudiant la visualitzin)"
@@ -19754,7 +19754,7 @@ ca:
   modules_tutorial_tray_d58ac3cb: "Safata de tutorial sobre els continguts"
   modules_updated_abeb4ec6: "S’han actualitzat els continguts"
   moduletitle_unpublished_8a70e0cd: "%{moduleTitle} (no publicat)"
-  mon_8f18082a: Dilluns
+  mon_8f18082a: dl.
   monday_432ff613: Dilluns
   mongolian_5467c6a8: Mongol
   monitor_b908967: Monitor
@@ -25934,7 +25934,7 @@ ca:
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "El mateix valor que “Canvas_URL__c”; probablement desapareixerà aviat"
   sample_data_e4fd01ff: "Dades d'exemple"
   sandboxes_53d03412: "Espais aïllats"
-  sat_fa4152a4: Dissabte
+  sat_fa4152a4: ds.
   saturday_af8feb7f: Dissabte
   saudi_arabia_966_d01ed717: "Aràbia Saudita (+966)"
   save_11a80ec3: Desa
@@ -28836,7 +28836,7 @@ ca:
   summary_generated_15d2d753: "S’ha generat el resum."
   summary_of_report_types_d064d42b: "Resum dels tipus d’informes"
   summary_statistics_f74852a5: "Estadístiques del resum"
-  sun_298d7c8b: Diumenge
+  sun_298d7c8b: dg.
   sundanese_a88f26d3: Sundanès
   sunday_50a31adb: Diumenge
   supplemental_logic_and_ux_for_supporting_course_pa_a2cc3230: "Lògica complementària i UX per admetre els ritmes de l'assignatura amb Camins cap al domini"
@@ -30558,7 +30558,7 @@ ca:
   throttle_jobs_f61be56: "Limita els treballs"
   throttle_tag_tag_ba5b9b50: "Limita l’etiqueta \"%{tag}\""
   throttling_jobs_4a90578c: "S’estan limitant els treballs"
-  thu_59cbcffe: Dijous
+  thu_59cbcffe: dj.
   thursday_f112cf65: Dijous
   ticket_successfully_submitted_f6254460: "La sol·licitud s'ha entregat correctament."
   ticketing_system_52205bff: "Sistema de sol·licitud"
@@ -31624,7 +31624,7 @@ ca:
   try_to_scan_again_5d3d0d77: "Proveu de tornar a escanejar-ho."
   tswana_7dc881a4: Setswana
   ttml_tracks_are_not_allowed_because_they_are_susce_d40b654a: "No es permeten les pistes TTML perquè poden patir atacs xss."
-  tue_bb10b386: Dimarts
+  tue_bb10b386: dt.
   tuesday_698a01b: Dimarts
   turkish_5b69578b: Turc
   turn_into_paragraph_8052ee9: "Convertiu-ho en un paràgraf"
@@ -33101,7 +33101,7 @@ ca:
   website_url_b995c5b6: "URL del lloc web"
   website_url_input_1a3eab25: "Entrada de l'URL del lloc web"
   website_url_url_bd07233d: "URL del lloc web: %{url}"
-  wed_84932f18: Dimecres
+  wed_84932f18: dc.
   wednesday_b6f755f5: Dimecres
   week_1f945ddd: Setmana
   week_s_cb1492ee: Setmana(es)
