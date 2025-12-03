@@ -62,11 +62,6 @@ const SuccessView: React.FC<SuccessViewProps> = ({
             title: title,
           })}
         >
-          <View>
-            <Heading level="h2" variant="titleCardRegular">
-              {title}
-            </Heading>
-          </View>
           <View margin="large 0">
             <Text size="large" variant="descriptionPage" as="h3">
               {I18n.t('You have fixed all accessibility issues on this page.')}
