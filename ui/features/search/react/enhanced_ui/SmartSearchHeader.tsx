@@ -311,7 +311,7 @@ export default function SmartSearchHeader(props: Props) {
           <Flex alignItems="center" gap="small">
             <IconAiColoredSolid size="small" />
             <ScreenReaderContent>{I18n.t('Ignite AI')}</ScreenReaderContent>
-            {I18n.t('IgniteAI Search')}
+            {I18n.t('Smart Search')}
           </Flex>
         </Heading>
         {renderSearchBar()}
@@ -319,7 +319,7 @@ export default function SmartSearchHeader(props: Props) {
       </Flex>
       <Tray
         open={showFilters}
-        label={I18n.t('IgniteAI Search filters')}
+        label={I18n.t('Smart search filters')}
         placement="end"
         onDismiss={() => setShowFilters(false)}
       >
