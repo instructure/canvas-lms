@@ -140,11 +140,14 @@ describe('useContributingScores', () => {
     })
 
     it('does not make API calls when outcomes are not visible', async () => {
-      renderHook(() => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}), {
-        wrapper: createWrapper(),
-      })
+      const {result} = renderHook(
+        () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
+        {wrapper: createWrapper()},
+      )
 
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+      })
 
       expect(fetchMock.calls()).toHaveLength(0)
     })
@@ -420,7 +423,9 @@ describe('useContributingScores', () => {
         result.current.contributingScores.forOutcome('2').toggleVisibility()
       })
 
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+      })
 
       expect(fetchMock.calls()).toHaveLength(0)
     })
@@ -437,7 +442,9 @@ describe('useContributingScores', () => {
         result.current.contributingScores.forOutcome('2').toggleVisibility()
       })
 
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+      })
 
       expect(fetchMock.calls()).toHaveLength(0)
     })
