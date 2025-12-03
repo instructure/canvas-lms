@@ -50,8 +50,8 @@ const SuccessView: React.FC<SuccessViewProps> = ({
 }) => {
   const regionRef = useRef<HTMLDivElement | null>(null)
   return (
-    <View position="fixed" overflowY="auto" width="inherit">
-      <Flex as="div" direction="column" height="100vh" width="100%">
+    <View position="relative" overflowY="auto" width="inherit">
+      <Flex as="div" direction="column" height="100%" width="100%">
         <Flex.Item
           as="header"
           padding="medium"
@@ -76,7 +76,7 @@ const SuccessView: React.FC<SuccessViewProps> = ({
         <Flex.Item as="main" padding="xx-large x-large" shouldGrow={true}>
           <Img src={SuccessBallons} data-testid="success-ballons" height="378px" width="308px" />
         </Flex.Item>
-        <Flex.Item as="footer">
+        <View as="div" position="sticky" insetBlockEnd="0" style={{zIndex: 10}}>
           <AccessibilityIssuesDrawerFooter
             nextButtonName={nextResource?.index >= 0 ? I18n.t('Next resource') : I18n.t('Close')}
             onSkip={handleSkip}
@@ -86,7 +86,7 @@ const SuccessView: React.FC<SuccessViewProps> = ({
             isSkipDisabled={true}
             isSaveAndNextDisabled={false}
           />
-        </Flex.Item>
+        </View>
       </Flex>
     </View>
   )
