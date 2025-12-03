@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {clone} from 'lodash'
+import {clone} from 'es-toolkit/compat'
 import K from './constants'
 import generateUUID from './util/generateUUID'
 

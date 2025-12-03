@@ -18,7 +18,7 @@
 
 import K from './constants'
 import $ from 'jquery'
-import {throttle, uniqueId} from 'lodash'
+import {throttle, uniqueId} from 'es-toolkit/compat'
 
 // # An event tracker installs code to capture quiz events and submits them for
 // # delivery.

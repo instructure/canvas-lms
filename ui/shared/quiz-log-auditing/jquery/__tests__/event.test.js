@@ -42,4 +42,17 @@ describe('Quizzes::LogAuditing::QuizEvent', () => {
     expect(event.data).toEqual(descriptor.event_data)
     expect(event.recordedAt).toEqual(new Date(descriptor.client_timestamp))
   })
+
+  test('#constructor: clones event data to avoid mutation', () => {
+    const originalData = {answer: 42, nested: {value: 'test'}}
+    const event = new QuizEvent('some_event_type', originalData)
+
+    // Verify data is cloned (shallow)
+    expect(event.data).toEqual(originalData)
+    expect(event.data).not.toBe(originalData)
+
+    // Mutating original should not affect event data (top level)
+    originalData.answer = 100
+    expect(event.data.answer).toBe(42)
+  })
 })
