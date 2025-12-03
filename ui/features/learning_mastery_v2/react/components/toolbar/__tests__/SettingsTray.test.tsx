@@ -68,20 +68,20 @@ describe('SettingsTray', () => {
     expect(props.onDismiss).toHaveBeenCalledTimes(1)
   })
 
-  it('calls setGradebookSettings when Apply button is clicked', async () => {
+  it('calls setGradebookSettings when Save button is clicked', async () => {
     const props = makeProps({open: true})
     const {getByText} = render(<SettingsTray {...props} />)
-    getByText('Apply').click()
+    getByText('Save').click()
     await waitFor(() => {
       expect(props.setGradebookSettings).toHaveBeenCalledWith(props.gradebookSettings)
     })
   })
 
-  it('disables Apply button when isSavingSettings is true', () => {
+  it('disables Save button when isSavingSettings is true', () => {
     const props = makeProps({open: true, isSavingSettings: true})
     const {getByText} = render(<SettingsTray {...props} />)
-    const applyButton = getByText('Apply').closest('button')
-    expect(applyButton).toBeDisabled()
+    const saveButton = getByText('Save').closest('button')
+    expect(saveButton).toBeDisabled()
   })
 
   it('shows flash alert when setGradebookSettings fails', async () => {
@@ -90,7 +90,7 @@ describe('SettingsTray', () => {
       setGradebookSettings: jest.fn().mockReturnValue(Promise.resolve({success: false})),
     })
     const {getByText} = render(<SettingsTray {...props} />)
-    getByText('Apply').click()
+    getByText('Save').click()
     await waitFor(() => {
       expect(mockShowFlashAlert).toHaveBeenCalledWith({
         type: 'error',
@@ -105,7 +105,7 @@ describe('SettingsTray', () => {
       setGradebookSettings: jest.fn().mockReturnValue(Promise.resolve({success: true})),
     })
     const {getByText} = render(<SettingsTray {...props} />)
-    getByText('Apply').click()
+    getByText('Save').click()
     await waitFor(() => {
       expect(mockShowFlashAlert).toHaveBeenCalledWith({
         type: 'success',
@@ -134,7 +134,7 @@ describe('SettingsTray', () => {
       const props = makeProps({open: true})
       const {getByText, getByLabelText} = render(<SettingsTray {...props} />)
       getByLabelText('SIS ID').click()
-      getByText('Apply').click()
+      getByText('Save').click()
       expect(props.setGradebookSettings).toHaveBeenCalledWith({
         ...props.gradebookSettings,
         secondaryInfoDisplay: SecondaryInfoDisplay.SIS_ID,
@@ -157,7 +157,7 @@ describe('SettingsTray', () => {
         />,
       )
       getByLabelText('Students with no results').click()
-      getByText('Apply').click()
+      getByText('Save').click()
       expect(props.setGradebookSettings).toHaveBeenCalledWith({
         ...props.gradebookSettings,
         displayFilters: [DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
@@ -178,7 +178,7 @@ describe('SettingsTray', () => {
       })
       const {getByText, getByLabelText} = render(<SettingsTray {...props} />)
       getByLabelText('Icons + Descriptor').click()
-      getByText('Apply').click()
+      getByText('Save').click()
       await waitFor(() => {
         expect(props.setGradebookSettings).toHaveBeenCalledWith({
           ...props.gradebookSettings,

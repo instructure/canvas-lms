@@ -18,6 +18,7 @@
 
 import React, {useCallback, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Tray} from '@instructure/ui-tray'
@@ -28,6 +29,7 @@ import {SecondaryInfoSelector} from './SecondaryInfoSelector'
 import {DisplayFilterSelector} from './DisplayFilterSelector'
 import {ScoreDisplayFormatSelector} from './ScoreDisplayFormatSelector'
 import {OutcomeArrangementSelector} from './OutcomeArrangementSelector'
+import {colors} from '@instructure/canvas-theme'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -97,52 +99,74 @@ export const SettingsTray: React.FC<SettingsTrayProps> = ({
       onDismiss={onDismiss}
       data-testid="lmgb-settings-tray"
     >
-      <Flex direction="column" padding="medium">
-        <Flex alignItems="center" justifyItems="space-between" data-testid="lmgb-settings-header">
-          <Text size="x-large" weight="bold">
-            {I18n.t('Settings')}
-          </Text>
-          <CloseButton
-            size="medium"
-            screenReaderLabel={I18n.t('Close Settings Tray')}
-            onClick={onDismiss}
-            data-testid="lmgb-close-settings-button"
-          />
-        </Flex>
-        <hr style={{marginBottom: '0', marginTop: '16px'}} />
-      </Flex>
-      <Flex direction="column" padding="small medium" alignItems="stretch" gap="medium">
-        <SecondaryInfoSelector
-          value={secondaryInfoDisplay}
-          onChange={info => setSecondaryInfoDisplay(info)}
-        />
-        <DisplayFilterSelector
-          values={displayFilters}
-          onChange={filters => setDisplayFilters(filters)}
-        />
-        <ScoreDisplayFormatSelector
-          value={scoreDisplayFormat}
-          onChange={format => setScoreDisplayFormat(format)}
-        />
-        <OutcomeArrangementSelector
-          value={outcomeArrangement}
-          onChange={arrangement => setOutcomeArrangement(arrangement)}
-        />
-        <Flex gap="small" alignItems="stretch" direction="column">
-          <Button color="primary" onClick={saveSettings} disabled={isSavingSettings}>
-            {I18n.t('Apply')}
-          </Button>
-          <Button
-            withBackground={false}
-            onClick={() => {
-              resetForm()
-              onDismiss()
-            }}
-            themeOverride={{borderWidth: '0px'}}
+      <Flex direction="column" height="100vh" justifyItems="space-between">
+        <Flex.Item>
+          <Flex direction="column" padding="medium">
+            <Flex
+              alignItems="center"
+              justifyItems="space-between"
+              data-testid="lmgb-settings-header"
+            >
+              <Text size="x-large" weight="bold">
+                {I18n.t('Settings')}
+              </Text>
+              <CloseButton
+                size="medium"
+                screenReaderLabel={I18n.t('Close Settings Tray')}
+                onClick={onDismiss}
+                data-testid="lmgb-close-settings-button"
+              />
+            </Flex>
+            <hr style={{marginBottom: '0', marginTop: '16px'}} />
+          </Flex>
+          <Flex direction="column" padding="small medium" alignItems="stretch" gap="medium">
+            <SecondaryInfoSelector
+              value={secondaryInfoDisplay}
+              onChange={info => setSecondaryInfoDisplay(info)}
+            />
+            <DisplayFilterSelector
+              values={displayFilters}
+              onChange={filters => setDisplayFilters(filters)}
+            />
+            <ScoreDisplayFormatSelector
+              value={scoreDisplayFormat}
+              onChange={format => setScoreDisplayFormat(format)}
+            />
+            <OutcomeArrangementSelector
+              value={outcomeArrangement}
+              onChange={arrangement => setOutcomeArrangement(arrangement)}
+            />
+          </Flex>
+        </Flex.Item>
+        <Flex.Item>
+          <View
+            as="div"
+            background="secondary"
+            borderColor={colors.primitives.grey14}
+            borderWidth="small none none none"
+            padding="small"
+            margin="large none none none"
           >
-            {I18n.t('Cancel')}
-          </Button>
-        </Flex>
+            <Flex gap="x-small" justifyItems="end">
+              <Flex.Item>
+                <Button
+                  onClick={() => {
+                    resetForm()
+                    onDismiss()
+                  }}
+                  color="secondary"
+                >
+                  {I18n.t('Cancel')}
+                </Button>
+              </Flex.Item>
+              <Flex.Item>
+                <Button color="primary" onClick={saveSettings} disabled={isSavingSettings}>
+                  {I18n.t('Save')}
+                </Button>
+              </Flex.Item>
+            </Flex>
+          </View>
+        </Flex.Item>
       </Flex>
     </Tray>
   )
