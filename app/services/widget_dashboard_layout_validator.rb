@@ -88,6 +88,7 @@ class WidgetDashboardLayoutValidator
     people
     todo_list
     progress_overview
+    recent_grades
   ].freeze
 
   attr_reader :errors

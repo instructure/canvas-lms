@@ -20,7 +20,7 @@ import React, {useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import type {CourseOption} from '../../types'
+import CourseFilterSelect from './CourseFilterSelect'
 import {useResponsiveContext} from '../../hooks/useResponsiveContext'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -50,7 +50,6 @@ export interface CourseWorkFiltersProps {
     event: React.SyntheticEvent,
     data: {value?: string | number; id?: string},
   ) => void
-  userCourses: CourseOption[]
 }
 
 const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
@@ -58,14 +57,8 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
   selectedDateFilter,
   onCourseChange,
   onDateFilterChange,
-  userCourses,
 }) => {
   const {isMobile} = useResponsiveContext()
-
-  const courseOptions: CourseOption[] = useMemo(
-    () => [{id: 'all', name: I18n.t('All Courses')}, ...userCourses],
-    [userCourses],
-  )
 
   const statusFilterOptions: DateFilterConfig[] = useMemo(
     () => [
@@ -79,18 +72,7 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
   return (
     <Flex direction={isMobile ? 'column' : 'row'} wrap="wrap" gap="small">
       <Flex.Item shouldGrow overflowX="visible" overflowY="visible">
-        <SimpleSelect
-          renderLabel={I18n.t('Course filter:')}
-          value={selectedCourse}
-          onChange={onCourseChange}
-          data-testid="course-filter-select"
-        >
-          {courseOptions.map(option => (
-            <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
-              {option.name}
-            </SimpleSelect.Option>
-          ))}
-        </SimpleSelect>
+        <CourseFilterSelect selectedCourse={selectedCourse} onChange={onCourseChange} />
       </Flex.Item>
       <Flex.Item shouldGrow overflowX="visible" overflowY="visible">
         <SimpleSelect

@@ -86,7 +86,7 @@ const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
 
   const statusPill = (
     <Pill
-      color={isGraded ? 'success' : 'info'}
+      color={isGraded ? 'success' : 'primary'}
       data-testid={`grade-status-badge-${submission._id}`}
       renderIcon={isGraded ? <IconCompleteSolid /> : undefined}
     >

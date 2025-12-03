@@ -19,6 +19,13 @@
 #
 
 module Types
+  class CourseWorkSubmissionsOrderField < BaseEnum
+    graphql_name "CourseWorkSubmissionsOrderField"
+    description "Fields to order course work submissions by"
+    value "graded_at", value: :graded_at, description: "Order by graded date"
+    value "due_at", value: :due_at, description: "Order by due date"
+  end
+
   class DashboardObserveeFilterInputType < BaseInputObject
     graphql_name "DashboardObserveeFilter"
     argument :observed_user_id,
@@ -682,9 +689,10 @@ module Types
       argument :include_overdue, Boolean, required: false, description: "Include overdue assignments"
       argument :observed_user_id, ID, required: false, description: "ID of the observed user"
       argument :only_submitted, Boolean, required: false, description: "Show only submitted assignments"
+      argument :order_by, CourseWorkSubmissionsOrderField, required: false, description: "Field to order results by"
       argument :start_date, GraphQL::Types::ISO8601DateTime, required: false, description: "Start date for due date range filter"
     end
-    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, observed_user_id: nil)
+    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, observed_user_id: nil, order_by: nil)
       return [] unless object == current_user
 
       # Get active course enrollments using the same filtering as dashboard
@@ -779,8 +787,13 @@ module Types
         end
       end
 
-      # Order by cached_due_date first (nulls last), then by assignment due_at (nulls last)
-      submissions_query = submissions_query.order(:cached_due_date, assignments: { due_at: :asc })
+      # Order submissions based on order_by parameter
+      submissions_query = case order_by
+                          when :graded_at
+                            submissions_query.order(graded_at: :desc)
+                          when :due_at, nil
+                            submissions_query.order(:cached_due_date, assignments: { due_at: :asc })
+                          end
 
       # Use eager_load for essential associations to avoid N+1 queries
       submissions_query.eager_load(assignment: :course)
