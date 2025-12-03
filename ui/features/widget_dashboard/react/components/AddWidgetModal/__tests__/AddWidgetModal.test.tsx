@@ -72,6 +72,7 @@ describe('AddWidgetModal', () => {
     expect(screen.getByTestId('widget-card-announcements')).toBeInTheDocument()
     expect(screen.getByTestId('widget-card-people')).toBeInTheDocument()
     expect(screen.getByTestId('widget-card-todo_list')).toBeInTheDocument()
+    expect(screen.getByTestId('widget-card-progress_overview')).toBeInTheDocument()
   })
 
   it('displays correct widget display names', () => {
@@ -98,7 +99,7 @@ describe('AddWidgetModal', () => {
     render(<AddWidgetModal {...defaultProps} />)
 
     const addButtons = screen.getAllByRole('button', {name: 'Add'})
-    expect(addButtons).toHaveLength(8)
+    expect(addButtons).toHaveLength(9)
   })
 
   it('calls addWidget with correct parameters when Add button is clicked', async () => {
