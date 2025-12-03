@@ -2962,10 +2962,10 @@
   dependencies:
     prop-types "^15"
 
-"@instructure/studio-player@1.4.2":
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.4.2.tgz#bb4a97c38b325e5b7b297601343c79557b44ef73"
-  integrity sha512-ttwM2TymYG4KENeUrT77B1aq/b129tjRzMTMSYZwbHBsI7wPZ5RPiHMqX3dJC8uLWSNw/+WbcoxaYpM2b8FmGQ==
+"@instructure/studio-player@1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.5.1.tgz#811402b2500dea753a3b08ad04434b4eb9e04163"
+  integrity sha512-V8BBU31gsiKIkVrB+NUDLPDIlYBKgYj9Yd7cUe/rJNbskv5RNK0WfhJs3HoRzgq9XutVDlbOcSDL+p4d6Nm8xQ==
   dependencies:
     "@floating-ui/react" "^0.27.3"
     "@nanostores/react" "^1.0.0"
