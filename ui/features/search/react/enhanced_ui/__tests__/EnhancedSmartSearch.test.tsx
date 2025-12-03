@@ -111,7 +111,7 @@ describe('EnhancedSmartSearch', () => {
     expect(queryByText('No results')).toBeNull()
     await waitFor(() => {
       expect(getByTestId('indexing_progress')).toBeInTheDocument()
-      expect(getByText(/wait a moment while we get IgniteAI Search ready/)).toBeInTheDocument()
+      expect(getByText(/wait a moment while we get Smart Search ready/)).toBeInTheDocument()
     })
   })
 
@@ -128,7 +128,7 @@ describe('EnhancedSmartSearch', () => {
     expect(queryByText('You may also be interested in')).toBeNull()
     expect(queryByText('No results')).toBeNull()
     expect(queryByTestId('indexing_progress')).toBeNull()
-    expect(queryByText(/wait a moment while we get IgniteAI Search ready/)).toBeNull()
+    expect(queryByText(/wait a moment while we get Smart Search ready/)).toBeNull()
   })
 
   describe('after a successful search', () => {
