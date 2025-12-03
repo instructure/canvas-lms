@@ -37,6 +37,7 @@ export const WIDGET_TYPES = {
   PEOPLE: 'people',
   TODO_LIST: 'todo_list',
   RECENT_GRADES: 'recent_grades',
+  PROGRESS_OVERVIEW: 'progress_overview',
 } as const
 
 export type WidgetType = (typeof WIDGET_TYPES)[keyof typeof WIDGET_TYPES]
