@@ -115,6 +115,14 @@ describe "student dashboard Course work widget", :ignore_js_errors do
       expect(driver.current_url).to include("/courses/#{@course1.id}/assignments/#{@due_assignment.id}")
     end
 
+    it "navigates to the course when clicking go to course link" do
+      go_to_dashboard
+
+      expect(course_work_item_course_link(@due_assignment.id)).to be_displayed
+      course_work_item_course_link(@due_assignment.id).click
+      expect(driver.current_url).to include("/courses/#{@course1.id}")
+    end
+
     it "displays course work in pagination" do
       @assignment1 = @course1.assignments.create!(name: "Course 1: assignment 1", due_at: 2.days.from_now.end_of_day, submission_types: "online_text_entry")
       @assignment2 = @course1.assignments.create!(name: "Course 1: assignment 2", due_at: 2.days.from_now.end_of_day, submission_types: "online_text_entry")
