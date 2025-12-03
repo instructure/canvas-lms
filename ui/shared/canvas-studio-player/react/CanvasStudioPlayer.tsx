@@ -385,6 +385,54 @@ export default function CanvasStudioPlayer({
     }
   }, [explicitSize, containerWidth, containerHeight])
 
+  /**
+   * When escape is pressed, if focus is inside the player:
+   * - If in fullscreen: manually exit and restore focus to fullscreen button
+   * - If menu is open: restore focus to the menu button
+   * Why: Chrome loses focus after fullscreen exit, Firefox doesn't
+   */
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const handleEscapeCapture = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+
+      const target = event.target as HTMLElement
+      if (!container.contains(target)) return
+
+      if (document.fullscreenElement) {
+        event.preventDefault()
+        event.stopPropagation()
+
+        document.exitFullscreen().then(() => {
+          const fullscreenButton = container.querySelector(
+            '[class*="_full-screen-button"]',
+          ) as HTMLElement | null
+          fullscreenButton?.focus()
+        })
+
+        return
+      }
+
+      // Handle menu escape - restore focus to menu button
+      const openMenuButton = container.querySelector(
+        '.controls-button[aria-expanded="true"], #kebab-menu-button[aria-expanded="true"]',
+      ) as HTMLElement | null
+      if (openMenuButton) {
+        setTimeout(() => {
+          openMenuButton.focus()
+        }, 0)
+      }
+    }
+
+    document.addEventListener('keydown', handleEscapeCapture, true)
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeCapture, true)
+    }
+  }, [])
+
   function renderLoader() {
     if (retryAttempt >= showBePatientMsgAfterAttempts) {
       setIsLoading(false)
