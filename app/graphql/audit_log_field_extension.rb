@@ -154,6 +154,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
                Mutations::UpdateGradebookGroupFilter,
                Mutations::UpdateLearnerDashboardTabSelection,
                Mutations::UpdateWidgetDashboardConfig,
+               Mutations::UpdateWidgetDashboardLayout,
                Mutations::AcceptEnrollmentInvitation,
                Mutations::RejectEnrollmentInvitation].include? mutation
 

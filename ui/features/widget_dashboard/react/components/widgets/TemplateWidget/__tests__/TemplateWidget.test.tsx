@@ -19,12 +19,14 @@
 import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import TemplateWidget from '../TemplateWidget'
 import type {TemplateWidgetProps} from '../TemplateWidget'
 import type {Widget} from '../../../../types'
 import {ResponsiveProvider} from '../../../../hooks/useResponsiveContext'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
+import {WidgetDashboardProvider} from '../../../../hooks/useWidgetDashboardContext'
 
 const mockWidget: Widget = {
   id: 'test-widget',
@@ -47,14 +49,25 @@ const setup = (
   children = <div>Test content</div>,
   matches: string[] = ['desktop'],
 ) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {retry: false},
+      mutations: {retry: false},
+    },
+  })
+
   return render(
-    <WidgetDashboardEditProvider>
-      <WidgetLayoutProvider>
-        <ResponsiveProvider matches={matches}>
-          <TemplateWidget {...props}>{children}</TemplateWidget>
-        </ResponsiveProvider>
-      </WidgetLayoutProvider>
-    </WidgetDashboardEditProvider>,
+    <QueryClientProvider client={queryClient}>
+      <WidgetDashboardProvider>
+        <WidgetDashboardEditProvider>
+          <WidgetLayoutProvider>
+            <ResponsiveProvider matches={matches}>
+              <TemplateWidget {...props}>{children}</TemplateWidget>
+            </ResponsiveProvider>
+          </WidgetLayoutProvider>
+        </WidgetDashboardEditProvider>
+      </WidgetDashboardProvider>
+    </QueryClientProvider>,
   )
 }
 
@@ -292,16 +305,27 @@ describe('TemplateWidget', () => {
       const removeButton = screen.getByTestId('test-widget-remove-button')
       await user.click(removeButton)
 
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {retry: false},
+          mutations: {retry: false},
+        },
+      })
+
       rerender(
-        <WidgetDashboardEditProvider>
-          <WidgetLayoutProvider>
-            <ResponsiveProvider matches={['desktop']}>
-              <TemplateWidget {...props}>
-                <div>Test content</div>
-              </TemplateWidget>
-            </ResponsiveProvider>
-          </WidgetLayoutProvider>
-        </WidgetDashboardEditProvider>,
+        <QueryClientProvider client={queryClient}>
+          <WidgetDashboardProvider>
+            <WidgetDashboardEditProvider>
+              <WidgetLayoutProvider>
+                <ResponsiveProvider matches={['desktop']}>
+                  <TemplateWidget {...props}>
+                    <div>Test content</div>
+                  </TemplateWidget>
+                </ResponsiveProvider>
+              </WidgetLayoutProvider>
+            </WidgetDashboardEditProvider>
+          </WidgetDashboardProvider>
+        </QueryClientProvider>,
       )
     })
   })
