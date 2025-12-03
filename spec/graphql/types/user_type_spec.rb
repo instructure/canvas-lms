@@ -193,40 +193,123 @@ describe Types::UserType do
         workflow_state: "active",
         sis_user_id: "a.ham"
       )
+      @admin = account_admin_user
+    end
+
+    before do
+      @resolver = GraphQLTypeTester.new(@student,
+                                        domain_root_account: @course.account.root_account,
+                                        request: ActionDispatch::TestRequest.create)
     end
 
     context "as admin" do
-      let(:admin) { account_admin_user }
-      let(:user_type_as_admin) do
-        GraphQLTypeTester.new(@student,
-                              current_user: admin,
-                              domain_root_account: @course.account.root_account,
-                              request: ActionDispatch::TestRequest.create)
-      end
-
       it "returns the sis user id if the user has permissions to read it" do
-        expect(user_type_as_admin.resolve("sisId")).to eq "a.ham"
+        expect(@resolver.resolve("sisId", current_user: @admin)).to eq @student.pseudonyms.first.sis_user_id
       end
 
       it "returns nil if the user does not have permission to read the sis user id" do
         account_admin_user_with_role_changes(role_changes: { read_sis: false, manage_sis: false })
-        admin_type = GraphQLTypeTester.new(@student,
-                                           current_user: @admin,
-                                           domain_root_account: @course.account.root_account,
-                                           request: ActionDispatch::TestRequest.create)
-        expect(admin_type.resolve("sisId")).to be_nil
+        expect(@resolver.resolve("sisId", current_user: @admin)).to be_nil
       end
     end
 
     context "as teacher" do
       it "returns the sis user id if the user has permissions to read it" do
-        expect(user_type.resolve("sisId")).to eq "a.ham"
+        expect(@resolver.resolve("sisId", current_user: @teacher)).to eq @student.pseudonyms.first.sis_user_id
       end
 
       it "returns null if the user does not have permission to read the sis user id" do
         @teacher.enrollments.find_by(course: @course).role
                 .role_overrides.create!(permission: "read_sis", enabled: false, account: @course.account)
-        expect(user_type.resolve("sisId")).to be_nil
+        expect(@resolver.resolve("sisId", current_user: @teacher)).to be_nil
+      end
+    end
+
+    context "permission check priority" do
+      context "with course context" do
+        before do
+          # Object level permissions should be never called if course is in context
+          expect(@student).not_to receive(:grants_any_right?)
+        end
+
+        it "checks account-level permission first" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@admin, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@course).not_to receive(:grants_any_right?)
+
+          expect(@resolver.resolve("sisId", current_user: @admin)).to eq @student.pseudonyms.first.sis_user_id
+        end
+
+        it "checks course-level permission if account-level fails" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@course).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("sisId", current_user: @teacher, course: @course)).to eq @student.pseudonyms.first.sis_user_id
+        end
+
+        it "returns nil account-level and course-level permission checks fail" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@course).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("sisId", current_user: @other_student, course: @course)).to be_nil
+        end
+      end
+
+      context "without course context" do
+        before do
+          # Course-level permissions should be never called if course is not in context
+          expect(@course).not_to receive(:grants_any_right?)
+        end
+
+        it "checks account-level permission first" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@admin, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@student).not_to receive(:grants_any_right?)
+
+          expect(@resolver.resolve("sisId", current_user: @admin)).to eq @student.pseudonyms.first.sis_user_id
+        end
+
+        it "checks object-level permission if account-level fails" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+
+          # Must use any_instance_of because GraphQL's IDLoader reloads User from DB (new instance)
+          # allow_any_instance_of: lets ALL grants_any_right? calls proceed (e.g., :read_full_profile checks)
+          # expect_any_instance_of: verifies our specific :read_sis, :manage_sis call happens
+          allow_any_instance_of(User).to receive(:grants_any_right?).and_call_original
+          expect_any_instance_of(User).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("sisId", current_user: @teacher)).to eq @student.pseudonyms.first.sis_user_id
+        end
+
+        it "returns nil account-level and object-level permission checks fail" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+
+          # Must use any_instance_of because GraphQL's IDLoader reloads User from DB (new instance)
+          # allow_any_instance_of: lets ALL grants_any_right? calls proceed (e.g., :read_full_profile checks)
+          # expect_any_instance_of: verifies our specific :read_sis, :manage_sis call happens
+          allow_any_instance_of(User).to receive(:grants_any_right?).and_call_original
+          expect_any_instance_of(User).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("sisId", current_user: @other_student)).to be_nil
+        end
       end
     end
   end
@@ -239,40 +322,123 @@ describe Types::UserType do
         workflow_state: "active",
         integration_id: "Rachel.Lands"
       )
+      @admin = account_admin_user
+    end
+
+    before do
+      @resolver = GraphQLTypeTester.new(@student,
+                                        domain_root_account: @course.account.root_account,
+                                        request: ActionDispatch::TestRequest.create)
     end
 
     context "as admin" do
-      let(:admin) { account_admin_user }
-      let(:user_type_as_admin) do
-        GraphQLTypeTester.new(@student,
-                              current_user: admin,
-                              domain_root_account: @course.account.root_account,
-                              request: ActionDispatch::TestRequest.create)
-      end
-
       it "returns the integration id if admin user has permissions to read SIS info" do
-        expect(user_type_as_admin.resolve("integrationId")).to eq "Rachel.Lands"
+        expect(@resolver.resolve("integrationId", current_user: @admin)).to eq @student.pseudonyms.first.integration_id
       end
 
       it "returns null for integration id if admin user does not have permission to read SIS info" do
         account_admin_user_with_role_changes(role_changes: { read_sis: false, manage_sis: false })
-        admin_type = GraphQLTypeTester.new(@student,
-                                           current_user: @admin,
-                                           domain_root_account: @course.account.root_account,
-                                           request: ActionDispatch::TestRequest.create)
-        expect(admin_type.resolve("integrationId")).to be_nil
+        expect(@resolver.resolve("integrationId", current_user: @admin)).to be_nil
       end
     end
 
     context "as teacher" do
       it "returns the integration id if teacher user has permissions to read SIS info" do
-        expect(user_type.resolve("integrationId")).to eq "Rachel.Lands"
+        expect(@resolver.resolve("integrationId", current_user: @teacher)).to eq @student.pseudonyms.first.integration_id
       end
 
       it "returns null if teacher user does not have permission to read SIS info" do
         @teacher.enrollments.find_by(course: @course).role
                 .role_overrides.create!(permission: "read_sis", enabled: false, account: @course.account)
-        expect(user_type.resolve("integrationId")).to be_nil
+        expect(@resolver.resolve("integrationId", current_user: @teacher)).to be_nil
+      end
+    end
+
+    context "permission check priority" do
+      context "with course context" do
+        before do
+          # Object level permissions should be never called if course is in context
+          expect(@student).not_to receive(:grants_any_right?)
+        end
+
+        it "checks account-level permission first" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@admin, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@course).not_to receive(:grants_any_right?)
+
+          expect(@resolver.resolve("integrationId", current_user: @admin)).to eq @student.pseudonyms.first.integration_id
+        end
+
+        it "checks course-level permission if account-level fails" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@course).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("integrationId", current_user: @teacher, course: @course)).to eq @student.pseudonyms.first.integration_id
+        end
+
+        it "returns nil account-level and course-level permission checks fail" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@course).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("integrationId", current_user: @other_student, course: @course)).to be_nil
+        end
+      end
+
+      context "without course context" do
+        before do
+          # Course-level permissions should be never called if course is not in context
+          expect(@course).not_to receive(:grants_any_right?)
+        end
+
+        it "checks account-level permission first" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@admin, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@student).not_to receive(:grants_any_right?)
+
+          expect(@resolver.resolve("integrationId", current_user: @admin)).to eq @student.pseudonyms.first.integration_id
+        end
+
+        it "checks object-level permission if account-level fails" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+
+          # Must use any_instance_of because GraphQL's IDLoader reloads User from DB (new instance)
+          # allow_any_instance_of: lets ALL grants_any_right? calls proceed (e.g., :read_full_profile checks)
+          # expect_any_instance_of: verifies our specific :read_sis, :manage_sis call happens
+          allow_any_instance_of(User).to receive(:grants_any_right?).and_call_original
+          expect_any_instance_of(User).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("integrationId", current_user: @teacher)).to eq @student.pseudonyms.first.integration_id
+        end
+
+        it "returns nil account-level and object-level permission checks fail" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+
+          # Must use any_instance_of because GraphQL's IDLoader reloads User from DB (new instance)
+          # allow_any_instance_of: lets ALL grants_any_right? calls proceed (e.g., :read_full_profile checks)
+          # expect_any_instance_of: verifies our specific :read_sis, :manage_sis call happens
+          allow_any_instance_of(User).to receive(:grants_any_right?).and_call_original
+          expect_any_instance_of(User).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("integrationId", current_user: @other_student)).to be_nil
+        end
       end
     end
   end
@@ -901,10 +1067,6 @@ describe Types::UserType do
     end
 
     context "permission check priority" do
-      before(:once) do
-        @other_student = student_in_course(course: @course).user
-      end
-
       before do
         @resolver = GraphQLTypeTester.new(
           @student,
