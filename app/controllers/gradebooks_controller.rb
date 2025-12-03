@@ -1114,6 +1114,7 @@ class GradebooksController < ApplicationController
         MULTISELECT_FILTERS_ENABLED: multiselect_filters_enabled?,
         gradebook_section_filter_id: filtered_sections,
         COMMENT_BANK_PER_ASSIGNMENT_ENABLED: Account.site_admin.feature_enabled?(:comment_bank_per_assignment),
+        PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
         show_inactive_enrollments: gradebook_settings(@context.global_id)&.[]("show_inactive_enrollments") == "true",
         show_concluded_enrollments: @context.completed? || gradebook_settings(@context.global_id)&.[]("show_concluded_enrollments") == "true",
       }
