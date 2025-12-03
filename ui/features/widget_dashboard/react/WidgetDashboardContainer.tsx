@@ -23,6 +23,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {IconConfigureLine} from '@instructure/ui-icons'
+import {Alert} from '@instructure/ui-alerts'
 import DashboardTabs from './components/DashboardTabs'
 import DashboardNotifications from './components/DashboardNotifications'
 import ObserverOptions from '@canvas/observer-picker'
@@ -42,8 +43,17 @@ const WidgetDashboardContainer: React.FC = () => {
   const {observedUsersList, canAddObservee, currentUser, currentUserRoles, dashboardFeatures} =
     useWidgetDashboard()
   const {isMobile, isDesktop} = useResponsiveContext()
-  const {isEditMode, isDirty, enterEditMode, exitEditMode, saveChanges} = useWidgetDashboardEdit()
-  const {resetConfig} = useWidgetLayout()
+  const {
+    isEditMode,
+    isDirty,
+    isSaving,
+    saveError,
+    enterEditMode,
+    exitEditMode,
+    saveChanges,
+    clearError,
+  } = useWidgetDashboardEdit()
+  const {config, resetConfig} = useWidgetLayout()
   const isCustomizationEnabled = dashboardFeatures.widget_dashboard_customization
 
   const handleChangeObservedUser = useMemo(() => getHandleChangeObservedUser(), [])
@@ -61,7 +71,7 @@ const WidgetDashboardContainer: React.FC = () => {
   }, [isDirty])
 
   const handleSave = () => {
-    saveChanges()
+    saveChanges(config)
   }
 
   const handleCancel = () => {
@@ -72,6 +82,16 @@ const WidgetDashboardContainer: React.FC = () => {
   return (
     <View as="div">
       <DashboardNotifications />
+      {saveError && (
+        <Alert
+          variant="error"
+          margin="0 0 medium"
+          renderCloseButtonLabel={I18n.t('Close')}
+          onDismiss={clearError}
+        >
+          {I18n.t('Failed to save widget layout: %{error}', {error: saveError})}
+        </Alert>
+      )}
       <Flex margin="0 0 medium" alignItems="center">
         <Flex.Item shouldGrow>
           <Flex gap="small" direction={isMobile ? 'column' : 'row'} alignItems="center">
@@ -97,9 +117,10 @@ const WidgetDashboardContainer: React.FC = () => {
                       <Button
                         color="primary"
                         onClick={handleSave}
+                        interaction={isSaving ? 'disabled' : 'enabled'}
                         data-testid="save-customize-button"
                       >
-                        {I18n.t('Save changes')}
+                        {isSaving ? I18n.t('Saving...') : I18n.t('Save changes')}
                       </Button>
                     </Flex.Item>
                   </>

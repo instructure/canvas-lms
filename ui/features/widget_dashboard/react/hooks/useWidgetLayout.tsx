@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createContext, useContext, useState, useCallback} from 'react'
+import React, {createContext, useContext, useState, useCallback, useEffect} from 'react'
 import type {WidgetConfig, Widget} from '../types'
 import {DEFAULT_WIDGET_CONFIG, LEFT_COLUMN, RIGHT_COLUMN} from '../constants'
 import {useWidgetDashboardEdit} from './useWidgetDashboardEdit'
+import {useWidgetDashboard} from './useWidgetDashboardContext'
 
 export type MoveAction =
   | 'move-left'
@@ -224,8 +225,19 @@ const moveWidgetToBottom = (widgets: Widget[], widgetId: string): Widget[] => {
 }
 
 export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
-  const [config, setConfig] = useState<WidgetConfig>(DEFAULT_WIDGET_CONFIG)
+  const {preferences} = useWidgetDashboard()
+  const [config, setConfig] = useState<WidgetConfig>(() => {
+    const persistedLayout = preferences.widget_dashboard_config?.layout
+    return persistedLayout || DEFAULT_WIDGET_CONFIG
+  })
   const {markDirty} = useWidgetDashboardEdit()
+
+  useEffect(() => {
+    const persistedLayout = preferences.widget_dashboard_config?.layout
+    if (persistedLayout) {
+      setConfig(persistedLayout)
+    }
+  }, [preferences.widget_dashboard_config?.layout])
 
   const moveWidget = useCallback(
     (widgetId: string, action: MoveAction) => {
