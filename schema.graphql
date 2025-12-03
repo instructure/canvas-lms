@@ -8746,6 +8746,7 @@ type RubricAssessment implements LegacyIDInterface {
   assessmentRatings: [RubricAssessmentRating!]
   assessmentType: AssessmentType!
   assessor: User
+  isCurrentUser: Boolean!
   rubricAssociation: RubricAssociation
   score: Float
   updatedAt: DateTime
