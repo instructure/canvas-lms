@@ -3781,7 +3781,6 @@ RSpec.describe ApplicationController, "#set_js_env" do
         expect(controller.js_env[:current_context]).to eq(
           {
             id: context.id,
-            global_id: context.global_id,
             url: "http://test.host/courses/#{context.id}",
             name: context.name,
             type: "Course"
@@ -3795,7 +3794,6 @@ RSpec.describe ApplicationController, "#set_js_env" do
         expect(controller.js_env[:current_context]).to eq(
           {
             id: context.id,
-            global_id: context.global_id,
             url: "http://test.host/courses/#{context.id}",
             name: context.name,
             type: "Course"
