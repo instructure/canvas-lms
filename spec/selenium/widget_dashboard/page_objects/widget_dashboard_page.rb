@@ -117,6 +117,10 @@ module WidgetDashboardPage
     "[data-testid='course-#{course_id}-gradebook-link']"
   end
 
+  def course_grades_go_to_course_link_selector(course_id)
+    "[data-testid='course-#{course_id}-link']"
+  end
+
   def course_grade_text_selector(course_id)
     "[data-testid='course-#{course_id}-grade']"
   end
@@ -143,6 +147,10 @@ module WidgetDashboardPage
 
   def course_work_item_link_selector(item_id)
     "[data-testid='course-work-item-link-#{item_id}']"
+  end
+
+  def course_work_item_course_link_selector(item_id)
+    "[data-testid='course-work-item-course-link-#{item_id}']"
   end
 
   def course_work_item_pill_selector(status_label, item_id)
@@ -282,6 +290,10 @@ module WidgetDashboardPage
     f(course_gradebook_link_selector(course_id))
   end
 
+  def course_grades_go_to_course_link(course_id)
+    f(course_grades_go_to_course_link_selector(course_id))
+  end
+
   def course_grade_text(course_id)
     f(course_grade_text_selector(course_id))
   end
@@ -308,6 +320,10 @@ module WidgetDashboardPage
 
   def course_work_item_link(item_id)
     f(course_work_item_link_selector(item_id))
+  end
+
+  def course_work_item_course_link(item_id)
+    f(course_work_item_course_link_selector(item_id))
   end
 
   def course_work_item_pill(status_label, item_id)
