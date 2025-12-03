@@ -182,14 +182,15 @@
                     <button id="parent_assignment_id_<%= assignment.id %>" class="Button Button--icon-action toggle_sub_assignments screenreader-toggle" aria-label="<%= t('Show discussion checkpoints information') %>" aria-expanded='false' aria-details="<%= t('show/hide the discussion checkpoints information reply to topic and required replies') %>"><i class="icon-arrow-open-end"></i><span class="screenreader-only"><%= t 'Expand or Collapse' %></span></button>
                   <% end %>
                   <% if assignment_presenter.show_submission_details? %>
-                    <% if assignment.a2_enabled? %>
+                    <% link_assignment = assignment_presenter.assignment_for_submission_link %>
+                    <% if link_assignment.a2_enabled? %>
                       <% if @presenter.student_is_user? || @presenter.user_an_observer_of_student? %>
-                        <a href="<%= context_url(@context, :context_assignment_url, assignment) %>"><%= assignment.title %></a>
+                        <a href="<%= context_url(@context, :context_assignment_url, link_assignment) %>"><%= assignment.title %></a>
                       <% else %>
-                        <a href="<%= speed_grader_course_gradebook_url({course_id: assignment.context_id, assignment_id: assignment}.merge({student_id: submission.user_id, only_path: true})) %>" target="_blank" rel="noopener"><%= assignment.title %></a>
+                        <a href="<%= speed_grader_course_gradebook_url({course_id: link_assignment.context_id, assignment_id: link_assignment}.merge({student_id: submission.user_id, only_path: true})) %>" target="_blank" rel="noopener"><%= assignment.title %></a>
                       <% end %>
                     <% else %>
-                      <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @presenter.student_id) %>"><%= assignment.title %></a>
+                      <a href="<%= context_url(@context, :context_assignment_submission_url, link_assignment, @presenter.student_id) %>"><%= assignment.title %></a>
                     <% end %>
                   <% else %>
                     <%= assignment.title %>

@@ -99,7 +99,15 @@ class GradeSummaryAssignmentPresenter
   end
 
   def is_assignment?
-    assignment.instance_of?(Assignment)
+    assignment.instance_of?(Assignment) || assignment.is_a?(PeerReviewSubAssignment)
+  end
+
+  def assignment_for_submission_link
+    if assignment.is_a?(PeerReviewSubAssignment)
+      assignment.parent_assignment
+    else
+      assignment
+    end
   end
 
   def has_no_group_weight?
