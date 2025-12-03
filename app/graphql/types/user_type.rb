@@ -141,22 +141,8 @@ module Types
     field :email, String, null: true
 
     def email
-      # IMPORTANT: The order of permission checks here is critical for performance.
-      # We check higher-level permissions (account/course) BEFORE user-level permissions
-      # to avoid N+1 queries. Checking object.grants_right? on the user requires loading
-      # all of the user's courses to verify permissions, which causes N+1s when
-      # resolving email for multiple users (e.g., in a course roster).
-      #
-      # By checking domain_root_account and course permissions first, we leverage context
-      # objects that are already loaded. Only when these context-level checks fail do we
-      # fall back to the expensive user-level permission check.
-      #
-      # When a course context is present, we skip the object-level permission check entirely
-      # and only check account/course level permissions for better performance.
-      #
-      # This optimization prevents timeouts on initial requests and matches the pattern
-      # used in the REST API for similar permission checks.
-
+      # Check account/course permissions before user-level to avoid N+1 queries.
+      # In course context, skip expensive object.grants_right? that loads all user enrollments.
       domain_root_account = context[:domain_root_account]
       unless domain_root_account.grants_right?(context[:current_user], :read_email_addresses)
         course = context[:course]
@@ -180,37 +166,55 @@ module Types
 
     field :sis_id, String, null: true
     def sis_id
+      # Check account/course permissions before user-level to avoid N+1 queries.
+      # In course context, skip expensive object.grants_any_right? that loads all user enrollments.
       domain_root_account = context[:domain_root_account]
-      if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
-         context[:course]&.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
-         object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
-        load_association(:pseudonyms).then do
-          pseudonym = SisPseudonym.for(object,
-                                       domain_root_account,
-                                       type: :implicit,
-                                       require_sis: false,
-                                       root_account: domain_root_account,
-                                       in_region: true)
-          pseudonym&.sis_user_id
-        end
+      unless domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+        course = context[:course]
+        has_permission = if course
+                           course.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+                         else
+                           object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+                         end
+
+        return unless has_permission
+      end
+
+      load_association(:pseudonyms).then do
+        pseudonym = SisPseudonym.for(object,
+                                     domain_root_account,
+                                     type: :implicit,
+                                     require_sis: false,
+                                     root_account: domain_root_account,
+                                     in_region: true)
+        pseudonym&.sis_user_id
       end
     end
 
     field :integration_id, String, null: true
     def integration_id
+      # Check account/course permissions before user-level to avoid N+1 queries.
+      # In course context, skip expensive object.grants_any_right? that loads all user enrollments.
       domain_root_account = context[:domain_root_account]
-      if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
-         context[:course]&.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
-         object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
-        load_association(:pseudonyms).then do
-          pseudonym = SisPseudonym.for(object,
-                                       domain_root_account,
-                                       type: :implicit,
-                                       require_sis: false,
-                                       root_account: domain_root_account,
-                                       in_region: true)
-          pseudonym&.integration_id
-        end
+      unless domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+        course = context[:course]
+        has_permission = if course
+                           course.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+                         else
+                           object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+                         end
+
+        return unless has_permission
+      end
+
+      load_association(:pseudonyms).then do
+        pseudonym = SisPseudonym.for(object,
+                                     domain_root_account,
+                                     type: :implicit,
+                                     require_sis: false,
+                                     root_account: domain_root_account,
+                                     in_region: true)
+        pseudonym&.integration_id
       end
     end
 
