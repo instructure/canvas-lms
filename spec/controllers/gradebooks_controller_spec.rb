@@ -3290,6 +3290,22 @@ describe GradebooksController do
         get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
         expect(assigns[:js_env].fetch(:VIEW_ALL_GRADES)).to be false
       end
+
+      it "includes PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED in js_env when feature is enabled" do
+        @assignment.publish
+        @course.enable_feature!(:platform_service_speedgrader)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED)).to be true
+      end
+
+      it "sets PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED to false when feature is disabled" do
+        @assignment.publish
+        @course.enable_feature!(:platform_service_speedgrader)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED)).to be false
+      end
     end
 
     it "falls back to classic speedgrader when the platform speedgrader launch URL is not configured" do
