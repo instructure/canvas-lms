@@ -270,6 +270,9 @@
           </a>
         </div>
       <% end %>
+      <% if @context.feature_enabled?(:peer_review_allocation_and_grading) && @assignment.has_peer_reviews? %>
+        <div id="peer-review-assignment-widget-mount-point"></div>
+      <% end %>
     <% end %>
 
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
