@@ -102,10 +102,14 @@ export const AccountTree = ({
   )
 
   useEffect(() => {
-    for (const id of expandedAccounts) {
-      fetchAccountData(id)
-    }
-    // this should onlyrun on first render
+    // On mount, fetch only the origin account and its direct children.
+    // In production, expandedAccounts is always initialized with a single account ID
+    // (the root account). Additional accounts are fetched on-demand when users
+    // expand tree nodes via handleToggle. This ensures we only load data when needed
+    // rather than preloading the entire account hierarchy.
+    fetchAccountData(originAccountId)
+
+    // this should only run on first render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
