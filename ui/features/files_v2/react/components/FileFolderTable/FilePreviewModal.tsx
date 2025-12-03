@@ -56,6 +56,7 @@ export const FilePreviewModal = ({
 }: FilePreviewModalProps) => {
   const modalBody = useRef<HTMLElement | null>(null)
   const fileInfoButton = useRef<HTMLElement | null>(null)
+  const shouldPreventDismiss = useRef<boolean>(false)
   const [currentItem, setCurrentItem] = useState<File | null>(item)
   const [currentIndex, setCurrentIndex] = useState<number>(
     item && collection ? collection.indexOf(item) : 0,
@@ -95,6 +96,44 @@ export const FilePreviewModal = ({
       })
     }
   }, [isOpen, name])
+
+  // Intercept Escape key to check if it originated from within Studio player
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleEscapeCapture = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+
+      const studioPlayer = document.querySelector('[data-media-player]')
+      if (!studioPlayer) {
+        shouldPreventDismiss.current = false
+        return
+      }
+
+      const target = event.target as HTMLElement
+      if (studioPlayer.contains(target)) {
+        shouldPreventDismiss.current = true
+
+        // Find the open menu trigger button and restore focus to it after menu closes
+        const openMenuButton = studioPlayer.querySelector(
+          '[aria-expanded="true"][aria-haspopup="true"]',
+        ) as HTMLElement | null
+        if (openMenuButton) {
+          setTimeout(() => {
+            openMenuButton.focus()
+          }, 0)
+        }
+      } else {
+        shouldPreventDismiss.current = false
+      }
+    }
+
+    document.addEventListener('keydown', handleEscapeCapture, true)
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeCapture, true)
+    }
+  }, [isOpen])
 
   useEffect(() => {
     const handlePopState = () => {
@@ -153,10 +192,18 @@ export const FilePreviewModal = ({
     }
   }
 
+  const handleDismiss = () => {
+    if (shouldPreventDismiss.current) {
+      shouldPreventDismiss.current = false
+      return
+    }
+    onClose()
+  }
+
   return (
     <Modal
       open={isOpen}
-      onDismiss={onClose}
+      onDismiss={handleDismiss}
       size={'fullscreen'}
       label={name}
       shouldCloseOnDocumentClick={false}
