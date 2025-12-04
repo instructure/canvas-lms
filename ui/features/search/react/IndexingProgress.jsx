@@ -30,7 +30,7 @@ export default function IndexingProgress({progress, isEnhanced = false}) {
       <div>
         <Text as="p">
           {I18n.t(
-            'Please wait a moment while we get IgniteAI Search ready for this course. This only needs to happen once.',
+            'Please wait a moment while we get Smart Search ready for this course. This only needs to happen once.',
           )}
         </Text>
         <Text as="p">
@@ -51,7 +51,7 @@ export default function IndexingProgress({progress, isEnhanced = false}) {
       <div>
         <Text>
           {I18n.t(
-            'Please wait a moment while we get IgniteAI Search ready for this course. This only needs to happen once.',
+            'Please wait a moment while we get Smart Search ready for this course. This only needs to happen once.',
           )}
         </Text>
         <br />

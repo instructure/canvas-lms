@@ -227,7 +227,12 @@ export default function SearchApp({courseId}) {
 
       <Heading level="h1" margin="0 0 medium 0" data-testid="smart-search-heading">
         <Flex justifyItems="space-between">
-          <Flex.Item>{I18n.t('IgniteAI Search')}</Flex.Item>
+          <Flex.Item>
+            {I18n.t('Smart Search')}
+            <Pill color="alert" margin="0 0 0 small" themeOverride={{background: 'alert'}}>
+              {I18n.t('Feature Preview')}
+            </Pill>
+          </Flex.Item>
           <Flex.Item>
             <Button onClick={_ => setIsTrayOpen(true)}>{I18n.t('How It Works')}</Button>
           </Flex.Item>
@@ -294,16 +299,16 @@ export default function SearchApp({courseId}) {
               />
             </Flex.Item>
             <Flex.Item>
-              <h3>{I18n.t('About IgniteAI Search')}</h3>
+              <h3>{I18n.t('About Smart Search')}</h3>
               <p>
                 {I18n.t(
-                  'IgniteAI Search, currently in development for Canvas, uses semantic algorithms and AI to understand query context and semantic meaning, not just keyword matching.',
+                  'Smart Search, currently in development for Canvas, uses semantic algorithms and AI to understand query context and semantic meaning, not just keyword matching.',
                 )}
               </p>
-              <h3>{I18n.t('Using IgniteAI Search')}</h3>
+              <h3>{I18n.t('Using Smart Search')}</h3>
               <p>
                 {I18n.t(
-                  'IgniteAI Search employs "embeddings" to mathematically represent content and queries for comparison, understanding keywords or general queries in any language, thanks to its multilingual AI model. Write search queries using keywords, questions, sentences, or whatever is most natural for you to describe what you are trying to find.',
+                  'Smart Search employs "embeddings" to mathematically represent content and queries for comparison, understanding keywords or general queries in any language, thanks to its multilingual AI model. Write search queries using keywords, questions, sentences, or whatever is most natural for you to describe what you are trying to find.',
                 )}
               </p>
               <h3>{I18n.t('Searchable Content')}</h3>
@@ -315,14 +320,14 @@ export default function SearchApp({courseId}) {
               <h3>{I18n.t('Contributing to Development')}</h3>
               <p>
                 {I18n.t(
-                  'IgniteAI Search is in feature preview. Feedback can be provided through result ratings and the Canvas Community space for IgniteAI Search Beta. Canvas community space can be found here: ',
+                  'Smart Search is in feature preview. Feedback can be provided through result ratings and the Canvas Community space for Smart Search Beta. Canvas community space can be found here: ',
                 )}
                 <a
                   href="https://community.canvaslms.com/t5/Smart-Search/gh-p/smart_search"
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {I18n.t('IgniteAI Search Community')}
+                  {I18n.t('Smart Search Community')}
                 </a>
               </p>
             </Flex.Item>

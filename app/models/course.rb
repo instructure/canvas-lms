@@ -3513,7 +3513,7 @@ class Course < ActiveRecord::Base
       default_tabs.insert(1,
                           {
                             id: TAB_SEARCH,
-                            label: t("IgniteAI Search"),
+                            label: t("#tabs.search", "Smart Search"),
                             css_class: "search",
                             href: :course_search_path
                           })

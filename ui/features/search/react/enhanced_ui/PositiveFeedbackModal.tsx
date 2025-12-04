@@ -49,7 +49,7 @@ export default function PositiveFeedbackModal(props: Props) {
             screenReaderLabel={I18n.t('Close')}
           />
         </Modal.Header>
-        <Modal.Body>{I18n.t('Your feedback helps us improve IgniteAI Search.')}</Modal.Body>
+        <Modal.Body>{I18n.t('Your feedback helps us improve smart search.')}</Modal.Body>
         <Modal.Footer>
           <Button data-testid="pf-close" onClick={props.onClose}>
             {I18n.t('Close')}
