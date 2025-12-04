@@ -30,9 +30,8 @@ jest.mock('jquery', () => ({
   },
 }))
 
-// Mock lodash throttle to just call the function immediately
-jest.mock('lodash', () => ({
-  ...jest.requireActual('lodash'),
+// Mock es-toolkit throttle to just call the function immediately
+jest.mock('es-toolkit', () => ({
   throttle: (fn: () => void) => fn,
 }))
 
