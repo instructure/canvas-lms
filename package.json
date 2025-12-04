@@ -202,7 +202,6 @@
     "timezone": "npm:@instructure/timezone@1.0.32",
     "tinycolor2": "^1.6.0",
     "twitter-text": "^3.1.0",
-    "underscore": "^1.13.6",
     "use-debounce": "^10",
     "use-media-set": "^1.1",
     "uuid": "3.4.0",
