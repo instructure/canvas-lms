@@ -226,3 +226,21 @@ export const ALLOCATION_RULES_QUERY = gql`
     }
   }
 `
+
+export const PEER_REVIEW_CONFIGURATION_QUERY = gql`
+  query GetPeerReviewConfiguration($assignmentId: ID!) {
+    assignment(id: $assignmentId) {
+      hasGroupCategory
+      peerReviews {
+        acrossSections
+        anonymousReviews
+        count
+        submissionRequired
+        intraReviews
+      }
+      peerReviewSubAssignment {
+        pointsPossible
+      }
+    }
+  }
+`
