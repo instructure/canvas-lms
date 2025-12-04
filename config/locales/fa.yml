@@ -14089,6 +14089,7 @@ fa:
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "رسانه برای تبدیل در صف انتظار مانده است، لطفا کمی بعد دوباره تلاش کنید."
   media_objects: 
     media_objects_not_configured: "اشیاء رسانه ای پیکربندی نشده اند"
+    video_player: "پخش کننده فیلم"
   media_objects_c2fa37cd: "اشیاء رسانه ای"
   media_over_time_d9332e25: "رسانه در طول زمان"
   media_recording_77cddc52: "ضبط رسانه ای"
@@ -16737,6 +16738,7 @@ fa:
   not_yet_assessed_9362f199: "هنوز ارزیابی نشده است"
   not_yet_completed_345a0bca: "هنوز تکمیل نشده است"
   not_yet_graded_40475341: "هنوز نمره گذاری نشده"
+  not_yet_graded_8b655a7: "هنوز نمره گذاری نشده"
   note_8b73ce09: نکته
   note_associated_tools_are_only_listed_once_even_if_ebae2aba: |-
       توجه: ابزارهای مرتبط فقط یک بار فهرست می شوند ، حتی اگر داشته باشند
@@ -25700,6 +25702,7 @@ fa:
   vietnamese_e7a76583: ویتنامی
   view_all_courses_1b4ea3e4: "مشاهده همه درس ها"
   view_all_e13bf0a6: "مشاهده همه"
+  view_all_grades_3f8bba2d: "مشاهده همه نمره ها"
   view_analytics_91a3b7a: "مشاهده تحلیل ها"
   view_analytics_data_in_tables_instead_of_graphs_8a33f536: "مشاهده داده های تحلیل ها به صورت جدول به جای نمودار"
   view_analytics_for_name_9b31594e: "مشاهده تحلیل برای %{name}"

@@ -17503,6 +17503,7 @@ tr:
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Medya dönüştürme için kuyruğa alındı, lütfen biraz sonra tekrar deneyin."
   media_objects: 
     media_objects_not_configured: "Ortam Nesneleri yapılandırılmamış"
+    video_player: "Video Oynatıcı"
   media_objects_c2fa37cd: "Medya Nesneleri"
   media_options_a0d501b9: "Medya Seçenekleri"
   media_over_time_d9332e25: "zaman içindeki medya"
@@ -20579,6 +20580,7 @@ tr:
   not_yet_completed_345a0bca: "Henüz tamamlanmadı"
   not_yet_ed60d582: "Henüz değerlendirilmedi"
   not_yet_graded_40475341: "Boş notlar hesaplamaya dâhil edilmez; yalnızca bir gönderim olduğunda geçici notlar uygulanır."
+  not_yet_graded_8b655a7: "Henüz Notlandırılmadı"
   not_yet_submitted_2d2b7328: "Bu haftaya ait etkinlik yok."
   note_8b73ce09: Not
   note_associated_tools_are_only_listed_once_even_if_ebae2aba: "İncelenecek dosya yok. Tüm dosyalar şimdilik iyi görünüyor."
@@ -27472,6 +27474,7 @@ tr:
   video_player_b371005: "Video Oynatıcı"
   vietnam_84_e50a2a44: "Viyetnam (+84)"
   view_all_courses_1b4ea3e4: "Tüm dersleri göster"
+  view_all_grades_3f8bba2d: "Tüm notları göster"
   view_analytics_91a3b7a: "Analitikleri Göster"
   view_analytics_data_in_tables_instead_of_graphs_8a33f536: "Analitik verilerini grafik yerine tablo olarak göster"
   view_announcements_b6d6d819: "Duyuruları göster"

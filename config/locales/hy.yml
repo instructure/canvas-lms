@@ -9358,6 +9358,7 @@ hy:
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Մուլտիմեդիան հերթագրված է փոխակերպման համար, խնդրում ենք փորձել նորից մի փոքր ավելի ուշ:"
   media_objects: 
     media_objects_not_configured: "Մուլտիմեդիա օբյեկտները չեն կարգաբերվել"
+    video_player: "Տեսաձայնագրության նվագարկիչ"
   media_recording_f53c5ef1: "Մուլտիմեդիա տվյալների գրանցում"
   media_recordings_749aef6d: "Մուլտիմեդիա տվյալների գրանցում"
   media_submission_464829f0: "Մուլտիմեդիա տվյալների ուղարկում"
@@ -11502,6 +11503,7 @@ hy:
   not_installed_37a21a76: "Տեղադրված չէ"
   not_now_97efd947: "Ոչ հիմա"
   not_yet_completed_345a0bca: "Դեռեւս ավարտված չէ"
+  not_yet_graded_8b655a7: "Դեռևս գնահատված չէ"
   note_length_cannot_exceed_maxlength_characters_82798b1: "Նշումը չի կարող գերազանցել %{maxLength} նիշը"
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Ծանուցում. որոշ տարրեր դասընթացի սկզբի և/կամ ավարտի ամսաթվերից դուրս են:"
   note_students_have_submitted_work_for_these_assign_7bc34e28: "ԾԱՆՈԹՈՒԹՅՈՒՆ. Ունկնդիրներն այս հանձնարարությունների հետ կապված ուղարկել են աշխատանքներ, որոնք չեն գնահատվել: Եթե այժմ տեղադրեք գնահատականները, դուք պետք է վերատեղադրեք նրանց գնահատականները նրանց ուղարկած վերջին աշխատանքները գնահատելուց հետո:  "
@@ -17794,6 +17796,7 @@ hy:
   video_b9f27375: Վիդեո
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Տեսաձայնագրության բովանդակությունը հնարավոր չէ տեսնել Ձեր կողմից ընտրված սարքի կամ հավելվածի միջոցով:"
   video_player_b371005: "Տեսաձայնագրության նվագարկիչ"
+  view_all_grades_3f8bba2d: "Դիտել բոլոր գնահատականները"
   view_analytics_91a3b7a: "Դիտել վերլուծությունը"
   view_app_center_6c89a3fe: "Դիտել App Center"
   view_app_configurations_52b52441: "Դիտել հավելվածի կարգաբերումները"

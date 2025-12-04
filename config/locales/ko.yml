@@ -9714,6 +9714,7 @@ ko:
   no_time_limit_for_long_running_conferences_d49fdfad: "시간 제한 없음(장기 회의)"
   not_deleted_2a7f63ef: "(삭제 안 됨)"
   not_installed_37a21a76: "설치 안 됨"
+  not_yet_graded_8b655a7: "평가 안 됨"
   nothing_for_now_e3e3ce2a: "현재 없음"
   notice_some_notifications_may_contain_confidential_5985f52a: "주의: 일부 알림은 기밀 정보를 포함할 수도 있습니다. 여러분의 기관에서 제공하는 것이 아닌 이메일로 알림을 받게 되면 민감한 Canvas 과목 및 그룹 정보를 기관 시스템 밖으로 보내는 결과를 낳을 수도 있습니다."
   notification: 
@@ -14688,6 +14689,7 @@ ko:
   verify_the_provided_search_base_i_e_ou_people_dc_e_23c08588: "제공된 검색 기준을 확인하십시오('ou=people,dc=example,dc=com')."
   version_5599c321: 버전
   view_all_courses_1b4ea3e4: "모든 과목 보기"
+  view_all_grades_3f8bba2d: "모든 평점 보기"
   view_app_center_6c89a3fe: "앱 센터 보기"
   view_app_configurations_52b52441: "앱 구성 보기"
   view_edit_grading_scheme_238d3028: "평가 구성표 보기/편집"
