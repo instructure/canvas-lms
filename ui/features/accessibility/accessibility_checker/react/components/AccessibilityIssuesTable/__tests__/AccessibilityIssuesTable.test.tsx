@@ -29,6 +29,8 @@ import {
 import {mockScanData} from '../../../../../shared/react/stores/mockData'
 import {useAccessibilityScansFetchUtils} from '../../../../../shared/react/hooks/useAccessibilityScansFetchUtils'
 
+const mockDoFetchAccessibilityIssuesSummary = jest.fn()
+
 jest.mock('../../../../../shared/react/hooks/useAccessibilityScansFetchUtils', () => ({
   useAccessibilityScansFetchUtils: jest.fn(),
 }))
@@ -65,9 +67,11 @@ describe('AccessibilityIssuesTable', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.restoreAllMocks()
+    mockDoFetchAccessibilityIssuesSummary.mockClear()
     useAccessibilityScansStore.setState({...mockState})
     ;(useAccessibilityScansFetchUtils as jest.Mock).mockReturnValue({
       doFetchAccessibilityScanData: mockDoFetch,
+      doFetchAccessibilityIssuesSummary: mockDoFetchAccessibilityIssuesSummary,
     })
   })
 
@@ -260,6 +264,57 @@ describe('AccessibilityIssuesTable', () => {
           page: 5,
         }),
       )
+    })
+
+    it('refetches dashboard summary when page changes', () => {
+      const {result} = renderHook(() => useAccessibilityScansStore())
+      act(() => {
+        result.current.setLoading(false)
+        result.current.setPage(1)
+        result.current.setPageCount(3)
+      })
+
+      const Wrapper = createWrapper()
+      render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
+
+      expect(mockDoFetchAccessibilityIssuesSummary).not.toHaveBeenCalled()
+
+      const buttons = screen.getAllByText(/2/i)
+      fireEvent.click(buttons[0])
+
+      expect(mockDoFetchAccessibilityIssuesSummary).toHaveBeenCalledTimes(1)
+      expect(mockDoFetchAccessibilityIssuesSummary).toHaveBeenCalledWith({})
+    })
+
+    it('refetches dashboard summary on multiple page changes', () => {
+      const {result} = renderHook(() => useAccessibilityScansStore())
+      act(() => {
+        result.current.setLoading(false)
+        result.current.setPage(1)
+        result.current.setPageCount(5)
+      })
+
+      const Wrapper = createWrapper()
+      const {rerender} = render(<AccessibilityIssuesTable />, {wrapper: Wrapper})
+
+      // Click page 2
+      const page2Buttons = screen.getAllByText(/2/i)
+      fireEvent.click(page2Buttons[0])
+
+      expect(mockDoFetchAccessibilityIssuesSummary).toHaveBeenCalledTimes(1)
+
+      // Update state to page 2
+      act(() => {
+        result.current.setPage(2)
+      })
+
+      rerender(<AccessibilityIssuesTable />)
+
+      // Click page 3
+      const page3Buttons = screen.getAllByText(/3/i)
+      fireEvent.click(page3Buttons[0])
+
+      expect(mockDoFetchAccessibilityIssuesSummary).toHaveBeenCalledTimes(2)
     })
   })
 })
