@@ -20,7 +20,7 @@ import React from 'react'
 import {createRoot} from 'react-dom/client'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import {extend, omit} from 'lodash'
+import {extend, omit} from 'es-toolkit/compat'
 import 'jquery-qtip'
 import ScreenReaderContent from '@canvas/quiz-legacy-client-apps/react/components/screen_reader_content'
 
