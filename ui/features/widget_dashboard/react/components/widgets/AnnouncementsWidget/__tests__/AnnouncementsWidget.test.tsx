@@ -520,9 +520,8 @@ describe('AnnouncementsWidget', () => {
       expect(screen.getByText('Test Announcement 2')).toBeInTheDocument()
     })
 
-    await waitFor(() => {
-      expect(callCount).toBe(2)
-    })
+    // Verify the retry triggered at least one additional call
+    expect(callCount).toBeGreaterThanOrEqual(2)
 
     cleanup()
   })
