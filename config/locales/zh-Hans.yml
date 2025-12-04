@@ -5835,16 +5835,16 @@ zh-Hans:
   attempt_1_7ba3c30f: "尝试次数 1"
   attempt_1_grade_484b35e4: "尝试次数 1：%{grade}"
   attempt_3dd42b18: 尝试
-  attempt_attempt_d3911720: "尝试次数 %{attempt}"
+  attempt_attempt_d3911720: "第 %{attempt} 次尝试"
   attempt_attempt_feedback_1b042ff5: "尝试 %{attempt} 次反馈"
   attempt_attempt_feedback_549683ba: "尝试%{attempt}次反馈："
   attempt_attempt_grade_c01f45df: "尝试%{attempt}：%{grade}"
   attempt_attempt_score_2a973edc: "尝试 %{attempt} 次评分："
-  attempt_count_267a4fc5: "尝试次数%{count}"
+  attempt_count_267a4fc5: "第 %{count} 次尝试"
   attempt_current_attempt_ef626179: "尝试次数%{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "尝试次数 %{current_attempt} 次，共 %{max_attempts} 次"
   attempt_f2691284: 尝试
-  attempt_number_83dcd86a: "尝试次数%{number}"
+  attempt_number_83dcd86a: "第 %{number} 次尝试"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: 尝试基于您的语言的数字格式检测评分册导出中的适当的字段分隔符。
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: 尝试基于您的语言的数字格式自动检测兼容的数据表报告中的相应字段分隔符。
   attempts_22baad: 
@@ -27195,7 +27195,7 @@ zh-Hans:
   previous_announcements_page_79c0ada1: 上一公告页面
   previous_assignment_83d1f423: 上一个作业
   previous_assignment_cc8cf7f3: 上一份作业
-  previous_bd2ac015: 先前
+  previous_bd2ac015: 上一页
   previous_csv_file_time_d7bfe7ef: "上一个 CSV 文件（%{time}）"
   previous_csv_timestamp_6673c69c: "上一个 CSV（%{timestamp}）"
   previous_export_c6a997f7: 上一次导出
@@ -29090,7 +29090,7 @@ zh-Hans:
         score: 评分
       submission_versions: 
         attempt: 尝试
-        attempt_history: 尝试历史记录
+        attempt_history: 尝试记录
         questions_not_graded: 有些问题尚未计分
         quiz_attempt_history_description: 显示您的测验尝试历史记录的表。每次尝试都列在左侧。尝试、时间和分数列在顶部。
         regraded: 已重新计分
@@ -30273,7 +30273,7 @@ zh-Hans:
   results_for_2bc07172: 结果：
   results_for_331ce107: "搜索结果 "
   results_for_ad5cfea5: 搜索结果
-  resume_fb900e8c: 恢复
+  resume_fb900e8c: 继续
   resume_quiz_afeceb87: 继续测验
   resume_survey_58dce775: 继续调查
   resync_grades_to_sis_d4dcfe12: "将评分重新同步到 SIS"
