@@ -14605,6 +14605,7 @@ hu:
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "A média a konverziós sorba került, kérjük várjon a feldolgozás végéig"
   media_objects: 
     media_objects_not_configured: "A Médiaobjektumok nincsenek konfigurálva"
+    video_player: Videólejátszó
   media_objects_c2fa37cd: "Média objektumok"
   media_over_time_d9332e25: "időn túli média"
   media_record_not_available_f78c16dd: "Rögzített média nem áll rendelkezésre"
@@ -17246,6 +17247,7 @@ hu:
   not_yet_assessed_9362f199: "Még nem értékelték"
   not_yet_completed_345a0bca: "Még befejezetlen"
   not_yet_graded_40475341: "Még nem értékelt"
+  not_yet_graded_8b655a7: "Még nincs értékelve"
   not_yet_submitted_2d2b7328: "Még nem nyújtották be"
   note_8b73ce09: Jegyzet
   note_associated_tools_are_only_listed_once_even_if_ebae2aba: "MEGJEGYZÉS: A társított eszközök csak egyszer szerepelnek a listában, még akkor is, ha van több alfiókra is telepítve vannak."
@@ -27195,6 +27197,7 @@ hu:
   video_player_for_label_6a5fdb03: "Videolejátszó ehhez: %{label}"
   vietnam_84_e50a2a44: "Vietnám (+84)"
   vietnamese_e7a76583: Vietnami
+  view_all_grades_3f8bba2d: "Összes értékelés megtekintése"
   view_analytics_data_in_tables_instead_of_graphs_8a33f536: "Statisztikák megtekintése táblázatokban, gráfok helyett."
   view_analytics_for_name_9b31594e: "A %{name} elemzéseinek megtekintése"
   view_announcement_e431195c: "Feladat megtekintése"
