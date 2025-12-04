@@ -8094,6 +8094,31 @@ describe Assignment do
         expect(peer_review_sub).to receive(:destroy).once
         assignment_with_peer_review.destroy
       end
+
+      it "allows deletion even when peer review submissions exist" do
+        assignment_with_peer_review.update!(peer_reviews: true)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+
+        peer_review_sub = create_peer_review_sub_assignment
+        peer_review_sub.update!(points_possible: 10)
+
+        student = user_model
+        assessor = user_model
+        student_submission = submission_model(assignment: assignment_with_peer_review, user: student)
+        assessor_submission = submission_model(assignment: assignment_with_peer_review, user: assessor)
+
+        AssessmentRequest.create!(
+          user: student,
+          asset: student_submission,
+          assessor_asset: assessor_submission,
+          assessor:,
+          workflow_state: "completed"
+        )
+
+        expect { assignment_with_peer_review.destroy }.not_to raise_error
+        expect(assignment_with_peer_review.reload.workflow_state).to eq("deleted")
+        expect(PeerReviewSubAssignment.unscoped.find_by(id: peer_review_sub.id)&.workflow_state).to eq("deleted")
+      end
     end
   end
 

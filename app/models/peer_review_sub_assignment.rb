@@ -121,6 +121,12 @@ class PeerReviewSubAssignment < AbstractAssignment
   end
 
   def points_possible_changes_ok?
+    # Since PeerReviewSubAssignments are synced with their parent Assignment
+    # on before_save and points possible is one of those attributes that are
+    # synced.  *see /models/assignment.rb#should_sync_peer_review_sub_assignment?*
+    # we need to make sure the workflow_state is not 'deleted'
+    # otherwise validation will fail when it trys sync points possible.
+    return false if workflow_state == "deleted" || will_save_change_to_workflow_state?(to: "deleted")
     return false unless persisted? && points_possible_changed?
     return false unless parent_assignment&.peer_reviews? && parent_assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
 
