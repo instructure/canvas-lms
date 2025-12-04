@@ -18,11 +18,15 @@
 
 const GRADEBOOK_GRAPHQL_CONFIG = {
   // Number of users to fetch per page in the gradebook
-  usersPageSize: 100,
+  usersPageSize: 50,
   // Maximum number of assignments to request concurrently
   maxAssignmentRequestCount: 10,
+  // Minimum number of students to include per submission request
+  // This ensures efficient batching by requiring at least 3 students per request
+  // even when distributing students across parallel requests
+  minNumberOfStudentsPerSubmissionRequest: 3,
   // Initial number of students to include as an alias when fetching submissions
-  // this will result responses with
+  // this will result in responses with
   // maxPageSize * initialNumberOfStudentsPerSubmissionRequest submissions
   // There is a max on the number of aliases that can be used in a query,
   // which is currently 20.
