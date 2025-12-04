@@ -547,8 +547,10 @@ describe('AssignmentPostingPolicyTray', () => {
       await enterNewDateTime(sharedDateInput, pastDateString)
 
       const saveButton = getByTestId('assignment-posting-policy-save-button')
-      expect(saveButton).toBeDisabled()
-      expect(screen.getByText('Date must be in the future')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(saveButton).toBeDisabled()
+        expect(screen.getByText('Date must be in the future')).toBeInTheDocument()
+      })
     })
 
     it('enables the "Save" button if scheduled post is selected and valid separate dates are set', async () => {
@@ -618,8 +620,10 @@ describe('AssignmentPostingPolicyTray', () => {
       await enterNewDateTime(dateInputs[1], pastDateString2) // Comment release date
 
       const saveButton = getByTestId('assignment-posting-policy-save-button')
-      expect(saveButton).toBeDisabled()
-      expect(screen.getAllByText('Date must be in the future')).toHaveLength(2)
+      await waitFor(() => {
+        expect(saveButton).toBeDisabled()
+        expect(screen.getAllByText('Date must be in the future')).toHaveLength(2)
+      })
     })
 
     it('disables the "Save" button and displays error messages if the comment release date is after the grade release date', async () => {
@@ -753,7 +757,9 @@ describe('AssignmentPostingPolicyTray', () => {
       await enterNewDateTime(dateInputs[1], pastCommentsDateString)
 
       // Verify the error appears
-      expect(screen.getByText('Date must be in the future')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(screen.getByText('Date must be in the future')).toBeInTheDocument()
+      })
 
       // Now change the grades date to a valid future date
       const futureGradesDate = new Date()
@@ -763,7 +769,9 @@ describe('AssignmentPostingPolicyTray', () => {
       await enterNewDateTime(dateInputs[0], futureGradesDateString)
 
       // The comments error should still be present
-      expect(screen.getByText('Date must be in the future')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(screen.getByText('Date must be in the future')).toBeInTheDocument()
+      })
     })
 
     describe('validation on save', () => {
