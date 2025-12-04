@@ -15864,6 +15864,7 @@ nn:
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Media står i kø for konvertering, prøv på nytt seinare."
   media_objects: 
     media_objects_not_configured: "Medieobjekt er ikkje konfigurerte"
+    video_player: Videoavspelar
   media_objects_c2fa37cd: Mediaobjekt
   media_over_time_d9332e25: "media over tid"
   media_record_not_available_f78c16dd: "Media Ikkje tilgjengeleg"
@@ -18549,6 +18550,7 @@ nn:
   not_yet_assessed_9362f199: "Ikkje vurdert enno"
   not_yet_completed_345a0bca: "Ikkje fullført enno"
   not_yet_graded_40475341: "Ikkje vurdert enno"
+  not_yet_graded_8b655a7: "Ikkje vurdert"
   not_yet_submitted_2d2b7328: "Ikkje ennå levert inn"
   note_8b73ce09: Merk
   note_associated_tools_are_only_listed_once_even_if_ebae2aba: "Merk: tilknytta verktøy er kun lista ein gong, sjølv om dei er installerte i fleire underkontoar."
@@ -29058,6 +29060,7 @@ nn:
   vietnam_84_e50a2a44: "Vietnam (+84)"
   vietnamese_e7a76583: Vietnamesisk
   view_all_e13bf0a6: "Vis alt"
+  view_all_grades_3f8bba2d: "Vis alle vurderingar"
   view_analytics_91a3b7a: "Vis analyse"
   view_analytics_data_in_tables_instead_of_graphs_8a33f536: "Vis analysedata i tabellar i staden for grafar"
   view_analytics_for_name_9b31594e: "Vis analyseresultat for %{name}"
