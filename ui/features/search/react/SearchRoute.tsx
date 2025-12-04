@@ -35,7 +35,7 @@ export function Component(): JSX.Element | null {
   useEffect(() => {
     const aiInformation = (
       <CanvasAiInformation
-        featureName={I18n.t('IgniteAI Search')}
+        featureName={I18n.t('Smart Search')}
         modelName={I18n.t('Cohere Embed Multilingual')}
         isTrainedWithUserData={false}
         dataSharedWithModel={I18n.t('Course')}
