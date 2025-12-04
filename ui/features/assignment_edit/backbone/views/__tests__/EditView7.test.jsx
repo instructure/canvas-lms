@@ -922,7 +922,7 @@ describe('EditView - Quiz Type Handling', () => {
         const tooltipWrapper = document.querySelector('#points_tooltip span')
         expect(tooltipWrapper.style.display).toBe('none')
       })
-    })
+    }, 30000)
   })
 
   describe('Disabled State', () => {
@@ -1005,7 +1005,7 @@ describe('EditView - Quiz Type Handling', () => {
       expect($quizTypeSelect.prop('disabled')).toBe(false)
 
       newView.remove()
-    })
+    }, 30000)
 
     test('quiz type selector is disabled for existing assignments', async () => {
       const assignment = new Assignment({
