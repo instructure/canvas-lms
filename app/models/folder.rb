@@ -289,7 +289,12 @@ class Folder < ActiveRecord::Base
   def clone_for(context, dup = nil, options = {})
     if !cloned_item && !new_record?
       self.cloned_item ||= ClonedItem.create(original_item: self)
-      save!
+      if Account.site_admin.feature_enabled?(:fix_bp_folder_unsynced_issue)
+        # This will follow the Attachment's clone_for method pattern to avoid touching the updated_at field.
+        Folder.where(id: self).update_all(cloned_item_id: cloned_item.id)
+      else
+        save!
+      end
     end
     existing = context.folders.active.where(id: self).first
     existing ||= context.folders.active.where(cloned_item_id: cloned_item_id || 0).first
