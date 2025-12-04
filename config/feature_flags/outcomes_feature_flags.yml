@@ -76,6 +76,19 @@ improved_lmgb:
       state: allowed
     development:
       state: allowed
+lmgb_student_reporting:
+  type: setting
+  state: hidden
+  applies_to: Course
+  shadow: true
+  display_name: Learning Mastery Gradebook Student Reporting
+  description: Enables student reporting features in the Learning Mastery Gradebook.
+  beta: true
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
 menu_option_for_outcome_details_page:
   type: setting
   state: hidden
