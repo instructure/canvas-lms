@@ -3173,7 +3173,8 @@ class UsersController < ApplicationController
     cc_params = params[:communication_channel]
 
     if cc_params
-      cc_type = cc_params[:type] || CommunicationChannel::TYPE_EMAIL
+      cc_type = (cc_params[:type] || CommunicationChannel::TYPE_EMAIL).downcase
+      # cc_type = (cc_params[:type] || CommunicationChannel::TYPE_EMAIL)
       cc_addr = cc_params[:address] || params[:pseudonym][:unique_id]
 
       cc_addr = nil if cc_type == CommunicationChannel::TYPE_EMAIL && !EmailAddressValidator.valid?(cc_addr)
@@ -3322,6 +3323,9 @@ class UsersController < ApplicationController
         end
 
         @user.save!
+        # Explicitly save communication channel if it exists (especially when reactivating a retired CC)
+        # @user.save! only auto-saves new associated records, not existing ones that were found and modified
+        @cc.save! if @cc&.changed?
 
         if @observee && !@user.as_observer_observation_links.where(user_id: @observee, root_account: @context).exists?
           UserObservationLink.create_or_restore(student: @observee, observer: @user, root_account: @context)

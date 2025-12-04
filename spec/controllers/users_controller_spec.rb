@@ -1196,6 +1196,80 @@ describe UsersController do
           expect(p.unique_id).to eq "spaceman@example.com"
           expect(p.user.email).to eq "spaceman@example.com"
         end
+
+        it "does not raises RecordNotUnique when reactivating a user with a retired CC and capitalized Email type" do
+          # First, create a user
+          post "create",
+               params: {
+                 account_id: account.id,
+                 pseudonym: {
+                   unique_id: "tim.mariner@example.com",
+                   sis_user_id: "041349",
+                   integration_id: "StaffID: 041349",
+                   send_confirmation: "False"
+                 },
+                 communication_channel: {
+                   type: "Email",
+                   skip_confirmation: "False"
+                 },
+                 user: {
+                   name: "Tim Mariner",
+                   sortable_name: "Mariner, Tim"
+                 }
+               },
+               format: "json"
+          expect(response).to be_successful
+
+          # Get the created user and pseudonym
+          pseudonym = Pseudonym.where(unique_id: "tim.mariner@example.com").first
+          user = pseudonym.user
+
+          # Verify we have a communication channel
+          cc = user.communication_channels.where(path_type: "email").by_path("tim.mariner@example.com").first
+          expect(cc).to be_present
+          expect(cc.path_type).to eq "email"
+
+          # Retire the communication channel and delete the user/pseudonym
+          user.destroy!
+
+          expect(user.reload.workflow_state).to eq "deleted"
+          expect(cc.reload.workflow_state).to eq "retired"
+
+          # Verify there's only ONE retired communication channel
+          expect(CommunicationChannel.where(
+            user_id: user.id,
+            path_type: "email"
+          ).count).to eq 1
+
+          # Try to reactivate with capitalized "Email" type (this reproduces the bug)
+          # The bug causes a database constraint violation
+          post "create",
+               params: {
+                 account_id: account.id,
+                 force_validations: "False",
+                 enable_sis_reactivation: "True",
+                 pseudonym: {
+                   unique_id: "tim.mariner@example.com",
+                   sis_user_id: "041349",
+                   integration_id: "StaffID: 041349",
+                   send_confirmation: "False"
+                 },
+                 communication_channel: {
+                   type: "Email",
+                   skip_confirmation: "True"
+                 },
+                 user: {
+                   name: "Tim Mariner",
+                   sortable_name: "Mariner, Tim"
+                 }
+               },
+               format: "json"
+          expect(response).to be_successful
+
+          # User is reactivated.
+          expect(user.reload.workflow_state).to eq "registered"
+          expect(cc.reload.workflow_state).to eq "active"
+        end
       end
 
       it "does not allow an admin to set the sis id when creating a user if they don't have privileges to manage sis" do
