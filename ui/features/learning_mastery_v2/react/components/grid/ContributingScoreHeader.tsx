@@ -18,18 +18,27 @@
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconArrowOpenDownLine} from '@instructure/ui-icons'
+import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {openWindow} from '@canvas/util/globalUtils'
 import {CELL_HEIGHT, COLUMN_WIDTH, SortBy, SortOrder} from '../../utils/constants'
+import {ContributingScoreAlignment} from '../../hooks/useContributingScores'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
 export interface ContributingScoreHeaderProps {
-  label: string
+  alignment: ContributingScoreAlignment
+  courseId: string
 }
 
-export const ContributingScoreHeader: React.FC<ContributingScoreHeaderProps> = ({label}) => (
+export const ContributingScoreHeader: React.FC<ContributingScoreHeaderProps> = ({
+  alignment,
+  courseId,
+}) => (
   <View
     background="secondary"
     as="div"
@@ -40,8 +49,34 @@ export const ContributingScoreHeader: React.FC<ContributingScoreHeaderProps> = (
     <Flex alignItems="center" justifyItems="space-between" height={CELL_HEIGHT}>
       <Flex.Item size="80%" padding="0 0 0 small">
         <TruncateText>
-          <Text weight="bold">{label}</Text>
+          <Text weight="bold">{alignment.associated_asset_name}</Text>
         </TruncateText>
+      </Flex.Item>
+      <Flex.Item padding="0 small 0 0">
+        <Menu
+          placement="bottom"
+          trigger={
+            <IconButton
+              withBorder={false}
+              withBackground={false}
+              size="small"
+              screenReaderLabel={I18n.t('Contributing Score Menu')}
+            >
+              <IconArrowOpenDownLine />
+            </IconButton>
+          }
+        >
+          <Menu.Item
+            onClick={() =>
+              openWindow(
+                `/courses/${courseId}/gradebook/speed_grader?assignment_id=${alignment.associated_asset_id}`,
+                '_blank',
+              )
+            }
+          >
+            {I18n.t('Open in Speedgrader')}
+          </Menu.Item>
+        </Menu>
       </Flex.Item>
     </Flex>
   </View>

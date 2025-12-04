@@ -176,7 +176,7 @@ const GradebookComponent: React.FC<GradebookProps> = ({
                             key={`alignment-${alignment.alignment_id}`}
                             size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}
                           >
-                            <ContributingScoreHeader label={alignment.associated_asset_name} />
+                            <ContributingScoreHeader alignment={alignment} courseId={courseId} />
                           </Flex.Item>
                         ),
                       )}
