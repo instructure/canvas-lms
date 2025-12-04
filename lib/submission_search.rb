@@ -96,7 +96,8 @@ class SubmissionSearch
     search_scope = if can_manage_or_view_grades || @course.participating_observers.map(&:id).include?(@searcher.id)
                      # a user with manage_grades, view_all_grades, or an observer can see other users' submissions
                      # TODO: may want to add a preloader for this
-                     search_scope.where(user_id: allowed_users)
+                     user_scope = filter_section_enrollment_states(allowed_users)
+                     search_scope.where(user_id: user_scope.select(:id))
                    elsif @course.grants_right?(@searcher, @session, :read_grades)
                      # a user can see their own submission
                      search_scope.where(user_id: @searcher.id)
@@ -228,12 +229,7 @@ class SubmissionSearch
 
   def allowed_users
     users = if @options[:apply_gradebook_enrollment_filters]
-              if @assignment.only_visible_to_overrides? && @assignment.active_assignment_overrides.where.not(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).none?
-                section_ids = @assignment.active_assignment_overrides.where(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).pluck(:set_id)
-                @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings, section_ids:)
-              else
-                @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
-              end
+              @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
             elsif @options[:include_concluded] || @options[:include_deactivated]
               @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
             else
@@ -246,6 +242,27 @@ class SubmissionSearch
     end
 
     users
+  end
+
+  def user_ids_by_enrollment_section_filters(section_ids)
+    # Use base enrollments association to avoid default scope that excludes inactive enrollments
+    @course.enrollments
+           .where(course_section_id: section_ids)
+           .where.not(workflow_state: excluded_enrollment_states_from_gradebook_settings)
+           .select(:user_id)
+  end
+
+  def filter_section_enrollment_states(user_scope)
+    return user_scope unless @options[:apply_gradebook_enrollment_filters]
+    return user_scope unless @assignment.only_visible_to_overrides?
+    return user_scope unless @assignment.active_assignment_overrides.where.not(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).none?
+
+    section_ids = @assignment.active_assignment_overrides.where(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).pluck(:set_id)
+    return User.none if section_ids.empty?
+
+    enrollment_scope = user_ids_by_enrollment_section_filters(section_ids)
+
+    user_scope.where(id: enrollment_scope)
   end
 
   def representative_id(user_id)
