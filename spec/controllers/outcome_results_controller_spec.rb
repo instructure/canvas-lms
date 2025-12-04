@@ -605,6 +605,10 @@ describe OutcomeResultsController do
         entries
       end
 
+      def set_outcome_arrangement(arrangement, user: @teacher, course: @course)
+        user.set_preference(:learning_mastery_gradebook_settings, course.global_id, { "outcome_arrangement" => arrangement })
+      end
+
       it "set ordering through API endpoint" do
         user_session(@teacher)
         outcome_ids = create_outcomes(@course, 3)
@@ -615,6 +619,8 @@ describe OutcomeResultsController do
              params: { course_id: @course.id, },
              body: outcome_position_map.to_json,
              as: :json
+
+        set_outcome_arrangement("custom")
 
         get "rollups",
             params: { context_id: @course.id,
@@ -668,6 +674,8 @@ describe OutcomeResultsController do
         outcome_ids.unshift(@outcome.id)
         set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, outcome_ids)
 
+        set_outcome_arrangement("custom")
+
         get "rollups",
             params: { context_id: @course.id,
                       course_id: @course.id,
@@ -689,6 +697,8 @@ describe OutcomeResultsController do
         # Reorder two outcomes in list and save
         outcome_ids[1], outcome_ids[2] = outcome_ids[2], outcome_ids[1]
         set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, outcome_ids)
+
+        set_outcome_arrangement("custom")
 
         get "rollups",
             params: { context_id: @course.id,
@@ -712,6 +722,8 @@ describe OutcomeResultsController do
         set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, outcome_ids)
         outcome_ids = outcome_ids.reject { |o| o == @outcomes[0]["id"] }
         @outcomes[0].destroy!
+
+        set_outcome_arrangement("custom")
 
         get "rollups",
             params: { context_id: @course.id,
@@ -737,6 +749,8 @@ describe OutcomeResultsController do
         @outcome_group.add_outcome(outcome)
         outcome_ids.append(outcome["id"])
 
+        set_outcome_arrangement("custom")
+
         get "rollups",
             params: { context_id: @course.id,
                       course_id: @course.id,
@@ -748,6 +762,122 @@ describe OutcomeResultsController do
         response_outcomes = json["linked"]["outcomes"]
         response_outcomes_ordering = get_response_ordering(response_outcomes)
         expect(response_outcomes_ordering).to eq(outcome_ids)
+      end
+
+      context "outcome arrangement sorting" do
+        it "sorts outcomes alphabetically when arrangement is set to alphabetical" do
+          user_session(@teacher)
+
+          outcome_a = @course.created_learning_outcomes.create!(title: "A Outcome")
+          outcome_c = @course.created_learning_outcomes.create!(title: "C Outcome")
+          outcome_b = @course.created_learning_outcomes.create!(title: "B Outcome")
+          @outcome_group.add_outcome(outcome_a)
+          @outcome_group.add_outcome(outcome_c)
+          @outcome_group.add_outcome(outcome_b)
+
+          set_outcome_arrangement("alphabetical")
+
+          get "rollups",
+              params: { context_id: @course.id,
+                        course_id: @course.id,
+                        context_type: "Course",
+                        include: ["outcomes"] },
+              format: "json"
+
+          json = response.parsed_body
+          response_outcomes = json["linked"]["outcomes"]
+          outcome_titles = response_outcomes.pluck("title")
+
+          expect(outcome_titles).to eq(outcome_titles.sort_by(&:downcase))
+        end
+
+        it "sorts outcomes by custom drag & drop order when arrangement is set to custom" do
+          user_session(@teacher)
+          outcome_ids = create_outcomes(@course, 3)
+          outcome_ids.unshift(@outcome.id)
+
+          custom_order = [outcome_ids[2], outcome_ids[0], outcome_ids[3], outcome_ids[1]]
+          set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, custom_order)
+
+          set_outcome_arrangement("custom")
+
+          get "rollups",
+              params: { context_id: @course.id,
+                        course_id: @course.id,
+                        context_type: "Course",
+                        include: ["outcomes"] },
+              format: "json"
+
+          json = response.parsed_body
+          response_outcomes = json["linked"]["outcomes"]
+          response_outcomes_ordering = get_response_ordering(response_outcomes)
+
+          expect(response_outcomes_ordering).to eq(custom_order)
+        end
+
+        it "sorts outcomes by upload order (creation time) when arrangement is set to upload_order" do
+          user_session(@teacher)
+          outcome_ids = create_outcomes(@course, 3)
+          outcome_ids.unshift(@outcome.id)
+
+          set_outcome_arrangement("upload_order")
+
+          get "rollups",
+              params: { context_id: @course.id,
+                        course_id: @course.id,
+                        context_type: "Course",
+                        include: ["outcomes"] },
+              format: "json"
+
+          json = response.parsed_body
+          response_outcomes = json["linked"]["outcomes"]
+          response_outcomes_ordering = get_response_ordering(response_outcomes)
+
+          expect(response_outcomes_ordering).to eq(outcome_ids.sort)
+        end
+
+        it "defaults to upload_order when no arrangement preference is set" do
+          user_session(@teacher)
+          outcome_ids = create_outcomes(@course, 3)
+          outcome_ids.unshift(@outcome.id)
+
+          get "rollups",
+              params: { context_id: @course.id,
+                        course_id: @course.id,
+                        context_type: "Course",
+                        include: ["outcomes"] },
+              format: "json"
+
+          json = response.parsed_body
+          response_outcomes = json["linked"]["outcomes"]
+          response_outcomes_ordering = get_response_ordering(response_outcomes)
+
+          expect(response_outcomes_ordering).to eq(outcome_ids.sort)
+        end
+
+        it "places outcomes without custom position at the end when using custom arrangement" do
+          user_session(@teacher)
+          outcome_ids = create_outcomes(@course, 4)
+
+          custom_order = [outcome_ids[1], outcome_ids[0]]
+          set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, custom_order)
+
+          set_outcome_arrangement("custom")
+
+          get "rollups",
+              params: { context_id: @course.id,
+                        course_id: @course.id,
+                        context_type: "Course",
+                        include: ["outcomes"] },
+              format: "json"
+
+          json = response.parsed_body
+          response_outcomes = json["linked"]["outcomes"]
+          response_outcomes_ordering = get_response_ordering(response_outcomes)
+
+          expect(response_outcomes_ordering.first(2)).to eq(custom_order)
+          expect(response_outcomes_ordering.last(2)).to eq([outcome_ids[2], outcome_ids[3]].sort)
+        end
       end
 
       context "cross-shard access" do
@@ -781,6 +911,8 @@ describe OutcomeResultsController do
 
             expect(response.successful?).to be_truthy
 
+            set_outcome_arrangement("custom", user: admin_user, course: @shard1_course)
+
             get "rollups",
                 params: { context_id: @shard1_course.id,
                           course_id: @shard1_course.id,
@@ -806,6 +938,8 @@ describe OutcomeResultsController do
           # Swap the first and last outcomes
           outcome_ids[0], outcome_ids[101] = outcome_ids[101], outcome_ids[0]
           set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, outcome_ids)
+
+          set_outcome_arrangement("custom")
 
           get "rollups",
               params: { context_id: @course.id,

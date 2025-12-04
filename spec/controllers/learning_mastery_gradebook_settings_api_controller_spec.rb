@@ -628,6 +628,72 @@ RSpec.describe LearningMasteryGradebookSettingsApiController do
         end
       end
 
+      describe "outcome_arrangement validation" do
+        it "accepts 'alphabetical' as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "outcome_arrangement" => "alphabetical" }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["outcome_arrangement"]).to eq("alphabetical")
+        end
+
+        it "accepts 'custom' as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "outcome_arrangement" => "custom" }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["outcome_arrangement"]).to eq("custom")
+        end
+
+        it "accepts 'upload_order' as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "outcome_arrangement" => "upload_order" }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["outcome_arrangement"]).to eq("upload_order")
+        end
+
+        it "rejects invalid values" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "outcome_arrangement" => "invalid_value" }
+          }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          json = json_parse
+          expect(json["errors"]).to include(a_string_matching(/Invalid outcome_arrangement.*Valid values are/))
+        end
+
+        it "rejects empty string" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "outcome_arrangement" => "" }
+          }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          json = json_parse
+          expect(json["errors"]).to include(a_string_matching(/Invalid outcome_arrangement.*Valid values are/))
+        end
+
+        it "returns the saved outcome_arrangement on subsequent GET requests" do
+          teacher.set_preference(:learning_mastery_gradebook_settings, @course.global_id, { "outcome_arrangement" => "custom" })
+
+          get :show, params: { course_id: @course.id }
+
+          expect(response).to be_successful
+          expect(json_parse["learning_mastery_gradebook_settings"]).to include("outcome_arrangement" => "custom")
+        end
+      end
+
       describe "students_per_page validation" do
         it "accepts 15 as a valid value" do
           put :update, params: {
@@ -750,20 +816,22 @@ RSpec.describe LearningMasteryGradebookSettingsApiController do
               "show_student_avatars" => 123,
               "name_display_format" => "invalid_format",
               "students_per_page" => 25,
-              "score_display_format" => "invalid_format"
+              "score_display_format" => "invalid_format",
+              "outcome_arrangement" => "invalid_arrangement"
             }
           }
 
           expect(response).to have_http_status(:unprocessable_content)
           json = json_parse
-          expect(json["errors"].length).to eq(6)
+          expect(json["errors"].length).to eq(7)
           expect(json["errors"]).to include(
             a_string_matching(/Invalid secondary_info_display.*Valid values are/),
             a_string_matching(/Invalid show_students_with_no_results.*Valid values are/),
             a_string_matching(/Invalid show_student_avatars.*Valid values are/),
             a_string_matching(/Invalid name_display_format.*Valid values are/),
             a_string_matching(/Invalid students_per_page.*Valid values are/),
-            a_string_matching(/Invalid score_display_format.*Valid values are/)
+            a_string_matching(/Invalid score_display_format.*Valid values are/),
+            a_string_matching(/Invalid outcome_arrangement.*Valid values are/)
           )
         end
       end
@@ -811,7 +879,8 @@ RSpec.describe LearningMasteryGradebookSettingsApiController do
               "show_student_avatars" => false,
               "name_display_format" => "last_first",
               "students_per_page" => 50,
-              "score_display_format" => "icon_and_label"
+              "score_display_format" => "icon_and_label",
+              "outcome_arrangement" => "alphabetical"
             }
           }
 
@@ -823,7 +892,8 @@ RSpec.describe LearningMasteryGradebookSettingsApiController do
             "show_student_avatars" => "false",
             "name_display_format" => "last_first",
             "students_per_page" => "50",
-            "score_display_format" => "icon_and_label"
+            "score_display_format" => "icon_and_label",
+            "outcome_arrangement" => "alphabetical"
           )
         end
       end
