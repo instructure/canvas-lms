@@ -628,6 +628,38 @@ describe Folder do
     end
   end
 
+  describe "clone_for cloned_item handling" do
+    before(:once) do
+      @folder = @course.folders.create!(name: "test folder")
+    end
+
+    it "does not touch updated_at when feature flag is enabled" do
+      Account.site_admin.enable_feature!(:fix_bp_folder_unsynced_issue)
+      @folder.reload
+      original_updated_at = @folder.updated_at
+
+      # Trigger the clone_for code path that creates a cloned_item
+      @folder.clone_for(@course)
+
+      @folder.reload
+      expect(@folder.cloned_item).to be_present
+      expect(@folder.updated_at).to eq(original_updated_at)
+    end
+
+    it "touches updated_at when feature flag is disabled" do
+      Account.site_admin.disable_feature!(:fix_bp_folder_unsynced_issue)
+      @folder.reload
+      original_updated_at = @folder.updated_at
+
+      # Trigger the clone_for code path that creates a cloned_item
+      @folder.clone_for(@course)
+
+      @folder.reload
+      expect(@folder.cloned_item).to be_present
+      expect(@folder.updated_at).not_to eq(original_updated_at)
+    end
+  end
+
   describe ".preload_root_folders" do
     it "returns an empty hash when given no contexts" do
       expect(Folder.preload_root_folders([])).to eq({})
