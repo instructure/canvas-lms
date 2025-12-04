@@ -889,10 +889,6 @@ class OutcomeResultsController < ApplicationController
                                     .select("#{ContentTag.quoted_table_name}.*, u.position")
       end
 
-      # Sort outcomes by lmgb_position
-      # If there is no lmgb_position for an outcome, then place it at the end
-      @outcome_links.sort_by! { |link| link[:position] || link[:id] }
-
       associations = [:learning_outcome_content]
       if Api.value_to_array(params[:include]).include? "outcome_paths"
         associations << { associated_asset: :learning_outcome_group }
@@ -900,7 +896,26 @@ class OutcomeResultsController < ApplicationController
       @outcome_links.each_slice(100) do |outcome_links_slice|
         ActiveRecord::Associations.preload(outcome_links_slice, associations)
       end
+
+      apply_outcome_arrangement
+
       @outcomes = @outcome_links.map(&:learning_outcome_content)
+    end
+  end
+
+  def apply_outcome_arrangement
+    return unless @outcome_links.is_a?(Array) && @outcome_links.any?
+
+    settings = @current_user.get_preference(:learning_mastery_gradebook_settings, @context.global_id) || {}
+
+    case settings["outcome_arrangement"]
+    when "alphabetical"
+      @outcome_links.sort_by! { |link| link.learning_outcome_content&.title.to_s.downcase }
+    when "custom"
+      @outcome_links.sort_by! { |link| [link[:position] || Float::INFINITY, link[:id]] }
+    else
+      # Default to upload order
+      @outcome_links.sort_by!(&:id)
     end
   end
 
