@@ -498,7 +498,7 @@ vi:
     tab_outcomes: "Kết Quả"
     tab_permissions: Quyền
     tab_plugins: "Trình Cắm"
-    tab_question_banks: "Ngân Hàng Câu Hỏi"
+    tab_question_banks: "Ngân Hàng Câu Hỏi (Bản cũ)"
     tab_rate_limiting: "Giới Hạn Tốc Độ"
     tab_root_accounts: "Tài Khoản Gốc"
     tab_rubrics: "Bảng Đánh Giá Theo Tiêu Chí"
@@ -9182,7 +9182,7 @@ vi:
     people: "Mọi người"
     plugins: "Trình Cắm"
     prior_users: "Người Sử Dụng Trước"
-    question_banks: "Ngân Hàng Câu Hỏi"
+    question_banks: "Ngân Hàng Câu Hỏi (Bản cũ)"
     quizzes: ~
     rate_limiting: "Giới Hạn Tốc Độ"
     registered_services: "Dịch Vụ Đã Đăng Ký"
@@ -22540,7 +22540,7 @@ vi:
       course_question_banks: "Ngân Hàng Câu Hỏi của Khóa Học"
       labels: 
         title: "Tên Ngân Hàng"
-      page_title: "Ngân Hàng Câu Hỏi"
+      page_title: "Ngân Hàng Câu Hỏi (Bản cũ)"
       see_bookmarked_banks: "Xem Các Ngân Hàng Được Đánh Dấu Trang"
       user_question_banks: "Ngân Hàng Câu Hỏi của Người Dùng"
     question_bank: 
@@ -22583,7 +22583,7 @@ vi:
       move_copy: "Di Chuyển/Sao Chép"
       select_bank: "Chọn ngân hàng câu hỏi đích cho câu hỏi này:"
       show_details: "Hiển Thị Chi Tiết Câu Hỏi"
-  question_banks_45bdf347: "Ngân Hàng Câu Hỏi"
+  question_banks_45bdf347: "Ngân Hàng Câu Hỏi (Bản cũ)"
   question_banks_account_navigation_9a7ab7c2: "Ngân Hàng Câu Hỏi (Điều Hướng Tài Khoản)"
   question_banks_courses_dd907ecf: "Ngân Hàng Câu Hỏi (Khóa Học)"
   question_banks_view_and_link_e6d9cde2: "Ngân hàng câu hỏi - xem và liên kết"
