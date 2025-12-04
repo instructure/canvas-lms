@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {throttle} from 'lodash'
+import {throttle} from 'es-toolkit'
 
 const pingUrl = (ENV as {ping_url?: string}).ping_url
 
@@ -34,7 +34,7 @@ if (pingUrl) {
       lastUserActivity = Date.now()
     },
     1000,
-    {leading: true, trailing: false},
+    {edges: ['leading']},
   )
 
   activityEvents.forEach(event => {
