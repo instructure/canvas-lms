@@ -23,8 +23,6 @@ import {DEFAULT_STUDENTS_PER_PAGE, SortOrder} from '../../utils/constants'
 import {Outcome, Rating, Student} from '../../types/rollup'
 import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../../__fixtures__/rollups'
 
-jest.useFakeTimers()
-
 jest.mock('@canvas/axios')
 
 describe('useRollups', () => {
@@ -78,6 +76,8 @@ describe('useRollups', () => {
   ]
 
   beforeEach(() => {
+    jest.useFakeTimers()
+    jest.clearAllMocks()
     const promise = Promise.resolve({
       status: 200,
       data: {
@@ -96,6 +96,93 @@ describe('useRollups', () => {
       },
     })
     ;(axios.get as jest.Mock).mockResolvedValue(promise)
+  })
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers()
+    jest.useRealTimers()
+  })
+
+  describe('useRollups hook with selectedUserIds', () => {
+    const emptyUserIds: number[] = []
+    const singleUserId: number[] = [97]
+    const multipleUserIds: number[] = [97, 42, 101]
+
+    it('passes selectedUserIds to the API call when provided', async () => {
+      renderHook(() =>
+        useRollups({
+          courseId: '1',
+          accountMasteryScalesEnabled: false,
+          selectedUserIds: multipleUserIds,
+        }),
+      )
+      await act(async () => jest.runAllTimers())
+      const params = {
+        params: {
+          rating_percents: true,
+          per_page: DEFAULT_STUDENTS_PER_PAGE,
+          exclude: [],
+          include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+          sort_by: 'student',
+          add_defaults: true,
+          sort_order: SortOrder.ASC,
+          page: 1,
+          user_ids: [97, 42, 101],
+        },
+      }
+      expect(axios.get).toHaveBeenCalledWith('/api/v1/courses/1/outcome_rollups', params)
+    })
+
+    it('does not include user_ids in API call when selectedUserIds is empty array', async () => {
+      renderHook(() =>
+        useRollups({
+          courseId: '1',
+          accountMasteryScalesEnabled: false,
+          selectedUserIds: emptyUserIds,
+        }),
+      )
+      await act(async () => jest.runAllTimers())
+      const callArgs = (axios.get as jest.Mock).mock.calls[0][1]
+      expect(callArgs.params).not.toHaveProperty('user_ids')
+    })
+
+    it('does not include user_ids in API call when selectedUserIds is undefined', async () => {
+      renderHook(() =>
+        useRollups({
+          courseId: '1',
+          accountMasteryScalesEnabled: false,
+        }),
+      )
+      await act(async () => jest.runAllTimers())
+      const callArgs = (axios.get as jest.Mock).mock.calls[0][1]
+      expect(callArgs.params).not.toHaveProperty('user_ids')
+    })
+
+    it('passes user_ids in params for single selectedUserId', async () => {
+      renderHook(() =>
+        useRollups({
+          courseId: '1',
+          accountMasteryScalesEnabled: false,
+          selectedUserIds: singleUserId,
+        }),
+      )
+      await act(async () => jest.runAllTimers())
+      const callParams = (axios.get as jest.Mock).mock.calls[0][1]
+      expect(callParams.params.user_ids).toEqual([97])
+    })
+
+    it('passes user_ids in params for multiple selectedUserIds', async () => {
+      renderHook(() =>
+        useRollups({
+          courseId: '1',
+          accountMasteryScalesEnabled: false,
+          selectedUserIds: multipleUserIds,
+        }),
+      )
+      await act(async () => jest.runAllTimers())
+      const callParams = (axios.get as jest.Mock).mock.calls[0][1]
+      expect(callParams.params.user_ids).toEqual([97, 42, 101])
+    })
   })
 
   describe('useRollups hook', () => {
@@ -151,7 +238,7 @@ describe('useRollups', () => {
             {
               outcomeId: '1',
               score: 0,
-              rating: {...mockedRatings[1], color: `#${mockedRatings[1].color}`},
+              rating: {...mockedRatings[2], color: `#${mockedRatings[2].color}`},
             },
           ],
         },

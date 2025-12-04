@@ -17,7 +17,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {map, some, every, find as _find, filter, reject, isEmpty} from 'lodash'
+import {map, some, every, find as _find, filter, reject, isEmpty} from 'es-toolkit/compat'
 import {View} from '@canvas/backbone'
 import template from '../../jst/rosterUser.handlebars'
 import EditSectionsModal from '../../react/EditSectionsModal'

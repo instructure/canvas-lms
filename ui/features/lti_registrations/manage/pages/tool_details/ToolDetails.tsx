@@ -29,7 +29,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import {Text} from '@instructure/ui-text'
 import {View, type ViewProps} from '@instructure/ui-view'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {IconCopyLine, IconTrashLine} from '@instructure/ui-icons'
+import {IconCopyLine, IconTrashLine, IconRefreshLine, IconDownloadLine} from '@instructure/ui-icons'
 import * as React from 'react'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {useZodParams} from '../../../common/lib/useZodParams/useZodParams'
@@ -267,6 +267,8 @@ export const ToolDetailsInner = ({
     })
   }, [])
 
+  const pendingUpdate = registration.pending_update
+
   return (
     <Flex direction="column">
       <View
@@ -344,6 +346,16 @@ export const ToolDetailsInner = ({
                   {I18n.t('Delete App')}
                 </Button>
               </Tooltip>
+
+              {window.ENV.LTI_DR_REGISTRATIONS_UPDATE && pendingUpdate ? (
+                <Button
+                  color="secondary"
+                  data-pendo="lti-registrations-update-available-button"
+                  renderIcon={() => <IconRefreshLine />}
+                >
+                  {I18n.t('Update Available')}
+                </Button>
+              ) : null}
             </Flex>
           </Flex>
         </Flex>

@@ -35,6 +35,8 @@ export const WIDGET_TYPES = {
   COURSE_GRADES: 'course_grades',
   ANNOUNCEMENTS: 'announcements',
   PEOPLE: 'people',
+  TODO_LIST: 'todo_list',
+  RECENT_GRADES: 'recent_grades',
 } as const
 
 export type WidgetType = (typeof WIDGET_TYPES)[keyof typeof WIDGET_TYPES]
@@ -51,10 +53,16 @@ export const DEFAULT_WIDGET_CONFIG = {
       position: {col: 1, row: 1, relative: 1},
       title: I18n.t('Course work'),
     },
+    // {
+    //   id: 'todo-list-widget',
+    //   type: WIDGET_TYPES.TODO_LIST,
+    //   position: {col: 2, row: 1, relative: 2},
+    //   title: I18n.t('To-do list'),
+    // },
     {
       id: 'announcements-widget',
       type: WIDGET_TYPES.ANNOUNCEMENTS,
-      position: {col: 2, row: 1, relative: 2},
+      position: {col: 2, row: 2, relative: 3},
       title: I18n.t('Announcements'),
     },
     {
@@ -66,7 +74,7 @@ export const DEFAULT_WIDGET_CONFIG = {
     {
       id: 'people-widget',
       type: WIDGET_TYPES.PEOPLE,
-      position: {col: 2, row: 2, relative: 3},
+      position: {col: 2, row: 3, relative: 5},
       title: I18n.t('People'),
     },
   ],

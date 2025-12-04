@@ -16,37 +16,61 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Session storage key for storing Ignite Agent state
 const SESSION_STORAGE_KEY = 'igniteAgent'
 
-/**
- * Session storage utility functions for Ignite Agent
- */
-export const IgniteAgentSessionStorage = {
-  /**
-   * Get the current session state
-   * @returns {object|null} The session state object or null if not found/invalid
-   */
-  getState() {
-    try {
-      const sessionState = sessionStorage.getItem(SESSION_STORAGE_KEY)
-      return sessionState ? JSON.parse(sessionState) : null
-    } catch (e) {
-      console.error('[Ignite Agent] Could not read from sessionStorage:', e)
-      return null
-    }
-  },
+const DEFAULT_AGENT_SESSION_STATE = {
+  isOpen: false,
+  sessionId: null,
+  buttonRelativeVerticalPosition: 0, // Default to 0% from bottom
+}
 
-  /**
-   * Set the agent state to open or closed
-   */
-  setAgentState(open) {
+/**
+ * Reads a specific value from the session storage object.
+ * @param {string} key The key of the property to read from the session state.
+ * @returns {*} The value of the property, or undefined if not found or on error.
+ */
+export function readFromSession(key) {
+  const sessionData = sessionStorage.getItem(SESSION_STORAGE_KEY)
+  if (sessionData) {
     try {
-      const sessionState = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
-      sessionState['isOpen'] = open
-      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessionState))
+      const parsedData = JSON.parse(sessionData)
+      if (parsedData && typeof parsedData === 'object' && !Array.isArray(parsedData)) {
+        return parsedData[key]
+      }
+      return undefined
     } catch (e) {
-      console.error('[Ignite Agent] Could not write to sessionStorage:', e)
+      console.error('[Ignite Agent] Error parsing session data. Returning undefined.', e)
+      return undefined
     }
-  },
+  }
+  return undefined
+}
+
+/**
+ * Writes a specific value to the session storage object.
+ * @param {string} key The key of the property to write.
+ * @param {*} value The value to set for the property.
+ */
+export function writeToSession(key, value) {
+  let sessionState
+  const existingData = sessionStorage.getItem(SESSION_STORAGE_KEY)
+
+  if (existingData) {
+    try {
+      sessionState = JSON.parse(existingData)
+    } catch (e) {
+      console.error('[Ignite Agent] Error parsing existing session data. Starting fresh.', e)
+      sessionState = {...DEFAULT_AGENT_SESSION_STATE}
+    }
+  } else {
+    sessionState = {...DEFAULT_AGENT_SESSION_STATE}
+  }
+
+  sessionState[key] = value
+
+  try {
+    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessionState))
+  } catch (e) {
+    console.error('[Ignite Agent] Error writing to session storage:', e)
+  }
 }

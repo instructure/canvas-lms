@@ -24,7 +24,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import {reduce, each} from 'lodash'
+import {reduce, each} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/Syllabus.handlebars'
 import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'

@@ -40,7 +40,8 @@ module Api::V1::Lti::Registration
     registrations.map do |r|
       account_binding = preloads.dig(r.global_id, :account_binding)
       overlay = preloads.dig(r.global_id, :overlay)
-      lti_registration_json(r, user, session, context, includes:, account_binding:, overlay:)
+      pending_update = preloads.dig(r.global_id, :pending_update)
+      lti_registration_json(r, user, session, context, includes:, account_binding:, overlay:, pending_update:)
     end
   end
 
@@ -52,7 +53,7 @@ module Api::V1::Lti::Registration
   # @param overlay [Lti::Overlay] Preloaded overlay to include in the response.
   #
   # @return [Hash] JSON representation of the LTI registration.
-  def lti_registration_json(registration, user, session, context, includes: [], account_binding: nil, overlay: nil)
+  def lti_registration_json(registration, user, session, context, includes: [], account_binding: nil, overlay: nil, pending_update: nil)
     includes = includes.map(&:to_sym)
 
     api_json(registration, user, session, only: JSON_ATTRS).tap do |json|
@@ -62,6 +63,7 @@ module Api::V1::Lti::Registration
       json["dynamic_registration"] = true if registration.dynamic_registration?
       json["developer_key_id"] = registration.developer_key&.global_id
       json["ims_registration_id"] = registration.ims_registration&.id
+      json["dynamic_registration_url"] = registration.ims_registration&.registration_url
       json["manual_configuration_id"] = registration.manual_configuration&.id
 
       if registration.site_admin?
@@ -107,6 +109,9 @@ module Api::V1::Lti::Registration
           json["overlay"]["versions"] = lti_overlay_versions_json(versions, user, session, context)
         end
       end
+
+      # Include pending update information if available
+      json["pending_update"] = pending_update&.global_id&.to_s
     end
   end
 end

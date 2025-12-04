@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "所有應用程式"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "允許媒體下載"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "允許成績單下載"
+    },
     "alpha_15d59033": {
         "message": "α"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "變更文字顏色"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "儲存本頁面後，套用變更。"
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "您所做的變更或未能儲存。"
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "嵌入影像"
+    },
+    "embed_options_44c4cba8": {
+        "message": "嵌入選項"
     },
     "embed_video_a97a64af": {
         "message": "嵌入影片"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "載入預覽"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "鎖定速度為 1 倍速"
     },
     "locked_762f138b": {
         "message": "已鎖定"

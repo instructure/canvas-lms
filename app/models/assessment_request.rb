@@ -25,6 +25,7 @@ class AssessmentRequest < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :asset, polymorphic: [:submission]
+  belongs_to :submission, foreign_key: :asset_id, optional: true, inverse_of: false
   belongs_to :assessor_asset, polymorphic: [:submission], polymorphic_prefix: true
   belongs_to :assessor, class_name: "User"
   belongs_to :rubric_association
@@ -87,6 +88,11 @@ class AssessmentRequest < ActiveRecord::Base
                                  current_enrollments = course.current_enrollments.pluck(:user_id)
                                  where(assessor_id: current_enrollments)
                                }
+  scope :completed_for_assignment, lambda { |assignment_id|
+    complete
+      .joins(:submission)
+      .where(submissions: { assignment_id: })
+  }
 
   scope :not_ignored_by, lambda { |user, purpose|
     where.not(

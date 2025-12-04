@@ -21,7 +21,7 @@ import {createRoot} from 'react-dom/client'
 import round from '@canvas/round'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {each, extend as lodashExtend} from 'lodash'
+import {each, extend as lodashExtend} from 'es-toolkit/compat'
 import numberHelper from '@canvas/i18n/numberHelper'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
 import NeverDropCollection from '../collections/NeverDropCollection'
@@ -45,8 +45,8 @@ const AG_FIELDS = {
   GROUP_WEIGHT: 'group_weight',
   DROP_RULES: {
     LOWEST: 'rules[drop_lowest]',
-    HIGHEST: 'rules[drop_highest]'
-  }
+    HIGHEST: 'rules[drop_highest]',
+  },
 }
 
 class CreateGroupView extends DialogFormView {
@@ -62,11 +62,11 @@ class CreateGroupView extends DialogFormView {
   getFieldSelector(field) {
     const fields = {
       [AG_FIELDS.NAME]: `ag_${this.assignmentGroup?.id ?? 'new'}_name`,
-      [AG_FIELDS.GROUP_WEIGHT]: `ag_${this.assignmentGroup?.id ?? 'new'}_group_weight`
+      [AG_FIELDS.GROUP_WEIGHT]: `ag_${this.assignmentGroup?.id ?? 'new'}_group_weight`,
     }
     if (this.assignmentGroup) {
-      fields[AG_FIELDS.DROP_RULES.LOWEST] = `ag_${this.assignmentGroup.id}_drop_lowest`,
-      fields[AG_FIELDS.DROP_RULES.HIGHEST] = `ag_${this.assignmentGroup.id}_drop_highest`
+      ;(fields[AG_FIELDS.DROP_RULES.LOWEST] = `ag_${this.assignmentGroup.id}_drop_lowest`),
+        (fields[AG_FIELDS.DROP_RULES.HIGHEST] = `ag_${this.assignmentGroup.id}_drop_highest`)
     }
     return fields[field]
   }
@@ -143,8 +143,12 @@ class CreateGroupView extends DialogFormView {
   }
 
   validateGroupWeight(value = null, shouldShowError = true) {
-    const inputValue = value ?? this.getElement('#' + this.getFieldSelector(AG_FIELDS.GROUP_WEIGHT))?.value
-    if (![undefined, null, ''].includes(inputValue) && Number.isNaN(Number(numberHelper.parse(inputValue)))) {
+    const inputValue =
+      value ?? this.getElement('#' + this.getFieldSelector(AG_FIELDS.GROUP_WEIGHT))?.value
+    if (
+      ![undefined, null, ''].includes(inputValue) &&
+      Number.isNaN(Number(numberHelper.parse(inputValue)))
+    ) {
       if (shouldShowError) {
         this.showInputError(AG_FIELDS.GROUP_WEIGHT, this.messages.non_number)
       } else {
@@ -254,12 +258,7 @@ class CreateGroupView extends DialogFormView {
     const errorsContainer = this.getElement(`#${fieldSelector}_errors`)
     if (errorsContainer) {
       const root = this.errorRoots[field] ?? createRoot(errorsContainer)
-      root.render(
-        <FormattedErrorMessage
-          message={message}
-          margin={"x-small 0 0 0"}
-        />
-      )
+      root.render(<FormattedErrorMessage message={message} margin={'x-small 0 0 0'} />)
       this.errorRoots[field] = root
     }
   }
@@ -293,7 +292,7 @@ class CreateGroupView extends DialogFormView {
   }
 
   clearAllErrors() {
-    Object.keys(this.errorRoots).forEach((inputField) => this.hideErrors(inputField))
+    Object.keys(this.errorRoots).forEach(inputField => this.hideErrors(inputField))
   }
 
   showWeight() {
@@ -364,7 +363,9 @@ class CreateGroupView extends DialogFormView {
 
     super.openAgain(...arguments)
     if (this.assignmentGroup) {
-      const dropLowestContainer = this.getElement(`.ag_${this.assignmentGroup.id}_drop_lowest_container`)
+      const dropLowestContainer = this.getElement(
+        `.ag_${this.assignmentGroup.id}_drop_lowest_container`,
+      )
       this.dropLowestRoot = this.dropLowestRoot ?? createRoot(dropLowestContainer)
       this.dropLowestRoot.render(
         <GroupRuleInput
@@ -374,9 +375,11 @@ class CreateGroupView extends DialogFormView {
           initialValue={dropLowestContainer?.dataset.value}
           onChange={() => this.hideErrors(AG_FIELDS.DROP_RULES.LOWEST)}
           data-testid={'drop_lowest_input'}
-        />
+        />,
       )
-      const dropHighestContainer = this.getElement(`.ag_${this.assignmentGroup.id}_drop_highest_container`)
+      const dropHighestContainer = this.getElement(
+        `.ag_${this.assignmentGroup.id}_drop_highest_container`,
+      )
       this.dropHighestRoot = this.dropHighestRoot ?? createRoot(dropHighestContainer)
       this.dropHighestRoot.render(
         <GroupRuleInput
@@ -386,7 +389,7 @@ class CreateGroupView extends DialogFormView {
           initialValue={dropHighestContainer?.dataset.value}
           onChange={() => this.hideErrors(AG_FIELDS.DROP_RULES.HIGHEST)}
           data-testid={'drop_highest_input'}
-        />
+        />,
       )
     }
     this.checkGroupWeight()
@@ -414,7 +417,7 @@ CreateGroupView.prototype.events = lodashExtend({}, CreateGroupView.prototype.ev
   'input [name="name"]': 'clearInputErrors',
   'change [name="name"]': 'validateInput',
   'input [name="group_weight"]': 'clearInputErrors',
-  'change [name="group_weight"]': 'validateInput'
+  'change [name="group_weight"]': 'validateInput',
 })
 
 CreateGroupView.prototype.els = {'.never_drop_rules_group': '$neverDropContainer'}

@@ -45,9 +45,24 @@ class ControllerView < HashView
   end
 
   def models
-    @controller.tags(:model).map do |model|
+    model_tags = @controller.tags(:model).map do |model|
       ModelView.new_from_model(model)
     end
+
+    # Find any methods with a @returns tag that also returns a schema. Get the JSON schema
+    # from that class directly.
+    referenced_schemas = @controller.children.filter_map do |method|
+      return_type = method.tags(:returns)&.first&.text
+      return_type if return_type&.starts_with?("Schemas::Docs::")
+    end.uniq
+
+    referenced_schemas.each do |referenced_schema|
+      base_module = DocumentationHelpers.class_from_string(referenced_schema)
+      model_name = referenced_schema.sub("Schemas::Docs::", "")
+      model_tags << ModelView.new_from_schema(model_name, base_module.schema)
+    end
+
+    model_tags
   end
 
   def desc

@@ -29,7 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 
 import ScopesList from './ScopesList'
 

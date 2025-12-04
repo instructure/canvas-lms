@@ -333,7 +333,6 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                   configurationMethod={this.props.configurationMethod}
                   updateConfigurationMethod={this.props.updateConfigurationMethod}
                   validScopes={ENV.validLtiScopes}
-                  validPlacements={ENV.validLtiPlacements}
                   invalidJson={this.state.invalidJson}
                   jsonString={this.state.jsonString}
                   updatePastedJson={this.updatePastedJson}

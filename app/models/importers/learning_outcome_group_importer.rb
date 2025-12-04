@@ -69,7 +69,7 @@ module Importers
       item.low_grade = hash[:low_grade]
       item.high_grade = hash[:high_grade]
 
-      item.updating_user = migration.user
+      item.importing = true
 
       if hash[:source_outcome_group_id]
         source_group = LearningOutcomeGroup.active.find_by(id: hash[:source_outcome_group_id])

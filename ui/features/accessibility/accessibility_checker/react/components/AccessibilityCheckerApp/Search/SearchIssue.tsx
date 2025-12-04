@@ -22,24 +22,35 @@ import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useDebouncedCallback} from 'use-debounce'
 import {IconButton} from '@instructure/ui-buttons'
+import {Alert} from '@instructure/ui-alerts'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('accessibility_checker')
 
 interface SearchIssueProps {
-  onSearchChange: (value: string) => void
+  onSearchChange: (value: string) => Promise<boolean>
 }
 
 export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
-  const [search, setSearch] = useState<string>('')
+  const [searchInput, setSearchInput] = useState<string>('')
+  const [alertMessage, setAlertMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const queryString = window.location.search
     const params = new URLSearchParams(queryString)
     const searchQuery = params.get('search')
     if (searchQuery) {
-      setSearch(searchQuery)
+      setSearchInput(searchQuery)
     }
   }, [])
+
+  useEffect(() => {
+    if (alertMessage !== null) {
+      const timeout = setTimeout(() => setAlertMessage(null), 3000)
+      return () => clearTimeout(timeout)
+    }
+  }, [alertMessage, setAlertMessage])
 
   const shouldSearch = (searchString: string) => {
     const searchQueryLength = searchString.trim().length
@@ -48,23 +59,24 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
 
   const debouncedOnSearchChange = useDebouncedCallback((value: string) => {
     if (shouldSearch(value)) {
-      onSearchChange(value)
+      onSearchChange(value).then(result => {
+        const msg =
+          value.length > 0
+            ? I18n.t('Search filter applied. Accessibility issues updated.')
+            : I18n.t('Search filter cleared. Accessibility issues updated.')
+
+        setTimeout(() => result && setAlertMessage(msg), 1500)
+      })
     }
   }, 300)
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newSearch = event.target.value
-    setSearch(newSearch)
-    debouncedOnSearchChange(newSearch)
-  }
-
-  const handleClear = () => {
-    setSearch('')
-    onSearchChange('')
+  const handleChange = (value: string) => {
+    setSearchInput(value)
+    debouncedOnSearchChange(value)
   }
 
   const clearButton = () => {
-    if (!search.length) return null
+    if (!searchInput.length) return null
 
     return (
       <IconButton
@@ -72,8 +84,8 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
         size="small"
         withBackground={false}
         withBorder={false}
+        onClick={() => handleChange('')}
         screenReaderLabel={I18n.t('Clear search')}
-        onClick={handleClear}
         data-testid="clear-search-button"
       >
         <IconTroubleLine />
@@ -82,24 +94,42 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
   }
 
   return (
-    <TextInput
-      id="issueSearchInput"
-      value={search}
-      renderBeforeInput={() => <IconSearchLine inline={false} />}
-      renderAfterInput={clearButton}
-      renderLabel={''}
-      onChange={handleSearchChange}
-      messages={[
-        {
-          type: 'hint',
-          text: I18n.t(
-            'Start typing to search. Results will update automatically after 3 characters.',
-          ),
-        },
-      ]}
-      placeholder={I18n.t('Search resource titles...')}
-      width="100%"
-      data-testid="issue-search-input"
-    />
+    <>
+      <View as="div" margin="medium 0">
+        {/* Wrap search input in form with role="search" for accessibility landmark navigation */}
+        <form role="search" onSubmit={e => e.preventDefault()}>
+
+          <TextInput
+            id="issueSearchInput"
+            value={searchInput}
+            renderBeforeInput={() => <IconSearchLine inline={false} />}
+            renderAfterInput={clearButton}
+            renderLabel={''}
+            onChange={event => handleChange(event.target.value)}
+            messages={[
+              {
+                type: 'hint',
+                text: I18n.t(
+                  'Start typing to search. Results will update automatically after 3 characters.',
+                ),
+              },
+            ]}
+            placeholder={I18n.t('Search resource titles...')}
+            width="100%"
+            data-testid="issue-search-input"
+          />
+        </form>
+      </View>
+      {alertMessage && (
+        <Alert
+          liveRegion={getLiveRegion}
+          liveRegionPoliteness="assertive"
+          isLiveRegionAtomic
+          screenReaderOnly
+        >
+          {alertMessage}
+        </Alert>
+      )}
+    </>
   )
 }

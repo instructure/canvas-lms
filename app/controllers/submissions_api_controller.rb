@@ -358,7 +358,7 @@ class SubmissionsApiController < ApplicationController
   #   Determines whether ordered results are returned in ascending or descending
   #   order.  Defaults to "ascending".  Doesn't affect results for "grouped" mode.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"submission_html_comments"|"rubric_assessment"|"assignment"|"total_scores"|"visibility"|"course"|"user"|"sub_assignment_submissions"|"student_entered_score"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"submission_html_comments"|"rubric_assessment"|"assignment"|"total_scores"|"visibility"|"course"|"user"|"sub_assignment_submissions"|"peer_review_submissions"|"student_entered_score"]
   #   Associations to include with the group. `total_scores` requires the
   #   `grouped` argument.
   #
@@ -456,6 +456,9 @@ class SubmissionsApiController < ApplicationController
     assignment_scope = @context.assignments.published.preload(:quiz, :discussion_topic, :post_policy)
     if includes.include?("sub_assignment_submissions") && @context.discussion_checkpoints_enabled?
       assignment_scope = assignment_scope.preload(:sub_assignments)
+    end
+    if includes.include?("peer_review_submissions") && @context.feature_enabled?(:peer_review_allocation_and_grading)
+      assignment_scope = assignment_scope.preload(:peer_review_sub_assignment)
     end
 
     assignment_scope = assignment_scope.where(post_to_sis: true) if value_to_boolean(params[:post_to_sis])
@@ -760,11 +763,12 @@ class SubmissionsApiController < ApplicationController
   #   Attach files to this comment that were previously uploaded using the
   #   Submission Comment API's files action
   #
-  # @argument include[] [String, "submission_comments"|"visibility"|"sub_assignment_submissions"|"provisional_grades"|"group"]
+  # @argument include[] [String, "submission_comments"|"visibility"|"sub_assignment_submissions"|"peer_review_submissions"|"provisional_grades"|"group"]
   #   Associations to include with the submission. "submission_comments" is always included by default.
   #   - "submission_comments": Comments on the submission (always included)
   #   - "visibility": Whether the assignment is visible to the owner of the submission
   #   - "sub_assignment_submissions": Sub-assignment submissions for discussion checkpoints
+  #   - "peer_review_submissions": Peer review submission data when peer review allocation and grading is enabled
   #   - "provisional_grades": Provisional grades (only available for moderated assignments)
   #   - "group": Group information (id and name) for group assignments
   #
@@ -813,6 +817,14 @@ class SubmissionsApiController < ApplicationController
   # @argument submission[seconds_late_override] [Integer]
   #   Sets the seconds late if late policy status is "late"
   #
+  # @argument submission[peer_review] [Boolean]
+  #   When true, updates the peer review sub assignment submission instead of
+  #   the parent assignment submission. The parent assignment must have peer reviews
+  #   enabled, the peer_review_allocation_and_grading feature flag must be enabled
+  #   for the course, and the assignment must have an associated peer review
+  #   sub assignment. If any of these conditions are not met, the API will
+  #   return a 422 error.
+  #
   # @argument rubric_assessment [RubricAssessment]
   #   Assign a rubric assessment to this assignment submission. The
   #   sub-parameters here depend on the rubric for the assignment. The general
@@ -859,6 +871,20 @@ class SubmissionsApiController < ApplicationController
   def update
     @assignment ||= api_find(@context.assignments.active, params[:assignment_id])
 
+    # Handle peer review sub assignment submissions
+    if params[:submission] && value_to_boolean(params[:submission][:peer_review])
+      validation_error = validate_peer_review_submission_conditions(@assignment)
+      if validation_error
+        return render json: { errors: [{ message: validation_error[:error] }] },
+                      status: validation_error[:status]
+      end
+
+      @assignment = @assignment.peer_review_sub_assignment
+
+      # Clear any cached submission since we're switching assignments
+      @submission = nil
+    end
+
     if params[:submission] && params[:submission][:posted_grade] && !params[:submission][:provisional] &&
        @assignment.moderated_grading && !@assignment.grades_published?
       render_unauthorized_action
@@ -871,6 +897,11 @@ class SubmissionsApiController < ApplicationController
       return
     end
     @submission ||= @assignment.all_submissions.find_or_create_by!(user: @user)
+
+    # Clear permission cache for peer review submissions to ensure fresh authorization check
+    if params[:submission] && value_to_boolean(params[:submission][:peer_review])
+      @submission.clear_permissions_cache(@current_user, session)
+    end
 
     authorized = if params[:submission] || params[:rubric_assessment]
                    authorized_action(@submission, @current_user, :grade)
@@ -909,6 +940,9 @@ class SubmissionsApiController < ApplicationController
         if params[:submission][:submission_type] == "basic_lti_launch" && (!@submission.has_submission? || @submission.submission_type == "basic_lti_launch")
           submission[:submission_type] = params[:submission][:submission_type]
           submission[:url] = params[:submission][:url]
+        end
+        if params[:submission][:submission_type] == "ams" && !@submission.has_submission?
+          submission[:submission_type] = params[:submission][:submission_type]
         end
         submission[:prefer_points_over_scheme] = value_to_boolean(params[:prefer_points_over_scheme])
       end
@@ -1021,7 +1055,7 @@ class SubmissionsApiController < ApplicationController
       Submission.bulk_load_attachments_and_previews([@submission])
 
       includes = %w[submission_comments]
-      includes.concat(Array.wrap(params[:include]) & %w[visibility sub_assignment_submissions])
+      includes.concat(Array.wrap(params[:include]) & %w[visibility sub_assignment_submissions peer_review_submissions])
       includes << "provisional_grades" if submission[:provisional]
       visiblity_included = includes.include?("visibility")
       if visiblity_included
@@ -1094,11 +1128,12 @@ class SubmissionsApiController < ApplicationController
   #   Attach files to this comment that were previously uploaded using the
   #   Submission Comment API's files action
   #
-  # @argument include[] [String, "submission_comments"|"visibility"|"sub_assignment_submissions"|"provisional_grades"|"group"]
+  # @argument include[] [String, "submission_comments"|"visibility"|"sub_assignment_submissions"|"peer_review_submissions"|"provisional_grades"|"group"]
   #   Associations to include with the submission. "submission_comments" is always included by default.
   #   - "submission_comments": Comments on the submission (always included)
   #   - "visibility": Whether the assignment is visible to the owner of the submission
   #   - "sub_assignment_submissions": Sub-assignment submissions for discussion checkpoints
+  #   - "peer_review_submissions": Peer review submission data when peer review allocation and grading is enabled
   #   - "provisional_grades": Provisional grades (only available for moderated assignments)
   #   - "group": Group information (id and name) for group assignments
   #
@@ -1299,10 +1334,15 @@ class SubmissionsApiController < ApplicationController
 
       students = Api.paginate(student_scope, self, api_v1_multiple_assignments_gradeable_students_url(@context))
 
+      visibility_by_user = AssignmentVisibility::AssignmentVisibilityService.visible_assignment_ids_in_course_by_user(
+        user_ids: students.map(&:id),
+        course_ids: @context.id,
+        assignment_ids:
+      )
+
       student_displays = students.map do |student|
         user_display = user_display_json(student, @context)
-        visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids:, user_ids: student.id).map(&:assignment_id)
-        user_display["assignment_ids"] = visible_assignment_ids
+        user_display["assignment_ids"] = visibility_by_user[student.id] || []
         user_display
       end
 
@@ -1669,6 +1709,20 @@ class SubmissionsApiController < ApplicationController
 
   def include_deactivated_students_in_summary?
     value_to_boolean(params[:include_deactivated])
+  end
+
+  def validate_peer_review_submission_conditions(assignment)
+    unless assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      return { error: I18n.t("Peer review allocation and grading feature is not enabled for this course"), status: :unprocessable_entity }
+    end
+
+    unless assignment.peer_reviews
+      return { error: I18n.t("This assignment does not have peer reviews enabled"), status: :unprocessable_entity }
+    end
+
+    unless assignment.peer_review_sub_assignment.present?
+      { error: I18n.t("This assignment does not have a peer review sub assignment"), status: :unprocessable_entity }
+    end
   end
 
   def change_topic_read_state(new_state)

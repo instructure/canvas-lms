@@ -23,6 +23,6 @@ module AccountDomainSpecHelper
     # can't mock environment_specific_domain directly on
     # any_instance due to it being overridden in MRA, so mock this
     # which works as long as test_cluster_name is nil
-    allow(HostUrl).to receive(:context_host).and_return(host)
+    allow(HostUrl).to receive_messages(context_host: host, default_host: host)
   end
 end

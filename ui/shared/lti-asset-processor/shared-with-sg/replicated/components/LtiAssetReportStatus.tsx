@@ -17,7 +17,12 @@
  */
 
 import {Flex} from '@instructure/ui-flex'
-import {IconCompleteSolid, IconWarningSolid} from '@instructure/ui-icons'
+import {
+  IconCompleteSolid,
+  IconHourGlassSolid,
+  IconInfoSolid,
+  IconWarningSolid,
+} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {canvas} from '@instructure/ui-themes'
@@ -33,27 +38,70 @@ interface Props {
   openModal?: () => void
 }
 
+type StatusDisplayProps = {
+  title: string
+  icon: JSX.Element
+
+  linkThemeOverride?: React.ComponentProps<typeof Link>['themeOverride']
+  linkDataPendo: string
+
+  textColor: React.ComponentProps<typeof Text>['color']
+}
+
+const PROCESSING_PROGRESSES = ['Processing', 'Pending', 'PendingManual']
+
+function summarizeReports(reports: LtiAssetReport[]): StatusDisplayProps {
+  if (reports.some(report => report.priority > 0)) {
+    return {
+      title: I18n.t('Please review'),
+      icon: <IconWarningSolid color="error" />,
+      linkThemeOverride: {
+        color: canvas.colors.ui.textError,
+        hoverColor: canvas.colors.ui.textError,
+      },
+      linkDataPendo: 'asset-reports-needs-attention-button',
+      textColor: 'danger',
+    }
+  }
+  if (reports.some(report => PROCESSING_PROGRESSES.includes(report.processingProgress))) {
+    return {
+      title: I18n.t('Processing'),
+      icon: <IconHourGlassSolid color="brand" />,
+      linkDataPendo: 'asset-reports-processing-button',
+      textColor: 'brand',
+    }
+  }
+  if (reports.some(report => report.processingProgress === 'Processed')) {
+    return {
+      title: I18n.t('All good'),
+      icon: <IconCompleteSolid color="brand" />,
+      linkDataPendo: 'asset-reports-all-good-button',
+      textColor: 'brand',
+    }
+  }
+  return {
+    title: I18n.t('No result'),
+    icon: <IconInfoSolid color="brand" />,
+    linkDataPendo: 'asset-reports-no-results-info-button',
+    textColor: 'brand',
+  }
+}
+
 /**
  * Stateless/presentational component to render the status of LTI Asset Reports for a student.
  */
 export default function LtiAssetReportStatus({
   reports,
-  ...propsForRenderStatus
+  textSize,
+  textWeight,
+  openModal,
 }: Props): JSX.Element {
   if (reports.length === 0) {
     return <Text>{I18n.t('No result')}</Text>
   }
-  const hasHighPriority = reports.some(report => report.priority > 0)
-  if (hasHighPriority) {
-    return renderStatus('high', propsForRenderStatus)
-  }
-  return renderStatus('ok', propsForRenderStatus)
-}
 
-function renderStatus(
-  status: 'high' | 'ok',
-  {textSize, textWeight, openModal}: Omit<Props, 'reports'>,
-) {
+  const statusDisplayProps: StatusDisplayProps = summarizeReports(reports)
+
   if (openModal) {
     return (
       <Link
@@ -61,19 +109,12 @@ function renderStatus(
           event.preventDefault()
           openModal()
         }}
-        renderIcon={status === 'ok' ? <IconCompleteSolid /> : <IconWarningSolid color="error" />}
+        renderIcon={statusDisplayProps.icon}
         variant="inline"
-        themeOverride={
-          status === 'ok'
-            ? {}
-            : {
-                color: canvas.colors.ui.textError,
-                hoverColor: canvas.colors.ui.textError,
-              }
-        }
-        data-pendo={`asset-reports-${status === 'high' ? 'needs-attention' : 'all-good'}-button`}
+        themeOverride={statusDisplayProps.linkThemeOverride}
+        data-pendo={statusDisplayProps.linkDataPendo}
       >
-        {status === 'ok' ? I18n.t('All good') : I18n.t('Needs attention')}
+        {statusDisplayProps.title}
       </Link>
     )
   }
@@ -81,11 +122,11 @@ function renderStatus(
     <Text
       size={textSize ?? 'descriptionPage'}
       weight={textWeight ?? 'weightImportant'}
-      color={status === 'ok' ? 'brand' : 'danger'}
+      color={statusDisplayProps.textColor}
     >
       <Flex display="flex" gap="xx-small">
-        {status === 'ok' ? <IconCompleteSolid color="brand" /> : <IconWarningSolid color="error" />}
-        {status === 'ok' ? I18n.t('All good') : I18n.t('Needs attention')}
+        {statusDisplayProps.icon}
+        {statusDisplayProps.title}
       </Flex>
     </Text>
   )

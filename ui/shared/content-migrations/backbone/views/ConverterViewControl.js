@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-tinypubsub'
-import {find} from 'lodash'
+import {find} from 'es-toolkit/compat'
 
 // Handles rendering the correct view depending on the
 // value selected.

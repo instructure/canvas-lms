@@ -49,7 +49,9 @@ export interface TemplateWidgetProps extends BaseWidgetProps {
   headerActions?: React.ReactNode
   loadingText?: string
   pagination?: PaginationProps
+  footerActions?: React.ReactNode
   isEditMode?: boolean
+  dragHandleProps?: any
 }
 
 const TemplateWidget: React.FC<TemplateWidgetProps> = ({
@@ -64,10 +66,12 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   onRetry,
   loadingText,
   pagination,
+  footerActions,
   isEditMode = false,
+  dragHandleProps,
 }) => {
   const {isMobile, isDesktop} = useResponsiveContext()
-  const {config, moveWidget} = useWidgetLayout()
+  const {config, moveWidget, removeWidget} = useWidgetLayout()
   const widgetTitle = title || widget.title
   const headingId = `${widget.id}-heading`
 
@@ -75,19 +79,33 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
     moveWidget(widget.id, action as MoveAction)
   }
 
+  const handleRemove = () => {
+    removeWidget(widget.id)
+  }
+
   const editModeActions = (
-    <Flex gap="x-small">
+    <div style={{display: 'flex', gap: '0.5rem', alignItems: 'center'}}>
       <WidgetContextMenu
         trigger={
-          <IconButton
-            screenReaderLabel={I18n.t('Drag to reorder widget')}
-            size="small"
-            withBackground={false}
-            withBorder={false}
+          <button
+            {...dragHandleProps}
             data-testid={`${widget.id}-drag-handle`}
+            style={{
+              ...dragHandleProps?.style,
+              cursor: 'grab',
+              display: 'flex',
+              alignItems: 'center',
+              border: 'none',
+              background: 'transparent',
+              padding: '0.375rem',
+              margin: 0,
+              lineHeight: 1,
+            }}
+            type="button"
+            aria-label={I18n.t('Drag to reorder or click for options')}
           >
             <IconDragHandleLine />
-          </IconButton>
+          </button>
         }
         widget={widget}
         config={config}
@@ -98,11 +116,12 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
         size="small"
         withBackground={false}
         withBorder={false}
+        onClick={handleRemove}
         data-testid={`${widget.id}-remove-button`}
       >
         <IconTrashLine />
       </IconButton>
-    </Flex>
+    </div>
   )
 
   const renderContent = () => {
@@ -170,19 +189,19 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
                 {headerActions && (
                   <Flex.Item padding="x-small 0 x-small x-small">{headerActions}</Flex.Item>
                 )}
-                {isEditMode && isDesktop && editModeActions && (
+                {isEditMode && isDesktop && (
                   <Flex.Item padding="x-small 0 x-small x-small">{editModeActions}</Flex.Item>
                 )}
               </Flex>
             ) : (
-              <Flex direction="row" alignItems="center" justifyItems="space-between">
+              <Flex direction="row" alignItems="center" justifyItems="space-between" wrap="wrap">
                 <Flex.Item shouldGrow>
                   <Heading level="h2" variant="titleCardSection" margin="0" id={headingId}>
                     {widgetTitle}
                   </Heading>
                 </Flex.Item>
                 {headerActions && <Flex.Item shouldGrow={false}>{headerActions}</Flex.Item>}
-                {isEditMode && isDesktop && editModeActions && (
+                {isEditMode && isDesktop && (
                   <Flex.Item margin="0 0 0 small" shouldGrow={false}>
                     {editModeActions}
                   </Flex.Item>
@@ -216,6 +235,12 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
                 aria-label={pagination.ariaLabel}
               />
             </Flex>
+          </View>
+        )}
+
+        {footerActions && !isLoading && !error && (
+          <View as="div" margin="small 0 0">
+            {footerActions}
           </View>
         )}
       </Flex>

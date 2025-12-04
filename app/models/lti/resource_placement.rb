@@ -55,12 +55,6 @@ module Lti
     # Default placements for LTI 1 and LTI 2, ignored for LTI 1.3
     LEGACY_DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
 
-    # Placements restricted so not advertised in the UI
-    NON_PUBLIC_PLACEMENTS = %i[submission_type_selection].freeze
-
-    # These placements require tools to be on an allow list
-    RESTRICTED_PLACEMENTS = %i[submission_type_selection].freeze
-
     # These placements don't need the CANVAS_PLACEMENT_EXTENSION_PREFIX
     STANDARD_PLACEMENTS = %i[ActivityAssetProcessor ActivityAssetProcessorContribution].freeze
 
@@ -150,11 +144,8 @@ module Lti
         p.delete(:conference_selection) unless Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
         p.delete(:ActivityAssetProcessor) unless root_account&.feature_enabled?(:lti_asset_processor)
         p.delete(:ActivityAssetProcessorContribution) unless root_account&.feature_enabled?(:lti_asset_processor_discussions)
+        p.delete(:top_navigation) unless root_account&.feature_enabled?(:top_navigation_placement)
       end
-    end
-
-    def self.public_placements(root_account)
-      valid_placements(root_account) - NON_PUBLIC_PLACEMENTS
     end
 
     def self.update_tabs_and_return_item_banks_tab(tabs, new_label = nil)

@@ -658,12 +658,14 @@ describe "Api::V1::Assignment" do
       end
     end
 
-    context "with peer_review_allocation feature flag enabled" do
+    context "with peer_review_allocation_and_grading feature flag enabled" do
       before do
         @assignment = assignment_model
         @assignment.update_attribute(:peer_reviews, true)
         @assignment.update_attribute(:peer_review_count, 2)
-        @assignment.course.enable_feature!(:peer_review_allocation)
+        @assignment.course.enable_feature!(:peer_review_allocation_and_grading)
+        @student1 = student_in_course(active_all: true, course: @assignment.course).user
+        @student2 = student_in_course(active_all: true, course: @assignment.course).user
       end
 
       it "includes peer_review_count" do
@@ -671,21 +673,39 @@ describe "Api::V1::Assignment" do
         expect(json).to have_key("peer_review_count")
         expect(json["peer_review_count"]).to eq 2
       end
-    end
 
-    context "with peer_review_grading feature flag enabled" do
-      before do
-        @assignment = assignment_model
-        @assignment.update_attribute(:peer_reviews, true)
-        @assignment.update_attribute(:peer_review_count, 3)
-        @assignment.course.enable_feature!(:peer_review_grading)
-        @assignment.course.disable_feature!(:peer_review_allocation)
+      it "includes has_peer_review_submissions as false when no peer reviews completed" do
+        json = api.assignment_json(@assignment, user, session, {})
+        expect(json).to have_key("has_peer_review_submissions")
+        expect(json["has_peer_review_submissions"]).to be false
       end
 
-      it "includes peer_review_count" do
+      it "includes has_peer_review_submissions as true when peer reviews completed" do
+        submission1 = @assignment.find_or_create_submission(@student1)
+        submission2 = @assignment.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "completed"
+        )
+
         json = api.assignment_json(@assignment, user, session, {})
-        expect(json).to have_key("peer_review_count")
-        expect(json["peer_review_count"]).to eq 3
+        expect(json).to have_key("has_peer_review_submissions")
+        expect(json["has_peer_review_submissions"]).to be true
+      end
+
+      it "does not include has_peer_review_submissions when peer reviews are disabled" do
+        @assignment.update_attribute(:peer_reviews, false)
+        json = api.assignment_json(@assignment, user, session, {})
+        expect(json).not_to have_key("has_peer_review_submissions")
+      end
+
+      it "does not include has_peer_review_submissions when feature flag is disabled" do
+        @assignment.course.disable_feature!(:peer_review_allocation_and_grading)
+        json = api.assignment_json(@assignment, user, session, {})
+        expect(json).not_to have_key("has_peer_review_submissions")
       end
     end
   end

@@ -228,8 +228,14 @@ describe('AssetReportModal', () => {
 
     it('shows Resubmit All Replies button for discussions', () => {
       const reports: LtiAssetReport[] = [
-        createDiscussionReport(0, {processorId: '1', resubmitAvailable: true}),
-        createDiscussionReport(1, {processorId: '2', resubmitAvailable: false}),
+        createDiscussionReport(0, {
+          processorId: '1',
+          resubmitAvailable: true,
+        }),
+        createDiscussionReport(1, {
+          processorId: '2',
+          resubmitAvailable: false,
+        }),
       ]
 
       renderComponent(
@@ -253,7 +259,12 @@ describe('AssetReportModal', () => {
     })
 
     it('hides button when studentIdForResubmission is not provided', () => {
-      const reports = [createDiscussionReport(0, {processorId: '1', resubmitAvailable: true})]
+      const reports = [
+        createDiscussionReport(0, {
+          processorId: '1',
+          resubmitAvailable: true,
+        }),
+      ]
 
       renderComponent(
         <AssetReportModal
@@ -275,7 +286,12 @@ describe('AssetReportModal', () => {
     })
 
     it('hides button when assignmentId is not provided', () => {
-      const reports = [createDiscussionReport(0, {processorId: '1', resubmitAvailable: true})]
+      const reports = [
+        createDiscussionReport(0, {
+          processorId: '1',
+          resubmitAvailable: true,
+        }),
+      ]
 
       renderComponent(
         <AssetReportModal
@@ -297,7 +313,12 @@ describe('AssetReportModal', () => {
     })
 
     it('hides button for non-discussion submissions', () => {
-      const reports = [createUploadReport(0, '10', {processorId: '1', resubmitAvailable: true})]
+      const reports = [
+        createUploadReport(0, '10', {
+          processorId: '1',
+          resubmitAvailable: true,
+        }),
+      ]
       const attachments = [{_id: '10', displayName: 'test.pdf'}]
 
       renderComponent(
@@ -319,6 +340,119 @@ describe('AssetReportModal', () => {
       expect(screen.queryByText('Resubmit All Replies')).not.toBeInTheDocument()
       // Should show the regular resubmit button instead
       expect(screen.getByText('Resubmit All Files')).toBeInTheDocument()
+    })
+  })
+
+  describe('pagination notification', () => {
+    it('shows notification when hasNextPage is true', () => {
+      const reports = [createUploadReport(0, '10', {processorId: '1'})]
+      const attachments = [{_id: '10', displayName: 'test.pdf'}]
+
+      renderComponent(
+        <AssetReportModal
+          assetProcessors={mockAssetProcessors}
+          modalTitle="Test Modal"
+          onClose={mockOnClose}
+          attachments={attachments}
+          attempt=""
+          mainTitle={undefined}
+          reports={reports}
+          showDocumentDisplayName={false}
+          studentIdForResubmission={undefined}
+          submissionType="online_upload"
+          hasNextPage={true}
+        />,
+      )
+
+      expect(
+        screen.getByText('Too many results, not all reports are being displayed'),
+      ).toBeInTheDocument()
+    })
+
+    it('does not show notification when hasNextPage is false', () => {
+      const reports = [createUploadReport(0, '10', {processorId: '1'})]
+      const attachments = [{_id: '10', displayName: 'test.pdf'}]
+
+      renderComponent(
+        <AssetReportModal
+          assetProcessors={mockAssetProcessors}
+          modalTitle="Test Modal"
+          onClose={mockOnClose}
+          attachments={attachments}
+          attempt=""
+          mainTitle={undefined}
+          reports={reports}
+          showDocumentDisplayName={false}
+          studentIdForResubmission={undefined}
+          submissionType="online_upload"
+          hasNextPage={false}
+        />,
+      )
+
+      expect(
+        screen.queryByText('Too many results, not all reports are being displayed'),
+      ).not.toBeInTheDocument()
+    })
+
+    it('does not show notification when hasNextPage is undefined', () => {
+      const reports = [createUploadReport(0, '10', {processorId: '1'})]
+      const attachments = [{_id: '10', displayName: 'test.pdf'}]
+
+      renderComponent(
+        <AssetReportModal
+          assetProcessors={mockAssetProcessors}
+          modalTitle="Test Modal"
+          onClose={mockOnClose}
+          attachments={attachments}
+          attempt=""
+          mainTitle={undefined}
+          reports={reports}
+          showDocumentDisplayName={false}
+          studentIdForResubmission={undefined}
+          submissionType="online_upload"
+        />,
+      )
+
+      expect(
+        screen.queryByText('Too many results, not all reports are being displayed'),
+      ).not.toBeInTheDocument()
+    })
+
+    it('shows notification for discussion submissions when hasNextPage is true', () => {
+      const reports = [
+        createBaseReport(
+          0,
+          {
+            discussionEntryVersion: {
+              _id: 'entry_123',
+              createdAt: '2025-01-15T16:45:00Z',
+              messageIntro: 'Test discussion entry',
+            },
+          },
+          {processorId: '1'},
+        ),
+      ]
+
+      renderComponent(
+        <AssetReportModal
+          assetProcessors={mockAssetProcessors}
+          modalTitle="Test Modal"
+          onClose={mockOnClose}
+          attachments={[]}
+          attempt=""
+          mainTitle={undefined}
+          reports={reports}
+          showDocumentDisplayName={false}
+          studentIdForResubmission="456"
+          submissionType="discussion_topic"
+          assignmentId="123"
+          hasNextPage={true}
+        />,
+      )
+
+      expect(
+        screen.getByText('Too many results, not all reports are being displayed'),
+      ).toBeInTheDocument()
     })
   })
 })

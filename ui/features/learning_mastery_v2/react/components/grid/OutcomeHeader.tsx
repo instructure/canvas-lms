@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
@@ -29,15 +29,25 @@ import {CELL_HEIGHT, COLUMN_WIDTH, SortBy, SortOrder} from '../../utils/constant
 import {Outcome} from '../../types/rollup'
 import {Sorting} from '../../types/shapes'
 import {OutcomeDescriptionModal} from '../modals/OutcomeDescriptionModal'
+import {DragDropConnectorProps} from './DragDropWrapper'
+import {ContributingScoresForOutcome} from '../../hooks/useContributingScores'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
-export interface OutcomeHeaderProps {
+export interface OutcomeHeaderProps extends DragDropConnectorProps {
   outcome: Outcome
   sorting: Sorting
+  contributingScoresForOutcome: ContributingScoresForOutcome
 }
 
-export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({outcome, sorting}) => {
+export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
+  outcome,
+  sorting,
+  connectDragSource,
+  connectDropTarget,
+  isDragging,
+  contributingScoresForOutcome,
+}) => {
   // OD => OutcomeDescription
   const [isODModalOpen, openODModal, closeODModal] = useModal() as [boolean, () => void, () => void]
 
@@ -56,8 +66,17 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({outcome, sorting}) 
     sorting.setSortOrder(SortOrder.DESC)
   }
 
-  return (
-    <>
+  const headerStyle = useMemo(
+    () => ({
+      opacity: isDragging ? 0.5 : 1,
+      cursor: 'grab',
+      transition: 'opacity 0.15s ease-in-out',
+    }),
+    [isDragging],
+  )
+
+  const headerContent = (
+    <div style={headerStyle}>
       <View
         background="secondary"
         as="div"
@@ -106,7 +125,11 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({outcome, sorting}) 
               </Menu.Item>
               <Menu.Separator />
               <Menu.Group label={I18n.t('Display')}>
-                <Menu.Item>{I18n.t('Hide Contributing Scores')}</Menu.Item>
+                <Menu.Item onClick={contributingScoresForOutcome.toggleVisibility}>
+                  {contributingScoresForOutcome.isVisible()
+                    ? I18n.t('Hide Contributing Scores')
+                    : I18n.t('Show Contributing Scores')}
+                </Menu.Item>
                 <Menu.Item onClick={openODModal}>{I18n.t('Outcome Info')}</Menu.Item>
                 <Menu.Item>{I18n.t('Show Outcome Distribution')}</Menu.Item>
               </Menu.Group>
@@ -114,6 +137,15 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({outcome, sorting}) 
           </Flex.Item>
         </Flex>
       </View>
+    </div>
+  )
+
+  return (
+    <>
+      {connectDragSource && connectDropTarget
+        ? connectDragSource(connectDropTarget(headerContent))
+        : headerContent}
+
       <OutcomeDescriptionModal
         outcome={outcome}
         isOpen={isODModalOpen}

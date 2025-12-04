@@ -98,4 +98,28 @@ describe Lti::Messages::ReportReviewRequest do
       expect { subject }.to raise_error(ArgumentError)
     end
   end
+
+  describe "legacy_custom_sourcedid extension" do
+    context "when extensions does not contain custom_sourcedid" do
+      before do
+        asset_report.update!(extensions: { "https://example.com/other" => "value" })
+      end
+
+      it "does not include legacy_custom_sourcedid extension" do
+        extension_key = "https://www.instructure.com/legacy_custom_sourcedid"
+        expect(subject).not_to have_key(extension_key)
+      end
+    end
+
+    context "when extensions contains custom_sourcedid" do
+      before do
+        asset_report.update!(extensions: { "https://www.instructure.com/legacy_custom_sourcedid" => "test-sourcedid-123" })
+      end
+
+      it "includes legacy_custom_sourcedid extension" do
+        extension_key = "https://www.instructure.com/legacy_custom_sourcedid"
+        expect(subject[extension_key]).to eq("test-sourcedid-123")
+      end
+    end
+  end
 end

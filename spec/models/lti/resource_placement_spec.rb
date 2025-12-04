@@ -43,7 +43,7 @@ module Lti
         expect(described_class.valid_placements(Account.default)).to include(:conference_selection)
       end
 
-      it "includes submission_type_selection when FF enabled" do
+      it "includes submission_type_selection" do
         expect(described_class.valid_placements(Account.default)).to include(:submission_type_selection)
       end
 
@@ -66,15 +66,15 @@ module Lti
         Account.default.enable_feature! :lti_asset_processor_discussions
         expect(described_class.valid_placements(Account.default)).to include(:ActivityAssetProcessorContribution)
       end
-    end
 
-    describe ".public_placements" do
-      it "does not include submission_type_selection" do
-        expect(described_class.public_placements(Account.default)).not_to include(:submission_type_selection)
+      it "does not include top_navigation when FF disabled" do
+        Account.default.disable_feature! :top_navigation_placement
+        expect(described_class.valid_placements(Account.default)).not_to include(:top_navigation)
       end
 
-      it "contains common placements" do
-        expect(described_class.public_placements(Account.default)).to include(:assignment_selection, :course_navigation, :link_selection)
+      it "includes top_navigation when FF enabled" do
+        Account.default.enable_feature! :top_navigation_placement
+        expect(described_class.valid_placements(Account.default)).to include(:top_navigation)
       end
     end
 

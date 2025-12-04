@@ -60,7 +60,7 @@ class PeerReview::PeerReviewSubmitterService < ApplicationService
   end
 
   def feature_enabled?
-    @parent_assignment&.context&.feature_enabled?(:peer_review_grading)
+    @parent_assignment&.context&.feature_enabled?(:peer_review_allocation_and_grading)
   end
 
   def peer_review_submission_supported?

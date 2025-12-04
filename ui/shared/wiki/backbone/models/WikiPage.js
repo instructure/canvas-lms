@@ -23,7 +23,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 import $ from 'jquery'
-import {pick, omit} from 'lodash'
+import {pick, omit} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import WikiPageRevision from './WikiPageRevision'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'

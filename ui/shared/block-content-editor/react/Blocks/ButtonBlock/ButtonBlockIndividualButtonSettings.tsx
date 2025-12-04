@@ -32,6 +32,7 @@ import {useButtonManager} from './useButtonManager'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
+import {Heading} from '@instructure/ui-heading'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -154,7 +155,9 @@ export const ButtonBlockIndividualButtonSettings = ({
           summary={
             <Flex justifyItems="space-between" alignItems="center">
               <Flex.Item shouldGrow shouldShrink>
-                <TruncateText>{buttonTitle}</TruncateText>
+                <Heading level="h4">
+                  <TruncateText>{buttonTitle}</TruncateText>
+                </Heading>
               </Flex.Item>
               <IconButton
                 onClick={() => handleButtonRemove(button.id, buttonIndex)}

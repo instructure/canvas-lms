@@ -32,20 +32,38 @@ describe RubricLLMService do
   end
 
   let(:service) { described_class.new(rubric) }
-  let(:inst_llm) { double("InstLLM::Client") }
 
   let(:llm_config_double) do
-    double(
+    instance_double(
       "LLMConfig",
       name: "rubric-create-V3",
-      model_id: "anthropic.claude-3-haiku-20240307-v1:0",
-      generate_prompt_and_options: ["PROMPT", {}]
-    )
+      model_id: "anthropic.claude-3-haiku-20240307-v1:0"
+    ).tap do |config|
+      allow(config).to receive(:generate_prompt_and_options).and_return("PROMPT")
+    end
+  end
+
+  let(:cedar_response_struct) { Struct.new(:response, keyword_init: true) }
+  let(:mock_cedar_prompt_response) do
+    Struct.new(:response, keyword_init: true).new(response: "<RUBRIC_DATA>\n</RUBRIC_DATA>")
+  end
+
+  let(:mock_cedar_conversation_response) do
+    Struct.new(:response, keyword_init: true).new(response: '{"criteria": []}')
   end
 
   before do
-    allow(InstLLMHelper).to receive(:with_rate_limit).and_yield
-    allow(InstLLMHelper).to receive(:client).and_return(inst_llm)
+    allow(Rails.env).to receive(:test?).and_return(true)
+
+    stub_const("CedarClient", Class.new do
+      def self.prompt(*)
+        mock_cedar_prompt_response
+      end
+
+      def self.conversation(*)
+        mock_cedar_conversation_response
+      end
+    end)
   end
 
   shared_context "llm config for create" do
@@ -218,13 +236,17 @@ describe RubricLLMService do
         ]
       }
 
-      expect(inst_llm).to receive(:chat).and_return(
-        InstLLM::Response::ChatResponse.new(
-          model: "model",
-          message: { role: :assistant, content: llm_payload.to_json[1..] }, # drop opening "{"
-          stop_reason: "stop",
-          usage: { input_tokens: 12, output_tokens: 34 }
+      expect(CedarClient).to receive(:conversation).with(
+        hash_including(
+          messages: array_including(
+            { role: "User", text: "PROMPT" },
+            { role: "Assistant", text: "{" }
+          ),
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          feature_slug: "rubric-generate"
         )
+      ).and_return(
+        cedar_response_struct.new(response: llm_payload.to_json[1..])
       )
 
       expect do
@@ -253,8 +275,9 @@ describe RubricLLMService do
       expect(llm_resp.associated_assignment).to eq assignment
       expect(llm_resp.user).to eq teacher
       expect(llm_resp.raw_response).to be_present
-      expect(llm_resp.input_tokens).to eq 12
-      expect(llm_resp.output_tokens).to eq 34
+      # CedarClient doesn't provide token usage info, so these are 0
+      expect(llm_resp.input_tokens).to eq 0
+      expect(llm_resp.output_tokens).to eq 0
     end
 
     describe "validations" do
@@ -330,13 +353,13 @@ describe RubricLLMService do
           </RUBRIC_DATA>
         TEXT
 
-        expect(inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "model",
-            message: { role: :assistant, content: llm_text },
-            stop_reason: "stop",
-            usage: { input_tokens: 22, output_tokens: 44 }
+        expect(CedarClient).to receive(:prompt).with(
+          hash_including(
+            model: "anthropic.claude-3-haiku-20240307-v1:0",
+            feature_slug: "rubric-regenerate-criteria"
           )
+        ).and_return(
+          cedar_response_struct.new(response: llm_text)
         )
 
         criteria = service.regenerate_criteria_via_llm(
@@ -375,13 +398,13 @@ describe RubricLLMService do
           </RUBRIC_DATA>
         TEXT
 
-        expect(inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "model",
-            message: { role: :assistant, content: llm_text },
-            stop_reason: "stop",
-            usage: { input_tokens: 10, output_tokens: 20 }
+        expect(CedarClient).to receive(:prompt).with(
+          hash_including(
+            model: "anthropic.claude-3-haiku-20240307-v1:0",
+            feature_slug: "rubric-regenerate-criterion"
           )
+        ).and_return(
+          cedar_response_struct.new(response: llm_text)
         )
 
         criteria = service.regenerate_criteria_via_llm(
@@ -413,13 +436,8 @@ describe RubricLLMService do
       include_examples "validates rubric user and assignment", :regenerate_criteria_via_llm
 
       it "raises when no <RUBRIC_DATA> block is found" do
-        expect(inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "model",
-            message: { role: :assistant, content: "no tags here" },
-            stop_reason: "stop",
-            usage: { input_tokens: 1, output_tokens: 1 }
-          )
+        expect(CedarClient).to receive(:prompt).and_return(
+          cedar_response_struct.new(response: "no tags here")
         )
 
         expect do
@@ -1365,13 +1383,8 @@ describe RubricLLMService do
           ]
         JSON
 
-        expect(inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "model",
-            message: { role: :assistant, content: malformed_json },
-            stop_reason: "stop",
-            usage: { input_tokens: 10, output_tokens: 20 }
-          )
+        expect(CedarClient).to receive(:conversation).and_return(
+          cedar_response_struct.new(response: malformed_json)
         )
 
         expect do
@@ -1382,7 +1395,7 @@ describe RubricLLMService do
 
     describe "network and service failures" do
       it "handles connection timeout errors" do
-        expect(inst_llm).to receive(:chat).and_raise(Timeout::Error.new("Connection timed out"))
+        expect(CedarClient).to receive(:conversation).and_raise(Timeout::Error.new("Connection timed out"))
 
         expect do
           service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 3, points_per_criterion: 10)
@@ -1390,7 +1403,7 @@ describe RubricLLMService do
       end
 
       it "handles DNS resolution failures" do
-        expect(inst_llm).to receive(:chat).and_raise(SocketError.new("getaddrinfo: Name or service not known"))
+        expect(CedarClient).to receive(:conversation).and_raise(SocketError.new("getaddrinfo: Name or service not known"))
 
         expect do
           service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 3, points_per_criterion: 10)
@@ -1398,7 +1411,7 @@ describe RubricLLMService do
       end
 
       it "handles HTTP errors" do
-        expect(inst_llm).to receive(:chat).and_raise(RuntimeError.new("HTTP client error"))
+        expect(CedarClient).to receive(:conversation).and_raise(RuntimeError.new("HTTP client error"))
 
         expect do
           service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 3, points_per_criterion: 10)
@@ -1406,7 +1419,7 @@ describe RubricLLMService do
       end
 
       it "handles connection refused errors" do
-        expect(inst_llm).to receive(:chat).and_raise(Errno::ECONNREFUSED.new("Connection refused"))
+        expect(CedarClient).to receive(:conversation).and_raise(Errno::ECONNREFUSED.new("Connection refused"))
 
         expect do
           service.generate_criteria_via_llm(assignment, {})
@@ -1414,7 +1427,7 @@ describe RubricLLMService do
       end
 
       it "handles timeout errors" do
-        expect(inst_llm).to receive(:chat).and_raise(Errno::ETIMEDOUT.new("Connection timed out"))
+        expect(CedarClient).to receive(:conversation).and_raise(Errno::ETIMEDOUT.new("Connection timed out"))
 
         expect do
           service.generate_criteria_via_llm(assignment, {})
@@ -1422,7 +1435,7 @@ describe RubricLLMService do
       end
 
       it "handles SSL errors" do
-        expect(inst_llm).to receive(:chat).and_raise(OpenSSL::SSL::SSLError.new("SSL certificate problem"))
+        expect(CedarClient).to receive(:conversation).and_raise(OpenSSL::SSL::SSLError.new("SSL certificate problem"))
 
         expect do
           service.generate_criteria_via_llm(assignment, {})
@@ -1430,27 +1443,18 @@ describe RubricLLMService do
       end
 
       it "handles unexpected response formats from LLM service" do
-        expect(inst_llm).to receive(:chat).and_return(
-          double("BadResponse",
-                 model: nil,
-                 message: nil,
-                 stop_reason: nil,
-                 usage: nil)
+        expect(CedarClient).to receive(:conversation).and_return(
+          double("BadResponse", response: nil)
         )
 
         expect do
           service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 3, points_per_criterion: 10)
-        end.to raise_error(NoMethodError)
+        end.to raise_error(ActiveRecord::NotNullViolation)
       end
 
       it "handles partial/corrupted JSON responses" do
-        expect(inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "model",
-            message: { role: :assistant, content: '{"criteria": [{"name": "Incomplete' },
-            stop_reason: "stop",
-            usage: { input_tokens: 10, output_tokens: 15 }
-          )
+        expect(CedarClient).to receive(:conversation).and_return(
+          cedar_response_struct.new(response: '"criteria": [{"name": "Incomplete')
         )
 
         expect do
@@ -1459,13 +1463,8 @@ describe RubricLLMService do
       end
 
       it "handles empty response from LLM service" do
-        expect(inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "model",
-            message: { role: :assistant, content: "" },
-            stop_reason: "stop",
-            usage: { input_tokens: 10, output_tokens: 0 }
-          )
+        expect(CedarClient).to receive(:conversation).and_return(
+          cedar_response_struct.new(response: "")
         )
 
         expect do
@@ -1490,7 +1489,7 @@ describe RubricLLMService do
       end
 
       it "handles network failures during regeneration" do
-        expect(inst_llm).to receive(:chat).and_raise(Errno::ECONNRESET.new("Connection reset by peer"))
+        expect(CedarClient).to receive(:prompt).and_raise(Errno::ECONNRESET.new("Connection reset by peer"))
 
         expect do
           service.regenerate_criteria_via_llm(assignment, { criteria: existing_criteria }, { criteria_count: 1, rating_count: 1 })
@@ -1498,7 +1497,7 @@ describe RubricLLMService do
       end
 
       it "handles SSL handshake failures during regeneration" do
-        expect(inst_llm).to receive(:chat).and_raise(OpenSSL::SSL::SSLError.new("SSL_connect SYSCALL returned=5 errno=0 state=SSLv3/TLS write client hello"))
+        expect(CedarClient).to receive(:prompt).and_raise(OpenSSL::SSL::SSLError.new("SSL_connect SYSCALL returned=5 errno=0 state=SSLv3/TLS write client hello"))
 
         expect do
           service.regenerate_criteria_via_llm(assignment, { criteria: existing_criteria }, { criteria_count: 1, rating_count: 1 })
@@ -1514,13 +1513,8 @@ describe RubricLLMService do
           rating:r1:description=Excellent
         TEXT
 
-        expect(inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "model",
-            message: { role: :assistant, content: truncated_response },
-            stop_reason: "max_tokens", # Stopped due to token limit
-            usage: { input_tokens: 10, output_tokens: 100 }
-          )
+        expect(CedarClient).to receive(:prompt).and_return(
+          cedar_response_struct.new(response: truncated_response)
         )
 
         expect do
@@ -1542,13 +1536,8 @@ describe RubricLLMService do
           </RUBRIC_DATA>
         TEXT
 
-        expect(inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "model",
-            message: { role: :assistant, content: bad_format_response },
-            stop_reason: "stop",
-            usage: { input_tokens: 10, output_tokens: 20 }
-          )
+        expect(CedarClient).to receive(:prompt).and_return(
+          cedar_response_struct.new(response: bad_format_response)
         )
 
         expect do
@@ -1563,13 +1552,8 @@ describe RubricLLMService do
       it "handles malformed JSON gracefully during regeneration" do
         malformed_response = "<RUBRIC_DATA>\ncriterion:c1:description=\"Test\"\n</RUBRIC_DATA>"
 
-        expect(inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "model",
-            message: { role: :assistant, content: malformed_response },
-            stop_reason: "stop",
-            usage: { input_tokens: 10, output_tokens: 20 }
-          )
+        expect(CedarClient).to receive(:prompt).and_return(
+          cedar_response_struct.new(response: malformed_response)
         )
 
         result = service.regenerate_criteria_via_llm(
@@ -1597,13 +1581,8 @@ describe RubricLLMService do
           </RUBRIC_DATA>
         TEXT
 
-        expect(inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "model",
-            message: { role: :assistant, content: response_text },
-            stop_reason: "stop",
-            usage: { input_tokens: 10, output_tokens: 20 }
-          )
+        expect(CedarClient).to receive(:prompt).and_return(
+          cedar_response_struct.new(response: response_text)
         )
 
         expect do

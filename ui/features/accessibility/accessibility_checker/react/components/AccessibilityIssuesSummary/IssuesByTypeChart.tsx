@@ -31,15 +31,10 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-
+import {Flex} from '@instructure/ui-flex'
 import {useAccessibilityScansStore} from '../../../../shared/react/stores/AccessibilityScansStore'
 import {IssueDataPoint} from '../../../../shared/react/types'
-import {
-  getChartData,
-  getChartOptions,
-  getSeverityCounts,
-  processIssuesToChartData,
-} from '../../utils/chart'
+import {getChartData, getChartOptions, processIssuesToChartData} from '../../utils/chart'
 
 const I18n = createI18nScope('issuesByTypeChart')
 
@@ -53,7 +48,11 @@ function renderLoading() {
   )
 }
 
-export const IssuesByTypeChart = () => {
+interface IssuesByTypeChartProps {
+  isMobile?: boolean
+}
+
+export const IssuesByTypeChart: React.FC<IssuesByTypeChartProps> = ({isMobile}) => {
   const [issuesSummary, loadingOfSummary] = useAccessibilityScansStore(
     useShallow(state => [state.issuesSummary, state.loadingOfSummary]),
   )
@@ -81,20 +80,57 @@ export const IssuesByTypeChart = () => {
     () => processIssuesToChartData(issuesSummary?.byRuleType),
     [issuesSummary],
   )
+
   const chartData = useMemo(
-    () => getChartData(issuesData, containerWidth),
-    [issuesData, containerWidth],
+    () => getChartData(issuesData, containerWidth, isMobile ? 3 : 6),
+    [issuesData, containerWidth, isMobile],
   )
+
   const chartOptions = useMemo(
     () => getChartOptions(issuesData, containerWidth),
     [issuesData, containerWidth],
   )
 
-  const severityCounts = useMemo(() => getSeverityCounts(issuesData), [issuesData])
+  const chartScreenReaderDescription = useMemo(() => {
+    // unable to dynamically declare and interpolate i18n strings for bar chart columns
+    // workaround is to declare single and plural template with dummy interpolation
+    // then replace dummy values with actual values during render
+
+    const issueTemplateSingle = I18n.t('%{count} issue for %{category}', {
+      count: 0,
+      category: 'PLACEHOLDER',
+    })
+
+    const issueTemplatePlural = I18n.t('%{count} issues for %{category}', {
+      count: 0,
+      category: 'PLACEHOLDER',
+    })
+
+    return issuesData.length > 0 ? (
+      <span>
+        {I18n.t('Chart data: ')}
+        {issuesData.map(item => {
+          const template = item.count === 1 ? issueTemplateSingle : issueTemplatePlural
+          return template
+            .toString()
+            .replace('0', item.count.toString())
+            .replace('PLACEHOLDER', item.issue)
+            .concat(', ')
+        })}
+      </span>
+    ) : (
+      I18n.t('No accessibility issues found.')
+    )
+  }, [issuesData])
 
   const ariaLabel = I18n.t(
-    'Issues by type chart. High: %{high} issues, Medium: %{medium} issues, Low: %{low} issues.',
-    {high: severityCounts.high, medium: severityCounts.medium, low: severityCounts.low},
+    {
+      one: 'Accessibility issues bar chart showing %{count} issue.',
+      other: 'Accessibility issues bar chart showing %{count} issues.',
+    },
+    {
+      count: issuesData.reduce((acc, item) => acc + item.count, 0),
+    },
   )
 
   useEffect(() => {
@@ -104,10 +140,13 @@ export const IssuesByTypeChart = () => {
       chartRef.current = new ChartJS(canvasRef.current, {
         type: 'bar',
         data: chartData,
-        options: chartOptions,
+        options: {
+          ...chartOptions,
+          indexAxis: isMobile ? 'y' : 'x',
+        },
       })
     }
-  }, [chartData, chartOptions])
+  }, [chartData, chartOptions, isMobile])
 
   // Cleanup chart on unmount
   useEffect(() => {
@@ -118,24 +157,45 @@ export const IssuesByTypeChart = () => {
 
   if (loadingOfSummary) return renderLoading()
 
+  const chartHeight = isMobile ? Math.max(190, Math.floor(chartData.labels.length * 75)) : 190
+
   return (
-    <View as="div" height="250px">
-      <Heading level="h3" margin="0 0 medium 0">
+    <Flex
+      as="div"
+      gap="small"
+      padding="small"
+      direction="column"
+      alignItems="center"
+      justifyItems="center"
+    >
+      <Heading level="h3" variant="titleCardRegular">
         {I18n.t('Issues by type')}
       </Heading>
-      <View
+      <Flex.Item
         as="div"
-        data-testid="issues-by-type-chart"
-        aria-label={ariaLabel}
+        width="100%"
+        height={`${chartHeight}px`}
         elementRef={r => {
           if (r instanceof HTMLDivElement || r === null) {
             containerRef.current = r
           }
         }}
-        height="190px"
       >
-        <canvas ref={canvasRef} />
-      </View>
-    </View>
+        <canvas
+          role="img"
+          ref={canvasRef}
+          aria-label={ariaLabel}
+          aria-describedby="chart-description"
+          data-testid="issues-by-type-chart"
+        />
+        <div
+          className="sr-only"
+          id="chart-description"
+          style={{visibility: 'hidden', overflow: 'hidden', height: 0}}
+        >
+          {chartScreenReaderDescription}
+        </div>
+      </Flex.Item>
+    </Flex>
   )
 }

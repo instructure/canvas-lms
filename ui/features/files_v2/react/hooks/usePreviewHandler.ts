@@ -20,7 +20,7 @@ import {useState, useEffect} from 'react'
 import {useLocation, useNavigate} from 'react-router-dom'
 import {useGetFile} from './useGetFile'
 import {File} from '../../interfaces/File'
-import {get} from 'lodash'
+import {get} from 'es-toolkit/compat'
 
 interface UsePreviewHandlerProps {
   collection: File[]

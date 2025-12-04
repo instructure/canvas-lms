@@ -53,6 +53,12 @@ export const MOCK_RATINGS: Rating[] = [
     points: 3,
   },
   {
+    color: 'yellow',
+    description: 'rating description!',
+    mastery: false,
+    points: 2,
+  },
+  {
     color: 'red',
     description: 'not great',
     mastery: false,
@@ -74,8 +80,9 @@ export const MOCK_OUTCOMES: Outcome[] = [
     display_name: 'Friendly outcome name',
     calculation_method: 'decaying_average',
     calculation_int: 65,
+    points_possible: 5,
     mastery_points: 5,
-    ratings: [MOCK_RATINGS[0], MOCK_RATINGS[1]],
+    ratings: [MOCK_RATINGS[3], MOCK_RATINGS[0], MOCK_RATINGS[1], MOCK_RATINGS[2]],
   },
   {
     id: '2',
@@ -84,7 +91,8 @@ export const MOCK_OUTCOMES: Outcome[] = [
     display_name: 'Friendly outcome name',
     calculation_method: 'decaying_average',
     calculation_int: 65,
+    points_possible: 5,
     mastery_points: 5,
-    ratings: [MOCK_RATINGS[0], MOCK_RATINGS[1]],
+    ratings: [MOCK_RATINGS[3], MOCK_RATINGS[0], MOCK_RATINGS[1], MOCK_RATINGS[2]],
   },
 ]

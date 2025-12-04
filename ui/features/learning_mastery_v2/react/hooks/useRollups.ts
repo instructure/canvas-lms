@@ -17,13 +17,12 @@
  */
 
 import {useState, useEffect, useRef} from 'react'
-import {groupBy} from 'lodash'
+import {groupBy} from 'es-toolkit/compat'
 import {loadRollups} from '../apiClient'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   StudentRollup,
   Outcome,
-  Rating,
   Student,
   OutcomeRollup,
   RollupsResponse,
@@ -40,6 +39,7 @@ import {
 import {Sorting} from '../types/shapes'
 import axios from '@canvas/axios'
 import {mapSettingsToFilters} from '../utils/filter'
+import {findRating} from '../utils/ratings'
 
 const I18n = createI18nScope('OutcomeManagement')
 
@@ -48,6 +48,7 @@ interface UseRollupsProps {
   accountMasteryScalesEnabled: boolean
   settings?: GradebookSettings | null
   enabled?: boolean
+  selectedUserIds?: number[]
 }
 
 interface UseRollupsReturn extends RollupData {
@@ -55,6 +56,10 @@ interface UseRollupsReturn extends RollupData {
   error: null | string
   setCurrentPage: (page: number) => void
   sorting: Sorting
+  filter: {
+    selectedOutcomeIds: string[]
+    setSelectedOutcomeIds: (outcomeIds: string[]) => void
+  }
 }
 
 interface RollupData {
@@ -63,6 +68,8 @@ interface RollupData {
   students: Student[]
   pagination?: Pagination
 }
+
+const EMPTY_USER_IDS: number[] = []
 
 const getRow = (studentRollups: StudentRollup[], outcomes: Outcome[]): OutcomeRollup[] =>
   studentRollups[0].scores.map(score => {
@@ -77,16 +84,6 @@ const getRow = (studentRollups: StudentRollup[], outcomes: Outcome[]): OutcomeRo
       },
     }
   })
-
-const findRating = (ratings: Rating[], score: number): Rating => {
-  const rating = ratings.find(
-    (r, i) =>
-      r.points === score ||
-      (i === 0 && score > r.points) ||
-      (score > r.points && ratings[i - 1].points > score),
-  )
-  return rating || ratings[ratings.length - 1]
-}
 
 const getStudents = (rollups: StudentRollup[], users: Student[]): Student[] => {
   const students = users.map(user => {
@@ -114,6 +111,7 @@ export default function useRollups({
   accountMasteryScalesEnabled,
   settings = null,
   enabled = true,
+  selectedUserIds = EMPTY_USER_IDS,
 }: UseRollupsProps): UseRollupsReturn {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<null | string>(null)
@@ -126,6 +124,7 @@ export default function useRollups({
   const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC)
   const [sortBy, setSortBy] = useState<SortBy>(SortBy.SortableName)
   const [sortOutcomeId, setSortOutcomeId] = useState<string | null>(null)
+  const [selectedOutcomeIds, setSelectedOutcomeIds] = useState<string[]>([])
 
   const needMasteryAndColorDefaults = !accountMasteryScalesEnabled
 
@@ -166,6 +165,8 @@ export default function useRollups({
           sortOrder,
           sortBy,
           sortOutcomeId || undefined,
+          selectedUserIds,
+          selectedOutcomeIds,
         )) as RollupsResponse
         const {users: fetchedUsers, outcomes: fetchedOutcomes} = data.linked
         const students = getStudents(data.rollups, fetchedUsers)
@@ -200,6 +201,8 @@ export default function useRollups({
     sortOutcomeId,
     settings,
     enabled,
+    selectedUserIds,
+    selectedOutcomeIds,
   ])
 
   return {
@@ -219,6 +222,10 @@ export default function useRollups({
       setSortBy,
       sortOutcomeId,
       setSortOutcomeId,
+    },
+    filter: {
+      selectedOutcomeIds,
+      setSelectedOutcomeIds,
     },
   }
 }

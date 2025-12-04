@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {omit, defer, pick} from 'lodash'
+import {defer, omit, pick} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
 import moment from 'moment-timezone'
@@ -48,6 +48,7 @@ import {CommonEventShowError} from '@canvas/calendar/jquery/CommonEvent/CommonEv
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import EditCalendarEventHeader from '../../react/components/EditCalendarEventHeader'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
+import splitAssetString from '@canvas/util/splitAssetString'
 
 const I18n = createI18nScope('calendar.edit')
 
@@ -150,6 +151,13 @@ export default class EditCalendarEventView extends Backbone.View {
       }
 
       return Object.keys(picked_params).forEach(key => {
+        // Skip start_time and end_time if editing an existing event.
+        // The template will format from start_at correctly.
+        // Only use URL param times when creating a new event.
+        if ((key === 'start_time' || key === 'end_time') && !this.model.isNew()) {
+          return
+        }
+
         const $e = this.$el.find(`input[name='${key}'], select[name='${key}']`)
         const value = $e.prop('type') === 'checkbox' ? [picked_params[key]] : picked_params[key]
         $e.val(value)
@@ -167,9 +175,17 @@ export default class EditCalendarEventView extends Backbone.View {
             .prop('checked', picked_params[key] === 'true')
         }
         if (key === 'calendar_event_context_code' && picked_params.course_sections?.length > 0) {
-          const active_section_id = picked_params[key].split('_')[2]
+          const parsed = splitAssetString(picked_params[key], false)
+          const active_section_id = parsed ? parsed[1] : null
+          if (!active_section_id) return
           const eventDateKeys = ['start_date', 'start_time', 'end_time']
           eventDateKeys.forEach(dateKey => {
+            // Skip start_time and end_time if editing an existing event.
+            // Template will format from section event data correctly.
+            if ((dateKey === 'start_time' || dateKey === 'end_time') && !this.model.isNew()) {
+              return
+            }
+
             const $element = this.$el.find(
               `input[name='child_event_data[${active_section_id}][${dateKey}]']`,
             )
@@ -329,9 +345,10 @@ export default class EditCalendarEventView extends Backbone.View {
       this.renderRecurringEventFrequencyPicker()
     })
 
-    const context_code = this.model.get('context_code')
-    const [context_type, context_id] = context_code.split('_')
-    if (context_type === 'course') {
+    const context_code = this.model.get('effective_context_code') || this.model.get('context_code')
+    const parsed = splitAssetString(context_code, false)
+    if (parsed && parsed[0] === 'course') {
+      const context_id = parsed[1]
       this.course = new Course()
       this.course.urlRoot = `/api/v1/courses/${context_id}?include[]=term`
       this.course

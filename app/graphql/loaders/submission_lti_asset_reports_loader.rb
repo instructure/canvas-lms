@@ -69,6 +69,7 @@ class Loaders::SubmissionLtiAssetReportsLoader < GraphQL::Batch::Loader
                       )
 
     visible_reports = visible_reports.where(visible_to_owner: true) if for_student
+    visible_reports = visible_reports.order("#{Lti::Asset.quoted_table_name}.created_at DESC")
 
     if last_submission_attempt_only || for_student
       visible_reports = visible_reports.preload(asset: :submission)

@@ -208,11 +208,6 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
           })
             .then(result => {
               if (result._type === 'Success') {
-                showFlashSuccess(
-                  I18n.t('%{count} exception(s) were successfully added.', {
-                    count: contextControls.length,
-                  }),
-                )()
                 refetchControls()
               } else {
                 // handle error

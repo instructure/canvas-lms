@@ -2287,9 +2287,9 @@ describe LearningObjectDatesController do
       )
     end
 
-    context "when peer_review_grading feature flag is enabled" do
+    context "when peer_review_allocation_and_grading feature flag is enabled" do
       before :once do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
           title: "Peer Review Sub Assignment",
           parent_assignment: @assignment_with_peer_review,
@@ -2385,14 +2385,14 @@ describe LearningObjectDatesController do
       end
     end
 
-    context "when peer_review_grading feature flag is disabled" do
+    context "when peer_review_allocation_and_grading feature flag is disabled" do
       before :once do
         # Peer review sub assignment that exists but should not be shown
         @hidden_peer_review_sub_assignment = PeerReviewSubAssignment.create!(
           title: "Hidden Peer Review Sub Assignment",
           parent_assignment: @assignment_with_peer_review
         )
-        @course.disable_feature!(:peer_review_grading)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
         @assignment_with_peer_review.reload
       end
 
@@ -2407,7 +2407,7 @@ describe LearningObjectDatesController do
 
     context "when assignment does not have peer reviews enabled" do
       before :once do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @assignment_without_peer_review = @course.assignments.create!(
           title: "Assignment without Peer Review",
           due_at: "2025-09-12T00:00:00Z",

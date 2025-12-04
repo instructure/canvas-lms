@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-import {map} from 'lodash'
+import {compact, flatMap, groupBy, map} from 'es-toolkit/compat'
 
 export const sortedRowKeys = rows => {
-  const {datedKeys, numberedKeys} = _.chain(rows)
-    .keys()
-    .groupBy(key => (key.length > 11 ? 'datedKeys' : 'numberedKeys'))
-    .value()
-  return _.chain([datedKeys, numberedKeys]).flatten().compact().value()
+  const {datedKeys, numberedKeys} = groupBy(Object.keys(rows), key =>
+    key.length > 11 ? 'datedKeys' : 'numberedKeys',
+  )
+  return compact([datedKeys, numberedKeys].flat())
 }
 
 export const datesFromOverride = override => ({
@@ -34,31 +32,27 @@ export const datesFromOverride = override => ({
 })
 
 export const rowsFromOverrides = assignmentOverrides => {
-  const overridesByKey = _.groupBy(assignmentOverrides, override => {
+  const overridesByKey = groupBy(assignmentOverrides, override => {
     override.set('rowKey', override.combinedDates())
     return override.get('rowKey')
   })
 
-  return _.chain(overridesByKey)
-    .map((overrides, key) => {
+  return Object.fromEntries(
+    Object.entries(overridesByKey).map(([key, overrides]) => {
       const datesForGroup = datesFromOverride(overrides[0])
       return [key, {overrides, dates: datesForGroup, persisted: true}]
-    })
-    .object()
-    .value()
+    }),
+  )
 }
 
 export const getAllOverrides = givenRows => {
   const rows = givenRows
-  return _.chain(rows)
-    .values()
-    .map(row =>
+  return compact(
+    flatMap(Object.values(rows), row =>
       map(row.overrides, override => {
         override.attributes.persisted = row.persisted
         return override
       }),
-    )
-    .flatten()
-    .compact()
-    .value()
+    ),
+  )
 }

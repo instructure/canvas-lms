@@ -31,7 +31,7 @@ import {
   sortBy,
   union,
   without,
-} from 'lodash'
+} from 'es-toolkit/compat'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'

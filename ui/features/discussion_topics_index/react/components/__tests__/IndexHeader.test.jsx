@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen as testScreen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import IndexHeader from '../IndexHeader'
-import merge from 'lodash/merge'
+import {merge} from 'es-toolkit/compat'
 
 const user = userEvent.setup()
 const SEARCH_FIELD_PLACEHOLDER = 'Search by title or author...'

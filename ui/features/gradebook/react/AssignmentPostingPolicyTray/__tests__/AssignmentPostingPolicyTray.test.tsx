@@ -23,7 +23,7 @@ import userEvent from '@testing-library/user-event'
 import AssignmentPostingPolicyTray from '../index'
 import * as Api from '../Api'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import { CamelizedAssignment } from '@canvas/grading/grading'
+import {CamelizedAssignment} from '@canvas/grading/grading'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {MockedProvider} from '@apollo/client/testing'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
@@ -42,7 +42,7 @@ type MockContext = {
     assignmentId: string
     postManually: boolean
   }) => void
-   onExited?: () => void
+  onExited?: () => void
   onDismiss?: () => void
 }
 
@@ -56,7 +56,7 @@ describe('AssignmentPostingPolicyTray', () => {
         <MockedQueryClientProvider client={queryClient}>
           <AssignmentPostingPolicyTray ref={ref => (tray = ref)} />
         </MockedQueryClientProvider>
-      </MockedProvider>
+      </MockedProvider>,
     )
     tray?.show(context)
     return component
@@ -66,9 +66,10 @@ describe('AssignmentPostingPolicyTray', () => {
 
   const getSaveButton = () => screen.getByTestId('assignment-posting-policy-save-button')
   const getCancelButton = () => screen.getByTestId('assignment-posting-policy-cancel-button')
-  const getCloseButton = () => screen.getByTestId('assignment-posting-policy-close-button').children[0]
+  const getCloseButton = () =>
+    screen.getByTestId('assignment-posting-policy-close-button').children[0]
   const getInput = (name: string) => {
-    return name === "Automatically"
+    return name === 'Automatically'
       ? screen.getByTestId('assignment-posting-policy-automatic-radio')
       : screen.getByTestId('assignment-posting-policy-manual-radio')
   }
@@ -413,7 +414,7 @@ describe('AssignmentPostingPolicyTray', () => {
       queryClient.setQueryData(['assignment_post_policy', context.assignment.id], null)
     })
 
-    const enterNewDateTime = async(dateTimeElement: HTMLElement, dateTimeString: string) => {
+    const enterNewDateTime = async (dateTimeElement: HTMLElement, dateTimeString: string) => {
       await userEvent.click(dateTimeElement)
       await userEvent.clear(dateTimeElement)
       await userEvent.paste(dateTimeString)
@@ -421,13 +422,13 @@ describe('AssignmentPostingPolicyTray', () => {
     }
 
     it('renders the ScheduledReleasePolicy component when selectedPostManually is true', async () => {
-      const { getByTestId } = renderTray()
+      const {getByTestId} = renderTray()
 
       expect(getByTestId('scheduled-release-policy')).toBeInTheDocument()
     })
 
     it('displays the scheduled release options when the scheduled release checkbox is checked', async () => {
-      const { getByTestId } = renderTray()
+      const {getByTestId} = renderTray()
       const scheduledReleasePolicy = getByTestId('scheduled-release-policy')
 
       const checkbox = getByTestId('scheduled-release-checkbox')
@@ -448,7 +449,7 @@ describe('AssignmentPostingPolicyTray', () => {
     })
 
     it('displays the date input for shared scheduled posts when "Grades & Comments Together" is selected', async () => {
-      const { getByTestId } = renderTray()
+      const {getByTestId} = renderTray()
       const checkbox = getByTestId('scheduled-release-checkbox')
 
       // Enable scheduled release options
@@ -464,7 +465,7 @@ describe('AssignmentPostingPolicyTray', () => {
     })
 
     it('displays the date inputs for separate scheduled posts when "Separate Schedules" is selected', async () => {
-      const { getByTestId } = renderTray()
+      const {getByTestId} = renderTray()
       const checkbox = getByTestId('scheduled-release-checkbox')
 
       // Enable scheduled release options
@@ -486,7 +487,7 @@ describe('AssignmentPostingPolicyTray', () => {
     })
 
     it('disables the "Save" button if scheduled post is selected but no dates are set', async () => {
-      const { getByTestId } = renderTray()
+      const {getByTestId} = renderTray()
       const checkbox = getByTestId('scheduled-release-checkbox')
 
       // Enable scheduled release options
@@ -498,7 +499,7 @@ describe('AssignmentPostingPolicyTray', () => {
     })
 
     it('enables the "Save" button if scheduled post is selected and valid dates are set', async () => {
-      const { getByTestId, getByPlaceholderText } = renderTray()
+      const {getByTestId, getByPlaceholderText} = renderTray()
       const checkbox = getByTestId('scheduled-release-checkbox')
 
       // Enable scheduled release options
@@ -524,7 +525,7 @@ describe('AssignmentPostingPolicyTray', () => {
     })
 
     it('disables the "Save" button and displays error message if scheduled post dates are in the past', async () => {
-      const { getByTestId, getByPlaceholderText } = renderTray()
+      const {getByTestId, getByPlaceholderText} = renderTray()
       const checkbox = getByTestId('scheduled-release-checkbox')
 
       // Enable scheduled release options
@@ -551,7 +552,7 @@ describe('AssignmentPostingPolicyTray', () => {
     })
 
     it('enables the "Save" button if scheduled post is selected and valid separate dates are set', async () => {
-      const { getByTestId, getAllByPlaceholderText } = renderTray()
+      const {getByTestId, getAllByPlaceholderText} = renderTray()
       const checkbox = getByTestId('scheduled-release-checkbox')
 
       // Enable scheduled release options
@@ -586,7 +587,7 @@ describe('AssignmentPostingPolicyTray', () => {
     })
 
     it('disables the "Save" button and displays error messages if separate scheduled post dates are invalid', async () => {
-      const { getByTestId, getAllByPlaceholderText } = renderTray()
+      const {getByTestId, getAllByPlaceholderText} = renderTray()
       const checkbox = getByTestId('scheduled-release-checkbox')
 
       // Enable scheduled release options
@@ -613,7 +614,6 @@ describe('AssignmentPostingPolicyTray', () => {
       pastDate2.setDate(pastDate2.getDate() - 1)
       const pastDateString2 = pastDate2.toISOString().slice(0, 16)
 
-
       await enterNewDateTime(dateInputs[0], pastDateString1) // Grade release date
       await enterNewDateTime(dateInputs[1], pastDateString2) // Comment release date
 
@@ -623,7 +623,7 @@ describe('AssignmentPostingPolicyTray', () => {
     })
 
     it('disables the "Save" button and displays error messages if the comment release date is after the grade release date', async () => {
-      const { getByTestId, getAllByPlaceholderText } = renderTray()
+      const {getByTestId, getAllByPlaceholderText} = renderTray()
       const checkbox = getByTestId('scheduled-release-checkbox')
 
       // Enable scheduled release options
@@ -655,8 +655,12 @@ describe('AssignmentPostingPolicyTray', () => {
 
       const saveButton = getByTestId('assignment-posting-policy-save-button')
       expect(saveButton).toBeDisabled()
-      expect(screen.getByText('Grades release date must be the same or after comments release date')).toBeInTheDocument()
-      expect(screen.getByText('Comments release date must be the same or before grades release date')).toBeInTheDocument()
+      expect(
+        screen.getByText('Grades release date must be the same or after comments release date'),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('Comments release date must be the same or before grades release date'),
+      ).toBeInTheDocument()
     })
 
     it('does not show validation error for pre-existing grades date when only comments date is changed', async () => {
@@ -673,7 +677,7 @@ describe('AssignmentPostingPolicyTray', () => {
         postCommentsAt: futureDateString,
       })
 
-      const { getAllByPlaceholderText, getByTestId } = renderTray()
+      const {getAllByPlaceholderText, getByTestId} = renderTray()
 
       const dateInputs = getAllByPlaceholderText('Select Date')
       expect(dateInputs).toHaveLength(2)
@@ -704,7 +708,7 @@ describe('AssignmentPostingPolicyTray', () => {
         postCommentsAt: pastDateString,
       })
 
-      const { getAllByPlaceholderText } = renderTray()
+      const {getAllByPlaceholderText} = renderTray()
 
       const dateInputs = getAllByPlaceholderText('Select Date')
       expect(dateInputs).toHaveLength(2)
@@ -736,7 +740,7 @@ describe('AssignmentPostingPolicyTray', () => {
         postCommentsAt: pastDateString,
       })
 
-      const { getAllByPlaceholderText } = renderTray()
+      const {getAllByPlaceholderText} = renderTray()
 
       const dateInputs = getAllByPlaceholderText('Select Date')
       expect(dateInputs).toHaveLength(2)
@@ -760,6 +764,212 @@ describe('AssignmentPostingPolicyTray', () => {
 
       // The comments error should still be present
       expect(screen.getByText('Date must be in the future')).toBeInTheDocument()
+    })
+
+    describe('validation on save', () => {
+      beforeEach(() => {
+        // @ts-expect-error
+        Api.setAssignmentPostPolicy.mockResolvedValue({
+          assignmentId: '2301',
+          postManually: true,
+        })
+      })
+
+      it('prevents save and shows error when scheduled release is checked in shared mode but no date is entered', async () => {
+        context.assignment.postManually = false
+        const {getByTestId} = renderTray()
+        await userEvent.click(getInput('Manually'))
+
+        const checkbox = getByTestId('scheduled-release-checkbox')
+        await userEvent.click(checkbox)
+        expect(checkbox).toBeChecked()
+
+        // Shared mode should be selected by default
+        const sharedRadio = getByTestId('shared-scheduled-post')
+        expect(sharedRadio).toBeChecked()
+
+        const saveButton = getSaveButton()
+        expect(saveButton).toBeEnabled()
+        await userEvent.click(saveButton)
+
+        expect(screen.getByText('Please enter a valid grades release date')).toBeInTheDocument()
+        expect(Api.setAssignmentPostPolicy).not.toHaveBeenCalled()
+      })
+
+      it('prevents save and shows error when scheduled release is checked in separate mode but no dates are entered', async () => {
+        context.assignment.postManually = false
+        const {getByTestId} = renderTray()
+        await userEvent.click(getInput('Manually'))
+        const checkbox = getByTestId('scheduled-release-checkbox')
+
+        // Enable scheduled release options
+        await userEvent.click(checkbox)
+        expect(checkbox).toBeChecked()
+
+        // Select separate mode
+        const separateRadio = getByTestId('separate-scheduled-post')
+        await userEvent.click(separateRadio)
+        expect(separateRadio).toBeChecked()
+
+        const saveButton = getSaveButton()
+        expect(saveButton).toBeEnabled()
+        await userEvent.click(saveButton)
+
+        const errorMessages = screen.getAllByText(
+          /Please enter a valid (grades|comment) release date/,
+        )
+        expect(errorMessages).toHaveLength(2)
+        expect(Api.setAssignmentPostPolicy).not.toHaveBeenCalled()
+      })
+
+      it('prevents save and shows error when scheduled release is in separate mode and only grades date is entered', async () => {
+        const {getByTestId, getAllByPlaceholderText} = renderTray()
+        const checkbox = getByTestId('scheduled-release-checkbox')
+
+        // Enable scheduled release options
+        await userEvent.click(checkbox)
+        expect(checkbox).toBeChecked()
+
+        // Select separate mode
+        const separateRadio = getByTestId('separate-scheduled-post')
+        await userEvent.click(separateRadio)
+        expect(separateRadio).toBeChecked()
+
+        // Enter only grades date
+        const dateInputs = getAllByPlaceholderText('Select Date')
+        const futureDate = new Date()
+        futureDate.setDate(futureDate.getDate() + 1)
+        const futureDateString = futureDate.toISOString().slice(0, 16)
+
+        await enterNewDateTime(dateInputs[0], futureDateString)
+
+        const saveButton = getSaveButton()
+        expect(saveButton).toBeEnabled()
+        await userEvent.click(saveButton)
+
+        expect(screen.getByText('Please enter a valid comment release date')).toBeInTheDocument()
+        expect(Api.setAssignmentPostPolicy).not.toHaveBeenCalled()
+      })
+
+      it('prevents save and shows error when scheduled release is in separate mode and only comments date is entered', async () => {
+        const {getByTestId, getAllByPlaceholderText} = renderTray()
+        const checkbox = getByTestId('scheduled-release-checkbox')
+
+        // Enable scheduled release options
+        await userEvent.click(checkbox)
+        expect(checkbox).toBeChecked()
+
+        // Select separate mode
+        const separateRadio = getByTestId('separate-scheduled-post')
+        await userEvent.click(separateRadio)
+        expect(separateRadio).toBeChecked()
+
+        // Enter only comments date
+        const dateInputs = getAllByPlaceholderText('Select Date')
+        const futureDate = new Date()
+        futureDate.setDate(futureDate.getDate() + 1)
+        const futureDateString = futureDate.toISOString().slice(0, 16)
+
+        await enterNewDateTime(dateInputs[1], futureDateString)
+
+        const saveButton = getSaveButton()
+        expect(saveButton).toBeEnabled()
+        await userEvent.click(saveButton)
+
+        expect(screen.getByText('Please enter a valid grades release date')).toBeInTheDocument()
+
+        expect(Api.setAssignmentPostPolicy).not.toHaveBeenCalled()
+      })
+
+      it('allows save when scheduled release is checked in shared mode and valid date is entered', async () => {
+        const {getByTestId, getByPlaceholderText} = renderTray()
+        const checkbox = getByTestId('scheduled-release-checkbox')
+
+        // Enable scheduled release options
+        await userEvent.click(checkbox)
+        expect(checkbox).toBeChecked()
+
+        // Shared mode should be selected by default
+        const sharedRadio = getByTestId('shared-scheduled-post')
+        expect(sharedRadio).toBeChecked()
+
+        // Enter a valid future date
+        const sharedDateInput = getByPlaceholderText('Choose release date')
+        const futureDate = new Date()
+        futureDate.setDate(futureDate.getDate() + 1)
+        const futureDateString = futureDate.toISOString().slice(0, 16)
+
+        await enterNewDateTime(sharedDateInput, futureDateString)
+
+        const saveButton = getSaveButton()
+        await userEvent.click(saveButton)
+
+        expect(
+          screen.queryByText('Please enter a valid grades release date'),
+        ).not.toBeInTheDocument()
+
+        await waitFor(() => {
+          expect(Api.setAssignmentPostPolicy).toHaveBeenCalled()
+        })
+      })
+
+      it('allows save when scheduled release is checked in separate mode and both valid dates are entered', async () => {
+        const {getByTestId, getAllByPlaceholderText} = renderTray()
+        const checkbox = getByTestId('scheduled-release-checkbox')
+
+        // Enable scheduled release options
+        await userEvent.click(checkbox)
+        expect(checkbox).toBeChecked()
+
+        // Select separate mode
+        const separateRadio = getByTestId('separate-scheduled-post')
+        await userEvent.click(separateRadio)
+        expect(separateRadio).toBeChecked()
+
+        // Enter valid future dates for both fields
+        const dateInputs = getAllByPlaceholderText('Select Date')
+        const futureDate1 = new Date()
+        futureDate1.setDate(futureDate1.getDate() + 1)
+        const futureDateString1 = futureDate1.toISOString().slice(0, 16)
+
+        const futureDate2 = new Date()
+        futureDate2.setDate(futureDate2.getDate() + 1)
+        const futureDateString2 = futureDate2.toISOString().slice(0, 16)
+
+        await enterNewDateTime(dateInputs[0], futureDateString1)
+        await enterNewDateTime(dateInputs[1], futureDateString2)
+
+        const saveButton = getSaveButton()
+        await userEvent.click(saveButton)
+
+        expect(
+          screen.queryByText('Please enter a valid grades release date'),
+        ).not.toBeInTheDocument()
+        expect(
+          screen.queryByText('Please enter a valid comment release date'),
+        ).not.toBeInTheDocument()
+
+        await waitFor(() => {
+          expect(Api.setAssignmentPostPolicy).toHaveBeenCalled()
+        })
+      })
+
+      it('allows save when scheduled release is not checked', async () => {
+        context.assignment.postManually = false
+        renderTray()
+        await waitFor(() => expect(getTray()).toBeInTheDocument())
+        await userEvent.click(getInput('Manually'))
+
+        const checkbox = screen.getByTestId('scheduled-release-checkbox')
+        expect(checkbox).not.toBeChecked()
+
+        const saveButton = getSaveButton()
+        expect(saveButton).toBeEnabled()
+        await userEvent.click(saveButton)
+        await waitFor(() => {
+          expect(Api.setAssignmentPostPolicy).toHaveBeenCalled()
+        })
+      })
     })
   })
 })

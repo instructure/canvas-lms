@@ -25,7 +25,7 @@
 import serviceRCELoader from './serviceRCELoader'
 import {RCELOADED_EVENT_NAME, send, destroy, focus} from '@canvas/rce-command-shim/RceCommandShim'
 import $ from 'jquery'
-import {escape} from 'lodash'
+import {escape} from 'es-toolkit/compat'
 
 function loadServiceRCE(target, tinyMCEInitOptions, callback) {
   target.css('display', 'none')

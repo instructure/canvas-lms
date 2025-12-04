@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {Model} from '@canvas/backbone'
-import {isEmpty} from 'lodash'
+import {isEmpty} from 'es-toolkit/compat'
 
 export default class Role extends Model {
   initialize() {

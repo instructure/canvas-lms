@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {filter, each} from 'lodash'
+import {filter, each} from 'es-toolkit/compat'
 import assignmentUtils from './assignmentUtils'
 import PostGradesDialogCorrectionsPage from './PostGradesDialogCorrectionsPage'
 import PostGradesDialogNeedsGradingPage from './PostGradesDialogNeedsGradingPage'

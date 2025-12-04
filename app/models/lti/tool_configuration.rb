@@ -32,26 +32,6 @@ module Lti
     validate :validate_placements
     validate :validate_oidc_initiation_urls
 
-    # @return [String | nil] A warning message about any disallowed placements
-    def verify_placements
-      placements_to_verify = placements.filter_map { |p| p["placement"] if Lti::ResourcePlacement::RESTRICTED_PLACEMENTS.include? p["placement"].to_sym }
-      return unless placements_to_verify.present?
-
-      # This is a candidate for a deduplication with the same logic in app/models/context_external_tool.rb#placement_allowed?
-      placements_to_verify.each do |placement|
-        allowed_domains = Setting.get("#{placement}_allowed_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
-        allowed_dev_keys = Setting.get("#{placement}_allowed_dev_keys", "").split(",").map(&:strip).reject(&:empty?)
-        next if allowed_domains.include?(domain) || allowed_dev_keys.include?(Shard.global_id_for(developer_key_id).to_s)
-
-        return t(
-          "Warning: the %{placement} placement is only allowed for Instructure approved LTI tools. If you believe you have received this message in error, please contact your support team.",
-          placement:
-        )
-      end
-
-      nil
-    end
-
     # @return [String[]] A list of warning messages for deprecated placements
     def placement_warnings
       warnings = []
@@ -62,8 +42,6 @@ module Lti
           )
         )
       end
-      may_be_warning = verify_placements
-      warnings.push(may_be_warning) unless may_be_warning.nil?
       warnings
     end
 

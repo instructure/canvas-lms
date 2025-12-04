@@ -133,7 +133,6 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
   end
 
   def replace_item_placeholders!(item_key, field_links, skip_associations = false)
-    context.saving_user = user
     item_type = item_key[:type]
     item_type = field_links.keys.first if [:block_editor, :block_editor_text].include? field_links.keys.first
 
@@ -143,7 +142,7 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     when :syllabus
       syllabus = context.syllabus_body
       if LinkReplacer.sub_placeholders!(syllabus, field_links.values.flatten)
-        context.update(syllabus_body: syllabus)
+        context.update_columns(syllabus_body: syllabus)
       end
     when :assessment_question
       process_assessment_question!(item_key[:item], field_links.values.flatten)
@@ -285,12 +284,18 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
   end
 
   def create_attachment_associations
+    context.update_attachment_associations(migration: @migration) if context.is_a?(Course) # create syllabus AAs
     @migration.imported_migration_items.each do |item|
       next unless item.respond_to?(:update_attachment_associations)
 
       item.update_attachment_associations(migration: @migration)
+      # Announcements are a sub-class of discussion topic and for some reason, it deletes
+      # all of the attachment associations it makes if I let it run on the "discussion_topic"
+      # object for the announcement.  Plus it's would be doing duplicate work, so we're skipping it.
+      next if item.is_a?(Announcement)
+
       (item.try(:assignment) || item.try(:discussion_topic) || item.try(:quiz))&.tap do |assoc_item|
-        assoc_item.update_attachment_associations(migration: @migration)
+        assoc_item.copy_attachment_associations_from(item)
       end
       item.try(:quiz_questions)&.each do |question|
         question.update_attachment_associations(migration: @migration)

@@ -27,7 +27,7 @@ import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.h/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */
 import 'jqueryui/progressbar'
-import {each} from 'lodash'
+import {each} from 'es-toolkit/compat'
 
 const I18n = createI18nScope('media_comments_publicjs')
 

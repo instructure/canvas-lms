@@ -114,7 +114,6 @@ module Importers
       item ||= context.assignments.temp_record # new(:context => context)
 
       item.updating_user = migration.user
-      item.saving_user = migration.user
       item.saved_by = :migration
       item.mark_as_importing!(migration)
       master_migration = migration&.for_master_course_import? # propagate null dates only for blueprint syncs
@@ -311,6 +310,12 @@ module Importers
       end
 
       hash[:due_at] ||= hash[:due_date] if hash.key?(:due_date)
+
+      # Clear due_at for assignments with checkpoints
+      if hash[:sub_assignments].present? && context.discussion_checkpoints_enabled?
+        hash[:due_at] = nil
+      end
+
       %i[due_at lock_at unlock_at peer_reviews_due_at].each do |key|
         if hash.key?(key) && (master_migration || hash[key].present?)
           item.send :"#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key])
@@ -465,13 +470,49 @@ module Importers
 
         parent_item.sub_assignments << sub_assignment
       end
+
+      create_missing_sub_assignment_submissions(parent_item)
     end
 
     def self.find_or_create_sub_assignment(sub_assignment_hash, parent_item)
       sub_item ||= SubAssignment.where(context_type: parent_item.context.class.to_s, context_id: parent_item.context, id: sub_assignment_hash[:id]).first
       sub_item ||= SubAssignment.where(context_type: parent_item.context.class.to_s, context_id: parent_item.context, migration_id: sub_assignment_hash[:migration_id]).first if sub_assignment_hash[:migration_id]
+      # If we still haven't found it, check by parent_assignment_id and sub_assignment_tag
+      # This handles re-imports where a sub_assignment was created without a migration_id
+      sub_item ||= parent_item.sub_assignments.active.find_by(sub_assignment_tag: sub_assignment_hash[:tag]) if sub_assignment_hash[:tag]
 
       sub_item || parent_item.sub_assignments.temp_record
+    end
+
+    def self.create_missing_sub_assignment_submissions(parent_item)
+      parent_item.sub_assignments.reload
+
+      students = parent_item.students_with_visibility
+
+      parent_item.sub_assignments.active.each do |sub_assignment|
+        # Load all existing submissions for this sub_assignment into a set for fast lookup
+        existing_submission_user_ids = sub_assignment.all_submissions
+                                                     .where(user: students)
+                                                     .pluck(:user_id)
+                                                     .to_set
+
+        students.find_each do |student|
+          next if existing_submission_user_ids.include?(student.id)
+
+          begin
+            sub_assignment.find_or_create_submission(student)
+          rescue ActiveRecord::RecordNotUnique
+            # Submission already exists, continue
+            next
+          rescue => e
+            Rails.logger.error(
+              "AssignmentImporter - Error creating submission for SubAssignment #{sub_assignment.id}, " \
+              "User #{student.id}: #{e.message}"
+            )
+            next
+          end
+        end
+      end
     end
 
     def self.import_similarity_detection_tool(hash, context, migration, item)
@@ -710,6 +751,13 @@ module Importers
     end
 
     def self.import_asset_processors(assignment, asset_processors_data, migration)
+      # for blueprint sync don't import if assignment has downstream changes and the assignment is not locked
+      if migration&.for_master_course_import?
+        content = assignment.discussion_topic? ? assignment.discussion_topic : assignment
+        content_tag = migration.master_course_subscription.content_tag_for(content)
+        return if content_tag&.downstream_changes&.any? && !content.editing_restricted?(:any)
+      end
+
       asset_processors_data.each do |ap_data|
         # Skip already existing APs: asset processors are immutable, so there's no need to update existing ones
         next if assignment.lti_asset_processors.where(migration_id: ap_data[:migration_id]).exists?

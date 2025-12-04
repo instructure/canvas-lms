@@ -147,10 +147,13 @@ describe('StudentCellPopover', () => {
     })
 
     it('shows loading spinner while fetching user details', async () => {
+      let res: (value: {} | PromiseLike<{}>) => void
       const user = userEvent.setup()
       fetchMock.get(
         `/api/v1/courses/${courseId}/users/${mockStudent.id}/lmgb_user_details`,
-        new Promise(resolve => setTimeout(() => resolve({body: mockUserDetails}), 100)),
+        new Promise(resolve => {
+          res = resolve
+        }),
       )
 
       renderWithQueryClient(<StudentCellPopover {...defaultProps()} />)
@@ -159,6 +162,8 @@ describe('StudentCellPopover', () => {
 
       // Spinner should appear while loading
       expect(screen.getByText('Loading user details')).toBeInTheDocument()
+
+      res!({body: mockUserDetails})
 
       // Wait for content to load
       await waitFor(() => {
@@ -559,6 +564,7 @@ describe('StudentCellPopover', () => {
       id: '1',
       title: 'Outcome 1',
       calculation_method: 'decaying_average',
+      points_possible: 10,
       mastery_points: 5,
       ratings: [
         {points: 10, color: 'green', description: 'Exceeds', mastery: false},
@@ -572,6 +578,7 @@ describe('StudentCellPopover', () => {
       id: '2',
       title: 'Outcome 2',
       calculation_method: 'decaying_average',
+      points_possible: 5,
       mastery_points: 3,
       ratings: [
         {points: 5, color: 'green', description: 'Exceeds', mastery: false},
@@ -585,6 +592,7 @@ describe('StudentCellPopover', () => {
       id: '3',
       title: 'Outcome 3',
       calculation_method: 'decaying_average',
+      points_possible: 8,
       mastery_points: 4,
       ratings: [
         {points: 8, color: 'green', description: 'Exceeds', mastery: false},

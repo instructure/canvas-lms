@@ -21,6 +21,7 @@ import {NamingConfirmation} from '../../registration_wizard_forms/NamingConfirma
 import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 import {getDefaultPlacementTextFromConfig} from './helpers'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 
 export type NamingConfirmationWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
@@ -33,7 +34,7 @@ export const NamingConfirmationWrapper = ({
 }: NamingConfirmationWrapperProps) => {
   const {state, ...actions} = overlayStore()
 
-  const placements = (state.placements.placements ?? []).map(p => ({
+  const placements = filterPlacementsByFeatureFlags(state.placements.placements ?? []).map(p => ({
     placement: p,
     label: state.naming.placements[p] ?? '',
     defaultValue: getDefaultPlacementTextFromConfig(p, internalConfig),

@@ -31,21 +31,21 @@ describe('studentsState.utils', () => {
       expect(result).toBe(5)
     })
 
-    it('returns the initial number when totalCount is very small', () => {
+    it('returns the minimum number when totalCount is very small', () => {
       const result = smartStudentsPerSubmissionRequest(5)
-      expect(result).toBe(1)
+      expect(result).toBe(GRADEBOOK_GRAPHQL_CONFIG.minNumberOfStudentsPerSubmissionRequest)
     })
 
-    it('returns the initial number when totalCount equals maxSubmissionRequestCount', () => {
+    it('returns the minimum number when totalCount equals maxSubmissionRequestCount', () => {
       const result = smartStudentsPerSubmissionRequest(
         GRADEBOOK_GRAPHQL_CONFIG.maxSubmissionRequestCount,
       )
-      expect(result).toBe(1)
+      expect(result).toBe(GRADEBOOK_GRAPHQL_CONFIG.minNumberOfStudentsPerSubmissionRequest)
     })
 
-    it('handles zero totalCount', () => {
+    it('handles zero totalCount with minimum', () => {
       const result = smartStudentsPerSubmissionRequest(0)
-      expect(result).toBe(0)
+      expect(result).toBe(GRADEBOOK_GRAPHQL_CONFIG.minNumberOfStudentsPerSubmissionRequest)
     })
 
     it('returns exactly the initial number when calculated value equals it', () => {

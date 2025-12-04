@@ -21,19 +21,25 @@ import React from 'react'
 
 import CanvasMultiSelect from '@canvas/multi-select'
 import {capitalizeFirstLetter} from '@instructure/ui-utils'
-import difference from 'lodash/difference'
-import filter from 'lodash/filter'
+import {difference, filter} from 'es-toolkit/compat'
 
 import Placement from './Placement'
 import {LtiPlacements} from '../../model/LtiPlacements'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 
 const I18n = createI18nScope('react_developer_keys')
 
 export default class Placements extends React.Component {
   constructor(props) {
     super(props)
+    const allPlacements = Object.values(LtiPlacements).filter(p => p !== 'default_placements')
+    const validPlacements = filterPlacementsByFeatureFlags(allPlacements)
+    const validPlacementNames = new Set(validPlacements)
+    const filteredPlacements = (props.placements || []).filter(p =>
+      validPlacementNames.has(p.placement),
+    )
     this.state = {
-      placements: this.props.placements,
+      placements: filteredPlacements,
     }
     this.placementRefs = {}
   }
@@ -92,7 +98,8 @@ export default class Placements extends React.Component {
 
   render() {
     const {placements} = this.state
-    const {validPlacements} = this.props
+    const allPlacements = Object.values(LtiPlacements).filter(p => p !== 'default_placements')
+    const validPlacements = filterPlacementsByFeatureFlags(allPlacements)
 
     return (
       <>
@@ -127,7 +134,6 @@ export default class Placements extends React.Component {
 }
 
 Placements.propTypes = {
-  validPlacements: PropTypes.arrayOf(PropTypes.string),
   placements: PropTypes.arrayOf(
     PropTypes.shape({
       placement: PropTypes.string.isRequired,
@@ -137,5 +143,4 @@ Placements.propTypes = {
 
 Placements.defaultProps = {
   placements: [{placement: 'account_navigation'}, {placement: 'link_selection'}],
-  validPlacements: [],
 }

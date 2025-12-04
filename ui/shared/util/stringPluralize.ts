@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 // ported pluralizations from active_support/inflections.rb
 // (except for cow -> kine, because nobody does that)
 const skip = [
@@ -56,7 +55,7 @@ const patterns = [
 
 const pluralize = function (string: string) {
   string = string || ''
-  if ($.inArray(string, skip) > 0) {
+  if (skip.includes(string)) {
     return string
   }
   for (let i = 0; i < patterns.length; i++) {

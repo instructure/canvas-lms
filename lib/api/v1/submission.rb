@@ -64,6 +64,22 @@ module Api::V1::Submission
       end
     end
 
+    if includes.include?("peer_review_submissions") && context.feature_enabled?(:peer_review_allocation_and_grading)
+      if assignment.peer_reviews? && assignment.peer_review_sub_assignment.present?
+        result = PeerReview::PeerReviewSubmissionSerializer.serialize(assignment:, user_id: submission.user_id)
+
+        peer_review_submission_data = if result[:submission]
+                                        peer_review_submission_json(result[:submission], result[:submission].assignment, current_user, session, context, includes, params, avatars)
+                                      end
+
+        hash["has_peer_review_submission"] = result[:has_peer_review_submission]
+        hash["peer_review_submission"] = peer_review_submission_data
+      else
+        hash["has_peer_review_submission"] = false
+        hash["peer_review_submission"] = nil
+      end
+    end
+
     if includes.include?("submission_history")
       if submission.quiz_submission && assignment.quiz && !assignment.quiz.anonymous_survey?
         hash["submission_history"] =
@@ -461,6 +477,21 @@ module Api::V1::Submission
     sub_assignment_json["published_grade"] = submission.published_grade
     sub_assignment_json["published_score"] = submission.published_score
     sub_assignment_json
+  end
+
+  def peer_review_submission_json(
+    submission,
+    assignment,
+    current_user,
+    session,
+    context = nil,
+    includes = [],
+    params = {},
+    avatars = false
+  )
+    # Remove peer_review_submissions from includes to prevent infinite recursion
+    filtered_includes = includes.reject { |inc| inc == "peer_review_submissions" }
+    submission_json(submission, assignment, current_user, session, context, filtered_includes, params, avatars)
   end
 
   # Create an attachment with a ZIP archive of an assignment's submissions.

@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import uniq from 'lodash/uniq'
-import without from 'lodash/without'
+import {uniq, without} from 'es-toolkit/compat'
 import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
 import {actionTypes} from './actions'

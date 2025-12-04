@@ -35,17 +35,18 @@ const baseCellThemeOverride: TableCellProps['themeOverride'] = _componentTheme =
 
 type Props = {
   item: AccessibilityResourceScan
+  isMobile: boolean
 }
 
-export const AccessibilityIssuesTableRow = ({item}: Props) => (
+export const AccessibilityIssuesTableRow = ({item, isMobile}: Props) => (
   <Table.Row key={`${item.resourceType}-${item.id}`} data-testid={`issue-row-${item.id}`}>
     <Table.Cell themeOverride={baseCellThemeOverride} textAlign="start">
       <Link href={item.resourceUrl}>
         <Text lineHeight="lineHeight150">{item.resourceName}</Text>
       </Link>
     </Table.Cell>
-    <Table.Cell textAlign="center">
-      <ScanStateCell item={item} />
+    <Table.Cell>
+      <ScanStateCell item={item} isMobile={isMobile} />
     </Table.Cell>
     <Table.Cell>
       <ContentTypeCell item={item} />

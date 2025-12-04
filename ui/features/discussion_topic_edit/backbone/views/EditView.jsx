@@ -24,7 +24,7 @@ import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeS
 import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector'
 import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsSelector'
 import PostToSisSelector from './PostToSisSelector'
-import {uniqueId, defer, includes, isEqual, extend as lodashExtend} from 'lodash'
+import {defer, includes, uniqueId, isEqual, extend as lodashExtend} from 'es-toolkit/compat'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import template from '../../jst/EditView.handlebars'

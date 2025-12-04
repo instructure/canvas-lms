@@ -25,7 +25,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
 import numberHelper from '@canvas/i18n/numberHelper'
 import round from '@canvas/round'
-import {isEqual} from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 
 const I18n = createI18nScope('gradingPeriodForm')
 

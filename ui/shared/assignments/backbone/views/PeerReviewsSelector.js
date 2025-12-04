@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import {extend} from '@canvas/backbone/utils'
-import {includes} from 'lodash'
+import {includes} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import numberHelper from '@canvas/i18n/numberHelper'
 import template from '../../jst/PeerReviewsSelector.handlebars'
@@ -86,8 +86,7 @@ PeerReviewsSelector.prototype.afterRender = function () {
 
 PeerReviewsSelector.prototype.toJSON = function () {
   const frozenAttributes = this.parentModel.frozenAttributes()
-  const allocationEnabled = ENV.PEER_REVIEW_ALLOCATION_ENABLED
-  const gradingEnabled = ENV.PEER_REVIEW_GRADING_ENABLED
+  const allocationAndGradingEnabled = ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED
   return {
     anonymousPeerReviews: this.parentModel.anonymousPeerReviews(),
     peerReviews: this.parentModel.peerReviews(),
@@ -101,7 +100,7 @@ PeerReviewsSelector.prototype.toJSON = function () {
     hideAnonymousPeerReview: this.hideAnonymousPeerReview,
     hasGroupCategory: this.parentModel.groupCategoryId(),
     intraGroupPeerReviews: this.parentModel.intraGroupPeerReviews(),
-    allocationOrGradingEnabled: allocationEnabled || gradingEnabled,
+    allocationAndGradingEnabled: allocationAndGradingEnabled,
   }
 }
 

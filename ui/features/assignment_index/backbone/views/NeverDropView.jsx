@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {defer} from 'lodash'
+import {defer} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import React from 'react'
 import {createRoot} from 'react-dom/client'

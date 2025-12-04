@@ -44,7 +44,7 @@ class AbstractAssignment < ActiveRecord::Base
   POINTED_GRADING_TYPES = %w[points percent letter_grade gpa_scale].to_set.freeze
 
   OFFLINE_SUBMISSION_TYPES = %i[on_paper external_tool none not_graded wiki_page].freeze
-  SUBMITTABLE_TYPES = %w[online_quiz discussion_topic wiki_page].freeze
+  SUBMITTABLE_TYPES = %w[online_quiz discussion_topic wiki_page ams].freeze
   LTI_EULA_SERVICE = "vnd.Canvas.Eula"
   AUDITABLE_ATTRIBUTES = %w[
     muted
@@ -2091,6 +2091,13 @@ class AbstractAssignment < ActiveRecord::Base
       submissions.having_submission.count
     end
   end
+
+  # Returns false for SubAssignment and PeerReviewSubAssignment since they cannot have AssessmentRequests.
+  # Assignment overrides this with the real implementation that queries the database.
+  def peer_review_submissions?
+    false
+  end
+  attr_writer :peer_review_submissions
 
   set_policy do
     given { |user, session| context.grants_right?(user, session, :read) && published? }

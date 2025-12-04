@@ -25,6 +25,7 @@ import {
   SecondaryInfoDisplay,
   NameDisplayFormat,
   ScoreDisplayFormat,
+  OutcomeArrangement,
   DEFAULT_GRADEBOOK_SETTINGS,
 } from '../utils/constants'
 
@@ -52,6 +53,12 @@ const buildDisplayFilters = (apiSettings: any): DisplayFilter[] => {
     DEFAULT_GRADEBOOK_SETTINGS.displayFilters.includes(DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS)
   ) {
     displayFilters.push(DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS)
+  }
+  if (
+    apiSettings.show_outcomes_with_no_results ??
+    DEFAULT_GRADEBOOK_SETTINGS.displayFilters.includes(DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS)
+  ) {
+    displayFilters.push(DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS)
   }
 
   return displayFilters
@@ -85,6 +92,9 @@ export const useGradebookSettings = (courseId: string): UseGradebookSettingsRetu
             scoreDisplayFormat:
               apiSettings.score_display_format ??
               (DEFAULT_GRADEBOOK_SETTINGS.scoreDisplayFormat as ScoreDisplayFormat),
+            outcomeArrangement:
+              apiSettings.outcome_arrangement ??
+              (DEFAULT_GRADEBOOK_SETTINGS.outcomeArrangement as OutcomeArrangement),
           }
 
           setSettings(loadedSettings)

@@ -96,6 +96,15 @@ describe LinkedAttachmentHandler do
       expect(fetch_list_with_field_name(nil)).to be_empty
     end
 
+    it "does not create associations for user files with UUID verifiers when not in migration context" do
+      html = <<~HTML
+        <p><a href="/users/#{another_user.id}/files/#{user_attachment.id}/download?verifier=#{user_attachment.uuid}">file 1</a></p>
+        <p><iframe src="/media_attachments_iframe/#{user_attachment.id}?verifier=#{user_attachment.uuid}"></iframe></p>
+      HTML
+      course.associate_attachments_to_rce_object(html, teacher)
+      expect(fetch_list_with_field_name(nil)).to be_empty
+    end
+
     it "works with fields" do
       html = <<~HTML
         <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>

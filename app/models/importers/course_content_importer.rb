@@ -208,7 +208,7 @@ module Importers
             import_syllabus_from_migration(course, syllabus_body, migration) if syllabus_body
           end
 
-          course.updating_user = migration.user
+          course.importing = true
           course.save! if course.changed?
 
           migration.resolve_content_links!
@@ -234,8 +234,7 @@ module Importers
                                     .where.not(migration_id: nil)
                                     .where(assessment_questions: { updated_at: migration.created_at.. })
             imported_aqs.each do |aq|
-              aq.updating_user = migration.user
-              aq.translate_links
+              aq.translate_links(migration:)
             end
           end
 

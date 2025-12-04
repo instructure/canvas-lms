@@ -127,7 +127,6 @@ class Attachment < ActiveRecord::Base
   has_one :canvadoc
   belongs_to :usage_rights
   has_many :canvadocs_annotation_contexts, inverse_of: :attachment
-  has_many :discussion_entry_drafts, inverse_of: :attachment
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :attachment
   has_one :estimated_duration, dependent: :destroy, inverse_of: :attachment
   has_many :lti_assets, class_name: "Lti::Asset", inverse_of: :attachment, dependent: :destroy

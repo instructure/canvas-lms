@@ -32,7 +32,7 @@ describe NewQuizzesHelper do
   end
 
   describe "#add_new_quizzes_bundle" do
-    context "when context does not respond to root_account" do
+    context "when context does not respond to feature_enabled?" do
       before do
         @context = Object.new
       end
@@ -48,7 +48,7 @@ describe NewQuizzesHelper do
 
     context "when new_quizzes_native_experience feature is disabled" do
       before do
-        account.disable_feature!(:new_quizzes_native_experience)
+        course.disable_feature!(:new_quizzes_native_experience)
       end
 
       it "does not add the new quizzes bundle" do
@@ -62,7 +62,7 @@ describe NewQuizzesHelper do
 
     context "when new_quizzes_native_experience feature is enabled" do
       before do
-        account.enable_feature!(:new_quizzes_native_experience)
+        course.enable_feature!(:new_quizzes_native_experience)
       end
 
       it "adds the new quizzes bundle and remote env" do

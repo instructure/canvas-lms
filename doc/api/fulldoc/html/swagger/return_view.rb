@@ -58,7 +58,7 @@ class ReturnView < ReturnViewNull
   end
 
   def type
-    @line.delete("[").delete("]")
+    @line.delete("[").delete("]").sub("Schemas::Docs::", "")
   end
 
   def to_swagger

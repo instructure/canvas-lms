@@ -18,7 +18,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
-import get from 'lodash/get'
+import {get} from 'es-toolkit/compat'
 
 import {View} from '@instructure/ui-view'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -81,7 +81,7 @@ export default class ManualConfigurationForm extends React.Component {
   }
 
   render() {
-    const {toolConfiguration, validScopes, validPlacements} = this.props
+    const {toolConfiguration, validScopes} = this.props
 
     return (
       <View>
@@ -105,11 +105,7 @@ export default class ManualConfigurationForm extends React.Component {
             custom_fields={this.customFields()}
             showMessages={this.state.showMessages}
           />
-          <Placements
-            ref={this.setPlacementsRef}
-            validPlacements={validPlacements}
-            placements={this.placements()}
-          />
+          <Placements ref={this.setPlacementsRef} placements={this.placements()} />
         </FormFieldGroup>
       </View>
     )
@@ -119,7 +115,6 @@ export default class ManualConfigurationForm extends React.Component {
 ManualConfigurationForm.propTypes = {
   toolConfiguration: PropTypes.object,
   validScopes: PropTypes.object.isRequired,
-  validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
 }
 
 ManualConfigurationForm.defaultProps = {

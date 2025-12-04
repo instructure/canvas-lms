@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {chunk} from 'lodash'
+import {chunk} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {RequestDispatch} from '@canvas/network'
@@ -30,10 +30,16 @@ import GRADEBOOK_GRAPHQL_CONFIG from './graphql/config'
  * fewer requests with more students each. For example, with many students, it's
  * faster to make more parallel requests with fewer students per request than
  * fewer requests with many students each.
+ *
+ * Returns `GRADEBOOK_GRAPHQL_CONFIG.minNumberOfStudentsPerSubmissionRequest`
+ * students per request to ensure efficient batching.
  */
 export const smartStudentsPerSubmissionRequest = (totalCount: number) => {
   return Math.min(
-    Math.ceil(totalCount / GRADEBOOK_GRAPHQL_CONFIG.maxSubmissionRequestCount),
+    Math.max(
+      GRADEBOOK_GRAPHQL_CONFIG.minNumberOfStudentsPerSubmissionRequest,
+      Math.ceil(totalCount / GRADEBOOK_GRAPHQL_CONFIG.maxSubmissionRequestCount),
+    ),
     GRADEBOOK_GRAPHQL_CONFIG.initialNumberOfStudentsPerSubmissionRequest,
   )
 }

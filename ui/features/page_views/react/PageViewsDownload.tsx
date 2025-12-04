@@ -21,7 +21,6 @@ import {useScope as i18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
-import _ from 'lodash'
 import {Text} from '@instructure/ui-text'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Table} from '@instructure/ui-table'
@@ -50,36 +49,41 @@ const locale = ENV?.LOCALE || navigator.language
 // For displaying selected months, we need a format with month and year only
 const formatter = new Intl.DateTimeFormat(locale, {year: 'numeric', month: 'long'})
 
-// Available dates are first day of each month for the last 12 months
-const availableDates = new Array(13).fill(0).map((_, i) => {
+// Type representing a year and month pair (month range is 1-12)
+type YearMonth = {year: number; month: number}
+
+function yearMonthToDate(ym: YearMonth): Date {
+  return new Date(ym.year, ym.month - 1, 1)
+}
+
+function yearMonthToApiString(ym: YearMonth): string {
+  return `${ym.year}-${String(ym.month).padStart(2, '0')}-01`
+}
+
+function nextMonth(ym: YearMonth): YearMonth {
+  if (ym.month === 12) {
+    return {year: ym.year + 1, month: 1}
+  }
+  return {year: ym.year, month: ym.month + 1}
+}
+
+// Compare two YearMonth values (-1 if a < b, 0 if equal, 1 if a > b)
+function compareYearMonth(a: YearMonth, b: YearMonth): number {
+  if (a.year !== b.year) return a.year - b.year
+  return a.month - b.month
+}
+
+// Available months are the last 13 months (current month + 12 previous)
+const availableMonths: YearMonth[] = new Array(13).fill(0).map((_, i) => {
   const date = new Date()
   date.setDate(1)
-  date.setHours(0, 0, 0, 0)
   date.setMonth(date.getMonth() - i)
-  return date
+  return {year: date.getFullYear(), month: date.getMonth() + 1}
 })
 
-// When sent to the API,
-// we need YYYY-MM-01 formats as it only accepts the first of the month
-// the start month is inclusive (YYYY-MM-01 00:00:00)
-function startMonthString(date: Date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`
-}
-
-// and the end month is exclusive (YYYY-MM-01 00:00:00 of the following month)
-function endMonthString(date: Date) {
-  const d = new Date(date)
-  d.setMonth(d.getMonth() + 1)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
-}
-
 export function PageViewsDownload({userId}: PageViewsDownloadProps): React.JSX.Element {
-  const [startMonth, setStartMonth] = useState<string | number | undefined>(
-    startMonthString(availableDates[0]),
-  )
-  const [endMonth, setEndMonth] = useState<string | number | undefined>(
-    endMonthString(availableDates[0]),
-  )
+  const [startMonth, setStartMonth] = useState<YearMonth>(availableMonths[0])
+  const [endMonth, setEndMonth] = useState<YearMonth>(availableMonths[0])
   const [exportError, setExportError] = useState<string | null>(null)
   const [asyncJobs, _setAsyncJobs, pollAsyncJobs, postAsyncJob, getDownloadUrl] =
     useAsyncPageviewJobs(`pv-export-${userId}`, userId)
@@ -138,7 +142,7 @@ export function PageViewsDownload({userId}: PageViewsDownloadProps): React.JSX.E
   }, [pollAsyncJobs])
 
   const postAsyncJobHandler = () => {
-    if (!startMonth || !endMonth || startMonth >= endMonth) {
+    if (compareYearMonth(startMonth, endMonth) > 0) {
       setExportError(
         I18n.t(
           'Please select a valid date range where the start month is not after the end month.',
@@ -151,14 +155,15 @@ export function PageViewsDownload({userId}: PageViewsDownloadProps): React.JSX.E
       return
     }
     setExportError(null)
-    // endDisplayDate must be one month earlier than the submitted endMonth (which is exclusive)
-    const endDisplayDate = new Date(new Date(endMonth).setMonth(new Date(endMonth).getMonth() - 1))
-    postAsyncJob(
-      userId,
-      `${formatter.format(new Date(startMonth))} - ${formatter.format(endDisplayDate)}`,
-      startMonth.toString(),
-      endMonth.toString(),
-    ).catch(e => {
+
+    // Convert YearMonth to Date objects for display formatting in the user's locale
+    const displayName = `${formatter.format(yearMonthToDate(startMonth))} - ${formatter.format(yearMonthToDate(endMonth))}`
+
+    // API expects exclusive end date, so we send the next month after the user's selection
+    const apiStartDate = yearMonthToApiString(startMonth)
+    const apiEndDate = yearMonthToApiString(nextMonth(endMonth))
+
+    postAsyncJob(userId, displayName, apiStartDate, apiEndDate).catch(e => {
       if (e instanceof FetchApiError && e.response.status === 429) {
         setExportError(
           I18n.t('You must wait for your running jobs to finish before starting a new one.'),
@@ -182,34 +187,38 @@ export function PageViewsDownload({userId}: PageViewsDownloadProps): React.JSX.E
             <SimpleSelect
               renderLabel={I18n.t('Start month')}
               placeholder={I18n.t('Select month')}
-              value={startMonth}
-              onChange={(_e, {value}) => setStartMonth(value)}
+              value={yearMonthToApiString(startMonth)}
+              onChange={(_e, {value}) => {
+                const ym = availableMonths.find(m => yearMonthToApiString(m) === value)
+                if (ym) setStartMonth(ym)
+              }}
             >
-              {availableDates.map(date => (
-                <SimpleSelect.Option
-                  key={startMonthString(date)}
-                  id={`start-month-${startMonthString(date)}`}
-                  value={startMonthString(date)}
-                >
-                  {formatter.format(date)}
-                </SimpleSelect.Option>
-              ))}
+              {availableMonths.map(ym => {
+                const key = yearMonthToApiString(ym)
+                return (
+                  <SimpleSelect.Option key={key} id={`start-month-${key}`} value={key}>
+                    {formatter.format(yearMonthToDate(ym))}
+                  </SimpleSelect.Option>
+                )
+              })}
             </SimpleSelect>
             <SimpleSelect
               renderLabel={I18n.t('End month')}
               placeholder={I18n.t('Select month')}
-              value={endMonth}
-              onChange={(_e, {value}) => setEndMonth(value)}
+              value={yearMonthToApiString(endMonth)}
+              onChange={(_e, {value}) => {
+                const ym = availableMonths.find(m => yearMonthToApiString(m) === value)
+                if (ym) setEndMonth(ym)
+              }}
             >
-              {availableDates.map(date => (
-                <SimpleSelect.Option
-                  key={endMonthString(date)}
-                  id={`end-month-${endMonthString(date)}`}
-                  value={endMonthString(date)}
-                >
-                  {formatter.format(date)}
-                </SimpleSelect.Option>
-              ))}
+              {availableMonths.map(ym => {
+                const key = yearMonthToApiString(ym)
+                return (
+                  <SimpleSelect.Option key={key} id={`end-month-${key}`} value={key}>
+                    {formatter.format(yearMonthToDate(ym))}
+                  </SimpleSelect.Option>
+                )
+              })}
             </SimpleSelect>
             <Button
               data-testid="page-views-csv-link"

@@ -19,7 +19,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {connect} from 'react-redux'
 import {arrayOf, bool, func, string} from 'prop-types'
 import React, {useEffect, useRef, useState} from 'react'
-import {flatten} from 'lodash'
+import {flatten} from 'es-toolkit/compat'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {IconButton} from '@instructure/ui-buttons'

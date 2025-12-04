@@ -19,7 +19,7 @@
 import {ReactNode, useEffect} from 'react'
 import {useNode} from '@craftjs/core'
 import {checkHtmlContent} from '../../../accessibilityChecker/htmlChecker'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import {View} from '@instructure/ui-view'
 import {useInstUIRef} from '../../../hooks/useInstUIRef'
 import {AccessibilityRule} from '../../../accessibilityChecker/types'

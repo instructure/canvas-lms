@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from 'backbone'
-import {each} from 'lodash'
+import {each} from 'es-toolkit/compat'
 
 const _parse = Backbone.Model.prototype.parse
 

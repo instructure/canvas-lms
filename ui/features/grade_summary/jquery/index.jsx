@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {forEach, extend as lodashExtend} from 'lodash'
+import {forEach, extend as lodashExtend} from 'es-toolkit/compat'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */

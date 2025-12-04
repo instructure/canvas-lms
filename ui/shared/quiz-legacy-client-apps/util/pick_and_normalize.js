@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {pick} from 'lodash'
+import {pick} from 'es-toolkit/compat'
 import {camelize} from './convert_case'
 
 export default function pickAndNormalize(set, keys) {

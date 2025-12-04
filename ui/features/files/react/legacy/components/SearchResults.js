@@ -17,13 +17,12 @@
  */
 
 import $ from 'jquery'
-import {map, isEqual, isArray} from 'lodash'
+import {map, isArray, isEqual} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 import customPropTypes from '@canvas/files/react/modules/customPropTypes'
 import updateAPIQuerySortParams from '../util/updateAPIQuerySortParams'
 import getAllPages from '../util/getAllPages'
-import 'location-origin'
 
 const I18n = createI18nScope('react_files')
 

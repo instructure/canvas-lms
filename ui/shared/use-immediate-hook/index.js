@@ -26,7 +26,7 @@
 // flicker in the browser by avoiding multiple DOM updates.
 
 import {useEffect, useRef} from 'react'
-import {isEqual} from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 
 function shallowEqualArrays(arrA, arrB) {
   if (arrA === arrB) return true

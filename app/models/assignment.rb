@@ -33,6 +33,7 @@ class Assignment < AbstractAssignment
 
   validates :parent_assignment_id, :sub_assignment_tag, absence: true
   validate :unpublish_ok?, if: -> { will_save_change_to_workflow_state?(to: "unpublished") }
+  validate :peer_review_count_changes_ok?, if: :peer_review_count_changed?
 
   before_save :before_soft_delete, if: -> { will_save_change_to_workflow_state?(to: "deleted") }
 
@@ -167,6 +168,29 @@ class Assignment < AbstractAssignment
     assignments.each { |a| a.can_unpublish = !assmnt_ids_with_subs.include?(a.id) }
   end
 
+  # Preloads the peer_review_submissions flag for a collection of assignments.
+  # This is more efficient than calling peer_review_submissions? on each assignment individually.
+  def self.preload_peer_review_submissions(assignments)
+    return unless assignments.any?
+
+    peer_review_submission_assignment_ids = assignment_ids_with_peer_review_submissions(assignments.map(&:id))
+    assignments.each { |a| a.peer_review_submissions = peer_review_submission_assignment_ids.include?(a.id) }
+  end
+
+  # Returns the IDs of assignments that have completed peer review submissions.
+  def self.assignment_ids_with_peer_review_submissions(assignment_ids)
+    AssessmentRequest
+      .from(sanitize_sql(["unnest('{?}'::int8[]) as peer_review_assignments (assignment_id)", assignment_ids]))
+      .where(
+        AssessmentRequest
+          .where(workflow_state: "completed")
+          .joins(:submission)
+          .where("submissions.assignment_id = peer_review_assignments.assignment_id")
+          .arel.exists
+      )
+      .distinct.pluck("peer_review_assignments.assignment_id")
+  end
+
   # Duplicates the course module content tags for the assignment to the new assignment.
   # @param new_assignment [Assignment] the assignment to duplicate the content tags for
   #
@@ -197,11 +221,28 @@ class Assignment < AbstractAssignment
     end
   end
 
+  # Returns true if there are completed peer review submissions for this assignment.
+  # Overrides the AbstractAssignment stub implementation.
+  def peer_review_submissions?
+    return @peer_review_submissions unless @peer_review_submissions.nil?
+
+    AssessmentRequest.completed_for_assignment(id).exists?
+  end
+
   private
 
   def before_soft_delete
     sub_assignments.destroy_all
     peer_review_sub_assignment&.destroy
+  end
+
+  def peer_review_count_changes_ok?
+    return false unless peer_reviews? && context.feature_enabled?(:peer_review_allocation_and_grading)
+
+    if peer_review_submissions?
+      errors.add :peer_review_count,
+                 I18n.t("Students have already submitted peer reviews, so reviews required and points cannot be changed.")
+    end
   end
 
   def governs_submittable?
@@ -246,7 +287,7 @@ class Assignment < AbstractAssignment
 
   def should_sync_peer_review_sub_assignment?
     return false if skip_peer_review_sub_assignment_sync
-    return false unless context.feature_enabled?(:peer_review_grading)
+    return false unless context.feature_enabled?(:peer_review_allocation_and_grading)
     return false unless peer_review_sub_assignment.present?
 
     previous_changes.keys.intersect?(PeerReviewSubAssignment::SYNCABLE_ATTRIBUTES)

@@ -21,7 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
-import _, {each, find, keys, includes, forEach, filter} from 'lodash'
+import {each, find, keys, includes, forEach, filter, pick} from 'es-toolkit/compat'
 import $, {param} from 'jquery'
 import pluralize from '@canvas/util/stringPluralize'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -660,10 +660,9 @@ EditView.prototype.setDefaultsIfNew = function () {
 }
 
 EditView.prototype.cacheAssignmentSettings = function () {
-  const new_assignment_settings = _.pick.apply(
-    _,
-    [this.getFormData()].concat(slice.call(this.settingsToCache())),
-  )
+  const formData = this.getFormData()
+  const keys = slice.call(this.settingsToCache())
+  const new_assignment_settings = pick(formData, ...keys)
   return userSettings.contextSet('new_assignment_settings', new_assignment_settings)
 }
 
@@ -1582,7 +1581,7 @@ EditView.prototype.getFormData = function () {
   if ($grader_count.length > 0) {
     data.grader_count = numberHelper.parse($grader_count[0].value)
   }
-  if (ENV.PEER_REVIEW_ALLOCATION_ENABLED || ENV.PEER_REVIEW_GRADING_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
     const checkedInput = document.getElementById('assignment_peer_reviews_checkbox')
     data.peer_reviews = checkedInput?.checked
 
@@ -1783,7 +1782,7 @@ EditView.prototype.showErrors = function (errors) {
   let shouldFocus = true
   Object.entries(errors).forEach(([key, value]) => {
     if (key === 'peer_review_details') {
-      if ((ENV.PEER_REVIEW_GRADING_ENABLED || ENV.PEER_REVIEW_ALLOCATION_ENABLED) && shouldFocus) {
+      if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && shouldFocus) {
         const peerReviewDetailsEl = document.getElementById(
           'peer_reviews_allocation_and_grading_details',
         )
@@ -1994,7 +1993,7 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
     delete errors.invalid_card
   }
 
-  if (ENV.PEER_REVIEW_GRADING_ENABLED || ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
     const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
     if (peerReviewCheckbox && peerReviewCheckbox.checked) {
       const peerReviewDetailsEl = document.getElementById(
@@ -2445,7 +2444,7 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
     this.hideErrors('final_grader_id_errors')
   }
   let isPeerReviewEnabled
-  if (ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
     const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
     if (peerReviewCheckbox) {
       isPeerReviewEnabled = peerReviewCheckbox.checked

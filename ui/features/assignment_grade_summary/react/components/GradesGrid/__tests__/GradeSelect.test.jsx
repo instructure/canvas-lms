@@ -21,7 +21,7 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import GradeSelect, {NO_SELECTION_LABEL} from '../GradeSelect'
 import {FAILURE, STARTED, SUCCESS} from '../../../grades/GradeActions'
-import {cloneDeep} from 'lodash'
+import {cloneDeep} from 'es-toolkit/compat'
 
 const STUDENT_NAME = 'Daniel Martin Lukacs'
 

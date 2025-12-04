@@ -20,7 +20,7 @@ import React from 'react'
 import {createRoot} from 'react-dom/client'
 import {extend} from '@canvas/backbone/utils'
 import turnitinSettingsDialog from '../../jst/TurnitinSettingsDialog.handlebars'
-import {extend as lodashExtend} from 'lodash'
+import {extend as lodashExtend} from 'es-toolkit/compat'
 import vericiteSettingsDialog from '../../jst/VeriCiteSettingsDialog.handlebars'
 import {View} from '@canvas/backbone'
 import htmlEscape from '@instructure/html-escape'
@@ -38,13 +38,13 @@ const EXCLUDE_SMALL_MATCHES_WORDS = {
   TYPE: 'words',
   RADIO_SELECTOR: '[value="words"]',
   INPUT_SELECTOR: '[name="words"]',
-  ERROR_CLASS: '.words_error_container'
+  ERROR_CLASS: '.words_error_container',
 }
 const EXCLUDE_SMALL_MATCHES_PERCENT = {
   TYPE: 'percent',
   RADIO_SELECTOR: '[value="percent"]',
   INPUT_SELECTOR: '[name="percent"]',
-  ERROR_CLASS: '.percent_error_container'
+  ERROR_CLASS: '.percent_error_container',
 }
 
 extend(TurnitinSettingsDialog, View)
@@ -157,7 +157,11 @@ TurnitinSettingsDialog.prototype.clearInputErrors = function (e) {
   }
 }
 
-TurnitinSettingsDialog.prototype.showErrorMessage = function (message, selectors, shouldFocus = false) {
+TurnitinSettingsDialog.prototype.showErrorMessage = function (
+  message,
+  selectors,
+  shouldFocus = false,
+) {
   if (shouldFocus) {
     this.getElement(selectors.INPUT_SELECTOR)?.focus()
   }
@@ -168,15 +172,15 @@ TurnitinSettingsDialog.prototype.showErrorMessage = function (message, selectors
   if (errorsContainer) {
     const root = this.errorRoots[selectors.TYPE] ?? createRoot(errorsContainer)
     root.render(
-       <FormattedErrorMessage
+      <FormattedErrorMessage
         message={message}
         margin="xx-small 0 small 0"
         iconMargin="0 xx-small xxx-small 0"
-      />
+      />,
     )
 
     Object.assign(this.errorRoots, {
-      [selectors.TYPE]: root
+      [selectors.TYPE]: root,
     })
   }
 }
@@ -208,7 +212,9 @@ TurnitinSettingsDialog.prototype.validateInput = function (selectors) {
 TurnitinSettingsDialog.prototype.runValidation = function (e) {
   // validate onBlur or when the radio input gets checked
   if (e.type == 'focusout') {
-    e.target.name === EXCLUDE_SMALL_MATCHES_WORDS.TYPE ? this.validateInput(EXCLUDE_SMALL_MATCHES_WORDS) : this.validateInput(EXCLUDE_SMALL_MATCHES_PERCENT)
+    e.target.name === EXCLUDE_SMALL_MATCHES_WORDS.TYPE
+      ? this.validateInput(EXCLUDE_SMALL_MATCHES_WORDS)
+      : this.validateInput(EXCLUDE_SMALL_MATCHES_PERCENT)
   } else if (e.target.checked && e.target.value === EXCLUDE_SMALL_MATCHES_WORDS.TYPE) {
     this.clearErrors(EXCLUDE_SMALL_MATCHES_PERCENT)
     this.validateInput(EXCLUDE_SMALL_MATCHES_WORDS)
@@ -246,7 +252,13 @@ TurnitinSettingsDialog.prototype.handleSubmit = function (ev) {
   if (this.$excludeSmallMatches.prop('checked')) {
     const error = this.getErrorMessage(formValues.exclude_small_matches_value, true)
     if (error) {
-      this.showErrorMessage(error, formValues.exclude_small_matches_type === 'words' ? EXCLUDE_SMALL_MATCHES_WORDS : EXCLUDE_SMALL_MATCHES_PERCENT, true)
+      this.showErrorMessage(
+        error,
+        formValues.exclude_small_matches_type === 'words'
+          ? EXCLUDE_SMALL_MATCHES_WORDS
+          : EXCLUDE_SMALL_MATCHES_PERCENT,
+        true,
+      )
     } else {
       this.closeDialog(formValues)
     }

@@ -55,7 +55,7 @@ export const SharedScheduledRelease = ({
   return (
     <View as="div" margin="medium medium 0" data-testid="shared-scheduled-post-datetime">
       <DateTimeInput
-        description={<ScreenReaderContent>{I18n.t('Pick a date and time')}</ScreenReaderContent>}
+        description={<ScreenReaderContent>{I18n.t('Release Date')}</ScreenReaderContent>}
         datePlaceholder={I18n.t('Choose release date')}
         dateRenderLabel={I18n.t('Release Date')}
         timeRenderLabel={I18n.t('Time')}

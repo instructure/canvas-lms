@@ -43,22 +43,6 @@ describe "Importing Learning Outcomes" do
     expect(log.child_outcome_links.detect { |link| link.content == lo2 }).not_to be_nil
   end
 
-  it "processes attachment associations" do
-    course_with_teacher
-    context = @course
-    aa_test_data = AttachmentAssociationsSpecHelper.new(context.account, context)
-    migration = ContentMigration.create!(context:)
-    migration.migration_ids_to_import = { copy: {} }
-    migration.user = @teacher
-    data = get_import_data [], "outcomes"
-    data.first["description"] = aa_test_data.base_html
-    data = { "learning_outcomes" => data }
-    Importers::LearningOutcomeImporter.process_migration(data, migration)
-    expect(context.learning_outcomes.count).to eq 2
-    expect(context.learning_outcomes.first.attachment_associations.count).to eq 1
-    expect(context.learning_outcomes.first.attachment_associations.first.attachment_id).to eq aa_test_data.attachment1.id
-  end
-
   it "imports group" do
     migration = ContentMigration.create!(context: @context)
     migration.migration_ids_to_import = { copy: {} }

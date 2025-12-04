@@ -79,6 +79,7 @@ module BookmarkedCollection
   require "bookmarked_collection/composite_proxy"
   require "bookmarked_collection/concat_collection"
   require "bookmarked_collection/concat_proxy"
+  require "bookmarked_collection/sync_concat_proxy"
   require "bookmarked_collection/filter_proxy"
   require "bookmarked_collection/sync_filter_proxy"
   require "bookmarked_collection/merge_proxy"
@@ -272,8 +273,12 @@ module BookmarkedCollection
   #     ['courses', courses],
   #     ['users', users])
   #
-  def self.concat(*collections)
-    BookmarkedCollection::ConcatProxy.new(collections)
+  def self.concat(*collections, sync: false)
+    if sync
+      BookmarkedCollection::SyncConcatProxy.new(collections)
+    else
+      BookmarkedCollection::ConcatProxy.new(collections)
+    end
   end
 
   # Filters the results of a collection to only include rows that the

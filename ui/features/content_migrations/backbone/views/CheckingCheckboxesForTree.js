@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {each, defer} from 'lodash'
+import {each, defer} from 'es-toolkit/compat'
 import $ from 'jquery'
 
 function CheckingCheckboxesForTree($tree, bindEvents) {

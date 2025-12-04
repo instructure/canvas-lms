@@ -55,7 +55,7 @@ RSpec.describe PeerReview::CourseOverrideUpdaterService do
   end
 
   before do
-    course.enable_feature!(:peer_review_grading)
+    course.enable_feature!(:peer_review_allocation_and_grading)
   end
 
   describe "#initialize" do
@@ -129,7 +129,7 @@ RSpec.describe PeerReview::CourseOverrideUpdaterService do
         )
 
         expect { invalid_service.call }.to raise_error(
-          PeerReview::InvalidOverrideDatesError,
+          PeerReview::InvalidDatesError,
           "Due date cannot be before unlock date"
         )
       end
@@ -228,8 +228,8 @@ RSpec.describe PeerReview::CourseOverrideUpdaterService do
           }
         end
 
-        it "raises InvalidOverrideDatesError" do
-          expect { service.call }.to raise_error(PeerReview::InvalidOverrideDatesError, "Due date cannot be before unlock date")
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(PeerReview::InvalidDatesError, "Due date cannot be before unlock date")
         end
       end
 
@@ -243,8 +243,8 @@ RSpec.describe PeerReview::CourseOverrideUpdaterService do
           }
         end
 
-        it "raises InvalidOverrideDatesError" do
-          expect { service.call }.to raise_error(PeerReview::InvalidOverrideDatesError, "Due date cannot be after lock date")
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(PeerReview::InvalidDatesError, "Due date cannot be after lock date")
         end
       end
 
@@ -258,8 +258,202 @@ RSpec.describe PeerReview::CourseOverrideUpdaterService do
           }
         end
 
-        it "raises InvalidOverrideDatesError" do
-          expect { service.call }.to raise_error(PeerReview::InvalidOverrideDatesError, "Unlock date cannot be after lock date")
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(PeerReview::InvalidDatesError, "Unlock date cannot be after lock date")
+        end
+      end
+    end
+
+    context "validation against parent override dates" do
+      let(:parent_assignment) { peer_review_sub_assignment.parent_assignment }
+
+      context "when updated peer review dates fall within parent override dates" do
+        before do
+          parent_override.update!(
+            unlock_at: 1.day.from_now,
+            lock_at: 4.weeks.from_now
+          )
+        end
+
+        let(:override_data) do
+          {
+            id: existing_override.id,
+            set_type: "Course",
+            unlock_at: 2.days.from_now,
+            due_at: 2.weeks.from_now,
+            lock_at: 3.weeks.from_now
+          }
+        end
+
+        it "updates the override successfully" do
+          result = service.call
+          expect(result.due_at).to eq(override_data[:due_at])
+          expect(result.unlock_at).to eq(override_data[:unlock_at])
+          expect(result.lock_at).to eq(override_data[:lock_at])
+        end
+      end
+
+      context "when updated peer review unlock_at is before parent unlock_at" do
+        let(:parent_override) do
+          assignment_override_model(
+            assignment: peer_review_sub_assignment.parent_assignment,
+            set: course,
+            unlock_at: 3.days.from_now,
+            lock_at: 4.weeks.from_now
+          )
+        end
+
+        let(:override_data) do
+          {
+            id: existing_override.id,
+            set_type: "Course",
+            unlock_at: 1.day.from_now,
+            due_at: 2.weeks.from_now,
+            lock_at: 3.weeks.from_now
+          }
+        end
+
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review override unlock date cannot be before parent override unlock date/
+          )
+        end
+      end
+
+      context "when updated peer review due_at is before parent unlock_at" do
+        let(:parent_override) do
+          assignment_override_model(
+            assignment: peer_review_sub_assignment.parent_assignment,
+            set: course,
+            unlock_at: 3.weeks.from_now,
+            lock_at: 5.weeks.from_now
+          )
+        end
+
+        let(:override_data) do
+          {
+            id: existing_override.id,
+            set_type: "Course",
+            unlock_at: 1.week.from_now,
+            due_at: 2.weeks.from_now,
+            lock_at: 4.weeks.from_now
+          }
+        end
+
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review override unlock date cannot be before parent override unlock date/
+          )
+        end
+      end
+
+      context "when updated peer review due_at is after parent lock_at" do
+        let(:parent_override) do
+          assignment_override_model(
+            assignment: peer_review_sub_assignment.parent_assignment,
+            set: course,
+            unlock_at: 1.day.from_now,
+            lock_at: 2.weeks.from_now
+          )
+        end
+
+        let(:override_data) do
+          {
+            id: existing_override.id,
+            set_type: "Course",
+            unlock_at: 2.days.from_now,
+            due_at: 3.weeks.from_now,
+            lock_at: 4.weeks.from_now
+          }
+        end
+
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review override due date cannot be after parent override lock date/
+          )
+        end
+      end
+
+      context "when updated peer review lock_at is after parent lock_at" do
+        let(:parent_override) do
+          assignment_override_model(
+            assignment: peer_review_sub_assignment.parent_assignment,
+            set: course,
+            unlock_at: 1.day.from_now,
+            lock_at: 2.weeks.from_now
+          )
+        end
+
+        let(:override_data) do
+          {
+            id: existing_override.id,
+            set_type: "Course",
+            unlock_at: 2.days.from_now,
+            due_at: 1.week.from_now,
+            lock_at: 3.weeks.from_now
+          }
+        end
+
+        it "raises InvalidDatesError" do
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review override lock date cannot be after parent override lock date/
+          )
+        end
+      end
+
+      context "when parent override has no unlock_at" do
+        before do
+          parent_override.update!(
+            unlock_at: nil,
+            unlock_at_overridden: false,
+            lock_at: 2.weeks.from_now,
+            lock_at_overridden: true
+          )
+        end
+
+        let(:override_data) do
+          {
+            id: existing_override.id,
+            set_type: "Course",
+            unlock_at: 1.day.ago,
+            due_at: 1.week.from_now,
+            lock_at: 10.days.from_now
+          }
+        end
+
+        it "does not validate against parent unlock_at" do
+          result = service.call
+          expect(result.unlock_at).to eq(override_data[:unlock_at])
+        end
+      end
+
+      context "when parent override has no lock_at" do
+        before do
+          parent_override.update!(
+            unlock_at: 1.day.from_now,
+            unlock_at_overridden: true,
+            lock_at: nil,
+            lock_at_overridden: false
+          )
+        end
+
+        let(:override_data) do
+          {
+            id: existing_override.id,
+            set_type: "Course",
+            unlock_at: 2.days.from_now,
+            due_at: 1.month.from_now,
+            lock_at: 2.months.from_now
+          }
+        end
+
+        it "does not validate against parent lock_at" do
+          result = service.call
+          expect(result.lock_at).to eq(override_data[:lock_at])
         end
       end
     end

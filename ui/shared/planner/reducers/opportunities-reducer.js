@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {handleActions} from 'redux-actions'
-import {cloneDeep} from 'lodash'
+import {cloneDeep} from 'es-toolkit/compat'
 
 const defaultState = {
   items: [],

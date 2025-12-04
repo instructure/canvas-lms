@@ -319,6 +319,7 @@ export type RootAccountFeatureId =
   | 'ams_root_account_integration'
   | 'api_rate_limits'
   | 'buttons_and_icons_root_account'
+  | 'canvas_apps_sub_account_access'
   | 'course_pace_allow_bulk_pace_assign'
   | 'course_pace_download_document'
   | 'course_pace_draft_state'
@@ -339,6 +340,7 @@ export type RootAccountFeatureId =
   | 'lti_link_to_apps_from_developer_keys'
   | 'lti_registrations_next'
   | 'lti_registrations_page'
+  | 'lti_dr_registrations_update'
   | 'lti_registrations_usage_data'
   | 'lti_registrations_usage_data_dev'
   | 'lti_registrations_usage_data_low_usage'
@@ -355,6 +357,7 @@ export type RootAccountFeatureId =
   | 'rubric_criterion_range'
   | 'scheduled_page_publication'
   | 'send_usage_metrics'
+  | 'top_navigation_placement'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_SERVICES

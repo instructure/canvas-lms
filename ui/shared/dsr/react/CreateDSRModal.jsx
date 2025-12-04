@@ -29,7 +29,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 import update from 'immutability-helper'
-import {get, isEmpty} from 'lodash'
+import {get, isEmpty} from 'es-toolkit/compat'
 import axios from '@canvas/axios'
 import {datetimeString} from '@canvas/datetime/date-functions'
 

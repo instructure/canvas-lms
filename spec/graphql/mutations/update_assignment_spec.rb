@@ -240,7 +240,7 @@ describe Mutations::UpdateAssignment do
 
   context "peer review submission_required" do
     before do
-      @course.enable_feature!(:peer_review_allocation)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
     end
 
     it "can update submission_required to true" do
@@ -280,7 +280,7 @@ describe Mutations::UpdateAssignment do
     end
 
     it "returns nil for submission_required when feature flag is disabled" do
-      @course.disable_feature!(:peer_review_allocation)
+      @course.disable_feature!(:peer_review_allocation_and_grading)
       assignment = Assignment.find(@assignment_id)
       assignment.update!(peer_review_submission_required: true)
 
@@ -298,7 +298,7 @@ describe Mutations::UpdateAssignment do
 
   context "peer review across_sections" do
     before do
-      @course.enable_feature!(:peer_review_allocation)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
     end
 
     it "can update across_sections to false" do
@@ -337,7 +337,7 @@ describe Mutations::UpdateAssignment do
     end
 
     it "returns nil for across_sections when feature flag is disabled" do
-      @course.disable_feature!(:peer_review_allocation)
+      @course.disable_feature!(:peer_review_allocation_and_grading)
       assignment = Assignment.find(@assignment_id)
       assignment.update!(peer_review_across_sections: true)
 

@@ -250,12 +250,12 @@
         <% end %>
       </div>
     </div>
-    <% if @submission.submission_type == "online_text_entry" || @submission.submission_type == "discussion_topic" %>
+    <% if %w[online_text_entry discussion_topic].include?(@submission.submission_type_for_asset_reports) %>
       <div
         id="asset_report_status_container"
         data-attempt="<%= @submission.attempt %>"
         data-submission-id="<%= @submission.id %>"
-        data-submission-type="<%= @submission.submission_type %>"
+        data-submission-type="<%= @submission.submission_type_for_asset_reports %>"
       ></div>
     <% end %>
     <% if @assessment_request %>

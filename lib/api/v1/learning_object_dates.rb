@@ -101,6 +101,6 @@ module Api::V1::LearningObjectDates
       overridable.peer_reviews? &&
       !overridable.discussion_topic? &&
       overridable.peer_review_sub_assignment.present? &&
-      overridable.context.feature_enabled?(:peer_review_grading)
+      overridable.context.feature_enabled?(:peer_review_allocation_and_grading)
   end
 end

@@ -50,6 +50,7 @@ export enum SecondaryInfoDisplay {
 
 export enum DisplayFilter {
   SHOW_STUDENTS_WITH_NO_RESULTS = 'show_students_with_no_results',
+  SHOW_OUTCOMES_WITH_NO_RESULTS = 'show_outcomes_with_no_results',
   SHOW_STUDENT_AVATARS = 'show_student_avatars',
 }
 
@@ -64,18 +65,30 @@ export enum ScoreDisplayFormat {
   ICON_AND_LABEL = 'icon_and_label',
 }
 
+export enum OutcomeArrangement {
+  ALPHABETICAL = 'alphabetical',
+  CUSTOM = 'custom',
+  UPLOAD_ORDER = 'upload_order',
+}
+
 export interface GradebookSettings {
   secondaryInfoDisplay: SecondaryInfoDisplay
   displayFilters: DisplayFilter[]
   nameDisplayFormat: NameDisplayFormat
   studentsPerPage: number
   scoreDisplayFormat: ScoreDisplayFormat
+  outcomeArrangement: OutcomeArrangement
 }
 
 export const DEFAULT_GRADEBOOK_SETTINGS: GradebookSettings = {
   secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
-  displayFilters: [DisplayFilter.SHOW_STUDENT_AVATARS, DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
+  displayFilters: [
+    DisplayFilter.SHOW_STUDENT_AVATARS,
+    DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
+    DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS,
+  ],
   nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
   studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
   scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
+  outcomeArrangement: OutcomeArrangement.UPLOAD_ORDER,
 }

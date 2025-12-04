@@ -267,12 +267,14 @@ export const assignmentRow = (
       </Table.Cell>
       <Table.Cell textAlign="start">
         {showDocumentProcessors && (
-          <LtiAssetProcessorCell
-            assetProcessors={assignment?.ltiAssetProcessorsConnection?.nodes}
-            assetReports={submission?.ltiAssetReportsConnection?.nodes}
-            submissionType={submission?.submissionType}
-            assignmentName={assignment?.name}
-          />
+          <span style={{whiteSpace: 'nowrap'}}>
+            <LtiAssetProcessorCell
+              assetProcessors={assignment?.ltiAssetProcessorsConnection?.nodes}
+              assetReports={submission?.ltiAssetReportsConnection?.nodes}
+              submissionType={submission?.submissionType}
+              assignmentName={assignment?.name}
+            />
+          </span>
         )}
       </Table.Cell>
       <Table.Cell textAlign="end">

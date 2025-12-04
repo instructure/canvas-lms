@@ -27,7 +27,7 @@ import {IconTrashLine} from '@instructure/ui-icons'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import type {Requirement, ModuleItem, PointsInputMessages} from './types'
 import {requirementTypesForResource} from '../utils/miscHelpers'
-import {groupBy} from 'lodash'
+import {groupBy} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ScoreSection from './ScoreSection'
 
@@ -74,7 +74,7 @@ export default function RequirementSelector({
   focusDropdown = false,
   focusDeleteButton = false,
   pointsInputMessages,
-  validatePointsInput
+  validatePointsInput,
 }: RequirementSelectorProps) {
   const removeButton = useRef<Element | null>(null)
   const dropdown = useRef<HTMLInputElement | null>(null)
@@ -108,7 +108,7 @@ export default function RequirementSelector({
   }, [focusDropdown, dropdown])
 
   const scoreSection = useMemo(() => {
-    if (requirement.type !== "score" && requirement.type !== "percentage") return null
+    if (requirement.type !== 'score' && requirement.type !== 'percentage') return null
 
     if (window.ENV.FEATURES.modules_requirements_allow_percentage) {
       return (
@@ -119,7 +119,7 @@ export default function RequirementSelector({
           pointsInputMessages={pointsInputMessages}
           validatePointsInput={validatePointsInput}
         />
-      );
+      )
     }
 
     return (
@@ -130,41 +130,29 @@ export default function RequirementSelector({
             value={requirement.minimumScore}
             width="4rem"
             showArrows={false}
-            renderLabel={
-              <ScreenReaderContent>
-                {I18n.t("Minimum Score")}
-              </ScreenReaderContent>
-            }
-            onChange={(event) => {
+            renderLabel={<ScreenReaderContent>{I18n.t('Minimum Score')}</ScreenReaderContent>}
+            onChange={event => {
               onUpdateRequirement(
                 {
                   ...requirement,
                   minimumScore: event.target.value,
                 } as Requirement,
-                index
-              );
+                index,
+              )
             }}
           />
         </Flex.Item>
         <Flex.Item shouldGrow={true} padding="0 0 0 small">
           {requirement.pointsPossible && (
             <View as="div">
-              <ScreenReaderContent>
-                {I18n.t("Points Possible")}
-              </ScreenReaderContent>
+              <ScreenReaderContent>{I18n.t('Points Possible')}</ScreenReaderContent>
               <Text data-testid="points-possible-value">{`/ ${requirement.pointsPossible}`}</Text>
             </View>
           )}
         </Flex.Item>
       </Flex>
-    );
-  }, [
-    requirement,
-    index,
-    onUpdateRequirement,
-    pointsInputMessages,
-    validatePointsInput
-  ]);
+    )
+  }, [requirement, index, onUpdateRequirement, pointsInputMessages, validatePointsInput])
 
   return (
     <View data-testid="module-requirement-card" as="div" borderRadius="medium" borderWidth="small">

@@ -23,6 +23,7 @@ import {mockInternalConfiguration} from './helpers'
 import {createLti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 import type {LtiPlacement} from '../../model/LtiPlacement'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('NamingConfirmationWrapper', () => {
   it('renders the NamingConfirmation', () => {
@@ -93,6 +94,13 @@ describe('NamingConfirmationWrapper', () => {
   })
 
   it('adds a new input when a new placement is added to the overlay', () => {
+    // This is only needed until the top_navigation_placement feature flag is removed
+    fakeENV.setup({
+      FEATURES: {
+        top_navigation_placement: true,
+      },
+    })
+
     const config = mockInternalConfiguration({
       placements: [{placement: 'course_navigation'}, {placement: 'global_navigation'}],
     })

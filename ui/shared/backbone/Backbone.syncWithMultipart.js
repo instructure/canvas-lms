@@ -17,7 +17,7 @@
 
 // copied from: https://gist.github.com/1998897
 
-import {isElement, isEmpty, uniqueId, isArray, each, map, flatten} from 'lodash'
+import {isElement, isArray, each, map, flatten, uniqueId, isEmpty} from 'es-toolkit/compat'
 import $ from 'jquery'
 import authenticity_token from '@canvas/authenticity-token'
 import htmlEscape from '@instructure/html-escape'

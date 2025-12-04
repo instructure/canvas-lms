@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {isArray, find} from 'lodash'
+import {isArray, find} from 'es-toolkit/compat'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 /*

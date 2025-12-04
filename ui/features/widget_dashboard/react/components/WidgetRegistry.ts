@@ -24,6 +24,8 @@ import CourseWorkCombinedWidget from './widgets/CourseWorkCombinedWidget/CourseW
 import CourseGradesWidget from './widgets/CourseGradesWidget/CourseGradesWidget'
 import AnnouncementsWidget from './widgets/AnnouncementsWidget/AnnouncementsWidget'
 import PeopleWidget from './widgets/PeopleWidget/PeopleWidget'
+import TodoListWidget from './widgets/TodoListWidget/TodoListWidget'
+import RecentGradesWidget from './widgets/RecentGradesWidget/RecentGradesWidget'
 
 const widgetRegistry: WidgetRegistry = {
   [WIDGET_TYPES.COURSE_WORK_SUMMARY]: {
@@ -33,17 +35,17 @@ const widgetRegistry: WidgetRegistry = {
   },
   [WIDGET_TYPES.COURSE_WORK]: {
     component: CourseWorkWidget,
-    displayName: 'Course Work',
+    displayName: 'Course work',
     description: 'View and manage all your course assignments and tasks',
   },
   [WIDGET_TYPES.COURSE_WORK_COMBINED]: {
     component: CourseWorkCombinedWidget,
-    displayName: 'Course Work Combined',
+    displayName: 'Course work combined',
     description: 'View course work statistics and assignments in one comprehensive view',
   },
   [WIDGET_TYPES.COURSE_GRADES]: {
     component: CourseGradesWidget,
-    displayName: 'Course Grades',
+    displayName: 'Course grades',
     description: 'Track your grades and academic progress across all courses',
   },
   [WIDGET_TYPES.ANNOUNCEMENTS]: {
@@ -55,6 +57,16 @@ const widgetRegistry: WidgetRegistry = {
     component: PeopleWidget,
     displayName: 'People',
     description: 'View and contact your course instructors and teaching assistants',
+  },
+  [WIDGET_TYPES.TODO_LIST]: {
+    component: TodoListWidget,
+    displayName: 'To-do list',
+    description: 'View and manage your planner items and upcoming tasks',
+  },
+  [WIDGET_TYPES.RECENT_GRADES]: {
+    component: RecentGradesWidget,
+    displayName: 'Recent grades & feedback',
+    description: 'View your recently graded assignments and submissions',
   },
 }
 

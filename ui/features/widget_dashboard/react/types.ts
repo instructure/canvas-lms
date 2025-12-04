@@ -73,6 +73,7 @@ export interface BaseWidgetProps {
   error?: string | null
   onRetry?: () => void
   isEditMode?: boolean
+  dragHandleProps?: any
 }
 
 export interface WidgetRenderer {
@@ -124,4 +125,31 @@ export interface Announcement {
     avatarUrl: string
   } | null
   isRead?: boolean
+}
+
+export interface RecentGradeSubmission {
+  _id: string
+  submittedAt: string | null
+  gradedAt: string | null
+  score: number | null
+  grade: string | null
+  state: string
+  assignment: {
+    _id: string
+    name: string
+    htmlUrl: string
+    pointsPossible: number | null
+    submissionTypes: string[]
+    quiz: {_id: string; title: string} | null
+    discussion: {_id: string; title: string} | null
+    course: {
+      _id: string
+      name: string
+      courseCode?: string
+    }
+  }
+}
+
+export interface GradeItemProps {
+  submission: RecentGradeSubmission
 }

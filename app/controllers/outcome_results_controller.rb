@@ -192,6 +192,7 @@ class OutcomeResultsController < ApplicationController
   include Outcomes::Enrollments
   include Outcomes::ResultAnalytics
   include CanvasOutcomesHelper
+  include AlignmentsHelper
 
   before_action :require_user
   before_action :require_context
@@ -299,9 +300,10 @@ class OutcomeResultsController < ApplicationController
   # @argument include[] [String, "courses"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"outcome_paths"|"users"]
   #   Specify additional collections to be side loaded with the result.
   #
-  # @argument exclude[] [String, "missing_user_rollups"]
-  #   Specify additional values to exclude. "missing_user_rollups" excludes
-  #   rollups for users without results.
+  # @argument exclude[] [String, "missing_user_rollups"|"missing_outcome_results"|"]
+  #   Specify additional values to exclude.
+  #   "missing_user_rollups" excludes rollups for users without results.
+  #   "missing_outcome_results" excludes outcomes without results.
   #
   # @argument sort_by [String, "student"|"outcome"]
   #   If specified, sorts outcome result rollups. "student" sorting will sort
@@ -383,6 +385,62 @@ class OutcomeResultsController < ApplicationController
         end
       end
     end
+  end
+
+  # @API Get contributing scores
+  #
+  # Gets the contributing scores for a specific outcome and set of users.
+  # Contributing scores are the individual assignment/quiz scores that
+  # contributed to the outcome score for each user.
+  #
+  # Returns all alignments for the outcome in the course context.
+  #
+  # @argument user_ids[] [Integer]
+  #   If specified, only the users whose ids are given will be included in the
+  #   results. It is an error to specify an id for a user who is not a student in
+  #   the context.
+  # @argument only_assignment_alignments [Boolean]
+  #   If specified, only assignment alignments will be included in the results.
+  #
+  # @example_response
+  #    {
+  #      "outcome": {
+  #        "id": "1",
+  #        "title": "Outcome 1"
+  #      },
+  #      "alignments": [
+  #        {
+  #          "alignment_id": "123",
+  #          "associated_asset_id": "456",
+  #          "associated_asset_name": "Assignment 1",
+  #          "associated_asset_type": "Assignment"
+  #        }
+  #      ],
+  #      "scores": [
+  #        {
+  #          "user_id": "1",
+  #          "alignment_id": "123",
+  #          "score": 3.5
+  #        }
+  #      ]
+  #    }
+  def contributing_scores
+    unless @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
+      reject! "insufficient permissions", :forbidden
+    end
+
+    @outcome = @outcomes.first
+    reject! "outcome not found" unless @outcome
+
+    alignments = find_all_outcome_alignments(@outcome, @context)
+    only_assignment_alignments = value_to_boolean(params[:only_assignment_alignments])
+
+    canvas_results, os_results = find_canvas_os_results(all_users: false)
+
+    canvas_results = canvas_results.preload(:user, :learning_outcome, alignment: :content)
+    all_results = canvas_results.to_a + (os_results || [])
+
+    render json: contributing_scores_json(@outcome, alignments, all_results, only_assignment_alignments:)
   end
 
   # @API Enqueue a delayed Outcome Rollup Calculation Job
@@ -521,11 +579,13 @@ class OutcomeResultsController < ApplicationController
   # used in sLMGB/LMGB
   def user_rollups(opts = { all_users: false })
     excludes = Api.value_to_array(params[:exclude]).uniq
-    filter_users_by_excludes
+
+    filter_enrollment_status
 
     ff_read_enabled = Account.site_admin.feature_enabled?(:outcomes_rollup_read)
 
     if ff_read_enabled
+      # TODO: Handle students/outcomes with no results filter (ticket: OUTC-422)
       stored_outcome_rollups(
         users: opts[:all_users] ? @all_users : @users,
         context: @context,
@@ -534,6 +594,9 @@ class OutcomeResultsController < ApplicationController
       )
     else
       @results, @outcome_service_results = find_canvas_os_results(opts)
+
+      remove_users_without_results(@results, @outcome_service_results) if excludes.include?("missing_user_rollups")
+      remove_outcomes_without_results(@results, @outcome_service_results) if excludes.include?("missing_outcome_results")
 
       @results = @results.preload(:user)
       ActiveRecord::Associations.preload(@results, :learning_outcome)
@@ -546,13 +609,9 @@ class OutcomeResultsController < ApplicationController
     end
   end
 
-  def filter_users_by_excludes(aggregate = false)
+  # Filters @users based on enrollment status (concluded/inactive enrollments)
+  def filter_enrollment_status
     excludes = Api.value_to_array(params[:exclude]).uniq
-    # exclude users with no results (if being requested) before we paginate,
-    # otherwise we end up with users in the pagination that may have no rollups,
-    # which will inflate the pagination total count
-    remove_users_with_no_results if excludes.include?("missing_user_rollups") && !aggregate
-
     exclude_concluded = excludes.include? "concluded_enrollments"
     exclude_inactive = excludes.include? "inactive_enrollments"
     return unless exclude_concluded || exclude_inactive
@@ -582,22 +641,21 @@ class OutcomeResultsController < ApplicationController
     @users = user_query.distinct
   end
 
-  # used in LMGB
-  # For merge & after performance testing
-  # Flagging potential issue - no reason to pull all the results for finding users
-  # why not send the already pulled results to the definition and use that to filter
-  def remove_users_with_no_results
-    userids_with_results, os_userids_with_results = find_canvas_os_results
-    userids_with_results = userids_with_results.pluck(:user_id).uniq
+  # Removes users without results based on already-fetched results
+  def remove_users_without_results(canvas_results, os_results)
+    user_ids_with_results = canvas_results.pluck(:user_id).uniq
+    user_ids_with_results |= os_results.pluck(:user_id) if os_results.present?
 
-    if os_userids_with_results.nil?
-      @users = @users.select { |u| userids_with_results.include? u.id }
+    @users = @users.select { |u| user_ids_with_results.include?(u.id) }
+  end
 
-    else
-      os_userids_with_results = os_userids_with_results.pluck(:user_id).uniq
-      os_userids_with_results.push(userids_with_results).flatten!
-      @users = @users.select { |u| os_userids_with_results.include? u.id }
-    end
+  # Removes outcomes without results based on already-fetched results
+  def remove_outcomes_without_results(canvas_results, os_results)
+    outcome_ids_with_results = canvas_results.pluck(:learning_outcome_id).uniq
+    outcome_ids_with_results |= os_results.pluck(:learning_outcome_id) if os_results.present?
+
+    @outcome_links = @outcome_links.select { |link| outcome_ids_with_results.include?(link.content_id) }
+    @outcomes = @outcome_links.map(&:learning_outcome_content)
   end
 
   def current_user_enrollments
@@ -663,7 +721,8 @@ class OutcomeResultsController < ApplicationController
   def aggregate_rollups_json
     # calculating averages for all users in the context and only returning one
     # rollup, so don't paginate users in this method.
-    filter_users_by_excludes(true)
+
+    filter_enrollment_status
 
     @results, @outcome_service_results = find_canvas_os_results(all_users: false)
     @results = @results.preload(:user)
@@ -795,7 +854,14 @@ class OutcomeResultsController < ApplicationController
     @outcome_groups = @context.learning_outcome_groups
     outcome_group_ids = @outcome_groups.pluck(:id)
     @outcome_links = []
-    if params[:outcome_group_id]
+    if params[:outcome_id]
+      outcome_id = params[:outcome_id].to_i
+      @outcome_links = ContentTag.learning_outcome_links.active.preload(:learning_outcome_content)
+                                 .where(content_id: outcome_id, context: @context)
+                                 .select("DISTINCT ON (content_tags.content_id) content_tags.*")
+      @outcomes = @outcome_links.map(&:learning_outcome_content)
+      reject! "outcome not found in this context" if @outcomes.empty?
+    elsif params[:outcome_group_id]
       group_id = params[:outcome_group_id].to_i
       reject! "can only include an outcome group id in the outcome context" unless outcome_group_ids.include?(group_id)
       @outcome_links = ContentTag.learning_outcome_links.active.where(associated_asset_id: group_id).preload(:learning_outcome_content)

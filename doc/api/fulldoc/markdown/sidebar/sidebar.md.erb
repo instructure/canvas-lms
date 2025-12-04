@@ -16,7 +16,7 @@
   * Resources
     <% options[:resources].each do |(resource, controllers)|
       next if resource.include?('Plagiarism')
-      link = url_for("#{topicize resource}.md") %>
+      link = url_for("#{DocumentationHelpers.topicize resource}.md") %>
     * [<%= resource %>](<%= link %>)
     <% end %>
   * Outcomes
@@ -60,7 +60,7 @@
       <% end %>
       * [Overview](file.plagiarism_platform.md)
       <% @plagiarism_file_list.each do |resource| %>
-      <% link = url_for("#{topicize resource}.md") %>
+      <% link = url_for("#{DocumentationHelpers.topicize resource}.md") %>
       * [<%= resource %>](<%= link %>)
       <% end %>
       * [JWT Access Tokens](file.jwt_access_tokens.md)

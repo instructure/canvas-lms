@@ -42,6 +42,11 @@ describe "layouts/application" do
       render "layouts/application"
       expect(doc.at_css(".ic-app.content-only")).to be_present
     end
+
+    it "renders the flash notices partial" do
+      render "layouts/application"
+      expect(doc.at_css("#flash_message_holder")).to be_present
+    end
   end
 
   context "with @show_footer" do

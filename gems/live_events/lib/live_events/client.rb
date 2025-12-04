@@ -119,7 +119,9 @@ module LiveEvents
 
       pusher = @worker || LiveEvents.worker
 
-      unless pusher.push(event, partition_key)
+      if pusher.push(event, partition_key)
+        LiveEvents.logger.info("Successfully queued job for live event: #{event.to_json}")
+      else
         LiveEvents.logger.error("Error queueing job for live event: #{event.to_json}")
         LiveEvents.statsd&.distributed_increment("#{statsd_prefix}.queue_full_errors", tags:)
       end

@@ -905,5 +905,80 @@ describe "submissions/show" do
         expect(response.body).to include('id="asset_report_modal"')
       end
     end
+
+    context "when submission is discussion_topic" do
+      let(:discussion_assignment) { @course.assignments.create!(submission_types: "discussion_topic") }
+      let(:discussion_submission) do
+        discussion_assignment.submit_homework(student, submission_type: "discussion_topic")
+      end
+
+      before do
+        assign(:assignment, discussion_assignment)
+        assign(:submission, discussion_submission)
+        assign(:context, @course)
+        assign(:current_user, student)
+      end
+
+      it "renders asset report status container with discussion_topic submission type" do
+        render "submissions/show"
+
+        expect(response.body).to include('id="asset_report_status_container"')
+        expect(response.body).to match(/id="asset_report_status_container"[^>]*data-submission-type="discussion_topic"/)
+      end
+    end
+
+    context "with checkpointed discussions" do
+      let_once(:checkpointed_topic) { DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion") }
+      let_once(:checkpointed_assignment) { checkpointed_topic.assignment }
+      let_once(:checkpoint_student) do
+        course_with_user("StudentEnrollment", course: @course, active_all: true).user
+      end
+
+      before :once do
+        # Create checkpoint sub-assignments
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: checkpointed_topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 3
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: checkpointed_topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 5.days.from_now }],
+          points_possible: 7
+        )
+      end
+
+      let_once(:checkpointed_submission) do
+        # For checkpointed discussions, the main submission won't have a
+        # submission_type until both checkpoints are complete
+        checkpointed_assignment.submission_for_student(checkpoint_student)
+      end
+
+      before do
+        view_context(@course, checkpoint_student)
+        assign(:assignment, checkpointed_assignment)
+        assign(:submission, checkpointed_submission)
+
+        # For checkpointed discussions, also need to assign the sub-assignment submissions
+        reply_to_topic_assignment = checkpointed_assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+        reply_to_entry_assignment = checkpointed_assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+        assign(:reply_to_topic_assignment, reply_to_topic_assignment)
+        assign(:reply_to_entry_assignment, reply_to_entry_assignment)
+        assign(:reply_to_topic_submission, reply_to_topic_assignment.submissions.find_by(user: checkpoint_student))
+        assign(:reply_to_entry_submission, reply_to_entry_assignment.submissions.find_by(user: checkpoint_student))
+      end
+
+      it "renders asset report status container with discussion_topic even when submission_type is nil" do
+        # Checkpointed discussions have nil submission_type until fully submitted
+        expect(checkpointed_submission.submission_type).to be_nil
+
+        render "submissions/show"
+
+        expect(response.body).to include('id="asset_report_status_container"')
+        expect(response.body).to match(/id="asset_report_status_container"[^>]*data-submission-type="discussion_topic"/)
+      end
+    end
   end
 end

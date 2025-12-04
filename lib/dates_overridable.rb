@@ -555,7 +555,12 @@ module DatesOverridable
       if tag_info[:due_date] < Time.zone.now &&
          (is_a?(Quizzes::Quiz) || (is_a?(AbstractAssignment) && expects_submission?)) &&
          !has_submission
-        tag_info[:past_due] = true
+        submission = if is_a?(Quizzes::Quiz)
+                       quiz_submissions.find_by(user:)
+                     else
+                       submissions.find_by(user:)
+                     end
+        tag_info[:past_due] = true unless submission&.excused?
       end
 
       tag_info[:due_date] = tag_info[:due_date].utc.iso8601

@@ -214,4 +214,129 @@ describe Canvas do
       expect(Canvas.infer_user("someuser")).to eq(user)
     end
   end
+
+  describe ".load_config_from_consul" do
+    let(:sample_config) do
+      {
+        "key" => "value",
+        "nested" => { "data" => "test" }
+      }
+    end
+
+    before do
+      allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("production"))
+    end
+
+    it "loads config from Consul when available" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).with("test_config.yml", any_args).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul("test_config")
+      expect(config).to eq({ "key" => "value", "nested" => { "data" => "test" } })
+    end
+
+    it "falls back to ConfigFile when Consul returns empty" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).with("test_config.yml", any_args).and_return(nil)
+      allow(ConfigFile).to receive(:load).with("test_config", "production").and_return({ "fallback" => "data" })
+
+      config = Canvas.load_config_from_consul("test_config")
+      expect(config).to eq({ "fallback" => "data" })
+    end
+
+    it "falls back to ConfigFile when Consul raises an error" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).and_raise(StandardError, "Consul connection failed")
+      allow(ConfigFile).to receive(:load).with("test_config", "production").and_return({ "fallback" => "data" })
+
+      config = Canvas.load_config_from_consul("test_config")
+      expect(config).to eq({ "fallback" => "data" })
+    end
+
+    it "uses failsafe_cache when specified" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      expect(proxy).to receive(:[]).with("test_config.yml", failsafe_cache: Rails.root.join("config")).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul("test_config", failsafe_cache: true)
+      expect(config).to eq({ "key" => "value", "nested" => { "data" => "test" } })
+    end
+
+    it "accepts cluster parameter" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      expect(DynamicSettings).to receive(:find).with(tree: :private, cluster: "cluster21", default_ttl: 5.minutes).and_return(proxy)
+      allow(proxy).to receive(:[]).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul("test_config", cluster: "cluster21")
+      expect(config).to eq({ "key" => "value", "nested" => { "data" => "test" } })
+    end
+
+    it "accepts custom TTL" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      expect(DynamicSettings).to receive(:find).with(tree: :private, cluster: nil, default_ttl: 10.minutes).and_return(proxy)
+      allow(proxy).to receive(:[]).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul("test_config", default_ttl: 10.minutes)
+      expect(config).to eq({ "key" => "value", "nested" => { "data" => "test" } })
+    end
+
+    it "returns config with indifferent access" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul("test_config")
+      expect(config[:key]).to eq("value")
+      expect(config["key"]).to eq("value")
+    end
+  end
+
+  describe ".load_config_from_consul_only" do
+    let(:sample_config) do
+      {
+        "key" => "value",
+        "nested" => { "data" => "test" }
+      }
+    end
+
+    it "loads config from Consul when available" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).with("test_config.yml", failsafe_cache: false).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul_only("test_config")
+      expect(config).to eq({ "key" => "value", "nested" => { "data" => "test" } })
+    end
+
+    it "returns nil when Consul has no config" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).with("test_config.yml", failsafe_cache: false).and_return(nil)
+
+      config = Canvas.load_config_from_consul_only("test_config")
+      expect(config).to be_nil
+    end
+
+    it "does not fall back to ConfigFile" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).with("test_config.yml", failsafe_cache: false).and_return(nil)
+      expect(ConfigFile).not_to receive(:load)
+
+      Canvas.load_config_from_consul_only("test_config")
+    end
+
+    it "returns config with indifferent access" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul_only("test_config")
+      expect(config[:key]).to eq("value")
+      expect(config["key"]).to eq("value")
+    end
+  end
 end

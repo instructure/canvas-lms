@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import {each, isEmpty, extend as lodashExtend} from 'lodash'
+import {each, isEmpty, extend as lodashExtend} from 'es-toolkit/compat'
 import CollectionView from '@canvas/backbone-collection-view'
 import 'jqueryui/sortable'
 import '@canvas/jquery/jquery.simulate'

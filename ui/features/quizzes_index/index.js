@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {map} from 'lodash'
+import {map} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import QuizItemGroupView from './backbone/views/QuizItemGroupView'
 import NoQuizzesView from './backbone/views/NoQuizzesView'

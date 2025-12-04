@@ -37,6 +37,20 @@ module WikiPageVisibility
           )
         end
       end
+
+      def invalidate_cache(course_ids: nil, user_ids: nil, wiki_page_ids: nil, include_concluded: true)
+        unless course_ids || wiki_page_ids
+          raise ArgumentError, "at least one non nil course_id or wiki_page_id is required (for query performance reasons)"
+        end
+
+        course_ids = Array(course_ids) if course_ids
+        user_ids = Array(user_ids) if user_ids
+        wiki_page_ids = Array(wiki_page_ids) if wiki_page_ids
+
+        key = service_cache_key(service: name, course_ids:, user_ids:, additional_ids: wiki_page_ids, include_concluded:)
+
+        Rails.cache.delete(key)
+      end
     end
   end
 end

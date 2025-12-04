@@ -207,21 +207,30 @@ class ContextModule < ActiveRecord::Base
   end
 
   def send_items_to_stream
-    if saved_change_to_workflow_state? && workflow_state == "active"
-      content_tags.where(content_type: "DiscussionTopic", workflow_state: "active").preload(:content).each do |ct|
-        ct.content.send_items_to_stream
-      end
+    return unless saved_change_to_workflow_state? && workflow_state == "active"
+
+    topics = DiscussionTopic
+             .where(id: content_tags.where(content_type: "DiscussionTopic", workflow_state: "active").select(:content_id))
+             .preload(:stream_item, :assignment_overrides, :discussion_topic_participants, :root_discussion_entries, context_module_tags: { context_module: :context }, context: { enrollments: [:user, :enrollment_state] })
+             .load
+
+    topic_ids_in_unpublished_modules = batch_load_unpublished_topic_ids(topics.map(&:id))
+
+    topics.each do |topic|
+      topic.send_items_to_stream(topic_ids_in_unpublished_modules:)
     end
   end
 
   def clear_discussion_stream_items
-    if saved_change_to_workflow_state? &&
-       ["active", nil].include?(workflow_state_before_last_save) &&
-       workflow_state == "unpublished"
-      content_tags.where(content_type: "DiscussionTopic", workflow_state: "active").preload(:content).each do |ct|
-        ct.content.clear_stream_items
-      end
-    end
+    return unless saved_change_to_workflow_state? &&
+                  ["active", nil].include?(workflow_state_before_last_save) &&
+                  workflow_state == "unpublished"
+
+    topics = content_tags.where(content_type: "DiscussionTopic", workflow_state: "active")
+                         .preload(content: { stream_item: [:context, :stream_item_instances] })
+                         .filter_map(&:content)
+
+    topics.each(&:clear_stream_items)
   end
 
   # This is intended for duplicating a content tag when we are duplicating a module
@@ -375,7 +384,7 @@ class ContextModule < ActiveRecord::Base
   alias_method :published?, :active?
 
   def publish_items!(progress: nil)
-    content_tags.each do |content_tag|
+    content_tags.preload(content: %i[assignment_overrides discussion_topic_section_visibilities sub_assignments context_module_tags]).load.each do |content_tag|
       break if progress&.reload&.failed?
 
       content_tag.trigger_publish!
@@ -383,7 +392,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def unpublish_items!(progress: nil)
-    content_tags.each do |content_tag|
+    content_tags.preload(:content).load.each do |content_tag|
       break if progress&.reload&.failed?
 
       content_tag.trigger_unpublish!
@@ -1097,5 +1106,21 @@ class ContextModule < ActiveRecord::Base
 
     assignments_quizzes = module_assignments + module_quizzes_and_discussions
     Assignment.where(id: assignments_quizzes)
+  end
+
+  private
+
+  def batch_load_unpublished_topic_ids(topic_ids)
+    unpublished_from_tags = ContentTag.where(content_type: "DiscussionTopic",
+                                             content_id: topic_ids,
+                                             workflow_state: "unpublished")
+                                      .pluck(:content_id)
+    unpublished_from_modules = ContextModule.joins(:content_tags)
+                                            .where(content_tags: { content_type: "DiscussionTopic", content_id: topic_ids })
+                                            .where(workflow_state: "unpublished")
+                                            .where.not(id:)
+                                            .pluck("content_tags.content_id")
+
+    (unpublished_from_tags + unpublished_from_modules).uniq
   end
 end

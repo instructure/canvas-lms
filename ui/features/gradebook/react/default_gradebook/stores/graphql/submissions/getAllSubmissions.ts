@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {getAllPages, GetAllPagesCallbacks, GetAllPagesReturnValue} from '../getAllPages'
-import {mapValues} from 'lodash'
+import {mapValues} from 'es-toolkit/compat'
 import {
   getSubmissions,
   GetSubmissionsParams,

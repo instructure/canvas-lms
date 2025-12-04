@@ -2112,6 +2112,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/lti_registrations/:id/overlay_history", action: :overlay_history
       get "accounts/:account_id/lti_registrations/:id/history", action: :history, as: :lti_registration_history
       get "accounts/:account_id/lti_registration_by_client_id/:client_id", action: :show_by_client_id
+      get "accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id", action: :show_registration_update_request, as: "lti_registration_update_request"
       put "accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id/apply", action: :apply_registration_update_request, as: "apply_lti_registration_update_request"
       put "accounts/:account_id/lti_registrations/:id", action: :update
       put "accounts/:account_id/lti_registrations/:id/reset", action: :reset
@@ -2483,6 +2484,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :outcome_results) do
       get "courses/:course_id/outcome_rollups", action: :rollups, as: "course_outcome_rollups"
       get "courses/:course_id/outcome_results", action: :index, as: "course_outcome_results"
+      get "courses/:course_id/outcomes/:outcome_id/contributing_scores", action: :contributing_scores, as: "course_outcome_contributing_scores"
       post "courses/:course_id/assign_outcome_order", action: :outcome_order, as: "course_outcomes_order"
       post "enqueue_outcome_rollup_calculation", action: :enqueue_outcome_rollup_calculation
     end
@@ -3156,6 +3158,7 @@ CanvasRails::Application.routes.draw do
       get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
       post "registrations", action: :create, as: :create_lti_registration
       put "registrations/:registration_id", action: :update, as: :update_lti_registration
+      get "registrations/:registration_id", action: :show_configuration, as: :get_lti_registration
     end
 
     # Public JWK Service

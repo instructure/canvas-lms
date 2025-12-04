@@ -97,7 +97,7 @@ add_reference :accounts, :course_template,
 
 Using this form bypasses validating rows in the referenced table against the newly added column in the referring table, as it is implicitly empty. This is convenient, because validating a foreign key constraint for an entire table requires an _exclusive_ lock against that table, which can be inconvenient if you're adding a foreign key to users.
 
-When adding a FOREIGN KEY, you should almost always include index: true, as otherwise deletion of rows in the referenced table requires full table scans of this table, which is almost always undesirable.
+When adding a FOREIGN KEY, you should almost always include an index. **For nullable foreign keys, recommend using a partial index** with `where: "column_name IS NOT NULL"` as shown in the example above. This reduces index size, improves performance, and saves storage by only indexing rows where the foreign key actually has a value. If most of the values are not nulls in the table, you should NOT use partial index, in this case the normal index is better.
 
 In the past, it was very inefficient to add a column with a default to a large table, so we had to do a 3 step process (add column with no default, set the default (meaning it applies to new rows), backfill default on old rows). However, as of PG 11, this is no longer a concern, [adding a column with a default is now efficient and fine.](https://www.depesz.com/2018/04/04/waiting-for-postgresql-11-fast-alter-table-add-column-with-a-non-null-default/)
 
@@ -123,7 +123,17 @@ Make sure there are **no references** to the table anywhere in the application c
 
 To add an index to a large table without locking it up and causing problems, you'll need to use disable_ddl_transaction! and then pass the algorithm: :concurrently option to add_index. Assume that all tables are large, unless you're absolutely sure it's not. See for example db/migrate/20140507204231_add_foreign_key_indexes.rb
 
-Keep in mind that there are scenarios where a predeploy migration is the better option when adding an index, like when new app code is being deployed that will not be performant without the index. But if it’s an especially large table that already exists and has queries running against, and the index simply makes existing queries execute a bit better, it may be better to add the index in a postdeploy so that it’s not blocking the critical path of deploying the new release.
+**Partial Indexes for sparse Nullable Columns**
+
+Example of a partial index on a nullable foreign key:
+```ruby
+add_index :table_name, :nullable_foreign_key_id,
+  where: "nullable_foreign_key_id IS NOT NULL",
+  algorithm: :concurrently,
+  if_not_exists: true
+```
+
+Keep in mind that there are scenarios where a predeploy migration is the better option when adding an index, like when new app code is being deployed that will not be performant without the index. But if it's an especially large table that already exists and has queries running against, and the index simply makes existing queries execute a bit better, it may be better to add the index in a postdeploy so that it's not blocking the critical path of deploying the new release.
 
 **Removing a column: postdeploy**
 

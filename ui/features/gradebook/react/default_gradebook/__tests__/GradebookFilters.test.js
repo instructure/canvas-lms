@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {map} from 'lodash'
+import {map} from 'es-toolkit/compat'
 import 'jquery-migrate'
 import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import ContentFilterDriver from '@canvas/grading/content-filters/ContentFilterDriver'

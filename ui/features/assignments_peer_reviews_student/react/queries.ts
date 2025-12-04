@@ -25,6 +25,12 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
       name
       dueAt
       description
+      assessmentRequestsForCurrentUser {
+        _id
+        available
+        workflowState
+        createdAt
+      }
     }
   }
 `

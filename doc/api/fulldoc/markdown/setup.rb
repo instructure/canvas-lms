@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "..")) # doc/api/ directory
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "html", "swagger"))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "html", "api_scopes"))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "decorator"))
@@ -27,6 +28,7 @@ require "api_scope_mapping_writer"
 require "decorator"
 require "fileutils"
 require "nokogiri"
+require "documentation_helpers"
 
 Rails.root.glob("doc/api/data_services/*.rb").sort.each { |file| require file }
 require_relative "../../permissions/permissions_markdown_creator"
@@ -54,11 +56,11 @@ module YARD::Templates::Helpers::BaseHelper
     if args.first.is_a?(String) && args.first =~ /^api:([^#]+)#(.*)/
       topic, controller = *lookup_topic($1.to_s)
       if topic
-        md_file = "#{topicize topic.first}.md"
+        md_file = "#{DocumentationHelpers.topicize topic.first}.md"
         action = $2
         name = controller.name.to_s
         name = "#{controller.namespace.name}/#{name}" if controller.namespace.name != :root
-        link_url("#{md_file}#method.#{topicize(name).sub("_controller", "")}.#{action}", args[1])
+        link_url("#{md_file}#method.#{DocumentationHelpers.topicize(name).sub("_controller", "")}.#{action}", args[1])
       else
         raise "couldn't find API link for #{args.first}"
       end
@@ -87,7 +89,7 @@ module YARD::Templates::Helpers::BaseHelper
       topic, _controller = *lookup_topic(appendix.namespace.to_s)
 
       if topic
-        md_file = "#{topicize topic.first}.md"
+        md_file = "#{DocumentationHelpers.topicize topic.first}.md"
         bookmark = "#{appendix.name.to_s.tr(" ", "+")}-appendix"
         link_url("#{md_file}##{bookmark}", appendix.title)
       else
@@ -135,10 +137,6 @@ end
 module YARD::Templates::Helpers::HtmlHelper
   include CanvasAPI::Deprecatable
 
-  def topicize(str)
-    str.tr(" ", "_").underscore
-  end
-
   def trim_and_br(str)
     str.strip.gsub(/\n+/, "<br>")
   end
@@ -172,7 +170,7 @@ module YARD::Templates::Helpers::HtmlHelper
       raise errmsg
     end
 
-    md_file = "#{topicize topic.first}.md"
+    md_file = "#{DocumentationHelpers.topicize topic.first}.md"
     bookmark = "#{appendix.name.to_s.tr(" ", "+")}-appendix"
     link_url("#{md_file}##{bookmark}", appendix.title)
   end
@@ -193,7 +191,7 @@ def init
 
   options[:page_title] = "Canvas LMS REST API Documentation"
 
-  build_json_objects_map
+  options[:json_objects_map], options[:json_objects] = DocumentationHelpers.build_json_objects_map(options[:resources])
 
   serialize_index
   serialize_markdown_pages
@@ -243,7 +241,7 @@ end
 def serialize_resource(resource, controllers)
   options[:object] = resource
   options[:controllers] = controllers
-  Templates::Engine.with_serializer("#{topicize resource}.md", options[:serializer]) do
+  Templates::Engine.with_serializer("#{DocumentationHelpers.topicize resource}.md", options[:serializer]) do
     T("layout").run(options.merge(page_title: resource + " - " + options[:page_title]))
   end
   options.delete(:controllers)
@@ -276,23 +274,6 @@ def serialize_markdown_pages
     serialize("file." + filename, page_title: extract_page_title_from_markdown(file))
     options.delete(:file)
   end
-end
-
-def build_json_objects_map
-  obj_map = {}
-  resource_obj_list = {}
-  options[:resources].each do |r, cs|
-    cs.each do |controller|
-      (controller.tags(:object) + controller.tags(:model)).each do |obj|
-        name, json = obj.text.split(/\n+/, 2).map(&:strip)
-        obj_map[name] = topicize r
-        resource_obj_list[r] ||= []
-        resource_obj_list[r] << [name, json]
-      end
-    end
-  end
-  options[:json_objects_map] = obj_map
-  options[:json_objects] = resource_obj_list
 end
 
 def generate_toc(output_path)

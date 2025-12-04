@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {some} from 'lodash'
+import {some} from 'es-toolkit/compat'
 
 // Mixin to make your (Paginated)CollectionView filterable on the client
 // side. Just put an <input class="filterable> in your template, mix in

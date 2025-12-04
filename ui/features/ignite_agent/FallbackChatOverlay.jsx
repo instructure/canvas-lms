@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {useScope as createI18nScope} from '@canvas/i18n'
-const I18n = createI18nScope('QRMobileLogin')
+const I18n = createI18nScope('IgniteAgent')
 
 import React from 'react'
 import {View} from '@instructure/ui-view'

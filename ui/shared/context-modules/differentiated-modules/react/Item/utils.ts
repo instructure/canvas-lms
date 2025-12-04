@@ -33,6 +33,9 @@ type UseDatesHookArgs = {
   due_at: string | null
   unlock_at: string | null
   lock_at: string | null
+  peer_review_available_from: string | null
+  peer_review_available_to: string | null
+  peer_review_due_at: string | null
   cardId: string
   onCardDatesChange?: (cardId: string, dateAttribute: string, dateValue: string | null) => void
 }
@@ -91,6 +94,24 @@ type UseDatesHookResult = [
   // setAvailableToDate
   (availableToDate: string | null) => void,
   // handleAvailableToDateChange
+  (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => void,
+  // peerReviewAvailableToDate
+  string | null,
+  // setPeerReviewAvailableToDate
+  (peerReviewAvailableToDate: string | null) => void,
+  // handlePeerReviewAvailableToDateChange
+  (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => void,
+  // peerReviewAvailableFromDate
+  string | null,
+  // setPeerReviewAvailableFromDate
+  (peerReviewAvailableFromDate: string | null) => void,
+  // handlePeerReviewAvailableFromDateChange
+  (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => void,
+  // peerReviewDueDate
+  string | null,
+  // setPeerReviewDueDate
+  (peerReviewDueDate: string | null) => void,
+  // handlePeerReviewDueDateChange
   (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => void,
 ]
 
@@ -173,6 +194,9 @@ export function useDates({
   unlock_at,
   lock_at,
   cardId,
+  peer_review_available_to,
+  peer_review_available_from,
+  peer_review_due_at,
   onCardDatesChange,
 }: UseDatesHookArgs): UseDatesHookResult {
   const [requiredRepliesDueDate, setRequiredRepliesDueDate] = useState<string | null>(
@@ -184,6 +208,29 @@ export function useDates({
   const [dueDate, setDueDate] = useState<string | null>(due_at)
   const [availableFromDate, setAvailableFromDate] = useState<string | null>(unlock_at)
   const [availableToDate, setAvailableToDate] = useState<string | null>(lock_at)
+
+  const [peerReviewAvailableToDate, setPeerReviewAvailableToDate] = useState<string | null>(
+    peer_review_available_to,
+  )
+  const [peerReviewAvailableFromDate, setPeerReviewAvailableFromDate] = useState<string | null>(
+    peer_review_available_from,
+  )
+  const [peerReviewDueDate, setPeerReviewDueDate] = useState<string | null>(peer_review_due_at)
+
+  useEffect(() => {
+    onCardDatesChange?.(cardId, 'peer_review_available_to', peerReviewAvailableToDate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [peerReviewAvailableToDate])
+
+  useEffect(() => {
+    onCardDatesChange?.(cardId, 'peer_review_available_from', peerReviewAvailableFromDate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [peerReviewAvailableFromDate])
+
+  useEffect(() => {
+    onCardDatesChange?.(cardId, 'peer_review_due_at', peerReviewDueDate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [peerReviewDueDate])
 
   useEffect(() => {
     onCardDatesChange?.(cardId, 'required_replies_due_at', requiredRepliesDueDate)
@@ -316,6 +363,60 @@ export function useDates({
     [availableToDate],
   )
 
+  const handlePeerReviewAvailableToDateChange = useCallback(
+    (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => {
+      const chosenPeerReviewAvailableToDate = peerReviewAvailableToDate
+        ? value
+        : timeValue === ''
+          ? setTimeToStringDate('23:59:00', value)
+          : value
+      const newPeerReviewAvailableToDate = setSeconds(chosenPeerReviewAvailableToDate)
+      // When user uses calendar pop-up type is "click", but for KB is "blur"
+      if (_event.type !== 'blur') {
+        setPeerReviewAvailableToDate(newPeerReviewAvailableToDate || null)
+      } else {
+        setTimeout(() => setPeerReviewAvailableToDate(newPeerReviewAvailableToDate || null), 0)
+      }
+    },
+    [peerReviewAvailableToDate],
+  )
+
+  const handlePeerReviewAvailableFromDateChange = useCallback(
+    (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => {
+      const chosenPeerReviewAvailableFromDate = peerReviewAvailableFromDate
+        ? value
+        : timeValue === ''
+          ? setTimeToStringDate('00:00:00', value)
+          : value
+      const newPeerReviewAvailableFromDate = setSeconds(chosenPeerReviewAvailableFromDate)
+      // When user uses calendar pop-up type is "click", but for KB is "blur"
+      if (_event.type !== 'blur') {
+        setPeerReviewAvailableFromDate(newPeerReviewAvailableFromDate || null)
+      } else {
+        setTimeout(() => setPeerReviewAvailableFromDate(newPeerReviewAvailableFromDate || null), 0)
+      }
+    },
+    [peerReviewAvailableFromDate],
+  )
+
+  const handlePeerReviewDueDateChange = useCallback(
+    (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => {
+      const chosenPeerReviewDueDate = peerReviewDueDate
+        ? value
+        : timeValue === ''
+          ? setTimeToStringDate('00:00:00', value)
+          : value
+      const newPeerReviewDueDate = setSeconds(chosenPeerReviewDueDate)
+      // When user uses calendar pop-up type is "click", but for KB is "blur"
+      if (_event.type !== 'blur') {
+        setPeerReviewDueDate(newPeerReviewDueDate || null)
+      } else {
+        setTimeout(() => setPeerReviewDueDate(newPeerReviewDueDate || null), 0)
+      }
+    },
+    [peerReviewDueDate],
+  )
+
   return [
     requiredRepliesDueDate,
     setRequiredRepliesDueDate,
@@ -332,6 +433,15 @@ export function useDates({
     availableToDate,
     setAvailableToDate,
     handleAvailableToDateChange,
+    peerReviewAvailableToDate,
+    setPeerReviewAvailableToDate,
+    handlePeerReviewAvailableToDateChange,
+    peerReviewAvailableFromDate,
+    setPeerReviewAvailableFromDate,
+    handlePeerReviewAvailableFromDateChange,
+    peerReviewDueDate,
+    setPeerReviewDueDate,
+    handlePeerReviewDueDateChange,
   ]
 }
 
@@ -353,6 +463,9 @@ export const generateCardActionLabels = (selected: string[]) => {
         clearRequiredRepliesDueAt: I18n.t('Clear required replies due date/time'),
         clearAvailableFrom: I18n.t('Clear available from date/time'),
         clearAvailableTo: I18n.t('Clear until date/time'),
+        clearPeerReviewAvailableTo: I18n.t('Clear peer review available to date/time'),
+        clearPeerReviewAvailableFrom: I18n.t('Clear peer review available from date/time'),
+        clearPeerReviewDueAt: I18n.t('Clear peer review due date/time'),
       }
     }
     case 1:
@@ -369,6 +482,17 @@ export const generateCardActionLabels = (selected: string[]) => {
           pillA: selected[0],
         }),
         clearAvailableTo: I18n.t('Clear until date/time for %{pillA}', {pillA: selected[0]}),
+        clearPeerReviewAvailableTo: I18n.t(
+          'Clear peer review available to date/time for %{pillA}',
+          {pillA: selected[0]},
+        ),
+        clearPeerReviewAvailableFrom: I18n.t(
+          'Clear peer review available from date/time for %{pillA}',
+          {pillA: selected[0]},
+        ),
+        clearPeerReviewDueAt: I18n.t('Clear peer review due date/time for %{pillA}', {
+          pillA: selected[0],
+        }),
       }
     case 2:
       return {
@@ -399,6 +523,24 @@ export const generateCardActionLabels = (selected: string[]) => {
           pillB: selected[1],
         }),
         clearAvailableTo: I18n.t('Clear until date/time for %{pillA} and %{pillB}', {
+          pillA: selected[0],
+          pillB: selected[1],
+        }),
+        clearPeerReviewAvailableTo: I18n.t(
+          'Clear peer review available to date/time for %{pillA} and %{pillB}',
+          {
+            pillA: selected[0],
+            pillB: selected[1],
+          },
+        ),
+        clearPeerReviewAvailableFrom: I18n.t(
+          'Clear peer review available from date/time for %{pillA} and %{pillB}',
+          {
+            pillA: selected[0],
+            pillB: selected[1],
+          },
+        ),
+        clearPeerReviewDueAt: I18n.t('Clear peer review due date/time for %{pillA} and %{pillB}', {
           pillA: selected[0],
           pillB: selected[1],
         }),
@@ -440,6 +582,30 @@ export const generateCardActionLabels = (selected: string[]) => {
           pillB: selected[1],
           pillC: selected[2],
         }),
+        clearPeerReviewAvailableTo: I18n.t(
+          'Clear peer review available to date/time for %{pillA}, %{pillB}, and %{pillC}',
+          {
+            pillA: selected[0],
+            pillB: selected[1],
+            pillC: selected[2],
+          },
+        ),
+        clearPeerReviewAvailableFrom: I18n.t(
+          'Clear peer review available from date/time for %{pillA}, %{pillB}, and %{pillC}',
+          {
+            pillA: selected[0],
+            pillB: selected[1],
+            pillC: selected[2],
+          },
+        ),
+        clearPeerReviewDueAt: I18n.t(
+          'Clear peer review due date/time for %{pillA}, %{pillB}, and %{pillC}',
+          {
+            pillA: selected[0],
+            pillB: selected[1],
+            pillC: selected[2],
+          },
+        ),
       }
     default:
       return {
@@ -478,6 +644,30 @@ export const generateCardActionLabels = (selected: string[]) => {
           pillB: selected[1],
           n: selected.length - 2,
         }),
+        clearPeerReviewAvailableTo: I18n.t(
+          'Clear peer review available to date/time for %{pillA}, %{pillB}, and %{n} others',
+          {
+            pillA: selected[0],
+            pillB: selected[1],
+            n: selected.length - 2,
+          },
+        ),
+        clearPeerReviewAvailableFrom: I18n.t(
+          'Clear peer review available from date/time for %{pillA}, %{pillB}, and %{n} others',
+          {
+            pillA: selected[0],
+            pillB: selected[1],
+            n: selected.length - 2,
+          },
+        ),
+        clearPeerReviewDueAt: I18n.t(
+          'Clear peer review due date/time for %{pillA}, %{pillB}, and %{n} others',
+          {
+            pillA: selected[0],
+            pillB: selected[1],
+            n: selected.length - 2,
+          },
+        ),
       }
   }
 }

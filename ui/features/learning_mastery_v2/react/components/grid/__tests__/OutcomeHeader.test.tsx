@@ -18,11 +18,12 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import {pick} from 'lodash'
+import {pick} from 'es-toolkit/compat'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 import {OutcomeHeader, OutcomeHeaderProps} from '../OutcomeHeader'
 import {Outcome} from '../../../types/rollup'
 import {SortOrder, SortBy} from '../../../utils/constants'
+import {ContributingScoresForOutcome} from '../../../hooks/useContributingScores'
 
 describe('OutcomeHeader', () => {
   const outcome: Outcome = {
@@ -32,10 +33,21 @@ describe('OutcomeHeader', () => {
     display_name: 'Friendly outcome name',
     calculation_method: 'decaying_average',
     calculation_int: 65,
+    points_possible: 5,
     mastery_points: defaultMasteryPoints,
     ratings: defaultRatings.map(rating =>
       pick(rating, ['description', 'points', 'color', 'mastery']),
     ),
+  }
+
+  const mockContributingScoresForOutcome: ContributingScoresForOutcome = {
+    isVisible: () => false,
+    toggleVisibility: jest.fn(),
+    data: undefined,
+    alignments: undefined,
+    scoresForUser: jest.fn(() => []),
+    isLoading: false,
+    error: undefined,
   }
 
   const defaultProps = (): OutcomeHeaderProps => {
@@ -49,6 +61,7 @@ describe('OutcomeHeader', () => {
         sortOutcomeId: null,
         setSortOutcomeId: jest.fn(),
       },
+      contributingScoresForOutcome: mockContributingScoresForOutcome,
     }
   }
 
@@ -64,7 +77,7 @@ describe('OutcomeHeader', () => {
     expect(getByText('Ascending scores')).toBeInTheDocument()
     expect(getByText('Descending scores')).toBeInTheDocument()
     expect(getByText('Display')).toBeInTheDocument()
-    expect(getByText('Hide Contributing Scores')).toBeInTheDocument()
+    expect(getByText('Show Contributing Scores')).toBeInTheDocument()
     expect(getByText('Outcome Info')).toBeInTheDocument()
     expect(getByText('Show Outcome Distribution')).toBeInTheDocument()
   })

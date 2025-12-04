@@ -22,6 +22,7 @@ import React, {
   useImperativeHandle,
   useCallback,
   useEffect,
+  useId,
 } from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextArea} from '@instructure/ui-text-area'
@@ -34,7 +35,7 @@ import {IconAiSolid} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
-
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {useAccessibilityCheckerContext} from '../../../hooks/useAccessibilityCheckerContext'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
@@ -59,6 +60,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
       }: FormComponentProps,
       ref,
     ) => {
+      const [alertMessage, setAlertMessage] = useState<string | null>(null)
       const checkboxRef = useRef<HTMLInputElement | null>(null)
       const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
       const [isChecked, setChecked] = useState(false)
@@ -68,6 +70,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
       const isAiGenerationEnabled = useAccessibilityScansStore(
         useShallow(state => state.aiGenerationEnabled),
       )
+      const charCountId = useId()
 
       const validateValue = useCallback(
         (currentValue: string | null, checked: boolean) => {
@@ -97,7 +100,40 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
       useEffect(() => {
         const {isValid, errorMessage} = validateValue(value, isChecked)
         onValidationChange?.(isValid, errorMessage)
-      }, [value, isChecked, onValidationChange, validateValue])
+
+        const timeout = setTimeout(() => {
+          const inputLength = value?.length ?? 0
+
+          const msg = I18n.t(
+            {
+              one: '%{count} / %{maxLength} characters entered.',
+              other: '%{count} / %{maxLength} characters entered.',
+            },
+            {count: inputLength, maxLength: issue.form.inputMaxLength},
+          )
+
+          setAlertMessage(msg)
+        }, 3000)
+
+        return () => clearTimeout(timeout)
+      }, [
+        value,
+        isChecked,
+        issue.form.inputMaxLength,
+        onValidationChange,
+        validateValue,
+        setAlertMessage,
+      ])
+
+      useEffect(() => {
+        const timeout = setTimeout(() => {
+          if (alertMessage) {
+            setAlertMessage(null)
+          }
+        }, 3000)
+
+        return () => clearTimeout(timeout)
+      }, [alertMessage, setAlertMessage])
 
       const handleCheckboxValueChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -212,6 +248,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               value={isChecked ? '' : value || ''}
               onChange={handleTextAreaChange}
               messages={shouldShowError ? [{text: error, type: 'newError'}] : []}
+              aria-describedby={charCountId}
             />
           </View>
           <Flex as="div" justifyItems="space-between" margin="small 0">
@@ -221,7 +258,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               </Text>
             </Flex.Item>
             <Flex.Item>
-              <Text size="small" color="secondary">
+              <Text size="small" color="secondary" id={charCountId}>
                 {value?.length || 0}/{issue.form.inputMaxLength} {I18n.t('characters')}
               </Text>
             </Flex.Item>
@@ -252,7 +289,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               <></>
             )}
           </Flex>
-          {generationError !== null ? (
+          {generationError && (
             <Flex>
               <Flex.Item>
                 <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
@@ -260,8 +297,16 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
                 </Alert>
               </Flex.Item>
             </Flex>
-          ) : (
-            <></>
+          )}
+          {alertMessage && (
+            <Alert
+              liveRegion={getLiveRegion}
+              liveRegionPoliteness="assertive"
+              isLiveRegionAtomic
+              screenReaderOnly
+            >
+              {alertMessage}
+            </Alert>
           )}
         </>
       )

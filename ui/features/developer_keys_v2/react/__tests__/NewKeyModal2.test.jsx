@@ -33,7 +33,6 @@ describe('NewKeyModal', () => {
     oldEnv = window.ENV
     window.ENV = {
       ...window.ENV,
-      validLtiPlacements: [],
       validLtiScopes: {},
     }
     userEvent.setup()

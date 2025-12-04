@@ -50,7 +50,7 @@ RSpec.describe PeerReview::AllocationService do
     course.enroll_student(student3, enrollment_state: :active)
 
     # Enable feature flag at course level by default
-    course.enable_feature!(:peer_review_allocation)
+    course.enable_feature!(:peer_review_allocation_and_grading)
   end
 
   describe "#initialize" do
@@ -67,7 +67,7 @@ RSpec.describe PeerReview::AllocationService do
     context "when validation fails" do
       context "when feature flag is not enabled" do
         before do
-          course.disable_feature!(:peer_review_allocation)
+          course.disable_feature!(:peer_review_allocation_and_grading)
         end
 
         it "returns error result" do
@@ -104,6 +104,36 @@ RSpec.describe PeerReview::AllocationService do
           expect(result[:error_code]).to eq(:not_submitted)
           expect(result[:message]).to include("must submit")
           expect(result[:status]).to eq(:bad_request)
+        end
+      end
+
+      context "when peer_review_submission_required is true" do
+        before do
+          assignment.update!(peer_review_submission_required: true)
+          assignment.submissions.find_by(user: student1).update!(workflow_state: "submitted")
+        end
+
+        it "returns error result when assessor has not submitted" do
+          result = service.allocate
+          expect(result[:success]).to be false
+          expect(result[:error_code]).to eq(:not_submitted)
+          expect(result[:message]).to include("must submit")
+          expect(result[:status]).to eq(:bad_request)
+        end
+      end
+
+      context "when peer_review_submission_required is false" do
+        before do
+          assignment.update!(peer_review_submission_required: false)
+          assignment.submit_homework(student1, body: "Student1 submission")
+        end
+
+        it "allows allocation even if assessor has not submitted" do
+          assignment.submit_homework(student2, body: "Student2 submission")
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].first).to be_a(AssessmentRequest)
+          expect(result[:assessment_requests].first.assessor_id).to eq(assessor.id)
         end
       end
 
@@ -160,7 +190,7 @@ RSpec.describe PeerReview::AllocationService do
           result = service.allocate
           expect(result[:success]).to be false
           expect(result[:error_code]).to eq(:limit_reached)
-          expect(result[:message]).to include("completed all required")
+          expect(result[:message]).to include("assigned all required")
           expect(result[:status]).to eq(:bad_request)
         end
       end
@@ -170,20 +200,23 @@ RSpec.describe PeerReview::AllocationService do
       before do
         assignment.submit_homework(assessor, body: "My submission")
         assignment.submit_homework(student1, body: "Student1 submission")
+        assignment.submit_homework(student2, body: "Student2 submission")
         @existing_request = assignment.assign_peer_review(assessor, student1)
       end
 
-      it "returns the existing ongoing review" do
+      it "returns existing ongoing reviews and allocates more to meet required count" do
         result = service.allocate
         expect(result[:success]).to be true
-        expect(result[:assessment_request].id).to eq(@existing_request.id)
-        expect(result[:assessment_request].workflow_state).to eq("assigned")
+        expect(result[:assessment_requests]).to be_an(Array)
+        expect(result[:assessment_requests].size).to eq(2)
+        expect(result[:assessment_requests].map(&:id)).to include(@existing_request.id)
+        expect(result[:assessment_requests].first.workflow_state).to eq("assigned")
       end
 
-      it "does not create a new assessment request" do
+      it "creates additional assessment requests to meet required count" do
         expect do
           service.allocate
-        end.not_to change { AssessmentRequest.count }
+        end.to change { AssessmentRequest.count }.by(1)
       end
     end
 
@@ -204,20 +237,23 @@ RSpec.describe PeerReview::AllocationService do
       before do
         assignment.submit_homework(assessor, body: "My submission")
         assignment.submit_homework(student1, body: "Student1 submission")
+        assignment.submit_homework(student2, body: "Student2 submission")
       end
 
-      it "returns success with assessment request" do
+      it "returns success with array of assessment requests" do
         result = service.allocate
         expect(result[:success]).to be true
-        expect(result[:assessment_request]).to be_a(AssessmentRequest)
-        expect(result[:assessment_request].assessor_id).to eq(assessor.id)
-        expect(result[:assessment_request].user_id).to eq(student1.id)
+        expect(result[:assessment_requests]).to be_an(Array)
+        expect(result[:assessment_requests].size).to eq(2)
+        expect(result[:assessment_requests].all?(AssessmentRequest)).to be true
+        expect(result[:assessment_requests].map(&:assessor_id).uniq).to eq([assessor.id])
+        expect(result[:assessment_requests].map(&:user_id)).to match_array([student1.id, student2.id])
       end
 
-      it "creates a new assessment request" do
+      it "creates multiple assessment requests to meet required count" do
         expect do
           service.allocate
-        end.to change { AssessmentRequest.count }.by(1)
+        end.to change { AssessmentRequest.count }.by(2)
       end
     end
 
@@ -250,12 +286,17 @@ RSpec.describe PeerReview::AllocationService do
         expect(results.size).to eq(2)
         expect(results.all? { |r| r[:success] }).to be true
 
-        # Both should have assessment requests
-        expect(results.all? { |r| r[:assessment_request].present? }).to be true
+        # Both should have assessment requests arrays
+        expect(results.all? { |r| r[:assessment_requests].present? }).to be true
+        expect(results.all? { |r| r[:assessment_requests].is_a?(Array) }).to be true
 
-        # Verify both got different submissions (unless there's only one available)
-        allocated_user_ids = results.map { |r| r[:assessment_request].user_id }
-        expect(allocated_user_ids).to be_present
+        # Each should have 2 allocations (peer_review_count is 2)
+        expect(results.all? { |r| r[:assessment_requests].size == 2 }).to be true
+
+        # Should be different to ensure fair distribution
+        allocated_user_ids_1 = results[0][:assessment_requests].map(&:user_id)
+        allocated_user_ids_2 = results[1][:assessment_requests].map(&:user_id)
+        expect(allocated_user_ids_1).not_to include(allocated_user_ids_2)
       end
 
       it "prevents duplicate allocations for the same assessor under concurrency" do
@@ -272,13 +313,104 @@ RSpec.describe PeerReview::AllocationService do
 
         threads.each(&:join)
 
-        # Both should succeed but return the same assessment request
+        # Both should succeed and return the same assessment requests
         expect(results.size).to eq(2)
         expect(results.all? { |r| r[:success] }).to be true
 
-        # Should have the same assessment request ID (one was created, one was found as ongoing)
-        assessment_ids = results.map { |r| r[:assessment_request].id }.uniq
-        expect(assessment_ids.size).to eq(1)
+        # Should have the same assessment request IDs (no duplicates created)
+        assessment_ids_1 = results[0][:assessment_requests].map(&:id).sort
+        assessment_ids_2 = results[1][:assessment_requests].map(&:id).sort
+        expect(assessment_ids_1).to eq(assessment_ids_2)
+        expect(assessment_ids_1.size).to eq(2)
+      end
+    end
+
+    context "when allocating multiple peer reviews" do
+      before do
+        assignment.update!(peer_review_count: 3)
+        assignment.submit_homework(assessor, body: "My submission")
+        assignment.submit_homework(student1, body: "Student1 submission")
+        assignment.submit_homework(student2, body: "Student2 submission")
+        assignment.submit_homework(student3, body: "Student3 submission")
+      end
+
+      it "allocates all required peer reviews at once" do
+        result = service.allocate
+        expect(result[:success]).to be true
+        expect(result[:assessment_requests].size).to eq(3)
+        expect(result[:assessment_requests].map(&:assessor_id).uniq).to eq([assessor.id])
+        expect(result[:assessment_requests].map(&:user_id)).to match_array([student1.id, student2.id, student3.id])
+      end
+
+      it "creates all assessment requests in the database" do
+        expect do
+          service.allocate
+        end.to change { AssessmentRequest.count }.by(3)
+      end
+
+      context "when some reviews are already assigned" do
+        before do
+          @existing_request = assignment.assign_peer_review(assessor, student1)
+        end
+
+        it "returns existing reviews and allocates remaining needed" do
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(3)
+          expect(result[:assessment_requests].map(&:id)).to include(@existing_request.id)
+        end
+
+        it "only creates new assessment requests for remaining needed" do
+          expect do
+            service.allocate
+          end.to change { AssessmentRequest.count }.by(2)
+        end
+      end
+
+      context "when prioritizing must_review submissions" do
+        before do
+          # Create allocation rules for student1 and student2
+          AllocationRule.create!(
+            course:,
+            assignment:,
+            assessor:,
+            assessee: student1,
+            must_review: true
+          )
+          AllocationRule.create!(
+            course:,
+            assignment:,
+            assessor:,
+            assessee: student2,
+            must_review: true
+          )
+        end
+
+        it "allocates must_review submissions first, then regular submissions" do
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(3)
+
+          # First two should be must_review (student1 and student2)
+          allocated_user_ids = result[:assessment_requests].map(&:user_id)
+          expect(allocated_user_ids).to include(student1.id, student2.id, student3.id)
+        end
+      end
+    end
+
+    context "when peer_review_count is 1" do
+      before do
+        assignment.update!(peer_review_count: 1)
+        assignment.submit_homework(assessor, body: "My submission")
+        assignment.submit_homework(student1, body: "Student1 submission")
+        assignment.submit_homework(student2, body: "Student2 submission")
+      end
+
+      it "allocates a single peer review in an array" do
+        result = service.allocate
+        expect(result[:success]).to be true
+        expect(result[:assessment_requests]).to be_an(Array)
+        expect(result[:assessment_requests].size).to eq(1)
       end
     end
   end
@@ -286,12 +418,14 @@ RSpec.describe PeerReview::AllocationService do
   describe "#validate" do
     it "returns success hash when all validations pass" do
       assignment.submit_homework(assessor, body: "My submission")
+      assignment.submit_homework(student1, body: "Student1 submission")
+      assignment.submit_homework(student2, body: "Student2 submission")
       result = service.send(:validate)
       expect(result[:success]).to be true
     end
   end
 
-  describe "#find_ongoing_review" do
+  describe "#find_ongoing_reviews" do
     context "when assessor has an assigned review" do
       before do
         assignment.submit_homework(assessor, body: "My submission")
@@ -299,10 +433,29 @@ RSpec.describe PeerReview::AllocationService do
         @request = assignment.assign_peer_review(assessor, student1)
       end
 
-      it "returns the assessment request" do
-        result = service.send(:find_ongoing_review)
-        expect(result).to eq(@request)
-        expect(result.workflow_state).to eq("assigned")
+      it "returns array with the assessment request" do
+        result = service.send(:find_ongoing_reviews)
+        expect(result).to be_an(Array)
+        expect(result.size).to eq(1)
+        expect(result.first).to eq(@request)
+        expect(result.first.workflow_state).to eq("assigned")
+      end
+    end
+
+    context "when assessor has multiple assigned reviews" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+        assignment.submit_homework(student1, body: "Student1 submission")
+        assignment.submit_homework(student2, body: "Student2 submission")
+        @request1 = assignment.assign_peer_review(assessor, student1)
+        @request2 = assignment.assign_peer_review(assessor, student2)
+      end
+
+      it "returns array with all ongoing assessment requests" do
+        result = service.send(:find_ongoing_reviews)
+        expect(result).to be_an(Array)
+        expect(result.size).to eq(2)
+        expect(result.map(&:id)).to match_array([@request1.id, @request2.id])
       end
     end
 
@@ -314,16 +467,16 @@ RSpec.describe PeerReview::AllocationService do
         request.update!(workflow_state: "completed")
       end
 
-      it "returns nil" do
-        result = service.send(:find_ongoing_review)
-        expect(result).to be_nil
+      it "returns empty array" do
+        result = service.send(:find_ongoing_reviews)
+        expect(result).to eq([])
       end
     end
 
     context "when assessor has no reviews" do
-      it "returns nil" do
-        result = service.send(:find_ongoing_review)
-        expect(result).to be_nil
+      it "returns empty array" do
+        result = service.send(:find_ongoing_reviews)
+        expect(result).to eq([])
       end
     end
   end
@@ -374,410 +527,64 @@ RSpec.describe PeerReview::AllocationService do
     end
   end
 
-  describe "#find_available_submission" do
-    context "when no submissions exist" do
-      it "returns nil" do
-        result = service.send(:find_available_submission)
-        expect(result).to be_nil
+  describe "#select_submissions_to_allocate" do
+    context "when no submissions are available" do
+      it "returns empty array" do
+        result = service.send(:select_submissions_to_allocate, [], 2)
+        expect(result).to eq([])
       end
     end
 
-    context "when only assessor has submitted" do
+    context "when selecting submissions" do
       before do
         assignment.submit_homework(assessor, body: "My submission")
-      end
-
-      it "returns nil" do
-        result = service.send(:find_available_submission)
-        expect(result).to be_nil
-      end
-    end
-
-    context "when one submission is available" do
-      before do
-        assignment.submit_homework(assessor, body: "My submission")
-        @submission = assignment.submit_homework(student1, body: "Student1 submission")
-      end
-
-      it "returns the available submission" do
-        result = service.send(:find_available_submission)
-        expect(result.id).to eq(@submission.id)
-        expect(result.user_id).to eq(student1.id)
-      end
-
-      it "excludes assessor's own submission" do
-        result = service.send(:find_available_submission)
-        expect(result.user_id).not_to eq(assessor.id)
-      end
-    end
-
-    context "when submission is already assigned to assessor" do
-      before do
-        assignment.submit_homework(assessor, body: "My submission")
-        assignment.submit_homework(student1, body: "Student1 submission")
-        assignment.assign_peer_review(assessor, student1)
-      end
-
-      it "returns nil" do
-        result = service.send(:find_available_submission)
-        expect(result).to be_nil
-      end
-    end
-
-    context "when prioritizing unreviewed submissions" do
-      before do
-        assignment.submit_homework(assessor, body: "My submission")
-
-        # Student1 submits first (older)
-        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
-        @submission1.update!(submitted_at: 3.days.ago)
-
-        # Student2 submits later (newer)
-        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
-        @submission2.update!(submitted_at: 1.day.ago)
-
-        # Another student reviews student1 (older submission)
-        assignment.assign_peer_review(student3, student1)
-      end
-
-      it "returns the unreviewed submission even if it's newer" do
-        result = service.send(:find_available_submission)
-        expect(result.id).to eq(@submission2.id)
-        expect(result.user_id).to eq(student2.id)
-      end
-    end
-
-    context "when all available submissions have been reviewed by someone" do
-      before do
-        assignment.submit_homework(assessor, body: "My submission")
-
-        # Student1 submits first (older)
-        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
-        @submission1.update!(submitted_at: 3.days.ago)
-
-        # Student2 submits later (newer)
-        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
-        @submission2.update!(submitted_at: 1.day.ago)
-
-        # Another student reviews all submissions
-        assignment.assign_peer_review(student3, student1)
-        assignment.assign_peer_review(student3, student2)
-      end
-
-      it "returns oldest submission even if reviewed" do
-        result = service.send(:find_available_submission)
-        expect(result.id).to eq(@submission1.id)
-        expect(result.user_id).to eq(student1.id)
-      end
-    end
-
-    context "when multiple unreviewed submissions exist" do
-      before do
-        assignment.submit_homework(assessor, body: "My submission")
-
-        # Create submissions at different times
-        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
-        @submission1.update!(submitted_at: 5.days.ago)
-
-        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
-        @submission2.update!(submitted_at: 3.days.ago)
-
-        @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
-        @submission3.update!(submitted_at: 1.day.ago)
-      end
-
-      it "returns the oldest unreviewed submission" do
-        result = service.send(:find_available_submission)
-        expect(result.id).to eq(@submission1.id)
-        expect(result.user_id).to eq(student1.id)
-      end
-    end
-
-    context "when submissions have different workflow states" do
-      before do
-        assignment.submit_homework(assessor, body: "My submission")
-
-        # Only submitted state should be considered
-        @submitted = assignment.submit_homework(student1, body: "Student1 submission")
-
-        # Graded state should also be considered
-        @graded = assignment.submit_homework(student2, body: "Student2 submission")
-        @graded.update!(workflow_state: "graded")
-
-        # Pending review should not be considered
-        pending = assignment.submit_homework(student3, body: "Student3 submission")
-        pending.update!(workflow_state: "pending_review")
-      end
-
-      it "includes submitted and graded submissions" do
-        result = service.send(:find_available_submission)
-        expect([student1.id, student2.id]).to include(result.user_id)
-      end
-
-      it "excludes pending_review submissions" do
-        result = service.send(:find_available_submission)
-        expect(result.user_id).not_to eq(student3.id)
-      end
-    end
-
-    context "when multiple students can review the same submission" do
-      before do
-        # All students submit (in order: assessor, student1, student2)
-        @assessor_submission = assignment.submit_homework(assessor, body: "Assessor submission")
-        @assessor_submission.update!(submitted_at: 4.days.ago)
         @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
         @submission1.update!(submitted_at: 3.days.ago)
         @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
         @submission2.update!(submitted_at: 2.days.ago)
-
-        # All submissions have been reviewed by someone
-        assignment.assign_peer_review(student3, assessor)
-        assignment.assign_peer_review(student3, student1)
-        assignment.assign_peer_review(student3, student2)
-
-        # Assessor already reviewed student1
-        assignment.assign_peer_review(assessor, student1)
-      end
-
-      it "allows the same submission to be assigned to a different student" do
-        # Assessor has already reviewed student1, so should get student2 (oldest available)
-        result = service.send(:find_available_submission)
-        expect(result.id).to eq(@submission2.id)
-        expect(result.user_id).to eq(student2.id)
-      end
-
-      it "allows student2 to also review the same submission that assessor reviewed" do
-        # Student2 hasn't reviewed anyone yet, should get assessor's submission (oldest)
-        student2_service = described_class.new(assignment:, assessor: student2)
-        result = student2_service.send(:find_available_submission)
-        expect(result.user_id).to eq(assessor.id)
-      end
-
-      it "can allocate the same submission to multiple reviewers" do
-        # Create assessment for student2 to review student1 (same as assessor reviewed)
-        assignment.assign_peer_review(student2, student1)
-
-        # Verify both assessor and student2 have assessment requests for student1
-        student1_reviewers = AssessmentRequest.for_assignment(assignment.id)
-                                              .where(user_id: student1.id)
-                                              .pluck(:assessor_id)
-        expect(student1_reviewers).to include(assessor.id, student2.id)
-      end
-    end
-  end
-
-  describe "#find_must_review_submission" do
-    context "when there are no allocation rules" do
-      before do
-        assignment.submit_homework(assessor, body: "My submission")
-        assignment.submit_homework(student1, body: "Student1 submission")
-      end
-
-      it "returns nil" do
-        result = service.send(:find_must_review_submission)
-        expect(result).to be_nil
-      end
-    end
-
-    context "when there are allocation rules but must_review is false" do
-      before do
-        assignment.submit_homework(assessor, body: "My submission")
-        assignment.submit_homework(student1, body: "Student1 submission")
-
-        AllocationRule.create!(
-          course:,
-          assignment:,
-          assessor:,
-          assessee: student1,
-          must_review: false,
-          review_permitted: true
-        )
-      end
-
-      it "returns nil" do
-        result = service.send(:find_must_review_submission)
-        expect(result).to be_nil
-      end
-    end
-
-    context "when there is one must review rule with available submission" do
-      before do
-        assignment.submit_homework(assessor, body: "My submission")
-        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
-
-        AllocationRule.create!(
-          course:,
-          assignment:,
-          assessor:,
-          assessee: student1,
-          must_review: true
-        )
-      end
-
-      it "returns the must review submission" do
-        result = service.send(:find_must_review_submission)
-        expect(result.id).to eq(@submission1.id)
-        expect(result.user_id).to eq(student1.id)
-      end
-    end
-
-    context "when must review submission is already assigned to assessor" do
-      before do
-        assignment.submit_homework(assessor, body: "My submission")
-        assignment.submit_homework(student1, body: "Student1 submission")
-
-        AllocationRule.create!(
-          course:,
-          assignment:,
-          assessor:,
-          assessee: student1,
-          must_review: true
-        )
-
-        assignment.assign_peer_review(assessor, student1)
-      end
-
-      it "returns nil" do
-        result = service.send(:find_must_review_submission)
-        expect(result).to be_nil
-      end
-    end
-
-    context "when must review submission has not been submitted yet" do
-      before do
-        assignment.submit_homework(assessor, body: "My submission")
-
-        AllocationRule.create!(
-          course:,
-          assignment:,
-          assessor:,
-          assessee: student1,
-          must_review: true
-        )
-      end
-
-      it "returns nil" do
-        result = service.send(:find_must_review_submission)
-        expect(result).to be_nil
-      end
-    end
-
-    context "when multiple must review rules exist" do
-      before do
-        assignment.submit_homework(assessor, body: "My submission")
-
-        # Student1 submits first (older)
-        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
-        @submission1.update!(submitted_at: 3.days.ago)
-
-        # Student2 submits later (newer)
-        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
-        @submission2.update!(submitted_at: 1.day.ago)
-
-        AllocationRule.create!(
-          course:,
-          assignment:,
-          assessor:,
-          assessee: student1,
-          must_review: true
-        )
-
-        AllocationRule.create!(
-          course:,
-          assignment:,
-          assessor:,
-          assessee: student2,
-          must_review: true
-        )
-      end
-
-      context "when both submissions have no reviews" do
-        it "returns the oldest submission" do
-          result = service.send(:find_must_review_submission)
-          expect(result.id).to eq(@submission1.id)
-          expect(result.user_id).to eq(student1.id)
-        end
-      end
-
-      context "when one submission has fewer reviews" do
-        before do
-          # Student3 reviews student1 (so student1 has 1 review)
-          assignment.submit_homework(student3, body: "Student3 submission")
-          assignment.assign_peer_review(student3, student1)
-        end
-
-        it "returns the submission with fewer reviews" do
-          result = service.send(:find_must_review_submission)
-          expect(result.id).to eq(@submission2.id)
-          expect(result.user_id).to eq(student2.id)
-        end
-      end
-
-      context "when both submissions have same number of reviews" do
-        before do
-          # Student3 reviews both student1 and student2
-          assignment.submit_homework(student3, body: "Student3 submission")
-          assignment.assign_peer_review(student3, student1)
-          assignment.assign_peer_review(student3, student2)
-        end
-
-        it "returns the oldest submission as tiebreaker" do
-          result = service.send(:find_must_review_submission)
-          expect(result.id).to eq(@submission1.id)
-          expect(result.user_id).to eq(student1.id)
-        end
-      end
-    end
-
-    context "with three must review submissions at different review counts" do
-      let(:student4) { user_model }
-
-      before do
-        course.enroll_student(student4, enrollment_state: :active)
-
-        assignment.submit_homework(assessor, body: "My submission")
-
-        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
-        @submission1.update!(submitted_at: 5.days.ago)
-
-        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
-        @submission2.update!(submitted_at: 3.days.ago)
-
         @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
         @submission3.update!(submitted_at: 1.day.ago)
-
-        assignment.submit_homework(student4, body: "Student4 submission")
-
-        AllocationRule.create!(course:, assignment:, assessor:, assessee: student1, must_review: true)
-        AllocationRule.create!(course:, assignment:, assessor:, assessee: student2, must_review: true)
-        AllocationRule.create!(course:, assignment:, assessor:, assessee: student3, must_review: true)
-
-        # Student1 has 2 reviews, Student2 has 1 review, Student3 has 0 reviews
-        assignment.assign_peer_review(student4, student1)
-        assignment.assign_peer_review(student4, student1)
-        assignment.assign_peer_review(student4, student2)
       end
 
-      it "returns submission with fewest reviews" do
-        result = service.send(:find_must_review_submission)
-        expect(result.id).to eq(@submission3.id)
-        expect(result.user_id).to eq(student3.id)
+      it "returns requested count of submissions" do
+        available = [@submission1, @submission2, @submission3]
+        result = service.send(:select_submissions_to_allocate, available, 2)
+        expect(result.size).to eq(2)
+      end
+
+      it "returns all submissions when count exceeds available" do
+        available = [@submission1, @submission2]
+        result = service.send(:select_submissions_to_allocate, available, 5)
+        expect(result.size).to eq(2)
+      end
+
+      it "prioritizes submissions with fewest reviews" do
+        assignment.assign_peer_review(student2, student3)
+        assignment.assign_peer_review(student1, student3)
+
+        available = [@submission1, @submission2, @submission3]
+        result = service.send(:select_submissions_to_allocate, available, 2)
+
+        expect(result.map(&:id)).to match_array([@submission1.id, @submission2.id])
+      end
+
+      it "uses submitted_at as tiebreaker when review counts are equal" do
+        available = [@submission1, @submission2, @submission3]
+        result = service.send(:select_submissions_to_allocate, available, 3)
+
+        expect(result.map(&:id)).to eq([@submission1.id, @submission2.id, @submission3.id])
       end
     end
-  end
 
-  describe "#find_available_submission with must review rules" do
-    context "when must review submission exists" do
+    context "when must_review rules exist" do
       before do
         assignment.submit_homework(assessor, body: "My submission")
-
-        # Student1 is older and unreviewed
         @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
         @submission1.update!(submitted_at: 5.days.ago)
-
-        # Student2 has must_review rule but is newer
         @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
         @submission2.update!(submitted_at: 1.day.ago)
+        @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
+        @submission3.update!(submitted_at: 3.days.ago)
 
         AllocationRule.create!(
           course:,
@@ -788,46 +595,61 @@ RSpec.describe PeerReview::AllocationService do
         )
       end
 
-      it "prioritizes must review submission over older submissions" do
-        result = service.send(:find_available_submission)
-        expect(result.id).to eq(@submission2.id)
-        expect(result.user_id).to eq(student2.id)
+      it "prioritizes must_review submissions first" do
+        available = [@submission1, @submission2, @submission3]
+        result = service.send(:select_submissions_to_allocate, available, 2)
+
+        expect(result.first.id).to eq(@submission2.id)
+        expect(result.map(&:id)).to include(@submission1.id)
+      end
+
+      it "sorts must_review submissions by review count" do
+        student4 = student_in_course(active_all: true).user
+        @submission4 = assignment.submit_homework(student4, body: "Student4 submission")
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student4,
+          must_review: true
+        )
+
+        assignment.assign_peer_review(student1, student2)
+        assignment.assign_peer_review(student3, student2)
+
+        available = [@submission1, @submission2, @submission3, @submission4]
+        result = service.send(:select_submissions_to_allocate, available, 2)
+
+        expect(result.first.id).to eq(@submission4.id)
+        expect(result.second.id).to eq(@submission2.id)
       end
     end
 
-    context "when must review submission is unavailable" do
+    context "when avoiding duplicates" do
       before do
         assignment.submit_homework(assessor, body: "My submission")
         @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
-        assignment.submit_homework(student2, body: "Student2 submission")
-
-        AllocationRule.create!(
-          course:,
-          assignment:,
-          assessor:,
-          assessee: student2,
-          must_review: true
-        )
-
-        # Already assigned the must review submission
-        assignment.assign_peer_review(assessor, student2)
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
       end
 
-      it "falls back to regular allocation logic" do
-        result = service.send(:find_available_submission)
-        expect(result.id).to eq(@submission1.id)
-        expect(result.user_id).to eq(student1.id)
+      it "does not return duplicate submissions" do
+        available = [@submission1, @submission2]
+        result = service.send(:select_submissions_to_allocate, available, 3)
+
+        expect(result.map(&:id).uniq.size).to eq(result.size)
       end
     end
   end
 
   describe "#success_result" do
-    let(:mock_request) { instance_double(AssessmentRequest) }
+    let(:mock_request1) { instance_double(AssessmentRequest) }
+    let(:mock_request2) { instance_double(AssessmentRequest) }
 
-    it "returns success hash with assessment_request" do
-      result = service.send(:success_result, mock_request)
+    it "returns success hash with assessment_requests array" do
+      result = service.send(:success_result, [mock_request1, mock_request2])
       expect(result[:success]).to be true
-      expect(result[:assessment_request]).to eq(mock_request)
+      expect(result[:assessment_requests]).to eq([mock_request1, mock_request2])
     end
   end
 

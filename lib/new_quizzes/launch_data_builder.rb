@@ -91,7 +91,7 @@ module NewQuizzes
         custom_canvas_rcs_service_jwt: rcs_jwt,
 
         # Locale and formatting
-        custom_canvas_timezone_name: @current_user.time_zone&.name,
+        custom_canvas_timezone_name: Time.zone.tzinfo.name,
         custom_canvas_high_contrast_setting: @current_user.prefers_high_contrast?,
         custom_canvas_decimal_separator: decimal_separator,
         custom_canvas_thousand_separator: thousand_separator,
@@ -107,6 +107,7 @@ module NewQuizzes
         # Backend URL - extracted from the tool's launch URL
         # This allows the native app to connect to the correct tenant-specific backend
         backend_url:,
+        locale:,
       }.compact # Remove nil values
     end
 
@@ -299,6 +300,10 @@ module NewQuizzes
     rescue URI::InvalidURIError => e
       Rails.logger.error("Failed to parse tool URL for backend_url: #{e.message}")
       nil
+    end
+
+    def locale
+      I18n.locale || I18n.default_locale
     end
 
     # Signs the launch parameters with HMAC-SHA256 using the tool's shared secret

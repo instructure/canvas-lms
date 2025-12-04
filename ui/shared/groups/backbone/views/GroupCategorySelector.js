@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
-import {isEmpty, find, chain, includes} from 'lodash'
+import {find, includes, isEmpty, map} from 'es-toolkit/compat'
 import template from '../../jst/GroupCategorySelector.handlebars'
 import '@canvas/assignments/jquery/toggleAccessibly'
 import awaitElement from '@canvas/await-element'
@@ -246,10 +246,7 @@ GroupCategorySelector.prototype.toJSON = function () {
       !this.parentModel.groupCategoryId() ||
       this.parentModel.groupCategoryId() === 'blank' ||
       this.parentModel.groupCategoryId() === 'new' ||
-      (!chain(this.groupCategories)
-        .map('id')
-        .includes(this.parentModel.groupCategoryId().toString())
-        .value() &&
+      (!map(this.groupCategories, 'id').includes(this.parentModel.groupCategoryId().toString()) &&
         !isEmpty(this.groupCategories)),
     hideGradeIndividually: this.hideGradeIndividually,
     gradeGroupStudentsIndividually:

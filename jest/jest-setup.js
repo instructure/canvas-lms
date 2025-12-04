@@ -163,6 +163,24 @@ if (!Set.prototype.difference) {
     writable: true,
   })
 }
+if (!Map.groupBy) {
+  Object.defineProperty(Map, 'groupBy', {
+    configurable: true,
+    value: function groupBy(items, keySelector) {
+      const map = new Map()
+      let i = 0
+      for (const item of items) {
+        const key = keySelector(item, i++)
+        if (!map.has(key)) {
+          map.set(key, [])
+        }
+        map.get(key).push(item)
+      }
+      return map
+    },
+    writable: true,
+  })
+}
 
 require('@instructure/ui-themes')
 

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {pick} from 'lodash'
+import {pick} from 'es-toolkit/compat'
 
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {Flex} from '@instructure/ui-flex'

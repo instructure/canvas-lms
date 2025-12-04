@@ -125,4 +125,32 @@ describe('CurrentDownloads', () => {
       expect(screen.getAllByText(/Preparing download: 0% complete/)).toHaveLength(2)
     })
   })
+
+  it('calls performRequest with correct parameters for groups', async () => {
+    render(
+      <FileManagementProvider
+        value={createMockFileManagementContext({contextType: 'group', contextId: '8168'})}
+      >
+        <CurrentDownloads rows={[]} />
+      </FileManagementProvider>,
+    )
+    ;(performRequest as jest.Mock).mockReturnValue(true)
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent('download_utils_event', {detail: {items: new Set(['1'])}}),
+      )
+    })
+
+    await waitFor(() => {
+      expect(performRequest).toHaveBeenCalledWith({
+        contextType: 'groups',
+        contextId: '8168',
+        items: new Set(['1']),
+        rows: [],
+        onProgress: expect.any(Function),
+        onComplete: expect.any(Function),
+      })
+    })
+  })
 })

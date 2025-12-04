@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {find, defer, reduce, throttle} from 'lodash'
+import {find, defer, reduce, throttle} from 'es-toolkit/compat'
 import $ from 'jquery'
 
 let $document, $window
@@ -45,7 +45,7 @@ export default {
     // at least one, the #main div whose min-height is 450px.) The number 30
     // here is a weak way to skip over a more recent parent container whose
     // min-height is inexplicably set to 30px.
-    const minHeightParent = find(this.$el.parents(), el => p($(el).css('minHeight')) > 30)
+    const minHeightParent = find(this.$el.parents().toArray(), el => p($(el).css('minHeight')) > 30)
     if (!minHeightParent) return // bail out; probably in a test
     const $minHeightParent = $(minHeightParent)
     const oldMaxHeight = $minHeightParent.css('maxHeight')
