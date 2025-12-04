@@ -36,7 +36,7 @@ module Extensions
           polymorphic.each do |sub_ref_name|
             sub_index = if index.is_a?(Hash)
                           index.dup
-                        elsif index
+                        elsif index || index.nil?
                           {}
                         else
                           index
@@ -151,7 +151,7 @@ module Extensions
                                       end
                 end
 
-                ::ActiveRecord::ConnectionAdapters::ReferenceDefinition.new(sub_ref_name, index:, **).add_to(self)
+                ::ActiveRecord::ConnectionAdapters::ReferenceDefinition.new(sub_ref_name, index: sub_index, **).add_to(self)
               end
 
               if check_constraint
