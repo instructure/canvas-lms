@@ -49,6 +49,8 @@ import {
   mapRubricAssociationUnderscoredKeysToCamelCase,
 } from '@canvas/rubrics/react/utils'
 import {PeerReviewWidget} from '@canvas/assignments/react/PeerReviewWidget'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 
@@ -382,7 +384,9 @@ $(() => {
   if (peerReviewMountPoint) {
     createOrUpdateRoot(
       'peer-review-assignment-widget-mount-point',
-      <PeerReviewWidget assignmentId={ENV.ASSIGNMENT_ID} courseId={ENV.COURSE_ID} />,
+      <QueryClientProvider client={queryClient}>
+        <PeerReviewWidget assignmentId={ENV.ASSIGNMENT_ID} courseId={ENV.COURSE_ID} />
+      </QueryClientProvider>,
     )
   }
 })

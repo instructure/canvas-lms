@@ -25,14 +25,23 @@ describe "assignment peer review widget" do
   include AssignmentsCommon
 
   context "with peer_review_allocation_and_grading feature flag" do
-    before(:once) do
+    before do
       course_with_teacher(active_all: true)
       @course.enable_feature!(:peer_review_allocation_and_grading)
       @assignment = @course.assignments.create!(
         name: "Test Assignment",
+        peer_review_count: 5,
         points_possible: 10,
         submission_types: "online_text_entry",
-        peer_reviews: true
+        peer_reviews: true,
+        anonymous_peer_reviews: false,
+        intra_group_peer_reviews: false,
+        peer_review_submission_required: true,
+        peer_review_across_sections: true
+      )
+      @assignment.create_peer_review_sub_assignment!(
+        context: @course,
+        points_possible: 5
       )
     end
 
@@ -72,6 +81,83 @@ describe "assignment peer review widget" do
 
       expect(f("#content")).not_to contain_css("#peer-review-assignment-widget-mount-point")
     end
+
+    context "peer review configuration tray" do
+      it "opens configuration tray when View Configuration button is clicked" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_ajaximations
+
+        view_config_button = f("[data-testid='view-configuration-button']")
+        view_config_button.click
+        wait_for_ajaximations
+
+        expect(f("[data-testid='peer-review-configuration-tray']")).to be_displayed
+      end
+
+      it "displays peer review configuration in tray" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_ajaximations
+
+        view_config_button = f("[data-testid='view-configuration-button']")
+        view_config_button.click
+        wait_for_ajaximations
+
+        tray = f("[data-testid='peer-review-configuration-tray']")
+        expect(tray).to include_text("Reviews Required")
+        expect(tray).to include_text("Points Per Review")
+        expect(tray).to include_text("Total Points")
+        expect(tray).to include_text("Across Sections")
+        expect(tray).to include_text("Submission Req")
+        expect(tray).to include_text("Anonymity")
+      end
+
+      it "closes configuration tray when close button is clicked" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_ajaximations
+
+        view_config_button = f("[data-testid='view-configuration-button']")
+        view_config_button.click
+        wait_for_ajaximations
+
+        expect(f("[data-testid='peer-review-configuration-tray']")).to be_displayed
+
+        close_button = f("[data-testid='peer-review-config-tray-close-button']")
+        close_button.click
+        wait_for_ajaximations
+
+        expect(f("#content")).not_to contain_css("[data-testid='peer-review-configuration-tray']")
+      end
+
+      it "displays 'Within Groups' field for group assignments" do
+        group_category = @course.group_categories.create!(name: "Project Groups")
+        @assignment.update!(group_category:)
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_ajaximations
+
+        view_config_button = f("[data-testid='view-configuration-button']")
+        view_config_button.click
+        wait_for_ajaximations
+
+        tray = f("[data-testid='peer-review-configuration-tray']")
+        expect(tray).to include_text("Within Groups")
+      end
+
+      it "displays correct review count in configuration" do
+        @assignment.update!(peer_review_count: 3)
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_ajaximations
+
+        view_config_button = f("[data-testid='view-configuration-button']")
+        view_config_button.click
+        wait_for_ajaximations
+
+        tray = f("[data-testid='peer-review-configuration-tray']")
+        expect(tray).to include_text("Reviews Required")
+        expect(tray).to include_text("3")
+      end
+    end
   end
 
   context "without peer_review_allocation_and_grading feature flag" do
@@ -81,7 +167,8 @@ describe "assignment peer review widget" do
       @assignment = @course.assignments.create!(
         name: "Test Assignment",
         points_possible: 10,
-        submission_types: "online_text_entry"
+        submission_types: "online_text_entry",
+        peer_reviews: true
       )
     end
 
@@ -104,7 +191,8 @@ describe "assignment peer review widget" do
       @assignment = @course.assignments.create!(
         name: "Test Assignment",
         points_possible: 10,
-        submission_types: "online_text_entry"
+        submission_types: "online_text_entry",
+        peer_reviews: true
       )
     end
 
