@@ -29,8 +29,25 @@ describe('FiltersPanel', () => {
     appliedFilters: [] as AppliedFilter[],
   }
 
+  const mockMatchMedia = (matches: boolean) => {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: jest.fn().mockImplementation(query => ({
+        matches,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      })),
+    })
+  }
+
   beforeEach(() => {
     jest.clearAllMocks()
+    mockMatchMedia(true)
   })
 
   it('renders the filter panel with correct title', () => {
@@ -44,7 +61,7 @@ describe('FiltersPanel', () => {
     expect(screen.queryByTestId('apply-filters-button')).not.toBeInTheDocument()
   })
 
-  it('renders applied filters component', () => {
+  it('renders applied filters component on desktop', () => {
     render(
       <FiltersPanel
         {...defaultProps}
@@ -52,6 +69,18 @@ describe('FiltersPanel', () => {
       />,
     )
     expect(screen.getByTestId('applied-filters')).toBeInTheDocument()
+  })
+
+  it('does not render applied filters component on tablet', () => {
+    mockMatchMedia(false)
+
+    render(
+      <FiltersPanel
+        {...defaultProps}
+        appliedFilters={[{key: 'workflowStates', option: {value: 'published', label: 'Published'}}]}
+      />,
+    )
+    expect(screen.queryByTestId('applied-filters')).not.toBeInTheDocument()
   })
 
   it('does not show clear filters button when no filters are applied', () => {

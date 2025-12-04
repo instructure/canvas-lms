@@ -164,29 +164,55 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
         toggleLabel={I18n.t('Filter resources')}
         ref={e => (toggleButtonRef.current = e)}
         summary={
-          <Flex gap="small">
-            <Flex.Item shouldGrow={false} shouldShrink={false}>
-              <Heading level="h2" variant="label" margin="small 0">
-                {I18n.t('Filter resources')}
-              </Heading>
-            </Flex.Item>
-            <Flex.Item shouldGrow={true} shouldShrink={true}>
-              <AppliedFilters appliedFilters={appliedFilters} setFilters={handleFilterChange} />
-            </Flex.Item>
-            {filterCount > 0 && (
-              <Flex.Item shouldGrow={false} shouldShrink={false}>
-                <Button
-                  data-testid="clear-filters-button"
-                  size="medium"
-                  onClick={handleReset}
-                  renderIcon={<IconXLine />}
-                  color="secondary"
-                >
-                  {I18n.t('Clear filters')}
-                </Button>
-              </Flex.Item>
-            )}
-          </Flex>
+          <Responsive
+            match="media"
+            query={responsiveQuerySizes({tablet: true, desktop: true})}
+            props={{
+              tablet: {
+                showTags: false,
+                buttonText:
+                  filterCount === 1
+                    ? I18n.t('Clear 1 filter')
+                    : I18n.t('Clear %{count} filters', {count: filterCount}),
+                wrap: 'wrap',
+              },
+              desktop: {showTags: true, buttonText: I18n.t('Clear filters'), wrap: 'no-wrap'},
+            }}
+            render={props => {
+              if (!props) return null
+              return (
+                <Flex gap="small" alignItems="start" wrap={props.wrap}>
+                  <Flex.Item shouldGrow={!props.showTags} shouldShrink={false}>
+                    <Heading level="h2" variant="label" margin="small 0">
+                      {I18n.t('Filter resources')}
+                    </Heading>
+                  </Flex.Item>
+                  {props.showTags && (
+                    <Flex.Item shouldGrow={true} shouldShrink={true}>
+                      <AppliedFilters
+                        appliedFilters={appliedFilters}
+                        setFilters={handleFilterChange}
+                      />
+                    </Flex.Item>
+                  )}
+                  {filterCount > 0 && (
+                    <Flex.Item shouldGrow={false} shouldShrink={false}>
+                      <Button
+                        data-testid="clear-filters-button"
+                        size="small"
+                        onClick={handleReset}
+                        renderIcon={<IconXLine />}
+                        color="secondary"
+                        margin="x-small 0 0 0"
+                      >
+                        {props.buttonText}
+                      </Button>
+                    </Flex.Item>
+                  )}
+                </Flex>
+              )
+            }}
+          />
         }
         onToggle={handleToggle}
         expanded={isOpen}
@@ -195,7 +221,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
           match="media"
           query={responsiveQuerySizes({tablet: true, desktop: true})}
           props={{
-            tablet: {outerDirection: 'column', checkboxDirection: 'column'},
+            tablet: {outerDirection: 'column', checkboxDirection: 'row'},
             desktop: {outerDirection: 'row', checkboxDirection: 'row'},
           }}
           render={props => {
