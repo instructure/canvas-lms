@@ -318,13 +318,15 @@ module Api::V1::User
       only = only.without(:temporary_enrollment_source_user_id, :temporary_enrollment_pairing_id)
     end
     api_json(enrollment, user, session, only:).tap do |json|
-      json[:enrollment_state] = if enrollment.course.workflow_state == "deleted" || enrollment.course_section.workflow_state == "deleted"
-                                  "deleted"
-                                elsif json[:workflow_state] != enrollment.enrollment_state.state
-                                  enrollment.state_based_on_date
-                                else
-                                  json.delete("workflow_state")
-                                end
+      json[:enrollment_state] = json.delete("workflow_state")
+      if enrollment.course.workflow_state == "deleted" || enrollment.course_section.workflow_state == "deleted"
+        json[:enrollment_state] = "deleted"
+      elsif enrollment.enrollment_state.state == "completed"
+        # using enrollment_state.state here since enrollment.workflow_state is not always accurate to
+        # course/term completion status. Not using state_based_on_date since that determines
+        # state partially by role
+        json[:enrollment_state] = "completed"
+      end
       json[:role] = enrollment.role.name
       json[:role_id] = enrollment.role_id
       if enrollment.user == user || enrollment.course.grants_right?(user, session, :read_reports)
