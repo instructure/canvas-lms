@@ -526,8 +526,9 @@ module IndexDefinitionExtensions
     super(*, **)
   end
 
-  def defined_for?(*, replica_identity: nil, **)
+  def defined_for?(*, replica_identity: nil, **options)
     return false unless replica_identity.nil? || self.replica_identity == replica_identity
+    return false unless !options.key?(:where) || where == options[:where]
 
     super
   end

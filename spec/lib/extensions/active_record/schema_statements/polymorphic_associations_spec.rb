@@ -29,6 +29,7 @@ describe Extensions::ActiveRecord::SchemaStatements::PolymorphicAssociations do
     expect(connection.column_exists?(:users, :attachment_id, :integer, limit: 8, null: true)).to be true
     expect(connection.column_exists?(:users, :asset_id)).to be false
     expect(connection.column_exists?(:users, :asset_type)).to be false
+    expect(connection.index_exists?(:users, :assignment_id, where: "(assignment_id IS NOT NULL)")).to be true
     expect(connection.check_constraint_exists?(:users,
                                                name: "chk_require_asset",
                                                expression: "(assignment_id IS NOT NULL)::int + (submission_id IS NOT NULL)::int + (attachment_id IS NOT NULL)::int = 1"))
@@ -41,6 +42,7 @@ describe Extensions::ActiveRecord::SchemaStatements::PolymorphicAssociations do
     expect(connection.column_exists?(:users, :attachment_id)).to be false
     expect(connection.column_exists?(:users, :asset_id)).to be false
     expect(connection.column_exists?(:users, :asset_type)).to be false
+    expect(connection.index_exists?(:users, :assignment_id)).to be false
     expect(connection.check_constraint_exists?(:users, name: "chk_require_asset")).to be false
   end
 
@@ -54,6 +56,7 @@ describe Extensions::ActiveRecord::SchemaStatements::PolymorphicAssociations do
     expect(connection.column_exists?(:users, :attachment_id, :integer, limit: 8, null: true)).to be true
     expect(connection.column_exists?(:users, :asset_id)).to be false
     expect(connection.column_exists?(:users, :asset_type)).to be false
+    expect(connection.index_exists?(:users, :assignment_id, where: "(assignment_id IS NOT NULL)")).to be true
     expect(connection.check_constraint_exists?(:users,
                                                name: "chk_require_asset",
                                                expression: "(assignment_id IS NOT NULL)::int + (submission_id IS NOT NULL)::int + (attachment_id IS NOT NULL)::int = 1"))
@@ -68,6 +71,7 @@ describe Extensions::ActiveRecord::SchemaStatements::PolymorphicAssociations do
     expect(connection.column_exists?(:users, :attachment_id)).to be false
     expect(connection.column_exists?(:users, :asset_id)).to be false
     expect(connection.column_exists?(:users, :asset_type)).to be false
+    expect(connection.index_exists?(:users, :assignment_id)).to be false
     expect(connection.check_constraint_exists?(:users, name: "chk_require_asset")).to be false
   end
 
