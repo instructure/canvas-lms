@@ -291,3 +291,23 @@ export interface UseAllocationRulesResult {
   error: any
   refetch: (page: number) => Promise<{rules: AllocationRuleType[]; totalCount: number | null}>
 }
+
+export interface PeerReviewConfiguration {
+  acrossSections: boolean
+  anonymousReviews: boolean
+  count: number
+  submissionRequired: boolean
+  intraReviews: boolean
+}
+
+export interface PeerReviewSubAssignment {
+  pointsPossible: number | null
+}
+
+export interface PeerReviewConfigurationData {
+  assignment: {
+    hasGroupCategory: boolean
+    peerReviews: PeerReviewConfiguration
+    peerReviewSubAssignment: PeerReviewSubAssignment | null
+  }
+}

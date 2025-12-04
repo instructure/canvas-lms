@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {IconPeerReviewLine, IconSettingsLine} from '@instructure/ui-icons'
+import {PeerReviewConfigurationTray} from './PeerReviewConfigurationTray'
 
 const I18n = createI18nScope('peer-review-assignment-widget')
 
@@ -31,30 +32,46 @@ export interface PeerReviewWidgetProps {
 }
 
 export const PeerReviewWidget = ({assignmentId, courseId}: PeerReviewWidgetProps) => {
-  return (
-    <View as="div" display="inline-block" borderColor="primary" borderWidth="small" padding="small">
-      <View>
-        <IconPeerReviewLine />
-        <View as="div" margin="0 0 0 small" display="inline-block">
-          <Text>{I18n.t('Peer Review')}</Text>
-        </View>
+  const [isConfigTrayOpen, setIsConfigTrayOpen] = useState(false)
 
-        <Button
-          margin="0 0 0 x-large"
-          renderIcon={<IconSettingsLine />}
-          data-testid="view-configuration-button"
-          aria-label={I18n.t('View Peer Review Configuration')}
-        >
-          {I18n.t('View Configuration')}
-        </Button>
-        <Button
-          margin="0 0 0 small"
-          data-testid="allocate-peer-reviews-button"
-          aria-label={I18n.t('Open Peer Review Allocation Tray')}
-        >
-          {I18n.t('Allocate Peer Reviews')}
-        </Button>
+  return (
+    <>
+      <View
+        as="div"
+        display="inline-block"
+        borderColor="primary"
+        borderWidth="small"
+        padding="small"
+      >
+        <View>
+          <IconPeerReviewLine />
+          <View as="div" margin="0 0 0 small" display="inline-block">
+            <Text>{I18n.t('Peer Review')}</Text>
+          </View>
+
+          <Button
+            margin="0 0 0 x-large"
+            renderIcon={<IconSettingsLine />}
+            data-testid="view-configuration-button"
+            aria-label={I18n.t('View Peer Review Configuration')}
+            onClick={() => setIsConfigTrayOpen(true)}
+          >
+            {I18n.t('View Configuration')}
+          </Button>
+          <Button
+            margin="0 0 0 small"
+            data-testid="allocate-peer-reviews-button"
+            aria-label={I18n.t('Open Peer Review Allocation Tray')}
+          >
+            {I18n.t('Allocate Peer Reviews')}
+          </Button>
+        </View>
       </View>
-    </View>
+      <PeerReviewConfigurationTray
+        assignmentId={assignmentId}
+        isTrayOpen={isConfigTrayOpen}
+        closeTray={() => setIsConfigTrayOpen(false)}
+      />
+    </>
   )
 }
