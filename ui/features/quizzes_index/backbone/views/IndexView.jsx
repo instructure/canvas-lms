@@ -18,7 +18,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import {debounce, reduce, forEach} from 'lodash'
+import {debounce, reduce, forEach} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/IndexView.handlebars'
 import '@canvas/rails-flash-notifications'
