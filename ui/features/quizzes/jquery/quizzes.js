@@ -28,7 +28,7 @@
 // xsslint safeString.property question_text
 import regradeTemplate from '../jst/regrade.handlebars'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {find, forEach, keys, difference} from 'lodash'
+import {find, forEach, keys, difference} from 'es-toolkit/compat'
 import $ from 'jquery'
 import calcCmd from './calcCmd'
 import htmlEscape, {raw} from '@instructure/html-escape'

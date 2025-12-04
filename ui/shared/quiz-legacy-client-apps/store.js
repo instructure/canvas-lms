@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {assignIn} from 'lodash'
+import {assignIn} from 'es-toolkit/compat'
 
 const Store = function (key, proto, Dispatcher) {
   const emitChange = this.emitChange.bind(this)

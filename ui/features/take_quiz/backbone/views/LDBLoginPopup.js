@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _, {map, isBoolean, extend} from 'lodash'
+import {map, isBoolean, extend, compact} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import Markup from '../../jst/LDBLoginPopup.handlebars'
@@ -201,7 +201,7 @@ export default class LDBLoginPopup extends Backbone.View {
       const $head = $(whnd.document.head)
 
       // Inject the stylesheets.
-      _(styleSheets).each(href => {
+      styleSheets.forEach(href => {
         $head.append(`<link rel="stylesheet" href="${htmlEscape(href)}" />`)
       })
 
@@ -239,11 +239,7 @@ export default class LDBLoginPopup extends Backbone.View {
     }
 
     // Store the links to the stylesheets
-    styleSheets = _(document.styleSheets)
-      .chain()
-      .map(styleSheet => styleSheet.href)
-      .compact()
-      .value()
+    styleSheets = compact(map(Array.from(document.styleSheets), styleSheet => styleSheet.href))
 
     $inputSink = $('<div />').on('click', bringToFront).css({
       'z-index': 1000,
