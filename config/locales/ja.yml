@@ -27973,12 +27973,12 @@ ja:
   question_banks_courses_dd907ecf: 質問バンク（コース）
   question_banks_view_and_link_e6d9cde2: "問題バンク - 表示とリンク"
   question_banks_view_and_link_to_f1bca68b: "質問バンク - 表示とリンク"
-  question_f06476d1: 質問
+  question_f06476d1: 問題
   question_group_837b8014: 質問グループ
   question_mark_icon_d2bbd204: クエスチョンマークのアイコン
-  question_position_45eba089: "質問%{position}"
+  question_position_45eba089: "問題%{position}"
   question_unanswered: 未回答
-  questions_a955145c: 質問
+  questions_a955145c: 問題
   queued_d0e45c4b: キュー
   queued_jobs_9a7a923e: キューに入ったジョブ
   quick_look_9bd1a50d: クイックルック
@@ -28037,15 +28037,15 @@ ja:
     navigation: 
       links: 
         back_to_session_information: ログに戻る
-        question: "質問%{position}"
-      questions: 質問
+        question: "問題%{position}"
+      questions: 問題
     no_answer: 解答なし
     page_header: セッション情報
     question_answers: 
       essay: 
         view_html_answer: "HTML の表示"
         view_plain_answer: プレーンの表示
-    question_header: "質問#%{position}"
+    question_header: "問題#%{position}"
     question_response_count: 
       one: "この問題は 1 回解答されました。"
       other: "この質問は %{count} 回解答されました。"
@@ -28058,7 +28058,7 @@ ja:
       buttons: 
         go_to_stream: ストリームの表示
       headers: 
-        question: "質問%{position}"
+        question: "問題%{position}"
         timestamp: タイムスタンプ
       legend: 
         dotted_circle: 破線の円
@@ -28167,7 +28167,7 @@ ja:
     loading_questions: 質問統計を読み込み中です。少々お待ちください。
     no_answer: 解答なし
     question_breakdown: 質問の分類
-    question_header: "質問%{position}"
+    question_header: "問題%{position}"
     quiz-stats-noshow-warning: 素晴らしさにも限界があります。この小テストの統計を表示することはできませんが、レポートをダウンロードすることはできます。
     response_student_count: 
       one: "1 人の受講生"
@@ -28874,7 +28874,7 @@ ja:
           expand_group: グループの展開
       question_list_right_side: 
         headers: 
-          questions: 質問
+          questions: 問題
       question_statistic: 
         attempts: 
           one: "%{count} 回の試行"
@@ -28898,7 +28898,7 @@ ja:
         headers: 
           due: 期限
           points: 点数
-          questions: 質問
+          questions: 問題
           time_limit: 制限時間
         multiple_due_dates: 複数の期日
         no_due_date: 期日なし
