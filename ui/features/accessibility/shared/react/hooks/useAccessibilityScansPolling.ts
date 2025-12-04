@@ -24,6 +24,7 @@ import {useAccessibilityScansStore} from '../stores/AccessibilityScansStore'
 import {AccessibilityResourceScan, ScanWorkflowState} from '../types'
 import {convertKeysToCamelCase} from '../utils/apiData'
 import {getCourseBasedPath} from '../utils/query'
+import {useAccessibilityScansFetchUtils} from './useAccessibilityScansFetchUtils'
 
 const POLLING_INTERVAL_MS = 5000
 
@@ -36,6 +37,7 @@ type PollingResponse = {
  * Uses TanStack Query for efficient polling with automatic cleanup.
  */
 export const useAccessibilityScansPolling = () => {
+  const {doFetchAccessibilityIssuesSummary} = useAccessibilityScansFetchUtils()
   const [accessibilityScans, setAccessibilityScans] = useAccessibilityScansStore(
     useShallow(state => [state.accessibilityScans, state.setAccessibilityScans]),
   )
@@ -88,6 +90,9 @@ export const useAccessibilityScansPolling = () => {
         })
 
         setAccessibilityScans(newScans)
+
+        // Refetch dashboard summary when scan states change
+        doFetchAccessibilityIssuesSummary({})
 
         return updatedScans
       }
