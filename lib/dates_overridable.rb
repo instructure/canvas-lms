@@ -274,7 +274,7 @@ module DatesOverridable
     if context.user_has_been_observer?(user)
       observed_student_due_dates(user).length > 1
     elsif context.user_has_been_admin?(user)
-      dates = all_dates_visible_to(user)
+      dates = all_dates_visible_to(user, include_module_overrides: false)
       dates && dates.map { |hash| self.class.due_date_compare_value(hash[:due_at]) }.uniq.size > 1
     elsif context.user_has_no_enrollments?(user)
       all_due_dates.length > 1
@@ -326,7 +326,7 @@ module DatesOverridable
     courses_user_has_been_enrolled_in
   end
 
-  def all_dates_visible_to(user, courses_user_has_been_enrolled_in: nil)
+  def all_dates_visible_to(user, include_module_overrides: true, courses_user_has_been_enrolled_in: nil)
     return all_due_dates if user.nil?
 
     if courses_user_has_been_enrolled_in
@@ -336,6 +336,7 @@ module DatesOverridable
             courses_user_has_been_enrolled_in[:admin].include?(context_id) ||
             courses_user_has_been_enrolled_in[:observer].include?(context_id)
         overrides = overrides_for(user)
+        overrides = overrides.reject(&:context_module_id) unless include_module_overrides
         overrides = overrides_to_hash(user, overrides)
         if !differentiated_assignments_applies? &&
            (overrides.empty? || courses_user_has_been_enrolled_in[:admin].include?(context_id))
@@ -351,6 +352,7 @@ module DatesOverridable
           context.user_has_been_admin?(user) ||
           context.user_has_been_observer?(user)
       overrides = overrides_for(user)
+      overrides = overrides.reject(&:context_module_id) unless include_module_overrides
       overrides = overrides_to_hash(user, overrides)
       if !differentiated_assignments_applies? && (overrides.empty? || context.user_has_been_admin?(user))
         overrides << base_due_date_hash
