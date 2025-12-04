@@ -321,7 +321,10 @@ describe('AdaChatbot', () => {
 
     await waitFor(
       () => {
-        expect(console.error).toHaveBeenCalledWith('Failed to open Ada chatbot:', expect.any(Error))
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          'Failed to open Ada chatbot:',
+          expect.any(Error),
+        )
       },
       {timeout: 6000},
     )
@@ -378,10 +381,9 @@ describe('AdaChatbot', () => {
       (call: SubscribeArgs) => call[0] === 'ada:end_conversation',
     )
 
-    if (subscribeCall) {
-      const callback = subscribeCall[1]
-      callback()
-    }
+    expect(subscribeCall).toBeDefined()
+    const callback = subscribeCall![1]
+    callback()
 
     expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('true')
     expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('false')
@@ -402,10 +404,9 @@ describe('AdaChatbot', () => {
       (call: SubscribeArgs) => call[0] === 'ada:minimize_chat',
     )
 
-    if (subscribeCall) {
-      const callback = subscribeCall[1]
-      callback()
-    }
+    expect(subscribeCall).toBeDefined()
+    const callback = subscribeCall![1]
+    callback()
 
     expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('false')
     expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('false')
@@ -426,10 +427,9 @@ describe('AdaChatbot', () => {
       (call: SubscribeArgs) => call[0] === 'ada:close_chat',
     )
 
-    if (subscribeCall) {
-      const callback = subscribeCall[1]
-      callback()
-    }
+    expect(subscribeCall).toBeDefined()
+    const callback = subscribeCall![1]
+    callback()
 
     expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('false')
     expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('false')
@@ -457,9 +457,10 @@ describe('AdaChatbot', () => {
         autoRestoreAda()
       })
 
-      await waitFor(() => {
-        expect(mockAdaEmbed.start).not.toHaveBeenCalled()
-      })
+      // Give any async operations a chance to complete
+      await new Promise(resolve => setTimeout(resolve, 50))
+
+      expect(mockAdaEmbed.start).not.toHaveBeenCalled()
     })
 
     it('only runs once even when called multiple times', async () => {
