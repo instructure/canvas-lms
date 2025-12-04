@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {extend} from 'lodash'
+import {extend} from 'es-toolkit/compat'
 import config from './config'
 import controller from './controller'
 import initialize from './config/initializer'
