@@ -111,7 +111,8 @@ const renderLoading = () => {
 const ReverseOrderingFirst = [IssuesTableColumns.Issues, IssuesTableColumns.LastEdited]
 
 export const AccessibilityIssuesTable = () => {
-  const {doFetchAccessibilityScanData} = useAccessibilityScansFetchUtils()
+  const {doFetchAccessibilityScanData, doFetchAccessibilityIssuesSummary} =
+    useAccessibilityScansFetchUtils()
 
   useAccessibilityScansPolling()
 
@@ -154,8 +155,9 @@ export const AccessibilityIssuesTable = () => {
       doFetchAccessibilityScanData({
         page: nextPage,
       })
+      doFetchAccessibilityIssuesSummary({})
     },
-    [doFetchAccessibilityScanData],
+    [doFetchAccessibilityScanData, doFetchAccessibilityIssuesSummary],
   )
 
   return (
