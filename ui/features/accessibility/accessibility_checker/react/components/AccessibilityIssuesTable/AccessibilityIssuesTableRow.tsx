@@ -52,11 +52,13 @@ export const AccessibilityIssuesTableRow = ({item, isMobile}: Props) => (
       <ContentTypeCell item={item} />
     </Table.Cell>
     <Table.Cell>
-      <Flex alignItems="center">
+      <Flex alignItems="center" gap="x-small">
         {item.resourceWorkflowState === ResourceWorkflowState.Published ? (
           <>
-            <Flex.Item margin="0 x-small 0 0">
-              <IconPublishSolid color="success" />
+            <Flex.Item>
+              <Flex>
+                <IconPublishSolid color="success" aria-hidden="true" />
+              </Flex>
             </Flex.Item>
             <Flex.Item>
               <Text>{I18n.t('Published')}</Text>
@@ -64,8 +66,10 @@ export const AccessibilityIssuesTableRow = ({item, isMobile}: Props) => (
           </>
         ) : (
           <>
-            <Flex.Item margin="0 x-small 0 0">
-              <IconUnpublishedSolid color="secondary" />
+            <Flex.Item>
+              <Flex>
+                <IconUnpublishedSolid color="secondary" aria-hidden="true" />
+              </Flex>
             </Flex.Item>
             <Flex.Item>
               <Text>{I18n.t('Unpublished')}</Text>

@@ -94,7 +94,9 @@ const FixOrReviewAction = ({item}: ScanStateCellProps) => {
 const IssueCountAndAction = ({item, isMobile}: ScanStateCellProps) => (
   <Flex gap="x-small">
     <Flex.Item {...getDesktopProps(isMobile)}>
-      <IssueCountBadge issueCount={item.issueCount} />
+      <Flex justifyItems="end">
+        <IssueCountBadge issueCount={item.issueCount} />
+      </Flex>
     </Flex.Item>
     <FixOrReviewAction item={item} isMobile={isMobile} />
   </Flex>
@@ -109,7 +111,9 @@ interface ScanStateWithIconProps {
 const ScanStateWithIcon = ({icon, text, isMobile}: ScanStateWithIconProps) => (
   <Flex gap="x-small">
     <Flex.Item {...getDesktopProps(isMobile)}>
-      <PresentationContent>{icon}</PresentationContent>
+      <Flex justifyItems="end">
+        {icon}
+      </Flex>
     </Flex.Item>
     <Flex.Item textAlign="start">
       <Text>{text}</Text>
@@ -167,7 +171,7 @@ const ScanStateWithExplanation = ({
 
 const NoIssuesText = ({isMobile}: {isMobile: boolean}) => (
   <ScanStateWithIcon
-    icon={<IconPublishSolid color="success" />}
+    icon={<IconPublishSolid color="success" aria-hidden="true"/>}
     text={I18n.t('No issues')}
     isMobile={isMobile}
   />
@@ -189,7 +193,7 @@ const ScanInProgress = ({item, isMobile}: {item: AccessibilityResourceScan; isMo
 // Should not happen, as a scan either completes or fails, but just in case...
 const UnknownIssuesText = ({isMobile}: {isMobile: boolean}) => (
   <ScanStateWithIcon
-    icon={<IconQuestionLine color="secondary" />}
+    icon={<IconQuestionLine color="secondary" aria-hidden="true" />}
     text={I18n.t('Unknown')}
     isMobile={isMobile}
   />
@@ -197,7 +201,7 @@ const UnknownIssuesText = ({isMobile}: {isMobile: boolean}) => (
 
 const ScanWithError = ({item, isMobile}: {item: AccessibilityResourceScan; isMobile: boolean}) => (
   <ScanStateWithExplanation
-    icon={<IconQuestionLine color="secondary" />}
+    icon={<IconQuestionLine color="secondary" aria-hidden="true" />}
     text={I18n.t('Failed')}
     tooltipText={I18n.t('Scan error:') + ` ${item.errorMessage || I18n.t('Unknown error')}`}
     isMobile={isMobile}
