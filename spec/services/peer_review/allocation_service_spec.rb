@@ -640,6 +640,66 @@ RSpec.describe PeerReview::AllocationService do
         expect(result.map(&:id).uniq.size).to eq(result.size)
       end
     end
+
+    context "when recycling submissions that have all been reviewed" do
+      let(:student4) { user_model }
+      let(:student5) { user_model }
+
+      before do
+        course.enroll_student(student4, enrollment_state: :active)
+        course.enroll_student(student5, enrollment_state: :active)
+
+        assignment.submit_homework(assessor, body: "Assessor submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission1.update!(submitted_at: 5.days.ago)
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission2.update!(submitted_at: 4.days.ago)
+        @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
+        @submission3.update!(submitted_at: 3.days.ago)
+
+        # All submissions have been reviewed at least once
+        # submission1: 1 review
+        assignment.assign_peer_review(student4, student1)
+
+        # submission2: 2 reviews
+        assignment.assign_peer_review(student4, student2)
+        assignment.assign_peer_review(student5, student2)
+
+        # submission3: 3 reviews
+        assignment.assign_peer_review(student4, student3)
+        assignment.assign_peer_review(student5, student3)
+        assignment.assign_peer_review(student1, student3)
+      end
+
+      it "properly recycles by prioritizing fewest reviews first" do
+        available = [@submission1, @submission2, @submission3]
+        result = service.send(:select_submissions_to_allocate, available, 2)
+
+        expect(result.map(&:id)).to eq([@submission1.id, @submission2.id])
+      end
+
+      it "uses submitted_at to break ties when review counts are equal" do
+        # Give submission1 and submission2 the same review count
+        assignment.assign_peer_review(student5, student1)
+
+        available = [@submission1, @submission2, @submission3]
+        result = service.send(:select_submissions_to_allocate, available, 2)
+
+        expect(result.map(&:id)).to eq([@submission1.id, @submission2.id])
+      end
+
+      it "handles submissions with identical review counts and submitted_at consistently" do
+        time = 5.days.ago
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission1.update!(submitted_at: time)
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission2.update!(submitted_at: time)
+        available = [@submission1, @submission2]
+        result = service.send(:select_submissions_to_allocate, available, 1)
+        # Should return consistently (e.g., by submission.id)
+        expect(result.size).to eq(1)
+      end
+    end
   end
 
   describe "#success_result" do
@@ -665,6 +725,77 @@ RSpec.describe PeerReview::AllocationService do
     it "defaults status to bad_request" do
       result = service.send(:error_result, :test_error, "Test message")
       expect(result[:status]).to eq(:bad_request)
+    end
+  end
+
+  describe "#preload_available_submissions" do
+    context "when filtering submissions by actual work submitted" do
+      before do
+        assignment.submit_homework(assessor, body: "Assessor submission")
+      end
+
+      it "includes submitted submissions with actual work" do
+        submission = assignment.submit_homework(student1, body: "Student1 submission")
+        submission.update!(workflow_state: "submitted")
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).to include(submission.id)
+      end
+
+      it "includes pending_review submissions with actual work" do
+        submission = assignment.submit_homework(student1, body: "Student1 submission")
+        submission.update!(workflow_state: "pending_review")
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).to include(submission.id)
+      end
+
+      it "includes graded submissions with actual work" do
+        submission = assignment.submit_homework(student1, body: "Student1 submission")
+        assignment.grade_student(student1, grader: course.teachers.first, score: 10)
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).to include(submission.id)
+      end
+
+      it "excludes graded submissions without actual submission_type" do
+        submission = assignment.submissions.find_by(user: student1)
+        submission.update!(workflow_state: "graded", score: 10, submission_type: nil)
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).not_to include(submission.id)
+      end
+
+      it "excludes deleted submissions" do
+        submission = assignment.submit_homework(student1, body: "Student1 submission")
+        submission.update!(workflow_state: "deleted")
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).not_to include(submission.id)
+      end
+
+      it "excludes unsubmitted submissions without submission_type" do
+        submission = assignment.submissions.find_by(user: student1)
+        submission.update!(workflow_state: "unsubmitted", submission_type: nil)
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).not_to include(submission.id)
+      end
+
+      it "excludes the assessor's own submission" do
+        assessor_submission = assignment.submissions.find_by(user: assessor)
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).not_to include(assessor_submission.id)
+      end
+
+      it "excludes submissions already assigned to the assessor" do
+        submission = assignment.submit_homework(student1, body: "Student1 submission")
+        assignment.assign_peer_review(assessor, student1)
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).not_to include(submission.id)
+      end
     end
   end
 end
