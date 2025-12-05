@@ -115,6 +115,7 @@ export const DASHBOARD_NOTIFICATIONS_KEY = 'dashboardNotifications'
 export const COURSE_WORK_KEY = 'courseWork'
 export const COURSE_STATISTICS_KEY = 'courseStatistics'
 export const COURSE_INSTRUCTORS_PAGINATED_KEY = 'courseInstructorsPaginated'
+export const PROGRESS_OVERVIEW_KEY = 'progressOverview'
 
 // URL patterns
 export const URL_PATTERNS = {
