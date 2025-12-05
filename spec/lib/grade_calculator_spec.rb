@@ -1936,93 +1936,75 @@ describe GradeCalculator do
   end
 
   describe "#save_scores_in_transaction" do
-    shared_examples "differentiated assignments" do
-      before do
-        grades = [[5, 20], [15, 20], [10, 20], [nil, 20], [20, 20], [10, 20], [nil, 20]]
+    before do
+      grades = [[5, 20], [15, 20], [10, 20], [nil, 20], [20, 20], [10, 20], [nil, 20]]
 
-        @group = @course.assignment_groups.create!(name: "DA group")
+      @group = @course.assignment_groups.create!(name: "DA group")
 
-        @assignments = grades.map do |score, possible|
-          a = @course.assignments.create! title: "homework",
-                                          points_possible: possible,
-                                          assignment_group: @group
+      @assignments = grades.map do |score, possible|
+        a = @course.assignments.create! title: "homework",
+                                        points_possible: possible,
+                                        assignment_group: @group
 
-          a.grade_student @user, grade: score, grader: @teacher unless score.nil?
+        a.grade_student @user, grade: score, grader: @teacher unless score.nil?
 
-          a.only_visible_to_overrides = true
-          a.save!
-          a
-        end
-
-        Submission.where(user: @user).update_all(posted_at: Time.zone.now)
-
-        @overridden_lowest = @assignments[0]
-        @overridden_highest = @assignments[1]
-        @overridden_middle = @assignments[2]
-
-        @user.enrollments.each(&:destroy)
-        @section = @course.course_sections.create!(name: "test section")
-        student_in_section(@section, user: @user)
-
-        create_section_override_for_assignment(@overridden_lowest, course_section: @section)
-        create_section_override_for_assignment(@overridden_highest, course_section: @section)
-        create_section_override_for_assignment(@overridden_middle, course_section: @section)
+        a.only_visible_to_overrides = true
+        a.save!
+        a
       end
 
-      def find_submission(assignment)
-        assignment.submissions.where(user_id: @user.id).first.id
-      end
+      Submission.where(user: @user).update_all(posted_at: Time.zone.now)
 
-      it "saves scores for all assignment group and enrollment combinations" do
-        # Fails if empty_drop_rows are not updated
-        @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
-        user_ids = @course.enrollments.map(&:user_id).uniq
-        group_ids = @assignments.map(&:assignment_group_id).uniq
-        GradeCalculator.new(user_ids, @course.id).compute_and_save_scores
-        expect(Score.where(assignment_group_id: group_ids).count).to eq @course.enrollments.count * group_ids.length
-        expect(ScoreMetadata.where(score_id: Score.where(assignment_group_id: group_ids)).count).to eq 2
-      end
+      @overridden_lowest = @assignments[0]
+      @overridden_highest = @assignments[1]
+      @overridden_middle = @assignments[2]
 
-      it "saves dropped submission to group score metadata" do
-        # Fails if non_empty_drop_rows are not updated
-        @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
-        GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
-        enrollment = Enrollment.find_by(user_id: @user.id, course_id: @course.id)
-        score = enrollment.find_score(assignment_group: @group)
-        expect(score.score_metadata.calculation_details).to eq({
-                                                                 "current" => { "dropped" => [find_submission(@overridden_middle)] },
-                                                                 "final" => { "dropped" => [find_submission(@overridden_middle)] }
-                                                               })
-      end
+      @user.enrollments.each(&:destroy)
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @user)
 
-      it "does not include muted assignments in the dropped submission list in group score metadata" do
-        # Fails if empty_drop_rows are not updated
-        @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
-        @overridden_middle.mute!
-        GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
-        enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
-        score = enrollment.find_score(assignment_group: @group)
-        expect(score.score_metadata.calculation_details).to eq({
-                                                                 "current" => { "dropped" => [] },
-                                                                 "final" => { "dropped" => [] }
-                                                               })
-      end
+      create_section_override_for_assignment(@overridden_lowest, course_section: @section)
+      create_section_override_for_assignment(@overridden_highest, course_section: @section)
+      create_section_override_for_assignment(@overridden_middle, course_section: @section)
     end
 
-    context "with use_batches_score_metadata_updates ON" do
-      before do
-        Account.site_admin.enable_feature!(:use_batches_score_metadata_updates)
-      end
-
-      it_behaves_like "differentiated assignments"
+    def find_submission(assignment)
+      assignment.submissions.where(user_id: @user.id).first.id
     end
 
-    context "with use_batches_score_metadata_updates OFF" do
-      before do
-        Account.site_admin.disable_feature!(:use_batches_score_metadata_updates)
-      end
+    it "saves scores for all assignment group and enrollment combinations" do
+      # Fails if empty_drop_rows are not updated
+      @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+      user_ids = @course.enrollments.map(&:user_id).uniq
+      group_ids = @assignments.map(&:assignment_group_id).uniq
+      GradeCalculator.new(user_ids, @course.id).compute_and_save_scores
+      expect(Score.where(assignment_group_id: group_ids).count).to eq @course.enrollments.count * group_ids.length
+      expect(ScoreMetadata.where(score_id: Score.where(assignment_group_id: group_ids)).count).to eq 2
+    end
 
-      it_behaves_like "differentiated assignments"
+    it "saves dropped submission to group score metadata" do
+      # Fails if non_empty_drop_rows are not updated
+      @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+      GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
+      enrollment = Enrollment.find_by(user_id: @user.id, course_id: @course.id)
+      score = enrollment.find_score(assignment_group: @group)
+      expect(score.score_metadata.calculation_details).to eq({
+                                                               "current" => { "dropped" => [find_submission(@overridden_middle)] },
+                                                               "final" => { "dropped" => [find_submission(@overridden_middle)] }
+                                                             })
+    end
+
+    it "does not include muted assignments in the dropped submission list in group score metadata" do
+      # Fails if empty_drop_rows are not updated
+      @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+      @overridden_middle.mute!
+      GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
+      enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
+      score = enrollment.find_score(assignment_group: @group)
+      expect(score.score_metadata.calculation_details).to eq({
+                                                               "current" => { "dropped" => [] },
+                                                               "final" => { "dropped" => [] }
+                                                             })
     end
   end
 

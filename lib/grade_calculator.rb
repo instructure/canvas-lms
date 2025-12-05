@@ -430,25 +430,6 @@ class GradeCalculator
     end
   end
 
-  # if use_batches_score_metadata_updates is OFF, we use this method
-  def group_dropped_rows_old
-    enrollments_by_user.keys.map do |user_id|
-      current = @current_groups[user_id].pluck(:global_id, :dropped).to_h
-      final = @final_groups[user_id].pluck(:global_id, :dropped).to_h
-      @groups.map do |group|
-        agid = group.global_id
-        hsh = {
-          current: { dropped: current[agid] },
-          final: { dropped: final[agid] }
-        }
-        enrollments_by_user[user_id].map do |enrollment|
-          "(#{enrollment.id}, #{group.id}, '#{hsh.to_json}')"
-        end
-      end
-    end.flatten
-  end
-
-  # if use_batches_score_metadata_updates is ON, we use this method
   def group_dropped_rows
     enrollments_by_user.keys.flat_map do |user_id|
       current = @current_groups[user_id].pluck(:global_id, :dropped).to_h
@@ -509,11 +490,7 @@ class GradeCalculator
         save_course_and_grading_period_metadata
         score_rows = group_score_rows
         if @grading_period.nil? && score_rows.any?
-          if Account.site_admin.feature_enabled?(:use_batches_score_metadata_updates)
-            save_assignment_group_scores(score_rows, group_dropped_rows)
-          else
-            save_assignment_group_scores_old(score_rows, group_dropped_rows_old)
-          end
+          save_assignment_group_scores(score_rows, group_dropped_rows)
         end
       end
     end
@@ -679,95 +656,6 @@ class GradeCalculator
     end
   end
 
-  # if use_batches_score_metadata_updates is OFF, we use this method
-  def save_assignment_group_scores_old(score_values, dropped_values)
-    table = Score.quoted_table_name
-
-    update_columns, update_conditions = assignment_group_columns_to_insert_or_update[:update_columns]
-                                        .each_with_object([+"", +""]) do |uc, (cols, conds)|
-      cols << %(#{", " unless cols.empty?}#{uc[:column]} = #{uc[:target]})
-      conds << %(#{" OR " unless conds.empty?}#{table}.#{uc[:column]} IS DISTINCT FROM #{uc[:target]})
-    end
-
-    value_names = assignment_group_columns_to_insert_or_update[:value_names]
-                  .map.with_index { |name, i| %((x->>#{i + 2})::FLOAT8 AS #{name}) }.join(", ")
-
-    Score.connection.with_max_update_limit(score_values.length) do
-      # Update existing assignment group Scores or create them if needed.
-      Score.connection.execute(<<~SQL.squish)
-        INSERT INTO #{table} (
-          enrollment_id, assignment_group_id,
-          #{assignment_group_columns_to_insert_or_update[:value_names].join(", ")},
-          course_score, root_account_id, created_at, updated_at
-        )
-          SELECT
-            val.enrollment_id AS enrollment_id,
-            val.assignment_group_id as assignment_group_id,
-            #{assignment_group_columns_to_insert_or_update[:insert_columns].join(", ")},
-            FALSE AS course_score,
-            #{@course.root_account_id} AS root_account_id,
-            #{updated_at} AS created_at,
-            #{updated_at} AS updated_at
-          FROM
-            (
-              SELECT
-                (x->>0)::INT8 AS enrollment_id,
-                (x->>1)::INT8 AS assignment_group_id,
-                #{value_names}
-              FROM
-                jsonb_array_elements('#{score_values.to_json}') x
-            ) val
-          ORDER BY assignment_group_id, enrollment_id
-        ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL
-        DO UPDATE SET
-          #{update_columns},
-          updated_at = excluded.updated_at,
-          root_account_id = excluded.root_account_id,
-          workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
-        WHERE
-          #{update_conditions}
-          OR #{table}.root_account_id IS DISTINCT FROM excluded.root_account_id
-          OR #{table}.workflow_state IS DISTINCT FROM COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
-      SQL
-    end
-
-    # We only save score metadata for posted grades. This means, if we're
-    # calculating unposted grades (which means @ignore_muted is false),
-    # we don't want to update the score metadata. TODO: start storing the
-    # score metadata for unposted grades.
-    if @ignore_muted
-      table = ScoreMetadata.quoted_table_name
-      Score.connection.with_max_update_limit(dropped_values.length) do
-        ScoreMetadata.connection.execute(<<~SQL.squish)
-          INSERT INTO #{table}
-            (score_id, calculation_details, created_at, updated_at)
-            SELECT
-              scores.id AS score_id,
-              CAST(val.calculation_details as json) AS calculation_details,
-              #{updated_at} AS created_at,
-              #{updated_at} AS updated_at
-            FROM (VALUES #{dropped_values.join(",")}) val
-              (enrollment_id, assignment_group_id, calculation_details)
-            LEFT OUTER JOIN #{Score.quoted_table_name} scores ON
-              scores.enrollment_id = val.enrollment_id AND
-              scores.assignment_group_id = val.assignment_group_id
-            ORDER BY score_id
-          ON CONFLICT (score_id)
-          DO UPDATE SET
-            calculation_details = excluded.calculation_details,
-            updated_at = excluded.updated_at
-          WHERE
-          #{table}.calculation_details #>>'{current,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{current,dropped}' OR
-          #{table}.calculation_details #>>'{final,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{final,dropped}'
-        SQL
-      end
-    end
-  rescue ActiveRecord::Deadlocked => e
-    Canvas::Errors.capture_exception(:grade_calculator, e, :warn)
-    raise Delayed::RetriableError, "Deadlock in upserting assignment group scores"
-  end
-
-  # if use_batches_score_metadata_updates is ON, we use this method
   def save_assignment_group_scores(score_values, dropped_values)
     table = Score.quoted_table_name
 
