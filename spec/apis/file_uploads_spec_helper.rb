@@ -141,6 +141,8 @@ shared_examples_for "file uploads api" do
           "category" => "uncategorized"
         }
 
+        expected_json["uuid"] = attachment.uuid if (attachment.context_type == "User" && attachment.context_id == @user.id) || !attachment.root_account.feature_enabled?(:deprecate_uuid_in_files_api)
+
         if attachment.context.is_a?(User) || attachment.context.is_a?(Course) || attachment.context.is_a?(Group)
           expected_json["preview_url"] = context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0)
         end
@@ -190,7 +192,9 @@ shared_examples_for "file uploads api" do
           expect(response).to be_successful
           attachment.reload
           json = json_parse(response.body)
-          expect(json).to eq attachment_json(attachment, { include: %w[enhanced_preview_url] })
+          expected_json = attachment_json(attachment, { include: %w[enhanced_preview_url] })
+          expected_json["uuid"] = attachment.uuid if (attachment.context_type == "User" && attachment.context_id == @user.id) || !attachment.root_account.feature_enabled?(:deprecate_uuid_in_files_api)
+          expect(json).to eq expected_json
 
           expect(attachment.file_state).to eq "available"
           expect(attachment.content_type).to eq "application/msword"
