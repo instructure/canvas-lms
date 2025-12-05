@@ -8355,6 +8355,7 @@ el:
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Το αρχείο πολυμέσων έχει προστεθεί στην ουρά για μετατροπή, παρακαλώ δοκιμάστε ξανά σε πολύ λίγο."
   media_objects: 
     media_objects_not_configured: "Τα Αντικείμενα Πολυμέσων δεν έχουν ρυθμιστεί"
+    video_player: "Πρόγραμμα Αναπαραγωγής Βίντεο"
   media_recording_77cddc52: "Ηχογράφηση Αρχείου Πολυμέσων"
   media_recording_f53c5ef1: "Ηχογράφηση αρχείου πολυμέσων"
   media_recording_submission_b7fd1491: "Υποβολή Ηχογράφησης Αρχείου Πολυμέσων"
@@ -10257,6 +10258,7 @@ el:
   not_published_73f7079: "Μη δημοσιευμένο"
   not_synced_529cbf29: "Δεν έχει συγχρονιστεί"
   not_yet_completed_345a0bca: "Δεν έχει ολοκληρωθεί ακόμη"
+  not_yet_graded_8b655a7: "Δεν έχει βαθμολογηθεί ακόμη"
   note_8b73ce09: Σημείωση
   note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: "<mrk mid=\"6194\" mtype=\"seg\">Σημείωση:</mrk> <mrk mid=\"6195\" mtype=\"seg\">Μπορεί να χρειαστεί έως και μία εβδομάδα για την παροχή του Beta URL, ανάλογα με τον κύκλο ανανέωσης Beta.</mrk>"
   note_length_cannot_exceed_maxlength_characters_82798b1: "Το μέγεθος της σημείωσης δεν μπορεί να υπερβαίνει τους %{maxLength} χαρακτήρες."
