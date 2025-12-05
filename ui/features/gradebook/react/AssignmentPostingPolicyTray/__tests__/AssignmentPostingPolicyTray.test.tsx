@@ -852,7 +852,10 @@ describe('AssignmentPostingPolicyTray', () => {
         await enterNewDateTime(dateInputs[0], futureDateString)
 
         const saveButton = getSaveButton()
-        expect(saveButton).toBeEnabled()
+        // Wait for state to settle after date entry
+        await waitFor(() => {
+          expect(saveButton).toBeEnabled()
+        })
         await userEvent.click(saveButton)
 
         expect(screen.getByText('Please enter a valid comment release date')).toBeInTheDocument()
@@ -881,7 +884,10 @@ describe('AssignmentPostingPolicyTray', () => {
         await enterNewDateTime(dateInputs[1], futureDateString)
 
         const saveButton = getSaveButton()
-        expect(saveButton).toBeEnabled()
+        // Wait for state to settle after date entry
+        await waitFor(() => {
+          expect(saveButton).toBeEnabled()
+        })
         await userEvent.click(saveButton)
 
         expect(screen.getByText('Please enter a valid grades release date')).toBeInTheDocument()
