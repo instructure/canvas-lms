@@ -26,10 +26,11 @@
 class Loaders::ObserverCourseSubmissionDataLoader < GraphQL::Batch::Loader
   include ObserverEnrollmentsHelper
 
-  def initialize(current_user:, request: nil)
+  def initialize(current_user:, request: nil, observed_user_id: nil)
     super()
     @current_user = current_user
     @request = request
+    @observed_user_id = observed_user_id
   end
 
   def perform(courses)
@@ -56,18 +57,29 @@ class Loaders::ObserverCourseSubmissionDataLoader < GraphQL::Batch::Loader
                                      .where(assignments: { context: course, has_sub_assignments: false })
                       end
                     else
-                      # Get the currently selected observed student based on observer cookie preference
-                      selected_student = selected_observed_student_from_cookie(@current_user, observed_students, @request)
+                      # Determine which student to get submissions for
+                      selected_student = if @observed_user_id
+                                           # Use the explicitly provided observed_user_id
+                                           observed_students.find { |s| s.id.to_s == @observed_user_id.to_s }
+                                         else
+                                           # Fall back to cookie-based selection
+                                           selected_observed_student_from_cookie(@current_user, observed_students, @request)
+                                         end
 
-                      # Get submissions from the selected observed student
-                      Submission
-                        .joins(:assignment, :user)
-                        .merge(AbstractAssignment.published)
-                        .where(
-                          assignments: { context: course, has_sub_assignments: false },
-                          user_id: selected_student.id
-                        )
-                        .where.not(workflow_state: "deleted")
+                      # If observed_user_id was provided but student not found in observed list, return empty
+                      if selected_student.nil?
+                        []
+                      else
+                        # Get submissions from the selected observed student
+                        Submission
+                          .active
+                          .joins(:assignment, :user)
+                          .merge(AbstractAssignment.published)
+                          .where(
+                            assignments: { context: course, has_sub_assignments: false },
+                            user_id: selected_student.id
+                          )
+                      end
                     end
 
       fulfill(course, submissions.is_a?(Array) ? submissions : submissions.to_a)

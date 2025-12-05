@@ -585,20 +585,22 @@ module Types
     def submission_statistics(observed_user_id: nil)
       return nil unless course.grants_right?(current_user, :read)
 
-      # Check if current user is an observer with observed students
-      observed_students = ObserverEnrollment.observed_students(course, current_user, include_restricted_access: false).keys
+      Loaders::ObservedStudentsLoader.for(current_user:, include_restricted_access: false).load(course).then do |observed_students_hash|
+        observed_students = observed_students_hash.keys
 
-      # filter observed_students to only students with observed_user_id if provided
-      if observed_user_id.present?
-        observed_students.select! { |student| student.id.to_s == observed_user_id.to_s }
-      end
+        if observed_user_id.present?
+          observed_students.select! { |student| student.id.to_s == observed_user_id.to_s }
+        end
 
-      is_observer = !observed_students.empty?
+        is_observer = !observed_students.empty?
 
-      if is_observer
-        Loaders::ObserverCourseSubmissionDataLoader.for(current_user:, request: context[:request]).load(course)
-      elsif observed_user_id.nil?
-        Loaders::CourseSubmissionDataLoader.for(current_user:).load(course)
+        if is_observer
+          Loaders::ObserverCourseSubmissionDataLoader.for(current_user:, request: context[:request], observed_user_id:).load(course)
+        elsif observed_user_id.nil?
+          Loaders::CourseSubmissionDataLoader.for(current_user:).load(course)
+        else
+          nil
+        end
       end
     end
 

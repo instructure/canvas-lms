@@ -10373,6 +10373,8 @@ type SubmissionStatistics {
   submissionsDueThisWeekCount: Int!
   submissionsOverdueCount(endDate: ISO8601DateTime, startDate: ISO8601DateTime): Int!
   submissionsSubmittedCount(endDate: ISO8601DateTime, startDate: ISO8601DateTime): Int!
+  submittedAndGradedCount: Int!
+  submittedNotGradedCount: Int!
   submittedSubmissionsCount: Int!
 }
 

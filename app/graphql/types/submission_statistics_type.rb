@@ -125,5 +125,23 @@ module Types
         !submission.missing? && (submission.submitted? || submission.graded? || submission.excused?)
       end
     end
+
+    field :submitted_and_graded_count, Integer, null: false
+    def submitted_and_graded_count
+      return 0 unless current_user
+
+      submissions.count do |submission|
+        submission.graded? || submission.excused?
+      end
+    end
+
+    field :submitted_not_graded_count, Integer, null: false
+    def submitted_not_graded_count
+      return 0 unless current_user
+
+      submissions.count do |submission|
+        !submission.excused? && (submission.submitted? || submission.pending_review?) && !submission.graded?
+      end
+    end
   end
 end
