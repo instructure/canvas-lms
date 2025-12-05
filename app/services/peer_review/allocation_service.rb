@@ -70,7 +70,7 @@ class PeerReview::AllocationService < ApplicationService
     # Validation: Check submission requirement based on assignment configuration
     if @assignment.peer_review_submission_required
       student_submission = @assignment.submissions.find_by(user: @assessor)
-      unless student_submission && %w[submitted graded complete].include?(student_submission.workflow_state)
+      unless student_submission&.has_submission?
         return error_result(:not_submitted, I18n.t("You must submit the assignment before requesting peer reviews"), :bad_request)
       end
     end
@@ -114,7 +114,8 @@ class PeerReview::AllocationService < ApplicationService
                                 .pluck(:user_id)
 
     @assignment.submissions
-               .where(workflow_state: %w[submitted graded complete])
+               .active
+               .having_submission
                .where.not(user_id: [@assessor.id, *already_assigned_user_ids])
                .preload(:user)
                .to_a
