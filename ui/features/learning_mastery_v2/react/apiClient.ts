@@ -39,6 +39,7 @@ interface RollupParams {
   page: number
   add_defaults?: boolean
   sort_outcome_id?: string
+  sort_alignment_id?: string
   user_ids?: number[]
 }
 
@@ -54,6 +55,7 @@ interface RollupParams {
  * @param sortOutcomeId - The ID of the outcome to sort by (when sortBy is 'outcome')
  * @param selectedUserIds - Array of user IDs to filter by (optional)
  * @param selectedOutcomeIds - Array of outcome IDs to filter by (optional)
+ * @param sortAlignmentId - The ID of the alignment to sort by (when sortBy is 'contributing_score')
  * @returns A promise that resolves to the API response
  */
 export const loadRollups = (
@@ -67,6 +69,7 @@ export const loadRollups = (
   sortOutcomeId?: string,
   selectedUserIds?: number[],
   selectedOutcomeIds?: string[],
+  sortAlignmentId?: string,
 ): Promise<AxiosResponse> => {
   const params: {params: RollupParams} = {
     params: {
@@ -79,6 +82,7 @@ export const loadRollups = (
       page,
       ...(needDefaults && {add_defaults: true}),
       ...(sortOutcomeId && {sort_outcome_id: sortOutcomeId}),
+      ...(sortAlignmentId && {sort_alignment_id: sortAlignmentId}),
       ...(selectedUserIds && selectedUserIds.length > 0 && {user_ids: selectedUserIds}),
       ...(selectedOutcomeIds && selectedOutcomeIds.length > 0 && {outcome_ids: selectedOutcomeIds}),
     },

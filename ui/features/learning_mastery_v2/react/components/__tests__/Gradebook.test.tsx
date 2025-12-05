@@ -114,6 +114,8 @@ describe('Gradebook', () => {
         setSortBy: jest.fn(),
         sortOutcomeId: null,
         setSortOutcomeId: jest.fn(),
+        sortAlignmentId: null,
+        setSortAlignmentId: jest.fn(),
       },
       onChangeNameDisplayFormat: jest.fn(),
       contributingScores: mockContributingScores,

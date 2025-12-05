@@ -60,6 +60,8 @@ describe('OutcomeHeader', () => {
         setSortBy: jest.fn(),
         sortOutcomeId: null,
         setSortOutcomeId: jest.fn(),
+        sortAlignmentId: null,
+        setSortAlignmentId: jest.fn(),
       },
       contributingScoresForOutcome: mockContributingScoresForOutcome,
     }

@@ -39,6 +39,7 @@ export enum SortBy {
   IntegrationId = 'student_integration_id',
   LoginId = 'student_login_id',
   Outcome = 'outcome',
+  ContributingScore = 'contributing_score',
 }
 
 export enum SecondaryInfoDisplay {
