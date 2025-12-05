@@ -18,18 +18,46 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
+import CourseProgressItem from './CourseProgressItem'
+import {useProgressOverview} from '../../../hooks/useProgressOverview'
 import type {BaseWidgetProps} from '../../../types'
 
 const I18n = createI18nScope('widget_dashboard')
 
-const ProgressOverviewWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false}) => {
+const ProgressOverviewWidget: React.FC<BaseWidgetProps> = ({
+  widget,
+  isEditMode = false,
+  dragHandleProps,
+}) => {
+  const {data: courses, isLoading, error} = useProgressOverview()
+
+  const hasNoCourses = !isLoading && !error && courses && courses.length === 0
+
   return (
-    <TemplateWidget widget={widget} isEditMode={isEditMode} showHeader={true}>
-      <Text size="medium" data-testid="progress-overview-placeholder">
-        {I18n.t('Progress overview widget coming soon...')}
-      </Text>
+    <TemplateWidget
+      widget={widget}
+      isEditMode={isEditMode}
+      dragHandleProps={dragHandleProps}
+      isLoading={isLoading}
+      error={error ? I18n.t('Failed to load progress overview. Please try again.') : null}
+      loadingText={I18n.t('Loading progress overview...')}
+    >
+      {hasNoCourses ? (
+        <View as="div" padding="medium" textAlign="center">
+          <Text size="medium" data-testid="no-courses-message">
+            {I18n.t('No courses found')}
+          </Text>
+        </View>
+      ) : (
+        <View as="div">
+          {courses?.map(course => (
+            <CourseProgressItem key={course.courseId} course={course} />
+          ))}
+        </View>
+      )}
     </TemplateWidget>
   )
 }
