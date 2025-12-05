@@ -116,6 +116,7 @@ new_quizzes_ai_quiz_generation:
   display_name: IgniteAI Question Authoring for Quizzes
   description: Enable IgniteAI Question Authoring for Quizzes feature
   state: allowed
+  root_opt_in: true
   applies_to: Course
   beta: true
   environments:
