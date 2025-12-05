@@ -1779,7 +1779,6 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @argument id [Integer] The id of the registration.
   # @argument update_request_id [Integer] The id of the registration update request to retrieve.
-  # @argument include [String] Array of additional information to include ["configuration", "lti_registration"]
   # @returns Lti::RegistrationUpdateRequest
   #
   # @example_request
@@ -1797,14 +1796,11 @@ class Lti::RegistrationsController < ApplicationController
       return render json: { errors: "registration does not belong to account" }, status: :bad_request
     end
 
-    includes = Array(params[:include]).map(&:to_sym) & [:configuration, :lti_registration]
-
     render json: lti_registration_update_request_json(
       registration_update_request,
       @current_user,
       session,
-      @context,
-      includes:
+      @context
     )
   end
 

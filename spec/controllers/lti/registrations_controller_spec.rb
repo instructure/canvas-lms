@@ -3091,51 +3091,6 @@ RSpec.describe Lti::RegistrationsController do
           expect(response_json["status"]).to eq("rejected")
         end
       end
-
-      context "with include parameter" do
-        context "when including configuration" do
-          let(:params) { { include: ["configuration"] } }
-
-          it "includes configuration in response" do
-            subject
-            expect(response_json).to have_key("configuration")
-          end
-        end
-
-        context "when including lti_registration" do
-          let(:params) { { include: ["lti_registration"] } }
-
-          it "includes lti_registration in response" do
-            subject
-            expect(response_json).to have_key("lti_registration")
-            expect(response_json["lti_registration"]).to include(
-              "id" => registration.id,
-              "name" => registration.name,
-              "workflow_state" => registration.workflow_state
-            )
-          end
-        end
-
-        context "when including both configuration and lti_registration" do
-          let(:params) { { include: ["configuration", "lti_registration"] } }
-
-          it "includes both in response" do
-            subject
-            expect(response_json).to have_key("configuration")
-            expect(response_json).to have_key("lti_registration")
-          end
-        end
-
-        context "when including invalid include parameter" do
-          let(:params) { { include: ["invalid", "configuration"] } }
-
-          it "only includes valid parameters" do
-            subject
-            expect(response_json).to have_key("configuration")
-            expect(response_json).not_to have_key("invalid")
-          end
-        end
-      end
     end
   end
 

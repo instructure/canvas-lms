@@ -38,9 +38,9 @@ module Api::V1::Lti::RegistrationUpdateRequest
 
   # Serializes a list of LTI registration update requests.
   # @param includes [Array<Symbol>] Accepted values: [:configuration, :lti_registration]
-  def lti_registration_update_requests_json(update_requests, user, session, context, includes: [])
+  def lti_registration_update_requests_json(update_requests, user, session, context)
     update_requests.map do |request|
-      lti_registration_update_request_json(request, user, session, context, includes:)
+      lti_registration_update_request_json(request, user, session, context)
     end
   end
 
@@ -48,9 +48,7 @@ module Api::V1::Lti::RegistrationUpdateRequest
   # @param includes [Array<Symbol>] Accepted values: [:configuration, :lti_registration]
   #
   # @return [Hash] JSON representation of the LTI registration update request.
-  def lti_registration_update_request_json(update_request, user, session, context, includes: [])
-    includes = includes.map(&:to_sym)
-
+  def lti_registration_update_request_json(update_request, user, session, context)
     api_json(update_request, user, session, only: JSON_ATTRS).tap do |json|
       json["status"] = if update_request.applied?
                          "applied"
@@ -66,25 +64,6 @@ module Api::V1::Lti::RegistrationUpdateRequest
 
       if update_request.updated_by.present?
         json["updated_by"] = render_user_or_instructure(update_request.updated_by, user, session, context)
-      end
-
-      if includes.include?(:configuration)
-        if update_request.lti_ims_registration.present?
-          json["configuration"] = Lti::IMS::Registration.to_internal_lti_configuration(update_request.lti_ims_registration)
-        elsif update_request.canvas_lti_configuration.present?
-          json["configuration"] = update_request.canvas_lti_configuration
-        end
-      end
-
-      if includes.include?(:lti_registration) && update_request.lti_registration.present?
-        # Only include basic registration info to avoid circular dependencies
-        registration = update_request.lti_registration
-        json["lti_registration"] = {
-          "id" => registration.id,
-          "name" => registration.name,
-          "admin_nickname" => registration.admin_nickname,
-          "workflow_state" => registration.workflow_state
-        }
       end
     end
   end
