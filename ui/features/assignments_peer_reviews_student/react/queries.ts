@@ -25,6 +25,10 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
       name
       dueAt
       description
+      courseId
+      peerReviews {
+        count
+      }
       assessmentRequestsForCurrentUser {
         _id
         available

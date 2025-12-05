@@ -27,11 +27,17 @@ export interface AssessmentRequest {
   createdAt: string
 }
 
+export interface PeerReviews {
+  count: number | null
+}
+
 export interface Assignment {
   _id: string
   name: string
   dueAt: string | null
   description: string | null
+  courseId: string
+  peerReviews: PeerReviews | null
   assessmentRequestsForCurrentUser: AssessmentRequest[] | null
 }
 
