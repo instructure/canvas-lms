@@ -18,7 +18,8 @@
 
 import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
-import {responsiveQuerySizes} from '../../utils'
+import {Submission} from '../../../graphql/Submission'
+import {responsiveQuerySizes, isSubmissionComplete} from '../../utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import React from 'react'
@@ -94,10 +95,25 @@ export const DiscussionTopicAlertManager = props => {
           )
         }
 
-        if (
-          !props.userHasEntry &&
+        const hasCheckpoints = (props.discussionTopic.assignment?.checkpoints?.length || 0) > 0
+        const hasAssessmentRequests =
           props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.length > 0
+
+        if (
+          hasAssessmentRequests &&
+          !isSubmissionComplete(
+            props.discussionTopic,
+            props.replyToTopicSubmission,
+            props.replyToEntrySubmission,
+            props.userHasEntry,
+          )
         ) {
+          const bannerMessage = hasCheckpoints
+            ? I18n.t(
+                'You must complete all discussion requirements—your initial post and required replies—before you can begin peer reviews.',
+              )
+            : I18n.t('You must post before being able to peer review.')
+
           applicableAlerts.push(
             <Alert
               key="post-required-for-peer-review"
@@ -108,7 +124,7 @@ export const DiscussionTopicAlertManager = props => {
                 data-testid="post-required-for-peer-review"
                 size={responsiveProps?.alert?.textSize}
               >
-                {I18n.t('You must post before being able to peer review.')}
+                {bannerMessage}
               </Text>
             </Alert>,
           )
@@ -206,4 +222,6 @@ export const DiscussionTopicAlertManager = props => {
 DiscussionTopicAlertManager.propTypes = {
   discussionTopic: Discussion.shape.isRequired,
   userHasEntry: PropTypes.bool.isRequired,
+  replyToTopicSubmission: Submission.shape,
+  replyToEntrySubmission: Submission.shape,
 }
