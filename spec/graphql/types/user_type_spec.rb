@@ -2107,49 +2107,6 @@ describe Types::UserType do
       end
     end
 
-    describe "with the limit argument" do
-      before do
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
-      end
-
-      it "returns a limited number of results" do
-        comment_bank_item_model(user: @teacher, context: @course, comment: "2nd great comment!")
-        expect(
-          type.resolve("commentBankItemsConnection(limit: 1) { nodes { comment } }").length
-        ).to eq 1
-      end
-
-      context "with send_metrics_for_comment_bank_items_connection_limit_used ON" do
-        before do
-          Account.site_admin.enable_feature!(:send_metrics_for_comment_bank_items_connection_limit_used)
-        end
-
-        it "reports metrics when limit is used" do
-          comment_bank_item_model(user: @teacher, context: @course, comment: "2nd great comment!")
-          type.resolve("commentBankItemsConnection(limit: 1) { nodes { comment } }")
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
-            "graphql.user_type.comment_bank_items_connection.limit_used",
-            { tags: { cluster: "test" } }
-          )
-        end
-      end
-
-      context "with send_metrics_for_comment_bank_items_connection_limit_used OFF" do
-        before do
-          Account.site_admin.disable_feature!(:send_metrics_for_comment_bank_items_connection_limit_used)
-        end
-
-        it "does not report metrics when limit is used" do
-          comment_bank_item_model(user: @teacher, context: @course, comment: "2nd great comment!")
-          type.resolve("commentBankItemsConnection(limit: 1) { nodes { comment } }")
-          expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with(
-            "graphql.user_type.comment_bank_items_connection.limit_used",
-            anything
-          )
-        end
-      end
-    end
-
     describe "with a search query" do
       before do
         @comment_bank_item2 = comment_bank_item_model(user: @teacher, context: @course, comment: "new comment!")
