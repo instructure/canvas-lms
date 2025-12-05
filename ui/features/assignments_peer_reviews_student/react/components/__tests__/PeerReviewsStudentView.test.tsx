@@ -30,8 +30,17 @@ jest.mock('@canvas/util/jquery/apiUserContent', () => ({
   convert: (html: string) => html,
 }))
 
+jest.mock('../../hooks/useAllocatePeerReviews', () => ({
+  useAllocatePeerReviews: jest.fn(),
+}))
+
 const {executeQuery} = require('@canvas/graphql')
 const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+
+const {useAllocatePeerReviews} = require('../../hooks/useAllocatePeerReviews')
+const mockUseAllocatePeerReviews = useAllocatePeerReviews as jest.MockedFunction<
+  typeof useAllocatePeerReviews
+>
 
 type PeerReviewsStudentViewProps = React.ComponentProps<typeof PeerReviewsStudentView>
 
@@ -52,9 +61,14 @@ function setup(props: Partial<PeerReviewsStudentViewProps> = {}) {
 }
 
 describe('PeerReviewsStudentView', () => {
+  const mockMutate = jest.fn()
+
   beforeEach(() => {
     jest.clearAllMocks()
     queryClient.clear()
+    mockUseAllocatePeerReviews.mockReturnValue({
+      mutate: mockMutate,
+    })
   })
 
   it('renders loading state initially', () => {
@@ -82,6 +96,24 @@ describe('PeerReviewsStudentView', () => {
         name: 'Test Peer Review Assignment',
         dueAt: '2025-12-31T23:59:59Z',
         description: '<p>This is the assignment description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+        },
+        assessmentRequestsForCurrentUser: [
+          {
+            _id: 'ar-1',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-01T00:00:00Z',
+          },
+          {
+            _id: 'ar-2',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-02T00:00:00Z',
+          },
+        ],
       },
     })
 
@@ -102,6 +134,11 @@ describe('PeerReviewsStudentView', () => {
         name: 'Assignment Without Due Date',
         dueAt: null,
         description: '<p>Description here</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 1,
+        },
+        assessmentRequestsForCurrentUser: [],
       },
     })
 
@@ -121,6 +158,11 @@ describe('PeerReviewsStudentView', () => {
         name: 'Assignment Without Description',
         dueAt: '2025-12-31T23:59:59Z',
         description: null,
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+        },
+        assessmentRequestsForCurrentUser: [],
       },
     })
 
@@ -140,6 +182,11 @@ describe('PeerReviewsStudentView', () => {
         name: 'Test Assignment',
         dueAt: '2025-12-31T23:59:59Z',
         description: '<p>Description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 1,
+        },
+        assessmentRequestsForCurrentUser: [],
       },
     })
 
@@ -159,6 +206,10 @@ describe('PeerReviewsStudentView', () => {
         name: 'Peer Review Assignment',
         dueAt: '2025-12-31T23:59:59Z',
         description: '<p>Assignment description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+        },
         assessmentRequestsForCurrentUser: [
           {
             _id: 'ar-1',
@@ -190,6 +241,10 @@ describe('PeerReviewsStudentView', () => {
         name: 'Assignment No Reviews',
         dueAt: '2025-12-31T23:59:59Z',
         description: '<p>Description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 0,
+        },
         assessmentRequestsForCurrentUser: null,
       },
     })
@@ -200,6 +255,134 @@ describe('PeerReviewsStudentView', () => {
       const selector = getByTestId('peer-review-selector')
       expect(selector).toBeInTheDocument()
       expect(selector).toHaveAttribute('value', 'No peer reviews available')
+    })
+  })
+
+  it('calls allocate when assessment requests count is less than peer reviews required', async () => {
+    mockExecuteQuery.mockResolvedValueOnce({
+      assignment: {
+        _id: '10',
+        name: 'Test Assignment',
+        dueAt: '2025-12-31T23:59:59Z',
+        description: '<p>Description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 3,
+        },
+        assessmentRequestsForCurrentUser: [
+          {
+            _id: 'ar-1',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-01T00:00:00Z',
+          },
+        ],
+      },
+    })
+
+    setup({assignmentId: '10'})
+
+    await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalledWith({
+        courseId: '100',
+        assignmentId: '10',
+      })
+    })
+  })
+
+  it('does not call allocate when assessment requests count equals peer reviews required', async () => {
+    mockExecuteQuery.mockResolvedValueOnce({
+      assignment: {
+        _id: '11',
+        name: 'Test Assignment',
+        dueAt: '2025-12-31T23:59:59Z',
+        description: '<p>Description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+        },
+        assessmentRequestsForCurrentUser: [
+          {
+            _id: 'ar-1',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-01T00:00:00Z',
+          },
+          {
+            _id: 'ar-2',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-02T00:00:00Z',
+          },
+        ],
+      },
+    })
+
+    setup({assignmentId: '11'})
+
+    await waitFor(() => {
+      expect(mockMutate).not.toHaveBeenCalled()
+    })
+  })
+
+  it('does not call allocate when no peer reviews are required', async () => {
+    mockExecuteQuery.mockResolvedValueOnce({
+      assignment: {
+        _id: '12',
+        name: 'Test Assignment',
+        dueAt: '2025-12-31T23:59:59Z',
+        description: '<p>Description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 0,
+        },
+        assessmentRequestsForCurrentUser: [],
+      },
+    })
+
+    setup({assignmentId: '12'})
+
+    await waitFor(() => {
+      expect(mockMutate).not.toHaveBeenCalled()
+    })
+  })
+
+  it('calls allocate only once even if component re-renders', async () => {
+    mockExecuteQuery.mockResolvedValue({
+      assignment: {
+        _id: '13',
+        name: 'Test Assignment',
+        dueAt: '2025-12-31T23:59:59Z',
+        description: '<p>Description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+        },
+        assessmentRequestsForCurrentUser: [
+          {
+            _id: 'ar-1',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-01T00:00:00Z',
+          },
+        ],
+      },
+    })
+
+    const {rerender} = setup({assignmentId: '13'})
+
+    await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalledTimes(1)
+    })
+
+    rerender(
+      <MockedQueryProvider>
+        <PeerReviewsStudentView assignmentId="13" />
+      </MockedQueryProvider>,
+    )
+
+    await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalledTimes(1)
     })
   })
 })

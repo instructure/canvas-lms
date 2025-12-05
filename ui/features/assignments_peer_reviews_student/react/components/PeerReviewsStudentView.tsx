@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -26,6 +26,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import AssignmentDescription from '@canvas/assignments/react/AssignmentDescription'
 import {useAssignmentQuery} from '../hooks/useAssignmentQuery'
+import {useAllocatePeerReviews} from '../hooks/useAllocatePeerReviews'
 import {PeerReviewSelector} from './PeerReviewSelector'
 
 const I18n = createI18nScope('peer_reviews_student')
@@ -37,7 +38,25 @@ interface PeerReviewsStudentViewProps {
 const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignmentId}) => {
   const [selectedTab, setSelectedTab] = useState<'details' | 'submission'>('details')
   const [selectedAssessmentIndex, setSelectedAssessmentIndex] = useState(0)
+  const [hasCalledAllocate, setHasCalledAllocate] = useState(false)
   const {data, isLoading, isError} = useAssignmentQuery(assignmentId)
+  const {mutate: allocatePeerReviews} = useAllocatePeerReviews()
+
+  useEffect(() => {
+    if (data?.assignment && !hasCalledAllocate) {
+      const assignment = data.assignment
+      const assessmentRequestsCount = assignment.assessmentRequestsForCurrentUser?.length || 0
+      const peerReviewsRequired = assignment.peerReviews?.count || 0
+
+      if (assessmentRequestsCount < peerReviewsRequired) {
+        setHasCalledAllocate(true)
+        allocatePeerReviews({
+          courseId: assignment.courseId,
+          assignmentId: assignment._id,
+        })
+      }
+    }
+  }, [data, allocatePeerReviews, hasCalledAllocate])
 
   if (isLoading) {
     return (
@@ -85,6 +104,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignme
       {assignment && (
         <View as="div" margin="0 0 medium 0">
           <PeerReviewSelector
+            key={`${assignment.assessmentRequestsForCurrentUser?.length || 0}-peer-reviews`}
             assessmentRequests={assignment.assessmentRequestsForCurrentUser || []}
             selectedIndex={selectedAssessmentIndex}
             onSelectionChange={setSelectedAssessmentIndex}
