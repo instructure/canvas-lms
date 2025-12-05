@@ -516,18 +516,6 @@ scheduled_feedback_releases:
       state: allowed_on
     development:
       state: allowed_on
-use_batches_score_metadata_updates:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Use Batches for Score Metadata Updates
-  shadow: true
-  description: |
-    Enables batch processing with PostgreSQL CROSS JOIN to reduce log size and improve compatibility with Observe.
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
 use_comment_library_v2:
   state: hidden
   applies_to: SiteAdmin
