@@ -202,9 +202,5 @@ This is useful for displaying "Page X of Y" pagination interfaces.
 }
 ```
 
-For details on which connections support `totalCount` and how to add it to new connections,
-see [app/graphql/types/HOWTO Connections.md](../../app/graphql/types/HOWTO%20Connections.md)
-
 **Note:** `totalCount` is only available on connections that have been explicitly
-configured for it. See `app/graphql/types/HOWTO Connections.md` for implementation
-details and performance considerations.
+configured for it. Not all connection types support this field.
