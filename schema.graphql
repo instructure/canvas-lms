@@ -11251,7 +11251,6 @@ type User implements LegacyIDInterface & Node & Timestamped {
     """
     query: String
   ): CommentBankItemConnection
-  commentBankItemsCount: Int @deprecated(reason: "Use `commentBankItems.pageInfo.totalCount` instead. This field will be removed in a future version.")
   conversationsConnection(
     """
     Returns the elements in the list that come after the specified cursor.
