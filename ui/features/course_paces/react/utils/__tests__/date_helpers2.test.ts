@@ -144,7 +144,7 @@ describe('date_helpers', () => {
         '2022-05-20T00:00:00-06:00',
         appliedPace,
       )
-      expect(captions.endDate).toEqual(END_DATE_CAPTIONS['course'])
+      expect(captions.endDate).toEqual(END_DATE_CAPTIONS['enrollment_course'])
       expect(captions.startDate).toEqual('Student enrollment date')
     })
 
@@ -198,6 +198,103 @@ describe('date_helpers', () => {
         pace,
       )
       expect(captions.startDate).toEqual('Determined by student enrollment date')
+    })
+
+    it('Enrollment Pace with course end date shows enrollment_course caption', () => {
+      const enrollmentPaceWithCourseEnd = {
+        ...STUDENT_PACE,
+        end_date: '2022-05-20T00:00:00-06:00',
+        end_date_context: 'course' as ContextTypes,
+      }
+      const appliedCourse = {
+        ...appliedPace,
+        type: 'Course' as const,
+      }
+
+      const captions = generateDatesCaptions(
+        enrollmentPaceWithCourseEnd,
+        '2022-05-01T00:00:00-06:00',
+        '2022-05-20T00:00:00-06:00',
+        appliedCourse,
+      )
+      expect(captions.endDate).toEqual(END_DATE_CAPTIONS['enrollment_course'])
+      expect(captions.endDate).toEqual('Determined by course end date')
+    })
+
+    it('Enrollment Pace with section end date shows enrollment_section caption', () => {
+      const enrollmentPaceWithSectionEnd = {
+        ...STUDENT_PACE,
+        end_date: '2022-05-20T00:00:00-06:00',
+        end_date_context: 'section' as ContextTypes,
+      }
+      const appliedSection = {
+        ...appliedPace,
+        type: 'Section' as const,
+      }
+
+      const captions = generateDatesCaptions(
+        enrollmentPaceWithSectionEnd,
+        '2022-05-01T00:00:00-06:00',
+        '2022-05-20T00:00:00-06:00',
+        appliedSection,
+      )
+      expect(captions.endDate).toEqual(END_DATE_CAPTIONS['enrollment_section'])
+      expect(captions.endDate).toEqual('Determined by section end date')
+    })
+
+    it('Enrollment Pace with hypothetical end date shows default caption', () => {
+      const enrollmentPaceHypothetical = {
+        ...STUDENT_PACE,
+        end_date: '2022-05-20T00:00:00-06:00',
+        end_date_context: 'hypothetical' as ContextTypes,
+      }
+      const appliedCourse = {
+        ...appliedPace,
+        type: 'Course' as const,
+      }
+
+      const captions = generateDatesCaptions(
+        enrollmentPaceHypothetical,
+        '2022-05-01T00:00:00-06:00',
+        '2022-05-20T00:00:00-06:00',
+        appliedCourse,
+      )
+      expect(captions.endDate).toEqual(END_DATE_CAPTIONS['default'])
+    })
+
+    it('Course Pace with course end date shows warning caption', () => {
+      const coursePaceWithCourseEnd = {
+        ...PRIMARY_PACE,
+        end_date: '2022-05-20T00:00:00-06:00',
+        end_date_context: 'course' as ContextTypes,
+      }
+
+      const captions = generateDatesCaptions(
+        coursePaceWithCourseEnd,
+        '2022-05-01T00:00:00-06:00',
+        '2022-05-20T00:00:00-06:00',
+        appliedPace,
+      )
+      expect(captions.endDate).toEqual(END_DATE_CAPTIONS['course'])
+      expect(captions.endDate).toContain('Changing this date will not save')
+    })
+
+    it('Section Pace with section end date shows warning caption', () => {
+      const sectionPaceWithSectionEnd = {
+        ...PRIMARY_PACE,
+        context_type: 'Section' as const,
+        end_date: '2022-05-20T00:00:00-06:00',
+        end_date_context: 'section' as ContextTypes,
+      }
+
+      const captions = generateDatesCaptions(
+        sectionPaceWithSectionEnd,
+        '2022-05-01T00:00:00-06:00',
+        '2022-05-20T00:00:00-06:00',
+        appliedPace,
+      )
+      expect(captions.endDate).toEqual(END_DATE_CAPTIONS['section'])
+      expect(captions.endDate).toContain('Changing this date will not save')
     })
   })
 })
