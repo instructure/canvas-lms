@@ -541,14 +541,6 @@ use_comment_library_v2:
   display_name: Use Enhanced Comment Library in SpeedGrader
   description: |
     Enables the new Comment Library experience in SpeedGrader.
-send_metrics_for_comment_bank_items_count_used:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Send Metrics for when `comment_bank_items_count` resolver is used on Comment Bank Items
-  shadow: true
-  description: |
-    Enables sending metrics when the `comment_bank_items_count` resolver is used on user_type.comment_bank_items_connection.
-
 grade_summary_preload_optimizations:
   state: hidden
   applies_to: SiteAdmin
