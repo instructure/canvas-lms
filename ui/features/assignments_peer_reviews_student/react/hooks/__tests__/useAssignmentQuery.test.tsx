@@ -56,6 +56,10 @@ describe('useAssignmentQuery', () => {
         name: 'Peer Review Assignment',
         dueAt: '2025-12-31T23:59:59Z',
         description: '<p>Assignment description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+        },
         assessmentRequestsForCurrentUser: [
           {
             _id: 'ar-1',
@@ -89,6 +93,10 @@ describe('useAssignmentQuery', () => {
       name: 'Peer Review Assignment',
       dueAt: '2025-12-31T23:59:59Z',
       description: '<p>Assignment description</p>',
+      courseId: '100',
+      peerReviews: {
+        count: 2,
+      },
       assessmentRequestsForCurrentUser: [
         {
           _id: 'ar-1',
@@ -114,6 +122,10 @@ describe('useAssignmentQuery', () => {
         name: 'Assignment Without Due Date',
         dueAt: null,
         description: '<p>Description here</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 1,
+        },
         assessmentRequestsForCurrentUser: [],
       },
     })
@@ -137,6 +149,10 @@ describe('useAssignmentQuery', () => {
         name: 'Assignment Without Description',
         dueAt: '2025-12-31T23:59:59Z',
         description: null,
+        courseId: '100',
+        peerReviews: {
+          count: 3,
+        },
         assessmentRequestsForCurrentUser: null,
       },
     })
@@ -174,6 +190,10 @@ describe('useAssignmentQuery', () => {
         name: 'Test Assignment',
         dueAt: null,
         description: null,
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+        },
         assessmentRequestsForCurrentUser: [],
       },
     })
