@@ -241,7 +241,7 @@ export const generateDatesCaptions = (
   if (contextType === 'enrollment') {
     const appliedPaceContextType = appliedPace?.type.toLocaleLowerCase()
     const paceType = ['course', 'section'].includes(appliedPaceContextType)
-      ? appliedPaceContextType
+      ? `enrollment_${appliedPaceContextType}`
       : 'default'
     captions.endDate = getEndDateCaption(endDateValue, coursePace, paceType)
     return captions
