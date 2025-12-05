@@ -21,6 +21,7 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {GlobalInst} from '@canvas/global/inst/GlobalInst'
 import {GlobalRemotes} from '@canvas/global/remotes/GlobalRemotes'
 import {ajaxJSON} from '@canvas/jquery/jquery.ajaxJSON'
+import type {AdaEmbed} from './shared/help-dialog/react/adaTypes'
 
 declare global {
   interface Global {
@@ -72,6 +73,8 @@ declare global {
     deferredBundles: string[]
     canvasReadyState?: 'loading' | 'complete'
     CANVAS_ACTIVE_BRAND_VARIABLES?: Record<string, unknown>
+    adaEmbed?: AdaEmbed
+    adaSettings?: Record<string, any>
   }
 
   /**
