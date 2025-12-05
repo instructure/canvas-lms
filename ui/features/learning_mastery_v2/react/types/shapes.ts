@@ -25,4 +25,6 @@ export interface Sorting {
   setSortBy: (sortBy: SortBy) => void
   sortOutcomeId: string | null
   setSortOutcomeId: (outcomeId: string | null) => void
+  sortAlignmentId: string | null
+  setSortAlignmentId: (alignmentId: string | null) => void
 }
