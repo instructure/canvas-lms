@@ -55,7 +55,12 @@ export interface GradebookProps {
   onChangeNameDisplayFormat: (format: NameDisplayFormat) => void
   onOutcomesReorder?: (orderedOutcomes: Outcome[]) => void
   contributingScores: ContributingScoresManager
-  onOpenStudentAssignmentTray?: (outcome: Outcome) => void
+  onOpenStudentAssignmentTray?: (
+    outcome: Outcome,
+    student: Student,
+    alignmentIndex: number,
+    alignments: ContributingScoreAlignment[],
+  ) => void
 }
 
 const GradebookComponent: React.FC<GradebookProps> = ({

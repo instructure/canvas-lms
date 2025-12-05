@@ -300,7 +300,7 @@ describe('useContributingScores', () => {
       expect(scores).toEqual([])
     })
 
-    it('returns score strings for each alignment', async () => {
+    it('returns score for each alignment', async () => {
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
         {wrapper: createWrapper()},
@@ -322,11 +322,14 @@ describe('useContributingScores', () => {
 
       const scoresForUser6 = result.current.contributingScores.forOutcome('2').scoresForUser('6')
       // User 6 has no score for D_5 (undefined) and score 1 for D_6
-      expect(scoresForUser6).toEqual([undefined, 1])
+      expect(scoresForUser6).toEqual([undefined, mockContributingScoresOutcome2.scores[0]])
 
       const scoresForUser7 = result.current.contributingScores.forOutcome('2').scoresForUser('7')
       // User 7 has score 3 for D_5 and score 2 for D_6
-      expect(scoresForUser7).toEqual([3, 2])
+      expect(scoresForUser7).toEqual([
+        mockContributingScoresOutcome2.scores[1],
+        mockContributingScoresOutcome2.scores[2],
+      ])
     })
 
     it('returns undefined for alignments without scores', async () => {

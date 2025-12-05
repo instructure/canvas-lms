@@ -36,8 +36,8 @@ import {GradebookSettings, NameDisplayFormat} from './utils/constants'
 import useRollups from './hooks/useRollups'
 import {useGradebookSettings} from './hooks/useGradebookSettings'
 import {saveLearningMasteryGradebookSettings, saveOutcomeOrder} from './apiClient'
-import {Outcome} from './types/rollup'
-import {useContributingScores} from './hooks/useContributingScores'
+import {Outcome, Student} from './types/rollup'
+import {ContributingScoreAlignment, useContributingScores} from './hooks/useContributingScores'
 import {StudentAssignmentDetailTray} from './components/trays/StudentAssignmentDetailTray'
 
 const queryClient = new QueryClient()
@@ -74,12 +74,11 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
   const [isSavingSettings, setIsSavingSettings] = useState(false)
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
   const [studentAssignmentTrayState, setStudentAssignmentTrayState] = useState<{
-    isOpen: boolean
-    outcome: Outcome | null
-  }>({
-    isOpen: false,
-    outcome: null,
-  })
+    outcome: Outcome
+    student: Student
+    currentAlignmentIndex: number
+    alignments: ContributingScoreAlignment[]
+  } | null>(null)
 
   const {
     isLoading: isLoadingGradebook,
@@ -175,18 +174,26 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     [courseId, outcomes],
   )
 
-  const handleOpenStudentAssignmentTray = useCallback((outcome: Outcome) => {
-    setStudentAssignmentTrayState({
-      isOpen: true,
-      outcome,
-    })
-  }, [])
+  const handleOpenStudentAssignmentTray = useCallback(
+    (
+      outcome: Outcome,
+      student: Student,
+      alignmentIndex: number,
+      alignments: ContributingScoreAlignment[],
+    ) => {
+      if (alignmentIndex === undefined) return
+      setStudentAssignmentTrayState({
+        outcome,
+        student,
+        currentAlignmentIndex: alignmentIndex,
+        alignments,
+      })
+    },
+    [],
+  )
 
   const handleCloseStudentAssignmentTray = useCallback(() => {
-    setStudentAssignmentTrayState({
-      isOpen: false,
-      outcome: null,
-    })
+    setStudentAssignmentTrayState(null)
   }, [])
 
   const renderBody = () => {
@@ -243,11 +250,53 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
       )}
       <FilterWrapper pagination={pagination} onPerPageChange={handleUpdateStudentsPerPage} />
       {renderBody()}
-      {studentAssignmentTrayState.isOpen && studentAssignmentTrayState.outcome && (
+      {studentAssignmentTrayState && (
         <StudentAssignmentDetailTray
-          open={studentAssignmentTrayState.isOpen}
+          open={true}
           onDismiss={handleCloseStudentAssignmentTray}
           outcome={studentAssignmentTrayState.outcome}
+          courseId={courseId}
+          student={studentAssignmentTrayState.student}
+          assignment={{
+            id: studentAssignmentTrayState.alignments[
+              studentAssignmentTrayState.currentAlignmentIndex
+            ].associated_asset_id,
+            name: studentAssignmentTrayState.alignments[
+              studentAssignmentTrayState.currentAlignmentIndex
+            ].associated_asset_name,
+            htmlUrl:
+              studentAssignmentTrayState.alignments[
+                studentAssignmentTrayState.currentAlignmentIndex
+              ].html_url,
+          }}
+          assignmentNavigator={{
+            hasNext:
+              studentAssignmentTrayState.currentAlignmentIndex <
+              studentAssignmentTrayState.alignments.length - 1,
+            hasPrevious: studentAssignmentTrayState.currentAlignmentIndex > 0,
+            onNext: () => {
+              setStudentAssignmentTrayState(prevState => {
+                if (!prevState) return null
+                const nextIndex = prevState.currentAlignmentIndex + 1
+                if (nextIndex >= prevState.alignments.length) return prevState
+                return {
+                  ...prevState,
+                  currentAlignmentIndex: nextIndex,
+                }
+              })
+            },
+            onPrevious: () => {
+              setStudentAssignmentTrayState(prevState => {
+                if (!prevState) return null
+                const prevIndex = prevState.currentAlignmentIndex - 1
+                if (prevIndex < 0) return prevState
+                return {
+                  ...prevState,
+                  currentAlignmentIndex: prevIndex,
+                }
+              })
+            },
+          }}
         />
       )}
     </>
