@@ -365,6 +365,16 @@ RSpec.describe Lti::Registration do
         expect(subject).to be_nil
       end
     end
+
+    context "when the icon_url is overlaid" do
+      let(:icon_url) { "https://a.different.icon.example.com/icon.png" }
+      let(:registration) { lti_registration_with_tool(overlay_params: { icon_url: }) }
+
+      it "returns the overlaid icon_url" do
+        registration
+        expect(subject).to eql(icon_url)
+      end
+    end
   end
 
   describe "#account_binding_for" do

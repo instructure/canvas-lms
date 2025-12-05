@@ -78,7 +78,7 @@ describe('Lti1p3RegistrationWizard', () => {
     expect(screen.getByText('Nickname')).toBeInTheDocument()
 
     await userEvent.click(findNextButton())
-    expect(screen.getByText('Icon URLs')).toBeInTheDocument()
+    expect(screen.getByText('Placement Icon URLs')).toBeInTheDocument()
 
     await userEvent.click(findNextButton())
     expect(screen.getByText('Review')).toBeInTheDocument()
@@ -144,7 +144,7 @@ describe('Lti1p3RegistrationWizard', () => {
     expect(screen.getByText(/sorry, something broke/i)).toBeInTheDocument()
   })
 
-  it('skips the icon confirmation screen if the tool has no placements with icons', async () => {
+  it("doesn't skip the icon confirmation screen even if the tool has no placements with icons", async () => {
     render(
       <Lti1p3RegistrationWizard
         {...defaultProps}
@@ -159,11 +159,12 @@ describe('Lti1p3RegistrationWizard', () => {
     await userEvent.click(findNextButton())
     await userEvent.click(findNextButton())
     await userEvent.click(findNextButton())
+    expect(screen.getByText(/Tool Icon URL/i, {selector: 'h3'})).toBeInTheDocument()
+    await userEvent.click(findNextButton())
     expect(screen.getByText(/^Review$/i)).toBeInTheDocument()
-    expect(screen.queryByText(/Icon URLs/i)).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByText(/^Previous$/i).closest('button')!)
-    expect(screen.getByText(/^Nickname$/i)).toBeInTheDocument()
+    expect(screen.getByText(/Tool Icon URL/i, {selector: 'h3'})).toBeInTheDocument()
   })
 
   it('includes EULA Settings step when tool has EulaUser scope and asset processor placements', async () => {

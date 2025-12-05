@@ -20,6 +20,7 @@ import {IconConfirmation} from '../../../registration_wizard_forms/IconConfirmat
 import {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
 import {Lti1p3RegistrationOverlayStore} from '../../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
+import {toUndefined} from '../../../../common/lib/toUndefined'
 
 type IconConfirmationPerfWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
@@ -42,14 +43,21 @@ type IconConfirmationPerfWrapperProps = {
  */
 export const IconConfirmationPerfWrapper = React.memo(
   ({overlayStore, registration}: IconConfirmationPerfWrapperProps) => {
-    const {allPlacements, placementIconOverrides, setPlacementIconUrl, hasSubmitted} = overlayStore(
-      s => ({
-        allPlacements: s.state.placements.placements ?? [],
-        placementIconOverrides: s.state.icons.placements,
-        setPlacementIconUrl: s.setPlacementIconUrl,
-        hasSubmitted: s.state.hasSubmitted,
-      }),
-    )
+    const {
+      allPlacements,
+      placementIconOverrides,
+      setPlacementIconUrl,
+      defaultIconUrl,
+      setDefaultIconUrl,
+      hasSubmitted,
+    } = overlayStore(s => ({
+      allPlacements: s.state.placements.placements ?? [],
+      placementIconOverrides: s.state.icons.placements,
+      setPlacementIconUrl: s.setPlacementIconUrl,
+      defaultIconUrl: s.state.icons.defaultIconUrl,
+      setDefaultIconUrl: s.setDefaultIconUrl,
+      hasSubmitted: s.state.hasSubmitted,
+    }))
 
     const filteredPlacements = React.useMemo(
       () => filterPlacementsByFeatureFlags(allPlacements),
@@ -64,6 +72,9 @@ export const IconConfirmationPerfWrapper = React.memo(
         placementIconOverrides={placementIconOverrides}
         setPlacementIconUrl={setPlacementIconUrl}
         hasSubmitted={hasSubmitted}
+        defaultIconUrl={defaultIconUrl}
+        setDefaultIconUrl={setDefaultIconUrl}
+        developerKeyId={toUndefined(registration.developer_key_id)}
       />
     )
   },

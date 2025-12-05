@@ -119,6 +119,7 @@ export const initialOverlayStateFromInternalConfig = (
         },
         {} as Partial<Record<LtiPlacementWithIcon, string | undefined>>,
       ),
+      defaultIconUrl: existingOverlay?.icon_url || internalConfig.launch_settings?.icon_url,
     },
   }
 }
@@ -227,6 +228,10 @@ export const convertToLtiConfigurationOverlay = (
         state.launchSettings.domain === internalConfig.domain
           ? undefined
           : state.launchSettings.domain,
+      icon_url:
+        state.icons.defaultIconUrl === internalConfig.launch_settings?.icon_url
+          ? undefined
+          : state.icons.defaultIconUrl,
       // todo: these undefined fields will all be removed
       oidc_initiation_url: undefined,
       redirect_uris: undefined,

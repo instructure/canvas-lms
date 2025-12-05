@@ -47,6 +47,7 @@ export interface Lti1p3RegistrationOverlayActions {
   setMessageSettings: (messageSettings: MessageSetting[]) => void
   setOverrideURI: (placement: LtiPlacement, uri: string) => void
   setPlacementIconUrl: (placement: LtiPlacementWithIcon, iconUrl: string) => void
+  setDefaultIconUrl: (iconUrl: string) => void
   setMessageType: (placement: LtiPlacement, messageType: LtiMessageType) => void
   setAdminNickname: (nickname: string) => void
   setDescription: (description: string) => void
@@ -258,6 +259,19 @@ export const createLti1p3RegistrationOverlayStore = (
                 ...state.icons.placements,
                 [placement]: filterEmptyString(iconUrl),
               },
+            },
+          }
+        }),
+      )
+    },
+    setDefaultIconUrl: iconUrl => {
+      set(
+        updateState(state => {
+          return {
+            ...state,
+            icons: {
+              ...state.icons,
+              defaultIconUrl: filterEmptyString(iconUrl),
             },
           }
         }),

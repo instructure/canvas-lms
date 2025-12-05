@@ -228,8 +228,9 @@ describe Api::V1::Lti::Registration do
     end
 
     context "with an overlay" do
+      let(:registration) { lti_registration_with_tool(account: context, registration_params: { admin_nickname: "Test", vendor: "Test Company" }, overlay_params: data) }
+      let(:overlay) { registration.overlay_for(context) }
       let(:includes) { [:overlay] }
-      let(:overlay) { lti_overlay_model(registration:, account: context, data:) }
       let(:data) { { title: "Test" } }
 
       before do
@@ -237,10 +238,16 @@ describe Api::V1::Lti::Registration do
       end
 
       it "includes the overlay" do
+        registration
         expect(subject[:overlay]).to include({
                                                id: overlay.id,
                                                data:
                                              })
+      end
+
+      it "uses the icon_url from the overlay" do
+        overlay.update!(data: { icon_url: "https://example.com/agreaticon.png" })
+        expect(subject[:icon_url]).to eq("https://example.com/agreaticon.png")
       end
     end
 

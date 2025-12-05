@@ -77,7 +77,10 @@ export const IconConfirmationWrapper = ({
       {} as Lti1p3RegistrationOverlayState['icons']['placements'],
     )
 
-    const errors = validateIconUris({placements: icon_urls})
+    const errors = validateIconUris({
+      placements: icon_urls,
+      defaultIconUrl: overlayState.overlay.icon_url,
+    })
 
     if (errors.length > 0) {
       document.getElementById(getInputIdForField(errors[0].field))?.focus()
@@ -100,6 +103,8 @@ export const IconConfirmationWrapper = ({
           name={overlayState.adminNickname ?? registration.name}
           placementIconOverrides={placementsWithUrls}
           setPlacementIconUrl={actions.updateIconUrl}
+          defaultIconUrl={overlayState.overlay.icon_url}
+          setDefaultIconUrl={actions.updateDefaultIconUrl}
           developerKeyId={registration.developer_key_id ?? undefined}
           hasSubmitted={hasSubmitted}
         />

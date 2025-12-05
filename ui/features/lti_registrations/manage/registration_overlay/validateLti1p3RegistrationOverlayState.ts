@@ -26,9 +26,11 @@ import {ZPublicJwk} from '../model/internal_lti_configuration/PublicJwk'
 
 const I18n = createI18nScope('lti_registrations')
 
-type IconUriField = Required<{
-  [Placement in keyof Lti1p3RegistrationOverlayState['icons']['placements']]: `icon_uri_${Placement}`
-}>[LtiPlacementWithIcon]
+type IconUriField =
+  | Required<{
+      [Placement in keyof Lti1p3RegistrationOverlayState['icons']['placements']]: `icon_uri_${Placement}`
+    }>[LtiPlacementWithIcon]
+  | 'default_icon_url'
 
 type OverrideUriField = Required<{
   [Placement in keyof Lti1p3RegistrationOverlayState['override_uris']['placements']]: `override_uri_${Placement}`
@@ -90,9 +92,11 @@ export const validateIconUris = (
   iconUris: Lti1p3RegistrationOverlayState['icons'],
 ): Lti1p3RegistrationOverlayStateError[] => {
   const placements = Object.keys(iconUris.placements) as LtiPlacementWithIcon[]
-  return placements
+  const defaultIconUrlValidation = validateUrl('default_icon_url', iconUris.defaultIconUrl)
+  const placementValidations = placements
     .sort()
     .flatMap(placement => validateUrl(`icon_uri_${placement}`, iconUris.placements[placement]))
+  return [...defaultIconUrlValidation, ...placementValidations]
 }
 
 export const validateLaunchSettings = (
