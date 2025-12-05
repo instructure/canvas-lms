@@ -970,18 +970,6 @@ module Types
       end
     end
 
-    field :comment_bank_items_count, Integer, null: true, deprecation_reason: <<~MD.strip
-      Use `commentBankItems.pageInfo.totalCount` instead. This field will be removed in a future version.
-    MD
-    def comment_bank_items_count
-      if Account.site_admin.feature_enabled?(:send_metrics_for_comment_bank_items_count_used)
-        InstStatsd::Statsd.distributed_increment("graphql.user_type.comment_bank_items_count_used", tags: {
-                                                   cluster: Shard.current.database_server&.id || "unknown"
-                                                 })
-      end
-      Loaders::CommentBankItemCountLoader.load(object)
-    end
-
     field :course_roles, [String], null: true do
       argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
       argument :course_id, String, required: false
