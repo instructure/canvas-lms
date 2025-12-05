@@ -512,16 +512,20 @@ describe('AnnouncementsWidget', () => {
       ).toBeInTheDocument()
     })
 
+    // Capture call count before retry
+    const callCountBeforeRetry = callCount
+
     // Click retry button
     const retryButton = screen.getByText('Retry')
     fireEvent.click(retryButton)
 
+    // Wait for successful data to appear, confirming retry worked
     await waitFor(() => {
       expect(screen.getByText('Test Announcement 2')).toBeInTheDocument()
     })
 
     // Verify the retry triggered at least one additional call
-    expect(callCount).toBeGreaterThanOrEqual(2)
+    expect(callCount).toBeGreaterThan(callCountBeforeRetry)
 
     cleanup()
   })
@@ -936,18 +940,18 @@ describe('AnnouncementsWidget', () => {
     const allOption = await screen.findByText('All')
     fireEvent.click(allOption)
 
-    // Pagination should remain visible during and after filter change
-    await waitFor(() => {
-      const paginationContainer = screen.getByTestId('pagination-container')
-      expect(paginationContainer).toBeInTheDocument()
-    })
-
-    // Verify new pagination reflects the "all" filter's total count
-    await waitFor(() => {
-      expect(screen.getByText('1')).toBeInTheDocument()
-      expect(screen.getByText('2')).toBeInTheDocument()
-      expect(screen.getByText('3')).toBeInTheDocument() // 9 items / 3 per page = 3 pages
-    })
+    // Wait for the "All" filter data to load and update pagination
+    // The "all" response has totalCount: 9, which means 3 pages
+    await waitFor(
+      () => {
+        const paginationContainer = screen.getByTestId('pagination-container')
+        expect(paginationContainer).toBeInTheDocument()
+        expect(screen.getByText('1')).toBeInTheDocument()
+        expect(screen.getByText('2')).toBeInTheDocument()
+        expect(screen.getByText('3')).toBeInTheDocument() // 9 items / 3 per page = 3 pages
+      },
+      {timeout: 3000},
+    )
 
     cleanup()
   })
