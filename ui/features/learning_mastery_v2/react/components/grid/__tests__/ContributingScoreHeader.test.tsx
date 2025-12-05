@@ -21,6 +21,7 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ContributingScoreHeader, ContributingScoreHeaderProps} from '../ContributingScoreHeader'
 import {ContributingScoreAlignment} from '../../../hooks/useContributingScores'
+import {SortOrder, SortBy} from '../../../utils/constants'
 
 const mockOpenWindow = jest.fn()
 jest.mock('@canvas/util/globalUtils', () => ({
@@ -41,6 +42,16 @@ describe('ContributingScoreHeader', () => {
     return {
       alignment: mockAlignment,
       courseId: '1',
+      sorting: {
+        sortOrder: SortOrder.ASC,
+        setSortOrder: jest.fn(),
+        sortBy: SortBy.SortableName,
+        setSortBy: jest.fn(),
+        sortOutcomeId: null,
+        setSortOutcomeId: jest.fn(),
+        sortAlignmentId: null,
+        setSortAlignmentId: jest.fn(),
+      },
     }
   }
 
@@ -74,6 +85,7 @@ describe('ContributingScoreHeader', () => {
   it('constructs the correct speedgrader URL with courseId and assignment_id', async () => {
     const user = userEvent.setup({pointerEventsCheck: 0})
     const props: ContributingScoreHeaderProps = {
+      ...defaultProps(),
       alignment: {
         ...mockAlignment,
         associated_asset_id: '250',
@@ -87,5 +99,60 @@ describe('ContributingScoreHeader', () => {
       '/courses/42/gradebook/speed_grader?assignment_id=250',
       '_blank',
     )
+  })
+
+  it('renders sorting options', async () => {
+    const user = userEvent.setup({pointerEventsCheck: 0})
+    const {getByText} = render(<ContributingScoreHeader {...defaultProps()} />)
+    await user.click(getByText('Contributing Score Menu'))
+    expect(getByText('Sort')).toBeInTheDocument()
+    expect(getByText('Ascending scores')).toBeInTheDocument()
+    expect(getByText('Descending scores')).toBeInTheDocument()
+  })
+
+  it('calls setSortBy and setSortAlignmentId when Ascending is clicked', async () => {
+    const user = userEvent.setup({pointerEventsCheck: 0})
+    const props = defaultProps()
+    const {getByText} = render(<ContributingScoreHeader {...props} />)
+    await user.click(getByText('Contributing Score Menu'))
+    await user.click(getByText('Ascending scores'))
+    expect(props.sorting.setSortBy).toHaveBeenCalledWith(SortBy.ContributingScore)
+    expect(props.sorting.setSortAlignmentId).toHaveBeenCalledWith('1')
+    expect(props.sorting.setSortOrder).toHaveBeenCalledWith(SortOrder.ASC)
+  })
+
+  it('calls setSortBy and setSortAlignmentId when Descending is clicked', async () => {
+    const user = userEvent.setup({pointerEventsCheck: 0})
+    const props = defaultProps()
+    const {getByText} = render(<ContributingScoreHeader {...props} />)
+    await user.click(getByText('Contributing Score Menu'))
+    await user.click(getByText('Descending scores'))
+    expect(props.sorting.setSortBy).toHaveBeenCalledWith(SortBy.ContributingScore)
+    expect(props.sorting.setSortAlignmentId).toHaveBeenCalledWith('1')
+    expect(props.sorting.setSortOrder).toHaveBeenCalledWith(SortOrder.DESC)
+  })
+
+  it('shows selected state when sorting by this alignment in ascending order', async () => {
+    const user = userEvent.setup({pointerEventsCheck: 0})
+    const props = defaultProps()
+    props.sorting.sortBy = SortBy.ContributingScore
+    props.sorting.sortAlignmentId = '1'
+    props.sorting.sortOrder = SortOrder.ASC
+    const {getByText} = render(<ContributingScoreHeader {...props} />)
+    await user.click(getByText('Contributing Score Menu'))
+    const ascendingItem = getByText('Ascending scores').closest('[role="menuitemradio"]')
+    expect(ascendingItem).toHaveAttribute('aria-checked', 'true')
+  })
+
+  it('shows selected state when sorting by this alignment in descending order', async () => {
+    const user = userEvent.setup({pointerEventsCheck: 0})
+    const props = defaultProps()
+    props.sorting.sortBy = SortBy.ContributingScore
+    props.sorting.sortAlignmentId = '1'
+    props.sorting.sortOrder = SortOrder.DESC
+    const {getByText} = render(<ContributingScoreHeader {...props} />)
+    await user.click(getByText('Contributing Score Menu'))
+    const descendingItem = getByText('Descending scores').closest('[role="menuitemradio"]')
+    expect(descendingItem).toHaveAttribute('aria-checked', 'true')
   })
 })

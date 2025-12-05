@@ -2015,6 +2015,143 @@ describe OutcomeResultsController do
         expect(rollup_scores).to eq scores
       end
 
+      context "by contributing_score" do
+        before do
+          # Use the alignment from outcome_result (for @student1)
+          @alignment = outcome_result.alignment
+          @alignment_id = "A_#{@alignment.id}"
+
+          # Find the existing result for @student2 and update it to use the same alignment
+          existing_result = LearningOutcomeResult.where(user_id: @student2.id, learning_outcome_id: @outcome.id).first
+          existing_result&.update_columns(content_tag_id: @alignment.id, score: 1, workflow_state: "active")
+
+          # @student3 has no result for this alignment, so their score will be nil
+        end
+
+        it "validates a missing sort_alignment_id parameter" do
+          get_rollups(sort_by: "contributing_score")
+          expect(response).not_to be_successful
+        end
+
+        it "validates an invalid sort_alignment_id parameter format" do
+          get_rollups(sort_by: "contributing_score", sort_alignment_id: "invalid_format")
+          expect(response).not_to be_successful
+        end
+
+        it "validates an invalid sort_alignment_id parameter with wrong prefix" do
+          get_rollups(sort_by: "contributing_score", sort_alignment_id: "123")
+          expect(response).not_to be_successful
+        end
+
+        it "sorts rollups by ascending alignment score" do
+          get_rollups(sort_by: "contributing_score", sort_alignment_id: @alignment_id)
+          expect(response).to be_successful
+          json = parse_response(response)
+          expect(json["rollups"].length).to eq(3)
+        end
+
+        it "sorts rollups by descending alignment score" do
+          get_rollups(sort_by: "contributing_score", sort_alignment_id: @alignment_id, sort_order: "desc")
+          expect(response).to be_successful
+          json = parse_response(response)
+          expect_user_order(json["rollups"], [@student1, @student2, @student3])
+          expect_score_order(json["rollups"], [3, 1, nil])
+        end
+
+        context "with pagination" do
+          def expect_students_in_pagination_by_alignment(page, students, scores, sort_order = "asc")
+            get_rollups(sort_by: "contributing_score", sort_alignment_id: @alignment_id, sort_order:, per_page: 1, page:)
+            expect(response).to be_successful
+            json = parse_response(response)
+            expect_user_order(json["rollups"], students)
+            expect_score_order(json["rollups"], scores)
+          end
+
+          context "ascending" do
+            it "return student2 in first page" do
+              expect_students_in_pagination_by_alignment(1, [@student2], [1])
+            end
+
+            it "return student1 in second page" do
+              expect_students_in_pagination_by_alignment(2, [@student1], [3])
+            end
+
+            it "return student3 in third page" do
+              expect_students_in_pagination_by_alignment(3, [@student3], [nil])
+            end
+
+            it "return no student in fourth page" do
+              expect_students_in_pagination_by_alignment(4, [], [])
+            end
+          end
+
+          context "descending" do
+            it "return student1 in first page" do
+              expect_students_in_pagination_by_alignment(1, [@student1], [3], "desc")
+            end
+
+            it "return student2 in second page" do
+              expect_students_in_pagination_by_alignment(2, [@student2], [1], "desc")
+            end
+
+            it "return student3 in third page" do
+              expect_students_in_pagination_by_alignment(3, [@student3], [nil], "desc")
+            end
+
+            it "return no student in fourth page" do
+              expect_students_in_pagination_by_alignment(4, [], [], "desc")
+            end
+          end
+        end
+
+        context "with alignment that has no scores" do
+          before do
+            # Create a new outcome with a new alignment that has no scores
+            @outcome2 = @course.created_learning_outcomes.create!(
+              title: "Outcome 2",
+              description: "second outcome",
+              vendor_guid: "vendorguid9002"
+            )
+            @assignment2 = @course.assignments.create!(title: "Assignment 2")
+            @alignment2 = @outcome2.align(@assignment2, @course, mastery_type: "points", mastery_score: 3)
+            @alignment2_id = "A_#{@alignment2.id}"
+          end
+
+          it "returns all students when sorting by alignment with no scores (descending)" do
+            # Before the fix, this would return 0 students when exclude[]=missing_user_rollups
+            get_rollups(
+              sort_by: "contributing_score",
+              sort_alignment_id: @alignment2_id,
+              sort_order: "desc",
+              exclude: ["missing_user_rollups"],
+              outcome_ids: [@outcome2.id]
+            )
+            expect(response).to be_successful
+            json = parse_response(response)
+            # All 3 students should be returned even though they have no scores for this alignment
+            # With no scores, they're sorted by name and reversed (desc)
+            expect(json["rollups"].length).to eq(3)
+            expect_user_order(json["rollups"], [@student3, @student2, @student1])
+          end
+
+          it "returns all students when sorting by alignment with no scores (ascending)" do
+            # Before the fix, this would return 0 students when exclude[]=missing_user_rollups
+            get_rollups(
+              sort_by: "contributing_score",
+              sort_alignment_id: @alignment2_id,
+              sort_order: "asc",
+              exclude: ["missing_user_rollups"],
+              outcome_ids: [@outcome2.id]
+            )
+            expect(response).to be_successful
+            json = parse_response(response)
+            # All 3 students should be returned even though they have no scores for this alignment
+            expect(json["rollups"].length).to eq(3)
+            expect_user_order(json["rollups"], [@student1, @student2, @student3])
+          end
+        end
+      end
+
       context "by student" do
         it "sorts rollups by ascending student sortable name" do
           get_rollups(sort_by: "student")

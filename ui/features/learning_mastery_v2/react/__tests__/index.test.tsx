@@ -89,6 +89,8 @@ describe('LearningMastery', () => {
       setSortBy: jest.fn(),
       sortOutcomeId: null,
       setSortOutcomeId: jest.fn(),
+      sortAlignmentId: null,
+      setSortAlignmentId: jest.fn(),
     },
     filter: {
       selectedOutcomeIds: [],

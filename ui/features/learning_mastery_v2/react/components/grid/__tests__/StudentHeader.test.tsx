@@ -31,6 +31,8 @@ const makeProps = (props = {}): StudentHeaderProps => {
       setSortBy: jest.fn(),
       sortOutcomeId: null,
       setSortOutcomeId: jest.fn(),
+      sortAlignmentId: null,
+      setSortAlignmentId: jest.fn(),
     },
     nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
     onChangeNameDisplayFormat: jest.fn(),
