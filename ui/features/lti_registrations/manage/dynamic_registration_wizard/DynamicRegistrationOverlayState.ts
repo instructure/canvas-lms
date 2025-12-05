@@ -41,6 +41,7 @@ export interface DynamicRegistrationOverlayActions {
   updateDescription: (description: string) => void
   updateAdminNickname: (nickname: string) => void
   updateIconUrl: (placement: LtiPlacement, iconUrl?: string) => void
+  updateDefaultIconUrl: (iconUrl?: string) => void
 }
 
 export type DynamicRegistrationOverlayState = {
@@ -112,6 +113,8 @@ const updateAdminNickname = (nickname: string) =>
     return {...state, adminNickname: nickname}
   })
 
+const updateDefaultIconUrl = (iconUrl?: string) => updateRegistrationKey('icon_url')(() => iconUrl)
+
 export type DynamicRegistrationOverlayStore = StoreApi<
   {
     state: DynamicRegistrationOverlayState
@@ -156,6 +159,7 @@ export const createDynamicRegistrationOverlayStore = (
             icon_url: iconUrl,
           }))(state),
         ),
+      updateDefaultIconUrl: (iconUrl?: string) => set(updateDefaultIconUrl(iconUrl)),
     })),
   )
 
@@ -170,6 +174,9 @@ const initialOverlayStateFromLtiRegistration = (
     overlay: {
       description: toUndefined(overlay?.description || registration.configuration.description),
       title: toUndefined(overlay?.title || registration.configuration.title),
+      icon_url: toUndefined(
+        overlay?.icon_url || registration.configuration.launch_settings?.icon_url,
+      ),
       disabled_scopes: overlay?.disabled_scopes || [],
       disabled_placements: overlay?.disabled_placements || [],
       placements: placementsWithOverlay(registration.configuration, overlay),

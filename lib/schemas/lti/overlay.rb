@@ -40,6 +40,7 @@ module Schemas::Lti
         custom_fields: { type: "object" },
         target_link_uri: { type: "string" },
         oidc_initiation_url: { type: "string" },
+        icon_url: { type: "string" },
         domain: { type: "string" },
         privacy_level: { type: "string", enum: ::Lti::PrivacyLevelExpander::SUPPORTED_LEVELS },
         disabled_scopes: { type: "array", items: { type: "string", enum: [*TokenScopes::LTI_SCOPES.keys, *TokenScopes::LTI_HIDDEN_SCOPES.keys] } },

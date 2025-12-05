@@ -213,15 +213,7 @@ export const Lti1p3RegistrationWizard = ({
             currentScreen="intermediate"
             reviewing={store.state.reviewing}
             onPreviousClicked={handlePreviousClicked('OverrideURIs')}
-            onNextClicked={() => {
-              const placements = store.state.overlayStore.getState().state.placements.placements
-              const enabledPlacements = filterPlacementsByFeatureFlags(placements ?? [])
-              if (enabledPlacements.some(p => isLtiPlacementWithIcon(p))) {
-                handleNextClicked('Icons')()
-              } else {
-                handleNextClicked('Review')()
-              }
-            }}
+            onNextClicked={handleNextClicked('Icons')}
           />
         </>
       )
@@ -249,15 +241,7 @@ export const Lti1p3RegistrationWizard = ({
           />
           <Footer
             currentScreen="last"
-            onPreviousClicked={() => {
-              const placements = store.state.overlayStore.getState().state.placements.placements
-              const enabledPlacements = filterPlacementsByFeatureFlags(placements ?? [])
-              if (enabledPlacements.some(p => isLtiPlacementWithIcon(p))) {
-                handlePreviousClicked('Icons')()
-              } else {
-                handlePreviousClicked('Naming')()
-              }
-            }}
+            onPreviousClicked={handlePreviousClicked('Icons')}
             updating={!!existingRegistration}
             onNextClicked={() => {
               if (existingRegistration) {

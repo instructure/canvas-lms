@@ -441,6 +441,54 @@ describe('Tool Configuration View Icon Placements', () => {
   })
 })
 
+describe('Tool Configuration View Tool Icon URL', () => {
+  it('should render message when no default icon URL is configured', () => {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        ims_registration_id: ZLtiImsRegistrationId.parse('1'),
+        overlaid_configuration: mockConfiguration({
+          launch_settings: {},
+        }),
+      },
+    })(<ToolConfigurationView />)
+
+    expect(getByText('Tool Icon URL')).toBeInTheDocument()
+    expect(getByText('No tool icon URL configured.')).toBeInTheDocument()
+  })
+
+  it('should render both the tool icon URL and placement-specific icons', () => {
+    const {getByText, getByTestId} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        ims_registration_id: ZLtiImsRegistrationId.parse('1'),
+        overlaid_configuration: mockConfiguration({
+          launch_settings: {
+            icon_url: 'http://example.com/default-icon.png',
+          },
+          placements: [
+            {
+              placement: 'editor_button',
+              enabled: true,
+              text: 'Editor Button',
+              icon_url: 'http://example.com/editor-icon.png',
+            },
+          ],
+        }),
+      },
+    })(<ToolConfigurationView />)
+
+    expect(getByText('Tool Icon URL')).toBeInTheDocument()
+    expect(getByText('http://example.com/default-icon.png')).toBeInTheDocument()
+    expect(getByText('Placement Icon URLs')).toBeInTheDocument()
+    expect(getByTestId('icon-url-editor_button')).toHaveTextContent(
+      'http://example.com/editor-icon.png',
+    )
+  })
+})
+
 describe('Tool Configuration Restore Default Button', () => {
   it('should disable the button on a site admin inherited tool', () => {
     const registration = mockSiteAdminRegistration('site admin reg', 1)

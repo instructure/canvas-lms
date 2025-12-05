@@ -366,10 +366,32 @@ export const ToolConfigurationView = () => {
         ))}
       </Section>
 
-      <Section title={I18n.t('Icon URLs')}>
+      <Section title={I18n.t('Tool Icon URL')}>
+        {registration.overlaid_configuration.launch_settings?.icon_url ? (
+          <Flex direction="row" alignItems="center" margin="small 0 0" gap="xx-small">
+            <Flex.Item margin="0 xx-small 0 0">
+              <img
+                style={{height: '24px'}}
+                src={registration.overlaid_configuration.launch_settings.icon_url}
+                alt={I18n.t('Icon displayed next to tool on Apps page')}
+              ></img>
+            </Flex.Item>
+            <Flex.Item shouldShrink>
+              <Text wrap="break-word">
+                {registration.overlaid_configuration.launch_settings.icon_url}
+              </Text>
+            </Flex.Item>
+          </Flex>
+        ) : (
+          <Text fontStyle="italic">{I18n.t('No tool icon URL configured.')}</Text>
+        )}
+
+        <Heading level="h3" margin="small 0" id="placement-icon-urls">
+          {I18n.t('Placement Icon URLs')}
+        </Heading>
         {enabledPlacementsWithIcons.length > 0 ? (
           enabledPlacementsWithIcons.map((p, i) => (
-            <View key={p.placement} as="div" margin="0 0 small 0" style={{overflow: 'hidden'}}>
+            <View key={p.placement} as="div" margin="small 0" style={{overflow: 'hidden'}}>
               <Text weight="bold">{i18nLtiPlacement(p.placement)}:</Text>
               <Flex
                 direction="row"

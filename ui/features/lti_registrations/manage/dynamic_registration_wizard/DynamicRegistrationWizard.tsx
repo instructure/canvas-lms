@@ -332,21 +332,10 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                   'Reviewing',
                 )
               } else {
-                const placements = state.registration.configuration.placements.map(p => p.placement)
-                const disabledPlacements =
-                  state.overlayStore.getState().state.overlay.disabled_placements ?? []
-                const enabledPlacements = filterPlacementsByFeatureFlags(
-                  placements.filter(p => !disabledPlacements.includes(p)),
+                dynamicRegistrationWizardState.transitionToConfirmationState(
+                  state._type,
+                  'IconConfirmation',
                 )
-
-                if (enabledPlacements.some(p => isLtiPlacementWithIcon(p))) {
-                  dynamicRegistrationWizardState.transitionToConfirmationState(
-                    state._type,
-                    'IconConfirmation',
-                  )
-                } else {
-                  dynamicRegistrationWizardState.transitionToReviewingState(state._type)
-                }
               }
             }}
           />
@@ -384,26 +373,11 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
             currentScreen="last"
             reviewing={state.reviewing}
             onPreviousClicked={() => {
-              const placements = state.registration.configuration.placements.map(p => p.placement)
-              const disabledPlacements =
-                state.overlayStore.getState().state.overlay.disabled_placements ?? []
-              const enabledPlacements = filterPlacementsByFeatureFlags(
-                placements.filter(p => !disabledPlacements.includes(p)),
+              dynamicRegistrationWizardState.transitionToConfirmationState(
+                state._type,
+                'IconConfirmation',
+                false,
               )
-
-              if (enabledPlacements.some(p => isLtiPlacementWithIcon(p))) {
-                dynamicRegistrationWizardState.transitionToConfirmationState(
-                  state._type,
-                  'IconConfirmation',
-                  false,
-                )
-              } else {
-                dynamicRegistrationWizardState.transitionToConfirmationState(
-                  state._type,
-                  'NamingConfirmation',
-                  false,
-                )
-              }
             }}
             onNextClicked={() => {
               if (registrationId) {

@@ -65,6 +65,7 @@ export type Lti1p3RegistrationOverlayState = {
   }
   icons: {
     placements: Partial<Record<LtiPlacementWithIcon, IconUrlOverride>>
+    defaultIconUrl?: string
   }
   dirty: boolean
   hasSubmitted: boolean

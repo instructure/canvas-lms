@@ -71,6 +71,8 @@ export const IconConfirmationWrapper = ({
           allPlacements={filteredPlacements}
           placementIconOverrides={state.icons.placements}
           setPlacementIconUrl={actions.setPlacementIconUrl}
+          defaultIconUrl={state.icons.defaultIconUrl ?? ''}
+          setDefaultIconUrl={actions.setDefaultIconUrl}
           hasSubmitted={hasSubmitted}
         />
       </RegistrationModalBody>
