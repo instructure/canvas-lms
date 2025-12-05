@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CURRENT_USER} from './constants'
+import {CURRENT_USER, SUBMITTED} from './constants'
 import {
   DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
   DISCUSSION_SUBENTRIES_QUERY,
@@ -547,5 +547,43 @@ export const getTranslation = async (text, translateTargetLanguage, signal) => {
 
     // If no response, just rethrow the original error
     throw e
+  }
+}
+
+/**
+ * Checks if a checkpoint submission is completed
+ * @param {Object} submission - The submission object
+ * @returns {boolean} - Whether the checkpoint is completed
+ */
+export const isCheckpointCompleted = submission => {
+  return submission?.submissionStatus === SUBMITTED
+}
+
+/**
+ * Checks if all required submissions are complete for peer review
+ * For checkpointed discussions, both reply_to_topic and reply_to_entry must be submitted
+ * For non-checkpointed discussions, the user just needs to have posted
+ * @param {Object} discussionTopic - The discussion topic object
+ * @param {Object} replyToTopicSubmission - The reply to topic submission object
+ * @param {Object} replyToEntrySubmission - The reply to entry submission object
+ * @param {boolean} userHasPosted - Whether the user has posted in the discussion
+ * @returns {boolean} - Whether the submission is complete
+ */
+export const isSubmissionComplete = (
+  discussionTopic,
+  replyToTopicSubmission,
+  replyToEntrySubmission,
+  userHasPosted,
+) => {
+  const hasCheckpoints = (discussionTopic?.assignment?.checkpoints?.length || 0) > 0
+
+  if (hasCheckpoints) {
+    // For checkpointed discussions: both checkpoints must be completed
+    return (
+      isCheckpointCompleted(replyToTopicSubmission) && isCheckpointCompleted(replyToEntrySubmission)
+    )
+  } else {
+    // For non-checkpointed discussions: user just needs to have posted
+    return userHasPosted
   }
 }
