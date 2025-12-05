@@ -11244,7 +11244,6 @@ type User implements LegacyIDInterface & Node & Timestamped {
     Returns the last _n_ elements from the list.
     """
     last: Int
-    limit: Int @deprecated(reason: "The `limit` argument is deprecated and will be removed in a future version.\nPlease use the standard GraphQL connection argument `first` instead, which provides\nidentical functionality and ensures a consistent API experience across all connection fields.")
 
     """
     Only include comments that match the query string.

@@ -856,32 +856,14 @@ module Types
       MD
       argument :assignment_id, ID, required: false
       argument :course_id, ID, required: false
-      argument :limit, Integer, required: false, deprecation_reason: <<~MD.strip
-        The `limit` argument is deprecated and will be removed in a future version.
-        Please use the standard GraphQL connection argument `first` instead, which provides
-        identical functionality and ensures a consistent API experience across all connection fields.
-      MD
     end
-    def comment_bank_items_connection(query: nil, course_id: nil, assignment_id: nil, limit: nil)
+    def comment_bank_items_connection(query: nil, course_id: nil, assignment_id: nil)
       return unless object == current_user
 
       comments = current_user.comment_bank_items
       comments = comments.where(ActiveRecord::Base.wildcard("comment", query.strip)) if query&.strip.present?
       comments = comments.where(course_id:) if course_id.present?
       comments = comments.where(assignment_id:) if assignment_id.present?
-
-      # Limit to be removed with the 2026-01-17 release
-      # .to_a gets around the .shard() bug documented in FOO-1989 so that it can be properly limited.
-      # After that bug is fixed and Switchman is upgraded in Canvas, we can remove the block below
-      # and use the 'first' argument on the connection instead of 'limit'.
-      if limit.present?
-        comments = comments.limit(limit).to_a.first(limit)
-        if Account.site_admin.feature_enabled?(:send_metrics_for_comment_bank_items_connection_limit_used)
-          InstStatsd::Statsd.distributed_increment("graphql.user_type.comment_bank_items_connection.limit_used", tags: {
-                                                     cluster: Shard.current.database_server&.id || "unknown"
-                                                   })
-        end
-      end
 
       comments
     end
