@@ -16,16 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Type definitions for Ada Embed SDK
- *
- * Reference: https://docs.ada.cx/generative/chat/web/sdk-api-reference#type-signatures
- * Only includes types currently in use. Extend as needed for additional functionality.
- */
-
-/**
- * Window information returned by getInfo()
- */
 export type WindowInfo = {
   isChatOpen: boolean
   isDrawerOpen: boolean
@@ -33,37 +23,10 @@ export type WindowInfo = {
   hasClosedChat: boolean
 }
 
-/**
- * Ada embed settings/configuration options
- */
-export type AdaSettings = {
-  handle?: string
-  crossWindowPersistence?: boolean
-  hideMask?: boolean
-  metaFields?: Record<string, string | boolean | number>
-  adaReadyCallback?: (params: {isRolledOut: boolean}) => void
-  onAdaEmbedLoaded?: () => void
-  toggleCallback?: (isDrawerOpen: boolean) => void
-  [key: string]: any
-}
-
-/**
- * The adaEmbed global object
- */
 export type AdaEmbed = {
-  start: (config: AdaSettings) => Promise<void>
+  start: (config: any) => Promise<void>
   getInfo: () => Promise<WindowInfo>
   toggle: () => Promise<void>
   stop?: () => Promise<void>
-  subscribeEvent: (
-    eventKey: string,
-    callback: (data: object, context: {eventKey: string}) => void,
-  ) => Promise<number>
-}
-
-/**
- * The AdaEmbed constructor (for non-lazy loading)
- */
-export type AdaEmbedConstructor = {
-  start: (config: AdaSettings) => Promise<void>
+  subscribeEvent: (eventKey: string, callback: (data: any) => void) => Promise<number>
 }
