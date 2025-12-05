@@ -51,7 +51,9 @@ module Api::V1::Attachment
   def attachment_json(attachment, user, url_options = {}, options = {})
     hash = attachment.slice("id", "folder_id", "display_name", "filename")
 
-    hash["uuid"] = attachment.uuid unless Account.site_admin.feature_enabled?(:deprecate_uuid_in_files_api)
+    if (attachment.context_type == "User" && attachment.context_id == user&.id) || !attachment.root_account.feature_enabled?(:deprecate_uuid_in_files_api)
+      hash["uuid"] = attachment.uuid
+    end
 
     hash["upload_status"] = AttachmentUploadStatus.upload_status(attachment)
 

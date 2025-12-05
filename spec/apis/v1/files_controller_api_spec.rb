@@ -701,6 +701,37 @@ describe "Files API", type: :request do
       end
     end
 
+    context "uuid removal for file verifier project" do
+      before do
+        user_session(@teacher)
+      end
+
+      it "returns the file uuid when the deprecate_uuid_in_files_api flag is disabled" do
+        @course.root_account.disable_feature!(:deprecate_uuid_in_files_api)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/files", @files_path_options.merge(course_id: @course.id.to_param), {})
+        expect(json.pluck("uuid")).to match_array([@a1.uuid, @a2.uuid, @a3.uuid])
+      end
+
+      context "with deprecate_uuid_in_files_api feature enabled" do
+        before do
+          @course.root_account.enable_feature!(:deprecate_uuid_in_files_api)
+        end
+
+        it "doesn't return the file uuid when the context is not the file owner" do
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/files", @files_path_options.merge(course_id: @course.id.to_param), {})
+          json.each do |f|
+            expect(f["uuid"]).to be_nil
+          end
+        end
+
+        it "returns the file uuid when the context is the file owner" do
+          user_att = @teacher.attachments.create(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"))
+          json = api_call(:get, "/api/v1/users/#{@teacher.id}/files", @files_path_options.merge(user_id: @teacher.id.to_param), {})
+          expect(json.pluck("uuid")).to match_array([user_att.uuid])
+        end
+      end
+    end
+
     it "omits verifiers using session auth" do
       user_session(@user)
       get @files_path
