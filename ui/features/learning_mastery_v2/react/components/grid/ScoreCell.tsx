@@ -57,29 +57,20 @@ export const ScoreCell: React.FC<ScoreCellProps> = ({
 }) => {
   const justifyItems = scoreDisplayFormat === ScoreDisplayFormat.ICON_ONLY ? 'center' : 'start'
   const Score = (
-    <Flex
-      width="100%"
-      height="100%"
-      alignItems="center"
-      gap="small"
-      justifyItems={justifyItems}
-      padding="xx-small"
-      margin={onClick ? 'none' : 'x-small'}
-    >
+    <Flex width="100%" height="100%" alignItems="center" gap="small" justifyItems={justifyItems}>
       {icon}
       <Label scoreDisplayFormat={scoreDisplayFormat} score={score} text={label} />
     </Flex>
   )
 
   return (
-    <Flex width="100%" height="100%" alignItems="center">
+    <Flex width="100%" height="100%" alignItems="center" padding="none medium-small">
       {onClick ? (
         <Link
           as="button"
           onClick={onClick}
           width="100%"
           themeOverride={{textDecorationWithinText: 'none'}}
-          margin="x-small"
         >
           {Score}
         </Link>

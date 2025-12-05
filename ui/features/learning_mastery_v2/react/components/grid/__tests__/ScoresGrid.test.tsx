@@ -17,13 +17,34 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {ScoresGrid, ScoresGridProps} from '../ScoresGrid'
 import {Student, Outcome, StudentRollupData} from '../../../types/rollup'
 import {ScoreDisplayFormat} from '../../../utils/constants'
-import {ContributingScoresManager} from '../../../hooks/useContributingScores'
+import {
+  ContributingScoresManager,
+  ContributingScoreAlignment,
+} from '../../../hooks/useContributingScores'
 
 describe('ScoresGrid', () => {
+  const mockAlignments: ContributingScoreAlignment[] = [
+    {
+      alignment_id: 'align-1',
+      associated_asset_id: 'assignment-1',
+      associated_asset_name: 'Assignment 1',
+      associated_asset_type: 'Assignment',
+      html_url: '/courses/123/assignments/assignment-1',
+    },
+    {
+      alignment_id: 'align-2',
+      associated_asset_id: 'assignment-2',
+      associated_asset_name: 'Assignment 2',
+      associated_asset_type: 'Assignment',
+      html_url: '/courses/123/assignments/assignment-2',
+    },
+  ]
+
   const mockContributingScores: ContributingScoresManager = {
     forOutcome: jest.fn(() => ({
       isVisible: () => false,
@@ -35,6 +56,10 @@ describe('ScoresGrid', () => {
       error: undefined,
     })),
   }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
 
   const defaultProps = (props: Partial<ScoresGridProps> = {}): ScoresGridProps => {
     return {
@@ -125,5 +150,108 @@ describe('ScoresGrid', () => {
   it('renders correct test-id for student-outcome-score cells', () => {
     const {getByTestId} = render(<ScoresGrid {...defaultProps()} />)
     expect(getByTestId('student-outcome-score-1-1')).toBeInTheDocument()
+  })
+
+  describe('contributing scores interaction', () => {
+    it('calls onOpenStudentAssignmentTray with correct parameters when score is clicked', async () => {
+      const user = userEvent.setup()
+      const onOpenStudentAssignmentTray = jest.fn()
+      const mockContributingScoresWithData: ContributingScoresManager = {
+        forOutcome: jest.fn(() => ({
+          isVisible: () => true,
+          toggleVisibility: jest.fn(),
+          data: {
+            outcome: {
+              id: '1',
+              title: 'Outcome Title',
+            },
+            alignments: mockAlignments,
+            scores: [
+              {
+                user_id: '1',
+                alignment_id: 'align-1',
+                score: 85,
+              },
+            ],
+          },
+          alignments: mockAlignments,
+          scoresForUser: jest.fn(() => [
+            {
+              user_id: '1',
+              alignment_id: 'align-1',
+              score: 85,
+            },
+          ]),
+          isLoading: false,
+          error: undefined,
+        })),
+      }
+
+      render(
+        <ScoresGrid
+          {...defaultProps({
+            contributingScores: mockContributingScoresWithData,
+            onOpenStudentAssignmentTray,
+          })}
+        />,
+      )
+
+      const scoreCell = screen.getByTestId('student-outcome-score-1-1')
+      const button = scoreCell.querySelector('button')
+      if (button) {
+        await user.click(button)
+        expect(onOpenStudentAssignmentTray).toHaveBeenCalledWith(
+          defaultProps().outcomes[0],
+          defaultProps().students[0],
+          0,
+          mockAlignments,
+        )
+      }
+    })
+
+    it('does not render clickable button when onOpenStudentAssignmentTray is not provided', () => {
+      const mockContributingScoresWithData: ContributingScoresManager = {
+        forOutcome: jest.fn(() => ({
+          isVisible: () => true,
+          toggleVisibility: jest.fn(),
+          data: {
+            outcome: {
+              id: '1',
+              title: 'Outcome Title',
+            },
+            alignments: mockAlignments,
+            scores: [
+              {
+                user_id: '1',
+                alignment_id: 'align-1',
+                score: 85,
+              },
+            ],
+          },
+          alignments: mockAlignments,
+          scoresForUser: jest.fn(() => [
+            {
+              user_id: '1',
+              alignment_id: 'align-1',
+              score: 85,
+            },
+          ]),
+          isLoading: false,
+          error: undefined,
+        })),
+      }
+
+      render(
+        <ScoresGrid
+          {...defaultProps({
+            contributingScores: mockContributingScoresWithData,
+          })}
+        />,
+      )
+
+      const scoreCell = screen.getByTestId('student-outcome-score-1-1')
+      const button = scoreCell.querySelector('button')
+      expect(button).toBeNull()
+    })
   })
 })

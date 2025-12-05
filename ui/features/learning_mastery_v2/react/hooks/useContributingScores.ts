@@ -48,7 +48,7 @@ export interface ContributingScoresForOutcome {
   toggleVisibility: () => void
   data?: ContributingScoresResponse
   alignments?: ContributingScoreAlignment[]
-  scoresForUser: (userId: string) => (number | undefined)[]
+  scoresForUser: (userId: string) => (ContributingScore | undefined)[]
   isLoading: boolean
   error?: Error | null
 }
@@ -67,14 +67,14 @@ interface UseContributingScoresProps {
 const getScoresForUser = (
   data: ContributingScoresResponse | undefined,
   userId: string,
-): (number | undefined)[] => {
+): (ContributingScore | undefined)[] => {
   if (!data) return []
 
   return data.alignments.map(alignment => {
     const score = data.scores.find(
       s => s.user_id === userId && s.alignment_id === alignment.alignment_id,
     )
-    return score?.score
+    return score
   })
 }
 
