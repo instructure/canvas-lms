@@ -21,7 +21,10 @@ import {Flex} from '@instructure/ui-flex'
 import {StudentOutcomeScore} from './StudentOutcomeScore'
 import {Student, Outcome, StudentRollupData, OutcomeRollup} from '../../types/rollup'
 import {ScoreDisplayFormat} from '../../utils/constants'
-import {ContributingScoresManager} from '../../hooks/useContributingScores'
+import {
+  ContributingScoreAlignment,
+  ContributingScoresManager,
+} from '../../hooks/useContributingScores'
 import {Cell} from './Cell'
 
 export interface ScoresGridProps {
@@ -30,7 +33,12 @@ export interface ScoresGridProps {
   rollups: StudentRollupData[]
   scoreDisplayFormat?: ScoreDisplayFormat
   contributingScores: ContributingScoresManager
-  onOpenStudentAssignmentTray?: (outcome: Outcome) => void
+  onOpenStudentAssignmentTray?: (
+    outcome: Outcome,
+    student: Student,
+    alignmentIndex: number,
+    alignments: ContributingScoreAlignment[],
+  ) => void
 }
 
 interface ExtendedOutcomeRollup extends OutcomeRollup {
@@ -42,7 +50,12 @@ interface ContributingScoreCellsProps {
   student: Student
   contributingScores: ContributingScoresManager
   outcome: Outcome
-  onScoreClick?: () => void
+  onScoreClick?: (
+    outcome: Outcome,
+    student: Student,
+    alignmentIndex: number,
+    alignments: ContributingScoreAlignment[],
+  ) => void
 }
 
 const ContributingScoreCells: React.FC<ContributingScoreCellsProps> = ({
@@ -65,10 +78,27 @@ const ContributingScoreCells: React.FC<ContributingScoreCellsProps> = ({
             key={`contributing-score-${student.id}-${outcome.id}-${scoreIndex}`}
           >
             <StudentOutcomeScore
-              score={score}
+              score={score?.score}
               outcome={outcome}
               scoreDisplayFormat={scoreDisplayFormat}
-              onScoreClick={onScoreClick}
+              onScoreClick={
+                onScoreClick
+                  ? () => {
+                      if (!contributingScoresForOutcome.alignments) return
+                      const alignmentIndex = contributingScoresForOutcome.alignments?.findIndex(
+                        alignment => alignment.alignment_id === score?.alignment_id,
+                      )
+                      if (alignmentIndex !== undefined && alignmentIndex >= 0) {
+                        onScoreClick(
+                          outcome,
+                          student,
+                          alignmentIndex,
+                          contributingScoresForOutcome.alignments,
+                        )
+                      }
+                    }
+                  : undefined
+              }
             />
           </Cell>
         ))}
@@ -116,11 +146,7 @@ const ScoresGridComponent: React.FC<ScoresGridProps> = ({
                 student={student}
                 outcome={outcome}
                 scoreDisplayFormat={scoreDisplayFormat}
-                onScoreClick={
-                  onOpenStudentAssignmentTray
-                    ? () => onOpenStudentAssignmentTray(outcome)
-                    : undefined
-                }
+                onScoreClick={onOpenStudentAssignmentTray}
               />
             </Fragment>
           ))}
