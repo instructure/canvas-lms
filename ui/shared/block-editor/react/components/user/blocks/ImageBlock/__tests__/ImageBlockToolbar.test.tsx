@@ -107,7 +107,6 @@ const mockTrayProps: MockTrayProps = {
   source: {
     initializeCollection: () => {},
     initializeUpload: () => {},
-    initializeFlickr: () => {},
     initializeImages: () => {},
     initializeDocuments: () => {},
     initializeMedia: () => {},

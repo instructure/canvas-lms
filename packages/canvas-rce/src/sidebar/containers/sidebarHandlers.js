@@ -30,7 +30,6 @@ import {
   uploadToMediaFolder,
   uploadToMediaFolderWithoutEditor,
 } from '../actions/upload'
-import {searchFlickr, openOrCloseFlickrForm} from '../actions/flickr'
 import {toggle as toggleFolder} from '../actions/files'
 import {openOrCloseNewPageForm} from '../actions/links'
 import {fetchInitialDocs, fetchNextDocs} from '../actions/documents'
@@ -55,8 +54,6 @@ export default function propsFromDispatch(dispatch) {
     fetchNextImages: (opts = {category: DEFAULT_FILE_CATEGORY}) => dispatch(fetchNextImages(opts)),
     startUpload: (tabContext, fileMetaProps) =>
       dispatch(uploadPreflight(tabContext, fileMetaProps)),
-    flickrSearch: term => dispatch(searchFlickr(term)),
-    toggleFlickrForm: () => dispatch(openOrCloseFlickrForm()),
     toggleUploadForm: () => dispatch(openOrCloseUploadForm()),
     toggleNewPageForm: () => dispatch(openOrCloseNewPageForm()),
     startIconMakerUpload: (fileMetaProps, uploadSettings) =>
