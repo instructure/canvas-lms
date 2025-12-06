@@ -23,10 +23,11 @@
 # Used to populate JS_ENV for the federated app
 module NewQuizzes
   class LaunchDataBuilder
-    def initialize(context:, assignment:, tool:, current_user:, controller:, request:, variable_expander:, placement: nil)
+    def initialize(context:, assignment:, tool:, tag:, current_user:, controller:, request:, variable_expander:, placement: nil)
       @context = context
       @assignment = assignment
       @tool = tool
+      @tag = tag
       @current_user = current_user
       @controller = controller
       @request = request
@@ -56,19 +57,20 @@ module NewQuizzes
 
       params = {
         # Non-custom params that are always included
-        lti_resource_link_id:,
         backend_url:,
         roles:,
         ext_roles:,
-
-        # Platform identifier
-        ext_platform: "canvas",
 
         # Tool consumer information
         tool_consumer_info_product_family_code: "canvas",
         tool_consumer_info_version: "cloud",
         tool_consumer_instance_guid: @context.root_account.lti_guid,
         tool_consumer_instance_name: @context.root_account.name,
+
+        # Parameters not included in VariableExpander
+        resource_link_id:,
+        resource_link_title:,
+        launch_presentation_return_url: return_url
       }.merge(standard_params)
 
       # Assignment-specific outcome service parameters
@@ -103,6 +105,9 @@ module NewQuizzes
       # Pass placement to include placement-specific custom fields (e.g., item_banks: course)
       unexpanded_fields = @tool.set_custom_fields(@placement)
 
+      # Add Canvas-specific custom parameters that need variable expansion
+      unexpanded_fields["custom_canvas_workflow_state"] = "$Canvas.course.workflowState"
+
       # Expand all variables
       @variable_expander.expand_variables!(unexpanded_fields)
     end
@@ -119,17 +124,27 @@ module NewQuizzes
 
     private
 
-    def lti_resource_link_id
-      # For assignments: use the resource link UUID from line items, or fall back to variable expander
-      # For Item Banks (no assignment): use the context's opaque identifier (same as standard LTI launch)
+    def resource_link_id
+      raise "Tool and tag are required for resource_link_id" unless @tool && @tag
 
+      @tool.opaque_identifier_for(@tag)
+    end
+
+    def resource_link_title
+      # Match LTI 1.1 behavior: use assignment title if available, otherwise tag title, otherwise tool name
       if @assignment
-        # Try to get from variable expander first (handles assignment resource links properly)
-        @assignment.lti_resource_link_id
+        @assignment.title
+      elsif @tag
+        @tag.title
       else
-        # For Item Banks: use context's opaque identifier (same as standard LTI launch)
-        Lti::V1p1::Asset.opaque_identifier_for(@context)
+        @tool.name
       end
+    end
+
+    def return_url
+      # Generate return URL - for native launches, this could be used by the tool
+      # to navigate back to Canvas after completion
+      @controller&.named_context_url(@context, :context_external_content_success_url, "external_tool_redirect", include_host: true)
     end
 
     def restrict_quantitative_data?
