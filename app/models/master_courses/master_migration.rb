@@ -218,7 +218,8 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     ce.save!
     ce.master_migration = self # don't need to reload
     ce.export_course(export_opts)
-    if type == :selective && ce.referenced_files.present?
+    if ce.referenced_files.present?
+      ce.settings[:referenced_user_file_ids] = ce.referenced_files.each_with_object([]) { |(id, att), arr| arr << id if att.context_type == "User" }
       ce.settings[:referenced_file_migration_ids] = ce.referenced_files.values.map(&:export_id)
       ce.save!
     end
