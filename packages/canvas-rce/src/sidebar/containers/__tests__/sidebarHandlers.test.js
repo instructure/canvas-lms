@@ -21,7 +21,6 @@ import * as actions from '../../actions/ui'
 import * as dataActions from '../../actions/data'
 import * as imageActions from '../../actions/images'
 import * as uploadActions from '../../actions/upload'
-import * as flickrActions from '../../actions/flickr'
 import * as fileActions from '../../actions/files'
 import * as linkActions from '../../actions/links'
 import * as docActions from '../../actions/documents'
@@ -34,7 +33,6 @@ jest.mock('../../actions/ui')
 jest.mock('../../actions/data')
 jest.mock('../../actions/images')
 jest.mock('../../actions/upload')
-jest.mock('../../actions/flickr')
 jest.mock('../../actions/files')
 jest.mock('../../actions/links')
 jest.mock('../../actions/documents')
@@ -178,22 +176,6 @@ describe('Sidebar handlers', () => {
       props.mediaUploadComplete(error, uploadData)
       expect(uploadActions.mediaUploadComplete).toHaveBeenCalledWith(error, uploadData)
       expect(dispatch).toHaveBeenCalledWith('MEDIA_UPLOAD_COMPLETE_ACTION')
-    })
-  })
-
-  describe('flickr management', () => {
-    it('dispatches searchFlickr action with term', () => {
-      const term = 'test'
-      flickrActions.searchFlickr.mockReturnValue('SEARCH_FLICKR_ACTION')
-      props.flickrSearch(term)
-      expect(flickrActions.searchFlickr).toHaveBeenCalledWith(term)
-      expect(dispatch).toHaveBeenCalledWith('SEARCH_FLICKR_ACTION')
-    })
-
-    it('dispatches openOrCloseFlickrForm action', () => {
-      flickrActions.openOrCloseFlickrForm.mockReturnValue('TOGGLE_FLICKR_FORM_ACTION')
-      props.toggleFlickrForm()
-      expect(dispatch).toHaveBeenCalledWith('TOGGLE_FLICKR_FORM_ACTION')
     })
   })
 

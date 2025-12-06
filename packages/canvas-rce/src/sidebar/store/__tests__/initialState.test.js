@@ -33,9 +33,6 @@ describe('Sidebar initialState', () => {
       initializeImages() {
         return {}
       },
-      initializeFlickr() {
-        return {}
-      },
       initializeDocuments() {
         return {}
       },
