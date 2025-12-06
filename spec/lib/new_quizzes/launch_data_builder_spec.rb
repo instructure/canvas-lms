@@ -32,9 +32,16 @@ module NewQuizzes
              request:,
              lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
              blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
-             lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement")
+             lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
+             named_context_url: "https://canvas.instructure.com/courses/#{course.id}/external_content/success/external_tool_redirect")
     end
     let(:variable_expander) { Lti::VariableExpander.new(account, course, controller, current_user: user, tool:) }
+    let(:tag) do
+      assignment.external_tool_tag || assignment.create_external_tool_tag(
+        url: tool&.url || "https://example.com/lti",
+        content: tool
+      )
+    end
 
     subject(:builder) do
       described_class.new(
@@ -93,7 +100,7 @@ module NewQuizzes
         let(:tool) { nil }
 
         it "raises an error when building" do
-          expect { builder.build }.to raise_error("Tool is required for resource_link_id")
+          expect { builder.build }.to raise_error("Tool and tag are required for resource_link_id")
         end
       end
 
@@ -374,8 +381,8 @@ module NewQuizzes
       context "when tool is nil" do
         let(:tool) { nil }
 
-        it "raises an error about missing tool" do
-          expect { builder.build_with_signature }.to raise_error("Tool is required for resource_link_id")
+        it "raises an error about missing tool and tag" do
+          expect { builder.build_with_signature }.to raise_error("Tool and tag are required for resource_link_id")
         end
       end
 
