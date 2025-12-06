@@ -3479,6 +3479,7 @@ class ApplicationController < ActionController::Base
       context: @context,
       assignment: @assignment,
       tool: @tool,
+      tag: @module_tag || @tag,
       current_user: @current_user,
       controller: self,
       request:,
@@ -3486,6 +3487,7 @@ class ApplicationController < ActionController::Base
                                                      current_user: @current_user,
                                                      current_pseudonym: @current_pseudonym,
                                                      assignment: @assignment,
+                                                     content_tag: @module_tag || @tag,
                                                      launch: @lti_launch,
                                                      tool: @tool,
                                                      launch_url: @resource_url
