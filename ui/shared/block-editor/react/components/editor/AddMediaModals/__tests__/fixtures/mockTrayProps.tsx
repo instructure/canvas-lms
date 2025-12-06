@@ -98,7 +98,6 @@ export const mockTrayProps = {
   source: {
     initializeCollection() {},
     initializeUpload() {},
-    initializeFlickr() {},
     initializeImages() {},
     initializeDocuments() {},
     initializeMedia() {},

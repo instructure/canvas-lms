@@ -60,7 +60,6 @@ describe('Instructure Media Plugin: clickCallback', () => {
       source: {
         initializeCollection() {},
         initializeUpload() {},
-        initializeFlickr() {},
         initializeImages() {},
         initializeDocuments() {},
         initializeMedia() {},
