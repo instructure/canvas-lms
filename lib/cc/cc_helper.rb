@@ -251,7 +251,7 @@ module CC
             next(match.url) if obj.try(:context_type).nil? || %w[Course User AssessmentQuestion].exclude?(obj.context_type)
 
             # find the object in the context in case it's deleted and we need to find the active attachment
-            obj = obj.context.attachments.find_by(id: obj) if %w[Course User].include?(obj.context_type)
+            obj = obj.context.attachments.find_by(id: obj) if obj.deleted? && %w[Course User].include?(obj.context_type)
             next(match.url) unless obj
             next(match.url) if obj.context_type == "Course" && obj.context_id != @course.id
             next(match.url) if obj.context_type == "AssessmentQuestion" && @for_course_copy
@@ -260,6 +260,11 @@ module CC
 
             obj.export_id = @key_generator.create_key(obj)
             @referenced_files[obj.id] = obj if @track_referenced_files && !@referenced_files[obj.id]
+            if obj.context_type == "User"
+              uri = Addressable::URI.parse(match.rest)
+              uri.query_values = uri.query_values&.except("verifier").presence
+              match.rest = uri.to_s
+            end
 
             if @for_course_copy
               "#{COURSE_TOKEN}/file_ref/#{obj.export_id}#{match.rest}"

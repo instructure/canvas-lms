@@ -831,15 +831,15 @@ describe ContentMigration do
     it "changes user linked files to course linked files" do
       image = attachment_model(context: @teacher, display_name: "cn_image.jpg", uploaded_data: fixture_file_upload("cn_image.jpg"))
       body = <<~HTML
-        <p><img src="/users/#{@teacher.id}/files/#{image.id}/preview"></p>
+        <p><img src="/users/#{@teacher.id}/files/#{image.id}/preview?verifier=#{image.uuid}"></p>
       HTML
       page = @copy_from.wiki_pages.create!(title: "some page", body:, updating_user: @teacher)
 
       run_course_copy
 
-      image_to = @copy_to.attachments.find_by(context: @copy_to, migration_id: mig_id(image))
+      image_to = @copy_to.attachments.find_by(migration_id: mig_id(image))
       page_to = @copy_to.wiki_pages.find_by(migration_id: mig_id(page))
-      expect(page_to.body).to include "/courses/#{@copy_to.id}/files/#{image_to.id}/preview"
+      expect(page_to.body).to eq(%(<p><img src="/courses/#{@copy_to.id}/files/#{image_to.id}/preview"></p>))
       expect(image_to.folder).to eq Folder.media_folder(@copy_to)
       expect(image_to.folder.hidden).to be_truthy
     end

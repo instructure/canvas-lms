@@ -540,6 +540,25 @@ describe MasterCourses::MasterMigration do
       expect(cm2.migration_settings[:imported_assets]["WikiPage"]).to eq page_to.id.to_s
     end
 
+    it "changes user linked files to course linked files" do
+      @copy_to = course_model
+      @sub = @template.add_child_course!(@copy_to)
+
+      image = attachment_model(context: @teacher, display_name: "cn_image.jpg", uploaded_data: fixture_file_upload("cn_image.jpg"))
+      body = <<~HTML
+        <p><img src="/users/#{@teacher.id}/files/#{image.id}/preview?verifier=#{image.uuid}"></p>
+      HTML
+      page = @copy_from.wiki_pages.create!(title: "some page", body:, updating_user: @teacher)
+
+      run_master_migration
+
+      image_to = @copy_to.attachments.find_by(migration_id: mig_id(image))
+      page_to = @copy_to.wiki_pages.find_by(migration_id: mig_id(page))
+      expect(page_to.body).to eq(%(<p><img src="/courses/#{@copy_to.id}/files/#{image_to.id}/preview"></p>))
+      expect(image_to.folder).to eq Folder.media_folder(@copy_to)
+      expect(image_to.folder.hidden).to be_truthy
+    end
+
     describe "send_item_notifications" do
       it "does not perform imports with send_item_notifications by default" do
         @copy_to = course_factory
