@@ -23,14 +23,6 @@
   </button>
   <ul class="al-options" role="menu" tabindex="0" aria-hidden="true">
     <% if @context.is_a?(Course) %>
-      <% if can_do(@context, @current_user, :read_roster) && !@context.horizon_course? %>
-        <li role="presentation">
-        <%= sidebar_button context_url(@context, :context_groups_url),
-                           t('View User Groups'),
-                           'group' %>
-        </li>
-      <% end %>
-
       <% if can_do(@context,
                    @current_user,
                    :allow_course_admin_actions,
