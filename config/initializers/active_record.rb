@@ -534,11 +534,25 @@ class ActiveRecord::Base
     end
   end
 
+  def self.aurora?
+    # We can't use `connection.wal?` because aurora now supports `pg_current_wal_lsn`
+    unless instance_variable_defined?(:@aurora)
+      @aurora = connection.select_value("SELECT count(*) > 0 FROM pg_settings where name like 'aurora%'")
+    end
+    @aurora
+  end
+
+  def self.aurora_durable_lsn
+    connection.select_value("SELECT durable_lsn FROM aurora_replica_status() WHERE server_id = aurora_db_instance_identifier()")
+  end
+
   def self.current_xlog_location
     Shard.current(connection_class_for_self).database_server.unguard do
       GuardRail.activate(:primary) do
         if Rails.env.test? ? in_transaction_in_test? : connection.open_transactions > 0
           raise "don't run current_xlog_location in a transaction"
+        elsif aurora?
+          aurora_durable_lsn
         else
           connection.current_wal_lsn
         end
@@ -554,10 +568,18 @@ class ActiveRecord::Base
     GuardRail.activate(replica) do
       # positive == first value greater, negative == second value greater
       start_time = Time.now.utc
-      while connection.wal_lsn_diff(start, :last_replay) >= 0
-        return false if timeout && Time.now.utc > start_time + timeout
+      if aurora?
+        while start - aurora_durable_lsn >= 0
+          return false if timeout && Time.now.utc > start_time + timeout
 
-        sleep 0.1
+          sleep 0.1
+        end
+      else
+        while connection.wal_lsn_diff(start, :last_replay) >= 0
+          return false if timeout && Time.now.utc > start_time + timeout
+
+          sleep 0.1
+        end
       end
     end
     true
