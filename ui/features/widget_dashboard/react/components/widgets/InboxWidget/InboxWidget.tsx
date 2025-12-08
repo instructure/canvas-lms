@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -28,11 +28,12 @@ import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import MessageItem from './MessageItem'
 import type {BaseWidgetProps} from '../../../types'
 import {useInboxMessages, type InboxFilter} from '../../../hooks/useInboxMessages'
+import {useWidgetConfig} from '../../../hooks/useWidgetConfig'
 
 const I18n = createI18nScope('widget_dashboard')
 
 const InboxWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false, dragHandleProps}) => {
-  const [filter, setFilter] = useState<InboxFilter>('unread')
+  const [filter, setFilter] = useWidgetConfig<InboxFilter>(widget.id, 'filter', 'unread')
   const {data: messages = [], isLoading, error, refetch} = useInboxMessages({limit: 5, filter})
 
   const handleFilterChange = (newFilter: InboxFilter) => {
