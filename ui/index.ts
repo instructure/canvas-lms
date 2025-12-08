@@ -136,11 +136,7 @@ function afterDocumentReady() {
   if (adaState === 'open' || adaState === 'minimized') {
     import('./shared/help-dialog/react/AdaChatbot')
       .then(module => {
-        if (typeof window !== 'undefined' && window.adaEmbed) {
-          module.autoRestoreAda()
-        } else {
-          console.warn('Ada embed script not available: autoRestoreAda not called')
-        }
+        module.autoRestoreAda()
       })
       .catch(error => console.error('Failed to load AdaChatbot:', error))
   }
