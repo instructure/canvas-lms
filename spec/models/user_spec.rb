@@ -4894,6 +4894,54 @@ describe User do
         expect(@user.user_can_edit_profile?).to be false
       end
     end
+
+    describe "user_can_edit_bio?" do
+      it "returns false when users_can_edit_profile is false" do
+        @pseudonym.account.settings[:users_can_edit_profile] = false
+        @pseudonym.account.settings[:users_can_edit_bio] = true
+        @pseudonym.account.save!
+        expect(@user.user_can_edit_bio?).to be false
+      end
+
+      it "allows editing bio if both settings are true" do
+        @pseudonym.account.settings[:users_can_edit_profile] = true
+        @pseudonym.account.settings[:users_can_edit_bio] = true
+        @pseudonym.account.save!
+        expect(@user.user_can_edit_bio?).to be true
+      end
+    end
+
+    describe "user_can_edit_profile_links?" do
+      it "returns false when users_can_edit_profile is false" do
+        @pseudonym.account.settings[:users_can_edit_profile] = false
+        @pseudonym.account.settings[:users_can_edit_profile_links] = true
+        @pseudonym.account.save!
+        expect(@user.user_can_edit_profile_links?).to be false
+      end
+
+      it "allows editing profile links if both settings are true" do
+        @pseudonym.account.settings[:users_can_edit_profile] = true
+        @pseudonym.account.settings[:users_can_edit_profile_links] = true
+        @pseudonym.account.save!
+        expect(@user.user_can_edit_profile_links?).to be true
+      end
+    end
+
+    describe "user_can_edit_title?" do
+      it "returns false when users_can_edit_profile is false" do
+        @pseudonym.account.settings[:users_can_edit_profile] = false
+        @pseudonym.account.settings[:users_can_edit_title] = true
+        @pseudonym.account.save!
+        expect(@user.user_can_edit_title?).to be false
+      end
+
+      it "allows editing title if both settings are true" do
+        @pseudonym.account.settings[:users_can_edit_profile] = true
+        @pseudonym.account.settings[:users_can_edit_title] = true
+        @pseudonym.account.save!
+        expect(@user.user_can_edit_title?).to be true
+      end
+    end
   end
 
   describe "user_can_edit_comm_channels?" do

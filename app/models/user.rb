@@ -3321,25 +3321,55 @@ class User < ActiveRecord::Base
     end
   end
 
-  def user_can_edit_name?
+  # creates a hash of booleans determining what profile fields the user can edit
+  def details_editable_by_user
     accounts = pseudonyms.shard(self).active.map(&:account)
-    return true if accounts.empty?
 
-    accounts.any?(&:users_can_edit_name?)
+    {
+      can_edit_name: user_can_edit_name?(accounts),
+      can_edit_bio: user_can_edit_bio?(accounts),
+      can_edit_title: user_can_edit_title?(accounts),
+      can_edit_profile_links: user_can_edit_profile_links?(accounts),
+      can_edit: user_can_edit_profile?(accounts),
+      can_edit_channels: user_can_edit_comm_channels?(accounts)
+    }
   end
 
-  def user_can_edit_profile?
-    accounts = pseudonyms.shard(self).active.map(&:account)
+  def check_account_user_can_edit_permissions?(accounts = nil, &)
+    accounts ||= pseudonyms.shard(self).active.map(&:account)
     return true if accounts.empty?
 
-    accounts.any?(&:users_can_edit_profile?)
+    accounts.any?(&)
   end
 
-  def user_can_edit_comm_channels?
-    accounts = pseudonyms.shard(self).active.map(&:account)
-    return true if accounts.empty?
+  def user_can_edit_name?(accounts = nil)
+    check_account_user_can_edit_permissions?(accounts, &:users_can_edit_name?)
+  end
 
-    accounts.any?(&:users_can_edit_comm_channels?)
+  def user_can_edit_bio?(accounts = nil)
+    check_account_user_can_edit_permissions?(accounts) do |account|
+      account.users_can_edit_bio? && account.users_can_edit_profile?
+    end
+  end
+
+  def user_can_edit_title?(accounts = nil)
+    check_account_user_can_edit_permissions?(accounts) do |account|
+      account.users_can_edit_title? && account.users_can_edit_profile?
+    end
+  end
+
+  def user_can_edit_profile_links?(accounts = nil)
+    check_account_user_can_edit_permissions?(accounts) do |account|
+      account.users_can_edit_profile_links? && account.users_can_edit_profile?
+    end
+  end
+
+  def user_can_edit_profile?(accounts = nil)
+    check_account_user_can_edit_permissions?(accounts, &:users_can_edit_profile?)
+  end
+
+  def user_can_edit_comm_channels?(accounts = nil)
+    check_account_user_can_edit_permissions?(accounts, &:users_can_edit_comm_channels?)
   end
 
   def suspended?

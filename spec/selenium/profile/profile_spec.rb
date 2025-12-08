@@ -567,6 +567,89 @@ describe "profile" do
     expect(f("#links_empty_message").text).to eq "No links have been added"
   end
 
+  describe "profile field permissions" do
+    def show_edit_form
+      f("[data-event='editProfile']").click
+
+      # assert we are actually in edit mode
+      expect(f("[data-event='cancelEditProfile']")).to be_displayed
+    end
+
+    before :once do
+      @account = Account.default
+      @account.settings[:enable_profiles] = true
+    end
+
+    it "can edit title when profiles and title setting are enabled" do
+      user_logged_in
+      # set to false to assert that we aren't relying on the name setting
+      # which was the original setting check
+      @account.settings[:users_can_edit_name] = false
+      @account.settings[:users_can_edit_profile] = true
+      @account.settings[:users_can_edit_title] = true
+      @account.save!
+      get "/profile"
+
+      show_edit_form
+      expect(f("[name='user_profile[title]']")).to be_displayed
+    end
+
+    it "can edit biography when profiles and biography setting are enabled" do
+      user_logged_in
+      @account.settings[:users_can_edit_profile] = true
+      @account.settings[:users_can_edit_bio] = true
+      @account.save!
+      get "/profile"
+
+      show_edit_form
+      expect(f("[name='user_profile[bio]']")).to be_displayed
+    end
+
+    it "can edit profile links when profiles and profile links setting are enabled" do
+      user_logged_in
+      @account.settings[:users_can_edit_profile] = true
+      @account.settings[:users_can_edit_profile_links] = true
+      @account.save!
+      get "/profile"
+
+      show_edit_form
+      expect(f("#edit_links_table")).to be_displayed
+    end
+
+    it "cannot edit biography when biography setting is disabled" do
+      user_logged_in
+      @account.settings[:users_can_edit_profile] = true
+      @account.settings[:users_can_edit_bio] = false
+      @account.save!
+      get "/profile"
+
+      show_edit_form
+      expect(element_exists?("[name='user_profile[bio]']")).to be false
+    end
+
+    it "cannot edit title when title setting is disabled" do
+      user_logged_in
+      @account.settings[:users_can_edit_profile] = true
+      @account.settings[:users_can_edit_title] = false
+      @account.save!
+      get "/profile"
+
+      show_edit_form
+      expect(element_exists?("[name='user_profile[title]']")).to be false
+    end
+
+    it "cannot edit profile links when profile links setting is disabled" do
+      user_logged_in
+      @account.settings[:users_can_edit_profile] = true
+      @account.settings[:users_can_edit_profile_links] = false
+      @account.save!
+      get "/profile"
+
+      show_edit_form
+      expect(element_exists?("#edit_links_table")).to be false
+    end
+  end
+
   describe "avatar reporting" do
     before do
       Account.default.enable_service(:avatars)

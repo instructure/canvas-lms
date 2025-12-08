@@ -3127,14 +3127,17 @@ class ApplicationController < ActionController::Base
     extend Api::V1::Group
 
     includes ||= []
+    profile_owner = profile.user
+    is_profile_owner = viewer == profile_owner
+    profile_permissions = profile_owner.details_editable_by_user
+    profile_permissions = profile_permissions.transform_values { false } unless is_profile_owner
+
     data = user_profile_json(profile, viewer, session, includes, profile)
-    data[:can_edit] = viewer == profile.user && profile.user.user_can_edit_profile?
-    data[:can_edit_channels] = viewer == profile.user && profile.user.user_can_edit_comm_channels?
-    data[:can_edit_name] = viewer == profile.user && profile.user.user_can_edit_name?
-    data[:can_edit_avatar] = data[:can_edit] && profile.user.avatar_state != :locked
-    data[:known_user] = viewer.address_book.known_user(profile.user)
-    if data[:known_user] && viewer != profile.user
-      common_courses = viewer.address_book.common_courses(profile.user)
+    data = data.merge(profile_permissions)
+    data[:can_edit_avatar] = data[:can_edit] && profile_owner.avatar_state != :locked
+    data[:known_user] = viewer.address_book.known_user(profile_owner)
+    if data[:known_user] && viewer != profile_owner
+      common_courses = viewer.address_book.common_courses(profile_owner)
       # address book can return a fake record in common courses with course_id
       # 0 which represents an admin -> user commonality.
       common_courses.delete(0)
