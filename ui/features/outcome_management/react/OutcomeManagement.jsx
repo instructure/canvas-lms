@@ -28,6 +28,7 @@ import OutcomesContext, {getContext} from '@canvas/outcomes/react/contexts/Outco
 import ManagementHeader from './ManagementHeader'
 import OutcomeManagementPanel from './Management/index'
 import AlignmentSummary from './Alignments/index'
+import Reporting from './Reporting/index'
 import {
   showOutcomesImporter,
   showOutcomesImporterIfInProgress,
@@ -72,9 +73,12 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
   const [importsTargetGroup, setImportsTargetGroup] = useState({})
   const isMobileView = !breakpoints?.tablet
   const contextValues = getContext(isMobileView)
-  const {accountLevelMasteryScalesFF, canManage, contextType} = contextValues.env
+  const {accountLevelMasteryScalesFF, lmgbStudentReportingFF, canManage, contextType} =
+    contextValues.env
   const shouldDisplayAlignmentsTab = improvedManagement && canManage && contextType === 'Course'
   const alignmentTabIndex = accountLevelMasteryScalesFF ? 3 : 1
+  const shouldDisplayReportingTab = lmgbStudentReportingFF && canManage && contextType === 'Course'
+  const reportingTabIndex = accountLevelMasteryScalesFF ? 4 : 2
 
   const onSetImportRef = useCallback(node => {
     setImportRef(node)
@@ -241,8 +245,19 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
             id="alignments"
             padding={isMobileView ? 'small none none' : 'small'}
           >
-            <ScreenReaderContent as="h2">Alignments Tab Content“</ScreenReaderContent>
+            <ScreenReaderContent as="h2">{I18n.t('Alignments Tab Content')}</ScreenReaderContent>
             <AlignmentSummary />
+          </Tabs.Panel>
+        )}
+        {shouldDisplayReportingTab && (
+          <Tabs.Panel
+            renderTitle={I18n.t('Reporting')}
+            isSelected={selectedIndex === reportingTabIndex}
+            id="reporting"
+            padding={isMobileView ? 'small none none' : 'small'}
+          >
+            <ScreenReaderContent as="h2">{I18n.t('Reporting Tab Content')}</ScreenReaderContent>
+            <Reporting />
           </Tabs.Panel>
         )}
       </Tabs>
