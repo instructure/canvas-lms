@@ -175,6 +175,22 @@ describe OutcomesController do
         expect(assigns[:js_env][:ARCHIVE_OUTCOMES]).to be false
       end
     end
+
+    context "lmgb_student_reporting" do
+      it "returns true if lmgb_student_reporting feature flag is enabled for course" do
+        @course.enable_feature!(:lmgb_student_reporting)
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:LMGB_STUDENT_REPORTING]).to be true
+      end
+
+      it "returns false if lmgb_student_reporting feature flag is disabled for course" do
+        @course.disable_feature!(:lmgb_student_reporting)
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:LMGB_STUDENT_REPORTING]).to be false
+      end
+    end
   end
 
   context "outcome_average_calculation" do
