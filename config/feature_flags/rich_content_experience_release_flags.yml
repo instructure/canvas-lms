@@ -203,6 +203,19 @@ media_links_use_attachment_id:
     development:
       state: allowed_on
 
+mcc_specific_error_message:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: 'Manually Created Courses Error Message'
+  description: |-
+    When enabled, provides a specific error message when users try to create or copy
+    a course in a restricted account and should use the Manually Created Courses sub-account instead.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
 permanent_page_links:
   state: hidden
   display_name: 'Permanent Page Links'
