@@ -375,3 +375,11 @@ ux_list_concluded_courses_in_bp:
       state: allowed_on
     development:
       state: allowed_on
+
+fix_bp_folder_unsynced_issue:
+  state: hidden
+  display_name: Fix blueprint sync during folder sync
+  description: |-
+    When Folders get synchronised during BP sync, do not update the original Folder with cloned_item_id to trigger 'Unsynced Changes'
+  applies_to: SiteAdmin
+  shadow: true
