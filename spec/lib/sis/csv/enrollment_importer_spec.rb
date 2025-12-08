@@ -1412,6 +1412,20 @@ describe SIS::CSV::EnrollmentImporter do
         expect(student_enrollment.workflow_state).to eq "completed"
         expect(student_enrollment.completed_at).to eq @course.conclude_at
       end
+
+      it "leaves the completed_at timestamp alone if the enrollment was hard-concluded (and the course is active)" do
+        @course.update! conclude_at: nil
+        student_enrollment = @course.enrollments.find_by(user: @student)
+        Timecop.travel(1.week.ago) do
+          student_enrollment.conclude
+        end
+        old_completed_at = student_enrollment.completed_at
+        process_csv_data_cleanly(
+          "course_id,user_id,role,status",
+          "concluded_course,student1,student,deleted_last_completed,"
+        )
+        expect(student_enrollment.reload.completed_at).to eq old_completed_at
+      end
     end
 
     context "when the import runs with 'completed' status" do
