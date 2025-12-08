@@ -153,3 +153,19 @@ export interface RecentGradeSubmission {
 export interface GradeItemProps {
   submission: RecentGradeSubmission
 }
+
+export interface ConversationParticipant {
+  id: string
+  name: string
+  avatarUrl?: string
+}
+
+export interface InboxMessage {
+  id: string
+  subject: string
+  lastMessageAt: string
+  messagePreview: string
+  workflowState: 'read' | 'unread' | 'archived'
+  conversationUrl: string
+  participants: ConversationParticipant[]
+}
