@@ -32,7 +32,6 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 
 const flushAllTimersAndPromises = async () => {
   while (jest.getTimerCount() > 0) {
-     
     await act(async () => {
       jest.runAllTimers()
     })

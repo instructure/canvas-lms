@@ -21,7 +21,12 @@ import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
-import { IconArrowOpenStartSolid, IconArrowDoubleStartSolid, IconArrowOpenEndSolid, IconArrowDoubleEndSolid } from '@instructure/ui-icons'
+import {
+  IconArrowOpenStartSolid,
+  IconArrowDoubleStartSolid,
+  IconArrowOpenEndSolid,
+  IconArrowDoubleEndSolid,
+} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('SpeedGraderDiscussionsNavigation')
 
@@ -35,7 +40,7 @@ export const SpeedGraderDiscussionsNavigation2 = ({studentId}: Props) => {
     studentEntryIds = [...studentEntryIds]
     // sortOrder should always be asc, that way first entry is always oldest.
     studentEntryIds.sort((a: string, b: string) => {
-      return parseInt(a, 10) - parseInt(b, 10);
+      return parseInt(a, 10) - parseInt(b, 10)
     })
   }
 
@@ -49,38 +54,41 @@ export const SpeedGraderDiscussionsNavigation2 = ({studentId}: Props) => {
     const entry_id = parseInt(params.get('entry_id') || `${Math.min(...studentEntryIds)}`, 10)
     const index = studentEntryIds.indexOf(entry_id)
     // Math.min defaults if entry_id is invalid
-    return index >= 0 ? index + 1 : studentEntryIds.indexOf(Math.min(...studentEntryIds)) + 1;
+    return index >= 0 ? index + 1 : studentEntryIds.indexOf(Math.min(...studentEntryIds)) + 1
   }
 
   const [currentEntryIndex, setCurrentEntryIndex] = useState<number>(getStartingEntry())
   const [nextEnabled, setNextEnabled] = useState<boolean>(!(currentEntryIndex == totalEntries))
-  const [prevEnabled, setPrevEnabled] = useState<boolean>(!(currentEntryIndex  == 1))
+  const [prevEnabled, setPrevEnabled] = useState<boolean>(!(currentEntryIndex == 1))
 
-  const onMessage = useCallback((e: MessageEvent) => {
-    const message = e.data
-    switch (message.subject) {
-      case 'DT.previousStudentReplyTab': {
-        setNextEnabled(true)
-        if(currentEntryIndex-1 <= 1){
-          setPrevEnabled(false)
+  const onMessage = useCallback(
+    (e: MessageEvent) => {
+      const message = e.data
+      switch (message.subject) {
+        case 'DT.previousStudentReplyTab': {
+          setNextEnabled(true)
+          if (currentEntryIndex - 1 <= 1) {
+            setPrevEnabled(false)
+          }
+          if (currentEntryIndex - 1 >= 1) {
+            setCurrentEntryIndex(currentEntryIndex - 1)
+          }
+          break
         }
-        if( currentEntryIndex-1 >= 1){
-          setCurrentEntryIndex(currentEntryIndex-1)
+        case 'DT.nextStudentReplyTab': {
+          setPrevEnabled(true)
+          if (currentEntryIndex + 1 >= totalEntries) {
+            setNextEnabled(false)
+          }
+          if (currentEntryIndex + 1 <= totalEntries) {
+            setCurrentEntryIndex(currentEntryIndex + 1)
+          }
+          break
         }
-        break
       }
-      case 'DT.nextStudentReplyTab': {
-        setPrevEnabled(true)
-        if(currentEntryIndex+1 >= totalEntries){
-          setNextEnabled(false)
-        }
-        if( currentEntryIndex+1 <= totalEntries){
-          setCurrentEntryIndex(currentEntryIndex+1)
-        }
-        break
-      }
-    }
-  }, [currentEntryIndex, totalEntries])
+    },
+    [currentEntryIndex, totalEntries],
+  )
 
   useEffect(() => {
     window.addEventListener('message', onMessage)
@@ -120,31 +128,41 @@ export const SpeedGraderDiscussionsNavigation2 = ({studentId}: Props) => {
     const message = {subject: 'DT.previousStudentReply'}
     sendPostMessage(message)
     setNextEnabled(true)
-    if(currentEntryIndex-1 <= 1){
+    if (currentEntryIndex - 1 <= 1) {
       setPrevEnabled(false)
     }
-    setCurrentEntryIndex(currentEntryIndex-1)
+    setCurrentEntryIndex(currentEntryIndex - 1)
   }
 
   function nextStudentReply() {
     const message = {subject: 'DT.nextStudentReply'}
     sendPostMessage(message)
     setPrevEnabled(true)
-    if(currentEntryIndex+1 >= totalEntries){
+    if (currentEntryIndex + 1 >= totalEntries) {
       setNextEnabled(false)
     }
-    setCurrentEntryIndex(currentEntryIndex+1)
+    setCurrentEntryIndex(currentEntryIndex + 1)
   }
 
   return (
     <Flex justifyItems="start" margin="x-small x-small x-small none">
       <Flex.Item margin="medium none medium none" shouldShrink={true}>
-        <IconButton data-testid="discussions-first-reply-button" screenReaderLabel={I18n.t('first student reply')} onClick={firstStudentReply} interaction={prevEnabled ? "enabled" : "disabled"}>
+        <IconButton
+          data-testid="discussions-first-reply-button"
+          screenReaderLabel={I18n.t('first student reply')}
+          onClick={firstStudentReply}
+          interaction={prevEnabled ? 'enabled' : 'disabled'}
+        >
           <IconArrowDoubleStartSolid inline={true} />
         </IconButton>
       </Flex.Item>
       <Flex.Item margin="medium" shouldShrink={true}>
-        <IconButton data-testid="discussions-previous-reply-button" screenReaderLabel={I18n.t('previous student reply')} onClick={previousStudentReply} interaction={prevEnabled ? "enabled" : "disabled"}>
+        <IconButton
+          data-testid="discussions-previous-reply-button"
+          screenReaderLabel={I18n.t('previous student reply')}
+          onClick={previousStudentReply}
+          interaction={prevEnabled ? 'enabled' : 'disabled'}
+        >
           <IconArrowOpenStartSolid inline={true} />
         </IconButton>
       </Flex.Item>
@@ -157,12 +175,22 @@ export const SpeedGraderDiscussionsNavigation2 = ({studentId}: Props) => {
         </Text>
       </Flex.Item>
       <Flex.Item margin="medium" shouldShrink={true}>
-        <IconButton data-testid="discussions-next-reply-button" screenReaderLabel={I18n.t('next student reply')} onClick={nextStudentReply} interaction={nextEnabled ? "enabled" : "disabled"}>
+        <IconButton
+          data-testid="discussions-next-reply-button"
+          screenReaderLabel={I18n.t('next student reply')}
+          onClick={nextStudentReply}
+          interaction={nextEnabled ? 'enabled' : 'disabled'}
+        >
           <IconArrowOpenEndSolid inline={true} />
         </IconButton>
       </Flex.Item>
       <Flex.Item margin="medium none medium none" shouldShrink={true}>
-        <IconButton data-testid="discussions-last-reply-button" screenReaderLabel={I18n.t('last student reply')} onClick={lastStudentReply} interaction={nextEnabled ? "enabled" : "disabled"}>
+        <IconButton
+          data-testid="discussions-last-reply-button"
+          screenReaderLabel={I18n.t('last student reply')}
+          onClick={lastStudentReply}
+          interaction={nextEnabled ? 'enabled' : 'disabled'}
+        >
           <IconArrowDoubleEndSolid inline={true} />
         </IconButton>
       </Flex.Item>

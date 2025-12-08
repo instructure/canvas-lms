@@ -22,10 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('block_content_editor')
 
-export const UndoButton = (props: {
-  active: boolean
-  onClick: () => void
-}) => {
+export const UndoButton = (props: {active: boolean; onClick: () => void}) => {
   return (
     <ToolbarButton
       interaction={props.active ? 'enabled' : 'disabled'}

@@ -71,7 +71,7 @@ describe('GroupEditForm - Submit', () => {
         description: 'The Group Description',
       },
       expect.anything(),
-      expect.anything()
+      expect.anything(),
     )
   })
 
@@ -91,6 +91,5 @@ describe('GroupEditForm - Submit', () => {
     getByText('Save').closest('button').click()
     await act(async () => jest.runAllTimers())
     expect(onSubmit).toHaveBeenCalled()
-
   })
 })

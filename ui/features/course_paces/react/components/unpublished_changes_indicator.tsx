@@ -108,13 +108,7 @@ export const UnpublishedChangesIndicator = ({
   }
 
   if (isSyncing) {
-    return (
-      <View>
-        {
-          <Text>{publishingMessage}</Text>
-        }
-      </View>
-    )
+    return <View>{<Text>{publishingMessage}</Text>}</View>
   }
 
   if (newPace && changeCount === 0) {

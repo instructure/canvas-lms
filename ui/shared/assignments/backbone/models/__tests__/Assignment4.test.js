@@ -212,7 +212,9 @@ describe('Assignment', () => {
           is_quiz_lti_assignment: true,
         })
         ENV.PERMISSIONS = {manage: true}
-        expect(assignment.toView().htmlUrl).toBe('http://example.com/assignments/1/edit?quiz_lti=true')
+        expect(assignment.toView().htmlUrl).toBe(
+          'http://example.com/assignments/1/edit?quiz_lti=true',
+        )
         ENV.PERMISSIONS = {}
         ENV.FLAGS = {}
       })

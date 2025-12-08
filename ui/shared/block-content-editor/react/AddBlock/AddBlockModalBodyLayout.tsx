@@ -20,10 +20,7 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Responsive} from '@instructure/ui-responsive'
 
-export const AddBlockModalBodyLayout = (props: {
-  groupedSelect: ReactNode
-  preview: ReactNode
-}) => {
+export const AddBlockModalBodyLayout = (props: {groupedSelect: ReactNode; preview: ReactNode}) => {
   return (
     <Responsive
       match="media"

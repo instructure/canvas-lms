@@ -59,7 +59,11 @@ export function buildAPDisplayTitle({
   title,
   toolPlacementLabel,
   toolName,
-}: {title?: string | null; toolPlacementLabel?: string | null; toolName: string}) {
+}: {
+  title?: string | null
+  toolPlacementLabel?: string | null
+  toolName: string
+}) {
   const toolTitle = toolPlacementLabel || toolName
   return title && title !== toolTitle ? `${toolTitle} · ${title}` : toolTitle
 }

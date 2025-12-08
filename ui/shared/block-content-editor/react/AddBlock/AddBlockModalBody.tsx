@@ -31,9 +31,7 @@ const componentsByName = Object.values(components).reduce(
   {} as Record<string, React.FC>,
 )
 
-export const AddBlockModalBody = (props: {
-  onBlockSelected: (block: ReactElement) => void
-}) => {
+export const AddBlockModalBody = (props: {onBlockSelected: (block: ReactElement) => void}) => {
   const [selectedItem, setSelectedItem] = useState(blockData[0].items[0])
   const PreviewComponent = previewFactory[selectedItem.id]
 

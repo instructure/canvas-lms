@@ -49,10 +49,7 @@ const createValidationSchema = (canManageUserDetails: boolean) =>
     short_name: z.string().optional(),
     sortable_name: z.string().optional(),
     ...(canManageUserDetails && {
-      email: z
-        .string()
-        .email(I18n.t('Invalid email address.'))
-        .or(z.literal('')),
+      email: z.string().email(I18n.t('Invalid email address.')).or(z.literal('')),
       time_zone: z.string().optional(),
     }),
   })

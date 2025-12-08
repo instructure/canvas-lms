@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, shape, string, func } from 'prop-types'
+import {arrayOf, shape, string, func} from 'prop-types'
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
@@ -29,7 +29,7 @@ export default class FinalGraderSelectMenu extends React.Component {
     availableModerators: arrayOf(shape({name: string.isRequired, id: string.isRequired}))
       .isRequired,
     finalGraderID: string,
-    hideErrors: func
+    hideErrors: func,
   }
 
   static defaultProps = {
@@ -42,24 +42,23 @@ export default class FinalGraderSelectMenu extends React.Component {
   }
 
   componentDidMount() {
-    $(document).on("validateFinalGraderSelectedValue", (_e, data) => {
-      this.setValidationError(!!data.error);
+    $(document).on('validateFinalGraderSelectedValue', (_e, data) => {
+      this.setValidationError(!!data.error)
     })
   }
 
   componentWillUnmount() {
-    $(document).off("validateFinalGraderSelectedValue")
+    $(document).off('validateFinalGraderSelectedValue')
   }
 
   setValidationError(validationError) {
     this.setState({
-      validationError: validationError
+      validationError: validationError,
     })
   }
 
   handleSelectFinalGrader = ({target: {value: selectedValue}}) => {
-    if(this.props.hideErrors)
-      this.props.hideErrors('final_grader_id_errors')
+    if (this.props.hideErrors) this.props.hideErrors('final_grader_id_errors')
     this.setState({selectedValue})
   }
 
@@ -78,13 +77,17 @@ export default class FinalGraderSelectMenu extends React.Component {
             onChange={this.handleSelectFinalGrader}
             value={this.state.selectedValue}
             style={{
-              borderColor: this.state.validationError ? 'red' : ''
+              borderColor: this.state.validationError ? 'red' : '',
             }}
           >
             {this.state.selectedValue === '' && (
-              <option key="select-grader" value="" style={{
-                borderColor: this.state.validationError ? 'red' : ''
-              }}>
+              <option
+                key="select-grader"
+                value=""
+                style={{
+                  borderColor: this.state.validationError ? 'red' : '',
+                }}
+              >
                 {I18n.t('Select Grader')}
               </option>
             )}
@@ -96,7 +99,7 @@ export default class FinalGraderSelectMenu extends React.Component {
             ))}
           </select>
         </label>
-        <View as="div" id="final_grader_id_errors" style={{ paddingBottom: "small" }}></View>
+        <View as="div" id="final_grader_id_errors" style={{paddingBottom: 'small'}}></View>
       </>
     )
   }

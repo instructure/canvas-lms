@@ -23,7 +23,7 @@ import Attachment from '../Attachment'
 
 jest.mock('../../util/mediaUtils', () => ({
   hasMediaFeature: jest.fn().mockReturnValue(true),
-  getUserMedia: jest.fn(() => Promise.resolve())
+  getUserMedia: jest.fn(() => Promise.resolve()),
 }))
 
 jest.useFakeTimers()
@@ -58,41 +58,47 @@ describe('Attachment', () => {
   test('displays a tag for a file when uploading a file', () => {
     const {getByTestId} = render(<Attachment {...getProps()} />)
     const fileInput = getByTestId('file-upload-0')
-    const file = new File(['file content'], 'example.txt', { type: 'text/plain' })
-    fireEvent.change(fileInput, { target: { files: [file] } })
+    const file = new File(['file content'], 'example.txt', {type: 'text/plain'})
+    fireEvent.change(fileInput, {target: {files: [file]}})
     expect(getByTestId('submission_file_tag_0')).toBeInTheDocument()
   })
 
   test('removes uploaded file when clearing the input', async () => {
     const {getByTestId, queryByTestId} = render(<Attachment {...getProps()} />)
     const fileInput = getByTestId('file-upload-0')
-    const file = new File(['file content'], 'example.txt', { type: 'text/plain' })
+    const file = new File(['file content'], 'example.txt', {type: 'text/plain'})
 
-    fireEvent.change(fileInput, { target: { files: [file] } })
+    fireEvent.change(fileInput, {target: {files: [file]}})
     expect(getByTestId('submission_file_tag_0')).toBeInTheDocument()
 
-    fireEvent.change(fileInput, { target: { files: [] } })
+    fireEvent.change(fileInput, {target: {files: []}})
     expect(queryByTestId('submission_file_tag_0')).not.toBeInTheDocument()
   })
 
   test('displays an error if an empty file is uploaded', () => {
     const {getByTestId, getByText} = render(<Attachment {...getProps()} />)
     const fileInput = getByTestId('file-upload-0')
-    const emptyFile = new File([], 'empty.txt', { type: 'text/plain' })
-    fireEvent.change(fileInput, { target: { files: [emptyFile] } })
+    const emptyFile = new File([], 'empty.txt', {type: 'text/plain'})
+    fireEvent.change(fileInput, {target: {files: [emptyFile]}})
     expect(getByText('Attached files must be greater than 0 bytes.')).toBeInTheDocument()
   })
 
   test('displays an error if an invalid file is uploaded', () => {
     const {getByTestId, getByText} = render(<Attachment {...getProps({validFileTypes: ['pdf']})} />)
     const fileInput = getByTestId('file-upload-0')
-    const file = new File(['file content'], 'example.txt', { type: 'text/plain' })
-    fireEvent.change(fileInput, { target: { files: [file] } })
-    expect(getByText('This file type is not allowed. Accepted file types are: pdf.')).toBeInTheDocument()
+    const file = new File(['file content'], 'example.txt', {type: 'text/plain'})
+    fireEvent.change(fileInput, {target: {files: [file]}})
+    expect(
+      getByText('This file type is not allowed. Accepted file types are: pdf.'),
+    ).toBeInTheDocument()
   })
 
   test('displays an error on focus if getShouldShowFileRequiredError returns true', () => {
-    const {getByTestId, getByText} = render(<Attachment {...getProps({getShouldShowFileRequiredError: jest.fn().mockReturnValue(true)})} />)
+    const {getByTestId, getByText} = render(
+      <Attachment
+        {...getProps({getShouldShowFileRequiredError: jest.fn().mockReturnValue(true)})}
+      />,
+    )
     const fileInput = getByTestId('file-upload-0')
     fireEvent.focus(fileInput)
     expect(getByText('A file is required to make a submission.')).toBeInTheDocument()
@@ -121,7 +127,9 @@ describe('Attachment', () => {
   })
 
   it('does not render webcam button when png is not a valid file type', () => {
-    const {queryByLabelText} = render(<Attachment {...getProps({validFileTypes: ['pdf', 'txt']})} />)
+    const {queryByLabelText} = render(
+      <Attachment {...getProps({validFileTypes: ['pdf', 'txt']})} />,
+    )
     expect(queryByLabelText('Use Webcam')).not.toBeInTheDocument()
   })
 })

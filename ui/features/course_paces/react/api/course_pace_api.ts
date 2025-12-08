@@ -16,7 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {AssignmentWeightening, CoursePace, OptionalDate, PaceContextTypes, Progress, WorkflowStates} from '../types'
+import type {
+  AssignmentWeightening,
+  CoursePace,
+  OptionalDate,
+  PaceContextTypes,
+  Progress,
+  WorkflowStates,
+} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 enum ApiMode {
@@ -67,7 +74,7 @@ export const update = (coursePace: CoursePace, extraSaveParams = {}) =>
     },
   }).then(({json}) => json)
 
-  export const create = (coursePace: CoursePace, extraSaveParams = {}) =>
+export const create = (coursePace: CoursePace, extraSaveParams = {}) =>
   doFetchApi<{course_pace: CoursePace; progress: Progress}>({
     path: `/api/v1/courses/${coursePace.course_id}/course_pacing`,
     method: 'POST',
@@ -87,7 +94,7 @@ export const createBulkPace = (coursePace: CoursePace, enrollmentIds: string[]) 
       user_id: null,
       hard_end_dates: null,
       course_pace: transformCoursePaceForApi(coursePace),
-      enrollment_ids: enrollmentIds
+      enrollment_ids: enrollmentIds,
     },
   }).then(({json}) => json)
 
@@ -113,23 +120,25 @@ export const resetToLastPublished = (contextType: PaceContextTypes, contextId: s
 export const load = (coursePaceId: string) =>
   doFetchApi<CoursePace>({path: `/api/v1/course_pacing/${coursePaceId}`}).then(({json}) => json)
 
-  export const getNewCoursePaceFor = (
-    courseId: string,
-    context: PaceContextTypes,
-    contextId: string,
-    isBulkEnrollment: boolean
-  ) => {
+export const getNewCoursePaceFor = (
+  courseId: string,
+  context: PaceContextTypes,
+  contextId: string,
+  isBulkEnrollment: boolean,
+) => {
+  const baseUrl = `/api/v1/courses/${courseId}/course_pacing/new`
 
-    const baseUrl = `/api/v1/courses/${courseId}/course_pacing/new`
-  
-    const url = isBulkEnrollment || context === 'Enrollment'
-      ?  `${baseUrl}?enrollment_id=${contextId}`
+  const url =
+    isBulkEnrollment || context === 'Enrollment'
+      ? `${baseUrl}?enrollment_id=${contextId}`
       : context === 'Section'
-      ? `${baseUrl}?course_section_id=${contextId}`
-      : baseUrl
-  
-    return doFetchApi<{ course_pace: CoursePace; progress: Progress }>({ path: url }).then(({ json }) => json)
-  }
+        ? `${baseUrl}?course_section_id=${contextId}`
+        : baseUrl
+
+  return doFetchApi<{course_pace: CoursePace; progress: Progress}>({path: url}).then(
+    ({json}) => json,
+  )
+}
 
 export const relinkToParentPace = (paceId: string) =>
   doFetchApi<{course_pace: CoursePace}>({
@@ -179,7 +188,7 @@ interface PublishApiFormattedCoursePace extends CompressApiFormattedCoursePace {
   readonly workflow_state: WorkflowStates
   readonly context_type: PaceContextTypes
   readonly context_id: string
-  readonly assignments_weighting: Array<{ resource_type: string; duration: number }>
+  readonly assignments_weighting: Array<{resource_type: string; duration: number}>
   readonly time_to_complete_calendar_days: number
 }
 
@@ -208,7 +217,7 @@ const transformCoursePaceForApi = (
     selected_days_to_skip: selectedDaysToSkipValue,
     exclude_weekends: coursePace.exclude_weekends,
   }
-  const weightedAssignment: Array<{ resource_type: string; duration: number }> =
+  const weightedAssignment: Array<{resource_type: string; duration: number}> =
     window.ENV.FEATURES.course_pace_weighted_assignments && coursePace.assignments_weighting
       ? Object.entries(coursePace.assignments_weighting)
           .filter(([_, value]) => value !== undefined)

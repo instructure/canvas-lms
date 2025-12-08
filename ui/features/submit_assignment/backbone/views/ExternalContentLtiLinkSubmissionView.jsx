@@ -34,21 +34,23 @@ class ExternalContentLtiLinkSubmissionView extends ExternalContentHomeworkSubmis
 
   render() {
     super.render()
-    const mountPoints = document.querySelectorAll('.turnitin_pledge_container_external_homework_url')
+    const mountPoints = document.querySelectorAll(
+      '.turnitin_pledge_container_external_homework_url',
+    )
     if (mountPoints.length > 0) {
       const pledgeMount = mountPoints[mountPoints.length - 1]
       if (pledgeMount) {
         const pledgeRoot = this.pledgeRoot ?? createRoot(pledgeMount)
         const pledgeText = pledgeMount.dataset.pledge
-        const setShouldShowPledgeError = (shouldShow) => this.shouldShowPledgeError = shouldShow
+        const setShouldShowPledgeError = shouldShow => (this.shouldShowPledgeError = shouldShow)
         const getShouldShowFileRequiredError = () => this.shouldShowPledgeError
         pledgeRoot.render(
           <SimilarityPledge
-            inputId='turnitin_pledge_external_content'
+            inputId="turnitin_pledge_external_content"
             setShouldShowPledgeError={setShouldShowPledgeError}
             getShouldShowPledgeError={getShouldShowFileRequiredError}
             pledgeText={pledgeText}
-          />
+          />,
         )
       }
     }

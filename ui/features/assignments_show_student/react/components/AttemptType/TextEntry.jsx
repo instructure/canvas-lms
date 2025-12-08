@@ -46,7 +46,7 @@ export default class TextEntry extends React.Component {
   }
 
   state = {
-    showErrorMessage: false
+    showErrorMessage: false,
   }
 
   _isMounted = false
@@ -205,7 +205,9 @@ export default class TextEntry extends React.Component {
   handleRCEInit = tinyeditor => {
     this._tinyeditor = tinyeditor
 
-    document.querySelector('.canvas-rce__skins--root.rce-wrapper').style.removeProperty('margin-bottom')
+    document
+      .querySelector('.canvas-rce__skins--root.rce-wrapper')
+      .style.removeProperty('margin-bottom')
     const rceIframe = document.getElementById('textentry_text_ifr')
     if (rceIframe && !this._rceAriaLabel) {
       const iframeBody = rceIframe.contentWindow.document.querySelector('body')
@@ -278,7 +280,7 @@ export default class TextEntry extends React.Component {
           }}
           resourceType="assignment.submission"
         />
-        {(this.state.showErrorMessage) && (
+        {this.state.showErrorMessage && (
           <View as="div" padding="small x-small" background="primary">
             <FormattedErrorMessage message={ERROR_MESSAGE} />
           </View>

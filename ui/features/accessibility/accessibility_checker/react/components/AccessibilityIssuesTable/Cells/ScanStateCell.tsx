@@ -111,9 +111,7 @@ interface ScanStateWithIconProps {
 const ScanStateWithIcon = ({icon, text, isMobile}: ScanStateWithIconProps) => (
   <Flex gap="x-small">
     <Flex.Item {...getDesktopProps(isMobile)}>
-      <Flex justifyItems="end">
-        {icon}
-      </Flex>
+      <Flex justifyItems="end">{icon}</Flex>
     </Flex.Item>
     <Flex.Item textAlign="start">
       <Text>{text}</Text>
@@ -171,7 +169,7 @@ const ScanStateWithExplanation = ({
 
 const NoIssuesText = ({isMobile}: {isMobile: boolean}) => (
   <ScanStateWithIcon
-    icon={<IconPublishSolid color="success" aria-hidden="true"/>}
+    icon={<IconPublishSolid color="success" aria-hidden="true" />}
     text={I18n.t('No issues')}
     isMobile={isMobile}
   />

@@ -27,17 +27,23 @@ const I18n = createI18nScope('discussions_posts')
 interface Props extends DiscussionSummaryUsage {}
 
 export const DiscussionSummaryUsagePill: React.FC<Props> = props => {
-    const limitNotReachedText = I18n.t('The maximum number of summary generations allowed per user per day is %{limit}.', {limit: props.limit})
-    const limitReachedText = I18n.t('Sorry, you have reached the maximum number of summary generations allowed (%{limit}) per day. Please try again tomorrow.', {limit: props.limit})
-    const limitReached = props.currentCount >= props.limit
-    const tooltipText = limitReached ? limitReachedText : limitNotReachedText
-    const color = limitReached ? 'danger' : 'success'
+  const limitNotReachedText = I18n.t(
+    'The maximum number of summary generations allowed per user per day is %{limit}.',
+    {limit: props.limit},
+  )
+  const limitReachedText = I18n.t(
+    'Sorry, you have reached the maximum number of summary generations allowed (%{limit}) per day. Please try again tomorrow.',
+    {limit: props.limit},
+  )
+  const limitReached = props.currentCount >= props.limit
+  const tooltipText = limitReached ? limitReachedText : limitNotReachedText
+  const color = limitReached ? 'danger' : 'success'
 
-    return (
-      <Tooltip renderTip={tooltipText} width="48px" data-testid="summary-generate-tooltip">
-          <Pill color={color} margin="x-small" data-testid="summary-usage-pill">
-              {props.currentCount} / {props.limit}
-          </Pill>
-      </Tooltip>
-    )
+  return (
+    <Tooltip renderTip={tooltipText} width="48px" data-testid="summary-generate-tooltip">
+      <Pill color={color} margin="x-small" data-testid="summary-usage-pill">
+        {props.currentCount} / {props.limit}
+      </Pill>
+    </Tooltip>
+  )
 }

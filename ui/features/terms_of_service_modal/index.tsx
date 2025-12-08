@@ -19,9 +19,12 @@
 import React from 'react'
 import TermsOfServiceModal from './react/TermsOfServiceModal'
 import ready from '@instructure/ready'
-import { createRoot } from 'react-dom/client'
+import {createRoot} from 'react-dom/client'
 
-const renderTermsModal = (container: Element | null, opts = { preview: false, footerLink: false }) => {
+const renderTermsModal = (
+  container: Element | null,
+  opts = {preview: false, footerLink: false},
+) => {
   if (container instanceof HTMLElement) {
     const root = createRoot(container)
     root.render(<TermsOfServiceModal preview={opts.preview} footerLink={opts.footerLink} />)
@@ -31,10 +34,10 @@ const renderTermsModal = (container: Element | null, opts = { preview: false, fo
 ready(() => {
   renderTermsModal(document.querySelector('#terms_of_service_preview_link'), {
     preview: true,
-    footerLink: false
+    footerLink: false,
   })
   document.querySelectorAll('.terms_of_service_link').forEach(container => {
     const footerLink = container.classList.contains('terms_of_service_footer_link')
-    renderTermsModal(container, { preview: false, footerLink })
+    renderTermsModal(container, {preview: false, footerLink})
   })
 })

@@ -101,6 +101,6 @@ export async function mockAssignmentAndSubmission(overrides = []) {
     assignment: result[0],
     submission: result[1],
     onChangeSubmission: () => {},
-    submitButtonRef: createRef()
+    submitButtonRef: createRef(),
   }
 }

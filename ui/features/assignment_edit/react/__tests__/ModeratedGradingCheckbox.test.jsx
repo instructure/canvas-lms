@@ -59,11 +59,14 @@ describe('ModeratedGradingCheckbox', () => {
     expect(checkbox().checked).toBe(true)
   })
 
-  test('enables the checkbox if no graded submissions exist, it is not a peer ' +
-    'review assignment, and it is not a group assignment', () => {
-    mountComponent()
-    expect(checkbox().disabled).toBe(false)
-  })
+  test(
+    'enables the checkbox if no graded submissions exist, it is not a peer ' +
+      'review assignment, and it is not a group assignment',
+    () => {
+      mountComponent()
+      expect(checkbox().disabled).toBe(false)
+    },
+  )
 
   test('disables the checkbox if graded submissions exist', () => {
     props.gradedSubmissionsExist = true

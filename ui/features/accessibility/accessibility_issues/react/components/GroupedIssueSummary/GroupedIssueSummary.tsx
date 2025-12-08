@@ -82,7 +82,9 @@ const PreviewOverlay = ({loading, error}: PreviewOverlayProps) => {
 
 const GroupedIssueSummaryHeader = ({
   issuesSummary,
-}: {issuesSummary: AccessibilityIssuesSummaryData | null}) => {
+}: {
+  issuesSummary: AccessibilityIssuesSummaryData | null
+}) => {
   return (
     <Flex alignItems="center" gap="small">
       <Flex.Item>

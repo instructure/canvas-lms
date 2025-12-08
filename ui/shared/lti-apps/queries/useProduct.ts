@@ -27,11 +27,7 @@ export type UseProductProps = {
   queryOptions?: Partial<UseQueryOptions<Product | null, Error, Product | null, ProductQueryKey>>
 }
 
-const queryFn = ({
-  queryKey,
-}: {
-  queryKey: ProductQueryKey
-}) => {
+const queryFn = ({queryKey}: {queryKey: ProductQueryKey}) => {
   const [, productId] = queryKey
   return fetchProductDetails(productId)
 }

@@ -183,9 +183,7 @@ describe('GradeSummary Grid', () => {
   test('sends student-specific select provisional grade statuses to each GridRow', () => {
     render(<Grid {...props} />)
     const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
-    const rowCalls = calls.filter(
-      call => call[0].selectProvisionalGradeStatus == STARTED,
-    )
+    const rowCalls = calls.filter(call => call[0].selectProvisionalGradeStatus == STARTED)
     expect(rowCalls).toHaveLength(1)
   })
 

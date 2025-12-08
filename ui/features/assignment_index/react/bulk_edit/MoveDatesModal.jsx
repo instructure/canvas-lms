@@ -40,7 +40,7 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
   const [shiftDaysMessages, setShiftDaysMessages] = useState([])
   const [shiftDays, setShiftDays] = useState(`${SHIFT_DAYS_MIN}`)
   const removeInputs = [
-    {value: DUE_DATES , label: I18n.t('Remove Due Dates')},
+    {value: DUE_DATES, label: I18n.t('Remove Due Dates')},
     {value: LOCK_DATES, label: I18n.t('Remove Availability Dates')},
     {value: DUE_AND_LOCK_DATES, label: I18n.t('Remove Both')},
   ]
@@ -51,62 +51,60 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
   }, [])
 
   const handleShiftDaysIncrement = useCallback(() => {
-    if(isNaN(shiftDays)) return
+    if (isNaN(shiftDays)) return
 
     setShiftDays(`${Number(shiftDays) + 1}`)
     setShiftDaysMessages([])
   }, [shiftDays])
 
   const handleShiftDaysDecrement = useCallback(() => {
-    if(isNaN(shiftDays)) return
+    if (isNaN(shiftDays)) return
 
     setShiftDays(`${Number(shiftDays) - 1}`)
     setShiftDaysMessages([])
   }, [shiftDays])
 
   const generateShiftDaysMessages = () => {
-
-    if(shiftDays.trim() === '') 
+    if (shiftDays.trim() === '')
       return [{type: 'newError', text: I18n.t('Number of days is required')}]
-    
-    const shiftDaysValue = Number(shiftDays)
-    if(isNaN(shiftDaysValue))
-      return [{type: 'newError', text: I18n.t('You must use a number')}]
 
-    if(!Number.isInteger(shiftDaysValue))
+    const shiftDaysValue = Number(shiftDays)
+    if (isNaN(shiftDaysValue)) return [{type: 'newError', text: I18n.t('You must use a number')}]
+
+    if (!Number.isInteger(shiftDaysValue))
       return [{type: 'newError', text: I18n.t('You must use an integer')}]
-    
-    if(shiftDaysValue < SHIFT_DAYS_MIN || shiftDaysValue > SHIFT_DAYS_MAX)
-      return [{
-        type: 'newError',
-        text: I18n.t('Must be between %{minValue} and %{maxValue}', {
-          minValue: SHIFT_DAYS_MIN,
-          maxValue: SHIFT_DAYS_MAX
-        })
-      }]
-    
+
+    if (shiftDaysValue < SHIFT_DAYS_MIN || shiftDaysValue > SHIFT_DAYS_MAX)
+      return [
+        {
+          type: 'newError',
+          text: I18n.t('Must be between %{minValue} and %{maxValue}', {
+            minValue: SHIFT_DAYS_MIN,
+            maxValue: SHIFT_DAYS_MAX,
+          }),
+        },
+      ]
+
     return []
   }
 
   const handleOk = useCallback(() => {
-    if (mode === 'shift'){
+    if (mode === 'shift') {
       const shiftDaysValidationMessages = generateShiftDaysMessages()
-      if(shiftDaysValidationMessages.length > 0){
+      if (shiftDaysValidationMessages.length > 0) {
         setShiftDaysMessages(shiftDaysValidationMessages)
         return
       }
       onShiftDays(shiftDays)
-    } 
+    }
     if (mode === 'remove') {
       const outputDatesToRemove = []
-      if(datesToRemove === DUE_DATES){
+      if (datesToRemove === DUE_DATES) {
         outputDatesToRemove.push('due_at')
-      }
-      else if(datesToRemove === LOCK_DATES){
+      } else if (datesToRemove === LOCK_DATES) {
         outputDatesToRemove.push('unlock_at')
         outputDatesToRemove.push('lock_at')
-      }
-      else if(datesToRemove === DUE_AND_LOCK_DATES){
+      } else if (datesToRemove === DUE_AND_LOCK_DATES) {
         outputDatesToRemove.push('due_at')
         outputDatesToRemove.push('unlock_at')
         outputDatesToRemove.push('lock_at')
@@ -136,11 +134,7 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
         <Button onClick={handleCancel} data-testid="cancel-batch-edit">
           {I18n.t('Cancel')}
         </Button>
-        <Button
-          margin="0 0 0 small"
-          color="primary"
-          onClick={handleOk}
-        >
+        <Button margin="0 0 0 small" color="primary" onClick={handleOk}>
           {I18n.t('Confirm')}
         </Button>
       </>
@@ -153,7 +147,7 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
         <NumberInput
           allowStringValue={true}
           width="200px"
-          renderLabel={I18n.t("Days")}
+          renderLabel={I18n.t('Days')}
           onChange={handleShiftDaysChange}
           messages={shiftDaysMessages}
           value={shiftDays}
@@ -176,7 +170,9 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
             <ScreenReaderContent>{I18n.t('Select dates to remove')}</ScreenReaderContent>
           }
         >
-           {removeInputs.map(input => <RadioInput key={input.value} value={input.value} label={input.label} />)}
+          {removeInputs.map(input => (
+            <RadioInput key={input.value} value={input.value} label={input.label} />
+          ))}
         </RadioInputGroup>
       )
     }

@@ -19,10 +19,7 @@
 import {Flex} from '@instructure/ui-flex'
 import React from 'react'
 
-export const TextBlockLayout = (props: {
-  title?: React.ReactNode
-  text: React.ReactNode
-}) => {
+export const TextBlockLayout = (props: {title?: React.ReactNode; text: React.ReactNode}) => {
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.title}

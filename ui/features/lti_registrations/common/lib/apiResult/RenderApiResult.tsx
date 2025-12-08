@@ -30,10 +30,7 @@ export type RenderApiResultProps<A> = {
   query: UseQueryResult<ApiResult<A>>
   onError?: (error: UnsuccessfulApiResult) => JSX.Element
   onInitialLoading?: () => JSX.Element
-  onSuccess: (params: {
-    data: A
-    refetching: boolean
-  }) => JSX.Element
+  onSuccess: (params: {data: A; refetching: boolean}) => JSX.Element
 }
 
 const renderError = (

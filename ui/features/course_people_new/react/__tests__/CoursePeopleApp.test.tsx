@@ -42,7 +42,10 @@ jest.mock('@canvas/error-boundary', () => ({
   default: ({
     children,
     errorComponent,
-  }: {children: React.ReactNode; errorComponent: React.ReactNode}) => (
+  }: {
+    children: React.ReactNode
+    errorComponent: React.ReactNode
+  }) => (
     <div
       data-testid="error-boundary"
       data-error-component={errorComponent ? 'has-error-component' : undefined}

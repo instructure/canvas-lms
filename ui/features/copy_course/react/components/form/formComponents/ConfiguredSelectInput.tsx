@@ -15,18 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  useMemo,
-  type SyntheticEvent
-} from 'react'
-import { SimpleSelect } from '@instructure/ui-simple-select'
-import { Select } from '@instructure/ui-select'
-import { IconSearchLine } from '@instructure/ui-icons'
-import { useScope as createI18nScope } from '@canvas/i18n'
-import type { FormMessage } from '@instructure/ui-form-field'
+import React, {useState, useCallback, useEffect, useMemo, type SyntheticEvent} from 'react'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {Select} from '@instructure/ui-select'
+import {IconSearchLine} from '@instructure/ui-icons'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = createI18nScope('content_copy_redesign')
 
@@ -47,7 +41,7 @@ export const ConfiguredSelectInput = ({
   onSelect,
   disabled = false,
   messages = [],
-  searchable = false
+  searchable = false,
 }: {
   label: string
   defaultInputValue?: string
@@ -70,7 +64,7 @@ export const ConfiguredSelectInput = ({
       Active: [],
       Future: [],
       Past: [],
-      Unscheduled: []
+      Unscheduled: [],
     }
 
     options.forEach(option => {
@@ -93,29 +87,26 @@ export const ConfiguredSelectInput = ({
 
   const groupedOptions = useMemo(
     () => groupOptionsByDate(filteredFlatOptions),
-    [filteredFlatOptions, groupOptionsByDate]
+    [filteredFlatOptions, groupOptionsByDate],
   )
 
   const filterOptions = useCallback(
     (value: string) => {
       const lower = value.toLowerCase()
-      return options.filter(option =>
-        option.name.toLowerCase().includes(lower)
-      )
+      return options.filter(option => option.name.toLowerCase().includes(lower))
     },
-    [options]
+    [options],
   )
 
   const getOptionById = useCallback(
     (id: string) => filteredFlatOptions.find(opt => opt.id === id),
-    [filteredFlatOptions]
+    [filteredFlatOptions],
   )
 
   useEffect(() => {
     if (!shouldFilter) {
       return
-    }
-    else if (!inputValue) {
+    } else if (!inputValue) {
       setFilteredFlatOptions(options)
     } else {
       const filtered = filterOptions(inputValue)
@@ -148,7 +139,7 @@ export const ConfiguredSelectInput = ({
     setHighlightedOptionId(null)
   }
 
-  const handleSelectOption = (_: SyntheticEvent, { id }: { id?: string }) => {
+  const handleSelectOption = (_: SyntheticEvent, {id}: {id?: string}) => {
     const selected = id ? getOptionById(id) : null
     if (!selected) return
     setSelectedOptionId(selected.id)
@@ -159,7 +150,7 @@ export const ConfiguredSelectInput = ({
     onSelect(selected.id)
   }
 
-  const handleHighlightOption = (event: SyntheticEvent, { id }: { id?: string }) => {
+  const handleHighlightOption = (event: SyntheticEvent, {id}: {id?: string}) => {
     event.persist()
     if (!id) {
       setHighlightedOptionId(null)
@@ -175,7 +166,7 @@ export const ConfiguredSelectInput = ({
         assistiveText={I18n.t('Use arrow keys to navigate options.')}
         value={inputValue}
         defaultValue={inputValue}
-        onChange={(_: SyntheticEvent, { id, value }) => {
+        onChange={(_: SyntheticEvent, {id, value}) => {
           const convertedId = id === undefined ? null : id
           setInputValue(value as string)
           onSelect(convertedId)
@@ -184,11 +175,7 @@ export const ConfiguredSelectInput = ({
         messages={messages}
       >
         {options.map(option => (
-          <SimpleSelect.Option
-            key={option.id}
-            id={option.id}
-            value={option.name}
-          >
+          <SimpleSelect.Option key={option.id} id={option.id} value={option.name}>
             {option.name}
           </SimpleSelect.Option>
         ))}
@@ -214,31 +201,29 @@ export const ConfiguredSelectInput = ({
         messages={messages}
         renderAfterInput={<IconSearchLine inline={false} />}
       >
-        {
-          filteredFlatOptions.length > 0 ? (
-            Object.entries(groupedOptions)
-              .filter(([, options]) => options.length > 0)
-              .map(([group, options]) => (
-                <Select.Group key={group} renderLabel={group}>
-                  {options.map(option => (
-                    <Select.Option
-                      key={option.id}
-                      id={option.id}
-                      isHighlighted={option.id === highlightedOptionId}
-                      isSelected={option.id === selectedOptionId}
-                      isDisabled={option.disabled}
-                    >
-                      {option.name}
-                    </Select.Option>
-                  ))}
-                </Select.Group>
-              ))
-          ) : (
-            <Select.Option id="empty-option" key="empty-option">
-              {I18n.t('No results')}
-            </Select.Option>
-          )
-        }
+        {filteredFlatOptions.length > 0 ? (
+          Object.entries(groupedOptions)
+            .filter(([, options]) => options.length > 0)
+            .map(([group, options]) => (
+              <Select.Group key={group} renderLabel={group}>
+                {options.map(option => (
+                  <Select.Option
+                    key={option.id}
+                    id={option.id}
+                    isHighlighted={option.id === highlightedOptionId}
+                    isSelected={option.id === selectedOptionId}
+                    isDisabled={option.disabled}
+                  >
+                    {option.name}
+                  </Select.Option>
+                ))}
+              </Select.Group>
+            ))
+        ) : (
+          <Select.Option id="empty-option" key="empty-option">
+            {I18n.t('No results')}
+          </Select.Option>
+        )}
       </Select>
     </div>
   )

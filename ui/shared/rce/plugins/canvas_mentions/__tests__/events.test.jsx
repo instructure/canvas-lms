@@ -109,7 +109,7 @@ describe('events', () => {
           return false
         })
         subject()
-         
+
         expect(ReactDOM.render).toHaveBeenCalled()
       })
     })

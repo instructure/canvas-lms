@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useRouteError } from "react-router-dom"
+import {useRouteError} from 'react-router-dom'
 
 export const ReThrowRouteError = () => {
   const error = useRouteError()

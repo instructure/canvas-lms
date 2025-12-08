@@ -67,8 +67,7 @@ const EditableContent = (props: Props) => {
         }))
         setMessages(parsedErrors)
         return false
-      }
-      else {
+      } else {
         // we show errors from the server if any
         evt?.result.catch((error: any) => {
           const titleError = error.responseJSON.errors.title[0]

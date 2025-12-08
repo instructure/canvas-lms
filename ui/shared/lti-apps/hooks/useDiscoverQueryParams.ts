@@ -39,7 +39,6 @@ const useDiscoverQueryParams = () => {
       page = parseInt(params.get('page') || '1', 10)
       filters = JSON.parse(params.get('filters') || '{}')
     } catch (error) {
-       
       console.error('Error parsing URL params', error)
     }
     return {search, page, filters}
