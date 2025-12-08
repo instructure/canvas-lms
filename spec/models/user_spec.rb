@@ -1601,18 +1601,8 @@ describe User do
       @concluded_course.grants_right?(@teacher2, :manage_wiki)
     end
 
-    it "checks soft-concluded courses" do
-      course_with_teacher(active_all: true)
-      es = course_with_student(course: @course, active_all: true).enrollment_state
-      # explicitly set enrollment_state to test soft-concluded (do not use in production code)
-      es.update(state: "completed")
-      teacher3 = @teacher
-      student3 = @student
-      expect(student3.check_courses_right?(teacher3, :manage_wiki_create)).to be_truthy
-    end
-
     it "allows for narrowing courses by enrollments" do
-      expect(@student2.check_courses_right?(@teacher2, :manage_account_memberships, @student2.enrollments.completed_by_date)).to be_falsey
+      expect(@student2.check_courses_right?(@teacher2, :manage_account_memberships, @student2.enrollments.concluded)).to be_falsey
     end
 
     context "sharding" do
@@ -1626,39 +1616,6 @@ describe User do
           expect(@student1.check_courses_right?(@teacher, :read_forum)).to be true
         end
       end
-    end
-  end
-
-  context "courses_for_enrollments" do
-    before :once do
-      course_with_teacher(active_all: true)
-      @teacher1 = @teacher
-      @student1 = @student
-      @active_course = @course
-
-      @teacher2 = @teacher
-      @student2 = @student
-      @concluded_course = @course
-      @concluded_course.complete!
-    end
-
-    it "includes courses for soft-concluded enrollments" do
-      enrollment = course_with_teacher(active_all: true)
-      # explicitly set enrollment_state to test soft-concluded (do not use in production code)
-      enrollment.enrollment_state.update(state: "completed")
-      enrollment_scope = @teacher.enrollments.completed_by_date
-
-      courses = @teacher.courses_for_enrollments(enrollment_scope)
-      expect(courses).to eq [enrollment.course]
-    end
-
-    it "excludes completed courses when include_completed_courses is false" do
-      enrollment = course_with_teacher(active_all: true)
-      enrollment.course.complete!
-      enrollment_scope = @teacher.enrollments.completed_by_date
-
-      courses = @teacher.courses_for_enrollments(enrollment_scope, nil, false)
-      expect(courses).to be_empty
     end
   end
 

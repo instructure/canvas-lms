@@ -4935,32 +4935,6 @@ describe CoursesController do
         expect(json[0]).to include({ "id" => student1.id })
       end
     end
-
-    it "enrollment status not impacted by role" do
-      user_session(teacher)
-      term = Account.default.enrollment_terms.create!(name: "Future Start",
-                                                      start_at: 6.months.from_now,
-                                                      end_at: 1.year.from_now)
-      course.update(enrollment_term: term)
-      course.restrict_student_future_view = true
-      course.save!
-      get "users", params: {
-        course_id: course.id,
-        format: "json",
-        include: ["enrollments"]
-      }
-
-      json = json_parse(response.body)
-      expect(response).to be_successful
-      expect(json.length).to eq(3)
-      # all teachers and students should have active enrollments
-      # iterate over all enrollments in the json response
-      json.each do |user|
-        user["enrollments"].each do |enrollment|
-          expect(enrollment["enrollment_state"]).to eq("active")
-        end
-      end
-    end
   end
 
   describe "#content_share_users" do
@@ -6185,36 +6159,6 @@ describe CoursesController do
     it "returns error for non-existent version" do
       post "restore_version", params: { course_id: @course.id, version_id: 999 }, format: :json
       expect(response).to have_http_status(:not_found)
-    end
-  end
-
-  describe "GET user_index" do
-    before do
-      @course = course_factory(name: "basic_course")
-      @course.enroll_teacher(@teacher = user_factory)
-      user_session(@teacher)
-    end
-
-    it "returns list of courses the user is enrolled in" do
-      get :user_index, params: { user_id: @teacher.id }
-      expect(response).to be_successful
-      json = response.parsed_body
-      expect(json).to be_an(Array)
-      expect(json.length).to eq(1)
-      expect(json.first["id"]).to eq(@course.id)
-    end
-
-    it "returns list of completed courses" do
-      completed_course = course_factory(account: @course.account)
-      completed_course.enroll_teacher(@teacher)
-      completed_course.complete!
-
-      get :user_index, params: { user_id: @teacher.id, state: ["completed"] }
-      expect(response).to be_successful
-      json = response.parsed_body
-      expect(json).to be_an(Array)
-      expect(json.length).to eq(1)
-      expect(json.first["id"]).to eq(completed_course.id)
     end
   end
 end
