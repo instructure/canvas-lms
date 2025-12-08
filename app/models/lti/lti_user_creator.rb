@@ -108,7 +108,7 @@ module Lti
 
     def concluded_course_enrollments
       @concluded_course_enrollments ||=
-        @canvas_context.is_a?(Course) ? @canvas_user.enrollments.completed_by_date.where(course_id: @canvas_context).to_a : []
+        @canvas_context.is_a?(Course) ? @canvas_user.enrollments.concluded.where(course_id: @canvas_context).to_a : []
     end
   end
 end
