@@ -28,6 +28,7 @@ import AssignmentDescription from '@canvas/assignments/react/AssignmentDescripti
 import {useAssignmentQuery} from '../hooks/useAssignmentQuery'
 import {useAllocatePeerReviews} from '../hooks/useAllocatePeerReviews'
 import {PeerReviewSelector} from './PeerReviewSelector'
+import AssignmentSubmission from './AssignmentSubmission'
 
 const I18n = createI18nScope('peer_reviews_student')
 
@@ -74,7 +75,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignme
     )
   }
 
-  const assignment = data.assignment
+  const {assessmentRequestsForCurrentUser, name, dueAt, description} = data.assignment
 
   return (
     <View as="div" padding="medium">
@@ -83,17 +84,17 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignme
           <Flex direction="column">
             <Flex.Item>
               <Text size="x-large" wrap="break-word" data-testid="title" weight="light">
-                {I18n.t('%{name} Peer Review', {name: assignment.name})}
+                {I18n.t('%{name} Peer Review', {name: name})}
               </Text>
             </Flex.Item>
-            {assignment.dueAt && (
+            {dueAt && (
               <Flex.Item>
                 <Text size="medium" weight="bold">
                   <FriendlyDatetime
                     data-testid="due-date"
                     prefix={I18n.t('Due:')}
                     format={I18n.t('#date.formats.full_with_weekday')}
-                    dateTime={assignment.dueAt}
+                    dateTime={dueAt}
                   />
                 </Text>
               </Flex.Item>
@@ -101,11 +102,11 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignme
           </Flex>
         </Flex.Item>
       </Flex>
-      {assignment && (
+      {data.assignment && (
         <View as="div" margin="0 0 medium 0">
           <PeerReviewSelector
-            key={`${assignment.assessmentRequestsForCurrentUser?.length || 0}-peer-reviews`}
-            assessmentRequests={assignment.assessmentRequestsForCurrentUser || []}
+            key={`${assessmentRequestsForCurrentUser?.length || 0}-peer-reviews`}
+            assessmentRequests={assessmentRequestsForCurrentUser || []}
             selectedIndex={selectedAssessmentIndex}
             onSelectionChange={setSelectedAssessmentIndex}
           />
@@ -123,15 +124,23 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignme
           isSelected={selectedTab === 'details'}
         >
           <View as="div" padding="medium 0">
-            <AssignmentDescription description={assignment.description ?? undefined} />
+            <AssignmentDescription description={description ?? undefined} />
           </View>
         </Tabs.Panel>
-
         <Tabs.Panel
           id="submission"
           renderTitle={I18n.t('Submission')}
           isSelected={selectedTab === 'submission'}
-        ></Tabs.Panel>
+        >
+          {assessmentRequestsForCurrentUser &&
+            assessmentRequestsForCurrentUser[selectedAssessmentIndex]?.submission && (
+              <View as="div">
+                <AssignmentSubmission
+                  submission={assessmentRequestsForCurrentUser[selectedAssessmentIndex].submission}
+                />
+              </View>
+            )}
+        </Tabs.Panel>
       </Tabs>
     </View>
   )

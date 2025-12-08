@@ -266,6 +266,7 @@ class AssignmentsController < ApplicationController
       add_crumb(t("Peer Reviews"))
     end
 
+    add_body_class("full-width")
     css_bundle :assignments_2_student
     js_bundle :assignments_peer_reviews_student
     render html: "", layout: true

@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import PeerReviewsStudentView from '../PeerReviewsStudentView'
@@ -290,6 +291,141 @@ describe('PeerReviewsStudentView', () => {
     })
   })
 
+  describe('Submission tab', () => {
+    it('renders submission when assessment request has a submission', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '9',
+          name: 'Assignment With Submission',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>Student submission text</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '9'})
+
+      await waitFor(() => {
+        expect(getByText('Submission')).toBeInTheDocument()
+      })
+    })
+
+    it('renders AssignmentSubmission component with correct submission data', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '11',
+          name: 'Assignment With Text Entry',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>This is the peer review submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByTestId, getByText} = setup({assignmentId: '11'})
+
+      await waitFor(() => {
+        expect(getByText('Submission')).toBeInTheDocument()
+      })
+
+      const user = userEvent.setup()
+      await user.click(getByText('Submission'))
+
+      await waitFor(() => {
+        expect(getByTestId('text-entry-content')).toBeInTheDocument()
+      })
+
+      expect(getByTestId('text-entry-content')).toHaveTextContent(
+        'This is the peer review submission',
+      )
+    })
+
+    it('updates submission display when peer review selection changes', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '12',
+          name: 'Multiple Peer Reviews',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>First submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+            {
+              _id: 'ar-2',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-02T00:00:00Z',
+              submission: {
+                _id: 'sub-2',
+                attempt: 1,
+                body: '<p>Second submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByTestId, getByText} = setup({assignmentId: '12'})
+
+      await waitFor(() => {
+        expect(getByText('Submission')).toBeInTheDocument()
+      })
+
+      const user = userEvent.setup()
+      await user.click(getByText('Submission'))
+
+      await waitFor(() => {
+        expect(getByTestId('text-entry-content')).toHaveTextContent('First submission')
+      })
+
+      const selector = getByTestId('peer-review-selector')
+      await user.click(selector)
+
+      const secondOption = getByText('Peer Review (2 of 2)')
+      await user.click(secondOption)
+
+      await waitFor(() => {
+        expect(getByTestId('text-entry-content')).toHaveTextContent('Second submission')
+      })
+    })
+  })
+
   it('does not call allocate when assessment requests count equals peer reviews required', async () => {
     mockExecuteQuery.mockResolvedValueOnce({
       assignment: {
@@ -383,6 +519,79 @@ describe('PeerReviewsStudentView', () => {
 
     await waitFor(() => {
       expect(mockMutate).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('Tab switching', () => {
+    it('switches between Assignment Details and Submission tabs', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '13',
+          name: 'Tab Switching Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Assignment description here</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>Submission text</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText, getByTestId} = setup({assignmentId: '13'})
+
+      await waitFor(() => {
+        expect(getByText('Assignment Details')).toBeInTheDocument()
+      })
+
+      expect(getByText('Assignment description here')).toBeInTheDocument()
+
+      const user = userEvent.setup()
+      await user.click(getByText('Submission'))
+
+      await waitFor(() => {
+        expect(getByTestId('text-entry-content')).toBeInTheDocument()
+      })
+    })
+
+    it('defaults to Assignment Details tab on initial render', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '14',
+          name: 'Default Tab Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description content</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>Submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '14'})
+
+      await waitFor(() => {
+        expect(getByText('Description content')).toBeInTheDocument()
+      })
     })
   })
 })
