@@ -42,10 +42,7 @@ describe "people" do
   end
 
   def create_student_group(group_text = "new student group")
-    expect_new_page_load do
-      f("#people-options .Button").click
-      fln("View User Groups").click
-    end
+    get "/courses/#{@course.id}/groups"
     open_student_group_dialog
     replace_and_proceed f("#new-group-set-name"), group_text
     f(%(button[data-testid="group-set-save"])).click
@@ -263,12 +260,8 @@ describe "people" do
     end
 
     it "tests self sign up / group structure functionality" do
-      get "/courses/#{@course.id}/users"
+      get "/courses/#{@course.id}/groups"
       group_count = "4"
-      expect_new_page_load do
-        f("#people-options .Button").click
-        fln("View User Groups").click
-      end
       open_student_group_dialog
       replace_and_proceed f("#new-group-set-name"), "new group"
       f("body").send_keys(:tab)
@@ -282,11 +275,7 @@ describe "people" do
     end
 
     it "errors if the user tries to set the limit group members to 1" do
-      get "/courses/#{@course.id}/users"
-      expect_new_page_load do
-        f("#people-options .Button").click
-        fln("View User Groups").click
-      end
+      get "/courses/#{@course.id}/groups"
       open_student_group_dialog
       replace_and_proceed f("#new-group-set-name"), "new group"
       f("body").send_keys(:tab)

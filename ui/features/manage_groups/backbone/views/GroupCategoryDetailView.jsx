@@ -88,6 +88,7 @@ export default class GroupCategoryDetailView extends View {
     json.canAdd = ENV.permissions.can_add_groups && !this.model.isLocked()
     json.canManage = ENV.permissions.can_manage_groups && !this.model.isLocked()
     json.canDelete = ENV.permissions.can_delete_groups && !this.model.isLocked()
+    json.downloadGroupCategoryRosterCSVPath = this.model.downloadGroupCategoryRosterCSVPath()
     return json
   }
 
