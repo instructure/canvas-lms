@@ -626,8 +626,9 @@ export const GradingSchemesManagement = ({
                 gradingSchemeCards={gradingSchemeCards?.filter(
                   card =>
                     card.gradingScheme.workflow_state === 'active' &&
-                    card.gradingScheme.title?.toLowerCase()
-                    .includes(gradingSchemeSearch.toLowerCase()),
+                    card.gradingScheme.title
+                      ?.toLowerCase()
+                      .includes(gradingSchemeSearch.toLowerCase()),
                 )}
                 caption={I18n.t('Active Grading Schemes')}
                 editGradingScheme={editGradingScheme}

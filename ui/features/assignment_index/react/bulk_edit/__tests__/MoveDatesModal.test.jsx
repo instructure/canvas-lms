@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { render, screen, waitFor } from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
-import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event'
-import MoveDatesModal, { SHIFT_DAYS_MAX, SHIFT_DAYS_MIN } from '../MoveDatesModal'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
+import MoveDatesModal, {SHIFT_DAYS_MAX, SHIFT_DAYS_MIN} from '../MoveDatesModal'
 
 describe('MoveDatesModal', () => {
   const props = (overrides = {}) => ({
@@ -30,7 +30,7 @@ describe('MoveDatesModal', () => {
     ...overrides,
   })
 
-  const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never })
+  const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
 
   afterEach(() => {
     jest.clearAllMocks()
@@ -40,11 +40,11 @@ describe('MoveDatesModal', () => {
     render(<MoveDatesModal {...props()} />)
     const numberInput = screen.getByLabelText('Days')
     const confirmButton = screen.getByText('Confirm')
-    return { numberInput, confirmButton }
+    return {numberInput, confirmButton}
   }
 
   it('shows error if days is empty', async () => {
-    const { numberInput, confirmButton } = renderModal()
+    const {numberInput, confirmButton} = renderModal()
     await user.clear(numberInput)
     await user.click(confirmButton)
     const errorMessage = await screen.findByText('Number of days is required')
@@ -52,7 +52,7 @@ describe('MoveDatesModal', () => {
   })
 
   it('shows error if days is non-numeric value', async () => {
-    const { numberInput, confirmButton } = renderModal()
+    const {numberInput, confirmButton} = renderModal()
     await user.clear(numberInput)
     await user.type(numberInput, 'abcde')
     await user.click(confirmButton)
@@ -61,7 +61,7 @@ describe('MoveDatesModal', () => {
   })
 
   it('shows error if days is decimal', async () => {
-    const { numberInput, confirmButton } = renderModal()
+    const {numberInput, confirmButton} = renderModal()
     await user.clear(numberInput)
     await user.type(numberInput, '5.9')
     await user.click(confirmButton)
@@ -70,16 +70,18 @@ describe('MoveDatesModal', () => {
   })
 
   it('shows error if days is out of range', async () => {
-    const { numberInput, confirmButton } = renderModal()
+    const {numberInput, confirmButton} = renderModal()
     await user.clear(numberInput)
     await user.type(numberInput, '0')
     await user.click(confirmButton)
-    const errorMessage = await screen.findByText(`Must be between ${SHIFT_DAYS_MIN} and ${SHIFT_DAYS_MAX}`)
+    const errorMessage = await screen.findByText(
+      `Must be between ${SHIFT_DAYS_MIN} and ${SHIFT_DAYS_MAX}`,
+    )
     expect(errorMessage).toBeInTheDocument()
   })
 
   it('clears days error when input value changes', async () => {
-    const { numberInput, confirmButton } = renderModal()
+    const {numberInput, confirmButton} = renderModal()
     await user.clear(numberInput)
     await user.click(confirmButton)
     const errorMessage = await screen.findByText('Number of days is required')
@@ -92,7 +94,7 @@ describe('MoveDatesModal', () => {
   })
 
   it('clears days error when radio selection changes', async () => {
-    const { numberInput, confirmButton } = renderModal()
+    const {numberInput, confirmButton} = renderModal()
     await user.clear(numberInput)
     await user.click(confirmButton)
     const errorMessage = await screen.findByText('Number of days is required')

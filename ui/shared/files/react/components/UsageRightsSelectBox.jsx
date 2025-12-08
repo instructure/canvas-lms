@@ -21,7 +21,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import filesEnv from '../modules/filesEnv'
-import { Text } from '@instructure/ui-text'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('usageRightsSelectBox')
 
@@ -86,7 +86,7 @@ export default class UsageRightsSelectBox extends React.Component {
 
   componentDidMount() {
     this.getUsageRightsOptions()
-    $(document).on("validateUsageRightsSelectedValue", (_e, data) => {
+    $(document).on('validateUsageRightsSelectedValue', (_e, data) => {
       this.setValidationError(!!data.error)
     })
   }
@@ -130,8 +130,7 @@ export default class UsageRightsSelectBox extends React.Component {
       showCreativeCommonsOptions: event.target.value === 'creative_commons',
       showMessage: this.props.showMessage && event.target.value === 'choose',
     })
-    if(this.props.hideErrors)
-      this.props.hideErrors()
+    if (this.props.hideErrors) this.props.hideErrors()
   }
 
   // This method only really applies to firefox which doesn't handle onChange
@@ -206,7 +205,8 @@ export default class UsageRightsSelectBox extends React.Component {
       <div className="UsageRightsSelectBox__container">
         <div className="control-group">
           <label className="control-label" htmlFor="usageRightSelector">
-            {I18n.t('Usage Rights')}<Text color={this.state.validationError ? 'danger' : 'primary'}>*</Text>:
+            {I18n.t('Usage Rights')}
+            <Text color={this.state.validationError ? 'danger' : 'primary'}>*</Text>:
           </label>
           <div className="controls">
             <select

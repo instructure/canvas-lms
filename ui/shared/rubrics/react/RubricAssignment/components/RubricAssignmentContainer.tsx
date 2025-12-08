@@ -76,7 +76,8 @@ export const RubricAssignmentContainer = ({
   const [_criteriaViaLlm, setCriteriaViaLlm] = useState(false)
   const [assignmentPoints, setAssignmentPoints] = useState(assignmentPointsPossible)
 
-  const deleteTooltipText = (rubric?.association_count ?? 0) > 1 ? I18n.t('Unlink Rubric') : I18n.t('Delete Rubric')
+  const deleteTooltipText =
+    (rubric?.association_count ?? 0) > 1 ? I18n.t('Unlink Rubric') : I18n.t('Delete Rubric')
 
   const handleSaveRubric = (
     savedRubricResponse: SaveRubricResponse,

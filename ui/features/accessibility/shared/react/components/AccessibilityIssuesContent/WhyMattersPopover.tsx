@@ -87,7 +87,13 @@ const WhyMattersPopover = ({issue}: WhyMattersPopoverProps) => {
           <Flex.Item>
             <Flex direction="column">
               <Flex.Item>
-                <Heading level="h4" margin="none" renderIcon={<IconWarningSolid fontSize={canvas.typography.legend} color="warning" />}>
+                <Heading
+                  level="h4"
+                  margin="none"
+                  renderIcon={
+                    <IconWarningSolid fontSize={canvas.typography.legend} color="warning" />
+                  }
+                >
                   <Text color="warning" weight="bold" size="legend">
                     {I18n.t('IMPORTANT')}
                   </Text>

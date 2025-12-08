@@ -92,10 +92,7 @@ describe('MicrosoftSyncButton', () => {
 
   describe('when the sync request fails', () => {
     beforeEach(() =>
-      doFetchApi.mockImplementationOnce(() =>
-         
-        Promise.reject({message: 'test error'}),
-      ),
+      doFetchApi.mockImplementationOnce(() => Promise.reject({message: 'test error'})),
     )
 
     it('calls the error handler, but allows trying to sync again', async () => {

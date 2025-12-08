@@ -319,24 +319,30 @@ describe('LatePoliciesTabPanel', () => {
       expect(spy).toHaveBeenCalledTimes(0)
     })
 
-    test('focuses on the missing submission checkbox when the alert closes if the' +
-      'missing submission input is disabled', () => {
-      subject({showAlert: true}, {missingSubmissionDeductionEnabled: false})
-      const spy = jest.spyOn(
-        getAutomaticallyApplyGradeForMissingSubmissionsCheckbox(screen),
-        'focus',
-      )
-      ref.current.closeAlert()
-      expect(spy).toHaveBeenCalledTimes(1)
-    })
+    test(
+      'focuses on the missing submission checkbox when the alert closes if the' +
+        'missing submission input is disabled',
+      () => {
+        subject({showAlert: true}, {missingSubmissionDeductionEnabled: false})
+        const spy = jest.spyOn(
+          getAutomaticallyApplyGradeForMissingSubmissionsCheckbox(screen),
+          'focus',
+        )
+        ref.current.closeAlert()
+        expect(spy).toHaveBeenCalledTimes(1)
+      },
+    )
 
-    test('does not focus on the missing submission input when the alert closes if the' +
-      'missing submission input is disabled', () => {
-      subject({showAlert: true}, {missingSubmissionDeductionEnabled: false})
-      const spy = jest.spyOn(getGradePercentageForMissingSubmissionsInput(screen), 'focus')
-      ref.current.closeAlert()
-      expect(spy).toHaveBeenCalledTimes(0)
-    })
+    test(
+      'does not focus on the missing submission input when the alert closes if the' +
+        'missing submission input is disabled',
+      () => {
+        subject({showAlert: true}, {missingSubmissionDeductionEnabled: false})
+        const spy = jest.spyOn(getGradePercentageForMissingSubmissionsInput(screen), 'focus')
+        ref.current.closeAlert()
+        expect(spy).toHaveBeenCalledTimes(0)
+      },
+    )
   })
 
   describe('spinner', () => {

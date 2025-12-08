@@ -54,7 +54,10 @@ export function AssetProcessors(props: AssetProcessorsProps) {
   const handleProcessorResponse = ({
     tool,
     data,
-  }: {tool: LtiLaunchDefinition; data: DeepLinkResponse}) => {
+  }: {
+    tool: LtiLaunchDefinition
+    data: DeepLinkResponse
+  }) => {
     addAttachedProcessors({tool, data, type: props.type})
   }
 

@@ -19,9 +19,7 @@
 import './block-content-editor-layout.css'
 import {ReactNode} from 'react'
 
-export const BlockContentViewerLayout = (props: {
-  editor: ReactNode
-}) => {
+export const BlockContentViewerLayout = (props: {editor: ReactNode}) => {
   return (
     <div className="block-content-editor-container">
       <div className="viewer-area">{props.editor}</div>

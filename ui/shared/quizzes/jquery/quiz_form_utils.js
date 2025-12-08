@@ -17,46 +17,49 @@
  */
 
 export function renderError(inputContainer, message) {
-    const inputMessageContainer = inputContainer.find('.input-message__container')
+  const inputMessageContainer = inputContainer.find('.input-message__container')
 
-    if (!inputMessageContainer.length) {
-      console.warn('renderError was called on a non-message container', inputContainer)
-      return
-    }
+  if (!inputMessageContainer.length) {
+    console.warn('renderError was called on a non-message container', inputContainer)
+    return
+  }
 
-    const inputField = inputContainer.find('input').last()
-    const inputMessageText = inputMessageContainer.find('.input-message__text')
+  const inputField = inputContainer.find('input').last()
+  const inputMessageText = inputMessageContainer.find('.input-message__text')
 
-    inputContainer.addClass('invalid')
-    inputField.attr('aria-invalid', 'true')
-    inputMessageContainer.addClass('error').removeClass('hidden')
-    inputMessageText
-      .attr({
-        'aria-live': 'polite',
-        'aria-atomic': 'true'
-      })
-      .text(message)
-    inputMessageText.addClass('error_text')
+  inputContainer.addClass('invalid')
+  inputField.attr('aria-invalid', 'true')
+  inputMessageContainer.addClass('error').removeClass('hidden')
+  inputMessageText
+    .attr({
+      'aria-live': 'polite',
+      'aria-atomic': 'true',
+    })
+    .text(message)
+  inputMessageText.addClass('error_text')
 
-    inputContainer.find('.asterisk').addClass('error')
+  inputContainer.find('.asterisk').addClass('error')
 }
 
 export function restoreOriginalMessage(inputContainer) {
-    const inputMessageContainer = inputContainer.find('.input-message__container')
-    const inputField = inputContainer.find('input').last()
-    const textToRestore = inputMessageContainer.data('original-text') || ''
-    const inputMessageText = inputMessageContainer.find('.input-message__text')
+  const inputMessageContainer = inputContainer.find('.input-message__container')
+  const inputField = inputContainer.find('input').last()
+  const textToRestore = inputMessageContainer.data('original-text') || ''
+  const inputMessageText = inputMessageContainer.find('.input-message__text')
 
-    inputContainer.removeClass('invalid')
-    inputField.removeAttr('aria-invalid')
-    inputMessageContainer.removeClass('error')
+  inputContainer.removeClass('invalid')
+  inputField.removeAttr('aria-invalid')
+  inputMessageContainer.removeClass('error')
 
-    inputMessageText.removeAttr('aria-live').removeAttr('aria-atomic').text(textToRestore)
-      .removeClass('error_text')
+  inputMessageText
+    .removeAttr('aria-live')
+    .removeAttr('aria-atomic')
+    .text(textToRestore)
+    .removeClass('error_text')
 
-    inputContainer.find('.asterisk').removeClass('error')
+  inputContainer.find('.asterisk').removeClass('error')
 
-    if (textToRestore === '') {
-      inputMessageContainer.addClass('hidden')
-    }
+  if (textToRestore === '') {
+    inputMessageContainer.addClass('hidden')
+  }
 }

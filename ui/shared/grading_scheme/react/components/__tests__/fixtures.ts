@@ -410,10 +410,8 @@ export class IntersectionObserver {
 
   thresholds = []
 
-   
   callback: IntersectionObserverCallback
 
-   
   constructor(callback: IntersectionObserverCallback) {
     this.callback = callback
     return this

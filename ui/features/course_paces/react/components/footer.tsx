@@ -49,7 +49,7 @@ import {
 import {getBlackoutDatesSyncing, getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
 import UnpublishedChangesIndicator from './unpublished_changes_indicator'
 import {RemovePaceWarningModal} from './remove_pace_warning_modal'
-import { isBulkEnrollment } from '../reducers/pace_contexts'
+import {isBulkEnrollment} from '../reducers/pace_contexts'
 
 const I18n = createI18nScope('course_paces_footer')
 
@@ -111,7 +111,7 @@ export const Footer = ({
   isDraftPace,
   paceName,
   blueprintLocked,
-  isBulkEnrollment
+  isBulkEnrollment,
 }: ComponentProps) => {
   const [isRemovePaceModalOpen, setRemovePaceModalOpen] = useState(false)
   const isCoursePace = !sectionPace && !studentPace
@@ -137,8 +137,9 @@ export const Footer = ({
   }
 
   const cancelDisabled = anyActiveRequests
-  let pubDisabled = !newPace &&
-  (!unpublishedChanges || autoSaving || isSyncing || showLoadingOverlay || blueprintLocked)
+  let pubDisabled =
+    !newPace &&
+    (!unpublishedChanges || autoSaving || isSyncing || showLoadingOverlay || blueprintLocked)
   const removeDisabled = autoSaving || isSyncing || showLoadingOverlay || pacePublishing
   const saveDraftEnabled = (isDraftPace || isUnpublishedNewPace) && unpublishedChanges
   // always override publishing to be enabled when a pace is a draft, even if there are no unsaved changes
@@ -149,8 +150,7 @@ export const Footer = ({
   if (newPace) {
     publishLabel = I18n.t('Create Pace')
   } else {
-    publishLabel =
-      allowDraftPaces && isDraftPace ? I18n.t('Publish Pace') : I18n.t('Apply Changes')
+    publishLabel = allowDraftPaces && isDraftPace ? I18n.t('Publish Pace') : I18n.t('Apply Changes')
   }
 
   const handleCancelClick = () => {
@@ -266,10 +266,7 @@ export const Footer = ({
         />
         <Flex.Item>
           {showRemovePaceButton && (
-            <Tooltip
-              renderTip={removeDisabled ? removeTip : ''}
-              on={[]}
-            >
+            <Tooltip renderTip={removeDisabled ? removeTip : ''} on={[]}>
               {showCondensedView ? (
                 <IconButton
                   screenReaderLabel={removePaceLabel}
@@ -290,10 +287,7 @@ export const Footer = ({
         </Flex.Item>
         <Flex.Item>
           {!showCondensedView && renderChangesIndicator()}
-          <Tooltip
-            renderTip={cancelDisabled ? cancelTip : ''}
-            on={[]}
-          >
+          <Tooltip renderTip={cancelDisabled ? cancelTip : ''} on={[]}>
             <Button
               color="secondary"
               margin="0 small 0"
@@ -304,10 +298,7 @@ export const Footer = ({
             </Button>
           </Tooltip>
           {getSaveDraftButton()}
-          <Tooltip
-            renderTip={pubDisabled ? pubTip : ''}
-            on={[]}
-          >
+          <Tooltip renderTip={pubDisabled ? pubTip : ''} on={[]}>
             <Button
               data-testid="apply-or-create-pace-button"
               color="primary"

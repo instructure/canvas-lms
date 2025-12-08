@@ -36,7 +36,7 @@ const defaultEnvPermissions = {
   read_sis: false,
   can_manage_differentiation_tags: false,
   allow_assign_to_differentiation_tags: false,
-  active_granular_enrollment_permissions: []
+  active_granular_enrollment_permissions: [],
 }
 
 const defaultEnvCourse = {
@@ -47,7 +47,7 @@ const defaultEnvCourse = {
   user_services_url: '',
   observer_pairing_codes_url: '',
   hideSectionsOnCourseUsersPage: false,
-  concluded: false
+  concluded: false,
 }
 
 export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeopleContextType => {
@@ -55,9 +55,7 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
     ? defaultEnvPermissions
     : {...defaultEnvPermissions, ...ENV.permissions}
 
-  const course = defaultContext
-    ? defaultEnvCourse
-    : {...defaultEnvCourse, ...ENV.course}
+  const course = defaultContext ? defaultEnvCourse : {...defaultEnvCourse, ...ENV.course}
 
   const currentUserId = ENV.current_user_id
   const allRoles = ENV.ALL_ROLES
@@ -76,7 +74,7 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
     read_sis: canViewSisIdColumn,
     can_manage_differentiation_tags: canManageDifferentiationTags,
     allow_assign_to_differentiation_tags: allowAssignToDifferentiationTags,
-    active_granular_enrollment_permissions: activeGranularEnrollmentPermissions
+    active_granular_enrollment_permissions: activeGranularEnrollmentPermissions,
   } = permissions
 
   const {
@@ -87,7 +85,7 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
     user_services_url: userServicesUrl,
     observer_pairing_codes_url: observerPairingCodesUrl,
     hideSectionsOnCourseUsersPage: hideSectionsOnCourseUsersPage,
-    concluded: courseConcluded
+    concluded: courseConcluded,
   } = course
 
   return {
@@ -118,6 +116,8 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
   }
 }
 
-const CoursePeopleContext = createContext<CoursePeopleContextType>(getCoursePeopleContext({defaultContext: true}))
+const CoursePeopleContext = createContext<CoursePeopleContextType>(
+  getCoursePeopleContext({defaultContext: true}),
+)
 
 export default CoursePeopleContext

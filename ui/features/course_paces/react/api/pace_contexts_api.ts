@@ -81,7 +81,7 @@ export const getStudentBulkPaceEditView = ({
   sortBy,
   orderType = 'asc',
   filterPaceStatus,
-  filterSection
+  filterSection,
 }: FetchBulkStudentViewsAPIParams): BulkStudentsApiResponse => {
   const apiParams: Record<string, string | number> = {}
   if (page && entriesPerRequest) {
@@ -96,12 +96,12 @@ export const getStudentBulkPaceEditView = ({
     apiParams.order = orderType
   }
 
-  if(filterPaceStatus !== 'all') {
+  if (filterPaceStatus !== 'all') {
     // @ts-expect-error
     apiParams.filter_pace_status = filterPaceStatus
   }
 
-  if(filterSection !== 'all') {
+  if (filterSection !== 'all') {
     // @ts-expect-error
     apiParams.filter_section = filterSection
   }

@@ -292,7 +292,6 @@ export function createPlannerApp() {
 createPlannerApp.scrollEventsRegistered = false
 
 function renderApp(element) {
-
   const root = createRoot(element)
   root.render(createPlannerApp())
 }
@@ -318,7 +317,7 @@ function renderHeader(element, auxElement) {
           />
         </Suspense>
       </Provider>
-    </DynamicUiProvider>
+    </DynamicUiProvider>,
   )
 }
 
@@ -334,7 +333,6 @@ export function renderToDoSidebar(element) {
     initializedOptions.env.current_user_roles.includes('teacher') &&
     initializedOptions.env.current_user_roles.includes('student')
 
-
   const root = createRoot(element)
   root.render(
     <Provider store={store}>
@@ -347,7 +345,7 @@ export function renderToDoSidebar(element) {
           additionalTitleContext={additionalTitleContext}
         />
       </Suspense>
-    </Provider>
+    </Provider>,
   )
 }
 

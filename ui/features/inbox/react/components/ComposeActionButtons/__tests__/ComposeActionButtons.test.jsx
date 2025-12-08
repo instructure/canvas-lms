@@ -46,12 +46,12 @@ describe('ComposeActionButtons', () => {
       const user = userEvent.setup()
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
-      
+
       const file = new File(['test'], 'test.txt', {type: 'text/plain'})
       const input = getByTestId('attachment-input')
-      
+
       await user.upload(input, file)
-      
+
       expect(props.onAttachmentUpload).toHaveBeenCalled()
     })
 
@@ -77,9 +77,9 @@ describe('ComposeActionButtons', () => {
       const user = userEvent.setup()
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
-      
+
       await user.click(getByTestId('media-upload'))
-      
+
       expect(props.onMediaUpload).toHaveBeenCalled()
     })
 
@@ -103,9 +103,9 @@ describe('ComposeActionButtons', () => {
       const user = userEvent.setup()
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
-      
+
       await user.click(getByTestId('cancel-button'))
-      
+
       expect(props.onCancel).toHaveBeenCalled()
     })
   })
@@ -115,9 +115,9 @@ describe('ComposeActionButtons', () => {
       const user = userEvent.setup()
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
-      
+
       await user.click(getByTestId('send-button'))
-      
+
       expect(props.onSend).toHaveBeenCalled()
     })
 

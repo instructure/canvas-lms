@@ -21,16 +21,16 @@
   }
 
   .immersiveView [data-media-player] {
-    --radius-3: .625rem;
+    --radius-3: 0.625rem;
   }
 }
 
 .immersiveViewContent {
   display: flex;
   flex-direction: column;
-  flex: 1; 
+  flex: 1;
   min-height: 0;
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 .immersiveViewHeader {

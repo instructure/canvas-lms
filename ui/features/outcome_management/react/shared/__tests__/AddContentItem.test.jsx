@@ -105,7 +105,10 @@ describe('AddContentItem', () => {
     const props = defaultProps()
     const {getByText, getByLabelText} = render(<AddContentItem {...props} />)
     fireEvent.change(getByLabelText(props.textInputInstructions), {
-      target: {value: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eu egestas elit. In hac habitasse platea dictumst. Nam gravida sollicitudin erat ac convallis. Maecenas malesuada ullamcorper massa ac eleifend. Sed viverra lorem ante, id dignissim est at.'},
+      target: {
+        value:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eu egestas elit. In hac habitasse platea dictumst. Nam gravida sollicitudin erat ac convallis. Maecenas malesuada ullamcorper massa ac eleifend. Sed viverra lorem ante, id dignissim est at.',
+      },
     })
     fireEvent.click(getByText(props.labelInstructions))
     expect(onSaveHandler).not.toHaveBeenCalled()

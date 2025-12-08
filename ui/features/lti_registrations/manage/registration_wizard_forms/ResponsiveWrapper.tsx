@@ -26,7 +26,9 @@ export type ResponsiveWrapperPassthroughProps = {
 
 export const ResponsiveWrapper = ({
   render,
-}: {render: (modalProps?: ResponsiveWrapperPassthroughProps | null) => React.ReactNode}) => {
+}: {
+  render: (modalProps?: ResponsiveWrapperPassthroughProps | null) => React.ReactNode
+}) => {
   return (
     <Responsive
       match="media"

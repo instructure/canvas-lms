@@ -247,9 +247,9 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                   type="text"
                   size="medium"
                   value={displayName}
-                  messages={invalidDisplayName
-                    ? [{text: invalidDisplayName, type: 'newError'}]
-                    : []}
+                  messages={
+                    invalidDisplayName ? [{text: invalidDisplayName, type: 'newError'}] : []
+                  }
                   renderLabel={I18n.t('Friendly Name')}
                   onChange={displayNameChangeHandler}
                   data-testid="display-name-input"

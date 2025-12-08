@@ -66,7 +66,6 @@ describe('PublishButtonView', () => {
   })
 
   describe('click interactions', () => {
-
     it('publish button renders fail to publish', async () => {
       jest.spyOn($, 'flashError')
       const btnView = new PublishButtonView({model: publish}).render()
@@ -85,7 +84,10 @@ describe('PublishButtonView', () => {
 
     it('publish button renders loading spinner only while publishing', async () => {
       jest.spyOn($, 'flashError')
-      const renderSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'renderOverlayLoadingSpinner')
+      const renderSpinnerSpy = jest.spyOn(
+        PublishButtonView.prototype,
+        'renderOverlayLoadingSpinner',
+      )
       const hideSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'hideOverlayLoadingSpinner')
       const btnView = new PublishButtonView({model: publish}).render()
       btnView.$el.trigger('click')
@@ -98,7 +100,10 @@ describe('PublishButtonView', () => {
 
     it('unpublish button renders loading spinner only while unpublishing', async () => {
       jest.spyOn($, 'flashError')
-      const renderSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'renderOverlayLoadingSpinner')
+      const renderSpinnerSpy = jest.spyOn(
+        PublishButtonView.prototype,
+        'renderOverlayLoadingSpinner',
+      )
       const hideSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'hideOverlayLoadingSpinner')
       const btnView = new PublishButtonView({model: published}).render()
       btnView.$el.trigger('click')
@@ -108,6 +113,5 @@ describe('PublishButtonView', () => {
       expect(btnView.$text.html()).toMatch(/Published/)
       expect($.flashError).toHaveBeenCalledWith('This assignment has failed to unpublish')
     })
-
   })
 })

@@ -50,40 +50,30 @@ const PeopleSearchBar: FC<PeopleSearchBarType> = ({
         size="medium"
         placeholder={I18n.t('Search people...')}
         value={searchTerm}
-        renderLabel={
-          <ScreenReaderContent>
-            {I18n.t('Search people')}
-          </ScreenReaderContent>
-        }
+        renderLabel={<ScreenReaderContent>{I18n.t('Search people')}</ScreenReaderContent>}
         onChange={onChangeHandler}
         interaction={'enabled'}
-        renderBeforeInput={<IconSearchLine inline={false} data-testid="search-icon"/>}
+        renderBeforeInput={<IconSearchLine inline={false} data-testid="search-icon" />}
         renderAfterInput={
-          searchTerm.length > 0
-            ? (
-                <IconButton
-                  type="button"
-                  size="small"
-                  withBackground={false}
-                  withBorder={false}
-                  screenReaderLabel={I18n.t('Clear search')}
-                  onClick={onClearHandler}
-                  data-testid="clear-search-icon"
-                >
-                  <IconTroubleLine />
-                </IconButton>
-              )
-            : null
+          searchTerm.length > 0 ? (
+            <IconButton
+              type="button"
+              size="small"
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={I18n.t('Clear search')}
+              onClick={onClearHandler}
+              data-testid="clear-search-icon"
+            >
+              <IconTroubleLine />
+            </IconButton>
+          ) : null
         }
         shouldNotWrap
       />
     </View>
     {!isLoading && (
-      <Alert
-        liveRegion={getLiveRegion}
-        liveRegionPoliteness="polite"
-        screenReaderOnly
-      >
+      <Alert liveRegion={getLiveRegion} liveRegionPoliteness="polite" screenReaderOnly>
         {I18n.t(
           {
             zero: 'No people found',

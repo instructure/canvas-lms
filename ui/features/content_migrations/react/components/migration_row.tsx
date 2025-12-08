@@ -74,7 +74,11 @@ const mapProgress = (cm_workflow_state: ContentMigrationWorkflowState): StatusPi
     : 'queued'
 }
 
-const MigrationRow = ({migration, layout = 'auto', updateMigrationItem}: ContentMigrationsRowProps) => {
+const MigrationRow = ({
+  migration,
+  layout = 'auto',
+  updateMigrationItem,
+}: ContentMigrationsRowProps) => {
   const [statusPillState, setStatusPillState] = useState<StatusPillState>(
     mapProgress(migration.workflow_state),
   )
@@ -117,7 +121,7 @@ const MigrationRow = ({migration, layout = 'auto', updateMigrationItem}: Content
     <Table.Row key={migration.id}>
       <Table.Cell themeOverride={cellStyle}>{migration.migration_type_title}</Table.Cell>
       <Table.Cell themeOverride={cellStyle}>
-        <SourceLink item={migration} ellipsis={layout !== 'stacked'}/>
+        <SourceLink item={migration} ellipsis={layout !== 'stacked'} />
       </Table.Cell>
       <Table.Cell themeOverride={cellStyle}>
         {datetimeString(migration.created_at, {timezone: ENV.CONTEXT_TIMEZONE})}
@@ -154,6 +158,5 @@ const MigrationRow = ({migration, layout = 'auto', updateMigrationItem}: Content
   )
 }
 MigrationRow.displayName = 'Row'
-
 
 export default MigrationRow

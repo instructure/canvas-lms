@@ -77,7 +77,9 @@ async function renderAndWaitForData(ui: React.ReactElement) {
 describe('useLtiAssetProcessors', () => {
   function TestUseLtiAssetProcessorsComponent({
     args,
-  }: {args: Parameters<typeof useLtiAssetProcessors>}) {
+  }: {
+    args: Parameters<typeof useLtiAssetProcessors>
+  }) {
     const query = useLtiAssetProcessors(...args)
     return !query.data ? null : <div data-testid="test-data">{JSON.stringify(query.data)}</div>
   }

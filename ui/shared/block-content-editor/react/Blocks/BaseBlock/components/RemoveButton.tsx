@@ -22,10 +22,7 @@ import {IconTrashLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('block_content_editor')
 
-export const RemoveButton = (props: {
-  onClicked: () => void
-  title: string
-}) => {
+export const RemoveButton = (props: {onClicked: () => void; title: string}) => {
   return (
     <IconButton
       data-testid="remove-block-button"

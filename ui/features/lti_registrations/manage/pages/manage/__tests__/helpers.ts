@@ -61,7 +61,11 @@ export const mockUser = ({
   id = '1',
   date = new Date(),
   overrides = {},
-}: {id?: string; date?: Date; overrides?: Partial<User>}) => {
+}: {
+  id?: string
+  date?: Date
+  overrides?: Partial<User>
+}) => {
   return {
     created_at: date,
     id: ZUserId.parse(id),

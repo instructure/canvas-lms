@@ -64,7 +64,7 @@ class FileUpload extends Component {
     onCanvasFileRequested: func.isRequired,
     onUploadRequested: func.isRequired,
     submission: Submission.shape,
-    submitButtonRef: object
+    submitButtonRef: object,
   }
 
   state = {
@@ -456,7 +456,13 @@ class FileUpload extends Component {
 
     return (
       <>
-        <Flex id="file-upload-container" data-testid="upload-pane" direction="column" width="100%" alignItems="stretch">
+        <Flex
+          id="file-upload-container"
+          data-testid="upload-pane"
+          direction="column"
+          width="100%"
+          alignItems="stretch"
+        >
           {files.length > 0 && (
             <Flex.Item padding="0 x-large x-large">{this.renderUploadedFiles(files)}</Flex.Item>
           )}
@@ -466,7 +472,7 @@ class FileUpload extends Component {
           </Flex.Item>
         </Flex>
         {this.state.showErrorMessage && (
-          <View as='div' padding='small 0 0 0' background='primary'>
+          <View as="div" padding="small 0 0 0" background="primary">
             <FormattedErrorMessage message={FILE_REQUIRED_ERROR_MESSAGE} />
           </View>
         )}

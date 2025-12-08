@@ -63,7 +63,7 @@ async function makeProps(overrides) {
     createSubmissionDraft: jest.fn().mockResolvedValue({}),
     updateEditingDraft: jest.fn(),
     focusOnInit: false,
-    errorMessage: ''
+    errorMessage: '',
   }
   return props
 }
@@ -267,7 +267,9 @@ describe('UrlEntry', () => {
       fireEvent.click(props.submitButtonRef.current)
       expect(getByText('Please enter a valid url (e.g. https://example.com)')).toBeInTheDocument()
       fireEvent.change(getByTestId('url-input'), {target: {value: 'https://url.com'}})
-      expect(queryByText('Please enter a valid url (e.g. https://example.com)')).not.toBeInTheDocument()
+      expect(
+        queryByText('Please enter a valid url (e.g. https://example.com)'),
+      ).not.toBeInTheDocument()
     })
 
     it('renders the preview button when the url is considered valid', async () => {

@@ -384,7 +384,10 @@ export default class Quiz extends Backbone.Model {
   nonBaseDates() {
     const dateGroups = this.get('all_dates')
     if (!dateGroups) return false
-    const withouBase = filter(dateGroups.models || [], dateGroup => dateGroup && !dateGroup.get('base'))
+    const withouBase = filter(
+      dateGroups.models || [],
+      dateGroup => dateGroup && !dateGroup.get('base'),
+    )
     return withouBase.length > 0
   }
 

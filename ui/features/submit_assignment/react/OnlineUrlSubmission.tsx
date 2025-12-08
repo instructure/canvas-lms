@@ -74,7 +74,7 @@ const OnlineUrlSubmission = ({
   const label = (
     <>
       <Text>{I18n.t('Website URL')}</Text>
-      <Text color={onlineUrlErrors.length > 0 ? "danger" : "primary"}>*</Text>
+      <Text color={onlineUrlErrors.length > 0 ? 'danger' : 'primary'}>*</Text>
     </>
   )
 

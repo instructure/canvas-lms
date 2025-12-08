@@ -33,11 +33,11 @@ const I18n = createI18nScope('accessibility_checker')
 function getIconByContentType(contentType: ResourceType) {
   switch (contentType) {
     case ResourceType.WikiPage:
-      return <IconDocumentLine aria-hidden="true"/>
+      return <IconDocumentLine aria-hidden="true" />
     case ResourceType.Assignment:
-      return <IconAssignmentLine aria-hidden="true"/>
+      return <IconAssignmentLine aria-hidden="true" />
     case ResourceType.Attachment:
-      return <IconMsWordLine aria-hidden="true"/>
+      return <IconMsWordLine aria-hidden="true" />
   }
 }
 

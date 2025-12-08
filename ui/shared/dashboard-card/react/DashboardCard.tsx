@@ -306,7 +306,7 @@ export const DashboardCard = ({
     )
   }
 
-  const CardHeading = headingLevel as keyof JSX.IntrinsicElements;
+  const CardHeading = headingLevel as keyof JSX.IntrinsicElements
 
   const dashboardCard = (
     <div

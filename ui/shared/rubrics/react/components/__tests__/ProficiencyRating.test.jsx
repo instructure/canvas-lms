@@ -156,7 +156,7 @@ describe('ProficiencyRating', () => {
 
   it('calls onBlurChange with correct parameters when description input loses focus', async () => {
     const onBlurChange = jest.fn()
-    const wrapper = renderProficiencyRating({ onBlurChange })
+    const wrapper = renderProficiencyRating({onBlurChange})
 
     const descriptionInput = wrapper.container.querySelector('input[value="Stellar"]')
     fireEvent.blur(descriptionInput)
@@ -165,7 +165,7 @@ describe('ProficiencyRating', () => {
 
   it('calls onBlurChange with correct parameters when points input loses focus', () => {
     const onBlurChange = jest.fn()
-    const wrapper = renderProficiencyRating({ onBlurChange })
+    const wrapper = renderProficiencyRating({onBlurChange})
 
     const pointsInput = wrapper.container.querySelectorAll('input')[2]
     fireEvent.blur(pointsInput)
@@ -174,11 +174,14 @@ describe('ProficiencyRating', () => {
   })
 
   it('shows error message when description input is empty and loses focus', () => {
-    const onBlurChange = jest.fn();
-    const wrapper = renderProficiencyRating({ onBlurChange, descriptionError: 'Description is required' })
+    const onBlurChange = jest.fn()
+    const wrapper = renderProficiencyRating({
+      onBlurChange,
+      descriptionError: 'Description is required',
+    })
 
     const descriptionInput = wrapper.container.querySelector('input[value="Stellar"]')
-    fireEvent.change(descriptionInput, { target: { value: '' } })
+    fireEvent.change(descriptionInput, {target: {value: ''}})
     fireEvent.blur(descriptionInput)
 
     expect(onBlurChange).toHaveBeenCalledWith('', 'description')
@@ -186,14 +189,14 @@ describe('ProficiencyRating', () => {
   })
 
   it('shows error message when points input is empty and loses focus', () => {
-    const onBlurChange = jest.fn();
-    const wrapper = renderProficiencyRating({ onBlurChange, pointsError: 'Invalid points' })
+    const onBlurChange = jest.fn()
+    const wrapper = renderProficiencyRating({onBlurChange, pointsError: 'Invalid points'})
 
     const pointsInput = wrapper.container.querySelector('input[value="10"]')
-    fireEvent.change(pointsInput, { target: { value: '' } })
+    fireEvent.change(pointsInput, {target: {value: ''}})
     fireEvent.blur(pointsInput)
 
     expect(onBlurChange).toHaveBeenCalledWith('', 'points')
     expect(wrapper.container).toHaveTextContent('Invalid points')
-  });
+  })
 })

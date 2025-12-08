@@ -42,7 +42,7 @@ export default class NewGradingPeriodSetForm extends React.Component {
     this.titleInput = React.createRef()
     this.cancelButton = React.createRef()
     this.createButton = React.createRef()
-    
+
     this.state = {
       buttonsDisabled: false,
       title: '',

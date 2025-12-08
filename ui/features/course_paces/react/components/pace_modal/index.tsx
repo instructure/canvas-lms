@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useState, useRef, useEffect } from 'react'
-import { connect } from 'react-redux'
+import React, {useState, useRef, useEffect} from 'react'
+import {connect} from 'react-redux'
 
-import { Flex } from '@instructure/ui-flex'
-import { Responsive } from '@instructure/ui-responsive'
-import { Heading } from '@instructure/ui-heading'
-import { IconButton } from '@instructure/ui-buttons'
-import { IconXSolid } from '@instructure/ui-icons'
-import { Modal } from '@instructure/ui-modal'
-import { TruncateText } from '@instructure/ui-truncate-text'
-import { Tray } from '@instructure/ui-tray'
-import { useScope as createI18nScope } from '@canvas/i18n'
-import { View } from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {Responsive} from '@instructure/ui-responsive'
+import {Heading} from '@instructure/ui-heading'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconXSolid} from '@instructure/ui-icons'
+import {Modal} from '@instructure/ui-modal'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {Tray} from '@instructure/ui-tray'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {View} from '@instructure/ui-view'
 
 import Body from '../body'
 import Errors from '../errors'
@@ -36,8 +36,8 @@ import Footer from '../footer'
 import UnpublishedChangesTrayContents from '../unpublished_changes_tray_contents'
 import UnpublishedWarningModal from '../header/unpublished_warning_modal'
 
-import { coursePaceActions } from '../../actions/course_paces'
-import { actions as uiActions } from '../../actions/ui'
+import {coursePaceActions} from '../../actions/course_paces'
+import {actions as uiActions} from '../../actions/ui'
 
 import type {
   CoursePace,
@@ -58,16 +58,16 @@ import {
   getPlannedEndDate,
   getUnappliedChangesExist,
 } from '../../reducers/course_paces'
-import { isBulkEnrollment , getSelectedPaceContext } from '../../reducers/pace_contexts'
-import { getResponsiveSize } from '../../reducers/ui'
-import type { SummarizedChange } from '../../utils/change_tracking'
+import {isBulkEnrollment, getSelectedPaceContext} from '../../reducers/pace_contexts'
+import {getResponsiveSize} from '../../reducers/ui'
+import type {SummarizedChange} from '../../utils/change_tracking'
 import PaceModalHeading from './heading'
-import { getEnrolledSection } from '../../reducers/enrollments'
+import {getEnrolledSection} from '../../reducers/enrollments'
 import PaceModalStats from './stats'
-import { generateModalLauncherId } from '../../utils/utils'
+import {generateModalLauncherId} from '../../utils/utils'
 import TimeSelection from './TimeSelection'
 import WeightedAssignmentsTray from '../header/settings/WeightedAssignmentsTray'
-import { Alert } from '@instructure/ui-alerts'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = createI18nScope('course_paces_modal')
 
@@ -124,7 +124,7 @@ export const PaceModal = ({
       return I18n.t('Loading...')
     }
 
-    if(props.isBulkEnrollment) {
+    if (props.isBulkEnrollment) {
       return I18n.t('Bulk Edit Student Pacing')
     } else if (props.coursePace.context_type === 'Course') {
       title = I18n.t('Course Pace')
@@ -166,13 +166,17 @@ export const PaceModal = ({
   }
 
   const renderMasteryPathWarning = () => {
-    if (!ENV.FEATURES.course_pace_pacing_with_mastery_paths || !ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
+    if (
+      !ENV.FEATURES.course_pace_pacing_with_mastery_paths ||
+      !ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+    ) {
       return null
     }
     return (
       <Alert variant="warning" margin="small">
-        All assignments in any Mastery Path are not assigned to all students.
-        As a student progresses through any Mastery Path, assignments will be assigned based on a student&apos;s performance.
+        All assignments in any Mastery Path are not assigned to all students. As a student
+        progresses through any Mastery Path, assignments will be assigned based on a student&apos;s
+        performance.
       </Alert>
     )
   }
@@ -280,7 +284,7 @@ export const PaceModal = ({
         />
         {window.ENV.FEATURES.course_pace_weighted_assignments && <WeightedAssignmentsTray />}
       </Modal.Body>
-      <Modal.Footer themeOverride={{ padding: '0' }}>
+      <Modal.Footer themeOverride={{padding: '0'}}>
         <Footer
           handleCancel={handleClose}
           handleDrawerToggle={() => setTrayOpen(!trayOpen)}
@@ -296,16 +300,16 @@ export const ResponsivePaceModal = (props: ComponentProps) => (
   <Responsive
     match="media"
     query={{
-      small: { maxWidth: '80rem' },
-      large: { minWidth: '80rem' },
+      small: {maxWidth: '80rem'},
+      large: {minWidth: '80rem'},
     }}
     props={{
-      small: { responsiveSize: 'small' },
-      large: { responsiveSize: 'large' },
+      small: {responsiveSize: 'small'},
+      large: {responsiveSize: 'large'},
     }}
   >
     {/* @ts-expect-error */}
-    {({ responsiveSize }) => <PaceModal outerResponsiveSize={responsiveSize} {...props} />}
+    {({responsiveSize}) => <PaceModal outerResponsiveSize={responsiveSize} {...props} />}
   </Responsive>
 )
 
