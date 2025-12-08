@@ -95,6 +95,8 @@ class Enrollment < ActiveRecord::Base
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
   scope :current_and_invited, -> { joins(:course).where(QueryBuilder.new(:current_and_invited).conditions).readonly(false) }
   scope :current_and_future, -> { joins(:course).where(QueryBuilder.new(:current_and_future).conditions).readonly(false) }
+  scope :concluded, -> { joins(:course).where(QueryBuilder.new(:completed).conditions).readonly(false) }
+  scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
   scope :horizon, -> { joins(:course).where(courses: { horizon_course: true }) }
   scope :not_horizon, -> { joins(:course).where(courses: { horizon_course: false }) }
 
@@ -1379,9 +1381,6 @@ class Enrollment < ActiveRecord::Base
                                        joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
                                                                .where("enrollment_states.state IN ('invited', 'pending_invited', 'pending_active')")
                                      }
-  scope :active_or_completed_by_date, lambda {
-    joins(:course).joins(:enrollment_state).where(enrollment_states: { restricted_access: false }).where("enrollment_states.state IN ('active', 'completed')")
-  }
   scope :completed_by_date,
         -> { joins(:enrollment_state).where(enrollment_states: { restricted_access: false, state: "completed" }) }
   scope :not_inactive_by_date, lambda {
