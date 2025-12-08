@@ -446,20 +446,17 @@ module Lti
         describe "when the context is a #{type}" do
           subject { helper_with_context(type) }
 
-          it "returns the concluded enrollments in a course for a user" do
+          it "returns the active enrollments in a course for a user" do
             set_up_persistance!
 
             student_enrollment = student_in_course(user:, course:, active_enrollment: true)
             student_enrollment.conclude
             teacher_enrollment = teacher_in_course(user:, course:, active_enrollment: true)
             observer_enrollment = course_with_observer(user:, course:)
-            # explicitly set enrollment_state to test soft-concluded (do not use in production code)
-            observer_enrollment.enrollment_state.update(state: "completed")
-
-            concluded_enrollments = subject.concluded_course_enrollments
-            expect(concluded_enrollments).to include student_enrollment
-            expect(concluded_enrollments).not_to include teacher_enrollment
-            expect(concluded_enrollments).to include observer_enrollment
+            observer_enrollment.conclude
+            expect(subject.concluded_course_enrollments).to include student_enrollment
+            expect(subject.concluded_course_enrollments).not_to include teacher_enrollment
+            expect(subject.concluded_course_enrollments).to include observer_enrollment
           end
         end
       end
