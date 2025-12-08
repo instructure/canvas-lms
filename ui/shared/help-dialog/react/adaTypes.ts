@@ -30,3 +30,7 @@ export type AdaEmbed = {
   stop?: () => Promise<void>
   subscribeEvent: (eventKey: string, callback: (data: any) => void) => Promise<number>
 }
+
+export type AdaEmbedConstructor = {
+  start: (config: any) => AdaEmbed
+}
