@@ -535,15 +535,19 @@ class EnrollmentsApiController < ApplicationController
         send(:"api_v1_#{endpoint_scope}_enrollments_url")
       )
 
+      ActiveRecord::Associations.preload(enrollments, %i[user course course_section root_account sis_pseudonym])
+
       include_group_ids = Array(params[:include]).include?("group_ids")
       includes = [:user] + Array(params[:include])
       user_json_preloads(enrollments.map(&:user), false, { group_memberships: include_group_ids })
 
-      render json: enrollments_json(enrollments,
-                                    @current_user,
-                                    session,
-                                    includes:,
-                                    opts: { grading_period: })
+      render json: enrollments.map { |e|
+        enrollment_json(e,
+                        @current_user,
+                        session,
+                        includes:,
+                        opts: { grading_period: })
+      }
     end
   end
 
@@ -1078,7 +1082,7 @@ class EnrollmentsApiController < ApplicationController
 
     if @context.grants_any_right?(@current_user, session, :read_roster, :view_all_grades, :manage_grades)
       scope = @context.apply_enrollment_visibility(@context.all_enrollments, @current_user).where(enrollment_index_conditions)
-      scope = scope.merge(Enrollment.joins(:enrollment_state)) if filtering_by_completed?
+
       unless params[:state].present?
         include_inactive = @context.grants_right?(@current_user, session, :read_as_admin)
         scope = include_inactive ? scope.all_active_or_pending : scope.active_or_pending
@@ -1090,13 +1094,9 @@ class EnrollmentsApiController < ApplicationController
       observer_enrollments = @context.observer_enrollments.active.where(user_id: @current_user)
       observed_student_ids = observer_enrollments.pluck(:associated_user_id).uniq.compact
 
-      user_enrollments = @context.enrollments.where(user: @current_user).where(enrollment_index_conditions)
-      observed_student_enrollments = @context.student_enrollments.where(user_id: observed_student_ids).where(enrollment_index_conditions)
-      if filtering_by_completed?
-        user_enrollments = user_enrollments.merge(Enrollment.joins(:enrollment_state))
-        observed_student_enrollments = observed_student_enrollments.merge(Enrollment.joins(:enrollment_state))
-      end
-      return user_enrollments.union(observed_student_enrollments)
+      return @context.enrollments.where(user: @current_user).where(enrollment_index_conditions).union(
+        @context.student_enrollments.where(user_id: observed_student_ids).where(enrollment_index_conditions)
+      )
     end
 
     render_unauthorized_action and return false
@@ -1155,9 +1155,6 @@ class EnrollmentsApiController < ApplicationController
                       user.enrollments.current_and_invited.where(enrollment_index_conditions)
                           .joins(:enrollment_state).where("enrollment_states.state<>'completed'")
                     end
-      if filtering_by_completed?
-        enrollments = enrollments.merge(Enrollment.joins(:enrollment_state))
-      end
       enrollments = enrollments.where(course_id: course) if course
     else
       if course
@@ -1187,7 +1184,6 @@ class EnrollmentsApiController < ApplicationController
         enrollments = user.enrollments.where(enrollment_index_conditions)
                           .where(root_account_id: approved_accounts)
       end
-      enrollments = enrollments.merge(Enrollment.joins(:enrollment_state)) if filtering_by_completed?
 
       # by default, return active and invited courses. don't use the existing
       # current_and_invited_enrollments scope because it won't return enrollments
@@ -1237,18 +1233,12 @@ class EnrollmentsApiController < ApplicationController
         conditions = state.filter_map { |s| Enrollment::QueryBuilder.new(s.to_sym).conditions }
         clauses << "(#{conditions.join(" OR ")})"
       else
+        clauses << "enrollments.workflow_state IN (:workflow_state)"
         unless state.is_a?(String) || (state.is_a?(Array) && state.all?(String))
           raise ActionController::BadRequest, "state must be a single string, or an array of strings"
         end
 
-        workflow_states = Array.wrap(state)
-        replacements[:workflow_states] = workflow_states
-        # we have to use enrollment_states for soft-concluded enrollments
-        clauses << if workflow_states.include?("completed")
-                     "(enrollment_states.state='completed' OR enrollments.workflow_state IN (:workflow_states))"
-                   else
-                     "enrollments.workflow_state IN (:workflow_states)"
-                   end
+        replacements[:workflow_state] = Array(state)
       end
     end
 
@@ -1312,11 +1302,5 @@ class EnrollmentsApiController < ApplicationController
       @use_bookmarking = !use_numeric_pagination_override
     end
     @use_bookmarking
-  end
-
-  def filtering_by_completed?
-    return false unless params[:state].present?
-
-    params[:state].include?("completed") || params[:state].include?("current_and_concluded")
   end
 end

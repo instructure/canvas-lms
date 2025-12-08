@@ -656,12 +656,11 @@ class MessageableUser
         common_role_column: "enrollments.type"
       }.merge(options)
       scope = base_scope(options)
-      scope = scope.joins(:enrollments)
+      scope = scope.joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=users.id")
 
       enrollment_conditions = self.class.enrollment_conditions(options)
       if enrollment_conditions
-        scope = scope.joins(enrollments: :enrollment_state) unless options[:include_concluded] == false
-        scope = scope.joins(enrollments: :course) unless options[:course_workflow_state]
+        scope = scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id") unless options[:course_workflow_state]
         scope = scope.where(enrollment_conditions)
       else
         scope = scope.none
@@ -880,8 +879,6 @@ class MessageableUser
                                   enrollments.user_id=users.id AND
                                   enrollments.course_id=groups.context_id
                                 INNER JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id
-                                INNER JOIN #{EnrollmentState.quoted_table_name} ON
-                                  enrollment_states.enrollment_id=enrollments.id
                               SQL
                               .where(workflow_state: "accepted")
                               .where("groups.workflow_state<>'deleted'")
