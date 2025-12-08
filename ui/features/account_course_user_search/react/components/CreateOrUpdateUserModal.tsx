@@ -190,6 +190,8 @@ export default function CreateOrUpdateUserModal(props: Props) {
 
       if (field === 'user[name]') {
         // shamelessly copypasted from user_sortable_name.js
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - nameParts' second argument (prior_parts) is optional at runtime but required by tsgo
         const sortableNameParts = nameParts(trim(updatedUser.sortable_name))
         if (
           !trim(updatedUser.sortable_name) ||
@@ -278,6 +280,8 @@ export default function CreateOrUpdateUserModal(props: Props) {
       try {
         if (error instanceof FetchApiError) {
           const errorJson = await error.response.json()
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - registrationErrors' second argument (defaults) is optional at runtime but required by tsgo
           const fetchErrors = registrationErrors(errorJson.errors)
           setErrors(prevErrors => ({
             ...defaultErrors,

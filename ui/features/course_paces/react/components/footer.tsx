@@ -146,7 +146,7 @@ export const Footer = ({
   if (allowDraftPaces && isDraftPace) pubDisabled = false
 
   // This wrapper div attempts to roughly match the dimensions of the publish button
-  let publishLabel = I18n.t('Publish')
+  let publishLabel: React.ReactNode = I18n.t('Publish')
   if (newPace) {
     publishLabel = I18n.t('Create Pace')
   } else {
@@ -170,7 +170,7 @@ export const Footer = ({
 
   const getSaveDraftButton = () => {
     if (allowDraftPaces && !isBulkEnrollment) {
-      let saveDraftLabel = I18n.t('Save as Draft')
+      let saveDraftLabel: React.ReactNode = I18n.t('Save as Draft')
       let draftTip = I18n.t('Save this pace as a draft without publishing.')
       if (!saveDraftEnabled && !isDraftPace) {
         return null

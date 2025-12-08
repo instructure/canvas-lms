@@ -69,10 +69,13 @@ class SetDefaultGradeDialogManager {
     }
   }
 
-  // @ts-expect-error
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore Legacy method callback not typed
   async showDialog(cb) {
     if (this.isAdmin || !this.assignment.inClosedGradingPeriod) {
       const SetDefaultGradeDialog = await AsyncComponents.loadSetDefaultGradeDialog()
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore Legacy dialog class not typed
       const dialog = new SetDefaultGradeDialog(this.getSetDefaultGradeDialogOptions())
 
       dialog.show(cb)

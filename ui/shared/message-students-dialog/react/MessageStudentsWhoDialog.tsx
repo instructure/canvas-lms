@@ -587,7 +587,7 @@ const MessageStudentsWhoDialog = ({
 
       const args: SendMessageArgs = {
         recipientsIds: uniqueRecipientsIds,
-        subject,
+        subject: subject ?? '',
         body: message.trim(),
       }
 

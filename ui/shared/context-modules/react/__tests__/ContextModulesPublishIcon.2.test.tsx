@@ -206,7 +206,7 @@ describe('ContextModulesPublishIcon', () => {
 
   it('disables the Publish All menu button when publishing or unpublishing', async () => {
     // ts is inferring what window.modules should look like. I don't care about anything else.
-    // @ts-expect-error
+    // @ts-expect-error - window.modules is a Canvas global not in TS types
     window.modules = {
       updatePublishMenuDisabledState: jest.fn(),
     }
@@ -220,6 +220,8 @@ describe('ContextModulesPublishIcon', () => {
       const publishButton = getByText('Unpublish module and all items')
       userEvent.click(publishButton)
       waitFor(() => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - window.modules is a Canvas global not in TS types
         expect(window.modules.updatePublishMenuDisabledState).toHaveBeenCalledWith(true)
       })
       resolve({response: new Response('', {status: 200}), json: {published: false}, text: ''})
@@ -227,6 +229,8 @@ describe('ContextModulesPublishIcon', () => {
     mockDoFetchApi.mockReturnValue(fetchPromise)
     await fetchPromise
     waitFor(() => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - window.modules is a Canvas global not in TS types
       expect(window.modules.updatePublishMenuDisabledState).toHaveBeenCalledWith(false)
     })
   })

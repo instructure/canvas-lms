@@ -88,11 +88,14 @@ export const OverlayHistoryView = (props: OverlayHistoryViewProps) => {
                       entry.created_by === 'Instructure'
                         ? I18n.t('Instructure')
                         : entry.created_by.name
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
+                    const formattedDate = tz.format(createdAt, 'date.formats.full')
 
                     return (
                       <Table.Row key={index}>
                         <Table.Cell>{status}</Table.Cell>
-                        <Table.Cell>{tz.format(createdAt, 'date.formats.full')}</Table.Cell>
+                        <Table.Cell>{formattedDate}</Table.Cell>
                         <Table.Cell>{createdBy}</Table.Cell>
                       </Table.Row>
                     )

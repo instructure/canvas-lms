@@ -21,6 +21,8 @@ import Backbone from '@canvas/backbone'
 import {map} from 'es-toolkit/compat'
 
 describe('UniqueDropdownCollection', () => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - Backbone collection type not fully specified
   let records: Backbone.Model[], coll: UniqueDropdownCollection
 
   beforeEach(() => {
@@ -31,6 +33,8 @@ describe('UniqueDropdownCollection', () => {
       }
       return result
     })()
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection constructor accepts initial models
     coll = new UniqueDropdownCollection(records, {
       propertyName: 'state',
       possibleValues: map([1, 2, 3, 4], i => i.toString()),
@@ -72,12 +76,14 @@ describe('UniqueDropdownCollection', () => {
       done()
     })
 
-    // @ts-expect-error - Backbone collection method
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection methods
     coll.remove(coll.get(1))
   })
 
   test('overrides add to munge params with an available value', () => {
-    // @ts-expect-error - Backbone collection property
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection property
     coll.model = Backbone.Model
 
     coll.add({})
@@ -85,12 +91,14 @@ describe('UniqueDropdownCollection', () => {
     expect(coll.availableValues).toHaveLength(0)
     expect(coll.takenValues).toHaveLength(4)
     expect(coll.takenValues.get('4') instanceof Backbone.Model).toBe(true)
-    // @ts-expect-error - Backbone collection methods
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection methods
     expect(coll.at(coll.length - 1).get('state')).toBe('4')
   })
 
   test('add should take the value from the front of the available values collection', done => {
-    // @ts-expect-error - Backbone collection methods
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection methods
     coll.remove(coll.at(0))
 
     const first_avail = coll.availableValues.at(0).get('state')
@@ -99,7 +107,8 @@ describe('UniqueDropdownCollection', () => {
       done()
     })
 
-    // @ts-expect-error - Backbone collection property
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection property
     coll.model = Backbone.Model
 
     coll.add({})
@@ -107,6 +116,8 @@ describe('UniqueDropdownCollection', () => {
 })
 
 describe('UniqueDropdownCollection, lazy setup', () => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - Backbone collection type not fully specified
   let records: Backbone.Model[], coll: UniqueDropdownCollection
 
   beforeEach(() => {
@@ -117,6 +128,8 @@ describe('UniqueDropdownCollection, lazy setup', () => {
       }
       return result
     })()
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection constructor accepts initial models
     coll = new UniqueDropdownCollection([], {
       propertyName: 'state',
       possibleValues: map([1, 2, 3, 4], i => i.toString()),
@@ -125,7 +138,8 @@ describe('UniqueDropdownCollection, lazy setup', () => {
 
   test('reset of collection recalculates availableValues', () => {
     expect(coll.availableValues).toHaveLength(4)
-    // @ts-expect-error - Backbone collection method
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection method
     coll.reset(records)
     expect(coll.availableValues).toHaveLength(1)
   })

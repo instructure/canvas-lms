@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
-import PeerReviewDetails from '../PeerReviewDetails'
+import PeerReviewDetails, {type AssignmentModel} from '../PeerReviewDetails'
 import {MAX_NUM_PEER_REVIEWS} from '../hooks/usePeerReviewSettings'
 
 jest.mock('@canvas/graphql', () => ({
@@ -54,12 +54,12 @@ function renderWithQueryClient(ui: React.ReactElement) {
 }
 
 describe('PeerReviewDetails', () => {
-  let assignment: Assignment
+  let assignment: AssignmentModel
   let user: ReturnType<typeof userEvent.setup>
 
   beforeEach(() => {
     user = userEvent.setup()
-    assignment = createMockAssignment() as unknown as Assignment
+    assignment = createMockAssignment() as unknown as AssignmentModel
     assignment.peerReviews = jest.fn(() => false)
     assignment.moderatedGrading = jest.fn(() => false)
 
@@ -769,7 +769,7 @@ describe('PeerReviewDetails', () => {
           points_possible: 25,
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -785,7 +785,7 @@ describe('PeerReviewDetails', () => {
           points_possible: 20,
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -801,7 +801,7 @@ describe('PeerReviewDetails', () => {
           points_possible: 10,
           grading_type: 'pass_fail',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -817,7 +817,7 @@ describe('PeerReviewDetails', () => {
         peerReviews: jest.fn(() => true),
         peerReviewCount: jest.fn(() => 2),
         anonymousPeerReviews: jest.fn(() => true),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -834,7 +834,7 @@ describe('PeerReviewDetails', () => {
         peerReviewCount: jest.fn(() => 2),
         intraGroupPeerReviews: jest.fn(() => true),
         groupCategoryId: jest.fn(() => '123'), // Make it a group assignment
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -919,7 +919,7 @@ describe('PeerReviewDetails', () => {
         peerReviewCount: jest.fn(() => 2),
         groupCategoryId: jest.fn(() => '123'),
         intraGroupPeerReviews: jest.fn(() => true),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -944,7 +944,7 @@ describe('PeerReviewDetails', () => {
         peerReviews: jest.fn(() => true),
         peerReviewCount: jest.fn(() => 2),
         anonymousPeerReviews: jest.fn(() => true),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -969,7 +969,7 @@ describe('PeerReviewDetails', () => {
         peerReviews: jest.fn(() => true),
         peerReviewCount: jest.fn(() => 2),
         peerReviewSubmissionRequired: jest.fn(() => true),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -997,7 +997,7 @@ describe('PeerReviewDetails', () => {
           points_possible: 10,
           grading_type: 'pass_fail',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -1015,7 +1015,7 @@ describe('PeerReviewDetails', () => {
           points_possible: 10,
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -1103,7 +1103,7 @@ describe('PeerReviewDetails', () => {
       const assignmentWithData = createMockAssignment({
         peerReviews: jest.fn(() => true),
         peerReviewCount: jest.fn(() => 3),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -1121,7 +1121,7 @@ describe('PeerReviewDetails', () => {
           points_possible: 10, // 10 / 2 = 5
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -1169,7 +1169,7 @@ describe('PeerReviewDetails', () => {
           points_possible: 15,
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -1207,7 +1207,7 @@ describe('PeerReviewDetails', () => {
           points_possible: 3.7, // 3.7 / 3 = 1.233333...
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -1223,7 +1223,7 @@ describe('PeerReviewDetails', () => {
           points_possible: 31.996, // 31.996 / 4 = 7.999, should round to 8
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 

@@ -152,6 +152,8 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
                       contentTagId={_id}
                       content={content}
                       itemIcon={itemIcon}
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore itemTypeText may be null, preserving original behavior
                       itemTypeText={itemTypeText}
                       completionRequirement={cr}
                       checkpoints={content.checkpoints}

@@ -199,6 +199,8 @@ const Columns: ReadonlyArray<Column> = [
     header: I18n.t('Installed On'),
     width: '130px',
     sortable: true,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
     render: r => <div>{tz.format(r.created_at, 'date.formats.medium')}</div>,
   },
   {
@@ -227,6 +229,8 @@ const Columns: ReadonlyArray<Column> = [
     header: I18n.t('Updated On'),
     width: '130px',
     sortable: true,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
     render: r => <div>{tz.format(r.updated_at, 'date.formats.medium')}</div>,
   },
   {

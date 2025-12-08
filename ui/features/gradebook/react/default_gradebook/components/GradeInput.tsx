@@ -93,7 +93,7 @@ function hasGradeChanged(props: Props, state: {grade: string}) {
 function assignmentLabel(assignment: CamelizedAssignment, formatType: GradeEntryMode) {
   switch (formatType) {
     case 'points': {
-      const points = I18n.n(assignment.pointsPossible, {
+      const points = I18n.n(assignment.pointsPossible ?? 0, {
         strip_insignificant_zeros: true,
         precision: 2,
       })

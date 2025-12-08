@@ -47,6 +47,6 @@ export const SurveyLinkBox = ({url, text, marginTop}) => {
 
 SurveyLinkBox.propTypes = {
   url: PropTypes.string,
-  text: PropTypes.object,
+  text: PropTypes.string,
   marginTop: PropTypes.string,
 }

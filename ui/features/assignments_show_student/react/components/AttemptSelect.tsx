@@ -91,7 +91,7 @@ export default function AttemptSelect({
 
   const attemptList = orderBy(uniqBy(filteredSubmissions, 'attempt'), 'attempt').map(sub => {
     const attemptNumber = sub.attempt || 1
-    return [I18n.t('Attempt %{attempt}', {attempt: attemptNumber}), sub.attempt]
+    return [I18n.t('Attempt %{attempt}', {attempt: attemptNumber}), sub.attempt] as const
   })
 
   function handleSubmissionChange(

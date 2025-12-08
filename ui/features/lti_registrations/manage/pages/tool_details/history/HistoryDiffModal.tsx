@@ -73,6 +73,8 @@ export const HistoryDiffModal: React.FC<HistoryDiffModalProps> = ({entry, isOpen
             {I18n.t('Changes by %{userName} on %{date}', {
               userName:
                 entry.created_by === 'Instructure' ? I18n.t('Instructure') : entry.created_by.name,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
               date: tz.format(entry.created_at, 'date.formats.full'),
             })}
           </Heading>

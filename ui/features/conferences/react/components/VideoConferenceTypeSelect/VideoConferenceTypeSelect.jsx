@@ -96,7 +96,7 @@ const VideoConferenceTypeSelect = ({conferenceTypes, onSetConferenceType, isEdit
   )
 }
 
-VideoConferenceTypeSelect.prototype = {
+VideoConferenceTypeSelect.propTypes = {
   conferenceTypes: arrayOf(PropTypes.object),
   onSetConferenceType: PropTypes.func,
   isEditing: PropTypes.bool,

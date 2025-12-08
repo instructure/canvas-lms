@@ -4271,7 +4271,10 @@ EG = {
       if (!submissions[0].submission.excused) {
         const outlierScoreHelper = new OutlierScoreHelper(score, pointsPossible)
         if (outlierScoreHelper.hasWarning()) {
-          $.flashWarning(outlierScoreHelper.warningMessage())
+          const warningMessage = outlierScoreHelper.warningMessage()
+          if (warningMessage) {
+            $.flashWarning(warningMessage)
+          }
         }
       }
 

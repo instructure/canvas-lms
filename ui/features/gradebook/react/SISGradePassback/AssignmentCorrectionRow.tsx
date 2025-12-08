@@ -40,8 +40,7 @@ class AssignmentCorrectionRow extends React.Component<Props> {
 
   dueAtRef: React.RefObject<HTMLInputElement>
 
-  // @ts-expect-error
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
     this.nameRef = React.createRef<HTMLInputElement>()
     this.dueAtRef = React.createRef<HTMLInputElement>()
@@ -64,6 +63,8 @@ class AssignmentCorrectionRow extends React.Component<Props> {
   initDueAtDateTimeField = () => {
     if (this.dueAtRef.current) {
       const $picker = $(this.dueAtRef.current)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - jQuery DatetimeField plugin method
       renderDatetimeField($picker).change(this.handleDateChanged)
     }
   }
@@ -201,6 +202,7 @@ class AssignmentCorrectionRow extends React.Component<Props> {
             type="text"
             aria-label={I18n.t('Assignment Name')}
             className="input-mlarge assignment-name"
+            // @ts-expect-error placeholder expects string | undefined, not null
             placeholder={assignment.name ? null : I18n.t('No Assignment Name')}
             defaultValue={unescape(assignment.name)}
             onChange={this.updateAssignmentName}
