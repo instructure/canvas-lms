@@ -67,6 +67,7 @@ describe('GroupCategoryView', () => {
     model.canMessageUnassignedMembers = () => true
     model.canAssignUnassignedMembers = () => true
     model.isLocked = () => false
+    model.downloadGroupCategoryRosterCSVPath = () => '/api/v1/group_categories/123/export'
 
     new GroupCategoryView({model})
   })

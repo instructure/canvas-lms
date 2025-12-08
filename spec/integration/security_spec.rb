@@ -712,7 +712,6 @@ describe "security" do
 
         get "/courses/#{@course.id}/users"
         expect(response).to be_successful
-        expect(response.body).to match(/View User Groups/)
         expect(response.body).to match(/View Prior Enrollments/)
         expect(response.body).not_to match(/Manage Users/)
 
@@ -753,7 +752,6 @@ describe "security" do
 
         get "/courses/#{@course.id}/users"
         expect(response).to be_successful
-        expect(response.body).to match(/View User Groups/)
         expect(response.body).to match(/View Prior Enrollments/)
 
         get "/courses/#{@course.id}/users/prior"

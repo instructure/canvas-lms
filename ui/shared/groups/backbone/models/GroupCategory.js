@@ -272,4 +272,8 @@ GroupCategory.prototype.urlFor = function (method) {
   }
 }
 
+GroupCategory.prototype.downloadGroupCategoryRosterCSVPath = function () {
+  return `/api/v1/group_categories/${this.id}/export`
+}
+
 export default GroupCategory
