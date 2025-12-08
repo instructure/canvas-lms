@@ -4935,32 +4935,6 @@ describe CoursesController do
         expect(json[0]).to include({ "id" => student1.id })
       end
     end
-
-    it "enrollment status not impacted by role" do
-      user_session(teacher)
-      term = Account.default.enrollment_terms.create!(name: "Future Start",
-                                                      start_at: 6.months.from_now,
-                                                      end_at: 1.year.from_now)
-      course.update(enrollment_term: term)
-      course.restrict_student_future_view = true
-      course.save!
-      get "users", params: {
-        course_id: course.id,
-        format: "json",
-        include: ["enrollments"]
-      }
-
-      json = json_parse(response.body)
-      expect(response).to be_successful
-      expect(json.length).to eq(3)
-      # all teachers and students should have active enrollments
-      # iterate over all enrollments in the json response
-      json.each do |user|
-        user["enrollments"].each do |enrollment|
-          expect(enrollment["enrollment_state"]).to eq("active")
-        end
-      end
-    end
   end
 
   describe "#content_share_users" do

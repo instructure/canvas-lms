@@ -299,11 +299,6 @@ module Api::V1::User
       json[:enrollment_state] = json.delete("workflow_state")
       if enrollment.course.workflow_state == "deleted" || enrollment.course_section.workflow_state == "deleted"
         json[:enrollment_state] = "deleted"
-      elsif enrollment.enrollment_state.state == "completed"
-        # using enrollment_state.state here since enrollment.workflow_state is not always accurate to
-        # course/term completion status. Not using state_based_on_date since that determines
-        # state partially by role
-        json[:enrollment_state] = "completed"
       end
       json[:role] = enrollment.role.name
       json[:role_id] = enrollment.role_id
