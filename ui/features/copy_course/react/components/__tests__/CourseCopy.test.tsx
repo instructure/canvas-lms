@@ -20,16 +20,21 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {render, fireEvent, screen, waitFor, getByTestId} from '@testing-library/react'
 import React from 'react'
-import CourseCopy from '../CourseCopy'
+import CourseCopy, {onErrorCallback} from '../CourseCopy'
 import {
   courseCopyRootKey,
   courseFetchKey,
   enrollmentTermsFetchKey,
   createCourseAndMigrationKey,
 } from '../../types'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
+}))
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: jest.fn(() => jest.fn()),
 }))
 
 describe('CourseCopy', () => {
@@ -212,5 +217,35 @@ describe('CourseCopy', () => {
 
     await fireEvent.click(getByTestId('clear-migration-button'))
     expect(assignLocation).toHaveBeenCalledWith(`/courses/${defaultProps.courseId}/settings`)
+  })
+
+  describe('onErrorCallback', () => {
+    it('shows generic error message for general errors', async () => {
+      const mockError = {
+        response: {
+          json: jest.fn().mockResolvedValue({error: 'some_other_error'}),
+        },
+      }
+
+      await onErrorCallback(mockError as any)
+
+      expect(showFlashError).toHaveBeenCalledWith(
+        'Something went wrong during copy course operation. Reload the page and try again.',
+      )
+    })
+
+    it('shows specific error message for manually_created_courses_subaccount_error', async () => {
+      const mockError = {
+        response: {
+          json: jest.fn().mockResolvedValue({error: 'manually_created_courses_subaccount_error'}),
+        },
+      }
+
+      await onErrorCallback(mockError as any)
+
+      expect(showFlashError).toHaveBeenCalledWith(
+        "You can't copy this course because course creation is restricted to the Manually Created Courses sub-account. Please contact your administrator for help.",
+      )
+    })
   })
 })
