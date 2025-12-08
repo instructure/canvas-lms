@@ -131,15 +131,12 @@ function afterDocumentReady() {
   }
 
   // Only import the module if the persisted state indicates it
-  // should be open, to avoid unnecessary loading
-  if (localStorage.getItem('persistedAdaClosed') === 'false') {
+  // should be restored (open or minimized), to avoid unnecessary loading
+  const adaState = localStorage.getItem('persistedAdaState')
+  if (adaState === 'open' || adaState === 'minimized') {
     import('./shared/help-dialog/react/AdaChatbot')
       .then(module => {
-        if (typeof window !== 'undefined' && window.adaEmbed) {
-          module.autoRestoreAda()
-        } else {
-          console.warn('Ada embed script not available: autoRestoreAda not called')
-        }
+        module.autoRestoreAda()
       })
       .catch(error => console.error('Failed to load AdaChatbot:', error))
   }
