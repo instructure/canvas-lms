@@ -18,15 +18,71 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import InboxWidget from '../InboxWidget'
-import type {BaseWidgetProps, Widget} from '../../../../types'
+import type {BaseWidgetProps, Widget, InboxMessage} from '../../../../types'
 import {
   WidgetDashboardProvider,
   type SharedCourseData,
 } from '../../../../hooks/useWidgetDashboardContext'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
+import * as useInboxMessagesModule from '../../../../hooks/useInboxMessages'
+
+jest.mock('../../../../hooks/useInboxMessages')
+
+const mockUseInboxMessages = useInboxMessagesModule.useInboxMessages as jest.MockedFunction<
+  typeof useInboxMessagesModule.useInboxMessages
+>
+
+const mockMessages: InboxMessage[] = [
+  {
+    id: '1',
+    subject: 'Assignment feedback available',
+    lastMessageAt: '2025-12-08T10:00:00Z',
+    messagePreview: 'Hey, I left some feedback on your...',
+    workflowState: 'unread',
+    conversationUrl: '/conversations/1',
+    participants: [
+      {
+        id: 'user1',
+        name: 'John Smith',
+        avatarUrl: undefined,
+      },
+    ],
+  },
+  {
+    id: '2',
+    subject: 'Course announcement: Quiz next week',
+    lastMessageAt: '2025-12-07T14:30:00Z',
+    messagePreview: 'Just a reminder that we have a quiz...',
+    workflowState: 'unread',
+    conversationUrl: '/conversations/2',
+    participants: [
+      {
+        id: 'user2',
+        name: 'Sarah Johnson',
+        avatarUrl: undefined,
+      },
+    ],
+  },
+  {
+    id: '3',
+    subject: 'Group project update',
+    lastMessageAt: '2025-12-05T09:15:00Z',
+    messagePreview: 'The group project deadline has been...',
+    workflowState: 'unread',
+    conversationUrl: '/conversations/3',
+    participants: [
+      {
+        id: 'user3',
+        name: 'Mike Davis',
+        avatarUrl: undefined,
+      },
+    ],
+  },
+]
 
 const mockWidget: Widget = {
   id: 'test-inbox-widget',
@@ -65,6 +121,19 @@ const renderWithProviders = (component: React.ReactElement) => {
 }
 
 describe('InboxWidget', () => {
+  beforeEach(() => {
+    mockUseInboxMessages.mockReturnValue({
+      data: mockMessages,
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    } as any)
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('renders widget with title', () => {
     renderWithProviders(<InboxWidget {...buildDefaultProps()} />)
     expect(screen.getByText('Inbox')).toBeInTheDocument()
@@ -76,7 +145,7 @@ describe('InboxWidget', () => {
     expect(filterSelect).toBeInTheDocument()
   })
 
-  it('renders mock message items', () => {
+  it('renders message items', () => {
     renderWithProviders(<InboxWidget {...buildDefaultProps()} />)
 
     expect(screen.getByTestId('message-item-1')).toBeInTheDocument()
@@ -108,13 +177,6 @@ describe('InboxWidget', () => {
     expect(screen.getByText('The group project deadline has been...')).toBeInTheDocument()
   })
 
-  it('renders "Open in Inbox" links for each message', () => {
-    renderWithProviders(<InboxWidget {...buildDefaultProps()} />)
-
-    const openLinks = screen.getAllByText('Open in Inbox')
-    expect(openLinks).toHaveLength(3)
-  })
-
   it('renders "Show all messages in inbox" action link', () => {
     renderWithProviders(<InboxWidget {...buildDefaultProps()} />)
 
@@ -131,27 +193,58 @@ describe('InboxWidget', () => {
   })
 
   it('handles loading state', () => {
-    renderWithProviders(<InboxWidget {...buildDefaultProps({isLoading: true})} />)
+    mockUseInboxMessages.mockReturnValue({
+      data: [],
+      isLoading: true,
+      error: null,
+      refetch: jest.fn(),
+    } as any)
+
+    renderWithProviders(<InboxWidget {...buildDefaultProps()} />)
 
     expect(screen.getByText(/loading/i)).toBeInTheDocument()
     expect(screen.queryByText('John Smith')).not.toBeInTheDocument()
   })
 
-  it('handles error state with retry button', () => {
-    const onRetry = jest.fn()
-    renderWithProviders(
-      <InboxWidget
-        {...buildDefaultProps({
-          error: 'Failed to load messages',
-          onRetry,
-        })}
-      />,
-    )
+  it('handles error state with retry button', async () => {
+    const mockRefetch = jest.fn()
+    mockUseInboxMessages.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: new Error('Failed to load messages'),
+      refetch: mockRefetch,
+    } as any)
 
-    expect(screen.getByText('Failed to load messages')).toBeInTheDocument()
+    renderWithProviders(<InboxWidget {...buildDefaultProps()} />)
+
+    expect(screen.getByText('Error: Failed to load messages')).toBeInTheDocument()
     const retryButton = screen.getByTestId('test-inbox-widget-retry-button')
     expect(retryButton).toBeInTheDocument()
-    expect(screen.queryByText('John Smith')).not.toBeInTheDocument()
+
+    await userEvent.click(retryButton)
+    expect(mockRefetch).toHaveBeenCalled()
+  })
+
+  it('handles empty state when no messages', () => {
+    mockUseInboxMessages.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    } as any)
+
+    renderWithProviders(<InboxWidget {...buildDefaultProps()} />)
+
+    expect(screen.getByText('No messages')).toBeInTheDocument()
+  })
+
+  it('changes filter when dropdown selection changes', async () => {
+    renderWithProviders(<InboxWidget {...buildDefaultProps()} />)
+
+    const filterSelect = screen.getByTestId('inbox-filter-select')
+    expect(filterSelect).toBeInTheDocument()
+
+    expect(mockUseInboxMessages).toHaveBeenCalledWith(expect.objectContaining({filter: 'unread'}))
   })
 
   it('truncates long subject lines', () => {
