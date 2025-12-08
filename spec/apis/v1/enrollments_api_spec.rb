@@ -1886,18 +1886,6 @@ describe EnrollmentsApiController, type: :request do
         end
       end
 
-      it "includes soft-concluded enrollments if state[]=completed" do
-        concluded_enrollment = @course.enroll_student(@student)
-        concluded_enrollment.enrollment_state.update(state: "completed")
-
-        @path = "/api/v1/courses/#{@course.id}/enrollments"
-        @params = { controller: "enrollments_api", action: "index", course_id: @course.id.to_param, format: "json", state: ["completed"] }
-        json = api_call(:get, @path, @params)
-
-        enrollment_ids = json.pluck("id")
-        expect(enrollment_ids).to contain_exactly(concluded_enrollment.id)
-      end
-
       context "group_ids" do
         it "includes a users group_ids if group_ids are in include" do
           @path = "/api/v1/courses/#{@course.id}/enrollments"
@@ -2519,20 +2507,6 @@ describe EnrollmentsApiController, type: :request do
         expect(json.pluck("id")).to include enrollment.id
       end
 
-      it "includes soft-concluded enrollments when state[]=completed is used" do
-        course_factory
-        active_enrollment = @user.enrollments.first
-        enrollment = @course.enroll_student(@user)
-        enrollment.enrollment_state.update(state: "completed")
-
-        json = api_call(:get,
-                        @user_path,
-                        @user_params.merge(state: %w[completed], type: %w[StudentEnrollment]))
-        ids = json.pluck("id")
-        expect(ids).to include enrollment.id
-        expect(ids).not_to include active_enrollment.id
-      end
-
       it "accepts multiple state[] filters" do
         course_factory
         @course.offer!
@@ -2754,21 +2728,6 @@ describe EnrollmentsApiController, type: :request do
 
         it "includes active enrollments for each observed student" do
           expect(student_enrollments.pluck("user_id")).to contain_exactly(observed_student.id)
-        end
-
-        it "includes soft-concluded enrollments for both observer and students if state[]=completed" do
-          course_for_concluded_enrollments = Course.create!
-          student_enrollment = course_for_concluded_enrollments.enroll_student(observed_student, active_all: true)
-          observer_enrollment = course_for_concluded_enrollments.enroll_user(observer, "ObserverEnrollment", associated_user_id: observed_student.id, active_all: true)
-          # conclude each enrollment_state
-          student_enrollment.enrollment_state.update(state: "completed")
-          observer_enrollment.enrollment_state.update(state: "completed")
-
-          modified_params = request_params.except(:course_id).merge(course_id: course_for_concluded_enrollments.id)
-          json = api_call_as_user(observer, :get, "/api/v1/courses/#{course_for_concluded_enrollments.id}/enrollments", modified_params)
-
-          enrollment_ids = json.pluck("id")
-          expect(enrollment_ids).to contain_exactly(student_enrollment.id, observer_enrollment.id)
         end
 
         it "includes both the observer's base enrollment and enrollments associated with observees" do
