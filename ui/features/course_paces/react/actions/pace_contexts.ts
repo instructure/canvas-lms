@@ -124,7 +124,10 @@ const thunkActions = {
       }
     }
   },
-  syncPublishingPaces: (loadLatestPaceByContextAction: Function, restart: boolean = false): ThunkAction<void, StoreState, void, Action> => {
+  syncPublishingPaces: (
+    loadLatestPaceByContextAction: Function,
+    restart: boolean = false,
+  ): ThunkAction<void, StoreState, void, Action> => {
     return (dispatch, getState) => {
       const {contextsPublishing, entries} = getState().paceContexts
       const loadedCodes = entries.map(({type, item_id}) => `${type}${item_id}`)
@@ -139,9 +142,7 @@ const thunkActions = {
       }))
       contextsToLoad.forEach(({pace_context}) => {
         const contextType = CONTEXT_TYPE_MAP[pace_context.type]
-        dispatch(
-          loadLatestPaceByContextAction(contextType, pace_context.item_id, null, false),
-        )
+        dispatch(loadLatestPaceByContextAction(contextType, pace_context.item_id, null, false))
         dispatch(regularActions.updatePublishingPaces(updatedPaceContextsProgress))
       })
     }

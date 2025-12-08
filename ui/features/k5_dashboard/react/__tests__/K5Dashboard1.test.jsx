@@ -296,12 +296,12 @@ describe('K-5 Dashboard', () => {
       render(<K5Dashboard {...defaultProps} />)
       await waitFor(() => {
         const announcementCalls = axiosMock.history.get.filter(call =>
-          call.url.match(/\/api\/v1\/announcements.*/)
+          call.url.match(/\/api\/v1\/announcements.*/),
         )
         expect(announcementCalls).toHaveLength(0)
 
         const externalToolsCalls = axiosMock.history.get.filter(call =>
-          call.url.match(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/)
+          call.url.match(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/),
         )
         expect(externalToolsCalls).toHaveLength(0)
       })

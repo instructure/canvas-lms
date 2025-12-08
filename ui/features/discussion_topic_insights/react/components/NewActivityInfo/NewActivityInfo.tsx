@@ -32,7 +32,11 @@ const NewActivityInfo = () => {
       renderCloseButtonLabel="Close"
       margin="0 0 large 0"
     >
-      <Text>{I18n.t('The discussion board has some new activity since the last insights were generated.')}</Text>
+      <Text>
+        {I18n.t(
+          'The discussion board has some new activity since the last insights were generated.',
+        )}
+      </Text>
     </Alert>
   )
 }

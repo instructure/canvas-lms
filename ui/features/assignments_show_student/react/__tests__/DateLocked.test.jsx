@@ -29,7 +29,7 @@ describe('DateLocked', () => {
   it('includes date in lock reason text', () => {
     const container = render(<DateLocked date="2020-07-04T19:30:00-01:00" type="assignment" />)
     expect(
-      container.getByText('This assignment is locked until Jul 4, 2020 at 8:30pm.')
+      container.getByText('This assignment is locked until Jul 4, 2020 at 8:30pm.'),
     ).toBeInTheDocument()
   })
 })

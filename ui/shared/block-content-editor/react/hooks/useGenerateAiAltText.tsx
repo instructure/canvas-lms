@@ -31,7 +31,10 @@ export const useGenerateAiAltText = (options: UseGenerateAiAltTextOptions) => {
     mutationFn: async ({
       attachmentId,
       signal,
-    }: {attachmentId: string | number; signal?: AbortSignal}) => {
+    }: {
+      attachmentId: string | number
+      signal?: AbortSignal
+    }) => {
       if (!options.url) {
         throw Error('URL is missing for alt text generation')
       }

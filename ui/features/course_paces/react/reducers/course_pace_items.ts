@@ -21,14 +21,13 @@ import {
   Constants as CoursePaceItemConstants,
   type CoursePaceItemAction,
 } from '../actions/course_pace_items'
-import { calculatePaceItemDuration } from '../utils/utils'
+import {calculatePaceItemDuration} from '../utils/utils'
 
 /* Reducers */
 
 const itemsReducer = (state: CoursePaceItem[], action: CoursePaceItemAction): CoursePaceItem[] => {
   switch (action.type) {
-    case CoursePaceItemConstants.SET_PACE_ITEM_DURATION:
-      {
+    case CoursePaceItemConstants.SET_PACE_ITEM_DURATION: {
       return state.map(item => {
         return item.module_item_id === action.payload.paceItemId
           ? {...item, duration: action.payload.duration}

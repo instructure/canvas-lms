@@ -77,7 +77,7 @@ describe('DirectShareOperationStatus', () => {
 
   describe('errors', () => {
     beforeEach(() => jest.spyOn(console, 'error').mockImplementation(() => {}))
-    afterEach(() => console.error.mockRestore())  
+    afterEach(() => console.error.mockRestore())
 
     it('shows error when promise is rejected', async () => {
       const promise = Promise.reject()
@@ -91,7 +91,7 @@ describe('DirectShareOperationStatus', () => {
       )
       expect(await findByText('error')).toBeInTheDocument()
       expect(queryByText(/starting|success/)).toBeNull()
-      expect(console.error).toHaveBeenCalled()  
+      expect(console.error).toHaveBeenCalled()
     })
   })
 

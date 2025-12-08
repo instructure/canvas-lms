@@ -49,7 +49,7 @@ export const NutritionFacts: React.FC<NutritionFactsProps> = ({
           shape="circle"
           color={responsiveProps.buttonColor}
         >
-          <NutritionFactsIcon size={iconSize} color={responsiveProps.color}/>
+          <NutritionFactsIcon size={iconSize} color={responsiveProps.color} />
         </IconButton>
       }
       {...STATIC_TEXT}

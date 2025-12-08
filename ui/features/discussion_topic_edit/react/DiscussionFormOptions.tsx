@@ -354,7 +354,10 @@ const RenderAllowLiking = ({options}: {options: DiscussionOptions}) => {
 const RenderAllowTodoDate = ({
   options,
   handleStudentTodoUpdate,
-}: {options: DiscussionOptions; handleStudentTodoUpdate?: (date: string) => void}) => {
+}: {
+  options: DiscussionOptions
+  handleStudentTodoUpdate?: (date: string) => void
+}) => {
   const [allowTodoDate, setAllowTodoDate] = useState(options.allow_todo_date)
   const [todoDate, setTodoDate] = useState(options.studentTodoAtDateValue)
 

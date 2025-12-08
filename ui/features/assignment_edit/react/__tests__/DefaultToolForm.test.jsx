@@ -29,7 +29,7 @@ const renderComponent = (props = {}) => {
     courseId: 1,
     toolName: 'Awesome Tool',
     previouslySelected: false,
-    hideErrors: jest.fn()
+    hideErrors: jest.fn(),
   }
   return render(<DefaultToolForm {...defaultProps} {...props} />)
 }

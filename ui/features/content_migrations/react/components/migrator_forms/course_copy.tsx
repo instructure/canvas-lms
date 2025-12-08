@@ -34,8 +34,8 @@ import {ImportLabel} from './import_label'
 import {ImportInProgressLabel} from './import_in_progress_label'
 import {ImportClearLabel} from './import_clear_label'
 import AsyncCourseSearchSelect from './common_components/async_course_search_select'
-import { CourseOption } from './types'
-import { FormMessage } from '@instructure/ui-form-field'
+import {CourseOption} from './types'
+import {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = createI18nScope('content_migrations_redesign')
 

@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {
-  CourseReport,
-} from '../types'
+import type {CourseReport} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 /* API methods */

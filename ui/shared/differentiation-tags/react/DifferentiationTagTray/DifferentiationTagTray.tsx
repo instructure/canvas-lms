@@ -54,7 +54,10 @@ export interface DifferentiationTagTrayProps {
 const Header = ({
   onClose,
   showCSVUploadView,
-}: {onClose: () => void; showCSVUploadView: boolean}) => (
+}: {
+  onClose: () => void
+  showCSVUploadView: boolean
+}) => (
   <Flex justifyItems="space-between" width="100%" padding="medium">
     <Flex.Item>
       <Heading level="h2" data-testid="differentiation-tag-header">
@@ -74,7 +77,10 @@ const Header = ({
 const EmptyState = ({
   onCreate,
   handleUploadCSV,
-}: {onCreate: () => void; handleUploadCSV: () => void}) => (
+}: {
+  onCreate: () => void
+  handleUploadCSV: () => void
+}) => (
   <Flex
     direction="column"
     alignItems="center"
@@ -319,7 +325,11 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
     file,
     onError,
     onSuccess,
-  }: {file: DataTransferItem | File; onError: () => void; onSuccess: () => void}) => {
+  }: {
+    file: DataTransferItem | File
+    onError: () => void
+    onSuccess: () => void
+  }) => {
     try {
       const actualFile = file instanceof DataTransferItem ? file.getAsFile() : file
       if (!actualFile) {

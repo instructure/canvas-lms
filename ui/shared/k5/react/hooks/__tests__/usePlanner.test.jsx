@@ -22,13 +22,13 @@ import {render, waitFor} from '@testing-library/react'
 import usePlanner from '../usePlanner'
 
 jest.mock('@canvas/planner')
- 
+
 const plannerExports = require('@canvas/planner')
 
 plannerExports.initializePlanner = jest.fn(options => Promise.resolve(options))
 
 jest.mock('@canvas/alerts/react/FlashAlert')
- 
+
 const flashAlerts = require('@canvas/alerts/react/FlashAlert')
 
 flashAlerts.showFlashError = jest.fn(() => () => {})

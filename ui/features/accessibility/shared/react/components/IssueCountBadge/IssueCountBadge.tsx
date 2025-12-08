@@ -47,7 +47,10 @@ export const formatBadgeOutput = (formattedCount: string) => {
 export const IssueCountBadge = ({
   issueCount,
   maxCount = DEFAULT_MAX_COUNT,
-}: {issueCount: number; maxCount?: number}) => {
+}: {
+  issueCount: number
+  maxCount?: number
+}) => {
   return (
     <Badge
       standalone

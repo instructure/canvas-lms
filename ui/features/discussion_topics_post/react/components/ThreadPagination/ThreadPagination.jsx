@@ -27,31 +27,32 @@ const I18n = createI18nScope('discussion_posts')
 export const NAV_BAR_HEIGHT = 64
 
 export const ThreadPagination = props => {
-
   const paddingBottom = useMemo(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    return ENV?.SEQUENCE && urlParams.get('embed') !== 'true' ? NAV_BAR_HEIGHT : 0;
+    const urlParams = new URLSearchParams(window.location.search)
+    return ENV?.SEQUENCE && urlParams.get('embed') !== 'true' ? NAV_BAR_HEIGHT : 0
   }, [])
 
-  return <div className="discussion-pagination-section" style={{paddingBottom}}>
-    <Pagination
-      margin="small"
-      variant="compact"
-      labelNext={I18n.t('Next Page')}
-      labelPrev={I18n.t('Previous Page')}
-      data-testid="pagination"
-    >
-      {Array.from(Array(props.totalPages)).map((v, i) => (
-        <Pagination.Page
-          key={btoa(i)}
-          onClick={() => props.setPage(i)}
-          current={props.selectedPage === i + 1}
-        >
-          {i + 1}
-        </Pagination.Page>
-      ))}
-    </Pagination>
-  </div>
+  return (
+    <div className="discussion-pagination-section" style={{paddingBottom}}>
+      <Pagination
+        margin="small"
+        variant="compact"
+        labelNext={I18n.t('Next Page')}
+        labelPrev={I18n.t('Previous Page')}
+        data-testid="pagination"
+      >
+        {Array.from(Array(props.totalPages)).map((v, i) => (
+          <Pagination.Page
+            key={btoa(i)}
+            onClick={() => props.setPage(i)}
+            current={props.selectedPage === i + 1}
+          >
+            {i + 1}
+          </Pagination.Page>
+        ))}
+      </Pagination>
+    </div>
+  )
 }
 
 ThreadPagination.propTypes = {

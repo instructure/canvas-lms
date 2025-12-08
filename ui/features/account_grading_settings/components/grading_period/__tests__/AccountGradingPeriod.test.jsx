@@ -158,9 +158,9 @@ describe('AccountGradingPeriod', () => {
     windowConfirm.mockReturnValue(true)
     const flashMessageMock = jest.fn()
     $.flashMessage = flashMessageMock
-    const axiosDeleteMock = jest.spyOn(axios, 'delete').mockImplementation(() => 
-      Promise.resolve({ status: 200, data: {} })
-    )
+    const axiosDeleteMock = jest
+      .spyOn(axios, 'delete')
+      .mockImplementation(() => Promise.resolve({status: 200, data: {}}))
 
     renderComponent()
     fireEvent.click(screen.getByTitle(/Delete/))

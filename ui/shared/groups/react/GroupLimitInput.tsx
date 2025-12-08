@@ -27,14 +27,11 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('editGroup')
 
 export type GroupLimitInputProps = {
-  id: string,
-  initialValue?: string,
+  id: string
+  initialValue?: string
 }
 
-const GroupLimitInput = ({
-  id,
-  initialValue = '',
-}: GroupLimitInputProps) => {
+const GroupLimitInput = ({id, initialValue = ''}: GroupLimitInputProps) => {
   const [limitValue, setLimitValue] = useState<string>(initialValue)
   const [errorMessages, setErrorMessages] = useState<FormMessage[]>([])
 
@@ -46,7 +43,7 @@ const GroupLimitInput = ({
       } else if (numberHelper.parse(Number(limitValue)) < 2) {
         errorText = I18n.t('Value must be greater than or equal to 2')
       }
-      if (errorText) setErrorMessages([{ text: errorText, type: 'newError' }])
+      if (errorText) setErrorMessages([{text: errorText, type: 'newError'}])
     }
   }
 
@@ -56,25 +53,25 @@ const GroupLimitInput = ({
   }
 
   const label = (
-    <Text size='small' weight='bold'>
+    <Text size="small" weight="bold">
       {I18n.t('Maximum members per group')}
     </Text>
   )
 
   return (
-    <View as='div' margin='small 0'>
+    <View as="div" margin="small 0">
       <NumberInput
         id={`group_limit_input_${id}`}
         placeholder={I18n.t('Leave blank for no limit')}
         renderLabel={label}
         messages={errorMessages}
-        name='group_limit'
+        name="group_limit"
         value={limitValue}
         onBlur={validateInput}
         onChange={handleInputChange}
         allowStringValue={true}
         showArrows={false}
-        width='294px'
+        width="294px"
         data-testid={`group_limit_input_${id}`}
       />
     </View>

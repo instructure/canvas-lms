@@ -144,7 +144,11 @@ describe('SubmissionManager', () => {
       act(() => {
         fireEvent.click(submitButton)
       })
-      expect(getByLabelText(/You must agree to the submission pledge before you can submit the assignment/)).toBeInTheDocument()
+      expect(
+        getByLabelText(
+          /You must agree to the submission pledge before you can submit the assignment/,
+        ),
+      ).toBeInTheDocument()
     })
 
     it('removes the error message after the user agrees to the pledge', () => {
@@ -157,14 +161,21 @@ describe('SubmissionManager', () => {
       act(() => {
         fireEvent.click(submitButton)
       })
-      expect(getByLabelText(/You must agree to the submission pledge before you can submit the assignment/)).toBeInTheDocument()
+      expect(
+        getByLabelText(
+          /You must agree to the submission pledge before you can submit the assignment/,
+        ),
+      ).toBeInTheDocument()
 
       const agreementCheckbox = getByLabelText(/I agree to the tool's/)
       act(() => {
         fireEvent.click(agreementCheckbox)
       })
-      expect(queryByLabelText(/You must agree to the submission pledge before you can submit the assignment/)).not.toBeInTheDocument()
-
+      expect(
+        queryByLabelText(
+          /You must agree to the submission pledge before you can submit the assignment/,
+        ),
+      ).not.toBeInTheDocument()
     })
   })
 })
