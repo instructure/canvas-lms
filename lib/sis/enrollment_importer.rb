@@ -534,6 +534,8 @@ module SIS
       end
 
       def completed_status(enrollment)
+        return if enrollment.explicitly_completed?
+
         enrollment.workflow_state = "completed"
         enrollment.completed_at = enrollment.course.concluded? ? enrollment.completed_at : Time.zone.now
       end
