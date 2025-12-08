@@ -49,11 +49,13 @@ export const SeparateScheduledRelease = ({
   handleChange,
 }: SeparateScheduledReleaseProps) => {
   const filterRelationshipErrors = (messages: FormMessage[]) => {
-    const relationshipErrorTexts = [
+    const relationshipErrorTexts: string[] = [
       GRADES_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
       COMMENTS_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
     ]
-    return messages.filter(msg => !relationshipErrorTexts.includes(msg.text))
+    return messages.filter(
+      msg => typeof msg.text === 'string' && !relationshipErrorTexts.includes(msg.text),
+    )
   }
 
   const validateAndUpdate = (

@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 
 interface ApplyButtonProps {
-  children: string
+  children: React.ReactNode
   undoMessage?: string
   onApply: () => void
   onUndo: () => void

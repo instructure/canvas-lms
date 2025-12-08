@@ -28,6 +28,8 @@ jest.mock('../../utils/titleConflicts')
 
 const wikiPageModel = new WikiPage()
 wikiPageModel.initialize({url: 'page-1'}, {contextAssetString: 'course_1'})
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - Backbone WikiPageEditView constructor type mismatch
 const viewElement = new WikiPageEditView({
   model: wikiPageModel,
   wiki_pages_path: '/courses/1/pages',

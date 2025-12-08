@@ -53,7 +53,8 @@ const buildDefaultProps = (
 })
 
 beforeEach(() => {
-  // @ts-expect-error
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - window.ENV is a Canvas global not in TS types
   window.ENV = {
     TIMEZONE: 'UTC',
   }
@@ -67,6 +68,8 @@ describe('ModuleHeaderUnlockAt', () => {
     const futureDate = moment().add(1, 'day').toISOString()
     setUp(buildDefaultProps({unlockAt: futureDate}))
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - format's third argument (zone) is optional at runtime but required by tsgo
     const formattedDate = format(futureDate, unlockAtFormat)
     const {container} = render(<ModuleHeaderUnlockAt unlockAt={futureDate} />)
 

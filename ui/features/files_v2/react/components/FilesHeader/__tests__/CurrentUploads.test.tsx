@@ -27,6 +27,8 @@ import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 
 function makeUploader(name: string, error?: object) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore FileUploader constructor not typed
   const uploader = new FileUploader({file: new File(['foo'], name, {type: 'text/plain'})})
   uploader.error = error
   return uploader

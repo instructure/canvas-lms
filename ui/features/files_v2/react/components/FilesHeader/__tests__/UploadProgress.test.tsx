@@ -22,6 +22,8 @@ import UploadProgress from '../UploadProgress'
 import FileUploader from '@canvas/files/react/modules/FileUploader'
 
 function makeUploader(name: string) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore FileUploader constructor not typed
   const uploader = new FileUploader({file: new File(['foo'], name, {type: 'text/plain'})})
   uploader.roundProgress = jest.fn().mockReturnValue(50)
   return uploader

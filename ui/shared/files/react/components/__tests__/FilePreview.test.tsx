@@ -37,7 +37,11 @@ describe('File Preview Rendering', () => {
   beforeEach(() => {
     // Initialize a few things to view in the preview.
     filesCollection = new FilesCollection()
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone File model constructor expects different args
     file1 = new File(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone File model constructor expects different args
       {
         id: '1',
         cid: 'c1',
@@ -49,7 +53,11 @@ describe('File Preview Rendering', () => {
       },
       {preflightUrl: ''},
     )
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone File model constructor expects different args
     file2 = new File(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone File model constructor expects different args
       {
         id: '2',
         cid: 'c2',
@@ -61,7 +69,11 @@ describe('File Preview Rendering', () => {
       },
       {preflightUrl: ''},
     )
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone File model constructor expects different args
     file3 = new File(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone File model constructor expects different args
       {
         id: '3',
         cid: 'c3',
@@ -74,7 +86,11 @@ describe('File Preview Rendering', () => {
       },
       {preflightUrl: ''},
     )
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone File model constructor expects different args
     file4 = new File(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone File model constructor expects different args
       {
         id: '4',
         cid: 'c4',
@@ -87,7 +103,11 @@ describe('File Preview Rendering', () => {
       },
       {preflightUrl: ''},
     )
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone File model constructor expects different args
     file5 = new File(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone File model constructor expects different args
       {
         id: '5',
         cid: 'c5',

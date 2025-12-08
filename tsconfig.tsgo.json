@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": null,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "paths": {
+      "*": ["./ui/*"],
+      "@canvas/*": ["./ui/shared/*"],
+      "@instructure/*": ["./packages/*", "./node_modules/@instructure/*"]
+    }
+  },
+  "exclude": ["node_modules", "**/node_modules/*", "node_modules/@instructure/updown"]
+}

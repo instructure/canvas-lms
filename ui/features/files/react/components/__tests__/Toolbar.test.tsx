@@ -55,6 +55,8 @@ const buttonsEnabled = (toolbar: any, config: any) => {
 
 describe('Toolbar', () => {
   beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore Legacy class constructor not typed
     file = new File({id: 1})
     courseFolder = new Folder({context_type: 'Course', context_id: 1})
     userFolder = new Folder({context_type: 'User', context_id: 2})

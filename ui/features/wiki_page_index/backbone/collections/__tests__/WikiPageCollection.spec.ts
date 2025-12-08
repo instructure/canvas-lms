@@ -94,6 +94,8 @@ describe('WikiPageCollection:sorting', () => {
 
   test('setting sort sets fetch parameters', () => {
     ;(collection as any).setSortField('created_at', 'desc')
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection options property not in type definition
     expect(collection.options).toBeTruthy()
     expect((collection as any).options?.params).toBeTruthy()
     expect((collection as any).options?.params.sort).toBe('created_at')

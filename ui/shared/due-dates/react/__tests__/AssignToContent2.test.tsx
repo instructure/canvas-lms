@@ -34,6 +34,8 @@ const COURSE_ID = 1
 const ASSIGNMENT_ID = '1'
 
 describe('AssignToContent2', () => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore Backbone collection constructor accepts initial models
   const assignmentcollection = new AssignmentOverrideCollection([
     {
       id: '100',
@@ -102,6 +104,8 @@ describe('AssignToContent2', () => {
   })
 
   it('preserves dates on the second card when adding an assignee to the first', async () => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore Backbone collection constructor accepts initial models
     const twoCardOverrides = new AssignmentOverrideCollection([
       {
         id: '200',

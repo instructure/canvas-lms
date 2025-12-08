@@ -61,6 +61,8 @@ describe('WikiPageIndexView', () => {
         context_asset_string: 'course_1',
       })
       model = new (WikiPage as any)({page_id: '42'})
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone collection constructor accepts initial models
       collection = new WikiPageCollection([model])
       view = new (WikiPageIndexView as any)({
         collection,
@@ -90,6 +92,8 @@ describe('WikiPageIndexView', () => {
         context_asset_string: 'course_1',
       })
       model = new (WikiPage as any)({page_id: '42', title: 'page 42'})
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone collection constructor accepts initial models
       collection = new WikiPageCollection([model])
       view = new (WikiPageIndexView as any)({
         collection,
@@ -125,6 +129,8 @@ describe('WikiPageIndexView', () => {
         context_asset_string: 'course_1',
       })
       model = new (WikiPage as any)({page_id: '42'})
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone collection constructor accepts initial models
       collection = new WikiPageCollection([model])
       view = new (WikiPageIndexView as any)({
         collection,
@@ -197,6 +203,8 @@ describe('WikiPageIndexView', () => {
         context_asset_string: 'course_1',
       })
       model = new (WikiPage as any)({page_id: '42'})
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone collection constructor accepts initial models
       collection = new WikiPageCollection([model])
       view = new (WikiPageIndexView as any)({
         collection,
@@ -270,6 +278,8 @@ describe('WikiPageIndexView', () => {
         context_asset_string: 'course_1',
       })
       model = new (WikiPage as any)({page_id: '42'})
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone collection constructor accepts initial models
       collection = new WikiPageCollection([model])
       view = new (WikiPageIndexView as any)({
         collection,
@@ -302,6 +312,8 @@ describe('WikiPageIndexView', () => {
         context_asset_string: 'course_1',
       })
       model = new (WikiPage as any)({page_id: '42'})
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone collection constructor accepts initial models
       collection = new WikiPageCollection([model])
       view = new (WikiPageIndexView as any)({
         collection,

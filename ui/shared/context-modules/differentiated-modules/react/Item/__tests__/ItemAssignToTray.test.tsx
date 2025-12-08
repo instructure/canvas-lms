@@ -91,14 +91,14 @@ describe('ItemAssignToTray', () => {
   })
 
   beforeEach(() => {
-    // @ts-expect-error
+    // @ts-expect-error - window.ENV is a Canvas global not in TS types
     window.ENV ||= {}
     ENV.VALID_DATE_RANGE = {
       start_at: {date: '2023-08-20T12:00:00Z', date_context: 'course'},
       end_at: {date: '2023-12-30T12:00:00Z', date_context: 'course'},
     }
     ENV.HAS_GRADING_PERIODS = false
-    // @ts-expect-error
+    // @ts-expect-error - ENV.SECTION_LIST type mismatch
     ENV.SECTION_LIST = [{id: '4'}, {id: '5'}]
     ENV.POST_TO_SIS = false
     ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = false
@@ -149,6 +149,8 @@ describe('ItemAssignToTray', () => {
   })
 
   afterEach(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - window.location assignment for test cleanup
     window.location = originalLocation
     fetchMock.resetHistory()
     fetchMock.restore()
@@ -379,7 +381,7 @@ describe('ItemAssignToTray', () => {
       const {getAllByText, findAllByTestId} = renderComponent({
         itemContentId: '31',
         defaultCards: [
-          // @ts-expect-error
+          // @ts-expect-error - partial card object for testing
           {
             defaultOptions: ['everyone'],
             key: 'key-card-0',
@@ -430,7 +432,7 @@ describe('ItemAssignToTray', () => {
       const {getAllByTestId, findAllByText} = renderComponent({
         itemContentId: '31',
         defaultCards: [
-          // @ts-expect-error
+          // @ts-expect-error - partial card object for testing
           {
             defaultOptions: ['everyone'],
             key: 'key-card-0',
@@ -899,7 +901,7 @@ describe('ItemAssignToTray', () => {
       const save = await findByTestId('differentiated_modules_save_button')
       await user.click(save)
       expect((await findAllByText(`${props.itemName} updated`))[0]).toBeInTheDocument()
-      // @ts-expect-error
+      // @ts-expect-error - fetchMock body type assertion
       const requestBody = JSON.parse(fetchMock.lastOptions(DATE_DETAILS)?.body)
       // filters out invalid overrides
       expect(requestBody.assignment_overrides).toHaveLength(2)
@@ -1086,9 +1088,9 @@ describe('ItemAssignToTray', () => {
 
   describe('required due dates', () => {
     beforeEach(() => {
-      // @ts-expect-error
+      // @ts-expect-error - global.ENV is a Canvas global not in TS types
       global.ENV = {
-        // @ts-expect-error
+        // @ts-expect-error - global.ENV is a Canvas global not in TS types
         ...global.ENV,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: true,
       }

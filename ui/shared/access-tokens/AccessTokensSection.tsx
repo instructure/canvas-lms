@@ -190,6 +190,18 @@ type TokenRowProps = {
 const TokenRow = memo(({token}: TokenRowProps) => {
   const deleteToken = useDeleteToken(token.user_id)
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - format's third argument (zone) is optional at runtime but required by tsgo
+  const createdAtFormatted = format(token.created_at, 'date.formats.full')
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - format's third argument (zone) is optional at runtime but required by tsgo
+  const lastUsedAtFormattedValue = format(token.last_used_at, 'date.formats.full')
+  const lastUsedAtFormatted = token.last_used_at ? lastUsedAtFormattedValue : null
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - format's third argument (zone) is optional at runtime but required by tsgo
+  const expiresAtFormattedValue = format(token.expires_at, 'date.formats.full')
+  const expiresAtFormatted = token.expires_at ? expiresAtFormattedValue : null
+
   return (
     <Table.Row>
       <Table.Cell>
@@ -204,17 +216,13 @@ const TokenRow = memo(({token}: TokenRowProps) => {
         </TruncateWithTooltip>
       </Table.Cell>
       <Table.Cell>
-        <Text>{format(token.created_at, 'date.formats.full')}</Text>
+        <Text>{createdAtFormatted}</Text>
       </Table.Cell>
       <Table.Cell>
-        <Text>
-          {token.last_used_at ? format(token.last_used_at, 'date.formats.full') : I18n.t('Unused')}
-        </Text>
+        <Text>{lastUsedAtFormatted ?? I18n.t('Unused')}</Text>
       </Table.Cell>
       <Table.Cell>
-        <Text>
-          {token.expires_at ? format(token.expires_at, 'date.formats.full') : I18n.t('Never')}
-        </Text>
+        <Text>{expiresAtFormatted ?? I18n.t('Never')}</Text>
       </Table.Cell>
       <Table.Cell>
         <IconButton

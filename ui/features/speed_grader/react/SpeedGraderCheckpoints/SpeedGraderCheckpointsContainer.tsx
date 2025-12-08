@@ -253,7 +253,10 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
 
     if (outlierScoreHelper.hasWarning()) {
       // $.flashWarning(outlierScoreHelper.warningMessage())
-      showFlashWarning(outlierScoreHelper.warningMessage())()
+      const warningMessage = outlierScoreHelper.warningMessage()
+      if (warningMessage) {
+        showFlashWarning(warningMessage)()
+      }
     }
   }, [assignment, lastSubmission])
 
