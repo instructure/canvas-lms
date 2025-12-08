@@ -18,8 +18,7 @@ import React from 'react'
 import {render, cleanup, waitFor} from '@testing-library/react'
 import AdaChatbot, {autoRestoreAda} from '../AdaChatbot'
 
-const CHAT_CLOSED_KEY = 'persistedAdaClosed'
-const DRAWER_OPEN_KEY = 'persistedAdaDrawerOpen'
+const ADA_STATE_KEY = 'persistedAdaState'
 
 describe('AdaChatbot', () => {
   const mockOnDialogClose = jest.fn()
@@ -139,8 +138,7 @@ describe('AdaChatbot', () => {
     await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
     await getStartConfig().adaReadyCallback()
     await waitFor(() => expect(mockAdaEmbed.toggle).toHaveBeenCalled())
-    expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('false')
-    expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('true')
+    expect(localStorage.getItem(ADA_STATE_KEY)).toBe('open')
   })
 
   it('does not mark chat closed when drawer is closed via toggleCallback', async () => {
@@ -149,20 +147,18 @@ describe('AdaChatbot', () => {
     await getStartConfig().adaReadyCallback()
 
     getStartConfig().toggleCallback(false)
-    expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('false')
-    expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('false')
+    expect(localStorage.getItem(ADA_STATE_KEY)).toBe('minimized')
   })
 
   it('opens Ada via help menu regardless of previous state', async () => {
-    localStorage.setItem(CHAT_CLOSED_KEY, 'true') // Previously closed
-    localStorage.setItem(DRAWER_OPEN_KEY, 'true') // Drawer was open
+    localStorage.setItem(ADA_STATE_KEY, 'closed') // Previously closed
 
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
     await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
 
     await getStartConfig().adaReadyCallback()
     await waitFor(() => expect(mockAdaEmbed.toggle).toHaveBeenCalled()) // Should open regardless
-    expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('false') // Now active
+    expect(localStorage.getItem(ADA_STATE_KEY)).toBe('open') // Now open
   })
 
   it('does not toggle when chat is already open via help menu', async () => {
@@ -225,8 +221,7 @@ describe('AdaChatbot', () => {
     getStartConfig().onAdaEmbedLoaded()
     getEventCallback('ada:end_conversation')()
 
-    expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('true')
-    expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('false')
+    expect(localStorage.getItem(ADA_STATE_KEY)).toBe('closed')
     await waitFor(() => expect(mockAdaEmbed.stop).toHaveBeenCalled())
   })
 
@@ -240,8 +235,7 @@ describe('AdaChatbot', () => {
       getStartConfig().onAdaEmbedLoaded()
       getEventCallback(eventName)()
 
-      expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('false')
-      expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('false')
+      expect(localStorage.getItem(ADA_STATE_KEY)).toBe('minimized')
     },
   )
 
@@ -268,21 +262,20 @@ describe('AdaChatbot', () => {
 
   describe('autoRestoreAda', () => {
     it('initializes Ada when not closed by user', async () => {
-      localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+      localStorage.setItem(ADA_STATE_KEY, 'open')
       autoRestoreAda()
       await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
     })
 
     it('does not initialize when closed by user', async () => {
-      localStorage.setItem(CHAT_CLOSED_KEY, 'true')
+      localStorage.setItem(ADA_STATE_KEY, 'closed')
       autoRestoreAda()
       await new Promise(resolve => setTimeout(resolve, 50))
       expect(mockAdaEmbed.start).not.toHaveBeenCalled()
     })
 
     it('prevents duplicate initialization and concurrent restore operations', async () => {
-      localStorage.setItem(CHAT_CLOSED_KEY, 'false')
-      localStorage.setItem(DRAWER_OPEN_KEY, 'true')
+      localStorage.setItem(ADA_STATE_KEY, 'open')
 
       autoRestoreAda()
       autoRestoreAda()
@@ -295,20 +288,20 @@ describe('AdaChatbot', () => {
     })
 
     it('allows reinitialization after stop()', async () => {
-      localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+      localStorage.setItem(ADA_STATE_KEY, 'open')
 
       autoRestoreAda()
       await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
 
       await resetInitialized()
 
-      localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+      localStorage.setItem(ADA_STATE_KEY, 'open')
       autoRestoreAda()
       await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalledTimes(2))
     })
 
     it('handles initialization errors gracefully', async () => {
-      localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+      localStorage.setItem(ADA_STATE_KEY, 'open')
       mockAdaEmbed.start.mockRejectedValue(new Error('Init failed'))
       autoRestoreAda()
       await waitFor(() =>
@@ -317,8 +310,7 @@ describe('AdaChatbot', () => {
     })
 
     it('restores drawer when previously open', async () => {
-      localStorage.setItem(DRAWER_OPEN_KEY, 'true')
-      localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+      localStorage.setItem(ADA_STATE_KEY, 'open')
 
       mockAdaEmbed.getInfo
         .mockResolvedValueOnce({
@@ -342,12 +334,11 @@ describe('AdaChatbot', () => {
       await restorePromise
 
       expect(mockAdaEmbed.toggle).toHaveBeenCalled()
-      expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('true')
+      expect(localStorage.getItem(ADA_STATE_KEY)).toBe('open')
     })
 
     it('does not restore drawer if drawer was not previously open', async () => {
-      localStorage.setItem(CHAT_CLOSED_KEY, 'false')
-      localStorage.setItem(DRAWER_OPEN_KEY, 'false')
+      localStorage.setItem(ADA_STATE_KEY, 'minimized')
 
       autoRestoreAda()
       await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
@@ -359,8 +350,7 @@ describe('AdaChatbot', () => {
     })
 
     it('handles errors during drawer restoration gracefully', async () => {
-      localStorage.setItem(CHAT_CLOSED_KEY, 'false')
-      localStorage.setItem(DRAWER_OPEN_KEY, 'true')
+      localStorage.setItem(ADA_STATE_KEY, 'open')
       mockAdaEmbed.toggle.mockRejectedValue(new Error('Toggle failed'))
 
       autoRestoreAda()
@@ -390,8 +380,7 @@ describe('AdaChatbot', () => {
     })
 
     it('prevents openAda during autoRestoreAda', async () => {
-      localStorage.setItem(CHAT_CLOSED_KEY, 'false')
-      localStorage.setItem(DRAWER_OPEN_KEY, 'true')
+      localStorage.setItem(ADA_STATE_KEY, 'open')
 
       // Make start() take longer to ensure the flag stays set
       let resolveStart: () => void
@@ -419,7 +408,7 @@ describe('AdaChatbot', () => {
     })
 
     it('resets state flags when Ada is stopped', async () => {
-      localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+      localStorage.setItem(ADA_STATE_KEY, 'open')
 
       render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
       await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
