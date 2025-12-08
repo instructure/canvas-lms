@@ -29,18 +29,36 @@ describe('PeerReviewSelector', () => {
       available: true,
       workflowState: 'assigned',
       createdAt: '2025-11-01T00:00:00Z',
+      submission: {
+        _id: 'sub-1',
+        attempt: 1,
+        body: '<p>Test submission 1</p>',
+        submissionType: 'online_text_entry',
+      },
     },
     {
       _id: 'ar-2',
       available: true,
       workflowState: 'assigned',
       createdAt: '2025-11-02T00:00:00Z',
+      submission: {
+        _id: 'sub-2',
+        attempt: 1,
+        body: '<p>Test submission 2</p>',
+        submissionType: 'online_text_entry',
+      },
     },
     {
       _id: 'ar-3',
       available: true,
       workflowState: 'assigned',
       createdAt: '2025-11-03T00:00:00Z',
+      submission: {
+        _id: 'sub-3',
+        attempt: 1,
+        body: '<p>Test submission 3</p>',
+        submissionType: 'online_text_entry',
+      },
     },
   ]
 
@@ -101,18 +119,36 @@ describe('PeerReviewSelector', () => {
         available: true,
         workflowState: 'assigned',
         createdAt: '2025-11-01T00:00:00Z',
+        submission: {
+          _id: 'sub-1',
+          attempt: 1,
+          body: '<p>Test submission 1</p>',
+          submissionType: 'online_text_entry',
+        },
       },
       {
         _id: 'ar-2',
         available: true,
         workflowState: 'assigned',
         createdAt: '2025-11-02T00:00:00Z',
+        submission: {
+          _id: 'sub-2',
+          attempt: 1,
+          body: '<p>Test submission 2</p>',
+          submissionType: 'online_text_entry',
+        },
       },
       {
         _id: 'ar-3',
         available: true,
         workflowState: 'completed',
         createdAt: '2025-11-03T00:00:00Z',
+        submission: {
+          _id: 'sub-3',
+          attempt: 1,
+          body: '<p>Test submission 3</p>',
+          submissionType: 'online_text_entry',
+        },
       },
     ]
 
@@ -159,18 +195,36 @@ describe('PeerReviewSelector', () => {
         available: false,
         workflowState: 'assigned',
         createdAt: '2025-11-01T00:00:00Z',
+        submission: {
+          _id: 'sub-1',
+          attempt: 1,
+          body: '<p>Test submission 1</p>',
+          submissionType: 'online_text_entry',
+        },
       },
       {
         _id: 'ar-2',
         available: true,
         workflowState: 'assigned',
         createdAt: '2025-11-02T00:00:00Z',
+        submission: {
+          _id: 'sub-2',
+          attempt: 1,
+          body: '<p>Test submission 2</p>',
+          submissionType: 'online_text_entry',
+        },
       },
       {
         _id: 'ar-3',
         available: true,
         workflowState: 'assigned',
         createdAt: '2025-11-03T00:00:00Z',
+        submission: {
+          _id: 'sub-3',
+          attempt: 1,
+          body: '<p>Test submission 3</p>',
+          submissionType: 'online_text_entry',
+        },
       },
     ]
 
