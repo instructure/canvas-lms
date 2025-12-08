@@ -19,8 +19,22 @@
  */
 
 import {defineConfig} from 'vitest/config'
+import {resolve} from 'path'
 import handlebarsPlugin from './ui-build/esbuild/handlebars-plugin'
 import svgPlugin from './ui-build/esbuild/svg-plugin'
+
+// Plugin to handle .graphql files as raw text
+const graphqlPlugin = {
+  name: 'graphql-loader',
+  transform(code: string, id: string) {
+    if (id.endsWith('.graphql')) {
+      return {
+        code: `export default ${JSON.stringify(code)}`,
+        map: null,
+      }
+    }
+  },
+}
 
 export default defineConfig({
   test: {
@@ -34,6 +48,18 @@ export default defineConfig({
       exclude: ['ui/**/__tests__/**/*'],
       reportOnFailure: true,
     },
+    // Force all jQuery-related modules to be bundled together so they share state
+    server: {
+      deps: {
+        inline: [/jquery/, /jqueryui/, /backbone/],
+      },
+    },
   },
-  plugins: [handlebarsPlugin(), svgPlugin()],
+  resolve: {
+    alias: {
+      // Match webpack's modules config: resolve(canvasDir, 'public/javascripts')
+      translations: resolve(__dirname, 'public/javascripts/translations'),
+    },
+  },
+  plugins: [handlebarsPlugin(), svgPlugin(), graphqlPlugin],
 })
