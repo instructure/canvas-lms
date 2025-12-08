@@ -113,10 +113,16 @@ class PeerReview::AllocationService < ApplicationService
                                 .for_assessor(@assessor.id)
                                 .pluck(:user_id)
 
+    must_not_review_user_ids = AllocationRule.active
+                                             .where(assignment: @assignment)
+                                             .where(assessor_id: @assessor.id)
+                                             .where(must_review: true, review_permitted: false)
+                                             .pluck(:assessee_id)
+
     @assignment.submissions
                .active
                .having_submission
-               .where.not(user_id: [@assessor.id, *already_assigned_user_ids])
+               .where.not(user_id: [@assessor.id, *already_assigned_user_ids, *must_not_review_user_ids])
                .preload(:user)
                .to_a
   end
@@ -127,7 +133,7 @@ class PeerReview::AllocationService < ApplicationService
     must_review_user_ids = AllocationRule.active
                                          .where(assignment: @assignment)
                                          .where(assessor_id: @assessor.id)
-                                         .where(must_review: true)
+                                         .where(must_review: true, review_permitted: true)
                                          .pluck(:assessee_id)
 
     submission_ids = available_submissions.map(&:id)
