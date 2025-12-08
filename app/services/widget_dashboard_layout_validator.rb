@@ -89,6 +89,7 @@ class WidgetDashboardLayoutValidator
     todo_list
     progress_overview
     recent_grades
+    inbox
   ].freeze
 
   attr_reader :errors
