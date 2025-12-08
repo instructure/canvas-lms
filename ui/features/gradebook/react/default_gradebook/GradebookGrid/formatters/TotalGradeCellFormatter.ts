@@ -173,7 +173,7 @@ export default class TotalGradeCellFormatter {
     let percentage = getGradePercentage(grade.score, grade.possible)
     percentage = Number.isFinite(percentage) ? percentage : 0
 
-    let possible = round(grade.possible, round.DEFAULT)
+    let possible: string | number = round(grade.possible, round.DEFAULT)
     possible = possible ? I18n.n(possible) : possible
 
     let letterGrade
@@ -185,7 +185,11 @@ export default class TotalGradeCellFormatter {
     }
 
     let displayAsScaledPoints = false
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore scaledScore/scaledPossible used as numbers for calculation, then formatted strings
     let scaledScore = NaN
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore scaledScore/scaledPossible used as numbers for calculation, then formatted strings
     let scaledPossible = NaN
 
     if (scheme) {
@@ -193,13 +197,19 @@ export default class TotalGradeCellFormatter {
       const scalingFactor = scheme.scalingFactor
 
       if (displayAsScaledPoints && grade.possible) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore I18n.n returns string, but scaledPossible starts as NaN for backward compat
         scaledPossible = I18n.n(scalingFactor, {
           precision: 2,
         })
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore I18n.n returns string, but scaledScore starts as NaN for backward compat
         scaledScore = I18n.n(scoreToScaledPoints(grade.score, grade.possible, scalingFactor), {
           precision: 2,
         })
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore scaledScore/scaledPossible are strings but getGradePercentage coerces to numbers
         const scaledPercentage = getGradePercentage(scaledScore, scaledPossible)
         letterGrade = GradeFormatHelper.replaceDashWithMinus(
           scoreToGrade(scaledPercentage, scheme.data, scheme.pointsBased, scheme.scalingFactor),

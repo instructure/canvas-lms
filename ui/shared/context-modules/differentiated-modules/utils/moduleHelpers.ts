@@ -391,7 +391,7 @@ function updateRequirements(moduleElement: HTMLDivElement, moduleSettings: Setti
       if (pointsPossibleElement) {
         if (requirement.pointsPossible) {
           pointsPossibleElement.textContent = I18n.t('%{points} pts', {
-            points: I18n.n(requirement.pointsPossible),
+            points: I18n.n(Number(requirement.pointsPossible)),
           })
         } else {
           pointsPossibleElement.textContent = ''

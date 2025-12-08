@@ -101,7 +101,7 @@ const AssignmentPublishButton = ({
       .catch(() => handleUpdatePublishFailure(isPublishing))
   }
   const getButtonLabel = (): React.ReactFragment => {
-    // @ts-expect-error
+    // @ts-expect-error InstUI component prop type mismatch
     return (
       <>
         {assignmentPublished ? I18n.t('Published') : I18n.t('Unpublished')}
@@ -147,14 +147,23 @@ const AssignmentPublishButton = ({
       }
       withArrow={false}
       trigger={
-        // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore InstUI Button component type issue
         <Button
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore InstUI component prop type mismatch
           elementRef={buttonRefCallback}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore InstUI component prop type mismatch
           renderIcon={assignmentPublished ? IconPublishSolid : IconNoLine}
           color="primary-inverse"
           themeOverride={buttonThemeOverride}
           data-testid="assignment-publish-menu"
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore InstUI component prop type mismatch
           display={breakpoints.mobileOnly && 'block'}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore InstUI component prop type mismatch
           margin={breakpoints.mobileOnly && 'none none small none'}
         >
           {getButtonLabel()}

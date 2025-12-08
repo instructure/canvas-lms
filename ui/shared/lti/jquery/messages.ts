@@ -18,7 +18,7 @@
 
 /* eslint no-console: 0 */
 
-import uuid from 'uuid'
+import * as uuid from 'uuid'
 import {
   NAVIGATION_MESSAGE as MENTIONS_NAVIGATION_MESSAGE,
   INPUT_CHANGE_MESSAGE as MENTIONS_INPUT_CHANGE_MESSAGE,

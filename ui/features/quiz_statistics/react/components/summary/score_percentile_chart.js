@@ -180,8 +180,6 @@ const ScorePercentileChart = createChartComponent({
   },
 
   /**
-   * @private
-   *
    * Calculate the number of students who scored above, or at, the average
    * and those who did lower.
    *
@@ -193,6 +191,7 @@ const ScorePercentileChart = createChartComponent({
    * @return {Number} out.aboveAverage
    * @return {Number} out.belowAverage
    */
+  // @ts-expect-error Legacy class method parameters not typed
   calculateStudentStatistics(_avgScore, scores) {
     const avgScore = Math.round(_avgScore)
 
@@ -215,9 +214,7 @@ const ScorePercentileChart = createChartComponent({
     }
   },
 
-  /**
-   * @private
-   */
+  // @ts-expect-error Legacy class method parameters not typed
   calculateChartData(props) {
     let percentile
     const set = []

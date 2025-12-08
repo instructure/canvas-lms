@@ -48,6 +48,8 @@ export default class SimilarityScore extends PureComponent<Props> {
     }
     const statusIcon = <SimilarityIcon similarityScore={similarityScore} status={status} />
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore similarityScore may be undefined, preserving original behavior
     const displayScore = I18n.n(similarityScore, {precision: 1})
     return (
       <Grid rowSpacing="none">

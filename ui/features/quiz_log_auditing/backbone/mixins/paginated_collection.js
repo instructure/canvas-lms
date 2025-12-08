@@ -202,7 +202,7 @@ const Mixin = {
     })(this)
   },
 
-  /** @private */
+  // @ts-expect-error Legacy class method parameters not typed
   _resetPaginationMeta() {
     this._paginationMeta = {}
   },

@@ -257,6 +257,14 @@ export const VideoConferenceModal = ({
 
   const header = isEditing ? I18n.t('Edit Video Conference') : I18n.t('New Video Conference')
 
+  const conferenceTypeSelect = (
+    <VideoConferenceTypeSelect
+      conferenceTypes={(window.ENV as any).conference_type_details}
+      onSetConferenceType={(type: string) => setConferenceType(type)}
+      isEditing={isEditing}
+    />
+  )
+
   const renderModalOptions = () => {
     if (conferenceType === 'BigBlueButton') {
       return (
@@ -364,12 +372,7 @@ export const VideoConferenceModal = ({
         <Heading>{header}</Heading>
       </Modal.Header>
       <Modal.Body padding="none" overflow="fit">
-        {/* @ts-expect-error VideoConferenceTypeSelect is JSX component */}
-        <VideoConferenceTypeSelect
-          conferenceTypes={(window.ENV as any).conference_type_details}
-          onSetConferenceType={(type: string) => setConferenceType(type)}
-          isEditing={isEditing}
-        />
+        {conferenceTypeSelect}
         {renderModalOptions()}
       </Modal.Body>
       <Modal.Footer>

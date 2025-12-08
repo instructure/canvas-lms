@@ -258,6 +258,8 @@ describe('PaceContextsContent', () => {
         const timeAgo = 5 * WEEK
         const modifiedPace = generateModifiedPace(timeAgo)
         const lastModified = new Date(Date.now() - timeAgo)
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
         const formattedDate = tz.format(lastModified, 'date.formats.long')
         fetchMock.get(
           SECTION_CONTEXTS_API,

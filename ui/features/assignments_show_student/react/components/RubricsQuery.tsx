@@ -87,6 +87,8 @@ export default function RubricsQuery({
         ? // @ts-expect-error
           parsedAssessments?.find(assessment => assessment.assessor?._id === ENV.current_user.id)
         : parsedAssessments?.[0]
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - fillAssessment's third argument (rubricSavedComments) is optional at runtime but required by tsgo
       const filledAssessment = fillAssessment(parsedRubric, assessment || {})
 
       useStore.setState({

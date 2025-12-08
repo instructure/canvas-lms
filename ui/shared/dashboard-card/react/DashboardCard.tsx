@@ -251,7 +251,7 @@ export const DashboardCard = ({
       const screenReaderLabel = `${link.label} - ${nicknameInfo.nickname}`
       return (
         <DashboardCardAction
-          // @ts-expect-error
+          // @ts-expect-error InstUI component prop type mismatch
           unreadCount={unreadCount(link.icon, course?.stream)}
           iconClass={link.icon}
           linkClass={link.css_class}
@@ -282,7 +282,7 @@ export const DashboardCard = ({
           nicknameInfo={nicknameInfo}
           assetString={assetString}
           onUnfavorite={handleUnfavorite}
-          // @ts-expect-error
+          // @ts-expect-error InstUI component prop type mismatch
           isFavorited={isFavorited}
           {...reorderingProps}
           trigger={
@@ -352,10 +352,15 @@ export const DashboardCard = ({
           </div>
         </a>
         {!published && canChangeCoursePublishState && (
-          // @ts-expect-error
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore InstUI component type issue
           <PublishButton
             courseNickname={nicknameInfo.nickname}
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore InstUI component prop type mismatch
             defaultView={defaultView}
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore InstUI component prop type mismatch
             pagesUrl={pagesUrl}
             frontPageTitle={frontPageTitle}
             courseId={id}

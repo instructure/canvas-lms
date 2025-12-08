@@ -209,6 +209,8 @@ export default function AnnouncementRow({
       masterCourse={{
         courseData: masterCourseData || {},
         getLockOptions: () => ({
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - Backbone model constructor type mismatch
           model: new AnnouncementModel(announcement),
           unlockedText: I18n.t('%{title} is unlocked. Click to lock.', {title: announcement.title}),
           lockedText: I18n.t('%{title} is locked. Click to unlock', {title: announcement.title}),

@@ -28,11 +28,11 @@ function getGradePercentage(score: number, pointsPossible: number) {
 }
 
 export interface AssignmentGroupCellData {
-  score: number
-  possible: number
-  percentage: number
-  scaledScore: number
-  scaledPossible: number
+  score: string | number
+  possible: string | number
+  percentage: string | number
+  scaledScore: string | number
+  scaledPossible: string | number
   displayAsScaledPoints: boolean
 }
 
@@ -81,11 +81,11 @@ export default class AssignmentGroupCellFormatter {
     let percentage = getGradePercentage(value.score, value.possible)
     percentage = Number.isFinite(percentage) ? percentage : 0
 
-    let possible = round(value.possible, round.DEFAULT)
-    possible = possible ? I18n.n(possible) : possible
+    const possibleRounded = round(value.possible, round.DEFAULT)
+    const possible: string | number = possibleRounded ? I18n.n(possibleRounded) : possibleRounded
     let displayAsScaledPoints = false
-    let scaledScore = NaN
-    let scaledPossible = NaN
+    let scaledScore: string | number = NaN
+    let scaledPossible: string | number = NaN
 
     const scheme = this.options.getCourseGradingScheme()
     if (scheme) {
