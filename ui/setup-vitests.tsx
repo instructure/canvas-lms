@@ -18,19 +18,42 @@
 
 import '@testing-library/jest-dom'
 import {vi} from 'vitest'
+import $ from 'jquery'
+
+// Import initialization from jest-setup.js that's framework-agnostic
+import {up as configureDateTime} from '@canvas/datetime/configureDateTime'
+import {up as configureDateTimeMomentParser} from '@canvas/datetime/configureDateTimeMomentParser'
+import {registerTranslations} from '@canvas/i18n'
+import CoreTranslations from '../public/javascripts/translations/en.json'
+import {up as installNodeDecorations} from './boot/initializers/installNodeDecorations'
+
+// Make jQuery available globally like webpack's ProvidePlugin does
+// This is needed for jqueryui plugins to attach to the correct jQuery instance
+vi.stubGlobal('$', $)
+vi.stubGlobal('jQuery', $)
+
+// Make vi available as jest for compatibility with existing tests
+vi.stubGlobal('jest', vi)
+
+// Register translations like jest-setup does
+registerTranslations('en', CoreTranslations)
 
 vi.stubGlobal('ENV', {
-  FEATURES: {},
+  use_rce_enhancements: true,
+  FEATURES: {
+    extended_submission_state: true,
+  },
 })
 
 vi.stubGlobal(
   'IntersectionObserver',
   class IntersectionObserver {
     observe() {}
-
     unobserve() {}
-
     disconnect() {}
+    takeRecords() {
+      return []
+    }
   },
 )
 
@@ -38,9 +61,7 @@ vi.stubGlobal(
   'ResizeObserver',
   class ResizeObserver {
     observe() {}
-
     unobserve() {}
-
     disconnect() {}
   },
 )
@@ -55,8 +76,92 @@ vi.stubGlobal('matchMedia', () => ({
   media: '',
 }))
 
-vi.stubGlobal('jest', vi)
+vi.stubGlobal(
+  'BroadcastChannel',
+  vi.fn().mockImplementation(() => ({
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    postMessage: vi.fn(),
+    close: vi.fn(),
+  })),
+)
 
+// Mock performance API - needed for wasPageReloaded.ts
+if (!globalThis.performance?.getEntriesByType) {
+  vi.stubGlobal('performance', {
+    ...globalThis.performance,
+    getEntriesByType: vi.fn(() => [{type: 'navigate'}]),
+  })
+}
+
+// because InstUI themeable components need an explicit "dir" attribute on the <html> element
+document.documentElement.setAttribute('dir', 'ltr')
+
+// Initialize datetime configuration
+configureDateTime()
+configureDateTimeMomentParser()
+installNodeDecorations()
+
+// Window/document polyfills matching jest-setup.js
+window.scroll = () => {}
+window.scrollTo = () => {}
+
+if (!window.alert) {
+  window.alert = () => {}
+}
+
+if (!window.HTMLElement.prototype.scrollIntoView) {
+  window.HTMLElement.prototype.scrollIntoView = () => {}
+}
+
+if (!window.structuredClone) {
+  ;(window as unknown as Record<string, unknown>).structuredClone = (obj: unknown) =>
+    JSON.parse(JSON.stringify(obj))
+}
+
+if (typeof window.URL.createObjectURL === 'undefined') {
+  Object.defineProperty(window.URL, 'createObjectURL', {value: () => 'http://example.com/whatever'})
+}
+
+if (typeof window.URL.revokeObjectURL === 'undefined') {
+  Object.defineProperty(window.URL, 'revokeObjectURL', {value: () => undefined})
+}
+
+if (!Document.prototype.createRange) {
+  Document.prototype.createRange = () =>
+    ({
+      setEnd() {},
+      setStart() {},
+      getBoundingClientRect() {
+        return {right: 0}
+      },
+      getClientRects() {
+        return {length: 0, left: 0, right: 0}
+      },
+    }) as unknown as Range
+}
+
+if (!Range.prototype.getBoundingClientRect) {
+  Range.prototype.getBoundingClientRect = () => ({
+    bottom: 0,
+    height: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+    toJSON: () => ({}),
+  })
+  Range.prototype.getClientRects = () =>
+    ({
+      item: () => null,
+      length: 0,
+      [Symbol.iterator]: vi.fn(),
+    }) as unknown as DOMRectList
+}
+
+// Canvas context mock
 HTMLCanvasElement.prototype.getContext = vi.fn().mockImplementation(() => ({
   fillRect: vi.fn(),
   clearRect: vi.fn(),
