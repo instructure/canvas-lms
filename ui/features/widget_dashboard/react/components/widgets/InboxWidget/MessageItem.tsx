@@ -21,7 +21,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {Link} from '@instructure/ui-link'
 import {Avatar} from '@instructure/ui-avatar'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import type {InboxMessage} from '../../../types'
@@ -109,12 +108,6 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
               </Flex>
             </Flex.Item>
           </Flex>
-        </Flex.Item>
-
-        <Flex.Item overflowX="visible" overflowY="visible">
-          <Link href={message.conversationUrl} isWithinText={false}>
-            <Text size="small">{I18n.t('Open in Inbox')}</Text>
-          </Link>
         </Flex.Item>
       </Flex>
     </View>
