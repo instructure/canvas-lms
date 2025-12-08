@@ -700,6 +700,142 @@ RSpec.describe PeerReview::AllocationService do
         expect(result.size).to eq(1)
       end
     end
+
+    context "when must_not_review rules exist" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: true,
+          review_permitted: false,
+          applies_to_assessor: true
+        )
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student3,
+          must_review: true,
+          review_permitted: false,
+          applies_to_assessor: false
+        )
+      end
+
+      it "excludes submissions with must_not_review rules" do
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:user_id)).not_to include(student2.id)
+        expect(available.map(&:user_id)).to include(student1.id)
+      end
+
+      it "does not allocate submissions with must_not_review rules" do
+        result = service.allocate
+        expect(result[:success]).to be true
+        expect(result[:assessment_requests].map(&:user_id)).not_to include(student2.id, student3.id)
+        expect(result[:assessment_requests].map(&:user_id)).to include(student1.id)
+      end
+    end
+
+    context "when mixing must_review and must_not_review rules" do
+      before do
+        assignment.update!(peer_review_count: 3)
+        assignment.submit_homework(assessor, body: "My submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission1.update!(submitted_at: 3.days.ago)
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission2.update!(submitted_at: 2.days.ago)
+        @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
+        @submission3.update!(submitted_at: 1.day.ago)
+
+        student4 = student_in_course(active_all: true).user
+        @submission4 = assignment.submit_homework(student4, body: "Student4 submission")
+        @submission4.update!(submitted_at: 4.days.ago)
+
+        # Must review student1
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student1,
+          must_review: true,
+          review_permitted: true
+        )
+
+        # Must not review student2
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: true,
+          review_permitted: false
+        )
+      end
+
+      it "prioritizes must_review submissions and excludes must_not_review submissions" do
+        result = service.allocate
+        expect(result[:success]).to be true
+        expect(result[:assessment_requests].size).to eq(3)
+
+        allocated_user_ids = result[:assessment_requests].map(&:user_id)
+
+        expect(allocated_user_ids).to include(student1.id)
+        expect(allocated_user_ids).not_to include(student2.id)
+        expect(allocated_user_ids).to include(student3.id)
+      end
+
+      it "filters out must_not_review in preload and prioritizes must_review in selection" do
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:user_id)).not_to include(student2.id)
+        expect(available.map(&:user_id)).to include(student1.id, student3.id)
+
+        result = service.send(:select_submissions_to_allocate, available, 3)
+        expect(result.first.user_id).to eq(student1.id)
+        expect(result.map(&:user_id)).not_to include(student2.id)
+      end
+    end
+
+    context "when all available submissions have must_not_review rules" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student1,
+          must_review: true,
+          review_permitted: false,
+          applies_to_assessor: true
+        )
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: true,
+          review_permitted: false,
+          applies_to_assessor: false
+        )
+      end
+
+      it "returns error when no submissions are available" do
+        result = service.allocate
+        expect(result[:success]).to be false
+        expect(result[:error_code]).to eq(:no_submissions_available)
+        expect(result[:message]).to include("no peer reviews available")
+      end
+    end
   end
 
   describe "#success_result" do
