@@ -29,11 +29,17 @@ import {
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 import * as useInboxMessagesModule from '../../../../hooks/useInboxMessages'
+import * as useWidgetConfigModule from '../../../../hooks/useWidgetConfig'
 
 jest.mock('../../../../hooks/useInboxMessages')
+jest.mock('../../../../hooks/useWidgetConfig')
 
 const mockUseInboxMessages = useInboxMessagesModule.useInboxMessages as jest.MockedFunction<
   typeof useInboxMessagesModule.useInboxMessages
+>
+
+const mockUseWidgetConfig = useWidgetConfigModule.useWidgetConfig as jest.MockedFunction<
+  typeof useWidgetConfigModule.useWidgetConfig
 >
 
 const mockMessages: InboxMessage[] = [
@@ -121,7 +127,11 @@ const renderWithProviders = (component: React.ReactElement) => {
 }
 
 describe('InboxWidget', () => {
+  let mockSetFilter: jest.Mock
+
   beforeEach(() => {
+    mockSetFilter = jest.fn()
+    mockUseWidgetConfig.mockReturnValue(['unread', mockSetFilter])
     mockUseInboxMessages.mockReturnValue({
       data: mockMessages,
       isLoading: false,
@@ -244,6 +254,34 @@ describe('InboxWidget', () => {
     const filterSelect = screen.getByTestId('inbox-filter-select')
     expect(filterSelect).toBeInTheDocument()
 
+    expect(mockUseInboxMessages).toHaveBeenCalledWith(expect.objectContaining({filter: 'unread'}))
+  })
+
+  it('loads persisted filter preference on mount', () => {
+    mockUseWidgetConfig.mockReturnValue(['all', mockSetFilter])
+
+    renderWithProviders(<InboxWidget {...buildDefaultProps()} />)
+
+    expect(mockUseWidgetConfig).toHaveBeenCalledWith('test-inbox-widget', 'filter', 'unread')
+    expect(mockUseInboxMessages).toHaveBeenCalledWith(expect.objectContaining({filter: 'all'}))
+  })
+
+  it('saves filter preference when changed', async () => {
+    renderWithProviders(<InboxWidget {...buildDefaultProps()} />)
+
+    const filterSelect = screen.getByTestId('inbox-filter-select')
+    await userEvent.click(filterSelect)
+
+    const allOption = screen.getByText('All')
+    await userEvent.click(allOption)
+
+    expect(mockSetFilter).toHaveBeenCalledWith('all')
+  })
+
+  it('defaults to unread filter when no preference saved', () => {
+    renderWithProviders(<InboxWidget {...buildDefaultProps()} />)
+
+    expect(mockUseWidgetConfig).toHaveBeenCalledWith('test-inbox-widget', 'filter', 'unread')
     expect(mockUseInboxMessages).toHaveBeenCalledWith(expect.objectContaining({filter: 'unread'}))
   })
 
