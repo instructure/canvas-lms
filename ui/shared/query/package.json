@@ -2,6 +2,7 @@
   "name": "@canvas/query",
   "private": true,
   "version": "1.0.0",
+  "main": "./index.tsx",
   "author": "neme",
   "owner": "CFA"
 }

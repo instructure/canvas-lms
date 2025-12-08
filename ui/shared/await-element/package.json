@@ -3,6 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "ckline@instructure.com",
-  "main": "./index.js",
+  "main": "./index.ts",
   "owner": "CFA"
 }
