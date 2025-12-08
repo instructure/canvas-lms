@@ -208,4 +208,94 @@ describe('useAssignmentQuery', () => {
       assignmentId: '123',
     })
   })
+
+  describe('Submission data', () => {
+    it('returns submission data with text entry fields', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '4',
+          name: 'Assignment With Text Submission',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>This is the student submission text</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('4'), {
+        wrapper: createWrapper(),
+      })
+
+      await waitForNextUpdate()
+
+      expect(
+        result.current.data?.assignment.assessmentRequestsForCurrentUser?.[0].submission,
+      ).toEqual({
+        _id: 'sub-1',
+        attempt: 1,
+        body: '<p>This is the student submission text</p>',
+        submissionType: 'online_text_entry',
+      })
+    })
+
+    it('returns multiple assessment requests with their submissions', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '6',
+          name: 'Multiple Peer Reviews',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>First submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+            {
+              _id: 'ar-2',
+              available: true,
+              workflowState: 'completed',
+              createdAt: '2025-11-02T00:00:00Z',
+              submission: {
+                _id: 'sub-2',
+                attempt: 2,
+                body: '<p>Second submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('6'), {
+        wrapper: createWrapper(),
+      })
+
+      await waitForNextUpdate()
+
+      const assessmentRequests = result.current.data?.assignment.assessmentRequestsForCurrentUser
+      expect(assessmentRequests).toHaveLength(2)
+      expect(assessmentRequests?.[0].submission?.body).toBe('<p>First submission</p>')
+      expect(assessmentRequests?.[1].submission?.body).toBe('<p>Second submission</p>')
+    })
+  })
 })

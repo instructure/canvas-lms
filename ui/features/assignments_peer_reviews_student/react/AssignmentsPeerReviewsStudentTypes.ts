@@ -16,31 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {gql} from '@apollo/client'
-
-export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
-  query GetPeerReviewAssignment($assignmentId: ID!) {
-    assignment(id: $assignmentId) {
-      _id
-      name
-      dueAt
-      description
-      courseId
-      peerReviews {
-        count
-      }
-      assessmentRequestsForCurrentUser {
-        _id
-        available
-        workflowState
-        createdAt
-        submission {
-          _id
-          attempt
-          body
-          submissionType
-        }
-      }
-    }
-  }
-`
+export interface Submission {
+  _id: string
+  attempt: number
+  body?: string | null
+  submissionType: string
+}
