@@ -267,7 +267,9 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
 
   const handleFailedImport = () => {
     showFlashAlert({
-      message: I18n.t('Tag upload failed. Please check the file format and try again.'),
+      message: I18n.t(
+        'Upload failed. Make sure all required info is included, the column names match the template, and the file is a CSV.',
+      ),
       type: 'error',
     })
     setIsProcessingCSV(false)
