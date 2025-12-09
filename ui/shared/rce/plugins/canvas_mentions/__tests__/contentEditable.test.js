@@ -20,8 +20,6 @@ import FakeEditor from './FakeEditor'
 import {screen} from '@testing-library/dom'
 import {makeMarkerEditable, makeBodyEditable} from '../contentEditable'
 
-jest.mock('react-dom')
-
 describe('contentEditable', () => {
   describe('makeMarkerEditable()', () => {
     let editor
