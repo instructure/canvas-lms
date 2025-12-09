@@ -35,6 +35,7 @@ export type IconConfirmationWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
   internalConfig: InternalLtiConfiguration
 }
+
 export const IconConfirmationWrapper = ({
   overlayStore,
   internalConfig,
