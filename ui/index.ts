@@ -21,6 +21,7 @@
 import './boot/initializers/setWebpackCdnHost'
 import '@canvas/jquery/jquery.instructure_jquery_patches' // this needs to be before anything else that requires jQuery
 import './boot'
+import './boot/featureRegistry'
 import {captureException} from '@sentry/browser'
 
 // true modules that we use in this file
@@ -119,6 +120,9 @@ function afterDocumentReady() {
   Promise.all((window.deferredBundles || []).map(loadBundle)).then(() => {
     advanceReadiness('deferredBundles')
   })
+
+  // Start the feature registry - mounts all registered features
+  window.CANVAS.startFeatures()
 
   const helpButton = document.querySelector('.help_dialog_trigger')
   if (helpButton !== null) helpButton.addEventListener('click', openHelpDialog)
