@@ -52,6 +52,13 @@ const cssPlugin = {
 export default defineConfig({
   test: {
     environment: 'jsdom',
+    // Configure jsdom to use http://localhost without port (matching Jest's default)
+    // This prevents test failures where URLs are compared with hardcoded 'http://localhost/...'
+    environmentOptions: {
+      jsdom: {
+        url: 'http://localhost',
+      },
+    },
     globals: true,
     setupFiles: 'ui/setup-vitests.tsx',
     include: ['ui/**/__tests__/**/*.test.?(c|m)[jt]s?(x)'],
