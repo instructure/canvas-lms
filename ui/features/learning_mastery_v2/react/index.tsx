@@ -111,6 +111,7 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     courseId,
     studentIds: students.map(student => student.id),
     outcomeIds: outcomes.map(outcome => outcome.id),
+    settings: gradebookSettings,
   })
 
   const handleGradebookSettingsChange = useCallback(

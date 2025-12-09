@@ -2657,6 +2657,71 @@ describe OutcomeResultsController do
       expect(response).to have_http_status(:bad_request)
     end
 
+    context "with unpublished assignments" do
+      before :once do
+        @published_assignment = @course.assignments.create!(title: "Published Assignment", workflow_state: "published")
+        @unpublished_assignment = @course.assignments.create!(title: "Unpublished Assignment", workflow_state: "unpublished")
+        @published_alignment = @outcome.align(@published_assignment, @course, mastery_score: 3)
+        @unpublished_alignment = @outcome.align(@unpublished_assignment, @course, mastery_score: 3)
+      end
+
+      it "excludes unpublished assignments by default" do
+        get :contributing_scores,
+            params: {
+              course_id: @course.id,
+              outcome_id: @outcome.id,
+              user_ids: [@student1.id],
+              only_assignment_alignments: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        alignment_names = json["alignments"].pluck("associated_asset_name")
+        expect(alignment_names).to include("Published Assignment")
+        expect(alignment_names).not_to include("Unpublished Assignment")
+      end
+
+      it "includes unpublished assignments when show_unpublished_assignments=true" do
+        get :contributing_scores,
+            params: {
+              course_id: @course.id,
+              outcome_id: @outcome.id,
+              user_ids: [@student1.id],
+              only_assignment_alignments: true,
+              show_unpublished_assignments: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        alignment_names = json["alignments"].pluck("associated_asset_name")
+        expect(alignment_names).to include("Published Assignment")
+        expect(alignment_names).to include("Unpublished Assignment")
+      end
+
+      it "excludes unpublished assignments when show_unpublished_assignments=false" do
+        get :contributing_scores,
+            params: {
+              course_id: @course.id,
+              outcome_id: @outcome.id,
+              user_ids: [@student1.id],
+              only_assignment_alignments: true,
+              show_unpublished_assignments: false
+            },
+            format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        alignment_names = json["alignments"].pluck("associated_asset_name")
+        expect(alignment_names).to include("Published Assignment")
+        expect(alignment_names).not_to include("Unpublished Assignment")
+      end
+    end
+
     it "requires proper permissions" do
       @student_session = user_session(@student1)
 
