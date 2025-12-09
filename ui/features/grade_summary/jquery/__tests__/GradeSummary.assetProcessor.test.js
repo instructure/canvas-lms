@@ -30,14 +30,6 @@ import {ZUseCourseAssignmentsAssetReportsParams} from '@canvas/lti-asset-process
 
 const I18n = createI18nScope('gradebooks')
 
-const mockRender = jest.fn()
-
-jest.mock('react-dom/client', () => ({
-  createRoot: jest.fn(() => ({
-    render: mockRender,
-  })),
-}))
-
 jest.mock('@canvas/lti-asset-processor/react/util/renderToElements', () => ({
   renderAPComponent: jest.fn(),
 }))
@@ -67,7 +59,6 @@ describe('GradeSummary - Asset Processor functionality', () => {
 
   describe('addAssetProcessorToLegacyTable', () => {
     beforeEach(() => {
-      mockRender.mockClear()
       renderAPComponent.mockClear()
 
       $fixtures.innerHTML = `
