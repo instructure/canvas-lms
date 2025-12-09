@@ -98,10 +98,11 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     selectedUserIds,
   })
 
-  const [outcomes, setOutcomes] = useState(initialOutcomes)
+  const [localOutcomes, setLocalOutcomes] = useState<Outcome[] | null>(null)
+  const outcomes = localOutcomes ?? initialOutcomes
 
   useEffect(() => {
-    setOutcomes(initialOutcomes)
+    setLocalOutcomes(null)
   }, [initialOutcomes])
 
   const {
@@ -159,19 +160,19 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
   const handleOutcomesReorder = useCallback(
     async (reorderedOutcomes: Outcome[]) => {
       const originalOutcomes = outcomes
-      setOutcomes(reorderedOutcomes)
+      setLocalOutcomes(reorderedOutcomes)
 
       try {
         await saveOutcomeOrder(courseId, reorderedOutcomes)
       } catch {
-        setOutcomes(originalOutcomes)
+        setLocalOutcomes(originalOutcomes === initialOutcomes ? null : originalOutcomes)
         showFlashAlert({
           type: 'error',
           message: I18n.t('Failed to save outcome order'),
         })
       }
     },
-    [courseId, outcomes],
+    [courseId, outcomes, initialOutcomes],
   )
 
   const handleOpenStudentAssignmentTray = useCallback(
