@@ -658,13 +658,15 @@ describe('AssignmentPostingPolicyTray', () => {
       await enterNewDateTime(dateInputs[0], futureDateString2)
 
       const saveButton = getByTestId('assignment-posting-policy-save-button')
-      expect(saveButton).toBeDisabled()
-      expect(
-        screen.getByText('Grades release date must be the same or after comments release date'),
-      ).toBeInTheDocument()
-      expect(
-        screen.getByText('Comments release date must be the same or before grades release date'),
-      ).toBeInTheDocument()
+      await waitFor(() => {
+        expect(saveButton).toBeDisabled()
+        expect(
+          screen.getByText('Grades release date must be the same or after comments release date'),
+        ).toBeInTheDocument()
+        expect(
+          screen.getByText('Comments release date must be the same or before grades release date'),
+        ).toBeInTheDocument()
+      })
     })
 
     it('does not show validation error for pre-existing grades date when only comments date is changed', async () => {
