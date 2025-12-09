@@ -23,23 +23,7 @@ import {createGradebook} from './GradebookSpecHelper'
 import studentRowHeaderConstants from '../constants/studentRowHeaderConstants'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-// Mock React and ReactDOM
-jest.mock('react', () => ({
-  ...jest.requireActual('react'),
-  createElement: jest.fn().mockImplementation((type, props, ...children) => ({
-    type,
-    props: {...props, children},
-  })),
-}))
-
-jest.mock('react-dom/client', () => ({
-  createRoot: jest.fn().mockReturnValue({
-    render: jest.fn(),
-    unmount: jest.fn(),
-  }),
-}))
-
-// Mock renderComponent from Gradebook.utils
+// Mock renderComponent from Gradebook.utils to prevent actual rendering
 jest.mock('../Gradebook.utils', () => ({
   ...jest.requireActual('../Gradebook.utils'),
   renderComponent: jest.fn(),
