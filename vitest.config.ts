@@ -36,6 +36,19 @@ const graphqlPlugin = {
   },
 }
 
+// Plugin to handle CSS imports as empty modules (like Jest's styleMock.js)
+const cssPlugin = {
+  name: 'css-loader',
+  transform(_code: string, id: string) {
+    if (id.endsWith('.css')) {
+      return {
+        code: 'export default {}',
+        map: null,
+      }
+    }
+  },
+}
+
 export default defineConfig({
   test: {
     environment: 'jsdom',
@@ -59,7 +72,26 @@ export default defineConfig({
     alias: {
       // Match webpack's modules config: resolve(canvasDir, 'public/javascripts')
       translations: resolve(__dirname, 'public/javascripts/translations'),
+      // Match Jest's moduleNameMapper for backbone versions
+      'node_modules-version-of-backbone': 'backbone',
+      'node_modules-version-of-react-modal': 'react-modal',
+      // Backbone global alias
+      Backbone: resolve(__dirname, 'public/javascripts/Backbone.js'),
+      // TinyMCE React mock
+      '@tinymce/tinymce-react': resolve(
+        __dirname,
+        'packages/canvas-rce/src/rce/__mocks__/tinymceReact.jsx',
+      ),
+      // decimal.js ESM compatibility
+      'decimal.js/decimal.mjs': 'decimal.js/decimal.js',
+      // Studio player mock
+      '@instructure/studio-player': resolve(
+        __dirname,
+        'packages/canvas-rce/src/rce/__mocks__/_mockStudioPlayer.js',
+      ),
+      // Crypto-es mock
+      'crypto-es': resolve(__dirname, 'packages/canvas-rce/src/rce/__mocks__/_mockCryptoEs.ts'),
     },
   },
-  plugins: [handlebarsPlugin(), svgPlugin(), graphqlPlugin],
+  plugins: [handlebarsPlugin(), svgPlugin(), graphqlPlugin, cssPlugin],
 })
