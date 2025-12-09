@@ -30,10 +30,20 @@ const queryClient = new QueryClient({
   },
 })
 
-export function renderBlock<T>(Block: React.FC<T>, props: T & React.Attributes) {
+export type RenderBlockOptions = {
+  aiAltTextGenerationURL?: string | null
+  toolbarReorder?: boolean
+}
+
+export function renderBlock<T>(
+  Block: React.FC<T>,
+  props: T & React.Attributes,
+  options: RenderBlockOptions = {},
+) {
+  const {aiAltTextGenerationURL = null, toolbarReorder = false} = options
   return render(
     <QueryClientProvider client={queryClient}>
-      <Provider store={createStore({aiAltTextGenerationURL: null, toolbarReorder: false})}>
+      <Provider store={createStore({aiAltTextGenerationURL, toolbarReorder})}>
         <Editor resolver={{[Block.name]: Block}}>
           <Frame>
             <Block {...props} />
