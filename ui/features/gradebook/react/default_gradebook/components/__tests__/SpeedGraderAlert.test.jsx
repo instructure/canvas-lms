@@ -17,88 +17,82 @@
  */
 
 import React from 'react'
+import {render, screen, waitFor, act} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import AnonymousSpeedGraderAlert from '../AnonymousSpeedGraderAlert'
-import {createGradebook} from '../../__tests__/GradebookSpecHelper'
 
-jest.mock('../AnonymousSpeedGraderAlert', () => {
-  const mockComponent = jest.fn(props => {
-    return {
-      render: () => (
-        <div role="dialog" data-testid="anonymous-speed-grader-alert">
-          <span>SpeedGrader URL: {props.speedGraderUrl}</span>
-          <button onClick={props.onClose}>Close</button>
-        </div>
-      ),
-      open: jest.fn(),
-    }
-  })
-  return {
-    __esModule: true,
-    default: mockComponent,
-  }
-})
-
-jest.mock('react-dom', () => ({
-  ...jest.requireActual('react-dom'),
-  render: jest.fn(element => element.type(element.props)),
-}))
-
-describe('Gradebook > renderAnonymousSpeedGraderAlert', () => {
-  let gradebook
-  const onClose = jest.fn()
-  const alertProps = {
-    speedGraderUrl: 'http://test.url:3000',
-    onClose,
+describe('AnonymousSpeedGraderAlert', () => {
+  const defaultProps = {
+    speedGraderUrl: 'http://test.url:3000/speed_grader',
+    onClose: jest.fn(),
   }
 
   beforeEach(() => {
-    gradebook = createGradebook()
-  })
-
-  afterEach(() => {
     jest.clearAllMocks()
   })
 
-  it('renders the AnonymousSpeedGraderAlert component', () => {
-    gradebook.renderAnonymousSpeedGraderAlert(alertProps)
-    expect(AnonymousSpeedGraderAlert).toHaveBeenCalled()
+  const renderComponent = (props = {}) => {
+    const ref = React.createRef()
+    render(<AnonymousSpeedGraderAlert ref={ref} {...defaultProps} {...props} />)
+    return ref
+  }
+
+  it('shows the alert content when open() is called', async () => {
+    const ref = renderComponent()
+    await act(async () => {
+      ref.current.open()
+    })
+    await waitFor(() => {
+      expect(screen.getByText('Anonymous Mode On:')).toBeInTheDocument()
+    })
+    expect(
+      screen.getByText('Unable to access specific student. Go to assignment in SpeedGrader?'),
+    ).toBeInTheDocument()
   })
 
-  it('passes speedGraderUrl to the modal as a prop', () => {
-    gradebook.renderAnonymousSpeedGraderAlert(alertProps)
-    expect(AnonymousSpeedGraderAlert).toHaveBeenCalledWith({
-      speedGraderUrl: 'http://test.url:3000',
-      onClose,
+  it('renders the Open SpeedGrader link with the correct href', async () => {
+    const ref = renderComponent({speedGraderUrl: 'http://custom.url/speed_grader'})
+    await act(async () => {
+      ref.current.open()
+    })
+    const openButton = await screen.findByRole('link', {name: /Open SpeedGrader/i})
+    expect(openButton).toHaveAttribute('href', 'http://custom.url/speed_grader')
+  })
+
+  it('renders a Cancel button', async () => {
+    const ref = renderComponent()
+    await act(async () => {
+      ref.current.open()
+    })
+    const cancelButton = await screen.findByRole('button', {name: /Cancel/i})
+    expect(cancelButton).toBeInTheDocument()
+  })
+
+  it('calls onClose when Cancel is clicked', async () => {
+    const onClose = jest.fn()
+    const ref = renderComponent({onClose})
+    await act(async () => {
+      ref.current.open()
+    })
+    const cancelButton = await screen.findByRole('button', {name: /Cancel/i})
+    await userEvent.click(cancelButton)
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled()
     })
   })
 
-  it('passes onClose to the modal as a prop', () => {
-    gradebook.renderAnonymousSpeedGraderAlert(alertProps)
-    expect(AnonymousSpeedGraderAlert).toHaveBeenCalledWith({
-      speedGraderUrl: 'http://test.url:3000',
-      onClose,
+  it('closes the alert when Cancel is clicked', async () => {
+    const ref = renderComponent()
+    await act(async () => {
+      ref.current.open()
     })
-  })
-})
-
-describe('Gradebook > showAnonymousSpeedGraderAlertForURL', () => {
-  let gradebook
-
-  beforeEach(() => {
-    gradebook = createGradebook()
-    jest.spyOn(gradebook, 'renderAnonymousSpeedGraderAlert')
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it('renders the alert with the supplied speedGraderURL', () => {
-    gradebook.showAnonymousSpeedGraderAlertForURL('http://test.url:3000')
-    expect(gradebook.renderAnonymousSpeedGraderAlert).toHaveBeenCalledWith(
-      expect.objectContaining({
-        speedGraderUrl: 'http://test.url:3000',
-      }),
-    )
+    await waitFor(() => {
+      expect(screen.getByText('Anonymous Mode On:')).toBeInTheDocument()
+    })
+    const cancelButton = screen.getByRole('button', {name: /Cancel/i})
+    await userEvent.click(cancelButton)
+    await waitFor(() => {
+      expect(screen.queryByText('Anonymous Mode On:')).not.toBeInTheDocument()
+    })
   })
 })
