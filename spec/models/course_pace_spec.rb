@@ -465,6 +465,84 @@ describe CoursePace do
       expect(@course_pace.course_pace_module_items.reload.pluck(:duration)).to eq([900, 900])
     end
 
+    it "restores module item durations between enrollments when compressing dates" do
+      course = Course.create!(
+        name: "Course Pace Test",
+        account: Account.default,
+        workflow_state: "available",
+        conclude_at: 30.days.from_now
+      )
+      course.enable_course_paces = true
+      course.save!
+
+      assignments = []
+      context_module_1 = course.context_modules.create!(name: "Module 1")
+      5.times do |i|
+        assignment = course.assignments.create!(
+          title: "Module 1 - Assignment #{i + 1}",
+          points_possible: 10,
+          workflow_state: "published"
+        )
+        content_tag = context_module_1.add_item(type: "assignment", id: assignment.id)
+        content_tag.publish! if content_tag.unpublished?
+        assignments << assignment
+      end
+
+      context_module_2 = course.context_modules.create!(name: "Module 2")
+      5.times do |i|
+        assignment = course.assignments.create!(
+          title: "Module 2 - Assignment #{i + 1}",
+          points_possible: 10,
+          workflow_state: "published"
+        )
+        content_tag = context_module_2.add_item(type: "assignment", id: assignment.id)
+        content_tag.publish! if content_tag.unpublished?
+        assignments << assignment
+      end
+
+      course_pace = course.course_paces.create!(
+        workflow_state: "active",
+        end_date: course.conclude_at,
+        exclude_weekends: true,
+        hard_end_dates: true,
+        published_at: Time.zone.now
+      )
+
+      # Add pace items with 5-day durations (10 assignments * 5 days = 50 days, course ends in 30)
+      [context_module_1, context_module_2].each do |mod|
+        mod.content_tags.each do |content_tag|
+          course_pace.course_pace_module_items.create!(
+            module_item: content_tag,
+            duration: 5
+          )
+        end
+      end
+
+      # Create 6 students with different start dates (0, 2, 4, 6, 8, 10 days ago)
+      students = []
+      6.times do |i|
+        user = user_model
+        enrollment = course.enroll_student(user, enrollment_state: "active")
+        enrollment.start_at = (i * 2).days.ago
+        enrollment.save!
+        students << user
+      end
+
+      expect(course_pace.publish).to be(true)
+
+      # With the fix, all students should have the SAME due date for the LAST assignment
+      # Because there is a course end date, they all compress to the course end date
+      last_assignment = assignments.last
+      last_assignment_overrides = students.map do |student|
+        last_assignment.assignment_overrides.joins(:assignment_override_students)
+                       .find_by(assignment_override_students: { user_id: student.id })
+      end
+      expected_last_due_date = last_assignment_overrides.first.due_at
+      last_assignment_overrides.each do |override|
+        expect(override.due_at).to eq(expected_last_due_date)
+      end
+    end
+
     context "with mastery paths" do
       before :once do
         setup_course_with_native_conditional_release(course: @course)
