@@ -140,12 +140,19 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         <Grid.Row>
           <Grid.Col>
             <Flex direction="row" gap="small" alignItems="center">
-              <Heading level="h3">
+              <Heading
+                level="h3"
+                aria-describedby={`deployment-availability-${deployment.id} deployment-exceptions-${deployment.id} deployment-placements-${deployment.id} deployment-id-${deployment.id} `}
+              >
                 {I18n.t('Installed in %{context_name}', {
                   context_name: deployment.context_name,
                 })}
               </Heading>
-              <Tag text={rootControl?.available ? I18n.t('Available') : I18n.t('Not Available')} />
+              <span id={`deployment-availability-${deployment.id}`} aria-hidden="true">
+                <Tag
+                  text={rootControl?.available ? I18n.t('Available') : I18n.t('Not Available')}
+                />
+              </span>
             </Flex>
           </Grid.Col>
 
@@ -184,6 +191,9 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                       deployment,
                     })
                   }}
+                  aria-label={I18n.t('Add Exception for %{context_name}', {
+                    context_name: deployment.context_name,
+                  })}
                   color="primary"
                 >
                   {I18n.t('Add Exception')}
@@ -218,17 +228,22 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
             .catch(onError)
         }}
       />
-      <div>
+      <div id={`deployment-id-${deployment.id}`} aria-hidden="true">
         <Text size="small">
           {I18n.t('Deployment ID: %{deployment_id}', {
             deployment_id: deployment.deployment_id,
           })}
         </Text>
       </div>
-      <div>
+      <div id={`deployment-exceptions-${deployment.id}`} aria-hidden="true">
         <Text size="small">{rootControl ? renderExceptionCounts(rootControl) : undefined}</Text>
       </div>
-      <View as="div" margin="0 0 small">
+      <View
+        as="div"
+        margin="0 0 small"
+        id={`deployment-placements-${deployment.id}`}
+        aria-hidden="true"
+      >
         <Text>
           <Link
             to={`/manage/${registration.id}/configuration#placements`}
