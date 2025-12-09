@@ -38,6 +38,7 @@ describe('DisplayFilterSelector', () => {
 
   it('renders all checkbox options', () => {
     render(<DisplayFilterSelector {...defaultProps} />)
+    expect(screen.getByLabelText('Unpublished Assignments')).toBeInTheDocument()
     expect(screen.getByLabelText('Students with no results')).toBeInTheDocument()
     expect(screen.getByLabelText('Avatars in student list')).toBeInTheDocument()
     expect(screen.getByLabelText('Outcomes with no results')).toBeInTheDocument()
@@ -45,10 +46,12 @@ describe('DisplayFilterSelector', () => {
 
   it('renders checkboxes with correct values', () => {
     render(<DisplayFilterSelector {...defaultProps} />)
+    const unpublishedCheckbox = screen.getByLabelText('Unpublished Assignments')
     const studentsCheckbox = screen.getByLabelText('Students with no results')
     const avatarsCheckbox = screen.getByLabelText('Avatars in student list')
     const outcomesCheckbox = screen.getByLabelText('Outcomes with no results')
 
+    expect(unpublishedCheckbox).toHaveAttribute('value', DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS)
     expect(studentsCheckbox).toHaveAttribute('value', DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS)
     expect(avatarsCheckbox).toHaveAttribute('value', DisplayFilter.SHOW_STUDENT_AVATARS)
     expect(outcomesCheckbox).toHaveAttribute('value', DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS)
@@ -58,6 +61,7 @@ describe('DisplayFilterSelector', () => {
     const props = {
       ...defaultProps,
       values: [
+        DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS,
         DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
         DisplayFilter.SHOW_STUDENT_AVATARS,
         DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS,
@@ -65,6 +69,7 @@ describe('DisplayFilterSelector', () => {
     }
     render(<DisplayFilterSelector {...props} />)
 
+    expect(screen.getByLabelText('Unpublished Assignments')).toBeChecked()
     expect(screen.getByLabelText('Students with no results')).toBeChecked()
     expect(screen.getByLabelText('Avatars in student list')).toBeChecked()
     expect(screen.getByLabelText('Outcomes with no results')).toBeChecked()
@@ -73,6 +78,7 @@ describe('DisplayFilterSelector', () => {
   it('displays checkboxes as unchecked when values are empty', () => {
     render(<DisplayFilterSelector {...defaultProps} />)
 
+    expect(screen.getByLabelText('Unpublished Assignments')).not.toBeChecked()
     expect(screen.getByLabelText('Students with no results')).not.toBeChecked()
     expect(screen.getByLabelText('Avatars in student list')).not.toBeChecked()
     expect(screen.getByLabelText('Outcomes with no results')).not.toBeChecked()
@@ -151,5 +157,26 @@ describe('DisplayFilterSelector', () => {
       DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS,
       DisplayFilter.SHOW_STUDENT_AVATARS,
     ])
+  })
+
+  it('can toggle unpublished assignments checkbox', async () => {
+    const user = userEvent.setup()
+    const onChange = jest.fn()
+    render(<DisplayFilterSelector {...defaultProps} onChange={onChange} />)
+
+    const unpublishedCheckbox = screen.getByLabelText('Unpublished Assignments')
+    await user.click(unpublishedCheckbox)
+
+    expect(onChange).toHaveBeenCalledWith([DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS])
+  })
+
+  it('displays unpublished assignments checkbox as checked when value is provided', () => {
+    const props = {
+      ...defaultProps,
+      values: [DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS],
+    }
+    render(<DisplayFilterSelector {...props} />)
+
+    expect(screen.getByLabelText('Unpublished Assignments')).toBeChecked()
   })
 })

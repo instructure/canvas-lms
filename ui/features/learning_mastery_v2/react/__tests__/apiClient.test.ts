@@ -195,6 +195,7 @@ describe('apiClient', () => {
             show_student_avatars: true,
             show_students_with_no_results: true,
             show_outcomes_with_no_results: true,
+            show_unpublished_assignments: false,
             name_display_format: 'first_last',
             students_per_page: 15,
             score_display_format: 'icon_only',
@@ -224,6 +225,7 @@ describe('apiClient', () => {
             show_student_avatars: false,
             show_students_with_no_results: false,
             show_outcomes_with_no_results: false,
+            show_unpublished_assignments: false,
             name_display_format: 'first_last',
             students_per_page: 30,
             score_display_format: 'icon_and_label',
@@ -253,6 +255,7 @@ describe('apiClient', () => {
             show_student_avatars: false,
             show_students_with_no_results: false,
             show_outcomes_with_no_results: false,
+            show_unpublished_assignments: false,
             name_display_format: 'first_last',
             students_per_page: 50,
             score_display_format: 'icon_only',
@@ -282,6 +285,7 @@ describe('apiClient', () => {
             show_student_avatars: true,
             show_students_with_no_results: false,
             show_outcomes_with_no_results: false,
+            show_unpublished_assignments: false,
             name_display_format: 'first_last',
             students_per_page: 15,
             score_display_format: 'icon_only',
@@ -311,6 +315,7 @@ describe('apiClient', () => {
             show_student_avatars: false,
             show_students_with_no_results: false,
             show_outcomes_with_no_results: false,
+            show_unpublished_assignments: false,
             name_display_format: 'last_first',
             students_per_page: 15,
             score_display_format: 'icon_only',
@@ -340,9 +345,40 @@ describe('apiClient', () => {
             show_student_avatars: false,
             show_students_with_no_results: false,
             show_outcomes_with_no_results: false,
+            show_unpublished_assignments: false,
             name_display_format: 'first_last',
             students_per_page: 15,
             score_display_format: 'icon_and_points',
+            outcome_arrangement: 'upload_order',
+          },
+        },
+      )
+    })
+
+    it('includes show_unpublished_assignments when filter is enabled', async () => {
+      const settings = {
+        secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
+        displayFilters: [DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS],
+        nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+        studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
+        scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
+        outcomeArrangement: OutcomeArrangement.UPLOAD_ORDER,
+      }
+
+      await saveLearningMasteryGradebookSettings('123', settings)
+
+      expect(mockedAxios.put).toHaveBeenCalledWith(
+        '/api/v1/courses/123/learning_mastery_gradebook_settings',
+        {
+          learning_mastery_gradebook_settings: {
+            secondary_info_display: 'none',
+            show_student_avatars: false,
+            show_students_with_no_results: false,
+            show_outcomes_with_no_results: false,
+            show_unpublished_assignments: true,
+            name_display_format: 'first_last',
+            students_per_page: 15,
+            score_display_format: 'icon_only',
             outcome_arrangement: 'upload_order',
           },
         },

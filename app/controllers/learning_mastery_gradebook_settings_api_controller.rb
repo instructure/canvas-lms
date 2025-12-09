@@ -72,6 +72,7 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
       :show_students_with_no_results,
       :show_outcomes_with_no_results,
       :show_student_avatars,
+      :show_unpublished_assignments,
       :name_display_format,
       :students_per_page,
       :score_display_format,
@@ -124,6 +125,13 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
       value = settings[:show_student_avatars]
       unless VALID_BOOLEAN_VALUES.include?(value)
         errors << "Invalid show_student_avatars ('#{value}'). Valid values are: [true, false]"
+      end
+    end
+
+    if settings.key?(:show_unpublished_assignments)
+      value = settings[:show_unpublished_assignments]
+      unless VALID_BOOLEAN_VALUES.include?(value)
+        errors << "Invalid show_unpublished_assignments ('#{value}'). Valid values are: [true, false]"
       end
     end
 
