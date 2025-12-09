@@ -40,106 +40,215 @@ describe('StudentAssignmentDetailTray', () => {
       onPrevious: jest.fn(),
       onNext: jest.fn(),
     },
+    studentNavigator: {
+      hasPrevious: true,
+      hasNext: true,
+      onPrevious: jest.fn(),
+      onNext: jest.fn(),
+    },
   }
 
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  it('renders when open', () => {
-    render(<StudentAssignmentDetailTray {...defaultProps} />)
-    expect(screen.getByTestId('student-assignment-detail-tray')).toBeInTheDocument()
+  describe('General behavior', () => {
+    it('renders when open', () => {
+      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      expect(screen.getByTestId('student-assignment-detail-tray')).toBeInTheDocument()
+    })
+
+    it('does not render when closed', () => {
+      render(<StudentAssignmentDetailTray {...defaultProps} open={false} />)
+      const tray = screen.queryByTestId('student-assignment-detail-tray')
+      expect(tray).not.toBeInTheDocument()
+    })
+
+    it('displays the outcome title', () => {
+      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      expect(screen.getByText(defaultProps.outcome.title)).toBeInTheDocument()
+    })
+
+    it('calls onDismiss when close button is clicked', async () => {
+      const user = userEvent.setup()
+      const onDismiss = jest.fn()
+      render(<StudentAssignmentDetailTray {...defaultProps} onDismiss={onDismiss} />)
+
+      const closeButton = screen.getByRole('button', {name: /close/i})
+      await user.click(closeButton)
+
+      expect(onDismiss).toHaveBeenCalledTimes(1)
+    })
   })
 
-  it('displays the outcome title', () => {
-    render(<StudentAssignmentDetailTray {...defaultProps} />)
-    expect(screen.getByText(defaultProps.outcome.title)).toBeInTheDocument()
+  describe('AssignmentSection integration', () => {
+    it('displays the assignment name as a link', () => {
+      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      const link = screen.getByRole('link', {name: /Test Assignment/i})
+      expect(link).toBeInTheDocument()
+      expect(link).toHaveAttribute('href', '/courses/123/assignments/456')
+    })
+
+    it('renders SpeedGrader button', () => {
+      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      const speedGraderButton = screen.getByRole('link', {name: /SpeedGrader/i})
+      expect(speedGraderButton).toBeInTheDocument()
+      expect(speedGraderButton).toHaveAttribute(
+        'href',
+        '/courses/123/gradebook/speed_grader?assignment_id=456&student_id=1',
+      )
+    })
+
+    it('renders assignment navigator', () => {
+      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      expect(screen.getByTestId('assignment-navigator')).toBeInTheDocument()
+    })
+
+    it('calls assignmentNavigator onPrevious when assignment previous button is clicked', async () => {
+      const user = userEvent.setup()
+      const onPrevious = jest.fn()
+      render(
+        <StudentAssignmentDetailTray
+          {...defaultProps}
+          assignmentNavigator={{...defaultProps.assignmentNavigator, onPrevious}}
+        />,
+      )
+
+      const assignmentNav = screen.getByTestId('assignment-navigator')
+      const previousButton = assignmentNav.querySelector('[data-testid="previous-button"]')
+      await user.click(previousButton!)
+      expect(onPrevious).toHaveBeenCalledTimes(1)
+    })
+
+    it('calls assignmentNavigator onNext when assignment next button is clicked', async () => {
+      const user = userEvent.setup()
+      const onNext = jest.fn()
+      render(
+        <StudentAssignmentDetailTray
+          {...defaultProps}
+          assignmentNavigator={{...defaultProps.assignmentNavigator, onNext}}
+        />,
+      )
+
+      const assignmentNav = screen.getByTestId('assignment-navigator')
+      const nextButton = assignmentNav.querySelector('[data-testid="next-button"]')
+      await user.click(nextButton!)
+      expect(onNext).toHaveBeenCalledTimes(1)
+    })
+
+    it('disables assignment previous button when hasPrevious is false', () => {
+      render(
+        <StudentAssignmentDetailTray
+          {...defaultProps}
+          assignmentNavigator={{...defaultProps.assignmentNavigator, hasPrevious: false}}
+        />,
+      )
+      const assignmentNav = screen.getByTestId('assignment-navigator')
+      const previousButton = assignmentNav.querySelector('[data-testid="previous-button"]')
+      expect(previousButton).toBeDisabled()
+    })
+
+    it('disables assignment next button when hasNext is false', () => {
+      render(
+        <StudentAssignmentDetailTray
+          {...defaultProps}
+          assignmentNavigator={{...defaultProps.assignmentNavigator, hasNext: false}}
+        />,
+      )
+      const assignmentNav = screen.getByTestId('assignment-navigator')
+      const nextButton = assignmentNav.querySelector('[data-testid="next-button"]')
+      expect(nextButton).toBeDisabled()
+    })
   })
 
-  it('displays the assignment name as a link', () => {
-    render(<StudentAssignmentDetailTray {...defaultProps} />)
-    const link = screen.getByRole('link', {name: /Test Assignment/i})
-    expect(link).toBeInTheDocument()
-    expect(link).toHaveAttribute('href', '/courses/123/assignments/456')
-  })
+  describe('StudentSection integration', () => {
+    it('renders student navigator', () => {
+      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      expect(screen.getByTestId('student-navigator')).toBeInTheDocument()
+    })
 
-  it('renders SpeedGrader button', () => {
-    render(<StudentAssignmentDetailTray {...defaultProps} />)
-    const speedGraderButton = screen.getByRole('link', {name: /SpeedGrader/i})
-    expect(speedGraderButton).toBeInTheDocument()
-    expect(speedGraderButton).toHaveAttribute(
-      'href',
-      '/courses/123/gradebook/speed_grader?assignment_id=456&student_id=1',
-    )
-  })
+    it('displays student name', () => {
+      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      expect(screen.getByText(MOCK_STUDENTS[0].name)).toBeInTheDocument()
+    })
 
-  it('renders assignment navigator', () => {
-    render(<StudentAssignmentDetailTray {...defaultProps} />)
-    expect(screen.getByTestId('assignment-navigator')).toBeInTheDocument()
-  })
+    it('displays student avatar', () => {
+      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      const avatar = screen.getByRole('img', {name: MOCK_STUDENTS[0].name})
+      expect(avatar).toBeInTheDocument()
+      expect(avatar).toHaveAttribute('src', MOCK_STUDENTS[0].avatar_url)
+    })
 
-  it('calls onDismiss when close button is clicked', async () => {
-    const user = userEvent.setup()
-    const onDismiss = jest.fn()
-    render(<StudentAssignmentDetailTray {...defaultProps} onDismiss={onDismiss} />)
+    it('renders mastery report link with correct URL', () => {
+      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      const link = screen.getByRole('link', {name: /View Mastery Report/i})
+      expect(link).toBeInTheDocument()
+      expect(link).toHaveAttribute('href', '/courses/123/grades/1#tab-outcomes')
+    })
 
-    const closeButton = screen.getByRole('button', {name: /close/i})
-    await user.click(closeButton)
+    it('calls studentNavigator onPrevious when student previous button is clicked', async () => {
+      const user = userEvent.setup()
+      const onPrevious = jest.fn()
+      render(
+        <StudentAssignmentDetailTray
+          {...defaultProps}
+          studentNavigator={{...defaultProps.studentNavigator, onPrevious}}
+        />,
+      )
 
-    expect(onDismiss).toHaveBeenCalledTimes(1)
-  })
+      const studentNav = screen.getByTestId('student-navigator')
+      const previousButton = studentNav.querySelector('[data-testid="previous-button"]')
+      await user.click(previousButton!)
+      expect(onPrevious).toHaveBeenCalledTimes(1)
+    })
 
-  it('calls onPrevious when previous button is clicked', async () => {
-    const user = userEvent.setup()
-    const onPrevious = jest.fn()
-    render(
-      <StudentAssignmentDetailTray
-        {...defaultProps}
-        assignmentNavigator={{...defaultProps.assignmentNavigator, onPrevious}}
-      />,
-    )
+    it('calls studentNavigator onNext when student next button is clicked', async () => {
+      const user = userEvent.setup()
+      const onNext = jest.fn()
+      render(
+        <StudentAssignmentDetailTray
+          {...defaultProps}
+          studentNavigator={{...defaultProps.studentNavigator, onNext}}
+        />,
+      )
 
-    await user.click(screen.getByTestId('previous-button'))
-    expect(onPrevious).toHaveBeenCalledTimes(1)
-  })
+      const studentNav = screen.getByTestId('student-navigator')
+      const nextButton = studentNav.querySelector('[data-testid="next-button"]')
+      await user.click(nextButton!)
+      expect(onNext).toHaveBeenCalledTimes(1)
+    })
 
-  it('calls onNext when next button is clicked', async () => {
-    const user = userEvent.setup()
-    const onNext = jest.fn()
-    render(
-      <StudentAssignmentDetailTray
-        {...defaultProps}
-        assignmentNavigator={{...defaultProps.assignmentNavigator, onNext}}
-      />,
-    )
+    it('disables student previous button when hasPrevious is false', () => {
+      render(
+        <StudentAssignmentDetailTray
+          {...defaultProps}
+          studentNavigator={{...defaultProps.studentNavigator, hasPrevious: false}}
+        />,
+      )
+      const studentNav = screen.getByTestId('student-navigator')
+      const previousButton = studentNav.querySelector('[data-testid="previous-button"]')
+      expect(previousButton).toBeDisabled()
+    })
 
-    await user.click(screen.getByTestId('next-button'))
-    expect(onNext).toHaveBeenCalledTimes(1)
-  })
+    it('disables student next button when hasNext is false', () => {
+      render(
+        <StudentAssignmentDetailTray
+          {...defaultProps}
+          studentNavigator={{...defaultProps.studentNavigator, hasNext: false}}
+        />,
+      )
+      const studentNav = screen.getByTestId('student-navigator')
+      const nextButton = studentNav.querySelector('[data-testid="next-button"]')
+      expect(nextButton).toBeDisabled()
+    })
 
-  it('disables previous button when hasPrevious is false', () => {
-    render(
-      <StudentAssignmentDetailTray
-        {...defaultProps}
-        assignmentNavigator={{...defaultProps.assignmentNavigator, hasPrevious: false}}
-      />,
-    )
-    expect(screen.getByTestId('previous-button')).toBeDisabled()
-  })
+    it('updates student information when student prop changes', () => {
+      const {rerender} = render(<StudentAssignmentDetailTray {...defaultProps} />)
+      expect(screen.getByText(MOCK_STUDENTS[0].name)).toBeInTheDocument()
 
-  it('disables next button when hasNext is false', () => {
-    render(
-      <StudentAssignmentDetailTray
-        {...defaultProps}
-        assignmentNavigator={{...defaultProps.assignmentNavigator, hasNext: false}}
-      />,
-    )
-    expect(screen.getByTestId('next-button')).toBeDisabled()
-  })
-
-  it('does not render when closed', () => {
-    render(<StudentAssignmentDetailTray {...defaultProps} open={false} />)
-    const tray = screen.queryByTestId('student-assignment-detail-tray')
-    expect(tray).not.toBeInTheDocument()
+      rerender(<StudentAssignmentDetailTray {...defaultProps} student={MOCK_STUDENTS[1]} />)
+      expect(screen.getByText(MOCK_STUDENTS[1].name)).toBeInTheDocument()
+      expect(screen.queryByText(MOCK_STUDENTS[0].name)).not.toBeInTheDocument()
+    })
   })
 })

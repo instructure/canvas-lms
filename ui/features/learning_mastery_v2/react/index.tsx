@@ -36,9 +36,10 @@ import {GradebookSettings, NameDisplayFormat} from './utils/constants'
 import useRollups from './hooks/useRollups'
 import {useGradebookSettings} from './hooks/useGradebookSettings'
 import {saveLearningMasteryGradebookSettings, saveOutcomeOrder} from './apiClient'
-import {Outcome, Student} from './types/rollup'
-import {ContributingScoreAlignment, useContributingScores} from './hooks/useContributingScores'
+import {Outcome} from './types/rollup'
+import {useContributingScores} from './hooks/useContributingScores'
 import {StudentAssignmentDetailTray} from './components/trays/StudentAssignmentDetailTray'
+import {useStudentAssignmentTray} from './hooks/useStudentAssignmentTray'
 
 const queryClient = new QueryClient()
 
@@ -73,12 +74,6 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
 
   const [isSavingSettings, setIsSavingSettings] = useState(false)
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
-  const [studentAssignmentTrayState, setStudentAssignmentTrayState] = useState<{
-    outcome: Outcome
-    student: Student
-    currentAlignmentIndex: number
-    alignments: ContributingScoreAlignment[]
-  } | null>(null)
 
   const {
     isLoading: isLoadingGradebook,
@@ -97,6 +92,8 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     settings: gradebookSettings,
     selectedUserIds,
   })
+
+  const studentAssignmentDetailTray = useStudentAssignmentTray(students)
 
   const [localOutcomes, setLocalOutcomes] = useState<Outcome[] | null>(null)
   const outcomes = localOutcomes ?? initialOutcomes
@@ -175,28 +172,6 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     [courseId, outcomes, initialOutcomes],
   )
 
-  const handleOpenStudentAssignmentTray = useCallback(
-    (
-      outcome: Outcome,
-      student: Student,
-      alignmentIndex: number,
-      alignments: ContributingScoreAlignment[],
-    ) => {
-      if (alignmentIndex === undefined) return
-      setStudentAssignmentTrayState({
-        outcome,
-        student,
-        currentAlignmentIndex: alignmentIndex,
-        alignments,
-      })
-    },
-    [],
-  )
-
-  const handleCloseStudentAssignmentTray = useCallback(() => {
-    setStudentAssignmentTrayState(null)
-  }, [])
-
   const renderBody = () => {
     if (error !== null || contributingScoresError !== null)
       return (
@@ -224,7 +199,7 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
         onChangeNameDisplayFormat={handleNameDisplayFormatChange}
         onOutcomesReorder={handleOutcomesReorder}
         contributingScores={contributingScores}
-        onOpenStudentAssignmentTray={handleOpenStudentAssignmentTray}
+        onOpenStudentAssignmentTray={studentAssignmentDetailTray.open}
         data-testid="gradebook-body"
       />
     )
@@ -251,55 +226,28 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
       )}
       <FilterWrapper pagination={pagination} onPerPageChange={handleUpdateStudentsPerPage} />
       {renderBody()}
-      {studentAssignmentTrayState && (
-        <StudentAssignmentDetailTray
-          open={true}
-          onDismiss={handleCloseStudentAssignmentTray}
-          outcome={studentAssignmentTrayState.outcome}
-          courseId={courseId}
-          student={studentAssignmentTrayState.student}
-          assignment={{
-            id: studentAssignmentTrayState.alignments[
-              studentAssignmentTrayState.currentAlignmentIndex
-            ].associated_asset_id,
-            name: studentAssignmentTrayState.alignments[
-              studentAssignmentTrayState.currentAlignmentIndex
-            ].associated_asset_name,
-            htmlUrl:
-              studentAssignmentTrayState.alignments[
-                studentAssignmentTrayState.currentAlignmentIndex
-              ].html_url,
-          }}
-          assignmentNavigator={{
-            hasNext:
-              studentAssignmentTrayState.currentAlignmentIndex <
-              studentAssignmentTrayState.alignments.length - 1,
-            hasPrevious: studentAssignmentTrayState.currentAlignmentIndex > 0,
-            onNext: () => {
-              setStudentAssignmentTrayState(prevState => {
-                if (!prevState) return null
-                const nextIndex = prevState.currentAlignmentIndex + 1
-                if (nextIndex >= prevState.alignments.length) return prevState
-                return {
-                  ...prevState,
-                  currentAlignmentIndex: nextIndex,
-                }
-              })
-            },
-            onPrevious: () => {
-              setStudentAssignmentTrayState(prevState => {
-                if (!prevState) return null
-                const prevIndex = prevState.currentAlignmentIndex - 1
-                if (prevIndex < 0) return prevState
-                return {
-                  ...prevState,
-                  currentAlignmentIndex: prevIndex,
-                }
-              })
-            },
-          }}
-        />
-      )}
+      {studentAssignmentDetailTray.isOpen &&
+        studentAssignmentDetailTray.state &&
+        studentAssignmentDetailTray.assignment && (
+          <StudentAssignmentDetailTray
+            open={true}
+            onDismiss={studentAssignmentDetailTray.close}
+            outcome={studentAssignmentDetailTray.state.outcome}
+            courseId={courseId}
+            student={studentAssignmentDetailTray.state.student}
+            assignment={studentAssignmentDetailTray.assignment}
+            assignmentNavigator={{
+              ...studentAssignmentDetailTray.assignmentNavigator,
+              onNext: studentAssignmentDetailTray.handlers.navigateNextAssignment,
+              onPrevious: studentAssignmentDetailTray.handlers.navigatePreviousAssignment,
+            }}
+            studentNavigator={{
+              ...studentAssignmentDetailTray.studentNavigator,
+              onNext: studentAssignmentDetailTray.handlers.navigateNextStudent,
+              onPrevious: studentAssignmentDetailTray.handlers.navigatePreviousStudent,
+            }}
+          />
+        )}
     </>
   )
 }

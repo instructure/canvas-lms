@@ -27,6 +27,7 @@ import {View} from '@instructure/ui-view'
 import TruncateWithTooltip from '@canvas/instui-bindings/react/TruncateWithTooltip'
 import {AssignmentSection} from './AssignmentSection'
 import {NavigatorProps} from './Navigator'
+import {StudentSection} from './StudentSection'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -42,10 +43,11 @@ export interface StudentAssignmentDetailTrayProps {
     htmlUrl: string
   }
   assignmentNavigator: NavigatorProps
+  studentNavigator: NavigatorProps
 }
 
 const TrayHeader = ({title, onClose}: {title: string; onClose: () => void}) => (
-  <Flex direction="row" data-testid="tray-header">
+  <Flex direction="row" data-testid="tray-header" padding="none none small">
     <Flex.Item>
       <CloseButton
         size="small"
@@ -72,6 +74,7 @@ export const StudentAssignmentDetailTray: React.FC<StudentAssignmentDetailTrayPr
   student,
   assignment,
   assignmentNavigator,
+  studentNavigator,
 }) => {
   return (
     <Tray
@@ -82,7 +85,7 @@ export const StudentAssignmentDetailTray: React.FC<StudentAssignmentDetailTrayPr
       onDismiss={onDismiss}
       data-testid="student-assignment-detail-tray"
     >
-      <Flex direction="column" padding="medium" gap="small">
+      <Flex direction="column" padding="medium">
         <TrayHeader title={outcome.title} onClose={onDismiss} />
         <AssignmentSection
           courseId={courseId}
@@ -97,6 +100,16 @@ export const StudentAssignmentDetailTray: React.FC<StudentAssignmentDetailTrayPr
           onPrevious={assignmentNavigator.onPrevious}
           onNext={assignmentNavigator.onNext}
         />
+        <hr />
+        <StudentSection
+          currentStudent={student}
+          masteryReportUrl={`/courses/${courseId}/grades/${student.id}#tab-outcomes`}
+          hasPrevious={studentNavigator.hasPrevious}
+          hasNext={studentNavigator.hasNext}
+          onPrevious={studentNavigator.onPrevious}
+          onNext={studentNavigator.onNext}
+        />
+        <hr />
       </Flex>
     </Tray>
   )
