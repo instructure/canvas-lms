@@ -1010,7 +1010,9 @@ describe "Submissions API", type: :request do
     end
 
     it "does not include peer_review_submission when peer reviews are disabled" do
-      @assignment.update!(peer_reviews: false)
+      # Skip validation: testing API response format when peer reviews disabled,
+      # not the business logic that prevents this state from occurring normally
+      @assignment.update_attribute(:peer_reviews, false)
 
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",

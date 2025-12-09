@@ -9987,6 +9987,88 @@ describe Assignment do
     end
   end
 
+  describe "peer_reviews_changes_ok?" do
+    before :once do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      @student1 = student_in_course(active_all: true, course: @course).user
+      @student2 = student_in_course(active_all: true, course: @course).user
+    end
+
+    def create_completed_assessment_request(assignment, reviewer:, reviewee:)
+      submission1 = assignment.find_or_create_submission(reviewee)
+      submission2 = assignment.find_or_create_submission(reviewer)
+      AssessmentRequest.create!(
+        user: reviewee,
+        asset: submission1,
+        assessor_asset: submission2,
+        assessor: reviewer,
+        workflow_state: "completed"
+      )
+    end
+
+    context "when disabling peer reviews" do
+      it "allows disabling when no peer review submissions exist" do
+        assignment = @course.assignments.create!(
+          name: "peer review assignment",
+          peer_reviews: true
+        )
+        assignment.peer_reviews = false
+        expect(assignment).to be_valid
+      end
+
+      it "prevents disabling when peer review submissions exist" do
+        assignment = @course.assignments.create!(
+          name: "peer review assignment",
+          peer_reviews: true
+        )
+        create_completed_assessment_request(assignment, reviewer: @student2, reviewee: @student1)
+
+        expect(assignment.peer_review_submissions?).to be true
+
+        assignment.peer_reviews = false
+        expect(assignment).not_to be_valid
+        expect(assignment.errors[:peer_reviews]).to include(
+          "cannot be disabled when students have already submitted reviews"
+        )
+      end
+
+      it "allows disabling when feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          name: "peer review assignment",
+          peer_reviews: true
+        )
+        create_completed_assessment_request(assignment, reviewer: @student2, reviewee: @student1)
+
+        assignment.peer_reviews = false
+        expect(assignment).to be_valid
+      end
+    end
+
+    context "when enabling peer reviews" do
+      it "allows enabling peer reviews with feature flag enabled" do
+        assignment = @course.assignments.create!(
+          name: "peer review assignment",
+          peer_reviews: false
+        )
+
+        assignment.peer_reviews = true
+        expect(assignment).to be_valid
+      end
+
+      it "allows enabling peer reviews with feature flag disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          name: "peer review assignment",
+          peer_reviews: false
+        )
+
+        assignment.peer_reviews = true
+        expect(assignment).to be_valid
+      end
+    end
+  end
+
   describe "anonymous grading validation" do
     before :once do
       @group_category = @course.group_categories.create! name: "groups"

@@ -1914,7 +1914,9 @@ describe Types::AssignmentType do
       end
 
       it "returns nil for peer review status when peer reviews are disabled" do
-        @peer_review_assignment.update!(peer_reviews: false)
+        # Skip validation: testing GraphQL response format when peer reviews disabled,
+        # not the business logic that prevents this state from occurring normally
+        @peer_review_assignment.update_attribute(:peer_reviews, false)
 
         result = peer_review_assignment_type.resolve("assignedStudents { nodes { peerReviewStatus { mustReviewCount } } }")
 
