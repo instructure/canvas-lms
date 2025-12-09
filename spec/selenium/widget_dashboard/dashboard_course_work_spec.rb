@@ -169,6 +169,25 @@ describe "student dashboard Course work widget", :ignore_js_errors do
       expect(element_exists?(course_work_item_selector(@assignment_late_but_not_locked.id))).to be_falsey
     end
 
+    it "doesn't display unassigned assignment" do
+      @assigned_assignment = @course4.assignments.create!(
+        name: "Assignment assigned but will be unassigned",
+        points_possible: 10,
+        due_at: 2.days.from_now.end_of_day,
+        only_visible_to_overrides: true,
+        submission_types: "online_text_entry"
+      )
+      create_adhoc_override_for_assignment(@assigned_assignment, @student3)
+
+      go_to_dashboard
+      expect(course_work_item(@assigned_assignment.id)).to be_displayed
+      @assigned_assignment.assignment_overrides.where(set_type: "ADHOC").destroy_all
+      clear_local_storage
+
+      go_to_dashboard
+      expect(element_exists?(course_work_item_selector(@assigned_assignment.id))).to be_falsey
+    end
+
     context "graded unsubmitted work" do
       # Verify that assignments that were never submitted but graded displays in submitted
       before :once do
