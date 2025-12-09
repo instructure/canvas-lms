@@ -170,7 +170,7 @@ describe CoursePaceDueDatesCalculator do
           @course_pace.update exclude_weekends: true
           @course_pace.reload
 
-          expected_due_date = Date.parse("2025-03-14")
+          expected_due_date = Date.parse("2025-03-14").in_time_zone(@course.time_zone)
 
           expect(@calculator.get_due_dates(@course_pace_module_items, enrollment)).to eq(
             { @course_pace_module_item.id => expected_due_date }
