@@ -62,9 +62,8 @@ class CoursePaceDueDatesCalculator
               item.module_item_id
             end
 
-      due_date_in_zone = due_date.in_time_zone(course_pace.course.time_zone).midnight
-      due_dates[key] = due_date_in_zone
-      start_date = due_date_in_zone
+      due_dates[key] = due_date.to_date.in_time_zone(course_pace.course.time_zone)
+      start_date = due_date # The next item's start date is this item's due date
     end
 
     due_dates
