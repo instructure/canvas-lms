@@ -3411,6 +3411,12 @@ EG = {
       return
     }
 
+    const handleAmsSubmissionUpdate = () => {
+      refreshGrades(() => {
+        this.updateStatsInHeader()
+      })
+    }
+
     amsGradingRoot = createRoot(container)
     amsGradingRoot.render(
       <AmsLoader
@@ -3421,6 +3427,7 @@ EG = {
           studentUuid: this.currentStudent.uuid,
           submissionId: String(submission.id),
         }}
+        onSubmissionUpdate={handleAmsSubmissionUpdate}
       />,
     )
 
