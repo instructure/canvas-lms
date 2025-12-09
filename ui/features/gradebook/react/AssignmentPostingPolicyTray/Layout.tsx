@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React, {useCallback, useEffect} from 'react'
 import {isEqual} from 'es-toolkit/compat'
 import {bool, func} from 'prop-types'
 import {Button, type ButtonProps} from '@instructure/ui-buttons'
@@ -52,15 +52,19 @@ export interface LayoutProps {
 
 export default function Layout(props: LayoutProps) {
   const {scheduled_feedback_releases: scheduledFeedbackReleasesEnabled} = ENV.FEATURES
-  const [updatedScheduledPost, setUpdatedScheduledPost] = React.useState<ScheduledRelease | null>(
-    null,
-  )
-  const [scheduledReleaseErrorMessages, setScheduledReleaseErrorMessages] = React.useState<{
-    [key in 'grades' | 'comments']: FormMessage[]
+
+  // Combined state for scheduled post data and errors to ensure atomic updates
+  const [scheduledReleaseState, setScheduledReleaseState] = React.useState<{
+    updatedScheduledPost: ScheduledRelease | null
+    errorMessages: {
+      [key in 'grades' | 'comments']: FormMessage[]
+    }
   }>({
-    grades: [],
-    comments: [],
+    updatedScheduledPost: null,
+    errorMessages: {grades: [], comments: []},
   })
+
+  const {updatedScheduledPost, errorMessages: scheduledReleaseErrorMessages} = scheduledReleaseState
 
   const {data: scheduledPost} = useGetAssignmentScheduledPost(props.assignmentId)
 
@@ -71,13 +75,14 @@ export default function Layout(props: LayoutProps) {
         ? 'shared'
         : 'separate'
 
-    setUpdatedScheduledPost({
-      postCommentsAt: scheduledPost?.postCommentsAt || null,
-      postGradesAt: scheduledPost?.postGradesAt || null,
-      scheduledPostMode,
+    setScheduledReleaseState({
+      updatedScheduledPost: {
+        postCommentsAt: scheduledPost?.postCommentsAt || null,
+        postGradesAt: scheduledPost?.postGradesAt || null,
+        scheduledPostMode,
+      },
+      errorMessages: {grades: [], comments: []},
     })
-
-    setScheduledReleaseErrorMessages({grades: [], comments: []})
   }, [scheduledPost])
 
   const automaticallyPostLabel = (
@@ -136,12 +141,6 @@ export default function Layout(props: LayoutProps) {
     props.onPostPolicyChanged({postManually: event.target.value === MANUAL_POST})
   }
 
-  const handleScheduledReleaseChange = (changes: Partial<ScheduledRelease>) => {
-    const newScheduledRelease = {...updatedScheduledPost, ...changes}
-    setUpdatedScheduledPost(newScheduledRelease)
-    props.onScheduledReleaseChange(newScheduledRelease)
-  }
-
   const validateScheduledRelease = (): boolean => {
     if (!updatedScheduledPost?.scheduledPostMode) {
       return true
@@ -163,10 +162,13 @@ export default function Layout(props: LayoutProps) {
     const hasErrors = gradeMessages.length > 0 || commentMessages.length > 0
 
     if (hasErrors) {
-      setScheduledReleaseErrorMessages({
-        grades: gradeMessages,
-        comments: commentMessages,
-      })
+      setScheduledReleaseState(prev => ({
+        ...prev,
+        errorMessages: {
+          grades: gradeMessages,
+          comments: commentMessages,
+        },
+      }))
     }
 
     return !hasErrors
@@ -179,11 +181,35 @@ export default function Layout(props: LayoutProps) {
     props.onSave?.(event)
   }
 
+  // Calculate errors based on mode
   const scheduledReleaseErrors =
     updatedScheduledPost?.scheduledPostMode === 'shared'
       ? scheduledReleaseErrorMessages.grades
       : [...scheduledReleaseErrorMessages.grades, ...scheduledReleaseErrorMessages.comments]
 
+  const handleScheduledReleaseChangeWithErrors = useCallback(
+    (
+      changes: Partial<ScheduledRelease>,
+      gradeErrors: FormMessage[],
+      commentErrors: FormMessage[],
+    ) => {
+      // Compute new release using functional update to get latest state
+      // React batches these updates, so the parent callback runs with correct values
+      setScheduledReleaseState(prev => {
+        const newScheduledRelease = {...prev.updatedScheduledPost, ...changes}
+        return {
+          updatedScheduledPost: newScheduledRelease,
+          errorMessages: {grades: gradeErrors, comments: commentErrors},
+        }
+      })
+      // Notify parent - compute same value to avoid stale closure
+      const newScheduledRelease = {...updatedScheduledPost, ...changes}
+      props.onScheduledReleaseChange(newScheduledRelease)
+    },
+    [props.onScheduledReleaseChange, updatedScheduledPost],
+  )
+
+  // Check if scheduled release has changed from original
   const hasScheduledReleaseChanged =
     !isEqual(
       {
@@ -194,7 +220,7 @@ export default function Layout(props: LayoutProps) {
         postCommentsAt: scheduledPost?.postCommentsAt ?? null,
         postGradesAt: scheduledPost?.postGradesAt ?? null,
       },
-    ) && !scheduledReleaseErrors.length
+    ) && scheduledReleaseErrors.length === 0
 
   return (
     <>
@@ -233,10 +259,7 @@ export default function Layout(props: LayoutProps) {
             postCommentsAt={updatedScheduledPost?.postCommentsAt}
             postGradesAt={updatedScheduledPost?.postGradesAt}
             scheduledPostMode={updatedScheduledPost?.scheduledPostMode}
-            handleChange={handleScheduledReleaseChange}
-            handleErrorMessages={(grades, comments) =>
-              setScheduledReleaseErrorMessages({grades, comments})
-            }
+            handleChangeWithErrors={handleScheduledReleaseChangeWithErrors}
           />
         )}
       </View>
