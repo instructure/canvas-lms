@@ -23,9 +23,11 @@
 // Mock the ready function to immediately execute the callback
 jest.mock('@instructure/ready', () => (callback: () => void) => callback())
 
-// Mock ReactDOM to avoid rendering
-jest.mock('react-dom', () => ({
-  render: jest.fn(),
+// Mock the React components to avoid actual rendering
+jest.mock('@canvas/trays/react/ContentTypeExternalToolDrawer', () => () => null)
+jest.mock('../react/TopNavigationTools', () => ({
+  TopNavigationTools: () => null,
+  MobileTopNavigationTools: () => null,
 }))
 
 // Mock ENV
