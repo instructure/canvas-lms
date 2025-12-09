@@ -163,6 +163,7 @@ class CoursePace < ActiveRecord::Base
         Assignment.suspend_grading_period_grade_recalculation do
           progress&.calculate_completion!(0, enrollments.size)
           enrollments.each do |enrollment|
+            course_pace_module_items.each(&:restore_attributes)
             compressed_module_items = compress_dates(start_date: nil, enrollment:)
                                       .sort_by { |ppmi| ppmi.module_item.position }
                                       .group_by { |ppmi| ppmi.module_item.context_module }

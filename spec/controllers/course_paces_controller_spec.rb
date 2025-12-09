@@ -990,7 +990,7 @@ describe CoursePacesController do
         json_response = response.parsed_body
         # Work week: [:sun, :wed, :fri, :sat]
         # Sunday 3 is a blackout date so it should be skipped.
-        expect(json_response.values).to eq(%w[2021-10-01 2021-10-02])
+        expect(json_response.values).to eq(%w[2021-10-01T00:00:00Z 2021-10-02T00:00:00Z])
       end
 
       it "supports changing durations and start dates" do
@@ -1002,7 +1002,7 @@ describe CoursePacesController do
         post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
         expect(response).to be_successful
         json_response = response.parsed_body
-        expect(json_response.values).to eq(%w[2021-11-03 2021-11-05])
+        expect(json_response.values).to eq(%w[2021-11-03T00:00:00Z 2021-11-05T00:00:00Z])
       end
 
       it "squishes proportionally and ends on the end date" do
@@ -1026,7 +1026,7 @@ describe CoursePacesController do
         post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
         expect(response).to be_successful
         json_response = response.parsed_body
-        expect(json_response.values).to eq(%w[2021-12-24 2021-12-29 2022-01-05 2022-01-12])
+        expect(json_response.values).to eq(%w[2021-12-24T00:00:00Z 2021-12-29T00:00:00Z 2022-01-05T00:00:00Z 2022-01-12T00:00:00Z])
       end
 
       it "returns uncompressed items if the end date is not set" do
@@ -1036,7 +1036,7 @@ describe CoursePacesController do
         post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
         expect(response).to be_successful
         json_response = response.parsed_body
-        expect(json_response.values).to eq(%w[2022-01-29 2022-02-16])
+        expect(json_response.values).to eq(%w[2022-01-29T00:00:00Z 2022-02-16T00:00:00Z])
       end
 
       it "prefers incoming blackout dates over what is already on the course" do
@@ -1057,7 +1057,7 @@ describe CoursePacesController do
         expect(response).to be_successful
         json_response = response.parsed_body
         # Work week: [:sun, :wed, :fri, :sat]
-        expect(json_response.values).to eq(%w[2021-10-02 2021-10-10])
+        expect(json_response.values).to eq(%w[2021-10-02T00:00:00Z 2021-10-10T00:00:00Z])
       end
     end
 
@@ -1071,7 +1071,7 @@ describe CoursePacesController do
         post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
         expect(response).to be_successful
         json_response = response.parsed_body
-        expect(json_response.values).to eq(%w[2021-09-30 2021-10-05])
+        expect(json_response.values).to eq(%w[2021-09-30T00:00:00Z 2021-10-05T00:00:00Z])
       end
 
       it "supports changing durations and start dates" do
@@ -1079,7 +1079,7 @@ describe CoursePacesController do
         post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
         expect(response).to be_successful
         json_response = response.parsed_body
-        expect(json_response.values).to eq(%w[2021-11-01 2021-11-05])
+        expect(json_response.values).to eq(%w[2021-11-01T00:00:00Z 2021-11-05T00:00:00Z])
       end
 
       it "squishes proportionally and ends on the end date" do
@@ -1087,7 +1087,7 @@ describe CoursePacesController do
         post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
         expect(response).to be_successful
         json_response = response.parsed_body
-        expect(json_response.values).to eq(%w[2021-12-21 2021-12-27 2021-12-31])
+        expect(json_response.values).to eq(%w[2021-12-21T00:00:00Z 2021-12-27T00:00:00Z 2021-12-31T00:00:00Z])
       end
 
       it "rolls over years properly" do
@@ -1101,7 +1101,7 @@ describe CoursePacesController do
         post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
         expect(response).to be_successful
         json_response = response.parsed_body
-        expect(json_response.values).to eq(%w[2021-12-22 2021-12-28 2022-01-05 2022-01-12])
+        expect(json_response.values).to eq(%w[2021-12-22T00:00:00Z 2021-12-28T00:00:00Z 2022-01-05T00:00:00Z 2022-01-12T00:00:00Z])
       end
 
       it "returns uncompressed items if the end date is not set" do
@@ -1111,7 +1111,7 @@ describe CoursePacesController do
         post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
         expect(response).to be_successful
         json_response = response.parsed_body
-        expect(json_response.values).to eq(%w[2022-01-28 2022-02-07])
+        expect(json_response.values).to eq(%w[2022-01-28T00:00:00Z 2022-02-07T00:00:00Z])
       end
 
       it "prefers incoming blackout dates over what is already on the course" do
@@ -1132,7 +1132,7 @@ describe CoursePacesController do
         expect(response).to be_successful
         json_response = response.parsed_body
         # skip the weekend, then due dates are mon and tues
-        expect(json_response.values).to eq(%w[2021-10-04 2021-10-05])
+        expect(json_response.values).to eq(%w[2021-10-04T00:00:00Z 2021-10-05T00:00:00Z])
       end
     end
 
@@ -1168,6 +1168,65 @@ describe CoursePacesController do
       expect(response).to be_successful
       json_response = response.parsed_body
       expect(json_response.keys).to eq(course_pace_module_items_attributes.map { |i| i[:module_item_id].to_s })
+    end
+
+    context "with enrollment context" do
+      before do
+        @student = user_model
+        @enrollment = @course.enroll_student(@student, enrollment_state: "active")
+        @enrollment.start_at = "2021-11-01"
+        @enrollment.save!
+      end
+
+      it "uses enrollment start date instead of course start date" do
+        course_pace_params = @valid_params.merge(
+          context_type: "Enrollment",
+          context_id: @student.id.to_s,
+          end_date: "2021-11-10"
+        )
+
+        post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+
+        # Should use enrollment start date (Nov 1), not course start date (Sept 30)
+        first_date = Date.parse(json_response.values.first)
+        expect(first_date.month).to eq(11) # November
+        expect(first_date.year).to eq(2021)
+        # First assignment with duration 1 should be due on Nov 2 (first business day after Nov 1)
+        expect(first_date).to eq(Date.parse("2021-11-02"))
+      end
+
+      it "handles compression with enrollment start date" do
+        # Create a scenario where compression is needed
+        course_pace_params = @valid_params.merge(
+          context_type: "Enrollment",
+          context_id: @student.id.to_s,
+          start_date: "2021-11-01",
+          end_date: "2021-11-03", # Very short timeframe to force compression
+          course_pace_module_items_attributes: [
+            {
+              id: @course_pace.course_pace_module_items.first.id,
+              module_item_id: @course_pace.course_pace_module_items.first.module_item_id,
+              duration: 5, # 5 days compressed into 3 days
+            },
+            {
+              id: @course_pace.course_pace_module_items.second.id,
+              module_item_id: @course_pace.course_pace_module_items.second.module_item_id,
+              duration: 5, # 5 days compressed into 3 days
+            },
+          ]
+        )
+
+        post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+
+        # Should compress but use enrollment's start date
+        dates = json_response.values.map { |d| Date.parse(d) }
+        expect(dates.first).to be >= Date.parse("2021-11-01")
+        expect(dates.last).to be <= Date.parse("2021-11-03")
+      end
     end
   end
 

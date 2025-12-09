@@ -173,6 +173,8 @@ interface CompressApiFormattedCoursePace {
   readonly end_date: OptionalDate
   readonly exclude_weekends?: boolean
   readonly selected_days_to_skip?: string[]
+  readonly context_type: PaceContextTypes
+  readonly context_id: string
   readonly course_pace_module_items_attributes: ApiCoursePaceModuleItemsAttributes[]
 }
 interface PublishApiFormattedCoursePace extends CompressApiFormattedCoursePace {
@@ -204,6 +206,8 @@ const transformCoursePaceForApi = (
   const compressedCoursePace: CompressApiFormattedCoursePace = {
     start_date: coursePace.start_date,
     end_date: coursePace.end_date,
+    context_type: coursePace.context_type,
+    context_id: coursePace.context_id,
     course_pace_module_items_attributes: coursePaceItems,
     selected_days_to_skip: selectedDaysToSkipValue,
     exclude_weekends: coursePace.exclude_weekends,
