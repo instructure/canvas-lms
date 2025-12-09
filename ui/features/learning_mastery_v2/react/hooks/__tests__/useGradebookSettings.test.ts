@@ -300,6 +300,57 @@ describe('useGradebookSettings', () => {
     expect(result.current.isLoading).toBe(false)
   })
 
+  it('loads show_unpublished_assignments setting from API response', async () => {
+    const mockSettings = {
+      secondary_info_display: SecondaryInfoDisplay.SIS_ID,
+      show_student_avatars: true,
+      show_students_with_no_results: true,
+      show_outcomes_with_no_results: false,
+      show_unpublished_assignments: true,
+    }
+    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {},
+      data: {learning_mastery_gradebook_settings: mockSettings},
+    })
+
+    const {result, waitForNextUpdate} = renderHook(() => useGradebookSettings(courseId))
+    await waitForNextUpdate()
+
+    expect(result.current.settings.displayFilters).toContain(
+      DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS,
+    )
+    expect(result.current.error).toBeNull()
+    expect(result.current.isLoading).toBe(false)
+  })
+
+  it('does not include show_unpublished_assignments when false in API response', async () => {
+    const mockSettings = {
+      secondary_info_display: SecondaryInfoDisplay.SIS_ID,
+      show_student_avatars: true,
+      show_students_with_no_results: true,
+      show_unpublished_assignments: false,
+    }
+    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {},
+      data: {learning_mastery_gradebook_settings: mockSettings},
+    })
+
+    const {result, waitForNextUpdate} = renderHook(() => useGradebookSettings(courseId))
+    await waitForNextUpdate()
+
+    expect(result.current.settings.displayFilters).not.toContain(
+      DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS,
+    )
+    expect(result.current.error).toBeNull()
+    expect(result.current.isLoading).toBe(false)
+  })
+
   it('updateSettings updates settings', async () => {
     jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,

@@ -50,6 +50,7 @@ export enum SecondaryInfoDisplay {
 }
 
 export enum DisplayFilter {
+  SHOW_UNPUBLISHED_ASSIGNMENTS = 'show_unpublished_assignments',
   SHOW_STUDENTS_WITH_NO_RESULTS = 'show_students_with_no_results',
   SHOW_OUTCOMES_WITH_NO_RESULTS = 'show_outcomes_with_no_results',
   SHOW_STUDENT_AVATARS = 'show_student_avatars',

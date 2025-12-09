@@ -60,6 +60,12 @@ const buildDisplayFilters = (apiSettings: any): DisplayFilter[] => {
   ) {
     displayFilters.push(DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS)
   }
+  if (
+    apiSettings.show_unpublished_assignments ??
+    DEFAULT_GRADEBOOK_SETTINGS.displayFilters.includes(DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS)
+  ) {
+    displayFilters.push(DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS)
+  }
 
   return displayFilters
 }

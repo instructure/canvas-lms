@@ -401,6 +401,8 @@ class OutcomeResultsController < ApplicationController
   #   the context.
   # @argument only_assignment_alignments [Boolean]
   #   If specified, only assignment alignments will be included in the results.
+  # @argument show_unpublished_assignments [Boolean]
+  #   If true, unpublished assignments will be included in the results. Defaults to false.
   #
   # @example_response
   #    {
@@ -434,6 +436,14 @@ class OutcomeResultsController < ApplicationController
 
     alignments = find_all_outcome_alignments(@outcome, @context)
     only_assignment_alignments = value_to_boolean(params[:only_assignment_alignments])
+    show_unpublished_assignments = value_to_boolean(params[:show_unpublished_assignments])
+
+    unless show_unpublished_assignments
+      alignments = alignments.reject do |alignment|
+        content = alignment.content_tag.content
+        content.is_a?(Assignment) && content.unpublished?
+      end
+    end
 
     canvas_results, os_results = find_canvas_os_results(all_users: false)
 

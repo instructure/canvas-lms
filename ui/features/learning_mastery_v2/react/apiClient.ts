@@ -148,6 +148,9 @@ export const saveLearningMasteryGradebookSettings = (
       show_outcomes_with_no_results: settings.displayFilters.includes(
         DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS,
       ),
+      show_unpublished_assignments: settings.displayFilters.includes(
+        DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS,
+      ),
       name_display_format: settings.nameDisplayFormat,
       students_per_page: settings.studentsPerPage,
       score_display_format: settings.scoreDisplayFormat,
