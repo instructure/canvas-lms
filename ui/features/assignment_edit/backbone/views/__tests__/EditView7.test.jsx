@@ -926,6 +926,24 @@ describe('EditView - Quiz Type Handling', () => {
   })
 
   describe('Disabled State', () => {
+    // These tests create their own views, so we need to ensure clean state
+    // between tests to avoid flakiness from leftover DOM elements
+    let localView
+
+    beforeEach(() => {
+      // Clear the fixtures before each test to ensure clean slate
+      $('#fixtures').empty()
+    })
+
+    afterEach(() => {
+      // Clean up any view created by this test
+      if (localView) {
+        localView.remove()
+        localView = null
+      }
+      $('#fixtures').empty()
+    })
+
     test('quiz type selector is not disabled for new assignments', async () => {
       const assignment = new Assignment({
         name: 'New Assignment',
@@ -969,7 +987,7 @@ describe('EditView - Quiz Type Handling', () => {
         views: {},
       })
 
-      const newView = new EditView({
+      localView = new EditView({
         model: assignment,
         assignmentGroupSelector,
         gradingTypeSelector,
@@ -984,8 +1002,8 @@ describe('EditView - Quiz Type Handling', () => {
         canEditGrades: true,
       })
 
-      newView.$el.appendTo($('#fixtures'))
-      newView.render()
+      localView.$el.appendTo($('#fixtures'))
+      localView.render()
 
       // Wait for the quiz type selector to be rendered in the DOM
       await waitFor(
@@ -1003,9 +1021,7 @@ describe('EditView - Quiz Type Handling', () => {
       // jQuery's :visible check can be unreliable in test environments
       const $quizTypeSelect = $('#assignment_quiz_type')
       expect($quizTypeSelect.prop('disabled')).toBe(false)
-
-      newView.remove()
-    }, 30000)
+    })
 
     test('quiz type selector is disabled for existing assignments', async () => {
       const assignment = new Assignment({
@@ -1051,7 +1067,7 @@ describe('EditView - Quiz Type Handling', () => {
         views: {},
       })
 
-      const existingView = new EditView({
+      localView = new EditView({
         model: assignment,
         assignmentGroupSelector,
         gradingTypeSelector,
@@ -1066,8 +1082,8 @@ describe('EditView - Quiz Type Handling', () => {
         canEditGrades: true,
       })
 
-      existingView.$el.appendTo($('#fixtures'))
-      existingView.render()
+      localView.$el.appendTo($('#fixtures'))
+      localView.render()
 
       // Wait for the quiz type selector to be rendered in the DOM
       await waitFor(
@@ -1087,14 +1103,9 @@ describe('EditView - Quiz Type Handling', () => {
       const $quizTypeSelect = $('#assignment_quiz_type')
       // Verify the select element exists
       expect($quizTypeSelect.length).toBeGreaterThan(0)
-      // Note: There appears to be a timing issue where the disabled state
-      // isn't properly set when anonymousSubmissionSelector is added to the view.
-      // The component should be disabled for existing assignments, but currently
-      // the React component doesn't receive the updated isExistingAssignment prop.
-      // This is a pre-existing issue from the commit that added this feature.
-      expect($quizTypeSelect.prop('disabled')).toBe(false)
-
-      existingView.remove()
+      // The quiz type selector should be disabled for existing assignments
+      // to prevent changing the quiz type after creation
+      expect($quizTypeSelect.prop('disabled')).toBe(true)
     })
   })
 
