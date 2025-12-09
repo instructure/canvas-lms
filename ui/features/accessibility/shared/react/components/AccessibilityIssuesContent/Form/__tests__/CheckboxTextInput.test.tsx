@@ -102,7 +102,6 @@ describe('CheckboxTextInput', () => {
     expect(screen.getByText('Test checkbox subtext')).toBeInTheDocument()
     expect(screen.getByText('Test TextArea Label')).toBeInTheDocument()
     expect(screen.getByText('Test input description')).toBeInTheDocument()
-    expect(screen.getByText('0/100 characters')).toBeInTheDocument()
   })
 
   it('toggles checkbox and disables/enables textarea accordingly', () => {

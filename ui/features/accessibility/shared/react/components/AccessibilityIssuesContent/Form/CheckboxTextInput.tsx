@@ -35,6 +35,7 @@ import {IconAiSolid} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
+import {FormMessage} from '@instructure/ui-form-field'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {useAccessibilityCheckerContext} from '../../../hooks/useAccessibilityCheckerContext'
 import {GenerateResponse} from '../../../types'
@@ -153,6 +154,10 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
       )
 
       const shouldShowError = error && !isChecked
+      const descriptionMessage: FormMessage = {text: issue.form.inputDescription, type: 'hint'}
+      const formMessages: FormMessage[] = shouldShowError
+        ? [descriptionMessage, {text: error, type: 'newError'}]
+        : [descriptionMessage]
 
       useImperativeHandle(
         ref,
@@ -247,22 +252,10 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               disabled={isChecked || isDisabled}
               value={isChecked ? '' : value || ''}
               onChange={handleTextAreaChange}
-              messages={shouldShowError ? [{text: error, type: 'newError'}] : []}
+              messages={formMessages}
               aria-describedby={charCountId}
             />
           </View>
-          <Flex as="div" justifyItems="space-between" margin="small 0">
-            <Flex.Item>
-              <Text size="small" color="secondary">
-                {issue.form.inputDescription}
-              </Text>
-            </Flex.Item>
-            <Flex.Item>
-              <Text size="small" color="secondary" id={charCountId}>
-                {value?.length || 0}/{issue.form.inputMaxLength} {I18n.t('characters')}
-              </Text>
-            </Flex.Item>
-          </Flex>
           <Flex as="div" margin="medium 0" gap="small">
             {isAiGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
               <Flex.Item>
