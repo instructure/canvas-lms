@@ -254,7 +254,7 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
             renderTitle={I18n.t('Reporting')}
             isSelected={selectedIndex === reportingTabIndex}
             id="reporting"
-            padding={isMobileView ? 'small none none' : 'small'}
+            padding="0"
           >
             <ScreenReaderContent as="h2">{I18n.t('Reporting Tab Content')}</ScreenReaderContent>
             <Reporting />
