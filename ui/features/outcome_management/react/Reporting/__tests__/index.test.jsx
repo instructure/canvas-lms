@@ -29,4 +29,11 @@ describe('Reporting', () => {
   it('renders without errors', () => {
     expect(() => render(<Reporting />)).not.toThrow()
   })
+
+  it('renders the "All Students" link with correct href', () => {
+    const {getByTestId} = render(<Reporting />)
+    const link = getByTestId('all-students-link')
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute('href', 'gradebook')
+  })
 })
