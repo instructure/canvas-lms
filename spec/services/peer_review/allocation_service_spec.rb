@@ -367,6 +367,124 @@ RSpec.describe PeerReview::AllocationService do
         end
       end
 
+      context "when peer_review_across_sections is true" do
+        let(:section1) { course.course_sections.create!(name: "Section 1") }
+        let(:section2) { course.course_sections.create!(name: "Section 2") }
+        let(:assessor2) { user_model }
+        let(:student4) { user_model }
+        let(:student5) { user_model }
+        let(:section_assignment) do
+          assignment_model(
+            course:,
+            title: "Section Peer Review Assignment",
+            peer_reviews: true,
+            peer_review_count: 2,
+            peer_review_across_sections: true,
+            automatic_peer_reviews: false,
+            submission_types: "online_text_entry"
+          )
+        end
+
+        before do
+          # Enroll assessor in section1
+          course.enroll_student(assessor2, enrollment_state: :active, section: section1)
+
+          # Enroll students in different sections
+          course.enroll_student(student4, enrollment_state: :active, section: section1)
+          course.enroll_student(student5, enrollment_state: :active, section: section2)
+
+          section_assignment.submit_homework(assessor2, body: "Assessor submission")
+          section_assignment.submit_homework(student4, body: "Student4 submission")
+          section_assignment.submit_homework(student5, body: "Student5 submission")
+        end
+
+        it "allocates peer reviews from any section" do
+          service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+          result = service2.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(2)
+          expect(result[:assessment_requests].map(&:user_id)).to match_array([student4.id, student5.id])
+        end
+      end
+
+      context "when peer_review_across_sections is false" do
+        let(:section1) { course.course_sections.create!(name: "Section 1") }
+        let(:section2) { course.course_sections.create!(name: "Section 2") }
+        let(:assessor2) { user_model }
+        let(:student4) { user_model }
+        let(:student5) { user_model }
+        let(:student6) { user_model }
+        let(:section_assignment) do
+          assignment_model(
+            course:,
+            title: "Section Peer Review Assignment",
+            peer_reviews: true,
+            peer_review_count: 2,
+            peer_review_across_sections: false,
+            automatic_peer_reviews: false,
+            submission_types: "online_text_entry"
+          )
+        end
+
+        before do
+          # Section 2
+          course.enroll_student(student6, enrollment_state: :active, section: section2)
+          section_assignment.submit_homework(student6, body: "Student6 submission")
+
+          # Section 1
+          course.enroll_student(assessor2, enrollment_state: :active, section: section1)
+          course.enroll_student(student4, enrollment_state: :active, section: section1)
+          course.enroll_student(student5, enrollment_state: :active, section: section1)
+          section_assignment.submit_homework(assessor2, body: "Assessor submission")
+          section_assignment.submit_homework(student4, body: "Student4 submission")
+          section_assignment.submit_homework(student5, body: "Student5 submission")
+        end
+
+        it "only allocates peer reviews from the same section" do
+          service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+          result = service2.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(2)
+          expect(result[:assessment_requests].map(&:user_id)).to match_array([student4.id, student5.id])
+        end
+
+        it "does not allocate reviews from different sections" do
+          service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+          result = service2.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].map(&:user_id)).not_to include(student6.id)
+        end
+
+        context "when there are insufficient submissions in the same section" do
+          before do
+            section_assignment.submissions.find_by(user: student5).destroy!
+          end
+
+          it "only allocates what is available in the same section" do
+            service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+            result = service2.allocate
+            expect(result[:success]).to be true
+            expect(result[:assessment_requests].size).to eq(1)
+            expect(result[:assessment_requests].first.user_id).to eq(student4.id)
+          end
+        end
+
+        context "when assessor is in multiple sections" do
+          before do
+            course.enroll_student(assessor2, enrollment_state: :active, section: section2, allow_multiple_enrollments: true)
+          end
+
+          it "allocates from all sections the assessor is enrolled in" do
+            service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+            result = service2.allocate
+            expect(result[:success]).to be true
+            expect(result[:assessment_requests].size).to eq(2)
+            # Should be able to allocate from both sections now
+            expect(result[:assessment_requests].map(&:user_id)).to match_array([student6.id, student4.id])
+          end
+        end
+      end
+
       context "when prioritizing must_review submissions" do
         before do
           # Create allocation rules for student1 and student2
@@ -865,6 +983,98 @@ RSpec.describe PeerReview::AllocationService do
   end
 
   describe "#preload_available_submissions" do
+    context "when peer_review_across_sections is true" do
+      let(:section1) { course.course_sections.create!(name: "Section 1") }
+      let(:section2) { course.course_sections.create!(name: "Section 2") }
+      let(:assessor2) { user_model }
+      let(:student4) { user_model }
+      let(:student5) { user_model }
+      let(:section_assignment) do
+        assignment_model(
+          course:,
+          title: "Section Peer Review Assignment",
+          peer_reviews: true,
+          peer_review_count: 2,
+          peer_review_across_sections: true,
+          automatic_peer_reviews: false,
+          submission_types: "online_text_entry"
+        )
+      end
+
+      before do
+        course.enroll_student(assessor2, enrollment_state: :active, section: section1)
+        course.enroll_student(student4, enrollment_state: :active, section: section1)
+        course.enroll_student(student5, enrollment_state: :active, section: section2)
+
+        section_assignment.submit_homework(assessor2, body: "Assessor submission")
+        section_assignment.submit_homework(student4, body: "Student4 submission")
+        section_assignment.submit_homework(student5, body: "Student5 submission")
+      end
+
+      it "includes submissions from all sections" do
+        service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+        available = service2.send(:preload_available_submissions)
+        expect(available.map(&:user_id)).to match_array([student4.id, student5.id])
+      end
+    end
+
+    context "when peer_review_across_sections is false" do
+      let(:section1) { course.course_sections.create!(name: "Section 1") }
+      let(:section2) { course.course_sections.create!(name: "Section 2") }
+      let(:assessor2) { user_model }
+      let(:student4) { user_model }
+      let(:student5) { user_model }
+      let(:student6) { user_model }
+      let(:section_assignment) do
+        assignment_model(
+          course:,
+          title: "Section Peer Review Assignment",
+          peer_reviews: true,
+          peer_review_count: 2,
+          peer_review_across_sections: false,
+          automatic_peer_reviews: false,
+          submission_types: "online_text_entry"
+        )
+      end
+
+      before do
+        course.enroll_student(assessor2, enrollment_state: :active, section: section1)
+        course.enroll_student(student4, enrollment_state: :active, section: section1)
+
+        course.enroll_student(student5, enrollment_state: :active, section: section2)
+        course.enroll_student(student6, enrollment_state: :active, section: section2)
+
+        section_assignment.submit_homework(assessor2, body: "Assessor submission")
+        section_assignment.submit_homework(student4, body: "Student4 submission")
+        section_assignment.submit_homework(student5, body: "Student5 submission")
+        section_assignment.submit_homework(student6, body: "Student6 submission")
+      end
+
+      it "only includes submissions from the same section as assessor" do
+        service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+        available = service2.send(:preload_available_submissions)
+        expect(available.map(&:user_id)).to eq([student4.id])
+      end
+
+      it "excludes submissions from different sections" do
+        service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+        available = service2.send(:preload_available_submissions)
+        expect(available.map(&:user_id)).not_to include(student5.id, student6.id)
+      end
+
+      context "when assessor is in multiple sections" do
+        before do
+          course.enroll_student(assessor2, enrollment_state: :active, section: section2, allow_multiple_enrollments: true)
+        end
+
+        it "includes submissions from all assessor's sections" do
+          service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+          available = service2.send(:preload_available_submissions)
+          expect(available.map(&:user_id)).to match_array([student4.id, student5.id, student6.id])
+        end
+      end
+    end
+
     context "when filtering submissions by actual work submitted" do
       before do
         assignment.submit_homework(assessor, body: "Assessor submission")
