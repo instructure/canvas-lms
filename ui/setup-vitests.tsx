@@ -21,11 +21,18 @@ import {vi} from 'vitest'
 import $ from 'jquery'
 
 // Import initialization from jest-setup.js that's framework-agnostic
+import {loadDevMessages, loadErrorMessages} from '@apollo/client/dev'
 import {up as configureDateTime} from '@canvas/datetime/configureDateTime'
 import {up as configureDateTimeMomentParser} from '@canvas/datetime/configureDateTimeMomentParser'
 import {registerTranslations} from '@canvas/i18n'
+import rceFormatMessage from '@instructure/canvas-rce/es/format-message'
+import filterUselessConsoleMessages from '@instructure/filter-console-messages'
 import CoreTranslations from '../public/javascripts/translations/en.json'
 import {up as installNodeDecorations} from './boot/initializers/installNodeDecorations'
+
+// Load Apollo Client dev messages for better error reporting
+loadDevMessages()
+loadErrorMessages()
 
 // Make jQuery available globally like webpack's ProvidePlugin does
 // This is needed for jqueryui plugins to attach to the correct jQuery instance
@@ -37,6 +44,47 @@ vi.stubGlobal('jest', vi)
 
 // Register translations like jest-setup does
 registerTranslations('en', CoreTranslations)
+
+// Configure RCE format-message
+rceFormatMessage.setup({
+  locale: 'en',
+  missingTranslation: 'ignore',
+})
+
+// Filter console noise to match Jest behavior
+// This helps focus on real errors rather than expected React warnings
+const ignoredErrors = [
+  /An update to %s inside a test was not wrapped in act/,
+  /Can't perform a React state update on an unmounted component/,
+  /Function components cannot be given refs/,
+  /The above error occurred in the <.*> component/,
+  /You seem to have overlapping act\(\) calls/,
+  /Warning: `ReactDOMTestUtils.act` is deprecated/,
+  /Warning: unmountComponentAtNode is deprecated/,
+  /Warning: findDOMNode is deprecated/,
+  /Warning: ReactDOM.render is no longer supported in React 18/,
+  /Warning: ReactDOMTestUtils is deprecated/,
+  /Warning: %s: Support for defaultProps will be removed/,
+]
+const ignoredWarnings = [
+  /JQMIGRATE:/,
+  /componentWillReceiveProps/,
+  /Found @client directives in a query but no ApolloClient resolvers/,
+  /No more mocked responses for the query/,
+]
+const originalError = console.error
+const originalWarn = console.warn
+console.error = (msg: unknown, ...args: unknown[]) => {
+  const msgStr = String(msg)
+  if (ignoredErrors.some(regex => regex.test(msgStr))) return
+  if (args.some(arg => ignoredErrors.some(regex => regex.test(String(arg))))) return
+  originalError(msg, ...args)
+}
+console.warn = (msg: unknown, ...args: unknown[]) => {
+  if (ignoredWarnings.some(regex => regex.test(String(msg)))) return
+  originalWarn(msg, ...args)
+}
+filterUselessConsoleMessages(console)
 
 vi.stubGlobal('ENV', {
   use_rce_enhancements: true,
@@ -159,6 +207,32 @@ if (!Range.prototype.getBoundingClientRect) {
       length: 0,
       [Symbol.iterator]: vi.fn(),
     }) as unknown as DOMRectList
+}
+
+// Load InstUI themes
+import '@instructure/ui-themes'
+
+// Worker mock
+if (!('Worker' in window)) {
+  Object.defineProperty(window, 'Worker', {
+    value: class Worker {
+      postMessage() {}
+      terminate() {}
+      addEventListener() {}
+      removeEventListener() {}
+      dispatchEvent() {
+        return true
+      }
+    },
+  })
+}
+
+// Fetch mock fallback
+if (!globalThis.fetch) {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockImplementation(() => Promise.resolve({json: () => ({})})),
+  )
 }
 
 // Canvas context mock
