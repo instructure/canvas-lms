@@ -3693,7 +3693,9 @@ describe Types::UserType do
       end
 
       it "returns nil when peer reviews are not enabled on assignment" do
-        @assignment.update!(peer_reviews: false)
+        # Skip validation: testing GraphQL response format when peer reviews disabled,
+        # not the business logic that prevents this state from occurring normally
+        @assignment.update_attribute(:peer_reviews, false)
 
         user_type_tester = GraphQLTypeTester.new(
           @student1,

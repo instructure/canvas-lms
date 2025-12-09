@@ -363,7 +363,7 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
               id="assignment_peer_reviews_checkbox"
               name="peer_reviews"
               checked={peerReviewChecked}
-              disabled={!peerReviewEnabled}
+              disabled={!peerReviewEnabled || hasPeerReviewSubmissions}
               onChange={handlePeerReviewCheck}
               label={I18n.t('Require Peer Reviews')}
               size="small"
@@ -462,7 +462,7 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
             <Flex.Item as="div" padding="small">
               <Alert variant="warning">
                 {I18n.t(
-                  'Students have already submitted peer reviews, so reviews required and points cannot be changed.',
+                  'Students have already submitted peer reviews, so peer reviews cannot be disabled and reviews required and points cannot be changed.',
                 )}
               </Alert>
             </Flex.Item>

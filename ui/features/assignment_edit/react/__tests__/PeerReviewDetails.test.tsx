@@ -29,11 +29,14 @@ vi.mock('@canvas/graphql', () => ({
   executeQuery: vi.fn(),
 }))
 
-// @ts-expect-error
-global.ENV = {
+window.ENV = {
+  ...window.ENV,
   use_high_contrast: false,
   PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: true,
 }
+
+const PEER_REVIEW_SUBMISSIONS_WARNING =
+  'Students have already submitted peer reviews, so peer reviews cannot be disabled and reviews required and points cannot be changed.'
 
 const createMockAssignment = (overrides = {}) => ({
   peerReviews: vi.fn(() => false),
@@ -1275,11 +1278,7 @@ describe('PeerReviewDetails', () => {
     it('shows alert message when peer review submissions exist', () => {
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
-      expect(
-        screen.getByText(
-          'Students have already submitted peer reviews, so reviews required and points cannot be changed.',
-        ),
-      ).toBeInTheDocument()
+      expect(screen.getByText(PEER_REVIEW_SUBMISSIONS_WARNING)).toBeInTheDocument()
     })
 
     it('disables reviews required input when peer review submissions exist', () => {
@@ -1300,11 +1299,7 @@ describe('PeerReviewDetails', () => {
       assignment.hasPeerReviewSubmissions = vi.fn(() => false)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
-      expect(
-        screen.queryByText(
-          'Students have already submitted peer reviews, so reviews required and points cannot be changed.',
-        ),
-      ).not.toBeInTheDocument()
+      expect(screen.queryByText(PEER_REVIEW_SUBMISSIONS_WARNING)).not.toBeInTheDocument()
 
       const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
       const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
@@ -1314,22 +1309,16 @@ describe('PeerReviewDetails', () => {
     })
 
     it('does not show alert or disable fields when PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED is false', () => {
-      // @ts-expect-error
-      global.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
-      expect(
-        screen.queryByText(
-          'Students have already submitted peer reviews, so reviews required and points cannot be changed.',
-        ),
-      ).not.toBeInTheDocument()
+      expect(screen.queryByText(PEER_REVIEW_SUBMISSIONS_WARNING)).not.toBeInTheDocument()
 
       const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
       expect(reviewsRequiredInput).not.toBeDisabled()
 
-      // @ts-expect-error
-      global.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
     })
 
     it('does not show alert or disable fields when hasPeerReviewSubmissions method does not exist', () => {
@@ -1340,17 +1329,45 @@ describe('PeerReviewDetails', () => {
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithoutMethod as any} />)
 
-      expect(
-        screen.queryByText(
-          'Students have already submitted peer reviews, so reviews required and points cannot be changed.',
-        ),
-      ).not.toBeInTheDocument()
+      expect(screen.queryByText(PEER_REVIEW_SUBMISSIONS_WARNING)).not.toBeInTheDocument()
 
       const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
       const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
 
       expect(reviewsRequiredInput).not.toBeDisabled()
       expect(pointsPerReviewInput).not.toBeDisabled()
+    })
+
+    it('disables peer review checkbox when peer review submissions exist', () => {
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      const checkbox = screen.getByTestId('peer-review-checkbox')
+      expect(checkbox).toBeDisabled()
+    })
+
+    it('keeps peer review checkbox enabled when peer review submissions do not exist', () => {
+      assignment.hasPeerReviewSubmissions = vi.fn(() => false)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      const checkbox = screen.getByTestId('peer-review-checkbox')
+      expect(checkbox).not.toBeDisabled()
+    })
+
+    it('does not disable checkbox when PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED is false', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
+
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      const checkbox = screen.getByTestId('peer-review-checkbox')
+      expect(checkbox).not.toBeDisabled()
+
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
+    })
+
+    it('shows updated warning message including checkbox restriction', () => {
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      expect(screen.getByText(PEER_REVIEW_SUBMISSIONS_WARNING)).toBeInTheDocument()
     })
   })
 })
