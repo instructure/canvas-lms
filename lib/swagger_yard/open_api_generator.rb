@@ -18,10 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "swagger_yard"
-require "yaml"
-require "json"
-require "fileutils"
 require_relative "canvas_adapter"
 
 module SwaggerYard
