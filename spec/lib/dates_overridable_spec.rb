@@ -324,7 +324,8 @@ shared_examples_for "learning object with due dates" do
 
   describe "due_date_hash" do
     it "returns the due at, lock_at, unlock_at, all day, and all day fields" do
-      due = 5.days.from_now
+      # Use a specific time that won't trigger all_day logic (not 23:59 or 00:00)
+      due = 5.days.from_now.change(hour: 12, min: 0)
       due_params = { due_at: due, lock_at: due, unlock_at: due }
       a = overridable.class.new(due_params)
       if a.is_a?(Quizzes::Quiz)
