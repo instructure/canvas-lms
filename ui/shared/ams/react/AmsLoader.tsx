@@ -43,9 +43,14 @@ interface AmsLoaderProps {
     submissionId?: string
     [key: string]: any
   }
+  onSubmissionUpdate?: () => void
 }
 
-export function AmsLoader({containerId, gradingContext}: AmsLoaderProps): JSX.Element | null {
+export function AmsLoader({
+  containerId,
+  gradingContext,
+  onSubmissionUpdate,
+}: AmsLoaderProps): JSX.Element | null {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const moduleRef = useRef<AmsModule | null>(null)
 
@@ -82,6 +87,7 @@ export function AmsLoader({containerId, gradingContext}: AmsLoaderProps): JSX.El
               createController: createRubricController,
             },
             ...(gradingContext && {gradingContext}),
+            ...(onSubmissionUpdate && {onSubmissionUpdate}),
           })
         }
       })
@@ -95,7 +101,7 @@ export function AmsLoader({containerId, gradingContext}: AmsLoaderProps): JSX.El
         moduleRef.current.unmount(containerRef.current)
       }
     }
-  }, [containerId, gradingContext])
+  }, [containerId, gradingContext, onSubmissionUpdate])
 
   return null
 }
