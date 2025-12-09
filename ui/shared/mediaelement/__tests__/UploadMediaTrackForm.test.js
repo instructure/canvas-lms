@@ -22,7 +22,17 @@ import 'jquery-migrate' // required
 
 $.migrateMute = true
 
-jest.mock('react-dom', () => ({render: jest.fn()}))
+// Mock the DOM element that ReactDOM.render uses
+beforeEach(() => {
+  const container = document.createElement('div')
+  container.id = 'media-track-video-url-container'
+  document.body.appendChild(container)
+})
+
+afterEach(() => {
+  document.getElementById('media-track-video-url-container')?.remove()
+})
+
 $.ajaxJSON = jest.fn().mockImplementation(() => ({}))
 
 describe('UploadMediaTrackForm', () => {
