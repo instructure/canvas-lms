@@ -1813,16 +1813,31 @@ form.user_content_post_form {
     }
   }
   .fixed_warning {
-    background-color: #fdd;
+    background-color: #ffcccc;
     border-width: 2px 0 0;
     border-style: solid;
-    border-color: black;
+    border-color: #000000;
     padding: 15px;
     opacity: 0.9;
-    color: black;
+    color: #000000;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+
+    a {
+      color: #000000;
+      text-decoration: underline;
+      &:hover, &:focus {
+        color: #000000;
+      }
+    }
+
+    button, .Button--icon-action {
+      color: #000000;
+      &:hover, &:focus {
+        color: #000000;
+      }
+    }
 
     .warning_message {
       margin-#{direction(left)}: auto;
