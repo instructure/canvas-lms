@@ -1532,6 +1532,7 @@ describe ConversationsController, type: :request do
                                     "attachments" => [
                                       {
                                         "filename" => "test.txt",
+                                        "uuid" => @attachment.uuid,
                                         "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1#{"&verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}",
                                         "content-type" => "text/plain",
                                         "display_name" => "test.txt",
