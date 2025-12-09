@@ -25,9 +25,6 @@
 # This adapter allows SwaggerYard to parse Canvas's existing YARD documentation
 # and generate OpenAPI 3.0 specifications from it.
 
-require "swagger_yard"
-require "yard"
-
 module SwaggerYard
   module CanvasAdapter
     # Storage for examples to be added during OpenAPI post-processing
