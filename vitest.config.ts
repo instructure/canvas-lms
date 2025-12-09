@@ -61,10 +61,12 @@ export default defineConfig({
       exclude: ['ui/**/__tests__/**/*'],
       reportOnFailure: true,
     },
-    // Force all jQuery-related modules to be bundled together so they share state
+    // Force modules to be bundled together so they share state
+    // - jQuery/jqueryui/backbone: share jQuery instance for plugin attachment
+    // - graphql: prevent "Cannot use GraphQLSchema from another module" errors
     server: {
       deps: {
-        inline: [/jquery/, /jqueryui/, /backbone/],
+        inline: [/jquery/, /jqueryui/, /backbone/, /graphql/],
       },
     },
   },
