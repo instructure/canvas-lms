@@ -24,17 +24,11 @@ import {IconConfirmation} from '../../registration_wizard_forms/IconConfirmation
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
 import {LtiPlacementsWithIcons, type LtiPlacementWithIcon} from '../../model/LtiPlacement'
 import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
-import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
-import {Footer} from '../../registration_wizard_forms/Footer'
-import {
-  getInputIdForField,
-  validateIconUris,
-} from '../../registration_overlay/validateLti1p3RegistrationOverlayState'
-import {Lti1p3RegistrationOverlayState} from '../../registration_overlay/Lti1p3RegistrationOverlayState'
 export type IconConfirmationProps = {
   overlayStore: DynamicRegistrationOverlayStore
   registration: LtiRegistrationWithConfiguration
   reviewing: boolean
+  hasSubmitted: boolean
   transitionToConfirmationState: DynamicRegistrationActions['transitionToConfirmationState']
   transitionToReviewingState: DynamicRegistrationActions['transitionToReviewingState']
 }
@@ -43,6 +37,7 @@ export const IconConfirmationWrapper = ({
   overlayStore,
   registration,
   reviewing,
+  hasSubmitted,
   transitionToConfirmationState,
   transitionToReviewingState,
 }: IconConfirmationProps) => {
@@ -64,57 +59,18 @@ export const IconConfirmationWrapper = ({
       [placement]: iconUrl ?? '',
     }
   }, {})
-  const [hasSubmitted, setHasSubmitted] = React.useState(false)
-
-  const onNextClicked = React.useCallback(() => {
-    const {state} = overlayStore.getState()
-    // if there are any errors, don't proceed
-    const icon_urls = LtiPlacementsWithIcons.toSorted().reduce(
-      (obj, p) => {
-        const placement_overlay = state.overlay?.placements ? state.overlay.placements[p] : {}
-        return {...obj, [p]: placement_overlay?.icon_url}
-      },
-      {} as Lti1p3RegistrationOverlayState['icons']['placements'],
-    )
-
-    const errors = validateIconUris({
-      placements: icon_urls,
-      defaultIconUrl: overlayState.overlay.icon_url,
-    })
-
-    if (errors.length > 0) {
-      document.getElementById(getInputIdForField(errors[0].field))?.focus()
-      setHasSubmitted(true)
-    } else {
-      transitionToReviewingState('IconConfirmation')
-    }
-  }, [transitionToReviewingState, overlayStore])
-
-  const onPreviousButtonClicked = React.useCallback(() => {
-    transitionToConfirmationState('IconConfirmation', 'NamingConfirmation')
-  }, [transitionToConfirmationState])
 
   return (
-    <>
-      <RegistrationModalBody>
-        <IconConfirmation
-          allPlacements={placements}
-          internalConfig={registration.configuration}
-          name={overlayState.adminNickname ?? registration.name}
-          placementIconOverrides={placementsWithUrls}
-          setPlacementIconUrl={actions.updateIconUrl}
-          defaultIconUrl={overlayState.overlay.icon_url}
-          setDefaultIconUrl={actions.updateDefaultIconUrl}
-          developerKeyId={registration.developer_key_id ?? undefined}
-          hasSubmitted={hasSubmitted}
-        />
-      </RegistrationModalBody>
-      <Footer
-        reviewing={reviewing}
-        currentScreen="intermediate"
-        onPreviousClicked={onPreviousButtonClicked}
-        onNextClicked={onNextClicked}
-      />
-    </>
+    <IconConfirmation
+      allPlacements={placements}
+      internalConfig={registration.configuration}
+      name={overlayState.adminNickname ?? registration.name}
+      placementIconOverrides={placementsWithUrls}
+      setPlacementIconUrl={actions.updateIconUrl}
+      developerKeyId={registration.developer_key_id ?? undefined}
+      defaultIconUrl={overlayState.overlay.icon_url}
+      setDefaultIconUrl={actions.updateDefaultIconUrl}
+      hasSubmitted={hasSubmitted}
+    />
   )
 }

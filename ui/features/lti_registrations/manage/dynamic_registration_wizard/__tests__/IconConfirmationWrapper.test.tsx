@@ -59,6 +59,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -81,6 +82,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -106,6 +108,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -143,6 +146,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -179,6 +183,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -211,6 +216,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -242,6 +248,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -262,41 +269,6 @@ describe('IconConfirmation', () => {
     expect(screen.getByTitle('Global Navigation icon')).not.toHaveAttribute('src', 'invalid-url')
   })
 
-  it('should transition to reviewing state when all icons are valid and the next button is clicked', async () => {
-    const config = mockConfigWithPlacements([
-      LtiPlacements.GlobalNavigation,
-      LtiPlacements.FileIndexMenu,
-    ])
-    const reg = mockRegistration({}, config)
-    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
-    render(
-      <IconConfirmationWrapper
-        registration={reg}
-        overlayStore={overlayStore}
-        reviewing={false}
-        transitionToConfirmationState={mockTransitionToConfirmationState}
-        transitionToReviewingState={mockTransitionToReviewingState}
-      />,
-    )
-    const iconPlacement = LtiPlacements.GlobalNavigation
-    const input = screen.getByLabelText(new RegExp(i18nLtiPlacement(iconPlacement)), {
-      selector: 'input',
-    })
-    await userEvent.clear(input)
-    await userEvent.click(input)
-    await userEvent.paste('http://example.com/icon.png')
-    // Wait for debouncing
-    vi.runOnlyPendingTimers()
-    expect(input).toHaveValue('http://example.com/icon.png')
-    expect(screen.getByAltText('Global Navigation icon')).toHaveAttribute(
-      'src',
-      'http://example.com/icon.png',
-    )
-    const nextButton = screen.getByRole('button', {name: /next/i})
-    await userEvent.click(nextButton)
-    expect(mockTransitionToReviewingState).toHaveBeenCalledTimes(1)
-  })
-
   it("should render the image provided in the icon url if it's a valid URL", async () => {
     const config = mockConfigWithPlacements([
       LtiPlacements.GlobalNavigation,
@@ -310,6 +282,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -331,29 +304,6 @@ describe('IconConfirmation', () => {
       'src',
       'http://example.com/icon.png',
     )
-  })
-
-  it('should render a Back to Review button when the user is reviewing', () => {
-    const config = mockConfigWithPlacements([
-      LtiPlacements.GlobalNavigation,
-      LtiPlacements.FileIndexMenu,
-    ])
-
-    const reg = mockRegistration({}, config)
-    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
-
-    render(
-      <IconConfirmationWrapper
-        overlayStore={overlayStore}
-        registration={reg}
-        reviewing={true}
-        transitionToConfirmationState={mockTransitionToConfirmationState}
-        transitionToReviewingState={mockTransitionToReviewingState}
-      />,
-    )
-
-    const backButton = screen.getByRole('button', {name: /back to review/i})
-    expect(backButton).toBeInTheDocument()
   })
 
   describe('Tool Icon URL', () => {
@@ -368,6 +318,7 @@ describe('IconConfirmation', () => {
           registration={reg}
           overlayStore={overlayStore}
           reviewing={false}
+          hasSubmitted={false}
           transitionToConfirmationState={mockTransitionToConfirmationState}
           transitionToReviewingState={mockTransitionToReviewingState}
         />,
@@ -390,6 +341,7 @@ describe('IconConfirmation', () => {
           registration={reg}
           overlayStore={overlayStore}
           reviewing={false}
+          hasSubmitted={false}
           transitionToConfirmationState={mockTransitionToConfirmationState}
           transitionToReviewingState={mockTransitionToReviewingState}
         />,
@@ -419,6 +371,7 @@ describe('IconConfirmation', () => {
           registration={reg}
           overlayStore={overlayStore}
           reviewing={false}
+          hasSubmitted={false}
           transitionToConfirmationState={mockTransitionToConfirmationState}
           transitionToReviewingState={mockTransitionToReviewingState}
         />,
@@ -442,6 +395,7 @@ describe('IconConfirmation', () => {
           registration={reg}
           overlayStore={overlayStore}
           reviewing={false}
+          hasSubmitted={false}
           transitionToConfirmationState={mockTransitionToConfirmationState}
           transitionToReviewingState={mockTransitionToReviewingState}
         />,
@@ -465,6 +419,7 @@ describe('IconConfirmation', () => {
           registration={reg}
           overlayStore={overlayStore}
           reviewing={false}
+          hasSubmitted={false}
           transitionToConfirmationState={mockTransitionToConfirmationState}
           transitionToReviewingState={mockTransitionToReviewingState}
         />,
@@ -492,6 +447,7 @@ describe('IconConfirmation', () => {
           registration={reg}
           overlayStore={overlayStore}
           reviewing={false}
+          hasSubmitted={false}
           transitionToConfirmationState={mockTransitionToConfirmationState}
           transitionToReviewingState={mockTransitionToReviewingState}
         />,
