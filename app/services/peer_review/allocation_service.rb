@@ -119,12 +119,32 @@ class PeerReview::AllocationService < ApplicationService
                                              .where(must_review: true, review_permitted: false)
                                              .pluck(:assessee_id)
 
-    @assignment.submissions
-               .active
-               .having_submission
-               .where.not(user_id: [@assessor.id, *already_assigned_user_ids, *must_not_review_user_ids])
-               .preload(:user)
-               .to_a
+    submissions = @assignment.submissions
+                             .active
+                             .having_submission
+                             .where.not(user_id: [@assessor.id, *already_assigned_user_ids, *must_not_review_user_ids])
+
+    unless @assignment.peer_review_across_sections
+      section_ids = assessor_section_ids
+      if section_ids.any?
+        section_user_ids = Enrollment.where(course_id: @assignment.context_id)
+                                     .where(type: "StudentEnrollment")
+                                     .where(workflow_state: "active")
+                                     .where(course_section_id: section_ids)
+                                     .distinct
+                                     .pluck(:user_id)
+        submissions = submissions.where(user_id: section_user_ids)
+      end
+    end
+
+    submissions.preload(:user).to_a
+  end
+
+  def assessor_section_ids
+    Enrollment.where(user_id: @assessor.id, course_id: @assignment.context_id)
+              .where(type: "StudentEnrollment")
+              .where(workflow_state: "active")
+              .pluck(:course_section_id)
   end
 
   def select_submissions_to_allocate(available_submissions, count)
