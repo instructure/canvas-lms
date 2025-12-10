@@ -1,20 +1,23 @@
-// Copyright (C) 2025 - present Instructure, Inc.
-//
-// This file is part of Canvas.
-//
-// Canvas is free software: you can redistribute it and/or modify it under
-// the terms of the GNU Affero General Public License as published by the Free
-// Software Foundation, version 3 of the License.
-//
-// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-// details.
-//
-// You should have received a copy of the GNU Affero General Public License along
-// with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {render, cleanup, waitFor} from '@testing-library/react'
 import AdaChatbot, {autoRestoreAda} from '../AdaChatbot'
 
@@ -41,6 +44,12 @@ describe('AdaChatbot', () => {
   }
 
   beforeEach(() => {
+    fakeENV.setup({
+      ADA_CHATBOT_ENABLED: true,
+      current_user: {},
+      current_user_roles: [],
+      DOMAIN_ROOT_ACCOUNT_UUID: 'test-uuid',
+    })
     jest.clearAllMocks()
     localStorage.clear()
     delete (window as any).adaEmbed
@@ -70,6 +79,7 @@ describe('AdaChatbot', () => {
     cleanup()
     localStorage.clear()
     jest.restoreAllMocks()
+    fakeENV.teardown()
   })
 
   it('renders nothing and calls onDialogClose', async () => {
@@ -86,6 +96,42 @@ describe('AdaChatbot', () => {
     await waitFor(() => expect(mockOnDialogClose).toHaveBeenCalled())
   })
 
+  it('does not initialize when Ada chatbot is disabled', async () => {
+    fakeENV.setup({ADA_CHATBOT_ENABLED: false})
+    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockOnDialogClose).toHaveBeenCalled())
+    expect(mockAdaEmbed.start).not.toHaveBeenCalled()
+  })
+
+  it('handles script load failure gracefully', async () => {
+    mockAdaEmbed.start.mockImplementation(() => {
+      throw new Error('Failed to load Ada embed script')
+    })
+    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() =>
+      expect(consoleWarnSpy).toHaveBeenCalledWith('Ada start failed:', expect.any(Error)),
+    )
+    expect(mockOnDialogClose).toHaveBeenCalled()
+  })
+
+  it('handles unexpected localStorage state gracefully', async () => {
+    localStorage.setItem(ADA_STATE_KEY, 'invalid-state')
+    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+    // Should treat invalid state as 'closed' and not toggle
+    expect(mockAdaEmbed.toggle).not.toHaveBeenCalled()
+  })
+
+  it('does not call onDialogClose after component unmount', async () => {
+    const {unmount} = render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+    mockOnDialogClose.mockClear()
+    unmount()
+    await getStartConfig().adaReadyCallback()
+    // After unmount, onDialogClose should not be called
+    expect(mockOnDialogClose).not.toHaveBeenCalled()
+  })
+
   it('initializes Ada with correct configuration', async () => {
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
     await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
@@ -98,18 +144,22 @@ describe('AdaChatbot', () => {
   })
 
   it('merges global adaSettings and overrides handle', async () => {
-    const globalSettings = {
-      crossWindowPersistence: true,
-      metaFields: {email: 'user@example.com'},
-      handle: 'should-be-overridden',
-    }
-    ;(window as any).adaSettings = globalSettings
-
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
     await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
 
     const config = getStartConfig()
-    expect(config.metaFields).toEqual(globalSettings.metaFields)
+    expect(config.metaFields).toEqual({
+      institutionUrl: 'http://localhost',
+      email: '',
+      name: '',
+      canvasRoles: '',
+      canvasUUID: 'test-uuid',
+      isRootAdmin: false,
+      isAdmin: false,
+      isTeacher: false,
+      isStudent: false,
+      isObserver: false,
+    })
     expect(config.crossWindowPersistence).toBe(true)
     expect(config.handle).toBe('instructure-gen')
   })

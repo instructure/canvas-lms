@@ -75,7 +75,7 @@ declare global {
     CANVAS_ACTIVE_BRAND_VARIABLES?: Record<string, unknown>
     adaEmbed?: AdaEmbed
     AdaEmbed?: AdaEmbedConstructor
-    adaSettings?: Record<string, any>
+    adaSettings?: import('./shared/help-dialog/react/adaTypes').AdaSettings
   }
 
   /**
