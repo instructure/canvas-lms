@@ -89,6 +89,9 @@ module Login::Shared
     setup_live_events_context
     # TODO: Only send this if the current_pseudonym's root account matches the current root
     # account?
+    if Account.site_admin.feature_enabled?(:federated_pseudonym_attributes)
+      AuthenticationMethods::FederatedPseudonymAttributes.load_from(session)
+    end
     Canvas::LiveEvents.logged_in(session, user, pseudonym)
 
     otp_passed ||= user.validate_otp_secret_key_remember_me_cookie(cookies["canvas_otp_remember_me"], request.remote_ip)
