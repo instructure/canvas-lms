@@ -170,3 +170,8 @@ export const containsHtmlTags = (message: string): boolean => {
 export const stripHtmlTags = (htmlText?: string): string | null => {
   return htmlText ? new DOMParser().parseFromString(htmlText, 'text/html').body.textContent : ''
 }
+
+export function htmlDecode(input?: string | null): string {
+  if (!input) return input || ''
+  return new DOMParser().parseFromString(input, 'text/html').documentElement.textContent || input
+}
