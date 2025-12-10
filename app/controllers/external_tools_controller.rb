@@ -2175,6 +2175,7 @@ class ExternalToolsController < ApplicationController
       context: @context,
       assignment: nil, # No assignment for item banks
       tool: @tool,
+      tag: nil, # No tag for item banks navigation launches
       current_user: @current_user,
       controller: self,
       request:,

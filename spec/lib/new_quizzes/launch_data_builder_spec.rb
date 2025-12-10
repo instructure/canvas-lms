@@ -100,7 +100,7 @@ module NewQuizzes
         let(:tool) { nil }
 
         it "raises an error when building" do
-          expect { builder.build }.to raise_error("Tool and tag are required for resource_link_id")
+          expect { builder.build }.to raise_error("Tool is required for resource_link_id")
         end
       end
 
@@ -381,8 +381,8 @@ module NewQuizzes
       context "when tool is nil" do
         let(:tool) { nil }
 
-        it "raises an error about missing tool and tag" do
-          expect { builder.build_with_signature }.to raise_error("Tool and tag are required for resource_link_id")
+        it "raises an error about missing tool" do
+          expect { builder.build_with_signature }.to raise_error("Tool is required for resource_link_id")
         end
       end
 
