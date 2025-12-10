@@ -30,7 +30,6 @@ import {Flex, FlexItemProps} from '@instructure/ui-flex'
 import {IconEditLine, IconPublishSolid, IconQuestionLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
-import {Link} from '@instructure/ui-link'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 import {
@@ -66,27 +65,14 @@ const FixOrReviewAction = ({item}: ScanStateCellProps) => {
     : I18n.t('Review issues for %{name}', {name: item.resourceName})
 
   const renderIcon = canFix ? <IconEditLine /> : null
-  const courseId = window.ENV.current_context?.id ?? null
 
   const handleClick = useCallback(() => selectIssue(item), [item, selectIssue])
 
   return (
     <Flex.Item textAlign="start">
-      {window.ENV.FEATURES?.accessibility_issues_in_full_page && courseId ? (
-        <Link
-          href={`/courses/${courseId}/accessibility_issues/${item.id}`}
-          variant="standalone"
-          data-testid={dataTestId}
-        >
-          <Button data-testid={dataTestId} size="small" renderIcon={renderIcon} onClick={() => {}}>
-            <AccessibleContent alt={altText}>{text}</AccessibleContent>
-          </Button>
-        </Link>
-      ) : (
-        <Button data-testid={dataTestId} size="small" renderIcon={renderIcon} onClick={handleClick}>
-          <AccessibleContent alt={altText}>{text}</AccessibleContent>
-        </Button>
-      )}
+      <Button data-testid={dataTestId} size="small" renderIcon={renderIcon} onClick={handleClick}>
+        <AccessibleContent alt={altText}>{text}</AccessibleContent>
+      </Button>
     </Flex.Item>
   )
 }
