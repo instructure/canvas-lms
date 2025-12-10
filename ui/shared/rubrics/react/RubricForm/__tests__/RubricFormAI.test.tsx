@@ -111,7 +111,7 @@ describe('RubricForm AI Tests', () => {
       expect(getByTestId('grade-level-input')).toHaveValue('Higher Education')
       expect(getByTestId('criteria-count-input')).toHaveValue('5')
       expect(getByTestId('rating-count-input')).toHaveValue('4')
-      expect(getByTestId('points-per-criterion-input')).toHaveValue('20')
+      expect(getByTestId('criteria-total-points-input')).toHaveValue('20')
       expect(getByTestId('standard-objective-input')).toBeInTheDocument()
       expect(getByTestId('additional-prompt-info-input')).toBeInTheDocument()
     })
@@ -147,14 +147,14 @@ describe('RubricForm AI Tests', () => {
       expect(queryByTestId('generate-criteria-form')).not.toBeInTheDocument()
     })
 
-    it('validates points per criterion input', async () => {
+    it('validates total points input', async () => {
       const {getByTestId} = renderComponent({
         aiRubricsEnabled: true,
         assignmentId: '1',
         courseId: '1',
       })
 
-      const pointsInput = getByTestId('points-per-criterion-input')
+      const pointsInput = getByTestId('criteria-total-points-input')
       fireEvent.change(pointsInput, {target: {value: '-1'}})
 
       const generateButton = getByTestId('generate-criteria-button')
@@ -162,7 +162,7 @@ describe('RubricForm AI Tests', () => {
 
       expect(RubricFormQueries.generateCriteria as Mock).not.toHaveBeenCalled()
       expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
-        'Points per criterion must be a valid number',
+        'Total points must be a valid positive number',
       )
     })
 
@@ -245,7 +245,7 @@ describe('RubricForm AI Tests', () => {
         expect(generateCriteriaMock).toHaveBeenCalledWith('1', '1', {
           criteriaCount: 5,
           ratingCount: 4,
-          pointsPerCriterion: '20',
+          totalPoints: '20',
           useRange: false,
           additionalPromptInfo: '',
           standard: standardText,
@@ -254,9 +254,7 @@ describe('RubricForm AI Tests', () => {
       })
 
       await waitFor(() => {
-        expect(getByTestId('rubric-criteria-container')).toHaveTextContent(
-          'Generated Criterion 1',
-        )
+        expect(getByTestId('rubric-criteria-container')).toHaveTextContent('Generated Criterion 1')
       })
     })
 
