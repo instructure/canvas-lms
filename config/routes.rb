@@ -570,7 +570,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    resources :accessibility_issues, only: [:update, :show]
+    resources :accessibility_issues, only: [:update]
 
     resources :ai_experiences, only: %i[index create new show edit update destroy]
     resources :ai_experiences, only: %i[index show new edit]

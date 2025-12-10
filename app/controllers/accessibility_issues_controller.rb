@@ -23,16 +23,6 @@ class AccessibilityIssuesController < ApplicationController
   before_action :check_authorized_action
   before_action :set_issue, only: [:update]
 
-  def show
-    js_bundle :accessibility_issues
-    render html: view_context.tag.div(
-      "",
-      id: "accessibility-issues-page-container",
-      data: { course_id: params[:course_id], issue_id: params[:id] }
-    ),
-           layout: true
-  end
-
   def update
     error = validate_update_params
     return render json: { error: }, status: :unprocessable_entity if error

@@ -38,27 +38,6 @@ describe AccessibilityIssuesController do
     allow_any_instance_of(described_class).to receive(:check_authorized_action).and_return(true)
   end
 
-  describe "GET #show" do
-    render_views
-    before do
-      allow(controller).to receive(:js_bundle)
-      get :show, params: { course_id: course.id, id: issue.id }
-    end
-
-    it "returns a 200 status" do
-      expect(response).to have_http_status(:ok)
-    end
-
-    it "renders the accessibility issues page container" do
-      expect(response.body).to include('<div id="accessibility-issues-page-container"')
-    end
-
-    it "includes the correct data attributes" do
-      expect(response.body).to include("data-course-id=\"#{course.id}\"")
-      expect(response.body).to include("data-issue-id=\"#{issue.id}\"")
-    end
-  end
-
   describe "PATCH #update" do
     context "when issue cannot be found" do
       before do

@@ -62,7 +62,6 @@ const I18n = createI18nScope('accessibility_checker')
 interface AccessibilityIssuesDrawerContentProps {
   item: AccessibilityResourceScan
   onClose: () => void
-  pageView?: boolean
 }
 
 function renderSpinner() {
@@ -78,7 +77,6 @@ function renderSpinner() {
 const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps> = ({
   item,
   onClose,
-  pageView = false,
 }: AccessibilityIssuesDrawerContentProps) => {
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
   const [currentIssueIndex, setCurrentIssueIndex] = useState(0)
@@ -421,12 +419,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   )
 
   return (
-    <Flex
-      as="div"
-      direction="column"
-      height={pageView ? 'auto' : '100%'}
-      width={pageView ? '100%' : 'auto'}
-    >
+    <Flex as="div" direction="column" height="100%" width="auto">
       <Flex.Item shouldGrow={true} overflowY="auto">
         <View position={'relative'} width="100%">
           <Flex as="div" direction="column" width="100%" margin="0 0 medium 0">
