@@ -4658,6 +4658,12 @@ class Course < ActiveRecord::Base
     horizon_course && account&.feature_enabled?(:horizon_course_setting)
   end
 
+  def horizon_back_to_units_enabled?
+    horizon_course? &&
+      root_account.feature_enabled?(:horizon_course_redesign) &&
+      root_account.feature_enabled?(:horizon_course_academic_switcher)
+  end
+
   def requirement_count_api_enabled?
     horizon_course?
   end
