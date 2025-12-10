@@ -2830,6 +2830,45 @@ RSpec.describe ApplicationController do
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
       end
     end
+
+    context "with federated pseudonym attributes" do
+      before do
+        user_with_pseudonym
+        controller.instance_variable_set(:@current_user, @user)
+        controller.instance_variable_set(:@current_pseudonym, @pseudonym)
+        @pseudonym.unique_id = "pseudonym_user"
+        @pseudonym.sis_user_id = "pseudonym_sis_456"
+      end
+
+      after do
+        AuthenticationMethods::FederatedPseudonymAttributes.reset
+      end
+
+      context "when federated attributes are loaded" do
+        before do
+          AuthenticationMethods::FederatedPseudonymAttributes.unique_id = "federated_user"
+          AuthenticationMethods::FederatedPseudonymAttributes.sis_user_id = "federated_sis_123"
+        end
+
+        it "uses federated unique_id in live events context" do
+          controller.send(:setup_live_events_context)
+          expect(LiveEvents.get_context[:user_login]).to eq "federated_user"
+          expect(LiveEvents.get_context[:user_sis_id]).to eq "federated_sis_123"
+        end
+      end
+
+      context "when federated attributes are not loaded" do
+        before do
+          AuthenticationMethods::FederatedPseudonymAttributes.reset
+        end
+
+        it "falls back to pseudonym attributes in live events context" do
+          controller.send(:setup_live_events_context)
+          expect(LiveEvents.get_context[:user_login]).to eq "pseudonym_user"
+          expect(LiveEvents.get_context[:user_sis_id]).to eq "pseudonym_sis_456"
+        end
+      end
+    end
   end
 
   describe "show_student_view_button? helper" do
