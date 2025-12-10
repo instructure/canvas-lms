@@ -36,7 +36,7 @@ const I18n = createI18nScope('rubrics-form-generated-criteria')
 export const defaultGenerateCriteriaForm: GenerateCriteriaFormProps = {
   criteriaCount: 5,
   ratingCount: 4,
-  pointsPerCriterion: '20',
+  totalPoints: '20',
   useRange: false,
   additionalPromptInfo: '',
   gradeLevel: 'higher-ed',
@@ -116,9 +116,9 @@ export const GeneratedCriteriaForm = ({
   }
 
   const handleGenerateButton = () => {
-    const points = parseFloat(generateCriteriaForm.pointsPerCriterion)
+    const points = parseFloat(generateCriteriaForm.totalPoints)
     if (isNaN(points) || points < 0) {
-      showFlashError(I18n.t('Points per criterion must be a valid number'))()
+      showFlashError(I18n.t('Total points must be a valid positive number'))()
       return
     }
     generateCriteriaMutation()
@@ -207,13 +207,13 @@ export const GeneratedCriteriaForm = ({
         </Flex.Item>
         <Flex.Item shouldShrink={true}>
           <TextInput
-            data-testid="points-per-criterion-input"
-            renderLabel={I18n.t('Points per Criterion')}
-            value={generateCriteriaForm.pointsPerCriterion}
+            data-testid="criteria-total-points-input"
+            renderLabel={I18n.t('Total points')}
+            value={generateCriteriaForm.totalPoints}
             onChange={(_event, value) =>
               updateGenerateCriteriaForm({
                 ...generateCriteriaForm,
-                pointsPerCriterion: value,
+                totalPoints: value,
               })
             }
             type="text"

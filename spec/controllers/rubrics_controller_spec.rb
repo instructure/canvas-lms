@@ -1296,7 +1296,7 @@ describe RubricsController do
         {
           course_id: @course.id,
           rubric_association: { association_type: "Assignment", association_id: @assignment.id },
-          generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5, use_range: true, grade_level: "college" }
+          generate_options: { criteria_count: 2, rating_count: 3, total_points: 5, use_range: true, grade_level: "college" }
         }
       end
 
@@ -1331,7 +1331,7 @@ describe RubricsController do
              params: {
                course_id: @course.id,
                rubric_association: { association_type: "Assignment", association_id: @assignment.id },
-               generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5, use_range: true, additional_prompt_info: "Focus on content", grade_level: "second" }
+               generate_options: { criteria_count: 2, rating_count: 3, total_points: 5, use_range: true, additional_prompt_info: "Focus on content", grade_level: "second" }
              },
              format: :json
 
@@ -1407,7 +1407,7 @@ describe RubricsController do
           course_id: @course.id,
           rubric_association: { association_type: "Assignment", association_id: @assignment.id },
           criteria: @existing_criteria,
-          generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 10, use_range: true, grade_level: "higher-ed" }
+          generate_options: { criteria_count: 2, rating_count: 3, total_points: 10, use_range: true, grade_level: "higher-ed" }
         }
       end
 
@@ -1443,7 +1443,7 @@ describe RubricsController do
                criteria: @existing_criteria,
                additional_user_prompt: "Make this more comprehensive",
                regenerate_options: { additional_user_prompt: "Make this more comprehensive" },
-               generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 10, use_range: true, grade_level: "college" }
+               generate_options: { criteria_count: 2, rating_count: 3, total_points: 10, use_range: true, grade_level: "college" }
              },
              format: :json
         expect(response).to be_successful
@@ -1481,7 +1481,7 @@ describe RubricsController do
                generate_options: {
                  criteria_count: 2,
                  rating_count: 3,
-                 points_per_criterion: 20,
+                 total_points: 20,
                  use_range: false,
                  grade_level: "higher-ed"
                }
@@ -1558,7 +1558,7 @@ describe RubricsController do
                  course_id: @course.id,
                  rubric_association: { association_type: "Assignment", association_id: @assignment.id },
                  criteria: existing_criteria_with_three,
-                 generate_options: { criteria_count: 3, rating_count: 3, points_per_criterion: 10 }
+                 generate_options: { criteria_count: 3, rating_count: 3, total_points: 10 }
                },
                format: :json
 
@@ -1627,7 +1627,7 @@ describe RubricsController do
                  course_id: @course.id,
                  rubric_association: { association_type: "Assignment", association_id: @assignment.id },
                  criteria: existing_criteria_with_three,
-                 generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 10 }
+                 generate_options: { criteria_count: 2, rating_count: 3, total_points: 10 }
                },
                format: :json
 
@@ -1659,7 +1659,7 @@ describe RubricsController do
             )
             post "llm_regenerate_criteria", params:, format: :json
             expect(response).to be_bad_request
-            expect(response.parsed_body["error"]).to eq "additional_user_prompt must be less than 1000 characters"
+            expect(response.parsed_body["error"]).to eq "additional_user_prompt must be 1000 characters or less"
           end
 
           it "returns error when additional_prompt_info is too long in generate_options" do
@@ -1669,17 +1669,17 @@ describe RubricsController do
             )
             post "llm_regenerate_criteria", params:, format: :json
             expect(response).to be_bad_request
-            expect(response.parsed_body["error"]).to eq "additional_prompt_info must be less than 1000 characters"
+            expect(response.parsed_body["error"]).to eq "additional_prompt_info must be 1000 characters or less"
           end
 
           it "returns error when standard in regenerate_options is too long" do
             long_standard = "s" * 1001
             params = request_params.deep_merge(
-              regenerate_options: { standard: long_standard }
+              generate_options: { standard: long_standard }
             )
             post "llm_regenerate_criteria", params:, format: :json
             expect(response).to be_bad_request
-            expect(response.parsed_body["error"]).to eq "standard must be less than 1000 characters"
+            expect(response.parsed_body["error"]).to eq "standard must be 1000 characters or less"
           end
         end
 
@@ -1733,7 +1733,7 @@ describe RubricsController do
             generate_options: {
               criteria_count: 5,
               rating_count: 4,
-              points_per_criterion: 20,
+              total_points: 20,
               use_range: false,
               grade_level: "higher-ed"
             }
@@ -1861,7 +1861,7 @@ describe RubricsController do
                generate_options: {
                  criteria_count: 2,
                  rating_count: 4,
-                 points_per_criterion: 25,
+                 total_points: 25,
                  use_range: true,
                  additional_prompt_info: "Focus on academic writing skills",
                  grade_level: "college"
@@ -1900,7 +1900,7 @@ describe RubricsController do
         expect(first_criterion[:description]).to eq "Evidence-Based Reasoning"
         expect(first_criterion[:long_description]).to eq "Demonstrates use of credible sources and logical reasoning"
         expect(first_criterion[:criterion_use_range]).to be true
-        expect(first_criterion[:points]).to eq 25
+        expect(first_criterion[:points]).to eq 12.5
         expect(first_criterion[:ratings].length).to eq 4
 
         # Verify ratings are properly sorted by points
@@ -2032,7 +2032,7 @@ describe RubricsController do
                course_id: @course.id,
                rubric_association: { association_type: "Assignment", association_id: @assignment.id },
                criteria: @existing_criteria,
-               generate_options: { criteria_count: 3, rating_count: 4, points_per_criterion: 25, use_range: true, grade_level: "higher-ed" },
+               generate_options: { criteria_count: 3, rating_count: 4, total_points: 25, use_range: true, grade_level: "higher-ed" },
                regenerate_options: { additional_user_prompt: "Make the criteria more detailed and add writing mechanics" }
              },
              format: :json
@@ -2072,13 +2072,15 @@ describe RubricsController do
         expect(first_criterion[:description]).to eq "Enhanced Argument Development"
         expect(first_criterion[:long_description]).to eq "Develops sophisticated and nuanced arguments with clear thesis"
         expect(first_criterion[:criterion_use_range]).to be true
-        expect(first_criterion[:points]).to eq 25
+        expect(first_criterion[:points]).to eq 8.33
         expect(first_criterion[:ratings].length).to eq 4
 
         # Second criterion should be updated but keep existing ID
         second_criterion = criteria_results.find { |c| c[:id] == "existing_c2" }
         expect(second_criterion).to be_present
         expect(second_criterion[:description]).to eq "Research Integration"
+        expect(second_criterion[:points]).to eq 8.33
+        expect(second_criterion[:ratings].length).to eq 4
         expect(second_criterion[:long_description]).to eq "Effectively integrates research to support arguments"
 
         # Third criterion should be new with generated ID
@@ -2086,6 +2088,8 @@ describe RubricsController do
         expect(third_criterion).to be_present
         expect(third_criterion[:id]).not_to start_with("_new_c_") # Should have real generated ID
         expect(third_criterion[:long_description]).to eq "Demonstrates command of grammar, syntax, and style"
+        expect(third_criterion[:points]).to eq 8.34
+        expect(third_criterion[:ratings].length).to eq 4
 
         # Verify all ratings are properly sorted by points descending
         criteria_results.each do |criterion|
@@ -2123,8 +2127,8 @@ describe RubricsController do
                course_id: @course.id,
                rubric_association: { association_type: "Assignment", association_id: @assignment.id },
                criteria: @existing_criteria,
-               generate_options: { criteria_count: 3, rating_count: 4, points_per_criterion: 20, use_range: false },
-               regenerate_options: { criterion_id: "existing_c1", standard: "Focus on logical reasoning and evidence quality" }
+               generate_options: { criteria_count: 3, rating_count: 4, total_points: 60, use_range: false, standard: "Focus on logical reasoning and evidence quality" },
+               regenerate_options: { criterion_id: "existing_c1" }
              },
              format: :json
 

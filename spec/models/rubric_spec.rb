@@ -1078,7 +1078,6 @@ describe Rubric do
       let(:progress) { Progress.create!(user: teacher, context: course, tag: "rubric_llm_generation") }
       let(:generate_options) { { criteria_count: 3, rating_count: 4, points_per_criterion: 20, use_range: false, grade_level: "higher-ed" } }
       let(:regenerate_options) { { criteria: existing_criteria, criterion_id: "c1" } }
-      let(:orig_generate_options) { { criteria_count: 2, rating_count: 3 } }
       let(:existing_criteria) do
         [
           {
@@ -1099,7 +1098,7 @@ describe Rubric do
           if method_name == :process_generate_criteria_via_llm
             Rubric.send(method_name, progress, course, teacher, assignment, generate_options)
           else
-            Rubric.send(method_name, progress, course, teacher, assignment, regenerate_options, orig_generate_options)
+            Rubric.send(method_name, progress, course, teacher, assignment, regenerate_options, generate_options)
           end
 
           progress.reload
@@ -1116,7 +1115,7 @@ describe Rubric do
           if method_name == :process_generate_criteria_via_llm
             Rubric.send(method_name, progress, course, teacher, assignment, generate_options)
           else
-            Rubric.send(method_name, progress, course, teacher, assignment, regenerate_options, orig_generate_options)
+            Rubric.send(method_name, progress, course, teacher, assignment, regenerate_options, generate_options)
           end
 
           progress.reload
@@ -1136,7 +1135,7 @@ describe Rubric do
           if method_name == :process_generate_criteria_via_llm
             Rubric.send(method_name, progress, course, other_user, assignment, generate_options)
           else
-            Rubric.send(method_name, progress, course, other_user, assignment, regenerate_options, orig_generate_options)
+            Rubric.send(method_name, progress, course, other_user, assignment, regenerate_options, generate_options)
           end
 
           progress.reload
@@ -1200,7 +1199,7 @@ describe Rubric do
             progress.reload
             expect(progress.workflow_state).to eq "running"
 
-            Rubric.process_regenerate_criteria_via_llm(progress, course, teacher, assignment, regenerate_options, orig_generate_options)
+            Rubric.process_regenerate_criteria_via_llm(progress, course, teacher, assignment, regenerate_options, generate_options)
 
             progress.reload
             expect(progress.workflow_state).to eq "completed"
