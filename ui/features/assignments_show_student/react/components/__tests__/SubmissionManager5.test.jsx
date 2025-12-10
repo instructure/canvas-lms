@@ -37,8 +37,6 @@ jest.mock('@canvas/rce/RichContentEditor')
 
 jest.mock('../../apis/ContextModuleApi')
 
-jest.mock('@canvas/do-fetch-api-effect')
-
 jest.useFakeTimers()
 
 function renderInContext(overrides = {}, children) {

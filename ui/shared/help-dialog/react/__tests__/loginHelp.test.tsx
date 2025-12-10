@@ -17,21 +17,23 @@
 import React from 'react'
 import {cleanup, render, screen, waitFor, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import LoginHelp, {renderLoginHelp} from '../loginHelp'
 
-jest.mock('@canvas/do-fetch-api-effect', () => ({
-  __esModule: true,
-  default: jest.fn(() =>
-    Promise.resolve({
-      json: [{}],
-      link: null,
-    }),
-  ),
-}))
+const server = setupServer(
+  http.get('*', () => {
+    return HttpResponse.json([{}])
+  }),
+)
 
 describe('LoginHelp Component and Helpers', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
+    server.resetHandlers()
     jest.clearAllMocks()
     document.body.innerHTML = ''
   })

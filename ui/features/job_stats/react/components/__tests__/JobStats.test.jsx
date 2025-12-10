@@ -19,23 +19,85 @@
 import React from 'react'
 import {render, act, fireEvent, waitFor} from '@testing-library/react'
 import JobStats from '../JobStats'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import mockJobsApi from './MockJobsAPI'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
 jest.useFakeTimers()
 
+const server = setupServer()
+
+function fakeLinkHeader(path) {
+  return `<${path}?page=1>; rel="current", <${path}?page=1>; rel="last"`
+}
+
+const fakeCluster = [
+  {
+    id: '101',
+    database_server_id: 'jobs1',
+    block_stranded_shard_ids: ['2'],
+    jobs_held_shard_ids: ['7', '9'],
+    domain: 'jobs101.example.com',
+    counts: {running: 86, queued: 7, future: 530, blocked: 9},
+  },
+]
+
+const refreshedCluster = [
+  {
+    id: '101',
+    database_server_id: 'jobs1',
+    block_stranded_shard_ids: [],
+    jobs_held_shard_ids: [],
+    domain: 'jobs101.example.com',
+    counts: {running: 1, queued: 10, future: 100, blocked: 0},
+  },
+]
+
+const fakeUnstuckResult = {
+  status: 'pending',
+  progress: {
+    id: '655',
+    context_id: '1',
+    context_type: 'User',
+    user_id: null,
+    tag: 'JobsV2Controller::run_unstucker!',
+    completion: null,
+    workflow_state: 'queued',
+    created_at: '2022-10-14T23:12:45Z',
+    updated_at: '2022-10-14T23:12:45Z',
+    message: null,
+    url: '/api/v1/progress/655',
+  },
+}
+
+const fakeProgressResult = {
+  id: '655',
+  context_id: '1',
+  context_type: 'User',
+  user_id: null,
+  tag: 'JobsV2Controller::run_unstucker!',
+  completion: 100.0,
+  workflow_state: 'completed',
+  created_at: '2022-10-14T23:12:45Z',
+  updated_at: '2022-10-14T23:12:46Z',
+  message: null,
+  url: '/api/v1/progress/655',
+}
+
+const fakeStuckResult = [
+  {name: 'foo', count: 1},
+  {name: 'baz', count: 2},
+]
+
 describe('JobStats', () => {
-  beforeAll(() => {
-    doFetchApi.mockImplementation(mockJobsApi)
-  })
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     fakeENV.setup({
       manage_jobs: false,
     })
-    doFetchApi.mockClear()
+    server.resetHandlers()
   })
 
   afterEach(() => {
@@ -43,6 +105,14 @@ describe('JobStats', () => {
   })
 
   it('loads cluster info', async () => {
+    server.use(
+      http.get('/api/v1/jobs2/clusters', () =>
+        HttpResponse.json(fakeCluster, {
+          headers: {Link: fakeLinkHeader('/api/v1/jobs2/clusters')},
+        }),
+      ),
+    )
+
     const {queryByText, getByText} = render(<JobStats />)
     await act(async () => jest.runAllTimers())
 
@@ -64,15 +134,29 @@ describe('JobStats', () => {
   })
 
   it('refreshes cluster', async () => {
+    let capturedParams = null
+    server.use(
+      http.get('/api/v1/jobs2/clusters', ({request}) => {
+        const url = new URL(request.url)
+        capturedParams = url.searchParams.get('job_shards[]')
+        if (capturedParams) {
+          return HttpResponse.json(refreshedCluster, {
+            headers: {Link: fakeLinkHeader('/api/v1/jobs2/clusters')},
+          })
+        }
+        return HttpResponse.json(fakeCluster, {
+          headers: {Link: fakeLinkHeader('/api/v1/jobs2/clusters')},
+        })
+      }),
+    )
+
     const {queryByText, getByText} = render(<JobStats />)
     await act(async () => jest.runAllTimers())
 
     fireEvent.click(getByText('Refresh', {selector: 'button span'}))
     await act(async () => jest.runAllTimers())
 
-    expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({params: {job_shards: ['101']}}),
-    )
+    expect(capturedParams).toBe('101')
 
     expect(queryByText('jobs held')).not.toBeInTheDocument()
     expect(queryByText('block stranded')).not.toBeInTheDocument()
@@ -93,6 +177,31 @@ describe('JobStats', () => {
       manage_jobs: true,
     })
 
+    let unstuckParams = null
+    let unstuckMethod = null
+    let progressCalled = false
+    let refreshCount = 0
+
+    server.use(
+      http.get('/api/v1/jobs2/clusters', () => {
+        refreshCount++
+        const data = refreshCount > 1 ? refreshedCluster : fakeCluster
+        return HttpResponse.json(data, {
+          headers: {Link: fakeLinkHeader('/api/v1/jobs2/clusters')},
+        })
+      }),
+      http.put('/api/v1/jobs2/unstuck', ({request}) => {
+        const url = new URL(request.url)
+        unstuckParams = url.searchParams.get('job_shards[]')
+        unstuckMethod = request.method
+        return HttpResponse.json(fakeUnstuckResult)
+      }),
+      http.get('/api/v1/progress/655', () => {
+        progressCalled = true
+        return HttpResponse.json(fakeProgressResult)
+      }),
+    )
+
     const {getByText, queryByText} = render(<JobStats />)
     await act(async () => jest.runAllTimers())
 
@@ -110,34 +219,50 @@ describe('JobStats', () => {
     await act(async () => jest.runAllTimers())
 
     expect(getByText('Unblocking...')).toBeInTheDocument()
-    expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: 'PUT',
-        params: {job_shards: ['101']},
-        path: '/api/v1/jobs2/unstuck',
-      }),
-    )
+    expect(unstuckMethod).toBe('PUT')
+    expect(unstuckParams).toBe('101')
 
     await act(async () => jest.advanceTimersByTime(2000))
 
-    expect(doFetchApi).toHaveBeenCalledWith(expect.objectContaining({path: '/api/v1/progress/655'}))
+    expect(progressCalled).toBe(true)
     expect(queryByText('9', {selector: 'td button'})).not.toBeInTheDocument()
     expect(getByText('0', {selector: 'td'})).toBeInTheDocument()
   })
 
   it('shows stuck strands/singletons', async () => {
+    let strandsCalled = false
+    let singletonsCalled = false
+
+    server.use(
+      http.get('/api/v1/jobs2/clusters', () =>
+        HttpResponse.json(fakeCluster, {
+          headers: {Link: fakeLinkHeader('/api/v1/jobs2/clusters')},
+        }),
+      ),
+      http.get('/api/v1/jobs2/stuck/strands', ({request}) => {
+        const url = new URL(request.url)
+        if (url.searchParams.get('job_shard') === '101') {
+          strandsCalled = true
+        }
+        return HttpResponse.json(fakeStuckResult)
+      }),
+      http.get('/api/v1/jobs2/stuck/singletons', ({request}) => {
+        const url = new URL(request.url)
+        if (url.searchParams.get('job_shard') === '101') {
+          singletonsCalled = true
+        }
+        return HttpResponse.json(fakeStuckResult)
+      }),
+    )
+
     const {getByText, getAllByText} = render(<JobStats />)
     await act(async () => jest.runAllTimers())
 
     fireEvent.click(getByText('9', {selector: 'td button'}))
     await act(async () => jest.runAllTimers())
 
-    expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({params: {job_shard: '101'}, path: '/api/v1/jobs2/stuck/strands'}),
-    )
-    expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({params: {job_shard: '101'}, path: '/api/v1/jobs2/stuck/singletons'}),
-    )
+    expect(strandsCalled).toBe(true)
+    expect(singletonsCalled).toBe(true)
 
     const ss_links = getAllByText('baz', {selector: 'td a'})
     expect(ss_links).toHaveLength(2)

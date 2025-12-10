@@ -17,13 +17,20 @@
  */
 
 import {render, act, fireEvent, waitFor} from '@testing-library/react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import MicrosoftSyncButton from '../MicrosoftSyncButton'
 import React from 'react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 describe('MicrosoftSyncButton', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
   const props = overrides => ({
     enabled: true,
     group: {
@@ -51,18 +58,21 @@ describe('MicrosoftSyncButton', () => {
     expect(subject().getByText('Sync Now').closest('button').disabled).toBeFalsy()
   })
 
-  it('schedules a sync on click', () => {
-    const component = subject()
-    doFetchApi.mockImplementationOnce(() => Promise.resolve({json: props().group}))
+  it('schedules a sync on click', async () => {
+    let requestMade = false
+    server.use(
+      http.post('/api/v1/courses/:courseId/microsoft_sync/schedule_sync', () => {
+        requestMade = true
+        return HttpResponse.json(props().group)
+      }),
+    )
 
+    const component = subject()
     act(() => {
       fireEvent.click(component.getByText('Sync Now'))
     })
 
-    expect(doFetchApi).toHaveBeenLastCalledWith({
-      method: 'POST',
-      path: `/api/v1/courses/${props().courseId}/microsoft_sync/schedule_sync`,
-    })
+    await waitFor(() => expect(requestMade).toBe(true))
   })
 
   describe('when it is not enabled', () => {
@@ -74,9 +84,14 @@ describe('MicrosoftSyncButton', () => {
   })
 
   describe('when the sync request is loading', () => {
-    beforeEach(() =>
-      doFetchApi.mockImplementationOnce(() => Promise.resolve({json: props().group})),
-    )
+    beforeEach(() => {
+      server.use(
+        http.post(
+          '/api/v1/courses/:courseId/microsoft_sync/schedule_sync',
+          () => new Promise(resolve => setTimeout(resolve, 5000)),
+        ),
+      )
+    })
 
     it('shows a "scheduling sync" spinner', () => {
       const component = subject()
@@ -91,9 +106,14 @@ describe('MicrosoftSyncButton', () => {
   })
 
   describe('when the sync request fails', () => {
-    beforeEach(() =>
-      doFetchApi.mockImplementationOnce(() => Promise.reject({message: 'test error'})),
-    )
+    beforeEach(() => {
+      server.use(
+        http.post(
+          '/api/v1/courses/:courseId/microsoft_sync/schedule_sync',
+          () => new HttpResponse(null, {status: 500}),
+        ),
+      )
+    })
 
     it('calls the error handler, but allows trying to sync again', async () => {
       const onError = jest.fn()
@@ -129,7 +149,11 @@ describe('MicrosoftSyncButton', () => {
         await waitFor(() => expect(onError).toHaveBeenCalled())
 
         // The second attempt succeeds
-        doFetchApi.mockImplementationOnce(() => Promise.resolve({json: props().group}))
+        server.use(
+          http.post('/api/v1/courses/:courseId/microsoft_sync/schedule_sync', () =>
+            HttpResponse.json(props().group),
+          ),
+        )
         fireEvent.click(component.getByText('Sync Now'))
         await waitFor(() => expect(onSuccess).toHaveBeenCalled())
 
@@ -142,7 +166,11 @@ describe('MicrosoftSyncButton', () => {
   describe('when the sync request succeeds', () => {
     const oldEnv = window.ENV
     beforeEach(() => {
-      doFetchApi.mockImplementationOnce(() => Promise.resolve({json: props().group}))
+      server.use(
+        http.post('/api/v1/courses/:courseId/microsoft_sync/schedule_sync', () =>
+          HttpResponse.json(props().group),
+        ),
+      )
       window.ENV = {
         MSFT_SYNC_CAN_BYPASS_COOLDOWN: false,
       }

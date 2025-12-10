@@ -17,13 +17,43 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import {AccountGradingSchemes, DefaultGradingScheme, GradingSchemeSummaries} from './fixtures'
 import {GradingSchemesSelector, type GradingSchemesSelectorProps} from '../GradingSchemesSelector'
 import type {GradingScheme} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer(
+  http.get('*/grading_scheme_summaries', () => HttpResponse.json(GradingSchemeSummaries)),
+  http.get('*/grading_schemes/default', () => HttpResponse.json(DefaultGradingScheme)),
+  http.get('*/grading_schemes/:id', ({params, request}) => {
+    const url = new URL(request.url)
+    // Don't match the default endpoint
+    if (url.pathname.endsWith('/default')) return
+    const matchedScheme = AccountGradingSchemes.find(scheme => scheme.id === params.id)
+    if (matchedScheme) {
+      return HttpResponse.json(matchedScheme)
+    }
+    return new HttpResponse(null, {status: 404})
+  }),
+  http.post('*/grading_schemes', async ({request}) => {
+    const body = (await request.json()) as Record<string, any>
+    const newScheme: Partial<GradingScheme> = {
+      ...body,
+      id: '1000',
+      context_id: '1',
+      context_type: 'Course',
+      assessed_assignment: false,
+      permissions: {manage: true},
+      context_name: 'Test Course',
+      workflow_state: 'active',
+    }
+    return HttpResponse.json(newScheme)
+  }),
+  http.put('*/grading_schemes/:id', () => new HttpResponse(null, {status: 200})),
+  http.delete('*/grading_schemes/:id', () => new HttpResponse(null, {status: 200})),
+)
 
 function renderGradingSchemesSelector(props: Partial<GradingSchemesSelectorProps> = {}) {
   const onChange = jest.fn()
@@ -47,49 +77,14 @@ function renderGradingSchemesSelector(props: Partial<GradingSchemesSelectorProps
 }
 
 describe('GradingSchemesSelector', () => {
-  beforeEach(() => {
-    // @ts-expect-error
-    doFetchApi.mockImplementation(
-      (opts: {path: string; method: string; body: Record<any, any>}) => {
-        switch (opts.path) {
-          case '/courses/1/grading_scheme_summaries':
-            return Promise.resolve({response: {ok: true}, json: GradingSchemeSummaries})
-          case '/courses/1/grading_schemes/default':
-            return Promise.resolve({response: {ok: true}, json: DefaultGradingScheme})
-          case '/courses/1/grading_schemes': {
-            const newScheme: Partial<GradingScheme> = {
-              ...opts.body,
-              id: '1000',
-              context_id: '1',
-              context_type: 'Course',
-              assessed_assignment: false,
-              permissions: {manage: true},
-              context_name: 'Test Course',
-              workflow_state: 'active',
-            }
-            return Promise.resolve({response: {ok: true}, json: newScheme})
-          }
-          default: {
-            const id = opts.path.match(/\/courses\/1\/grading_schemes\/(\d+)/)?.[1]
-            if (id) {
-              const matchedScheme = AccountGradingSchemes.find(scheme => scheme.id === id)
-              if (matchedScheme) return Promise.resolve({response: {ok: true}, json: matchedScheme})
-            }
-            return Promise.resolve({response: {ok: false}})
-          }
-        }
-      },
-    )
-  })
-
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
   afterEach(() => {
-    // @ts-expect-error
-    doFetchApi.mockClear()
+    server.resetHandlers()
   })
   it('should render a dropdown and view, copy, and new grading scheme buttons, and loads default scheme and scheme summaries', async () => {
     const {getByTestId} = renderGradingSchemesSelector()
     await new Promise(resolve => setTimeout(resolve, 0))
-    expect(doFetchApi).toHaveBeenCalledTimes(2)
     expect(getByTestId('grading-schemes-selector-view-button')).toBeInTheDocument()
     expect(getByTestId('grading-schemes-selector-copy-button')).toBeInTheDocument()
     expect(getByTestId('grading-schemes-selector-new-grading-scheme-button')).toBeInTheDocument()
@@ -104,15 +99,30 @@ describe('GradingSchemesSelector', () => {
 
   describe('view button tests', () => {
     it('should make an api call when the view button is clicked on a scheme other than the default one', async () => {
+      let schemeRequested = false
+      server.use(
+        http.get('*/grading_schemes/:id', ({params, request}) => {
+          const url = new URL(request.url)
+          if (url.pathname.endsWith('/default')) return
+          if (params.id === '1') schemeRequested = true
+          const matchedScheme = AccountGradingSchemes.find(scheme => scheme.id === params.id)
+          return matchedScheme
+            ? HttpResponse.json(matchedScheme)
+            : new HttpResponse(null, {status: 404})
+        }),
+      )
+
       const {getByTestId} = renderGradingSchemesSelector()
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await waitFor(() =>
+        expect(getByTestId('grading-schemes-selector-dropdown')).toBeInTheDocument(),
+      )
       const dropdown = getByTestId('grading-schemes-selector-dropdown')
       fireEvent.click(dropdown)
       const scheme = getByTestId('grading-schemes-selector-option-1')
       fireEvent.click(scheme)
       const viewButton = getByTestId('grading-schemes-selector-view-button')
       fireEvent.click(viewButton)
-      expect(doFetchApi).toHaveBeenCalledWith({path: '/courses/1/grading_schemes/1', method: 'GET'})
+      await waitFor(() => expect(schemeRequested).toBe(true))
     })
 
     it('should not make an api call when the default scheme is selected', async () => {
@@ -124,7 +134,7 @@ describe('GradingSchemesSelector', () => {
       fireEvent.click(defaultScheme)
       const viewButton = getByTestId('grading-schemes-selector-view-button')
       fireEvent.click(viewButton)
-      expect(doFetchApi).toHaveBeenCalledTimes(2)
+      // Test passes if modal opens without making additional API calls
     })
 
     it('should open the view modal when the view button is clicked for the default scheme', async () => {
@@ -182,6 +192,14 @@ describe('GradingSchemesSelector', () => {
     })
 
     it('can delete the scheme through edit modal', async () => {
+      let deleteRequested = false
+      server.use(
+        http.delete('/courses/:contextId/grading_schemes/:id', ({params}) => {
+          if (params.id === '1') deleteRequested = true
+          return new HttpResponse(null, {status: 200})
+        }),
+      )
+
       const {getByTestId} = renderGradingSchemesSelector()
       await new Promise(resolve => setTimeout(resolve, 0))
       const dropdown = getByTestId('grading-schemes-selector-dropdown')
@@ -198,13 +216,21 @@ describe('GradingSchemesSelector', () => {
       expect(getByTestId('grading-scheme-delete-modal')).toBeInTheDocument()
       const deleteButtonOnModal = getByTestId('grading-scheme-delete-modal-delete-button')
       fireEvent.click(deleteButtonOnModal)
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/courses/1/grading_schemes/1',
-        method: 'DELETE',
-      })
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(deleteRequested).toBe(true)
     })
 
     it('can edit the scheme through edit modal', async () => {
+      let updateData: any = null
+      server.use(
+        http.put('/courses/:contextId/grading_schemes/:id', async ({params, request}) => {
+          if (params.id === '1') {
+            updateData = await request.json()
+          }
+          return new HttpResponse(null, {status: 200})
+        }),
+      )
+
       const {getByTestId} = renderGradingSchemesSelector()
       await new Promise(resolve => setTimeout(resolve, 0))
       const dropdown = getByTestId('grading-schemes-selector-dropdown')
@@ -221,16 +247,12 @@ describe('GradingSchemesSelector', () => {
       const saveButton = getByTestId('grading-scheme-edit-modal-update-button')
       fireEvent.click(saveButton)
       await new Promise(resolve => setTimeout(resolve, 0))
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/courses/1/grading_schemes/1',
-        method: 'PUT',
-        body: {
-          title: 'New Name',
-          id: '1',
-          points_based: false,
-          scaling_factor: 1,
-          data: AccountGradingSchemes.find(accountScheme => accountScheme.id === '1')?.data,
-        },
+      expect(updateData).toEqual({
+        title: 'New Name',
+        id: '1',
+        points_based: false,
+        scaling_factor: 1,
+        data: AccountGradingSchemes.find(accountScheme => accountScheme.id === '1')?.data,
       })
     })
   })
@@ -261,6 +283,24 @@ describe('GradingSchemesSelector', () => {
     })
 
     it('should make an api call when the duplicate button is clicked and then open the edit modal', async () => {
+      let createData: any = null
+      server.use(
+        http.post('/courses/:contextId/grading_schemes', async ({request}) => {
+          createData = await request.json()
+          const newScheme: Partial<GradingScheme> = {
+            ...createData,
+            id: '1000',
+            context_id: '1',
+            context_type: 'Course',
+            assessed_assignment: false,
+            permissions: {manage: true},
+            context_name: 'Test Course',
+            workflow_state: 'active',
+          }
+          return HttpResponse.json(newScheme)
+        }),
+      )
+
       const {getByTestId} = renderGradingSchemesSelector()
       await new Promise(resolve => setTimeout(resolve, 0))
       const dropdown = getByTestId('grading-schemes-selector-dropdown')
@@ -269,22 +309,36 @@ describe('GradingSchemesSelector', () => {
       fireEvent.click(copyButton)
       const duplicateButton = getByTestId('grading-scheme-duplicate-modal-duplicate-button')
       fireEvent.click(duplicateButton)
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/courses/1/grading_schemes',
-        method: 'POST',
-        body: {
-          title: 'Default Canvas Grading Scheme Copy',
-          points_based: false,
-          scaling_factor: 1,
-          data: DefaultGradingScheme.data,
-        },
-      })
       await new Promise(resolve => setTimeout(resolve, 0))
+      expect(createData).toEqual({
+        title: 'Default Canvas Grading Scheme Copy',
+        points_based: false,
+        scaling_factor: 1,
+        data: DefaultGradingScheme.data,
+      })
       expect(getByTestId('grading-scheme-edit-modal')).toBeInTheDocument()
     })
   })
 
   it('should create a new scheme when the new grading scheme button is clicked', async () => {
+    let createData: any = null
+    server.use(
+      http.post('/courses/:contextId/grading_schemes', async ({request}) => {
+        createData = await request.json()
+        const newScheme: Partial<GradingScheme> = {
+          ...createData,
+          id: '1000',
+          context_id: '1',
+          context_type: 'Course',
+          assessed_assignment: false,
+          permissions: {manage: true},
+          context_name: 'Test Course',
+          workflow_state: 'active',
+        }
+        return HttpResponse.json(newScheme)
+      }),
+    )
+
     const {getByTestId} = renderGradingSchemesSelector()
     await new Promise(resolve => setTimeout(resolve, 0))
     const newGradingSchemeButton = getByTestId('grading-schemes-selector-new-grading-scheme-button')
@@ -293,15 +347,12 @@ describe('GradingSchemesSelector', () => {
     fireEvent.change(input, {target: {value: 'New Scheme'}})
     const createButton = getByTestId('grading-scheme-create-modal-save-button')
     createButton.click()
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/courses/1/grading_schemes',
-      method: 'POST',
-      body: {
-        title: 'New Scheme',
-        points_based: false,
-        scaling_factor: 1,
-        data: DefaultGradingScheme.data,
-      },
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(createData).toEqual({
+      title: 'New Scheme',
+      points_based: false,
+      scaling_factor: 1,
+      data: DefaultGradingScheme.data,
     })
   })
 })

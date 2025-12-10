@@ -29,21 +29,19 @@ import {
   singleTagCategory,
   multipleTagsCategoryLimit,
 } from '../../util/tagCategoryCardMocks'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect', () => ({
-  __esModule: true,
-  default: jest.fn(() =>
-    Promise.resolve({
-      response: {ok: true},
-      json: {
-        created: [],
-        updated: [],
-        deleted: [],
-        group_category: {id: 1, name: 'Mock Tag Set'},
-      },
-    }),
-  ),
-}))
+const server = setupServer(
+  http.post('*/group_categories/bulk_manage_differentiation_tag', () => {
+    return HttpResponse.json({
+      created: [],
+      updated: [],
+      deleted: [],
+      group_category: {id: 1, name: 'Mock Tag Set'},
+    })
+  }),
+)
 
 describe('DifferentiationTagModalForm', () => {
   const user = userEvent.setup({delay: 0})
@@ -68,12 +66,19 @@ describe('DifferentiationTagModalForm', () => {
   }
 
   beforeAll(() => {
+    server.listen()
     const globalEnv = global as any
     globalEnv.ENV = {course: {id: '456', max_variants_per_tag_category: 10}}
   })
 
+  afterAll(() => server.close())
+
   beforeEach(() => {
     jest.clearAllMocks()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   it('renders the modal when isOpen is true', () => {

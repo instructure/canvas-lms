@@ -31,7 +31,6 @@ import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('axios') // mock axios for final grade override helper API call
-jest.mock('@canvas/do-fetch-api-effect', () => jest.fn()) // mock doFetchApi for final grade override helper API call
 jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
   executeApiRequest: jest.fn(),
 }))

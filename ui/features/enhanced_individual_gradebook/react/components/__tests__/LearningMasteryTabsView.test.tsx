@@ -30,7 +30,6 @@ import LearningMasteryTabsView from '../LearningMasteryTabsView'
 import {OUTCOME_ROLLUP_QUERY_RESPONSE, setGradebookOptions, setupCanvasQueries} from './fixtures'
 
 jest.mock('axios') // mock axios for final grade override helper API call
-jest.mock('@canvas/do-fetch-api-effect', () => jest.fn()) // mock doFetchApi for final grade override helper API call
 jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
   executeApiRequest: jest.fn(),
 }))

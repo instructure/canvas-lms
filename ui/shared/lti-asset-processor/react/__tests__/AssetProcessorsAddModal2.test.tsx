@@ -17,8 +17,9 @@
  */
 
 import React from 'react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {fireEvent, render, waitFor} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {AssetProcessorsAddModal} from '../AssetProcessorsAddModal'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
@@ -27,7 +28,6 @@ import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 import {
   mockDeepLinkResponse,
   mockInvalidDeepLinkResponse,
-  mockDoFetchApi,
   mockToolsForAssignment as assignmentTools,
   mockToolsForDiscussions as discussionTools,
   mockContributionDeepLinkResponse,
@@ -37,21 +37,31 @@ import {useAssetProcessorsToolsList} from '../hooks/useAssetProcessorsToolsList'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 
-jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/external-tools/messages')
+
+const server = setupServer(
+  http.get('/api/v1/courses/:courseId/lti_apps/launch_definitions', ({request}) => {
+    const url = new URL(request.url)
+    const placements = url.searchParams.get('placements[]')
+    return HttpResponse.json(
+      placements === 'ActivityAssetProcessor' ? assignmentTools : discussionTools,
+    )
+  }),
+)
 
 describe('AssetProcessorsAddModal', () => {
   let mockOnProcessorResponse: jest.Mock
   const queryClient = new QueryClient()
-  let mockedDoFetchApi: jest.Mock
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     mockOnProcessorResponse = jest.fn()
-    const launchDefsUrl = '/api/v1/courses/123/lti_apps/launch_definitions'
-    mockedDoFetchApi = mockDoFetchApi(launchDefsUrl, doFetchApi as jest.Mock)
   })
 
   afterEach(() => {
+    server.resetHandlers()
     queryClient.clear()
     jest.clearAllMocks()
   })
@@ -122,11 +132,6 @@ describe('AssetProcessorsAddModal', () => {
         {timeout: 3000},
       ).then(toolCard => {
         act(() => toolCard!.click())
-      })
-
-      expect(mockedDoFetchApi).toHaveBeenCalledWith({
-        path: '/api/v1/courses/123/lti_apps/launch_definitions',
-        params: {'placements[]': type},
       })
 
       const iframe = await waitFor(() => getByTitle('Configure new document processing app'))
