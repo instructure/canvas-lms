@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import type JQuery from 'jquery'
 import deferPromise from '@instructure/defer-promise'
+import {htmlDecode} from '@canvas/util/TextHelper'
 import {
   each,
   every,
@@ -212,7 +213,6 @@ import {
   getStudentGradeForColumn,
   idArraysEqual,
   hiddenStudentIdsForAssignment,
-  htmlDecode,
   isAdmin,
   isGradedOrExcusedSubmissionUnposted,
   onGridKeyDown,
