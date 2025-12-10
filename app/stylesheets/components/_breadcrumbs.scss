@@ -83,3 +83,22 @@
     color: $ic-font-color--subdued;
   }
 }
+
+.horizon-back-to-units {
+  white-space: nowrap;
+}
+
+.horizon-heading-course-name {
+  font-weight: bold;
+  text-align: center;
+  display: flex;
+  flex: 2;
+  justify-content: center;
+  margin: 1%;
+}
+
+@media (max-width: 875px) {
+  .horizon-heading-course-name {
+    flex: 1;
+  }
+}
