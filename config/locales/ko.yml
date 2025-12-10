@@ -327,6 +327,8 @@ ko:
     report_header_student_id: "학생 ID"
     report_header_student_name: "학생 이름"
     report_header_term: 학기
+    report_header_token_id: ID
+    report_header_token_status: 상태
     report_header_user_id: "사용자 id"
     report_header_user_name: "사용자 이름"
     sis_exporter: 

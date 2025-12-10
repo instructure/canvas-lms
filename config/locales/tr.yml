@@ -760,7 +760,9 @@ tr:
     report_header_token_dev_key_id: "dev anahtar id"
     report_header_token_dev_key_name: "dev anahtar adı"
     report_header_token_hint: "token ipucu"
+    report_header_token_id: id
     report_header_token_last_used: "son kullanılan"
+    report_header_token_status: durum
     report_header_unposted_current_grade: "yayınlanmamış güncel not"
     report_header_unposted_current_score: "yayınlanmamış güncel puan"
     report_header_unposted_final_grade: "yayınlanmamış nihai not"
