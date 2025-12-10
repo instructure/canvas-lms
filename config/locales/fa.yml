@@ -562,7 +562,9 @@ fa:
     report_header_token_dev_key_id: "شناسه کلید dev"
     report_header_token_dev_key_name: "نام کلید dev"
     report_header_token_hint: "راهنمای نشانه"
+    report_header_token_id: شناسه
     report_header_token_last_used: "آخرین استفاده"
+    report_header_token_status: وضعیت
     report_header_unposted_current_grade: "نمره فعلی پست نشده"
     report_header_unposted_current_score: "نمره فعلی ارسال نشده"
     report_header_unposted_final_grade: "نمره نهایی پست نشده"
