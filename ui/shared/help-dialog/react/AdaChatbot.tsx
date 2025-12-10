@@ -17,30 +17,62 @@
  */
 
 import {useEffect, useRef} from 'react'
-
-type WindowInfo = {
-  isChatOpen: boolean
-  isDrawerOpen: boolean
-  hasActiveChatter: boolean
-  hasClosedChat: boolean
-}
-
-type AdaEmbed = {
-  start: (config: any) => Promise<void>
-  getInfo: () => Promise<WindowInfo>
-  toggle: () => Promise<void>
-  stop?: () => Promise<void>
-  subscribeEvent: (eventKey: string, callback: (data: any) => void) => Promise<number>
-}
+import type {WindowInfo} from './adaTypes'
 
 type AdaChatbotProps = {
   onDialogClose: () => void
 }
 
-const CHAT_CLOSED_KEY = 'persistedAdaClosed' // User explicitly ended conversation
-const DRAWER_OPEN_KEY = 'persistedAdaDrawerOpen' // Drawer was open (vs minimized)
+const ADA_STATE_KEY = 'persistedAdaState' // localStorage key for Ada state
+
+type AdaState = 'closed' | 'open' | 'minimized'
 
 let adaReadyPromise: Promise<void> | null = null
+let adaScriptLoadPromise: Promise<void> | null = null
+let isRestoringDrawer = false
+let isOpeningAda = false
+let adaEventsBound = false
+
+/**
+ * Loads the Ada embed script dynamically.
+ * Returns a promise that resolves when the script is loaded.
+ */
+function loadAdaScript(): Promise<void> {
+  if (adaScriptLoadPromise) return adaScriptLoadPromise
+
+  // If adaEmbed is available, resolve without trying to load the script
+  if (typeof window !== 'undefined' && window.adaEmbed) {
+    adaScriptLoadPromise = Promise.resolve()
+    return adaScriptLoadPromise
+  }
+
+  adaScriptLoadPromise = new Promise((resolve, reject) => {
+    const existingScript = document.getElementById('__ada')
+    if (existingScript) {
+      resolve()
+      return
+    }
+
+    const script = document.createElement('script')
+    script.id = '__ada'
+    script.src = 'https://static.ada.support/embed2.js'
+    script.async = true
+    script.setAttribute('data-lazy', '')
+    script.setAttribute('data-handle', 'instructure-gen')
+
+    const handleError = () => {
+      adaScriptLoadPromise = null
+      reject(new Error('Failed to load Ada embed script'))
+    }
+
+    script.onload = () => resolve()
+    script.onerror = handleError
+
+    document.body.appendChild(script)
+  })
+
+  return adaScriptLoadPromise
+}
 
 function updateChatState({
   isOpen,
@@ -52,154 +84,185 @@ function updateChatState({
   hasClosedChat?: boolean
 }) {
   if (hasClosedChat) {
-    markChatClosed()
-  } else if (hasClosedChat === false) {
-    // Explicitly keep chat active for soft closes
-    markChatActive()
+    setAdaState('closed')
+  } else if (isOpen) {
+    setAdaState('open')
+  } else {
+    // Drawer minimized but chat still active
+    setAdaState('minimized')
   }
+
   if (hasActiveChatter) {
-    ;(window as any).adaSettings = {
-      ...(window as any).adaSettings,
+    window.adaSettings = {
+      ...window.adaSettings,
       hideMask: true,
     }
   }
-  if (isOpen) {
-    markChatActive()
-    markDrawerOpen()
-  } else {
-    // Soft close, unless explicitly ended conversation
-    markDrawerClosed()
+}
+
+function getAdaState(): AdaState {
+  try {
+    const state = localStorage.getItem(ADA_STATE_KEY)
+    if (state === 'closed' || state === 'open' || state === 'minimized') {
+      return state
+    }
+  } catch (e) {
+    console.warn('Ada localStorage get failed; defaulting to closed', e)
+  }
+  return 'closed' // Default state
+}
+
+function setAdaState(state: AdaState): void {
+  try {
+    localStorage.setItem(ADA_STATE_KEY, state)
+  } catch (e) {
+    console.warn('Ada localStorage set failed', e)
   }
 }
 
-function getAdaEmbed(): AdaEmbed | null {
-  return (window as any).adaEmbed ?? null
+/**
+ * Gets the Ada settings based on current user and environment.
+ */
+function getAdaSettings() {
+  const user = window.ENV?.current_user || {}
+  const roles: string[] = window.ENV?.current_user_roles || []
+  const roleSet = new Set(roles)
+  const domainRootAccountUuid = window.ENV?.DOMAIN_ROOT_ACCOUNT_UUID || ''
+
+  return {
+    crossWindowPersistence: true,
+    metaFields: {
+      institutionUrl: window.location.origin,
+      email: user.email || '',
+      name: user.display_name || '',
+      canvasRoles: roles.join(','),
+      canvasUUID: domainRootAccountUuid,
+      isRootAdmin: roleSet.has('root_admin'),
+      isAdmin: roleSet.has('admin'),
+      isTeacher: roleSet.has('teacher'),
+      isStudent: roleSet.has('student'),
+      isObserver: roleSet.has('observer'),
+    },
+  }
 }
 
-function wasClosedByUser(): boolean {
-  return localStorage.getItem(CHAT_CLOSED_KEY) === 'true'
-}
-
-function markChatClosed(): void {
-  localStorage.setItem(CHAT_CLOSED_KEY, 'true')
-}
-
-function markChatActive(): void {
-  localStorage.setItem(CHAT_CLOSED_KEY, 'false')
-}
-
-function wasDrawerOpen(): boolean {
-  return localStorage.getItem(DRAWER_OPEN_KEY) === 'true'
-}
-
-function markDrawerOpen(): void {
-  localStorage.setItem(DRAWER_OPEN_KEY, 'true')
-}
-
-function markDrawerClosed(): void {
-  localStorage.setItem(DRAWER_OPEN_KEY, 'false')
+/**
+ * Checks if Ada chatbot is enabled via feature flag
+ * If not enabled, silently skips initialization.
+ */
+function isAdaEnabled(): boolean {
+  if (typeof window === 'undefined' || !window.ENV) {
+    return false
+  }
+  return window.ENV.ADA_CHATBOT_ENABLED === true
 }
 
 /**
  * Initializes Ada embed and restores drawer/chat state if needed.
  * Returns a promise that resolves when Ada is ready to use.
  */
-function initializeAda(): Promise<void> {
+async function initializeAda(): Promise<void> {
+  if (!isAdaEnabled()) {
+    return
+  }
+
   if (adaReadyPromise) return adaReadyPromise
 
-  const adaEmbed = getAdaEmbed()
-  if (!adaEmbed) return Promise.reject(new Error('Ada embed not available'))
+  adaReadyPromise = (async () => {
+    try {
+      await loadAdaScript()
 
-  // Resolves when Ada is ready
-  adaReadyPromise = new Promise((resolve, reject) => {
-    adaEmbed
-      .start({
-        ...((window as any).adaSettings || {}),
-        handle: 'instructure-gen',
-        onAdaEmbedLoaded: () => {
-          // Subscribe to end_conversation event - only this marks chat as closed
-          adaEmbed
-            .subscribeEvent('ada:end_conversation', () => {
-              updateChatState({
-                isOpen: false,
-                hasActiveChatter: false,
-                hasClosedChat: true,
-              })
-              if (typeof adaEmbed.stop === 'function') {
-                adaEmbed
-                  .stop()
-                  .catch(err => {
-                    console.warn('Ada stop failed on end_conversation:', err)
-                  })
-                  .finally(() => {
-                    adaReadyPromise = null // Allow reinitialization after stop
-                  })
+      // With data-lazy, call adaEmbed.start() to initialize
+      if (!window.adaEmbed?.start) {
+        throw new Error('adaEmbed.start not available after script load')
+      }
+
+      return await new Promise<void>((resolve, reject) => {
+        window
+          .adaEmbed!.start({
+            ...getAdaSettings(),
+            handle: 'instructure-gen',
+            onAdaEmbedLoaded: () => {
+              const adaEmbed = window.adaEmbed
+              if (!adaEmbed) {
+                reject(new Error('adaEmbed not available in onAdaEmbedLoaded'))
+                return
               }
-            })
-            .catch(err => console.warn('Ada subscribe end_conversation failed', err))
 
-          // Subscribe to minimize_chat - drawer minimized but chat still active
-          adaEmbed
-            .subscribeEvent('ada:minimize_chat', () => {
+              // Avoid duplicate subscriptions: only bind once per lifecycle
+              if (adaEventsBound) {
+                return
+              }
+
+              // Subscribe to end_conversation event - only this marks chat as closed
+              const endConversationHandler = () => {
+                updateChatState({
+                  isOpen: false,
+                  hasActiveChatter: false,
+                  hasClosedChat: true,
+                })
+                if (typeof adaEmbed.stop === 'function') {
+                  adaEmbed
+                    .stop()
+                    .catch((err: Error) => {
+                      console.warn('Ada stop failed on end_conversation:', err)
+                    })
+                    .finally(() => {
+                      adaReadyPromise = null // Allow reinitialization after stop
+                      isRestoringDrawer = false
+                      isOpeningAda = false
+                      adaEventsBound = false
+                    })
+                } else {
+                  adaReadyPromise = null
+                  isRestoringDrawer = false
+                  isOpeningAda = false
+                  adaEventsBound = false
+                }
+              }
+
+              adaEmbed
+                .subscribeEvent('ada:end_conversation', endConversationHandler)
+                .catch((err: Error) => console.warn('Ada subscribe end_conversation failed', err))
+
+              // Subscribe to drawer-close events (minimize or close)
+              ;['ada:minimize_chat', 'ada:close_chat']
+                .map(event => {
+                  const handler = () => {
+                    updateChatState({
+                      isOpen: false,
+                      hasActiveChatter: false,
+                      hasClosedChat: false,
+                    })
+                  }
+                  return adaEmbed.subscribeEvent(event, handler)
+                })
+                .forEach(p =>
+                  p.catch((err: Error) => console.warn('Ada subscribe drawer event failed', err)),
+                )
+              adaEventsBound = true
+            },
+            adaReadyCallback: () => {
+              resolve()
+            },
+            toggleCallback: (isOpen: boolean) => {
               updateChatState({
-                isOpen: false,
+                isOpen,
                 hasActiveChatter: false,
                 hasClosedChat: false,
               })
-            })
-            .catch(err => console.warn('Ada subscribe minimize_chat failed', err))
-
-          // Subscribe to close_chat - drawer closed but chat may still be active
-          adaEmbed
-            .subscribeEvent('ada:close_chat', () => {
-              updateChatState({
-                isOpen: false,
-                hasActiveChatter: false,
-                hasClosedChat: false,
-              })
-            })
-            .catch(err => console.warn('Ada subscribe close_chat failed', err))
-        },
-        adaReadyCallback: async () => {
-          // Signal that Ada is ready
-          resolve()
-
-          try {
-            const adaWindowInfo = await adaEmbed.getInfo()
-            const shouldRestoreDrawer = !wasClosedByUser() && wasDrawerOpen()
-            if (shouldRestoreDrawer && !adaWindowInfo.isChatOpen) {
-              await adaEmbed.toggle()
-              const freshAdaWindowInfo = await adaEmbed.getInfo()
-              updateChatState({
-                isOpen: freshAdaWindowInfo.isChatOpen,
-                hasActiveChatter: freshAdaWindowInfo.hasActiveChatter,
-                hasClosedChat: freshAdaWindowInfo.hasClosedChat,
-              })
-            } else {
-              updateChatState({
-                isOpen: adaWindowInfo.isChatOpen,
-                hasActiveChatter: adaWindowInfo.hasActiveChatter,
-                hasClosedChat: adaWindowInfo.hasClosedChat,
-              })
-            }
-          } catch (error) {
-            console.warn('Ada ready callback failed:', error)
-          }
-        },
-        toggleCallback: (isOpen: boolean) => {
-          updateChatState({
-            isOpen,
-            hasActiveChatter: false,
-            hasClosedChat: false,
+            },
           })
-        },
+          .catch(reject)
       })
-      .catch(err => {
-        console.warn('Ada start failed:', err)
-        adaReadyPromise = null // Allow retry on failure
-        reject(err)
-      })
-  })
+    } catch (err) {
+      console.warn('Ada start failed:', err)
+      // Reset promise so initialization can be retried
+      adaReadyPromise = null
+      adaEventsBound = false
+      throw err
+    }
+  })()
 
   return adaReadyPromise
 }
@@ -208,21 +271,32 @@ function initializeAda(): Promise<void> {
  * Opens Ada chatbot and restores drawer state
  */
 async function openAda(onDialogClose?: () => void): Promise<void> {
-  try {
-    const adaEmbed = getAdaEmbed()
-    if (!adaEmbed) throw new Error('Ada embed script not available')
+  if (isOpeningAda || isRestoringDrawer) {
+    console.warn('Ada is already being opened')
+    onDialogClose?.()
+    return
+  }
 
-    // Wait for Ada to be ready before calling methods
+  isOpeningAda = true
+  try {
     await initializeAda()
 
-    const adaWindowInfo = await adaEmbed.getInfo()
+    if (!window.adaEmbed) throw new Error('Ada embed not available after initialization')
+    const adaEmbed = window.adaEmbed
+
+    const adaWindowInfo: WindowInfo = await adaEmbed.getInfo()
     if (!adaWindowInfo.isChatOpen) {
       await adaEmbed.toggle()
     }
-    updateChatState({isOpen: true, hasActiveChatter: adaWindowInfo.hasActiveChatter})
+    updateChatState({
+      isOpen: true,
+      hasActiveChatter: adaWindowInfo.hasActiveChatter,
+      hasClosedChat: false,
+    })
   } catch (error) {
     console.error('Failed to open Ada chatbot:', error)
   } finally {
+    isOpeningAda = false
     onDialogClose?.()
   }
 }
@@ -231,11 +305,41 @@ async function openAda(onDialogClose?: () => void): Promise<void> {
  * Auto-restore Ada if it was open in a previous session.
  * Should be called after main app initialization.
  */
-export function autoRestoreAda(): void {
-  if (!wasClosedByUser()) {
-    initializeAda().catch(err => {
-      console.warn('Auto-restore Ada failed:', err)
-    })
+export async function autoRestoreAda(): Promise<void> {
+  const adaState = getAdaState()
+
+  if (adaState === 'closed') {
+    return // User explicitly closed, don't restore
+  }
+
+  if (isRestoringDrawer || isOpeningAda) {
+    console.warn('Ada restore/open already in progress')
+    return
+  }
+
+  isRestoringDrawer = true
+  try {
+    await initializeAda()
+
+    // After initialization, check if drawer should be restored
+    if (window.adaEmbed && adaState === 'open') {
+      const adaEmbed = window.adaEmbed
+      const adaWindowInfo: WindowInfo = await adaEmbed.getInfo()
+      if (!adaWindowInfo.isChatOpen) {
+        await adaEmbed.toggle()
+        const freshAdaWindowInfo: WindowInfo = await adaEmbed.getInfo()
+        updateChatState({
+          isOpen: freshAdaWindowInfo.isChatOpen,
+          hasActiveChatter: freshAdaWindowInfo.hasActiveChatter,
+          hasClosedChat: freshAdaWindowInfo.hasClosedChat,
+        })
+      }
+    }
+    // If state is 'minimized', Ada initializes but stays minimized (default behavior)
+  } catch (err) {
+    console.warn('Auto-restore Ada failed:', err)
+  } finally {
+    isRestoringDrawer = false
   }
 }
 
