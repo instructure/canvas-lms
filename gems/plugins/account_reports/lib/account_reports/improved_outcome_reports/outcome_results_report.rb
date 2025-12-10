@@ -273,18 +273,20 @@ module AccountReports
         accounts = {}
         assignments = {}
         outcomes = {}
-        nq_assignments.each do |s|
-          c_id = s["course id"]
-          if courses.key?(c_id)
-            course_map = courses[c_id]
-            course_map[:assignment_ids].add(s["assignment id"])
-            course_map[:outcome_ids].add(s["learning outcome id"])
-          else
-            courses[c_id] = { course_id: c_id, assignment_ids: Set[s["assignment id"]], outcome_ids: Set[s["learning outcome id"]] }
+        nq_assignments.in_batches(strategy: :cursor) do |batch|
+          batch.each do |s|
+            c_id = s["course id"]
+            if courses.key?(c_id)
+              course_map = courses[c_id]
+              course_map[:assignment_ids].add(s["assignment id"])
+              course_map[:outcome_ids].add(s["learning outcome id"])
+            else
+              courses[c_id] = { course_id: c_id, assignment_ids: Set[s["assignment id"]], outcome_ids: Set[s["learning outcome id"]] }
+            end
+            accounts[s["account id"]] = s
+            assignments[s["assignment id"].to_s] = s
+            outcomes[s["learning outcome id"].to_s] = s
           end
-          accounts[s["account id"]] = s
-          assignments[s["assignment id"].to_s] = s
-          outcomes[s["learning outcome id"].to_s] = s
         end
 
         student_results = {}
