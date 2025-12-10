@@ -493,7 +493,9 @@ he:
     report_header_token_dev_key_id: "מפתח מזהה dev"
     report_header_token_dev_key_name: "שם מפתח key"
     report_header_token_hint: "רמז לשחזור האסימון"
+    report_header_token_id: מזהה
     report_header_token_last_used: "שומש לאחרונה"
+    report_header_token_status: מצב
     report_header_user__id: user_id
     report_header_user_id: "מזהה משתמש"
     report_header_user_name: "שם משתמש"
