@@ -23,10 +23,12 @@ import {InMemoryCache} from '@apollo/client'
 import {CommentLibraryTray} from '../CommentLibraryTray'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {SpeedGraderLegacy_CommentBankItems} from '../../graphql/queries'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
-jest.mock('@canvas/do-fetch-api-effect')
+
+const server = setupServer()
 
 describe('CommentLibraryTray', () => {
   const defaultProps = {
@@ -105,9 +107,19 @@ describe('CommentLibraryTray', () => {
     )
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(doFetchApi as jest.Mock).mockResolvedValue({})
+    // Default handler for user settings API
+    server.use(
+      http.put('/api/v1/users/self/settings', () => HttpResponse.json({})),
+    )
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   describe('Rendering Tests', () => {

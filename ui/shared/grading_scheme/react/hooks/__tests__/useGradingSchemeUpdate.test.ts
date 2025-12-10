@@ -17,27 +17,23 @@
  */
 
 import {useGradingSchemeUpdate} from '../useGradingSchemeUpdate'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {renderHook} from '@testing-library/react-hooks/dom'
 import type {GradingScheme, GradingSchemeUpdateRequest} from '../../../gradingSchemeApiModel'
 import {ApiCallStatus} from '../ApiCallStatus'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const courseId = '11'
 const accountId = '42'
 
-jest.mock('@canvas/do-fetch-api-effect')
-beforeEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
-})
-
-afterEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
-})
+const server = setupServer()
 
 describe('useGradingSchemeUpdateHook', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   it('renders for course context without error', () => {
     const {result} = renderHook(() => useGradingSchemeUpdate())
     expect(result.error).toBeFalsy()
@@ -49,7 +45,6 @@ describe('useGradingSchemeUpdateHook', () => {
   })
 
   it('makes a PUT request for course context to update a grading scheme', async () => {
-    const {result} = renderHook(() => useGradingSchemeUpdate())
     const data = [
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
@@ -72,31 +67,31 @@ describe('useGradingSchemeUpdateHook', () => {
       permissions: {manage: true},
       workflow_state: 'active',
     }
+    let capturedPath = ''
+    let capturedBody: unknown = null
 
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({
-      response: {ok: true},
-      json: gradingScheme,
-    })
+    server.use(
+      http.put(`/courses/${courseId}/grading_schemes/:schemeId`, async ({request}) => {
+        capturedPath = new URL(request.url).pathname
+        capturedBody = await request.json()
+        return HttpResponse.json(gradingScheme)
+      }),
+    )
+
+    const {result} = renderHook(() => useGradingSchemeUpdate())
     const updatedGradingScheme = await result.current.updateGradingScheme(
       'Course',
       courseId,
       gradingSchemeUpdateRequest,
     )
-    // @ts-expect-error
-    const lastCall = doFetchApi.mock.calls.pop()
-    expect(lastCall[0]).toMatchObject({
-      path: `/courses/${courseId}/grading_schemes/some-id`,
-      method: 'PUT',
-      body: gradingSchemeUpdateRequest,
-    })
 
+    expect(capturedPath).toBe(`/courses/${courseId}/grading_schemes/some-id`)
+    expect(capturedBody).toEqual(gradingSchemeUpdateRequest)
     expect(updatedGradingScheme).toEqual(gradingScheme)
     expect(result.current.updateGradingSchemeStatus).toEqual(ApiCallStatus.COMPLETED)
   })
 
   it('makes a PUT request for account context to update a grading scheme', async () => {
-    const {result} = renderHook(() => useGradingSchemeUpdate())
     const data = [
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
@@ -118,24 +113,26 @@ describe('useGradingSchemeUpdateHook', () => {
       permissions: {manage: true},
       workflow_state: 'active',
     }
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({
-      response: {ok: true},
-      json: gradingScheme,
-    })
+    let capturedPath = ''
+    let capturedBody: unknown = null
+
+    server.use(
+      http.put(`/accounts/${accountId}/grading_schemes/:schemeId`, async ({request}) => {
+        capturedPath = new URL(request.url).pathname
+        capturedBody = await request.json()
+        return HttpResponse.json(gradingScheme)
+      }),
+    )
+
+    const {result} = renderHook(() => useGradingSchemeUpdate())
     const updatedGradingScheme = await result.current.updateGradingScheme(
       'Account',
       accountId,
       gradingSchemeUpdateRequest,
     )
-    // @ts-expect-error
-    const lastCall = doFetchApi.mock.calls.pop()
-    expect(lastCall[0]).toMatchObject({
-      path: `/accounts/${accountId}/grading_schemes/some-id`,
-      method: 'PUT',
-      body: gradingSchemeUpdateRequest,
-    })
 
+    expect(capturedPath).toBe(`/accounts/${accountId}/grading_schemes/some-id`)
+    expect(capturedBody).toEqual(gradingSchemeUpdateRequest)
     expect(updatedGradingScheme).toEqual(gradingScheme)
     expect(result.current.updateGradingSchemeStatus).toEqual(ApiCallStatus.COMPLETED)
   })

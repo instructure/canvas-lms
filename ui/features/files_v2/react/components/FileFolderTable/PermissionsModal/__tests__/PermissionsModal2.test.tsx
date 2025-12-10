@@ -18,7 +18,6 @@
 
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {FileManagementProvider} from '../../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 import {FAKE_FILES, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
@@ -28,8 +27,12 @@ import {RowsProvider} from '../../../../contexts/RowsContext'
 import PermissionsModal from '../PermissionsModal'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {mockRowsContext} from '../../__tests__/testUtils'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
+
+let capturedRequest: {path: string; body: any} | null = null
 
 const defaultProps = {
   open: true,
@@ -47,14 +50,34 @@ const renderComponent = (props?: any) =>
   )
 
 describe('PermissionsModal', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
+    capturedRequest = null
     fakeENV.setup()
     const filesContexts = createFilesContexts()
     resetAndGetFilesEnv(filesContexts)
-    ;(doFetchApi as jest.Mock).mockResolvedValue({})
+    server.use(
+      http.put('/api/v1/files/:fileId', async ({request}) => {
+        capturedRequest = {
+          path: new URL(request.url).pathname,
+          body: await request.json(),
+        }
+        return HttpResponse.json({})
+      }),
+      http.put('/api/v1/folders/:folderId', async ({request}) => {
+        capturedRequest = {
+          path: new URL(request.url).pathname,
+          body: await request.json(),
+        }
+        return HttpResponse.json({})
+      }),
+    )
   })
 
   afterEach(() => {
+    server.resetHandlers()
     jest.clearAllMocks()
     jest.resetAllMocks()
     const filesContexts = createFilesContexts()
@@ -66,50 +89,51 @@ describe('PermissionsModal', () => {
     renderComponent({
       items: [Object.assign({}, FAKE_FILES[0], {usage_rights: {}})],
     })
-    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({})
     await userEvent.click(screen.getByTestId('permissions-save-button'))
 
     await waitFor(() => {
       expect(screen.getAllByText(/permissions have been successfully set./i)[0]).toBeInTheDocument()
-      expect(doFetchApi).toHaveBeenCalledWith({
-        body: {
-          hidden: false,
-          lock_at: '',
-          locked: false,
-          unlock_at: '',
-          visibility_level: 'inherit',
-        },
-        method: 'PUT',
-        path: '/api/v1/files/178',
-        headers: {'Content-Type': 'application/json'},
+      expect(capturedRequest).not.toBeNull()
+      expect(capturedRequest?.path).toBe('/api/v1/files/178')
+      expect(capturedRequest?.body).toEqual({
+        hidden: false,
+        lock_at: '',
+        locked: false,
+        unlock_at: '',
+        visibility_level: 'inherit',
       })
     })
   })
 
   it('fails fetch request and shows alert', async () => {
+    server.use(
+      http.put('/api/v1/files/:fileId', async ({request}) => {
+        capturedRequest = {
+          path: new URL(request.url).pathname,
+          body: await request.json(),
+        }
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
+
     renderComponent({
       items: [Object.assign({}, FAKE_FILES[0], {usage_rights: {}})],
     })
 
-    // PUT request response
-    ;(doFetchApi as jest.Mock).mockRejectedValue({})
     await userEvent.click(await screen.getByTestId('permissions-save-button'))
 
     await waitFor(() => {
       expect(
         screen.getAllByText(/an error occurred while setting permissions. please try again./i)[0],
       ).toBeInTheDocument()
-      expect(doFetchApi).toHaveBeenCalledWith({
-        body: {
-          hidden: false,
-          lock_at: '',
-          locked: false,
-          unlock_at: '',
-          visibility_level: 'inherit',
-        },
-        method: 'PUT',
-        path: '/api/v1/files/178',
-        headers: {'Content-Type': 'application/json'},
+      expect(capturedRequest).not.toBeNull()
+      expect(capturedRequest?.path).toBe('/api/v1/files/178')
+      expect(capturedRequest?.body).toEqual({
+        hidden: false,
+        lock_at: '',
+        locked: false,
+        unlock_at: '',
+        visibility_level: 'inherit',
       })
     })
   })

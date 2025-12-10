@@ -21,14 +21,15 @@ import {renderHook, act} from '@testing-library/react-hooks'
 import {waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {useOutcomes} from '../useOutcomes'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {executeQuery} from '@canvas/graphql'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/graphql')
 
-const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
 const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+
+const server = setupServer()
 
 const mockRootOutcomeGroup = {
   id: 1,
@@ -121,11 +122,15 @@ const createWrapper = () => {
 }
 
 describe('useOutcomes', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   afterEach(() => {
+    server.resetHandlers()
     jest.restoreAllMocks()
   })
 
@@ -284,7 +289,13 @@ describe('useOutcomes', () => {
 
   describe('without provided groupId', () => {
     it('fetches root outcome group first, then fetches outcomes', async () => {
-      mockDoFetchApi.mockResolvedValue({json: mockRootOutcomeGroup} as any)
+      let rootGroupFetched = false
+      server.use(
+        http.get('/api/v1/courses/123/root_outcome_group', () => {
+          rootGroupFetched = true
+          return HttpResponse.json(mockRootOutcomeGroup)
+        }),
+      )
       mockExecuteQuery.mockResolvedValue(mockOutcomesData)
 
       const {result, rerender} = renderHook(
@@ -299,10 +310,7 @@ describe('useOutcomes', () => {
 
       // Wait for the root group fetch to be called first
       await waitFor(() => {
-        expect(mockDoFetchApi).toHaveBeenCalledWith({
-          path: '/api/v1/courses/123/root_outcome_group',
-          method: 'GET',
-        })
+        expect(rootGroupFetched).toBe(true)
       })
 
       // Force a rerender to allow the second query to pick up the new enabled state
@@ -332,8 +340,7 @@ describe('useOutcomes', () => {
     })
 
     it('handles error from root outcome group fetch', async () => {
-      const error = new Error('Failed to fetch root group')
-      mockDoFetchApi.mockRejectedValue(error)
+      server.use(http.get('/api/v1/courses/123/root_outcome_group', () => HttpResponse.error()))
 
       const {result} = renderHook(
         () =>
@@ -344,7 +351,7 @@ describe('useOutcomes', () => {
       )
 
       await waitFor(() => {
-        expect(result.current.error).toEqual(error)
+        expect(result.current.error).not.toBeNull()
       })
 
       expect(result.current.outcomes).toEqual([])

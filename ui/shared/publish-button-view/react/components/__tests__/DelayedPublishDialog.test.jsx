@@ -17,11 +17,12 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import DelayedPublishDialog from '../DelayedPublishDialog'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const flushPromises = () => new Promise(setTimeout)
 
@@ -35,6 +36,9 @@ const fakePage = {
   publish_at: '2022-11-01T22:00:00Z',
   body: '<p>Hello</p>',
 }
+
+// Track captured request for verification
+let lastCapturedRequest = null
 
 function renderDialog(props) {
   return render(
@@ -51,13 +55,28 @@ function renderDialog(props) {
 }
 
 describe('DelayedPublishDialog', () => {
-  beforeAll(() => {
-    doFetchApi.mockResolvedValue(fakePage)
-  })
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
-    doFetchApi.mockClear()
+    lastCapturedRequest = null
+    server.use(
+      // Use wildcard path to catch all PUT requests
+      http.put('*', async ({request}) => {
+        const url = new URL(request.url)
+        // doFetchApi sends params as URL search params for PUT
+        lastCapturedRequest = {
+          path: url.pathname,
+          method: 'PUT',
+          search: url.search,
+          searchParams: Object.fromEntries(url.searchParams.entries()),
+        }
+        return HttpResponse.json(fakePage)
+      }),
+    )
   })
+
+  afterEach(() => server.resetHandlers())
 
   it('shows the publish-at date', async () => {
     const {getByLabelText} = renderDialog({publishAt: '2022-03-03T14:00:00'})
@@ -78,12 +97,15 @@ describe('DelayedPublishDialog', () => {
     const {getByLabelText, getByRole} = renderDialog({onUpdatePublishAt})
     fireEvent.click(getByLabelText('Unpublished'))
     fireEvent.click(getByRole('button', {name: 'OK'}))
-    await flushPromises()
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/courses/123/pages/a-page',
-      method: 'PUT',
-      params: {wiki_page: {publish_at: null}},
+    await waitFor(() => {
+      expect(lastCapturedRequest).not.toBeNull()
     })
+    expect(lastCapturedRequest.path).toBe('/api/v1/courses/123/pages/a-page')
+    expect(lastCapturedRequest.method).toBe('PUT')
+    // doFetchApi sends params in URL search string with bracket notation
+    // null value is sent as empty string
+    expect(lastCapturedRequest.search).toContain('wiki_page')
+    expect(lastCapturedRequest.searchParams['wiki_page[publish_at]']).toBe('')
     expect(onUpdatePublishAt).toHaveBeenCalledWith(null)
   })
 
@@ -95,12 +117,13 @@ describe('DelayedPublishDialog', () => {
     fireEvent.change(input, {target: {value: '2022-03-03T00:00:00.000Z'}})
     fireEvent.blur(input)
     fireEvent.click(getByRole('button', {name: 'OK'}))
-    await flushPromises()
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/courses/123/pages/a-page',
-      method: 'PUT',
-      params: {wiki_page: {publish_at: '2022-03-03T00:00:00.000Z'}},
+    await waitFor(() => {
+      expect(lastCapturedRequest).not.toBeNull()
     })
+    expect(lastCapturedRequest.path).toBe('/api/v1/courses/123/pages/a-page')
+    expect(lastCapturedRequest.method).toBe('PUT')
+    // doFetchApi sends params in URL search string with bracket notation
+    expect(lastCapturedRequest.search).toContain('2022-03-03')
     expect(onUpdatePublishAt).toHaveBeenCalledWith('2022-03-03T00:00:00.000Z')
   })
 

@@ -27,13 +27,14 @@ import {
   SpeedGraderLegacy_CommentBankItems,
 } from '../graphql/queries'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 jest.mock('use-debounce', () => ({
   useDebounce: jest.fn((value: string) => [value, {isPending: () => false}]),
 }))
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 describe('CommentLibrary', () => {
   const defaultUserId = '1'
@@ -157,12 +158,19 @@ describe('CommentLibrary', () => {
     )
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup({comment_library_suggestions_enabled: true})
-    ;(doFetchApi as jest.Mock).mockResolvedValue({})
+    // Default handler for user settings API
+    server.use(
+      http.put('/api/v1/users/self/settings', () => HttpResponse.json({})),
+    )
   })
 
   afterEach(() => {
+    server.resetHandlers()
     fakeENV.teardown()
     jest.clearAllMocks()
     jest.useRealTimers()

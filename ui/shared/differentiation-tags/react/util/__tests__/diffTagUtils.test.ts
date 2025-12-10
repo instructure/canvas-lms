@@ -17,80 +17,106 @@
  */
 
 import {bulkFetchUserTags, bulkDeleteGroupMemberships, getCommonTagIds} from '../diffTagUtils'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 describe('bulkFetchUserTags', () => {
-  const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+  let lastCapturedRequest: {path: string; params?: Record<string, string[]>} | null = null
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
+    lastCapturedRequest = null
     jest.clearAllMocks()
   })
+
+  afterEach(() => server.resetHandlers())
 
   it('calls the correct endpoint and returns the user tags mapping', async () => {
     const courseId = 42
     const userIds = [1, 2, 3]
-    const apiResponse = {
-      json: {
-        1: [5, 6],
-        2: [7],
-        3: [],
-      },
+    const responseData = {
+      1: [5, 6],
+      2: [7],
+      3: [],
     }
-    mockDoFetchApi.mockResolvedValueOnce(apiResponse as any)
+
+    server.use(
+      http.get('/api/v1/courses/:courseId/bulk_user_tags', ({request, params}) => {
+        const url = new URL(request.url)
+        lastCapturedRequest = {
+          path: url.pathname,
+          params: {user_ids: url.searchParams.getAll('user_ids[]')},
+        }
+        return HttpResponse.json(responseData)
+      }),
+    )
 
     const result = await bulkFetchUserTags(courseId, userIds)
 
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: `/api/v1/courses/${courseId}/bulk_user_tags`,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      params: {
-        user_ids: userIds.map(id => id.toString()),
-      },
-    })
-    expect(result).toEqual(apiResponse.json)
+    expect(lastCapturedRequest).not.toBeNull()
+    expect(lastCapturedRequest!.path).toBe(`/api/v1/courses/${courseId}/bulk_user_tags`)
+    expect(lastCapturedRequest!.params?.user_ids).toEqual(['1', '2', '3'])
+    expect(result).toEqual(responseData)
   })
 
   it('throws if response.json is missing', async () => {
-    mockDoFetchApi.mockResolvedValueOnce({} as any)
+    server.use(
+      http.get('/api/v1/courses/:courseId/bulk_user_tags', () => {
+        return new HttpResponse(null, {status: 204})
+      }),
+    )
     await expect(bulkFetchUserTags(1, [2])).rejects.toThrow('Failed to bulk fetch user tags')
   })
 })
 
 describe('bulkDeleteGroupMemberships', () => {
-  const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+  let lastCapturedRequest: {path: string; method: string; params?: Record<string, string[]>} | null =
+    null
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
+    lastCapturedRequest = null
     jest.clearAllMocks()
   })
+
+  afterEach(() => server.resetHandlers())
 
   it('calls the correct endpoint and returns the raw response', async () => {
     const groupId = 10
     const userIds = [1, 2, 3]
-    const apiResponse = {json: {deleted_user_ids: [1, 2], unauthorized_user_ids: [3]}}
-    mockDoFetchApi.mockResolvedValueOnce(apiResponse as any)
+    const responseData = {deleted_user_ids: [1, 2], unauthorized_user_ids: [3]}
+
+    server.use(
+      http.delete('/api/v1/groups/:groupId/users', ({request}) => {
+        const url = new URL(request.url)
+        lastCapturedRequest = {
+          path: url.pathname,
+          method: 'DELETE',
+          params: {user_ids: url.searchParams.getAll('user_ids[]')},
+        }
+        return HttpResponse.json(responseData)
+      }),
+    )
 
     const result = await bulkDeleteGroupMemberships(groupId, userIds)
 
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: `/api/v1/groups/${groupId}/users`,
-      method: 'DELETE',
-      params: {
-        user_ids: userIds.map(id => id.toString()),
-      },
-    })
-    expect(result).toBe(apiResponse)
+    expect(lastCapturedRequest).not.toBeNull()
+    expect(lastCapturedRequest!.path).toBe(`/api/v1/groups/${groupId}/users`)
+    expect(lastCapturedRequest!.method).toBe('DELETE')
+    expect(lastCapturedRequest!.params?.user_ids).toEqual(['1', '2', '3'])
+    expect(result).toEqual(expect.objectContaining({json: responseData}))
   })
 
   it('returns the error if the API call fails', async () => {
-    const error = new Error('Network error')
-    mockDoFetchApi.mockRejectedValueOnce(error)
+    server.use(http.delete('/api/v1/groups/:groupId/users', () => HttpResponse.error()))
     const result = await bulkDeleteGroupMemberships(5, [7, 8])
-    expect(result).toBe(error)
+    expect(result).toBeInstanceOf(Error)
   })
 })
 
