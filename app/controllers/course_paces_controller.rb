@@ -614,7 +614,15 @@ class CoursePacesController < ApplicationController
                                           .group_by { |ppmi| ppmi.module_item.context_module }
                                           .sort_by { |context_module, _items| context_module.position }
                                           .to_h.values.flatten
-    compressed_dates = CoursePaceDueDatesCalculator.new(@course_pace).get_due_dates(compressed_module_items, start_date:)
+    # For student enrollment paces, pass the enrollment to ensure dates match what will be published
+    # Don't pass start_date when we have an enrollment - let the enrollment's start date take precedence
+    enrollment = nil
+    if @course_pace.user_id.present?
+      enrollment = @course.student_enrollments.active.find_by(user_id: @course_pace.user_id)
+      compressed_dates = CoursePaceDueDatesCalculator.new(@course_pace).get_due_dates(compressed_module_items, enrollment)
+    else
+      compressed_dates = CoursePaceDueDatesCalculator.new(@course_pace).get_due_dates(compressed_module_items, enrollment, start_date:)
+    end
 
     render json: compressed_dates.to_json
   end
