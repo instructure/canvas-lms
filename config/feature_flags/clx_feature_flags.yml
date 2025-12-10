@@ -109,6 +109,13 @@ horizon_chart_view:
   display_name: "Canvas Career: Chart View"
   description: |-
     Enables chart view in Canvas Career.
+horizon_native_permissions_page:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Permissions Page"
+  description: |-
+    Enables native permissions page instead of the Academic iframe in Canvas Career.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:
