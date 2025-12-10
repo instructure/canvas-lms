@@ -55,6 +55,7 @@ class CareerController < ApplicationController
   def features_env
     %i[
       horizon_root_experience
+      horizon_role_dashboards
       horizon_dashboard_ai_widgets
       horizon_hris_integrations
       horizon_user_profile_page
