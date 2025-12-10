@@ -432,7 +432,9 @@ module Lti
         end
       end
 
-      controls = Lti::ContextControl.where(id: ids).preload(:account, :course, :created_by, :updated_by).order(id: :asc)
+      controls = Lti::ContextControl.where(id: ids)
+                                    # Used by serializer for users' names.
+                                    .preload(:created_by, :updated_by).order(id: :asc)
       calculated_attrs = Lti::ContextControlService.preload_calculated_attrs(controls)
 
       invalidate_navigation_cache_for_deployments(
