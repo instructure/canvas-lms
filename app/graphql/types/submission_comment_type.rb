@@ -51,7 +51,7 @@ module Types
     field :submission_id, ID, null: false
 
     field :author, Types::UserType, null: true
-    field :author_visible_name, Types::HtmlEncodedStringType, null: true
+    field :author_visible_name, String, null: true
     field :media_comment_id, String, null: true
 
     field :comment, String, null: true

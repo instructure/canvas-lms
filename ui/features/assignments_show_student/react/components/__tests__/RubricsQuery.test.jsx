@@ -42,7 +42,6 @@ async function makeMocks() {
     Assignment: {rubric: {}},
     Rubric: {criteria: [{}]},
     Submission: {rubricAssessmentsConnection: []},
-    HtmlEncodedString: () => 'Mocked HTML encoded string',
   }
 
   const result = await mockQuery(RUBRIC_QUERY, overrides, variables)

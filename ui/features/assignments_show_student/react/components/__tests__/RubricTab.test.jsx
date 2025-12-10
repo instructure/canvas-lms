@@ -93,7 +93,6 @@ async function makeProps(opts = {}) {
       Rubric: {
         criteria: [{}],
       },
-      HtmlEncodedString: () => 'Mocked HTML encoded string',
     },
   ]
 

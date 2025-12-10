@@ -85,15 +85,15 @@ module Types
 
     global_id_field :id
 
-    field :first_name, HtmlEncodedStringType, null: true
-    field :last_name, HtmlEncodedStringType, null: true
-    field :name, HtmlEncodedStringType, null: true
+    field :first_name, String, null: true
+    field :last_name, String, null: true
+    field :name, String, null: true
     field :short_name,
-          HtmlEncodedStringType,
+          String,
           "A short name the user has selected, for use in conversations or other less formal places through the site.",
           null: true
     field :sortable_name,
-          HtmlEncodedStringType,
+          String,
           "The name of the user that is should be used for sorting groups of users, such as in the gradebook.",
           null: true
 
