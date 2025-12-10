@@ -24,9 +24,9 @@ interface SearchSpanProps {
    */
   searchTerm?: string
   /**
-   * String containing displayable message
+   * String containing displayable message. Can include HTML tags.
    */
-  text?: string
+  htmlBody?: string
   isSplitView?: boolean
   isAnnouncement?: boolean
   isTopic?: boolean
@@ -115,7 +115,7 @@ export function SearchSpan({...props}: SearchSpanProps) {
       data-resource-id={props.resourceId}
       data-testid={props.testId}
       dangerouslySetInnerHTML={{
-        __html: addSearchHighlighting(props.searchTerm, props.text, props.isSplitView),
+        __html: addSearchHighlighting(props.searchTerm, props.htmlBody, props.isSplitView),
       }}
     />
   )

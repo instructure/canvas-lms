@@ -5505,11 +5505,6 @@ type HideAssignmentGradesPayload {
 }
 
 """
-HTML encoded string
-"""
-scalar HtmlEncodedString
-
-"""
 An ISO 8601-encoded datetime
 """
 scalar ISO8601DateTime @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc3339")
@@ -9699,7 +9694,7 @@ type SubmissionComment implements LegacyIDInterface & Timestamped {
   attachments: [File!]!
   attempt: Int!
   author: User
-  authorVisibleName: HtmlEncodedString
+  authorVisibleName: String
   canReply: Boolean
   comment: String
   course: Course
@@ -11559,7 +11554,7 @@ type User implements LegacyIDInterface & Node & Timestamped {
     """
     last: Int
   ): GroupConnection
-  firstName: HtmlEncodedString
+  firstName: String
   groupMemberships(filter: UserGroupMembershipsFilterInput): [GroupMembership!]!
 
   """
@@ -11572,9 +11567,9 @@ type User implements LegacyIDInterface & Node & Timestamped {
   instructureIdentityGlobalUserId: String
   instructureIdentityOrganizationUserId: String
   integrationId: String
-  lastName: HtmlEncodedString
+  lastName: String
   loginId: String
-  name: HtmlEncodedString
+  name: String
   notificationPreferences: NotificationPreferences
   notificationPreferencesEnabled(accountId: ID, contextType: NotificationPreferencesContextType!, courseId: ID): Boolean!
 
@@ -11611,13 +11606,13 @@ type User implements LegacyIDInterface & Node & Timestamped {
   """
   A short name the user has selected, for use in conversations or other less formal places through the site.
   """
-  shortName: HtmlEncodedString
+  shortName: String
   sisId: String
 
   """
   The name of the user that is should be used for sorting groups of users, such as in the gradebook.
   """
-  sortableName: HtmlEncodedString
+  sortableName: String
   summaryAnalytics(
     """
     returns summary analytics for this course
