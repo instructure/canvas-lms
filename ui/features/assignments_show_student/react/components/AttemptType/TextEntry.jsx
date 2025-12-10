@@ -23,7 +23,7 @@ import {RceLti11ContentItem} from '@instructure/canvas-rce/es/rce/plugins/instru
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import theme from '@instructure/canvas-theme'
-import StudentViewContext from '../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'

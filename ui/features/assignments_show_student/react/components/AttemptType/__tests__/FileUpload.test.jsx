@@ -26,7 +26,7 @@ import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphq
 import {MockedProvider} from '@apollo/client/testing'
 import React, {createRef} from 'react'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
-import StudentViewContext from '../../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 
 jest.mock('@canvas/upload-file', () => ({
   uploadFile: jest.fn().mockImplementation(file => {

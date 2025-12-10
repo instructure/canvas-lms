@@ -21,7 +21,7 @@ import {fireEvent, render} from '@testing-library/react'
 import React, {createRef} from 'react'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/client/testing'
-import StudentViewContext from '../../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 
 import UrlEntry from '../UrlEntry'
 

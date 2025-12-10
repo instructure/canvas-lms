@@ -19,7 +19,7 @@
 import {Button} from '@instructure/ui-buttons'
 import {IconMoreLine} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
-import StudentViewContext from './Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'

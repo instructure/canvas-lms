@@ -25,7 +25,9 @@ import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/re
 import {act, fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
-import StudentViewContext, {StudentViewContextDefaults} from '../Context'
+import StudentViewContext, {
+  StudentViewContextDefaults,
+} from '@canvas/assignments/react/StudentViewContext'
 import SubmissionManager from '../SubmissionManager'
 
 jest.mock('@canvas/util/globalUtils', () => ({

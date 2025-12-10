@@ -32,8 +32,8 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {bool, func} from 'prop-types'
 import React, {useContext, useState} from 'react'
-import ClosedDiscussionSVG from '../../../images/ClosedDiscussions.svg'
-import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
+import ClosedDiscussionSVG from '@canvas/assignments/react/images/ClosedDiscussions.svg'
+import SVGWithTextPlaceholder from './SVGWithTextPlaceholder'
 import {
   assignedAssessmentsCount,
   availableAndUnavailableCounts,
@@ -41,9 +41,9 @@ import {
   getPeerReviewHeaderText,
   getPeerReviewSubHeaderText,
   getRedirectUrlToFirstPeerReview,
-} from '../../helpers/PeerReviewHelpers'
-import StudentViewContext from '../Context'
-import PeerReviewPromptModal from '../PeerReviewPromptModal'
+} from '@canvas/assignments/helpers/PeerReviewHelpers'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
+import PeerReviewPromptModal from '@canvas/assignments/react/PeerReviewPromptModal'
 import CommentContent from './CommentContent'
 import CommentTextArea from './CommentTextArea'
 

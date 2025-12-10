@@ -50,7 +50,7 @@ import {
   getPeerReviewHeaderText,
   getPeerReviewSubHeaderText,
   getRedirectUrlToFirstPeerReview,
-} from '../helpers/PeerReviewHelpers'
+} from '@canvas/assignments/helpers/PeerReviewHelpers'
 import {shouldRenderSelfAssessment, transformRubricAssessmentData} from '../helpers/RubricHelpers'
 import {
   friendlyTypeName,
@@ -61,9 +61,9 @@ import {
   getPointsValue,
 } from '../helpers/SubmissionHelpers'
 import AttemptTab from './AttemptTab'
-import StudentViewContext from './Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import MarkAsDoneButton from './MarkAsDoneButton'
-import PeerReviewPromptModal from './PeerReviewPromptModal'
+import PeerReviewPromptModal from '@canvas/assignments/react/PeerReviewPromptModal'
 import SimilarityPledge from '@canvas/assignments/react/SimilarityPledge'
 import StudentFooter from './StudentFooter'
 import useStore from './stores/index'

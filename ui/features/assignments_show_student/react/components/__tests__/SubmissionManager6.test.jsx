@@ -23,7 +23,9 @@ import {act, render, waitFor} from '@testing-library/react'
 import React from 'react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 import TextEntry from '../AttemptType/TextEntry'
-import StudentViewContext, {StudentViewContextDefaults} from '../Context'
+import StudentViewContext, {
+  StudentViewContextDefaults,
+} from '@canvas/assignments/react/StudentViewContext'
 import SubmissionManager from '../SubmissionManager'
 
 jest.mock('@canvas/util/globalUtils', () => ({

@@ -20,7 +20,7 @@ import React from 'react'
 import PeerReviewPromptModal, {
   type PeerReviewPromptModalProps,
   type PeerReviewSubheader,
-} from '../PeerReviewPromptModal'
+} from '@canvas/assignments/react/PeerReviewPromptModal'
 import {fireEvent, render} from '@testing-library/react'
 
 describe('PeerReviewPromptModal', () => {
