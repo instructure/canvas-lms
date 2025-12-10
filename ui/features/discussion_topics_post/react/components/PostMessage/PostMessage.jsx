@@ -157,7 +157,7 @@ export function PostMessage({...props}) {
                 <SearchSpan
                   isSplitView={props.isSplitView}
                   searchTerm={searchTerm}
-                  text={props.message}
+                  htmlBody={props.message}
                   isAnnouncement={props.discussionTopic?.isAnnouncement}
                   isTopic={props.isTopic}
                   resourceId={
@@ -185,7 +185,7 @@ export function PostMessage({...props}) {
                             lang={targetLanguage}
                             isSplitView={props.isSplitView}
                             searchTerm={searchTerm}
-                            text={message}
+                            htmlBody={message}
                             isAnnouncement={props.discussionTopic?.isAnnouncement}
                             isTopic={props.isTopic}
                             resourceId={
