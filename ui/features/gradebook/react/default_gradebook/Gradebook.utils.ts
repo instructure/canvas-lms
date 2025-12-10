@@ -145,12 +145,6 @@ export function idArraysEqual(idArray1: string[], idArray2: string[]): boolean {
   return [...idArray1].sort().join() === [...idArray2].sort().join()
 }
 
-export function htmlDecode(input?: string): string | null {
-  return input
-    ? new DOMParser().parseFromString(input, 'text/html').documentElement.textContent
-    : null
-}
-
 export function isAdmin() {
   return (ENV.current_user_roles || []).includes('admin')
 }
