@@ -141,7 +141,8 @@ class Lti::ContextControl < ActiveRecord::Base
     end
 
     # Get the path for a context (account or course) and the paths of all of
-    # its parent accounts.
+    # its parent accounts. If given a string, will simply return the string itself
+    # and all of its possible ancestral paths.
     #
     # Note: this does not return paths for context controls that necessarily
     # exist; it does not query to see if there is a control at each path.
@@ -150,7 +151,7 @@ class Lti::ContextControl < ActiveRecord::Base
     #
     # E.g. with a root account 1, subaccount 3, and course 1, for
     # context = course 1 this will return:
-    # [ "a1", "a1.a3", "a1.a3.c1" ]
+    # [ "a1.", "a1.a3.", "a1.a3.c1." ]
     #
     # This method should be used when searching for context controls by path, to
     # get all context controls that could affect the provided context.
@@ -158,9 +159,15 @@ class Lti::ContextControl < ActiveRecord::Base
     # @returns An array of strings, with each string being a path like what is
     #          returned from calculate_path.
     #
-    # @param context [Account|Course] the account or course to find paths for
-    def self_and_all_parent_paths(context)
-      path = calculate_path(context)
+    # @param context_or_path [Account|Course|String] the context to find paths for, or
+    # an already computed path
+    def self_and_all_parent_paths(context_or_path)
+      path = if context_or_path.is_a?(String)
+               context_or_path
+             else
+               calculate_path(context_or_path)
+             end
+
       path_parts = path.split(".")
       path_parts.reduce([]) do |all_paths, segment|
         appended_path = (all_paths.last || "") + "#{segment}."
@@ -197,6 +204,10 @@ class Lti::ContextControl < ActiveRecord::Base
       # of splitting on segments and worrying about that.
       query.order("deployment_id, LENGTH(path) DESC").select("DISTINCT ON (deployment_id) *")
     end
+  end
+
+  def self_and_all_parent_paths
+    Lti::ContextControl.self_and_all_parent_paths(path)
   end
 
   def context_name

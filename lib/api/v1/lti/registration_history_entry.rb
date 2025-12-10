@@ -91,10 +91,10 @@ module Api::V1::Lti::RegistrationHistoryEntry
                                  .reduce(Set.new) { |set, controls| set.merge(controls.keys) }
 
     controls_by_deployment = Lti::ContextControl.where(id: control_ids.to_a)
-                                                # Needed to figure out display paths and context names
-                                                .preload(:account,
-                                                         :course,
-                                                         deployment: :context)
+                                                # Used by lti_deployment_json
+                                                # when determining the context's
+                                                # name.
+                                                .preload(deployment: :context)
                                                 .group_by(&:deployment)
 
     calculated_attrs = Lti::ContextControlService.preload_calculated_attrs(controls_by_deployment.values.flatten)

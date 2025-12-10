@@ -376,6 +376,15 @@ describe Lti::ContextControl do
                              "a#{account.id}.a#{subaccount.id}.c#{course.id}.",
                            ])
     end
+
+    it "handles being passed a bare path" do
+      result = Lti::ContextControl.send(:self_and_all_parent_paths, "a1.a2.c3.")
+      expect(result).to eq([
+                             "a1.",
+                             "a1.a2.",
+                             "a1.a2.c3.",
+                           ])
+    end
   end
 
   describe ".deployment_ids_for_context" do
