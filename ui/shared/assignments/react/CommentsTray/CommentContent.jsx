@@ -15,15 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import React, {useContext, useEffect} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {bool, arrayOf} from 'prop-types'
 import CommentRow from './CommentRow'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {MARK_SUBMISSION_COMMENT_READ} from '@canvas/assignments/graphql/student/Mutations'
-import noComments from '../../../images/NoComments.svg'
-import noCommentsPeerReview from '../../../images/noCommentsPeerReview.svg'
-import React, {useContext, useEffect} from 'react'
+import noComments from '@canvas/assignments/react/images/NoComments.svg'
+import noCommentsPeerReview from '@canvas/assignments/react/images/noCommentsPeerReview.svg'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {
@@ -31,7 +32,7 @@ import {
   SUBMISSION_HISTORIES_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
 import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionComment'
-import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
+import SVGWithTextPlaceholder from './SVGWithTextPlaceholder'
 import {useMutation} from '@apollo/client'
 import {View} from '@instructure/ui-view'
 import {captureException} from '@sentry/react'

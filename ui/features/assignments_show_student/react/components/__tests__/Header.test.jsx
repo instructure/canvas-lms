@@ -20,12 +20,12 @@ import Header from '../Header'
 import {mockAssignmentAndSubmission, mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-import StudentViewContext from '../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import {AssignmentMocks} from '@canvas/assignments/graphql/student/Assignment'
 
 jest.mock('../AttemptSelect')
-jest.mock('../CommentsTray', () => () => '')
+jest.mock('@canvas/assignments/react/CommentsTray', () => () => '')
 
 // EVAL-3711 Remove ICE Feature Flag
 

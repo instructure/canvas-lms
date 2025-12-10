@@ -20,8 +20,8 @@
 
 import $ from 'jquery'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import CommentContent from '../CommentsTray/CommentContent'
-import CommentsTrayBody from '../CommentsTray/CommentsTrayBody'
+import CommentContent from '../CommentContent'
+import CommentsTrayBody from '../CommentsTrayBody'
 import {
   CREATE_SUBMISSION_COMMENT,
   MARK_SUBMISSION_COMMENT_READ,
@@ -32,10 +32,10 @@ import {createCache} from '@canvas/apollo-v3'
 import {MockedProvider} from '@apollo/client/testing'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'
-import StudentViewContext from '../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
-import {COMPLETED_PEER_REVIEW_TEXT} from '../../helpers/PeerReviewHelpers'
+import {COMPLETED_PEER_REVIEW_TEXT} from '@canvas/assignments/helpers/PeerReviewHelpers'
 
 async function mockSubmissionCommentQuery(overrides = {}, variableOverrides = {}) {
   const variables = {

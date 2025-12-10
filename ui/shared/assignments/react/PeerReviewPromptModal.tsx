@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import successSVG from '../../images/Success.svg'
+import successSVG from './images/Success.svg'
 
 import type {ViewProps} from '@instructure/ui-view'
 

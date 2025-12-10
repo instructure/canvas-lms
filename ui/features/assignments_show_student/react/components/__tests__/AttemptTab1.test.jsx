@@ -26,7 +26,7 @@ import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMo
 import {MockedProvider} from '@apollo/client/testing'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import React, {createRef} from 'react'
-import StudentViewContext from '../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
 // eslint-disable-next-line no-undef
