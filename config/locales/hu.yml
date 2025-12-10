@@ -647,7 +647,9 @@ hu:
     report_header_token_dev_key_id: "fejlesztői kulcs azonosító"
     report_header_token_dev_key_name: "fejlesztői kulcs neve"
     report_header_token_hint: "token tipp"
+    report_header_token_id: azonosító
     report_header_token_last_used: "utoljára használt:"
+    report_header_token_status: státusz
     report_header_unposted_current_grade: "nem publikált aktuális osztályzat"
     report_header_unposted_current_score: "el nem küldött jelenlegi eredmény"
     report_header_unposted_final_grade: "nem publikált végső osztályzat"
