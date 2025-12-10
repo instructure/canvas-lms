@@ -684,7 +684,9 @@ nn:
     report_header_token_dev_key_id: "dev key-ID"
     report_header_token_dev_key_name: "dev key-namn"
     report_header_token_hint: token-hint
+    report_header_token_id: ID
     report_header_token_last_used: "sist brukt"
+    report_header_token_status: status
     report_header_unposted_current_grade: "gjeldande resultat ikkje posta"
     report_header_unposted_current_score: "gjeldande resultat ikkje posta"
     report_header_unposted_final_grade: "sluttresultat ikkje posta"
