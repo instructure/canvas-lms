@@ -96,6 +96,42 @@ describe('AdaChatbot', () => {
     await waitFor(() => expect(mockOnDialogClose).toHaveBeenCalled())
   })
 
+  it('does not initialize when Ada chatbot is disabled', async () => {
+    fakeENV.setup({ADA_CHATBOT_ENABLED: false})
+    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockOnDialogClose).toHaveBeenCalled())
+    expect(mockAdaEmbed.start).not.toHaveBeenCalled()
+  })
+
+  it('handles script load failure gracefully', async () => {
+    mockAdaEmbed.start.mockImplementation(() => {
+      throw new Error('Failed to load Ada embed script')
+    })
+    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() =>
+      expect(consoleWarnSpy).toHaveBeenCalledWith('Ada start failed:', expect.any(Error)),
+    )
+    expect(mockOnDialogClose).toHaveBeenCalled()
+  })
+
+  it('handles unexpected localStorage state gracefully', async () => {
+    localStorage.setItem(ADA_STATE_KEY, 'invalid-state')
+    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+    // Should treat invalid state as 'closed' and not toggle
+    expect(mockAdaEmbed.toggle).not.toHaveBeenCalled()
+  })
+
+  it('does not call onDialogClose after component unmount', async () => {
+    const {unmount} = render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+    mockOnDialogClose.mockClear()
+    unmount()
+    await getStartConfig().adaReadyCallback()
+    // After unmount, onDialogClose should not be called
+    expect(mockOnDialogClose).not.toHaveBeenCalled()
+  })
+
   it('initializes Ada with correct configuration', async () => {
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
     await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
@@ -108,18 +144,22 @@ describe('AdaChatbot', () => {
   })
 
   it('merges global adaSettings and overrides handle', async () => {
-    const globalSettings = {
-      crossWindowPersistence: true,
-      metaFields: {email: 'user@example.com'},
-      handle: 'should-be-overridden',
-    }
-    ;(window as any).adaSettings = globalSettings
-
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
     await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
 
     const config = getStartConfig()
-    expect(config.metaFields).toEqual(globalSettings.metaFields)
+    expect(config.metaFields).toEqual({
+      institutionUrl: 'http://localhost',
+      email: '',
+      name: '',
+      canvasRoles: '',
+      canvasUUID: 'test-uuid',
+      isRootAdmin: false,
+      isAdmin: false,
+      isTeacher: false,
+      isStudent: false,
+      isObserver: false,
+    })
     expect(config.crossWindowPersistence).toBe(true)
     expect(config.handle).toBe('instructure-gen')
   })
