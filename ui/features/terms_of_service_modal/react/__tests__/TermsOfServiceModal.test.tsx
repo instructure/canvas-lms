@@ -19,16 +19,18 @@
 import React from 'react'
 import $ from 'jquery'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import TermsOfServiceModal from '../TermsOfServiceModal'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {openWindow} from '@canvas/util/globalUtils'
 
-jest.mock('@canvas/do-fetch-api-effect', () => jest.fn())
 jest.mock('@canvas/util/globalUtils', () => {
   const actual = jest.requireActual('@canvas/util/globalUtils')
   return {...actual, openWindow: jest.fn()}
 })
+
+const server = setupServer()
 
 interface TermsOfServiceModalProps {
   preview?: boolean
@@ -38,6 +40,9 @@ const renderTermsOfServiceModal = (props: TermsOfServiceModalProps = {}) =>
   render(<TermsOfServiceModal {...props} />)
 
 describe('TermsOfServiceModal', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     jest.clearAllMocks()
     fakeENV.setup({
@@ -47,6 +52,7 @@ describe('TermsOfServiceModal', () => {
   })
 
   afterEach(() => {
+    server.resetHandlers()
     cleanup()
     $('#fixtures').empty()
     fakeENV.teardown()
@@ -63,11 +69,12 @@ describe('TermsOfServiceModal', () => {
   })
 
   it('opens external url instead of modal when aup returns redirectUrl', async () => {
-    const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+    server.use(
+      http.get('/api/v1/acceptable_use_policy', () =>
+        HttpResponse.json({redirectUrl: 'https://example.com/aup'}),
+      ),
+    )
     const mockOpenWindow = openWindow as unknown as jest.Mock
-    mockDoFetchApi.mockResolvedValueOnce({
-      json: {redirectUrl: 'https://example.com/aup'},
-    } as any)
     renderTermsOfServiceModal()
     screen.getByTestId('tos-link').click()
     // assert window open and no modal
@@ -82,11 +89,12 @@ describe('TermsOfServiceModal', () => {
   })
 
   it('opens modal when aup returns inline content', async () => {
-    const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+    server.use(
+      http.get('/api/v1/acceptable_use_policy', () =>
+        HttpResponse.json({content: '<p>Inline AUP</p>'}),
+      ),
+    )
     const mockOpenWindow = openWindow as unknown as jest.Mock
-    mockDoFetchApi.mockResolvedValueOnce({
-      json: {content: '<p>Inline AUP</p>'},
-    } as any)
     renderTermsOfServiceModal()
     screen.getByTestId('tos-link').click()
     // modal should appear
@@ -96,9 +104,14 @@ describe('TermsOfServiceModal', () => {
   })
 
   it('reuses cached redirectUrl on subsequent clicks without refetch', async () => {
-    const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+    let fetchCount = 0
+    server.use(
+      http.get('/api/v1/acceptable_use_policy', () => {
+        fetchCount++
+        return HttpResponse.json({redirectUrl: 'https://ex.com/aup'})
+      }),
+    )
     const mockOpenWindow = openWindow as unknown as jest.Mock
-    mockDoFetchApi.mockResolvedValueOnce({json: {redirectUrl: 'https://ex.com/aup'}} as any)
     renderTermsOfServiceModal()
     const link = screen.getByTestId('tos-link')
     // first click fetches + opens
@@ -107,18 +120,23 @@ describe('TermsOfServiceModal', () => {
     // second click should not refetch
     link.click()
     await waitFor(() => expect(mockOpenWindow).toHaveBeenCalledTimes(2))
-    expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
+    expect(fetchCount).toBe(1)
   })
 
   it('reuses cached inline content on subsequent clicks without refetch', async () => {
-    const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
-    mockDoFetchApi.mockResolvedValueOnce({json: {content: '<p>Inline AUP</p>'}} as any)
+    let fetchCount = 0
+    server.use(
+      http.get('/api/v1/acceptable_use_policy', () => {
+        fetchCount++
+        return HttpResponse.json({content: '<p>Inline AUP</p>'})
+      }),
+    )
     renderTermsOfServiceModal()
     const link = screen.getByTestId('tos-link')
     // first open
     link.click()
     await waitFor(() => expect(screen.getByText('Inline AUP')).toBeInTheDocument())
-    expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
+    expect(fetchCount).toBe(1)
     // close modal
     const closeWrapper = screen.getByTestId('instui-modal-close')
     closeWrapper.querySelector('button')!.click()
@@ -126,15 +144,15 @@ describe('TermsOfServiceModal', () => {
     // second open uses cached content
     link.click()
     await waitFor(() => expect(screen.getByText('Inline AUP')).toBeInTheDocument())
-    expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
+    expect(fetchCount).toBe(1)
   })
 
   it('silently fails and does not open modal when api returns invalid response', async () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-    const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+    server.use(
+      http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json({invalid: 'data'})),
+    )
     const mockOpenWindow = openWindow as unknown as jest.Mock
-    // return invalid response (missing content and redirectUrl)
-    mockDoFetchApi.mockResolvedValueOnce({json: {invalid: 'data'}} as any)
     renderTermsOfServiceModal()
     screen.getByTestId('tos-link').click()
     // wait a bit to ensure nothing happens
@@ -153,10 +171,8 @@ describe('TermsOfServiceModal', () => {
 
   it('silently fails and does not open modal when api returns undefined', async () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-    const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+    server.use(http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json(null)))
     const mockOpenWindow = openWindow as unknown as jest.Mock
-    // return undefined (fetch error already logged)
-    mockDoFetchApi.mockResolvedValueOnce({json: undefined} as any)
     renderTermsOfServiceModal()
     screen.getByTestId('tos-link').click()
     // wait a bit to ensure nothing happens

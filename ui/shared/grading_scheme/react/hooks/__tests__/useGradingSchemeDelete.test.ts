@@ -17,27 +17,23 @@
  */
 
 import {useGradingSchemeDelete} from '../useGradingSchemeDelete'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {renderHook} from '@testing-library/react-hooks/dom'
 import type {GradingSchemeTemplate} from '../../../gradingSchemeApiModel'
 import {ApiCallStatus} from '../ApiCallStatus'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const courseId = '11'
 const accountId = '42'
 
-jest.mock('@canvas/do-fetch-api-effect')
-beforeEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
-})
-
-afterEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
-})
+const server = setupServer()
 
 describe('useGradingSchemeDeleteHook', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   it('renders for course context without error', () => {
     const {result} = renderHook(() => useGradingSchemeDelete())
     expect(result.error).toBeFalsy()
@@ -49,53 +45,48 @@ describe('useGradingSchemeDeleteHook', () => {
   })
 
   it('makes a DELETE request for course context to delete a grading scheme', async () => {
-    const {result} = renderHook(() => useGradingSchemeDelete())
-
     const gradingSchemeTemplate: GradingSchemeTemplate = {
       data: [],
       title: 'My Course Grading Scheme',
       scaling_factor: 1.0,
       points_based: false,
     }
+    let capturedPath = ''
 
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({
-      response: {ok: true},
-      json: gradingSchemeTemplate,
-    })
+    server.use(
+      http.delete(`/courses/${courseId}/grading_schemes/:schemeId`, ({request}) => {
+        capturedPath = new URL(request.url).pathname
+        return HttpResponse.json(gradingSchemeTemplate)
+      }),
+    )
+
+    const {result} = renderHook(() => useGradingSchemeDelete())
     await result.current.deleteGradingScheme('Course', courseId, 'some-grading-scheme-id')
-    // @ts-expect-error
-    const lastCall = doFetchApi.mock.calls.pop()
-    expect(lastCall[0]).toMatchObject({
-      path: `/courses/${courseId}/grading_schemes/some-grading-scheme-id`,
-      method: 'DELETE',
-    })
+
+    expect(capturedPath).toBe(`/courses/${courseId}/grading_schemes/some-grading-scheme-id`)
     expect(result.current.deleteGradingSchemeStatus).toEqual(ApiCallStatus.COMPLETED)
   })
 
   it('makes a DELETE request for account context to delete a grading scheme', async () => {
-    const {result} = renderHook(() => useGradingSchemeDelete())
-
     const gradingSchemeTemplate: GradingSchemeTemplate = {
       data: [],
       title: 'My Account Grading Scheme',
       scaling_factor: 1.0,
       points_based: false,
     }
+    let capturedPath = ''
 
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({
-      response: {ok: true},
-      json: gradingSchemeTemplate,
-    })
+    server.use(
+      http.delete(`/accounts/${accountId}/grading_schemes/:schemeId`, ({request}) => {
+        capturedPath = new URL(request.url).pathname
+        return HttpResponse.json(gradingSchemeTemplate)
+      }),
+    )
+
+    const {result} = renderHook(() => useGradingSchemeDelete())
     await result.current.deleteGradingScheme('Account', accountId, 'some-grading-scheme-id')
-    // @ts-expect-error
-    const lastCall = doFetchApi.mock.calls.pop()
-    expect(lastCall[0]).toMatchObject({
-      path: `/accounts/${accountId}/grading_schemes/some-grading-scheme-id`,
-      method: 'DELETE',
-    })
 
+    expect(capturedPath).toBe(`/accounts/${accountId}/grading_schemes/some-grading-scheme-id`)
     expect(result.current.deleteGradingSchemeStatus).toEqual(ApiCallStatus.COMPLETED)
   })
 })

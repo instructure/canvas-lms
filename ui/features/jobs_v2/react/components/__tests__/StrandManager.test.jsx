@@ -20,9 +20,10 @@ import React from 'react'
 import {fireEvent} from '@testing-library/react'
 import renderWithMocks, {updateInternalSettingMutation} from './MockSettingsApi'
 import StrandManager from '../StrandManager'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const flushPromises = () => new Promise(setTimeout)
 
@@ -34,14 +35,37 @@ const fakeJob = {
 }
 
 describe('StrandManager', () => {
-  beforeAll(() => {
-    doFetchApi.mockResolvedValue({status: 'OK', count: 1})
-  })
+  // Track captured request for verification
+  let lastCapturedRequest = null
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
-    doFetchApi.mockClear()
+    lastCapturedRequest = null
+    // Default handler that captures request and returns success
+    server.use(
+      http.put('/api/v1/jobs2/manage', async ({request}) => {
+        const url = new URL(request.url)
+        lastCapturedRequest = {
+          path: url.pathname,
+          method: 'PUT',
+          params: Object.fromEntries(url.searchParams.entries()),
+        }
+        // Convert string params back to numbers where appropriate
+        if (lastCapturedRequest.params.priority) {
+          lastCapturedRequest.params.priority = parseInt(lastCapturedRequest.params.priority, 10)
+        }
+        if (lastCapturedRequest.params.max_concurrent) {
+          lastCapturedRequest.params.max_concurrent = parseInt(lastCapturedRequest.params.max_concurrent, 10)
+        }
+        return HttpResponse.json({status: 'OK', count: 1})
+      }),
+    )
     updateInternalSettingMutation.mockClear()
   })
+
+  afterEach(() => server.resetHandlers())
 
   it('edits priority but not concurrency for normal strand', async () => {
     const onUpdate = jest.fn()
@@ -53,13 +77,13 @@ describe('StrandManager', () => {
     expect(queryByLabelText('Permanent num_strands setting')).not.toBeInTheDocument()
     fireEvent.change(getByLabelText('Priority'), {target: {value: '11'}})
     fireEvent.click(getByText('Apply'))
-    expect(doFetchApi).toHaveBeenCalledWith({
+    await flushPromises()
+    expect(lastCapturedRequest).toEqual({
       path: '/api/v1/jobs2/manage',
       method: 'PUT',
       params: {strand: 'foobar', priority: 11, max_concurrent: 1},
     })
-    await flushPromises()
-    expect(onUpdate).toHaveBeenCalledWith({status: 'OK', count: 1})
+    expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({json: {status: 'OK', count: 1}}))
   })
 
   it('edits both priority and concurrency for n_strand', async () => {
@@ -77,13 +101,13 @@ describe('StrandManager', () => {
     fireEvent.change(getByLabelText('Dynamic concurrency'), {target: {value: '7'}})
     fireEvent.change(getByLabelText('Permanent num_strands setting'), {target: {value: '14'}})
     fireEvent.click(getByText('Apply'))
-    expect(doFetchApi).toHaveBeenCalledWith({
+    await flushPromises()
+    expect(lastCapturedRequest).toEqual({
       path: '/api/v1/jobs2/manage',
       method: 'PUT',
       params: {strand: 'foobar', priority: 11, max_concurrent: 7},
     })
-    await flushPromises()
-    expect(onUpdate).toHaveBeenCalledWith({status: 'OK', count: 1})
+    expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({json: {status: 'OK', count: 1}}))
     expect(updateInternalSettingMutation).toHaveBeenCalled()
   })
 
@@ -101,13 +125,13 @@ describe('StrandManager', () => {
     fireEvent.change(getByLabelText('Priority'), {target: {value: '15'}})
     fireEvent.change(getByLabelText('Dynamic concurrency'), {target: {value: '8'}})
     fireEvent.click(getByText('Apply'))
-    expect(doFetchApi).toHaveBeenCalledWith({
+    await flushPromises()
+    expect(lastCapturedRequest).toEqual({
       path: '/api/v1/jobs2/manage',
       method: 'PUT',
       params: {strand: 'foobar', priority: 15, max_concurrent: 8},
     })
-    await flushPromises()
-    expect(onUpdate).toHaveBeenCalledWith({status: 'OK', count: 1})
+    expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({json: {status: 'OK', count: 1}}))
     expect(updateInternalSettingMutation).not.toHaveBeenCalled()
   })
 })

@@ -17,21 +17,21 @@
  */
 
 import {useAccountDefaultGradingSchemeUpdate} from '../useAccountDefaultGradingSchemeUpdate'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ApiCallStatus} from '../ApiCallStatus'
 
 import {renderHook} from '@testing-library/react-hooks/dom'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const accountId = '42'
 
-jest.mock('@canvas/do-fetch-api-effect')
-
-afterEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
-})
+const server = setupServer()
 
 describe('useAccountDefaultGradingSchemeUpdateHook', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   it('renders for course context without error', () => {
     const {result} = renderHook(() => useAccountDefaultGradingSchemeUpdate())
     expect(result.error).toBeFalsy()
@@ -43,31 +43,30 @@ describe('useAccountDefaultGradingSchemeUpdateHook', () => {
   })
 
   it('makes a POST request for account context to update a grading scheme', async () => {
-    const {result} = renderHook(() => useAccountDefaultGradingSchemeUpdate())
     const data = [
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
     ]
+    let capturedPath = ''
+    let capturedBody: unknown = null
 
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({
-      response: {ok: true},
-      json: {title: 'Scheme 1', data},
-    })
+    server.use(
+      http.put(`/accounts/${accountId}/grading_schemes/account_default`, async ({request}) => {
+        capturedPath = new URL(request.url).pathname
+        capturedBody = await request.json()
+        return HttpResponse.json({title: 'Scheme 1', data})
+      }),
+    )
+
+    const {result} = renderHook(() => useAccountDefaultGradingSchemeUpdate())
     const loadedGradingScheme = await result.current.updateAccountDefaultGradingScheme(
       accountId,
       '99',
     )
-    // @ts-expect-error
-    const lastCall = doFetchApi.mock.calls.pop()
-    expect(lastCall[0]).toMatchObject({
-      path: `/accounts/${accountId}/grading_schemes/account_default`,
-      method: 'PUT',
-      body: {id: '99'},
-    })
 
+    expect(capturedPath).toBe(`/accounts/${accountId}/grading_schemes/account_default`)
+    expect(capturedBody).toEqual({id: '99'})
     expect(loadedGradingScheme).toEqual({title: 'Scheme 1', data})
-
     expect(result.current.updateAccountDefaultGradingSchemeStatus).toEqual(ApiCallStatus.COMPLETED)
   })
 })

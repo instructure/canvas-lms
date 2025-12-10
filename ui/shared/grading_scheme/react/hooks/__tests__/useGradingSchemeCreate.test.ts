@@ -17,27 +17,23 @@
  */
 
 import {useGradingSchemeCreate} from '../useGradingSchemeCreate'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {renderHook} from '@testing-library/react-hooks/dom'
 import type {GradingSchemeTemplate} from '../../../gradingSchemeApiModel'
 import {ApiCallStatus} from '../ApiCallStatus'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const courseId = '11'
 const accountId = '42'
 
-jest.mock('@canvas/do-fetch-api-effect')
-beforeEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
-})
-
-afterEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
-})
+const server = setupServer()
 
 describe('useGradingSchemeCreateHook', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   it('renders for course context without error', () => {
     const {result} = renderHook(() => useGradingSchemeCreate())
     expect(result.error).toBeFalsy()
@@ -49,7 +45,6 @@ describe('useGradingSchemeCreateHook', () => {
   })
 
   it('makes a POST request for course context to create a grading scheme', async () => {
-    const {result} = renderHook(() => useGradingSchemeCreate())
     const data = [
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
@@ -60,25 +55,23 @@ describe('useGradingSchemeCreateHook', () => {
       points_based: false,
       scaling_factor: 1.0,
     }
+    let capturedPath = ''
 
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({
-      response: {ok: true},
-      json: gradingSchemeTemplate,
-    })
+    server.use(
+      http.post(`/courses/${courseId}/grading_schemes`, ({request}) => {
+        capturedPath = new URL(request.url).pathname
+        return HttpResponse.json(gradingSchemeTemplate)
+      }),
+    )
+
+    const {result} = renderHook(() => useGradingSchemeCreate())
     const createdGradingScheme = await result.current.createGradingScheme(
       'Course',
       courseId,
       gradingSchemeTemplate,
     )
-    // @ts-expect-error
-    const lastCall = doFetchApi.mock.calls.pop()
-    expect(lastCall[0]).toMatchObject({
-      path: `/courses/${courseId}/grading_schemes`,
-      method: 'POST',
-      body: {},
-    })
 
+    expect(capturedPath).toBe(`/courses/${courseId}/grading_schemes`)
     expect(createdGradingScheme).toEqual({
       title: 'My Course Grading Scheme',
       data,
@@ -89,7 +82,6 @@ describe('useGradingSchemeCreateHook', () => {
   })
 
   it('makes a POST request for account context to create a grading scheme', async () => {
-    const {result} = renderHook(() => useGradingSchemeCreate())
     const data = [
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
@@ -100,25 +92,23 @@ describe('useGradingSchemeCreateHook', () => {
       points_based: false,
       scaling_factor: 1.0,
     }
+    let capturedPath = ''
 
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({
-      response: {ok: true},
-      json: gradingSchemeTemplate,
-    })
+    server.use(
+      http.post(`/accounts/${accountId}/grading_schemes`, ({request}) => {
+        capturedPath = new URL(request.url).pathname
+        return HttpResponse.json(gradingSchemeTemplate)
+      }),
+    )
+
+    const {result} = renderHook(() => useGradingSchemeCreate())
     const createdGradingScheme = await result.current.createGradingScheme(
       'Account',
       accountId,
       gradingSchemeTemplate,
     )
-    // @ts-expect-error
-    const lastCall = doFetchApi.mock.calls.pop()
-    expect(lastCall[0]).toMatchObject({
-      path: `/accounts/${accountId}/grading_schemes`,
-      method: 'POST',
-      body: {},
-    })
 
+    expect(capturedPath).toBe(`/accounts/${accountId}/grading_schemes`)
     expect(createdGradingScheme).toEqual({
       title: 'My Account Grading Scheme',
       data,

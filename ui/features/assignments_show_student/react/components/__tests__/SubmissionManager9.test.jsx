@@ -19,7 +19,6 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
@@ -27,6 +26,8 @@ import ContextModuleApi from '../../apis/ContextModuleApi'
 import StudentViewContext, {StudentViewContextDefaults} from '../Context'
 import SubmissionManager from '../SubmissionManager'
 import store from '../stores'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 // Reset all mocks before each test to ensure isolation
 beforeEach(() => {
@@ -45,7 +46,7 @@ jest.mock('@canvas/rce/RichContentEditor')
 
 jest.mock('../../apis/ContextModuleApi')
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 function renderInContext(overrides = {}, children) {
   const contextProps = {...StudentViewContextDefaults, ...overrides}
@@ -82,10 +83,16 @@ function gradedOverrides() {
 }
 
 describe('SubmissionManager', () => {
+  // Track captured request for verification
+  let lastCapturedRequest = null
+
   beforeAll(() => {
+    server.listen()
     window.INST = window.INST || {}
     window.INST.editorButtons = []
   })
+
+  afterAll(() => server.close())
 
   describe('peer reviews', () => {
     describe('without rubrics', () => {
@@ -168,8 +175,18 @@ describe('SubmissionManager', () => {
       }
 
       beforeEach(async () => {
-        doFetchApi.mockClear()
-        doFetchApi.mockResolvedValue({})
+        lastCapturedRequest = null
+        // Default handler that captures request and returns success
+        server.use(
+          http.post('/courses/:courseId/rubric_associations/:rubricAssociationId/assessments', async ({request}) => {
+            lastCapturedRequest = {
+              method: 'POST',
+              path: new URL(request.url).pathname,
+              body: await request.text(),
+            }
+            return HttpResponse.json({})
+          }),
+        )
         setCurrentUserAsAssessmentOwner()
         await setMocks()
         await waitFor(() => {})
@@ -189,6 +206,7 @@ describe('SubmissionManager', () => {
       })
 
       afterEach(() => {
+        server.resetHandlers()
         window.ENV = originalENV
         store.setState({
           displayedAssessment: null,
@@ -324,13 +342,12 @@ describe('SubmissionManager', () => {
         fireEvent.click(getByTestId('submit-peer-review-button'))
 
         const rubricAssociationId = mocks[0].result.data.assignment.rubricAssociation._id
-        expect(doFetchApi).toHaveBeenCalledWith(
-          expect.objectContaining({
-            method: 'POST',
-            path: `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
-            body: expect.stringContaining('user_id%5D=4'),
-          }),
-        )
+        await waitFor(() => {
+          expect(lastCapturedRequest).not.toBeNull()
+          expect(lastCapturedRequest.method).toBe('POST')
+          expect(lastCapturedRequest.path).toBe(`/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`)
+          expect(lastCapturedRequest.body).toContain('user_id%5D=4')
+        })
       })
 
       it('sends a http request with anonymous peer reviews enabled to the rubrics assessments endpoint when the user clicks on Submit button', async () => {
@@ -360,13 +377,12 @@ describe('SubmissionManager', () => {
         fireEvent.click(getByTestId('submit-peer-review-button'))
 
         const rubricAssociationId = mocks[0].result.data.assignment.rubricAssociation._id
-        expect(doFetchApi).toHaveBeenCalledWith(
-          expect.objectContaining({
-            method: 'POST',
-            path: `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
-            body: expect.stringContaining('anonymous_id%5D=ad0f'),
-          }),
-        )
+        await waitFor(() => {
+          expect(lastCapturedRequest).not.toBeNull()
+          expect(lastCapturedRequest.method).toBe('POST')
+          expect(lastCapturedRequest.path).toBe(`/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`)
+          expect(lastCapturedRequest.body).toContain('anonymous_id%5D=ad0f')
+        })
       })
 
       it('creates a success alert when the http request was sent successfully', async () => {
@@ -557,7 +573,12 @@ describe('SubmissionManager', () => {
 
       it('creates an error alert when the http request fails', async () => {
         setOtherUserAsAssessmentOwner()
-        doFetchApi.mockImplementation(() => Promise.reject(new Error('Network error')))
+        // Override the default handler to return an error
+        server.use(
+          http.post('/courses/:courseId/rubric_associations/:rubricAssociationId/assessments', () => {
+            return HttpResponse.error()
+          }),
+        )
         const setOnFailure = jest.fn()
 
         // Set up peer review mode

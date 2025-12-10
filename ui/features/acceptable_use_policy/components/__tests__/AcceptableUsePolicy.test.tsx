@@ -19,13 +19,15 @@
 import React from 'react'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import AcceptableUsePolicy from '../AcceptableUsePolicy'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {userEvent} from '@testing-library/user-event'
 import {useLocation, useNavigate, useNavigationType} from 'react-router-dom'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/alerts/react/FlashAlert')
+
+const server = setupServer()
 
 const mockApiResponse = {
   content: '<p>Test Acceptable Use Policy Content</p>',
@@ -46,9 +48,13 @@ describe('AcceptableUsePolicy', () => {
   const mockNavigate = jest.fn()
   const mockNavigationType = useNavigationType as jest.Mock
   const mockLocation = useLocation as jest.Mock
+
   beforeAll(() => {
+    server.listen()
     ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
   })
+
+  afterAll(() => server.close())
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -58,18 +64,21 @@ describe('AcceptableUsePolicy', () => {
   })
 
   afterEach(() => {
+    server.resetHandlers()
     cleanup()
   })
 
   it('mounts without crashing', () => {
+    server.use(
+      http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json(mockApiResponse)),
+    )
     render(<AcceptableUsePolicy />)
   })
 
   it('loads content from the API and displays it', async () => {
-    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
-      json: mockApiResponse,
-      response: {ok: true},
-    })
+    server.use(
+      http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json(mockApiResponse)),
+    )
     render(<AcceptableUsePolicy />)
     expect(screen.getByText('Loading page')).toBeInTheDocument()
     await waitFor(() =>
@@ -79,10 +88,9 @@ describe('AcceptableUsePolicy', () => {
   })
 
   it('displays an error message when content fails to load', async () => {
-    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
-      json: null,
-      response: {ok: false},
-    })
+    server.use(
+      http.get('/api/v1/acceptable_use_policy', () => new HttpResponse(null, {status: 500})),
+    )
     render(<AcceptableUsePolicy />)
     expect(screen.getByText('Loading page')).toBeInTheDocument()
     await waitFor(() =>
@@ -96,10 +104,9 @@ describe('AcceptableUsePolicy', () => {
   })
 
   it('displays an info message when content is null', async () => {
-    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
-      json: {content: null},
-      response: {ok: true},
-    })
+    server.use(
+      http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json({content: null})),
+    )
     render(<AcceptableUsePolicy />)
     expect(screen.getByText('Loading page')).toBeInTheDocument()
     await waitFor(() =>
@@ -114,10 +121,9 @@ describe('AcceptableUsePolicy', () => {
 
   describe('navigation behavior', () => {
     it('redirects to /login when the CloseButton is clicked with no history', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
-        json: mockApiResponse,
-        response: {ok: true},
-      })
+      server.use(
+        http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json(mockApiResponse)),
+      )
       mockNavigationType.mockReturnValue('POP')
       mockLocation.mockReturnValue({key: 'default'})
       render(<AcceptableUsePolicy />)
@@ -132,10 +138,9 @@ describe('AcceptableUsePolicy', () => {
     })
 
     it('navigates back when the CloseButton is clicked and history exists', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
-        json: mockApiResponse,
-        response: {ok: true},
-      })
+      server.use(
+        http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json(mockApiResponse)),
+      )
       mockNavigationType.mockReturnValue('PUSH')
       mockLocation.mockReturnValue({key: 'abc123'})
       render(<AcceptableUsePolicy />)

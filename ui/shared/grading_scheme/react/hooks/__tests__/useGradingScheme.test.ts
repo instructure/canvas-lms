@@ -17,26 +17,22 @@
  */
 
 import {useGradingScheme} from '../useGradingScheme'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ApiCallStatus} from '../ApiCallStatus'
 
 import {renderHook} from '@testing-library/react-hooks/dom'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const courseId = '11'
 const accountId = '42'
 
-jest.mock('@canvas/do-fetch-api-effect')
-beforeEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
-})
-
-afterEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
-})
+const server = setupServer()
 
 describe('useGradingSchemeHook', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   it('renders for course context without error', () => {
     const {result} = renderHook(() => useGradingScheme())
     expect(result.error).toBeFalsy()
@@ -48,59 +44,54 @@ describe('useGradingSchemeHook', () => {
   })
 
   it('makes a GET request for course context to load grading scheme', async () => {
-    const {result} = renderHook(() => useGradingScheme())
     const data = [
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
     ]
+    let capturedPath = ''
 
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({
-      response: {ok: true},
-      json: {title: 'Scheme 1', data},
-    })
+    server.use(
+      http.get(`/courses/${courseId}/grading_schemes/:schemeId`, ({request}) => {
+        capturedPath = new URL(request.url).pathname
+        return HttpResponse.json({title: 'Scheme 1', data})
+      }),
+    )
+
+    const {result} = renderHook(() => useGradingScheme())
     const loadedGradingScheme = await result.current.loadGradingScheme(
       'Course',
       courseId,
       'some-id',
     )
-    // @ts-expect-error
-    const lastCall = doFetchApi.mock.calls.pop()
-    expect(lastCall[0]).toMatchObject({
-      path: `/courses/${courseId}/grading_schemes/some-id`,
-      method: 'GET',
-    })
 
+    expect(capturedPath).toBe(`/courses/${courseId}/grading_schemes/some-id`)
     expect(loadedGradingScheme).toEqual({title: 'Scheme 1', data})
     expect(result.current.loadGradingSchemeStatus).toEqual(ApiCallStatus.COMPLETED)
   })
 
   it('makes a GET request for account context to load grading scheme', async () => {
-    const {result} = renderHook(() => useGradingScheme())
     const data = [
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
     ]
+    let capturedPath = ''
 
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({
-      response: {ok: true},
-      json: {title: 'Scheme 1', data},
-    })
+    server.use(
+      http.get(`/accounts/${accountId}/grading_schemes/:schemeId`, ({request}) => {
+        capturedPath = new URL(request.url).pathname
+        return HttpResponse.json({title: 'Scheme 1', data})
+      }),
+    )
+
+    const {result} = renderHook(() => useGradingScheme())
     const loadedGradingScheme = await result.current.loadGradingScheme(
       'Account',
       accountId,
       'some-id',
     )
-    // @ts-expect-error
-    const lastCall = doFetchApi.mock.calls.pop()
-    expect(lastCall[0]).toMatchObject({
-      path: `/accounts/${accountId}/grading_schemes/some-id`,
-      method: 'GET',
-    })
 
+    expect(capturedPath).toBe(`/accounts/${accountId}/grading_schemes/some-id`)
     expect(loadedGradingScheme).toEqual({title: 'Scheme 1', data})
-
     expect(result.current.loadGradingSchemeStatus).toEqual(ApiCallStatus.COMPLETED)
   })
 })

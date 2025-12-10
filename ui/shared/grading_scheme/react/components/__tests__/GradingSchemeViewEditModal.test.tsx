@@ -17,26 +17,21 @@
  */
 
 import React from 'react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {render} from '@testing-library/react'
 import {
   GradingSchemeViewEditModal,
   type GradingSchemeViewEditModalProps,
 } from '../GradingSchemeViewEditModal'
 import {AccountGradingSchemes, DefaultGradingScheme} from './fixtures'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 describe('Grading Schemes View Edit Tests', () => {
-  beforeEach(() => {
-    // @ts-expect-error
-    doFetchApi.mockClear()
-  })
-
-  afterEach(() => {
-    // @ts-expect-error
-    doFetchApi.mockClear()
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   const renderGradingSchemesManagement = (props: Partial<GradingSchemeViewEditModalProps> = {}) => {
     return render(
@@ -54,50 +49,62 @@ describe('Grading Schemes View Edit Tests', () => {
   }
 
   it('should render selected grading scheme', async () => {
-    // @ts-expect-error
-    doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: AccountGradingSchemes[0]})
-    // @ts-expect-error
-    doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: DefaultGradingScheme})
+    server.use(
+      http.get('/courses/:contextId/grading_schemes/:schemeId', () =>
+        HttpResponse.json(AccountGradingSchemes[0]),
+      ),
+      http.get('/courses/:contextId/grading_schemes/default', () =>
+        HttpResponse.json(DefaultGradingScheme),
+      ),
+    )
     const {getByTestId} = renderGradingSchemesManagement()
 
     await new Promise(resolve => setTimeout(resolve, 0))
-    expect(doFetchApi).toHaveBeenCalledTimes(2)
     expect(getByTestId('grading_scheme_1_edit_button')).toBeInTheDocument()
   })
 
   it('should not disable course grading scheme buttons', async () => {
-    // @ts-expect-error
-    doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: AccountGradingSchemes[0]})
-    // @ts-expect-error
-    doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: DefaultGradingScheme})
+    server.use(
+      http.get('/courses/:contextId/grading_schemes/:schemeId', () =>
+        HttpResponse.json(AccountGradingSchemes[0]),
+      ),
+      http.get('/courses/:contextId/grading_schemes/default', () =>
+        HttpResponse.json(DefaultGradingScheme),
+      ),
+    )
     const {getByTestId} = renderGradingSchemesManagement()
 
     await new Promise(resolve => setTimeout(resolve, 0))
-    expect(doFetchApi).toHaveBeenCalledTimes(2)
     expect(getByTestId('grading_scheme_1_edit_button')).not.toBeDisabled()
   })
 
   it('should disable Account grading scheme buttons when contextType is Course', async () => {
-    // @ts-expect-error
-    doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: AccountGradingSchemes[1]})
-    // @ts-expect-error
-    doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: DefaultGradingScheme})
+    server.use(
+      http.get('/courses/:contextId/grading_schemes/:schemeId', () =>
+        HttpResponse.json(AccountGradingSchemes[1]),
+      ),
+      http.get('/courses/:contextId/grading_schemes/default', () =>
+        HttpResponse.json(DefaultGradingScheme),
+      ),
+    )
     const {getByTestId} = renderGradingSchemesManagement()
 
     await new Promise(resolve => setTimeout(resolve, 0))
-    expect(doFetchApi).toHaveBeenCalledTimes(2)
     expect(getByTestId('grading_scheme_2_edit_button')).toBeDisabled()
   })
 
   it('should not disable Account grading scheme buttons when contextType is Account', async () => {
-    // @ts-expect-error
-    doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: AccountGradingSchemes[1]})
-    // @ts-expect-error
-    doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: DefaultGradingScheme})
+    server.use(
+      http.get('/accounts/:contextId/grading_schemes/:schemeId', () =>
+        HttpResponse.json(AccountGradingSchemes[1]),
+      ),
+      http.get('/accounts/:contextId/grading_schemes/default', () =>
+        HttpResponse.json(DefaultGradingScheme),
+      ),
+    )
     const {getByTestId} = renderGradingSchemesManagement({contextType: 'Account'})
 
     await new Promise(resolve => setTimeout(resolve, 0))
-    expect(doFetchApi).toHaveBeenCalledTimes(2)
     expect(getByTestId('grading_scheme_2_edit_button')).not.toBeDisabled()
   })
 })

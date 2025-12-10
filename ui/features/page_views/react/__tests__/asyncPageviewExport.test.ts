@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {renderHook, act} from '@testing-library/react-hooks'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {
   useAsyncPageviewJobs,
   notExpired,
@@ -28,19 +30,7 @@ import {
 } from '../hooks/asyncPageviewExport'
 import {FetchApiError} from '@canvas/do-fetch-api-effect'
 
-// Mock doFetchApi
-jest.mock('@canvas/do-fetch-api-effect', () => ({
-  __esModule: true,
-  default: jest.fn(),
-  FetchApiError: class FetchApiError extends Error {
-    response: Response
-    constructor(message: string, response: Response) {
-      super(message)
-      this.response = response
-    }
-  },
-}))
-const doFetchApi = require('@canvas/do-fetch-api-effect').default
+const server = setupServer()
 
 describe('useAsyncPageviewJobs', () => {
   const key = 'test_jobs'
@@ -53,10 +43,12 @@ describe('useAsyncPageviewJobs', () => {
     updatedAt: new Date(),
   }
 
-  beforeEach(() => {
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
     window.localStorage.clear()
-    jest.clearAllMocks()
   })
+  afterAll(() => server.close())
 
   it('initializes jobs from localStorage', () => {
     window.localStorage.setItem(key, JSON.stringify([job]))
@@ -75,7 +67,11 @@ describe('useAsyncPageviewJobs', () => {
   })
 
   it('postJob adds a new job', async () => {
-    doFetchApi.mockResolvedValue({json: {poll_url: 'baseurl/newid'}})
+    server.use(
+      http.post(`/api/v1/users/${userid}/page_views/query`, () =>
+        HttpResponse.json({poll_url: 'baseurl/newid'}),
+      ),
+    )
     const {result} = renderHook(() => useAsyncPageviewJobs(key, userid))
     const [, , , postJob] = result.current
     await act(async () => {
@@ -88,7 +84,12 @@ describe('useAsyncPageviewJobs', () => {
 
   describe('getDownloadUrl', () => {
     it('returns correct url when status is 200', async () => {
-      doFetchApi.mockResolvedValue({json: null, response: {status: 200} as Response})
+      server.use(
+        http.head(
+          `/api/v1/users/${userid}/page_views/query/${job.query_id}/results`,
+          () => new HttpResponse(null, {status: 200}),
+        ),
+      )
 
       const {result} = renderHook(() => useAsyncPageviewJobs(key, userid))
       const [, , , , getDownloadUrl] = result.current
@@ -98,8 +99,12 @@ describe('useAsyncPageviewJobs', () => {
     })
 
     it('throws error and updates job status on 204', async () => {
-      const mockResponse = {status: 204} as Response
-      doFetchApi.mockResolvedValue({json: null, response: mockResponse})
+      server.use(
+        http.head(
+          `/api/v1/users/${userid}/page_views/query/${job.query_id}/results`,
+          () => new HttpResponse(null, {status: 204}),
+        ),
+      )
 
       const {result} = renderHook(() => useAsyncPageviewJobs(key, userid))
       const [, setJobs, , , getDownloadUrl] = result.current
@@ -115,8 +120,12 @@ describe('useAsyncPageviewJobs', () => {
     })
 
     it('throws error and removes job on 404', async () => {
-      const mockResponse = {status: 404} as Response
-      doFetchApi.mockRejectedValue(new FetchApiError('Not Found', mockResponse))
+      server.use(
+        http.head(
+          `/api/v1/users/${userid}/page_views/query/${job.query_id}/results`,
+          () => new HttpResponse(null, {status: 404}),
+        ),
+      )
 
       const {result} = renderHook(() => useAsyncPageviewJobs(key, userid))
       const [, setJobs, , , getDownloadUrl] = result.current

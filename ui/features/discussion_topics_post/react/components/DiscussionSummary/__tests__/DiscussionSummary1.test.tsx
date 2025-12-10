@@ -21,12 +21,13 @@ import {render, waitFor, fireEvent} from '@testing-library/react'
 import {DiscussionSummary, DiscussionSummaryProps} from '../DiscussionSummary'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {MockedProvider} from '@apollo/client/testing'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {DiscussionSummaryRatings} from '../DiscussionSummaryRatings'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -66,27 +67,28 @@ describe('DiscussionSummary', () => {
     usage: {currentCount: 3, limit: 5},
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup({
       discussion_topic_id: '5678',
       context_id: '1234',
       context_type: 'Course',
     })
-    // Reset mock for each test
     jest.clearAllMocks()
-    ;(doFetchApi as jest.Mock).mockReset()
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    ;(doFetchApi as jest.Mock).mockClear()
+    server.resetHandlers()
   })
   describe('DiscussionSummaryUsagePill', () => {
     it('should display a pill with summary usage information and an enabled Generate button if some usage left', async () => {
-      ;(doFetchApi as jest.Mock).mockImplementationOnce(() =>
-        Promise.resolve({
-          json: expectedSummary,
-        }),
+      server.use(
+        http.get('/api/v1/courses/1234/discussion_topics/5678/summaries', () =>
+          HttpResponse.json(expectedSummary),
+        ),
       )
 
       const {getByTestId} = setup({
@@ -105,10 +107,14 @@ describe('DiscussionSummary', () => {
     })
 
     it('should display a pill with summary usage information and a disabled Generate button if no usage left', async () => {
-      ;(doFetchApi as jest.Mock).mockImplementationOnce(() =>
-        Promise.resolve({
-          json: {id: 1, text: 'This is a discussion summary', usage: {currentCount: 5, limit: 5}},
-        }),
+      server.use(
+        http.get('/api/v1/courses/1234/discussion_topics/5678/summaries', () =>
+          HttpResponse.json({
+            id: 1,
+            text: 'This is a discussion summary',
+            usage: {currentCount: 5, limit: 5},
+          }),
+        ),
       )
 
       const {getByTestId} = setup({
@@ -129,7 +135,14 @@ describe('DiscussionSummary', () => {
 
   describe('Interactions', () => {
     beforeEach(() => {
-      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({json: expectedSummary})
+      server.use(
+        http.get('/api/v1/courses/1234/discussion_topics/5678/summaries', () =>
+          HttpResponse.json(expectedSummary),
+        ),
+        http.post('/api/v1/courses/1234/discussion_topics/5678/summaries', () =>
+          HttpResponse.json(expectedSummary),
+        ),
+      )
     })
 
     it('should call onDisableSummaryClick when disable button is clicked', async () => {
@@ -151,6 +164,14 @@ describe('DiscussionSummary', () => {
     })
 
     it('should call fetchSummary with correct parameters when generate button is clicked', async () => {
+      let capturedUrl = ''
+      server.use(
+        http.post('/api/v1/courses/1234/discussion_topics/5678/summaries', ({request}) => {
+          capturedUrl = request.url
+          return HttpResponse.json(expectedSummary)
+        }),
+      )
+
       const {getByTestId} = setup({
         summary: expectedSummary,
       })
@@ -168,18 +189,13 @@ describe('DiscussionSummary', () => {
         fireEvent.click(generateButton!)
       })
 
-      expect(doFetchApi).toHaveBeenCalledWith({
-        method: 'POST',
-        // @ts-expect-error
-        path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
-        params: {userInput: 'focus on student feedback'},
+      await waitFor(() => {
+        expect(capturedUrl).toContain('/api/v1/courses/1234/discussion_topics/5678/summaries')
+        expect(capturedUrl).toContain('userInput=focus')
       })
     })
 
     it('should call postDiscussionSummaryFeedback with like when like button is clicked', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: false, disliked: false}})
-      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: true, disliked: false}})
-
       const setLiked = jest.fn()
       const postDiscussionSummaryFeedback = jest.fn()
       const {getByTestId} = setup({
@@ -202,12 +218,6 @@ describe('DiscussionSummary', () => {
     })
 
     it('should call postDiscussionSummaryFeedback with dislike when dislike button is clicked', async () => {
-      // Setup mocks specifically for this test
-      const mockFetchApi = doFetchApi as jest.Mock
-      mockFetchApi.mockImplementation(() =>
-        Promise.resolve({json: {liked: false, disliked: false}}),
-      )
-
       const setDisliked = jest.fn()
       const postDiscussionSummaryFeedback = jest.fn().mockResolvedValue({})
 
@@ -234,10 +244,6 @@ describe('DiscussionSummary', () => {
     })
 
     it('should call postDiscussionSummaryFeedback with reset_like when dislike is true and dislike button is clicked', async () => {
-      // Setup mocks specifically for this test
-      const mockFetchApi = doFetchApi as jest.Mock
-      mockFetchApi.mockImplementation(() => Promise.resolve({json: {liked: false, disliked: true}}))
-
       const setDisliked = jest.fn()
       const postDiscussionSummaryFeedback = jest.fn().mockResolvedValue({})
 
