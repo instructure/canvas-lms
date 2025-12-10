@@ -3342,9 +3342,13 @@ class ApplicationController < ActionController::Base
         ctx = Canvas::LiveEvents.base_context_attributes(@context, @domain_root_account)
 
         if @current_pseudonym
-          ctx[:user_login] = @current_pseudonym.unique_id
+          ctx[:user_login] = AuthenticationMethods::FederatedPseudonymAttributes.unique_id ||
+                             @current_pseudonym.unique_id
+
           ctx[:user_account_id] = @current_pseudonym.global_account_id
-          ctx[:user_sis_id] = @current_pseudonym.sis_user_id
+
+          ctx[:user_sis_id] = AuthenticationMethods::FederatedPseudonymAttributes.sis_user_id ||
+                              @current_pseudonym.sis_user_id
         end
 
         ctx[:user_id] = @current_user.global_id if @current_user
