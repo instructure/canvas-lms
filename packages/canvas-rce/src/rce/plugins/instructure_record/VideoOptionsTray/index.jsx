@@ -57,8 +57,10 @@ const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
 
 function mapStudioEmbedOptions(embedOptions) {
   return embedOptions
-    ? Object.entries(embedOptions).filter(([, v]) => v).map(([k]) => k)
-    : [];
+    ? Object.entries(embedOptions)
+        .filter(([, v]) => v)
+        .map(([k]) => k)
+    : []
 }
 
 export default function VideoOptionsTray({
@@ -73,7 +75,7 @@ export default function VideoOptionsTray({
   id = 'video-options-tray',
   studioOptions = null,
   forBlockEditorUse = false,
-  onStudioEmbedOptionChanged = () => { },
+  onStudioEmbedOptionChanged = () => {},
 }) {
   const isConsolidatedMediaPlayer = RCEGlobals.getFeatures()?.consolidated_media_player
   const isEmbedImprovements = RCEGlobals.getFeatures()?.rce_studio_embed_improvements
@@ -96,9 +98,9 @@ export default function VideoOptionsTray({
   const [editLocked, setEditLocked] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const [studioEmbedOptions, setStudioEmbedOptions] = useState(
-    () => mapStudioEmbedOptions(studioOptions?.embedOptions)
-  );
+  const [studioEmbedOptions, setStudioEmbedOptions] = useState(() =>
+    mapStudioEmbedOptions(studioOptions?.embedOptions),
+  )
 
   const isStudio = !!studioOptions
   const showDisplayOptions = (!isStudio || studioOptions.convertibleToLink) && !forBlockEditorUse
@@ -155,18 +157,17 @@ export default function VideoOptionsTray({
     setSubtitles(new_subtitles)
   }
 
-  const handleEmbedOptionChange = useCallback((options) => {
-    const mappedOptions = options
-      .reduce(
-        (a, c) => {
-          a[c] = options.includes(c)
-          return a
-        },
-        {},
-      )
-    setStudioEmbedOptions(options)
-    onStudioEmbedOptionChanged(mappedOptions)
-  }, [onStudioEmbedOptionChanged]);
+  const handleEmbedOptionChange = useCallback(
+    options => {
+      const mappedOptions = options.reduce((a, c) => {
+        a[c] = options.includes(c)
+        return a
+      }, {})
+      setStudioEmbedOptions(options)
+      onStudioEmbedOptionChanged(mappedOptions)
+    },
+    [onStudioEmbedOptionChanged],
+  )
 
   function handleSave(event, updateMediaObject) {
     event.preventDefault()
@@ -246,6 +247,7 @@ export default function VideoOptionsTray({
           shouldContainFocus={true}
           shouldReturnFocus={true}
           size="regular"
+          themeOverride={{zIndex: 11000}} // ensure tray is above RCE toolbar
         >
           <Flex direction="column" height={getTrayHeight()}>
             <Flex.Item as="header" padding="medium">
@@ -372,28 +374,31 @@ export default function VideoOptionsTray({
                       )}
                       {isStudio && isEmbedImprovements ? (
                         <Flex.Item padding="small">
-                          <CheckboxGroup name="studio-embed-options"
+                          <CheckboxGroup
+                            name="studio-embed-options"
                             onChange={handleEmbedOptionChange}
                             value={studioEmbedOptions}
-                            description={formatMessage("Embed Options")}
+                            description={formatMessage('Embed Options')}
                           >
-                            <Text variant="contentSmall">{formatMessage('Changes will apply after you save this page.')}</Text>
+                            <Text variant="contentSmall">
+                              {formatMessage('Changes will apply after you save this page.')}
+                            </Text>
                             <Checkbox
                               label={formatMessage('Lock speed at 1x')}
                               value="lockSpeed"
-                              variant='toggle'
+                              variant="toggle"
                             />
                             {!studioOptions?.embedOptions?.isExternal ? (
                               <Checkbox
                                 label={formatMessage('Allow media download')}
                                 value="enableMediaDownload"
-                                variant='toggle'
+                                variant="toggle"
                               />
                             ) : null}
                             <Checkbox
                               label={formatMessage('Allow transcript download')}
                               value="enableTranscriptDownload"
-                              variant='toggle'
+                              variant="toggle"
                             />
                           </CheckboxGroup>
                         </Flex.Item>
