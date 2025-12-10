@@ -4751,6 +4751,129 @@ describe AssignmentsApiController, type: :request do
         end
       end
 
+      context "when overrides is an empty array" do
+        let(:course) { course_model }
+        let(:user) { user_model }
+        let(:assignment) do
+          assignment_model(
+            context: course,
+            peer_reviews: true
+          )
+        end
+        let(:test_object) { Object.new.extend(Api::V1::Assignment) }
+        let(:prepared_update) do
+          {
+            assignment:,
+            overrides: [],
+            old_assignment: nil,
+            notify_of_update: false,
+            valid: true
+          }
+        end
+        let(:assignment_params_with_empty_overrides) do
+          ActionController::Parameters.new({
+                                             assignment_overrides: [],
+                                             peer_review: {
+                                               points_possible: 50,
+                                               grading_type: "points"
+                                             }
+                                           }).permit!
+        end
+
+        before do
+          course.enable_feature!(:peer_review_allocation_and_grading)
+          allow(test_object).to receive_messages(
+            prepare_assignment_create_or_update: prepared_update,
+            grading_periods_allow_submittable_update?: true
+          )
+          allow(SubmissionLifecycleManager).to receive(:recompute)
+          allow(assignment).to receive_messages(
+            peer_review_sub_assignment: nil,
+            peer_reviews: true,
+            context: course
+          )
+        end
+
+        it "calls update_api_assignment_with_overrides" do
+          expect(test_object).to receive(:update_api_assignment_with_overrides)
+            .with(prepared_update, user)
+            .and_return(:ok)
+
+          result = test_object.send(:update_api_assignment, assignment, assignment_params_with_empty_overrides, user)
+          expect(result).to eq(:ok)
+        end
+
+        it "does not bypass override processing" do
+          expect(test_object).to receive(:update_api_assignment_with_overrides)
+            .and_return(:ok)
+
+          expect(assignment).not_to receive(:save_without_broadcasting!)
+
+          test_object.send(:update_api_assignment, assignment, assignment_params_with_empty_overrides, user)
+        end
+
+        it "handles peer review creation in transaction" do
+          mock_peer_review_sub = double("peer_review_sub_assignment")
+
+          allow(test_object).to receive_messages(
+            update_api_assignment_with_overrides: :ok,
+            create_api_peer_review_sub_assignment: mock_peer_review_sub
+          )
+          allow(assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+          expect(Assignment).to receive(:transaction).at_least(:once).and_call_original
+          expect(test_object).to receive(:create_api_peer_review_sub_assignment)
+            .with(assignment, hash_including(points_possible: 50, grading_type: "points"))
+
+          result = test_object.send(:update_api_assignment, assignment, assignment_params_with_empty_overrides, user)
+          expect(result).to eq(:ok)
+        end
+
+        it "clears existing overrides" do
+          existing_section = course.course_sections.create!(name: "Section 1")
+          assignment.assignment_overrides.create!(
+            set: existing_section,
+            due_at: 1.week.from_now
+          )
+
+          expect(test_object).to receive(:update_api_assignment_with_overrides) do |prep_update, _user|
+            expect(prep_update[:overrides]).to eq([])
+            :ok
+          end
+
+          test_object.send(:update_api_assignment, assignment, assignment_params_with_empty_overrides, user)
+        end
+
+        context "with peer review overrides" do
+          let(:assignment_params_with_peer_review_overrides) do
+            ActionController::Parameters.new({
+                                               assignment_overrides: [],
+                                               peer_review: {
+                                                 points_possible: 50,
+                                                 peer_review_overrides: []
+                                               }
+                                             }).permit!
+          end
+
+          it "handles empty peer_review_overrides alongside empty assignment_overrides" do
+            mock_peer_review_sub = double("peer_review_sub_assignment")
+
+            allow(test_object).to receive(:update_api_assignment_with_overrides)
+              .and_return(:ok)
+            allow(assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+            expect(test_object).to receive(:create_api_peer_review_sub_assignment) do |_assignment, params|
+              expect(params).to be_a(ActionController::Parameters)
+              expect(params[:peer_review_overrides]).to eq([])
+              mock_peer_review_sub
+            end
+
+            result = test_object.send(:update_api_assignment, assignment, assignment_params_with_peer_review_overrides, user)
+            expect(result).to eq(:ok)
+          end
+        end
+      end
+
       describe "only_visible_to_overrides reset logic" do
         let(:course) { course_model }
         let(:assignment) do
