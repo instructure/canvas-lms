@@ -17,11 +17,12 @@
  */
 
 import {waitFor} from '@testing-library/dom'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import publishOneModuleHelperModule from '../utils/publishOneModuleHelper'
 
 import publishAllModulesHelperModule from '../utils/publishAllModulesHelper'
 import {initBody, makeModuleWithItems} from './testHelpers'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const {
   batchUpdateAllModulesApiCall,
@@ -37,24 +38,45 @@ const {renderContextModulesPublishIcon} = {
   ...publishOneModuleHelperModule,
 }
 
-jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('../utils/publishOneModuleHelper')
 
-const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+const server = setupServer()
 
 describe('publishAllModulesHelper', () => {
+  // Track captured request for verification
+  let lastCapturedRequest: {method: string; path: string; body?: any} | null = null
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    mockDoFetchApi.mockResolvedValue({
-      response: new Response('', {status: 200}),
-      json: {published: true},
-      text: '',
-    })
+    lastCapturedRequest = null
+    // Default handlers
+    server.use(
+      http.put('/api/v1/courses/:courseId/modules', async ({request}) => {
+        const url = new URL(request.url)
+        lastCapturedRequest = {
+          method: 'PUT',
+          path: url.pathname,
+          body: await request.json(),
+        }
+        return HttpResponse.json({published: true})
+      }),
+      http.get('/api/v1/courses/:courseId/modules', ({request}) => {
+        const url = new URL(request.url)
+        lastCapturedRequest = {
+          method: 'GET',
+          path: url.pathname + url.search,
+        }
+        return HttpResponse.json([])
+      }),
+    )
     initBody()
   })
 
   afterEach(() => {
+    server.resetHandlers()
     jest.clearAllMocks()
-    mockDoFetchApi.mockReset()
     document.body.innerHTML = ''
   })
 
@@ -69,64 +91,81 @@ describe('publishAllModulesHelper', () => {
       const skipItems = true
       await batchUpdateAllModulesApiCall(1, publish, skipItems)
 
-      expect(doFetchApi).toHaveBeenCalledTimes(1)
-      expect(doFetchApi).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'PUT',
-          path: '/api/v1/courses/1/modules',
-          body: {
-            module_ids: [1, 2],
-            event: 'publish',
-            skip_content_tags: skipItems,
-            async: true,
-          },
-        }),
-      )
+      await waitFor(() => {
+        expect(lastCapturedRequest).not.toBeNull()
+      })
+      expect(lastCapturedRequest!.method).toBe('PUT')
+      expect(lastCapturedRequest!.path).toBe('/api/v1/courses/1/modules')
+      expect(lastCapturedRequest!.body).toEqual({
+        module_ids: [1, 2],
+        event: 'publish',
+        skip_content_tags: skipItems,
+        async: true,
+      })
     })
 
     it('returns a rejected promise on error', async () => {
-      const whoops = new Error('whoops')
-      mockDoFetchApi.mockRejectedValueOnce(whoops)
-      await expect(batchUpdateAllModulesApiCall(2, true, true)).rejects.toBe(whoops)
+      server.use(
+        http.put('/api/v1/courses/:courseId/modules', () => HttpResponse.error()),
+      )
+      await expect(batchUpdateAllModulesApiCall(2, true, true)).rejects.toThrow()
     })
   })
 
   describe('fetchAllItemPublishedStates', () => {
+    let requestCount = 0
+    let requestPaths: string[] = []
+
     beforeEach(() => {
-      mockDoFetchApi.mockReset()
-      mockDoFetchApi.mockResolvedValue({
-        response: new Response('', {status: 200}),
-        json: [],
-        text: '',
-      })
+      requestCount = 0
+      requestPaths = []
+      server.use(
+        http.get('/api/v1/courses/:courseId/modules', ({request}) => {
+          const url = new URL(request.url)
+          requestCount++
+          requestPaths.push(url.pathname + url.search)
+          return HttpResponse.json([])
+        }),
+      )
     })
-    it('GETs the module item states', () => {
+
+    it('GETs the module item states', async () => {
       fetchAllItemPublishedStates(7)
-      expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
-      expect(mockDoFetchApi).toHaveBeenCalledWith({
-        method: 'GET',
-        path: '/api/v1/courses/7/modules?include[]=items',
+      await waitFor(() => {
+        expect(requestCount).toBe(1)
       })
+      expect(requestPaths[0]).toBe('/api/v1/courses/7/modules?include[]=items')
     })
+
     it('exhausts paginated responses', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        json: [{id: 1, published: true, items: []}],
-        link: {next: {url: '/another/page', rel: 'next'}},
-        text: '',
-      })
+      // Override with paginated response
+      server.use(
+        http.get('/api/v1/courses/:courseId/modules', ({request}) => {
+          const url = new URL(request.url)
+          requestCount++
+          requestPaths.push(url.pathname + url.search)
+          return HttpResponse.json(
+            [{id: 1, published: true, items: []}],
+            {headers: {Link: '</another/page>; rel="next"'}},
+          )
+        }),
+        http.get('/another/page', ({request}) => {
+          requestCount++
+          requestPaths.push(new URL(request.url).pathname)
+          return HttpResponse.json([])
+        }),
+      )
 
       fetchAllItemPublishedStates(7)
-      await waitFor(() => expect(mockDoFetchApi).toHaveBeenCalledTimes(2))
-      expect(mockDoFetchApi).toHaveBeenLastCalledWith({
-        method: 'GET',
-        path: '/another/page',
-      })
+      await waitFor(() => expect(requestCount).toBe(2))
+      expect(requestPaths[1]).toBe('/another/page')
     })
+
     it('returns a rejected promise on error', async () => {
-      const whoops = new Error('whoops')
-      mockDoFetchApi.mockRejectedValueOnce(whoops)
-      await expect(fetchAllItemPublishedStates(7)).rejects.toBe(whoops)
+      server.use(
+        http.get('/api/v1/courses/:courseId/modules', () => HttpResponse.error()),
+      )
+      await expect(fetchAllItemPublishedStates(7)).rejects.toThrow()
     })
   })
 

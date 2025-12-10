@@ -16,32 +16,43 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {forgotPassword, performSignIn} from '../auth'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 jest.mock('@canvas/authenticity-token', () => jest.fn(() => 'testCsrfToken'))
 
-jest.mock('@canvas/do-fetch-api-effect', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}))
+const server = setupServer()
+
+let capturedRequest: {path: string; body: any} | null = null
 
 describe('Auth Service', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
+    capturedRequest = null
     jest.clearAllMocks()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   describe('performSignIn', () => {
     it('should call doFetchApi with correct parameters and handle success', async () => {
-      const mockResponse = {
-        json: {pseudonym: {}, location: '/dashboard'},
-        response: {status: 200},
-      }
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      server.use(
+        http.post('/login/canvas', async ({request}) => {
+          capturedRequest = {
+            path: new URL(request.url).pathname,
+            body: await request.json(),
+          }
+          return HttpResponse.json({pseudonym: {}, location: '/dashboard'})
+        }),
+      )
       const result = await performSignIn('testUser', 'testPassword', true, '/login/canvas')
-      expect(doFetchApi).toHaveBeenCalledWith({
+      expect(capturedRequest).toEqual({
         path: '/login/canvas',
-        method: 'POST',
         body: {
           authenticity_token: 'testCsrfToken',
           pseudonym_session: {
@@ -61,8 +72,7 @@ describe('Auth Service', () => {
     })
 
     it('should return empty data when response has no json', async () => {
-      const mockResponse = {json: null, response: {status: 200}}
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      server.use(http.post('/login/canvas', () => new HttpResponse(null, {status: 200})))
       const result = await performSignIn('testUser', 'testPassword', true, '/login/canvas')
       expect(result).toEqual({status: 200, data: {}})
     })
@@ -70,15 +80,18 @@ describe('Auth Service', () => {
 
   describe('forgotPassword', () => {
     it('should call doFetchApi with correct parameters and handle success', async () => {
-      const mockResponse = {
-        json: {requested: true},
-        response: {status: 200},
-      }
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      server.use(
+        http.post('/forgot_password', async ({request}) => {
+          capturedRequest = {
+            path: new URL(request.url).pathname,
+            body: await request.json(),
+          }
+          return HttpResponse.json({requested: true})
+        }),
+      )
       const result = await forgotPassword('test@example.com')
-      expect(doFetchApi).toHaveBeenCalledWith({
+      expect(capturedRequest).toEqual({
         path: '/forgot_password',
-        method: 'POST',
         body: {
           authenticity_token: 'testCsrfToken',
           pseudonym_session: {
@@ -93,8 +106,7 @@ describe('Auth Service', () => {
     })
 
     it('should return {requested: false} when response has no json', async () => {
-      const mockResponse = {json: null, response: {status: 200}}
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      server.use(http.post('/forgot_password', () => new HttpResponse(null, {status: 200})))
       const result = await forgotPassword('test@example.com')
       expect(result).toEqual({status: 200, data: {requested: false}})
     })

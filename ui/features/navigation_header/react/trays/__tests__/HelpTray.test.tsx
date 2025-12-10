@@ -21,10 +21,10 @@ import {render as testingLibraryRender, screen} from '@testing-library/react'
 import HelpTray from '../HelpTray'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-// Mock the API call
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const props = {
   closeTray: jest.fn(),
@@ -58,11 +58,16 @@ describe('HelpTray', () => {
     },
   ]
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({response: {status: 200, ok: true}})
+    // Default handler for help_links API
+    server.use(http.get('/help_links', () => HttpResponse.json([])))
   })
 
   afterEach(() => {
+    server.resetHandlers()
     queryClient.removeQueries()
   })
 

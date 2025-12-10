@@ -22,17 +22,22 @@ import useManagedCourseSearchApi from '@canvas/direct-sharing/react/effects/useM
 import useModuleCourseSearchApi from '@canvas/direct-sharing/react/effects/useModuleCourseSearchApi'
 import {FAKE_FILES} from '../../../../../fixtures/fakeData'
 import DirectShareCourseTray from '../DirectShareCourseTray'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import userEvent from '@testing-library/user-event'
 import {RowsProvider} from '../../../../contexts/RowsContext'
 import {mockRowsContext} from '../../__tests__/testUtils'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 jest.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
 jest.mock('@canvas/direct-sharing/react/effects/useModuleCourseSearchApi')
-jest.mock('@canvas/do-fetch-api-effect')
+
+const server = setupServer()
 
 const courseA = {id: '1', name: 'Course A', course_code: '1', term: 'default term'}
 const courseB = {id: '2', name: 'Course B', course_code: '2', term: 'default term'}
+
+let capturedRequest: {path: string; body: any} | null = null
+let moduleItemsFetchCount = 0
 
 const defaultProps = {
   open: true,
@@ -52,6 +57,7 @@ describe('DirectShareCourseTray', () => {
   let ariaLive: HTMLElement
 
   beforeAll(() => {
+    server.listen()
     ariaLive = document.createElement('div')
     ariaLive.id = 'flash_screenreader_holder'
     ariaLive.setAttribute('role', 'alert')
@@ -59,20 +65,36 @@ describe('DirectShareCourseTray', () => {
   })
 
   afterAll(() => {
+    server.close()
     if (ariaLive) document.body.removeChild(ariaLive)
   })
 
   beforeEach(() => {
+    capturedRequest = null
+    moduleItemsFetchCount = 0
     ;(useManagedCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
       success([courseA, courseB])
     })
     ;(useModuleCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
       success([])
     })
-    ;(doFetchApi as jest.Mock).mockResolvedValue({})
+    server.use(
+      http.post('/api/v1/courses/:courseId/content_migrations', async ({request}) => {
+        capturedRequest = {
+          path: new URL(request.url).pathname,
+          body: await request.json(),
+        }
+        return HttpResponse.json({})
+      }),
+      http.get('/api/v1/courses/:courseId/modules/:moduleId/items', () => {
+        moduleItemsFetchCount++
+        return HttpResponse.json([])
+      }),
+    )
   })
 
   afterEach(() => {
+    server.resetHandlers()
     jest.clearAllMocks()
     jest.resetAllMocks()
     cleanup()
@@ -102,20 +124,18 @@ describe('DirectShareCourseTray', () => {
     await userEvent.click(screen.getByText(courseA.name))
     await userEvent.click(screen.getByTestId('direct-share-course-copy'))
 
-    expect(doFetchApi as jest.Mock).toHaveBeenCalledWith({
-      method: 'POST',
-      path: `/api/v1/courses/1/content_migrations`,
-      body: {
-        migration_type: 'course_copy_importer',
-        select: {attachments: ['178']},
-        settings: {
-          source_course_id: '1',
-          insert_into_module_id: null,
-          associate_with_assignment_id: null,
-          is_copy_to: true,
-          insert_into_module_type: 'attachments',
-          insert_into_module_position: null,
-        },
+    expect(capturedRequest).not.toBeNull()
+    expect(capturedRequest?.path).toBe('/api/v1/courses/1/content_migrations')
+    expect(capturedRequest?.body).toEqual({
+      migration_type: 'course_copy_importer',
+      select: {attachments: ['178']},
+      settings: {
+        source_course_id: '1',
+        insert_into_module_id: null,
+        associate_with_assignment_id: null,
+        is_copy_to: true,
+        insert_into_module_type: 'attachments',
+        insert_into_module_position: null,
       },
     })
 
@@ -145,11 +165,11 @@ describe('DirectShareCourseTray', () => {
     await userEvent.click(screen.getByText('Module 1'))
 
     expect(screen.getByTestId('select-position')).toBeInTheDocument()
-    expect(doFetchApi).toHaveBeenCalled()
+    expect(moduleItemsFetchCount).toBeGreaterThan(0)
     ;(useManagedCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
       success([courseA, courseB])
     })
-    ;(doFetchApi as jest.Mock).mockClear()
+    const previousFetchCount = moduleItemsFetchCount
 
     input = screen.getByLabelText(/select a course/i)
     await userEvent.click(input)
@@ -157,7 +177,7 @@ describe('DirectShareCourseTray', () => {
     await userEvent.click(screen.getByText(courseB.name))
 
     expect(screen.queryByTestId('select-position')).not.toBeInTheDocument()
-    expect(doFetchApi).not.toHaveBeenCalled()
+    expect(moduleItemsFetchCount).toBe(previousFetchCount)
   })
 
   describe('errors', () => {
@@ -168,7 +188,15 @@ describe('DirectShareCourseTray', () => {
     })
 
     it('reports an error if the fetch fails', async () => {
-      ;(doFetchApi as jest.Mock).mockRejectedValueOnce(() => ({}))
+      server.use(
+        http.post('/api/v1/courses/:courseId/content_migrations', async ({request}) => {
+          capturedRequest = {
+            path: new URL(request.url).pathname,
+            body: await request.json(),
+          }
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
 
       renderComponent()
       const input = screen.getByLabelText(/select a course/i)
@@ -177,20 +205,18 @@ describe('DirectShareCourseTray', () => {
       await userEvent.click(screen.getByText(courseA.name))
       await userEvent.click(screen.getByTestId('direct-share-course-copy'))
 
-      expect(doFetchApi as jest.Mock).toHaveBeenCalledWith({
-        method: 'POST',
-        path: `/api/v1/courses/1/content_migrations`,
-        body: {
-          migration_type: 'course_copy_importer',
-          select: {attachments: ['178']},
-          settings: {
-            source_course_id: '1',
-            insert_into_module_id: null,
-            associate_with_assignment_id: null,
-            is_copy_to: true,
-            insert_into_module_type: 'attachments',
-            insert_into_module_position: null,
-          },
+      expect(capturedRequest).not.toBeNull()
+      expect(capturedRequest?.path).toBe('/api/v1/courses/1/content_migrations')
+      expect(capturedRequest?.body).toEqual({
+        migration_type: 'course_copy_importer',
+        select: {attachments: ['178']},
+        settings: {
+          source_course_id: '1',
+          insert_into_module_id: null,
+          associate_with_assignment_id: null,
+          is_copy_to: true,
+          insert_into_module_type: 'attachments',
+          insert_into_module_position: null,
         },
       })
 

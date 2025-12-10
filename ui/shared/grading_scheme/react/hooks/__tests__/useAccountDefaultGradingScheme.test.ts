@@ -17,25 +17,21 @@
  */
 
 import {useAccountDefaultGradingScheme} from '../useAccountDefaultGradingScheme'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ApiCallStatus} from '../ApiCallStatus'
 
 import {renderHook} from '@testing-library/react-hooks/dom'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const accountId = '42'
 
-jest.mock('@canvas/do-fetch-api-effect')
-beforeEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
-})
-
-afterEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
-})
+const server = setupServer()
 
 describe('useAccountDefaultGradingSchemeHook', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   it('renders for course context without error', () => {
     const {result} = renderHook(() => useAccountDefaultGradingScheme())
     expect(result.error).toBeFalsy()
@@ -47,27 +43,24 @@ describe('useAccountDefaultGradingSchemeHook', () => {
   })
 
   it('makes a GET request for account context to load grading scheme', async () => {
-    const {result} = renderHook(() => useAccountDefaultGradingScheme())
     const data = [
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
     ]
+    let capturedPath = ''
 
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({
-      response: {ok: true},
-      json: {title: 'Scheme 1', data},
-    })
+    server.use(
+      http.get(`/accounts/${accountId}/grading_schemes/account_default`, ({request}) => {
+        capturedPath = new URL(request.url).pathname
+        return HttpResponse.json({title: 'Scheme 1', data})
+      }),
+    )
+
+    const {result} = renderHook(() => useAccountDefaultGradingScheme())
     const loadedGradingScheme = await result.current.loadAccountDefaultGradingScheme(accountId)
-    // @ts-expect-error
-    const lastCall = doFetchApi.mock.calls.pop()
-    expect(lastCall[0]).toMatchObject({
-      path: `/accounts/${accountId}/grading_schemes/account_default`,
-      method: 'GET',
-    })
 
+    expect(capturedPath).toBe(`/accounts/${accountId}/grading_schemes/account_default`)
     expect(loadedGradingScheme).toEqual({title: 'Scheme 1', data})
-
     expect(result.current.loadAccountDefaultGradingSchemeStatus).toEqual(ApiCallStatus.COMPLETED)
   })
 })

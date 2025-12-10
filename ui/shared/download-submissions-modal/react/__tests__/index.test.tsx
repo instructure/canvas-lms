@@ -19,9 +19,10 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import DownloadSubmissionModal from '../index'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const setUp = (propOverrides = {}) => {
   const props = {
@@ -36,15 +37,24 @@ const setUp = (propOverrides = {}) => {
   return render(<DownloadSubmissionModal {...props} />)
 }
 
+// Track API call count
+let apiCallCount = 0
+
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+
 beforeEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockResolvedValue({
-    json: {
-      attachment: {
-        size: 100,
-      },
-    },
-  })
+  apiCallCount = 0
+  server.use(
+    http.get('/courses/:courseId/assignments/:assignmentId/submissions', ({request}) => {
+      apiCallCount++
+      return HttpResponse.json({
+        attachment: {
+          size: 100,
+        },
+      })
+    }),
+  )
 
   // Mock the download button click to prevent navigation
   const mockClick = jest.fn()
@@ -57,8 +67,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
+  server.resetHandlers()
   jest.restoreAllMocks()
 })
 
@@ -71,38 +80,38 @@ describe('DownloadSubmissionModal', () => {
 
   it('renders 100% progress and success text when the download is complete', async () => {
     const {getByTestId} = setUp()
-    await waitFor(() => expect(doFetchApi).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(apiCallCount).toBe(1))
     expect(await getByTestId('progress-value').textContent).toBe('100%')
     expect(getByTestId('progress-text').textContent).toBe('Finished preparing 100 Bytes.')
   })
 
   it('enables the download button when download is complete', async () => {
     const {getByTestId} = setUp()
-    await waitFor(() => expect(doFetchApi).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(apiCallCount).toBe(1))
     const button = getByTestId('download_button')
     expect(button).not.toHaveAttribute('disabled')
   })
 
   describe('error while downloading', () => {
     beforeEach(() => {
-      // @ts-expect-error
-      doFetchApi.mockRejectedValue(new Error('error'))
-    })
-
-    afterEach(() => {
-      // @ts-expect-error
-      doFetchApi.mockClear()
+      apiCallCount = 0
+      server.use(
+        http.get('/courses/:courseId/assignments/:assignmentId/submissions', () => {
+          apiCallCount++
+          return HttpResponse.error()
+        }),
+      )
     })
 
     it('renders error text', async () => {
       const {getByTestId} = setUp()
-      await waitFor(() => expect(doFetchApi).toHaveBeenCalledTimes(1))
+      await waitFor(() => expect(apiCallCount).toBe(1))
       expect(getByTestId('progress-text').textContent).toBe('Failed to gather and compress files.')
     })
 
     it('does not enable the download button', async () => {
       const {getByTestId} = setUp()
-      await waitFor(() => expect(doFetchApi).toHaveBeenCalledTimes(1))
+      await waitFor(() => expect(apiCallCount).toBe(1))
       const button = getByTestId('download_button')
       expect(button).toHaveAttribute('disabled')
     })

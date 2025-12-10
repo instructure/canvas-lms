@@ -18,12 +18,11 @@
 
 import React from 'react'
 import {act, render} from '@testing-library/react'
-import type doFetchApi from '@canvas/do-fetch-api-effect'
 import ContextModulesPublishModal from '../ContextModulesPublishModal'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
-
-const mockDoFetchApi = jest.fn() as jest.MockedFunction<typeof doFetchApi>
+const server = setupServer()
 
 const defaultProps = {
   isOpen: true,
@@ -43,20 +42,22 @@ const defaultProps = {
 }
 
 beforeAll(() => {
-  mockDoFetchApi.mockResolvedValue({
-    response: new Response('', {status: 200}),
-    json: {completed: []},
-    text: '',
-  })
+  server.listen()
 })
 
 beforeEach(() => {
-  mockDoFetchApi.mockClear()
+  // Default handler for progress API
+  server.use(
+    http.get('/api/v1/progress/:progressId', () => HttpResponse.json({completed: []})),
+  )
 })
 
 afterEach(() => {
+  server.resetHandlers()
   jest.clearAllMocks()
 })
+
+afterAll(() => server.close())
 
 describe('ContextModulesPublishModal', () => {
   it('renders the title and warning text', () => {

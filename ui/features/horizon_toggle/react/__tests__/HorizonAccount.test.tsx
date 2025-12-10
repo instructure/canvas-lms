@@ -17,12 +17,20 @@
  */
 
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {HorizonAccount} from '../HorizonAccount'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
+
 jest.mock('@canvas/util/globalUtils', () => ({
   reloadWindow: jest.fn(),
+}))
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  ...jest.requireActual('@canvas/alerts/react/FlashAlert'),
+  showFlashError: jest.fn(),
 }))
 
 describe('HorizonAccount', () => {
@@ -35,6 +43,10 @@ describe('HorizonAccount', () => {
     }
     return render(<HorizonAccount {...props} />)
   }
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => server.resetHandlers())
 
   it('renders the component', () => {
     setup()
@@ -61,34 +73,42 @@ describe('HorizonAccount', () => {
     expect(checkbox).toBeDisabled()
   })
 
-  it('makes an API call when the button is clicked', () => {
-    ;(doFetchApi as jest.Mock).mockResolvedValue({
-      response: {status: 200},
-    })
+  it('makes an API call when the button is clicked', async () => {
+    let capturedBody: any = null
+    server.use(
+      http.put('/api/v1/accounts/123', async ({request}) => {
+        capturedBody = await request.json()
+        return HttpResponse.json({})
+      }),
+    )
+
     setup()
     const checkbox = screen.getByLabelText(/I acknowledge that switching to Canvas Career/)
     fireEvent.click(checkbox)
     const button = screen.getByText('Switch to Canvas Career')
     fireEvent.click(button)
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/accounts/123',
-      method: 'PUT',
-      body: {
+
+    await waitFor(() => {
+      expect(capturedBody).toEqual({
         id: '123',
         account: {settings: {horizon_account: {value: true}}},
-      },
+      })
     })
   })
 
-  it('shows an error message when API call fails', () => {
-    ;(doFetchApi as jest.Mock).mockRejectedValue(new Error('Failed to switch to Canvas Career'))
+  it('shows an error message when API call fails', async () => {
+    server.use(http.put('/api/v1/accounts/123', () => HttpResponse.error()))
+
     setup()
     const checkbox = screen.getByLabelText(/I acknowledge that switching to Canvas Career/)
     fireEvent.click(checkbox)
     const button = screen.getByText('Switch to Canvas Career')
     fireEvent.click(button)
-    waitFor(() => {
-      expect(screen.getByText('Failed to switch to Canvas Career')).toBeInTheDocument()
+
+    await waitFor(() => {
+      expect(showFlashError).toHaveBeenCalledWith(
+        'Failed to switch to Canvas Career. Please try again.',
+      )
     })
   })
 })

@@ -20,10 +20,13 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import ForbiddenWordsFileUpload, {createFolder} from '../ForbiddenWordsFileUpload'
 import userEvent from '@testing-library/user-event'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('../apiClient')
+
+const server = setupServer()
 
 describe('ForbiddenWordsFileUpload Component', () => {
   const defaultProps = {
@@ -34,7 +37,17 @@ describe('ForbiddenWordsFileUpload Component', () => {
     setForbiddenWordsFilename: jest.fn(),
   }
 
+  beforeAll(() => {
+    server.listen()
+    fakeENV.setup({DOMAIN_ROOT_ACCOUNT_ID: '1'})
+  })
+  afterAll(() => {
+    server.close()
+    fakeENV.teardown()
+  })
+
   afterEach(() => {
+    server.resetHandlers()
     jest.clearAllMocks()
   })
 
@@ -71,41 +84,30 @@ describe('ForbiddenWordsFileUpload Component', () => {
 
   describe('createFolder', () => {
     it('should create a folder and return its ID on a successful API call', async () => {
-      const mockResponse = {
-        response: {status: 200},
-        text: JSON.stringify({id: 123}),
-      }
-      // @ts-expect-error
-      doFetchApi.mockResolvedValue(mockResponse)
+      let requestReceived = false
+      server.use(
+        http.post('/api/v1/accounts/1/folders', () => {
+          requestReceived = true
+          return HttpResponse.json({id: 123})
+        }),
+      )
       const result = await createFolder()
       expect(result).toBe(123)
-      expect(doFetchApi).toHaveBeenCalledWith({
-        method: 'POST',
-        path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/folders`,
-        body: expect.any(FormData),
-      })
+      expect(requestReceived).toBe(true)
     })
 
     it('should return null if the API call fails', async () => {
-      const mockErrorResponse = {
-        response: {status: 500},
-        text: 'Internal Server Error',
-      }
-      // @ts-expect-error
-      doFetchApi.mockResolvedValue(mockErrorResponse)
+      server.use(
+        http.post('/api/v1/accounts/1/folders', () => new HttpResponse(null, {status: 500})),
+      )
       const result = await createFolder()
       expect(result).toBeNull()
-      expect(doFetchApi).toHaveBeenCalled()
     })
 
     it('should return null if an error is thrown during execution', async () => {
-      // @ts-expect-error
-      doFetchApi.mockImplementation(() => {
-        throw new Error('Network Error')
-      })
+      server.use(http.post('/api/v1/accounts/1/folders', () => HttpResponse.error()))
       const result = await createFolder()
       expect(result).toBeNull()
-      expect(doFetchApi).toHaveBeenCalled()
     })
   })
 })

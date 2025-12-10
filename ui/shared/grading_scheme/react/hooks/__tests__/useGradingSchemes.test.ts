@@ -17,26 +17,22 @@
  */
 
 import {useGradingSchemes} from '../useGradingSchemes'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ApiCallStatus} from '../ApiCallStatus'
 
 import {renderHook} from '@testing-library/react-hooks/dom'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const courseId = '11'
 const accountId = '42'
 
-jest.mock('@canvas/do-fetch-api-effect')
-beforeEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
-})
-
-afterEach(() => {
-  // @ts-expect-error
-  doFetchApi.mockClear()
-})
+const server = setupServer()
 
 describe('useGradingSchemesHook', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   it('renders for course context without error', () => {
     const {result} = renderHook(() => useGradingSchemes())
     expect(result.error).toBeFalsy()
@@ -48,7 +44,6 @@ describe('useGradingSchemesHook', () => {
   })
 
   it('makes a GET request for course context to load grading schemes', async () => {
-    const {result} = renderHook(() => useGradingSchemes())
     const data1 = [
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
@@ -57,23 +52,23 @@ describe('useGradingSchemesHook', () => {
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
     ]
+    let capturedUrl = ''
 
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({
-      response: {ok: true},
-      json: [
-        {title: 'Scheme 1', data: data1, id: 'id-1'},
-        {title: 'Scheme 2', data: data2, id: 'id-2'},
-      ],
-    })
+    server.use(
+      http.get(`/courses/${courseId}/grading_schemes`, ({request}) => {
+        capturedUrl = request.url
+        return HttpResponse.json([
+          {title: 'Scheme 1', data: data1, id: 'id-1'},
+          {title: 'Scheme 2', data: data2, id: 'id-2'},
+        ])
+      }),
+    )
+
+    const {result} = renderHook(() => useGradingSchemes())
     const loadedGradingSchemes = await result.current.loadGradingSchemes('Course', courseId)
-    // @ts-expect-error
-    const lastCall = doFetchApi.mock.calls.pop()
-    expect(lastCall[0]).toMatchObject({
-      path: `/courses/${courseId}/grading_schemes?include_archived=false`,
-      method: 'GET',
-    })
 
+    expect(capturedUrl).toContain(`/courses/${courseId}/grading_schemes`)
+    expect(capturedUrl).toContain('include_archived=false')
     expect(loadedGradingSchemes).toEqual([
       {title: 'Scheme 1', data: data1, id: 'id-1'},
       {title: 'Scheme 2', data: data2, id: 'id-2'},
@@ -82,7 +77,6 @@ describe('useGradingSchemesHook', () => {
   })
 
   it('makes a GET request for account context to load grading schemes', async () => {
-    const {result} = renderHook(() => useGradingSchemes())
     const data1 = [
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
@@ -91,28 +85,27 @@ describe('useGradingSchemesHook', () => {
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
     ]
+    let capturedUrl = ''
 
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({
-      response: {ok: true},
-      json: [
-        {title: 'Scheme 1', data: data1},
-        {title: 'Scheme 2', data: data2},
-      ],
-    })
+    server.use(
+      http.get(`/accounts/${accountId}/grading_schemes`, ({request}) => {
+        capturedUrl = request.url
+        return HttpResponse.json([
+          {title: 'Scheme 1', data: data1},
+          {title: 'Scheme 2', data: data2},
+        ])
+      }),
+    )
+
+    const {result} = renderHook(() => useGradingSchemes())
     const loadedGradingSchemes = await result.current.loadGradingSchemes('Account', accountId)
-    // @ts-expect-error
-    const lastCall = doFetchApi.mock.calls.pop()
-    expect(lastCall[0]).toMatchObject({
-      path: `/accounts/${accountId}/grading_schemes?include_archived=false`,
-      method: 'GET',
-    })
 
+    expect(capturedUrl).toContain(`/accounts/${accountId}/grading_schemes`)
+    expect(capturedUrl).toContain('include_archived=false')
     expect(loadedGradingSchemes).toEqual([
       {title: 'Scheme 1', data: data1},
       {title: 'Scheme 2', data: data2},
     ])
-
     expect(result.current.loadGradingSchemesStatus).toEqual(ApiCallStatus.COMPLETED)
   })
 })

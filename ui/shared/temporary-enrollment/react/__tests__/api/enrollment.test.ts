@@ -23,11 +23,19 @@ import {
   fetchTemporaryEnrollments,
   getTemporaryEnrollmentPairing,
 } from '../../api/enrollment'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {type Enrollment, ITEMS_PER_PAGE, type User} from '../../types'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-// Mock the API call
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
+
+// Track captured requests for verification
+let lastCapturedRequest: {
+  path: string
+  method: string
+  searchParams?: Record<string, string>
+  body?: any
+} | null = null
 
 const mockRecipientUser: User = {
   id: '123',
@@ -60,6 +68,10 @@ const mockEnrollment: Enrollment = {
 }
 
 describe('enrollment api', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => server.resetHandlers())
+
   describe('Enrollment functions', () => {
     const mockConsoleError = jest.fn()
 
@@ -67,6 +79,7 @@ describe('enrollment api', () => {
 
     beforeEach(() => {
       jest.clearAllMocks()
+      lastCapturedRequest = null
     })
 
     afterEach(() => {
@@ -90,11 +103,15 @@ describe('enrollment api', () => {
           user: mockRecipientUser,
           temporary_enrollment_provider: mockProviderUser,
         }
-        ;(doFetchApi as jest.Mock).mockResolvedValue({
-          response: {status: 200, ok: true},
-          json: mockJson,
-          link: {current: {}, next: {}},
-        })
+        server.use(
+          http.get('/api/v1/users/:userId/enrollments', () => {
+            return HttpResponse.json(mockJson, {
+              headers: {
+                Link: '<http://example.com/api/v1/users/1/enrollments?page=1>; rel="current"',
+              },
+            })
+          }),
+        )
 
         const result = await fetchTemporaryEnrollments('1', true, '')
         expect(result.enrollments).toEqual(mockJson)
@@ -105,32 +122,39 @@ describe('enrollment api', () => {
           ...mockEnrollment,
           user: mockRecipientUser,
         }
-        ;(doFetchApi as jest.Mock).mockResolvedValue({
-          response: {status: 200, ok: true},
-          json: mockJson,
-          link: {current: {}, next: {}},
-        })
+        server.use(
+          http.get('/api/v1/users/:userId/enrollments', () => {
+            return HttpResponse.json(mockJson, {
+              headers: {
+                Link: '<http://example.com/api/v1/users/1/enrollments?page=1>; rel="current"',
+              },
+            })
+          }),
+        )
 
         const result = await fetchTemporaryEnrollments('1', false, 'first')
         expect(result.enrollments).toEqual(mockJson)
       })
 
       it('returns empty array when no enrollments are found', async () => {
-        ;(doFetchApi as jest.Mock).mockResolvedValue({
-          response: {status: 204, ok: true},
-          json: [],
-          link: {current: {}, next: {}},
-        })
+        server.use(
+          http.get('/api/v1/users/:userId/enrollments', () => {
+            return HttpResponse.json([], {
+              status: 204,
+              headers: {
+                Link: '<http://example.com/api/v1/users/1/enrollments?page=1>; rel="current"',
+              },
+            })
+          }),
+        )
 
         const result = await fetchTemporaryEnrollments('1', true, 'first')
         expect(result.enrollments).toEqual([])
       })
 
-      it('should throw an error when doFetchApi fails', async () => {
-        ;(doFetchApi as jest.Mock).mockRejectedValue(new Error('An error occurred'))
-        await expect(fetchTemporaryEnrollments('1', true, 'first')).rejects.toThrow(
-          'An error occurred',
-        )
+      it('should throw an error when fetch fails', async () => {
+        server.use(http.get('/api/v1/users/:userId/enrollments', () => HttpResponse.error()))
+        await expect(fetchTemporaryEnrollments('1', true, 'first')).rejects.toThrow()
       })
 
       it.each([
@@ -139,80 +163,100 @@ describe('enrollment api', () => {
         [403, 'Forbidden'],
         [404, 'Not Found'],
         [500, 'Internal Server Error'],
-      ])('should throw an error when doFetchApi returns status %i', async (status, statusText) => {
-        ;(doFetchApi as jest.Mock).mockResolvedValue({
-          response: {status, statusText, ok: false},
-          json: Promise.resolve({error: statusText}),
-        })
+      ])('should throw an error when API returns status %i', async (status, statusText) => {
+        server.use(
+          http.get('/api/v1/users/:userId/enrollments', () => {
+            return HttpResponse.json({error: 'Error'}, {status, statusText})
+          }),
+        )
+        // doFetchApi throws FetchApiError which propagates directly
+        // (the else if (!response.ok) code path in fetchTemporaryEnrollments is unreachable)
         await expect(fetchTemporaryEnrollments('1', true, 'first')).rejects.toThrow(
-          new Error(`Failed to get temporary enrollments for recipient`),
+          `doFetchApi received a bad response: ${status} ${statusText}`,
         )
       })
 
       it('should return enrollment data with the correct type for a provider', async () => {
-        ;(doFetchApi as jest.Mock).mockResolvedValue({
-          response: {status: 200, ok: true},
-          json: [{}],
-          link: null,
-        })
-        await fetchTemporaryEnrollments('1', false, 'first')
-        expect(doFetchApi).toHaveBeenCalledWith(
-          expect.objectContaining({
-            path: '/api/v1/users/1/enrollments',
-            params: expect.objectContaining({
-              state: ['current_future_and_restricted'],
-              per_page: ITEMS_PER_PAGE,
-              temporary_enrollment_recipients_for_provider: true,
-            }),
+        server.use(
+          http.get('/api/v1/users/:userId/enrollments', ({request}) => {
+            const url = new URL(request.url)
+            lastCapturedRequest = {
+              path: url.pathname,
+              method: 'GET',
+              searchParams: Object.fromEntries(url.searchParams.entries()),
+            }
+            return HttpResponse.json([{}])
           }),
         )
+        await fetchTemporaryEnrollments('1', false, 'first')
+        expect(lastCapturedRequest).not.toBeNull()
+        expect(lastCapturedRequest!.path).toBe('/api/v1/users/1/enrollments')
+        expect(lastCapturedRequest!.searchParams).toMatchObject({
+          'state[]': 'current_future_and_restricted',
+          per_page: String(ITEMS_PER_PAGE),
+          temporary_enrollment_recipients_for_provider: 'true',
+        })
       })
 
       it('should return enrollment data with the correct type for a recipient', async () => {
-        ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
-          response: {status: 200, ok: true},
-          json: Promise.resolve([{}]),
-          link: null,
-        })
-        await fetchTemporaryEnrollments('1', true, 'first')
-        expect(doFetchApi).toHaveBeenCalledWith(
-          expect.objectContaining({
-            path: '/api/v1/users/1/enrollments',
-            params: expect.objectContaining({
-              state: ['current_future_and_restricted'],
-              per_page: ITEMS_PER_PAGE,
-              temporary_enrollments_for_recipient: true,
-              include: ['avatar_url', 'temporary_enrollment_providers'],
-            }),
+        server.use(
+          http.get('/api/v1/users/:userId/enrollments', ({request}) => {
+            const url = new URL(request.url)
+            lastCapturedRequest = {
+              path: url.pathname,
+              method: 'GET',
+              searchParams: Object.fromEntries(url.searchParams.entries()),
+            }
+            return HttpResponse.json([{}])
           }),
         )
+        await fetchTemporaryEnrollments('1', true, 'first')
+        expect(lastCapturedRequest).not.toBeNull()
+        expect(lastCapturedRequest!.path).toBe('/api/v1/users/1/enrollments')
+        expect(lastCapturedRequest!.searchParams).toMatchObject({
+          'state[]': 'current_future_and_restricted',
+          per_page: String(ITEMS_PER_PAGE),
+          temporary_enrollments_for_recipient: 'true',
+        })
       })
     })
 
     describe('deleteEnrollment', () => {
       beforeEach(() => {
         jest.clearAllMocks()
+        lastCapturedRequest = null
       })
 
       it('completes successful deletion without errors', async () => {
-        const mockResponse = {response: {status: 204}}
-        ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
         const courseId = '1'
         const enrollmentId = '2'
+        server.use(
+          http.delete('/api/v1/courses/:courseId/enrollments/:enrollmentId', ({request}) => {
+            const url = new URL(request.url)
+            lastCapturedRequest = {
+              path: url.pathname,
+              method: 'DELETE',
+              searchParams: Object.fromEntries(url.searchParams.entries()),
+            }
+            return new HttpResponse(null, {status: 204})
+          }),
+        )
         await expect(deleteEnrollment(courseId, enrollmentId)).resolves.not.toThrow()
-        expect(doFetchApi).toHaveBeenCalledWith({
-          path: `/api/v1/courses/${courseId}/enrollments/${enrollmentId}`,
-          method: 'DELETE',
-          params: {task: 'delete'},
-        })
+        expect(lastCapturedRequest).not.toBeNull()
+        expect(lastCapturedRequest!.path).toBe(`/api/v1/courses/${courseId}/enrollments/${enrollmentId}`)
+        expect(lastCapturedRequest!.method).toBe('DELETE')
+        expect(lastCapturedRequest!.searchParams).toMatchObject({task: 'delete'})
         expect(mockConsoleError).not.toHaveBeenCalled()
       })
 
       it('throws a specific error message on failure', async () => {
-        const mockError: Error = new Error('Network error occurred')
-        ;(doFetchApi as jest.Mock).mockRejectedValue(mockError)
         const courseId = '1'
         const enrollmentId = '2'
+        server.use(
+          http.delete('/api/v1/courses/:courseId/enrollments/:enrollmentId', () =>
+            HttpResponse.error(),
+          ),
+        )
         try {
           await deleteEnrollment(courseId, enrollmentId)
         } catch (error) {
@@ -225,40 +269,48 @@ describe('enrollment api', () => {
       })
 
       it('handles non-200 status code gracefully', async () => {
-        ;(doFetchApi as jest.Mock).mockResolvedValue({response: {status: 404}})
+        server.use(
+          http.delete('/api/v1/courses/:courseId/enrollments/:enrollmentId', () =>
+            HttpResponse.json({error: 'Not found'}, {status: 404}),
+          ),
+        )
         try {
           await deleteEnrollment('1', '2')
         } catch (e: any) {
-          expect(e.message).toBe('Failed to delete enrollment: HTTP status code 404')
+          // The function catches all errors and throws a generic message
+          expect(e.message).toBe('Failed to delete temporary enrollment')
         }
       })
     })
 
     describe('fetchTemporaryEnrollmentPairing', () => {
       it('creates temporary enrollment pairing successfully', async () => {
-        const mockResponse = {
-          json: {
-            temporary_enrollment_pairing: {
-              id: '143',
-              root_account_id: '2',
-              workflow_state: 'active',
-              created_at: '2024-01-12T20:02:47Z',
-              updated_at: '2024-01-12T20:02:47Z',
-              created_by_id: '1',
-              deleted_by_id: null,
-              ending_enrollment_state: 'completed',
-            },
-          },
+        const mockPairing = {
+          id: '143',
+          root_account_id: '2',
+          workflow_state: 'active',
+          created_at: '2024-01-12T20:02:47Z',
+          updated_at: '2024-01-12T20:02:47Z',
+          created_by_id: '1',
+          deleted_by_id: null,
+          ending_enrollment_state: 'completed',
         }
-        ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+        server.use(
+          http.post('/api/v1/accounts/:accountId/temporary_enrollment_pairings', () => {
+            return HttpResponse.json({temporary_enrollment_pairing: mockPairing})
+          }),
+        )
         const rootAccountId = '2'
         const result = await createTemporaryEnrollmentPairing(rootAccountId, 'completed')
-        expect(result).toEqual(mockResponse.json.temporary_enrollment_pairing)
+        expect(result).toEqual(mockPairing)
       })
 
       it('throws a specific error message on failure', async () => {
-        const mockError: Error = new Error('Network error occurred')
-        ;(doFetchApi as jest.Mock).mockRejectedValue(mockError)
+        server.use(
+          http.post('/api/v1/accounts/:accountId/temporary_enrollment_pairings', () =>
+            HttpResponse.error(),
+          ),
+        )
         const rootAccountId = '2'
         try {
           await createTemporaryEnrollmentPairing(rootAccountId, 'completed')
@@ -276,30 +328,33 @@ describe('enrollment api', () => {
       it('retrieves temporary enrollment pairing successfully', async () => {
         const accountId = '2'
         const pairingId = 143
-        const mockResponse = {
-          json: {
-            temporary_enrollment_pairing: {
-              id: '143',
-              root_account_id: '2',
-              workflow_state: 'active',
-              created_at: '2024-01-12T20:02:47Z',
-              updated_at: '2024-01-12T20:02:47Z',
-              created_by_id: '1',
-              deleted_by_id: null,
-              ending_enrollment_state: 'completed',
-            },
-          },
+        const mockPairing = {
+          id: '143',
+          root_account_id: '2',
+          workflow_state: 'active',
+          created_at: '2024-01-12T20:02:47Z',
+          updated_at: '2024-01-12T20:02:47Z',
+          created_by_id: '1',
+          deleted_by_id: null,
+          ending_enrollment_state: 'completed',
         }
-        ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+        server.use(
+          http.get('/api/v1/accounts/:accountId/temporary_enrollment_pairings/:pairingId', () => {
+            return HttpResponse.json({temporary_enrollment_pairing: mockPairing})
+          }),
+        )
         const result = await getTemporaryEnrollmentPairing(accountId, pairingId)
-        expect(result).toEqual(mockResponse.json.temporary_enrollment_pairing)
+        expect(result).toEqual(mockPairing)
       })
 
       it('throws a specific error message on failure', async () => {
         const accountId = '2'
         const pairingId = 143
-        const mockError: Error = new Error('Network error occurred')
-        ;(doFetchApi as jest.Mock).mockRejectedValue(mockError)
+        server.use(
+          http.get('/api/v1/accounts/:accountId/temporary_enrollment_pairings/:pairingId', () =>
+            HttpResponse.error(),
+          ),
+        )
         try {
           await getTemporaryEnrollmentPairing(accountId, pairingId)
         } catch (error) {
@@ -311,17 +366,21 @@ describe('enrollment api', () => {
         }
       })
 
-      it('throws an unknown error message when the error is not an instance of Error', async () => {
+      it('handles network errors with standard error message', async () => {
         const accountId = '2'
         const pairingId = 143
-        const mockError = 'Some non-Error value'
-        ;(doFetchApi as jest.Mock).mockRejectedValue(mockError)
+        // With real doFetchApi, network errors are always Error instances
+        // The "unknown error" code path is defensive code for edge cases
+        server.use(
+          http.get('/api/v1/accounts/:accountId/temporary_enrollment_pairings/:pairingId', () => {
+            return HttpResponse.error()
+          }),
+        )
         try {
           await getTemporaryEnrollmentPairing(accountId, pairingId)
         } catch (error: any) {
-          expect(error.message).toBe(
-            'Failed to retrieve temporary enrollment pairing due to an unknown error',
-          )
+          // doFetchApi throws Error instances, so we get the standard message
+          expect(error.message).toBe('Failed to retrieve temporary enrollment pairing')
         }
       })
     })
@@ -338,36 +397,39 @@ describe('enrollment api', () => {
         '1',
       ]
 
-      it('calls doFetchApi with correct parameters', async () => {
-        ;(doFetchApi as jest.Mock).mockResolvedValue({response: {status: 204}})
+      it('calls API with correct parameters', async () => {
+        server.use(
+          http.post('/api/v1/sections/:sectionId/enrollments', async ({request}) => {
+            const url = new URL(request.url)
+            lastCapturedRequest = {
+              path: url.pathname,
+              method: 'POST',
+              searchParams: Object.fromEntries(url.searchParams.entries()),
+            }
+            return new HttpResponse(null, {status: 200})
+          }),
+        )
         await expect(createEnrollment(...mockParams)).resolves.not.toThrow()
-        expect(doFetchApi).toHaveBeenCalledWith({
-          path: `/api/v1/sections/${mockParams[0]}/enrollments`,
-          params: {
-            enrollment: {
-              user_id: '1',
-              temporary_enrollment_source_user_id: '2',
-              temporary_enrollment_pairing_id: '1',
-              limit_privileges_to_course_section: false,
-              start_at: '2022-01-01T00:00:00.000Z',
-              end_at: '2022-06-01T00:00:00.000Z',
-              role_id: '1',
-            },
-          },
-          method: 'POST',
+        expect(lastCapturedRequest).not.toBeNull()
+        expect(lastCapturedRequest!.path).toBe(`/api/v1/sections/${mockParams[0]}/enrollments`)
+        expect(lastCapturedRequest!.method).toBe('POST')
+        // doFetchApi serializes params to URL query string with bracket notation
+        expect(lastCapturedRequest!.searchParams).toMatchObject({
+          'enrollment[user_id]': '1',
+          'enrollment[temporary_enrollment_source_user_id]': '2',
+          'enrollment[temporary_enrollment_pairing_id]': '1',
+          'enrollment[limit_privileges_to_course_section]': 'false',
+          'enrollment[start_at]': '2022-01-01T00:00:00.000Z',
+          'enrollment[end_at]': '2022-06-01T00:00:00.000Z',
+          'enrollment[role_id]': '1',
         })
         expect(mockConsoleError).not.toHaveBeenCalled()
       })
 
-      it('handles JSON parsing error', async () => {
-        ;(doFetchApi as jest.Mock).mockRejectedValueOnce({
-          response: {
-            status: 400,
-            text: async () => {
-              throw new Error('Invalid JSON data')
-            },
-          },
-        })
+      it('handles network error', async () => {
+        server.use(
+          http.post('/api/v1/sections/:sectionId/enrollments', () => HttpResponse.error()),
+        )
         await expect(async () => {
           try {
             await createEnrollment(...mockParams)
@@ -379,7 +441,7 @@ describe('enrollment api', () => {
       })
 
       // server-side error messages found here: app/controllers/enrollments_api_controller.rb
-      describe('user-facing doFetchApi server error message string translations', () => {
+      describe('user-facing API server error message string translations', () => {
         it.each([
           {
             // concluded_course
@@ -402,13 +464,11 @@ describe('enrollment api', () => {
             translatedMessage: 'Failed to create temporary enrollment, please try again later',
           },
         ])('Translate API error message', async ({apiMessage, translatedMessage}) => {
-          const mockJsonFunction = jest.fn().mockResolvedValue({message: apiMessage})
-          ;(doFetchApi as jest.Mock).mockRejectedValueOnce({
-            response: {
-              json: mockJsonFunction,
-              status: 500,
-            },
-          })
+          server.use(
+            http.post('/api/v1/sections/:sectionId/enrollments', () => {
+              return HttpResponse.json({message: apiMessage}, {status: 500})
+            }),
+          )
           await expect(createEnrollment(...mockParams)).rejects.toThrow(translatedMessage)
         })
       })

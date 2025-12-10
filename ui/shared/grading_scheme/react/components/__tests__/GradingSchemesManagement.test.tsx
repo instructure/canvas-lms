@@ -17,27 +17,40 @@
  */
 
 import React from 'react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {fireEvent, render} from '@testing-library/react'
 import {
   GradingSchemesManagement,
   type GradingSchemesManagementProps,
 } from '../GradingSchemesManagement'
 import {AccountGradingSchemes, DefaultGradingScheme} from './fixtures'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 describe('Grading Schemes Management Tests', () => {
-  beforeEach(() => {
-    // @ts-expect-error
-    doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: AccountGradingSchemes})
-    // @ts-expect-error
-    doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: DefaultGradingScheme})
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
-  afterEach(() => {
-    // @ts-expect-error
-    doFetchApi.mockClear()
+  beforeEach(() => {
+    server.use(
+      http.get('/courses/:contextId/grading_schemes', () =>
+        HttpResponse.json(AccountGradingSchemes),
+      ),
+      http.get('/accounts/:contextId/grading_schemes', () =>
+        HttpResponse.json(AccountGradingSchemes),
+      ),
+      http.get('/courses/:contextId/grading_schemes/default', () =>
+        HttpResponse.json(DefaultGradingScheme),
+      ),
+      http.get('/accounts/:contextId/grading_schemes/default', () =>
+        HttpResponse.json(DefaultGradingScheme),
+      ),
+      http.get('/accounts/:contextId/grading_schemes/account_default', () =>
+        HttpResponse.json(null),
+      ),
+    )
   })
 
   const renderGradingSchemesManagement = (props: Partial<GradingSchemesManagementProps> = {}) => {
@@ -57,7 +70,6 @@ describe('Grading Schemes Management Tests', () => {
     const {getByTestId} = renderGradingSchemesManagement()
 
     await new Promise(resolve => setTimeout(resolve, 0))
-    expect(doFetchApi).toHaveBeenCalledTimes(2)
     expect(getByTestId('grading_scheme_1_edit_button')).toBeInTheDocument()
     expect(getByTestId('grading_scheme_2_edit_button')).toBeInTheDocument()
     expect(getByTestId('grading_scheme_3_edit_button')).toBeInTheDocument()

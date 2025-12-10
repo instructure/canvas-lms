@@ -17,117 +17,123 @@
  */
 
 import {waitFor} from '@testing-library/dom'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {monitorProgress, cancelProgressAction} from '../ProgressHelpers'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
-const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+const server = setupServer()
 
 describe('ProgressHelpers', () => {
+  // Track API calls
+  let apiCallCount = 0
+  let lastCapturedRequest: {path: string; method: string; body?: any} | null = null
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup()
-    mockDoFetchApi.mockResolvedValue({
-      response: new Response('', {status: 200}),
-      json: {published: true},
-      text: '',
-    })
+    apiCallCount = 0
+    lastCapturedRequest = null
+    // Default handler
+    server.use(
+      http.get('/api/v1/progress/:progressId', () => {
+        apiCallCount++
+        return HttpResponse.json({published: true})
+      }),
+      http.post('/api/v1/progress/:progressId/cancel', async ({request}) => {
+        apiCallCount++
+        lastCapturedRequest = {
+          path: new URL(request.url).pathname,
+          method: 'POST',
+          body: await request.json(),
+        }
+        return HttpResponse.json({published: true})
+      }),
+    )
   })
 
   afterEach(() => {
+    server.resetHandlers()
     jest.clearAllMocks()
-    mockDoFetchApi.mockReset()
     fakeENV.teardown()
   })
 
   describe('monitorProgress', () => {
-    beforeAll(() => {
+    beforeEach(() => {
       jest.useFakeTimers()
     })
 
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
     it('polls for progress until completed', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        json: {
-          id: '3533',
-          workflow_state: 'queued',
-          url: '/api/v1/progress/3533',
-        },
-        text: '',
-      })
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        json: {
-          id: '3533',
-          workflow_state: 'running',
-          url: '/api/v1/progress/3533',
-        },
-        text: '',
-      })
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        json: {
-          id: '3533',
-          workflow_state: 'completed',
-          url: '/api/v1/progress/3533',
-        },
-        text: '',
-      })
+      // Create a sequence of responses based on call count
+      let callIndex = 0
+      const responses = [
+        {id: '3533', workflow_state: 'queued', url: '/api/v1/progress/3533'},
+        {id: '3533', workflow_state: 'running', url: '/api/v1/progress/3533'},
+        {id: '3533', workflow_state: 'completed', url: '/api/v1/progress/3533'},
+      ]
+
+      server.use(
+        http.get('/api/v1/progress/:progressId', () => {
+          apiCallCount++
+          const response = responses[callIndex] || responses[responses.length - 1]
+          callIndex++
+          return HttpResponse.json(response)
+        }),
+      )
 
       const setCurrentProgress = jest.fn()
       monitorProgress('3533', setCurrentProgress, () => {})
+      // Allow the promise to resolve - use type assertion for advanceTimersByTimeAsync
+      // which exists in Jest 29.5+ but types may not include it
+      await (jest as any).advanceTimersByTimeAsync(100)
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(1))
-      expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
-      expect(mockDoFetchApi).toHaveBeenNthCalledWith(1, {path: '/api/v1/progress/3533'})
-      jest.runOnlyPendingTimers()
+      expect(apiCallCount).toBe(1)
+      await (jest as any).advanceTimersByTimeAsync(1000)
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(2))
-      expect(mockDoFetchApi).toHaveBeenCalledTimes(2)
-      expect(mockDoFetchApi).toHaveBeenNthCalledWith(2, {path: '/api/v1/progress/3533'})
-      jest.runOnlyPendingTimers()
+      expect(apiCallCount).toBe(2)
+      await (jest as any).advanceTimersByTimeAsync(1000)
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(3))
-      expect(mockDoFetchApi).toHaveBeenCalledTimes(3)
-      expect(mockDoFetchApi).toHaveBeenNthCalledWith(3, {path: '/api/v1/progress/3533'})
-      jest.runOnlyPendingTimers()
+      expect(apiCallCount).toBe(3)
     })
 
     it('polls for progress until failed', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        json: {
-          id: '3533',
-          workflow_state: 'queued',
-          url: '/api/v1/progress/3533',
-        },
-        text: '',
-      })
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        json: {
-          id: '3533',
-          workflow_state: 'failed',
-          url: '/api/v1/progress/3533',
-        },
-        text: '',
-      })
+      let callIndex = 0
+      const responses = [
+        {id: '3533', workflow_state: 'queued', url: '/api/v1/progress/3533'},
+        {id: '3533', workflow_state: 'failed', url: '/api/v1/progress/3533'},
+      ]
+
+      server.use(
+        http.get('/api/v1/progress/:progressId', () => {
+          apiCallCount++
+          const response = responses[callIndex] || responses[responses.length - 1]
+          callIndex++
+          return HttpResponse.json(response)
+        }),
+      )
 
       const setCurrentProgress = jest.fn()
       monitorProgress('3533', setCurrentProgress, () => {})
+      await (jest as any).advanceTimersByTimeAsync(100)
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(1))
-      expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
-      expect(mockDoFetchApi).toHaveBeenNthCalledWith(1, {path: '/api/v1/progress/3533'})
-      jest.runOnlyPendingTimers()
+      expect(apiCallCount).toBe(1)
+      await (jest as any).advanceTimersByTimeAsync(1000)
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(2))
-      expect(mockDoFetchApi).toHaveBeenCalledTimes(2)
-      expect(mockDoFetchApi).toHaveBeenNthCalledWith(2, {path: '/api/v1/progress/3533'})
-      jest.runOnlyPendingTimers()
+      expect(apiCallCount).toBe(2)
     })
 
     it('calls onProgressFail on a catestrophic failure', async () => {
-      const err = new Error('whoops')
-      mockDoFetchApi.mockRejectedValueOnce(err)
+      server.use(http.get('/api/v1/progress/:progressId', () => HttpResponse.error()))
       const onProgressFail = jest.fn()
       monitorProgress('3533', () => {}, onProgressFail)
-      await waitFor(() => expect(onProgressFail).toHaveBeenCalledWith(err))
+      await (jest as any).advanceTimersByTimeAsync(100)
+      await waitFor(() => expect(onProgressFail).toHaveBeenCalledWith(expect.any(Error)))
     })
   })
 
@@ -136,7 +142,7 @@ describe('ProgressHelpers', () => {
       const onCancelComplete = jest.fn()
       cancelProgressAction(undefined, onCancelComplete)
       expect(onCancelComplete).toHaveBeenCalledTimes(0)
-      expect(mockDoFetchApi).toHaveBeenCalledTimes(0)
+      expect(apiCallCount).toBe(0)
     })
 
     it('bails out if the progress has already completed', () => {
@@ -146,7 +152,7 @@ describe('ProgressHelpers', () => {
         onCancelComplete,
       )
       expect(onCancelComplete).toHaveBeenCalledTimes(0)
-      expect(mockDoFetchApi).toHaveBeenCalledTimes(0)
+      expect(apiCallCount).toBe(0)
     })
 
     it('bails out if the progress has already failed', () => {
@@ -156,7 +162,7 @@ describe('ProgressHelpers', () => {
         onCancelComplete,
       )
       expect(onCancelComplete).toHaveBeenCalledTimes(0)
-      expect(mockDoFetchApi).toHaveBeenCalledTimes(0)
+      expect(apiCallCount).toBe(0)
     })
 
     it('cancels the progress', async () => {
@@ -165,34 +171,26 @@ describe('ProgressHelpers', () => {
         {id: '17', workflow_state: 'running', message: 'canceled', completion: 25, results: {}},
         onCancelComplete,
       )
-      expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
-      expect(mockDoFetchApi).toHaveBeenCalledWith({
-        method: 'POST',
-        path: '/api/v1/progress/17/cancel',
-        body: {message: 'canceled'},
-      })
+      await waitFor(() => expect(apiCallCount).toBe(1))
+      expect(lastCapturedRequest).not.toBeNull()
+      expect(lastCapturedRequest!.path).toBe('/api/v1/progress/17/cancel')
+      expect(lastCapturedRequest!.method).toBe('POST')
+      expect(lastCapturedRequest!.body).toEqual({message: 'canceled'})
       await waitFor(() => expect(onCancelComplete).toHaveBeenCalled())
       expect(onCancelComplete).toHaveBeenCalledTimes(1)
       expect(onCancelComplete).toHaveBeenCalledWith()
     })
 
     it('calls onCancelComplete with the error on failure', async () => {
-      const mockError = new Error('API request failed')
-      mockDoFetchApi.mockRejectedValueOnce(mockError)
+      server.use(http.post('/api/v1/progress/:progressId/cancel', () => HttpResponse.error()))
       const onCancelComplete = jest.fn()
       cancelProgressAction(
         {id: '17', workflow_state: 'running', message: 'canceled', completion: 25, results: {}},
         onCancelComplete,
       )
-      expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
-      expect(mockDoFetchApi).toHaveBeenCalledWith({
-        method: 'POST',
-        path: '/api/v1/progress/17/cancel',
-        body: {message: 'canceled'},
-      })
       await waitFor(() => expect(onCancelComplete).toHaveBeenCalled())
       expect(onCancelComplete).toHaveBeenCalledTimes(1)
-      expect(onCancelComplete).toHaveBeenCalledWith(mockError)
+      expect(onCancelComplete).toHaveBeenCalledWith(expect.any(Error))
     })
   })
 })
