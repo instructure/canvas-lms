@@ -329,6 +329,10 @@ module AuthenticationMethods
       end
     end
 
+    if @current_pseudonym && Account.site_admin.feature_enabled?(:federated_pseudonym_attributes)
+      FederatedPseudonymAttributes.load_from(session)
+    end
+
     logger.info "[AUTH] final user: #{@current_user&.id}"
     if Sentry.initialized? && !Rails.env.test?
       Sentry.set_user({ id: @current_user&.global_id, ip_address: request.remote_ip }.compact)
