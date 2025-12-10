@@ -21,13 +21,22 @@ import {AUPLayout} from '../../layouts/AUPLayout'
 import {AUPRoutes} from '../AUPRoutes'
 import {MemoryRouter, Route, Routes} from 'react-router-dom'
 import {render, screen} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer(
+  http.get('/api/v1/acceptable_use_policy', () =>
+    HttpResponse.json({
+      id: 1,
+      content: 'Test acceptable use policy content',
+    }),
+  ),
+)
 
 describe('AUPRoutes', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => server.resetHandlers())
 
   it('mounts without crashing', () => {
     render(

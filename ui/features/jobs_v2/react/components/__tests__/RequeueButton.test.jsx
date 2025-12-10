@@ -19,33 +19,29 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import RequeueButton from '../RequeueButton'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer(
+  http.post('/api/v1/jobs2/:id/requeue', () => HttpResponse.json({id: 123})),
+)
 
 const flushPromises = () => new Promise(setTimeout)
-
-function mockRequeueApi({path}) {
-  if (path === '/api/v1/jobs2/1/requeue') {
-    return Promise.resolve({json: {id: 123}})
-  } else {
-    return Promise.reject()
-  }
-}
 
 describe('RequeueButton', () => {
   let oldEnv
   beforeAll(() => {
     oldEnv = {...window.ENV}
-    doFetchApi.mockImplementation(mockRequeueApi)
-  })
-
-  beforeEach(() => {
-    doFetchApi.mockClear()
+    server.listen()
   })
 
   afterAll(() => {
     window.ENV = oldEnv
+    server.close()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   it("doesn't render if the user lacks :manage_jobs", async () => {

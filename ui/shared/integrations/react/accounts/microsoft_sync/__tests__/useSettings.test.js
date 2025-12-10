@@ -19,9 +19,11 @@
 import {renderHook} from '@testing-library/react-hooks'
 import {defaultState} from '../lib/settingsReducer'
 import useSettings from '../lib/useSettings'
-import useFetchApi from '@canvas/use-fetch-api-hook'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/use-fetch-api-hook')
+const server = setupServer()
 
 const CONTEXT_BASE_URL = '/accounts/5'
 
@@ -30,43 +32,49 @@ const subject = () => {
 }
 
 describe('useGetSettings', () => {
-  let previousEnv
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    useFetchApi.mockClear()
-    previousEnv = ENV
+    fakeENV.setup()
   })
 
   afterEach(() => {
-    ENV = previousEnv
+    fakeENV.teardown()
+    server.resetHandlers()
   })
 
   it('renders without errors', () => {
+    fakeENV.setup({CONTEXT_BASE_URL})
+    server.use(http.get('/api/v1/accounts/5/settings', () => HttpResponse.json(defaultState)))
     const {result} = subject()
     expect(result.error).toBeFalsy()
   })
 
-  it('tries to get current account settings', () => {
-    ENV = {
-      CONTEXT_BASE_URL,
-    }
-    const {result} = subject()
-    const call = useFetchApi.mock.calls.pop()[0]
-    expect(call.path).toMatch(`/api/v1${CONTEXT_BASE_URL}/settings`)
-    expect(result.current[0]).toStrictEqual(defaultState)
+  it('tries to get current account settings', async () => {
+    fakeENV.setup({CONTEXT_BASE_URL})
+    server.use(http.get('/api/v1/accounts/5/settings', () => HttpResponse.json(defaultState)))
+    const {result, waitForNextUpdate} = subject()
+    await waitForNextUpdate()
+    expect(result.current[0]).toStrictEqual({...defaultState, loading: false})
   })
 
   describe('updating state after fetch finishes', () => {
-    it('adds errors on failure to fetch', () => {
-      useFetchApi.mockImplementationOnce(({loading, error}) => {
-        loading(false)
-        error('error!')
-      })
-      const {result} = subject()
+    beforeEach(() => {
+      fakeENV.setup({CONTEXT_BASE_URL})
+    })
+
+    it('adds errors on failure to fetch', async () => {
+      server.use(
+        http.get('/api/v1/accounts/5/settings', () => new HttpResponse(null, {status: 500})),
+      )
+      const {result, waitForNextUpdate} = subject()
+      await waitForNextUpdate()
       expect(result.current[0].loading).toBeFalsy()
       expect(result.current[0].errorMessage).toBeTruthy()
     })
 
-    it('updates the settings to the fetched settings', () => {
+    it('updates the settings to the fetched settings', async () => {
       const expectedSettings = {
         ...defaultState,
         microsoft_sync_enabled: true,
@@ -77,12 +85,10 @@ describe('useGetSettings', () => {
         microsoft_sync_remote_attribute: 'mailNickname',
         loading: false,
       }
-      useFetchApi.mockImplementationOnce(({success, loading}) => {
-        loading(false)
-        success(expectedSettings)
-      })
+      server.use(http.get('/api/v1/accounts/5/settings', () => HttpResponse.json(expectedSettings)))
 
-      const {result} = subject()
+      const {result, waitForNextUpdate} = subject()
+      await waitForNextUpdate()
       expect(result.current[0]).toStrictEqual(expectedSettings)
     })
   })

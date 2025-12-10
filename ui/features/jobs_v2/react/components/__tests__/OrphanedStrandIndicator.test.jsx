@@ -19,48 +19,48 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import OrphanedStrandIndicator from '../OrphanedStrandIndicator'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer(
+  http.put('/api/v1/jobs2/unstuck', ({request}) => {
+    const url = new URL(request.url)
+    const strand = url.searchParams.get('strand')
+    const singleton = url.searchParams.get('singleton')
 
-const flushPromises = () => new Promise(setTimeout)
-
-function mockUnstuckApi({path, params}) {
-  if (path === '/api/v1/jobs2/unstuck') {
-    if (params.strand) {
-      return Promise.resolve({json: {status: 'OK', count: 2}})
-    } else if (params.singleton) {
-      return Promise.resolve({json: {status: 'OK', count: 1}})
+    if (strand) {
+      return HttpResponse.json({status: 'OK', count: 2})
+    } else if (singleton) {
+      return HttpResponse.json({status: 'OK', count: 1})
     } else {
-      return Promise.resolve({
-        json: {
-          status: 'pending',
-          progress: {
-            id: 101,
-            url: 'http://example.com/api/v1/progress/101',
-            workflow_state: 'queued',
-          },
+      return HttpResponse.json({
+        status: 'pending',
+        progress: {
+          id: 101,
+          url: 'http://example.com/api/v1/progress/101',
+          workflow_state: 'queued',
         },
       })
     }
-  } else {
-    return Promise.reject()
-  }
-}
+  }),
+)
+
+const flushPromises = () => new Promise(setTimeout)
 
 describe('OrphanedStrandIndicator', () => {
   let oldEnv
   beforeAll(() => {
     oldEnv = {...window.ENV}
-    doFetchApi.mockImplementation(mockUnstuckApi)
-  })
-
-  beforeEach(() => {
-    doFetchApi.mockClear()
+    server.listen()
   })
 
   afterAll(() => {
     window.ENV = oldEnv
+    server.close()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   it("doesn't render button if the user lacks :manage_jobs", async () => {

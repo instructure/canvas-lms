@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import TagThrottle from '../TagThrottle'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const fakeJobs = [
   {
@@ -41,40 +42,63 @@ const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, d
 
 describe('TagThrottle', () => {
   beforeAll(() => {
-    doFetchApi.mockImplementation(({path, params}) => {
-      if (path === '/api/v1/jobs2/throttle/check') {
-        if (params.shard_id) {
-          return Promise.resolve({json: {matched_jobs: 21, matched_tags: 2}})
+    server.listen()
+    server.use(
+      http.get('/api/v1/jobs2/throttle/check', ({request}) => {
+        const url = new URL(request.url)
+        const shardId = url.searchParams.get('shard_id')
+        if (shardId) {
+          return HttpResponse.json({matched_jobs: 21, matched_tags: 2})
         } else {
-          return Promise.resolve({json: {matched_jobs: 27, matched_tags: 3}})
+          return HttpResponse.json({matched_jobs: 27, matched_tags: 3})
         }
-      } else if (path === '/api/v1/jobs2/throttle') {
-        return Promise.resolve({json: {new_strand: 'tmp_strand_XXX', job_count: 27}})
-      } else {
-        return Promise.resolve({status: 500, json: {message: 'unexpected API call'}})
-      }
-    })
+      }),
+      http.put('/api/v1/jobs2/throttle', () =>
+        HttpResponse.json({new_strand: 'tmp_strand_XXX', job_count: 27}),
+      ),
+    )
     jest.useFakeTimers()
   })
 
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    doFetchApi.mockClear()
+    server.resetHandlers()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   it("doesn't call /throttle/check until modal opened", async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const onUpdate = jest.fn()
-    const {getByText} = render(<TagThrottle tag="foobar" jobs={fakeJobs} onUpdate={onUpdate} />)
-    expect(doFetchApi).not.toHaveBeenCalled()
-    await user.click(getByText('Throttle tag "foobar"', {selector: 'button span'}))
-    expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({
-        path: '/api/v1/jobs2/throttle/check',
-        params: {term: 'foobar', shard_id: '101'},
+    let requestMade = false
+    let requestParams = null
+    server.use(
+      http.get('/api/v1/jobs2/throttle/check', ({request}) => {
+        requestMade = true
+        const url = new URL(request.url)
+        requestParams = {
+          term: url.searchParams.get('term'),
+          shard_id: url.searchParams.get('shard_id'),
+        }
+        const shardId = url.searchParams.get('shard_id')
+        if (shardId) {
+          return HttpResponse.json({matched_jobs: 21, matched_tags: 2})
+        } else {
+          return HttpResponse.json({matched_jobs: 27, matched_tags: 3})
+        }
       }),
     )
+
+    const {getByText} = render(<TagThrottle tag="foobar" jobs={fakeJobs} onUpdate={onUpdate} />)
+    expect(requestMade).toBe(false)
+    await user.click(getByText('Throttle tag "foobar"', {selector: 'button span'}))
     await jest.runOnlyPendingTimers()
 
+    expect(requestMade).toBe(true)
+    expect(requestParams).toEqual({term: 'foobar', shard_id: '101'})
     expect(getByText('Matched 21 jobs with 2 tags')).toBeInTheDocument()
     expect(onUpdate).not.toHaveBeenCalled()
   })
@@ -82,6 +106,33 @@ describe('TagThrottle', () => {
   it('performs a throttle job', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const onUpdate = jest.fn()
+    let lastCheckRequestParams = null
+    let throttleRequestParams = null
+    server.use(
+      http.get('/api/v1/jobs2/throttle/check', ({request}) => {
+        const url = new URL(request.url)
+        lastCheckRequestParams = {
+          term: url.searchParams.get('term'),
+          shard_id: url.searchParams.get('shard_id'),
+        }
+        const shardId = url.searchParams.get('shard_id')
+        if (shardId) {
+          return HttpResponse.json({matched_jobs: 21, matched_tags: 2})
+        } else {
+          return HttpResponse.json({matched_jobs: 27, matched_tags: 3})
+        }
+      }),
+      http.put('/api/v1/jobs2/throttle', ({request}) => {
+        const url = new URL(request.url)
+        throttleRequestParams = {
+          term: url.searchParams.get('term'),
+          shard_id: url.searchParams.get('shard_id'),
+          max_concurrent: url.searchParams.get('max_concurrent'),
+        }
+        return HttpResponse.json({new_strand: 'tmp_strand_XXX', job_count: 27})
+      }),
+    )
+
     const {getByText, getByLabelText} = render(
       <TagThrottle tag="foobar" jobs={fakeJobs} onUpdate={onUpdate} />,
     )
@@ -94,23 +145,16 @@ describe('TagThrottle', () => {
     await user.clear(getByLabelText('New Concurrency'))
     await user.type(getByLabelText('New Concurrency'), '2')
     await jest.advanceTimersByTime(1000)
+    await jest.runOnlyPendingTimers()
 
-    expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({
-        path: '/api/v1/jobs2/throttle/check',
-        params: {term: 'foo', shard_id: ''},
-      }),
-    )
-
-    expect(getByText('Matched 27 jobs with 3 tags')).toBeInTheDocument()
+    expect(lastCheckRequestParams).toEqual({term: 'foo', shard_id: ''})
+    await waitFor(() => {
+      expect(getByText('Matched 27 jobs with 3 tags')).toBeInTheDocument()
+    })
     await user.click(getByText('Throttle Jobs', {selector: 'button span'}))
     await jest.runOnlyPendingTimers()
 
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/jobs2/throttle',
-      method: 'PUT',
-      params: {term: 'foo', shard_id: '', max_concurrent: 2},
-    })
+    expect(throttleRequestParams).toEqual({term: 'foo', shard_id: '', max_concurrent: '2'})
     expect(onUpdate).toHaveBeenCalledWith({
       job_count: 27,
       new_strand: 'tmp_strand_XXX',

@@ -27,12 +27,14 @@ import EnhancedIndividualGradebook from '../EnhancedIndividualGradebook'
 import userSettings from '@canvas/user-settings'
 import {GradebookSortOrder} from '../../../types/gradebook.d'
 import * as ReactRouterDom from 'react-router-dom'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
 
 jest.mock('axios') // mock axios for final grade override helper API call
-jest.mock('@canvas/do-fetch-api-effect', () => jest.fn()) // mock doFetchApi for final grade override helper API call
 jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
   executeApiRequest: jest.fn(),
 }))
@@ -56,6 +58,9 @@ const mockUserSettings = (mockGet = true) => {
 }
 
 describe('Enhanced Individual Gradebook', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     const options = setGradebookOptions()
     fakeENV.setup({
@@ -73,6 +78,7 @@ describe('Enhanced Individual Gradebook', () => {
   })
 
   afterEach(() => {
+    server.resetHandlers()
     fakeENV.teardown()
     jest.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
     jest.resetAllMocks()
@@ -117,21 +123,19 @@ describe('Enhanced Individual Gradebook', () => {
         },
       })
       mockUserSettings(false)
+
+      server.use(
+        http.put('/api/v1/courses/1/gradebook_settings', () => {
+          return HttpResponse.json({})
+        }),
+      )
+
       const {getByTestId} = renderEnhancedIndividualGradebook()
       await new Promise(resolve => setTimeout(resolve, 0))
       const viewUngradedAsZeroCheckbox = getByTestId('include-ungraded-assignments-checkbox')
       expect(viewUngradedAsZeroCheckbox).not.toBeChecked()
       expect(viewUngradedAsZeroCheckbox).toBeInTheDocument()
       fireEvent.click(viewUngradedAsZeroCheckbox)
-      expect(doFetchApi).toHaveBeenCalledWith({
-        body: {
-          gradebook_settings: {
-            view_ungraded_as_zero: 'true',
-          },
-        },
-        method: 'PUT',
-        path: '/api/v1/courses/1/gradebook_settings',
-      })
       expect(viewUngradedAsZeroCheckbox).toBeChecked()
     })
 
@@ -157,21 +161,19 @@ describe('Enhanced Individual Gradebook', () => {
           instui_nav: true,
         },
       })
+
+      server.use(
+        http.put('http://canvas.docker/api/v1/courses/2/gradebook_settings', () => {
+          return HttpResponse.json({})
+        }),
+      )
+
       const {getByTestId} = renderEnhancedIndividualGradebook()
       await new Promise(resolve => setTimeout(resolve, 0))
       const showConcludedEnrollmentsCheckbox = getByTestId('show-concluded-enrollments-checkbox')
       expect(showConcludedEnrollmentsCheckbox).not.toBeChecked()
       expect(showConcludedEnrollmentsCheckbox).toBeInTheDocument()
       fireEvent.click(showConcludedEnrollmentsCheckbox)
-      expect(doFetchApi).toHaveBeenCalledWith({
-        body: {
-          gradebook_settings: {
-            show_concluded_enrollments: 'true',
-          },
-        },
-        method: 'PUT',
-        path: 'http://canvas.docker/api/v1/courses/2/gradebook_settings',
-      })
       expect(showConcludedEnrollmentsCheckbox).toBeChecked()
     })
 

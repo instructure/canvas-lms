@@ -20,8 +20,6 @@ import {render} from '@testing-library/react'
 import React from 'react'
 import MicrosoftSyncDebugInfo from '../MicrosoftSyncDebugInfo'
 
-jest.mock('@canvas/do-fetch-api-effect')
-
 describe('MicrosoftSyncDebugInfo', () => {
   const props = overrides => ({
     debugInfo: [
