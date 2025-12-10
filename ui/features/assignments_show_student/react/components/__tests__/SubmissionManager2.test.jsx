@@ -26,7 +26,7 @@ import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/re
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 import SubmissionManager from '../SubmissionManager'
-import {availableReviewCount} from '../../helpers/PeerReviewHelpers'
+import {availableReviewCount} from '@canvas/assignments/helpers/PeerReviewHelpers'
 import {queryClient} from '@canvas/query'
 
 jest.mock('@canvas/util/globalUtils', () => ({

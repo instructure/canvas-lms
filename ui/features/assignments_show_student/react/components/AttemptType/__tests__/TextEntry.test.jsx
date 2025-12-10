@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React, {createRef} from 'react'
 import TextEntry, {ERROR_MESSAGE} from '../TextEntry'
-import StudentViewContext from '../../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 
 jest.mock(
   '@instructure/canvas-rce/es/rce/plugins/instructure_rce_external_tools/lti11-content-items/RceLti11ContentItem',

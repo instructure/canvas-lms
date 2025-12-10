@@ -27,7 +27,7 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
-import {getPeerReviewUrl} from '../helpers/PeerReviewHelpers'
+import {getPeerReviewUrl} from '@canvas/assignments/helpers/PeerReviewHelpers'
 import type {AssignedAssessments} from 'api'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 

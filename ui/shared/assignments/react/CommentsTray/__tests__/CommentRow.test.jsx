@@ -17,7 +17,7 @@
  */
 
 import {render} from '@testing-library/react'
-import CommentRow from '../CommentsTray/CommentRow'
+import CommentRow from '../CommentRow'
 
 const getMockProps = () => ({
   comment: {

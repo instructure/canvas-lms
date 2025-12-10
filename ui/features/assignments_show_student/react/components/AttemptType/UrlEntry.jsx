@@ -33,7 +33,7 @@ import {IconEyeLine, IconExternalLinkLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import StudentViewContext from '../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {TextInput} from '@instructure/ui-text-input'
 
 const I18n = createI18nScope('assignments_2_url_entry')

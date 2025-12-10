@@ -23,7 +23,9 @@ import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/re
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
-import StudentViewContext, {StudentViewContextDefaults} from '../Context'
+import StudentViewContext, {
+  StudentViewContextDefaults,
+} from '@canvas/assignments/react/StudentViewContext'
 import SubmissionManager from '../SubmissionManager'
 import store from '../stores'
 import {setupServer} from 'msw/node'
@@ -178,14 +180,17 @@ describe('SubmissionManager', () => {
         lastCapturedRequest = null
         // Default handler that captures request and returns success
         server.use(
-          http.post('/courses/:courseId/rubric_associations/:rubricAssociationId/assessments', async ({request}) => {
-            lastCapturedRequest = {
-              method: 'POST',
-              path: new URL(request.url).pathname,
-              body: await request.text(),
-            }
-            return HttpResponse.json({})
-          }),
+          http.post(
+            '/courses/:courseId/rubric_associations/:rubricAssociationId/assessments',
+            async ({request}) => {
+              lastCapturedRequest = {
+                method: 'POST',
+                path: new URL(request.url).pathname,
+                body: await request.text(),
+              }
+              return HttpResponse.json({})
+            },
+          ),
         )
         setCurrentUserAsAssessmentOwner()
         await setMocks()
@@ -345,7 +350,9 @@ describe('SubmissionManager', () => {
         await waitFor(() => {
           expect(lastCapturedRequest).not.toBeNull()
           expect(lastCapturedRequest.method).toBe('POST')
-          expect(lastCapturedRequest.path).toBe(`/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`)
+          expect(lastCapturedRequest.path).toBe(
+            `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
+          )
           expect(lastCapturedRequest.body).toContain('user_id%5D=4')
         })
       })
@@ -380,7 +387,9 @@ describe('SubmissionManager', () => {
         await waitFor(() => {
           expect(lastCapturedRequest).not.toBeNull()
           expect(lastCapturedRequest.method).toBe('POST')
-          expect(lastCapturedRequest.path).toBe(`/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`)
+          expect(lastCapturedRequest.path).toBe(
+            `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
+          )
           expect(lastCapturedRequest.body).toContain('anonymous_id%5D=ad0f')
         })
       })
@@ -575,9 +584,12 @@ describe('SubmissionManager', () => {
         setOtherUserAsAssessmentOwner()
         // Override the default handler to return an error
         server.use(
-          http.post('/courses/:courseId/rubric_associations/:rubricAssociationId/assessments', () => {
-            return HttpResponse.error()
-          }),
+          http.post(
+            '/courses/:courseId/rubric_associations/:rubricAssociationId/assessments',
+            () => {
+              return HttpResponse.error()
+            },
+          ),
         )
         const setOnFailure = jest.fn()
 

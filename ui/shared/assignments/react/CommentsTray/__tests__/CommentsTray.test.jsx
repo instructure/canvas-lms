@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CommentsTray from '../CommentsTray/index'
+import CommentsTray from '../index'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/client/testing'
 import {fireEvent, render} from '@testing-library/react'
