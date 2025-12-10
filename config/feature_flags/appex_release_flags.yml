@@ -52,3 +52,13 @@ enforce_service_token_tenant_matching:
       state: hidden
     production:
       state: hidden
+federated_pseudonym_attributes:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Federated Pseudonym Attributes
+  description: Enable to use federated pseudonym attributes (username, SIS user ID) from authentication providers in live events and other Canvas features. When disabled, Canvas will use local pseudonym attributes as fallback.
+  environments:
+    development:
+      state: allowed
+    ci:
+      state: allowed
