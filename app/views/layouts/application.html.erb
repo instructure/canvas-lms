@@ -23,7 +23,7 @@
   if @domain_root_account&.feature_enabled?(:top_navigation_placement)
     js_env INIT_DRAWER_LAYOUT_MUTEX: "init-drawer-layout"
     js_bundle(:top_navigation_tools)
-end
+  end
 
   if add_ignite_agent_bundle?
     js_bundle(:ignite_agent)
@@ -273,10 +273,6 @@ end
 
   <% if @show_embedded_chat %>
     <%= render :partial => 'shared/embedded_chat' %>
-  <% end %>
-
-  <% if @domain_root_account&.feature_enabled?(:ada_chatbot) %>
-    <%= render :partial => 'shared/ada_embed' %>
   <% end %>
 
   <% if @show_fixed_bottom %>
