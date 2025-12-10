@@ -142,6 +142,10 @@
               <%= link_to course_path(id: @context.id), :class => "btn k5-back-to-subject", :id => "back_to_subject" do %>
                 <i class="icon-arrow-open-left"></i> <%= t('Back to Subject') %>
               <% end %>
+            <% elsif @context&.is_a?(Course) && @context.horizon_back_to_units_enabled? %>
+              <%= link_to course_path(id: @context.id), :class => "btn horizon-back-to-units", :id => "back_to_units" do %>
+                <i class="icon-arrow-open-left"></i> <%= t('Back to Units') %>
+              <% end %>
             <% else %>
               <%= render_crumbs %>
             <% end %>
@@ -149,6 +153,8 @@
 
           <% if @context&.is_a?(Course) && @context.elementary_subject_course? %>
             <span class="k5-heading-course-name"><%= @context.nickname_for(@current_user) %></span>
+          <% elsif @context&.is_a?(Course) && @context.horizon_back_to_units_enabled? %>
+            <span class="horizon-heading-course-name"><%= @context.nickname_for(@current_user) %></span>
           <% end %>
 
           <div id="nutrition_facts_container"></div>

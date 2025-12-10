@@ -65,7 +65,7 @@ module HorizonMode
     if @context.is_a?(Account)
       @context.horizon_account?
     elsif @context.is_a?(Course)
-      @context.horizon_course?
+      @context.horizon_course? && !@context.root_account.feature_enabled?(:horizon_course_academic_switcher)
     else
       false
     end

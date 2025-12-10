@@ -116,6 +116,13 @@ horizon_native_permissions_page:
   display_name: "Canvas Career: Permissions Page"
   description: |-
     Enables native permissions page instead of the Academic iframe in Canvas Career.
+horizon_course_academic_switcher:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Course Academic Switcher"
+  description: |-
+    Handles switching between Canvas Academic and Career in Courses.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:
