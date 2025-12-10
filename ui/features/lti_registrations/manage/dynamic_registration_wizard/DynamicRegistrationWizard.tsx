@@ -33,13 +33,14 @@ import {
   mkUseDynamicRegistrationWizardState,
   type DynamicRegistrationWizardState,
   type DynamicRegistrationActions,
+  ConfirmationStateType,
 } from './DynamicRegistrationWizardState'
-import {IconConfirmationWrapper} from './components/IconConfirmationWrapper'
-import {NamingConfirmationWrapper} from './components/NamingConfirmationWrapper'
-import {PermissionConfirmationWrapper} from './components/PermissionConfirmationWrapper'
-import {PlacementsConfirmationWrapper} from './components/PlacementsConfirmationWrapper'
-import {PrivacyConfirmationWrapper} from './components/PrivacyConfirmationWrapper'
-import {ReviewScreenWrapper} from './components/ReviewScreenWrapper'
+import {IconConfirmationWrapper} from '../lti_1p3_registration_form/components/IconConfirmationWrapper'
+import {NamingConfirmationWrapper} from '../lti_1p3_registration_form/components/NamingConfirmationWrapper'
+import {PermissionConfirmationWrapper} from '../lti_1p3_registration_form/components/PermissionConfirmationWrapper'
+import {PlacementsConfirmationWrapper} from '../lti_1p3_registration_form/components/PlacementsConfirmationWrapper'
+import {PrivacyConfirmationWrapper} from '../lti_1p3_registration_form/components/PrivacyConfirmationWrapper'
+import {ReviewScreenWrapper} from '../lti_1p3_registration_form/components/ReviewScreenWrapper'
 import {isUnsuccessful} from '../../common/lib/apiResult/ApiResult'
 import {Footer} from '../registration_wizard_forms/Footer'
 import type {LtiRegistrationId} from '../model/LtiRegistrationId'
@@ -47,6 +48,7 @@ import {Header} from '../registration_wizard_forms/Header'
 import {isLtiPlacementWithIcon} from '../model/LtiPlacement'
 import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {getInputIdForField} from '../registration_overlay/validateLti1p3RegistrationOverlayState'
+import {Lti1p3RegistrationWizardStep} from '../lti_1p3_registration_form/Lti1p3RegistrationWizardState'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -291,59 +293,68 @@ const renderStepContent = (
       )
     case 'PermissionConfirmation':
       return (
-        <RegistrationModalBody>
-          <PermissionConfirmationWrapper
-            registration={state.registration}
-            overlayStore={state.overlayStore}
-          />
-        </RegistrationModalBody>
+        <PermissionConfirmationWrapper
+          internalConfig={state.registration.configuration}
+          overlayStore={state.overlayStore}
+          scopesSupported={state.registration.configuration.scopes}
+          showAllSettings={false}
+        />
       )
     case 'PrivacyLevelConfirmation':
       return (
-        <RegistrationModalBody>
-          <PrivacyConfirmationWrapper
-            overlayStore={state.overlayStore}
-            toolName={state.registration.name}
-          />
-        </RegistrationModalBody>
+        <PrivacyConfirmationWrapper
+          overlayStore={state.overlayStore}
+          internalConfig={state.registration.configuration}
+        />
       )
     case 'PlacementsConfirmation':
       return (
-        <RegistrationModalBody>
-          <PlacementsConfirmationWrapper
-            registration={state.registration}
-            overlayStore={state.overlayStore}
-          />
-        </RegistrationModalBody>
+        <PlacementsConfirmationWrapper
+          internalConfig={state.registration.configuration}
+          overlayStore={state.overlayStore}
+          supportedPlacements={state.registration.configuration.placements.map(p => p.placement)}
+        />
       )
     case 'NamingConfirmation':
       return (
-        <RegistrationModalBody>
-          <NamingConfirmationWrapper
-            registration={state.registration}
-            overlayStore={state.overlayStore}
-          />
-        </RegistrationModalBody>
+        <NamingConfirmationWrapper
+          overlayStore={state.overlayStore}
+          internalConfig={state.registration.configuration}
+        />
       )
     case 'IconConfirmation':
       return (
-        <RegistrationModalBody>
-          <IconConfirmationWrapper
-            overlayStore={state.overlayStore}
-            registration={state.registration}
-            reviewing={state.reviewing}
-            hasSubmitted={state.hasSubmitted ?? false}
-            transitionToConfirmationState={actions.transitionToConfirmationState}
-            transitionToReviewingState={actions.transitionToReviewingState}
-          />
-        </RegistrationModalBody>
+        <IconConfirmationWrapper
+          overlayStore={state.overlayStore}
+          internalConfig={state.registration.configuration}
+          reviewing={state.reviewing}
+          onNextButtonClicked={() => {}} // Handled by generalized footer
+          onPreviousButtonClicked={() => {}} // Handled by generalized footer
+          includeFooter={false}
+        />
       )
     case 'Reviewing':
       return (
         <ReviewScreenWrapper
+          includeLaunchSettings={false}
           overlayStore={state.overlayStore}
-          registration={state.registration}
-          transitionToConfirmationState={actions.transitionToConfirmationState}
+          internalConfig={state.registration.configuration}
+          transitionTo={step => {
+            // Map Lti1p3RegistrationWizardStep to ConfirmationStateType
+            const stepMapping: Partial<
+              Record<Lti1p3RegistrationWizardStep, ConfirmationStateType>
+            > = {
+              Permissions: 'PermissionConfirmation',
+              DataSharing: 'PrivacyLevelConfirmation',
+              Placements: 'PlacementsConfirmation',
+              Naming: 'NamingConfirmation',
+              Icons: 'IconConfirmation',
+            }
+            const mappedStep = stepMapping[step]
+            if (mappedStep) {
+              actions.transitionToConfirmationState('Reviewing', mappedStep, true)
+            }
+          }}
         />
       )
     case 'DeletingDevKey':

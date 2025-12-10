@@ -152,6 +152,7 @@ describe('DynamicRegistrationWizard', () => {
     )
     const reg = mockRegistration({
       configuration: mockToolConfiguration({
+        title: 'Test Registration',
         scopes: [
           'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem',
           'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly',

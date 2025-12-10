@@ -27,12 +27,14 @@ export type ReviewScreenWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
   internalConfig: InternalLtiConfiguration
   transitionTo: (step: Lti1p3RegistrationWizardStep) => void
+  includeLaunchSettings?: boolean
 }
 
 export const ReviewScreenWrapper = ({
   overlayStore,
   internalConfig,
   transitionTo,
+  includeLaunchSettings = true,
 }: ReviewScreenWrapperProps) => {
   const {state} = overlayStore()
   const placements = filterPlacementsByFeatureFlags(state.placements.placements ?? [])
@@ -70,21 +72,25 @@ export const ReviewScreenWrapper = ({
 
   return (
     <ReviewScreen
-      launchSettings={{
-        customFields: customFieldsValue,
-        redirectUris:
-          state.launchSettings.redirectURIs?.split('\n') ??
-          toUndefined(internalConfig.redirect_uris),
-        defaultTargetLinkUri:
-          state.launchSettings.targetLinkURI ?? toUndefined(internalConfig.target_link_uri),
-        oidcInitiationUrl:
-          state.launchSettings.openIDConnectInitiationURL ??
-          toUndefined(internalConfig.oidc_initiation_url),
-        jwkMethod: state.launchSettings.JwkMethod ?? 'public_jwk_url',
-        jwkUrl: state.launchSettings.JwkURL ?? toUndefined(internalConfig.public_jwk_url),
-        jwk: jwkValue,
-        domain: state.launchSettings.domain ?? toUndefined(internalConfig.domain),
-      }}
+      launchSettings={
+        includeLaunchSettings
+          ? {
+              customFields: customFieldsValue,
+              redirectUris:
+                state.launchSettings.redirectURIs?.split('\n') ??
+                toUndefined(internalConfig.redirect_uris),
+              defaultTargetLinkUri:
+                state.launchSettings.targetLinkURI ?? toUndefined(internalConfig.target_link_uri),
+              oidcInitiationUrl:
+                state.launchSettings.openIDConnectInitiationURL ??
+                toUndefined(internalConfig.oidc_initiation_url),
+              jwkMethod: state.launchSettings.JwkMethod ?? 'public_jwk_url',
+              jwkUrl: state.launchSettings.JwkURL ?? toUndefined(internalConfig.public_jwk_url),
+              jwk: jwkValue,
+              domain: state.launchSettings.domain ?? toUndefined(internalConfig.domain),
+            }
+          : undefined
+      }
       eulaSettings={eulaSettings}
       description={description}
       placements={placements}

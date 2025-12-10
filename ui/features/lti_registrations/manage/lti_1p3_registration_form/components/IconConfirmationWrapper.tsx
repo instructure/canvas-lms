@@ -34,6 +34,7 @@ export type IconConfirmationWrapperProps = {
   reviewing: boolean
   overlayStore: Lti1p3RegistrationOverlayStore
   internalConfig: InternalLtiConfiguration
+  includeFooter?: boolean
 }
 
 export const IconConfirmationWrapper = ({
@@ -42,6 +43,7 @@ export const IconConfirmationWrapper = ({
   reviewing,
   onNextButtonClicked,
   onPreviousButtonClicked,
+  includeFooter = true,
 }: IconConfirmationWrapperProps) => {
   const {state, ...actions} = overlayStore()
 
@@ -77,12 +79,14 @@ export const IconConfirmationWrapper = ({
           hasSubmitted={hasSubmitted}
         />
       </RegistrationModalBody>
-      <Footer
-        reviewing={reviewing}
-        currentScreen="intermediate"
-        onPreviousClicked={onPreviousButtonClicked}
-        onNextClicked={onNextClicked}
-      />
+      {includeFooter && (
+        <Footer
+          reviewing={reviewing}
+          currentScreen="intermediate"
+          onPreviousClicked={onPreviousButtonClicked}
+          onNextClicked={onNextClicked}
+        />
+      )}
     </>
   )
 }

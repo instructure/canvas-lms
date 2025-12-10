@@ -19,13 +19,14 @@
 import {PlacementsConfirmation} from '../../registration_wizard_forms/PlacementsConfirmation'
 import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
-import {AllLtiPlacements, InternalOnlyLtiPlacements} from '../../model/LtiPlacement'
+import {AllLtiPlacements, InternalOnlyLtiPlacements, LtiPlacement} from '../../model/LtiPlacement'
 import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 
 export type PlacementsConfirmationProps = {
   internalConfig: InternalLtiConfiguration
   overlayStore: Lti1p3RegistrationOverlayStore
+  supportedPlacements?: Array<LtiPlacement>
 }
 
 const allPlacements = [...AllLtiPlacements].sort()
@@ -33,11 +34,12 @@ const allPlacements = [...AllLtiPlacements].sort()
 export const PlacementsConfirmationWrapper = ({
   internalConfig,
   overlayStore,
+  supportedPlacements,
 }: PlacementsConfirmationProps) => {
   const {state, ...actions} = overlayStore()
 
   const internalConfigPlacements = internalConfig.placements.map(p => p.placement)
-  const availablePlacements = allPlacements.filter(
+  const availablePlacements = (supportedPlacements || allPlacements).filter(
     p => !InternalOnlyLtiPlacements.includes(p as any) || internalConfigPlacements.includes(p),
   )
 
