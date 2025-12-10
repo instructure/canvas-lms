@@ -123,8 +123,8 @@ describe Api::V1::LearningObjectDates do
           peer_review_sub = assignment.peer_review_sub_assignment
           harness.send(:add_peer_review_info, hash, assignment)
 
-          expect(hash).to have_key("peer_review_sub_assignment")
-          peer_review_data = hash["peer_review_sub_assignment"]
+          expect(hash).to have_key(:peer_review_sub_assignment)
+          peer_review_data = hash[:peer_review_sub_assignment]
           expect(peer_review_data[:id]).to eq(peer_review_sub.id)
           expect(peer_review_data[:due_at]).to eq("2025-09-10T18:00:00Z")
           expect(peer_review_data[:unlock_at]).to eq("2025-09-05T08:00:00Z")
@@ -157,8 +157,8 @@ describe Api::V1::LearningObjectDates do
         it "includes overrides data in the response" do
           harness.send(:add_peer_review_info, hash, assignment)
 
-          expect(hash).to have_key("peer_review_sub_assignment")
-          peer_review_data = hash["peer_review_sub_assignment"]
+          expect(hash).to have_key(:peer_review_sub_assignment)
+          peer_review_data = hash[:peer_review_sub_assignment]
           expect(peer_review_data[:overrides]).to have(1).item
 
           override_data = peer_review_data[:overrides].first
@@ -190,7 +190,7 @@ describe Api::V1::LearningObjectDates do
         it "excludes inactive overrides" do
           harness.send(:add_peer_review_info, hash, assignment)
 
-          peer_review_data = hash["peer_review_sub_assignment"]
+          peer_review_data = hash[:peer_review_sub_assignment]
           expect(peer_review_data[:overrides]).to eq([])
         end
       end

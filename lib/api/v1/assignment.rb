@@ -721,7 +721,7 @@ module Api::V1::Assignment
     Assignment.suspend_due_date_caching do
       if peer_review_grading_enabled
         Assignment.transaction do
-          response = if prepared_update[:overrides].present?
+          response = if prepared_update[:overrides]
                        update_api_assignment_with_overrides(prepared_update, user)
                      else
                        if assignment_params["force_updated_at"] && !prepared_update[:assignment].changed?
