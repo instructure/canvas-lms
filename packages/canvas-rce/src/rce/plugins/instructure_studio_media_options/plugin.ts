@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tinymce, {Editor} from 'tinymce'
+import tinymce, {Editor, Events} from 'tinymce'
 import {
   isStudioEmbeddedMedia,
   handleBeforeObjectSelected,
@@ -52,6 +52,10 @@ const handleStudioMessage = (e: MessageEvent) => {
   }
 }
 
+const isEmbedButtonActive = (buttonName: string, currentSelectedElement: Element) => {
+  return (currentSelectedElement.getAttribute('data-mce-p-src') || '').includes(buttonName)
+}
+
 tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Editor) {
   if (RCEGlobals.getFeatures().rce_studio_embed_improvements) {
     window.addEventListener('message', handleStudioMessage)
@@ -71,6 +75,16 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
           background-color: #2B7ABC;
           color: white;
         }
+
+        .tox .tox-pop .tox-tbtn.tox-tbtn--enabled {
+          background-color: #6A7883;
+          color: white;
+        }
+
+        .tox .tox-pop .tox-tbtn.tox-tbtn--enabled:hover {
+          background-color: #2B7ABC;
+          color: white;
+        }
       `
         document.head.appendChild(style)
       }
@@ -82,7 +96,15 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
     ed.ui.registry.addIcon('options-icon', optionsIcon)
     ed.ui.registry.addIcon('remove-icon', removeIcon)
 
-    ed.ui.registry.addButton('thumbnail-view', {
+    ed.ui.registry.addToggleButton('thumbnail-view', {
+      onSetup: buttonApi => {
+        buttonApi.setActive(isEmbedButtonActive('thumbnail_embed', ed.selection.getNode()))
+        const editorEventCallback = (eventApi: Events.NodeChangeEvent) => {
+          buttonApi.setActive(isEmbedButtonActive('thumbnail_embed', eventApi.element))
+        }
+        ed.on('NodeChange', editorEventCallback)
+        return () => ed.off('NodeChange', editorEventCallback)
+      },
       onAction() {
         notifyStudioEmbedTypeChange(ed, 'thumbnail_embed')
       },
@@ -91,7 +113,15 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
       tooltip: formatMessage('Thumbnail'),
     })
 
-    ed.ui.registry.addButton('learn-view', {
+    ed.ui.registry.addToggleButton('learn-view', {
+      onSetup: buttonApi => {
+        buttonApi.setActive(isEmbedButtonActive('learn_embed', ed.selection.getNode()))
+        const editorEventCallback = (eventApi: Events.NodeChangeEvent) => {
+          buttonApi.setActive(isEmbedButtonActive('learn_embed', eventApi.element))
+        }
+        ed.on('NodeChange', editorEventCallback)
+        return () => ed.off('NodeChange', editorEventCallback)
+      },
       onAction() {
         notifyStudioEmbedTypeChange(ed, 'learn_embed')
       },
@@ -100,7 +130,15 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
       tooltip: formatMessage('Learn'),
     })
 
-    ed.ui.registry.addButton('collab-view', {
+    ed.ui.registry.addToggleButton('collab-view', {
+      onSetup: buttonApi => {
+        buttonApi.setActive(isEmbedButtonActive('collaboration_embed', ed.selection.getNode()))
+        const editorEventCallback = (eventApi: Events.NodeChangeEvent) => {
+          buttonApi.setActive(isEmbedButtonActive('collaboration_embed', eventApi.element))
+        }
+        ed.on('NodeChange', editorEventCallback)
+        return () => ed.off('NodeChange', editorEventCallback)
+      },
       onAction() {
         notifyStudioEmbedTypeChange(ed, 'collaboration_embed')
       },
