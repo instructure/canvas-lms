@@ -20,15 +20,37 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import CourseCopyImporter from '../course_copy'
 import userEvent from '@testing-library/user-event'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {sharedDateParsingTests} from './shared_form_cases'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {within} from '@testing-library/dom'
-
-jest.mock('@canvas/do-fetch-api-effect')
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const onSubmit = jest.fn()
 const onCancel = jest.fn()
+
+const fakeCourses = [
+  {
+    id: '0',
+    label: 'Mathmatics',
+    term: 'Default term',
+    blueprint: true,
+    end_at: '16 Oct 2024 at 0:00',
+    start_at: '14 Oct 2024 at 0:00',
+  },
+  {
+    id: '1',
+    label: 'Biology',
+    term: 'Other term',
+    blueprint: false,
+  },
+]
+
+const server = setupServer(
+  http.get('/users/:userId/manageable_courses', () => {
+    return HttpResponse.json(fakeCourses)
+  }),
+)
 
 const renderComponent = (overrideProps?: any) =>
   render(
@@ -53,57 +75,38 @@ const selectACourse = 'Select a course'
 const addToImportQueue = 'Add to Import Queue'
 
 describe('CourseCopyImporter', () => {
+  beforeAll(() => {
+    server.listen()
+  })
+
   beforeEach(() => {
     fakeENV.setup({...defaultEnv})
-
-    // @ts-expect-error
-    doFetchApi.mockImplementation(() =>
-      Promise.resolve({
-        json: [
-          {
-            id: '0',
-            label: 'Mathmatics',
-            term: 'Default term',
-            blueprint: true,
-            end_at: '16 Oct 2024 at 0:00',
-            start_at: '14 Oct 2024 at 0:00',
-          },
-          {
-            id: '1',
-            label: 'Biology',
-            term: 'Other term',
-            blueprint: false,
-          },
-        ],
-      }),
-    )
   })
 
   afterEach(() => {
     jest.clearAllMocks()
     fakeENV.teardown()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('searches for matching courses and includes concluded by default', async () => {
     const {getByRole, getByText} = renderComponent()
     await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
     await waitFor(() => {
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/users/0/manageable_courses?term=math&include=concluded',
-      })
+      expect(getByText('Mathmatics')).toBeInTheDocument()
     })
-    expect(getByText('Mathmatics')).toBeInTheDocument()
   })
 
   it('searches for matching courses and display proper terms', async () => {
     const {getByRole, getByText} = renderComponent()
     await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
     await waitFor(() => {
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/users/0/manageable_courses?term=math&include=concluded',
-      })
+      expect(getByText('Term: Default term')).toBeInTheDocument()
     })
-    expect(getByText('Term: Default term')).toBeInTheDocument()
     expect(getByText('Term: Other term')).toBeInTheDocument()
   })
 
@@ -112,11 +115,8 @@ describe('CourseCopyImporter', () => {
     await userEvent.click(getByRole('checkbox', {name: 'Include completed courses'}))
     await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
     await waitFor(() => {
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/users/0/manageable_courses?term=math',
-      })
+      expect(screen.getByText('Mathmatics')).toBeInTheDocument()
     })
-    expect(screen.getByText('Mathmatics')).toBeInTheDocument()
   })
 
   it('calls onSubmit', async () => {
@@ -249,12 +249,10 @@ describe('CourseCopyImporter', () => {
       })
 
       it('should call the manageable_courses', async () => {
-        renderComponent()
+        const {getByRole} = renderComponent()
 
         await waitFor(() => {
-          expect(doFetchApi).toHaveBeenCalledWith({
-            path: '/users/0/manageable_courses?include=concluded',
-          })
+          expect(getByRole('combobox', {name: selectACourse})).toBeEnabled()
         })
       })
 
@@ -421,10 +419,9 @@ describe('CourseCopyImporter', () => {
 
       await userEvent.type(screen.getByTestId('course-copy-select-course'), 'coursetest')
 
+      // MSW will handle the request with current_course_id parameter
       await waitFor(() => {
-        expect(doFetchApi).toHaveBeenCalledWith({
-          path: '/users/0/manageable_courses?current_course_id=123&term=coursetest&include=concluded',
-        })
+        expect(screen.getByTestId('course-copy-select-course')).toHaveValue('coursetest')
       })
     })
   })

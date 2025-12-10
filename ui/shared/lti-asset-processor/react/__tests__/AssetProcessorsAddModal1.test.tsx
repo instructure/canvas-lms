@@ -16,30 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {render} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {AssetProcessorsAddModal} from '../AssetProcessorsAddModal'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {mockDoFetchApi, mockToolsForAssignment as tools} from './assetProcessorsTestHelpers'
+import {mockToolsForAssignment as tools} from './assetProcessorsTestHelpers'
 import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 
-jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/external-tools/messages')
+
+const server = setupServer(
+  http.get('/api/v1/courses/:courseId/lti_apps/launch_definitions', ({request}) => {
+    const url = new URL(request.url)
+    const placements = url.searchParams.get('placements[]')
+    return HttpResponse.json(placements === 'ActivityAssetProcessor' ? tools : [])
+  }),
+)
 
 describe('AssetProcessorsAddModal', () => {
   let mockOnProcessorResponse: jest.Mock
   const queryClient = new QueryClient()
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     mockOnProcessorResponse = jest.fn()
-
     queryClient.setQueryData(['assetProcessors', 123], tools)
-    const launchDefsUrl = '/api/v1/courses/123/lti_apps/launch_definitions'
-    mockDoFetchApi(launchDefsUrl, doFetchApi as jest.Mock)
   })
 
   afterEach(() => {
+    server.resetHandlers()
     queryClient.clear()
     jest.clearAllMocks()
   })

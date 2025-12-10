@@ -38,8 +38,6 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashError: jest.fn(() => jest.fn()),
 }))
 
-jest.mock('@canvas/do-fetch-api-effect')
-
 // Mock makeBulkItemRequests function
 jest.mock('../../../../queries/makeBulkItemRequests', () => ({
   makeBulkItemRequests: jest.fn(),

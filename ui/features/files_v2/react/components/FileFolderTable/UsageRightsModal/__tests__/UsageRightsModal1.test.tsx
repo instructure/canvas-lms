@@ -17,7 +17,6 @@
  */
 
 import {render, screen, waitFor} from '@testing-library/react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import userEvent from '@testing-library/user-event'
 import UsageRightsModal from '../UsageRightsModal'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
@@ -26,8 +25,10 @@ import {FileManagementProvider} from '../../../../contexts/FileManagementContext
 import {RowsProvider} from '../../../../contexts/RowsContext'
 import {parseNewRows} from '../UsageRightsModalUtils'
 import {mockRowsContext} from '../../__tests__/testUtils'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const MOCK_LICENSES = [
   {
@@ -88,23 +89,15 @@ const renderComponent = (props: any = defaultProps) =>
   )
 
 describe('UsageRightsModal', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    // Reset and clear mocks before each test to ensure clean state
-    jest.clearAllMocks()
-    jest.resetAllMocks()
-    // Set up the mock for the licenses fetch that happens on component mount
-    ;(doFetchApi as jest.Mock).mockImplementation((params: any) => {
-      if (params.path && params.path.includes('content_licenses')) {
-        return Promise.resolve({json: MOCK_LICENSES})
-      }
-      return Promise.resolve({})
-    })
+    server.use(http.get('*/content_licenses', () => HttpResponse.json(MOCK_LICENSES)))
   })
 
   afterEach(() => {
-    // Clean up after each test
-    jest.clearAllMocks()
-    jest.resetAllMocks()
+    server.resetHandlers()
   })
 
   it('renders header', async () => {
@@ -201,25 +194,23 @@ describe('UsageRightsModal', () => {
 
   // TODO: RCX-3380
   xit('performs fetch request and shows alert', async () => {
-    // Reset mock implementation for this specific test
-    jest.clearAllMocks()
-    jest.resetAllMocks()
-
-    // Set up the license fetch that happens on component mount
-    ;(doFetchApi as jest.Mock).mockImplementationOnce((params: any) => {
-      if (params.path && params.path.includes('content_licenses')) {
-        return Promise.resolve({json: MOCK_LICENSES})
-      }
-      return Promise.resolve({})
-    })
-
-    // Set up the PUT request to succeed for the second call
-    ;(doFetchApi as jest.Mock).mockImplementationOnce((params: any) => {
-      if (params.method === 'PUT' && params.path.includes('usage_rights')) {
-        return Promise.resolve({})
-      }
-      return Promise.resolve({})
-    })
+    let requestMade = false
+    let requestParams: any = null
+    server.use(
+      http.put('/api/v1/courses/2/usage_rights', async ({request}) => {
+        requestMade = true
+        const url = new URL(request.url)
+        requestParams = {
+          folder_ids: url.searchParams.getAll('folder_ids[]'),
+          file_ids: url.searchParams.getAll('file_ids[]'),
+          usage_rights: {
+            legal_copyright: url.searchParams.get('usage_rights[legal_copyright]'),
+            use_justification: url.searchParams.get('usage_rights[use_justification]'),
+          },
+        }
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
 
     renderComponent()
 
@@ -236,14 +227,8 @@ describe('UsageRightsModal', () => {
     })
 
     // Verify the API was called with the correct parameters
-    expect(doFetchApi).toHaveBeenCalledWith({
-      method: 'PUT',
-      path: '/api/v1/courses/2/usage_rights',
-      params: {
-        folder_ids: FAKE_FOLDERS.map(f => f.id.toString()),
-        file_ids: FAKE_FILES.map(f => f.id.toString()),
-        usage_rights: {legal_copyright: 'acme inc', use_justification: 'own_copyright'},
-      },
-    })
+    expect(requestMade).toBe(true)
+    expect(requestParams.usage_rights.legal_copyright).toBe('acme inc')
+    expect(requestParams.usage_rights.use_justification).toBe('own_copyright')
   })
 })

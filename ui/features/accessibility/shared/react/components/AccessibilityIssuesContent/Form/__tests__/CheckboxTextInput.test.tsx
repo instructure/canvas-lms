@@ -17,11 +17,12 @@
  */
 
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import CheckboxTextInput from '../CheckboxTextInput'
 import {FormType, IssueWorkflowState} from '../../../../types'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 // Import the actual context
 import {
@@ -50,7 +51,11 @@ const mockContextValue: AccessibilityCheckerContextType = {
   setIsTrayOpen: jest.fn(),
 }
 
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+
 beforeEach(() => {
+  server.resetHandlers()
   jest.resetAllMocks()
   ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
     const state = {aiGenerationEnabled: true}
@@ -195,16 +200,16 @@ describe('CheckboxTextInput', () => {
 
     // Mock the API response
     const mockGeneratedText = 'This is AI generated alt text'
-    ;(doFetchApi as jest.Mock).mockImplementation(options => {
-      // Test that the path contains "/generate"
-      expect(options.path).toContain('/generate')
-      // Return our mock response
-      return Promise.resolve({
-        json: {
+    let generateCalled = false
+    server.use(
+      // Match both /generate and //generate (double slash from URL construction)
+      http.post('**/generate', () => {
+        generateCalled = true
+        return HttpResponse.json({
           value: mockGeneratedText,
-        },
-      })
-    })
+        })
+      }),
+    )
 
     render(
       <AccessibilityCheckerContext.Provider value={mockContextValue}>
@@ -221,6 +226,7 @@ describe('CheckboxTextInput', () => {
 
     // Verify the value gets updated with the API response
     await waitFor(() => {
+      expect(generateCalled).toBe(true)
       expect(defaultProps.onChangeValue).toHaveBeenCalledWith(mockGeneratedText)
     })
   })
@@ -242,12 +248,12 @@ describe('CheckboxTextInput', () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 
     // Mock API failure
-    ;(doFetchApi as jest.Mock).mockImplementation(options => {
-      // Test that the path contains "/generate"
-      expect(options.path).toContain('/generate')
-      // Return a rejected promise
-      return Promise.reject(new Error('API Error'))
-    })
+    server.use(
+      // Match both /generate and //generate (double slash from URL construction)
+      http.post('**/generate', () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
 
     render(
       <AccessibilityCheckerContext.Provider value={mockContextValue}>

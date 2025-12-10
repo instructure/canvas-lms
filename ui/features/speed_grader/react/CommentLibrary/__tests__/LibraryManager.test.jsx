@@ -20,7 +20,6 @@ import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
 import {act, fireEvent, render as rtlRender, waitFor} from '@testing-library/react'
 import {createCache} from '@canvas/apollo-v3'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {
   commentBankItemMocks,
   commentBankItemMocksV2,
@@ -31,6 +30,8 @@ import {
 } from './mocks'
 import LibraryManager from '../LibraryManager'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: jest.fn(),
@@ -45,7 +46,8 @@ const flushAllTimersAndPromises = async () => {
 }
 
 jest.useFakeTimers()
-jest.mock('@canvas/do-fetch-api-effect')
+
+const server = setupServer()
 
 describe('LibraryManager', () => {
   let setFocusToTextAreaMock
@@ -61,6 +63,12 @@ describe('LibraryManager', () => {
     }
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => {
+    server.close()
+    window.ENV = {}
+  })
+
   beforeEach(() => {
     window.ENV = {comment_library_suggestions_enabled: true}
     setFocusToTextAreaMock = jest.fn()
@@ -68,10 +76,7 @@ describe('LibraryManager', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
-  })
-
-  afterAll(() => {
-    window.ENV = {}
+    server.resetHandlers()
   })
 
   const render = ({
@@ -338,20 +343,26 @@ describe('LibraryManager', () => {
     })
 
     it("fires a request to save the checkbox state when it's clicked", async () => {
-      doFetchApi.mockImplementationOnce(() =>
-        Promise.resolve({json: {comment_library_suggestions_enabled: false}}),
+      let capturedMethod = null
+      let capturedBody = null
+      let capturedPath = null
+      server.use(
+        http.put('/api/v1/users/self/settings', async ({request}) => {
+          capturedMethod = request.method
+          capturedPath = '/api/v1/users/self/settings'
+          capturedBody = await request.json()
+          return HttpResponse.json({comment_library_suggestions_enabled: false})
+        }),
       )
       const {getByText, getByLabelText} = render()
       await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       fireEvent.click(getByLabelText('Show suggestions when typing'))
-      expect(doFetchApi).toHaveBeenCalledTimes(1)
-      expect(doFetchApi).toHaveBeenCalledWith({
-        method: 'PUT',
-        path: '/api/v1/users/self/settings',
-        body: {
-          comment_library_suggestions_enabled: false,
-        },
+      await act(async () => jest.advanceTimersByTime(100))
+      expect(capturedMethod).toBe('PUT')
+      expect(capturedPath).toBe('/api/v1/users/self/settings')
+      expect(capturedBody).toEqual({
+        comment_library_suggestions_enabled: false,
       })
       expect(getByLabelText('Show suggestions when typing')).not.toBeChecked()
       await act(async () => jest.advanceTimersByTime(1000))
@@ -359,12 +370,19 @@ describe('LibraryManager', () => {
     })
 
     it('does not write to ENV if the request fails', async () => {
-      doFetchApi.mockImplementationOnce(() => Promise.reject(new Error('Network error')))
+      let requestCalled = false
+      server.use(
+        http.put('/api/v1/users/self/settings', () => {
+          requestCalled = true
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
       const {getByText, getByLabelText} = render()
       await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       fireEvent.click(getByLabelText('Show suggestions when typing'))
-      expect(doFetchApi).toHaveBeenCalledTimes(1)
+      await act(async () => jest.advanceTimersByTime(100))
+      expect(requestCalled).toBe(true)
       await act(async () => jest.advanceTimersByTime(1000))
       expect(ENV.comment_library_suggestions_enabled).toBe(true)
       expect(showFlashAlert).toHaveBeenCalledWith({

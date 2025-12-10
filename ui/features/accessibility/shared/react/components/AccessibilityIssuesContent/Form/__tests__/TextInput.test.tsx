@@ -17,9 +17,10 @@
  */
 
 import {createElement} from 'react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 import {
   AccessibilityCheckerContext,
@@ -29,6 +30,8 @@ import {FormType, IssueWorkflowState} from '../../../../types'
 import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
 import TextInputForm from '../TextInput'
 import {useAccessibilityScansStore} from '../../../../stores/AccessibilityScansStore'
+
+const server = setupServer()
 
 // Mock the Button component to handle ai-primary color
 jest.mock('@instructure/ui-buttons', () => {
@@ -46,11 +49,15 @@ jest.mock('@instructure/ui-buttons', () => {
   }
 })
 
-jest.mock('@canvas/do-fetch-api-effect')
-
 jest.mock('../../../../stores/AccessibilityScansStore')
 
 describe('TextInputForm', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
   beforeEach(() => {
     jest.resetAllMocks()
     ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
@@ -164,12 +171,12 @@ describe('TextInputForm', () => {
 
   it('handles errors when generate API call fails', async () => {
     // Mock API failure
-    ;(doFetchApi as jest.Mock).mockImplementation(options => {
-      // Test that the path contains "/generate"
-      expect(options.path).toContain('/generate')
-      // Return a rejected promise
-      return Promise.reject(new Error('API Error'))
-    })
+    server.use(
+      // Match both /generate and //generate (double slash from URL construction)
+      http.post('**/generate', () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
 
     render(
       <AccessibilityCheckerContext.Provider value={mockContextValue}>

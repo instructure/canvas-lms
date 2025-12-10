@@ -19,23 +19,13 @@
 import React from 'react'
 import {act, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type doFetchApi from '@canvas/do-fetch-api-effect'
-import type {DoFetchApiResults} from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
 import {initBody, makeModuleWithItems} from '../../__tests__/testHelpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/do-fetch-api-effect', () => ({
-  __esModule: true,
-  default: jest.fn(() =>
-    Promise.resolve({
-      response: new Response('', {status: 200}),
-      json: {published: true},
-      text: '',
-      link: undefined,
-    } as DoFetchApiResults<{published: boolean}>),
-  ),
-}))
+const server = setupServer()
 
 jest.mock('@canvas/context-modules/jquery/utils', () => {
   const originalModule = jest.requireActual('@canvas/context-modules/jquery/utils')
@@ -50,9 +40,6 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: jest.fn(),
 }))
 
-const mockDoFetchApi = jest.requireMock('@canvas/do-fetch-api-effect')
-  .default as jest.MockedFunction<typeof doFetchApi>
-
 const mockShowFlashAlert = showFlashAlert as jest.Mock
 
 const defaultProps = {
@@ -65,17 +52,14 @@ const defaultProps = {
 
 const PUBLISH_URL = '/api/v1/courses/1/modules/1'
 
-const mockResponse = new Response('', {status: 200})
-mockResponse.json = () => Promise.resolve({published: true})
+beforeAll(() => server.listen())
+afterAll(() => server.close())
 
 beforeEach(() => {
-  mockDoFetchApi.mockImplementation(() =>
-    Promise.resolve({
-      response: mockResponse,
-      json: {published: true},
-      text: '',
-      link: undefined,
-    } as DoFetchApiResults<{published: boolean}>),
+  server.use(
+    http.put(PUBLISH_URL, () => {
+      return HttpResponse.json({published: true})
+    }),
   )
   mockShowFlashAlert.mockReset()
   initBody()
@@ -83,8 +67,8 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  server.resetHandlers()
   jest.clearAllMocks()
-  mockDoFetchApi.mockReset()
   document.body.innerHTML = ''
 })
 
@@ -137,6 +121,16 @@ describe('ContextModulesPublishIcon', () => {
 
   it('calls publishAll when clicked publish all menu item is clicked', async () => {
     const user = userEvent.setup({delay: null})
+    let requestCaptured = false
+    server.use(
+      http.put(PUBLISH_URL, async ({request}) => {
+        const body = await request.json()
+        expect(body).toEqual({module: {published: true, skip_content_tags: false}})
+        requestCaptured = true
+        return HttpResponse.json({published: true})
+      }),
+    )
+
     const {getByRole} = render(<ContextModulesPublishIcon {...defaultProps} />)
 
     // Open menu and click publish all
@@ -148,15 +142,9 @@ describe('ContextModulesPublishIcon', () => {
     const publishButton = getByRole('menuitem', {name: 'Publish module and all items'})
     await user.click(publishButton)
 
-    // Verify API call
+    // Verify API call was made
     await waitFor(() => {
-      expect(mockDoFetchApi).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'PUT',
-          path: PUBLISH_URL,
-          body: {module: {published: true, skip_content_tags: false}},
-        }),
-      )
+      expect(requestCaptured).toBe(true)
     })
 
     // Verify flash message
@@ -173,6 +161,16 @@ describe('ContextModulesPublishIcon', () => {
 
   it('calls publishModuleOnly when clicked publish module menu item is clicked', async () => {
     const user = userEvent.setup({delay: null})
+    let requestCaptured = false
+    server.use(
+      http.put(PUBLISH_URL, async ({request}) => {
+        const body = await request.json()
+        expect(body).toEqual({module: {published: true, skip_content_tags: true}})
+        requestCaptured = true
+        return HttpResponse.json({published: true})
+      }),
+    )
+
     const {getByRole} = render(<ContextModulesPublishIcon {...defaultProps} />)
 
     // Open menu and click publish module only
@@ -184,15 +182,9 @@ describe('ContextModulesPublishIcon', () => {
     const publishButton = getByRole('menuitem', {name: 'Publish module only'})
     await user.click(publishButton)
 
-    // Verify API call
+    // Verify API call was made
     await waitFor(() => {
-      expect(mockDoFetchApi).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'PUT',
-          path: PUBLISH_URL,
-          body: {module: {published: true, skip_content_tags: true}},
-        }),
-      )
+      expect(requestCaptured).toBe(true)
     })
 
     // Verify flash message
@@ -209,6 +201,16 @@ describe('ContextModulesPublishIcon', () => {
 
   it('calls unpublishAll when clicked unpublish all items is clicked', async () => {
     const user = userEvent.setup({delay: null})
+    let requestCaptured = false
+    server.use(
+      http.put(PUBLISH_URL, async ({request}) => {
+        const body = await request.json()
+        expect(body).toEqual({module: {published: false, skip_content_tags: false}})
+        requestCaptured = true
+        return HttpResponse.json({published: false})
+      }),
+    )
+
     const {getByRole} = render(<ContextModulesPublishIcon {...defaultProps} />)
 
     // Open menu and click unpublish all
@@ -220,15 +222,9 @@ describe('ContextModulesPublishIcon', () => {
     const unpublishButton = getByRole('menuitem', {name: 'Unpublish module and all items'})
     await user.click(unpublishButton)
 
-    // Verify API call
+    // Verify API call was made
     await waitFor(() => {
-      expect(mockDoFetchApi).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'PUT',
-          path: PUBLISH_URL,
-          body: {module: {published: false, skip_content_tags: false}},
-        }),
-      )
+      expect(requestCaptured).toBe(true)
     })
 
     // Verify flash message

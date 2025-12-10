@@ -27,7 +27,6 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import * as ReactRouterDom from 'react-router-dom'
 
 jest.mock('axios') // mock axios for final grade override helper API call
-jest.mock('@canvas/do-fetch-api-effect', () => jest.fn()) // mock doFetchApi for final grade override helper API call
 jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
   executeApiRequest: jest.fn(),
 }))

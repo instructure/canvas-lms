@@ -39,8 +39,6 @@ jest.mock('@canvas/rce/RichContentEditor')
 
 jest.mock('../../apis/ContextModuleApi')
 
-jest.mock('@canvas/do-fetch-api-effect')
-
 jest.useFakeTimers()
 
 describe('SubmissionManager', () => {

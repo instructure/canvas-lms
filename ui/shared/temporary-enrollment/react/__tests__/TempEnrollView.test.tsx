@@ -43,8 +43,6 @@ const renderView = async (props: any) => {
 describe('TempEnrollView component', () => {
   window.confirm = jest.fn(() => true)
 
-  jest.mock('@canvas/do-fetch-api-effect')
-
   const defaultProvider = {
     name: 'Provider User',
     avatar_url: 'https://someurl.com/avatar.png',

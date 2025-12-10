@@ -23,8 +23,6 @@ import userEvent from '@testing-library/user-event'
 import {GradingSchemeTable, type GradingSchemeTableProps} from '../GradingSchemeTable'
 import {AccountGradingSchemeCards, DefaultGradingScheme, ExtraGradingSchemeCards} from './fixtures'
 
-jest.mock('@canvas/do-fetch-api-effect')
-
 describe('GradingSchemeTable', () => {
   beforeEach(() => {
     jest.clearAllMocks()
