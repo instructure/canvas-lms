@@ -464,7 +464,9 @@ uk:
     report_header_token_dev_key_id: "ідентифікатор ключа dev"
     report_header_token_dev_key_name: "Ім'я ключа dev"
     report_header_token_hint: "маркер поради"
+    report_header_token_id: ідентифікатор
     report_header_token_last_used: "останній використаний"
+    report_header_token_status: статус
     report_header_user__id: user_id
     report_header_user_id: "ідентифікатор користувача"
     report_header_user_name: "імя користувача"
