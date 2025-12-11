@@ -874,13 +874,6 @@ describe('Gradebook#renderSubmissionTray', () => {
           post_manually: false,
         },
       }
-
-      jest.spyOn(global, 'fetch').mockImplementation(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({submission_comments: []}),
-        }),
-      )
     })
 
     afterEach(() => {
