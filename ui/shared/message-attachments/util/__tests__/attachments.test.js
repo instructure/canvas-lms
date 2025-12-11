@@ -19,6 +19,8 @@ import * as uploadFileModule from '@canvas/upload-file'
 
 import {addAttachmentsFn, removeAttachmentFn} from '../attachments'
 
+// eslint-disable-next-line no-undef
+if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
 jest.mock('@canvas/upload-file')
 
 const fileInput = {
@@ -58,7 +60,7 @@ const getAddAttachments = ({
 
 describe('addAttachmentsFn', () => {
   beforeEach(() => {
-    uploadFileModule.uploadFiles = jest.fn().mockResolvedValue([])
+    uploadFileModule.uploadFiles.mockResolvedValue([])
   })
 
   afterEach(() => {
@@ -126,7 +128,7 @@ describe('addAttachmentsFn', () => {
     })
 
     it('sets failure message when upload fails', async () => {
-      uploadFileModule.uploadFiles = jest.fn().mockImplementation(() => {
+      uploadFileModule.uploadFiles.mockImplementation(() => {
         throw new Error()
       })
       const mockSetOnSuccess = jest.fn()

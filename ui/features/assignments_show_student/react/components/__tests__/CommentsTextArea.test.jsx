@@ -16,9 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global vi */
 import * as uploadFileModule from '@canvas/upload-file'
 import $ from 'jquery'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+
+if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
+jest.mock('@canvas/upload-file')
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedProvider} from '@apollo/client/testing'
 import React from 'react'
@@ -45,8 +49,17 @@ global.File = class MockFile extends global.Blob {
   }
 }
 
-global.URL.createObjectURL = jest.fn(file => `mock-url-for-${file.name}`)
-global.URL.revokeObjectURL = jest.fn()
+// Mock URL methods - Vitest needs stubGlobal, Jest can use direct assignment
+if (typeof vi !== 'undefined') {
+  const MockURL = class extends URL {
+    static createObjectURL = vi.fn(file => `mock-url-for-${file.name}`)
+    static revokeObjectURL = vi.fn()
+  }
+  vi.stubGlobal('URL', MockURL)
+} else {
+  global.URL.createObjectURL = jest.fn(file => `mock-url-for-${file.name}`)
+  global.URL.revokeObjectURL = jest.fn()
+}
 
 async function mockSubmissionCommentQuery() {
   const variables = {submissionAttempt: 0, submissionId: '1'}

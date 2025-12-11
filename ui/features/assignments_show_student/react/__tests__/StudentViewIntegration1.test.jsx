@@ -35,6 +35,10 @@ import React from 'react'
 import StudentViewQuery from '../components/StudentViewQuery'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
+/* global vi */
+if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
+jest.mock('@canvas/upload-file')
+
 jest.mock('../components/AttemptSelect')
 
 const server = setupServer()
@@ -187,7 +191,6 @@ describe('student view integration tests', () => {
     // components re-rendering
     // EVAL-3907 - remove or rewrite to remove spies on imports
     it.skip('displays the new file after it has been uploaded', async () => {
-      uploadFileModule.uploadFile = jest.fn()
       uploadFileModule.uploadFile.mockReturnValueOnce({id: '1', name: 'test.jpg'})
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')
 
@@ -218,7 +221,6 @@ describe('student view integration tests', () => {
 
     // EVAL-3907 - remove or rewrite to remove spies on imports
     it.skip('displays a progress bar for each new file being uploaded', async () => {
-      uploadFileModule.uploadFiles = jest.fn()
       uploadFileModule.uploadFiles.mockReturnValueOnce([
         {id: '1', name: 'file1.jpg'},
         {id: '2', name: 'file2.jpg'},
