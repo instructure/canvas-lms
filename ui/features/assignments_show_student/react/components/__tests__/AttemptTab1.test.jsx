@@ -29,6 +29,8 @@ import React, {createRef} from 'react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
+// eslint-disable-next-line no-undef
+if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
 jest.mock('@canvas/upload-file')
 
 const defaultMocks = (result = {data: {course: {externalToolsConnection: {nodes: []}}}}) => [
@@ -289,7 +291,7 @@ describe('ContentTabs', () => {
     describe('Uploading a file', () => {
       beforeAll(() => {
         $('body').append('<div role="alert" id="flash_screenreader_holder" />')
-        uploadFileModule.uploadFiles = jest.fn()
+        uploadFileModule.uploadFiles.mockImplementation(jest.fn())
       })
 
       it('shows a file preview for an uploaded file', async () => {

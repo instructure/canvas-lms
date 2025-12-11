@@ -31,6 +31,8 @@ import * as uploadFileModule from '@canvas/upload-file'
 import {graphql, HttpResponse} from 'msw'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
+// eslint-disable-next-line no-undef
+if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
 jest.mock('@canvas/upload-file')
 
 jest.mock('../../../util/utils', () => ({
@@ -58,7 +60,7 @@ describe('ComposeModalContainer', () => {
   })
 
   beforeEach(() => {
-    uploadFileModule.uploadFiles = jest.fn().mockResolvedValue([])
+    uploadFileModule.uploadFiles.mockResolvedValue([])
     fakeENV.setup({
       current_user_id: '1',
       CONVERSATIONS: {

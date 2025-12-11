@@ -16,14 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {vi as viType} from 'vitest'
+declare const vi: typeof viType | undefined
+
+if (typeof vi !== 'undefined') vi.mock('@canvas/alerts/react/FlashAlert')
+jest.mock('@canvas/alerts/react/FlashAlert')
+
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {fetchItemTitles} from '../fetchItemTitles'
-
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
-}))
 
 const server = setupServer(
   http.get('/api/v1/courses/:courseId/modules/:moduleId/items', ({params}) => {

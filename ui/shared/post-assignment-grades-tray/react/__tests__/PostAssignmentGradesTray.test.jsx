@@ -16,15 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global vi */
+if (typeof vi !== 'undefined') {
+  vi.mock('@canvas/alerts/react/FlashAlert')
+  vi.mock('@canvas/post-assignment-grades-tray/react/Api')
+}
+jest.mock('@canvas/alerts/react/FlashAlert')
+jest.mock('@canvas/post-assignment-grades-tray/react/Api')
+
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen as rtlScreen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import PostAssignmentGradesTray from '..'
 import * as Api from '@canvas/post-assignment-grades-tray/react/Api'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-
-jest.mock('@canvas/alerts/react/FlashAlert')
-jest.mock('@canvas/post-assignment-grades-tray/react/Api')
 
 describe('PostAssignmentGradesTray', () => {
   let tray
@@ -57,20 +62,20 @@ describe('PostAssignmentGradesTray', () => {
       ],
     }
 
-    FlashAlert.showFlashAlert = jest.fn()
-    Api.postAssignmentGrades = jest.fn()
-    Api.resolvePostAssignmentGradesStatus = jest.fn()
-    Api.postAssignmentGradesForSections = jest.fn()
+    FlashAlert.showFlashAlert.mockClear()
+    Api.postAssignmentGrades.mockClear()
+    Api.resolvePostAssignmentGradesStatus.mockClear()
+    Api.postAssignmentGradesForSections.mockClear()
   })
 
   afterEach(() => {
-    FlashAlert.destroyContainer = jest.fn()
+    FlashAlert.destroyContainer.mockClear()
     jest.clearAllMocks()
   })
 
   const waitForTrayToOpen = async () => {
     await waitFor(() => {
-      expect(screen.getByRole('dialog', {name: 'Post grades tray'})).toBeInTheDocument()
+      expect(rtlScreen.getByRole('dialog', {name: 'Post grades tray'})).toBeInTheDocument()
     })
   }
 
@@ -79,14 +84,14 @@ describe('PostAssignmentGradesTray', () => {
       renderTray()
       await tray.show(defaultProps)
       await waitForTrayToOpen()
-      expect(screen.getByRole('dialog', {name: 'Post grades tray'})).toBeInTheDocument()
+      expect(rtlScreen.getByRole('dialog', {name: 'Post grades tray'})).toBeInTheDocument()
     })
 
     it('displays the name of the assignment', async () => {
       renderTray()
       await tray.show(defaultProps)
       await waitForTrayToOpen()
-      expect(screen.getByRole('heading', {name: 'Math 1.1'})).toBeInTheDocument()
+      expect(rtlScreen.getByRole('heading', {name: 'Math 1.1'})).toBeInTheDocument()
     })
 
     it('resets the "Specific Sections" toggle', async () => {
@@ -94,7 +99,7 @@ describe('PostAssignmentGradesTray', () => {
       await tray.show(defaultProps)
       await waitForTrayToOpen()
 
-      const toggle = screen.getByRole('checkbox', {name: /specific sections/i})
+      const toggle = rtlScreen.getByRole('checkbox', {name: /specific sections/i})
       await userEvent.click(toggle)
 
       await tray.show(defaultProps)
@@ -113,16 +118,16 @@ describe('PostAssignmentGradesTray', () => {
       await tray.show(defaultProps)
       await waitForTrayToOpen()
 
-      const toggle = screen.getByRole('checkbox', {name: /specific sections/i})
+      const toggle = rtlScreen.getByRole('checkbox', {name: /specific sections/i})
       await userEvent.click(toggle)
-      await userEvent.click(screen.getByLabelText('Sophomores'))
+      await userEvent.click(rtlScreen.getByLabelText('Sophomores'))
 
       await tray.show(defaultProps)
       await waitForTrayToOpen()
 
       await userEvent.click(toggle)
-      await userEvent.click(screen.getByLabelText('Freshmen'))
-      await userEvent.click(screen.getByRole('button', {name: 'Post'}))
+      await userEvent.click(rtlScreen.getByLabelText('Freshmen'))
+      await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
 
       expect(Api.postAssignmentGradesForSections).toHaveBeenCalledWith('2301', ['2001'], {
         gradedOnly: false,
@@ -136,7 +141,7 @@ describe('PostAssignmentGradesTray', () => {
       await tray.show(defaultProps)
       await waitForTrayToOpen()
 
-      const closeButtons = screen.getAllByRole('button', {name: /close/i})
+      const closeButtons = rtlScreen.getAllByRole('button', {name: /close/i})
       await userEvent.click(closeButtons[1]) // Use the second Close button
       await waitFor(() => {
         expect(mockOnExited).toHaveBeenCalledTimes(1)
@@ -148,7 +153,7 @@ describe('PostAssignmentGradesTray', () => {
       await tray.show(defaultProps)
       await waitForTrayToOpen()
 
-      const closeButtons = screen.getAllByRole('button', {name: /close/i})
+      const closeButtons = rtlScreen.getAllByRole('button', {name: /close/i})
       await userEvent.click(closeButtons[1]) // Use the second Close button
       await waitFor(() => {
         expect(mockOnExited).toHaveBeenCalledTimes(1)
@@ -161,14 +166,14 @@ describe('PostAssignmentGradesTray', () => {
       renderTray()
       await tray.show(defaultProps)
       await waitForTrayToOpen()
-      expect(screen.getByRole('checkbox', {name: /specific sections/i})).toBeInTheDocument()
+      expect(rtlScreen.getByRole('checkbox', {name: /specific sections/i})).toBeInTheDocument()
     })
 
     it('does not display the sections when unchecked', async () => {
       renderTray()
       await tray.show(defaultProps)
       await waitForTrayToOpen()
-      expect(screen.queryByLabelText('Freshmen')).not.toBeInTheDocument()
+      expect(rtlScreen.queryByLabelText('Freshmen')).not.toBeInTheDocument()
     })
 
     it('shows the sections when checked', async () => {
@@ -176,15 +181,17 @@ describe('PostAssignmentGradesTray', () => {
       await tray.show(defaultProps)
       await waitForTrayToOpen()
 
-      await userEvent.click(screen.getByRole('checkbox', {name: /specific sections/i}))
-      expect(screen.getByLabelText('Freshmen')).toBeInTheDocument()
+      await userEvent.click(rtlScreen.getByRole('checkbox', {name: /specific sections/i}))
+      expect(rtlScreen.getByLabelText('Freshmen')).toBeInTheDocument()
     })
 
     it('is not shown when there are no sections', async () => {
       renderTray({sections: []})
       await tray.show({...defaultProps, sections: []})
       await waitForTrayToOpen()
-      expect(screen.queryByRole('checkbox', {name: /specific sections/i})).not.toBeInTheDocument()
+      expect(
+        rtlScreen.queryByRole('checkbox', {name: /specific sections/i}),
+      ).not.toBeInTheDocument()
     })
   })
 
@@ -202,7 +209,7 @@ describe('PostAssignmentGradesTray', () => {
         renderTray(props)
         await tray.show(props)
         await waitForTrayToOpen()
-        expect(screen.getByText('1')).toBeInTheDocument()
+        expect(rtlScreen.getByText('1')).toBeInTheDocument()
       })
 
       it('counts submissions with postable comments and without a postedAt', async () => {
@@ -217,7 +224,7 @@ describe('PostAssignmentGradesTray', () => {
         renderTray(props)
         await tray.show(props)
         await waitForTrayToOpen()
-        expect(screen.getByText('1')).toBeInTheDocument()
+        expect(rtlScreen.getByText('1')).toBeInTheDocument()
       })
     })
 
@@ -233,7 +240,7 @@ describe('PostAssignmentGradesTray', () => {
         renderTray(props)
         await tray.show(props)
         await waitForTrayToOpen()
-        expect(screen.queryByTestId('unposted-summary')).not.toBeInTheDocument()
+        expect(rtlScreen.queryByTestId('unposted-summary')).not.toBeInTheDocument()
       })
     })
   })
@@ -253,14 +260,14 @@ describe('PostAssignmentGradesTray', () => {
       renderTray()
       await tray.show(defaultProps)
       await waitForTrayToOpen()
-      expect(screen.getByRole('button', {name: 'Post'})).toBeInTheDocument()
+      expect(rtlScreen.getByRole('button', {name: 'Post'})).toBeInTheDocument()
     })
 
     it('calls postAssignmentGrades with correct assignment id', async () => {
       renderTray()
       await tray.show(defaultProps)
       await waitForTrayToOpen()
-      await userEvent.click(screen.getByRole('button', {name: 'Post'}))
+      await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
       expect(Api.postAssignmentGrades).toHaveBeenCalledWith('2301', expect.any(Object))
     })
 
@@ -268,7 +275,7 @@ describe('PostAssignmentGradesTray', () => {
       renderTray()
       await tray.show(defaultProps)
       await waitForTrayToOpen()
-      await userEvent.click(screen.getByRole('button', {name: 'Post'}))
+      await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
       expect(Api.resolvePostAssignmentGradesStatus).toHaveBeenCalledTimes(1)
     })
 
@@ -281,8 +288,8 @@ describe('PostAssignmentGradesTray', () => {
       renderTray()
       await tray.show(defaultProps)
       await waitForTrayToOpen()
-      await userEvent.click(screen.getByRole('button', {name: 'Post'}))
-      expect(screen.getByRole('heading', {name: 'Math 1.1'})).toBeInTheDocument()
+      await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
+      expect(rtlScreen.getByRole('heading', {name: 'Math 1.1'})).toBeInTheDocument()
       resolveStatus()
     })
 
@@ -290,7 +297,7 @@ describe('PostAssignmentGradesTray', () => {
       renderTray()
       await tray.show(defaultProps)
       await waitForTrayToOpen()
-      await userEvent.click(screen.getByRole('button', {name: 'Post'}))
+      await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
       expect(mockOnPosted).toHaveBeenCalledTimes(1)
     })
 
@@ -304,8 +311,8 @@ describe('PostAssignmentGradesTray', () => {
         renderTray()
         await tray.show(defaultProps)
         await waitForTrayToOpen()
-        await userEvent.click(screen.getByRole('button', {name: 'Post'}))
-        expect(screen.getByRole('img', {name: 'Posting grades'})).toBeInTheDocument()
+        await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
+        expect(rtlScreen.getByRole('img', {name: 'Posting grades'})).toBeInTheDocument()
         resolveStatus()
       })
     })
@@ -315,7 +322,7 @@ describe('PostAssignmentGradesTray', () => {
         renderTray()
         await tray.show(defaultProps)
         await waitForTrayToOpen()
-        await userEvent.click(screen.getByRole('button', {name: 'Post'}))
+        await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
         expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
           message: 'Success! Grades have been posted to everyone for Math 1.1.',
           type: 'success',
@@ -331,7 +338,7 @@ describe('PostAssignmentGradesTray', () => {
         renderTray(props)
         await tray.show(props)
         await waitForTrayToOpen()
-        await userEvent.click(screen.getByRole('button', {name: 'Post'}))
+        await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
         expect(FlashAlert.showFlashAlert).not.toHaveBeenCalled()
       })
     })
@@ -341,8 +348,8 @@ describe('PostAssignmentGradesTray', () => {
         renderTray()
         await tray.show(defaultProps)
         await waitForTrayToOpen()
-        await userEvent.click(screen.getByRole('radio', {name: /graded/i}))
-        await userEvent.click(screen.getByRole('button', {name: 'Post'}))
+        await userEvent.click(rtlScreen.getByRole('radio', {name: /graded/i}))
+        await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
         expect(Api.postAssignmentGrades).toHaveBeenCalledWith('2301', {gradedOnly: true})
       })
 
@@ -350,8 +357,8 @@ describe('PostAssignmentGradesTray', () => {
         renderTray()
         await tray.show(defaultProps)
         await waitForTrayToOpen()
-        await userEvent.click(screen.getByRole('radio', {name: /everyone/i}))
-        await userEvent.click(screen.getByRole('button', {name: 'Post'}))
+        await userEvent.click(rtlScreen.getByRole('radio', {name: /everyone/i}))
+        await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
         expect(Api.postAssignmentGrades).toHaveBeenCalledWith('2301', {gradedOnly: false})
       })
 
@@ -359,8 +366,8 @@ describe('PostAssignmentGradesTray', () => {
         renderTray()
         await tray.show(defaultProps)
         await waitForTrayToOpen()
-        await userEvent.click(screen.getByRole('radio', {name: /graded/i}))
-        await userEvent.click(screen.getByRole('button', {name: 'Post'}))
+        await userEvent.click(rtlScreen.getByRole('radio', {name: /graded/i}))
+        await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
         expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
           message: 'Success! Grades have been posted to everyone graded for Math 1.1.',
           type: 'success',
@@ -377,7 +384,7 @@ describe('PostAssignmentGradesTray', () => {
         renderTray()
         await tray.show(defaultProps)
         await waitForTrayToOpen()
-        await userEvent.click(screen.getByRole('button', {name: 'Post'}))
+        await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
         expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
           message: 'There was a problem posting assignment grades.',
           type: 'error',
@@ -388,16 +395,16 @@ describe('PostAssignmentGradesTray', () => {
         renderTray()
         await tray.show(defaultProps)
         await waitForTrayToOpen()
-        await userEvent.click(screen.getByRole('button', {name: 'Post'}))
-        expect(screen.getByRole('dialog')).toBeInTheDocument()
+        await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
+        expect(rtlScreen.getByRole('dialog')).toBeInTheDocument()
       })
 
       it('removes spinner', async () => {
         renderTray()
         await tray.show(defaultProps)
         await waitForTrayToOpen()
-        await userEvent.click(screen.getByRole('button', {name: 'Post'}))
-        expect(screen.queryByRole('img', {name: 'Posting grades'})).not.toBeInTheDocument()
+        await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
+        expect(rtlScreen.queryByRole('img', {name: 'Posting grades'})).not.toBeInTheDocument()
       })
     })
 
@@ -413,7 +420,7 @@ describe('PostAssignmentGradesTray', () => {
         renderTray()
         await tray.show(defaultProps)
         await waitForTrayToOpen()
-        expect(screen.getByRole('checkbox', {name: /specific sections/i})).not.toBeDisabled()
+        expect(rtlScreen.getByRole('checkbox', {name: /specific sections/i})).not.toBeDisabled()
       })
 
       it('disables section toggle when assignment is anonymous', async () => {
@@ -424,7 +431,7 @@ describe('PostAssignmentGradesTray', () => {
         renderTray(props)
         await tray.show(props)
         await waitForTrayToOpen()
-        expect(screen.getByRole('checkbox', {name: /specific sections/i})).toBeDisabled()
+        expect(rtlScreen.getByRole('checkbox', {name: /specific sections/i})).toBeDisabled()
       })
 
       describe('with section toggle clicked', () => {
@@ -432,18 +439,18 @@ describe('PostAssignmentGradesTray', () => {
           renderTray()
           await tray.show(defaultProps)
           await waitForTrayToOpen()
-          await userEvent.click(screen.getByRole('checkbox', {name: /specific sections/i}))
-          await userEvent.click(screen.getByRole('button', {name: 'Post'}))
-          expect(screen.getByText('Please select at least one option')).toBeInTheDocument()
+          await userEvent.click(rtlScreen.getByRole('checkbox', {name: /specific sections/i}))
+          await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
+          expect(rtlScreen.getByText('Please select at least one option')).toBeInTheDocument()
         })
 
         it('shows success message when sections are selected and posting succeeds', async () => {
           renderTray()
           await tray.show(defaultProps)
           await waitForTrayToOpen()
-          await userEvent.click(screen.getByRole('checkbox', {name: /specific sections/i}))
-          await userEvent.click(screen.getByLabelText('Sophomores'))
-          await userEvent.click(screen.getByRole('button', {name: 'Post'}))
+          await userEvent.click(rtlScreen.getByRole('checkbox', {name: /specific sections/i}))
+          await userEvent.click(rtlScreen.getByLabelText('Sophomores'))
+          await userEvent.click(rtlScreen.getByRole('button', {name: 'Post'}))
           expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
             message: 'Success! Grades have been posted for the selected sections of Math 1.1.',
             type: 'success',
