@@ -46,10 +46,19 @@ describe('ContentTabs', () => {
     window.INST = window.INST || {}
     window.INST.editorButtons = []
 
-    // Mock URL.createObjectURL for file handling
-    URL.createObjectURL = jest.fn(blob => {
-      return `blob:mock-url-${blob.name || 'unnamed'}`
-    })
+    // Mock URL.createObjectURL for file handling if not already mocked
+    // (Vitest setup already provides this mock, Jest may not)
+    if (typeof URL.createObjectURL !== 'function') {
+      try {
+        Object.defineProperty(URL, 'createObjectURL', {
+          value: jest.fn(blob => `blob:mock-url-${blob?.name || 'unnamed'}`),
+          writable: true,
+          configurable: true,
+        })
+      } catch {
+        // Property may already be defined and non-configurable
+      }
+    }
 
     // Mock Blob.prototype.slice for file handling
     if (!Blob.prototype.slice) {
