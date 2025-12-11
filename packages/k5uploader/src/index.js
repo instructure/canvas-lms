@@ -84,9 +84,14 @@ K5Uploader.prototype.uploadFile = function (file) {
 
   if (
     this.uiconfig.acceptableFile(file, k5Options.allowedMediaTypes) ||
-    ['webm', 'video/webm', 'audio/webm', 'video/mp4', 'video/mp4;codecs=vp9,opus'].includes(
-      file.type,
-    )
+    [
+      'webm',
+      'video/webm',
+      'audio/webm',
+      'video/mp4',
+      'video/mp4;codecs=vp9,opus',
+      'video/webm; codecs="vp8, opus"',
+    ].includes(file.type)
   ) {
     this.uploader = new Uploader()
     this.uploader.send(this.session, file)
