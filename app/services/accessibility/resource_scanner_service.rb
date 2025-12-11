@@ -130,9 +130,9 @@ class Accessibility::ResourceScannerService < ApplicationService
   def over_size_limit?
     case @resource
     when WikiPage
-      @resource.body.size > MAX_HTML_SIZE
+      (@resource.body&.size || 0) > MAX_HTML_SIZE
     when Assignment
-      @resource.description.size > MAX_HTML_SIZE
+      (@resource.description&.size || 0) > MAX_HTML_SIZE
     when Attachment
       @resource.size > MAX_PDF_SIZE
     else
@@ -177,9 +177,9 @@ class Accessibility::ResourceScannerService < ApplicationService
   def scan_resource_for_issues
     raw_issues = case @resource
                  when WikiPage
-                   check_content_accessibility(@resource.body)
+                   check_content_accessibility(@resource.body.to_s)
                  when Assignment
-                   check_content_accessibility(@resource.description)
+                   check_content_accessibility(@resource.description.to_s)
                  when Attachment
                    check_pdf_accessibility(@resource)
                  else
