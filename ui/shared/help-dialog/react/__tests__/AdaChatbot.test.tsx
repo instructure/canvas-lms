@@ -1,373 +1,480 @@
-// Copyright (C) 2025 - present Instructure, Inc.
-//
-// This file is part of Canvas.
-//
-// Canvas is free software: you can redistribute it and/or modify it under
-// the terms of the GNU Affero General Public License as published by the Free
-// Software Foundation, version 3 of the License.
-//
-// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-// details.
-//
-// You should have received a copy of the GNU Affero General Public License along
-// with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {render, cleanup, waitFor} from '@testing-library/react'
-import AdaChatbot from '../AdaChatbot'
+import AdaChatbot, {autoRestoreAda} from '../AdaChatbot'
 
-const CHAT_CLOSED_KEY = 'persistedAdaClosed'
-const DRAWER_OPEN_KEY = 'persistedAdaDrawerOpen'
+const ADA_STATE_KEY = 'persistedAdaState'
 
 describe('AdaChatbot', () => {
   const mockOnDialogClose = jest.fn()
   let mockAdaEmbed: any
+  let consoleWarnSpy: jest.SpyInstance
+  let consoleErrorSpy: jest.SpyInstance
+
+  // Helper to extract callbacks from Ada start configuration
+  const getStartConfig = () => mockAdaEmbed.start.mock.calls[0][0]
+  const getEventCallback = (eventName: string) =>
+    mockAdaEmbed.subscribeEvent.mock.calls.find(([key]: [string]) => key === eventName)?.[1]
+
+  // Helper to reset isInitialized flag by triggering end_conversation
+  const resetInitialized = async () => {
+    if (mockAdaEmbed.start.mock.calls.length > 0) {
+      getStartConfig().onAdaEmbedLoaded()
+      getEventCallback('ada:end_conversation')()
+      await waitFor(() => expect(mockAdaEmbed.stop).toHaveBeenCalled())
+    }
+  }
 
   beforeEach(() => {
+    fakeENV.setup({
+      ADA_CHATBOT_ENABLED: true,
+      current_user: {},
+      current_user_roles: [],
+      DOMAIN_ROOT_ACCOUNT_UUID: 'test-uuid',
+    })
     jest.clearAllMocks()
     localStorage.clear()
     delete (window as any).adaEmbed
     delete (window as any).adaSettings
-    jest.spyOn(console, 'warn').mockImplementation(() => {})
-    jest.spyOn(console, 'error').mockImplementation(() => {})
+    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 
     mockAdaEmbed = {
       start: jest.fn().mockResolvedValue(undefined),
-      toggle: jest.fn(),
-      getInfo: jest.fn().mockResolvedValue({isChatOpen: false, hasActiveChatter: false}),
+      toggle: jest.fn().mockResolvedValue(undefined),
+      getInfo: jest.fn().mockResolvedValue({
+        isChatOpen: false,
+        isDrawerOpen: false,
+        hasActiveChatter: false,
+        hasClosedChat: false,
+      }),
       subscribeEvent: jest.fn().mockResolvedValue(1),
+      stop: jest.fn().mockResolvedValue(undefined),
     }
-
     ;(window as any).adaEmbed = mockAdaEmbed
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    if (mockAdaEmbed?.start?.mock?.calls?.length > 0) {
+      await resetInitialized().catch(() => {})
+    }
     cleanup()
     localStorage.clear()
     jest.restoreAllMocks()
+    fakeENV.teardown()
   })
 
-  it('renders nothing as expected', () => {
+  it('renders nothing and calls onDialogClose', async () => {
     const {container} = render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
     expect(container.firstChild).toBeNull()
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+    await getStartConfig().adaReadyCallback()
+    await waitFor(() => expect(mockOnDialogClose).toHaveBeenCalled())
   })
 
-  it('calls onDialogClose when opening Ada', async () => {
-    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
-
-    await waitFor(() => {
-      expect(mockOnDialogClose).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  it('does nothing when Ada embed is not available', async () => {
+  it('handles missing Ada embed gracefully', async () => {
     delete (window as any).adaEmbed
-
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockOnDialogClose).toHaveBeenCalled())
+  })
 
-    await waitFor(() => {
-      expect(mockOnDialogClose).toHaveBeenCalledTimes(1)
+  it('does not initialize when Ada chatbot is disabled', async () => {
+    fakeENV.setup({ADA_CHATBOT_ENABLED: false})
+    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockOnDialogClose).toHaveBeenCalled())
+    expect(mockAdaEmbed.start).not.toHaveBeenCalled()
+  })
+
+  it('handles script load failure gracefully', async () => {
+    mockAdaEmbed.start.mockImplementation(() => {
+      throw new Error('Failed to load Ada embed script')
     })
+    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() =>
+      expect(consoleWarnSpy).toHaveBeenCalledWith('Ada start failed:', expect.any(Error)),
+    )
+    expect(mockOnDialogClose).toHaveBeenCalled()
+  })
+
+  it('handles unexpected localStorage state gracefully', async () => {
+    localStorage.setItem(ADA_STATE_KEY, 'invalid-state')
+    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+    // Should treat invalid state as 'closed' and not toggle
+    expect(mockAdaEmbed.toggle).not.toHaveBeenCalled()
+  })
+
+  it('does not call onDialogClose after component unmount', async () => {
+    const {unmount} = render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+    mockOnDialogClose.mockClear()
+    unmount()
+    await getStartConfig().adaReadyCallback()
+    // After unmount, onDialogClose should not be called
+    expect(mockOnDialogClose).not.toHaveBeenCalled()
   })
 
   it('initializes Ada with correct configuration', async () => {
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
 
-    await waitFor(() => {
-      expect(mockAdaEmbed.start).toHaveBeenCalledTimes(1)
-    })
-
-    expect(mockAdaEmbed.start).toHaveBeenCalledWith(
-      expect.objectContaining({
-        handle: 'instructure-gen',
-        onAdaEmbedLoaded: expect.any(Function),
-        adaReadyCallback: expect.any(Function),
-        toggleCallback: expect.any(Function),
-      }),
-    )
+    const config = getStartConfig()
+    expect(config.handle).toBe('instructure-gen')
+    expect(config).toHaveProperty('onAdaEmbedLoaded')
+    expect(config).toHaveProperty('adaReadyCallback')
+    expect(config).toHaveProperty('toggleCallback')
   })
 
-  it('injects global adaSettings and overrides handle', async () => {
-    const globalSettings = {
-      crossWindowPersistence: true,
-      metaFields: {
-        institutionUrl: 'https://example.instructure.com',
-        email: 'user@example.com',
-        name: 'Test User',
-        canvasRoles: 'teacher,admin',
-        canvasUUID: 'abc-123',
-        isRootAdmin: false,
-        isAdmin: true,
-        isTeacher: true,
-        isStudent: false,
-        isObserver: false,
-      },
-      handle: 'should-be-overridden',
-    }
-    ;(window as any).adaSettings = globalSettings
-
+  it('merges global adaSettings and overrides handle', async () => {
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
 
-    await waitFor(() => {
-      expect(mockAdaEmbed.start).toHaveBeenCalledTimes(1)
+    const config = getStartConfig()
+    expect(config.metaFields).toEqual({
+      institutionUrl: 'http://localhost',
+      email: '',
+      name: '',
+      canvasRoles: '',
+      canvasUUID: 'test-uuid',
+      isRootAdmin: false,
+      isAdmin: false,
+      isTeacher: false,
+      isStudent: false,
+      isObserver: false,
     })
-
-    const passedConfig = mockAdaEmbed.start.mock.calls[0][0]
-
-    expect(passedConfig.metaFields).toEqual(globalSettings.metaFields)
-    expect(passedConfig.crossWindowPersistence).toBe(true)
-    expect(passedConfig.handle).toBe('instructure-gen')
-    expect(globalSettings.handle).toBe('should-be-overridden')
+    expect(config.crossWindowPersistence).toBe(true)
+    expect(config.handle).toBe('instructure-gen')
   })
 
-  it('opens Ada when chat is closed', async () => {
+  it('toggles Ada when chat is closed', async () => {
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
-
-    await waitFor(() => {
-      expect(mockAdaEmbed.getInfo).toHaveBeenCalled()
-    })
-
-    expect(mockAdaEmbed.toggle).toHaveBeenCalledTimes(1)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+    await getStartConfig().adaReadyCallback()
+    await waitFor(() => expect(mockAdaEmbed.toggle).toHaveBeenCalled())
   })
 
-  it('does not toggle Ada when chat is already open', async () => {
-    mockAdaEmbed.getInfo.mockResolvedValue({isChatOpen: true, hasActiveChatter: false})
-
-    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
-
-    await waitFor(() => {
-      expect(mockAdaEmbed.getInfo).toHaveBeenCalled()
+  it('does not toggle when chat is already open', async () => {
+    mockAdaEmbed.getInfo.mockResolvedValue({
+      isChatOpen: true,
+      isDrawerOpen: true,
+      hasActiveChatter: false,
+      hasClosedChat: false,
     })
-
+    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
     expect(mockAdaEmbed.toggle).not.toHaveBeenCalled()
   })
 
   it('marks chat as active and drawer open when opened', async () => {
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
-
-    await waitFor(() => {
-      expect(mockAdaEmbed.toggle).toHaveBeenCalled()
-    })
-
-    expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('false')
-    expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('true')
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+    await getStartConfig().adaReadyCallback()
+    await waitFor(() => expect(mockAdaEmbed.toggle).toHaveBeenCalled())
+    expect(localStorage.getItem(ADA_STATE_KEY)).toBe('open')
   })
 
-  it('does not mark chat closed when minimizing via toggleCallback', async () => {
+  it('does not mark chat closed when drawer is closed via toggleCallback', async () => {
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+    await getStartConfig().adaReadyCallback()
 
-    await waitFor(() => {
-      expect(mockAdaEmbed.start).toHaveBeenCalled()
-    })
-
-    const {toggleCallback} = mockAdaEmbed.start.mock.calls[0][0]
-
-    toggleCallback(false)
-
-    expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('false')
-    expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('false')
+    getStartConfig().toggleCallback(false)
+    expect(localStorage.getItem(ADA_STATE_KEY)).toBe('minimized')
   })
 
-  it('marks chat as active and drawer open via toggleCallback', async () => {
+  it('opens Ada via help menu regardless of previous state', async () => {
+    localStorage.setItem(ADA_STATE_KEY, 'closed') // Previously closed
+
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
 
-    await waitFor(() => {
-      expect(mockAdaEmbed.start).toHaveBeenCalled()
-    })
-
-    const {toggleCallback} = mockAdaEmbed.start.mock.calls[0][0]
-
-    toggleCallback(true)
-
-    expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('false')
-    expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('true')
+    await getStartConfig().adaReadyCallback()
+    await waitFor(() => expect(mockAdaEmbed.toggle).toHaveBeenCalled()) // Should open regardless
+    expect(localStorage.getItem(ADA_STATE_KEY)).toBe('open') // Now open
   })
 
-  it('restores drawer open only when it was previously open and not closed by user', async () => {
-    // Simulate user had drawer open previously
-    localStorage.setItem(DRAWER_OPEN_KEY, 'true')
-    mockAdaEmbed.getInfo.mockResolvedValue({isChatOpen: false, hasActiveChatter: true})
-
-    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
-
-    await waitFor(() => {
-      expect(mockAdaEmbed.start).toHaveBeenCalled()
+  it('does not toggle when chat is already open via help menu', async () => {
+    mockAdaEmbed.getInfo.mockResolvedValue({
+      isChatOpen: true,
+      isDrawerOpen: true,
+      hasActiveChatter: false,
+      hasClosedChat: false,
     })
 
-    const {adaReadyCallback} = mockAdaEmbed.start.mock.calls[0][0]
-    await adaReadyCallback()
-
-    expect(mockAdaEmbed.toggle).toHaveBeenCalled()
-  })
-
-  it('does not restore drawer when chat was explicitly closed by user', async () => {
-    localStorage.setItem(CHAT_CLOSED_KEY, 'true')
-    localStorage.setItem(DRAWER_OPEN_KEY, 'true')
-    mockAdaEmbed.getInfo
-      .mockResolvedValueOnce({isChatOpen: false, hasActiveChatter: true}) // First call from openAda
-      .mockResolvedValueOnce({isChatOpen: true, hasActiveChatter: true}) // After toggle
-
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
 
-    // Wait for openAda to complete (which calls toggle once)
-    await waitFor(() => {
-      expect(mockAdaEmbed.toggle).toHaveBeenCalledTimes(1)
-    })
-
-    const {adaReadyCallback} = mockAdaEmbed.start.mock.calls[0][0]
-    await adaReadyCallback()
-
-    // Should not have made additional toggle calls because wasClosedByUser() returns true
-    expect(mockAdaEmbed.toggle).toHaveBeenCalledTimes(1)
-  })
-
-  it('does not toggle when chat is already open in adaReadyCallback', async () => {
-    mockAdaEmbed.getInfo.mockResolvedValue({isChatOpen: true, hasActiveChatter: false})
-
-    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
-
-    await waitFor(() => {
-      expect(mockAdaEmbed.start).toHaveBeenCalled()
-    })
-
-    const {adaReadyCallback} = mockAdaEmbed.start.mock.calls[0][0]
-    await adaReadyCallback()
-
-    // Toggle should not be called in adaReadyCallback since chat is already open
+    await getStartConfig().adaReadyCallback()
     expect(mockAdaEmbed.toggle).not.toHaveBeenCalled()
   })
 
-  it('handles errors in adaReadyCallback gracefully', async () => {
-    mockAdaEmbed.getInfo.mockRejectedValue(new Error('getInfo failed'))
-
+  it('handles errors during Ada opening gracefully', async () => {
+    mockAdaEmbed.getInfo.mockRejectedValueOnce(new Error('getInfo failed'))
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
 
-    await waitFor(() => {
-      expect(mockAdaEmbed.start).toHaveBeenCalled()
-    })
-
-    const {adaReadyCallback} = mockAdaEmbed.start.mock.calls[0][0]
-    await adaReadyCallback()
-
-    expect(console.warn).toHaveBeenCalledWith('Ada ready callback failed:', expect.any(Error))
+    await getStartConfig().adaReadyCallback()
+    await waitFor(() =>
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed to open Ada chatbot:',
+        expect.any(Error),
+      ),
+    )
   })
 
-  it('handles Ada initialization errors gracefully', async () => {
+  it('handles initialization errors gracefully', async () => {
     mockAdaEmbed.start.mockRejectedValue(new Error('Ada initialization failed'))
-
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
-
-    await waitFor(() => {
-      expect(console.error).toHaveBeenCalledWith('Failed to open Ada chatbot:', expect.any(Error))
-    })
-
-    expect(mockOnDialogClose).toHaveBeenCalledTimes(1)
+    await waitFor(() =>
+      expect(consoleWarnSpy).toHaveBeenCalledWith('Ada start failed:', expect.any(Error)),
+    )
+    expect(mockOnDialogClose).toHaveBeenCalled()
   })
 
-  it('prevents duplicate initialization with promise caching', async () => {
+  it('handles operation errors gracefully', async () => {
+    mockAdaEmbed.toggle.mockRejectedValue(new Error('Toggle failed'))
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
-    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
-
-    await waitFor(() => {
-      expect(mockAdaEmbed.start).toHaveBeenCalledTimes(1)
-    })
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+    await getStartConfig().adaReadyCallback()
+    await waitFor(() =>
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed to open Ada chatbot:',
+        expect.any(Error),
+      ),
+    )
+    expect(mockOnDialogClose).toHaveBeenCalled()
   })
 
-  it('marks chat closed and drawer closed on end conversation event', async () => {
+  it('marks chat closed on end_conversation event and calls stop()', async () => {
+    mockAdaEmbed.stop = jest.fn().mockResolvedValue(undefined)
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
 
-    await waitFor(() => {
-      expect(mockAdaEmbed.start).toHaveBeenCalled()
-    })
+    getStartConfig().onAdaEmbedLoaded()
+    getEventCallback('ada:end_conversation')()
 
-    const {onAdaEmbedLoaded} = mockAdaEmbed.start.mock.calls[0][0]
-    onAdaEmbedLoaded()
+    expect(localStorage.getItem(ADA_STATE_KEY)).toBe('closed')
+    await waitFor(() => expect(mockAdaEmbed.stop).toHaveBeenCalled())
+  })
 
-    // Simulate end conversation event by invoking the callback passed to subscribeEvent
-    type SubscribeArgs = [eventKey: string, callback: () => void]
-    const subscribeCall = (mockAdaEmbed.subscribeEvent.mock.calls as SubscribeArgs[]).find(
-      (call: SubscribeArgs) => call[0] === 'ada:end_conversation',
+  it.each(['ada:minimize_chat', 'ada:close_chat'])(
+    'keeps chat active on %s event',
+    async eventName => {
+      render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+      await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+      await getStartConfig().adaReadyCallback()
+
+      getStartConfig().onAdaEmbedLoaded()
+      getEventCallback(eventName)()
+
+      expect(localStorage.getItem(ADA_STATE_KEY)).toBe('minimized')
+    },
+  )
+
+  it('allows reinitialization when stop() fails', async () => {
+    mockAdaEmbed.stop = jest.fn().mockRejectedValue(new Error('Stop failed'))
+    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+
+    await resetInitialized().catch(() => {}) // Triggers stop which fails but resets flag
+
+    await waitFor(() =>
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'Ada stop failed on end_conversation:',
+        expect.any(Error),
+      ),
     )
 
-    if (subscribeCall) {
-      const callback = subscribeCall[1]
-      callback()
-    }
-
-    expect(localStorage.getItem(CHAT_CLOSED_KEY)).toBe('true')
-    expect(localStorage.getItem(DRAWER_OPEN_KEY)).toBe('false')
+    cleanup()
+    mockAdaEmbed.start.mockClear()
+    mockAdaEmbed.stop.mockResolvedValue(undefined)
+    render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+    await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
   })
 
   describe('autoRestoreAda', () => {
     it('initializes Ada when not closed by user', async () => {
-      jest.isolateModules(() => {
-        localStorage.setItem(CHAT_CLOSED_KEY, 'false')
-        const {autoRestoreAda} = require('../AdaChatbot')
-
-        autoRestoreAda()
-      })
-
-      await waitFor(() => {
-        expect(mockAdaEmbed.start).toHaveBeenCalledTimes(1)
-      })
+      localStorage.setItem(ADA_STATE_KEY, 'open')
+      autoRestoreAda()
+      await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
     })
 
-    it('does not initialize Ada when closed by user', async () => {
-      jest.isolateModules(() => {
-        localStorage.setItem(CHAT_CLOSED_KEY, 'true')
-        const {autoRestoreAda} = require('../AdaChatbot')
-
-        autoRestoreAda()
-      })
-
-      await waitFor(() => {
-        expect(mockAdaEmbed.start).not.toHaveBeenCalled()
-      })
+    it('does not initialize when closed by user', async () => {
+      localStorage.setItem(ADA_STATE_KEY, 'closed')
+      autoRestoreAda()
+      await new Promise(resolve => setTimeout(resolve, 50))
+      expect(mockAdaEmbed.start).not.toHaveBeenCalled()
     })
 
-    it('only runs once even when called multiple times', async () => {
-      jest.isolateModules(() => {
-        localStorage.setItem(CHAT_CLOSED_KEY, 'false')
-        const {autoRestoreAda} = require('../AdaChatbot')
+    it('prevents duplicate initialization and concurrent restore operations', async () => {
+      localStorage.setItem(ADA_STATE_KEY, 'open')
 
-        autoRestoreAda()
-        autoRestoreAda()
-        autoRestoreAda()
-      })
+      autoRestoreAda()
+      autoRestoreAda()
+      autoRestoreAda()
 
-      await waitFor(() => {
-        expect(mockAdaEmbed.start).toHaveBeenCalledTimes(1)
-      })
+      await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalledTimes(1))
+      await getStartConfig().adaReadyCallback()
+
+      await waitFor(() => expect(mockAdaEmbed.toggle).toHaveBeenCalledTimes(1))
+    })
+
+    it('allows reinitialization after stop()', async () => {
+      localStorage.setItem(ADA_STATE_KEY, 'open')
+
+      autoRestoreAda()
+      await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+
+      await resetInitialized()
+
+      localStorage.setItem(ADA_STATE_KEY, 'open')
+      autoRestoreAda()
+      await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalledTimes(2))
     })
 
     it('handles initialization errors gracefully', async () => {
-      let errorSpy: jest.SpyInstance
+      localStorage.setItem(ADA_STATE_KEY, 'open')
+      mockAdaEmbed.start.mockRejectedValue(new Error('Init failed'))
+      autoRestoreAda()
+      await waitFor(() =>
+        expect(consoleWarnSpy).toHaveBeenCalledWith('Ada start failed:', expect.any(Error)),
+      )
+    })
 
-      jest.isolateModules(() => {
-        localStorage.setItem(CHAT_CLOSED_KEY, 'false')
+    it('restores drawer when previously open', async () => {
+      localStorage.setItem(ADA_STATE_KEY, 'open')
 
-        // Set up the mock to reject before importing the module
-        const failingAdaEmbed = {
-          start: jest.fn().mockRejectedValue(new Error('Init failed')),
-          toggle: jest.fn(),
-          getInfo: jest.fn().mockResolvedValue({isChatOpen: false, hasActiveChatter: false}),
-          subscribeEvent: jest.fn().mockResolvedValue(1),
-        }
-        ;(window as any).adaEmbed = failingAdaEmbed
+      mockAdaEmbed.getInfo
+        .mockResolvedValueOnce({
+          isChatOpen: false,
+          isDrawerOpen: false,
+          hasActiveChatter: false,
+          hasClosedChat: false,
+        })
+        .mockResolvedValueOnce({
+          isChatOpen: true,
+          isDrawerOpen: true,
+          hasActiveChatter: false,
+          hasClosedChat: false,
+        })
 
-        errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-        const {autoRestoreAda} = require('../AdaChatbot')
+      const restorePromise = autoRestoreAda()
+      await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
 
-        autoRestoreAda()
+      // Trigger adaReadyCallback to complete initialization
+      await getStartConfig().adaReadyCallback()
+      await restorePromise
+
+      expect(mockAdaEmbed.toggle).toHaveBeenCalled()
+      expect(localStorage.getItem(ADA_STATE_KEY)).toBe('open')
+    })
+
+    it('does not restore drawer if drawer was not previously open', async () => {
+      localStorage.setItem(ADA_STATE_KEY, 'minimized')
+
+      autoRestoreAda()
+      await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+
+      await getStartConfig().adaReadyCallback()
+      await new Promise(resolve => setTimeout(resolve, 50))
+
+      expect(mockAdaEmbed.toggle).not.toHaveBeenCalled()
+    })
+
+    it('handles errors during drawer restoration gracefully', async () => {
+      localStorage.setItem(ADA_STATE_KEY, 'open')
+      mockAdaEmbed.toggle.mockRejectedValue(new Error('Toggle failed'))
+
+      autoRestoreAda()
+      await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+
+      await getStartConfig().adaReadyCallback()
+      await waitFor(() =>
+        expect(consoleWarnSpy).toHaveBeenCalledWith('Auto-restore Ada failed:', expect.any(Error)),
+      )
+    })
+  })
+
+  describe('race condition prevention', () => {
+    it('prevents concurrent openAda calls', async () => {
+      // Render two components at the same time
+      render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+      render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+
+      await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+      await getStartConfig().adaReadyCallback()
+      await waitFor(() => expect(mockAdaEmbed.toggle).toHaveBeenCalled())
+
+      // Only one toggle despite two components
+      expect(mockAdaEmbed.toggle).toHaveBeenCalledTimes(1)
+      expect(mockOnDialogClose).toHaveBeenCalledTimes(2)
+      expect(consoleWarnSpy).toHaveBeenCalledWith('Ada is already being opened')
+    })
+
+    it('prevents openAda during autoRestoreAda', async () => {
+      localStorage.setItem(ADA_STATE_KEY, 'open')
+
+      // Make start() take longer to ensure the flag stays set
+      let resolveStart: () => void
+      const startPromise = new Promise<void>(resolve => {
+        resolveStart = resolve
       })
+      mockAdaEmbed.start.mockReturnValue(startPromise)
 
-      await waitFor(() => {
-        expect(errorSpy!).toHaveBeenCalledWith('Failed to auto-restore Ada:', expect.any(Error))
-      })
+      // Start autoRestoreAda (without awaiting)
+      const restorePromise = autoRestoreAda()
 
-      errorSpy!.mockRestore()
+      // Wait for start to be called (flag is now set)
+      await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+
+      render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+
+      // Should warn about concurrent operation
+      await waitFor(() =>
+        expect(consoleWarnSpy).toHaveBeenCalledWith('Ada is already being opened'),
+      )
+
+      resolveStart!()
+      await getStartConfig().adaReadyCallback()
+      await restorePromise
+    })
+
+    it('resets state flags when Ada is stopped', async () => {
+      localStorage.setItem(ADA_STATE_KEY, 'open')
+
+      render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+      await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+
+      getStartConfig().onAdaEmbedLoaded()
+      getEventCallback('ada:end_conversation')()
+
+      await waitFor(() => expect(mockAdaEmbed.stop).toHaveBeenCalled())
+
+      cleanup()
+      mockAdaEmbed.start.mockClear()
+      mockAdaEmbed.toggle.mockClear()
+
+      render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
+      await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
+      expect(consoleWarnSpy).not.toHaveBeenCalledWith('Ada is already being opened')
     })
   })
 })
