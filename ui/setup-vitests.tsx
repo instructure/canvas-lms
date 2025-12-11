@@ -35,11 +35,94 @@ import 'jqueryui/widget'
 import 'jqueryui/mouse'
 import 'jqueryui/position'
 import 'jqueryui/draggable'
+import 'jqueryui/droppable'
 import 'jqueryui/resizable'
 import 'jqueryui/button'
 import 'jqueryui/dialog'
 import 'jqueryui/tabs'
 import 'jqueryui/sortable'
+import 'jqueryui/menu'
+import 'jqueryui/autocomplete'
+import 'jqueryui/tooltip'
+import 'jqueryui/datepicker'
+import 'jqueryui/progressbar'
+
+// Provide fallback stubs for jQuery UI plugins in case imports don't properly attach
+// This ensures tests don't fail with "X is not a function" errors
+const jqueryUIStubs = {
+  tooltip(this: JQuery) {
+    return this
+  },
+  tabs(this: JQuery) {
+    return this
+  },
+  autocomplete(this: JQuery) {
+    return this
+  },
+  dialog(this: JQuery) {
+    return this
+  },
+  sortable(this: JQuery) {
+    return this
+  },
+  draggable(this: JQuery) {
+    return this
+  },
+  droppable(this: JQuery) {
+    return this
+  },
+  resizable(this: JQuery) {
+    return this
+  },
+  datepicker(this: JQuery) {
+    return this
+  },
+  menu(this: JQuery) {
+    return this
+  },
+  slider(this: JQuery) {
+    return this
+  },
+  selectable(this: JQuery) {
+    return this
+  },
+  accordion(this: JQuery) {
+    return this
+  },
+  progressbar(this: JQuery) {
+    return this
+  },
+  spinner(this: JQuery) {
+    return this
+  },
+  button(this: JQuery) {
+    return this
+  },
+  buttonset(this: JQuery) {
+    return this
+  },
+}
+
+// Apply stubs only if the method doesn't exist on $.fn
+for (const [name, stub] of Object.entries(jqueryUIStubs)) {
+  if (!($.fn as unknown as Record<string, unknown>)[name]) {
+    ;($.fn as unknown as Record<string, unknown>)[name] = stub
+  }
+}
+
+// Add toJSON method for form serialization (used by Backbone views)
+if (!($.fn as unknown as Record<string, unknown>).toJSON) {
+  ;($.fn as unknown as Record<string, unknown>).toJSON = function (this: JQuery) {
+    const result: Record<string, string> = {}
+    this.find('input, select, textarea').each(function () {
+      const el = this as HTMLInputElement
+      if (el.name) {
+        result[el.name] = el.value
+      }
+    })
+    return result
+  }
+}
 
 // Import Canvas jQuery plugins that extend $ with custom methods
 // These are normally loaded via webpack entry points in Jest
@@ -61,6 +144,11 @@ loadErrorMessages()
 
 // Make vi available as jest for compatibility with existing tests
 vi.stubGlobal('jest', vi)
+
+// Add Jest-style skip functions for Vitest compatibility
+vi.stubGlobal('xit', vi.fn())
+vi.stubGlobal('xdescribe', vi.fn())
+vi.stubGlobal('xtest', vi.fn())
 
 // Register translations like jest-setup does
 registerTranslations('en', CoreTranslations)

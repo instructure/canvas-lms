@@ -49,6 +49,70 @@ const cssPlugin = {
   },
 }
 
+// Plugin to transform jest.mock() calls to vi.mock() for Vitest hoisting compatibility
+// Jest hoists jest.mock() calls, but Vitest only hoists vi.mock() calls
+// This plugin finds all jest.mock() calls and adds corresponding vi.mock() calls at the top
+const jestMockHoistPlugin = {
+  name: 'jest-mock-hoist',
+  enforce: 'pre' as const,
+  transform(code: string, id: string) {
+    // Only process test files
+    if (!id.includes('__tests__') || !id.match(/\.(test|spec)\.(ts|tsx|js|jsx)$/)) {
+      return null
+    }
+
+    // Find all jest.mock() calls with their module paths
+    const jestMockRegex = /jest\.mock\(\s*(['"`])([^'"`]+)\1/g
+    const mocks: string[] = []
+    let match
+
+    while ((match = jestMockRegex.exec(code)) !== null) {
+      const quote = match[1]
+      const modulePath = match[2]
+      mocks.push(`vi.mock(${quote}${modulePath}${quote})`)
+    }
+
+    if (mocks.length === 0) {
+      return null
+    }
+
+    // Check if vi.mock calls already exist for these modules
+    const existingViMocks = new Set<string>()
+    const viMockRegex = /vi\.mock\(\s*(['"`])([^'"`]+)\1/g
+    while ((match = viMockRegex.exec(code)) !== null) {
+      existingViMocks.add(match[2])
+    }
+
+    // Filter out mocks that already have vi.mock
+    const newMocks = mocks.filter(mock => {
+      const modulePath = mock.match(/vi\.mock\(\s*(['"`])([^'"`]+)\1/)?.[2]
+      return modulePath && !existingViMocks.has(modulePath)
+    })
+
+    if (newMocks.length === 0) {
+      return null
+    }
+
+    // Add vi.mock calls at the very top of the file (after any shebang/pragma)
+    // These will be hoisted by Vitest
+    const viMockBlock = `// Auto-generated vi.mock() calls for Vitest hoisting\n${newMocks.join('\n')}\n\n`
+
+    // Find the best insertion point (after any leading comments/pragmas)
+    let insertIndex = 0
+    const leadingCommentMatch = code.match(/^(\s*(\/\*[\s\S]*?\*\/|\/\/[^\n]*\n)*\s*)/)
+    if (leadingCommentMatch) {
+      insertIndex = leadingCommentMatch[0].length
+    }
+
+    const newCode = code.slice(0, insertIndex) + viMockBlock + code.slice(insertIndex)
+
+    return {
+      code: newCode,
+      map: null,
+    }
+  },
+}
+
 export default defineConfig({
   test: {
     environment: 'jsdom',
@@ -100,7 +164,9 @@ export default defineConfig({
       ),
       // Crypto-es mock
       'crypto-es': resolve(__dirname, 'packages/canvas-rce/src/rce/__mocks__/_mockCryptoEs.ts'),
+      // @jest/globals compatibility shim - redirect to vitest
+      '@jest/globals': resolve(__dirname, 'ui/shared/test-utils/jest-globals-shim.ts'),
     },
   },
-  plugins: [handlebarsPlugin(), svgPlugin(), graphqlPlugin, cssPlugin],
+  plugins: [jestMockHoistPlugin, handlebarsPlugin(), svgPlugin(), graphqlPlugin, cssPlugin],
 })
