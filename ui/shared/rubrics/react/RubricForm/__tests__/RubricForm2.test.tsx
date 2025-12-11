@@ -1270,13 +1270,8 @@ describe('RubricForm Tests', () => {
         expect(submitCriterionRegenerateButton).toBeEnabled()
         fireEvent.click(submitCriterionRegenerateButton)
 
-        // Wait for the modal to close and error message to appear
-        await waitFor(
-          () => {
-            expect(queryByText('Regenerate Criterion')).not.toBeInTheDocument()
-          },
-          {timeout: 5000},
-        )
+        // Wait for the modal to close using the same pattern as other tests
+        await waitForElementToBeRemoved(queryByText('Regenerate Criterion'))
 
         await waitFor(
           () => {
