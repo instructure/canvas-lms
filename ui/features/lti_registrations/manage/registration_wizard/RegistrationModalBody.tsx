@@ -25,6 +25,7 @@ export const MODAL_BODY_HEIGHT = '25rem'
 export type RegistrationModalProps = {
   padding?: 'medium' | 'none'
   children: React.ReactNode
+  bottomSpacing?: boolean
 }
 
 const paddingMapping = {
@@ -35,13 +36,14 @@ const paddingMapping = {
 export const RegistrationModalBody = ({
   padding,
   children,
+  bottomSpacing = true,
 }: React.PropsWithChildren<RegistrationModalProps>) => {
   return (
     <Modal.Body padding={padding ?? 'medium'}>
       <View height={`calc(${MODAL_BODY_HEIGHT} - ${paddingMapping[padding ?? 'medium']})`} as="div">
         {children}
         {/* Add some space at the bottom of the modal to make sure the content is not too close to the bottom of the modal. Nothing else seems to work */}
-        <div style={{height: '10px'}} />
+        {bottomSpacing ? <div style={{height: '10px'}} /> : null}
       </View>
     </Modal.Body>
   )
