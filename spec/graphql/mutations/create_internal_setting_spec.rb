@@ -59,7 +59,6 @@ describe Mutations::CreateInternalSetting do
     expect(internal_setting_result["value"]).to eq "never! 👀"
     expect(internal_setting_result["secret"]).to be false
 
-    Setting.reset_cache!
     expect(Setting.get("sentry_disabled", "")).to eq "never! 👀"
   end
 
