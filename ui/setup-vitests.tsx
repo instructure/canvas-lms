@@ -20,6 +20,31 @@ import '@testing-library/jest-dom'
 import {vi} from 'vitest'
 import $ from 'jquery'
 
+// Make jQuery available globally BEFORE importing plugins
+// This is needed for jqueryui plugins to attach to the correct jQuery instance
+vi.stubGlobal('$', $)
+vi.stubGlobal('jQuery', $)
+
+// Import jqueryui modules in dependency order
+// 1. core.js defines $.ui namespace and $.ui.plugin (used by draggable/resizable)
+// 2. widget.js defines $.widget() factory used by all other jqueryui modules
+// 3. mouse.js defines $.ui.mouse (base for draggable, sortable, etc.)
+// 4. Then the rest can be loaded
+import 'jqueryui/core'
+import 'jqueryui/widget'
+import 'jqueryui/mouse'
+import 'jqueryui/position'
+import 'jqueryui/draggable'
+import 'jqueryui/resizable'
+import 'jqueryui/button'
+import 'jqueryui/dialog'
+import 'jqueryui/tabs'
+import 'jqueryui/sortable'
+
+// Import Canvas jQuery plugins that extend $ with custom methods
+// These are normally loaded via webpack entry points in Jest
+import '@canvas/rails-flash-notifications/jquery'
+
 // Import initialization from jest-setup.js that's framework-agnostic
 import {loadDevMessages, loadErrorMessages} from '@apollo/client/dev'
 import {up as configureDateTime} from '@canvas/datetime/configureDateTime'
@@ -33,11 +58,6 @@ import {up as installNodeDecorations} from './boot/initializers/installNodeDecor
 // Load Apollo Client dev messages for better error reporting
 loadDevMessages()
 loadErrorMessages()
-
-// Make jQuery available globally like webpack's ProvidePlugin does
-// This is needed for jqueryui plugins to attach to the correct jQuery instance
-vi.stubGlobal('$', $)
-vi.stubGlobal('jQuery', $)
 
 // Make vi available as jest for compatibility with existing tests
 vi.stubGlobal('jest', vi)
