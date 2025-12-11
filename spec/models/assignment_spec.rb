@@ -13764,4 +13764,70 @@ describe Assignment do
       expect(submission.posted_at).not_to be_nil
     end
   end
+
+  describe "#peer_review_overrides_for_dates" do
+    before :once do
+      @course = course_factory(active_all: true)
+      @assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        peer_reviews: true
+      )
+    end
+
+    it "returns nil when feature flag is disabled" do
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      expect(@assignment.peer_review_overrides_for_dates).to be_nil
+    end
+
+    it "returns nil when assignment does not have peer reviews enabled" do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      @assignment.update!(peer_reviews: false)
+      expect(@assignment.peer_review_overrides_for_dates).to be_nil
+    end
+
+    it "returns nil when peer review sub assignment does not exist" do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      expect(@assignment.peer_review_overrides_for_dates).to be_nil
+    end
+
+    context "with peer review sub assignment" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        service = PeerReview::PeerReviewCreatorService.new(
+          parent_assignment: @assignment,
+          points_possible: 5
+        )
+        service.call
+        @peer_review_sub = @assignment.reload.peer_review_sub_assignment
+      end
+
+      it "returns hash with overrides and peer_review_sub" do
+        result = @assignment.peer_review_overrides_for_dates
+        expect(result).to be_a(Hash)
+        expect(result[:peer_review_sub]).to eq(@peer_review_sub)
+        expect(result[:overrides]).to be_a(Hash)
+      end
+
+      it "indexes overrides by parent_override_id" do
+        section = @course.course_sections.create!(name: "Section 1")
+        parent_override = @assignment.assignment_overrides.create!(
+          set: section,
+          due_at: 1.week.from_now
+        )
+        pr_override = @peer_review_sub.assignment_overrides.create!(
+          parent_override:,
+          set: section,
+          due_at: 2.weeks.from_now
+        )
+
+        result = @assignment.peer_review_overrides_for_dates
+        expect(result[:overrides][parent_override.id]).to eq(pr_override)
+      end
+
+      it "returns nil when peer review sub assignment is deleted" do
+        @peer_review_sub.destroy
+        expect(@assignment.reload.peer_review_overrides_for_dates).to be_nil
+      end
+    end
+  end
 end
