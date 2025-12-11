@@ -50,8 +50,8 @@ describe('CollectionView', () => {
     contentView.remove()
   })
 
-  test('should be accessible', function (done) {
-    isAccessible(contentView, done, {a11yReport: true})
+  test('should be accessible', async () => {
+    await new Promise(resolve => isAccessible(contentView, resolve, {a11yReport: true}))
   })
 
   test('collectionView replaces text with warning and link on renderNoOutcomeWarning event', function () {

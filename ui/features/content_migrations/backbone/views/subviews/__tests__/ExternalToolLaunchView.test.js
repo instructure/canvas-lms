@@ -42,8 +42,8 @@ describe('ExternalToolLaunchView', () => {
     jest.clearAllMocks()
   })
 
-  test('it should be accessible', function (done) {
-    isAccessible(launchView, done, {a11yReport: true})
+  test('it should be accessible', async () => {
+    await new Promise(resolve => isAccessible(launchView, resolve, {a11yReport: true}))
   })
 
   test('calls render on return view when launch button clicked', function () {

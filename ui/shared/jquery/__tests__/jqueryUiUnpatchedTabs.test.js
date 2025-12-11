@@ -80,14 +80,17 @@ describe('tabs widget', () => {
     ok($tab2Content.is(':visible'), 'Tab 2 content is visible after switching')
   })
 
-  test('Clicking on a tab triggers expected event', function (done) {
+  test('Clicking on a tab triggers expected event', async () => {
     const $tabs = $('#tabs')
-    $tabs.on('tabsactivate', function (event, ui) {
-      ok(ui.newTab.is('li'), 'New tab is a list item')
-      ok(ui.newPanel.is('div'), 'New panel is a div element')
-      done()
+    const eventPromise = new Promise(resolve => {
+      $tabs.on('tabsactivate', (event, ui) => {
+        resolve(ui)
+      })
     })
     $tabs.find('a[href="#tab-2"]').click()
+    const ui = await eventPromise
+    ok(ui.newTab.is('li'), 'New tab is a list item')
+    ok(ui.newPanel.is('div'), 'New panel is a div element')
   })
 
   test('Destroying tabs removes associated UI elements and bindings', function () {

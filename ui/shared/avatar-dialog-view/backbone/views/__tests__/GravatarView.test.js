@@ -58,8 +58,8 @@ describe('GravatarView', () => {
     jest.restoreAllMocks()
   })
 
-  test('it should be accessible', function (done) {
-    isAccessible(view, done, {a11yReport: true})
+  test('it should be accessible', async () => {
+    await new Promise(resolve => isAccessible(view, resolve, {a11yReport: true}))
   })
 
   test('pre-populates preview with default', function () {

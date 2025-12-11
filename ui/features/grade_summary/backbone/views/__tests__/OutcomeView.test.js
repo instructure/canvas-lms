@@ -45,8 +45,8 @@ describe('OutcomeViewSpec', () => {
     }
   })
 
-  test('should be accessible', function (done) {
-    isAccessible(outcomeView, done, {a11yReport: true})
+  test('should be accessible', async () => {
+    await new Promise(resolve => isAccessible(outcomeView, resolve, {a11yReport: true}))
   })
 
   test('assign instance of ProgressBarView on init', function () {
