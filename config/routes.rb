@@ -2963,6 +2963,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :career_experience) do
+      get "career/enabled", action: :enabled
       get "career/experience_summary", action: :experience_summary
       post "career/switch_experience", action: :switch_experience
       post "career/switch_role", action: :switch_role
