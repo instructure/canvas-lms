@@ -19,33 +19,32 @@
 import $ from 'jquery'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import subject from '../reports'
 import Dispatcher from '../../dispatcher'
 import config from '../../config'
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+import K from '../../constants'
 
 const server = setupServer()
 
 beforeAll(() => server.listen({onUnhandledRequest: 'bypass'}))
-afterEach(async () => {
-  server.resetHandlers()
-  // __reset__() will clear all callbacks
-  subject.__reset__()
-  // Give a moment for any pending async operations to settle
-  await sleep(10)
-})
 afterAll(() => server.close())
 
 beforeEach(() => {
+  fakeENV.setup()
   config.ajax = $.ajax
   config.quizReportsUrl = 'http://localhost/reports'
-  // Ensure we start with a clean state
   subject.__reset__()
 })
 
+afterEach(() => {
+  server.resetHandlers()
+  subject.__reset__()
+  fakeENV.teardown()
+})
+
 describe('quizReports:generate', function () {
-  it('makes the right request', done => {
+  it('makes the right request', async () => {
     let capturedRequest = null
 
     server.use(
@@ -59,45 +58,45 @@ describe('quizReports:generate', function () {
           quiz_reports: [
             {
               id: '200',
+              url: 'http://localhost/reports/200',
               progress: {
-                workflow_state: 'foobar',
+                workflow_state: K.PROGRESS_ACTIVE,
                 url: 'http://localhost/progress/123',
               },
             },
           ],
         })
       }),
-      // Mock the progress URL that gets polled
+      // Mock the progress URL that gets polled - keep it active so it doesn't
+      // complete and alter the state during the test
       http.get('http://localhost/progress/*', () => {
         return HttpResponse.json({
-          workflow_state: 'completed',
-          completion: 100,
+          workflow_state: K.PROGRESS_ACTIVE,
+          completion: 50,
         })
       }),
       // Mock any other report fetch requests
-      http.get('http://localhost/reports', () => {
+      http.get('http://localhost/reports*', () => {
         return HttpResponse.json({quiz_reports: []})
       }),
     )
 
-    Dispatcher.dispatch('quizReports:generate', 'student_analysis')
-      .then(() => {
-        expect(capturedRequest).toBeTruthy()
-        expect(capturedRequest.url).toBe('/reports')
-        expect(capturedRequest.method).toBe('POST')
-        expect(capturedRequest.body).toEqual({
-          quiz_reports: [
-            {
-              report_type: 'student_analysis',
-              includes_all_versions: true,
-            },
-          ],
-          include: ['progress', 'file'],
-        })
+    // Dispatch returns a promise that resolves when the POST succeeds
+    await Dispatcher.dispatch('quizReports:generate', 'student_analysis')
 
-        expect(subject.getAll()[0].progress.workflowState).toBe('foobar')
-        done()
-      })
-      .catch(error => done(error))
+    expect(capturedRequest).toBeTruthy()
+    expect(capturedRequest.url).toBe('/reports')
+    expect(capturedRequest.method).toBe('POST')
+    expect(capturedRequest.body).toEqual({
+      quiz_reports: [
+        {
+          report_type: 'student_analysis',
+          includes_all_versions: true,
+        },
+      ],
+      include: ['progress', 'file'],
+    })
+
+    expect(subject.getAll()[0].progress.workflowState).toBe(K.PROGRESS_ACTIVE)
   })
 })
