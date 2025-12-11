@@ -25,8 +25,10 @@ import {findMediaPlayerIframe} from '../../shared/iframeUtils'
 import VideoOptionsTray from '.'
 import {isStudioEmbeddedMedia, parseStudioOptions, updateStudioEmbedOptions, validateStudioEmbedOptions} from '../../shared/StudioLtiSupportUtils'
 import RCEGlobals from '../../../RCEGlobals'
+import formatMessage from '../../../../format-message'
 
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
+export const ANNOUNCER_ID = 'instructure-video-options-tray-announcer'
 
 export const VIDEO_SIZE_DEFAULT = {height: '225px', width: '400px'} // AKA "LARGE"
 export const STUDIO_PLAYER_VIDEO_SIZE_DEFAULT = {height: '300px', width: '480px'}
@@ -54,6 +56,23 @@ export default class TrayController {
     this._isOpen = false
     this._shouldOpen = false
     this._renderId = 0
+    this._announcer = this.createAnnouncer()
+  }
+
+  createAnnouncer() {
+    let announcer = document.getElementById(ANNOUNCER_ID)
+
+    if (announcer !== null) {
+      return announcer
+    }
+
+    announcer = document.createElement('div')
+    announcer.id = ANNOUNCER_ID
+    announcer.setAttribute('role', 'status')
+    announcer.setAttribute('aria-live', 'polite')
+    announcer.setAttribute('aria-relevant', 'additions text')
+    document.body.appendChild(announcer)
+    return announcer
   }
 
   get $container() {
@@ -82,6 +101,7 @@ export default class TrayController {
 
     const trayProps = bridge.trayProps.get(editor)
     this._renderTray(trayProps)
+    this._announcer.textContent = ''
   }
 
   hideTrayForEditor(editor) {
@@ -173,6 +193,7 @@ export default class TrayController {
       }
     }
     this._dismissTray()
+    this._announcer.textContent = formatMessage('Media options saved.')
   }
 
   _dismissTray() {
