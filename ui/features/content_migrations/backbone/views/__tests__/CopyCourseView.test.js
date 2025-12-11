@@ -51,8 +51,8 @@ describe('CopyCourseView: Initializer', () => {
     $(fixtues).html('')
   })
 
-  test('it should be accessible', function (done) {
-    isAccessible(copyCourseView, done, {a11yReport: true})
+  test('it should be accessible', async () => {
+    await new Promise(resolve => isAccessible(copyCourseView, resolve, {a11yReport: true}))
   })
 
   // passes in QUnit, fails in Jest
