@@ -349,7 +349,12 @@ class RoleOverridesController < ApplicationController
 
     name = api_request? ? (params[:label].presence || params[:role]) : params[:role_type]
 
-    return render json: { message: "missing required parameter 'role'" }, status: :bad_request if api_request? && name.blank?
+    if api_request?
+      return render json: { message: "missing required parameter 'role'" }, status: :bad_request if name.blank?
+
+      used_names = @context.available_roles.map(&:name)
+      return render json: { message: "role name #{name} already in use" }, status: :bad_request if used_names.include?(name)
+    end
 
     base_role_type = params[:base_role_type] || Role::DEFAULT_ACCOUNT_TYPE
     role = @context.roles.build(name:)
