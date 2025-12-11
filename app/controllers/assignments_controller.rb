@@ -146,7 +146,7 @@ class AssignmentsController < ApplicationController
 
   def render_a2_student_view(student:)
     current_user_submission = @assignment.submissions.find_by(user: student)
-    submission = if @context.feature_enabled?(:peer_reviews_for_a2)
+    submission = if @context.feature_enabled?(:assignments_2_student)
                    if params[:reviewee_id].present? && !@assignment.anonymous_peer_reviews?
                      @assignment.submissions.find_by(user_id: params[:reviewee_id])
                    elsif params[:anonymous_asset_id].present?
@@ -158,7 +158,7 @@ class AssignmentsController < ApplicationController
                    current_user_submission
                  end
 
-    peer_review_mode_enabled = @context.feature_enabled?(:peer_reviews_for_a2) && (params[:reviewee_id].present? || params[:anonymous_asset_id].present?)
+    peer_review_mode_enabled = @context.feature_enabled?(:assignments_2_student) && (params[:reviewee_id].present? || params[:anonymous_asset_id].present?)
     peer_review_available = submission.present? && @assignment.submitted?(submission:) && current_user_submission.present? && @assignment.submitted?(submission: current_user_submission)
     grading_standard = @context.grading_standard_or_default
     js_env({
