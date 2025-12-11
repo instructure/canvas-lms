@@ -19,5 +19,6 @@
 // Compatibility shim for @jest/globals imports in Vitest
 // This allows tests that import from '@jest/globals' to work in both Jest and Vitest
 import {vi, expect, describe, it, beforeEach, afterEach, beforeAll, afterAll, test} from 'vitest'
+import {mocked} from './mocked'
 
-export {vi as jest, expect, describe, it, beforeEach, afterEach, beforeAll, afterAll, test}
+export {vi as jest, expect, describe, it, beforeEach, afterEach, beforeAll, afterAll, test, mocked}

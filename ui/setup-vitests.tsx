@@ -150,6 +150,13 @@ vi.stubGlobal('xit', vi.fn())
 vi.stubGlobal('xdescribe', vi.fn())
 vi.stubGlobal('xtest', vi.fn())
 
+// Make mocked() available globally for safe mock casting
+// This is equivalent to jest.mocked() / vi.mocked() but works in both runners
+// Usage: mocked(myFunction).mockReturnValue('value')
+// Instead of: (myFunction as jest.Mock).mockReturnValue('value')
+import {mocked} from '@canvas/test-utils/mocked'
+vi.stubGlobal('mocked', mocked)
+
 // Register translations like jest-setup does
 registerTranslations('en', CoreTranslations)
 
