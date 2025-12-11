@@ -44,8 +44,8 @@ describe('CalendarNavigator', () => {
     $('ul[id^=ui-id-]').remove()
   })
 
-  test('should be accessible', function (done) {
-    isAccessible(navigator, () => done(), {a11yReport: true})
+  test('should be accessible', async () => {
+    await new Promise(resolve => isAccessible(navigator, resolve, {a11yReport: true}))
   })
 
   // TODO: LF-626 started failing only in Jenkins when unrelated code was removed

@@ -43,8 +43,8 @@ describe('ProgressStatusViewSpec', () => {
     psv.remove()
   })
 
-  test('it should be accessible', function (done) {
-    isAccessible($fixtures, done, {a11yReport: true})
+  test('it should be accessible', async () => {
+    await new Promise(resolve => isAccessible($fixtures, resolve, {a11yReport: true}))
   })
 
   test('displays progress workflow_state when migrations workflow_state is running', function () {

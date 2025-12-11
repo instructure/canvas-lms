@@ -62,8 +62,8 @@ describe('DiscussionTopicToolbarView', () => {
     fakeENV.teardown()
   })
 
-  test('it should be accessible', function (done) {
-    isAccessible(view, done, {a11yReport: true})
+  test('it should be accessible', async () => {
+    await new Promise(resolve => isAccessible(view, resolve, {a11yReport: true}))
   })
 
   test('keyboard shortcut modal info shows when it has focus', function () {
