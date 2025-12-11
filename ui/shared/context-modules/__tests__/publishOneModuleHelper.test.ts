@@ -110,14 +110,16 @@ describe('publishOneModuleHelper', () => {
   describe('publishModule', () => {
     let spy: jest.SpyInstance
     beforeEach(() => {
-      spy = jest.spyOn(publishOneModuleHelperModule, 'batchUpdateOneModuleApiCall')
+      // Mock the implementation to prevent actual async operations
+      spy = jest
+        .spyOn(publishOneModuleHelperModule, 'batchUpdateOneModuleApiCall')
+        .mockResolvedValue(undefined)
       makeModuleWithItems(1, [117, 119], false)
     })
     afterEach(() => {
       spy.mockRestore()
     })
     it('calls batchUpdateOneModuleApiCall with the correct argumets', async () => {
-      const spy = jest.spyOn(publishOneModuleHelperModule, 'batchUpdateOneModuleApiCall')
       const courseId = 1
       const moduleId = 1
       let skipItems = false
@@ -170,7 +172,10 @@ describe('publishOneModuleHelper', () => {
   describe('unpublishModule', () => {
     let spy: jest.SpyInstance
     beforeEach(() => {
-      spy = jest.spyOn(publishOneModuleHelperModule, 'batchUpdateOneModuleApiCall')
+      // Mock the implementation to prevent actual async operations
+      spy = jest
+        .spyOn(publishOneModuleHelperModule, 'batchUpdateOneModuleApiCall')
+        .mockResolvedValue(undefined)
       makeModuleWithItems(1, [117, 119], false)
     })
     afterEach(() => {
