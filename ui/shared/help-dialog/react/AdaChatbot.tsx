@@ -189,11 +189,6 @@ async function initializeAda(): Promise<void> {
                 return
               }
 
-              // Avoid duplicate subscriptions: only bind once per lifecycle
-              if (adaEventsBound) {
-                return
-              }
-
               // Subscribe to end_conversation event - only this marks chat as closed
               const endConversationHandler = () => {
                 updateChatState({
