@@ -64,6 +64,15 @@ describe Mutations::UpdateInternalSetting do
     expect(Setting.find(internal_setting.id).value).to eq "new_value"
   end
 
+  it "clears the HA cache" do
+    # Force lazy setup to happen before we track calls to MultiCache.delete
+    sender
+
+    expect(MultiCache).to receive(:delete).with("all_settings")
+
+    execute("new_value")
+  end
+
   context "errors" do
     def expect_error(result, message)
       errors = result["errors"] || result.dig("data", "updateInternalSetting", "errors")
