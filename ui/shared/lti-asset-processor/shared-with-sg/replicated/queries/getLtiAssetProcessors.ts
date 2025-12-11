@@ -18,8 +18,7 @@
 
 import {z} from 'zod'
 import {useScope as createI18nScope} from '@canvas/i18n'
-// biome-ignore lint/nursery/noImportCycles: replicated/ directory should be kept identical to the code in canvas-lms
-import {type GqlTemplateStringType, gql} from '../../dependenciesShims'
+import {type GqlTemplateStringType, gql} from '../../gqlShim'
 
 const I18n = createI18nScope('lti_asset_processor')
 

@@ -36,8 +36,9 @@
  * See also canvas-lms/doc/lti/18_asset_reports.md
  */
 
-import {gql} from '@apollo/client'
-import type {DocumentNode as GqlTemplateStringType} from 'graphql'
+// Re-export gql from gqlShim to avoid circular dependencies
+// (gqlShim doesn't import from graphqlQueryHooks like this file does)
+import {gql, type GqlTemplateStringType} from './gqlShim'
 
 // Values returned by the graphql queries replicated/queries/*.ts and
 // replicated/mutations/*.ts must be compatible with these types.
