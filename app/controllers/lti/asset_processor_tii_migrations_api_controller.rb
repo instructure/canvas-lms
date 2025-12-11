@@ -139,7 +139,10 @@ module Lti
             id: progress.id,
             workflow_state: progress.workflow_state,
             completion: progress.completion,
-            message: progress.message
+            message: progress.message,
+            results: {
+              migration_report_url: progress.results&.dig(:migration_report_url)
+            }
           }
         end
     end

@@ -31,50 +31,88 @@ module Lti
 
     def perform(progress)
       @progress = progress
-
       if prevalidations_successful?
         @progress.calculate_completion!(0, actls_for_account_count)
-        migrate_actls
+        generate_migration_report do |csv|
+          migrate_actls(csv)
+        end
       end
-      @progress.set_results(@results)
-      create_migration_report
+      save_migration_report
+      @progress.set_results(@results.except(:actl_errors)) # actl_errors can be large, exclude from progress results
       send_migration_report_email
 
-      # TODO: fail the job if there were fatal errors
+      if any_error_occurred?
+        Rails.logger.info("TII Asset Processor migration completed with errors")
+        @progress.fail!
+      else
+        Rails.logger.info("TII Asset Processor migration completed successfully")
+        @progress.complete!
+      end
     end
 
     private
 
-    def migrate_actls
+    def migrate_actls(csv)
       actls_for_account.find_each do |actl|
+        subaccount_toolproxy = false
+        ap_migration_status = :failed
+        report_migration_status = :failed
         tool_proxy = actl.associated_tool_proxy
         # only migrate if tool proxy is installed on this account/course (not for sub-accounts)
-        next unless tool_proxy.present? && proxy_in_account?(tool_proxy, @account)
-
-        initialize_proxy_results(tool_proxy)
-
-        if get_proxy_result(tool_proxy, :cet_creation_failed) # We could not create the CET for this TP earlier so skipping
+        unless tool_proxy.present? && proxy_in_account?(tool_proxy, @account)
+          subaccount_toolproxy = true
           next
         end
+        initialize_proxy_results(tool_proxy)
+
+        next if get_proxy_result(tool_proxy, :cet_creation_failed) # We could not create the CET for this TP earlier
 
         unless tool_proxy.migrated_to_context_external_tool.present?
           migrate_tool_proxy(tool_proxy)
           unless proxy_errors(tool_proxy).empty? && tool_proxy.reload.migrated_to_context_external_tool.present?
             set_proxy_result(tool_proxy, :cet_creation_failed, true)
-            log_proxy_error(tool_proxy, "Skipping ACTL ID=#{actl.id} migration due to failed CET creation Tool Proxy ID=#{tool_proxy.global_id}")
+            add_proxy_error(tool_proxy, "Tool creation failed for Tool Proxy ID=#{tool_proxy.global_id}")
             next
           end
         end
 
-        create_asset_processor_from_actl(actl, tool_proxy)
+        ap_migration_status, ap = create_asset_processor_from_actl(actl, tool_proxy)
 
-        # TODO: migrate reports
+        report_migration_status, reports_count = migrate_reports(actl, tool_proxy, ap)
       rescue => e
-        Canvas::Errors.capture_exception(:tii_migration, e)
-        log_proxy_error(tool_proxy, "Unexpected error migrating ACTL ID=#{actl.id}")
+        capture_and_log_exception(e)
+        add_actl_error(actl, "Unexpected error migrating ACTL ID=#{actl.id}")
       ensure
         @progress.increment_completion!(1)
+        unless subaccount_toolproxy
+          assignment = actl.assignment
+          csv << [
+            assignment.id,
+            assignment.name,
+            assignment.course.id,
+            tool_proxy&.id,
+            ap&.context_external_tool_id || "",
+            ap_migration_status.to_s,
+            report_migration_status.to_s,
+            reports_count || 0,
+            report_error_message(tool_proxy, actl).join(", "),
+            tool_proxy.present? ? get_proxy_result(tool_proxy, :warnings).join(", ") : ""
+          ]
+        end
       end
+    end
+
+    def report_error_message(tool_proxy, actl)
+      messages = []
+      if tool_proxy.present?
+        messages += proxy_errors(tool_proxy)
+      else
+        return ["Missing tool proxy"]
+      end
+      if actl.present? && @results[:actl_errors].present? && @results[:actl_errors][actl.id].present?
+        messages += @results[:actl_errors][actl.id]
+      end
+      messages
     end
 
     def proxy_in_account?(tool_proxy, account)
@@ -92,8 +130,8 @@ module Lti
     def actls_for_account
       AssignmentConfigurationToolLookup
         .where(
-          tool_vendor_code: "turnitin.com",
-          tool_product_code: "turnitin-lti",
+          tool_vendor_code: TII_TOOL_VENDOR_CODE,
+          tool_product_code: TII_TOOL_PRODUCT_CODE,
           tool_type: "Lti::MessageHandler"
         )
         .joins(:assignment)
@@ -113,13 +151,13 @@ module Lti
       context_matching_deployments = deployments.select { |deployment| deployment.context == tool_proxy.context }
 
       if deployments.length > 1
-        log_proxy_error(tool_proxy, "Multiple TII AP deployments found in context. #{deployments.map(&:id).join(", ")}")
+        add_proxy_error(tool_proxy, "Multiple TII AP deployments found in context. #{deployments.map(&:id).join(", ")}")
         return
       end
 
       if context_matching_deployments.empty?
         if deployments.any?
-          log_proxy_error(tool_proxy, "Found #{deployments.map { |d| "CET ID=#{d.id}" }.join(", ")}} TII AP deployments in context of Tool Proxy ID=#{tool_proxy.global_id}, but none match the context. Skipping migration.")
+          add_proxy_error(tool_proxy, "Found #{deployments.map { |d| "CET ID=#{d.id}" }.join(", ")}} TII AP deployments in context of Tool Proxy ID=#{tool_proxy.global_id}, but none match the context. Skipping migration.")
           return
         end
         Rails.logger.info("No TII AP deployment found for Tool Proxy ID=#{tool_proxy.global_id}, creating one")
@@ -132,6 +170,9 @@ module Lti
       end
 
       tii_tp_migration(tool_proxy, context_matching_deployments.first)
+    rescue => e
+      capture_and_log_exception(e)
+      add_proxy_error(tool_proxy, "Unexpected error when migrating Tool Proxy ID=#{tool_proxy.global_id}: #{e.message}")
     end
 
     def tii_developer_key
@@ -165,11 +206,11 @@ module Lti
       Rails.logger.info("Created TII Asset Processor deployment ID=#{deployment.global_id} for Tool Proxy ID=#{tool_proxy.global_id}")
       deployment
     rescue Lti::ContextExternalToolErrors => e
-      log_proxy_error(tool_proxy, "Failed to create deployment for Tool Proxy ID=#{tool_proxy.global_id}: #{e.message}")
+      add_proxy_error(tool_proxy, "Failed to create deployment for Tool Proxy ID=#{tool_proxy.global_id}: #{e.message}")
       nil
     rescue => e
-      Canvas::Errors.capture_exception(:tii_migration, e, :info)
-      log_proxy_error(tool_proxy, "Unexpected error creating deployment for Tool Proxy ID=#{tool_proxy.global_id}: #{e.message}")
+      capture_and_log_exception(e)
+      add_proxy_error(tool_proxy, "Unexpected error creating deployment for Tool Proxy ID=#{tool_proxy.global_id}: #{e.message}")
       nil
     end
 
@@ -178,13 +219,13 @@ module Lti
 
       migration_endpoint = extract_migration_endpoint(tool_proxy)
       unless migration_endpoint
-        log_proxy_error(tool_proxy, "Failed to extract migration endpoint from Tool Proxy ID=#{tool_proxy.global_id}")
+        add_proxy_error(tool_proxy, "Failed to extract migration endpoint from Tool Proxy ID=#{tool_proxy.global_id}")
         return
       end
 
       if call_tii_migration_endpoint(tool_proxy, deployment, migration_endpoint)
         # Save deployment ID to tool_proxy
-        tool_proxy.update!(migrated_to_context_external_tool_id: deployment.id)
+        tool_proxy.update_column(:migrated_to_context_external_tool_id, deployment.id)
         Rails.logger.info("Successfully migrated Tool Proxy ID=#{tool_proxy.global_id} to deployment ID=#{deployment.global_id}")
       end
     end
@@ -229,9 +270,9 @@ module Lti
           retry
         end
 
-        Canvas::Errors.capture_exception(:tii_migration, e)
+        capture_and_log_exception(e)
         error_msg = "Exception during migration for Tool Proxy ID=#{tool_proxy.global_id}: #{e.message}"
-        log_proxy_error(tool_proxy, error_msg)
+        add_proxy_error(tool_proxy, error_msg)
         false
       end
     end
@@ -251,7 +292,7 @@ module Lti
 
       "#{uri.scheme}://#{uri.host}/api/migrate"
     rescue => e
-      Canvas::Errors.capture_exception(:tii_migration, e, :info)
+      capture_and_log_exception(e)
       Rails.logger.error("Failed to extract migration endpoint from Tool Proxy: #{e.message}")
       nil
     end
@@ -288,9 +329,24 @@ module Lti
       }
     end
 
-    def log_proxy_error(tool_proxy, message)
+    def add_proxy_error(tool_proxy, message)
       Rails.logger.error(message)
       @results[:proxies][tool_proxy.id][:errors] << message
+    end
+
+    def add_proxy_warning(tool_proxy, message)
+      Rails.logger.warn(message)
+      unless @results[:proxies][tool_proxy.id][:warnings].include?(message)
+        @results[:proxies][tool_proxy.id][:warnings] << message
+      end
+    end
+
+    def add_actl_error(actl, message)
+      @results[:actl_errors] ||= {}
+      @results[:actl_errors][actl.id] ||= []
+      unless @results[:actl_errors][actl.id].include?(message)
+        @results[:actl_errors][actl.id] << message
+      end
     end
 
     def get_proxy_result(tool_proxy, key)
@@ -302,27 +358,36 @@ module Lti
     end
 
     def proxy_errors(tool_proxy)
-      get_proxy_result(tool_proxy, :errors)
+      get_proxy_result(tool_proxy, :errors) || []
     end
 
-    def log_proxy_warning(tool_proxy, message)
-      Rails.logger.warn(message)
-      @results[:proxies][tool_proxy.id][:warnings] << message
+    def capture_and_log_exception(exception)
+      error_info = Canvas::Errors.capture_exception(:tii_migration, exception)
+      if error_info.is_a?(Hash) && error_info[:error_report].present?
+        error_report_id = error_info[:error_report]
+        @results[:error_report_ids] ||= []
+        @results[:error_report_ids] << error_report_id
+        Rails.logger.error("Captured exception with error report ID: #{error_report_id}")
+      end
+      error_info
     end
 
     def create_asset_processor_from_actl(actl, tool_proxy)
-      return unless tool_proxy.migrated_to_context_external_tool.present?
+      unless tool_proxy.migrated_to_context_external_tool.present?
+        add_actl_error(actl, "Cannot create Asset Processor for ACTL ID=#{actl.id} as Tool Proxy ID=#{tool_proxy.global_id} has not been migrated to LTI 1.3")
+        return [:failed, nil]
+      end
 
       migration_id = "cpf_#{tool_proxy.guid}_#{actl.assignment.global_id}"
       existing_ap = Lti::AssetProcessor.active.where(assignment: actl.assignment, migration_id:).first
       if existing_ap.present?
         Rails.logger.warn("Asset Processor already exists for ACTL ID=#{actl.id} and migration_id=#{migration_id}, skipping")
-        return existing_ap
+        return [:existing, existing_ap]
       end
 
       proxy_id = tool_proxy.raw_data&.dig("custom", "proxy_instance_id")
       unless proxy_id.present?
-        log_proxy_warning(tool_proxy, "No proxy_instance_id found in Tool Proxy ID=#{tool_proxy.global_id}")
+        add_proxy_warning(tool_proxy, "No proxy_instance_id found in Tool Proxy ID=#{tool_proxy.global_id}")
       end
 
       ap = Lti::AssetProcessor.new(
@@ -336,19 +401,98 @@ module Lti
       )
       ap.save!
       Rails.logger.info("Created Asset Processor ID=#{ap.id} for ACTL ID=#{actl.id}")
-      ap
+      [:created, ap]
     rescue => e
-      Canvas::Errors.capture_exception(:tii_migration, e)
-      log_proxy_error(tool_proxy, "Failed to create Asset Processor for ACTL ID=#{actl.id}: #{e.message}")
-      nil
+      capture_and_log_exception(e)
+      add_actl_error(actl, "Failed to create Asset Processor for ACTL ID=#{actl.id}: #{e.message}")
+      [:failed, nil]
     end
 
-    def create_migration_report
-      # TODO: create report csv
+    def generate_migration_report
+      @csv_content = CSV.generate do |csv|
+        csv << [
+          "Assignment ID",
+          "Assignment Name",
+          "Course ID",
+          "Tool Proxy ID",
+          "Lti 1.3 Tool ID",
+          "Asset Processor Migration",
+          "Asset Report Migration",
+          "Number of Reports Migrated",
+          "Error Message",
+          "Warnings"
+        ]
+        yield csv
+      end
+    end
+
+    def save_migration_report
+      return unless @csv_content
+
+      save_report(@csv_content)
+    end
+
+    def save_report(csv)
+      attachment = Attachment.new(
+        context: @account,
+        filename: "tii_ap_migration_report_#{@progress.id}.csv",
+        content_type: "text/csv"
+      )
+      Attachments::Storage.store_for_attachment(attachment, StringIO.new(csv))
+      attachment.save!
+      @results[:migration_report_attachment_id] = attachment.id
+      @results[:migration_report_url] = report_download_url(attachment.id)
     end
 
     def send_migration_report_email
-      # TODO: Send email with migration results
+      return if @email.blank?
+
+      download_url = @results[:migration_report_url]
+      return unless download_url # Don't send email if report wasn't created
+
+      m = Message.new
+      m.to = @email
+      m.from = HostUrl.outgoing_email_address
+      m.subject = I18n.t(:asset_processor_migration_report_subject, "Turnitin Asset Processor Migration Report")
+      m.body = any_error_occurred? ? failure_email_body(download_url) : success_email_body(download_url)
+
+      Mailer.deliver(Mailer.create_message(m))
+      Rails.logger.info("Sent migration report email to #{@email}")
+    rescue => e
+      capture_and_log_exception(e)
+      Rails.logger.error("Failed to send migration report email: #{e.message}")
+      @results[:email_error] = true
+    end
+
+    def report_download_url(attachment_id)
+      return unless attachment_id
+
+      Rails.application.routes.url_helpers.account_file_download_url(
+        @account.id,
+        attachment_id,
+        host: HostUrl.context_host(@account),
+        protocol: HostUrl.protocol
+      )
+    end
+
+    def success_email_body(download_url)
+      I18n.t(
+        :asset_processor_migration_report_email_body,
+        "The Turnitin migration from LTI 2.0 to LTI 1.3 Asset Processor on account %{account} has completed successfully.\n\n" \
+        "Click here to download the report: %{url}",
+        account: @account.name,
+        url: download_url
+      )
+    end
+
+    def failure_email_body(download_url)
+      I18n.t(
+        :asset_processor_migration_failure_email_body,
+        "The Turnitin migration from LTI 2.0 to LTI 1.3 Asset Processor on account %{account} has completed with errors. " \
+        "Click here to download the report: %{url}",
+        account: @account.name,
+        url: download_url
+      )
     end
 
     def prevalidations_successful?
@@ -362,6 +506,13 @@ module Lti
 
     def migrate_reports(_actl, _tool_proxy, _ap)
       # TODO: implement in later commit
+      [:success, 0]
+    end
+
+    def any_error_occurred?
+      @results[:fatal_error].present? ||
+        @results[:proxies].values.any? { |r| r[:errors].any? } ||
+        @results[:actl_errors].present?
     end
   end
 end

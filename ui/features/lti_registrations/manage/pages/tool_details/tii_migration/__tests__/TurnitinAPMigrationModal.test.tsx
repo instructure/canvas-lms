@@ -68,8 +68,8 @@ const mockMigrationCompleted: TiiApMigration = {
     tag: 'ap_migration',
     workflow_state: 'completed',
     completion: 100,
-    result: {
-      report_id: 456,
+    results: {
+      migration_report_url: 'https://example.com/migration_report/535',
     },
   },
 }
@@ -82,8 +82,8 @@ const mockMigrationFailed: TiiApMigration = {
     tag: 'ap_migration',
     workflow_state: 'failed',
     completion: 50,
-    result: {
-      report_id: 457,
+    results: {
+      migration_report_url: 'https://example.com/migration_report/536',
     },
   },
 }
@@ -666,5 +666,83 @@ describe('TurnitinAPMigrationModal', () => {
     expect(requestCount).toBe(1)
 
     jest.useRealTimers()
+  })
+
+  it('should show download report link for completed migration when report URL is available', async () => {
+    server.use(
+      http.get(
+        `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+        () => {
+          return HttpResponse.json([mockMigrationCompleted])
+        },
+      ),
+    )
+
+    render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+    await waitFor(() => {
+      expect(screen.getByText(/Migration completed!/)).toBeInTheDocument()
+    })
+
+    const downloadLink = screen.getByRole('link', {name: /Download Report/i})
+    expect(downloadLink).toBeInTheDocument()
+    expect(downloadLink).toHaveAttribute('href', 'https://example.com/migration_report/535')
+    expect(downloadLink).toHaveAttribute('target', '_blank')
+    expect(downloadLink).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
+  it('should show download report link for failed migration when report URL is available', async () => {
+    server.use(
+      http.get(
+        `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+        () => {
+          return HttpResponse.json([mockMigrationFailed])
+        },
+      ),
+    )
+
+    render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+    await waitFor(() => {
+      expect(screen.getByText(/Migration failed/)).toBeInTheDocument()
+    })
+
+    const downloadLink = screen.getByRole('link', {name: /Download Report/i})
+    expect(downloadLink).toBeInTheDocument()
+    expect(downloadLink).toHaveAttribute('href', 'https://example.com/migration_report/536')
+    expect(downloadLink).toHaveAttribute('target', '_blank')
+    expect(downloadLink).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
+  it('should not show download report link when report URL is not available', async () => {
+    const migrationWithoutReport: TiiApMigration = {
+      account_id: '5',
+      account_name: 'Account Without Report',
+      migration_progress: {
+        id: '537',
+        tag: 'ap_migration',
+        workflow_state: 'completed',
+        completion: 100,
+        results: {},
+      },
+    }
+
+    server.use(
+      http.get(
+        `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+        () => {
+          return HttpResponse.json([migrationWithoutReport])
+        },
+      ),
+    )
+
+    render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+    await waitFor(() => {
+      expect(screen.getByText(/Migration completed!/)).toBeInTheDocument()
+    })
+
+    const downloadLink = screen.queryByRole('link', {name: /Download Report/i})
+    expect(downloadLink).not.toBeInTheDocument()
   })
 })
