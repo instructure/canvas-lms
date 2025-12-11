@@ -274,7 +274,7 @@ const renderStepContent = (
       )
     case 'WaitingForTool':
       return (
-        <RegistrationModalBody padding="none">
+        <RegistrationModalBody padding="none" bottomSpacing={false}>
           <iframe
             src={addParams(props.dynamicRegistrationUrl, {
               openid_configuration: state.registrationToken.oidc_configuration_url,
