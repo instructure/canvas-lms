@@ -31,6 +31,8 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 
+// eslint-disable-next-line no-undef
+if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
 jest.mock('@canvas/upload-file')
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
@@ -161,7 +163,7 @@ describe('ContentTabs', () => {
     let submitButtonRef
     beforeAll(async () => {
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')
-      uploadFileModule.uploadFiles = jest.fn()
+      uploadFileModule.uploadFiles.mockImplementation(jest.fn())
       submitButtonRef = createSubmitButtonRef()
 
       // This gets the lazy loaded components loaded before our specs.

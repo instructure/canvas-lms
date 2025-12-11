@@ -29,6 +29,8 @@ import {ConversationContext} from '../../../util/constants'
 import * as utils from '../../../util/utils'
 import * as uploadFileModule from '@canvas/upload-file'
 
+// eslint-disable-next-line no-undef
+if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
 jest.mock('@canvas/upload-file')
 
 jest.mock('../../../util/utils', () => ({
@@ -56,7 +58,7 @@ describe('ComposeModalContainer', () => {
   })
 
   beforeEach(() => {
-    uploadFileModule.uploadFiles = jest.fn().mockResolvedValue([])
+    uploadFileModule.uploadFiles.mockResolvedValue([])
     window.ENV = {
       current_user_id: '1',
       CONVERSATIONS: {
