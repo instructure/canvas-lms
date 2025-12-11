@@ -137,7 +137,8 @@ describe "discussions" do
       end
 
       it "cannot convert ungraded to checkpointed if there are replies" do
-        @topic_no_options.reply_from({ user: teacher, text: "I feel pretty" })
+        student = student_in_course(course:, active_all: true).user
+        @topic_no_options.reply_from({ user: student, text: "I feel pretty" })
         get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
         force_click_native("span[data-testid='graded-checkbox'] input")
         expect(f("span[data-testid='checkpoints-checkbox'] input").attribute("disabled")).to be_truthy
@@ -1563,8 +1564,9 @@ describe "discussions" do
 
         it "cannot edit a non-checkpointed discussion with replies into a checkpointed discussion" do
           graded_discussion = create_graded_discussion(course)
+          student = student_in_course(course:, active_all: true).user
           graded_discussion.discussion_entries.create!(
-            user: @teacher,
+            user: student,
             message: "Initial post"
           )
 

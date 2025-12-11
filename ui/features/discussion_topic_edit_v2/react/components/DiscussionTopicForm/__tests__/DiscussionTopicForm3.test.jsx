@@ -311,10 +311,23 @@ describe('DiscussionTopicForm', () => {
 
     it('disable checkpoints if there are student submissions', () => {
       const {queryByTestId} = setup({
+        isEditing: true,
         currentDiscussionTopic: DiscussionTopic.mock({
-          assignment: Assignment.mock({
-            hasSubmittedSubmissions: true,
-          }),
+          assignment: Assignment.mock(),
+          canGroup: false,
+        }),
+      })
+
+      expect(queryByTestId('checkpoints-checkbox').querySelector('input')).toBeDisabled()
+    })
+
+    it('disable checkpoints for group discussions with child topic replies', () => {
+      const {queryByTestId} = setup({
+        isEditing: true,
+        currentDiscussionTopic: DiscussionTopic.mock({
+          assignment: Assignment.mock(),
+          groupSet: GroupSet.mock(),
+          canGroup: false,
         }),
       })
 

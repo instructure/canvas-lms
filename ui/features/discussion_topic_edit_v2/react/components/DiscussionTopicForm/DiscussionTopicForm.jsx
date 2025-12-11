@@ -172,9 +172,10 @@ function DiscussionTopicForm({
 
   const isAlreadyAGroupDiscussion = !!currentDiscussionTopic?.groupSet?._id
 
-  const isCheckpointsForbidden =
-    currentDiscussionTopic?.assignment?.hasSubmittedSubmissions ||
-    currentDiscussionTopic?.entryCounts?.repliesCount > 0
+  // Both group discussion and checkpoints settings are disabled when there are submissions or replies
+  const hasSubmissionsOrReplies = isEditing && !currentDiscussionTopic?.canGroup
+
+  const isCheckpointsForbidden = hasSubmissionsOrReplies
 
   const checkPointsToolTipText = isCheckpointsForbidden
     ? I18n.t('Checkpoints cannot be toggled after replies have been made.')
@@ -540,7 +541,7 @@ function DiscussionTopicForm({
     isAlreadyAGroupDiscussion,
   )
 
-  const canGroupDiscussion = !isEditing || currentDiscussionTopic?.canGroup || false
+  const canGroupDiscussion = !hasSubmissionsOrReplies
 
   const createSubmitPayload = shouldPublish => {
     let message = currentDiscussionTopic?.message
