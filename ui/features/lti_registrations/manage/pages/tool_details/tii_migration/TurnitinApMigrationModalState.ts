@@ -28,9 +28,9 @@ const ZTiiApMigrationProgress = z.object({
   workflow_state: z.enum(['running', 'completed', 'failed', 'queued']),
   completion: z.number().nullish(),
   message: z.string().nullish(),
-  result: z
+  results: z
     .object({
-      report_id: z.number().nullish(),
+      migration_report_url: z.string().nullish(),
       assignment_count: z.number().nullish(),
     })
     .nullish(),

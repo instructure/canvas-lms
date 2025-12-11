@@ -45,13 +45,10 @@ export type TurnitinAPMigrationModalProps = {
   rootAccountId: string
 }
 
-const ViewReportLink = (migration: TiiApMigration) => {
-  // TODO implement report download in later commit
-  return null
-}
-
 const MigrationStatusDetails = (migration: TiiApMigration) => {
   const workflowState = migration.migration_progress?.workflow_state || 'ready'
+  const reportUrl = migration.migration_progress?.results?.migration_report_url
+
   switch (workflowState) {
     case 'ready':
       return (
@@ -68,21 +65,25 @@ const MigrationStatusDetails = (migration: TiiApMigration) => {
       )
     case 'completed':
       return (
-        <>
-          <Text size="small" color="secondary">
-            {I18n.t('Migration completed!')}
-          </Text>
-          <ViewReportLink {...migration} />
-        </>
+        <Text size="small" color="secondary">
+          {I18n.t('Migration completed!')}{' '}
+          {reportUrl && (
+            <Link href={reportUrl} target="_blank" rel="noopener noreferrer" isWithinText={true}>
+              {I18n.t('Download Report')}
+            </Link>
+          )}
+        </Text>
       )
     case 'failed':
       return (
-        <>
-          <Text size="small" color="secondary">
-            {I18n.t('Migration failed.')}
-          </Text>
-          <ViewReportLink {...migration} />
-        </>
+        <Text size="small" color="secondary">
+          {I18n.t('Migration failed.')}{' '}
+          {reportUrl && (
+            <Link href={reportUrl} target="_blank" rel="noopener noreferrer" isWithinText={true}>
+              {I18n.t('Download Report')}
+            </Link>
+          )}
+        </Text>
       )
     default:
       return workflowState satisfies never
