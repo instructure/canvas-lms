@@ -35,7 +35,6 @@ describe "peer review student landing page" do
   before(:once) do
     Account.default.enable_feature!(:peer_review_allocation_and_grading)
     Account.default.enable_feature!(:assignments_2_student)
-    Account.default.enable_feature!(:peer_reviews_for_a2)
     course_with_teacher(active_all: true)
     @student1 = student_in_course(name: "Student 1", course: @course, enrollment_state: :active).user
     @student2 = student_in_course(name: "Student 2", course: @course, enrollment_state: :active).user
