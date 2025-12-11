@@ -417,7 +417,9 @@ el:
     report_header_token_dev_key_id: "id κλειδιού dev"
     report_header_token_dev_key_name: "όνομα κλειδιού dev"
     report_header_token_hint: "υπόδειξη για διακριτικό token"
+    report_header_token_id: id
     report_header_token_last_used: "χρησιμοποιήθηκε τελευταία φορά"
+    report_header_token_status: κατάσταση
     report_header_user_id: "id χρήστη"
     report_header_user_name: "όνομα χρήστη"
     report_header_user_sis_id: "id sis χρήστη"
