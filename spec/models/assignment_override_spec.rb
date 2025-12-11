@@ -1547,4 +1547,92 @@ describe AssignmentOverride do
       expect(override.errors[:parent_override_id]).to include("can only be set for overrides belonging to SubAssignment or PeerReviewSubAssignment")
     end
   end
+
+  describe "#peer_review_dates_for_override" do
+    before :once do
+      @course = course_factory(active_all: true)
+      @assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        peer_reviews: true
+      )
+      @section = @course.course_sections.create!(name: "Section 1")
+      @override = @assignment.assignment_overrides.create!(
+        set: @section,
+        due_at: 1.week.from_now
+      )
+    end
+
+    it "returns nil when assignment has no peer reviews" do
+      @assignment.update!(peer_reviews: false)
+      expect(@override.peer_review_dates_for_override).to be_nil
+    end
+
+    it "returns nil when feature flag is disabled" do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      expect(@override.peer_review_dates_for_override).to be_nil
+    end
+
+    it "returns nil when peer review sub assignment does not exist" do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      expect(@override.peer_review_dates_for_override).to be_nil
+    end
+
+    context "with peer review sub assignment" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        service = PeerReview::PeerReviewCreatorService.new(
+          parent_assignment: @assignment,
+          points_possible: 5
+        )
+        service.call
+        @peer_review_sub = @assignment.reload.peer_review_sub_assignment
+        @peer_review_sub.update!(
+          due_at: 2.weeks.from_now,
+          unlock_at: 1.5.weeks.from_now,
+          lock_at: 2.5.weeks.from_now
+        )
+      end
+
+      it "returns base peer review dates when no matching override exists" do
+        result = @override.peer_review_dates_for_override
+        expect(result).to be_a(Hash)
+        expect(result[:due_at]).to eq(@peer_review_sub.due_at)
+        expect(result[:unlock_at]).to eq(@peer_review_sub.unlock_at)
+        expect(result[:lock_at]).to eq(@peer_review_sub.lock_at)
+      end
+
+      it "returns override-specific dates when matching override exists" do
+        pr_override = @peer_review_sub.assignment_overrides.create!(
+          parent_override: @override,
+          set: @section,
+          due_at: 3.weeks.from_now,
+          unlock_at: 2.5.weeks.from_now,
+          lock_at: 3.5.weeks.from_now
+        )
+
+        result = @override.peer_review_dates_for_override
+        expect(result).to be_a(Hash)
+        expect(result[:due_at]).to eq(pr_override.due_at)
+        expect(result[:unlock_at]).to eq(pr_override.unlock_at)
+        expect(result[:lock_at]).to eq(pr_override.lock_at)
+      end
+
+      it "accepts preloaded peer review overrides hash" do
+        pr_override = @peer_review_sub.assignment_overrides.create!(
+          parent_override: @override,
+          set: @section,
+          due_at: 3.weeks.from_now
+        )
+
+        peer_review_overrides = {
+          overrides: { @override.id => pr_override },
+          peer_review_sub: @peer_review_sub
+        }
+
+        result = @override.peer_review_dates_for_override(peer_review_overrides)
+        expect(result[:due_at]).to eq(pr_override.due_at)
+      end
+    end
+  end
 end
