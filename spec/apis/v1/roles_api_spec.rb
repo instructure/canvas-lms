@@ -64,6 +64,25 @@ describe "Roles API", type: :request do
         @account.reload
         expect(@account.available_account_roles).to include(@role)
       end
+
+      it "checks for name collision on inherited roles" do
+        role = @account.roles.new(name: "NewRole")
+        role.base_role_type = "StudentEnrollment"
+        role.save!
+
+        sub_account = @account.sub_accounts.create!
+        account_admin_user(account: sub_account, active_user: true)
+
+        api_call(
+          :post,
+          "/api/v1/accounts/#{sub_account.id}/roles",
+          { controller: "role_overrides", action: "add_role", format: "json", account_id: sub_account.id },
+          { role: "NewRole" }
+        )
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.body).to eq('{"message":"role name NewRole already in use"}')
+      end
     end
 
     describe "index" do
