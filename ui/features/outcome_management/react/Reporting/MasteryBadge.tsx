@@ -16,20 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {View} from '@instructure/ui-view'
-import ReportingBreadcrumbs from './ReportingBreadcrumbs'
-import StudentOutcomesTable from './StudentOutcomesTable'
-import {useOutcomeRollups} from './hooks/useOutcomeRollups'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
+import type {MasteryLevel} from './types'
+import MasteryIcon from './MasteryIcon'
 
-const Reporting = () => {
-  const {outcomes} = useOutcomeRollups()
+interface MasteryBadgeProps {
+  masteryLevel: MasteryLevel
+  score: number | null
+}
 
+const MasteryBadge = ({masteryLevel, score}: MasteryBadgeProps) => {
   return (
-    <View data-testid="outcome-reporting" padding="small 0" display="block">
-      <ReportingBreadcrumbs />
-      <StudentOutcomesTable outcomes={outcomes} />
-    </View>
+    <Flex gap="x-small" justifyItems="start">
+      <Flex.Item>
+        <MasteryIcon masteryLevel={masteryLevel} />
+      </Flex.Item>
+      <Flex.Item>
+        <Text>{score ?? '--'}</Text>
+      </Flex.Item>
+    </Flex>
   )
 }
 
-export default Reporting
+export default MasteryBadge
