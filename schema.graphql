@@ -3556,6 +3556,7 @@ type DateHash {
   dueAt: DateTime
   id: ID
   lockAt: DateTime
+  peerReviewDates: PeerReviewDates
   set: DateHashSet
   title: String
   unlockAt: DateTime
@@ -7703,6 +7704,15 @@ interface PagesConnectionInterface {
     """
     last: Int
   ): PageConnection
+}
+
+"""
+Peer review dates for an assignment date hash entry
+"""
+type PeerReviewDates {
+  dueAt: DateTime
+  lockAt: DateTime
+  unlockAt: DateTime
 }
 
 """

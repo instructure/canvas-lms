@@ -191,6 +191,19 @@ class Assignment < AbstractAssignment
       .distinct.pluck("peer_review_assignments.assignment_id")
   end
 
+  def peer_review_overrides_for_dates
+    return nil unless context.feature_enabled?(:peer_review_allocation_and_grading)
+    return nil unless peer_reviews?
+
+    peer_review_sub = peer_review_sub_assignment
+    return nil unless peer_review_sub
+
+    {
+      overrides: peer_review_sub.assignment_overrides.active.index_by(&:parent_override_id),
+      peer_review_sub:
+    }
+  end
+
   # Duplicates the course module content tags for the assignment to the new assignment.
   # @param new_assignment [Assignment] the assignment to duplicate the content tags for
   #
