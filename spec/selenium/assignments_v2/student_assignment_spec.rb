@@ -869,7 +869,6 @@ describe "as a student" do
 
     context "peer reviews" do
       before(:once) do
-        Account.default.enable_feature!(:peer_reviews_for_a2)
         @student1 = student_in_course(name: "Student 1", course: @course, enrollment_state: :active).user
         @student2 = student_in_course(name: "Student 2", course: @course, enrollment_state: :active).user
         @student3 = student_in_course(name: "Student 3", course: @course, enrollment_state: :active).user

@@ -1104,7 +1104,6 @@ describe AssignmentsController do
               nil
             )
 
-            @course.enable_feature!(:peer_reviews_for_a2)
             @course.enable_feature!(:assignments_2_student)
           end
 
@@ -1136,35 +1135,35 @@ describe AssignmentsController do
             expect(assigns[:js_env][:SUBMISSION_ID]).to be_nil
           end
 
-          it "sets the student SUBMISSION_ID when peer_reviews_for_a2 FF is off and reviewee_id param is present" do
-            @course.disable_feature!(:peer_reviews_for_a2)
+          it "sets the student SUBMISSION_ID when assignments_2_student FF is off and reviewee_id param is present" do
+            @course.disable_feature!(:assignments_2_student)
 
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
             expect(assigns[:js_env][:SUBMISSION_ID]).to eq @student_submission.id
           end
 
-          it "sets the student SUBMISSION_ID when peer_reviews_for_a2 FF is off and anonymous_asset_id param is present" do
-            @course.disable_feature!(:peer_reviews_for_a2)
+          it "sets the student SUBMISSION_ID when assignments_2_student FF is off and anonymous_asset_id param is present" do
+            @course.disable_feature!(:assignments_2_student)
 
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
             expect(assigns[:js_env][:SUBMISSION_ID]).to eq @student_submission.id
           end
 
-          it "sets the peer_review_mode_enabled to true when peer_reviews_for_a2 FF is ON and reviewee_id is present" do
+          it "sets the peer_review_mode_enabled to true when assignments_2_student FF is ON and reviewee_id is present" do
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
             expect(assigns[:js_env][:peer_review_mode_enabled]).to be true
           end
 
-          it "sets the peer_review_mode_enabled to true when peer_reviews_for_a2 FF is ON and anonymous_asset_id is present" do
+          it "sets the peer_review_mode_enabled to true when assignments_2_student FF is ON and anonymous_asset_id is present" do
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
             expect(assigns[:js_env][:peer_review_mode_enabled]).to be true
           end
 
-          it "sets the peer_review_mode_enabled to false when peer_reviews_for_a2 FF is ON with no presence of reviewee_id and anonymous_asset_id" do
+          it "sets the peer_review_mode_enabled to false when assignments_2_student FF is ON with no presence of reviewee_id and anonymous_asset_id" do
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id }
             expect(assigns[:js_env][:peer_review_mode_enabled]).to be false
@@ -3562,7 +3561,6 @@ describe AssignmentsController do
       before :once do
         @course.enable_feature!(:peer_review_allocation_and_grading)
         @course.enable_feature!(:assignments_2_student)
-        @course.enable_feature!(:peer_reviews_for_a2)
       end
 
       before do
@@ -3603,7 +3601,6 @@ describe AssignmentsController do
       before :once do
         @course.disable_feature!(:peer_review_allocation_and_grading)
         @course.enable_feature!(:assignments_2_student)
-        @course.enable_feature!(:peer_reviews_for_a2)
       end
 
       before do
