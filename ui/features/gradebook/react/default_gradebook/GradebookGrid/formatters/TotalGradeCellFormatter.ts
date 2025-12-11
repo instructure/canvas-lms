@@ -23,6 +23,7 @@ import {scoreToGrade} from '@instructure/grading-utils'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 import htmlEscape from '@instructure/html-escape'
 import listFormatterPolyfill from '@canvas/util/listFormatter'
+import numberHelper from '@canvas/i18n/numberHelper'
 import type Gradebook from '../../Gradebook'
 import type {Assignment} from '../../../../../../api.d'
 import type {DeprecatedGradingScheme} from '@canvas/grading/grading.d'
@@ -34,8 +35,13 @@ const listFormatter = Intl.ListFormat
   ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
   : listFormatterPolyfill
 
-function getGradePercentage(score: number, pointsPossible: number) {
-  const grade = scoreToPercentage(score, pointsPossible)
+function getGradePercentage(score: number | string, pointsPossible: number | string) {
+  // the args can be i18n formatted strings, which may use commas instead of decimals like "3,5"
+  const numScore = typeof score === 'string' ? numberHelper.parse(score) : score
+  const numPossible =
+    typeof pointsPossible === 'string' ? numberHelper.parse(pointsPossible) : pointsPossible
+
+  const grade = scoreToPercentage(numScore, numPossible)
   return round(grade, round.DEFAULT)
 }
 
