@@ -274,6 +274,11 @@ describe('useQueryPageViewsPaginated', () => {
       result.current.setCurrentPage(3)
     })
 
+    // Wait for the fetch to complete first, then check for the revert
+    await waitFor(() => {
+      expect(result.current.isFetching).toBe(false)
+    })
+
     // Should revert back to page 2
     await waitFor(() => {
       expect(result.current.currentPage).toBe(2)

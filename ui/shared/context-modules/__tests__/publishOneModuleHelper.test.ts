@@ -101,6 +101,9 @@ describe('publishOneModuleHelper', () => {
   afterEach(() => {
     server.resetHandlers()
     jest.clearAllMocks()
+    // Clear flash alert holders to prevent alerts from leaking between tests
+    document.getElementById('flashalert_message_holder')?.remove()
+    document.getElementById('flash_screenreader_holder')?.remove()
     document.body.innerHTML = ''
   })
 
