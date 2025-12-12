@@ -1017,16 +1017,48 @@ describe CoursePacesController do
 
       it "rolls over years properly" do
         assignment = @course.assignments.create! name: "A4", workflow_state: "active"
-        @mod1.add_item id: assignment.id, type: "assignment"
         tag = @mod1.add_item id: assignment.id, type: "assignment"
         @course_pace.course_pace_module_items.create! module_item: tag, duration: 8
 
-        course_pace_params = rolles_over_course_pace_params.merge(selected_days_to_skip: SELECTED_DAYS_TO_SKIP)
+        pace_items = [
+          @course_pace.course_pace_module_items.first,
+          @course_pace.course_pace_module_items.second,
+          @course_pace.course_pace_module_items.third,
+          @course_pace.course_pace_module_items.fourth,
+        ]
+
+        course_pace_params = @valid_params.merge(
+          start_date: "2021-12-13",
+          end_date: "2022-01-12",
+          selected_days_to_skip: SELECTED_DAYS_TO_SKIP,
+          course_pace_module_items_attributes: [
+            {
+              id: pace_items[0].id,
+              module_item_id: pace_items[0].module_item_id,
+              duration: 7,
+            },
+            {
+              id: pace_items[1].id,
+              module_item_id: pace_items[1].module_item_id,
+              duration: 6,
+            },
+            {
+              id: pace_items[2].id,
+              module_item_id: pace_items[2].module_item_id,
+              duration: 5,
+            },
+            {
+              id: pace_items[3].id,
+              module_item_id: pace_items[3].module_item_id,
+              duration: 5,
+            },
+          ]
+        )
 
         post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
         expect(response).to be_successful
         json_response = response.parsed_body
-        expect(json_response.values).to eq(%w[2021-12-24T00:00:00Z 2021-12-29T00:00:00Z 2022-01-05T00:00:00Z 2022-01-12T00:00:00Z])
+        expect(json_response.values).to eq(%w[2021-12-24T00:00:00Z 2021-12-29T00:00:00Z 2022-01-07T00:00:00Z 2022-01-12T00:00:00Z])
       end
 
       it "returns uncompressed items if the end date is not set" do
@@ -1092,16 +1124,48 @@ describe CoursePacesController do
 
       it "rolls over years properly" do
         assignment = @course.assignments.create! name: "A4", workflow_state: "active"
-        @mod1.add_item id: assignment.id, type: "assignment"
         tag = @mod1.add_item id: assignment.id, type: "assignment"
         @course_pace.course_pace_module_items.create! module_item: tag, duration: 8
 
-        course_pace_params = rolles_over_course_pace_params.merge(exclude_weekends: true)
+        pace_items = [
+          @course_pace.course_pace_module_items.first,
+          @course_pace.course_pace_module_items.second,
+          @course_pace.course_pace_module_items.third,
+          @course_pace.course_pace_module_items.fourth,
+        ]
+
+        course_pace_params = @valid_params.merge(
+          start_date: "2021-12-13",
+          end_date: "2022-01-12",
+          exclude_weekends: true,
+          course_pace_module_items_attributes: [
+            {
+              id: pace_items[0].id,
+              module_item_id: pace_items[0].module_item_id,
+              duration: 7,
+            },
+            {
+              id: pace_items[1].id,
+              module_item_id: pace_items[1].module_item_id,
+              duration: 6,
+            },
+            {
+              id: pace_items[2].id,
+              module_item_id: pace_items[2].module_item_id,
+              duration: 5,
+            },
+            {
+              id: pace_items[3].id,
+              module_item_id: pace_items[3].module_item_id,
+              duration: 5,
+            },
+          ]
+        )
 
         post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
         expect(response).to be_successful
         json_response = response.parsed_body
-        expect(json_response.values).to eq(%w[2021-12-22T00:00:00Z 2021-12-28T00:00:00Z 2022-01-05T00:00:00Z 2022-01-12T00:00:00Z])
+        expect(json_response.values).to eq(%w[2021-12-22T00:00:00Z 2021-12-29T00:00:00Z 2022-01-06T00:00:00Z 2022-01-12T00:00:00Z])
       end
 
       it "returns uncompressed items if the end date is not set" do
@@ -1226,6 +1290,41 @@ describe CoursePacesController do
         dates = json_response.values.map { |d| Date.parse(d) }
         expect(dates.first).to be >= Date.parse("2021-11-01")
         expect(dates.last).to be <= Date.parse("2021-11-03")
+      end
+    end
+
+    context "timezone handling" do
+      it "calculates compressed dates in the course timezone" do
+        @course.update!(time_zone: "Pacific/Auckland")
+
+        course_pace_params = @valid_params.merge(
+          start_date: "2021-10-01",
+          end_date: "2021-10-05",
+          course_pace_module_items_attributes: [
+            {
+              id: @course_pace.course_pace_module_items.first.id,
+              module_item_id: @course_pace.course_pace_module_items.first.module_item_id,
+              duration: 2,
+            },
+            {
+              id: @course_pace.course_pace_module_items.second.id,
+              module_item_id: @course_pace.course_pace_module_items.second.module_item_id,
+              duration: 3,
+            },
+          ]
+        )
+
+        post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+
+        json_response.each_value do |date_string|
+          time = Time.zone.parse(date_string)
+          time_in_zone = time.in_time_zone(@course.time_zone)
+          expect(time_in_zone.hour).to eq(0)
+          expect(time_in_zone.min).to eq(0)
+          expect(time_in_zone.sec).to eq(0)
+        end
       end
     end
   end
