@@ -328,8 +328,6 @@ const renderStepContent = (
           overlayStore={state.overlayStore}
           internalConfig={state.registration.configuration}
           reviewing={state.reviewing}
-          onNextButtonClicked={() => {}} // Handled by generalized footer
-          onPreviousButtonClicked={() => {}} // Handled by generalized footer
           includeFooter={false}
         />
       )

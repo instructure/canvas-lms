@@ -40,16 +40,12 @@ describe('IconConfirmationWrapper', () => {
       placements: [{placement: LtiPlacements.GlobalNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = vi.fn()
-    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
@@ -68,16 +64,12 @@ describe('IconConfirmationWrapper', () => {
       },
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = vi.fn()
-    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
@@ -92,16 +84,12 @@ describe('IconConfirmationWrapper', () => {
       ],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = vi.fn()
-    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
@@ -128,16 +116,12 @@ describe('IconConfirmationWrapper', () => {
       placements: [{placement: 'global_navigation', icon_url: 'https://example.com/icon'}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = vi.fn()
-    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
@@ -152,36 +136,6 @@ describe('IconConfirmationWrapper', () => {
     expect(screen.getByText('Invalid URL')).toBeInTheDocument()
   })
 
-  it('focuses the invalid input if any of the URLs are invalid', async () => {
-    const internalConfig = mockInternalConfiguration({
-      placements: [{placement: 'global_navigation', icon_url: 'https://example.com/icon'}],
-    })
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = vi.fn()
-    const onPreviousButtonClicked = vi.fn()
-    render(
-      <IconConfirmationWrapper
-        overlayStore={overlayStore}
-        internalConfig={internalConfig}
-        reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
-      />,
-    )
-    const input = screen.getByLabelText(
-      new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation)),
-    )
-    await userEvent.click(input)
-    await userEvent.clear(input)
-    await userEvent.paste('invalid-url')
-    await userEvent.tab()
-
-    await userEvent.click(screen.getByText('Next').closest('button')!)
-
-    expect(input).toHaveFocus()
-    expect(onNextButtonClicked).not.toHaveBeenCalled()
-  })
-
   it('renders a default icon if no icon is provided for the editor button placement', () => {
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: LtiPlacements.EditorButton, icon_url: undefined}],
@@ -190,16 +144,12 @@ describe('IconConfirmationWrapper', () => {
       },
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = vi.fn()
-    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
@@ -223,16 +173,12 @@ describe('IconConfirmationWrapper', () => {
       },
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = vi.fn()
-    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
@@ -254,16 +200,12 @@ describe('IconConfirmationWrapper', () => {
       ],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = vi.fn()
-    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
@@ -300,16 +242,12 @@ describe('IconConfirmationWrapper', () => {
       },
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = vi.fn()
-    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
@@ -342,16 +280,12 @@ describe('IconConfirmationWrapper', () => {
         launch_settings: {icon_url: 'https://example.com/default-icon.png'},
       })
       const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-      const onNextButtonClicked = jest.fn()
-      const onPreviousButtonClicked = jest.fn()
 
       render(
         <IconConfirmationWrapper
           overlayStore={overlayStore}
           internalConfig={internalConfig}
           reviewing={false}
-          onNextButtonClicked={onNextButtonClicked}
-          onPreviousButtonClicked={onPreviousButtonClicked}
         />,
       )
 
@@ -364,16 +298,12 @@ describe('IconConfirmationWrapper', () => {
         launch_settings: {icon_url: 'https://example.com/default-icon.png'},
       })
       const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-      const onNextButtonClicked = jest.fn()
-      const onPreviousButtonClicked = jest.fn()
 
       render(
         <IconConfirmationWrapper
           overlayStore={overlayStore}
           internalConfig={internalConfig}
           reviewing={false}
-          onNextButtonClicked={onNextButtonClicked}
-          onPreviousButtonClicked={onPreviousButtonClicked}
         />,
       )
 
@@ -392,16 +322,12 @@ describe('IconConfirmationWrapper', () => {
         launch_settings: {icon_url: 'https://example.com/default-icon.png'},
       })
       const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-      const onNextButtonClicked = jest.fn()
-      const onPreviousButtonClicked = jest.fn()
 
       render(
         <IconConfirmationWrapper
           overlayStore={overlayStore}
           internalConfig={internalConfig}
           reviewing={false}
-          onNextButtonClicked={onNextButtonClicked}
-          onPreviousButtonClicked={onPreviousButtonClicked}
         />,
       )
 
@@ -416,16 +342,13 @@ describe('IconConfirmationWrapper', () => {
         placements: [{placement: LtiPlacements.GlobalNavigation}],
       })
       const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-      const onNextButtonClicked = jest.fn()
-      const onPreviousButtonClicked = jest.fn()
 
       render(
         <IconConfirmationWrapper
           overlayStore={overlayStore}
           internalConfig={internalConfig}
           reviewing={false}
-          onNextButtonClicked={onNextButtonClicked}
-          onPreviousButtonClicked={onPreviousButtonClicked}
+          hasClickedNext={true}
         />,
       )
 
@@ -433,6 +356,7 @@ describe('IconConfirmationWrapper', () => {
       await userEvent.click(input)
       await userEvent.paste('invalid-url')
       await userEvent.tab()
+      jest.runAllTimers()
 
       expect(screen.getByText('Invalid URL')).toBeInTheDocument()
     })
@@ -442,16 +366,12 @@ describe('IconConfirmationWrapper', () => {
         placements: [{placement: LtiPlacements.GlobalNavigation}],
       })
       const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-      const onNextButtonClicked = jest.fn()
-      const onPreviousButtonClicked = jest.fn()
 
       render(
         <IconConfirmationWrapper
           overlayStore={overlayStore}
           internalConfig={internalConfig}
           reviewing={false}
-          onNextButtonClicked={onNextButtonClicked}
-          onPreviousButtonClicked={onPreviousButtonClicked}
         />,
       )
 
@@ -472,16 +392,12 @@ describe('IconConfirmationWrapper', () => {
         launch_settings: {icon_url: 'https://example.com/default-icon.png'},
       })
       const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-      const onNextButtonClicked = jest.fn()
-      const onPreviousButtonClicked = jest.fn()
 
       render(
         <IconConfirmationWrapper
           overlayStore={overlayStore}
           internalConfig={internalConfig}
           reviewing={false}
-          onNextButtonClicked={onNextButtonClicked}
-          onPreviousButtonClicked={onPreviousButtonClicked}
         />,
       )
 

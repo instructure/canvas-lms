@@ -395,7 +395,7 @@ describe('IconConfirmation', () => {
           registration={reg}
           overlayStore={overlayStore}
           reviewing={false}
-          hasSubmitted={false}
+          hasSubmitted={true}
           transitionToConfirmationState={mockTransitionToConfirmationState}
           transitionToReviewingState={mockTransitionToReviewingState}
         />,

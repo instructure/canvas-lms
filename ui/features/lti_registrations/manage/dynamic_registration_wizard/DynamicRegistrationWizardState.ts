@@ -20,6 +20,7 @@ import {create} from 'zustand'
 import type {AccountId} from '../model/AccountId'
 import type {DynamicRegistrationToken} from '../model/DynamicRegistrationToken'
 import {
+  containsPlacementWithIcon,
   createLti1p3RegistrationOverlayStore,
   type Lti1p3RegistrationOverlayStore,
 } from '../registration_overlay/Lti1p3RegistrationOverlayStore'
@@ -674,19 +675,4 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
 const originOfUrl = (urlStr: string) => {
   const url = new URL(urlStr)
   return url.origin
-}
-
-/**
- * Returns true if the given state contains placements with icons
- * Used to determine if we should show the IconConfirmation step
- * @param state
- * @returns
- */
-const containsPlacementWithIcon = (state: ConfirmationState<ConfirmationStateType>): boolean => {
-  const placements = state.registration.configuration.placements.map(p => p.placement)
-  const overlayState = state.overlayStore.getState().state
-  const enabledPlacements = filterPlacementsByFeatureFlags(
-    overlayState.placements.placements || placements,
-  )
-  return enabledPlacements.some(p => isLtiPlacementWithIcon(p))
 }

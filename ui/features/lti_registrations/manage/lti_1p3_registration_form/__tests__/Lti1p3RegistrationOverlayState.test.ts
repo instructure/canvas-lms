@@ -42,7 +42,9 @@ describe('Lti1p3RegistrationOverlayState', () => {
       icons: {
         placements: {},
       },
-      placements: {},
+      placements: {
+        placements: [],
+      },
       naming: {
         placements: {},
       },
