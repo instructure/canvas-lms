@@ -3483,7 +3483,7 @@ class ApplicationController < ActionController::Base
       context: @context,
       assignment: @assignment,
       tool: @tool,
-      tag: @module_tag || @tag,
+      tag: @tag || @module_tag,
       current_user: @current_user,
       controller: self,
       request:,
