@@ -35,6 +35,9 @@ class Lti::Registration < ActiveRecord::Base
   belongs_to :created_by, class_name: "User", inverse_of: :created_lti_registrations, optional: true
   belongs_to :updated_by, class_name: "User", inverse_of: :updated_lti_registrations, optional: true
 
+  belongs_to :template_registration, class_name: "Lti::Registration", inverse_of: :local_copies, optional: true
+  has_many :local_copies, class_name: "Lti::Registration", inverse_of: :template_registration
+
   # If this tool has been installed via dynamic registration, it will have an ims_registration.
   has_one :ims_registration, class_name: "Lti::IMS::Registration", inverse_of: :lti_registration, foreign_key: :lti_registration_id
 
@@ -53,6 +56,7 @@ class Lti::Registration < ActiveRecord::Base
   validates :description, length: { maximum: 2048 }, allow_blank: true
   validates :name, presence: true
   validate :account_is_root_account
+  validate :template_registration_must_be_in_site_admin, if: :template_registration_id?
 
   scope :active, -> { where(workflow_state: "active") }
   scope :site_admin, -> { where(account: Account.site_admin) }
@@ -183,7 +187,11 @@ class Lti::Registration < ActiveRecord::Base
   # This will not properly account for a possible future scenario where the account is
   # for a _sub_ account underneath the registration's root account.
   def inherited_for?(account)
-    account != self.account
+    if self.account.feature_enabled?(:lti_registrations_templates)
+      template_registration_id.present?
+    else
+      account != self.account
+    end
   end
 
   delegate :site_admin?, to: :account
@@ -321,5 +329,12 @@ class Lti::Registration < ActiveRecord::Base
     return unless account
 
     errors.add :account, "account is not a root account" unless account.root_account?
+  end
+
+  def template_registration_must_be_in_site_admin
+    return unless template_registration
+
+    errors.add :template_registration, "Site Admin registrations cannot inherit from a template" if site_admin? && template_registration.present?
+    errors.add :template_registration, "must be inherited from Site Admin" unless template_registration.site_admin?
   end
 end

@@ -404,6 +404,19 @@ lti_registrations_history:
       state: allowed_on
     ci:
       state: allowed_on
+lti_registrations_templates:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Support Inherited Apps in LTI Apps Page
+  description: |-
+    When enabled, allows apps inherited from Site Admin to be edited on the Apps page, and will
+    create local copies of inherited apps.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_registrations_next:
   state: hidden
   shadow: true
