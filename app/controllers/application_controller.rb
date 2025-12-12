@@ -3484,6 +3484,7 @@ class ApplicationController < ActionController::Base
       context: @context,
       assignment: @assignment,
       tool: @tool,
+      tag: @tag || @module_tag,
       current_user: @current_user,
       request:
     ).build_with_signature
