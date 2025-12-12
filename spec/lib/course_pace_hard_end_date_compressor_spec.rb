@@ -38,6 +38,111 @@ describe CoursePaceHardEndDateCompressor do
   end
 
   describe ".compress" do
+    context "sorts items by module and item position before compression" do
+      before :once do
+        # Create two modules with items in intentionally wrong order
+        @module1 = @course.context_modules.create!(position: 1, name: "Module 1")
+        @module2 = @course.context_modules.create!(position: 2, name: "Module 2")
+
+        # Create assignments with specific positions
+        @assignment1 = @course.assignments.create!(name: "Assignment 1")
+        @tag1 = @assignment1.context_module_tags.create!(
+          context_module: @module1,
+          context: @course,
+          tag_type: "context_module",
+          position: 1
+        )
+
+        @assignment2 = @course.assignments.create!(name: "Assignment 2")
+        @tag2 = @assignment2.context_module_tags.create!(
+          context_module: @module1,
+          context: @course,
+          tag_type: "context_module",
+          position: 2
+        )
+
+        @assignment3 = @course.assignments.create!(name: "Assignment 3")
+        @tag3 = @assignment3.context_module_tags.create!(
+          context_module: @module2,
+          context: @course,
+          tag_type: "context_module",
+          position: 1
+        )
+      end
+
+      it "sorts persisted items correctly regardless of input order" do
+        # Get items from the database (persisted pace)
+        items = @course_pace.course_pace_module_items.to_a
+        compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, items)
+
+        expect(compressed[0].module_item_id).to eq(@tag1.id)
+        expect(compressed[1].module_item_id).to eq(@tag2.id)
+        expect(compressed[2].module_item_id).to eq(@tag3.id)
+      end
+
+      it "sorts unpersisted items correctly by loading module associations" do
+        # Create an unpersisted pace with items in wrong order
+        unpersisted_pace = @course.course_paces.new(
+          workflow_state: "active",
+          end_date: "2021-09-10",
+          hard_end_dates: true
+        )
+
+        items = [
+          unpersisted_pace.course_pace_module_items.build(module_item_id: @tag3.id, duration: 2),
+          unpersisted_pace.course_pace_module_items.build(module_item_id: @tag1.id, duration: 1),
+          unpersisted_pace.course_pace_module_items.build(module_item_id: @tag2.id, duration: 3),
+        ]
+
+        compressed = CoursePaceHardEndDateCompressor.compress(unpersisted_pace, items)
+
+        expect(compressed[0].module_item_id).to eq(@tag1.id)
+        expect(compressed[1].module_item_id).to eq(@tag2.id)
+        expect(compressed[2].module_item_id).to eq(@tag3.id)
+      end
+
+      it "handles items with same module position correctly" do
+        @assignment4 = @course.assignments.create!(name: "Assignment 4")
+        @tag4 = @assignment4.context_module_tags.create!(
+          context_module: @module1,
+          context: @course,
+          tag_type: "context_module",
+          position: 3
+        )
+
+        items = @course_pace.course_pace_module_items.to_a
+        wrong_order = [items[2], items[3], items[0], items[1]]
+
+        compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, wrong_order)
+
+        expect(compressed[0].module_item_id).to eq(@tag1.id)
+        expect(compressed[1].module_item_id).to eq(@tag2.id)
+        expect(compressed[2].module_item_id).to eq(@tag4.id)
+        expect(compressed[3].module_item_id).to eq(@tag3.id)
+      end
+
+      it "only loads module associations once when needed" do
+        unpersisted_pace = @course.course_paces.new(
+          workflow_state: "active",
+          end_date: "2021-09-10",
+          hard_end_dates: true
+        )
+
+        items = [
+          unpersisted_pace.course_pace_module_items.build(module_item_id: @tag1.id, duration: 1),
+          unpersisted_pace.course_pace_module_items.build(module_item_id: @tag2.id, duration: 2),
+        ]
+
+        module_items = ContentTag.where(id: items.map(&:module_item_id)).preload(:context_module).index_by(&:id)
+        items.each { |item| item.module_item = module_items[item.module_item_id] }
+
+        # Should not trigger additional queries
+        expect(ContentTag).not_to receive(:where)
+
+        CoursePaceHardEndDateCompressor.compress(unpersisted_pace, items)
+      end
+    end
+
     context "compresses dates to fit within the end date" do
       before :once do
         assignment = @course.assignments.create!
