@@ -55,12 +55,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def show_distribution_graph?
-    if preload_optimizations_enabled?
-      @assignment.association(:score_statistic).target = @summary.assignment_stats[assignment.id] # Avoid another query
-    else
-      @assignment.score_statistic = @summary.assignment_stats[assignment.id] # Avoid another query
-    end
-
+    @assignment.association(:score_statistic).target = @summary.assignment_stats[assignment.id] # Avoid another query
     @assignment.can_view_score_statistics?(@current_user)
   end
 
@@ -329,12 +324,6 @@ class GradeSummaryAssignmentPresenter
 
   def viewing_fake_student?
     @summary.student_enrollment.fake_student?
-  end
-
-  def preload_optimizations_enabled?
-    return @preload_optimizations_enabled if defined?(@preload_optimizations_enabled)
-
-    @preload_optimizations_enabled = Account.site_admin.feature_enabled?(:grade_summary_preload_optimizations)
   end
 
   FULLWIDTH = 150.0

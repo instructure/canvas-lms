@@ -515,14 +515,3 @@ use_comment_library_v2:
   display_name: Use Enhanced Comment Library in SpeedGrader
   description: |
     Enables the new Comment Library experience in SpeedGrader.
-grade_summary_preload_optimizations:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Grade Summary Preload Optimizations
-  description: |
-    Enables optimizations for preloading data on the Grade Summary page.
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
