@@ -66,6 +66,10 @@ module Api::V1::Lti::Registration
       json["dynamic_registration_url"] = registration.ims_registration&.registration_url
       json["manual_configuration_id"] = registration.manual_configuration&.id
 
+      if context.root_account.feature_enabled?(:lti_registrations_templates)
+        json["template_registration_id"] = registration.template_registration_id
+      end
+
       if registration.site_admin?
         json["created_by"] = "Instructure"
       elsif registration.created_by.present?
