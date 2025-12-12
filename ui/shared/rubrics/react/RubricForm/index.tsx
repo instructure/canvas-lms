@@ -416,6 +416,7 @@ export const RubricForm = ({
 
           {showGenerateCriteriaForm && (
             <GeneratedCriteriaForm
+              totalPoints={assignmentPointsPossible}
               criterionUseRangeEnabled={criterionUseRangeEnabled}
               criteriaBeingGenerated={!!criteriaBeingGenerated}
               generateCriteriaMutation={generateCriteriaMutation}

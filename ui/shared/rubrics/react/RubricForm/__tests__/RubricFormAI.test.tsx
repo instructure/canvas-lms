@@ -116,6 +116,16 @@ describe('RubricForm AI Tests', () => {
       expect(getByTestId('additional-prompt-info-input')).toBeInTheDocument()
     })
 
+    it('auto-populates assignment points possible in total points input', () => {
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        assignmentPointsPossible: 50,
+        courseId: '1',
+      })
+      expect(getByTestId('criteria-total-points-input')).toHaveValue('50')
+    })
+
     it('does not show the form when aiRubricsEnabled is false', () => {
       const {queryByTestId} = renderComponent({
         aiRubricsEnabled: false,
