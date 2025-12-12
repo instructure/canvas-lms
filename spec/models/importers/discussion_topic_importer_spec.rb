@@ -151,5 +151,28 @@ describe Importers::DiscussionTopicImporter do
         expect(subject.reply_to_entry_required_count).to eq(0)
       end
     end
+
+    context "when discussion has lock_at but assignment does not" do
+      it "uses assignment lock_at for discussion topic" do
+        discussion_data = {
+          migration_id: "test_discussion",
+          title: "Test Discussion",
+          description: "Test description",
+          lock_at: "2025-04-05T00:00:00Z",
+          assignment: {
+            migration_id: "test_assignment",
+            title: "Test Assignment",
+            due_at: "2025-12-02T00:00:00Z",
+            lock_at: nil
+          }
+        }
+
+        topic = Importers::DiscussionTopicImporter.import_from_migration(discussion_data, context, migration)
+
+        expect(topic.lock_at).to be_nil
+        expect(topic.assignment.due_at).to eq(Time.zone.parse("2025-12-02T00:00:00Z"))
+        expect(topic.assignment.lock_at).to be_nil
+      end
+    end
   end
 end
