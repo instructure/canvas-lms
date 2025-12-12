@@ -17,7 +17,7 @@
  */
 
 import {Flex} from '@instructure/ui-flex'
-import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import ConfusedPanda from '@canvas/images/ConfusedPanda.svg'
@@ -30,7 +30,9 @@ export function NoTranscript() {
       <View maxWidth="102px">
         <img src={ConfusedPanda} alt="" />
       </View>
-      <Heading variant="titleCardRegular">{I18n.t('There is no transcript yet.')}</Heading>
+      <Text size="descriptionPage" weight="weightImportant" lineHeight="lineHeight100">
+        {I18n.t('There is no transcript yet.')}
+      </Text>
     </Flex>
   )
 }
