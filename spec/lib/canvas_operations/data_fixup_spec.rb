@@ -157,6 +157,44 @@ RSpec.describe CanvasOperations::DataFixup do
     end
   end
 
+  describe "required method implementations" do
+    describe "#process_batch" do
+      it "raises NoMethodError when not implemented for batch mode" do
+        fixup_class = Class.new(described_class) do
+          self.mode = :batch
+          scope { User.all }
+        end
+
+        fixup = fixup_class.new
+        expect { fixup.send(:process_batch, []) }.to raise_error(NoMethodError, "Subclasses must implement #process_batch when mode is :batch")
+      end
+    end
+
+    describe "#process_record" do
+      it "raises NoMethodError when not implemented for individual_record mode" do
+        fixup_class = Class.new(described_class) do
+          self.mode = :individual_record
+          scope { User.all }
+        end
+
+        fixup = fixup_class.new
+        record = double("record")
+        expect { fixup.send(:process_record, record) }.to raise_error(NoMethodError, "Subclasses must implement #process_record when mode is :individual_record")
+      end
+    end
+
+    describe "#scope" do
+      it "raises NotImplementedError when not defined" do
+        fixup_class = Class.new(described_class) do
+          self.mode = :batch
+        end
+
+        fixup = fixup_class.new
+        expect { fixup.send(:scope) }.to raise_error(NotImplementedError, "Subclasses must define scope using `scope { ... }` or implement #scope method")
+      end
+    end
+  end
+
   describe "#run" do
     subject(:run_fixup) { fixup_instance.run(nil) }
 
