@@ -142,7 +142,9 @@ module CanvasOperations
     # Subclasses must implement this method to define how to process a batch of records
     #
     # Only used when mode is set to :batch.
-    def process_batch(batch); end
+    def process_batch(_batch)
+      raise NoMethodError, "Subclasses must implement #process_batch when mode is :batch"
+    end
 
     # Processes an individual record. Ideal for when each record needs to be
     # loaded and processed separately.
@@ -150,7 +152,9 @@ module CanvasOperations
     # Subclasses must implement this method to define how to process an individual record.
     #
     # Only used when mode is set to :individual_record.
-    def process_record(record); end
+    def process_record(_record)
+      raise NoMethodError, "Subclasses must implement #process_record when mode is :individual_record"
+    end
 
     # Determines if the current shard is a valid target for the DataFixup operation.
     #
