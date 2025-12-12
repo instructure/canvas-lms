@@ -112,7 +112,6 @@ describe('Lti1p3RegistrationWizard', () => {
     for (let i = 0; i < 7; i++) {
       await userEvent.click(findNextButton())
     }
-
     await userEvent.click(screen.getByText('Update App').closest('button')!)
     expect(screen.getAllByText('Updating App')[0]).toBeInTheDocument()
   })
@@ -312,5 +311,119 @@ describe('Lti1p3RegistrationWizard', () => {
 
     await userEvent.click(screen.getByText('Previous').closest('button')!)
     expect(screen.getByText('Placements')).toBeInTheDocument()
+  })
+
+  it('correctly skips EULA Settings when navigating back if not applicable', async () => {
+    render(
+      <Lti1p3RegistrationWizard
+        {...defaultProps}
+        internalConfiguration={mockInternalConfiguration({
+          scopes: ['https://canvas.instructure.com/lti-ags/progress/scope/show'],
+          placements: [
+            {
+              placement: 'course_navigation',
+              enabled: true,
+              text: 'Course Navigation',
+            },
+          ],
+        })}
+      />,
+    )
+
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+
+    expect(screen.getByText('Override URIs')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByText('Previous').closest('button')!)
+    expect(screen.getByText('Placements')).toBeInTheDocument()
+    expect(screen.queryByText('EULA Settings')).not.toBeInTheDocument()
+  })
+
+  it('focuses invalid inputs if any fields are invalid on launch settings step', async () => {
+    const user = userEvent.setup()
+    render(<Lti1p3RegistrationWizard {...defaultProps} />)
+
+    const redirectURIs = screen.getByLabelText(/Redirect URIs/i)
+    await user.clear(redirectURIs)
+    await user.paste('http:<<<>>')
+    await user.tab()
+    await user.click(findNextButton())
+    expect(redirectURIs).toHaveFocus()
+
+    await user.clear(redirectURIs)
+    await user.paste('https://example.com/launch')
+
+    const domain = screen.getByLabelText('Domain')
+    await user.clear(domain)
+    await user.paste('domain00---.com.')
+    await user.tab()
+    await user.click(findNextButton())
+    expect(domain).toHaveFocus()
+
+    await user.clear(domain)
+    await user.paste('example.com')
+    await user.click(findNextButton())
+    expect(screen.getByText('Permissions')).toBeInTheDocument()
+  })
+
+  it('focuses invalid inputs if any fields are invalid on override uris step', async () => {
+    const user = userEvent.setup()
+    render(<Lti1p3RegistrationWizard {...defaultProps} />)
+
+    // Navigate to Override URIs step
+    await user.click(findNextButton()) // Launch Settings -> Permissions
+    await user.click(findNextButton()) // Permissions -> Data Sharing
+    await user.click(findNextButton()) // Data Sharing -> Placements
+    await user.click(findNextButton()) // Placements -> Override URIs
+
+    expect(screen.getByText('Override URIs')).toBeInTheDocument()
+
+    // Enter an invalid override URI for course_navigation placement (first one)
+    const overrideUriInputs = screen.getAllByLabelText('Override URI')
+    const overrideUriInput = overrideUriInputs[0]
+    await user.clear(overrideUriInput)
+    await user.paste('invalid-url')
+    await user.tab()
+    await user.click(findNextButton())
+    expect(overrideUriInput).toHaveFocus()
+
+    // Fix the invalid URI and verify the wizard can proceed
+    await user.clear(overrideUriInput)
+    await user.paste('https://example.com/override')
+    await user.click(findNextButton())
+    expect(screen.getByText('Nickname')).toBeInTheDocument()
+  })
+
+  it('focuses invalid inputs if any fields are invalid on icon urls step', async () => {
+    const user = userEvent.setup()
+    render(<Lti1p3RegistrationWizard {...defaultProps} />)
+
+    await user.click(findNextButton())
+    await user.click(findNextButton())
+    await user.click(findNextButton())
+    await user.click(findNextButton())
+    await user.click(findNextButton())
+    await user.click(findNextButton())
+
+    expect(screen.getByText('Placement Icon URLs')).toBeInTheDocument()
+
+    // Enter an invalid icon URL for global_navigation placement (which supports icons)
+    // Find the Global Navigation heading first, then find the input associated with it
+    screen.getByText('Global Navigation')
+    const iconUrlInput = screen.getAllByRole('textbox')[1]
+    await user.clear(iconUrlInput)
+    await user.paste('invalid-url')
+    await user.tab()
+    await user.click(findNextButton())
+    expect(iconUrlInput).toHaveFocus()
+
+    // Fix the invalid URL and verify the wizard can proceed
+    await user.clear(iconUrlInput)
+    await user.paste('https://example.com/icon.png')
+    await user.click(findNextButton())
+    expect(screen.getByText('Review')).toBeInTheDocument()
   })
 })

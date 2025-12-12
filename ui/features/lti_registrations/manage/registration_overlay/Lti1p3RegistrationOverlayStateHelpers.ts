@@ -138,7 +138,7 @@ export const convertToLtiConfigurationOverlay = (
   state: Lti1p3RegistrationOverlayState,
   internalConfig: InternalLtiConfiguration,
 ): {overlay: LtiConfigurationOverlay; config: InternalLtiConfiguration} => {
-  const placements = state.placements.placements?.reduce((acc, placement) => {
+  const placements = state.placements.placements.reduce((acc, placement) => {
     const internalPlacement = internalConfig.placements.find(p => p.placement === placement)
     const courseNavDefaultValue =
       placement === 'course_navigation'
@@ -223,7 +223,7 @@ export const convertToLtiConfigurationOverlay = (
           ? undefined
           : state.data_sharing.privacy_level,
       disabled_placements,
-      placements,
+      placements: Object.keys(placements).length === 0 ? undefined : placements,
       domain:
         state.launchSettings.domain === internalConfig.domain
           ? undefined

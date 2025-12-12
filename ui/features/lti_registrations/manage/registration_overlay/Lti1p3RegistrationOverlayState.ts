@@ -42,7 +42,7 @@ export type Lti1p3RegistrationOverlayState = {
     privacy_level?: LtiPrivacyLevel
   }
   placements: {
-    placements?: LtiPlacement[]
+    placements: LtiPlacement[]
     courseNavigationDefaultDisabled?: boolean
     topNavigationAllowFullscreen?: boolean
   }

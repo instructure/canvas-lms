@@ -21,44 +21,22 @@ import {IconConfirmation} from '../../registration_wizard_forms/IconConfirmation
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
-import {Footer} from '../../registration_wizard_forms/Footer'
-import {
-  getInputIdForField,
-  validateIconUris,
-} from '../../registration_overlay/validateLti1p3RegistrationOverlayState'
 import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 
 export type IconConfirmationWrapperProps = {
-  onNextButtonClicked: () => void
-  onPreviousButtonClicked: () => void
   reviewing: boolean
   overlayStore: Lti1p3RegistrationOverlayStore
   internalConfig: InternalLtiConfiguration
   includeFooter?: boolean
+  hasClickedNext?: boolean
 }
 
 export const IconConfirmationWrapper = ({
   overlayStore,
   internalConfig,
-  reviewing,
-  onNextButtonClicked,
-  onPreviousButtonClicked,
-  includeFooter = true,
+  hasClickedNext,
 }: IconConfirmationWrapperProps) => {
   const {state, ...actions} = overlayStore()
-
-  const [hasSubmitted, setHasSubmitted] = React.useState(false)
-
-  const onNextClicked = React.useCallback(() => {
-    // if there are any errors, don't proceed
-    const errors = validateIconUris(overlayStore.getState().state.icons)
-    if (errors.length > 0) {
-      document.getElementById(getInputIdForField(errors[0].field))?.focus()
-    } else {
-      onNextButtonClicked()
-    }
-    setHasSubmitted(true)
-  }, [onNextButtonClicked, overlayStore])
 
   const filteredPlacements = React.useMemo(
     () => filterPlacementsByFeatureFlags(state.placements.placements ?? []),
@@ -66,27 +44,17 @@ export const IconConfirmationWrapper = ({
   )
 
   return (
-    <>
-      <RegistrationModalBody>
-        <IconConfirmation
-          internalConfig={internalConfig}
-          name={internalConfig.title}
-          allPlacements={filteredPlacements}
-          placementIconOverrides={state.icons.placements}
-          setPlacementIconUrl={actions.setPlacementIconUrl}
-          defaultIconUrl={state.icons.defaultIconUrl ?? ''}
-          setDefaultIconUrl={actions.setDefaultIconUrl}
-          hasSubmitted={hasSubmitted}
-        />
-      </RegistrationModalBody>
-      {includeFooter && (
-        <Footer
-          reviewing={reviewing}
-          currentScreen="intermediate"
-          onPreviousClicked={onPreviousButtonClicked}
-          onNextClicked={onNextClicked}
-        />
-      )}
-    </>
+    <RegistrationModalBody>
+      <IconConfirmation
+        internalConfig={internalConfig}
+        name={internalConfig.title}
+        allPlacements={filteredPlacements}
+        placementIconOverrides={state.icons.placements}
+        setPlacementIconUrl={actions.setPlacementIconUrl}
+        defaultIconUrl={state.icons.defaultIconUrl}
+        setDefaultIconUrl={actions.setDefaultIconUrl}
+        hasSubmitted={hasClickedNext ?? false}
+      />
+    </RegistrationModalBody>
   )
 }

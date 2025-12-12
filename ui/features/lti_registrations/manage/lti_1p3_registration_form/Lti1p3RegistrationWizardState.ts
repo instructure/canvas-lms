@@ -22,13 +22,23 @@ import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
 import {
+  containsPlacementWithIcon,
   createLti1p3RegistrationOverlayStore,
   type Lti1p3RegistrationOverlayStore,
 } from '../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {convertToLtiConfigurationOverlay} from '../registration_overlay/Lti1p3RegistrationOverlayStateHelpers'
+import {
+  validateLaunchSettings,
+  validateOverrideUris,
+  validateIconUris,
+  getInputIdForField,
+  type Lti1p3RegistrationOverlayStateError,
+} from '../registration_overlay/validateLti1p3RegistrationOverlayState'
 
 import type {Lti1p3RegistrationWizardService} from './Lti1p3RegistrationWizardService'
 import {create} from 'zustand'
+import {LtiRegistration, LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
+import {UnifiedToolId} from '../model/UnifiedToolId'
 
 export type Lti1p3RegistrationWizardState = {
   overlayStore: Lti1p3RegistrationOverlayStore
@@ -36,6 +46,7 @@ export type Lti1p3RegistrationWizardState = {
   _step: Lti1p3RegistrationWizardStep
   reviewing: boolean
   errorMessage?: string
+  hasClickedNext?: boolean
 }
 
 export interface Lti1p3RegistrationWizardActions {
@@ -52,6 +63,54 @@ export interface Lti1p3RegistrationWizardActions {
     registrationId: LtiRegistrationId,
     unifiedToolId?: string,
   ) => Promise<void>
+
+  /**
+   * Handle next button click with validation for the current step
+   * Calls onErrors callback with validation errors if any
+   */
+  advanceStep: (
+    accountId: AccountId,
+    onSuccessfulRegistration: (registrationId: LtiRegistrationId) => void,
+    onErrors: (errors: Array<Lti1p3RegistrationOverlayStateError>) => void,
+    existingRegistration?: LtiRegistrationWithConfiguration,
+    unifiedToolId?: UnifiedToolId,
+  ) => void
+
+  /**
+   * Handle previous button click for the current step
+   */
+  previousStep: (currentStep: Lti1p3RegistrationWizardStep) => void
+
+  /**
+   * Check if current step can proceed (used for button state)
+   */
+  canProceed: (currentStep: Lti1p3RegistrationWizardStep) => boolean
+
+  /**
+   * Validate the current step and return validation errors
+   * Returns empty array if no validation errors
+   */
+  validateStep: (
+    currentStep: Lti1p3RegistrationWizardStep,
+  ) => Array<Lti1p3RegistrationOverlayStateError>
+
+  /**
+   * Returns true if the current step should be skipped
+   * false otherwise
+   * @param currentStep
+   * @returns
+   */
+  shouldSkipStep: (currentStep: Lti1p3RegistrationWizardStep) => boolean
+
+  /**
+   * Handle the final save/install action from the review screen
+   */
+  handleSave: (
+    accountId: AccountId,
+    existingRegistrationId?: LtiRegistrationId,
+    unifiedToolId?: string,
+    onSuccessfulSave?: (registrationId: LtiRegistrationId) => void,
+  ) => void
 }
 
 export type Lti1p3RegistrationWizardStep =
@@ -67,6 +126,18 @@ export type Lti1p3RegistrationWizardStep =
   | 'Installing'
   | 'Updating'
   | 'Error'
+
+const Lti1p3RegistrationWizardStepOrder: Array<Lti1p3RegistrationWizardStep> = [
+  'LaunchSettings',
+  'Permissions',
+  'DataSharing',
+  'Placements',
+  'EulaSettings',
+  'OverrideURIs',
+  'Naming',
+  'Icons',
+  'Review',
+]
 
 export type Lti1p3RegistrationWizardStore = {
   state: Lti1p3RegistrationWizardState
@@ -156,6 +227,136 @@ export const createLti1p3RegistrationWizardState = ({
             errorMessage: formatApiResultError(result),
           },
         }))
+      }
+    },
+    advanceStep: (
+      accountId,
+      onSuccessfulRegistration,
+      onErrors,
+      existingRegistration,
+      unifiedToolId,
+    ) => {
+      const currentState = get()
+      if (currentState.state._step === 'Review') {
+        currentState.handleSave(
+          accountId,
+          existingRegistration?.id,
+          unifiedToolId,
+          onSuccessfulRegistration,
+        )
+      } else {
+        set(state => {
+          const errors = state.validateStep(state.state._step)
+          if (errors.length > 0) {
+            onErrors(errors)
+            return {
+              state: {
+                ...state.state,
+                hasClickedNext: true,
+              },
+            }
+          }
+          if (state.state.reviewing) {
+            return {
+              state: {
+                ...state.state,
+                _step: 'Review',
+              },
+            }
+          }
+
+          const currentStepIndex = Lti1p3RegistrationWizardStepOrder.indexOf(state.state._step)
+
+          let candidateStepIndex = currentStepIndex + 1
+          while (candidateStepIndex <= Lti1p3RegistrationWizardStepOrder.length - 1) {
+            const candidateStep = Lti1p3RegistrationWizardStepOrder[candidateStepIndex]
+            if (state.shouldSkipStep(candidateStep)) {
+              candidateStepIndex++
+              continue
+            } else {
+              break
+            }
+          }
+          const nextStep =
+            candidateStepIndex < Lti1p3RegistrationWizardStepOrder.length
+              ? Lti1p3RegistrationWizardStepOrder[candidateStepIndex]
+              : 'Review'
+
+          return {
+            state: {
+              ...state.state,
+              _step: nextStep,
+              reviewing: nextStep === 'Review' ? true : state.state.reviewing,
+            },
+          }
+        })
+      }
+    },
+    previousStep: currentStep =>
+      set(state => {
+        const currentStepIndex = Lti1p3RegistrationWizardStepOrder.indexOf(currentStep)
+
+        // starting at the current step, find the previous step in the order, skipping any that should be skipped
+        let candidateStepIndex = currentStepIndex - 1
+        while (candidateStepIndex > 0) {
+          const candidateStep = Lti1p3RegistrationWizardStepOrder[candidateStepIndex]
+          if (state.shouldSkipStep(candidateStep)) {
+            candidateStepIndex--
+            continue
+          } else {
+            break
+          }
+        }
+
+        const previousStep =
+          candidateStepIndex >= 0
+            ? Lti1p3RegistrationWizardStepOrder[candidateStepIndex]
+            : 'LaunchSettings'
+
+        return {
+          state: {
+            ...state.state,
+            _step: previousStep,
+            reviewing: false,
+          },
+        }
+      }),
+    canProceed: _currentStep => {
+      // All steps can proceed for now - can add validation logic here later if needed
+      return true
+    },
+    shouldSkipStep: currentStep => {
+      switch (currentStep) {
+        case 'EulaSettings':
+          return !get().state.overlayStore.getState().isEulaCapable()
+        default:
+          return false
+      }
+    },
+    validateStep: currentStep => {
+      const store = get()
+      switch (currentStep) {
+        case 'LaunchSettings':
+          return validateLaunchSettings(store.state.overlayStore.getState().state.launchSettings)
+        case 'OverrideURIs':
+          return validateOverrideUris(store.state.overlayStore.getState().state.override_uris)
+        case 'Icons':
+          return validateIconUris(store.state.overlayStore.getState().state.icons)
+        default:
+          return []
+      }
+    },
+    handleSave: (accountId, existingRegistrationId, unifiedToolId, onSuccessfulSave) => {
+      const store = get()
+      if (existingRegistrationId) {
+        store.update(
+          onSuccessfulSave || (() => {}),
+          accountId,
+          existingRegistrationId,
+          unifiedToolId,
+        )
+      } else {
+        store.install(onSuccessfulSave || (() => {}), accountId, unifiedToolId)
       }
     },
   }))
