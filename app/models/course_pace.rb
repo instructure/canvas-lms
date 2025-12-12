@@ -164,6 +164,7 @@ class CoursePace < ActiveRecord::Base
           progress&.calculate_completion!(0, enrollments.size)
           enrollments.each do |enrollment|
             course_pace_module_items.each(&:restore_attributes)
+            # Compressor handles sorting internally
             compressed_module_items = compress_dates(start_date: nil, enrollment:)
             dates =
               CoursePaceDueDatesCalculator.new(self).get_due_dates(compressed_module_items, enrollment)
