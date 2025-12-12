@@ -18,6 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import * as React from 'react'
+import {ProgressBar} from '@instructure/ui-progress'
 import type {AccountId} from '../model/AccountId'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
@@ -58,6 +59,41 @@ const getFooterCurrentScreen = (step: Lti1p3RegistrationWizardStep) => {
 
 const shouldShowFooter = (step: Lti1p3RegistrationWizardStep) => {
   return !['Installing', 'Updating', 'Error'].includes(step)
+}
+
+const TotalProgressLevels = 9
+const ProgressLevels: Record<Lti1p3RegistrationWizardStep, number> = {
+  LaunchSettings: 1,
+  Permissions: 2,
+  DataSharing: 3,
+  Placements: 4,
+  EulaSettings: 5,
+  OverrideURIs: 6,
+  Naming: 7,
+  Icons: 8,
+  Review: 9,
+  Installing: 9,
+  Updating: 9,
+  Error: 0,
+}
+
+const progressBar = (step: Lti1p3RegistrationWizardStep) => (
+  <ProgressBar
+    meterColor="info"
+    shouldAnimate={true}
+    size="x-small"
+    frameBorder="none"
+    screenReaderLabel={I18n.t('Installation Progress')}
+    valueNow={ProgressLevels[step]}
+    valueMax={TotalProgressLevels}
+    themeOverride={{
+      trackBottomBorderWidth: '0',
+    }}
+  />
+)
+
+const shouldShowProgressBar = (step: Lti1p3RegistrationWizardStep) => {
+  return step !== 'Error'
 }
 
 const renderStepContent = (
@@ -209,6 +245,7 @@ export const Lti1p3RegistrationWizard = ({
   return (
     <>
       <Header onClose={onDismiss} editing={!!existingRegistration} />
+      {shouldShowProgressBar(currentState.state._step) && progressBar(currentState.state._step)}
       {renderStepContent(
         currentState.state._step,
         {
