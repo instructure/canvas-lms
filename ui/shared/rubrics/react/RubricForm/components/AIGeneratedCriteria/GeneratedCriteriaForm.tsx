@@ -95,20 +95,23 @@ const gradeLevelLabel = (k: GradeLevel) => {
 }
 
 type GeneratedCriteriaFormProps = {
+  totalPoints?: number
   criterionUseRangeEnabled: boolean
   criteriaBeingGenerated: boolean
   generateCriteriaMutation: () => void
   onFormOptionsChange?: (options: GenerateCriteriaFormProps) => void
 }
 export const GeneratedCriteriaForm = ({
+  totalPoints,
   criterionUseRangeEnabled,
   criteriaBeingGenerated,
   generateCriteriaMutation,
   onFormOptionsChange,
 }: GeneratedCriteriaFormProps) => {
-  const [generateCriteriaForm, setGenerateCriteriaForm] = useState<GenerateCriteriaFormProps>(
-    defaultGenerateCriteriaForm,
-  )
+  const [generateCriteriaForm, setGenerateCriteriaForm] = useState<GenerateCriteriaFormProps>({
+    ...defaultGenerateCriteriaForm,
+    totalPoints: totalPoints ? totalPoints.toString() : defaultGenerateCriteriaForm.totalPoints,
+  })
 
   const updateGenerateCriteriaForm = (newForm: GenerateCriteriaFormProps) => {
     setGenerateCriteriaForm(newForm)
