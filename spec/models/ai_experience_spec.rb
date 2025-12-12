@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "webmock/rspec"
+
 describe AiExperience do
   let(:account) { Account.create! }
   let(:root_account) { Account.default }
@@ -91,6 +93,201 @@ describe AiExperience do
       experience_id = experience.id
       experience.destroy
       expect(AiExperience.find_by(id: experience_id)).to be_nil
+    end
+  end
+
+  describe "conversation_context lifecycle callbacks" do
+    before do
+      Setting.set("llm_conversation_base_url", "http://localhost:3001")
+      allow(Rails.application.credentials).to receive(:llm_conversation_bearer_token).and_return("test-token")
+    end
+
+    describe "after_create" do
+      let(:prompt_response) do
+        {
+          "success" => true,
+          "data" => {
+            "id" => "prompt-uuid",
+            "code" => "alpha",
+            "content" => "System prompt"
+          }
+        }
+      end
+
+      let(:create_context_response) do
+        {
+          "success" => true,
+          "data" => {
+            "id" => "context-uuid",
+            "type" => "assignment",
+            "data" => {
+              "scenario" => valid_attributes[:pedagogical_guidance],
+              "facts" => valid_attributes[:facts],
+              "learning_objectives" => valid_attributes[:learning_objective]
+            },
+            "prompt_id" => "prompt-uuid"
+          }
+        }
+      end
+
+      before do
+        stub_request(:get, "http://localhost:3001/prompts/by-code/alpha")
+          .to_return(status: 200, body: prompt_response.to_json, headers: { "Content-Type" => "application/json" })
+
+        stub_request(:post, "http://localhost:3001/conversation-context")
+          .to_return(status: 200, body: create_context_response.to_json, headers: { "Content-Type" => "application/json" })
+      end
+
+      it "creates conversation_context after creating AI experience" do
+        experience = AiExperience.create!(valid_attributes)
+
+        expect(experience.llm_conversation_context_id).to eq("context-uuid")
+        expect(WebMock).to have_requested(:post, "http://localhost:3001/conversation-context")
+      end
+
+      it "does not fail AI experience creation if context creation fails" do
+        stub_request(:post, "http://localhost:3001/conversation-context")
+          .to_return(status: 500, body: "Internal Server Error")
+
+        expect do
+          experience = AiExperience.create!(valid_attributes)
+          expect(experience).to be_persisted
+          expect(experience.llm_conversation_context_id).to be_nil
+        end.not_to raise_error
+      end
+
+      it "logs error when context creation fails" do
+        stub_request(:post, "http://localhost:3001/conversation-context")
+          .to_return(status: 500, body: "Internal Server Error")
+
+        expect(Rails.logger).to receive(:error).with(/Failed to create conversation context/)
+
+        AiExperience.create!(valid_attributes)
+      end
+    end
+
+    describe "after_update" do
+      let!(:experience) do
+        exp = AiExperience.create!(valid_attributes)
+        exp.update_column(:llm_conversation_context_id, "context-uuid")
+        exp
+      end
+
+      let(:update_context_response) do
+        {
+          "success" => true,
+          "data" => {
+            "id" => "context-uuid",
+            "data" => {
+              "scenario" => "Updated scenario",
+              "facts" => "Updated facts",
+              "learning_objectives" => "Updated objectives"
+            }
+          }
+        }
+      end
+
+      before do
+        stub_request(:patch, "http://localhost:3001/conversation-context/context-uuid")
+          .to_return(status: 200, body: update_context_response.to_json, headers: { "Content-Type" => "application/json" })
+      end
+
+      it "updates conversation_context when pedagogical_guidance changes" do
+        experience.update!(pedagogical_guidance: "Updated scenario")
+
+        expect(WebMock).to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+      end
+
+      it "updates conversation_context when facts change" do
+        experience.update!(facts: "Updated facts")
+
+        expect(WebMock).to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+      end
+
+      it "updates conversation_context when learning_objective changes" do
+        experience.update!(learning_objective: "Updated objectives")
+
+        expect(WebMock).to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+      end
+
+      it "does not update conversation_context when other fields change" do
+        experience.update!(title: "New Title")
+
+        expect(WebMock).not_to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+      end
+
+      it "does not update conversation_context if context_id is not set" do
+        experience.update_column(:llm_conversation_context_id, nil)
+        experience.update!(pedagogical_guidance: "Updated scenario")
+
+        expect(WebMock).not_to have_requested(:patch, %r{http://localhost:3001/conversation-context/})
+      end
+
+      it "does not fail AI experience update if context update fails" do
+        stub_request(:patch, "http://localhost:3001/conversation-context/context-uuid")
+          .to_return(status: 500, body: "Internal Server Error")
+
+        expect do
+          experience.update!(pedagogical_guidance: "Updated scenario")
+          expect(experience.reload.pedagogical_guidance).to eq("Updated scenario")
+        end.not_to raise_error
+      end
+
+      it "logs error when context update fails" do
+        stub_request(:patch, "http://localhost:3001/conversation-context/context-uuid")
+          .to_return(status: 500, body: "Internal Server Error")
+
+        expect(Rails.logger).to receive(:error).with(/Failed to update conversation context/)
+
+        experience.update!(pedagogical_guidance: "Updated scenario")
+      end
+    end
+
+    describe "before_destroy" do
+      let!(:experience) do
+        exp = AiExperience.create!(valid_attributes)
+        exp.update_column(:llm_conversation_context_id, "context-uuid")
+        exp
+      end
+
+      before do
+        stub_request(:delete, "http://localhost:3001/conversation-context/context-uuid")
+          .to_return(status: 200, body: { "success" => true }.to_json, headers: { "Content-Type" => "application/json" })
+      end
+
+      it "deletes conversation_context when destroying AI experience" do
+        experience.destroy
+
+        expect(WebMock).to have_requested(:delete, "http://localhost:3001/conversation-context/context-uuid")
+      end
+
+      it "does not delete conversation_context if context_id is not set" do
+        experience.update_column(:llm_conversation_context_id, nil)
+        experience.destroy
+
+        expect(WebMock).not_to have_requested(:delete, %r{http://localhost:3001/conversation-context/})
+      end
+
+      it "does not fail AI experience destruction if context deletion fails" do
+        stub_request(:delete, "http://localhost:3001/conversation-context/context-uuid")
+          .to_return(status: 500, body: "Internal Server Error")
+
+        experience_id = experience.id
+
+        expect do
+          experience.destroy
+          expect(AiExperience.find_by(id: experience_id)).to be_nil
+        end.not_to raise_error
+      end
+
+      it "logs error when context deletion fails" do
+        stub_request(:delete, "http://localhost:3001/conversation-context/context-uuid")
+          .to_return(status: 500, body: "Internal Server Error")
+
+        expect(Rails.logger).to receive(:error).with(/Failed to delete conversation context/)
+
+        experience.destroy
+      end
     end
   end
 end
