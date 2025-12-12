@@ -634,7 +634,7 @@ class ContentMigration < ActiveRecord::Base
         end
         # sync the existing folders first in case someone did something weird like deleted and replaced a folder in the same sync
         MasterCourses::FolderHelper.update_folder_names_and_states(context, source_export)
-        copy_attachments_from_course(source_export)
+        copy_attachments_for_migration(source_export)
         MasterCourses::FolderHelper.recalculate_locked_folders(context)
       elsif for_course_template?
         data = JSON.parse(exported_attachment.open, max_nesting: 50)
@@ -861,6 +861,19 @@ class ContentMigration < ActiveRecord::Base
     return @merge_mappings[old_item] if old_item.is_a?(String)
 
     @merge_mappings[old_item.asset_string]
+  end
+
+  def copy_attachments_for_migration(source_export)
+    copy_attachments_from_course(source_export)
+
+    destination_media_folder = Folder.media_folder(context)
+    bp_user_files = Attachment.where(id: source_export.settings["referenced_user_file_ids"]) if source_export.settings["referenced_user_file_ids"].present?
+    (source_export.referenced_files.values + bp_user_files.to_a).each do |att|
+      next unless att.context_type == "User"
+
+      export_path = "#{destination_media_folder.name}/#{att.display_name}"
+      copy_attachment_to_destination_course(source_export, att, export_path, destination_media_folder.id)
+    end
   end
 
   def copy_attachments_from_course(source_export)

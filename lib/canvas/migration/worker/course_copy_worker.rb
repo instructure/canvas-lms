@@ -58,14 +58,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
           cm.workflow_state = :pre_processed
           cm.update_import_progress(10)
 
-          cm.copy_attachments_from_course(ce)
-          destination_media_folder = Folder.media_folder(cm.context)
-          ce.referenced_files.each_value do |att|
-            next unless att.context_type == "User"
-
-            export_path = "#{destination_media_folder.name}/#{att.display_name}"
-            cm.copy_attachment_to_destination_course(ce, att, export_path, destination_media_folder.id)
-          end
+          cm.copy_attachments_for_migration(ce)
           cm.update_import_progress(20)
 
           cm.import_content
