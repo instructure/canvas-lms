@@ -77,6 +77,13 @@ const mockGqlResponse = {
       _id: '123',
       enrollmentsConnection: {
         nodes: mockProgressData,
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
+          totalCount: 2,
+        },
       },
     },
   },
@@ -183,6 +190,13 @@ describe('ProgressOverviewWidget', () => {
               _id: '123',
               enrollmentsConnection: {
                 nodes: [],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  startCursor: null,
+                  endCursor: null,
+                  totalCount: 0,
+                },
               },
             },
           },
@@ -251,6 +265,13 @@ describe('ProgressOverviewWidget', () => {
                     },
                   },
                 ],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  startCursor: null,
+                  endCursor: null,
+                  totalCount: 1,
+                },
               },
             },
           },
@@ -280,6 +301,109 @@ describe('ProgressOverviewWidget', () => {
     )
 
     const {cleanup} = setup({}, {observedUserId})
+
+    await waitFor(() => {
+      expect(screen.getByTestId('course-progress-item-1')).toBeInTheDocument()
+    })
+
+    cleanup()
+  })
+
+  it('does not show pagination when only one page', async () => {
+    const {cleanup} = setup()
+
+    await waitFor(() => {
+      expect(screen.getByTestId('course-progress-item-1')).toBeInTheDocument()
+    })
+
+    expect(screen.queryByTestId('pagination-container')).not.toBeInTheDocument()
+
+    cleanup()
+  })
+
+  it('shows pagination when more than one page', async () => {
+    const mockDataWithPagination = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollmentsConnection: {
+            nodes: mockProgressData,
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: 'cursor1',
+              totalCount: 10,
+            },
+          },
+        },
+      },
+    }
+
+    server.use(
+      graphql.query('GetUserProgressOverview', () => {
+        return HttpResponse.json(mockDataWithPagination)
+      }),
+    )
+
+    const {cleanup} = setup()
+
+    await waitFor(() => {
+      expect(screen.getByTestId('pagination-container')).toBeInTheDocument()
+    })
+
+    cleanup()
+  })
+
+  it('handles pagination navigation', async () => {
+    const page1Data = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollmentsConnection: {
+            nodes: [mockProgressData[0]],
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: 'cursor1',
+              totalCount: 6,
+            },
+          },
+        },
+      },
+    }
+
+    const page2Data = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollmentsConnection: {
+            nodes: [mockProgressData[1]],
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: true,
+              startCursor: 'cursor1',
+              endCursor: null,
+              totalCount: 6,
+            },
+          },
+        },
+      },
+    }
+
+    let requestCount = 0
+    server.use(
+      graphql.query('GetUserProgressOverview', ({variables}) => {
+        requestCount++
+        if (variables.after) {
+          return HttpResponse.json(page2Data)
+        }
+        return HttpResponse.json(page1Data)
+      }),
+    )
+
+    const {cleanup} = setup()
 
     await waitFor(() => {
       expect(screen.getByTestId('course-progress-item-1')).toBeInTheDocument()
