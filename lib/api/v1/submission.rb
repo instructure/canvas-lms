@@ -65,7 +65,7 @@ module Api::V1::Submission
     end
 
     if includes.include?("peer_review_submissions") && context.feature_enabled?(:peer_review_allocation_and_grading)
-      if assignment.peer_reviews? && assignment.peer_review_sub_assignment.present?
+      if assignment.peer_reviews? && assignment.peer_review_sub_assignment.present? && !assignment.is_a?(PeerReviewSubAssignment)
         result = PeerReview::PeerReviewSubmissionSerializer.serialize(assignment:, user_id: submission.user_id)
 
         peer_review_submission_data = if result[:submission]
