@@ -1919,7 +1919,9 @@ class CoursesController < ApplicationController
   def re_send_invitations
     get_context
     if authorized_action(@context, @current_user, %i[manage_students allow_course_admin_actions])
-      @context.delay_if_production.re_send_invitations!(@current_user)
+      @context
+        .delay(singleton: "course:re_send_invitations!:#{@context.global_id}")
+        .re_send_invitations!(@current_user)
 
       respond_to do |format|
         format.html { redirect_to course_settings_url }
