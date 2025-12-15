@@ -158,6 +158,8 @@ describe DiscussionTopicInsight do
         workflow_state: "created"
       )
 
+      Account.site_admin.disable_feature!(:discussion_insights_with_cedar)
+
       @inst_llm = instance_double(InstLLM::Client)
       allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
 
@@ -578,6 +580,128 @@ describe DiscussionTopicInsight do
       )
 
       expect { @insight.generate }.to raise_error(ArgumentError, /not sequential numbers starting from 0/)
+      expect(@insight.reload.workflow_state).to eq("failed")
+    end
+  end
+
+  describe "#generate with Cedar" do
+    let(:cedar_response_struct) { Struct.new(:response, keyword_init: true) }
+    let(:default_cedar_response) do
+      cedar_response_struct.new(response: '[{"id":"0","final_label":"relevant","feedback":"Test"}]')
+    end
+
+    before do
+      @insight = @discussion_topic.insights.create!(
+        user: @teacher,
+        workflow_state: "created"
+      )
+
+      @llm_config = double("LLMConfig")
+      allow(@llm_config).to receive_messages(
+        model_id: "anthropic.claude-3-haiku-20240307-v1:0",
+        generate_prompt_and_options: ["test prompt", { "max_tokens" => 2000 }],
+        name: "discussion_topic_insights"
+      )
+      allow(LLMConfigs).to receive(:config_for).with("discussion_topic_insights").and_return(@llm_config)
+
+      stub_const("CedarClient", Class.new do
+        class << self
+          attr_accessor :prompt_response
+
+          def enabled?
+            true
+          end
+
+          def prompt(*)
+            prompt_response || raise("CedarClient.prompt called without mock response")
+          end
+        end
+      end)
+
+      CedarClient.prompt_response = default_cedar_response
+
+      Account.site_admin.enable_feature!(:discussion_insights_with_cedar)
+    end
+
+    it "calls Cedar API when feature flag is enabled and CedarClient is enabled" do
+      @discussion_topic.discussion_entries.create!(message: "test message", user: @student)
+
+      cedar_response = cedar_response_struct.new(response: '[{"id":"0","final_label":"relevant","feedback":"Good post"}]')
+      CedarClient.prompt_response = cedar_response
+
+      @insight.generate
+
+      expect(@insight.workflow_state).to eq("completed")
+      expect(@insight.entries.count).to eq(1)
+    end
+
+    it "creates insight entries with same structure as Bedrock" do
+      @discussion_topic.discussion_entries.create!(message: "test message", user: @student)
+
+      cedar_response = cedar_response_struct.new(response: '[{"id":"0","final_label":"needs_review","feedback":"Needs more detail"}]')
+      CedarClient.prompt_response = cedar_response
+
+      @insight.generate
+
+      expect(@insight.entries.count).to eq(1)
+      insight_entry = @insight.entries.first
+      expect(insight_entry.discussion_entry).to be_present
+      expect(insight_entry.ai_evaluation["final_label"]).to eq("needs_review")
+      expect(insight_entry.ai_evaluation["feedback"]).to eq("Needs more detail")
+    end
+
+    it "falls back to Bedrock when feature flag is disabled" do
+      Account.site_admin.disable_feature!(:discussion_insights_with_cedar)
+
+      @discussion_topic.discussion_entries.create!(message: "test message", user: @student)
+
+      inst_llm = instance_double(InstLLM::Client)
+      allow(InstLLMHelper).to receive(:client).and_return(inst_llm)
+      expect(inst_llm).to receive(:chat).and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: '[{"id":"0","final_label":"relevant","feedback":"Good"}]' },
+          stop_reason: "stop",
+          usage: { input_tokens: 100, output_tokens: 50 }
+        )
+      )
+
+      @insight.generate
+
+      expect(@insight.workflow_state).to eq("completed")
+    end
+
+    it "falls back to Bedrock when CedarClient is not enabled" do
+      allow(CedarClient).to receive(:enabled?).and_return(false)
+
+      @discussion_topic.discussion_entries.create!(message: "test message", user: @student)
+
+      inst_llm = instance_double(InstLLM::Client)
+      allow(InstLLMHelper).to receive(:client).and_return(inst_llm)
+      expect(inst_llm).to receive(:chat).and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "anthropic.claude-3-haiku-20240307-v1:0",
+          message: { role: :assistant, content: '[{"id":"0","final_label":"relevant","feedback":"Good"}]' },
+          stop_reason: "stop",
+          usage: { input_tokens: 100, output_tokens: 50 }
+        )
+      )
+
+      @insight.generate
+
+      expect(@insight.workflow_state).to eq("completed")
+    end
+
+    it "validates Cedar response format same as Bedrock" do
+      @discussion_topic.discussion_entries.create!(message: "test", user: @student)
+
+      cedar_response = cedar_response_struct.new(response: '[{"id":"0","final_label":"invalid_label","feedback":"Test"}]')
+      CedarClient.prompt_response = cedar_response
+
+      expect do
+        @insight.generate
+      end.to raise_error(ArgumentError, /invalid final_label/)
+
       expect(@insight.reload.workflow_state).to eq("failed")
     end
   end
