@@ -345,6 +345,8 @@ class Assignment < AbstractAssignment
   end
 
   def excluded_from_accessibility_scan?
-    quiz_lti?
+    # Check submission_types directly for online_quiz to catch assignments
+    # created by quizzes before the quiz association is set
+    submission_types == "online_quiz" || external_tool?
   end
 end

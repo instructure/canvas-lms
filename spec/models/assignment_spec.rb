@@ -6785,6 +6785,34 @@ describe Assignment do
     end
   end
 
+  describe "scope :not_excluded_from_accessibility_scan" do
+    let(:course) { course_model }
+
+    it "includes regular assignments" do
+      regular_assignment = course.assignments.create!(title: "Regular Assignment")
+      expect(course.assignments.not_excluded_from_accessibility_scan).to include(regular_assignment)
+    end
+
+    it "excludes Classic Quiz assignments" do
+      quiz = course.quizzes.create!(title: "Classic Quiz", quiz_type: "assignment")
+      classic_quiz_assignment = quiz.assignment
+      expect(course.assignments.not_excluded_from_accessibility_scan).not_to include(classic_quiz_assignment)
+    end
+
+    it "excludes external tool assignments" do
+      external_tool_assignment = course.assignments.create!(
+        title: "External Tool Assignment",
+        submission_types: "external_tool"
+      )
+      expect(course.assignments.not_excluded_from_accessibility_scan).not_to include(external_tool_assignment)
+    end
+
+    it "excludes New Quizzes (quiz_lti) assignments" do
+      quiz_lti_assignment = new_quizzes_assignment(course:)
+      expect(course.assignments.not_excluded_from_accessibility_scan).not_to include(quiz_lti_assignment)
+    end
+  end
+
   describe "scope: assignment_or_peer_review" do
     before :once do
       @course = course_factory(active_all: true)
@@ -13360,6 +13388,77 @@ describe Assignment do
     let(:valid_attributes) { { title: "Test Assignment", course: } }
     let(:relevant_attributes_for_scan) { { description: "<p>Lorem ipsum</p>" } }
     let(:irrelevant_attributes_for_scan) { { points_possible: 100 } }
+  end
+
+  describe "#excluded_from_accessibility_scan?" do
+    let(:course) { course_model }
+
+    context "when assignment is a Classic Quiz" do
+      let(:quiz) { course.quizzes.create!(title: "Test Quiz", quiz_type: "assignment") }
+      let!(:assignment) { quiz.reload.assignment }
+
+      it "returns true" do
+        expect(assignment.send(:excluded_from_accessibility_scan?)).to be true
+      end
+
+      it "returns true even when quiz association is not yet set" do
+        # This tests the timing fix where submission_types is set before quiz association
+        assignment_without_quiz = course.assignments.new(
+          title: "Quiz Assignment",
+          submission_types: "online_quiz"
+        )
+        expect(assignment_without_quiz.send(:excluded_from_accessibility_scan?)).to be true
+      end
+
+      it "prevents accessibility scan from running" do
+        account = course.root_account
+        account.enable_feature!(:a11y_checker)
+        course.enable_feature!(:a11y_checker_eap)
+        Progress.create!(
+          tag: Accessibility::CourseScanService::SCAN_TAG,
+          context: course,
+          workflow_state: "completed"
+        )
+
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+        assignment.update!(description: "<p>Updated description</p>")
+      end
+    end
+
+    context "when assignment uses an external tool" do
+      let(:assignment) do
+        course.assignments.create!(
+          title: "External Tool Assignment",
+          submission_types: "external_tool"
+        )
+      end
+
+      it "returns true" do
+        expect(assignment.send(:excluded_from_accessibility_scan?)).to be true
+      end
+
+      it "prevents accessibility scan from running" do
+        account = course.root_account
+        account.enable_feature!(:a11y_checker)
+        course.enable_feature!(:a11y_checker_eap)
+        Progress.create!(
+          tag: Accessibility::CourseScanService::SCAN_TAG,
+          context: course,
+          workflow_state: "completed"
+        )
+
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+        assignment.update!(description: "<p>Updated description</p>")
+      end
+    end
+
+    context "when assignment is a regular assignment" do
+      let(:assignment) { course.assignments.create!(title: "Regular Assignment") }
+
+      it "returns false" do
+        expect(assignment.send(:excluded_from_accessibility_scan?)).to be false
+      end
+    end
   end
 
   describe "peer_review_sub_assignment association" do
