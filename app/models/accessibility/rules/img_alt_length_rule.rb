@@ -70,6 +70,12 @@ module Accessibility
         I18n.t("Recommended alt text length is under %{max_length} characters. Concise descriptions help screen reader users scan pages efficiently.", max_length: ImgAltRuleHelper::MAX_LENGTH)
       end
 
+      def issue_preview(elem)
+        return nil unless elem.tag_name == "img"
+
+        ImgAltRuleHelper.adjust_img_style(elem)
+      end
+
       def why
         I18n.t("This description is over %{max_length} characters. Long alt text can cause \"audio fatigue\" because screen readers cannot pause or navigate through it. Recommendation: Consider summarising the image here. If the image needs a detailed description (like a chart), place that text in the document body or a caption instead.", max_length: ImgAltRuleHelper::MAX_LENGTH)
       end

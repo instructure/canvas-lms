@@ -84,7 +84,12 @@ describe Accessibility::Rules::ImgAltRule do
 
       expect(result).to be_a(Array)
       expect(result.length).to eq(2)
-      expect(result[1]).to include('style="max-width: 100%; max-height: 13rem; object-fit: contain;"')
+      expect(result[1]).to include("display: flex")
+      expect(result[1]).to include("justify-content: center")
+      expect(result[1]).to include("align-items: center")
+      expect(result[1]).to include("max-width: 100%")
+      expect(result[1]).to include("max-height: 100%")
+      expect(result[1]).to include("object-fit: contain")
       expect(result[1]).to include('alt="Descriptive alt text"')
     end
 
@@ -170,7 +175,12 @@ describe Accessibility::Rules::ImgAltRule do
       result = rule.issue_preview(img_element)
 
       expect(result).not_to be_nil
-      expect(result).to include('style="max-width: 100%; max-height: 13rem; object-fit: contain;"')
+      expect(result).to include("display: flex")
+      expect(result).to include("justify-content: center")
+      expect(result).to include("align-items: center")
+      expect(result).to include("max-width: 100%")
+      expect(result).to include("max-height: 100%")
+      expect(result).to include("object-fit: contain")
       expect(result).to include('id="test-img"')
       expect(result).to include('src="image.jpg"')
     end
