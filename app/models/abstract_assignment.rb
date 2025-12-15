@@ -200,6 +200,7 @@ class AbstractAssignment < ActiveRecord::Base
       SQL
   }
   scope :nondeleted, -> { where.not(workflow_state: "deleted") }
+  scope :assignment_or_peer_review, -> { where(type: ["Assignment", "PeerReviewSubAssignment"]) }
 
   validates_associated :external_tool_tag, if: :external_tool?
   validate :group_category_changes_ok?

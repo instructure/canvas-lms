@@ -254,7 +254,8 @@ class SubmissionsApiController < ApplicationController
   # @returns [Submission]
   def index
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      @assignment = api_find(@context.assignments.active, params[:assignment_id])
+      assignment_scope = AbstractAssignment.assignment_or_peer_review.where(context: @context).active
+      @assignment = api_find(assignment_scope, params[:assignment_id])
       includes = Array.wrap(params[:include])
 
       student_ids = if value_to_boolean(params[:grouped])
@@ -453,7 +454,7 @@ class SubmissionsApiController < ApplicationController
 
     includes = Array(params[:include])
 
-    assignment_scope = @context.assignments.published.preload(:quiz, :discussion_topic, :post_policy)
+    assignment_scope = AbstractAssignment.assignment_or_peer_review.where(context: @context).published.preload(:quiz, :discussion_topic, :post_policy)
     if includes.include?("sub_assignment_submissions") && @context.discussion_checkpoints_enabled?
       assignment_scope = assignment_scope.preload(:sub_assignments)
     end
@@ -671,7 +672,8 @@ class SubmissionsApiController < ApplicationController
   # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"full_rubric_assessment"|"visibility"|"course"|"user"|"read_status"]
   #   Associations to include with the group.
   def show_anonymous
-    @assignment = api_find(@context.assignments.active, params[:assignment_id])
+    assignment_scope = AbstractAssignment.assignment_or_peer_review.where(context: @context).active
+    @assignment = api_find(assignment_scope, params[:assignment_id])
     @submission = @assignment.submissions.find_by!(anonymous_id: params[:anonymous_id])
     @user = get_user_considering_section(@submission.user_id)
     @anonymize_user_id = true
@@ -869,7 +871,7 @@ class SubmissionsApiController < ApplicationController
   #   Then a possible set of values for rubric_assessment would be:
   #       rubric_assessment[crit1][points]=3&rubric_assessment[crit1][rating_id]=rat1&rubric_assessment[crit2][points]=5&rubric_assessment[crit2][rating_id]=rat2&rubric_assessment[crit2][comments]=Well%20Done.
   def update
-    assignment_scope = AbstractAssignment.where(context: @context, type: ["Assignment", "PeerReviewSubAssignment"]).active
+    assignment_scope = AbstractAssignment.assignment_or_peer_review.where(context: @context).active
     assignment_scope = assignment_scope.preload(:parent_assignment) if params[:assignment_id]
     @assignment ||= api_find(assignment_scope, params[:assignment_id])
 
@@ -1211,7 +1213,8 @@ class SubmissionsApiController < ApplicationController
   #   Then a possible set of values for rubric_assessment would be:
   #       rubric_assessment[crit1][points]=3&rubric_assessment[crit1][rating_id]=rat1&rubric_assessment[crit2][points]=5&rubric_assessment[crit2][rating_id]=rat2&rubric_assessment[crit2][comments]=Well%20Done.
   def update_anonymous
-    @assignment = api_find(@context.assignments.active, params[:assignment_id])
+    assignment_scope = AbstractAssignment.assignment_or_peer_review.where(context: @context).active
+    @assignment = api_find(assignment_scope, params[:assignment_id])
     @submission = @assignment.submissions.find_by!(anonymous_id: params[:anonymous_id])
     @user = get_user_considering_section(@submission.user_id)
     @anonymize_user_id = true
@@ -1772,7 +1775,8 @@ class SubmissionsApiController < ApplicationController
   end
 
   def ensure_submission
-    @assignment = api_find(@context.assignments.active, params[:assignment_id])
+    assignment_scope = AbstractAssignment.assignment_or_peer_review.where(context: @context).active
+    @assignment = api_find(assignment_scope, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
     @submission = @assignment.submission_for_student(@user)
   end

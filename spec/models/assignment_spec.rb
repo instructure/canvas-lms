@@ -6785,6 +6785,35 @@ describe Assignment do
     end
   end
 
+  describe "scope: assignment_or_peer_review" do
+    before :once do
+      @course = course_factory(active_all: true)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      @assignment = @course.assignments.create!(title: "Regular Assignment")
+      @parent_assignment = @course.assignments.create!(
+        title: "Parent Assignment",
+        peer_reviews: true,
+        automatic_peer_reviews: false
+      )
+      @peer_review_assignment = @parent_assignment.create_peer_review_sub_assignment!(
+        peer_reviews: true,
+        peer_review_count: 2
+      )
+    end
+
+    it "includes regular assignments" do
+      expect(AbstractAssignment.assignment_or_peer_review).to include(@assignment)
+    end
+
+    it "includes peer review sub-assignments" do
+      expect(AbstractAssignment.assignment_or_peer_review).to include(@peer_review_assignment)
+    end
+
+    it "includes parent assignments" do
+      expect(AbstractAssignment.assignment_or_peer_review).to include(@parent_assignment)
+    end
+  end
+
   describe "scope: exclude_muted_associations_for_user" do
     before do
       @assignment = assignment_model(course: @course)

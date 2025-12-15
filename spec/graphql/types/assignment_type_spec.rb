@@ -1377,7 +1377,8 @@ describe Types::AssignmentType do
 
         query = GraphQLTypeTester.new(@assignment, current_user: teacher)
 
-        expect(query.resolve("submissionsConnection {nodes {subAssignmentSubmissions {assignmentId}}}")).to match_array [[@c1.id.to_s, @c2.id.to_s]]
+        result = query.resolve("submissionsConnection {nodes {subAssignmentSubmissions {assignmentId}}}")
+        expect(result.flatten).to contain_exactly(@c1.id.to_s, @c2.id.to_s)
       end
     end
   end

@@ -841,7 +841,7 @@ describe('SubmissionTray', () => {
       }
       const submission = {
         ...props.submission,
-        assignmentId: '29',
+        assignmentId: '168',
       }
       const {getByText} = render(
         <SubmissionTray
@@ -855,38 +855,36 @@ describe('SubmissionTray', () => {
       expect(speedGraderLink?.href).toMatch(/assignment_id=29/)
     })
 
-    test('assignment link uses parent assignment htmlUrl for peer review sub assignments', () => {
+    test('assignment link uses htmlUrl for peer review sub assignments', () => {
       const assignment = {
         ...props.assignment,
+        id: '168',
         parentAssignmentId: '29',
-        htmlUrl: 'http://parent-assignment-url/',
+        htmlUrl: 'http://localhost/courses/1/assignments/29',
       }
       const {getByText} = render(<SubmissionTray {...props} assignment={assignment} />)
       const assignmentLink = getByText('Book Report').closest('a')
-      expect(assignmentLink?.href).toBe('http://parent-assignment-url/')
+      expect(assignmentLink?.href).toBe('http://localhost/courses/1/assignments/29')
     })
 
     test('displays peer review assignment name when isPeerReviewAssignment is true', () => {
-      const assignment = {
-        ...props.assignment,
-        name: 'Main Assignment',
-      }
       const peerReviewAssignment = {
+        ...props.assignment,
         id: '31',
         name: 'Peer Review',
+        parent_assignment_id: '30',
       }
       const {getByText} = render(
         <SubmissionTray
           {...props}
-          assignment={assignment}
+          assignment={peerReviewAssignment}
           isPeerReviewAssignment={true}
-          peerReviewAssignment={peerReviewAssignment}
         />,
       )
       expect(getByText('Peer Review')).toBeInTheDocument()
     })
 
-    test('falls back to assignment name when peerReviewAssignment is not provided', () => {
+    test('displays assignment name for peer review assignments', () => {
       const assignment = {
         ...props.assignment,
         name: 'Main Assignment',
