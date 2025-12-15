@@ -50,6 +50,9 @@ class YoutubeMigrationService
   CONVERT_TAG = "youtube_embed_convert"
   BULK_CONVERT_TAG = "youtube_embed_bulk_convert"
   STUDIO_LTI_TOOL_DOMAIN = "arc.instructure.com"
+  STUCK_SCAN_THRESHOLD = 1.hour
+  TIMEOUT_THRESHOLD = 3.hours
+  MAX_RETRIES = 3
 
   class EmbedNotFoundError < StandardError; end
   class UnsupportedResourceTypeError < StandardError; end
@@ -783,5 +786,71 @@ class YoutubeMigrationService
     stuck_progress.set_results(results)
 
     stuck_progress.complete!
+  end
+
+  def self.process_stuck_scans
+    Rails.logger.info("[YouTube Scan Retry] Checking for stuck scans")
+    return unless Account.site_admin.feature_enabled?(:new_quizzes_scanning_youtube_links)
+
+    stuck_scans = Progress.where(
+      tag: SCAN_TAG,
+      workflow_state: "waiting_for_external_tool",
+      context_type: "Course"
+    ).where(created_at: ..STUCK_SCAN_THRESHOLD.ago).preload(:context)
+
+    Rails.logger.info("[YouTube Scan Retry] Found #{stuck_scans.count} stuck scans")
+
+    stuck_scans.find_each do |progress|
+      progress.with_lock do
+        # Re-check state after acquiring lock to prevent race conditions
+        next unless progress.waiting_for_external_tool?
+
+        if progress.created_at <= TIMEOUT_THRESHOLD.ago || progress.results&.dig(:retry_count).to_i >= MAX_RETRIES
+          timeout_scan(progress)
+        else
+          Rails.logger.info("[YouTube Scan Retry] Should retry scan? #{should_retry_scan?(progress)}")
+          retry_scan(progress) if should_retry_scan?(progress)
+        end
+      end
+    rescue => e
+      Canvas::Errors.capture_exception(:youtube_scan_retry, e, {
+                                         progress_id: progress.id,
+                                         course_id: progress.context_id
+                                       })
+    end
+  end
+
+  def self.should_retry_scan?(progress)
+    results = progress.results || {}
+    last_retry = results[:last_retry_at]
+
+    return true if last_retry.nil?
+
+    Time.parse(last_retry.to_s).utc < STUCK_SCAN_THRESHOLD.ago
+  end
+
+  def self.retry_scan(progress)
+    results = (progress.results || {}).dup
+    results[:retry_count] = (results[:retry_count] || 0) + 1
+    results[:last_retry_at] = Time.now.utc
+
+    progress.set_results(results)
+
+    call_external_tool(progress.context, progress.id)
+
+    Rails.logger.info("[YouTube Scan Retry] Re-emitted Live Event for scan_id=#{progress.id}, course_id=#{progress.context_id}, retry_count=#{results[:retry_count]}")
+  end
+
+  def self.timeout_scan(progress)
+    results = (progress.results || {}).dup
+    results[:new_quizzes_scan_status] = "timeout"
+    results[:error] = "Timed out waiting for New Quizzes scan results after 3 hours"
+    results[:completed_at] = Time.now.utc
+    results[:timeout_at] = Time.now.utc
+
+    progress.set_results(results)
+    progress.complete!
+
+    Rails.logger.warn("[YouTube Scan Retry] Timed out scan_id=#{progress.id}, course_id=#{progress.context_id}")
   end
 end

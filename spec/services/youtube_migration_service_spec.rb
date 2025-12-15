@@ -2607,6 +2607,116 @@ RSpec.describe YoutubeMigrationService do
     end
   end
 
+  describe ".process_stuck_scans" do
+    let(:new_quiz_course) { course_model }
+    let(:progress) do
+      Progress.create!(
+        tag: YoutubeMigrationService::SCAN_TAG,
+        context: new_quiz_course,
+        workflow_state: "waiting_for_external_tool"
+      )
+    end
+
+    before do
+      Account.site_admin.enable_feature!(:new_quizzes_scanning_youtube_links)
+
+      # Stub the assignment chain for new_quizzes? and call_external_tool
+      external_tool_tag = double(content_id: 1)
+      quiz_assignment = double(external_tool_tag:)
+      quiz_lti_scope = double(any?: true, last: quiz_assignment)
+      active_scope = double(type_quiz_lti: quiz_lti_scope)
+      assignments = double(active: active_scope)
+
+      allow_any_instance_of(Course).to receive(:assignments).and_return(assignments)
+    end
+
+    context "when progress is less than 1 minute old" do
+      it "does not process the scan" do
+        progress.update!(created_at: 30.minutes.ago)
+        expect(described_class).not_to receive(:retry_scan)
+        expect(described_class).not_to receive(:timeout_scan)
+        described_class.process_stuck_scans
+      end
+    end
+
+    context "when progress is between 1-3 minutes old" do
+      it "retries the scan by re-emitting Live Event" do
+        progress.update!(created_at: 2.hours.ago)
+        expect(Canvas::LiveEvents).to receive(:scan_youtube_links)
+        described_class.process_stuck_scans
+
+        progress.reload
+        expect(progress.workflow_state).to eq("waiting_for_external_tool")
+        expect(progress.results[:retry_count]).to eq(1)
+        expect(progress.results[:last_retry_at]).to be_present
+      end
+    end
+
+    context "when progress is 3+ minutes old" do
+      it "times out the scan and marks as completed" do
+        progress.update!(created_at: 4.hours.ago)
+        described_class.process_stuck_scans
+
+        progress.reload
+        expect(progress.workflow_state).to eq("completed")
+        expect(progress.results[:new_quizzes_scan_status]).to eq("timeout")
+        expect(progress.results[:error]).to include("Timed out")
+        expect(progress.results[:timeout_at]).to be_present
+      end
+    end
+
+    context "when feature flag is disabled" do
+      it "does not process any scans" do
+        Account.site_admin.disable_feature!(:new_quizzes_scanning_youtube_links)
+        progress.update!(created_at: 2.hours.ago)
+        expect(described_class).not_to receive(:retry_scan)
+        described_class.process_stuck_scans
+      end
+    end
+
+    context "with multiple stuck scans" do
+      let(:progress2) do
+        Progress.create!(
+          tag: YoutubeMigrationService::SCAN_TAG,
+          context: new_quiz_course,
+          workflow_state: "waiting_for_external_tool",
+          created_at: 2.hours.ago
+        )
+      end
+      let(:progress3) do
+        Progress.create!(
+          tag: YoutubeMigrationService::SCAN_TAG,
+          context: new_quiz_course,
+          workflow_state: "waiting_for_external_tool",
+          created_at: 4.hours.ago
+        )
+      end
+
+      it "processes all stuck scans appropriately" do
+        progress.update!(created_at: 2.hours.ago)
+        progress2
+        progress3
+
+        expect(Canvas::LiveEvents).to receive(:scan_youtube_links).twice
+
+        described_class.process_stuck_scans
+
+        progress.reload
+        progress2.reload
+        progress3.reload
+
+        expect(progress.workflow_state).to eq("waiting_for_external_tool")
+        expect(progress.results[:retry_count]).to eq(1)
+
+        expect(progress2.workflow_state).to eq("waiting_for_external_tool")
+        expect(progress2.results[:retry_count]).to eq(1)
+
+        expect(progress3.workflow_state).to eq("completed")
+        expect(progress3.results[:new_quizzes_scan_status]).to eq("timeout")
+      end
+    end
+  end
+
   describe "skip_attachment_association_update flag" do
     before do
       studio_tool
