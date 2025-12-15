@@ -151,7 +151,7 @@ class CommunicationChannel < ActiveRecord::Base
 
     p.dispatch :merge_email_communication_channel
     p.to { self }
-    p.whenever { @send_merge_notification && path_type == TYPE_EMAIL }
+    p.whenever { @send_merge_notification && path_type == TYPE_EMAIL && !user.all_active_pseudonyms.empty? }
     p.data { broadcast_data }
 
     p.dispatch :confirm_sms_communication_channel
@@ -476,7 +476,7 @@ class CommunicationChannel < ActiveRecord::Base
 
       ccs.map(&:user).select do |u|
         result = merge_candidates.fetch(u.global_id) do
-          merge_candidates[u.global_id] = !u.all_active_pseudonyms.empty?
+          merge_candidates[u.global_id] = !u.all_active_pseudonyms(reload: true).empty?
         end
         return [u] if result && break_on_first_found
 
