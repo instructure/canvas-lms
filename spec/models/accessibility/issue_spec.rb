@@ -29,14 +29,22 @@ describe Accessibility::Issue do
       wiki_pages = double("WikiPages")
       not_deleted_wiki_pages = double("NotDeletedWikiPagesRelation")
 
+      assignments = double("Assignments")
+      active_assignments = double("ActiveAssignments")
+      not_excluded_assignments = double("NotExcludedAssignments")
+
       allow(context_double).to receive_messages(
         wiki_pages:,
-        assignments: double("Assignments", active: double(order: [])),
+        assignments:,
         attachments: double("Attachments", not_deleted: double(order: [])),
         exceeds_accessibility_scan_limit?: false
       )
       allow(wiki_pages).to receive(:not_deleted).and_return(not_deleted_wiki_pages)
       allow(not_deleted_wiki_pages).to receive(:order).and_return([page])
+
+      allow(assignments).to receive(:active).and_return(active_assignments)
+      allow(active_assignments).to receive(:not_excluded_from_accessibility_scan).and_return(not_excluded_assignments)
+      allow(not_excluded_assignments).to receive(:order).and_return([])
 
       allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
 
@@ -51,6 +59,7 @@ describe Accessibility::Issue do
 
       assignments = double("Assignments")
       active_assignments = double("ActiveAssignments")
+      not_excluded_assignments = double("NotExcludedAssignments")
 
       allow(context_double).to receive_messages(
         wiki_pages: double("WikiPages", not_deleted: double(order: [])),
@@ -59,7 +68,8 @@ describe Accessibility::Issue do
         exceeds_accessibility_scan_limit?: false
       )
       allow(assignments).to receive(:active).and_return(active_assignments)
-      allow(active_assignments).to receive(:order).and_return([assignment])
+      allow(active_assignments).to receive(:not_excluded_from_accessibility_scan).and_return(not_excluded_assignments)
+      allow(not_excluded_assignments).to receive(:order).and_return([assignment])
 
       allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
 
@@ -132,12 +142,20 @@ describe Accessibility::Issue do
     end
 
     it "returns nils if size limits exceeded" do
+      assignments = double("Assignments")
+      active_assignments = double("ActiveAssignments")
+      not_excluded_assignments = double("NotExcludedAssignments")
+
       allow(context_double).to receive_messages(
         wiki_pages: double("WikiPages", not_deleted: double(order: [])),
-        assignments: double("Assignments", active: double(order: [])),
+        assignments:,
         attachments: double("Attachments", not_deleted: double(order: [])),
         exceeds_accessibility_scan_limit?: true
       )
+
+      allow(assignments).to receive(:active).and_return(active_assignments)
+      allow(active_assignments).to receive(:not_excluded_from_accessibility_scan).and_return(not_excluded_assignments)
+      allow(not_excluded_assignments).to receive(:order).and_return([])
 
       result = described_class.new(context: context_double).generate
       expect(result[:accessibility_scan_disabled]).to be true

@@ -187,6 +187,10 @@ class AbstractAssignment < ActiveRecord::Base
     end
   }
   scope :not_type_quiz_lti, -> { where.not(id: type_quiz_lti) }
+  scope :not_excluded_from_accessibility_scan, lambda {
+    where.not(submission_types: ["online_quiz", "external_tool"])
+         .where.not(id: type_quiz_lti)
+  }
 
   scope :exclude_muted_associations_for_user, lambda { |user|
     joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id = #{User.connection.quote(user.id_for_database)} AND submissions.assignment_id = assignments.id")

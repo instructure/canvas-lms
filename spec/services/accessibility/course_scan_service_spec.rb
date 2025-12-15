@@ -127,6 +127,14 @@ describe Accessibility::CourseScanService do
       let!(:assignment1) { assignment_model(course:) }
       let!(:assignment2) { assignment_model(course:) }
       let!(:quiz_lti_assignment) { new_quizzes_assignment(course:) }
+      let!(:classic_quiz) { course.quizzes.create!(title: "Classic Quiz", quiz_type: "assignment") }
+      let!(:classic_quiz_assignment) { classic_quiz.assignment }
+      let!(:external_tool_assignment) do
+        course.assignments.create!(
+          title: "External Tool Assignment",
+          submission_types: "external_tool"
+        )
+      end
 
       before do
         assignment2.destroy!
@@ -143,6 +151,14 @@ describe Accessibility::CourseScanService do
 
       it "does not scan the New Quizzes assignment" do
         expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: quiz_lti_assignment)
+      end
+
+      it "does not scan the Classic Quiz assignment" do
+        expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: classic_quiz_assignment)
+      end
+
+      it "does not scan the external tool assignment" do
+        expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: external_tool_assignment)
       end
     end
 
