@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import CourseProgressItem from './CourseProgressItem'
-import {useProgressOverview} from '../../../hooks/useProgressOverview'
+import {useProgressOverviewPaginated} from '../../../hooks/useProgressOverview'
 import type {BaseWidgetProps} from '../../../types'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -32,7 +32,15 @@ const ProgressOverviewWidget: React.FC<BaseWidgetProps> = ({
   isEditMode = false,
   dragHandleProps,
 }) => {
-  const {data: courses, isLoading, error} = useProgressOverview()
+  const {
+    data: courses,
+    currentPageIndex,
+    totalPages,
+    goToPage,
+    isLoading,
+    error,
+    refetch,
+  } = useProgressOverviewPaginated()
 
   const hasNoCourses = !isLoading && !error && courses && courses.length === 0
 
@@ -43,7 +51,15 @@ const ProgressOverviewWidget: React.FC<BaseWidgetProps> = ({
       dragHandleProps={dragHandleProps}
       isLoading={isLoading}
       error={error ? I18n.t('Failed to load progress overview. Please try again.') : null}
+      onRetry={refetch}
       loadingText={I18n.t('Loading progress overview...')}
+      pagination={{
+        currentPage: currentPageIndex + 1,
+        totalPages,
+        onPageChange: goToPage,
+        isLoading,
+        ariaLabel: I18n.t('Progress overview pagination'),
+      }}
     >
       {hasNoCourses ? (
         <View as="div" padding="medium" textAlign="center">

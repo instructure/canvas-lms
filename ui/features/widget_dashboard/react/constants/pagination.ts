@@ -23,4 +23,5 @@ export const DEFAULT_PAGE_SIZE = {
   COURSE_WORK: 4,
   COURSE_WORK_COMBINED: 6,
   PEOPLE: 5,
+  PROGRESS_OVERVIEW: 5,
 } as const
