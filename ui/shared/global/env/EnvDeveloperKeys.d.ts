@@ -25,4 +25,5 @@ export interface EnvDeveloperKeys {
 
   accountEndpoint: string
   enableTestClusterChecks: boolean
+  showApiGetWithBodyNotice: boolean
 }
