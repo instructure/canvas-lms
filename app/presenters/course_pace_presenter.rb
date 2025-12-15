@@ -390,7 +390,9 @@ class CoursePacePresenter
   end
 
   def due_dates
-    @due_dates ||= due_dates_calculator.get_due_dates(course_pace_module_items.to_h.values.flatten, enrollment)
+    @due_dates ||= Time.use_zone(course_pace.course.time_zone) do
+      due_dates_calculator.get_due_dates(course_pace_module_items.to_h.values.flatten, enrollment)
+    end
   end
 
   def planned_end_date
