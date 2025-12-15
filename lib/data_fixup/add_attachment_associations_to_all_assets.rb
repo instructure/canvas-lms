@@ -79,7 +79,7 @@ module DataFixup::AddAttachmentAssociationsToAllAssets
         context_concern = (field == :syllabus_body) ? "syllabus_body" : nil
         object.associate_attachments_to_rce_object(object[field], nil, context_concern:, skip_user_verification: true)
       end
-      sleep Setting.get("create_attachment_association_datafixup_sleep_cluster_#{Shard.current.database_server.id}", "0.5", set_if_nx: true).to_f
+      sleep Setting.get("create_attachment_association_datafixup_sleep_cluster_#{Shard.current.database_server.id}", "0.0").to_f
     end
   end
 
@@ -118,7 +118,7 @@ module DataFixup::AddAttachmentAssociationsToAllAssets
   def self.process_calendar_event_children_batch(field, batch_ids)
     CalendarEvent.where(id: batch_ids).each do |child_event|
       child_event.associate_attachments_to_rce_object(child_event[field], nil, skip_user_verification: true)
-      sleep Setting.get("create_attachment_association_datafixup_sleep_cluster_#{Shard.current.database_server.id}", "0.5", set_if_nx: true).to_f
+      sleep Setting.get("create_attachment_association_datafixup_sleep_cluster_#{Shard.current.database_server.id}", "0.0").to_f
     end
   end
 
@@ -158,7 +158,7 @@ module DataFixup::AddAttachmentAssociationsToAllAssets
   def self.process_discussion_topic_children_batch(field, batch_ids)
     DiscussionTopic.where(id: batch_ids).each do |child_topic|
       child_topic.associate_attachments_to_rce_object(child_topic[field], nil, skip_user_verification: true)
-      sleep Setting.get("create_attachment_association_datafixup_sleep_cluster_#{Shard.current.database_server.id}", "0.5", set_if_nx: true).to_f
+      sleep Setting.get("create_attachment_association_datafixup_sleep_cluster_#{Shard.current.database_server.id}", "0.0").to_f
     end
   end
 
@@ -180,7 +180,7 @@ module DataFixup::AddAttachmentAssociationsToAllAssets
     #  main reason for this is to optimize the process
     scope = scope.where("series_uuid IS NULL OR series_head = ?", true) if model == CalendarEvent
 
-    scope.find_ids_in_batches(batch_size: 100_000) do |batch_ids|
+    scope.find_ids_in_batches do |batch_ids|
       process_model_and_create_attachment_association(model, field, batch_ids)
     end
   end
