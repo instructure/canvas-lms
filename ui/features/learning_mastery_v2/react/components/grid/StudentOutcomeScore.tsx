@@ -22,7 +22,7 @@ import {Outcome} from '../../types/rollup'
 import {svgUrl} from '../../utils/icons'
 import {ScoreDisplayFormat} from '../../utils/constants'
 import {findRating} from '../../utils/ratings'
-import {ScoreCell} from './ScoreCell'
+import {ScoreWithLabel} from './ScoreWithLabel'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -30,19 +30,17 @@ export interface StudentOutcomeScoreProps {
   outcome: Outcome
   score?: number
   scoreDisplayFormat?: ScoreDisplayFormat
-  onScoreClick?: () => void
 }
 
 const StudentOutcomeScoreComponent: React.FC<StudentOutcomeScoreProps> = ({
   outcome,
   score,
-  onScoreClick,
   scoreDisplayFormat = ScoreDisplayFormat.ICON_ONLY,
 }) => {
   const rating = score !== undefined ? findRating(outcome.ratings, score) : undefined
 
   return (
-    <ScoreCell
+    <ScoreWithLabel
       icon={
         <SVGWrapper
           fillColor={rating?.color}
@@ -53,7 +51,6 @@ const StudentOutcomeScoreComponent: React.FC<StudentOutcomeScoreProps> = ({
       score={score}
       scoreDisplayFormat={scoreDisplayFormat}
       label={rating?.description || I18n.t('Unassessed')}
-      onClick={onScoreClick}
     />
   )
 }

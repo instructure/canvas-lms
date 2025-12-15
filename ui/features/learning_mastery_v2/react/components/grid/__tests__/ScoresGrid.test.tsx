@@ -152,106 +152,127 @@ describe('ScoresGrid', () => {
     expect(getByTestId('student-outcome-score-1-1')).toBeInTheDocument()
   })
 
+  it('renders grid with proper ARIA role', () => {
+    render(<ScoresGrid {...defaultProps()} />)
+    expect(screen.getByRole('grid')).toBeInTheDocument()
+  })
+
+  it('renders rows with proper ARIA role', () => {
+    render(<ScoresGrid {...defaultProps()} />)
+    expect(screen.getByRole('row')).toBeInTheDocument()
+  })
+
+  it('renders gridcells with proper ARIA role', () => {
+    render(<ScoresGrid {...defaultProps()} />)
+    const gridcells = screen.getAllByRole('gridcell')
+    expect(gridcells.length).toBeGreaterThan(0)
+  })
+
   describe('contributing scores interaction', () => {
-    it('calls onOpenStudentAssignmentTray with correct parameters when score is clicked', async () => {
-      const user = userEvent.setup()
-      const onOpenStudentAssignmentTray = jest.fn()
-      const mockContributingScoresWithData: ContributingScoresManager = {
-        forOutcome: jest.fn(() => ({
-          isVisible: () => true,
-          toggleVisibility: jest.fn(),
-          data: {
-            outcome: {
-              id: '1',
-              title: 'Outcome Title',
-            },
-            alignments: mockAlignments,
-            scores: [
-              {
-                user_id: '1',
-                alignment_id: 'align-1',
-                score: 85,
-              },
-            ],
+    const mockContributingScoresVisible: ContributingScoresManager = {
+      forOutcome: jest.fn(() => ({
+        isVisible: () => true,
+        toggleVisibility: jest.fn(),
+        data: {
+          outcome: {
+            id: '1',
+            title: 'Outcome Title',
           },
           alignments: mockAlignments,
-          scoresForUser: jest.fn(() => [
+          scores: [
             {
               user_id: '1',
               alignment_id: 'align-1',
               score: 85,
             },
-          ]),
-          isLoading: false,
-          error: undefined,
-        })),
-      }
+          ],
+        },
+        alignments: mockAlignments,
+        scoresForUser: jest.fn(() => [
+          {
+            user_id: '1',
+            alignment_id: 'align-1',
+            score: 85,
+          },
+        ]),
+        isLoading: false,
+        error: undefined,
+      })),
+    }
+
+    it('renders contributing score cells when visible', () => {
+      render(
+        <ScoresGrid
+          {...defaultProps({
+            contributingScores: mockContributingScoresVisible,
+          })}
+        />,
+      )
+
+      expect(screen.getByTestId('contributing-score-1-1-0')).toBeInTheDocument()
+    })
+
+    it('shows action button on contributing score cell focus', async () => {
+      const user = userEvent.setup()
 
       render(
         <ScoresGrid
           {...defaultProps({
-            contributingScores: mockContributingScoresWithData,
+            contributingScores: mockContributingScoresVisible,
+          })}
+        />,
+      )
+
+      const contributingCell = screen.getByTestId('contributing-score-1-1-0')
+      await user.click(contributingCell)
+
+      expect(
+        screen.getByRole('button', {name: 'View Contributing Score Details'}),
+      ).toBeInTheDocument()
+    })
+
+    it('calls onOpenStudentAssignmentTray when action button is clicked', async () => {
+      const user = userEvent.setup()
+      const onOpenStudentAssignmentTray = jest.fn()
+
+      render(
+        <ScoresGrid
+          {...defaultProps({
+            contributingScores: mockContributingScoresVisible,
             onOpenStudentAssignmentTray,
           })}
         />,
       )
 
-      const scoreCell = screen.getByTestId('student-outcome-score-1-1')
-      const button = scoreCell.querySelector('button')
-      if (button) {
-        await user.click(button)
-        expect(onOpenStudentAssignmentTray).toHaveBeenCalledWith(
-          defaultProps().outcomes[0],
-          defaultProps().students[0],
-          0,
-          mockAlignments,
-        )
-      }
+      const contributingCell = screen.getByTestId('contributing-score-1-1-0')
+      await user.click(contributingCell)
+
+      const button = screen.getByRole('button', {name: 'View Contributing Score Details'})
+      await user.click(button)
+
+      expect(onOpenStudentAssignmentTray).toHaveBeenCalledWith(
+        defaultProps().outcomes[0],
+        defaultProps().students[0],
+        0,
+        mockAlignments,
+      )
     })
 
-    it('does not render clickable button when onOpenStudentAssignmentTray is not provided', () => {
-      const mockContributingScoresWithData: ContributingScoresManager = {
-        forOutcome: jest.fn(() => ({
-          isVisible: () => true,
-          toggleVisibility: jest.fn(),
-          data: {
-            outcome: {
-              id: '1',
-              title: 'Outcome Title',
-            },
-            alignments: mockAlignments,
-            scores: [
-              {
-                user_id: '1',
-                alignment_id: 'align-1',
-                score: 85,
-              },
-            ],
-          },
-          alignments: mockAlignments,
-          scoresForUser: jest.fn(() => [
-            {
-              user_id: '1',
-              alignment_id: 'align-1',
-              score: 85,
-            },
-          ]),
-          isLoading: false,
-          error: undefined,
-        })),
-      }
+    it('action button should be disabled when onOpenStudentAssignmentTray is not provided', async () => {
+      const user = userEvent.setup()
 
       render(
         <ScoresGrid
           {...defaultProps({
-            contributingScores: mockContributingScoresWithData,
+            contributingScores: mockContributingScoresVisible,
           })}
         />,
       )
 
-      const scoreCell = screen.getByTestId('student-outcome-score-1-1')
-      const button = scoreCell.querySelector('button')
-      expect(button).toBeNull()
+      const contributingCell = screen.getByTestId('contributing-score-1-1-0')
+      await user.click(contributingCell)
+
+      expect(screen.queryByRole('button', {name: 'View Contributing Score Details'})).toBeDisabled()
     })
   })
 })

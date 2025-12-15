@@ -18,57 +18,34 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import {ScoreCell, ScoreCellProps} from '../ScoreCell'
+import {ScoreWithLabel, ScoreWithLabelProps} from '../ScoreWithLabel'
 import {ScoreDisplayFormat} from '../../../utils/constants'
 
-describe('ScoreCell', () => {
-  const defaultProps: ScoreCellProps = {
+describe('ScoreWithLabel', () => {
+  const defaultProps: ScoreWithLabelProps = {
     score: 3,
     label: 'Mastery',
     icon: <div data-testid="test-icon">Icon</div>,
   }
 
   it('renders with icon and label', () => {
-    render(<ScoreCell {...defaultProps} />)
+    render(<ScoreWithLabel {...defaultProps} />)
     expect(screen.getByTestId('test-icon')).toBeInTheDocument()
     expect(screen.getByText('Mastery')).toBeInTheDocument()
   })
 
-  it('renders as clickable button when onClick is provided', () => {
-    const onClick = jest.fn()
-    render(<ScoreCell {...defaultProps} onClick={onClick} />)
-    const button = screen.getByRole('button')
-    expect(button).toBeInTheDocument()
-  })
-
-  it('calls onClick when clicked', async () => {
-    const user = userEvent.setup()
-    const onClick = jest.fn()
-    render(<ScoreCell {...defaultProps} onClick={onClick} />)
-
-    const button = screen.getByRole('button')
-    await user.click(button)
-
-    expect(onClick).toHaveBeenCalledTimes(1)
-  })
-
-  it('does not render as button when onClick is not provided', () => {
-    render(<ScoreCell {...defaultProps} />)
-    const button = screen.queryByRole('button')
-    expect(button).toBeNull()
-  })
-
   describe('scoreDisplayFormat', () => {
     it('shows label in ScreenReaderContent with ICON_ONLY format (default)', () => {
-      render(<ScoreCell {...defaultProps} scoreDisplayFormat={ScoreDisplayFormat.ICON_ONLY} />)
+      render(<ScoreWithLabel {...defaultProps} scoreDisplayFormat={ScoreDisplayFormat.ICON_ONLY} />)
       const srContent = screen.getByText('Mastery')
       expect(srContent).toBeInTheDocument()
       expect(srContent.closest('[class*="screenReaderContent"]')).toBeInTheDocument()
     })
 
     it('shows visible label with ICON_AND_LABEL format', () => {
-      render(<ScoreCell {...defaultProps} scoreDisplayFormat={ScoreDisplayFormat.ICON_AND_LABEL} />)
+      render(
+        <ScoreWithLabel {...defaultProps} scoreDisplayFormat={ScoreDisplayFormat.ICON_AND_LABEL} />,
+      )
       const labelText = screen.getByText('Mastery')
       expect(labelText).toBeInTheDocument()
       expect(labelText.closest('[class*="screenReaderContent"]')).not.toBeInTheDocument()
@@ -76,7 +53,10 @@ describe('ScoreCell', () => {
 
     it('shows visible score with ICON_AND_POINTS format', () => {
       render(
-        <ScoreCell {...defaultProps} scoreDisplayFormat={ScoreDisplayFormat.ICON_AND_POINTS} />,
+        <ScoreWithLabel
+          {...defaultProps}
+          scoreDisplayFormat={ScoreDisplayFormat.ICON_AND_POINTS}
+        />,
       )
       const pointsText = screen.getByText('3')
       expect(pointsText).toBeInTheDocument()
@@ -85,14 +65,14 @@ describe('ScoreCell', () => {
   })
 
   it('renders without icon', () => {
-    render(<ScoreCell {...defaultProps} icon={undefined} />)
+    render(<ScoreWithLabel {...defaultProps} icon={undefined} />)
     expect(screen.queryByTestId('test-icon')).not.toBeInTheDocument()
     expect(screen.getByText('Mastery')).toBeInTheDocument()
   })
 
   it('renders without score', () => {
     render(
-      <ScoreCell
+      <ScoreWithLabel
         {...defaultProps}
         score={undefined}
         label="Unassessed"
@@ -103,7 +83,7 @@ describe('ScoreCell', () => {
   })
 
   it('uses default ICON_ONLY format when not specified', () => {
-    render(<ScoreCell {...defaultProps} />)
+    render(<ScoreWithLabel {...defaultProps} />)
     const srContent = screen.getByText('Mastery')
     expect(srContent.closest('[class*="screenReaderContent"]')).toBeInTheDocument()
   })
