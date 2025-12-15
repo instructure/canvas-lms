@@ -17,19 +17,19 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import {LoginLogo} from '..'
 import {NewLoginProvider, NewLoginDataProvider, useNewLoginData} from '../../context'
 
-jest.mock('../../context', () => {
-  const originalModule = jest.requireActual('../../context')
+vi.mock('../../context', async () => {
+  const originalModule = await vi.importActual('../../context')
   return {
     ...originalModule,
-    useNewLoginData: jest.fn(),
+    useNewLoginData: vi.fn(),
   }
 })
 
-const mockUseNewLoginData = useNewLoginData as jest.Mock
+const mockUseNewLoginData = vi.mocked(useNewLoginData)
 
 const renderLoginLogo = () =>
   render(
@@ -41,12 +41,17 @@ const renderLoginLogo = () =>
   )
 
 describe('LoginLogo', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders nothing when loginLogoUrl is not provided', () => {
     mockUseNewLoginData.mockReturnValue({
+      isDataLoading: false,
       loginLogoUrl: '',
       loginLogoText: 'Canvas LMS',
     })
@@ -58,6 +63,7 @@ describe('LoginLogo', () => {
     const alt = 'Canvas LMS'
     const src = 'https://example.com/logo.png'
     mockUseNewLoginData.mockReturnValue({
+      isDataLoading: false,
       loginLogoUrl: src,
       loginLogoText: alt,
     })
@@ -70,6 +76,7 @@ describe('LoginLogo', () => {
   it('renders logo with empty alt when loginLogoText is missing', () => {
     const src = 'https://example.com/logo.png'
     mockUseNewLoginData.mockReturnValue({
+      isDataLoading: false,
       loginLogoUrl: src,
       loginLogoText: undefined,
     })

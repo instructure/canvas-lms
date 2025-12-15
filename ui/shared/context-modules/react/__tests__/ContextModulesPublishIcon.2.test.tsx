@@ -28,20 +28,20 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const server = setupServer()
 
-jest.mock('@canvas/context-modules/jquery/utils', () => {
-  const originalModule = jest.requireActual('@canvas/context-modules/jquery/utils')
+vi.mock('@canvas/context-modules/jquery/utils', async () => {
+  const originalModule = await vi.importActual('@canvas/context-modules/jquery/utils')
   return {
     __esModule: true,
     ...originalModule,
-    updateModuleItem: jest.fn(),
+    updateModuleItem: vi.fn(),
   }
 })
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
-const mockShowFlashAlert = showFlashAlert as jest.Mock
+const mockShowFlashAlert = showFlashAlert as ReturnType<typeof vi.fn>
 
 const defaultProps = {
   courseId: '1',
@@ -69,7 +69,7 @@ beforeEach(() => {
 
 afterEach(() => {
   server.resetHandlers()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   document.body.innerHTML = ''
 })
 
@@ -174,7 +174,7 @@ describe('ContextModulesPublishIcon', () => {
     // ts is inferring what window.modules should look like. I don't care about anything else.
     // @ts-expect-error - window.modules is a Canvas global not in TS types
     window.modules = {
-      updatePublishMenuDisabledState: jest.fn(),
+      updatePublishMenuDisabledState: vi.fn(),
     }
 
     server.use(

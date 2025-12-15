@@ -23,7 +23,7 @@ import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {PeerReviewWidget} from '../PeerReviewWidget'
 
-jest.mock('../PeerReviewConfigurationTray', () => ({
+vi.mock('../PeerReviewConfigurationTray', () => ({
   PeerReviewConfigurationTray: ({
     isTrayOpen,
     closeTray,

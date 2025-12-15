@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import '@testing-library/jest-dom'
 import {windowPathname} from '@canvas/util/globalUtils'
 import {cleanup, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -27,41 +26,43 @@ import {performSignIn} from '../../services'
 import SignIn from '../SignIn'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: jest.fn(),
+vi.mock('react-router-dom', async () => ({
+  ...(await vi.importActual('react-router-dom')),
+  useNavigate: vi.fn(),
 }))
 
-jest.mock('../../context', () => {
-  const actualContext = jest.requireActual('../../context')
+vi.mock('../../context', async () => {
+  const actualContext = await vi.importActual('../../context')
   return {
     ...actualContext,
-    useNewLoginData: jest.fn(() => ({
-      ...actualContext.useNewLoginData(),
+    useNewLoginData: vi.fn(() => ({
+      isDataLoading: false,
       loginHandleName: 'Email',
     })),
-    useNewLogin: jest.fn(() => ({
+    useNewLogin: vi.fn(() => ({
       isUiActionPending: false,
-      setIsUiActionPending: jest.fn(),
+      setIsUiActionPending: vi.fn(),
       otpRequired: false,
-      setOtpRequired: jest.fn(),
+      setOtpRequired: vi.fn(),
       rememberMe: false,
-      setRememberMe: jest.fn(),
-      loginFailed: false,
-      setLoginFailed: jest.fn(),
+      setRememberMe: vi.fn(),
+      showForgotPassword: false,
+      setShowForgotPassword: vi.fn(),
+      otpCommunicationChannelId: null,
+      setOtpCommunicationChannelId: vi.fn(),
     })),
   }
 })
 
-jest.mock('../../services/auth', () => ({
-  performSignIn: jest.fn().mockResolvedValue({}),
-  initiateOtpRequest: jest.fn(),
+vi.mock('../../services/auth', () => ({
+  performSignIn: vi.fn().mockResolvedValue({}),
+  initiateOtpRequest: vi.fn(),
 }))
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  ...jest.requireActual('@canvas/util/globalUtils'),
-  assignLocation: jest.fn(),
-  windowPathname: jest.fn(),
+vi.mock('@canvas/util/globalUtils', async () => ({
+  ...(await vi.importActual('@canvas/util/globalUtils')),
+  assignLocation: vi.fn(),
+  windowPathname: vi.fn(),
 }))
 
 describe('SignIn', () => {
@@ -77,17 +78,18 @@ describe('SignIn', () => {
     )
   }
 
-  const mockNavigate = jest.fn()
+  const mockNavigate = vi.fn()
   beforeAll(() => {
-    ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
+    vi.mocked(useNavigate).mockReturnValue(mockNavigate)
   })
 
   beforeEach(() => {
     fakeENV.setup()
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
     // reset the mock implementation to return the default values
-    ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
+    vi.mocked(useNewLoginData).mockImplementation(() => ({
+      isDataLoading: false,
       loginHandleName: 'Email',
     }))
   })
@@ -98,9 +100,8 @@ describe('SignIn', () => {
   })
 
   describe('login behavior', () => {
-    // fickle
-    it.skip('calls performSignIn with /login/canvas when on the Canvas login route', async () => {
-      ;(windowPathname as jest.Mock).mockReturnValue('/login/canvas')
+    it('calls performSignIn with /login/canvas when on the Canvas login route', async () => {
+      vi.mocked(windowPathname).mockReturnValue('/login/canvas')
       const {getByTestId} = setup()
       const usernameInput = getByTestId('username-input')
       const passwordInput = getByTestId('password-input')
@@ -118,8 +119,8 @@ describe('SignIn', () => {
       })
     })
 
-    it.skip('calls performSignIn with /login/ldap when on the LDAP login route', async () => {
-      ;(windowPathname as jest.Mock).mockReturnValue('/login/ldap')
+    it('calls performSignIn with /login/ldap when on the LDAP login route', async () => {
+      vi.mocked(windowPathname).mockReturnValue('/login/ldap')
       const {getByTestId} = setup()
       const usernameInput = getByTestId('username-input')
       const passwordInput = getByTestId('password-input')
@@ -137,20 +138,11 @@ describe('SignIn', () => {
       })
     })
 
-    // fickle
+    // Skip: Error message doesn't render properly with current mock setup
     it.skip('displays a login error alert when invalid credentials are submitted', async () => {
-      ;(performSignIn as jest.Mock).mockRejectedValueOnce({response: {status: 400}})
-      ;(useNewLogin as jest.Mock).mockReturnValue({
-        isUiActionPending: false,
-        setIsUiActionPending: jest.fn(),
-        otpRequired: false,
-        setOtpRequired: jest.fn(),
-        rememberMe: false,
-        loginFailed: true,
-        setLoginFailed: jest.fn(),
-      })
+      vi.mocked(performSignIn).mockRejectedValueOnce({response: {status: 400}})
 
-      const {getByTestId} = setup()
+      const {getByTestId, findByText} = setup()
       const usernameInput = getByTestId('username-input')
       const passwordInput = getByTestId('password-input')
       const loginButton = getByTestId('login-button')
@@ -159,9 +151,10 @@ describe('SignIn', () => {
       await userEvent.click(loginButton)
 
       // Wait for the login to fail and check if the error message appears
-      await waitFor(() => {
-        expect(getByTestId('login-error-alert')).toBeInTheDocument()
-      })
+      const errorMessage = await findByText(/Please verify your email or password and try again/i)
+      expect(errorMessage).toBeInTheDocument()
+      expect(usernameInput).toHaveAttribute('aria-invalid', 'true')
+      expect(passwordInput).toHaveValue('')
     })
 
     it('does not call performSignIn when the username is missing', async () => {
@@ -188,14 +181,17 @@ describe('SignIn', () => {
   describe('ui State', () => {
     it('disables the "Log In" button when isUiActionPending is true', async () => {
       // Mock the useNewLogin hook to return isUiActionPending: true
-      ;(useNewLogin as jest.Mock).mockReturnValue({
+      vi.mocked(useNewLogin).mockReturnValue({
         isUiActionPending: true,
-        setIsUiActionPending: jest.fn(),
+        setIsUiActionPending: vi.fn(),
         otpRequired: false,
-        setOtpRequired: jest.fn(),
+        setOtpRequired: vi.fn(),
         rememberMe: false,
-        loginFailed: false,
-        setLoginFailed: jest.fn(),
+        setRememberMe: vi.fn(),
+        showForgotPassword: false,
+        setShowForgotPassword: vi.fn(),
+        otpCommunicationChannelId: null,
+        setOtpCommunicationChannelId: vi.fn(),
       })
 
       const {getByTestId} = setup()
@@ -205,14 +201,17 @@ describe('SignIn', () => {
 
     it('disables the username and password inputs during login submission', async () => {
       // Mock the useNewLogin hook to return isUiActionPending: true
-      ;(useNewLogin as jest.Mock).mockReturnValue({
+      vi.mocked(useNewLogin).mockReturnValue({
         isUiActionPending: true,
-        setIsUiActionPending: jest.fn(),
+        setIsUiActionPending: vi.fn(),
         otpRequired: false,
-        setOtpRequired: jest.fn(),
+        setOtpRequired: vi.fn(),
         rememberMe: false,
-        loginFailed: false,
-        setLoginFailed: jest.fn(),
+        setRememberMe: vi.fn(),
+        showForgotPassword: false,
+        setShowForgotPassword: vi.fn(),
+        otpCommunicationChannelId: null,
+        setOtpCommunicationChannelId: vi.fn(),
       })
 
       const {getByTestId} = setup()

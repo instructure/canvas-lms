@@ -29,12 +29,12 @@ describe.skip('handleAssignmentIndexDeepLinking', () => {
   const fakeEvent: {data: {moduleCreated?: boolean; placement?: string}} = {data: {}}
 
   beforeEach(() => {
-    jest.spyOn(window.sessionStorage, 'setItem')
-    jest.spyOn(DeepLinking, 'reloadPage')
+    vi.spyOn(window.sessionStorage, 'setItem')
+    vi.spyOn(DeepLinking, 'reloadPage')
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     window.sessionStorage.clear()
   })
 
@@ -96,9 +96,9 @@ describe.skip('handleAssignmentIndexDeepLinking', () => {
 // EVAL-3907 - remove or rewrite to remove spies on imports
 describe.skip('alertIfDeepLinkingCreatedModule', () => {
   beforeEach(() => {
-    jest.spyOn(window.sessionStorage, 'getItem')
-    jest.spyOn(window.sessionStorage, 'removeItem')
-    jest.spyOn(Alerts, 'showFlashAlert').mockImplementation(() => {})
+    vi.spyOn(window.sessionStorage, 'getItem')
+    vi.spyOn(window.sessionStorage, 'removeItem')
+    vi.spyOn(Alerts, 'showFlashAlert').mockImplementation(() => {})
   })
 
   afterEach(() => {

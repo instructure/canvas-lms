@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {screen, render} from '@testing-library/react'
+import {cleanup, screen, render} from '@testing-library/react'
 
 import {ReviewScreenWrapper} from '../components/ReviewScreenWrapper'
 import {mockConfigWithPlacements, mockRegistration, mockToolConfiguration} from './helpers'
@@ -27,6 +27,10 @@ import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
 
 describe('ReviewScreen', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   it('renders without error', () => {
     const config = mockConfigWithPlacements([
       LtiPlacements.CourseNavigation,
@@ -39,7 +43,7 @@ describe('ReviewScreen', () => {
       <ReviewScreenWrapper
         registration={reg}
         overlayStore={overlayStore}
-        transitionToConfirmationState={jest.fn()}
+        transitionToConfirmationState={vi.fn()}
       />,
     )
 
@@ -58,7 +62,7 @@ describe('ReviewScreen', () => {
       <ReviewScreenWrapper
         registration={reg}
         overlayStore={overlayStore}
-        transitionToConfirmationState={jest.fn()}
+        transitionToConfirmationState={vi.fn()}
       />,
     )
 
@@ -82,7 +86,7 @@ describe('ReviewScreen', () => {
       <ReviewScreenWrapper
         registration={reg}
         overlayStore={overlayStore}
-        transitionToConfirmationState={jest.fn()}
+        transitionToConfirmationState={vi.fn()}
       />,
     )
 
@@ -108,7 +112,7 @@ describe('ReviewScreen', () => {
       <ReviewScreenWrapper
         registration={reg}
         overlayStore={overlayStore}
-        transitionToConfirmationState={jest.fn()}
+        transitionToConfirmationState={vi.fn()}
       />,
     )
 
@@ -156,7 +160,7 @@ describe('ReviewScreen', () => {
       <ReviewScreenWrapper
         registration={reg}
         overlayStore={overlayStore}
-        transitionToConfirmationState={jest.fn()}
+        transitionToConfirmationState={vi.fn()}
       />,
     )
 
@@ -185,7 +189,7 @@ describe('ReviewScreen', () => {
         <ReviewScreenWrapper
           registration={reg}
           overlayStore={overlayStore}
-          transitionToConfirmationState={jest.fn()}
+          transitionToConfirmationState={vi.fn()}
         />,
       )
 
@@ -220,7 +224,7 @@ describe('ReviewScreen', () => {
         <ReviewScreenWrapper
           registration={reg}
           overlayStore={overlayStore}
-          transitionToConfirmationState={jest.fn()}
+          transitionToConfirmationState={vi.fn()}
         />,
       )
 
@@ -267,7 +271,7 @@ describe('ReviewScreen', () => {
         <ReviewScreenWrapper
           registration={reg}
           overlayStore={overlayStore}
-          transitionToConfirmationState={jest.fn()}
+          transitionToConfirmationState={vi.fn()}
         />,
       )
 
@@ -295,7 +299,7 @@ describe('ReviewScreen', () => {
         <ReviewScreenWrapper
           registration={reg}
           overlayStore={overlayStore}
-          transitionToConfirmationState={jest.fn()}
+          transitionToConfirmationState={vi.fn()}
         />,
       )
 
@@ -322,7 +326,7 @@ describe('ReviewScreen', () => {
         <ReviewScreenWrapper
           registration={reg}
           overlayStore={overlayStore}
-          transitionToConfirmationState={jest.fn()}
+          transitionToConfirmationState={vi.fn()}
         />,
       )
 

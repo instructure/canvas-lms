@@ -21,13 +21,89 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import CourseActivityForm, {type CourseActivityFormProps} from '../CourseActivityForm'
 import userEvent from '@testing-library/user-event'
 
+// Mock DateTimeInput to make tests more reliable
+// The real InstUI DateTimeInput has complex internal state that doesn't respond well to fireEvent
+vi.mock('@instructure/ui-date-time-input', () => {
+  const React = require('react')
+  return {
+    DateTimeInput: ({
+      dateRenderLabel,
+      timeRenderLabel,
+      onChange,
+      messages,
+      invalidDateTimeMessage,
+    }: {
+      dateRenderLabel: string
+      timeRenderLabel: string
+      onChange: (event: unknown, isoValue: string | undefined) => void
+      messages?: Array<{text: string; type: string}>
+      invalidDateTimeMessage?: string
+    }) => {
+      const [isInvalid, setIsInvalid] = React.useState(false)
+
+      const allMessages = [
+        ...(messages || []),
+        ...(isInvalid && invalidDateTimeMessage
+          ? [{text: invalidDateTimeMessage, type: 'error'}]
+          : []),
+      ]
+
+      return React.createElement(
+        'div',
+        null,
+        React.createElement('input', {
+          'aria-label': dateRenderLabel,
+          'data-testid': `${dateRenderLabel.toLowerCase().replace(' ', '-')}-input`,
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+            const dateValue = e.target.value
+            const invalid = dateValue === 'invalid date'
+            setIsInvalid(invalid)
+            if (dateValue && !invalid) {
+              e.target.setAttribute('data-date-value', dateValue)
+            }
+            const timeInput = e.target.parentElement?.querySelector(
+              `[aria-label="${timeRenderLabel}"]`
+            ) as HTMLInputElement
+            const timeValue = timeInput?.getAttribute('data-time-value')
+            if (dateValue && !invalid && timeValue) {
+              onChange(e, new Date(`${dateValue}, ${timeValue}`).toISOString())
+            } else if (invalid) {
+              onChange(e, undefined)
+            }
+          },
+        }),
+        React.createElement('input', {
+          'aria-label': timeRenderLabel,
+          'data-testid': `${timeRenderLabel.toLowerCase().replace(' ', '-')}-input`,
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+            const timeValue = e.target.value
+            if (timeValue) {
+              e.target.setAttribute('data-time-value', timeValue)
+            }
+            const dateInput = e.target.parentElement?.querySelector(
+              `[aria-label="${dateRenderLabel}"]`
+            ) as HTMLInputElement
+            const dateValue = dateInput?.getAttribute('data-date-value')
+            if (dateValue && timeValue) {
+              onChange(e, new Date(`${dateValue}, ${timeValue}`).toISOString())
+            }
+          },
+        }),
+        ...allMessages.map((msg, i) =>
+          React.createElement('span', {key: i}, msg.text)
+        )
+      )
+    },
+  }
+})
+
 describe('CourseActivityForm', () => {
   const props: CourseActivityFormProps = {
     accountId: '1',
-    onSubmit: jest.fn(),
+    onSubmit: vi.fn(),
   }
 
-  afterEach(() => jest.resetAllMocks())
+  afterEach(() => vi.resetAllMocks())
 
   it('should be able to submit the form with course id only', async () => {
     render(<CourseActivityForm {...props} />)
@@ -124,19 +200,20 @@ describe('CourseActivityForm', () => {
     const toTime = screen.getByLabelText('To Time')
     const submit = screen.getByLabelText('Find')
 
-    fireEvent.input(courseId, {target: {value: courseIdValue}})
-    fireEvent.input(fromDate, {target: {value: fromDateValue}})
+    fireEvent.change(courseId, {target: {value: courseIdValue}})
+    fireEvent.change(fromDate, {target: {value: fromDateValue}})
     fireEvent.blur(fromDate)
-    fireEvent.input(fromTime, {target: {value: timeValue}})
+    fireEvent.change(fromTime, {target: {value: timeValue}})
     fireEvent.blur(fromTime)
-    fireEvent.input(toDate, {target: {value: toDateValue}})
+    fireEvent.change(toDate, {target: {value: toDateValue}})
     fireEvent.blur(toDate)
-    fireEvent.input(toTime, {target: {value: timeValue}})
+    fireEvent.change(toTime, {target: {value: timeValue}})
     fireEvent.blur(toTime)
-    await userEvent.click(submit)
+    fireEvent.click(submit)
 
-    const errorText = await screen.findAllByText('To Date cannot come before From Date.')
-    expect(errorText.length).toBeTruthy()
+    await waitFor(() => {
+      expect(screen.getAllByText('To Date cannot come before From Date.').length).toBeTruthy()
+    })
     expect(props.onSubmit).not.toHaveBeenCalled()
   })
 })

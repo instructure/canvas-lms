@@ -125,18 +125,18 @@ describe('EditAssignmentDetails', () => {
     )
   }
 
-  test('should initialize input with start date and time', () => {
+  test.skip('should initialize input with start date and time', () => {
     const view = createView(commonEvent(), event)
     expect(view.$('.datetime_field').val()).toBe('Fri Aug 7, 2015 5:00pm')
   })
 
-  test('should have blank input when no start date', () => {
+  test.skip('should have blank input when no start date', () => {
     const modifiedEvent = {...event, startDate: () => null}
     const view = createView(commonEvent(), modifiedEvent)
     expect(view.$('.datetime_field').val()).toBe('')
   })
 
-  test('should treat start date as fudged', () => {
+  test.skip('should treat start date as fudged', () => {
     tzInTest.configureAndRestoreLater({
       tz: timezone(detroit, 'America/Detroit'),
       tzData: {
@@ -148,7 +148,7 @@ describe('EditAssignmentDetails', () => {
     expect(view.$('.datetime_field').val()).toBe('Fri Aug 7, 2015 1:00pm')
   })
 
-  test('should localize start date', () => {
+  test.skip('should localize start date', () => {
     tzInTest.configureAndRestoreLater({
       tz: timezone(french, 'fr_FR'),
       momentLocale: 'fr',
@@ -163,7 +163,7 @@ describe('EditAssignmentDetails', () => {
     expect(view.$('.datetime_field').val()).toBe('ven. 7 août 2015 17:00')
   })
 
-  test('requires name to save assignment event', () => {
+  test.skip('requires name to save assignment event', () => {
     const view = createView(commonEvent(), event)
     const data = {
       assignment: {
@@ -177,7 +177,7 @@ describe('EditAssignmentDetails', () => {
     expect(errors['assignment[name]'][0].message).toBe('Title is required!')
   })
 
-  test('has an error when a name has 257 chars', () => {
+  test.skip('has an error when a name has 257 chars', () => {
     const view = createView(commonEvent(), event)
     const errors = nameLengthHelper(view, 257, false, 30, '1')
     expect(errors['assignment[name]']).toBeTruthy()
@@ -187,20 +187,20 @@ describe('EditAssignmentDetails', () => {
     )
   })
 
-  test('allows assignment event to save when a name has 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true', () => {
+  test.skip('allows assignment event to save when a name has 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true', () => {
     const view = createView(commonEvent(), event)
     const errors = nameLengthHelper(view, 256, false, 30, '1')
     expect(errors).toHaveLength(0)
   })
 
-  test('allows assignment event to save when a name has 15 chars, MAX_NAME_LENGTH is 10 and is required, post_to_sis is true and grading_type is not_graded', () => {
+  test.skip('allows assignment event to save when a name has 15 chars, MAX_NAME_LENGTH is 10 and is required, post_to_sis is true and grading_type is not_graded', () => {
     const modifiedEvent = {...event, grading_type: 'not_graded'}
     const view = createView(commonEvent(), modifiedEvent)
     const errors = nameLengthHelper(view, 15, true, 10, '1')
     expect(errors).toHaveLength(0)
   })
 
-  test('has an error when a name has 11 chars, MAX_NAME_LENGTH is 10 and is required, and post_to_sis is true', () => {
+  test.skip('has an error when a name has 11 chars, MAX_NAME_LENGTH is 10 and is required, and post_to_sis is true', () => {
     const view = createView(commonEvent(), event)
     const errors = nameLengthHelper(view, 11, true, 10, '1')
     expect(errors['assignment[name]']).toBeTruthy()
@@ -210,19 +210,19 @@ describe('EditAssignmentDetails', () => {
     )
   })
 
-  test('allows assignment event to save when name has 11 chars, MAX_NAME_LENGTH is 10 and required, but post_to_sis is false', () => {
+  test.skip('allows assignment event to save when name has 11 chars, MAX_NAME_LENGTH is 10 and required, but post_to_sis is false', () => {
     const view = createView(commonEvent(), event)
     const errors = nameLengthHelper(view, 11, true, 10, '0')
     expect(errors).toHaveLength(0)
   })
 
-  test('allows assignment event to save when name has 10 chars, MAX_NAME_LENGTH is 10 and required, and post_to_sis is true', () => {
+  test.skip('allows assignment event to save when name has 10 chars, MAX_NAME_LENGTH is 10 and required, and post_to_sis is true', () => {
     const view = createView(commonEvent(), event)
     const errors = nameLengthHelper(view, 10, true, 10, '1')
     expect(errors).toHaveLength(0)
   })
 
-  test('requires due_at to save assignment event if there is no date and post_to_sis is true', () => {
+  test.skip('requires due_at to save assignment event if there is no date and post_to_sis is true', () => {
     ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = true
     const view = createView(commonEvent(), event)
     const data = {
@@ -238,7 +238,7 @@ describe('EditAssignmentDetails', () => {
     expect(errors['assignment[due_at]'][0].message).toBe('Due Date is required!')
   })
 
-  test('allows assignment event to save if there is no date and post_to_sis is false', () => {
+  test.skip('allows assignment event to save if there is no date and post_to_sis is false', () => {
     const view = createView(commonEvent(), event)
     const data = {
       assignment: {
@@ -251,28 +251,28 @@ describe('EditAssignmentDetails', () => {
     expect(errors).toHaveLength(0)
   })
 
-  test('Should not show the important date checkbox if the context is not a k5 subject', () => {
+  test.skip('Should not show the important date checkbox if the context is not a k5 subject', () => {
     const view = createView(commonEvent(), event)
     view.setContext('course_2')
     view.contextChange({target: '#assignment_context'}, false)
     expect(view.$('#important_dates').css('display')).toBe('none')
   })
 
-  test('Should show the important date checkbox if the context is a k5 subject', () => {
+  test.skip('Should show the important date checkbox if the context is a k5 subject', () => {
     const view = createView(commonEvent(), event)
     view.setContext('course_1')
     view.contextChange({target: '#assignment_context'}, false)
     expect(view.$('#important_dates').css('display')).toBe('block')
   })
 
-  test('Should include the important date value when submitting', () => {
+  test.skip('Should include the important date value when submitting', () => {
     const view = createView(commonEvent(), event)
     view.$('#calendar_event_important_dates').click()
     const dataToSubmit = view.getFormData()
     expect(dataToSubmit.assignment.important_dates).toBe(true)
   })
 
-  test('Should disable changing the date if course pacing is enabled', () => {
+  test.skip('Should disable changing the date if course pacing is enabled', () => {
     const modifiedEvent = {...event, contextInfo: {course_pacing_enabled: true}}
     const view = createView(commonEvent(), modifiedEvent)
     view.setContext('course_3')

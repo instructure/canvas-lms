@@ -139,7 +139,7 @@ describe('TemplateWidget', () => {
   })
 
   it('renders error state with retry button', () => {
-    const onRetry = jest.fn()
+    const onRetry = vi.fn()
     const props = buildDefaultProps({error: 'Something went wrong', onRetry})
     setup(props)
 
@@ -211,7 +211,7 @@ describe('TemplateWidget', () => {
     const pagination = {
       currentPage: 2,
       totalPages: 5,
-      onPageChange: jest.fn(),
+      onPageChange: vi.fn(),
       ariaLabel: 'Test Pagination',
     }
     const props = buildDefaultProps({pagination})
@@ -225,7 +225,7 @@ describe('TemplateWidget', () => {
     const pagination = {
       currentPage: 1,
       totalPages: 1,
-      onPageChange: jest.fn(),
+      onPageChange: vi.fn(),
       ariaLabel: 'Test Pagination',
     }
     const props = buildDefaultProps({pagination})

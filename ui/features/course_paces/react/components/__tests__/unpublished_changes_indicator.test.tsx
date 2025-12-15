@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import {UnpublishedChangesIndicator} from '../unpublished_changes_indicator'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
 
-const onUnpublishedNavigation = jest.fn()
+const onUnpublishedNavigation = vi.fn()
 
 const defaultProps = {
   changeCount: 2,
@@ -33,7 +33,8 @@ const defaultProps = {
 }
 
 afterEach(() => {
-  jest.clearAllMocks()
+  cleanup()
+  vi.clearAllMocks()
 })
 
 describe('UnpublishedChangesIndicator', () => {
@@ -57,7 +58,7 @@ describe('UnpublishedChangesIndicator', () => {
 
   describe('onClick callback', () => {
     let onClick: () => void
-    beforeEach(() => (onClick = jest.fn()))
+    beforeEach(() => (onClick = vi.fn()))
 
     it('is called when clicked if there are pending changes', async () => {
       const {getByText} = render(
@@ -95,7 +96,7 @@ describe('UnpublishedChangesIndicator', () => {
   })
 
   it('throws when a negative changeCount is specified', () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     expect(() =>
       render(<UnpublishedChangesIndicator {...defaultProps} changeCount={-1} />),

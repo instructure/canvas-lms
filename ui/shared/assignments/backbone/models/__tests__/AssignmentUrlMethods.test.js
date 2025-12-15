@@ -21,8 +21,8 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import Assignment from '../Assignment'
 
 // Mock the horizon utils module
-jest.mock('@canvas/horizon/utils', () => ({
-  getUrlWithHorizonParams: jest.fn(),
+vi.mock('@canvas/horizon/utils', () => ({
+  getUrlWithHorizonParams: vi.fn(),
 }))
 
 describe('Assignment URL Methods', () => {
@@ -34,7 +34,7 @@ describe('Assignment URL Methods', () => {
     delete window.location
     window.location = {href: '', origin: 'https://canvas.instructure.com'}
     // Clear all mocks before each test
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

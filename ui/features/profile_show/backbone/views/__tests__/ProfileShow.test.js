@@ -19,12 +19,15 @@
 import ProfileShow from '../ProfileShow'
 import $ from 'jquery'
 import 'jquery-migrate'
+import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 describe('ProfileShow', () => {
   let view
   let container
 
   beforeEach(() => {
+    vi.useFakeTimers()
+
     container = document.createElement('div')
     document.body.appendChild(container)
 
@@ -40,6 +43,10 @@ describe('ProfileShow', () => {
   })
 
   afterEach(() => {
+    // Clean up flash alerts and their timers before restoring real timers
+    destroyContainer()
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
     container.remove()
   })
 
@@ -109,7 +116,7 @@ describe('ProfileShow', () => {
         it('succeeds', () => {
           // Arrange
           const form = document.querySelector('#profile_form')
-          const preventDefault = jest.fn()
+          const preventDefault = vi.fn()
 
           // Act & Assert
           view.validateForm({preventDefault, target: form})
@@ -123,7 +130,7 @@ describe('ProfileShow', () => {
           const form = document.querySelector('#profile_form')
           const nameInput = document.querySelector('#user_short_name')
           nameInput.value = ''
-          const preventDefault = jest.fn()
+          const preventDefault = vi.fn()
 
           // Act & Assert
           view.validateForm({preventDefault, target: form})
@@ -137,7 +144,7 @@ describe('ProfileShow', () => {
           const form = document.querySelector('#profile_form')
           const nameInput = document.querySelector('#user_short_name')
           nameInput.remove()
-          const preventDefault = jest.fn()
+          const preventDefault = vi.fn()
 
           // Act & Assert
           view.validateForm({preventDefault, target: form})
@@ -150,7 +157,7 @@ describe('ProfileShow', () => {
       // Arrange
       const form = document.querySelector('#profile_form')
       const titleInput = document.querySelector('#profile_title')
-      const preventDefault = jest.fn()
+      const preventDefault = vi.fn()
 
       // Act & Assert - Valid input
       titleInput.value = 'a'.repeat(255)
@@ -167,7 +174,7 @@ describe('ProfileShow', () => {
       // Arrange
       const form = document.querySelector('#profile_form')
       const bioInput = document.querySelector('#profile_bio')
-      const preventDefault = jest.fn()
+      const preventDefault = vi.fn()
 
       // Act & Assert - Valid input
       bioInput.value = 'a'.repeat(65536)
@@ -184,7 +191,7 @@ describe('ProfileShow', () => {
       // Arrange
       const form = document.querySelector('#profile_form')
       const linkInput = document.querySelector('#profile_link')
-      const preventDefault = jest.fn()
+      const preventDefault = vi.fn()
 
       // Act & Assert - Valid input
       linkInput.value = 'yahoo'
@@ -199,15 +206,19 @@ describe('ProfileShow', () => {
   })
 
   describe('profile update notifications', () => {
-    it('shows success message when success container is present', async () => {
+    it('shows success message when success container is present', () => {
       view.renderAlert('Profile has been saved successfully', 'error')
+      // Advance timers to allow the alert to render
+      vi.advanceTimersByTime(100)
       expect(document.querySelector('#flashalert_message_holder').textContent).toContain(
         'Profile has been saved successfully',
       )
     })
 
-    it('shows failure message when failed container is present', async () => {
+    it('shows failure message when failed container is present', () => {
       view.renderAlert('Profile save was unsuccessful', 'error')
+      // Advance timers to allow the alert to render
+      vi.advanceTimersByTime(100)
       expect(document.querySelector('#flashalert_message_holder').textContent).toContain(
         'Profile save was unsuccessful',
       )

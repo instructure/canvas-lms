@@ -204,7 +204,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
     })
 
     test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, () => {
-      const onChangeSort = jest.fn()
+      const onChangeSort = vi.fn()
       const wrapper = render(
         <CoursesList
           {...{

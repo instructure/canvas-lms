@@ -29,13 +29,13 @@ describe('ModelBody', () => {
     attachments: [],
     bodyMessages: [],
     children: undefined,
-    onBodyChange: jest.fn(),
+    onBodyChange: vi.fn(),
     pastMessages: [],
-    removeAttachment: jest.fn(),
-    replaceAttachment: jest.fn(),
+    removeAttachment: vi.fn(),
+    replaceAttachment: vi.fn(),
     modalError: '',
     mediaUploadFile: {},
-    onRemoveMediaComment: jest.fn(),
+    onRemoveMediaComment: vi.fn(),
   }
 
   const renderWithProvider = (ui: React.ReactElement, options?: Omit<RenderOptions, 'wrapper'>) => {

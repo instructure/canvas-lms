@@ -40,13 +40,13 @@ describe('Tray', () => {
   }
 
   beforeEach(() => {
-    setIsOpenMock = jest.fn()
-    setShowSuggestionsMock = jest.fn()
-    setRemovedItemIndexMock = jest.fn()
+    setIsOpenMock = vi.fn()
+    setShowSuggestionsMock = vi.fn()
+    setRemovedItemIndexMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders a header', () => {

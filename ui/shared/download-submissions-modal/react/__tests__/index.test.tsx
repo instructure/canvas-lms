@@ -57,8 +57,8 @@ beforeEach(() => {
   )
 
   // Mock the download button click to prevent navigation
-  const mockClick = jest.fn()
-  jest.spyOn(document, 'getElementById').mockImplementation(id => {
+  const mockClick = vi.fn()
+  vi.spyOn(document, 'getElementById').mockImplementation(id => {
     if (id === 'download_button') {
       return {click: mockClick} as any
     }
@@ -68,7 +68,7 @@ beforeEach(() => {
 
 afterEach(() => {
   server.resetHandlers()
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('DownloadSubmissionModal', () => {

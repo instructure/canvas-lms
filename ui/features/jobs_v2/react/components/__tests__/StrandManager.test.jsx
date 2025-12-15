@@ -68,7 +68,7 @@ describe('StrandManager', () => {
   afterEach(() => server.resetHandlers())
 
   it('edits priority but not concurrency for normal strand', async () => {
-    const onUpdate = jest.fn()
+    const onUpdate = vi.fn()
     const {getByText, getByLabelText, queryByLabelText} = renderWithMocks(
       <StrandManager strand="foobar" jobs={[fakeJob]} onUpdate={onUpdate} />,
     )
@@ -87,7 +87,7 @@ describe('StrandManager', () => {
   })
 
   it('edits both priority and concurrency for n_strand', async () => {
-    const onUpdate = jest.fn()
+    const onUpdate = vi.fn()
     const {getByText, getByLabelText} = renderWithMocks(
       <StrandManager
         strand="foobar"
@@ -112,7 +112,7 @@ describe('StrandManager', () => {
   })
 
   it("doesn't mutate the num_strands setting if unchanged", async () => {
-    const onUpdate = jest.fn()
+    const onUpdate = vi.fn()
     const {getByText, getByLabelText} = renderWithMocks(
       <StrandManager
         strand="foobar"

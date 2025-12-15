@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {CourseName} from '../CourseName'
 
 // Mock TruncateText to simulate truncation behavior in tests
-jest.mock('@instructure/ui-truncate-text', () => ({
+vi.mock('@instructure/ui-truncate-text', () => ({
   TruncateText: ({
     children,
     onUpdate,

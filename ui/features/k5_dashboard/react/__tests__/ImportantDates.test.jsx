@@ -54,14 +54,14 @@ describe('ImportantDates', () => {
   })
 
   beforeEach(() => {
-    jest.useFakeTimers()
-    jest.setSystemTime(new Date(CURRENT_TIME))
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(CURRENT_TIME))
     fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS)
     fetchMock.get(EVENTS_URL, MOCK_EVENTS)
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
     fetchMock.restore()
     destroyContainer()
     localStorage.clear()
@@ -167,7 +167,7 @@ describe('ImportantDates', () => {
   })
 
   it('shows close button if handleClose is provided', async () => {
-    const handleCloseFunc = jest.fn()
+    const handleCloseFunc = vi.fn()
     const {findByRole} = render(<ImportantDates {...getProps()} handleClose={handleCloseFunc} />)
     const closeButton = await findByRole('button', {name: 'Hide Important Dates'})
     expect(closeButton).toBeInTheDocument()

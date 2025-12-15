@@ -20,7 +20,7 @@ import React from 'react'
 import {render, fireEvent, act} from '@testing-library/react'
 import AddContentItem from '../AddContentItem'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('AddContentItem', () => {
   let onSaveHandler, onHideHandler
@@ -33,12 +33,12 @@ describe('AddContentItem', () => {
   })
 
   beforeEach(() => {
-    onSaveHandler = jest.fn()
-    onHideHandler = jest.fn()
+    onSaveHandler = vi.fn()
+    onHideHandler = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders component with labelInstructions', () => {
@@ -50,7 +50,7 @@ describe('AddContentItem', () => {
   it('focuses the input automatically', async () => {
     const props = defaultProps()
     const {getByLabelText} = render(<AddContentItem {...props} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(getByLabelText(props.textInputInstructions)).toHaveFocus()
   })
 
@@ -97,7 +97,7 @@ describe('AddContentItem', () => {
     })
     fireEvent.click(getByText(props.labelInstructions))
     expect(onSaveHandler).not.toHaveBeenCalled()
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(document.activeElement.value).toEqual('  ')
   })
 

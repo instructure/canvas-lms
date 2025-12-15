@@ -28,8 +28,8 @@ injectGlobalAlertContainers()
 
 const defaultProps = {
   open: true,
-  onSave: jest.fn(),
-  onDismiss: jest.fn(),
+  onSave: vi.fn(),
+  onDismiss: vi.fn(),
 }
 
 const renderComponent = (props = {}) => {
@@ -118,7 +118,7 @@ describe('NewStudentGroupModal', () => {
 
   it('fetches and reports status', async () => {
     fetchMock.postOnce(`path:/courses/${ENV.course_id}/groups`, 200)
-    const onDismissMock = jest.fn()
+    const onDismissMock = vi.fn()
     const {getByText, getByRole, getAllByText, getByLabelText} = renderComponent({
       onDismiss: onDismissMock,
     })
@@ -150,7 +150,7 @@ describe('NewStudentGroupModal', () => {
 
   describe('errors', () => {
     beforeEach(() => {
-      jest.spyOn(console, 'error').mockImplementation()
+      vi.spyOn(console, 'error').mockImplementation()
     })
 
     afterEach(() => {

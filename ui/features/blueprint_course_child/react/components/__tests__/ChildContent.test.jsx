@@ -40,7 +40,7 @@ describe('ChildContent app', () => {
 
   test('clearRoutes removes blueprint path', () => {
     const props = defaultProps()
-    props.routeTo = jest.fn()
+    props.routeTo = vi.fn()
     const ref = React.createRef()
     render(<ChildContent {...props} ref={ref} />)
     const instance = ref.current
@@ -50,7 +50,7 @@ describe('ChildContent app', () => {
 
   test('showChangeLog calls selectChangeLog prop with argument', () => {
     const props = defaultProps()
-    props.selectChangeLog = jest.fn()
+    props.selectChangeLog = vi.fn()
     const ref = React.createRef()
     render(<ChildContent {...props} ref={ref} />)
     const instance = ref.current
@@ -60,7 +60,7 @@ describe('ChildContent app', () => {
 
   test('hideChangeLog calls selectChangeLog prop with null', () => {
     const props = defaultProps()
-    props.selectChangeLog = jest.fn()
+    props.selectChangeLog = vi.fn()
     const ref = React.createRef()
     render(<ChildContent {...props} ref={ref} />)
     const instance = ref.current
@@ -70,7 +70,7 @@ describe('ChildContent app', () => {
 
   test('realRef gets called with component instance on mount', () => {
     const props = defaultProps()
-    props.realRef = jest.fn()
+    props.realRef = vi.fn()
     const ref = React.createRef()
     const tree = render(<ChildContent {...props} ref={ref} />)
     const instance = ref.current

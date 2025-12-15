@@ -21,16 +21,16 @@ import React from 'react'
 import {Reply} from '../Reply'
 import {responsiveQuerySizes} from '../../../utils'
 
-jest.mock('../../../utils')
+vi.mock('../../../utils')
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })
@@ -59,7 +59,7 @@ describe('Reply', () => {
   })
 
   it('calls provided callback when clicked', () => {
-    const onClickMock = jest.fn()
+    const onClickMock = vi.fn()
     const {getByText} = setup({onClick: onClickMock})
     expect(onClickMock.mock.calls).toHaveLength(0)
     fireEvent.click(getByText('Reply'))

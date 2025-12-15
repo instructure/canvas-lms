@@ -26,8 +26,8 @@ import {within} from '@testing-library/dom'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-const onSubmit = jest.fn()
-const onCancel = jest.fn()
+const onSubmit = vi.fn()
+const onCancel = vi.fn()
 
 const fakeCourses = [
   {
@@ -84,7 +84,7 @@ describe('CourseCopyImporter', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fakeENV.teardown()
     server.resetHandlers()
   })
@@ -296,10 +296,12 @@ describe('CourseCopyImporter', () => {
         it('should clear the dropdown on search field change', async () => {
           const component = await populateSearchField()
           await userEvent.type(component.getByRole('combobox', {name: searchForACourse}), 'invalid')
-          expect(
-            (component.getByTestId('course-copy-select-preloaded-courses') as HTMLInputElement)
-              .value,
-          ).toBe('')
+          await waitFor(() => {
+            expect(
+              (component.getByTestId('course-copy-select-preloaded-courses') as HTMLInputElement)
+                .value,
+            ).toBe('')
+          })
         })
 
         it('should throw invalid message on empty selected course', async () => {

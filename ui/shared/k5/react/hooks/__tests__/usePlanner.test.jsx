@@ -29,12 +29,12 @@ if (typeof vi !== 'undefined') {
     showFlashError: vi.fn(() => () => {}),
   }))
 }
-jest.mock('@canvas/planner', () => ({
-  initializePlanner: jest.fn(options => Promise.resolve(options)),
+vi.mock('@canvas/planner', () => ({
+  initializePlanner: vi.fn(options => Promise.resolve(options)),
 }))
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
-  showFlashError: jest.fn(() => () => {}),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
+  showFlashError: vi.fn(() => () => {}),
 }))
 
 import React from 'react'

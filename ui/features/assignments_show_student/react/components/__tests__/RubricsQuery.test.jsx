@@ -25,8 +25,8 @@ import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {useAllPages} from '@canvas/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/query', () => ({
-  useAllPages: jest.fn(),
+vi.mock('@canvas/query', () => ({
+  useAllPages: vi.fn(),
 }))
 
 async function makeMocks() {

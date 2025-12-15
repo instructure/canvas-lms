@@ -23,9 +23,9 @@ import {render, fireEvent} from '@testing-library/react'
 describe('OnlineUrlSubmission', () => {
   const getProps = (override = {}) => {
     return {
-      setValue: jest.fn(),
-      getShouldShowUrlError: jest.fn(),
-      setShouldShowUrlError: jest.fn(),
+      setValue: vi.fn(),
+      getShouldShowUrlError: vi.fn(),
+      setShouldShowUrlError: vi.fn(),
       ...override,
     }
   }
@@ -45,7 +45,7 @@ describe('OnlineUrlSubmission', () => {
   it('displays errors on focus if getShouldShowUrlError returns true', async () => {
     const {findByTestId, getByText} = render(
       <OnlineUrlSubmission
-        {...getProps({getShouldShowUrlError: jest.fn().mockReturnValue(true)})}
+        {...getProps({getShouldShowUrlError: vi.fn().mockReturnValue(true)})}
       />,
     )
     const urlInput = await findByTestId('online-url-input')
@@ -54,11 +54,11 @@ describe('OnlineUrlSubmission', () => {
   })
 
   it('clears errors when input is being changed', async () => {
-    const setShouldShowUrlErrorMock = jest.fn()
+    const setShouldShowUrlErrorMock = vi.fn()
     const {findByTestId, getByText, queryByText} = render(
       <OnlineUrlSubmission
         {...getProps({
-          getShouldShowUrlError: jest.fn().mockReturnValue(true),
+          getShouldShowUrlError: vi.fn().mockReturnValue(true),
           setShouldShowUrlError: setShouldShowUrlErrorMock,
         })}
       />,
@@ -73,7 +73,7 @@ describe('OnlineUrlSubmission', () => {
   })
 
   it('clears errors on blur if the input is empty', async () => {
-    const setShouldShowUrlErrorMock = jest.fn()
+    const setShouldShowUrlErrorMock = vi.fn()
     const {findByTestId, queryByText} = render(
       <OnlineUrlSubmission {...getProps({setShouldShowUrlError: setShouldShowUrlErrorMock})} />,
     )
@@ -84,7 +84,7 @@ describe('OnlineUrlSubmission', () => {
   })
 
   it('calls setValue when the input changes', async () => {
-    const setValueMock = jest.fn()
+    const setValueMock = vi.fn()
     const {findByTestId} = render(<OnlineUrlSubmission {...getProps({setValue: setValueMock})} />)
     const urlInput = await findByTestId('online-url-input')
     fireEvent.input(urlInput, {target: {value: 'www.'}})

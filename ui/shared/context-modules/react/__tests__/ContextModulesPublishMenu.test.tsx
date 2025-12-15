@@ -29,27 +29,28 @@ import {
 import {monitorProgress, cancelProgressAction} from '@canvas/progress/ProgressHelpers'
 
 import ContextModulesPublishMenu from '../ContextModulesPublishMenu'
+import {type Mock} from 'vitest'
 
 const server = setupServer()
 
-jest.mock('@canvas/progress/ProgressHelpers', () => ({
+vi.mock('@canvas/progress/ProgressHelpers', () => ({
   _esModule: true,
-  monitorProgress: jest.fn(),
-  cancelProgressAction: jest.fn(),
+  monitorProgress: vi.fn(),
+  cancelProgressAction: vi.fn(),
 }))
 
-jest.mock('../../utils/publishAllModulesHelper', () => ({
+vi.mock('../../utils/publishAllModulesHelper', () => ({
   __esModule: true,
-  updateModulePendingPublishedStates: jest.fn(),
-  batchUpdateAllModulesApiCall: jest.fn(),
-  fetchAllItemPublishedStates: jest.fn(),
+  updateModulePendingPublishedStates: vi.fn(),
+  batchUpdateAllModulesApiCall: vi.fn(),
+  fetchAllItemPublishedStates: vi.fn(),
 }))
 
-const mockUpdateModulePendingPublishedStates = updateModulePendingPublishedStates as jest.Mock
-const mockMonitorProgress = monitorProgress as jest.Mock
-const mockBatchUpdateAllModulesApiCall = batchUpdateAllModulesApiCall as jest.Mock
-const mockCancelProgressAction = cancelProgressAction as jest.Mock
-const mockFetchAllItemPublishedStates = fetchAllItemPublishedStates as jest.Mock
+const mockUpdateModulePendingPublishedStates = updateModulePendingPublishedStates as Mock
+const mockMonitorProgress = monitorProgress as Mock
+const mockBatchUpdateAllModulesApiCall = batchUpdateAllModulesApiCall as Mock
+const mockCancelProgressAction = cancelProgressAction as Mock
+const mockFetchAllItemPublishedStates = fetchAllItemPublishedStates as Mock
 
 const defaultProps = {
   courseId: '1',
@@ -144,12 +145,12 @@ describe('ContextModulesPublishMenu', () => {
     })
 
     describe('progress', () => {
-      let mockMonitorProgress: jest.Mock
-      let mockBatchUpdateAllModulesApiCall: jest.Mock
+      let mockMonitorProgress: Mock
+      let mockBatchUpdateAllModulesApiCall: Mock
 
       beforeEach(() => {
-        mockMonitorProgress = monitorProgress as jest.Mock
-        mockBatchUpdateAllModulesApiCall = batchUpdateAllModulesApiCall as jest.Mock
+        mockMonitorProgress = monitorProgress as Mock
+        mockBatchUpdateAllModulesApiCall = batchUpdateAllModulesApiCall as Mock
         mockBatchUpdateAllModulesApiCall.mockImplementation(() =>
           Promise.resolve({
             json: {

@@ -17,28 +17,28 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import HelpTray from '../HelpTray'
 import {useHelpTray, useNewLoginData} from '../../context'
 import {userEvent} from '@testing-library/user-event'
 
-jest.mock('../../context', () => {
-  const originalModule = jest.requireActual('../../context')
+vi.mock('../../context', async () => {
+  const originalModule = await vi.importActual('../../context')
   return {
     ...originalModule,
-    useHelpTray: jest.fn(),
-    useNewLoginData: jest.fn(),
+    useHelpTray: vi.fn(),
+    useNewLoginData: vi.fn(),
   }
 })
 
-jest.mock('@canvas/help-dialog', () => ({
+vi.mock('@canvas/help-dialog', () => ({
   __esModule: true,
   default: () => <div data-testid="help-dialog">Mocked HelpDialog</div>,
 }))
 
-const mockUseHelpTray = useHelpTray as jest.Mock
-const mockUseNewLoginData = useNewLoginData as jest.Mock
+const mockUseHelpTray = vi.mocked(useHelpTray)
+const mockUseNewLoginData = vi.mocked(useNewLoginData)
 
 const renderHelpTray = () => {
   const queryClient = new QueryClient()
@@ -50,27 +50,46 @@ const renderHelpTray = () => {
 }
 
 describe('HelpTray', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
-    mockUseNewLoginData.mockReturnValue({helpLink: {text: 'Support'}})
+    vi.clearAllMocks()
+    mockUseNewLoginData.mockReturnValue({
+      isDataLoading: false,
+      helpLink: {text: 'Support', trackCategory: 'help', trackLabel: 'help_link'},
+    })
   })
 
   it('renders the tray with heading text', () => {
-    mockUseHelpTray.mockReturnValue({isHelpTrayOpen: true, closeHelpTray: jest.fn()})
+    mockUseHelpTray.mockReturnValue({
+      isHelpTrayOpen: true,
+      openHelpTray: vi.fn(),
+      closeHelpTray: vi.fn(),
+    })
     renderHelpTray()
     expect(screen.getByText('Support')).toBeInTheDocument()
     expect(screen.getByTestId('help-tray')).toBeInTheDocument()
   })
 
   it('renders the HelpDialog inside the tray', () => {
-    mockUseHelpTray.mockReturnValue({isHelpTrayOpen: true, closeHelpTray: jest.fn()})
+    mockUseHelpTray.mockReturnValue({
+      isHelpTrayOpen: true,
+      openHelpTray: vi.fn(),
+      closeHelpTray: vi.fn(),
+    })
     renderHelpTray()
     expect(screen.getByTestId('help-dialog')).toBeInTheDocument()
   })
 
   it('calls closeHelpTray when CloseButton is clicked', async () => {
-    const closeHelpTray = jest.fn()
-    mockUseHelpTray.mockReturnValue({isHelpTrayOpen: true, closeHelpTray})
+    const closeHelpTray = vi.fn()
+    mockUseHelpTray.mockReturnValue({
+      isHelpTrayOpen: true,
+      openHelpTray: vi.fn(),
+      closeHelpTray,
+    })
     renderHelpTray()
     const wrapper = screen.getByTestId('close-help-tray-button')
     const button = wrapper.querySelector('button')
@@ -82,7 +101,11 @@ describe('HelpTray', () => {
   })
 
   it('does not render tray if isHelpTrayOpen is false', () => {
-    mockUseHelpTray.mockReturnValue({isHelpTrayOpen: false, closeHelpTray: jest.fn()})
+    mockUseHelpTray.mockReturnValue({
+      isHelpTrayOpen: false,
+      openHelpTray: vi.fn(),
+      closeHelpTray: vi.fn(),
+    })
     renderHelpTray()
     expect(screen.queryByTestId('help-tray')).not.toBeInTheDocument()
   })

@@ -52,15 +52,15 @@ const duplicates = {
 const defaultProps = {
   duplicates,
   inviteUsersURL: '/courses/#/invite_users',
-  onSelectDuplicate: jest.fn(),
-  onNewForDuplicate: jest.fn(),
-  onSkipDuplicate: jest.fn(),
+  onSelectDuplicate: vi.fn(),
+  onNewForDuplicate: vi.fn(),
+  onSkipDuplicate: vi.fn(),
   fieldsRefAndError: {},
 }
 
 describe('DuplicateSection', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the component with user list', () => {

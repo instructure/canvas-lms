@@ -21,16 +21,16 @@ import {render, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ComposeActionButtons} from '../ComposeActionButtons'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: () => {},
   showFlashError: () => () => {},
 }))
 
 const createProps = overrides => ({
-  onAttachmentUpload: jest.fn(),
-  onMediaUpload: overrides?.hasOwnProperty('onMediaUpload') ? overrides.onMediaUpload : jest.fn(),
-  onCancel: jest.fn(),
-  onSend: jest.fn(),
+  onAttachmentUpload: vi.fn(),
+  onMediaUpload: overrides?.hasOwnProperty('onMediaUpload') ? overrides.onMediaUpload : vi.fn(),
+  onCancel: vi.fn(),
+  onSend: vi.fn(),
   isSending: false,
   ...overrides,
 })
@@ -38,7 +38,7 @@ const createProps = overrides => ({
 describe('ComposeActionButtons', () => {
   afterEach(() => {
     cleanup()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('attachment upload', () => {

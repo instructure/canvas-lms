@@ -39,8 +39,8 @@ describe('EarlyAccessModal', () => {
   })
 
   it('calls onAccept after successful API call when accept button is clicked', async () => {
-    const onAccept = jest.fn()
-    const onCancel = jest.fn()
+    const onAccept = vi.fn()
+    const onCancel = vi.fn()
 
     fetchMock.postOnce('/api/v1/accounts/1/features/early_access_program', {
       early_access_program: true,
@@ -67,8 +67,8 @@ describe('EarlyAccessModal', () => {
   })
 
   it('calls onCancel without API call when cancel button is clicked', async () => {
-    const onAccept = jest.fn()
-    const onCancel = jest.fn()
+    const onAccept = vi.fn()
+    const onCancel = vi.fn()
 
     const {getByText, getByTestId} = render(
       <EarlyAccessModal isOpen={true} onAccept={onAccept} onCancel={onCancel} />,
@@ -85,8 +85,8 @@ describe('EarlyAccessModal', () => {
   })
 
   it('does not render when isOpen is false', () => {
-    const onAccept = jest.fn()
-    const onCancel = jest.fn()
+    const onAccept = vi.fn()
+    const onCancel = vi.fn()
 
     const {queryByText} = render(
       <EarlyAccessModal isOpen={false} onAccept={onAccept} onCancel={onCancel} />,

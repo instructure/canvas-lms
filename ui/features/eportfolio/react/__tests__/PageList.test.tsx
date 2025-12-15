@@ -40,7 +40,7 @@ describe('PageList', () => {
     portfolio: portfolio,
     sectionId: section.id,
     sectionName: section.name,
-    onUpdate: jest.fn(),
+    onUpdate: vi.fn(),
     isOwner: true,
   }
 

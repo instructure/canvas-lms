@@ -32,9 +32,9 @@ import {
   CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE,
 } from '../../../../util/constants'
 
-jest.mock('../../../../util/utils', () => ({
-  ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn(),
+vi.mock('../../../../util/utils', async () => ({
+  ...(await vi.importActual('../../../../util/utils')),
+  responsiveQuerySizes: vi.fn(),
 }))
 
 describe('MessageDetailContainer', () => {
@@ -43,12 +43,12 @@ describe('MessageDetailContainer', () => {
   beforeAll(() => {
     server.listen({onUnhandledRequest: 'error'})
 
-    window.matchMedia = jest.fn().mockImplementation(() => ({
+    window.matchMedia = vi.fn().mockImplementation(() => ({
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }))
 
     responsiveQuerySizes.mockImplementation(() => ({
@@ -57,7 +57,7 @@ describe('MessageDetailContainer', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(async () => {
@@ -67,24 +67,24 @@ describe('MessageDetailContainer', () => {
 
   afterAll(() => {
     server.close()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   const setup = async ({
     conversation = Conversation.mock(),
     isSubmissionCommentsType = false,
-    onReply = jest.fn(),
-    onReplyAll = jest.fn(),
-    onDelete = jest.fn(),
-    onForward = jest.fn(),
-    onReadStateChange = jest.fn(),
-    setOnSuccess = jest.fn(),
-    setCanReply = jest.fn(),
+    onReply = vi.fn(),
+    onReplyAll = vi.fn(),
+    onDelete = vi.fn(),
+    onForward = vi.fn(),
+    onReadStateChange = vi.fn(),
+    setOnSuccess = vi.fn(),
+    setCanReply = vi.fn(),
     overrideProps = {},
   } = {}) => {
     const container = render(
       <ApolloProvider client={mswClient}>
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess}}>
           <ConversationContext.Provider value={{isSubmissionCommentsType}}>
             <MessageDetailContainer
               conversation={conversation}

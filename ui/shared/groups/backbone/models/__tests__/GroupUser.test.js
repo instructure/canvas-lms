@@ -28,12 +28,12 @@ describe('GroupUser', () => {
   beforeEach(() => {
     const groupCategory = new GroupCategory()
     groupUser = new GroupUser({category: groupCategory})
-    leaveGroupSpy = jest.spyOn(groupUser, 'leaveGroup')
-    joinGroupSpy = jest.spyOn(groupUser, 'joinGroup')
+    leaveGroupSpy = vi.spyOn(groupUser, 'leaveGroup')
+    joinGroupSpy = vi.spyOn(groupUser, 'joinGroup')
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('updates group correctly upon save and fires joinGroup and leaveGroup appropriately', () => {

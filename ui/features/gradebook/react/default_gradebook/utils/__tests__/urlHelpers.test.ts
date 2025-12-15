@@ -23,10 +23,10 @@ describe('urlHelpers', () => {
     window.history.pushState({}, '', url)
   }
 
-  let replaceStateSpy: jest.SpyInstance
+  let replaceStateSpy: any
 
   beforeEach(() => {
-    replaceStateSpy = jest.spyOn(window.history, 'replaceState')
+    replaceStateSpy = vi.spyOn(window.history, 'replaceState')
   })
 
   afterEach(() => {

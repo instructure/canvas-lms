@@ -16,15 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, screen} from '@testing-library/react'
+import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 import React from 'react'
 import {Card} from '..'
 
 describe('Card', () => {
-  const mockOnClick = jest.fn()
+  const mockOnClick = vi.fn()
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    cleanup()
   })
 
   it('mounts without crashing', () => {

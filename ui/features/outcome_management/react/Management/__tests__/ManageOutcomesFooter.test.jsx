@@ -40,16 +40,16 @@ describe('ManageOutcomesFooter', () => {
     selectedCount: numberToGenerate,
     onRemoveHandler: onRemoveHandlerMock,
     onMoveHandler: onMoveHandlerMock,
-    onClearHandler: jest.fn(),
+    onClearHandler: vi.fn(),
   })
 
   beforeEach(() => {
-    onRemoveHandlerMock = jest.fn()
-    onMoveHandlerMock = jest.fn()
+    onRemoveHandlerMock = vi.fn()
+    onMoveHandlerMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderWithContext = children => {

@@ -23,13 +23,13 @@ import {userEvent} from '@testing-library/user-event'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 // Mock the flash alert module
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: jest.fn(() => jest.fn()),
-  showFlashError: jest.fn(() => jest.fn()),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashSuccess: vi.fn(() => vi.fn()),
+  showFlashError: vi.fn(() => vi.fn()),
 }))
 
 describe('GroupCategoryMessageAllUnassignedModal', () => {
-  const onDismiss = jest.fn()
+  const onDismiss = vi.fn()
   const open = true
   const recipients = [{id: '1', short_name: 'name'}]
   const groupCategory = {
@@ -153,7 +153,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
 
   describe('errors', () => {
     beforeEach(() => {
-      jest.spyOn(console, 'error').mockImplementation()
+      vi.spyOn(console, 'error').mockImplementation()
     })
 
     afterEach(() => {

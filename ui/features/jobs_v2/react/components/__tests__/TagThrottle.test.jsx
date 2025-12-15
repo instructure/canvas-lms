@@ -23,6 +23,14 @@ import TagThrottle from '../TagThrottle'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
+// Mock the debounce hook to avoid timer issues
+vi.mock('@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm', () => ({
+  default: (initialValue) => ({
+    searchTerm: initialValue,
+    setSearchTerm: vi.fn(),
+  }),
+}))
+
 const server = setupServer()
 
 const fakeJobs = [
@@ -57,7 +65,6 @@ describe('TagThrottle', () => {
         HttpResponse.json({new_strand: 'tmp_strand_XXX', job_count: 27}),
       ),
     )
-    jest.useFakeTimers()
   })
 
   afterAll(() => server.close())
@@ -72,7 +79,7 @@ describe('TagThrottle', () => {
 
   it("doesn't call /throttle/check until modal opened", async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const onUpdate = jest.fn()
+    const onUpdate = vi.fn()
     let requestMade = false
     let requestParams = null
     server.use(
@@ -95,9 +102,7 @@ describe('TagThrottle', () => {
     const {getByText} = render(<TagThrottle tag="foobar" jobs={fakeJobs} onUpdate={onUpdate} />)
     expect(requestMade).toBe(false)
     await user.click(getByText('Throttle tag "foobar"', {selector: 'button span'}))
-    await jest.runOnlyPendingTimers()
-
-    expect(requestMade).toBe(true)
+    await waitFor(() => expect(requestMade).toBe(true))
     expect(requestParams).toEqual({term: 'foobar', shard_id: '101'})
     expect(getByText('Matched 21 jobs with 2 tags')).toBeInTheDocument()
     expect(onUpdate).not.toHaveBeenCalled()
@@ -105,7 +110,7 @@ describe('TagThrottle', () => {
 
   it('performs a throttle job', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const onUpdate = jest.fn()
+    const onUpdate = vi.fn()
     let lastCheckRequestParams = null
     let throttleRequestParams = null
     server.use(
@@ -137,24 +142,20 @@ describe('TagThrottle', () => {
       <TagThrottle tag="foobar" jobs={fakeJobs} onUpdate={onUpdate} />,
     )
     await user.click(getByText('Throttle tag "foobar"', {selector: 'button span'}))
-    await jest.runOnlyPendingTimers()
 
     await user.clear(getByLabelText('Tag starts with'))
     await user.type(getByLabelText('Tag starts with'), 'foo')
     await user.clear(getByLabelText('Shard ID (optional)'))
     await user.clear(getByLabelText('New Concurrency'))
     await user.type(getByLabelText('New Concurrency'), '2')
-    await jest.advanceTimersByTime(1000)
-    await jest.runOnlyPendingTimers()
 
-    expect(lastCheckRequestParams).toEqual({term: 'foo', shard_id: ''})
+    await waitFor(() => expect(lastCheckRequestParams).toEqual({term: 'foo', shard_id: ''}))
     await waitFor(() => {
       expect(getByText('Matched 27 jobs with 3 tags')).toBeInTheDocument()
     })
     await user.click(getByText('Throttle Jobs', {selector: 'button span'}))
-    await jest.runOnlyPendingTimers()
 
-    expect(throttleRequestParams).toEqual({term: 'foo', shard_id: '', max_concurrent: '2'})
+    await waitFor(() => expect(throttleRequestParams).toEqual({term: 'foo', shard_id: '', max_concurrent: '2'}))
     expect(onUpdate).toHaveBeenCalledWith({
       job_count: 27,
       new_strand: 'tmp_strand_XXX',

@@ -69,12 +69,7 @@ function defaultProps({props = {}, filterSettings = {}} = {}) {
 }
 
 function mouseover($el: any) {
-  const event = new MouseEvent('mouseover', {
-    bubbles: true,
-    cancelable: true,
-    view: window,
-  })
-  $el.dispatchEvent(event)
+  fireEvent.mouseOver($el)
 }
 
 function getMenuItemWithLabel($parent: Element, label: any) {
@@ -141,7 +136,7 @@ describe('ViewOptionsMenu', () => {
     })
 
     test('triggers the onSelect when the "Notes" option is clicked', function () {
-      const spy = jest.spyOn(props.teacherNotes, 'onSelect')
+      const spy = vi.spyOn(props.teacherNotes, 'onSelect')
       wrapper = mountAndOpenOptions()
       fireEvent.click(getMenuItem(ref.current.menuContent, 'Notes'))
       expect(spy).toHaveBeenCalledTimes(1)
@@ -194,7 +189,7 @@ describe('ViewOptionsMenu', () => {
     })
 
     test('onSelect is called when a filter is selected', function () {
-      props.filterSettings.onSelect = jest.fn()
+      props.filterSettings.onSelect = vi.fn()
       wrapper = mountAndOpenOptions()
       fireEvent.click(getMenuItem(ref.current.menuContent, 'Filters', 'Grading Periods'))
       expect(props.filterSettings.onSelect).toHaveBeenCalledTimes(1)
@@ -202,7 +197,7 @@ describe('ViewOptionsMenu', () => {
     })
 
     test('onSelect is called with list of selected filters upon any selection change', function () {
-      props.filterSettings.onSelect = jest.fn()
+      props.filterSettings.onSelect = vi.fn()
       props.filterSettings.selected = ['assignmentGroups', 'sections']
       wrapper = mountAndOpenOptions()
       fireEvent.click(getMenuItem(ref.current.menuContent, 'Filters', 'Grading Periods'))
@@ -252,7 +247,7 @@ describe('ViewOptionsMenu', () => {
     test('onSelectViewUngradedAsZero is called when selected', function () {
       props.viewUngradedAsZero = false
       props.allowViewUngradedAsZero = true
-      props.onSelectViewUngradedAsZero = jest.fn()
+      props.onSelectViewUngradedAsZero = vi.fn()
       wrapper = mountAndOpenOptions()
       fireEvent.click(getMenuItem(ref.current.menuContent, 'View Ungraded as 0'))
       expect(props.onSelectViewUngradedAsZero).toHaveBeenCalledTimes(1)
@@ -280,7 +275,7 @@ describe('ViewOptionsMenu', () => {
     })
 
     test('onSelectShowUnpublishedAssignment is called when selected', function () {
-      props.onSelectShowUnpublishedAssignments = jest.fn()
+      props.onSelectShowUnpublishedAssignments = vi.fn()
       wrapper = mountAndOpenOptions()
       fireEvent.click(getMenuItem(ref.current.menuContent, 'Unpublished Assignments'))
       expect(props.onSelectShowUnpublishedAssignments).toHaveBeenCalledTimes(1)
@@ -328,15 +323,15 @@ describe('ViewOptionsMenu', () => {
           direction,
           disabled,
           modulesEnabled,
-          onSortByDefault: jest.fn(),
-          onSortByNameAscending: jest.fn(),
-          onSortByNameDescending: jest.fn(),
-          onSortByDueDateAscending: jest.fn(),
-          onSortByDueDateDescending: jest.fn(),
-          onSortByPointsAscending: jest.fn(),
-          onSortByPointsDescending: jest.fn(),
-          onSortByModuleAscending: jest.fn(),
-          onSortByModuleDescending: jest.fn(),
+          onSortByDefault: vi.fn(),
+          onSortByNameAscending: vi.fn(),
+          onSortByNameDescending: vi.fn(),
+          onSortByDueDateAscending: vi.fn(),
+          onSortByDueDateDescending: vi.fn(),
+          onSortByPointsAscending: vi.fn(),
+          onSortByPointsDescending: vi.fn(),
+          onSortByModuleAscending: vi.fn(),
+          onSortByModuleDescending: vi.fn(),
         },
       }
     }
@@ -591,7 +586,7 @@ describe('ViewOptionsMenu', () => {
 
   describe('ViewOptionsMenu - Statuses', () => {
     test('clicking Statuses calls onSelectShowStatusesModal', () => {
-      props.onSelectShowStatusesModal = jest.fn()
+      props.onSelectShowStatusesModal = vi.fn()
       wrapper = mountAndOpenOptions()
       fireEvent.click(getMenuItem(ref.current.menuContent, 'Statuses…'))
       expect(props.onSelectShowStatusesModal).toHaveBeenCalledTimes(1)

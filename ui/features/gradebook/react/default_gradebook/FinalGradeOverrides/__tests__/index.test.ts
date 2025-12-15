@@ -27,12 +27,12 @@ import * as FinalGradeOverrideApi from '@canvas/grading/FinalGradeOverrideApi'
 import FinalGradeOverrides from '../index'
 
 // Mock the external dependencies
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
-jest.mock('@canvas/grading/FinalGradeOverrideApi', () => ({
-  updateFinalGradeOverride: jest.fn(),
+vi.mock('@canvas/grading/FinalGradeOverrideApi', () => ({
+  updateFinalGradeOverride: vi.fn(),
 }))
 
 describe('Gradebook FinalGradeOverrides', () => {
@@ -58,10 +58,10 @@ describe('Gradebook FinalGradeOverrides', () => {
       gradingPeriodId: '1501',
 
       gradebookGrid: {
-        updateRowCell: jest.fn(),
+        updateRowCell: vi.fn(),
       },
 
-      isFilteringColumnsByGradingPeriod: jest.fn().mockReturnValue(false),
+      isFilteringColumnsByGradingPeriod: vi.fn().mockReturnValue(false),
 
       student(id) {
         return students[id]
@@ -173,12 +173,8 @@ describe('Gradebook FinalGradeOverrides', () => {
 
   describe('#updateGrade()', () => {
     const mockUpdateFinalGradeOverride =
-      FinalGradeOverrideApi.updateFinalGradeOverride as jest.MockedFunction<
-        typeof FinalGradeOverrideApi.updateFinalGradeOverride
-      >
-    const mockShowFlashAlert = FlashAlert.showFlashAlert as jest.MockedFunction<
-      typeof FlashAlert.showFlashAlert
-    >
+      FinalGradeOverrideApi.updateFinalGradeOverride as any
+    const mockShowFlashAlert = FlashAlert.showFlashAlert as any
 
     beforeEach(() => {
       mockUpdateFinalGradeOverride.mockResolvedValue({percentage: 90.0})
@@ -186,7 +182,7 @@ describe('Gradebook FinalGradeOverrides', () => {
     })
 
     afterEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     async function finished() {

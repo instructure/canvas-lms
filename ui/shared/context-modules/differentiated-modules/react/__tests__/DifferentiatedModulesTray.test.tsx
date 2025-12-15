@@ -48,7 +48,7 @@ describe('DifferentiatedModulesTray', () => {
   const OVERRIDES_URL = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
 
   it('calls onDismiss when close button is clicked', () => {
-    const onDismiss = jest.fn()
+    const onDismiss = vi.fn()
     const {getByRole} = renderComponent({onDismiss})
     getByRole('button', {name: /close/i}).click()
     expect(onDismiss).toHaveBeenCalled()

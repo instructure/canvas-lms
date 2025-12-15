@@ -18,7 +18,8 @@
 
 import store from '../index'
 import type {InitialRowFilterSettings, InitialColumnFilterSettings} from '../filtersState'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import type {GradebookFilterApiResponse, PartialFilterPreset} from '../../gradebook.d'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
@@ -80,19 +81,35 @@ const customStatuses: GradeStatus[] = [
   },
 ]
 
+const server = setupServer()
+
 describe('filtersState', () => {
   const courseId = store.getState().courseId
 
+  beforeEach(() => {
+    server.listen({onUnhandledRequest: 'bypass'})
+  })
+
   afterEach(() => {
     store.setState(originalState, true)
-    fetchMock.restore()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('fetches filters', async () => {
     const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.get(url, mockResponse.slice(0, 1))
+    let getCalled = false
+    server.use(
+      http.get(url, () => {
+        getCalled = true
+        return HttpResponse.json(mockResponse.slice(0, 1))
+      })
+    )
     await store.getState().fetchFilters()
-    expect(fetchMock.called(url, 'GET')).toBe(true)
+    expect(getCalled).toBe(true)
     expect(store.getState().filterPresets).toMatchObject([
       {
         id: '321',
@@ -135,9 +152,15 @@ describe('filtersState', () => {
       updated_at: '2022-01-01T00:00:00Z',
     }
     const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.post(url, mockResponse[0])
+    let postCalled = false
+    server.use(
+      http.post(url, () => {
+        postCalled = true
+        return HttpResponse.json(mockResponse[0])
+      })
+    )
     await store.getState().saveStagedFilter(newFilter)
-    expect(fetchMock.called(url, 'POST')).toBe(true)
+    expect(postCalled).toBe(true)
     expect(store.getState().stagedFilters).toHaveLength(0)
     expect(store.getState().filterPresets).toMatchObject([
       {
@@ -177,12 +200,18 @@ describe('filtersState', () => {
       ],
     })
     const url = `/api/v1/courses/${courseId}/gradebook_filters/321`
-    fetchMock.put(url, {
-      gradebook_filter: {
-        ...mockResponse[0].gradebook_filter,
-        name: 'filter 1 (renamed)',
-      },
-    })
+    let putCalled = false
+    server.use(
+      http.put(url, () => {
+        putCalled = true
+        return HttpResponse.json({
+          gradebook_filter: {
+            ...mockResponse[0].gradebook_filter,
+            name: 'filter 1 (renamed)',
+          },
+        })
+      })
+    )
     await store.getState().updateFilterPreset({
       id: '321',
       name: 'filter 1 (renamed)',
@@ -197,7 +226,7 @@ describe('filtersState', () => {
       created_at: '2020-01-01T00:00:00Z',
       updated_at: '2020-01-01T00:00:00Z',
     })
-    expect(fetchMock.called(url, 'PUT')).toBe(true)
+    expect(putCalled).toBe(true)
     expect(store.getState().filterPresets).toMatchObject([
       {
         id: '321',
@@ -228,7 +257,13 @@ describe('filtersState', () => {
       ],
     })
     const url = `/api/v1/courses/${courseId}/gradebook_filters/321`
-    fetchMock.delete(url, mockResponse[0])
+    let deleteCalled = false
+    server.use(
+      http.delete(url, () => {
+        deleteCalled = true
+        return HttpResponse.json(mockResponse[0])
+      })
+    )
     await store.getState().deleteFilterPreset({
       id: '321',
       name: 'filter 1 (renamed)',
@@ -236,13 +271,11 @@ describe('filtersState', () => {
       created_at: '2020-01-01T00:00:00Z',
       updated_at: '2020-01-01T00:00:00Z',
     })
-    expect(fetchMock.called(url, 'DELETE')).toBe(true)
+    expect(deleteCalled).toBe(true)
     expect(store.getState().filterPresets).toMatchObject([])
   })
 
   it('does not derive staged filter from empty gradebook settings', async () => {
-    const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
       student_group_id: null,
@@ -268,8 +301,6 @@ describe('filtersState', () => {
   })
 
   it('derive staged section filter from gradebook settings', async () => {
-    const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: '1',
       student_group_id: null,
@@ -302,8 +333,6 @@ describe('filtersState', () => {
   })
 
   it('derive staged student group filter from gradebook settings', async () => {
-    const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
       student_group_id: '1',
@@ -336,8 +365,6 @@ describe('filtersState', () => {
   })
 
   it('derive staged assignment group filter from gradebook settings', async () => {
-    const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
       student_group_id: null,
@@ -370,8 +397,6 @@ describe('filtersState', () => {
   })
 
   it('derive staged submission filter from gradebook settings', async () => {
-    const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
       student_group_id: null,
@@ -404,8 +429,6 @@ describe('filtersState', () => {
   })
 
   it('derive staged submission status filter from gradebook settings', async () => {
-    const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
       student_group_id: null,
@@ -438,8 +461,6 @@ describe('filtersState', () => {
   })
 
   it(`does not derive staged assignment group filter from '0'`, async () => {
-    const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
       student_group_id: null,
@@ -465,8 +486,6 @@ describe('filtersState', () => {
   })
 
   it('derive staged grading period filter from gradebook settings', async () => {
-    const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
       student_group_id: null,
@@ -499,8 +518,6 @@ describe('filtersState', () => {
   })
 
   it('derive staged module filter from gradebook settings', async () => {
-    const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
       student_group_id: null,
@@ -532,8 +549,6 @@ describe('filtersState', () => {
   })
 
   it(`does not derive staged module filter from '0'`, async () => {
-    const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
       student_group_id: null,
@@ -559,8 +574,6 @@ describe('filtersState', () => {
   })
 
   it('derive staged start date filter from gradebook settings', async () => {
-    const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
       student_group_id: null,
@@ -593,8 +606,6 @@ describe('filtersState', () => {
   })
 
   it('derive staged end date filter from gradebook settings', async () => {
-    const url = `/api/v1/courses/${courseId}/gradebook_filters`
-    fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
       student_group_id: null,
@@ -646,11 +657,14 @@ describe('filtersState', () => {
       ],
     })
 
-    fetchMock
-      .putOnce(`/api/v1/courses/${courseId}/gradebook_filters/321`, mockResponse[0])
-      .putOnce(`/api/v1/courses/${courseId}/gradebook_filters/432`, mockResponse[1], {
-        overwriteRoutes: false,
+    server.use(
+      http.put(`/api/v1/courses/${courseId}/gradebook_filters/321`, () => {
+        return HttpResponse.json(mockResponse[0])
+      }),
+      http.put(`/api/v1/courses/${courseId}/gradebook_filters/432`, () => {
+        return HttpResponse.json(mockResponse[1])
       })
+    )
     await store.getState().updateFilterPreset({
       id: '321',
       name: 'filter 1',
@@ -676,8 +690,6 @@ describe('filtersState', () => {
 
   describe('multi-select', () => {
     it('derive staged section filter from gradebook settings', async () => {
-      const url = `/api/v1/courses/${courseId}/gradebook_filters`
-      fetchMock.post(url, mockResponse[0])
       const initialRowFilterSettings: InitialRowFilterSettings = {
         section_id: null,
         section_ids: ['1', '2'],
@@ -716,8 +728,6 @@ describe('filtersState', () => {
     })
 
     it('derive staged student group filter from gradebook settings', async () => {
-      const url = `/api/v1/courses/${courseId}/gradebook_filters`
-      fetchMock.post(url, mockResponse[0])
       const initialRowFilterSettings: InitialRowFilterSettings = {
         section_id: null,
         student_group_id: '1',
@@ -756,8 +766,6 @@ describe('filtersState', () => {
     })
 
     it('derive staged assignment group filter from gradebook settings', async () => {
-      const url = `/api/v1/courses/${courseId}/gradebook_filters`
-      fetchMock.post(url, mockResponse[0])
       const initialRowFilterSettings: InitialRowFilterSettings = {
         section_id: null,
         student_group_id: null,
@@ -796,8 +804,6 @@ describe('filtersState', () => {
     })
 
     it('derive staged submission filter from gradebook settings', async () => {
-      const url = `/api/v1/courses/${courseId}/gradebook_filters`
-      fetchMock.post(url, mockResponse[0])
       const initialRowFilterSettings: InitialRowFilterSettings = {
         section_id: null,
         student_group_id: null,
@@ -841,8 +847,6 @@ describe('filtersState', () => {
     })
 
     it('derive staged module filter from gradebook settings', async () => {
-      const url = `/api/v1/courses/${courseId}/gradebook_filters`
-      fetchMock.post(url, mockResponse[0])
       const initialRowFilterSettings: InitialRowFilterSettings = {
         section_id: null,
         student_group_id: null,
@@ -881,8 +885,6 @@ describe('filtersState', () => {
     })
 
     it('derive staged grading period filter from gradebook settings', async () => {
-      const url = `/api/v1/courses/${courseId}/gradebook_filters`
-      fetchMock.post(url, mockResponse[0])
       const initialRowFilterSettings: InitialRowFilterSettings = {
         section_id: null,
         student_group_id: null,
@@ -915,8 +917,6 @@ describe('filtersState', () => {
     })
 
     it('derive staged start date filter from gradebook settings', async () => {
-      const url = `/api/v1/courses/${courseId}/gradebook_filters`
-      fetchMock.post(url, mockResponse[0])
       const initialRowFilterSettings: InitialRowFilterSettings = {
         section_id: null,
         student_group_id: null,
@@ -949,8 +949,6 @@ describe('filtersState', () => {
     })
 
     it('derive staged end date filter from gradebook settings', async () => {
-      const url = `/api/v1/courses/${courseId}/gradebook_filters`
-      fetchMock.post(url, mockResponse[0])
       const initialRowFilterSettings: InitialRowFilterSettings = {
         section_id: null,
         student_group_id: null,

@@ -23,16 +23,19 @@ import {DashboardHeader} from '../DashboardHeader'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import {resetPlanner} from '@canvas/planner'
 
-jest.mock('@canvas/planner', () => ({
-  ...jest.requireActual('@canvas/planner'),
-  resetPlanner: jest.fn(),
-  initializePlanner: jest.fn().mockResolvedValue(),
-  loadPlannerDashboard: jest.fn(),
-}))
+vi.mock('@canvas/planner', async () => {
+  const actual = await vi.importActual('@canvas/planner')
+  return {
+    ...actual,
+    resetPlanner: vi.fn(),
+    initializePlanner: vi.fn().mockResolvedValue(),
+    loadPlannerDashboard: vi.fn(),
+  }
+})
 
 injectGlobalAlertContainers()
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 const defaultEnv = {
   current_user: {id: '1'},
@@ -78,11 +81,11 @@ describe('DashboardHeader', () => {
       STUDENT_PLANNER_COURSES: [],
     }
     resetPlanner()
-    plannerSpy = jest.spyOn(DashboardHeader.prototype, 'loadPlannerComponent')
-    saveDashboardViewSpy = jest
+    plannerSpy = vi.spyOn(DashboardHeader.prototype, 'loadPlannerComponent')
+    saveDashboardViewSpy = vi
       .spyOn(DashboardHeader.prototype, 'saveDashboardView')
       .mockImplementation(() => {})
-    cardLoadSpy = jest.spyOn(DashboardHeader.prototype, 'loadCardDashboard')
+    cardLoadSpy = vi.spyOn(DashboardHeader.prototype, 'loadCardDashboard')
     document.body.innerHTML = ''
     document.body.innerHTML = `
       <div id="dashboard-planner" style="display: none;"></div>
@@ -235,7 +238,7 @@ describe('DashboardHeader', () => {
           dashboard_graphql_integration: true,
         },
       }
-      const loadCardDashboardSpy = jest.spyOn(DashboardHeader.prototype, 'loadCardDashboard')
+      const loadCardDashboardSpy = vi.spyOn(DashboardHeader.prototype, 'loadCardDashboard')
       render(<FakeDashboardHeader {...defaultProps} preloadedCards={[]} />)
       expect(loadCardDashboardSpy).not.toHaveBeenCalled()
     })

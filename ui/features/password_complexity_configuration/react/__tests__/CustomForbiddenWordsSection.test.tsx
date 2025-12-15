@@ -22,7 +22,7 @@ import CustomForbiddenWordsSection from '../CustomForbiddenWordsSection'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('../apiClient')
+vi.mock('../apiClient')
 
 const server = setupServer(
   http.get('/api/v1/accounts/:accountId/settings', () => {

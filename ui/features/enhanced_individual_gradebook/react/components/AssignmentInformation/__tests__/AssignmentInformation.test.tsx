@@ -24,7 +24,7 @@ import {assignmentInfoDefaultProps, defaultAssignment} from './fixtures'
 
 describe('Assignment Information Tests', () => {
   beforeEach(() => {
-    $.subscribe = jest.fn()
+    $.subscribe = vi.fn()
   })
   const renderAssignmentInformation = (props: AssignmentInformationComponentProps) => {
     return render(<AssignmentInformation {...props} />)

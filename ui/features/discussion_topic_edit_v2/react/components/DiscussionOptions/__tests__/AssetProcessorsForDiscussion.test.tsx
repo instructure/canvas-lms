@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {render, screen} from '@testing-library/react'
-import '@testing-library/jest-dom'
 import {AssetProcessorsForDiscussion} from '../AssetProcessorsForDiscussion'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
@@ -27,8 +26,8 @@ import {
   useAssetProcessorsState,
 } from '@canvas/lti-asset-processor/react/hooks/AssetProcessorsState'
 
-jest.mock('@canvas/lti-asset-processor/react/hooks/useAssetProcessorsToolsList', () => ({
-  useAssetProcessorsToolsList: jest.fn(),
+vi.mock('@canvas/lti-asset-processor/react/hooks/useAssetProcessorsToolsList', () => ({
+  useAssetProcessorsToolsList: vi.fn(),
 }))
 
 const queryClient = new QueryClient()
@@ -45,11 +44,11 @@ describe('AssetProcessorsForDiscussion', () => {
   ]
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   const mockUseAssetProcessorsToolsList = (tools: LtiLaunchDefinition[]) => {
-    ;(useAssetProcessorsToolsList as jest.Mock).mockReturnValue({
+    ;(useAssetProcessorsToolsList as ReturnType<typeof vi.fn>).mockReturnValue({
       data: tools,
       isLoading: false,
       isError: false,

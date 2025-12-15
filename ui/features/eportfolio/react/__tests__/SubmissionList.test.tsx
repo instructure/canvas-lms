@@ -26,12 +26,12 @@ import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
 // Mock showFlashAlert to prevent React rendering issues during static initialization
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
-  showFlashError: jest.fn(),
-  showFlashSuccess: jest.fn(),
-  showFlashWarning: jest.fn(),
-  destroyContainer: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
+  showFlashError: vi.fn(),
+  showFlashSuccess: vi.fn(),
+  showFlashWarning: vi.fn(),
+  destroyContainer: vi.fn(),
 }))
 
 const sectionList = [{name: 'First Section', id: 1, position: 1, category_url: '/path/to/first'}]
@@ -104,7 +104,7 @@ describe('SubmissionList', () => {
   afterEach(() => {
     queryClient.clear()
     fakeENV.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderWithClient = (ui: React.ReactElement) => {

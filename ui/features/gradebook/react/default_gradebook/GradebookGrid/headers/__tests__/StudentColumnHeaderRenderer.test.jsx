@@ -49,7 +49,7 @@ describe('GradebookGrid StudentLastNameColumnHeaderRenderer', () => {
       login_handle_name: 'a_jones',
       sis_name: 'Example SIS',
     })
-    gradebook.saveSettings = jest.fn().mockResolvedValue()
+    gradebook.saveSettings = vi.fn().mockResolvedValue()
     renderer = new StudentColumnHeaderRenderer(
       gradebook,
       StudentLastNameColumnHeader,
@@ -107,7 +107,7 @@ describe('GradebookGrid StudentColumnHeaderRenderer', () => {
       login_handle_name: 'a_jones',
       sis_name: 'Example SIS',
     })
-    gradebook.saveSettings = jest.fn().mockResolvedValue()
+    gradebook.saveSettings = vi.fn().mockResolvedValue()
     renderer = new StudentColumnHeaderRenderer(gradebook, StudentColumnHeader, 'student')
   })
 
@@ -128,7 +128,7 @@ describe('GradebookGrid StudentColumnHeaderRenderer', () => {
     })
 
     it('includes a callback for adding elements to the Gradebook KeyboardNav', () => {
-      gradebook.keyboardNav.addGradebookElement = jest.fn()
+      gradebook.keyboardNav.addGradebookElement = vi.fn()
       renderComponent()
       component.props.addGradebookElement()
       expect(gradebook.keyboardNav.addGradebookElement).toHaveBeenCalledTimes(1)
@@ -152,7 +152,7 @@ describe('GradebookGrid StudentColumnHeaderRenderer', () => {
     })
 
     it('includes a callback for keyDown events', () => {
-      gradebook.handleHeaderKeyDown = jest.fn()
+      gradebook.handleHeaderKeyDown = vi.fn()
       renderComponent()
       component.props.onHeaderKeyDown({})
       expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledTimes(1)
@@ -160,62 +160,62 @@ describe('GradebookGrid StudentColumnHeaderRenderer', () => {
 
     it.skip('calls Gradebook#handleHeaderKeyDown with a given event', () => {
       const exampleEvent = new Event('example')
-      gradebook.handleHeaderKeyDown = jest.fn()
+      gradebook.handleHeaderKeyDown = vi.fn()
       renderComponent()
       component.props.onHeaderKeyDown(exampleEvent)
       expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledWith(exampleEvent)
     })
 
     it('calls Gradebook#handleHeaderKeyDown with the column id', () => {
-      gradebook.handleHeaderKeyDown = jest.fn()
+      gradebook.handleHeaderKeyDown = vi.fn()
       renderComponent()
       component.props.onHeaderKeyDown({})
       expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledWith(expect.any(Object), 'student')
     })
 
     it('includes a callback for closing the column header menu', () => {
-      jest.useFakeTimers()
-      gradebook.handleColumnHeaderMenuClose = jest.fn()
+      vi.useFakeTimers()
+      gradebook.handleColumnHeaderMenuClose = vi.fn()
       renderComponent()
       component.props.onMenuDismiss()
-      jest.runAllTimers()
+      vi.runAllTimers()
       expect(gradebook.handleColumnHeaderMenuClose).toHaveBeenCalledTimes(1)
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
 
     it('does not call the menu close handler synchronously', () => {
-      jest.useFakeTimers()
-      gradebook.handleColumnHeaderMenuClose = jest.fn()
+      vi.useFakeTimers()
+      gradebook.handleColumnHeaderMenuClose = vi.fn()
       renderComponent()
       component.props.onMenuDismiss()
       expect(gradebook.handleColumnHeaderMenuClose).not.toHaveBeenCalled()
-      jest.runAllTimers()
-      jest.useRealTimers()
+      vi.runAllTimers()
+      vi.useRealTimers()
     })
 
     it('includes a callback for selecting the primary info', () => {
-      gradebook.setSelectedPrimaryInfo = jest.fn()
+      gradebook.setSelectedPrimaryInfo = vi.fn()
       renderComponent()
       component.props.onSelectPrimaryInfo()
       expect(gradebook.setSelectedPrimaryInfo).toHaveBeenCalledTimes(1)
     })
 
     it('includes a callback for selecting the secondary info', () => {
-      gradebook.setSelectedSecondaryInfo = jest.fn()
+      gradebook.setSelectedSecondaryInfo = vi.fn()
       renderComponent()
       component.props.onSelectSecondaryInfo()
       expect(gradebook.setSelectedSecondaryInfo).toHaveBeenCalledTimes(1)
     })
 
     it('includes a callback for toggling the enrollment filter', () => {
-      gradebook.toggleEnrollmentFilter = jest.fn()
+      gradebook.toggleEnrollmentFilter = vi.fn()
       renderComponent()
       component.props.onToggleEnrollmentFilter()
       expect(gradebook.toggleEnrollmentFilter).toHaveBeenCalledTimes(1)
     })
 
     it('includes a callback for removing elements to the Gradebook KeyboardNav', () => {
-      gradebook.keyboardNav.removeGradebookElement = jest.fn()
+      gradebook.keyboardNav.removeGradebookElement = vi.fn()
       renderComponent()
       component.props.removeGradebookElement()
       expect(gradebook.keyboardNav.removeGradebookElement).toHaveBeenCalledTimes(1)

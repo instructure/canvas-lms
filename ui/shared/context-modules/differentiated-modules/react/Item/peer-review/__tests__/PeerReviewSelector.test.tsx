@@ -24,19 +24,19 @@ describe('PeerReviewSelector', () => {
   const defaultProps = {
     assignmentDueDate: '2024-11-20T23:59:00Z',
     peerReviewAvailableToDate: null,
-    setPeerReviewAvailableToDate: jest.fn(),
-    handlePeerReviewAvailableToDateChange: jest.fn(),
+    setPeerReviewAvailableToDate: vi.fn(),
+    handlePeerReviewAvailableToDateChange: vi.fn(),
     peerReviewAvailableFromDate: null,
-    setPeerReviewAvailableFromDate: jest.fn(),
-    handlePeerReviewAvailableFromDateChange: jest.fn(),
+    setPeerReviewAvailableFromDate: vi.fn(),
+    handlePeerReviewAvailableFromDateChange: vi.fn(),
     peerReviewDueDate: null,
-    setPeerReviewDueDate: jest.fn(),
-    handlePeerReviewDueDateChange: jest.fn(),
+    setPeerReviewDueDate: vi.fn(),
+    handlePeerReviewDueDateChange: vi.fn(),
     validationErrors: {},
     unparsedFieldKeys: new Set<string>(),
     dateInputRefs: {},
     timeInputRefs: {},
-    handleBlur: jest.fn(() => jest.fn()),
+    handleBlur: vi.fn(() => vi.fn()),
     breakpoints: {},
     clearButtonAltLabels: {
       dueDateLabel: 'Clear due date for 2 students',
@@ -49,7 +49,7 @@ describe('PeerReviewSelector', () => {
   const originalENV = window.ENV
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     // Set up ENV
     window.ENV = {
@@ -112,8 +112,8 @@ describe('PeerReviewSelector', () => {
 
     it('passes correct props to PeerReviewDueDateTimeInput', () => {
       const peerReviewDueDate = '2024-11-18T00:00:00Z'
-      const setPeerReviewDueDate = jest.fn()
-      const handlePeerReviewDueDateChange = jest.fn()
+      const setPeerReviewDueDate = vi.fn()
+      const handlePeerReviewDueDateChange = vi.fn()
 
       const {container} = renderComponent({
         peerReviewDueDate,
@@ -128,8 +128,8 @@ describe('PeerReviewSelector', () => {
 
     it('passes correct props to PeerReviewAvailableFromDateTimeInput', () => {
       const peerReviewAvailableFromDate = '2024-11-10T00:00:00Z'
-      const setPeerReviewAvailableFromDate = jest.fn()
-      const handlePeerReviewAvailableFromDateChange = jest.fn()
+      const setPeerReviewAvailableFromDate = vi.fn()
+      const handlePeerReviewAvailableFromDateChange = vi.fn()
 
       const {container} = renderComponent({
         peerReviewAvailableFromDate,
@@ -144,8 +144,8 @@ describe('PeerReviewSelector', () => {
 
     it('passes correct props to PeerReviewAvailableToDateTimeInput', () => {
       const peerReviewAvailableToDate = '2024-11-25T23:59:00Z'
-      const setPeerReviewAvailableToDate = jest.fn()
-      const handlePeerReviewAvailableToDateChange = jest.fn()
+      const setPeerReviewAvailableToDate = vi.fn()
+      const handlePeerReviewAvailableToDateChange = vi.fn()
 
       const {container} = renderComponent({
         peerReviewAvailableToDate,
@@ -258,8 +258,8 @@ describe('PeerReviewSelector', () => {
 
   describe('cleanup', () => {
     it('removes event listeners on unmount', () => {
-      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener')
-      const checkboxRemoveListenerSpy = jest.spyOn(mockCheckbox, 'removeEventListener')
+      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener')
+      const checkboxRemoveListenerSpy = vi.spyOn(mockCheckbox, 'removeEventListener')
 
       const {unmount} = renderComponent()
       unmount()
@@ -274,9 +274,9 @@ describe('PeerReviewSelector', () => {
 
   describe('clearing peer review dates', () => {
     it('clears all peer review dates when assignmentDueDate becomes null', async () => {
-      const setPeerReviewDueDate = jest.fn()
-      const setPeerReviewAvailableFromDate = jest.fn()
-      const setPeerReviewAvailableToDate = jest.fn()
+      const setPeerReviewDueDate = vi.fn()
+      const setPeerReviewAvailableFromDate = vi.fn()
+      const setPeerReviewAvailableToDate = vi.fn()
 
       const {rerender} = renderComponent({
         assignmentDueDate: '2024-11-20T23:59:00Z',
@@ -315,9 +315,9 @@ describe('PeerReviewSelector', () => {
     })
 
     it('clears all peer review dates when peer review checkbox is unchecked', async () => {
-      const setPeerReviewDueDate = jest.fn()
-      const setPeerReviewAvailableFromDate = jest.fn()
-      const setPeerReviewAvailableToDate = jest.fn()
+      const setPeerReviewDueDate = vi.fn()
+      const setPeerReviewAvailableFromDate = vi.fn()
+      const setPeerReviewAvailableToDate = vi.fn()
 
       const {rerender} = renderComponent({
         peerReviewDueDate: '2024-11-18T00:00:00Z',

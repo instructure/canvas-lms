@@ -51,7 +51,7 @@ describe('TimeLateInput', () => {
       locale: 'en',
       renderLabelBefore: false,
       secondsLate: 0,
-      onSecondsLateUpdated: jest.fn(),
+      onSecondsLateUpdated: vi.fn(),
       width: '5rem',
     }
   })

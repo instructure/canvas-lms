@@ -25,6 +25,16 @@ import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useM
 import ModuleHeader from '../ModuleHeader'
 import {PAGE_SIZE, MODULE_ITEMS, MODULES} from '../../utils/constants'
 
+vi.mock('@canvas/context-modules/react/publishing/publishingContext', async () => {
+  const actual = await vi.importActual('@canvas/context-modules/react/publishing/publishingContext')
+  return {
+    ...actual,
+    usePublishing: vi.fn(() => ({
+      publishingInProgress: false,
+    })),
+  }
+})
+
 const server = setupServer(
   graphql.query('GetModuleItemsQuery', () => {
     return HttpResponse.json({
@@ -93,7 +103,7 @@ const buildDefaultProps = (overrides: Partial<ModuleHeaderProps> = {}): ModuleHe
     id,
     name: 'Test Module',
     expanded: false,
-    onToggleExpand: jest.fn(),
+    onToggleExpand: vi.fn(),
     published: true,
     prerequisites: [],
     completionRequirements: [],

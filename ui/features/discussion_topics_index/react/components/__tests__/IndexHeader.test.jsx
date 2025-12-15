@@ -85,7 +85,7 @@ describe('IndexHeader', () => {
   })
 
   it('calls onFilterChange when entering a search term', async () => {
-    const searchMock = jest.fn()
+    const searchMock = vi.fn()
     const props = makeProps({searchDiscussions: searchMock()})
 
     render(<IndexHeader {...props} />)
@@ -96,7 +96,7 @@ describe('IndexHeader', () => {
   })
 
   it('calls onFilterChange when selecting a new filter', async () => {
-    const filterMock = jest.fn()
+    const filterMock = vi.fn()
     const props = makeProps({
       searchDiscussions: () => filterMock(),
       permissions: {

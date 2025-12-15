@@ -92,7 +92,7 @@ describe('GradeSummary GradesGrid', () => {
           },
         },
       },
-      onGradeSelect: jest.fn(),
+      onGradeSelect: vi.fn(),
       selectProvisionalGradeStatuses: {},
       students: [
         {id: '1111', displayName: 'Adam Jones'},

@@ -24,11 +24,11 @@ import AnonymousSpeedGraderAlert from '../AnonymousSpeedGraderAlert'
 describe('AnonymousSpeedGraderAlert', () => {
   const defaultProps = {
     speedGraderUrl: 'http://test.url:3000/speed_grader',
-    onClose: jest.fn(),
+    onClose: vi.fn(),
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderComponent = (props = {}) => {
@@ -69,7 +69,7 @@ describe('AnonymousSpeedGraderAlert', () => {
   })
 
   it('calls onClose when Cancel is clicked', async () => {
-    const onClose = jest.fn()
+    const onClose = vi.fn()
     const ref = renderComponent({onClose})
     await act(async () => {
       ref.current.open()

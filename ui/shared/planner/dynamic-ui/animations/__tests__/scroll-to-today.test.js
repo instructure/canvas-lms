@@ -24,8 +24,8 @@ import {createAnimation, mockRegistryEntry} from './test-utils'
 
 const TZ = 'Asia/Tokyo'
 const today = moment.tz('2018-04-15T12:00:00', TZ)
-const successalert = jest.fn()
-const srAlert = jest.fn()
+const successalert = vi.fn()
+const srAlert = vi.fn()
 const pastMessage = 'Nothing planned today. Selecting most recent item.'
 const futureMessage = 'Nothing planned today. Selecting next item.'
 const nothingTodayMessage = 'There is nothing planned for today.'
@@ -34,7 +34,7 @@ beforeAll(() => {
   MockDate.set(today, TZ)
   initialize({
     visualSuccessCallback: successalert,
-    visualErrorCallback: jest.fn(),
+    visualErrorCallback: vi.fn(),
     srAlertCallback: srAlert,
   })
 })
@@ -43,7 +43,7 @@ afterAll(() => {
 })
 beforeEach(() => {
   successalert.mockReset()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('scrollToToday', () => {
@@ -261,7 +261,7 @@ describe('scrollToToday', () => {
         return today_elem
       }
       const mockRegistryEntries = [mockRegistryEntry('some-item', 'i1', moment.tz(today, TZ))]
-      mockRegistryEntries[0].component.getFocusable = jest.fn(() => undefined)
+      mockRegistryEntries[0].component.getFocusable = vi.fn(() => undefined)
       registry.getAllItemsSorted.mockReturnValue(mockRegistryEntries)
       store.getState.mockReturnValue({
         timeZone: TZ,

@@ -18,6 +18,7 @@
 
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import {waitFor} from '@testing-library/react'
 import {uploadFile} from '../apiFileUtils'
 
 describe('apiFileUtils', () => {
@@ -28,13 +29,9 @@ describe('apiFileUtils', () => {
   afterAll(() => server.close())
 
   describe('uploadFile', () => {
-    it('runs the onSuccess method after upload', done => {
-      const onSuccess = jest.fn(data => {
-        expect(data).toBe('yo')
-        expect(onFail).not.toHaveBeenCalled()
-        done()
-      })
-      const onFail = jest.fn()
+    it('runs the onSuccess method after upload', async () => {
+      const onSuccess = vi.fn()
+      const onFail = vi.fn()
 
       server.use(
         http.post('/api/v1/folders/1/files', () =>
@@ -59,14 +56,16 @@ describe('apiFileUtils', () => {
 
       const file = {name: 'file1', size: 0}
       uploadFile(file, '1', onSuccess, onFail)
+
+      await waitFor(() => {
+        expect(onSuccess).toHaveBeenCalledWith('yo')
+        expect(onFail).not.toHaveBeenCalled()
+      })
     })
 
-    it('runs the onFailure method on upload failure', done => {
-      const onSuccess = jest.fn()
-      const onFail = jest.fn(() => {
-        expect(onSuccess).not.toHaveBeenCalled()
-        done()
-      })
+    it('runs the onFailure method on upload failure', async () => {
+      const onSuccess = vi.fn()
+      const onFail = vi.fn()
 
       server.use(
         http.post('/api/v1/folders/1/files', () =>
@@ -85,16 +84,18 @@ describe('apiFileUtils', () => {
 
       const file = {name: 'file2', size: 0}
       uploadFile(file, '1', onSuccess, onFail)
+
+      await waitFor(() => {
+        expect(onFail).toHaveBeenCalled()
+        expect(onSuccess).not.toHaveBeenCalled()
+      })
     })
   })
 
   describe('onFileUploadInfoReceived', () => {
-    it('runs the onFailure on file prep failure', done => {
-      const onSuccess = jest.fn()
-      const onFail = jest.fn(() => {
-        expect(onSuccess).not.toHaveBeenCalled()
-        done()
-      })
+    it('runs the onFailure on file prep failure', async () => {
+      const onSuccess = vi.fn()
+      const onFail = vi.fn()
 
       server.use(
         http.post('/api/v1/folders/1/files', () =>
@@ -104,6 +105,11 @@ describe('apiFileUtils', () => {
 
       const file = {name: 'file2', size: 0}
       uploadFile(file, '1', onSuccess, onFail)
+
+      await waitFor(() => {
+        expect(onFail).toHaveBeenCalled()
+        expect(onSuccess).not.toHaveBeenCalled()
+      })
     })
   })
 })

@@ -368,7 +368,7 @@ describe('showAllOrLess', () => {
     })
 
     it('should not call document dispatchEvent on isLoading true', () => {
-      const spy = jest.spyOn(document, 'dispatchEvent')
+      const spy = vi.spyOn(document, 'dispatchEvent')
       const module = makeModule()
       module.dataset.loadstate = 'paginated'
 

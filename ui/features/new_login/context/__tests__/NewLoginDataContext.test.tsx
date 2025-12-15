@@ -18,15 +18,14 @@
 
 import {render, screen} from '@testing-library/react'
 import React from 'react'
-import '@testing-library/jest-dom'
 import {renderHook} from '@testing-library/react-hooks'
 import {NewLoginDataProvider, useNewLoginData} from '..'
 
-const mockUseFetchNewLoginData = jest.fn()
+const mockUseFetchNewLoginData = vi.hoisted(() => vi.fn())
 
-jest.mock('../../hooks/useFetchNewLoginData', () => {
+vi.mock('../../hooks/useFetchNewLoginData', () => {
   return {
-    useFetchNewLoginData: jest.fn(() => mockUseFetchNewLoginData()),
+    useFetchNewLoginData: mockUseFetchNewLoginData,
   }
 })
 
@@ -64,7 +63,7 @@ describe('NewLoginDataContext', () => {
   let originalConsoleError: typeof console.error
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     originalConsoleError = console.error
   })
 

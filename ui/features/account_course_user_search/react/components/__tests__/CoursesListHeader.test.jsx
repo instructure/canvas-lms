@@ -21,7 +21,7 @@ import {render, fireEvent} from '@testing-library/react'
 import CoursesListHeader from '../CoursesListHeader'
 
 const defaultProps = {
-  onChangeSort: jest.fn(),
+  onChangeSort: vi.fn(),
   id: 'test_id',
   label: 'Test Label',
   tipDesc: 'Click to sort descending',
@@ -30,7 +30,7 @@ const defaultProps = {
 
 describe('CoursesListHeader', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders with default props', () => {
@@ -84,7 +84,7 @@ describe('CoursesListHeader', () => {
   })
 
   it('calls onChangeSort when clicked', () => {
-    const onChangeSort = jest.fn()
+    const onChangeSort = vi.fn()
     const {getByRole} = render(<CoursesListHeader {...defaultProps} onChangeSort={onChangeSort} />)
 
     fireEvent.click(getByRole('button'))

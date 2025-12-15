@@ -36,9 +36,9 @@ describe('DynamicRegistrationModal', () => {
 
     warn = console.warn
 
-    console.error = jest.fn()
+    console.error = vi.fn()
 
-    console.warn = jest.fn()
+    console.warn = vi.fn()
   })
 
   afterAll(() => {
@@ -49,7 +49,7 @@ describe('DynamicRegistrationModal', () => {
 
   describe('default export', () => {
     const store = {
-      dispatch: jest.fn(),
+      dispatch: vi.fn(),
     }
     it('opens the modal', async () => {
       useDynamicRegistrationState.getState().open()

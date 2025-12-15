@@ -27,8 +27,8 @@ describe('PortfolioSettingsModal', () => {
     public: true,
     profile_url: '/path/to/profile',
   }
-  const mockConfirm = jest.fn()
-  const mockCancel = jest.fn()
+  const mockConfirm = vi.fn()
+  const mockCancel = vi.fn()
   afterEach(() => {
     fetchMock.restore()
   })

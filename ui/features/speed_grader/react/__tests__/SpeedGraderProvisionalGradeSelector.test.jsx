@@ -244,7 +244,7 @@ describe('SpeedGraderProvisionalGradeSelector', () => {
     ]
     props.provisionalGrades = provisionalGrades
 
-    const formatSpy = jest.spyOn(GradeFormatHelper, 'formatSubmissionGrade')
+    const formatSpy = vi.spyOn(GradeFormatHelper, 'formatSubmissionGrade')
     const ref = React.createRef()
     render(<SpeedGraderProvisionalGradeSelector {...props} ref={ref} />)
     ref.current.setState({detailsVisible: true})
@@ -267,7 +267,7 @@ describe('SpeedGraderProvisionalGradeSelector', () => {
     ]
     props.provisionalGrades = provisionalGrades
 
-    const formatSpy = jest.spyOn(GradeFormatHelper, 'formatSubmissionGrade')
+    const formatSpy = vi.spyOn(GradeFormatHelper, 'formatSubmissionGrade')
     const ref = React.createRef()
     render(<SpeedGraderProvisionalGradeSelector {...props} ref={ref} />)
     ref.current.setState({detailsVisible: true})

@@ -290,7 +290,7 @@ function DiscussionTopicForm({
   useEffect(() => {
     const graphqlAps = currentDiscussionTopic?.assignment?.ltiAssetProcessorsConnection?.nodes || []
     setFromExistingAttachedProcessors(graphqlAps.map(existingAttachedAssetProcessorFromGraphql))
-  }, [currentDiscussionTopic?.assignment?.assetProcessors, setFromExistingAttachedProcessors])
+  }, [currentDiscussionTopic?.assignment?.ltiAssetProcessorsConnection, setFromExistingAttachedProcessors])
 
   const [displayGradeAs, setDisplayGradeAs] = useState(
     currentDiscussionTopic?.assignment?.gradingType || 'points',

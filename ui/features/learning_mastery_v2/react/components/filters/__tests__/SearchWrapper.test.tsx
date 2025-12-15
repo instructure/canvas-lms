@@ -22,15 +22,15 @@ import {SearchWrapper} from '../SearchWrapper'
 import * as useStudentsHook from '../../../hooks/useStudents'
 import * as useOutcomesHook from '../../../hooks/useOutcomes'
 
-jest.mock('../../../hooks/useStudents')
-jest.mock('../../../hooks/useOutcomes')
+vi.mock('../../../hooks/useStudents')
+vi.mock('../../../hooks/useOutcomes')
 
 const defaultProps = {
   courseId: '123',
   selectedUserIds: [],
-  onSelectedUserIdsChange: jest.fn(),
+  onSelectedUserIdsChange: vi.fn(),
   selectedOutcomes: [],
-  onSelectOutcomes: jest.fn(),
+  onSelectOutcomes: vi.fn(),
 }
 
 describe('SearchWrapper', () => {
@@ -44,7 +44,7 @@ describe('SearchWrapper', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     queryClient = new QueryClient({
       defaultOptions: {
         queries: {
@@ -52,12 +52,12 @@ describe('SearchWrapper', () => {
         },
       },
     })
-    jest.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
+    vi.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
       students: [],
       isLoading: false,
       error: null,
     })
-    jest.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
+    vi.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
       outcomes: [],
       outcomesCount: 0,
       isLoading: false,
@@ -68,7 +68,7 @@ describe('SearchWrapper', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   const renderWithQueryClient = (ui: React.ReactElement) => {
@@ -95,7 +95,7 @@ describe('SearchWrapper', () => {
   })
 
   it('passes onSelectedUserIdsChange prop to StudentSearch', () => {
-    const onSelectedUserIdsChange = jest.fn()
+    const onSelectedUserIdsChange = vi.fn()
 
     renderWithQueryClient(
       <SearchWrapper {...defaultProps} onSelectedUserIdsChange={onSelectedUserIdsChange} />,
@@ -168,7 +168,7 @@ describe('SearchWrapper', () => {
     })
 
     it('passes onSelectOutcomes prop to OutcomeSearch', () => {
-      const onSelectOutcomes = jest.fn()
+      const onSelectOutcomes = vi.fn()
 
       renderWithQueryClient(<SearchWrapper {...defaultProps} onSelectOutcomes={onSelectOutcomes} />)
 

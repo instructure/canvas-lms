@@ -76,7 +76,7 @@ const MOCK_LICENSES = [
 const defaultProps = {
   open: true,
   items: FAKE_FOLDERS_AND_FILES,
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
 }
 
 const renderComponent = (props: any = defaultProps) =>

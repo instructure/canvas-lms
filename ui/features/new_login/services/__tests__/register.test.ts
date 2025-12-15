@@ -20,7 +20,9 @@ import {createParentAccount, createStudentAccount, createTeacherAccount} from '.
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/authenticity-token', () => jest.fn(() => 'testCsrfToken'))
+vi.mock('@canvas/authenticity-token', () => ({
+  default: vi.fn(() => 'testCsrfToken'),
+}))
 
 const server = setupServer()
 
@@ -32,7 +34,7 @@ describe('Register Service', () => {
 
   beforeEach(() => {
     capturedRequest = null
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -58,7 +60,6 @@ describe('Register Service', () => {
     expect(capturedRequest).toEqual({
       path: '/users',
       body: {
-        authenticity_token: 'testCsrfToken',
         user: {
           initial_enrollment_type: 'teacher',
           name: 'Test Teacher',
@@ -68,6 +69,7 @@ describe('Register Service', () => {
           unique_id: 'test@example.com',
         },
         'g-recaptcha-response': 'mock-captcha-token',
+        authenticity_token: 'testCsrfToken',
       },
     })
     expect(result).toEqual({status: 200, data: {success: true}})
@@ -105,7 +107,6 @@ describe('Register Service', () => {
       expect(capturedRequest).toEqual({
         path: '/users',
         body: {
-          authenticity_token: 'testCsrfToken',
           user: {
             name: 'Test Parent',
             terms_of_use: '1',
@@ -123,6 +124,7 @@ describe('Register Service', () => {
           communication_channel: {
             skip_confirmation: '1',
           },
+          authenticity_token: 'testCsrfToken',
         },
       })
       expect(result).toEqual({status: 201, data: {success: true}})
@@ -165,7 +167,6 @@ describe('Register Service', () => {
       expect(capturedRequest).toEqual({
         path: '/users',
         body: {
-          authenticity_token: 'testCsrfToken',
           user: {
             name: 'Test Student',
             terms_of_use: '1',
@@ -180,6 +181,7 @@ describe('Register Service', () => {
           },
           self_enrollment: '1',
           pseudonym_type: 'username',
+          authenticity_token: 'testCsrfToken',
         },
       })
       expect(result).toEqual({status: 201, data: {success: true}})
@@ -206,7 +208,6 @@ describe('Register Service', () => {
       expect(capturedRequest).toEqual({
         path: '/users',
         body: {
-          authenticity_token: 'testCsrfToken',
           user: {
             name: 'Test Student',
             terms_of_use: '1',
@@ -220,6 +221,7 @@ describe('Register Service', () => {
           },
           self_enrollment: '1',
           pseudonym_type: 'username',
+          authenticity_token: 'testCsrfToken',
         },
       })
       expect(result).toEqual({status: 201, data: {success: true}})

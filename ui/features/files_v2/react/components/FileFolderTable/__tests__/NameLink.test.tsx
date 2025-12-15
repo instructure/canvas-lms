@@ -26,16 +26,16 @@ import {queryClient} from '@canvas/query'
 import userEvent from '@testing-library/user-event'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(() => jest.fn()),
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: vi.fn(() => vi.fn()),
+  showFlashAlert: vi.fn(),
 }))
 
-const mockNavigate = jest.fn()
-const mockUseLocation = jest.fn()
+const mockNavigate = vi.fn()
+const mockUseLocation = vi.fn()
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+vi.mock('react-router-dom', async () => ({
+  ...await vi.importActual('react-router-dom'),
   useNavigate: () => mockNavigate,
   useLocation: () => mockUseLocation(),
 }))
@@ -61,7 +61,7 @@ describe('NameLink', () => {
   const queryParams = '?sort=name&order=asc&preview=123&search_term=example'
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockUseLocation.mockReturnValue({
       pathname: path,
       search: queryParams,
@@ -125,7 +125,7 @@ describe('NameLink', () => {
   })
 
   describe('file preview functionality', () => {
-    const mockOnPreviewFile = jest.fn()
+    const mockOnPreviewFile = vi.fn()
 
     beforeEach(() => {
       mockOnPreviewFile.mockClear()

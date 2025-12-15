@@ -85,7 +85,7 @@ describe('WikiPageCollection:sorting', () => {
   })
 
   test('setting sort triggers a sortChanged event', () => {
-    const sortChangedSpy = jest.fn()
+    const sortChangedSpy = vi.fn()
     ;(collection as any).on('sortChanged', sortChangedSpy)
     collection.setSortField('created_at')
     expect(sortChangedSpy).toHaveBeenCalledTimes(1)
@@ -103,8 +103,8 @@ describe('WikiPageCollection:sorting', () => {
   })
 
   test('sortByField delegates to setSortField', () => {
-    const setSortFieldStub = jest.spyOn(collection, 'setSortField').mockImplementation()
-    const fetchStub = jest.spyOn(collection, 'fetch' as any).mockImplementation()
+    const setSortFieldStub = vi.spyOn(collection, 'setSortField').mockImplementation(() => {})
+    const fetchStub = vi.spyOn(collection, 'fetch' as any).mockImplementation(() => {})
     ;(collection as any).sortByField('created_at', 'desc')
     expect(setSortFieldStub).toHaveBeenCalledTimes(1)
     expect(setSortFieldStub).toHaveBeenCalledWith('created_at', 'desc')
@@ -113,7 +113,7 @@ describe('WikiPageCollection:sorting', () => {
   })
 
   test('sortByField triggers a fetch', () => {
-    const fetchStub = jest.spyOn(collection, 'fetch' as any).mockImplementation()
+    const fetchStub = vi.spyOn(collection, 'fetch' as any).mockImplementation(() => {})
     ;(collection as any).sortByField('created_at', 'desc')
     expect(fetchStub).toHaveBeenCalledTimes(1)
     fetchStub.mockRestore()

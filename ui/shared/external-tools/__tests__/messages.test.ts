@@ -68,9 +68,9 @@ describe('1.1 content item messages', () => {
     let cancel: () => void
     let remove: () => void | undefined
     beforeEach(() => {
-      ready = jest.fn()
-      cancel = jest.fn()
-      onDeepLinkingResponse = jest.fn()
+      ready = vi.fn()
+      cancel = vi.fn()
+      onDeepLinkingResponse = vi.fn()
     })
 
     afterEach(() => {
@@ -171,7 +171,7 @@ describe('1.1 content item messages', () => {
 
     describe('postMessageExternalContentReady', () => {
       it('posts message to window', () => {
-        const window = {postMessage: jest.fn()}
+        const window = {postMessage: vi.fn()}
         const eventData = {
           contentItems: [{url: 'test'}],
           service: 'equella',
@@ -186,7 +186,7 @@ describe('1.1 content item messages', () => {
 
     describe('postMessageExternalContentCancel', () => {
       it('posts message to window', () => {
-        const window = {postMessage: jest.fn()}
+        const window = {postMessage: vi.fn()}
         postMessageExternalContentCancel(window)
         expect(window.postMessage).toHaveBeenCalledWith(
           {subject: 'externalContentCancel'},

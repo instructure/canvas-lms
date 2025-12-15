@@ -22,13 +22,14 @@ import {renderHook, act} from '@testing-library/react-hooks'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {useQueryPageViewsPaginated} from '../useQueryPageViewsPaginated'
 import {type APIPageView} from '../../utils'
+import doFetchApiModule from '@canvas/do-fetch-api-effect'
 
 // Mock doFetchApi
-jest.mock('@canvas/do-fetch-api-effect', () => ({
+vi.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
-  default: jest.fn(),
+  default: vi.fn(),
 }))
-const doFetchApi = require('@canvas/do-fetch-api-effect').default
+const doFetchApi = vi.mocked(doFetchApiModule)
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -59,7 +60,7 @@ function createMockPageViews(userId: string, pageNumber: number, count: number):
 }
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('useQueryPageViewsPaginated', () => {
@@ -77,8 +78,11 @@ describe('useQueryPageViewsPaginated', () => {
       link: {
         next: {
           url: `http://localhost/api/v1/users/123/page_views?page=${nextPageBookmark}&per_page=10`,
+          rel: 'next',
         },
       },
+      response: {} as Response,
+      text: JSON.stringify(mockViews),
     })
 
     const {result} = renderHook(() => useQueryPageViewsPaginated(defaultOptions), {
@@ -106,23 +110,29 @@ describe('useQueryPageViewsPaginated', () => {
     const page2Views = createMockPageViews('124', 2, 10)
 
     // Mock first call (page 1)
-    doFetchApi.mockResolvedValueOnce({
+    vi.mocked(doFetchApi).mockResolvedValueOnce({
       json: page1Views,
       link: {
         next: {
           url: `http://localhost/api/v1/users/124/page_views?page=${btoa('bookmark:2')}&per_page=10`,
+          rel: 'next',
         },
       },
+      response: {} as Response,
+      text: JSON.stringify(page1Views),
     })
 
     // Mock second call (page 2)
-    doFetchApi.mockResolvedValueOnce({
+    vi.mocked(doFetchApi).mockResolvedValueOnce({
       json: page2Views,
       link: {
         next: {
           url: `http://localhost/api/v1/users/124/page_views?page=${btoa('bookmark:3')}&per_page=10`,
+          rel: 'next',
         },
       },
+      response: {} as Response,
+      text: JSON.stringify(page2Views),
     })
 
     const {result} = renderHook(
@@ -157,7 +167,7 @@ describe('useQueryPageViewsPaginated', () => {
       expect(result.current.views[0].id).toContain('124-2-') // Should have page 2 data
     })
 
-    expect(doFetchApi.mock.calls).toHaveLength(2) // Should have made 2 API calls
+    expect(vi.mocked(doFetchApi).mock.calls).toHaveLength(2) // Should have made 2 API calls
   })
 
   it('should update totalPages as pages are discovered', async () => {
@@ -165,23 +175,29 @@ describe('useQueryPageViewsPaginated', () => {
     const page2Views = createMockPageViews('125', 2, 10)
 
     // Mock page 1 with next page
-    doFetchApi.mockResolvedValueOnce({
+    vi.mocked(doFetchApi).mockResolvedValueOnce({
       json: page1Views,
       link: {
         next: {
           url: `http://localhost/api/v1/users/125/page_views?page=${btoa('bookmark:2')}&per_page=10`,
+          rel: 'next',
         },
       },
+      response: {} as Response,
+      text: JSON.stringify(page1Views),
     })
 
     // Mock page 2 with next page
-    doFetchApi.mockResolvedValueOnce({
+    vi.mocked(doFetchApi).mockResolvedValueOnce({
       json: page2Views,
       link: {
         next: {
           url: `http://localhost/api/v1/users/125/page_views?page=${btoa('bookmark:3')}&per_page=10`,
+          rel: 'next',
         },
       },
+      response: {} as Response,
+      text: JSON.stringify(page2Views),
     })
 
     const {result} = renderHook(
@@ -219,29 +235,37 @@ describe('useQueryPageViewsPaginated', () => {
     const page2Views = createMockPageViews('126', 2, 10)
 
     // Mock page 1 with next page
-    doFetchApi.mockResolvedValueOnce({
+    vi.mocked(doFetchApi).mockResolvedValueOnce({
       json: page1Views,
       link: {
         next: {
           url: `http://localhost/api/v1/users/126/page_views?page=${btoa('bookmark:2')}&per_page=10`,
+          rel: 'next',
         },
       },
+      response: {} as Response,
+      text: JSON.stringify(page1Views),
     })
 
     // Mock page 2 with next page
-    doFetchApi.mockResolvedValueOnce({
+    vi.mocked(doFetchApi).mockResolvedValueOnce({
       json: page2Views,
       link: {
         next: {
           url: `http://localhost/api/v1/users/126/page_views?page=${btoa('bookmark:3')}&per_page=10`,
+          rel: 'next',
         },
       },
+      response: {} as Response,
+      text: JSON.stringify(page2Views),
     })
 
     // Mock page 3 as empty
-    doFetchApi.mockResolvedValueOnce({
+    vi.mocked(doFetchApi).mockResolvedValueOnce({
       json: [],
       link: undefined,
+      response: {} as Response,
+      text: '[]',
     })
 
     const {result} = renderHook(
@@ -286,14 +310,16 @@ describe('useQueryPageViewsPaginated', () => {
       expect(result.current.totalPages).toBe(2) // Should not show more pages
     })
 
-    expect(doFetchApi.mock.calls).toHaveLength(3) // Should have made 3 API calls (1, 2, 3)
+    expect(vi.mocked(doFetchApi).mock.calls).toHaveLength(3) // Should have made 3 API calls (1, 2, 3)
   })
 
   it('should handle completely empty response', async () => {
     // Mock empty response
-    doFetchApi.mockResolvedValue({
+    vi.mocked(doFetchApi).mockResolvedValue({
       json: [],
       link: undefined,
+      response: {} as Response,
+      text: '[]',
     })
 
     const {result} = renderHook(
@@ -320,7 +346,7 @@ describe('useQueryPageViewsPaginated', () => {
   it('should handle date range parameters', async () => {
     const mockViews = createMockPageViews('127', 1, 5)
 
-    doFetchApi.mockImplementation((options: {params: {start_time?: string; end_time?: string}}) => {
+    vi.mocked(doFetchApi).mockImplementation((options) => {
       // Verify that the date parameters are passed correctly
       expect(options.params?.start_time).toBe('2023-01-01T00:00:00.000Z')
       expect(options.params?.end_time).toBe('2023-01-31T23:59:59.999Z')
@@ -328,6 +354,8 @@ describe('useQueryPageViewsPaginated', () => {
       return Promise.resolve({
         json: mockViews,
         link: undefined,
+        response: {} as Response,
+        text: JSON.stringify(mockViews),
       })
     })
 
@@ -380,23 +408,29 @@ describe('useQueryPageViewsPaginated', () => {
     const page2Views = createMockPageViews('129', 2, 5)
 
     // Mock page 1 with next page
-    doFetchApi.mockResolvedValueOnce({
+    vi.mocked(doFetchApi).mockResolvedValueOnce({
       json: page1Views,
       link: {
         next: {
           url: `http://localhost/api/v1/users/129/page_views?page=${btoa('bookmark:2')}&per_page=5`,
+          rel: 'next',
         },
       },
+      response: {} as Response,
+      text: JSON.stringify(page1Views),
     })
 
     // Mock page 2 with next page
-    doFetchApi.mockResolvedValueOnce({
+    vi.mocked(doFetchApi).mockResolvedValueOnce({
       json: page2Views,
       link: {
         next: {
           url: `http://localhost/api/v1/users/129/page_views?page=${btoa('bookmark:3')}&per_page=5`,
+          rel: 'next',
         },
       },
+      response: {} as Response,
+      text: JSON.stringify(page2Views),
     })
 
     const {result} = renderHook(
@@ -446,6 +480,6 @@ describe('useQueryPageViewsPaginated', () => {
     })
 
     // Should have made the right number of API calls (not excessive)
-    expect(doFetchApi.mock.calls.length).toBeLessThanOrEqual(4) // 1, 2, back to 1 (cached), back to 2 (cached or new)
+    expect(vi.mocked(doFetchApi).mock.calls.length).toBeLessThanOrEqual(4) // 1, 2, back to 1 (cached), back to 2 (cached or new)
   })
 })

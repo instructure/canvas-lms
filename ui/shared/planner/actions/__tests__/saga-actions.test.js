@@ -60,7 +60,7 @@ function mockItem(date = '2017-12-18', opts = {}) {
 
 describe('mergeFutureItems', () => {
   it('extracts and dispatches complete days and returns true', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = [mockItem('2017-12-18'), mockItem('2017-12-18'), mockItem('2017-12-19')]
     const mockDays = itemsToDays(mockItems)
     const result = mergeFutureItems(mockItems, 'mock response')(
@@ -75,7 +75,7 @@ describe('mergeFutureItems', () => {
   })
 
   it('does not dispatch gotDaysSuccess if there are no complete days and returns false', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = [mockItem(), mockItem()]
     const result = mergeFutureItems(mockItems, 'mock response')(
       mockDispatch,
@@ -89,7 +89,7 @@ describe('mergeFutureItems', () => {
   })
 
   it('extracts all days when allFutureItemsLoaded', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = [mockItem(), mockItem()]
     const result = mergeFutureItems(mockItems, 'mock response')(
       mockDispatch,
@@ -107,7 +107,7 @@ describe('mergeFutureItems', () => {
   })
 
   it('returns true when allFutureItemsLoaded but there are no available days', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = []
     const result = mergeFutureItems(mockItems, 'mock response')(
       mockDispatch,
@@ -122,7 +122,7 @@ describe('mergeFutureItems', () => {
 
 describe('mergePastItems', () => {
   it('extracts complete days in reverse order', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = [mockItem('2017-12-17'), mockItem('2017-12-18')]
     const result = mergePastItems(mockItems, 'mock response')(
       mockDispatch,
@@ -138,7 +138,7 @@ describe('mergePastItems', () => {
   })
 
   it('extracts all days when allPastItemsLoaded', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = [mockItem(), mockItem()]
     const result = mergePastItems(mockItems, 'mock response')(
       mockDispatch,
@@ -154,7 +154,7 @@ describe('mergePastItems', () => {
   })
 
   it('returns true when allPastItemsLoaded but there are no available days', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = []
     const result = mergePastItems(mockItems, 'mock response')(
       mockDispatch,
@@ -169,7 +169,7 @@ describe('mergePastItems', () => {
 
 describe('mergePastItemsForNewActivity', () => {
   it('does not merge complete days if there is no new activity in those days', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = [mockItem('2017-12-17'), mockItem('2017-12-18')]
     const result = mergePastItemsForNewActivity(mockItems, 'mock response')(
       mockDispatch,
@@ -183,7 +183,7 @@ describe('mergePastItemsForNewActivity', () => {
   })
 
   it('does not merge partial days even with new activity', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = [mockItem('2017-12-18', {newActivity: true})]
     const result = mergePastItemsForNewActivity(mockItems, 'mock response')(
       mockDispatch,
@@ -197,7 +197,7 @@ describe('mergePastItemsForNewActivity', () => {
   })
 
   it('merges days if allPastItemsLoaded even if no new activity', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = [mockItem('2017-12-18')]
     const result = mergePastItemsForNewActivity(mockItems, 'mock response')(
       mockDispatch,
@@ -213,7 +213,7 @@ describe('mergePastItemsForNewActivity', () => {
   })
 
   it('merges complete days when they contain new activity', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = [
       mockItem('2017-12-17'),
       mockItem('2017-12-18', {newActivity: true}),
@@ -243,7 +243,7 @@ describe('mergePastItemsForToday', () => {
   })
 
   it('does not merge complete days if we did not find today', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = [mockItem('2017-12-23'), mockItem('2017-12-24')]
     const result = mergePastItemsForToday(mockItems, 'mock response')(
       mockDispatch,
@@ -257,7 +257,7 @@ describe('mergePastItemsForToday', () => {
   })
 
   it('does not merge partial days even finding today', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = [mockItem('2017-12-18')]
     const result = mergePastItemsForToday(mockItems, 'mock response')(
       mockDispatch,
@@ -271,7 +271,7 @@ describe('mergePastItemsForToday', () => {
   })
 
   it('merges days if allPastItemsLoaded even if we did not find today', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = [mockItem('2017-12-14')]
     const result = mergePastItemsForToday(mockItems, 'mock response')(
       mockDispatch,
@@ -287,7 +287,7 @@ describe('mergePastItemsForToday', () => {
   })
 
   it('merges complete days when they contain today', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = [mockItem('2017-12-15'), mockItem('2017-12-16')]
     const result = mergePastItemsForToday(mockItems, 'mock response')(
       mockDispatch,
@@ -305,13 +305,13 @@ describe('mergePastItemsForToday', () => {
 
 describe('consumePeekIntoPast', () => {
   it('found a past item', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const result = consumePeekIntoPast(['item'], 'mock response')(mockDispatch, () => {})
     expect(result).toBe(true)
     expect(mockDispatch).toHaveBeenCalledWith(peekedIntoPast({hasSomeItems: true}))
   })
   it('found no past items', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const result = consumePeekIntoPast([], 'mock response')(mockDispatch, () => {})
     expect(result).toBe(true)
     expect(mockDispatch).toHaveBeenCalledWith(peekedIntoPast({hasSomeItems: false}))
@@ -329,7 +329,7 @@ describe('mergeWeekItems', () => {
   })
 
   beforeEach(() => {
-    getStateMock = jest.fn(opts => {
+    getStateMock = vi.fn(opts => {
       return {
         ...getStateFn(opts)(),
         weeklyDashboard: {
@@ -342,7 +342,7 @@ describe('mergeWeekItems', () => {
   })
 
   it('extracts and dispatches complete days and returns true', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = []
     const sunday = moment.tz('UTC').startOf('week')
     for (let i = 0; i < 8; ++i) {
@@ -372,7 +372,7 @@ describe('mergeWeekItems', () => {
   })
 
   it('does not dispatch weekLoaded we do not get the full week up front', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = []
     const sunday = moment.tz('UTC').startOf('week')
     for (let i = 0; i < 5; ++i) {
@@ -393,7 +393,7 @@ describe('mergeWeekItems', () => {
   })
 
   it('returns true when allWeekItemsLoaded but there are no available days', () => {
-    const mockDispatch = jest.fn()
+    const mockDispatch = vi.fn()
     const mockItems = []
     const sunday = moment.tz('UTC').startOf('week')
     const result = mergeWeekItems()(mockItems, 'mock response')(mockDispatch, () => {

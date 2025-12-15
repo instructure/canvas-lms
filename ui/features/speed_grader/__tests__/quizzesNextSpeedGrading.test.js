@@ -28,9 +28,9 @@ describe('QuizzesNextSpeedGrading', () => {
   let addEventListenerMock
 
   beforeEach(() => {
-    postMessageMock = jest.fn()
+    postMessageMock = vi.fn()
     fakeIframeHolder = {
-      children: jest.fn().mockReturnValue([
+      children: vi.fn().mockReturnValue([
         {
           contentWindow: {
             postMessage: postMessageMock,
@@ -39,21 +39,21 @@ describe('QuizzesNextSpeedGrading', () => {
       ]),
     }
 
-    registerCallback = jest.fn()
-    refreshGradesCallback = jest.fn()
-    addEventListenerMock = jest.fn()
+    registerCallback = vi.fn()
+    refreshGradesCallback = vi.fn()
+    addEventListenerMock = vi.fn()
 
     fakeEG = {
-      next: jest.fn(),
-      prev: jest.fn(),
-      refreshSubmissionsToView: jest.fn(),
-      showGrade: jest.fn(),
-      showDiscussion: jest.fn(),
-      showRubric: jest.fn(),
-      updateStatsInHeader: jest.fn(),
-      refreshFullRubric: jest.fn(),
-      setGradeReadOnly: jest.fn(),
-      showSubmissionDetails: jest.fn(),
+      next: vi.fn(),
+      prev: vi.fn(),
+      refreshSubmissionsToView: vi.fn(),
+      showGrade: vi.fn(),
+      showDiscussion: vi.fn(),
+      showRubric: vi.fn(),
+      updateStatsInHeader: vi.fn(),
+      refreshFullRubric: vi.fn(),
+      setGradeReadOnly: vi.fn(),
+      showSubmissionDetails: vi.fn(),
     }
 
     speedGraderWindow = {

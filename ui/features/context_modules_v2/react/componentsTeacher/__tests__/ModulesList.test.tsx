@@ -126,13 +126,13 @@ describe('dndUtils.handleDragEnd (MODULE moves)', () => {
 
   function runAndCaptureModule(result: DropResult, modules: Array<{_id: string}> = []) {
     const queryClient = new QueryClient()
-    const mutateMock = jest.fn()
+    const mutateMock = vi.fn()
     const reorderModulesMutation = {mutate: mutateMock}
     const data: any = {pages: [{modules}]}
 
     queryClient.setQueryData([MODULES, courseId], data)
 
-    dndHandleDragEnd(result, data, courseId, queryClient, reorderModulesMutation, jest.fn())
+    dndHandleDragEnd(result, data, courseId, queryClient, reorderModulesMutation, vi.fn())
 
     return {mutateMock, queryClient}
   }
@@ -191,7 +191,7 @@ describe('dndUtils.handleDragEnd (MODULE moves)', () => {
 
   it('data is undefined: does nothing', () => {
     const result = makeModuleResult('m1', 0, 1)
-    const mutateMock = jest.fn()
+    const mutateMock = vi.fn()
     const reorderModulesMutation = {mutate: mutateMock}
     dndHandleDragEnd(
       result,
@@ -199,17 +199,17 @@ describe('dndUtils.handleDragEnd (MODULE moves)', () => {
       courseId,
       new QueryClient(),
       reorderModulesMutation,
-      jest.fn(),
+      vi.fn(),
     )
     expect(mutateMock).not.toHaveBeenCalled()
   })
 
   it('data.pages is empty: does nothing', () => {
     const result = makeModuleResult('m1', 0, 1)
-    const mutateMock = jest.fn()
+    const mutateMock = vi.fn()
     const reorderModulesMutation = {mutate: mutateMock}
     const data: any = {pages: []}
-    dndHandleDragEnd(result, data, courseId, new QueryClient(), reorderModulesMutation, jest.fn())
+    dndHandleDragEnd(result, data, courseId, new QueryClient(), reorderModulesMutation, vi.fn())
     expect(mutateMock).not.toHaveBeenCalled()
   })
 })

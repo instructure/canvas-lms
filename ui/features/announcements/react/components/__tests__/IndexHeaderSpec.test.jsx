@@ -27,7 +27,7 @@ function makeProps() {
     applicationElement: () => document.getElementById('fixtures'),
     contextId: '1',
     contextType: 'course',
-    deleteSelectedAnnouncements: jest.fn(),
+    deleteSelectedAnnouncements: vi.fn(),
     isBusy: false,
     permissions: {
       create: true,
@@ -35,17 +35,17 @@ function makeProps() {
       manage_course_content_delete: true,
       moderate: true,
     },
-    searchAnnouncements: jest.fn(),
+    searchAnnouncements: vi.fn(),
     selectedCount: 0,
-    toggleSelectedAnnouncementsLock: jest.fn(),
+    toggleSelectedAnnouncementsLock: vi.fn(),
     announcementsLocked: false,
     isToggleLocking: false,
-    markAllAnnouncementRead: jest.fn(),
+    markAllAnnouncementRead: vi.fn(),
   }
 }
 
 // Making sure debounce is not making tests slow in CI, passed fn should fire instantly instead
-jest.mock('lodash/debounce', () => jest.fn(fn => fn))
+vi.mock('lodash/debounce', () => vi.fn(fn => fn))
 
 describe('"Add Announcement" button', () => {
   test('is present when the user has permission to create an announcement', () => {
@@ -64,7 +64,7 @@ describe('"Add Announcement" button', () => {
 
 describe('searching announcements', () => {
   test('calls the searchAnnouncements prop with searchInput value after debounce timeout', async () => {
-    const spy = jest.fn()
+    const spy = vi.fn()
     const props = makeProps()
     props.searchAnnouncements = spy
     render(<IndexHeader {...props} />)
@@ -129,7 +129,7 @@ describe('"Announcement Filter" select', () => {
   })
 
   test('calls the searchAnnouncements prop when selecting a filter option with the selected value', async () => {
-    const spy = jest.fn()
+    const spy = vi.fn()
     const props = makeProps()
     props.searchAnnouncements = spy
     render(<IndexHeader {...props} />)

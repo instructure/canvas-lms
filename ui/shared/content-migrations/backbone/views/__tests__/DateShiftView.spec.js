@@ -28,12 +28,12 @@ describe('DateShiftViewSpec', () => {
     })
 
     dateShiftView.$oldStartDate = {
-      val: jest.fn().mockReturnThis(),
-      trigger: jest.fn(),
+      val: vi.fn().mockReturnThis(),
+      trigger: vi.fn(),
     }
     dateShiftView.$oldEndDate = {
-      val: jest.fn().mockReturnThis(),
-      trigger: jest.fn(),
+      val: vi.fn().mockReturnThis(),
+      trigger: vi.fn(),
     }
   })
 

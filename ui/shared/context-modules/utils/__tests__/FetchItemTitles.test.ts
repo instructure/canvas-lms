@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {vi as viType} from 'vitest'
-declare const vi: typeof viType | undefined
+import {vi} from 'vitest'
 
-if (typeof vi !== 'undefined') vi.mock('@canvas/alerts/react/FlashAlert')
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'

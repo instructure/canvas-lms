@@ -18,18 +18,21 @@
 
 import React from 'react'
 import {renderHook} from '@testing-library/react-hooks'
-import fetchMock from 'fetch-mock'
 import {useGetPaginatedFiles} from '../useGetPaginatedFiles'
 import {useSearchTerm} from '../useSearchTerm'
 import {queryClient} from '@canvas/query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('../useSearchTerm')
-const mockGenerateTableUrl = jest.fn()
-jest.mock('../../../utils/apiUtils', () => ({
-  ...jest.requireActual('../../../utils/apiUtils'),
-  parseLinkHeader: jest.fn(() => ({next: 'next-link'})),
-  parseBookmarkFromUrl: jest.fn(() => 'bookmark'),
+const server = setupServer()
+
+vi.mock('../useSearchTerm')
+const mockGenerateTableUrl = vi.fn()
+vi.mock('../../../utils/apiUtils', async () => ({
+  ...await vi.importActual('../../../utils/apiUtils'),
+  parseLinkHeader: vi.fn(() => ({next: 'next-link'})),
+  parseBookmarkFromUrl: vi.fn(() => 'bookmark'),
   generateTableUrl: (params: any) => {
     mockGenerateTableUrl(params)
     return 'generated-url'
@@ -45,35 +48,42 @@ describe('useGetPaginatedFiles', () => {
     context_type: 'Course',
   }
 
-  const mockOnSettled = jest.fn()
-  const mockSetSearchTerm = jest.fn()
+  const mockOnSettled = vi.fn()
+  const mockSetSearchTerm = vi.fn()
 
   const wrapper = ({children}: {children: React.ReactNode}) => (
     <MockedQueryClientProvider client={queryClient}>{children}</MockedQueryClientProvider>
   )
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    jest.clearAllMocks()
-    fetchMock.reset()
-    fetchMock.mock('*', {
-      body: [{id: '1', name: 'test.txt'}],
-      headers: {
-        Link: '<https://canvas.example.com/api/v1/courses/1/files?bookmark=next>; rel="next"',
-      },
-    })
-    ;(useSearchTerm as jest.Mock).mockImplementation(() => ({
+    vi.clearAllMocks()
+    server.use(
+      http.get('*', () => {
+        return HttpResponse.json([{id: '1', name: 'test.txt'}], {
+          headers: {
+            Link: '<https://canvas.example.com/api/v1/courses/1/files?bookmark=next>; rel="next"',
+          },
+        })
+      }),
+    )
+    vi.mocked(useSearchTerm).mockImplementation(() => ({
       searchTerm: '',
+      urlEncodedSearchTerm: '',
       setSearchTerm: mockSetSearchTerm,
     }))
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   it('returns all results when search term is empty', async () => {
-    ;(useSearchTerm as jest.Mock).mockImplementation(() => ({
+    vi.mocked(useSearchTerm).mockImplementation(() => ({
       searchTerm: '',
+      urlEncodedSearchTerm: '',
       setSearchTerm: mockSetSearchTerm,
     }))
 
@@ -82,14 +92,14 @@ describe('useGetPaginatedFiles', () => {
       {wrapper},
     )
     await waitForNextUpdate()
-    expect(fetchMock.called()).toBe(true)
     expect(mockOnSettled).toHaveBeenCalled()
     expect(result.current.data).toBeTruthy()
   })
 
   it('returns empty results when search term is a single character without making API call', async () => {
-    ;(useSearchTerm as jest.Mock).mockImplementation(() => ({
+    vi.mocked(useSearchTerm).mockImplementation(() => ({
       searchTerm: 'a',
+      urlEncodedSearchTerm: 'a',
       setSearchTerm: mockSetSearchTerm,
     }))
 
@@ -101,13 +111,13 @@ describe('useGetPaginatedFiles', () => {
 
     expect(result.current.search.term).toBe('a')
     expect(mockOnSettled).toHaveBeenCalledWith([])
-    expect(fetchMock.called()).toBe(false)
     expect(result.current.data).toEqual([])
   })
 
   it('handles search terms with more than one character', async () => {
-    ;(useSearchTerm as jest.Mock).mockImplementation(() => ({
+    vi.mocked(useSearchTerm).mockImplementation(() => ({
       searchTerm: 'test',
+      urlEncodedSearchTerm: 'test',
       setSearchTerm: mockSetSearchTerm,
     }))
 
@@ -118,15 +128,15 @@ describe('useGetPaginatedFiles', () => {
     await waitForNextUpdate()
 
     expect(mockGenerateTableUrl).toHaveBeenCalled()
-    expect(fetchMock.called()).toBe(true)
     expect(mockOnSettled).toHaveBeenCalled()
     expect(result.current.data).toBeTruthy()
   })
 
   it('handles search terms with spaces correctly', async () => {
     // Setup search term with a space and a character (should be treated as single char)
-    ;(useSearchTerm as jest.Mock).mockImplementation(() => ({
+    vi.mocked(useSearchTerm).mockImplementation(() => ({
       searchTerm: ' a ',
+      urlEncodedSearchTerm: '%20a%20',
       setSearchTerm: mockSetSearchTerm,
     }))
 
@@ -136,7 +146,6 @@ describe('useGetPaginatedFiles', () => {
     )
     await waitForNextUpdate()
 
-    expect(fetchMock.called()).toBe(false)
     expect(mockOnSettled).toHaveBeenCalledWith([])
     expect(result.current.data).toEqual([])
   })
@@ -144,7 +153,7 @@ describe('useGetPaginatedFiles', () => {
   it('calls backend with URL-encoded search term', async () => {
     const searchTerm = '!@#$%^&*()_+'
     const expectedEncodedTerm = encodeURIComponent(searchTerm)
-    ;(useSearchTerm as jest.Mock).mockImplementation(() => ({
+    vi.mocked(useSearchTerm).mockImplementation(() => ({
       searchTerm,
       urlEncodedSearchTerm: expectedEncodedTerm,
       setSearchTerm: mockSetSearchTerm,

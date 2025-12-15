@@ -26,7 +26,7 @@ const SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT = 'speed_grader_lti_asset_repor
 
 let lastRenderedProps: LtiAssetReportsForSpeedgraderProps | null = null
 
-jest.mock('@canvas/lti-asset-processor/react/LtiAssetReportsForSpeedgraderWrapper', () => ({
+vi.mock('@canvas/lti-asset-processor/react/LtiAssetReportsForSpeedgraderWrapper', () => ({
   LtiAssetReportsForSpeedgraderWrapper: (props: LtiAssetReportsForSpeedgraderProps) => {
     lastRenderedProps = props
     return <div data-testid="lti-asset-reports-mock">Mock LtiAssetReportsForSpeedgrader</div>

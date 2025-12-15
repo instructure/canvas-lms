@@ -17,16 +17,22 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssignmentSubmission from '../AssignmentSubmission'
 import type {Submission} from '../../AssignmentsPeerReviewsStudentTypes'
 
-jest.mock('@canvas/util/jquery/apiUserContent', () => ({
-  convert: (html: string) => html,
+vi.mock('@canvas/util/jquery/apiUserContent', () => ({
+  default: {
+    convert: (html: string) => html,
+  },
 }))
 
 describe('AssignmentSubmission', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const createSubmission = (overrides = {}): Submission => ({
     _id: '1',
     attempt: 1,

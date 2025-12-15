@@ -47,16 +47,16 @@ describe('Quizzes::LogAuditing::EventTracker', () => {
 
   describe('throttle', () => {
     beforeEach(() => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
     })
 
     afterEach(() => {
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
 
     it('throttles callback when throttle option is set', () => {
       const tracker = new TestEventTracker()
-      const callback = jest.fn()
+      const callback = vi.fn()
 
       tracker.bind(document, 'click', callback, {throttle: 1000})
 
@@ -70,7 +70,7 @@ describe('Quizzes::LogAuditing::EventTracker', () => {
       expect(callback).toHaveBeenCalledTimes(1)
 
       // After throttle window, next click should fire
-      jest.advanceTimersByTime(1000)
+      vi.advanceTimersByTime(1000)
       $(document).trigger('click')
       expect(callback).toHaveBeenCalledTimes(2)
 
@@ -79,7 +79,7 @@ describe('Quizzes::LogAuditing::EventTracker', () => {
 
     it('does not throttle when throttle option is not set', () => {
       const tracker = new TestEventTracker()
-      const callback = jest.fn()
+      const callback = vi.fn()
 
       tracker.bind(document, 'click', callback)
 
@@ -96,7 +96,7 @@ describe('Quizzes::LogAuditing::EventTracker', () => {
   describe('uninstall', () => {
     it('removes event bindings on uninstall', () => {
       const tracker = new TestEventTracker()
-      const callback = jest.fn()
+      const callback = vi.fn()
 
       tracker.bind(document, 'click', callback)
       $(document).trigger('click')

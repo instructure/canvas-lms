@@ -24,7 +24,7 @@ describe('useTranslationQueue', () => {
   const createMockJob = (label, doneList) => {
     let resolver
     const promise = new Promise(resolve => (resolver = resolve))
-    const job = jest.fn(() => promise.finally(() => doneList.push(label)))
+    const job = vi.fn(() => promise.finally(() => doneList.push(label)))
     job.resolve = resolver
     return job
   }

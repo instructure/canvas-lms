@@ -22,8 +22,9 @@ import userEvent from '@testing-library/user-event'
 import PeopleFilter from '../PeopleFilter'
 import {DEFAULT_OPTION} from '../../../../util/constants'
 import {EnvRole} from '../../../../types'
+import useCoursePeopleContext from '../../../hooks/useCoursePeopleContext'
 
-jest.mock('../../../hooks/useCoursePeopleContext')
+vi.mock('../../../hooks/useCoursePeopleContext')
 
 const allRoles = [
   {...DEFAULT_OPTION, id: '1', label: 'Teacher', count: 1},
@@ -40,7 +41,7 @@ describe('PeopleFilter', () => {
   const otherRole = filterOptions[1]
   const user = userEvent.setup()
   const defaultProps = {
-    onOptionSelect: jest.fn(),
+    onOptionSelect: vi.fn(),
   }
 
   const renderComponent = () => render(<PeopleFilter {...defaultProps} />)
@@ -51,14 +52,12 @@ describe('PeopleFilter', () => {
   const otherLabel = labelWithCount(otherRole)
 
   beforeEach(() => {
-    require('../../../hooks/useCoursePeopleContext').default.mockReturnValue(
-      useCoursePeopleContextMocks,
-    )
+    ;(useCoursePeopleContext as any).mockReturnValue(useCoursePeopleContextMocks)
     renderComponent()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the filter dropdown', () => {

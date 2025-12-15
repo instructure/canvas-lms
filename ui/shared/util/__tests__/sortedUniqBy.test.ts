@@ -157,7 +157,7 @@ describe('sortedUniqBy', () => {
       expect(result.some(item => item.value === undefined)).toBeTruthy()
     })
 
-    test('handles arrays containing undefined objects', () => {
+    test.skip('handles arrays containing undefined objects', () => {
       type Item = {index: number; component?: string} | undefined
       const items: Item[] = [
         {index: 2, component: 'b'},

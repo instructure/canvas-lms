@@ -33,7 +33,7 @@ const defaultProps = {
     {id: 2, visible: false},
     {id: 10, visible: true},
   ],
-  onApplyClicked: jest.fn(),
+  onApplyClicked: vi.fn(),
   enableSaveButton: true,
   showConfirmation: false,
 }
@@ -49,7 +49,7 @@ describe('Footer', () => {
   })
 
   it('calls onApplyClicked when apply button is pressed', () => {
-    const onApplyClicked = jest.fn()
+    const onApplyClicked = vi.fn()
     const {getByRole} = render(<Footer {...defaultProps} onApplyClicked={onApplyClicked} />)
     getByRole('button', {name: 'Apply Changes'}).click()
     expect(onApplyClicked).toHaveBeenCalledTimes(1)
@@ -75,7 +75,7 @@ describe('Footer', () => {
   })
 
   it('displays the confirmation modal if showConfirmation is enabled', async () => {
-    const onApplyClicked = jest.fn()
+    const onApplyClicked = vi.fn()
     const {getByRole} = render(
       <Footer {...defaultProps} showConfirmation={true} onApplyClicked={onApplyClicked} />,
     )

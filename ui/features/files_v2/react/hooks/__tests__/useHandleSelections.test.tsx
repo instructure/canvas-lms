@@ -23,10 +23,10 @@ import {useHandleSelections} from '../useHandleSelections'
 
 describe('useHandleSelections', () => {
   const selectableIds = ['file1', 'file2', 'file3']
-  let setSelectionAnnouncement: jest.Mock
+  let setSelectionAnnouncement: any
 
   beforeEach(() => {
-    setSelectionAnnouncement = jest.fn()
+    setSelectionAnnouncement = vi.fn()
   })
 
   it('should initialize with no selected IDs', () => {

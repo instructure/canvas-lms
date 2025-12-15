@@ -30,7 +30,7 @@ import {
   IMPORT_COMPLETED,
 } from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('FindOutcomesView', () => {
   let onChangeHandlerMock
@@ -86,15 +86,15 @@ describe('FindOutcomesView', () => {
 
   beforeEach(() => {
     cache = createCache()
-    onChangeHandlerMock = jest.fn()
-    onClearHandlerMock = jest.fn()
-    importOutcomeHandlerMock = jest.fn()
-    onLoadMoreHandlerMock = jest.fn()
-    onAddAllHandlerMock = jest.fn()
+    onChangeHandlerMock = vi.fn()
+    onClearHandlerMock = vi.fn()
+    importOutcomeHandlerMock = vi.fn()
+    onLoadMoreHandlerMock = vi.fn()
+    onAddAllHandlerMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const render = (

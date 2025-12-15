@@ -147,14 +147,14 @@ describe('GradeSummary', () => {
 
   describe('formatPercentGrade', () => {
     it('returns an internationalized number value', () => {
-      jest.spyOn(I18n.constructor.prototype, 'n').mockReturnValue('1,234%')
+      vi.spyOn(I18n.constructor.prototype, 'n').mockReturnValue('1,234%')
       expect(GradeSummary.formatPercentGrade(1234)).toBe('1,234%')
     })
   })
 
   describe('calculateGrade', () => {
     it('returns an internationalized percentage when given a score and nonzero points possible', () => {
-      jest.spyOn(I18n.constructor.prototype, 'n').mockImplementation(number => `${number}%`)
+      vi.spyOn(I18n.constructor.prototype, 'n').mockImplementation(number => `${number}%`)
       expect(GradeSummary.calculateGrade(97, 100)).toBe('97%')
       expect(I18n.n.mock.calls[0][1].percentage).toBeTruthy()
     })
@@ -170,7 +170,7 @@ describe('GradeSummary', () => {
 
   describe('calculateGrades', () => {
     it('calculates grades using data in the env', () => {
-      jest.spyOn(CourseGradeCalculator, 'calculate')
+      vi.spyOn(CourseGradeCalculator, 'calculate')
       GradeSummary.calculateGrades()
       const args = CourseGradeCalculator.calculate.mock.calls[0]
       expect(args[0]).toEqual(ENV.submissions)

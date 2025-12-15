@@ -25,10 +25,10 @@ import {renderHook, act} from '@testing-library/react-hooks'
 import {MockedProvider} from '@apollo/client/testing'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
 describe('useManageOutcomes', () => {
@@ -53,33 +53,33 @@ describe('useManageOutcomes', () => {
       () => useManageOutcomes({collection: 'test', initialGroupId: '400'}),
       {wrapper},
     )
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(result.current.selectedGroupId).toBe('400')
     expect(result.current.selectedParentGroupId).toBe('100')
 
     act(() => result.current.queryCollections({id: '100'}))
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(result.current.selectedGroupId).toBe('100')
     expect(result.current.selectedParentGroupId).toBe('1')
   })
 
   it('it doesnt show deleted group after rerender', async () => {
     const {result} = renderHook(() => useManageOutcomes(), {wrapper})
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
 
     expect(result.current.collections['100']).toBeDefined()
     act(() => result.current.removeGroup('100'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(result.current.collections['100']).toBeUndefined()
 
     const {result: result2} = renderHook(() => useManageOutcomes(), {wrapper})
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(result2.current.collections['100']).toBeUndefined()
   })
 
   it('should flash a screenreader only info message when a group is loading', async () => {
     const {result} = renderHook(() => useManageOutcomes(), {wrapper})
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
 
     expect(result.current.collections['100']).toBeDefined()
     result.current.queryCollections({id: '100', parentGroupId: '1'})

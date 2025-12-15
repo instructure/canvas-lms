@@ -23,31 +23,31 @@ import {responsiveQuerySizes} from '../../../utils'
 import {useTranslationStore} from '../../../hooks/useTranslationStore'
 import {ObserverContext} from '../../../utils/ObserverContext'
 
-jest.mock('../../../utils')
+vi.mock('../../../utils')
 
-jest.mock('../../../hooks/useTranslationStore')
+vi.mock('../../../hooks/useTranslationStore')
 
-const useTranslationStoreMock = useTranslationStore as unknown as jest.Mock
-const responsiveQuerySizesMock = responsiveQuerySizes as jest.Mock
+const useTranslationStoreMock = useTranslationStore as unknown as any
+const responsiveQuerySizesMock = responsiveQuerySizes as any
 
 const mediaQueryMock = {
   matches: true,
   media: '',
   onchange: null,
-  addListener: jest.fn(),
-  removeListener: jest.fn(),
-  addEventListener: jest.fn(),
-  removeEventListener: jest.fn(),
-  dispatchEvent: jest.fn(),
+  addListener: vi.fn(),
+  removeListener: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn(),
 }
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(query => ({...mediaQueryMock, media: query}))
+  window.matchMedia = vi.fn().mockImplementation(query => ({...mediaQueryMock, media: query}))
 })
 
 afterEach(() => {
   cleanup()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 beforeEach(() => {
@@ -62,9 +62,9 @@ const initalMockState = {
     '1': {loading: false},
   },
   translateAll: false,
-  addEntry: jest.fn(),
-  removeEntry: jest.fn(),
-  clearEntry: jest.fn(),
+  addEntry: vi.fn(),
+  removeEntry: vi.fn(),
+  clearEntry: vi.fn(),
 }
 
 const defaultProviderProps = {
@@ -102,11 +102,11 @@ const setup = (props: any = {}, providerProps: any = {}) =>
 
 describe('PostMessage AI translation', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     useTranslationStoreMock.mockImplementation((selector: any) => {
       return selector({...initalMockState})
     })
-    ;(useTranslationStoreMock as any).getState = jest.fn(() => ({...initalMockState}))
+    ;(useTranslationStoreMock as any).getState = vi.fn(() => ({...initalMockState}))
   })
 
   it('should display loading spinner and text while translation is in progress', async () => {
@@ -334,8 +334,8 @@ describe('PostMessage AI translation', () => {
               translatedMessage: 'Translated message',
             },
           },
-          removeEntry: jest.fn(),
-          setModalOpen: jest.fn(),
+          removeEntry: vi.fn(),
+          setModalOpen: vi.fn(),
         }
 
         return selector(state)
@@ -415,7 +415,7 @@ describe('PostMessage AI translation', () => {
     })
 
     it('should call setModalOpen when "Change translation language" is clicked', async () => {
-      const setModalOpenMock = jest.fn()
+      const setModalOpenMock = vi.fn()
 
       useTranslationStoreMock.mockImplementation((selector: any) => {
         const state = {
@@ -428,7 +428,7 @@ describe('PostMessage AI translation', () => {
               translatedMessage: 'Translated message',
             },
           },
-          removeEntry: jest.fn(),
+          removeEntry: vi.fn(),
           setModalOpen: setModalOpenMock,
         }
 
@@ -444,7 +444,7 @@ describe('PostMessage AI translation', () => {
     })
 
     it('should call setModalOpen with originalTitle when id is "topic"', async () => {
-      const setModalOpenMock = jest.fn()
+      const setModalOpenMock = vi.fn()
 
       useTranslationStoreMock.mockImplementation((selector: any) => {
         const state = {
@@ -457,7 +457,7 @@ describe('PostMessage AI translation', () => {
               translatedMessage: 'Translated message',
             },
           },
-          removeEntry: jest.fn(),
+          removeEntry: vi.fn(),
           setModalOpen: setModalOpenMock,
         }
 
@@ -473,7 +473,7 @@ describe('PostMessage AI translation', () => {
     })
 
     it('should call clearEntry when "Hide translation" is clicked', async () => {
-      const clearEntryMock = jest.fn()
+      const clearEntryMock = vi.fn()
 
       useTranslationStoreMock.mockImplementation((selector: any) => {
         const state = {
@@ -487,7 +487,7 @@ describe('PostMessage AI translation', () => {
             },
           },
           clearEntry: clearEntryMock,
-          setModalOpen: jest.fn(),
+          setModalOpen: vi.fn(),
         }
 
         return selector(state)
@@ -513,19 +513,19 @@ describe('PostMessage AI translation', () => {
           },
         },
         translateAll: true,
-        removeEntry: jest.fn(),
-        setModalOpen: jest.fn(),
+        removeEntry: vi.fn(),
+        setModalOpen: vi.fn(),
       }
 
       useTranslationStoreMock.mockImplementation((selector: any) => {
         return selector(state)
       })
-      ;(useTranslationStoreMock as any).getState = jest.fn(() => state)
+      ;(useTranslationStoreMock as any).getState = vi.fn(() => state)
 
       const {queryByTestId} = setup(
         {},
         {
-          enqueueTranslation: jest.fn(),
+          enqueueTranslation: vi.fn(),
           entryTranslatingSet: new Set(),
         },
       )
@@ -538,20 +538,20 @@ describe('PostMessage AI translation', () => {
 
 describe('PostMessage intersection observer registration', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     useTranslationStoreMock.mockImplementation((selector: any) => {
       return selector({...initalMockState})
     })
-    ;(useTranslationStoreMock as any).getState = jest.fn(() => ({...initalMockState}))
+    ;(useTranslationStoreMock as any).getState = vi.fn(() => ({...initalMockState}))
   })
 
   it('should register the component with the observer during mount', () => {
-    const observeMock = jest.fn()
-    const unobserveMock = jest.fn()
+    const observeMock = vi.fn()
+    const unobserveMock = vi.fn()
     const observerMock = {
       observe: observeMock,
       unobserve: unobserveMock,
-      disconnect: jest.fn(),
+      disconnect: vi.fn(),
     }
     const nodesRefMock = {current: new Map()}
 
@@ -584,12 +584,12 @@ describe('PostMessage intersection observer registration', () => {
   })
 
   it('should unobserve and remove from nodesRef on unmount', () => {
-    const observeMock = jest.fn()
-    const unobserveMock = jest.fn()
+    const observeMock = vi.fn()
+    const unobserveMock = vi.fn()
     const observerMock = {
       observe: observeMock,
       unobserve: unobserveMock,
-      disconnect: jest.fn(),
+      disconnect: vi.fn(),
     }
     const nodesRefMock = {current: new Map()}
 

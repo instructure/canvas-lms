@@ -22,8 +22,8 @@ import NeverDropCollection from '../../collections/NeverDropCollection'
 import NeverDropCollectionView from '../NeverDropCollectionView'
 
 // Mock debounce to make it synchronous for testing
-jest.mock('lodash', () => ({
-  ...jest.requireActual('lodash'),
+vi.mock('lodash', () => ({
+  ...vi.requireActual('lodash'),
   debounce: fn => fn,
 }))
 

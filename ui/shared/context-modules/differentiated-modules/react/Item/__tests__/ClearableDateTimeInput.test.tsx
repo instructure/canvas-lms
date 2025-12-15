@@ -24,7 +24,7 @@ import ClearableDateTimeInput, {type ClearableDateTimeInputProps} from '../Clear
 // We'll assume that the functionality of DateTimeInput is tested elsewhere,
 // so since these unit tests are focused on the behavior of this wrapper,
 // just mocking it out seems safe.
-jest.mock('@instructure/ui-date-time-input', () => ({
+vi.mock('@instructure/ui-date-time-input', () => ({
   DateTimeInput: ({onChange, messages, description}: any) => {
     return (
       <div data-testid="mocked-date-time-input">
@@ -59,8 +59,8 @@ describe('ClearableDateTimeInput', () => {
     dateRenderLabel: 'Date',
     value: null,
     messages: [],
-    onChange: jest.fn(),
-    onClear: jest.fn(),
+    onChange: vi.fn(),
+    onClear: vi.fn(),
     breakpoints: {},
     clearButtonAltLabel: 'Clear input for 2 students',
   }
@@ -69,7 +69,7 @@ describe('ClearableDateTimeInput', () => {
     render(<ClearableDateTimeInput {...props} {...overrides} />)
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders', () => {
@@ -89,7 +89,7 @@ describe('ClearableDateTimeInput', () => {
   })
 
   it('calls onChange when date is changed', async () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByTestId} = renderComponent({onChange})
     const changeDateButton = getByTestId('simulate-date-change')
 
@@ -109,7 +109,7 @@ describe('ClearableDateTimeInput', () => {
 
   describe('validation of "reasonable" dates', () => {
     it('prevents dates before 1980 and shows error message', async () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByTestId, getByText} = renderComponent({onChange})
 
       const changeDateButton = getByTestId('simulate-date-change')
@@ -127,7 +127,7 @@ describe('ClearableDateTimeInput', () => {
     })
 
     it('allows dates after 1980', async () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByTestId, queryByText} = renderComponent({onChange})
 
       const changeDateButton = getByTestId('simulate-date-change')
@@ -145,8 +145,8 @@ describe('ClearableDateTimeInput', () => {
     })
 
     it('clears validation error when clear button is clicked', async () => {
-      const onChange = jest.fn()
-      const onClear = jest.fn()
+      const onChange = vi.fn()
+      const onClear = vi.fn()
       const {getByTestId, getByText, queryByText} = renderComponent({onChange, onClear})
 
       const changeDateButton = getByTestId('simulate-date-change')
@@ -170,7 +170,7 @@ describe('ClearableDateTimeInput', () => {
     })
 
     it('clears validation error when a valid date is selected after an invalid one', async () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByTestId, getByText, queryByText} = renderComponent({onChange})
 
       const changeDateButton = getByTestId('simulate-date-change')

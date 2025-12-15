@@ -26,8 +26,8 @@ describe('lti.showAlert handler', () => {
 
   beforeEach(() => {
     responseMessages = {
-      sendBadRequestError: jest.fn(),
-      sendSuccess: jest.fn(),
+      sendBadRequestError: vi.fn(),
+      sendSuccess: vi.fn(),
     }
   })
 
@@ -65,7 +65,7 @@ describe('lti.showAlert handler', () => {
     describe(`when alertType is ${alertType}`, () => {
       beforeEach(() => {
         message = {body, alertType}
-        jest.spyOn($, method)
+        vi.spyOn($, method)
       })
 
       afterEach(() => {
@@ -89,7 +89,7 @@ describe('lti.showAlert handler', () => {
 
     beforeEach(() => {
       message = {body, title}
-      jest.spyOn($, 'flashMessageSafe')
+      vi.spyOn($, 'flashMessageSafe')
     })
 
     afterEach(() => {
@@ -105,7 +105,7 @@ describe('lti.showAlert handler', () => {
   describe('when title is not found', () => {
     beforeEach(() => {
       message = {body}
-      jest.spyOn($, 'flashMessageSafe')
+      vi.spyOn($, 'flashMessageSafe')
     })
 
     afterEach(() => {

@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, cleanup, fireEvent} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 
 import AssignmentColumnHeader from '../AssignmentColumnHeader'
 
@@ -376,7 +375,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
 
     describe('when closed', () => {
       beforeEach(() => {
-        props.onMenuDismiss = jest.fn()
+        props.onMenuDismiss = vi.fn()
         mountAndOpenOptionsMenu()
         closeOptionsMenu()
       })

@@ -31,8 +31,8 @@ import {mockRowsContext} from '../../FileFolderTable/__tests__/testUtils'
 
 const defaultProps = {
   isOpen: true,
-  onRequestClose: jest.fn(),
-  onExited: jest.fn(),
+  onRequestClose: vi.fn(),
+  onExited: vi.fn(),
 }
 
 const renderComponent = (props = {}) => {
@@ -49,7 +49,7 @@ const renderComponent = (props = {}) => {
 describe('CreateFolderModal', () => {
   beforeEach(() => {
     fakeENV.setup()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fetchMock.reset()
     fetchMock.post(/.*\/folders/, 200)
   })

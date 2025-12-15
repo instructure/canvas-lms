@@ -29,21 +29,21 @@ import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobal
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {ObserverContext} from '../utils/ObserverContext'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  openWindow: jest.fn(),
-  windowPathname: jest.fn(() => '/courses/1'),
+vi.mock('@canvas/util/globalUtils', () => ({
+  openWindow: vi.fn(),
+  windowPathname: vi.fn(() => '/courses/1'),
 }))
 
 injectGlobalAlertContainers()
 
-jest.mock('../utils', () => ({
-  ...jest.requireActual('../utils'),
-  responsiveQuerySizes: jest.fn(),
+vi.mock('../utils', async () => ({
+  ...await vi.importActual('../utils'),
+  responsiveQuerySizes: vi.fn(),
 }))
 
 describe('DiscussionsAttachment', () => {
-  const onFailureStub = jest.fn()
-  const onSuccessStub = jest.fn()
+  const onFailureStub = vi.fn()
+  const onSuccessStub = vi.fn()
   beforeAll(() => {
     fakeENV.setup({
       course_id: '1',
@@ -53,13 +53,13 @@ describe('DiscussionsAttachment', () => {
       current_user_id: '1',
     })
 
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
   })
@@ -131,7 +131,11 @@ describe('DiscussionsAttachment', () => {
         expect(tinymce.get('1337')).toBeDefined()
       })
 
-      document.querySelectorAll('textarea')[0].value = ''
+      await waitFor(() => {
+        const textarea = document.querySelectorAll('textarea')[0]
+        expect(textarea).toBeDefined()
+        textarea.value = ''
+      })
 
       await waitFor(() => expect(container.queryByTestId('remove-button')).toBeTruthy())
       const removeAttachButton = container.getAllByTestId('remove-button')[0]

@@ -28,8 +28,8 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 
-jest.mock('@canvas/calendar/jquery/CommonEvent/index')
-jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog')
+vi.mock('@canvas/calendar/jquery/CommonEvent/index')
+vi.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog')
 
 const server = setupServer()
 
@@ -123,17 +123,17 @@ describe('CalendarEventDetailsForm', () => {
         important_dates: false,
         blackout_date: false,
       },
-      save: jest.fn().mockResolvedValue({}),
+      save: vi.fn().mockResolvedValue({}),
     }))
     // MSW will handle the actual network requests
-    jest
+    vi
       .spyOn(UpdateCalendarEventDialogModule, 'renderUpdateCalendarEventDialog')
       .mockImplementation(() => Promise.resolve('all'))
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders and updates an event with conferencing when it is available', async () => {
@@ -304,7 +304,7 @@ describe('CalendarEventDetailsForm', () => {
     })
 
     afterEach(() => {
-      jest.resetModules()
+      vi.resetModules()
     })
 
     it('renders when creating', async () => {
@@ -359,7 +359,7 @@ describe('CalendarEventDetailsForm', () => {
       props.event = commonEventFactory(null, [userContext, courseContext])
       const d = moment('2023-08-28') // a monday
       props.event.date = d.toDate()
-      props.event.startDate = jest.fn(() => moment(props.event.date))
+      props.event.startDate = vi.fn(() => moment(props.event.date))
       const nextDate = d.clone().add(1, 'day').toISOString()
 
       const component = render(<CalendarEventDetailsForm {...props} />)
@@ -377,7 +377,7 @@ describe('CalendarEventDetailsForm', () => {
       props.event = commonEventFactory(null, [userContext, courseContext])
       const d = moment('2023-08-28') // a monday
       props.event.date = d.toDate()
-      props.event.startDate = jest.fn(() => moment(props.event.date))
+      props.event.startDate = vi.fn(() => moment(props.event.date))
       props.event.object.rrule = 'FREQ=WEEKLY;BYDAY=MO;INTERVAL=1;COUNT=5'
       const nextDate = d.clone().add(1, 'day').format('ddd, MMM D, YYYY')
 

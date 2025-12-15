@@ -21,7 +21,7 @@ import React from 'react'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
 import DiscussionTopicForm from '../DiscussionTopicForm'
 
-jest.mock('@canvas/rce/react/CanvasRce')
+vi.mock('@canvas/rce/react/CanvasRce')
 
 describe('DiscussionTopicForm', () => {
   const setup = ({
@@ -79,8 +79,9 @@ describe('DiscussionTopicForm', () => {
   })
 
   describe('Todo Date', () => {
+    // TODO: vi->vitest - test times out waiting for form submission, needs investigation
     it('clears todo date in submission when switching to graded', async () => {
-      const mockOnSubmit = jest.fn()
+      const mockOnSubmit = vi.fn()
       const todoDate = '2024-12-31T23:59:00Z'
       const {getByTestId} = setup({
         onSubmit: mockOnSubmit,
@@ -107,7 +108,7 @@ describe('DiscussionTopicForm', () => {
     })
 
     it('preserves todo date in ungraded mode', async () => {
-      const mockOnSubmit = jest.fn()
+      const mockOnSubmit = vi.fn()
       const todoDate = '2024-12-31T23:59:00Z'
       const {getByTestId} = setup({
         onSubmit: mockOnSubmit,
@@ -131,7 +132,9 @@ describe('DiscussionTopicForm', () => {
     })
   })
 
-  // returns 12:00 AM in jsdom 25
+  // FIXME: jsdom 25 changed how DateTimeInput generates timestamps when selecting dates,
+  // causing the midnight detection in isFancyMidnightNeeded to fail. The date picker now
+  // returns a different time value that doesn't trigger the 00:00:00 -> 23:59:00 conversion.
   it.skip('applies fancy midnight to assign reviews when needed', () => {
     const {getByTestId, getByText} = setup()
 
@@ -197,7 +200,7 @@ describe('DiscussionTopicForm', () => {
     })
 
     it('sets delayedPostAt and lockAt to null when checkpoints are enabled in a blueprint course', async () => {
-      const mockOnSubmit = jest.fn()
+      const mockOnSubmit = vi.fn()
       const availableFrom = '2024-12-31T10:00:00Z'
       const availableUntil = '2024-12-31T23:59:00Z'
 
@@ -224,7 +227,7 @@ describe('DiscussionTopicForm', () => {
     it('sets dates normally when checkpoints are disabled in a blueprint course', async () => {
       window.ENV.FEATURES.discussion_checkpoints = false
       window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = false
-      const mockOnSubmit = jest.fn()
+      const mockOnSubmit = vi.fn()
       const availableFrom = '2024-12-31T10:00:00Z'
       const availableUntil = '2024-12-31T23:59:00Z'
 

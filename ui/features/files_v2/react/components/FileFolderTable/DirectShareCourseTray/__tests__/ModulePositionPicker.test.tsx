@@ -30,7 +30,7 @@ const server = setupServer()
 const defaultProps = {
   courseId: '1',
   moduleId: '1',
-  onSelectPosition: jest.fn(),
+  onSelectPosition: vi.fn(),
 }
 
 const renderComponent = (props = {}) =>
@@ -57,8 +57,8 @@ describe('ModulePositionPicker', () => {
 
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
-    jest.resetAllMocks()
+    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
   it("shows 'loading additional items' when it's still loading data", async () => {
@@ -165,7 +165,7 @@ describe('ModulePositionPicker', () => {
     )
     rerender(
       <RowsProvider
-        value={{setCurrentRows: jest.fn(), currentRows: [], setSessionExpired: jest.fn()}}
+        value={{setCurrentRows: vi.fn(), currentRows: [], setSessionExpired: vi.fn()}}
       >
         <ModulePositionPicker {...defaultProps} moduleId="2" />
       </RowsProvider>,

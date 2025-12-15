@@ -47,9 +47,9 @@ function renderDialog(props) {
       courseId={props.courseId || 123}
       contentId={props.contentId || 'a-page'}
       publishAt={props.publishAt || '2022-02-22T22:22:22Z'}
-      onPublish={props.onPublish || jest.fn()}
-      onUpdatePublishAt={props.onUpdatePublishAt || jest.fn()}
-      onClose={props.onClose || jest.fn()}
+      onPublish={props.onPublish || vi.fn()}
+      onUpdatePublishAt={props.onUpdatePublishAt || vi.fn()}
+      onClose={props.onClose || vi.fn()}
     />,
   )
 }
@@ -85,7 +85,7 @@ describe('DelayedPublishDialog', () => {
   })
 
   it('publishes a page outright', async () => {
-    const onPublish = jest.fn()
+    const onPublish = vi.fn()
     const {getByLabelText, getByRole} = renderDialog({onPublish})
     fireEvent.click(getByLabelText('Published'))
     fireEvent.click(getByRole('button', {name: 'OK'}))
@@ -93,7 +93,7 @@ describe('DelayedPublishDialog', () => {
   })
 
   it('cancels scheduled publication', async () => {
-    const onUpdatePublishAt = jest.fn()
+    const onUpdatePublishAt = vi.fn()
     const {getByLabelText, getByRole} = renderDialog({onUpdatePublishAt})
     fireEvent.click(getByLabelText('Unpublished'))
     fireEvent.click(getByRole('button', {name: 'OK'}))
@@ -110,7 +110,7 @@ describe('DelayedPublishDialog', () => {
   })
 
   it('changes the scheduled publication date', async () => {
-    const onUpdatePublishAt = jest.fn()
+    const onUpdatePublishAt = vi.fn()
     const {getByLabelText, getByRole} = renderDialog({onUpdatePublishAt})
     fireEvent.click(getByLabelText('Scheduled for publication'))
     const input = getByLabelText('Choose a date')
@@ -128,7 +128,7 @@ describe('DelayedPublishDialog', () => {
   })
 
   it('closes', async () => {
-    const onClose = jest.fn()
+    const onClose = vi.fn()
     const {getByRole} = renderDialog({onClose})
     fireEvent.click(getByRole('button', {name: 'Close'}))
     expect(onClose).toHaveBeenCalled()

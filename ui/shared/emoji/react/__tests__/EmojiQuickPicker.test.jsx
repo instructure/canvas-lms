@@ -26,7 +26,7 @@ describe('EmojiQuickPicker', () => {
   let insertEmoji
 
   beforeEach(() => {
-    insertEmoji = jest.fn()
+    insertEmoji = vi.fn()
   })
 
   afterEach(() => {

@@ -24,26 +24,26 @@ import {User} from '../../../../graphql/User'
 import {responsiveQuerySizes} from '../../../utils'
 import {ObserverContext} from '../../../utils/ObserverContext'
 
-jest.mock('../../../utils')
+vi.mock('../../../utils')
 
 const mediaQueryMock = {
   matches: true,
   media: '',
   onchange: null,
-  addListener: jest.fn(),
-  removeListener: jest.fn(),
-  addEventListener: jest.fn(),
-  removeEventListener: jest.fn(),
-  dispatchEvent: jest.fn(),
+  addListener: vi.fn(),
+  removeListener: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn(),
 }
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(query => ({...mediaQueryMock, media: query}))
+  window.matchMedia = vi.fn().mockImplementation(query => ({...mediaQueryMock, media: query}))
 })
 
 afterEach(() => {
   cleanup()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 beforeEach(() => {

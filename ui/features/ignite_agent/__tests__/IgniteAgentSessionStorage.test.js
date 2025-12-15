@@ -23,8 +23,8 @@ describe('IgniteAgentSessionStorage', () => {
 
   beforeEach(() => {
     sessionStorage.clear()
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
 
   afterEach(() => {
@@ -67,7 +67,7 @@ describe('IgniteAgentSessionStorage', () => {
     })
 
     it('returns undefined and logs error when sessionStorage contains invalid JSON', () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       sessionStorage.setItem(SESSION_STORAGE_KEY, 'invalid-json{')
 
       const result = readFromSession('isOpen')
@@ -182,7 +182,7 @@ describe('IgniteAgentSessionStorage', () => {
     })
 
     it('uses default state when existing data is invalid JSON', () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       sessionStorage.setItem(SESSION_STORAGE_KEY, 'invalid-json{')
 
       writeToSession('customKey', 'testValue')
@@ -202,7 +202,7 @@ describe('IgniteAgentSessionStorage', () => {
 
     it('handles error when sessionStorage.setItem fails', () => {
       // Suppress console.error for this test since we're intentionally causing an error
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       const mockError = new Error('Storage quota exceeded')
 
       // Get the descriptor to properly mock the property
@@ -211,7 +211,7 @@ describe('IgniteAgentSessionStorage', () => {
         configurable: true,
         enumerable: true,
         writable: true,
-        value: jest.fn(() => {
+        value: vi.fn(() => {
           throw mockError
         }),
       })

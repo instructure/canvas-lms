@@ -29,10 +29,10 @@ import {createCache} from '@canvas/apollo-v3'
 import GroupMoveModal from '../GroupMoveModal'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('GroupMoveModal', () => {
   let cache
@@ -56,11 +56,11 @@ describe('GroupMoveModal', () => {
       group100childCounts: 2,
     })
     cache = createCache()
-    onCloseHandlerMock = jest.fn()
+    onCloseHandlerMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const render = (
@@ -85,25 +85,25 @@ describe('GroupMoveModal', () => {
 
   it('renders component with Group title', async () => {
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(getByText('Move "Group 100 folder 0"')).toBeInTheDocument()
   })
 
   it('shows modal if open prop true', async () => {
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(getByText('Cancel')).toBeInTheDocument()
   })
 
   it('does not show modal if open prop false', async () => {
     const {queryByText} = render(<GroupMoveModal {...defaultProps({isOpen: false})} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(queryByText('Cancel')).not.toBeInTheDocument()
   })
 
   it('calls onCloseHandlerMock on Close button click', async () => {
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     const closeBtn = getByText('Close')
     fireEvent.click(closeBtn)
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
@@ -111,7 +111,7 @@ describe('GroupMoveModal', () => {
 
   it('calls onCloseHandlerMock on Cancel button click', async () => {
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     const closeBtn = getByText('Cancel')
     fireEvent.click(closeBtn)
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
@@ -119,15 +119,15 @@ describe('GroupMoveModal', () => {
 
   it('enables the move button when a valid group is selected', async () => {
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     fireEvent.click(getByText('Group 100 folder 1'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(getByText('Move').closest('button')).toBeEnabled()
   })
 
   it('by default, select parent group and disables move button', async () => {
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(getByText('Account folder 0')).toBeInTheDocument()
     expect(getByText('Group 100 folder 1')).toBeInTheDocument()
     expect(getByText('Move').closest('button')).toBeDisabled()
@@ -145,11 +145,11 @@ describe('GroupMoveModal', () => {
       }),
     ]
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     fireEvent.click(getByText('Group 100 folder 1'))
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     expect(showFlashAlert).toHaveBeenCalledWith({
       message: '"Group 100 folder 0" was moved to "Group 100 folder 1".',
       type: 'success',
@@ -169,11 +169,11 @@ describe('GroupMoveModal', () => {
       }),
     ]
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     fireEvent.click(getByText('Group 100 folder 1'))
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while moving this group. Please try again.',
       type: 'error',
@@ -194,11 +194,11 @@ describe('GroupMoveModal', () => {
     ]
 
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     fireEvent.click(getByText('Group 100 folder 1'))
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while moving this group. Please try again.',
       type: 'error',
@@ -219,11 +219,11 @@ describe('GroupMoveModal', () => {
     ]
 
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     fireEvent.click(getByText('Group 100 folder 1'))
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while moving this group. Please try again.',
       type: 'error',
@@ -247,13 +247,13 @@ describe('GroupMoveModal', () => {
       }),
     ]
 
-    const onSuccess = jest.fn()
+    const onSuccess = vi.fn()
     const {getByText} = render(<GroupMoveModal {...defaultProps({onSuccess})} />)
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     fireEvent.click(getByText('Group 100 folder 1'))
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     expect(onSuccess).toHaveBeenCalled()
   })
 
@@ -275,20 +275,20 @@ describe('GroupMoveModal', () => {
         }),
       ]
       const {getByText, getByLabelText} = render(<GroupMoveModal {...defaultProps()} />)
-      await act(async () => jest.runOnlyPendingTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {
         target: {value: 'new group'},
       })
       fireEvent.click(getByText('Create new group'))
-      await act(async () => jest.runOnlyPendingTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: '"new group" was successfully created.',
         type: 'success',
       })
       expect(getByText('Move').closest('button')).toBeEnabled()
       fireEvent.click(getByText('Move'))
-      await act(async () => jest.runOnlyPendingTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: '"Group 100 folder 0" was moved to "new group".',
         type: 'success',

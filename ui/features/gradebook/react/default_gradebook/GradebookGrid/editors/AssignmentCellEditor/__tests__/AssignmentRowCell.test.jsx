@@ -541,14 +541,14 @@ describe('GradebookGrid AssignmentRowCell', () => {
       })
 
       test('calls onToggleSubmissionTrayOpen when clicked', () => {
-        props.onToggleSubmissionTrayOpen = jest.fn()
+        props.onToggleSubmissionTrayOpen = vi.fn()
         wrapper = render(<AssignmentRowCell {...props} />)
         wrapper.container.querySelector(buttonSelector).click()
         expect(props.onToggleSubmissionTrayOpen).toHaveBeenCalledTimes(1)
       })
 
       test('calls onToggleSubmissionTrayOpen with the student id and assignment id', () => {
-        props.onToggleSubmissionTrayOpen = jest.fn()
+        props.onToggleSubmissionTrayOpen = vi.fn()
         wrapper = render(<AssignmentRowCell {...props} />)
         wrapper.container.querySelector(buttonSelector).click()
         expect(props.onToggleSubmissionTrayOpen).toHaveBeenCalledWith('1101', '2301')
@@ -560,7 +560,7 @@ describe('GradebookGrid AssignmentRowCell', () => {
           id: '2301',
           name: 'Parent Assignment',
         }
-        props.onToggleSubmissionTrayOpen = jest.fn()
+        props.onToggleSubmissionTrayOpen = vi.fn()
         wrapper = render(<AssignmentRowCell {...props} />)
         wrapper.container.querySelector(buttonSelector).click()
         expect(props.onToggleSubmissionTrayOpen).toHaveBeenCalledWith('1101', '2301')

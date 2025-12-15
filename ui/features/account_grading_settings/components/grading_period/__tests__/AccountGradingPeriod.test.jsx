@@ -21,18 +21,26 @@ import React from 'react'
 import {render, fireEvent, screen} from '@testing-library/react'
 import axios from '@canvas/axios'
 import GradingPeriod from '../AccountGradingPeriod'
-import DateHelper from '@canvas/datetime/dateHelper'
+import * as DateHelper from '@canvas/datetime/dateHelper'
 import {windowConfirm} from '@canvas/util/globalUtils'
 
-jest.mock('@canvas/datetime/dateHelper', () => ({
-  formatDateForDisplay: jest.fn(date => {
+vi.mock('@canvas/datetime/dateHelper', async importOriginal => {
+  const actual = await importOriginal()
+  const formatDateForDisplayMock = vi.fn(date => {
     const options = {year: 'numeric', month: '2-digit', day: '2-digit'}
     return date.toLocaleDateString('en-US', options)
-  }),
-}))
+  })
+  return {
+    ...actual,
+    default: {
+      ...actual.default,
+      formatDateForDisplay: formatDateForDisplayMock,
+    },
+  }
+})
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  windowConfirm: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  windowConfirm: vi.fn(),
 }))
 
 const allPermissions = {read: true, create: true, update: true, delete: true}
@@ -49,10 +57,10 @@ const defaultProps = {
   },
   weighted: true,
   readOnly: false,
-  onEdit: jest.fn(),
+  onEdit: vi.fn(),
   permissions: allPermissions,
   deleteGradingPeriodURL: 'api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D',
-  onDelete: jest.fn(),
+  onDelete: vi.fn(),
 }
 
 describe('AccountGradingPeriod', () => {
@@ -62,13 +70,14 @@ describe('AccountGradingPeriod', () => {
 
   beforeEach(() => {
     windowConfirm.mockReset()
-    jest.spyOn(axios, 'delete').mockReset()
+    vi.spyOn(axios, 'delete').mockReset()
     defaultProps.onDelete.mockReset()
     defaultProps.onEdit.mockReset()
+    DateHelper.default.formatDateForDisplay.mockClear()
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('shows the "edit grading period" button when "update" is permitted', () => {
@@ -99,19 +108,23 @@ describe('AccountGradingPeriod', () => {
   it('displays the start date in a friendly format', () => {
     renderComponent()
     expect(screen.getByText(/Starts:/)).toBeInTheDocument()
-    expect(DateHelper.formatDateForDisplay).toHaveBeenCalledWith(defaultProps.period.startDate)
+    expect(DateHelper.default.formatDateForDisplay).toHaveBeenCalledWith(
+      defaultProps.period.startDate,
+    )
   })
 
   it('displays the end date in a friendly format', () => {
     renderComponent()
     expect(screen.getByText(/Ends:/)).toBeInTheDocument()
-    expect(DateHelper.formatDateForDisplay).toHaveBeenCalledWith(defaultProps.period.endDate)
+    expect(DateHelper.default.formatDateForDisplay).toHaveBeenCalledWith(defaultProps.period.endDate)
   })
 
   it('displays the close date in a friendly format', () => {
     renderComponent()
     expect(screen.getByText(/Closes:/)).toBeInTheDocument()
-    expect(DateHelper.formatDateForDisplay).toHaveBeenCalledWith(defaultProps.period.closeDate)
+    expect(DateHelper.default.formatDateForDisplay).toHaveBeenCalledWith(
+      defaultProps.period.closeDate,
+    )
   })
 
   it('displays the weight in a friendly format', () => {
@@ -147,7 +160,7 @@ describe('AccountGradingPeriod', () => {
 
   it('does not delete the period if the user cancels the delete confirmation', () => {
     windowConfirm.mockReturnValue(false)
-    const axiosDeleteMock = jest.spyOn(axios, 'delete')
+    const axiosDeleteMock = vi.spyOn(axios, 'delete')
     renderComponent()
     fireEvent.click(screen.getByTitle(/Delete/))
     expect(defaultProps.onDelete).not.toHaveBeenCalled()
@@ -156,9 +169,9 @@ describe('AccountGradingPeriod', () => {
 
   it('calls onDelete if the user confirms deletion and the axios call succeeds', async () => {
     windowConfirm.mockReturnValue(true)
-    const flashMessageMock = jest.fn()
+    const flashMessageMock = vi.fn()
     $.flashMessage = flashMessageMock
-    const axiosDeleteMock = jest
+    const axiosDeleteMock = vi
       .spyOn(axios, 'delete')
       .mockImplementation(() => Promise.resolve({status: 200, data: {}}))
 

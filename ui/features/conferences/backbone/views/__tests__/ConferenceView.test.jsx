@@ -92,13 +92,13 @@ describe('ConferenceView', () => {
     window.ENV = {
       context_asset_string: 'course_1',
     }
-    mockScreenReaderMessage = jest.fn()
+    mockScreenReaderMessage = vi.fn()
     $.screenReaderFlashMessage = mockScreenReaderMessage
 
     // Create a mock jQuery promise
     const mockDeferred = $.Deferred()
     mockDeferred.resolve({deleted: true})
-    $.ajaxJSON = jest.fn().mockReturnValue(mockDeferred)
+    $.ajaxJSON = vi.fn().mockReturnValue(mockDeferred)
   })
 
   afterEach(() => {
@@ -107,8 +107,8 @@ describe('ConferenceView', () => {
       container.remove()
       container = null
     }
-    jest.resetAllMocks()
-    jest.restoreAllMocks()
+    vi.resetAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('renders the conference view', () => {
@@ -117,8 +117,8 @@ describe('ConferenceView', () => {
   })
 
   it('shows screenreader message when deleting a conference', async () => {
-    const mockConfirm = jest.spyOn(window, 'confirm').mockImplementation(() => true)
-    const mockDestroy = jest.fn().mockImplementation(options => {
+    const mockConfirm = vi.spyOn(window, 'confirm').mockImplementation(() => true)
+    const mockDestroy = vi.fn().mockImplementation(options => {
       options.success()
       return Promise.resolve()
     })
@@ -127,7 +127,7 @@ describe('ConferenceView', () => {
     view.model.destroy = mockDestroy
 
     const event = new Event('click')
-    event.preventDefault = jest.fn()
+    event.preventDefault = vi.fn()
     await view.delete(event)
 
     expect(mockScreenReaderMessage).toHaveBeenCalledWith('Conference was deleted')
@@ -135,7 +135,7 @@ describe('ConferenceView', () => {
   })
 
   it('shows screenreader message when deleting recordings', async () => {
-    const mockConfirm = jest.spyOn(window, 'confirm').mockImplementation(() => true)
+    const mockConfirm = vi.spyOn(window, 'confirm').mockImplementation(() => true)
 
     const conferenceWithRecordings = {
       id: 1,
@@ -168,15 +168,15 @@ describe('ConferenceView', () => {
 
     const view = createConferenceView(conferenceWithRecordings)
     const $recordingButton = view.$el.find('div.ig-button[data-id="954cc3"]')
-    $recordingButton.data('url', '/recording')
+    $recordingButton.data('url', '/api/v1/courses/1/conferences/1')
     $recordingButton.data('id', '954cc3')
 
     const event = new Event('click')
-    event.preventDefault = jest.fn()
+    event.preventDefault = vi.fn()
     const deleteLink = $recordingButton.find('a.delete_recording_link')[0]
     await view.deleteRecording({...event, currentTarget: deleteLink})
 
-    expect($.ajaxJSON).toHaveBeenCalledWith('/recording/recording', 'DELETE', {
+    expect($.ajaxJSON).toHaveBeenCalledWith('/api/v1/courses/1/conferences/1/recording', 'DELETE', {
       recording_id: '954cc3',
     })
   })

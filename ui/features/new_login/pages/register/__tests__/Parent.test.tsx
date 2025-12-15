@@ -26,20 +26,20 @@ import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../../
 import {createParentAccount} from '../../../services'
 import Parent from '../Parent'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
-jest.mock('../../../services', () => ({
-  createParentAccount: jest.fn(),
+vi.mock('../../../services', () => ({
+  createParentAccount: vi.fn(),
 }))
 
-jest.mock('../../../context', () => {
-  const actualContext = jest.requireActual('../../../context')
+vi.mock('../../../context', async () => {
+  const actualContext = await vi.importActual('../../../context')
   return {
     ...actualContext,
-    useNewLoginData: jest.fn(() => ({
-      ...actualContext.useNewLoginData(),
+    useNewLoginData: vi.fn(() => ({
+      isDataLoading: false,
     })),
   }
 })
@@ -58,10 +58,11 @@ describe('Parent', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
     // reset the mock implementation to return the default values
-    ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
+    vi.mocked(useNewLoginData).mockImplementation(() => ({
+      isDataLoading: false,
       loginHandleName: 'Email',
       privacyPolicyUrl: '',
       termsOfUseUrl: '',
@@ -86,8 +87,8 @@ describe('Parent', () => {
     })
 
     it('renders terms checkbox when required', async () => {
-      ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
-        ...jest.requireActual('../../../context').useNewLoginData(),
+      vi.mocked(useNewLoginData).mockImplementation(() => ({
+        isDataLoading: false,
         termsRequired: true,
         privacyPolicyUrl: 'http://www.example.com/privacy',
         termsOfUseUrl: 'http://www.example.com/terms',
@@ -159,7 +160,8 @@ describe('Parent', () => {
     })
 
     it('validates the terms checkbox when required', async () => {
-      ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
+      vi.mocked(useNewLoginData).mockImplementation(() => ({
+        isDataLoading: false,
         termsRequired: true,
         privacyPolicyUrl: 'http://www.example.com/privacy',
         termsOfUseUrl: 'http://www.example.com/terms',
@@ -194,9 +196,9 @@ describe('Parent', () => {
 
   describe('form submission', () => {
     it('submits successfully with valid inputs', async () => {
-      ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(createParentAccount).mockResolvedValueOnce({
         status: 200,
-        data: {redirect_url: '/dashboard'},
+        data: {success: true, destination: '/dashboard'},
       })
       setup()
       await userEvent.type(screen.getByTestId('email-input'), 'parent@example.com')
@@ -218,7 +220,7 @@ describe('Parent', () => {
     })
 
     it('shows error messages for failed API validation', async () => {
-      ;(createParentAccount as jest.Mock).mockRejectedValueOnce({
+      vi.mocked(createParentAccount).mockRejectedValueOnce({
         response: {
           json: async () => ({
             errors: {
@@ -240,7 +242,7 @@ describe('Parent', () => {
     })
 
     it('handles generic server errors gracefully', async () => {
-      ;(createParentAccount as jest.Mock).mockRejectedValueOnce({
+      vi.mocked(createParentAccount).mockRejectedValueOnce({
         response: {
           status: 500,
           json: async () => ({}),
@@ -263,9 +265,9 @@ describe('Parent', () => {
     })
 
     it('redirects to the provided destination after a successful submission', async () => {
-      ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(createParentAccount).mockResolvedValueOnce({
         status: 200,
-        data: {destination: '/custom-redirect'},
+        data: {success: true, destination: '/custom-redirect'},
       })
       setup()
       await userEvent.type(screen.getByTestId('email-input'), 'parent@example.com')
@@ -280,9 +282,9 @@ describe('Parent', () => {
     })
 
     it('redirects to the course page if course data is provided', async () => {
-      ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(createParentAccount).mockResolvedValueOnce({
         status: 200,
-        data: {course: {course: {id: 42}}},
+        data: {success: true, course: {course: {id: 42}}},
       })
       setup()
       await userEvent.type(screen.getByTestId('email-input'), 'parent@example.com')
@@ -297,9 +299,9 @@ describe('Parent', () => {
     })
 
     it('redirects to the default location if no destination or course is provided', async () => {
-      ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(createParentAccount).mockResolvedValueOnce({
         status: 200,
-        data: {},
+        data: {success: true},
       })
       setup()
       await userEvent.type(screen.getByTestId('email-input'), 'parent@example.com')

@@ -45,8 +45,8 @@ describe('RubricAssessmentContainer Tests', () => {
           rubricAssessmentData={[]}
           rubricTitle="Rubric"
           viewModeOverride="horizontal"
-          onDismiss={jest.fn()}
-          onSubmit={jest.fn()}
+          onDismiss={vi.fn()}
+          onSubmit={vi.fn()}
           {...props}
         />
       </MockedQueryProvider>,

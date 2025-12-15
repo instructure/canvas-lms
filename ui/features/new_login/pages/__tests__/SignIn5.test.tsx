@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import '@testing-library/jest-dom'
 import {cleanup, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MemoryRouter, useNavigate} from 'react-router-dom'
@@ -25,45 +24,47 @@ import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../con
 import SignIn from '../SignIn'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: jest.fn(),
+vi.mock('react-router-dom', async () => ({
+  ...(await vi.importActual('react-router-dom')),
+  useNavigate: vi.fn(),
 }))
 
-jest.mock('../../context', () => {
-  const actualContext = jest.requireActual('../../context')
+vi.mock('../../context', async () => {
+  const actualContext = await vi.importActual<typeof import('../../context')>('../../context')
   return {
     ...actualContext,
-    useNewLoginData: jest.fn(() => ({
-      ...actualContext.useNewLoginData(),
+    useNewLoginData: vi.fn(() => ({
+      isDataLoading: false,
       loginHandleName: 'Email',
     })),
-    useNewLogin: jest.fn(() => ({
+    useNewLogin: vi.fn(() => ({
       isUiActionPending: false,
-      setIsUiActionPending: jest.fn(),
+      setIsUiActionPending: vi.fn(),
       otpRequired: false,
-      setOtpRequired: jest.fn(),
+      setOtpRequired: vi.fn(),
       rememberMe: false,
-      setRememberMe: jest.fn(),
-      loginFailed: false,
-      setLoginFailed: jest.fn(),
+      setRememberMe: vi.fn(),
+      showForgotPassword: false,
+      setShowForgotPassword: vi.fn(),
+      otpCommunicationChannelId: null,
+      setOtpCommunicationChannelId: vi.fn(),
     })),
   }
 })
 
-jest.mock('../../services/auth', () => ({
-  performSignIn: jest.fn().mockResolvedValue({}),
-  initiateOtpRequest: jest.fn(),
+vi.mock('../../services/auth', () => ({
+  performSignIn: vi.fn().mockResolvedValue({}),
+  initiateOtpRequest: vi.fn(),
 }))
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  ...jest.requireActual('@canvas/util/globalUtils'),
-  assignLocation: jest.fn(),
-  windowPathname: jest.fn(),
+vi.mock('@canvas/util/globalUtils', async () => ({
+  ...(await vi.importActual('@canvas/util/globalUtils')),
+  assignLocation: vi.fn(),
+  windowPathname: vi.fn(),
 }))
 
 // fickle
-describe.skip('SignIn', () => {
+describe('SignIn', () => {
   const setup = () => {
     return render(
       <MemoryRouter>
@@ -76,17 +77,18 @@ describe.skip('SignIn', () => {
     )
   }
 
-  const mockNavigate = jest.fn()
+  const mockNavigate = vi.fn()
   beforeAll(() => {
-    ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
+    vi.mocked(useNavigate).mockReturnValue(mockNavigate)
   })
 
   beforeEach(() => {
     fakeENV.setup()
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
     // reset the mock implementation to return the default values
-    ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
+    vi.mocked(useNewLoginData).mockImplementation(() => ({
+      isDataLoading: false,
       loginHandleName: 'Email',
     }))
   })
@@ -97,7 +99,8 @@ describe.skip('SignIn', () => {
   })
 
   describe('ui State', () => {
-    it('removes the error alert when the user starts typing in the username field', async () => {
+    // Skip: Tests error alert dismissal behavior - requires proper FlashAlert integration
+    it.skip('removes the error alert when the user starts typing in the username field', async () => {
       const {getByTestId} = setup()
       const usernameInput = getByTestId('username-input')
       const loginButton = getByTestId('login-button')
@@ -111,7 +114,8 @@ describe.skip('SignIn', () => {
       })
     })
 
-    it('removes the error alert when the user starts typing in the password field', async () => {
+    // Skip: Tests error alert dismissal behavior - requires proper FlashAlert integration
+    it.skip('removes the error alert when the user starts typing in the password field', async () => {
       const {getByTestId} = setup()
       const usernameInput = getByTestId('username-input')
       const passwordInput = getByTestId('password-input')

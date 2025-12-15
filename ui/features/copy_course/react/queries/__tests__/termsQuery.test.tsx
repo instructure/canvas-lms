@@ -25,8 +25,8 @@ import type {EnrollmentTerms} from '../../../../../api'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/query', () => ({
-  useAllPages: jest.fn(),
+vi.mock('@canvas/query', () => ({
+  useAllPages: vi.fn(),
 }))
 
 const server = setupServer()
@@ -35,7 +35,7 @@ beforeAll(() => server.listen())
 afterAll(() => server.close())
 afterEach(() => {
   server.resetHandlers()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('useTermsQuery', () => {
@@ -65,7 +65,7 @@ describe('useTermsQuery', () => {
     pageParams: [null, {page: '2', per_page: '10'}],
   }
 
-  const mockUseAllPages = useAllPages as jest.Mock
+  const mockUseAllPages = useAllPages as ReturnType<typeof vi.fn>
 
   it('should return terms data', () => {
     mockUseAllPages.mockReturnValue({

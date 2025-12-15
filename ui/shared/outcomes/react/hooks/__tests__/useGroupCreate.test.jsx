@@ -24,10 +24,10 @@ import {MockedProvider} from '@apollo/client/testing'
 import {createOutcomeGroupMocks} from '../../../mocks/Management'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(() => vi.fn(() => {})),
 }))
 
 describe('useGroupCreate', () => {
@@ -41,7 +41,7 @@ describe('useGroupCreate', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const wrapper = ({children, mocks = createOutcomeGroupMocks()}) => (
@@ -67,7 +67,7 @@ describe('useGroupCreate', () => {
     act(() => {
       result.current.createGroup(groupName, parentGroupId)
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(result.current.createdGroups).toEqual([groupId])
   })
 
@@ -78,7 +78,7 @@ describe('useGroupCreate', () => {
     act(() => {
       result.current.createGroup(groupName, parentGroupId)
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(showFlashAlert).toHaveBeenCalledWith({
       message: '"New Group" was successfully created.',
       type: 'success',
@@ -95,7 +95,7 @@ describe('useGroupCreate', () => {
     act(() => {
       result.current.createGroup(groupName, parentGroupId)
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while creating this group. Please try again.',
       type: 'error',
@@ -112,7 +112,7 @@ describe('useGroupCreate', () => {
     act(() => {
       result.current.createGroup(groupName, parentGroupId)
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while creating this group. Please try again.',
       type: 'error',
@@ -126,7 +126,7 @@ describe('useGroupCreate', () => {
     act(() => {
       result.current.createGroup(groupName, parentGroupId)
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(result.current.createdGroups).toEqual([groupId])
     act(() => {
       result.current.clearCreatedGroups()

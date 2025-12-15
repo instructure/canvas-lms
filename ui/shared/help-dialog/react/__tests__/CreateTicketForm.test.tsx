@@ -26,8 +26,8 @@ import {http, HttpResponse} from 'msw'
 const server = setupServer()
 
 describe('CreateTicketForm', () => {
-  const onCancel = jest.fn()
-  const onSubmit = jest.fn()
+  const onCancel = vi.fn()
+  const onSubmit = vi.fn()
 
   const props = {onCancel, onSubmit}
 
@@ -65,7 +65,7 @@ describe('CreateTicketForm', () => {
 
   afterEach(() => {
     server.resetHandlers()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('rendering', () => {
@@ -120,7 +120,7 @@ describe('CreateTicketForm', () => {
   describe('validation', () => {
     beforeEach(() => {
       // Reset all mocks before each test
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('prevents submission if required fields are empty', async () => {
@@ -208,15 +208,20 @@ describe('CreateTicketForm', () => {
       const {getByTestId, getByText} = render(<CreateTicketForm {...props} />)
       // fill and submit form
       fireEvent.change(getByTestId('subject-input'), {target: {value: 'Test subject'}})
-      fireEvent.change(getByTestId('description-input'), {target: {value: 'Test description'}})
+      fireEvent.change(getByTestId('description-input'), {
+        target: {value: 'Test description'},
+      })
       await userEvent.click(getByTestId('severity-select'))
       await userEvent.click(getByText('Just a casual question, comment, idea, or suggestion'))
-      await userEvent.type(getByTestId('email-input'), 'test@instructure.com')
+      fireEvent.change(getByTestId('email-input'), {target: {value: 'test@instructure.com'}})
       await userEvent.click(getByTestId('submit-button'))
       // verify api call
-      await waitFor(() => {
-        expect(lastCapturedRequest).not.toBeNull()
-      })
+      await waitFor(
+        () => {
+          expect(lastCapturedRequest).not.toBeNull()
+        },
+        {timeout: 10000},
+      )
       expect(lastCapturedRequest!.path).toBe('/error_reports')
       expect(lastCapturedRequest!.method).toBe('POST')
       expect(lastCapturedRequest!.body.error).toMatchObject({
@@ -226,7 +231,7 @@ describe('CreateTicketForm', () => {
         email: 'test@instructure.com',
         context_asset_string: null,
       })
-    })
+    }, 10000)
 
     it('sends correct payload when user is logged in', async () => {
       mockEnv({

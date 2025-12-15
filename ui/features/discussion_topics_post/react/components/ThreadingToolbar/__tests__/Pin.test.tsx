@@ -17,29 +17,26 @@
  */
 
 import {render, fireEvent, screen} from '@testing-library/react'
-import React, {Component} from 'react'
+import React from 'react'
 import {Pin} from '../Pin'
-import type {SVGIconProps} from '@instructure/ui-svg-images'
 import {responsiveQuerySizes} from '../../../utils'
 
-jest.mock('../../../utils')
-jest.mock('@instructure/ui-icons', () => ({
-  IconPinSolid: (props: Component<SVGIconProps>) => <svg {...props} data-testid="icon-pin-solid" />,
-  IconPinLine: (props: Component<SVGIconProps>) => <svg {...props} data-testid="icon-pin-line" />,
+vi.mock('../../../utils')
+vi.mock('@instructure/ui-icons', () => ({
+  IconPinSolid: (props: any) => <svg {...props} data-testid="icon-pin-solid" />,
+  IconPinLine: (props: any) => <svg {...props} data-testid="icon-pin-line" />,
 }))
 
-const mockResponsiveQuerySizes = responsiveQuerySizes as jest.MockedFunction<
-  typeof responsiveQuerySizes
->
+const mockResponsiveQuerySizes = responsiveQuerySizes as ReturnType<typeof vi.fn>
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })
@@ -55,7 +52,7 @@ beforeEach(() => {
 
 const setup = (props = {}) => {
   const defaultProps = {
-    onClick: jest.fn(),
+    onClick: vi.fn(),
     isPinned: false,
   }
 
@@ -126,7 +123,7 @@ describe('Pin', () => {
 
   describe('onClick', () => {
     it('calls provided callback when clicked', () => {
-      const onClickMock = jest.fn()
+      const onClickMock = vi.fn()
       const {getAllByText} = setup({onClick: onClickMock})
 
       expect(onClickMock.mock.calls).toHaveLength(0)

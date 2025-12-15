@@ -49,14 +49,14 @@ describe('HorizontalButtonDisplay', () => {
     isPreviewMode: false,
     ratings: mockRatings,
     ratingOrder: 'descending',
-    onSelectRating: jest.fn(),
+    onSelectRating: vi.fn(),
     criterionUseRange: false,
     isSelfAssessment: false,
     hidePoints: false,
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders all rating buttons', () => {

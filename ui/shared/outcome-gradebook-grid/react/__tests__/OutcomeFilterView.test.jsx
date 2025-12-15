@@ -29,7 +29,7 @@ const defaultProps = () => ({
 })
 
 it('calls toggleInactiveEnrollments to enable displaying inactive enrollments', () => {
-  const toggleInactiveEnrollments = jest.fn()
+  const toggleInactiveEnrollments = vi.fn()
   const {getByText, getByRole} = render(
     <OutcomeFilterView {...defaultProps()} toggleInactiveEnrollments={toggleInactiveEnrollments} />,
   )
@@ -39,7 +39,7 @@ it('calls toggleInactiveEnrollments to enable displaying inactive enrollments', 
 })
 
 it('calls toggleInactiveEnrollments to disable displaying inactive enrollments', () => {
-  const toggleInactiveEnrollments = jest.fn()
+  const toggleInactiveEnrollments = vi.fn()
   const {getByText, getByRole} = render(
     <OutcomeFilterView
       {...defaultProps()}
@@ -53,7 +53,7 @@ it('calls toggleInactiveEnrollments to disable displaying inactive enrollments',
 })
 
 it('calls toggleConcludedEnrollments to enable displaying Concluded enrollments', () => {
-  const toggleConcludedEnrollments = jest.fn()
+  const toggleConcludedEnrollments = vi.fn()
   const {getByText, getByRole} = render(
     <OutcomeFilterView
       {...defaultProps()}
@@ -66,7 +66,7 @@ it('calls toggleConcludedEnrollments to enable displaying Concluded enrollments'
 })
 
 it('calls toggleConcludedEnrollments to disable displaying Concluded enrollments', () => {
-  const toggleConcludedEnrollments = jest.fn()
+  const toggleConcludedEnrollments = vi.fn()
   const {getByText, getByRole} = render(
     <OutcomeFilterView
       {...defaultProps()}
@@ -80,7 +80,7 @@ it('calls toggleConcludedEnrollments to disable displaying Concluded enrollments
 })
 
 it('calls toggleUnassessedStudents to enable displaying Unassessed students', () => {
-  const toggleUnassessedStudents = jest.fn()
+  const toggleUnassessedStudents = vi.fn()
   const {getByText, getByRole} = render(
     <OutcomeFilterView {...defaultProps()} toggleUnassessedStudents={toggleUnassessedStudents} />,
   )
@@ -90,7 +90,7 @@ it('calls toggleUnassessedStudents to enable displaying Unassessed students', ()
 })
 
 it('calls toggleUnassessedStudents to disable displaying Unassessed students', () => {
-  const toggleUnassessedStudents = jest.fn()
+  const toggleUnassessedStudents = vi.fn()
   const {getByText, getByRole} = render(
     <OutcomeFilterView
       {...defaultProps()}

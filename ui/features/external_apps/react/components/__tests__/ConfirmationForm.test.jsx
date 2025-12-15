@@ -23,8 +23,8 @@ import ConfirmationForm from '../ConfirmationForm'
 
 function newProps(overrides) {
   return {
-    onCancel: jest.fn(),
-    onConfirm: jest.fn(),
+    onCancel: vi.fn(),
+    onConfirm: vi.fn(),
     message: 'Are you sure you want to install the tool?',
     confirmLabel: 'Yes, please',
     cancelLabel: 'Nope!',

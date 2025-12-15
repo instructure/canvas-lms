@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {DisplayFilter} from '../../../utils/constants'
 import {DisplayFilterSelector, DisplayFilterSelectorProps} from '../DisplayFilterSelector'
@@ -24,11 +24,15 @@ import {DisplayFilterSelector, DisplayFilterSelectorProps} from '../DisplayFilte
 describe('DisplayFilterSelector', () => {
   const defaultProps: DisplayFilterSelectorProps = {
     values: [],
-    onChange: jest.fn(),
+    onChange: vi.fn(),
   }
 
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders checkbox group with correct name and description', () => {
@@ -86,7 +90,7 @@ describe('DisplayFilterSelector', () => {
 
   it('calls onChange with updated values when checkbox is clicked', async () => {
     const user = userEvent.setup()
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     render(<DisplayFilterSelector {...defaultProps} onChange={onChange} />)
 
     const studentsCheckbox = screen.getByLabelText('Students with no results')
@@ -97,7 +101,7 @@ describe('DisplayFilterSelector', () => {
 
   it('calls onChange with multiple values when multiple checkboxes are selected', async () => {
     const user = userEvent.setup()
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     render(<DisplayFilterSelector {...defaultProps} onChange={onChange} />)
 
     const studentsCheckbox = screen.getByLabelText('Students with no results')
@@ -122,7 +126,7 @@ describe('DisplayFilterSelector', () => {
 
   it('calls onChange with empty array when all checkboxes are unchecked', async () => {
     const user = userEvent.setup()
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const props = {
       ...defaultProps,
       values: [DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
@@ -138,7 +142,7 @@ describe('DisplayFilterSelector', () => {
 
   it('preserves other selected values when toggling one checkbox', async () => {
     const user = userEvent.setup()
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const props = {
       ...defaultProps,
       values: [

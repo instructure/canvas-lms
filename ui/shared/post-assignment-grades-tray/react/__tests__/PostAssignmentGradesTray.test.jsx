@@ -21,8 +21,8 @@ if (typeof vi !== 'undefined') {
   vi.mock('@canvas/alerts/react/FlashAlert')
   vi.mock('@canvas/post-assignment-grades-tray/react/Api')
 }
-jest.mock('@canvas/alerts/react/FlashAlert')
-jest.mock('@canvas/post-assignment-grades-tray/react/Api')
+vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/post-assignment-grades-tray/react/Api')
 
 import React from 'react'
 import {render, screen as rtlScreen, waitFor} from '@testing-library/react'
@@ -43,8 +43,8 @@ describe('PostAssignmentGradesTray', () => {
   }
 
   beforeEach(() => {
-    mockOnExited = jest.fn()
-    mockOnPosted = jest.fn()
+    mockOnExited = vi.fn()
+    mockOnPosted = vi.fn()
 
     defaultProps = {
       assignment: {
@@ -70,7 +70,7 @@ describe('PostAssignmentGradesTray', () => {
 
   afterEach(() => {
     FlashAlert.destroyContainer.mockClear()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const waitForTrayToOpen = async () => {

@@ -54,7 +54,7 @@ describe('OutcomeDetailView', () => {
     document.body.innerHTML = '<div id="application"></div>'
 
     // Mock jQuery dialog
-    $.fn.dialog = jest.fn(() => $({}))
+    $.fn.dialog = vi.fn(() => $({}))
 
     // Mock Backbone sync
     Backbone.sync = (_method, _model, options) => {
@@ -88,7 +88,7 @@ describe('OutcomeDetailView', () => {
     expect(outcomeDetailView.alignmentsView).toBeInstanceOf(CollectionView)
   })
 
-  it('renders all alignments', done => {
+  it('renders all alignments', async () => {
     const outcome = new Outcome({
       id: outcomeId,
       mastery_points: 3,
@@ -96,15 +96,18 @@ describe('OutcomeDetailView', () => {
     })
     outcome.group = new Group({title: 'Outcome Group Title'})
 
-    // Listen for the reset event on alignmentsForView
-    outcomeDetailView.alignmentsForView.on('reset', () => {
-      expect(outcomeDetailView.allAlignments).toBeInstanceOf(OutcomeResultCollection)
-      expect(outcomeDetailView.alignmentsForView).toHaveLength(1)
-      const alignment = outcomeDetailView.alignmentsForView.at(0)
-      expect(alignment.get('links').alignment).toBe('assignment_1')
-      done()
+    // Create a promise that resolves when the reset event fires
+    const resetPromise = new Promise(resolve => {
+      outcomeDetailView.alignmentsForView.on('reset', resolve)
     })
 
     outcomeDetailView.show(outcome)
+
+    await resetPromise
+
+    expect(outcomeDetailView.allAlignments).toBeInstanceOf(OutcomeResultCollection)
+    expect(outcomeDetailView.alignmentsForView).toHaveLength(1)
+    const alignment = outcomeDetailView.alignmentsForView.at(0)
+    expect(alignment.get('links').alignment).toBe('assignment_1')
   })
 })

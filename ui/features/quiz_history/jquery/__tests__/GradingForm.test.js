@@ -61,7 +61,7 @@ describe('GradingForm', () => {
   // fails in Jest, passes in QUnit
   test.skip('handler passed in is called for key enter', function () {
     const scoringSnapshot = {}
-    const onInputChange = jest.fn()
+    const onInputChange = vi.fn()
     const gradingForm = new GradingForm(scoringSnapshot)
     gradingForm.preventInsanity(onInputChange)
 
@@ -74,7 +74,7 @@ describe('GradingForm', () => {
 
   test('handler paased in is not called for other keys', function () {
     const scoringSnapshot = {}
-    const onInputChange = jest.fn()
+    const onInputChange = vi.fn()
     const gradingForm = new GradingForm(scoringSnapshot)
     gradingForm.preventInsanity(onInputChange)
 

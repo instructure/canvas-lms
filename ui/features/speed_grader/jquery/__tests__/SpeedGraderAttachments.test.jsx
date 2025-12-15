@@ -23,7 +23,7 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import SpeedGrader from '../speed_grader'
 
 // Mock SpeedGraderSettingsMenu
-jest.mock('../../react/SpeedGraderSettingsMenu', () => ({
+vi.mock('../../react/SpeedGraderSettingsMenu', () => ({
   __esModule: true,
   default: () => null,
 }))
@@ -64,7 +64,7 @@ describe('SpeedGrader Attachments', () => {
     document.body.appendChild(fixtures)
 
     // Mock jQuery ajaxJSON
-    $.ajaxJSON = jest.fn()
+    $.ajaxJSON = vi.fn()
     $.ajaxJSON.unhandledXHRs = []
   })
 
@@ -96,7 +96,7 @@ describe('SpeedGrader Attachments', () => {
     SpeedGrader.EG.currentStudent = originalStudent
     fakeENV.teardown()
     fixtures.innerHTML = ''
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('attachment iframe contents', () => {

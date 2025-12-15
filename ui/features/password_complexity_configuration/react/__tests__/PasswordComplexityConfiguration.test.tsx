@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, screen, waitFor, cleanup} from '@testing-library/react'
-import '@testing-library/jest-dom'
 import PasswordComplexityConfiguration from '../PasswordComplexityConfiguration'
 import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'

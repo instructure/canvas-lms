@@ -89,8 +89,8 @@ interface DefaultProps {
 }
 
 const buildDefaultProps = (overrides: Partial<DefaultProps> = {}): DefaultProps => ({
-  onCollapseAll: jest.fn(),
-  onExpandAll: jest.fn(),
+  onCollapseAll: vi.fn(),
+  onExpandAll: vi.fn(),
   anyModuleExpanded: true,
   ...overrides,
 })

@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
 import {AssignmentSubmissionTypeSelectionLaunchButton} from '../AssignmentSubmissionTypeSelectionLaunchButton'
 
-const onClickFn = jest.fn()
+const onClickFn = vi.fn()
 const tool = {
   id: '1',
   title: 'Tool Title',

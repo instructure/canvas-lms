@@ -16,7 +16,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import SelectMenuGroup from '../SelectMenuGroup'
@@ -24,6 +24,10 @@ import SelectMenuGroup from '../SelectMenuGroup'
 describe('SelectMenuGroup', () => {
   let props: any
   let wrapper: any
+
+  afterEach(() => {
+    cleanup()
+  })
 
   async function selectOptionFromMenu(user: any, menuSelector: string, optionValue: string) {
     await user.click(wrapper.container.querySelector(menuSelector))
@@ -206,7 +210,7 @@ describe('SelectMenuGroup', () => {
   })
 
   test('calls saveAssignmentOrder when the button is clicked, if assignment order has changed', async () => {
-    const stub = jest.fn(() => Promise.resolve())
+    const stub = vi.fn(() => Promise.resolve())
     const user = userEvent.setup()
     wrapper = render(<SelectMenuGroup {...props} saveAssignmentOrder={stub} />)
     await selectOptionFromMenu(user, '#assignment_sort_order_select_menu', 'title')
@@ -217,7 +221,7 @@ describe('SelectMenuGroup', () => {
 
   test('does not call saveAssignmentOrder when the button is clicked, if assignment is unchanged', async () => {
     const user = userEvent.setup()
-    props.saveAssignmentOrder = jest.fn()
+    props.saveAssignmentOrder = vi.fn()
     wrapper = render(<SelectMenuGroup {...props} />)
     await selectOptionFromMenu(user, '#student_select_menu', '7')
     const submitButton = wrapper.container.querySelector('button#apply_select_menus')
@@ -242,7 +246,7 @@ describe('SelectMenuGroup', () => {
     }
 
     beforeEach(() => {
-      props.goToURL = jest.fn()
+      props.goToURL = vi.fn()
     })
 
     describe('when the student has changed', () => {

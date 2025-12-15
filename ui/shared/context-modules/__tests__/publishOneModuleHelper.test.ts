@@ -23,6 +23,7 @@ import {updateModuleItem} from '../jquery/utils'
 import publishOneModuleHelperModule from '../utils/publishOneModuleHelper'
 import {initBody, makeModuleWithItems} from './testHelpers'
 import type {KeyedModuleItems} from '../react/types'
+import {type MockInstance} from 'vitest'
 
 const server = setupServer()
 
@@ -30,21 +31,21 @@ const server = setupServer()
 // This has something to do with '../jquery/utils' importing
 // the showAllOrLess module, but the imported function is never called
 // so I don't know why this is necessary. it does make the tests pass.
-jest.mock('../utils/showAllOrLess', () => ({
-  addShowAllOrLess: jest.fn(),
+vi.mock('../utils/showAllOrLess', () => ({
+  addShowAllOrLess: vi.fn(),
 }))
 
-jest.mock('@canvas/relock-modules-dialog', () => {
-  return jest.fn().mockImplementation(() => ({
-    renderIfNeeded: jest.fn().mockImplementation(json => {
+vi.mock('@canvas/relock-modules-dialog', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    renderIfNeeded: vi.fn().mockImplementation(json => {
       if (json.relock_warning) {
         const dialog = document.createElement('div')
         dialog.className = 'relock-modules-dialog'
         document.body.appendChild(dialog)
       }
     }),
-  }))
-})
+  })),
+}))
 
 const {
   batchUpdateOneModuleApiCall,
@@ -60,16 +61,16 @@ const {
   ...publishOneModuleHelperModule,
 }
 
-jest.mock('../jquery/utils', () => {
-  const originalModule = jest.requireActual('../jquery/utils')
+vi.mock('../jquery/utils', async () => {
+  const originalModule = await vi.importActual('../jquery/utils')
   return {
     __esmodule: true,
     ...originalModule,
-    updateModuleItem: jest.fn(),
+    updateModuleItem: vi.fn(),
   }
 })
 
-const updatePublishMenuDisabledState = jest.fn()
+const updatePublishMenuDisabledState = vi.fn()
 
 describe('publishOneModuleHelper', () => {
   beforeAll(() => {
@@ -100,7 +101,7 @@ describe('publishOneModuleHelper', () => {
 
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // Clear flash alert holders to prevent alerts from leaking between tests
     document.getElementById('flashalert_message_holder')?.remove()
     document.getElementById('flash_screenreader_holder')?.remove()
@@ -108,10 +109,10 @@ describe('publishOneModuleHelper', () => {
   })
 
   describe('publishModule', () => {
-    let spy: jest.SpyInstance
+    let spy: MockInstance
     beforeEach(() => {
       // Mock the implementation to prevent actual async operations
-      spy = jest
+      spy = vi
         .spyOn(publishOneModuleHelperModule, 'batchUpdateOneModuleApiCall')
         .mockResolvedValue(undefined)
       makeModuleWithItems(1, [117, 119], false)
@@ -170,10 +171,10 @@ describe('publishOneModuleHelper', () => {
   })
 
   describe('unpublishModule', () => {
-    let spy: jest.SpyInstance
+    let spy: MockInstance
     beforeEach(() => {
       // Mock the implementation to prevent actual async operations
-      spy = jest
+      spy = vi
         .spyOn(publishOneModuleHelperModule, 'batchUpdateOneModuleApiCall')
         .mockResolvedValue(undefined)
       makeModuleWithItems(1, [117, 119], false)
@@ -211,8 +212,8 @@ describe('publishOneModuleHelper', () => {
   })
 
   describe('batchUpdateOneModuleApiCall', () => {
-    let spy: jest.SpyInstance | null = null
-    const spy2: jest.SpyInstance | null = null
+    let spy: MockInstance | null = null
+    const spy2: MockInstance | null = null
     beforeEach(() => {
       makeModuleWithItems(1, [117, 119], false)
       makeModuleWithItems(2, [217, 219], true)
@@ -255,7 +256,7 @@ describe('publishOneModuleHelper', () => {
     })
 
     it('disables the "Publish All" button while running', async () => {
-      spy = jest.spyOn(publishOneModuleHelperModule, 'disableContextModulesPublishMenu')
+      spy = vi.spyOn(publishOneModuleHelperModule, 'disableContextModulesPublishMenu')
       await batchUpdateOneModuleApiCall(1, 2, false, true, 'loading message', 'success message')
       expect(spy).toHaveBeenCalledTimes(2)
       expect(spy).toHaveBeenCalledWith(true)
@@ -263,7 +264,7 @@ describe('publishOneModuleHelper', () => {
     })
 
     it('renders the modules publish button', async () => {
-      spy = jest.spyOn(publishOneModuleHelperModule, 'renderContextModulesPublishIcon')
+      spy = vi.spyOn(publishOneModuleHelperModule, 'renderContextModulesPublishIcon')
       await batchUpdateOneModuleApiCall(1, 2, false, true, 'loading message', 'success message')
       expect(spy).toHaveBeenCalledTimes(2)
       expect(spy).toHaveBeenCalledWith(1, 2, true, true, 'loading message')
@@ -271,7 +272,7 @@ describe('publishOneModuleHelper', () => {
     })
 
     it('updates the module items when skipping item update', async () => {
-      spy = jest.spyOn(publishOneModuleHelperModule, 'updateModuleItemsPublishedStates')
+      spy = vi.spyOn(publishOneModuleHelperModule, 'updateModuleItemsPublishedStates')
       await batchUpdateOneModuleApiCall(1, 2, false, true, 'loading message', 'success message')
       await waitFor(() => {
         expect(spy).toHaveBeenCalledTimes(1)
@@ -280,7 +281,7 @@ describe('publishOneModuleHelper', () => {
     })
 
     it('updates the module items when publishing item update', async () => {
-      spy = jest.spyOn(publishOneModuleHelperModule, 'fetchModuleItemPublishedState')
+      spy = vi.spyOn(publishOneModuleHelperModule, 'fetchModuleItemPublishedState')
       await batchUpdateOneModuleApiCall(1, 2, false, false, 'loading message', 'success message')
       expect(spy).toHaveBeenCalledTimes(1)
       expect(spy).toHaveBeenCalledWith(1, 2)
@@ -382,7 +383,7 @@ describe('publishOneModuleHelper', () => {
     })
 
     it('calls updateModuleItemPublishedState for each module item', () => {
-      const spy = jest.spyOn(publishOneModuleHelperModule, 'updateModuleItemPublishedState')
+      const spy = vi.spyOn(publishOneModuleHelperModule, 'updateModuleItemPublishedState')
       const published = true
       const isPublishing = false
 
@@ -409,7 +410,7 @@ describe('publishOneModuleHelper', () => {
     })
 
     it('does not change published state if undefined', () => {
-      const spy = jest.spyOn(publishOneModuleHelperModule, 'updateModuleItemPublishedState')
+      const spy = vi.spyOn(publishOneModuleHelperModule, 'updateModuleItemPublishedState')
       const published = undefined
       const isPublishing = true
 

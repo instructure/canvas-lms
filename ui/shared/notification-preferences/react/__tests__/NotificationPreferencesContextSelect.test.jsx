@@ -25,11 +25,11 @@ describe('NotificationPreferencesContextSelect', () => {
   const defaultProps = {
     enrollments: [],
     currentContext: {name: 'Account', value: 'account'},
-    handleContextChanged: jest.fn(),
+    handleContextChanged: vi.fn(),
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('enrollment deduplication', () => {
@@ -184,7 +184,7 @@ describe('NotificationPreferencesContextSelect', () => {
         },
       ]
 
-      const handleContextChanged = jest.fn()
+      const handleContextChanged = vi.fn()
 
       render(
         <NotificationPreferencesContextSelect

@@ -59,7 +59,7 @@ describe('Account Course User Search UsersList View', function () {
         avatar_url: 'http://someurl',
       },
     ],
-    handleSubmitEditUserForm: jest.fn(),
+    handleSubmitEditUserForm: vi.fn(),
     permissions: {
       can_masquerade: true,
       can_message_users: true,
@@ -70,9 +70,9 @@ describe('Account Course User Search UsersList View', function () {
       sort: 'username',
       order: 'asc',
     },
-    onUpdateFilters: jest.fn(),
-    onApplyFilters: jest.fn(),
-    sortColumnHeaderRef: jest.fn(),
+    onUpdateFilters: vi.fn(),
+    onApplyFilters: vi.fn(),
+    sortColumnHeaderRef: vi.fn(),
     roles: [],
   }
 
@@ -125,7 +125,7 @@ describe('Account Course User Search UsersList View', function () {
       })
 
       it(`clicking the ${label} column header calls onChangeSort with ${columnID}`, async () => {
-        const sortSpy = jest.fn()
+        const sortSpy = vi.fn()
         const wrapper = render(
           <UsersList
             {...{

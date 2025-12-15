@@ -24,13 +24,13 @@ describe('initMutexes drawer_layout_mutex', () => {
   beforeEach(() => {
     window.ENV = {}
     document.body = document.createElement('body')
-    jest.resetModules()
+    vi.resetModules()
   })
 
   afterEach(() => {
     window.ENV = oldEnv
     document.body = oldBody
-    jest.resetModules()
+    vi.resetModules()
   })
 
   it('should create a drawer layout mutex if all conditions are met', () => {
@@ -44,7 +44,7 @@ describe('initMutexes drawer_layout_mutex', () => {
     drawerLayout.id = 'drawer-layout-mount-point'
     document.body.appendChild(drawerLayout)
 
-    jest.isolateModules(() => {
+    vi.isolateModules(() => {
       const MutexManager = require('@canvas/mutex-manager/MutexManager').default
       require('../initMutexes')
       expect(Object.keys(MutexManager.mutexes)).toHaveLength(1)
@@ -61,7 +61,7 @@ describe('initMutexes drawer_layout_mutex', () => {
     drawerLayout.id = 'drawer-layout-mount-point'
     document.body.appendChild(drawerLayout)
 
-    jest.isolateModules(() => {
+    vi.isolateModules(() => {
       const MutexManager = require('@canvas/mutex-manager/MutexManager').default
       require('../initMutexes')
       expect(MutexManager.mutexes[drawer_layout_mutex]).toBeUndefined()
@@ -75,7 +75,7 @@ describe('initMutexes drawer_layout_mutex', () => {
     drawerLayout.id = 'drawer-layout-mount-point'
     document.body.appendChild(drawerLayout)
 
-    jest.isolateModules(() => {
+    vi.isolateModules(() => {
       const MutexManager = require('@canvas/mutex-manager/MutexManager').default
       require('../initMutexes')
       expect(MutexManager.mutexes[drawer_layout_mutex]).toBeUndefined()
@@ -89,7 +89,7 @@ describe('initMutexes drawer_layout_mutex', () => {
     topNav.id = 'top-nav-tools-mount-point'
     document.body.appendChild(topNav)
 
-    jest.isolateModules(() => {
+    vi.isolateModules(() => {
       const MutexManager = require('@canvas/mutex-manager/MutexManager').default
       require('../initMutexes')
       expect(MutexManager.mutexes[drawer_layout_mutex]).toBeUndefined()

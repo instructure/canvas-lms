@@ -23,7 +23,7 @@ import AppDetails from '../AppDetails'
 describe('External Apps App Details', () => {
   it('the back to app center link goes to the proper place', () => {
     const fakeStore = {
-      findAppByShortName: jest.fn().mockReturnValue({
+      findAppByShortName: vi.fn().mockReturnValue({
         short_name: 'someApp',
         config_options: [],
       }),

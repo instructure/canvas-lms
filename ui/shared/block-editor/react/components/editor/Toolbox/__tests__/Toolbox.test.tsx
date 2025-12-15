@@ -56,7 +56,7 @@ describe('Toolbox', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders', () => {
@@ -94,7 +94,7 @@ describe('Toolbox', () => {
   })
 
   it('calls onDismiss when close button is clicked', async () => {
-    const onDismiss = jest.fn()
+    const onDismiss = vi.fn()
     const {getByText} = renderComponent({onDismiss})
 
     await user.click(getByText('Close').closest('button') as HTMLButtonElement)
@@ -104,9 +104,9 @@ describe('Toolbox', () => {
 
   describe('when editing templates', () => {
     it('dispatches DeleteTemplateEvent when delete button is clicked', async () => {
-      window.confirm = jest.fn(() => true)
+      window.confirm = vi.fn(() => true)
       const blockeditoreditor = document.querySelector('.block-editor-editor') as HTMLElement
-      const dispatchEvent = jest.spyOn(blockeditoreditor, 'dispatchEvent')
+      const dispatchEvent = vi.spyOn(blockeditoreditor, 'dispatchEvent')
 
       const {getByText} = renderComponent({templateEditor: TemplateEditor.LOCAL})
 

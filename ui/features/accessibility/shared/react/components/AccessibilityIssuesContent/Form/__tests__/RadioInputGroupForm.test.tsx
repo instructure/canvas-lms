@@ -16,12 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, fireEvent} from '@testing-library/react'
+import {cleanup, render, screen, fireEvent} from '@testing-library/react'
 
 import {AccessibilityIssue, FormType, IssueWorkflowState} from '../../../../types'
 import RadioInputGroupForm from '../RadioInputGroupForm'
 
 describe('RadioInputGroupForm', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const createMockIssue = (options?: string[]): AccessibilityIssue => ({
     id: '1',
     ruleId: 'test-rule',
@@ -41,11 +45,11 @@ describe('RadioInputGroupForm', () => {
   const defaultProps = {
     issue: createMockIssue(),
     value: null,
-    onChangeValue: jest.fn(),
+    onChangeValue: vi.fn(),
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('rendering', () => {
@@ -100,7 +104,7 @@ describe('RadioInputGroupForm', () => {
   })
 
   it('calls onChangeValue when a radio option is selected', () => {
-    const onChangeValue = jest.fn()
+    const onChangeValue = vi.fn()
     const props = {
       ...defaultProps,
       issue: createMockIssue(),

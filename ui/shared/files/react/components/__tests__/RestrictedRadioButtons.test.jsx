@@ -25,7 +25,7 @@ import Folder from '../../../backbone/models/Folder'
 const renderComponent = (props = {}) => {
   const defaultProps = {
     models: [new Folder({id: 999})],
-    radioStateChange: jest.fn(),
+    radioStateChange: vi.fn(),
   }
   return render(<RestrictedRadioButtons {...defaultProps} {...props} />)
 }
@@ -87,7 +87,7 @@ describe('RestrictedRadioButtons', () => {
   })
 
   it('calls radioStateChange when an option is selected', async () => {
-    const radioStateChange = jest.fn()
+    const radioStateChange = vi.fn()
     const user = userEvent.setup()
     renderComponent({radioStateChange})
 

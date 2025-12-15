@@ -73,8 +73,8 @@ describe('Entry', () => {
       }),
     ]
     entry.set('replies', replies)
-    setSpy = jest.spyOn(entry, 'set')
-    const onCompleteCallback = jest.fn()
+    setSpy = vi.spyOn(entry, 'set')
+    const onCompleteCallback = vi.fn()
     entry.sync('update', entry, {complete: onCompleteCallback})
     await new Promise(resolve => setTimeout(resolve, 10))
     expect(setSpy).toHaveBeenCalledWith('replies', [])

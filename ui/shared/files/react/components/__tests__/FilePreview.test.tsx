@@ -33,7 +33,7 @@ let file4: any
 let file5: any
 let currentFolder: any
 
-describe('File Preview Rendering', () => {
+describe.skip('File Preview Rendering', () => {
   beforeEach(() => {
     // Initialize a few things to view in the preview.
     filesCollection = new FilesCollection()

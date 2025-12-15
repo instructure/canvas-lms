@@ -254,7 +254,7 @@ describe('useFetchNewLoginData', () => {
   })
 
   it('handles invalid JSON in data-auth-providers gracefully', () => {
-    const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleErrorMock = vi.spyOn(console, 'error').mockImplementation(() => {})
     createMockContainer(
       null,
       'invalid JSON',

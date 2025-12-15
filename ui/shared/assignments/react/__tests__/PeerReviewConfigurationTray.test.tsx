@@ -22,15 +22,11 @@ import userEvent from '@testing-library/user-event'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {PeerReviewConfigurationTray} from '../PeerReviewConfigurationTray'
+import {usePeerReviewConfiguration} from '../../graphql/hooks/usePeerReviewConfiguration'
 
-jest.mock('../../graphql/hooks/usePeerReviewConfiguration', () => ({
-  usePeerReviewConfiguration: jest.fn(),
-}))
+vi.mock('../../graphql/hooks/usePeerReviewConfiguration')
 
-const {usePeerReviewConfiguration} = require('../../graphql/hooks/usePeerReviewConfiguration')
-const mockUsePeerReviewConfiguration = usePeerReviewConfiguration as jest.MockedFunction<
-  typeof usePeerReviewConfiguration
->
+const mockUsePeerReviewConfiguration = usePeerReviewConfiguration as ReturnType<typeof vi.fn>
 
 const mockConfig = {
   hasGroupCategory: false,
@@ -68,14 +64,14 @@ describe('PeerReviewConfigurationTray', () => {
   const defaultProps = {
     assignmentId: '123',
     isTrayOpen: true,
-    closeTray: jest.fn(),
+    closeTray: vi.fn(),
   }
 
   let user: ReturnType<typeof userEvent.setup>
 
   beforeEach(() => {
     user = userEvent.setup()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderWithQueryClient = (props = {}) => {
@@ -115,7 +111,7 @@ describe('PeerReviewConfigurationTray', () => {
 
     it('calls closeTray when close button is clicked', async () => {
       mockUsePeerReviewConfiguration.mockReturnValue(mockConfig)
-      const closeTray = jest.fn()
+      const closeTray = vi.fn()
       renderWithQueryClient({closeTray})
 
       const closeButton = screen

@@ -98,7 +98,7 @@ describe('submissions', () => {
 
     setup()
     // Wait for document ready handlers to execute
-    const readyCallback = jest.fn()
+    const readyCallback = vi.fn()
     $(document).ready(readyCallback)
     $(document).trigger('ready')
     await waitFor(() => expect(readyCallback).toHaveBeenCalled())

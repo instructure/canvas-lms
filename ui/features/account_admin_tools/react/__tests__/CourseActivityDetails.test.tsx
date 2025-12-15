@@ -33,7 +33,7 @@ describe('CourseActivityDetails', () => {
     user: {
       name: 'mock@user.com',
     },
-    onClose: jest.fn(),
+    onClose: vi.fn(),
   }
 
   it('should render common fields', () => {

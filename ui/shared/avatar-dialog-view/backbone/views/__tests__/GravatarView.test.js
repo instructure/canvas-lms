@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import '@canvas/jquery/jquery.ajaxJSON'
 import GravatarView from '../GravatarView'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toBe(y)
@@ -55,11 +55,11 @@ describe('GravatarView', () => {
   afterEach(() => {
     window.ENV = oldEnv
     view.remove()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('it should be accessible', async () => {
-    await new Promise(resolve => isAccessible(view, resolve, {a11yReport: true}))
+    await isAccessible(view, {a11yReport: true})
   })
 
   test('pre-populates preview with default', function () {
@@ -75,7 +75,7 @@ describe('GravatarView', () => {
   })
 
   test('calls avatar url with specified size and returns gravatarURL', async function () {
-    $.ajaxJSON = jest.fn(() => Promise.resolve())
+    $.ajaxJSON = vi.fn(() => Promise.resolve())
 
     const gravatarURL = view.updateAvatar()
 

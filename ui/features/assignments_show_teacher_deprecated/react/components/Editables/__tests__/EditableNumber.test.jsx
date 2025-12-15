@@ -63,7 +63,7 @@ describe('EditableNumber', () => {
   })
 
   it('exits edit mode on <Enter>', () => {
-    const onChangeMode = jest.fn()
+    const onChangeMode = vi.fn()
     const {getByDisplayValue} = render(
       <EditableNumber
         mode="edit"
@@ -79,9 +79,9 @@ describe('EditableNumber', () => {
   })
 
   it('reverts to the old value and exits edit mode on Escape', () => {
-    const onChange = jest.fn()
-    const onInputChange = jest.fn()
-    const onChangeMode = jest.fn()
+    const onChange = vi.fn()
+    const onInputChange = vi.fn()
+    const onChangeMode = vi.fn()
     const {getByDisplayValue} = render(
       <EditableNumber
         mode="edit"

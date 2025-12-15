@@ -174,18 +174,18 @@ describe('sortByAssignmentColumn', () => {
 
   beforeEach(() => {
     gradebook = createGradebook()
-    jest
+    vi
       .spyOn(gradebook, 'sortRowsBy')
       .mockImplementation(sortFn => sortFn(gradebook.studentA, gradebook.studentB))
-    jest.spyOn(gradebook, 'gradeSort').mockImplementation()
-    jest.spyOn(gradebook, 'missingSort').mockImplementation()
-    jest.spyOn(gradebook, 'lateSort').mockImplementation()
+    vi.spyOn(gradebook, 'gradeSort').mockImplementation()
+    vi.spyOn(gradebook, 'missingSort').mockImplementation()
+    vi.spyOn(gradebook, 'lateSort').mockImplementation()
     gradebook.studentA = {name: 'Adam Jones'}
     gradebook.studentB = {name: 'Betty Ford'}
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('sorts the gradebook rows', () => {
@@ -238,16 +238,16 @@ describe('sortByAssignmentGroupColumn', () => {
 
   beforeEach(() => {
     gradebook = createGradebook()
-    jest
+    vi
       .spyOn(gradebook, 'sortRowsBy')
       .mockImplementation(sortFn => sortFn(gradebook.studentA, gradebook.studentB))
-    jest.spyOn(gradebook, 'gradeSort').mockImplementation()
+    vi.spyOn(gradebook, 'gradeSort').mockImplementation()
     gradebook.studentA = {name: 'Adam Jones'}
     gradebook.studentB = {name: 'Betty Ford'}
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('sorts the gradebook rows', () => {
@@ -288,16 +288,16 @@ describe('sortByTotalGradeColumn', () => {
 
   beforeEach(() => {
     gradebook = createGradebook()
-    jest
+    vi
       .spyOn(gradebook, 'sortRowsBy')
       .mockImplementation(sortFn => sortFn(gradebook.studentA, gradebook.studentB))
-    jest.spyOn(gradebook, 'gradeSort').mockImplementation()
+    vi.spyOn(gradebook, 'gradeSort').mockImplementation()
     gradebook.studentA = {name: 'Adam Jones'}
     gradebook.studentB = {name: 'Betty Ford'}
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('sorts the gradebook rows', () => {

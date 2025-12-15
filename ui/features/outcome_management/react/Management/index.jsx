@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useState, useEffect} from 'react'
+import React, {useCallback, useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'

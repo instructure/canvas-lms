@@ -22,7 +22,7 @@ import {act, fireEvent, render, within} from '@testing-library/react'
 import {BLACKOUT_DATES} from '../../../__tests__/fixtures'
 import BlackoutDates from '../blackout_dates'
 
-const onChange = jest.fn()
+const onChange = vi.fn()
 
 const defaultProps = {
   blackoutDates: BLACKOUT_DATES,
@@ -31,7 +31,7 @@ const defaultProps = {
 
 describe('BlackoutDates', () => {
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders', () => {

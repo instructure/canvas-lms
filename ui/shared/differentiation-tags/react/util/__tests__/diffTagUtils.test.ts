@@ -30,7 +30,7 @@ describe('bulkFetchUserTags', () => {
 
   beforeEach(() => {
     lastCapturedRequest = null
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => server.resetHandlers())
@@ -82,7 +82,7 @@ describe('bulkDeleteGroupMemberships', () => {
 
   beforeEach(() => {
     lastCapturedRequest = null
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => server.resetHandlers())

@@ -26,7 +26,7 @@ import PandaPubPoller from '@canvas/panda-pub-poller'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 
-jest.mock('@canvas/panda-pub-poller')
+vi.mock('@canvas/panda-pub-poller')
 
 const server = setupServer()
 
@@ -51,7 +51,7 @@ describe('Quiz', () => {
 
   afterEach(() => {
     server.resetHandlers()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     fakeENV.teardown()
   })
 
@@ -303,7 +303,7 @@ describe('Quiz polling', () => {
         new_quizzes_navigation_updates: false,
       },
     })
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     quiz = new Quiz({
       id: 7,
       course_id: 1,
@@ -314,7 +314,7 @@ describe('Quiz polling', () => {
     })
 
     // Mock fetch to return a jQuery-like promise with always
-    fetchMock = jest.spyOn(quiz, 'fetch').mockImplementation(() => ({
+    fetchMock = vi.spyOn(quiz, 'fetch').mockImplementation(() => ({
       always: callback => {
         callback()
         return Promise.resolve()
@@ -322,8 +322,8 @@ describe('Quiz polling', () => {
     }))
 
     pollerMock = {
-      start: jest.fn(),
-      stop: jest.fn(),
+      start: vi.fn(),
+      stop: vi.fn(),
     }
     PandaPubPoller.mockImplementation((_interval, _maxAttempts, callback) => {
       callback(() => {})
@@ -332,8 +332,8 @@ describe('Quiz polling', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    jest.useRealTimers()
+    vi.restoreAllMocks()
+    vi.useRealTimers()
   })
 
   it('polls for updates (duplicate)', () => {

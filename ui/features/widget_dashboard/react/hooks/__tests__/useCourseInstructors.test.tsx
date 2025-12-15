@@ -201,7 +201,7 @@ describe('useCourseInstructors', () => {
 
   it('should handle GraphQL errors', async () => {
     const originalConsoleError = console.error
-    console.error = jest.fn()
+    console.error = vi.fn()
 
     server.use(
       graphql.query('GetCourseInstructorsPaginated', () => {

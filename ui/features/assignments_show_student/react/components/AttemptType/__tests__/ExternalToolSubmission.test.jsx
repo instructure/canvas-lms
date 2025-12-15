@@ -142,8 +142,8 @@ describe('ExternalToolSubmission', () => {
     let onFileUploadRequested
 
     beforeEach(() => {
-      createSubmissionDraft = jest.fn()
-      onFileUploadRequested = jest.fn()
+      createSubmissionDraft = vi.fn()
+      onFileUploadRequested = vi.fn()
     })
 
     function postMessage(subject, contents) {

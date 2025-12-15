@@ -17,11 +17,15 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import NeverDrop from '../NeverDrop'
 
 describe('NeverDrop', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const mockAssignments = [
     {id: '1', name: 'Assignment 1'},
     {id: '2', name: 'Assignment 2'},
@@ -32,12 +36,12 @@ describe('NeverDrop', () => {
     canChangeDropRules: true,
     assignments: mockAssignments,
     label_id: 'test-label',
-    onRemove: jest.fn(),
-    onChange: jest.fn(),
+    onRemove: vi.fn(),
+    onChange: vi.fn(),
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('renders remove button with correct title', () => {

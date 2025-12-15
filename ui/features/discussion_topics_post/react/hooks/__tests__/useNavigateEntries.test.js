@@ -22,17 +22,17 @@ import useNavigateEntries from '../useNavigateEntries'
 import * as useSpeedGraderModule from '../useSpeedGrader'
 import * as useStudentEntriesModule from '../useStudentEntries'
 
-jest.mock('../useSpeedGrader')
-jest.mock('../useStudentEntries')
+vi.mock('../useSpeedGrader')
+vi.mock('../useStudentEntries')
 
 describe('useNavigateEntries', () => {
-  const mockSetHighlightEntryId = jest.fn()
-  const mockSetPageNumber = jest.fn()
-  const mockSetExpandedThreads = jest.fn()
-  const mockSetFocusSelector = jest.fn()
+  const mockSetHighlightEntryId = vi.fn()
+  const mockSetPageNumber = vi.fn()
+  const mockSetExpandedThreads = vi.fn()
+  const mockSetFocusSelector = vi.fn()
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     // Mock window.location with proper URL object
     const url = new URL('http://localhost?student_id=123')
@@ -40,14 +40,14 @@ describe('useNavigateEntries', () => {
     window.location = url
 
     // Mock URL constructor to return our test URL
-    global.URL = jest.fn(() => url)
+    global.URL = vi.fn(() => url)
 
     // Default mock implementations
-    jest.spyOn(useSpeedGraderModule, 'default').mockReturnValue({
+    vi.spyOn(useSpeedGraderModule, 'default').mockReturnValue({
       isInSpeedGrader: true,
-      postMessageEntryIds: jest.fn(),
-      handleCommentKeyPress: jest.fn(),
-      handleGradeKeyPress: jest.fn(),
+      postMessageEntryIds: vi.fn(),
+      handleCommentKeyPress: vi.fn(),
+      handleGradeKeyPress: vi.fn(),
     })
   })
 
@@ -64,12 +64,12 @@ describe('useNavigateEntries', () => {
   }
 
   const mockStudentEntriesQuery = (isLoading = false, entries = []) => {
-    jest.spyOn(useStudentEntriesModule, 'useStudentEntries').mockReturnValue({
+    vi.spyOn(useStudentEntriesModule, 'useStudentEntries').mockReturnValue({
       data: {
         pages: entries.length > 0 ? [{entries}] : [],
       },
       isLoading,
-      refetch: jest.fn(),
+      refetch: vi.fn(),
     })
   }
 
@@ -155,11 +155,11 @@ describe('useNavigateEntries', () => {
     })
 
     it('should NOT auto-navigate when not in SpeedGrader', async () => {
-      jest.spyOn(useSpeedGraderModule, 'default').mockReturnValue({
+      vi.spyOn(useSpeedGraderModule, 'default').mockReturnValue({
         isInSpeedGrader: false,
-        postMessageEntryIds: jest.fn(),
-        handleCommentKeyPress: jest.fn(),
-        handleGradeKeyPress: jest.fn(),
+        postMessageEntryIds: vi.fn(),
+        handleCommentKeyPress: vi.fn(),
+        handleGradeKeyPress: vi.fn(),
       })
 
       const entries = [

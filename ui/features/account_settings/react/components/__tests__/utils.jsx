@@ -22,14 +22,14 @@ import {render} from '@testing-library/react'
 import {configStore} from '../../store'
 
 const fakeAxios = {
-  delete: jest.fn(() => ({then() {}})),
-  get: jest.fn(() => ({then() {}})),
-  post: jest.fn(() => ({
+  delete: vi.fn(() => ({then() {}})),
+  get: vi.fn(() => ({then() {}})),
+  post: vi.fn(() => ({
     then() {
       return {then() {}}
     },
   })),
-  put: jest.fn(() => ({then() {}})),
+  put: vi.fn(() => ({then() {}})),
 }
 
 // This is modified from a version by Kent C. Dodds described here:

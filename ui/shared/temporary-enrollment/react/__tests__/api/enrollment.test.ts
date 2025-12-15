@@ -73,17 +73,17 @@ describe('enrollment api', () => {
   afterEach(() => server.resetHandlers())
 
   describe('Enrollment functions', () => {
-    const mockConsoleError = jest.fn()
+    const mockConsoleError = vi.fn()
 
     let originalConsoleError: typeof console.error
 
     beforeEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       lastCapturedRequest = null
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
 
     beforeAll(() => {
@@ -223,7 +223,7 @@ describe('enrollment api', () => {
 
     describe('deleteEnrollment', () => {
       beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         lastCapturedRequest = null
       })
 

@@ -114,7 +114,7 @@ describe('DraggableDashboardCard', () => {
 
   it('updates card positions after drag and drop', async () => {
     const Box = getDroppableDashboardCardBox()
-    const moveCard = jest.fn()
+    const moveCard = vi.fn()
 
     const {getAllByTestId} = renderWithDnd(
       <Box cardComponent={DashboardCard} courseCards={CARDS} moveCard={moveCard} />,

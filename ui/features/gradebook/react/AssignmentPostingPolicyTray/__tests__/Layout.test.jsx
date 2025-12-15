@@ -24,11 +24,11 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import Layout from '../Layout'
 
-jest.mock('@canvas/apollo-v3', () => ({
+vi.mock('@canvas/apollo-v3', () => ({
   createClient: () => ({
-    mutate: jest.fn().mockResolvedValue({}),
+    mutate: vi.fn().mockResolvedValue({}),
   }),
-  gql: jest.fn(),
+  gql: vi.fn(),
 }))
 
 describe('AssignmentPostingPolicyTray Layout', () => {
@@ -69,9 +69,9 @@ describe('AssignmentPostingPolicyTray Layout', () => {
       allowAutomaticPosting: true,
       allowCanceling: true,
       allowSaving: true,
-      onPostPolicyChanged: jest.fn(),
-      onDismiss: jest.fn(),
-      onSave: jest.fn(),
+      onPostPolicyChanged: vi.fn(),
+      onDismiss: vi.fn(),
+      onSave: vi.fn(),
       originalPostManually: true,
       selectedPostManually: false,
     }

@@ -39,7 +39,7 @@ describe('Review Screen Wrapper', () => {
     const state = overlayStore.getState()
     overlayStore.setState({...state, state: {...state.state, ...stateOverrides}})
 
-    const transitionTo = jest.fn()
+    const transitionTo = vi.fn()
 
     render(
       <ReviewScreenWrapper

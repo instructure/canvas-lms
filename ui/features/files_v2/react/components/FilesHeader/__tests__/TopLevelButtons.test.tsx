@@ -33,7 +33,7 @@ import {mockRowsContext} from '../../FileFolderTable/__tests__/testUtils'
 const defaultProps = {
   isUserContext: false,
   size: 'small',
-  onCreateFolderButtonClick: jest.fn(),
+  onCreateFolderButtonClick: vi.fn(),
 }
 
 const renderComponent = (props?: any, context: Partial<FileManagementContextProps> = {}) => {

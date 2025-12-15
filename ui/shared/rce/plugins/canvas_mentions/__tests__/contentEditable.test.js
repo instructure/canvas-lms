@@ -39,7 +39,7 @@ describe('contentEditable', () => {
 
     afterEach(() => {
       editor.setContent('')
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
 
     it('sets contenteditable to false on the body', () => {
@@ -53,7 +53,7 @@ describe('contentEditable', () => {
     })
 
     it('moves the cursor to the editable span', () => {
-      editor.selection.setCursorLocation = jest.fn()
+      editor.selection.setCursorLocation = vi.fn()
       subject()
       expect(editor.selection.setCursorLocation).toHaveBeenCalled()
     })
@@ -66,8 +66,8 @@ describe('contentEditable', () => {
 
     beforeEach(() => {
       editor = new FakeEditor()
-      editor.selection.getBookmark = jest.fn()
-      editor.selection.moveToBookmark = jest.fn()
+      editor.selection.getBookmark = vi.fn()
+      editor.selection.moveToBookmark = vi.fn()
 
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">

@@ -22,9 +22,9 @@ import {ConversationListItem} from '../ConversationListItem'
 import {responsiveQuerySizes} from '../../../../util/utils'
 import {SubmissionComment} from '../../../../graphql/SubmissionComment'
 
-jest.mock('../../../../util/utils', () => ({
-  ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn(),
+vi.mock('../../../../util/utils', async (importOriginal) => ({
+  ...(await importOriginal()),
+  responsiveQuerySizes: vi.fn(),
 }))
 
 const submissionsCommentsMock = (overrides = {}) => ({
@@ -84,25 +84,25 @@ describe('ConversationListItem', () => {
         ],
       },
       isUnread: false,
-      onSelect: jest.fn(),
-      onOpen: jest.fn(),
-      onStar: jest.fn(),
-      onMarkAsRead: jest.fn(),
-      onMarkAsUnRead: jest.fn(),
-      readStateChangeConversationParticipants: jest.fn(),
+      onSelect: vi.fn(),
+      onOpen: vi.fn(),
+      onStar: vi.fn(),
+      onMarkAsRead: vi.fn(),
+      onMarkAsUnRead: vi.fn(),
+      readStateChangeConversationParticipants: vi.fn(),
       ...overrides,
     }
   }
 
   beforeAll(() => {
     // Add appropriate mocks for responsive
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
 
@@ -114,7 +114,7 @@ describe('ConversationListItem', () => {
 
   describe('behavior', () => {
     it('calls the onSelect callback with the new state', () => {
-      const onSelectMock = jest.fn()
+      const onSelectMock = vi.fn()
 
       const props = createProps({onSelect: onSelectMock})
 
@@ -130,7 +130,7 @@ describe('ConversationListItem', () => {
     })
 
     it('calls onStar on not-starred click', () => {
-      const onStarMock = jest.fn()
+      const onStarMock = vi.fn()
 
       const props = createProps({onStar: onStarMock})
 
@@ -161,7 +161,7 @@ describe('ConversationListItem', () => {
         bubbles: true,
         cancelable: true,
       })
-      Object.assign(clickEvent, {stopPropagation: jest.fn()})
+      Object.assign(clickEvent, {stopPropagation: vi.fn()})
       fireEvent(unreadBadge, clickEvent)
 
       expect(clickEvent.stopPropagation).toHaveBeenCalledTimes(1)
@@ -178,7 +178,7 @@ describe('ConversationListItem', () => {
     })
 
     it('update read state called with correct parameters', () => {
-      const onMarkAsUnread = jest.fn()
+      const onMarkAsUnread = vi.fn()
 
       const props = createProps({
         onMarkAsUnread,
@@ -270,7 +270,7 @@ describe('ConversationListItem', () => {
     })
 
     it('sends correct submission id to be marked as read', () => {
-      const onMarkAsRead = jest.fn()
+      const onMarkAsRead = vi.fn()
       const props = createProps({
         conversation: submissionsCommentsMock(),
         isUnread: true,

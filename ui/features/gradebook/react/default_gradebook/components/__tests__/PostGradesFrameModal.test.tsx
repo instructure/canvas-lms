@@ -49,7 +49,7 @@ describe('PostGradesFrameModal', () => {
   })
 
   it('calls onClose when closed', async () => {
-    const onClose = jest.fn()
+    const onClose = vi.fn()
 
     const {getByRole} = renderComponent({selectedLtiId: '1', onClose})
 
@@ -58,7 +58,7 @@ describe('PostGradesFrameModal', () => {
   })
 
   it('calls onClose when tool sends lti.close message', async () => {
-    const onClose = jest.fn()
+    const onClose = vi.fn()
 
     const {getByTitle} = renderComponent({selectedLtiId: '1', onClose})
     const iframe = getByTitle('Sync Grades') as HTMLIFrameElement

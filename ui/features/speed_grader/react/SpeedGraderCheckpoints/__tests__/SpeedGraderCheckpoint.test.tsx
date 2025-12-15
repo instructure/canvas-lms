@@ -101,9 +101,9 @@ const getDefaultProps = (
     getCustomGradeStatus('2', 'Custom Grade Status 2'),
   ],
   lateSubmissionInterval: lateSubmissionInterval,
-  updateSubmissionGrade: jest.fn(),
-  updateSubmissionStatus: jest.fn(),
-  setLastSubmission: jest.fn(),
+  updateSubmissionGrade: vi.fn(),
+  updateSubmissionStatus: vi.fn(),
+  setLastSubmission: vi.fn(),
 })
 
 const setup = (props: {

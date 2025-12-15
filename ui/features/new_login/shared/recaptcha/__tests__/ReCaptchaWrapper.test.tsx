@@ -16,10 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, {useRef} from 'react'
 import ReCaptchaWrapper, {ReCaptchaWrapperRef} from '../ReCaptchaWrapper'
+
+afterEach(() => {
+  cleanup()
+})
 
 describe('ReCaptchaWrapper', () => {
   test('renders children inside the wrapper', () => {

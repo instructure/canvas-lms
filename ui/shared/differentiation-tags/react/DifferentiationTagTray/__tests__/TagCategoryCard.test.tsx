@@ -28,14 +28,14 @@ import {
 } from '../../util/tagCategoryCardMocks'
 import {useDeleteDifferentiationTagCategory} from '../../hooks/useDeleteDifferentiationTagCategory'
 
-jest.mock('../../hooks/useDeleteDifferentiationTagCategory')
+vi.mock('../../hooks/useDeleteDifferentiationTagCategory')
 
 describe('TagCategoryCard', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // Set a default mock return value so that deleteMutation is defined in all tests.
-    ;(useDeleteDifferentiationTagCategory as jest.Mock).mockReturnValue({
-      mutate: jest.fn(),
+    ;(useDeleteDifferentiationTagCategory as any).mockReturnValue({
+      mutate: vi.fn(),
       isLoading: false,
     })
   })
@@ -43,9 +43,9 @@ describe('TagCategoryCard', () => {
   const renderComponent = (props?: Partial<TagCategoryCardProps>) => {
     const defaultProps: TagCategoryCardProps = {
       category: noTagsCategory,
-      onEditCategory: jest.fn(),
+      onEditCategory: vi.fn(),
       newlyCreatedCategoryId: null,
-      onEditButtonBlur: jest.fn(),
+      onEditButtonBlur: vi.fn(),
     }
     return render(<TagCategoryCard {...defaultProps} {...props} />)
   }
@@ -83,7 +83,7 @@ describe('TagCategoryCard', () => {
   })
 
   it('calls onEditCategory when the edit icon button is clicked', async () => {
-    const onEditCategoryMock = jest.fn()
+    const onEditCategoryMock = vi.fn()
     const editableCategory = {...noTagsCategory, id: 4, name: 'Editable Category'}
 
     renderComponent({category: editableCategory, onEditCategory: onEditCategoryMock})
@@ -106,8 +106,8 @@ describe('TagCategoryCard', () => {
     })
 
     it('displays a loading state in the modal when deletion is in progress', async () => {
-      ;(useDeleteDifferentiationTagCategory as jest.Mock).mockReturnValue({
-        mutate: jest.fn(),
+      ;(useDeleteDifferentiationTagCategory as any).mockReturnValue({
+        mutate: vi.fn(),
         isPending: true,
       })
       renderComponent()
@@ -121,10 +121,10 @@ describe('TagCategoryCard', () => {
     })
 
     it('calls the delete mutation and closes the modal on successful deletion', async () => {
-      const mockMutate = jest.fn((_, {onSuccess}) => {
+      const mockMutate = vi.fn((_, {onSuccess}) => {
         onSuccess && onSuccess()
       })
-      ;(useDeleteDifferentiationTagCategory as jest.Mock).mockReturnValue({
+      ;(useDeleteDifferentiationTagCategory as any).mockReturnValue({
         mutate: mockMutate,
         isLoading: false,
       })
@@ -142,10 +142,10 @@ describe('TagCategoryCard', () => {
     })
 
     it('displays an error message when deletion fails', async () => {
-      const mockMutate = jest.fn((_, {onError}) => {
+      const mockMutate = vi.fn((_, {onError}) => {
         onError && onError(new Error('Deletion failed'))
       })
-      ;(useDeleteDifferentiationTagCategory as jest.Mock).mockReturnValue({
+      ;(useDeleteDifferentiationTagCategory as any).mockReturnValue({
         mutate: mockMutate,
         isLoading: false,
       })

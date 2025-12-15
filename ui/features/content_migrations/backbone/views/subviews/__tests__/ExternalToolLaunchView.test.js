@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import ExternalToolLaunchView from '../ExternalToolLaunchView'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 let mockMigration
 let mockReturnView
@@ -29,7 +29,7 @@ describe('ExternalToolLaunchView', () => {
   beforeEach(() => {
     mockMigration = new Backbone.Model()
     mockReturnView = new Backbone.View()
-    mockReturnView.render = jest.fn().mockReturnThis()
+    mockReturnView.render = vi.fn().mockReturnThis()
     launchView = new ExternalToolLaunchView({
       contentReturnView: mockReturnView,
       model: mockMigration,
@@ -39,11 +39,11 @@ describe('ExternalToolLaunchView', () => {
 
   afterEach(() => {
     launchView.remove()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('it should be accessible', async () => {
-    await new Promise(resolve => isAccessible(launchView, resolve, {a11yReport: true}))
+    await isAccessible(launchView, {a11yReport: true})
   })
 
   test('calls render on return view when launch button clicked', function () {

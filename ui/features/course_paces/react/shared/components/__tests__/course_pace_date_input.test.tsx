@@ -33,7 +33,7 @@ beforeAll(() => {
 })
 
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('CoursePacesDateSelector', () => {
@@ -42,8 +42,8 @@ describe('CoursePacesDateSelector', () => {
     label: 'The Label',
     helpText: 'help text',
     message: undefined,
-    onDateChange: jest.fn(),
-    validateDay: jest.fn(),
+    onDateChange: vi.fn(),
+    validateDay: vi.fn(),
     interaction: 'enabled',
     width: '100%',
     weekendsDisabled: true,

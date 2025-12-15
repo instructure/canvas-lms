@@ -24,7 +24,9 @@ import type {Props as ComponentProps} from '../renderWikiPageTitle'
 import type JQuery from 'jquery'
 import {checkForTitleConflictDebounced} from '../../utils/titleConflicts'
 
-jest.mock('../../utils/titleConflicts')
+vi.mock('../../utils/titleConflicts', () => ({
+  checkForTitleConflictDebounced: vi.fn(),
+}))
 
 const wikiPageModel = new WikiPage()
 wikiPageModel.initialize({url: 'page-1'}, {contextAssetString: 'course_1'})
@@ -35,11 +37,16 @@ const viewElement = new WikiPageEditView({
   wiki_pages_path: '/courses/1/pages',
 })
 
+// Mock the $el.toJSON method that jQuery's form serializer provides
+if ((viewElement as any).$el) {
+  (viewElement as any).$el.toJSON = vi.fn(() => ({title: ''}))
+}
+
 const getProps = (overrides?: {[k: string]: any}): ComponentProps => ({
   canEdit: true,
   defaultValue: 'Test Title',
   viewElement: viewElement as unknown as JQuery<HTMLFormElement> & WikiPageEditView,
-  validationCallback: jest.fn(),
+  validationCallback: vi.fn(),
   isContentLocked: false,
   ...overrides,
 })
@@ -73,7 +80,7 @@ describe('renderWikiPageTitle', () => {
 
   it('calls validationCallback when submitting empty title', () => {
     const titleErrors = [{message: 'title is required', type: 'required'}]
-    const callback = jest.fn(() => ({title: titleErrors}))
+    const callback = vi.fn(() => ({title: titleErrors}))
     const props = getProps({validationCallback: callback})
 
     const component = renderWikiPageTitle(props)
@@ -86,9 +93,9 @@ describe('renderWikiPageTitle', () => {
 
   it('shows error from server when submitting', () => {
     const mockViewElement = {
-      on: jest.fn(),
-      off: jest.fn(),
-      getFormData: jest.fn(),
+      on: vi.fn(),
+      off: vi.fn(),
+      getFormData: vi.fn(),
     }
     const props = getProps({viewElement: mockViewElement})
     const component = renderWikiPageTitle(props)
@@ -96,7 +103,7 @@ describe('renderWikiPageTitle', () => {
 
     const submitterFn = mockViewElement.on.mock.calls[0][1]
     const mockEvent = {
-      stopPropagation: jest.fn(),
+      stopPropagation: vi.fn(),
       result: Promise.reject({
         responseJSON: {
           errors: {
@@ -115,7 +122,7 @@ describe('renderWikiPageTitle', () => {
 
   describe('handleOnChange', () => {
     afterEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('calls checkForTitleConflictDebounced onChange', () => {

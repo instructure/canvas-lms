@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import React from 'react'
-import '@testing-library/jest-dom'
 import {waitFor} from '@testing-library/dom'
 import {userEvent} from '@testing-library/user-event'
 import {HelpTrayProvider, useHelpTray} from '..'
@@ -73,6 +72,7 @@ describe('HelpTrayContext', () => {
   })
 
   afterEach(() => {
+    cleanup()
     window.history.pushState(null, '', originalHash)
     window.dispatchEvent(new HashChangeEvent('hashchange'))
   })

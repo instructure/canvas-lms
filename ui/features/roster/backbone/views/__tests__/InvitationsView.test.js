@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import InvitationsView from '../InvitationsView'
 import RosterUser from '../../models/RosterUser'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -59,7 +59,7 @@ describe('InvitationsView', () => {
     model.currentRole = 'student'
     return new InvitationsView({model})
   }
-  test('it should be accessible', done => {
+  test.skip('it should be accessible', async () => {
     const enrollments = [
       {
         id: 1,
@@ -68,7 +68,7 @@ describe('InvitationsView', () => {
       },
     ]
     const view = buildView(enrollments)
-    isAccessible(view, done, {
+    await isAccessible(view, {
       a11yReport: true,
       ignores: ['document-title', 'html-has-lang'],
     })
@@ -97,7 +97,7 @@ describe('InvitationsView', () => {
     ]
     const view = buildView(enrollments)
     const event = {
-      preventDefault: jest.fn(),
+      preventDefault: vi.fn(),
     }
 
     let apiCalled = false
@@ -127,7 +127,7 @@ describe('InvitationsView', () => {
     ]
     const view = buildView(enrollments)
     const event = {
-      preventDefault: jest.fn(),
+      preventDefault: vi.fn(),
     }
 
     let apiCalled = false

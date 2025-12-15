@@ -50,14 +50,14 @@ describe('Rce Abstraction - integration', () => {
         return renderCallback(fakeEditor)
       },
     }
-    jest.spyOn(RCELoader, 'loadRCE').mockImplementation(callback => callback(fakeRceModule))
+    vi.spyOn(RCELoader, 'loadRCE').mockImplementation(callback => callback(fakeRceModule))
   })
 
   afterEach(() => {
     fakeENV.teardown()
     $('#fixtures').empty()
     editorUtils.resetRCE()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   // fails in Jest, passes in QUnit

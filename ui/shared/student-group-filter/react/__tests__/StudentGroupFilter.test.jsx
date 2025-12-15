@@ -19,7 +19,6 @@
 import React from 'react'
 import {render, cleanup, screen} from '@testing-library/react'
 import StudentGroupFilter from '../index'
-import '@testing-library/jest-dom/extend-expect'
 
 describe('StudentGroupFilter', () => {
   let context
@@ -46,7 +45,7 @@ describe('StudentGroupFilter', () => {
         },
       ],
       label: 'Select a student group',
-      onChange: jest.fn(),
+      onChange: vi.fn(),
       value: '2101',
     }
   })

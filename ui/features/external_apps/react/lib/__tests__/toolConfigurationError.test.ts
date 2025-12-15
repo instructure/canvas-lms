@@ -26,15 +26,15 @@ interface ErrorWithStatus {
 }
 
 beforeAll(() => {
-  $.flashError = jest.fn()
+  $.flashError = vi.fn()
 })
 
 afterEach(() => {
-  ;($.flashError as jest.Mock).mockClear()
+  ;($.flashError as any).mockClear()
 })
 
 afterAll(() => {
-  ;($.flashError as jest.Mock).mockRestore()
+  ;($.flashError as any).mockRestore()
 })
 
 const clientId = '1000000009'

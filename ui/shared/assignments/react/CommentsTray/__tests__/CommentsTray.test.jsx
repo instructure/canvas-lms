@@ -79,7 +79,7 @@ describe('CommentsTray', () => {
   })
 
   it('closes the tray when the close button is clicked', async () => {
-    props.closeTray = jest.fn()
+    props.closeTray = vi.fn()
     const {getByTestId} = renderComponent()
     const closeButton = getByTestId('tray-close-button').getElementsByTagName('button')[0]
     fireEvent.click(closeButton)

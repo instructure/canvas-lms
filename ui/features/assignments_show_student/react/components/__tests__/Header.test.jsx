@@ -19,13 +19,13 @@
 import Header from '../Header'
 import {mockAssignmentAndSubmission, mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import {AssignmentMocks} from '@canvas/assignments/graphql/student/Assignment'
 
-jest.mock('../AttemptSelect')
-jest.mock('@canvas/assignments/react/CommentsTray', () => () => '')
+vi.mock('../AttemptSelect')
+vi.mock('@canvas/assignments/react/CommentsTray', () => () => '')
 
 // EVAL-3711 Remove ICE Feature Flag
 
@@ -487,7 +487,7 @@ describe('Peer reviews counter', () => {
     })
 
     // fickle
-    it.skip('renders the required peer review link with peer reviews assigned', () => {
+    it('renders the required peer review link with peer reviews assigned', () => {
       const {queryByTestId} = render(<Header {...props} />)
       expect(queryByTestId('assignment-student-header')).toHaveTextContent('Required Peer Reviews')
     })

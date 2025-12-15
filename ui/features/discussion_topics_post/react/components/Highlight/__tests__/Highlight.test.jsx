@@ -21,12 +21,12 @@ import React from 'react'
 import {Highlight} from '../Highlight'
 import {DiscussionManagerUtilityContext} from '../../../utils/constants'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 const setup = props => {
   return render(
     <DiscussionManagerUtilityContext.Provider
-      value={{focusSelector: '', setFocusSelector: jest.fn()}}
+      value={{focusSelector: '', setFocusSelector: vi.fn()}}
     >
       <Highlight {...props}>
         <button>Test Button</button>
@@ -46,13 +46,13 @@ describe('Highlight', () => {
     window.history.pushState({}, '', newUrl.toString())
 
     // Mock scrollIntoView since it's not implemented in JSDOM
-    Element.prototype.scrollIntoView = jest.fn()
+    Element.prototype.scrollIntoView = vi.fn()
   })
 
   afterEach(() => {
     // Restore original URL
     window.history.pushState({}, '', originalWindowLocation.href)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('displays the highlight', async () => {
@@ -62,7 +62,7 @@ describe('Highlight', () => {
       // Allow layout effects to complete
       await Promise.resolve()
       // Allow setTimeout to complete
-      jest.runAllTimers()
+      vi.runAllTimers()
     })
 
     expect(getByTestId('isHighlighted')).toBeInTheDocument()
@@ -80,7 +80,7 @@ describe('Highlight', () => {
       // Allow layout effects to complete
       await Promise.resolve()
       // Allow setTimeout to complete
-      jest.runAllTimers()
+      vi.runAllTimers()
     })
 
     expect(getByTestId('isHighlighted')).toHaveClass('highlight-discussion')

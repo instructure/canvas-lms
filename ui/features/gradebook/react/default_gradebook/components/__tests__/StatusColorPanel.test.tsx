@@ -30,7 +30,7 @@ describe('StatusColorPanel', () => {
 
   beforeEach(() => {
     colors = statusColors()
-    onColorsUpdated = jest.fn()
+    onColorsUpdated = vi.fn()
   })
 
   it('renders a list item for each color in .colors', () => {

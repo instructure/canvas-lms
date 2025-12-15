@@ -21,7 +21,7 @@ import {MediaComment} from '../../../../graphql/MediaComment'
 import {MessageDetailMediaAttachment} from '../MessageDetailMediaAttachment'
 import React from 'react'
 
-jest.mock('@instructure/ui-media-player', () => ({
+vi.mock('@instructure/ui-media-player', () => ({
   MediaPlayer: () => <div />,
 }))
 

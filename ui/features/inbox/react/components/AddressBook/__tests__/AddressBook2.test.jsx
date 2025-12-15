@@ -74,14 +74,14 @@ const demoData = {
 
 const defaultProps = {
   menuData: demoData,
-  onUserFilterSelect: jest.fn(),
-  setIsMenuOpen: jest.fn(),
+  onUserFilterSelect: vi.fn(),
+  setIsMenuOpen: vi.fn(),
 }
 
 const setup = props => {
   return render(
     <ApolloProvider client={mswClient}>
-      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+      <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
         <AddressBook {...props} />
       </AlertManagerContext.Provider>
     </ApolloProvider>,
@@ -91,7 +91,7 @@ const setup = props => {
 describe('Address Book Component', () => {
   describe('Behaviors', () => {
     it('Should set popup menu to open when button is pressed', async () => {
-      const mockSetIsMenuOpen = jest.fn()
+      const mockSetIsMenuOpen = vi.fn()
       const {container} = setup({...defaultProps, setIsMenuOpen: mockSetIsMenuOpen})
       const button = container.querySelector('button')
       fireEvent.click(button)
@@ -99,7 +99,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should set popup menu to false when address button is pressed and popup is open', async () => {
-      const mockSetIsMenuOpen = jest.fn()
+      const mockSetIsMenuOpen = vi.fn()
       const {container} = setup({
         ...defaultProps,
         isMenuOpen: true,
@@ -111,7 +111,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should set popup menu to true when down arrow is pressed', async () => {
-      const mockSetIsMenuOpen = jest.fn()
+      const mockSetIsMenuOpen = vi.fn()
       const {container} = setup({
         ...defaultProps,
         isMenuOpen: true,
@@ -125,7 +125,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should set popup menu to false when focus is changed', async () => {
-      const mockSetIsMenuOpen = jest.fn()
+      const mockSetIsMenuOpen = vi.fn()
       const {container} = setup({
         ...defaultProps,
         setIsMenuOpen: mockSetIsMenuOpen,
@@ -140,7 +140,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should not set popup menu to true when textInput is focused', async () => {
-      const mockSetIsMenuOpen = jest.fn()
+      const mockSetIsMenuOpen = vi.fn()
       const {container} = setup({...defaultProps, setIsMenuOpen: mockSetIsMenuOpen})
       const input = container.querySelector('input')
       fireEvent.focus(input)
@@ -148,7 +148,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should set popup menu to true when textInput is clicked', async () => {
-      const mockSetIsMenuOpen = jest.fn()
+      const mockSetIsMenuOpen = vi.fn()
       const {container} = setup({...defaultProps, setIsMenuOpen: mockSetIsMenuOpen})
       const input = container.querySelector('input')
       fireEvent.click(input)
@@ -156,7 +156,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should pass back ID of item when selected', async () => {
-      const onSelectSpy = jest.fn()
+      const onSelectSpy = vi.fn()
       setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
@@ -165,7 +165,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should select item when navigating down and enter key is pressed', async () => {
-      const onSelectSpy = jest.fn()
+      const onSelectSpy = vi.fn()
       const {container} = setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy})
       const input = container.querySelector('input')
       fireEvent.focus(input)
@@ -176,7 +176,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should select item when navigating up and enter key is pressed', () => {
-      const onSelectSpy = jest.fn()
+      const onSelectSpy = vi.fn()
       const {container} = setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy})
       const input = container.querySelector('input')
       fireEvent.focus(input)
@@ -226,7 +226,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should reset selected item when data changes and menu is open', async () => {
-      const onSelectSpy = jest.fn()
+      const onSelectSpy = vi.fn()
       const {rerender} = setup({
         ...defaultProps,
         isMenuOpen: true,
@@ -242,7 +242,7 @@ describe('Address Book Component', () => {
 
       rerender(
         <ApolloProvider client={mswClient}>
-          <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
             <AddressBook {...defaultProps} menuData={newData} isMenuOpen={true} isSubMenu={true} />
           </AlertManagerContext.Provider>
         </ApolloProvider>,

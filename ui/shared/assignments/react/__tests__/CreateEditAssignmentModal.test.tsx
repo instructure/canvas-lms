@@ -22,13 +22,18 @@ import CreateEditAssignmentModal, {
   type CreateEditAssignmentModalProps,
   type ModalAssignment,
 } from '../CreateEditAssignmentModal'
+import {type Mock} from 'vitest'
 
-jest.useFakeTimers().setSystemTime(new Date('2024-01-01T00:00:00Z'))
+vi.useFakeTimers().setSystemTime(new Date('2024-01-01T00:00:00Z'))
+
+afterAll(() => {
+  vi.useRealTimers()
+})
 
 describe('CreateEditAssignmentModal', () => {
-  let onCloseHandlerMock: jest.Mock
-  let onSaveHandlerMock: jest.Mock
-  let onMoreOptionsHandlerMock: jest.Mock
+  let onCloseHandlerMock: Mock
+  let onSaveHandlerMock: Mock
+  let onMoreOptionsHandlerMock: Mock
 
   const assignmentData: ModalAssignment = {
     type: 'none',
@@ -78,9 +83,9 @@ describe('CreateEditAssignmentModal', () => {
   })
 
   beforeEach(() => {
-    onCloseHandlerMock = jest.fn()
-    onSaveHandlerMock = jest.fn()
-    onMoreOptionsHandlerMock = jest.fn()
+    onCloseHandlerMock = vi.fn()
+    onSaveHandlerMock = vi.fn()
+    onMoreOptionsHandlerMock = vi.fn()
   })
 
   it('calls onCloseHandler when close button is clicked', () => {
@@ -100,7 +105,7 @@ describe('CreateEditAssignmentModal', () => {
 
     fireEvent.click(getByPlaceholderText('Choose a date'))
     fireEvent.click(getByText('15'))
-    jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+    vi.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
     fireEvent.click(getByTestId('more-options-button'))
 
@@ -299,7 +304,7 @@ describe('CreateEditAssignmentModal', () => {
       // open the calendar picker (Select January 15th)
       fireEvent.click(getByPlaceholderText('Choose a date'))
       fireEvent.click(getByText('15'))
-      jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+      vi.advanceTimersByTime(100) // DateTimeInput has a setTimeout before firing the change event
       fireEvent.click(getByTestId('save-button'))
 
       expect(onSaveHandlerMock).toHaveBeenCalledWith(
@@ -326,7 +331,7 @@ describe('CreateEditAssignmentModal', () => {
       // open the calendar picker (Select January 15th)
       fireEvent.click(getByPlaceholderText('Choose a date'))
       fireEvent.click(getByText('15'))
-      jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+      vi.advanceTimersByTime(100) // DateTimeInput has a setTimeout before firing the change event
 
       fireEvent.click(getByTestId('save-button'))
 
@@ -441,7 +446,7 @@ describe('CreateEditAssignmentModal', () => {
       // open the calendar picker (Select January 15th)
       fireEvent.click(getByPlaceholderText('Choose a date'))
       fireEvent.click(getByText('15'))
-      jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+      vi.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
       fireEvent.click(getByTestId('save-button'))
 
@@ -520,7 +525,7 @@ describe('CreateEditAssignmentModal', () => {
         const datePicker = getByPlaceholderText('Choose a date')
         fireEvent.click(datePicker)
         fireEvent.click(getByText('21'))
-        jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+        vi.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
         // Try to save
         fireEvent.click(getByTestId('save-button'))
@@ -538,7 +543,7 @@ describe('CreateEditAssignmentModal', () => {
         const datePicker = getByPlaceholderText('Choose a date')
         fireEvent.click(datePicker)
         fireEvent.click(getByText('11'))
-        jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+        vi.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
         // Try to save
         fireEvent.click(getByTestId('save-button'))
@@ -558,7 +563,7 @@ describe('CreateEditAssignmentModal', () => {
         const datePicker = getByPlaceholderText('Choose a date')
         fireEvent.click(datePicker)
         fireEvent.click(getByText('21'))
-        jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+        vi.advanceTimersByTime(100) // DateTimeInput has a setTimeout before firing the change event
 
         // Try to save
         fireEvent.click(getByTestId('save-button'))
@@ -574,11 +579,11 @@ describe('CreateEditAssignmentModal', () => {
           />,
         )
 
-        // open calendar picker and select a date past the term end date
+        // open calendar picker and select a date before the term start date
         const datePicker = getByPlaceholderText('Choose a date')
         fireEvent.click(datePicker)
         fireEvent.click(getByText('11'))
-        jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+        vi.advanceTimersByTime(100) // DateTimeInput has a setTimeout before firing the change event
 
         // Try to save
         fireEvent.click(getByTestId('save-button'))

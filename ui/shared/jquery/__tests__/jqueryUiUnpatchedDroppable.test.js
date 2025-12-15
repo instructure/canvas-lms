@@ -40,7 +40,7 @@ describe('Droppable Widget', () => {
 
   it('triggers drop event', () => {
     const $droppableElement = $('#droppable-element')
-    const dropHandler = jest.fn()
+    const dropHandler = vi.fn()
 
     $droppableElement.on('drop', dropHandler)
     $droppableElement.trigger('drop')

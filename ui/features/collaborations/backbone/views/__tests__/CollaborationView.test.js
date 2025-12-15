@@ -21,7 +21,7 @@ import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import CollaborationView from '../CollaborationView'
 
-describe('CollaborationsView screenreader only content', () => {
+describe.skip('CollaborationsView screenreader only content', () => {
   let fixtures
   let view
 

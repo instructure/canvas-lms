@@ -21,8 +21,8 @@ if (typeof vi !== 'undefined') {
   vi.mock('@canvas/hide-assignment-grades-tray/react/Api')
   vi.mock('@canvas/alerts/react/FlashAlert')
 }
-jest.mock('@canvas/hide-assignment-grades-tray/react/Api')
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/hide-assignment-grades-tray/react/Api')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 import {render, screen as rtlScreen, waitFor, fireEvent} from '@testing-library/react'
 import React from 'react'
@@ -49,8 +49,8 @@ describe('HideAssignmentGradesTray', () => {
       id: '2301',
       name: 'Math 1.1',
     },
-    onExited: jest.fn(),
-    onHidden: jest.fn(),
+    onExited: vi.fn(),
+    onHidden: vi.fn(),
     sections: [
       {id: '2001', name: 'Freshmen'},
       {id: '2002', name: 'Sophomores'},
@@ -62,13 +62,13 @@ describe('HideAssignmentGradesTray', () => {
 
   beforeEach(() => {
     trayRef = null
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // Clean up any previous renders to avoid duplicate elements
     document.body.innerHTML = ''
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderTray = () => {
@@ -138,7 +138,7 @@ describe('HideAssignmentGradesTray', () => {
       })
 
       // Show the tray again with a fresh context
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       document.body.innerHTML = ''
       await showTray()
 
@@ -242,7 +242,7 @@ describe('HideAssignmentGradesTray', () => {
 
     // fickle; this test passes individually
     it.skip('disables hide button while processing', async () => {
-      const hideAssignmentGradesMock = jest.fn(
+      const hideAssignmentGradesMock = vi.fn(
         () => new Promise(resolve => setTimeout(resolve, 100)),
       )
       Api.hideAssignmentGrades.mockImplementation(hideAssignmentGradesMock)

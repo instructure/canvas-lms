@@ -31,15 +31,15 @@ const createProps = overrides => {
     settingsDisabled: false,
     shouldRenderMarkAsRead: true,
     shouldRenderMarkAsUnread: true,
-    compose: jest.fn(),
-    reply: jest.fn(),
-    replyAll: jest.fn(),
-    archive: jest.fn(),
-    delete: jest.fn(),
-    markAsUnread: jest.fn(),
-    markAsRead: jest.fn(),
-    forward: jest.fn(),
-    star: jest.fn(),
+    compose: vi.fn(),
+    reply: vi.fn(),
+    replyAll: vi.fn(),
+    archive: vi.fn(),
+    delete: vi.fn(),
+    markAsUnread: vi.fn(),
+    markAsRead: vi.fn(),
+    forward: vi.fn(),
+    star: vi.fn(),
     ...overrides,
   }
 }
@@ -132,7 +132,7 @@ describe('MessageActionButtons', () => {
 
   it('calls unarchive when unarchive prop exists', async () => {
     const props = createProps({
-      unarchive: jest.fn(),
+      unarchive: vi.fn(),
     })
 
     const {queryByTestId} = render(<MessageActionButtons {...props} />)

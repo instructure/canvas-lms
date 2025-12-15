@@ -135,7 +135,7 @@ describe('<CustomHelpLinkSettings/>', () => {
 
   describe('validate', () => {
     beforeEach(() => {
-      jest.spyOn($, 'screenReaderFlashMessage')
+      vi.spyOn($, 'screenReaderFlashMessage')
     })
 
     afterEach(() => {

@@ -28,7 +28,7 @@ describe('WikiPageRevisionView', () => {
   test('binds to model change triggers', () => {
     const revision = new WikiPageRevision()
     const view = new WikiPageRevisionView({model: revision})
-    const renderSpy = jest.spyOn(view, 'render')
+    const renderSpy = vi.spyOn(view, 'render')
     revision.set('body', 'A New Body')
     expect(renderSpy).toHaveBeenCalled()
   })
@@ -36,15 +36,15 @@ describe('WikiPageRevisionView', () => {
   test('restore delegates to model.restore', async () => {
     const revision = new WikiPageRevision()
     const view = new WikiPageRevisionView({model: revision})
-    const restoreSpy = jest.spyOn(view.model, 'restore').mockImplementation(() => ({
+    const restoreSpy = vi.spyOn(view.model, 'restore').mockImplementation(() => ({
       done: callback => {
         callback({url: 'test-url'})
         return {fail: () => {}}
       },
     }))
-    jest.spyOn(view, 'windowLocation').mockReturnValue({
+    vi.spyOn(view, 'windowLocation').mockReturnValue({
       href: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     })
     view.restore()
     $('button[data-testid="confirm-button"]').trigger('click')

@@ -33,7 +33,7 @@ describe('coursesQuery', () => {
 
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should fetch course data', async () => {

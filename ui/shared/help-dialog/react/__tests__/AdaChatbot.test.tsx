@@ -24,10 +24,10 @@ import AdaChatbot, {autoRestoreAda} from '../AdaChatbot'
 const ADA_STATE_KEY = 'persistedAdaState'
 
 describe('AdaChatbot', () => {
-  const mockOnDialogClose = jest.fn()
+  const mockOnDialogClose = vi.fn()
   let mockAdaEmbed: any
-  let consoleWarnSpy: jest.SpyInstance
-  let consoleErrorSpy: jest.SpyInstance
+  let consoleWarnSpy: any
+  let consoleErrorSpy: any
 
   // Helper to extract callbacks from Ada start configuration
   const getStartConfig = () => mockAdaEmbed.start.mock.calls[0][0]
@@ -50,24 +50,24 @@ describe('AdaChatbot', () => {
       current_user_roles: [],
       DOMAIN_ROOT_ACCOUNT_UUID: 'test-uuid',
     })
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     localStorage.clear()
     delete (window as any).adaEmbed
     delete (window as any).adaSettings
-    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     mockAdaEmbed = {
-      start: jest.fn().mockResolvedValue(undefined),
-      toggle: jest.fn().mockResolvedValue(undefined),
-      getInfo: jest.fn().mockResolvedValue({
+      start: vi.fn().mockResolvedValue(undefined),
+      toggle: vi.fn().mockResolvedValue(undefined),
+      getInfo: vi.fn().mockResolvedValue({
         isChatOpen: false,
         isDrawerOpen: false,
         hasActiveChatter: false,
         hasClosedChat: false,
       }),
-      subscribeEvent: jest.fn().mockResolvedValue(1),
-      stop: jest.fn().mockResolvedValue(undefined),
+      subscribeEvent: vi.fn().mockResolvedValue(1),
+      stop: vi.fn().mockResolvedValue(undefined),
     }
     ;(window as any).adaEmbed = mockAdaEmbed
   })
@@ -78,7 +78,7 @@ describe('AdaChatbot', () => {
     }
     cleanup()
     localStorage.clear()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     fakeENV.teardown()
   })
 
@@ -264,7 +264,7 @@ describe('AdaChatbot', () => {
   })
 
   it('marks chat closed on end_conversation event and calls stop()', async () => {
-    mockAdaEmbed.stop = jest.fn().mockResolvedValue(undefined)
+    mockAdaEmbed.stop = vi.fn().mockResolvedValue(undefined)
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
     await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
 
@@ -290,7 +290,7 @@ describe('AdaChatbot', () => {
   )
 
   it('allows reinitialization when stop() fails', async () => {
-    mockAdaEmbed.stop = jest.fn().mockRejectedValue(new Error('Stop failed'))
+    mockAdaEmbed.stop = vi.fn().mockRejectedValue(new Error('Stop failed'))
     render(<AdaChatbot onDialogClose={mockOnDialogClose} />)
     await waitFor(() => expect(mockAdaEmbed.start).toHaveBeenCalled())
 

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {StudentHeader, StudentHeaderProps} from '../StudentHeader'
 import {SortOrder, SortBy, NameDisplayFormat} from '../../../utils/constants'
@@ -26,21 +26,25 @@ const makeProps = (props = {}): StudentHeaderProps => {
   return {
     sorting: {
       sortOrder: SortOrder.ASC,
-      setSortOrder: jest.fn(),
+      setSortOrder: vi.fn(),
       sortBy: SortBy.Name,
-      setSortBy: jest.fn(),
+      setSortBy: vi.fn(),
       sortOutcomeId: null,
-      setSortOutcomeId: jest.fn(),
+      setSortOutcomeId: vi.fn(),
       sortAlignmentId: null,
-      setSortAlignmentId: jest.fn(),
+      setSortAlignmentId: vi.fn(),
     },
     nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
-    onChangeNameDisplayFormat: jest.fn(),
+    onChangeNameDisplayFormat: vi.fn(),
     ...props,
   }
 }
 
 describe('StudentHeader', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   it('renders a "Student" cell', () => {
     const {getByText} = render(<StudentHeader {...makeProps()} />)
     expect(getByText('Students')).toBeInTheDocument()
@@ -174,11 +178,11 @@ describe('StudentHeader', () => {
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
         sorting: {
           sortOrder: SortOrder.ASC,
-          setSortOrder: jest.fn(),
+          setSortOrder: vi.fn(),
           sortBy: SortBy.Name,
-          setSortBy: jest.fn(),
+          setSortBy: vi.fn(),
           sortOutcomeId: null,
-          setSortOutcomeId: jest.fn(),
+          setSortOutcomeId: vi.fn(),
         },
       })
       const {getByText} = render(<StudentHeader {...props} />)
@@ -193,11 +197,11 @@ describe('StudentHeader', () => {
         nameDisplayFormat: NameDisplayFormat.LAST_FIRST,
         sorting: {
           sortOrder: SortOrder.ASC,
-          setSortOrder: jest.fn(),
+          setSortOrder: vi.fn(),
           sortBy: SortBy.SortableName,
-          setSortBy: jest.fn(),
+          setSortBy: vi.fn(),
           sortOutcomeId: null,
-          setSortOutcomeId: jest.fn(),
+          setSortOutcomeId: vi.fn(),
         },
       })
       const {getByText} = render(<StudentHeader {...props} />)
@@ -212,11 +216,11 @@ describe('StudentHeader', () => {
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
         sorting: {
           sortOrder: SortOrder.ASC,
-          setSortOrder: jest.fn(),
+          setSortOrder: vi.fn(),
           sortBy: SortBy.SisId,
-          setSortBy: jest.fn(),
+          setSortBy: vi.fn(),
           sortOutcomeId: null,
-          setSortOutcomeId: jest.fn(),
+          setSortOutcomeId: vi.fn(),
         },
       })
       const {getByText} = render(<StudentHeader {...props} />)

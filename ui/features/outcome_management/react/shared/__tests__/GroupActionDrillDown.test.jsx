@@ -25,8 +25,8 @@ import OutcomesContext, {
   ROOT_GROUP_ID,
 } from '@canvas/outcomes/react/contexts/OutcomesContext'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(() => vi.fn(() => {})),
 }))
 
 describe('GroupActionDrillDown', () => {
@@ -78,12 +78,12 @@ describe('GroupActionDrillDown', () => {
   })
 
   beforeEach(() => {
-    onCollectionClick = jest.fn()
-    setShowOutcomesView = jest.fn()
+    onCollectionClick = vi.fn()
+    setShowOutcomesView = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const render = (

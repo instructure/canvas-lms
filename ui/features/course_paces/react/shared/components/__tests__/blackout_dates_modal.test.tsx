@@ -22,8 +22,8 @@ import {act, render} from '@testing-library/react'
 import {BLACKOUT_DATES} from '../../../__tests__/fixtures'
 import BlackoutDatesModal from '../blackout_dates_modal'
 
-const onCancel = jest.fn()
-const onSave = jest.fn()
+const onCancel = vi.fn()
+const onSave = vi.fn()
 
 const defaultProps = {
   open: true,
@@ -34,7 +34,7 @@ const defaultProps = {
 
 describe('BlackoutDatesModal', () => {
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('opens', () => {

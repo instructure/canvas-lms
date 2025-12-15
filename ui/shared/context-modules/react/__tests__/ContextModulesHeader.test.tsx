@@ -35,7 +35,7 @@ const defaultProps = {
     visible: true,
   },
   expandCollapseAll: {
-    onExpandCollapseAll: jest.fn(),
+    onExpandCollapseAll: vi.fn(),
     anyModuleExpanded: true,
   },
   addModule: {

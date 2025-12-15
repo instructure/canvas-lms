@@ -24,7 +24,7 @@ import LLMConversationView from '../components/LLMConversationView'
 
 const defaultProps = {
   isOpen: true,
-  onClose: jest.fn(),
+  onClose: vi.fn(),
   courseId: 123,
   aiExperienceId: '1',
   aiExperienceTitle: 'Test Experience',
@@ -32,16 +32,16 @@ const defaultProps = {
   learningObjectives: 'Test objectives',
   scenario: 'Test scenario',
   isExpanded: true,
-  onToggleExpanded: jest.fn(),
+  onToggleExpanded: vi.fn(),
 }
 
 describe('LLMConversationView', () => {
   beforeEach(() => {
     fetchMock.restore()
     // Mock scrollIntoView which is not available in JSDOM
-    Element.prototype.scrollIntoView = jest.fn()
+    Element.prototype.scrollIntoView = vi.fn()
     // Mock focus which is used for accessibility
-    HTMLElement.prototype.focus = jest.fn()
+    HTMLElement.prototype.focus = vi.fn()
 
     // Default mocks for most tests - can be overridden in individual tests
     // Mock get active conversation (returns empty - no active conversation)
@@ -54,7 +54,7 @@ describe('LLMConversationView', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('does not render when closed', () => {
@@ -82,7 +82,7 @@ describe('LLMConversationView', () => {
   })
 
   it('calls onToggleExpanded when collapsed card is clicked', () => {
-    const onToggleExpanded = jest.fn()
+    const onToggleExpanded = vi.fn()
     render(
       <LLMConversationView
         {...defaultProps}
@@ -98,7 +98,7 @@ describe('LLMConversationView', () => {
   })
 
   it('calls onToggleExpanded when close button is clicked', () => {
-    const onToggleExpanded = jest.fn()
+    const onToggleExpanded = vi.fn()
     render(<LLMConversationView {...defaultProps} onToggleExpanded={onToggleExpanded} />)
 
     const closeButton = screen.getAllByText('Close preview')[0].closest('button')

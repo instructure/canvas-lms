@@ -37,7 +37,7 @@ describe('AvatarModal', () => {
   })
 
   it('renders modal with defaults', () => {
-    const {getByText, getByTestId} = render(<AvatarModal onClose={jest.fn()} />)
+    const {getByText, getByTestId} = render(<AvatarModal onClose={vi.fn()} />)
     expect(getByText('Select Profile Picture')).toBeInTheDocument()
     expect(getByTestId('save-avatar-button')).toBeInTheDocument()
     expect(getByTestId('cancel-avatar-button')).toBeInTheDocument()
@@ -48,7 +48,7 @@ describe('AvatarModal', () => {
   })
 
   it('calls onClose when canceling', async () => {
-    const onClose = jest.fn()
+    const onClose = vi.fn()
     const {getByTestId} = render(<AvatarModal onClose={onClose} />)
 
     fireEvent.click(getByTestId('cancel-avatar-button'))
@@ -62,7 +62,7 @@ describe('AvatarModal', () => {
     const preflightPath = '/files/pending'
     fetchMock.post(preflightPath, 200)
 
-    const {getAllByText, getByTestId} = render(<AvatarModal onClose={jest.fn()} />)
+    const {getAllByText, getByTestId} = render(<AvatarModal onClose={vi.fn()} />)
     fireEvent.click(getByTestId('save-avatar-button'))
     await waitFor(() => {
       expect(fetchMock.called(preflightPath)).toBe(true)

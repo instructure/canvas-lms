@@ -37,16 +37,16 @@ describe('ApiProgressBar', () => {
   }
 
   beforeEach(() => {
-    jest.useFakeTimers()
-    jest.spyOn(ProgressStore, 'get').mockImplementation(() => {
+    vi.useFakeTimers()
+    vi.spyOn(ProgressStore, 'get').mockImplementation(() => {
       ProgressStore.setState({[defaultProgress.id]: defaultProgress})
     })
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     ProgressStore.clearState()
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   it('does not render initially when not in progress', () => {
@@ -56,13 +56,13 @@ describe('ApiProgressBar', () => {
 
   it('renders progress bar when in progress', () => {
     const {getByTestId} = renderComponent({progress_id: defaultProgress.id})
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
     expect(getByTestId('api-progress-bar')).toBeInTheDocument()
   })
 
   it('updates when progress state changes', () => {
     const {getByTestId} = renderComponent({progress_id: defaultProgress.id})
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
 
     // Update progress state to running
     const updatedProgress = {...defaultProgress, workflow_state: 'running', completion: 50}
@@ -74,9 +74,9 @@ describe('ApiProgressBar', () => {
   })
 
   it('calls onComplete when progress is completed', () => {
-    const onComplete = jest.fn()
+    const onComplete = vi.fn()
     renderComponent({progress_id: defaultProgress.id, onComplete})
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
 
     // Update progress state to completed
     const completedProgress = {...defaultProgress, workflow_state: 'completed', completion: 100}
@@ -87,32 +87,32 @@ describe('ApiProgressBar', () => {
 
   it('stops polling when progress is completed', () => {
     const {queryByTestId} = renderComponent({progress_id: defaultProgress.id})
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
 
     // Update progress state to completed
     const completedProgress = {...defaultProgress, workflow_state: 'completed', completion: 100}
     ProgressStore.setState({[defaultProgress.id]: completedProgress})
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
 
     expect(queryByTestId('api-progress-bar')).not.toBeInTheDocument()
   })
 
   it('starts polling when progress_id is provided', () => {
     renderComponent({progress_id: defaultProgress.id})
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
     expect(ProgressStore.get).toHaveBeenCalled()
   })
 
   it('does not start polling when no progress_id is provided', () => {
     renderComponent()
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
     expect(ProgressStore.get).not.toHaveBeenCalled()
   })
 
   describe('progress states', () => {
     it('shows progress bar in queued state', () => {
       const {getByTestId} = renderComponent({progress_id: defaultProgress.id})
-      jest.advanceTimersByTime(1000)
+      vi.advanceTimersByTime(1000)
       const progressBar = getByTestId('api-progress-bar')
       expect(progressBar).toBeInTheDocument()
       expect(progressBar.querySelector('[role="progressbar"]')).toHaveAttribute(
@@ -123,7 +123,7 @@ describe('ApiProgressBar', () => {
 
     it('shows progress bar in running state', () => {
       const {getByTestId} = renderComponent({progress_id: defaultProgress.id})
-      jest.advanceTimersByTime(1000)
+      vi.advanceTimersByTime(1000)
 
       const runningProgress = {...defaultProgress, workflow_state: 'running', completion: 75}
       ProgressStore.setState({[defaultProgress.id]: runningProgress})
@@ -138,7 +138,7 @@ describe('ApiProgressBar', () => {
 
     it('removes progress bar in completed state', () => {
       const {queryByTestId} = renderComponent({progress_id: defaultProgress.id})
-      jest.advanceTimersByTime(1000)
+      vi.advanceTimersByTime(1000)
 
       const completedProgress = {...defaultProgress, workflow_state: 'completed', completion: 100}
       ProgressStore.setState({[defaultProgress.id]: completedProgress})

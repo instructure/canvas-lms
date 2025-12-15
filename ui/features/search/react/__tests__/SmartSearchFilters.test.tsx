@@ -20,14 +20,14 @@ import userEvent from '@testing-library/user-event'
 import SmartSearchFilters, {ALL_SOURCES} from '../SmartSearchFilters'
 
 const props = {
-  handleCloseTray: jest.fn(),
-  updateFilters: jest.fn(),
+  handleCloseTray: vi.fn(),
+  updateFilters: vi.fn(),
   filters: ALL_SOURCES,
 }
 
 describe('SmartSearchFilters', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders filters as checked', () => {

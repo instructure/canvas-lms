@@ -137,7 +137,7 @@ describe('useWidgetConfig', () => {
       }),
     )
 
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     const {result} = renderHook(() => useWidgetConfig('test-widget', 'testKey', 'defaultValue'), {
       wrapper: createWrapper(),

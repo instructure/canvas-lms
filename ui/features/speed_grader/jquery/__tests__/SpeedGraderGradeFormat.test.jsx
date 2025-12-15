@@ -58,23 +58,23 @@ describe('SpeedGrader Grade Formatting', () => {
     documentLocationHash = ''
 
     const history = {
-      back: jest.fn(),
+      back: vi.fn(),
       length: 1,
-      popState: jest.fn(),
-      pushState: jest.fn(),
-      replaceState: jest.fn(),
+      popState: vi.fn(),
+      pushState: vi.fn(),
+      replaceState: vi.fn(),
     }
 
-    jest.spyOn(SpeedGraderHelpers, 'getHistory').mockReturnValue(history)
-    jest
+    vi.spyOn(SpeedGraderHelpers, 'getHistory').mockReturnValue(history)
+    vi
       .spyOn(SpeedGraderHelpers, 'setLocation')
       .mockImplementation(url => (documentLocation = url))
-    jest.spyOn(SpeedGraderHelpers, 'getLocation').mockImplementation(() => documentLocation)
-    jest
+    vi.spyOn(SpeedGraderHelpers, 'getLocation').mockImplementation(() => documentLocation)
+    vi
       .spyOn(SpeedGraderHelpers, 'setLocationHash')
       .mockImplementation(hash => (documentLocationHash = hash))
-    jest.spyOn(SpeedGraderHelpers, 'getLocationHash').mockImplementation(() => documentLocationHash)
-    jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
+    vi.spyOn(SpeedGraderHelpers, 'getLocationHash').mockImplementation(() => documentLocationHash)
+    vi.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
 
     // Set up ENV
     fakeENV.setup({
@@ -94,7 +94,7 @@ describe('SpeedGrader Grade Formatting', () => {
   afterEach(() => {
     document.body.innerHTML = ''
     fakeENV.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('formatGradeForSubmission', () => {

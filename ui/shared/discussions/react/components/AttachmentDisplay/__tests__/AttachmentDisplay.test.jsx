@@ -25,19 +25,19 @@ import userEvent from '@testing-library/user-event'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
-jest.mock('@canvas/upload-file')
+vi.mock('@canvas/upload-file')
 
 const setup = props => {
   const mockAlertManager = {
-    setOnFailure: jest.fn(),
-    setOnSuccess: jest.fn(),
+    setOnFailure: vi.fn(),
+    setOnSuccess: vi.fn(),
   }
 
   const renderResult = render(
     <AlertManagerContext.Provider value={mockAlertManager}>
       <AttachmentDisplay
-        setAttachment={jest.fn()}
-        setAttachmentToUpload={jest.fn()}
+        setAttachment={vi.fn()}
+        setAttachmentToUpload={vi.fn()}
         responsiveQuerySizes={responsiveQuerySizes}
         {...props}
       />
@@ -50,12 +50,12 @@ const setup = props => {
 describe('AttachmentDisplay', () => {
   beforeEach(() => {
     fakeENV.setup()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('displays AttachButton when there is no attachment', () => {
@@ -104,7 +104,7 @@ describe('AttachmentDisplay', () => {
   })
 
   it('uploads file with submit intent if we do not pass the checkContextQuota param', async () => {
-    jest.spyOn(uploadFileModule, 'uploadFile').mockResolvedValue({
+    vi.spyOn(uploadFileModule, 'uploadFile').mockResolvedValue({
       id: '1',
       url: 'http://example.com/file.txt',
       display_name: 'file.txt',
@@ -119,7 +119,7 @@ describe('AttachmentDisplay', () => {
   })
 
   it('uploads file with attach_discussion_file intent if we pass the checkContextQuota param', async () => {
-    jest.spyOn(uploadFileModule, 'uploadFile').mockResolvedValue({
+    vi.spyOn(uploadFileModule, 'uploadFile').mockResolvedValue({
       id: '1',
       url: 'http://example.com/file.txt',
       display_name: 'file.txt',

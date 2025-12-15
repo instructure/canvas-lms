@@ -20,10 +20,10 @@ const ACTIVITY_THRESHOLD = 5 * 60 * 1000 // 5 minutes
 const PING_INTERVAL = 1000 * 180 // 3 minutes
 const ACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart'] as const
 
-const mockFail = jest.fn().mockReturnThis()
-const mockPost = jest.fn().mockReturnValue({fail: mockFail})
+const mockFail = vi.fn().mockReturnThis()
+const mockPost = vi.fn().mockReturnValue({fail: mockFail})
 
-jest.mock('jquery', () => ({
+vi.mock('jquery', () => ({
   __esModule: true,
   default: {
     post: mockPost,
@@ -31,7 +31,7 @@ jest.mock('jquery', () => ({
 }))
 
 // Mock es-toolkit throttle to just call the function immediately
-jest.mock('es-toolkit', () => ({
+vi.mock('es-toolkit', () => ({
   throttle: (fn: () => void) => fn,
 }))
 
@@ -43,7 +43,7 @@ describe('ping initializer', () => {
   let currentTime: number
 
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
 
     mockPost.mockClear()
     mockFail.mockClear()
@@ -52,17 +52,17 @@ describe('ping initializer', () => {
 
     intervalCallback = null
     originalSetInterval = global.setInterval
-    global.setInterval = jest.fn((callback: () => void) => {
+    global.setInterval = vi.fn((callback: () => void) => {
       intervalCallback = callback
       return 1 as unknown as NodeJS.Timeout
     }) as unknown as typeof setInterval
 
     currentTime = 1000000
     originalDateNow = Date.now
-    Date.now = jest.fn(() => currentTime)
+    Date.now = vi.fn(() => currentTime)
 
-    jest.spyOn(document, 'addEventListener')
-    jest.spyOn(document, 'removeEventListener')
+    vi.spyOn(document, 'addEventListener')
+    vi.spyOn(document, 'removeEventListener')
 
     Object.defineProperty(document, 'visibilityState', {
       writable: true,
@@ -75,7 +75,7 @@ describe('ping initializer', () => {
     window.ENV = originalEnv
     global.setInterval = originalSetInterval
     Date.now = originalDateNow
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('when ENV.ping_url is set', () => {
@@ -150,7 +150,7 @@ describe('ping initializer', () => {
     })
 
     it('clears interval and removes event listeners on 401 response', () => {
-      const clearIntervalSpy = jest.spyOn(global, 'clearInterval')
+      const clearIntervalSpy = vi.spyOn(global, 'clearInterval')
       require('../ping')
 
       intervalCallback!()

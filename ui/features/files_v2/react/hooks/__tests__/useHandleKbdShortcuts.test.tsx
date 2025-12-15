@@ -39,12 +39,12 @@ const renderDummyComponent = (selectAllHandler: () => void, deselectAllHandler: 
 
 describe('useHandleKbdShortcuts', () => {
   let user: UserEvent
-  let selectAllHandler: jest.Mock
-  let deselectAllHandler: jest.Mock
+  let selectAllHandler: any
+  let deselectAllHandler: any
 
   beforeEach(() => {
-    selectAllHandler = jest.fn()
-    deselectAllHandler = jest.fn()
+    selectAllHandler = vi.fn()
+    deselectAllHandler = vi.fn()
     user = userEvent.setup()
     renderDummyComponent(selectAllHandler, deselectAllHandler)
   })

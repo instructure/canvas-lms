@@ -22,7 +22,7 @@ import type {JsonUrlWizardService} from '../JsonUrlWizardService'
 export const mockJsonUrlWizardService = (
   mocked?: Partial<JsonUrlWizardService>,
 ): JsonUrlWizardService => ({
-  fetchThirdPartyToolConfiguration: jest.fn(),
+  fetchThirdPartyToolConfiguration: vi.fn(),
   ...mocked,
 })
 

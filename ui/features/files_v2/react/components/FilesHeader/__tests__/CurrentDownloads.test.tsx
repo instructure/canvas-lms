@@ -24,22 +24,22 @@ import {createMockFileManagementContext} from '../../../__tests__/createMockCont
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {performRequest} from '../../../../utils/downloadUtils'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(() => jest.fn()),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: vi.fn(() => vi.fn()),
 }))
 
-jest.mock('jquery', () => {
-  const mockFlashError = jest.fn()
-  const jqueryMock = jest.fn() as jest.Mock & {flashError: jest.Mock}
+vi.mock('jquery', () => {
+  const mockFlashError = vi.fn()
+  const jqueryMock = vi.fn() as ReturnType<typeof vi.fn> & {flashError: ReturnType<typeof vi.fn>}
   jqueryMock.flashError = mockFlashError
   return jqueryMock
 })
 
-jest.mock('../../../../utils/downloadUtils', () => ({
-  addDownloadListener: jest.fn(fn => window.addEventListener('download_utils_event', fn)),
-  removeDownloadListener: jest.fn(fn => window.removeEventListener('download_utils_event', fn)),
-  performRequest: jest.fn(),
-  downloadFile: jest.fn(),
+vi.mock('../../../../utils/downloadUtils', () => ({
+  addDownloadListener: vi.fn(fn => window.addEventListener('download_utils_event', fn)),
+  removeDownloadListener: vi.fn(fn => window.removeEventListener('download_utils_event', fn)),
+  performRequest: vi.fn(),
+  downloadFile: vi.fn(),
 }))
 
 const renderComponent = () => {
@@ -52,7 +52,7 @@ const renderComponent = () => {
 
 describe('CurrentDownloads', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders null when not downloading', () => {
@@ -62,7 +62,7 @@ describe('CurrentDownloads', () => {
 
   it('does not render when downloading just one file', async () => {
     renderComponent()
-    ;(performRequest as jest.Mock).mockReturnValue(false)
+    ;(performRequest as ReturnType<typeof vi.fn>).mockReturnValue(false)
 
     act(() => {
       window.dispatchEvent(
@@ -78,7 +78,7 @@ describe('CurrentDownloads', () => {
 
   it('shows flash error if download already in progress', async () => {
     renderComponent()
-    ;(performRequest as jest.Mock).mockReturnValue(true)
+    ;(performRequest as ReturnType<typeof vi.fn>).mockReturnValue(true)
 
     act(() => {
       window.dispatchEvent(
@@ -101,7 +101,7 @@ describe('CurrentDownloads', () => {
 
   it('calls performRequest with correct parameters', async () => {
     renderComponent()
-    ;(performRequest as jest.Mock).mockReturnValue(true)
+    ;(performRequest as ReturnType<typeof vi.fn>).mockReturnValue(true)
 
     act(() => {
       window.dispatchEvent(
@@ -134,7 +134,7 @@ describe('CurrentDownloads', () => {
         <CurrentDownloads rows={[]} />
       </FileManagementProvider>,
     )
-    ;(performRequest as jest.Mock).mockReturnValue(true)
+    ;(performRequest as ReturnType<typeof vi.fn>).mockReturnValue(true)
 
     act(() => {
       window.dispatchEvent(

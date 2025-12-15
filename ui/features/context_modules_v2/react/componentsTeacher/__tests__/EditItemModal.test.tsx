@@ -26,7 +26,7 @@ import EditItemModal, {type EditItemModalProps} from '../EditItemModal'
 
 const buildDefaultProps = (overrides: Partial<EditItemModalProps> = {}): EditItemModalProps => ({
   isOpen: true,
-  onRequestClose: jest.fn(),
+  onRequestClose: vi.fn(),
   itemName: 'Test Item',
   itemType: 'assignment',
   itemIndent: 1,

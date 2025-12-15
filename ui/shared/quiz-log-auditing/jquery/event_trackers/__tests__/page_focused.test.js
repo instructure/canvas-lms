@@ -20,13 +20,13 @@ import Subject from '../page_focused'
 import K from '../../constants'
 import $ from 'jquery'
 
-const capture = jest.fn()
+const capture = vi.fn()
 const tracker = new Subject()
 tracker.install(capture)
 
 describe('Quizzes::LogAuditing::EventTrackers::PageFocused', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it.skip('#constructor: it sets up the proper context', () => {

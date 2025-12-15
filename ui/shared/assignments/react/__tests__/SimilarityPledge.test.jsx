@@ -26,11 +26,11 @@ describe('SimilarityPledge', () => {
       eulaUrl: '',
       checked: true,
       comments: '',
-      onChange: jest.fn(),
+      onChange: vi.fn(),
       pledgeText: 'a grave and solemn pledge',
       shouldShowPledgeError: false,
-      getShouldShowPledgeError: jest.fn(),
-      setShouldShowPledgeError: jest.fn(),
+      getShouldShowPledgeError: vi.fn(),
+      setShouldShowPledgeError: vi.fn(),
       checkboxRef: null,
       ...overrides,
     }
@@ -38,7 +38,7 @@ describe('SimilarityPledge', () => {
   }
 
   it('calls the onChange property when the checkbox is toggled', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByTestId} = setup({eulaUrl: 'http://some.url', onChange: onChange})
     const checkbox = getByTestId('similarity-pledge-checkbox')
     act(() => {
@@ -100,7 +100,7 @@ describe('SimilarityPledge', () => {
     })
 
     it('removes the error message when the checkbox is checked', () => {
-      const mockSetShouldShowPledgeError = jest.fn()
+      const mockSetShouldShowPledgeError = vi.fn()
       const {getByTestId, queryByText} = setup({
         checked: false,
         setShouldShowPledgeError: mockSetShouldShowPledgeError,

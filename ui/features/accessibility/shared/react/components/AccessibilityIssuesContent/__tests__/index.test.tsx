@@ -24,7 +24,7 @@ import {multiIssueItem, checkboxTextInputRuleItem} from './__mocks__'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-const mockClose = jest.fn()
+const mockClose = vi.fn()
 
 const baseItem = multiIssueItem
 
@@ -80,9 +80,9 @@ const server = setupServer(
   }),
 )
 
-jest.mock('use-debounce', () => ({
+vi.mock('use-debounce', () => ({
   __esModule: true,
-  useDebouncedCallback: jest.fn((callback, _delay) => callback),
+  useDebouncedCallback: vi.fn((callback, _delay) => callback),
 }))
 
 describe('AccessibilityIssuesDrawerContent', () => {
@@ -90,7 +90,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

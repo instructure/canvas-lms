@@ -25,8 +25,8 @@ import type {User, DuplicateUser} from '../types'
 const props = {
   foundUsers: [],
   duplicateUsers: {},
-  searchFailure: jest.fn(),
-  readySubmit: jest.fn(),
+  searchFailure: vi.fn(),
+  readySubmit: vi.fn(),
   canReadSIS: true,
   duplicateReq: false,
 }
@@ -85,7 +85,7 @@ const userDetailsUriMock = (userId: string, response: object) =>
 describe('TempEnrollSearchConfirmation', () => {
   beforeEach(() => {
     fetchMock.reset()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('render one user', async () => {

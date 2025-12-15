@@ -45,7 +45,7 @@ it('renders all future items loaded regardless of other props', () => {
 
 it('invokes the callback when the load more button is clicked', async () => {
   const user = userEvent.setup()
-  const mockLoad = jest.fn()
+  const mockLoad = vi.fn()
   const {getByText} = render(<LoadingFutureIndicator onLoadMore={mockLoad} />)
   await user.click(getByText('Load more'))
   expect(mockLoad).toHaveBeenCalledWith({loadMoreButtonClicked: true})

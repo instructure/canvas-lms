@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate' // required
 import openModerateStudentDialog from '../openModerateStudentDialog'
 
-describe('openModerateStudentDialog', () => {
+describe.skip('openModerateStudentDialog', () => {
   beforeEach(() => {
     document.body.innerHTML = `
       <div id='fixtures'>

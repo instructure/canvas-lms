@@ -16,21 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ApplyButton from '../ApplyButton'
 
 describe('ApplyButton', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const defaultProps = {
     children: 'Apply',
-    onApply: jest.fn(),
-    onUndo: jest.fn(),
+    onApply: vi.fn(),
+    onUndo: vi.fn(),
     isApplied: false,
     isLoading: false,
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('when not applied', () => {

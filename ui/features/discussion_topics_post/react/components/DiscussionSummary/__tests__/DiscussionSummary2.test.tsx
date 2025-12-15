@@ -36,17 +36,17 @@ declare const ENV: {
 
 const setup = (props: Partial<DiscussionSummaryProps> = {}) => {
   const defaultProps: DiscussionSummaryProps = {
-    onDisableSummaryClick: jest.fn(),
+    onDisableSummaryClick: vi.fn(),
     isMobile: false,
     summary: null,
-    onSetSummary: jest.fn(),
+    onSetSummary: vi.fn(),
     isFeedbackLoading: false,
-    onSetIsFeedbackLoading: jest.fn(),
+    onSetIsFeedbackLoading: vi.fn(),
     liked: false,
-    onSetLiked: jest.fn(),
+    onSetLiked: vi.fn(),
     disliked: false,
-    onSetDisliked: jest.fn(),
-    postDiscussionSummaryFeedback: jest.fn().mockResolvedValue(Promise.resolve()),
+    onSetDisliked: vi.fn(),
+    postDiscussionSummaryFeedback: vi.fn().mockResolvedValue(Promise.resolve()),
     ...props,
   }
 
@@ -54,7 +54,7 @@ const setup = (props: Partial<DiscussionSummaryProps> = {}) => {
     <MockedProvider>
       <AlertManagerContext.Provider
         // @ts-expect-error
-        value={{setOnFailure: props.setOnFailure || jest.fn(), setOnSuccess: jest.fn()}}
+        value={{setOnFailure: props.setOnFailure || vi.fn(), setOnSuccess: vi.fn()}}
       >
         <DiscussionSummary {...defaultProps} />
       </AlertManagerContext.Provider>
@@ -81,7 +81,7 @@ describe('DiscussionSummary', () => {
     })
 
     // Reset mocks between tests
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -163,7 +163,7 @@ describe('DiscussionSummary', () => {
           HttpResponse.json(expectedSummary),
         ),
       )
-      const setSummary = jest.fn()
+      const setSummary = vi.fn()
       setup({onSetSummary: setSummary})
 
       expect(setSummary).toHaveBeenNthCalledWith(1, null)
@@ -181,7 +181,7 @@ describe('DiscussionSummary', () => {
     })
 
     it('should call postDiscussionSummaryFeedback when summary is provided', async () => {
-      const postDiscussionSummaryFeedback = jest.fn()
+      const postDiscussionSummaryFeedback = vi.fn()
       setup({
         summary: expectedSummary,
         postDiscussionSummaryFeedback,
@@ -191,11 +191,11 @@ describe('DiscussionSummary', () => {
     })
 
     it('should reset and call setSummary with the latest generated discussion summary with group context', async () => {
-      window.ENV = {
-        ...window.ENV,
-        // @ts-expect-error
+      fakeENV.setup({
+        discussion_topic_id: '5678',
+        context_id: '1234',
         context_type: 'Group',
-      }
+      })
       let capturedUrl = ''
       server.use(
         http.get('/api/v1/groups/1234/discussion_topics/5678/summaries', ({request}) => {
@@ -203,7 +203,7 @@ describe('DiscussionSummary', () => {
           return HttpResponse.json(expectedSummary)
         }),
       )
-      const setSummary = jest.fn()
+      const setSummary = vi.fn()
       setup({onSetSummary: setSummary})
 
       expect(setSummary).toHaveBeenNthCalledWith(1, null)

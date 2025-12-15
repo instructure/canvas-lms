@@ -16,17 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @jest-environment node
- */
-
 import deprecated from '../deprecated'
 
 describe('deprecated', () => {
   let originalFn
+  let consoleWarnSpy
   beforeEach(() => {
-    originalFn = jest.fn()
-    jest.spyOn(console, 'warn').mockImplementation()
+    originalFn = vi.fn()
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation()
+  })
+
+  afterEach(() => {
+    consoleWarnSpy.mockRestore()
   })
 
   it('only logs deprecation message once', () => {

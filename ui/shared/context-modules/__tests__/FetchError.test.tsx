@@ -22,13 +22,13 @@ import {FetchError} from '../utils/FetchError'
 
 describe('FetchError', () => {
   it('renders the component', () => {
-    const component = render(<FetchError retryCallback={jest.fn()} />)
+    const component = render(<FetchError retryCallback={vi.fn()} />)
 
     expect(component.getByText('Items failed to load')).toBeInTheDocument()
   })
 
   it('calls the callback on push the retry', () => {
-    const mockRetryCallback = jest.fn()
+    const mockRetryCallback = vi.fn()
 
     const component = render(<FetchError retryCallback={mockRetryCallback} />)
 

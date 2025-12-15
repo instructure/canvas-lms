@@ -25,13 +25,13 @@ import {
   CreateAllocationRuleInput,
   CreateAllocationRuleResponse,
 } from '../../teacher/AssignmentTeacherTypes'
+import {executeQuery} from '@canvas/graphql'
 
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(),
+vi.mock('@canvas/graphql', () => ({
+  executeQuery: vi.fn(),
 }))
 
-const {executeQuery} = require('@canvas/graphql')
-const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+const mockExecuteQuery = vi.mocked(executeQuery)
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -49,7 +49,7 @@ const createWrapper = () => {
 
 describe('useCreateAllocationRule', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const mockInput: CreateAllocationRuleInput = {
@@ -90,8 +90,8 @@ describe('useCreateAllocationRule', () => {
 
       mockExecuteQuery.mockResolvedValueOnce(mockResponse)
 
-      const onSuccess = jest.fn()
-      const onError = jest.fn()
+      const onSuccess = vi.fn()
+      const onError = vi.fn()
 
       const {result, waitForNextUpdate} = renderHook(
         () => useCreateAllocationRule(onSuccess, onError),
@@ -130,8 +130,8 @@ describe('useCreateAllocationRule', () => {
 
       mockExecuteQuery.mockResolvedValueOnce(mockResponse)
 
-      const onSuccess = jest.fn()
-      const onError = jest.fn()
+      const onSuccess = vi.fn()
+      const onError = vi.fn()
 
       const {result, waitForNextUpdate} = renderHook(
         () => useCreateAllocationRule(onSuccess, onError),
@@ -176,8 +176,8 @@ describe('useCreateAllocationRule', () => {
 
       mockExecuteQuery.mockResolvedValueOnce(mockResponse)
 
-      const onSuccess = jest.fn()
-      const onError = jest.fn()
+      const onSuccess = vi.fn()
+      const onError = vi.fn()
 
       const {result, waitForNextUpdate} = renderHook(
         () => useCreateAllocationRule(onSuccess, onError),
@@ -201,8 +201,8 @@ describe('useCreateAllocationRule', () => {
       const mockError = new Error('Network error')
       mockExecuteQuery.mockRejectedValueOnce(mockError)
 
-      const onSuccess = jest.fn()
-      const onError = jest.fn()
+      const onSuccess = vi.fn()
+      const onError = vi.fn()
 
       const {result, waitForNextUpdate} = renderHook(
         () => useCreateAllocationRule(onSuccess, onError),

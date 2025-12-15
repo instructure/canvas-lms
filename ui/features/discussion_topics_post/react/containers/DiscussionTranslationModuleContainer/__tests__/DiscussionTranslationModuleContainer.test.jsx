@@ -26,9 +26,9 @@ import {useTranslationStore} from '../../../hooks/useTranslationStore'
 import {ObserverContext} from '../../../utils/ObserverContext'
 
 const mockContextValue = {
-  setTranslateTargetLanguage: jest.fn(),
-  setShowTranslationControl: jest.fn(),
-  clearQueue: jest.fn(),
+  setTranslateTargetLanguage: vi.fn(),
+  setShowTranslationControl: vi.fn(),
+  clearQueue: vi.fn(),
   translationLanguages: {
     current: [
       {id: 'en', name: 'English', translated_to_name: 'Translated to English'},
@@ -38,10 +38,10 @@ const mockContextValue = {
   },
 }
 
-jest.mock('../../../hooks/useTranslationStore')
+vi.mock('../../../hooks/useTranslationStore')
 
-const mockSetActiveLanguage = jest.fn()
-const mockClearTranslateAll = jest.fn()
+const mockSetActiveLanguage = vi.fn()
+const mockClearTranslateAll = vi.fn()
 
 const defaultState = {
   entries: [],
@@ -49,7 +49,7 @@ const defaultState = {
   translateAll: false,
   setActiveLanguage: mockSetActiveLanguage,
   clearTranslateAll: mockClearTranslateAll,
-  setTranslateAll: jest.fn(),
+  setTranslateAll: vi.fn(),
 }
 
 const defaultMocks = []
@@ -61,8 +61,8 @@ const setup = (overrideContextValue = {}) =>
         value={{
           observerRef: {current: undefined},
           nodesRef: {current: new Map()},
-          startObserving: jest.fn(),
-          stopObserving: jest.fn(),
+          startObserving: vi.fn(),
+          stopObserving: vi.fn(),
         }}
       >
         <DiscussionManagerUtilityContext.Provider
@@ -83,7 +83,7 @@ describe('DiscussionTranslationModuleContainer', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     useTranslationStore.mockImplementation(selector => {
       return selector({...defaultState})
     })

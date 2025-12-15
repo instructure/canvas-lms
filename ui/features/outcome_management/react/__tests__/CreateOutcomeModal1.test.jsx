@@ -36,10 +36,10 @@ import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobal
 
 injectGlobalAlertContainers()
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(() => vi.fn(() => {})),
 }))
 
 const USER_EVENT_OPTIONS = {delay: null, pointerEventsCheck: PointerEventsCheckLevel.Never}
@@ -89,13 +89,13 @@ describe('CreateOutcomeModal', () => {
   }
 
   beforeEach(() => {
-    onCloseHandlerMock = jest.fn()
-    onSuccessMock = jest.fn()
+    onCloseHandlerMock = vi.fn()
+    onSuccessMock = vi.fn()
     cache = createCache()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const itBehavesLikeAForm = specProps => {
@@ -132,13 +132,13 @@ describe('CreateOutcomeModal', () => {
 
       it('does not show error message below Name field on initial load', async () => {
         const {queryByText} = render(<CreateOutcomeModal {...getProps()} />)
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         expect(queryByText('Cannot be blank')).not.toBeInTheDocument()
       })
 
       it('shows error message below Name field if no name after user makes changes to name', async () => {
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...getProps()} />)
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: '123'}})
         fireEvent.change(getByLabelText('Name'), {target: {value: ''}})
         expect(getByText('Cannot be blank')).toBeInTheDocument()
@@ -146,21 +146,21 @@ describe('CreateOutcomeModal', () => {
 
       it('shows error message below Name field if name includes only spaces', async () => {
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...getProps()} />)
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: '  '}})
         expect(getByText('Cannot be blank')).toBeInTheDocument()
       })
 
       it('shows error message below Name field if name > 255 characters', async () => {
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...getProps()} />)
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'a'.repeat(256)}})
         expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
       })
 
       it('shows error message below displayName field if displayName > 255 characters', async () => {
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...getProps()} />)
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'a'.repeat(256)}})
         expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
       })
@@ -170,7 +170,7 @@ describe('CreateOutcomeModal', () => {
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [...smallOutcomeTree()],
         })
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
@@ -185,10 +185,10 @@ describe('CreateOutcomeModal', () => {
         const {getByLabelText, getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [...smallOutcomeTree()],
         })
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         await user.click(getByText('Create'))
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
       })
 
@@ -197,7 +197,7 @@ describe('CreateOutcomeModal', () => {
           mocks: [...smallOutcomeTree()],
           isMobileView: true,
         })
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         expect(getByText('Root account folder')).toBeInTheDocument()
         expect(getByText('Account folder 0')).toBeInTheDocument()
       })
@@ -208,7 +208,7 @@ describe('CreateOutcomeModal', () => {
           mocks: [...smallOutcomeTree()],
           isMobileView: true,
         })
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         expect(queryByText('Root account folder')).not.toBeInTheDocument()
         expect(queryByText('Account folder 0')).toBeInTheDocument()
         expect(queryByText('Group 100 folder 0')).toBeInTheDocument()
@@ -230,7 +230,7 @@ describe('CreateOutcomeModal', () => {
             }),
           ],
         })
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
@@ -238,7 +238,7 @@ describe('CreateOutcomeModal', () => {
         })
         await user.click(getByText('Account folder 0'))
         await user.click(getByText('Create'))
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         await waitFor(() => {
           expect(onSuccessMock).toHaveBeenCalledTimes(1)
           expect(onSuccessMock).toHaveBeenCalledWith({
@@ -263,14 +263,14 @@ describe('CreateOutcomeModal', () => {
             }),
           ],
         })
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
           target: {value: 'Friendly Description value'},
         })
         await user.click(getByText('Create'))
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         await waitFor(() => {
           expect(showFlashAlert).toHaveBeenCalledWith({
             message: '"Outcome 123" was successfully created.',
@@ -293,7 +293,7 @@ describe('CreateOutcomeModal', () => {
             }),
           ],
         })
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         await user.click(getByText('Create'))
@@ -319,11 +319,11 @@ describe('CreateOutcomeModal', () => {
             }),
           ],
         })
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         await user.click(getByText('Create'))
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         await waitFor(() => {
           expect(showFlashAlert).toHaveBeenCalledWith({
             message: 'An error occurred while creating this outcome. Please try again.',
@@ -349,14 +349,14 @@ describe('CreateOutcomeModal', () => {
             }),
           ],
         })
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
           target: {value: 'Friendly description'},
         })
         await user.click(getByText('Create'))
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         await waitFor(() => {
           expect(showFlashAlert).toHaveBeenCalledWith({
             message: 'An error occurred while creating this outcome. Please try again.',

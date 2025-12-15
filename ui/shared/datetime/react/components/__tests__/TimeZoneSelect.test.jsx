@@ -111,7 +111,7 @@ describe('TimeZoneSelect', () => {
   })
 
   it('calls onChange on a selection', () => {
-    const onChangeTZ = jest.fn()
+    const onChangeTZ = vi.fn()
     const {getByText} = render(
       <TimeZoneSelect
         label="the label"

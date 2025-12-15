@@ -31,7 +31,7 @@ describe('ExternalApps Lti2Iframe', () => {
     ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = window.origin
 
     props = {
-      handleInstall: jest.fn(),
+      handleInstall: vi.fn(),
       registrationUrl: 'http://localhost/register',
       reregistration: false,
       toolName: 'The best LTI tool ever',
@@ -98,7 +98,7 @@ describe('ExternalApps Lti2Iframe', () => {
 
   describe('handleInstall prop', () => {
     beforeEach(() => {
-      props.handleInstall = jest.fn()
+      props.handleInstall = vi.fn()
       render(<Lti2Iframe {...props} />)
     })
 
@@ -156,7 +156,7 @@ describe('ExternalApps Lti2Iframe', () => {
   })
 
   it('removes the "message" event listener when unmounting', async () => {
-    props.handleInstall = jest.fn()
+    props.handleInstall = vi.fn()
     const {unmount} = render(<Lti2Iframe {...props} />)
     unmount()
     const message = {subject: 'lti.lti2Registration'}

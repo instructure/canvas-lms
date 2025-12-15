@@ -18,7 +18,6 @@
 
 import {render, screen} from '@testing-library/react'
 import {act, renderHook} from '@testing-library/react-hooks'
-import '@testing-library/jest-dom'
 
 import {IssuesByTypeChart} from '../IssuesByTypeChart'
 import {
@@ -41,8 +40,8 @@ describe('IssuesByTypeChart', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
     useAccessibilityScansStore.setState({...mockState})
   })
 

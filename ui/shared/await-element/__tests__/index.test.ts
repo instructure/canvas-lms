@@ -20,30 +20,30 @@ import awaitElement from '../index'
 
 describe('awaitElement', () => {
   beforeAll(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterAll(() => {
-    jest.runAllTimers()
-    jest.useRealTimers()
+    vi.runAllTimers()
+    vi.useRealTimers()
   })
 
   beforeEach(() => {
-    jest.spyOn(window, 'requestAnimationFrame').mockImplementation(function (
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(function (
       cb: (number: number) => void,
     ): number {
       return window.setTimeout(function () {
         cb(0)
       }, 50)
     })
-    jest.spyOn(window, 'cancelAnimationFrame').mockImplementation(function (timer: number): void {
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(function (timer: number): void {
       window.clearTimeout(timer)
     })
   })
 
   afterEach(() => {
-    ;(window.requestAnimationFrame as jest.Mock).mockRestore()
-    ;(window.cancelAnimationFrame as jest.Mock).mockRestore()
+    ;(window.requestAnimationFrame as any).mockRestore()
+    ;(window.cancelAnimationFrame as any).mockRestore()
   })
 
   it('detects a new DOM element when it’s added', async () => {
@@ -52,7 +52,7 @@ describe('awaitElement', () => {
 
     const promise = awaitElement('lolly', 1000)
     document.body.append(elt)
-    jest.runAllTimers()
+    vi.runAllTimers()
     const result = await promise
     expect(result.id).toBe('lolly')
   })
@@ -63,7 +63,7 @@ describe('awaitElement', () => {
     document.body.append(elt)
 
     const promise = awaitElement('popsicle', 1000)
-    jest.runAllTimers()
+    vi.runAllTimers()
     const result = await promise
     expect(result.id).toBe('popsicle')
   })
@@ -71,7 +71,7 @@ describe('awaitElement', () => {
   it('rejects the Promise if the element never gets added', async () => {
     const promise = awaitElement('lost-to-eternity', 1000)
     try {
-      jest.advanceTimersByTime(1050) // oops we waited just a little too long
+      vi.advanceTimersByTime(1050) // oops we waited just a little too long
       await promise
       throw new Error('fails')
     } catch (e) {
@@ -85,9 +85,9 @@ describe('awaitElement', () => {
 
     const promise = awaitElement('just-in-time', 3000)
 
-    jest.advanceTimersByTime(2949) // wait until it's almost too late
+    vi.advanceTimersByTime(2949) // wait until it's almost too late
     document.body.append(elt) // ...then add the element in the nick of time
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     const result = await promise
     expect(result.id).toBe('just-in-time')

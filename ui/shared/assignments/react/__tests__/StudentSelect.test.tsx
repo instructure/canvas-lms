@@ -24,18 +24,15 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import StudentSelect from '../StudentSelect'
 import {CourseStudent} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
 
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(),
+vi.mock('@canvas/graphql', () => ({
+  executeQuery: vi.fn(),
 }))
 
-jest.mock('../../graphql/hooks/useAssignedStudents', () => ({
-  useAssignedStudents: jest.fn(),
-}))
+vi.mock('../../graphql/hooks/useAssignedStudents')
 
-const {useAssignedStudents} = require('../../graphql/hooks/useAssignedStudents')
-const mockUseAssignedStudents = useAssignedStudents as jest.MockedFunction<
-  typeof useAssignedStudents
->
+import {useAssignedStudents} from '../../graphql/hooks/useAssignedStudents'
+
+const mockUseAssignedStudents = vi.mocked(useAssignedStudents)
 
 const mockStudents: CourseStudent[] = [
   {_id: '1', name: 'Pikachu', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
@@ -68,9 +65,9 @@ const mockStudentsWithPeerReviewStatus: CourseStudent[] = [
 ]
 
 describe('StudentSelect', () => {
-  const mockOnOptionSelect = jest.fn()
-  const mockHandleInputRef = jest.fn()
-  const mockClearErrors = jest.fn()
+  const mockOnOptionSelect = vi.fn()
+  const mockHandleInputRef = vi.fn()
+  const mockClearErrors = vi.fn()
 
   const defaultProps = {
     inputId: 'test-student-select',
@@ -89,7 +86,7 @@ describe('StudentSelect', () => {
 
   beforeEach(() => {
     user = userEvent.setup()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     mockUseAssignedStudents.mockReturnValue({
       students: [],

@@ -24,15 +24,15 @@ import PeerReviewDueDateTimeInput from '../PeerReviewDueDateTimeInput'
 describe('PeerReviewDueDateTimeInput', () => {
   const defaultProps = {
     peerReviewDueDate: null,
-    setPeerReviewDueDate: jest.fn(),
-    handlePeerReviewDueDateChange: jest.fn(),
+    setPeerReviewDueDate: vi.fn(),
+    handlePeerReviewDueDateChange: vi.fn(),
     clearButtonAltLabel: 'Clear input for 2 students',
     disabled: false,
     validationErrors: {},
     unparsedFieldKeys: new Set<string>(),
     dateInputRefs: {},
     timeInputRefs: {},
-    handleBlur: jest.fn(() => jest.fn()),
+    handleBlur: vi.fn(() => vi.fn()),
     breakpoints: {},
   }
 
@@ -40,7 +40,7 @@ describe('PeerReviewDueDateTimeInput', () => {
     render(<PeerReviewDueDateTimeInput {...defaultProps} {...overrides} />)
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders with correct labels', () => {
@@ -75,7 +75,7 @@ describe('PeerReviewDueDateTimeInput', () => {
   })
 
   it('calls setPeerReviewDueDate with null when clear button is clicked', async () => {
-    const setPeerReviewDueDate = jest.fn()
+    const setPeerReviewDueDate = vi.fn()
     renderComponent({
       peerReviewDueDate: '2024-11-15T00:00:00Z',
       setPeerReviewDueDate,
@@ -87,7 +87,7 @@ describe('PeerReviewDueDateTimeInput', () => {
   })
 
   it('calls handlePeerReviewDueDateChange when date is changed', async () => {
-    const handlePeerReviewDueDateChange = jest.fn()
+    const handlePeerReviewDueDateChange = vi.fn()
     renderComponent({
       handlePeerReviewDueDateChange,
     })
@@ -102,7 +102,7 @@ describe('PeerReviewDueDateTimeInput', () => {
   })
 
   it('calls handleBlur when input loses focus', () => {
-    const handleBlur = jest.fn(() => jest.fn())
+    const handleBlur = vi.fn(() => vi.fn())
     renderComponent({handleBlur})
 
     expect(handleBlur).toHaveBeenCalledWith('peer_review_due_at')

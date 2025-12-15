@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import {FilePreviewModal, FilePreviewModalProps} from '../FilePreviewModal'
@@ -27,17 +26,13 @@ import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/canvas-studio-player', () => {
-  const mockDefault = jest.fn(() => <div data-testid="media-player">Media Player</div>)
-  return {
-    __esModule: true,
-    default: mockDefault,
-  }
-})
+vi.mock('@canvas/canvas-studio-player', () => ({
+  default: () => <div data-testid="media-player">Media Player</div>,
+}))
 
 const defaultProps: FilePreviewModalProps = {
   isOpen: true,
-  onClose: jest.fn(),
+  onClose: vi.fn(),
   item: FAKE_FILES[0],
   collection: FAKE_FILES,
 }
@@ -52,19 +47,19 @@ const renderComponent = (props?: Partial<FilePreviewModalProps>) => {
 
 describe('FilePreviewModal', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fetchMock.get(/\/media_attachments\/\d+\/info/, {
       body: [],
       headers: {},
       status: 200,
       overwriteRoutes: true,
     })
-    window.history.replaceState = jest.fn()
+    window.history.replaceState = vi.fn()
   })
 
   afterEach(() => {
     fetchMock.reset()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     destroyContainer()
   })
 
