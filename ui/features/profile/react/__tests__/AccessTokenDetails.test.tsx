@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor, fireEvent} from '@testing-library/react'
+import {cleanup, render, screen, waitFor, fireEvent} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import AccessTokenDetails, {type AccessTokenDetailsProps} from '../AccessTokenDetails'
@@ -40,8 +40,8 @@ describe('AccessTokenDetails', () => {
     loadedToken,
     url: '/url',
     userCanUpdateTokens: true,
-    onClose: jest.fn(),
-    onTokenLoad: jest.fn(),
+    onClose: vi.fn(),
+    onTokenLoad: vi.fn(),
   }
 
   beforeEach(() => {
@@ -51,6 +51,7 @@ describe('AccessTokenDetails', () => {
   })
 
   afterEach(() => {
+    cleanup()
     fetchMock.reset()
     fetchMock.restore()
     fakeENV.teardown()
@@ -175,7 +176,7 @@ describe('AccessTokenDetails', () => {
     )
 
     // Mock window.confirm
-    const confirmSpy = jest.spyOn(window, 'confirm').mockImplementationOnce(() => true)
+    const confirmSpy = vi.spyOn(window, 'confirm').mockImplementationOnce(() => true)
 
     render(<AccessTokenDetails {...props} />)
     const regenerateButton = await screen.findByText('Regenerate Token', {}, {timeout: 2000})
@@ -198,7 +199,7 @@ describe('AccessTokenDetails', () => {
     fetchMock.put(props.url, 500, {overwriteRoutes: true})
 
     // Mock window.confirm
-    const confirmSpy = jest.spyOn(window, 'confirm').mockImplementationOnce(() => true)
+    const confirmSpy = vi.spyOn(window, 'confirm').mockImplementationOnce(() => true)
 
     render(<AccessTokenDetails {...props} />)
     const regenerateButton = await screen.findByText('Regenerate Token', {}, {timeout: 2000})

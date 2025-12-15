@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 import DiscussionTopicToolbarView from '../DiscussionTopicToolbarView'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
@@ -63,7 +63,7 @@ describe('DiscussionTopicToolbarView', () => {
   })
 
   test('it should be accessible', async () => {
-    await new Promise(resolve => isAccessible(view, resolve, {a11yReport: true}))
+    await isAccessible(view, {a11yReport: true})
   })
 
   test('keyboard shortcut modal info shows when it has focus', function () {

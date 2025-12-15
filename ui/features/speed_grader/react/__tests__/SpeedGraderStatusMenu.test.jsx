@@ -33,7 +33,7 @@ describe('SpeedGraderStatusMenu', () => {
       locale: 'en',
       secondsLate: 0,
       selection: 'none',
-      updateSubmission: jest.fn(),
+      updateSubmission: vi.fn(),
     }
   })
 

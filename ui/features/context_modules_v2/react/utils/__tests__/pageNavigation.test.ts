@@ -23,9 +23,9 @@ import type {ModulePageNavigationDetail} from '../types.d'
 
 describe('pageNavigation', () => {
   describe('navigateToLastPage', () => {
-    let eventHandler: jest.Mock
+    let eventHandler: any
     beforeEach(() => {
-      eventHandler = jest.fn()
+      eventHandler = vi.fn()
       document.addEventListener('module-page-navigation', eventHandler)
     })
     afterEach(() => {

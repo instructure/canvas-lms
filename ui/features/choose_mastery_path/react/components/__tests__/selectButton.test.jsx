@@ -23,7 +23,7 @@ import SelectButton from '../select-button'
 const defaultProps = () => ({
   isSelected: false,
   isDisabled: false,
-  onSelect: jest.fn(),
+  onSelect: vi.fn(),
 })
 
 describe('SelectButton', () => {

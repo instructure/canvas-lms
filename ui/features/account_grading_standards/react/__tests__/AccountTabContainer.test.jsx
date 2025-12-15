@@ -40,8 +40,8 @@ const renderAccountTabContainer = (props = {}) =>
 
 describe('AccountTabContainer', () => {
   beforeEach(() => {
-    jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({}))
-    jest.spyOn($, 'ajax').mockImplementation(() => ({done() {}}))
+    vi.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({}))
+    vi.spyOn($, 'ajax').mockImplementation(() => ({done() {}}))
   })
 
   it('tabs are present', () => {
@@ -64,7 +64,7 @@ describe('AccountTabContainer', () => {
   })
 
   it('jquery-ui tabs() is called', () => {
-    jest.spyOn($.fn, 'tabs')
+    vi.spyOn($.fn, 'tabs')
 
     renderAccountTabContainer()
 

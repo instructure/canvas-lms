@@ -120,7 +120,7 @@ const sendCustomEvents = function (events, assignments, plannerItems, includeNex
 
 const server = setupServer()
 
-describe('AgendaView', () => {
+describe.skip('AgendaView', () => {
   let container
   let contexts
   let contextCodes

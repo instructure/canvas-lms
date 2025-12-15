@@ -23,11 +23,11 @@ import {QueryClient} from '@tanstack/react-query'
 import type {TeacherAssignmentType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
 import TeacherSavedView from '../TeacherSavedView'
 
-const mockUseModuleSequence = jest.fn()
+const mockUseModuleSequence = vi.fn()
 
-jest.mock('../utils/getModuleItemId', () => ({
+vi.mock('../utils/getModuleItemId', () => ({
   __esModule: true,
-  default: jest.fn(assignment => {
+  default: vi.fn(assignment => {
     if (assignment?.modules && assignment.modules.length > 0) {
       return assignment.modules[0].lid
     }
@@ -35,7 +35,7 @@ jest.mock('../utils/getModuleItemId', () => ({
   }),
 }))
 
-jest.mock('../hooks/useModuleSequence', () => ({
+vi.mock('../hooks/useModuleSequence', () => ({
   __esModule: true,
   default: (...args: any[]) => mockUseModuleSequence(...args),
 }))
@@ -78,7 +78,7 @@ describe('TeacherSavedView', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockUseModuleSequence.mockReturnValue({
       isLoading: false,
       error: null,

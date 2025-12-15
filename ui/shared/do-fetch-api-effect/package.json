@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "@canvas/do-fetch-api-effect",
   "private": true,
   "version": "1.0.0",

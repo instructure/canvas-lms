@@ -27,7 +27,7 @@ import {
 describe('QTIZipImporter', () => {
   beforeAll(() => (window.ENV.UPLOAD_LIMIT = 1024))
 
-  afterEach(() => jest.clearAllMocks())
+  afterEach(() => vi.clearAllMocks())
 
   sharedFormTests(QTIZipImporter)
   sharedBankTests(QTIZipImporter)

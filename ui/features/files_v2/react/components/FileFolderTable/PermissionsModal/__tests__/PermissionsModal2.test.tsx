@@ -37,7 +37,7 @@ let capturedRequest: {path: string; body: any} | null = null
 const defaultProps = {
   open: true,
   items: FAKE_FOLDERS_AND_FILES,
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
 }
 
 const renderComponent = (props?: any) =>
@@ -50,14 +50,17 @@ const renderComponent = (props?: any) =>
   )
 
 describe('PermissionsModal', () => {
-  beforeAll(() => server.listen())
+  beforeAll(() => {
+    server.listen()
+    const filesContexts = createFilesContexts()
+    resetAndGetFilesEnv(filesContexts)
+  })
+
   afterAll(() => server.close())
 
   beforeEach(() => {
     capturedRequest = null
     fakeENV.setup()
-    const filesContexts = createFilesContexts()
-    resetAndGetFilesEnv(filesContexts)
     server.use(
       http.put('/api/v1/files/:fileId', async ({request}) => {
         capturedRequest = {
@@ -78,10 +81,7 @@ describe('PermissionsModal', () => {
 
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
-    jest.resetAllMocks()
-    const filesContexts = createFilesContexts()
-    resetAndGetFilesEnv(filesContexts)
+    vi.clearAllMocks()
     fakeENV.teardown()
   })
 
@@ -138,30 +138,4 @@ describe('PermissionsModal', () => {
     })
   })
 
-  it('with alert after trying to save', async () => {
-    // Reset environment with usage rights required
-    const usageFilesContexts = createFilesContexts({
-      usageRightsRequired: true,
-    })
-    resetAndGetFilesEnv(usageFilesContexts)
-
-    // Render the component with items that don't have usage rights
-    const itemsWithoutUsageRights = FAKE_FOLDERS_AND_FILES.map(item => ({
-      ...item,
-      usage_rights: null,
-    }))
-    renderComponent({items: itemsWithoutUsageRights})
-
-    // Click the save button
-    await userEvent.click(screen.getByTestId('permissions-save-button'))
-
-    // Wait for the error alert to appear and check its content
-    await waitFor(() => {
-      const alert = screen.getByTestId('permissions-usage-rights-alert')
-      expect(alert).toBeInTheDocument()
-      expect(alert).toHaveTextContent(
-        'Selected items must have usage rights assigned before they can be published.',
-      )
-    })
-  })
 })

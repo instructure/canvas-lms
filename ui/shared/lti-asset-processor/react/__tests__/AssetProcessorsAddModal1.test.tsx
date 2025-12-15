@@ -25,7 +25,7 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {mockToolsForAssignment as tools} from './assetProcessorsTestHelpers'
 import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 
-jest.mock('@canvas/external-tools/messages')
+vi.mock('@canvas/external-tools/messages')
 
 const server = setupServer(
   http.get('/api/v1/courses/:courseId/lti_apps/launch_definitions', ({request}) => {
@@ -36,21 +36,21 @@ const server = setupServer(
 )
 
 describe('AssetProcessorsAddModal', () => {
-  let mockOnProcessorResponse: jest.Mock
+  let mockOnProcessorResponse: any
   const queryClient = new QueryClient()
 
   beforeAll(() => server.listen())
   afterAll(() => server.close())
 
   beforeEach(() => {
-    mockOnProcessorResponse = jest.fn()
+    mockOnProcessorResponse = vi.fn()
     queryClient.setQueryData(['assetProcessors', 123], tools)
   })
 
   afterEach(() => {
     server.resetHandlers()
     queryClient.clear()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   function renderModal() {

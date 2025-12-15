@@ -21,11 +21,11 @@ import {render} from '@testing-library/react'
 import {AccountNavigation} from '../AccountNavigation'
 
 describe('AccountNavigation', () => {
-  const props = {onPageClick: jest.fn()}
+  const props = {onPageClick: vi.fn()}
 
   describe('onPageClick called with page changes', () => {
     afterEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('calls onPageClick with index when a page is clicked', () => {
@@ -45,7 +45,7 @@ describe('AccountNavigation', () => {
 
   describe('Correct number of page buttons load', () => {
     afterEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('renders one page button when pageCount is 1', () => {

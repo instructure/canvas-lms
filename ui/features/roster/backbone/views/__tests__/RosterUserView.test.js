@@ -23,8 +23,8 @@ import RosterUser from '../../models/RosterUser'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('@instructure/ui-avatar', () => ({
-  Avatar: jest.fn().mockImplementation(({name}) => `<mock-avatar name="${name}" />`),
+vi.mock('@instructure/ui-avatar', () => ({
+  Avatar: vi.fn().mockImplementation(({name}) => `<mock-avatar name="${name}" />`),
 }))
 
 const server = setupServer()
@@ -77,7 +77,7 @@ describe('RosterUserView', () => {
       </div>
     `
 
-    jest.spyOn(window, 'confirm').mockImplementation(() => true)
+    vi.spyOn(window, 'confirm').mockImplementation(() => true)
 
     // Setup MSW handlers for AJAX requests
     server.use(
@@ -95,14 +95,14 @@ describe('RosterUserView', () => {
       }),
     )
 
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
     document.body.innerHTML = ''
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     delete window.ENV
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   it('moves focus to previous user when deleting a user in the middle', async () => {
@@ -121,7 +121,7 @@ describe('RosterUserView', () => {
     }
 
     const previousUserTrigger = document.querySelector('.al-trigger')
-    const jQueryFocusMock = jest.fn(() => {
+    const jQueryFocusMock = vi.fn(() => {
       previousUserTrigger.focus()
     })
 
@@ -153,7 +153,7 @@ describe('RosterUserView', () => {
     }
 
     const addUsersButton = document.querySelector('[data-testid="add-users-button"]')
-    const jQueryFocusMock = jest.fn(() => {
+    const jQueryFocusMock = vi.fn(() => {
       addUsersButton.focus()
     })
 

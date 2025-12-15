@@ -31,13 +31,13 @@ describe('Shared > Network > CheatDepaginator', () => {
 
   beforeEach(() => {
     dispatch = {
-      _getJSON: jest.fn(),
+      _getJSON: vi.fn(),
     }
   })
 
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterAll(() => {

@@ -30,7 +30,7 @@ describe('GradebookGrid StudentLastNameCellFormatter', () => {
     setFixtureHtml($fixture)
 
     gradebook = createGradebook({})
-    jest.spyOn(gradebook, 'saveSettings').mockImplementation(() => {})
+    vi.spyOn(gradebook, 'saveSettings').mockImplementation(() => {})
     formatter = new StudentLastNameCellFormatter(gradebook)
 
     gradebook.setSections([

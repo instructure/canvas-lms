@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CREATE_SUBMISSION} from '@canvas/assignments/graphql/student/Mutations'
 import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
@@ -29,17 +30,15 @@ import SubmissionManager from '../SubmissionManager'
 import {availableReviewCount} from '@canvas/assignments/helpers/PeerReviewHelpers'
 import {queryClient} from '@canvas/query'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
-jest.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/rce/RichContentEditor')
 
-jest.mock('../../apis/ContextModuleApi')
-
-jest.useFakeTimers()
+vi.mock('../../apis/ContextModuleApi')
 
 describe('SubmissionManager', () => {
   beforeAll(() => {
@@ -48,8 +47,13 @@ describe('SubmissionManager', () => {
   })
 
   beforeEach(() => {
+    vi.useFakeTimers()
     ContextModuleApi.getContextModuleData.mockResolvedValue({})
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   describe('Peer Review modal after clicking the "Submit Assignment" button', () => {
@@ -112,7 +116,7 @@ describe('SubmissionManager', () => {
 
     it('is present when there are assigned assessments', async () => {
       const {getByText, getByRole, findByText} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
           </MockedProvider>
@@ -123,7 +127,7 @@ describe('SubmissionManager', () => {
       fireEvent.click(submitButton)
 
       await act(async () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
       })
 
       const peerReviewButton = getByRole('button', {name: 'Peer Review'})
@@ -144,7 +148,7 @@ describe('SubmissionManager', () => {
       props.submission.assignedAssessments = []
 
       const {getByText, queryByRole} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
           </MockedProvider>
@@ -155,7 +159,7 @@ describe('SubmissionManager', () => {
       fireEvent.click(submitButton)
 
       await act(async () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
       })
 
       const peerReviewButton = queryByRole('button', {name: 'Peer Review'})
@@ -182,7 +186,7 @@ describe('SubmissionManager', () => {
       }
 
       const {getByText} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
           </MockedProvider>
@@ -193,7 +197,7 @@ describe('SubmissionManager', () => {
       fireEvent.click(submitButton)
 
       await act(async () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
       })
 
       expect(getByText('Peer Review').closest('button')).toBeDisabled()
@@ -219,7 +223,7 @@ describe('SubmissionManager', () => {
       }
 
       const {getByText, queryByRole} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
           </MockedProvider>
@@ -230,7 +234,7 @@ describe('SubmissionManager', () => {
       fireEvent.click(submitButton)
 
       await act(async () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
       })
 
       const peerReviewButton = queryByRole('button', {name: 'Peer Review'})
@@ -244,7 +248,7 @@ describe('SubmissionManager', () => {
 
     it('redirects to the corresponding url when the anonymous peer reviews option is enabled and the "Peer Review" button is clicked', async () => {
       const {getByText, queryByRole} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
           </MockedProvider>
@@ -255,7 +259,7 @@ describe('SubmissionManager', () => {
       fireEvent.click(submitButton)
 
       await act(async () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
       })
 
       const peerReviewButton = queryByRole('button', {name: 'Peer Review'})
@@ -297,7 +301,7 @@ describe('SubmissionManager', () => {
     ]
 
     const {getByText} = render(
-      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+      <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
         <MockedProvider mocks={mocks}>
           <SubmissionManager {...props} />
         </MockedProvider>

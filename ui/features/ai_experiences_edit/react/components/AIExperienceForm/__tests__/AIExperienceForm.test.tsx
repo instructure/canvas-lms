@@ -18,7 +18,7 @@
 
 import '@instructure/canvas-theme'
 import React from 'react'
-import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, fireEvent, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import AIExperienceForm from '../AIExperienceForm'
 import type {AIExperience} from '../../../../types'
@@ -34,11 +34,15 @@ const mockAiExperience: AIExperience = {
 }
 
 describe('AIExperienceForm', () => {
-  const mockOnSubmit = jest.fn()
-  const mockOnCancel = jest.fn()
+  const mockOnSubmit = vi.fn()
+  const mockOnCancel = vi.fn()
+
+  afterEach(() => {
+    cleanup()
+  })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fetchMock.restore()
     // @ts-expect-error
     window.ENV = {COURSE_ID: 123}

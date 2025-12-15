@@ -186,7 +186,7 @@ describe('useWidgetDashboardEdit', () => {
         widgets: [],
       }
 
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
       server.use(
         graphql.mutation('UpdateWidgetDashboardLayout', () => {
@@ -231,7 +231,7 @@ describe('useWidgetDashboardEdit', () => {
         widgets: [],
       }
 
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
       server.use(
         graphql.mutation('UpdateWidgetDashboardLayout', () => {
@@ -265,7 +265,7 @@ describe('useWidgetDashboardEdit', () => {
         widgets: [],
       }
 
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
       server.use(
         graphql.mutation('UpdateWidgetDashboardLayout', () => {
@@ -310,7 +310,7 @@ describe('useWidgetDashboardEdit', () => {
         widgets: [],
       }
 
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
       server.use(
         graphql.mutation('UpdateWidgetDashboardLayout', () => {

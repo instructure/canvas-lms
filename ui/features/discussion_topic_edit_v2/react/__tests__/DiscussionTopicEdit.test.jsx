@@ -22,7 +22,7 @@ import React from 'react'
 import {DiscussionTopicEdit} from '../index'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/rce/react/CanvasRce')
+vi.mock('@canvas/rce/react/CanvasRce')
 
 describe('DiscussionTopicEdit', () => {
   beforeEach(() => {

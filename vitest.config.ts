@@ -114,7 +114,11 @@ const jestMockHoistPlugin = {
 }
 
 export default defineConfig({
+  esbuild: {
+    jsx: 'automatic',
+  },
   test: {
+    testTimeout: 10000,
     environment: 'jsdom',
     reporters: [
       'default',
@@ -144,17 +148,6 @@ export default defineConfig({
       'packages/**',
       'gems/**',
       'ui/boot/initializers/**/*',
-      'ui/features/k5_dashboard/react/__tests__/GradesPage.test.jsx',
-      'ui/features/grade_summary/backbone/views/__tests__/OutcomePopoverView.test.js',
-      'ui/features/assignment_edit/backbone/views/__tests__/EditView4.test.jsx',
-      'ui/features/assignment_edit/backbone/views/__tests__/EditView7.test.jsx',
-      // TODO: assignments_show_student - RCE initialization issues
-      'ui/features/assignments_show_student/react/components/AttemptType/__tests__/TextEntry.test.jsx',
-      // TODO: assignments_show_student - GraphQL MockedProvider timing issues
-      'ui/features/assignments_show_student/react/components/__tests__/StudentContent2.test.jsx',
-      'ui/features/assignments_show_student/react/components/__tests__/AttemptTab2.test.jsx',
-      // TODO: jQuery UI dialog getClientRects errors in jsdom
-      'ui/shared/files/react/components/__tests__/PublishCloud.test.jsx',
     ],
     coverage: {
       include: ['ui/**/*.ts?(x)', 'ui/**/*.js?(x)'],
@@ -162,17 +155,25 @@ export default defineConfig({
       reportOnFailure: true,
     },
     // Force modules to be bundled together so they share state
-    // - jQuery/jqueryui/backbone: share jQuery instance for plugin attachment
     // - graphql: prevent "Cannot use GraphQLSchema from another module" errors
+    // Note: jQuery is handled via alias to jquery-with-plugins.ts wrapper
     server: {
       deps: {
-        inline: [/jquery/, /jqueryui/, /backbone/, /graphql/],
+        inline: [/graphql/],
       },
     },
   },
   resolve: {
+    // Force jQuery to be deduplicated - ensures all imports get the same instance
+    dedupe: ['jquery'],
     extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
     alias: [
+      // CRITICAL: Redirect all jQuery imports to our wrapper with plugins pre-attached
+      // This ensures toJSON, dialog, droppable, etc. are available on all jQuery instances
+      {
+        find: /^jquery$/,
+        replacement: resolve(__dirname, 'ui/shared/test-utils/jquery-with-plugins.ts'),
+      },
       // Match tsconfig.json paths for @canvas/* imports (must come before other aliases)
       {
         find: /^@canvas\/(.+)$/,

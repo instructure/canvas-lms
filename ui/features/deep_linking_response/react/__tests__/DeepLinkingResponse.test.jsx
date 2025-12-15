@@ -41,7 +41,7 @@ describe('RetrievingContent', () => {
     render(<RetrievingContent environment={env()} parentWindow={windowMock} />)
 
   beforeEach(() => {
-    windowMock.postMessage = jest.fn()
+    windowMock.postMessage = vi.fn()
   })
 
   afterEach(() => {

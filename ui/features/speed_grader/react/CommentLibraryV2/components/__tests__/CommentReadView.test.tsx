@@ -17,26 +17,30 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import CommentReadView from '../CommentReadView'
 import * as shave from '@canvas/shave'
 
-jest.mock('@canvas/shave')
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/shave')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 describe('CommentReadView', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const defaultProps = {
     id: 'comment-1',
     comment: 'This is a test comment',
     index: 0,
-    onClick: jest.fn(),
-    setIsEditing: jest.fn(),
+    onClick: vi.fn(),
+    setIsEditing: vi.fn(),
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderWithMocks = (props = {}) => {
@@ -91,7 +95,7 @@ describe('CommentReadView', () => {
 
   describe('Truncation Tests', () => {
     it('shows show more button when comment is truncated', async () => {
-      ;(shave.default as jest.Mock).mockReturnValue(true)
+      ;(shave.default as any).mockReturnValue(true)
 
       renderWithMocks()
 
@@ -101,7 +105,7 @@ describe('CommentReadView', () => {
     })
 
     it('does not show show more button when comment is not truncated', async () => {
-      ;(shave.default as jest.Mock).mockReturnValue(false)
+      ;(shave.default as any).mockReturnValue(false)
 
       renderWithMocks()
 
@@ -112,7 +116,7 @@ describe('CommentReadView', () => {
 
     it('toggles between show more and show less on button click', async () => {
       const user = userEvent.setup()
-      ;(shave.default as jest.Mock).mockReturnValue(true)
+      ;(shave.default as any).mockReturnValue(true)
 
       renderWithMocks()
 
@@ -132,7 +136,7 @@ describe('CommentReadView', () => {
 
     it('expands comment text when show more is clicked', async () => {
       const user = userEvent.setup()
-      ;(shave.default as jest.Mock).mockReturnValue(true)
+      ;(shave.default as any).mockReturnValue(true)
 
       const longComment = 'This is a very long comment that should be truncated initially'
       renderWithMocks({comment: longComment})
@@ -152,7 +156,7 @@ describe('CommentReadView', () => {
   describe('Interaction Tests', () => {
     it('calls onClick when comment area is clicked', async () => {
       const user = userEvent.setup()
-      const onClick = jest.fn()
+      const onClick = vi.fn()
 
       renderWithMocks({onClick})
 
@@ -164,7 +168,7 @@ describe('CommentReadView', () => {
 
     it('calls onClick when screen reader button is clicked', async () => {
       const user = userEvent.setup()
-      const onClick = jest.fn()
+      const onClick = vi.fn()
 
       renderWithMocks({onClick})
 
@@ -207,7 +211,7 @@ describe('CommentReadView', () => {
 
     it('screen reader button is keyboard accessible', async () => {
       const user = userEvent.setup()
-      const onClick = jest.fn()
+      const onClick = vi.fn()
 
       renderWithMocks({onClick})
 
@@ -228,7 +232,7 @@ describe('CommentReadView', () => {
   describe('Edit Button Tests', () => {
     it('clicking edit button calls setIsEditing with true', async () => {
       const user = userEvent.setup()
-      const setIsEditing = jest.fn()
+      const setIsEditing = vi.fn()
 
       renderWithMocks({setIsEditing})
 
@@ -241,7 +245,7 @@ describe('CommentReadView', () => {
 
     it('edit button is keyboard accessible with Enter key', async () => {
       const user = userEvent.setup()
-      const setIsEditing = jest.fn()
+      const setIsEditing = vi.fn()
 
       renderWithMocks({setIsEditing})
 
@@ -254,7 +258,7 @@ describe('CommentReadView', () => {
 
     it('edit button is keyboard accessible with Space key', async () => {
       const user = userEvent.setup()
-      const setIsEditing = jest.fn()
+      const setIsEditing = vi.fn()
 
       renderWithMocks({setIsEditing})
 

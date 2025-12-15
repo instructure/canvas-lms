@@ -26,10 +26,10 @@ import BulkEditStudentPaces from '../bulk_edit_students'
 const reducer = (state = {ui: {bulkEditModalOpen: false, selectedBulkStudents: []}}) => state
 const store = createStore(reducer)
 
-const openModal = jest.fn()
-const closeModal = jest.fn()
-const setSelectedPaceContext = jest.fn()
-const handleContextSelect = jest.fn()
+const openModal = vi.fn()
+const closeModal = vi.fn()
+const setSelectedPaceContext = vi.fn()
+const handleContextSelect = vi.fn()
 
 const defaultProps = {
   openModal,

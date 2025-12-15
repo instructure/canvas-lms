@@ -80,6 +80,7 @@ const defaultProps = (props = {}) => {
       dndOptions: {},
       clearSelectedItems: () => {},
       onMove: () => {},
+      onResolvePath: () => {},
     },
     props,
   )

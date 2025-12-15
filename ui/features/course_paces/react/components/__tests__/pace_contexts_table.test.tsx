@@ -66,17 +66,17 @@ const defaultProps: PaceContextsTableProps = {
   handleContextSelect: () => {},
   contextsPublishing: [],
   course: course,
-  showCourseReport: jest.fn(),
-  createCourseReport: jest.fn(),
+  showCourseReport: vi.fn(),
+  createCourseReport: vi.fn(),
 }
 
 beforeEach(() => {
-  defaultProps.showCourseReport = jest.fn()
-  defaultProps.createCourseReport = jest.fn()
+  defaultProps.showCourseReport = vi.fn()
+  defaultProps.createCourseReport = vi.fn()
 })
 
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('PaceContextTable', () => {

@@ -34,7 +34,7 @@ function thenStub() {
 }
 describe('Developer key actions', () => {
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('listInheritedDeveloperKeysStart returns proper action', () => {
@@ -71,7 +71,7 @@ describe('Developer key actions', () => {
   })
 
   test('getDeveloperKeys retrieves account key data', () => {
-    const getStub = jest.spyOn(axios, 'get').mockReturnValue(thenStub())
+    const getStub = vi.spyOn(axios, 'get').mockReturnValue(thenStub())
     actions.getDeveloperKeys('http://www.test.com', {})(
       () => {},
       () => {},
@@ -80,7 +80,7 @@ describe('Developer key actions', () => {
   })
 
   test('getDeveloperKeys retrieves inherited account key data', () => {
-    const getStub = jest.spyOn(axios, 'get').mockReturnValue(thenStub())
+    const getStub = vi.spyOn(axios, 'get').mockReturnValue(thenStub())
     actions.getDeveloperKeys('http://www.test.com', {})(
       () => {},
       () => {},
@@ -89,7 +89,7 @@ describe('Developer key actions', () => {
   })
 
   test('getRemainingDeveloperKeys requests keys from the specified URL', () => {
-    const getStub = jest.spyOn(axios, 'get').mockReturnValue(thenStub())
+    const getStub = vi.spyOn(axios, 'get').mockReturnValue(thenStub())
     actions.getRemainingDeveloperKeys('http://www.test.com', [])(
       () => {},
       () => {},
@@ -98,7 +98,7 @@ describe('Developer key actions', () => {
   })
 
   test('getRemainingInheritedDeveloperKeys requests keys from the specified URL with inherited param', () => {
-    const getStub = jest.spyOn(axios, 'get').mockReturnValue(thenStub())
+    const getStub = vi.spyOn(axios, 'get').mockReturnValue(thenStub())
     actions.getRemainingInheritedDeveloperKeys('http://www.test.com', [])(
       () => {},
       () => {},
@@ -107,7 +107,7 @@ describe('Developer key actions', () => {
   })
 
   test('listDeveloperKeyScopes makes a request to the scopes endpoint', () => {
-    const getStub = jest.spyOn(axios, 'get').mockReturnValue(thenStub())
+    const getStub = vi.spyOn(axios, 'get').mockReturnValue(thenStub())
     actions.listDeveloperKeyScopes(1)(store.dispatch)
     expect(getStub).toHaveBeenCalledWith('/api/v1/accounts/1/scopes?group_by=resource_name')
   })

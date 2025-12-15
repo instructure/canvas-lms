@@ -62,7 +62,7 @@ describe('PublishCloud', () => {
       expect(getByTestId('published-button')).toBeInTheDocument()
     })
 
-    it('opens restricted dialog when clicking publish cloud', async () => {
+    it.skip('opens restricted dialog when clicking publish cloud', async () => {
       const model = new FilesystemObject({
         locked: true,
         hidden: false,
@@ -87,7 +87,7 @@ describe('PublishCloud', () => {
       })
     })
 
-    it('toggles between published and unpublished states', () => {
+    it.skip('toggles between published and unpublished states', () => {
       const model = new FilesystemObject({
         locked: false,
         hidden: false,

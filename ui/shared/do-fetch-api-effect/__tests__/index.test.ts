@@ -170,7 +170,7 @@ describe('doFetchApi', () => {
     server.use(
       http.post(path, async ({request}) => {
         capturedRequest = {
-          headers: Object.fromEntries(request.headers.entries()),
+          headers: Object.fromEntries(Array.from(request.headers as any)),
           cache: request.cache,
           body: await request.text(),
           method: request.method,
@@ -204,7 +204,7 @@ describe('doFetchApi', () => {
     let capturedHeaders: Record<string, string>
     server.use(
       http.get(path, ({request}) => {
-        capturedHeaders = Object.fromEntries(request.headers.entries())
+        capturedHeaders = Object.fromEntries(Array.from(request.headers as any))
         return HttpResponse.json({key: 'value'})
       }),
     )
@@ -225,7 +225,7 @@ describe('doFetchApi', () => {
     server.use(
       http.post(path, async ({request}) => {
         capturedRequest = {
-          headers: Object.fromEntries(request.headers.entries()),
+          headers: Object.fromEntries(Array.from(request.headers as any)),
           body: await request.text(),
         }
         return new HttpResponse(null, {status: 200})
@@ -251,7 +251,7 @@ describe('doFetchApi', () => {
     server.use(
       http.post(path, async ({request}) => {
         capturedRequest = {
-          headers: Object.fromEntries(request.headers.entries()),
+          headers: Object.fromEntries(Array.from(request.headers as any)),
           body: await request.text(),
         }
         return new HttpResponse(null, {status: 200})
@@ -275,7 +275,7 @@ describe('doFetchApi', () => {
     server.use(
       http.post(path, async ({request}) => {
         capturedRequest = {
-          headers: Object.fromEntries(request.headers.entries()),
+          headers: Object.fromEntries(Array.from(request.headers as any)),
           body: await request.text(),
         }
         return new HttpResponse(null, {status: 200})
@@ -297,7 +297,7 @@ describe('doFetchApi', () => {
         http.post(path, async ({request}) => {
           const contentType = request.headers.get('content-type') || ''
           capturedRequest = {
-            headers: Object.fromEntries(request.headers.entries()),
+            headers: Object.fromEntries(Array.from(request.headers as any)),
             bodyIsFormData: contentType.includes('multipart/form-data'),
           }
           return new HttpResponse(null, {status: 200})
@@ -321,7 +321,7 @@ describe('doFetchApi', () => {
         http.post(path, async ({request}) => {
           const contentType = request.headers.get('content-type') || ''
           capturedRequest = {
-            headers: Object.fromEntries(request.headers.entries()),
+            headers: Object.fromEntries(Array.from(request.headers as any)),
             bodyIsFormData: contentType.includes('multipart/form-data'),
           }
           return new HttpResponse(null, {status: 200})
@@ -347,7 +347,7 @@ describe('doFetchApi', () => {
         http.post(path, async ({request}) => {
           const contentType = request.headers.get('content-type') || ''
           capturedRequest = {
-            headers: Object.fromEntries(request.headers.entries()),
+            headers: Object.fromEntries(Array.from(request.headers as any)),
             bodyIsFormData: contentType.includes('multipart/form-data'),
           }
           return new HttpResponse(null, {status: 200})
@@ -372,7 +372,7 @@ describe('doFetchApi', () => {
         http.post(path, async ({request}) => {
           const contentType = request.headers.get('content-type') || ''
           capturedRequest = {
-            headers: Object.fromEntries(request.headers.entries()),
+            headers: Object.fromEntries(Array.from(request.headers as any)),
             bodyIsFormData: contentType.includes('multipart/form-data'),
           }
           return new HttpResponse(null, {status: 200})
@@ -397,7 +397,7 @@ describe('doFetchApi', () => {
         http.post(path, async ({request}) => {
           const contentType = request.headers.get('content-type') || ''
           capturedRequest = {
-            headers: Object.fromEntries(request.headers.entries()),
+            headers: Object.fromEntries(Array.from(request.headers as any)),
             bodyIsFormData: contentType.includes('multipart/form-data'),
           }
           return new HttpResponse(null, {status: 200})
@@ -422,7 +422,7 @@ describe('doFetchApi', () => {
         http.post(path, async ({request}) => {
           const contentType = request.headers.get('content-type') || ''
           capturedRequest = {
-            headers: Object.fromEntries(request.headers.entries()),
+            headers: Object.fromEntries(Array.from(request.headers as any)),
             bodyIsFormData: contentType.includes('multipart/form-data'),
           }
           return new HttpResponse(null, {status: 200})

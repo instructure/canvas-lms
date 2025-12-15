@@ -23,8 +23,8 @@ import userEvent from '@testing-library/user-event'
 const defaultProps = {
   courseId: '1',
   selectedUsers: [],
-  onUserSelected: jest.fn(),
-  onUserRemoved: jest.fn(),
+  onUserSelected: vi.fn(),
+  onUserRemoved: vi.fn(),
 }
 
 const renderComponent = (props?: any) =>

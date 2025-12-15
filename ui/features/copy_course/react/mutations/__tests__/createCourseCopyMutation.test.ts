@@ -22,7 +22,7 @@ import type {CopyCourseFormSubmitData} from '../../types'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/content-migrations/react/CommonMigratorControls/converter/form_data_converter')
+vi.mock('@canvas/content-migrations/react/CommonMigratorControls/converter/form_data_converter')
 
 const server = setupServer()
 
@@ -54,14 +54,14 @@ describe('createCourseCopyMutation', () => {
   const courseCreationResult = {id: '4'}
 
   const mockConvertFormDataToMigrationCreateRequest =
-    convertFormDataToMigrationCreateRequest as jest.Mock
+    convertFormDataToMigrationCreateRequest as any
 
   beforeAll(() => server.listen())
   afterAll(() => server.close())
 
   beforeEach(() => {
     capturedRequests = []
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

@@ -24,23 +24,24 @@ import {http, HttpResponse} from 'msw'
 import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
 import {initBody, makeModuleWithItems} from '../../__tests__/testHelpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {type Mock} from 'vitest'
 
 const server = setupServer()
 
-jest.mock('@canvas/context-modules/jquery/utils', () => {
-  const originalModule = jest.requireActual('@canvas/context-modules/jquery/utils')
+vi.mock('@canvas/context-modules/jquery/utils', async () => {
+  const originalModule = await vi.importActual('@canvas/context-modules/jquery/utils')
   return {
     __esModule: true,
     ...originalModule,
-    updateModuleItem: jest.fn(),
+    updateModuleItem: vi.fn(),
   }
 })
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
-const mockShowFlashAlert = showFlashAlert as jest.Mock
+const mockShowFlashAlert = showFlashAlert as Mock
 
 const defaultProps = {
   courseId: '1',
@@ -68,7 +69,7 @@ beforeEach(() => {
 
 afterEach(() => {
   server.resetHandlers()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   document.body.innerHTML = ''
 })
 

@@ -46,13 +46,13 @@ describe('RequeueButton', () => {
 
   it("doesn't render if the user lacks :manage_jobs", async () => {
     ENV.manage_jobs = false
-    const {queryByText} = render(<RequeueButton id="1" onRequeue={jest.fn()} />)
+    const {queryByText} = render(<RequeueButton id="1" onRequeue={vi.fn()} />)
     expect(queryByText('Requeue Job')).not.toBeInTheDocument()
   })
 
   it('initiates a requeue if the user has :manage_jobs', async () => {
     ENV.manage_jobs = true
-    const onRequeue = jest.fn()
+    const onRequeue = vi.fn()
     const {getByRole} = render(<RequeueButton id="1" onRequeue={onRequeue} />)
     fireEvent.click(getByRole('button', {name: 'Requeue Job'}))
     await flushPromises()

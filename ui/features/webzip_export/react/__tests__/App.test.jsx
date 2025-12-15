@@ -24,8 +24,8 @@ import {act, render, waitFor} from '@testing-library/react'
 import {assignLocation} from '@canvas/util/globalUtils'
 
 // Mock the assignLocation function
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 const server = setupServer()
@@ -34,7 +34,7 @@ describe('Webzip export app', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
   afterAll(() => server.close())
 

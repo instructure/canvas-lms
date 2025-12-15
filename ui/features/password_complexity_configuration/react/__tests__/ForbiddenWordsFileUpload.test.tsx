@@ -24,17 +24,17 @@ import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('../apiClient')
+vi.mock('../apiClient')
 
 const server = setupServer()
 
 describe('ForbiddenWordsFileUpload Component', () => {
   const defaultProps = {
     open: true,
-    onDismiss: jest.fn(),
-    onSave: jest.fn(),
-    setForbiddenWordsUrl: jest.fn(),
-    setForbiddenWordsFilename: jest.fn(),
+    onDismiss: vi.fn(),
+    onSave: vi.fn(),
+    setForbiddenWordsUrl: vi.fn(),
+    setForbiddenWordsFilename: vi.fn(),
   }
 
   beforeAll(() => {
@@ -48,7 +48,7 @@ describe('ForbiddenWordsFileUpload Component', () => {
 
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('Rendering', () => {

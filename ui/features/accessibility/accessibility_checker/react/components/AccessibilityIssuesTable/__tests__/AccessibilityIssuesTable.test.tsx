@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, screen} from '@testing-library/react'
+import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 import {act, renderHook} from '@testing-library/react-hooks'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import React from 'react'
+import {type Mock} from 'vitest'
 
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable'
 import {
@@ -29,21 +30,21 @@ import {
 import {mockScanData} from '../../../../../shared/react/stores/mockData'
 import {useAccessibilityScansFetchUtils} from '../../../../../shared/react/hooks/useAccessibilityScansFetchUtils'
 
-const mockDoFetchAccessibilityIssuesSummary = jest.fn()
+const mockDoFetchAccessibilityIssuesSummary = vi.fn()
 
-jest.mock('../../../../../shared/react/hooks/useAccessibilityScansFetchUtils', () => ({
-  useAccessibilityScansFetchUtils: jest.fn(),
+vi.mock('../../../../../shared/react/hooks/useAccessibilityScansFetchUtils', () => ({
+  useAccessibilityScansFetchUtils: vi.fn(),
 }))
 
 // Mock breakpoints to always return desktop queries for sortable table
-jest.mock('@canvas/breakpoints', () => ({
-  ...jest.requireActual('@canvas/breakpoints'),
+vi.mock('@canvas/breakpoints', async () => ({
+  ...await vi.importActual('@canvas/breakpoints'),
   responsiveQuerySizes: () => ({
     desktop: {minWidth: '0px'},
   }),
 }))
 
-const mockDoFetch = jest.fn()
+const mockDoFetch = vi.fn()
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -60,16 +61,20 @@ const createWrapper = () => {
 }
 
 describe('AccessibilityIssuesTable', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const mockState = {
     ...initialState,
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
     mockDoFetchAccessibilityIssuesSummary.mockClear()
     useAccessibilityScansStore.setState({...mockState})
-    ;(useAccessibilityScansFetchUtils as jest.Mock).mockReturnValue({
+    ;(useAccessibilityScansFetchUtils as Mock).mockReturnValue({
       doFetchAccessibilityScanData: mockDoFetch,
       doFetchAccessibilityIssuesSummary: mockDoFetchAccessibilityIssuesSummary,
     })

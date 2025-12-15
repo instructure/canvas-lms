@@ -24,16 +24,16 @@ describe('checkShouldFramebust', () => {
   })
 
   it('returns false when getElementById returns null', () => {
-    jest.spyOn(window.parent.document, 'getElementById').mockReturnValue(null)
-    jest.restoreAllMocks()
+    vi.spyOn(window.parent.document, 'getElementById').mockReturnValue(null)
+    vi.restoreAllMocks()
   })
 
   it('catches errors when accessing parent.document (cross-origin)', () => {
-    jest.spyOn(window.parent.document, 'getElementById').mockImplementation(() => {
+    vi.spyOn(window.parent.document, 'getElementById').mockImplementation(() => {
       throw new Error('SecurityError: Blocked a frame with origin')
     })
 
     expect(() => checkShouldFramebust()).not.toThrow()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 })

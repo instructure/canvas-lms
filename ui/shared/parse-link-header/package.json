@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "@canvas/parse-link-header",
   "private": true,
   "version": "1.0.0",

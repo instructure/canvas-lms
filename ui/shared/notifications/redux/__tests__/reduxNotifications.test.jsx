@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global vi */
-if (typeof vi !== 'undefined') vi.mock('@canvas/alerts/react/FlashAlert')
-jest.mock('@canvas/alerts/react/FlashAlert')
-
 import {subscribeFlashNotifications, notificationActions, reduceNotifications} from '../actions'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+
+vi.spyOn(FlashAlert, 'showFlashAlert').mockImplementation(() => {})
+vi.spyOn(FlashAlert, 'destroyContainer').mockImplementation(() => {})
 
 const createMockStore = state => ({
   subs: [],
@@ -29,7 +28,7 @@ const createMockStore = state => ({
     this.subs.push(cb)
   },
   getState: () => state,
-  dispatch: jest.fn(),
+  dispatch: vi.fn(),
   mockStateChange() {
     this.subs.forEach(sub => sub())
   },
@@ -37,18 +36,10 @@ const createMockStore = state => ({
 
 describe('Redux Notifications', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  afterEach(() => {
-    FlashAlert.destroyContainer.mockClear()
+    vi.clearAllMocks()
   })
 
   test('subscribes to a store and calls showFlashAlert for each notification in state', () => {
-    const useFakeTimers = typeof vi !== 'undefined' ? vi.useFakeTimers : jest.useFakeTimers
-    const useRealTimers = typeof vi !== 'undefined' ? vi.useRealTimers : jest.useRealTimers
-    const runAllTimers = typeof vi !== 'undefined' ? vi.runAllTimers : jest.runAllTimers
-
     const mockStore = createMockStore({
       notifications: [
         {id: '1', message: 'hello'},
@@ -59,21 +50,17 @@ describe('Redux Notifications', () => {
     subscribeFlashNotifications(mockStore)
     mockStore.mockStateChange()
 
-    useFakeTimers()
-    runAllTimers()
+    vi.useFakeTimers()
+    vi.runAllTimers()
 
     expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(2)
     expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({id: '1', message: 'hello'})
     expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({id: '2', message: 'world'})
 
-    useRealTimers()
+    vi.useRealTimers()
   })
 
   test('subscribes to a store and dispatches clearNotifications for each notification in state', () => {
-    const useFakeTimers = typeof vi !== 'undefined' ? vi.useFakeTimers : jest.useFakeTimers
-    const useRealTimers = typeof vi !== 'undefined' ? vi.useRealTimers : jest.useRealTimers
-    const runAllTimers = typeof vi !== 'undefined' ? vi.runAllTimers : jest.runAllTimers
-
     const mockStore = createMockStore({
       notifications: [
         {id: '1', message: 'hello'},
@@ -84,14 +71,14 @@ describe('Redux Notifications', () => {
     subscribeFlashNotifications(mockStore)
     mockStore.mockStateChange()
 
-    useFakeTimers()
-    runAllTimers()
+    vi.useFakeTimers()
+    vi.runAllTimers()
 
     expect(mockStore.dispatch).toHaveBeenCalledTimes(2)
     expect(mockStore.dispatch).toHaveBeenCalledWith(notificationActions.clearNotification('1'))
     expect(mockStore.dispatch).toHaveBeenCalledWith(notificationActions.clearNotification('2'))
 
-    useRealTimers()
+    vi.useRealTimers()
   })
 })
 

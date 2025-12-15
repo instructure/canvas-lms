@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {cleanup, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Suggestions from '../Suggestions'
 
@@ -28,12 +28,16 @@ describe('Suggestions', () => {
       {_id: '2', comment: 'Needs improvement'},
     ],
     showResults: true,
-    setComment: jest.fn(),
-    onClose: jest.fn(),
+    setComment: vi.fn(),
+    onClose: vi.fn(),
   }
 
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('Visibility behavior', () => {
@@ -88,7 +92,7 @@ describe('Suggestions', () => {
     })
 
     it('calls onClose on document click', async () => {
-      const onClose = jest.fn()
+      const onClose = vi.fn()
       render(<Suggestions {...defaultProps} onClose={onClose} />)
 
       // Simulate document click

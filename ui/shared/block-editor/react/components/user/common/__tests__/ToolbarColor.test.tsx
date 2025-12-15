@@ -128,8 +128,8 @@ describe('ToolbarColor', () => {
   it('includes the default foreground color', () => {
     const tabs = cloneBaseTabs()
     delete tabs.border
-    window.getComputedStyle = jest.fn().mockReturnValue({
-      getPropertyValue: jest.fn().mockReturnValue(DEFAULT_FONT_COLOR),
+    window.getComputedStyle = vi.fn().mockReturnValue({
+      getPropertyValue: vi.fn().mockReturnValue(DEFAULT_FONT_COLOR),
     })
     const {getByText} = renderComponent({tabs})
     const button = getByText('Color').closest('button') as HTMLButtonElement
@@ -191,8 +191,8 @@ describe('ToolbarColor', () => {
 
   describe('background tab', () => {
     beforeEach(() => {
-      window.getComputedStyle = jest.fn().mockReturnValue({
-        getPropertyValue: jest.fn().mockReturnValue(DEFAULT_FONT_COLOR),
+      window.getComputedStyle = vi.fn().mockReturnValue({
+        getPropertyValue: vi.fn().mockReturnValue(DEFAULT_FONT_COLOR),
       })
     })
 

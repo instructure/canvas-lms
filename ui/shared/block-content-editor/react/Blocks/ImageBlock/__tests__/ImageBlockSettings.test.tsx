@@ -21,14 +21,15 @@ import {renderBlock} from '../../__tests__/render-helper'
 import userEvent from '@testing-library/user-event'
 import {waitFor} from '@testing-library/react'
 import {createMockStore} from '../../../__tests__/createMockStore'
+import {generateAiAltText} from '../../../utilities/aiAltTextApi'
 
-const mockStore = jest.fn()
-jest.mock('react', () => {
-  const ActualReact = jest.requireActual('react')
+const mockStore = vi.fn()
+vi.mock('react', async () => {
+  const ActualReact = await vi.importActual<typeof import('react')>('react')
   return {
     ...ActualReact,
     useContext: (context: React.Context<any>) => {
-      const result = ActualReact.useContext(context)
+      const result = ActualReact.useContext(context) as any
       if (context.displayName === 'FastContext') {
         return {
           ...result,
@@ -40,8 +41,8 @@ jest.mock('react', () => {
   }
 })
 
-jest.mock('../../../utilities/aiAltTextApi', () => ({
-  generateAiAltText: jest.fn().mockResolvedValue({
+vi.mock('../../../utilities/aiAltTextApi', () => ({
+  generateAiAltText: vi.fn().mockResolvedValue({
     image: {altText: 'AI generated alt text'},
   }),
 }))
@@ -71,7 +72,7 @@ describe('ImageBlockSettings', () => {
     )
   })
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('include title', () => {
@@ -236,7 +237,6 @@ describe('ImageBlockSettings', () => {
     })
 
     it('generates alt text when clicked', async () => {
-      const {generateAiAltText} = require('../../../utilities/aiAltTextApi')
       mockStore.mockReturnValue(
         createMockStore({
           aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
@@ -276,8 +276,7 @@ describe('ImageBlockSettings', () => {
         }),
       )
 
-      const {generateAiAltText} = require('../../../utilities/aiAltTextApi')
-      generateAiAltText.mockImplementation(
+      vi.mocked(generateAiAltText).mockImplementation(
         () =>
           new Promise(resolve =>
             setTimeout(() => resolve({image: {altText: 'AI generated alt text'}}), 100),

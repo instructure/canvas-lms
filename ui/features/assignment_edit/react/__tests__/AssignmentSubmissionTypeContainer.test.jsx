@@ -20,8 +20,8 @@ import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
 import {AssignmentSubmissionTypeContainer} from '../AssignmentSubmissionTypeContainer'
 
-const onLaunchButtonFn = jest.fn()
-const onRemoveResourceFn = jest.fn()
+const onLaunchButtonFn = vi.fn()
+const onRemoveResourceFn = vi.fn()
 const tool = {
   id: '1',
   title: 'Tool Title',

@@ -417,7 +417,7 @@ describe('CourseWorkCombinedWidget', () => {
   })
 
   it('handles error state', async () => {
-    jest.spyOn(console, 'error').mockImplementation()
+    vi.spyOn(console, 'error').mockImplementation(() => {})
 
     server.use(
       graphql.query('GetUserCourseStatistics', () => {

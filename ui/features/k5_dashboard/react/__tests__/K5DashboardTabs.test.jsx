@@ -25,8 +25,6 @@ import K5Dashboard from '../K5Dashboard'
 import {defaultK5DashboardProps as defaultProps} from './mocks'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 
-jest.useFakeTimers()
-
 const render = children =>
   testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
@@ -105,14 +103,15 @@ describe('K5Dashboard Tabs', () => {
       render(<K5Dashboard {...defaultProps} />)
 
       act(() => findTabByName('Grades', {selected: false}).click())
-      await act(async () => jest.runAllTimers())
-      expect(findTabByName('Grades', {selected: true})).toBeInTheDocument()
+      await waitFor(() => {
+        expect(findTabByName('Grades', {selected: true})).toBeInTheDocument()
+      })
 
       act(() => findTabByName('Resources', {selected: false}).click())
-      await act(async () => jest.runAllTimers())
-
-      expect(findTabByName('Grades', {selected: false})).toBeInTheDocument()
-      expect(findTabByName('Resources', {selected: true})).toBeInTheDocument()
+      await waitFor(() => {
+        expect(findTabByName('Grades', {selected: false})).toBeInTheDocument()
+        expect(findTabByName('Resources', {selected: true})).toBeInTheDocument()
+      })
     })
   })
 })

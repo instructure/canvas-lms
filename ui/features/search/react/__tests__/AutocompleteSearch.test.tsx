@@ -23,8 +23,8 @@ import userEvent from '@testing-library/user-event'
 const options = ['graphs', 'graphs and charts', 'calculators', 'computational geometry']
 
 const props = {
-  onInputChange: jest.fn(),
-  setInputRef: jest.fn(),
+  onInputChange: vi.fn(),
+  setInputRef: vi.fn(),
   options,
   defaultValue: '',
 }

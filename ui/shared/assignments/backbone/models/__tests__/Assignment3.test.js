@@ -180,7 +180,7 @@ describe('Assignment', () => {
           },
         ],
       })
-      jest.spyOn(assignment, 'multipleDueDates').mockReturnValue(false)
+      vi.spyOn(assignment, 'multipleDueDates').mockReturnValue(false)
       expect(assignment.singleSectionDueDate()).toBe(dueAt.toISOString())
     })
 

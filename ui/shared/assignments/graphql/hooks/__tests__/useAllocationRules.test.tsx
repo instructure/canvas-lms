@@ -24,12 +24,13 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {useAllocationRules} from '../useAllocationRules'
 import {AllocationRuleType} from '../../teacher/AssignmentTeacherTypes'
 
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(),
+import {executeQuery} from '@canvas/graphql'
+
+vi.mock('@canvas/graphql', () => ({
+  executeQuery: vi.fn(),
 }))
 
-const {executeQuery} = require('@canvas/graphql')
-const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+const mockExecuteQuery = vi.mocked(executeQuery)
 
 const mockAllocationRules: AllocationRuleType[] = [
   {
@@ -83,7 +84,7 @@ const createWrapper = () => {
 
 describe('useAllocationRules', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockExecuteQuery.mockClear()
   })
 

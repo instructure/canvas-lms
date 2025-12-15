@@ -43,14 +43,14 @@ it('renders the body', () => {
 })
 
 it('triggers close', () => {
-  const onDismiss = jest.fn()
+  const onDismiss = vi.fn()
   const {getByText} = renderConfirmDialog({onDismiss})
   fireEvent.click(getByText('close the dialog'))
   expect(onDismiss).toHaveBeenCalled()
 })
 
 it('creates buttons and passes through button properties', () => {
-  const clicked = jest.fn()
+  const clicked = vi.fn()
   const {getByTestId} = renderConfirmDialog({
     buttons: () => [
       {children: 'click me', onClick: clicked, 'data-testid': 'test-button'},

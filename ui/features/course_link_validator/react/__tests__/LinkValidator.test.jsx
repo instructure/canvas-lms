@@ -22,23 +22,26 @@ import LinkValidator from '../LinkValidator'
 import $ from 'jquery'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.useFakeTimers()
-jest.mock('jquery')
+vi.useFakeTimers()
+vi.mock('jquery')
 
 describe('LinkValidator', () => {
   beforeEach(() => {
     // Mock jQuery selector and show/hide methods
-    const mockShow = jest.fn()
-    const mockHide = jest.fn()
-    const mockJQuery = jest.fn(() => ({
+    const mockShow = vi.fn()
+    const mockHide = vi.fn()
+    const mockScreenReaderFlashMessage = vi.fn()
+    const mockJQuery = vi.fn(() => ({
       show: mockShow,
       hide: mockHide,
     }))
+    mockJQuery.screenReaderFlashMessage = mockScreenReaderFlashMessage
     $.mockImplementation(selector => mockJQuery(selector))
+    $.screenReaderFlashMessage = mockScreenReaderFlashMessage
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('confetti', () => {
@@ -62,7 +65,7 @@ describe('LinkValidator', () => {
 
       afterEach(() => {
         fakeENV.teardown()
-        jest.clearAllMocks()
+        vi.clearAllMocks()
       })
 
       it('renders confetti', async () => {
@@ -70,7 +73,7 @@ describe('LinkValidator', () => {
 
         act(() => {
           fireEvent.click(getByTestId('validate-button'))
-          jest.advanceTimersByTime(2000)
+          vi.advanceTimersByTime(2000)
         })
 
         await waitFor(() => {
@@ -93,7 +96,7 @@ describe('LinkValidator', () => {
 
           act(() => {
             fireEvent.click(getByTestId('validate-button'))
-            jest.advanceTimersByTime(2000)
+            vi.advanceTimersByTime(2000)
           })
 
           await waitFor(() => {
@@ -141,7 +144,7 @@ describe('LinkValidator', () => {
 
       afterEach(() => {
         fakeENV.teardown()
-        jest.clearAllMocks()
+        vi.clearAllMocks()
       })
 
       it('does not render confetti', async () => {
@@ -151,7 +154,7 @@ describe('LinkValidator', () => {
 
         act(() => {
           fireEvent.click(getByTestId('validate-button'))
-          jest.advanceTimersByTime(2000)
+          vi.advanceTimersByTime(2000)
         })
 
         await waitFor(() => {
@@ -166,7 +169,7 @@ describe('LinkValidator', () => {
 
         act(() => {
           fireEvent.click(getByTestId('validate-button'))
-          jest.advanceTimersByTime(2000)
+          vi.advanceTimersByTime(2000)
         })
 
         await waitFor(() => {

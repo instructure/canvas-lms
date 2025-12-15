@@ -16,21 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
 import {LoginLayout} from '../LoginLayout'
-import '@testing-library/jest-dom'
 import {HelpTrayProvider, NewLoginDataProvider, NewLoginProvider} from '../../context'
 
-jest.mock('react-router-dom', () => {
-  const originalModule = jest.requireActual('react-router-dom')
+vi.mock('react-router-dom', async () => {
+  const originalModule = await vi.importActual('react-router-dom')
   return {
     ...originalModule,
     // mock ScrollRestoration to avoid errors since this test uses MemoryRouter, which is not a data
     // router and ScrollRestoration requires a data router to function properly
     ScrollRestoration: () => null,
   }
+})
+
+afterEach(() => {
+  cleanup()
 })
 
 describe('LoginLayout', () => {

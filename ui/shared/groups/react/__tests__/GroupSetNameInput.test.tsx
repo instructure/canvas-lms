@@ -25,8 +25,8 @@ describe('GroupSetNameInput', () => {
     const defaultProps: GroupSetNameInputProps = {
       id: '1',
       initialValue: 'Test Group',
-      getShouldShowEmptyNameError: jest.fn(() => true),
-      setShouldShowEmptyNameError: jest.fn(),
+      getShouldShowEmptyNameError: vi.fn(() => true),
+      setShouldShowEmptyNameError: vi.fn(),
     }
     return <GroupSetNameInput {...defaultProps} {...props} />
   }

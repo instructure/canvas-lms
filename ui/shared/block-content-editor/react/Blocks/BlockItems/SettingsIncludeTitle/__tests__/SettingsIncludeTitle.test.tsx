@@ -23,7 +23,7 @@ import {SettingsIncludeTitleProps} from '../types'
 describe('SettingsIncludeTitle', () => {
   const defaultProps: SettingsIncludeTitleProps = {
     checked: false,
-    onChange: jest.fn(),
+    onChange: vi.fn(),
   }
 
   it('renders the checkbox with correct label', () => {

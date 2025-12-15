@@ -104,8 +104,8 @@ function mockStandardAssignmentsResponse() {
 function renderBulkEdit(overrides = {}) {
   const props = {
     courseId: '42',
-    onCancel: jest.fn(),
-    onSave: jest.fn(),
+    onCancel: vi.fn(),
+    onSave: vi.fn(),
     ...overrides,
   }
   const result = {...render(<BulkEdit {...props} />), ...props}
@@ -127,7 +127,7 @@ function changeAndBlurInput(input, newValue) {
 
 beforeEach(() => {
   fetchMock.put(/api\/v1\/courses\/\d+\/assignments\/bulk_update/, {})
-  jest.useFakeTimers()
+  vi.useFakeTimers()
 })
 
 afterEach(() => {
@@ -294,7 +294,9 @@ describe('Assignment Bulk Edit Dates', () => {
     expect(revertButtons).toHaveLength(0)
   })
 
-  it('can revert edited dates on a row', async () => {
+  it(
+    'can revert edited dates on a row',
+    async () => {
     const {getAllByText, getAllByLabelText, getByDisplayValue} = await renderBulkEditAndWait()
 
     const assignmentUnlockAt = getByDisplayValue('Thu, Mar 19, 2020, 9:00 AM')
@@ -320,7 +322,9 @@ describe('Assignment Bulk Edit Dates', () => {
     fireEvent.click(revertButtons[2])
     expect(assignmentUnlockAt.value).toBe('Thu, Mar 19, 2020, 9:00 AM') // original value
     expect(nullDueDate.value).toBe('') // original value
-  })
+  },
+    10000,
+  )
 
   it('can revert nonsense input on a row', async () => {
     const {getAllByText, getByDisplayValue} = await renderBulkEditAndWait()

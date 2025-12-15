@@ -16,11 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
 import {SSOButtons} from '..'
 import {NewLoginDataProvider, NewLoginProvider} from '../../context'
+
+afterEach(() => {
+  cleanup()
+})
 
 describe('SSOButtons', () => {
   it('mounts without crashing', () => {

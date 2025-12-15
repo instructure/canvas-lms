@@ -19,13 +19,15 @@
 import {showCourseNav, hideCourseNav} from '../toggleCourseNav'
 import updateSubnavMenuToggle from '@canvas/courses/jquery/updateSubnavMenuToggle'
 
-jest.mock('@canvas/courses/jquery/updateSubnavMenuToggle', () => jest.fn())
+vi.mock('@canvas/courses/jquery/updateSubnavMenuToggle', () => ({
+  default: vi.fn(),
+}))
 
 describe('toggleCourseNav', () => {
   describe('course nav menu is open', () => {
     beforeEach(() => {
       document.body.classList.add('course-menu-expanded')
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('showCourseNav show do nothing', () => {
@@ -44,7 +46,7 @@ describe('toggleCourseNav', () => {
   describe('course nav menu is closed', () => {
     beforeEach(() => {
       document.body.classList.remove('course-menu-expanded')
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('showCourseNav should show course nav', () => {

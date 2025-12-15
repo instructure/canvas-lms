@@ -22,9 +22,9 @@ import {TranslationControls} from '../TranslationControls'
 import {DiscussionManagerUtilityContext} from '../../../utils/constants'
 import userEvent from '@testing-library/user-event'
 
-const mockSetActiveLanguage = jest.fn()
+const mockSetActiveLanguage = vi.fn()
 
-jest.mock('../../../hooks/useTranslationStore', () => ({
+vi.mock('../../../hooks/useTranslationStore', () => ({
   useTranslationStore: selector => {
     const state = {
       activeLanguage: null,
@@ -34,9 +34,9 @@ jest.mock('../../../hooks/useTranslationStore', () => ({
   },
 }))
 
-const mockOnSetIsLanguageAlreadyActiveError = jest.fn()
-const mockOnSetIsLanguageNotSelectedError = jest.fn()
-const mockOnSetSelectedLanguage = jest.fn()
+const mockOnSetIsLanguageAlreadyActiveError = vi.fn()
+const mockOnSetIsLanguageNotSelectedError = vi.fn()
+const mockOnSetSelectedLanguage = vi.fn()
 
 const mockTranslationLanguages = {
   current: [
@@ -72,7 +72,7 @@ describe('TranslationControls Component', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the component correctly', () => {

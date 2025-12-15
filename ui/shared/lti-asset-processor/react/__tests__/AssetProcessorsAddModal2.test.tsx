@@ -37,7 +37,7 @@ import {useAssetProcessorsToolsList} from '../hooks/useAssetProcessorsToolsList'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 
-jest.mock('@canvas/external-tools/messages')
+vi.mock('@canvas/external-tools/messages')
 
 const server = setupServer(
   http.get('/api/v1/courses/:courseId/lti_apps/launch_definitions', ({request}) => {
@@ -50,20 +50,22 @@ const server = setupServer(
 )
 
 describe('AssetProcessorsAddModal', () => {
-  let mockOnProcessorResponse: jest.Mock
+  let mockOnProcessorResponse: any
   const queryClient = new QueryClient()
 
   beforeAll(() => server.listen())
   afterAll(() => server.close())
 
   beforeEach(() => {
-    mockOnProcessorResponse = jest.fn()
+    mockOnProcessorResponse = vi.fn()
   })
 
   afterEach(() => {
     server.resetHandlers()
     queryClient.clear()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+    // Reset Zustand store state to prevent test pollution
+    useAssetProcessorsAddModalState.getState().actions.close()
   })
 
   function renderModal(type: AssetProcessorType) {
@@ -145,13 +147,13 @@ describe('AssetProcessorsAddModal', () => {
     })
 
     it(`handles valid deep linking response for ${type}`, async () => {
-      const mockOnProcessorResponse = jest.fn()
+      const mockOnProcessorResponse = vi.fn()
 
       const validResponse = {...mockResponse}
       expect(validResponse.tool_id).toBe(tool_id)
 
-      const mockHECM = handleExternalContentMessages as jest.Mock
-      mockHECM.mockImplementation(({onDeepLinkingResponse}) => {
+      const mockHECM = handleExternalContentMessages as any
+      mockHECM.mockImplementation(({onDeepLinkingResponse}: {onDeepLinkingResponse: (response: any) => void}) => {
         setTimeout(() => onDeepLinkingResponse(validResponse), 0)
         return () => {}
       })
@@ -182,14 +184,14 @@ describe('AssetProcessorsAddModal', () => {
     })
 
     it(`handles invalid deep linking response for ${type}`, async () => {
-      const mockOnProcessorResponse = jest.fn()
+      const mockOnProcessorResponse = vi.fn()
       const matchingTool = toolsForType(type).find(
         tool => tool.definition_id === mockInvalidDeepLinkResponse.tool_id,
       )
       expect(matchingTool).not.toBeUndefined()
 
-      const mockHECM = handleExternalContentMessages as jest.Mock
-      mockHECM.mockImplementation(({onDeepLinkingResponse}) => {
+      const mockHECM = handleExternalContentMessages as any
+      mockHECM.mockImplementation(({onDeepLinkingResponse}: {onDeepLinkingResponse: (response: any) => void}) => {
         setTimeout(() => onDeepLinkingResponse(mockInvalidDeepLinkResponse), 0)
         return () => {}
       })
@@ -246,7 +248,7 @@ describe('AssetProcessorsAddModal', () => {
     )) as HTMLIFrameElement
     const source = iframe.contentWindow as Window
     // If we don't overwrite postMessage we get some strange internal error in jsdom's postMessage
-    jest.spyOn(source, 'postMessage').mockImplementation(() => {})
+    vi.spyOn(source, 'postMessage').mockImplementation(() => {})
 
     monitorLtiMessages()
 

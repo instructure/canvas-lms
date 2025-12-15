@@ -385,7 +385,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
         env: ENV.RAILS_ENVIRONMENT,
       }),
       valueMatchesExpected: (value: string) =>
-        value.toLowerCase() === ENV.RAILS_ENVIRONMENT.toLowerCase(),
+        value?.toLowerCase() === ENV.RAILS_ENVIRONMENT?.toLowerCase(),
     })
   }
 

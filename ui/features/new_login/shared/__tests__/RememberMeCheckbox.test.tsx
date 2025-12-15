@@ -16,10 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import React from 'react'
 import {RememberMeCheckbox} from '..'
 import {NewLoginProvider} from '../../context'
+
+afterEach(() => {
+  cleanup()
+})
 
 describe('RememberMeCheckbox', () => {
   it('mounts without crashing', () => {

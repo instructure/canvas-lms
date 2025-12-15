@@ -19,25 +19,25 @@
 import {render} from '@testing-library/react'
 import React from 'react'
 import {RolePillContainer} from '../RolePillContainer'
-import {responsiveQuerySizes} from '../../../utils'
+import * as utils from '../../../utils'
 
-jest.mock('../../../utils')
+vi.mock('../../../utils')
 const discussionRoles = ['Author', 'TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment']
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })
 
 beforeEach(() => {
-  responsiveQuerySizes.mockImplementation(() => ({
+  vi.mocked(utils.responsiveQuerySizes).mockImplementation(() => ({
     desktop: {maxWidth: '1000px'},
   }))
 })
@@ -104,7 +104,7 @@ describe('RolePillContainer', () => {
 
   describe('Mobile view is respected', () => {
     beforeEach(() => {
-      responsiveQuerySizes.mockImplementation(() => ({
+      vi.mocked(utils.responsiveQuerySizes).mockImplementation(() => ({
         tablet: {maxWidth: '767px'},
       }))
     })

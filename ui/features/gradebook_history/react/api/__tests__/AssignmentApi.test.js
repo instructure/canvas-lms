@@ -24,13 +24,13 @@ describe('AssignmentApi', () => {
   const courseId = 23
 
   beforeEach(() => {
-    getStub = jest.spyOn(axios, 'get').mockResolvedValue({
+    getStub = vi.spyOn(axios, 'get').mockResolvedValue({
       response: {},
     })
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('getAssignmentsByName makes a request with a search term', async () => {

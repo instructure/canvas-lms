@@ -36,17 +36,17 @@ describe('DueDateOverride', () => {
 
     // Mock jQuery errorBox with chaining
     const $mockElement = {
-      css: jest.fn().mockReturnThis(),
-      attr: jest.fn().mockReturnThis(),
+      css: vi.fn().mockReturnThis(),
+      attr: vi.fn().mockReturnThis(),
     }
-    $.fn.errorBox = jest.fn().mockReturnValue($mockElement)
+    $.fn.errorBox = vi.fn().mockReturnValue($mockElement)
     $.fn.errorBox.errorBoxes = []
-    $.moveErrorBoxes = jest.fn()
+    $.moveErrorBoxes = vi.fn()
   })
 
   afterEach(() => {
     fixtures.innerHTML = ''
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('#validateTokenInput', () => {
@@ -82,8 +82,8 @@ describe('DueDateOverride', () => {
     it('rowKey can be prefixed with a zero', () => {
       const data = {assignment_overrides: [{group_id: '42', rowKey: '01'}]}
 
-      jest.spyOn(StudentGroupStore, 'fetchComplete').mockReturnValue(true)
-      jest.spyOn(StudentGroupStore, 'groupsFilteredForSelectedSet').mockReturnValue([])
+      vi.spyOn(StudentGroupStore, 'fetchComplete').mockReturnValue(true)
+      vi.spyOn(StudentGroupStore, 'groupsFilteredForSelectedSet').mockReturnValue([])
       const view = new DueDateOverrideView()
       const errs = view.validateGroupOverrides(data, {})
       view.showError(errs.invalidGroupOverride.element, errs.invalidGroupOverride.message)
@@ -93,8 +93,8 @@ describe('DueDateOverride', () => {
     it('Does not date restrict individual student overrides', () => {
       const data = {assignment_overrides: [{student_ids: [20], rowKey: '16309'}]}
 
-      jest.spyOn(StudentGroupStore, 'fetchComplete').mockReturnValue(true)
-      jest.spyOn(StudentGroupStore, 'groupsFilteredForSelectedSet').mockReturnValue([])
+      vi.spyOn(StudentGroupStore, 'fetchComplete').mockReturnValue(true)
+      vi.spyOn(StudentGroupStore, 'groupsFilteredForSelectedSet').mockReturnValue([])
       const view = new DueDateOverrideView()
       const errs = view.validateGroupOverrides(data, {})
       expect(errs.invalidGroupOverride).toBeUndefined()
@@ -109,9 +109,9 @@ describe('DueDateOverride', () => {
       ]
       const data = {assignment_overrides: overrides}
 
-      const validateSpy = jest.spyOn(DateValidator.prototype, 'validateDatetimes')
+      const validateSpy = vi.spyOn(DateValidator.prototype, 'validateDatetimes')
       const view = new DueDateOverrideView()
-      jest.spyOn(view, 'postToSIS').mockReturnValue(false)
+      vi.spyOn(view, 'postToSIS').mockReturnValue(false)
 
       view.validateDatetimes(data, {})
 
@@ -146,7 +146,7 @@ describe('DueDateOverride', () => {
         const data = {assignment_overrides: overrides}
 
         const view = new DueDateOverrideView()
-        jest.spyOn(view, 'postToSIS').mockReturnValue(false)
+        vi.spyOn(view, 'postToSIS').mockReturnValue(false)
 
         const errors = view.validateDatetimes(data, {})
         expect(Object.keys(errors)).toHaveLength(0)
@@ -158,7 +158,7 @@ describe('DueDateOverride', () => {
         const data = {assignment_overrides: overrides}
 
         const view = new DueDateOverrideView()
-        jest.spyOn(view, 'postToSIS').mockReturnValue(false)
+        vi.spyOn(view, 'postToSIS').mockReturnValue(false)
 
         const errors = view.validateDatetimes(data, {})
         expect(errors.due_at.message).toBe('Due date cannot be after course end')

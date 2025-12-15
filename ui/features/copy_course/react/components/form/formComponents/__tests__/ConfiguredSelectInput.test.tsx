@@ -65,7 +65,7 @@ describe('ConfiguredSelectInput', () => {
   })
 
   it('calls the onSelect mock on selection', () => {
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     const {getByLabelText, getByText} = renderConfiguredSelectInput({onSelect})
     fireEvent.click(getByLabelText(label))
     fireEvent.click(getByText(options[1].name))
@@ -100,7 +100,7 @@ describe('ConfiguredSelectInput', () => {
   })
 
   it('selects an option when clicked and calls onSelect', () => {
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     const {getByLabelText, getByText, getByDisplayValue} = renderConfiguredSelectInput({
       searchable: true,
       defaultInputValue: '',
@@ -115,7 +115,7 @@ describe('ConfiguredSelectInput', () => {
   })
 
   it('automatically selects first option if no defaultInputValue is provided', () => {
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     const {getByDisplayValue} = renderConfiguredSelectInput({
       searchable: true,
       defaultInputValue: undefined,

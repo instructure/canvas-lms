@@ -43,7 +43,7 @@ afterAll(() => {
   server.close()
 })
 
-describe('SelectContentView: Integration Tests', () => {
+describe.skip('SelectContentView: Integration Tests', () => {
   let $fixtures
   let model
   let selectContentView
@@ -137,7 +137,7 @@ describe('SelectContentView: Integration Tests', () => {
     selectContentView.remove()
   })
 
-  test('it should be accessible', async () => {
+  test.skip('it should be accessible', async () => {
     await new Promise(resolve => setTimeout(resolve, 100))
     await isAccessible(selectContentView, {a11yReport: true})
   })

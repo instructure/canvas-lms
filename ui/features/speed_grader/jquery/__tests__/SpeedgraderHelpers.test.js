@@ -397,8 +397,8 @@ describe('SpeedgraderHelpers#plagiarismResubmitHandler', () => {
     resubmitButton.id = 'resubmit-button'
     resubmitButton.textContent = 'Click Here'
     document.body.appendChild(resubmitButton)
-    mockReloadPage = jest.spyOn(SpeedgraderHelpers, 'reloadPage').mockImplementation(() => {})
-    mockAjaxJSON = jest.fn()
+    mockReloadPage = vi.spyOn(SpeedgraderHelpers, 'reloadPage').mockImplementation(() => {})
+    mockAjaxJSON = vi.fn()
     $.ajaxJSON = mockAjaxJSON
   })
 
@@ -409,7 +409,7 @@ describe('SpeedgraderHelpers#plagiarismResubmitHandler', () => {
   })
 
   test("prevents the button's default action and starts resubmission", () => {
-    const preventDefault = jest.fn()
+    const preventDefault = vi.fn()
     const event = {
       preventDefault,
       target: resubmitButton,
@@ -428,7 +428,7 @@ describe('SpeedgraderHelpers#plagiarismResubmitHandler', () => {
 
   test('reloads the page after successful resubmission', () => {
     const event = {
-      preventDefault: jest.fn(),
+      preventDefault: vi.fn(),
       target: resubmitButton,
     }
     SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com')

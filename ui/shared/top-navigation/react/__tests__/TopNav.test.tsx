@@ -23,10 +23,9 @@ import {TopNavBar} from '@instructure/ui-top-nav-bar'
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 const queryClient = new QueryClient()
 
-jest.mock('../hooks/useToggleCourseNav', () => ({
-  __esModule: true,
+vi.mock('../hooks/useToggleCourseNav', () => ({
   default: () => ({
-    toggle: jest.fn(),
+    toggle: vi.fn(),
   }),
 }))
 describe('TopNav', () => {
@@ -63,7 +62,7 @@ describe('TopNav', () => {
   })
 
   describe('getBreadCrumbSetter', () => {
-    const callback = jest.fn()
+    const callback = vi.fn()
 
     it('returns an object with getter and setter functions', () => {
       render(

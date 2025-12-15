@@ -47,11 +47,11 @@ describe('ErrorBoundary', () => {
   })
 
   describe('Error Handling', () => {
-    let consoleErrorSpy: jest.SpyInstance
+    let consoleErrorSpy: any
     const stopJsdomError = (e: ErrorEvent) => e.preventDefault()
 
     beforeEach(() => {
-      consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       window.addEventListener('error', stopJsdomError, {capture: true})
     })
 
@@ -72,11 +72,11 @@ describe('ErrorBoundary', () => {
   })
 
   describe('State Management', () => {
-    let consoleErrorSpy: jest.SpyInstance
+    let consoleErrorSpy: any
     const stopJsdomError = (e: ErrorEvent) => e.preventDefault()
 
     beforeEach(() => {
-      consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       window.addEventListener('error', stopJsdomError, {capture: true})
     })
 

@@ -17,33 +17,38 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {type MockedFunction} from 'vitest'
 import AddWidgetModal from '../AddWidgetModal'
 import {useWidgetLayout} from '../../../hooks/useWidgetLayout'
 
-jest.mock('../../../hooks/useWidgetLayout')
+vi.mock('../../../hooks/useWidgetLayout')
 
-const mockUseWidgetLayout = useWidgetLayout as jest.MockedFunction<typeof useWidgetLayout>
+const mockUseWidgetLayout = useWidgetLayout as MockedFunction<typeof useWidgetLayout>
 
 describe('AddWidgetModal', () => {
-  const mockAddWidget = jest.fn()
+  const mockAddWidget = vi.fn()
   const defaultProps = {
     open: true,
-    onClose: jest.fn(),
+    onClose: vi.fn(),
     targetColumn: 1,
     targetRow: 2,
   }
 
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockUseWidgetLayout.mockReturnValue({
       config: {widgets: []},
       addWidget: mockAddWidget,
-      moveWidget: jest.fn(),
-      moveWidgetToPosition: jest.fn(),
-      removeWidget: jest.fn(),
-      resetConfig: jest.fn(),
+      moveWidget: vi.fn(),
+      moveWidgetToPosition: vi.fn(),
+      removeWidget: vi.fn(),
+      resetConfig: vi.fn(),
     } as any)
   })
 
@@ -158,10 +163,10 @@ describe('AddWidgetModal', () => {
         ],
       },
       addWidget: mockAddWidget,
-      moveWidget: jest.fn(),
-      moveWidgetToPosition: jest.fn(),
-      removeWidget: jest.fn(),
-      resetConfig: jest.fn(),
+      moveWidget: vi.fn(),
+      moveWidgetToPosition: vi.fn(),
+      removeWidget: vi.fn(),
+      resetConfig: vi.fn(),
     } as any)
 
     render(<AddWidgetModal {...defaultProps} />)
@@ -183,10 +188,10 @@ describe('AddWidgetModal', () => {
         ],
       },
       addWidget: mockAddWidget,
-      moveWidget: jest.fn(),
-      moveWidgetToPosition: jest.fn(),
-      removeWidget: jest.fn(),
-      resetConfig: jest.fn(),
+      moveWidget: vi.fn(),
+      moveWidgetToPosition: vi.fn(),
+      removeWidget: vi.fn(),
+      resetConfig: vi.fn(),
     } as any)
 
     render(<AddWidgetModal {...defaultProps} />)
@@ -210,10 +215,10 @@ describe('AddWidgetModal', () => {
         ],
       },
       addWidget: mockAddWidget,
-      moveWidget: jest.fn(),
-      moveWidgetToPosition: jest.fn(),
-      removeWidget: jest.fn(),
-      resetConfig: jest.fn(),
+      moveWidget: vi.fn(),
+      moveWidgetToPosition: vi.fn(),
+      removeWidget: vi.fn(),
+      resetConfig: vi.fn(),
     } as any)
 
     const user = userEvent.setup()

@@ -28,7 +28,7 @@ describe('Gradebook#setSortRowsBySetting', () => {
     gradebook = createGradebook(options)
 
     // Mock the saveSettings method to prevent actual HTTP requests
-    gradebook.saveSettings = jest.fn().mockResolvedValue({})
+    gradebook.saveSettings = vi.fn().mockResolvedValue({})
   })
 
   it('sets the "sort rows by" setting', () => {
@@ -40,7 +40,7 @@ describe('Gradebook#setSortRowsBySetting', () => {
   })
 
   it('sorts the grid rows after updating the setting', () => {
-    gradebook.sortGridRows = jest.fn()
+    gradebook.sortGridRows = vi.fn()
 
     gradebook.setSortRowsBySetting('assignment_201', 'grade', 'descending')
 

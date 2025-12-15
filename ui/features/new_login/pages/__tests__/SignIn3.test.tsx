@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import '@testing-library/jest-dom'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -26,40 +25,43 @@ import {NewLoginDataProvider, NewLoginProvider, useNewLogin, useNewLoginData} fr
 import {initiateOtpRequest, performSignIn} from '../../services'
 import SignIn from '../SignIn'
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: jest.fn(),
+vi.mock('react-router-dom', async () => ({
+  ...(await vi.importActual('react-router-dom')),
+  useNavigate: vi.fn(),
 }))
 
-jest.mock('../../context', () => {
-  const actualContext = jest.requireActual('../../context')
+vi.mock('../../context', async () => {
+  const actualContext = await vi.importActual<typeof import('../../context')>('../../context')
   return {
     ...actualContext,
-    useNewLoginData: jest.fn(() => ({
-      ...actualContext.useNewLoginData(),
+    useNewLoginData: vi.fn(() => ({
+      isDataLoading: false,
     })),
-    useNewLogin: jest.fn(() => ({
+    useNewLogin: vi.fn(() => ({
       isUiActionPending: false,
-      setIsUiActionPending: jest.fn(),
+      setIsUiActionPending: vi.fn(),
       otpRequired: false,
-      setOtpRequired: jest.fn(),
+      setOtpRequired: vi.fn(),
       rememberMe: false,
-      setRememberMe: jest.fn(),
-      loginFailed: false,
-      setLoginFailed: jest.fn(),
+      setRememberMe: vi.fn(),
+      showForgotPassword: false,
+      setShowForgotPassword: vi.fn(),
+      otpCommunicationChannelId: null,
+      setOtpCommunicationChannelId: vi.fn(),
     })),
   }
 })
 
-jest.mock('../../services/auth', () => ({
-  performSignIn: jest.fn(),
-  initiateOtpRequest: jest.fn(),
+vi.mock('../../services', async () => ({
+  ...(await vi.importActual('../../services')),
+  performSignIn: vi.fn(),
+  initiateOtpRequest: vi.fn(),
 }))
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  ...jest.requireActual('@canvas/util/globalUtils'),
-  assignLocation: jest.fn(),
-  windowPathname: jest.fn().mockReturnValue('/login/canvas'),
+vi.mock('@canvas/util/globalUtils', async () => ({
+  ...(await vi.importActual('@canvas/util/globalUtils')),
+  assignLocation: vi.fn(),
+  windowPathname: vi.fn().mockReturnValue('/login/canvas'),
 }))
 
 describe('SignIn', () => {
@@ -75,16 +77,16 @@ describe('SignIn', () => {
     )
   }
 
-  const mockNavigate = jest.fn()
+  const mockNavigate = vi.fn()
   beforeAll(() => {
-    ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
+    vi.mocked(useNavigate).mockReturnValue(mockNavigate)
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
     // reset the mock implementation to return the default values
-    ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
+    vi.mocked(useNewLoginData).mockImplementation(() => ({
+      isDataLoading: false,
       loginHandleName: 'Email',
     }))
   })
@@ -95,15 +97,17 @@ describe('SignIn', () => {
 
   describe('form validation', () => {
     it('shows validation error when the username contains only whitespace', async () => {
-      ;(useNewLogin as jest.Mock).mockReturnValue({
+      vi.mocked(useNewLogin).mockReturnValue({
         isUiActionPending: false,
-        setIsUiActionPending: jest.fn(),
+        setIsUiActionPending: vi.fn(),
         otpRequired: false,
-        setOtpRequired: jest.fn(),
+        setOtpRequired: vi.fn(),
         rememberMe: false,
-        setRememberMe: jest.fn(),
-        loginFailed: false,
-        setLoginFailed: jest.fn(),
+        setRememberMe: vi.fn(),
+        showForgotPassword: false,
+        setShowForgotPassword: vi.fn(),
+        otpCommunicationChannelId: null,
+        setOtpCommunicationChannelId: vi.fn(),
       })
       setup()
       const usernameInput = screen.getByTestId('username-input')
@@ -123,15 +127,17 @@ describe('SignIn', () => {
     })
 
     it('shows validation error when the password contains only whitespace after fixing the username', async () => {
-      ;(useNewLogin as jest.Mock).mockReturnValue({
+      vi.mocked(useNewLogin).mockReturnValue({
         isUiActionPending: false,
-        setIsUiActionPending: jest.fn(),
+        setIsUiActionPending: vi.fn(),
         otpRequired: false,
-        setOtpRequired: jest.fn(),
+        setOtpRequired: vi.fn(),
         rememberMe: false,
-        setRememberMe: jest.fn(),
-        loginFailed: false,
-        setLoginFailed: jest.fn(),
+        setRememberMe: vi.fn(),
+        showForgotPassword: false,
+        setShowForgotPassword: vi.fn(),
+        otpCommunicationChannelId: null,
+        setOtpCommunicationChannelId: vi.fn(),
       })
       setup()
       const usernameInput = screen.getByTestId('username-input')
@@ -152,15 +158,17 @@ describe('SignIn', () => {
     })
 
     it('toggles the aria-invalid attribute correctly for both fields during sequential validation', async () => {
-      ;(useNewLogin as jest.Mock).mockReturnValue({
+      vi.mocked(useNewLogin).mockReturnValue({
         isUiActionPending: false,
-        setIsUiActionPending: jest.fn(),
+        setIsUiActionPending: vi.fn(),
         otpRequired: false,
-        setOtpRequired: jest.fn(),
+        setOtpRequired: vi.fn(),
         rememberMe: false,
-        setRememberMe: jest.fn(),
-        loginFailed: false,
-        setLoginFailed: jest.fn(),
+        setRememberMe: vi.fn(),
+        showForgotPassword: false,
+        setShowForgotPassword: vi.fn(),
+        otpCommunicationChannelId: null,
+        setOtpCommunicationChannelId: vi.fn(),
       })
       setup()
       const usernameInput = screen.getByTestId('username-input')
@@ -179,15 +187,17 @@ describe('SignIn', () => {
     })
 
     it('marks both username and password fields as valid after sequential validation with correct input', async () => {
-      ;(useNewLogin as jest.Mock).mockReturnValue({
+      vi.mocked(useNewLogin).mockReturnValue({
         isUiActionPending: false,
-        setIsUiActionPending: jest.fn(),
+        setIsUiActionPending: vi.fn(),
         otpRequired: false,
-        setOtpRequired: jest.fn(),
+        setOtpRequired: vi.fn(),
         rememberMe: false,
-        setRememberMe: jest.fn(),
-        loginFailed: false,
-        setLoginFailed: jest.fn(),
+        setRememberMe: vi.fn(),
+        showForgotPassword: false,
+        setShowForgotPassword: vi.fn(),
+        otpCommunicationChannelId: null,
+        setOtpCommunicationChannelId: vi.fn(),
       })
       setup()
       const usernameInput = screen.getByTestId('username-input')
@@ -204,15 +214,17 @@ describe('SignIn', () => {
     })
 
     it('does not submit if required fields are empty', async () => {
-      ;(useNewLogin as jest.Mock).mockReturnValue({
+      vi.mocked(useNewLogin).mockReturnValue({
         isUiActionPending: false,
-        setIsUiActionPending: jest.fn(),
+        setIsUiActionPending: vi.fn(),
         otpRequired: false,
-        setOtpRequired: jest.fn(),
+        setOtpRequired: vi.fn(),
         rememberMe: false,
-        setRememberMe: jest.fn(),
-        loginFailed: false,
-        setLoginFailed: jest.fn(),
+        setRememberMe: vi.fn(),
+        showForgotPassword: false,
+        setShowForgotPassword: vi.fn(),
+        otpCommunicationChannelId: null,
+        setOtpCommunicationChannelId: vi.fn(),
       })
       setup()
       const loginButton = screen.getByTestId('login-button')
@@ -226,15 +238,17 @@ describe('SignIn', () => {
     })
 
     it('shows validation messages when fields are left blank', async () => {
-      ;(useNewLogin as jest.Mock).mockReturnValue({
+      vi.mocked(useNewLogin).mockReturnValue({
         isUiActionPending: false,
-        setIsUiActionPending: jest.fn(),
+        setIsUiActionPending: vi.fn(),
         otpRequired: false,
-        setOtpRequired: jest.fn(),
+        setOtpRequired: vi.fn(),
         rememberMe: false,
-        setRememberMe: jest.fn(),
-        loginFailed: false,
-        setLoginFailed: jest.fn(),
+        setRememberMe: vi.fn(),
+        showForgotPassword: false,
+        setShowForgotPassword: vi.fn(),
+        otpCommunicationChannelId: null,
+        setOtpCommunicationChannelId: vi.fn(),
       })
       setup()
       const loginButton = screen.getByTestId('login-button')
@@ -249,15 +263,17 @@ describe('SignIn', () => {
     })
 
     it('validates all fields at once on form submission', async () => {
-      ;(useNewLogin as jest.Mock).mockReturnValue({
+      vi.mocked(useNewLogin).mockReturnValue({
         isUiActionPending: false,
-        setIsUiActionPending: jest.fn(),
+        setIsUiActionPending: vi.fn(),
         otpRequired: false,
-        setOtpRequired: jest.fn(),
+        setOtpRequired: vi.fn(),
         rememberMe: false,
-        setRememberMe: jest.fn(),
-        loginFailed: false,
-        setLoginFailed: jest.fn(),
+        setRememberMe: vi.fn(),
+        showForgotPassword: false,
+        setShowForgotPassword: vi.fn(),
+        otpCommunicationChannelId: null,
+        setOtpCommunicationChannelId: vi.fn(),
       })
       setup()
       const loginButton = screen.getByTestId('login-button')
@@ -278,27 +294,24 @@ describe('SignIn', () => {
       })
     })
 
-    // fickle
-    describe.skip('otp flow', () => {
-      it('redirects to the OtpForm component and removes the username and password inputs when OTP is required', async () => {
-        const setOtpRequired = jest.fn()
-        ;(useNewLogin as jest.Mock).mockReturnValue({
+    describe('otp flow', () => {
+      it('calls setOtpRequired(true) when OTP is required from the API response', async () => {
+        const setOtpRequiredMock = vi.fn()
+        vi.mocked(useNewLogin).mockReturnValue({
           isUiActionPending: false,
-          setIsUiActionPending: jest.fn(),
+          setIsUiActionPending: vi.fn(),
           otpRequired: false,
-          setOtpRequired,
+          setOtpRequired: setOtpRequiredMock,
           rememberMe: false,
-          setRememberMe: jest.fn(),
-          loginFailed: false,
-          setLoginFailed: jest.fn(),
+          setRememberMe: vi.fn(),
+          showForgotPassword: false,
+          setShowForgotPassword: vi.fn(),
+          otpCommunicationChannelId: null,
+          setOtpCommunicationChannelId: vi.fn(),
         })
-        ;(performSignIn as jest.Mock).mockResolvedValue({
+        vi.mocked(performSignIn).mockResolvedValue({
           status: 200,
           data: {otp_required: true},
-        })
-        ;(initiateOtpRequest as jest.Mock).mockResolvedValue({
-          status: 200,
-          data: {otp_sent: true, otp_communication_channel_id: '12345'},
         })
         setup()
         const usernameInput = screen.getByTestId('username-input')
@@ -308,18 +321,33 @@ describe('SignIn', () => {
         await userEvent.type(passwordInput, 'password123')
         await userEvent.click(loginButton)
         await waitFor(() => {
-          expect(performSignIn).toHaveBeenCalledWith('user@example.com', 'password123', false)
+          expect(performSignIn).toHaveBeenCalledWith('user@example.com', 'password123', false, '/login/canvas')
         })
-        ;(useNewLogin as jest.Mock).mockReturnValue({
+        // Verify setOtpRequired was called with true when API returns otp_required: true
+        await waitFor(() => {
+          expect(setOtpRequiredMock).toHaveBeenCalledWith(true)
+        })
+      })
+
+      it('renders OtpForm when otpRequired is true', async () => {
+        vi.mocked(useNewLogin).mockReturnValue({
           isUiActionPending: false,
-          setIsUiActionPending: jest.fn(),
+          setIsUiActionPending: vi.fn(),
           otpRequired: true,
-          setOtpRequired,
+          setOtpRequired: vi.fn(),
           rememberMe: false,
-          setRememberMe: jest.fn(),
-          loginFailed: false,
-          setLoginFailed: jest.fn(),
+          setRememberMe: vi.fn(),
+          showForgotPassword: false,
+          setShowForgotPassword: vi.fn(),
+          otpCommunicationChannelId: null,
+          setOtpCommunicationChannelId: vi.fn(),
         })
+        vi.mocked(initiateOtpRequest).mockResolvedValue({
+          status: 200,
+          data: {otp_sent: true, otp_communication_channel_id: '12345'},
+        })
+        setup()
+        // OtpForm shows loading initially, then the form after initiateOtpRequest completes
         await waitFor(() => {
           expect(screen.getByText(/Multi-Factor Authentication/i)).toBeInTheDocument()
         })

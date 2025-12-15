@@ -21,16 +21,16 @@ import {render, cleanup} from '@testing-library/react'
 import SearchGradingPeriodsField from '../SearchGradingPeriodsField'
 import userEvent from '@testing-library/user-event'
 
-jest.mock('es-toolkit/compat', () => ({
-  ...jest.requireActual('es-toolkit/compat'),
-  debounce: jest.fn(fn => fn),
+vi.mock('es-toolkit/compat', async () => ({
+  ...await vi.importActual('es-toolkit/compat'),
+  debounce: vi.fn(fn => fn),
 }))
 
 describe('SearchGradingPeriodsField', () => {
   let changeSearchText
 
   beforeEach(() => {
-    changeSearchText = jest.fn()
+    changeSearchText = vi.fn()
   })
 
   afterEach(cleanup)

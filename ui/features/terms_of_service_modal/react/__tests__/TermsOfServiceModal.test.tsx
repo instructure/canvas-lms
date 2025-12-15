@@ -25,9 +25,9 @@ import TermsOfServiceModal from '../TermsOfServiceModal'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {openWindow} from '@canvas/util/globalUtils'
 
-jest.mock('@canvas/util/globalUtils', () => {
-  const actual = jest.requireActual('@canvas/util/globalUtils')
-  return {...actual, openWindow: jest.fn()}
+vi.mock('@canvas/util/globalUtils', async () => {
+  const actual = await vi.importActual('@canvas/util/globalUtils')
+  return {...actual, openWindow: vi.fn()}
 })
 
 const server = setupServer()
@@ -44,7 +44,7 @@ describe('TermsOfServiceModal', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fakeENV.setup({
       TERMS_OF_SERVICE_CUSTOM_CONTENT: 'Hello World',
     })
@@ -74,7 +74,7 @@ describe('TermsOfServiceModal', () => {
         HttpResponse.json({redirectUrl: 'https://example.com/aup'}),
       ),
     )
-    const mockOpenWindow = openWindow as unknown as jest.Mock
+    const mockOpenWindow = openWindow as unknown as any
     renderTermsOfServiceModal()
     screen.getByTestId('tos-link').click()
     // assert window open and no modal
@@ -94,7 +94,7 @@ describe('TermsOfServiceModal', () => {
         HttpResponse.json({content: '<p>Inline AUP</p>'}),
       ),
     )
-    const mockOpenWindow = openWindow as unknown as jest.Mock
+    const mockOpenWindow = openWindow as unknown as any
     renderTermsOfServiceModal()
     screen.getByTestId('tos-link').click()
     // modal should appear
@@ -111,7 +111,7 @@ describe('TermsOfServiceModal', () => {
         return HttpResponse.json({redirectUrl: 'https://ex.com/aup'})
       }),
     )
-    const mockOpenWindow = openWindow as unknown as jest.Mock
+    const mockOpenWindow = openWindow as unknown as any
     renderTermsOfServiceModal()
     const link = screen.getByTestId('tos-link')
     // first click fetches + opens
@@ -148,11 +148,11 @@ describe('TermsOfServiceModal', () => {
   })
 
   it('silently fails and does not open modal when api returns invalid response', async () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     server.use(
       http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json({invalid: 'data'})),
     )
-    const mockOpenWindow = openWindow as unknown as jest.Mock
+    const mockOpenWindow = openWindow as unknown as any
     renderTermsOfServiceModal()
     screen.getByTestId('tos-link').click()
     // wait a bit to ensure nothing happens
@@ -170,9 +170,9 @@ describe('TermsOfServiceModal', () => {
   })
 
   it('silently fails and does not open modal when api returns undefined', async () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     server.use(http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json(null)))
-    const mockOpenWindow = openWindow as unknown as jest.Mock
+    const mockOpenWindow = openWindow as unknown as any
     renderTermsOfServiceModal()
     screen.getByTestId('tos-link').click()
     // wait a bit to ensure nothing happens

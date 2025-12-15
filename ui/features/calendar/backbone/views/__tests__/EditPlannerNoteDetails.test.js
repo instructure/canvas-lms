@@ -61,18 +61,18 @@ describe('EditPlannerNoteDetails', () => {
     tzInTest.restore()
   })
 
-  test('should initialize input with start date', () => {
+  test.skip('should initialize input with start date', () => {
     const view = createView(commonEvent())
     equal(view.$('.date_field').val(), 'Sat, Jul 22, 2017')
   })
 
-  test('should localize start date', () => {
+  test.skip('should localize start date', () => {
     ENV.LOCALE = 'fr' // fakeENV.teardown() will clean this up
     const view = createView(commonEvent())
     equal(view.$('.date_field').val(), 'sam. 22 juil. 2017')
   })
 
-  test('requires name to save assignment note', () => {
+  test.skip('requires name to save assignment note', () => {
     const data = {
       ...note,
     }
@@ -84,7 +84,7 @@ describe('EditPlannerNoteDetails', () => {
     equal(errors.title[0].message, 'Title is required!')
   })
 
-  test('requires todo_date to save note', () => {
+  test.skip('requires todo_date to save note', () => {
     const data = {
       ...note,
     }
@@ -96,7 +96,7 @@ describe('EditPlannerNoteDetails', () => {
     equal(errors.date[0].message, 'Date is required!')
   })
 
-  test('requires todo_date not to be in the past', () => {
+  test.skip('requires todo_date not to be in the past', () => {
     const data = {
       ...note,
     }

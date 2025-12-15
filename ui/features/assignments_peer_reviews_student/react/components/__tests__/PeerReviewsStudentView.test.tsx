@@ -23,25 +23,25 @@ import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import PeerReviewsStudentView from '../PeerReviewsStudentView'
 
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(),
+import {executeQuery} from '@canvas/graphql'
+import {useAllocatePeerReviews} from '../../hooks/useAllocatePeerReviews'
+
+vi.mock('@canvas/graphql', () => ({
+  executeQuery: vi.fn(),
 }))
 
-jest.mock('@canvas/util/jquery/apiUserContent', () => ({
-  convert: (html: string) => html,
+vi.mock('@canvas/util/jquery/apiUserContent', () => ({
+  default: {
+    convert: (html: string) => html,
+  },
 }))
 
-jest.mock('../../hooks/useAllocatePeerReviews', () => ({
-  useAllocatePeerReviews: jest.fn(),
+vi.mock('../../hooks/useAllocatePeerReviews', () => ({
+  useAllocatePeerReviews: vi.fn(),
 }))
 
-const {executeQuery} = require('@canvas/graphql')
-const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
-
-const {useAllocatePeerReviews} = require('../../hooks/useAllocatePeerReviews')
-const mockUseAllocatePeerReviews = useAllocatePeerReviews as jest.MockedFunction<
-  typeof useAllocatePeerReviews
->
+const mockExecuteQuery = vi.mocked(executeQuery)
+const mockUseAllocatePeerReviews = vi.mocked(useAllocatePeerReviews)
 
 type PeerReviewsStudentViewProps = React.ComponentProps<typeof PeerReviewsStudentView>
 
@@ -62,14 +62,14 @@ function setup(props: Partial<PeerReviewsStudentViewProps> = {}) {
 }
 
 describe('PeerReviewsStudentView', () => {
-  const mockMutate = jest.fn()
+  const mockMutate = vi.fn()
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     queryClient.clear()
     mockUseAllocatePeerReviews.mockReturnValue({
       mutate: mockMutate,
-    })
+    } as any)
   })
 
   it('renders loading state initially', () => {

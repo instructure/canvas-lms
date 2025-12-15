@@ -23,8 +23,8 @@ describe('IgniteAgentLocalStorage', () => {
 
   beforeEach(() => {
     localStorage.clear()
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
 
   afterEach(() => {
@@ -67,7 +67,7 @@ describe('IgniteAgentLocalStorage', () => {
     })
 
     it('returns undefined and logs error when localStorage contains invalid JSON', () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       localStorage.setItem(LOCAL_STORAGE_KEY, 'invalid-json{')
 
       const result = readFromLocal('buttonRelativeVerticalPosition')
@@ -181,7 +181,7 @@ describe('IgniteAgentLocalStorage', () => {
     })
 
     it('uses default state when existing data is invalid JSON', () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       localStorage.setItem(LOCAL_STORAGE_KEY, 'invalid-json{')
 
       writeToLocal('buttonRelativeVerticalPosition', 50)
@@ -198,7 +198,7 @@ describe('IgniteAgentLocalStorage', () => {
 
     it('handles error when localStorage.setItem fails', () => {
       // Suppress console.error for this test since we're intentionally causing an error
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       const mockError = new Error('Storage quota exceeded')
 
       // Get the descriptor to properly mock the property
@@ -207,7 +207,7 @@ describe('IgniteAgentLocalStorage', () => {
         configurable: true,
         enumerable: true,
         writable: true,
-        value: jest.fn(() => {
+        value: vi.fn(() => {
           throw mockError
         }),
       })

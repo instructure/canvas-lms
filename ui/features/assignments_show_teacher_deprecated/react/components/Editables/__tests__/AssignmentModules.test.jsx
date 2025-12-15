@@ -53,6 +53,8 @@ describe('AssignmentModulesUI', () => {
     expect(getByText('Module 1 | Module 2')).toBeInTheDocument()
   })
 
+  // Skipped: Uses deprecated InstUI Select API that no longer renders properly
+  // See CAUTION comment in SelectableText.jsx
   it.skip('renders the given assignment modules in edit mode', () => {
     const moduleList = makeModuleList()
 
@@ -101,9 +103,11 @@ describe('AssignmentModulesUI', () => {
     expect(container.querySelectorAll('button')).toHaveLength(0)
   })
 
+  // Skipped: Uses deprecated InstUI Select API that no longer renders properly
+  // See CAUTION comment in SelectableText.jsx
   it.skip('calls onChange when the selection changes', () => {
-    const onchange = jest.fn()
-    const onchangemode = jest.fn()
+    const onchange = vi.fn()
+    const onchangemode = vi.fn()
     const moduleList = makeModuleList()
 
     const {container} = render(

@@ -36,7 +36,7 @@ describe('MigrationConverterView', () => {
   let migrationConverterView
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     migrationConverterView = new MigrationConverterView({
       selectOptions: [
         {
@@ -51,7 +51,7 @@ describe('MigrationConverterView', () => {
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
     migrationConverterView.remove()
     document.body.innerHTML = ''
   })
@@ -62,11 +62,11 @@ describe('MigrationConverterView', () => {
       expect(migrationConverterView.$el.find('#converter #rendered').length).toBeGreaterThan(0)
     })
     migrationConverterView.renderConverter(subView)
-    jest.advanceTimersByTime(15)
+    vi.advanceTimersByTime(15)
   })
 
   it('triggers reset event when no subView is passed in to render', () => {
-    const resetCallback = jest.fn()
+    const resetCallback = vi.fn()
     migrationConverterView.on('converterReset', resetCallback)
     migrationConverterView.renderConverter()
     expect(resetCallback).toHaveBeenCalled()
@@ -80,6 +80,6 @@ describe('MigrationConverterView', () => {
       )
     })
     migrationConverterView.renderConverter(subView)
-    jest.advanceTimersByTime(15)
+    vi.advanceTimersByTime(15)
   })
 })

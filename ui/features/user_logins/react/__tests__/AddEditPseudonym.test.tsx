@@ -16,12 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, screen} from '@testing-library/react'
+import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 import AddEditPseudonym, {type AddEditPseudonymProps} from '../AddEditPseudonym'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 
 describe('AddEditPseudonym', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const policy = {
     maximum_login_attempts: '8',
     minimum_character_length: '8',
@@ -55,8 +59,8 @@ describe('AddEditPseudonym', () => {
     isEdit: false,
     userId: '123',
     pseudonym,
-    onClose: jest.fn(),
-    onSubmit: jest.fn(),
+    onClose: vi.fn(),
+    onSubmit: vi.fn(),
   }
   const CREATE_LOGIN_URL = `/users/${props.userId}/pseudonyms`
   const UPDATE_LOGIN_URL = `/users/${props.userId}/pseudonyms/${pseudonym.id}`

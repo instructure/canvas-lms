@@ -130,7 +130,7 @@ export default class TextEntry extends React.Component {
     this._isMounted = false
     clearTimeout(this._saveDraftTimer)
     window.removeEventListener('message', this.handleMessage)
-    this.props.submitButtonRef.current?.removeEventListener('click', this.handleSubmitClick)
+    this.props.submitButtonRef?.current?.removeEventListener('click', this.handleSubmitClick)
   }
 
   handleSubmitClick = () => {

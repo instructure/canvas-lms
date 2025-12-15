@@ -25,7 +25,7 @@ import AddApp from '../AddApp'
 describe('ExternalApps.AddApp', () => {
   let container
   let app
-  const handleToolInstalled = jest.fn()
+  const handleToolInstalled = vi.fn()
 
   beforeEach(() => {
     container = document.createElement('div')

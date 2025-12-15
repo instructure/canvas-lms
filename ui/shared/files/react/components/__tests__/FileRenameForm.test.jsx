@@ -102,7 +102,7 @@ describe('FileRenameForm', () => {
   })
 
   it('calls onNameConflictResolved when committing changes', () => {
-    const onNameConflictResolved = jest.fn()
+    const onNameConflictResolved = vi.fn()
     const props = {
       fileOptions: {file: {name: 'file_name.md'}},
       onNameConflictResolved,
@@ -118,7 +118,7 @@ describe('FileRenameForm', () => {
   })
 
   it('preserves expandZip option when skipping', () => {
-    const onNameConflictResolved = jest.fn()
+    const onNameConflictResolved = vi.fn()
     const props = {
       fileOptions: {
         file: {name: 'file_name.zip'},
@@ -140,7 +140,7 @@ describe('FileRenameForm', () => {
   })
 
   it('preserves expandZip option when renaming', () => {
-    const onNameConflictResolved = jest.fn()
+    const onNameConflictResolved = vi.fn()
     const props = {
       fileOptions: {
         file: {name: 'file_name.zip'},
@@ -162,7 +162,7 @@ describe('FileRenameForm', () => {
   })
 
   it('preserves expandZip option when replacing', () => {
-    const onNameConflictResolved = jest.fn()
+    const onNameConflictResolved = vi.fn()
     const props = {
       fileOptions: {
         file: {name: 'file_name.zip'},

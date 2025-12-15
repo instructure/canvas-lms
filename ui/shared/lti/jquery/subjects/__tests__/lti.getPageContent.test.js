@@ -24,9 +24,9 @@ describe('lti.getPageContent handler', () => {
 
   beforeEach(() => {
     responseMessages = {
-      sendBadRequestError: jest.fn(),
-      sendResponse: jest.fn(),
-      sendError: jest.fn(),
+      sendBadRequestError: vi.fn(),
+      sendResponse: vi.fn(),
+      sendError: vi.fn(),
     }
     originalDocument = window.document
     // Create a clean document for each test

@@ -25,7 +25,7 @@ import SearchBar from '../SearchBar'
 type SearchBarProps = React.ComponentProps<typeof SearchBar>
 const defaultProps: SearchBarProps = {
   initialValue: '',
-  onSearch: jest.fn(),
+  onSearch: vi.fn(),
 }
 
 const renderComponent = (props?: Partial<SearchBarProps>) => {
@@ -46,11 +46,11 @@ const getInput = () => screen.getByPlaceholderText('Search files...')
 
 describe('SearchBar', () => {
   const expectedSearchTerm = 'searchTerm'
-  const onSearch = jest.fn<void, [string]>()
+  const onSearch = vi.fn<(searchTerm: string) => void>()
   let user: UserEvent
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     user = userEvent.setup()
   })
 

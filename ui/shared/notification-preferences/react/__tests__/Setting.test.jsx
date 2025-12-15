@@ -24,14 +24,14 @@ function defaultProps(overrides) {
   return {
     preferenceOptions: ['immediately', 'daily', 'weekly', 'never'],
     selectedPreference: 'immediately',
-    updatePreference: jest.fn(),
+    updatePreference: vi.fn(),
     ...overrides,
   }
 }
 
 describe('Notification Preferences Setting', () => {
   it('calls the updatePreference callback on change', () => {
-    const updatePreference = jest.fn()
+    const updatePreference = vi.fn()
     const props = defaultProps({updatePreference})
 
     const {getByRole, getByText} = render(<NotificationPreferencesSetting {...props} />)

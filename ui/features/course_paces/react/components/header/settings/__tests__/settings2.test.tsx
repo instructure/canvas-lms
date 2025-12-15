@@ -25,9 +25,9 @@ import {renderConnected} from '../../../../__tests__/utils'
 
 import {Settings, type ComponentProps} from '../settings'
 
-const toggleExcludeWeekends = jest.fn()
-const toggleSelectedDaysToSkip = jest.fn()
-const updateBlackoutDates = jest.fn()
+const toggleExcludeWeekends = vi.fn()
+const toggleSelectedDaysToSkip = vi.fn()
+const updateBlackoutDates = vi.fn()
 
 const defaultProps: ComponentProps = {
   blackoutDates: BLACKOUT_DATES,
@@ -53,7 +53,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   fakeENV.teardown()
 })
 

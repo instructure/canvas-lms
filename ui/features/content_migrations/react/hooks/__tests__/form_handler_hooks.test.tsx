@@ -21,14 +21,14 @@ import {useSubmitHandler, useSubmitHandlerWithQuestionBank} from '../form_handle
 import type {onSubmitMigrationFormCallback, QuestionBankSettings} from '../../components/types'
 
 describe('from handler hooks', () => {
-  const mockOnSubmit: onSubmitMigrationFormCallback = jest.fn()
+  const mockOnSubmit: onSubmitMigrationFormCallback = vi.fn()
   const createMockFileInputRef = () =>
     ({
-      current: {focus: jest.fn()},
+      current: {focus: vi.fn()},
     }) as unknown as React.RefObject<HTMLInputElement>
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('useSubmitHandlerWithQuestionBank', () => {

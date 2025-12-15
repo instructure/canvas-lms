@@ -61,6 +61,7 @@ describe('AssignmentDate', () => {
     expect(getByTestId('EditableDateTime-editor')).toBeInTheDocument()
   })
 
+  // Skipped: DateTimeInput was replaced with a stub in EditableDateTime.jsx due to InstUI deprecation
   it.skip('shows error message with invalid value when in edit mode', () => {
     // because the error message is rendered by the instui DateTimeInput
     const {getAllByText} = renderAssignmentDate({mode: 'edit', onValidate: () => false})
@@ -81,9 +82,10 @@ describe('AssignmentDate', () => {
     expect(getByText('No Due Date')).toBeInTheDocument()
   })
 
+  // Skipped: DateTimeInput was replaced with a stub in EditableDateTime.jsx due to InstUI deprecation
   it.skip('handles jibberish date input', () => {
     const value = '2108-03-13T15:15:00-07:00'
-    const invalidMessage = jest.fn()
+    const invalidMessage = vi.fn()
     const {getByDisplayValue} = renderAssignmentDate({
       mode: 'edit',
       onValidate: () => true,
@@ -102,6 +104,7 @@ describe('AssignmentDate', () => {
     expect(invalidMessage).toHaveBeenCalled()
   })
 
+  // Skipped: DateTimeInput was replaced with a stub in EditableDateTime.jsx due to InstUI deprecation
   it.skip('handles input', () => {
     function validator(value) {
       const d = new Date(value)
@@ -109,7 +112,7 @@ describe('AssignmentDate', () => {
       return d.valueOf() < reference.valueOf()
     }
     const value = '2108-03-13T15:15:00-07:00'
-    const invalidMessage = jest.fn()
+    const invalidMessage = vi.fn()
     const {getByDisplayValue} = renderAssignmentDate({
       mode: 'edit',
       onValidate: validator,

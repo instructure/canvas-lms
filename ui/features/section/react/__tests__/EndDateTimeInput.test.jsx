@@ -17,9 +17,33 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, fireEvent} from '@testing-library/react'
 import EndDateTimeInput from '../EndDateTimeInput'
-import userEvent from '@testing-library/user-event'
+
+// Store original handlers to call them in mock
+let mockOnBlur = null
+
+vi.mock('@instructure/ui-date-time-input', () => ({
+  DateTimeInput: ({onChange, onBlur, dateInputRef, timeInputRef, messages}) => {
+    mockOnBlur = onBlur
+    return (
+      <div data-testid="mocked-date-time-input">
+        <input
+          data-testid="section-end-date"
+          ref={dateInputRef}
+        />
+        <input data-testid="section-end-time" ref={timeInputRef} />
+        {messages && messages.length > 0 && (
+          <div data-testid="messages">
+            {messages.map((msg, idx) => (
+              <div key={idx}>{msg.text}</div>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  },
+}))
 
 const mockENV = {
   CONTEXT_TIMEZONE: 'America/New_York',
@@ -29,7 +53,8 @@ const mockENV = {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
+  mockOnBlur = null
   global.ENV = mockENV
 })
 
@@ -37,13 +62,13 @@ describe('EndDateTimeInput', () => {
   const initialValue = '2023-05-15T12:00:00Z'
 
   it('renders', () => {
-    render(<EndDateTimeInput initialValue={initialValue}></EndDateTimeInput>)
+    render(<EndDateTimeInput initialValue={initialValue} handleDateTimeChange={() => {}} />)
     expect(screen.getByTestId('section-end-date')).toBeInTheDocument()
     expect(screen.getByTestId('section-end-time')).toBeInTheDocument()
   })
 
   it('shows hints when context and local timezones differ', () => {
-    render(<EndDateTimeInput initialValue={initialValue}></EndDateTimeInput>)
+    render(<EndDateTimeInput initialValue={initialValue} handleDateTimeChange={() => {}} />)
     expect(screen.getByText('Local: Mon, May 15, 2023, 5:00 AM')).toBeInTheDocument()
     expect(screen.getByText('Course: Mon, May 15, 2023, 8:00 AM')).toBeInTheDocument()
   })
@@ -56,17 +81,22 @@ describe('EndDateTimeInput', () => {
       LOCALE: 'en',
     }
     global.ENV = newMockENV
-    render(<EndDateTimeInput initialValue={initialValue}></EndDateTimeInput>)
+    render(<EndDateTimeInput initialValue={initialValue} handleDateTimeChange={() => {}} />)
     expect(screen.queryByText('Local: Mon, May 15, 2023, 5:00 AM')).not.toBeInTheDocument()
     expect(screen.queryByText('Course: Mon, May 15, 2023, 8:00 AM')).not.toBeInTheDocument()
   })
 
-  it('shows error if date is invalid', async () => {
-    render(<EndDateTimeInput initialValue={initialValue}></EndDateTimeInput>)
+  it('shows error if date is invalid', () => {
+    render(<EndDateTimeInput initialValue={initialValue} handleDateTimeChange={() => {}} />)
     const input = screen.getByTestId('section-end-date')
-    await userEvent.clear(input)
-    await userEvent.type(input, 'invalid')
-    await userEvent.tab()
+
+    // Set invalid value directly on the input element (not via event)
+    // This is needed because the component reads from the ref's value property
+    input.value = 'invalid'
+
+    // Trigger blur to run validation
+    mockOnBlur()
+
     expect(screen.getByText('Please enter a valid format for a date')).toBeInTheDocument()
   })
 })

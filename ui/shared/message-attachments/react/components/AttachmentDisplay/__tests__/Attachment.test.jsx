@@ -33,7 +33,7 @@ const setup = props => {
 
 describe('Attachment', () => {
   it('calls onReplace on double click', () => {
-    const onReplaceMock = jest.fn()
+    const onReplaceMock = vi.fn()
     const {getByTestId} = setup({onReplace: onReplaceMock})
     expect(onReplaceMock.mock.calls).toHaveLength(0)
     fireEvent.dblClick(getByTestId('attachment'))
@@ -42,7 +42,7 @@ describe('Attachment', () => {
   })
 
   it('calls onDelete when clicking the remove button', () => {
-    const onDeleteMock = jest.fn()
+    const onDeleteMock = vi.fn()
     const {getByTestId} = setup({onDelete: onDeleteMock})
     expect(onDeleteMock.mock.calls).toHaveLength(0)
     fireEvent.mouseOver(getByTestId('attachment'))

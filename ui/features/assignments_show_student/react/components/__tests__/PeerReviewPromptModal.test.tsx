@@ -24,12 +24,12 @@ import PeerReviewPromptModal, {
 import {fireEvent, render} from '@testing-library/react'
 
 describe('PeerReviewPromptModal', () => {
-  let onRedirect: jest.Mock<any, any>
-  let onClose: jest.Mock<any, any>
+  let onRedirect: any
+  let onClose: any
 
   beforeEach(() => {
-    onRedirect = jest.fn()
-    onClose = jest.fn()
+    onRedirect = vi.fn()
+    onClose = vi.fn()
   })
 
   type RenderHelperProps = Pick<

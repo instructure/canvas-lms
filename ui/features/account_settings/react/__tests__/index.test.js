@@ -35,8 +35,8 @@ describe('start', () => {
     document.body.appendChild(fixtures)
 
     const fakeAxios = {
-      put: jest.fn(() => ({then() {}})),
-      get: jest.fn(() => ({then() {}})),
+      put: vi.fn(() => ({then() {}})),
+      get: vi.fn(() => ({then() {}})),
     }
 
     expect(() => {

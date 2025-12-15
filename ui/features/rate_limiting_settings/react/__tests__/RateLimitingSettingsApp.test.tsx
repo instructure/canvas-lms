@@ -26,15 +26,15 @@ import {http, HttpResponse} from 'msw'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock the flash alert
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
 const server = setupServer()
 
 // Mock the copy to clipboard button
-jest.mock('@canvas/copy-to-clipboard-button', () => {
-  return function MockCopyToClipboardButton(props: any) {
+vi.mock('@canvas/copy-to-clipboard-button', () => ({
+  default: function MockCopyToClipboardButton(props: any) {
     return (
       <button
         onClick={() => navigator.clipboard?.writeText(props.value)}
@@ -44,15 +44,15 @@ jest.mock('@canvas/copy-to-clipboard-button', () => {
         Copy
       </button>
     )
-  }
-})
+  },
+}))
 
 beforeAll(() => {
   server.listen()
   // Mock clipboard API
   Object.assign(navigator, {
     clipboard: {
-      writeText: jest.fn().mockResolvedValue(undefined),
+      writeText: vi.fn().mockResolvedValue(undefined),
     },
   })
   fakeENV.setup({ACCOUNT_ID: '1'})
@@ -105,7 +105,7 @@ const mockApiResponse = mockRateLimitSettings
 
 describe('RateLimitingSettingsApp', () => {
   beforeEach(() => {
-    ;(showFlashAlert as jest.Mock).mockClear()
+    ;(showFlashAlert as any).mockClear()
 
     // Mock CSRF token meta tag
     const csrfMeta = document.createElement('meta')
@@ -234,7 +234,7 @@ describe('RateLimitingSettingsApp', () => {
       )
 
       // Mock window.confirm
-      const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(true)
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
 
       render(<RateLimitingSettingsApp />)
 
@@ -270,7 +270,7 @@ describe('RateLimitingSettingsApp', () => {
       )
 
       // Mock window.confirm to return false
-      const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false)
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
 
       render(<RateLimitingSettingsApp />)
 

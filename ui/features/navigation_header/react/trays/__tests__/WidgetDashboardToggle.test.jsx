@@ -20,7 +20,6 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
-import '@testing-library/jest-dom/extend-expect'
 import WidgetDashboardToggle from '../WidgetDashboardToggle'
 import fakeENV from '@canvas/test-utils/fakeENV'
 

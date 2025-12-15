@@ -55,7 +55,7 @@ describe('OutcomeDialogView', () => {
       },
     })
 
-    const readyCallback = jest.fn()
+    const readyCallback = vi.fn()
     $(document).ready(readyCallback)
     $(document).trigger('ready')
     await waitFor(() => expect(readyCallback).toHaveBeenCalled())
@@ -63,9 +63,9 @@ describe('OutcomeDialogView', () => {
     // Mock jQuery dialog
     $dialog = $('<div>')
     $dialog.parent = () => ({
-      attr: jest.fn().mockReturnThis(),
+      attr: vi.fn().mockReturnThis(),
     })
-    dialogSpy = jest.fn().mockReturnValue($dialog)
+    dialogSpy = vi.fn().mockReturnValue($dialog)
     $.fn.dialog = dialogSpy
 
     outcomeDialogView = new OutcomeDialogView({model: new Outcome()})
@@ -76,7 +76,7 @@ describe('OutcomeDialogView', () => {
 
   afterEach(() => {
     outcomeDialogView.remove()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     server.resetHandlers()
     fakeEnv.teardown()
   })
@@ -87,8 +87,8 @@ describe('OutcomeDialogView', () => {
 
   describe('afterRender', () => {
     it('sets element and renders line graph', () => {
-      const setElementSpy = jest.spyOn(outcomeDialogView.outcomeLineGraphView, 'setElement')
-      const renderSpy = jest.spyOn(outcomeDialogView.outcomeLineGraphView, 'render')
+      const setElementSpy = vi.spyOn(outcomeDialogView.outcomeLineGraphView, 'setElement')
+      const renderSpy = vi.spyOn(outcomeDialogView.outcomeLineGraphView, 'render')
 
       outcomeDialogView.render()
 
@@ -99,7 +99,7 @@ describe('OutcomeDialogView', () => {
 
   describe('show', () => {
     beforeEach(() => {
-      jest.spyOn(outcomeDialogView, 'render')
+      vi.spyOn(outcomeDialogView, 'render')
       dialogSpy.mockClear()
     })
 
@@ -110,8 +110,15 @@ describe('OutcomeDialogView', () => {
       expect(dialogSpy).not.toHaveBeenCalledWith('open')
     })
 
-    it.each([13, 32])('renders and opens dialog with KeyCode %i', keyCode => {
-      outcomeDialogView.show(mockEvent('mouseenter', {keyCode}))
+    it('renders and opens dialog with KeyCode 13', () => {
+      outcomeDialogView.show(mockEvent('mouseenter', {keyCode: 13}))
+
+      expect(outcomeDialogView.render).toHaveBeenCalled()
+      expect(dialogSpy).toHaveBeenCalledWith('open')
+    })
+
+    it('renders and opens dialog with KeyCode 32', () => {
+      outcomeDialogView.show(mockEvent('mouseenter', {keyCode: 32}))
 
       expect(outcomeDialogView.render).toHaveBeenCalled()
       expect(dialogSpy).toHaveBeenCalledWith('open')

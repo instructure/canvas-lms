@@ -57,7 +57,7 @@ const defaultProps: Props = {
 
 describe('SubmissionTrayRadioInput', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderComponent = (customProps: Partial<Props> = {}) => {
@@ -104,7 +104,7 @@ describe('SubmissionTrayRadioInput', () => {
     })
 
     it('calls onChange when clicked', async () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByRole} = renderComponent({onChange})
       const user = userEvent.setup()
       await user.click(getByRole('radio'))

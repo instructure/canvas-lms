@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, fireEvent, waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import CheckboxTextInput from '../CheckboxTextInput'
@@ -32,7 +32,7 @@ import {
 import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
 import {useAccessibilityScansStore} from '../../../../stores/AccessibilityScansStore'
 
-jest.mock('../../../../stores/AccessibilityScansStore')
+vi.mock('../../../../stores/AccessibilityScansStore')
 
 // Create a fully typed mock context
 const mockContextValue: AccessibilityCheckerContextType = {
@@ -46,18 +46,22 @@ const mockContextValue: AccessibilityCheckerContextType = {
     url: 'http://example.com',
     editUrl: 'http://example.com/edit',
   }),
-  setSelectedItem: jest.fn(),
+  setSelectedItem: vi.fn(),
   isTrayOpen: false,
-  setIsTrayOpen: jest.fn(),
+  setIsTrayOpen: vi.fn(),
 }
 
 beforeAll(() => server.listen())
 afterAll(() => server.close())
 
+afterEach(() => {
+  cleanup()
+})
+
 beforeEach(() => {
   server.resetHandlers()
-  jest.resetAllMocks()
-  ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+  vi.resetAllMocks()
+  ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
     const state = {aiGenerationEnabled: true}
     return selector(state)
   })
@@ -84,7 +88,7 @@ describe('CheckboxTextInput', () => {
       },
     },
     value: '',
-    onChangeValue: jest.fn(),
+    onChangeValue: vi.fn(),
   }
 
   it('renders without crashing', () => {
@@ -245,7 +249,7 @@ describe('CheckboxTextInput', () => {
     }
 
     // Mock console.error to suppress expected error output
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     // Mock API failure
     server.use(
@@ -285,8 +289,8 @@ describe('CheckboxTextInput', () => {
 
   describe('onValidationChange callback', () => {
     it('calls onValidationChange when user types valid text', async () => {
-      const onValidationChange = jest.fn()
-      const onChangeValue = jest.fn()
+      const onValidationChange = vi.fn()
+      const onChangeValue = vi.fn()
 
       const {rerender} = render(
         <AccessibilityCheckerContext.Provider value={mockContextValue}>
@@ -320,8 +324,8 @@ describe('CheckboxTextInput', () => {
     })
 
     it('calls onValidationChange when text exceeds max length', async () => {
-      const onValidationChange = jest.fn()
-      const onChangeValue = jest.fn()
+      const onValidationChange = vi.fn()
+      const onChangeValue = vi.fn()
 
       const {rerender} = render(
         <AccessibilityCheckerContext.Provider value={mockContextValue}>
@@ -359,7 +363,7 @@ describe('CheckboxTextInput', () => {
     })
 
     it('calls onValidationChange when checkbox is checked (decorative image)', async () => {
-      const onValidationChange = jest.fn()
+      const onValidationChange = vi.fn()
 
       render(
         <AccessibilityCheckerContext.Provider value={mockContextValue}>
@@ -378,7 +382,7 @@ describe('CheckboxTextInput', () => {
     })
 
     it('calls onValidationChange when textarea is empty', async () => {
-      const onValidationChange = jest.fn()
+      const onValidationChange = vi.fn()
 
       render(
         <AccessibilityCheckerContext.Provider value={mockContextValue}>
@@ -392,7 +396,7 @@ describe('CheckboxTextInput', () => {
 
   describe('AI generation feature flag', () => {
     it('shows generate button when feature flag is enabled', () => {
-      ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+      ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
         const state = {aiGenerationEnabled: true}
         return selector(state)
       })
@@ -419,7 +423,7 @@ describe('CheckboxTextInput', () => {
     })
 
     it('hides generate button when feature flag is disabled', () => {
-      ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+      ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
         const state = {aiGenerationEnabled: false}
         return selector(state)
       })

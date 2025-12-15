@@ -23,12 +23,18 @@ import {render} from '@testing-library/react'
 import FileListComponent from '../FileList'
 
 describe('FileList', () => {
+  const mockCreateObjectURL = vi.fn(() => 'mock-url')
+
   beforeEach(() => {
-    window.URL.createObjectURL = jest.fn(() => 'mock-url')
+    vi.stubGlobal('URL', {
+      ...window.URL,
+      createObjectURL: mockCreateObjectURL,
+    })
   })
 
   afterEach(() => {
-    window.URL.createObjectURL.mockReset()
+    vi.unstubAllGlobals()
+    mockCreateObjectURL.mockReset()
   })
 
   const files = [
@@ -68,7 +74,7 @@ describe('FileList', () => {
         <FileListComponent
           canRemove={true}
           files={files.slice(0, 1)}
-          removeFileHandler={jest.fn()}
+          removeFileHandler={vi.fn()}
         />
       </MockedProvider>,
     )

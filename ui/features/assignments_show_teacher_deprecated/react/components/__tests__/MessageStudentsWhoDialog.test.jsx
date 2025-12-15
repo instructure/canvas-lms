@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import axios from '@canvas/axios'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {cleanup, render, fireEvent, waitFor} from '@testing-library/react'
 import MessageStudentsWhoDialog from '../MessageStudentsWhoDialog'
 import {mockAssignment, mockUser, mockSubmission} from '../../test-utils'
@@ -31,7 +32,13 @@ import {partialSubAssignment, variedSubmissionTypes} from './fixtures/Assignment
  *  resumes on A2.
  */
 
-jest.mock('axios')
+
+const server = setupServer()
+
+beforeAll(() => server.listen({onUnhandledRequest: 'warn'}))  
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+
 
 function renderMessageStudentsWhoDialog(assignment = mockAssignment(), propsOverride = {}) {
   const props = {
@@ -599,22 +606,30 @@ describe.skip('MessageStudentsWhoDialog', () => {
 
   describe('sending messages', () => {
     it('displays loading state when message is being sent', async () => {
+      server.use(
+        http.post('/api/v1/conversations', () => {
+          return HttpResponse.json([], {status: 202})
+        }),
+      )
       const {getByTestId, getByText} = renderMessageStudentsWhoDialog(partialSubAssignment())
       const bodyInput = getByTestId('body-input')
       fireEvent.change(bodyInput, {target: {value: 'Typing some body text here'}})
       const sendButton = getByText('Send').closest('button')
-      axios.post.mockResolvedValue(() => Promise.resolve({status: 202, data: []}))
       fireEvent.click(sendButton)
 
       expect(await waitFor(() => getByText('Sending messages'))).toBeInTheDocument()
     })
 
     it('handles success', async () => {
+      server.use(
+        http.post('/api/v1/conversations', () => {
+          return HttpResponse.json([], {status: 202})
+        }),
+      )
       const {getByTestId, getByText} = renderMessageStudentsWhoDialog(partialSubAssignment())
       const bodyInput = getByTestId('body-input')
       fireEvent.change(bodyInput, {target: {value: 'Typing some body text here'}})
       const sendButton = getByText('Send').closest('button')
-      axios.post.mockResolvedValue(() => Promise.resolve({status: 202, data: []}))
       fireEvent.click(sendButton)
 
       // filter out the screenreader alerts and assert that
@@ -624,13 +639,17 @@ describe.skip('MessageStudentsWhoDialog', () => {
     })
 
     it('handles error', async () => {
+      server.use(
+        http.post('/api/v1/conversations', () => {
+          return HttpResponse.json(null, {status: 500})
+        }),
+      )
       const {getByTestId, findAllByText, getByText} = renderMessageStudentsWhoDialog(
         partialSubAssignment(),
       )
       const bodyInput = getByTestId('body-input')
       fireEvent.change(bodyInput, {target: {value: 'Typing some body text here'}})
       const sendButton = getByText('Send').closest('button')
-      axios.post.mockRejectedValue(() => Promise.reject(new Error('something bad happened')))
       fireEvent.click(sendButton)
 
       // filter out the screenreader alerts and assert that

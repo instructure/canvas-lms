@@ -20,6 +20,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {type MockedFunction} from 'vitest'
 import InboxWidget from '../InboxWidget'
 import type {BaseWidgetProps, Widget, InboxMessage} from '../../../../types'
 import {
@@ -31,14 +32,14 @@ import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardE
 import * as useInboxMessagesModule from '../../../../hooks/useInboxMessages'
 import * as useWidgetConfigModule from '../../../../hooks/useWidgetConfig'
 
-jest.mock('../../../../hooks/useInboxMessages')
-jest.mock('../../../../hooks/useWidgetConfig')
+vi.mock('../../../../hooks/useInboxMessages')
+vi.mock('../../../../hooks/useWidgetConfig')
 
-const mockUseInboxMessages = useInboxMessagesModule.useInboxMessages as jest.MockedFunction<
+const mockUseInboxMessages = useInboxMessagesModule.useInboxMessages as MockedFunction<
   typeof useInboxMessagesModule.useInboxMessages
 >
 
-const mockUseWidgetConfig = useWidgetConfigModule.useWidgetConfig as jest.MockedFunction<
+const mockUseWidgetConfig = useWidgetConfigModule.useWidgetConfig as MockedFunction<
   typeof useWidgetConfigModule.useWidgetConfig
 >
 
@@ -127,21 +128,21 @@ const renderWithProviders = (component: React.ReactElement) => {
 }
 
 describe('InboxWidget', () => {
-  let mockSetFilter: jest.Mock
+  let mockSetFilter: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    mockSetFilter = jest.fn()
+    mockSetFilter = vi.fn()
     mockUseWidgetConfig.mockReturnValue(['unread', mockSetFilter])
     mockUseInboxMessages.mockReturnValue({
       data: mockMessages,
       isLoading: false,
       error: null,
-      refetch: jest.fn(),
+      refetch: vi.fn(),
     } as any)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders widget with title', () => {
@@ -207,7 +208,7 @@ describe('InboxWidget', () => {
       data: [],
       isLoading: true,
       error: null,
-      refetch: jest.fn(),
+      refetch: vi.fn(),
     } as any)
 
     renderWithProviders(<InboxWidget {...buildDefaultProps()} />)
@@ -217,7 +218,7 @@ describe('InboxWidget', () => {
   })
 
   it('handles error state with retry button', async () => {
-    const mockRefetch = jest.fn()
+    const mockRefetch = vi.fn()
     mockUseInboxMessages.mockReturnValue({
       data: [],
       isLoading: false,
@@ -240,7 +241,7 @@ describe('InboxWidget', () => {
       data: [],
       isLoading: false,
       error: null,
-      refetch: jest.fn(),
+      refetch: vi.fn(),
     } as any)
 
     renderWithProviders(<InboxWidget {...buildDefaultProps()} />)

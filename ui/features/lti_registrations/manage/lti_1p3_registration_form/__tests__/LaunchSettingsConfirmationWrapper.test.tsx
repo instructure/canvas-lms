@@ -34,8 +34,8 @@ describe('LaunchSettings', () => {
       <LaunchSettingsConfirmationWrapper
         internalConfig={config}
         overlayStore={overlayStore}
-        onPreviousClicked={jest.fn()}
-        onNextClicked={jest.fn()}
+        onPreviousClicked={vi.fn()}
+        onNextClicked={vi.fn()}
         reviewing={false}
       />,
     )
@@ -78,8 +78,8 @@ describe('LaunchSettings', () => {
       <LaunchSettingsConfirmationWrapper
         internalConfig={config}
         overlayStore={overlayStore}
-        onPreviousClicked={jest.fn()}
-        onNextClicked={jest.fn()}
+        onPreviousClicked={vi.fn()}
+        onNextClicked={vi.fn()}
         reviewing={false}
       />,
     )
@@ -135,8 +135,8 @@ it('renders a popover on hovering over the custom fields info button', async () 
     <LaunchSettingsConfirmationWrapper
       internalConfig={config}
       overlayStore={overlayStore}
-      onPreviousClicked={jest.fn()}
-      onNextClicked={jest.fn()}
+      onPreviousClicked={vi.fn()}
+      onNextClicked={vi.fn()}
       reviewing={false}
     />,
   )
@@ -170,12 +170,12 @@ it('focuses invalid inputs if any fields are invalid', async () => {
     public_jwk_url: 'https://example.com/jwks',
   })
   const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
-  const onNextClicked = jest.fn()
+  const onNextClicked = vi.fn()
   render(
     <LaunchSettingsConfirmationWrapper
       internalConfig={config}
       overlayStore={overlayStore}
-      onPreviousClicked={jest.fn()}
+      onPreviousClicked={vi.fn()}
       onNextClicked={onNextClicked}
       reviewing={false}
     />,

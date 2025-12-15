@@ -22,7 +22,7 @@ import {ThreadPagination, NAV_BAR_HEIGHT} from '../ThreadPagination'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 const defaultProps = overrides => ({
-  setPage: jest.fn(),
+  setPage: vi.fn(),
   selectedPage: 1,
   totalPages: 10,
   ...overrides,

@@ -19,7 +19,6 @@
 import React from 'react'
 import {screen, fireEvent} from '@testing-library/react'
 import {renderConnected} from '../../../__tests__/utils'
-import '@testing-library/jest-dom'
 import TimeSelection from '../TimeSelection'
 import {PRIMARY_PACE, STUDENT_PACE} from '../../../__tests__/fixtures'
 import {CoursePace, Pace} from 'features/course_paces/react/types'

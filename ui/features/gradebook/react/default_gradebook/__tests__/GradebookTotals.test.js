@@ -26,14 +26,14 @@ describe('Gradebook Totals', () => {
   let mockAjaxJSON
 
   beforeEach(() => {
-    mockAjaxJSON = jest.fn()
+    mockAjaxJSON = vi.fn()
     $.ajaxJSON = mockAjaxJSON
 
     // Mock jQuery dialog
-    $.fn.dialog = jest.fn().mockImplementation(function () {
+    $.fn.dialog = vi.fn().mockImplementation(function () {
       return this
     })
-    $.fn.data = jest.fn()
+    $.fn.data = vi.fn()
 
     gradebook = createGradebook({
       show_total_grade_as_points: true,
@@ -42,17 +42,17 @@ describe('Gradebook Totals', () => {
 
     gradebook.gradebookGrid.gridSupport = {
       columns: {
-        updateColumnHeaders: jest.fn(),
+        updateColumnHeaders: vi.fn(),
       },
     }
 
-    gradebook.gradebookGrid.invalidate = jest.fn()
+    gradebook.gradebookGrid.invalidate = vi.fn()
   })
 
   afterEach(() => {
     UserSettings.contextRemove('warned_about_totals_display')
     gradebook.destroy()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('#switchTotalDisplay', () => {
@@ -80,7 +80,7 @@ describe('Gradebook Totals', () => {
     })
 
     it('updates user preferences via API', () => {
-      $.ajaxJSON = jest.fn().mockImplementation((url, method, data) => {
+      $.ajaxJSON = vi.fn().mockImplementation((url, method, data) => {
         return $.Deferred().resolve().promise()
       })
 
@@ -121,7 +121,7 @@ describe('Gradebook Totals', () => {
 
   describe('#togglePointsOrPercentTotals', () => {
     beforeEach(() => {
-      jest.spyOn(gradebook, 'switchTotalDisplay')
+      vi.spyOn(gradebook, 'switchTotalDisplay')
     })
 
     it('immediately toggles display when warnings are ignored', () => {
@@ -131,7 +131,7 @@ describe('Gradebook Totals', () => {
     })
 
     it('invokes callback when warnings are ignored', () => {
-      const callback = jest.fn()
+      const callback = vi.fn()
       UserSettings.contextSet('warned_about_totals_display', true)
       gradebook.togglePointsOrPercentTotals(callback)
       expect(callback).toHaveBeenCalled()
@@ -151,7 +151,7 @@ describe('Gradebook Totals', () => {
     })
 
     it('sets callback as dialog onClose function', () => {
-      const callback = jest.fn()
+      const callback = vi.fn()
       UserSettings.contextSet('warned_about_totals_display', false)
       const dialog = gradebook.togglePointsOrPercentTotals(callback)
       expect(dialog.options.onClose).toBe(callback)

@@ -18,14 +18,14 @@
 
 import React from 'react'
 import FilterNav from '../FilterNav'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import store from '../../stores/index'
 import type {FilterNavProps} from '../FilterNav'
 import type {FilterPreset, Filter} from '../../gradebook.d'
 import type {Assignment} from '../../../../../../api'
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import '@testing-library/jest-dom/extend-expect'
 
 beforeEach(() => {
   // Ensure a live region for screenreader alerts exists for Alert component
@@ -278,6 +278,21 @@ const mockPostResponse = {
   },
 }
 
+const server = setupServer(
+  http.get('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+  http.post('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+  http.put('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+  http.delete('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+)
+
 const USER_EVENT_OPTIONS = {
   pointerEventsCheck: PointerEventsCheckLevel.Never,
 }
@@ -291,6 +306,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  cleanup()
   window.ENV.FEATURES = oldEnv
 })
 
@@ -300,11 +316,14 @@ describe('Filter dropdown', () => {
       filterPresets: defaultFilterPresets,
       appliedFilters: [],
     })
-    fetchMock.mock('*', 200)
+    server.listen({onUnhandledRequest: 'bypass'})
   })
   afterEach(() => {
     store.setState(originalState, true)
-    fetchMock.restore()
+    server.resetHandlers()
+  })
+  afterAll(() => {
+    server.close()
   })
 
   it('Shows filter menu items', async () => {
@@ -441,11 +460,19 @@ describe('FilterNav (save)', () => {
       filterPresets: defaultFilterPresets,
       appliedFilters: defaultAppliedFilters,
     })
-    fetchMock.post('/api/v1/courses/0/gradebook_filters', mockPostResponse)
+    server.use(
+      http.post('/api/v1/courses/0/gradebook_filters', () => {
+        return HttpResponse.json(mockPostResponse)
+      }),
+    )
+    server.listen({onUnhandledRequest: 'bypass'})
   })
   afterEach(() => {
     store.setState(originalState, true)
-    fetchMock.restore()
+    server.resetHandlers()
+  })
+  afterAll(() => {
+    server.close()
   })
 
   it('Save button is disabled if filter preset name is blank', async () => {

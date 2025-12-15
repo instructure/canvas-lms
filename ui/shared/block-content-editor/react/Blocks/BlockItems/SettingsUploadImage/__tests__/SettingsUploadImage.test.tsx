@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {SettingsUploadImage} from '../SettingsUploadImage'
 
 describe('SettingsUploadImage', () => {
-  const mockOnImageChange = jest.fn()
+  const mockOnImageChange = vi.fn()
 
   beforeEach(() => {
     mockOnImageChange.mockClear()

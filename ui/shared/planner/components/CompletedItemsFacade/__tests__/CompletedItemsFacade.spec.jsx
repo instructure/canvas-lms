@@ -27,7 +27,7 @@ it('renders ToggleDetails with text indicating count', () => {
 })
 
 it('calls the onClick prop when clicked', async () => {
-  const fakeOnClick = jest.fn()
+  const fakeOnClick = vi.fn()
   const wrapper = render(<CompletedItemsFacade onClick={fakeOnClick} itemCount={0} />)
 
   const button = wrapper.getByText('Show 0 completed items')
@@ -48,8 +48,8 @@ it('displays Pills when given them', () => {
 
 it('registers itself as animatable', () => {
   const ref = React.createRef()
-  const fakeRegister = jest.fn()
-  const fakeDeregister = jest.fn()
+  const fakeRegister = vi.fn()
+  const fakeDeregister = vi.fn()
   const wrapper = render(
     <CompletedItemsFacade
       ref={ref}

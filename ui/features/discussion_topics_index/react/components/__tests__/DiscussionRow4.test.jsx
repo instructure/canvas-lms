@@ -22,8 +22,8 @@ import {merge} from 'es-toolkit/compat'
 import React from 'react'
 import {DiscussionRow} from '../DiscussionRow'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // We can't call the wrapped component because a lot of these tests are depending
@@ -190,7 +190,7 @@ describe('DiscussionRow', () => {
   })
 
   it('opens the copyTo tray when menu item is selected', async () => {
-    const copyMock = jest.fn()
+    const copyMock = vi.fn()
     const props = makeProps({
       displayManageMenu: true,
       DIRECT_SHARE_ENABLED: true,
@@ -211,7 +211,7 @@ describe('DiscussionRow', () => {
   })
 
   it('opens the sendTo tray when menu item is selected', async () => {
-    const sendMock = jest.fn()
+    const sendMock = vi.fn()
     const props = makeProps({
       displayManageMenu: true,
       DIRECT_SHARE_ENABLED: true,

@@ -47,7 +47,7 @@ function setPlayerSize(player, type, dimensions, container, resizeContainer = tr
 
 const server = setupServer()
 
-// TODO: The studio-player does not work with jest
+// TODO: The studio-player does not work with vi
 // revisit unit tests if they upgrade it to play nicer
 describe.skip('CanvasStudioPlayer', () => {
   describe('rendering', () => {
@@ -73,7 +73,7 @@ describe.skip('CanvasStudioPlayer', () => {
 
     beforeEach(() => {
       // @ts-expect-error
-      jest.useFakeTimers()
+      vi.useFakeTimers()
       server.use(
         http.get(/\/media_objects\/\d+\/info/, () => {
           return HttpResponse.json({
@@ -84,10 +84,10 @@ describe.skip('CanvasStudioPlayer', () => {
     })
     afterEach(() => {
       act(() => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
       })
-      jest.resetAllMocks()
-      jest.useRealTimers()
+      vi.resetAllMocks()
+      vi.useRealTimers()
       server.resetHandlers()
     })
 
@@ -173,7 +173,7 @@ describe.skip('CanvasStudioPlayer', () => {
           <CanvasStudioPlayer media_id="dummy_media_id" mediaSources={[]} />,
         )
         expect(getAllByText('Loading')[0]).toBeInTheDocument()
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
         expect(fetchMock.calls()).toHaveLength(1)
       })
       it('makes ajax call if no mediaSources are provided on load', async () => {
@@ -187,7 +187,7 @@ describe.skip('CanvasStudioPlayer', () => {
           },
         )
         render(<CanvasStudioPlayer media_id="dummy_media_id" />)
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
         expect(fetchMock.calls()).toHaveLength(1)
         expect(fetchMock.calls()[0][0]).toEqual('/media_objects/dummy_media_id/info')
       })
@@ -202,7 +202,7 @@ describe.skip('CanvasStudioPlayer', () => {
           },
         )
         render(<CanvasStudioPlayer media_id="dummy_media_id" attachment_id="1" />)
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
         expect(fetchMock.calls()).toHaveLength(1)
         expect(fetchMock.calls()[0][0]).toEqual('/media_attachments/1/info')
       })
@@ -213,20 +213,20 @@ describe.skip('CanvasStudioPlayer', () => {
           container: document.getElementById('here').firstElementChild,
         })
         act(() => {
-          jest.runOnlyPendingTimers()
+          vi.runOnlyPendingTimers()
         })
 
         expect(fetchMock.calls()).toHaveLength(1)
         expect(component.getByText('Failed retrieving media sources.')).toBeInTheDocument()
       })
       it.skip('tries ajax call up to MAX times if no media_sources', async () => {
-        // Note that the comment below was written while we were still using jest-fetch-mock,
-        // which used cross-fetch and jest.mock/jest.spyOn. It's possible that fetchMock
+        // Note that the comment below was written while we were still using vi-fetch-mock,
+        // which used cross-fetch and vi.mock/vi.spyOn. It's possible that fetchMock
         // avoids these issues somehow. Good luck traveler.
         // MAT-885
         // this spec passes if run alone, but fails as part of the larger suite
         // what I see happening is fetch.mock.calls is getting reset to 0 because the mock
-        // can't find the instance. see canvas-lms/node_modules/jest-mock/build/index.js
+        // can't find the instance. see canvas-lms/node_modules/vi-mock/build/index.js
         // at line 345 where
         // let state = this._mockState.get(f);
         // returns undefined
@@ -259,7 +259,7 @@ describe.skip('CanvasStudioPlayer', () => {
           expect(component.getByText('Loading')).toBeInTheDocument()
           await act(async () => {
             await waitFor(() => {
-              jest.runOnlyPendingTimers()
+              vi.runOnlyPendingTimers()
               expect(fetchMock.calls()).toHaveLength(1)
             })
           })
@@ -269,13 +269,13 @@ describe.skip('CanvasStudioPlayer', () => {
           )
           await act(async () => {
             await waitFor(() => {
-              jest.runOnlyPendingTimers()
+              vi.runOnlyPendingTimers()
               expect(fetchMock.calls()).toHaveLength(2)
             })
           })
           await act(async () => {
             await waitFor(() => {
-              jest.runOnlyPendingTimers()
+              vi.runOnlyPendingTimers()
               expect(fetchMock.calls()).toHaveLength(3)
             })
           })
@@ -292,25 +292,25 @@ describe.skip('CanvasStudioPlayer', () => {
           )
           await act(async () => {
             await waitFor(() => {
-              jest.runOnlyPendingTimers()
+              vi.runOnlyPendingTimers()
               expect(fetchMock.calls()).toHaveLength(4)
             })
           })
           await act(async () => {
             await waitFor(() => {
-              jest.runOnlyPendingTimers()
+              vi.runOnlyPendingTimers()
               expect(fetchMock.calls()).toHaveLength(5)
             })
           })
           await act(async () => {
             await waitFor(() => {
-              jest.runOnlyPendingTimers()
+              vi.runOnlyPendingTimers()
               expect(fetchMock.calls()).toHaveLength(6)
             })
           })
           // add a 7th iteration just to prove the queries stopped at MAX_RETRY_ATTEMPTS
           await act(async () => {
-            jest.runOnlyPendingTimers()
+            vi.runOnlyPendingTimers()
             await waitFor(() => {})
           })
 
@@ -325,7 +325,7 @@ describe.skip('CanvasStudioPlayer', () => {
             /Giving up on retrieving media sources. This issue will probably resolve itself eventually./,
           )
 
-          jest.runOnlyPendingTimers()
+          vi.runOnlyPendingTimers()
           await waitFor(() => {})
         })
       })
@@ -342,7 +342,7 @@ describe.skip('CanvasStudioPlayer', () => {
 
           await act(async () => {
             await waitFor(() => {
-              jest.runOnlyPendingTimers()
+              vi.runOnlyPendingTimers()
               expect(fetchMock.calls()).toHaveLength(1)
             })
           })
@@ -505,7 +505,7 @@ describe.skip('CanvasStudioPlayer', () => {
         offsetHeight: h,
         style: {},
         classList: {
-          add: jest.fn(),
+          add: vi.fn(),
         },
       }
     }

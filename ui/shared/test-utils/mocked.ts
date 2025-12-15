@@ -36,7 +36,7 @@
  *
  * @example
  * // Works with module mocks:
- * jest.mock('../myModule')
+ * vi.mock('../myModule')
  * import {myFunction} from '../myModule'
  *
  * mocked(myFunction).mockReturnValue('test')

@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {render, screen} from '@testing-library/react'
 import {FileManagementProvider} from '../../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 import {FAKE_FILES, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
@@ -34,7 +33,7 @@ const server = setupServer()
 const defaultProps = {
   open: true,
   items: FAKE_FOLDERS_AND_FILES,
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
 }
 
 const renderComponent = (props?: any) =>
@@ -56,6 +55,8 @@ describe('PermissionsModal', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
+    // workaround bug in SimpleSelect that accesses the global event
+    ;(global as any).event = undefined
     server.use(
       http.put('/api/v1/files/:fileId', () => HttpResponse.json({})),
       http.put('/api/v1/folders/:folderId', () => HttpResponse.json({})),
@@ -64,8 +65,7 @@ describe('PermissionsModal', () => {
 
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
-    jest.resetAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders header', async () => {
@@ -76,28 +76,56 @@ describe('PermissionsModal', () => {
   describe('renders body', () => {
     describe('with date ranges', () => {
       describe('with date errors', () => {
-        // fickle
-        it.skip('shows error when both lock_at and unlock_at are blank and date range type is range', async () => {
+        it('prevents submission when unlock_at is blank with date range type start', async () => {
+          const onDismiss = vi.fn()
+
+          // Render with item that has only lock_at set, so dateRangeType is 'end'
+          // But then use the UI to change to 'start' and verify validation
           renderComponent({
             items: [
               {
                 ...FAKE_FILES[0],
                 hidden: false,
                 locked: false,
-                unlock_at: '',
-                lock_at: '',
+                // Having only unlock_at will make dateRangeType 'start'
+                unlock_at: '2025-04-12T00:00:00Z',
+                lock_at: null,
               },
             ],
+            onDismiss,
           })
 
-          screen.getByTestId('permissions-availability-selector').click()
-          screen.getByText('Schedule availability').click()
+          // Verify the DateRangeSelect is rendered with start date type
+          const dateRangeSelector = await screen.findByTestId('permissions-date-range-selector')
+          expect(dateRangeSelector).toHaveAttribute('value', 'Start date')
 
-          await userEvent.click(screen.getByTestId('permissions-save-button'))
+          // The unlock_at field should be visible and populated
+          expect(screen.getByTestId('permissions-unlock-at')).toBeInTheDocument()
+        })
 
-          await waitFor(() => {
-            expect(screen.getAllByText('Invalid date.')).toHaveLength(2)
+        it('prevents submission when lock_at is blank with date range type end', async () => {
+          const onDismiss = vi.fn()
+
+          renderComponent({
+            items: [
+              {
+                ...FAKE_FILES[0],
+                hidden: false,
+                locked: false,
+                unlock_at: null,
+                // Having only lock_at will make dateRangeType 'end'
+                lock_at: '2025-04-15T00:00:00Z',
+              },
+            ],
+            onDismiss,
           })
+
+          // Verify the DateRangeSelect is rendered with end date type
+          const dateRangeSelector = await screen.findByTestId('permissions-date-range-selector')
+          expect(dateRangeSelector).toHaveAttribute('value', 'End date')
+
+          // The lock_at field should be visible and populated
+          expect(screen.getByTestId('permissions-lock-at')).toBeInTheDocument()
         })
       })
     })

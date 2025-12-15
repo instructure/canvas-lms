@@ -49,7 +49,7 @@ describe('ToolLaunchResizer', () => {
   })
 
   describe('#tool_content_wrapper', () => {
-    const sanitizeSpy = jest.fn()
+    const sanitizeSpy = vi.fn()
     const wrapperId = 'foo'
 
     beforeEach(() => {

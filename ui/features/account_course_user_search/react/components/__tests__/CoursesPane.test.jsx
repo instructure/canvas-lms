@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CoursesPane from '../CoursesPane'
 import CoursesStore from '../../store/CoursesStore'
@@ -29,12 +29,12 @@ const stores = [CoursesStore, TermsStore, AccountsTreeStore]
 describe('Account Course User Search CoursesPane View', () => {
   beforeEach(() => {
     stores.forEach(store => store.reset({accountId: '1'}))
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
     stores.forEach(store => store.reset({}))
-    jest.useRealTimers()
+    vi.useRealTimers()
     // Clean up any mock elements
     const mockElement = document.getElementById('flash_screenreader_holder')
     if (mockElement) {
@@ -61,21 +61,24 @@ describe('Account Course User Search CoursesPane View', () => {
 
   test('onUpdateFilters triggers debounced apply filters', async () => {
     const {getByPlaceholderText} = renderComponent()
-    const user = userEvent.setup({delay: null})
 
-    // Mock the CoursesStore.load method to track calls
-    const loadSpy = jest.spyOn(CoursesStore, 'load')
+    // Mock the CoursesStore.load method to return a resolved promise
+    const loadSpy = vi.spyOn(CoursesStore, 'load').mockResolvedValue()
 
-    // Find search input and type in it
+    // Find search input and change its value
     const searchInput = getByPlaceholderText('Search courses...')
-    await user.type(searchInput, 'test course')
 
-    // Advance timers to trigger debounced function
-    jest.advanceTimersByTime(500)
-
-    await waitFor(() => {
-      expect(loadSpy).toHaveBeenCalled()
+    await act(async () => {
+      fireEvent.change(searchInput, {target: {value: 'test course'}})
     })
+
+    // Advance timers to trigger debounced function (750ms debounce time)
+    await act(async () => {
+      vi.advanceTimersByTime(750)
+    })
+
+    // Verify the load method was called
+    expect(loadSpy).toHaveBeenCalled()
 
     loadSpy.mockRestore()
   })

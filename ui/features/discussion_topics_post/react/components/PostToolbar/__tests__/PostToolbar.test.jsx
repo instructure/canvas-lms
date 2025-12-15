@@ -18,34 +18,35 @@
 
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {PostToolbar} from '../PostToolbar'
 import {Discussion} from '../../../../graphql/Discussion'
 import {MockedProvider} from '@apollo/client/testing'
 import {useTranslationStore} from '../../../hooks/useTranslationStore'
 import {useTranslation} from '../../../hooks/useTranslation'
 
-jest.mock('../../../hooks/useTranslation')
-jest.mock('../../../hooks/useTranslationStore')
+vi.mock('../../../hooks/useTranslation')
+vi.mock('../../../hooks/useTranslationStore')
 
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
+vi.mock('../../../utils', async () => ({
+  ...(await vi.importActual('../../../utils')),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })
 
 beforeEach(() => {
-  useTranslation.mockReturnValue({tryTranslate: jest.fn()})
+  useTranslation.mockReturnValue({tryTranslate: vi.fn()})
 })
 
 const setup = (props, mocks = []) => {
@@ -83,7 +84,7 @@ describe('PostToolbar', () => {
     })
 
     it('displays if callback is provided', () => {
-      const onTogglePublishMock = jest.fn()
+      const onTogglePublishMock = vi.fn()
       const {getByText, getByTestId} = setup({
         onTogglePublish: onTogglePublishMock,
         isPublished: true,
@@ -96,7 +97,7 @@ describe('PostToolbar', () => {
     })
 
     it('displays as disabled if canUnpublish is false', () => {
-      const onTogglePublishMock = jest.fn()
+      const onTogglePublishMock = vi.fn()
       const {getByText} = setup({
         onTogglePublish: onTogglePublishMock,
         isPublished: true,
@@ -106,7 +107,7 @@ describe('PostToolbar', () => {
     })
 
     it('adds proper tracing state when it is unpublished', () => {
-      const onTogglePublishMock = jest.fn()
+      const onTogglePublishMock = vi.fn()
       const {getByTestId} = setup({
         onTogglePublish: onTogglePublishMock,
         isPublished: false,
@@ -123,7 +124,7 @@ describe('PostToolbar', () => {
     })
 
     it('displays if callback is provided', () => {
-      const onToggleSubscriptionMock = jest.fn()
+      const onToggleSubscriptionMock = vi.fn()
       const {queryByText, getByText, getByTestId} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
         isSubscribed: true,
@@ -140,7 +141,7 @@ describe('PostToolbar', () => {
     })
 
     it('adds proper tracing state when it is unsubscibed', () => {
-      const onToggleSubscriptionMock = jest.fn()
+      const onToggleSubscriptionMock = vi.fn()
       const {getByTestId} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
         isSubscribed: false,
@@ -151,7 +152,7 @@ describe('PostToolbar', () => {
 
     it('displays if user does not have teacher, designer, ta', () => {
       window.ENV.current_user_roles = ['student']
-      const onToggleSubscriptionMock = jest.fn()
+      const onToggleSubscriptionMock = vi.fn()
       const {queryByText} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
         isSubscribed: true,
@@ -162,7 +163,7 @@ describe('PostToolbar', () => {
 
     it('does not display if user has teacher', () => {
       window.ENV.current_user_roles = ['teacher']
-      const onToggleSubscriptionMock = jest.fn()
+      const onToggleSubscriptionMock = vi.fn()
       const {queryByText} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
         isSubscribed: true,
@@ -172,7 +173,7 @@ describe('PostToolbar', () => {
 
     it('does not display if user has designer', () => {
       window.ENV.current_user_roles = ['designer']
-      const onToggleSubscriptionMock = jest.fn()
+      const onToggleSubscriptionMock = vi.fn()
       const {queryByText} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
         isSubscribed: true,
@@ -182,7 +183,7 @@ describe('PostToolbar', () => {
 
     it('does not display if user has ta', () => {
       window.ENV.current_user_roles = ['ta']
-      const onToggleSubscriptionMock = jest.fn()
+      const onToggleSubscriptionMock = vi.fn()
       const {queryByText} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
         isSubscribed: true,
@@ -192,7 +193,7 @@ describe('PostToolbar', () => {
 
     it('makes the button disabled if cannot subscribe', () => {
       window.ENV.current_user_roles = ['student']
-      const onToggleSubscriptionMock = jest.fn()
+      const onToggleSubscriptionMock = vi.fn()
       const {queryAllByText} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
         discussion: Discussion.mock({
@@ -209,7 +210,7 @@ describe('PostToolbar', () => {
   describe('menu options', () => {
     describe('mark all as read', () => {
       it('calls provided callback when clicked', () => {
-        const onReadAllMock = jest.fn()
+        const onReadAllMock = vi.fn()
         const {getByTestId, getByText} = setup({onReadAll: onReadAllMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(onReadAllMock.mock.calls).toHaveLength(0)
@@ -222,7 +223,7 @@ describe('PostToolbar', () => {
 
     describe('mark all as unread', () => {
       it('calls provided callback when clicked', () => {
-        const onUnreadAllMock = jest.fn()
+        const onUnreadAllMock = vi.fn()
         const {getByTestId, getByText} = setup({onUnreadAll: onUnreadAllMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(onUnreadAllMock.mock.calls).toHaveLength(0)
@@ -241,7 +242,7 @@ describe('PostToolbar', () => {
       })
 
       it('calls provided callback when clicked', () => {
-        const onEditMock = jest.fn()
+        const onEditMock = vi.fn()
         const {getByTestId, getByText} = setup({onEdit: onEditMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(onEditMock.mock.calls).toHaveLength(0)
@@ -258,7 +259,7 @@ describe('PostToolbar', () => {
       })
 
       it('calls provided callback when clicked', () => {
-        const onDeleteMock = jest.fn()
+        const onDeleteMock = vi.fn()
         const {getByTestId, getByText} = setup({onDelete: onDeleteMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(onDeleteMock.mock.calls).toHaveLength(0)
@@ -278,7 +279,7 @@ describe('PostToolbar', () => {
       describe('comments are currently enabled', () => {
         it('renders correct display text', () => {
           const {queryByText, getByTestId} = setup({
-            onCloseForComments: jest.fn(),
+            onCloseForComments: vi.fn(),
           })
           fireEvent.click(getByTestId('discussion-post-menu-trigger'))
           expect(queryByText('Close for Comments')).toBeTruthy()
@@ -286,7 +287,7 @@ describe('PostToolbar', () => {
         })
 
         it('calls provided callback when clicked', () => {
-          const onToggleCommentsMock = jest.fn()
+          const onToggleCommentsMock = vi.fn()
           const {getByTestId, getByText} = setup({
             onCloseForComments: onToggleCommentsMock,
           })
@@ -300,7 +301,7 @@ describe('PostToolbar', () => {
       describe('comments are currently disabled', () => {
         it('renders correct display text', () => {
           const {queryByText, getByTestId} = setup({
-            onOpenForComments: jest.fn(),
+            onOpenForComments: vi.fn(),
           })
           fireEvent.click(getByTestId('discussion-post-menu-trigger'))
           expect(queryByText('Open for Comments')).toBeTruthy()
@@ -308,7 +309,7 @@ describe('PostToolbar', () => {
         })
 
         it('calls provided callback when clicked', () => {
-          const onToggleCommentsMock = jest.fn()
+          const onToggleCommentsMock = vi.fn()
           const {getByTestId, getByText} = setup({
             onOpenForComments: onToggleCommentsMock,
           })
@@ -328,7 +329,7 @@ describe('PostToolbar', () => {
       })
 
       it('calls provided callback when clicked', () => {
-        const onSendMock = jest.fn()
+        const onSendMock = vi.fn()
         const {getByTestId, getByText} = setup({onSend: onSendMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(onSendMock.mock.calls).toHaveLength(0)
@@ -345,7 +346,7 @@ describe('PostToolbar', () => {
       })
 
       it('calls provided callback when clicked', () => {
-        const onCopyMock = jest.fn()
+        const onCopyMock = vi.fn()
         const {getByTestId, getByText} = setup({onCopy: onCopyMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(onCopyMock.mock.calls).toHaveLength(0)
@@ -362,7 +363,7 @@ describe('PostToolbar', () => {
       })
 
       it('calls provided callback when clicked', () => {
-        const onOpenSpeedgraderMock = jest.fn()
+        const onOpenSpeedgraderMock = vi.fn()
         const {getByTestId, getByText} = setup({onOpenSpeedgrader: onOpenSpeedgraderMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(onOpenSpeedgraderMock.mock.calls).toHaveLength(0)
@@ -379,7 +380,7 @@ describe('PostToolbar', () => {
       })
 
       it('calls provided callback when clicked', () => {
-        const onDisplayRubricMock = jest.fn()
+        const onDisplayRubricMock = vi.fn()
         const {getByTestId, getByText} = setup({
           onDisplayRubric: onDisplayRubricMock,
           showRubric: true,
@@ -393,7 +394,7 @@ describe('PostToolbar', () => {
 
     describe('share to commons', () => {
       beforeAll(() => {
-        window.ENV = {
+        fakeENV.setup({
           discussion_topic_menu_tools: [
             {
               base_url: 'example.com',
@@ -408,7 +409,11 @@ describe('PostToolbar', () => {
               title: 'Share to Example',
             },
           ],
-        }
+        })
+      })
+
+      afterAll(() => {
+        fakeENV.teardown()
       })
 
       it('does not render if cannot manage content', () => {
@@ -432,8 +437,8 @@ describe('PostToolbar', () => {
     })
 
     describe('translate', () => {
-      const tryTranslate = jest.fn()
-      const clearEntry = jest.fn()
+      const tryTranslate = vi.fn()
+      const clearEntry = vi.fn()
 
       it('displays Hide Translation when translation exists', () => {
         useTranslation.mockReturnValue({tryTranslate})

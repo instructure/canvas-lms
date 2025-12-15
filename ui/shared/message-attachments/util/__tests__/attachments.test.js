@@ -19,9 +19,7 @@ import * as uploadFileModule from '@canvas/upload-file'
 
 import {addAttachmentsFn, removeAttachmentFn} from '../attachments'
 
-// eslint-disable-next-line no-undef
-if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
-jest.mock('@canvas/upload-file')
+vi.mock('@canvas/upload-file')
 
 const fileInput = {
   currentTarget: {
@@ -38,16 +36,16 @@ const fileInput = {
   },
 }
 
-const getRemoveAttachment = (mockSetAttachments = jest.fn()) => {
+const getRemoveAttachment = (mockSetAttachments = vi.fn()) => {
   return removeAttachmentFn(mockSetAttachments)
 }
 
 const getAddAttachments = ({
-  mockSetAttachments = jest.fn(),
-  mockSetPendingUploads = jest.fn(),
+  mockSetAttachments = vi.fn(),
+  mockSetPendingUploads = vi.fn(),
   attachmentFolderId = '1983',
-  mockSetOnFailure = jest.fn(),
-  mockSetOnSuccess = jest.fn(),
+  mockSetOnFailure = vi.fn(),
+  mockSetOnSuccess = vi.fn(),
 } = {}) => {
   return addAttachmentsFn(
     mockSetAttachments,
@@ -64,7 +62,7 @@ describe('addAttachmentsFn', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('returns a function', () => {
@@ -87,7 +85,7 @@ describe('addAttachmentsFn', () => {
     })
 
     it('tracks pending uploads', async () => {
-      const mockSetPendingUploads = jest.fn()
+      const mockSetPendingUploads = vi.fn()
       const addAttachments = getAddAttachments({mockSetPendingUploads})
       expect(mockSetPendingUploads).toHaveBeenCalledTimes(0)
 
@@ -97,7 +95,7 @@ describe('addAttachmentsFn', () => {
     })
 
     it('saves added attachments', async () => {
-      const mockSetAttachments = jest.fn()
+      const mockSetAttachments = vi.fn()
       const addAttachments = getAddAttachments({mockSetAttachments})
 
       await addAttachments(fileInput)
@@ -106,8 +104,8 @@ describe('addAttachmentsFn', () => {
     })
 
     it('sets success message', async () => {
-      const mockSetOnSuccess = jest.fn()
-      const mockSetOnFailure = jest.fn()
+      const mockSetOnSuccess = vi.fn()
+      const mockSetOnFailure = vi.fn()
       const addAttachments = getAddAttachments({mockSetOnSuccess, mockSetOnFailure})
 
       await addAttachments(fileInput)
@@ -117,8 +115,8 @@ describe('addAttachmentsFn', () => {
     })
 
     it('sets failure message when no files', async () => {
-      const mockSetOnSuccess = jest.fn()
-      const mockSetOnFailure = jest.fn()
+      const mockSetOnSuccess = vi.fn()
+      const mockSetOnFailure = vi.fn()
       const addAttachments = getAddAttachments({mockSetOnSuccess, mockSetOnFailure})
 
       await addAttachments({currentTarget: {files: []}})
@@ -131,8 +129,8 @@ describe('addAttachmentsFn', () => {
       uploadFileModule.uploadFiles.mockImplementation(() => {
         throw new Error()
       })
-      const mockSetOnSuccess = jest.fn()
-      const mockSetOnFailure = jest.fn()
+      const mockSetOnSuccess = vi.fn()
+      const mockSetOnFailure = vi.fn()
       const addAttachments = getAddAttachments({mockSetOnSuccess, mockSetOnFailure})
 
       await addAttachments(fileInput)
@@ -149,7 +147,7 @@ describe('removeAttachmentFn', () => {
 
   describe('returned function', () => {
     it('removes correct attachment', () => {
-      const mockSetAttachments = jest.fn().mockImplementation(fn => {
+      const mockSetAttachments = vi.fn().mockImplementation(fn => {
         return fn([{id: '1983'}, {id: '9999'}])
       })
       const removeAttachment = getRemoveAttachment(mockSetAttachments)
@@ -160,7 +158,7 @@ describe('removeAttachmentFn', () => {
     })
 
     it('removes no attachments when no match', () => {
-      const mockSetAttachments = jest.fn().mockImplementation(fn => {
+      const mockSetAttachments = vi.fn().mockImplementation(fn => {
         return fn([{id: '1983'}, {id: '9999'}])
       })
       const removeAttachment = getRemoveAttachment(mockSetAttachments)
@@ -171,7 +169,7 @@ describe('removeAttachmentFn', () => {
     })
 
     it('removes no attachments when empty id', () => {
-      const mockSetAttachments = jest.fn().mockImplementation(fn => {
+      const mockSetAttachments = vi.fn().mockImplementation(fn => {
         return fn([{id: '1983'}, {id: '9999'}])
       })
       const removeAttachment = getRemoveAttachment(mockSetAttachments)
@@ -182,7 +180,7 @@ describe('removeAttachmentFn', () => {
     })
 
     it('removes no attachments when invalid id', () => {
-      const mockSetAttachments = jest.fn().mockImplementation(fn => {
+      const mockSetAttachments = vi.fn().mockImplementation(fn => {
         return fn([{id: '1983'}, {id: '9999'}])
       })
       const removeAttachment = getRemoveAttachment(mockSetAttachments)

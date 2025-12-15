@@ -33,7 +33,7 @@ describe('ThemeEditorImageRow Component', () => {
         human_name: 'Image',
         variable_name: 'image',
       },
-      onChange: jest.fn(),
+      onChange: vi.fn(),
     }
   })
 
@@ -104,7 +104,7 @@ describe('ThemeEditorImageRow Component', () => {
     const blob = new Blob(['foo'], {type: 'text/plain'})
     const originalCreateObjectURL = window.URL.createObjectURL
     const expected = 'blob:url'
-    jest.spyOn(window.URL, 'createObjectURL').mockReturnValue(expected)
+    vi.spyOn(window.URL, 'createObjectURL').mockReturnValue(expected)
     component.setValue({files: [blob]})
     expect(props.onChange).toHaveBeenCalledWith(expected)
     expect(window.URL.createObjectURL).toHaveBeenCalledWith(blob)

@@ -17,13 +17,149 @@
  */
 
 import '@testing-library/jest-dom'
-import {vi} from 'vitest'
+import {cleanup} from '@testing-library/react'
+import {vi, afterEach} from 'vitest'
 import $ from 'jquery'
+
+// Track all timers created during tests so we can clean them up
+// This prevents memory leaks from InstUI transitions and other timer-based code
+const pendingTimeouts = new Set<ReturnType<typeof setTimeout>>()
+const pendingIntervals = new Set<ReturnType<typeof setInterval>>()
+
+const originalSetTimeout = globalThis.setTimeout
+const originalSetInterval = globalThis.setInterval
+const originalClearTimeout = globalThis.clearTimeout
+const originalClearInterval = globalThis.clearInterval
+
+// Wrap setTimeout to track pending timers
+globalThis.setTimeout = ((callback: (...args: unknown[]) => void, ms?: number, ...args: unknown[]) => {
+  const id = originalSetTimeout(() => {
+    pendingTimeouts.delete(id)
+    callback(...args)
+  }, ms)
+  pendingTimeouts.add(id)
+  return id
+}) as typeof setTimeout
+
+// Wrap setInterval to track pending intervals
+globalThis.setInterval = ((callback: (...args: unknown[]) => void, ms?: number, ...args: unknown[]) => {
+  const id = originalSetInterval(callback, ms, ...args)
+  pendingIntervals.add(id)
+  return id
+}) as typeof setInterval
+
+// Wrap clearTimeout to remove from tracking
+globalThis.clearTimeout = ((id?: ReturnType<typeof setTimeout>) => {
+  if (id !== undefined) {
+    pendingTimeouts.delete(id)
+    originalClearTimeout(id)
+  }
+}) as typeof clearTimeout
+
+// Wrap clearInterval to remove from tracking
+globalThis.clearInterval = ((id?: ReturnType<typeof setInterval>) => {
+  if (id !== undefined) {
+    pendingIntervals.delete(id)
+    originalClearInterval(id)
+  }
+}) as typeof clearInterval
+
+// Global cleanup after each test to prevent memory leaks and timer issues
+// This is especially important for InstUI components that use transitions with setTimeout
+afterEach(() => {
+  // Clear all pending timers from InstUI transitions, animations, etc.
+  // These can cause "document is not defined" errors when they fire after jsdom teardown
+  for (const id of pendingTimeouts) {
+    originalClearTimeout(id)
+  }
+  pendingTimeouts.clear()
+
+  for (const id of pendingIntervals) {
+    originalClearInterval(id)
+  }
+  pendingIntervals.clear()
+
+  // Clean up any rendered React components that weren't explicitly unmounted
+  // This is a safeguard for tests that don't properly clean up
+  cleanup()
+})
+
+// jQuery plugins (toJSON, dialog, droppable, etc.) are added via the jquery-with-plugins.ts wrapper
+// which is aliased in vitest.config.ts. All imports of 'jquery' get the pre-configured instance.
+
+// Mock brandable CSS globally to prevent stylesheet loading errors
+// This prevents errors when handlebars templates try to load stylesheets during import
+vi.mock('@canvas/brandable-css', () => ({
+  __esModule: true,
+  default: {
+    loadStylesheetForJST: vi.fn(),
+    loadStylesheet: vi.fn(),
+    getCssVariant: vi.fn(() => 'new_styles_normal_contrast'),
+    getHandlebarsIndex: vi.fn(() => [[], {}]),
+    urlFor: vi.fn(() => ''),
+  },
+}))
+
+// Mock grading-scheme module to prevent resolution errors
+vi.mock('@canvas/grading-scheme', () => ({
+  __esModule: true,
+  GradingSchemesSelector: () => null,
+  GradingSchemesManagement: () => null,
+  UsedLocationsModal: () => null,
+}))
+
+// Mock fcUtil to avoid fullCalendar dependency issues in tests
+// fullCalendar doesn't properly attach to jQuery in Vitest environment
+vi.mock('@canvas/calendar/jquery/fcUtil', async () => {
+  const moment = await import('moment')
+  const tz = await import('@instructure/moment-utils')
+
+  return {
+    default: {
+      wrap(date: Date | string | null | undefined) {
+        if (!date) return null
+        try {
+          // fudgeDateForProfileTimezone may not be available, so just use moment directly
+          return moment.default(date)
+        } catch (e) {
+          console.error('Error in fcUtil.wrap:', e)
+          return moment.default(date)
+        }
+      },
+      unwrap(date: any) {
+        if (!date) return null
+        if (date.hasZone && date.hasZone()) {
+          return date.toDate()
+        } else {
+          return tz.parse(date.format())
+        }
+      },
+      now() {
+        return moment.default()
+      },
+      clone(momentObj: any) {
+        return moment.default(momentObj)
+      },
+      addMinuteDelta(momentObj: any, minuteDelta: number) {
+        const dayDelta = (minuteDelta / 1440) | 0
+        minuteDelta %= 1440
+        const result = moment.default(momentObj)
+        result.add(dayDelta, 'days')
+        result.add(minuteDelta, 'minutes')
+        return result
+      },
+    },
+  }
+})
 
 // Make jQuery available globally BEFORE importing plugins
 // This is needed for jqueryui plugins to attach to the correct jQuery instance
 vi.stubGlobal('$', $)
 vi.stubGlobal('jQuery', $)
+
+// Make moment available globally for fullCalendar
+import moment from 'moment'
+vi.stubGlobal('moment', moment)
 
 // Import jqueryui modules in dependency order
 // 1. core.js defines $.ui namespace and $.ui.plugin (used by draggable/resizable)
@@ -47,82 +183,11 @@ import 'jqueryui/tooltip'
 import 'jqueryui/datepicker'
 import 'jqueryui/progressbar'
 
-// Provide fallback stubs for jQuery UI plugins in case imports don't properly attach
-// This ensures tests don't fail with "X is not a function" errors
-const jqueryUIStubs = {
-  tooltip(this: JQuery) {
-    return this
-  },
-  tabs(this: JQuery) {
-    return this
-  },
-  autocomplete(this: JQuery) {
-    return this
-  },
-  dialog(this: JQuery) {
-    return this
-  },
-  sortable(this: JQuery) {
-    return this
-  },
-  draggable(this: JQuery) {
-    return this
-  },
-  droppable(this: JQuery) {
-    return this
-  },
-  resizable(this: JQuery) {
-    return this
-  },
-  datepicker(this: JQuery) {
-    return this
-  },
-  menu(this: JQuery) {
-    return this
-  },
-  slider(this: JQuery) {
-    return this
-  },
-  selectable(this: JQuery) {
-    return this
-  },
-  accordion(this: JQuery) {
-    return this
-  },
-  progressbar(this: JQuery) {
-    return this
-  },
-  spinner(this: JQuery) {
-    return this
-  },
-  button(this: JQuery) {
-    return this
-  },
-  buttonset(this: JQuery) {
-    return this
-  },
-}
+// jQuery UI plugins are now stubbed in the vi.mock('jquery') factory above
+// This ensures ALL imports of jquery get the same instance with plugins attached
 
-// Apply stubs only if the method doesn't exist on $.fn
-for (const [name, stub] of Object.entries(jqueryUIStubs)) {
-  if (!($.fn as unknown as Record<string, unknown>)[name]) {
-    ;($.fn as unknown as Record<string, unknown>)[name] = stub
-  }
-}
-
-// Add toJSON method for form serialization (used by Backbone views)
-if (!($.fn as unknown as Record<string, unknown>).toJSON) {
-  ;($.fn as unknown as Record<string, unknown>).toJSON = function (this: JQuery) {
-    const result: Record<string, string> = {}
-    this.find('input, select, textarea').each(function () {
-      const el = this as HTMLInputElement
-      if (el.name) {
-        result[el.name] = el.value
-      }
-    })
-    return result
-  }
-}
+// Import Canvas jQuery plugins - these extend $.fn with custom methods
+import '@canvas/serialize-form'
 
 // Import Canvas jQuery plugins that extend $ with custom methods
 // These are normally loaded via webpack entry points in Jest
@@ -186,9 +251,15 @@ const ignoredWarnings = [
   /componentWillReceiveProps/,
   /Found @client directives in a query but no ApolloClient resolvers/,
   /No more mocked responses for the query/,
+  /Consumer uses the legacy contextTypes API/,
+  /Warning: ReactDOM.render is no longer supported in React 18/,
+]
+const ignoredLogs = [
+  /JQMIGRATE:/,
 ]
 const originalError = console.error
 const originalWarn = console.warn
+const originalLog = console.log
 console.error = (msg: unknown, ...args: unknown[]) => {
   const msgStr = String(msg)
   if (ignoredErrors.some(regex => regex.test(msgStr))) return
@@ -198,6 +269,10 @@ console.error = (msg: unknown, ...args: unknown[]) => {
 console.warn = (msg: unknown, ...args: unknown[]) => {
   if (ignoredWarnings.some(regex => regex.test(String(msg)))) return
   originalWarn(msg, ...args)
+}
+console.log = (msg: unknown, ...args: unknown[]) => {
+  if (ignoredLogs.some(regex => regex.test(String(msg)))) return
+  originalLog(msg, ...args)
 }
 filterUselessConsoleMessages(console)
 
@@ -283,7 +358,11 @@ if (!window.structuredClone) {
 }
 
 if (typeof window.URL.createObjectURL === 'undefined') {
-  Object.defineProperty(window.URL, 'createObjectURL', {value: () => 'http://example.com/whatever'})
+  // Return blob: URLs to match real behavior expected by tests (e.g., FileUpload.test.jsx)
+  let blobCounter = 0
+  Object.defineProperty(window.URL, 'createObjectURL', {
+    value: () => `blob:http://localhost/test-blob-${blobCounter++}`,
+  })
 }
 
 if (typeof window.URL.revokeObjectURL === 'undefined') {

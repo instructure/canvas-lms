@@ -107,21 +107,21 @@ describe('CanvasAsyncSelect', () => {
   })
 
   it('shows the options on input change', () => {
-    const handleInputChange = jest.fn()
+    const handleInputChange = vi.fn()
     const {input, getByText} = renderSelect({onInputChange: handleInputChange})
     fireEvent.change(input, {target: {value: 'abc'}})
     expect(getByText('---')).toBeInTheDocument()
   })
 
   it('reports changes to the input', () => {
-    const handleInputChange = jest.fn()
+    const handleInputChange = vi.fn()
     const {input} = renderSelect({onInputChange: handleInputChange})
     fireEvent.change(input, {target: {value: 'abc'}})
     expect(handleInputChange).toHaveBeenCalledWith(expect.anything(), 'abc')
   })
 
   it('displays the specified options and reports selections', () => {
-    const handleOptionSelected = jest.fn()
+    const handleOptionSelected = vi.fn()
     const {input, getByText} = renderSelect({
       onOptionSelected: handleOptionSelected,
       options: [{id: 'foo', label: 'bar'}],

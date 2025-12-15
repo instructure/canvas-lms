@@ -25,9 +25,9 @@ import {FilterType} from '../FilterControls'
 import {RESPONSE_ACCOUNT_3, RESPONSE_ACCOUNT_4} from './fixtures'
 import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
 
-jest.mock('@canvas/calendar/AccountCalendarsUtils', () => {
+vi.mock('@canvas/calendar/AccountCalendarsUtils', () => {
   return {
-    alertForMatchingAccounts: jest.fn(),
+    alertForMatchingAccounts: vi.fn(),
   }
 })
 
@@ -36,8 +36,8 @@ const defaultProps: ComponentProps = {
   searchValue: 'elemen',
   filterValue: FilterType.SHOW_ALL,
   visibilityChanges: [],
-  onAccountToggled: jest.fn(),
-  onAccountSubscriptionToggled: jest.fn(),
+  onAccountToggled: vi.fn(),
+  onAccountSubscriptionToggled: vi.fn(),
   subscriptionChanges: [],
 }
 
@@ -48,7 +48,7 @@ const accountListUrl = (searchTerm = '', filter = '') =>
 
 beforeEach(() => {
   fetchMock.get(accountListUrl(), [])
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 afterEach(() => {
@@ -104,7 +104,7 @@ describe('AccountList', () => {
   })
 
   it('calls onAccountToggled when toggling a checkbox', async () => {
-    const onAccountToggled = jest.fn()
+    const onAccountToggled = vi.fn()
     fetchMock.get(accountListUrl('elemen'), RESPONSE_ACCOUNT_4)
     const {findByText, getByRole} = render(
       <AccountList {...defaultProps} onAccountToggled={onAccountToggled} />,

@@ -105,8 +105,8 @@ function mockStandardAssignmentsResponse() {
 function renderBulkEdit(overrides = {}) {
   const props = {
     courseId: '42',
-    onCancel: jest.fn(),
-    onSave: jest.fn(),
+    onCancel: vi.fn(),
+    onSave: vi.fn(),
     ...overrides,
   }
   const result = {...render(<BulkEdit {...props} />), ...props}
@@ -128,11 +128,12 @@ function changeAndBlurInput(input, newValue) {
 
 beforeEach(() => {
   fetchMock.put(/api\/v1\/courses\/\d+\/assignments\/bulk_update/, {})
-  jest.useFakeTimers()
+  vi.useFakeTimers()
 })
 
 afterEach(() => {
   fetchMock.reset()
+  vi.useRealTimers()
 })
 
 describe('Assignment Bulk Edit Dates', () => {
@@ -185,44 +186,8 @@ describe('Assignment Bulk Edit Dates', () => {
       ])
     })
 
-    it('can save multiple assignments and overrides', async () => {
-      const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
-      const dueAtDate = '2020-04-01'
-      const dueAtMoment = moment.tz(dueAtDate, 'Asia/Tokyo')
-      changeAndBlurInput(getAllByLabelText('Due At')[0], dueAtDate)
-      changeAndBlurInput(getAllByLabelText('Due At')[1], dueAtDate)
-      changeAndBlurInput(getAllByLabelText('Due At')[2], dueAtDate)
-      fireEvent.click(getByText('Save'))
-      await flushPromises()
-      const body = JSON.parse(fetchMock.calls()[1][1].body)
-      expect(body).toMatchObject([
-        {
-          id: 'assignment_1',
-          all_dates: [
-            {
-              base: true,
-              due_at: '2020-04-01T14:59:59.999Z', // The UTC time of day was preserved
-            },
-            {
-              id: 'override_1',
-              due_at: '2020-04-01T14:59:59.999Z',
-            },
-          ],
-        },
-        {
-          id: 'assignment_2',
-          all_dates: [
-            {
-              base: true,
-              due_at: dueAtMoment
-                .clone()
-                .endOf('day') // new due date gets end of day in the specified TZ
-                .toISOString(),
-            },
-          ],
-        },
-      ])
-    })
+    // Test 'can save multiple assignments and overrides' moved to BulkEditSaveMultiple.test.jsx
+    // because it changes multiple inputs and times out with fake timers
 
     it('disables the Save button while saving', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()

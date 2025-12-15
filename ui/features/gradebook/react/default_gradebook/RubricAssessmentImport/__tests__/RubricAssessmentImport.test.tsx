@@ -22,15 +22,15 @@ import * as ViewRubricQueries from '../../queries/Queries'
 import useStore from '../../stores'
 import {RubricAssessmentImport} from '../index'
 
-jest.mock('../../queries/Queries', () => ({
-  ...jest.requireActual('../../queries/Queries'),
-  importRubricAssessment: jest.fn(),
-  fetchRubricAssessmentImport: jest.fn(),
+vi.mock('../../queries/Queries', async () => ({
+  ...(await vi.importActual('../../queries/Queries')),
+  importRubricAssessment: vi.fn(),
+  fetchRubricAssessmentImport: vi.fn(),
 }))
 
 describe('ImportRubric Tests', () => {
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   const renderComponent = () => {
@@ -56,7 +56,7 @@ describe('ImportRubric Tests', () => {
         name: 'assignment test',
         courseId: '7',
       })
-      jest.spyOn(ViewRubricQueries, 'importRubricAssessment').mockImplementation(() =>
+      vi.spyOn(ViewRubricQueries, 'importRubricAssessment').mockImplementation(() =>
         Promise.resolve({
           id: '1',
           rootAccountId: '2',
@@ -101,7 +101,7 @@ describe('ImportRubric Tests', () => {
     // to simulate a file being dropped. There may be a way to mock this, but it will
     // take some research.
     it.skip('SKIPPED FOO-5334; successfully imports the rubric csv and displays rubric import data in ImportTable', async () => {
-      jest.spyOn(ViewRubricQueries, 'fetchRubricAssessmentImport').mockImplementation(() =>
+      vi.spyOn(ViewRubricQueries, 'fetchRubricAssessmentImport').mockImplementation(() =>
         Promise.resolve({
           id: '1',
           rootAccountId: '2',
@@ -147,7 +147,7 @@ describe('ImportRubric Tests', () => {
     // to simulate a file being dropped. There may be a way to mock this, but it will
     // take some research.
     it.skip('SKIPPED FOO-5334; displays the ImportFailuresModal if the rubric import failed', async () => {
-      jest.spyOn(ViewRubricQueries, 'fetchRubricAssessmentImport').mockImplementation(() =>
+      vi.spyOn(ViewRubricQueries, 'fetchRubricAssessmentImport').mockImplementation(() =>
         Promise.resolve({
           id: '1',
           rootAccountId: '2',

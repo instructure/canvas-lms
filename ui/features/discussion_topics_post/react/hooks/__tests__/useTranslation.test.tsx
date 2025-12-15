@@ -26,11 +26,11 @@ import React from 'react'
 import {GET_PREFERRED_LANGUAGE} from '../../../graphql/Queries'
 import {UPDATE_DISCUSSION_TOPIC_PARTICIPANT} from '../../../graphql/Mutations'
 
-jest.mock('../../utils', () => ({
-  getTranslation: jest.fn(),
+vi.mock('../../utils', () => ({
+  getTranslation: vi.fn(),
 }))
 
-const mockGetTranslation = utils.getTranslation as jest.MockedFunction<typeof utils.getTranslation>
+const mockGetTranslation = utils.getTranslation as ReturnType<typeof vi.fn>
 
 describe('useTranslation', () => {
   beforeEach(() => {
@@ -47,7 +47,7 @@ describe('useTranslation', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const createMockQueryResponse = (preferredLanguage: string | null) => ({
@@ -225,7 +225,7 @@ describe('useTranslation', () => {
   describe('tryTranslate', () => {
     it('opens modal when preferredLanguage is not set', async () => {
       const mocks = [createMockQueryResponse(null)]
-      const setModalOpenSpy = jest.fn()
+      const setModalOpenSpy = vi.fn()
 
       useTranslationStore.setState({
         setModalOpen: setModalOpenSpy,

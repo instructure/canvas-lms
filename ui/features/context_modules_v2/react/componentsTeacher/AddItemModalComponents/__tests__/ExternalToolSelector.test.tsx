@@ -73,7 +73,7 @@ const contentItems: ExternalToolModalItem[] = [
 ]
 
 const buildProps = (overrides = {}) => ({
-  onToolSelect: jest.fn(),
+  onToolSelect: vi.fn(),
   contentItems: contentItems,
   ...overrides,
 })

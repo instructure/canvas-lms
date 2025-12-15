@@ -24,8 +24,8 @@ import {Discussion} from '../../../../graphql/Discussion'
 import {Assignment} from '../../../../graphql/Assignment'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
+vi.mock('../../../utils', async (importOriginal) => ({
+  ...(await importOriginal()),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 

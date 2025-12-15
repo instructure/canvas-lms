@@ -40,13 +40,13 @@ describe('AlignmentSummaryHeader', () => {
   })
 
   beforeEach(() => {
-    updateSearchHandlerMock = jest.fn()
-    clearSearchHandlerMock = jest.fn()
-    updateFilterHandlerMock = jest.fn()
+    updateSearchHandlerMock = vi.fn()
+    clearSearchHandlerMock = vi.fn()
+    updateFilterHandlerMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders component', () => {

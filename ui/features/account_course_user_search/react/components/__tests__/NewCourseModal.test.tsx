@@ -81,7 +81,7 @@ describe('NewCourseModal', () => {
   })
 
   it('handles accounts with null names gracefully', () => {
-    const mockGetTree = jest.spyOn(AccountsTreeStore, 'getTree').mockReturnValue({
+    const mockGetTree = vi.spyOn(AccountsTreeStore, 'getTree').mockReturnValue({
       loading: false,
       accounts: [
         {

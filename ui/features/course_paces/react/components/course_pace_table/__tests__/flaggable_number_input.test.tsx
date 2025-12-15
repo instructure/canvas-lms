@@ -23,9 +23,9 @@ import userEvent from '@testing-library/user-event'
 
 import {FlaggableNumberInput} from '../flaggable_number_input'
 
-const onChange = jest.fn()
-const onDecrement = jest.fn()
-const onIncrement = jest.fn()
+const onChange = vi.fn()
+const onDecrement = vi.fn()
+const onIncrement = vi.fn()
 
 const defaultProps = {
   label: 'Duration for assignment 3',
@@ -40,7 +40,7 @@ const defaultProps = {
 
 describe('FlaggableNumberInput', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders an input with provided label and value', () => {

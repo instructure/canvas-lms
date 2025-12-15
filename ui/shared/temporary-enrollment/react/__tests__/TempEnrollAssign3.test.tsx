@@ -21,11 +21,11 @@ import {Props, TempEnrollAssign, tempEnrollAssignData} from '../TempEnrollAssign
 import {MAX_ALLOWED_COURSES_PER_PAGE, PROVIDER, User} from '../types'
 import fetchMock from 'fetch-mock'
 
-const backCall = jest.fn()
+const backCall = vi.fn()
 
-jest.mock('../api/enrollment', () => ({
-  deleteEnrollment: jest.fn(),
-  getTemporaryEnrollmentPairing: jest.fn(),
+vi.mock('../api/enrollment', () => ({
+  deleteEnrollment: vi.fn(),
+  getTemporaryEnrollmentPairing: vi.fn(),
 }))
 
 const truePermissions = {
@@ -84,7 +84,7 @@ const props: Props = {
     },
   ],
   goBack: backCall,
-  setEnrollmentStatus: jest.fn(),
+  setEnrollmentStatus: vi.fn(),
   doSubmit: () => false,
   isInAssignEditMode: false,
   enrollmentType: PROVIDER,
@@ -116,7 +116,7 @@ describe('TempEnrollAssign', () => {
   afterEach(() => {
     fetchMock.reset()
     fetchMock.restore()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // ensure a clean state before each tests
     localStorage.clear()
   })
@@ -185,14 +185,14 @@ describe('TempEnrollAssign', () => {
     )
     const startTime = await findByLabelTextWithinStartDate('Time *')
 
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     fireEvent.input(startDate, {target: {value: expectedStartDateDisplay}})
     fireEvent.blur(startDate)
-    jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+    vi.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
     fireEvent.input(startTime, {target: {value: expectedStartTime12Hr}})
     fireEvent.blur(startTime)
-    jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+    vi.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
     const storedDataRaw = localStorage.getItem(tempEnrollAssignData) as string
     expect(storedDataRaw).toBeTruthy()
@@ -224,14 +224,14 @@ describe('TempEnrollAssign', () => {
     const {findByLabelText: findByLabelTextWithinEndDate} = within(endDateContainer as HTMLElement)
     const endTime = await findByLabelTextWithinEndDate('Time *')
 
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     fireEvent.input(endDate, {target: {value: expectedEndDateDisplay}})
     fireEvent.blur(endDate)
-    jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+    vi.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
     fireEvent.input(endTime, {target: {value: expectedEndTime12Hr}})
     fireEvent.blur(endTime)
-    jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+    vi.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
     const storedDataRaw = localStorage.getItem(tempEnrollAssignData) as string
     expect(storedDataRaw).toBeTruthy()

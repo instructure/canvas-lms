@@ -24,7 +24,7 @@ import rubric_assessment from '../rubric_assessment'
 
 describe('RubricAssessment', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     document.body.innerHTML = ''
   })
 
@@ -94,7 +94,7 @@ describe('RubricAssessment', () => {
     let flashWarning
 
     beforeEach(() => {
-      flashWarning = jest.fn()
+      flashWarning = vi.fn()
       $.flashWarning = flashWarning
     })
 

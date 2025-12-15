@@ -34,42 +34,42 @@ describe('ViewOptionsTabPanel', () => {
       columnSort: {
         currentValue: {criterion: 'points', direction: 'descending'},
         modulesEnabled: true,
-        onChange: jest.fn(),
+        onChange: vi.fn(),
       },
       finalGradeOverrideEnabled: true,
       hideAssignmentGroupTotals: {
         checked: false,
-        onChange: jest.fn(),
+        onChange: vi.fn(),
       },
       hideTotal: {
         checked: false,
-        onChange: jest.fn(),
+        onChange: vi.fn(),
       },
       showNotes: {
         checked: true,
-        onChange: jest.fn(),
+        onChange: vi.fn(),
       },
       showUnpublishedAssignments: {
         checked: true,
-        onChange: jest.fn(),
+        onChange: vi.fn(),
       },
       statusColors: {
         currentValues: statusColors(),
-        onChange: jest.fn(),
+        onChange: vi.fn(),
       },
       viewUngradedAsZero: {
         allowed: true,
         checked: true,
-        onChange: jest.fn(),
+        onChange: vi.fn(),
       },
       showSeparateFirstLastNames: {
         allowed: true,
         checked: false,
-        onChange: jest.fn(),
+        onChange: vi.fn(),
       },
       viewHiddenGradesIndicator: {
         checked: false,
-        onChange: jest.fn(),
+        onChange: vi.fn(),
       },
     }
   })
@@ -117,7 +117,7 @@ describe('ViewOptionsTabPanel', () => {
     })
 
     it('calls .onChange when the user selects a new setting', () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByText} = renderPanel({
         columnSort: {...props.columnSort, onChange},
       })
@@ -145,7 +145,7 @@ describe('ViewOptionsTabPanel', () => {
     })
 
     it('calls .onChange when the user toggles the item', () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByLabelText} = renderPanel({showNotes: {checked: false, onChange}})
 
       fireEvent.click(getByLabelText('Notes'))
@@ -169,7 +169,7 @@ describe('ViewOptionsTabPanel', () => {
     })
 
     it('calls .onChange when the user toggles the item', () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByLabelText} = renderPanel({showUnpublishedAssignments: {checked: false, onChange}})
 
       fireEvent.click(getByLabelText('Unpublished Assignments'))
@@ -194,7 +194,7 @@ describe('ViewOptionsTabPanel', () => {
       })
 
       it('calls .onChange when the user toggles the item', () => {
-        const onChange = jest.fn()
+        const onChange = vi.fn()
         const {getByLabelText} = renderPanel({
           viewUngradedAsZero: {allowed: true, checked: false, onChange},
         })
@@ -228,7 +228,7 @@ describe('ViewOptionsTabPanel', () => {
     })
 
     it('calls .onChange when the user toggles the item', () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByLabelText} = renderPanel({
         hideAssignmentGroupTotals: {allowed: true, checked: false, onChange},
       })
@@ -265,7 +265,7 @@ describe('ViewOptionsTabPanel', () => {
     })
 
     it('calls .onChange when the user toggles the item', () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByLabelText} = renderPanel({
         hideTotal: {allowed: true, checked: false, onChange},
       })
@@ -292,7 +292,7 @@ describe('ViewOptionsTabPanel', () => {
       })
 
       it('calls .onChange when the user toggles the item', () => {
-        const onChange = jest.fn()
+        const onChange = vi.fn()
         const {getByLabelText} = renderPanel({
           showSeparateFirstLastNames: {allowed: true, checked: false, onChange},
         })
@@ -326,7 +326,7 @@ describe('ViewOptionsTabPanel', () => {
     })
 
     it('calls .onChange when the user toggles the item', () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByLabelText} = renderPanel({
         viewHiddenGradesIndicator: {checked: false, onChange},
       })
@@ -351,7 +351,7 @@ describe('ViewOptionsTabPanel', () => {
     })
 
     it('calls .onChange when the user changes a color', () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByText} = renderPanel({
         statusColors: {
           currentValues: {...statusColors(), excused: '#ffffff'},

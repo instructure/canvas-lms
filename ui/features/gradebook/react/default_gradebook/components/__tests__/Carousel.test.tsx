@@ -70,7 +70,7 @@ describe('Carousel', () => {
 
   test('calls onLeftArrowClick when left arrow is clicked', async function () {
     props.displayLeftArrow = true
-    props.onLeftArrowClick = jest.fn()
+    props.onLeftArrowClick = vi.fn()
     subject(props)
     await userEvent.click(screen.getByRole('button', {name: 'Previous'}))
     expect(props.onLeftArrowClick).toHaveBeenCalledTimes(1)
@@ -78,7 +78,7 @@ describe('Carousel', () => {
 
   test('calls onRightArrowClick when right arrow is clicked', async function () {
     props.displayRightArrow = true
-    props.onRightArrowClick = jest.fn()
+    props.onRightArrowClick = vi.fn()
     subject(props)
     await userEvent.click(screen.getByRole('button', {name: 'Next'}))
     expect(props.onRightArrowClick).toHaveBeenCalledTimes(1)

@@ -16,30 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, screen} from '@testing-library/react'
+import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
-import {NewLoginDataProvider, NewLoginProvider} from '../../../context'
+import {NewLoginDataProvider, NewLoginProvider,useNewLogin} from '../../../context'
 import Landing from '../Landing'
 
-const mockNavigate = jest.fn()
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
-}))
-
-jest.mock('../../../context', () => {
-  const originalModule = jest.requireActual('../../../context')
+const mockNavigate = vi.fn()
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom')
   return {
-    ...originalModule,
-    useNewLogin: jest.fn(() => ({isUiActionPending: false})),
+    ...actual,
+    useNavigate: () => mockNavigate,
   }
 })
-const mockUseNewLogin = require('../../../context').useNewLogin
+
+
+vi.mock('../../../context', async () => {
+  const originalModule = await vi.importActual('../../../context')
+  return {
+    ...originalModule,
+    useNewLogin: vi.fn(() => ({isUiActionPending: false})),
+  }
+})
+const mockUseNewLogin = vi.mocked(useNewLogin)
 
 describe('Landing', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderLanding = () =>
@@ -88,8 +96,19 @@ describe('Landing', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/login/canvas/register/teacher')
   })
 
-  it('prevents navigation when a “ui action” is pending', () => {
-    mockUseNewLogin.mockReturnValueOnce({isUiActionPending: true})
+  it('prevents navigation when a "ui action" is pending', () => {
+    vi.mocked(mockUseNewLogin).mockReturnValueOnce({
+      isUiActionPending: true,
+      setIsUiActionPending: vi.fn(),
+      rememberMe: false,
+      setRememberMe: vi.fn(),
+      otpRequired: false,
+      setOtpRequired: vi.fn(),
+      showForgotPassword: false,
+      setShowForgotPassword: vi.fn(),
+      otpCommunicationChannelId: null,
+      setOtpCommunicationChannelId: vi.fn(),
+    })
     renderLanding()
     const teacherCard = screen.getByLabelText('Create Teacher Account')
     fireEvent.click(teacherCard)

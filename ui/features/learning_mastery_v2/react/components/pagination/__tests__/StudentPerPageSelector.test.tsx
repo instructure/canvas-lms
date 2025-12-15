@@ -24,7 +24,7 @@ describe('StudentPerPageSelector', () => {
   const defaultProps: StudentPerPageSelectorProps = {
     options: [10, 20, 50],
     value: 20,
-    onChange: jest.fn(),
+    onChange: vi.fn(),
   }
 
   it('renders the correct number of options', async () => {

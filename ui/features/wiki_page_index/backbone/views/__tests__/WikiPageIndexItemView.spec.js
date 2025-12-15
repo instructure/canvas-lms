@@ -66,7 +66,7 @@ describe('WikiPageIndex', () => {
         collectionHasTodoDate: () => {},
         selectedPages: {},
       })
-      const stub = jest.spyOn(model, 'setFrontPage').mockImplementation()
+      const stub = vi.spyOn(model, 'setFrontPage').mockImplementation()
       view.useAsFrontPage()
       expect(stub).toHaveBeenCalledTimes(1)
       stub.mockRestore()

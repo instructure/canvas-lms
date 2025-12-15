@@ -7,7 +7,7 @@
  * @website: http://www.datejs.com/
  */
  
-import './sugarpak'
+import './sugarpak.js'
 (function () {
     Date.Parsing = {
         Exception: function (s) {

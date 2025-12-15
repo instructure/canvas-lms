@@ -20,19 +20,19 @@ import {renderBlock} from '../../__tests__/render-helper'
 import {ImageTextBlock} from '../ImageTextBlock'
 import {ImageTextBlockProps} from '../types'
 
-jest.mock('../../../store', () => ({
+vi.mock('../../../store', async () => ({
   __esModule: true,
-  ...jest.requireActual('../../../store'),
-  useAppSetStore: jest.fn().mockReturnValue(jest.fn()),
+  ...await vi.importActual('../../../store'),
+  useAppSetStore: vi.fn().mockReturnValue(vi.fn()),
 }))
 
-const useIsInEditorMock = jest.fn()
-jest.mock('../../../hooks/useIsInEditor', () => ({
+const useIsInEditorMock = vi.fn()
+vi.mock('../../../hooks/useIsInEditor', () => ({
   useIsInEditor: () => useIsInEditorMock(),
 }))
 
-const useIsEditingBlockMock = jest.fn()
-jest.mock('../../../hooks/useIsEditingBlock', () => ({
+const useIsEditingBlockMock = vi.fn()
+vi.mock('../../../hooks/useIsEditingBlock', () => ({
   useIsEditingBlock: () => useIsEditingBlockMock(),
 }))
 
@@ -65,7 +65,7 @@ const defaultProps: ImageTextBlockProps = {
 
 describe('ImageTextBlock', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('when block in edit mode', () => {

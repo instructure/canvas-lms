@@ -25,7 +25,7 @@ import {createMockFileManagementContext} from '../../../__tests__/createMockCont
 
 describe('SubTableContent', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     ENV.FEATURES = {restrict_student_access: false}
   })
 

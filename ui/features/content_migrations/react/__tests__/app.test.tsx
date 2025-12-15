@@ -20,7 +20,6 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
-import '@testing-library/jest-dom/extend-expect'
 import {App} from '../app'
 
 const server = setupServer()

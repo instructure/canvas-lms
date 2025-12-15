@@ -138,8 +138,8 @@ describe('SubmissionTray', () => {
   }
 
   function carouselButton(label: string) {
-    const $buttons = [...content.querySelectorAll('button')]
-    return $buttons.find($button => $button.textContent.trim() === label)
+    const $buttons = Array.from(content.querySelectorAll('button')) as HTMLButtonElement[]
+    return $buttons.find($button => $button.textContent?.trim() === label)
   }
 
   function submitForStudentButton() {
@@ -159,7 +159,7 @@ describe('SubmissionTray', () => {
   }
 
   function studentGroupRequiredAlert() {
-    return [...document.querySelectorAll('div')].find($el =>
+    return [...Array.from(document.querySelectorAll('div'))].find($el =>
       $el.textContent?.includes('you must select a student group'),
     )
   }
@@ -304,7 +304,7 @@ describe('SubmissionTray', () => {
     props.assignment.gradingType = 'points'
     props.assignment.htmlUrl = 'http://htmlUrl/'
     props.assignment.published = true
-    props.onAnonymousSpeedGraderClick = jest.fn()
+    props.onAnonymousSpeedGraderClick = vi.fn()
 
     mountComponent()
     fireEvent.click(speedGraderLink()!)
@@ -659,7 +659,7 @@ describe('SubmissionTray', () => {
     })
 
     test('receives the "onGradeSubmission" callback given to the Tray', async () => {
-      const onGradeSubmission = jest.fn()
+      const onGradeSubmission = vi.fn()
       mountComponent({onGradeSubmission})
       const gradeInput = findGradeInput()
       await gradeInput?.inputValueAndBlur('EX')
@@ -799,14 +799,14 @@ describe('SubmissionTray', () => {
   })
 
   test('cancelCommenting calls editSubmissionComment', () => {
-    const editSubmissionComment = jest.fn()
+    const editSubmissionComment = vi.fn()
     mountComponent({editedCommentId: '5', editSubmissionComment})
     reactRef.current.cancelCommenting()
     expect(editSubmissionComment).toHaveBeenCalledTimes(1)
   })
 
   test('cancelCommenting sets the edited submission comment id to null', () => {
-    const editSubmissionComment = jest.fn()
+    const editSubmissionComment = vi.fn()
     mountComponent({editedCommentId: '5', editSubmissionComment})
     reactRef.current.cancelCommenting()
     expect(editSubmissionComment).toHaveBeenCalledWith(null)

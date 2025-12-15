@@ -25,7 +25,7 @@ import {GroupSet} from '../../../../graphql/GroupSet'
 import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from '../../../util/constants'
 import DiscussionTopicForm, {isGuidDataValid, getAbGuidArray} from '../DiscussionTopicForm'
 
-jest.mock('@canvas/rce/react/CanvasRce')
+vi.mock('@canvas/rce/react/CanvasRce')
 
 describe('DiscussionTopicForm', () => {
   const setup = ({
@@ -122,7 +122,7 @@ describe('DiscussionTopicForm', () => {
     })
 
     it('submits only with non-empty title', () => {
-      const onSubmit = jest.fn()
+      const onSubmit = vi.fn()
       const {getByText, getByPlaceholderText} = setup({onSubmit})
       const saveButton = getByText('Save')
       saveButton.click()
@@ -133,10 +133,9 @@ describe('DiscussionTopicForm', () => {
     })
 
     it('shows too-long title reminder', async () => {
-      const {getByText, getByLabelText} = setup()
-      const titleInput = getByLabelText(/Topic Title/)
-      fireEvent.input(titleInput, {target: {value: 'A'.repeat(260)}})
-      await userEvent.type(titleInput, 'A')
+      const {getByText, getByPlaceholderText} = setup()
+      const titleInput = getByPlaceholderText('Topic Title')
+      fireEvent.input(titleInput, {target: {value: 'A'.repeat(256)}})
       await waitFor(() =>
         expect(getByText('Title must be less than 255 characters.')).toBeInTheDocument(),
       )

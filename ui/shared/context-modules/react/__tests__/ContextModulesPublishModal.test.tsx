@@ -54,7 +54,7 @@ beforeEach(() => {
 
 afterEach(() => {
   server.resetHandlers()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 afterAll(() => server.close())
@@ -95,7 +95,7 @@ describe('ContextModulesPublishModal', () => {
   })
 
   it('calls onPublish when the publish button is clicked', () => {
-    const onPublish = jest.fn()
+    const onPublish = vi.fn()
     const {getByText} = render(
       <ContextModulesPublishModal {...defaultProps} onPublish={onPublish} />,
     )
@@ -105,7 +105,7 @@ describe('ContextModulesPublishModal', () => {
   })
 
   it('has a close button', () => {
-    const onDismiss = jest.fn()
+    const onDismiss = vi.fn()
     const {getByTestId} = render(
       <ContextModulesPublishModal {...defaultProps} onDismiss={onDismiss} />,
     )

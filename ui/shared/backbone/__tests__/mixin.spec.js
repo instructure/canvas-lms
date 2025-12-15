@@ -23,12 +23,12 @@ describe('mixin', () => {
     const mixin1 = {
       events: {'click .foo': 'foo'},
       defaults: {foo: 'bar'},
-      foo: jest.fn(),
+      foo: vi.fn(),
     }
     const mixin2 = {
       events: {'click .bar': 'bar'},
       defaults: {baz: 'qux'},
-      bar: jest.fn(),
+      bar: vi.fn(),
     }
     const obj = mixin({}, mixin1, mixin2)
     // events are expected to all be merged together

@@ -22,17 +22,17 @@ import {DATE_RANGE_TYPE_OPTIONS} from '../PermissionsModalUtils'
 
 const defaultProps: DateRangeSelectProps = {
   dateRangeType: null,
-  onChangeDateRangeType: jest.fn(),
+  onChangeDateRangeType: vi.fn(),
   unlockAt: null,
-  unlockAtDateInputRef: jest.fn(),
-  unlockAtTimeInputRef: jest.fn(),
+  unlockAtDateInputRef: vi.fn(),
+  unlockAtTimeInputRef: vi.fn(),
   unlockAtError: undefined,
-  onChangeUnlockAt: jest.fn(),
+  onChangeUnlockAt: vi.fn(),
   lockAt: null,
-  lockAtDateInputRef: jest.fn(),
-  lockAtTimeInputRef: jest.fn(),
+  lockAtDateInputRef: vi.fn(),
+  lockAtTimeInputRef: vi.fn(),
   lockAtError: undefined,
-  onChangeLockAt: jest.fn(),
+  onChangeLockAt: vi.fn(),
 }
 
 const renderComponent = async (propsOverride: Partial<DateRangeSelectProps> = {}) => {
@@ -45,7 +45,7 @@ describe('DateRangeSelect', () => {
   const lockAtTestId = 'permissions-lock-at'
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the start and end date inputs when dateRangeType is range', async () => {
@@ -78,7 +78,7 @@ describe('DateRangeSelect', () => {
   it('calls onChangeDateRangeType when the select value changes', async () => {
     const propsOverride = {
       dateRangeType: DATE_RANGE_TYPE_OPTIONS.range,
-      onChangeDateRangeType: jest.fn(),
+      onChangeDateRangeType: vi.fn(),
     }
     await renderComponent(propsOverride)
 

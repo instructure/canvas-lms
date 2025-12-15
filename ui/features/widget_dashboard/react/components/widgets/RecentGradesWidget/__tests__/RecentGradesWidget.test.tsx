@@ -427,7 +427,7 @@ describe('RecentGradesWidget', () => {
   })
 
   it('handles error state', () => {
-    const onRetry = jest.fn()
+    const onRetry = vi.fn()
     setup({error: 'Failed to load grades', onRetry})
 
     expect(screen.getByText('Failed to load grades')).toBeInTheDocument()
@@ -436,7 +436,7 @@ describe('RecentGradesWidget', () => {
 
   it('calls onRetry when retry button is clicked', async () => {
     const user = userEvent.setup()
-    const onRetry = jest.fn()
+    const onRetry = vi.fn()
     setup({error: 'Failed to load grades', onRetry})
 
     const retryButton = screen.getByTestId('recent-grades-widget-retry-button')

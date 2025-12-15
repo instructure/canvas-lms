@@ -33,8 +33,8 @@ const renderComponent = overrides => {
 }
 
 describe('CopyToClipboard', () => {
-  beforeEach(() => (document.execCommand = jest.fn()))
-  afterEach(() => jest.restoreAllMocks())
+  beforeEach(() => (document.execCommand = vi.fn()))
+  afterEach(() => vi.restoreAllMocks())
 
   it('renders the value', () => {
     const {getByDisplayValue} = renderComponent()

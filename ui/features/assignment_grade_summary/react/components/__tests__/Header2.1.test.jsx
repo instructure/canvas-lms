@@ -25,6 +25,21 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import Header from '../Header'
 import configureStore from '../../configureStore'
 
+vi.mock('../../assignment/AssignmentActions', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    releaseGrades: vi.fn().mockImplementation(() => ({
+      type: 'SET_RELEASE_GRADES_STATUS',
+      payload: {status: 'STARTED'},
+    })),
+    unmuteAssignment: vi.fn().mockImplementation(() => ({
+      type: 'SET_UNMUTE_ASSIGNMENT_STATUS',
+      payload: {status: 'STARTED'},
+    })),
+  }
+})
+
 describe('GradeSummary Header "Post to Students" button', () => {
   let store
   let storeEnv
@@ -65,27 +80,11 @@ describe('GradeSummary Header "Post to Students" button', () => {
       ],
     }
 
-    window.confirm = jest.fn(() => true)
-
-    jest.mock('../../assignment/AssignmentActions', () => ({
-      releaseGrades: jest.fn().mockImplementation(() => ({
-        type: 'SET_RELEASE_GRADES_STATUS',
-        payload: {status: 'STARTED'},
-      })),
-      setReleaseGradesStatus: jest.fn(),
-      setUnmuteAssignmentStatus: jest.fn(),
-      unmuteAssignment: jest.fn().mockImplementation(() => ({
-        type: 'SET_UNMUTE_ASSIGNMENT_STATUS',
-        payload: {status: 'STARTED'},
-      })),
-      STARTED: 'STARTED',
-      SUCCESS: 'SUCCESS',
-      FAILURE: 'FAILURE',
-    }))
+    window.confirm = vi.fn(() => true)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     fakeENV.teardown()
     document.body.innerHTML = ''
   })

@@ -24,13 +24,13 @@ import {SectionToolbar} from '../SectionToolbar'
 
 const props: Record<string, any> = {} // Initialize props
 
-const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
+const mockSetProp = vi.fn((callback: (props: Record<string, any>) => void) => {
   callback(props)
 })
 
-jest.mock('@craftjs/core', () => {
+vi.mock('@craftjs/core', () => {
   return {
-    useNode: jest.fn(_node => {
+    useNode: vi.fn(_node => {
       return {
         actions: {setProp: mockSetProp},
         props: {iconName: undefined},
@@ -40,7 +40,7 @@ jest.mock('@craftjs/core', () => {
 })
 
 // Mock the ColorModal component to avoid the InstUI ColorPicker issue
-jest.mock('../ColorModal', () => ({
+vi.mock('../ColorModal', () => ({
   ColorModal: ({open, onSubmit}: {open: boolean; onSubmit: (color: string) => void}) => {
     if (!open) return null
     return (

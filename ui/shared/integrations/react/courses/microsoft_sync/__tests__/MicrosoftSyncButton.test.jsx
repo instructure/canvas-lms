@@ -116,7 +116,7 @@ describe('MicrosoftSyncButton', () => {
     })
 
     it('calls the error handler, but allows trying to sync again', async () => {
-      const onError = jest.fn()
+      const onError = vi.fn()
 
       const component = subject({onError})
       fireEvent.click(component.getByText('Sync Now'))
@@ -133,8 +133,8 @@ describe('MicrosoftSyncButton', () => {
     })
 
     describe('and then succeeds on retry', () => {
-      const onSuccess = jest.fn()
-      const onError = jest.fn()
+      const onSuccess = vi.fn()
+      const onError = vi.fn()
 
       afterEach(() => {
         onSuccess.mockClear()
@@ -181,7 +181,7 @@ describe('MicrosoftSyncButton', () => {
     })
 
     it('shows a success message and disables the sync button', async () => {
-      const onSuccess = jest.fn()
+      const onSuccess = vi.fn()
 
       const component = subject({onSuccess})
       fireEvent.click(component.getByText('Sync Now'))
@@ -199,7 +199,7 @@ describe('MicrosoftSyncButton', () => {
   })
 
   describe('when the cool down period has not passed', () => {
-    const onInfo = jest.fn()
+    const onInfo = vi.fn()
     const overrides = {
       group: {
         ...props().group,

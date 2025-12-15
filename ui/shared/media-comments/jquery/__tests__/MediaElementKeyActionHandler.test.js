@@ -42,38 +42,38 @@ describe('MediaElementKeyActionHandler', () => {
     fakeEvent = {
       target: $target[0],
       keyCode: KeyCodes.ENTER,
-      preventDefault: jest.fn(),
+      preventDefault: vi.fn(),
     }
     fakeMedia = {
       currentTime: 0,
       duration: 100,
       paused: true,
-      pause: jest.fn(),
-      play: jest.fn(),
-      setCurrentTime: jest.fn(),
-      setVolume: jest.fn(),
+      pause: vi.fn(),
+      play: vi.fn(),
+      setCurrentTime: vi.fn(),
+      setVolume: vi.fn(),
       volume: 0.5,
     }
     fakePlayer = {
-      exitFullScreen: jest.fn(),
+      exitFullScreen: vi.fn(),
       isFullScreen: false,
       media: {
         muted: false,
       },
       options: {
-        defaultSeekBackwardInterval: jest.fn().mockReturnValue(seekInterval),
-        defaultSeekForwardInterval: jest.fn().mockReturnValue(seekInterval),
-        defaultJumpBackwardInterval: jest.fn().mockReturnValue(jumpInterval),
-        defaultJumpForwardInterval: jest.fn().mockReturnValue(jumpInterval),
+        defaultSeekBackwardInterval: vi.fn().mockReturnValue(seekInterval),
+        defaultSeekForwardInterval: vi.fn().mockReturnValue(seekInterval),
+        defaultJumpBackwardInterval: vi.fn().mockReturnValue(jumpInterval),
+        defaultJumpForwardInterval: vi.fn().mockReturnValue(jumpInterval),
       },
-      setMuted: jest.fn(),
+      setMuted: vi.fn(),
     }
 
     handler = new MediaElementKeyActionHandler(fakeMejs, fakePlayer, fakeMedia, fakeEvent)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('event handlers', () => {
@@ -108,13 +108,13 @@ describe('MediaElementKeyActionHandler', () => {
 
   describe('handlerKey', () => {
     it('returns the matching key based on where the event occurred', () => {
-      jest.spyOn(handler, '_targetControl').mockReturnValue(['found'])
+      vi.spyOn(handler, '_targetControl').mockReturnValue(['found'])
       handler._targetControl.mockReturnValueOnce(['found'])
       expect(handler.handlerKey()).toBe('captions')
     })
 
     it('returns the player key if no controls were the target', () => {
-      jest.spyOn(handler, '_targetControl').mockReturnValue([])
+      vi.spyOn(handler, '_targetControl').mockReturnValue([])
       expect(handler.handlerKey()).toBe('player')
     })
   })
@@ -134,7 +134,7 @@ describe('MediaElementKeyActionHandler', () => {
 
   describe('fullscreenHandler', () => {
     beforeEach(() => {
-      $target[0].click = jest.fn()
+      $target[0].click = vi.fn()
     })
 
     it('simulates a click event when SPACE is pressed', () => {

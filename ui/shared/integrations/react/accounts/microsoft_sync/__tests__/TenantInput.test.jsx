@@ -32,7 +32,7 @@ describe('TenantInput', () => {
   })
 
   it('calls the provided input handler on input', () => {
-    const inputHandlerMock = jest.fn()
+    const inputHandlerMock = vi.fn()
     const container = setup({
       tenantInputHandler: inputHandlerMock,
     })

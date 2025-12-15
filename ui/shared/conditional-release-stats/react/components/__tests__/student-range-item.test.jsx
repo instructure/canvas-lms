@@ -30,7 +30,7 @@ describe('StudentRangeItem', () => {
       },
       trend: 0,
     },
-    selectStudent: jest.fn(),
+    selectStudent: vi.fn(),
     ...overrides,
   })
 

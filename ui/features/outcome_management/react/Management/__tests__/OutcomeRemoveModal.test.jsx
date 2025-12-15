@@ -59,14 +59,14 @@ describe('OutcomeRemoveModal', () => {
 
   beforeEach(() => {
     cache = createCache()
-    onCloseHandlerMock = jest.fn()
-    onCleanupHandlerMock = jest.fn()
-    onRemoveLearningOutcomesHandlerMock = jest.fn()
-    removeOutcomes = jest.fn()
+    onCloseHandlerMock = vi.fn()
+    onCleanupHandlerMock = vi.fn()
+    onRemoveLearningOutcomesHandlerMock = vi.fn()
+    removeOutcomes = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const render = (

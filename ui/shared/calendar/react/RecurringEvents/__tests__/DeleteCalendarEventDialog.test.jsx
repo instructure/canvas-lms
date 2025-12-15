@@ -29,10 +29,10 @@ import {
 
 const server = setupServer()
 
-const handleCancel = jest.fn()
-const handleDeleting = jest.fn()
-const handleDeleted = jest.fn()
-const handleUpdated = jest.fn()
+const handleCancel = vi.fn()
+const handleDeleting = vi.fn()
+const handleDeleted = vi.fn()
+const handleUpdated = vi.fn()
 
 const defaultProps = {
   isOpen: true,
@@ -74,7 +74,7 @@ describe('DeleteCalendarEventDialog', () => {
   afterEach(() => {
     // Clean up after each test
     cleanup() // Clean up any rendered components
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders single event dialog', () => {

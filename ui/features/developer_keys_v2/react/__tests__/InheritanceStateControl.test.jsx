@@ -24,13 +24,13 @@ import InheritanceStateControl from '../InheritanceStateControl'
 import {confirm} from '@canvas/instui-bindings/react/Confirm'
 import $ from 'jquery'
 
-jest.mock('@canvas/instui-bindings/react/Confirm')
+vi.mock('@canvas/instui-bindings/react/Confirm')
 
 // Mock jQuery flash notification functions
 beforeEach(() => {
-  $.flashError = jest.fn()
-  $.flashMessage = jest.fn()
-  $.flashWarning = jest.fn()
+  $.flashError = vi.fn()
+  $.flashMessage = vi.fn()
+  $.flashWarning = vi.fn()
 })
 
 const sampleDeveloperKey = (defaults = {}) => {

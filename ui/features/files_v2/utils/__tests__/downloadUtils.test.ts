@@ -27,11 +27,11 @@ import {FAKE_FILES, FAKE_FOLDERS} from '../../fixtures/fakeData'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(() => jest.fn()),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: vi.fn(() => vi.fn()),
 }))
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 let capturedRequests: Array<{path: string; body: string | null}> = []
@@ -69,7 +69,7 @@ const server = setupServer(
 
 describe('addDownloadListener', () => {
   it('adds event listener for custom event', () => {
-    const mockListener = jest.fn()
+    const mockListener = vi.fn()
     addDownloadListener(mockListener)
     window.dispatchEvent(new CustomEvent('download_utils_event'))
     expect(mockListener).toHaveBeenCalled()
@@ -79,7 +79,7 @@ describe('addDownloadListener', () => {
 
 describe('removeDownloadListener', () => {
   it('removes event listener for custom event', () => {
-    const mockListener = jest.fn()
+    const mockListener = vi.fn()
     addDownloadListener(mockListener)
     removeDownloadListener(mockListener)
     window.dispatchEvent(new CustomEvent('download_utils_event'))
@@ -90,7 +90,7 @@ describe('removeDownloadListener', () => {
 describe('downloadZip', () => {
   it('dispatches custom event with items detail', () => {
     const items = new Set(['file1', 'file2'])
-    const mockListener = jest.fn()
+    const mockListener = vi.fn()
     addDownloadListener(mockListener)
     downloadZip(items)
     expect(mockListener).toHaveBeenCalledWith(expect.objectContaining({detail: {items}}))
@@ -102,15 +102,15 @@ describe('performRequest', () => {
   const mockItems = new Set(['folder-46', 'file-178'])
   const mockContextType = 'courses'
   const mockContextId = '1'
-  const mockOnProgress = jest.fn()
-  const mockOnComplete = jest.fn()
+  const mockOnProgress = vi.fn()
+  const mockOnComplete = vi.fn()
 
   beforeAll(() => server.listen())
   afterAll(() => server.close())
 
   beforeEach(() => {
     capturedRequests = []
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

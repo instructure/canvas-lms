@@ -62,7 +62,7 @@ describe('CreateOrEditSetModal::SelfSignup::', () => {
   })
 
   describe('onChange', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
 
     beforeEach(() => {
       onChange.mockReset()

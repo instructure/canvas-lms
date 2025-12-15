@@ -52,13 +52,13 @@ describe('MessageStudents', () => {
 
   beforeEach(() => {
     user = userEvent.setup({delay: null})
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    jest.clearAllTimers()
-    jest.useRealTimers()
+    vi.clearAllMocks()
+    vi.clearAllTimers()
+    vi.useRealTimers()
   })
 
   describe('form validation', () => {
@@ -66,7 +66,7 @@ describe('MessageStudents', () => {
       const {getByTestId, getByText} = renderMessageStudents()
       await act(async () => {
         await user.click(getByTestId('message-students-submit'))
-        jest.runAllTimers()
+        vi.runAllTimers()
       })
       expect(getByText(/please provide a subject/i)).toBeInTheDocument()
     })
@@ -93,7 +93,7 @@ describe('MessageStudents', () => {
       await fillForm({getByLabelText})
       await act(async () => {
         await user.click(getByTestId('message-students-submit'))
-        jest.runAllTimers()
+        vi.runAllTimers()
       })
       const errorMessage = await findByText('Invalid subject')
       expect(errorMessage).toBeInTheDocument()
@@ -102,11 +102,11 @@ describe('MessageStudents', () => {
 
   describe('modal behavior', () => {
     it('closes when clicking close button', async () => {
-      const onRequestClose = jest.fn()
+      const onRequestClose = vi.fn()
       const {getByTestId} = renderMessageStudents({onRequestClose})
       await act(async () => {
         await user.click(getByTestId('message-students-cancel'))
-        jest.runAllTimers()
+        vi.runAllTimers()
       })
       expect(onRequestClose).toHaveBeenCalled()
     })

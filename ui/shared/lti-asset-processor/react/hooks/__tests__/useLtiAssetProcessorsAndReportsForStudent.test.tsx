@@ -29,13 +29,13 @@ import {executeQueryAndValidate} from '../graphqlQueryHooks'
 import {ZGetLtiAssetProcessorsAndReportsForStudentResult} from '@canvas/lti-asset-processor/queries/getLtiAssetProcessorsAndReportsForStudent'
 import {waitFor} from '@testing-library/react'
 
-jest.mock('../graphqlQueryHooks', () => ({
-  executeQueryAndValidate: jest.fn(() => defaultGetLtiAssetProcessorsAndReportsForStudentResult()),
+vi.mock('../graphqlQueryHooks', () => ({
+  executeQueryAndValidate: vi.fn(() =>
+    Promise.resolve(defaultGetLtiAssetProcessorsAndReportsForStudentResult()),
+  ),
 }))
 
-const mockExecuteQueryAndValidate = executeQueryAndValidate as jest.MockedFunction<
-  typeof executeQueryAndValidate
->
+const mockExecuteQueryAndValidate = executeQueryAndValidate as ReturnType<typeof vi.fn>
 
 let queryClient: QueryClient
 
@@ -68,7 +68,7 @@ describe('useLtiAssetProcessorsAndReportsForStudent hooks', () => {
       ...originalEnv,
       FEATURES: {lti_asset_processor: true},
     }
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

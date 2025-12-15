@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import '@testing-library/jest-dom'
 import 'jqueryui/tooltip'
 
 // Add missing jQuery methods
@@ -87,21 +86,25 @@ describe('jQuery UI Tooltip Widget', () => {
     delete Element.prototype.getBoundingClientRect
   })
 
-  it('shows tooltip on mouseenter', done => {
-    tooltipTarget.one('tooltipopen', () => {
-      expect(document.querySelector('.ui-tooltip')).toBeInTheDocument()
-      done()
+  it('shows tooltip on mouseenter', () => {
+    return new Promise(resolve => {
+      tooltipTarget.one('tooltipopen', () => {
+        expect(document.querySelector('.ui-tooltip')).toBeInTheDocument()
+        resolve()
+      })
+      tooltipTarget.trigger('mouseenter')
     })
-    tooltipTarget.trigger('mouseenter')
   })
 
-  it('hides tooltip on mouseleave', done => {
+  it('hides tooltip on mouseleave', () => {
     tooltipTarget.tooltip('open')
-    tooltipTarget.one('tooltipclose', () => {
-      expect(document.querySelector('.ui-tooltip')).not.toBeInTheDocument()
-      done()
+    return new Promise(resolve => {
+      tooltipTarget.one('tooltipclose', () => {
+        expect(document.querySelector('.ui-tooltip')).not.toBeInTheDocument()
+        resolve()
+      })
+      tooltipTarget.trigger('mouseleave')
     })
-    tooltipTarget.trigger('mouseleave')
   })
 
   it('displays custom content', () => {

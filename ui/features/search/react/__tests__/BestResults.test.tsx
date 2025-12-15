@@ -23,7 +23,7 @@ import userEvent from '@testing-library/user-event'
 const props = {
   courseId: '1',
   searchTerm: 'writing outlines',
-  resetSearch: jest.fn(),
+  resetSearch: vi.fn(),
   results: [
     {
       content_id: '3',

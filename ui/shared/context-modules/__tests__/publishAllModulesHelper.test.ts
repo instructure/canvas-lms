@@ -38,7 +38,7 @@ const {renderContextModulesPublishIcon} = {
   ...publishOneModuleHelperModule,
 }
 
-jest.mock('../utils/publishOneModuleHelper')
+vi.mock('../utils/publishOneModuleHelper')
 
 const server = setupServer()
 
@@ -76,7 +76,7 @@ describe('publishAllModulesHelper', () => {
 
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     document.body.innerHTML = ''
   })
 
@@ -170,8 +170,8 @@ describe('publishAllModulesHelper', () => {
   })
 
   describe('updateModulePendingPublishedStates', () => {
-    let updateModuleSpy: jest.SpyInstance
-    let updateItemsSpy: jest.SpyInstance
+    let updateModuleSpy: any
+    let updateItemsSpy: any
     beforeEach(() => {
       makeModuleWithItems(1, [117, 119], false)
       makeModuleWithItems(2, [217, 219], true)
@@ -182,8 +182,8 @@ describe('publishAllModulesHelper', () => {
     })
 
     it('updates the modules and their items', () => {
-      updateModuleSpy = jest.spyOn(publishAllModulesHelperModule, 'updateModulePublishedState')
-      updateItemsSpy = jest.spyOn(publishOneModuleHelperModule, 'updateModuleItemsPublishedStates')
+      updateModuleSpy = vi.spyOn(publishAllModulesHelperModule, 'updateModulePublishedState')
+      updateItemsSpy = vi.spyOn(publishOneModuleHelperModule, 'updateModuleItemsPublishedStates')
       const isPublishing = true
       updateModulePendingPublishedStates(isPublishing)
       expect(updateModuleSpy).toHaveBeenCalledTimes(2)

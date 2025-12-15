@@ -23,13 +23,13 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {useAssignedStudents} from '../useAssignedStudents'
 import {ASSIGNED_STUDENTS_QUERY} from '../../teacher/Queries'
 import {CourseStudent} from '../../teacher/AssignmentTeacherTypes'
+import {executeQuery} from '@canvas/graphql'
 
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(),
+vi.mock('@canvas/graphql', () => ({
+  executeQuery: vi.fn(),
 }))
 
-const {executeQuery} = require('@canvas/graphql')
-const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+const mockExecuteQuery = vi.mocked(executeQuery)
 
 const mockAssignedStudents: CourseStudent[] = [
   {_id: '1', name: 'Squirtle', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
@@ -61,7 +61,7 @@ const createWrapper = () => {
 
 describe('useAssignedStudents', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('with assignmentId', () => {

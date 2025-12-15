@@ -27,12 +27,12 @@ import {IMPORTANT_DATES_CONTEXTS} from '@canvas/k5/react/__tests__/fixtures'
 const SAVED_SELECTED_CONTEXTS_URL = /\/api\/v1\/calendar_events\/save_selected_contexts.*/
 
 const defaultProps = {
-  closeModal: jest.fn(),
+  closeModal: vi.fn(),
   contexts: IMPORTANT_DATES_CONTEXTS,
   isOpen: true,
   selectedContextCodes: ['course_2'],
   selectedContextsLimit: 2,
-  updateSelectedContextCodes: jest.fn(),
+  updateSelectedContextCodes: vi.fn(),
 }
 
 beforeEach(() => {
@@ -40,7 +40,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.resetAllMocks()
+  vi.resetAllMocks()
   fetchMock.restore()
   destroyContainer()
 })

@@ -181,9 +181,9 @@ describe('TempEnrollUsersListRow', () => {
           avatar_url: 'http://someurl',
         },
         roles: [{id: '19', label: 'Teacher', base_role_name: 'TeacherEnrollment'}],
-        handleOpenEditUserDialog: jest.fn(),
-        handleSubmitEditUserForm: jest.fn(),
-        handleCloseEditUserDialog: jest.fn(),
+        handleOpenEditUserDialog: vi.fn(),
+        handleSubmitEditUserForm: vi.fn(),
+        handleCloseEditUserDialog: vi.fn(),
         permissions: {
           can_add_temporary_enrollments: false,
           can_edit_temporary_enrollments: false,

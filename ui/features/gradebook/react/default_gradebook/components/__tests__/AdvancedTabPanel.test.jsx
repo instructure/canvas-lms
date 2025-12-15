@@ -26,7 +26,7 @@ describe('GradebookSettingsModal AdvancedTabPanel', () => {
     courseSettings: {
       allowFinalGradeOverride: false,
     },
-    onCourseSettingsChange: jest.fn(),
+    onCourseSettingsChange: vi.fn(),
   }
 
   beforeEach(() => {

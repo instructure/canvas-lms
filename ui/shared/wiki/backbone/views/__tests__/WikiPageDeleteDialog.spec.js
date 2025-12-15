@@ -23,8 +23,8 @@ import WikiPageDeleteDialog from '../WikiPageDeleteDialog'
 import $ from 'jquery'
 
 // Mock the horizon utils module
-jest.mock('@canvas/horizon/utils', () => ({
-  redirectWithHorizonParams: jest.fn(),
+vi.mock('@canvas/horizon/utils', () => ({
+  redirectWithHorizonParams: vi.fn(),
 }))
 
 describe('WikiPageDeleteDialog', () => {
@@ -40,7 +40,7 @@ describe('WikiPageDeleteDialog', () => {
   afterEach(() => {
     fakeENV.teardown()
     window.location = originalLocation
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('maintains the view of the model', () => {
@@ -61,13 +61,13 @@ describe('WikiPageDeleteDialog', () => {
 
       // Mock the model's destroy method to return a jQuery Deferred-like object
       const destroyDeferred = {
-        then: jest.fn(callback => {
+        then: vi.fn(callback => {
           callback()
           return destroyDeferred
         }),
-        fail: jest.fn(() => destroyDeferred),
+        fail: vi.fn(() => destroyDeferred),
       }
-      model.destroy = jest.fn().mockReturnValue(destroyDeferred)
+      model.destroy = vi.fn().mockReturnValue(destroyDeferred)
 
       const dialog = new WikiPageDeleteDialog({
         model,
@@ -75,14 +75,14 @@ describe('WikiPageDeleteDialog', () => {
       })
 
       // Mock jQuery functions
-      global.$ = Object.assign(jest.fn(), {
-        cookie: jest.fn(),
-        flashMessage: jest.fn(),
+      global.$ = Object.assign(vi.fn(), {
+        cookie: vi.fn(),
+        flashMessage: vi.fn(),
         Deferred: function () {
           const dfd = {
-            resolve: jest.fn(),
-            reject: jest.fn(),
-            promise: jest.fn().mockReturnThis(),
+            resolve: vi.fn(),
+            reject: vi.fn(),
+            promise: vi.fn().mockReturnThis(),
           }
           return dfd
         },
@@ -90,7 +90,7 @@ describe('WikiPageDeleteDialog', () => {
 
       // Mock the dialog element's disableWhileLoading method
       dialog.$el = {
-        disableWhileLoading: jest.fn(dfd => dfd),
+        disableWhileLoading: vi.fn(dfd => dfd),
       }
 
       // Call submit to trigger the deletion
@@ -105,13 +105,13 @@ describe('WikiPageDeleteDialog', () => {
 
       // Mock the model's destroy method to return a jQuery Deferred-like object
       const destroyDeferred = {
-        then: jest.fn(callback => {
+        then: vi.fn(callback => {
           callback()
           return destroyDeferred
         }),
-        fail: jest.fn(() => destroyDeferred),
+        fail: vi.fn(() => destroyDeferred),
       }
-      model.destroy = jest.fn().mockReturnValue(destroyDeferred)
+      model.destroy = vi.fn().mockReturnValue(destroyDeferred)
 
       const dialog = new WikiPageDeleteDialog({
         model,
@@ -119,14 +119,14 @@ describe('WikiPageDeleteDialog', () => {
       })
 
       // Mock jQuery functions
-      global.$ = Object.assign(jest.fn(), {
-        cookie: jest.fn(),
-        flashMessage: jest.fn(),
+      global.$ = Object.assign(vi.fn(), {
+        cookie: vi.fn(),
+        flashMessage: vi.fn(),
         Deferred: function () {
           const dfd = {
-            resolve: jest.fn(),
-            reject: jest.fn(),
-            promise: jest.fn().mockReturnThis(),
+            resolve: vi.fn(),
+            reject: vi.fn(),
+            promise: vi.fn().mockReturnThis(),
           }
           return dfd
         },
@@ -134,7 +134,7 @@ describe('WikiPageDeleteDialog', () => {
 
       // Mock the dialog element
       dialog.$el = {
-        disableWhileLoading: jest.fn(dfd => dfd),
+        disableWhileLoading: vi.fn(dfd => dfd),
       }
 
       dialog.submit()
@@ -147,13 +147,13 @@ describe('WikiPageDeleteDialog', () => {
 
       // Mock the model's destroy method to return a jQuery Deferred-like object
       const destroyDeferred = {
-        then: jest.fn(callback => {
+        then: vi.fn(callback => {
           callback()
           return destroyDeferred
         }),
-        fail: jest.fn(() => destroyDeferred),
+        fail: vi.fn(() => destroyDeferred),
       }
-      model.destroy = jest.fn().mockReturnValue(destroyDeferred)
+      model.destroy = vi.fn().mockReturnValue(destroyDeferred)
 
       const dialog = new WikiPageDeleteDialog({
         model,
@@ -161,21 +161,21 @@ describe('WikiPageDeleteDialog', () => {
       })
 
       // Mock jQuery functions
-      $.flashMessage = jest.fn()
+      $.flashMessage = vi.fn()
       $.Deferred = function () {
         const dfd = {
-          resolve: jest.fn(),
-          reject: jest.fn(),
-          promise: jest.fn().mockReturnThis(),
+          resolve: vi.fn(),
+          reject: vi.fn(),
+          promise: vi.fn().mockReturnThis(),
         }
         return dfd
       }
 
       // Mock the dialog element and close method
       dialog.$el = {
-        disableWhileLoading: jest.fn(dfd => dfd),
+        disableWhileLoading: vi.fn(dfd => dfd),
       }
-      dialog.close = jest.fn()
+      dialog.close = vi.fn()
 
       dialog.submit()
 

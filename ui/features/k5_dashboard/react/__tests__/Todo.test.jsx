@@ -25,8 +25,8 @@ import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import {MOCK_TODOS} from './mocks'
 import Todo from '../Todo'
 
-jest.mock('moment-timezone')
-jest.mock('@canvas/k5/react/utils')
+vi.mock('moment-timezone')
+vi.mock('@canvas/k5/react/utils')
 
 const timeZone = 'Europe/Dublin'
 
@@ -44,7 +44,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.resetAllMocks()
+  vi.resetAllMocks()
   // Clear flash alerts between tests
   destroyContainer()
 })
@@ -160,7 +160,7 @@ describe('Todo', () => {
     expect(queryByText('Plant some plants')).not.toBeInTheDocument()
   })
   // Skip with LX-2092
-  it.skip('displays a button that ignores the associated todo and removes it from the rendered list', async () => {
+  it('displays a button that ignores the associated todo and removes it from the rendered list', async () => {
     ignoreTodo.mockResolvedValue({ignored: true})
 
     const {getByRole, queryByText} = render(<Todo {...defaultProps} />)

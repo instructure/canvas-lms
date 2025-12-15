@@ -307,7 +307,7 @@ describe('ItemAssignToCard - PeerReviewSelector Integration', () => {
     })
 
     it('integrates with card validity tracking for peer review dates', () => {
-      const onValidityChange = jest.fn()
+      const onValidityChange = vi.fn()
       renderComponent({
         onValidityChange,
         peer_review_due_at: '2024-11-18T00:00:00Z',
@@ -320,7 +320,7 @@ describe('ItemAssignToCard - PeerReviewSelector Integration', () => {
 
   describe('PeerReviewSelector callback integration', () => {
     it('calls onCardDatesChange when peer review due date changes', () => {
-      const onCardDatesChange = jest.fn()
+      const onCardDatesChange = vi.fn()
       renderComponent({
         onCardDatesChange,
         peer_review_due_at: '2024-11-18T00:00:00Z',
@@ -335,7 +335,7 @@ describe('ItemAssignToCard - PeerReviewSelector Integration', () => {
     })
 
     it('calls onCardDatesChange when peer review available from date changes', () => {
-      const onCardDatesChange = jest.fn()
+      const onCardDatesChange = vi.fn()
       renderComponent({
         onCardDatesChange,
         peer_review_available_from: '2024-11-10T00:00:00Z',
@@ -349,7 +349,7 @@ describe('ItemAssignToCard - PeerReviewSelector Integration', () => {
     })
 
     it('calls onCardDatesChange when peer review available to date changes', () => {
-      const onCardDatesChange = jest.fn()
+      const onCardDatesChange = vi.fn()
       renderComponent({
         onCardDatesChange,
         peer_review_available_to: '2024-11-25T23:59:00Z',

@@ -19,7 +19,7 @@
 import userSettings from '@canvas/user-settings'
 import SpeedGrader from '../speed_grader'
 
-jest.mock('@canvas/user-settings')
+vi.mock('@canvas/user-settings')
 
 describe('SpeedGrader getStudentNameAndGrade', () => {
   let windowJsonData
@@ -50,7 +50,7 @@ describe('SpeedGrader getStudentNameAndGrade', () => {
 
   afterEach(() => {
     delete window.jsonData
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('returns student name and submission status', () => {

@@ -29,7 +29,7 @@ import {
 import MasteryCalculation from '../index'
 import {masteryCalculationGraphqlMocks} from '@canvas/outcomes/mocks/Outcomes'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 const server = setupServer()
 
@@ -100,7 +100,7 @@ describe('MasteryCalculation', () => {
 
   it('loads proficiency data for Account', async () => {
     const {getByDisplayValue} = render(<MasteryCalculation />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(getByDisplayValue(/65/)).not.toEqual(null)
   })
 
@@ -109,7 +109,7 @@ describe('MasteryCalculation', () => {
       contextType: 'Course',
       contextId: '12',
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     await waitFor(async () => {
       expect(await findByDisplayValue(/65/)).not.toBeNull()
     })
@@ -117,7 +117,7 @@ describe('MasteryCalculation', () => {
 
   it('loads role list', async () => {
     const {getByText, getAllByText} = render(<MasteryCalculation />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(
       getByText(
         /Permission to change this mastery calculation at the account level is enabled for/,
@@ -135,7 +135,7 @@ describe('MasteryCalculation', () => {
     mocks[0] = {...mocks[0], result: {errors: new Error('aw shucks')}}
 
     const {getByText} = render(<MasteryCalculation />, {mocks: mocks})
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(getByText(/An error occurred/)).not.toEqual(null)
   })
 
@@ -159,7 +159,7 @@ describe('MasteryCalculation', () => {
       },
     ]
     const {getByText} = render(<MasteryCalculation />, {mocks: emptyMocks})
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(getByText('Mastery Calculation')).not.toBeNull()
   })
 
@@ -170,7 +170,7 @@ describe('MasteryCalculation', () => {
       calculationMethod: 'decaying_average',
       calculationInt: 88,
     }
-    const updateCall = jest.fn(() => ({
+    const updateCall = vi.fn(() => ({
       data: {
         createOutcomeCalculationMethod: {
           outcomeCalculationMethod: {
@@ -203,7 +203,7 @@ describe('MasteryCalculation', () => {
 
     it('submits a request when calculation method is saved', async () => {
       const {getByText, findByLabelText} = render(<MasteryCalculation />, {mocks: updateMocks})
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
 
       const parameter = await findByLabelText(/Parameter/)
       fireEvent.input(parameter, {target: {value: '88'}})

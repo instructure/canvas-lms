@@ -28,10 +28,10 @@ import DirectShareCoursePanel from '../DirectShareCoursePanel'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('../../effects/useManagedCourseSearchApi')
-jest.mock('../../effects/useModuleCourseSearchApi')
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn().mockReturnValue(jest.fn()),
+vi.mock('../../effects/useManagedCourseSearchApi')
+vi.mock('../../effects/useModuleCourseSearchApi')
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: vi.fn().mockReturnValue(vi.fn()),
 }))
 
 describe('DirectShareCoursePanel', () => {
@@ -67,7 +67,7 @@ describe('DirectShareCoursePanel', () => {
   afterEach(() => {
     fetchMock.restore()
     fakeENV.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('shows the overwrite warning', () => {
@@ -80,7 +80,7 @@ describe('DirectShareCoursePanel', () => {
   })
 
   it('calls the onCancel property', () => {
-    const handleCancel = jest.fn()
+    const handleCancel = vi.fn()
     const {getByText} = render(<DirectShareCoursePanel onCancel={handleCancel} />)
     fireEvent.click(getByText(/cancel/i))
     expect(handleCancel).toHaveBeenCalled()
@@ -238,7 +238,7 @@ describe('DirectShareCoursePanel', () => {
 
   describe('errors', () => {
     beforeEach(() => {
-      jest.spyOn(console, 'error').mockImplementation()
+      vi.spyOn(console, 'error').mockImplementation()
       showFlashError.mockClear()
     })
 

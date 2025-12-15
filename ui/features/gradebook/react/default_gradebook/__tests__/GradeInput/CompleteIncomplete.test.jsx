@@ -49,7 +49,7 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
       assignment,
       disabled: false,
       enterGradesAs: 'passFail',
-      onSubmissionUpdate: jest.fn(),
+      onSubmissionUpdate: vi.fn(),
       pendingGradeInfo: null,
       submission,
     }

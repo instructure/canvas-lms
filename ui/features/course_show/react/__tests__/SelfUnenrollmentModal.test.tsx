@@ -24,7 +24,7 @@ import fetchMock from 'fetch-mock'
 describe('SelfUnenrollmentModal', () => {
   const UNENROLLMENT_API_URL =
     '/courses/1/self_unenrollment/cqwYiUaQWrfmrUenN6UXQlIyhqcWDFiowYAdeP59'
-  const onClose = jest.fn()
+  const onClose = vi.fn()
 
   beforeEach(() => {
     fetchMock.post(UNENROLLMENT_API_URL, 200)

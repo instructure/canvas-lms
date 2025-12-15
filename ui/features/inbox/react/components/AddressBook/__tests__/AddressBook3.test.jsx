@@ -78,14 +78,14 @@ const demoData = {
 
 const defaultProps = {
   menuData: demoData,
-  onUserFilterSelect: jest.fn(),
-  setIsMenuOpen: jest.fn(),
+  onUserFilterSelect: vi.fn(),
+  setIsMenuOpen: vi.fn(),
 }
 
 const setup = props => {
   return render(
     <ApolloProvider client={mswClient}>
-      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+      <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
         <AddressBook {...props} />
       </AlertManagerContext.Provider>
     </ApolloProvider>,
@@ -95,7 +95,7 @@ const setup = props => {
 describe('Address Book Component', () => {
   describe('Tags', () => {
     it('Should close popover after selecting one item', async () => {
-      const mockSetIsMenuOpen = jest.fn()
+      const mockSetIsMenuOpen = vi.fn()
 
       setup({...defaultProps, isMenuOpen: true, isSubMenu: true, setIsMenuOpen: mockSetIsMenuOpen})
       const popover = await screen.findByTestId('address-book-popover')
@@ -105,7 +105,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should not close popover after selecting one item with command button pressed', async () => {
-      const mockSetIsMenuOpen = jest.fn()
+      const mockSetIsMenuOpen = vi.fn()
 
       setup({...defaultProps, isMenuOpen: true, isSubMenu: true, setIsMenuOpen: mockSetIsMenuOpen})
       const popover = await screen.findByTestId('address-book-popover')
@@ -141,7 +141,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should render tag when item is selected', async () => {
-      const onSelectSpy = jest.fn()
+      const onSelectSpy = vi.fn()
       setup({...defaultProps, isMenuOpen: true, isSubMenu: true, onSelect: onSelectSpy})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
@@ -165,7 +165,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should pass back selected IDs as an array', async () => {
-      const onSelectedIdsChangeMock = jest.fn()
+      const onSelectedIdsChangeMock = vi.fn()
       setup({
         ...defaultProps,
         isMenuOpen: true,
@@ -194,7 +194,7 @@ describe('Address Book Component', () => {
 
   describe('Callbacks', () => {
     it('Should send search input through onTextChange callback', async () => {
-      const onChangeSpy = jest.fn()
+      const onChangeSpy = vi.fn()
       const {findByTestId} = setup({...defaultProps, onTextChange: onChangeSpy})
       const input = await findByTestId('-address-book-input')
       fireEvent.change(input, {target: {value: 'Test'}})
@@ -202,7 +202,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should select item when clicked', async () => {
-      const onSelectSpy = jest.fn()
+      const onSelectSpy = vi.fn()
       setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy, isSubMenu: true})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
@@ -211,8 +211,8 @@ describe('Address Book Component', () => {
     })
 
     it('Should call onUserFilterSelect when item is selected', async () => {
-      const onSelectSpy = jest.fn()
-      const onUserFilterSelectSpy = jest.fn()
+      const onSelectSpy = vi.fn()
+      const onUserFilterSelectSpy = vi.fn()
       setup({
         ...defaultProps,
         isMenuOpen: true,
@@ -227,7 +227,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should call back for group clicks', async () => {
-      const onSelectSpy = jest.fn()
+      const onSelectSpy = vi.fn()
       setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy, isSubMenu: true})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
@@ -237,7 +237,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should set isLast for CONTEXT_TYPE', async () => {
-      const onSelectSpy = jest.fn()
+      const onSelectSpy = vi.fn()
       setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy, isSubMenu: true})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
@@ -248,7 +248,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should call back for back click', async () => {
-      const onSelectSpy = jest.fn()
+      const onSelectSpy = vi.fn()
       setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy, isSubMenu: true})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
@@ -263,7 +263,7 @@ describe('Address Book Component', () => {
       unobserve: () => null,
     })
     beforeEach(() => {
-      window.IntersectionObserver = jest.fn().mockImplementation(intersectionObserverMock)
+      window.IntersectionObserver = vi.fn().mockImplementation(intersectionObserverMock)
     })
     it('Should create an observer when more data is available', async () => {
       const component = setup({

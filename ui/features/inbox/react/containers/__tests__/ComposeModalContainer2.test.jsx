@@ -30,13 +30,13 @@ import * as utils from '../../../util/utils'
 import * as uploadFileModule from '@canvas/upload-file'
 import {graphql} from 'msw'
 
-// eslint-disable-next-line no-undef
+ 
 if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
-jest.mock('@canvas/upload-file')
+vi.mock('@canvas/upload-file')
 
-jest.mock('../../../util/utils', () => ({
-  ...jest.requireActual('../../../util/utils'),
-  responsiveQuerySizes: jest.fn().mockReturnValue({
+vi.mock('../../../util/utils', async () => ({
+  ...(await vi.importActual('../../../util/utils')),
+  responsiveQuerySizes: vi.fn().mockReturnValue({
     desktop: {minWidth: '768px'},
   }),
 }))
@@ -49,12 +49,12 @@ describe('ComposeModalContainer', () => {
     server.close()
     server.listen({onUnhandledRequest: 'error'})
 
-    window.matchMedia = jest.fn().mockImplementation(() => ({
+    window.matchMedia = vi.fn().mockImplementation(() => ({
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }))
   })
 
@@ -72,7 +72,7 @@ describe('ComposeModalContainer', () => {
   afterEach(async () => {
     server.resetHandlers()
     // Clear any pending timers
-    jest.clearAllTimers()
+    vi.clearAllTimers()
     // Wait for any pending Apollo operations
     await waitForApolloLoading()
   })
@@ -82,8 +82,8 @@ describe('ComposeModalContainer', () => {
   })
 
   const setup = ({
-    setOnFailure = jest.fn(),
-    setOnSuccess = jest.fn(),
+    setOnFailure = vi.fn(),
+    setOnSuccess = vi.fn(),
     isReply,
     isReplyAll,
     isForward,
@@ -98,12 +98,12 @@ describe('ComposeModalContainer', () => {
           <ConversationContext.Provider value={{isSubmissionCommentsType}}>
             <ComposeModalManager
               open={true}
-              onDismiss={jest.fn()}
+              onDismiss={vi.fn()}
               isReply={isReply}
               isReplyAll={isReplyAll}
               isForward={isForward}
               conversation={conversation}
-              onSelectedIdsChange={jest.fn()}
+              onSelectedIdsChange={vi.fn()}
               selectedIds={selectedIds}
               inboxSignatureBlock={inboxSignatureBlock}
             />
@@ -114,8 +114,8 @@ describe('ComposeModalContainer', () => {
 
   describe('Create Conversation', () => {
     it('does not close modal when an error occurs', async () => {
-      const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
-      const mockedSetOnFailure = jest.fn().mockResolvedValue({})
+      const mockedSetOnSuccess = vi.fn().mockResolvedValue({})
+      const mockedSetOnFailure = vi.fn().mockResolvedValue({})
 
       const component = setup({
         setOnFailure: mockedSetOnFailure,
@@ -169,7 +169,7 @@ describe('ComposeModalContainer', () => {
     })
 
     it('displays specific error message for reply errors', async () => {
-      const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+      const mockedSetOnSuccess = vi.fn().mockResolvedValue({})
 
       const mockConversationWithError = {
         _id: '3',
@@ -262,7 +262,7 @@ describe('ComposeModalContainer', () => {
             },
           ],
         }
-        const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+        const mockedSetOnSuccess = vi.fn().mockResolvedValue({})
 
         const component = setup({
           setOnSuccess: mockedSetOnSuccess,

@@ -31,13 +31,13 @@ import userEvent from '@testing-library/user-event'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 
-jest.mock('../../utils/assignToHelper', () => {
-  const originalModule = jest.requireActual('../../utils/assignToHelper')
+vi.mock('../../utils/assignToHelper', async () => {
+  const originalModule = await vi.importActual('../../utils/assignToHelper')
 
   return {
     __esModule: true,
     ...originalModule,
-    updateModuleUI: jest.fn(),
+    updateModuleUI: vi.fn(),
   }
 })
 
@@ -133,7 +133,7 @@ describe('AssignToPanel', () => {
   })
 
   it('calls updateParentData on unmount with changes', async () => {
-    const updateParentDataMock = jest.fn()
+    const updateParentDataMock = vi.fn()
     const {unmount, findByTestId} = renderComponent({updateParentData: updateParentDataMock})
     await userEvent.click(await findByTestId('custom-option'))
     unmount()
@@ -147,7 +147,7 @@ describe('AssignToPanel', () => {
   })
 
   it('calls updateParentData on unmount with no changes', async () => {
-    const updateParentDataMock = jest.fn()
+    const updateParentDataMock = vi.fn()
     const {unmount} = renderComponent({updateParentData: updateParentDataMock})
     unmount()
     expect(updateParentDataMock).toHaveBeenCalledWith(
@@ -366,13 +366,14 @@ describe('AssignToPanel', () => {
       getByRole('button', {name: 'Save'}).click()
       expect((await findAllByText('Module access updated successfully.'))[0]).toBeInTheDocument()
       const requestBody = fetchMock.lastOptions(ASSIGNMENT_OVERRIDES_URL_PUT)?.body
-      const expectedPayload = JSON.stringify({
+      const expectedPayload = {
         overrides: [{course_section_id: SECTIONS_DATA[0].id}],
-      })
-      expect(requestBody).toEqual(expectedPayload)
+      }
+      // Compare as objects to avoid JSON property order issues
+      expect(JSON.parse(requestBody as unknown as string)).toEqual(expectedPayload)
     })
 
-    it.skip('updates existing assignment overrides', async () => {
+    it('updates existing assignment overrides', async () => {
       fetchMock.get(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {overwriteRoutes: true})
       const studentsOverride = ASSIGNMENT_OVERRIDES_DATA[0]
       const existingOverride = ASSIGNMENT_OVERRIDES_DATA[1]
@@ -387,14 +388,15 @@ describe('AssignToPanel', () => {
 
       getByRole('button', {name: 'Save'}).click()
       expect((await findAllByText('Module access updated successfully.'))[0]).toBeInTheDocument()
-      const requestBody = fetchMock.lastOptions(ASSIGNMENT_OVERRIDES_URL)?.body
+      const requestBody = fetchMock.lastOptions(ASSIGNMENT_OVERRIDES_URL_PUT)?.body
       // it sends back the student list override, including the assignment override id
-      const expectedPayload = JSON.stringify({
+      const expectedPayload = {
         overrides: [
           {id: studentsOverride.id, student_ids: studentsOverride.students!.map(({id}) => id)},
         ],
-      })
-      expect(requestBody).toEqual(expectedPayload)
+      }
+      // Compare as objects to avoid JSON property order issues
+      expect(JSON.parse(requestBody as unknown as string)).toEqual(expectedPayload)
     })
 
     it('updates the modules UI', async () => {
@@ -406,8 +408,8 @@ describe('AssignToPanel', () => {
 
     it('calls onDidSubmit instead of onDismiss if passed', async () => {
       fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
-      const onDidSubmitMock = jest.fn()
-      const onDismissMock = jest.fn()
+      const onDidSubmitMock = vi.fn()
+      const onDismissMock = vi.fn()
       renderComponent({
         onDidSubmit: onDidSubmitMock,
         onDismiss: onDismissMock,

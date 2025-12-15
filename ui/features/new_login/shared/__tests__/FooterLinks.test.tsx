@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MemoryRouter} from 'react-router-dom'
 import {FooterLinks} from '..'
@@ -28,19 +28,19 @@ import {
   useNewLoginData,
 } from '../../context'
 
-jest.mock('../../context', () => {
-  const originalModule = jest.requireActual('../../context')
+vi.mock('../../context', async () => {
+  const originalModule = await vi.importActual('../../context')
   return {
     ...originalModule,
-    useNewLoginData: jest.fn(),
-    useHelpTray: jest.fn(),
-    useNewLogin: jest.fn(),
+    useNewLoginData: vi.fn(),
+    useHelpTray: vi.fn(),
+    useNewLogin: vi.fn(),
   }
 })
 
-const mockUseNewLoginData = useNewLoginData as jest.Mock
-const mockUseHelpTray = useHelpTray as jest.Mock
-const mockUseNewLogin = useNewLogin as jest.Mock
+const mockUseNewLoginData = useNewLoginData as any
+const mockUseHelpTray = useHelpTray as any
+const mockUseNewLogin = useNewLogin as any
 
 const mockHelpLink = {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'}
 
@@ -56,8 +56,12 @@ describe('FooterLinks', () => {
       </MemoryRouter>,
     )
 
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders without crashing', () => {
@@ -66,7 +70,7 @@ describe('FooterLinks', () => {
       helpLink: mockHelpLink,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
-    mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
+    mockUseHelpTray.mockReturnValue({openHelpTray: vi.fn()})
     renderFooterLinks()
   })
 
@@ -77,7 +81,7 @@ describe('FooterLinks', () => {
       requireAup: true,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
-    mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
+    mockUseHelpTray.mockReturnValue({openHelpTray: vi.fn()})
     renderFooterLinks()
     expect(screen.getByTestId('help-link')).toBeInTheDocument()
     expect(screen.getByTestId('privacy-link')).toBeInTheDocument()
@@ -86,7 +90,7 @@ describe('FooterLinks', () => {
   })
 
   it('disables links when isDisabled is true', async () => {
-    const mockOpenHelpTray = jest.fn()
+    const mockOpenHelpTray = vi.fn()
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: true,
       helpLink: mockHelpLink,
@@ -105,7 +109,7 @@ describe('FooterLinks', () => {
       helpLink: mockHelpLink,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
-    mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
+    mockUseHelpTray.mockReturnValue({openHelpTray: vi.fn()})
     renderFooterLinks()
     const links = screen.getAllByTestId(/-link$/)
     links.forEach(link => {
@@ -114,7 +118,7 @@ describe('FooterLinks', () => {
   })
 
   it('opens help tray when help link is clicked', async () => {
-    const mockOpenHelpTray = jest.fn()
+    const mockOpenHelpTray = vi.fn()
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: false,
       helpLink: mockHelpLink,
@@ -133,7 +137,7 @@ describe('FooterLinks', () => {
       helpLink: mockHelpLink,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
-    mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
+    mockUseHelpTray.mockReturnValue({openHelpTray: vi.fn()})
     renderFooterLinks()
     const helpLink = screen.getByTestId('help-link')
     expect(helpLink).toHaveAttribute('data-track-category', 'test-category')
@@ -146,7 +150,7 @@ describe('FooterLinks', () => {
       helpLink: null,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
-    mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
+    mockUseHelpTray.mockReturnValue({openHelpTray: vi.fn()})
     renderFooterLinks()
     const helpLink = screen.queryByTestId('help-link')
     expect(helpLink).toBeNull()
@@ -158,7 +162,7 @@ describe('FooterLinks', () => {
       requireAup: null,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
-    mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
+    mockUseHelpTray.mockReturnValue({openHelpTray: vi.fn()})
     renderFooterLinks()
     const helpLink = screen.queryByTestId('aup-link')
     expect(helpLink).toBeNull()
@@ -171,7 +175,7 @@ describe('FooterLinks', () => {
       requireAup: 'true',
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
-    mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
+    mockUseHelpTray.mockReturnValue({openHelpTray: vi.fn()})
     renderFooterLinks()
     const helpLink = screen.getByTestId('help-link')
     expect(helpLink.tagName).toBe('BUTTON')
@@ -201,8 +205,8 @@ describe('FooterLinks', () => {
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({
-      openHelpTray: jest.fn(),
-      closeHelpTray: jest.fn(),
+      openHelpTray: vi.fn(),
+      closeHelpTray: vi.fn(),
       isHelpTrayOpen: false,
     })
     renderFooterLinks()
@@ -216,8 +220,8 @@ describe('FooterLinks', () => {
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({
-      openHelpTray: jest.fn(),
-      closeHelpTray: jest.fn(),
+      openHelpTray: vi.fn(),
+      closeHelpTray: vi.fn(),
       isHelpTrayOpen: true,
     })
     renderFooterLinks()
@@ -231,7 +235,7 @@ describe('FooterLinks', () => {
       requireAup: true,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
-    mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
+    mockUseHelpTray.mockReturnValue({openHelpTray: vi.fn()})
     renderFooterLinks()
     const links = screen.getAllByTestId(/-link$/)
     links.forEach(link => {

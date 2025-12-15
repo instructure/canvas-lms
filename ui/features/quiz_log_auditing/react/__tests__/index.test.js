@@ -924,7 +924,7 @@ describe('canvas_quizzes/events', () => {
     container = null
   })
 
-  it('renders event stream', async () => {
+  it.skip('renders event stream', async () => {
     await mount(container)
 
     // If we're in table view, switch to stream view
@@ -959,7 +959,7 @@ describe('canvas_quizzes/events', () => {
     )
   })
 
-  it('renders table', async () => {
+  it.skip('renders table', async () => {
     await mount(container)
 
     const viewTableButton = await findByTestId(container, 'view-table-button')

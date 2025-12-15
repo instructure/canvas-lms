@@ -27,11 +27,11 @@ import {OutcomeArrangement} from '../../../utils/constants'
 describe('OutcomeArrangementSelector', () => {
   const defaultProps: OutcomeArrangementSelectorProps = {
     value: OutcomeArrangement.UPLOAD_ORDER,
-    onChange: jest.fn(),
+    onChange: vi.fn(),
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the dropdown with label', () => {
@@ -50,7 +50,7 @@ describe('OutcomeArrangementSelector', () => {
   })
 
   it('calls onChange when an option is selected', async () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const user = userEvent.setup()
     render(<OutcomeArrangementSelector {...defaultProps} onChange={onChange} />)
 

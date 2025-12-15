@@ -33,15 +33,15 @@ import {
 } from '../../types'
 
 // Mock getCourseBasedPath to return a predictable path
-jest.mock('../../utils/query', () => ({
-  getCourseBasedPath: jest.fn((path: string) => `/courses/1${path}`),
-  parseFetchParams: jest.fn(() => ({})),
+vi.mock('../../utils/query', () => ({
+  getCourseBasedPath: vi.fn((path: string) => `/courses/1${path}`),
+  parseFetchParams: vi.fn(() => ({})),
 }))
 
-const mockDoFetchAccessibilityIssuesSummary = jest.fn().mockResolvedValue(undefined)
+const mockDoFetchAccessibilityIssuesSummary = vi.fn().mockResolvedValue(undefined)
 
-jest.mock('../useAccessibilityScansFetchUtils', () => ({
-  useAccessibilityScansFetchUtils: jest.fn(() => ({
+vi.mock('../useAccessibilityScansFetchUtils', () => ({
+  useAccessibilityScansFetchUtils: vi.fn(() => ({
     doFetchAccessibilityIssuesSummary: mockDoFetchAccessibilityIssuesSummary,
   })),
 }))
@@ -88,7 +88,7 @@ describe('useAccessibilityScansPolling', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockDoFetchAccessibilityIssuesSummary.mockClear()
     useAccessibilityScansStore.setState(initialState)
   })

@@ -21,30 +21,30 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Toolbar} from '../Toolbar'
 
-const mockSetMode = jest.fn()
-const mockUseAppSelector = jest.fn()
+const mockSetMode = vi.fn()
+const mockUseAppSelector = vi.fn()
 
-jest.mock('../../store', () => ({
+vi.mock('../../store', () => ({
   useAppSelector: (selector: (state: any) => any) => mockUseAppSelector(selector),
 }))
 
-jest.mock('../../hooks/useEditorMode', () => ({
+vi.mock('../../hooks/useEditorMode', () => ({
   useEditorMode: () => {
     const store = mockUseAppSelector((state: any) => state)
     return {mode: store.editor.mode, setMode: mockSetMode}
   },
 }))
 
-jest.mock('../../hooks/useEditHistory', () => ({
+vi.mock('../../hooks/useEditHistory', () => ({
   useEditHistory: () => ({
-    undo: jest.fn(),
-    redo: jest.fn(),
+    undo: vi.fn(),
+    redo: vi.fn(),
     canUndo: true,
     canRedo: true,
   }),
 }))
 
-jest.mock('../../hooks/useGetBlocksCount', () => ({
+vi.mock('../../hooks/useGetBlocksCount', () => ({
   useGetBlocksCount: () => ({blocksCount: 3}),
 }))
 
@@ -58,7 +58,7 @@ function renderToolbar() {
 
 describe('Toolbar', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('when toolbar is in default mode', () => {

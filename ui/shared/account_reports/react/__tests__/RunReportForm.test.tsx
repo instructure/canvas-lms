@@ -115,9 +115,9 @@ const props = {
   formHTML: innerHtml1,
   path: '/api/fake_post',
   reportName: 'test_report_csv',
-  closeModal: jest.fn(),
-  onSuccess: jest.fn(),
-  onRender: jest.fn(),
+  closeModal: vi.fn(),
+  onSuccess: vi.fn(),
+  onRender: vi.fn(),
 }
 
 describe('RunReportForm', () => {

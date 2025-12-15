@@ -23,7 +23,7 @@ let editor
 beforeEach(() => {
   editor = new FakeEditor()
 
-  editor.execCommand = jest.fn()
+  editor.execCommand = vi.fn()
   editor.execCommand.mockImplementation(function (command, _ui, value) {
     const newElement = document.createElement('span')
     newElement.innerHTML = value
@@ -33,7 +33,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.resetAllMocks()
+  vi.resetAllMocks()
 })
 
 const returnValueExamples = subject => {

@@ -21,7 +21,7 @@ import $ from '@canvas/rails-flash-notifications'
 
 describe('lti.screenReaderAlert handler', () => {
   it('prevents html from being passed to screenReaderFlashMessageExclusive', () => {
-    const flashMessage = jest.spyOn($, 'screenReaderFlashMessageExclusive')
+    const flashMessage = vi.spyOn($, 'screenReaderFlashMessageExclusive')
     handler({
       message: {body: {html: 'abc'}},
     })

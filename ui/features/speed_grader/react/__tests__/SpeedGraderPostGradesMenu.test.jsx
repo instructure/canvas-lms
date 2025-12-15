@@ -27,8 +27,8 @@ describe('SpeedGraderPostGradesMenu', () => {
     allowPostingGradesOrComments: true,
     allowManageGrades: true,
     hasGradesOrPostableComments: true,
-    onHideGrades: jest.fn(),
-    onPostGrades: jest.fn(),
+    onHideGrades: vi.fn(),
+    onPostGrades: vi.fn(),
   }
 
   const renderMenu = async (customProps = {}) => {
@@ -40,7 +40,7 @@ describe('SpeedGraderPostGradesMenu', () => {
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('menu trigger', () => {

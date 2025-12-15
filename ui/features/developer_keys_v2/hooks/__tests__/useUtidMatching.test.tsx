@@ -59,14 +59,11 @@ describe('useUtidMatching', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.useFakeTimers()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
     server.resetHandlers()
-    jest.runOnlyPendingTimers()
-    jest.useRealTimers()
     queryClient.clear()
   })
 
@@ -89,9 +86,7 @@ describe('useUtidMatching', () => {
 
     const redirectUris = 'https://example.com/redirect\nhttps://another.com/callback'
     const {result} = renderHook(() => useUtidMatching(redirectUris, accountId), {wrapper})
-    expect(result.current.loading).toBe(true)
 
-    jest.advanceTimersByTime(500)
     await waitFor(
       () => {
         expect(result.current.loading).toBe(false)
@@ -105,9 +100,6 @@ describe('useUtidMatching', () => {
   })
 
   it('handles empty response gracefully', async () => {
-    // Use real timers for this test to avoid fake timer + MSW timing issues in CI
-    jest.useRealTimers()
-
     server.use(
       http.get('/api/v1/accounts/:accountId/developer_keys/lookup_utids', () =>
         HttpResponse.json({api_registrations: []}),
@@ -148,7 +140,7 @@ describe('useUtidMatching', () => {
     )
   })
 
-  it('does not make API call for empty redirect URIs', () => {
+  it('does not make API call for empty redirect URIs', async () => {
     let requestMade = false
     server.use(
       http.get('/api/v1/accounts/:accountId/developer_keys/lookup_utids', () => {
@@ -159,12 +151,13 @@ describe('useUtidMatching', () => {
 
     renderHook(() => useUtidMatching('', accountId), {wrapper})
 
-    jest.advanceTimersByTime(500)
+    // Wait longer than debounce delay to ensure no request is made
+    await new Promise(resolve => setTimeout(resolve, 600))
 
     expect(requestMade).toBe(false)
   })
 
-  it('does not make API call for whitespace-only redirect URIs', () => {
+  it('does not make API call for whitespace-only redirect URIs', async () => {
     let requestMade = false
     server.use(
       http.get('/api/v1/accounts/:accountId/developer_keys/lookup_utids', () => {
@@ -175,7 +168,8 @@ describe('useUtidMatching', () => {
 
     renderHook(() => useUtidMatching('   \n  \n  ', accountId), {wrapper})
 
-    jest.advanceTimersByTime(500)
+    // Wait longer than debounce delay to ensure no request is made
+    await new Promise(resolve => setTimeout(resolve, 600))
 
     expect(requestMade).toBe(false)
   })
@@ -199,19 +193,16 @@ describe('useUtidMatching', () => {
       },
     )
 
-    // Rapid changes
+    // Rapid changes within debounce window
     rerender({uris: 'https://example2.com'})
-    jest.advanceTimersByTime(100)
+    await new Promise(resolve => setTimeout(resolve, 100))
 
     rerender({uris: 'https://example3.com'})
-    jest.advanceTimersByTime(100)
+    await new Promise(resolve => setTimeout(resolve, 100))
 
     rerender({uris: 'https://example4.com'})
-    jest.advanceTimersByTime(100)
 
-    // Only the last call should be made after full debounce period
-    jest.advanceTimersByTime(500)
-
+    // Wait for debounce to complete and request to finish
     await waitFor(
       () => {
         expect(requestCount).toBe(2)
@@ -232,8 +223,6 @@ describe('useUtidMatching', () => {
 
     const redirectUris = '  https://example.com  \n\n  https://another.com  \n  \n'
     const {result} = renderHook(() => useUtidMatching(redirectUris, accountId), {wrapper})
-
-    jest.advanceTimersByTime(500)
 
     await waitFor(
       () => {

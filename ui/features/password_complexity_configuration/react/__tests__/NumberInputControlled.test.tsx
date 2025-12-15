@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 import NumberInputControlled from '../NumberInputControlled'
 
 describe('NumberInputControlled', () => {
@@ -26,7 +25,7 @@ describe('NumberInputControlled', () => {
     minimum: 0,
     maximum: 10,
     currentValue: 5,
-    updateCurrentValue: jest.fn(),
+    updateCurrentValue: vi.fn(),
     disabled: false,
     'data-testid': 'number-input',
   }

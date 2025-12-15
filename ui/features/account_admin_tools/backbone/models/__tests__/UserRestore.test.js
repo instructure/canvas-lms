@@ -52,7 +52,7 @@ describe('UserRestore', () => {
 
   // Describes searching for a user by ID
   test("triggers 'searching' when search is called", function () {
-    const callback = jest.fn()
+    const callback = vi.fn()
     userRestore.on('searching', callback)
     userRestore.search(account_id)
     expect(callback).toHaveBeenCalled()

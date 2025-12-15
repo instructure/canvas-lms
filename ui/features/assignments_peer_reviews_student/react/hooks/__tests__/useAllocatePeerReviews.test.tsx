@@ -26,8 +26,8 @@ import {useAllocatePeerReviews} from '../useAllocatePeerReviews'
 import type {ReactNode} from 'react'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(() => jest.fn()),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: vi.fn(() => vi.fn()),
 }))
 
 const server = setupServer(
@@ -108,7 +108,7 @@ describe('useAllocatePeerReviews', () => {
       },
     })
 
-    const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries')
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
 
     const wrapper = ({children}: {children: ReactNode}) => (
       <MockedQueryClientProvider client={queryClient}>{children}</MockedQueryClientProvider>

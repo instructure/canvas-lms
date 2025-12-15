@@ -20,7 +20,7 @@ import {renderHook, act} from '@testing-library/react-hooks'
 import useSearch from '../useSearch'
 import {ChangeEvent} from 'react'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('useSearch', () => {
   const event = {
@@ -42,7 +42,7 @@ describe('useSearch', () => {
     expect(result.current.search).toBe('123')
     expect(result.current.debouncedSearch).toBe('')
     act(() => {
-      jest.runAllTimers()
+      vi.runAllTimers()
     })
     expect(result.current.debouncedSearch).toBe('123')
   })
@@ -53,7 +53,7 @@ describe('useSearch', () => {
       result.current.onClearHandler()
     })
     act(() => {
-      jest.runAllTimers()
+      vi.runAllTimers()
     })
     expect(result.current.search).toBe('')
   })
@@ -66,15 +66,15 @@ describe('useSearch', () => {
     expect(result.current.search).toBe('123')
     expect(result.current.debouncedSearch).toBe('')
     act(() => {
-      jest.advanceTimersByTime(100)
+      vi.advanceTimersByTime(100)
     })
     expect(result.current.debouncedSearch).toBe('')
     act(() => {
-      jest.advanceTimersByTime(100)
+      vi.advanceTimersByTime(100)
     })
     expect(result.current.debouncedSearch).toBe('')
     act(() => {
-      jest.advanceTimersByTime(300)
+      vi.advanceTimersByTime(300)
     })
     expect(result.current.debouncedSearch).toBe('123')
   })

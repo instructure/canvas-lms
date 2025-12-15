@@ -44,22 +44,22 @@ import {NoSections} from '../../../common'
 
 let customProps: any = {}
 
-const mockSetCustom = jest.fn((callback: (props: Record<string, any>) => void) => {
+const mockSetCustom = vi.fn((callback: (props: Record<string, any>) => void) => {
   callback(customProps)
 })
 
-jest.mock('@craftjs/core', () => {
-  const module = jest.requireActual('@craftjs/core')
+vi.mock('@craftjs/core', async () => {
+  const module = await vi.importActual('@craftjs/core')
   return {
     ...module,
-    useNode: jest.fn(() => {
+    useNode: vi.fn(() => {
       return {
         actions: {
           setCustom: mockSetCustom,
         },
         connectors: {
-          connect: jest.fn(),
-          drag: jest.fn(),
+          connect: vi.fn(),
+          drag: vi.fn(),
         },
         node: {
           id: '1',

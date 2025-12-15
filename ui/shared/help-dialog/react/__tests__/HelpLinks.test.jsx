@@ -23,8 +23,8 @@ import HelpLinks from '../HelpLinks'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  replaceLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  replaceLocation: vi.fn(),
 }))
 
 const server = setupServer()
@@ -92,7 +92,7 @@ describe('HelpLinks', () => {
 
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders all the links', () => {

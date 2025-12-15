@@ -61,7 +61,7 @@ describe('BlueprintCourse app', () => {
   test('change log route onEnter calls app showChangeLog with params from URL', () => {
     blueprint = new BlueprintCourse(container, defaultData())
     blueprint.render()
-    blueprint.app.showChangeLog = jest.fn()
+    blueprint.app.showChangeLog = vi.fn()
     blueprint.routes[0].onEnter(
       {params: {blueprintType: 'template', templateId: '2', changeId: '3'}},
       () => {},
@@ -73,15 +73,15 @@ describe('BlueprintCourse app', () => {
       changeId: '3',
     })
 
-    blueprint.app.hideChangeLog = jest.fn()
+    blueprint.app.hideChangeLog = vi.fn()
     blueprint.routes[0].onExit({}, () => {})
     expect(blueprint.app.hideChangeLog).toHaveBeenCalledTimes(1)
   })
 
   test('start does not call setupRouter() when shabang is missing in the URL', () => {
     blueprint = new BlueprintCourse(container, defaultData())
-    const renderSpy = jest.spyOn(blueprint, 'render')
-    const setupRouterSpy = jest.spyOn(blueprint, 'setupRouter')
+    const renderSpy = vi.spyOn(blueprint, 'render')
+    const setupRouterSpy = vi.spyOn(blueprint, 'setupRouter')
 
     blueprint.start()
 
@@ -92,8 +92,8 @@ describe('BlueprintCourse app', () => {
   test('start calls render() and setupRouter() when shabang is in the URL', () => {
     window.location.hash = '#!/blueprint'
     blueprint = new BlueprintCourse(container, defaultData())
-    const renderSpy = jest.spyOn(blueprint, 'render')
-    const setupRouterSpy = jest.spyOn(blueprint, 'setupRouter')
+    const renderSpy = vi.spyOn(blueprint, 'render')
+    const setupRouterSpy = vi.spyOn(blueprint, 'setupRouter')
 
     blueprint.start()
 

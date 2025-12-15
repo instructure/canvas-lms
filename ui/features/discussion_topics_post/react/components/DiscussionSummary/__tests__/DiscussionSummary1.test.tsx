@@ -33,17 +33,17 @@ const I18n = createI18nScope('discussion_posts')
 
 const setup = (props: Partial<DiscussionSummaryProps> = {}) => {
   const defaultProps: DiscussionSummaryProps = {
-    onDisableSummaryClick: jest.fn(),
+    onDisableSummaryClick: vi.fn(),
     isMobile: false,
     summary: null,
-    onSetSummary: jest.fn(),
+    onSetSummary: vi.fn(),
     isFeedbackLoading: false,
-    onSetIsFeedbackLoading: jest.fn(),
+    onSetIsFeedbackLoading: vi.fn(),
     liked: false,
-    onSetLiked: jest.fn(),
+    onSetLiked: vi.fn(),
     disliked: false,
-    onSetDisliked: jest.fn(),
-    postDiscussionSummaryFeedback: jest.fn().mockResolvedValue(Promise.resolve()),
+    onSetDisliked: vi.fn(),
+    postDiscussionSummaryFeedback: vi.fn().mockResolvedValue(Promise.resolve()),
     ...props,
   }
 
@@ -51,7 +51,7 @@ const setup = (props: Partial<DiscussionSummaryProps> = {}) => {
     <MockedProvider>
       <AlertManagerContext.Provider
         // @ts-expect-error
-        value={{setOnFailure: props.setOnFailure || jest.fn(), setOnSuccess: jest.fn()}}
+        value={{setOnFailure: props.setOnFailure || vi.fn(), setOnSuccess: vi.fn()}}
       >
         <DiscussionSummary {...defaultProps} />
       </AlertManagerContext.Provider>
@@ -76,7 +76,7 @@ describe('DiscussionSummary', () => {
       context_id: '1234',
       context_type: 'Course',
     })
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -146,7 +146,7 @@ describe('DiscussionSummary', () => {
     })
 
     it('should call onDisableSummaryClick when disable button is clicked', async () => {
-      const onDisableSummaryClick = jest.fn()
+      const onDisableSummaryClick = vi.fn()
       const {getByTestId} = setup({
         summary: expectedSummary,
         onDisableSummaryClick: onDisableSummaryClick,
@@ -196,8 +196,8 @@ describe('DiscussionSummary', () => {
     })
 
     it('should call postDiscussionSummaryFeedback with like when like button is clicked', async () => {
-      const setLiked = jest.fn()
-      const postDiscussionSummaryFeedback = jest.fn()
+      const setLiked = vi.fn()
+      const postDiscussionSummaryFeedback = vi.fn()
       const {getByTestId} = setup({
         summary: expectedSummary,
         postDiscussionSummaryFeedback,
@@ -218,8 +218,8 @@ describe('DiscussionSummary', () => {
     })
 
     it('should call postDiscussionSummaryFeedback with dislike when dislike button is clicked', async () => {
-      const setDisliked = jest.fn()
-      const postDiscussionSummaryFeedback = jest.fn().mockResolvedValue({})
+      const setDisliked = vi.fn()
+      const postDiscussionSummaryFeedback = vi.fn().mockResolvedValue({})
 
       const {getByTestId} = setup({
         summary: expectedSummary,
@@ -244,8 +244,8 @@ describe('DiscussionSummary', () => {
     })
 
     it('should call postDiscussionSummaryFeedback with reset_like when dislike is true and dislike button is clicked', async () => {
-      const setDisliked = jest.fn()
-      const postDiscussionSummaryFeedback = jest.fn().mockResolvedValue({})
+      const setDisliked = vi.fn()
+      const postDiscussionSummaryFeedback = vi.fn().mockResolvedValue({})
 
       const {getByTestId} = setup({
         summary: expectedSummary,
@@ -272,8 +272,8 @@ describe('DiscussionSummary', () => {
 
   describe('DiscussionSummaryRatings', () => {
     const defaultProps = {
-      onLikeClick: jest.fn(),
-      onDislikeClick: jest.fn(),
+      onLikeClick: vi.fn(),
+      onDislikeClick: vi.fn(),
       liked: false,
       disliked: false,
       isEnabled: true,

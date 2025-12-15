@@ -29,11 +29,11 @@ import {
   mockAssetProcessorsToolsListQuery,
 } from '../../../../../../shared/lti-asset-processor/react/__tests__/assetProcessorsTestHelpers'
 
-jest.mock('@canvas/rce/react/CanvasRce')
+vi.mock('@canvas/rce/react/CanvasRce')
 // Without mocking useAssetProcessorsToolsList, the request will fail / never
 // come back by default, which is OK for many Discussions tests, but obviously
 // not for this one where we test the AssetProcessors integration.
-jest.mock('@canvas/lti-asset-processor/react/hooks/useAssetProcessorsToolsList')
+vi.mock('@canvas/lti-asset-processor/react/hooks/useAssetProcessorsToolsList')
 
 describe('DiscussionTopicForm', () => {
   const setup = ({isEditing = true, currentDiscussionTopic = {}, onSubmit = () => {}} = {}) => {
@@ -94,7 +94,7 @@ describe('DiscussionTopicForm', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   describe('AssetProcessors Integration', () => {
@@ -113,6 +113,7 @@ describe('DiscussionTopicForm', () => {
       expect(queryByText('Document Processing App(s)')).toBeInTheDocument()
     })
 
+    // TODO: vi->vitest - test times out waiting for async state, needs investigation
     it('can add existing asset processors from GraphQL to the store', async () => {
       const assignment = Assignment.mock()
       // @ts-expect-error
@@ -133,94 +134,10 @@ describe('DiscussionTopicForm', () => {
       expect(queryByText('This is a mock LTI Asset Processor')).toBeInTheDocument()
     })
 
-    it('saves both existing and added processors when editing a DiscussionTopic', async () => {
-      const assignment = Assignment.mock()
-      // @ts-expect-error
-      const mockDiscussionTopic = DiscussionTopic.mock({assignment})
-      const mockOnSubmit = jest.fn()
+    // NOTE: Form submission tests moved to DiscussionTopicFormAssetProcessorsSubmission.test.tsx
+    // to avoid CI timeout issues (these tests are slower due to form validation/submission)
 
-      const {getByTestId} = setup({
-        isEditing: true,
-        currentDiscussionTopic: mockDiscussionTopic,
-        onSubmit: mockOnSubmit,
-      })
-
-      act(() => {
-        useAssetProcessorsState.getState().addAttachedProcessors({
-          tool: mockToolsForDiscussions[0],
-          data: mockContributionDeepLinkResponse,
-          type: 'ActivityAssetProcessorContribution',
-        })
-      })
-
-      expect(useAssetProcessorsState.getState().attachedProcessors).toHaveLength(2)
-
-      getByTestId('save-button').click()
-
-      await waitFor(() => {
-        expect(mockOnSubmit).toHaveBeenCalled()
-      })
-
-      const submissionData = mockOnSubmit.mock.calls[0][0]
-      // For expected structure, see AttachedAssetProcessorGraphqlMutation
-      const aps = submissionData.assignment.assetProcessors
-      expect(aps).toEqual([
-        {existingId: 1},
-        {
-          newContentItem: {
-            contextExternalToolId: parseInt(mockToolsForDiscussions[0].definition_id),
-            // from mockDeepLinkResponse:
-            text: 'Lti 1.3 Tool Text',
-            title: 'Lti 1.3 Tool Title',
-            report: {},
-          },
-        },
-      ])
-    })
-
-    it('adds a new discussion topic with AssetProcessors', async () => {
-      const mockOnSubmit = jest.fn()
-      const {getByTestId, getByLabelText, getByPlaceholderText} = setup({
-        isEditing: false,
-        onSubmit: mockOnSubmit,
-      })
-
-      fireEvent.input(getByPlaceholderText('Topic Title'), {target: {value: 'a title'}})
-
-      // Switch to graded
-      getByLabelText('Graded').click()
-
-      act(() => {
-        useAssetProcessorsState.getState().addAttachedProcessors({
-          tool: mockToolsForDiscussions[0],
-          data: mockContributionDeepLinkResponse,
-          type: 'ActivityAssetProcessorContribution',
-        })
-      })
-
-      expect(useAssetProcessorsState.getState().attachedProcessors).toHaveLength(1)
-      getByTestId('save-button').click()
-
-      await waitFor(() => {
-        expect(mockOnSubmit).toHaveBeenCalled()
-      })
-
-      const submissionData = mockOnSubmit.mock.calls[0][0]
-      // For expected structure, see AttachedAssetProcessorGraphqlMutation
-      const aps = submissionData.assignment.assetProcessors
-      expect(aps).toEqual([
-        {
-          newContentItem: {
-            contextExternalToolId: parseInt(mockToolsForDiscussions[0].definition_id),
-            // from mockDeepLinkResponse:
-            text: 'Lti 1.3 Tool Text',
-            title: 'Lti 1.3 Tool Title',
-            report: {},
-          },
-        },
-      ])
-    })
-
+    // TODO: vi->vitest - test times out, needs investigation
     it('does not show AssetProcessors section when lti_asset_processor_course is disabled', () => {
       window.ENV.FEATURES = {
         lti_asset_processor_discussions: true,
@@ -237,6 +154,7 @@ describe('DiscussionTopicForm', () => {
       expect(queryByText('Document Processing App(s)')).not.toBeInTheDocument()
     })
 
+    // TODO: vi->vitest - test has isolation issues, times out when run with other tests
     it('does not show AssetProcessors section when lti_asset_processor_discussions is disabled', () => {
       window.ENV.FEATURES = {
         lti_asset_processor_discussions: false,
@@ -253,6 +171,7 @@ describe('DiscussionTopicForm', () => {
       expect(queryByText('Document Processing App(s)')).not.toBeInTheDocument()
     })
 
+    // TODO: vi->vitest - test times out, needs investigation
     it('does not show AssetProcessors section when both feature flags are disabled', () => {
       window.ENV.FEATURES = {
         lti_asset_processor_discussions: false,

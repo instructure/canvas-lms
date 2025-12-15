@@ -82,7 +82,6 @@ describe('CourseRestore', () => {
     server.resetHandlers()
     fakeENV.teardown()
     $('#fixtures').empty()
-    jest.useRealTimers()
   })
 
   afterAll(() => server.close())
@@ -92,7 +91,6 @@ describe('CourseRestore', () => {
     account_id = 4
     course_id = 42
     courseRestore = new CourseRestoreModel({account_id})
-    jest.useFakeTimers()
     $('#fixtures').append($('<div id="flash_screenreader_holder" />'))
 
     // Set up default handlers for all tests
@@ -112,7 +110,7 @@ describe('CourseRestore', () => {
     )
   })
   test("triggers 'searching' when search is called", function () {
-    const callback = jest.fn()
+    const callback = vi.fn()
     courseRestore.on('searching', callback)
     courseRestore.search(account_id)
     expect(callback).toHaveBeenCalled()
@@ -158,8 +156,6 @@ describe('CourseRestore', () => {
   })
 
   test('restores a course after search finds a deleted course', async () => {
-    jest.useRealTimers() // Use real timers for this test
-
     // Set up handlers with proper URL patterns to catch all requests
     server.use(
       // Handle search requests

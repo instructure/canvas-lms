@@ -17,14 +17,14 @@
  */
 
 import '@instructure/date-js'
-import i18nLolcalize from './i18nLolcalize'
+import i18nLolcalize from './i18nLolcalize.js'
 import I18n from 'i18n-js'
 import {
   extend as activateI18nliner,
   inferKey,
   normalizeDefault,
 } from '@instructure/i18nliner-runtime'
-import logEagerLookupViolations from './logEagerLookupViolations'
+import logEagerLookupViolations from './logEagerLookupViolations.js'
 import htmlEscape from '@instructure/html-escape'
 
 activateI18nliner(I18n, {

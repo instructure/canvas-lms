@@ -27,8 +27,8 @@ describe('PrerequisiteSelector', () => {
       {id: '1', name: 'Module 1'},
       {id: '2', name: 'Module 2'},
     ],
-    onDropPrerequisite: jest.fn(),
-    onUpdatePrerequisite: jest.fn(),
+    onDropPrerequisite: vi.fn(),
+    onUpdatePrerequisite: vi.fn(),
     index: 0,
   }
 
@@ -40,7 +40,7 @@ describe('PrerequisiteSelector', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders', () => {

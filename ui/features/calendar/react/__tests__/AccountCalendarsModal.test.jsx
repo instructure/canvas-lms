@@ -34,9 +34,9 @@ import AccountCalendarsModal, {
 } from '../AccountCalendarsModal'
 import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
 
-jest.mock('@canvas/calendar/AccountCalendarsUtils', () => {
+vi.mock('@canvas/calendar/AccountCalendarsUtils', () => {
   return {
-    alertForMatchingAccounts: jest.fn(),
+    alertForMatchingAccounts: vi.fn(),
   }
 })
 
@@ -49,7 +49,7 @@ describe('Other Calendars modal ', () => {
   const markAsSeenUrl = encodeURI(SAVE_PREFERENCES_ENDPOINT.concat(`?mark_feature_as_seen=true`))
 
   beforeAll(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   beforeEach(() => {
@@ -65,7 +65,7 @@ describe('Other Calendars modal ', () => {
     fetchMock.get(getSearchUrl('Test2'), emptyResponse)
     fetchMock.get(getSearchUrl('T'), emptyResponse)
     fetchMock.post(markAsSeenUrl, {body: {status: 'ok'}})
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -74,7 +74,7 @@ describe('Other Calendars modal ', () => {
 
   const getProps = (overrides = {}) => ({
     getSelectedOtherCalendars: () => [page1Results[0]],
-    onSave: jest.fn(),
+    onSave: vi.fn(),
     calendarsPerRequest: 2,
     featureSeen: true,
     ...overrides,
@@ -89,7 +89,7 @@ describe('Other Calendars modal ', () => {
     act(() => {
       const now = Date.now()
       MockDate.set(now + ms)
-      jest.advanceTimersByTime(ms)
+      vi.advanceTimersByTime(ms)
     })
   }
 

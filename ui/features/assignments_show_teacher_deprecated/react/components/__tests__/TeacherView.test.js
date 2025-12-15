@@ -31,7 +31,7 @@ import {
 
 describe('TeacherView', () => {
   describe('basic TeacherView stuff', () => {
-    it.skip('shows the assignment', async () => {
+    it('shows the assignment', async () => {
       const assignment = mockAssignment()
       const {getByText, getAllByText} = await renderTeacherView(assignment)
       expect(await waitFor(() => getAllByText(assignment.name)[0])).toBeInTheDocument()
@@ -127,7 +127,7 @@ describe('TeacherView', () => {
   })
 
   describe('editing the assignment', () => {
-    it.skip('render footer when assignment is changed', async () => {
+    it('render footer when assignment is changed', async () => {
       const assignment = mockAssignment({name: 'old name'})
       const {getByText, getByDisplayValue, getByTestId} = await renderTeacherView(assignment, [], {
         readOnly: false,
@@ -145,7 +145,7 @@ describe('TeacherView', () => {
       expect(getByTestId('TeacherFooter')).toBeInTheDocument()
     })
 
-    it.skip('resets assignment on Cancel', async () => {
+    it('resets assignment on Cancel', async () => {
       const assignment = mockAssignment({name: 'old name'})
       const {getByText, getAllByText, getByDisplayValue, getByTestId} = renderTeacherView(
         assignment,
@@ -174,7 +174,7 @@ describe('TeacherView', () => {
       expect(getAllByText('old name')[0]).toBeInTheDocument()
     })
 
-    it.skip('aborts save if there is an invalid field in the assignment', async () => {
+    it('aborts save if there is an invalid field in the assignment', async () => {
       const assignment = mockAssignment({name: 'old name'})
       const {getByText, getAllByText, getByDisplayValue, getByTestId} = renderTeacherView(
         assignment,
@@ -201,7 +201,7 @@ describe('TeacherView', () => {
       expect(getAllByText('You cannot save while there are errors')[0]).toBeInTheDocument()
     })
 
-    it.skip('bypasses update if new value == old', async () => {
+    it('bypasses update if new value == old', async () => {
       // this spec is here to exercise 1 line of code
       const assignment = mockAssignment({name: 'old name'})
       const {getByText, getAllByText, getByDisplayValue, queryByTestId} = renderTeacherView(

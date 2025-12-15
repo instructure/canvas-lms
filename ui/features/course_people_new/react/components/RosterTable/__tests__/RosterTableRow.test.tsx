@@ -31,7 +31,7 @@ import {
 } from '../../../../util/constants'
 import {mockUser, mockEnrollment} from '../../../../graphql/Mocks'
 
-jest.mock('../../../hooks/useCoursePeopleContext')
+vi.mock('../../../hooks/useCoursePeopleContext')
 
 describe('RosterTableRow', () => {
   const mockedUser = mockUser()
@@ -39,7 +39,7 @@ describe('RosterTableRow', () => {
   const defaultProps = {
     user: mockedUser,
     isSelected: false,
-    handleSelectRow: jest.fn(),
+    handleSelectRow: vi.fn(),
   }
 
   const defaultContextValues = {
@@ -76,11 +76,11 @@ describe('RosterTableRow', () => {
     )
 
   beforeEach(() => {
-    ;(useCoursePeopleContext as jest.Mock).mockReturnValue(defaultContextValues)
+    ;(useCoursePeopleContext as any).mockReturnValue(defaultContextValues)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders user information correctly', () => {
@@ -125,7 +125,7 @@ describe('RosterTableRow', () => {
   })
 
   it('handles selecting checkbox for individual user', () => {
-    const handleSelectRow = jest.fn()
+    const handleSelectRow = vi.fn()
     const {getByTestId} = renderRosterTableRow({handleSelectRow})
     const checkbox = getByTestId(`select-user-${mockedUser._id}`)
     fireEvent.click(checkbox)
@@ -133,7 +133,7 @@ describe('RosterTableRow', () => {
   })
 
   it('hides user selection checkbox when allowAssignToDifferentiationTags is false', () => {
-    ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleContext as any).mockReturnValue({
       ...defaultContextValues,
       allowAssignToDifferentiationTags: false,
     })
@@ -142,7 +142,7 @@ describe('RosterTableRow', () => {
   })
 
   it('hides user selection checkbox when canManageDifferentiationTags is false', () => {
-    ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleContext as any).mockReturnValue({
       ...defaultContextValues,
       canManageDifferentiationTags: false,
     })
@@ -151,7 +151,7 @@ describe('RosterTableRow', () => {
   })
 
   it('hides login ID column when canViewLoginIdColumn is false', () => {
-    ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleContext as any).mockReturnValue({
       ...defaultContextValues,
       canViewLoginIdColumn: false,
     })
@@ -160,7 +160,7 @@ describe('RosterTableRow', () => {
   })
 
   it('hides SIS ID column when canViewSisIdColumn is false', () => {
-    ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleContext as any).mockReturnValue({
       ...defaultContextValues,
       canViewSisIdColumn: false,
     })
@@ -169,7 +169,7 @@ describe('RosterTableRow', () => {
   })
 
   it('hides sections when hideSectionsOnCourseUsersPage is true', () => {
-    ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleContext as any).mockReturnValue({
       ...defaultContextValues,
       hideSectionsOnCourseUsersPage: true,
     })
@@ -178,7 +178,7 @@ describe('RosterTableRow', () => {
   })
 
   it('hides last activity when canReadReports is false', () => {
-    ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleContext as any).mockReturnValue({
       ...defaultContextValues,
       canReadReports: false,
     })
@@ -188,7 +188,7 @@ describe('RosterTableRow', () => {
 
   describe('Option Menu Visibility', () => {
     it('hides menu for students when enrollments cannot be removed', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         canManageStudents: false,
       })
@@ -201,7 +201,7 @@ describe('RosterTableRow', () => {
     })
 
     it('hides menu for teachers when canAllowCourseAdminActions is false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         canAllowCourseAdminActions: false,
       })
@@ -219,7 +219,7 @@ describe('RosterTableRow', () => {
     })
 
     it('hides menu for teaching assistants when canAllowCourseAdminActions is false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         canAllowCourseAdminActions: false,
       })
@@ -234,7 +234,7 @@ describe('RosterTableRow', () => {
     })
 
     it('hides menu for designers when canAllowCourseAdminActions is false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         canAllowCourseAdminActions: false,
       })
@@ -252,7 +252,7 @@ describe('RosterTableRow', () => {
     })
 
     it('hides menu for observers when canManageStudents and canAllowCourseAdminActions are false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         canManageStudents: false,
         canAllowCourseAdminActions: false,

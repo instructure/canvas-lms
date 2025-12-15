@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 import QuizSelect from '../QuizSelect'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
@@ -44,7 +43,7 @@ describe('QuizSelect', () => {
 
   it('renders loading spinner initially', () => {
     server.use(http.get('/api/quiz/v1/courses/:courseId/quizzes/', () => HttpResponse.json([])))
-    render(<QuizSelect onSelect={jest.fn()} />)
+    render(<QuizSelect onSelect={vi.fn()} />)
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
 
@@ -52,14 +51,14 @@ describe('QuizSelect', () => {
     server.use(
       http.get('/api/quiz/v1/courses/:courseId/quizzes/', () => HttpResponse.json(mockQuizzes)),
     )
-    render(<QuizSelect onSelect={jest.fn()} />)
+    render(<QuizSelect onSelect={vi.fn()} />)
     await waitFor(() => expect(screen.getByText('Quiz 1')).toBeInTheDocument())
     expect(screen.getByText('Quiz 2')).toBeInTheDocument()
   })
 
   it('renders error message on fetch failure', async () => {
     server.use(http.get('/api/quiz/v1/courses/:courseId/quizzes/', () => HttpResponse.error()))
-    render(<QuizSelect onSelect={jest.fn()} />)
+    render(<QuizSelect onSelect={vi.fn()} />)
     await waitFor(() => expect(screen.getByText('Failed to fetch quizzes')).toBeInTheDocument())
   })
 
@@ -67,7 +66,7 @@ describe('QuizSelect', () => {
     server.use(
       http.get('/api/quiz/v1/courses/:courseId/quizzes/', () => HttpResponse.json(mockQuizzes)),
     )
-    render(<QuizSelect onSelect={jest.fn()} />)
+    render(<QuizSelect onSelect={vi.fn()} />)
     await waitFor(() => expect(screen.getByText('Quiz 1')).toBeInTheDocument())
     fireEvent.change(screen.getByPlaceholderText('Search...'), {target: {value: 'Quiz 2'}})
     expect(screen.queryByText('Quiz 1')).not.toBeInTheDocument()

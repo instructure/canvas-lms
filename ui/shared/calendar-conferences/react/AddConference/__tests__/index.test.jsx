@@ -79,14 +79,14 @@ describe('AddConference', () => {
 
       describe('success', () => {
         it('creates a plugin style conference when pressed', async () => {
-          const setConference = jest.fn()
+          const setConference = vi.fn()
           await launchPlugin({setConference})
           expect(setConference).toHaveBeenCalledWith(pluginConference)
         })
       })
 
       it('sets inputRef', async () => {
-        const inputRef = jest.fn()
+        const inputRef = vi.fn()
         await launchPlugin({inputRef})
         expect(inputRef).toHaveBeenCalled()
       })
@@ -139,7 +139,7 @@ describe('AddConference', () => {
       })
 
       it('calls set conference callback when complete', () => {
-        const setConference = jest.fn()
+        const setConference = vi.fn()
         const {queryByTitle} = launchLTI({setConference})
 
         postMessage([{title: 'MyLink', text: 'My description', type: 'link'}])
@@ -154,7 +154,7 @@ describe('AddConference', () => {
       })
 
       it('provides a default title if none available', () => {
-        const setConference = jest.fn()
+        const setConference = vi.fn()
         launchLTI({setConference})
 
         postMessage([{type: 'link'}])
@@ -183,21 +183,21 @@ describe('AddConference', () => {
       })
 
       it('accepts HTML responses', () => {
-        const setConference = jest.fn()
+        const setConference = vi.fn()
         launchLTI({setConference})
         postMessage([{type: 'html'}])
         expect(setConference).toHaveBeenCalled()
       })
 
       it('does not accept LtiLink responses', () => {
-        const setConference = jest.fn()
+        const setConference = vi.fn()
         launchLTI({setConference})
         postMessage([{type: 'ltiLink'}])
         expect(setConference).not.toHaveBeenCalled()
       })
 
       it('receives launch settings via Deep Linking response', () => {
-        const setConference = jest.fn()
+        const setConference = vi.fn()
         launchLTI({setConference})
 
         const content_item = {
@@ -248,7 +248,7 @@ describe('AddConference', () => {
 
     it('creates a new conference if another conference type is selected', async () => {
       const currentConferenceType = conferenceTypes[1]
-      const setConference = jest.fn()
+      const setConference = vi.fn()
       const {getByRole, findByText} = render(
         <AddConference {...getProps({conferenceTypes, currentConferenceType, setConference})} />,
       )
@@ -265,7 +265,7 @@ describe('AddConference', () => {
 
     it('does no clear the current conference if the same type is selected', async () => {
       const currentConferenceType = conferenceTypes[1]
-      const setConference = jest.fn()
+      const setConference = vi.fn()
       const {getByRole, findByText} = render(
         <AddConference {...getProps({conferenceTypes, currentConferenceType, setConference})} />,
       )
@@ -281,7 +281,7 @@ describe('AddConference', () => {
     })
 
     it('sets inputRef', async () => {
-      const inputRef = jest.fn()
+      const inputRef = vi.fn()
       render(<AddConference {...getProps({conferenceTypes, inputRef})} />)
       expect(inputRef).toHaveBeenCalled()
     })

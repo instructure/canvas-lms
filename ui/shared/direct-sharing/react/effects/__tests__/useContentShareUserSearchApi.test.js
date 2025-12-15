@@ -29,7 +29,7 @@ describe('useContentShareUserSearchApi', () => {
   const path = '/api/v1/courses/42/content_share_users'
 
   it('reports null as its result if the search term is too short', () => {
-    const success = jest.fn()
+    const success = vi.fn()
     renderHook(() =>
       useContentShareUserSearchApi({success, courseId: '42', params: {search_term: '12'}}),
     )
@@ -38,7 +38,7 @@ describe('useContentShareUserSearchApi', () => {
 
   it('fetches results if the search term is long enough', async () => {
     fetchMock.mock(`path:${path}`, ['list of users'])
-    const success = jest.fn()
+    const success = vi.fn()
     renderHook(() =>
       useContentShareUserSearchApi({success, courseId: '42', params: {search_term: '123'}}),
     )
@@ -48,7 +48,7 @@ describe('useContentShareUserSearchApi', () => {
   })
 
   it('throws if the courseId parameter is missing', () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     const {result} = renderHook(() => useContentShareUserSearchApi({params: {search_term: '123'}}))
     expect(result.error).toBeDefined()
     expect(result.error.message).toMatch(/courseId.*required/)

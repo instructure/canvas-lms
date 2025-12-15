@@ -19,7 +19,7 @@
 import {createGradebook} from './GradebookSpecHelper'
 import GradebookApi from '../apis/GradebookApi'
 
-jest.mock('../apis/GradebookApi')
+vi.mock('../apis/GradebookApi')
 
 const $container = document.createElement('div')
 document.body.appendChild($container)
@@ -38,16 +38,16 @@ describe('Gradebook > Teacher Notes', () => {
       getOptions: () => ({
         numberOfColumnsToFreeze: 0,
       }),
-      invalidate: jest.fn(),
-      setColumns: jest.fn(),
-      setNumberOfColumnsToFreeze: jest.fn(),
-      destroy: jest.fn(),
+      invalidate: vi.fn(),
+      setColumns: vi.fn(),
+      setNumberOfColumnsToFreeze: vi.fn(),
+      destroy: vi.fn(),
     }
     gradebook.gradebookGrid.gridSupport = {
-      destroy: jest.fn(),
+      destroy: vi.fn(),
     }
-    gradebook.renderViewOptionsMenu = jest.fn()
-    gradebook.flashError = jest.fn()
+    gradebook.renderViewOptionsMenu = vi.fn()
+    gradebook.flashError = vi.fn()
   }
 
   describe('showing teacher notes', () => {
@@ -64,7 +64,7 @@ describe('Gradebook > Teacher Notes', () => {
     })
 
     afterEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       if (gradebook?.gradebookGrid?.grid?.destroy?.mockReset) {
         gradebook.gradebookGrid.grid.destroy.mockReset()
       }
@@ -149,7 +149,7 @@ describe('Gradebook > Teacher Notes', () => {
     })
 
     afterEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       if (gradebook?.gradebookGrid?.grid?.destroy?.mockReset) {
         gradebook.gradebookGrid.grid.destroy.mockReset()
       }

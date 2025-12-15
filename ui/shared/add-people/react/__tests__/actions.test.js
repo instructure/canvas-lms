@@ -22,7 +22,7 @@ import {actions, actionTypes} from '../actions'
 import INITIAL_STATE from '@canvas/add-people/initialState'
 
 const mockAxiosSuccess = (data = {}) => {
-  jest.spyOn(axios, 'post').mockResolvedValue({
+  vi.spyOn(axios, 'post').mockResolvedValue({
     data,
     status: 200,
     statusText: 'Ok',
@@ -39,13 +39,13 @@ const failureData = {
   },
 }
 const mockAxiosFail = () => {
-  jest.spyOn(axios, 'post').mockRejectedValue(failureData)
+  vi.spyOn(axios, 'post').mockRejectedValue(failureData)
 }
 let store = null
 let storeSpy = null
 let runningState = INITIAL_STATE
 const mockStore = (state = runningState) => {
-  storeSpy = jest.fn()
+  storeSpy = vi.fn()
   store = createStore((st, action) => {
     storeSpy(action)
     return st
@@ -56,7 +56,7 @@ const testConfig = () => ({
     mockStore()
   },
   afterEach() {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   },
 })
 

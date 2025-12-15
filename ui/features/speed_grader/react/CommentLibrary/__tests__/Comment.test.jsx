@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {vi} from 'vitest'
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import Comment from '../Comment'
@@ -39,16 +40,16 @@ describe('Comment', () => {
   const oldWindowConfirm = window.confirm
 
   beforeEach(() => {
-    onDeleteMock = jest.fn()
-    onClickMock = jest.fn()
-    setRemovedItemIndexMock = jest.fn()
-    window.confirm = jest.fn()
+    onDeleteMock = vi.fn()
+    onClickMock = vi.fn()
+    setRemovedItemIndexMock = vi.fn()
+    window.confirm = vi.fn()
     window.confirm.mockImplementation(() => true)
   })
 
   afterEach(() => {
     window.confirm = oldWindowConfirm
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the comment text and a trash icon', () => {

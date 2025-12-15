@@ -31,7 +31,7 @@ const mockENV = {
 
 beforeEach(() => {
   global.ENV = {...mockENV}
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('generateMessages', () => {

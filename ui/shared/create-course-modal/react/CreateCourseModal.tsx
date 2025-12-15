@@ -113,16 +113,51 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
       })
   }
 
+  // Define all callbacks at the top level to maintain hook order
+  const teacherStudentSuccess = useCallback((enrollments: Enrollment[]) => {
+    const accounts = getAccountsFromEnrollments(enrollments)
+    setAllAccounts(accounts)
+    if (accounts.length === 1) {
+      setSelectedAccount(accounts[0])
+      setAccountSearchTerm(accounts[0].name)
+    }
+  }, [])
+
+  const adminSuccess = useCallback((accounts: Account[]) => {
+    // Filter out any undefined/null accounts and ensure they have names before sorting
+    const validAccounts = accounts.filter(account => account && account.name)
+    setAllAccounts(
+      validAccounts.sort((a, b) =>
+        a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'}),
+      ),
+    )
+  }, [])
+
+  const noEnrollmentsSuccess = useCallback((account: Account[]) => {
+    setAllAccounts(account)
+    setSelectedAccount(account[0])
+    setAccountSearchTerm(account[0].name)
+  }, [])
+
+  const enhancedFetchingSuccess = useCallback((accounts: Account[]) => {
+    setAllAccounts(
+      accounts.sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'})),
+    )
+    if (accounts.length === 1) {
+      setSelectedAccount(accounts[0])
+      setAccountSearchTerm(accounts[0].name)
+    }
+  }, [])
+
+  const accountsError = useCallback(
+    (err: Error) => showFlashError(I18n.t('Unable to get accounts'))(err),
+    [],
+  )
+
+  // Build fetch options without inline hooks
   const teacherStudentFetchOpts = {
     path: '/api/v1/users/self/courses',
-    success: useCallback((enrollments: Enrollment[]) => {
-      const accounts = getAccountsFromEnrollments(enrollments)
-      setAllAccounts(accounts)
-      if (accounts.length === 1) {
-        setSelectedAccount(accounts[0])
-        setAccountSearchTerm(accounts[0].name)
-      }
-    }, []),
+    success: teacherStudentSuccess,
     params: {
       per_page: 100,
       include: ['account'],
@@ -133,15 +168,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
 
   const adminFetchOpts = {
     path: '/api/v1/manageable_accounts',
-    success: useCallback((accounts: Account[]) => {
-      // Filter out any undefined/null accounts and ensure they have names before sorting
-      const validAccounts = accounts.filter(account => account && account.name)
-      setAllAccounts(
-        validAccounts.sort((a, b) =>
-          a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'}),
-        ),
-      )
-    }, []),
+    success: adminSuccess,
     params: {
       per_page: 100,
     },
@@ -149,11 +176,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
 
   const noEnrollmentsFetchOpts = {
     path: '/api/v1/manually_created_courses_account',
-    success: useCallback((account: Account[]) => {
-      setAllAccounts(account)
-      setSelectedAccount(account[0])
-      setAccountSearchTerm(account[0].name)
-    }, []),
+    success: noEnrollmentsSuccess,
   }
 
   let fetchOpts = {}
@@ -161,17 +184,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
   if (window.ENV.FEATURES?.enhanced_course_creation_account_fetching) {
     fetchOpts = {
       path: '/api/v1/course_creation_accounts',
-
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      success: useCallback((accounts: Account[]) => {
-        setAllAccounts(
-          accounts.sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'})),
-        )
-        if (accounts.length === 1) {
-          setSelectedAccount(accounts[0])
-          setAccountSearchTerm(accounts[0].name)
-        }
-      }, []),
+      success: enhancedFetchingSuccess,
       params: {
         per_page: 100,
       },
@@ -186,7 +199,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
 
   useFetchApi({
     loading: setLoading,
-    error: useCallback((err: Error) => showFlashError(I18n.t('Unable to get accounts'))(err), []),
+    error: accountsError,
     fetchAllPages: true,
     ...(fetchOpts as any),
   })
@@ -222,22 +235,29 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
     homeOptionPath = `/api/v1/accounts/${selectedAccount.id}/courses`
   }
 
+  const homeroomsSuccess = useCallback((courses: Course[]) => {
+    const homerooms = courses ? courses.filter(homeroom => homeroom.homeroom_course) : []
+    setAllHomerooms(homerooms)
+    if (homerooms.length > 0) {
+      setSelectedHomeroom(homerooms[0])
+    } else {
+      setSelectedHomeroom(null)
+    }
+  }, [])
+
+  const homeroomsError = useCallback(
+    (err: Error) => showFlashError(I18n.t('Unable to get homerooms'))(err),
+    [],
+  )
+
   useFetchApi({
     loading: setLoading,
-    success: useCallback((courses: Course[]) => {
-      const homerooms = courses ? courses.filter(homeroom => homeroom.homeroom_course) : []
-      setAllHomerooms(homerooms)
-      if (homerooms.length > 0) {
-        setSelectedHomeroom(homerooms[0])
-      } else {
-        setSelectedHomeroom(null)
-      }
-    }, []),
+    success: homeroomsSuccess,
     params: {
       homeroom: true,
       per_page: 100,
     },
-    error: useCallback((err: Error) => showFlashError(I18n.t('Unable to get homerooms'))(err), []),
+    error: homeroomsError,
     fetchAllPages: true,
     // don't let students/users with no enrollments sync homeroom data
     forceResult: ['no_enrollments', 'student'].includes(permissions) ? [] : undefined,

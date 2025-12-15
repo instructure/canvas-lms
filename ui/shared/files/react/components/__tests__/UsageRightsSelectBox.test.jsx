@@ -33,7 +33,7 @@ describe('UsageRightsSelectBox', () => {
   ]
 
   beforeEach(() => {
-    jest.spyOn($, 'get').mockImplementation((url, callback) => {
+    vi.spyOn($, 'get').mockImplementation((url, callback) => {
       if (callback) {
         callback(licenseData)
       }
@@ -42,7 +42,7 @@ describe('UsageRightsSelectBox', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('shows alert message if nothing is chosen and component is setup for a message', () => {

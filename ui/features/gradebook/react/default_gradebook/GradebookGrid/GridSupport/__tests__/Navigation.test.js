@@ -141,7 +141,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateNext', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigateNext.subscribe(handler)
       simulateKeyDown('Tab')
       expect(handler).toHaveBeenCalledTimes(1)
@@ -228,7 +228,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateNext', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigateNext.subscribe(handler)
       simulateKeyDown('Tab')
       expect(handler).toHaveBeenCalledTimes(1)
@@ -330,7 +330,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateNext', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigateNext.subscribe(handler)
       simulateKeyDown('Tab')
       expect(handler).toHaveBeenCalledTimes(1)
@@ -439,7 +439,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigatePrev', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigatePrev.subscribe(handler)
       simulateKeyDown('ShiftTab')
       expect(handler).toHaveBeenCalledTimes(1)
@@ -506,7 +506,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigatePrev', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigatePrev.subscribe(handler)
       simulateKeyDown('ShiftTab')
       expect(handler).toHaveBeenCalledTimes(1)
@@ -573,7 +573,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateRight', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigateRight.subscribe(handler)
       simulateKeyDown('RightArrow')
       expect(handler).toHaveBeenCalledTimes(1)
@@ -629,7 +629,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateRight', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigateRight.subscribe(handler)
       simulateKeyDown('RightArrow')
       expect(handler).toHaveBeenCalledTimes(1)
@@ -686,7 +686,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('does not trigger onNavigateRight', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigateRight.subscribe(handler)
       simulateKeyDown('RightArrow')
       expect(handler).toHaveBeenCalledTimes(0)
@@ -777,7 +777,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateLeft', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigateLeft.subscribe(handler)
       simulateKeyDown('LeftArrow')
       expect(handler).toHaveBeenCalledTimes(1)
@@ -833,7 +833,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateLeft', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigateLeft.subscribe(handler)
       simulateKeyDown('LeftArrow')
       expect(handler).toHaveBeenCalledTimes(1)
@@ -890,7 +890,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('does not trigger onNavigateLeft', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigateLeft.subscribe(handler)
       simulateKeyDown('LeftArrow')
       expect(handler).toHaveBeenCalledTimes(0)
@@ -1012,7 +1012,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('does not trigger onNavigateUp', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigateUp.subscribe(handler)
       simulateKeyDown('UpArrow')
       expect(handler).toHaveBeenCalledTimes(0)
@@ -1049,7 +1049,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateUp', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigateUp.subscribe(handler)
       simulateKeyDown('UpArrow')
       expect(handler).toHaveBeenCalledTimes(1)
@@ -1131,7 +1131,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers onNavigateDown', () => {
-      const handler = jest.fn()
+      const handler = vi.fn()
       gridSupport.events.onNavigateDown.subscribe(handler)
       simulateKeyDown('DownArrow')
       expect(handler).toHaveBeenCalledTimes(1)
@@ -1277,7 +1277,7 @@ describe('GradebookGrid GridSupport Navigation', () => {
     })
 
     test('triggers the event when handling keydown on a header child element', () => {
-      const spy = jest.fn()
+      const spy = vi.fn()
       gridSupport.events.onKeyDown.subscribe(spy)
       const headerChild = document.querySelectorAll('.slick-column-name')[2]
       simulateKeyDown('Tab', headerChild)

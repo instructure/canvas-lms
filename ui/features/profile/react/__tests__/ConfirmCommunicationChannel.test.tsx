@@ -24,8 +24,8 @@ import ConfirmCommunicationChannel, {
   type ConfirmCommunicationChannelProps,
 } from '../ConfirmCommunicationChannel'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
 describe('ConfirmCommunicationChannel', () => {
@@ -36,16 +36,16 @@ describe('ConfirmCommunicationChannel', () => {
   afterEach(() => {
     fakeENV.teardown()
     fetchMock.restore()
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
   const props: ConfirmCommunicationChannelProps = {
     phoneNumberOrEmail: '123-456-7890',
     communicationChannel: {user_id: '1', pseudonym_id: '2', channel_id: '3'},
     children: <div />,
-    onClose: jest.fn(),
-    onError: jest.fn(),
-    onSubmit: jest.fn(),
+    onClose: vi.fn(),
+    onError: vi.fn(),
+    onSubmit: vi.fn(),
   }
 
   it('should render the provided phone number', () => {

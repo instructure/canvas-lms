@@ -29,8 +29,8 @@ import {
 } from '../../types'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
@@ -69,7 +69,7 @@ describe('CourseCopy', () => {
         },
       },
     })
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderWithClient = (ui: React.ReactElement) => {

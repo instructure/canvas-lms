@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import TutorialTrayContent from '../TutorialTrayContent'
 
 const defaultProps = {
@@ -25,6 +25,10 @@ const defaultProps = {
 }
 
 describe('TutorialTrayContent', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   it('renders with required props', () => {
     const {getByText} = render(<TutorialTrayContent {...defaultProps} />)
 

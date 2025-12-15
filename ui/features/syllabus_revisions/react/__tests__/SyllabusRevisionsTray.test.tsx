@@ -21,11 +21,11 @@ import {render, screen, fireEvent, waitFor, cleanup} from '@testing-library/reac
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import SyllabusRevisionsTray from '../SyllabusRevisionsTray'
+import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const server = setupServer()
 
-jest.mock('@canvas/alerts/react/FlashAlert')
-const {showFlashAlert, showFlashError} = require('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 describe('SyllabusRevisionsTray', () => {
   const mockVersions = [
@@ -49,7 +49,7 @@ describe('SyllabusRevisionsTray', () => {
   const defaultProps = {
     courseId: '123',
     open: true,
-    onDismiss: jest.fn(),
+    onDismiss: vi.fn(),
   }
 
   beforeAll(() => server.listen())
@@ -57,13 +57,13 @@ describe('SyllabusRevisionsTray', () => {
     server.resetHandlers()
     cleanup()
     document.body.innerHTML = ''
-    showFlashAlert.mockClear()
-    showFlashError.mockClear()
+    vi.mocked(showFlashAlert).mockClear()
+    vi.mocked(showFlashError).mockClear()
   })
   afterAll(() => server.close())
 
   beforeEach(() => {
-    showFlashError.mockReturnValue(jest.fn())
+    vi.mocked(showFlashError).mockReturnValue(vi.fn())
   })
 
   it('renders tray when open', () => {

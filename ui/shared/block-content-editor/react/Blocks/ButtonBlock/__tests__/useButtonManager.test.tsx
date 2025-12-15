@@ -34,10 +34,10 @@ const MAX_BUTTONS = 5
 const MIN_BUTTONS = 1
 
 describe('useButtonManager', () => {
-  const mockOnChange = jest.fn()
+  const mockOnChange = vi.fn()
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('initialization', () => {

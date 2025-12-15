@@ -25,7 +25,7 @@ function makeUploader(name: string) {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore FileUploader constructor not typed
   const uploader = new FileUploader({file: new File(['foo'], name, {type: 'text/plain'})})
-  uploader.roundProgress = jest.fn().mockReturnValue(50)
+  uploader.roundProgress = vi.fn().mockReturnValue(50)
   return uploader
 }
 
@@ -52,7 +52,7 @@ describe('UploadProgress', () => {
     })
 
     it('with success message', () => {
-      defaultProps.uploader.roundProgress = jest.fn().mockReturnValue(100)
+      defaultProps.uploader.roundProgress = vi.fn().mockReturnValue(100)
       renderComponent()
       const progressBar = document.body.querySelector('progress')
       expect(progressBar).toHaveAttribute('value', '100')
@@ -61,7 +61,7 @@ describe('UploadProgress', () => {
     })
 
     it('with error message', () => {
-      defaultProps.uploader.roundProgress = jest.fn().mockReturnValue(50)
+      defaultProps.uploader.roundProgress = vi.fn().mockReturnValue(50)
       defaultProps.uploader.error = {message: 'Error uploading file.'}
       renderComponent()
       const progressBar = document.body.querySelector('progress')
@@ -73,7 +73,7 @@ describe('UploadProgress', () => {
 
   describe('renders message', () => {
     it('when fails', () => {
-      defaultProps.uploader.roundProgress = jest.fn().mockReturnValue(50)
+      defaultProps.uploader.roundProgress = vi.fn().mockReturnValue(50)
       defaultProps.uploader.error = {message: 'Error uploading file.'}
       renderComponent()
       expect(screen.getByText('File failed to upload. Please try again.')).toBeInTheDocument()
@@ -81,7 +81,7 @@ describe('UploadProgress', () => {
   })
 
   it('render abort button', () => {
-    defaultProps.uploader.canAbort = jest.fn().mockReturnValue(true)
+    defaultProps.uploader.canAbort = vi.fn().mockReturnValue(true)
     renderComponent()
     expect(screen.getByText('Cancel upload')).toBeInTheDocument()
   })

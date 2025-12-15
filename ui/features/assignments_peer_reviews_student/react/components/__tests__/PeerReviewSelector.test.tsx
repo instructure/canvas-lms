@@ -63,7 +63,7 @@ describe('PeerReviewSelector', () => {
   ]
 
   it('renders no peer reviews message when assessment requests are null', () => {
-    const mockOnChange = jest.fn()
+    const mockOnChange = vi.fn()
     render(
       <PeerReviewSelector
         assessmentRequests={null as any}
@@ -77,7 +77,7 @@ describe('PeerReviewSelector', () => {
   })
 
   it('shows correct count in label for second option selected', () => {
-    const mockOnChange = jest.fn()
+    const mockOnChange = vi.fn()
     render(
       <PeerReviewSelector
         assessmentRequests={mockAssessmentRequests}
@@ -91,7 +91,7 @@ describe('PeerReviewSelector', () => {
   })
 
   it('calls onSelectionChange when selection changes', async () => {
-    const mockOnChange = jest.fn()
+    const mockOnChange = vi.fn()
     const user = userEvent.setup()
     render(
       <PeerReviewSelector
@@ -111,7 +111,7 @@ describe('PeerReviewSelector', () => {
   })
 
   it('groups assessments into ready to review and completed sections', async () => {
-    const mockOnChange = jest.fn()
+    const mockOnChange = vi.fn()
     const user = userEvent.setup()
     const mixedAssessments: AssessmentRequest[] = [
       {
@@ -168,7 +168,7 @@ describe('PeerReviewSelector', () => {
   })
 
   it('only shows ready to review group when no completed assessments', async () => {
-    const mockOnChange = jest.fn()
+    const mockOnChange = vi.fn()
     const user = userEvent.setup()
 
     render(
@@ -187,7 +187,7 @@ describe('PeerReviewSelector', () => {
   })
 
   it('filters out unavailable items and shows only available in selector with correct numbering when item is unavailable', async () => {
-    const mockOnChange = jest.fn()
+    const mockOnChange = vi.fn()
     const user = userEvent.setup()
     const assessmentsWithUnavailableFirst: AssessmentRequest[] = [
       {

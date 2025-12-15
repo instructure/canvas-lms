@@ -39,22 +39,22 @@ describe('LDBLoginPopup', () => {
     popup = new LDBLoginPopup({sticky: false})
     mockWindow = {
       document: {
-        write: jest.fn(),
-        close: jest.fn(),
-        find: jest.fn(() => ({
+        write: vi.fn(),
+        close: vi.fn(),
+        find: vi.fn(() => ({
           length: $('link').length,
-          trigger: jest.fn(),
+          trigger: vi.fn(),
         })),
       },
-      close: jest.fn(),
+      close: vi.fn(),
       onbeforeunload: null,
       onload: null,
     }
-    global.window.open = jest.fn().mockReturnValue(mockWindow)
+    global.window.open = vi.fn().mockReturnValue(mockWindow)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     server.resetHandlers()
   })
 
@@ -71,8 +71,8 @@ describe('LDBLoginPopup', () => {
   })
 
   it('closes after a successful login', () => {
-    jest.useFakeTimers()
-    const onClose = jest.fn()
+    vi.useFakeTimers()
+    const onClose = vi.fn()
 
     server.use(
       http.get('*', () => {
@@ -83,17 +83,17 @@ describe('LDBLoginPopup', () => {
     popup.on('close', onClose)
     popup.on('open', (e, document) => {
       document.find('.btn-primary').trigger('click')
-      jest.advanceTimersByTime(1)
+      vi.advanceTimersByTime(1)
       expect(onClose).toHaveBeenCalled()
     })
 
     popup.exec()
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   it('triggers login_success event after successful login', () => {
-    jest.useFakeTimers()
-    const onSuccess = jest.fn()
+    vi.useFakeTimers()
+    const onSuccess = vi.fn()
 
     server.use(
       http.get('*', () => {
@@ -104,11 +104,11 @@ describe('LDBLoginPopup', () => {
     popup.on('login_success', onSuccess)
     popup.on('open', (e, document) => {
       document.find('.btn-primary').trigger('click')
-      jest.advanceTimersByTime(1)
+      vi.advanceTimersByTime(1)
       expect(onSuccess).toHaveBeenCalled()
     })
 
     popup.exec()
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 })

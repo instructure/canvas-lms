@@ -94,19 +94,19 @@ describe('Gradebook#gotAllAssignmentGroups', () => {
   })
 
   it('sets the "assignment groups loaded" state', () => {
-    jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
     gradebook.gotAllAssignmentGroups([])
     expect(gradebook.setAssignmentGroupsLoaded).toHaveBeenCalledTimes(1)
   })
 
   it('sets the "assignment groups loaded" state to true', () => {
-    jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
     gradebook.gotAllAssignmentGroups([])
     expect(gradebook.setAssignmentGroupsLoaded).toHaveBeenCalledWith(true)
   })
 
   it('adds the assignment group to the group definitions if it is new', () => {
-    jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
     const assignmentGroup = {
       id: '12',
       assignments: [{id: '35', name: 'An Assignment', due_at: null}],
@@ -116,7 +116,7 @@ describe('Gradebook#gotAllAssignmentGroups', () => {
   })
 
   it('adds new assignments to existing assignment groups', () => {
-    jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
     gradebook.assignmentGroups['12'] = {
       id: '12',
       assignments: [{id: '22', name: 'Some Other Assignment', due_at: null}],
@@ -131,7 +131,7 @@ describe('Gradebook#gotAllAssignmentGroups', () => {
   })
 
   it('does not add duplicate assignments to assignment groups', () => {
-    jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
     gradebook.assignmentGroups['12'] = {
       id: '12',
       assignments: [{id: '35', name: 'An Assignment', due_at: null}],
@@ -155,8 +155,8 @@ describe('Gradebook#gotAllAssignmentGroups', () => {
     })
 
     it('adds peer review sub assignments to the assignment group', () => {
-      jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
-      jest.spyOn(gradebook, 'addAssignmentColumnDefinition')
+      vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+      vi.spyOn(gradebook, 'addAssignmentColumnDefinition')
       const assignmentGroup = {
         id: '12',
         assignment_group_id: '12',
@@ -181,8 +181,8 @@ describe('Gradebook#gotAllAssignmentGroups', () => {
     })
 
     it('adds peer review sub assignments to the assignments object', () => {
-      jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
-      jest.spyOn(gradebook, 'addAssignmentColumnDefinition')
+      vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+      vi.spyOn(gradebook, 'addAssignmentColumnDefinition')
       const assignmentGroup = {
         id: '12',
         assignment_group_id: '12',
@@ -207,8 +207,8 @@ describe('Gradebook#gotAllAssignmentGroups', () => {
     })
 
     it('adds parent_assignment reference to peer review sub assignments', () => {
-      jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
-      jest.spyOn(gradebook, 'addAssignmentColumnDefinition')
+      vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+      vi.spyOn(gradebook, 'addAssignmentColumnDefinition')
       const parentAssignment = {
         id: '35',
         name: 'An Assignment',
@@ -231,8 +231,8 @@ describe('Gradebook#gotAllAssignmentGroups', () => {
     })
 
     it('adds column definition for peer review sub assignments', () => {
-      jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
-      jest.spyOn(gradebook, 'addAssignmentColumnDefinition')
+      vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+      vi.spyOn(gradebook, 'addAssignmentColumnDefinition')
       const assignmentGroup = {
         id: '12',
         assignment_group_id: '12',
@@ -257,8 +257,8 @@ describe('Gradebook#gotAllAssignmentGroups', () => {
   })
 
   it('does not add peer review sub assignments when peer_review_sub_assignment is missing', () => {
-    jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
-    jest.spyOn(gradebook, 'addAssignmentColumnDefinition')
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'addAssignmentColumnDefinition')
     const assignmentGroup = {
       id: '12',
       assignment_group_id: '12',
@@ -278,8 +278,8 @@ describe('Gradebook#gotAllAssignmentGroups', () => {
   })
 
   it('does not add peer review sub assignments when assignment does not have peer reviews enabled', () => {
-    jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
-    jest.spyOn(gradebook, 'addAssignmentColumnDefinition')
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'addAssignmentColumnDefinition')
     const assignmentGroup = {
       id: '12',
       assignment_group_id: '12',
@@ -412,7 +412,7 @@ describe('Gradebook#updateFilterAssignmentIds', () => {
         parent_assignment_id: '2301',
       },
     })
-    jest.spyOn(gradebook, 'filterAssignments').mockReturnValue([
+    vi.spyOn(gradebook, 'filterAssignments').mockReturnValue([
       {
         id: '2301',
         name: 'Assignment 1',
@@ -446,7 +446,7 @@ describe('Gradebook#updateStudentHeadersAndReloadData', () => {
   })
 
   it('makes a call to update column headers', () => {
-    const updateColumnHeaders = jest.spyOn(
+    const updateColumnHeaders = vi.spyOn(
       gradebook.gradebookGrid.gridSupport.columns,
       'updateColumnHeaders',
     )
@@ -455,7 +455,7 @@ describe('Gradebook#updateStudentHeadersAndReloadData', () => {
   })
 
   it('updates the student column header', () => {
-    const updateColumnHeaders = jest.spyOn(
+    const updateColumnHeaders = vi.spyOn(
       gradebook.gradebookGrid.gridSupport.columns,
       'updateColumnHeaders',
     )
@@ -474,7 +474,7 @@ describe('Gradebook#gotCustomColumnDataChunk', () => {
       1101: {id: '1101', assignment_201: {}, assignment_202: {}},
       1102: {id: '1102', assignment_201: {}},
     }
-    jest.spyOn(gradebook, 'invalidateRowsForStudentIds')
+    vi.spyOn(gradebook, 'invalidateRowsForStudentIds')
   })
 
   it('updates students with custom column data', () => {
@@ -643,7 +643,7 @@ describe('Gradebook Assignment Student Visibility', () => {
     let saveSettingsStub
 
     beforeEach(() => {
-      saveSettingsStub = jest
+      saveSettingsStub = vi
         .spyOn(gradebook, 'saveSettings')
         .mockImplementation((_context_id, gradebook_settings) =>
           Promise.resolve(gradebook_settings),

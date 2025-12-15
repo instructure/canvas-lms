@@ -21,7 +21,7 @@ import 'jquery-migrate'
 import '../outerclick'
 describe('outerclick', () => {
   it('should work', () => {
-    const handler = jest.fn()
+    const handler = vi.fn()
     const $doc = $(document.body)
     const $foo = $('<b>hello <i>world</i></b>').appendTo($doc)
     $foo.on('outerclick', handler)

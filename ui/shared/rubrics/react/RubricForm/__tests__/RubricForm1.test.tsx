@@ -27,14 +27,17 @@ import {WarningModal} from '../components/WarningModal'
 import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
 import {reorderRatingsAtIndex} from '../../utils'
 
-jest.mock('../queries/RubricFormQueries', () => ({
-  ...jest.requireActual('../queries/RubricFormQueries'),
-  saveRubric: jest.fn(),
-  generateCriteria: jest.fn(),
-}))
+vi.mock('../queries/RubricFormQueries', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../queries/RubricFormQueries')>()
+  return {
+    ...actual,
+    saveRubric: vi.fn(),
+    generateCriteria: vi.fn(),
+  }
+})
 
-jest.mock('@canvas/progress/ProgressHelpers', () => ({
-  monitorProgress: jest.fn(),
+vi.mock('@canvas/progress/ProgressHelpers', () => ({
+  monitorProgress: vi.fn(),
 }))
 
 const ROOT_OUTCOME_GROUP = {
@@ -60,7 +63,7 @@ describe('RubricForm Tests', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     destroyFlashAlertContainer()
   })
 
@@ -99,7 +102,7 @@ describe('RubricForm Tests', () => {
 
   describe('with rubricId', () => {
     afterEach(() => {
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
 
     it('loads rubric data and populates appropriate fields', () => {
@@ -320,7 +323,7 @@ describe('RubricForm Tests', () => {
             },
           },
         }
-        jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
+        vi.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
           // @ts-expect-error
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
@@ -359,7 +362,7 @@ describe('RubricForm Tests', () => {
             },
           },
         }
-        jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
+        vi.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
           // @ts-expect-error
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
@@ -388,7 +391,7 @@ describe('RubricForm Tests', () => {
             },
           },
         }
-        jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
+        vi.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
           // @ts-expect-error
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
@@ -490,7 +493,7 @@ describe('RubricForm Tests', () => {
 
   describe('assessed rubrics', () => {
     afterEach(() => {
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
 
     it('renders appropriate info alert when rubric is assessed', () => {
@@ -598,11 +601,11 @@ describe('RubricForm Tests', () => {
   })
 
   describe('WarningModal', () => {
-    const onDismissMock = jest.fn()
-    const onCancelMock = jest.fn()
+    const onDismissMock = vi.fn()
+    const onCancelMock = vi.fn()
 
     beforeEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('renders correctly when open', () => {

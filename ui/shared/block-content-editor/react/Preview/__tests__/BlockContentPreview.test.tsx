@@ -20,8 +20,8 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {BlockContentPreview} from '../BlockContentPreview'
 
-jest.mock('../../hooks/useGetSerializedNodes', () => ({
-  useGetSerializedNodes: jest.fn(),
+vi.mock('../../hooks/useGetSerializedNodes', () => ({
+  useGetSerializedNodes: vi.fn(),
 }))
 
 const renderPreview = () => {
@@ -30,7 +30,7 @@ const renderPreview = () => {
 
 describe('BlockContentPreview', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should select "desktop" by default', async () => {

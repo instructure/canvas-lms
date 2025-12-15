@@ -56,12 +56,12 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    jest
+    vi
       .spyOn(gradebook, 'isGradeEditable')
       .mockImplementation(
         (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
       )
-    jest
+    vi
       .spyOn(gradebook, 'isGradeVisible')
       .mockImplementation(
         (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
@@ -100,7 +100,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     }
     $container.remove()
     fakeENV.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   const createEditor = () => {
@@ -109,7 +109,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
   describe('initialization', () => {
     beforeEach(() => {
-      jest.spyOn(ReactDOM, 'render')
+      vi.spyOn(ReactDOM, 'render')
     })
 
     afterEach(() => {
@@ -154,7 +154,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the AssignmentRowCell component when triggered', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
@@ -162,7 +162,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('passes the event when calling handleKeyDown', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       const [event] =
@@ -174,7 +174,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('returns the return value from the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
+      vi.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(returnValue).toBe(false)
@@ -183,7 +183,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .handleKeyDown on the ReadOnlyCell component when grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
@@ -216,7 +216,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#focus()', () => {
     test('calls .focus on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'focus')
+      vi.spyOn(editor.component, 'focus')
       editor.focus()
       expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
@@ -224,7 +224,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .focus on the ReadOnlyCell component when grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'focus')
+      vi.spyOn(editor.component, 'focus')
       editor.focus()
       expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
@@ -233,14 +233,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#isValueChanged()', () => {
     test('returns the result of calling .isValueChanged on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
+      vi.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
     test('calls .isValueChanged on the ReadOnlyCell component when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
+      vi.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
@@ -261,7 +261,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#loadValue()', () => {
     test('renders the component', () => {
       createEditor()
-      jest.spyOn(editor, 'renderComponent').mockImplementation(() => {})
+      vi.spyOn(editor, 'renderComponent').mockImplementation(() => {})
       editor.loadValue()
       expect(editor.renderComponent).toHaveBeenCalledTimes(1)
     })
@@ -270,7 +270,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#applyValue()', () => {
     test('calls .gradeSubmission on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
@@ -278,14 +278,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .gradeSubmission on the ReadOnlyCell component when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('includes the given item when applying the value', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       const [item] =
         editor.component.gradeSubmission.mock.calls[
@@ -296,7 +296,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('includes the given value when applying the value', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       const [, value] =
         editor.component.gradeSubmission.mock.calls[
@@ -348,12 +348,12 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    jest
+    vi
       .spyOn(gradebook, 'isGradeEditable')
       .mockImplementation(
         (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
       )
-    jest
+    vi
       .spyOn(gradebook, 'isGradeVisible')
       .mockImplementation(
         (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
@@ -392,7 +392,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     }
     $container.remove()
     fakeENV.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   const createEditor = () => {
@@ -406,7 +406,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
   describe('initialization', () => {
     beforeEach(() => {
-      jest.spyOn(ReactDOM, 'render')
+      vi.spyOn(ReactDOM, 'render')
     })
 
     afterEach(() => {
@@ -451,7 +451,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the AssignmentRowCell component when triggered', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
@@ -459,7 +459,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('passes the event when calling handleKeyDown', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       const [event] =
@@ -471,7 +471,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('returns the return value from the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
+      vi.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(returnValue).toBe(false)
@@ -480,7 +480,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .handleKeyDown on the ReadOnlyCell component when grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
@@ -513,7 +513,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#focus()', () => {
     test('calls .focus on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'focus')
+      vi.spyOn(editor.component, 'focus')
       editor.focus()
       expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
@@ -521,7 +521,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .focus on the ReadOnlyCell component when grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'focus')
+      vi.spyOn(editor.component, 'focus')
       editor.focus()
       expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
@@ -530,14 +530,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#isValueChanged()', () => {
     test('returns the result of calling .isValueChanged on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
+      vi.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
     test('calls .isValueChanged on the ReadOnlyCell component when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
+      vi.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
@@ -558,7 +558,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#loadValue()', () => {
     test('renders the component', () => {
       createEditor()
-      jest.spyOn(editor, 'renderComponent').mockImplementation(() => {})
+      vi.spyOn(editor, 'renderComponent').mockImplementation(() => {})
       editor.loadValue()
       expect(editor.renderComponent).toHaveBeenCalledTimes(1)
     })
@@ -567,7 +567,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#applyValue()', () => {
     test('calls .gradeSubmission on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
@@ -575,14 +575,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .gradeSubmission on the ReadOnlyCell component when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('includes the given item when applying the value', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       const [item] =
         editor.component.gradeSubmission.mock.calls[
@@ -593,7 +593,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('includes the given value when applying the value', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       const [, value] =
         editor.component.gradeSubmission.mock.calls[
@@ -644,12 +644,12 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    jest
+    vi
       .spyOn(gradebook, 'isGradeEditable')
       .mockImplementation(
         (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
       )
-    jest
+    vi
       .spyOn(gradebook, 'isGradeVisible')
       .mockImplementation(
         (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
@@ -688,7 +688,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     }
     $container.remove()
     fakeENV.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   const createEditor = () => {
@@ -702,7 +702,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
   describe('initialization', () => {
     beforeEach(() => {
-      jest.spyOn(ReactDOM, 'render')
+      vi.spyOn(ReactDOM, 'render')
     })
 
     afterEach(() => {
@@ -747,7 +747,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the AssignmentRowCell component when triggered', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
@@ -755,7 +755,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('passes the event when calling handleKeyDown', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       const [event] =
@@ -767,7 +767,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('returns the return value from the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
+      vi.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(returnValue).toBe(false)
@@ -776,7 +776,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .handleKeyDown on the ReadOnlyCell component when grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
@@ -809,7 +809,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#focus()', () => {
     test('calls .focus on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'focus')
+      vi.spyOn(editor.component, 'focus')
       editor.focus()
       expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
@@ -817,7 +817,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .focus on the ReadOnlyCell component when grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'focus')
+      vi.spyOn(editor.component, 'focus')
       editor.focus()
       expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
@@ -826,14 +826,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#isValueChanged()', () => {
     test('returns the result of calling .isValueChanged on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
+      vi.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
     test('calls .isValueChanged on the ReadOnlyCell component when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
+      vi.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
@@ -854,7 +854,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#loadValue()', () => {
     test('renders the component', () => {
       createEditor()
-      jest.spyOn(editor, 'renderComponent').mockImplementation(() => {})
+      vi.spyOn(editor, 'renderComponent').mockImplementation(() => {})
       editor.loadValue()
       expect(editor.renderComponent).toHaveBeenCalledTimes(1)
     })
@@ -863,7 +863,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#applyValue()', () => {
     test('calls .gradeSubmission on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
@@ -871,14 +871,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .gradeSubmission on the ReadOnlyCell component when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('includes the given item when applying the value', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       const [item] =
         editor.component.gradeSubmission.mock.calls[
@@ -889,7 +889,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('includes the given value when applying the value', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       const [, value] =
         editor.component.gradeSubmission.mock.calls[
@@ -940,12 +940,12 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    jest
+    vi
       .spyOn(gradebook, 'isGradeEditable')
       .mockImplementation(
         (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
       )
-    jest
+    vi
       .spyOn(gradebook, 'isGradeVisible')
       .mockImplementation(
         (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
@@ -984,7 +984,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     }
     $container.remove()
     fakeENV.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   const createEditor = () => {
@@ -998,7 +998,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
   describe('initialization', () => {
     beforeEach(() => {
-      jest.spyOn(ReactDOM, 'render')
+      vi.spyOn(ReactDOM, 'render')
     })
 
     afterEach(() => {
@@ -1043,7 +1043,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the AssignmentRowCell component when triggered', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
@@ -1051,7 +1051,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('passes the event when calling handleKeyDown', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       const [event] =
@@ -1063,7 +1063,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('returns the return value from the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
+      vi.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(returnValue).toBe(false)
@@ -1072,7 +1072,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .handleKeyDown on the ReadOnlyCell component when grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
@@ -1105,7 +1105,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#focus()', () => {
     test('calls .focus on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'focus')
+      vi.spyOn(editor.component, 'focus')
       editor.focus()
       expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
@@ -1113,7 +1113,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .focus on the ReadOnlyCell component when grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'focus')
+      vi.spyOn(editor.component, 'focus')
       editor.focus()
       expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
@@ -1122,14 +1122,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#isValueChanged()', () => {
     test('returns the result of calling .isValueChanged on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
+      vi.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
     test('calls .isValueChanged on the ReadOnlyCell component when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
+      vi.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
@@ -1150,7 +1150,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#loadValue()', () => {
     test('renders the component', () => {
       createEditor()
-      jest.spyOn(editor, 'renderComponent').mockImplementation(() => {})
+      vi.spyOn(editor, 'renderComponent').mockImplementation(() => {})
       editor.loadValue()
       expect(editor.renderComponent).toHaveBeenCalledTimes(1)
     })
@@ -1159,7 +1159,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#applyValue()', () => {
     test('calls .gradeSubmission on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
@@ -1167,14 +1167,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .gradeSubmission on the ReadOnlyCell component when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('includes the given item when applying the value', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       const [item] =
         editor.component.gradeSubmission.mock.calls[
@@ -1185,7 +1185,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('includes the given value when applying the value', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       const [, value] =
         editor.component.gradeSubmission.mock.calls[
@@ -1236,12 +1236,12 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    jest
+    vi
       .spyOn(gradebook, 'isGradeEditable')
       .mockImplementation(
         (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
       )
-    jest
+    vi
       .spyOn(gradebook, 'isGradeVisible')
       .mockImplementation(
         (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
@@ -1280,7 +1280,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     }
     $container.remove()
     fakeENV.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   const createEditor = () => {
@@ -1294,7 +1294,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
   describe('initialization', () => {
     beforeEach(() => {
-      jest.spyOn(ReactDOM, 'render')
+      vi.spyOn(ReactDOM, 'render')
     })
 
     afterEach(() => {
@@ -1339,7 +1339,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the AssignmentRowCell component when triggered', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
@@ -1347,7 +1347,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('passes the event when calling handleKeyDown', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       const [event] =
@@ -1359,7 +1359,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('returns the return value from the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
+      vi.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(returnValue).toBe(false)
@@ -1368,7 +1368,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .handleKeyDown on the ReadOnlyCell component when grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
@@ -1401,7 +1401,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#focus()', () => {
     test('calls .focus on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'focus')
+      vi.spyOn(editor.component, 'focus')
       editor.focus()
       expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
@@ -1409,7 +1409,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .focus on the ReadOnlyCell component when grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'focus')
+      vi.spyOn(editor.component, 'focus')
       editor.focus()
       expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
@@ -1418,14 +1418,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#isValueChanged()', () => {
     test('returns the result of calling .isValueChanged on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
+      vi.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
     test('calls .isValueChanged on the ReadOnlyCell component when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
+      vi.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
@@ -1446,7 +1446,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#loadValue()', () => {
     test('renders the component', () => {
       createEditor()
-      jest.spyOn(editor, 'renderComponent').mockImplementation(() => {})
+      vi.spyOn(editor, 'renderComponent').mockImplementation(() => {})
       editor.loadValue()
       expect(editor.renderComponent).toHaveBeenCalledTimes(1)
     })
@@ -1455,7 +1455,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#applyValue()', () => {
     test('calls .gradeSubmission on the AssignmentRowCell component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
@@ -1463,14 +1463,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('calls .gradeSubmission on the ReadOnlyCell component when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('includes the given item when applying the value', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       const [item] =
         editor.component.gradeSubmission.mock.calls[
@@ -1481,7 +1481,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
     test('includes the given value when applying the value', () => {
       createEditor()
-      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
+      vi.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
       const [, value] =
         editor.component.gradeSubmission.mock.calls[

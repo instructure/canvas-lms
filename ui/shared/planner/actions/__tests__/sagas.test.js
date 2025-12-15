@@ -349,7 +349,7 @@ describe('loadAllOpportunitiesSaga', () => {
   })
 
   it('alerts if there is a loading error', () => {
-    const alertSpy = jest.fn()
+    const alertSpy = vi.fn()
     initialize({visualErrorCallback: alertSpy})
     const generator = loadAllOpportunitiesSaga()
     generator.next() // start saga

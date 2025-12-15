@@ -42,7 +42,7 @@ describe('GraderCountNumberInput', () => {
       currentGraderCount: null,
       locale: 'en',
       availableGradersCount: 10,
-      hideErrors: jest.fn(),
+      hideErrors: vi.fn(),
     }
   })
 

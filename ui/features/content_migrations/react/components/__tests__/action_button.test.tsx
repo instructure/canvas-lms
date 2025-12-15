@@ -58,7 +58,7 @@ describe('ActionButton', () => {
   afterAll(() => server.close())
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders button when issues count is greater than zero', () => {

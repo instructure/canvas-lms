@@ -40,9 +40,9 @@ describe('RegistrationWizardModal', () => {
 
     warn = console.warn
 
-    console.error = jest.fn()
+    console.error = vi.fn()
 
-    console.warn = jest.fn()
+    console.warn = vi.fn()
   })
 
   afterAll(() => {
@@ -51,8 +51,8 @@ describe('RegistrationWizardModal', () => {
     console.warn = warn
   })
 
-  const bindGlobalLtiRegistration = jest.fn()
-  const fetchRegistrationByClientId = jest.fn()
+  const bindGlobalLtiRegistration = vi.fn()
+  const fetchRegistrationByClientId = vi.fn()
 
   const inheritedKeyService: InheritedKeyService = {
     bindGlobalLtiRegistration,
@@ -62,7 +62,7 @@ describe('RegistrationWizardModal', () => {
   describe('When opened', () => {
     const accountId = ZAccountId.parse('123')
     const developerKeyId = ZDeveloperKeyId.parse('abc')
-    const onSuccessfulInstallation = jest.fn()
+    const onSuccessfulInstallation = vi.fn()
 
     beforeEach(() => {
       openInheritedKeyWizard(developerKeyId, onSuccessfulInstallation)

@@ -20,7 +20,7 @@
 // This mock is compatible with both Jest and Vitest
 
 /* global vi */
-const mockFn = typeof vi !== 'undefined' ? vi.fn : jest.fn
+const mockFn = typeof vi !== 'undefined' ? vi.fn : vi.fn
 
 export const uploadFile = mockFn().mockResolvedValue({})
 export const completeUpload = mockFn().mockResolvedValue({})

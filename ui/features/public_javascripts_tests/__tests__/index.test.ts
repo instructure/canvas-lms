@@ -24,14 +24,14 @@ describe('lti_post_message_forwarding', () => {
   let source: MessageEventSource
   beforeEach(() => {
     source = {
-      postMessage: jest.fn(),
+      postMessage: vi.fn(),
     } as unknown as Window
     // for indexInTopFrames
-    jest
+    vi
       .spyOn(window.top, 'frames', 'get')
       .mockReturnValue({'0': {}, '1': source, '2': {}, length: 3})
   })
-  afterEach(() => jest.restoreAllMocks())
+  afterEach(() => vi.restoreAllMocks())
 
   describe('handler', () => {
     let message: string | object
@@ -68,7 +68,7 @@ describe('lti_post_message_forwarding', () => {
         windowReferences = []
         includeRCESignal = false
         parentWindow = {
-          postMessage: jest.fn(),
+          postMessage: vi.fn(),
         } as unknown as Window
       })
 
@@ -93,7 +93,7 @@ describe('lti_post_message_forwarding', () => {
 
       it('reuses existing windowId for previously-seen source windows', () => {
         subject()
-        const source2 = {postMessage: jest.fn()}
+        const source2 = {postMessage: vi.fn()}
         handler(
           parentDomain,
           windowReferences,
@@ -135,7 +135,7 @@ describe('lti_post_message_forwarding', () => {
         origin = 'https://parent.domain.com'
         parentDomain = 'https://parent.domain.com'
         source = {
-          postMessage: jest.fn(),
+          postMessage: vi.fn(),
         } as unknown as Window
         // source is index 1 (above we're using windowId=1):
         windowReferences = [undefined, source]
@@ -173,13 +173,13 @@ describe('lti_post_message_forwarding', () => {
 
   describe('init', () => {
     it('sets up an event handler for postMessage when the DOM loads', () => {
-      jest.spyOn(document, 'readyState', 'get').mockReturnValue('loading')
-      jest.spyOn(document, 'addEventListener').mockImplementation(() => {})
+      vi.spyOn(document, 'readyState', 'get').mockReturnValue('loading')
+      vi.spyOn(document, 'addEventListener').mockImplementation(() => {})
       init()
       expect(document.addEventListener).toHaveBeenCalledWith('DOMContentLoaded', expect.anything())
       const cb = document.addEventListener.mock.calls[0][1]
 
-      jest.spyOn(window, 'addEventListener').mockImplementation(() => {})
+      vi.spyOn(window, 'addEventListener').mockImplementation(() => {})
       cb()
       expect(window.addEventListener).toHaveBeenCalledWith('message', expect.anything())
     })

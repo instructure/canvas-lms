@@ -20,16 +20,16 @@ import {createDynamicUiMiddleware as createMiddleware} from '../middleware'
 
 function createManager() {
   return {
-    setStore: jest.fn(),
-    handleAction: jest.fn(),
-    uiStateUnchanged: jest.fn(),
+    setStore: vi.fn(),
+    handleAction: vi.fn(),
+    uiStateUnchanged: vi.fn(),
   }
 }
 
 function createStore() {
   return {
-    getState: jest.fn(),
-    dispatch: jest.fn(),
+    getState: vi.fn(),
+    dispatch: vi.fn(),
   }
 }
 
@@ -42,13 +42,13 @@ it('registers the store with the manager', () => {
 it('notifies manager of actions', () => {
   const mockManager = createManager()
   const mockAction = {some: 'action'}
-  createMiddleware(mockManager)(createStore())(jest.fn())({some: 'action'})
+  createMiddleware(mockManager)(createStore())(vi.fn())({some: 'action'})
   expect(mockManager.handleAction).toHaveBeenCalledWith(mockAction)
 })
 
 it('behaves as middleware', () => {
   const mockManager = createManager()
-  const mockNext = jest.fn(() => 'next result')
+  const mockNext = vi.fn(() => 'next result')
   const result = createMiddleware(mockManager)(createStore())(mockNext)({some: 'action'})
   expect(result).toEqual('next result')
 })
@@ -59,7 +59,7 @@ it('notifies the manager when the state is unchanged', () => {
   const theState = {}
   mockStore.getState.mockReturnValue(theState)
   const theAction = {type: 'an action'}
-  createMiddleware(mockManager)(mockStore)(jest.fn())(theAction)
+  createMiddleware(mockManager)(mockStore)(vi.fn())(theAction)
   expect(mockManager.uiStateUnchanged).toHaveBeenCalledWith(theAction)
 })
 
@@ -67,7 +67,7 @@ it('does not notify the manager of unchanged state when the state has changed', 
   const mockManager = createManager()
   const mockStore = createStore()
   mockStore.getState.mockReturnValueOnce({state: 'first'}).mockReturnValueOnce({state: 'second'})
-  createMiddleware(mockManager)(mockStore)(jest.fn())({some: 'action'})
+  createMiddleware(mockManager)(mockStore)(vi.fn())({some: 'action'})
   expect(mockManager.uiStateUnchanged).not.toHaveBeenCalled()
 })
 

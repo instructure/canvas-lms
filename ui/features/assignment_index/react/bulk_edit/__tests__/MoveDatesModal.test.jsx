@@ -23,9 +23,9 @@ import MoveDatesModal, {SHIFT_DAYS_MAX, SHIFT_DAYS_MIN} from '../MoveDatesModal'
 
 describe('MoveDatesModal', () => {
   const props = (overrides = {}) => ({
-    onShiftDays: jest.fn(),
-    onRemoveDates: jest.fn(),
-    onCancel: jest.fn(),
+    onShiftDays: vi.fn(),
+    onRemoveDates: vi.fn(),
+    onCancel: vi.fn(),
     open: true,
     ...overrides,
   })
@@ -33,7 +33,7 @@ describe('MoveDatesModal', () => {
   const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderModal = () => {

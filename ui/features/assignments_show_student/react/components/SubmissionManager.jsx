@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useEffect, useContext, useRef, useMemo} from 'react'
+import React, {useState, useEffect, useContext, useRef, useMemo} from 'react'
 import {useApolloClient, useMutation} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'

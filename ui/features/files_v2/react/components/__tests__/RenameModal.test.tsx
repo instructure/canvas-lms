@@ -29,11 +29,11 @@ import {mockRowsContext} from '../FileFolderTable/__tests__/testUtils'
 
 const defaultProps: {
   isOpen: boolean
-  onClose: jest.Mock
+  onClose: any
   renamingItem: File | Folder
 } = {
   isOpen: true,
-  onClose: jest.fn(),
+  onClose: vi.fn(),
   renamingItem: FAKE_FILES[0],
 }
 
@@ -47,7 +47,7 @@ const renderComponent = (props = {}) => {
 
 describe('RenameModal', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

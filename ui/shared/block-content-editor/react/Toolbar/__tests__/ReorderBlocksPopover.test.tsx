@@ -23,8 +23,8 @@ import {ReorderBlocksPopover} from '../ReorderBlocksPopover'
 describe('ReorderBlocksPopover', () => {
   const defaultProps = {
     isShowingContent: false,
-    onShowContent: jest.fn(),
-    onHideContent: jest.fn(),
+    onShowContent: vi.fn(),
+    onHideContent: vi.fn(),
     renderTrigger: () => <button data-testid="trigger-button">Trigger</button>,
   }
 
@@ -38,7 +38,7 @@ describe('ReorderBlocksPopover', () => {
   const getCloseButton = () => screen.getByTestId('reorder-blocks-close-button')
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('rendering', () => {
@@ -83,7 +83,7 @@ describe('ReorderBlocksPopover', () => {
   describe('interactions', () => {
     it('renders close button that can be clicked', async () => {
       const user = userEvent.setup()
-      const onHideContent = jest.fn()
+      const onHideContent = vi.fn()
 
       renderPopover(true, {onHideContent})
 

@@ -38,11 +38,11 @@ describe('LongTextEditor', () => {
     },
     alt_container: document.getElementById('fixtures'),
     grid: {
-      navigatePrev: jest.fn(),
-      navigateNext: jest.fn(),
+      navigatePrev: vi.fn(),
+      navigateNext: vi.fn(),
     },
-    commitChanges: jest.fn(),
-    cancelChanges: jest.fn(),
+    commitChanges: vi.fn(),
+    cancelChanges: vi.fn(),
   })
 
   beforeEach(() => {

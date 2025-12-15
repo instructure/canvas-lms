@@ -25,26 +25,29 @@ import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../../
 import {createStudentAccount} from '../../../services'
 import Student from '../Student'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
-jest.mock('../../../services', () => ({
-  createStudentAccount: jest.fn(),
+vi.mock('../../../services', () => ({
+  createStudentAccount: vi.fn(),
 }))
 
-jest.mock('../../../context', () => {
-  const actualContext = jest.requireActual('../../../context')
+vi.mock('../../../context', async () => {
+  const actual = await vi.importActual<typeof import('../../../context')>('../../../context')
   return {
-    ...actualContext,
-    useNewLoginData: jest.fn(() => ({
-      ...actualContext.useNewLoginData(),
+    ...actual,
+    useNewLoginData: vi.fn(() => ({
+      isDataLoading: false,
     })),
   }
 })
 
 describe('Student', () => {
+  let user: ReturnType<typeof userEvent.setup>
+
   const setup = () => {
+    user = userEvent.setup()
     render(
       <MemoryRouter>
         <NewLoginProvider>
@@ -57,10 +60,11 @@ describe('Student', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
     // reset the mock implementation to return the default values
-    ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
+    ;(useNewLoginData as ReturnType<typeof vi.fn>).mockImplementation(() => ({
+      isDataLoading: false,
       loginHandleName: 'Email',
       privacyPolicyUrl: '',
       requireEmail: false,
@@ -84,8 +88,8 @@ describe('Student', () => {
     })
 
     it('renders terms checkbox when required', async () => {
-      ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
-        ...jest.requireActual('../../../context').useNewLoginData(),
+      ;(useNewLoginData as ReturnType<typeof vi.fn>).mockImplementation(() => ({
+        isDataLoading: false,
         termsRequired: true,
         privacyPolicyUrl: 'http://www.example.com/privacy',
         termsOfUseUrl: 'http://www.example.com/terms',
@@ -95,8 +99,8 @@ describe('Student', () => {
     })
 
     it('renders email input when required', async () => {
-      ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
-        ...jest.requireActual('../../../context').useNewLoginData(),
+      ;(useNewLoginData as ReturnType<typeof vi.fn>).mockImplementation(() => ({
+        isDataLoading: false,
         requireEmail: true,
       }))
       setup()
@@ -106,7 +110,8 @@ describe('Student', () => {
 
   describe('form validation', () => {
     beforeEach(() => {
-      ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
+      ;(useNewLoginData as ReturnType<typeof vi.fn>).mockImplementation(() => ({
+        isDataLoading: false,
         privacyPolicyUrl: 'http://www.example.com/privacy',
         requireEmail: true,
         termsOfUseUrl: 'http://www.example.com/terms',
@@ -116,124 +121,138 @@ describe('Student', () => {
 
     it('shows an error for a missing name and focuses the name input', async () => {
       setup()
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.click(screen.getByTestId('submit-button'))
       expect(await screen.findByText('Name is required.')).toBeInTheDocument()
       expect(document.activeElement).toBe(screen.getByTestId('name-input'))
-      await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('name-input'), 'John Doe')
+      await user.click(screen.getByTestId('submit-button'))
       expect(screen.queryByText('Name is required.')).not.toBeInTheDocument()
     })
 
     it('shows an error for a missing username and focuses the username input', async () => {
       setup()
-      await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('name-input'), 'John Doe')
+      await user.click(screen.getByTestId('submit-button'))
       expect(await screen.findByText('Username is required.')).toBeInTheDocument()
       expect(document.activeElement).toBe(screen.getByTestId('username-input'))
-      await userEvent.type(screen.getByTestId('username-input'), 'validusername')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('username-input'), 'validusername')
+      await user.click(screen.getByTestId('submit-button'))
       expect(screen.queryByText('Username is required.')).not.toBeInTheDocument()
     })
 
     it('shows an error when the password is missing and focuses the password input', async () => {
       setup()
-      await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
-      await userEvent.type(screen.getByTestId('username-input'), 'validusername')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('name-input'), 'John Doe')
+      await user.type(screen.getByTestId('username-input'), 'validusername')
+      await user.click(screen.getByTestId('submit-button'))
       expect(await screen.findByText('Password is required.')).toBeInTheDocument()
       expect(document.activeElement).toBe(screen.getByTestId('password-input'))
-      await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('password-input'), 'ValidPassword123!')
+      await user.click(screen.getByTestId('submit-button'))
       expect(screen.queryByText('Password is required.')).not.toBeInTheDocument()
     })
 
     it('validates that passwords match and focuses the confirm password input', async () => {
       setup()
-      await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
-      await userEvent.type(screen.getByTestId('username-input'), 'validusername')
-      await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('confirm-password-input'), 'MismatchPassword')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('name-input'), 'John Doe')
+      await user.type(screen.getByTestId('username-input'), 'validusername')
+      await user.type(screen.getByTestId('password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('confirm-password-input'), 'MismatchPassword')
+      await user.click(screen.getByTestId('submit-button'))
       expect(await screen.findByText('Passwords do not match.')).toBeInTheDocument()
-      expect(document.activeElement).toBe(screen.getByTestId('confirm-password-input'))
-      await userEvent.clear(screen.getByTestId('confirm-password-input'))
-      await userEvent.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
-      await userEvent.click(screen.getByTestId('submit-button'))
-      expect(screen.queryByText('Passwords do not match.')).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(document.activeElement).toBe(screen.getByTestId('confirm-password-input'))
+      })
+      await user.clear(screen.getByTestId('confirm-password-input'))
+      await user.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
+      await user.click(screen.getByTestId('submit-button'))
+      await waitFor(() => {
+        expect(screen.queryByText('Passwords do not match.')).not.toBeInTheDocument()
+      })
     })
 
     it('validates the join code field and focuses the join code input', async () => {
       setup()
-      await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
-      await userEvent.type(screen.getByTestId('username-input'), 'validusername')
-      await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('name-input'), 'John Doe')
+      await user.type(screen.getByTestId('username-input'), 'validusername')
+      await user.type(screen.getByTestId('password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
+      await user.click(screen.getByTestId('submit-button'))
       expect(await screen.findByText('Join code is required.')).toBeInTheDocument()
-      expect(document.activeElement).toBe(screen.getByTestId('join-code-input'))
-      await userEvent.type(screen.getByTestId('join-code-input'), 'JOIN123')
-      await userEvent.click(screen.getByTestId('submit-button'))
-      expect(screen.queryByText('Join code is required.')).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(document.activeElement).toBe(screen.getByTestId('join-code-input'))
+      })
+      await user.type(screen.getByTestId('join-code-input'), 'JOIN123')
+      await user.click(screen.getByTestId('submit-button'))
+      await waitFor(() => {
+        expect(screen.queryByText('Join code is required.')).not.toBeInTheDocument()
+      })
     })
 
     it('validates the email field when required and focuses the email input', async () => {
       setup()
-      await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
-      await userEvent.type(screen.getByTestId('username-input'), 'validusername')
-      await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('join-code-input'), 'JOIN123')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('name-input'), 'John Doe')
+      await user.type(screen.getByTestId('username-input'), 'validusername')
+      await user.type(screen.getByTestId('password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('join-code-input'), 'JOIN123')
+      await user.click(screen.getByTestId('submit-button'))
       expect(await screen.findByText('Please enter a valid email address.')).toBeInTheDocument()
-      expect(document.activeElement).toBe(screen.getByTestId('email-input'))
-      await userEvent.type(screen.getByTestId('email-input'), 'valid@example.com')
-      await userEvent.click(screen.getByTestId('submit-button'))
-      expect(screen.queryByText('Please enter a valid email address.')).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(document.activeElement).toBe(screen.getByTestId('email-input'))
+      })
+      await user.type(screen.getByTestId('email-input'), 'valid@example.com')
+      await user.click(screen.getByTestId('submit-button'))
+      await waitFor(() => {
+        expect(screen.queryByText('Please enter a valid email address.')).not.toBeInTheDocument()
+      })
     })
 
     it('validates the terms checkbox when required', async () => {
       setup()
-      await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
-      await userEvent.type(screen.getByTestId('username-input'), 'validusername')
-      await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('join-code-input'), 'JOIN123')
-      await userEvent.type(screen.getByTestId('email-input'), 'valid@example.com')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('name-input'), 'John Doe')
+      await user.type(screen.getByTestId('username-input'), 'validusername')
+      await user.type(screen.getByTestId('password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('join-code-input'), 'JOIN123')
+      await user.type(screen.getByTestId('email-input'), 'valid@example.com')
+      await user.click(screen.getByTestId('submit-button'))
       expect(
         await screen.findByText('You must accept the terms to create an account.'),
       ).toBeInTheDocument()
-      await userEvent.click(screen.getByTestId('terms-and-policy-checkbox'))
-      await userEvent.click(screen.getByTestId('submit-button'))
-      expect(
-        screen.queryByText('You must accept the terms to create an account.'),
-      ).not.toBeInTheDocument()
+      await user.click(screen.getByTestId('terms-and-policy-checkbox'))
+      await user.click(screen.getByTestId('submit-button'))
+      await waitFor(() => {
+        expect(
+          screen.queryByText('You must accept the terms to create an account.'),
+        ).not.toBeInTheDocument()
+      })
     })
 
     it('does not clear the name error until submit is clicked again', async () => {
       setup()
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.click(screen.getByTestId('submit-button'))
       expect(await screen.findByText('Name is required.')).toBeInTheDocument()
-      await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
+      await user.type(screen.getByTestId('name-input'), 'John Doe')
       expect(screen.queryByText('Name is required.')).toBeInTheDocument()
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.click(screen.getByTestId('submit-button'))
       expect(screen.queryByText('Name is required.')).not.toBeInTheDocument()
     })
   })
 
   describe('form submission', () => {
     it('submits successfully with valid inputs', async () => {
-      ;(createStudentAccount as jest.Mock).mockResolvedValueOnce({
+      ;(createStudentAccount as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         status: 200,
-        data: {redirect_url: '/dashboard'},
+        data: {success: true, destination: '/dashboard'},
       })
       setup()
-      await userEvent.type(screen.getByTestId('name-input'), 'Student User')
-      await userEvent.type(screen.getByTestId('username-input'), 'studentusername')
-      await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('join-code-input'), 'JOIN123')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('name-input'), 'Student User')
+      await user.type(screen.getByTestId('username-input'), 'studentusername')
+      await user.type(screen.getByTestId('password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('join-code-input'), 'JOIN123')
+      await user.click(screen.getByTestId('submit-button'))
       await waitFor(() => {
         expect(createStudentAccount).toHaveBeenCalledWith({
           name: 'Student User',
@@ -249,7 +268,7 @@ describe('Student', () => {
     })
 
     it('shows error messages for failed API validation', async () => {
-      ;(createStudentAccount as jest.Mock).mockRejectedValueOnce({
+      ;(createStudentAccount as ReturnType<typeof vi.fn>).mockRejectedValueOnce({
         response: {
           json: async () => ({
             errors: {
@@ -264,30 +283,30 @@ describe('Student', () => {
         },
       })
       setup()
-      await userEvent.type(screen.getByTestId('name-input'), 'Student User')
-      await userEvent.type(screen.getByTestId('username-input'), 'existingusername')
-      await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('join-code-input'), 'INVALID')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('name-input'), 'Student User')
+      await user.type(screen.getByTestId('username-input'), 'existingusername')
+      await user.type(screen.getByTestId('password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('join-code-input'), 'INVALID')
+      await user.click(screen.getByTestId('submit-button'))
       expect(await screen.findByText('This username is already in use.')).toBeInTheDocument()
       expect(screen.getByText('The enrollment code is invalid.')).toBeInTheDocument()
     })
 
     it('handles generic server errors gracefully', async () => {
-      ;(createStudentAccount as jest.Mock).mockRejectedValueOnce({
+      ;(createStudentAccount as ReturnType<typeof vi.fn>).mockRejectedValueOnce({
         response: {
           status: 500,
           json: async () => ({}),
         },
       })
       setup()
-      await userEvent.type(screen.getByTestId('name-input'), 'Student User')
-      await userEvent.type(screen.getByTestId('username-input'), 'studentusername')
-      await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('join-code-input'), 'JOIN123')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('name-input'), 'Student User')
+      await user.type(screen.getByTestId('username-input'), 'studentusername')
+      await user.type(screen.getByTestId('password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('join-code-input'), 'JOIN123')
+      await user.click(screen.getByTestId('submit-button'))
       await waitFor(() => {
         const alertContainer = document.querySelector('.flashalert-message') as HTMLElement
         const flashAlert = within(alertContainer!).getByText(
@@ -298,34 +317,34 @@ describe('Student', () => {
     })
 
     it('redirects to the provided destination after a successful submission', async () => {
-      ;(createStudentAccount as jest.Mock).mockResolvedValueOnce({
+      ;(createStudentAccount as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         status: 200,
-        data: {destination: '/custom-redirect'},
+        data: {success: true, destination: '/custom-redirect'},
       })
       setup()
-      await userEvent.type(screen.getByTestId('name-input'), 'Student User')
-      await userEvent.type(screen.getByTestId('username-input'), 'studentusername')
-      await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('join-code-input'), 'JOIN123')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('name-input'), 'Student User')
+      await user.type(screen.getByTestId('username-input'), 'studentusername')
+      await user.type(screen.getByTestId('password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('join-code-input'), 'JOIN123')
+      await user.click(screen.getByTestId('submit-button'))
       await waitFor(() => {
         expect(assignLocation).toHaveBeenCalledWith('/custom-redirect')
       })
     })
 
     it('redirects to the default location if no destination is provided', async () => {
-      ;(createStudentAccount as jest.Mock).mockResolvedValueOnce({
+      ;(createStudentAccount as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         status: 200,
-        data: {},
+        data: {success: true},
       })
       setup()
-      await userEvent.type(screen.getByTestId('name-input'), 'Student User')
-      await userEvent.type(screen.getByTestId('username-input'), 'studentusername')
-      await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
-      await userEvent.type(screen.getByTestId('join-code-input'), 'JOIN123')
-      await userEvent.click(screen.getByTestId('submit-button'))
+      await user.type(screen.getByTestId('name-input'), 'Student User')
+      await user.type(screen.getByTestId('username-input'), 'studentusername')
+      await user.type(screen.getByTestId('password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
+      await user.type(screen.getByTestId('join-code-input'), 'JOIN123')
+      await user.click(screen.getByTestId('submit-button'))
       await waitFor(() => {
         expect(assignLocation).toHaveBeenCalledWith('/?registration_success=1')
       })
@@ -335,7 +354,7 @@ describe('Student', () => {
   it('navigates to login when the cancel button is clicked', async () => {
     setup()
     const backButton = screen.getByTestId('back-button')
-    await userEvent.click(backButton)
+    await user.click(backButton)
     await waitFor(() => {
       expect(assignLocation).toHaveBeenCalledWith('/login')
     })

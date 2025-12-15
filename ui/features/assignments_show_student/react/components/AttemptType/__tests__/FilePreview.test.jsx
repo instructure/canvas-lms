@@ -93,7 +93,7 @@ describe('FilePreview', () => {
   beforeEach(() => {
     originalEnv = global.ENV
     global.ENV = {...originalEnv, FEATURES: {lti_asset_processor: true}}
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

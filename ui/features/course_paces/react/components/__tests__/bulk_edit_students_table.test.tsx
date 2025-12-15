@@ -19,22 +19,24 @@
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import {Provider} from 'react-redux'
-import {createStore} from 'redux'
+import {createStore, applyMiddleware} from 'redux'
+import {thunk} from 'redux-thunk'
 import {BulkEditStudentsTable} from '../bulk_edit_students_table'
 import {DEFAULT_BULK_EDIT_STUDENTS_STATE} from '../../__tests__/fixtures'
 
-jest.mock('../../actions/bulk_edit_students_actions', () => ({
-  fetchStudents: jest.fn(() => ({type: 'MOCK_FETCH_STUDENTS'})),
-  setSearchTerm: jest.fn(term => ({type: 'SET_SEARCH_TERM', payload: term})),
-  setFilterSection: jest.fn(section => ({type: 'SET_FILTER_SECTION', payload: section})),
-  setFilterPaceStatus: jest.fn(status => ({type: 'SET_FILTER_PACE_STATUS', payload: status})),
-  setPage: jest.fn(page => ({type: 'SET_PAGE', payload: page})),
-  setSort: jest.fn((col, order) => ({type: 'SET_SORT', payload: {col, order}})),
-  resetBulkEditState: jest.fn(() => ({type: 'RESET_BULK_EDIT_STATE'})),
+vi.mock('../../actions/bulk_edit_students_actions', () => ({
+  fetchStudents: vi.fn(() => () => Promise.resolve()),
+  setSearchTerm: vi.fn(term => ({type: 'SET_SEARCH_TERM', payload: term})),
+  setFilterSection: vi.fn(section => ({type: 'SET_FILTER_SECTION', payload: section})),
+  setFilterPaceStatus: vi.fn(status => ({type: 'SET_FILTER_PACE_STATUS', payload: status})),
+  setPage: vi.fn(page => ({type: 'SET_PAGE', payload: page})),
+  setSort: vi.fn((col, order) => ({type: 'SET_SORT', payload: {col, order}})),
+  resetBulkEditState: vi.fn(() => ({type: 'RESET_BULK_EDIT_STATE'})),
 }))
 
 const initialState = {
   bulkEditStudents: {...DEFAULT_BULK_EDIT_STUDENTS_STATE},
+  coursePace: {course_id: '1'},
   ui: {
     selectedBulkStudents: [] as string[],
   },
@@ -76,7 +78,7 @@ const reducer = (state = initialState, action: any) => {
   }
 }
 
-const store = createStore(reducer)
+const store = createStore(reducer, applyMiddleware(thunk))
 
 describe('BulkEditStudentsTable', () => {
   it('renders the table with student data', async () => {
@@ -239,7 +241,7 @@ describe('BulkEditStudentsTable', () => {
       ...initialState,
       bulkEditStudents: {...initialState.bulkEditStudents, isLoading: true},
     }
-    const storeWithLoading = createStore(() => loadingState)
+    const storeWithLoading = createStore(() => loadingState, applyMiddleware(thunk))
 
     render(
       <Provider store={storeWithLoading}>
@@ -255,7 +257,7 @@ describe('BulkEditStudentsTable', () => {
       ...initialState,
       bulkEditStudents: {...initialState.bulkEditStudents, error: 'An error occurred'},
     }
-    const storeWithError = createStore(() => errorState)
+    const storeWithError = createStore(() => errorState, applyMiddleware(thunk))
 
     render(
       <Provider store={storeWithError}>

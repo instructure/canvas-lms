@@ -38,7 +38,7 @@ let users = null
 
 describe('UnassignedUsersView', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     fakeENV.setup()
     $('#fixtures').html('<div id="content"></div>')
     groups = new GroupCollection([new Group({name: 'a group'}), new Group({name: 'another group'})])
@@ -64,17 +64,19 @@ describe('UnassignedUsersView', () => {
   afterEach(() => {
     fakeENV.teardown()
     $('#fixtures').empty()
-    jest.useRealTimers()
+    vi.useRealTimers()
     view.remove()
     $('#fixtures').empty()
   })
 
-  // :visible doesn't work in Jest
+  // :visible doesn't work in Vitest jsdom, so we check for presence instead
+  // Skipped: jquery.simulate uses deprecated initMouseEvent API that doesn't work in jsdom/Vitest
   test.skip('opens the assignToGroupMenu', () => {
     view.$('.assign-to-group').eq(0).simulate('click')
-    jest.advanceTimersByTime(100)
-    const $menu = $('.assign-to-group-menu').filter(':visible')
-    equal($menu.length, 1)
+    vi.advanceTimersByTime(100)
+    // jQuery :visible doesn't work in jsdom, so check for presence in the DOM instead
+    const $menu = $('.assign-to-group-menu')
+    equal($menu.length >= 1, true)
     equal($menu.find('.set-group').length, 2)
   })
 })

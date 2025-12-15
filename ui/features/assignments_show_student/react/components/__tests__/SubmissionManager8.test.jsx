@@ -26,17 +26,15 @@ import StudentViewContext, {
 } from '@canvas/assignments/react/StudentViewContext'
 import SubmissionManager from '../SubmissionManager'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
-jest.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/rce/RichContentEditor')
 
-jest.mock('../../apis/ContextModuleApi')
-
-jest.useFakeTimers()
+vi.mock('../../apis/ContextModuleApi')
 
 function renderInContext(overrides = {}, children) {
   const contextProps = {...StudentViewContextDefaults, ...overrides}

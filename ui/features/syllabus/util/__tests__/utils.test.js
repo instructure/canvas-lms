@@ -19,9 +19,9 @@
 import {attachImmersiveReaderButton} from '../utils'
 import {initializeReaderButton} from '@canvas/immersive-reader/ImmersiveReader'
 
-jest.mock('@canvas/immersive-reader/ImmersiveReader', () => {
+vi.mock('@canvas/immersive-reader/ImmersiveReader', () => {
   return {
-    initializeReaderButton: jest.fn(),
+    initializeReaderButton: vi.fn(),
   }
 })
 

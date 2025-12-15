@@ -27,17 +27,15 @@ import store from '../stores'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
-jest.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/rce/RichContentEditor')
 
-jest.mock('../../apis/ContextModuleApi')
-
-jest.useFakeTimers()
+vi.mock('../../apis/ContextModuleApi')
 
 describe('SubmissionManager', () => {
   beforeAll(() => {
@@ -57,7 +55,7 @@ describe('SubmissionManager', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('self assessment', () => {
@@ -83,8 +81,8 @@ describe('SubmissionManager', () => {
     let setOnSuccess
 
     const renderComponent = async (assignmentOverrides = {}, isSubmitted = true) => {
-      setOnFailure = jest.fn()
-      setOnSuccess = jest.fn()
+      setOnFailure = vi.fn()
+      setOnSuccess = vi.fn()
 
       const props = await mockAssignmentAndSubmission({
         Submission: {

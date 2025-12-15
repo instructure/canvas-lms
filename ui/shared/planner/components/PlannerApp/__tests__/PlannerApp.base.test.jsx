@@ -59,12 +59,12 @@ beforeAll(() => {
 
 afterAll(() => {
   MockDate.reset()
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('PlannerApp basic rendering', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders base component with days', () => {
@@ -107,7 +107,7 @@ describe('PlannerApp basic rendering', () => {
   })
 
   it('notifies the UI to perform dynamic updates', () => {
-    const mockUpdate = jest.fn()
+    const mockUpdate = vi.fn()
     const {rerender} = render(
       <PlannerApp {...getDefaultValues({isLoading: true})} triggerDynamicUiUpdates={mockUpdate} />,
     )

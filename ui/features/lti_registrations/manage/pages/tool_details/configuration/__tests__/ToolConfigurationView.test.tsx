@@ -455,7 +455,7 @@ describe('Tool Configuration Restore Default Button', () => {
                 <Outlet
                   context={{
                     registration,
-                    refreshRegistration: jest.fn(),
+                    refreshRegistration: vi.fn(),
                   }}
                 />
               }
@@ -531,7 +531,7 @@ describe('Tool Configuration Copy JSON Code button', () => {
                 <Outlet
                   context={{
                     registration,
-                    refreshRegistration: jest.fn(),
+                    refreshRegistration: vi.fn(),
                   }}
                 />
               }

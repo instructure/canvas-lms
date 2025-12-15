@@ -89,7 +89,7 @@ const MCC_ACCOUNT_URL = 'api/v1/manually_created_courses_account'
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never}
 
 describe('CreateCourseModal (1)', () => {
-  const setModalOpen = jest.fn()
+  const setModalOpen = vi.fn()
   let originalEnv
 
   const getProps = (overrides = {}) => ({

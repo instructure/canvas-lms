@@ -101,7 +101,7 @@ export const IconConfirmation = React.memo(
 
     React.useEffect(() => {
       return () => {
-        debouncedImgUrlsUpdate.flush()
+        debouncedImgUrlsUpdate?.flush?.()
       }
     }, [debouncedImgUrlsUpdate])
 

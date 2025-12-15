@@ -41,7 +41,7 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
       ['F', 0.0],
     ]
     gradebook = createGradebook({default_grading_standard: defaultGradingScheme})
-    gradebook.saveSettings = jest
+    gradebook.saveSettings = vi
       .fn()
       .mockImplementation((_context_id, gradebook_settings) => Promise.resolve(gradebook_settings))
 
@@ -67,7 +67,7 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
     const getSubmissionState = gradebook.submissionStateMap.getSubmissionState.bind(
       gradebook.submissionStateMap,
     )
-    jest
+    vi
       .spyOn(gradebook.submissionStateMap, 'getSubmissionState')
       .mockImplementation(getSubmissionState)
     gradebook.submissionStateMap.getSubmissionState.mockImplementation(sub => {
@@ -77,7 +77,7 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     fixture.remove()
   })
 

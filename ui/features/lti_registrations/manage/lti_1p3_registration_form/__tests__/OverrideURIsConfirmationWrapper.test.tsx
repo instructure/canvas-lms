@@ -30,8 +30,8 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.CourseNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
+    const onNextClicked = vi.fn()
+    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
@@ -54,8 +54,8 @@ describe('OverrideURIsConfirmation', () => {
       ],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
+    const onNextClicked = vi.fn()
+    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
@@ -77,8 +77,8 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.CourseNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
+    const onNextClicked = vi.fn()
+    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
@@ -109,8 +109,8 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.CourseNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
+    const onNextClicked = vi.fn()
+    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
@@ -136,8 +136,8 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.CourseNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
+    const onNextClicked = vi.fn()
+    const onPreviousClicked = vi.fn()
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
@@ -164,8 +164,8 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.ModuleMenuModal}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
+    const onNextClicked = vi.fn()
+    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
@@ -188,8 +188,8 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.EditorButton}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
+    const onNextClicked = vi.fn()
+    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
@@ -213,8 +213,8 @@ describe('OverrideURIsConfirmation', () => {
       ],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
+    const onNextClicked = vi.fn()
+    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
@@ -248,8 +248,8 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.CourseNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
+    const onNextClicked = vi.fn()
+    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper

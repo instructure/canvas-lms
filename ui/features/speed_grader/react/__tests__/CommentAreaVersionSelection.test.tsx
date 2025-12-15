@@ -20,13 +20,15 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import fakeEnv from '@canvas/test-utils/fakeENV'
 
-jest.mock('../CommentLibrary', () => {
-  return function MockCommentLibraryV1() {
-    return <div data-testid="comment-library-v1">CommentLibrary V1</div>
+vi.mock('../CommentLibrary', () => {
+  return {
+    default: function MockCommentLibraryV1() {
+      return <div data-testid="comment-library-v1">CommentLibrary V1</div>
+    },
   }
 })
 
-jest.mock('../CommentLibraryV2/CommentLibrary', () => {
+vi.mock('../CommentLibraryV2/CommentLibrary', () => {
   return {
     CommentLibrary: function MockCommentLibraryV2() {
       return <div data-testid="comment-library-v2">CommentLibrary V2</div>
@@ -37,24 +39,24 @@ jest.mock('../CommentLibraryV2/CommentLibrary', () => {
 import CommentArea from '../CommentArea'
 
 describe('CommentArea - Comment Library Version Selection', () => {
-  let getTextAreaRefMock: jest.Mock
+  let getTextAreaRefMock: ReturnType<typeof vi.fn>
 
   const defaultProps = () => ({
     getTextAreaRef: getTextAreaRefMock,
     courseId: '1',
     userId: '1',
     useRCELite: false,
-    handleCommentChange: jest.fn(),
+    handleCommentChange: vi.fn(),
     currentText: '',
     readOnly: false,
   })
 
   beforeEach(() => {
-    getTextAreaRefMock = jest.fn()
+    getTextAreaRefMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fakeEnv.teardown()
   })
 

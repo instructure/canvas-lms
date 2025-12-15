@@ -95,7 +95,7 @@ describe('useHowManyModulesAreFetchingItems', () => {
   })
 
   it('component integration with callback when fetchComplete', async () => {
-    const callback = jest.fn()
+    const callback = vi.fn()
     const {queryClient, wrapper} = setup()
     const TestComponent = ({callback}: any) => {
       const {moduleFetchingCount, maxFetchingCount, fetchComplete} =
@@ -190,7 +190,7 @@ describe('useHowManyModulesAreFetchingItems', () => {
 
   it('does not call callback when fetchComplete is true and maxFetchingCount is 1', async () => {
     const {wrapper} = setup()
-    const callback = jest.fn()
+    const callback = vi.fn()
 
     const TestComponent = ({callback}: {callback: () => void}) => {
       useQuery({

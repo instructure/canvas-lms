@@ -21,8 +21,8 @@ import {render, fireEvent, waitFor, within} from '@testing-library/react'
 import ProficiencyTable from '../ProficiencyTable'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(() => vi.fn(() => {})),
 }))
 
 const defaultProps = (props = {}) => ({
@@ -33,7 +33,7 @@ const defaultProps = (props = {}) => ({
 
 describe('default proficiency', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the correct headers', () => {
@@ -143,7 +143,7 @@ describe('default proficiency', () => {
   })
 
   it('renders confirmation modal, calls update on save, and flashes a message to the user', async () => {
-    const updateSpy = jest.fn(() => Promise.resolve())
+    const updateSpy = vi.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps({contextType: 'course'})} update={updateSpy} />,
     )
@@ -161,7 +161,7 @@ describe('default proficiency', () => {
   })
 
   it('does not call save when canceling on the confirmation modal', async () => {
-    const updateSpy = jest.fn(() => Promise.resolve())
+    const updateSpy = vi.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps()} update={updateSpy} />,
     )
@@ -173,7 +173,7 @@ describe('default proficiency', () => {
   })
 
   it('empty rating description does not call update', () => {
-    const updateSpy = jest.fn(() => Promise.resolve())
+    const updateSpy = vi.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps()} update={updateSpy} />,
     )
@@ -184,7 +184,7 @@ describe('default proficiency', () => {
   })
 
   it('empty rating points does not call update', () => {
-    const updateSpy = jest.fn(() => Promise.resolve())
+    const updateSpy = vi.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps()} update={updateSpy} />,
     )
@@ -195,7 +195,7 @@ describe('default proficiency', () => {
   })
 
   it('invalid rating points does not call update', () => {
-    const updateSpy = jest.fn(() => Promise.resolve())
+    const updateSpy = vi.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps()} update={updateSpy} />,
     )
@@ -206,7 +206,7 @@ describe('default proficiency', () => {
   })
 
   it('increasing rating points does call update', () => {
-    const updateSpy = jest.fn(() => Promise.resolve())
+    const updateSpy = vi.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps()} update={updateSpy} />,
     )
@@ -218,7 +218,7 @@ describe('default proficiency', () => {
   })
 
   it('negative rating points does not call update', () => {
-    const updateSpy = jest.fn(() => Promise.resolve())
+    const updateSpy = vi.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps()} update={updateSpy} />,
     )
@@ -246,7 +246,7 @@ describe('default proficiency', () => {
   })
 
   it('calls onNotifyPendingChanges when changes data', async () => {
-    const onNotifyPendingChangesSpy = jest.fn()
+    const onNotifyPendingChangesSpy = vi.fn()
     const update = () => Promise.resolve()
     const {getByText, getByDisplayValue} = render(
       <ProficiencyTable
@@ -301,7 +301,7 @@ describe('custom proficiency', () => {
   })
 
   describe('ratings are automatically sorted', () => {
-    const updateSpy = jest.fn(() => Promise.resolve())
+    const updateSpy = vi.fn(() => Promise.resolve())
     const defaultColor = 'EF4437'
     const defaultRating1 = {
       description: 'Great',

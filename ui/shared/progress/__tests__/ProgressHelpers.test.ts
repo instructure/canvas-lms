@@ -36,11 +36,17 @@ describe('ProgressHelpers', () => {
     fakeENV.setup()
     apiCallCount = 0
     lastCapturedRequest = null
-    // Default handler
+    // Default handler - return completed state to prevent infinite loops
     server.use(
       http.get('/api/v1/progress/:progressId', () => {
         apiCallCount++
-        return HttpResponse.json({published: true})
+        return HttpResponse.json({
+          id: 'default',
+          workflow_state: 'completed',
+          message: null,
+          completion: 100,
+          results: {},
+        })
       }),
       http.post('/api/v1/progress/:progressId/cancel', async ({request}) => {
         apiCallCount++
@@ -49,26 +55,24 @@ describe('ProgressHelpers', () => {
           method: 'POST',
           body: await request.json(),
         }
-        return HttpResponse.json({published: true})
+        return HttpResponse.json({
+          id: 'default',
+          workflow_state: 'completed',
+          message: null,
+          completion: 100,
+          results: {},
+        })
       }),
     )
   })
 
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fakeENV.teardown()
   })
 
   describe('monitorProgress', () => {
-    beforeEach(() => {
-      jest.useFakeTimers()
-    })
-
-    afterEach(() => {
-      jest.useRealTimers()
-    })
-
     it('polls for progress until completed', async () => {
       // Create a sequence of responses based on call count
       let callIndex = 0
@@ -87,17 +91,12 @@ describe('ProgressHelpers', () => {
         }),
       )
 
-      const setCurrentProgress = jest.fn()
-      monitorProgress('3533', setCurrentProgress, () => {})
-      // Allow the promise to resolve - use type assertion for advanceTimersByTimeAsync
-      // which exists in Jest 29.5+ but types may not include it
-      await (jest as any).advanceTimersByTimeAsync(100)
+      const setCurrentProgress = vi.fn()
+      monitorProgress('3533', setCurrentProgress, () => {}, 50) // Use shorter polling interval
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(1))
       expect(apiCallCount).toBe(1)
-      await (jest as any).advanceTimersByTimeAsync(1000)
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(2))
       expect(apiCallCount).toBe(2)
-      await (jest as any).advanceTimersByTimeAsync(1000)
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(3))
       expect(apiCallCount).toBe(3)
     })
@@ -118,35 +117,36 @@ describe('ProgressHelpers', () => {
         }),
       )
 
-      const setCurrentProgress = jest.fn()
-      monitorProgress('3533', setCurrentProgress, () => {})
-      await (jest as any).advanceTimersByTimeAsync(100)
-      await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(1))
-      expect(apiCallCount).toBe(1)
-      await (jest as any).advanceTimersByTimeAsync(1000)
-      await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(2))
-      expect(apiCallCount).toBe(2)
+      const setCurrentProgress = vi.fn()
+      monitorProgress('3533', setCurrentProgress, () => {}, 50) // Use shorter polling interval
+      await waitFor(() => {
+        expect(setCurrentProgress).toHaveBeenCalledTimes(1)
+        expect(apiCallCount).toBe(1)
+      })
+      await waitFor(() => {
+        expect(setCurrentProgress).toHaveBeenCalledTimes(2)
+        expect(apiCallCount).toBe(2)
+      })
     })
 
     it('calls onProgressFail on a catestrophic failure', async () => {
       server.use(http.get('/api/v1/progress/:progressId', () => HttpResponse.error()))
-      const onProgressFail = jest.fn()
-      monitorProgress('3533', () => {}, onProgressFail)
-      await (jest as any).advanceTimersByTimeAsync(100)
+      const onProgressFail = vi.fn()
+      monitorProgress('3533', () => {}, onProgressFail, 50) // Use shorter polling interval
       await waitFor(() => expect(onProgressFail).toHaveBeenCalledWith(expect.any(Error)))
     })
   })
 
   describe('cancelProgressAction', () => {
     it('bails out of no progress is provided', () => {
-      const onCancelComplete = jest.fn()
+      const onCancelComplete = vi.fn()
       cancelProgressAction(undefined, onCancelComplete)
       expect(onCancelComplete).toHaveBeenCalledTimes(0)
       expect(apiCallCount).toBe(0)
     })
 
     it('bails out if the progress has already completed', () => {
-      const onCancelComplete = jest.fn()
+      const onCancelComplete = vi.fn()
       cancelProgressAction(
         {id: '17', workflow_state: 'completed', message: 'completed', completion: 100, results: {}},
         onCancelComplete,
@@ -156,7 +156,7 @@ describe('ProgressHelpers', () => {
     })
 
     it('bails out if the progress has already failed', () => {
-      const onCancelComplete = jest.fn()
+      const onCancelComplete = vi.fn()
       cancelProgressAction(
         {id: '17', workflow_state: 'failed', message: 'failed', completion: 25, results: {}},
         onCancelComplete,
@@ -166,7 +166,7 @@ describe('ProgressHelpers', () => {
     })
 
     it('cancels the progress', async () => {
-      const onCancelComplete = jest.fn()
+      const onCancelComplete = vi.fn()
       cancelProgressAction(
         {id: '17', workflow_state: 'running', message: 'canceled', completion: 25, results: {}},
         onCancelComplete,
@@ -183,7 +183,7 @@ describe('ProgressHelpers', () => {
 
     it('calls onCancelComplete with the error on failure', async () => {
       server.use(http.post('/api/v1/progress/:progressId/cancel', () => HttpResponse.error()))
-      const onCancelComplete = jest.fn()
+      const onCancelComplete = vi.fn()
       cancelProgressAction(
         {id: '17', workflow_state: 'running', message: 'canceled', completion: 25, results: {}},
         onCancelComplete,

@@ -26,7 +26,7 @@ import {
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {defaultRatingsAndCalculationMethod} from '../Management/__tests__/helpers'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('FindOutcomeItem', () => {
   let onMenuHandlerMock
@@ -69,12 +69,12 @@ describe('FindOutcomeItem', () => {
   }
 
   beforeEach(() => {
-    onMenuHandlerMock = jest.fn()
-    onImportOutcomeHandlerMock = jest.fn()
+    onMenuHandlerMock = vi.fn()
+    onImportOutcomeHandlerMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders title if title prop passed', () => {

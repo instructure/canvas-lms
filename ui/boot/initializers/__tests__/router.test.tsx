@@ -21,15 +21,15 @@ import React from 'react'
 import {FallbackSpinner, loadReactRouter} from '../router'
 
 describe('loadReactRouter', () => {
-  let consoleErrorSpy: jest.SpyInstance
+  let consoleErrorSpy: any
 
   beforeEach(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     document.body.innerHTML = '<div id="react-router-portals"></div>'
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     document.body.innerHTML = ''
   })
 

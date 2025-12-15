@@ -28,7 +28,7 @@ import {http, HttpResponse} from 'msw'
 
 const server = setupServer()
 
-const setOnSuccess = jest.fn()
+const setOnSuccess = vi.fn()
 
 const render = children =>
   testingLibraryRender(
@@ -37,8 +37,12 @@ const render = children =>
     </MockedQueryProvider>,
   )
 
-jest.mock('../MobileContextMenu', () => () => <></>)
-jest.mock('../MobileGlobalMenu', () => () => <></>)
+vi.mock('../MobileContextMenu', () => ({
+  default: () => <></>,
+}))
+vi.mock('../MobileGlobalMenu', () => ({
+  default: () => <></>,
+}))
 
 describe('MobileNavigation', () => {
   beforeAll(() => server.listen())
@@ -65,7 +69,7 @@ describe('MobileNavigation', () => {
   afterEach(() => {
     fakeENV.teardown()
     server.resetHandlers()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     document.body.innerHTML = ''
   })
 

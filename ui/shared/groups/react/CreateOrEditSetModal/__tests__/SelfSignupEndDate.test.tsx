@@ -20,7 +20,7 @@ import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import SelfSignupEndDate from '../SelfSignupEndDate'
 
-const onDatechangeMock = jest.fn()
+const onDatechangeMock = vi.fn()
 const component = (overrides = {}) => {
   const props = {
     initialEndDate: '',

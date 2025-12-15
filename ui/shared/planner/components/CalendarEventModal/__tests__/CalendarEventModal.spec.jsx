@@ -22,7 +22,7 @@ import moment from 'moment-timezone'
 import CalendarEventModal from '../index'
 import {convertApiUserContent} from '../../../utilities/contentUtils'
 
-jest.mock('../../../utilities/contentUtils')
+vi.mock('../../../utilities/contentUtils')
 convertApiUserContent.mockImplementation(p => p)
 
 function defaultProps(options = {}) {
@@ -30,7 +30,7 @@ function defaultProps(options = {}) {
   delete options.currentUser
   return {
     open: true,
-    requestClose: jest.fn(),
+    requestClose: vi.fn(),
     title: 'event title',
     html_url: 'http://example.com',
     courseName: 'the course',
@@ -54,7 +54,7 @@ function defaultProps(options = {}) {
 
 describe('CalendarEventModal', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the modal with title and event details', () => {

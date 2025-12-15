@@ -95,7 +95,7 @@ describe('Other Calendars modal ', () => {
   })
 
   it('calls setSelectedContexts when a course is selected', () => {
-    const setSelectedContexts = jest.fn()
+    const setSelectedContexts = vi.fn()
     const {getByText, getByTestId, rerender} = render(
       <ContextSelector {...DEFAULT_PROPS} setSelectedContexts={setSelectedContexts} />,
     )
@@ -114,8 +114,8 @@ describe('Other Calendars modal ', () => {
   })
 
   it('toggles parent context when a section is selected', () => {
-    const setSelectedContexts = jest.fn()
-    const setSelectedSubContexts = jest.fn()
+    const setSelectedContexts = vi.fn()
+    const setSelectedSubContexts = vi.fn()
     const {getByText, getByTestId} = render(
       <ContextSelector
         {...DEFAULT_PROPS}

@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {render, waitFor} from '@testing-library/react'
+import {cleanup, render, waitFor} from '@testing-library/react'
+import {type MockedFunction} from 'vitest'
 import {SettingsTray, SettingsTrayProps} from '../SettingsTray'
 import {
   DEFAULT_GRADEBOOK_SETTINGS,
@@ -25,21 +26,25 @@ import {
 } from '../../../utils/constants'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 const makeProps = (props = {}): SettingsTrayProps => ({
   open: true,
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
   gradebookSettings: DEFAULT_GRADEBOOK_SETTINGS,
-  setGradebookSettings: jest.fn(),
+  setGradebookSettings: vi.fn(),
   ...props,
 })
 
 describe('SettingsTray', () => {
-  const mockShowFlashAlert = showFlashAlert as jest.MockedFunction<typeof showFlashAlert>
+  afterEach(() => {
+    cleanup()
+  })
+
+  const mockShowFlashAlert = showFlashAlert as MockedFunction<typeof showFlashAlert>
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders when open is true', () => {
@@ -87,7 +92,7 @@ describe('SettingsTray', () => {
   it('shows flash alert when setGradebookSettings fails', async () => {
     const props = makeProps({
       open: true,
-      setGradebookSettings: jest.fn().mockReturnValue(Promise.resolve({success: false})),
+      setGradebookSettings: vi.fn().mockReturnValue(Promise.resolve({success: false})),
     })
     const {getByText} = render(<SettingsTray {...props} />)
     getByText('Save').click()
@@ -102,7 +107,7 @@ describe('SettingsTray', () => {
   it('shows flash alert when setGradebookSettings succeeds', async () => {
     const props = makeProps({
       open: true,
-      setGradebookSettings: jest.fn().mockReturnValue(Promise.resolve({success: true})),
+      setGradebookSettings: vi.fn().mockReturnValue(Promise.resolve({success: true})),
     })
     const {getByText} = render(<SettingsTray {...props} />)
     getByText('Save').click()
@@ -174,7 +179,7 @@ describe('SettingsTray', () => {
     it('updates scoreDisplayFormat on change', async () => {
       const props = makeProps({
         open: true,
-        setGradebookSettings: jest.fn().mockReturnValue(Promise.resolve({success: true})),
+        setGradebookSettings: vi.fn().mockReturnValue(Promise.resolve({success: true})),
       })
       const {getByText, getByLabelText} = render(<SettingsTray {...props} />)
       getByLabelText('Icons + Descriptor').click()

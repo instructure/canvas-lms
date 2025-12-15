@@ -17,20 +17,58 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act} from '@testing-library/react'
+import {render, fireEvent, act, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import useContentShareUserSearchApi from '../../effects/useContentShareUserSearchApi'
 import DirectShareUserModal from '../DirectShareUserModal'
 
-jest.mock('../../effects/useContentShareUserSearchApi')
+vi.mock('../../effects/useContentShareUserSearchApi')
 
-const flushAllTimersAndPromises = async () => {
-  while (jest.getTimerCount() > 0) {
-    await act(async () => {
-      jest.runAllTimers()
-    })
-  }
+// Mock the lazy-loaded component to avoid issues with React.lazy
+function MockDirectShareUserPanel({
+  selectedUsers,
+  onUserSelected,
+  onUserRemoved,
+  selectedUsersError,
+  userSelectInputRef,
+}) {
+  const inputRef = React.useRef(null)
+
+  React.useEffect(() => {
+    if (userSelectInputRef && inputRef.current) {
+      userSelectInputRef(inputRef.current)
+    }
+  }, [userSelectInputRef])
+
+  return (
+    <div data-testid="mock-user-panel">
+      <label>
+        Send to:
+        <input
+          ref={inputRef}
+          data-testid="user-search-input"
+          onChange={e => {
+            if (e.target.value === 'abc') {
+              onUserSelected({id: 'abc', name: 'abc'})
+            } else if (e.target.value === 'cde') {
+              onUserSelected({id: 'cde', name: 'cde'})
+            }
+          }}
+        />
+      </label>
+      {selectedUsersError && <div>You must select at least one user</div>}
+      {selectedUsers.map(user => (
+        <button type="button" key={user.id} onClick={() => onUserRemoved(user)}>
+          {user.name}
+        </button>
+      ))}
+    </div>
+  )
 }
+
+vi.mock('../DirectShareUserPanel', () => ({
+  default: MockDirectShareUserPanel,
+}))
 
 describe('DirectShareUserModal', () => {
   let ariaLive
@@ -49,30 +87,26 @@ describe('DirectShareUserModal', () => {
   })
 
   beforeEach(() => {
-    jest.useFakeTimers()
-
-    useContentShareUserSearchApi.mockImplementationOnce(({success}) => {
-      success([
-        {id: 'abc', name: 'abc'},
-        {id: 'cde', name: 'cde'},
-      ])
+    useContentShareUserSearchApi.mockImplementation(() => {
+      // Mock implementation - not used with the mocked DirectShareUserPanel
     })
   })
 
-  afterEach(async () => {
-    await flushAllTimersAndPromises()
+  afterEach(() => {
     fetchMock.restore()
+    vi.clearAllMocks()
   })
 
   async function selectUser(getByText, findByLabelText, name = 'abc') {
-    fireEvent.change(await findByLabelText(/send to:/i), {target: {value: name}})
-    await act(async () => jest.runAllTimers()) // let the debounce happen
-    fireEvent.click(getByText(name))
+    const input = await findByLabelText(/send to:/i)
+    fireEvent.change(input, {target: {value: name}})
+    // Wait for the user to be selected and appear as a tag
+    await waitFor(() => getByText(name))
   }
 
-  it('starts a share operation and reports status UNDER TEST', async () => {
+  it('starts a share operation and reports status', async () => {
     fetchMock.postOnce('path:/api/v1/users/self/content_shares', 200)
-    const onDismiss = jest.fn()
+    const onDismiss = vi.fn()
     const {getByText, getAllByText, findByLabelText} = render(
       <DirectShareUserModal
         open={true}
@@ -109,7 +143,7 @@ describe('DirectShareUserModal', () => {
 
   describe('errors', () => {
     beforeEach(() => {
-      jest.spyOn(console, 'error').mockImplementation()
+      vi.spyOn(console, 'error').mockImplementation()
     })
 
     afterEach(() => {

@@ -25,12 +25,12 @@ describe('ColorPickerWrapper', () => {
     popoverButtonScreenReaderLabel: 'Open color picker popover',
     value: '#FF0000',
     baseColor: '#FFFFFF',
-    onChange: jest.fn(),
+    onChange: vi.fn(),
     baseColorLabel: 'Background Color',
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('uses different baseColor for contrast checking', async () => {

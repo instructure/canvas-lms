@@ -76,13 +76,13 @@ import {
 import {handleOpeningModuleUpdateTray} from '../../handlers/modulePageActionHandlers'
 import '../../handlers/modulePageCommandEventHandlers'
 
-jest.mock('../../handlers/moduleActionHandlers')
-jest.mock('../../handlers/modulePageActionHandlers', () => ({
-  ...jest.requireActual('../../handlers/modulePageActionHandlers'),
-  handleOpeningModuleUpdateTray: jest.fn(),
+vi.mock('../../handlers/moduleActionHandlers')
+vi.mock('../../handlers/modulePageActionHandlers', async () => ({
+  ...await vi.importActual('../../handlers/modulePageActionHandlers'),
+  handleOpeningModuleUpdateTray: vi.fn(),
 }))
 
-const setIsManagementContentTrayOpenMock = jest.fn()
+const setIsManagementContentTrayOpenMock = vi.fn()
 
 // External tool data to be provided through context
 const mockExternalTools = {
@@ -229,7 +229,7 @@ describe('ModuleActionMenu', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
   afterAll(() => server.close())
   describe('rendering', () => {
@@ -569,7 +569,7 @@ describe('ModuleActionMenu', () => {
   })
 
   describe('actions', () => {
-    const modulePageActionEventHandler = jest.fn()
+    const modulePageActionEventHandler = vi.fn()
     beforeAll(() => {
       document.addEventListener('module-action', modulePageActionEventHandler)
     })

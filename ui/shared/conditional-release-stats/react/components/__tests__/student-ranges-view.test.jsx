@@ -88,12 +88,12 @@ const defaultProps = {
     range: 0,
     student: null,
   },
-  selectStudent: jest.fn(),
+  selectStudent: vi.fn(),
 }
 
 describe('StudentRangesView', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders three range components correctly', () => {

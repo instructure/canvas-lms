@@ -23,28 +23,36 @@ import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import PeerReviewAllocationRulesTray from '../PeerReviewAllocationRulesTray'
 import {AllocationRuleType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
+import {executeQuery} from '@canvas/graphql'
 
-jest.mock('../images/pandasBalloon.svg', () => 'mock-pandas-balloon.svg')
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(),
+vi.mock('../images/pandasBalloon.svg', () => ({default: 'mock-pandas-balloon.svg'}))
+vi.mock('@canvas/graphql', () => ({
+  executeQuery: vi.fn(),
 }))
-jest.mock('../peerReviewConstants', () => ({
-  SEARCH_DEBOUNCE_DELAY: 0,
-  SEARCH_RESULT_ANNOUNCEMENT_DELAY: 0,
-}))
-jest.mock('../AllocationRuleCard', () => {
-  return function MockAllocationRuleCard({rule}: {rule: any}) {
-    return <div data-testid="allocation-rule-card">{rule.id}</div>
+vi.mock('../peerReviewConstants', async importOriginal => {
+  const actual = await importOriginal<typeof import('../peerReviewConstants')>()
+  return {
+    ...actual,
+    SEARCH_DEBOUNCE_DELAY: 0,
+    SEARCH_RESULT_ANNOUNCEMENT_DELAY: 0,
   }
 })
-jest.mock('../CreateEditAllocationRuleModal', () => {
-  return function MockCreateEditAllocationRuleModal({isOpen}: {isOpen: boolean}) {
-    return isOpen ? <div data-testid="create-rule-modal">Modal</div> : null
+vi.mock('../AllocationRuleCard', () => {
+  return {
+    default: function MockAllocationRuleCard({rule}: {rule: any}) {
+      return <div data-testid="allocation-rule-card">{rule.id}</div>
+    },
+  }
+})
+vi.mock('../CreateEditAllocationRuleModal', () => {
+  return {
+    default: function MockCreateEditAllocationRuleModal({isOpen}: {isOpen: boolean}) {
+      return isOpen ? <div data-testid="create-rule-modal">Modal</div> : null
+    },
   }
 })
 
-const {executeQuery} = require('@canvas/graphql')
-const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+const mockExecuteQuery = vi.mocked(executeQuery)
 
 const mockAllocationRules: AllocationRuleType[] = [
   {
@@ -102,7 +110,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     assignmentId: '456',
     requiredPeerReviewsCount: 2,
     isTrayOpen: true,
-    closeTray: jest.fn(),
+    closeTray: vi.fn(),
     canEdit: false,
   }
 
@@ -110,7 +118,7 @@ describe('PeerReviewAllocationRulesTray', () => {
 
   beforeEach(() => {
     user = userEvent.setup()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     ENV.COURSE_ID = '1'
 
     Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
@@ -118,10 +126,10 @@ describe('PeerReviewAllocationRulesTray', () => {
       value: 600,
     })
 
-    global.ResizeObserver = jest.fn().mockImplementation(() => ({
-      observe: jest.fn(),
-      unobserve: jest.fn(),
-      disconnect: jest.fn(),
+    global.ResizeObserver = vi.fn().mockImplementation(() => ({
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn(),
     }))
   })
 
@@ -581,13 +589,13 @@ describe('PeerReviewAllocationRulesTray', () => {
 
   describe('Screen reader alerts', () => {
     beforeEach(() => {
-      jest.useFakeTimers()
-      HTMLElement.prototype.focus = jest.fn()
+      vi.useFakeTimers()
+      HTMLElement.prototype.focus = vi.fn()
     })
 
     afterEach(() => {
-      jest.runOnlyPendingTimers()
-      jest.useRealTimers()
+      vi.runOnlyPendingTimers()
+      vi.useRealTimers()
     })
 
     it('renders aria-live region with correct attributes', async () => {
@@ -674,7 +682,7 @@ describe('PeerReviewAllocationRulesTray', () => {
         },
       })
 
-      const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
+      const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout')
 
       const {unmount} = renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 

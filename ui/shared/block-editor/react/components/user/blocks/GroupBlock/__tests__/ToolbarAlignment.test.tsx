@@ -22,7 +22,7 @@ import {ToolbarAlignment} from '../toolbar/ToolbarAlignment'
 
 describe('ToolbarAlignment', () => {
   it('renders', () => {
-    const {getByText} = render(<ToolbarAlignment onSave={jest.fn()} />)
+    const {getByText} = render(<ToolbarAlignment onSave={vi.fn()} />)
     expect(getByText('Alignment Options')).toBeInTheDocument()
   })
 
@@ -32,7 +32,7 @@ describe('ToolbarAlignment', () => {
         layout="row"
         alignment="start"
         verticalAlignment="start"
-        onSave={jest.fn()}
+        onSave={vi.fn()}
       />,
     )
     getByText('Alignment Options').closest('button')?.click()
@@ -52,7 +52,7 @@ describe('ToolbarAlignment', () => {
         layout="column"
         alignment="center"
         verticalAlignment="end"
-        onSave={jest.fn()}
+        onSave={vi.fn()}
       />,
     )
     getByText('Alignment Options').closest('button')?.click()
@@ -63,7 +63,7 @@ describe('ToolbarAlignment', () => {
   })
 
   it('shows the reset button when the alignment is not the default', () => {
-    const {getByText} = render(<ToolbarAlignment alignment="center" onSave={jest.fn()} />)
+    const {getByText} = render(<ToolbarAlignment alignment="center" onSave={vi.fn()} />)
     getByText('Alignment Options').closest('button')?.click()
     getByText('Align Horizontally').click()
     expect(getByText('Reset Default Alignment')).toBeInTheDocument()
@@ -71,7 +71,7 @@ describe('ToolbarAlignment', () => {
 
   it('hides the reset button once it is clicked', () => {
     const {getByText, queryByText} = render(
-      <ToolbarAlignment verticalAlignment="center" onSave={jest.fn()} />,
+      <ToolbarAlignment verticalAlignment="center" onSave={vi.fn()} />,
     )
     getByText('Alignment Options').closest('button')?.click()
     expect(getByText('Reset Default Alignment')).toBeInTheDocument()
@@ -85,7 +85,7 @@ describe('ToolbarAlignment', () => {
         layout="column"
         alignment="center"
         verticalAlignment="end"
-        onSave={jest.fn()}
+        onSave={vi.fn()}
       />,
     )
     getByText('Alignment Options').closest('button')?.click()

@@ -25,13 +25,13 @@ describe('RenderGuard', () => {
   const originalWarn = console.warn
 
   beforeEach(() => {
-    console.warn = jest.fn()
+    console.warn = vi.fn()
   })
 
   afterEach(() => {
     document.getElementById(markerId)?.remove()
     console.warn = originalWarn
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('renders children when marker is present', () => {

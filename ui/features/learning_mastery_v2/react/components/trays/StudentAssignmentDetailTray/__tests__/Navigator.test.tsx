@@ -17,23 +17,27 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Navigator, NavigatorComponentProps} from '../Navigator'
 
 describe('Navigator', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const defaultProps: NavigatorComponentProps = {
     hasPrevious: true,
     hasNext: true,
     previousLabel: 'Previous item',
     nextLabel: 'Next item',
-    onPrevious: jest.fn(),
-    onNext: jest.fn(),
+    onPrevious: vi.fn(),
+    onNext: vi.fn(),
     children: <div>Current Item</div>,
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders children content', () => {
@@ -49,7 +53,7 @@ describe('Navigator', () => {
 
   it('calls onPrevious when previous button is clicked', async () => {
     const user = userEvent.setup()
-    const onPrevious = jest.fn()
+    const onPrevious = vi.fn()
     render(<Navigator {...defaultProps} onPrevious={onPrevious} />)
 
     await user.click(screen.getByTestId('previous-button'))
@@ -58,7 +62,7 @@ describe('Navigator', () => {
 
   it('calls onNext when next button is clicked', async () => {
     const user = userEvent.setup()
-    const onNext = jest.fn()
+    const onNext = vi.fn()
     render(<Navigator {...defaultProps} onNext={onNext} />)
 
     await user.click(screen.getByTestId('next-button'))

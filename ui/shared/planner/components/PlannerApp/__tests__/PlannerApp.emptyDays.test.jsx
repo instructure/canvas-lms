@@ -62,12 +62,12 @@ beforeAll(() => {
 
 afterAll(() => {
   MockDate.reset()
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('PlannerApp empty day calculations', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('only renders days with items in the past', () => {
@@ -192,10 +192,10 @@ describe('PlannerApp empty day calculations', () => {
   })
 
   it('empty days internals are correct', () => {
-    const countSpy = jest.spyOn(PlannerApp.prototype, 'countEmptyDays')
-    const emptyDaysSpy = jest.spyOn(PlannerApp.prototype, 'renderEmptyDays')
-    const emptyDayStretchSpy = jest.spyOn(PlannerApp.prototype, 'renderEmptyDayStretch')
-    const oneDaySpy = jest.spyOn(PlannerApp.prototype, 'renderOneDay')
+    const countSpy = vi.spyOn(PlannerApp.prototype, 'countEmptyDays')
+    const emptyDaysSpy = vi.spyOn(PlannerApp.prototype, 'renderEmptyDays')
+    const emptyDayStretchSpy = vi.spyOn(PlannerApp.prototype, 'renderEmptyDayStretch')
+    const oneDaySpy = vi.spyOn(PlannerApp.prototype, 'renderOneDay')
 
     let days = [
       moment.tz(TZ).add(0, 'day'),
