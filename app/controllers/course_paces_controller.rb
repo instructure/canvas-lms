@@ -609,12 +609,13 @@ class CoursePacesController < ApplicationController
       return render json: { success: false, errors: "End date cannot be before start date" }, status: :unprocessable_entity
     end
 
-    compressed_module_items = @course_pace.compress_dates(save: false, start_date:)
-                                          .sort_by { |ppmi| ppmi.module_item.position }
-                                          .group_by { |ppmi| ppmi.module_item.context_module }
-                                          .sort_by { |context_module, _items| context_module.position }
-                                          .to_h.values.flatten
-    compressed_dates = CoursePaceDueDatesCalculator.new(@course_pace).get_due_dates(compressed_module_items, start_date:)
+    # Wrap date calculations in the course timezone to match the publish path
+    compressed_dates = Time.use_zone(@course.time_zone) do
+      # Compressor handles sorting internally, so no need to sort after
+      compressed_module_items = @course_pace.compress_dates(save: false, start_date:)
+
+      CoursePaceDueDatesCalculator.new(@course_pace).get_due_dates(compressed_module_items, start_date:)
+    end
 
     render json: compressed_dates.to_json
   end

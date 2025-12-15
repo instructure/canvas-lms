@@ -34,6 +34,11 @@ class CoursePaceHardEndDateCompressor
     return if compress_items_after && compress_items_after >= items.length - 1
     return items if items.empty?
 
+    # Ensure items are sorted by module position and item position before compression
+    # This is critical because compression calculates durations sequentially
+    # This ensures consistency between compression calls
+    items = sort_items_by_module_position(items)
+
     course_pace_due_dates_calculator = CoursePaceDueDatesCalculator.new(course_pace)
     blackout_dates = course_pace_due_dates_calculator.blackout_dates
     enrollment_start_date = enrollment&.start_at || [enrollment&.effective_start_at, enrollment&.created_at].compact.max
@@ -229,6 +234,24 @@ class CoursePaceHardEndDateCompressor
     end
     items
   end
+
+  def self.sort_items_by_module_position(items)
+    # Only load if not already loaded
+    needs_loading = items.first && !items.first.module_item
+
+    if needs_loading
+      module_item_ids = items.filter_map(&:module_item_id).uniq
+      module_items_by_id = ContentTag.where(id: module_item_ids).preload(:context_module).index_by(&:id)
+
+      items.each do |ppmi|
+        ppmi.module_item = module_items_by_id[ppmi.module_item_id] if ppmi.module_item_id
+      end
+    end
+
+    # Sort by module position, then item position
+    items.sort_by { |ppmi| [ppmi.module_item.context_module.position, ppmi.module_item.position] }
+  end
+  private_class_method :sort_items_by_module_position
 end
 
 PaceDuration = Struct.new(:duration, :rounding_direction, :remainder) do

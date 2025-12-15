@@ -254,6 +254,8 @@ describe('Course paces actions', () => {
         course_pace: {
           start_date: PRIMARY_PACE.start_date,
           end_date: PRIMARY_PACE.end_date,
+          context_type: PRIMARY_PACE.context_type,
+          context_id: PRIMARY_PACE.context_id,
           course_pace_module_items_attributes: PRIMARY_PACE.modules.reduce(
             (runningValue: Array<any>, module) => {
               return runningValue.concat(
@@ -284,6 +286,8 @@ describe('Course paces actions', () => {
         course_pace: {
           start_date: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.start_date,
           end_date: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.end_date,
+          context_type: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.context_type,
+          context_id: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.context_id,
           course_pace_module_items_attributes:
             PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.modules.reduce(
               (runningValue: Array<any>, module) => {

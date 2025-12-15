@@ -193,7 +193,7 @@ class CoursePacePresenter
         when 1
           docx_replace(cell, "[X]", ppmi.duration.to_s)
         when 2
-          docx_replace(cell, "MM/DD/YYYY", due_dates[ppmi.id].strftime(DATE_FORMAT))
+          docx_replace(cell, "MM/DD/YYYY", due_dates[ppmi.id].to_date.strftime(DATE_FORMAT))
         when 3
           docx_replace(cell, "[published/ unpublished]", module_item.content.published? ? "Published" : "Unpublished")
         end
@@ -390,11 +390,13 @@ class CoursePacePresenter
   end
 
   def due_dates
-    @due_dates ||= due_dates_calculator.get_due_dates(course_pace_module_items.to_h.values.flatten, enrollment)
+    @due_dates ||= Time.use_zone(course_pace.course.time_zone) do
+      due_dates_calculator.get_due_dates(course_pace_module_items.to_h.values.flatten, enrollment)
+    end
   end
 
   def planned_end_date
-    @planned_end_date ||= due_dates.values.last
+    @planned_end_date ||= due_dates.values.last&.to_date
   end
 
   def docx_replace(doc, matcher, replace_with)

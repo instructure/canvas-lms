@@ -29,11 +29,16 @@ import {View} from '@instructure/ui-view'
 import moment from 'moment-timezone'
 import _ from 'lodash'
 import type {CoursePace, OptionalDate, Pace, ResponsiveSizes, StoreState} from '../../types'
-import {generateDatesCaptions, rawDaysBetweenInclusive} from '../../utils/date_stuff/date_helpers'
+import {
+  generateDatesCaptions,
+  getEndDateValue,
+  rawDaysBetweenInclusive,
+} from '../../utils/date_stuff/date_helpers'
 import {coursePaceActions} from '../../actions/course_paces'
 import {calendarDaysToPaceDuration} from '../../utils/utils'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
 import {BlackoutDate} from '../../shared/types'
+import {getCompression} from '../../reducers/course_paces'
 
 const I18n = createI18nScope('acceptable_use_policy')
 
@@ -47,6 +52,7 @@ interface PassedProps {
 
 interface StoreProps {
   readonly blackoutDates: BlackoutDate[]
+  readonly compression: number
 }
 
 interface DispatchProps {
@@ -54,6 +60,8 @@ interface DispatchProps {
   readonly setPaceItemsDurationFromTimeToComplete: typeof coursePaceActions.setPaceItemsDurationFromTimeToComplete
   readonly setStartDate: typeof coursePaceActions.setStartDate
   readonly setTimeToCompleteCalendarDaysFromItems: typeof coursePaceActions.setTimeToCompleteCalendarDaysFromItems
+  readonly compressDates: typeof coursePaceActions.compressDates
+  readonly uncompressDates: typeof coursePaceActions.uncompressDates
 }
 
 interface DateInputWithCaptionProps {
@@ -140,6 +148,9 @@ const TimeSelection = (props: TimeSelectionProps) => {
     blackoutDates,
     setStartDate,
     setTimeToCompleteCalendarDaysFromItems,
+    compressDates,
+    uncompressDates,
+    compression,
   } = props
 
   const originalSelectedDaysToSkip = useRef(coursePace.selected_days_to_skip)
@@ -151,6 +162,14 @@ const TimeSelection = (props: TimeSelectionProps) => {
   const [endDate, setEndDate] = useState<OptionalDate>(null)
   const [weeks, setWeeks] = useState<number>(0)
   const [days, setDays] = useState<number>(0)
+
+  useEffect(() => {
+    if (compression > 0) {
+      compressDates()
+    } else {
+      uncompressDates()
+    }
+  }, [compressDates, compression, uncompressDates])
 
   useEffect(() => {
     if (
@@ -169,15 +188,31 @@ const TimeSelection = (props: TimeSelectionProps) => {
       coursePace.time_to_complete_calendar_days === 0
         ? 0
         : coursePace.time_to_complete_calendar_days || 0
-    const endDateValue = startDateMoment.add(calendarDays, 'days').startOf('day').toISOString()
-    setEndDate(endDateValue)
+    const plannedEndDate = startDateMoment.add(calendarDays, 'days').startOf('day').toISOString()
+    const actualEndDate = getEndDateValue(coursePace, plannedEndDate)
+    setEndDate(actualEndDate)
 
-    const originalPaceDuration = calendarDaysToPaceDuration(
-      coursePace.time_to_complete_calendar_days || 0,
-    )
-    setWeeks(originalPaceDuration.weeks)
-    setDays(originalPaceDuration.days)
-  }, [coursePace.time_to_complete_calendar_days, coursePace.start_date])
+    // Calculate weeks/days display using actual vs projected end dates
+    // This matches how getPaceDuration works - uses the minimum of the two
+    const paceStart = moment(coursePace.start_date).endOf('day')
+    const paceEnd = coursePace.end_date ? moment(coursePace.end_date).endOf('day') : null
+    const projectedEnd = moment(plannedEndDate).endOf('day')
+
+    // Use the earlier of paceEnd (course/section end) or projectedEnd (calculated from assignments)
+    const effectiveEnd = paceEnd && projectedEnd.isAfter(paceEnd) ? paceEnd : projectedEnd
+    const actualCalendarDays = rawDaysBetweenInclusive(paceStart, effectiveEnd)
+    const displayCalendarDays = actualCalendarDays < 0 ? 0 : actualCalendarDays - 1
+
+    const paceDuration = calendarDaysToPaceDuration(displayCalendarDays)
+    setWeeks(paceDuration.weeks)
+    setDays(paceDuration.days)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    coursePace.time_to_complete_calendar_days,
+    coursePace.start_date,
+    coursePace.end_date,
+    coursePace.end_date_context,
+  ])
 
   const setTimeToComplete = (startDate: OptionalDate, endDate: OptionalDate) => {
     if (!startDate || !endDate) return
@@ -212,13 +247,15 @@ const TimeSelection = (props: TimeSelectionProps) => {
     dateValue,
     caption,
     dataTestId,
+    label,
   }: {
     dateValue: OptionalDate
     caption: string
     dataTestId: string
+    label: string
   }) => {
     return (
-      <LabeledComponent label={I18n.t('Start Date')}>
+      <LabeledComponent label={label}>
         <DateInputContainer caption={caption} dateColumnWidth={dateColumnWidth}>
           <View display="inline-block" height="2.406rem" padding="x-small 0 0 x-small">
             <Text data-testid={dataTestId}>
@@ -307,6 +344,7 @@ const TimeSelection = (props: TimeSelectionProps) => {
             dateValue={coursePace.start_date}
             caption={captions.startDate}
             dataTestId="start-date-readonly"
+            label={I18n.t('Start Date')}
           />
         ) : (
           <DateInputWithCaption
@@ -320,34 +358,53 @@ const TimeSelection = (props: TimeSelectionProps) => {
             disabledDates={(date: string) => Boolean(endDate && date > endDate)}
           />
         )}
-        <DateInputWithCaption
-          key="end-date"
-          date={endDate}
-          dateColumnWidth={dateColumnWidth}
-          onChangeDate={onChangeEndDate}
-          caption={captions.endDate}
-          renderLabel={I18n.t('End Date')}
-          dataTestId="end-date-input"
-          disabledDates={(date: string) =>
-            Boolean(coursePace.start_date && date < coursePace.start_date)
-          }
-        />
+        {enrollmentType && coursePace.end_date_context !== 'hypothetical' ? (
+          <ReadOnlyDateWithCaption
+            dateValue={endDate}
+            caption={captions.endDate}
+            dataTestId="end-date-readonly"
+            label={I18n.t('End Date')}
+          />
+        ) : (
+          <DateInputWithCaption
+            key="end-date"
+            date={endDate}
+            dateColumnWidth={dateColumnWidth}
+            onChangeDate={onChangeEndDate}
+            caption={captions.endDate}
+            renderLabel={I18n.t('End Date')}
+            dataTestId="end-date-input"
+            disabledDates={(date: string) =>
+              Boolean(coursePace.start_date && date < coursePace.start_date)
+            }
+          />
+        )}
         <Flex.Item>
           <LabeledComponent label={I18n.t('Time to Complete Course')}>
-            <NumberInputWithLabel
-              value={weeks}
-              label="Weeks"
-              renderLabel=""
-              unit="weeks"
-              dataTestId="weeks-number-input"
-            />
-            <NumberInputWithLabel
-              value={days}
-              label="Days"
-              renderLabel=""
-              unit="days"
-              dataTestId="days-number-input"
-            />
+            {enrollmentType && coursePace.end_date_context !== 'hypothetical' ? (
+              <View display="inline-block" height="2.406rem" padding="x-small 0 0 x-small">
+                <Text data-testid="time-to-complete-readonly">
+                  {weeks} {I18n.t('Weeks')} {days} {I18n.t('Days')}
+                </Text>
+              </View>
+            ) : (
+              <>
+                <NumberInputWithLabel
+                  value={weeks}
+                  label="Weeks"
+                  renderLabel=""
+                  unit="weeks"
+                  dataTestId="weeks-number-input"
+                />
+                <NumberInputWithLabel
+                  value={days}
+                  label="Days"
+                  renderLabel=""
+                  unit="days"
+                  dataTestId="days-number-input"
+                />
+              </>
+            )}
           </LabeledComponent>
         </Flex.Item>
       </Flex>
@@ -358,6 +415,7 @@ const TimeSelection = (props: TimeSelectionProps) => {
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
     blackoutDates: getBlackoutDates(state),
+    compression: getCompression(state),
   }
 }
 
@@ -366,4 +424,6 @@ export default connect(mapStateToProps, {
   setPaceItemsDurationFromTimeToComplete: coursePaceActions.setPaceItemsDurationFromTimeToComplete,
   setStartDate: coursePaceActions.setStartDate,
   setTimeToCompleteCalendarDaysFromItems: coursePaceActions.setTimeToCompleteCalendarDaysFromItems,
+  compressDates: coursePaceActions.compressDates,
+  uncompressDates: coursePaceActions.uncompressDates,
 })(TimeSelection)
