@@ -120,4 +120,39 @@ describe Accessibility::Rules::ImgAltLengthRule do
       expect(result).to eq(generated_alt)
     end
   end
+
+  context "when generating issue preview" do
+    it "returns styled HTML for img elements" do
+      long_alt = "This is an extremely long description" * 10
+      input_html = "<div><img id=\"test-img\" src=\"image.jpg\" alt=\"#{long_alt}\"></div>"
+      document = Nokogiri::HTML.fragment(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      img_element = document.at_css("img")
+      rule = Accessibility::Rules::ImgAltLengthRule.new
+
+      result = rule.issue_preview(img_element)
+
+      expect(result).not_to be_nil
+      expect(result).to include("display: flex")
+      expect(result).to include("justify-content: center")
+      expect(result).to include("align-items: center")
+      expect(result).to include("max-width: 100%")
+      expect(result).to include("max-height: 100%")
+      expect(result).to include("object-fit: contain")
+      expect(result).to include('id="test-img"')
+      expect(result).to include('src="image.jpg"')
+    end
+
+    it "returns nil for non-img elements" do
+      input_html = '<div id="test-div">Some content</div>'
+      document = Nokogiri::HTML.fragment(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      div_element = document.at_css("div")
+      rule = Accessibility::Rules::ImgAltLengthRule.new
+
+      result = rule.issue_preview(div_element)
+
+      expect(result).to be_nil
+    end
+  end
 end
