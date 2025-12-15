@@ -74,8 +74,8 @@ describe('BreakdownGraph', () => {
       grading_scheme: null,
     },
     isLoading: false,
-    selectRange: jest.fn(),
-    openSidebar: jest.fn(),
+    selectRange: vi.fn(),
+    openSidebar: vi.fn(),
     ...overrides,
   })
 

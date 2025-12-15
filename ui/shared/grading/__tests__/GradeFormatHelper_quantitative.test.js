@@ -47,11 +47,11 @@ describe('GradeFormatHelper.formatGrade() with Restrict_quantitative_data', () =
     GradeFormatHelper.formatGrade(grade, options)
 
   beforeEach(() => {
-    jest.spyOn(numberHelper, 'validate').mockImplementation(val => !Number.isNaN(parseFloat(val)))
+    vi.spyOn(numberHelper, 'validate').mockImplementation(val => !Number.isNaN(parseFloat(val)))
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('returns the set grade value if it is already a letter_grade', () => {

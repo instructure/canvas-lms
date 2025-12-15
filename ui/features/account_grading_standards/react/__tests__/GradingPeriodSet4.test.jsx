@@ -18,19 +18,18 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
-import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
 import GradingPeriodSet from '../GradingPeriodSet'
 import gradingPeriodsApi from '@canvas/grading/jquery/gradingPeriodsApi'
 import axios from '@canvas/axios'
 
-jest.mock('@canvas/grading/jquery/gradingPeriodsApi')
-jest.mock('@canvas/axios')
+vi.mock('@canvas/grading/jquery/gradingPeriodsApi')
+vi.mock('@canvas/axios')
 
 // Mock jQuery functions
 const $ = {
-  flashMessage: jest.fn(),
-  flashError: jest.fn(),
+  flashMessage: vi.fn(),
+  flashError: vi.fn(),
 }
 global.$ = $
 
@@ -39,9 +38,9 @@ describe('GradingPeriodSet - Form Validation and Accessibility', () => {
   let windowConfirmMock
 
   beforeEach(() => {
-    windowConfirmMock = jest.spyOn(window, 'confirm').mockImplementation(() => true)
-    gradingPeriodsApi.batchUpdate = jest.fn().mockResolvedValue([])
-    axios.delete = jest.fn().mockResolvedValue({})
+    windowConfirmMock = vi.spyOn(window, 'confirm').mockImplementation(() => true)
+    gradingPeriodsApi.batchUpdate = vi.fn().mockResolvedValue([])
+    axios.delete = vi.fn().mockResolvedValue({})
     $.flashMessage.mockReset()
     $.flashError.mockReset()
 
@@ -72,10 +71,10 @@ describe('GradingPeriodSet - Form Validation and Accessibility', () => {
         displayTotalsForAllGradingPeriods: false,
       },
       terms: [],
-      onEdit: jest.fn(),
-      onDelete: jest.fn(),
-      onPeriodsChange: jest.fn(),
-      onToggleBody: jest.fn(),
+      onEdit: vi.fn(),
+      onDelete: vi.fn(),
+      onPeriodsChange: vi.fn(),
+      onToggleBody: vi.fn(),
       gradingPeriods: [
         {
           id: '1',

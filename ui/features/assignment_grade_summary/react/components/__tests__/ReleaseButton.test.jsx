@@ -30,7 +30,7 @@ import ReleaseButton from '../ReleaseButton'
 describe('GradeSummary ReleaseButton', () => {
   const props = {
     gradesReleased: false,
-    onClick: jest.fn(),
+    onClick: vi.fn(),
     releaseGradesStatus: null,
   }
 

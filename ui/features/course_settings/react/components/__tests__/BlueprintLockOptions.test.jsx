@@ -43,7 +43,7 @@ const defaultProps = {
 
 describe('BlueprintLockOptions', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the blueprint checkbox', () => {

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {AssignmentSection, AssignmentSectionProps} from '../AssignmentSection'
 
@@ -32,12 +32,16 @@ describe('AssignmentSection', () => {
     },
     hasPrevious: true,
     hasNext: true,
-    onPrevious: jest.fn(),
-    onNext: jest.fn(),
+    onPrevious: vi.fn(),
+    onNext: vi.fn(),
   }
 
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders assignment name as a link', () => {
@@ -72,7 +76,7 @@ describe('AssignmentSection', () => {
 
   it('calls onPrevious when previous button is clicked', async () => {
     const user = userEvent.setup()
-    const onPrevious = jest.fn()
+    const onPrevious = vi.fn()
     render(<AssignmentSection {...defaultProps} onPrevious={onPrevious} />)
 
     await user.click(screen.getByTestId('previous-button'))
@@ -81,7 +85,7 @@ describe('AssignmentSection', () => {
 
   it('calls onNext when next button is clicked', async () => {
     const user = userEvent.setup()
-    const onNext = jest.fn()
+    const onNext = vi.fn()
     render(<AssignmentSection {...defaultProps} onNext={onNext} />)
 
     await user.click(screen.getByTestId('next-button'))

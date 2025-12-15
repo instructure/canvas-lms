@@ -27,7 +27,7 @@ import PropTypes from 'prop-types'
 describe('existingAttachedAssetProcessorFromGraphql', () => {
   function testMatchesPropTypesShape(graphqlData: ExistingAttachedAssetProcessorGraphql) {
     // mock console.error:
-    jest.spyOn(console, 'error').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
     try {
       // Validate that the test data matches the expected GraphQL PropTypes shape
       PropTypes.checkPropTypes(

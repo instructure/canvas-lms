@@ -40,10 +40,10 @@ const defaultProps: HeaderProps = {
   blueprintLocked: false,
   isDraftPace: false,
   isSyncing: false,
-  fetchDefaultPaceContext: jest.fn(),
-  setDefaultPaceContextAsSelected: jest.fn(),
-  setSelectedPaceContext: jest.fn(),
-  syncUnpublishedChanges: jest.fn(),
+  fetchDefaultPaceContext: vi.fn(),
+  setDefaultPaceContextAsSelected: vi.fn(),
+  setSelectedPaceContext: vi.fn(),
+  syncUnpublishedChanges: vi.fn(),
 }
 
 const server = setupServer()
@@ -63,7 +63,7 @@ describe('Course paces header', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     server.resetHandlers()
   })
 

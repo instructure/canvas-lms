@@ -32,7 +32,7 @@ import {
 } from '../graphql/Management'
 import {defaultRatings, defaultMasteryPoints} from '../react/hooks/useRatings'
 import {flattenDeep, pick, uniq} from 'es-toolkit/compat'
-import {jest} from '@jest/globals'
+import {vi} from 'vitest'
 
 const testRatings = defaultRatings.map(rating => pick(rating, ['description', 'points']))
 
@@ -885,7 +885,7 @@ export const groupDetailMocks = ({
           targetGroupId,
         },
       },
-      newData: jest.fn(() => {
+      newData: vi.fn(() => {
         if (!wasFetchedOnce) {
           wasFetchedOnce = true
 

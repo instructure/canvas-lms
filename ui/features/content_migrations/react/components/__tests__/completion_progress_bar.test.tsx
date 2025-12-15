@@ -25,7 +25,7 @@ const renderComponent = (overrideProps?: any) =>
 
 describe('CompletionProgressBar', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders with proper progress', async () => {

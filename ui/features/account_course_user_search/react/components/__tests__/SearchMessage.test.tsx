@@ -36,7 +36,7 @@ interface Collection {
 
 interface Props {
   collection: Collection
-  setPage: jest.Mock
+  setPage: any
   noneFoundMessage: string
   knownLastPage?: string
 }
@@ -51,7 +51,7 @@ function defaultProps(): Props {
         last: {url: 'abc10', page: '10'},
       },
     },
-    setPage: jest.fn(),
+    setPage: vi.fn(),
     noneFoundMessage: 'None found!',
   }
 }

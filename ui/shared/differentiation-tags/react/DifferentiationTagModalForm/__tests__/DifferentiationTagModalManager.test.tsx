@@ -23,17 +23,17 @@ import type {DifferentiationTagModalManagerProps} from '../DifferentiationTagMod
 import {useDifferentiationTagCategoriesIndex} from '../../hooks/useDifferentiationTagCategoriesIndex'
 import DifferentiationTagModalForm from '../DifferentiationTagModalForm'
 
-jest.mock('../../hooks/useDifferentiationTagCategoriesIndex', () => ({
-  useDifferentiationTagCategoriesIndex: jest.fn(),
+vi.mock('../../hooks/useDifferentiationTagCategoriesIndex', () => ({
+  useDifferentiationTagCategoriesIndex: vi.fn(),
 }))
 
-jest.mock('../DifferentiationTagModalForm', () => ({
+vi.mock('../DifferentiationTagModalForm', () => ({
   __esModule: true,
-  default: jest.fn(() => null),
+  default: vi.fn(() => null),
 }))
 
 describe('DifferentiationTagModalManager', () => {
-  const onCloseMock = jest.fn()
+  const onCloseMock = vi.fn()
   const defaultProps: DifferentiationTagModalManagerProps = {
     isOpen: true,
     onClose: onCloseMock,
@@ -49,13 +49,13 @@ describe('DifferentiationTagModalManager', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     const mockUseDifferentiationTagCategoriesIndex =
-      useDifferentiationTagCategoriesIndex as jest.Mock
+      useDifferentiationTagCategoriesIndex as any
     mockUseDifferentiationTagCategoriesIndex.mockReturnValue({data: undefined})
 
-    const mockDifferentiationTagModalForm = DifferentiationTagModalForm as jest.Mock
+    const mockDifferentiationTagModalForm = DifferentiationTagModalForm as any
     mockDifferentiationTagModalForm.mockClear()
   })
 
@@ -73,7 +73,7 @@ describe('DifferentiationTagModalManager', () => {
         {id: 123, name: 'Category 123', extraField: 'ignore'},
         {id: 456, name: 'Category 456', extraField: 'ignore'},
       ]
-      const mockFn = useDifferentiationTagCategoriesIndex as jest.Mock
+      const mockFn = useDifferentiationTagCategoriesIndex as any
       mockFn.mockReturnValue({data: mockCategories})
       renderComponent({mode: 'edit', differentiationTagCategoryId: 123})
 
@@ -96,7 +96,7 @@ describe('DifferentiationTagModalManager', () => {
         {id: 202, name: 'Category 202', groups: ['groupC', 'groupD']},
       ]
 
-      const mockFn = useDifferentiationTagCategoriesIndex as jest.Mock
+      const mockFn = useDifferentiationTagCategoriesIndex as any
       mockFn.mockReturnValue({data: mockCategories})
 
       renderComponent({mode: 'edit', differentiationTagCategoryId: 101})
@@ -123,7 +123,7 @@ describe('DifferentiationTagModalManager', () => {
         {id: 456, name: 'Category 456'},
       ]
 
-      const mockFn = useDifferentiationTagCategoriesIndex as jest.Mock
+      const mockFn = useDifferentiationTagCategoriesIndex as any
       mockFn.mockReturnValue({data: mockCategories})
 
       renderComponent({mode: 'edit', differentiationTagCategoryId: 123})
@@ -145,7 +145,7 @@ describe('DifferentiationTagModalManager', () => {
   describe('create mode', () => {
     it('does not pass a tag set to the form', () => {
       const mockCategories = [{id: 789, name: 'Category 789'}]
-      const mockFn = useDifferentiationTagCategoriesIndex as jest.Mock
+      const mockFn = useDifferentiationTagCategoriesIndex as any
       mockFn.mockReturnValue({data: mockCategories})
 
       renderComponent({mode: 'create'})
@@ -163,7 +163,7 @@ describe('DifferentiationTagModalManager', () => {
 
   it('passes common props (isOpen and onClose) to the form', () => {
     const mockCategories = [{id: 111, name: 'Category 111'}]
-    const mockFn = useDifferentiationTagCategoriesIndex as jest.Mock
+    const mockFn = useDifferentiationTagCategoriesIndex as any
     mockFn.mockReturnValue({data: mockCategories})
 
     renderComponent({isOpen: false, onClose: onCloseMock})

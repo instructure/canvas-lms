@@ -20,14 +20,15 @@ import React from 'react'
 import {renderHook, act} from '@testing-library/react-hooks'
 import {waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {type MockedFunction} from 'vitest'
 import {useOutcomes} from '../useOutcomes'
 import {executeQuery} from '@canvas/graphql'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/graphql')
+vi.mock('@canvas/graphql')
 
-const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+const mockExecuteQuery = executeQuery as MockedFunction<typeof executeQuery>
 
 const server = setupServer()
 
@@ -126,12 +127,12 @@ describe('useOutcomes', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
     server.resetHandlers()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('with provided groupId', () => {

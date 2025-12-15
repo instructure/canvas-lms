@@ -53,8 +53,8 @@ describe('SpeedGrader PostPolicies', () => {
       {id: '2001', name: 'Hogwarts'},
       {id: '2002', name: 'Freshmen'},
     ]
-    afterUpdateSubmission = jest.fn()
-    updateSubmission = jest.fn()
+    afterUpdateSubmission = vi.fn()
+    updateSubmission = vi.fn()
     postPolicies = new PostPolicies({
       afterUpdateSubmission,
       assignment: expectedAssignment(),
@@ -103,7 +103,7 @@ describe('SpeedGrader PostPolicies', () => {
     }
 
     beforeEach(() => {
-      jest.spyOn(postPolicies._hideAssignmentGradesTray, 'show').mockImplementation(() => {})
+      vi.spyOn(postPolicies._hideAssignmentGradesTray, 'show').mockImplementation(() => {})
     })
 
     test('calls "show" for the "Hide Assignment Grades" tray', () => {
@@ -157,7 +157,7 @@ describe('SpeedGrader PostPolicies', () => {
     })
 
     test('onHidden does not reload the page when assignment anonymousGrading is false', () => {
-      const reloadStub = jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
+      const reloadStub = vi.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
       const submissionsMap = {
         1: {posted_at: new Date().toISOString()},
       }
@@ -169,7 +169,7 @@ describe('SpeedGrader PostPolicies', () => {
     })
 
     test('onHidden reloads the page when assignment anonymousGrading is true', () => {
-      const reloadStub = jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
+      const reloadStub = vi.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
       const submissionsMap = {
         1: {posted_at: new Date().toISOString()},
       }
@@ -198,7 +198,7 @@ describe('SpeedGrader PostPolicies', () => {
     }
 
     beforeEach(() => {
-      jest.spyOn(postPolicies._postAssignmentGradesTray, 'show').mockImplementation(() => {})
+      vi.spyOn(postPolicies._postAssignmentGradesTray, 'show').mockImplementation(() => {})
     })
 
     test('calls "show" for the "Post Assignment Grades" tray', () => {
@@ -269,7 +269,7 @@ describe('SpeedGrader PostPolicies', () => {
     })
 
     test('onPosted does not reload the page when assignment anonymousGrading is false', () => {
-      const reloadStub = jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
+      const reloadStub = vi.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
       const submissionsMap = {
         1: {posted_at: null},
       }
@@ -282,7 +282,7 @@ describe('SpeedGrader PostPolicies', () => {
     })
 
     test('onPosted reloads the page when assignment anonymousGrading is true', () => {
-      const reloadStub = jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
+      const reloadStub = vi.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
       const submissionsMap = {
         1: {posted_at: null},
       }

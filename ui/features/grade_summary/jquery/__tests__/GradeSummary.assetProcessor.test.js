@@ -30,8 +30,8 @@ import {ZUseCourseAssignmentsAssetReportsParams} from '@canvas/lti-asset-process
 
 const I18n = createI18nScope('gradebooks')
 
-jest.mock('@canvas/lti-asset-processor/react/util/renderToElements', () => ({
-  renderAPComponent: jest.fn(),
+vi.mock('@canvas/lti-asset-processor/react/util/renderToElements', () => ({
+  renderAPComponent: vi.fn(),
 }))
 
 describe('GradeSummary - Asset Processor functionality', () => {

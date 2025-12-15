@@ -22,7 +22,7 @@ import $ from 'jquery'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
-jest.mock('@canvas/upload-file')
+vi.mock('@canvas/upload-file')
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedProvider} from '@apollo/client/testing'
 import React from 'react'
@@ -57,8 +57,8 @@ if (typeof vi !== 'undefined') {
   }
   vi.stubGlobal('URL', MockURL)
 } else {
-  global.URL.createObjectURL = jest.fn(file => `mock-url-for-${file.name}`)
-  global.URL.revokeObjectURL = jest.fn()
+  global.URL.createObjectURL = vi.fn(file => `mock-url-for-${file.name}`)
+  global.URL.revokeObjectURL = vi.fn()
 }
 
 async function mockSubmissionCommentQuery() {
@@ -113,8 +113,8 @@ describe('CommentTextArea', () => {
   })
 
   beforeEach(() => {
-    mockedSetOnFailure = jest.fn().mockResolvedValue({})
-    mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+    mockedSetOnFailure = vi.fn().mockResolvedValue({})
+    mockedSetOnSuccess = vi.fn().mockResolvedValue({})
   })
 
   const uploadFiles = (element, files) => {
@@ -130,7 +130,7 @@ describe('CommentTextArea', () => {
     let mediaObject
 
     beforeEach(() => {
-      createSubmissionComment = jest.fn()
+      createSubmissionComment = vi.fn()
       mediaObject = {
         id: 1,
         name: 'Never Gonna Give You Up',
@@ -285,7 +285,7 @@ describe('CommentTextArea', () => {
     uploadFiles(fileInput, [file])
 
     const uploadButton = container.querySelector('button[id="attachmentFileButton"]')
-    jest.spyOn(uploadButton, 'focus')
+    vi.spyOn(uploadButton, 'focus')
 
     const button = container.querySelector(`button[id="${file.id}"]`)
     expect(button).toContainElement(getByText(`Remove ${file.name}`))
@@ -311,7 +311,7 @@ describe('CommentTextArea', () => {
     uploadFiles(fileInput, files)
 
     const nextFile = container.querySelector(`button[id="${files[1].id}"]`)
-    jest.spyOn(nextFile, 'focus')
+    vi.spyOn(nextFile, 'focus')
 
     const firstFile = container.querySelector(`button[id="${files[0].id}"]`)
     expect(firstFile).toContainElement(getByText(`Remove ${files[0].name}`))
@@ -337,7 +337,7 @@ describe('CommentTextArea', () => {
     uploadFiles(fileInput, files)
 
     const prevFile = container.querySelector(`button[id="${files[0].id}"]`)
-    jest.spyOn(prevFile, 'focus')
+    vi.spyOn(prevFile, 'focus')
 
     const currFile = container.querySelector(`button[id="${files[1].id}"]`)
     expect(currFile).toContainElement(getByText(`Remove ${files[1].name}`))
@@ -383,9 +383,8 @@ describe('CommentTextArea', () => {
 
   // LS-1339 created to figure out why this is failing
   // since updating @instructure/ui-media-player to v7
-
+  // TODO: Fix in EVAL-2482
   it.skip('notifies users when a submission comments with files is sent', async () => {
-    // unskip in EVAL-2482
     const mockedFunctionPlacedholder = uploadFileModule.submissionCommentAttachmentsUpload
     uploadFileModule.submissionCommentAttachmentsUpload = () => [
       {id: '1', name: 'awesome-test-image1.png'},
@@ -430,9 +429,8 @@ describe('CommentTextArea', () => {
 
   // LS-1339 created to figure out why this is failing
   // since updating @instructure/ui-media-player to v7
-
+  // TODO: Fix in EVAL-2482
   it.skip('users cannot send submission comments with not files or text', async () => {
-    // unskip in EVAL-2482
     const mockedFunctionPlacedholder = uploadFileModule.submissionCommentAttachmentsUpload
     uploadFileModule.submissionCommentAttachmentsUpload = () => [
       {id: '1', name: 'awesome-test-image1.png'},
@@ -461,9 +459,8 @@ describe('CommentTextArea', () => {
 
   // LS-1339 created to figure out why this is failing
   // since updating @instructure/ui-media-player to v7
-
+  // TODO: Fix in EVAL-2482
   it.skip('notifies users of error when file fails to upload', async () => {
-    // unskip in EVAL-2482
     const mockedFunctionPlacedholder = uploadFileModule.submissionCommentAttachmentsUpload
     uploadFileModule.submissionCommentAttachmentsUpload = () => {
       throw new Error('Error uploading file to canvas API')

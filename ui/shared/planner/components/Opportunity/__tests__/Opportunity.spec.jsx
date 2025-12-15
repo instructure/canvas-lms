@@ -40,7 +40,7 @@ function defaultProps(options = {}) {
 
 it('calls the onClick prop when dismissed is clicked', async () => {
   const tempProps = defaultProps()
-  tempProps.dismiss = jest.fn()
+  tempProps.dismiss = vi.fn()
   const wrapper = render(<Opportunity {...tempProps} />)
   const dismissButton = wrapper
     .getByText('Dismiss this is a description about the opportunity')
@@ -108,8 +108,8 @@ it('renders a Pill if in the past', () => {
 })
 
 it('registers itself as animatable', () => {
-  const fakeRegister = jest.fn()
-  const fakeDeregister = jest.fn()
+  const fakeRegister = vi.fn()
+  const fakeDeregister = vi.fn()
   const ref = React.createRef()
   const wrapper = render(
     <Opportunity

@@ -70,7 +70,7 @@ const object = {
     if (wrappers['*']) {
       options.wrapper = wrappers
     }
-    if (typeof this !== 'undefined' && !(this instanceof Window)) {
+    if (typeof this !== 'undefined' && (typeof Window === 'undefined' || !(this instanceof Window))) {
       for (key of Array.from(this)) {
         options[key] = this[key]
       }

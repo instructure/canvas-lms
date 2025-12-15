@@ -136,7 +136,7 @@ describe('useCreatePlannerNote', () => {
       },
     })
 
-    const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries')
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
 
     const wrapper = ({children}: {children: ReactNode}) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

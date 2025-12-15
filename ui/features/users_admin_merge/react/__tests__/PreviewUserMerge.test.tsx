@@ -33,8 +33,8 @@ describe('PreviewUserMerge', () => {
     currentUserId: '1',
     sourceUserId: sourceUser.id,
     destinationUserId: destinationUser.id,
-    onSwap: jest.fn(),
-    onStartOver: jest.fn(),
+    onSwap: vi.fn(),
+    onStartOver: vi.fn(),
   }
   const MERGE_USERS_URL = `/api/v1/users/${sourceUser.id}/merge_into/${destinationUser.id}`
 

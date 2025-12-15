@@ -28,17 +28,17 @@ import {
   OutcomeArrangement,
 } from '../../utils/constants'
 
-jest.mock('../../apiClient')
+vi.mock('../../apiClient')
 
 describe('useGradebookSettings', () => {
   const courseId = '123'
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('loads settings successfully', async () => {
@@ -48,7 +48,7 @@ describe('useGradebookSettings', () => {
       show_students_with_no_results: true,
       show_outcomes_with_no_results: true,
     }
-    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+    vi.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -70,7 +70,7 @@ describe('useGradebookSettings', () => {
   })
 
   it('sets default settings on error', async () => {
-    jest
+    vi
       .spyOn(apiClient, 'loadLearningMasteryGradebookSettings')
       .mockRejectedValue(new Error('fail'))
     const {result, waitForNextUpdate} = renderHook(() => useGradebookSettings(courseId))
@@ -81,7 +81,7 @@ describe('useGradebookSettings', () => {
   })
 
   it('sets default settings if response is missing settings', async () => {
-    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+    vi.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -99,7 +99,7 @@ describe('useGradebookSettings', () => {
       secondary_info_display: SecondaryInfoDisplay.SIS_ID,
       show_student_avatars: false,
     }
-    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+    vi.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -121,7 +121,7 @@ describe('useGradebookSettings', () => {
     const mockSettings = {
       secondary_info_display: SecondaryInfoDisplay.SIS_ID,
     }
-    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+    vi.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -143,7 +143,7 @@ describe('useGradebookSettings', () => {
       show_student_avatars: true,
       show_students_with_no_results: true,
     }
-    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+    vi.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -166,7 +166,7 @@ describe('useGradebookSettings', () => {
       show_students_with_no_results: true,
       name_display_format: NameDisplayFormat.LAST_FIRST,
     }
-    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+    vi.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -188,7 +188,7 @@ describe('useGradebookSettings', () => {
       show_student_avatars: true,
       show_students_with_no_results: true,
     }
-    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+    vi.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -213,7 +213,7 @@ describe('useGradebookSettings', () => {
       show_students_with_no_results: true,
       score_display_format: ScoreDisplayFormat.ICON_AND_POINTS,
     }
-    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+    vi.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -235,7 +235,7 @@ describe('useGradebookSettings', () => {
       show_student_avatars: true,
       show_students_with_no_results: true,
     }
-    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+    vi.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -260,7 +260,7 @@ describe('useGradebookSettings', () => {
       show_students_with_no_results: true,
       outcome_arrangement: OutcomeArrangement.CUSTOM,
     }
-    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+    vi.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -282,7 +282,7 @@ describe('useGradebookSettings', () => {
       show_student_avatars: true,
       show_students_with_no_results: true,
     }
-    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+    vi.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -352,7 +352,7 @@ describe('useGradebookSettings', () => {
   })
 
   it('updateSettings updates settings', async () => {
-    jest.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
+    vi.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockResolvedValue({
       status: 200,
       statusText: 'OK',
       headers: {},

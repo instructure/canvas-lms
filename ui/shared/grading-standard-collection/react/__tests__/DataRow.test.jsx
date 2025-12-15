@@ -35,11 +35,11 @@ describe('DataRow not being edited, without a sibling', () => {
     row: ['A', 92.346],
     editing: false,
     round: number => Math.round(number * 100) / 100,
-    onRowMinScoreChange: jest.fn(),
+    onRowMinScoreChange: vi.fn(),
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders in "view" mode', () => {
@@ -69,13 +69,13 @@ describe('DataRow being edited', () => {
     row: ['A', 92.346],
     editing: true,
     round: number => Math.round(number * 100) / 100,
-    onRowMinScoreChange: jest.fn(),
-    onRowNameChange: jest.fn(),
-    onDeleteRow: jest.fn(),
+    onRowMinScoreChange: vi.fn(),
+    onRowNameChange: vi.fn(),
+    onDeleteRow: vi.fn(),
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders in "edit" mode', () => {
@@ -120,7 +120,7 @@ describe('DataRow being edited', () => {
   })
 
   it('does not call onRowMinScoreChange if input value is less than 0', async () => {
-    const mockOnRowMinScoreChange = jest.fn()
+    const mockOnRowMinScoreChange = vi.fn()
     const props = {...defaultProps, onRowMinScoreChange: mockOnRowMinScoreChange}
     const user = userEvent.setup()
     const {getByTestId} = renderInTable(<DataRow key={0} {...props} />)
@@ -134,7 +134,7 @@ describe('DataRow being edited', () => {
   })
 
   it('does not call onRowMinScoreChange if input value is greater than 100', async () => {
-    const mockOnRowMinScoreChange = jest.fn()
+    const mockOnRowMinScoreChange = vi.fn()
     const props = {...defaultProps, onRowMinScoreChange: mockOnRowMinScoreChange}
     const user = userEvent.setup()
     const {getByTestId} = renderInTable(<DataRow key={0} {...props} />)
@@ -197,7 +197,7 @@ describe('DataRow with a sibling', () => {
     siblingRow: ['A', 92.346],
     editing: false,
     round: number => Math.round(number * 100) / 100,
-    onRowMinScoreChange: jest.fn(),
+    onRowMinScoreChange: vi.fn(),
   }
 
   it("shows the max score as the sibling's min score", () => {

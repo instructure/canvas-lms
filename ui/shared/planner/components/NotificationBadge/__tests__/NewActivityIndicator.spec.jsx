@@ -30,8 +30,8 @@ it('renders indicator with correct props', () => {
 })
 
 it('registers itself as animatable', () => {
-  const fakeRegister = jest.fn()
-  const fakeDeregister = jest.fn()
+  const fakeRegister = vi.fn()
+  const fakeDeregister = vi.fn()
   const ref = React.createRef()
   const {rerender} = render(
     <NewActivityIndicator

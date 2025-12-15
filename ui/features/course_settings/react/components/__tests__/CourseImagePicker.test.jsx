@@ -35,22 +35,22 @@ describe('CourseImagePicker Component', () => {
     })
 
     // Mock jQuery's flashError function to prevent the test from failing
-    $.flashError = jest.fn()
+    $.flashError = vi.fn()
   })
 
   afterEach(() => {
     fakeENV.teardown(oldEnv)
 
     // Clean up jQuery mocks
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   const renderComponent = (props = {}) => {
-    return render(<CourseImagePicker courseId="101" handleFileUpload={jest.fn()} {...props} />)
+    return render(<CourseImagePicker courseId="101" handleFileUpload={vi.fn()} {...props} />)
   }
 
   it('calls the handleFileUpload prop when an image is selected', async () => {
-    const handleFileUpload = jest.fn()
+    const handleFileUpload = vi.fn()
     const {getByTestId} = renderComponent({handleFileUpload})
 
     const file = new File(['test image'], 'image.jpg', {type: 'image/jpeg'})
@@ -70,7 +70,7 @@ describe('CourseImagePicker Component', () => {
   })
 
   it('shows an error message when a non-image file is dropped', async () => {
-    const handleFileUpload = jest.fn()
+    const handleFileUpload = vi.fn()
     const {getByTestId, findByText} = renderComponent({handleFileUpload})
 
     const file = new File(['test file'], 'test.txt', {type: 'text/plain'})

@@ -22,10 +22,13 @@ import {FAKE_COURSE_FOLDER, FAKE_USER_FOLDER} from '../../fixtures/fakeData'
 import {type Folder} from '../../interfaces/File'
 import {resetFilesEnv} from '../filesEnvUtils'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  ...jest.requireActual('@canvas/util/globalUtils'),
-  windowPathname: jest.fn(),
-}))
+vi.mock('@canvas/util/globalUtils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@canvas/util/globalUtils')>()
+  return {
+    ...actual,
+    windowPathname: vi.fn(),
+  }
+})
 
 describe('generateUrlPath', () => {
   let courseFolder: Folder, userFolder: Folder
@@ -37,12 +40,12 @@ describe('generateUrlPath', () => {
 
   describe('when showing all contexts', () => {
     beforeAll(() => {
-      ;(windowPathname as jest.Mock).mockReturnValue('/files/')
+      ;(windowPathname as ReturnType<typeof vi.fn>).mockReturnValue('/files/')
     })
 
     afterAll(() => {
       resetFilesEnv()
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
 
     it('returns the correct path for a course folder', () => {
@@ -58,12 +61,12 @@ describe('generateUrlPath', () => {
 
   describe('when not showing all contexts', () => {
     beforeAll(() => {
-      ;(windowPathname as jest.Mock).mockReturnValue('/')
+      ;(windowPathname as ReturnType<typeof vi.fn>).mockReturnValue('/')
     })
 
     afterAll(() => {
       resetFilesEnv()
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
 
     it('returns the correct path for a course folder', () => {

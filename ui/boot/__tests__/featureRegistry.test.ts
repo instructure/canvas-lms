@@ -19,8 +19,8 @@
 import type {FeatureConfig, FeatureLifecycle} from '../featureRegistry'
 
 const createMockLifecycle = (overrides: Partial<FeatureLifecycle> = {}): FeatureLifecycle => ({
-  mount: jest.fn(),
-  unmount: jest.fn(),
+  mount: vi.fn(),
+  unmount: vi.fn(),
   ...overrides,
 })
 
@@ -33,7 +33,7 @@ const createMockConfig = (overrides: Partial<FeatureConfig> = {}): FeatureConfig
 describe('FeatureRegistry', () => {
   beforeEach(() => {
     // Reset the registry before each test by re-importing
-    jest.resetModules()
+    vi.resetModules()
     // Clear any existing CANVAS object
     delete (window as any).CANVAS
   })
@@ -50,7 +50,7 @@ describe('FeatureRegistry', () => {
     })
 
     it('ignores duplicate registration with same name', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       await import('../featureRegistry')
 
       window.CANVAS.registerFeature(createMockConfig({name: 'dup-feature'}))
@@ -68,7 +68,7 @@ describe('FeatureRegistry', () => {
     it('mounts feature immediately if startFeatures already called', async () => {
       await import('../featureRegistry')
 
-      const mountFn = jest.fn()
+      const mountFn = vi.fn()
       await window.CANVAS.startFeatures()
 
       window.CANVAS.registerFeature(
@@ -89,8 +89,8 @@ describe('FeatureRegistry', () => {
     it('mounts all registered features', async () => {
       await import('../featureRegistry')
 
-      const mount1 = jest.fn()
-      const mount2 = jest.fn()
+      const mount1 = vi.fn()
+      const mount2 = vi.fn()
 
       window.CANVAS.registerFeature(
         createMockConfig({
@@ -115,10 +115,10 @@ describe('FeatureRegistry', () => {
       await import('../featureRegistry')
 
       const callOrder: string[] = []
-      const bootstrap = jest.fn(() => {
+      const bootstrap = vi.fn(() => {
         callOrder.push('bootstrap')
       })
-      const mount = jest.fn(() => {
+      const mount = vi.fn(() => {
         callOrder.push('mount')
       })
 
@@ -137,7 +137,7 @@ describe('FeatureRegistry', () => {
     it('only calls bootstrap once even if mount is called multiple times', async () => {
       await import('../featureRegistry')
 
-      const bootstrap = jest.fn()
+      const bootstrap = vi.fn()
 
       window.CANVAS.registerFeature(
         createMockConfig({
@@ -156,7 +156,7 @@ describe('FeatureRegistry', () => {
     it('does not mount feature when activeWhen returns false', async () => {
       await import('../featureRegistry')
 
-      const mount = jest.fn()
+      const mount = vi.fn()
 
       window.CANVAS.registerFeature(
         createMockConfig({
@@ -174,7 +174,7 @@ describe('FeatureRegistry', () => {
     it('mounts feature when activeWhen returns true', async () => {
       await import('../featureRegistry')
 
-      const mount = jest.fn()
+      const mount = vi.fn()
 
       window.CANVAS.registerFeature(
         createMockConfig({
@@ -194,8 +194,8 @@ describe('FeatureRegistry', () => {
     it('does not mount overridden feature', async () => {
       await import('../featureRegistry')
 
-      const originalMount = jest.fn()
-      const overrideMount = jest.fn()
+      const originalMount = vi.fn()
+      const overrideMount = vi.fn()
 
       window.CANVAS.registerFeature(
         createMockConfig({
@@ -218,10 +218,10 @@ describe('FeatureRegistry', () => {
     })
 
     it('warns when trying to override already mounted feature', async () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
       await import('../featureRegistry')
 
-      const originalMount = jest.fn()
+      const originalMount = vi.fn()
 
       // Register and start features with just the original
       window.CANVAS.registerFeature(
@@ -257,7 +257,7 @@ describe('FeatureRegistry', () => {
       container.id = 'test-slot'
       document.body.appendChild(container)
 
-      const mount = jest.fn()
+      const mount = vi.fn()
 
       window.CANVAS.registerFeature(
         createMockConfig({
@@ -275,10 +275,10 @@ describe('FeatureRegistry', () => {
     })
 
     it('warns and does not mount when slot element not found', async () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
       await import('../featureRegistry')
 
-      const mount = jest.fn()
+      const mount = vi.fn()
 
       window.CANVAS.registerFeature(
         createMockConfig({
@@ -300,7 +300,7 @@ describe('FeatureRegistry', () => {
       await import('../featureRegistry')
 
       const container = document.createElement('div')
-      const mount = jest.fn()
+      const mount = vi.fn()
 
       window.CANVAS.registerFeature(
         createMockConfig({
@@ -318,7 +318,7 @@ describe('FeatureRegistry', () => {
 
   describe('error handling', () => {
     it('catches and logs errors during mount', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       await import('../featureRegistry')
 
       const error = new Error('Mount failed')

@@ -21,7 +21,7 @@ import {BlockContentEditor} from '../BlockContentEditor'
 
 describe('BlockContentEditor', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('does not break when onInit is null', () => {

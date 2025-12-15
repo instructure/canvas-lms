@@ -117,7 +117,7 @@ describe('ModeratedGradingFormFieldGroup', () => {
     test('calls onModeratedGradingChange when the checkbox is checked', async () => {
       const user = userEvent.setup()
       props.moderatedGradingEnabled = false
-      props.onModeratedGradingChange = jest.fn()
+      props.onModeratedGradingChange = vi.fn()
       mountComponent()
       await user.click(moderatedGradingCheckbox())
       expect(props.onModeratedGradingChange).toHaveBeenCalledTimes(1)
@@ -125,7 +125,7 @@ describe('ModeratedGradingFormFieldGroup', () => {
 
     test('calls onModeratedGradingChange when the checkbox is unchecked', async () => {
       const user = userEvent.setup()
-      props.onModeratedGradingChange = jest.fn()
+      props.onModeratedGradingChange = vi.fn()
       mountComponent()
       await user.click(moderatedGradingCheckbox())
       expect(props.onModeratedGradingChange).toHaveBeenCalledTimes(1)

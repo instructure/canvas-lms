@@ -25,9 +25,9 @@ import * as StudentActions from '../../students/StudentActions'
 import GradersTable from '../GradersTable/index'
 import configureStore from '../../configureStore'
 
-jest.mock('../../grades/GradeActions', () => ({
-  ...jest.requireActual('../../grades/GradeActions'),
-  acceptGraderGrades: jest.fn(),
+vi.mock('../../grades/GradeActions', async () => ({
+  ...(await vi.importActual('../../grades/GradeActions')),
+  acceptGraderGrades: vi.fn(),
 }))
 
 describe('GradeSummary GradersTable', () => {
@@ -37,7 +37,7 @@ describe('GradeSummary GradersTable', () => {
   let wrapper
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     storeEnv = {
       assignment: {
         courseId: '1201',

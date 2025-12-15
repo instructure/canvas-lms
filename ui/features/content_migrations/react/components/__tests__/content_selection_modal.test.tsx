@@ -65,7 +65,7 @@ describe('ContentSelectionModal', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     server.resetHandlers()
   })
 
@@ -173,7 +173,7 @@ describe('ContentSelectionModal', () => {
 
     it('calls updateMigrationItem', async () => {
       window.ENV.current_user_id = '3'
-      const updateMigrationItem = jest.fn()
+      const updateMigrationItem = vi.fn()
       renderComponent({updateMigrationItem})
       expect(updateMigrationItem).not.toHaveBeenCalled()
 

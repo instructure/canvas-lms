@@ -22,12 +22,15 @@ import {useLazyQuery} from '@apollo/client'
 import {useFetchAllPages} from '../useFetchAllPages'
 
 // Mock Apollo Client
-jest.mock('@apollo/client', () => ({
-  ...jest.requireActual('@apollo/client'),
-  useLazyQuery: jest.fn(),
-}))
+vi.mock('@apollo/client', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@apollo/client')>()
+  return {
+    ...actual,
+    useLazyQuery: vi.fn(),
+  }
+})
 
-const mockUseLazyQuery = useLazyQuery as jest.MockedFunction<typeof useLazyQuery>
+const mockUseLazyQuery = useLazyQuery as ReturnType<typeof vi.fn>
 
 describe('useFetchAllPages', () => {
   // Mock query - not using gql tag to avoid GraphQL codegen validation
@@ -39,7 +42,7 @@ describe('useFetchAllPages', () => {
   const mockGetPageInfo = (data: any) => data?.items?.pageInfo
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('single page fetch', () => {
@@ -51,12 +54,12 @@ describe('useFetchAllPages', () => {
         },
       }
 
-      const mockExecuteQuery = jest.fn().mockResolvedValue({
+      const mockExecuteQuery = vi.fn().mockResolvedValue({
         data: mockData,
         error: undefined,
       })
 
-      const mockFetchMore = jest.fn()
+      const mockFetchMore = vi.fn()
 
       mockUseLazyQuery.mockReturnValue([
         mockExecuteQuery,
@@ -121,12 +124,12 @@ describe('useFetchAllPages', () => {
         },
       }
 
-      const mockExecuteQuery = jest.fn().mockResolvedValue({
+      const mockExecuteQuery = vi.fn().mockResolvedValue({
         data: page1Data,
         error: undefined,
       })
 
-      const mockFetchMore = jest
+      const mockFetchMore = vi
         .fn()
         .mockResolvedValueOnce({data: page2Data})
         .mockResolvedValueOnce({data: page3Data})
@@ -167,7 +170,7 @@ describe('useFetchAllPages', () => {
       const page1 = [{id: '1', name: 'Item 1'}]
       const page2 = [{id: '2', name: 'Item 2'}]
 
-      const mockExecuteQuery = jest.fn().mockResolvedValue({
+      const mockExecuteQuery = vi.fn().mockResolvedValue({
         data: {
           items: {
             nodes: page1,
@@ -178,7 +181,7 @@ describe('useFetchAllPages', () => {
       })
 
       // Apollo's cache will have merged the nodes by the time fetchMore resolves
-      const mockFetchMore = jest.fn().mockResolvedValue({
+      const mockFetchMore = vi.fn().mockResolvedValue({
         data: {
           items: {
             nodes: [...page1, ...page2], // Simulating Apollo's cache merge
@@ -222,7 +225,7 @@ describe('useFetchAllPages', () => {
 
   describe('loading state', () => {
     it('should set loading to true while fetching', async () => {
-      const mockExecuteQuery = jest.fn().mockImplementation(
+      const mockExecuteQuery = vi.fn().mockImplementation(
         () =>
           new Promise(resolve =>
             setTimeout(
@@ -243,7 +246,7 @@ describe('useFetchAllPages', () => {
 
       mockUseLazyQuery.mockReturnValue([
         mockExecuteQuery,
-        {data: undefined, loading: false, error: undefined, fetchMore: jest.fn()},
+        {data: undefined, loading: false, error: undefined, fetchMore: vi.fn()},
       ] as any)
 
       const {result} = renderHook(() =>
@@ -272,14 +275,14 @@ describe('useFetchAllPages', () => {
   describe('error handling', () => {
     it('should handle query errors', async () => {
       const testError = new Error('Query failed')
-      const mockExecuteQuery = jest.fn().mockResolvedValue({
+      const mockExecuteQuery = vi.fn().mockResolvedValue({
         data: undefined,
         error: testError,
       })
 
       mockUseLazyQuery.mockReturnValue([
         mockExecuteQuery,
-        {data: undefined, loading: false, error: undefined, fetchMore: jest.fn()},
+        {data: undefined, loading: false, error: undefined, fetchMore: vi.fn()},
       ] as any)
 
       const {result} = renderHook(() =>
@@ -302,14 +305,14 @@ describe('useFetchAllPages', () => {
     })
 
     it('should handle missing data error', async () => {
-      const mockExecuteQuery = jest.fn().mockResolvedValue({
+      const mockExecuteQuery = vi.fn().mockResolvedValue({
         data: null,
         error: undefined,
       })
 
       mockUseLazyQuery.mockReturnValue([
         mockExecuteQuery,
-        {data: null, loading: false, error: undefined, fetchMore: jest.fn()},
+        {data: null, loading: false, error: undefined, fetchMore: vi.fn()},
       ] as any)
 
       const {result} = renderHook(() =>
@@ -333,7 +336,7 @@ describe('useFetchAllPages', () => {
     })
 
     it('should handle missing pageInfo error', async () => {
-      const mockExecuteQuery = jest.fn().mockResolvedValue({
+      const mockExecuteQuery = vi.fn().mockResolvedValue({
         data: {
           items: {
             nodes: [{id: '1', name: 'Item 1'}],
@@ -345,7 +348,7 @@ describe('useFetchAllPages', () => {
 
       mockUseLazyQuery.mockReturnValue([
         mockExecuteQuery,
-        {data: undefined, loading: false, error: undefined, fetchMore: jest.fn()},
+        {data: undefined, loading: false, error: undefined, fetchMore: vi.fn()},
       ] as any)
 
       const {result} = renderHook(() =>
@@ -370,11 +373,11 @@ describe('useFetchAllPages', () => {
 
     it('should handle errors from useLazyQuery hook', async () => {
       const apolloError = new Error('Apollo error')
-      const mockExecuteQuery = jest.fn()
+      const mockExecuteQuery = vi.fn()
 
       mockUseLazyQuery.mockReturnValue([
         mockExecuteQuery,
-        {data: undefined, loading: false, error: apolloError, fetchMore: jest.fn()},
+        {data: undefined, loading: false, error: apolloError, fetchMore: vi.fn()},
       ] as any)
 
       const {result} = renderHook(() =>
@@ -388,7 +391,7 @@ describe('useFetchAllPages', () => {
     })
 
     it('should stop fetching on error in fetchMore', async () => {
-      const mockExecuteQuery = jest.fn().mockResolvedValue({
+      const mockExecuteQuery = vi.fn().mockResolvedValue({
         data: {
           items: {
             nodes: [{id: '1', name: 'Item 1'}],
@@ -398,7 +401,7 @@ describe('useFetchAllPages', () => {
         error: undefined,
       })
 
-      const mockFetchMore = jest.fn().mockResolvedValue({
+      const mockFetchMore = vi.fn().mockResolvedValue({
         data: undefined,
         error: new Error('Second page failed'),
       })
@@ -432,7 +435,7 @@ describe('useFetchAllPages', () => {
 
   describe('variables handling', () => {
     it('should pass variables to query and preserve them in fetchMore', async () => {
-      const mockExecuteQuery = jest.fn().mockResolvedValue({
+      const mockExecuteQuery = vi.fn().mockResolvedValue({
         data: {
           items: {
             nodes: [{id: '1'}],
@@ -442,7 +445,7 @@ describe('useFetchAllPages', () => {
         error: undefined,
       })
 
-      const mockFetchMore = jest.fn().mockResolvedValue({
+      const mockFetchMore = vi.fn().mockResolvedValue({
         data: {
           items: {
             nodes: [{id: '1'}, {id: '2'}],
@@ -498,7 +501,7 @@ describe('useFetchAllPages', () => {
     })
 
     it('should work without variables', async () => {
-      const mockExecuteQuery = jest.fn().mockResolvedValue({
+      const mockExecuteQuery = vi.fn().mockResolvedValue({
         data: {
           items: {
             nodes: [{id: '1'}],
@@ -510,7 +513,7 @@ describe('useFetchAllPages', () => {
 
       mockUseLazyQuery.mockReturnValue([
         mockExecuteQuery,
-        {data: undefined, loading: false, error: undefined, fetchMore: jest.fn()},
+        {data: undefined, loading: false, error: undefined, fetchMore: vi.fn()},
       ] as any)
 
       const {result} = renderHook(() =>
@@ -538,7 +541,7 @@ describe('useFetchAllPages', () => {
     it('should handle nested data structures', async () => {
       const customGetPageInfo = (data: any) => data?.legacyNode?.recipientsObservers?.pageInfo
 
-      const mockExecuteQuery = jest.fn().mockResolvedValue({
+      const mockExecuteQuery = vi.fn().mockResolvedValue({
         data: {
           legacyNode: {
             id: 'user1',
@@ -551,7 +554,7 @@ describe('useFetchAllPages', () => {
         error: undefined,
       })
 
-      const mockFetchMore = jest.fn().mockResolvedValue({
+      const mockFetchMore = vi.fn().mockResolvedValue({
         data: {
           legacyNode: {
             id: 'user1',

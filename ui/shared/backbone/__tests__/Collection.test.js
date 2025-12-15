@@ -124,7 +124,7 @@ describe('Collection', () => {
 
   test('triggers setParam event', () => {
     const collection = new Collection()
-    const spy = jest.fn()
+    const spy = vi.fn()
     collection.on('setParam', spy)
     collection.setParam('foo', 'bar')
     expect(spy).toHaveBeenCalledTimes(1)
@@ -143,7 +143,7 @@ describe('Collection', () => {
 
   test('triggers setParams event', () => {
     const collection = new Collection()
-    const spy = jest.fn()
+    const spy = vi.fn()
     collection.on('setParams', spy)
     const params = {
       foo: 'bar',

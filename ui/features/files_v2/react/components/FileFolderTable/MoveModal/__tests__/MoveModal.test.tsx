@@ -29,8 +29,8 @@ import {mockRowFocusContext} from '../../__tests__/testUtils'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('../hooks', () => ({
-  useFoldersQuery: jest.fn(),
+vi.mock('../hooks', () => ({
+  useFoldersQuery: vi.fn(),
 }))
 
 const server = setupServer()
@@ -39,7 +39,7 @@ let capturedRequests: Array<{path: string; body: any}> = []
 
 const defaultProps = {
   open: true,
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
   items: FAKE_FOLDERS_AND_FILES,
 }
 
@@ -64,10 +64,9 @@ describe('MoveModal', () => {
 
   beforeEach(() => {
     capturedRequests = []
-    ;(useFoldersQuery as jest.Mock).mockReturnValue({
+    vi.mocked(useFoldersQuery).mockReturnValue({
       folders: {[FAKE_FOLDERS[1].id]: FAKE_FOLDERS[1]},
       foldersLoading: false,
-      foldersSuccessful: true,
       foldersError: false,
     })
     flashElements = document.createElement('div')
@@ -164,10 +163,9 @@ describe('MoveModal', () => {
   })
 
   it('performs fetch request', async () => {
-    ;(useFoldersQuery as jest.Mock).mockReturnValue({
+    vi.mocked(useFoldersQuery).mockReturnValue({
       folders: {[FAKE_FOLDERS[2].id]: FAKE_FOLDERS[2]},
       foldersLoading: false,
-      foldersSuccessful: true,
       foldersError: false,
     })
 

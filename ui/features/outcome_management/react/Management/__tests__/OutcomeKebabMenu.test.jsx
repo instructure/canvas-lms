@@ -63,11 +63,11 @@ describe('OutcomeKebabMenu', () => {
   }
 
   beforeEach(() => {
-    onMenuHandlerMock = jest.fn()
+    onMenuHandlerMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders Kebab menu with custom menu title for screen readers if menuTitle prop provided', () => {

@@ -28,7 +28,7 @@ const mockPagination = {
 
 const makeProps = (props = {}): GradebookPaginationProps => ({
   pagination: mockPagination,
-  onPageChange: jest.fn(),
+  onPageChange: vi.fn(),
   ...props,
 })
 

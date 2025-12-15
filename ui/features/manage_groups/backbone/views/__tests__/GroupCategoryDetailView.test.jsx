@@ -44,10 +44,10 @@ describe('GroupCategoryDetailView', () => {
     model.groups = () => groups
     model.unassignedUsers = () => unassignedUsers
     model.progressModel = new Model()
-    model.canMessageUnassignedMembers = jest.fn(() => false)
-    model.canAssignUnassignedMembers = jest.fn(() => false)
-    model.isLocked = jest.fn(() => false)
-    model.downloadGroupCategoryRosterCSVPath = jest.fn(() => '/api/v1/group_categories/123/export')
+    model.canMessageUnassignedMembers = vi.fn(() => false)
+    model.canAssignUnassignedMembers = vi.fn(() => false)
+    model.isLocked = vi.fn(() => false)
+    model.downloadGroupCategoryRosterCSVPath = vi.fn(() => '/api/v1/group_categories/123/export')
   })
 
   afterEach(() => {
@@ -107,7 +107,7 @@ describe('GroupCategoryDetailView', () => {
         },
       })
 
-      model.isLocked = jest.fn(() => true)
+      model.isLocked = vi.fn(() => true)
 
       view = new GroupCategoryDetailView({
         model,

@@ -41,7 +41,7 @@ const setUp = (propOverrides = {}, mockSuccess = true) => {
 
 describe('AssignmentPublishButton', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders button with publish state if published', () => {

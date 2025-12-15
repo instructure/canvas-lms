@@ -18,16 +18,15 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 import {TranslationTriggerModal} from '../components/TranslationTriggerModal/TranslationTriggerModal'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
 injectGlobalAlertContainers()
 
 describe('TranslationTriggerModal', () => {
-  const mockCloseModal = jest.fn()
-  const mockCloseModalAndKeepTranslations = jest.fn()
-  const mockCloseModalAndRemoveTranslations = jest.fn()
+  const mockCloseModal = vi.fn()
+  const mockCloseModalAndKeepTranslations = vi.fn()
+  const mockCloseModalAndRemoveTranslations = vi.fn()
 
   const getProps = isModalOpen => {
     return {

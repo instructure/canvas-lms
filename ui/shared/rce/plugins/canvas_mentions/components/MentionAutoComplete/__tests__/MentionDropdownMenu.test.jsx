@@ -78,7 +78,7 @@ describe('MentionDropdownMenu tests', () => {
   })
 
   it('should call ARIA template for the Popup menu', () => {
-    const spy = jest.spyOn(ARIA_ID_TEMPLATES, 'ariaControlTemplate')
+    const spy = vi.spyOn(ARIA_ID_TEMPLATES, 'ariaControlTemplate')
     setup()
     expect(spy).toHaveBeenCalled()
     expect(spy.mock.calls).toHaveLength(2)

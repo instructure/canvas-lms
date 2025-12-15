@@ -43,9 +43,9 @@ describe('setCspEnabledAction', () => {
 describe('setCspEnabled', () => {
   it('converts non-plural contexts to plural', () => {
     const thunk = Actions.setCspEnabled('course', 1, true)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeAxios = {
-      put: jest.fn(() => ({then() {}})),
+      put: vi.fn(() => ({then() {}})),
     }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeAxios.put).toHaveBeenCalledWith(expect.stringContaining('courses'), {
@@ -55,9 +55,9 @@ describe('setCspEnabled', () => {
 
   it('does not modify plural contexts', () => {
     const thunk = Actions.setCspEnabled('courses', 1, true)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeAxios = {
-      put: jest.fn(() => ({then() {}})),
+      put: vi.fn(() => ({then() {}})),
     }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeAxios.put).toHaveBeenCalledWith(expect.stringContaining('courses'), {
@@ -67,9 +67,9 @@ describe('setCspEnabled', () => {
 
   it('dispatches an optimistic action followed by the final result', () => {
     const thunk = Actions.setCspEnabled('courses', 1, true)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeAxios = {
-      put: jest.fn(() => ({
+      put: vi.fn(() => ({
         then(func) {
           const fakeResponse = {data: {enabled: true}}
           func(fakeResponse)
@@ -91,9 +91,9 @@ describe('setCspEnabled', () => {
 describe('getCspEnabled', () => {
   it('converts non-plural contexts to plural', () => {
     const thunk = Actions.getCspEnabled('course', 1)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeAxios = {
-      get: jest.fn(() => ({then() {}})),
+      get: vi.fn(() => ({then() {}})),
     }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeAxios.get).toHaveBeenCalledWith(expect.stringContaining('courses'))
@@ -101,9 +101,9 @@ describe('getCspEnabled', () => {
 
   it('dispatches a SET_CSP_ENABLED action when complete', () => {
     const thunk = Actions.getCspEnabled('courses', 1)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeAxios = {
-      get: jest.fn(() => ({
+      get: vi.fn(() => ({
         then(func) {
           const fakeResponse = {data: {enabled: true}}
           func(fakeResponse)
@@ -151,9 +151,9 @@ describe('addDomainAction', () => {
 describe('addDomain', () => {
   it('dispatches an optimistic action followed by the final result', () => {
     const thunk = Actions.addDomain('account', 1, 'instructure.com')
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeAxios = {
-      post: jest.fn(() => ({
+      post: vi.fn(() => ({
         then(func) {
           const fakeResponse = {}
           func(fakeResponse)
@@ -173,11 +173,11 @@ describe('addDomain', () => {
   })
 
   it('calls the afterAdd function after dispatching', () => {
-    const fakeAfterAdd = jest.fn()
+    const fakeAfterAdd = vi.fn()
     const thunk = Actions.addDomain('account', 1, 'instructure.com', fakeAfterAdd)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeAxios = {
-      post: jest.fn(() => ({
+      post: vi.fn(() => ({
         then(func) {
           const fakeResponse = {}
           func(fakeResponse)
@@ -238,10 +238,10 @@ describe('addDomainBulkAction', () => {
 describe('getCurrentWhitelist', () => {
   it('dispatches a bulk domain action ', () => {
     const thunk = Actions.getCurrentWhitelist('account', 1)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeGetState = () => ({enabled: true})
     const fakeAxios = {
-      get: jest.fn(() => ({
+      get: vi.fn(() => ({
         then(func) {
           const fakeResponse = {
             data: {
@@ -309,9 +309,9 @@ describe('removeDomainAction', () => {
 describe('removeDomain', () => {
   it('dispatches an optimistic action followed by the final result', () => {
     const thunk = Actions.removeDomain('account', 1, 'instructure.com')
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeAxios = {
-      delete: jest.fn(() => ({
+      delete: vi.fn(() => ({
         then(func) {
           const fakeResponse = {}
           func(fakeResponse)
@@ -355,10 +355,10 @@ describe('setCspInheritedAction', () => {
 describe('setCspInherited', () => {
   it('dispatches a optimistic value followed by the actual result', () => {
     const thunk = Actions.setCspInherited('account', 1, true)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeGetState = () => ({})
     const fakeAxios = {
-      put: jest.fn(() => ({
+      put: vi.fn(() => ({
         then(func) {
           const fakeResponse = {
             data: {
@@ -382,10 +382,10 @@ describe('setCspInherited', () => {
 
   it('updates the enabled status and domain list when successful', () => {
     const thunk = Actions.setCspInherited('account', 1, false)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeGetState = () => ({})
     const fakeAxios = {
-      put: jest.fn(() => ({
+      put: vi.fn(() => ({
         then(func) {
           const fakeResponse = {
             data: {
@@ -410,10 +410,10 @@ describe('setCspInherited', () => {
 
   it('sets the dirty status when cspInherited is true but then switches to false with no account whitelist', () => {
     const thunk = Actions.setCspInherited('account', 1, false)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeGetState = () => ({cspInherited: true})
     const fakeAxios = {
-      put: jest.fn(() => ({
+      put: vi.fn(() => ({
         then(func) {
           const fakeResponse = {
             data: {
@@ -437,9 +437,9 @@ describe('setCspInherited', () => {
 describe('getCspInherited', () => {
   it('dispatches a SET_CSP_INHERITED action when complete', () => {
     const thunk = Actions.getCspInherited('account', 1)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeAxios = {
-      get: jest.fn(() => ({
+      get: vi.fn(() => ({
         then(func) {
           const fakeResponse = {data: {inherited: true}}
           func(fakeResponse)
@@ -490,7 +490,7 @@ describe('copyInheritedAction', () => {
 describe('copyInheritedIfNeeded', () => {
   it('does does nothing if isDirty state is false', () => {
     const thunk = Actions.copyInheritedIfNeeded('account', 1)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeGetState = () => ({
       isDirty: false,
       whitelistedDomains: {inherited: ['canvaslms.com']},
@@ -502,10 +502,10 @@ describe('copyInheritedIfNeeded', () => {
 
   it('dispatches a setDirtyAction and a copyInherited action when the request completes', () => {
     const thunk = Actions.copyInheritedIfNeeded('account', 1)
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeGetState = () => ({isDirty: true, whitelistedDomains: {inherited: ['canvaslms.com']}})
     const fakeAxios = {
-      post: jest.fn(() => ({
+      post: vi.fn(() => ({
         then(func) {
           const fakeResponse = {
             data: {
@@ -531,11 +531,11 @@ describe('copyInheritedIfNeeded', () => {
 
   it('adds the modifiedDomainOption.add domain to the list of domains to be copied', () => {
     const thunk = Actions.copyInheritedIfNeeded('account', 1, {add: 'instructure.com'})
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeGetState = () => ({isDirty: true, whitelistedDomains: {inherited: ['canvaslms.com']}})
     const fakeAxios = {
-      post: jest.fn(() => ({
-        then: jest.fn(),
+      post: vi.fn(() => ({
+        then: vi.fn(),
       })),
     }
     thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
@@ -547,14 +547,14 @@ describe('copyInheritedIfNeeded', () => {
 
   it('removes the modifiedDomainOption.delete domain from the list of domains to be copied', () => {
     const thunk = Actions.copyInheritedIfNeeded('account', 1, {delete: 'instructure.com'})
-    const fakeDispatch = jest.fn()
+    const fakeDispatch = vi.fn()
     const fakeGetState = () => ({
       isDirty: true,
       whitelistedDomains: {inherited: ['canvaslms.com', 'instructure.com']},
     })
     const fakeAxios = {
-      post: jest.fn(() => ({
-        then: jest.fn(),
+      post: vi.fn(() => ({
+        then: vi.fn(),
       })),
     }
     thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})

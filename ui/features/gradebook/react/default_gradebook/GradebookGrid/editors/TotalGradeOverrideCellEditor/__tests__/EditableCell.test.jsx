@@ -34,7 +34,7 @@ describe('GradebookGrid TotalGradeOverrideCellEditor EditableCell', () => {
       gradeEntry,
       gradeInfo: gradeEntry.parseValue('91%'),
       gradeIsUpdating: false,
-      onGradeUpdate: jest.fn(),
+      onGradeUpdate: vi.fn(),
       pendingGradeInfo: null,
     }
   })

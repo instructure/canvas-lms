@@ -55,6 +55,17 @@ const server = setupServer(
       },
     })
   }),
+  graphql.query('GetAssignmentGroupsQuery', () => {
+    return HttpResponse.json({
+      data: {
+        course: {
+          assignmentGroupsConnection: {
+            edges: [],
+          },
+        },
+      },
+    })
+  }),
 )
 
 const renderWithProviders = (props: Partial<React.ComponentProps<typeof AddItemModal>> = {}) => {
@@ -71,7 +82,7 @@ const renderWithProviders = (props: Partial<React.ComponentProps<typeof AddItemM
       <ContextModuleProvider {...contextModuleDefaultProps}>
         <AddItemModal
           isOpen={true}
-          onRequestClose={jest.fn()}
+          onRequestClose={vi.fn()}
           moduleName="Test Module"
           moduleId="1"
           {...props}
@@ -83,8 +94,20 @@ const renderWithProviders = (props: Partial<React.ComponentProps<typeof AddItemM
 
 describe('AddItemModal', () => {
   beforeAll(() => server.listen())
+  beforeEach(() => {
+    // Create live region element required by Alert component
+    const liveRegion = document.createElement('div')
+    liveRegion.id = 'flash_screenreader_holder'
+    liveRegion.setAttribute('role', 'alert')
+    document.body.appendChild(liveRegion)
+  })
   afterEach(() => {
     server.resetHandlers()
+    // Clean up live region element
+    const liveRegion = document.getElementById('flash_screenreader_holder')
+    if (liveRegion) {
+      document.body.removeChild(liveRegion)
+    }
   })
   afterAll(() => server.close())
 
@@ -178,7 +201,7 @@ describe('AddItemModal', () => {
     })
 
     it('allows form submission when item is selected', async () => {
-      const mockOnClose = jest.fn()
+      const mockOnClose = vi.fn()
 
       server.use(
         graphql.query('GetAssignmentsQuery', () => {

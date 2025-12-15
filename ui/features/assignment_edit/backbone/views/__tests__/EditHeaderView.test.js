@@ -25,8 +25,8 @@ import axe from 'axe-core'
 import {assignLocation} from '@canvas/util/globalUtils'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 const createEditHeaderView = (
@@ -73,8 +73,8 @@ describe('EditHeaderView', () => {
     fakeENV.teardown()
     container.remove()
     $(document).off('submit')
-    jest.resetAllMocks()
-    jest.clearAllMocks()
+    vi.resetAllMocks()
+    vi.clearAllMocks()
   })
 
   // TODO: Fix accessibility test - requires more complex DOM setup
@@ -175,7 +175,7 @@ describe('EditHeaderView', () => {
     it('calls onDeleteSuccess for unsaved assignments', () => {
       fakeENV.setup({ASSIGNMENT_INDEX_URL: '/assignments', SETTINGS: {}})
       const view = createEditHeaderView()
-      const onDeleteSuccess = jest.spyOn(view, 'onDeleteSuccess')
+      const onDeleteSuccess = vi.spyOn(view, 'onDeleteSuccess')
       view.delete()
       expect(onDeleteSuccess).toHaveBeenCalled()
       expect(assignLocation).toHaveBeenCalledWith('/assignments')
@@ -212,8 +212,8 @@ describe('EditHeaderView', () => {
 
     it('prevents delete for assignments in closed grading periods', () => {
       const view = createEditHeaderView({in_closed_grading_period: true})
-      jest.spyOn(window, 'confirm')
-      jest.spyOn(view, 'delete')
+      vi.spyOn(window, 'confirm')
+      vi.spyOn(view, 'delete')
       view.$('.delete_assignment_link').click()
       expect(window.confirm).not.toHaveBeenCalled()
       expect(view.delete).not.toHaveBeenCalled()

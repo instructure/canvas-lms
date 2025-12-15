@@ -24,14 +24,14 @@ import {queryClient} from '@canvas/query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 
 // Mock the OverTimeGraph component from its separate file
-jest.mock('../OverTimeGraph', () => {
-  return jest.fn(({name, url}) => (
+vi.mock('../OverTimeGraph', () => ({
+  default: vi.fn(({name, url}) => (
     <div data-testid="over-time-graph">
       <div>Mocked Graph for {name}</div>
       <a href={url}>Download CSV</a>
     </div>
-  ))
-})
+  )),
+}))
 
 const renderModal = () => {
   const screen = render(
@@ -61,7 +61,7 @@ const generateUrl = (accountId: string, key: string) =>
 
 describe('OverTimeModal', () => {
   afterAll(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

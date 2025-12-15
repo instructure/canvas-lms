@@ -18,14 +18,15 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
+import {type MockedFunction} from 'vitest'
 import TextEntryAssetReportStatusLink from '../TextEntryAssetReportStatusLink'
 import {useShouldShowLtiAssetReportsForStudent} from '@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent'
 
 // Mock the hooks
-jest.mock('@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent')
+vi.mock('@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent')
 
 // Mock the child component
-jest.mock('@canvas/lti-asset-processor/react/LtiAssetReportsForStudentSubmission', () => {
+vi.mock('@canvas/lti-asset-processor/react/LtiAssetReportsForStudentSubmission', () => {
   return {
     LtiAssetReportsForStudentSubmission: function MockComponent(props: any) {
       return (
@@ -39,14 +40,14 @@ jest.mock('@canvas/lti-asset-processor/react/LtiAssetReportsForStudentSubmission
 })
 
 // Mock i18n
-jest.mock('@canvas/i18n', () => ({
+vi.mock('@canvas/i18n', () => ({
   useScope: () => ({
     t: (key: string) => key,
   }),
 }))
 
 const mockUseShouldShowLtiAssetReportsForStudent =
-  useShouldShowLtiAssetReportsForStudent as jest.MockedFunction<
+  useShouldShowLtiAssetReportsForStudent as MockedFunction<
     typeof useShouldShowLtiAssetReportsForStudent
   >
 
@@ -57,7 +58,7 @@ describe('TextEntryAssetReportStatusLink', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders when shouldShow is true', () => {

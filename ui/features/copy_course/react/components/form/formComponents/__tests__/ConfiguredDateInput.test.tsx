@@ -53,12 +53,12 @@ describe('ConfiguredDateInput', () => {
     })
 
     // Mock the current date to be January 1st of the current year at noon
-    jest.useFakeTimers()
-    jest.setSystemTime(new Date(`${currentYear}-01-01T07:00:00.000Z`)) // 12am Denver time
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(`${currentYear}-01-01T07:00:00.000Z`)) // 12am Denver time
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
     fakeENV.teardown()
   })
 
@@ -85,9 +85,9 @@ describe('ConfiguredDateInput', () => {
 
   it('calls onSelectedDateChange when a date is selected', async () => {
     const user = userEvent.setup({
-      advanceTimers: jest.advanceTimersByTime,
+      advanceTimers: vi.advanceTimersByTime,
     })
-    const handleDateChange = jest.fn()
+    const handleDateChange = vi.fn()
     const {getByPlaceholderText} = render(
       <ConfiguredDateInput
         selectedDate={`${currentYear}-01-05T00:00:00.000Z`}

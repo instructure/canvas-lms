@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, screen} from '@testing-library/react'
+import {act, cleanup, render, screen} from '@testing-library/react'
 import React, {useEffect} from 'react'
-import '@testing-library/jest-dom'
 import {NewLoginProvider, useNewLogin} from '..'
 
 class ErrorBoundary extends React.Component<
@@ -60,6 +59,10 @@ const TestComponent = () => {
     </div>
   )
 }
+
+afterEach(() => {
+  cleanup()
+})
 
 describe('NewLoginContext', () => {
   it('renders without crashing', () => {

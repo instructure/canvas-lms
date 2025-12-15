@@ -30,7 +30,7 @@ describe('GradeSummary AcceptGradesButton', () => {
       id: 'required_because_idk',
       acceptGradesStatus: null,
       graderName: 'Jackie Chan',
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       selectionDetails: {
         allowed: true,
         provisionalGradeIds: ['4601'],

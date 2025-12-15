@@ -24,14 +24,14 @@ import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 const server = setupServer()
 
 describe('SuggestionsEnabledToggleSection', () => {
   const defaultProps = {
     checked: true,
-    onChange: jest.fn(),
+    onChange: vi.fn(),
   }
 
   const setup = (props = {}) => {
@@ -43,7 +43,7 @@ describe('SuggestionsEnabledToggleSection', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // Default handler for user settings API
     server.use(
       http.put('/api/v1/users/self/settings', () => HttpResponse.json({})),
@@ -94,7 +94,7 @@ describe('SuggestionsEnabledToggleSection', () => {
   describe('User Interaction Tests', () => {
     it('calls onChange with true when unchecked checkbox is clicked', async () => {
       const user = userEvent.setup()
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       setup({checked: false, onChange})
 
       const checkbox = screen.getByTestId('suggestions-when-typing-toggle')
@@ -105,7 +105,7 @@ describe('SuggestionsEnabledToggleSection', () => {
 
     it('calls onChange with false when checked checkbox is clicked', async () => {
       const user = userEvent.setup()
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       setup({checked: true, onChange})
 
       const checkbox = screen.getByTestId('suggestions-when-typing-toggle')
@@ -158,7 +158,7 @@ describe('SuggestionsEnabledToggleSection', () => {
   describe('Error Handling Tests', () => {
     it('shows error flash alert when API call fails', async () => {
       const user = userEvent.setup()
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       server.use(
         http.put('/api/v1/users/self/settings', () => HttpResponse.error()),
       )
@@ -178,7 +178,7 @@ describe('SuggestionsEnabledToggleSection', () => {
 
     it('still calls onChange callback even when API fails', async () => {
       const user = userEvent.setup()
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       server.use(
         http.put('/api/v1/users/self/settings', () => HttpResponse.error()),
       )

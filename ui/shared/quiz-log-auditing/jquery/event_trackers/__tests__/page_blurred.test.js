@@ -23,7 +23,7 @@ import 'jquery-migrate'
 
 // Mock window.blur since jsdom doesn't implement it
 Object.defineProperty(window, 'blur', {
-  value: jest.fn(),
+  value: vi.fn(),
   writable: true,
 })
 
@@ -34,21 +34,19 @@ describe('Quizzes::LogAuditing::EventTrackers::PageBlurred', () => {
     expect(tracker.priority).toBe(K.EVT_PRIORITY_LOW)
   })
 
-  it('captures page blur events', done => {
+  it('captures page blur events', async () => {
     const tracker = new Subject()
-    const capture = jest.fn()
+    const capture = vi.fn()
     tracker.install(capture)
     $(window).blur()
 
-    setTimeout(() => {
-      expect(capture).toHaveBeenCalled()
-      done()
-    })
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(capture).toHaveBeenCalled()
   })
 
   it('does not send events if in iframe (for RCE focusing)', () => {
     const tracker = new Subject()
-    const capture = jest.fn()
+    const capture = vi.fn()
     tracker.install(capture)
 
     const iframe = $('<iframe>').appendTo('body').focus()

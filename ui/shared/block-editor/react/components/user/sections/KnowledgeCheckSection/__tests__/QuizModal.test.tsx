@@ -24,8 +24,8 @@ import {Editor, Frame} from '@craftjs/core'
 describe('QuizModal', () => {
   const defaultProps = {
     open: true,
-    onClose: jest.fn(),
-    onSelect: jest.fn(),
+    onClose: vi.fn(),
+    onSelect: vi.fn(),
   }
 
   const renderModal = (props = {}) => {

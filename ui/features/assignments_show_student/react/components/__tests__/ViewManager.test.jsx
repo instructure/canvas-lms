@@ -176,7 +176,7 @@ describe('ViewManager', () => {
           </MockedProvider>,
         )
 
-        const mockFocus = jest.fn()
+        const mockFocus = vi.fn()
         const assignmentToggle = getByTestId('assignments-2-assignment-toggle-details')
         assignmentToggle.focus = mockFocus
 

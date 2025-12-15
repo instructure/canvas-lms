@@ -23,16 +23,16 @@ import {mockInternalConfiguration} from './helpers'
 import {LtiPlacements, type LtiPlacementWithIcon} from '../../model/LtiPlacement'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 
-const userEvent = ue.userEvent.setup({advanceTimers: jest.advanceTimersByTime})
+const userEvent = ue.userEvent.setup({advanceTimers: vi.advanceTimersByTime})
 describe('IconConfirmationWrapper', () => {
   beforeEach(() => {
-    jest.resetAllMocks()
-    jest.useFakeTimers()
+    vi.resetAllMocks()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.runAllTimers()
-    jest.useRealTimers()
+    vi.runAllTimers()
+    vi.useRealTimers()
   })
 
   it('renders correctly', () => {
@@ -40,8 +40,8 @@ describe('IconConfirmationWrapper', () => {
       placements: [{placement: LtiPlacements.GlobalNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
+    const onNextButtonClicked = vi.fn()
+    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
@@ -67,8 +67,8 @@ describe('IconConfirmationWrapper', () => {
       },
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
+    const onNextButtonClicked = vi.fn()
+    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
@@ -90,8 +90,8 @@ describe('IconConfirmationWrapper', () => {
       ],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
+    const onNextButtonClicked = vi.fn()
+    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
@@ -114,7 +114,7 @@ describe('IconConfirmationWrapper', () => {
     await userEvent.click(input)
     await userEvent.clear(input)
     await userEvent.paste('https://new-icon-url.com')
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     expect(overlayStore.getState().state.icons.placements[placement as LtiPlacementWithIcon]).toBe(
       'https://new-icon-url.com',
@@ -126,8 +126,8 @@ describe('IconConfirmationWrapper', () => {
       placements: [{placement: 'global_navigation', icon_url: 'https://example.com/icon'}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
+    const onNextButtonClicked = vi.fn()
+    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
@@ -155,8 +155,8 @@ describe('IconConfirmationWrapper', () => {
       placements: [{placement: 'global_navigation', icon_url: 'https://example.com/icon'}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
+    const onNextButtonClicked = vi.fn()
+    const onPreviousButtonClicked = vi.fn()
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
@@ -188,8 +188,8 @@ describe('IconConfirmationWrapper', () => {
       },
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
+    const onNextButtonClicked = vi.fn()
+    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
@@ -221,8 +221,8 @@ describe('IconConfirmationWrapper', () => {
       },
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
+    const onNextButtonClicked = vi.fn()
+    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
@@ -252,8 +252,8 @@ describe('IconConfirmationWrapper', () => {
       ],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
+    const onNextButtonClicked = vi.fn()
+    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
@@ -280,7 +280,7 @@ describe('IconConfirmationWrapper', () => {
     )
     expect(img).toHaveAttribute('src', 'https://example.com/icon/first')
 
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     expect(overlayStore.getState().state.icons.placements[LtiPlacements.GlobalNavigation]).toBe(
       'https://new-icon-url.com',
@@ -298,8 +298,8 @@ describe('IconConfirmationWrapper', () => {
       },
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
+    const onNextButtonClicked = vi.fn()
+    const onPreviousButtonClicked = vi.fn()
 
     render(
       <IconConfirmationWrapper
@@ -312,7 +312,7 @@ describe('IconConfirmationWrapper', () => {
     )
 
     overlayStore.getState().togglePlacement(LtiPlacements.EditorButton)
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     const input = screen.getByLabelText(
       new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation), 'i'),

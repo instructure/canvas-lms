@@ -32,17 +32,17 @@ const courseReport: CourseReport = {
 
 const defaultProps: PaceDownloadModalProps = {
   courseReport: courseReport,
-  showCourseReport: jest.fn(async () => courseReport),
-  setCourseReport: jest.fn(),
+  showCourseReport: vi.fn(async () => courseReport),
+  setCourseReport: vi.fn(),
 }
 
 beforeEach(() => {
-  defaultProps.showCourseReport = jest.fn()
-  defaultProps.setCourseReport = jest.fn()
+  defaultProps.showCourseReport = vi.fn()
+  defaultProps.setCourseReport = vi.fn()
 })
 
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('PaceDownloadModal', () => {
@@ -57,9 +57,9 @@ describe('PaceDownloadModal', () => {
   })
 
   it('polls the course report', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     const modal = render(<PaceDownloadModal {...defaultProps} />)
-    jest.advanceTimersByTime(POLL_DOCX_DELAY + 100)
+    vi.advanceTimersByTime(POLL_DOCX_DELAY + 100)
     expect(defaultProps.showCourseReport).toHaveBeenCalled()
   })
 })

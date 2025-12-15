@@ -26,7 +26,7 @@ describe('SpeedGraderAlerts', () => {
 
   beforeEach(() => {
     $flashMessage = $('<div>').appendTo(document.body)
-    $.flashMessage = jest.fn(message => {
+    $.flashMessage = vi.fn(message => {
       $flashMessage.text(message)
       return $flashMessage
     })

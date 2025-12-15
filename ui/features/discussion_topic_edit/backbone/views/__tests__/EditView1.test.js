@@ -16,6 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Mock brandable CSS to prevent stylesheet loading errors during import
+// This mock must be before any imports that could transitively load handlebars templates
+vi.mock('@canvas/brandable-css', () => ({
+  __esModule: true,
+  default: {
+    loadStylesheetForJST: vi.fn(),
+    loadStylesheet: vi.fn(),
+    getCssVariant: vi.fn().mockReturnValue('new_styles_normal_contrast'),
+    getHandlebarsIndex: vi.fn().mockReturnValue([[], {}]),
+    urlFor: vi.fn().mockReturnValue(''),
+  },
+}))
+
 import $ from 'jquery'
 import RCELoader from '@canvas/rce/serviceRCELoader'
 import EditView from '../EditView'
@@ -121,13 +134,13 @@ describe('EditView', () => {
   })
 
   it('validates the group category for non-assignment discussions', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     const view = editView({permissions: {CAN_SET_GROUP: true}})
-    jest.advanceTimersByTime(1)
+    vi.advanceTimersByTime(1)
     const data = {group_category_id: 'blank'}
     const errors = view.validateBeforeSave(data, [])
     expect(errors.newGroupCategory[0].message).toBeTruthy()
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   it('does not render #podcast_has_student_posts_container for non-course contexts', () => {

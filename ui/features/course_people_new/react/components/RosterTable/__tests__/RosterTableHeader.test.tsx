@@ -24,7 +24,7 @@ import RosterTableHeader from '../RosterTableHeader'
 import useCoursePeopleContext from '../../../hooks/useCoursePeopleContext'
 import {DEFAULT_SORT_FIELD, DEFAULT_SORT_DIRECTION} from '../../../../util/constants'
 
-jest.mock('../../../hooks/useCoursePeopleContext')
+vi.mock('../../../hooks/useCoursePeopleContext')
 
 describe('RosterTableHeader', () => {
   const user = userEvent.setup()
@@ -34,8 +34,8 @@ describe('RosterTableHeader', () => {
     someSelected: false,
     sortField: DEFAULT_SORT_FIELD,
     sortDirection: DEFAULT_SORT_DIRECTION,
-    handleSelectAll: jest.fn(),
-    handleSort: jest.fn(),
+    handleSelectAll: vi.fn(),
+    handleSort: vi.fn(),
   }
 
   const defaultContextValues = {
@@ -48,11 +48,11 @@ describe('RosterTableHeader', () => {
   }
 
   beforeEach(() => {
-    ;(useCoursePeopleContext as jest.Mock).mockReturnValue(defaultContextValues)
+    ;(useCoursePeopleContext as any).mockReturnValue(defaultContextValues)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderWithTable = (props = {}) => {
@@ -86,7 +86,7 @@ describe('RosterTableHeader', () => {
 
   describe('conditional rendering based on permissions', () => {
     it('hides login ID column when canViewLoginIdColumn is false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         canViewLoginIdColumn: false,
       })
@@ -95,7 +95,7 @@ describe('RosterTableHeader', () => {
     })
 
     it('hides SIS ID column when canViewSisIdColumn is false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         canViewSisIdColumn: false,
       })
@@ -104,7 +104,7 @@ describe('RosterTableHeader', () => {
     })
 
     it('hides sections column when hideSectionsOnCourseUsersPage is true', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         hideSectionsOnCourseUsersPage: true,
       })
@@ -113,7 +113,7 @@ describe('RosterTableHeader', () => {
     })
 
     it('hides last and total activity columns when canReadReports is false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         canReadReports: false,
       })
@@ -123,7 +123,7 @@ describe('RosterTableHeader', () => {
     })
 
     it('hides user select/checkboxes column when allowAssignToDifferentiationTags is false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         allowAssignToDifferentiationTags: false,
       })
@@ -132,7 +132,7 @@ describe('RosterTableHeader', () => {
     })
 
     it('hides user select/checkboxes column when canManageDifferentiationTags is false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         canManageDifferentiationTags: false,
       })
@@ -143,7 +143,7 @@ describe('RosterTableHeader', () => {
 
   describe('sorting', () => {
     it('calls handleSort when clicking a sortable column', async () => {
-      const handleSort = jest.fn()
+      const handleSort = vi.fn()
       const {getByTestId} = renderWithTable({handleSort})
       const nameHeader = getByTestId('header-name')
       await user.click(within(nameHeader).getByRole('button', {hidden: true}))
@@ -166,7 +166,7 @@ describe('RosterTableHeader', () => {
 
   describe('select all checkbox', () => {
     it('calls handleSelectAll when clicked', async () => {
-      const handleSelectAll = jest.fn()
+      const handleSelectAll = vi.fn()
       const {getByTestId} = renderWithTable({handleSelectAll})
       await user.click(getByTestId('header-select-all'))
       expect(handleSelectAll).toHaveBeenCalledWith(false)

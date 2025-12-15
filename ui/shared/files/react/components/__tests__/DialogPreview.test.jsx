@@ -24,13 +24,13 @@ import FilesystemObjectThumbnail from '../FilesystemObjectThumbnail'
 
 describe('DialogPreview', () => {
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('renders a single item with FilesystemObjectThumbnail', () => {
     const file = new File({name: 'Test File', thumbnail_url: 'blah'})
     file.url = () => 'some_url'
-    jest
+    vi
       .spyOn(FilesystemObjectThumbnail.prototype, 'render')
       .mockReturnValue(<div data-testid="mock-thumbnail" />)
 

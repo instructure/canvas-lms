@@ -20,10 +20,10 @@ import {act, fireEvent} from '@testing-library/react'
 
 export const clickEl = async el => {
   fireEvent.click(el)
-  await act(async () => jest.runAllTimers())
+  await act(async () => vi.runAllTimers())
 }
 
 export const clickWithPending = async el => {
   fireEvent.click(el)
-  await act(async () => jest.runOnlyPendingTimers())
+  await act(async () => vi.runOnlyPendingTimers())
 }

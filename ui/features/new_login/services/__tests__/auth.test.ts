@@ -20,7 +20,9 @@ import {forgotPassword, performSignIn} from '../auth'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/authenticity-token', () => jest.fn(() => 'testCsrfToken'))
+vi.mock('@canvas/authenticity-token', () => ({
+  default: vi.fn(() => 'testCsrfToken'),
+}))
 
 const server = setupServer()
 
@@ -32,7 +34,7 @@ describe('Auth Service', () => {
 
   beforeEach(() => {
     capturedRequest = null
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

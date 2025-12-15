@@ -88,7 +88,7 @@ test('renders the RSSFeedList component with 5 rows for 5 feeds', () => {
 })
 
 test('calls getExternalFeeds when feed has not been loaded', () => {
-  const mockGetExternalFeeds = jest.fn()
+  const mockGetExternalFeeds = vi.fn()
   renderComponent({
     hasLoadedFeed: false,
     getExternalFeeds: mockGetExternalFeeds,
@@ -98,7 +98,7 @@ test('calls getExternalFeeds when feed has not been loaded', () => {
 })
 
 test('does not call getExternalFeeds when feed has been loaded', () => {
-  const mockGetExternalFeeds = jest.fn()
+  const mockGetExternalFeeds = vi.fn()
   renderComponent({
     hasLoadedFeed: true,
     getExternalFeeds: mockGetExternalFeeds,
@@ -108,7 +108,7 @@ test('does not call getExternalFeeds when feed has been loaded', () => {
 })
 
 test('calls deleteExternalFeed with correct feed ID when deleting feed', async () => {
-  const mockDeleteExternalFeed = jest.fn()
+  const mockDeleteExternalFeed = vi.fn()
   const feeds = [
     {
       display_name: 'felix',

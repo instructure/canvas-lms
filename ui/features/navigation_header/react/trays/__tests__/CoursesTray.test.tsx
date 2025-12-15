@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render as testingLibraryRender} from '@testing-library/react'
+import {cleanup, render as testingLibraryRender} from '@testing-library/react'
 import CoursesTray from '../CoursesTray'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
@@ -29,6 +29,10 @@ const render = (children: unknown) =>
   testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 describe('CoursesTray', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const courses = [
     {
       id: '1',

@@ -26,15 +26,15 @@ describe('GradeFormatHelper', () => {
   const translateString = I18n.t
 
   beforeEach(() => {
-    jest.resetModules()
-    jest.clearAllMocks()
-    jest.spyOn(numberHelper, 'validate').mockImplementation(val => !Number.isNaN(parseFloat(val)))
-    jest.spyOn(I18n.constructor.prototype, 't').mockImplementation(translateString)
+    vi.resetModules()
+    vi.clearAllMocks()
+    vi.spyOn(numberHelper, 'validate').mockImplementation(val => !Number.isNaN(parseFloat(val)))
+    vi.spyOn(I18n.constructor.prototype, 't').mockImplementation(translateString)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('.isExcused', () => {

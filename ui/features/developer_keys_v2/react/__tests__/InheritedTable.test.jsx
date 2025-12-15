@@ -42,7 +42,7 @@ describe('InheritedTable', () => {
   afterEach(() => {
     container.remove()
     window.ENV = {}
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fakeENV.teardown()
   })
 
@@ -66,17 +66,17 @@ describe('InheritedTable', () => {
       <InheritedTable
         label="Inherited Keys"
         prefix="inherited"
-        store={{dispatch: jest.fn()}}
+        store={{dispatch: vi.fn()}}
         actions={{
-          makeVisibleDeveloperKey: jest.fn(),
-          makeInvisibleDeveloperKey: jest.fn(),
-          activateDeveloperKey: jest.fn(),
-          deactivateDeveloperKey: jest.fn(),
-          deleteDeveloperKey: jest.fn(),
-          editDeveloperKey: jest.fn(),
-          developerKeysModalOpen: jest.fn(),
-          setBindingWorkflowState: jest.fn(),
-          updateDeveloperKey: jest.fn(),
+          makeVisibleDeveloperKey: vi.fn(),
+          makeInvisibleDeveloperKey: vi.fn(),
+          activateDeveloperKey: vi.fn(),
+          deactivateDeveloperKey: vi.fn(),
+          deleteDeveloperKey: vi.fn(),
+          editDeveloperKey: vi.fn(),
+          developerKeysModalOpen: vi.fn(),
+          setBindingWorkflowState: vi.fn(),
+          updateDeveloperKey: vi.fn(),
         }}
         developerKeysList={keyList || devKeyList()}
         ctx={{

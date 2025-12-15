@@ -34,7 +34,7 @@ const server = setupServer()
 const defaultProps = {
   open: true,
   items: FAKE_FOLDERS_AND_FILES,
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
 }
 
 const renderComponent = (props?: any) =>
@@ -64,8 +64,8 @@ describe('PermissionsModal', () => {
 
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
-    jest.resetAllMocks()
+    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders header', async () => {

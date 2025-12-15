@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import {MockedProvider} from '@apollo/client/testing'
 import {STUDENT_SEARCH_QUERY} from '../../../assignmentData'
 import {mockAssignment, mockSubmission, mockUser, closest} from '../../../test-utils'
@@ -58,7 +58,7 @@ function renderStudentsSearcher(usersAndVariables, useAssignment) {
   return fns
 }
 
-beforeEach(() => jest.useFakeTimers())
+beforeEach(() => vi.useFakeTimers())
 
 describe('StudentsSearcher', () => {
   it('renders a spinner while loading', () => {
@@ -102,16 +102,16 @@ describe('StudentsSearcher', () => {
     expect(queryByText('Message Students', {exact: false})).toBeNull()
   })
 
-  it.skip('initially loads all students and renders results', () => {
+  it.skip('initially loads all students and renders results', async () => {
     const foo = mockUser({lid: 'foo', shortName: 'foo'})
     const bar = mockUser({lid: 'bar', shortName: 'bar'})
     const {getByText} = renderStudentsSearcher([{users: [foo, bar]}])
-    jest.runOnlyPendingTimers()
-    expect(getByText(foo.shortName)).toBeInTheDocument()
+    vi.runOnlyPendingTimers()
+    await waitFor(() => expect(getByText(foo.shortName)).toBeInTheDocument())
     expect(getByText(bar.shortName)).toBeInTheDocument()
   })
 
-  it.skip('sorts by username', () => {
+  it('sorts by username', async () => {
     const {getByText} = renderStudentsSearcher([
       {},
       {
@@ -123,17 +123,17 @@ describe('StudentsSearcher', () => {
         variables: {orderBy: [{field: 'username', direction: 'descending'}]},
       },
     ])
-    jest.runOnlyPendingTimers()
-    fireEvent.click(closest(getByText('Name'), 'button'))
-    jest.runOnlyPendingTimers()
-    expect(getByText('searched user')).toBeInTheDocument()
+    vi.runOnlyPendingTimers()
+    await waitFor(() => fireEvent.click(closest(getByText('Name'), 'button')))
+    vi.runOnlyPendingTimers()
+    await waitFor(() => expect(getByText('searched user')).toBeInTheDocument())
 
     fireEvent.click(closest(getByText('Name'), 'button'))
-    jest.runOnlyPendingTimers()
-    expect(getByText('reverse searched user')).toBeInTheDocument()
+    vi.runOnlyPendingTimers()
+    await waitFor(() => expect(getByText('reverse searched user')).toBeInTheDocument())
   })
 
-  it.skip('sorts by score', () => {
+  it('sorts by score', async () => {
     const {getByText} = renderStudentsSearcher([
       {},
       {
@@ -141,13 +141,13 @@ describe('StudentsSearcher', () => {
         variables: {orderBy: [{field: 'score', direction: 'ascending'}]},
       },
     ])
-    jest.runOnlyPendingTimers()
-    fireEvent.click(closest(getByText('Score'), 'button'))
-    jest.runOnlyPendingTimers()
-    expect(getByText('searched user')).toBeInTheDocument()
+    vi.runOnlyPendingTimers()
+    await waitFor(() => fireEvent.click(closest(getByText('Score'), 'button')))
+    vi.runOnlyPendingTimers()
+    await waitFor(() => expect(getByText('searched user')).toBeInTheDocument())
   })
 
-  it.skip('sorts by submission date', () => {
+  it('sorts by submission date', async () => {
     const {getByText} = renderStudentsSearcher([
       {},
       {
@@ -155,15 +155,15 @@ describe('StudentsSearcher', () => {
         variables: {orderBy: [{field: 'submitted_at', direction: 'ascending'}]},
       },
     ])
-    jest.runOnlyPendingTimers()
-    fireEvent.click(closest(getByText('Submission Date'), 'button'))
-    jest.runOnlyPendingTimers()
-    expect(getByText('searched user')).toBeInTheDocument()
+    vi.runOnlyPendingTimers()
+    await waitFor(() => fireEvent.click(closest(getByText('Submission Date'), 'button')))
+    vi.runOnlyPendingTimers()
+    await waitFor(() => expect(getByText('searched user')).toBeInTheDocument())
   })
 
   it('hides extended filters by default', () => {
     const {queryByTestId} = renderStudentsSearcher()
-    jest.runOnlyPendingTimers()
+    vi.runOnlyPendingTimers()
     expect(queryByTestId('assignToFilter')).toBeNull()
     expect(queryByTestId('attemptsFilter')).toBeNull()
     expect(queryByTestId('assignToFilter')).toBeNull()
@@ -172,43 +172,44 @@ describe('StudentsSearcher', () => {
   it('toggles extended filters when button is clicked', () => {
     const {queryByTestId, getByTestId, getByText} = renderStudentsSearcher()
     fireEvent.click(closest(getByText('Filter'), 'button'))
-    jest.runOnlyPendingTimers()
+    vi.runOnlyPendingTimers()
     expect(getByTestId('assignToFilter')).toBeInTheDocument()
     expect(getByTestId('attemptFilter')).toBeInTheDocument()
     expect(getByTestId('statusFilter')).toBeInTheDocument()
 
     fireEvent.click(closest(getByText('Filter'), 'button'))
-    jest.runOnlyPendingTimers()
+    vi.runOnlyPendingTimers()
     expect(queryByTestId('assignToFilter')).toBeNull()
     expect(queryByTestId('attemptFilter')).toBeNull()
     expect(queryByTestId('assignToFilter')).toBeNull()
   })
 
-  it.skip('runs the userSearch query with a delay', () => {
+  it('runs the userSearch query with a delay', async () => {
     const {getByText, queryByText, getByLabelText} = renderStudentsSearcher([
       {},
       {users: [mockUser({shortName: 'searched user'})], variables: {userSearch: 'search'}},
     ])
-    jest.runOnlyPendingTimers()
+    vi.runOnlyPendingTimers()
+    await waitFor(() => expect(getByText(mockUser().shortName)).toBeInTheDocument())
     const searchInput = getByLabelText('Search by student name')
     fireEvent.change(searchInput, {target: {value: 'search'}})
 
     // initially hasn't searched yet
-    jest.advanceTimersByTime(500)
+    vi.advanceTimersByTime(500)
     expect(getByText(mockUser().shortName)).toBeInTheDocument()
     expect(queryByText('searched user')).toBeNull()
 
     // then does the search after the delay
-    jest.advanceTimersByTime(500)
-    expect(getByText('searched user')).toBeInTheDocument()
+    vi.advanceTimersByTime(500)
+    await waitFor(() => expect(getByText('searched user')).toBeInTheDocument())
   })
 
   it('displays a message and does not load when 0 < search characters < 3', () => {
     const {getByText, getByLabelText} = renderStudentsSearcher()
-    jest.runOnlyPendingTimers()
+    vi.runOnlyPendingTimers()
     const searchInput = getByLabelText('Search by student name')
     fireEvent.change(searchInput, {target: {value: '12'}})
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
     expect(getByText(/at least 3 characters/)).toBeInTheDocument()
   })
 })

@@ -21,7 +21,7 @@ import React from 'react'
 import {render, fireEvent, act} from '@testing-library/react'
 import TreeBrowser from '../TreeBrowser'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('TreeBrowser', () => {
   let onCollectionToggle, collections, onCreateGroup
@@ -68,8 +68,8 @@ describe('TreeBrowser', () => {
         parentGroupId: '1',
       },
     }
-    onCollectionToggle = jest.fn()
-    onCreateGroup = jest.fn()
+    onCollectionToggle = vi.fn()
+    onCreateGroup = vi.fn()
 
     ENV = {
       current_user: {
@@ -80,7 +80,7 @@ describe('TreeBrowser', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders root and leaf collections', () => {
@@ -141,7 +141,7 @@ describe('TreeBrowser', () => {
     it('expands and focuses on text box when clicked', async () => {
       const {getByText, getByLabelText} = render(<TreeBrowser {...defaultProps()} />)
       fireEvent.click(getByText('Create New Group'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(getByLabelText('Enter new group name')).toHaveFocus()
     })
 
@@ -152,7 +152,7 @@ describe('TreeBrowser', () => {
         key: 'ArrowLeft',
         code: 'ArrowLeft',
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(getByText('Leaf folder').closest('li')).toHaveFocus()
     })
 

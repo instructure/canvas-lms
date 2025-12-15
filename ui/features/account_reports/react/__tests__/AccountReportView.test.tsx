@@ -24,7 +24,7 @@ import fetchMock from 'fetch-mock'
 
 describe('AccountReportView', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fetchMock.restore()
   })
 

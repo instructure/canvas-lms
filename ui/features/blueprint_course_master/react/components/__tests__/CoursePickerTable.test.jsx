@@ -59,7 +59,7 @@ describe('CoursePickerTable component', () => {
 
   test('calls onSelectedChanged when courses are selected', async () => {
     const props = defaultProps()
-    props.onSelectedChanged = jest.fn()
+    props.onSelectedChanged = vi.fn()
     const {container} = render(<CoursePickerTable {...props} />)
     const checkbox = container.querySelectorAll(
       '[data-testid="bca-table__course-row"] input[type="checkbox"]',
@@ -73,7 +73,7 @@ describe('CoursePickerTable component', () => {
   test('calls onSelectedChanged when courses are unselected', async () => {
     const props = defaultProps()
     props.selectedCourses = ['1']
-    props.onSelectedChanged = jest.fn()
+    props.onSelectedChanged = vi.fn()
     const {container} = render(<CoursePickerTable {...props} />)
     const checkbox = container.querySelectorAll(
       '[data-testid="bca-table__course-row"] input[type="checkbox"]',
@@ -86,7 +86,7 @@ describe('CoursePickerTable component', () => {
 
   test('calls onSelectedChanged with correct data when "Select All" is selected', async () => {
     const props = defaultProps()
-    props.onSelectedChanged = jest.fn()
+    props.onSelectedChanged = vi.fn()
     const {container} = render(<CoursePickerTable {...props} />)
 
     const checkbox = container.querySelectorAll(
@@ -107,7 +107,7 @@ describe('CoursePickerTable component', () => {
     const check = container.querySelectorAll(
       '[data-testid="bca-table__course-row"] input[type="checkbox"]',
     )[0]
-    check.focus = jest.fn()
+    check.focus = vi.fn()
 
     instance.handleFocusLoss(0)
     expect(check.focus).toHaveBeenCalledTimes(1)
@@ -122,7 +122,7 @@ describe('CoursePickerTable component', () => {
     const check = container.querySelectorAll(
       '[data-testid="bca-table__course-row"] input[type="checkbox"]',
     )[1]
-    check.focus = jest.fn()
+    check.focus = vi.fn()
 
     instance.handleFocusLoss(2)
     expect(check.focus).toHaveBeenCalledTimes(1)
@@ -136,7 +136,7 @@ describe('CoursePickerTable component', () => {
     const instance = ref.current
 
     const check = container.querySelectorAll('.bca-table__select-all input[type="checkbox"]')[0]
-    check.focus = jest.fn()
+    check.focus = vi.fn()
 
     instance.handleFocusLoss(1)
     expect(check.focus).toHaveBeenCalledTimes(1)

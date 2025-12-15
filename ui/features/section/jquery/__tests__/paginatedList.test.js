@@ -21,6 +21,7 @@ import 'jquery-migrate'
 import PaginatedList from '../PaginatedList'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import {waitFor} from '@testing-library/react'
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toEqual(y)
@@ -49,7 +50,7 @@ describe('PaginatedList', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    $.fx.off = true // Disable jQuery animations to prevent timer issues
 
     response = [{value: 'one'}, {value: 'two'}]
 
@@ -63,7 +64,7 @@ describe('PaginatedList', () => {
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    $.fx.off = false // Re-enable jQuery animations
     fixture.remove()
   })
 
@@ -79,8 +80,9 @@ describe('PaginatedList', () => {
       url: '/api/v1/test.json',
     })
 
-    await jest.runAllTimersAsync()
-    equal(el.list.children().length, 2)
+    await waitFor(() => {
+      equal(el.list.children().length, 2)
+    })
   })
 
   test('should display a view more link if next page is available', async function () {
@@ -100,8 +102,9 @@ describe('PaginatedList', () => {
       url: '/api/v1/test.json',
     })
 
-    await jest.runAllTimersAsync()
-    ok(el.wrapper.find('.view-more-link').length > 0)
+    await waitFor(() => {
+      ok(el.wrapper.find('.view-more-link').length > 0)
+    })
     equal(list.options.requestParams.page, 'bookmarkstuff')
   })
 
@@ -117,8 +120,9 @@ describe('PaginatedList', () => {
       url: '/api/v1/test.json',
     })
 
-    await jest.runAllTimersAsync()
-    ok(el.wrapper.find('.view-more-link').length === 0)
+    await waitFor(() => {
+      ok(el.wrapper.find('.view-more-link').length === 0)
+    })
   })
 
   test('should accept a template function', async function () {
@@ -133,9 +137,10 @@ describe('PaginatedList', () => {
       url: '/api/v1/test.json',
     })
 
-    await jest.runAllTimersAsync()
-    equal(el.list.find('li:first-child').text(), 'one')
-    equal(el.list.find('li:last-child').text(), 'two')
+    await waitFor(() => {
+      equal(el.list.find('li:first-child').text(), 'one')
+      equal(el.list.find('li:last-child').text(), 'two')
+    })
   })
 
   test('should accept a presenter function', async function () {
@@ -151,8 +156,9 @@ describe('PaginatedList', () => {
       url: '/api/v1/test.json',
     })
 
-    await jest.runAllTimersAsync()
-    equal(el.list.find('li:first-child').text(), 'changed')
+    await waitFor(() => {
+      equal(el.list.find('li:first-child').text(), 'changed')
+    })
   })
 
   test('should allow user to defer getJSON', function () {
@@ -170,8 +176,7 @@ describe('PaginatedList', () => {
       url: '/api/v1/not-called.json',
     })
 
-    // Give time for potential request
-    jest.runAllTimers()
+    // Verify no request was made
     expect(requestMade).toBe(false)
   })
 })

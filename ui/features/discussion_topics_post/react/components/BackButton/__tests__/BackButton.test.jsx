@@ -26,7 +26,7 @@ const setup = props => {
 }
 
 describe('BackButton', () => {
-  const onClick = jest.fn()
+  const onClick = vi.fn()
 
   it('Should show the button text', () => {
     const {queryByText} = setup()

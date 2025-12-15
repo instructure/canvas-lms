@@ -22,7 +22,7 @@ import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import React from 'react'
 import GroupCategoryModal from '../GroupCategoryModal'
 
-const setup = (onSubmit = jest.fn()) => {
+const setup = (onSubmit = vi.fn()) => {
   return render(<GroupCategoryModal show={true} onSubmit={onSubmit} />)
 }
 
@@ -65,17 +65,17 @@ describe('GroupCategoryModal', () => {
 
   it('enables number input when it picks a group structure', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {getByText, findByLabelText} = setup()
+    const {getByText, findByText, findByLabelText} = setup()
     await user.click(getByText('Group Structure'))
-    await user.click(getByText('Split students by number of groups'))
+    await user.click(await findByText('Split students by number of groups'))
     expect(await findByLabelText('Number of Groups')).toBeInTheDocument()
   })
 
   it('increments/decrements number input, which stays in bounds', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {getByText, getByLabelText} = setup()
+    const {getByText, findByText, getByLabelText} = setup()
     await user.click(getByText('Group Structure'))
-    await user.click(getByText('Split students by number of groups'))
+    await user.click(await findByText('Split students by number of groups'))
     const numberInput = getByLabelText('Number of Groups') as HTMLInputElement
     await user.type(numberInput, '{arrowdown}')
     expect(numberInput.value).toBe('0')
@@ -91,7 +91,7 @@ describe('GroupCategoryModal', () => {
 
   it('calls submission function on submit', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const onSubmit = jest.fn()
+    const onSubmit = vi.fn()
     const {getByText} = setup(onSubmit)
     await user.click(getByText('Submit'))
     expect(onSubmit).toHaveBeenCalled()

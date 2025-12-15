@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, act, waitFor, fireEvent} from '@testing-library/react'
+import {cleanup, render, act, waitFor, fireEvent} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
@@ -25,9 +25,9 @@ import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import {AccountCalendarSettings} from '../AccountCalendarSettings'
 import {RESPONSE_ACCOUNT_1, RESPONSE_ACCOUNT_5, RESPONSE_ACCOUNT_6} from './fixtures'
 
-jest.mock('@canvas/calendar/AccountCalendarsUtils', () => {
+vi.mock('@canvas/calendar/AccountCalendarsUtils', () => {
   return {
-    alertForMatchingAccounts: jest.fn(),
+    alertForMatchingAccounts: vi.fn(),
   }
 })
 
@@ -38,11 +38,12 @@ const defaultProps = {
 beforeEach(() => {
   fetchMock.get(/\/api\/v1\/accounts\/1\/account_calendars.*/, RESPONSE_ACCOUNT_1)
   fetchMock.get(/\/api\/v1\/accounts\/1\/visible_calendars_count.*/, RESPONSE_ACCOUNT_1.length)
-  jest.useFakeTimers()
-  jest.clearAllMocks()
+  vi.useFakeTimers()
+  vi.clearAllMocks()
 })
 
 afterEach(() => {
+  cleanup()
   fetchMock.restore()
   destroyContainer()
 })
@@ -111,8 +112,8 @@ describe('AccountCalendarSettings', () => {
       fetchMock.get(/\/api\/v1\/accounts\/1\/visible_calendars_count.*/, RESPONSE_ACCOUNT_5.length)
       fetchMock.get(/\/api\/v1\/accounts\/1\/account_calendars.*/, RESPONSE_ACCOUNT_5)
       fetchMock.put(/\/api\/v1\/accounts\/1\/account_calendars/, {message: 'Updated 1 account'})
-      jest.useFakeTimers()
-      jest.clearAllMocks()
+      vi.useFakeTimers()
+      vi.clearAllMocks()
     })
 
     it('saves subscription type changes', async () => {
@@ -205,13 +206,13 @@ describe('AccountCalendarSettings', () => {
         act(() => getUniversityCheckbox().click())
 
         const event = new Event('beforeunload')
-        event.preventDefault = jest.fn()
+        event.preventDefault = vi.fn()
         window.dispatchEvent(event)
         expect(event.preventDefault).toHaveBeenCalled()
 
         act(() => getUniversityCheckbox().click())
 
-        event.preventDefault = jest.fn()
+        event.preventDefault = vi.fn()
         window.dispatchEvent(event)
         expect(event.preventDefault).not.toHaveBeenCalled()
       })
@@ -226,14 +227,14 @@ describe('AccountCalendarSettings', () => {
         act(() => getByText('Auto subscribe').click())
 
         const event = new Event('beforeunload')
-        event.preventDefault = jest.fn()
+        event.preventDefault = vi.fn()
         window.dispatchEvent(event)
         expect(event.preventDefault).toHaveBeenCalled()
 
         act(() => getAllByTestId('subscription-dropdown')[0].click())
         act(() => getByText('Manual subscribe').click())
 
-        event.preventDefault = jest.fn()
+        event.preventDefault = vi.fn()
         window.dispatchEvent(event)
         expect(event.preventDefault).not.toHaveBeenCalled()
       })

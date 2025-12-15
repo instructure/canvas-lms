@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from '@canvas/axios'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {createGradebook} from './GradebookSpecHelper'
 import SubmissionCommentApi from '../apis/SubmissionCommentApi'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
-jest.mock('@canvas/axios')
+vi.mock('@canvas/alerts/react/FlashAlert')
+
+const server = setupServer()
 
 describe('SubmissionComments', () => {
   let gradebook
@@ -40,6 +42,7 @@ describe('SubmissionComments', () => {
   }
 
   beforeEach(() => {
+    server.listen({onUnhandledRequest: 'bypass'})
     gridNode = document.createElement('div')
     gradebook = createGradebook({
       gradebookGridNode: gridNode,
@@ -79,12 +82,17 @@ describe('SubmissionComments', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   describe('#updateSubmissionComments', () => {
     beforeEach(() => {
-      jest.spyOn(gradebook, 'renderSubmissionTray').mockImplementation(() => {})
+      vi.spyOn(gradebook, 'renderSubmissionTray').mockImplementation(() => {})
     })
 
     it('calls renderSubmissionTray', () => {
@@ -101,13 +109,13 @@ describe('SubmissionComments', () => {
 
   describe('#unloadSubmissionComments', () => {
     it('calls setSubmissionComments with empty collection', () => {
-      const setSubmissionCommentsMock = jest.spyOn(gradebook, 'setSubmissionComments')
+      const setSubmissionCommentsMock = vi.spyOn(gradebook, 'setSubmissionComments')
       gradebook.unloadSubmissionComments()
       expect(setSubmissionCommentsMock).toHaveBeenCalledWith([])
     })
 
     it('sets submission comments as not loaded', () => {
-      const setSubmissionCommentsLoadedMock = jest.spyOn(gradebook, 'setSubmissionCommentsLoaded')
+      const setSubmissionCommentsLoadedMock = vi.spyOn(gradebook, 'setSubmissionCommentsLoaded')
       gradebook.unloadSubmissionComments()
       expect(setSubmissionCommentsLoadedMock).toHaveBeenCalledWith(false)
     })
@@ -115,22 +123,24 @@ describe('SubmissionComments', () => {
 
   describe('#apiCreateSubmissionComment', () => {
     beforeEach(() => {
-      jest.spyOn(gradebook, 'renderSubmissionTray').mockImplementation(() => {})
-      axios.put.mockResolvedValue({
-        data: {
-          submission_comments: [
-            {
-              id: 1,
-              comment: 'a comment',
-              created_at: '2024-01-01T00:00:00Z',
-            },
-          ],
-        },
-      })
+      vi.spyOn(gradebook, 'renderSubmissionTray').mockImplementation(() => {})
+      server.use(
+        http.put('/api/v1/courses/*/assignments/*/submissions/*', () => {
+          return HttpResponse.json({
+            submission_comments: [
+              {
+                id: 1,
+                comment: 'a comment',
+                created_at: '2024-01-01T00:00:00Z',
+              },
+            ],
+          })
+        })
+      )
     })
 
     it('updates submission comments on successful API call', async () => {
-      jest.spyOn(gradebook, 'updateSubmissionComments')
+      vi.spyOn(gradebook, 'updateSubmissionComments')
       await gradebook.apiCreateSubmissionComment('a comment')
       expect(gradebook.updateSubmissionComments).toHaveBeenCalled()
     })
@@ -141,13 +151,17 @@ describe('SubmissionComments', () => {
     })
 
     it('shows error flash message on failed API call', async () => {
-      axios.put.mockRejectedValue(new Error('Network error'))
+      server.use(
+        http.put('/api/v1/courses/*/assignments/*/submissions/*', () => {
+          return new HttpResponse(null, {status: 500})
+        })
+      )
       await gradebook.apiCreateSubmissionComment('a comment')
       expect(FlashAlert.showFlashError).toHaveBeenCalled()
     })
 
     it('includes correct data in API call for individual assignment', async () => {
-      const createSubmissionCommentSpy = jest.spyOn(SubmissionCommentApi, 'createSubmissionComment')
+      const createSubmissionCommentSpy = vi.spyOn(SubmissionCommentApi, 'createSubmissionComment')
       await gradebook.apiCreateSubmissionComment('a comment')
 
       expect(createSubmissionCommentSpy).toHaveBeenCalledWith(
@@ -162,8 +176,8 @@ describe('SubmissionComments', () => {
     })
 
     it('includes attempt in API call when submission has attempt', async () => {
-      jest.spyOn(gradebook, 'getSubmission').mockReturnValue({attempt: 3})
-      const createSubmissionCommentSpy = jest.spyOn(SubmissionCommentApi, 'createSubmissionComment')
+      vi.spyOn(gradebook, 'getSubmission').mockReturnValue({attempt: 3})
+      const createSubmissionCommentSpy = vi.spyOn(SubmissionCommentApi, 'createSubmissionComment')
 
       await gradebook.apiCreateSubmissionComment('a comment')
 
@@ -182,7 +196,7 @@ describe('SubmissionComments', () => {
         const groupAssignment = {...assignment, grade_group_students_individually: false}
         gradebook.setAssignments({2301: groupAssignment})
 
-        const createSubmissionCommentSpy = jest.spyOn(
+        const createSubmissionCommentSpy = vi.spyOn(
           SubmissionCommentApi,
           'createSubmissionComment',
         )

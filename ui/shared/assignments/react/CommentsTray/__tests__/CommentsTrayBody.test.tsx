@@ -158,8 +158,8 @@ describe('CommentsTrayBody', () => {
   beforeEach(() => {
     // @ts-expect-error
     window.ENV = {...originalENV, RICH_CONTENT_APP_HOST: '', JWT: '123'}
-    mockedSetOnFailure = jest.fn().mockResolvedValue({})
-    mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+    mockedSetOnFailure = vi.fn().mockResolvedValue({})
+    mockedSetOnSuccess = vi.fn().mockResolvedValue({})
   })
 
   afterEach(() => {
@@ -169,7 +169,7 @@ describe('CommentsTrayBody', () => {
 
   describe('read/unread comments', () => {
     it('marks submission comments as read after timeout', async () => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
 
       const props = await mockAssignmentAndSubmission([
         {
@@ -182,7 +182,7 @@ describe('CommentsTrayBody', () => {
         },
       }
 
-      const mockMutation = jest.fn().mockResolvedValue({data: {markSubmissionCommentsRead: {}}})
+      const mockMutation = vi.fn().mockResolvedValue({data: {markSubmissionCommentsRead: {}}})
       const mocks = [
         await mockSubmissionCommentQuery(overrides),
         await mockMarkSubmissionCommentsRead({newData: () => mockMutation()}),
@@ -190,13 +190,13 @@ describe('CommentsTrayBody', () => {
 
       render(mockContext(<CommentsTrayBody {...props} />, mocks))
 
-      await act(() => jest.runAllTimers())
+      await act(() => vi.runAllTimers())
 
       await waitFor(() => expect(mockMutation).toHaveBeenCalledWith(), {timeout: 3000})
     })
 
     it('does not mark submission comments as read for observers', async () => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
 
       const props = await mockAssignmentAndSubmission({
         // @ts-expect-error
@@ -208,7 +208,7 @@ describe('CommentsTrayBody', () => {
         },
       }
 
-      const mockMutation = jest.fn().mockResolvedValue({data: {markSubmissionCommentsRead: {}}})
+      const mockMutation = vi.fn().mockResolvedValue({data: {markSubmissionCommentsRead: {}}})
       const mocks = [
         await mockSubmissionCommentQuery(overrides),
         await mockMarkSubmissionCommentsRead({newData: () => mockMutation()}),
@@ -225,13 +225,13 @@ describe('CommentsTrayBody', () => {
         ),
       )
 
-      await act(() => jest.runAllTimers())
+      await act(() => vi.runAllTimers())
 
       expect(mockMutation).not.toHaveBeenCalled()
     })
 
     it('renders an error when submission comments fail to be marked as read', async () => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
 
       const props = await mockAssignmentAndSubmission([
         {
@@ -250,8 +250,8 @@ describe('CommentsTrayBody', () => {
 
       render(mockContext(<CommentsTrayBody {...props} />, mocks))
 
-      await act(() => jest.advanceTimersByTime(3000))
-      await act(() => jest.runAllTimers())
+      await act(() => vi.advanceTimersByTime(3000))
+      await act(() => vi.runAllTimers())
 
       expect(mockedSetOnFailure).toHaveBeenCalledWith(
         'There was a problem marking submission comments as read',
@@ -259,7 +259,7 @@ describe('CommentsTrayBody', () => {
     })
 
     it('alerts the screen reader when submission comments are marked as read', async () => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
 
       const props = await mockAssignmentAndSubmission([
         {
@@ -284,8 +284,8 @@ describe('CommentsTrayBody', () => {
 
       render(mockContext(<CommentsTrayBody {...props} />, mocks))
 
-      await act(() => jest.advanceTimersByTime(3000))
-      await act(() => jest.runAllTimers())
+      await act(() => vi.advanceTimersByTime(3000))
+      await act(() => vi.runAllTimers())
 
       expect(mockedSetOnSuccess).toHaveBeenCalledWith(
         'All submission comments have been marked as read',
@@ -295,12 +295,13 @@ describe('CommentsTrayBody', () => {
 
   describe('group assignments', () => {
     // fickle. EVAL-3667
-    it.skip('renders warning that comments will be sent to the whole group for group assignments', async () => {
+    it('renders warning that comments will be sent to the whole group for group assignments', async () => {
       const mocks = [await mockSubmissionCommentQuery()]
       const props = await mockAssignmentAndSubmission([
         {
           Assignment: {
             gradeGroupStudentsIndividually: false,
+            groupCategoryId: '1',
             groupSet: {
               _id: '1',
               name: 'sample-group-set',
@@ -314,7 +315,13 @@ describe('CommentsTrayBody', () => {
       ])
       const {queryByText} = render(
         // @ts-expect-error
-        <StudentViewContext.Provider value={{allowChangesToSubmission: true, isObserver: false}}>
+        <StudentViewContext.Provider
+          value={{
+            allowChangesToSubmission: true,
+            allowPeerReviewComments: true,
+            isObserver: false,
+          }}
+        >
           <MockedProvider mocks={mocks}>
             <CommentsTrayBody {...props} />
           </MockedProvider>
@@ -331,6 +338,7 @@ describe('CommentsTrayBody', () => {
         {
           Assignment: {
             gradeGroupStudentsIndividually: true,
+            groupCategoryId: '1',
             groupSet: {
               _id: '1',
               name: 'sample-group-set',
@@ -510,7 +518,7 @@ describe('CommentsTrayBody', () => {
     }
 
     const cursorMock = await mockSubmissionCommentQuery(overrides, {cursor: 'Hello World'})
-    const cursorMockWrapper = jest.fn().mockReturnValue(cursorMock.result)
+    const cursorMockWrapper = vi.fn().mockReturnValue(cursorMock.result)
 
     const mocks = [
       await mockSubmissionCommentQuery(overrides),
@@ -1019,7 +1027,7 @@ describe('CommentsTrayBody', () => {
         mockSubmissionCommentQuery({}, {peerReview: true}),
         mockCreateSubmissionComment(),
       ])
-      const onSuccessfulPeerReviewMockFunction = jest.fn()
+      const onSuccessfulPeerReviewMockFunction = vi.fn()
       const props = {
         ...(await getDefaultPropsWithReviewerSubmission('assigned')),
         onSuccessfulPeerReview: onSuccessfulPeerReviewMockFunction,

@@ -25,25 +25,32 @@ import {SplitScreenThreadsContainer} from '../SplitScreenThreadsContainer'
 import {MockedProvider} from '@apollo/client/testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {updateDiscussionEntryParticipantMock} from '../../../../graphql/Mocks'
 import {ObserverContext} from '../../../utils/ObserverContext'
 
-jest.mock('../../../utils/constants', () => ({
-  ...jest.requireActual('../../../utils/constants'),
-  AUTO_MARK_AS_READ_DELAY: 0,
-}))
+vi.mock('../../../utils/constants', async importOriginal => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    AUTO_MARK_AS_READ_DELAY: 0,
+  }
+})
 
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
-}))
+vi.mock('../../../utils', async importOriginal => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
+  }
+})
 
 describe('SplitScreenThreadsContainer', () => {
-  const setOnFailure = jest.fn()
-  const setOnSuccess = jest.fn()
+  const setOnFailure = vi.fn()
+  const setOnSuccess = vi.fn()
 
   beforeAll(() => {
-    window.ENV = {
+    fakeENV.setup({
       discussion_topic_id: '1',
       manual_mark_as_read: false,
       current_user: {
@@ -52,15 +59,18 @@ describe('SplitScreenThreadsContainer', () => {
         avatar_image_url: 'www.avatar.com',
       },
       course_id: '1',
-    }
+    })
 
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       }
     })
   })
@@ -159,7 +169,7 @@ describe('SplitScreenThreadsContainer', () => {
 
   describe('show more replies buttons', () => {
     it('clicking show older replies button calls showOlderReplies()', async () => {
-      const showOlderReplies = jest.fn()
+      const showOlderReplies = vi.fn()
       const container = setup(
         defaultProps({overrides: {hasMoreOlderReplies: true, showOlderReplies}}),
       )
@@ -169,7 +179,7 @@ describe('SplitScreenThreadsContainer', () => {
     })
 
     it('clicking show newer replies button calls showNewerReplies()', async () => {
-      const showNewerReplies = jest.fn()
+      const showNewerReplies = vi.fn()
       const container = setup(
         defaultProps({overrides: {hasMoreNewerReplies: true, showNewerReplies}}),
       )
@@ -181,7 +191,7 @@ describe('SplitScreenThreadsContainer', () => {
 
   describe('thread actions menu', () => {
     it('allows toggling the unread state of an entry', async () => {
-      const onToggleUnread = jest.fn()
+      const onToggleUnread = vi.fn()
       const props = defaultProps({overrides: {onToggleUnread}})
       props.discussionEntry.discussionSubentriesConnection.nodes[0].entryParticipant.read = true
       const {findAllByTestId, findByTestId} = setup(props)
@@ -195,7 +205,7 @@ describe('SplitScreenThreadsContainer', () => {
     })
 
     it('only shows the delete option if you have permission', async () => {
-      const props = defaultProps({overrides: {onDelete: jest.fn()}})
+      const props = defaultProps({overrides: {onDelete: vi.fn()}})
       props.discussionEntry.discussionSubentriesConnection.nodes[0].permissions.delete = false
       const {queryByTestId, findAllByTestId} = setup(props)
 
@@ -205,7 +215,7 @@ describe('SplitScreenThreadsContainer', () => {
     })
 
     it('allows deleting an entry', async () => {
-      const onDelete = jest.fn()
+      const onDelete = vi.fn()
       const {getByTestId, findAllByTestId} = setup(defaultProps({overrides: {onDelete}}))
 
       const threadActionsMenu = await findAllByTestId('thread-actions-menu')
@@ -216,7 +226,7 @@ describe('SplitScreenThreadsContainer', () => {
     })
 
     it('only shows the SpeedGrader option if you have permission', async () => {
-      const props = defaultProps({overrides: {onOpenInSpeedGrader: jest.fn()}})
+      const props = defaultProps({overrides: {onOpenInSpeedGrader: vi.fn()}})
       props.discussionTopic.permissions.speedGrader = false
       const {queryByTestId, findAllByTestId} = setup(props)
 
@@ -226,7 +236,7 @@ describe('SplitScreenThreadsContainer', () => {
     })
 
     it('allows opening an entry in speedgrader', async () => {
-      const onOpenInSpeedGrader = jest.fn()
+      const onOpenInSpeedGrader = vi.fn()
       const {getByTestId, findAllByTestId} = setup(defaultProps({overrides: {onOpenInSpeedGrader}}))
 
       const threadActionsMenu = await findAllByTestId('thread-actions-menu')
@@ -322,7 +332,7 @@ describe('SplitScreenThreadsContainer', () => {
     })
 
     beforeEach(() => {
-      window.IntersectionObserver = jest.fn().mockImplementation(intersectionObserverMock)
+      window.IntersectionObserver = vi.fn().mockImplementation(intersectionObserverMock)
     })
 
     it('observer is not created when entry is already read', () => {
@@ -360,7 +370,7 @@ describe('SplitScreenThreadsContainer', () => {
   })
 
   it('Go To Quoted Reply should work', () => {
-    const onOpenSplitScreenView = jest.fn()
+    const onOpenSplitScreenView = vi.fn()
     const props = defaultProps({
       discussionEntryOverrides: {
         rootEntryId: '50',

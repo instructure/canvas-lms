@@ -24,12 +24,10 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import CreateEditAllocationRuleModal from '../CreateEditAllocationRuleModal'
 import {CourseStudent, AllocationRuleType} from '../../graphql/teacher/AssignmentTeacherTypes'
 
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(),
-}))
+vi.mock('@canvas/graphql')
 
-const {executeQuery} = require('@canvas/graphql')
-const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+import {executeQuery} from '@canvas/graphql'
+const mockExecuteQuery = vi.mocked(executeQuery)
 
 const mockStudents: CourseStudent[] = [
   {_id: '1', name: 'Student 1', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
@@ -38,13 +36,13 @@ const mockStudents: CourseStudent[] = [
 ]
 
 describe('CreateEditAllocationRuleModal', () => {
-  const mockSetIsOpen = jest.fn()
+  const mockSetIsOpen = vi.fn()
   const defaultProps = {
     assignmentId: '123',
     requiredPeerReviewsCount: 2,
     isOpen: true,
     setIsOpen: mockSetIsOpen,
-    refetchRules: jest.fn(),
+    refetchRules: vi.fn(),
   }
 
   const assessor: CourseStudent = {
@@ -72,7 +70,7 @@ describe('CreateEditAllocationRuleModal', () => {
 
   beforeEach(() => {
     user = userEvent.setup()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderWithProviders = (props = {}) => {

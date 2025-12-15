@@ -27,10 +27,10 @@ import {http, HttpResponse} from 'msw'
 const server = setupServer()
 
 const props = {
-  closeTray: jest.fn(),
+  closeTray: vi.fn(),
   badgeDisabled: false,
-  setBadgeDisabled: jest.fn(),
-  forceUnreadPoll: jest.fn(),
+  setBadgeDisabled: vi.fn(),
+  forceUnreadPoll: vi.fn(),
 }
 const render = () => {
   return testingLibraryRender(

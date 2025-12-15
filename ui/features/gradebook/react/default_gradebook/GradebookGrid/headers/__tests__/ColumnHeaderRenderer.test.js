@@ -46,13 +46,13 @@ describe('GradebookGrid ColumnHeaderRenderer', () => {
     assignmentColumnRendererFactory = renderer.factories.assignment
 
     // Mock the render and destroy methods to avoid actual rendering
-    jest.spyOn(assignmentColumnRendererFactory, 'render').mockImplementation(() => {})
-    jest.spyOn(assignmentColumnRendererFactory, 'destroy').mockImplementation(() => {})
+    vi.spyOn(assignmentColumnRendererFactory, 'render').mockImplementation(() => {})
+    vi.spyOn(assignmentColumnRendererFactory, 'destroy').mockImplementation(() => {})
   })
 
   afterEach(() => {
     container.remove()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('renderColumnHeader', () => {

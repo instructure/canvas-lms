@@ -65,7 +65,7 @@ describe('GradebookGrid AssignmentRowCellPropFactory', () => {
         item: {id: '1101'},
       }
 
-      jest.spyOn(gradebook, 'updateRowAndRenderSubmissionTray').mockImplementation(() => {})
+      vi.spyOn(gradebook, 'updateRowAndRenderSubmissionTray').mockImplementation(() => {})
     })
 
     afterEach(() => {
@@ -87,22 +87,22 @@ describe('GradebookGrid AssignmentRowCellPropFactory', () => {
     })
 
     test('.gradeIsEditable is true when the grade for the submission is editable', () => {
-      jest.spyOn(gradebook, 'isGradeEditable').mockReturnValue(true)
+      vi.spyOn(gradebook, 'isGradeEditable').mockReturnValue(true)
       expect(getProps().gradeIsEditable).toBe(true)
     })
 
     test('.gradeIsEditable is false when the grade for the submission is not editable', () => {
-      jest.spyOn(gradebook, 'isGradeEditable').mockReturnValue(false)
+      vi.spyOn(gradebook, 'isGradeEditable').mockReturnValue(false)
       expect(getProps().gradeIsEditable).toBe(false)
     })
 
     test('.gradeIsVisible is true when the grade for the submission is visible', () => {
-      jest.spyOn(gradebook, 'isGradeVisible').mockReturnValue(true)
+      vi.spyOn(gradebook, 'isGradeVisible').mockReturnValue(true)
       expect(getProps().gradeIsVisible).toBe(true)
     })
 
     test('.gradeIsVisible is false when the grade for the submission is not visible', () => {
-      jest.spyOn(gradebook, 'isGradeVisible').mockReturnValue(false)
+      vi.spyOn(gradebook, 'isGradeVisible').mockReturnValue(false)
       expect(getProps().gradeIsVisible).toBe(false)
     })
 
@@ -153,7 +153,7 @@ describe('GradebookGrid AssignmentRowCellPropFactory', () => {
     })
 
     test('.onToggleSubmissionTrayOpen toggles the tray using .toggleSubmissionTrayOpen', () => {
-      jest.spyOn(gradebook, 'toggleSubmissionTrayOpen')
+      vi.spyOn(gradebook, 'toggleSubmissionTrayOpen')
       getProps().onToggleSubmissionTrayOpen()
       expect(gradebook.toggleSubmissionTrayOpen).toHaveBeenCalledTimes(1)
     })
@@ -241,7 +241,7 @@ describe('GradebookGrid AssignmentRowCellPropFactory', () => {
 
       describe('when showing similarity scores in Gradebook', () => {
         beforeEach(() => {
-          jest.spyOn(gradebook, 'showSimilarityScore').mockReturnValue(true)
+          vi.spyOn(gradebook, 'showSimilarityScore').mockReturnValue(true)
         })
 
         afterEach(() => {
@@ -268,7 +268,7 @@ describe('GradebookGrid AssignmentRowCellPropFactory', () => {
             user_id: '1101',
           }
 
-          jest.spyOn(gradebook, 'getSubmission').mockReturnValue(submission)
+          vi.spyOn(gradebook, 'getSubmission').mockReturnValue(submission)
           expect(getProps().submission.similarityInfo).toEqual({
             status: 'scored',
             similarityScore: 75,

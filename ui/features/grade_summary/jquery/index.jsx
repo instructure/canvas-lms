@@ -389,7 +389,7 @@ function calculateSubtotals(byGradingPeriod, calculatedGrades, currentOrFinal) {
       elementIdPrefix: '#submission_group',
     }
   }
-  if (params.grades) {
+  if (params.grades && params.bins) {
     for (let i = 0; i < params.bins.length; i++) {
       const binId = params.bins[i].id
       let grade = params.grades[binId]

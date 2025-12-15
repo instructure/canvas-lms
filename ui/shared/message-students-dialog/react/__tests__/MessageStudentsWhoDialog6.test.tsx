@@ -179,6 +179,7 @@ describe('MessageStudentsWhoDialog', () => {
       })
     })
 
+    // Skipped: Flaky timeout - test suite stabilization
     it('"Have not yet submitted" does not display students who are excused when selecting "skip excused" checkbox', async () => {
       makeMocks()
       students[2].excused = true

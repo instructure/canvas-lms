@@ -23,12 +23,13 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {usePeerReviewConfiguration} from '../usePeerReviewConfiguration'
 import {PEER_REVIEW_CONFIGURATION_QUERY} from '../../teacher/Queries'
 
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(),
+import {executeQuery} from '@canvas/graphql'
+
+vi.mock('@canvas/graphql', () => ({
+  executeQuery: vi.fn(),
 }))
 
-const {executeQuery} = require('@canvas/graphql')
-const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+const mockExecuteQuery = vi.mocked(executeQuery)
 
 const mockPeerReviewConfig = {
   assignment: {
@@ -78,7 +79,7 @@ const createWrapper = () => {
 
 describe('usePeerReviewConfiguration', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('with assignmentId', () => {

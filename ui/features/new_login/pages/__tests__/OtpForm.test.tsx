@@ -17,7 +17,7 @@
  */
 
 import {assignLocation} from '@canvas/util/globalUtils'
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
@@ -25,12 +25,12 @@ import {NewLoginProvider} from '../../context'
 import {cancelOtpRequest, verifyOtpRequest} from '../../services'
 import OtpForm from '../OtpForm'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
-jest.mock('../../services', () => ({
-  initiateOtpRequest: jest
+vi.mock('../../services', () => ({
+  initiateOtpRequest: vi
     .fn()
     .mockResolvedValue(
       new Promise(resolve =>
@@ -40,9 +40,14 @@ jest.mock('../../services', () => ({
         ),
       ),
     ),
-  verifyOtpRequest: jest.fn(),
-  cancelOtpRequest: jest.fn().mockResolvedValue({status: 200}),
+  verifyOtpRequest: vi.fn(),
+  cancelOtpRequest: vi.fn().mockResolvedValue({status: 200}),
 }))
+
+afterEach(() => {
+  cleanup()
+  vi.clearAllMocks()
+})
 
 describe('OtpForm', () => {
   const setup = () => {
@@ -102,7 +107,7 @@ describe('OtpForm', () => {
     })
 
     it('submits valid OTP and redirects', async () => {
-      ;(verifyOtpRequest as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(verifyOtpRequest).mockResolvedValueOnce({
         status: 200,
         data: {location: '/dashboard'},
       })
@@ -116,7 +121,7 @@ describe('OtpForm', () => {
 
   describe('error handling', () => {
     it('shows error when OTP verification fails due to invalid code', async () => {
-      ;(verifyOtpRequest as jest.Mock).mockRejectedValueOnce({response: {status: 422}})
+      vi.mocked(verifyOtpRequest).mockRejectedValueOnce({response: {status: 422}})
       setup()
       await waitFor(() => expect(screen.getByTestId('otp-input')).toBeInTheDocument())
       await userEvent.type(screen.getByTestId('otp-input'), '654321')
@@ -127,7 +132,7 @@ describe('OtpForm', () => {
     })
 
     it('shows error when OTP verification encounters a server error', async () => {
-      ;(verifyOtpRequest as jest.Mock).mockRejectedValueOnce(new Error('Server Error'))
+      vi.mocked(verifyOtpRequest).mockRejectedValueOnce(new Error('Server Error'))
       setup()
       await waitFor(() => expect(screen.getByTestId('otp-input')).toBeInTheDocument())
       await userEvent.type(screen.getByTestId('otp-input'), '987654')

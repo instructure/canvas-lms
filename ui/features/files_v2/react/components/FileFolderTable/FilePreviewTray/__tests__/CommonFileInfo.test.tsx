@@ -27,11 +27,11 @@ import {
   isRestricted,
 } from '../../../../../utils/fileUtils'
 
-jest.mock('../../../../../utils/fileUtils', () => ({
-  getRestrictedText: jest.fn(() => 'Restricted Text'),
-  isHidden: jest.fn(() => false),
-  isPublished: jest.fn(() => true),
-  isRestricted: jest.fn(() => false),
+vi.mock('../../../../../utils/fileUtils', () => ({
+  getRestrictedText: vi.fn(() => 'Restricted Text'),
+  isHidden: vi.fn(() => false),
+  isPublished: vi.fn(() => true),
+  isRestricted: vi.fn(() => false),
 }))
 
 describe('CommonFileInfo', () => {
@@ -47,10 +47,10 @@ describe('CommonFileInfo', () => {
 
   it('renders file information correctly', () => {
     // Mock the file utils to return expected values
-    ;(isPublished as jest.Mock).mockReturnValue(true)
-    ;(isRestricted as jest.Mock).mockReturnValue(true)
-    ;(isHidden as jest.Mock).mockReturnValue(false)
-    ;(getRestrictedText as jest.Mock).mockReturnValue('Restricted File')
+    ;(isPublished as any).mockReturnValue(true)
+    ;(isRestricted as any).mockReturnValue(true)
+    ;(isHidden as any).mockReturnValue(false)
+    ;(getRestrictedText as any).mockReturnValue('Restricted File')
 
     render(<CommonFileInfo item={mockItem as File} />)
     expect(screen.getByText('File Info')).toBeInTheDocument()
@@ -76,15 +76,15 @@ describe('CommonFileInfo', () => {
   })
 
   it('renders "Hidden" if file is published but hidden', () => {
-    ;(isRestricted as jest.Mock).mockReturnValue(false)
-    ;(isHidden as jest.Mock).mockReturnValue(true)
+    ;(isRestricted as any).mockReturnValue(false)
+    ;(isHidden as any).mockReturnValue(true)
     render(<CommonFileInfo item={mockItem as File} />)
     expect(screen.getByText('Hidden')).toBeInTheDocument()
   })
 
   it('renders "Restricted Text" if file is published and restricted', () => {
-    ;(isRestricted as jest.Mock).mockReturnValue(true)
-    ;(getRestrictedText as jest.Mock).mockReturnValue('Restricted Text')
+    ;(isRestricted as any).mockReturnValue(true)
+    ;(getRestrictedText as any).mockReturnValue('Restricted Text')
     render(<CommonFileInfo item={mockItem as File} />)
     expect(screen.getByText('Status')).toBeInTheDocument()
     expect(screen.getByText('Restricted Text')).toBeInTheDocument()

@@ -19,7 +19,6 @@
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ExternalToolModalLauncher from '../ExternalToolModalLauncher'
-import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 function generateProps(overrides = {}) {
   return {
@@ -74,7 +73,7 @@ describe('ExternalToolModalLauncher', () => {
     afterAll(() => (window.ENV = origEnv))
 
     test('invokes onRequestClose prop when window receives externalContentReady event', async () => {
-      const onRequestCloseMock = jest.fn()
+      const onRequestCloseMock = vi.fn()
       const props = generateProps({onRequestClose: onRequestCloseMock})
 
       render(<ExternalToolModalLauncher {...props} />)
@@ -88,7 +87,7 @@ describe('ExternalToolModalLauncher', () => {
     })
 
     test('invokes onRequestClose prop when window receives externalContentCancel event', () => {
-      const onRequestCloseMock = jest.fn()
+      const onRequestCloseMock = vi.fn()
       const props = generateProps({onRequestClose: onRequestCloseMock})
 
       render(<ExternalToolModalLauncher {...props} />)
@@ -99,7 +98,7 @@ describe('ExternalToolModalLauncher', () => {
     })
 
     test('invokes onDeepLinkingResponse prop when window receives externalContentCancel event', () => {
-      const onDeepLinkingResponseMock = jest.fn()
+      const onDeepLinkingResponseMock = vi.fn()
       const props = generateProps({onDeepLinkingResponse: onDeepLinkingResponseMock})
 
       render(<ExternalToolModalLauncher {...props} />)
@@ -112,7 +111,7 @@ describe('ExternalToolModalLauncher', () => {
 
   describe('onClose behavior', () => {
     it('calls onRequestClose when clicking a button element', async () => {
-      const onRequestCloseMock = jest.fn()
+      const onRequestCloseMock = vi.fn()
       const {getByText} = render(
         <ExternalToolModalLauncher
           {...generateProps({onRequestClose: onRequestCloseMock, isOpen: true})}
@@ -127,7 +126,7 @@ describe('ExternalToolModalLauncher', () => {
     })
 
     it('does not call onRequestClose when clicking outside the diaglog', async () => {
-      const onRequestCloseMock = jest.fn()
+      const onRequestCloseMock = vi.fn()
       const {getByRole} = render(
         <ExternalToolModalLauncher
           {...generateProps({onRequestClose: onRequestCloseMock, isOpen: true})}
@@ -141,23 +140,9 @@ describe('ExternalToolModalLauncher', () => {
       expect(onRequestCloseMock).not.toHaveBeenCalled()
     })
 
-    it('calls onRequestClose when tool sends lti.close event', async () => {
-      monitorLtiMessages()
-
-      const onRequestCloseMock = jest.fn()
-      const {getByTitle} = render(
-        <ExternalToolModalLauncher
-          {...generateProps({onRequestClose: onRequestCloseMock, isOpen: true})}
-        />,
-      )
-
-      const iframe = getByTitle('Modal Title') as HTMLIFrameElement
-      sendPostMessage({subject: 'lti.close'}, iframe.contentWindow)
-
-      await waitFor(() => {
-        expect(onRequestCloseMock).toHaveBeenCalled()
-      })
-    })
+    // lti.close test moved to ExternalToolModalLauncherLtiClose.test.tsx
+    // because monitorLtiMessages() has global side effects that can cause
+    // flaky test failures when running with other tests
   })
 
   test('sets the iframe allowances', async () => {

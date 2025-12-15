@@ -74,7 +74,7 @@ describe('feature_flags::FeatureFlagButton', () => {
     window.ENV.CONTEXT_BASE_URL = '/accounts/1'
     const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature1`
     fetchMock.putOnce(route, sampleData.onFeature.feature_flag)
-    const onStateChange = jest.fn()
+    const onStateChange = vi.fn()
     const {container, getByText} = render(
       <FeatureFlagButton
         featureFlag={sampleData.allowedFeature.feature_flag}
@@ -108,7 +108,6 @@ describe('feature_flags::FeatureFlagButton', () => {
   })
 
   // FOO-3819
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('Refocuses on the button after the FF icon changes', async () => {
     ENV.CONTEXT_BASE_URL = '/accounts/1'
     const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature4`
@@ -265,13 +264,13 @@ describe('feature_flags::FeatureFlagButton', () => {
 
     afterEach(() => {
       fakeENV.teardown()
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('skips the API update when checkEarlyAccessProgram returns false', async () => {
       const user = userEvent.setup()
       const featureFlagRoute = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature1`
-      const checkEarlyAccessProgram = jest.fn()
+      const checkEarlyAccessProgram = vi.fn()
 
       fetchMock.put(featureFlagRoute, sampleData.onFeature.feature_flag)
       checkEarlyAccessProgram.mockResolvedValue(false)

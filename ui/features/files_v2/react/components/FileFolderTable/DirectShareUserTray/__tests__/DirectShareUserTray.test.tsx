@@ -27,7 +27,7 @@ import {mockRowsContext} from '../../__tests__/testUtils'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/direct-sharing/react/effects/useContentShareUserSearchApi')
+vi.mock('@canvas/direct-sharing/react/effects/useContentShareUserSearchApi')
 
 const server = setupServer()
 
@@ -56,7 +56,7 @@ const userB = {
 const defaultProps = {
   open: true,
   courseId: '1',
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
   file: FAKE_FILES[0],
 }
 
@@ -89,7 +89,7 @@ describe('DirectShareUserTray', () => {
 
   beforeEach(() => {
     capturedRequest = null
-    ;(useContentShareUserSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
+    ;(useContentShareUserSearchApi as any).mockImplementationOnce(({success}: {success: any}) => {
       success([userA, userB])
     })
     server.use(
@@ -105,8 +105,8 @@ describe('DirectShareUserTray', () => {
 
   afterEach(async () => {
     server.resetHandlers()
-    jest.clearAllMocks()
-    jest.resetAllMocks()
+    vi.clearAllMocks()
+    vi.resetAllMocks()
     cleanup()
   })
 

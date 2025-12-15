@@ -34,11 +34,12 @@ describe('LoginHelp Component and Helpers', () => {
 
   beforeEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
     document.body.innerHTML = ''
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    // Wait for any pending transitions to complete before cleanup
+    await new Promise(resolve => setTimeout(resolve, 500))
     cleanup()
     document.body.innerHTML = ''
   })

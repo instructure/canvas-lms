@@ -87,7 +87,7 @@ describe('DateTimeInput::', () => {
   })
 
   it('makes a good callback when the date is changed', async () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByLabelText, queryAllByText, rerender} = renderInput({onChange})
     const dateInput = getByLabelText('Date')
     fireEvent.input(dateInput, {target: {value: 'Apr 10 2022'}})
@@ -99,7 +99,7 @@ describe('DateTimeInput::', () => {
   })
 
   it('makes a good callback when the time is changed', async () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByLabelText, queryAllByText, rerender} = renderInput({onChange})
     const timeInput = getByLabelText('Time')
     fireEvent.click(timeInput)

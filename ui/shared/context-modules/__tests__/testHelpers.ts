@@ -31,7 +31,7 @@ function makeModel(type: string, id: number, module_item_id: number) {
       module_item_id,
     },
     view: {
-      render: jest.fn(),
+      render: vi.fn(),
     },
   }
 }

@@ -84,6 +84,8 @@ function failADate(whichDate) {
   }
   const errMessages = {}
 
+  // Skip: DateTimeInput was stubbed out in EditableDateTime.jsx because
+  // InstUI DateTimeInput was deprecated in v7. See comment in that file.
   it.skip(`renders the error message when ${whichDate} date is invalid`, async () => {
     const override = mockOverride({
       dueAt: '2018-12-25T23:59:59-05:00',

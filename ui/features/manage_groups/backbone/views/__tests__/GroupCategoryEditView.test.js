@@ -20,7 +20,7 @@ import $ from 'jquery'
 import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
 import GroupCategoryEditView from '@canvas/groups/backbone/views/GroupCategoryEditView'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 let view = null
 let groupCategory = null
@@ -52,8 +52,8 @@ describe('GroupCategoryEditView', () => {
     document.getElementById('fixtures').innerHTML = ''
   })
 
-  test('it should be accessible', done => {
-    isAccessible($fixtures, done, {a11yReport: true})
+  test('it should be accessible', async () => {
+    await isAccessible($fixtures, {a11yReport: true})
   })
 
   test('validateFormData does not error when group_limit is null', () => {

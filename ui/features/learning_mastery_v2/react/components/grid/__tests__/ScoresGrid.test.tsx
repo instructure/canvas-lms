@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ScoresGrid, ScoresGridProps} from '../ScoresGrid'
 import {Student, Outcome, StudentRollupData} from '../../../types/rollup'
@@ -28,6 +28,10 @@ import {
 } from '../../../hooks/useContributingScores'
 
 describe('ScoresGrid', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const mockAlignments: ContributingScoreAlignment[] = [
     {
       alignment_id: 'align-1',
@@ -46,19 +50,19 @@ describe('ScoresGrid', () => {
   ]
 
   const mockContributingScores: ContributingScoresManager = {
-    forOutcome: jest.fn(() => ({
+    forOutcome: vi.fn(() => ({
       isVisible: () => false,
-      toggleVisibility: jest.fn(),
+      toggleVisibility: vi.fn(),
       data: undefined,
       alignments: undefined,
-      scoresForUser: jest.fn(() => []),
+      scoresForUser: vi.fn(() => []),
       isLoading: false,
       error: undefined,
     })),
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const defaultProps = (props: Partial<ScoresGridProps> = {}): ScoresGridProps => {
@@ -170,9 +174,9 @@ describe('ScoresGrid', () => {
 
   describe('contributing scores interaction', () => {
     const mockContributingScoresVisible: ContributingScoresManager = {
-      forOutcome: jest.fn(() => ({
+      forOutcome: vi.fn(() => ({
         isVisible: () => true,
-        toggleVisibility: jest.fn(),
+        toggleVisibility: vi.fn(),
         data: {
           outcome: {
             id: '1',
@@ -188,7 +192,7 @@ describe('ScoresGrid', () => {
           ],
         },
         alignments: mockAlignments,
-        scoresForUser: jest.fn(() => [
+        scoresForUser: vi.fn(() => [
           {
             user_id: '1',
             alignment_id: 'align-1',
@@ -233,7 +237,7 @@ describe('ScoresGrid', () => {
 
     it('calls onOpenStudentAssignmentTray when action button is clicked', async () => {
       const user = userEvent.setup()
-      const onOpenStudentAssignmentTray = jest.fn()
+      const onOpenStudentAssignmentTray = vi.fn()
 
       render(
         <ScoresGrid

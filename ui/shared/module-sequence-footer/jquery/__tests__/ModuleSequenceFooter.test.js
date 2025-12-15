@@ -89,14 +89,10 @@ describe('ModuleSequenceFooter', () => {
     $fixtures.append($testEl)
 
     MSFClass = $.fn.moduleSequenceFooter.MSFClass
-
-    // Use fake timers for React rendering
-    jest.useFakeTimers()
   })
 
   afterEach(() => {
     $fixtures.remove()
-    jest.useRealTimers()
   })
 
   describe('initialization', () => {
@@ -167,7 +163,6 @@ describe('ModuleSequenceFooter', () => {
 
       // Wait for the fetch promise to resolve
       await msf.data('msfInstance').fetch()
-      jest.runAllTimers()
 
       expect($testEl.find('.module-sequence-footer.no-animation')).toHaveLength(1)
       expect($testEl.find('.module-sequence-padding.no-animation')).toHaveLength(1)
@@ -198,8 +193,6 @@ describe('ModuleSequenceFooter', () => {
       // Wait for the fetch promise to resolve
       await msf.data('msfInstance').fetch()
 
-      // Wait for React to render
-      jest.runAllTimers()
 
       expect($testEl.find('[aria-label="Previous Module Item"]')).toHaveLength(0)
       expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(0)
@@ -252,7 +245,6 @@ describe('ModuleSequenceFooter', () => {
 
       // Wait for the fetch promise to resolve
       await msf.data('msfInstance').fetch()
-      jest.runAllTimers()
 
       expect($testEl.find('[aria-label="Previous Module Item"]')).toHaveLength(1)
       expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
@@ -306,7 +298,6 @@ describe('ModuleSequenceFooter', () => {
 
       // Wait for the fetch promise to resolve
       await msf.data('msfInstance').fetch()
-      jest.runAllTimers()
 
       expect($testEl.find('[aria-label="Previous Module Item"]')).toHaveLength(1)
       expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
@@ -338,7 +329,7 @@ describe('ModuleSequenceFooter', () => {
     })
 
     it('shows element when rendering', async () => {
-      const showSpy = jest.spyOn($testEl, 'show')
+      const showSpy = vi.spyOn($testEl, 'show')
 
       server.use(
         http.get('/api/v1/courses/42/module_item_sequence', () => {
@@ -356,13 +347,12 @@ describe('ModuleSequenceFooter', () => {
 
       // Wait for the fetch promise to resolve
       await msf.data('msfInstance').fetch()
-      jest.runAllTimers()
 
       expect(showSpy).toHaveBeenCalled()
     })
 
     it('triggers resize event', async () => {
-      const resizeHandler = jest.fn()
+      const resizeHandler = vi.fn()
       $(window).on('resize', resizeHandler)
 
       server.use(
@@ -381,7 +371,6 @@ describe('ModuleSequenceFooter', () => {
 
       // Wait for the fetch promise to resolve
       await msf.data('msfInstance').fetch()
-      jest.runAllTimers()
 
       expect(resizeHandler).toHaveBeenCalled()
       $(window).off('resize', resizeHandler)
@@ -408,7 +397,6 @@ describe('ModuleSequenceFooter', () => {
 
       // Wait for the fetch promise to resolve
       await msf.data('msfInstance').fetch()
-      jest.runAllTimers()
 
       expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
       expect($testEl.find('a').attr('href')).toMatch('chew-z')
@@ -433,7 +421,6 @@ describe('ModuleSequenceFooter', () => {
 
       // Wait for the fetch promise to resolve
       await msf.data('msfInstance').fetch()
-      jest.runAllTimers()
 
       expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
       expect($testEl.find('a').attr('href')).toMatch('mod.module.mod')
@@ -460,7 +447,6 @@ describe('ModuleSequenceFooter', () => {
 
       // Wait for the fetch promise to resolve
       await msf.data('msfInstance').fetch()
-      jest.runAllTimers()
 
       const nextButton = $testEl.find('[aria-label="Next Module Item"][disabled]')
 
@@ -497,7 +483,6 @@ describe('ModuleSequenceFooter', () => {
 
       // Wait for the fetch promise to resolve
       await msf.data('msfInstance').fetch()
-      jest.runAllTimers()
 
       expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
       expect($testEl.find('a').attr('href')).toMatch('mod.module.mod')
@@ -554,7 +539,6 @@ describe('ModuleSequenceFooter', () => {
 
       // Wait for the fetch promise to resolve
       await msf.data('msfInstance').fetch()
-      jest.runAllTimers()
 
       expect($testEl.find('[aria-label="Previous Module Item"]')).toHaveLength(1)
       expect($testEl.find('[aria-label="Next Module Item - opens in new window"]')).toHaveLength(1)

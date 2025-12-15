@@ -23,8 +23,8 @@ import {DaySub} from '../types'
 
 const mockSubstitution: DaySub = {id: 1, from: 0, to: 1}
 
-const mockOnChangeSubstitution = jest.fn()
-const mockOnRemoveSubstitution = jest.fn()
+const mockOnChangeSubstitution = vi.fn()
+const mockOnRemoveSubstitution = vi.fn()
 
 const renderComponent = (overrideProps?: any) =>
   render(
@@ -40,7 +40,7 @@ const renderComponent = (overrideProps?: any) =>
 
 describe('DaySubstitution', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the component with move from selector', () => {

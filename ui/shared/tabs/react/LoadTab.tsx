@@ -25,7 +25,7 @@ export const waitForElement = (
   callback: WaitForElementCallback,
   interval = 100,
   timeout = 5000,
-): void => {
+): number => {
   const start = Date.now()
 
   const timer = setInterval(() => {
@@ -41,10 +41,12 @@ export const waitForElement = (
       }
     }
   }, interval)
+
+  return timer as unknown as number
 }
 
-export function LoadTab(loadTabFunction: (tabId: string) => void) {
-  waitForElement('div[role="tablist"]', settingsTabs => {
+export function LoadTab(loadTabFunction: (tabId: string) => void): number {
+  return waitForElement('div[role="tablist"]', settingsTabs => {
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
         if (mutation.type === 'attributes' && mutation.attributeName === 'aria-selected') {

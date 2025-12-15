@@ -31,16 +31,16 @@ class MockWindow {
     this._now = 0
     this.scrollY = 0
     this.Date = {now: () => this._now}
-    this.addEventListener = jest
+    this.addEventListener = vi
       .fn()
       .mockImplementation(
         (event, callback) =>
           (this._eventListeners[event] = injectedEventObject => callback(injectedEventObject)),
       )
-    this.removeEventListener = jest
+    this.removeEventListener = vi
       .fn()
       .mockImplementation(event => delete this._eventListeners[event])
-    this.scrollTo = jest.fn().mockImplementation((x, y) => (this.scrollY = y))
+    this.scrollTo = vi.fn().mockImplementation((x, y) => (this.scrollY = y))
     this.document = {
       activeElement: 5,
       createElement: () => new MockElement(),

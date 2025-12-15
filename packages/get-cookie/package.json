@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "@instructure/get-cookie",
   "private": true,
   "version": "1.0.0",

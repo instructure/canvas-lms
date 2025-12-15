@@ -63,12 +63,12 @@ describe('DashboardCardBox', () => {
       body: {},
     })
 
-    jest.spyOn(CourseActivitySummaryStore, 'getStateForCourse').mockReturnValue({})
+    vi.spyOn(CourseActivitySummaryStore, 'getStateForCourse').mockReturnValue({})
   })
 
   afterEach(() => {
     fetchMock.reset()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderComponent = () => {

@@ -77,12 +77,12 @@ describe('ManageOutcomeItem', () => {
   })
 
   beforeEach(() => {
-    onMenuHandlerMock = jest.fn()
-    onCheckboxHandlerMock = jest.fn()
+    onMenuHandlerMock = vi.fn()
+    onCheckboxHandlerMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders title if title prop passed', () => {

@@ -22,7 +22,7 @@ import axios from '@canvas/axios'
 describe('apiClient', () => {
   describe('addExternalFeed', () => {
     it('provides arguments to the post request correctly', () => {
-      axios.post = jest.fn()
+      axios.post = vi.fn()
       apiClient.addExternalFeed(
         {
           contextType: 'course',

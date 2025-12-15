@@ -29,7 +29,7 @@ const getDOMNodes = function (data) {
   return [component, btnTriggerDelete]
 }
 
-jest.mock('../../lib/ExternalAppsStore')
+vi.mock('../../lib/ExternalAppsStore')
 
 describe('ExternalApps.DeleteExternalToolButton', () => {
   let tools
@@ -59,7 +59,7 @@ describe('ExternalApps.DeleteExternalToolButton', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   test('does not render when the canDelete permission is false', () => {
@@ -74,7 +74,7 @@ describe('ExternalApps.DeleteExternalToolButton', () => {
 
   test('open and close modal', async () => {
     const ref = React.createRef()
-    const data = {tool: tools[1], canDelete: true, returnFocus: jest.fn(), ref}
+    const data = {tool: tools[1], canDelete: true, returnFocus: vi.fn(), ref}
     renderComponent(data)
 
     await userEvent.click(screen.getByText(/delete/i))

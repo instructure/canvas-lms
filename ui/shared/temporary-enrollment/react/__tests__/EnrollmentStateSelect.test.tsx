@@ -38,7 +38,7 @@ describe('EnrollmentStateSelect', () => {
   })
 
   it('calls onChange when an option is selected', async () => {
-    const handleChange = jest.fn()
+    const handleChange = vi.fn()
     render(<EnrollmentStateSelect onChange={handleChange} label="Select State" />)
     const comboboxElement = screen.getByRole('combobox')
     await userEvent.click(comboboxElement)

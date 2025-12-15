@@ -26,16 +26,16 @@ import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock jQuery to prevent flashError errors from unrelated components
-jest.mock('jquery', () => {
+vi.mock('jquery', () => {
   const jQueryMock = {
-    flashError: jest.fn(),
-    Deferred: jest.fn(() => ({
-      resolve: jest.fn(),
-      reject: jest.fn(),
-      promise: jest.fn(),
+    flashError: vi.fn(),
+    Deferred: vi.fn(() => ({
+      resolve: vi.fn(),
+      reject: vi.fn(),
+      promise: vi.fn(),
     })),
   }
-  return jest.fn(() => jQueryMock)
+  return vi.fn(() => jQueryMock)
 })
 
 const server = setupServer(...handlers)
@@ -59,7 +59,7 @@ beforeEach(() => {
 afterEach(() => {
   server.resetHandlers()
   fakeENV.teardown()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 afterAll(() => {
@@ -101,14 +101,14 @@ const demoData = {
 
 const defaultProps = {
   menuData: demoData,
-  onUserFilterSelect: jest.fn(),
-  setIsMenuOpen: jest.fn(),
+  onUserFilterSelect: vi.fn(),
+  setIsMenuOpen: vi.fn(),
 }
 
 const setup = props => {
   return render(
     <ApolloProvider client={mswClient}>
-      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+      <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
         <AddressBook {...props} />
       </AlertManagerContext.Provider>
     </ApolloProvider>,
@@ -173,13 +173,13 @@ describe('Address Book Component', () => {
             userData: [testUserWithPronouns],
           }
 
-          const mockSetIsMenuOpen = jest.fn()
+          const mockSetIsMenuOpen = vi.fn()
           const {queryByText} = setup({
             menuData: testData,
             isMenuOpen: true,
             isSubMenu: true,
             setIsMenuOpen: mockSetIsMenuOpen,
-            onUserFilterSelect: jest.fn(),
+            onUserFilterSelect: vi.fn(),
           })
 
           // Wait for the user's name to appear
@@ -218,13 +218,13 @@ describe('Address Book Component', () => {
             userData: [testUserWithPronouns],
           }
 
-          const mockSetIsMenuOpen = jest.fn()
+          const mockSetIsMenuOpen = vi.fn()
           setup({
             menuData: testData,
             isMenuOpen: true,
             isSubMenu: true,
             setIsMenuOpen: mockSetIsMenuOpen,
-            onUserFilterSelect: jest.fn(),
+            onUserFilterSelect: vi.fn(),
           })
 
           // Wait for the user's name to appear
@@ -236,7 +236,7 @@ describe('Address Book Component', () => {
         })
 
         it('Do not show up pronouns if pronouns is null', async () => {
-          const mockSetIsMenuOpen = jest.fn()
+          const mockSetIsMenuOpen = vi.fn()
           const props = {...defaultProps}
           props.menuData.userData[0].pronouns = null
           const {queryByText} = setup({

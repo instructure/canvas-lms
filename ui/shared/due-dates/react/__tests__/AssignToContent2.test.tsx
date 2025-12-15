@@ -83,7 +83,8 @@ describe('AssignToContent2', () => {
 
   beforeEach(() => {
     fetchMock.get(SECTIONS_URL, SECTIONS_DATA).get(DATE_DETAILS, {}).get(SETTINGS_URL, {})
-    queryClient.setQueryData(['students', COURSE_ID, {per_page: 100}], [])
+    // Use string courseId to match how the component passes it
+    queryClient.setQueryData(['students', String(COURSE_ID), {per_page: 100}], [])
   })
 
   afterEach(() => {
@@ -137,7 +138,7 @@ describe('AssignToContent2', () => {
       },
     ])
 
-    const onSyncMock = jest.fn()
+    const onSyncMock = vi.fn()
     render(
       <MockedQueryProvider>
         <AssignToContent2
@@ -181,14 +182,6 @@ describe('AssignToContent2', () => {
     ).toBeInTheDocument()
   })
 
-  describe('pending changes', () => {
-    const addAssignee = async (_getByTestId: any, findByTestId: any, findByText: any) => {
-      const assigneeSelector = await findByTestId('assignee_selector')
-      act(() => assigneeSelector.click())
-      const option1 = await findByText(SECTIONS_DATA[0].name)
-      act(() => option1.click())
-    }
-  })
 
   describe('in a paced course', () => {
     beforeEach(() => {
@@ -263,7 +256,7 @@ describe('AssignToContent2', () => {
     })
 
     it('calls onSync with the importantDates flag when checking/unchecking the option', () => {
-      const onSyncMock = jest.fn()
+      const onSyncMock = vi.fn()
       const {getByTestId} = setUp({onSync: onSyncMock})
 
       getByTestId('important_dates').click()

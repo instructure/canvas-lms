@@ -26,19 +26,19 @@ describe('ConditionalRelease Editor', () => {
 
   const makePromise = () => {
     const promise = {}
-    promise.then = jest.fn().mockReturnValue(promise)
-    promise.catch = jest.fn().mockReturnValue(promise)
+    promise.then = vi.fn().mockReturnValue(promise)
+    promise.catch = vi.fn().mockReturnValue(promise)
     return promise
   }
 
   class ConditionalReleaseEditor {
     constructor(env) {
       editor = {
-        attach: jest.fn(),
-        updateAssignment: jest.fn(),
-        saveRule: jest.fn(),
-        getErrors: jest.fn(),
-        focusOnError: jest.fn(),
+        attach: vi.fn(),
+        updateAssignment: vi.fn(),
+        saveRule: vi.fn(),
+        getErrors: vi.fn(),
+        focusOnError: vi.fn(),
         env,
       }
       return editor

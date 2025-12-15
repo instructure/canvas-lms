@@ -23,10 +23,10 @@ import {MessageDetailActions} from '../MessageDetailActions'
 describe('MessageDetailActions', () => {
   const setup = () => {
     const props = {
-      onReply: jest.fn(),
-      onReplyAll: jest.fn(),
-      onDelete: jest.fn(),
-      onForward: jest.fn(),
+      onReply: vi.fn(),
+      onReplyAll: vi.fn(),
+      onDelete: vi.fn(),
+      onForward: vi.fn(),
       authorName: 'John Cena',
     }
 

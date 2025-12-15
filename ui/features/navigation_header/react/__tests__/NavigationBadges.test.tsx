@@ -29,7 +29,7 @@ const server = setupServer()
 const render = (children: unknown) =>
   testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
-const unreadComponent = jest.fn(() => <></>)
+const unreadComponent = vi.fn(() => <></>)
 
 describe('GlobalNavigation', () => {
   beforeAll(() => server.listen({onUnhandledRequest: 'bypass'}))

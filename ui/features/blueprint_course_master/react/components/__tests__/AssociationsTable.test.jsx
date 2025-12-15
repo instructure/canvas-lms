@@ -59,7 +59,7 @@ describe('AssociationsTable component', () => {
 
   test('calls onRemoveAssociations when association remove button is clicked', async () => {
     const props = defaultProps()
-    props.onRemoveAssociations = jest.fn()
+    props.onRemoveAssociations = vi.fn()
     const tree = render(<AssociationsTable {...props} />)
     const button = tree.container.querySelectorAll(
       'tr[data-testid="associations-course-row"] button',

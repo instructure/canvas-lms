@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, within} from '@testing-library/react'
+import {cleanup, render, screen, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import FiltersPanel from '../FiltersPanel'
 import {AppliedFilter, FilterOption} from '../../../../../../shared/react/types'
 
 describe('FiltersPanel', () => {
-  const mockOnFilterChange = jest.fn()
+  const mockOnFilterChange = vi.fn()
 
   const defaultProps = {
     onFilterChange: mockOnFilterChange,
@@ -32,21 +32,25 @@ describe('FiltersPanel', () => {
   const mockMatchMedia = (matches: boolean) => {
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
-      value: jest.fn().mockImplementation(query => ({
+      value: vi.fn().mockImplementation(query => ({
         matches,
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       })),
     })
   }
 
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockMatchMedia(true)
   })
 

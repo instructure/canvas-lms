@@ -25,21 +25,24 @@ import {Attachment} from '../../../../graphql/Attachment'
 import {MockedProvider} from '@apollo/client/testing'
 import {ObserverContext} from '../../../utils/ObserverContext'
 
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({
-    desktop: {maxWidth: '1000px'},
-  }),
-}))
+vi.mock('../../../utils', async () => {
+  const actual = await vi.importActual('../../../utils')
+  return {
+    ...actual,
+    responsiveQuerySizes: () => ({
+      desktop: {maxWidth: '1000px'},
+    }),
+  }
+})
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })

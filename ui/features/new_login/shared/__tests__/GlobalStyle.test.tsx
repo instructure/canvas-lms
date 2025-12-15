@@ -16,9 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import React from 'react'
 import GlobalStyle from '../GlobalStyle'
+
+afterEach(() => {
+  cleanup()
+})
 
 describe('GlobalStyle', () => {
   it('applies global styles to html and body', () => {

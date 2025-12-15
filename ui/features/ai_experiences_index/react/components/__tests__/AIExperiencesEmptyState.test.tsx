@@ -22,10 +22,10 @@ import userEvent from '@testing-library/user-event'
 import AIExperiencesEmptyState from '../AIExperiencesEmptyState'
 
 describe('AIExperiencesEmptyState', () => {
-  const mockOnCreateNew = jest.fn()
+  const mockOnCreateNew = vi.fn()
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the spaceman image', () => {

@@ -24,9 +24,9 @@ describe('saveLtiToolConfiguration', () => {
   let dispatch
 
   beforeEach(() => {
-    dispatch = jest.fn()
-    jest.clearAllMocks()
-    axios.post = jest.fn().mockResolvedValue({
+    dispatch = vi.fn()
+    vi.clearAllMocks()
+    axios.post = vi.fn().mockResolvedValue({
       data: {
         tool_configuration: {settings: {test: 'config'}, developer_key_id: '1'},
         developer_key: {id: 100000000087, name: 'test key'},
@@ -84,9 +84,9 @@ describe('saveLtiToolConfiguration', () => {
     }
 
     beforeEach(() => {
-      jest.clearAllMocks()
-      axios.post = jest.fn().mockRejectedValue(error)
-      $.flashError = jest.fn()
+      vi.clearAllMocks()
+      axios.post = vi.fn().mockRejectedValue(error)
+      $.flashError = vi.fn()
     })
 
     afterEach(() => {
@@ -107,8 +107,8 @@ describe('saveLtiToolConfiguration', () => {
 
 describe('updateLtiKey', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
-    axios.put = jest.fn().mockResolvedValue({})
+    vi.clearAllMocks()
+    axios.put = vi.fn().mockResolvedValue({})
   })
 
   afterEach(() => {
@@ -130,7 +130,7 @@ describe('updateLtiKey', () => {
     access_token_count: 1,
   }
 
-  const update = (callback = jest.fn()) => {
+  const update = (callback = vi.fn()) => {
     return actions.updateLtiKey(
       developerKey,
       disabledPlacements,
@@ -142,7 +142,7 @@ describe('updateLtiKey', () => {
   }
 
   it('makes a request to the tool config update endpoint', () => {
-    update(jest.fn())
+    update(vi.fn())
 
     expect(axios.put).toHaveBeenCalledWith(
       `/api/lti/developer_keys/${developerKeyId}/tool_configuration`,

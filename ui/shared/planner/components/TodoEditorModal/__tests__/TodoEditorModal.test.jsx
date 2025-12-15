@@ -22,7 +22,7 @@ import {render, fireEvent, waitFor} from '@testing-library/react'
 import TodoEditorModal from '../index'
 import {initialize} from '../../../utilities/alertUtils'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 const defaultProps = (options = {}) => ({
   savePlannerItem: () => {},
@@ -46,8 +46,8 @@ const simpleTodoItem = (opts = {}) => ({
   ...opts,
 })
 
-const successFn = jest.fn()
-const errorFn = jest.fn()
+const successFn = vi.fn()
+const errorFn = vi.fn()
 
 beforeAll(() => {
   initialize({visualSuccessCallback: successFn, visualErrorCallback: errorFn})
@@ -59,7 +59,7 @@ it('does not show the editor modal when todoItem is null', () => {
 })
 
 it('shows the editor modal when todoItem is set', () => {
-  const mockOnEdit = jest.fn()
+  const mockOnEdit = vi.fn()
   const {getByTestId} = render(
     <TodoEditorModal {...defaultProps({onEdit: mockOnEdit, todoItem: simpleTodoItem()})} />,
   )
@@ -68,7 +68,7 @@ it('shows the editor modal when todoItem is set', () => {
 })
 
 it('calls onClose when the x is clicked ', () => {
-  const mockOnClose = jest.fn()
+  const mockOnClose = vi.fn()
   const newProps = {...defaultProps({onClose: mockOnClose, todoItem: simpleTodoItem()})}
   const {getByTestId} = render(<TodoEditorModal {...newProps} />)
   const closeButton = getByTestId('close-editor-modal').querySelector('button')
@@ -79,8 +79,8 @@ it('calls onClose when the x is clicked ', () => {
 
 it('updates the planner item and then closes the editor when Save is clicked ', async () => {
   const todoItem = simpleTodoItem()
-  const mockOnClose = jest.fn()
-  const mockSave = jest.fn(() => Promise.resolve())
+  const mockOnClose = vi.fn()
+  const mockSave = vi.fn(() => Promise.resolve())
   const newProps = {
     ...defaultProps({
       onClose: mockOnClose,
@@ -97,7 +97,7 @@ it('updates the planner item and then closes the editor when Save is clicked ', 
   fireEvent.blur(date)
   fireEvent.change(title, {target: {value: 'Updated Todo'}})
   fireEvent.change(details, {target: {value: 'These are the todo details'}})
-  jest.runOnlyPendingTimers()
+  vi.runOnlyPendingTimers()
 
   const saveButton = getByTestId('save')
   fireEvent.click(saveButton)
@@ -116,9 +116,9 @@ it('updates the planner item and then closes the editor when Save is clicked ', 
 
 it('deletes the planner item and then closes the editor when Delete is clicked ', async () => {
   const todoItem = simpleTodoItem()
-  const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(true)
-  const mockOnClose = jest.fn()
-  const mockDelete = jest.fn(() => Promise.resolve())
+  const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+  const mockOnClose = vi.fn()
+  const mockDelete = vi.fn(() => Promise.resolve())
   const newProps = {
     ...defaultProps({
       onClose: mockOnClose,
@@ -139,7 +139,7 @@ it('deletes the planner item and then closes the editor when Delete is clicked '
 
 it('shows an error if To-do update fails', async () => {
   const todoItem = simpleTodoItem()
-  const mockSave = jest.fn(() => Promise.reject())
+  const mockSave = vi.fn(() => Promise.reject())
   const newProps = {
     ...defaultProps({
       savePlannerItem: mockSave,
@@ -155,8 +155,8 @@ it('shows an error if To-do update fails', async () => {
 
 it('shows an error if To-do deletion fails', async () => {
   const todoItem = simpleTodoItem()
-  jest.spyOn(window, 'confirm').mockReturnValue(true)
-  const mockDelete = jest.fn(() => Promise.reject())
+  vi.spyOn(window, 'confirm').mockReturnValue(true)
+  const mockDelete = vi.fn(() => Promise.reject())
   const newProps = {
     ...defaultProps({
       deletePlannerItem: mockDelete,

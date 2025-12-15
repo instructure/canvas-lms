@@ -21,7 +21,6 @@ import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
-import '@testing-library/jest-dom'
 import DashboardNotifications from '../DashboardNotifications'
 import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
 

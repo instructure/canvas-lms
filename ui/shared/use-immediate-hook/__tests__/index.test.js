@@ -21,14 +21,14 @@ import useImmediate from '../index'
 
 describe('useImmediate', () => {
   it('runs the function the first time', () => {
-    const fn = jest.fn()
+    const fn = vi.fn()
     renderHook(() => useImmediate(fn))
     expect(fn).toHaveBeenCalledTimes(1)
   })
 
   it('runs the cleanup function on rerender and unmount', () => {
-    const cleanup = jest.fn()
-    const fn = jest.fn(() => cleanup)
+    const cleanup = vi.fn()
+    const fn = vi.fn(() => cleanup)
     const {rerender, unmount} = renderHook(() => useImmediate(fn))
     rerender()
     expect(fn).toHaveBeenCalledTimes(2)
@@ -39,14 +39,14 @@ describe('useImmediate', () => {
   })
 
   it('runs fn initially when deps are specified', () => {
-    const fn = jest.fn()
+    const fn = vi.fn()
     renderHook(() => useImmediate(fn, ['dep']))
     expect(fn).toHaveBeenCalledTimes(1)
   })
 
   it('does not rerun the fn or the cleanup when deps have not changed', () => {
-    const cleanup = jest.fn()
-    const fn = jest.fn(() => cleanup)
+    const cleanup = vi.fn()
+    const fn = vi.fn(() => cleanup)
     const {rerender} = renderHook(() => useImmediate(fn, ['dep']))
     rerender()
     expect(fn).toHaveBeenCalledTimes(1)
@@ -55,8 +55,8 @@ describe('useImmediate', () => {
 
   it('reruns fn and cleanup when deps change', () => {
     let dep = 'foo'
-    const cleanup = jest.fn()
-    const fn = jest.fn(() => cleanup)
+    const cleanup = vi.fn()
+    const fn = vi.fn(() => cleanup)
     const {rerender} = renderHook(() => useImmediate(fn, [dep]))
     dep = 'bar'
     rerender()
@@ -66,8 +66,8 @@ describe('useImmediate', () => {
 
   it('only does a shallow comparison by default', () => {
     let dep = {foo: 'bar'}
-    const cleanup = jest.fn()
-    const fn = jest.fn(() => cleanup)
+    const cleanup = vi.fn()
+    const fn = vi.fn(() => cleanup)
     const {rerender} = renderHook(() => useImmediate(fn, [dep]))
     dep = {foo: 'bar'}
     rerender()
@@ -77,8 +77,8 @@ describe('useImmediate', () => {
 
   it('does a deep comparison if specified', () => {
     let dep = {foo: 'bar'}
-    const cleanup = jest.fn()
-    const fn = jest.fn(() => cleanup)
+    const cleanup = vi.fn()
+    const fn = vi.fn(() => cleanup)
     const {rerender} = renderHook(() => useImmediate(fn, [dep], {deep: true}))
     dep = {foo: 'bar'}
     rerender()

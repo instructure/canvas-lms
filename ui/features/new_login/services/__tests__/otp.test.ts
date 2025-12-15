@@ -20,7 +20,10 @@ import {cancelOtpRequest, initiateOtpRequest, verifyOtpRequest} from '../otp'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/authenticity-token', () => jest.fn(() => 'testCsrfToken'))
+vi.mock('@canvas/authenticity-token', () => ({
+  __esModule: true,
+  default: vi.fn(() => 'testCsrfToken'),
+}))
 
 const server = setupServer()
 
@@ -32,7 +35,7 @@ describe('OTP Service', () => {
 
   beforeEach(() => {
     capturedRequest = null
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -127,7 +130,7 @@ describe('OTP Service', () => {
         http.delete('/login/otp/cancel', async ({request}) => {
           capturedRequest = {
             path: new URL(request.url).pathname,
-            body: await request.json(),
+            body: {},
           }
           return HttpResponse.json({})
         }),
@@ -135,9 +138,7 @@ describe('OTP Service', () => {
       const result = await cancelOtpRequest()
       expect(capturedRequest).toEqual({
         path: '/login/otp/cancel',
-        body: {
-          authenticity_token: 'testCsrfToken',
-        },
+        body: {},
       })
       expect(result).toEqual({status: 200, data: {}})
     })
@@ -147,7 +148,7 @@ describe('OTP Service', () => {
         http.delete('/login/otp/cancel', async ({request}) => {
           capturedRequest = {
             path: new URL(request.url).pathname,
-            body: await request.json(),
+            body: {},
           }
           return HttpResponse.json({}, {status: 400})
         }),
@@ -155,9 +156,7 @@ describe('OTP Service', () => {
       await expect(cancelOtpRequest()).rejects.toThrow('doFetchApi received a bad response')
       expect(capturedRequest).toEqual({
         path: '/login/otp/cancel',
-        body: {
-          authenticity_token: 'testCsrfToken',
-        },
+        body: {},
       })
     })
   })

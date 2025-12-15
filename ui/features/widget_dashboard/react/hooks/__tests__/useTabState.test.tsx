@@ -186,7 +186,7 @@ describe('useTabState', () => {
   })
 
   it('should handle GraphQL mutation errors gracefully', async () => {
-    const consoleError = jest.spyOn(console, 'error').mockImplementation()
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     // Override the server handler to return an error
     server.use(

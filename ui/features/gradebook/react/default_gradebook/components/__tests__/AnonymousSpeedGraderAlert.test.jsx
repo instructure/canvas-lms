@@ -23,7 +23,7 @@ import AnonymousSpeedGraderAlert from '../AnonymousSpeedGraderAlert'
 
 describe('AnonymousSpeedGraderAlert', () => {
   const defaultProps = {
-    onClose: jest.fn(),
+    onClose: vi.fn(),
     speedGraderUrl: 'http://test.url:3000',
   }
 
@@ -37,7 +37,7 @@ describe('AnonymousSpeedGraderAlert', () => {
 
   afterEach(() => {
     applicationElement.remove()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('is closed initially', () => {

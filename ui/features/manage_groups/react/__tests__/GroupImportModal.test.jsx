@@ -23,7 +23,7 @@ describe('GroupImportModal', () => {
   it('adds an error message when an unsupported filetype is selected', async () => {
     const badFile = new File(['(⌐□_□)'], 'file.png', {type: 'image/png'})
     const {findByText, findByLabelText} = render(
-      <GroupImportModal setProgress={jest.fn} groupCategoryId={1} />,
+      <GroupImportModal setProgress={vi.fn} groupCategoryId={1} />,
     )
     const fileDrop = await findByLabelText(/Upload CSV File/i)
 
@@ -38,15 +38,15 @@ describe('GroupImportModal', () => {
   })
 
   // FOO-4218 - remove or rewrite to remove spies on imports
-  it.skip('sends the file to the API on successful upload', async () => {
-    const mockCreateImport = jest.spyOn(apiClient, 'createImport').mockImplementation(() => {
+  it('sends the file to the API on successful upload', async () => {
+    const mockCreateImport = vi.spyOn(apiClient, 'createImport').mockImplementation(() => {
       return new Promise(resolve => {
         resolve(true)
       })
     })
 
     const file = new File(['1,2,3'], 'file.csv', {type: 'text/csv'})
-    const {findByLabelText} = render(<GroupImportModal setProgress={jest.fn} groupCategoryId={1} />)
+    const {findByLabelText} = render(<GroupImportModal setProgress={vi.fn} groupCategoryId={1} />)
     const fileDrop = await findByLabelText(/Upload CSV File/i)
 
     // Source: https://github.com/testing-library/react-testing-library/issues/93#issuecomment-403887769
@@ -60,8 +60,8 @@ describe('GroupImportModal', () => {
   })
 
   // FOO-4218 - remove or rewrite to remove spies on imports
-  it.skip('displays an error when the API requests fails', async () => {
-    jest.spyOn(apiClient, 'createImport').mockImplementation(() => {
+  it('displays an error when the API requests fails', async () => {
+    vi.spyOn(apiClient, 'createImport').mockImplementation(() => {
       return new Promise((resolve, reject) => {
         reject(new Error("That didn't work"))
       })
@@ -69,7 +69,7 @@ describe('GroupImportModal', () => {
 
     const file = new File(['1,2,3'], 'file.csv', {type: 'text/csv'})
     const {findByLabelText, findAllByText} = render(
-      <GroupImportModal setProgress={jest.fn} groupCategoryId={1} />,
+      <GroupImportModal setProgress={vi.fn} groupCategoryId={1} />,
     )
     const fileDrop = await findByLabelText(/Upload CSV File/i)
 

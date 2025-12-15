@@ -30,14 +30,14 @@ if (!window.ENV.current_user_roles) {
   window.ENV.current_user_roles = []
 }
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  ...jest.requireActual('@canvas/util/globalUtils'),
+vi.mock('@canvas/util/globalUtils', async () => ({
+  ...(await vi.importActual('@canvas/util/globalUtils')),
   windowPathname: () => '/files',
-  assignLocation: jest.fn(),
+  assignLocation: vi.fn(),
 }))
 
-jest.mock('@canvas/files/react/modules/filesEnv', () => ({
-  ...jest.requireActual('@canvas/files/react/modules/filesEnv'),
+vi.mock('@canvas/files/react/modules/filesEnv', async () => ({
+  ...(await vi.importActual('@canvas/files/react/modules/filesEnv')),
   get userFileAccessRestricted() {
     return (
       window.ENV?.FEATURES?.restrict_student_access &&
@@ -46,20 +46,21 @@ jest.mock('@canvas/files/react/modules/filesEnv', () => ({
   },
 }))
 
-jest.mock('@canvas/files_v2/react/modules/filesEnvFactory', () => ({
-  ...jest.requireActual('@canvas/files_v2/react/modules/filesEnvFactory'),
-  createFilesEnv: customFilesContexts => ({
-    ...jest
-      .requireActual('@canvas/files_v2/react/modules/filesEnvFactory')
-      .createFilesEnv(customFilesContexts),
-    get userFileAccessRestricted() {
-      return (
-        window.ENV?.FEATURES?.restrict_student_access &&
-        (window.ENV?.current_user_roles || []).includes('student')
-      )
-    },
-  }),
-}))
+vi.mock('@canvas/files_v2/react/modules/filesEnvFactory', async () => {
+  const actual = await vi.importActual('@canvas/files_v2/react/modules/filesEnvFactory')
+  return {
+    ...actual,
+    createFilesEnv: customFilesContexts => ({
+      ...actual.createFilesEnv(customFilesContexts),
+      get userFileAccessRestricted() {
+        return (
+          window.ENV?.FEATURES?.restrict_student_access &&
+          (window.ENV?.current_user_roles || []).includes('student')
+        )
+      },
+    }),
+  }
+})
 
 export default (window.ENV.FILES_CONTEXTS = [
   {

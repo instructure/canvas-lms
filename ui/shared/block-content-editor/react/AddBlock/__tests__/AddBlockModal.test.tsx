@@ -20,10 +20,11 @@ import {render, screen, within, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {AddBlockModal} from '../AddBlockModal'
+import {type Mock} from 'vitest'
 
 describe('AddBlockModal', () => {
-  let onDismissMock: jest.Mock
-  let onAddBlockMock: jest.Mock
+  let onDismissMock: Mock
+  let onAddBlockMock: Mock
 
   const renderModal = (props: Partial<React.ComponentProps<typeof AddBlockModal>>) => {
     render(
@@ -38,8 +39,8 @@ describe('AddBlockModal', () => {
 
   beforeEach(() => {
     fakeENV.setup()
-    onDismissMock = jest.fn()
-    onAddBlockMock = jest.fn()
+    onDismissMock = vi.fn()
+    onAddBlockMock = vi.fn()
   })
 
   afterEach(() => {

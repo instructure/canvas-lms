@@ -27,16 +27,21 @@ import OutcomesContext, {
 import {createCache} from '@canvas/apollo-v3'
 import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
 import {groupMocks} from '@canvas/outcomes/mocks/Management'
-import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
-jest.mock('@canvas/progress/resolve_progress')
-jest.useFakeTimers()
+vi.mock('@canvas/progress/resolve_progress')
+vi.useFakeTimers()
+
+// Local helper to replace clickEl from testHelpers (which uses vi)
+const clickEl = async el => {
+  fireEvent.click(el)
+  await act(async () => vi.runOnlyPendingTimers())
+}
 
 // passes locally, flaky on Jenkins
 describe('FindOutcomesModal', () => {
@@ -55,15 +60,15 @@ describe('FindOutcomesModal', () => {
   })
 
   beforeEach(() => {
-    onCloseHandlerMock = jest.fn()
-    setTargetGroupIdsToRefetchMock = jest.fn()
-    setImportsTargetGroupMock = jest.fn()
+    onCloseHandlerMock = vi.fn()
+    setTargetGroupIdsToRefetchMock = vi.fn()
+    setImportsTargetGroupMock = vi.fn()
     cache = createCache()
     window.ENV = {}
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     resolveProgress.mockReset()
   })
 
@@ -104,7 +109,7 @@ describe('FindOutcomesModal', () => {
   const itBehavesLikeAModal = () => {
     it('renders component with "Add Outcomes to Account" title when contextType is Account', async () => {
       const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
     })
 
@@ -112,7 +117,7 @@ describe('FindOutcomesModal', () => {
       const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
         contextType: 'Course',
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       expect(getByText('Add Outcomes to Course')).toBeInTheDocument()
     })
 
@@ -130,19 +135,19 @@ describe('FindOutcomesModal', () => {
           contextType: 'Course',
         },
       )
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       expect(getByText('Add Outcomes to "The Group Title"')).toBeInTheDocument()
     })
 
     it('shows modal if open prop true', async () => {
       const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       expect(getByText('Close')).toBeInTheDocument()
     })
 
     it('does not show modal if open prop false', async () => {
       const {queryByText} = render(<FindOutcomesModal {...defaultProps({open: false})} />)
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       expect(queryByText('Close')).not.toBeInTheDocument()
     })
 
@@ -150,7 +155,7 @@ describe('FindOutcomesModal', () => {
       describe('within an account', () => {
         it('displays a screen reader error and text error on failed request', async () => {
           const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {mocks: []})
-          await act(async () => jest.runAllTimers())
+          await act(async () => vi.runOnlyPendingTimers())
           expect(showFlashAlert).toHaveBeenCalledWith({
             message: 'An error occurred while loading account learning outcome groups.',
             srOnly: true,
@@ -166,7 +171,7 @@ describe('FindOutcomesModal', () => {
             contextType: 'Course',
             mocks: [],
           })
-          await act(async () => jest.runAllTimers())
+          await act(async () => vi.runOnlyPendingTimers())
           expect(showFlashAlert).toHaveBeenCalledWith({
             message: 'An error occurred while loading course learning outcome groups.',
             srOnly: true,
@@ -182,35 +187,35 @@ describe('FindOutcomesModal', () => {
     const clickWithinMobileSelect = async selectNode => {
       if (isMobileView) {
         fireEvent.click(selectNode)
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runOnlyPendingTimers())
       }
     }
 
     it('clears selected outcome group for the outcomes view after closing and reopening', async () => {
       const {getByText, queryByText, rerender} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       await clickWithinMobileSelect(queryByText('Groups'))
       fireEvent.click(getByText('Account Standards'))
       fireEvent.click(getByText('Root Account Outcome Group 0'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       await clickWithinMobileSelect(queryByText('View 0 Outcomes'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       expect(getByText('All Root Account Outcome Group 0 Outcomes')).toBeInTheDocument()
       fireEvent.click(getByText('Done'))
       render(<FindOutcomesModal {...defaultProps({open: false})} />, {renderer: rerender})
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       render(<FindOutcomesModal {...defaultProps()} />, {renderer: rerender})
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
     })
 
     describe('within an account context', () => {
       it('renders Account Standards groups for non root accounts', async () => {
         const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         await clickWithinMobileSelect(queryByText('Groups'))
         fireEvent.click(getByText('Account Standards'))
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         expect(getByText('Root Account Outcome Group 0')).toBeInTheDocument()
       })
 
@@ -218,7 +223,7 @@ describe('FindOutcomesModal', () => {
         const {queryByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           mocks: findModalMocks({parentAccountChildren: 0}),
         })
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         expect(queryByText('Account Standards')).not.toBeInTheDocument()
       })
     })
@@ -227,7 +232,7 @@ describe('FindOutcomesModal', () => {
       const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />, {
         contextType: 'Course',
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       await clickWithinMobileSelect(queryByText('Groups'))
       await clickEl(getByText('Account Standards'))
       await clickEl(getByText('Course Account Outcome Group'))
@@ -244,17 +249,17 @@ describe('FindOutcomesModal', () => {
           mocks: findModalMocks({includeGlobalRootGroup: true}),
           globalRootId: '1',
         })
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         await clickWithinMobileSelect(queryByText('Groups'))
         fireEvent.click(getByText('State Standards'))
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runOnlyPendingTimers())
       })
 
       it('does not render the State Standard group if no globalRootId is set', async () => {
         const {queryByText, getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           mocks: findModalMocks({includeGlobalRootGroup: true}),
         })
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         expect(getByText(/An error occurred while loading account outcomes/)).toBeInTheDocument()
         expect(queryByText('State Standards')).not.toBeInTheDocument()
       })
@@ -264,10 +269,10 @@ describe('FindOutcomesModal', () => {
           mocks: [...findModalMocks({includeGlobalRootGroup: true}), ...groupMocks({groupId: '1'})],
           globalRootId: '1',
         })
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         await clickWithinMobileSelect(queryByText('Groups'))
         fireEvent.click(getByText('State Standards'))
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         expect(getByText('Select a group to reveal outcomes here.')).toBeInTheDocument()
       })
     })
@@ -282,20 +287,20 @@ describe('FindOutcomesModal', () => {
 
     it('renders the action drilldown', async () => {
       const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       expect(getByText('Groups')).toBeInTheDocument()
     })
 
     it('does not render the TreeBrowser', async () => {
       const {queryByTestId} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       const treeBrowser = queryByTestId('groupsColumnRef')
       expect(treeBrowser).not.toBeInTheDocument()
     })
 
     it('does not render the list of outcomes until the action link is clicked', async () => {
       const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       await clickEl(queryByText('Groups'))
       fireEvent.click(getByText('Account Standards'))
       await clickEl(getByText('Root Account Outcome Group 0'))
@@ -306,11 +311,11 @@ describe('FindOutcomesModal', () => {
 
     it('renders the billboard until an action link is clicked', async () => {
       const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       await clickEl(queryByText('Groups'))
       fireEvent.click(getByText('Account Standards'))
       expect(getByText('Select a group to reveal outcomes here.')).toBeInTheDocument()
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       await clickEl(getByText('Root Account Outcome Group 0'))
       fireEvent.click(getByText('View 0 Outcomes'))
       expect(queryByText('Select a group to reveal outcomes here.')).not.toBeInTheDocument()
@@ -318,7 +323,7 @@ describe('FindOutcomesModal', () => {
 
     it('unselects the selected group when the modal is closed', async () => {
       const {getByText, queryByText, rerender} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       await clickEl(queryByText('Groups'))
       fireEvent.click(getByText('Account Standards'))
       await clickEl(getByText('Root Account Outcome Group 0'))

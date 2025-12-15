@@ -19,14 +19,13 @@
 import $ from 'jquery'
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
 import GradingPeriodSet from '../GradingPeriodSet'
 import gradingPeriodsApi from '@canvas/grading/jquery/gradingPeriodsApi'
 import axios from '@canvas/axios'
 
-jest.mock('@canvas/grading/jquery/gradingPeriodsApi')
-jest.mock('@canvas/axios')
+vi.mock('@canvas/grading/jquery/gradingPeriodsApi')
+vi.mock('@canvas/axios')
 
 describe('GradingPeriodSet', () => {
   let props
@@ -35,11 +34,11 @@ describe('GradingPeriodSet', () => {
   let flashErrorMock
 
   beforeEach(() => {
-    windowConfirmMock = jest.spyOn(window, 'confirm').mockImplementation(() => true)
-    flashMessageMock = jest.spyOn($, 'flashMessage').mockImplementation(() => {})
-    flashErrorMock = jest.spyOn($, 'flashError').mockImplementation(() => {})
-    gradingPeriodsApi.batchUpdate = jest.fn().mockResolvedValue([])
-    axios.delete = jest.fn().mockResolvedValue({})
+    windowConfirmMock = vi.spyOn(window, 'confirm').mockImplementation(() => true)
+    flashMessageMock = vi.spyOn($, 'flashMessage').mockImplementation(() => {})
+    flashErrorMock = vi.spyOn($, 'flashError').mockImplementation(() => {})
+    gradingPeriodsApi.batchUpdate = vi.fn().mockResolvedValue([])
+    axios.delete = vi.fn().mockResolvedValue({})
 
     props = {
       set: {
@@ -49,10 +48,10 @@ describe('GradingPeriodSet', () => {
         displayTotalsForAllGradingPeriods: false,
       },
       terms: [],
-      onEdit: jest.fn(),
-      onDelete: jest.fn(),
-      onPeriodsChange: jest.fn(),
-      onToggleBody: jest.fn(),
+      onEdit: vi.fn(),
+      onDelete: vi.fn(),
+      onPeriodsChange: vi.fn(),
+      onToggleBody: vi.fn(),
       gradingPeriods: [
         {
           id: '1',

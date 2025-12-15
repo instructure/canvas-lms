@@ -240,6 +240,12 @@ describe('SmartSearch', () => {
         target: {value: SEARCH_TERM},
       })
 
+      // Perform initial search before applying filters
+      await user.click(getByTestId('search-button'))
+      await waitFor(() => {
+        expect(getAllByTestId('search-result')).toHaveLength(2)
+      })
+
       await user.click(getByTestId('filter-button'))
       await user.click(getByTestId('discussion-topics-checkbox'))
       await user.click(getByTestId('assignments-checkbox'))

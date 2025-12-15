@@ -21,7 +21,6 @@ import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DifferentiationTagModalForm from '../DifferentiationTagModalForm'
 import type {DifferentiationTagModalFormProps} from '../DifferentiationTagModalForm'
-import '@testing-library/jest-dom'
 import {CREATE_MODE, EDIT_MODE} from '../../util/constants'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {
@@ -46,7 +45,7 @@ const server = setupServer(
 describe('DifferentiationTagModalForm', () => {
   const user = userEvent.setup({delay: 0})
 
-  const onCloseMock = jest.fn()
+  const onCloseMock = vi.fn()
   const mockTagSet = multipleTagsCategory
 
   const renderComponent = (props: Partial<DifferentiationTagModalFormProps> = {}) => {
@@ -74,7 +73,7 @@ describe('DifferentiationTagModalForm', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

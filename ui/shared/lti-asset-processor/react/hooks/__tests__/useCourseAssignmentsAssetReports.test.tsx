@@ -20,6 +20,7 @@ import {renderHook} from '@testing-library/react-hooks'
 import {waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import React from 'react'
+import {type MockedFunction} from 'vitest'
 import {useCourseAssignmentsAssetReports} from '../useCourseAssignmentsAssetReports'
 import {executeQuery} from '@canvas/graphql'
 import {
@@ -28,11 +29,11 @@ import {
 } from '../../../queries/__fixtures__/GetCourseAssignmentsAssetReports'
 import type {GetCourseAssignmentsAssetReportsResult} from '../../../queries/getCourseAssignmentsAssetReports'
 
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(),
+vi.mock('@canvas/graphql', () => ({
+  executeQuery: vi.fn(),
 }))
 
-const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+const mockExecuteQuery = executeQuery as MockedFunction<typeof executeQuery>
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -49,6 +50,7 @@ const createWrapper = () => {
 
 describe('useCourseAssignmentsAssetReports', () => {
   beforeEach(() => {
+    vi.useFakeTimers()
     mockExecuteQuery.mockClear()
     // Enable the feature flag
     window.ENV = {
@@ -58,6 +60,11 @@ describe('useCourseAssignmentsAssetReports', () => {
         lti_asset_processor: true,
       },
     }
+  })
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
   })
 
   it('fetches and transforms data successfully', async () => {

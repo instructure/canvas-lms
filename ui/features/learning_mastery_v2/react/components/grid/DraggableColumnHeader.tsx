@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useMemo} from 'react'
+import type {ConnectDragSource, ConnectDropTarget} from 'react-dnd'
 import {ColumnHeader, ColumnHeaderProps} from './ColumnHeader'
 
 export interface DraggableColumnHeaderProps extends ColumnHeaderProps {
-  connectDragSource?: __ReactDnd.ConnectDragSource
-  connectDropTarget?: __ReactDnd.ConnectDropTarget
+  connectDragSource?: ConnectDragSource
+  connectDropTarget?: ConnectDropTarget
   isDragging?: boolean
 }
 

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import WidgetCard from '../WidgetCard'
 
@@ -26,12 +26,16 @@ describe('WidgetCard', () => {
     type: 'course_work_summary',
     displayName: 'Course Work Summary',
     description: 'Shows summary of upcoming assignments and course work',
-    onAdd: jest.fn(),
+    onAdd: vi.fn(),
     disabled: false,
   }
 
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders with correct display name and description', () => {

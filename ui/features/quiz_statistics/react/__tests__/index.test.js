@@ -764,7 +764,7 @@ describe('canvas_quizzes/statistics', () => {
   })
 
   it('renders', async () => {
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
     const node = document.createElement('div')
     document.body.appendChild(node)
 

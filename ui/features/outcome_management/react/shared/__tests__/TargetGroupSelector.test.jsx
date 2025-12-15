@@ -28,10 +28,10 @@ import {
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo-v3'
 import TargetGroupSelector from '../TargetGroupSelector'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
-jest.useFakeTimers()
+vi.mock('@canvas/alerts/react/FlashAlert')
+vi.useFakeTimers()
 
 describe('TargetGroupSelector', () => {
   let cache
@@ -47,11 +47,12 @@ describe('TargetGroupSelector', () => {
 
   beforeEach(() => {
     cache = createCache()
-    setTargetGroupMock = jest.fn()
+    setTargetGroupMock = vi.fn()
+    vi.spyOn(FlashAlert, 'showFlashAlert').mockImplementation(() => {})
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const render = (
@@ -76,9 +77,9 @@ describe('TargetGroupSelector', () => {
     const {getByText} = render(<TargetGroupSelector {...defaultProps()} />, {
       mocks: [...smallOutcomeTree()],
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(getByText('Account folder 0')).toBeInTheDocument()
   })
 
@@ -86,9 +87,9 @@ describe('TargetGroupSelector', () => {
     const {getByText} = render(<TargetGroupSelector {...defaultProps({groupId: undefined})} />, {
       mocks: [...smallOutcomeTree()],
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
     expect(setTargetGroupMock).toHaveBeenCalledWith({
       targetAncestorsIds: ['100', '1'],
@@ -106,8 +107,8 @@ describe('TargetGroupSelector', () => {
     render(<TargetGroupSelector {...defaultProps()} />, {
       mocks: [],
     })
-    await act(async () => jest.runAllTimers())
-    expect(showFlashAlert).toHaveBeenCalledWith({
+    await act(async () => vi.runAllTimers())
+    expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading account learning outcome groups.',
       srOnly: true,
       type: 'error',
@@ -120,8 +121,8 @@ describe('TargetGroupSelector', () => {
       contextType: 'Course',
       mocks: [],
     })
-    await act(async () => jest.runAllTimers())
-    expect(showFlashAlert).toHaveBeenCalledWith({
+    await act(async () => vi.runAllTimers())
+    expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading course learning outcome groups.',
       srOnly: true,
       type: 'error',
@@ -134,12 +135,12 @@ describe('TargetGroupSelector', () => {
       ...groupMocks({groupId: '100', childGroupOffset: 400}),
     ]
     const {getByText} = render(<TargetGroupSelector {...defaultProps()} />, {mocks})
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     fireEvent.click(getByText('Account folder 1'))
-    await act(async () => jest.runAllTimers())
-    expect(showFlashAlert).toHaveBeenCalledWith({
+    await act(async () => vi.runAllTimers())
+    expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading account learning outcome groups.',
       type: 'error',
       srOnly: false,
@@ -148,7 +149,7 @@ describe('TargetGroupSelector', () => {
 
   it('renders a create new group link', async () => {
     const {getByText} = render(<TargetGroupSelector {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(getByText('Create New Group')).toBeInTheDocument()
   })
 
@@ -169,10 +170,10 @@ describe('TargetGroupSelector', () => {
           ],
         },
       )
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       // We're in group 123
       fireEvent.click(getByText('Back'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       // Now we're group 12 (parent group of 123)
       expect(getByText('Group 12')).toBeInTheDocument()
       // We should se a setTargetGroup with group 12 (parent of 123)
@@ -183,7 +184,7 @@ describe('TargetGroupSelector', () => {
   describe('create new group button', () => {
     it('focuses on the link after the AddContentItem unexpands after cancellation', async () => {
       const {getByText} = render(<TargetGroupSelector {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
       fireEvent.click(getByText('Cancel'))
       expect(getByText('Create New Group')).toHaveFocus()
@@ -199,16 +200,16 @@ describe('TargetGroupSelector', () => {
           }),
         ],
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
       fireEvent.click(getByText('Create new group'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(getByText('Create New Group')).not.toHaveFocus()
     })
 
     it('notifyGroupCreated is called when a group is created', async () => {
-      const notifyMock = jest.fn(() => {})
+      const notifyMock = vi.fn(() => {})
       const {getByText, getByLabelText} = render(
         <TargetGroupSelector {...defaultProps({notifyGroupCreated: notifyMock})} />,
         {
@@ -221,11 +222,11 @@ describe('TargetGroupSelector', () => {
           ],
         },
       )
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
       fireEvent.click(getByText('Create new group'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(notifyMock).toHaveBeenCalledTimes(1)
     })
 
@@ -239,12 +240,12 @@ describe('TargetGroupSelector', () => {
           }),
         ],
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
       fireEvent.click(getByText('Create new group'))
-      await act(async () => jest.runAllTimers())
-      expect(showFlashAlert).toHaveBeenCalledWith({
+      await act(async () => vi.runAllTimers())
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
         type: 'success',
         message: '"new group name" was successfully created.',
       })
@@ -261,12 +262,12 @@ describe('TargetGroupSelector', () => {
           }),
         ],
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
       fireEvent.click(getByText('Create new group'))
-      await act(async () => jest.runAllTimers())
-      expect(showFlashAlert).toHaveBeenCalledWith({
+      await act(async () => vi.runAllTimers())
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
         type: 'error',
         message: 'An error occurred while creating this group. Please try again.',
       })

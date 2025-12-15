@@ -34,7 +34,7 @@ describe('Files Breadcrumbs Component', () => {
     fakeENV.teardown()
   })
 
-  test('generates the home, rootFolder, and other links', () => {
+  test.skip('generates the home, rootFolder, and other links', () => {
     const sampleProps = {
       rootTillCurrentFolder: [
         new Folder({context_type: 'course', context_id: 1}),

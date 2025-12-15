@@ -29,9 +29,20 @@ import React, {createRef} from 'react'
 import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
-// eslint-disable-next-line no-undef
-if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
-jest.mock('@canvas/upload-file')
+vi.mock('@canvas/upload-file')
+
+// Mock LazyLoad to render children immediately in tests
+vi.mock('@canvas/lazy-load', () => ({
+  __esModule: true,
+  default: ({children}) => children,
+  lazy: fn => {
+    let Component
+    fn().then(mod => {
+      Component = mod.default
+    })
+    return props => Component ? <Component {...props} /> : null
+  },
+}))
 
 const defaultMocks = (result = {data: {course: {externalToolsConnection: {nodes: []}}}}) => [
   {
@@ -53,7 +64,7 @@ describe('ContentTabs', () => {
     if (typeof URL.createObjectURL !== 'function') {
       try {
         Object.defineProperty(URL, 'createObjectURL', {
-          value: jest.fn(blob => `blob:mock-url-${blob?.name || 'unnamed'}`),
+          value: vi.fn(blob => `blob:mock-url-${blob?.name || 'unnamed'}`),
           writable: true,
           configurable: true,
         })
@@ -64,7 +75,7 @@ describe('ContentTabs', () => {
 
     // Mock Blob.prototype.slice for file handling
     if (!Blob.prototype.slice) {
-      Blob.prototype.slice = jest.fn(function (start, end) {
+      Blob.prototype.slice = vi.fn(function (start, end) {
         return this
       })
     }
@@ -223,14 +234,15 @@ describe('ContentTabs', () => {
       })
       props.submitButtonRef = createSubmitButtonRef()
 
-      const {getByTestId} = render(
+      const {findByTestId} = render(
         <MockedQueryProvider>
           <MockedProvider mocks={defaultMocks()}>
             <AttemptTab {...props} focusAttemptOnInit={false} />
           </MockedProvider>
         </MockedQueryProvider>,
       )
-      expect(await waitFor(() => getByTestId('upload-pane'))).toBeInTheDocument()
+      // Use findByTestId with extended timeout for lazy-loaded component
+      expect(await findByTestId('upload-pane', {}, {timeout: 5000})).toBeInTheDocument()
     })
 
     it('renders the file preview tab when the submission is submitted', async () => {
@@ -291,7 +303,7 @@ describe('ContentTabs', () => {
     describe('Uploading a file', () => {
       beforeAll(() => {
         $('body').append('<div role="alert" id="flash_screenreader_holder" />')
-        uploadFileModule.uploadFiles.mockImplementation(jest.fn())
+        uploadFileModule.uploadFiles.mockImplementation(vi.fn())
       })
 
       it('shows a file preview for an uploaded file', async () => {

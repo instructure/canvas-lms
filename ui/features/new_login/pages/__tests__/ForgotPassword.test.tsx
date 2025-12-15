@@ -25,22 +25,22 @@ import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../con
 import {forgotPassword} from '../../services'
 import ForgotPassword from '../ForgotPassword'
 
-jest.mock('../../context', () => {
-  const actualContext = jest.requireActual('../../context')
+vi.mock('../../context', async () => {
+  const actualContext = await vi.importActual<typeof import('../../context')>('../../context')
   return {
     ...actualContext,
-    useNewLoginData: jest.fn(() => ({
-      ...actualContext.useNewLoginData(),
+    useNewLoginData: vi.fn(() => ({
+      isDataLoading: false,
     })),
   }
 })
 
-jest.mock('../../services/auth', () => ({
-  forgotPassword: jest.fn(),
+vi.mock('../../services/auth', () => ({
+  forgotPassword: vi.fn(),
 }))
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 describe('ForgotPassword', () => {
@@ -57,10 +57,11 @@ describe('ForgotPassword', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
     // reset the mock implementation to return the default values
-    ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
+    vi.mocked(useNewLoginData).mockImplementation(() => ({
+      isDataLoading: false,
       loginHandleName: 'Email',
     }))
   })
@@ -153,7 +154,7 @@ describe('ForgotPassword', () => {
     })
 
     it('renders the confirmation back button and navigates back to login after successful submission', async () => {
-      ;(forgotPassword as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(forgotPassword).mockResolvedValueOnce({
         status: 200,
         data: {requested: true},
       })
@@ -179,7 +180,7 @@ describe('ForgotPassword', () => {
     })
 
     it('disables UI elements while the form is submitting and keeps the submit button disabled after success', async () => {
-      ;(forgotPassword as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(forgotPassword).mockResolvedValueOnce({
         status: 200,
         data: {requested: true},
       })
@@ -202,7 +203,7 @@ describe('ForgotPassword', () => {
 
   describe('forgot password confirmation', () => {
     it('shows confirmation message after successful submission', async () => {
-      ;(forgotPassword as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(forgotPassword).mockResolvedValueOnce({
         status: 200,
         data: {requested: true},
       })
@@ -220,7 +221,7 @@ describe('ForgotPassword', () => {
     })
 
     it('moves focus to the confirmation heading after successful submission', async () => {
-      ;(forgotPassword as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(forgotPassword).mockResolvedValueOnce({
         status: 200,
         data: {requested: true},
       })

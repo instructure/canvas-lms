@@ -21,7 +21,7 @@ import {render, fireEvent} from '@testing-library/react'
 import CommentArea from '../CommentArea'
 import fakeEnv from '@canvas/test-utils/fakeENV'
 
-jest.mock('../CommentLibraryV2/CommentLibrary', () => {
+vi.mock('../CommentLibraryV2/CommentLibrary', () => {
   return {
     // eslint-disable-next-line react/prop-types
     CommentLibrary: function CommentLibrary({setComment, setFocusToTextArea}) {
@@ -50,12 +50,12 @@ describe('CommentArea', () => {
   }
 
   beforeEach(() => {
-    getTextAreaRefMock = jest.fn()
-    handleCommentChangeMock = jest.fn()
+    getTextAreaRefMock = vi.fn()
+    handleCommentChangeMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fakeEnv.teardown()
   })
 
@@ -105,7 +105,7 @@ describe('CommentArea', () => {
     })
 
     it('calls handleCommentChange when setComment is invoked from CommentLibraryWrapper', () => {
-      const handleCommentChange = jest.fn()
+      const handleCommentChange = vi.fn()
       const {getByText} = render(
         <CommentArea {...defaultProps()} handleCommentChange={handleCommentChange} />,
       )
@@ -115,10 +115,10 @@ describe('CommentArea', () => {
     })
 
     it('focuses textarea when setFocusToTextArea is invoked from CommentLibraryWrapper', () => {
-      const mockTextArea = {focus: jest.fn()}
+      const mockTextArea = {focus: vi.fn()}
       getTextAreaRefMock.mockImplementation(el => {
         if (el) {
-          mockTextArea.focus = jest.fn()
+          mockTextArea.focus = vi.fn()
           Object.assign(el, mockTextArea)
         }
       })
@@ -131,7 +131,7 @@ describe('CommentArea', () => {
 
     describe('with RCE Lite enabled', () => {
       it('calls handleCommentChange when inserting comment', () => {
-        const handleCommentChange = jest.fn()
+        const handleCommentChange = vi.fn()
 
         const {getByText} = render(
           <CommentArea

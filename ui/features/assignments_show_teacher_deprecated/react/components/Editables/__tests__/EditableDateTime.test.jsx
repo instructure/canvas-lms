@@ -51,7 +51,7 @@ function renderEditableDateTime(props = {}) {
  *  2, we are just going to short out those components and skip the tests.
  */
 
-describe.skip('EditableDateTime', () => {
+describe('EditableDateTime', () => {
   it('renders in view mode', () => {
     const value = '2019-04-11T13:00:00-05:00'
     const {getByText} = renderEditableDateTime({value})
@@ -61,7 +61,8 @@ describe.skip('EditableDateTime', () => {
     expect(getByText(dtstring)).toBeInTheDocument()
   })
 
-  it('renders in edit mode', () => {
+  // Skipped: DateTimeInput is stubbed out (InstUI v7 deprecation - see component file)
+  it.skip('renders in edit mode', () => {
     const value = '2019-04-11T13:00:00-05:00'
     const {getAllByText, getByLabelText} = renderEditableDateTime({mode: 'edit', value})
 
@@ -73,10 +74,11 @@ describe.skip('EditableDateTime', () => {
     expect(getAllByText(dtstring)[0]).toBeInTheDocument()
   })
 
-  it('exits edit mode and reverts to previous value on Escape', () => {
+  // Skipped: DateTimeInput is stubbed out (InstUI v7 deprecation - see component file)
+  it.skip('exits edit mode and reverts to previous value on Escape', () => {
     const value = '2019-04-11T13:00:00-05:00'
-    const onChangeMode = jest.fn()
-    const onChange = jest.fn()
+    const onChangeMode = vi.fn()
+    const onChange = vi.fn()
     const {getByDisplayValue} = renderEditableDateTime({
       mode: 'edit',
       onChangeMode,
@@ -108,8 +110,8 @@ describe.skip('EditableDateTime', () => {
 
   // it('saves new value on Enter', async () => {
   //   const value = '2018-04-11T13:00:00-05:00'
-  //   const onChange = jest.fn()
-  //   const onChangeMode = jest.fn()
+  //   const onChange = vi.fn()
+  //   const onChangeMode = vi.fn()
   //   const {container} = renderEditableDateTime({
   //     mode: 'edit',
   //     onChange,
@@ -134,8 +136,8 @@ describe.skip('EditableDateTime', () => {
 
   // it('saves the new value on blur', () => {
   //   const value = '2019-04-11T13:00:00-05:00'
-  //   const onChange = jest.fn()
-  //   const onChangeMode = jest.fn()
+  //   const onChange = vi.fn()
+  //   const onChangeMode = vi.fn()
   //   const {container, getByDisplayValue} = render(
   //     <div>
   //       <EditableDateTime

@@ -29,8 +29,8 @@ import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
-  executeApiRequest: jest.fn(),
+vi.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
+  executeApiRequest: vi.fn(),
 }))
 
 const renderGradingResults = (props: GradingResultsComponentProps) => {
@@ -46,9 +46,9 @@ describe('Grading Results Tests', () => {
 
   beforeEach(() => {
     fakeENV.setup()
-    $.subscribe = jest.fn()
+    $.subscribe = vi.fn()
     setupCanvasQueries()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     user = userEvent.setup()
   })
 
@@ -202,7 +202,7 @@ describe('Grading Results Tests', () => {
     })
     it('makes the correct API call when submitting a grade from the modal', () => {
       // Reset the mock to ensure it's clean for this test
-      const mockApiRequest = executeApiRequest as jest.Mock
+      const mockApiRequest = executeApiRequest as any
       mockApiRequest.mockClear()
       mockApiRequest.mockImplementation(() => Promise.resolve({}))
 

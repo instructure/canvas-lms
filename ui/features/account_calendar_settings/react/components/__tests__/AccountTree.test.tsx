@@ -26,10 +26,10 @@ import {RESPONSE_ACCOUNT_1, RESPONSE_ACCOUNT_4} from './fixtures'
 const defaultProps = {
   originAccountId: 1,
   visibilityChanges: [],
-  onAccountToggled: jest.fn(),
+  onAccountToggled: vi.fn(),
   showSpinner: false,
   subscriptionChanges: [],
-  onAccountSubscriptionToggled: jest.fn(),
+  onAccountSubscriptionToggled: vi.fn(),
   onAccountExpandedToggled: () => {},
   expandedAccounts: [1],
 }
@@ -68,7 +68,7 @@ describe('AccountTree', () => {
   })
 
   it('calls onAccountToggled when a checkbox is toggled', async () => {
-    const onAccountToggled = jest.fn()
+    const onAccountToggled = vi.fn()
     const {findByRole, getByRole} = render(
       <AccountTree {...defaultProps} onAccountToggled={onAccountToggled} />,
     )
@@ -85,7 +85,7 @@ describe('AccountTree', () => {
   })
 
   it('asks to expand tree when a parent account is selected', async () => {
-    const onAccountExpandedToggled = jest.fn()
+    const onAccountExpandedToggled = vi.fn()
     const {findByRole} = render(
       <AccountTree {...defaultProps} onAccountExpandedToggled={onAccountExpandedToggled} />,
     )
@@ -111,7 +111,7 @@ describe('AccountTree', () => {
   })
 
   it('fetches account children on user expansion', async () => {
-    const onAccountExpandedToggled = jest.fn()
+    const onAccountExpandedToggled = vi.fn()
     const {findByRole} = render(
       <AccountTree {...defaultProps} onAccountExpandedToggled={onAccountExpandedToggled} />,
     )

@@ -65,13 +65,13 @@ describe('Gradebook > Students', () => {
     })
 
     it('rebuilds grid rows', () => {
-      jest.spyOn(gradebook, 'buildRows')
+      vi.spyOn(gradebook, 'buildRows')
       gradebook.updateStudentIds(studentIds)
       expect(gradebook.buildRows).toHaveBeenCalledTimes(1)
     })
 
     it('rebuilds grid rows after storing the student ids', () => {
-      jest.spyOn(gradebook, 'buildRows').mockImplementation(() => {
+      vi.spyOn(gradebook, 'buildRows').mockImplementation(() => {
         expect(gradebook.courseContent.students.listStudentIds()).toEqual(studentIds)
       })
       gradebook.updateStudentIds(studentIds)
@@ -79,29 +79,29 @@ describe('Gradebook > Students', () => {
 
     it('rebuilds grid rows after updating assignment student visibility', () => {
       gradebook.assignmentStudentVisibility = {2301: ['1101', '1102']}
-      jest.spyOn(gradebook, 'buildRows').mockImplementation(() => {
+      vi.spyOn(gradebook, 'buildRows').mockImplementation(() => {
         expect(gradebook.assignmentStudentVisibility).toEqual({})
       })
       gradebook.updateStudentIds(studentIds)
     })
 
     it('updates essential data load status', () => {
-      jest.spyOn(gradebook, '_updateEssentialDataLoaded')
+      vi.spyOn(gradebook, '_updateEssentialDataLoaded')
       gradebook.updateStudentIds(studentIds)
       expect(gradebook._updateEssentialDataLoaded).toHaveBeenCalledTimes(1)
     })
 
     it('updates essential data load status after updating student ids loaded status', () => {
-      jest.spyOn(gradebook, 'renderFilters')
-      jest.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
+      vi.spyOn(gradebook, 'renderFilters')
+      vi.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
         expect(gradebook.contentLoadStates.studentIdsLoaded).toBe(true)
       })
       gradebook.updateStudentIds(studentIds)
     })
 
     it('updates essential data load status after building rows', () => {
-      jest.spyOn(gradebook, 'buildRows')
-      jest.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
+      vi.spyOn(gradebook, 'buildRows')
+      vi.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
         expect(gradebook.buildRows).toHaveBeenCalledTimes(1)
       })
       gradebook.updateStudentIds(studentIds)
@@ -124,35 +124,35 @@ describe('Gradebook > Students', () => {
     })
 
     it('updates column headers when the grid has rendered', () => {
-      jest.spyOn(gradebook, '_gridHasRendered').mockReturnValue(true)
-      jest.spyOn(gradebook, 'updateColumnHeaders')
+      vi.spyOn(gradebook, '_gridHasRendered').mockReturnValue(true)
+      vi.spyOn(gradebook, 'updateColumnHeaders')
       gradebook.updateStudentsLoaded(true)
       expect(gradebook.updateColumnHeaders).toHaveBeenCalledTimes(1)
     })
 
     it('updates column headers after updating the students loaded status', () => {
-      jest.spyOn(gradebook, '_gridHasRendered').mockReturnValue(true)
-      jest.spyOn(gradebook, 'updateColumnHeaders').mockImplementation(() => {
+      vi.spyOn(gradebook, '_gridHasRendered').mockReturnValue(true)
+      vi.spyOn(gradebook, 'updateColumnHeaders').mockImplementation(() => {
         expect(gradebook.contentLoadStates.studentsLoaded).toBe(true)
       })
       gradebook.updateStudentsLoaded(true)
     })
 
     it('does not update column headers when the grid has not yet rendered', () => {
-      jest.spyOn(gradebook, '_gridHasRendered').mockReturnValue(false)
-      jest.spyOn(gradebook, 'updateColumnHeaders')
+      vi.spyOn(gradebook, '_gridHasRendered').mockReturnValue(false)
+      vi.spyOn(gradebook, 'updateColumnHeaders')
       gradebook.updateStudentsLoaded(true)
       expect(gradebook.updateColumnHeaders).not.toHaveBeenCalled()
     })
 
     it('renders filters', () => {
-      jest.spyOn(gradebook, 'renderFilters')
+      vi.spyOn(gradebook, 'renderFilters')
       gradebook.updateStudentsLoaded(true)
       expect(gradebook.renderFilters).toHaveBeenCalledTimes(1)
     })
 
     it('renders filters after updating the students loaded status', () => {
-      jest.spyOn(gradebook, 'renderFilters').mockImplementation(() => {
+      vi.spyOn(gradebook, 'renderFilters').mockImplementation(() => {
         expect(gradebook.contentLoadStates.studentsLoaded).toBe(true)
       })
       gradebook.updateStudentsLoaded(true)
@@ -160,14 +160,14 @@ describe('Gradebook > Students', () => {
 
     it('updates the total grade column when students and submissions are loaded', () => {
       gradebook.setSubmissionsLoaded(true)
-      jest.spyOn(gradebook, 'updateTotalGradeColumn')
+      vi.spyOn(gradebook, 'updateTotalGradeColumn')
       gradebook.updateStudentsLoaded(true)
       expect(gradebook.updateTotalGradeColumn).toHaveBeenCalledTimes(1)
     })
 
     it('updates the total grade column after updating the students loaded status', () => {
       gradebook.setSubmissionsLoaded(true)
-      jest.spyOn(gradebook, 'updateTotalGradeColumn').mockImplementation(() => {
+      vi.spyOn(gradebook, 'updateTotalGradeColumn').mockImplementation(() => {
         expect(gradebook.contentLoadStates.studentsLoaded).toBe(true)
       })
       gradebook.updateStudentsLoaded(true)
@@ -175,7 +175,7 @@ describe('Gradebook > Students', () => {
 
     it('does not update the total grade column when submissions are not loaded', () => {
       gradebook.setSubmissionsLoaded(false)
-      jest.spyOn(gradebook, 'updateTotalGradeColumn')
+      vi.spyOn(gradebook, 'updateTotalGradeColumn')
       gradebook.updateStudentsLoaded(true)
       expect(gradebook.updateTotalGradeColumn).not.toHaveBeenCalled()
     })
@@ -183,7 +183,7 @@ describe('Gradebook > Students', () => {
     it('does not update the total grade column when students are being reloaded', () => {
       gradebook.setSubmissionsLoaded(true)
       gradebook.setStudentsLoaded(true)
-      jest.spyOn(gradebook, 'updateTotalGradeColumn')
+      vi.spyOn(gradebook, 'updateTotalGradeColumn')
       gradebook.updateStudentsLoaded(false)
       expect(gradebook.updateTotalGradeColumn).not.toHaveBeenCalled()
     })
@@ -194,7 +194,7 @@ describe('Gradebook > Students', () => {
 
     beforeEach(() => {
       gradebook = createGradebook()
-      jest.spyOn(gradebook.gradebookGrid, 'render').mockImplementation(() => {})
+      vi.spyOn(gradebook.gradebookGrid, 'render').mockImplementation(() => {})
 
       studentData = [
         {
@@ -337,7 +337,7 @@ describe('Gradebook > Students', () => {
 
     it('builds rows', () => {
       gradebook.searchFilteredStudentIds = [1101]
-      jest.spyOn(gradebook, 'buildRows')
+      vi.spyOn(gradebook, 'buildRows')
       gradebook.gotChunkOfStudents(studentData)
       expect(gradebook.buildRows).toHaveBeenCalledTimes(1)
     })

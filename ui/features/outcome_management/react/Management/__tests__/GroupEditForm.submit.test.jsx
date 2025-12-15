@@ -28,11 +28,11 @@ describe('GroupEditForm - Submit', () => {
   let onCloseHandler, onSubmit
 
   beforeAll(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterAll(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   const defaultProps = (props = {}) => ({
@@ -43,12 +43,12 @@ describe('GroupEditForm - Submit', () => {
   })
 
   beforeEach(() => {
-    onCloseHandler = jest.fn()
-    onSubmit = jest.fn()
+    onCloseHandler = vi.fn()
+    onSubmit = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('calls onSubmit when submission', async () => {
@@ -57,13 +57,13 @@ describe('GroupEditForm - Submit', () => {
       description: 'The Group Description',
     }
     const {getByLabelText, getByText} = render(<GroupEditForm {...defaultProps({initialValues})} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
 
     focusChange(getByLabelText('Group Name *'), 'New group name')
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
 
     fireEvent.click(getByText('Save'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
 
     expect(onSubmit).toHaveBeenCalledWith(
       {
@@ -77,19 +77,19 @@ describe('GroupEditForm - Submit', () => {
 
   it('does not save if form is invalid', async () => {
     const {getByLabelText, getByText} = render(<GroupEditForm {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     const groupTitle = getByLabelText('Group Name *')
     fireEvent.change(groupTitle, {target: {value: 'a'.repeat(256)}})
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(groupTitle.value).toBe('a'.repeat(256))
     getByText('Save').closest('button').click()
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(onSubmit).not.toHaveBeenCalled()
     fireEvent.change(groupTitle, {target: {value: 'a'.repeat(255)}})
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(groupTitle.value).toBe('a'.repeat(255))
     getByText('Save').closest('button').click()
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(onSubmit).toHaveBeenCalled()
   })
 })

@@ -22,11 +22,11 @@ import userEvent from '@testing-library/user-event'
 import PreSaveRelockModal from '../PreSaveRelockModal'
 
 describe('PreSaveRelockModal', () => {
-  const mockOnSave = jest.fn()
-  const mockOnCancel = jest.fn()
+  const mockOnSave = vi.fn()
+  const mockOnCancel = vi.fn()
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const defaultProps = {

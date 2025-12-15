@@ -21,8 +21,8 @@ import {fireEvent, render} from '@testing-library/react'
 import {MissingSectionsWarningModal} from '../MissingSectionsWarningModal'
 
 const defaultProps = {
-  onClose: jest.fn(),
-  onContinue: jest.fn(e => e.preventDefault()),
+  onClose: vi.fn(),
+  onContinue: vi.fn(e => e.preventDefault()),
 }
 
 const setup = (props = defaultProps) => {

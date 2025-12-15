@@ -102,9 +102,9 @@ const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentPr
   published: true,
   expanded: true,
   hasActiveOverrides: false,
-  setModuleAction: jest.fn(),
-  setIsManageModuleContentTrayOpen: jest.fn(),
-  setSourceModule: jest.fn(),
+  setModuleAction: vi.fn(),
+  setIsManageModuleContentTrayOpen: vi.fn(),
+  setSourceModule: vi.fn(),
   ...overrides,
 })
 
@@ -228,7 +228,7 @@ describe('ModuleHeaderActionPanel', () => {
 
   it('calls onToggleShowAll when Show All button is clicked', async () => {
     const user = userEvent.setup()
-    const mockToggleShowAll = jest.fn()
+    const mockToggleShowAll = vi.fn()
 
     setUp(
       buildDefaultProps({

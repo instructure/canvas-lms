@@ -125,7 +125,7 @@ it('renders unique text for dismiss button', () => {
 })
 
 it('calls the handleDismissClick prop when the dismiss X is clicked', () => {
-  const handleDismissClick = jest.fn()
+  const handleDismissClick = vi.fn()
   const item = {
     type: 'Assignment',
     title: 'Introduction to Board Games',

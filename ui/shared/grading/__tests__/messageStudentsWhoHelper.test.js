@@ -20,7 +20,7 @@ import {keys} from 'es-toolkit/compat'
 import MessageStudentsWhoHelper from '../messageStudentsWhoHelper'
 import axios from '@canvas/axios'
 
-jest.mock('@canvas/axios')
+vi.mock('@canvas/axios')
 
 describe('MessageStudentsWhoHelper', () => {
   let assignment
@@ -31,14 +31,14 @@ describe('MessageStudentsWhoHelper', () => {
 
   describe('#options', () => {
     test("Includes the 'Haven't been graded' option if there are submissions", () => {
-      jest.spyOn(MessageStudentsWhoHelper, 'hasSubmission').mockReturnValue(true)
+      vi.spyOn(MessageStudentsWhoHelper, 'hasSubmission').mockReturnValue(true)
       const options = MessageStudentsWhoHelper.options(assignment)
       expect(options[1].text).toBe("Haven't been graded")
       MessageStudentsWhoHelper.hasSubmission.mockRestore()
     })
 
     test("Does not include the 'Haven't been graded' option if there are no submissions", () => {
-      jest.spyOn(MessageStudentsWhoHelper, 'hasSubmission').mockReturnValue(false)
+      vi.spyOn(MessageStudentsWhoHelper, 'hasSubmission').mockReturnValue(false)
       const options = MessageStudentsWhoHelper.options(assignment)
       expect(options[1].text).toBe('Scored less than')
       MessageStudentsWhoHelper.hasSubmission.mockRestore()
@@ -230,7 +230,7 @@ describe('MessageStudentsWhoHelper', () => {
       const option = {
         criteriaFn: (student, cutoff) => student.score > cutoff,
       }
-      jest.spyOn(MessageStudentsWhoHelper, 'findOptionByText').mockReturnValue(option)
+      vi.spyOn(MessageStudentsWhoHelper, 'findOptionByText').mockReturnValue(option)
       const students = [{user_data: {id: '1', score: 8}}, {user_data: {id: '2', score: 4}}]
       const cutoff = 5
       const selected = 'Scored more than'
@@ -245,7 +245,7 @@ describe('MessageStudentsWhoHelper', () => {
       const option = {
         subjectFn: (assignment, cutoff) => `name: ${assignment.name}, cutoff: ${cutoff}`,
       }
-      jest.spyOn(MessageStudentsWhoHelper, 'findOptionByText').mockReturnValue(option)
+      vi.spyOn(MessageStudentsWhoHelper, 'findOptionByText').mockReturnValue(option)
       const assignment = {id: '1', name: 'Shootbags'}
       const cutoff = 5
       const subjectCallbackFn = MessageStudentsWhoHelper.generateSubjectCallbackFn(assignment)
@@ -311,12 +311,12 @@ describe('MessageStudentsWhoHelper', () => {
     const mockedAxios = axios
 
     beforeEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       mockedAxios.post.mockResolvedValue({data})
     })
 
     afterEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     test('sends a post request to the "conversations" url', async () => {

@@ -40,7 +40,7 @@ describe('Assignments Show Student ErrorBoundary', () => {
 
   beforeEach(() => {
     // Mock console.error to prevent error output in tests
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     // Also suppress window.onerror to prevent JSDOM from logging errors
     originalError = window.onerror

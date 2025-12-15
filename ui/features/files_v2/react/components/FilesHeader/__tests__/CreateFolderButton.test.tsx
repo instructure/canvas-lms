@@ -29,8 +29,8 @@ import {mockRowsContext} from '../../FileFolderTable/__tests__/testUtils'
 import fetchMock from 'fetch-mock'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: jest.fn(() => () => {}),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashSuccess: vi.fn(() => () => {}),
 }))
 
 const renderComponent = () => {
@@ -44,10 +44,10 @@ const renderComponent = () => {
     </FileManagementProvider>,
   )
 }
-jest.useFakeTimers()
+vi.useFakeTimers()
 describe('CreateFolderButton', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fetchMock.post(/.*\/folders/, 200)
   })
 
@@ -89,7 +89,7 @@ describe('CreateFolderButton', () => {
     const createButton = screen.getByRole('button', {name: /Create Folder/i})
     await user.click(createButton)
 
-    jest.runAllTimers()
+    vi.runAllTimers()
     await waitFor(() =>
       expect(showFlashSuccess).toHaveBeenCalledWith('Folder created successfully'),
     )

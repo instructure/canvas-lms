@@ -43,17 +43,17 @@ describe('GradebookGrid TotalGradeCellFormatter', () => {
       show_total_grade_as_points: true,
     })
 
-    jest.spyOn(gradebook, 'getTotalPointsPossible').mockReturnValue(10)
-    jest.spyOn(gradebook, 'listInvalidAssignmentGroups').mockReturnValue([])
-    jest.spyOn(gradebook, 'listHiddenAssignments').mockReturnValue([])
-    jest.spyOn(gradebook, 'saveSettings')
+    vi.spyOn(gradebook, 'getTotalPointsPossible').mockReturnValue(10)
+    vi.spyOn(gradebook, 'listInvalidAssignmentGroups').mockReturnValue([])
+    vi.spyOn(gradebook, 'listHiddenAssignments').mockReturnValue([])
+    vi.spyOn(gradebook, 'saveSettings')
     formatter = new TotalGradeCellFormatter(gradebook)
 
     grade = {score: 8, possible: 10}
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     fixture.remove()
     I18nStubber.clear()
   })
@@ -199,7 +199,7 @@ describe('GradebookGrid TotalGradeCellFormatter', () => {
   })
 
   test('does not render a letter grade when not using a grading standard', () => {
-    jest.spyOn(gradebook, 'getCourseGradingScheme').mockReturnValue(null)
+    vi.spyOn(gradebook, 'getCourseGradingScheme').mockReturnValue(null)
     expect(renderCell().querySelector('.letter-grade-points')).toBeNull()
     gradebook.getCourseGradingScheme.mockRestore()
   })

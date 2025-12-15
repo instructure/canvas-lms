@@ -20,7 +20,6 @@ function mouseover($el) {
   const event = new MouseEvent('mouseover', {
     bubbles: true,
     cancelable: true,
-    view: window,
   })
   $el.dispatchEvent(event)
 }

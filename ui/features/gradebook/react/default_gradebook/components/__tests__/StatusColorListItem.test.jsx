@@ -25,17 +25,17 @@ const defaultProps = (props = {}) => ({
   status: 'late',
   color: '#efefef',
   isColorPickerShown: false,
-  colorPickerOnToggle: jest.fn(),
-  colorPickerButtonRef: jest.fn(),
-  colorPickerContentRef: jest.fn(),
-  colorPickerAfterClose: jest.fn(),
-  afterSetColor: jest.fn(),
+  colorPickerOnToggle: vi.fn(),
+  colorPickerButtonRef: vi.fn(),
+  colorPickerContentRef: vi.fn(),
+  colorPickerAfterClose: vi.fn(),
+  afterSetColor: vi.fn(),
   ...props,
 })
 
 describe('StatusColorListItem', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('displays the status text', () => {
@@ -64,7 +64,7 @@ describe('StatusColorListItem', () => {
   })
 
   it('calls afterSetColor when color is changed', async () => {
-    const afterSetColor = jest.fn()
+    const afterSetColor = vi.fn()
     const user = userEvent.setup()
 
     render(<StatusColorListItem {...defaultProps({afterSetColor})} />)

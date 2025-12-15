@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
   TopNavigationTools,
@@ -27,13 +27,17 @@ import {
 import type {Tool} from '@canvas/global/env/EnvCommon'
 
 describe('TopNavigationTools', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
     window.ENV = window.ENV || {}
     window.ENV.FEATURES = {}
   })
 
   it('renders pinned tools as icon buttons and unpinned tools in menu', async () => {
-    jest.useRealTimers()
+    vi.useRealTimers()
 
     const tools = [
       {
@@ -51,7 +55,7 @@ describe('TopNavigationTools', () => {
         pinned: false,
       },
     ]
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const user = userEvent.setup()
     const {getByRole, getByLabelText, getAllByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
@@ -74,7 +78,7 @@ describe('TopNavigationTools', () => {
     const menuItem = getByRole('menuitem', {name: /Tool 2/})
     expect(menuItem).toBeInTheDocument()
 
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   it('renders menu before pinned tools in DOM when a11y fixes flag is OFF', () => {
@@ -96,7 +100,7 @@ describe('TopNavigationTools', () => {
         pinned: false,
       },
     ]
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const {getAllByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
@@ -127,7 +131,7 @@ describe('TopNavigationTools', () => {
         pinned: false,
       },
     ]
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const {getAllByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
@@ -158,7 +162,7 @@ describe('TopNavigationTools', () => {
         pinned: false,
       },
     ]
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const {getAllByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
@@ -189,7 +193,7 @@ describe('TopNavigationTools', () => {
         pinned: false,
       },
     ]
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const {getAllByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
@@ -227,7 +231,7 @@ describe('TopNavigationTools', () => {
         pinned: false,
       },
     ]
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const {getAllByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
@@ -241,7 +245,7 @@ describe('TopNavigationTools', () => {
 
   it('renders empty container when no tools provided', () => {
     const tools: Tool[] = []
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const {container, queryByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
@@ -252,7 +256,7 @@ describe('TopNavigationTools', () => {
   })
 
   it('renders all tools in menu when no tools are pinned', async () => {
-    jest.useRealTimers()
+    vi.useRealTimers()
 
     const tools = [
       {
@@ -270,7 +274,7 @@ describe('TopNavigationTools', () => {
         pinned: false,
       },
     ]
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const user = userEvent.setup()
     const {getByRole, queryByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
@@ -291,13 +295,13 @@ describe('TopNavigationTools', () => {
     expect(getByRole('menuitem', {name: /Tool 1/})).toBeInTheDocument()
     expect(getByRole('menuitem', {name: /Tool 2/})).toBeInTheDocument()
 
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 })
 
 describe('MobileTopNavigationTools', () => {
   it('renders all tools in a single menu with pinned tools at top', async () => {
-    jest.useRealTimers()
+    vi.useRealTimers()
 
     const tools = [
       {
@@ -315,7 +319,7 @@ describe('MobileTopNavigationTools', () => {
         pinned: true,
       },
     ]
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const user = userEvent.setup()
     const {getByRole} = render(
       <MobileTopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
@@ -337,13 +341,13 @@ describe('MobileTopNavigationTools', () => {
     // Should have a separator between pinned and unpinned tools
     expect(getByRole('presentation')).toBeInTheDocument()
 
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 })
 
 describe('handleToolClick', () => {
   it('finds tool', async () => {
-    jest.useRealTimers()
+    vi.useRealTimers()
 
     const tool = {
       id: '1',
@@ -352,7 +356,7 @@ describe('handleToolClick', () => {
       icon_url: 'https://instructure.com',
       pinned: true,
     }
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const user = userEvent.setup()
     const {getByRole} = render(
       <TopNavigationTools tools={[tool]} handleToolLaunch={handleToolLaunch} />,
@@ -362,7 +366,7 @@ describe('handleToolClick', () => {
     await user.click(toolButton)
     expect(handleToolLaunch).toHaveBeenCalledWith(tool)
 
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 })
 

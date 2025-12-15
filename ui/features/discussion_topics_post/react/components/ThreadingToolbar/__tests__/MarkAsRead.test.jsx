@@ -21,16 +21,16 @@ import React from 'react'
 import {responsiveQuerySizes} from '../../../utils'
 import {MarkAsRead} from '../MarkAsRead'
 
-jest.mock('../../../utils')
+vi.mock('../../../utils')
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })
@@ -72,7 +72,7 @@ describe('MarkAsRead', () => {
   })
 
   it('calls provided callback when clicked', () => {
-    const onClickMock = jest.fn()
+    const onClickMock = vi.fn()
     const {getAllByText} = setup({onClick: onClickMock})
     expect(onClickMock.mock.calls).toHaveLength(0)
     fireEvent.click(getAllByText('Mark as Read')[0])

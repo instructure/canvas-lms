@@ -27,8 +27,8 @@ describe('k5-theme', () => {
 
   afterEach(() => {
     window.ENV = originalEnv
-    jest.clearAllMocks()
-    jest.resetModules()
+    vi.clearAllMocks()
+    vi.resetModules()
   })
 
   describe('K-5 theme', () => {

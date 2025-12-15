@@ -23,7 +23,7 @@ import OutcomePopoverView from '../OutcomePopoverView'
 import OutcomeDialogView from '../OutcomeDialogView'
 import OutcomeView from '../OutcomeView'
 import ProgressBarView from '../ProgressBarView'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 const ok = x => expect(x).toBeTruthy()
 
@@ -46,7 +46,7 @@ describe('OutcomeViewSpec', () => {
   })
 
   test('should be accessible', async () => {
-    await new Promise(resolve => isAccessible(outcomeView, resolve, {a11yReport: true}))
+    await isAccessible(outcomeView, {a11yReport: true})
   })
 
   test('assign instance of ProgressBarView on init', function () {
@@ -62,7 +62,7 @@ describe('OutcomeViewSpec', () => {
 
   test('click & keydown .more-details', function () {
     outcomeView.render()
-    const showSpy = jest.spyOn(outcomeView.dialog, 'show').mockImplementation(() => {})
+    const showSpy = vi.spyOn(outcomeView.dialog, 'show').mockImplementation(() => {})
     outcomeView.$el.find('a.more-details').trigger(e('click'))
     expect(showSpy).toHaveBeenCalled()
     showSpy.mockClear()

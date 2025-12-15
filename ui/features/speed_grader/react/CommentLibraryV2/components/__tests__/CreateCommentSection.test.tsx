@@ -17,16 +17,20 @@
  */
 
 import React from 'react'
-import {render, waitFor, screen} from '@testing-library/react'
+import {cleanup, render, waitFor, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import {CreateCommentSection} from '../CreateCommentSection'
 import {SpeedGraderLegacy_CreateCommentBankItem} from '../../graphql/mutations'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 describe('CreateCommentSection', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const defaultProps = {
     courseId: '1',
   }
@@ -70,7 +74,7 @@ describe('CreateCommentSection', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('Rendering Tests', () => {
@@ -126,7 +130,7 @@ describe('CreateCommentSection', () => {
 
     it('clicking "Add to Library" calls mutation with correct variables', async () => {
       const user = userEvent.setup()
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [createCommentMock({comment: 'Test comment'})]
       setup(mocks)
 
@@ -182,7 +186,7 @@ describe('CreateCommentSection', () => {
   describe('GraphQL Mutation Tests', () => {
     it('mutation called with correct courseId', async () => {
       const user = userEvent.setup()
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [createCommentMock({courseId: '42', comment: 'Test comment'})]
       setup(mocks, {courseId: '42'})
 
@@ -202,7 +206,7 @@ describe('CreateCommentSection', () => {
 
     it('success flash alert shows "Comment added"', async () => {
       const user = userEvent.setup()
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [createCommentMock({comment: 'Test comment'})]
       setup(mocks)
 
@@ -224,7 +228,7 @@ describe('CreateCommentSection', () => {
   describe('Error Handling Tests', () => {
     it('error flash alert shows "Failed to add comment" on mutation failure', async () => {
       const user = userEvent.setup()
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [createCommentMock({comment: 'Test comment', success: false})]
       setup(mocks)
 
@@ -244,6 +248,7 @@ describe('CreateCommentSection', () => {
 
     it('text is preserved in textarea on failure', async () => {
       const user = userEvent.setup()
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [createCommentMock({comment: 'Test comment', success: false})]
       setup(mocks)
 
@@ -256,7 +261,7 @@ describe('CreateCommentSection', () => {
       await user.click(button)
 
       await waitFor(() => {
-        expect(jest.spyOn(FlashAlert, 'showFlashAlert')).toHaveBeenCalledWith({
+        expect(showFlashAlertMock).toHaveBeenCalledWith({
           message: 'Failed to add comment',
           type: 'error',
         })
@@ -267,6 +272,7 @@ describe('CreateCommentSection', () => {
 
     it('button re-enables after error', async () => {
       const user = userEvent.setup()
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [createCommentMock({comment: 'Test comment', success: false})]
       setup(mocks)
 
@@ -277,7 +283,7 @@ describe('CreateCommentSection', () => {
       await user.click(button)
 
       await waitFor(() => {
-        expect(jest.spyOn(FlashAlert, 'showFlashAlert')).toHaveBeenCalledWith({
+        expect(showFlashAlertMock).toHaveBeenCalledWith({
           message: 'Failed to add comment',
           type: 'error',
         })

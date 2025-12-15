@@ -20,18 +20,21 @@ import * as Actions from '../loading-actions'
 import {queryClient} from '@canvas/query'
 import {MOCK_QUERY_CARDS_RESPONSE} from '@canvas/k5/react/__tests__/fixtures'
 
-jest.mock('../../utilities/apiUtils', () => ({
-  ...jest.requireActual('../../utilities/apiUtils'),
-  getContextCodesFromState: jest.requireActual('../../utilities/apiUtils').getContextCodesFromState,
-  findNextLink: jest.fn(),
-  transformApiToInternalItem: jest.fn(response => ({
-    ...response,
-    newActivity: response.new_activity,
-    transformedToInternal: true,
-  })),
-  transformInternalToApiItem: jest.fn(internal => ({...internal, transformedToApi: true})),
-  observedUserId: jest.requireActual('../../utilities/apiUtils').observedUserId,
-}))
+vi.mock('../../utilities/apiUtils', async () => {
+  const actual = await vi.importActual('../../utilities/apiUtils')
+  return {
+    ...actual,
+    getContextCodesFromState: actual.getContextCodesFromState,
+    findNextLink: vi.fn(),
+    transformApiToInternalItem: vi.fn(response => ({
+      ...response,
+      newActivity: response.new_activity,
+      transformedToInternal: true,
+    })),
+    transformInternalToApiItem: vi.fn(internal => ({...internal, transformedToApi: true})),
+    observedUserId: actual.observedUserId,
+  }
+})
 
 const getBasicState = () => ({
   courses: [],
@@ -56,14 +59,14 @@ const getBasicState = () => ({
   currentUser: {id: '1'},
 })
 
-jest.mock('@canvas/dashboard-card/dashboardCardQueries', () => ({
-  fetchDashboardCardsAsync: jest.fn(() => Promise.resolve(MOCK_QUERY_CARDS_RESPONSE)),
+vi.mock('@canvas/dashboard-card/dashboardCardQueries', () => ({
+  fetchDashboardCardsAsync: vi.fn(() => Promise.resolve(MOCK_QUERY_CARDS_RESPONSE)),
 }))
 
 describe('getCourseList with GraphQL integration', () => {
   let mockDispatch
   beforeEach(() => {
-    mockDispatch = jest.fn()
+    mockDispatch = vi.fn()
     global.ENV = {
       FEATURES: {dashboard_graphql_integration: true},
       current_user_id: '1',

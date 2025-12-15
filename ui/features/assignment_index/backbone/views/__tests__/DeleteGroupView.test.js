@@ -21,7 +21,6 @@ import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DeleteGroupView from '../DeleteGroupView'
 import $ from 'jquery'
-import '@testing-library/jest-dom'
 import axe from 'axe-core'
 
 describe('DeleteGroupView', () => {
@@ -54,11 +53,11 @@ describe('DeleteGroupView', () => {
 
     // Mock dialog functionality
     view.dialog = {
-      open: jest.fn(),
-      close: jest.fn(),
-      isOpen: jest.fn(() => true),
+      open: vi.fn(),
+      close: vi.fn(),
+      isOpen: vi.fn(() => true),
       focusable: {
-        focus: jest.fn(),
+        focus: vi.fn(),
       },
     }
 
@@ -67,9 +66,12 @@ describe('DeleteGroupView', () => {
       return view.dialog
     }
 
+    // Mock jQuery disableWhileLoading
+    view.$el.disableWhileLoading = vi.fn((promise) => promise)
+
     // Mock form validation and submission
-    view.validateBeforeSave = jest.fn(() => true)
-    view.saveFormData = jest.fn(() => $.Deferred().resolve().promise())
+    view.validateBeforeSave = vi.fn(() => true)
+    view.saveFormData = vi.fn(() => $.Deferred().resolve().promise())
 
     return view
   }
@@ -83,7 +85,7 @@ describe('DeleteGroupView', () => {
   afterEach(() => {
     container.remove()
     $('form.dialogFormView').remove()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be accessible', async () => {
@@ -94,10 +96,10 @@ describe('DeleteGroupView', () => {
   })
 
   it('should delete a group without assignments', () => {
-    const confirmSpy = jest.spyOn(window, 'confirm').mockImplementation(() => true)
+    const confirmSpy = vi.spyOn(window, 'confirm').mockImplementation(() => true)
     const view = createView(false, true)
-    const destroyModelSpy = jest.spyOn(view, 'destroyModel')
-    jest.spyOn(view.model, 'destroy').mockImplementation(() => Promise.resolve())
+    const destroyModelSpy = vi.spyOn(view, 'destroyModel')
+    vi.spyOn(view.model, 'destroy').mockImplementation(() => Promise.resolve())
 
     view.render()
     view.openAgain()
@@ -133,8 +135,8 @@ describe('DeleteGroupView', () => {
 
   it('deletes a group with assignments', () => {
     const view = createView(true, true)
-    const destroyModelSpy = jest.spyOn(view, 'destroyModel')
-    jest.spyOn(view.model, 'destroy').mockImplementation(() => Promise.resolve())
+    const destroyModelSpy = vi.spyOn(view, 'destroyModel')
+    vi.spyOn(view.model, 'destroy').mockImplementation(() => Promise.resolve())
 
     view.render()
     view.openAgain()
@@ -150,7 +152,7 @@ describe('DeleteGroupView', () => {
     view.render()
 
     // Mock validateFormData to return validation error
-    jest.spyOn(view, 'validateFormData').mockImplementation(() => ({
+    vi.spyOn(view, 'validateFormData').mockImplementation(() => ({
       move_assignments_to: [
         {
           type: 'required',
@@ -171,8 +173,8 @@ describe('DeleteGroupView', () => {
 
   it('moves assignments to another group', () => {
     const view = createView(true, true)
-    const destroyModelSpy = jest.spyOn(view, 'destroyModel')
-    jest.spyOn(view.model, 'destroy').mockImplementation(() => Promise.resolve())
+    const destroyModelSpy = vi.spyOn(view, 'destroyModel')
+    vi.spyOn(view.model, 'destroy').mockImplementation(() => Promise.resolve())
 
     view.render()
     view.openAgain()
@@ -185,9 +187,9 @@ describe('DeleteGroupView', () => {
   })
 
   it('prevents deleting the last assignment group', () => {
-    const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => true)
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => true)
     const view = createView(true, false)
-    const destroyModelSpy = jest.spyOn(view, 'destroyModel')
+    const destroyModelSpy = vi.spyOn(view, 'destroyModel')
 
     view.render()
     view.openAgain()

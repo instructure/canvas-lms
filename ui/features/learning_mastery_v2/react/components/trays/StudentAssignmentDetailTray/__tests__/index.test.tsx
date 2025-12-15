@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {StudentAssignmentDetailTray} from '..'
 import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../../../__fixtures__/rollups'
@@ -25,7 +25,7 @@ import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../../../__fixtures__/rollups'
 describe('StudentAssignmentDetailTray', () => {
   const defaultProps = {
     open: true,
-    onDismiss: jest.fn(),
+    onDismiss: vi.fn(),
     outcome: MOCK_OUTCOMES[0],
     courseId: '123',
     student: MOCK_STUDENTS[0],
@@ -37,19 +37,23 @@ describe('StudentAssignmentDetailTray', () => {
     assignmentNavigator: {
       hasPrevious: true,
       hasNext: true,
-      onPrevious: jest.fn(),
-      onNext: jest.fn(),
+      onPrevious: vi.fn(),
+      onNext: vi.fn(),
     },
     studentNavigator: {
       hasPrevious: true,
       hasNext: true,
-      onPrevious: jest.fn(),
-      onNext: jest.fn(),
+      onPrevious: vi.fn(),
+      onNext: vi.fn(),
     },
   }
 
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('General behavior', () => {
@@ -71,7 +75,7 @@ describe('StudentAssignmentDetailTray', () => {
 
     it('calls onDismiss when close button is clicked', async () => {
       const user = userEvent.setup()
-      const onDismiss = jest.fn()
+      const onDismiss = vi.fn()
       render(<StudentAssignmentDetailTray {...defaultProps} onDismiss={onDismiss} />)
 
       const closeButton = screen.getByRole('button', {name: /close/i})
@@ -106,7 +110,7 @@ describe('StudentAssignmentDetailTray', () => {
 
     it('calls assignmentNavigator onPrevious when assignment previous button is clicked', async () => {
       const user = userEvent.setup()
-      const onPrevious = jest.fn()
+      const onPrevious = vi.fn()
       render(
         <StudentAssignmentDetailTray
           {...defaultProps}
@@ -122,7 +126,7 @@ describe('StudentAssignmentDetailTray', () => {
 
     it('calls assignmentNavigator onNext when assignment next button is clicked', async () => {
       const user = userEvent.setup()
-      const onNext = jest.fn()
+      const onNext = vi.fn()
       render(
         <StudentAssignmentDetailTray
           {...defaultProps}
@@ -188,7 +192,7 @@ describe('StudentAssignmentDetailTray', () => {
 
     it('calls studentNavigator onPrevious when student previous button is clicked', async () => {
       const user = userEvent.setup()
-      const onPrevious = jest.fn()
+      const onPrevious = vi.fn()
       render(
         <StudentAssignmentDetailTray
           {...defaultProps}
@@ -204,7 +208,7 @@ describe('StudentAssignmentDetailTray', () => {
 
     it('calls studentNavigator onNext when student next button is clicked', async () => {
       const user = userEvent.setup()
-      const onNext = jest.fn()
+      const onNext = vi.fn()
       render(
         <StudentAssignmentDetailTray
           {...defaultProps}

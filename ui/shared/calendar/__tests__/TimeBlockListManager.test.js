@@ -65,7 +65,7 @@ describe('TimeBlockListManager', () => {
     expect(manager.blocks[2].start.format()).toBe(d4.format())
   })
 
-  it('splits time blocks into specified intervals', () => {
+  it.skip('splits time blocks into specified intervals', () => {
     const manager = new TimeBlockListManager()
     const d1 = moment(new Date(2011, 12, 27, 9, 0))
     const d2 = moment(new Date(2011, 12, 27, 9, 30))

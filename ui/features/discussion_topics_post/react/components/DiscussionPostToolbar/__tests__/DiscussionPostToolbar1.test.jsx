@@ -27,33 +27,33 @@ import {DiscussionManagerUtilityContext, SearchContext} from '../../../utils/con
 import {DiscussionPostToolbar} from '../DiscussionPostToolbar'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
-  openWindow: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
+  openWindow: vi.fn(),
 }))
 
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
+vi.mock('../../../utils', async () => ({
+  ...await vi.importActual('../../../utils'),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
-jest.mock('../../../utils/constants', () => ({
-  ...jest.requireActual('../../../utils/constants'),
+vi.mock('../../../utils/constants', async () => ({
+  ...await vi.importActual('../../../utils/constants'),
   isSpeedGraderInTopUrl: false,
 }))
 
-const onFailureStub = jest.fn()
-const onSuccessStub = jest.fn()
+const onFailureStub = vi.fn()
+const onSuccessStub = vi.fn()
 
 beforeEach(() => {
   fakeENV.setup()
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 
@@ -70,7 +70,7 @@ afterEach(() => {
   fakeENV.teardown()
   onFailureStub.mockClear()
   onSuccessStub.mockClear()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 const setup = (
@@ -79,8 +79,8 @@ const setup = (
   discussionManagerProviderValues = {translationLanguages: {current: []}},
 ) => {
   const searchContextValues = {
-    setAllThreadsStatus: jest.fn(),
-    setExpandedThreads: jest.fn(),
+    setAllThreadsStatus: vi.fn(),
+    setExpandedThreads: vi.fn(),
   }
 
   return render(
@@ -119,7 +119,7 @@ describe('DiscussionPostToolbar', () => {
         it('should add pendo action id properly', () => {
           const {getByTestId} = setup(
             {
-              setUserSplitScreenPreference: jest.fn(),
+              setUserSplitScreenPreference: vi.fn(),
               userSplitScreenPreference: false,
               isExpanded: true,
             },
@@ -135,7 +135,7 @@ describe('DiscussionPostToolbar', () => {
         it('should add pendo action id properly', () => {
           const {getByTestId} = setup(
             {
-              setUserSplitScreenPreference: jest.fn(),
+              setUserSplitScreenPreference: vi.fn(),
               userSplitScreenPreference: false,
               isExpanded: false,
             },
@@ -154,9 +154,9 @@ describe('DiscussionPostToolbar', () => {
       it('should render the button with the proper pendo attribute for further event tracking', async () => {
         const {getByTestId} = setup(
           {
-            setUserSplitScreenPreference: jest.fn(),
+            setUserSplitScreenPreference: vi.fn(),
             userSplitScreenPreference: true,
-            closeView: jest.fn(),
+            closeView: vi.fn(),
           },
           updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true}),
         )
@@ -170,9 +170,9 @@ describe('DiscussionPostToolbar', () => {
       it('should render the button with the proper pendo attribute for further event tracking', async () => {
         const {getByTestId} = setup(
           {
-            setUserSplitScreenPreference: jest.fn(),
+            setUserSplitScreenPreference: vi.fn(),
             userSplitScreenPreference: false,
-            closeView: jest.fn(),
+            closeView: vi.fn(),
           },
           updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true}),
         )
@@ -182,8 +182,8 @@ describe('DiscussionPostToolbar', () => {
       })
 
       it('should call updateUserDiscussionsSplitscreenView mutation when clicked', async () => {
-        const setUserSplitScreenPreferenceMock = jest.fn()
-        const closeViewMock = jest.fn()
+        const setUserSplitScreenPreferenceMock = vi.fn()
+        const closeViewMock = vi.fn()
 
         const mocks = updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true})
 
@@ -210,7 +210,7 @@ describe('DiscussionPostToolbar', () => {
 
   describe('Search Field', () => {
     it('should call onChange when typing occurs', async () => {
-      const onSearchChangeMock = jest.fn()
+      const onSearchChangeMock = vi.fn()
       const {getByLabelText} = setup({onSearchChange: onSearchChangeMock})
       const searchInput = getByLabelText('Search entries or author...')
 
@@ -228,7 +228,7 @@ describe('DiscussionPostToolbar', () => {
 
   describe('View Dropdown', () => {
     it('should call onChange when event is fired', () => {
-      const onViewFilterMock = jest.fn()
+      const onViewFilterMock = vi.fn()
       const {getByText, getByLabelText} = setup({onViewFilter: onViewFilterMock})
       const simpleSelect = getByLabelText('Filter by')
       fireEvent.click(simpleSelect)

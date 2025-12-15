@@ -225,6 +225,7 @@ export const Discussion = {
       expanded: false,
       summaryEnabled: false,
       preferredLanguage: null,
+      posted: false,
       __typename: 'DiscussionParticipant',
     },
     sortOrderLocked = false,

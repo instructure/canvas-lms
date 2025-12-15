@@ -187,8 +187,8 @@ describe('Shared > Network > RequestDispatch', () => {
     })
 
     it('handles pagination with callbacks', async () => {
-      const pageCallback = jest.fn()
-      const pagesEnqueued = jest.fn()
+      const pageCallback = vi.fn()
+      const pagesEnqueued = vi.fn()
 
       server.use(
         http.get(TEST_URL, ({request}) => {

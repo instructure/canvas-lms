@@ -49,7 +49,7 @@ describe('HomeroomPage', () => {
     localStorage.clear()
     fetchMock.restore()
     fakeEnv.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('shows loading skeletons while loading for announcements and cards', () => {

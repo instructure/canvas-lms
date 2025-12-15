@@ -26,7 +26,7 @@ injectGlobalAlertContainers()
 const props = {
   toggleSRMessage: () => {},
   onApplyFilters: () => {},
-  onUpdateFilters: jest.fn(),
+  onUpdateFilters: vi.fn(),
   isLoading: true,
   draftFilters: {
     enrollment_type: null,
@@ -187,7 +187,7 @@ describe('CoursesToolbar', () => {
           search_term: 'test search',
         },
       }
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       const {getByTestId} = render(<CoursesToolbar {...propsWithSearchTerm} />)
       const clearButton = getByTestId('clear-search')
 

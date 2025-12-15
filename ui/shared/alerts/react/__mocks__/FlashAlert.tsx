@@ -16,11 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {vi as viType} from 'vitest'
-declare const vi: typeof viType | undefined
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockFn: any = typeof vi !== 'undefined' ? vi.fn : jest.fn
+ 
+const mockFn: any = vi.fn
 
 export const showFlashAlert = mockFn()
 export const showFlashError = mockFn(() => mockFn())

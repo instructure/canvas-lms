@@ -70,13 +70,13 @@ describe('Outcome Tests', () => {
     })
 
     test('default calculation method settings not set if calculation_method exists', () => {
-      const spy = jest.spyOn(Outcome.prototype, 'setDefaultCalcSettings')
+      const spy = vi.spyOn(Outcome.prototype, 'setDefaultCalcSettings')
       new Outcome(importedOutcome, {parse: true})
       expect(spy).not.toHaveBeenCalled()
     })
 
     test('default calculation method settings set if calculation_method is null', () => {
-      const spy = jest.spyOn(Outcome.prototype, 'setDefaultCalcSettings')
+      const spy = vi.spyOn(Outcome.prototype, 'setDefaultCalcSettings')
       new Outcome(courseOutcome, {parse: true})
       expect(spy).toHaveBeenCalled()
     })
@@ -183,7 +183,7 @@ describe('Outcome Tests', () => {
 
     test('ignores proficiency attributes during saving', () => {
       const outcome = new Outcome(importedOutcome, {parse: true})
-      jest.spyOn(outcome, 'url').mockReturnValue('fake-url')
+      vi.spyOn(outcome, 'url').mockReturnValue('fake-url')
       outcome.save({}, {})
 
       expect(outcome.get('mastery_points')).toBeUndefined()

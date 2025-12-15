@@ -37,12 +37,12 @@ describe('OutcomeGroupHeader', () => {
     )
 
   beforeEach(() => {
-    onMenuHandlerMock = jest.fn()
-    hideOutcomesViewMock = jest.fn()
+    onMenuHandlerMock = vi.fn()
+    hideOutcomesViewMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderWithContext = children => {

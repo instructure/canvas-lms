@@ -19,13 +19,14 @@
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {type MockedFunction} from 'vitest'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../../hooks/useModuleContext'
 import ModuleItemAsyncSelect from '../ModuleItemAsyncSelect'
 import {useModuleItemContent} from '../../../hooks/queries/useModuleItemContent'
 
-jest.mock('../../../hooks/queries/useModuleItemContent')
+vi.mock('../../../hooks/queries/useModuleItemContent')
 
-const mockUseModuleItemContent = useModuleItemContent as jest.MockedFunction<
+const mockUseModuleItemContent = useModuleItemContent as MockedFunction<
   typeof useModuleItemContent
 >
 
@@ -55,7 +56,7 @@ const renderWithProviders = (
   const defaultProps = {
     itemType: 'assignment' as const,
     courseId: '123',
-    onSelectionChange: jest.fn(),
+    onSelectionChange: vi.fn(),
     renderLabel: 'Select Assignment',
   }
 
@@ -70,7 +71,7 @@ const renderWithProviders = (
 
 describe('ModuleItemAsyncSelect', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockUseModuleItemContent.mockReturnValue({
       data: {pages: [{items: []}]},
       isLoading: false,
@@ -162,7 +163,7 @@ describe('ModuleItemAsyncSelect', () => {
 
   describe('Item selection', () => {
     it('calls onSelectionChange when item is selected', async () => {
-      const mockOnSelectionChange = jest.fn()
+      const mockOnSelectionChange = vi.fn()
 
       mockUseModuleItemContent.mockReturnValue({
         data: {pages: [{items: mockAssignments}]},
@@ -185,7 +186,7 @@ describe('ModuleItemAsyncSelect', () => {
     })
 
     it('clears selection when user starts typing different text', async () => {
-      const mockOnSelectionChange = jest.fn()
+      const mockOnSelectionChange = vi.fn()
 
       mockUseModuleItemContent.mockReturnValue({
         data: {

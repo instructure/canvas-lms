@@ -20,18 +20,19 @@ import {LTI_ASSET_PROCESSORS_QUERY} from '@canvas/lti-asset-processor/shared-wit
 import {useLtiAssetProcessors, useLtiAssetReports} from '../graphqlQueryHooks'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {render, waitFor} from '@testing-library/react'
+import {type MockedFunction} from 'vitest'
 import {executeQuery} from '@canvas/graphql'
 import {defaultGetLtiAssetProcessorsResult} from '@canvas/lti-asset-processor/shared-with-sg/replicated/__fixtures__/default/ltiAssetProcessors'
 import {defaultGetLtiAssetReportsResult} from '@canvas/lti-asset-processor/shared-with-sg/replicated/__fixtures__/default/ltiAssetReports'
 import {LTI_ASSET_REPORTS_QUERY} from '@canvas/lti-asset-processor/shared-with-sg/replicated/queries/getLtiAssetReports'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(() => 'foo'),
+vi.mock('@canvas/graphql', () => ({
+  executeQuery: vi.fn(() => 'foo'),
 }))
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
 let queryClient: QueryClient
@@ -53,7 +54,7 @@ beforeEach(() => {
     },
   })
 
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 afterEach(() => {
@@ -61,7 +62,7 @@ afterEach(() => {
 })
 
 function mockExecuteQuery(returnValue: any) {
-  ;(executeQuery as jest.MockedFunction<typeof executeQuery>).mockReturnValue(
+  ;(executeQuery as MockedFunction<typeof executeQuery>).mockReturnValue(
     Promise.resolve(returnValue),
   )
 }
@@ -109,7 +110,7 @@ describe('useLtiAssetProcessors', () => {
   })
 
   it('shows a flash alert on error', async () => {
-    ;(executeQuery as jest.MockedFunction<typeof executeQuery>).mockRejectedValue(
+    ;(executeQuery as MockedFunction<typeof executeQuery>).mockRejectedValue(
       new Error('Network error'),
     )
 
@@ -186,7 +187,7 @@ describe('useLtiAssetReports', () => {
   })
 
   it('shows a flash alert on error', async () => {
-    ;(executeQuery as jest.MockedFunction<typeof executeQuery>).mockRejectedValue(
+    ;(executeQuery as MockedFunction<typeof executeQuery>).mockRejectedValue(
       new Error('Network error'),
     )
 

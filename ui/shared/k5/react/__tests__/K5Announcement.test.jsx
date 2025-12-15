@@ -24,15 +24,15 @@ import {http, HttpResponse} from 'msw'
 import K5Announcement from '../K5Announcement'
 
 // Mock FlashAlert to prevent DOM issues
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
 // Ensure document is available in test environment
 beforeAll(() => {
   if (typeof document === 'undefined') {
     global.document = {
-      createElement: jest.fn(() => ({})),
+      createElement: vi.fn(() => ({})),
     }
   }
 })

@@ -35,16 +35,30 @@ describe('GroupCategoryView', () => {
       },
     })
 
-    $.flashError = jest.fn()
-    $.flashMessage = jest.fn()
+    $.flashError = vi.fn()
+    $.flashMessage = vi.fn()
+
+    // Mock jQuery UI droppable and related methods
+    $.fn.droppable = vi.fn(function() {
+      return this
+    })
+    $.fn.unbind = vi.fn(function() {
+      return this
+    })
+    $.fn.on = vi.fn(function() {
+      return this
+    })
+    $.fn.parent = vi.fn(function() {
+      return $(this)
+    })
 
     groups = new Collection()
     groups.resourceName = 'groups'
-    groups.load = jest.fn(() => Promise.resolve())
+    groups.load = vi.fn(() => Promise.resolve())
     groups.constructor.prototype.resourceName = 'groups'
     unassignedUsers = new Collection()
     unassignedUsers.resourceName = 'users'
-    unassignedUsers.load = jest.fn(() => Promise.resolve())
+    unassignedUsers.load = vi.fn(() => Promise.resolve())
     unassignedUsers.constructor.prototype.resourceName = 'users'
 
     model = new Model({
@@ -57,7 +71,7 @@ describe('GroupCategoryView', () => {
     model.groups = () => groups
     model.unassignedUsers = () => unassignedUsers
     model.progressModel = new Model()
-    model.fetch = jest.fn(options => options.success?.())
+    model.fetch = vi.fn(options => options.success?.())
     model.present = () => ({
       ...model.attributes,
       randomlyAssignStudentsInProgress: false,

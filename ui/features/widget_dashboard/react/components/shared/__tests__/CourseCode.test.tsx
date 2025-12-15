@@ -24,7 +24,7 @@ import {getCourseCodeColor} from '../../widgets/CourseGradesWidget/utils'
 import {WidgetDashboardProvider} from '../../../hooks/useWidgetDashboardContext'
 
 //Mock TruncateText to simulate truncation behavior in tests
-jest.mock('@instructure/ui-truncate-text', () => ({
+vi.mock('@instructure/ui-truncate-text', () => ({
   TruncateText: ({
     children,
     onUpdate,
@@ -36,6 +36,8 @@ jest.mock('@instructure/ui-truncate-text', () => ({
     React.useEffect(() => {
       if (onUpdate && children && children.length > 30) {
         onUpdate(true)
+      } else if (onUpdate) {
+        onUpdate(false)
       }
     }, [children, onUpdate])
 
@@ -43,7 +45,7 @@ jest.mock('@instructure/ui-truncate-text', () => ({
     const displayText =
       children && children.length > 30 ? `${children.substring(0, 15)}...` : children
 
-    return displayText
+    return <>{displayText}</>
   },
 }))
 

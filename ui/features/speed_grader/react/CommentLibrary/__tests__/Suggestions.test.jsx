@@ -35,12 +35,12 @@ describe('Suggestions', () => {
 
   beforeEach(() => {
     document.body.innerHTML = '<div id="suggestions"/>'
-    setCommentMock = jest.fn()
-    closeSuggestionsMock = jest.fn()
+    setCommentMock = vi.fn()
+    closeSuggestionsMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('doesnt render the menu when showResults is false', () => {

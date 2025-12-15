@@ -36,7 +36,7 @@ describe('ZipFileOptionsForm', () => {
   test('creates a display message based on fileOptions', () => {
     const props = {
       fileOptions: {file: {name: 'neat_file'}},
-      onZipOptionsResolved: jest.fn(),
+      onZipOptionsResolved: vi.fn(),
     }
     render(<ZipFileOptionsForm {...props} />)
     expect(
@@ -47,7 +47,7 @@ describe('ZipFileOptionsForm', () => {
   })
 
   test('handleExpandClick expands zip', () => {
-    const onZipOptionsResolved = jest.fn()
+    const onZipOptionsResolved = vi.fn()
     const props = {
       fileOptions: {file: 'the_file_obj'},
       onZipOptionsResolved,

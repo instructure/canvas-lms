@@ -41,7 +41,7 @@ beforeEach(() => {
     preventDefault() {},
   }
   ref = React.createRef()
-  returnFocus = jest.fn()
+  returnFocus = vi.fn()
   userEvent.setup()
 })
 

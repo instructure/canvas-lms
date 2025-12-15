@@ -69,28 +69,28 @@ function assignmentWithEditedOverride() {
 }
 
 describe('BulkEditTable Layout', () => {
-  const mockUpdateAssignmentDate = jest.fn()
-  const mockSetAssignmentSelected = jest.fn()
-  const mockSelectAllAssignments = jest.fn()
-  const mockClearOverrideEdits = jest.fn()
+  const mockUpdateAssignmentDate = vi.fn()
+  const mockSetAssignmentSelected = vi.fn()
+  const mockSelectAllAssignments = vi.fn()
+  const mockClearOverrideEdits = vi.fn()
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('stacked layout', () => {
     beforeEach(() => {
       Object.defineProperty(window, 'matchMedia', {
         writable: true,
-        value: jest.fn().mockImplementation(query => ({
+        value: vi.fn().mockImplementation(query => ({
           matches: query.includes('maxWidth'),
           media: query,
           onchange: null,
-          addListener: jest.fn(),
-          removeListener: jest.fn(),
-          addEventListener: jest.fn(),
-          removeEventListener: jest.fn(),
-          dispatchEvent: jest.fn(),
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          dispatchEvent: vi.fn(),
         })),
       })
     })
@@ -150,19 +150,19 @@ describe('BulkEditTable Layout', () => {
     let matchMediaMock
 
     beforeEach(() => {
-      matchMediaMock = jest.fn().mockImplementation(query => ({
+      matchMediaMock = vi.fn().mockImplementation(query => ({
         matches: false,
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn((event, handler) => {
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn((event, handler) => {
           if (event === 'change') {
             setTimeout(() => handler({matches: false}), 0)
           }
         }),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       }))
 
       Object.defineProperty(window, 'matchMedia', {

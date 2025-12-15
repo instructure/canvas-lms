@@ -24,12 +24,18 @@ import {mswClient} from '../../../../../shared/msw/mswClient'
 import {setupServer} from 'msw/node'
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import {responsiveQuerySizes} from '../../../util/utils'
+import userEvent from '@testing-library/user-event'
+import * as utils from '../../../util/utils'
 
-jest.mock('../../../util/utils', () => ({
-  ...jest.requireActual('../../../util/utils'),
-  responsiveQuerySizes: jest.fn(),
-}))
+vi.mock('../../../util/utils', async () => {
+  const actual = await vi.importActual('../../../util/utils')
+  return {
+    ...actual,
+    responsiveQuerySizes: vi.fn(() => ({
+      desktop: {minWidth: '768px'},
+    })),
+  }
+})
 
 describe('MessageListActionContainer', () => {
   const server = setupServer(...handlers)
@@ -37,20 +43,16 @@ describe('MessageListActionContainer', () => {
   beforeAll(() => {
     server.listen()
 
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
   })
-
-  responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {minWidth: '768px'},
-  }))
 
   afterEach(() => {
     server.resetHandlers()
@@ -69,15 +71,15 @@ describe('MessageListActionContainer', () => {
   const setup = overrideProps => {
     return render(
       <ApolloProvider client={mswClient}>
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <MessageListActionContainer
             activeMailbox="inbox"
-            onCompose={jest.fn()}
-            onReply={jest.fn()}
-            onReplyAll={jest.fn()}
-            onForward={jest.fn()}
-            onSelectMailbox={jest.fn()}
-            setCourseNameFilter={jest.fn()}
+            onCompose={vi.fn()}
+            onReply={vi.fn()}
+            onReplyAll={vi.fn()}
+            onForward={vi.fn()}
+            onSelectMailbox={vi.fn()}
+            setCourseNameFilter={vi.fn()}
             {...overrideProps}
           />
         </AlertManagerContext.Provider>
@@ -97,17 +99,18 @@ describe('MessageListActionContainer', () => {
     })
 
     it('should render All Courses option', async () => {
-      const {findByTestId, queryByText} = setup()
+      const {findByTestId, findByText} = setup()
       const courseDropdown = await findByTestId('course-select')
       fireEvent.click(courseDropdown)
-      expect(await queryByText('All Courses')).toBeInTheDocument()
+      expect(await findByText('All Courses')).toBeInTheDocument()
     })
 
     it('should render concluded courses option', async () => {
-      const {findByTestId, queryByText} = setup()
+      const user = userEvent.setup()
+      const {findByTestId, findByText} = setup()
       const courseDropdown = await findByTestId('course-select')
-      fireEvent.click(courseDropdown)
-      expect(await queryByText('Concluded Courses')).toBeInTheDocument()
+      await user.click(courseDropdown)
+      expect(await findByText('Concluded Courses')).toBeInTheDocument()
     })
 
     it('should render concluded courses', async () => {
@@ -125,7 +128,7 @@ describe('MessageListActionContainer', () => {
     })
 
     it('should call onCourseFilterSelect when course selected', async () => {
-      const mock = jest.fn()
+      const mock = vi.fn()
 
       const component = setup({
         onCourseFilterSelect: mock,
@@ -142,7 +145,7 @@ describe('MessageListActionContainer', () => {
     })
 
     it('should callback to update mailbox when event fires', async () => {
-      const mock = jest.fn()
+      const mock = vi.fn()
 
       const component = setup({
         onSelectMailbox: mock,
@@ -159,7 +162,7 @@ describe('MessageListActionContainer', () => {
     })
 
     it('should call onSelectMailbox when mailbox changed', async () => {
-      const mock = jest.fn()
+      const mock = vi.fn()
 
       const component = setup({
         onSelectMailbox: mock,
@@ -254,7 +257,7 @@ describe('MessageListActionContainer', () => {
   })
 
   it('should have archive disabled when activeMailbox is sent', async () => {
-    const archiveMock = jest.fn()
+    const archiveMock = vi.fn()
     const component = setup({
       archiveDisabled: false,
       activeMailbox: 'sent',
@@ -266,7 +269,7 @@ describe('MessageListActionContainer', () => {
   })
 
   it('should show unarchive button when displayUnarchiveButton is true', async () => {
-    const unArchiveMock = jest.fn()
+    const unArchiveMock = vi.fn()
     const component = setup({
       archiveDisabled: false,
       displayUnarchiveButton: true,
@@ -278,7 +281,7 @@ describe('MessageListActionContainer', () => {
   })
 
   it('should trigger archive function when archiving', async () => {
-    const archiveMock = jest.fn()
+    const archiveMock = vi.fn()
 
     const component = setup({
       archiveDisabled: false,
@@ -292,7 +295,7 @@ describe('MessageListActionContainer', () => {
   })
 
   it('should trigger archive function when unarchiving', async () => {
-    const unArchiveMock = jest.fn()
+    const unArchiveMock = vi.fn()
     const component = setup({
       archiveDisabled: false,
       displayUnarchiveButton: true,
@@ -306,7 +309,7 @@ describe('MessageListActionContainer', () => {
   })
 
   it('should trigger delete function', async () => {
-    const deleteMock = jest.fn()
+    const deleteMock = vi.fn()
     const component = setup({
       deleteDisabled: false,
       selectedConversations: [{test1: 'test1'}, {test2: 'test2'}],

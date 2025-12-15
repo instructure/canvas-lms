@@ -31,7 +31,7 @@ describe('MultiSelectSearchInput', () => {
       id: 'my-multi-select',
       label: 'Delicious Vegetables',
       disabled: false,
-      onChange: jest.fn(),
+      onChange: vi.fn(),
       options: [
         {id: '1', text: 'Broccoli'},
         {id: '2', text: 'Cucumber'},

@@ -24,9 +24,9 @@ import NotificationSettings, {type NotificationSettingsProps} from '..'
 
 function formDataToObject(formData: FormData): Record<string, string> {
   const obj: Record<string, string> = {}
-  for (const e of formData) {
-    obj[e[0]] = e[1] as string
-  }
+  formData.forEach((value, key) => {
+    obj[key] = value as string
+  })
   return obj
 }
 

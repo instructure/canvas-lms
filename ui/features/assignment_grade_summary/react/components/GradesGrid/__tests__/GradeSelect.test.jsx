@@ -180,14 +180,14 @@ describe('GradeSummary::GradeSelect', () => {
 
   describe('when the input is dismissed by clicking elsewhere', () => {
     it('does not call the onSelect prop', async () => {
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const {input} = await mountAndClick({...props, onSelect})
       await clickOffAndWaitForMenu(input)
       expect(onSelect).not.toHaveBeenCalled()
     })
 
     it('does not call the onSelect prop when the input was changed', async () => {
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const {input} = await mountAndClick({...props, onSelect})
       await userEvent.type(input, '7.9')
       await clickOffAndWaitForMenu(input)
@@ -195,7 +195,7 @@ describe('GradeSummary::GradeSelect', () => {
     })
 
     it('does not call the onSelect prop when the input was cleared', async () => {
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const {input} = await mountAndClick({...props, onSelect})
       fireEvent.input(input, {target: {value: ''}})
       await clickOffAndWaitForMenu(input)
@@ -269,7 +269,7 @@ describe('GradeSummary::GradeSelect', () => {
 
   describe('when selecting an existing grade', () => {
     it('calls the onSelect callback', async () => {
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const {input, menu} = await mountAndClick({...props, onSelect})
       const opt = findOption(menu, labelForGrader('frizz'))
       await userEvent.click(opt)
@@ -278,7 +278,7 @@ describe('GradeSummary::GradeSelect', () => {
     })
 
     it('passes the related grade info to the callback', async () => {
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const {input, menu} = await mountAndClick({...props, onSelect})
       const opt = findOption(menu, labelForGrader('frizz'))
       await userEvent.click(opt)
@@ -288,7 +288,7 @@ describe('GradeSummary::GradeSelect', () => {
 
     it('does not call the callback when the option for the selected grade is clicked', async () => {
       props.grades.robin.selected = true
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const {input, menu} = await mountAndClick({...props, onSelect})
       const opt = findOption(menu, labelForGrader('robin'))
       await userEvent.click(opt)
@@ -337,7 +337,7 @@ describe('GradeSummary::GradeSelect', () => {
     describe('when clicking the custom grade option', () => {
       it('does not call the onSelect callback when the custom grade is selected', async () => {
         props.grades.teach.selected = true
-        const onSelect = jest.fn()
+        const onSelect = vi.fn()
         const {input, menu} = await mountAndClick({...props, onSelect})
         const opt = findOption(menu, customLabel(score))
         await userEvent.click(opt)
@@ -346,7 +346,7 @@ describe('GradeSummary::GradeSelect', () => {
       })
 
       it('calls the onSelect callback when the custom grade is not selected', async () => {
-        const onSelect = jest.fn()
+        const onSelect = vi.fn()
         const {input, menu} = await mountAndClick({...props, onSelect})
         const opt = findOption(menu, customLabel(score))
         await userEvent.click(opt)
@@ -355,7 +355,7 @@ describe('GradeSummary::GradeSelect', () => {
       })
 
       it('includes the custom grade info when calling the onSelect callback', async () => {
-        const onSelect = jest.fn()
+        const onSelect = vi.fn()
         const {input, menu} = await mountAndClick({...props, onSelect})
         const opt = findOption(menu, customLabel(score))
         await userEvent.click(opt)
@@ -365,7 +365,7 @@ describe('GradeSummary::GradeSelect', () => {
 
       it('calls the onSelect callback when entered text has changed the selected custom grade', async () => {
         props.grades.teach.selected = true
-        const onSelect = jest.fn()
+        const onSelect = vi.fn()
         const {input} = await mountAndClick({...props, onSelect})
         fireEvent.change(input, {target: {value: '5'}})
         fireEvent.keyDown(input, {keyCode: 13})
@@ -376,7 +376,7 @@ describe('GradeSummary::GradeSelect', () => {
       it('updates the custom grade info sent to the callback with the changed score', async () => {
         const newScore = '55'
         props.grades.teach.selected = true
-        const onSelect = jest.fn()
+        const onSelect = vi.fn()
         const {input} = await mountAndClick({...props, onSelect})
         fireEvent.change(input, {target: {value: newScore}})
         fireEvent.keyDown(input, {keyCode: 13})
@@ -402,7 +402,7 @@ describe('GradeSummary::GradeSelect', () => {
     })
 
     it('allows selecting other grades', async () => {
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const {input, menu} = await mountAndClick({...props, onSelect, finalGrader: null})
       const opt = findOption(menu, labelForGrader('robin'))
       await userEvent.click(opt)
@@ -450,7 +450,7 @@ describe('GradeSummary::GradeSelect', () => {
     })
 
     it('does not prevent selecting an existing grade', async () => {
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const {input, menu} = await mountAndClick({...props, disabledCustomGrade: true, onSelect})
       const opt = findOption(menu, labelForGrader('robin'))
       await userEvent.click(opt)
@@ -573,7 +573,7 @@ describe('GradeSummary::GradeSelect', () => {
 
   describe('miscellaneous UI checks', () => {
     it('allows selection by filter then arrow down and enter', async () => {
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const {input} = await mountAndClick({...props, onSelect})
       fireEvent.change(input, {target: {value: 'mr.'}}) // matches Mr. Keating and Mr. Feeny
       fireEvent.keyDown(input, {keyCode: 40}) // downarrow
@@ -584,7 +584,7 @@ describe('GradeSummary::GradeSelect', () => {
 
     it('does not make the callback if the selection has not changed', async () => {
       props.grades.robin.selected = true
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const {input} = await mountAndClick({...props, onSelect})
       fireEvent.keyDown(input, {keyCode: 13}) // enter
       await waitForMenuClosed(input)
@@ -592,7 +592,7 @@ describe('GradeSummary::GradeSelect', () => {
     })
 
     it('closes the menu and makes no callback if escape is pressed during selection', async () => {
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const {input} = await mountAndClick({...props, onSelect})
       fireEvent.keyDown(input, {keyCode: 40}) // downarrow
       fireEvent.keyDown(input, {keyCode: 40}) // downarrow
@@ -603,7 +603,7 @@ describe('GradeSummary::GradeSelect', () => {
 
     it('disables and skips over an un-selectable grader', async () => {
       props.graders[1].graderSelectable = false // disable 'robin'
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const {input, menu} = await mountAndClick({...props, onSelect})
       const opt = findOption(menu, labelForGrader('robin'))
       expect(opt.attributes.getNamedItem('aria-disabled').value).toBe('true')

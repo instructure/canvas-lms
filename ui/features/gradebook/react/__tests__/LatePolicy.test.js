@@ -51,7 +51,7 @@ describe('Gradebook#applyLatePolicy', () => {
         {id: 101, isClosed: false},
       ],
     }
-    latePolicyApplicator = jest
+    latePolicyApplicator = vi
       .spyOn(LatePolicyApplicator, 'processSubmission')
       .mockReturnValue(true)
 
@@ -121,7 +121,7 @@ describe('Gradebook#applyLatePolicy', () => {
   })
 
   it('does not grade submissions for concluded students', () => {
-    const calculateStudentGrade = jest.spyOn(gradebook, 'calculateStudentGrade')
+    const calculateStudentGrade = vi.spyOn(gradebook, 'calculateStudentGrade')
     gradebook.applyLatePolicy()
     const gradesCalculated = calculateStudentGrade.mock.calls.some(
       call => call[0] === gradebook.students[12],

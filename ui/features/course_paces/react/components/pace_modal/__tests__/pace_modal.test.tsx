@@ -29,15 +29,15 @@ import {
 
 import {PaceModal, type ResponsiveComponentProps} from '..'
 
-const onClose = jest.fn(),
-  clearCategoryError = jest.fn()
+const onClose = vi.fn(),
+  clearCategoryError = vi.fn()
 
 const defaultProps: ResponsiveComponentProps = {
   coursePace: PRIMARY_PACE,
   isOpen: true,
   onClose,
   clearCategoryError,
-  onResetPace: jest.fn(),
+  onResetPace: vi.fn(),
   responsiveSize: 'large' as const,
   unappliedChangesExist: false,
   paceName: 'Custom Pace',
@@ -48,14 +48,14 @@ const defaultProps: ResponsiveComponentProps = {
   plannedEndDate: '2022-12-01',
   compression: 0,
   outerResponsiveSize: 'large',
-  compressDates: jest.fn(),
-  uncompressDates: jest.fn(),
-  setOuterResponsiveSize: jest.fn(),
+  compressDates: vi.fn(),
+  uncompressDates: vi.fn(),
+  setOuterResponsiveSize: vi.fn(),
   isBulkEnrollment: false,
 }
 
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('PaceModal', () => {

@@ -29,7 +29,7 @@ const deepEqual = (x, y) => expect(x).toEqual(y)
 
 describe('TopicView', () => {
   beforeEach(() => {
-    jest.spyOn(ReactDOM, 'render').mockImplementation()
+    vi.spyOn(ReactDOM, 'render').mockImplementation()
     fakeENV.setup()
     ENV.DISCUSSION = {
       TOPIC: {
@@ -48,11 +48,21 @@ describe('TopicView', () => {
     }
     ENV.use_rce_enhancements = true
     ENV.COURSE_ID = '1'
+
+    // Create the mount point for direct share modal
+    const mountPoint = document.createElement('div')
+    mountPoint.id = 'direct-share-mount-point'
+    document.body.appendChild(mountPoint)
   })
 
   afterEach(() => {
     fakeENV.teardown()
     ReactDOM.render.mockRestore()
+    // Clean up mount point
+    const mountPoint = document.getElementById('direct-share-mount-point')
+    if (mountPoint) {
+      mountPoint.remove()
+    }
   })
 
   // These tests cheat a bit by calling methods on the view directly. For now this was easier than

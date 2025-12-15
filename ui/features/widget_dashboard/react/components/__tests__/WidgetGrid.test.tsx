@@ -16,45 +16,46 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Mock react-beautiful-dnd FIRST before any imports
-jest.mock('react-beautiful-dnd', () => ({
-  DragDropContext: ({children}: any) => <div data-testid="drag-drop-context">{children}</div>,
-  Droppable: ({children, droppableId}: any) => (
-    <div data-testid={`droppable-${droppableId}`}>
-      {children(
+import React from 'react'
+
+// Mock react-beautiful-dnd AFTER React import
+vi.mock('react-beautiful-dnd', () => ({
+  DragDropContext: ({children}: any) => React.createElement('div', {'data-testid': 'drag-drop-context'}, children),
+  Droppable: ({children, droppableId}: any) =>
+    React.createElement('div', {'data-testid': `droppable-${droppableId}`},
+      children(
         {
-          innerRef: jest.fn(),
+          innerRef: vi.fn(),
           droppableProps: {'data-rbd-droppable-id': droppableId},
           placeholder: null,
         },
         {isDraggingOver: false},
-      )}
-    </div>
-  ),
-  Draggable: ({children, draggableId, index}: any) => (
-    <div data-testid={`draggable-${draggableId}`} data-rbd-draggable-id={draggableId}>
-      {children(
+      )
+    ),
+  Draggable: ({children, draggableId, index}: any) =>
+    React.createElement('div', {
+      'data-testid': `draggable-${draggableId}`,
+      'data-rbd-draggable-id': draggableId
+    },
+      children(
         {
-          innerRef: jest.fn(),
+          innerRef: vi.fn(),
           draggableProps: {'data-rbd-draggable-id': draggableId},
           dragHandleProps: {'data-rbd-drag-handle-draggable-id': draggableId},
         },
         {isDragging: false},
-      )}
-    </div>
-  ),
+      )
+    ),
 }))
 
 // Mock the WidgetRegistry to avoid dependency issues
-jest.mock('../WidgetRegistry', () => ({
-  getWidget: jest.fn(() => ({
-    component: ({widget}: any) => <div data-testid={`widget-${widget.id}`}>{widget.title}</div>,
+vi.mock('../WidgetRegistry', () => ({
+  getWidget: vi.fn(() => ({
+    component: ({widget}: any) => React.createElement('div', {'data-testid': `widget-${widget.id}`}, widget.title),
     displayName: 'Mock Widget',
     description: 'Mock widget for testing',
   })),
 }))
-
-import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import WidgetGrid from '../WidgetGrid'
@@ -136,7 +137,7 @@ const indexInParent = (el: HTMLElement) => Array.from(el.parentNode!.children).i
 const mockMatchMedia = (width: number) => {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: jest.fn().mockImplementation((query: string) => {
+    value: vi.fn().mockImplementation((query: string) => {
       let matches = false
 
       // Mobile: maxWidth: '639px'
@@ -156,11 +157,11 @@ const mockMatchMedia = (width: number) => {
         matches,
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       }
     }),
   })
@@ -173,7 +174,7 @@ describe('WidgetGrid', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('Desktop Layout (≥1024px)', () => {

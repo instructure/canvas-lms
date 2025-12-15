@@ -27,8 +27,8 @@ import detroit from 'timezone/America/Detroit'
 import $ from 'jquery'
 
 // Mock jQuery functions used in the component
-$.fn.data = jest.fn()
-$.fn.is = jest.fn()
+$.fn.data = vi.fn()
+$.fn.is = vi.fn()
 
 describe('TimeBlockSelectRow', () => {
   let props
@@ -66,9 +66,9 @@ describe('TimeBlockSelectRow', () => {
         startTime: originalDate,
         endTime: new Date('2016-10-28T19:30:00.000Z'),
       },
-      setData: jest.fn(),
-      handleDelete: jest.fn(),
-      onBlur: jest.fn(),
+      setData: vi.fn(),
+      handleDelete: vi.fn(),
+      onBlur: vi.fn(),
     }
   })
 
@@ -137,7 +137,7 @@ describe('TimeBlockSelectRow', () => {
   })
 
   it('calls onBlur when non-blank and when the target row is the last', async () => {
-    const firstOnBlur = jest.fn()
+    const firstOnBlur = vi.fn()
     const {container} = render(
       <div>
         <TimeBlockSelectRow slotEventId="1" {...props} onBlur={firstOnBlur} />

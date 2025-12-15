@@ -18,7 +18,6 @@
 
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import '@testing-library/jest-dom'
 import CreateNewModule from '../CreateNewModule'
 import type {InfiniteData} from '@tanstack/react-query'
 import type {ModulesResponse} from '../../utils/types'

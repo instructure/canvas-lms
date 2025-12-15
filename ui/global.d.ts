@@ -153,6 +153,8 @@ declare global {
     datetime_field: () => JQuery<HTMLInputElement>
     disableWhileLoading: any
     fileSize: (size: number) => string
+    toJSON: () => Record<string, unknown>
+    toggleAccessibly: (visible?: boolean) => JQuery
     fillTemplateData: any
     fillWindowWithMe: (options?: {onResize: () => void}) => JQuery<HTMLElement>
     fixDialogButtons: () => void
@@ -212,6 +214,37 @@ declare global {
     ajaxJSONFiles: any
     isPreviewable: any
     ajaxJSON: typeof ajaxJSON
+    ui: {
+      keyCode: {
+        ENTER: number
+        ESCAPE: number
+        TAB: number
+        UP: number
+        DOWN: number
+        LEFT: number
+        RIGHT: number
+        SPACE: number
+        BACKSPACE: number
+        DELETE: number
+        HOME: number
+        END: number
+        PAGE_UP: number
+        PAGE_DOWN: number
+      }
+    }
+  }
+
+  interface JQuery {
+    dialog(options?: any): JQuery
+    dialog(method: string, ...args: any[]): any
+    menu(options?: any): JQuery
+    menu(method: string, ...args: any[]): any
+    draggable(options?: any): JQuery
+    draggable(method: string, ...args: any[]): any
+    tooltip(options?: any): JQuery
+    tooltip(method: string, ...args: any[]): any
+    selectmenu(options?: any): JQuery
+    selectmenu(method: string, ...args: any[]): any
   }
 
   // due to overrides in packages/date-js/core.js

@@ -24,13 +24,13 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const server = setupServer()
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  reloadWindow: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  reloadWindow: vi.fn(),
 }))
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  ...jest.requireActual('@canvas/alerts/react/FlashAlert'),
-  showFlashError: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', async () => ({
+  ...await vi.importActual('@canvas/alerts/react/FlashAlert'),
+  showFlashError: vi.fn(),
 }))
 
 describe('HorizonAccount', () => {

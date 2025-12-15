@@ -38,8 +38,8 @@ const mockSections: ExistingSectionEnrollment[] = [
 ]
 
 const defaultProps = {
-  onClose: jest.fn(),
-  onUpdate: jest.fn(() => {
+  onClose: vi.fn(),
+  onUpdate: vi.fn(() => {
     return Promise.resolve()
   }),
   excludeSections: mockSections,
@@ -52,7 +52,7 @@ describe('EditSectionsModal', () => {
 
   beforeEach(() => {
     fetchMock.restore()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterAll(() => {
@@ -108,7 +108,7 @@ describe('EditSectionsModal', () => {
   })
 
   it('shows error flash message when update fails', async () => {
-    const onUpdate = jest.fn().mockRejectedValue(new Error('Update failed'))
+    const onUpdate = vi.fn().mockRejectedValue(new Error('Update failed'))
     const {getAllByText, getByText} = render(
       <EditSectionsModal {...defaultProps} onUpdate={onUpdate} />,
     )

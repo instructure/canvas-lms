@@ -23,8 +23,8 @@ import type {OrganizationProduct} from '../../../models/Product'
 import {product} from '../../common/__tests__/data'
 
 // Mock the productRoute function
-jest.mock('../../../utils/routes', () => ({
-  productRoute: jest.fn(id => `/product/${id}`),
+vi.mock('../../../utils/routes', () => ({
+  productRoute: vi.fn(id => `/product/${id}`),
 }))
 
 const mockOrganizationProduct: OrganizationProduct = {

@@ -20,7 +20,7 @@ import {fireEvent, waitFor} from '@testing-library/react'
 import {renderTeacherView} from './integration-utils'
 import {closest, mockAssignment, itBehavesLikeADialog} from '../../../test-utils'
 
-jest.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/rce/RichContentEditor')
 
 describe('MessageStudentsWho integration', () => {
   itBehavesLikeADialog({

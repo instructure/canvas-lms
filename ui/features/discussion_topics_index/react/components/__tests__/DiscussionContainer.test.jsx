@@ -192,7 +192,7 @@ describe('DiscussionsContainer', () => {
   })
 
   it('renders background image no discussions are present', () => {
-    const renderBackgroundMock = jest.fn()
+    const renderBackgroundMock = vi.fn()
     const propOverrides = {discussions: [], renderContainerBackground: renderBackgroundMock}
 
     renderConnectedComponent(propOverrides)

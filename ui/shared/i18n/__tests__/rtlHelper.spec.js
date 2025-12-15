@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// this is a QUnit test and not a jest test because it needs a real DOM to pick on the dir='rtl' stuff
+// this is a QUnit test and not a vi test because it needs a real DOM to pick on the dir='rtl' stuff
 
 import {direction} from '../rtlHelper'
 

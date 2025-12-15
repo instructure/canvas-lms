@@ -18,46 +18,45 @@
 import {fireEvent} from '@testing-library/react'
 import {BaseBlockEditWrapper} from '../BaseBlockEditWrapper'
 import {renderBlock} from '../../../__tests__/render-helper'
-const {any} = expect
 
-const mockAddBlockModalOpen = jest.fn()
-const mockSettingsTrayOpen = jest.fn()
-const mockDeleteNode = jest.fn()
-const mockDuplicateNode = jest.fn()
-const mockMoveUp = jest.fn()
-const mockMoveDown = jest.fn()
-const mockMoveToTop = jest.fn()
-const mockMoveToBottom = jest.fn()
-const mockUseMoveBlock = jest.fn()
-const mockUseIsEditingBlock = jest.fn()
+const mockAddBlockModalOpen = vi.fn()
+const mockSettingsTrayOpen = vi.fn()
+const mockDeleteNode = vi.fn()
+const mockDuplicateNode = vi.fn()
+const mockMoveUp = vi.fn()
+const mockMoveDown = vi.fn()
+const mockMoveToTop = vi.fn()
+const mockMoveToBottom = vi.fn()
+const mockUseMoveBlock = vi.fn()
+const mockUseIsEditingBlock = vi.fn()
 
-jest.mock('../../../../store', () => ({
-  ...jest.requireActual('../../../../store'),
-  useAppSetStore: jest.fn().mockReturnValue(jest.fn()),
+vi.mock('../../../../store', async () => ({
+  ...(await vi.importActual('../../../../store')),
+  useAppSetStore: vi.fn().mockReturnValue(vi.fn()),
 }))
-const mockUseBlockTitle = jest.fn()
+const mockUseBlockTitle = vi.fn()
 
-jest.mock('../../../../hooks/useBlockTitle', () => ({
+vi.mock('../../../../hooks/useBlockTitle', () => ({
   useBlockTitle: () => mockUseBlockTitle(),
 }))
 
 const getUseBlockTitleMock = (title: string) => title
 
-jest.mock('../../../../hooks/useAddBlockModal', () => ({
+vi.mock('../../../../hooks/useAddBlockModal', () => ({
   useAddBlockModal: () => ({
     open: mockAddBlockModalOpen,
-    close: jest.fn(),
+    close: vi.fn(),
   }),
 }))
 
-jest.mock('../../../../hooks/useSettingsTray', () => ({
+vi.mock('../../../../hooks/useSettingsTray', () => ({
   useSettingsTray: () => ({
     open: mockSettingsTrayOpen,
-    close: jest.fn(),
+    close: vi.fn(),
   }),
 }))
 
-jest.mock('../../../../hooks/useIsEditingBlock', () => ({
+vi.mock('../../../../hooks/useIsEditingBlock', () => ({
   useIsEditingBlock: () => mockUseIsEditingBlock(),
 }))
 
@@ -72,15 +71,15 @@ const getUseIsEditingBlockMock = ({
   isEditingViaEditButton,
 })
 
-jest.mock('../../../../hooks/useDeleteNode', () => ({
+vi.mock('../../../../hooks/useDeleteNode', () => ({
   useDeleteNode: () => mockDeleteNode,
 }))
 
-jest.mock('../../../../hooks/useDuplicateNode', () => ({
+vi.mock('../../../../hooks/useDuplicateNode', () => ({
   useDuplicateNode: () => mockDuplicateNode,
 }))
 
-jest.mock('../../../../hooks/useMoveBlock', () => ({
+vi.mock('../../../../hooks/useMoveBlock', () => ({
   useMoveBlock: () => mockUseMoveBlock(),
 }))
 
@@ -106,7 +105,7 @@ describe('BaseBlockEditWrapper', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockUseIsEditingBlock.mockReturnValue(
       getUseIsEditingBlockMock({isEditing: false, isEditingViaEditButton: false}),
     )
@@ -159,7 +158,7 @@ describe('BaseBlockEditWrapper', () => {
 
       fireEvent.click(insertButton)
 
-      expect(mockAddBlockModalOpen).toHaveBeenCalledWith(any(String))
+      expect(mockAddBlockModalOpen).toHaveBeenCalledWith(expect.any(String))
     })
   })
 
@@ -188,7 +187,7 @@ describe('BaseBlockEditWrapper', () => {
 
       fireEvent.click(editButton)
 
-      expect(mockSettingsTrayOpen).toHaveBeenCalledWith(any(String))
+      expect(mockSettingsTrayOpen).toHaveBeenCalledWith(expect.any(String))
     })
 
     describe('Move button', () => {

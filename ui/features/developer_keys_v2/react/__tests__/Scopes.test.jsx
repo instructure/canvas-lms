@@ -102,17 +102,17 @@ describe('Scopes', () => {
   })
 
   it('handles filter input change by setting the filter state', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     const {ref} = renderScopes()
     const eventDup = {currentTarget: {value: 'banana'}}
 
     ref.current.handleFilterChange(eventDup)
 
     // Advance timers to trigger the debounced function (400ms delay)
-    jest.advanceTimersByTime(400)
+    vi.advanceTimersByTime(400)
 
     expect(ref.current.state.filter).toBe('banana')
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   it('renders Billboard if requireScopes is false', () => {
@@ -158,7 +158,7 @@ describe('Scopes', () => {
   })
 
   it('controls requireScopes change when clicking requireScopes button', async () => {
-    const requireScopesStub = jest.fn()
+    const requireScopesStub = vi.fn()
 
     renderScopes(false, true, requireScopesStub)
 

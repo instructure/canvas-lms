@@ -41,7 +41,7 @@ const migrations: ContentMigrationItem[] = [
   },
 ]
 
-const fetchNext = jest.fn()
+const fetchNext = vi.fn()
 
 const renderComponent = ({
   migrationArray = migrations,
@@ -56,7 +56,7 @@ const renderComponent = ({
     <ContentMigrationsTable
       migrations={migrationArray}
       isLoading={isLoading}
-      updateMigrationItem={jest.fn()}
+      updateMigrationItem={vi.fn()}
       fetchNext={fetchNext}
       hasMore={hasMore}
     />,
@@ -68,7 +68,7 @@ describe('ContentMigrationTable', () => {
   const originalMediaResult = window.matchMedia('(min-width: 768px)')
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   beforeAll(() => {
@@ -84,7 +84,7 @@ describe('ContentMigrationTable', () => {
         configurable: true,
         enumerable: true,
       })
-      window.matchMedia = jest.fn().mockReturnValueOnce(originalMediaResult)
+      window.matchMedia = vi.fn().mockReturnValueOnce(originalMediaResult)
     })
 
     it('renders the table', () => {
@@ -135,7 +135,7 @@ describe('ContentMigrationTable', () => {
         configurable: true,
         enumerable: true,
       })
-      window.matchMedia = jest.fn().mockReturnValueOnce(originalMediaResult)
+      window.matchMedia = vi.fn().mockReturnValueOnce(originalMediaResult)
     })
 
     it('renders the table', () => {

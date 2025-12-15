@@ -22,10 +22,13 @@ import {responsiveQuerySizes} from '../../../../util/utils'
 import {MessageDetailItem} from '../MessageDetailItem'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('../../../../util/utils', () => ({
-  ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn(),
-}))
+vi.mock('../../../../util/utils', async () => {
+  const actual = await vi.importActual('../../../../util/utils')
+  return {
+    ...actual,
+    responsiveQuerySizes: vi.fn(),
+  }
+})
 
 const defaultProps = {
   conversationMessage: {
@@ -60,13 +63,13 @@ describe('MessageDetailItem', () => {
 
   beforeAll(() => {
     // Add appropriate mocks for responsive
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
 
@@ -283,10 +286,10 @@ describe('MessageDetailItem', () => {
         htmlBody: 'This is the body text for the message.',
       },
       contextName: 'Fake Course 1',
-      onReply: jest.fn(),
-      onReplyAll: jest.fn(),
-      onDelete: jest.fn(),
-      onForward: jest.fn(),
+      onReply: vi.fn(),
+      onReplyAll: vi.fn(),
+      onDelete: vi.fn(),
+      onForward: vi.fn(),
     }
 
     const {getByTestId, getByText} = render(<MessageDetailItem {...props} />)

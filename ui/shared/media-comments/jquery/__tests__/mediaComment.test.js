@@ -111,7 +111,7 @@ describe('mediaComment', () => {
   afterEach(() => {
     window.INST.kalturaSettings = originalKalturaSettings
     document.body.innerHTML = ''
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     delete $.fn.mediaComment
     server.resetHandlers()
   })

@@ -23,8 +23,8 @@ import {svgUrl} from '../../../utils/icons'
 import {Outcome, Rating} from '../../../types/rollup'
 import {ScoreDisplayFormat} from '../../../utils/constants'
 
-jest.mock('../../../utils/icons', () => ({
-  svgUrl: jest.fn(() => 'http://test.com'),
+vi.mock('../../../utils/icons', () => ({
+  svgUrl: vi.fn(() => 'http://test.com'),
 }))
 
 describe('StudentOutcomeScore', () => {

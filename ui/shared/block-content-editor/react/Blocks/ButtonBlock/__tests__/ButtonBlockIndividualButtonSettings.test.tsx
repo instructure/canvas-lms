@@ -43,7 +43,7 @@ const defaultProps: ButtonBlockIndividualButtonSettingsProps = {
       text: 'Button 2',
     }),
   ],
-  onButtonsChange: jest.fn(),
+  onButtonsChange: vi.fn(),
 }
 
 const clickToggleButton = (index: number) => {
@@ -56,7 +56,7 @@ const clickToggleButton = (index: number) => {
 
 describe('ButtonBlockIndividualButtonSettings', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('rendering', () => {
@@ -105,7 +105,7 @@ describe('ButtonBlockIndividualButtonSettings', () => {
 
   describe('Button actions', () => {
     it('adds a new button', () => {
-      const buttonsChanged = jest.fn()
+      const buttonsChanged = vi.fn()
       render(
         <ButtonBlockIndividualButtonSettings {...defaultProps} onButtonsChange={buttonsChanged} />,
       )
@@ -131,7 +131,7 @@ describe('ButtonBlockIndividualButtonSettings', () => {
     })
 
     it('deletes a button', () => {
-      const buttonsChanged = jest.fn()
+      const buttonsChanged = vi.fn()
       render(
         <ButtonBlockIndividualButtonSettings {...defaultProps} onButtonsChange={buttonsChanged} />,
       )
@@ -145,7 +145,7 @@ describe('ButtonBlockIndividualButtonSettings', () => {
     })
 
     describe('focus after delete', () => {
-      const renderFocusTest = (onButtonsChange = jest.fn()) => {
+      const renderFocusTest = (onButtonsChange = vi.fn()) => {
         const propsWithThreeButtons = {
           ...defaultProps,
           initialButtons: [
@@ -184,7 +184,7 @@ describe('ButtonBlockIndividualButtonSettings', () => {
     })
 
     it('updates button text', () => {
-      const buttonsChanged = jest.fn()
+      const buttonsChanged = vi.fn()
       render(
         <ButtonBlockIndividualButtonSettings {...defaultProps} onButtonsChange={buttonsChanged} />,
       )
@@ -203,7 +203,7 @@ describe('ButtonBlockIndividualButtonSettings', () => {
 
     describe('updates button color', () => {
       it('updates button background color', async () => {
-        const buttonsChanged = jest.fn()
+        const buttonsChanged = vi.fn()
         const newColor = '#FF0000'
         render(
           <ButtonBlockIndividualButtonSettings
@@ -225,7 +225,7 @@ describe('ButtonBlockIndividualButtonSettings', () => {
       })
 
       it('updates button text color', async () => {
-        const buttonsChanged = jest.fn()
+        const buttonsChanged = vi.fn()
         const newColor = '#051b53ff'
         render(
           <ButtonBlockIndividualButtonSettings
@@ -248,7 +248,7 @@ describe('ButtonBlockIndividualButtonSettings', () => {
     })
 
     describe('button style', () => {
-      const renderStyleTest = (onButtonsChange = jest.fn()) => {
+      const renderStyleTest = (onButtonsChange = vi.fn()) => {
         const propsWithStyles = {
           ...defaultProps,
           initialButtons: [
@@ -304,7 +304,7 @@ describe('ButtonBlockIndividualButtonSettings', () => {
     })
 
     it('updates button url', () => {
-      const buttonsChanged = jest.fn()
+      const buttonsChanged = vi.fn()
       render(
         <ButtonBlockIndividualButtonSettings {...defaultProps} onButtonsChange={buttonsChanged} />,
       )
@@ -322,7 +322,7 @@ describe('ButtonBlockIndividualButtonSettings', () => {
     })
 
     it('updates button linkOpenMode', () => {
-      const buttonsChanged = jest.fn()
+      const buttonsChanged = vi.fn()
       render(
         <ButtonBlockIndividualButtonSettings {...defaultProps} onButtonsChange={buttonsChanged} />,
       )

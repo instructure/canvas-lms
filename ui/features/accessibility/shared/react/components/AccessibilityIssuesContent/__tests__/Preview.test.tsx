@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse, delay} from 'msw'
 import {
@@ -58,10 +58,11 @@ describe('Preview', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
+    cleanup()
     server.resetHandlers()
   })
 
@@ -373,8 +374,8 @@ describe('Preview', () => {
       )
 
       const ref = React.createRef<PreviewHandle>()
-      const onSuccess = jest.fn()
-      const onError = jest.fn()
+      const onSuccess = vi.fn()
+      const onError = vi.fn()
 
       render(<Preview {...defaultProps} ref={ref} />)
 
@@ -398,8 +399,8 @@ describe('Preview', () => {
       )
 
       const ref = React.createRef<PreviewHandle>()
-      const onSuccess = jest.fn()
-      const onError = jest.fn()
+      const onSuccess = vi.fn()
+      const onError = vi.fn()
 
       render(<Preview {...defaultProps} ref={ref} />)
 

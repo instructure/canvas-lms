@@ -89,10 +89,10 @@ describe('SpeedGrader Discussion', () => {
       }),
     )
     // No need to mock getJSON since we're already using MSW for all network requests
-    jest.spyOn(SpeedGrader.EG, 'domReady').mockImplementation(() => {})
-    jest.spyOn(SpeedGrader.EG, 'jsonReady').mockImplementation(() => {})
-    jest.spyOn(SpeedGrader.EG, 'setInitiallyLoadedStudent').mockImplementation(() => {})
-    $appendSpy = jest.spyOn(window.$.fn, 'append')
+    vi.spyOn(SpeedGrader.EG, 'domReady').mockImplementation(() => {})
+    vi.spyOn(SpeedGrader.EG, 'jsonReady').mockImplementation(() => {})
+    vi.spyOn(SpeedGrader.EG, 'setInitiallyLoadedStudent').mockImplementation(() => {})
+    $appendSpy = vi.spyOn(window.$.fn, 'append')
 
     window.INST = {
       kalturaSettings: {
@@ -165,7 +165,7 @@ describe('SpeedGrader Discussion', () => {
 
   afterEach(() => {
     SpeedGrader.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     fixtures.remove()
     fakeENV.teardown()
     delete window.jsonData

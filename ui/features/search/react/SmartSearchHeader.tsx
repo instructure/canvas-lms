@@ -118,10 +118,9 @@ export default function SmartSearchHeader(props: Props) {
       } else if (queryParam !== searchTerm) {
         // update the URL with the new search term
         setSearchParams(prevParams => {
-          return {
-            ...prevParams,
-            q: searchTerm,
-          }
+          const newParams = new URLSearchParams(prevParams)
+          newParams.set('q', searchTerm)
+          return newParams
         })
       }
       if (searchTerm === '') return

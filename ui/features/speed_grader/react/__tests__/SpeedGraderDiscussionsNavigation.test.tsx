@@ -26,7 +26,7 @@ const setup = () => {
 
 const setupMockIframes = () => {
   const mockContentWindow = {
-    postMessage: jest.fn(),
+    postMessage: vi.fn(),
   }
 
   const mockDiscussionIframe = {
@@ -35,11 +35,11 @@ const setupMockIframes = () => {
 
   const mockSpeedgraderIframe = {
     contentDocument: {
-      getElementById: jest.fn().mockReturnValue(mockDiscussionIframe),
+      getElementById: vi.fn().mockReturnValue(mockDiscussionIframe),
     },
   }
 
-  jest.spyOn(document, 'getElementById').mockReturnValue(mockSpeedgraderIframe as any)
+  vi.spyOn(document, 'getElementById').mockReturnValue(mockSpeedgraderIframe as any)
 
   return mockContentWindow
 }

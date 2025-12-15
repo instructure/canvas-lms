@@ -17,11 +17,15 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {cleanup, render, fireEvent} from '@testing-library/react'
 
 import PeerReviewNavigationLink from '../PeerReviewNavigationLink'
 
 describe('PeerReviewNavigationLink', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const props = {
     assignedAssessments: [
       {
@@ -58,12 +62,12 @@ describe('PeerReviewNavigationLink', () => {
   })
 
   // LF-1022
-  it.skip('displays a gray highlight on the current peer review', () => {
+  it('displays a gray highlight on the current peer review', () => {
     const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
     fireEvent.click(getByTestId('header-peer-review-link'))
     const completedMenuItem = getByTestId('peer-review-completed-1')
-    expect(completedMenuItem.firstChild?.firstChild).toHaveStyle('color: white')
-    expect(completedMenuItem).toHaveStyle('background: #6A7883')
+    expect(completedMenuItem.firstChild?.firstChild).toHaveStyle('color: rgb(255, 255, 255)')
+    expect(completedMenuItem).toHaveStyle('background: rgb(43, 122, 188)')
   })
 
   describe('required peer review link when the anonymous peer review option is disabled', () => {

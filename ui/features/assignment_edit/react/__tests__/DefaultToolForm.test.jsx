@@ -29,14 +29,14 @@ const renderComponent = (props = {}) => {
     courseId: 1,
     toolName: 'Awesome Tool',
     previouslySelected: false,
-    hideErrors: jest.fn(),
+    hideErrors: vi.fn(),
   }
   return render(<DefaultToolForm {...defaultProps} {...props} />)
 }
 
 describe('DefaultToolForm', () => {
   beforeEach(() => {
-    jest.spyOn(axios, 'get').mockResolvedValue({data: []})
+    vi.spyOn(axios, 'get').mockResolvedValue({data: []})
   })
 
   it('renders a button to launch the tool', () => {
@@ -45,7 +45,7 @@ describe('DefaultToolForm', () => {
   })
 
   it('launches the tool when the button is clicked', async () => {
-    SelectContentDialog.Events.onContextExternalToolSelect = jest.fn()
+    SelectContentDialog.Events.onContextExternalToolSelect = vi.fn()
     const wrapper = renderComponent()
     await userEvent.click(wrapper.getByRole('button', {name: 'Add Content'}))
     expect(SelectContentDialog.Events.onContextExternalToolSelect).toHaveBeenCalled()

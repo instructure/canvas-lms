@@ -21,7 +21,7 @@ import {fireEvent, render} from '@testing-library/react'
 import {EnrollmentTreeItem} from '../EnrollmentTreeItem'
 import type {Spacing} from '@instructure/emotion'
 
-const callback = jest.fn()
+const callback = vi.fn()
 
 const props = {
   enrollId: '1',

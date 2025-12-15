@@ -25,10 +25,13 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import {generatePageListKey} from '../utils'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  ...jest.requireActual('@canvas/util/globalUtils'),
-  assignLocation: jest.fn(),
-}))
+vi.mock('@canvas/util/globalUtils', async () => {
+  const actual = await vi.importActual('@canvas/util/globalUtils')
+  return {
+    ...actual,
+    assignLocation: vi.fn(),
+  }
+})
 
 // Import the mocked module
 import * as globalUtils from '@canvas/util/globalUtils'
@@ -49,7 +52,7 @@ describe('SubmissionModal', () => {
   ]
   const defaultProps = {
     submission,
-    onClose: jest.fn(),
+    onClose: vi.fn(),
     sections,
     sectionId: 11,
     portfolioId: 1,
@@ -72,7 +75,7 @@ describe('SubmissionModal', () => {
   beforeEach(() => {
     queryClient.clear()
     fetchMock.restore()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     queryClient.setQueryData(generatePageListKey(sections[0].id, defaultProps.portfolioId), {
       pages: [{json: firstPages, nextPage: null}],
@@ -86,7 +89,7 @@ describe('SubmissionModal', () => {
   afterEach(() => {
     queryClient.clear()
     fetchMock.restore()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders a modal', async () => {

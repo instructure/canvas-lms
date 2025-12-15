@@ -281,7 +281,7 @@ describe('DeveloperKeyFormFields', () => {
       })
 
       it('can save dev key without UTID selector', () => {
-        const updateDeveloperKey = jest.fn()
+        const updateDeveloperKey = vi.fn()
         const {queryByTestId} = renderComponent(developerKey, false, {
           contextId: '1',
           updateDeveloperKey,

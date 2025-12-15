@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {BasicPagination, BasicPaginationProps} from '../BasicPagination'
 
@@ -28,12 +28,16 @@ describe('BasicPagination', () => {
     currentPage: 1,
     perPage: 10,
     totalItems: 100,
-    onNext: jest.fn(),
-    onPrev: jest.fn(),
+    onNext: vi.fn(),
+    onPrev: vi.fn(),
   }
 
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('when on first page', () => {
@@ -95,7 +99,7 @@ describe('BasicPagination', () => {
   describe('callback functions', () => {
     it('should call onNext when next button is clicked', async () => {
       const user = userEvent.setup()
-      const onNext = jest.fn()
+      const onNext = vi.fn()
 
       render(<BasicPagination {...defaultProps} currentPage={1} onNext={onNext} />)
 
@@ -107,7 +111,7 @@ describe('BasicPagination', () => {
 
     it('should call onPrev when previous button is clicked', async () => {
       const user = userEvent.setup()
-      const onPrev = jest.fn()
+      const onPrev = vi.fn()
 
       render(<BasicPagination {...defaultProps} currentPage={2} onPrev={onPrev} />)
 

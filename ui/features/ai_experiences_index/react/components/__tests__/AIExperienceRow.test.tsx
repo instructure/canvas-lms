@@ -26,15 +26,15 @@ const defaultProps = {
   title: 'Customer Service Training',
   workflowState: 'published' as const,
   createdAt: '2025-01-15T10:30:00Z',
-  onEdit: jest.fn(),
-  onTestConversation: jest.fn(),
-  onPublishToggle: jest.fn(),
-  onDelete: jest.fn(),
+  onEdit: vi.fn(),
+  onTestConversation: vi.fn(),
+  onPublishToggle: vi.fn(),
+  onDelete: vi.fn(),
 }
 
 describe('AIExperienceRow', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders title and formatted creation date', () => {

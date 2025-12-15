@@ -51,11 +51,11 @@ describe('ColumnHeaders', () => {
 
   describe('sort order message', () => {
     beforeEach(() => {
-      $.screenReaderFlashMessage = jest.fn()
+      $.screenReaderFlashMessage = vi.fn()
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
 
     describe('when no query is provided', () => {

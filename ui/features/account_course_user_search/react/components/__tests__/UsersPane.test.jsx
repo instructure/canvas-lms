@@ -76,7 +76,7 @@ describe('Account Course User Search UsersPane View', () => {
     fakeENV.teardown()
   })
   test('handleUpdateSearchFilter dispatches applySearchFilter action', done => {
-    const spy = jest.spyOn(UserActions, 'applySearchFilter')
+    const spy = vi.spyOn(UserActions, 'applySearchFilter')
     const store = fakeStore()
     renderUsersPane(store)
 

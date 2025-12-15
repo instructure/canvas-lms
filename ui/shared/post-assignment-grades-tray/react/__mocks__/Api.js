@@ -17,7 +17,7 @@
  */
 
 /* global vi */
-const mockFn = typeof vi !== 'undefined' ? vi.fn : jest.fn
+const mockFn = typeof vi !== 'undefined' ? vi.fn : vi.fn
 
 export const POST_ASSIGNMENT_GRADES = 'POST_ASSIGNMENT_GRADES'
 export const POST_ASSIGNMENT_GRADES_FOR_SECTIONS = 'POST_ASSIGNMENT_GRADES_FOR_SECTIONS'

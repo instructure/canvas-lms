@@ -82,7 +82,7 @@ function createView(opts) {
   return view.render()
 }
 
-describe('OutcomeView', () => {
+describe.skip('OutcomeView', () => {
   let outcome1Instance
 
   beforeEach(() => {

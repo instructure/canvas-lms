@@ -50,8 +50,8 @@ describe('CheckpointsGradeInputs', () => {
   })
 
   beforeEach(() => {
-    onReplyToTopicSubmissionChangeMock = jest.fn()
-    onReplyToEntrySubmissionChangeMock = jest.fn()
+    onReplyToTopicSubmissionChangeMock = vi.fn()
+    onReplyToEntrySubmissionChangeMock = vi.fn()
   })
 
   it('should render', () => {

@@ -26,7 +26,7 @@ import {pick} from 'es-toolkit/compat'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 
 describe('OutcomeDescriptionModal', () => {
-  let onCloseHandlerMock: jest.Mock
+  let onCloseHandlerMock: any
 
   const setCalculationMethod = (
     outcome: Outcome,
@@ -126,7 +126,7 @@ describe('OutcomeDescriptionModal', () => {
   }
 
   beforeEach(() => {
-    onCloseHandlerMock = jest.fn()
+    onCloseHandlerMock = vi.fn()
   })
 
   it('shows modal if isOpen prop is true', () => {

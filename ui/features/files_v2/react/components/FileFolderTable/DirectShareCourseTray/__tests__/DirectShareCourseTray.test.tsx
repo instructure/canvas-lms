@@ -28,8 +28,8 @@ import {mockRowsContext} from '../../__tests__/testUtils'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
-jest.mock('@canvas/direct-sharing/react/effects/useModuleCourseSearchApi')
+vi.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
+vi.mock('@canvas/direct-sharing/react/effects/useModuleCourseSearchApi')
 
 const server = setupServer()
 
@@ -39,9 +39,13 @@ const courseB = {id: '2', name: 'Course B', course_code: '2', term: 'default ter
 let capturedRequest: {path: string; body: any} | null = null
 let moduleItemsFetchCount = 0
 
+// Track last params to simulate useImmediate behavior (only call success when params change)
+let lastCourseParams: string | null = null
+let lastModuleParams: string | null = null
+
 const defaultProps = {
   open: true,
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
   courseId: '1',
   file: FAKE_FILES[0],
 }
@@ -72,12 +76,27 @@ describe('DirectShareCourseTray', () => {
   beforeEach(() => {
     capturedRequest = null
     moduleItemsFetchCount = 0
-    ;(useManagedCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
-      success([courseA, courseB])
-    })
-    ;(useModuleCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
-      success([])
-    })
+    lastCourseParams = null
+    lastModuleParams = null
+    vi.mocked(useManagedCourseSearchApi).mockImplementation(
+      (fetchApiOpts: {success?: (data: any) => void; params?: Record<string, any>} = {}) => {
+        // Simulate useImmediate behavior - only call success when params change
+        const paramsKey = JSON.stringify(fetchApiOpts.params || {})
+        if (paramsKey !== lastCourseParams) {
+          lastCourseParams = paramsKey
+          fetchApiOpts.success?.([courseA, courseB])
+        }
+      },
+    )
+    vi.mocked(useModuleCourseSearchApi).mockImplementation(
+      (fetchApiOpts: {success?: (data: any) => void; params?: Record<string, any>} = {}) => {
+        const paramsKey = JSON.stringify(fetchApiOpts.params || {})
+        if (paramsKey !== lastModuleParams) {
+          lastModuleParams = paramsKey
+          fetchApiOpts.success?.([])
+        }
+      },
+    )
     server.use(
       http.post('/api/v1/courses/:courseId/content_migrations', async ({request}) => {
         capturedRequest = {
@@ -95,8 +114,7 @@ describe('DirectShareCourseTray', () => {
 
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
-    jest.resetAllMocks()
+    vi.clearAllMocks()
     cleanup()
   })
 
@@ -145,12 +163,23 @@ describe('DirectShareCourseTray', () => {
   })
 
   it('deletes the module and removes the position selector when a new course is selected', async () => {
-    ;(useModuleCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
-      success([
-        {id: '1', name: 'Module 1'},
-        {id: '2', name: 'Module 2'},
-      ])
-    })
+    // Return modules only for course A (id: '1'), empty for course B
+    vi.mocked(useModuleCourseSearchApi).mockImplementation(
+      (fetchApiOpts: {success?: (data: any) => void; params?: {contextId?: string}} = {}) => {
+        const paramsKey = JSON.stringify(fetchApiOpts.params || {})
+        if (paramsKey !== lastModuleParams) {
+          lastModuleParams = paramsKey
+          if (fetchApiOpts.params?.contextId === '1') {
+            fetchApiOpts.success?.([
+              {id: '1', name: 'Module 1'},
+              {id: '2', name: 'Module 2'},
+            ])
+          } else {
+            fetchApiOpts.success?.([])
+          }
+        }
+      },
+    )
 
     renderComponent()
 
@@ -166,9 +195,6 @@ describe('DirectShareCourseTray', () => {
 
     expect(screen.getByTestId('select-position')).toBeInTheDocument()
     expect(moduleItemsFetchCount).toBeGreaterThan(0)
-    ;(useManagedCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
-      success([courseA, courseB])
-    })
     const previousFetchCount = moduleItemsFetchCount
 
     input = screen.getByLabelText(/select a course/i)

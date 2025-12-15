@@ -27,7 +27,7 @@ describe('canvas_quizzes/events/views/answer_matrix/option', () => {
   })
 
   it('emits onChange', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByTestId} = render(<Option onChange={onChange} />)
 
     assertChange({

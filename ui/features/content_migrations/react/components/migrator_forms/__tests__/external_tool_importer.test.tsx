@@ -33,7 +33,7 @@ const env = {
 }
 
 describe('ExternalToolImporter', () => {
-  const onSubmit = jest.fn()
+  const onSubmit = vi.fn()
   beforeEach(() => {
     fakeENV.setup(env)
     window.addEventListener('message', processMigrationContentItem)
@@ -43,7 +43,7 @@ describe('ExternalToolImporter', () => {
     render(
       <ExternalToolImporter
         onSubmit={onSubmit}
-        onCancel={jest.fn()}
+        onCancel={vi.fn()}
         {...overrideProps}
         title={modalTitle}
         value="external_tool_1"
@@ -69,7 +69,7 @@ describe('ExternalToolImporter', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fakeENV.teardown()
     window.removeEventListener('message', processMigrationContentItem)
   })

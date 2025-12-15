@@ -30,11 +30,11 @@ import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import StudentContent from '../StudentContent'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 injectGlobalAlertContainers()
-jest.mock('../AttemptSelect')
-jest.mock('../../apis/ContextModuleApi')
-jest.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
+vi.mock('../AttemptSelect')
+vi.mock('../../apis/ContextModuleApi')
+vi.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
   return {
-    initializeReaderButton: jest.fn(),
+    initializeReaderButton: vi.fn(),
   }
 })
 function gradedOverrides() {

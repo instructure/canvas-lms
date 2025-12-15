@@ -21,21 +21,24 @@ import {MessageDetailHeader} from '../MessageDetailHeader'
 import {responsiveQuerySizes} from '../../../../util/utils'
 import {ConversationContext} from '../../../../util/constants'
 
-jest.mock('../../../../util/utils', () => ({
-  ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn(),
-}))
+vi.mock('../../../../util/utils', async () => {
+  const actual = await vi.importActual('../../../../util/utils')
+  return {
+    ...actual,
+    responsiveQuerySizes: vi.fn(),
+  }
+})
 
 describe('MessageDetailHeader', () => {
   beforeAll(() => {
     // Add appropriate mocks for responsive
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
 
@@ -81,11 +84,11 @@ describe('MessageDetailHeader', () => {
   describe('when restrict_student_access feature is enabled', () => {
     const props = {
       text: 'Message Header Text',
-      onReplyAll: jest.fn(),
-      onForward: jest.fn(),
-      onArchive: jest.fn(),
-      onStar: jest.fn(),
-      onDelete: jest.fn(),
+      onReplyAll: vi.fn(),
+      onForward: vi.fn(),
+      onArchive: vi.fn(),
+      onStar: vi.fn(),
+      onDelete: vi.fn(),
     }
 
     beforeAll(() => {
@@ -124,7 +127,7 @@ describe('MessageDetailHeader', () => {
       text: 'Button Test',
     }
     it('sends the selected option to the onReply callback function', () => {
-      props.onReply = jest.fn()
+      props.onReply = vi.fn()
       const {getByRole} = render(<MessageDetailHeader {...props} />)
       const replyButton = getByRole(
         (role, element) => role === 'button' && element.textContent === 'Reply for Button Test',
@@ -136,7 +139,7 @@ describe('MessageDetailHeader', () => {
     })
 
     it('sends the selected option to the onReplyAll callback function', () => {
-      props.onReplyAll = jest.fn()
+      props.onReplyAll = vi.fn()
       const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
       const moreOptionsButton = getByRole(
         (role, element) =>
@@ -150,7 +153,7 @@ describe('MessageDetailHeader', () => {
     })
 
     it('sends the selected option to the onDelete callback function', () => {
-      props.onDelete = jest.fn()
+      props.onDelete = vi.fn()
       const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
       const moreOptionsButton = getByRole(
         (role, element) =>
@@ -163,7 +166,7 @@ describe('MessageDetailHeader', () => {
     })
 
     it('sends the selected option to the onForward callback function', () => {
-      props.onForward = jest.fn()
+      props.onForward = vi.fn()
       const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
       const moreOptionsButton = getByRole(
         (role, element) =>
@@ -177,7 +180,7 @@ describe('MessageDetailHeader', () => {
     })
 
     it('sends the selected option to the onStar callback function', () => {
-      props.onStar = jest.fn()
+      props.onStar = vi.fn()
       const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
       const moreOptionsButton = getByRole(
         (role, element) =>
@@ -190,7 +193,7 @@ describe('MessageDetailHeader', () => {
     })
 
     it('sends the selected option to the onUnstar callback function', () => {
-      props.onUnstar = jest.fn()
+      props.onUnstar = vi.fn()
       const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
       const moreOptionsButton = getByRole(
         (role, element) =>
@@ -203,7 +206,7 @@ describe('MessageDetailHeader', () => {
     })
 
     it('sends the selected option to the onArchive callback function', () => {
-      props.onArchive = jest.fn()
+      props.onArchive = vi.fn()
       const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
       const moreOptionsButton = getByRole(
         (role, element) =>
@@ -216,7 +219,7 @@ describe('MessageDetailHeader', () => {
     })
 
     it('sends the selected option to the onUnarchive callback function', () => {
-      props.onUnarchive = jest.fn()
+      props.onUnarchive = vi.fn()
       const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
       const moreOptionsButton = getByRole(
         (role, element) =>

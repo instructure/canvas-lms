@@ -38,14 +38,14 @@ import {
   SITE_ADMIN_ENV,
 } from '../../../util/test-constants'
 
-jest.mock('../../../util/utils', () => ({
-  ...jest.requireActual('../../../util/utils'),
-  responsiveQuerySizes: jest.fn(),
+vi.mock('../../../util/utils', async () => ({
+  ...(await vi.importActual('../../../util/utils')),
+  responsiveQuerySizes: vi.fn(),
 }))
 
 describe('CoursePeople', () => {
-  const setOnFailure = jest.fn()
-  const setOnSuccess = jest.fn()
+  const setOnFailure = vi.fn()
+  const setOnSuccess = vi.fn()
   const mockUsers = [DESIGNER_1, TEACHER_1, TA_1, STUDENT_1, STUDENT_2, STUDENT_3, OBSERVER_1].map(
     user => mockUser(user),
   )
@@ -62,11 +62,11 @@ describe('CoursePeople', () => {
 
   beforeEach(() => {
     window.ENV = SITE_ADMIN_ENV
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
 

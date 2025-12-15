@@ -17,14 +17,15 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {UtidSelector} from '../UtidSelector'
 import * as useUtidMatchingModule from '../../hooks/useUtidMatching'
+import {type MockedFunction} from 'vitest'
 
-jest.mock('../../hooks/useUtidMatching')
+vi.mock('../../hooks/useUtidMatching')
 
-const mockUseUtidMatching = useUtidMatchingModule.useUtidMatching as jest.MockedFunction<
+const mockUseUtidMatching = useUtidMatchingModule.useUtidMatching as MockedFunction<
   typeof useUtidMatchingModule.useUtidMatching
 >
 
@@ -33,7 +34,7 @@ describe('UtidSelector', () => {
     redirectUris: 'https://example.com/redirect',
     accountId: '123',
     selectedUtid: null,
-    onUtidChange: jest.fn(),
+    onUtidChange: vi.fn(),
     showRequiredMessage: false,
   }
 
@@ -58,8 +59,12 @@ describe('UtidSelector', () => {
     },
   ]
 
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders with label', () => {
@@ -178,7 +183,7 @@ describe('UtidSelector', () => {
   })
 
   it('auto-selects when only one match', () => {
-    const onUtidChange = jest.fn()
+    const onUtidChange = vi.fn()
     const singleMatch = [mockMatches[0]]
 
     mockUseUtidMatching.mockReturnValue({
@@ -193,7 +198,7 @@ describe('UtidSelector', () => {
   })
 
   it('does not auto-select when already selected', () => {
-    const onUtidChange = jest.fn()
+    const onUtidChange = vi.fn()
     const singleMatch = [mockMatches[0]]
 
     mockUseUtidMatching.mockReturnValue({
@@ -214,7 +219,7 @@ describe('UtidSelector', () => {
   })
 
   it('clears existing utid when no matches (for editing existing keys)', () => {
-    const onUtidChange = jest.fn()
+    const onUtidChange = vi.fn()
 
     mockUseUtidMatching.mockReturnValue({
       matches: [],
@@ -262,7 +267,7 @@ describe('UtidSelector', () => {
   })
 
   it('calls onUtidChange when selection changes', async () => {
-    const onUtidChange = jest.fn()
+    const onUtidChange = vi.fn()
 
     mockUseUtidMatching.mockReturnValue({
       matches: mockMatches,
@@ -363,7 +368,7 @@ describe('UtidSelector', () => {
   })
 
   it('calls onValidationChange with invalid when matches are available but nothing is selected', () => {
-    const onValidationChange = jest.fn()
+    const onValidationChange = vi.fn()
 
     mockUseUtidMatching.mockReturnValue({
       matches: mockMatches,
@@ -377,7 +382,7 @@ describe('UtidSelector', () => {
   })
 
   it('calls onValidationChange with valid when matches are available and one is selected', () => {
-    const onValidationChange = jest.fn()
+    const onValidationChange = vi.fn()
 
     mockUseUtidMatching.mockReturnValue({
       matches: mockMatches,
@@ -397,7 +402,7 @@ describe('UtidSelector', () => {
   })
 
   it('calls onValidationChange with valid when no matches are available', () => {
-    const onValidationChange = jest.fn()
+    const onValidationChange = vi.fn()
 
     mockUseUtidMatching.mockReturnValue({
       matches: [],
@@ -411,8 +416,8 @@ describe('UtidSelector', () => {
   })
 
   it('preserves pre-existing UTID selection when editing a key', () => {
-    const onUtidChange = jest.fn()
-    const onValidationChange = jest.fn()
+    const onUtidChange = vi.fn()
+    const onValidationChange = vi.fn()
     const existingUtid = '550e8400-e29b-41d4-a716-446655440000'
 
     mockUseUtidMatching.mockReturnValue({
@@ -435,8 +440,8 @@ describe('UtidSelector', () => {
   })
 
   it('preserves pre-existing UTID even when not in current matches', () => {
-    const onUtidChange = jest.fn()
-    const onValidationChange = jest.fn()
+    const onUtidChange = vi.fn()
+    const onValidationChange = vi.fn()
     const existingUtid = 'some-other-utid-not-in-matches'
 
     mockUseUtidMatching.mockReturnValue({

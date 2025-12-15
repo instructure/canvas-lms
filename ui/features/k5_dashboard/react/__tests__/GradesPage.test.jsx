@@ -19,12 +19,27 @@
 
 import React from 'react'
 import {act, render, waitFor} from '@testing-library/react'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import PropTypes from 'prop-types'
+
+vi.mock('@canvas/k5/react/utils', () => ({
+  transformGrades: vi.fn(data => data),
+  fetchGradesForGradingPeriod: vi.fn(),
+  fetchGradesForGradingPeriodAsObserver: vi.fn(),
+  getCourseGrades: vi.fn(c => c),
+  DEFAULT_COURSE_COLOR: '#334451',
+  GradingPeriodShape: {
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    end_date: PropTypes.string,
+    start_date: PropTypes.string,
+    workflow_state: PropTypes.string,
+  },
+}))
 
 import {GradesPage, getGradingPeriodsFromCourses, overrideCourseGradingPeriods} from '../GradesPage'
-import fetchMock from 'fetch-mock'
-
-jest.mock('@canvas/k5/react/utils')
-const utils = require('@canvas/k5/react/utils')
+import * as utils from '@canvas/k5/react/utils'
 
 const defaultCourses = [
   {
@@ -232,17 +247,36 @@ const defaultProps = {
 
 const BASE_GRADES_URL =
   '/api/v1/users/self/courses?enrollment_state=active&per_page=100&include[]=total_scores&include[]=current_grading_period_scores&include[]=grading_periods&include[]=course_image&include[]=grading_scheme&include[]=restrict_quantitative_data'
-const GRADING_PERIODS_URL = encodeURI(BASE_GRADES_URL)
-const OBSERVER_GRADING_PERIODS_URL = encodeURI(`${BASE_GRADES_URL}&include[]=observed_users`)
+const GRADING_PERIODS_URL = BASE_GRADES_URL
+const OBSERVER_GRADING_PERIODS_URL = `${BASE_GRADES_URL}&include[]=observed_users`
+
+const server = setupServer()
 
 describe('GradesPage', () => {
+  beforeAll(() => {
+    server.listen({onUnhandledRequest: 'warn'})
+  })
+
   beforeEach(() => {
     utils.transformGrades.mockImplementation(data => data)
-    fetchMock.get(GRADING_PERIODS_URL, defaultCourses)
+    server.use(
+      http.get('/api/v1/users/self/courses', ({request}) => {
+        const url = new URL(request.url)
+        if (url.searchParams.get('enrollment_state') === 'active') {
+          return HttpResponse.json(defaultCourses)
+        }
+        return HttpResponse.json([])
+      })
+    )
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
+    vi.clearAllMocks()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('displays loading skeletons when grades are loading', async () => {
@@ -251,18 +285,20 @@ describe('GradesPage', () => {
   })
 
   it('displays an error message if there was an error fetching grades', async () => {
-    fetchMock.get(
-      GRADING_PERIODS_URL,
-      () => {
-        throw new Error('oh no!')
-      },
-      {overwriteRoutes: true},
+    server.use(
+      http.get('/api/v1/users/self/courses', () => {
+        return HttpResponse.json(
+          {errors: [{message: 'oh no!'}]},
+          {status: 500}
+        )
+      })
     )
     const {getAllByText} = render(<GradesPage {...defaultProps} />)
     // showFlashError appears to create both a regular and a screen-reader only alert on the page
     await waitFor(() => getAllByText('Failed to load the grades tab'))
     expect(getAllByText('Failed to load the grades tab')[0]).toBeInTheDocument()
-    expect(getAllByText('oh no!')[0]).toBeInTheDocument()
+    // doFetchApi displays the HTTP status error message
+    expect(getAllByText(/doFetchApi received a bad response/)[0]).toBeInTheDocument()
   })
 
   it('renders fetched non-homeroom courses', async () => {
@@ -283,27 +319,27 @@ describe('GradesPage', () => {
   })
 
   it('does not render a grading period drop-down if the user does not have student role', async () => {
-    fetchMock.get(
-      GRADING_PERIODS_URL,
-      [
-        {
-          courseId: '99',
-          courseName: 'For Teachers Only',
-          isHomeroom: false,
-          currentGradingPeriod: '1',
-          enrollmentType: 'teacher',
-          score: null,
-          grade: null,
-          gradingPeriods: [
-            {
-              id: '1',
-              title: 'The Only One',
-              workflow_state: 'active',
-            },
-          ],
-        },
-      ],
-      {overwriteRoutes: true},
+    server.use(
+      http.get('/api/v1/users/self/courses', () => {
+        return HttpResponse.json([
+          {
+            courseId: '99',
+            courseName: 'For Teachers Only',
+            isHomeroom: false,
+            currentGradingPeriod: '1',
+            enrollmentType: 'teacher',
+            score: null,
+            grade: null,
+            gradingPeriods: [
+              {
+                id: '1',
+                title: 'The Only One',
+                workflow_state: 'active',
+              },
+            ],
+          },
+        ])
+      })
     )
     const {getByText, queryByText} = render(<GradesPage {...defaultProps} />)
     await waitFor(() => getByText('For Teachers Only'))
@@ -355,9 +391,11 @@ describe('GradesPage', () => {
         },
       ],
     }
-    fetchMock.get(GRADING_PERIODS_URL, [courseWithoutGrades], {
-      overwriteRoutes: true,
-    })
+    server.use(
+      http.get('/api/v1/users/self/courses', () => {
+        return HttpResponse.json([courseWithoutGrades])
+      })
+    )
     const {getByText, queryByText} = render(<GradesPage {...defaultProps} />)
 
     await waitFor(() => expect(getByText('76%')).toBeInTheDocument())
@@ -371,7 +409,16 @@ describe('GradesPage', () => {
 
   describe('Parent Support', () => {
     beforeEach(() => {
-      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, defaultCourses)
+      server.use(
+        http.get('/api/v1/users/self/courses', ({request}) => {
+          const url = new URL(request.url)
+          const includesObservedUsers = url.searchParams.getAll('include[]').includes('observed_users')
+          if (includesObservedUsers) {
+            return HttpResponse.json(defaultCourses)
+          }
+          return HttpResponse.json(defaultCourses)
+        })
+      )
       utils.getCourseGrades.mockImplementation(c => c)
     })
 

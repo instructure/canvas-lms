@@ -46,8 +46,8 @@ describe('CourseWorkFilters', () => {
   const defaultProps = {
     selectedCourse: 'all',
     selectedDateFilter: 'not_submitted' as const,
-    onCourseChange: jest.fn(),
-    onDateFilterChange: jest.fn(),
+    onCourseChange: vi.fn(),
+    onDateFilterChange: vi.fn(),
   }
 
   const renderWithProviders = (ui: React.ReactElement) => {
@@ -103,7 +103,7 @@ describe('CourseWorkFilters', () => {
 
   it('calls onDateFilterChange when submission status is changed', async () => {
     const user = userEvent.setup()
-    const onDateFilterChange = jest.fn()
+    const onDateFilterChange = vi.fn()
 
     renderWithProviders(
       <CourseWorkFilters {...defaultProps} onDateFilterChange={onDateFilterChange} />,
@@ -120,7 +120,7 @@ describe('CourseWorkFilters', () => {
 
   it('calls onCourseChange when course is changed', async () => {
     const user = userEvent.setup()
-    const onCourseChange = jest.fn()
+    const onCourseChange = vi.fn()
 
     renderWithProviders(<CourseWorkFilters {...defaultProps} onCourseChange={onCourseChange} />)
 

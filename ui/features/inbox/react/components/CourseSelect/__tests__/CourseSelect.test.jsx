@@ -62,7 +62,7 @@ describe('CourseSelect', () => {
   it('renders the course select', () => {
     const props = createProps()
     const {getByTestId} = render(
-      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+      <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
         <CourseSelect {...props} />
       </AlertManagerContext.Provider>,
     )
@@ -71,10 +71,10 @@ describe('CourseSelect', () => {
 
   it('opens the select and allows selecting an option', () => {
     const props = createProps()
-    const mockCourseFilterSet = jest.fn()
+    const mockCourseFilterSet = vi.fn()
     props.onCourseFilterSelect = mockCourseFilterSet
     const {getByTestId, getByText} = render(
-      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+      <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
         <CourseSelect {...props} />
       </AlertManagerContext.Provider>,
     )
@@ -87,7 +87,7 @@ describe('CourseSelect', () => {
   it('filters the options when typing', () => {
     const props = createProps()
     const {getByTestId, queryByText} = render(
-      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+      <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
         <CourseSelect {...props} />
       </AlertManagerContext.Provider>,
     )
@@ -102,7 +102,7 @@ describe('CourseSelect', () => {
     it('is present regardless of the current filter', () => {
       const props = createProps()
       const {getByTestId, queryByText} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <CourseSelect {...props} />
         </AlertManagerContext.Provider>,
       )
@@ -113,12 +113,12 @@ describe('CourseSelect', () => {
     })
 
     it('resets mailbox selections when selected', () => {
-      const filterMock = jest.fn()
+      const filterMock = vi.fn()
       const props = createProps({
         onCourseFilterSelect: filterMock,
       })
       const {getByTestId, getByText} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <CourseSelect {...props} />
         </AlertManagerContext.Provider>,
       )
@@ -136,7 +136,7 @@ describe('CourseSelect', () => {
     it('restores "All Courses" when ESC is pressed with no selection', async () => {
       const props = createProps()
       const {getByTestId} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <CourseSelect {...props} />
         </AlertManagerContext.Provider>,
       )
@@ -160,7 +160,7 @@ describe('CourseSelect', () => {
     it('restores selected course name when ESC is pressed', async () => {
       const props = createProps()
       const {getByTestId, getByText} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <CourseSelect {...props} />
         </AlertManagerContext.Provider>,
       )
@@ -191,7 +191,7 @@ describe('CourseSelect', () => {
     it('shows "All Courses" by default on main page', () => {
       const props = createProps()
       const {getByTestId} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <CourseSelect {...props} />
         </AlertManagerContext.Provider>,
       )
@@ -202,7 +202,7 @@ describe('CourseSelect', () => {
     it('clears input when dropdown opens on main page', () => {
       const props = createProps()
       const {getByTestId} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <CourseSelect {...props} />
         </AlertManagerContext.Provider>,
       )
@@ -217,7 +217,7 @@ describe('CourseSelect', () => {
     it('does not reset input value while dropdown is open', async () => {
       const props = createProps()
       const {getByTestId} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <CourseSelect {...props} />
         </AlertManagerContext.Provider>,
       )
@@ -237,7 +237,7 @@ describe('CourseSelect', () => {
     it('shows empty string by default on compose modal', () => {
       const props = createProps({mainPage: false})
       const {getByTestId} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <CourseSelect {...props} />
         </AlertManagerContext.Provider>,
       )

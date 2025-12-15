@@ -273,7 +273,7 @@ describe('FileBrowser', () => {
       }
 
       ref.current.setState({collections})
-      jest.spyOn(ref.current, 'getFolderData')
+      vi.spyOn(ref.current, 'getFolderData')
 
       await userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
 
@@ -301,7 +301,7 @@ describe('FileBrowser', () => {
       // Wait for state to settle
       await new Promise(resolve => setTimeout(resolve, 50))
 
-      jest.spyOn(ref.current, 'getFolderData')
+      vi.spyOn(ref.current, 'getFolderData')
 
       await userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
 
@@ -480,7 +480,7 @@ describe('FileBrowser', () => {
 
   describe('on file click', () => {
     it('sets a selected file on file click', async () => {
-      const spy = jest.fn()
+      const spy = vi.fn()
       const {wrapper, ref} = renderFileBrowser({selectFile: spy})
       const collections = {
         0: {id: 0, collections: [1]},
@@ -661,7 +661,7 @@ describe('FileBrowser', () => {
           context: '/courses/1',
         },
       }
-      const spy = jest.spyOn(ref.current, 'submitFile')
+      const spy = vi.spyOn(ref.current, 'submitFile')
 
       ref.current.setState({collections})
 
@@ -757,7 +757,7 @@ describe('FileBrowser', () => {
       }
 
       ref.current.setState({collections})
-      jest.spyOn(ref.current, 'setSuccessMessage')
+      vi.spyOn(ref.current, 'setSuccessMessage')
 
       server.use(
         http.post(`/api/v1/folders/${id}/files`, ({request}) => {
@@ -815,7 +815,7 @@ describe('FileBrowser', () => {
       }
 
       ref.current.setState({collections})
-      jest.spyOn(ref.current, 'setFailureMessage')
+      vi.spyOn(ref.current, 'setFailureMessage')
 
       server.use(
         http.post(`/api/v1/folders/${id}/files`, () => new HttpResponse(null, {status: 500})),

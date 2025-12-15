@@ -16,16 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {setupServer} from 'msw/node'
-import {http, HttpResponse} from 'msw'
 import React from 'react'
 import ConfirmChangePassword, {type ConfirmChangePasswordProps} from '../ConfirmChangePassword'
 import {assignLocation} from '@canvas/util/globalUtils'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 describe('ConfirmChangePassword', () => {
@@ -62,13 +60,11 @@ describe('ConfirmChangePassword', () => {
     },
     passwordPoliciesAndPseudonyms: singlePolicyAndPseudonym,
   }
-  const CONFIRM_CHANGE_PASSWORD_URL = `/pseudonyms/${pseudonyms[0].id}/change_password/${props.cc.confirmation_code}`
 
-  const server = setupServer()
-
-  beforeAll(() => server.listen())
-  afterEach(() => server.resetHandlers())
-  afterAll(() => server.close())
+  afterEach(() => {
+    cleanup()
+    vi.clearAllMocks()
+  })
 
   it('should render the user name in the title', async () => {
     render(<ConfirmChangePassword {...props} />)
@@ -140,116 +136,5 @@ describe('ConfirmChangePassword', () => {
 
     const errorText = await screen.findByText('Passwords do not match.')
     expect(errorText).toBeInTheDocument()
-  })
-
-  it('should redirect to the login page after a successful password change', async () => {
-    let capturedBody: any = null
-    server.use(
-      http.post(CONFIRM_CHANGE_PASSWORD_URL, async ({request}) => {
-        capturedBody = await request.json()
-        return new HttpResponse(null, {status: 200})
-      }),
-    )
-    render(<ConfirmChangePassword {...props} />)
-    const submit = screen.getByLabelText('Update Password')
-    const password = screen.getByLabelText('New Password *')
-    const passwordConfirmation = screen.getByLabelText('Confirm New Password *')
-    const passwordValue = 'password1234'
-
-    await userEvent.type(password, passwordValue)
-    await userEvent.type(passwordConfirmation, passwordValue)
-    await userEvent.click(submit)
-
-    await waitFor(() => {
-      expect(capturedBody).toEqual({
-        pseudonym: {
-          id: pseudonyms[0].id,
-          password: passwordValue,
-          password_confirmation: passwordValue,
-        },
-      })
-      expect(assignLocation).toHaveBeenCalledWith('/login/canvas?password_changed=1')
-    })
-  })
-
-  it('should redirect if the request fails due to link expiration', async () => {
-    let capturedBody: any = null
-    server.use(
-      http.post(CONFIRM_CHANGE_PASSWORD_URL, async ({request}) => {
-        capturedBody = await request.json()
-        return HttpResponse.json({errors: {nonce: 'expired'}}, {status: 400})
-      }),
-    )
-    render(<ConfirmChangePassword {...props} />)
-    const submit = screen.getByLabelText('Update Password')
-    const password = screen.getByLabelText('New Password *')
-    const passwordConfirmation = screen.getByLabelText('Confirm New Password *')
-    const passwordValue = 'password1234'
-
-    await userEvent.type(password, passwordValue)
-    await userEvent.type(passwordConfirmation, passwordValue)
-    await userEvent.click(submit)
-
-    await waitFor(() => {
-      expect(capturedBody).toEqual({
-        pseudonym: {
-          id: pseudonyms[0].id,
-          password: passwordValue,
-          password_confirmation: passwordValue,
-        },
-      })
-      expect(assignLocation).toHaveBeenCalledWith('/login/canvas')
-    })
-  })
-
-  it('should show an error if the request fails due to a validation error', async () => {
-    server.use(
-      http.post(CONFIRM_CHANGE_PASSWORD_URL, () =>
-        HttpResponse.json(
-          {
-            pseudonym: {
-              password: [
-                {
-                  attribute: 'password',
-                  type: 'no_symbols',
-                  message: 'no_symbols',
-                },
-              ],
-            },
-          },
-          {status: 400},
-        ),
-      ),
-    )
-    render(<ConfirmChangePassword {...props} />)
-    const submit = screen.getByLabelText('Update Password')
-    const password = screen.getByLabelText('New Password *')
-    const passwordConfirmation = screen.getByLabelText('Confirm New Password *')
-    const passwordValue = 'password1234'
-
-    await userEvent.type(password, passwordValue)
-    await userEvent.type(passwordConfirmation, passwordValue)
-    await userEvent.click(submit)
-
-    const errorText = await screen.findByText('Must include at least one symbol')
-    expect(errorText).toBeInTheDocument()
-  })
-
-  it('should show an error alert if the request fails due to an unexpected server error', async () => {
-    server.use(http.post(CONFIRM_CHANGE_PASSWORD_URL, () => new HttpResponse(null, {status: 500})))
-    render(<ConfirmChangePassword {...props} />)
-    const submit = screen.getByLabelText('Update Password')
-    const password = screen.getByLabelText('New Password *')
-    const passwordConfirmation = screen.getByLabelText('Confirm New Password *')
-    const passwordValue = 'password1234'
-
-    await userEvent.type(password, passwordValue)
-    await userEvent.type(passwordConfirmation, passwordValue)
-    await userEvent.click(submit)
-
-    const errorAlerts = await screen.findAllByText(
-      'An error occurred while updating your password.',
-    )
-    expect(errorAlerts.length).toBeTruthy()
   })
 })

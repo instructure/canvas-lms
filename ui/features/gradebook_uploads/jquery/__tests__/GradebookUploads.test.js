@@ -26,7 +26,7 @@ let mockGrid
 
 // Mock Slick global
 global.Slick = {
-  Grid: jest.fn((container, data, columns, options) => {
+  Grid: vi.fn((container, data, columns, options) => {
     if (container.is('#gradebook_grid')) {
       mainGridArgs = {data, columns, options}
     } else if (container.is('#gradebook_grid_header')) {
@@ -148,15 +148,15 @@ describe('GradebookUploads', () => {
 
     // Mock grid creation
     mockGrid = {
-      invalidateRow: jest.fn(),
-      render: jest.fn(),
-      setCellCssStyles: jest.fn((_style, rows) => {
+      invalidateRow: vi.fn(),
+      render: vi.fn(),
+      setCellCssStyles: vi.fn((_style, rows) => {
         gradeReviewRow = rows
       }),
     }
 
-    $.fn.fillWindowWithMe = jest.fn()
-    $.fn.SlickGrid = jest.fn((container, data, columns, options) => {
+    $.fn.fillWindowWithMe = vi.fn()
+    $.fn.SlickGrid = vi.fn((container, data, columns, options) => {
       if (container.is('#gradebook_grid')) {
         mainGridArgs = {data, columns, options}
       } else if (container.is('#gradebook_grid_header')) {
@@ -168,7 +168,7 @@ describe('GradebookUploads', () => {
 
   afterEach(() => {
     container.remove()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('createGeneralFormatter', () => {

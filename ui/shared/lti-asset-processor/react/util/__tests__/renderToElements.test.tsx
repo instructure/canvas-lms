@@ -21,32 +21,32 @@ import {z} from 'zod'
 import {renderToElements, renderAPComponent, renderAPComponentNoQC} from '../renderToElements'
 
 // Mock only what's actually used
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: vi.fn(),
 }))
 
-jest.mock('react-dom/client', () => ({
-  createRoot: jest.fn(),
+vi.mock('react-dom/client', () => ({
+  createRoot: vi.fn(),
 }))
 
-jest.mock('@canvas/query', () => ({
+vi.mock('@canvas/query', () => ({
   queryClient: {},
 }))
 
-jest.mock('@canvas/i18n', () => ({
-  useScope: () => ({
-    t: (key: string) => key,
-  }),
+vi.mock('@canvas/i18n', () => ({
+  useScope: vi.fn(() => ({
+    t: vi.fn((key: string) => key),
+  })),
 }))
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {createRoot} from 'react-dom/client'
 
-const mockShowFlashError = showFlashError as jest.MockedFunction<typeof showFlashError>
-const mockCreateRoot = createRoot as jest.MockedFunction<typeof createRoot>
+const mockShowFlashError = showFlashError as ReturnType<typeof vi.fn>
+const mockCreateRoot = createRoot as ReturnType<typeof vi.fn>
 
 describe('renderToElements', () => {
-  let mockRender: jest.Mock
+  let mockRender: ReturnType<typeof vi.fn>
   let mockRoot: any
 
   beforeEach(() => {
@@ -54,20 +54,20 @@ describe('renderToElements', () => {
     document.body.innerHTML = ''
 
     // Reset mocks
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     // Setup mock root
-    mockRender = jest.fn()
+    mockRender = vi.fn()
     mockRoot = {render: mockRender}
     mockCreateRoot.mockReturnValue(mockRoot)
 
     // Mock console methods
-    jest.spyOn(console, 'warn').mockImplementation(() => {})
-    jest.spyOn(console, 'error').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('basic functionality', () => {
@@ -291,7 +291,7 @@ describe('renderToElements', () => {
 
     it('correctly formats selector with div prefix', () => {
       document.body.innerHTML = '<div class="test-component"></div>'
-      jest.spyOn(document, 'querySelectorAll')
+      vi.spyOn(document, 'querySelectorAll')
 
       renderToElements({
         selector: '.test-component',
@@ -306,7 +306,7 @@ describe('renderToElements', () => {
 
     it('works with ID selectors', () => {
       document.body.innerHTML = '<div id="test-component"></div>'
-      jest.spyOn(document, 'querySelectorAll')
+      vi.spyOn(document, 'querySelectorAll')
 
       renderToElements({
         selector: '#test-component',
@@ -326,9 +326,9 @@ describe('convenience functions', () => {
 
   beforeEach(() => {
     document.body.innerHTML = ''
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
-    const mockRender = jest.fn()
+    const mockRender = vi.fn()
     const mockRoot = {render: mockRender}
     mockCreateRoot.mockReturnValue(mockRoot as any)
   })

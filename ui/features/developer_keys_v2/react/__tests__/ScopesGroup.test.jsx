@@ -36,8 +36,8 @@ const scopes = [
 ]
 
 const baseProps = {
-  setSelectedScopes: jest.fn(),
-  setReadOnlySelected: jest.fn(),
+  setSelectedScopes: vi.fn(),
+  setReadOnlySelected: vi.fn(),
   selectedScopes: [scopes[0].scope],
   scopes,
   name: 'Cool Scope Group',

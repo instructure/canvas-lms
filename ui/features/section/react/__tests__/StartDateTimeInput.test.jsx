@@ -29,7 +29,7 @@ const mockENV = {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   global.ENV = mockENV
 })
 
@@ -65,7 +65,8 @@ describe('StartDateTimeInput', () => {
     render(<StartDateTimeInput initialValue={initialValue}></StartDateTimeInput>)
     const input = screen.getByTestId('section-start-date')
     await userEvent.clear(input)
-    await userEvent.type(input, 'invalid')
+    // Use paste instead of type for faster input
+    await userEvent.paste('invalid')
     await userEvent.tab()
     expect(screen.getByText('Please enter a valid format for a date')).toBeInTheDocument()
   })

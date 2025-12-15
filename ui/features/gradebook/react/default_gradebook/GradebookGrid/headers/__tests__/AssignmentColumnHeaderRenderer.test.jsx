@@ -60,7 +60,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
   function buildGradebook() {
     gradebook = createGradebook()
-    gradebook.saveSettings = jest.fn()
+    gradebook.saveSettings = vi.fn()
 
     assignment = {
       id: '2301',
@@ -125,7 +125,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
     it('includes a callback for adding elements to the Gradebook KeyboardNav', () => {
       buildGradebook()
-      gradebook.keyboardNav.addGradebookElement = jest.fn()
+      gradebook.keyboardNav.addGradebookElement = vi.fn()
       renderComponent()
       component.props.addGradebookElement()
       expect(gradebook.keyboardNav.addGradebookElement).toHaveBeenCalledTimes(1)
@@ -200,14 +200,14 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
     it('includes the curve grades action', () => {
       buildGradebook()
-      gradebook.getCurveGradesAction = jest.fn().mockReturnValue('CurveAction')
+      gradebook.getCurveGradesAction = vi.fn().mockReturnValue('CurveAction')
       renderComponent()
       expect(component.props.curveGradesAction).toBe('CurveAction')
     })
 
     it('includes the download submissions action', () => {
       buildGradebook()
-      gradebook.getDownloadSubmissionsAction = jest.fn().mockReturnValue('DownloadAction')
+      gradebook.getDownloadSubmissionsAction = vi.fn().mockReturnValue('DownloadAction')
       renderComponent()
       expect(component.props.downloadSubmissionsAction).toBe('DownloadAction')
     })
@@ -269,7 +269,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
     it('includes a callback for changing the "enter grades as" setting', () => {
       buildGradebook()
-      gradebook.updateEnterGradesAsSetting = jest.fn()
+      gradebook.updateEnterGradesAsSetting = vi.fn()
       renderComponent()
       component.props.enterGradesAsSetting.onSelect('percent')
       expect(gradebook.updateEnterGradesAsSetting).toHaveBeenCalledTimes(1)
@@ -277,7 +277,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
     it('includes the assignment id when changing the "enter grades as" setting', () => {
       buildGradebook()
-      gradebook.updateEnterGradesAsSetting = jest.fn()
+      gradebook.updateEnterGradesAsSetting = vi.fn()
       renderComponent()
       component.props.enterGradesAsSetting.onSelect('percent')
       const assignmentId =
@@ -289,7 +289,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
     it('includes the new setting when changing the "enter grades as" setting', () => {
       buildGradebook()
-      gradebook.updateEnterGradesAsSetting = jest.fn()
+      gradebook.updateEnterGradesAsSetting = vi.fn()
       renderComponent()
       component.props.enterGradesAsSetting.onSelect('percent')
       const newSetting =
@@ -336,7 +336,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
     describe('"Post grades" action', () => {
       beforeEach(() => {
-        gradebook.postPolicies.showPostAssignmentGradesTray = jest.fn()
+        gradebook.postPolicies.showPostAssignmentGradesTray = vi.fn()
       })
 
       it('sets enabledForUser to true if the user can edit grades', () => {
@@ -408,7 +408,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
       })
 
       it('includes the `onSelect` callback when showing the "Post Assignment Grades" tray', () => {
-        const onSelectCallback = jest.fn()
+        const onSelectCallback = vi.fn()
         gradebook.gotChunkOfStudents([student])
         renderComponent()
         component.props.postGradesAction.onSelect(onSelectCallback)
@@ -422,7 +422,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
     describe('"Hide grades" action', () => {
       beforeEach(() => {
-        gradebook.postPolicies.showHideAssignmentGradesTray = jest.fn()
+        gradebook.postPolicies.showHideAssignmentGradesTray = vi.fn()
       })
 
       it('sets hasGradesOrPostableComments to true if at least one submission is graded', () => {
@@ -478,7 +478,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
       })
 
       it('includes the `onSelect` callback when showing the "Hide Assignment Grades" tray', () => {
-        const onSelectCallback = jest.fn()
+        const onSelectCallback = vi.fn()
         gradebook.gotChunkOfStudents([student])
         renderComponent()
         component.props.hideGradesAction.onSelect(onSelectCallback)
@@ -492,7 +492,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
     describe('"Grade Posting Policy" action', () => {
       beforeEach(() => {
-        gradebook.postPolicies.showAssignmentPostingPolicyTray = jest.fn()
+        gradebook.postPolicies.showAssignmentPostingPolicyTray = vi.fn()
       })
 
       it('includes a callback to show the "Grade Posting Policy" tray', () => {
@@ -512,7 +512,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
       })
 
       it('includes the `onSelect` callback when showing the "Grade Posting Policy" tray', () => {
-        const onSelectCallback = jest.fn()
+        const onSelectCallback = vi.fn()
         renderComponent()
         component.props.showGradePostingPolicyAction.onSelect(onSelectCallback)
         const [{onExited}] =
@@ -640,7 +640,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
     it.skip('getCurrentlyShownStudents() fetches students using visibleStudentsThatCanSeeAssignment', () => {
       buildGradebook()
-      gradebook.visibleStudentsThatCanSeeAssignment = jest
+      gradebook.visibleStudentsThatCanSeeAssignment = vi
         .fn()
         .mockReturnValue({[student.id]: student})
 
@@ -651,7 +651,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
     it('includes a callback for keyDown events', () => {
       buildGradebook()
-      gradebook.handleHeaderKeyDown = jest.fn()
+      gradebook.handleHeaderKeyDown = vi.fn()
       renderComponent()
       component.props.onHeaderKeyDown({})
       expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledTimes(1)
@@ -660,7 +660,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
     it.skip('calls Gradebook#handleHeaderKeyDown with a given event', () => {
       buildGradebook()
       const exampleEvent = new Event('example')
-      gradebook.handleHeaderKeyDown = jest.fn()
+      gradebook.handleHeaderKeyDown = vi.fn()
       renderComponent()
       component.props.onHeaderKeyDown(exampleEvent)
       expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledWith(exampleEvent)
@@ -668,7 +668,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
     it('calls Gradebook#handleHeaderKeyDown with the column id', () => {
       buildGradebook()
-      gradebook.handleHeaderKeyDown = jest.fn()
+      gradebook.handleHeaderKeyDown = vi.fn()
       renderComponent()
       component.props.onHeaderKeyDown({})
       expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledWith(expect.any(Object), column.id)
@@ -676,7 +676,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
     it.skip('includes a callback for closing the column header menu', () => {
       buildGradebook()
-      gradebook.handleColumnHeaderMenuClose = jest.fn()
+      gradebook.handleColumnHeaderMenuClose = vi.fn()
       renderComponent()
       component.props.onMenuDismiss()
       expect(gradebook.handleColumnHeaderMenuClose).toHaveBeenCalledTimes(1)
@@ -685,19 +685,19 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
     it('does not call the menu close handler synchronously', () => {
       // The React render lifecycle is not yet complete at this time.
       // The callback must begin after React finishes to avoid conflicts.
-      jest.useFakeTimers()
+      vi.useFakeTimers()
       buildGradebook()
-      gradebook.handleColumnHeaderMenuClose = jest.fn()
+      gradebook.handleColumnHeaderMenuClose = vi.fn()
       renderComponent()
       component.props.onMenuDismiss()
       expect(gradebook.handleColumnHeaderMenuClose).not.toHaveBeenCalled()
-      jest.runAllTimers()
-      jest.useRealTimers()
+      vi.runAllTimers()
+      vi.useRealTimers()
     })
 
     it('includes a callback for removing elements to the Gradebook KeyboardNav', () => {
       buildGradebook()
-      gradebook.keyboardNav.removeGradebookElement = jest.fn()
+      gradebook.keyboardNav.removeGradebookElement = vi.fn()
       renderComponent()
       component.props.removeGradebookElement()
       expect(gradebook.keyboardNav.removeGradebookElement).toHaveBeenCalledTimes(1)
@@ -705,14 +705,14 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
     it('includes the reupload submissions action', () => {
       buildGradebook()
-      gradebook.getReuploadSubmissionsAction = jest.fn().mockReturnValue('ReuploadAction')
+      gradebook.getReuploadSubmissionsAction = vi.fn().mockReturnValue('ReuploadAction')
       renderComponent()
       expect(component.props.reuploadSubmissionsAction).toBe('ReuploadAction')
     })
 
     it('includes the set default grade action', () => {
       buildGradebook()
-      gradebook.getSetDefaultGradeAction = jest.fn().mockReturnValue('SetDefaultGradeAction')
+      gradebook.getSetDefaultGradeAction = vi.fn().mockReturnValue('SetDefaultGradeAction')
       renderComponent()
       expect(component.props.setDefaultGradeAction).toBe('SetDefaultGradeAction')
     })
@@ -847,7 +847,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
       const contextCode = '1'
 
       buildGradebook()
-      gradebook.sendMessageStudentsWho = jest.fn()
+      gradebook.sendMessageStudentsWho = vi.fn()
       renderComponent()
       component.props.onSendMessageStudentsWho(recipientsIds, subject, body, contextCode)
       expect(gradebook.sendMessageStudentsWho).toHaveBeenCalledTimes(1)

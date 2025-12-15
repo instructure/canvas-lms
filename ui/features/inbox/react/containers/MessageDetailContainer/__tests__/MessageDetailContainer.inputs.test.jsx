@@ -32,22 +32,22 @@ import {
   CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE,
 } from '../../../../util/constants'
 
-jest.mock('../../../../util/utils', () => ({
-  ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn(),
+vi.mock('../../../../util/utils', async () => ({
+  ...(await vi.importActual('../../../../util/utils')),
+  responsiveQuerySizes: vi.fn(),
 }))
 describe('MessageDetailContainer', () => {
   const server = setupServer(...handlers)
   beforeAll(() => {
     server.listen()
 
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
 
@@ -67,18 +67,18 @@ describe('MessageDetailContainer', () => {
   const setup = ({
     conversation = Conversation.mock(),
     isSubmissionCommentsType = false,
-    onReply = jest.fn(),
-    onReplyAll = jest.fn(),
-    onDelete = jest.fn(),
-    onForward = jest.fn(),
-    onReadStateChange = jest.fn(),
-    setOnSuccess = jest.fn(),
-    setCanReply = jest.fn(),
+    onReply = vi.fn(),
+    onReplyAll = vi.fn(),
+    onDelete = vi.fn(),
+    onForward = vi.fn(),
+    onReadStateChange = vi.fn(),
+    setOnSuccess = vi.fn(),
+    setCanReply = vi.fn(),
     overrideProps = {},
   } = {}) =>
     render(
       <ApolloProvider client={mswClient}>
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess}}>
           <ConversationContext.Provider value={{isSubmissionCommentsType}}>
             <MessageDetailContainer
               conversation={conversation}
@@ -100,7 +100,7 @@ describe('MessageDetailContainer', () => {
 
     describe('function inputs', () => {
       it('should delete with correct conversation ID', async () => {
-        const mockConvoDelete = jest.fn()
+        const mockConvoDelete = vi.fn()
         const container = setup({onDelete: mockConvoDelete})
         await waitForApolloLoading()
 
@@ -111,7 +111,7 @@ describe('MessageDetailContainer', () => {
       })
 
       it('should reply with correct message', async () => {
-        const mockOnReply = jest.fn()
+        const mockOnReply = vi.fn()
         const container = setup({onReply: mockOnReply})
         await waitForApolloLoading()
 
@@ -123,7 +123,7 @@ describe('MessageDetailContainer', () => {
       })
 
       it('should forward with correct message', async () => {
-        const mockOnForward = jest.fn()
+        const mockOnForward = vi.fn()
         const container = setup({onForward: mockOnForward})
         await waitForApolloLoading()
 
@@ -136,7 +136,7 @@ describe('MessageDetailContainer', () => {
       })
 
       it('should reply all with correct message', async () => {
-        const mockOnReplyAll = jest.fn()
+        const mockOnReplyAll = vi.fn()
         const container = setup({onReplyAll: mockOnReplyAll})
         await waitForApolloLoading()
 
@@ -149,7 +149,7 @@ describe('MessageDetailContainer', () => {
       })
 
       it('should mark loaded conversation as read', async () => {
-        const mockReadStateChange = jest.fn()
+        const mockReadStateChange = vi.fn()
         const container = setup({
           conversation: {
             ...Conversation.mock(),

@@ -114,7 +114,7 @@ describe('StudentContextTray', () => {
   describe('when tray is opened after being closed', () => {
     it('calls data.refetch when user has manage tags permissions', () => {
       window.ENV.permissions = {can_manage_differentiation_tags: true}
-      const mockRefetch = jest.fn()
+      const mockRefetch = vi.fn()
       const userWithAnalytics = {...user, analytics}
 
       // Mock returnFocusTo to prevent focus errors when closing the tray
@@ -140,7 +140,7 @@ describe('StudentContextTray', () => {
     })
 
     it('does not call data.refetch when user lacks manage tags permissions', () => {
-      const mockRefetch = jest.fn()
+      const mockRefetch = vi.fn()
       const userWithAnalytics = {...user, analytics}
       props.returnFocusTo = () => []
       props.data = {loading: false, user: userWithAnalytics, course, refetch: mockRefetch}

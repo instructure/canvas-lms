@@ -29,17 +29,15 @@ import StudentViewContext, {
 } from '@canvas/assignments/react/StudentViewContext'
 import SubmissionManager from '../SubmissionManager'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
-jest.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/rce/RichContentEditor')
 
-jest.mock('../../apis/ContextModuleApi')
-
-jest.useFakeTimers()
+vi.mock('../../apis/ContextModuleApi')
 
 function renderInContext(overrides = {}, children) {
   const contextProps = {...StudentViewContextDefaults, ...overrides}
@@ -170,7 +168,7 @@ describe('SubmissionManager', () => {
       let cancelDraftAction
 
       beforeEach(() => {
-        cancelDraftAction = jest.fn()
+        cancelDraftAction = vi.fn()
       })
 
       afterEach(async () => {
@@ -183,7 +181,7 @@ describe('SubmissionManager', () => {
       // TODO (EVAL-2018): the confirmation dialog isn't playing nice with the
       // rest of the tests.  Unskip in the aforementioned ticket, or in a future
       // ticket when we redo the dialog.
-      describe.skip('when the current draft has actual content', () => {
+      describe('when the current draft has actual content', () => {
         const renderDraft = async () => {
           const props = await mockAssignmentAndSubmission({
             Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 2, id: '123'},

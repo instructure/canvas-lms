@@ -342,8 +342,8 @@ describe('addItemHandlers', () => {
 
     it('should call onChange and dispatch with File object', () => {
       const dummyFile = new File(['content'], 'test.txt', {type: 'text/plain'})
-      const onChange = jest.fn()
-      const dispatch = jest.fn()
+      const onChange = vi.fn()
+      const dispatch = vi.fn()
 
       sharedHandleFileDrop([dummyFile], {onChange, dispatch})
 
@@ -356,15 +356,15 @@ describe('addItemHandlers', () => {
     })
 
     it('should not call onChange or dispatch when given DataTransferItem', () => {
-      const onChange = jest.fn()
-      const dispatch = jest.fn()
+      const onChange = vi.fn()
+      const dispatch = vi.fn()
 
       const mockItem: DataTransferItem = {
         kind: 'file',
         type: 'text/plain',
         getAsFile: () => dummyFile,
-        getAsString: jest.fn(),
-        webkitGetAsEntry: jest.fn(),
+        getAsString: vi.fn(),
+        webkitGetAsEntry: vi.fn(),
       }
 
       sharedHandleFileDrop([mockItem], {onChange, dispatch})
@@ -374,9 +374,9 @@ describe('addItemHandlers', () => {
     })
 
     it('should do nothing when no accepted files are provided', () => {
-      const setFile = jest.fn()
-      const onChange = jest.fn()
-      const dispatch = jest.fn()
+      const setFile = vi.fn()
+      const onChange = vi.fn()
+      const dispatch = vi.fn()
 
       sharedHandleFileDrop([], {onChange, dispatch})
 

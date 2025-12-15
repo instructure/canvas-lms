@@ -56,6 +56,8 @@ describe('SpeedGrader Submission History', () => {
   let fixtures
 
   beforeEach(() => {
+    vi.useFakeTimers()
+
     fixtures = document.createElement('div')
     fixtures.id = 'fixtures'
     document.body.appendChild(fixtures)
@@ -125,11 +127,17 @@ describe('SpeedGrader Submission History', () => {
     }
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    // Flush all pending timers and microtasks before teardown to prevent
+    // async React operations from running after the test environment is destroyed
+    await vi.runAllTimersAsync()
+
     SpeedGrader.teardown()
     fixtures.remove()
     fakeENV.teardown()
     delete window.jsonData
+
+    vi.useRealTimers()
   })
 
   it('handles non-nested submission history', () => {
