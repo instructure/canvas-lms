@@ -483,6 +483,17 @@ describe CommunicationChannel do
       expect(cc1.has_merge_candidates?).to be_truthy
     end
 
+    it "does not broadcast merge notification if user has no active pseudonyms" do
+      user2 = User.create!
+      cc2 = communication_channel(user2, { username: "jt@instructure.com", active_cc: true })
+      pseudonym = Account.default.pseudonyms.create!(user: user2, unique_id: "user2")
+      pseudonym.workflow_state = "deleted"
+      pseudonym.save!
+
+      expect(cc2).not_to receive(:dispatch_notifications)
+      cc2.send_merge_notification!
+    end
+
     it "does not return users for push channels" do
       user2 = User.create!
       communication_channel(user2, { username: "push", path_type: CommunicationChannel::TYPE_PUSH, active_cc: true })
