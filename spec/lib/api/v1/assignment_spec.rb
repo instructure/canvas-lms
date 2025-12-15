@@ -708,6 +708,27 @@ describe "Api::V1::Assignment" do
         expect(json).not_to have_key("has_peer_review_submissions")
       end
     end
+
+    context "peer review sub-assignment html_url" do
+      it "uses parent assignment ID in html_url for peer review sub-assignments" do
+        course = course_model
+        parent_assignment = assignment_model(course:)
+        peer_review_sub_assignment = PeerReviewSubAssignment.create!(parent_assignment:)
+
+        json = api.assignment_json(peer_review_sub_assignment, user, session, {})
+
+        expect(json["html_url"]).to eq("assignment/url/#{course.id}/#{parent_assignment.id}")
+      end
+
+      it "uses its own ID in html_url for regular assignments" do
+        course = course_model
+        regular_assignment = assignment_model(course:)
+
+        json = api.assignment_json(regular_assignment, user, session, {})
+
+        expect(json["html_url"]).to eq("assignment/url/#{course.id}/#{regular_assignment.id}")
+      end
+    end
   end
 
   describe "*_settings_hash methods" do
