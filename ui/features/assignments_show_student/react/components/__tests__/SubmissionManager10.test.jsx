@@ -25,6 +25,7 @@ import ContextModuleApi from '../../apis/ContextModuleApi'
 import SubmissionManager from '../SubmissionManager'
 import store from '../stores'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
@@ -78,7 +79,13 @@ describe('SubmissionManager', () => {
       fakeENV.teardown()
     })
 
+    let setOnFailure
+    let setOnSuccess
+
     const renderComponent = async (assignmentOverrides = {}, isSubmitted = true) => {
+      setOnFailure = jest.fn()
+      setOnSuccess = jest.fn()
+
       const props = await mockAssignmentAndSubmission({
         Submission: {
           ...(isSubmitted
@@ -123,7 +130,9 @@ describe('SubmissionManager', () => {
 
       return render(
         <MockedProvider>
-          <SubmissionManager {...props} />
+          <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
+            <SubmissionManager {...props} />
+          </AlertManagerContext.Provider>
         </MockedProvider>,
       )
     }
@@ -220,6 +229,28 @@ describe('SubmissionManager', () => {
       expect(getByTestId('rubric-self-assessment-rating-button-1')).toBeDisabled()
       expect(getByTestId('rubric-self-assessment-rating-button-selected')).toBeInTheDocument()
       expect(getByTestId('rubric-self-assessment-rating-button-0')).toBeDisabled()
+    })
+
+    it('shows error alert when trying to submit incomplete rubric', async () => {
+      store.setState({
+        displayedAssessment: {
+          data: [],
+        },
+        isSavingRubricAssessment: false,
+        selfAssessment: null,
+      })
+
+      const {getByTestId} = await renderComponent()
+
+      fireEvent.click(getByTestId('self-assess-button'))
+
+      expect(getByTestId('enhanced-rubric-assessment-tray')).toBeInTheDocument()
+
+      // Submit without selecting any ratings
+      const submitButton = getByTestId('save-rubric-assessment-button')
+      fireEvent.click(submitButton)
+
+      expect(setOnFailure).toHaveBeenCalledWith('Incomplete Self Assessment')
     })
   })
 })

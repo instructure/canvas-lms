@@ -18,13 +18,12 @@
 
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
+import {RubricAssessmentTray, isRubricComplete} from '@canvas/rubrics/react/RubricAssessment'
 import {
   RubricAssessmentData,
   Rubric,
   RubricSelfAssessmentData,
 } from '@canvas/rubrics/react/types/rubric'
-import {isRubricComplete} from '../../helpers/RubricHelpers'
 import {useSubmitSelfAssessment} from '../../mutations/useSubmitSelfAssessment'
 import useStore from '../stores/index'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -77,12 +76,24 @@ export const SelfAssessmentTray = ({
     return assessmentFormatted
   }
 
-  const handleSubmitSelfAssessment = async (assessment: RubricSelfAssessmentData) => {
-    if (!isRubricComplete(assessment)) {
+  const validateAndSubmitSelfAssessment = async (rubricAssessment: RubricAssessmentData[]) => {
+    if (
+      !isRubricComplete({
+        criteria: rubric.criteria ?? [],
+        hidePoints,
+        isFreeFormCriterionComments: !!rubric.freeFormCriterionComments,
+        rubricAssessment,
+      })
+    ) {
       setOnFailure(I18n.t('Incomplete Self Assessment'))
       return
     }
 
+    const assessmentFormatted = formatAssessmentForSubmission(rubricAssessment)
+    await handleSubmitSelfAssessment(assessmentFormatted)
+  }
+
+  const handleSubmitSelfAssessment = async (assessment: RubricSelfAssessmentData) => {
     try {
       handleOnSubmitting(true, assessment)
       await submitSelfAssessment({assessment, rubricAssociationId, rubric})
@@ -108,10 +119,7 @@ export const SelfAssessmentTray = ({
       rubricAssessmentData={selfAssessmentData}
       rubric={rubric}
       viewModeOverride="horizontal"
-      onSubmit={assessment => {
-        const assessmentFormatted = formatAssessmentForSubmission(assessment)
-        handleSubmitSelfAssessment(assessmentFormatted)
-      }}
+      onSubmit={validateAndSubmitSelfAssessment}
     />
   )
 }
