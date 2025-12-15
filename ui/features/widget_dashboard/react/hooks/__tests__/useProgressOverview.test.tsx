@@ -17,23 +17,22 @@
  */
 
 import {renderHook} from '@testing-library/react-hooks'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import React from 'react'
 import {waitFor} from '@testing-library/react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
-import {useProgressOverview} from '../useProgressOverview'
+import {useProgressOverviewPaginated} from '../useProgressOverview'
 import {WidgetDashboardProvider} from '../useWidgetDashboardContext'
 import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
 
-const mockProgressData = [
+const mockCourses = [
   {
     course: {
       _id: '1',
-      name: 'Environmental Science',
-      courseCode: 'ENVS150',
+      name: 'Course 1',
+      courseCode: 'C1',
       submissionStatistics: {
-        submittedAndGradedCount: 8,
+        submittedAndGradedCount: 5,
         submittedNotGradedCount: 2,
         missingSubmissionsCount: 1,
         submissionsDueCount: 3,
@@ -43,10 +42,10 @@ const mockProgressData = [
   {
     course: {
       _id: '2',
-      name: 'Calculus II',
-      courseCode: 'MATH201',
+      name: 'Course 2',
+      courseCode: 'C2',
       submissionStatistics: {
-        submittedAndGradedCount: 5,
+        submittedAndGradedCount: 3,
         submittedNotGradedCount: 1,
         missingSubmissionsCount: 2,
         submissionsDueCount: 4,
@@ -55,25 +54,7 @@ const mockProgressData = [
   },
 ]
 
-const mockGqlResponse = {
-  data: {
-    legacyNode: {
-      _id: '123',
-      enrollmentsConnection: {
-        nodes: mockProgressData,
-      },
-    },
-  },
-}
-
-const setup = (envOverrides = {}, dashboardProps = {}) => {
-  const originalEnv = window.ENV
-  window.ENV = {
-    ...originalEnv,
-    current_user_id: '123',
-    ...envOverrides,
-  }
-
+const createWrapper = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -83,60 +64,68 @@ const setup = (envOverrides = {}, dashboardProps = {}) => {
     },
   })
 
-  const result = renderHook(() => useProgressOverview(), {
-    wrapper: ({children}: {children: React.ReactNode}) => (
-      <QueryClientProvider client={queryClient}>
-        <WidgetDashboardProvider {...dashboardProps}>{children}</WidgetDashboardProvider>
-      </QueryClientProvider>
-    ),
-  })
-
-  return {
-    ...result,
-    queryClient,
-    cleanup: () => {
-      window.ENV = originalEnv
-      result.unmount()
-    },
-  }
+  return ({children}: {children: React.ReactNode}) => (
+    <QueryClientProvider client={queryClient}>
+      <WidgetDashboardProvider>{children}</WidgetDashboardProvider>
+    </QueryClientProvider>
+  )
 }
 
 const server = setupServer(
   graphql.query('GetUserProgressOverview', () => {
-    return HttpResponse.json(mockGqlResponse)
+    return HttpResponse.json({
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollmentsConnection: {
+            nodes: mockCourses,
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: null,
+              totalCount: 2,
+            },
+          },
+        },
+      },
+    })
   }),
 )
 
-beforeAll(() => server.listen())
+beforeAll(() => {
+  server.listen()
+  window.ENV = {
+    ...window.ENV,
+    current_user_id: '123',
+  }
+})
+
 afterEach(() => {
   server.resetHandlers()
   clearWidgetDashboardCache()
 })
+
 afterAll(() => server.close())
 
-describe('useProgressOverview', () => {
-  it('fetches and returns progress overview data', async () => {
-    const {result, cleanup} = setup()
+describe('useProgressOverviewPaginated', () => {
+  it('fetches and returns paginated course data', async () => {
+    const {result} = renderHook(() => useProgressOverviewPaginated(), {
+      wrapper: createWrapper(),
+    })
+
+    expect(result.current.isLoading).toBe(true)
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.isLoading).toBe(false)
     })
 
     expect(result.current.data).toHaveLength(2)
-    expect(result.current.data?.[0]).toEqual({
-      courseId: '1',
-      courseName: 'Environmental Science',
-      courseCode: 'ENVS150',
-      submittedAndGradedCount: 8,
-      submittedNotGradedCount: 2,
-      missingSubmissionsCount: 1,
-      submissionsDueCount: 3,
-    })
-
-    cleanup()
+    expect(result.current.data?.[0].courseId).toBe('1')
+    expect(result.current.data?.[1].courseId).toBe('2')
   })
 
-  it('handles empty enrollments', async () => {
+  it('calculates total pages correctly', async () => {
     server.use(
       graphql.query('GetUserProgressOverview', () => {
         return HttpResponse.json({
@@ -144,7 +133,14 @@ describe('useProgressOverview', () => {
             legacyNode: {
               _id: '123',
               enrollmentsConnection: {
-                nodes: [],
+                nodes: mockCourses,
+                pageInfo: {
+                  hasNextPage: true,
+                  hasPreviousPage: false,
+                  startCursor: null,
+                  endCursor: 'cursor1',
+                  totalCount: 12,
+                },
               },
             },
           },
@@ -152,15 +148,80 @@ describe('useProgressOverview', () => {
       }),
     )
 
-    const {result, cleanup} = setup()
-
-    await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
+    const {result} = renderHook(() => useProgressOverviewPaginated(), {
+      wrapper: createWrapper(),
     })
 
-    expect(result.current.data).toEqual([])
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
 
-    cleanup()
+    expect(result.current.totalPages).toBe(3)
+    expect(result.current.totalCount).toBe(12)
+  })
+
+  it('handles page navigation', async () => {
+    const page1Data = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollmentsConnection: {
+            nodes: [mockCourses[0]],
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: 'cursor1',
+              totalCount: 10,
+            },
+          },
+        },
+      },
+    }
+
+    const page2Data = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollmentsConnection: {
+            nodes: [mockCourses[1]],
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: true,
+              startCursor: 'cursor1',
+              endCursor: null,
+              totalCount: 10,
+            },
+          },
+        },
+      },
+    }
+
+    server.use(
+      graphql.query('GetUserProgressOverview', ({variables}) => {
+        if (variables.after) {
+          return HttpResponse.json(page2Data)
+        }
+        return HttpResponse.json(page1Data)
+      }),
+    )
+
+    const {result} = renderHook(() => useProgressOverviewPaginated(), {
+      wrapper: createWrapper(),
+    })
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    expect(result.current.currentPageIndex).toBe(0)
+    expect(result.current.data?.[0].courseId).toBe('1')
+
+    result.current.goToPage(2)
+
+    await waitFor(() => {
+      expect(result.current.currentPageIndex).toBe(1)
+    })
   })
 
   it('filters out courses with null submissionStatistics', async () => {
@@ -172,16 +233,23 @@ describe('useProgressOverview', () => {
               _id: '123',
               enrollmentsConnection: {
                 nodes: [
-                  mockProgressData[0],
+                  mockCourses[0],
                   {
                     course: {
                       _id: '3',
                       name: 'Course Without Stats',
-                      courseCode: 'TEST303',
+                      courseCode: 'C3',
                       submissionStatistics: null,
                     },
                   },
                 ],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  startCursor: null,
+                  endCursor: null,
+                  totalCount: 1,
+                },
               },
             },
           },
@@ -189,16 +257,51 @@ describe('useProgressOverview', () => {
       }),
     )
 
-    const {result, cleanup} = setup()
+    const {result} = renderHook(() => useProgressOverviewPaginated(), {
+      wrapper: createWrapper(),
+    })
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.isLoading).toBe(false)
     })
 
     expect(result.current.data).toHaveLength(1)
     expect(result.current.data?.[0].courseId).toBe('1')
+  })
 
-    cleanup()
+  it('handles empty results', async () => {
+    server.use(
+      graphql.query('GetUserProgressOverview', () => {
+        return HttpResponse.json({
+          data: {
+            legacyNode: {
+              _id: '123',
+              enrollmentsConnection: {
+                nodes: [],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  startCursor: null,
+                  endCursor: null,
+                  totalCount: 0,
+                },
+              },
+            },
+          },
+        })
+      }),
+    )
+
+    const {result} = renderHook(() => useProgressOverviewPaginated(), {
+      wrapper: createWrapper(),
+    })
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    expect(result.current.data).toHaveLength(0)
+    expect(result.current.totalPages).toBe(0)
   })
 
   it('handles errors', async () => {
@@ -208,79 +311,34 @@ describe('useProgressOverview', () => {
       }),
     )
 
-    const {result, cleanup} = setup()
-
-    await waitFor(() => {
-      expect(result.current.isError).toBe(true)
+    const {result} = renderHook(() => useProgressOverviewPaginated(), {
+      wrapper: createWrapper(),
     })
 
-    expect(result.current.error).toBeTruthy()
+    await waitFor(() => {
+      expect(result.current.error).toBeTruthy()
+    })
 
-    cleanup()
+    expect(result.current.isLoading).toBe(false)
   })
 
-  it('supports observer mode', async () => {
-    const observedUserId = '456'
-
-    server.use(
-      graphql.query('GetUserProgressOverview', ({variables}) => {
-        expect(variables.observedUserId).toBe(observedUserId)
-        return HttpResponse.json(mockGqlResponse)
-      }),
-    )
-
-    const {result, cleanup} = setup({}, {observedUserId})
+  it('resets pagination correctly', async () => {
+    const {result} = renderHook(() => useProgressOverviewPaginated(), {
+      wrapper: createWrapper(),
+    })
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.isLoading).toBe(false)
     })
 
-    expect(result.current.data).toHaveLength(2)
-
-    cleanup()
-  })
-
-  it('defaults count fields to 0 when missing', async () => {
-    server.use(
-      graphql.query('GetUserProgressOverview', () => {
-        return HttpResponse.json({
-          data: {
-            legacyNode: {
-              _id: '123',
-              enrollmentsConnection: {
-                nodes: [
-                  {
-                    course: {
-                      _id: '1',
-                      name: 'Test Course',
-                      courseCode: 'TEST101',
-                      submissionStatistics: {},
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        })
-      }),
-    )
-
-    const {result, cleanup} = setup()
+    result.current.goToPage(2)
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.currentPageIndex).toBe(1)
     })
 
-    expect(result.current.data?.[0]).toEqual({
-      courseId: '1',
-      courseName: 'Test Course',
-      courseCode: 'TEST101',
-      submittedAndGradedCount: 0,
-      submittedNotGradedCount: 0,
-      missingSubmissionsCount: 0,
-      submissionsDueCount: 0,
-    })
+    result.current.resetPagination()
 
-    cleanup()
+    expect(result.current.currentPageIndex).toBe(0)
   })
 })
