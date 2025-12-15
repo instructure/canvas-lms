@@ -115,6 +115,8 @@ RUN --mount=target=/tmp/src \
         ui \
         ui-build \
         jest.config.js \
+        vitest.config.ts \
+        vitest.workspace.ts \
         package.json \
         tsconfig.json \
         yarn.lock \
