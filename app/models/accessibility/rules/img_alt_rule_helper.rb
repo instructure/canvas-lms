@@ -89,8 +89,11 @@ module Accessibility
 
       def self.adjust_img_style(elem)
         fixed_elem = elem.dup
-        fixed_elem["style"] = "max-width: 100%; max-height: 13rem; object-fit: contain;"
-        fixed_elem.to_html
+        fixed_elem["style"] = "max-width: 100%; max-height: 100%; object-fit: contain;"
+        wrapper = Nokogiri::XML::Node.new("div", Nokogiri::HTML::Document.new)
+        wrapper["style"] = "display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;"
+        wrapper.add_child(fixed_elem)
+        wrapper.to_html
       end
 
       def self.validation_error_missing

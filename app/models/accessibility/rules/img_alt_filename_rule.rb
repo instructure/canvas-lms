@@ -72,6 +72,12 @@ module Accessibility
         I18n.t("This text (alt text) is read by screen readers and displayed if the image fails to load. Replace the filename with a meaningful description.")
       end
 
+      def issue_preview(elem)
+        return nil unless elem.tag_name == "img"
+
+        ImgAltRuleHelper.adjust_img_style(elem)
+      end
+
       def why
         I18n.t("Alt text is a description of an image only visible to screen readers.
         Screen readers are software to help people who are blind or have low vision interact with websites and computers.
