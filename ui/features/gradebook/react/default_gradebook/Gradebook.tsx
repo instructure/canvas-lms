@@ -3635,7 +3635,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const rowDelta = direction === 'next' ? 1 : -1
     const newRowIdx = location.row + rowDelta
     const student = this.listRows()[newRowIdx]
-    const {assignmentId, peerReviewAssignmentId} = this.getSubmissionTrayState()
+    const {assignmentId} = this.getSubmissionTrayState()
     if (!student) {
       return
     }
@@ -3643,7 +3643,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       row: newRowIdx,
       cell: location.cell,
     })
-    this.setSubmissionTrayState(true, student.id, assignmentId, peerReviewAssignmentId)
+    this.setSubmissionTrayState(true, student.id, assignmentId)
     return this.updateRowAndRenderSubmissionTray(student.id)
   }
 
@@ -3653,34 +3653,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return
     }
     const assignment = this.navigateAssignment(direction)
-    if (!assignment) {
+    if (!assignment || !assignment.assignmentId) {
       return
     }
-
-    let rawAssignment
-
-    if (assignment.assignmentId) {
-      rawAssignment = this.getAssignment(assignment.assignmentId)
-    }
-
-    if (rawAssignment?.parent_assignment_id) {
-      this.setSubmissionTrayState(
-        true,
-        studentId,
-        rawAssignment.parent_assignment_id,
-        assignment.assignmentId,
-      )
-    } else {
-      this.setSubmissionTrayState(true, studentId, assignment.assignmentId)
-    }
+    this.setSubmissionTrayState(true, studentId, assignment.assignmentId)
 
     return this.updateRowAndRenderSubmissionTray(studentId)
   }
 
-  getSubmissionTrayProps = (
-    student: null | Student = null,
-    peerReviewAssignmentId: string | null = null,
-  ): SubmissionTrayProps => {
+  getSubmissionTrayProps = (student: null | Student = null): SubmissionTrayProps => {
     if (!this.gradebookGrid?.gridSupport) throw new Error('grid is not initialized')
     const {open, studentId, assignmentId, editedCommentId} = this.getSubmissionTrayState()
     if (!studentId) {
@@ -3756,7 +3737,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         assignment.omit_from_final_grade ||
         (this.options.group_weighting_scheme === 'percent' && isGroupWeightZero),
       isOpen: open,
-      isPeerReviewAssignment: Boolean(peerReviewAssignmentId),
+      isPeerReviewAssignment: Boolean(assignment?.parent_assignment_id),
       latePolicy: this.courseContent.latePolicy,
       locale: this.props.locale,
       onAnonymousSpeedGraderClick: this.showAnonymousSpeedGraderAlertForURL,
@@ -3764,9 +3745,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       onGradeSubmission: this.gradeSubmission,
       onStickerChange: this.handleStickerChanged,
       onRequestClose: this.closeSubmissionTray,
-      peerReviewAssignment: peerReviewAssignmentId
-        ? camelizeProperties(this.getAssignment(peerReviewAssignmentId))
-        : null,
       pendingGradeInfo: this.getPendingGradeInfo({
         assignmentId,
         userId: studentId,
@@ -3823,11 +3801,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   renderSubmissionTray = (student: Student | null = null) => {
-    const {open, studentId, assignmentId, peerReviewAssignmentId} = this.getSubmissionTrayState()
+    const {open, studentId, assignmentId} = this.getSubmissionTrayState()
     if (!assignmentId) throw new Error('assignmentId missing')
     if (!studentId) throw new Error('studentId missing')
     const mountPoint = document.getElementById('StudentTray__Container')
-    const props = this.getSubmissionTrayProps(student, peerReviewAssignmentId)
+    const props = this.getSubmissionTrayProps(student)
     if (!this.getSubmissionCommentsLoaded() && open) {
       this.loadSubmissionComments(assignmentId, studentId)
     }
@@ -3853,17 +3831,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.renderSubmissionTray(this.student(studentId))
   }
 
-  toggleSubmissionTrayOpen = (
-    studentId: string,
-    assignmentId: string,
-    peerReviewAssignmentId: string | null = null,
-  ) => {
-    this.setSubmissionTrayState(
-      !this.getSubmissionTrayState().open,
-      studentId,
-      assignmentId,
-      peerReviewAssignmentId,
-    )
+  toggleSubmissionTrayOpen = (studentId: string, assignmentId: string) => {
+    this.setSubmissionTrayState(!this.getSubmissionTrayState().open, studentId, assignmentId)
     return this.updateRowAndRenderSubmissionTray(studentId)
   }
 
@@ -3886,7 +3855,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     open: boolean,
     studentId: string | null = null,
     assignmentId: string | null = null,
-    peerReviewAssignmentId: string | null = null,
   ) => {
     this.gridDisplaySettings.submissionTray.open = open
     if (studentId) {
@@ -3895,7 +3863,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (assignmentId) {
       this.gridDisplaySettings.submissionTray.assignmentId = assignmentId
     }
-    this.gridDisplaySettings.submissionTray.peerReviewAssignmentId = peerReviewAssignmentId
     if (open) {
       return this.gradebookGrid?.gridSupport?.helper.commitCurrentEdit()
     }

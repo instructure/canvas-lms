@@ -146,7 +146,6 @@ export type SubmissionTrayProps = {
   customGradeStatuses: GradeStatus[]
   customGradeStatusesEnabled: boolean
   contentRef?: React.RefObject<HTMLDivElement>
-  peerReviewAssignment: CamelizedAssignment | null
 }
 
 export type CheckpointState = {
@@ -453,7 +452,8 @@ export default class SubmissionTray extends React.Component<
 
   render() {
     const {name, avatarUrl} = this.props.student
-    const assignmentParam = `assignment_id=${this.props.submission.assignmentId}`
+    const assignmentId = this.props.assignment.parentAssignmentId || this.props.submission.assignmentId
+    const assignmentParam = `assignment_id=${assignmentId}`
     const studentParam = `student_id=${this.props.student.id}`
     const peerReviewParam = this.props.isPeerReviewAssignment ? '&peer_review=true' : ''
     const speedGraderUrlParams = this.props.assignment.anonymizeStudents
@@ -661,9 +661,7 @@ export default class SubmissionTray extends React.Component<
       this.props.assignment,
     )
 
-    const assignmentDisplayName = this.props.isPeerReviewAssignment
-      ? this.props.peerReviewAssignment?.name || this.props.assignment.name
-      : this.props.assignment.name
+    const assignmentDisplayName = this.props.assignment.name
 
     return (
       <ApolloProvider client={createClient()}>

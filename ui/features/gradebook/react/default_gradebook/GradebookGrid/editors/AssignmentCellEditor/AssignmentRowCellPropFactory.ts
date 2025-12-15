@@ -96,15 +96,7 @@ export default class AssignmentRowCellPropFactory {
       isPeerReviewAssignment,
 
       onToggleSubmissionTrayOpen: () => {
-        const submissionTrayAssignmentId = isPeerReviewAssignment
-          ? (assignment.parent_assignment_id as string)
-          : assignment.id
-
-        this.gradebook.toggleSubmissionTrayOpen(
-          student.id,
-          submissionTrayAssignmentId,
-          isPeerReviewAssignment ? assignment.id : null,
-        )
+        this.gradebook.toggleSubmissionTrayOpen(student.id, assignment.id)
       },
 
       onGradeSubmission: this.gradebook.gradeSubmission,
