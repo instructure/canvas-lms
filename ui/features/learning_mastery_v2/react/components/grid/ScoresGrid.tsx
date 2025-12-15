@@ -25,7 +25,8 @@ import {
   ContributingScoreAlignment,
   ContributingScoresManager,
 } from '../../hooks/useContributingScores'
-import {Cell} from './Cell'
+import {CellWithAction} from './CellWithAction'
+import {FocusableCell} from './FocusableCell'
 
 export interface ScoresGridProps {
   students: Student[]
@@ -71,36 +72,37 @@ const ContributingScoreCells: React.FC<ContributingScoreCellsProps> = ({
   return (
     <Fragment>
       {isVisible &&
-        scores.map((score, scoreIndex) => (
-          <Cell
+        scores.map((score, alignmentIndex) => (
+          <CellWithAction
+            data-testid={`contributing-score-${student.id}-${outcome.id}-${alignmentIndex}`}
+            key={`contributing-score-${student.id}-${outcome.id}-${alignmentIndex}`}
             background="secondary"
-            data-testid={`contributing-score-${student.id}-${outcome.id}-${scoreIndex}`}
-            key={`contributing-score-${student.id}-${outcome.id}-${scoreIndex}`}
+            actionLabel="View Contributing Score Details"
+            onAction={
+              onScoreClick
+                ? () => {
+                    if (!contributingScoresForOutcome.alignments) return
+                    if (
+                      alignmentIndex >= 0 &&
+                      alignmentIndex < contributingScoresForOutcome.alignments.length
+                    ) {
+                      onScoreClick(
+                        outcome,
+                        student,
+                        alignmentIndex,
+                        contributingScoresForOutcome.alignments,
+                      )
+                    }
+                  }
+                : undefined
+            }
           >
             <StudentOutcomeScore
               score={score?.score}
               outcome={outcome}
               scoreDisplayFormat={scoreDisplayFormat}
-              onScoreClick={
-                onScoreClick
-                  ? () => {
-                      if (!contributingScoresForOutcome.alignments) return
-                      const alignmentIndex = contributingScoresForOutcome.alignments?.findIndex(
-                        alignment => alignment.alignment_id === score?.alignment_id,
-                      )
-                      if (alignmentIndex !== undefined && alignmentIndex >= 0) {
-                        onScoreClick(
-                          outcome,
-                          student,
-                          alignmentIndex,
-                          contributingScoresForOutcome.alignments,
-                        )
-                      }
-                    }
-                  : undefined
-              }
             />
-          </Cell>
+          </CellWithAction>
         ))}
     </Fragment>
   )
@@ -129,18 +131,18 @@ const ScoresGridComponent: React.FC<ScoresGridProps> = ({
   }, [rollups])
 
   return (
-    <Flex direction="column">
+    <Flex direction="column" role="grid">
       {students.map(student => (
-        <Flex direction="row" key={student.id}>
+        <Flex direction="row" key={student.id} role="row">
           {outcomes.map((outcome, index) => (
             <Fragment key={`${student.id}-${outcome.id}-${index}`}>
-              <Cell data-testid={`student-outcome-score-${student.id}-${outcome.id}`}>
+              <FocusableCell data-testid={`student-outcome-score-${student.id}-${outcome.id}`}>
                 <StudentOutcomeScore
                   score={rollupsByStudentAndOutcome[`${student.id}_${outcome.id}`]?.score}
                   outcome={outcome}
                   scoreDisplayFormat={scoreDisplayFormat}
                 />
-              </Cell>
+              </FocusableCell>
               <ContributingScoreCells
                 contributingScores={contributingScores}
                 student={student}

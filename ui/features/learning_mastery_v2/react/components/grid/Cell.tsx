@@ -28,6 +28,7 @@ export const Cell: React.FC<CellProps> = ({children, ...props}) => {
   return (
     <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}>
       <View
+        role="gridcell"
         as="div"
         height={CELL_HEIGHT}
         borderWidth="0 0 small 0"

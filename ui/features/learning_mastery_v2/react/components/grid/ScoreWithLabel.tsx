@@ -20,14 +20,12 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {ScoreDisplayFormat} from '../../utils/constants'
-import {Link} from '@instructure/ui-link'
 
-export interface ScoreCellProps {
+export interface ScoreWithLabelProps {
   score?: number
   scoreDisplayFormat?: ScoreDisplayFormat
   icon?: React.ReactNode
   label?: string
-  onClick?: () => void
 }
 
 interface LabelProps {
@@ -48,35 +46,25 @@ const Label: React.FC<LabelProps> = ({scoreDisplayFormat, score, text}) => {
   return <ScreenReaderContent>{text}</ScreenReaderContent>
 }
 
-export const ScoreCell: React.FC<ScoreCellProps> = ({
+export const ScoreWithLabel: React.FC<ScoreWithLabelProps> = ({
   icon,
   score,
   label,
-  onClick,
   scoreDisplayFormat = ScoreDisplayFormat.ICON_ONLY,
 }) => {
   const justifyItems = scoreDisplayFormat === ScoreDisplayFormat.ICON_ONLY ? 'center' : 'start'
-  const Score = (
-    <Flex width="100%" height="100%" alignItems="center" gap="small" justifyItems={justifyItems}>
-      {icon}
-      <Label scoreDisplayFormat={scoreDisplayFormat} score={score} text={label} />
-    </Flex>
-  )
 
   return (
-    <Flex width="100%" height="100%" alignItems="center" padding="none medium-small">
-      {onClick ? (
-        <Link
-          as="button"
-          onClick={onClick}
-          width="100%"
-          themeOverride={{textDecorationWithinText: 'none'}}
-        >
-          {Score}
-        </Link>
-      ) : (
-        Score
-      )}
+    <Flex
+      width="100%"
+      height="100%"
+      alignItems="center"
+      gap="small"
+      padding="none medium-small"
+      justifyItems={justifyItems}
+    >
+      {icon}
+      <Label scoreDisplayFormat={scoreDisplayFormat} score={score} text={label} />
     </Flex>
   )
 }
