@@ -605,6 +605,8 @@
 #       }
 #     }
 class ExternalToolsController < ApplicationController
+  include NewQuizzesHelper
+
   class InvalidSettingsError < StandardError; end
 
   before_action :require_context, except: [:all_visible_nav_tools]
@@ -913,6 +915,11 @@ class ExternalToolsController < ApplicationController
         end
 
         add_crumb(@tool.label_for(placement, I18n.locale))
+
+        # Check if this is an Item Banks launch with native experience enabled
+        if item_banks_launch?(@tool, placement) && new_quizzes_native_experience_enabled?
+          return render_native_item_banks(placement)
+        end
 
         @return_url = named_context_url(@context, :context_external_content_success_url, "external_tool_redirect", { include_host: true })
         @redirect_return = true
@@ -2120,5 +2127,60 @@ class ExternalToolsController < ApplicationController
     @_whitelisted_query_params ||= WHITELISTED_QUERY_PARAMS.each_with_object({}) do |query_param, h|
       h[query_param] = params[query_param] if params.key?(query_param)
     end
+  end
+
+  def item_banks_launch?(tool, placement)
+    # Check if this is a quiz_lti tool with course_navigation or account_navigation placement
+    # and the custom_fields indicate it's for item_banks
+    return false unless tool.quiz_lti?
+    return false unless %w[course_navigation account_navigation].include?(placement)
+
+    # Check if the tool's placement has item_banks custom field
+    nav_settings = tool.extension_setting(placement.to_sym)
+    return false unless nav_settings
+
+    custom_fields = nav_settings[:custom_fields] || {}
+    custom_fields[:item_banks].present?
+  end
+
+  def render_native_item_banks(placement)
+    add_new_quizzes_bundle
+
+    # Build launch data with item banks context
+    signed_launch_data = build_item_banks_launch_data(placement)
+
+    js_env(NEW_QUIZZES: signed_launch_data)
+
+    add_body_class("native-new-quizzes full-width")
+
+    render "assignments/native_new_quizzes", layout: "application"
+  end
+
+  def build_item_banks_launch_data(placement)
+    # Create a variable expander for LTI variable substitution
+    variable_expander = Lti::VariableExpander.new(
+      @domain_root_account,
+      @context,
+      self,
+      {
+        current_user: @current_user,
+        current_pseudonym: @current_pseudonym,
+        tool: @tool
+      }
+    )
+
+    # Build launch data using the NewQuizzes::LaunchDataBuilder
+    # but without an assignment (since this is item banks, not a specific quiz)
+    ::NewQuizzes::LaunchDataBuilder.new(
+      context: @context,
+      assignment: nil, # No assignment for item banks
+      tool: @tool,
+      tag: nil, # No tag for item banks navigation launches
+      current_user: @current_user,
+      controller: self,
+      request:,
+      variable_expander:,
+      placement: # Pass the placement for placement-specific custom fields
+    ).build_with_signature
   end
 end

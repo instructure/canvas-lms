@@ -3486,7 +3486,17 @@ class ApplicationController < ActionController::Base
       tool: @tool,
       tag: @tag || @module_tag,
       current_user: @current_user,
-      request:
+      controller: self,
+      request:,
+      variable_expander: Lti::VariableExpander.new(@domain_root_account, @context, self, {
+                                                     current_user: @current_user,
+                                                     current_pseudonym: @current_pseudonym,
+                                                     assignment: @assignment,
+                                                     content_tag: @module_tag || @tag,
+                                                     launch: @lti_launch,
+                                                     tool: @tool,
+                                                     launch_url: @resource_url
+                                                   })
     ).build_with_signature
 
     js_env(NEW_QUIZZES: signed_launch_data)

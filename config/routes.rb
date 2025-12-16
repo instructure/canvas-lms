@@ -1656,7 +1656,11 @@ CanvasRails::Application.routes.draw do
 
       %w[course account].each do |context|
         get "#{context}s/:#{context}_id/external_tools/sessionless_launch", action: :generate_sessionless_launch, as: "#{context}_external_tool_sessionless_launch"
-        get "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :show, as: "#{context}_external_tool_show"
+
+        # Support client-side routing in federated apps (e.g., New Quizzes)
+        # Routes like `/courses/:course_id/external_tools/:external_tool_id/any/nested/path`
+        # will be handled by the router in the federated app
+        get "#{context}s/:#{context}_id/external_tools/:external_tool_id#{full_path_glob}", action: :show, as: "#{context}_external_tool_show"
 
         # Migration URL
         get "#{context}s/:#{context}_id/external_tools/:external_tool_id/migration_info", action: :migration_info, as: "#{context}_external_tool_migration_info"
