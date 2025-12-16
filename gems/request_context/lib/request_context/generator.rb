@@ -67,6 +67,8 @@ module RequestContext
       # logged here to get as close to the beginning of the request being
       # processed as possible
       RequestContext::Generator.store_request_queue_time(env["HTTP_X_REQUEST_START"])
+      RequestContext::Generator.store_cloudfront_id(env["HTTP_X_AMZ_CF_ID"])
+      RequestContext::Generator.store_alb_trace_id(env["HTTP_X_AMZN_TRACE_ID"])
 
       status, headers, body = @app.call(env)
 
@@ -107,6 +109,14 @@ module RequestContext
         delta = (Time.now.utc.to_f * 1_000_000).to_i - match["req_start"].to_i
         RequestContext::Generator.add_meta_header("q", delta)
       end
+    end
+
+    def self.store_cloudfront_id(header_val)
+      add_meta_header("cfid", header_val) if header_val.present?
+    end
+
+    def self.store_alb_trace_id(header_val)
+      add_meta_header("tid", header_val) if header_val.present?
     end
 
     def self.store_request_meta(request, context, sentry_trace = nil)
