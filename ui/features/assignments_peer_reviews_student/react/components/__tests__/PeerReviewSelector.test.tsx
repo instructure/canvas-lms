@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {PeerReviewSelector} from '../PeerReviewSelector'
-import type {AssessmentRequest} from '../../hooks/useAssignmentQuery'
+import type {AssessmentRequest} from '../../AssignmentsPeerReviewsStudentTypes'
 
 describe('PeerReviewSelector', () => {
   const mockAssessmentRequests: AssessmentRequest[] = [

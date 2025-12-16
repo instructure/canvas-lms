@@ -3577,6 +3577,16 @@ describe AssignmentsController do
         get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
         expect(assigns[:js_env][:ASSIGNMENT_ID]).to eq(@assignment.id)
       end
+
+      it "sets EMOJIS_ENABLED in js_env based on feature flag" do
+        @course.enable_feature!(:submission_comment_emojis)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:js_env][:EMOJIS_ENABLED]).to be(true)
+
+        @course.disable_feature!(:submission_comment_emojis)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:js_env][:EMOJIS_ENABLED]).to be(false)
+      end
     end
 
     context "when user is a teacher" do

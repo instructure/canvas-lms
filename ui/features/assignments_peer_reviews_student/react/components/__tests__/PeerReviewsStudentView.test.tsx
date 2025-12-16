@@ -49,6 +49,11 @@ const buildDefaultProps = (
   overrides: Partial<PeerReviewsStudentViewProps> = {},
 ): PeerReviewsStudentViewProps => ({
   assignmentId: '1',
+  breakpoints: {
+    mobileOnly: false,
+    tablet: false,
+    desktop: true,
+  },
   ...overrides,
 })
 
@@ -513,7 +518,10 @@ describe('PeerReviewsStudentView', () => {
 
     rerender(
       <MockedQueryProvider>
-        <PeerReviewsStudentView assignmentId="13" />
+        <PeerReviewsStudentView
+          assignmentId="13"
+          breakpoints={{mobileOnly: false, tablet: false, desktop: true}}
+        />
       </MockedQueryProvider>,
     )
 
@@ -591,6 +599,76 @@ describe('PeerReviewsStudentView', () => {
 
       await waitFor(() => {
         expect(getByText('Description content')).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('Mobile view', () => {
+    it('renders mobile tab labels when mobileOnly is true', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '15',
+          name: 'Mobile Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByText} = setup({
+        assignmentId: '15',
+        breakpoints: {mobileOnly: true, tablet: false, desktop: false},
+      })
+
+      await waitFor(() => {
+        expect(getByText('Assignment')).toBeInTheDocument()
+      })
+
+      expect(getByText('Peer Review')).toBeInTheDocument()
+    })
+
+    it('renders desktop tab labels when mobileOnly is false', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '16',
+          name: 'Desktop Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByText} = setup({
+        assignmentId: '16',
+        breakpoints: {mobileOnly: false, tablet: false, desktop: true},
+      })
+
+      await waitFor(() => {
+        expect(getByText('Assignment Details')).toBeInTheDocument()
+      })
+
+      expect(getByText('Submission')).toBeInTheDocument()
+    })
+
+    it('renders divider on mobile', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '17',
+          name: 'Mobile Divider Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {container} = setup({
+        assignmentId: '17',
+        breakpoints: {mobileOnly: true, tablet: false, desktop: false},
+      })
+
+      await waitFor(() => {
+        const dividers = container.querySelectorAll('hr')
+        expect(dividers.length).toBeGreaterThan(0)
       })
     })
   })

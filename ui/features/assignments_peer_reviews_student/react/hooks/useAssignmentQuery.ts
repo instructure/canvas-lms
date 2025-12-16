@@ -19,29 +19,7 @@
 import {useQuery} from '@tanstack/react-query'
 import {executeQuery} from '@canvas/graphql'
 import {PEER_REVIEW_ASSIGNMENT_QUERY} from '../queries'
-import {Submission} from '../AssignmentsPeerReviewsStudentTypes'
-
-export interface AssessmentRequest {
-  _id: string
-  available: boolean | null
-  workflowState: string
-  createdAt: string
-  submission: Submission | null
-}
-
-export interface PeerReviews {
-  count: number | null
-}
-
-export interface Assignment {
-  _id: string
-  name: string
-  dueAt: string | null
-  description: string | null
-  courseId: string
-  peerReviews: PeerReviews | null
-  assessmentRequestsForCurrentUser: AssessmentRequest[] | null
-}
+import {Assignment} from '../AssignmentsPeerReviewsStudentTypes'
 
 interface AssignmentQueryData {
   assignment: Assignment

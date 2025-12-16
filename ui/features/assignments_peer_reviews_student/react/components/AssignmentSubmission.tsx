@@ -22,24 +22,46 @@ import ErrorShip from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {Submission} from '../AssignmentsPeerReviewsStudentTypes'
+import {Submission, Assignment} from '../AssignmentsPeerReviewsStudentTypes'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
+import CommentsTrayContentWithApollo from './CommentsTrayContentWithApollo'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {IconDiscussionLine} from '@instructure/ui-icons'
+import {Heading} from '@instructure/ui-heading'
+import {calculateMasqueradeHeight} from '@canvas/context-modules/differentiated-modules/utils/miscHelpers'
 
 const I18n = createI18nScope('peer_reviews_student')
 
 interface AssignmentSubmissionProps {
   submission: Submission
+  assignment: Assignment
+  isMobile?: boolean
 }
 
-const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({submission}) => {
+const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
+  submission,
+  assignment,
+  isMobile = false,
+}) => {
   const [viewMode, setViewMode] = useState<'paper' | 'plain_text'>('paper')
+  const [showComments, setShowComments] = useState(false)
+
+  const handleToggleComments = () => {
+    setShowComments(!showComments)
+  }
 
   const renderTextEntry = () => {
     const submissionClass = `user_content ${viewMode}`
 
     return (
-      <View as="div" background="secondary" padding="small">
+      <View
+        as="div"
+        height="100%"
+        background="secondary"
+        padding="small"
+        overflowY={isMobile ? 'auto' : 'hidden'}
+      >
         <Flex as="div" textAlign="end" margin="0 0 small 0">
           <SimpleSelect
             renderLabel=""
@@ -60,7 +82,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({submission})
           className={submissionClass}
           data-testid="text-entry-content"
           role="document"
-          style={{maxHeight: '45vh', overflow: 'auto'}}
+          style={{maxHeight: isMobile ? undefined : '43vh', overflow: 'auto'}}
           dangerouslySetInnerHTML={{
             __html: apiUserContent.convert(submission.body || ''),
           }}
@@ -69,19 +91,120 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({submission})
     )
   }
 
-  switch (submission.submissionType) {
-    case 'online_text_entry':
-      return renderTextEntry()
-    default:
-      return (
-        <GenericErrorPage
-          imageUrl={ErrorShip}
-          errorSubject={I18n.t('Submission type error')}
-          errorCategory={I18n.t('Student Peer Review Submission Error Page.')}
-          errorMessage={I18n.t('Submission type not yet supported.')}
-        />
-      )
+  const renderSubmissionType = () => {
+    switch (submission.submissionType) {
+      case 'online_text_entry':
+        return renderTextEntry()
+      default:
+        return (
+          <GenericErrorPage
+            imageUrl={ErrorShip}
+            errorSubject={I18n.t('Submission type error')}
+            errorCategory={I18n.t('Student Peer Review Submission Error Page.')}
+            errorMessage={I18n.t('Submission type not yet supported.')}
+          />
+        )
+    }
   }
+
+  return (
+    <View
+      as="div"
+      minHeight="calc(720px - 10.75rem)"
+      height="calc(100vh - 22rem)"
+      overflowY="hidden"
+    >
+      <Flex as="div" height="100%" alignItems="start">
+        <Flex.Item as="div" height="100%" shouldGrow>
+          {renderSubmissionType()}
+        </Flex.Item>
+        {showComments && (
+          <Flex.Item
+            as="div"
+            direction="column"
+            size="327px"
+            height="100%"
+            padding="small"
+            overflowY="auto"
+          >
+            <Flex as="div" direction="column" justifyItems="space-between" height="100%">
+              <Flex.Item>
+                <Flex as="div" direction="row" justifyItems="space-between">
+                  <Flex.Item>
+                    <Heading variant="titleModule" level="h2">
+                      {I18n.t('Peer Comments')}
+                    </Heading>
+                  </Flex.Item>
+                  <Flex.Item>
+                    <CloseButton
+                      screenReaderLabel={I18n.t('Close Peer Comments')}
+                      size="small"
+                      onClick={() => setShowComments(false)}
+                      data-testid="close-comments-button"
+                    />
+                  </Flex.Item>
+                </Flex>
+              </Flex.Item>
+              <Flex.Item>
+                <CommentsTrayContentWithApollo
+                  submission={submission}
+                  assignment={assignment}
+                  isPeerReviewEnabled={true}
+                  renderTray={isMobile}
+                  closeTray={() => setShowComments(false)}
+                  open={showComments}
+                />
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+        )}
+      </Flex>
+      <footer
+        style={{
+          position: 'fixed',
+          right: 0,
+          left: isMobile ? '0px' : '275px',
+          bottom: `${calculateMasqueradeHeight()}px`,
+          padding: isMobile ? '0px' : '0px 24px 8px 0px',
+          zIndex: '999',
+        }}
+        data-testid="peer-review-footer"
+      >
+        <View
+          as="div"
+          borderWidth="small 0 0 0"
+          borderColor="primary"
+          padding="small"
+          background="primary"
+        >
+          <Flex
+            direction={isMobile ? 'column' : 'row'}
+            justifyItems={isMobile ? 'start' : 'space-between'}
+          >
+            <Flex.Item margin={isMobile ? '0 0 small 0' : '0'}>
+              <Button
+                renderIcon={<IconDiscussionLine />}
+                onClick={handleToggleComments}
+                data-testid="toggle-comments-button"
+                size={isMobile ? 'small' : 'medium'}
+              >
+                {showComments ? I18n.t('Hide Comments') : I18n.t('Show Comments')}
+              </Button>
+            </Flex.Item>
+            <Flex.Item>
+              <Button
+                color="primary"
+                data-testid="submit-peer-review-button"
+                size={isMobile ? 'small' : 'medium'}
+              >
+                {I18n.t('Submit Peer Review')}
+              </Button>
+            </Flex.Item>
+          </Flex>
+        </View>
+      </footer>
+    </View>
+  )
 }
 
 export default AssignmentSubmission

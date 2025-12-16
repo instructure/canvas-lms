@@ -25,6 +25,9 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
       name
       dueAt
       description
+      expectsSubmission
+      nonDigitalSubmission
+      pointsPossible
       courseId
       peerReviews {
         count
@@ -40,6 +43,9 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
           body
           submissionType
         }
+      }
+      rubric {
+        _id
       }
     }
   }

@@ -161,4 +161,113 @@ describe "peer review student landing page" do
       expect(f("body")).to include_text("Completed Peer Reviews")
     end
   end
+
+  context "comments tray integration" do
+    before do
+      @assignment.assign_peer_review(@student1, @student2)
+    end
+
+    it "shows toggle comments button in submission view", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      expect(toggle_button).to be_displayed
+      expect(toggle_button.text).to include("Show Comments")
+    end
+
+    it "opens comments tray when toggle button is clicked", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      expect(f("h2")).to include_text("Peer Comments")
+      expect(toggle_button.text).to include("Hide Comments")
+    end
+
+    it "closes comments tray when toggle button is clicked again", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      expect(f("h2")).to include_text("Peer Comments")
+
+      toggle_button.click
+      wait_for_ajaximations
+
+      expect(toggle_button.text).to include("Show Comments")
+      expect(f("div[id='submission']")).not_to contain_css("div[data-testid='comments-container']")
+    end
+
+    it "allows user to submit a comment", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("This is a peer review comment")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      expect(f("body")).to include_text("This is a peer review comment")
+    end
+
+    it "displays submit peer review button", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      expect(submit_button).to be_displayed
+      expect(submit_button.text).to include("Submit Peer Review")
+    end
+
+    it "maintains comments tray state when switching between peer reviews", custom_timeout: 30 do
+      @assignment.assign_peer_review(@student1, @student3)
+
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      expect(f("h2")).to include_text("Peer Comments")
+
+      selector = f("input[data-testid='peer-review-selector']")
+      click_INSTUI_Select_option(selector, "Peer Review (2 of 2)")
+      wait_for_ajaximations
+
+      expect(toggle_button.text).to include("Hide Comments")
+    end
+  end
 end

@@ -40,7 +40,7 @@ const CommentsTrayBody = lazy(() => {
   )
 })
 
-function TrayContent({
+export function TrayContent({
   assignment,
   submission,
   reviewerSubmission,
