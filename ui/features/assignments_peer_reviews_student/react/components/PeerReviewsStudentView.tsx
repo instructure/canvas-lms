@@ -29,19 +29,32 @@ import {useAssignmentQuery} from '../hooks/useAssignmentQuery'
 import {useAllocatePeerReviews} from '../hooks/useAllocatePeerReviews'
 import {PeerReviewSelector} from './PeerReviewSelector'
 import AssignmentSubmission from './AssignmentSubmission'
+import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints/src'
+import theme from '@instructure/canvas-theme'
 
 const I18n = createI18nScope('peer_reviews_student')
 
-interface PeerReviewsStudentViewProps {
+export interface PeerReviewsStudentViewProps {
   assignmentId: string
+  breakpoints: Breakpoints
 }
 
-const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignmentId}) => {
+const Divider = () => (
+  <View as="div" margin="medium none">
+    <hr style={{border: 'none', borderBottom: `1px solid ${theme.colors.contrasts.grey1214}`}} />
+  </View>
+)
+
+const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
+  assignmentId,
+  breakpoints,
+}) => {
   const [selectedTab, setSelectedTab] = useState<'details' | 'submission'>('details')
   const [selectedAssessmentIndex, setSelectedAssessmentIndex] = useState(0)
   const [hasCalledAllocate, setHasCalledAllocate] = useState(false)
   const {data, isLoading, isError} = useAssignmentQuery(assignmentId)
   const {mutate: allocatePeerReviews} = useAllocatePeerReviews()
+  const isMobile = breakpoints.mobileOnly
 
   useEffect(() => {
     if (data?.assignment && !hasCalledAllocate) {
@@ -78,72 +91,81 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignme
   const {assessmentRequestsForCurrentUser, name, dueAt, description} = data.assignment
 
   return (
-    <View as="div" padding="medium">
-      <Flex justifyItems="space-between" margin="0 0 medium 0">
-        <Flex.Item shouldGrow={true}>
-          <Flex direction="column">
-            <Flex.Item>
-              <Text size="x-large" wrap="break-word" data-testid="title" weight="light">
-                {I18n.t('%{name} Peer Review', {name: name})}
-              </Text>
-            </Flex.Item>
-            {dueAt && (
+    <>
+      <View as="div">
+        <Flex justifyItems="space-between" margin="0 0 medium 0">
+          <Flex.Item shouldGrow={true}>
+            <Flex direction="column">
               <Flex.Item>
-                <Text size="medium" weight="bold">
-                  <FriendlyDatetime
-                    data-testid="due-date"
-                    prefix={I18n.t('Due:')}
-                    format={I18n.t('#date.formats.full_with_weekday')}
-                    dateTime={dueAt}
-                  />
+                <Text
+                  size="x-large"
+                  wrap="break-word"
+                  data-testid="title"
+                  weight={isMobile ? 'normal' : 'light'}
+                >
+                  {I18n.t('%{name} Peer Review', {name: name})}
                 </Text>
               </Flex.Item>
-            )}
-          </Flex>
-        </Flex.Item>
-      </Flex>
-      {data.assignment && (
-        <View as="div" margin="0 0 medium 0">
-          <PeerReviewSelector
-            key={`${assessmentRequestsForCurrentUser?.length || 0}-peer-reviews`}
-            assessmentRequests={assessmentRequestsForCurrentUser || []}
-            selectedIndex={selectedAssessmentIndex}
-            onSelectionChange={setSelectedAssessmentIndex}
-          />
-        </View>
-      )}
-      <Tabs
-        margin="medium 0"
-        onRequestTabChange={(_event, {index}) => {
-          setSelectedTab(index === 0 ? 'details' : 'submission')
-        }}
-      >
-        <Tabs.Panel
-          id="assignment-details"
-          renderTitle={I18n.t('Assignment Details')}
-          isSelected={selectedTab === 'details'}
-        >
-          <View as="div" padding="medium 0">
-            <AssignmentDescription description={description ?? undefined} />
+              {dueAt && (
+                <Flex.Item>
+                  <Text size="medium" weight="bold">
+                    <FriendlyDatetime
+                      data-testid="due-date"
+                      prefix={I18n.t('Due:')}
+                      format={I18n.t('#date.formats.full_with_weekday')}
+                      dateTime={dueAt}
+                    />
+                  </Text>
+                </Flex.Item>
+              )}
+            </Flex>
+          </Flex.Item>
+        </Flex>
+        {isMobile && <Divider />}
+        {data.assignment && (
+          <View as="div" margin="0 0 medium 0">
+            <PeerReviewSelector
+              key={`${assessmentRequestsForCurrentUser?.length || 0}-peer-reviews`}
+              assessmentRequests={assessmentRequestsForCurrentUser || []}
+              selectedIndex={selectedAssessmentIndex}
+              onSelectionChange={setSelectedAssessmentIndex}
+            />
           </View>
-        </Tabs.Panel>
-        <Tabs.Panel
-          id="submission"
-          renderTitle={I18n.t('Submission')}
-          isSelected={selectedTab === 'submission'}
+        )}
+        <Tabs
+          margin="medium 0"
+          onRequestTabChange={(_event, {index}) => {
+            setSelectedTab(index === 0 ? 'details' : 'submission')
+          }}
         >
-          {assessmentRequestsForCurrentUser &&
-            assessmentRequestsForCurrentUser[selectedAssessmentIndex]?.submission && (
-              <View as="div">
+          <Tabs.Panel
+            id="assignment-details"
+            renderTitle={isMobile ? I18n.t('Assignment') : I18n.t('Assignment Details')}
+            isSelected={selectedTab === 'details'}
+          >
+            <View as="div" padding="medium 0">
+              <AssignmentDescription description={description ?? undefined} />
+            </View>
+          </Tabs.Panel>
+          <Tabs.Panel
+            id="submission"
+            renderTitle={isMobile ? I18n.t('Peer Review') : I18n.t('Submission')}
+            isSelected={selectedTab === 'submission'}
+            padding="0"
+          >
+            {assessmentRequestsForCurrentUser &&
+              assessmentRequestsForCurrentUser[selectedAssessmentIndex]?.submission && (
                 <AssignmentSubmission
                   submission={assessmentRequestsForCurrentUser[selectedAssessmentIndex].submission}
+                  assignment={data.assignment}
+                  isMobile={isMobile}
                 />
-              </View>
-            )}
-        </Tabs.Panel>
-      </Tabs>
-    </View>
+              )}
+          </Tabs.Panel>
+        </Tabs>
+      </View>
+    </>
   )
 }
 
-export default PeerReviewsStudentView
+export default WithBreakpoints(PeerReviewsStudentView)

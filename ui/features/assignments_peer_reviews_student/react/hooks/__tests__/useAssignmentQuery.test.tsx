@@ -56,6 +56,9 @@ describe('useAssignmentQuery', () => {
         name: 'Peer Review Assignment',
         dueAt: '2025-12-31T23:59:59Z',
         description: '<p>Assignment description</p>',
+        expectsSubmission: true,
+        nonDigitalSubmission: false,
+        pointsPossible: 10,
         courseId: '100',
         peerReviews: {
           count: 2,
@@ -74,6 +77,7 @@ describe('useAssignmentQuery', () => {
             createdAt: '2025-11-02T00:00:00Z',
           },
         ],
+        rubric: null,
       },
     })
 
@@ -93,6 +97,9 @@ describe('useAssignmentQuery', () => {
       name: 'Peer Review Assignment',
       dueAt: '2025-12-31T23:59:59Z',
       description: '<p>Assignment description</p>',
+      expectsSubmission: true,
+      nonDigitalSubmission: false,
+      pointsPossible: 10,
       courseId: '100',
       peerReviews: {
         count: 2,
@@ -111,6 +118,7 @@ describe('useAssignmentQuery', () => {
           createdAt: '2025-11-02T00:00:00Z',
         },
       ],
+      rubric: null,
     })
     expect(result.current.isError).toBe(false)
   })
@@ -122,11 +130,15 @@ describe('useAssignmentQuery', () => {
         name: 'Assignment Without Due Date',
         dueAt: null,
         description: '<p>Description here</p>',
+        expectsSubmission: true,
+        nonDigitalSubmission: false,
+        pointsPossible: 5,
         courseId: '100',
         peerReviews: {
           count: 1,
         },
         assessmentRequestsForCurrentUser: [],
+        rubric: null,
       },
     })
 
@@ -149,11 +161,15 @@ describe('useAssignmentQuery', () => {
         name: 'Assignment Without Description',
         dueAt: '2025-12-31T23:59:59Z',
         description: null,
+        expectsSubmission: true,
+        nonDigitalSubmission: false,
+        pointsPossible: 20,
         courseId: '100',
         peerReviews: {
           count: 3,
         },
         assessmentRequestsForCurrentUser: null,
+        rubric: null,
       },
     })
 
@@ -190,11 +206,15 @@ describe('useAssignmentQuery', () => {
         name: 'Test Assignment',
         dueAt: null,
         description: null,
+        expectsSubmission: true,
+        nonDigitalSubmission: false,
+        pointsPossible: 10,
         courseId: '100',
         peerReviews: {
           count: 2,
         },
         assessmentRequestsForCurrentUser: [],
+        rubric: null,
       },
     })
 
@@ -217,6 +237,11 @@ describe('useAssignmentQuery', () => {
           name: 'Assignment With Text Submission',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          expectsSubmission: true,
+          nonDigitalSubmission: false,
+          pointsPossible: 15,
+          courseId: '100',
+          peerReviews: {count: 2},
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -231,6 +256,7 @@ describe('useAssignmentQuery', () => {
               },
             },
           ],
+          rubric: null,
         },
       })
 
@@ -257,6 +283,11 @@ describe('useAssignmentQuery', () => {
           name: 'Multiple Peer Reviews',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          expectsSubmission: true,
+          nonDigitalSubmission: false,
+          pointsPossible: 25,
+          courseId: '100',
+          peerReviews: {count: 2},
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -283,6 +314,7 @@ describe('useAssignmentQuery', () => {
               },
             },
           ],
+          rubric: null,
         },
       })
 

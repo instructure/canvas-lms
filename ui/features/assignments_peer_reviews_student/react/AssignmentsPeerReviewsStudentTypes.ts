@@ -22,3 +22,35 @@ export interface Submission {
   body?: string | null
   submissionType: string
 }
+
+export interface Assignment {
+  _id: string
+  name: string
+  dueAt: string | null
+  description: string | null
+  expectsSubmission: boolean
+  nonDigitalSubmission: boolean
+  pointsPossible: number
+  courseId: string
+  peerReviews: PeerReviews | null
+  assessmentRequestsForCurrentUser: AssessmentRequest[] | null
+  env?: {
+    currentUser?: {
+      avatar_image_url?: string
+      display_name?: string
+    }
+    courseId?: string
+  }
+}
+
+export interface AssessmentRequest {
+  _id: string
+  available: boolean | null
+  workflowState: string
+  createdAt: string
+  submission: Submission | null
+}
+
+interface PeerReviews {
+  count: number | null
+}
