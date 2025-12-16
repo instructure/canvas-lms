@@ -119,6 +119,7 @@ class RequestThrottle
 
   def allowed?(request, bucket)
     if approved?(request)
+      Rails.logger.info("approved request, skipping throttling, client id: #{client_identifiers(request).inspect} ip: #{request.remote_ip}")
       true
     elsif blocked?(request)
       # blocking is useful even if throttling is disabled, this is left in intentionally
