@@ -62,3 +62,27 @@ federated_pseudonym_attributes:
       state: allowed
     ci:
       state: allowed
+saml_count_one_time_use_usage:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Count SAML OneTimeUse Condition Usage
+  description: Send metrics to DataDog on OneTimeUse condition usage in SAML assertions.
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
+saml_enforce_one_time_use:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Enforce SAML OneTimeUse Condition
+  description: Enforce the OneTimeUse condition in SAML assertions to prevent replay attacks. You can check if any violations have been seen on the authentication providers page.
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
