@@ -227,6 +227,6 @@ class RateLimitingSettingsController < ApplicationController
     high_water_mark = params[:throttle_high_water_mark]
     return unless high_water_mark.present? && !params.key?(:throttle_maximum)
 
-    params[:throttle_maximum] = [high_water_mark.to_i - 200, 0].max
+    params[:throttle_maximum] = [high_water_mark.to_i + 200, 0].max
   end
 end

@@ -412,7 +412,7 @@ describe RateLimitingSettingsController do
       # Verify the automatic throttle_maximum calculation
       created_config = OAuthClientConfig.find(json["id"])
       expect(created_config.throttle_high_water_mark).to eq(500)
-      expect(created_config.throttle_maximum).to eq(300) # 500 - 200
+      expect(created_config.throttle_maximum).to eq(700) # 500 + 200
     end
 
     it "returns validation errors for invalid data" do
@@ -459,7 +459,7 @@ describe RateLimitingSettingsController do
       expect(response).to have_http_status(:ok)
       oauth_client_config.reload
       expect(oauth_client_config.throttle_high_water_mark).to eq(2000)
-      expect(oauth_client_config.throttle_maximum).to eq(1800) # 2000 - 200
+      expect(oauth_client_config.throttle_maximum).to eq(2200) # 2000 + 200
       expect(oauth_client_config.comment).to eq("Updated comment")
     end
 
