@@ -43,7 +43,6 @@ import {EnvPortfolio} from './EnvPortfolio'
 import {EnvProfiles} from './EnvProfiles'
 import {EnvRce} from './EnvRce'
 import {EnvReleaseNotes} from './EnvReleaseNotes'
-import {EnvSmartSearch} from './EnvSmartSearch'
 import {EnvUserMerge} from './EnvUserMerge'
 import {EnvWikiPages} from './EnvWikiPages'
 import {EnvAuthentication} from './EnvAuthentication'
@@ -89,7 +88,6 @@ export type GlobalEnv =
         EnvPortfolio &
         EnvUserMerge &
         EnvLtiRegistrations &
-        EnvSmartSearch &
         EnvHorizon &
         EnvAuthentication &
         EnvWidgetDashboard &
