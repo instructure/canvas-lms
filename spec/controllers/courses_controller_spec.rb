@@ -5352,6 +5352,26 @@ describe CoursesController do
     end
   end
 
+  describe "#re_send_invitations" do
+    before :once do
+      @notification = Notification.create!(name: "Enrollment Invitation")
+      course_factory(active_all: true)
+      @user1 = user_with_pseudonym(active_all: true)
+      @course.enroll_student(@user1)
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "only creates one job per course at a time" do
+      post "re_send_invitations", params: { course_id: @course.id }
+      post "re_send_invitations", params: { course_id: @course.id }
+
+      expect(Delayed::Job.where(tag: "Course#re_send_invitations!").count).to eq 1
+    end
+  end
+
   context "accept_enrollment" do
     before do
       allow(RequestCache).to receive(:clear).and_call_original
