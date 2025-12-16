@@ -18,8 +18,7 @@
 
 import {Portal} from '@instructure/ui-portal'
 import {useParams} from 'react-router-dom'
-import SearchApp from './SearchApp'
-import EnhancedSmartSearch from './enhanced_ui/EnhancedSmartSearch'
+import SmartSearch from './SmartSearch'
 import {useEffect} from 'react'
 import CanvasAiInformation from '@canvas/instui-bindings/react/AiInformation'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -84,16 +83,9 @@ export function Component(): JSX.Element | null {
     return null
   }
 
-  if (ENV.enhanced_ui_enabled) {
-    return (
-      <Portal open={true} mountNode={mountPoint}>
-        <EnhancedSmartSearch courseId={courseId ?? ''} />
-      </Portal>
-    )
-  }
   return (
     <Portal open={true} mountNode={mountPoint}>
-      <SearchApp courseId={courseId} />
+      <SmartSearch courseId={courseId ?? ''} />
     </Portal>
   )
 }

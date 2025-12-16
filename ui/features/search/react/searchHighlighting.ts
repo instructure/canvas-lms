@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import stopwords from '../stopwords'
+import stopwords from './stopwords'
 
 const MAX_NUMBER_OF_SEGMENTS = 2
 const SEGMENT_LENGTH = 24

@@ -43,31 +43,18 @@ describe "smart search" do
     Account.default.enable_feature!(:smart_search)
   end
 
-  # Remove this when we sunset the old UI + remove FF
-  [:enhanced, :normal].each do |view_type|
-    describe "#{view_type}:" do
-      before :once do
-        if view_type == :enhanced
-          Account.default.enable_feature!(:smart_search_enhanced_ui)
-        else
-          Account.default.disable_feature!(:smart_search_enhanced_ui)
-        end
-      end
+  it "renders smart search page" do
+    get "/courses/#{@course.id}/search"
 
-      it "renders smart search page" do
-        get "/courses/#{@course.id}/search"
+    expect(f("[data-testid='smart-search-heading']")).to be_present
+    expect(f("[data-testid='search-input']")).to be_present
+  end
 
-        expect(f("[data-testid='smart-search-heading']")).to be_present
-        expect(f("[data-testid='search-input']")).to be_present
-      end
+  it "renders indexing" do
+    # we can't reasonably test result searching without mocking embeddings/waiting for indexing
+    # so just check that the indexing progress is there
+    get "/courses/#{@course.id}/search"
 
-      it "renders indexing" do
-        # we can't reasonably test result searching without mocking embeddings/waiting for indexing
-        # so just check that the indexing progress is there
-        get "/courses/#{@course.id}/search"
-
-        expect(f("[data-testid='indexing_progress']")).to be_present
-      end
-    end
+    expect(f("[data-testid='indexing_progress']")).to be_present
   end
 end

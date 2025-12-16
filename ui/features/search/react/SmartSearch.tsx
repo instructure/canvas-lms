@@ -18,13 +18,13 @@
 
 import {useRef, useState} from 'react'
 import SmartSearchHeader from './SmartSearchHeader'
-import type {IndexProgress, Result} from '../types'
+import type {IndexProgress, Result} from './types'
 import BestResults from './BestResults'
 import SimilarResults from './SimilarResults'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import IndexingProgress from '../IndexingProgress'
+import IndexingProgress from './IndexingProgress'
 import {Alert} from '@instructure/ui-alerts'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 
@@ -37,7 +37,7 @@ interface Props {
   courseId: string
 }
 
-export default function EnhancedSmartSearch(props: Props) {
+export default function SmartSearch(props: Props) {
   const previousSearch = useRef('')
   const searchInput = useRef<HTMLInputElement | null>(null)
   const [searchResults, setSearchResults] = useState<Result[]>([])
@@ -66,7 +66,7 @@ export default function EnhancedSmartSearch(props: Props) {
         </Alert>
       )
     } else if (indexingProgress !== null) {
-      return <IndexingProgress progress={indexingProgress?.progress} isEnhanced={true} />
+      return <IndexingProgress progress={indexingProgress?.progress} />
     } else if (previousSearch.current === '' && searchResults.length === 0) {
       // no search has been performed yet
       return null

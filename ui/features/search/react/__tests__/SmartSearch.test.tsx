@@ -17,7 +17,7 @@
  */
 
 import {fireEvent, render, waitFor, within} from '@testing-library/react'
-import EnhancedSmartSearch from '../EnhancedSmartSearch'
+import SmartSearch from '../SmartSearch'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
@@ -84,12 +84,12 @@ const SEARCH_URL = encodeURI(
   `/api/v1/courses/${props.courseId}/smartsearch?q=${SEARCH_TERM}&per_page=25&include[]=modules&include[]=status`,
 )
 
-describe('EnhancedSmartSearch', () => {
+describe('SmartSearch', () => {
   const renderSearch = (overrides = {}) => {
     return render(
       <BrowserRouter basename="">
         <Routes>
-          <Route path="/" element={<EnhancedSmartSearch {...props} {...overrides} />} />
+          <Route path="/" element={<SmartSearch {...props} {...overrides} />} />
         </Routes>
       </BrowserRouter>,
     )

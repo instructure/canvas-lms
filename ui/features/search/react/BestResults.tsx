@@ -17,7 +17,7 @@
  */
 
 import {Heading} from '@instructure/ui-heading'
-import type {Result} from '../types'
+import type {Result} from './types'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'

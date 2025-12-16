@@ -29,7 +29,7 @@ import {
   IconCalendarMonthLine,
   IconUnpublishedLine,
 } from '@instructure/ui-icons'
-import type {Module, Result} from '../types'
+import type {Module, Result} from './types'
 import {htmlEscape} from '@instructure/html-escape'
 import {Pill} from '@instructure/ui-pill'
 import {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
