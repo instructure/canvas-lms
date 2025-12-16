@@ -179,6 +179,36 @@ describe('DeveloperKeys App', () => {
         ).toBeInTheDocument()
       })
     })
+
+    describe('when account setting is set', () => {
+      beforeEach(() => {
+        fakeENV.setup({showApiGetWithBodyNotice: true})
+      })
+
+      it('shows get body alert', () => {
+        setup([])
+        expect(
+          getByText('API GET requests with a body instead of query parameters will be blocked', {
+            exact: false,
+          }),
+        ).toBeInTheDocument()
+      })
+    })
+
+    describe('when account setting is not set', () => {
+      beforeEach(() => {
+        fakeENV.setup({showApiGetWithBodyNotice: false})
+      })
+
+      it('does not show get body alert', () => {
+        setup([])
+        expect(
+          queryByText('API GET requests with a body instead of query parameters will be blocked', {
+            exact: false,
+          }),
+        ).not.toBeInTheDocument()
+      })
+    })
   })
 
   describe('inherited tab', () => {
