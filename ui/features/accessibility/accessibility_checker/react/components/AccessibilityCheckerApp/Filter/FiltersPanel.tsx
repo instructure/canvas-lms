@@ -245,7 +245,9 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                           messages={[
                             {
                               type: 'hint',
-                              text: I18n.t('Expected format: %{format}', {format: dateFormatHint}),
+                              text: I18n.t('Expected format: %{date_format}', {
+                                date_format: dateFormatHint,
+                              }),
                             },
                           ]}
                           width="100%"
@@ -265,7 +267,9 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                           messages={[
                             {
                               type: 'hint',
-                              text: I18n.t('Expected format: %{format}', {format: dateFormatHint}),
+                              text: I18n.t('Expected format: %{date_format}', {
+                                date_format: dateFormatHint,
+                              }),
                             },
                           ]}
                           width="100%"
