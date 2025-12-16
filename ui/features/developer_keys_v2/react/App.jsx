@@ -168,10 +168,27 @@ class DeveloperKeysApp extends React.Component {
       {
         text: [
           I18n.t(
+            `API GET requests with a body instead of query parameters will be blocked in Production in the February release, as part of fronting Canvas with a CDN. These requests are already blocked in Beta and Test.`,
+          ),
+          I18n.t(
+            `You are being notified because this Canvas instance has recently received requests which would be blocked. You can read more in the *API Changelog* and learn how to mitigate this change in the blog post linked there.`,
+            {
+              wrappers: [
+                `<a data-pendo='api-cdn-change-log' target='_blank' href='https://community.instructure.com/en/discussion/626858/2025-api-and-cli-change-log/p1' style='text-decoration: underline'>$1</a>`,
+              ],
+            },
+          ),
+        ],
+        type: 'warning',
+        shouldShow: ENV.showApiGetWithBodyNotice,
+      },
+      {
+        text: [
+          I18n.t(
             `API requests now require the User-Agent header to be set. These requests are now blocked in Beta, and enforcement in Test and Production is coming soon - please see the *API Change Log* for dates. `,
             {
               wrappers: [
-                `<a data-pendo='dev-key-change-log' target='_blank' href='https://community.canvaslms.com/t5/Canvas-Change-Log/2025-API-and-CLI-Change-Log/ta-p/626858' style='text-decoration: underline'>$1</a>`,
+                `<a data-pendo='dev-key-change-log' target='_blank' href='https://community.instructure.com/en/discussion/626858/2025-api-and-cli-change-log/p1' style='text-decoration: underline'>$1</a>`,
               ],
             },
           ),

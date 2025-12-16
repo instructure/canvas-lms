@@ -217,6 +217,7 @@ class DeveloperKeysController < ApplicationController
         js_env(
           accountEndpoint: api_v1_account_developer_keys_path(@context),
           enableTestClusterChecks: DeveloperKey.test_cluster_checks_enabled?,
+          showApiGetWithBodyNotice: !!@domain_root_account.settings[:show_api_get_with_body_notice],
           validLtiScopes:
             TokenScopes.public_lti_scopes_hash_for_account(@domain_root_account)
         )
