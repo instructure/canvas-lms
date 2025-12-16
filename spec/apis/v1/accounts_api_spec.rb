@@ -2536,6 +2536,44 @@ describe "Accounts API", type: :request do
                           blueprint_associated: false })
         expect(json.pluck("name")).to match_array %w[MasterCourse OtherCourse]
       end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "filters blueprint courses correctly across shards" do
+          admin_user = account_admin_user
+
+          @shard1.activate do
+            @cross_shard_account = Account.create!
+            @cross_shard_account.account_users.create!(user: admin_user)
+            master_course = course_model(name: "CrossShardMaster", account: @cross_shard_account)
+            child_course = course_model(name: "CrossShardChild", account: @cross_shard_account)
+            course_model(name: "CrossShardOther", account: @cross_shard_account)
+            template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
+            template.add_child_course!(child_course)
+          end
+
+          json = api_call_as_user(admin_user,
+                                  :get,
+                                  "/api/v1/accounts/#{@cross_shard_account.global_id}/courses?blueprint=false",
+                                  { controller: "accounts",
+                                    action: "courses_api",
+                                    account_id: @cross_shard_account.global_id.to_s,
+                                    format: "json",
+                                    blueprint: false })
+          expect(json.pluck("name")).to match_array %w[CrossShardChild CrossShardOther]
+
+          json = api_call_as_user(admin_user,
+                                  :get,
+                                  "/api/v1/accounts/#{@cross_shard_account.global_id}/courses?blueprint=true",
+                                  { controller: "accounts",
+                                    action: "courses_api",
+                                    account_id: @cross_shard_account.global_id.to_s,
+                                    format: "json",
+                                    blueprint: true })
+          expect(json.pluck("name")).to match_array %w[CrossShardMaster]
+        end
+      end
     end
 
     context "public courses" do

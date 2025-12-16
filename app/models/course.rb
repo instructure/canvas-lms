@@ -1122,10 +1122,10 @@ class Course < ActiveRecord::Base
   scope :archived, -> { deleted.where.not(archived_at: nil) }
 
   scope :master_courses, -> { joins(:master_course_templates).where.not(MasterCourses::MasterTemplate.table_name => { workflow_state: "deleted" }) }
-  scope :not_master_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::MasterTemplate.quoted_table_name} AS mct ON mct.course_id=courses.id AND mct.workflow_state<>'deleted'").where("mct IS NULL") } # rubocop:disable Rails/WhereEquals -- mct is a table, not a column
+  scope :not_master_courses, -> { left_joins(:master_course_templates).where("master_courses_master_templates.id IS NULL OR master_courses_master_templates.workflow_state = 'deleted'") }
 
   scope :associated_courses, -> { joins(:master_course_subscriptions).where.not(MasterCourses::ChildSubscription.table_name => { workflow_state: "deleted" }) }
-  scope :not_associated_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'").where("mcs IS NULL") } # rubocop:disable Rails/WhereEquals -- mcs is a table, not a column
+  scope :not_associated_courses, -> { left_joins(:master_course_subscriptions).where("master_courses_child_subscriptions.id IS NULL OR master_courses_child_subscriptions.workflow_state = 'deleted'") }
 
   scope :public_courses, -> { where(is_public: true) }
   scope :not_public_courses, -> { where(is_public: false) }
