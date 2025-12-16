@@ -1661,4 +1661,185 @@ describe SubmissionsController do
       end
     end
   end
+
+  describe "PUT update with student_entered_score" do
+    before(:once) do
+      @course = course_factory(active_all: true)
+      @teacher = teacher_in_course(course: @course, active_all: true).user
+      @student = student_in_course(course: @course, active_all: true).user
+    end
+
+    context "with regular assignment" do
+      before(:once) do
+        @assignment = @course.assignments.create!(title: "Regular Assignment", points_possible: 10)
+        @submission = @assignment.grade_student(@student, grade: "5", grader: @teacher).first
+      end
+
+      before { user_session(@student) }
+
+      it "updates student_entered_score for regular assignment" do
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @assignment.id,
+              id: @student.id,
+              submission: { student_entered_score: 8 }
+            },
+            format: :json
+        expect(response).to have_http_status(:ok)
+        expect(@submission.reload.student_entered_score).to eq(8.0)
+      end
+
+      it "clears student_entered_score when set to null" do
+        @submission.update!(student_entered_score: 7)
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @assignment.id,
+              id: @student.id,
+              submission: { student_entered_score: nil }
+            },
+            format: :json
+        expect(response).to have_http_status(:ok)
+        expect(@submission.reload.student_entered_score).to be_nil
+      end
+
+      it "does not allow updating deleted assignments" do
+        @assignment.destroy
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @assignment.id,
+              id: @student.id,
+              submission: { comment: "test comment" }
+            },
+            format: :json
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "with peer review sub assignment" do
+      before(:once) do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @parent_assignment = @course.assignments.create!(
+          title: "Assignment with Peer Review",
+          points_possible: 10,
+          peer_reviews: true,
+          peer_reviews_due_at: 1.day.from_now
+        )
+        @peer_review = PeerReviewSubAssignment.create!(
+          parent_assignment: @parent_assignment,
+          points_possible: 5
+        )
+        @reviewer = student_in_course(course: @course, active_all: true).user
+        @assessment_request = AssessmentRequest.create!(
+          user: @student,
+          asset: @parent_assignment.find_or_create_submission(@student),
+          assessor: @reviewer,
+          assessor_asset: @peer_review.find_or_create_submission(@reviewer),
+          peer_review_sub_assignment: @peer_review
+        )
+        @peer_review_submission = @peer_review.grade_student(@reviewer, grade: "3", grader: @teacher).first
+      end
+
+      before { user_session(@reviewer) }
+
+      it "allows finding peer review assignment in update action" do
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @peer_review.id,
+              id: @reviewer.id,
+              submission: { comment: "peer review comment" }
+            },
+            format: :json
+        expect(response).to have_http_status(:created)
+        expect(@peer_review_submission.reload.submission_comments.length).to be 1
+        expect(@peer_review_submission.submission_comments.first.comment).to eq("peer review comment")
+      end
+
+      it "does not allow updating deleted peer review assignments" do
+        @peer_review.destroy
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @peer_review.id,
+              id: @reviewer.id,
+              submission: { comment: "peer review comment" }
+            },
+            format: :json
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "updates student_entered_score for peer review sub assignment" do
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @peer_review.id,
+              id: @reviewer.id,
+              submission: { student_entered_score: 4 }
+            },
+            format: :json
+        expect(response).to have_http_status(:ok)
+        expect(@peer_review_submission.reload.student_entered_score).to eq(4.0)
+      end
+
+      it "clears student_entered_score for peer review when set to null" do
+        @peer_review_submission.update!(student_entered_score: 2)
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @peer_review.id,
+              id: @reviewer.id,
+              submission: { student_entered_score: nil }
+            },
+            format: :json
+        expect(response).to have_http_status(:ok)
+        expect(@peer_review_submission.reload.student_entered_score).to be_nil
+      end
+
+      it "persists student_entered_score to database" do
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @peer_review.id,
+              id: @reviewer.id,
+              submission: { student_entered_score: 5 }
+            },
+            format: :json
+        expect(response).to have_http_status(:ok)
+        expect(@peer_review_submission.reload.student_entered_score).to eq(5.0)
+      end
+    end
+
+    context "with checkpoint sub assignment" do
+      before(:once) do
+        @course.account.enable_feature!(:discussion_checkpoints)
+        @discussion_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpoint Discussion")
+        @due_at = 1.week.from_now
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @discussion_topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: @due_at }],
+          points_possible: 10
+        )
+        @parent_assignment = @discussion_topic.assignment
+        @checkpoint_sub_assignment = @parent_assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      end
+
+      before { user_session(@student) }
+
+      it "does not allow updating checkpoint sub assignments directly" do
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @checkpoint_sub_assignment.id,
+              id: @student.id,
+              submission: { comment: "checkpoint comment" }
+            },
+            format: :json
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end
