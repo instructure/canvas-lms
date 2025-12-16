@@ -22,7 +22,6 @@ import parseLinkHeader from '@canvas/parse-link-header'
 import configureAxios from '../utilities/configureAxios'
 import {alert} from '../utilities/alertUtils'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {maybeUpdateTodoSidebar} from './sidebar-actions'
 import {
   getPlannerItems,
   getWeeklyPlannerItems,
@@ -245,7 +244,6 @@ export const deletePlannerItem = plannerItem => {
       .catch(() => alert(I18n.t('Failed to delete to do'), true))
     dispatch(clearUpdateTodo())
     dispatch(deletedPlannerItem(promise))
-    dispatch(maybeUpdateTodoSidebar(promise))
     return promise
   }
 }
@@ -303,7 +301,6 @@ export const togglePlannerItemCompletion = plannerItem => {
         }
       })
     dispatch(savedPlannerItem(promise))
-    dispatch(maybeUpdateTodoSidebar(promise))
     return promise
   }
 }

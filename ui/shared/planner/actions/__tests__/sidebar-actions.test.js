@@ -54,7 +54,6 @@ afterEach(() => {
   server.resetHandlers()
   MockDate.reset()
   Actions.sidebarLoadNextItems.reset()
-  Actions.maybeUpdateTodoSidebar.reset()
 })
 
 afterAll(() => {
@@ -178,20 +177,11 @@ describe('load items', () => {
     expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'})
   })
 
-  it('continues to load if there are less than 14 incomplete items loaded', async () => {
-    let requestCount = 0
+  it('loads items with per_page parameter', async () => {
+    let requestUrl = ''
     server.use(
-      http.get('*/api/v1/planner/items', () => {
-        requestCount++
-        return new HttpResponse(JSON.stringify([]), {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            link: requestCount === 1 ? '</>; rel="next"' : '',
-          },
-        })
-      }),
-      http.get('*/', () => {
+      http.get('*/api/v1/planner/items', req => {
+        requestUrl = req.request.url
         return new HttpResponse(JSON.stringify([]), {
           status: 200,
           headers: {
@@ -203,130 +193,9 @@ describe('load items', () => {
 
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    await thunk(
-      fakeDispatch,
-      mockGetState({
-        items: [
-          {completed: true},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-        ],
-      }),
-    )
-
+    await thunk(fakeDispatch, mockGetState())
     expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'})
-    expect(fakeDispatch).toHaveBeenCalledTimes(6)
-    const secondCallThunk = fakeDispatch.mock.calls[5][0]
-    expect(secondCallThunk).toBe(Actions.sidebarLoadNextItems)
-    fakeDispatch.mockReset()
-    await secondCallThunk(
-      fakeDispatch,
-      mockGetState({
-        nextUrl: '/',
-        items: [
-          {completed: true},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: true},
-          {completed: true},
-          {completed: true},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: true},
-          {completed: true},
-        ],
-      }),
-    )
-  })
-
-  it('stops loading when it gets 14 incomplete items', async () => {
-    server.use(
-      http.get('*/api/v1/planner/items', () => {
-        return new HttpResponse(JSON.stringify([]), {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            link: '</>; rel="next"',
-          },
-        })
-      }),
-    )
-
-    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    await thunk(
-      fakeDispatch,
-      mockGetState({
-        items: [
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-        ],
-      }),
-    )
-
-    expect(fakeDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
-  })
-
-  it('finishes loading even when there are less then 5 incomplete items', async () => {
-    server.use(
-      http.get('*/api/v1/planner/items', () => {
-        return new HttpResponse(JSON.stringify([]), {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-      }),
-    )
-
-    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    await thunk(
-      fakeDispatch,
-      mockGetState({
-        items: [
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: false},
-          {completed: true},
-          {completed: true},
-        ],
-      }),
-    )
-
-    expect(fakeDispatch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'SIDEBAR_ENOUGH_ITEMS_LOADED',
-      }),
-    )
+    expect(requestUrl).toContain('per_page=14')
   })
 
   it('dispatches SIDEBAR_ITEMS_LOADING_FAILED on failure', async () => {
@@ -349,30 +218,23 @@ describe('load items', () => {
       expect.objectContaining({type: 'SIDEBAR_ITEMS_LOADING_FAILED', error: true}),
     )
   })
-})
 
-describe('fetch more items', () => {
-  it('resumes loading when there are less than the desired number of incomplete items', async () => {
-    const mockDispatch = jest.fn()
-    const mockGs = mockGetState({nextUrl: '/', items: generateItems(13)})
-    const savedItemPromise = new Promise(resolve => resolve({item: {completed: true}}))
-    await Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, mockGs)
-    expect(mockDispatch).toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
-  })
-
-  it('will not resume loading if desired number of items is loaded', async () => {
-    const mockDispatch = jest.fn()
-    const gs = mockGetState({nextUrl: '/', items: generateItems(14)})
-    const savedItemPromise = new Promise(resolve => resolve({item: {completed: true}}))
-    await Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, gs)
-    expect(mockDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
-  })
-
-  it('will not resume loading if all items are loaded', async () => {
-    const mockDispatch = jest.fn()
-    const gs = mockGetState({nextUrl: null})
-    const savedItemPromise = new Promise(resolve => resolve({item: {completed: true}}))
-    await Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, gs)
-    expect(mockDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
+  it('uses incomplete_items filter in API requests', async () => {
+    let requestUrl = ''
+    server.use(
+      http.get('*/api/v1/planner/items', req => {
+        requestUrl = req.request.url
+        return new HttpResponse(JSON.stringify([]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
+    )
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
+    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
+    await thunk(fakeDispatch, mockGetState())
+    expect(requestUrl).toContain('filter=incomplete_items')
   })
 })
