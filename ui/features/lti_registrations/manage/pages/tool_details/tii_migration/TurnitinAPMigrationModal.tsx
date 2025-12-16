@@ -263,7 +263,7 @@ export const TurnitinAPMigrationModal = ({
           </View>
         ) : !migrations || migrations.length === 0 ? (
           <View as="div" textAlign="center" padding="large" height="25rem">
-            <Text>{I18n.t('No migrations available.')}</Text>
+            <Text>{I18n.t('There is nothing to migrate.')}</Text>
           </View>
         ) : (
           <Flex direction="column" height="25rem">

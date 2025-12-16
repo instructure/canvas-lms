@@ -184,7 +184,7 @@ describe('TurnitinAPMigrationModal Render', () => {
     render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
 
     await waitFor(() => {
-      expect(screen.getByText('No migrations available.')).toBeInTheDocument()
+      expect(screen.getByText('There is nothing to migrate.')).toBeInTheDocument()
     })
   })
 
