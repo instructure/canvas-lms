@@ -260,4 +260,51 @@ describe AuthenticationProvider::SAML do
       expect(entity.roles.last.authn_requests_signed?).to be_nil
     end
   end
+
+  context "response collection" do
+    skip "requires Redis" unless CanvasCache::Redis.enabled?
+
+    let(:ap) { @account.authentication_providers.create!(auth_type: "saml") }
+    let(:response) { instance_double(SAML2::Response, errors: []) }
+
+    before do
+      ap.settings["collect_responses"] = true
+    end
+
+    it "does nothing if not enabled" do
+      ap.settings.delete("collect_responses")
+
+      ap.collect_response(response, "<xml>")
+      expect(ap.collected_responses).to eql []
+    end
+
+    it "stores and retrieves SAML responses" do
+      responses = Array.new(12) { |i| "<xml#{i}>" }
+      responses.each do |resp|
+        ap.collect_response(response, resp)
+      end
+      # defaults to keeping 10
+      expect(ap.collected_responses).to eql(responses[2..].map { |r| { "xml" => r, "errors" => "" } })
+    end
+
+    it "limits it if configured" do
+      ap.settings["collect_responses"] = 3
+      responses = Array.new(5) { |i| "<xml#{i}>" }
+      responses.each do |resp|
+        ap.collect_response(response, resp)
+      end
+      expect(ap.collected_responses).to eql(responses[2..].map { |r| { "xml" => r, "errors" => "" } })
+    end
+
+    it "collects a response with errors" do
+      allow(response).to receive(:errors).and_return(["bad signature"])
+      ap.collect_response(response, "<xml_with_errors>")
+      expect(ap.collected_responses).to eql([{ "xml" => "<xml_with_errors>", "errors" => "bad signature" }])
+    end
+
+    it "collects a response with additional fields" do
+      ap.collect_response(response, "<xml>", more: "data")
+      expect(ap.collected_responses).to eql([{ "xml" => "<xml>", "errors" => "", "more" => "data" }])
+    end
+  end
 end
