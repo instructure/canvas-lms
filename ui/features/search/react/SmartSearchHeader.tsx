@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useCallback, useEffect, useRef, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
-import type {IndexProgress, Result} from '../types'
+import type {IndexProgress, Result} from './types'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
