@@ -545,4 +545,25 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
     result
   end
+
+  def collected_responses_key
+    "saml:collected_responses:#{global_id}"
+  end
+
+  def collect_response(response, response_raw, **additional_fields)
+    return unless (maxlen = settings["collect_responses"])
+
+    maxlen = 10 unless maxlen.is_a?(Integer) && maxlen.positive?
+    ::Canvas.redis.xadd(collected_responses_key,
+                        additional_fields.merge(xml: response_raw, errors: response.errors.join("\n")),
+                        maxlen:)
+  end
+
+  def collected_responses
+    ::Canvas.redis.xrange(collected_responses_key, "-", "+").map(&:last)
+  end
+
+  def clear_collected_responsees
+    ::Canvas.redis.del(collected_responses_key)
+  end
 end

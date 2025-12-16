@@ -100,6 +100,8 @@ class Login::SamlController < ApplicationController
       aac.debug_set(:login_to_canvas_success, "false")
     end
 
+    aac.collect_response(response, request.request_parameters[:SAMLResponse])
+
     assertion = response.assertions.first
     begin
       provider_attributes = assertion&.attribute_statements&.first.to_h
