@@ -247,7 +247,6 @@ export default function VideoOptionsTray({
           shouldContainFocus={true}
           shouldReturnFocus={true}
           size="regular"
-          themeOverride={{zIndex: 11000}} // ensure tray is above RCE toolbar
         >
           <Flex direction="column" height={getTrayHeight()}>
             <Flex.Item as="header" padding="medium">
