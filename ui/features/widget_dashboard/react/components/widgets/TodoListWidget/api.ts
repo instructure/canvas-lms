@@ -24,6 +24,12 @@ export interface FetchPlannerItemsParams {
   end_date?: string
   per_page?: number
   order?: 'asc' | 'desc'
+  filter?:
+    | 'new_activity'
+    | 'ungraded_todo_items'
+    | 'all_ungraded_todo_items'
+    | 'incomplete_items'
+    | 'complete_items'
 }
 
 export interface FetchPlannerItemsResponse {
@@ -46,6 +52,7 @@ export async function fetchPlannerItems(
     if (params.end_date) queryParams.append('end_date', params.end_date)
     if (params.per_page) queryParams.append('per_page', params.per_page.toString())
     if (params.order) queryParams.append('order', params.order)
+    if (params.filter) queryParams.append('filter', params.filter)
 
     url = `/api/v1/planner/items?${queryParams.toString()}`
   }
