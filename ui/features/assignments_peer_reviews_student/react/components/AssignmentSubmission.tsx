@@ -22,7 +22,7 @@ import ErrorShip from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {Submission, Assignment} from '../AssignmentsPeerReviewsStudentTypes'
+import {Submission, Assignment} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import CommentsTrayContentWithApollo from './CommentsTrayContentWithApollo'
@@ -31,6 +31,7 @@ import {IconDiscussionLine} from '@instructure/ui-icons'
 import {Heading} from '@instructure/ui-heading'
 import {calculateMasqueradeHeight} from '@canvas/context-modules/differentiated-modules/utils/miscHelpers'
 import UrlSubmissionDisplay from '@canvas/assignments/react/UrlSubmissionDisplay'
+import FileSubmissionPreview from '@canvas/assignments/react/FileSubmissionPreview'
 
 const I18n = createI18nScope('peer_reviews_student')
 
@@ -132,6 +133,8 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
         return renderTextEntry()
       case 'online_url':
         return renderUrlEntry()
+      case 'online_upload':
+        return <FileSubmissionPreview submission={submission} />
       default:
         return renderError(
           I18n.t('Submission type error'),

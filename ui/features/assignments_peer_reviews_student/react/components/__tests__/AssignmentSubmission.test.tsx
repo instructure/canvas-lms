@@ -20,7 +20,7 @@ import React from 'react'
 import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssignmentSubmission from '../AssignmentSubmission'
-import type {Submission} from '../../AssignmentsPeerReviewsStudentTypes'
+import {Submission} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
 
 vi.mock('@canvas/util/jquery/apiUserContent', () => ({
   default: {
@@ -265,6 +265,40 @@ describe('AssignmentSubmission', () => {
       await user.click(link)
 
       expect(mockWindowOpen).toHaveBeenCalledWith('https://example.com/test')
+    })
+  })
+
+  describe('online_upload submissions', () => {
+    it('renders file submission preview', () => {
+      const assignment = createAssignment()
+      const submission = createSubmission({
+        submissionType: 'online_upload',
+        attachments: [
+          {
+            _id: '101',
+            displayName: 'test-file.pdf',
+            mimeClass: 'pdf',
+            size: '1.2 MB',
+            thumbnailUrl: null,
+            submissionPreviewUrl: 'http://example.com/preview/101',
+            url: 'http://example.com/download/101',
+          },
+        ],
+      })
+      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+
+      expect(screen.getByTestId('file-preview')).toBeInTheDocument()
+    })
+
+    it('renders no submission message when attachments is empty', () => {
+      const assignment = createAssignment()
+      const submission = createSubmission({
+        submissionType: 'online_upload',
+        attachments: [],
+      })
+      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+
+      expect(screen.getByText('No Submission')).toBeInTheDocument()
     })
   })
 
