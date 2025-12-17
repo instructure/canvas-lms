@@ -376,6 +376,14 @@ a11y_checker_ai_generation:
     If enabled, the AI feature for generating text for the relevant rule such as alt text missing, table captions missing is displayed at the wizard.
   shadow: true
 
+a11y_checker_additional_resources:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Accessibility Checker Additional Resources
+  description: |-
+    If enabled, the Accessibility checker will include additional resources during the course scan. It will include Announcements, Discussion Topics (Graded and Ungraded) and Syllabus.
+  shadow: true
+
 ux_list_concluded_courses_in_bp:
   state: hidden
   display_name: List concluded courses with Concluded pill in blueprint association modal
