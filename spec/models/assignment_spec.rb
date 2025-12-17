@@ -50,6 +50,12 @@ describe Assignment do
     expect(assignment.peer_review_across_sections).to be true
   end
 
+  describe "constants" do
+    it "includes peer_review in OFFLINE_SUBMISSION_TYPES" do
+      expect(AbstractAssignment::OFFLINE_SUBMISSION_TYPES).to include(:peer_review)
+    end
+  end
+
   it "has a useful state machine" do
     assignment_model(course: @course)
     expect(@a.state).to be(:published)
@@ -8944,6 +8950,15 @@ describe Assignment do
       assignment_model(submission_types: "on_paper", course: @course)
       expect(@assignment.readable_submission_types).to eq "on paper"
     end
+
+    it "returns 'a peer review' for peer_review submission type" do
+      parent_assignment = @course.assignments.create!
+      peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+        parent_assignment:,
+        submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+      )
+      expect(peer_review_sub_assignment.readable_submission_types).to eq "a peer review"
+    end
   end
 
   describe "#update_grading_period_grades with no grading periods" do
@@ -12520,6 +12535,22 @@ describe Assignment do
       it "returns false if the specified type is not contained in the assignment's list of accepted types" do
         assignment.update!(submission_types: "on_paper,online_upload")
         expect(assignment).not_to be_accepts_submission_type("online_text_entry")
+      end
+    end
+
+    context "when the submission_type is 'peer_review'" do
+      it "returns false for regular Assignment" do
+        assignment.update!(submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
+        expect(assignment).not_to be_accepts_submission_type(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
+      end
+
+      it "returns true for PeerReviewSubAssignment" do
+        parent_assignment = @course.assignments.create!
+        peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          parent_assignment:,
+          submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+        )
+        expect(peer_review_sub_assignment).to be_accepts_submission_type(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
       end
     end
   end
