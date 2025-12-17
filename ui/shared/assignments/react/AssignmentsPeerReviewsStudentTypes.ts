@@ -16,12 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export interface Attachment {
+  _id: string
+  displayName: string
+  mimeClass: string
+  size: string
+  thumbnailUrl?: string | null
+  submissionPreviewUrl?: string | null
+  url?: string | null
+}
+
 export interface Submission {
   _id: string
   attempt: number
   body?: string | null
   submissionType: string
   url?: string | null
+  attachments?: Attachment[] | null
 }
 
 export interface Assignment {

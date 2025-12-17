@@ -19,7 +19,7 @@
 import {useQuery} from '@tanstack/react-query'
 import {executeQuery} from '@canvas/graphql'
 import {PEER_REVIEW_ASSIGNMENT_QUERY} from '../queries'
-import {Assignment} from '../AssignmentsPeerReviewsStudentTypes'
+import {Assignment} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
 
 interface AssignmentQueryData {
   assignment: Assignment

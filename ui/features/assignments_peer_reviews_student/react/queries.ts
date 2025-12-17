@@ -50,6 +50,15 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
           body
           submissionType
           url
+          attachments {
+            _id
+            displayName
+            mimeClass
+            size
+            thumbnailUrl
+            submissionPreviewUrl
+            url
+          }
         }
       }
       rubric {

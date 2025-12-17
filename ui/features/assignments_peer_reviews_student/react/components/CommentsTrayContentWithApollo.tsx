@@ -19,7 +19,7 @@
 import React from 'react'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import CommentsTray, {TrayContent} from '@canvas/assignments/react/CommentsTray'
-import {Submission, Assignment} from '../AssignmentsPeerReviewsStudentTypes'
+import {Submission, Assignment} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
 
 const apolloClient = createClient()
 
