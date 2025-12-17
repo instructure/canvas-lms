@@ -281,6 +281,7 @@ export interface EnvCommon {
  */
 export type SiteAdminFeatureId =
   | 'a11y_checker_ai_generation'
+  | 'a11y_checker_additional_resources'
   | 'account_calendar_events'
   | 'account_level_blackout_dates'
   | 'courses_popout_sisid'
