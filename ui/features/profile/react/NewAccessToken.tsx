@@ -156,7 +156,7 @@ const NewAccessToken = ({onSubmit, onClose}: NewAccessTokenProps) => {
                   "Access tokens are what allow third-party applications to access Canvas resources on your behalf. These tokens are normally created automatically for applications as needed, but if *you're developing a new or limited project* you can just generate the token from here.",
                   {
                     wrapper:
-                      '<a href="https://canvas.instructure.com/doc/api/index.html" class="external" target="_blank" rel="noreferrer noopener">$1</a>',
+                      '<a href="https://developerdocs.instructure.com/services/canvas" class="external" target="_blank" rel="noreferrer noopener">$1</a>',
                   },
                 ),
               ),
