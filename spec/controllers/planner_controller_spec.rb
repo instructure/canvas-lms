@@ -685,6 +685,122 @@ describe PlannerController do
           end
         end
 
+        context "complete_items filter" do
+          it "filters complete_items including completed assignments and overridden items" do
+            submitted_assignment = assignment_model(course: @course1, title: "submitted assignment", due_at: 1.week.from_now)
+            submitted_assignment.submit_homework(@student, submission_type: "online_text_entry", body: "some text")
+            incomplete_assignment = assignment_model(course: @course1, title: "incomplete assignment", due_at: 2.weeks.from_now)
+
+            marked_complete_quiz = quiz_model(course: @course1, title: "marked complete quiz", due_at: 3.weeks.from_now, quiz_type: "practice_quiz")
+            marked_complete_quiz.publish!
+            PlannerOverride.create!(plannable: marked_complete_quiz, user: @student, marked_complete: true)
+
+            incomplete_quiz = quiz_model(course: @course1, title: "incomplete quiz", due_at: 4.weeks.from_now, quiz_type: "practice_quiz")
+            incomplete_quiz.publish!
+
+            get :index, params: {
+              filter: "complete_items",
+              context_codes: [@course1.asset_string],
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 6.weeks.from_now.iso8601
+            }
+
+            response_json = json_parse(response.body)
+            complete_items = response_json.pluck("plannable_type", "plannable_id")
+            expect(complete_items).to include(["assignment", submitted_assignment.id], ["quiz", marked_complete_quiz.id])
+            expect(complete_items).not_to include(["assignment", incomplete_assignment.id], ["quiz", incomplete_quiz.id])
+          end
+
+          it "applies complete filtering to all supported planner item types" do
+            test_items = {
+              assignment: assignment_model(course: @course1, due_at: 1.week.from_now),
+              quiz: quiz_model(course: @course1, due_at: 2.weeks.from_now, quiz_type: "practice_quiz").tap(&:publish!),
+              planner_note: planner_note_model(course: @course1, user: @student, todo_date: 3.weeks.from_now),
+              calendar_event: @course1.calendar_events.create!(
+                title: "test event",
+                start_at: 4.weeks.from_now,
+                end_at: 4.weeks.from_now + 1.hour
+              ),
+              discussion_topic: discussion_topic_model(course: @course1, todo_date: 5.weeks.from_now).tap(&:publish!),
+              wiki_page: wiki_page_model(course: @course1, todo_date: 6.weeks.from_now)
+            }
+
+            test_items.each_value { |item| PlannerOverride.create!(plannable: item, user: @student, marked_complete: true) }
+
+            get :index, params: {
+              filter: "complete_items",
+              context_codes: [@course1.asset_string],
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 8.weeks.from_now.iso8601
+            }
+
+            response_json = json_parse(response.body)
+            returned_items = response_json.pluck("plannable_type", "plannable_id")
+            test_items = test_items.map { |type, item| [type.to_s, item.id] }
+            expect(returned_items).to include(*test_items)
+          end
+
+          it "respects PlannerOverride precedence over submission status for complete_items filter" do
+            submitted_assignment = assignment_model(course: @course1, due_at: 1.week.from_now)
+            submitted_assignment.submit_homework(@student, submission_type: "online_text_entry", body: "submission")
+            PlannerOverride.create!(plannable: submitted_assignment, user: @student, marked_complete: false)
+
+            get :index, params: {
+              filter: "complete_items",
+              context_codes: [@course1.asset_string],
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 4.weeks.from_now.iso8601
+            }
+
+            response_json = json_parse(response.body)
+            expect(response_json.pluck("plannable_id")).not_to include(submitted_assignment.id)
+          end
+
+          it "includes assignments with complete overrides regardless of submission status" do
+            submitted_assignment = assignment_model(course: @course1, title: "submitted assignment", due_at: 1.week.from_now)
+            submitted_assignment.submit_homework(@student, submission_type: "online_text_entry", body: "submission")
+            PlannerOverride.create!(plannable: submitted_assignment, user: @student, marked_complete: true)
+            unsubmitted_assignment = assignment_model(course: @course1, title: "unsubmitted assignment", due_at: 2.weeks.from_now)
+            PlannerOverride.create!(plannable: unsubmitted_assignment, user: @student, marked_complete: true)
+
+            get :index, params: {
+              filter: "complete_items",
+              context_codes: [@course1.asset_string],
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 4.weeks.from_now.iso8601
+            }
+
+            response_json = json_parse(response.body)
+            assignment_ids = response_json.pluck("plannable_id")
+            expect(assignment_ids).to include(submitted_assignment.id, unsubmitted_assignment.id)
+          end
+
+          it "filters complete sub_assignments correctly" do
+            topic = DiscussionTopic.create_graded_topic!(course: @course1, title: "Checkpointed Discussion")
+            topic.create_checkpoints(reply_to_topic_points: 5, reply_to_entry_points: 10, reply_to_entry_required_count: 2)
+
+            reply_to_topic_checkpoint = topic.assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_topic")
+            reply_to_entry_checkpoint = topic.assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_entry")
+
+            reply_to_topic_checkpoint.update!(due_at: 1.week.from_now)
+            reply_to_entry_checkpoint.update!(due_at: 2.weeks.from_now)
+
+            reply_to_topic_checkpoint.submit_homework(@student, submission_type: "discussion_topic", body: "reply to topic")
+
+            get :index, params: {
+              filter: "complete_items",
+              context_codes: [@course1.asset_string],
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 4.weeks.from_now.iso8601
+            }
+
+            response_json = json_parse(response.body)
+            sub_assignment_ids = response_json.pluck("plannable_id")
+            expect(sub_assignment_ids).to include(reply_to_topic_checkpoint.id)
+            expect(sub_assignment_ids).not_to include(reply_to_entry_checkpoint.id)
+          end
+        end
+
         it "filters all_ungraded_todo_items for teachers, including unpublished items" do
           @course_page.unpublish
           @group_topic.unpublish
