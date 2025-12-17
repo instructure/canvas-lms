@@ -6190,6 +6190,11 @@ describe "Submissions API", type: :request do
         expect(json["message"]).to eq "Invalid submission[submission_type] given"
       end
 
+      it "rejects peer_review submission_type (system-only)" do
+        json = api_call(:post, @url, @args, { submission: { submission_type: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE } }, {}, expected_status: 400)
+        expect(json["message"]).to eq "Invalid submission[submission_type] given"
+      end
+
       it "rejects mismatched submission_type and params" do
         json = api_call(:post, @url, @args, { submission: { submission_type: "online_url", body: "some html text" } }, {}, expected_status: 400)
         expect(json["message"]).to eq "Invalid parameters for submission_type online_url. Required: submission[url]"

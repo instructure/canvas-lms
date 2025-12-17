@@ -43,7 +43,7 @@ class AbstractAssignment < ActiveRecord::Base
   ALLOWED_GRADING_TYPES = %w[points percent letter_grade gpa_scale pass_fail not_graded].to_set.freeze
   POINTED_GRADING_TYPES = %w[points percent letter_grade gpa_scale].to_set.freeze
 
-  OFFLINE_SUBMISSION_TYPES = %i[on_paper external_tool none not_graded wiki_page].freeze
+  OFFLINE_SUBMISSION_TYPES = %i[on_paper external_tool none not_graded wiki_page peer_review].freeze
   SUBMITTABLE_TYPES = %w[online_quiz discussion_topic wiki_page ams].freeze
   LTI_EULA_SERVICE = "vnd.Canvas.Eula"
   AUDITABLE_ATTRIBUTES = %w[
@@ -3538,6 +3538,8 @@ class AbstractAssignment < ActiveRecord::Base
       t "submission_types.on_paper", "on paper"
     when "external_tool"
       t "submission_types.external_tool", "an external tool"
+    when "peer_review"
+      t "submission_types.peer_review", "a peer review"
     else
       nil
     end
@@ -4407,7 +4409,9 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def accepts_submission_type?(submission_type)
-    if submission_type == "basic_lti_launch"
+    if submission_type == "peer_review"
+      is_a?(PeerReviewSubAssignment)
+    elsif submission_type == "basic_lti_launch"
       submission_types =~ /online|external_tool/
     else
       submission_types_array.include?(submission_type)

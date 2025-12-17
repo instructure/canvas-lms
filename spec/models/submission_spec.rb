@@ -9792,6 +9792,38 @@ describe Submission do
     end
   end
 
+  describe "submission_type_is_valid" do
+    describe "peer_review submission type" do
+      it "is valid without body field" do
+        parent_assignment = @course.assignments.create!
+        peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          parent_assignment:,
+          submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+        )
+        submission = peer_review_sub_assignment.submit_homework(
+          @user,
+          submission_type: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+        )
+        expect(submission).to be_valid
+        expect(submission.body).to be_nil
+      end
+
+      it "is valid with empty body" do
+        parent_assignment = @course.assignments.create!
+        peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          parent_assignment:,
+          submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+        )
+        submission = peer_review_sub_assignment.submit_homework(
+          @user,
+          submission_type: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE,
+          body: ""
+        )
+        expect(submission).to be_valid
+      end
+    end
+  end
+
   describe "#ensure_attempts_are_in_range" do
     let(:submission) { @assignment.submissions.first }
 

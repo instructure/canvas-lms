@@ -5207,8 +5207,7 @@ describe AssignmentsApiController, type: :request do
             points_possible: 10,
             due_at: 5.days.from_now,
             unlock_at: 3.days.from_now,
-            lock_at: 1.week.from_now,
-            submission_types: "online_text_entry"
+            lock_at: 1.week.from_now
           )
         end
 
