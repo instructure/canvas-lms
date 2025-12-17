@@ -217,6 +217,9 @@ module.exports = [
     },
   },
 
+  // Vitest
+  require('./eslint.config.vitest'),
+
   // Jest
   require('./eslint.config.jest'),
 ]
