@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
@@ -392,6 +392,93 @@ describe('TodoListWidget', () => {
       expect(screen.getByTestId('create-todo-date-input')).toBeInTheDocument()
       expect(screen.getByTestId('create-todo-course-select')).toBeInTheDocument()
       expect(screen.getByTestId('create-todo-details-input')).toBeInTheDocument()
+    })
+  })
+
+  describe('filter dropdown', () => {
+    it('renders filter dropdown', async () => {
+      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+      })
+
+      expect(screen.getByTestId('todo-filter-select')).toBeInTheDocument()
+    })
+
+    it('defaults to Incomplete filter', async () => {
+      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+      })
+
+      const filterSelect = screen.getByTestId('todo-filter-select')
+      expect(filterSelect).toHaveValue('Incomplete')
+    })
+
+    it('can change to Complete filter', async () => {
+      global.event = undefined // workaround bug in SimpleSelect that accesses the global event
+      const user = userEvent.setup()
+      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+      })
+
+      const filterSelect = screen.getByTestId('todo-filter-select')
+      await user.click(filterSelect)
+
+      const completeOption = await screen.findByText('Complete')
+      await user.click(completeOption)
+
+      // Wait for the filter to update and refetch to complete
+      await waitFor(
+        () => {
+          const updatedFilterSelect = screen.getByTestId('todo-filter-select')
+          expect(updatedFilterSelect).toHaveValue('Complete')
+        },
+        {timeout: 3000},
+      )
+    })
+
+    it('can change to All filter', async () => {
+      global.event = undefined // workaround bug in SimpleSelect that accesses the global event
+      const user = userEvent.setup()
+      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+      })
+
+      const filterSelect = screen.getByTestId('todo-filter-select')
+      await user.click(filterSelect)
+
+      const allOption = await screen.findByText('All')
+      await user.click(allOption)
+
+      // Wait for the filter to update and refetch to complete
+      await waitFor(
+        () => {
+          const updatedFilterSelect = screen.getByTestId('todo-filter-select')
+          expect(updatedFilterSelect).toHaveValue('All')
+        },
+        {timeout: 3000},
+      )
+    })
+
+    it('filter is placed in widget body', async () => {
+      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+      })
+
+      const filterSelect = screen.getByTestId('todo-filter-select')
+      const newButton = screen.getByTestId('new-todo-button')
+
+      expect(filterSelect).toBeInTheDocument()
+      expect(newButton).toBeInTheDocument()
     })
   })
 })
