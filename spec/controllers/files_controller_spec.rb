@@ -273,6 +273,66 @@ describe FilesController do
         expect(response).to be_successful
       end
     end
+
+    context "root folder permissions with files_a11y_rewrite" do
+      before do
+        Account.site_admin.enable_feature!(:files_a11y_rewrite)
+      end
+
+      it "excludes course context where Files tab is disabled for student" do
+        user_session(@student)
+        @course.update_attribute(:tab_configuration, [{ "id" => 11, "hidden" => true }])
+
+        get "index", params: { user_id: @student.id }
+        expect(response).to be_successful
+
+        files_contexts = assigns[:js_env][:FILES_CONTEXTS]
+        context_asset_strings = files_contexts.pluck(:asset_string)
+
+        expect(context_asset_strings).not_to include(@course.asset_string)
+        expect(context_asset_strings).to include(@student.asset_string)
+      end
+
+      it "includes course context where Files tab is enabled for teacher" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(response).to be_successful
+
+        files_contexts = assigns[:js_env][:FILES_CONTEXTS]
+        course_context = files_contexts.find { |c| c[:asset_string] == @course.asset_string }
+
+        expect(course_context).to be_present
+        expect(course_context[:root_folder_right]).to be true
+      end
+
+      it "includes root_folder_right field in context data when feature enabled" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(response).to be_successful
+
+        files_contexts = assigns[:js_env][:FILES_CONTEXTS]
+        files_contexts.each { |c| expect(c).to have_key(:root_folder_right) }
+      end
+
+      it "includes user context with accessible courses" do
+        user_session(@student)
+        get "index", params: { user_id: @student.id }
+        expect(response).to be_successful
+
+        files_contexts = assigns[:js_env][:FILES_CONTEXTS]
+        context_asset_strings = files_contexts.pluck(:asset_string)
+
+        expect(context_asset_strings).to include(@student.asset_string)
+      end
+
+      it "handles contexts with root folders gracefully" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(response).to be_successful
+
+        expect(assigns[:js_env][:FILES_CONTEXTS]).to be_present
+      end
+    end
   end
 
   describe "GET 'show'" do
