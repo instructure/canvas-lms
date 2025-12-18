@@ -195,6 +195,11 @@ class InfoController < ApplicationController
     render_deep_json(deep_check[:critical], deep_check[:secondary], failed.any? ? 503 : 200)
   end
 
+  def shard_info
+    info = Shard.current.database_server.config.slice(:region, :database)
+    render json: info.merge({ shard: Shard.current.id })
+  end
+
   private
 
   def render_readiness_json(components, is_deep_check)

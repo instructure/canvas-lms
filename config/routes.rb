@@ -1105,6 +1105,7 @@ CanvasRails::Application.routes.draw do
   # To be used by ALB
   get "internal/readiness" => "info#readiness"
   get "deep" => "info#deep"
+  get "shard_info" => "info#shard_info"
 
   get "web-app-manifest/manifest.json" => "info#web_app_manifest"
 
