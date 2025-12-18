@@ -20,6 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import {http} from 'msw'
 import {setupServer} from 'msw/node'
+import {waitFor} from '@testing-library/react'
 import SetDefaultGradeDialog from '../SetDefaultGradeDialog'
 import {windowAlert} from '@canvas/util/globalUtils'
 
@@ -93,8 +94,7 @@ describe('Shared > SetDefaultGradeDialog', () => {
       vi.spyOn($, 'publish').mockImplementation(vi.fn())
     })
 
-    // fickle; cf. EVAL-4977
-    test.skip('submit reports number of students scored', async () => {
+    test('submit reports number of students scored', async () => {
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
@@ -111,18 +111,15 @@ describe('Shared > SetDefaultGradeDialog', () => {
       })
 
       dialog.show()
-      await new Promise(resolve => setTimeout(resolve, 50)) // Wait for dialog to render
+      await waitFor(() => expect(getDialog()).toBeTruthy())
 
       document.querySelector('input[name="default_grade"]').value = '10'
       clickSetDefaultGrade()
 
-      await new Promise(resolve => setTimeout(resolve, 100))
-
-      expect(windowAlert).toHaveBeenCalledWith('2 student scores updated')
+      await waitFor(() => expect(windowAlert).toHaveBeenCalledWith('2 student scores updated'))
     })
 
-    // fickle; cf. EVAL-4977
-    test.skip('submit reports number of students marked as missing', async () => {
+    test('submit reports number of students marked as missing', async () => {
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
@@ -139,20 +136,15 @@ describe('Shared > SetDefaultGradeDialog', () => {
       })
 
       dialog.show()
-      await new Promise(resolve => setTimeout(resolve, 50)) // Wait for dialog to render
+      await waitFor(() => expect(getDialog()).toBeTruthy())
 
-      // Set the input value and submit
       document.querySelector('input[name="default_grade"]').value = 'mi'
       clickSetDefaultGrade()
 
-      // Wait for the alert to be called
-      await new Promise(resolve => setTimeout(resolve, 100))
-
-      expect(windowAlert).toHaveBeenCalledWith('2 students marked as missing')
+      await waitFor(() => expect(windowAlert).toHaveBeenCalledWith('2 students marked as missing'))
     })
 
-    // fickle; cf. EVAL-4977
-    test.skip('submit ignores the missing shortcut when the shortcut feature flag is disabled', async () => {
+    test('submit ignores the missing shortcut when the shortcut feature flag is disabled', async () => {
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
@@ -169,18 +161,15 @@ describe('Shared > SetDefaultGradeDialog', () => {
       })
 
       dialog.show()
-      await new Promise(resolve => setTimeout(resolve, 50))
+      await waitFor(() => expect(getDialog()).toBeTruthy())
 
       document.querySelector('input[name="default_grade"]').value = 'mi'
       clickSetDefaultGrade()
 
-      await new Promise(resolve => setTimeout(resolve, 100))
-
-      expect(windowAlert).toHaveBeenCalledWith('2 student scores updated')
+      await waitFor(() => expect(windowAlert).toHaveBeenCalledWith('2 student scores updated'))
     })
 
-    // fickle; cf. EVAL-4977
-    test.skip('submit reports number of students when api includes duplicates due to group assignments', async () => {
+    test('submit reports number of students when api includes duplicates due to group assignments', async () => {
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
@@ -200,14 +189,12 @@ describe('Shared > SetDefaultGradeDialog', () => {
       })
 
       dialog.show()
-      await new Promise(resolve => setTimeout(resolve, 50))
+      await waitFor(() => expect(getDialog()).toBeTruthy())
 
       document.querySelector('input[name="default_grade"]').value = '10'
       clickSetDefaultGrade()
 
-      await new Promise(resolve => setTimeout(resolve, 100))
-
-      expect(windowAlert).toHaveBeenCalledWith('4 student scores updated')
+      await waitFor(() => expect(windowAlert).toHaveBeenCalledWith('4 student scores updated'))
     })
   })
 })

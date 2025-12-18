@@ -427,7 +427,7 @@ describe('#loadGraphqlStudentData()', () => {
     server.close()
   })
 
-  test.skip('returns student and submission data', async () => {
+  test('returns student and submission data', async () => {
     await store.getState().loadGraphqlStudentData()
     verifyStudentDataLoaded()
   })

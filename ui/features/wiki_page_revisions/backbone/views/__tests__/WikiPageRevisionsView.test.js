@@ -37,7 +37,7 @@ describe('WikiPageRevisionsView', () => {
   })
 
   describe('model selection', () => {
-    it.skip('sets selected attribute when selecting a model', () => {
+    it('sets selected attribute when selecting a model', () => {
       // Arrange
       collection.add({revision_id: 21})
       collection.add({revision_id: 37})
@@ -51,7 +51,7 @@ describe('WikiPageRevisionsView', () => {
       expect(collection.models[1].get('selected')).toBe(false)
     })
 
-    it.skip('updates selection when changing selected model', () => {
+    it('updates selection when changing selected model', () => {
       // Arrange
       collection.add({revision_id: 21})
       collection.add({revision_id: 37})
@@ -67,7 +67,7 @@ describe('WikiPageRevisionsView', () => {
   })
 
   describe('pagination', () => {
-    it.skip('fetches previous page from collection', () => {
+    it('fetches previous page from collection', () => {
       // Arrange
       const fetchSpy = vi.spyOn(collection, 'fetch').mockResolvedValue()
 
@@ -81,7 +81,7 @@ describe('WikiPageRevisionsView', () => {
       })
     })
 
-    it.skip('fetches next page from collection', () => {
+    it('fetches next page from collection', () => {
       // Arrange
       const fetchSpy = vi.spyOn(collection, 'fetch').mockResolvedValue()
 
@@ -97,7 +97,7 @@ describe('WikiPageRevisionsView', () => {
   })
 
   describe('navigation state', () => {
-    it.skip('indicates when previous page is available', () => {
+    it('indicates when previous page is available', () => {
       // Arrange
       vi.spyOn(collection, 'canFetch').mockImplementation(arg => arg === 'prev')
 
@@ -105,7 +105,7 @@ describe('WikiPageRevisionsView', () => {
       expect(view.toJSON().CAN.FETCH_PREV).toBe(true)
     })
 
-    it.skip('indicates when next page is available', () => {
+    it('indicates when next page is available', () => {
       // Arrange
       vi.spyOn(collection, 'canFetch').mockImplementation(arg => arg === 'next')
 

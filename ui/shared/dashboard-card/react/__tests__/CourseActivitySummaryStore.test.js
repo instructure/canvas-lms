@@ -30,7 +30,7 @@ vi.mock('@canvas/query', () => ({
   executeQuery: vi.fn(() => Promise.resolve({data: {}})),
 }))
 
-describe.skip('CourseActivitySummaryStore', () => {
+describe('CourseActivitySummaryStore', () => {
   const stream = [
     {
       type: 'DiscussionTopic',
@@ -53,6 +53,7 @@ describe.skip('CourseActivitySummaryStore', () => {
 
   afterEach(() => {
     server.resetHandlers()
+    vi.restoreAllMocks()
   })
 
   describe('getStateForCourse', () => {

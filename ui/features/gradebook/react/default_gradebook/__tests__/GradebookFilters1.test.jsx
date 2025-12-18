@@ -36,7 +36,7 @@ const server = setupServer(
   }),
 )
 
-describe.skip('Gradebook#filterStudents', () => {
+describe('Gradebook#filterStudents', () => {
   let students
   let gradebook
 
@@ -182,7 +182,7 @@ describe.skip('Gradebook#filterStudents', () => {
   })
 })
 
-describe.skip('Gradebook#getSelectedEnrollmentFilters', () => {
+describe('Gradebook#getSelectedEnrollmentFilters', () => {
   beforeAll(() => server.listen())
   afterEach(() => server.resetHandlers())
   afterAll(() => server.close())
@@ -250,7 +250,7 @@ describe.skip('Gradebook#getSelectedEnrollmentFilters', () => {
   })
 })
 
-describe.skip('Gradebook#toggleEnrollmentFilter', () => {
+describe('Gradebook#toggleEnrollmentFilter', () => {
   let gradebook
 
   beforeAll(() => server.listen())
@@ -310,7 +310,7 @@ describe.skip('Gradebook#toggleEnrollmentFilter', () => {
   })
 })
 
-describe.skip('Gradebook#updateCurrentModule', () => {
+describe('Gradebook#updateCurrentModule', () => {
   let gradebook
 
   beforeAll(() => server.listen())
@@ -373,7 +373,7 @@ describe.skip('Gradebook#updateCurrentModule', () => {
   })
 })
 
-describe.skip('Gradebook#updateCurrentAssignmentGroup', () => {
+describe('Gradebook#updateCurrentAssignmentGroup', () => {
   let gradebook
 
   beforeAll(() => server.listen())
@@ -435,7 +435,7 @@ describe.skip('Gradebook#updateCurrentAssignmentGroup', () => {
   })
 })
 
-describe.skip('Gradebook', () => {
+describe('Gradebook', () => {
   beforeAll(() => server.listen())
   afterEach(() => server.resetHandlers())
   afterAll(() => server.close())

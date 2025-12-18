@@ -123,33 +123,33 @@ describe('IndexView', () => {
     expect(view.options.hasNoQuizzes).toBeTruthy()
   })
 
-  it.skip('sets hasNoQuizzes to false if has assignment quizzes', () => {
+  it('sets hasNoQuizzes to false if has assignment quizzes', () => {
     const assignments = new QuizCollection([{id: 1, permissions: {delete: true}}])
     const open = new QuizCollection([])
     view = createIndexView(assignments, open)
     expect(view.options.hasNoQuizzes).toBeFalsy()
   })
 
-  it.skip('sets hasNoQuizzes to false if has open quizzes', () => {
+  it('sets hasNoQuizzes to false if has open quizzes', () => {
     const assignments = new QuizCollection([])
     const open = new QuizCollection([{id: 1, permissions: {delete: true}}])
     view = createIndexView(assignments, open)
     expect(view.options.hasNoQuizzes).toBeFalsy()
   })
 
-  it.skip('sets hasAssignmentQuizzes if has assignment quizzes', () => {
+  it('sets hasAssignmentQuizzes if has assignment quizzes', () => {
     const assignments = new QuizCollection([{id: 1, permissions: {delete: true}}])
     view = createIndexView(assignments)
     expect(view.options.hasAssignmentQuizzes).toBeTruthy()
   })
 
-  it.skip('sets hasOpenQuizzes if has open quizzes', () => {
+  it('sets hasOpenQuizzes if has open quizzes', () => {
     const open = new QuizCollection([{id: 1, permissions: {delete: true}}])
     view = createIndexView(null, open)
     expect(view.options.hasOpenQuizzes).toBeTruthy()
   })
 
-  it.skip('sets hasSurveys if has surveys', () => {
+  it('sets hasSurveys if has surveys', () => {
     const surveys = new QuizCollection([{id: 1, permissions: {delete: true}}])
     view = createIndexView(null, null, surveys)
     expect(view.options.hasSurveys).toBeTruthy()
@@ -168,16 +168,17 @@ describe('IndexView', () => {
     expect(view.$('.choose-quiz-engine')).toHaveLength(0)
   })
 
-  it.skip('renders choose quiz engine modal', () => {
+  it('renders choose quiz engine modal', () => {
     ENV.flags.quiz_lti_enabled = true
     const mockRender = vi.spyOn(ReactDOM, 'render').mockImplementation(() => {})
     view = createIndexView()
-    view.$('.choose-quiz-engine').simulate('click')
+    // Use native DOM click instead of simulate
+    view.$('.choose-quiz-engine')[0].click()
     expect(mockRender.mock.calls[0][0].props.setOpen).toBe(true)
     mockRender.mockRestore()
   })
 
-  it.skip('should render the view', () => {
+  it('should render the view', () => {
     const assignments = new QuizCollection([
       {
         id: 1,
@@ -207,7 +208,7 @@ describe('IndexView', () => {
     expect(view.$el.find('.collectionViewItems li.quiz')).toHaveLength(4)
   })
 
-  it.skip('should filter by search term', () => {
+  it('should filter by search term', () => {
     const assignments = new QuizCollection([
       {
         id: 1,

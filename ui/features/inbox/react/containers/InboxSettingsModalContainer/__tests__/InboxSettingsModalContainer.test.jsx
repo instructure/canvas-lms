@@ -155,10 +155,7 @@ describe('InboxSettingsModalContainer', () => {
       )
     })
 
-    // TODO: This test is skipped due to MSW handler override timing issues after
-    // Jest-to-Vitest migration. The server.use() call should override handlers but
-    // the mutation still returns success. Needs investigation into Apollo cache behavior.
-    it.skip('calls onDismissWithAlert with SAVE_SETTINGS_FAIL when GraphQL mutation fails', async () => {
+    it('calls onDismissWithAlert with SAVE_SETTINGS_FAIL when GraphQL mutation fails', async () => {
       server.use(...inboxSettingsHandlers(1))
       const {getByText} = setup({...defaultProps()})
       await waitForApolloLoading()

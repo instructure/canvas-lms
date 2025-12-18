@@ -61,7 +61,7 @@ describe('lti.get_data handler', () => {
       message = {message_id: 'any'}
     })
 
-    it.skip('sends bad request error postMessage', () => {
+    it('sends bad request error postMessage', () => {
       handler({message, responseMessages, event})
       expect(responseMessages.sendBadRequestError).toHaveBeenCalledWith(
         "Missing required 'key' field",
@@ -77,7 +77,7 @@ describe('lti.get_data handler', () => {
       message = {key: 'hello'}
     })
 
-    it.skip('sends bad request error postMessage', () => {
+    it('sends bad request error postMessage', () => {
       handler({message, responseMessages, event})
       expect(responseMessages.sendBadRequestError).toHaveBeenCalledWith(
         "Missing required 'message_id' field",
@@ -90,12 +90,12 @@ describe('lti.get_data handler', () => {
       message = {key: 'hello', message_id: 'any'}
     })
 
-    it.skip('gets data from platform storage', () => {
+    it('gets data from platform storage', () => {
       handler({message, responseMessages, event})
       expect(platformStorage.getData).toHaveBeenCalledWith(event.origin, message.key)
     })
 
-    it.skip('sends response postMessage with key and value', () => {
+    it('sends response postMessage with key and value', () => {
       handler({message, responseMessages, event})
       expect(responseMessages.sendResponse).toHaveBeenCalledWith({key: message.key, value})
     })

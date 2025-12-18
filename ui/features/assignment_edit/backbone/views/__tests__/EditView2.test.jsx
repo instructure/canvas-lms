@@ -105,7 +105,7 @@ const disableCheckbox = id => {
   document.getElementById(id).disabled = true
 }
 
-describe.skip('EditView', () => {
+describe('EditView', () => {
   let fixtures
 
   beforeEach(() => {

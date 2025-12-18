@@ -92,7 +92,7 @@ describe('GradingPeriodSet', () => {
       gradingPeriodsApi.batchUpdate.mockRejectedValue(new Error('FAIL'))
     })
 
-    it.skip('prevents saving a grading period with overlapping startDate', async () => {
+    it('prevents saving a grading period with overlapping startDate', async () => {
       const {getByRole, getByLabelText} = renderComponent()
       const user = userEvent.setup()
 
@@ -108,7 +108,7 @@ describe('GradingPeriodSet', () => {
       expect(getByLabelText(/start date/i)).toBeInTheDocument()
     })
 
-    it.skip('prevents saving a grading period with overlapping endDate', async () => {
+    it('prevents saving a grading period with overlapping endDate', async () => {
       const {getByRole, getByLabelText} = renderComponent()
       const user = userEvent.setup()
 
@@ -124,7 +124,7 @@ describe('GradingPeriodSet', () => {
       expect(getByLabelText(/end date/i)).toBeInTheDocument()
     })
 
-    it.skip('prevents saving a grading period with endDate before startDate', async () => {
+    it('prevents saving a grading period with endDate before startDate', async () => {
       const {getByRole, getByLabelText} = renderComponent()
       const user = userEvent.setup()
 

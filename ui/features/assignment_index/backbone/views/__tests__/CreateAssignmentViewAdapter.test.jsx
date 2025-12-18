@@ -112,7 +112,7 @@ describe('CreateAssignmentViewAdapter', () => {
     expect(closeHandlerMock).toHaveBeenCalled()
   })
 
-  it.skip('shows a flash alert when the assignment fails to save', async () => {
+  it('shows a flash alert when the assignment fails to save', async () => {
     const error = new Error('Failed to save')
     const saveSpy = vi.spyOn(Backbone.Model.prototype, 'save').mockRejectedValue(error)
 

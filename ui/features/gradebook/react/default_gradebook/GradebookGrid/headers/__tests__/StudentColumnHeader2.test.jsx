@@ -18,12 +18,13 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {waitFor} from '@testing-library/react'
 
 import StudentColumnHeader from '../StudentColumnHeader'
 import studentRowHeaderConstants from '../../../constants/studentRowHeaderConstants'
 import {getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
-describe.skip('GradebookGrid StudentColumnHeader', () => {
+describe('GradebookGrid StudentColumnHeader', () => {
   let $container
   let $menuContent
   let component
@@ -96,14 +97,17 @@ describe.skip('GradebookGrid StudentColumnHeader', () => {
     return document.querySelector(`[aria-labelledby="${$button.id}"]`)
   }
 
-  function openOptionsMenu() {
+  async function openOptionsMenu() {
     getOptionsMenuTrigger().click()
-    $menuContent = getOptionsMenuContent()
+    await waitFor(() => {
+      $menuContent = getOptionsMenuContent()
+      expect($menuContent).toBeInTheDocument()
+    })
   }
 
-  function mountAndOpenOptionsMenu() {
+  async function mountAndOpenOptionsMenu() {
     mountComponent()
-    openOptionsMenu()
+    await openOptionsMenu()
   }
 
   function closeOptionsMenu() {
@@ -128,8 +132,8 @@ describe.skip('GradebookGrid StudentColumnHeader', () => {
       expect(getOptionsMenuContent()).toBeTruthy()
     })
 
-    it('closes the options menu when clicked', () => {
-      mountAndOpenOptionsMenu()
+    it('closes the options menu when clicked', async () => {
+      await mountAndOpenOptionsMenu()
       getOptionsMenuTrigger().click()
       expect(getOptionsMenuContent()).toBeFalsy()
     })
@@ -168,48 +172,43 @@ describe.skip('GradebookGrid StudentColumnHeader', () => {
       return getSortOrderOption('Z–A')
     }
 
-    it.skip('is added as a Gradebook element when opened', () => {
-      mountAndOpenOptionsMenu()
-      const $sortByMenuContent = getMenuContent($menuContent, 'Sort by')
-      expect(gradebookElements.indexOf($sortByMenuContent)).not.toBe(-1)
-    })
 
-    it('is removed as a Gradebook element when closed', () => {
-      mountAndOpenOptionsMenu()
+    it('is removed as a Gradebook element when closed', async () => {
+      await mountAndOpenOptionsMenu()
       const $sortByMenuContent = getMenuContent($menuContent, 'Sort by')
       closeOptionsMenu()
       expect(gradebookElements.indexOf($sortByMenuContent)).toBe(-1)
     })
 
-    it('is disabled when all options are disabled', () => {
+    it('is disabled when all options are disabled', async () => {
       props.disabled = true
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       expect(getMenuItem($menuContent, 'Sort by').getAttribute('aria-disabled')).toBe('true')
     })
 
     describe('"Type" menu group', () => {
       describe('"Name" option', () => {
-        it('is selected when sorting by sortable name', () => {
+        it('is selected when sorting by sortable name', async () => {
           props.sortBySetting.settingKey = 'sortable_name'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortByNameOption().getAttribute('aria-checked')).toBe('true')
         })
 
-        it('is not selected when not sorting by sortable name', () => {
+        it('is not selected when not sorting by sortable name', async () => {
           props.sortBySetting.settingKey = 'login_id'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortByNameOption().getAttribute('aria-checked')).toBe('false')
         })
 
-        it('is not selected when isSortColumn is false', () => {
+        it('is not selected when isSortColumn is false', async () => {
           props.sortBySetting.isSortColumn = false
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortByNameOption().getAttribute('aria-checked')).toBe('false')
         })
 
-        it('is optionally disabled', () => {
+        it('is optionally disabled', async () => {
           props.sortBySetting.disabled = true
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortByNameOption().getAttribute('aria-disabled')).toBe('true')
         })
 
@@ -218,51 +217,45 @@ describe.skip('GradebookGrid StudentColumnHeader', () => {
             props.sortBySetting.onSortBySortableName = vi.fn()
           })
 
-          it('calls the .sortBySetting.onSortBySortableName callback', () => {
-            mountAndOpenOptionsMenu()
+          it('calls the .sortBySetting.onSortBySortableName callback', async () => {
+            await mountAndOpenOptionsMenu()
             getSortByNameOption().click()
             expect(props.sortBySetting.onSortBySortableName).toHaveBeenCalledTimes(1)
           })
 
-          it('returns focus to the "Options" menu trigger', () => {
-            mountAndOpenOptionsMenu()
+          it('returns focus to the "Options" menu trigger', async () => {
+            await mountAndOpenOptionsMenu()
             getSortByNameOption().focus()
             getSortByNameOption().click()
-            expect(document.activeElement).toBe(getOptionsMenuTrigger())
-          })
-
-          // TODO: GRADE-____
-          it.skip('does not call the .sortBySetting.onSortBySortableName callback when already selected', () => {
-            props.sortBySetting.settingKey = 'sortable_name'
-            mountAndOpenOptionsMenu()
-            getSortByNameOption().focus()
-            expect(props.sortBySetting.onSortBySortableName).not.toHaveBeenCalled()
+            await waitFor(() => {
+              expect(document.activeElement).toBe(getOptionsMenuTrigger())
+            })
           })
         })
       })
 
       describe('"SIS ID" option', () => {
-        it('is selected when sorting by SIS ID', () => {
+        it('is selected when sorting by SIS ID', async () => {
           props.sortBySetting.settingKey = 'sis_user_id'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortBySisIdOption().getAttribute('aria-checked')).toBe('true')
         })
 
-        it('is not selected when not sorting by SIS ID', () => {
+        it('is not selected when not sorting by SIS ID', async () => {
           props.sortBySetting.settingKey = 'login_id'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortBySisIdOption().getAttribute('aria-checked')).toBe('false')
         })
 
-        it('is not selected when isSortColumn is false', () => {
+        it('is not selected when isSortColumn is false', async () => {
           props.sortBySetting.isSortColumn = false
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortBySisIdOption().getAttribute('aria-checked')).toBe('false')
         })
 
-        it('is optionally disabled', () => {
+        it('is optionally disabled', async () => {
           props.sortBySetting.disabled = true
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortBySisIdOption().getAttribute('aria-disabled')).toBe('true')
         })
 
@@ -271,51 +264,45 @@ describe.skip('GradebookGrid StudentColumnHeader', () => {
             props.sortBySetting.onSortBySisId = vi.fn()
           })
 
-          it('calls the .sortBySetting.onSortBySisId callback', () => {
-            mountAndOpenOptionsMenu()
+          it('calls the .sortBySetting.onSortBySisId callback', async () => {
+            await mountAndOpenOptionsMenu()
             getSortBySisIdOption().click()
             expect(props.sortBySetting.onSortBySisId).toHaveBeenCalledTimes(1)
           })
 
-          it('returns focus to the "Options" menu trigger', () => {
-            mountAndOpenOptionsMenu()
+          it('returns focus to the "Options" menu trigger', async () => {
+            await mountAndOpenOptionsMenu()
             getSortBySisIdOption().focus()
             getSortBySisIdOption().click()
-            expect(document.activeElement).toBe(getOptionsMenuTrigger())
-          })
-
-          // TODO: GRADE-____
-          it.skip('does not call the .sortBySetting.onSortBySisId callback when already selected', () => {
-            props.sortBySetting.settingKey = 'sis_user_id'
-            mountAndOpenOptionsMenu()
-            getSortBySisIdOption().focus()
-            expect(props.sortBySetting.onSortBySisId).not.toHaveBeenCalled()
+            await waitFor(() => {
+              expect(document.activeElement).toBe(getOptionsMenuTrigger())
+            })
           })
         })
       })
 
       describe('"Integration ID" option', () => {
-        it('is selected when sorting by integration ID', () => {
+        it('is selected when sorting by integration ID', async () => {
           props.sortBySetting.settingKey = 'integration_id'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortByIntegrationIdOption().getAttribute('aria-checked')).toBe('true')
         })
 
-        it('is not selected when not sorting by integration ID', () => {
+        it('is not selected when not sorting by integration ID', async () => {
           props.sortBySetting.settingKey = 'login_id'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortByIntegrationIdOption().getAttribute('aria-checked')).toBe('false')
         })
 
-        it('is not selected when isSortColumn is false', () => {
+        it('is not selected when isSortColumn is false', async () => {
           props.sortBySetting.isSortColumn = false
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortByIntegrationIdOption().getAttribute('aria-checked')).toBe('false')
         })
 
-        it('is optionally disabled', () => {
+        it('is optionally disabled', async () => {
           props.sortBySetting.disabled = true
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortByIntegrationIdOption().getAttribute('aria-disabled')).toBe('true')
         })
 
@@ -324,51 +311,45 @@ describe.skip('GradebookGrid StudentColumnHeader', () => {
             props.sortBySetting.onSortByIntegrationId = vi.fn()
           })
 
-          it('calls the .sortBySetting.onSortByIntegrationId callback', () => {
-            mountAndOpenOptionsMenu()
+          it('calls the .sortBySetting.onSortByIntegrationId callback', async () => {
+            await mountAndOpenOptionsMenu()
             getSortByIntegrationIdOption().click()
             expect(props.sortBySetting.onSortByIntegrationId).toHaveBeenCalledTimes(1)
           })
 
-          it('returns focus to the "Options" menu trigger', () => {
-            mountAndOpenOptionsMenu()
+          it('returns focus to the "Options" menu trigger', async () => {
+            await mountAndOpenOptionsMenu()
             getSortByIntegrationIdOption().focus()
             getSortByIntegrationIdOption().click()
-            expect(document.activeElement).toBe(getOptionsMenuTrigger())
-          })
-
-          // TODO: GRADE-____
-          it.skip('does not call the .sortBySetting.onSortByIntegrationId callback when already selected', () => {
-            props.sortBySetting.settingKey = 'integration_id'
-            mountAndOpenOptionsMenu()
-            getSortByIntegrationIdOption().focus()
-            expect(props.sortBySetting.onSortByIntegrationId).not.toHaveBeenCalled()
+            await waitFor(() => {
+              expect(document.activeElement).toBe(getOptionsMenuTrigger())
+            })
           })
         })
       })
 
       describe('"Login ID" option', () => {
-        it('is selected when sorting by login ID', () => {
+        it('is selected when sorting by login ID', async () => {
           props.sortBySetting.settingKey = 'login_id'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortByLoginIdOption().getAttribute('aria-checked')).toBe('true')
         })
 
-        it('is not selected when not sorting by login ID', () => {
+        it('is not selected when not sorting by login ID', async () => {
           props.sortBySetting.settingKey = 'sortable_name'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortByLoginIdOption().getAttribute('aria-checked')).toBe('false')
         })
 
-        it('is not selected when isSortColumn is false', () => {
+        it('is not selected when isSortColumn is false', async () => {
           props.sortBySetting.isSortColumn = false
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortByLoginIdOption().getAttribute('aria-checked')).toBe('false')
         })
 
-        it('is optionally disabled', () => {
+        it('is optionally disabled', async () => {
           props.sortBySetting.disabled = true
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getSortByLoginIdOption().getAttribute('aria-disabled')).toBe('true')
         })
 
@@ -377,25 +358,19 @@ describe.skip('GradebookGrid StudentColumnHeader', () => {
             props.sortBySetting.onSortByLoginId = vi.fn()
           })
 
-          it('calls the .sortBySetting.onSortByLoginId callback', () => {
-            mountAndOpenOptionsMenu()
+          it('calls the .sortBySetting.onSortByLoginId callback', async () => {
+            await mountAndOpenOptionsMenu()
             getSortByLoginIdOption().click()
             expect(props.sortBySetting.onSortByLoginId).toHaveBeenCalledTimes(1)
           })
 
-          it('returns focus to the "Options" menu trigger', () => {
-            mountAndOpenOptionsMenu()
+          it('returns focus to the "Options" menu trigger', async () => {
+            await mountAndOpenOptionsMenu()
             getSortByLoginIdOption().focus()
             getSortByLoginIdOption().click()
-            expect(document.activeElement).toBe(getOptionsMenuTrigger())
-          })
-
-          // TODO: GRADE-____
-          it.skip('does not call the .sortBySetting.onSortByLoginId callback when already selected', () => {
-            props.sortBySetting.settingKey = 'login_id'
-            mountAndOpenOptionsMenu()
-            getSortByLoginIdOption().focus()
-            expect(props.sortBySetting.onSortByLoginId).not.toHaveBeenCalled()
+            await waitFor(() => {
+              expect(document.activeElement).toBe(getOptionsMenuTrigger())
+            })
           })
         })
       })
@@ -403,27 +378,27 @@ describe.skip('GradebookGrid StudentColumnHeader', () => {
 
     describe('"Order" menu group', () => {
       describe('"A–Z" option', () => {
-        it('is selected when sorting in ascending order', () => {
+        it('is selected when sorting in ascending order', async () => {
           props.sortBySetting.direction = 'ascending'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getAscendingSortOrderOption().getAttribute('aria-checked')).toBe('true')
         })
 
-        it('is not selected when not sorting in ascending order', () => {
+        it('is not selected when not sorting in ascending order', async () => {
           props.sortBySetting.direction = 'descending'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getAscendingSortOrderOption().getAttribute('aria-checked')).toBe('false')
         })
 
-        it('is not selected when isSortColumn is false', () => {
+        it('is not selected when isSortColumn is false', async () => {
           props.sortBySetting.isSortColumn = false
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getAscendingSortOrderOption().getAttribute('aria-checked')).toBe('false')
         })
 
-        it('is optionally disabled', () => {
+        it('is optionally disabled', async () => {
           props.sortBySetting.disabled = true
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getAscendingSortOrderOption().getAttribute('aria-disabled')).toBe('true')
         })
 
@@ -432,51 +407,45 @@ describe.skip('GradebookGrid StudentColumnHeader', () => {
             props.sortBySetting.onSortInAscendingOrder = vi.fn()
           })
 
-          it('calls the .sortBySetting.onSortInAscendingOrder callback', () => {
-            mountAndOpenOptionsMenu()
+          it('calls the .sortBySetting.onSortInAscendingOrder callback', async () => {
+            await mountAndOpenOptionsMenu()
             getAscendingSortOrderOption().click()
             expect(props.sortBySetting.onSortInAscendingOrder).toHaveBeenCalledTimes(1)
           })
 
-          it('returns focus to the "Options" menu trigger', () => {
-            mountAndOpenOptionsMenu()
+          it('returns focus to the "Options" menu trigger', async () => {
+            await mountAndOpenOptionsMenu()
             getAscendingSortOrderOption().focus()
             getAscendingSortOrderOption().click()
-            expect(document.activeElement).toBe(getOptionsMenuTrigger())
-          })
-
-          // TODO: GRADE-____
-          it.skip('does not call the .sortBySetting.onSortInAscendingOrder callback when already selected', () => {
-            props.sortBySetting.direction = 'ascending'
-            mountAndOpenOptionsMenu()
-            getAscendingSortOrderOption().click()
-            expect(props.sortBySetting.onSortBySortableNameAscending).not.toHaveBeenCalled()
+            await waitFor(() => {
+              expect(document.activeElement).toBe(getOptionsMenuTrigger())
+            })
           })
         })
       })
 
       describe('"Z–A" option', () => {
-        it('is selected when sorting in descending order', () => {
+        it('is selected when sorting in descending order', async () => {
           props.sortBySetting.direction = 'descending'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getDescendingSortOrderOption().getAttribute('aria-checked')).toBe('true')
         })
 
-        it('is not selected when not sorting in descending order', () => {
+        it('is not selected when not sorting in descending order', async () => {
           props.sortBySetting.direction = 'ascending'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getDescendingSortOrderOption().getAttribute('aria-checked')).toBe('false')
         })
 
-        it('is not selected when isSortColumn is false', () => {
+        it('is not selected when isSortColumn is false', async () => {
           props.sortBySetting.isSortColumn = false
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getDescendingSortOrderOption().getAttribute('aria-checked')).toBe('false')
         })
 
-        it('is optionally disabled', () => {
+        it('is optionally disabled', async () => {
           props.sortBySetting.disabled = true
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           expect(getDescendingSortOrderOption().getAttribute('aria-disabled')).toBe('true')
         })
 
@@ -485,25 +454,19 @@ describe.skip('GradebookGrid StudentColumnHeader', () => {
             props.sortBySetting.onSortInDescendingOrder = vi.fn()
           })
 
-          it('calls the .sortBySetting.onSortInDescendingOrder callback', () => {
-            mountAndOpenOptionsMenu()
+          it('calls the .sortBySetting.onSortInDescendingOrder callback', async () => {
+            await mountAndOpenOptionsMenu()
             getDescendingSortOrderOption().click()
             expect(props.sortBySetting.onSortInDescendingOrder).toHaveBeenCalledTimes(1)
           })
 
-          it('returns focus to the "Options" menu trigger', () => {
-            mountAndOpenOptionsMenu()
+          it('returns focus to the "Options" menu trigger', async () => {
+            await mountAndOpenOptionsMenu()
             getDescendingSortOrderOption().focus()
             getDescendingSortOrderOption().click()
-            expect(document.activeElement).toBe(getOptionsMenuTrigger())
-          })
-
-          // TODO: GRADE-____
-          it.skip('does not call the .sortBySetting.onSortInDescendingOrder callback when already selected', () => {
-            props.sortBySetting.direction = 'ascending'
-            mountAndOpenOptionsMenu()
-            getDescendingSortOrderOption().click()
-            expect(props.sortBySetting.onSortBySortableNameDescending).not.toHaveBeenCalled()
+            await waitFor(() => {
+              expect(document.activeElement).toBe(getOptionsMenuTrigger())
+            })
           })
         })
       })

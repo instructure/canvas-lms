@@ -178,14 +178,14 @@ describe('SearchFormActions', () => {
       vi.clearAllMocks()
     })
 
-    it.skip('dispatches fetchHistoryStart', async () => {
+    it('dispatches fetchHistoryStart', async () => {
       const thunk = SearchFormActions.getGradebookHistory({})
       await thunk(dispatchMock)
       expect(HistoryActions.fetchHistoryStart).toHaveBeenCalled()
       expect(dispatchMock).toHaveBeenCalledWith({type: 'fetchHistoryStart'})
     })
 
-    it.skip('dispatches fetchHistorySuccess on success', async () => {
+    it('dispatches fetchHistorySuccess on success', async () => {
       const thunk = SearchFormActions.getGradebookHistory({})
       await thunk(dispatchMock)
       expect(HistoryActions.fetchHistorySuccess).toHaveBeenCalledWith(
@@ -195,7 +195,7 @@ describe('SearchFormActions', () => {
       expect(dispatchMock).toHaveBeenCalledWith({type: 'fetchHistorySuccess'})
     })
 
-    it.skip('dispatches fetchHistoryFailure on failure', async () => {
+    it('dispatches fetchHistoryFailure on failure', async () => {
       const error = new Error('FAIL')
       getGradebookHistoryMock.mockRejectedValue(error)
       const thunk = SearchFormActions.getGradebookHistory({})
@@ -248,7 +248,7 @@ describe('SearchFormActions', () => {
       expect(fetchSpy).toHaveBeenCalledTimes(1)
     })
 
-    it.skip('calls getUsersByName with empty array for enrollmentStates if course is not concluded', async () => {
+    it('calls getUsersByName with empty array for enrollmentStates if course is not concluded', async () => {
       courseIsConcludedMock.mockReturnValue(false)
       const thunk = SearchFormActions.getSearchOptions('graders', 'Norval')
       await thunk(dispatchMock)

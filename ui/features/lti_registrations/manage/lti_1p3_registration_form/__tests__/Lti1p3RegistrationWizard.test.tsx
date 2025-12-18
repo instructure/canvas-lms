@@ -57,7 +57,7 @@ describe('Lti1p3RegistrationWizard', () => {
     expect(onDismiss).toHaveBeenCalled()
   })
 
-  it.skip('navigates through all steps in order', async () => {
+  it('navigates through all steps in order', async () => {
     render(<Lti1p3RegistrationWizard {...defaultProps} />)
 
     expect(screen.getByText('LTI 1.3 Registration')).toBeInTheDocument()
@@ -94,7 +94,7 @@ describe('Lti1p3RegistrationWizard', () => {
     expect(screen.getByText('LTI 1.3 Registration')).toBeInTheDocument()
   })
 
-  it.skip('shows updating state when updating an existing registration', async () => {
+  it('shows updating state when updating an existing registration', async () => {
     const existingRegistration = mockRegistration('Test App', 1)
     render(
       <Lti1p3RegistrationWizard
@@ -115,7 +115,7 @@ describe('Lti1p3RegistrationWizard', () => {
     expect(screen.getAllByText('Updating App')[0]).toBeInTheDocument()
   })
 
-  it.skip('shows error state when an error occurs', async () => {
+  it('shows error state when an error occurs', async () => {
     const existingRegistration = mockRegistration('Test App', 1)
     const errorService = mockLti1p3RegistrationWizardService({
       updateLtiRegistration: vi.fn().mockReturnValue({
@@ -144,7 +144,7 @@ describe('Lti1p3RegistrationWizard', () => {
     expect(screen.getByText(/sorry, something broke/i)).toBeInTheDocument()
   })
 
-  it.skip('skips the icon confirmation screen if the tool has no placements with icons', async () => {
+  it('skips the icon confirmation screen if the tool has no placements with icons', async () => {
     render(
       <Lti1p3RegistrationWizard
         {...defaultProps}

@@ -82,8 +82,7 @@ describe('DueDateRow with empty props and canDelete true', () => {
     expect(container).toBeInTheDocument()
   })
 
-  // Skipped: Remove button not rendering - ARC-9211
-  it.skip('returns a remove link if canDelete', () => {
+  it('returns a remove link if canDelete', () => {
     render(<DueDateRow {...props} />)
     expect(screen.queryByRole('button', {name: /remove/i})).toBeTruthy()
   })
@@ -135,8 +134,7 @@ describe('DueDateRow with realistic props and canDelete false', () => {
     expect(screen.queryByRole('button', {name: /remove/i})).toBeFalsy()
   })
 
-  // Skipped: Component not rendering due date set region - ARC-9211
-  it.skip('tokenizing ADHOC overrides works', () => {
+  it('tokenizing ADHOC overrides works', () => {
     render(<DueDateRow {...props} />)
     expect(screen.getByRole('region', {name: /due date set/i})).toBeTruthy()
   })

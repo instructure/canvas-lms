@@ -293,12 +293,10 @@ describe('ItemAssignToCard', () => {
 
     describe('isCheckpointed is true', () => {
       beforeEach(() => {
-        // @ts-expect-error
         window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
       })
 
       afterEach(() => {
-        // @ts-expect-error
         window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = false
       })
 

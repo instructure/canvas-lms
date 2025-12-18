@@ -75,10 +75,10 @@ describe('MissingDateDialogView', () => {
     $('#fixtures').empty()
   })
 
-  // :visible doesn't work with our jsdom
-  test.skip('should display a dialog if the given fields are invalid', function () {
+  test('should display a dialog if the given fields are invalid', function () {
     ok(dialog.render())
-    ok($('.ui-dialog:visible').length > 0)
+    // Use existence check instead of :visible which doesn't work in JSDOM
+    ok($('.ui-dialog').length > 0)
   })
 
   test('should not display a dialog if the given fields are valid', function () {
@@ -87,15 +87,13 @@ describe('MissingDateDialogView', () => {
     equal($('.ui-dialog').length, 0)
   })
 
-  // jQuery UI dialog positioning doesn't work properly in Vitest/JSDOM
-  test.skip('should close the dialog on secondary button press', function () {
+  test('should close the dialog on secondary button press', function () {
     dialog.render()
     dialog.$dialog.find('.btn:not(.btn-primary)').click()
     equal($('.ui-dialog').length, 0)
   })
 
-  // jQuery UI dialog positioning doesn't work properly in Vitest/JSDOM
-  test.skip('should run the success callback on on primary button press', function () {
+  test('should run the success callback on on primary button press', function () {
     dialog.render()
     dialog.$dialog.find('.btn-primary').click()
     expect(dialog.options.success).toHaveBeenCalledTimes(1)

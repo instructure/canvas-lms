@@ -23,8 +23,6 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-vi.useFakeTimers()
-
 const server = setupServer()
 
 function fakeLinkHeader(path) {
@@ -102,10 +100,9 @@ describe('JobStats', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    vi.clearAllTimers()
   })
 
-  it.skip('loads cluster info', async () => {
+  it('loads cluster info', async () => {
     server.use(
       http.get('/api/v1/jobs2/clusters', () =>
         HttpResponse.json(fakeCluster, {
@@ -115,7 +112,10 @@ describe('JobStats', () => {
     )
 
     const {queryByText, getByText} = render(<JobStats />)
-    await act(async () => vi.runOnlyPendingTimers())
+
+    await waitFor(() => {
+      expect(getByText('jobs1', {selector: 'a'})).toBeInTheDocument()
+    })
 
     const jobs1_link = getByText('jobs1', {selector: 'a'})
     expect(jobs1_link.getAttribute('href')).toEqual('//jobs101.example.com/jobs_v2')
@@ -129,12 +129,10 @@ describe('JobStats', () => {
     expect(getByText('9', {selector: 'td button'})).toBeInTheDocument()
 
     // since ENV.manage_jobs is explicitly set to false
-    await waitFor(() => {
-      expect(queryByText('Unblock', {selector: 'button span'})).not.toBeInTheDocument()
-    })
+    expect(queryByText('Unblock', {selector: 'button span'})).not.toBeInTheDocument()
   })
 
-  it.skip('refreshes cluster', async () => {
+  it('refreshes cluster', async () => {
     let capturedParams = null
     server.use(
       http.get('/api/v1/jobs2/clusters', ({request}) => {
@@ -152,14 +150,21 @@ describe('JobStats', () => {
     )
 
     const {queryByText, getByText} = render(<JobStats />)
-    await act(async () => vi.runOnlyPendingTimers())
+
+    await waitFor(() => {
+      expect(getByText('Refresh', {selector: 'button span'})).toBeInTheDocument()
+    })
 
     fireEvent.click(getByText('Refresh', {selector: 'button span'}))
-    await act(async () => vi.runOnlyPendingTimers())
 
-    expect(capturedParams).toBe('101')
+    await waitFor(() => {
+      expect(capturedParams).toBe('101')
+    })
 
-    expect(queryByText('jobs held')).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(queryByText('jobs held')).not.toBeInTheDocument()
+    })
+
     expect(queryByText('block stranded')).not.toBeInTheDocument()
     expect(queryByText('86', {selector: 'td'})).not.toBeInTheDocument()
     expect(queryByText('7', {selector: 'td'})).not.toBeInTheDocument()
@@ -173,7 +178,10 @@ describe('JobStats', () => {
   })
 
   it.skip('unstucks a cluster', async () => {
+    vi.useFakeTimers({shouldAdvanceTime: true})
+
     // Set manage_jobs to true for this test
+    fakeENV.teardown()
     fakeENV.setup({
       manage_jobs: true,
     })
@@ -204,28 +212,35 @@ describe('JobStats', () => {
     )
 
     const {getByText, queryByText} = render(<JobStats />)
-    await act(async () => vi.runOnlyPendingTimers())
+
+    await waitFor(() => {
+      expect(getByText('Unblock', {selector: 'button span'})).toBeInTheDocument()
+    })
 
     fireEvent.click(getByText('Unblock', {selector: 'button span'}))
-    await act(async () => vi.runOnlyPendingTimers())
 
-    expect(
-      getByText('Are you sure you want to unblock all stuck jobs in this job cluster?'),
-    ).toBeInTheDocument()
+    await waitFor(() => {
+      expect(
+        getByText('Are you sure you want to unblock all stuck jobs in this job cluster?'),
+      ).toBeInTheDocument()
+    })
+
     expect(
       getByText('NOTE: Jobs blocked by shard migrations will not be unblocked.'),
     ).toBeInTheDocument()
 
     fireEvent.click(getByText('Confirm'))
-    await act(async () => vi.runOnlyPendingTimers())
 
-    expect(getByText('Unblocking...')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(getByText('Unblocking...')).toBeInTheDocument()
+    })
+
     expect(unstuckMethod).toBe('PUT')
     expect(unstuckParams).toBe('101')
 
     // Advance timers to trigger the polling interval
     await act(async () => {
-      vi.advanceTimersByTime(2000)
+      await vi.advanceTimersByTimeAsync(2000)
     })
 
     // Wait for the async updates to complete
@@ -237,9 +252,11 @@ describe('JobStats', () => {
       expect(queryByText('9', {selector: 'td button'})).not.toBeInTheDocument()
       expect(getByText('0', {selector: 'td'})).toBeInTheDocument()
     })
+
+    vi.useRealTimers()
   })
 
-  it.skip('shows stuck strands/singletons', async () => {
+  it('shows stuck strands/singletons', async () => {
     let strandsCalled = false
     let singletonsCalled = false
 
@@ -266,16 +283,24 @@ describe('JobStats', () => {
     )
 
     const {getByText, getAllByText} = render(<JobStats />)
-    await act(async () => vi.runOnlyPendingTimers())
+
+    await waitFor(() => {
+      expect(getByText('9', {selector: 'td button'})).toBeInTheDocument()
+    })
 
     fireEvent.click(getByText('9', {selector: 'td button'}))
-    await act(async () => vi.runOnlyPendingTimers())
 
-    expect(strandsCalled).toBe(true)
-    expect(singletonsCalled).toBe(true)
+    await waitFor(() => {
+      expect(strandsCalled).toBe(true)
+      expect(singletonsCalled).toBe(true)
+    })
+
+    await waitFor(() => {
+      const ss_links = getAllByText('baz', {selector: 'td a'})
+      expect(ss_links).toHaveLength(2)
+    })
 
     const ss_links = getAllByText('baz', {selector: 'td a'})
-    expect(ss_links).toHaveLength(2)
     expect(ss_links.map(link => link.getAttribute('href'))).toEqual([
       '//jobs101.example.com/jobs_v2?group_type=strand&group_text=baz&bucket=queued',
       '//jobs101.example.com/jobs_v2?group_type=singleton&group_text=baz&bucket=queued',

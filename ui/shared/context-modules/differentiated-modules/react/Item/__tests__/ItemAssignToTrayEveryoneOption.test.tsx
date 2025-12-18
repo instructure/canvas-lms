@@ -16,19 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, cleanup, waitFor} from '@testing-library/react'
+import {cleanup, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import {
   OVERRIDES,
   OVERRIDES_URL,
   renderComponent,
-  SECTIONS_URL,
   setupBaseMocks,
   setupEnv,
   setupFlashHolder,
 } from './ItemAssignToTrayTestUtils'
 
-describe('ItemAssignToTray - AssigneeSelector', () => {
+describe('ItemAssignToTray - Everyone Option', () => {
   const originalLocation = window.location
 
   beforeAll(() => {
@@ -96,8 +95,7 @@ describe('ItemAssignToTray - AssigneeSelector', () => {
     waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Everyone'))
   })
 
-  // TODO: flaky in Vitest - intermittently times out
-  it.skip('renders everyone option for item with course and module overrides', async () => {
+  it('renders everyone option for item with course and module overrides', async () => {
     fetchMock.get(
       OVERRIDES_URL,
       {
@@ -132,104 +130,5 @@ describe('ItemAssignToTray - AssigneeSelector', () => {
     const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
     expect(selectedOptions).toHaveLength(1)
     waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Everyone'))
-  })
-
-  it('renders mastery paths option for noop 1 overrides', async () => {
-    fetchMock.get(
-      '/api/v1/courses/1/settings',
-      {conditional_release: true},
-      {overwriteRoutes: true},
-    )
-    fetchMock.get(
-      OVERRIDES_URL,
-      {
-        overrides: [
-          {
-            due_at: null,
-            id: undefined,
-            lock_at: null,
-            noop_id: 1,
-            unlock_at: null,
-          },
-        ],
-      },
-      {overwriteRoutes: true},
-    )
-    const {findAllByTestId} = renderComponent()
-    const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
-    expect(selectedOptions).toHaveLength(1)
-    waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Mastery Paths'))
-  })
-
-  it('calls onDismiss when an error occurs while fetching data', async () => {
-    fetchMock.getOnce(SECTIONS_URL, 500, {overwriteRoutes: true})
-    const onDismiss = vi.fn()
-    renderComponent({onDismiss})
-    await waitFor(() => expect(onDismiss).toHaveBeenCalledTimes(1))
-  })
-
-  // TODO: flaky in Vitest - intermittently times out
-  it.skip('adds a card when add button is clicked', async () => {
-    fetchMock.get(
-      OVERRIDES_URL,
-      {
-        id: '23',
-        due_at: '2023-10-05T12:00:00Z',
-        unlock_at: '2023-10-01T12:00:00Z',
-        lock_at: '2023-11-01T12:00:00Z',
-        only_visible_to_overrides: false,
-        visible_to_everyone: true,
-        overrides: [],
-      },
-      {
-        overwriteRoutes: true,
-      },
-    )
-    const {findAllByTestId, getAllByTestId} = renderComponent()
-    const cards = await findAllByTestId('item-assign-to-card')
-    expect(cards).toHaveLength(1)
-    act(() => getAllByTestId('add-card')[0].click())
-    expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
-  })
-
-  // TODO: flaky in Vitest - times out
-  it.skip('shows top add button if more than 3 cards exist', async () => {
-    fetchMock.get(
-      OVERRIDES_URL,
-      {
-        id: '23',
-        due_at: '2023-10-05T12:00:00Z',
-        unlock_at: '2023-10-01T12:00:00Z',
-        lock_at: '2023-11-01T12:00:00Z',
-        only_visible_to_overrides: false,
-        visible_to_everyone: true,
-        overrides: [
-          {
-            id: '2',
-            assignment_id: '23',
-            course_section_id: '4',
-          },
-          {
-            id: '3',
-            assignment_id: '23',
-            course_section_id: '5',
-          },
-          {
-            id: '4',
-            assignment_id: '23',
-            course_section_id: '6',
-          },
-        ],
-      },
-      {
-        overwriteRoutes: true,
-      },
-    )
-    const {findAllByTestId, getAllByTestId} = renderComponent()
-    const cards = await findAllByTestId('item-assign-to-card')
-    expect(cards).toHaveLength(4)
-    expect(getAllByTestId('add-card')).toHaveLength(2)
-    act(() => getAllByTestId('add-card')[0].click())
-    expect(getAllByTestId('item-assign-to-card')).toHaveLength(5)
   })
 })

@@ -68,7 +68,7 @@ describe('useAccessibilityScanFetchUtils', () => {
     server.resetHandlers()
   })
 
-  it.skip('should make a fetch attempt with default state, when newStateToFetch object is empty', async () => {
+  it('should make a fetch attempt with default state, when newStateToFetch object is empty', async () => {
     let capturedUrl = ''
     server.use(
       http.get('*/accessibility/resource_scan', ({request}) => {
@@ -96,7 +96,7 @@ describe('useAccessibilityScanFetchUtils', () => {
     expect(storeResult.current.search).toBe(defaultStateToFetch.search)
   })
 
-  it.skip('should set pageCount based on API response headers', async () => {
+  it('should set pageCount based on API response headers', async () => {
     server.use(
       http.get('*/accessibility/resource_scan', () => {
         return HttpResponse.json([], {
@@ -121,7 +121,7 @@ describe('useAccessibilityScanFetchUtils', () => {
     expect(storeResult.current.pageCount).toBe(5)
   })
 
-  it.skip('should make a fetch attempt based on a non-empty newStateToFetch object, and update the store', async () => {
+  it('should make a fetch attempt based on a non-empty newStateToFetch object, and update the store', async () => {
     let capturedUrl = ''
     server.use(
       http.get('*/accessibility/resource_scan', ({request}) => {
@@ -158,7 +158,7 @@ describe('useAccessibilityScanFetchUtils', () => {
     expect(storeResult.current.search).toBe(testNewStateToFetch.search)
   })
 
-  it.skip('should only save the error message in the store if the fetch fails', async () => {
+  it('should only save the error message in the store if the fetch fails', async () => {
     let capturedUrl = ''
     server.use(
       http.get('*/accessibility/resource_scan', ({request}) => {

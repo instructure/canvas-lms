@@ -84,7 +84,7 @@ describe('GradingPeriodSet', () => {
       gradingPeriodsApi.batchUpdate.mockRejectedValue(new Error('FAIL'))
     })
 
-    it.skip('prevents saving a grading period without a title', async () => {
+    it('prevents saving a grading period without a title', async () => {
       const {getByRole, getByLabelText} = renderComponent()
       const user = userEvent.setup()
 
@@ -99,7 +99,7 @@ describe('GradingPeriodSet', () => {
       expect(getByLabelText(/title/i)).toBeInTheDocument()
     })
 
-    it.skip('prevents saving a grading period with only spaces as title', async () => {
+    it('prevents saving a grading period with only spaces as title', async () => {
       const {getByRole, getByLabelText} = renderComponent()
       const user = userEvent.setup()
 
@@ -115,7 +115,7 @@ describe('GradingPeriodSet', () => {
       expect(getByLabelText(/title/i)).toBeInTheDocument()
     })
 
-    it.skip('prevents saving a grading period with a negative weight', async () => {
+    it('prevents saving a grading period with a negative weight', async () => {
       const {getByRole, getByLabelText} = renderComponent()
       const user = userEvent.setup()
 
@@ -131,7 +131,7 @@ describe('GradingPeriodSet', () => {
       expect(getByLabelText(/weight/i)).toBeInTheDocument()
     })
 
-    it.skip('prevents saving a grading period without a valid startDate', async () => {
+    it('prevents saving a grading period without a valid startDate', async () => {
       const {getByRole, getByLabelText} = renderComponent()
       const user = userEvent.setup()
 
@@ -146,7 +146,7 @@ describe('GradingPeriodSet', () => {
       expect(getByLabelText(/start date/i)).toBeInTheDocument()
     })
 
-    it.skip('prevents saving a grading period without a valid endDate', async () => {
+    it('prevents saving a grading period without a valid endDate', async () => {
       const {getByRole, getByLabelText} = renderComponent()
       const user = userEvent.setup()
 
@@ -161,7 +161,7 @@ describe('GradingPeriodSet', () => {
       expect(getByLabelText(/end date/i)).toBeInTheDocument()
     })
 
-    it.skip('prevents saving a grading period without a valid closeDate', async () => {
+    it('prevents saving a grading period without a valid closeDate', async () => {
       const {getByRole, getByLabelText} = renderComponent()
       const user = userEvent.setup()
 

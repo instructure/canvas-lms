@@ -115,7 +115,7 @@ describe('Enhanced Individual Gradebook', () => {
       expect(viewUngradedAsZeroCheckbox).toBeChecked()
     })
 
-    it.skip('makes api call when "View Ungraded as 0" checkbox is checked & save-view-ungraded-as-zero-to-server is true', async () => {
+    it('makes api call when "View Ungraded as 0" checkbox is checked & save-view-ungraded-as-zero-to-server is true', async () => {
       const options = setGradebookOptions({save_view_ungraded_as_zero_to_server: true})
       fakeENV.setup({
         ...options,
@@ -136,7 +136,7 @@ describe('Enhanced Individual Gradebook', () => {
       const {getByTestId} = renderEnhancedIndividualGradebook()
       await new Promise(resolve => setTimeout(resolve, 0))
       const viewUngradedAsZeroCheckbox = getByTestId('include-ungraded-assignments-checkbox')
-      expect(viewUngradedAsZeroCheckbox).not.toBeChecked()
+      expect(viewUngradedAsZeroCheckbox).toBeChecked()
       expect(viewUngradedAsZeroCheckbox).toBeInTheDocument()
       fireEvent.click(viewUngradedAsZeroCheckbox)
       await new Promise(resolve => setTimeout(resolve, 100))

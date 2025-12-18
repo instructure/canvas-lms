@@ -400,6 +400,9 @@ describe('EnhancedActionMenu', () => {
     })
 
     it.skip('on failure, shows a message to the user indicating the export failed', async () => {
+      // SKIP REASON: Test fails with "Timers are not mocked" error when waitFor tries to
+      // advance timers. The test needs vi.useFakeTimers() setup but other tests in this
+      // file may not be compatible with fake timers.
       const spy = vi.spyOn(window.$, 'flashError').mockReturnValue(true)
       const exportResult = getPromise('rejected')
       startExport.mockReturnValue(exportResult)

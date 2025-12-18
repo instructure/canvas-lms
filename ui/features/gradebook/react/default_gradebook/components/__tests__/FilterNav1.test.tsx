@@ -499,6 +499,9 @@ describe('FilterNav', () => {
     })
 
     it.skip('clicking on another popover trigger will close the current popover', async () => {
+      // SKIP REASON: Popover auto-close behavior when clicking another trigger doesn't work
+      // in test environment. The modules filter-type popover is not rendered after clicking
+      // the modules applied-filter, suggesting popover state management issues.
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       const {getByText, getByTestId, queryByTestId, getByRole} = render(
         <FilterNav {...filterProps} />,

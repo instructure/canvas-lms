@@ -68,7 +68,7 @@ describe('WikiPageEditView', () => {
     expect(view.$el).toBeDefined()
   })
 
-  test.skip('should show errors', () => {
+  test('should show errors', () => {
     const view = createView()
     const errors = {
       body: [{type: 'too_long', message: 'Error...'}],
@@ -77,7 +77,7 @@ describe('WikiPageEditView', () => {
     expect(view.$('.body_has_errors')).toBeDefined()
   })
 
-  test.skip('should only make 1 request when save & publish is clicked', async () => {
+  test('should only make 1 request when save & publish is clicked', async () => {
     const submitSpy = vi
       .spyOn(WikiPageEditView.prototype, 'submit')
       .mockImplementation(function (e) {
@@ -125,7 +125,7 @@ describe('WikiPageEditView', () => {
   })
 
   describe('getFormData', () => {
-    test.skip('assignment is included in form data', () => {
+    test('assignment is included in form data', () => {
       const view = createView()
       const data = view.getFormData()
       expect(data.assignment).toBeDefined()
@@ -146,7 +146,7 @@ describe('WikiPageEditView', () => {
       window.location = originalLocation
     })
 
-    test.skip('calls redirectWithHorizonParams when redirect callback is triggered', () => {
+    test('calls redirectWithHorizonParams when redirect callback is triggered', () => {
       const model = new WikiPage({html_url: 'https://example.com/pages/test'})
       const view = new WikiPageEditView({
         model,
@@ -159,7 +159,7 @@ describe('WikiPageEditView', () => {
       expect(redirectWithHorizonParams).toHaveBeenCalledWith('https://example.com/pages/test')
     })
 
-    test.skip('redirect callback uses model html_url', () => {
+    test('redirect callback uses model html_url', () => {
       const testUrl = 'https://example.com/courses/1/pages/my-page'
       const model = new WikiPage({html_url: testUrl})
       const view = new WikiPageEditView({
@@ -173,7 +173,7 @@ describe('WikiPageEditView', () => {
       expect(redirectWithHorizonParams).toHaveBeenCalledWith(testUrl)
     })
 
-    test.skip('redirect works with assign-to functionality disabled', () => {
+    test('redirect works with assign-to functionality disabled', () => {
       ENV.COURSE_ID = null // Disable assign-to
       const model = new WikiPage({html_url: 'https://example.com/pages/test'})
       const view = new WikiPageEditView({

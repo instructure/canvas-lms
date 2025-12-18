@@ -72,21 +72,19 @@ describe('AuthenticationProviders', () => {
       })
     })
 
-    // doesn't work in Jest due to lack of support for focusable in jQuery UI
-    test.skip('shows the form for the matching auth type', () => {
+    test('shows the form for the matching auth type', () => {
       AuthenticationProviders.changedAuthType('facebook')
       const $form = $container.querySelector<HTMLFormElement>('#facebook_form')
       strictEqual($form!.style.display, '')
     })
 
-    // doesn't work in Jest due to lack of support for focusable in jQuery UI
-    test.skip('does not show unrelated forms', () => {
+    test('does not show unrelated forms', () => {
       AuthenticationProviders.changedAuthType('facebook')
       const $form = $container.querySelector<HTMLFormElement>('#google_form')
       equal($form!.style.display, 'none')
     })
 
-    // doesn't work in Jest due to lack of support for focusable in jQuery UI
+    // jQuery UI's :focusable selector doesn't work in jsdom
     test.skip('sets focus on the first focusable element of the visible form', () => {
       AuthenticationProviders.changedAuthType('google')
       vi.advanceTimersByTime(100)

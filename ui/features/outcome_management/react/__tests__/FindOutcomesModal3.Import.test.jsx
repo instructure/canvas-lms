@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
-import {render as rtlRender, waitFor} from '@testing-library/react'
+import {render as rtlRender, waitFor, act} from '@testing-library/react'
 import FindOutcomesModal from '../FindOutcomesModal'
 import OutcomesContext, {
   ACCOUNT_GROUP_ID,
@@ -190,7 +190,10 @@ describe('FindOutcomesModal - Individual Outcome Import Tests', () => {
 
     expect(queryAllByText('Loading')).toHaveLength(1)
 
-    doResolveProgress()
+    await act(async () => {
+      doResolveProgress()
+      await vi.runAllTimersAsync()
+    })
     await waitFor(() => expect(queryByText('Loading')).not.toBeInTheDocument())
     expect(queryAllByText('Added')).toHaveLength(1)
     expect(localStorage.activeImports).toEqual('[]')
@@ -220,7 +223,10 @@ describe('FindOutcomesModal - Individual Outcome Import Tests', () => {
     // Verify loading state
     expect(getByText('Loading')).toBeInTheDocument()
 
-    doResolveProgress()
+    await act(async () => {
+      doResolveProgress()
+      await vi.runAllTimersAsync()
+    })
     await waitFor(() => expect(queryByText('Loading')).not.toBeInTheDocument())
 
     // Verify completed state

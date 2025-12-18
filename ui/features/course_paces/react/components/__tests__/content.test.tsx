@@ -188,10 +188,11 @@ describe('PaceContextsContent', () => {
       expect(getByText('Please try another search term')).toBeInTheDocument()
     })
 
-    it.skip('provides contextType and contextId to Pace modal', async () => {
+    it('provides contextType and contextId to Pace modal', async () => {
+      const user = userEvent.setup({delay: null})
       const {findByRole} = renderConnected(<PaceContent />)
       const sectionLink = await findByRole('button', {name: firstSection.name})
-      act(() => sectionLink.click())
+      await user.click(sectionLink)
       expect(uiActions.setSelectedPaceContext).toHaveBeenCalledWith('Section', firstSection.item_id)
     })
 
@@ -314,7 +315,7 @@ describe('PaceContextsContent', () => {
         fetchMock.get(INIT_SECTION_PACE_PROGRESS_STATUS_POLL, {course_pace: {}, progress: {id: 2}})
       })
 
-      it.skip('shows a loading indicator for each pace publishing', async () => {
+      it('shows a loading indicator for each pace publishing', async () => {
         fetchMock.get('/api/v1/progress/2', {progress: {id: 2}})
 
         const paceContextsState: PaceContextsState = {
@@ -342,7 +343,7 @@ describe('PaceContextsContent', () => {
         ).toBeInTheDocument()
       })
 
-      it.skip('starts polling for published status updates on mount', async () => {
+      it('starts polling for published status updates on mount', async () => {
         fetchMock.get('/api/v1/progress/1', {progress: {id: 1}})
 
         const user = userEvent.setup({delay: null})

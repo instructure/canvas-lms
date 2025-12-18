@@ -128,19 +128,14 @@ describe('K5Dashboard Parent Support - Switching and Grades', () => {
       await waitFor(() => expect(fetchShowK5Dashboard).toHaveBeenCalledWith('2'))
     }
 
-    // TODO: This test is skipped due to slow rendering in Vitest.
-    // Consider splitting to separate test file with its own setup/teardown.
-    it.skip(
-      'does not reload the page if a k5 student with the same font selection is selected in the picker',
-      async () => {
-        // Explicitly set the same K5 settings for Student 2
-        fetchShowK5Dashboard.mockImplementationOnce(() =>
-          Promise.resolve({show_k5_dashboard: true, use_classic_font: false}),
-        )
-        await switchToStudent2()
-        expect(reloadWindow).not.toHaveBeenCalled()
-      },
-    )
+    it('does not reload the page if a k5 student with the same font selection is selected in the picker', async () => {
+      // Explicitly set the same K5 settings for Student 2
+      fetchShowK5Dashboard.mockImplementationOnce(() =>
+        Promise.resolve({show_k5_dashboard: true, use_classic_font: false}),
+      )
+      await switchToStudent2()
+      expect(reloadWindow).not.toHaveBeenCalled()
+    })
 
     it('reloads the page when a classic student is selected in the students picker', async () => {
       fetchShowK5Dashboard.mockImplementationOnce(() =>

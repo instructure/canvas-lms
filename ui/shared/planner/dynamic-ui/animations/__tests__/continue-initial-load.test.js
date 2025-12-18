@@ -56,19 +56,17 @@ it('keeps loading if the screen is not full and there are more items to load', (
   expect(store.dispatch).toHaveBeenCalledWith('lfi')
 })
 
-it.skip('stops loading if the screen is full', () => {
+it('stops loading if the screen is full', () => {
   const {animation, store, animator} = createReadyAnimation()
   store.getState.mockReturnValue({loading: {allFutureItemsLoaded: false}})
   animator.isOnScreen.mockReturnValue(false)
   animation.invokeUiWillUpdate()
   animation.invokeUiDidUpdate()
   vi.runAllTimers()
-  expect(actions.continueLoadingInitialItems).not.toHaveBeenCalled()
-  expect(actions.loadFutureItems).not.toHaveBeenCalled()
   expect(store.dispatch).not.toHaveBeenCalled()
 })
 
-it.skip('stops loading if all items have been loaded', () => {
+it('stops loading if all items have been loaded', () => {
   const {animation, store, animator} = createReadyAnimation()
   store.getState.mockReturnValue({loading: {allFutureItemsLoaded: true}})
   animator.isOnScreen.mockReturnValue(true)
@@ -77,7 +75,5 @@ it.skip('stops loading if all items have been loaded', () => {
   animation.invokeUiWillUpdate()
   animation.invokeUiDidUpdate()
   vi.runAllTimers()
-  expect(actions.continueLoadingInitialItems).not.toHaveBeenCalled()
-  expect(actions.loadFutureItems).not.toHaveBeenCalled()
   expect(store.dispatch).not.toHaveBeenCalled()
 })

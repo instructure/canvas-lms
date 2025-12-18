@@ -17,10 +17,22 @@
  */
 
 import {render, screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {userEvent} from '@testing-library/user-event'
 import DifferentiationTagConverterMessage from '../DifferentiationTagConverterMessage'
+import axios from 'axios'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+vi.mock('axios')
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
+}))
 
 describe('DifferentiationTagConverterMessage', () => {
+  let user: ReturnType<typeof userEvent.setup>
+
+  beforeEach(() => {
+    user = userEvent.setup()
+  })
   const renderComponent = (props: any) => {
     const defaultProps = {
       courseId: '1',
@@ -110,32 +122,27 @@ describe('DifferentiationTagConverterMessage', () => {
   })
 
   describe('button click', () => {
-    it.skip('calls "onFinish" when button is clicked and query is successful', async () => {
-      vi.mock('axios', () => ({
-        put: vi.fn(() => Promise.resolve({status: 204})),
-      }))
+    it('calls "onFinish" when button is clicked and query is successful', async () => {
+      vi.mocked(axios.put).mockResolvedValueOnce({status: 204} as any)
 
       const onFinishMethod = vi.fn()
       renderComponent({onFinish: onFinishMethod})
 
-      const button = screen.getByText('Convert Differentiation Tags')
-      await userEvent.click(button)
+      const button = screen.getByTestId('convert-differentiation-tags-button')
+      await user.click(button)
 
       await waitFor(() => {
-        expect(onFinishMethod).toHaveBeenCalledTimes(0)
+        expect(onFinishMethod).toHaveBeenCalledTimes(1)
       })
     })
 
-    it.skip('shows error message when query fails', async () => {
-      vi.mock('axios', () => ({
-        put: vi.fn(() => Promise.reject(new Error('Failed to convert differentiation tags.'))),
-      }))
+    it('shows error message when query fails', async () => {
+      vi.mocked(axios.put).mockRejectedValueOnce(new Error('Failed to convert differentiation tags.'))
 
-      const showFlashAlert = vi.fn()
-      renderComponent({showFlashAlert})
+      renderComponent({})
 
-      const button = screen.getByText('Convert Differentiation Tags')
-      await userEvent.click(button)
+      const button = screen.getByTestId('convert-differentiation-tags-button')
+      await user.click(button)
 
       await waitFor(() => {
         expect(showFlashAlert).toHaveBeenCalledWith({

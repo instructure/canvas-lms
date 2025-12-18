@@ -63,7 +63,7 @@ describe('WikiPageView', () => {
     expect(view.display_show_all_pages).toBe(true)
   })
 
-  test.skip('model.view maintained by item view', () => {
+  test('model.view maintained by item view', () => {
     const model = new WikiPage()
     const view = new WikiPageView({model})
     expect(model.view).toEqual(view)
@@ -71,6 +71,7 @@ describe('WikiPageView', () => {
     expect(model.view).toEqual(view)
   })
 
+  // Element not detaching properly after re-render
   test.skip('detach/reattach the publish icon view', () => {
     const model = new WikiPage()
     const view = new WikiPageView({model})
@@ -162,6 +163,7 @@ describe('WikiPageView', () => {
       $('#direct-share-mount-point').remove()
     })
 
+    // fails with jsdom 25 - jquery.simulate incompatibility
     test.skip('opens and closes user share modal', () => {
       const model = new WikiPage({
         page_id: '42',
@@ -223,7 +225,7 @@ describe('WikiPageView', () => {
       document.body.appendChild(container)
     })
 
-    it.skip('renders the block editor', () => {
+    it('renders the block editor', () => {
       const model = new WikiPage({
         editor: 'block_editor',
         block_editor_attributes: {

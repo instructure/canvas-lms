@@ -149,25 +149,27 @@ describe('HeaderInputs', () => {
     })
   })
 
-  // TODO: This test freezes in Vitest due to the 500ms setInterval polling in
-  // AddressBookContainer that conflicts with fake timers. The debouncing mechanism
-  // creates an infinite loop when advancing fake timers. Needs refactoring to use
-  // a debounce function instead of setInterval polling.
+  // TODO: This test is skipped due to issues with AddressBookContainer behavior.
+  // Original issue: fake timers conflict with setInterval polling causing infinite loop.
+  // Attempted fix: removed fake timers, but onSelectedIdsChange callback is not being
+  // triggered when selecting items. Needs investigation into AddressBookContainer
+  // event handling and MSW mock setup for address book queries.
   it.skip('calls onSelectedIdsChange when using the Address Book component', async () => {
-    vi.useFakeTimers()
     const props = defaultProps({addressBookContainerOpen: true})
     const container = setup(props)
     const input = await container.findByTestId('compose-modal-header-address-book-input')
     fireEvent.change(input, {target: {value: 'Fred'}})
 
-    // for debouncing
-    await act(async () => vi.advanceTimersByTime(1000))
-    const items = await screen.findAllByTestId('address-book-item')
+    // Wait for debouncing and items to appear
+    const items = await screen.findAllByTestId('address-book-item', {}, {timeout: 3000})
     fireEvent.mouseDown(items[0])
 
-    await waitFor(() => {
-      expect(props.onSelectedIdsChange).toHaveBeenCalled()
-    })
+    await waitFor(
+      () => {
+        expect(props.onSelectedIdsChange).toHaveBeenCalled()
+      },
+      {timeout: 3000},
+    )
     expect(props.onSelectedIdsChange.mock.calls[0][0][0]._id).toBe('1')
   })
 })

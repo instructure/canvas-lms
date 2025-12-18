@@ -127,7 +127,7 @@ describe('ExceptionModal', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
-  it.skip('allows searching for multiple contexts and adding them', async () => {
+  it('allows searching for multiple contexts and adding them', async () => {
     const accountId = ZAccountId.parse('1')
     const openState = {open: true, deployment: mockDeployment({})}
     const onClose = vi.fn()
@@ -214,7 +214,7 @@ describe('ExceptionModal', () => {
     expect(screen.queryByText('Subaccount 101')).not.toBeInTheDocument()
   })
 
-  it.skip('updates the availability status when the select option is changed', async () => {
+  it('updates the availability status when the select option is changed', async () => {
     const accountId = ZAccountId.parse('1')
     const openState = {open: true, deployment: mockDeployment({})}
     const onClose = vi.fn()
@@ -255,8 +255,7 @@ describe('ExceptionModal', () => {
     expect(select).toHaveDisplayValue(/not available/i)
   })
 
-  // TODO: vi->vitest - userEvent timing issue, element not found after click
-  it.skip('calls onConfirm with selected controls when Save is clicked', async () => {
+  it('calls onConfirm with selected controls when Save is clicked', async () => {
     const accountId = ZAccountId.parse('1')
     const openState = {open: true, deployment: mockDeployment({})}
     const onClose = vi.fn()
@@ -296,7 +295,7 @@ describe('ExceptionModal', () => {
     )
   })
 
-  it.skip('allows adding exceptions via the browse popover for subaccount and course contexts', async () => {
+  it('allows adding exceptions via the browse popover for subaccount and course contexts', async () => {
     const accountId = ZAccountId.parse('1')
     const openState = {open: true, deployment: mockDeployment({})}
     const onClose = vi.fn()
@@ -421,8 +420,7 @@ describe('ExceptionModal', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
-  // TODO: vi->vitest - userEvent timing issue, input not cleared after selection
-  it.skip('clears the search filter after a context is selected', async () => {
+  it('clears the search filter after a context is selected', async () => {
     const accountId = ZAccountId.parse('1')
     const openState = {open: true, deployment: mockDeployment({})}
     renderWithQueryClient(

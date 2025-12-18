@@ -34,6 +34,15 @@ vi.mock(
   }),
 )
 
+// Mock getTranslations to resolve immediately, avoiding the "Loading..." state in RCE
+vi.mock('@instructure/canvas-rce/es/getTranslations', async importOriginal => {
+  const original = await importOriginal()
+  return {
+    ...original,
+    default: () => Promise.resolve(),
+  }
+})
+
 async function makeProps(opts = {}) {
   const mockedSubmission =
     opts.submission ||
@@ -88,8 +97,7 @@ describe('TextEntry', () => {
 
   describe('initial rendering', () => {
     describe('before rendering has finished', () => {
-      // TODO: vi->vitest - RCE not loading placeholder content properly
-      it.skip('renders a placeholder text area with the submission contents', async () => {
+      it('renders a placeholder text area with the submission contents', async () => {
         const {findByDisplayValue} = await renderEditor()
         const textarea = await findByDisplayValue('words', {exact: false})
         expect(textarea).toBeInTheDocument()
@@ -98,16 +106,14 @@ describe('TextEntry', () => {
 
     describe('when the RCE has finished rendering', () => {
       describe('read-only mode', () => {
-        // TODO: vi->vitest - test fails with null fakeEditor, RCE initialization timing issue
-        it.skip('is not enabled if the readOnly prop is false', async () => {
+        it('is not enabled if the readOnly prop is false', async () => {
           await renderEditor()
           await waitFor(() => {
             expect(fakeEditor.readonly).toStrictEqual(false)
           })
         })
 
-        // TODO: vi->vitest - test fails with null fakeEditor, RCE initialization timing issue
-        it.skip('is enabled for observers', async () => {
+        it('is enabled for observers', async () => {
           const props = await makeProps()
           render(
             <StudentViewContext.Provider
@@ -127,8 +133,7 @@ describe('TextEntry', () => {
       })
 
       describe('text contents', () => {
-        // TODO: vi->vitest - test fails, RCE not loading content properly
-        it.skip('uses the submission body if the submission is graded', async () => {
+        it('uses the submission body if the submission is graded', async () => {
           const props = await makeProps({
             submission: {
               id: '1',
@@ -143,8 +148,7 @@ describe('TextEntry', () => {
           expect(textarea).toBeInTheDocument()
         })
 
-        // TODO: vi->vitest - test fails, RCE not loading content properly
-        it.skip('uses the submission body if the submission is submitted', async () => {
+        it('uses the submission body if the submission is submitted', async () => {
           const props = await makeProps({
             submission: {
               id: '1',
@@ -159,8 +163,7 @@ describe('TextEntry', () => {
           expect(textarea).toBeInTheDocument()
         })
 
-        // TODO: vi->vitest - test fails, RCE not loading content properly
-        it.skip('uses the contents of the draft if not graded or submitted and a draft is present', async () => {
+        it('uses the contents of the draft if not graded or submitted and a draft is present', async () => {
           const props = await makeProps({
             submission: {
               id: '1',
@@ -174,8 +177,7 @@ describe('TextEntry', () => {
           expect(textarea).toBeInTheDocument()
         })
 
-        // TODO: vi->vitest - test fails, RCE not loading content properly with fake timers
-        it.skip('is empty if not graded or submitted and no draft is present', async () => {
+        it('is empty if not graded or submitted and no draft is present', async () => {
           const props = await makeProps({
             submission: {
               id: '1',
@@ -237,8 +239,7 @@ describe('TextEntry', () => {
       return result
     }
 
-    // TODO: vi->vitest - test fails with null fakeEditor, RCE initialization timing issue
-    it.skip('does not update the mode of the editor if the readOnly prop has not changed', async () => {
+    it('does not update the mode of the editor if the readOnly prop has not changed', async () => {
       const {rerender} = await doInitialRender()
       const updatedProps = await makeProps({
         submission: {
@@ -253,8 +254,7 @@ describe('TextEntry', () => {
       expect(setModeSpy).not.toHaveBeenCalled()
     })
 
-    // TODO: vi->vitest - test fails with null fakeEditor, RCE initialization timing issue
-    it.skip('sets the content of the editor if the attempt and body draft has changed', async () => {
+    it('sets the content of the editor if the attempt and body draft has changed', async () => {
       const {rerender} = await doInitialRender()
 
       const newProps = await makeProps({
@@ -271,8 +271,7 @@ describe('TextEntry', () => {
       expect(setContentSpy).toHaveBeenCalledWith('hello, again')
     })
 
-    // TODO: vi->vitest - test fails with null fakeEditor, RCE initialization timing issue
-    it.skip('does not sets the content of the editor if the body draft has not changed', async () => {
+    it('does not sets the content of the editor if the body draft has not changed', async () => {
       const {rerender} = await doInitialRender()
 
       const newProps = await makeProps({
@@ -289,8 +288,7 @@ describe('TextEntry', () => {
       expect(setContentSpy).not.toHaveBeenCalled()
     })
 
-    // TODO: vi->vitest - test fails with null fakeEditor, RCE initialization timing issue
-    it.skip('does not set the content of the editor if the attempt has not changed', async () => {
+    it('does not set the content of the editor if the attempt has not changed', async () => {
       const {rerender} = await doInitialRender()
       const newProps = await makeProps({
         submission: {...initialSubmission, grade: 0, state: 'graded'},

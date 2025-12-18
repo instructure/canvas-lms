@@ -24,7 +24,7 @@ import AssignmentColumnHeader from '../AssignmentColumnHeader'
 import MessageStudentsWhoDialog from '../../../../shared/MessageStudentsWhoDialog'
 import {getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
-describe.skip('GradebookGrid AssignmentColumnHeader', () => {
+describe('GradebookGrid AssignmentColumnHeader', () => {
   let container
   let component
   let gradebookElements

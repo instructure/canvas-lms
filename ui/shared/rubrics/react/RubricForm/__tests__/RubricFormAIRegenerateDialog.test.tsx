@@ -137,7 +137,7 @@ describe('RubricForm AI Regenerate Dialog Test', () => {
     )
   }
 
-  it.skip('displays the regenerate dialog with proper content when regenerate for a specific criterion is initiated', async () => {
+  it('displays the regenerate dialog with proper content when regenerate for a specific criterion is initiated', async () => {
     const {queryAllByTestId, getByTestId, getByText} = renderComponent({
       aiRubricsEnabled: true,
       assignmentId: '1',

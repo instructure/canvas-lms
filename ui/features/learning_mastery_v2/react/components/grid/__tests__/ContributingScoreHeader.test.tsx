@@ -70,7 +70,7 @@ describe('ContributingScoreHeader', () => {
     expect(getByText('Open in Speedgrader')).toBeInTheDocument()
   })
 
-  it.skip('opens speedgrader in a new tab when "Open in Speedgrader" is clicked', async () => {
+  it('opens speedgrader in a new tab when "Open in Speedgrader" is clicked', async () => {
     const user = userEvent.setup({pointerEventsCheck: 0})
     const {getByText} = render(<ContributingScoreHeader {...defaultProps()} />)
     await user.click(getByText('Contributing Score Menu'))
@@ -81,7 +81,7 @@ describe('ContributingScoreHeader', () => {
     )
   })
 
-  it.skip('constructs the correct speedgrader URL with courseId and assignment_id', async () => {
+  it('constructs the correct speedgrader URL with courseId and assignment_id', async () => {
     const user = userEvent.setup({pointerEventsCheck: 0})
     const props: ContributingScoreHeaderProps = {
       ...defaultProps(),

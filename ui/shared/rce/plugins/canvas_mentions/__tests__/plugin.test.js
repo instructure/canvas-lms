@@ -42,6 +42,7 @@ describe('plugin', () => {
     expect(plugin.name).toEqual('canvas_mentions')
   })
 
+  // Plugin registration happens at module load time, but mock prevents it
   it.skip('registers the plugin', () => {
     expect(tinymce.PluginManager.add).toHaveBeenCalledWith('canvas_mentions', expect.anything())
   })

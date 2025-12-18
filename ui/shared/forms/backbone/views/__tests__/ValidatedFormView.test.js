@@ -87,7 +87,7 @@ describe('ValidatedFormView', () => {
     fakeENV.teardown()
   })
 
-  it.skip('disables inputs while loading', () => {
+  it('disables inputs while loading', () => {
     expect(form.$(':disabled')).toHaveLength(0)
 
     form.on('submit', () => {
@@ -98,19 +98,19 @@ describe('ValidatedFormView', () => {
     form.submit()
   })
 
-  it.skip('delegates submit to saveFormData', () => {
+  it('delegates submit to saveFormData', () => {
     const saveFormDataSpy = vi.spyOn(form, 'saveFormData')
     form.submit()
     expect(saveFormDataSpy).toHaveBeenCalled()
   })
 
-  it.skip('calls validateBeforeSave during submit', () => {
+  it('calls validateBeforeSave during submit', () => {
     const validateBeforeSaveSpy = vi.spyOn(form, 'validateBeforeSave')
     form.submit()
     expect(validateBeforeSaveSpy).toHaveBeenCalled()
   })
 
-  it.skip('calls hideErrors during submit', () => {
+  it('calls hideErrors during submit', () => {
     const hideErrorsSpy = vi.spyOn(form, 'hideErrors')
     form.submit()
     expect(hideErrorsSpy).toHaveBeenCalled()
@@ -122,16 +122,15 @@ describe('ValidatedFormView', () => {
     expect(validateFormDataSpy).toHaveBeenCalled()
   })
 
-  it.skip('delegates validate to validateFormData', () => {
+  it('delegates validate to validateFormData', () => {
     const validateFormDataSpy = vi.spyOn(form, 'validateFormData')
     form.validate()
     expect(validateFormDataSpy).toHaveBeenCalled()
   })
 
-  it.skip('calls hideErrors during validate with and without errors', () => {
+  it('calls hideErrors during validate with and without errors', () => {
     const hideErrorsSpy = vi.spyOn(form, 'hideErrors')
-    vi
-      .spyOn(form, 'validateFormData')
+    vi.spyOn(form, 'validateFormData')
       .mockReturnValueOnce({})
       .mockReturnValueOnce({
         errors: [
@@ -150,10 +149,9 @@ describe('ValidatedFormView', () => {
     expect(hideErrorsSpy).toHaveBeenCalled()
   })
 
-  it.skip('calls showErrors during validate with and without errors', () => {
+  it('calls showErrors during validate with and without errors', () => {
     const showErrorsSpy = vi.spyOn(form, 'showErrors')
-    vi
-      .spyOn(form, 'validateFormData')
+    vi.spyOn(form, 'validateFormData')
       .mockReturnValueOnce({})
       .mockReturnValueOnce({
         errors: [
@@ -181,7 +179,7 @@ describe('ValidatedFormView', () => {
       fakeENV.teardown()
     })
 
-    it.skip('calls the sendFunc to determine if RCE is ready', () => {
+    it('calls the sendFunc to determine if RCE is ready', () => {
       const fakeSendFunc = vi.fn().mockReturnValue(true)
       const textArea = $('<textarea data-rich_text="true"></textarea>')
       form.$el.append(textArea)
@@ -195,7 +193,7 @@ describe('ValidatedFormView', () => {
       )
     })
 
-    it.skip('ends execution if sendFunc returns false', () => {
+    it('ends execution if sendFunc returns false', () => {
       const validateFormDataSpy = vi.spyOn(form, 'validateFormData')
       const fakeSendFunc = vi.fn().mockReturnValue(false)
       const textArea = $('<textarea data-rich_text="true"></textarea>')

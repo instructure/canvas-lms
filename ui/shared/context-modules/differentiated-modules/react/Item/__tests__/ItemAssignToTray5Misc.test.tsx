@@ -17,22 +17,18 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, cleanup, screen, waitFor} from '@testing-library/react'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import {act, cleanup, screen, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import ItemAssignToTray from '../ItemAssignToTray'
 import {
   DEFAULT_PROPS,
-  FIRST_GROUP_CATEGORY_DATA,
   FIRST_GROUP_CATEGORY_ID,
   FIRST_GROUP_CATEGORY_URL,
   OVERRIDES,
   OVERRIDES_URL,
   renderComponent,
-  SECOND_GROUP_CATEGORY_DATA,
-  SECOND_GROUP_CATEGORY_ID,
   SECTIONS_URL,
   setupBaseMocks,
   setupEnv,
@@ -112,75 +108,6 @@ describe('ItemAssignToTray - Module Overrides', () => {
   })
 })
 
-describe('ItemAssignToTray - Student Groups', () => {
-  const originalLocation = window.location
-
-  const payload = {
-    id: '23',
-    due_at: '2023-10-05T12:00:00Z',
-    unlock_at: '2023-10-01T12:00:00Z',
-    lock_at: '2023-11-01T12:00:00Z',
-    only_visible_to_overrides: false,
-    group_category_id: FIRST_GROUP_CATEGORY_ID,
-    visible_to_everyone: true,
-    overrides: [],
-  }
-
-  beforeAll(() => {
-    setupFlashHolder()
-  })
-
-  beforeEach(() => {
-    setupEnv()
-    setupBaseMocks()
-    vi.resetAllMocks()
-  })
-
-  afterEach(() => {
-    window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
-    cleanup()
-  })
-
-  it('displays student groups if the assignmet is a group assignment', async () => {
-    fetchMock.get(OVERRIDES_URL, payload, {
-      overwriteRoutes: true,
-    })
-    const {findByText, findByTestId, getByText} = renderComponent()
-    const assigneeSelector = await findByTestId('assignee_selector')
-    act(() => assigneeSelector.click())
-    await findByText(FIRST_GROUP_CATEGORY_DATA[0].name)
-    FIRST_GROUP_CATEGORY_DATA.forEach(group => {
-      expect(getByText(group.name)).toBeInTheDocument()
-    })
-  })
-
-  // TODO: flaky in Vitest - fails intermittently
-  it.skip('refreshes the group options if the group category is overridden', async () => {
-    fetchMock.get(OVERRIDES_URL, payload, {
-      overwriteRoutes: true,
-    })
-    const {findByText, findByTestId, getByText, queryByText, rerender} = renderComponent()
-    const assigneeSelector = await findByTestId('assignee_selector')
-    act(() => assigneeSelector.click())
-    await findByText(FIRST_GROUP_CATEGORY_DATA[0].name)
-    SECOND_GROUP_CATEGORY_DATA.forEach(group => {
-      expect(queryByText(group.name)).not.toBeInTheDocument()
-    })
-    rerender(
-      <MockedQueryProvider>
-        <ItemAssignToTray {...DEFAULT_PROPS} defaultGroupCategoryId={SECOND_GROUP_CATEGORY_ID} />
-      </MockedQueryProvider>,
-    )
-
-    await findByText(SECOND_GROUP_CATEGORY_DATA[0].name)
-    SECOND_GROUP_CATEGORY_DATA.forEach(group => {
-      expect(getByText(group.name)).toBeInTheDocument()
-    })
-  })
-})
-
 describe('ItemAssignToTray - Paced Course with Mastery Paths', () => {
   const originalLocation = window.location
 
@@ -252,8 +179,7 @@ describe('ItemAssignToTray - Card Focus', () => {
     cleanup()
   })
 
-  // TODO: flaky in Vitest - focus behavior differs from Jest in jsdom
-  it.skip('focuses on the add button when deleting a card', async () => {
+  it('focuses on the add button when deleting a card', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {findAllByTestId, getAllByTestId} = renderComponent()
 
@@ -264,8 +190,7 @@ describe('ItemAssignToTray - Card Focus', () => {
     await waitFor(() => expect(addButton).toHaveFocus())
   })
 
-  // TODO: flaky in Vitest - times out waiting for cards
-  it.skip("focuses on the newly-created card's delete button when adding a card", async () => {
+  it("focuses on the newly-created card's delete button when adding a card", async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {findAllByTestId, getByTestId, getAllByTestId} = renderComponent()
 
@@ -304,8 +229,7 @@ describe('ItemAssignToTray - Pagination', () => {
     cleanup()
   })
 
-  // TODO: flaky in Vitest - intermittently times out
-  it.skip('fetches and combines multiple pages of overrides', async () => {
+  it('fetches and combines multiple pages of overrides', async () => {
     const page1 = {
       id: '23',
       overrides: [

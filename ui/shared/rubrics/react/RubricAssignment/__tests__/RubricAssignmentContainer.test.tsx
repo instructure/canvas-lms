@@ -28,8 +28,11 @@ import {queryClient} from '@canvas/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
 
-vi.mock('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries')>()
+vi.mock('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries', async importOriginal => {
+  const actual =
+    await importOriginal<
+      typeof import('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries')
+    >()
   return {
     ...actual,
     saveRubric: vi.fn(),
@@ -130,7 +133,7 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByTestId('save-rubric-button')).toBeDisabled()
     })
 
-    it.skip('should save a new rubric and display the Rubric title, edit, preview, and remove buttons', async () => {
+    it('should save a new rubric and display the Rubric title, edit, preview, and remove buttons', async () => {
       const {getByTestId} = renderComponent()
       getByTestId('create-assignment-rubric-button').click()
       const titleInput = getByTestId('rubric-form-title')

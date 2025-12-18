@@ -45,6 +45,9 @@ const ROOT_OUTCOME_GROUP = {
 /**
  * Tests for save button validation that require opening the criterion modal.
  * These are split out from RubricForm2.test.tsx to avoid CI timeouts.
+ * Additional slow whitespace validation tests moved to separate files:
+ * - RubricFormSaveButtonWhitespace255.test.tsx
+ * - RubricFormSaveButtonWhitespace254.test.tsx
  */
 describe('RubricForm Save Button with Criteria Tests', () => {
   beforeEach(() => {
@@ -87,40 +90,6 @@ describe('RubricForm Save Button with Criteria Tests', () => {
     })
     fireEvent.click(getByTestId('rubric-criterion-save'))
   }
-
-  it('save button is disabled when title is 255 whitespace even with criteria', async () => {
-    const {getByTestId} = renderComponent()
-    const titleInput = getByTestId('rubric-form-title')
-    fireEvent.change(titleInput, {
-      target: {
-        value:
-          '                                                                                                                                                                                                                                                               ',
-      },
-    })
-
-    await addCriterionToRubric(getByTestId)
-
-    await waitFor(() => {
-      expect(getByTestId('save-rubric-button')).toBeDisabled()
-    })
-  })
-
-  it('save button is enabled when title is 254 whitespace and 1 letter', async () => {
-    const {getByTestId} = renderComponent()
-    const titleInput = getByTestId('rubric-form-title')
-    fireEvent.change(titleInput, {
-      target: {
-        value:
-          'e                                                                                                                                                                                                                                                              ',
-      },
-    })
-
-    await addCriterionToRubric(getByTestId)
-
-    await waitFor(() => {
-      expect(getByTestId('save-rubric-button')).toBeEnabled()
-    })
-  })
 
   it('save button is enabled when title is not empty and there is criteria', async () => {
     const {getByTestId} = renderComponent()

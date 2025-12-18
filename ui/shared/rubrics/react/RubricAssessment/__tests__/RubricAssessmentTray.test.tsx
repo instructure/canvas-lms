@@ -81,7 +81,7 @@ describe('RubricAssessmentTray Tests', () => {
       expect(getByTestId('rubric-assessment-footer')).toBeInTheDocument()
     })
 
-    it.skip('should switch to the horizontal view when the horizontal option is selected', async () => {
+    it('should switch to the horizontal view when the horizontal option is selected', async () => {
       const {getByTestId, queryAllByTestId, queryByRole} = renderComponent()
       const viewModeSelect = getByTestId('rubric-assessment-view-mode-select') as HTMLSelectElement
 
@@ -633,7 +633,7 @@ describe('RubricAssessmentTray Tests', () => {
       })
     })
 
-    it.skip('should keep the selected rating when switching between view modes', async () => {
+    it('should keep the selected rating when switching between view modes', async () => {
       const {getByTestId, queryByTestId, queryByRole, queryAllByTestId} = renderComponent()
       const viewModeSelect = getByTestId('rubric-assessment-view-mode-select') as HTMLSelectElement
 

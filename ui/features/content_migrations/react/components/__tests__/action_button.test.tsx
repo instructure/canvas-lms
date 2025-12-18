@@ -196,7 +196,7 @@ describe('ActionButton', () => {
         ).toBeInTheDocument()
       })
 
-      it.skip('shows spinner when loading more issues', async () => {
+      it('shows spinner when loading more issues', async () => {
         let callCount = 0
         server.use(
           http.get('https://mock.issues.url/*', async () => {

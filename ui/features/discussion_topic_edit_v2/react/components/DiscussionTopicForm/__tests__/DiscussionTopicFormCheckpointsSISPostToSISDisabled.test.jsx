@@ -32,10 +32,7 @@ vi.mock('@canvas/due-dates/util/differentiatedModulesUtil', async importOriginal
   }
 })
 
-// These tests are isolated to avoid CI timeouts from module loading time
-// being counted against the first test.
-
-describe('DiscussionTopicForm Checkpoints SIS Validation', () => {
+describe('DiscussionTopicForm Checkpoints SIS - Post to SIS Disabled', () => {
   const mockOnSubmit = vi.fn()
 
   const setupWithPreConfiguredCheckpoints = ({
@@ -81,24 +78,6 @@ describe('DiscussionTopicForm Checkpoints SIS Validation', () => {
     mockOnSubmit.mockClear()
   })
 
-  // First test has longer timeout to absorb module loading time
-  it('allows submission when due dates not required at account level', {timeout: 20000}, () => {
-    const {queryByRole, queryByLabelText} = setupWithPreConfiguredCheckpoints({
-      dueDateRequired: false,
-      postToSis: true,
-      checkpointDueAt: null,
-    })
-
-    const titleInput = queryByLabelText('Topic Title')
-    titleInput.value = 'Test Checkpoint Discussion'
-    titleInput.dispatchEvent(new Event('change', {bubbles: true}))
-
-    const submitButton = queryByRole('button', {name: /save/i})
-    submitButton.click()
-
-    expect(mockOnSubmit).toHaveBeenCalled()
-  })
-
   it('allows submission when post to SIS is disabled', () => {
     const {queryByRole, queryByLabelText} = setupWithPreConfiguredCheckpoints({
       dueDateRequired: true,
@@ -114,22 +93,5 @@ describe('DiscussionTopicForm Checkpoints SIS Validation', () => {
     submitButton.click()
 
     expect(mockOnSubmit).toHaveBeenCalled()
-  })
-
-  it('blocks submission when checkpoint due dates are missing', () => {
-    const {queryByRole, queryByLabelText} = setupWithPreConfiguredCheckpoints({
-      dueDateRequired: true,
-      postToSis: true,
-      checkpointDueAt: null, // No due dates
-    })
-
-    const titleInput = queryByLabelText('Topic Title')
-    titleInput.value = 'Test Checkpoint Discussion'
-    titleInput.dispatchEvent(new Event('change', {bubbles: true}))
-
-    const submitButton = queryByRole('button', {name: /save/i})
-    submitButton.click()
-
-    expect(mockOnSubmit).not.toHaveBeenCalled()
   })
 })

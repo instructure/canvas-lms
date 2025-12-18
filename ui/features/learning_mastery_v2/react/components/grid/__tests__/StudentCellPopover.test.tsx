@@ -409,7 +409,7 @@ describe('StudentCellPopover', () => {
       )
     })
 
-    it.skip('clicking Message link opens message modal', async () => {
+    it('clicking Message link opens message modal', async () => {
       const user = userEvent.setup()
       renderWithQueryClient(<StudentCellPopover {...defaultProps()} />)
 
@@ -429,7 +429,7 @@ describe('StudentCellPopover', () => {
       })
     })
 
-    it.skip('message modal can be closed', async () => {
+    it('message modal can be closed', async () => {
       const user = userEvent.setup()
       renderWithQueryClient(<StudentCellPopover {...defaultProps()} />)
 
