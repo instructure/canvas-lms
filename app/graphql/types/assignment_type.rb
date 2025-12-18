@@ -368,7 +368,7 @@ module Types
 
     field :assessment_requests_for_current_user, [AssessmentRequestType], null: true
     def assessment_requests_for_current_user
-      Loaders::AssessmentRequestLoader.for(current_user:).load(assignment)
+      Loaders::AssessmentRequestLoader.for(current_user:, order_by_id: true).load(assignment)
     end
 
     # Use string reference instead of constant to avoid circular dependency

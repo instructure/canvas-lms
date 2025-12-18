@@ -281,6 +281,22 @@ describe Types::AssignmentType do
     expect(result[0]).to eq student.name
   end
 
+  it "returns assessment requests ordered by id for the current user" do
+    student2 = student_in_course(course:, active_all: true).user
+    student3 = student_in_course(course:, active_all: true).user
+    student4 = student_in_course(course:, active_all: true).user
+
+    assignment.assign_peer_review(student, student2)
+    assignment.assign_peer_review(student, student3)
+    assignment.assign_peer_review(student, student4)
+
+    result = assignment_type.resolve("assessmentRequestsForCurrentUser { _id }")
+    expect(result.count).to eq 3
+
+    ids = result.map(&:to_i)
+    expect(ids).to eq(ids.sort)
+  end
+
   describe "assessmentRequestsForUser" do
     let(:student2) { student_in_course(course:, name: "Matthew Lemon", active_all: true).user }
     let(:student3) { student_in_course(course:, name: "Rob Orton", active_all: true).user }

@@ -17,23 +17,29 @@
  */
 
 import React, {useState, useEffect} from 'react'
+import {useQueryClient} from '@tanstack/react-query'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Tabs} from '@instructure/ui-tabs'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import ErrorShip from '@canvas/images/ErrorShip.svg'
+import GenericErrorPage from '@canvas/generic-error-page/react'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import AssignmentDescription from '@canvas/assignments/react/AssignmentDescription'
 import NeedsSubmissionPeerReview from '@canvas/assignments/react/NeedsSubmissionPeerReview'
 import {useAssignmentQuery} from '../hooks/useAssignmentQuery'
 import {useAllocatePeerReviews} from '../hooks/useAllocatePeerReviews'
+import {useReviewerSubmissionQuery} from '../hooks/useReviewerSubmissionQuery'
 import {PeerReviewSelector} from './PeerReviewSelector'
 import AssignmentSubmission from './AssignmentSubmission'
 import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints/src'
 import theme from '@instructure/canvas-theme'
 import {isPeerReviewLocked} from '../utils/peerReviewLockUtils'
 import LockedPeerReview from './LockedPeerReview'
+import PeerReviewPromptModal from '@canvas/assignments/react/PeerReviewPromptModal'
+import {COMPLETED_PEER_REVIEW_TEXT} from '@canvas/assignments/helpers/PeerReviewHelpers'
 
 const I18n = createI18nScope('peer_reviews_student')
 
@@ -55,12 +61,17 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
   const [selectedTab, setSelectedTab] = useState<'details' | 'submission'>('details')
   const [selectedAssessmentIndex, setSelectedAssessmentIndex] = useState(0)
   const [hasCalledAllocate, setHasCalledAllocate] = useState(false)
+  const [shouldNavigateToNext, setShouldNavigateToNext] = useState(false)
+  const [peerReviewModalOpen, setPeerReviewModalOpen] = useState(false)
+  const [hasSeenPeerReviewModal, setHasSeenPeerReviewModal] = useState(false)
 
   const userId = ENV.current_user_id || ''
-  const isMobile = breakpoints.mobileOnly
 
+  const queryClient = useQueryClient()
   const {data, isLoading, isError} = useAssignmentQuery(assignmentId, userId)
   const {mutate: allocatePeerReviews} = useAllocatePeerReviews()
+  const {data: reviewerSubmission} = useReviewerSubmissionQuery(assignmentId, userId || '')
+  const isMobile = breakpoints.mobileOnly
 
   useEffect(() => {
     if (data?.assignment && !hasCalledAllocate) {
@@ -74,6 +85,12 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
 
       const assessmentRequestsCount = assignment.assessmentRequestsForCurrentUser?.length || 0
       const peerReviewsRequired = assignment.peerReviews?.count || 0
+      const submissionRequired = assignment.peerReviews?.submissionRequired ?? false
+      const hasSubmitted =
+        assignment.submissionsConnection?.nodes &&
+        assignment.submissionsConnection.nodes.length > 0 &&
+        assignment.submissionsConnection.nodes[0]?.submissionStatus === 'submitted'
+      const showSubmissionRequiredView = submissionRequired && !hasSubmitted
 
       if (!showSubmissionRequiredView && assessmentRequestsCount < peerReviewsRequired) {
         setHasCalledAllocate(true)
@@ -85,6 +102,38 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     }
   }, [data, allocatePeerReviews, hasCalledAllocate])
 
+  useEffect(() => {
+    const assessmentRequests = data?.assignment?.assessmentRequestsForCurrentUser
+    if (shouldNavigateToNext && assessmentRequests) {
+      const currentReview = assessmentRequests[selectedAssessmentIndex]
+
+      const nextAssignedReview = assessmentRequests.find(
+        assessment =>
+          assessment.workflowState === 'assigned' &&
+          assessment.available === true &&
+          assessment._id !== currentReview?._id,
+      )
+
+      if (nextAssignedReview) {
+        const nextIndex = assessmentRequests.indexOf(nextAssignedReview)
+        setSelectedAssessmentIndex(nextIndex)
+      } else {
+        setPeerReviewModalOpen(true)
+        setHasSeenPeerReviewModal(true)
+      }
+
+      setShouldNavigateToNext(false)
+    }
+  }, [shouldNavigateToNext, data, selectedAssessmentIndex])
+
+  const handleNextPeerReview = () => {
+    setShouldNavigateToNext(true)
+  }
+
+  const handleCommentSubmitted = () => {
+    queryClient.invalidateQueries({queryKey: ['peerReviewAssignment', assignmentId]})
+  }
+
   if (isLoading) {
     return (
       <View as="div" padding="medium" textAlign="center">
@@ -95,9 +144,12 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
 
   if (isError || !data?.assignment) {
     return (
-      <View as="div" padding="medium">
-        <Text color="danger">{I18n.t('Failed to load assignment details')}</Text>
-      </View>
+      <GenericErrorPage
+        imageUrl={ErrorShip}
+        errorSubject={I18n.t('Student Peer Review Assignment error')}
+        errorCategory={I18n.t('Student Peer Review Assignment Error Page.')}
+        errorMessage={I18n.t('Failed to load assignment details.')}
+      />
     )
   }
 
@@ -107,7 +159,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     description,
     peerReviews,
     submissionsConnection,
-    assignedToDates
+    assignedToDates,
   } = data.assignment
   const submissionRequired = peerReviews?.submissionRequired ?? false
   const hasSubmitted =
@@ -164,7 +216,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
 
     return (
       <Tabs
-        margin="xx-small 0"
+        margin="x-small 0"
         onRequestTabChange={(_event, {index}) => {
           setSelectedTab(index === 0 ? 'details' : 'submission')
         }}
@@ -183,13 +235,22 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
           renderTitle={isMobile ? I18n.t('Peer Review') : I18n.t('Submission')}
           isSelected={selectedTab === 'submission'}
           padding="0"
+          data-testid="submission-tab"
         >
           {assessmentRequestsForCurrentUser &&
             assessmentRequestsForCurrentUser[selectedAssessmentIndex]?.submission && (
               <AssignmentSubmission
                 submission={assessmentRequestsForCurrentUser[selectedAssessmentIndex].submission}
+                isPeerReviewCompleted={
+                  assessmentRequestsForCurrentUser[selectedAssessmentIndex].workflowState ===
+                  'completed'
+                }
                 assignment={data.assignment}
+                reviewerSubmission={reviewerSubmission}
                 isMobile={isMobile}
+                handleNextPeerReview={handleNextPeerReview}
+                onCommentSubmitted={handleCommentSubmitted}
+                hasSeenPeerReviewModal={hasSeenPeerReviewModal}
               />
             )}
         </Tabs.Panel>
@@ -213,6 +274,14 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
           </View>
         )}
         {renderBody()}
+        <PeerReviewPromptModal
+          headerText={[COMPLETED_PEER_REVIEW_TEXT]}
+          headerMargin={'small 0 x-large'}
+          peerReviewButtonText={null}
+          open={peerReviewModalOpen}
+          onClose={() => setPeerReviewModalOpen(false)}
+          onRedirect={() => {}}
+        />
       </View>
     </>
   )

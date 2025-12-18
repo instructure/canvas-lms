@@ -28,12 +28,24 @@ vi.mock('@canvas/util/jquery/apiUserContent', () => ({
   },
 }))
 
+let mockOnSuccessfulPeerReview: (() => void) | null = null
+
 vi.mock('../CommentsTrayContentWithApollo', () => {
-  const MockedCommentsTray = (props: any) => (
-    <div data-testid="mocked-comments-tray" data-props={JSON.stringify(props)}>
-      Mocked Comments Tray
-    </div>
-  )
+  const MockedCommentsTray = (props: any) => {
+    // Store the callback so tests can trigger it
+    mockOnSuccessfulPeerReview = props.onSuccessfulPeerReview
+    return (
+      <div
+        data-testid="mocked-comments-tray"
+        data-props={JSON.stringify({
+          ...props,
+          onSuccessfulPeerReview: undefined, // Don't serialize function
+        })}
+      >
+        Mocked Comments Tray
+      </div>
+    )
+  }
   MockedCommentsTray.displayName = 'CommentsTrayContentWithApollo'
   return {
     __esModule: true,
@@ -44,6 +56,7 @@ vi.mock('../CommentsTrayContentWithApollo', () => {
 describe('AssignmentSubmission', () => {
   afterEach(() => {
     cleanup()
+    mockOnSuccessfulPeerReview = null
   })
 
   const createSubmission = (overrides = {}): Submission => ({
@@ -70,11 +83,35 @@ describe('AssignmentSubmission', () => {
     ...overrides,
   })
 
+  const createReviewerSubmission = (overrides = {}) => ({
+    _id: 'reviewer-sub-1',
+    id: 'reviewer-sub-1-id',
+    attempt: 1,
+    assignedAssessments: [
+      {
+        assetId: 'asset-1',
+        workflowState: 'assigned',
+        assetSubmissionType: 'online_text_entry',
+      },
+    ],
+    ...overrides,
+  })
+
+  const createDefaultProps = (overrides = {}) => ({
+    submission: createSubmission(),
+    assignment: createAssignment(),
+    reviewerSubmission: createReviewerSubmission(),
+    isPeerReviewCompleted: false,
+    handleNextPeerReview: jest.fn(),
+    onCommentSubmitted: jest.fn(),
+    hasSeenPeerReviewModal: false,
+    isMobile: false,
+    ...overrides,
+  })
+
   describe('online_text_entry submissions', () => {
     it('renders text entry content', () => {
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       expect(screen.getByTestId('text-entry-content')).toBeInTheDocument()
       expect(screen.getByTestId('text-entry-content')).toHaveTextContent(
@@ -83,18 +120,14 @@ describe('AssignmentSubmission', () => {
     })
 
     it('renders Paper View selector by default', () => {
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       const select = screen.getByTestId('view-mode-selector')
       expect(select).toHaveValue('Paper View')
     })
 
     it('applies paper class to content by default', () => {
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       const content = screen.getByTestId('text-entry-content')
       expect(content).toHaveClass('user_content', 'paper')
@@ -102,9 +135,7 @@ describe('AssignmentSubmission', () => {
 
     it('switches to Plain Text View when selected', async () => {
       const user = userEvent.setup()
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       const select = screen.getByTestId('view-mode-selector')
       await user.click(select)
@@ -117,9 +148,7 @@ describe('AssignmentSubmission', () => {
 
     it('applies plain_text class when Plain Text View is selected', async () => {
       const user = userEvent.setup()
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       const select = screen.getByTestId('view-mode-selector')
       await user.click(select)
@@ -132,9 +161,7 @@ describe('AssignmentSubmission', () => {
     })
 
     it('applies scrollable container styles', () => {
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       const content = screen.getByTestId('text-entry-content')
       expect(content).toHaveStyle({
@@ -143,11 +170,15 @@ describe('AssignmentSubmission', () => {
     })
 
     it('renders HTML content correctly', () => {
-      const submission = createSubmission({
-        body: '<p>Paragraph 1</p><p>Paragraph 2</p><strong>Bold text</strong>',
-      })
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            submission: createSubmission({
+              body: '<p>Paragraph 1</p><p>Paragraph 2</p><strong>Bold text</strong>',
+            }),
+          })}
+        />,
+      )
 
       const content = screen.getByTestId('text-entry-content')
       expect(content.innerHTML).toContain('<p>Paragraph 1</p>')
@@ -156,18 +187,22 @@ describe('AssignmentSubmission', () => {
     })
 
     it('renders empty string when body is null', () => {
-      const submission = createSubmission({body: null})
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({submission: createSubmission({body: null})})}
+        />,
+      )
 
       const content = screen.getByTestId('text-entry-content')
       expect(content).toBeEmptyDOMElement()
     })
 
     it('renders empty string when body is empty', () => {
-      const submission = createSubmission({body: ''})
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({submission: createSubmission({body: ''})})}
+        />,
+      )
 
       const content = screen.getByTestId('text-entry-content')
       expect(content).toBeEmptyDOMElement()
@@ -177,11 +212,8 @@ describe('AssignmentSubmission', () => {
   describe('view mode persistence', () => {
     it('maintains selected view mode across re-renders', async () => {
       const user = userEvent.setup()
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      const {rerender} = render(
-        <AssignmentSubmission submission={submission} assignment={assignment} />,
-      )
+      const props = createDefaultProps()
+      const {rerender} = render(<AssignmentSubmission {...props} />)
 
       const select = screen.getByTestId('view-mode-selector')
       await user.click(select)
@@ -189,16 +221,14 @@ describe('AssignmentSubmission', () => {
 
       expect(select).toHaveValue('Plain Text View')
 
-      rerender(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      rerender(<AssignmentSubmission {...props} />)
 
       expect(select).toHaveValue('Plain Text View')
     })
 
     it('can switch back to Paper View from Plain Text View', async () => {
       const user = userEvent.setup()
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       const select = screen.getByTestId('view-mode-selector')
 
@@ -217,35 +247,47 @@ describe('AssignmentSubmission', () => {
 
   describe('online_url submissions', () => {
     it('renders URL submission content', () => {
-      const submission = createSubmission({
-        submissionType: 'online_url',
-        url: 'https://example.com',
-      })
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            submission: createSubmission({
+              submissionType: 'online_url',
+              url: 'https://example.com',
+            }),
+          })}
+        />,
+      )
 
       expect(screen.getByTestId('url-entry-content')).toBeInTheDocument()
       expect(screen.getByTestId('url-submission-text')).toHaveTextContent('https://example.com')
     })
 
     it('renders error when URL is missing', () => {
-      const submission = createSubmission({
-        submissionType: 'online_url',
-        url: null,
-      })
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            submission: createSubmission({
+              submissionType: 'online_url',
+              url: null,
+            }),
+          })}
+        />,
+      )
 
       expect(screen.getByText('Sorry, Something Broke')).toBeInTheDocument()
     })
 
     it('renders error when URL is empty string', () => {
-      const submission = createSubmission({
-        submissionType: 'online_url',
-        url: '',
-      })
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            submission: createSubmission({
+              submissionType: 'online_url',
+              url: '',
+            }),
+          })}
+        />,
+      )
 
       expect(screen.getByText('Sorry, Something Broke')).toBeInTheDocument()
     })
@@ -255,12 +297,16 @@ describe('AssignmentSubmission', () => {
       const mockWindowOpen = vi.fn()
       window.open = mockWindowOpen
 
-      const submission = createSubmission({
-        submissionType: 'online_url',
-        url: 'https://example.com/test',
-      })
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            submission: createSubmission({
+              submissionType: 'online_url',
+              url: 'https://example.com/test',
+            }),
+          })}
+        />,
+      )
 
       const link = screen.getByTestId('url-submission-text')
       await user.click(link)
@@ -286,7 +332,14 @@ describe('AssignmentSubmission', () => {
           },
         ],
       })
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            submission,
+            assignment,
+          })}
+        />,
+      )
 
       expect(screen.getByTestId('file-preview')).toBeInTheDocument()
     })
@@ -297,7 +350,14 @@ describe('AssignmentSubmission', () => {
         submissionType: 'online_upload',
         attachments: [],
       })
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            submission,
+            assignment,
+          })}
+        />,
+      )
 
       expect(screen.getByText('No Submission')).toBeInTheDocument()
     })
@@ -305,8 +365,11 @@ describe('AssignmentSubmission', () => {
 
   describe('unsupported submission types', () => {
     it('renders error page for unsupported submission type', () => {
-      const submission = createSubmission({submissionType: 'unsupported'})
-      render(<AssignmentSubmission submission={submission} assignment={createAssignment()} />)
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({submission: createSubmission({submissionType: 'unsupported'})})}
+        />,
+      )
 
       expect(screen.getByText('Sorry, Something Broke')).toBeInTheDocument()
     })
@@ -314,9 +377,7 @@ describe('AssignmentSubmission', () => {
 
   describe('comments tray', () => {
     it('renders toggle comments button', () => {
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       expect(screen.getByTestId('toggle-comments-button')).toBeInTheDocument()
       expect(screen.getByTestId('toggle-comments-button')).toHaveTextContent('Show Comments')
@@ -324,9 +385,7 @@ describe('AssignmentSubmission', () => {
 
     it('shows comments tray when toggle button is clicked', async () => {
       const user = userEvent.setup()
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       const toggleButton = screen.getByTestId('toggle-comments-button')
       expect(screen.queryByTestId('mocked-comments-tray')).not.toBeInTheDocument()
@@ -339,9 +398,7 @@ describe('AssignmentSubmission', () => {
 
     it('hides comments tray when toggle button is clicked again', async () => {
       const user = userEvent.setup()
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       const toggleButton = screen.getByTestId('toggle-comments-button')
       await user.click(toggleButton)
@@ -356,7 +413,7 @@ describe('AssignmentSubmission', () => {
       const user = userEvent.setup()
       const submission = createSubmission()
       const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps({submission, assignment})} />)
 
       await user.click(screen.getByTestId('toggle-comments-button'))
 
@@ -371,9 +428,7 @@ describe('AssignmentSubmission', () => {
 
     it('includes close button for comments tray', async () => {
       const user = userEvent.setup()
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       await user.click(screen.getByTestId('toggle-comments-button'))
 
@@ -383,9 +438,7 @@ describe('AssignmentSubmission', () => {
 
     it('renders Peer Comments heading when comments are shown', async () => {
       const user = userEvent.setup()
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       await user.click(screen.getByTestId('toggle-comments-button'))
 
@@ -395,9 +448,7 @@ describe('AssignmentSubmission', () => {
 
   describe('peer review footer', () => {
     it('renders submit peer review button', () => {
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       expect(screen.getByTestId('submit-peer-review-button')).toBeInTheDocument()
       expect(screen.getByTestId('submit-peer-review-button')).toHaveTextContent(
@@ -406,9 +457,7 @@ describe('AssignmentSubmission', () => {
     })
 
     it('renders footer with correct layout', () => {
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       const footer = screen.getByTestId('peer-review-footer')
       expect(footer).toBeInTheDocument()
@@ -418,25 +467,194 @@ describe('AssignmentSubmission', () => {
     })
 
     it('applies correct styling for non-mobile layout', () => {
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(
-        <AssignmentSubmission submission={submission} assignment={assignment} isMobile={false} />,
-      )
+      render(<AssignmentSubmission {...createDefaultProps()} />)
 
       const footer = screen.getByTestId('peer-review-footer')
       expect(footer).toHaveStyle({left: '275px'})
     })
 
     it('applies correct styling for mobile layout', () => {
-      const submission = createSubmission()
-      const assignment = createAssignment()
-      render(
-        <AssignmentSubmission submission={submission} assignment={assignment} isMobile={true} />,
-      )
+      render(<AssignmentSubmission {...createDefaultProps({isMobile: true})} />)
 
       const footer = screen.getByTestId('peer-review-footer')
       expect(footer).toHaveStyle({left: '0px'})
+    })
+
+    it('shows submit peer review button when peer review is not completed', () => {
+      render(<AssignmentSubmission {...createDefaultProps({isPeerReviewCompleted: false})} />)
+
+      expect(screen.getByTestId('submit-peer-review-button')).toBeInTheDocument()
+    })
+
+    it('hides submit peer review button when peer review is completed', () => {
+      render(<AssignmentSubmission {...createDefaultProps({isPeerReviewCompleted: true})} />)
+
+      expect(screen.queryByTestId('submit-peer-review-button')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('error messages', () => {
+    it('renders error page for unsupported submission type', () => {
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({submission: createSubmission({submissionType: 'fake_type'})})}
+        />,
+      )
+
+      expect(screen.getByText('Sorry, Something Broke')).toBeInTheDocument()
+    })
+  })
+
+  describe('submit button visibility with hasSeenPeerReviewModal', () => {
+    it('shows button if peer review modal not seen', () => {
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            hasSeenPeerReviewModal: false,
+          })}
+        />,
+      )
+
+      expect(screen.getByTestId('submit-peer-review-button')).toBeInTheDocument()
+    })
+
+    it('hides button if peer review modal has been seen', () => {
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            isPeerReviewCompleted: false,
+            hasSeenPeerReviewModal: true,
+          })}
+        />,
+      )
+
+      expect(screen.queryByTestId('submit-peer-review-button')).not.toBeInTheDocument()
+    })
+
+    it('hides button when peer review is completed', () => {
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            isPeerReviewCompleted: true,
+            hasSeenPeerReviewModal: false,
+          })}
+        />,
+      )
+
+      expect(screen.queryByTestId('submit-peer-review-button')).not.toBeInTheDocument()
+    })
+
+    it('hides button when both peer review completed and modal seen', () => {
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            isPeerReviewCompleted: true,
+            hasSeenPeerReviewModal: true,
+          })}
+        />,
+      )
+
+      expect(screen.queryByTestId('submit-peer-review-button')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('onCommentSubmitted callback', () => {
+    it('calls onCommentSubmitted when comment is successfully submitted', async () => {
+      const onCommentSubmitted = jest.fn()
+      const user = userEvent.setup()
+
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            onCommentSubmitted,
+          })}
+        />,
+      )
+
+      await user.click(screen.getByTestId('toggle-comments-button'))
+
+      expect(mockOnSuccessfulPeerReview).toBeTruthy()
+      mockOnSuccessfulPeerReview!()
+      expect(onCommentSubmitted).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('submission change detection', () => {
+    it('maintains button visibility when same submission is re-rendered with updated isPeerReviewCompleted', () => {
+      const props = createDefaultProps({
+        submission: createSubmission({_id: 'submission-1'}),
+        isPeerReviewCompleted: false,
+        hasSeenPeerReviewModal: false,
+      })
+
+      const {rerender} = render(<AssignmentSubmission {...props} />)
+
+      expect(screen.getByTestId('submit-peer-review-button')).toBeInTheDocument()
+
+      rerender(<AssignmentSubmission {...props} isPeerReviewCompleted={true} />)
+
+      // Button should still be visible because initialIsPeerReviewCompleted was false
+      expect(screen.getByTestId('submit-peer-review-button')).toBeInTheDocument()
+    })
+
+    it('resets button visibility when navigating to a different submission', () => {
+      const props = createDefaultProps({
+        submission: createSubmission({_id: 'submission-1'}),
+        isPeerReviewCompleted: false,
+        hasSeenPeerReviewModal: false,
+      })
+
+      const {rerender} = render(<AssignmentSubmission {...props} />)
+
+      expect(screen.getByTestId('submit-peer-review-button')).toBeInTheDocument()
+
+      rerender(
+        <AssignmentSubmission
+          {...props}
+          submission={createSubmission({_id: 'submission-2'})}
+          isPeerReviewCompleted={true}
+        />,
+      )
+
+      expect(screen.queryByTestId('submit-peer-review-button')).not.toBeInTheDocument()
+    })
+
+    it('resets button visibility when navigating to another incomplete submission', () => {
+      const props = createDefaultProps({
+        submission: createSubmission({_id: 'submission-1'}),
+        isPeerReviewCompleted: true,
+        hasSeenPeerReviewModal: false,
+      })
+
+      const {rerender} = render(<AssignmentSubmission {...props} />)
+
+      expect(screen.queryByTestId('submit-peer-review-button')).not.toBeInTheDocument()
+
+      rerender(
+        <AssignmentSubmission
+          {...props}
+          submission={createSubmission({_id: 'submission-2'})}
+          isPeerReviewCompleted={false}
+        />,
+      )
+
+      expect(screen.getByTestId('submit-peer-review-button')).toBeInTheDocument()
+    })
+
+    it('preserves button visibility through re-render of same submission', () => {
+      const props = createDefaultProps({
+        submission: createSubmission({_id: 'submission-1'}),
+        isPeerReviewCompleted: false,
+        hasSeenPeerReviewModal: false,
+      })
+
+      const {rerender} = render(<AssignmentSubmission {...props} />)
+
+      expect(screen.getByTestId('submit-peer-review-button')).toBeInTheDocument()
+
+      // re-renders with updated isPeerReviewCompleted
+      rerender(<AssignmentSubmission {...props} isPeerReviewCompleted={true} />)
+      expect(screen.getByTestId('submit-peer-review-button')).toBeInTheDocument()
     })
   })
 })

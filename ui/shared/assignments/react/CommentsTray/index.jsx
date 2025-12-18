@@ -46,6 +46,7 @@ export function TrayContent({
   reviewerSubmission,
   isPeerReviewEnabled = false,
   onSuccessfulPeerReview,
+  usePeerReviewModal = true,
 }) {
   // Case where this is backed by a submission draft, not a real submission, so
   // we can't actually save comments.
@@ -67,6 +68,7 @@ export function TrayContent({
         reviewerSubmission={reviewerSubmission}
         isPeerReviewEnabled={isPeerReviewEnabled}
         onSuccessfulPeerReview={onSuccessfulPeerReview}
+        usePeerReviewModal={usePeerReviewModal}
       />
     </Suspense>
   )
@@ -78,6 +80,7 @@ TrayContent.propTypes = {
   reviewerSubmission: Submission.shape,
   isPeerReviewEnabled: bool,
   onSuccessfulPeerReview: func,
+  usePeerReviewModal: bool,
 }
 
 export default function CommentsTray({
@@ -88,6 +91,7 @@ export default function CommentsTray({
   open,
   isPeerReviewEnabled = false,
   onSuccessfulPeerReview,
+  usePeerReviewModal = true,
 }) {
   // attempts 0 and 1 get combined into a single attempt
   const attempt = submission?.attempt || 1
@@ -127,6 +131,7 @@ export default function CommentsTray({
               submission={submission}
               reviewerSubmission={reviewerSubmission}
               onSuccessfulPeerReview={onSuccessfulPeerReview}
+              usePeerReviewModal={usePeerReviewModal}
             />
           </Flex.Item>
         </Flex>
@@ -143,4 +148,5 @@ CommentsTray.propTypes = {
   open: bool.isRequired,
   isPeerReviewEnabled: bool,
   onSuccessfulPeerReview: func,
+  usePeerReviewModal: bool,
 }

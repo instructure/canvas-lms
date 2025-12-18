@@ -20,11 +20,14 @@
 
 import $ from 'jquery'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {ApolloClient, gql} from '@apollo/client'
+import {MockedProvider} from '@apollo/client/testing'
+import {createCache} from '@canvas/apollo-v3'
+import {COMPLETED_PEER_REVIEW_TEXT} from '@canvas/assignments/helpers/PeerReviewHelpers'
 import CommentContent from '../CommentContent'
 import CommentsTrayBody from '../CommentsTrayBody'
 import {CREATE_SUBMISSION_COMMENT} from '@canvas/assignments/graphql/student/Mutations'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
-import {MockedProvider} from '@apollo/client/testing'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'
 import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
@@ -541,5 +544,348 @@ describe('CommentsTrayBody', () => {
     expect(renderedAttachment).toBeInTheDocument()
     expect(renderedAttachment).toContainElement(getByText('Test Display Name'))
     expect(renderedAttachment).toContainElement(container.querySelector("svg[name='IconPdf']"))
+  })
+
+  describe('peer review mode enabled', () => {
+    it('displays an alert when the assignedAssessments for the user is completed for this submission', async () => {
+      const overrides = {
+        SubmissionCommentConnection: {
+          nodes: [
+            {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', htmlComment: 'first comment'},
+            {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', htmlComment: 'last comment'},
+            {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', htmlComment: 'middle comment'},
+          ],
+        },
+      }
+      const comments = await mockComments(overrides)
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
+      props.submission.gradeHidden = true
+      props.isPeerReviewEnabled = true
+      const commentProps = {...props, comments}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
+
+      expect(queryByText('Your peer review is complete!')).toBeInTheDocument()
+    })
+
+    it('does not display an alert when peer review mode is disabled', async () => {
+      const overrides = {
+        SubmissionCommentConnection: {
+          nodes: [
+            {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', htmlComment: 'first comment'},
+            {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', htmlComment: 'last comment'},
+            {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', htmlComment: 'middle comment'},
+          ],
+        },
+      }
+      const comments = await mockComments(overrides)
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
+      props.submission.gradeHidden = true
+      props.isPeerReviewEnabled = false
+      const commentProps = {...props, comments}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
+
+      expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
+    })
+
+    it('does not display an alert when the assignedAssessments does not have a completed workflow for this user', async () => {
+      const props = await getDefaultPropsWithReviewerSubmission('assigned')
+      props.submission.gradeHidden = true
+      props.isPeerReviewEnabled = true
+      const commentProps = {...props, comments: []}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
+
+      expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
+    })
+
+    it('renders a message with image if there are no comments', async () => {
+      const mocks = [await mockSubmissionCommentQuery({}, {peerReview: true})]
+      const props = await getDefaultPropsWithReviewerSubmission('assigned')
+      props.isPeerReviewEnabled = true
+      props.assignment.rubric = null
+      const {getByText, getByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <CommentsTrayBody {...props} />
+        </MockedProvider>,
+      )
+
+      await waitFor(() =>
+        expect(
+          getByText(
+            'Add a comment to complete your peer review. You will only see comments written by you.',
+          ),
+        ).toBeInTheDocument(),
+      )
+      expect(getByTestId('svg-placeholder-container')).toBeInTheDocument()
+    })
+
+    it('renders a message that only comments authored by the viewer are visible if there are no comments and a rubric attached', async () => {
+      const mocks = [await mockSubmissionCommentQuery({}, {peerReview: true})]
+      const props = await mockAssignmentAndSubmission()
+      props.isPeerReviewEnabled = true
+      props.assignment.rubric = {id: 123}
+      const {getByText, getByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <CommentsTrayBody {...props} />
+        </MockedProvider>,
+      )
+
+      await waitFor(() =>
+        expect(getByText('You will only see comments written by you.')).toBeInTheDocument(),
+      )
+      expect(getByTestId('svg-placeholder-container')).toBeInTheDocument()
+    })
+
+    it('does not display an alert when the assignment has rubrics', async () => {
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
+      props.assignment.rubric = {}
+      props.submission.gradeHidden = true
+      props.isPeerReviewEnabled = true
+      const commentProps = {...props, comments: []}
+
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
+
+      expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
+    })
+
+    it('shows peer review prompt modal with next peer review if user has other assigned reviews', async () => {
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
+      props.isPeerReviewEnabled = true
+      const {findByPlaceholderText, getByText, findByText, queryByTestId} = render(
+        mockContext(<CommentsTrayBody {...props} />, mocks),
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+
+      expect(await findByText('You have 1 more Peer Review to complete.')).toBeTruthy()
+      expect(queryByTestId('peer-review-prompt-modal')).toBeInTheDocument()
+    })
+
+    it('shows peer review prompt modal with completed peer review text when no other assigned reviews remaining', async () => {
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
+      const props = await getDefaultPropsWithReviewerSubmission('assigned')
+      props.isPeerReviewEnabled = true
+      props.reviewerSubmission.assignedAssessments[1].workflowState = 'completed'
+      const {findByPlaceholderText, getByText, findByText, queryByTestId} = render(
+        mockContext(<CommentsTrayBody {...props} />, mocks),
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+
+      expect(await findByText(COMPLETED_PEER_REVIEW_TEXT)).toBeTruthy()
+      expect(queryByTestId('peer-review-prompt-modal')).toBeInTheDocument()
+    })
+
+    it('shows peer review prompt modal with unavailable peer review text when only unavailable reviews remaining', async () => {
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
+      const props = await getDefaultPropsWithReviewerSubmission('assigned')
+      props.isPeerReviewEnabled = true
+      props.reviewerSubmission.assignedAssessments[1].assetSubmissionType = null
+      const {findByPlaceholderText, getByText, findByText, queryByTestId} = render(
+        mockContext(<CommentsTrayBody {...props} />, mocks),
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+
+      expect(await findByText('You have 1 more Peer Review to complete.')).toBeTruthy()
+      expect(await findByText('The submission is not available just yet.')).toBeTruthy()
+      expect(await findByText('Please check back soon.')).toBeTruthy()
+      expect(queryByTestId('peer-review-prompt-modal')).toBeInTheDocument()
+    })
+
+    it('does not show peer review modal if user already completed all peer reviews and leaves a comment', async () => {
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
+      props.isPeerReviewEnabled = true
+      props.reviewerSubmission.assignedAssessments[1].workflowState = 'completed'
+      const {findByPlaceholderText, getByText, queryByTestId} = render(
+        mockContext(<CommentsTrayBody {...props} />, mocks),
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+
+      expect(queryByTestId('peer-review-prompt-modal')).not.toBeInTheDocument()
+    })
+
+    it('does not show peer review modal if assignment has a rubric', async () => {
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
+      props.isPeerReviewEnabled = true
+      props.assignment.rubric = {}
+      const {findByPlaceholderText, getByText, queryByTestId} = render(
+        mockContext(<CommentsTrayBody {...props} />, mocks),
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+
+      expect(queryByTestId('peer-review-prompt-modal')).not.toBeInTheDocument()
+    })
+
+    it('does not show peer review modal when usePeerReviewModal is false', async () => {
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
+      const props = await getDefaultPropsWithReviewerSubmission('assigned')
+      props.isPeerReviewEnabled = true
+      props.usePeerReviewModal = false
+      props.reviewerSubmission.assignedAssessments[1].workflowState = 'completed'
+      const {findByPlaceholderText, getByText, findByText, queryByTestId} = render(
+        mockContext(<CommentsTrayBody {...props} />, mocks),
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+
+      expect(queryByTestId('peer-review-prompt-modal')).not.toBeInTheDocument()
+    })
+
+    it('calls the onSuccessfulPeerReview function to re-render page when a peer review comment is successful', async () => {
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
+      const onSuccessfulPeerReviewMockFunction = vi.fn()
+      const props = {
+        ...(await getDefaultPropsWithReviewerSubmission('assigned')),
+        onSuccessfulPeerReview: onSuccessfulPeerReviewMockFunction,
+      }
+      props.isPeerReviewEnabled = true
+      const {findByPlaceholderText, getByText} = render(
+        mockContext(<CommentsTrayBody {...props} />, mocks),
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+      await waitFor(() => expect(onSuccessfulPeerReviewMockFunction).toHaveBeenCalled())
+      expect(props.reviewerSubmission.assignedAssessments[0].workflowState).toEqual('completed')
+    })
+  })
+})
+
+describe('Submission Draft and Comment Behavior', () => {
+  let client
+
+  beforeEach(() => {
+    const cache = createCache()
+    client = new ApolloClient({
+      cache,
+      uri: '/api/graphql',
+    })
+  })
+
+  function writeToCache(client, query, data) {
+    client.writeQuery({
+      query,
+      data,
+    })
+  }
+
+  function readFromCache(client, query) {
+    return client.cache.readQuery({
+      query,
+    })
+  }
+
+  // Test case
+  it('allows sending a comment after discarding a submission draft', async () => {
+    const submissionId = 'test-submission-id'
+
+    const submissionQuery = gql`
+        query GetHistory {
+          node(id: "${submissionId}") {
+            __typename
+            ... on Submission {
+              submissionHistoriesConnection(filter: { includeCurrentSubmission: false }) {
+                nodes {
+                  attempt
+                }
+              }
+            }
+          }
+        }
+      `
+
+    const commentQuery = gql`
+        query GetComments {
+          node(id: "${submissionId}") {
+            __typename
+            ... on Submission {
+              commentsConnection(filter: { forAttempt: 1, peerReview: false }, last: 20) {
+                nodes {
+                  _id
+                  comment
+                }
+              }
+            }
+          }
+        }
+        `
+
+    // Mock creating a submission draft
+    writeToCache(client, submissionQuery, {
+      node: {
+        __typename: 'Submission',
+        submissionHistoriesConnection: {
+          __typename: 'SubmissionHistoryConnection',
+          nodes: [{attempt: 1}],
+        },
+      },
+    })
+
+    // Verify draft exists in cache
+    let cacheData = readFromCache(client, submissionQuery)
+    expect(cacheData.node.submissionHistoriesConnection.nodes).toHaveLength(1)
+
+    // Mock discarding the draft
+    writeToCache(client, submissionQuery, {
+      node: {
+        __typename: 'Submission',
+        submissionHistoriesConnection: {
+          __typename: 'SubmissionHistoryConnection',
+          nodes: [],
+        },
+      },
+    })
+
+    // Verify draft is removed from cache
+    cacheData = readFromCache(client, submissionQuery)
+    expect(cacheData.node.submissionHistoriesConnection.nodes).toHaveLength(0)
+
+    // Mock sending a comment
+    writeToCache(client, commentQuery, {
+      node: {
+        __typename: 'Submission',
+        commentsConnection: {
+          __typename: 'CommentConnection',
+          nodes: [{_id: 'comment-1', comment: 'This is a comment'}],
+        },
+      },
+    })
+
+    // Verify comment is added to cache
+    cacheData = readFromCache(client, commentQuery)
+    expect(cacheData.node.commentsConnection.nodes).toHaveLength(1)
+    expect(cacheData.node.commentsConnection.nodes[0].comment).toBe('This is a comment')
   })
 })

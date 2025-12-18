@@ -35,6 +35,19 @@ vi.mock('@canvas/assignments/react/CommentsTray', () => ({
 }))
 
 describe('CommentsTrayContentWithApollo', () => {
+  const reviewerSubmission = {
+    _id: 'reviewer-sub-1',
+    id: 'U3VibWlzc2lvbi0x',
+    attempt: 1,
+    assignedAssessments: [
+      {
+        assetId: 'asset-1',
+        workflowState: 'assigned',
+        assetSubmissionType: 'online_text_entry',
+      },
+    ],
+  }
+
   const defaultProps = {
     submission: {id: '1', _id: '1', attempt: 1, submissionType: 'online_text_entry'},
     assignment: {
@@ -55,6 +68,8 @@ describe('CommentsTrayContentWithApollo', () => {
     renderTray: false,
     closeTray: jest.fn(),
     open: false,
+    onSuccessfulPeerReview: jest.fn(),
+    reviewerSubmission: reviewerSubmission,
   }
 
   it('renders TrayContent when renderTray is false', () => {
@@ -148,7 +163,6 @@ describe('CommentsTrayContentWithApollo', () => {
 
     it('formats submission ID as base64-encoded GraphQL global ID', () => {
       render(<CommentsTrayContentWithApollo {...defaultProps} renderTray={false} />)
-
       const trayContent = screen.getByTestId('tray-content')
       const props = JSON.parse(trayContent.textContent || '{}')
 
@@ -169,13 +183,102 @@ describe('CommentsTrayContentWithApollo', () => {
 
     it('formats data correctly when renderTray is true', () => {
       render(<CommentsTrayContentWithApollo {...defaultProps} renderTray={true} />)
-
       const commentsTray = screen.getByTestId('comments-tray')
       const props = JSON.parse(commentsTray.textContent || '{}')
 
       const expectedId = btoa(`Submission-${defaultProps.submission._id}`)
       expect(props.submission.id).toBe(expectedId)
       expect(props.assignment.env.courseId).toBe(defaultProps.assignment.courseId)
+    })
+  })
+
+  describe('reviewerSubmission prop', () => {
+    it('passes reviewerSubmission to TrayContent when provided', () => {
+      render(
+        <CommentsTrayContentWithApollo
+          {...defaultProps}
+          reviewerSubmission={reviewerSubmission}
+          renderTray={false}
+        />,
+      )
+      expect(defaultProps.reviewerSubmission).toEqual(reviewerSubmission)
+      expect(defaultProps.reviewerSubmission.id).toBe('U3VibWlzc2lvbi0x')
+      expect(defaultProps.reviewerSubmission.assignedAssessments).toHaveLength(1)
+    })
+
+    it('passes reviewerSubmission to CommentsTray when provided', () => {
+      render(
+        <CommentsTrayContentWithApollo
+          {...defaultProps}
+          reviewerSubmission={reviewerSubmission}
+          renderTray={true}
+        />,
+      )
+      expect(defaultProps.reviewerSubmission).toEqual(reviewerSubmission)
+      expect(defaultProps.reviewerSubmission.assignedAssessments).toHaveLength(1)
+    })
+
+    it('works when reviewerSubmission is undefined', () => {
+      render(
+        <CommentsTrayContentWithApollo
+          {...defaultProps}
+          reviewerSubmission={undefined}
+          renderTray={false}
+        />,
+      )
+
+      const trayContent = screen.getByTestId('tray-content')
+      const props = JSON.parse(trayContent.textContent || '{}')
+
+      expect(props.reviewerSubmission).toBeUndefined()
+    })
+
+    it('works when reviewerSubmission is null', () => {
+      render(
+        <CommentsTrayContentWithApollo
+          {...defaultProps}
+          reviewerSubmission={null}
+          renderTray={false}
+        />,
+      )
+
+      const trayContent = screen.getByTestId('tray-content')
+      const props = JSON.parse(trayContent.textContent || '{}')
+
+      expect(props.reviewerSubmission).toBeNull()
+    })
+
+    it('passes reviewerSubmission with multiple assigned assessments', () => {
+      const multipleAssessments = {
+        ...reviewerSubmission,
+        assignedAssessments: [
+          {
+            assetId: 'asset-1',
+            workflowState: 'assigned',
+            assetSubmissionType: 'online_text_entry',
+          },
+          {
+            assetId: 'asset-2',
+            workflowState: 'completed',
+            assetSubmissionType: 'online_upload',
+          },
+        ],
+      }
+
+      render(
+        <CommentsTrayContentWithApollo
+          {...defaultProps}
+          reviewerSubmission={multipleAssessments}
+          renderTray={false}
+        />,
+      )
+
+      const trayContent = screen.getByTestId('tray-content')
+      const props = JSON.parse(trayContent.textContent || '{}')
+
+      expect(props.reviewerSubmission.assignedAssessments).toHaveLength(2)
+      expect(props.reviewerSubmission.assignedAssessments[0].workflowState).toBe('assigned')
+      expect(props.reviewerSubmission.assignedAssessments[1].workflowState).toBe('completed')
     })
   })
 })

@@ -65,7 +65,7 @@ export default function CommentsTrayBody(props) {
     variables: queryVariables,
   })
 
-  const {reviewerSubmission} = props
+  const {reviewerSubmission, usePeerReviewModal} = props
   const {assignedAssessments = []} = reviewerSubmission ?? {}
   const {availableCount, unavailableCount} = availableAndUnavailableCounts(assignedAssessments)
 
@@ -103,7 +103,9 @@ export default function CommentsTrayBody(props) {
     const remainingReviewCounts = assignedAssessmentsCount(assignedAssessments)
     if (!remainingReviewCounts && previousWorkflowState === COMPLETED_WORKFLOW_STATE) return
 
-    setPeerReviewModalOpen(true)
+    if (usePeerReviewModal) {
+      setPeerReviewModalOpen(true)
+    }
   }
 
   const {allowPeerReviewComments} = useContext(StudentViewContext)
@@ -222,8 +224,10 @@ CommentsTrayBody.propTypes = {
   reviewerSubmission: Submission.shape,
   isPeerReviewEnabled: bool,
   onSuccessfulPeerReview: func,
+  usePeerReviewModal: bool,
 }
 
 CommentsTrayBody.defaultProps = {
   isPeerReviewEnabled: false,
+  usePeerReviewModal: true,
 }
