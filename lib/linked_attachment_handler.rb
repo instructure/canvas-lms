@@ -115,7 +115,7 @@ module LinkedAttachmentHandler
 
           shard.activate do
             all_attachment_associations << {
-              context_type: class_name,
+              context_type: self.class.polymorphic_name,
               context_id: id,
               attachment_id: attachment.id,
               user_id: user&.id,

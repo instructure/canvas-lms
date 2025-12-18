@@ -127,7 +127,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       end
     end
 
-    discussion_topic.saving_user = current_user
+    discussion_topic.updating_user = current_user
 
     # Save the discussion topic before updating the assignment if the group category is being updated,
     # because creating group assignment overrides are dependent on the group category being set
@@ -203,7 +203,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
             points_possible: checkpoint[:points_possible],
             dates:,
             replies_required: checkpoint[:replies_required],
-            saving_user: current_user
+            updating_user: current_user
           )
         end
       end
@@ -227,7 +227,6 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     end
 
     discussion_topic.editor = current_user
-    discussion_topic.saving_user = current_user
     return errors_for(discussion_topic) unless discussion_topic.save!
 
     if input.key?(:ungraded_discussion_overrides)
@@ -279,7 +278,7 @@ def set_discussion_assignment_association(assignment_params, discussion_topic)
     discussion_topic.assignment = assignment
     discussion_topic.sync_assignment
     # This save is required to prevent an extra discussion_topic from being created in the updateAssignment
-    assignment.saving_user = current_user
+    assignment.updating_user = current_user
     assignment.save!
   end
 end

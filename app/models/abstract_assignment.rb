@@ -442,7 +442,7 @@ class AbstractAssignment < ActiveRecord::Base
                    }]
                  end,
           replies_required: result.discussion_topic.reply_to_entry_required_count || nil,
-          saving_user: opts[:user]
+          updating_user: opts[:user]
         )
         new_sub_assignment.duplicate_of = sub_assignment
         new_sub_assignment.save!
@@ -1309,13 +1309,13 @@ class AbstractAssignment < ActiveRecord::Base
       quiz.updating_user = updating_user
       quiz.save if quiz.changed?
     elsif self.submission_types == "discussion_topic" && !%i[discussion_topic sub_assignment].include?(@saved_by)
-      topic = discussion_topic || context.discussion_topics.build(user: @updating_user)
+      topic = discussion_topic || context.discussion_topics.build(user: updating_user)
       topic.message = description
       save_submittable(topic)
       self.discussion_topic = topic
     elsif context.conditional_release? &&
           self.submission_types == "wiki_page" && @saved_by != :wiki_page
-      page = wiki_page || context.wiki_pages.build(user: @updating_user)
+      page = wiki_page || context.wiki_pages.build(user: updating_user)
       save_submittable(page)
       self.wiki_page = page
     end
