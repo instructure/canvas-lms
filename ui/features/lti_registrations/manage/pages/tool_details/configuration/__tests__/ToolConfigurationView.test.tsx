@@ -18,7 +18,7 @@
 import {AllLtiScopes} from '@canvas/lti/model/LtiScope'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {clickOrFail} from '../../../__tests__/interactionHelpers'
-import {createMemoryRouter, Outlet, Route, Routes} from 'react-router-dom'
+import {createMemoryRouter, Outlet, Route, Routes, useNavigate} from 'react-router-dom'
 import {AllLtiPlacements} from '../../../../model/LtiPlacement'
 import {AllLtiPrivacyLevels} from '../../../../model/LtiPrivacyLevel'
 import {i18nLtiPlacement} from '../../../../model/i18nLtiPlacement'
@@ -34,6 +34,16 @@ import {
 } from '../../../manage/__tests__/helpers'
 import fetchMock from 'fetch-mock'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {userEvent} from '@testing-library/user-event'
+import {fireEvent} from '@testing-library/react'
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom')
+  return {
+    ...actual,
+    useNavigate: vi.fn(),
+  }
+})
 
 describe('Tool Configuration View Launch Settings', () => {
   it('should render the Launch Settings for manual registrations', () => {
@@ -753,5 +763,50 @@ describe('Tool Configuration View EULA Settings', () => {
 
     expect(getByText('EULA Settings')).toBeInTheDocument()
     expect(getByText('No custom fields configured.')).toBeInTheDocument()
+  })
+})
+
+describe('Tool Configuration Edit button, keyboard navigation', () => {
+  const mockNavigate = vi.fn()
+
+  beforeEach(() => {
+    mockNavigate.mockClear()
+    vi.mocked(useNavigate).mockReturnValue(mockNavigate)
+  })
+
+  it('calls navigate when Edit button is activated with Enter key', async () => {
+    const user = userEvent.setup()
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    const editButton = getByText('Edit').closest('button')!
+
+    await user.type(editButton, '{Enter}')
+
+    // Button should navigate to the edit configuration page
+    expect(mockNavigate).toHaveBeenCalledWith('/manage/1/configuration/edit')
+  })
+
+  it('calls navigate when Edit button is activated with Space key', async () => {
+    const user = userEvent.setup()
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    const editButton = getByText('Edit').closest('button')!
+
+    await user.type(editButton, '{Space}')
+
+    // Button should navigate to the edit configuration page
+    expect(mockNavigate).toHaveBeenCalledWith('/manage/1/configuration/edit')
   })
 })
