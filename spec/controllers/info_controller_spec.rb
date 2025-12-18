@@ -267,6 +267,16 @@ describe InfoController do
     end
   end
 
+  describe "GET 'shard_info'" do
+    it "returns shard information" do
+      get "shard_info"
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json).to have_key("shard")
+      expect(json).to have_key("database")
+    end
+  end
+
   describe "GET 'help_links'" do
     it "works" do
       get "help_links"
