@@ -140,7 +140,6 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
         created_assignment = working_assignment[:assignment]
 
         discussion_topic.assignment = created_assignment
-        discussion_topic.assignment.saving_user = current_user
         discussion_topic.lock_at = created_assignment.lock_at
         discussion_topic.unlock_at = created_assignment.unlock_at
       end
@@ -163,14 +162,13 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
             points_possible: checkpoint[:points_possible],
             dates:,
             replies_required: checkpoint[:replies_required],
-            saving_user: current_user
+            updating_user: current_user
           )
         end
       end
     end
 
     discussion_topic.saved_by = :assignment if discussion_topic.assignment.present?
-    discussion_topic.saving_user = current_user
     return errors_for(discussion_topic) unless discussion_topic.save!
 
     if input.key?(:ungraded_discussion_overrides)

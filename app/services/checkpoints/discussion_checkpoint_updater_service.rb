@@ -25,7 +25,7 @@ class Checkpoints::DiscussionCheckpointUpdaterService < Checkpoints::DiscussionC
     checkpoint = find_checkpoint
     compute_due_dates_and_create_submissions(checkpoint)
     checkpoint.saved_by = @saved_by
-    checkpoint.saving_user = @saving_user
+    checkpoint.updating_user = @updating_user
     checkpoint.save!
     checkpoint.saved_by = nil
     checkpoint

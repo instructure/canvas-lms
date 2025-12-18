@@ -154,14 +154,16 @@ module Factories
       discussion_topic: @topic,
       checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
       dates: due_date_reply_to_topic,
-      points_possible: opts[:points_possible_reply_to_topic] || 5
+      points_possible: opts[:points_possible_reply_to_topic] || 5,
+      updating_user: opts[:updating_user]
     )
     reply_to_entry = Checkpoints::DiscussionCheckpointCreatorService.call(
       discussion_topic: @topic,
       checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
       dates: due_date_reply_to_entry,
       points_possible: opts[:points_possible_reply_to_entry] || 5,
-      replies_required: opts[:reply_to_entry_required_count] || 3
+      replies_required: opts[:reply_to_entry_required_count] || 3,
+      updating_user: opts[:updating_user]
     )
     [reply_to_topic, reply_to_entry, @topic]
   end
