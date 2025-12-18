@@ -82,10 +82,7 @@ export default function BulkEditHeader({
             </Text>
           </Flex.Item>
           <Flex.Item>
-            <Button
-              margin="0 0 0 small"
-              onClick={() => onOpenBatchEdit(true)}
-            >
+            <Button margin="0 0 0 small" onClick={() => onOpenBatchEdit(true)}>
               {I18n.t('Batch Edit')}
             </Button>
           </Flex.Item>
@@ -99,9 +96,7 @@ export default function BulkEditHeader({
               margin="0 0 0 small"
               color="primary"
               interaction={
-                startingSave || jobRunning || validationErrorsExist
-                  ? 'disabled'
-                  : 'enabled'
+                startingSave || jobRunning || validationErrorsExist ? 'disabled' : 'enabled'
               }
               onClick={onSave}
             >
@@ -154,10 +149,7 @@ export default function BulkEditHeader({
           </Text>
         </Flex.Item>
         <Flex.Item>
-          <Button
-            margin="0 0 0 small"
-            onClick={() => onOpenBatchEdit(true)}
-          >
+          <Button margin="0 0 0 small" onClick={() => onOpenBatchEdit(true)}>
             {I18n.t('Batch Edit')}
           </Button>
         </Flex.Item>
@@ -171,9 +163,7 @@ export default function BulkEditHeader({
             margin="0 0 0 small"
             color="primary"
             interaction={
-              startingSave || jobRunning || validationErrorsExist
-                ? 'disabled'
-                : 'enabled'
+              startingSave || jobRunning || validationErrorsExist ? 'disabled' : 'enabled'
             }
             onClick={onSave}
           >

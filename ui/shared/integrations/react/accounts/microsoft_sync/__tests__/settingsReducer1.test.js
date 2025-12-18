@@ -23,13 +23,14 @@ import {
 } from '../lib/settingsHelper'
 import {defaultState, settingsReducer, reducerActions} from '../lib/settingsReducer'
 
-jest.mock('../lib/settingsHelper', () => {
+vi.mock('../lib/settingsHelper', async () => {
+  const actual = await vi.importActual('../lib/settingsHelper')
   return {
-    ...jest.requireActual('../lib/settingsHelper'),
-    tenantErrorMessages: jest.fn(),
-    doUpdateSettings: jest.fn(),
-    getSuffixErrorMessages: jest.fn(),
-    getTenantErrorMessages: jest.fn(),
+    ...actual,
+    tenantErrorMessages: vi.fn(),
+    doUpdateSettings: vi.fn(),
+    getSuffixErrorMessages: vi.fn(),
+    getTenantErrorMessages: vi.fn(),
   }
 })
 

@@ -24,15 +24,15 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 describe('DueDateCalendars', () => {
   const someDate = new Date(Date.UTC(2012, 1, 1, 7, 0, 0))
   const defaultProps = {
-    replaceDate: jest.fn(),
+    replaceDate: vi.fn(),
     rowKey: 'nullnullnull',
     dates: {
       due_at: someDate,
     },
     overrides: [
       {
-        get: jest.fn(),
-        set: jest.fn(),
+        get: vi.fn(),
+        set: vi.fn(),
       },
     ],
     sections: {},

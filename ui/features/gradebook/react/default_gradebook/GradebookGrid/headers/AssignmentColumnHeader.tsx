@@ -63,9 +63,11 @@ function labelForHideGradesAction(hideGradesAction: {
   return I18n.t('No grades to hide')
 }
 
-function speedGraderUrl(assignment: {courseId: string; id: string}) {
+function speedGraderUrl(assignment: {courseId: string; id: string; parentAssignmentId?: string}) {
+  const assignmentId = assignment.parentAssignmentId || assignment.id
+  const peerReviewParam = assignment.parentAssignmentId ? '&peer_review=true' : ''
   return encodeURI(
-    `/courses/${assignment.courseId}/gradebook/speed_grader?assignment_id=${assignment.id}`,
+    `/courses/${assignment.courseId}/gradebook/speed_grader?assignment_id=${assignmentId}${peerReviewParam}`,
   )
 }
 

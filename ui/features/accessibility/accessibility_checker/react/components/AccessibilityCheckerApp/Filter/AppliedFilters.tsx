@@ -1,4 +1,3 @@
-/**
 /*
  * Copyright (C) 2025 - present Instructure, Inc.
  *
@@ -34,6 +33,8 @@ interface AppliedFiltersProps {
 }
 
 const formatDate = (date: Date | string) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
   return tz.format(date, 'date.formats.medium')
 }
 

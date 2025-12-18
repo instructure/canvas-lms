@@ -20,7 +20,7 @@ import type {ModuleItemContent} from '../../utils/types'
 
 describe('moduleItemActionHandlers', () => {
   describe('handleSpeedGrader', () => {
-    let windowOpenSpy: jest.SpyInstance
+    let windowOpenSpy: any
 
     // Define the function inline to avoid importing complex dependencies
     const handleSpeedGrader = (
@@ -43,7 +43,7 @@ describe('moduleItemActionHandlers', () => {
     }
 
     beforeEach(() => {
-      windowOpenSpy = jest.spyOn(window, 'open').mockImplementation()
+      windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
     })
 
     afterEach(() => {
@@ -102,7 +102,7 @@ describe('moduleItemActionHandlers', () => {
       } as ModuleItemContent
 
       const courseId = '456'
-      const setIsMenuOpen = jest.fn()
+      const setIsMenuOpen = vi.fn()
 
       handleSpeedGrader(content, courseId, setIsMenuOpen)
 

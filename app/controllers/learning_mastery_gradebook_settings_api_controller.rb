@@ -27,6 +27,7 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
   VALID_NAME_DISPLAY_FORMAT_VALUES = %w[first_last last_first].freeze
   VALID_STUDENTS_PER_PAGE_VALUES = [15, 30, 50, 100].freeze
   VALID_SCORE_DISPLAY_FORMAT_VALUES = %w[icon_only icon_and_points icon_and_label].freeze
+  VALID_OUTCOME_ARRANGEMENT_VALUES = %w[alphabetical custom upload_order].freeze
   VALID_BOOLEAN_VALUES = [true, false, "true", "false"].freeze
 
   # @API Get Learning Mastery Gradebook Settings
@@ -71,9 +72,11 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
       :show_students_with_no_results,
       :show_outcomes_with_no_results,
       :show_student_avatars,
+      :show_unpublished_assignments,
       :name_display_format,
       :students_per_page,
-      :score_display_format
+      :score_display_format,
+      :outcome_arrangement
     )
   end
 
@@ -125,6 +128,13 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
       end
     end
 
+    if settings.key?(:show_unpublished_assignments)
+      value = settings[:show_unpublished_assignments]
+      unless VALID_BOOLEAN_VALUES.include?(value)
+        errors << "Invalid show_unpublished_assignments ('#{value}'). Valid values are: [true, false]"
+      end
+    end
+
     if settings.key?(:name_display_format)
       value = settings[:name_display_format]
       unless VALID_NAME_DISPLAY_FORMAT_VALUES.include?(value)
@@ -143,6 +153,13 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
       value = settings[:score_display_format]
       unless VALID_SCORE_DISPLAY_FORMAT_VALUES.include?(value)
         errors << "Invalid score_display_format ('#{value}'). Valid values are: #{VALID_SCORE_DISPLAY_FORMAT_VALUES.join(", ")}"
+      end
+    end
+
+    if settings.key?(:outcome_arrangement)
+      value = settings[:outcome_arrangement]
+      unless VALID_OUTCOME_ARRANGEMENT_VALUES.include?(value)
+        errors << "Invalid outcome_arrangement ('#{value}'). Valid values are: #{VALID_OUTCOME_ARRANGEMENT_VALUES.join(", ")}"
       end
     end
 

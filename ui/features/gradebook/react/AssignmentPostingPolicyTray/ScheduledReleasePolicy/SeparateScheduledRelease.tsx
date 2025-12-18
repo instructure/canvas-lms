@@ -35,8 +35,11 @@ type SeparateScheduledReleaseProps = {
   commentErrorMessages: FormMessage[]
   postGradesAt?: string | null
   postCommentsAt?: string | null
-  handleChange: (changes: Partial<SeparateScheduledReleaseProps>) => void
-  handleErrorMessages: (grades: FormMessage[], comments: FormMessage[]) => void
+  handleChange: (
+    changes: {postGradesAt?: string; postCommentsAt?: string},
+    gradeErrors: FormMessage[],
+    commentErrors: FormMessage[],
+  ) => void
 }
 export const SeparateScheduledRelease = ({
   gradeErrorMessages,
@@ -44,19 +47,20 @@ export const SeparateScheduledRelease = ({
   postGradesAt,
   postCommentsAt,
   handleChange,
-  handleErrorMessages,
 }: SeparateScheduledReleaseProps) => {
   const filterRelationshipErrors = (messages: FormMessage[]) => {
-    const relationshipErrorTexts = [
+    const relationshipErrorTexts: string[] = [
       GRADES_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
       COMMENTS_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
     ]
-    return messages.filter(msg => !relationshipErrorTexts.includes(msg.text))
+    return messages.filter(
+      msg => typeof msg.text === 'string' && !relationshipErrorTexts.includes(msg.text),
+    )
   }
 
-  const validateReleaseDates = (
-    gradesDateString: string | null,
-    commentsDateString: string | null,
+  const validateAndUpdate = (
+    gradesDateString: string | null | undefined,
+    commentsDateString: string | null | undefined,
     changedField: 'grades' | 'comments',
   ) => {
     const gradeMessages: FormMessage[] = []
@@ -65,14 +69,24 @@ export const SeparateScheduledRelease = ({
     const gradesDate = gradesDateString ? new Date(gradesDateString) : null
     const commentsDate = commentsDateString ? new Date(commentsDateString) : null
 
-    if (changedField === 'grades' && gradesDate && gradesDate < new Date()) {
-      gradeMessages.push({text: I18n.t('Date must be in the future'), type: 'error'})
+    // Validate date is in future only for the changed field
+    if (changedField === 'grades') {
+      if (!gradesDateString) {
+        gradeMessages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
+      } else if (gradesDate && gradesDate < new Date()) {
+        gradeMessages.push({text: I18n.t('Date must be in the future'), type: 'error'})
+      }
     }
 
-    if (changedField === 'comments' && commentsDate && commentsDate < new Date()) {
-      commentMessages.push({text: I18n.t('Date must be in the future'), type: 'error'})
+    if (changedField === 'comments') {
+      if (!commentsDateString) {
+        commentMessages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
+      } else if (commentsDate && commentsDate < new Date()) {
+        commentMessages.push({text: I18n.t('Date must be in the future'), type: 'error'})
+      }
     }
 
+    // Validate relationship between dates
     if (gradesDate && commentsDate && gradesDate < commentsDate) {
       gradeMessages.push({
         text: GRADES_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
@@ -90,36 +104,25 @@ export const SeparateScheduledRelease = ({
     const preservedCommentErrors =
       changedField === 'grades' ? filterRelationshipErrors(commentErrorMessages) : []
 
-    handleErrorMessages(
+    // Single callback with both value changes and error messages
+    const changes =
+      changedField === 'grades'
+        ? {postGradesAt: gradesDateString ?? undefined}
+        : {postCommentsAt: commentsDateString ?? undefined}
+
+    handleChange(
+      changes,
       [...preservedGradeErrors, ...gradeMessages],
       [...preservedCommentErrors, ...commentMessages],
     )
   }
 
   const onChangeGradeReleaseDate = (_e: React.SyntheticEvent, isoDate?: string) => {
-    const messages: FormMessage[] = []
-    handleChange({postGradesAt: isoDate})
-
-    if (!isoDate) {
-      messages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
-      handleErrorMessages(messages, filterRelationshipErrors(commentErrorMessages))
-      return
-    }
-
-    validateReleaseDates(isoDate, postCommentsAt || null, 'grades')
+    validateAndUpdate(isoDate, postCommentsAt, 'grades')
   }
 
   const onChangeCommentReleaseDate = (_e: React.SyntheticEvent, isoDate?: string) => {
-    const messages: FormMessage[] = []
-    handleChange({postCommentsAt: isoDate})
-
-    if (!isoDate) {
-      messages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
-      handleErrorMessages(filterRelationshipErrors(gradeErrorMessages), messages)
-      return
-    }
-
-    validateReleaseDates(postGradesAt || null, isoDate, 'comments')
+    validateAndUpdate(postGradesAt, isoDate, 'comments')
   }
 
   return (

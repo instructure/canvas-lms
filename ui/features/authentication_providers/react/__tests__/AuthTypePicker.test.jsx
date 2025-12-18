@@ -47,7 +47,7 @@ describe('AuthTypePicker', () => {
   })
 
   it('choosing an auth type fires the provided callback', async () => {
-    const spy = jest.fn()
+    const spy = vi.fn()
     const wrapper = renderAuthTypePicker({onChange: spy})
 
     await userEvent.selectOptions(wrapper.getByRole('combobox'), authTypes[1].name)

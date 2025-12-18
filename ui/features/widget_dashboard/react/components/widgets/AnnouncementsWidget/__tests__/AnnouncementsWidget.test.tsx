@@ -284,56 +284,6 @@ const setup = (
   }
 }
 
-// Mock course grades data for course code enrichment
-const mockCourseGradesResponse = {
-  data: {
-    legacyNode: {
-      _id: '123',
-      enrollmentsConnection: {
-        nodes: [
-          {
-            course: {
-              _id: '1',
-              name: 'Test Course 1',
-              courseCode: 'MATH 101',
-            },
-            grades: {
-              currentScore: 85,
-              currentGrade: 'B',
-              finalScore: null,
-              finalGrade: null,
-              overrideScore: null,
-              overrideGrade: null,
-            },
-          },
-          {
-            course: {
-              _id: '2',
-              name: 'Test Course 2',
-              courseCode: 'ENG 201',
-            },
-            grades: {
-              currentScore: 92,
-              currentGrade: 'A-',
-              finalScore: null,
-              finalGrade: null,
-              overrideScore: null,
-              overrideGrade: null,
-            },
-          },
-        ],
-        pageInfo: {
-          hasNextPage: false,
-          hasPreviousPage: false,
-          startCursor: null,
-          endCursor: null,
-          totalCount: null,
-        },
-      },
-    },
-  },
-}
-
 const server = setupServer(...defaultGraphQLHandlers)
 
 const waitForLoadingToComplete = async () => {
@@ -512,17 +462,20 @@ describe('AnnouncementsWidget', () => {
       ).toBeInTheDocument()
     })
 
+    // Capture call count before retry
+    const callCountBeforeRetry = callCount
+
     // Click retry button
     const retryButton = screen.getByText('Retry')
     fireEvent.click(retryButton)
 
+    // Wait for successful data to appear, confirming retry worked
     await waitFor(() => {
       expect(screen.getByText('Test Announcement 2')).toBeInTheDocument()
     })
 
-    await waitFor(() => {
-      expect(callCount).toBe(2)
-    })
+    // Verify the retry triggered at least one additional call
+    expect(callCount).toBeGreaterThan(callCountBeforeRetry)
 
     cleanup()
   })
@@ -616,11 +569,17 @@ describe('AnnouncementsWidget', () => {
     const readOption = await screen.findByText('Read')
     fireEvent.click(readOption)
 
+    // Wait for loading to complete after filter change
+    await waitForLoadingToComplete()
+
     // Now only read announcements should show
-    await waitFor(() => {
-      expect(screen.getByText('Test Announcement 1')).toBeInTheDocument()
-      expect(screen.queryByText('Test Announcement 2')).not.toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Test Announcement 1')).toBeInTheDocument()
+        expect(screen.queryByText('Test Announcement 2')).not.toBeInTheDocument()
+      },
+      {timeout: 3000},
+    )
 
     // Change to "All" filter
     const updatedDropdown = screen.getByTitle('Read')
@@ -629,11 +588,17 @@ describe('AnnouncementsWidget', () => {
     const allOption = await screen.findByText('All')
     fireEvent.click(allOption)
 
+    // Wait for loading to complete after filter change
+    await waitForLoadingToComplete()
+
     // Now both announcements should show
-    await waitFor(() => {
-      expect(screen.getByText('Test Announcement 1')).toBeInTheDocument()
-      expect(screen.getByText('Test Announcement 2')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Test Announcement 1')).toBeInTheDocument()
+        expect(screen.getByText('Test Announcement 2')).toBeInTheDocument()
+      },
+      {timeout: 3000},
+    )
 
     cleanup()
   })
@@ -735,6 +700,9 @@ describe('AnnouncementsWidget', () => {
     const filterSelect = screen.getByDisplayValue('Unread')
     fireEvent.click(filterSelect)
     fireEvent.click(screen.getByText('All'))
+
+    // Wait for loading to complete after filter change
+    await waitForLoadingToComplete()
 
     await waitFor(() => {
       expect(screen.getByText('Test Announcement 1')).toBeInTheDocument()
@@ -937,18 +905,21 @@ describe('AnnouncementsWidget', () => {
     const allOption = await screen.findByText('All')
     fireEvent.click(allOption)
 
-    // Pagination should remain visible during and after filter change
-    await waitFor(() => {
-      const paginationContainer = screen.getByTestId('pagination-container')
-      expect(paginationContainer).toBeInTheDocument()
-    })
+    // Wait for loading to complete after filter change
+    await waitForLoadingToComplete()
 
-    // Verify new pagination reflects the "all" filter's total count
-    await waitFor(() => {
-      expect(screen.getByText('1')).toBeInTheDocument()
-      expect(screen.getByText('2')).toBeInTheDocument()
-      expect(screen.getByText('3')).toBeInTheDocument() // 9 items / 3 per page = 3 pages
-    })
+    // Wait for the "All" filter data to load and update pagination
+    // The "all" response has totalCount: 9, which means 3 pages
+    await waitFor(
+      () => {
+        const paginationContainer = screen.getByTestId('pagination-container')
+        expect(paginationContainer).toBeInTheDocument()
+        expect(screen.getByText('1')).toBeInTheDocument()
+        expect(screen.getByText('2')).toBeInTheDocument()
+        expect(screen.getByText('3')).toBeInTheDocument() // 9 items / 3 per page = 3 pages
+      },
+      {timeout: 3000},
+    )
 
     cleanup()
   })

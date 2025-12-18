@@ -20,18 +20,20 @@ import Actions from '../actions'
 import {uploadFile as rawUploadFile} from '@canvas/upload-file'
 import Helpers from '../helpers'
 
-jest.mock('@canvas/upload-file', () => ({
-  uploadFile: jest.fn(),
+vi.mock('@canvas/upload-file', () => ({
+  uploadFile: vi.fn(),
 }))
 
-jest.mock('../helpers', () => ({
-  extractInfoFromEvent: jest.fn(),
-  isValidImageType: jest.fn(),
+vi.mock('../helpers', () => ({
+  default: {
+    extractInfoFromEvent: vi.fn(),
+    isValidImageType: vi.fn(),
+  },
 }))
 
 describe('Course Settings Actions', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('calling setModalVisibility produces the proper object', () => {
@@ -76,7 +78,7 @@ describe('Course Settings Actions', () => {
     }
 
     const mockAjaxLib = {
-      get: jest.fn().mockResolvedValue(fakeResponse),
+      get: vi.fn().mockResolvedValue(fakeResponse),
     }
 
     const expectedAction = {
@@ -112,7 +114,7 @@ describe('Course Settings Actions', () => {
 
   test('prepareSetImage with a imageUrl calls putImageData', async () => {
     const mockAjaxLib = {
-      put: jest.fn().mockResolvedValue({}),
+      put: vi.fn().mockResolvedValue({}),
     }
 
     const dispatches = []
@@ -136,8 +138,8 @@ describe('Course Settings Actions', () => {
     }
 
     const mockAjaxLib = {
-      get: jest.fn().mockResolvedValue(fakeResponse),
-      put: jest.fn().mockResolvedValue({}),
+      get: vi.fn().mockResolvedValue(fakeResponse),
+      put: vi.fn().mockResolvedValue({}),
     }
 
     const dispatches = []
@@ -246,8 +248,8 @@ describe('Course Settings Actions', () => {
     })
 
     const mockAjaxLib = {
-      put: jest.fn().mockResolvedValue({}),
-      get: jest.fn().mockResolvedValue({
+      put: vi.fn().mockResolvedValue({}),
+      get: vi.fn().mockResolvedValue({
         data: {
           url: fileDownloadUrl,
         },

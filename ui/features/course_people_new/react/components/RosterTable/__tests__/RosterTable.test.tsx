@@ -27,10 +27,11 @@ import {
   PENDING_ENROLLMENT,
 } from '../../../../util/constants'
 import useCoursePeopleQuery from '../../../hooks/useCoursePeopleQuery'
+import useCoursePeopleContext from '../../../hooks/useCoursePeopleContext'
 import {mockUser, mockEnrollment} from '../../../../graphql/Mocks'
 
-jest.mock('../../../hooks/useCoursePeopleQuery')
-jest.mock('../../../hooks/useCoursePeopleContext')
+vi.mock('../../../hooks/useCoursePeopleQuery')
+vi.mock('../../../hooks/useCoursePeopleContext')
 
 const mockUsers = [
   mockUser({
@@ -73,19 +74,17 @@ describe('RosterTable', () => {
   const renderComponent = () => render(<RosterTable {...defaultProps} />)
 
   beforeEach(() => {
-    ;(useCoursePeopleQuery as jest.Mock).mockReturnValue({
+    vi.mocked(useCoursePeopleQuery).mockReturnValue({
       data: mockUsers,
       isLoading: false,
       error: null,
-    })
-    require('../../../hooks/useCoursePeopleContext').default.mockReturnValue(
-      useCoursePeopleContextMocks,
-    )
+    } as any)
+    vi.mocked(useCoursePeopleContext).mockReturnValue(useCoursePeopleContextMocks as any)
     renderComponent()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the table with correct caption', () => {

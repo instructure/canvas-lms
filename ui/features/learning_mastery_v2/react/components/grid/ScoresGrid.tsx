@@ -21,8 +21,12 @@ import {Flex} from '@instructure/ui-flex'
 import {StudentOutcomeScore} from './StudentOutcomeScore'
 import {Student, Outcome, StudentRollupData, OutcomeRollup} from '../../types/rollup'
 import {ScoreDisplayFormat} from '../../utils/constants'
-import {ContributingScoresManager} from '../../hooks/useContributingScores'
-import {Cell} from './Cell'
+import {
+  ContributingScoreAlignment,
+  ContributingScoresManager,
+} from '../../hooks/useContributingScores'
+import {CellWithAction} from './CellWithAction'
+import {FocusableCell} from './FocusableCell'
 
 export interface ScoresGridProps {
   students: Student[]
@@ -30,7 +34,12 @@ export interface ScoresGridProps {
   rollups: StudentRollupData[]
   scoreDisplayFormat?: ScoreDisplayFormat
   contributingScores: ContributingScoresManager
-  onOpenStudentAssignmentTray?: (outcome: Outcome) => void
+  onOpenStudentAssignmentTray?: (
+    outcome: Outcome,
+    student: Student,
+    alignmentIndex: number,
+    alignments: ContributingScoreAlignment[],
+  ) => void
 }
 
 interface ExtendedOutcomeRollup extends OutcomeRollup {
@@ -42,7 +51,12 @@ interface ContributingScoreCellsProps {
   student: Student
   contributingScores: ContributingScoresManager
   outcome: Outcome
-  onScoreClick?: () => void
+  onScoreClick?: (
+    outcome: Outcome,
+    student: Student,
+    alignmentIndex: number,
+    alignments: ContributingScoreAlignment[],
+  ) => void
 }
 
 const ContributingScoreCells: React.FC<ContributingScoreCellsProps> = ({
@@ -58,19 +72,37 @@ const ContributingScoreCells: React.FC<ContributingScoreCellsProps> = ({
   return (
     <Fragment>
       {isVisible &&
-        scores.map((score, scoreIndex) => (
-          <Cell
+        scores.map((score, alignmentIndex) => (
+          <CellWithAction
+            data-testid={`contributing-score-${student.id}-${outcome.id}-${alignmentIndex}`}
+            key={`contributing-score-${student.id}-${outcome.id}-${alignmentIndex}`}
             background="secondary"
-            data-testid={`contributing-score-${student.id}-${outcome.id}-${scoreIndex}`}
-            key={`contributing-score-${student.id}-${outcome.id}-${scoreIndex}`}
+            actionLabel="View Contributing Score Details"
+            onAction={
+              onScoreClick
+                ? () => {
+                    if (!contributingScoresForOutcome.alignments) return
+                    if (
+                      alignmentIndex >= 0 &&
+                      alignmentIndex < contributingScoresForOutcome.alignments.length
+                    ) {
+                      onScoreClick(
+                        outcome,
+                        student,
+                        alignmentIndex,
+                        contributingScoresForOutcome.alignments,
+                      )
+                    }
+                  }
+                : undefined
+            }
           >
             <StudentOutcomeScore
-              score={score}
+              score={score?.score}
               outcome={outcome}
               scoreDisplayFormat={scoreDisplayFormat}
-              onScoreClick={onScoreClick}
             />
-          </Cell>
+          </CellWithAction>
         ))}
     </Fragment>
   )
@@ -99,28 +131,24 @@ const ScoresGridComponent: React.FC<ScoresGridProps> = ({
   }, [rollups])
 
   return (
-    <Flex direction="column">
+    <Flex direction="column" role="grid">
       {students.map(student => (
-        <Flex direction="row" key={student.id}>
+        <Flex direction="row" key={student.id} role="row">
           {outcomes.map((outcome, index) => (
             <Fragment key={`${student.id}-${outcome.id}-${index}`}>
-              <Cell data-testid={`student-outcome-score-${student.id}-${outcome.id}`}>
+              <FocusableCell data-testid={`student-outcome-score-${student.id}-${outcome.id}`}>
                 <StudentOutcomeScore
                   score={rollupsByStudentAndOutcome[`${student.id}_${outcome.id}`]?.score}
                   outcome={outcome}
                   scoreDisplayFormat={scoreDisplayFormat}
                 />
-              </Cell>
+              </FocusableCell>
               <ContributingScoreCells
                 contributingScores={contributingScores}
                 student={student}
                 outcome={outcome}
                 scoreDisplayFormat={scoreDisplayFormat}
-                onScoreClick={
-                  onOpenStudentAssignmentTray
-                    ? () => onOpenStudentAssignmentTray(outcome)
-                    : undefined
-                }
+                onScoreClick={onOpenStudentAssignmentTray}
               />
             </Fragment>
           ))}

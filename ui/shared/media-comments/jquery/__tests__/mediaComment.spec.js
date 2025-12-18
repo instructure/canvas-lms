@@ -28,7 +28,7 @@ describe('getSourcesAndTracks', () => {
   })
 
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
   })
 
   afterEach(() => {
@@ -37,7 +37,7 @@ describe('getSourcesAndTracks', () => {
 
   afterAll(() => {
     server.close()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('with no attachment id', async () => {

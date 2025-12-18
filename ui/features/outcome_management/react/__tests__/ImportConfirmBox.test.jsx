@@ -21,12 +21,12 @@ import {render, screen, act, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ImportConfirmBox, {showImportConfirmBox} from '../ImportConfirmBox'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('ImportConfirmBox', () => {
   let alertDiv
-  const onCloseHandlerMock = jest.fn()
-  const onImportHandlerMock = jest.fn()
+  const onCloseHandlerMock = vi.fn()
+  const onImportHandlerMock = vi.fn()
   const defaultProps = (props = {}) => ({
     count: 100,
     onCloseHandler: onCloseHandlerMock,
@@ -60,7 +60,7 @@ describe('ImportConfirmBox', () => {
 
   afterEach(() => {
     // Clean up after each test
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     document.body.innerHTML = ''
     alertDiv = null
   })
@@ -113,7 +113,7 @@ describe('ImportConfirmBox', () => {
       const cancelButton = container.querySelector('button span span').closest('button')
       fireEvent.click(cancelButton)
 
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(onCloseHandlerMock).toHaveBeenCalled()
     })
 
@@ -135,7 +135,7 @@ describe('ImportConfirmBox', () => {
       )
 
       fireEvent.click(importButton)
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(onImportHandlerMock).toHaveBeenCalled()
       expect(onCloseHandlerMock).toHaveBeenCalled()
     })
@@ -152,7 +152,7 @@ describe('ImportConfirmBox', () => {
     it('calls onCloseHandler before ImportConfirmBox is unmounted', async () => {
       showImportConfirmBox({...defaultProps()})
       fireEvent.click(screen.getByText('Cancel'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(onCloseHandlerMock).toHaveBeenCalled()
     })
 

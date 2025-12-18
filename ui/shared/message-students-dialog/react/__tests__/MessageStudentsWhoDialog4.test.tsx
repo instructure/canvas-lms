@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {vi} from 'vitest'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {within} from '@testing-library/dom'
 import MessageStudentsWhoDialog, {
@@ -547,10 +548,10 @@ describe('MessageStudentsWhoDialog', () => {
   })
 
   describe('send message button', () => {
-    let onSend: jest.Mock<any, any>
+    let onSend: ReturnType<typeof vi.fn>
 
     beforeEach(() => {
-      onSend = jest.fn()
+      onSend = vi.fn()
       students.forEach(student => {
         student.submittedAt = null
       })
@@ -630,12 +631,12 @@ describe('MessageStudentsWhoDialog', () => {
 
   // unskip in EVAL-2535
   describe.skip('onSend', () => {
-    let onClose: jest.Mock<any, any>
-    let onSend: jest.Mock<any, any>
+    let onClose: ReturnType<typeof vi.fn>
+    let onSend: ReturnType<typeof vi.fn>
 
     beforeEach(() => {
-      onClose = jest.fn()
-      onSend = jest.fn()
+      onClose = vi.fn()
+      onSend = vi.fn()
     })
 
     it('is called with the specified subject', async () => {

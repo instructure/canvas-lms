@@ -19,11 +19,11 @@
 import axios from '@canvas/axios'
 import {removeOutcomeGroup} from '../Management'
 
-jest.mock('@canvas/axios')
+vi.mock('@canvas/axios')
 
 describe('api', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('removeOutcomeGroup', () => {

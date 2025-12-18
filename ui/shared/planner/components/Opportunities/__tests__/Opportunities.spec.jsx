@@ -49,7 +49,7 @@ function defaultProps() {
   }
 }
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 it('renders the base component correctly with one of each kind of opportunity', () => {
   const {container, getByRole} = render(<Opportunities {...defaultProps()} />)
@@ -98,7 +98,7 @@ it('renders empty state when no opportunities', () => {
 
 it('calls toggle popover when escape is pressed', () => {
   const tempProps = defaultProps()
-  const mockDispatch = jest.fn()
+  const mockDispatch = vi.fn()
   tempProps.togglePopover = mockDispatch
   const {container} = render(<Opportunities {...tempProps} />)
   const opportunitiesParent = container.querySelector('#opportunities_parent')
@@ -110,8 +110,8 @@ it('calls toggle popover when escape is pressed', () => {
 })
 
 it('registers itself as animatable', () => {
-  const fakeRegister = jest.fn()
-  const fakeDeregister = jest.fn()
+  const fakeRegister = vi.fn()
+  const fakeDeregister = vi.fn()
   const ref = React.createRef()
   render(
     <Opportunities

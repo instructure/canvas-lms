@@ -268,7 +268,7 @@ describe('CriterionModal tests', () => {
     })
 
     it('save button should display validation error if there is no criterion name', () => {
-      const onSave = jest.fn()
+      const onSave = vi.fn()
       const criterion = getCriterion({description: ''})
 
       const {getByTestId, queryByText} = renderComponent({onSave, criterion})
@@ -280,7 +280,7 @@ describe('CriterionModal tests', () => {
     })
 
     it('save button should display validation error if there is no rating name', () => {
-      const onSave = jest.fn()
+      const onSave = vi.fn()
       const criterion = getCriterion({
         ratings: [{id: '1', description: '', points: 0, longDescription: ''}],
       })
@@ -294,7 +294,7 @@ describe('CriterionModal tests', () => {
     })
 
     it('save button should display validation error if there is only a single rating with no name', () => {
-      const onSave = jest.fn()
+      const onSave = vi.fn()
       const ratings = [
         {id: '1', description: 'Valid', points: 0, longDescription: ''},
         {id: '1', description: 'Valid', points: 0, longDescription: ''},
@@ -312,7 +312,7 @@ describe('CriterionModal tests', () => {
     })
 
     it('should call onSave when save button is clicked', () => {
-      const onSave = jest.fn()
+      const onSave = vi.fn()
       const criterion = getCriterion()
 
       const {getByTestId} = renderComponent({onSave, criterion})
@@ -323,7 +323,7 @@ describe('CriterionModal tests', () => {
     })
 
     it('should call onDismiss when cancel button is clicked', () => {
-      const onDismiss = jest.fn()
+      const onDismiss = vi.fn()
       const {getByTestId} = renderComponent({onDismiss})
 
       fireEvent.click(getByTestId('rubric-criterion-cancel'))
@@ -362,7 +362,7 @@ describe('CriterionModal tests', () => {
 
   describe('Warning Modal Tests', () => {
     it('should show call dismiss if nothing changed', () => {
-      const onDismiss = jest.fn()
+      const onDismiss = vi.fn()
       const {getByTestId} = renderComponent({
         onDismiss,
         criterion: getCriterion(),
@@ -373,7 +373,7 @@ describe('CriterionModal tests', () => {
     })
 
     it('should show warning modal when criterion description has been changed', () => {
-      const onDismiss = jest.fn()
+      const onDismiss = vi.fn()
       const {getByTestId} = renderComponent({
         onDismiss,
         criterion: getCriterion(),
@@ -395,7 +395,7 @@ describe('CriterionModal tests', () => {
     })
 
     it('should show warning modal when criterion long description has been changed', () => {
-      const onDismiss = jest.fn()
+      const onDismiss = vi.fn()
       const {getByTestId} = renderComponent({
         onDismiss,
         criterion: getCriterion(),
@@ -419,7 +419,7 @@ describe('CriterionModal tests', () => {
     })
 
     it('should show warning modal when criterion use range has been changed', () => {
-      const onDismiss = jest.fn()
+      const onDismiss = vi.fn()
       const {getByTestId} = renderComponent({
         onDismiss,
         criterion: getCriterion({criterionUseRange: false}),
@@ -441,7 +441,7 @@ describe('CriterionModal tests', () => {
     })
 
     it('should show warning modal when ratings have been changed', () => {
-      const onDismiss = jest.fn()
+      const onDismiss = vi.fn()
       const {getByTestId, queryAllByTestId} = renderComponent({
         onDismiss,
         criterion: getCriterion(),

@@ -27,8 +27,7 @@ import CourseWorkFilters, {
   type DateFilterOption,
   isValidDateFilterOption,
 } from '../../shared/CourseWorkFilters'
-import type {BaseWidgetProps, CourseOption} from '../../../types'
-import {useSharedCourses} from '../../../hooks/useSharedCourses'
+import type {BaseWidgetProps} from '../../../types'
 import {useCourseWorkPaginated} from '../../../hooks/useCourseWork'
 import {useCourseWorkStatistics} from '../../../hooks/useCourseWorkStatistics'
 import StatisticsCardsGrid from '../../shared/StatisticsCardsGrid'
@@ -61,12 +60,6 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
     'not_submitted',
     isValidDateFilterOption,
   )
-
-  const {data: courseGrades = []} = useSharedCourses({limit: 1000})
-  const userCourses: CourseOption[] = courseGrades.map(courseGrade => ({
-    id: courseGrade.courseId,
-    name: courseGrade.courseName,
-  }))
 
   const courseFilter = selectedCourse === 'all' ? undefined : selectedCourse
   const dateParams = convertDateFilterToParams(selectedDateFilter)
@@ -152,7 +145,6 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
             selectedDateFilter={selectedDateFilter}
             onCourseChange={handleCourseChange}
             onDateFilterChange={handleDateFilterChange}
-            userCourses={userCourses}
           />
         </Flex.Item>
 

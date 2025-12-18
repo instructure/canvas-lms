@@ -203,15 +203,6 @@ export type IssueRuleType =
   | 'img-alt-filename'
   | 'paragraphs-for-headings'
 
-// Used in the GroupedIssueSummary, merges multiple IssueRuleTypes per group
-export type IssueSummaryGroup =
-  | 'headings'
-  | 'links'
-  | 'img-alt-text'
-  | 'tables'
-  | 'lists'
-  | 'low-contrast'
-
 export type FilterGroupMapping = {
   'alt-text': IssueRuleType[]
   'heading-order': IssueRuleType[]

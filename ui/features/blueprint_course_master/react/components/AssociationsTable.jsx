@@ -159,18 +159,65 @@ export default class AssociationsTable extends React.Component {
     return null
   }
 
-  renderRows(associations) {
+  renderCourseLink(course) {
+    if (!course.id) {
+      return this.renderCellText(course.name)
+    }
+
+    return (
+      <Link href={`/courses/${course.id}`} isWithinText={false}>
+        {course.name}
+      </Link>
+    )
+  }
+
+  renderRemoveButton(course, focusNode) {
+    return (
+      <IconButton
+        withBackground={false}
+        withBorder={false}
+        renderIcon={<IconXSolid />}
+        color="primary"
+        elementRef={focusNode.ref}
+        size="small"
+        screenReaderLabel={I18n.t('Remove course association %{name}', {name: course.name})}
+        onClick={this.onRemove.bind(this, course.id, course.name, focusNode.index)}
+        data-course-id={course.id}
+      />
+    )
+  }
+
+  renderRestoreLink(course, focusNode) {
+    return (
+      <View display="inline-block" margin="xx-small none">
+        <Link
+          isWithinText={false}
+          as="button"
+          elementRef={focusNode.ref}
+          onClick={this.onRestore.bind(this, course.id, course.name)}
+        >
+          <PresentationContent>
+            <Text size="small">{I18n.t('Undo')}</Text>
+          </PresentationContent>
+          <ScreenReaderContent>
+            {I18n.t('Undo remove course association %{name}', {name: course.name})}
+          </ScreenReaderContent>
+        </Link>
+      </View>
+    )
+  }
+
+  renderRows(associations, removing = false) {
     const shouldRenderStatusPill = !!window.ENV.FEATURES.ux_list_concluded_courses_in_bp
 
     return associations.map(course => {
       const focusNode = this.props.focusManager.allocateNext()
-      const label = I18n.t('Remove course association %{name}', {name: course.name})
 
       return (
         <Table.Row id={`course_${course.id}`} key={course.id} data-testid="associations-course-row">
           <Table.Cell>
             <Flex direction="column" gap="x-small">
-              <Flex.Item>{this.renderCellText(course.name)}</Flex.Item>
+              <Flex.Item>{this.renderCourseLink(course)}</Flex.Item>
               {shouldRenderStatusPill && <Flex.Item>{this.renderStatusPill(course)}</Flex.Item>}
             </Flex>
           </Table.Cell>
@@ -185,62 +232,9 @@ export default class AssociationsTable extends React.Component {
             )}
           </Table.Cell>
           <Table.Cell>
-            <IconButton
-              withBackground={false}
-              withBorder={false}
-              renderIcon={<IconXSolid />}
-              color="primary"
-              elementRef={focusNode.ref}
-              size="small"
-              screenReaderLabel={label}
-              onClick={this.onRemove.bind(this, course.id, course.name, focusNode.index)}
-              data-course-id={course.id}
-            />
-          </Table.Cell>
-        </Table.Row>
-      )
-    })
-  }
-
-  renderToBeRemovedRows(associations) {
-    const shouldRenderStatusPill = !!window.ENV.FEATURES.ux_list_concluded_courses_in_bp
-
-    return associations.map(course => {
-      const focusNode = this.props.focusManager.allocateNext()
-      const label = I18n.t('Undo remove course association %{name}', {name: course.name})
-
-      return (
-        <Table.Row key={course.id} data-testid="associations-course-row">
-          <Table.Cell>
-            <Flex direction="column" gap="x-small">
-              <Flex.Item>{this.renderCellText(course.name)}</Flex.Item>
-              {shouldRenderStatusPill && <Flex.Item>{this.renderStatusPill(course)}</Flex.Item>}
-            </Flex>
-          </Table.Cell>
-          <Table.Cell>{this.renderCellText(course.course_code)}</Table.Cell>
-          <Table.Cell>{this.renderCellText(course.term.name)}</Table.Cell>
-          <Table.Cell>{this.renderCellText(course.sis_course_id)}</Table.Cell>
-          <Table.Cell>
-            {this.renderCellText(
-              course.teachers
-                ? course.teachers.map(teacher => teacher.display_name).join(', ')
-                : I18n.t('%{teacher_count} teachers', {teacher_count: course.teacher_count}),
-            )}
-          </Table.Cell>
-          <Table.Cell>
-            <View display="inline-block" margin="xx-small none">
-              <Link
-                isWithinText={false}
-                as="button"
-                elementRef={focusNode.ref}
-                onClick={this.onRestore.bind(this, course.id, course.name)}
-              >
-                <PresentationContent>
-                  <Text size="small">{I18n.t('Undo')}</Text>
-                </PresentationContent>
-                <ScreenReaderContent>{label}</ScreenReaderContent>
-              </Link>
-            </View>
+            {removing
+              ? this.renderRestoreLink(course, focusNode)
+              : this.renderRemoveButton(course, focusNode)}
           </Table.Cell>
         </Table.Row>
       )
@@ -289,7 +283,7 @@ export default class AssociationsTable extends React.Component {
             </Text>
           </Table.ColHeader>
         </Table.Row>,
-      ].concat(this.renderToBeRemovedRows(this.props.removedAssociations))
+      ].concat(this.renderRows(this.props.removedAssociations, true))
     }
 
     return null

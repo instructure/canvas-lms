@@ -31,7 +31,7 @@ describe('SectionList', () => {
   const defaultProps = {
     portfolio,
     isOwner: true,
-    onConfirm: jest.fn(),
+    onConfirm: vi.fn(),
     sections: sectionList,
   }
 

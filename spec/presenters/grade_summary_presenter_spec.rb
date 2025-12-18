@@ -799,4 +799,71 @@ describe GradeSummaryPresenter do
       expect(presenter).to be_show_updated_plagiarism_icons(actual_plagiarism_data)
     end
   end
+
+  describe "peer review assignments" do
+    let(:course) { Course.create! }
+    let(:student) { User.create! }
+    let(:enrollment) { course.enroll_student(student, enrollment_state: "active") }
+    let(:assignment) { assignment_model(course:, peer_reviews: true) }
+    let(:peer_review_assignment) do
+      PeerReviewSubAssignment.create!(
+        parent_assignment: assignment,
+        context: course,
+        title: "Peer Review",
+        points_possible: 10
+      )
+    end
+
+    before do
+      course.offer
+      enrollment
+    end
+
+    context "when peer_review_allocation_and_grading feature flag is disabled" do
+      it "does not include peer review assignments" do
+        peer_review_assignment
+        presenter = GradeSummaryPresenter.new(course, student, student.id)
+
+        assignment_ids = presenter.assignments.map(&:id)
+        expect(assignment_ids).not_to include(peer_review_assignment.id)
+      end
+    end
+
+    context "when peer_review_allocation_and_grading feature flag is enabled" do
+      before { course.enable_feature!(:peer_review_allocation_and_grading) }
+
+      it "includes peer review assignments for parent assignments with peer_reviews: true" do
+        peer_review_assignment
+        presenter = GradeSummaryPresenter.new(course, student, student.id)
+
+        assignment_ids = presenter.assignments.map(&:id)
+        expect(assignment_ids).to include(peer_review_assignment.id)
+      end
+
+      it "does not include peer review assignments for parent assignments with peer_reviews: false" do
+        assignment_without_reviews = assignment_model(course:, peer_reviews: false)
+        peer_review_for_no_reviews = PeerReviewSubAssignment.create!(
+          parent_assignment: assignment_without_reviews,
+          context: course,
+          title: "Peer Review",
+          points_possible: 10
+        )
+
+        presenter = GradeSummaryPresenter.new(course, student, student.id)
+        assignment_ids = presenter.assignments.map(&:id)
+
+        expect(assignment_ids).not_to include(peer_review_for_no_reviews.id)
+      end
+
+      it "does not include deleted peer review assignments" do
+        peer_review_assignment
+        peer_review_assignment.destroy
+
+        presenter = GradeSummaryPresenter.new(course, student, student.id)
+        assignment_ids = presenter.assignments.map(&:id)
+
+        expect(assignment_ids).not_to include(peer_review_assignment.id)
+      end
+    end
+  end
 end

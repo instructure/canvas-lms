@@ -38,7 +38,7 @@ describe('ObserverOptions', () => {
       display_name: 'Zelda',
       avatarUrl: 'http://avatar',
     },
-    handleChangeObservedUser: jest.fn(),
+    handleChangeObservedUser: vi.fn(),
     canAddObservee: false,
     ...overrides,
   })
@@ -76,7 +76,7 @@ describe('ObserverOptions', () => {
   })
 
   it('calls handleChangeObservedUser and saves cookie when changing the user', () => {
-    const handleChangeObservedUser = jest.fn()
+    const handleChangeObservedUser = vi.fn()
     const {getByRole, getByText} = render(
       <ObserverOptions {...getProps({handleChangeObservedUser})} />,
     )

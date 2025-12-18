@@ -25,20 +25,20 @@ const textFile = new File(['foo'], 'foo.txt', {type: 'text/plain'})
 
 const defaultProps = {
   open: true,
-  onClose: jest.fn(),
+  onClose: vi.fn(),
   fileOptions: {
     name: 'foo.txt',
     file: textFile,
     cannotOverwrite: false,
     expandZip: false,
   },
-  onNameConflictResolved: jest.fn(),
+  onNameConflictResolved: vi.fn(),
 }
 const renderComponent = (props = {}) => render(<FileRenameForm {...defaultProps} {...props} />)
 
 describe('FileRenameForm', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders header', () => {

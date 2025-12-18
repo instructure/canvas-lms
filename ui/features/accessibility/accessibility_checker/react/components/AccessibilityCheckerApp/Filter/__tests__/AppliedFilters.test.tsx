@@ -17,12 +17,16 @@
  */
 
 import React from 'react'
-import {render, screen, fireEvent} from '@testing-library/react'
+import {cleanup, render, screen, fireEvent} from '@testing-library/react'
 import AppliedFilters from '../AppliedFilters'
 import {AppliedFilter, FilterOption} from '../../../../../../shared/react/types'
 
 describe('AppliedFilters', () => {
-  const mockSetFilters = jest.fn()
+  afterEach(() => {
+    cleanup()
+  })
+
+  const mockSetFilters = vi.fn()
 
   beforeEach(() => {
     mockSetFilters.mockClear()

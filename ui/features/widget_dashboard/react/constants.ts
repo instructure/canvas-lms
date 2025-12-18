@@ -37,6 +37,8 @@ export const WIDGET_TYPES = {
   PEOPLE: 'people',
   TODO_LIST: 'todo_list',
   RECENT_GRADES: 'recent_grades',
+  PROGRESS_OVERVIEW: 'progress_overview',
+  INBOX: 'inbox',
 } as const
 
 export type WidgetType = (typeof WIDGET_TYPES)[keyof typeof WIDGET_TYPES]
@@ -114,6 +116,8 @@ export const DASHBOARD_NOTIFICATIONS_KEY = 'dashboardNotifications'
 export const COURSE_WORK_KEY = 'courseWork'
 export const COURSE_STATISTICS_KEY = 'courseStatistics'
 export const COURSE_INSTRUCTORS_PAGINATED_KEY = 'courseInstructorsPaginated'
+export const PROGRESS_OVERVIEW_KEY = 'progressOverview'
+export const INBOX_MESSAGES_KEY = 'inboxMessages'
 
 // URL patterns
 export const URL_PATTERNS = {
@@ -170,6 +174,17 @@ export const UPDATE_WIDGET_DASHBOARD_CONFIG = gql`
     updateWidgetDashboardConfig(input: {widgetId: $widgetId, filters: $filters}) {
       widgetId
       filters
+      errors {
+        message
+      }
+    }
+  }
+`
+
+export const UPDATE_WIDGET_DASHBOARD_LAYOUT = gql`
+  mutation UpdateWidgetDashboardLayout($layout: String!) {
+    updateWidgetDashboardLayout(input: {layout: $layout}) {
+      layout
       errors {
         message
       }

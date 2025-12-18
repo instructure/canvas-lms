@@ -21,11 +21,14 @@ import MobileNavigation from '../MobileNavigation'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import axios from 'axios'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {act} from 'react-dom/test-utils'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-const setOnSuccess = jest.fn()
+const server = setupServer()
+
+const setOnSuccess = vi.fn()
 
 const render = children =>
   testingLibraryRender(
@@ -34,43 +37,39 @@ const render = children =>
     </MockedQueryProvider>,
   )
 
-jest.mock('axios')
-jest.mock('../MobileContextMenu', () => () => <></>)
-jest.mock('../MobileGlobalMenu', () => () => <></>)
-
-// Mock the doFetchApi function to prevent actual API calls
-jest.mock('@canvas/do-fetch-api-effect', () => ({
-  __esModule: true,
-  default: jest.fn().mockImplementation(() => Promise.resolve({json: {unread_count: 123}})),
+vi.mock('../MobileContextMenu', () => ({
+  default: () => <></>,
+}))
+vi.mock('../MobileGlobalMenu', () => ({
+  default: () => <></>,
 }))
 
 describe('MobileNavigation', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fakeENV.setup()
-    // mocks for ui/features/navigation_header/react/utils.ts:37
-    ENV.ACCOUNT_ID = 'test-account-id'
-    ENV.current_user_id = '1'
-    ENV.current_user = {fake_student: false}
+    fakeENV.setup({
+      ACCOUNT_ID: 'test-account-id',
+      current_user_id: '1',
+      current_user: {fake_student: false},
+    })
 
     // Reset the query client before each test
     queryClient.clear()
 
-    axios.get.mockImplementation(url => {
-      if (
-        url ===
-        '/api/v1/accounts/test-account-id/lti_apps/launch_definitions?per_page=50&placements[]=global_navigation&only_visible=true'
-      ) {
-        return Promise.resolve({
-          data: [],
-        })
-      }
-      return Promise.resolve({data: []})
-    })
+    server.use(
+      http.get('/api/v1/accounts/test-account-id/lti_apps/launch_definitions', () =>
+        HttpResponse.json([]),
+      ),
+      http.get('/api/v1/conversations/unread_count', () => HttpResponse.json({unread_count: 123})),
+    )
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.clearAllMocks()
+    server.resetHandlers()
+    vi.clearAllMocks()
     document.body.innerHTML = ''
   })
 

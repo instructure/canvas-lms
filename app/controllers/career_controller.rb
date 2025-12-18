@@ -67,6 +67,9 @@ class CareerController < ApplicationController
       horizon_course_redesign
       horizon_course_index_page
       horizon_chart_view
+      horizon_native_permissions_page
+      horizon_course_academic_switcher
+      horizon_syncable_objects_redesign
     ].index_with { |feature| @domain_root_account.feature_enabled?(feature) }
   end
 end

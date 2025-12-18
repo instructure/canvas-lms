@@ -205,7 +205,11 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
       enabled,
       locked,
       explicit,
-    }: {enabled?: boolean; locked?: boolean; explicit: boolean}): void {
+    }: {
+      enabled?: boolean
+      locked?: boolean
+      explicit: boolean
+    }): void {
       handleClick({name: permissionName, id: roleId, inTray, enabled, locked, explicit})
     }
 

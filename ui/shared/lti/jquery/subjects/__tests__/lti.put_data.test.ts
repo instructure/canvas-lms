@@ -19,10 +19,11 @@
 import * as platformStorage from '../../platform_storage'
 import type {ResponseMessages} from '../../response_messages'
 import handler from '../lti.put_data'
+import {type Mocked} from 'vitest'
 
-jest.mock('../../platform_storage')
+vi.mock('../../platform_storage')
 
-const mockedPlatformStorage = platformStorage as jest.Mocked<typeof platformStorage>
+const mockedPlatformStorage = platformStorage as Mocked<typeof platformStorage>
 
 describe('lti.put_data handler', () => {
   let message: Parameters<typeof handler>[0]['message']
@@ -31,15 +32,15 @@ describe('lti.put_data handler', () => {
 
   beforeEach(() => {
     responseMessages = {
-      sendBadRequestError: jest.fn(),
-      sendResponse: jest.fn(),
-      sendSuccess: jest.fn(),
-      sendError: jest.fn(),
-      sendGenericError: jest.fn(),
-      sendWrongOriginError: jest.fn(),
-      sendUnsupportedSubjectError: jest.fn(),
-      sendUnauthorizedError: jest.fn(),
-      isResponse: jest.fn(),
+      sendBadRequestError: vi.fn(),
+      sendResponse: vi.fn(),
+      sendSuccess: vi.fn(),
+      sendError: vi.fn(),
+      sendGenericError: vi.fn(),
+      sendWrongOriginError: vi.fn(),
+      sendUnsupportedSubjectError: vi.fn(),
+      sendUnauthorizedError: vi.fn(),
+      isResponse: vi.fn(),
     }
     event = new MessageEvent('message', {
       origin: 'http://example.com',

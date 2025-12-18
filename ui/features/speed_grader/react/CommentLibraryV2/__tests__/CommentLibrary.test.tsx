@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitFor, screen, act} from '@testing-library/react'
+import {cleanup, render, waitFor, screen, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import {CommentLibraryContent} from '../CommentLibrary'
@@ -27,15 +27,23 @@ import {
   SpeedGraderLegacy_CommentBankItems,
 } from '../graphql/queries'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('use-debounce', () => ({
-  useDebounce: jest.fn((value: string) => [value, {isPending: () => false}]),
+const {mockUseDebounce} = vi.hoisted(() => ({
+  mockUseDebounce: vi.fn(),
+}))
+vi.mock('use-debounce', () => ({
+  useDebounce: mockUseDebounce,
 }))
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 describe('CommentLibrary', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const defaultUserId = '1'
   const defaultCourseId = '1'
 
@@ -126,8 +134,8 @@ describe('CommentLibrary', () => {
       comment: '',
       userId: defaultUserId,
       courseId: defaultCourseId,
-      setComment: jest.fn(),
-      setFocusToTextArea: jest.fn(),
+      setComment: vi.fn(),
+      setFocusToTextArea: vi.fn(),
       ...props,
     }
 
@@ -157,15 +165,22 @@ describe('CommentLibrary', () => {
     )
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup({comment_library_suggestions_enabled: true})
-    ;(doFetchApi as jest.Mock).mockResolvedValue({})
+    // Default handler for user settings API
+    server.use(http.put('/api/v1/users/self/settings', () => HttpResponse.json({})))
+    // Set default mock implementation for useDebounce
+    mockUseDebounce.mockImplementation((value: string) => [value, {isPending: () => false}])
   })
 
   afterEach(() => {
+    server.resetHandlers()
     fakeENV.teardown()
-    jest.clearAllMocks()
-    jest.useRealTimers()
+    vi.clearAllMocks()
+    vi.useRealTimers()
   })
 
   describe('Rendering Tests', () => {
@@ -293,15 +308,14 @@ describe('CommentLibrary', () => {
 
   describe('setCommentFromLibrary callback', () => {
     beforeEach(() => {
-      const {useDebounce} = require('use-debounce')
-      useDebounce.mockReturnValue(['', {isPending: () => false}])
+      mockUseDebounce.mockReturnValue(['', {isPending: () => false}])
     })
 
     it('calls setComment and setFocusToTextArea when comment is selected', async () => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
       const user = userEvent.setup({delay: null})
-      const setComment = jest.fn()
-      const setFocusToTextArea = jest.fn()
+      const setComment = vi.fn()
+      const setFocusToTextArea = vi.fn()
       const mocks = [
         createCountMock(defaultUserId, 3),
         createCommentsMock(defaultUserId, defaultCourseId),
@@ -330,19 +344,19 @@ describe('CommentLibrary', () => {
 
       // Fast-forward timers to trigger async focus
       act(() => {
-        jest.runAllTimers()
+        vi.runAllTimers()
       })
 
       // Now setFocus should be called
       expect(setFocusToTextArea).toHaveBeenCalled()
 
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
 
     it('closes tray after comment selection', async () => {
       const user = userEvent.setup()
-      const setComment = jest.fn()
-      const setFocusToTextArea = jest.fn()
+      const setComment = vi.fn()
+      const setFocusToTextArea = vi.fn()
       const mocks = [
         createCountMock(defaultUserId, 3),
         createCommentsMock(defaultUserId, defaultCourseId),
@@ -386,8 +400,7 @@ describe('CommentLibrary', () => {
       })
 
       it('triggers query when comment length is 3 or more characters', async () => {
-        const {useDebounce} = require('use-debounce')
-        useDebounce.mockReturnValue(['great', {isPending: () => false}])
+        mockUseDebounce.mockReturnValue(['great', {isPending: () => false}])
 
         const mocks = [
           createCountMock(defaultUserId, 10),
@@ -402,8 +415,7 @@ describe('CommentLibrary', () => {
       })
 
       it('strips HTML tags from comment before querying', async () => {
-        const {useDebounce} = require('use-debounce')
-        useDebounce.mockReturnValue(['hello', {isPending: () => false}])
+        mockUseDebounce.mockReturnValue(['hello', {isPending: () => false}])
 
         const mocks = [
           createCountMock(defaultUserId, 10),
@@ -435,8 +447,7 @@ describe('CommentLibrary', () => {
     describe('Toggle state management', () => {
       it('disables suggestions when toggle is turned off', async () => {
         const user = userEvent.setup()
-        const {useDebounce} = require('use-debounce')
-        useDebounce.mockReturnValue(['great', {isPending: () => false}])
+        mockUseDebounce.mockReturnValue(['great', {isPending: () => false}])
 
         const mocks = [
           createCountMock(defaultUserId, 10),
@@ -476,8 +487,7 @@ describe('CommentLibrary', () => {
 
       it('shows toggle in checked state when suggestions are enabled', async () => {
         const user = userEvent.setup()
-        const {useDebounce} = require('use-debounce')
-        useDebounce.mockReturnValue(['test', {isPending: () => false}])
+        mockUseDebounce.mockReturnValue(['test', {isPending: () => false}])
 
         const mocks = [
           createCountMock(defaultUserId, 10),
@@ -511,8 +521,7 @@ describe('CommentLibrary', () => {
 
     describe('Suggestions visibility logic', () => {
       it('renders suggestions anchor when suggestion conditions could be met', async () => {
-        const {useDebounce} = require('use-debounce')
-        useDebounce.mockReturnValue(['great', {isPending: () => false}])
+        mockUseDebounce.mockReturnValue(['great', {isPending: () => false}])
 
         const mocks = [
           createCountMock(defaultUserId, 10),
@@ -527,8 +536,7 @@ describe('CommentLibrary', () => {
       })
 
       it('hides suggestions popover when debounce is pending', async () => {
-        const {useDebounce} = require('use-debounce')
-        useDebounce.mockReturnValue(['great', {isPending: () => true}])
+        mockUseDebounce.mockReturnValue(['great', {isPending: () => true}])
 
         const mocks = [createCountMock(defaultUserId, 10)]
 
@@ -543,8 +551,7 @@ describe('CommentLibrary', () => {
       })
 
       it('hides suggestions popover when no results are returned', async () => {
-        const {useDebounce} = require('use-debounce')
-        useDebounce.mockReturnValue(['xyz', {isPending: () => false}])
+        mockUseDebounce.mockReturnValue(['xyz', {isPending: () => false}])
 
         const mocks = [
           createCountMock(defaultUserId, 10),
@@ -564,8 +571,7 @@ describe('CommentLibrary', () => {
 
     describe('State management on comment selection from suggestions', () => {
       it('renders suggestions with correct data for selection', async () => {
-        const {useDebounce} = require('use-debounce')
-        useDebounce.mockReturnValue(['great', {isPending: () => false}])
+        mockUseDebounce.mockReturnValue(['great', {isPending: () => false}])
 
         const mocks = [
           createCountMock(defaultUserId, 10),
@@ -594,8 +600,7 @@ describe('CommentLibrary', () => {
 
     describe('State reset on comment clear', () => {
       it('re-enables search when comment is cleared', async () => {
-        const {useDebounce} = require('use-debounce')
-        useDebounce.mockReturnValue(['', {isPending: () => false}])
+        mockUseDebounce.mockReturnValue(['', {isPending: () => false}])
 
         const mocks = [createCountMock(defaultUserId, 10)]
 
@@ -631,8 +636,8 @@ describe('CommentLibrary', () => {
               comment=""
               userId={defaultUserId}
               courseId={defaultCourseId}
-              setComment={jest.fn()}
-              setFocusToTextArea={jest.fn()}
+              setComment={vi.fn()}
+              setFocusToTextArea={vi.fn()}
             />
           </MockedProvider>,
         )
@@ -646,8 +651,7 @@ describe('CommentLibrary', () => {
 
     describe('Integration with suggestion query', () => {
       it('fetches suggestions with correct variables', async () => {
-        const {useDebounce} = require('use-debounce')
-        useDebounce.mockReturnValue(['test', {isPending: () => false}])
+        mockUseDebounce.mockReturnValue(['test', {isPending: () => false}])
 
         const mocks = [
           createCountMock(defaultUserId, 10),
@@ -670,8 +674,7 @@ describe('CommentLibrary', () => {
       })
 
       it('returns empty array when no results', async () => {
-        const {useDebounce} = require('use-debounce')
-        useDebounce.mockReturnValue(['nothing', {isPending: () => false}])
+        mockUseDebounce.mockReturnValue(['nothing', {isPending: () => false}])
 
         const mocks = [
           createCountMock(defaultUserId, 10),
@@ -689,8 +692,7 @@ describe('CommentLibrary', () => {
       })
 
       it('filters null nodes from query results', async () => {
-        const {useDebounce} = require('use-debounce')
-        useDebounce.mockReturnValue(['test', {isPending: () => false}])
+        mockUseDebounce.mockReturnValue(['test', {isPending: () => false}])
 
         const mocks = [
           createCountMock(defaultUserId, 10),

@@ -18,17 +18,16 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect' // for the additional matchers
 import SwitchEditorControl from '../SwitchEditorControl'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 
 describe('SwitchEditorControl', () => {
   beforeEach(() => {
-    jest.spyOn(RichContentEditor, 'callOnRCE').mockImplementation(() => {})
+    vi.spyOn(RichContentEditor, 'callOnRCE').mockImplementation(() => {})
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('changes text on each click', () => {

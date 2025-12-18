@@ -39,8 +39,8 @@ const defaultProps = {
   weekendsDisabled: false,
   compression: 0,
   setStartDate: () => {},
-  compressDates: jest.fn(),
-  uncompressDates: jest.fn(),
+  compressDates: vi.fn(),
+  uncompressDates: vi.fn(),
   responsiveSize: 'large' as ResponsiveSizes,
   appliedPace: PACE_CONTEXTS_DEFAULT_STATE.selectedContext?.applied_pace!,
 }

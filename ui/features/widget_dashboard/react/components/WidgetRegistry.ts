@@ -26,6 +26,8 @@ import AnnouncementsWidget from './widgets/AnnouncementsWidget/AnnouncementsWidg
 import PeopleWidget from './widgets/PeopleWidget/PeopleWidget'
 import TodoListWidget from './widgets/TodoListWidget/TodoListWidget'
 import RecentGradesWidget from './widgets/RecentGradesWidget/RecentGradesWidget'
+import ProgressOverviewWidget from './widgets/ProgressOverviewWidget/ProgressOverviewWidget'
+import InboxWidget from './widgets/InboxWidget/InboxWidget'
 
 const widgetRegistry: WidgetRegistry = {
   [WIDGET_TYPES.COURSE_WORK_SUMMARY]: {
@@ -67,6 +69,16 @@ const widgetRegistry: WidgetRegistry = {
     component: RecentGradesWidget,
     displayName: 'Recent grades & feedback',
     description: 'View your recently graded assignments and submissions',
+  },
+  [WIDGET_TYPES.PROGRESS_OVERVIEW]: {
+    component: ProgressOverviewWidget,
+    displayName: 'Progress overview',
+    description: 'Track your progress across courses with module and assignment statistics',
+  },
+  [WIDGET_TYPES.INBOX]: {
+    component: InboxWidget,
+    displayName: 'Inbox',
+    description: 'View recent messages from your Canvas conversations',
   },
 }
 

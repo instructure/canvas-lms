@@ -41,7 +41,7 @@ import {TagSelect, AvailableTags} from './components/create_from_templates/TagSe
 
 const I18n = createI18nScope('block-editor')
 
-export default function CreateFromTemplate(props: {course_id: string, noBlocks: boolean }) {
+export default function CreateFromTemplate(props: {course_id: string; noBlocks: boolean}) {
   const {actions} = useEditor()
   const [isOpen, setIsOpen] = useState<boolean>(props.noBlocks)
   const [displayType, setDisplayType] = useState<DisplayType>('grid')

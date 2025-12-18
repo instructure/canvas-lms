@@ -41,7 +41,7 @@ function defaultProps() {
   return {
     id: 'device-under-test',
     isLoading: false,
-    onChange: jest.fn(),
+    onChange: vi.fn(),
     label: LABEL,
   }
 }

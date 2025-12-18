@@ -28,9 +28,9 @@ import {
 } from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  ...jest.requireActual('@canvas/util/globalUtils'),
-  windowPathname: jest.fn(),
+vi.mock('@canvas/util/globalUtils', async () => ({
+  ...await vi.importActual('@canvas/util/globalUtils'),
+  windowPathname: vi.fn(),
 }))
 
 const rootCourseFolder = {
@@ -125,19 +125,19 @@ const renderComponent = (props = {}, context: Partial<FileManagementContextProps
   )
 }
 
-jest.mock('react-router-dom', () => ({
+vi.mock('react-router-dom', () => ({
   Link: (props: any) => <a href={props.to}>{props.children}</a>,
 }))
 
 describe('Breadcrumbs', () => {
   beforeEach(() => {
-    ;(windowPathname as jest.Mock).mockReturnValue('/')
+    vi.mocked(windowPathname).mockReturnValue('/')
     const filesContexts = createFilesContexts()
     resetAndGetFilesEnv(filesContexts)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   describe('with small size', () => {
@@ -155,7 +155,7 @@ describe('Breadcrumbs', () => {
     })
 
     it('renders for all contexts', () => {
-      ;(windowPathname as jest.Mock).mockReturnValue('/files/')
+      vi.mocked(windowPathname).mockReturnValue('/files/')
       const multipleFilesContexts = createFilesContexts({
         isMultipleContexts: true,
       })
@@ -185,7 +185,7 @@ describe('Breadcrumbs', () => {
     })
 
     it('renders for all contexts', () => {
-      ;(windowPathname as jest.Mock).mockReturnValue('/files/courses_2/')
+      vi.mocked(windowPathname).mockReturnValue('/files/courses_2/')
       const multipleFilesContexts = createFilesContexts({
         isMultipleContexts: true,
       })

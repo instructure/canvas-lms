@@ -46,7 +46,7 @@ const mockContentItems: ContentItem[] = [
 ]
 
 const buildProps = (overrides = {}) => ({
-  onChange: jest.fn(),
+  onChange: vi.fn(),
   itemType: 'external_url' as const,
   contentItems: mockContentItems,
   formErrors: {},

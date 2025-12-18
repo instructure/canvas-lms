@@ -55,9 +55,9 @@ describe('GenerateLink', () => {
   })
 
   it('shows generating state when clicked', async () => {
-    jest.useFakeTimers()
-    const createSpy = jest.spyOn(CourseEpubExportStore, 'create')
-    const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime})
+    vi.useFakeTimers()
+    const createSpy = vi.spyOn(CourseEpubExportStore, 'create')
+    const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime})
 
     const {getByRole, getByText} = render(<GenerateLink {...props} />)
     const button = getByRole('button', {name: I18n.t('Generate ePub')})
@@ -65,10 +65,10 @@ describe('GenerateLink', () => {
 
     expect(getByText(I18n.t('Generating...'))).toBeInTheDocument()
 
-    jest.advanceTimersByTime(1005)
+    vi.advanceTimersByTime(1005)
     expect(getByRole('button', {name: I18n.t('Generate ePub')})).toBeInTheDocument()
 
-    jest.useRealTimers()
+    vi.useRealTimers()
     createSpy.mockRestore()
   })
 

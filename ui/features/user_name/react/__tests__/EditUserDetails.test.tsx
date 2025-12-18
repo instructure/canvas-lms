@@ -36,8 +36,8 @@ describe('EditUserDetails', () => {
   const props: EditUserDetailsProps = {
     userId: '1',
     canManageUserDetails: true,
-    onClose: jest.fn(),
-    onSubmit: jest.fn(),
+    onClose: vi.fn(),
+    onSubmit: vi.fn(),
     timezones,
     userDetails: {
       email: 'test@test.com',

@@ -31,15 +31,15 @@ describe('AlignmentOutcomeItemList', () => {
   })
 
   beforeEach(() => {
-    loadMore = jest.fn()
+    loadMore = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const mockContainer = (container, prop, value) => {
-    jest.spyOn(container, prop, 'get').mockImplementation(() => value)
+    vi.spyOn(container, prop, 'get').mockImplementation(() => value)
   }
 
   it('renders loader when loading prop is true', () => {

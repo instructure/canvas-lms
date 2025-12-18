@@ -31,11 +31,11 @@ describe('TrayTextArea', () => {
   }
 
   beforeEach(() => {
-    onAddMock = jest.fn()
+    onAddMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the text area with a placeholder', () => {

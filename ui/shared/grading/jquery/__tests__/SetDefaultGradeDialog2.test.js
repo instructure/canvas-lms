@@ -23,8 +23,8 @@ import {setupServer} from 'msw/node'
 import SetDefaultGradeDialog from '../SetDefaultGradeDialog'
 import {windowAlert} from '@canvas/util/globalUtils'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  windowAlert: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  windowAlert: vi.fn(),
 }))
 
 const server = setupServer()
@@ -63,7 +63,7 @@ describe('Shared > SetDefaultGradeDialog', () => {
       }
     }
     server.resetHandlers()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   function getDialog() {
@@ -90,7 +90,7 @@ describe('Shared > SetDefaultGradeDialog', () => {
     }
 
     beforeEach(() => {
-      jest.spyOn($, 'publish').mockImplementation(jest.fn())
+      vi.spyOn($, 'publish').mockImplementation(vi.fn())
     })
 
     // fickle; cf. EVAL-4977

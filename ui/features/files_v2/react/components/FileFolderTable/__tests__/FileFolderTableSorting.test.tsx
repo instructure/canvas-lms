@@ -21,7 +21,7 @@ import {renderComponent} from './testUtils'
 
 describe('FileFolderTable', () => {
   let flashElements: any
-  const onSortChange = jest.fn()
+  const onSortChange = vi.fn()
   beforeEach(() => {
     flashElements = document.createElement('div')
     flashElements.setAttribute('id', 'flash_screenreader_holder')

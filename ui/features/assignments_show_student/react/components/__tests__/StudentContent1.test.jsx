@@ -26,15 +26,15 @@ import {
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
-import StudentViewContext from '../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import StudentContent from '../StudentContent'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 injectGlobalAlertContainers()
-jest.mock('../AttemptSelect')
-jest.mock('../../apis/ContextModuleApi')
-jest.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
+vi.mock('../AttemptSelect')
+vi.mock('../../apis/ContextModuleApi')
+vi.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
   return {
-    initializeReaderButton: jest.fn(),
+    initializeReaderButton: vi.fn(),
   }
 })
 function gradedOverrides() {

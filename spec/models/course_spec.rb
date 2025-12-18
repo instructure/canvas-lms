@@ -9298,7 +9298,8 @@ describe Course do
     describe "#exceeds_accessibility_scan_limit?" do
       before do
         allow(course.wiki_pages).to receive(:not_deleted).and_return(double(count: wiki_count))
-        allow(course.assignments).to receive(:active).and_return(double(count: assignment_count))
+        active_assignments = double(not_excluded_from_accessibility_scan: double(count: assignment_count))
+        allow(course.assignments).to receive(:active).and_return(active_assignments)
       end
 
       context "when total resources exceed limit" do

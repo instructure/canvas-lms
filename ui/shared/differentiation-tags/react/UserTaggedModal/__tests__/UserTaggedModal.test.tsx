@@ -25,23 +25,25 @@ import {useUserTags} from '../../hooks/useUserTags'
 import {useDeleteTagMembership} from '../../hooks/useDeleteTagMembership'
 import MessageBus from '@canvas/util/MessageBus'
 
-jest.mock('../../hooks/useUserTags')
-jest.mock('../../hooks/useDeleteTagMembership')
-jest.mock('@canvas/util/MessageBus', () => ({
-  trigger: jest.fn(),
+vi.mock('../../hooks/useUserTags')
+vi.mock('../../hooks/useDeleteTagMembership')
+vi.mock('@canvas/util/MessageBus', () => ({
+  default: {
+    trigger: vi.fn(),
+  },
 }))
 
-const mockuseUserTags = useUserTags as jest.Mock
-const mockuseDeleteTagMembership = useDeleteTagMembership as jest.Mock
+const mockuseUserTags = useUserTags as any
+const mockuseDeleteTagMembership = useDeleteTagMembership as any
 describe('UserTaggedModal', () => {
   const defaultProps: UserTaggedModalProps = {
     isOpen: true,
     courseId: 1,
     userId: 2,
     userName: 'user',
-    onClose: jest.fn(),
+    onClose: vi.fn(),
   }
-  const mutateMock = jest.fn()
+  const mutateMock = vi.fn()
   const renderComponent = (mockReturn = {}, props = {}, mutationMockReturn = {}) => {
     const defaultMock = {
       data: [{id: 1, name: 'test group', groupCategoryName: 'test category', isSingleTag: false}],
@@ -68,7 +70,7 @@ describe('UserTaggedModal', () => {
     }))
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('Shows the modal if isOpen is true', () => {

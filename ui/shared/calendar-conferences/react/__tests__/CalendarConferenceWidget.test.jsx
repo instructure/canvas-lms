@@ -24,7 +24,7 @@ import CalendarConferenceWidget from '../CalendarConferenceWidget'
 // we use RichContentEditor.preloadRemoteModule() to consolidate the import of
 // tinymce in the code, but since dynamic loading takes time during tests, we do
 // a static import here and mock out the dynamic
-jest.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/rce/RichContentEditor')
 
 describe('CalendarConferenceWidget', () => {
   const conferenceTypes = [

@@ -40,8 +40,8 @@ export const generateFrequencyOptions = (
   timezone: string,
   rrule: string | null,
 ): FrequencyOption[] => {
-  const day = I18n.lookup('date.day_names').at(eventStart.day())
-  const month = I18n.lookup('date.month_names').at(eventStart.month() + 1)
+  const day = (I18n.lookup('date.day_names') as string[] | null)?.at(eventStart.day())
+  const month = (I18n.lookup('date.month_names') as string[] | null)?.at(eventStart.month() + 1)
   const date = eventStart.date()
   const weekdayIndex = weekdayInMonth(eventStart)
   const weekNumber = [

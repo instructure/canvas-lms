@@ -45,7 +45,7 @@ export const App = () => {
       .then((response: MigrationsResponse) => {
         setMigrations(prevMigrations => [...prevMigrations, ...response.json])
         lastFetchCountRef.current = response.json.length
-        pageRef.current = pageRef.current + 1;
+        pageRef.current = pageRef.current + 1
       })
       .catch(showFlashError(I18n.t("Couldn't load previous content migrations")))
       .finally(() => setIsLoading(false))
@@ -80,7 +80,7 @@ export const App = () => {
         }
       }
     },
-    [setMigrations]
+    [setMigrations],
   )
 
   return (

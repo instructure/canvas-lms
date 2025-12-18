@@ -69,7 +69,7 @@ describe('DevelopersKeyApp', () => {
 
   function fakeStore() {
     return {
-      dispatch: jest.fn(action => action),
+      dispatch: vi.fn(action => action),
     }
   }
 
@@ -77,24 +77,24 @@ describe('DevelopersKeyApp', () => {
     const props = {
       applicationState: initialApplicationState(),
       actions: {
-        developerKeysModalOpen: jest.fn(),
-        createOrEditDeveloperKey: jest.fn(),
-        developerKeysModalClose: jest.fn(),
-        getRemainingDeveloperKeys: jest.fn(),
-        getRemainingInheritedDeveloperKeys: jest.fn(),
-        editDeveloperKey: jest.fn(),
-        listDeveloperKeyScopesSet: jest.fn(),
-        saveLtiToolConfiguration: jest.fn(),
-        ltiKeysSetLtiKey: jest.fn(),
-        resetLtiState: jest.fn(),
-        updateLtiKey: jest.fn(),
-        listDeveloperKeysReplace: jest.fn(),
-        makeVisibleDeveloperKey: jest.fn(),
-        setBindingWorkflowState: jest.fn(),
-        makeInvisibleDeveloperKey: jest.fn(),
-        activateDeveloperKey: jest.fn(),
-        deactivateDeveloperKey: jest.fn(),
-        deleteDeveloperKey: jest.fn(),
+        developerKeysModalOpen: vi.fn(),
+        createOrEditDeveloperKey: vi.fn(),
+        developerKeysModalClose: vi.fn(),
+        getRemainingDeveloperKeys: vi.fn(),
+        getRemainingInheritedDeveloperKeys: vi.fn(),
+        editDeveloperKey: vi.fn(),
+        listDeveloperKeyScopesSet: vi.fn(),
+        saveLtiToolConfiguration: vi.fn(),
+        ltiKeysSetLtiKey: vi.fn(),
+        resetLtiState: vi.fn(),
+        updateLtiKey: vi.fn(),
+        listDeveloperKeysReplace: vi.fn(),
+        makeVisibleDeveloperKey: vi.fn(),
+        setBindingWorkflowState: vi.fn(),
+        makeInvisibleDeveloperKey: vi.fn(),
+        activateDeveloperKey: vi.fn(),
+        deactivateDeveloperKey: vi.fn(),
+        deleteDeveloperKey: vi.fn(),
       },
       store: fakeStore(),
       ctx: {

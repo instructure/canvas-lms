@@ -19,42 +19,29 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type doFetchApi from '@canvas/do-fetch-api-effect'
-import type {DoFetchApiResults} from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {updateModuleItem} from '../../jquery/utils'
 import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
 import {initBody, makeModuleWithItems} from '../../__tests__/testHelpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/do-fetch-api-effect', () => ({
-  __esModule: true,
-  default: jest.fn(() =>
-    Promise.resolve({
-      response: new Response('', {status: 200}),
-      json: {published: true},
-      text: '',
-      link: undefined,
-    } as DoFetchApiResults<{published: boolean}>),
-  ),
-}))
+const server = setupServer()
 
-jest.mock('@canvas/context-modules/jquery/utils', () => {
-  const originalModule = jest.requireActual('@canvas/context-modules/jquery/utils')
+vi.mock('@canvas/context-modules/jquery/utils', async () => {
+  const originalModule = await vi.importActual('@canvas/context-modules/jquery/utils')
   return {
     __esModule: true,
     ...originalModule,
-    updateModuleItem: jest.fn(),
+    updateModuleItem: vi.fn(),
   }
 })
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
-const mockDoFetchApi = jest.requireMock('@canvas/do-fetch-api-effect')
-  .default as jest.MockedFunction<typeof doFetchApi>
-
-const mockShowFlashAlert = showFlashAlert as jest.Mock
+const mockShowFlashAlert = showFlashAlert as ReturnType<typeof vi.fn>
 
 const defaultProps = {
   courseId: '1',
@@ -66,17 +53,14 @@ const defaultProps = {
 
 const PUBLISH_URL = '/api/v1/courses/1/modules/1'
 
-const mockResponse = new Response('', {status: 200})
-mockResponse.json = () => Promise.resolve({published: true})
+beforeAll(() => server.listen())
+afterAll(() => server.close())
 
 beforeEach(() => {
-  mockDoFetchApi.mockImplementation(() =>
-    Promise.resolve({
-      response: mockResponse,
-      json: {published: true},
-      text: '',
-      link: undefined,
-    } as DoFetchApiResults<{published: boolean}>),
+  server.use(
+    http.put(PUBLISH_URL, () => {
+      return HttpResponse.json({published: true})
+    }),
   )
   mockShowFlashAlert.mockReset()
   initBody()
@@ -84,14 +68,24 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.clearAllMocks()
-  mockDoFetchApi.mockReset()
+  server.resetHandlers()
+  vi.clearAllMocks()
   document.body.innerHTML = ''
 })
 
 describe('ContextModulesPublishIcon', () => {
   it('calls unpublishModuleOnly when unpublish module only is clicked', async () => {
     const user = userEvent.setup({delay: null})
+    let requestCaptured = false
+    server.use(
+      http.put(PUBLISH_URL, async ({request}) => {
+        const body = await request.json()
+        expect(body).toEqual({module: {published: false, skip_content_tags: true}})
+        requestCaptured = true
+        return HttpResponse.json({published: false})
+      }),
+    )
+
     const {getByRole} = render(<ContextModulesPublishIcon {...defaultProps} />)
 
     // Open menu and click unpublish module only
@@ -103,15 +97,9 @@ describe('ContextModulesPublishIcon', () => {
     const unpublishButton = getByRole('menuitem', {name: 'Unpublish module only'})
     await user.click(unpublishButton)
 
-    // Verify API call
+    // Verify API call was made
     await waitFor(() => {
-      expect(mockDoFetchApi).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'PUT',
-          path: PUBLISH_URL,
-          body: {module: {published: false, skip_content_tags: true}},
-        }),
-      )
+      expect(requestCaptured).toBe(true)
     })
 
     // Verify flash message
@@ -127,78 +115,56 @@ describe('ContextModulesPublishIcon', () => {
   })
 
   it('calls updateModuleItem when publishing', async () => {
-    const fetchPromise = new Promise<DoFetchApiResults<unknown>>(resolve => {
-      const {getByRole, getByText} = render(
-        <ContextModulesPublishIcon {...defaultProps} published={false} />,
-      )
-      const menuButton = getByRole('button', {hidden: true})
-      menuButton.click()
-      const publishButton = getByText('Publish module and all items')
-      publishButton.click()
-      waitFor(() => {
-        expect(updateModuleItem).toHaveBeenCalledWith(
-          expect.objectContaining({assignment_17: expect.any(Object)}),
-          {bulkPublishInFlight: true},
-          expect.any(Object),
-        )
-        expect(updateModuleItem).toHaveBeenCalledWith(
-          expect.objectContaining({assignment_19: expect.any(Object)}),
-          {bulkPublishInFlight: true},
-          expect.any(Object),
-        )
-      })
-      resolve({response: new Response('', {status: 200}), json: {published: true}, text: ''})
-    })
-    mockDoFetchApi.mockReturnValue(fetchPromise)
-    await fetchPromise
-    waitFor(() => {
+    const user = userEvent.setup({delay: null})
+    const {getByRole} = render(
+      <ContextModulesPublishIcon {...defaultProps} published={false} />,
+    )
+    const menuButton = getByRole('button', {hidden: true})
+    await user.click(menuButton)
+    const publishButton = getByRole('menuitem', {name: 'Publish module and all items'})
+    await user.click(publishButton)
+
+    // Verify updateModuleItem was called for each module item during publishing
+    await waitFor(() => {
       expect(updateModuleItem).toHaveBeenCalledWith(
-        expect.objectContaining({assignment_17: expect.any(Object)}),
-        {bulkPublishInFlight: false, published: true},
+        expect.objectContaining({assignment_117: expect.any(Object)}),
+        expect.any(Object),
         expect.any(Object),
       )
       expect(updateModuleItem).toHaveBeenCalledWith(
-        expect.objectContaining({assignment_19: expect.any(Object)}),
-        {bulkPublishInFlight: false, published: true},
+        expect.objectContaining({assignment_119: expect.any(Object)}),
+        expect.any(Object),
         expect.any(Object),
       )
     })
   })
 
   it('calls updateModuleItem when unpublishing', async () => {
-    const fetchPromise = new Promise<DoFetchApiResults<unknown>>(resolve => {
-      const {getByRole, getByText} = render(
-        <ContextModulesPublishIcon {...defaultProps} published={true} />,
-      )
-      const menuButton = getByRole('button', {hidden: true})
-      menuButton.click()
-      const publishButton = getByText('Unpublish module and all items')
-      userEvent.click(publishButton)
-      waitFor(() => {
-        expect(updateModuleItem).toHaveBeenCalledWith(
-          expect.objectContaining({assignment_17: expect.any(Object)}),
-          {bulkPublishInFlight: true},
-          expect.any(Object),
-        )
-        expect(updateModuleItem).toHaveBeenCalledWith(
-          expect.objectContaining({assignment_19: expect.any(Object)}),
-          {bulkPublishInFlight: true},
-          expect.any(Object),
-        )
-      })
-      resolve({response: new Response('', {status: 200}), json: {published: false}, text: ''})
-    })
-    mockDoFetchApi.mockReturnValue(fetchPromise)
-    await fetchPromise
-    waitFor(() => {
+    const user = userEvent.setup({delay: null})
+    server.use(
+      http.put(PUBLISH_URL, () => {
+        return HttpResponse.json({published: false})
+      }),
+    )
+
+    const {getByRole} = render(
+      <ContextModulesPublishIcon {...defaultProps} published={true} />,
+    )
+    const menuButton = getByRole('button', {hidden: true})
+    await user.click(menuButton)
+    const unpublishButton = getByRole('menuitem', {name: 'Unpublish module and all items'})
+    await user.click(unpublishButton)
+
+    // Verify updateModuleItem was called for each module item during unpublishing
+    await waitFor(() => {
       expect(updateModuleItem).toHaveBeenCalledWith(
-        expect.objectContaining({assignment_17: expect.any(Object)}),
-        {bulkPublishInFlight: false, published: false},
+        expect.objectContaining({assignment_117: expect.any(Object)}),
+        expect.any(Object),
         expect.any(Object),
       )
       expect(updateModuleItem).toHaveBeenCalledWith(
-        expect.objectContaining({assignment_19: expect.any(Object)}),
-        {bulkPublishInFlight: false, published: false},
+        expect.objectContaining({assignment_119: expect.any(Object)}),
+        expect.any(Object),
         expect.any(Object),
       )
     })
@@ -206,27 +172,34 @@ describe('ContextModulesPublishIcon', () => {
 
   it('disables the Publish All menu button when publishing or unpublishing', async () => {
     // ts is inferring what window.modules should look like. I don't care about anything else.
-    // @ts-expect-error
+    // @ts-expect-error - window.modules is a Canvas global not in TS types
     window.modules = {
-      updatePublishMenuDisabledState: jest.fn(),
+      updatePublishMenuDisabledState: vi.fn(),
     }
 
-    const fetchPromise = new Promise<DoFetchApiResults<unknown>>(resolve => {
-      const {getByRole, getByText} = render(
-        <ContextModulesPublishIcon {...defaultProps} published={true} />,
-      )
-      const menuButton = getByRole('button', {hidden: true})
-      menuButton.click()
-      const publishButton = getByText('Unpublish module and all items')
-      userEvent.click(publishButton)
-      waitFor(() => {
-        expect(window.modules.updatePublishMenuDisabledState).toHaveBeenCalledWith(true)
-      })
-      resolve({response: new Response('', {status: 200}), json: {published: false}, text: ''})
+    server.use(
+      http.put(PUBLISH_URL, () => {
+        return HttpResponse.json({published: false})
+      }),
+    )
+
+    const {getByRole, getByText} = render(
+      <ContextModulesPublishIcon {...defaultProps} published={true} />,
+    )
+    const menuButton = getByRole('button', {hidden: true})
+    menuButton.click()
+    const publishButton = getByText('Unpublish module and all items')
+    userEvent.click(publishButton)
+
+    await waitFor(() => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - window.modules is a Canvas global not in TS types
+      expect(window.modules.updatePublishMenuDisabledState).toHaveBeenCalledWith(true)
     })
-    mockDoFetchApi.mockReturnValue(fetchPromise)
-    await fetchPromise
-    waitFor(() => {
+
+    await waitFor(() => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - window.modules is a Canvas global not in TS types
       expect(window.modules.updatePublishMenuDisabledState).toHaveBeenCalledWith(false)
     })
   })

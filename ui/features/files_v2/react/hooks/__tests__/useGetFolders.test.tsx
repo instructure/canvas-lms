@@ -26,9 +26,9 @@ import {FileContext} from '@canvas/files_v2/react/modules/filesEnvFactory.types'
 import {useParams} from 'react-router-dom'
 
 // Mock the useParams hook
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useParams: jest.fn().mockReturnValue({
+vi.mock('react-router-dom', async () => ({
+  ...await vi.importActual('react-router-dom'),
+  useParams: vi.fn().mockReturnValue({
     context: '',
     '*': '',
   }),
@@ -66,7 +66,7 @@ describe('useGetFolders', () => {
   beforeEach(() => {
     fetchMock.get(/.*\/folders\/by_path/, mockFolders)
     resetAndGetFilesEnv(USER_FILES_CONTEXT)
-    ;(useParams as jest.Mock).mockReturnValue({
+    ;(useParams as any).mockReturnValue({
       context: 'users_1',
       '*': '',
     })
@@ -109,7 +109,7 @@ describe('useGetFolders', () => {
   describe('in a subfolder', () => {
     beforeEach(() => {
       fetchMock.get(/.*\/folders\/by_path/, mockSubfolders, {overwriteRoutes: true})
-      ;(useParams as jest.Mock).mockReturnValue({
+      ;(useParams as any).mockReturnValue({
         context: 'users_1',
         '*': 'profile pictures',
       })

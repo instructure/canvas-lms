@@ -35,20 +35,20 @@ import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExterna
 
 injectGlobalAlertContainers()
 
-jest.mock('../AttemptSelect')
+vi.mock('../AttemptSelect')
 
-jest.mock('../../apis/ContextModuleApi')
+vi.mock('../../apis/ContextModuleApi')
 
-jest.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
+vi.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
   return {
-    initializeReaderButton: jest.fn(),
+    initializeReaderButton: vi.fn(),
   }
 })
 
-jest.mock('@canvas/assignments/react/AssignmentExternalTools', () => ({
+vi.mock('@canvas/assignments/react/AssignmentExternalTools', () => ({
   __esModule: true,
   default: {
-    attach: jest.fn(),
+    attach: vi.fn(),
   },
 }))
 
@@ -241,6 +241,7 @@ describe('Assignment Student Content View', () => {
       expect(queryByRole('button', {name: 'Mark as done'})).not.toBeInTheDocument()
     })
 
+    // Skipped: GraphQL mock timing issue in Vitest - rubric query doesn't resolve before assertion
     it.skip('renders the rubric if the assignment has one', async () => {
       window.ENV.ASSIGNMENT_ID = '1'
       window.ENV.COURSE_ID = '1'

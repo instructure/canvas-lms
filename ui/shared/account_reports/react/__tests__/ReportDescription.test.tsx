@@ -22,7 +22,7 @@ import ReportDescription from '../ReportDescription'
 const props = {
   descHTML: '<h1>Report Description</h1>',
   title: 'Report Title',
-  closeModal: jest.fn(),
+  closeModal: vi.fn(),
 }
 
 describe('ReportDescription', () => {

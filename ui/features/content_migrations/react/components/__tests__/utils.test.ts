@@ -126,7 +126,7 @@ describe('humanReadableSize', () => {
 
 describe('responseToItem', () => {
   const mockI18n = {
-    t: jest.fn((key, params) => {
+    t: vi.fn((key, params) => {
       if (params) {
         return key.replace(/%\{(\w+)\}/g, (_: any, k: any) => params[k])
       }

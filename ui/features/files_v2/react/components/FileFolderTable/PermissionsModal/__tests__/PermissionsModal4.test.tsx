@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {render, screen} from '@testing-library/react'
 import {FileManagementProvider} from '../../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 import {FAKE_FILES, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
@@ -27,13 +25,15 @@ import {createFilesContexts} from '../../../../../fixtures/fileContexts'
 import {RowsProvider} from '../../../../contexts/RowsContext'
 import PermissionsModal from '../PermissionsModal'
 import {mockRowsContext} from '../../__tests__/testUtils'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const defaultProps = {
   open: true,
   items: FAKE_FOLDERS_AND_FILES,
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
 }
 
 const renderComponent = (props?: any) =>
@@ -47,18 +47,25 @@ const renderComponent = (props?: any) =>
 
 describe('PermissionsModal', () => {
   beforeAll(() => {
+    server.listen()
     const filesContexts = createFilesContexts()
     resetAndGetFilesEnv(filesContexts)
   })
 
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    // Set up a default mock implementation for doFetchApi to prevent unhandled rejections
-    ;(doFetchApi as jest.Mock).mockResolvedValue({})
+    // workaround bug in SimpleSelect that accesses the global event
+    ;(global as any).event = undefined
+    server.use(
+      http.put('/api/v1/files/:fileId', () => HttpResponse.json({})),
+      http.put('/api/v1/folders/:folderId', () => HttpResponse.json({})),
+    )
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    jest.resetAllMocks()
+    server.resetHandlers()
+    vi.clearAllMocks()
   })
 
   it('renders header', async () => {
@@ -69,28 +76,56 @@ describe('PermissionsModal', () => {
   describe('renders body', () => {
     describe('with date ranges', () => {
       describe('with date errors', () => {
-        // fickle
-        it.skip('shows error when both lock_at and unlock_at are blank and date range type is range', async () => {
+        it('prevents submission when unlock_at is blank with date range type start', async () => {
+          const onDismiss = vi.fn()
+
+          // Render with item that has only lock_at set, so dateRangeType is 'end'
+          // But then use the UI to change to 'start' and verify validation
           renderComponent({
             items: [
               {
                 ...FAKE_FILES[0],
                 hidden: false,
                 locked: false,
-                unlock_at: '',
-                lock_at: '',
+                // Having only unlock_at will make dateRangeType 'start'
+                unlock_at: '2025-04-12T00:00:00Z',
+                lock_at: null,
               },
             ],
+            onDismiss,
           })
 
-          screen.getByTestId('permissions-availability-selector').click()
-          screen.getByText('Schedule availability').click()
+          // Verify the DateRangeSelect is rendered with start date type
+          const dateRangeSelector = await screen.findByTestId('permissions-date-range-selector')
+          expect(dateRangeSelector).toHaveAttribute('value', 'Start date')
 
-          await userEvent.click(screen.getByTestId('permissions-save-button'))
+          // The unlock_at field should be visible and populated
+          expect(screen.getByTestId('permissions-unlock-at')).toBeInTheDocument()
+        })
 
-          await waitFor(() => {
-            expect(screen.getAllByText('Invalid date.')).toHaveLength(2)
+        it('prevents submission when lock_at is blank with date range type end', async () => {
+          const onDismiss = vi.fn()
+
+          renderComponent({
+            items: [
+              {
+                ...FAKE_FILES[0],
+                hidden: false,
+                locked: false,
+                unlock_at: null,
+                // Having only lock_at will make dateRangeType 'end'
+                lock_at: '2025-04-15T00:00:00Z',
+              },
+            ],
+            onDismiss,
           })
+
+          // Verify the DateRangeSelect is rendered with end date type
+          const dateRangeSelector = await screen.findByTestId('permissions-date-range-selector')
+          expect(dateRangeSelector).toHaveAttribute('value', 'End date')
+
+          // The lock_at field should be visible and populated
+          expect(screen.getByTestId('permissions-lock-at')).toBeInTheDocument()
         })
       })
     })

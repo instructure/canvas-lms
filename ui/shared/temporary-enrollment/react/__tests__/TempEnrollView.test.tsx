@@ -41,9 +41,11 @@ const renderView = async (props: any) => {
 }
 
 describe('TempEnrollView component', () => {
-  window.confirm = jest.fn(() => true)
+  window.confirm = vi.fn(() => true)
 
-  jest.mock('@canvas/do-fetch-api-effect')
+  beforeEach(() => {
+    vi.useFakeTimers({shouldAdvanceTime: true})
+  })
 
   const defaultProvider = {
     name: 'Provider User',
@@ -68,10 +70,10 @@ describe('TempEnrollView component', () => {
 
   const props = {
     user: defaultProvider,
-    onEdit: jest.fn(),
-    onDelete: jest.fn(),
-    onAddNew: jest.fn(),
-    disableModal: jest.fn(),
+    onEdit: vi.fn(),
+    onDelete: vi.fn(),
+    onAddNew: vi.fn(),
+    disableModal: vi.fn(),
     enrollmentType: PROVIDER,
     modifyPermissions: {
       canAdd: true,
@@ -84,7 +86,10 @@ describe('TempEnrollView component', () => {
   const FETCH_RECIPIENT_ENROLLMENTS = `/api/v1/users/${defaultProvider.id}/enrollments?state%5B%5D=current_future_and_restricted&per_page=${ITEMS_PER_PAGE}&page=first&include%5B%5D=avatar_url&include%5B%5D=temporary_enrollment_providers&temporary_enrollments_for_recipient=true`
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    // Flush pending timers from InstUI transitions before teardown
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
+    vi.restoreAllMocks()
     fetchMock.restore()
     // reset cache between tests
     queryClient.removeQueries()
@@ -328,7 +333,7 @@ describe('TempEnrollView component', () => {
           `/api/v1/courses/${defaultEnrollment.course_id}/enrollments/${defaultEnrollment.id}?task=delete`,
           {},
         )
-        window.confirm = jest.fn(() => true)
+        window.confirm = vi.fn(() => true)
       })
 
       it('opens a confirmation dialog when delete button is clicked', async () => {
@@ -338,7 +343,7 @@ describe('TempEnrollView component', () => {
       })
 
       it('does not perform deletion if user cancels confirmation', async () => {
-        window.confirm = jest.fn(() => false)
+        window.confirm = vi.fn(() => false)
         await renderView(props)
         await waitFor(() => fireEvent.click(screen.getByTestId('delete-button')))
         expect(await screen.findByText('Recipient User')).toBeInTheDocument()

@@ -163,7 +163,7 @@ describe('ProficiencyCalculation', () => {
     })
 
     it('calls save when the button is clicked', () => {
-      const update = jest.fn()
+      const update = vi.fn()
       const {getByText, getByLabelText} = render(
         <ProficiencyCalculation {...makeProps({update})} />,
       )
@@ -179,7 +179,7 @@ describe('ProficiencyCalculation', () => {
     })
 
     it('calls onNotifyPendingChanges when changes data', async () => {
-      const onNotifyPendingChangesSpy = jest.fn()
+      const onNotifyPendingChangesSpy = vi.fn()
       const {getByText, getByLabelText} = render(
         <ProficiencyCalculation
           {...makeProps({onNotifyPendingChanges: onNotifyPendingChangesSpy})}
@@ -210,7 +210,7 @@ describe('ProficiencyCalculation', () => {
 
     describe('highest', () => {
       it('calls update with the correct arguments', () => {
-        const update = jest.fn()
+        const update = vi.fn()
         const {getByDisplayValue, getByText} = render(
           <ProficiencyCalculation {...makeProps({update})} />,
         )
@@ -226,7 +226,7 @@ describe('ProficiencyCalculation', () => {
 
     describe('latest', () => {
       it('calls update with the correct arguments', () => {
-        const update = jest.fn()
+        const update = vi.fn()
         const {getByDisplayValue, getByText} = render(
           <ProficiencyCalculation {...makeProps({update})} />,
         )
@@ -243,7 +243,7 @@ describe('ProficiencyCalculation', () => {
     describe('average', () => {
       it('calls update with the correct arguments', () => {
         window.ENV.OUTCOME_AVERAGE_CALCULATION = true
-        const update = jest.fn()
+        const update = vi.fn()
         const {getByDisplayValue, getByText} = render(
           <ProficiencyCalculation {...makeProps({update})} />,
           {
@@ -283,7 +283,7 @@ describe('ProficiencyCalculation', () => {
       })
 
       it('renders the confirmation modal only when int is valid', async () => {
-        const update = jest.fn()
+        const update = vi.fn()
         const {getByText, queryByText, getByLabelText} = render(
           <ProficiencyCalculation {...makeProps({update})} />,
         )
@@ -336,7 +336,7 @@ describe('ProficiencyCalculation', () => {
       })
 
       it('renders the confirmation modal only when int is valid', async () => {
-        const update = jest.fn()
+        const update = vi.fn()
         const {getByText, queryByText, getByLabelText} = render(
           <ProficiencyCalculation
             {...makeProps({update, method: {calculationMethod: 'n_mastery', calculationInt: 5}})}
@@ -451,8 +451,8 @@ describe('ProficiencyCalculation', () => {
     })
 
     it('clears int if changing from method with int to one without', () => {
-      const update = jest.fn()
-      const setError = jest.fn()
+      const update = vi.fn()
+      const setError = vi.fn()
       const {getByText, getByDisplayValue} = render(
         <ProficiencyCalculation {...makeProps({individualOutcome: 'edit', update, setError})} />,
       )
@@ -509,7 +509,7 @@ describe('ProficiencyCalculation', () => {
 
       it('renders example with a warning when average calculation method selected', () => {
         window.ENV.OUTCOME_AVERAGE_CALCULATION = true
-        const update = jest.fn()
+        const update = vi.fn()
         const {getByDisplayValue, getByText} = render(
           <ProficiencyCalculation {...makeProps({update})} />,
           {
@@ -539,8 +539,8 @@ describe('ProficiencyCalculation', () => {
     })
 
     it('calls update with calculation method and int if method or int changes', () => {
-      const update = jest.fn()
-      const setError = jest.fn()
+      const update = vi.fn()
+      const setError = vi.fn()
       const {getByText, getByDisplayValue, queryByTestId} = render(
         <ProficiencyCalculation {...makeProps({individualOutcome: 'edit', update, setError})} />,
       )
@@ -553,8 +553,8 @@ describe('ProficiencyCalculation', () => {
     })
 
     it('calls setError with true if calculation parameter changes to invalid value', () => {
-      const update = jest.fn()
-      const setError = jest.fn()
+      const update = vi.fn()
+      const setError = vi.fn()
       const {queryByTestId} = render(
         <ProficiencyCalculation {...makeProps({individualOutcome: 'edit', update, setError})} />,
       )

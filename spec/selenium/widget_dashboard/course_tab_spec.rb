@@ -83,5 +83,19 @@ describe "student dashboard people widget", :ignore_js_errors do
       course_card_action(@course2.name, "Discussions").click
       expect(driver.current_url).to include("/courses/#{@course2.id}/discussion_topics")
     end
+
+    it "can reorder course tiles via drag and drop" do
+      go_to_course_tab
+
+      course_cards_list = all_course_cards.map { |card| card.attribute("aria-label") }
+      expect(course_cards_list.size).to be 3
+      expect(course_cards_list).to eq([@course1.name, @course2.name, @course3.name])
+
+      drag_and_drop_element(course_card(@course3.name), course_card(@course1.name))
+      after_drag_drop = all_course_cards.map { |card| card.attribute("aria-label") }
+
+      expect(after_drag_drop).to eq([@course1.name, @course3.name, @course2.name])
+      expect(after_drag_drop.size).to be 3
+    end
   end
 end

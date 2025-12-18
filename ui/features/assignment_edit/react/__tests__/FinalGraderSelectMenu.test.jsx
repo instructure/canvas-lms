@@ -60,7 +60,7 @@ describe('FinalGraderSelectMenu', () => {
         {name: 'Jane Doe', id: '492'},
       ],
       finalGraderID: undefined,
-      hideErrors: jest.fn(),
+      hideErrors: vi.fn(),
     }
   })
 

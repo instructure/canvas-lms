@@ -18,16 +18,31 @@
 
 import React from 'react'
 import FilterNav from '../FilterNav'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import store from '../../stores/index'
 import type {FilterNavProps} from '../FilterNav'
 import type {FilterPreset, Filter} from '../../gradebook.d'
 import type {Assignment} from '../../../../../../api'
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import '@testing-library/jest-dom/extend-expect'
 
 const originalState = store.getState()
+
+const server = setupServer(
+  http.get('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+  http.post('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+  http.put('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+  http.delete('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+)
 
 const defaultRules = {
   drop_lowest: 0,
@@ -297,11 +312,17 @@ describe('FilterNav', () => {
       filterPresets: defaultFilterPresets,
       appliedFilters: defaultAppliedFilters,
     })
-    fetchMock.mock('*', 200)
+    server.listen({onUnhandledRequest: 'bypass'})
   })
+
   afterEach(() => {
+    cleanup()
     store.setState(originalState, true)
-    fetchMock.restore()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('renders filters button', async () => {
@@ -392,14 +413,16 @@ describe('FilterNav', () => {
   })
 
   it('clicking Create New Filter Preset triggers onChange with filter', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const user = userEvent.setup({...USER_EVENT_OPTIONS, delay: null})
     store.setState({filterPresets: []})
-    const {getByText, queryByTestId, getByTestId} = render(<FilterNav {...defaultProps} />)
+    const {getByText, queryByTestId, findByText, findByTestId} = render(
+      <FilterNav {...defaultProps} />,
+    )
     expect(queryByTestId('save-filter-button')).toBeNull()
     await user.click(getByText('Apply Filters'))
     await user.click(getByText('Create & Manage Filter Presets'))
-    await user.click(getByText('Toggle Create Filter Preset'))
-    expect(getByTestId('save-filter-button')).toBeVisible()
+    await user.click(await findByText('Toggle Create Filter Preset'))
+    expect(await findByTestId('save-filter-button')).toBeVisible()
   })
 
   describe('FilterNavPopover', () => {

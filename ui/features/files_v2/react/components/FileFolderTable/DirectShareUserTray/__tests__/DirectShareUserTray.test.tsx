@@ -20,14 +20,18 @@ import React from 'react'
 import {render, cleanup, screen, waitFor} from '@testing-library/react'
 import DirectShareUserTray from '../DirectShareUserTray'
 import useContentShareUserSearchApi from '@canvas/direct-sharing/react/effects/useContentShareUserSearchApi'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import userEvent from '@testing-library/user-event'
 import {FAKE_FILES} from '../../../../../fixtures/fakeData'
 import {RowsProvider} from '../../../../contexts/RowsContext'
 import {mockRowsContext} from '../../__tests__/testUtils'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/direct-sharing/react/effects/useContentShareUserSearchApi')
-jest.mock('@canvas/do-fetch-api-effect')
+vi.mock('@canvas/direct-sharing/react/effects/useContentShareUserSearchApi')
+
+const server = setupServer()
+
+let capturedRequest: {path: string; body: any} | null = null
 
 const userA = {
   id: '1',
@@ -52,7 +56,7 @@ const userB = {
 const defaultProps = {
   open: true,
   courseId: '1',
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
   file: FAKE_FILES[0],
 }
 
@@ -67,6 +71,7 @@ describe('DirectShareUserTray', () => {
   let ariaLive: HTMLElement
 
   beforeAll(() => {
+    server.listen()
     // @ts-expect-error
     window.ENV = {COURSE_ID: '42'}
     ariaLive = document.createElement('div')
@@ -76,21 +81,32 @@ describe('DirectShareUserTray', () => {
   })
 
   afterAll(() => {
+    server.close()
     // @ts-expect-error
     delete window.ENV
     if (ariaLive) document.body.removeChild(ariaLive)
   })
 
   beforeEach(() => {
-    ;(useContentShareUserSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
+    capturedRequest = null
+    ;(useContentShareUserSearchApi as any).mockImplementationOnce(({success}: {success: any}) => {
       success([userA, userB])
     })
-    ;(doFetchApi as jest.Mock).mockResolvedValue({})
+    server.use(
+      http.post('/api/v1/users/self/content_shares', async ({request}) => {
+        capturedRequest = {
+          path: new URL(request.url).pathname,
+          body: await request.json(),
+        }
+        return HttpResponse.json({})
+      }),
+    )
   })
 
   afterEach(async () => {
-    jest.clearAllMocks()
-    jest.resetAllMocks()
+    server.resetHandlers()
+    vi.clearAllMocks()
+    vi.resetAllMocks()
     cleanup()
   })
 
@@ -121,14 +137,12 @@ describe('DirectShareUserTray', () => {
       await userEvent.click(screen.getByText(userA.name))
       await userEvent.click(screen.getByTestId('direct-share-user-send'))
 
-      expect(doFetchApi as jest.Mock).toHaveBeenCalledWith({
-        method: 'POST',
-        path: '/api/v1/users/self/content_shares',
-        body: {
-          receiver_ids: ['1'],
-          content_type: 'attachment',
-          content_id: '178',
-        },
+      expect(capturedRequest).not.toBeNull()
+      expect(capturedRequest?.path).toBe('/api/v1/users/self/content_shares')
+      expect(capturedRequest?.body).toEqual({
+        receiver_ids: ['1'],
+        content_type: 'attachment',
+        content_id: '178',
       })
 
       expect(screen.getAllByText(/start/i)[0]).toBeInTheDocument()
@@ -137,7 +151,15 @@ describe('DirectShareUserTray', () => {
     })
 
     it('when fetch fails', async () => {
-      ;(doFetchApi as jest.Mock).mockRejectedValueOnce(() => ({}))
+      server.use(
+        http.post('/api/v1/users/self/content_shares', async ({request}) => {
+          capturedRequest = {
+            path: new URL(request.url).pathname,
+            body: await request.json(),
+          }
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
 
       renderComponent()
 
@@ -150,14 +172,12 @@ describe('DirectShareUserTray', () => {
       await userEvent.click(screen.getByText(userA.name))
       await userEvent.click(screen.getByTestId('direct-share-user-send'))
 
-      expect(doFetchApi as jest.Mock).toHaveBeenCalledWith({
-        method: 'POST',
-        path: '/api/v1/users/self/content_shares',
-        body: {
-          receiver_ids: ['1'],
-          content_type: 'attachment',
-          content_id: '178',
-        },
+      expect(capturedRequest).not.toBeNull()
+      expect(capturedRequest?.path).toBe('/api/v1/users/self/content_shares')
+      expect(capturedRequest?.body).toEqual({
+        receiver_ids: ['1'],
+        content_type: 'attachment',
+        content_id: '178',
       })
 
       expect(screen.getAllByText(/start/i)[0]).toBeInTheDocument()

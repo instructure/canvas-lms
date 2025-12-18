@@ -117,7 +117,7 @@ describe('AnnouncementItem', () => {
       },
     })
 
-    const removeQueriesSpy = jest.spyOn(queryClient, 'removeQueries')
+    const removeQueriesSpy = vi.spyOn(queryClient, 'removeQueries')
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -156,7 +156,7 @@ describe('AnnouncementItem', () => {
       },
     })
 
-    const removeQueriesSpy = jest.spyOn(queryClient, 'removeQueries')
+    const removeQueriesSpy = vi.spyOn(queryClient, 'removeQueries')
 
     const readAnnouncement = {...mockAnnouncement, isRead: true}
 

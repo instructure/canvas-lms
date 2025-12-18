@@ -187,6 +187,10 @@ class AbstractAssignment < ActiveRecord::Base
     end
   }
   scope :not_type_quiz_lti, -> { where.not(id: type_quiz_lti) }
+  scope :not_excluded_from_accessibility_scan, lambda {
+    where.not(submission_types: ["online_quiz", "external_tool"])
+         .where.not(id: type_quiz_lti)
+  }
 
   scope :exclude_muted_associations_for_user, lambda { |user|
     joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id = #{User.connection.quote(user.id_for_database)} AND submissions.assignment_id = assignments.id")
@@ -200,6 +204,7 @@ class AbstractAssignment < ActiveRecord::Base
       SQL
   }
   scope :nondeleted, -> { where.not(workflow_state: "deleted") }
+  scope :assignment_or_peer_review, -> { where(type: ["Assignment", "PeerReviewSubAssignment"]) }
 
   validates_associated :external_tool_tag, if: :external_tool?
   validate :group_category_changes_ok?
@@ -4337,7 +4342,6 @@ class AbstractAssignment < ActiveRecord::Base
   def a2_enabled?
     return false unless course.feature_enabled?(:assignments_2_student)
     return false if quiz? || discussion_topic? || wiki_page? || quiz_lti?
-    return false if peer_reviews? && !course.feature_enabled?(:peer_reviews_for_a2)
     return false if external_tool? && !Account.site_admin.feature_enabled?(:external_tools_for_a2)
 
     true

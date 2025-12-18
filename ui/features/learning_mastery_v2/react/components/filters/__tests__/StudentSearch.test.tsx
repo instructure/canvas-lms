@@ -16,14 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {render, screen, waitFor, act} from '@testing-library/react'
+import {cleanup, render, screen, waitFor, act} from '@testing-library/react'
 import {StudentSearch} from '../StudentSearch'
 import * as useStudentsHook from '../../../hooks/useStudents'
 import {Student} from '../../../types/rollup'
 
-jest.mock('../../../hooks/useStudents')
-jest.mock('../../../apiClient')
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('../../../hooks/useStudents')
+vi.mock('../../../apiClient')
+vi.mock('@canvas/alerts/react/FlashAlert')
+
+afterEach(() => {
+  cleanup()
+})
 
 const mockStudents: Student[] = [
   {
@@ -58,7 +62,7 @@ const mockSearchResults: Student[] = [
 const defaultProps = {
   courseId: '123',
   selectedUserIds: [],
-  onSelectedUserIdsChange: jest.fn(),
+  onSelectedUserIdsChange: vi.fn(),
 }
 
 describe('StudentSearch', () => {
@@ -70,8 +74,8 @@ describe('StudentSearch', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
+    vi.clearAllMocks()
+    vi.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
       students: mockStudents,
       isLoading: false,
       error: null,
@@ -79,7 +83,7 @@ describe('StudentSearch', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('renders StudentSearch with CanvasMultiSelect when pagination is provided', () => {
@@ -119,7 +123,7 @@ describe('StudentSearch', () => {
     const {rerender} = render(<StudentSearch {...defaultProps} />)
 
     // Change the students returned by the hook
-    jest.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
+    vi.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
       students: mockSearchResults,
       isLoading: false,
       error: null,
@@ -182,7 +186,7 @@ describe('StudentSearch', () => {
   })
 
   it('renders component when useStudents hook returns error', () => {
-    jest.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
+    vi.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
       students: [],
       isLoading: false,
       error: 'Failed to load students',
@@ -195,7 +199,7 @@ describe('StudentSearch', () => {
   })
 
   it('handles empty students array from useStudents hook', () => {
-    jest.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
+    vi.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
       students: [],
       isLoading: false,
       error: null,
@@ -207,7 +211,7 @@ describe('StudentSearch', () => {
   })
 
   it('handles students loading state from useStudents hook', () => {
-    jest.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
+    vi.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
       students: [],
       isLoading: true,
       error: null,
@@ -219,7 +223,7 @@ describe('StudentSearch', () => {
   })
 
   it('handles students error state from useStudents hook', () => {
-    jest.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
+    vi.spyOn(useStudentsHook, 'useStudents').mockReturnValue({
       students: [],
       isLoading: false,
       error: 'Failed to load students',

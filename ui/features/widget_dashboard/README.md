@@ -240,7 +240,7 @@ describe('MyWidget', () => {
   })
 
   it('handles error state', () => {
-    const onRetry = jest.fn()
+    const onRetry = vi.fn()
     render(<MyWidget {...buildDefaultProps({error: 'Failed to load', onRetry})} />)
 
     expect(screen.getByText('Failed to load')).toBeInTheDocument()

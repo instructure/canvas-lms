@@ -94,7 +94,6 @@ Progress.prototype.url = function () {
 // @returns {Deferred}
 // @api public
 Progress.prototype.poll = function () {
-   
   this.fetch().then(
     this.onPoll,
     (function (_this) {

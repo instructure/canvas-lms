@@ -156,6 +156,29 @@ export const refreshRegistrationWithAllInfo = (
   })
 }
 
+const createRegistrationWithConfigQueryKey = (
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId,
+) => [accountId, 'lti_registrations', ltiRegistrationId, 'withConfig']
+
+export const useRegistrationWithConfig = (
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId,
+) => {
+  return useQuery({
+    queryKey: createRegistrationWithConfigQueryKey(ltiRegistrationId, accountId),
+    queryFn: () => {
+      return doFetchWithSchema(
+        {
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}?include[]=configuration&include[]=overlay`,
+        },
+        ZLtiRegistrationWithConfiguration,
+      )
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
 export type FetchLtiRegistrationWithLegacyConfiguration = (
   accountId: AccountId,
   registrationId: LtiRegistrationId,

@@ -20,7 +20,7 @@ import * as AssignmentActions from '../AssignmentActions'
 import * as AssignmentApi from '../AssignmentApi'
 import configureStore from '../../configureStore'
 
-jest.mock('../AssignmentApi')
+vi.mock('../AssignmentApi')
 
 const flushPromises = () => new Promise(resolve => setTimeout(resolve))
 
@@ -62,7 +62,7 @@ describe('GradeSummary AssignmentActions', () => {
     })
 
     afterEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('sets the "release grades" status to "started"', () => {
@@ -132,7 +132,7 @@ describe('GradeSummary AssignmentActions', () => {
     })
 
     afterEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('sets the "unmuted assignment" status to "started"', () => {

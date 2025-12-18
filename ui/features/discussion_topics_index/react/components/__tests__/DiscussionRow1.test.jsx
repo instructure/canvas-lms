@@ -22,8 +22,8 @@ import {merge} from 'es-toolkit/compat'
 import React from 'react'
 import {DiscussionRow} from '../DiscussionRow'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // We can't call the wrapped component because a lot of these tests are depending
@@ -145,7 +145,7 @@ describe('DiscussionRow', () => {
   })
 
   it('renders Correct screen reader message for locking discussions', async () => {
-    const updateDiscussionMock = jest.fn()
+    const updateDiscussionMock = vi.fn()
     const discussion = {locked: false, title: 'blerp'}
     render(
       <DiscussionRow
@@ -174,7 +174,7 @@ describe('DiscussionRow', () => {
   })
 
   it('renders Correct screen reader message for unlocking discussions', async () => {
-    const updateDiscussionMock = jest.fn()
+    const updateDiscussionMock = vi.fn()
     const discussion = {locked: true, title: 'blerp'}
     render(
       <DiscussionRow

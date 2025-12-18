@@ -5083,7 +5083,7 @@ describe "Submissions API", type: :request do
     assert_forbidden
   end
 
-  describe "with peer_review parameter" do
+  describe "direct peer review sub-assignment update" do
     before :once do
       @peer_review_course = course_factory(active_all: true)
       @peer_review_teacher = teacher_in_course(course: @peer_review_course, active_all: true).user
@@ -5091,54 +5091,52 @@ describe "Submissions API", type: :request do
       @peer_review_course.enable_feature!(:peer_review_allocation_and_grading)
       @peer_review_sub_assignment = peer_review_model(course: @peer_review_course)
       @parent_assignment = @peer_review_sub_assignment.parent_assignment
-      @api_params = {
+      @direct_api_params = {
         controller: "submissions_api",
         action: "update",
         format: "json",
         course_id: @peer_review_course.id.to_s,
-        assignment_id: @parent_assignment.id.to_s,
+        assignment_id: @peer_review_sub_assignment.id.to_s,
         user_id: @peer_review_student.id.to_s
       }
-      @api_url = "/api/v1/courses/#{@peer_review_course.id}/assignments/#{@parent_assignment.id}/submissions/#{@peer_review_student.id}.json"
+      @direct_api_url = "/api/v1/courses/#{@peer_review_course.id}/assignments/#{@peer_review_sub_assignment.id}/submissions/#{@peer_review_student.id}.json"
       @user = @peer_review_teacher
     end
 
-    def update_submission_via_api(body = {})
+    def update_submission_directly(body = {})
       api_call(
         :put,
-        @api_url,
-        @api_params,
+        @direct_api_url,
+        @direct_api_params,
         body
       )
     end
 
     context "when all conditions are met" do
-      it "updates peer review sub assignment submission instead of parent assignment submission" do
-        json = update_submission_via_api(
+      it "updates peer review sub assignment submission using direct ID" do
+        json = update_submission_directly(
           {
             submission: {
-              posted_grade: "8",
-              peer_review: true
+              posted_grade: "9"
             }
           }
         )
 
-        expect(json["score"]).to eq 8.0
+        expect(json["score"]).to eq 9.0
         expect(json["assignment_id"]).to eq @peer_review_sub_assignment.id
 
         parent_submission = @parent_assignment.submissions.find_by(user: @peer_review_student)
         expect(parent_submission.score).to be_nil
 
         peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
-        expect(peer_review_submission.score).to eq 8.0
+        expect(peer_review_submission.score).to eq 9.0
       end
 
-      it "handles excuse correctly" do
-        json = update_submission_via_api(
+      it "handles excuse correctly with direct approach" do
+        json = update_submission_directly(
           {
             submission: {
-              excuse: true,
-              peer_review: true
+              excuse: true
             }
           }
         )
@@ -5149,28 +5147,24 @@ describe "Submissions API", type: :request do
         expect(peer_review_submission.excused?).to be true
       end
 
-      it "handles comments correctly" do
-        update_submission_via_api(
+      it "handles comments correctly with direct approach" do
+        update_submission_directly(
           {
             comment: {
-              text_comment: "Great peer review work!"
-            },
-            submission: {
-              peer_review: true
+              text_comment: "Excellent peer review!"
             }
           }
         )
 
         peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
-        expect(peer_review_submission.submission_comments.last.comment).to eq "Great peer review work!"
+        expect(peer_review_submission.submission_comments.last.comment).to eq "Excellent peer review!"
       end
 
-      it "handles late_policy_status correctly" do
-        update_submission_via_api(
+      it "handles late_policy_status correctly with direct approach" do
+        update_submission_directly(
           {
             submission: {
-              late_policy_status: "late",
-              peer_review: true
+              late_policy_status: "late"
             }
           }
         )
@@ -5179,12 +5173,11 @@ describe "Submissions API", type: :request do
         expect(peer_review_submission.late_policy_status).to eq "late"
       end
 
-      it "handles missing grade status correctly" do
-        update_submission_via_api(
+      it "handles missing grade status correctly with direct approach" do
+        update_submission_directly(
           {
             submission: {
-              late_policy_status: "missing",
-              peer_review: true
+              late_policy_status: "missing"
             }
           }
         )
@@ -5194,12 +5187,11 @@ describe "Submissions API", type: :request do
         expect(peer_review_submission.missing?).to be true
       end
 
-      it "handles extended grade status correctly" do
-        update_submission_via_api(
+      it "handles extended grade status correctly with direct approach" do
+        update_submission_directly(
           {
             submission: {
-              late_policy_status: "extended",
-              peer_review: true
+              late_policy_status: "extended"
             }
           }
         )
@@ -5209,14 +5201,13 @@ describe "Submissions API", type: :request do
         expect(peer_review_submission.extended?).to be true
       end
 
-      it "handles late status with seconds_late_override correctly" do
+      it "handles late status with seconds_late_override correctly with direct approach" do
         seconds_late_override = 3.days
-        json = update_submission_via_api(
+        json = update_submission_directly(
           {
             submission: {
               late_policy_status: "late",
-              seconds_late_override:,
-              peer_review: true
+              seconds_late_override:
             }
           }
         )
@@ -5229,16 +5220,15 @@ describe "Submissions API", type: :request do
         expect(peer_review_submission.seconds_late).to eq seconds_late_override.to_i
       end
 
-      it "updates seconds_late_override on existing late peer review submission" do
+      it "updates seconds_late_override on existing late peer review submission with direct approach" do
         peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
         peer_review_submission.update!(late_policy_status: "late", seconds_late_override: 1.day.to_i)
 
         new_seconds_late_override = 5.days
-        json = update_submission_via_api(
+        json = update_submission_directly(
           {
             submission: {
-              seconds_late_override: new_seconds_late_override,
-              peer_review: true
+              seconds_late_override: new_seconds_late_override
             }
           }
         )
@@ -5256,15 +5246,14 @@ describe "Submissions API", type: :request do
         @peer_review_course.disable_feature!(:peer_review_allocation_and_grading)
       end
 
-      it "returns error" do
+      it "returns error when using direct peer review sub-assignment ID" do
         json = api_call(
           :put,
-          @api_url,
-          @api_params,
+          @direct_api_url,
+          @direct_api_params,
           {
             submission: {
-              posted_grade: "8",
-              peer_review: true
+              posted_grade: "8"
             }
           },
           {},
@@ -5276,20 +5265,19 @@ describe "Submissions API", type: :request do
       end
     end
 
-    context "when peer_reviews is disabled on assignment" do
+    context "when parent doesn't have peer reviews enabled" do
       before do
         @parent_assignment.update!(peer_reviews: false)
       end
 
-      it "returns error" do
+      it "returns error when using direct peer review sub-assignment ID" do
         json = api_call(
           :put,
-          @api_url,
-          @api_params,
+          @direct_api_url,
+          @direct_api_params,
           {
             submission: {
-              posted_grade: "8",
-              peer_review: true
+              posted_grade: "8"
             }
           },
           {},
@@ -5301,20 +5289,20 @@ describe "Submissions API", type: :request do
       end
     end
 
-    context "when peer review sub assignment doesn't exist" do
+    context "when parent assignment is missing" do
       before do
-        @peer_review_sub_assignment.destroy
+        # Simulate orphaned sub-assignment by nullifying parent reference
+        @peer_review_sub_assignment.update_column(:parent_assignment_id, nil)
       end
 
-      it "returns error" do
+      it "returns error when sub assignment has no parent" do
         json = api_call(
           :put,
-          @api_url,
-          @api_params,
+          @direct_api_url,
+          @direct_api_params,
           {
             submission: {
-              posted_grade: "8",
-              peer_review: true
+              posted_grade: "8"
             }
           },
           {},
@@ -5322,45 +5310,40 @@ describe "Submissions API", type: :request do
         )
 
         expect(json["errors"]).to be_present
-        expect(json["errors"].first["message"]).to eq("This assignment does not have a peer review sub assignment")
+        expect(json["errors"].first["message"]).to eq("This peer review sub assignment does not have a parent assignment")
       end
     end
 
-    context "backward compatibility" do
-      it "updates parent assignment submission when peer_review parameter is absent" do
-        json = update_submission_via_api(
+    context "authorization" do
+      it "allows teacher to grade peer review submission directly" do
+        @user = @peer_review_teacher
+        json = update_submission_directly(
           {
             submission: {
-              posted_grade: "8"
+              posted_grade: "10"
             }
           }
         )
 
-        expect(json["score"]).to eq 8.0
-        expect(json["assignment_id"]).to eq @parent_assignment.id
-
-        parent_submission = @parent_assignment.submissions.find_by(user: @peer_review_student)
-        expect(parent_submission.score).to eq 8.0
-
-        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
-        expect(peer_review_submission&.score).to be_nil
+        expect(json["score"]).to eq 10.0
       end
 
-      it "updates parent assignment submission when peer_review is false" do
-        json = update_submission_via_api(
+      it "prevents student from grading peer review submission directly" do
+        @user = @peer_review_student
+        json = api_call(
+          :put,
+          @direct_api_url,
+          @direct_api_params,
           {
             submission: {
-              posted_grade: "8",
-              peer_review: false
+              posted_grade: "10"
             }
-          }
+          },
+          {},
+          { expected_status: 403 }
         )
 
-        expect(json["score"]).to eq 8.0
-        expect(json["assignment_id"]).to eq @parent_assignment.id
-
-        parent_submission = @parent_assignment.submissions.find_by(user: @peer_review_student)
-        expect(parent_submission.score).to eq 8.0
+        expect(json["status"]).to eq "unauthorized"
       end
     end
   end

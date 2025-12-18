@@ -19,6 +19,39 @@ import React, {useState, useEffect, useRef, useCallback} from 'react'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {Checkbox} from '@instructure/ui-checkbox'
+
+/** Sub-assignment for peer reviews with grading info */
+export interface PeerReviewSubAssignment {
+  points_possible: number
+  grading_type: 'points' | 'pass_fail' | string
+}
+
+/**
+ * Interface for Assignment model methods used in peer review functionality.
+ * This provides type safety for the Backbone Assignment model.
+ */
+export interface AssignmentModel {
+  /** Get the group category ID, if any */
+  groupCategoryId(): string | null
+  /** Check if peer reviews are enabled */
+  peerReviews(): boolean
+  /** Check if moderated grading is enabled */
+  moderatedGrading(): boolean
+  /** Get the peer review sub-assignment data */
+  peerReviewSubAssignment?(): PeerReviewSubAssignment | null
+  /** Get the number of peer reviews required */
+  peerReviewCount?(): number
+  /** Check if there are existing peer review submissions */
+  hasPeerReviewSubmissions?(): boolean
+  /** Check if peer reviews can be assigned across sections */
+  peerReviewAcrossSections?(): boolean
+  /** Check if intra-group peer reviews are enabled */
+  intraGroupPeerReviews?(): boolean
+  /** Check if peer reviews are anonymous */
+  anonymousPeerReviews?(): boolean
+  /** Check if submission is required before peer reviews */
+  peerReviewSubmissionRequired?(): boolean
+}
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -46,18 +79,18 @@ function createOrUpdateRoot(elementId: string, component: React.ReactNode) {
   }
   root.render(component)
 }
-const hasValidGroupCategory = (assignment: Assignment): boolean => {
+const hasValidGroupCategory = (assignment: AssignmentModel): boolean => {
   const groupCategoryId = assignment.groupCategoryId()
   return !!groupCategoryId && groupCategoryId !== 'blank'
 }
-const getIsGroupAssignment = (assignment: Assignment): boolean => {
+const getIsGroupAssignment = (assignment: AssignmentModel): boolean => {
   const hasGroupCategoryCheckbox = document.getElementById('has_group_category') as HTMLInputElement
   if (hasGroupCategoryCheckbox) {
     return hasGroupCategoryCheckbox.checked
   }
   return hasValidGroupCategory(assignment)
 }
-export const renderPeerReviewDetails = (assignment: Assignment) => {
+export const renderPeerReviewDetails = (assignment: AssignmentModel) => {
   const $mountPoint = document.getElementById('peer_reviews_allocation_and_grading_details')
   if ($mountPoint) {
     const queryClient = new QueryClient()
@@ -148,7 +181,7 @@ const SectionHeader = ({title, padding = 'small'}: {title: string; padding?: str
     </Text>
   </Flex.Item>
 )
-const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
+const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
   const [peerReviewChecked, setPeerReviewChecked] = useState(assignment.peerReviews() || false)
   const [peerReviewEnabled, setPeerReviewEnabled] = useState(!assignment.moderatedGrading())
   const [isGroupAssignment, setIsGroupAssignment] = useState(hasValidGroupCategory(assignment))

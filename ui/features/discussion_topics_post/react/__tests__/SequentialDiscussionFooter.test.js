@@ -17,14 +17,48 @@
  */
 
 import $ from 'jquery'
-import {adjustFooter} from '../../index'
+import {vi} from 'vitest'
+
+vi.mock('@instructure/ready', () => ({
+  default: vi.fn((callback) => {}),
+}))
+
+const {adjustFooter} = await import('../../index')
 
 describe('adjustFooter', () => {
   beforeEach(() => {
     document.body.innerHTML = `<div class="discussion-redesign-layout"></div>
       <div id="content"></div>
-      <div id="module_sequence_footer_container" style="padding-right: 20px; width: 100px;">Container</div>
-      <div id="module_sequence_footer" style="width:20px; right: 5px; bottom: 0; "></div>`
+      <div id="module_sequence_footer_container">Container</div>
+      <div id="module_sequence_footer"></div>`
+
+    // Mock getBoundingClientRect for layout calculations
+    const container = document.getElementById('module_sequence_footer_container')
+    container.getBoundingClientRect = vi.fn(() => ({
+      width: 100,
+      height: 0,
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0,
+    }))
+
+    // Set computed styles
+    const originalGetComputedStyle = window.getComputedStyle
+    window.getComputedStyle = vi.fn((element) => {
+      if (element === container) {
+        return {
+          paddingRight: '20px',
+          width: '100px',
+          getPropertyValue: (prop) => {
+            if (prop === 'padding-right') return '20px'
+            if (prop === 'width') return '100px'
+            return ''
+          },
+        }
+      }
+      return originalGetComputedStyle(element)
+    })
   })
 
   afterEach(() => {
@@ -33,20 +67,17 @@ describe('adjustFooter', () => {
 
   it('should adjust the width and right position of the footer', () => {
     adjustFooter()
-    setTimeout(() => {
-      const footer = $('#module_sequence_footer')
-      expect(footer.css('width')).toBe('calc(100px - 20px)')
-      expect(footer.css('right')).toBe('20px')
-    })
+    const footer = document.getElementById('module_sequence_footer')
+    expect(footer.style.width).toBe('calc(100px - 20px)')
+    expect(footer.style.right).toBe('20px')
   })
 
   it('should not adjust the footer if the container does not exist', () => {
     $('#module_sequence_footer_container').remove()
     adjustFooter()
-    setTimeout(() => {
-      const footer = $('#module_sequence_footer')
-      expect(footer.css('width')).toBe('20px')
-      expect(footer.css('right')).toBe('5px')
-    })
+    const footer = document.getElementById('module_sequence_footer')
+    // When container doesn't exist, footer styles shouldn't be changed
+    expect(footer.style.width).toBe('')
+    expect(footer.style.right).toBe('')
   })
 })

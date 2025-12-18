@@ -97,11 +97,17 @@ export const AccessTokensSection = ({userId}: AccessTokensTableProps) => {
       <Table caption={I18n.t('User Generated Access Tokens')} margin="small 0" layout="fixed">
         <Table.Head>
           <Table.Row>
+            <Table.ColHeader id="token-id" width="5%">
+              {I18n.t('ID')}
+            </Table.ColHeader>
+            <Table.ColHeader id="visible-token" width="15%">
+              {I18n.t('Token')}
+            </Table.ColHeader>
             <Table.ColHeader id="purpose">{I18n.t('Purpose')}</Table.ColHeader>
             <Table.ColHeader id="created">{I18n.t('Created')}</Table.ColHeader>
             <Table.ColHeader id="last-used">{I18n.t('Last Used')}</Table.ColHeader>
             <Table.ColHeader id="expires">{I18n.t('Expires')}</Table.ColHeader>
-            <Table.ColHeader id="remove" width="5rem">
+            <Table.ColHeader id="remove" width="7%">
               {I18n.t('Remove')}
             </Table.ColHeader>
           </Table.Row>
@@ -184,25 +190,39 @@ type TokenRowProps = {
 const TokenRow = memo(({token}: TokenRowProps) => {
   const deleteToken = useDeleteToken(token.user_id)
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - format's third argument (zone) is optional at runtime but required by tsgo
+  const createdAtFormatted = format(token.created_at, 'date.formats.full')
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - format's third argument (zone) is optional at runtime but required by tsgo
+  const lastUsedAtFormattedValue = format(token.last_used_at, 'date.formats.full')
+  const lastUsedAtFormatted = token.last_used_at ? lastUsedAtFormattedValue : null
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - format's third argument (zone) is optional at runtime but required by tsgo
+  const expiresAtFormattedValue = format(token.expires_at, 'date.formats.full')
+  const expiresAtFormatted = token.expires_at ? expiresAtFormattedValue : null
+
   return (
     <Table.Row>
+      <Table.Cell>
+        <Text>{token.id}</Text>
+      </Table.Cell>
+      <Table.Cell>
+        <Text wrap="break-word">{token.visible_token}</Text>
+      </Table.Cell>
       <Table.Cell>
         <TruncateWithTooltip>
           <Text>{token.purpose || I18n.t('User Generated')}</Text>
         </TruncateWithTooltip>
       </Table.Cell>
       <Table.Cell>
-        <Text>{format(token.created_at, 'date.formats.full')}</Text>
+        <Text>{createdAtFormatted}</Text>
       </Table.Cell>
       <Table.Cell>
-        <Text>
-          {token.last_used_at ? format(token.last_used_at, 'date.formats.full') : I18n.t('Unused')}
-        </Text>
+        <Text>{lastUsedAtFormatted ?? I18n.t('Unused')}</Text>
       </Table.Cell>
       <Table.Cell>
-        <Text>
-          {token.expires_at ? format(token.expires_at, 'date.formats.full') : I18n.t('Never')}
-        </Text>
+        <Text>{expiresAtFormatted ?? I18n.t('Never')}</Text>
       </Table.Cell>
       <Table.Cell>
         <IconButton

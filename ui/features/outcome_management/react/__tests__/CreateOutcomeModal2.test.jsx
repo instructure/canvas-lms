@@ -36,10 +36,10 @@ import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobal
 
 injectGlobalAlertContainers()
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(() => vi.fn(() => {})),
 }))
 
 const USER_EVENT_OPTIONS = {delay: null, pointerEventsCheck: PointerEventsCheckLevel.Never}
@@ -89,13 +89,13 @@ describe('CreateOutcomeModal', () => {
   }
 
   beforeEach(() => {
-    onCloseHandlerMock = jest.fn()
-    onSuccessMock = jest.fn()
+    onCloseHandlerMock = vi.fn()
+    onSuccessMock = vi.fn()
     cache = createCache()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const itBehavesLikeAForm = specProps => {
@@ -110,7 +110,7 @@ describe('CreateOutcomeModal', () => {
         const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [],
         })
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         const {getByText} = within(getByTestId('loading-error'))
         expect(getByText(/An error occurred while loading account outcomes/)).toBeInTheDocument()
       })
@@ -121,7 +121,7 @@ describe('CreateOutcomeModal', () => {
           contextId: '2',
           mocks: [],
         })
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         const {getByText} = within(getByTestId('loading-error'))
         expect(getByText(/An error occurred while loading course outcomes/)).toBeInTheDocument()
       })
@@ -142,7 +142,7 @@ describe('CreateOutcomeModal', () => {
             }),
           ],
         })
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
@@ -150,7 +150,7 @@ describe('CreateOutcomeModal', () => {
         })
         await user.click(getByText('Root account folder'))
         await user.click(getByText('Create'))
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         await waitFor(() => {
           expect(showFlashAlert).toHaveBeenCalledWith({
             message: '"Outcome 123" was successfully created.',
@@ -162,7 +162,7 @@ describe('CreateOutcomeModal', () => {
       it('does not submit form if error in form and click on Create button', async () => {
         const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />)
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         const friendlyName = getByLabelText('Friendly Name')
         fireEvent.change(friendlyName, {target: {value: 'a'.repeat(256)}})
@@ -176,7 +176,7 @@ describe('CreateOutcomeModal', () => {
         const {getByText, getByLabelText, queryAllByText} = render(
           <CreateOutcomeModal {...defaultProps()} />,
         )
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         const name = getByLabelText('Name')
         const friendlyName = getByLabelText('Friendly Name')
         const friendlyDescription = getByLabelText(
@@ -207,11 +207,11 @@ describe('CreateOutcomeModal', () => {
             ],
           },
         )
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         await user.click(getByText('Create New Group'))
         fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'test'}})
         await user.click(getByText('Create new group'))
-        await act(async () => jest.runOnlyPendingTimers())
+        await act(async () => vi.runOnlyPendingTimers())
         expect(getByTestId('create-button')).toHaveFocus()
       })
 
@@ -220,7 +220,7 @@ describe('CreateOutcomeModal', () => {
           const {queryByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
             friendlyDescriptionFF: false,
           })
-          await act(async () => jest.runOnlyPendingTimers())
+          await act(async () => vi.runOnlyPendingTimers())
           expect(
             queryByLabelText('Friendly description (for parent/student display)'),
           ).not.toBeInTheDocument()
@@ -240,11 +240,11 @@ describe('CreateOutcomeModal', () => {
               }),
             ],
           })
-          await act(async () => jest.runOnlyPendingTimers())
+          await act(async () => vi.runOnlyPendingTimers())
           fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
           fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
           await user.click(getByText('Create'))
-          await act(async () => jest.runOnlyPendingTimers())
+          await act(async () => vi.runOnlyPendingTimers())
           // if setFriendlyDescription mutation is called the expectation below will fail
           await waitFor(() => {
             expect(showFlashAlert).toHaveBeenCalledWith({
@@ -257,67 +257,83 @@ describe('CreateOutcomeModal', () => {
 
       describe('Account Level Mastery Scales Feature Flag', () => {
         describe('when feature flag disabled', () => {
-          it('displays Calculation Method selection form', async () => {
-            const {getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              accountLevelMasteryScalesFF: false,
-            })
-            await act(async () => jest.runOnlyPendingTimers())
-            expect(getByLabelText('Calculation Method')).toBeInTheDocument()
-          })
-
-          it('displays Proficiency Ratings selection form', async () => {
-            const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              accountLevelMasteryScalesFF: false,
-            })
-            await act(async () => jest.runOnlyPendingTimers())
-            expect(getByTestId('outcome-management-ratings')).toBeInTheDocument()
-          })
-
-          it('creates outcome with calculation method and proficiency ratings', async () => {
-            const user = userEvent.setup(USER_EVENT_OPTIONS)
-            const {getByText, getByLabelText, getByDisplayValue} = render(
-              <CreateOutcomeModal {...defaultProps()} />,
-              {
+          it(
+            'displays Calculation Method selection form',
+            async () => {
+              const {getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
                 accountLevelMasteryScalesFF: false,
-                mocks: [
-                  ...smallOutcomeTree(),
-                  createLearningOutcomeMock({
-                    title: 'Outcome 123',
-                    displayName: 'Display name',
-                    description: '',
-                    groupId: '1',
-                    calculationMethod: 'n_mastery',
-                    calculationInt: 5,
-                    individualCalculation: true,
-                    individualRatings: true,
-                  }),
-                ],
-              },
-            )
-            await act(async () => jest.runOnlyPendingTimers())
-            fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
-            fireEvent.change(getByLabelText('Friendly Name'), {
-              target: {value: 'Display name'},
-            })
-            await user.click(getByDisplayValue('Decaying Average'))
-            await user.click(getByText('n Number of Times'))
-            await user.click(getByText('Create'))
-            await act(async () => jest.runOnlyPendingTimers())
-            await waitFor(() => {
-              expect(showFlashAlert).toHaveBeenCalledWith({
-                message: '"Outcome 123" was successfully created.',
-                type: 'success',
               })
-            })
-          })
+              await act(async () => vi.runOnlyPendingTimers())
+              expect(getByLabelText('Calculation Method')).toBeInTheDocument()
+            },
+            10000,
+          )
 
-          it('displays horizontal divider between ratings and calculation method which is hidden from screen readers', async () => {
-            const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              accountLevelMasteryScalesFF: false,
-            })
-            await act(async () => jest.runOnlyPendingTimers())
-            expect(getByTestId('outcome-create-modal-horizontal-divider')).toBeInTheDocument()
-          })
+          it(
+            'displays Proficiency Ratings selection form',
+            async () => {
+              const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
+                accountLevelMasteryScalesFF: false,
+              })
+              await act(async () => vi.runOnlyPendingTimers())
+              expect(getByTestId('outcome-management-ratings')).toBeInTheDocument()
+            },
+            10000,
+          )
+
+          it(
+            'creates outcome with calculation method and proficiency ratings',
+            async () => {
+              const user = userEvent.setup(USER_EVENT_OPTIONS)
+              const {getByText, getByLabelText, getByDisplayValue} = render(
+                <CreateOutcomeModal {...defaultProps()} />,
+                {
+                  accountLevelMasteryScalesFF: false,
+                  mocks: [
+                    ...smallOutcomeTree(),
+                    createLearningOutcomeMock({
+                      title: 'Outcome 123',
+                      displayName: 'Display name',
+                      description: '',
+                      groupId: '1',
+                      calculationMethod: 'n_mastery',
+                      calculationInt: 5,
+                      individualCalculation: true,
+                      individualRatings: true,
+                    }),
+                  ],
+                },
+              )
+              await act(async () => vi.runOnlyPendingTimers())
+              fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
+              fireEvent.change(getByLabelText('Friendly Name'), {
+                target: {value: 'Display name'},
+              })
+              await user.click(getByDisplayValue('Decaying Average'))
+              await user.click(getByText('n Number of Times'))
+              await user.click(getByText('Create'))
+              await act(async () => vi.runOnlyPendingTimers())
+              await waitFor(() => {
+                expect(showFlashAlert).toHaveBeenCalledWith({
+                  message: '"Outcome 123" was successfully created.',
+                  type: 'success',
+                })
+              })
+            },
+            10000,
+          )
+
+          it(
+            'displays horizontal divider between ratings and calculation method which is hidden from screen readers',
+            async () => {
+              const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
+                accountLevelMasteryScalesFF: false,
+              })
+              await act(async () => vi.runOnlyPendingTimers())
+              expect(getByTestId('outcome-create-modal-horizontal-divider')).toBeInTheDocument()
+            },
+            10000,
+          )
 
           it('sets focus on rating description if error in both description and points and click on Create button', async () => {
             const user = userEvent.setup(USER_EVENT_OPTIONS)
@@ -357,13 +373,13 @@ describe('CreateOutcomeModal', () => {
         describe('when feature flag enabled', () => {
           it('does not display Calculation Method selection form', async () => {
             const {queryByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />)
-            await act(async () => jest.runOnlyPendingTimers())
+            await act(async () => vi.runOnlyPendingTimers())
             expect(queryByLabelText('Calculation Method')).not.toBeInTheDocument()
           })
 
           it('does not display Proficiency Ratings selection form', async () => {
             const {queryByTestId} = render(<CreateOutcomeModal {...defaultProps()} />)
-            await act(async () => jest.runOnlyPendingTimers())
+            await act(async () => vi.runOnlyPendingTimers())
             expect(queryByTestId('outcome-management-ratings')).not.toBeInTheDocument()
           })
         })

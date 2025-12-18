@@ -423,10 +423,13 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     const contextType = this.props.context_type
 
     const coursePaceItem = this.props.coursePaceItem
-    const masteryPathsData: MasteryPathsData = CyoeHelper.getItemData(
-      coursePaceItem.assignment_id,
-      true,
-    )
+    const cyoeData = CyoeHelper.getItemData(coursePaceItem.assignment_id, true)
+    const masteryPathsData: MasteryPathsData | undefined = cyoeData
+      ? {
+          ...cyoeData,
+          releasedLabel: cyoeData.releasedLabel ?? undefined,
+        }
+      : undefined
 
     return (
       <InstUISettingsProvider theme={{componentOverrides}}>

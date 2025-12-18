@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { defaultFetchOptions } from '@canvas/util/xhr';
+import {defaultFetchOptions} from '@canvas/util/xhr'
 
 export const fetchImpact = () =>
-    fetch("/api/v1/impact/config", {
-      ...defaultFetchOptions(),
-    })
-    .then((resp) => resp.json())
-    .then((data) => ({ isEnabled: data?.enabled ?? false }))
+  fetch('/api/v1/impact/config', {
+    ...defaultFetchOptions(),
+  })
+    .then(resp => resp.json())
+    .then(data => ({isEnabled: data?.enabled ?? false}))

@@ -29,7 +29,7 @@ const ids = ['flash_screenreader_holder', 'flashalert_message_holder', 'flash-me
 
 describe('FlashAlert', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     for (let i = 0; i < ids.length; i++) {
       const el = document.createElement('div')
@@ -43,8 +43,8 @@ describe('FlashAlert', () => {
     // ensure the automatic close timeout (10000ms) has elapsed
     // add 500ms for the animation
     // add 10ms for cushion
-    jest.advanceTimersByTime(10510)
-    jest.useRealTimers()
+    vi.advanceTimersByTime(10510)
+    vi.useRealTimers()
 
     // remove the screenreader alert holder or railsFlashNotificationsHelperSpec can fail
     const sralertholder = document.getElementById('flash_screenreader_holder')
@@ -72,20 +72,20 @@ describe('FlashAlert', () => {
   describe('.showFlashAlert', () => {
     it.skip('closes after 11 seconds, respecting timeout if ENV.flashAlertTimeout is not set', () => {
       callShowFlashAlert()
-      jest.advanceTimersByTime(11000)
+      vi.advanceTimersByTime(11000)
       strictEqual(document.querySelector('#flashalert_message_holder').innerHTML, '')
     })
 
     it('does not close after 11 seconds if ENV.flashAlertTimeout is set', () => {
       callShowFlashAlert({}, true)
-      jest.advanceTimersByTime(11000)
+      vi.advanceTimersByTime(11000)
       notStrictEqual(document.querySelector('#flashalert_message_holder').innerHTML, '')
     })
 
     it('has no effect when the container element has been removed', () => {
       callShowFlashAlert()
       destroyContainer()
-      jest.advanceTimersByTime(11000)
+      vi.advanceTimersByTime(11000)
       ok('no error was thrown')
     })
 
@@ -97,7 +97,7 @@ describe('FlashAlert', () => {
           .getElementById('flashalert_message_holder')
           .classList.contains('clickthrough-container'),
       )
-      jest.advanceTimersByTime(11000)
+      vi.advanceTimersByTime(11000)
     })
   })
 
@@ -105,10 +105,10 @@ describe('FlashAlert', () => {
     // passes in Jest, fails in QUnit
     it.skip('renders an alert with a default message', () => {
       showFlashError()()
-      jest.advanceTimersByTime(600)
+      vi.advanceTimersByTime(600)
       const expectedText = 'An error occurred making a network request'
       ok(document.querySelector('#flashalert_message_holder').innerText.includes(expectedText))
-      jest.advanceTimersByTime(500) // tick to close the alert with timeout
+      vi.advanceTimersByTime(500) // tick to close the alert with timeout
     })
   })
 
@@ -117,20 +117,20 @@ describe('FlashAlert', () => {
     it.skip('renders an alert with a given message', () => {
       const expectedText = 'hello world'
       showFlashSuccess(expectedText)()
-      jest.advanceTimersByTime(600)
+      vi.advanceTimersByTime(600)
       ok(document.querySelector('#flashalert_message_holder').innerText.includes(expectedText))
-      jest.advanceTimersByTime(500) // tick to close the alert with timeout
+      vi.advanceTimersByTime(500) // tick to close the alert with timeout
     })
 
     // passes in Jest, fails in QUnit
     it.skip('renders an alert without "Details"', () => {
       showFlashSuccess('yay!')({body: 'a body'})
-      jest.advanceTimersByTime(600)
+      vi.advanceTimersByTime(600)
       strictEqual(
         document.querySelector('#flashalert_message_holder').innerText.includes('Details'),
         false,
       )
-      jest.advanceTimersByTime(500) // tick to close the alert with timeout
+      vi.advanceTimersByTime(500) // tick to close the alert with timeout
     })
   })
 })

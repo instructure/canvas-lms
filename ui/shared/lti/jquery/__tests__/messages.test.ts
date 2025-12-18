@@ -24,8 +24,8 @@ import {
   onLtiClosePostMessage,
 } from '../messages'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 const requestFullWindowLaunchMessage = {
@@ -43,12 +43,12 @@ let iframe: HTMLIFrameElement
 let iframeThunk: () => HTMLIFrameElement
 
 beforeEach(() => {
-  source = {postMessage: jest.fn()} as any as Window
+  source = {postMessage: vi.fn()} as any as Window
   iframe = {contentWindow: source} as any as HTMLIFrameElement
   iframeThunk = () => iframe
 })
 
-afterEach(() => jest.restoreAllMocks())
+afterEach(() => vi.restoreAllMocks())
 
 function postMessageEvent(data: unknown, origin?: string): MessageEvent {
   return {
@@ -69,7 +69,7 @@ describe('ltiMessageHander', () => {
   })
 
   it('handles parseable messages from window.postMessage', async () => {
-    const flashMessage = jest.spyOn($, 'screenReaderFlashMessageExclusive')
+    const flashMessage = vi.spyOn($, 'screenReaderFlashMessageExclusive')
     await expectMessage({subject: 'lti.screenReaderAlert', body: 'Hi'}, true)
     expect(flashMessage).toHaveBeenCalledWith('Hi')
   })
@@ -177,7 +177,7 @@ describe('ltiMessageHander', () => {
     })
 
     it('calls callback when added', async () => {
-      const callback = jest.fn()
+      const callback = vi.fn()
 
       runCallbackOnLtiPostMessage(subject, iframeThunk, callback)
 
@@ -187,7 +187,7 @@ describe('ltiMessageHander', () => {
     })
 
     it('does not call callback once removed', async () => {
-      const callback = jest.fn()
+      const callback = vi.fn()
 
       const remove = runCallbackOnLtiPostMessage(subject, iframeThunk, callback)
       remove()
@@ -198,7 +198,7 @@ describe('ltiMessageHander', () => {
     })
 
     it('calls callback when added with hook', async () => {
-      const callback = jest.fn()
+      const callback = vi.fn()
 
       runOnLtiClosePostMessage(callback, iframeThunk)
 
@@ -208,7 +208,7 @@ describe('ltiMessageHander', () => {
     })
 
     it('does not call callback when hook is cleaned up', async () => {
-      const callback = jest.fn()
+      const callback = vi.fn()
 
       const cleanup = runOnLtiClosePostMessage(iframeThunk, callback)
       cleanup()
@@ -219,8 +219,8 @@ describe('ltiMessageHander', () => {
     })
 
     it('calls all callbacks for subject', async () => {
-      const callback1 = jest.fn()
-      const callback2 = jest.fn()
+      const callback1 = vi.fn()
+      const callback2 = vi.fn()
 
       runCallbackOnLtiPostMessage(subject, iframeThunk, callback1)
       runCallbackOnLtiPostMessage(subject, iframeThunk, callback2)
@@ -232,8 +232,8 @@ describe('ltiMessageHander', () => {
     })
 
     it('keeps callbacks for separate invocations separate', async () => {
-      const callback1 = jest.fn()
-      const callback2 = jest.fn()
+      const callback1 = vi.fn()
+      const callback2 = vi.fn()
 
       const remove1 = runCallbackOnLtiPostMessage(subject, iframeThunk, callback1)
       runCallbackOnLtiPostMessage(subject, iframeThunk, callback2)
@@ -246,8 +246,8 @@ describe('ltiMessageHander', () => {
     })
 
     it('only calls callbacks for subject', async () => {
-      const callback1 = jest.fn()
-      const callback2 = jest.fn()
+      const callback1 = vi.fn()
+      const callback2 = vi.fn()
 
       runCallbackOnLtiPostMessage(subject, iframeThunk, callback1)
       runCallbackOnLtiPostMessage('lti.frameResize', iframeThunk, callback2)
@@ -259,7 +259,7 @@ describe('ltiMessageHander', () => {
     })
 
     it('does not call callbacks if the iframe does not match', async () => {
-      const callback = jest.fn()
+      const callback = vi.fn()
 
       runCallbackOnLtiPostMessage(subject, () => document.createElement('iframe'), callback)
 
@@ -272,9 +272,9 @@ describe('ltiMessageHander', () => {
       let iframe: HTMLIFrameElement
 
       beforeEach(() => {
-        iframe = {contentWindow: {postMessage: jest.fn()}} as any as HTMLIFrameElement
+        iframe = {contentWindow: {postMessage: vi.fn()}} as any as HTMLIFrameElement
 
-        jest.spyOn(window.top!, 'frames', 'get').mockReturnValue({
+        vi.spyOn(window.top!, 'frames', 'get').mockReturnValue({
           post_message_forwarding: source,
           0: source,
           1: iframe.contentWindow,
@@ -284,7 +284,7 @@ describe('ltiMessageHander', () => {
       })
 
       it('calls callbacks if the event source is the forwarder and the iframe matches the indexInTopFrame', async () => {
-        const callback = jest.fn()
+        const callback = vi.fn()
         runCallbackOnLtiPostMessage(subject, () => iframe, callback)
 
         const event = postMessageEvent({subject, sourceToolInfo: {indexInTopFrames: 1}})
@@ -293,7 +293,7 @@ describe('ltiMessageHander', () => {
       })
 
       it('does not call callbacks if the event source is the forwarder but the iframe does not match the indexInTopFrame', async () => {
-        const callback = jest.fn()
+        const callback = vi.fn()
         runCallbackOnLtiPostMessage(subject, () => iframe, callback)
 
         const event = postMessageEvent({subject, sourceToolInfo: {indexInTopFrames: 0}})
@@ -302,11 +302,11 @@ describe('ltiMessageHander', () => {
       })
 
       it('does not call callbacks if the iframe matches the indexInTopFrame but the event source is not the forwarder (e.g. spoofed)', async () => {
-        const callback = jest.fn()
+        const callback = vi.fn()
         runCallbackOnLtiPostMessage(subject, () => iframe, callback)
 
         window.top!.frames['post_message_forwarding' as any] = {
-          postMessage: jest.fn(),
+          postMessage: vi.fn(),
         } as any as Window
         const event = postMessageEvent({subject, sourceToolInfo: {indexInTopFrames: 1}})
         await ltiMessageHandler(event)
@@ -390,8 +390,8 @@ describe('response messages', () => {
 
   describe('when message handler fails', () => {
     beforeEach(() => {
-      // mock console.error to avoid jest complaints
-      jest.spyOn(console, 'error').mockImplementation()
+      // mock console.error to avoid vi complaints
+      vi.spyOn(console, 'error').mockImplementation(() => {})
     })
 
     it('should send response message', async () => {
@@ -468,7 +468,7 @@ describe('page functionality', () => {
   })
 
   it('sets the unload message', async () => {
-    const addEventListenerSpy = jest.spyOn(window, 'addEventListener')
+    const addEventListenerSpy = vi.spyOn(window, 'addEventListener')
     await ltiMessageHandler(
       postMessageEvent({
         subject: 'lti.setUnloadMessage',
@@ -480,7 +480,7 @@ describe('page functionality', () => {
   })
 
   it('sets the unload message event if no "message" is given', async () => {
-    const addEventListenerSpy = jest.spyOn(window, 'addEventListener')
+    const addEventListenerSpy = vi.spyOn(window, 'addEventListener')
     await ltiMessageHandler(
       postMessageEvent({
         subject: 'lti.setUnloadMessage',

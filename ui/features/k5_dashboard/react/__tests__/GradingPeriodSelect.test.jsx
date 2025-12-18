@@ -55,7 +55,7 @@ describe('GradingPeriodSelect', () => {
   })
 
   it('Calls the provided callback with the selected grading period id', () => {
-    const handleSelectGradingPeriod = jest.fn()
+    const handleSelectGradingPeriod = vi.fn()
     const {getByRole, getByText} = render(
       <GradingPeriodSelect
         {...defaultProps}

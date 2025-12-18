@@ -51,6 +51,15 @@ describe Mutations::DeleteInternalSetting do
     expect(Setting.find_by(id: internal_setting.id)).to be_nil
   end
 
+  it "clears the HA cache" do
+    # Force lazy setup to happen before we track calls to MultiCache.delete
+    sender
+
+    expect(MultiCache).to receive(:delete).with("all_settings")
+
+    execute
+  end
+
   context "errors" do
     def expect_error(result, message)
       errors = result["errors"] || result.dig("data", "deleteInternalSetting", "errors")

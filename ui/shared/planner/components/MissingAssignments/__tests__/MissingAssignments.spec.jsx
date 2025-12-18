@@ -70,7 +70,7 @@ const defaultProps = (expanded = false) => ({
   },
   responsiveSize: 'large',
   timeZone: 'Pacific/Guam',
-  toggleMissing: jest.fn(),
+  toggleMissing: vi.fn(),
 })
 
 describe('MissingAssignments', () => {

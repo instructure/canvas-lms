@@ -80,7 +80,7 @@ const modalProps = {
     ...providerUser,
   },
   isEditMode: false,
-  onToggleEditMode: jest.fn(),
+  onToggleEditMode: vi.fn(),
   modifyPermissions: {
     canAdd: true,
     canDelete: true,
@@ -138,8 +138,8 @@ const USER_LIST_URI = encodeURI(`/accounts/1/user_lists.json?${userListsParams}`
 const userDetailsUriMock = (userId: string, response: object) =>
   fetchMock.get(`/api/v1/users/${userId}/profile`, response)
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: jest.fn(() => jest.fn(() => {})),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashSuccess: vi.fn(() => vi.fn(() => {})),
 }))
 
 describe('TempEnrollModal', () => {
@@ -151,7 +151,7 @@ describe('TempEnrollModal', () => {
   beforeEach(() => {
     localStorage.clear()
     fetchMock.reset()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -238,6 +238,13 @@ describe('TempEnrollModal', () => {
       const submit = await screen.findByText('Submit')
       expect(submit).toBeInTheDocument()
       fireEvent.click(submit)
+
+      // Wait for the modal to close after submission
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Find recipients of Temporary Enrollments'),
+        ).not.toBeInTheDocument()
+      })
 
       expect(fetchMock.calls(USER_LIST_URI)).toHaveLength(1)
       expect(fetchMock.calls('/api/v1/users/2/profile')).toHaveLength(1)

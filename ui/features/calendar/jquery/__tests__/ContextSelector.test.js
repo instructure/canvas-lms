@@ -58,8 +58,8 @@ describe('ContextSelector', () => {
       sub_context_codes: [],
     }
 
-    contextsChangedCB = jest.fn()
-    closeCB = jest.fn()
+    contextsChangedCB = vi.fn()
+    closeCB = vi.fn()
   })
 
   afterEach(() => {

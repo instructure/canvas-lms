@@ -23,7 +23,21 @@ import * as useManagedCourseSearchApi from '../../effects/useManagedCourseSearch
 import DirectShareCourseTray from '../DirectShareCourseTray'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('../../effects/useManagedCourseSearchApi')
+vi.mock('../../effects/useManagedCourseSearchApi')
+
+// Mock the lazy-loaded component to avoid dynamic import issues in tests
+vi.mock('../DirectShareCoursePanel', () => ({
+  default: function MockDirectShareCoursePanel({onCancel}: {onCancel: () => void}) {
+    return (
+      <div>
+        <span>Select a Course</span>
+        <button data-testid="confirm-action-secondary-button" onClick={onCancel}>
+          Cancel
+        </button>
+      </div>
+    )
+  },
+}))
 
 describe('DirectShareCourseTray', () => {
   let ariaLive: HTMLElement
@@ -42,7 +56,7 @@ describe('DirectShareCourseTray', () => {
   beforeEach(() => {
     fakeENV.setup()
     // Reset the mock implementation
-    jest.spyOn(useManagedCourseSearchApi, 'default').mockImplementation(() => undefined)
+    vi.spyOn(useManagedCourseSearchApi, 'default').mockImplementation(() => undefined)
   })
 
   afterEach(() => {
@@ -50,7 +64,7 @@ describe('DirectShareCourseTray', () => {
   })
 
   it('displays interface for selecting a course', async () => {
-    const {getByText} = render(
+    const {findByText} = render(
       <DirectShareCourseTray
         open={true}
         sourceCourseId=""
@@ -58,14 +72,14 @@ describe('DirectShareCourseTray', () => {
         onDismiss={() => {}}
       />,
     )
-    // loads the panel asynchronously, so we have to wait for it
-    expect(await waitFor(() => getByText(/select a course/i))).toBeInTheDocument()
+    // loads the panel asynchronously via React.lazy, so we have to wait for Suspense to resolve
+    expect(await findByText(/select a course/i)).toBeInTheDocument()
   })
 
   it('calls onDismiss when cancel is clicked', async () => {
-    const handleDismiss = jest.fn()
+    const handleDismiss = vi.fn()
     const user = userEvent.setup()
-    const {getByTestId} = render(
+    const {findByTestId} = render(
       <DirectShareCourseTray
         open={true}
         onDismiss={handleDismiss}
@@ -74,8 +88,8 @@ describe('DirectShareCourseTray', () => {
       />,
     )
 
-    // Wait for the cancel button to be in the document
-    const cancelButton = await waitFor(() => getByTestId('confirm-action-secondary-button'))
+    // Wait for the lazy-loaded panel to render with the cancel button
+    const cancelButton = await findByTestId('confirm-action-secondary-button')
     await user.click(cancelButton)
     expect(handleDismiss).toHaveBeenCalled()
   })

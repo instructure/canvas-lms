@@ -26,7 +26,10 @@ interface NutritionFactsIconProps {
   size?: number
 }
 
-export const NutritionFactsIcon: React.FC<NutritionFactsIconProps> = ({color = 'primary', size = 18}) => {
+export const NutritionFactsIcon: React.FC<NutritionFactsIconProps> = ({
+  color = 'primary',
+  size = 18,
+}) => {
   const selectedColor = ICON_COLORS[color]
   return (
     <svg

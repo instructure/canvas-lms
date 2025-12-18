@@ -21,24 +21,32 @@ import ClearBadgeCountsButton from '../ClearBadgeCountsButton'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {waitFor} from '@testing-library/dom'
-import axios from '@canvas/axios'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/axios', () => ({
-  put: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: vi.fn(() => vi.fn(() => {})),
+  showFlashSuccess: vi.fn(() => vi.fn(() => {})),
 }))
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(() => jest.fn(() => {})),
-  showFlashSuccess: jest.fn(() => jest.fn(() => {})),
-}))
+
+const server = setupServer()
 
 describe('ClearBadgeCountsButton', () => {
   const props = {
     userId: '5',
     courseId: '2',
   }
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   afterEach(() => {
-    jest.clearAllMocks()
+    server.resetHandlers()
   })
 
   it('renders the button with enabled interaction', () => {
@@ -49,18 +57,26 @@ describe('ClearBadgeCountsButton', () => {
   })
 
   it('disables the button and makes API call on click', async () => {
+    server.use(
+      http.put(`/api/v1/courses/${props.courseId}/submissions/${props.userId}/clear_unread`, () => {
+        return new HttpResponse(null, {status: 204})
+      }),
+    )
+
     const {getByRole} = render(<ClearBadgeCountsButton {...props} />)
     const button = getByRole('button', {name: 'Clear Badge Counts'})
     await userEvent.click(button)
     expect(button).toBeInTheDocument()
     expect(button).toHaveAttribute('disabled')
-    expect(axios.put).toHaveBeenCalledWith(
-      `/api/v1/courses/${props.courseId}/submissions/${props.userId}/clear_unread`,
-    )
   })
 
-  it('shows success message when API call is successful and status is 204 (flaky)', async () => {
-    ;(axios.put as jest.Mock).mockResolvedValue({status: 204})
+  it('shows success message when API call is successful and status is 204', async () => {
+    server.use(
+      http.put(`/api/v1/courses/${props.courseId}/submissions/${props.userId}/clear_unread`, () => {
+        return new HttpResponse(null, {status: 204})
+      }),
+    )
+
     const {getByRole} = render(<ClearBadgeCountsButton {...props} />)
     const button = getByRole('button', {name: 'Clear Badge Counts'})
     await userEvent.click(button)
@@ -69,7 +85,12 @@ describe('ClearBadgeCountsButton', () => {
 
   it('shows failure message when API call does not return 204', async () => {
     const errorMessage = 'Error clearing badge counts.'
-    ;(axios.put as jest.Mock).mockResolvedValue({status: 200})
+    server.use(
+      http.put(`/api/v1/courses/${props.courseId}/submissions/${props.userId}/clear_unread`, () => {
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
+
     const {getByRole} = render(<ClearBadgeCountsButton {...props} />)
     const button = getByRole('button', {name: 'Clear Badge Counts'})
     await userEvent.click(button)
@@ -78,8 +99,12 @@ describe('ClearBadgeCountsButton', () => {
 
   it('shows error message when API call fails', async () => {
     const errorMessage = 'Error clearing badge counts.'
-    const err: Error = new Error('Test error')
-    ;(axios.put as jest.Mock).mockRejectedValue(err)
+    server.use(
+      http.put(`/api/v1/courses/${props.courseId}/submissions/${props.userId}/clear_unread`, () => {
+        return HttpResponse.error()
+      }),
+    )
+
     const {getByRole} = render(<ClearBadgeCountsButton {...props} />)
     const button = getByRole('button', {name: 'Clear Badge Counts'})
     await userEvent.click(button)

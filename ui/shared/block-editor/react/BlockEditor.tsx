@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {type NodeId, DefaultEventHandlers, Editor, Frame} from '@craftjs/core'
-import uuid from 'uuid'
+import * as uuid from 'uuid'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View, type ViewOwnProps} from '@instructure/ui-view'

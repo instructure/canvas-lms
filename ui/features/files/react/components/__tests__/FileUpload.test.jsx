@@ -26,7 +26,7 @@ describe('FileUpload', () => {
   let addEventListenerSpy
 
   beforeAll(() => {
-    addEventListenerSpy = jest.spyOn(document, 'addEventListener')
+    addEventListenerSpy = vi.spyOn(document, 'addEventListener')
   })
 
   afterAll(() => {
@@ -60,7 +60,7 @@ describe('FileUpload', () => {
 
   it('renders a FileDrop when there are no files', () => {
     const props = defaultProps()
-    jest.spyOn(props.currentFolder, 'isEmpty').mockReturnValue(true)
+    vi.spyOn(props.currentFolder, 'isEmpty').mockReturnValue(true)
     const wrapper = render(<FileUpload {...props} />)
     // the Billboard
     expect(wrapper.getByText('Drop files here to upload')).toBeInTheDocument()
@@ -79,7 +79,7 @@ describe('FileUpload', () => {
 
   it('does not render a full sized FileDrop when the currentFolder is not empty', () => {
     const props = defaultProps()
-    jest.spyOn(props.currentFolder, 'isEmpty').mockReturnValue(false)
+    vi.spyOn(props.currentFolder, 'isEmpty').mockReturnValue(false)
     const wrapper = render(<FileUpload {...props} />)
     expect(wrapper.container.querySelectorAll('.FileUpload__full')).toHaveLength(0)
   })

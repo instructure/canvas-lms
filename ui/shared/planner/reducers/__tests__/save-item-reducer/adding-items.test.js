@@ -70,7 +70,7 @@ afterAll(() => {
 })
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 it('adds a new item to a new day when the new date is within the loaded range', () => {

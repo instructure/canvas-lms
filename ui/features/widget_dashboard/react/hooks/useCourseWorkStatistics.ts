@@ -29,6 +29,8 @@ interface SubmissionStatistics {
   submissionsDueCount: number
   missingSubmissionsCount: number
   submissionsSubmittedCount: number
+  submittedAndGradedCount: number
+  submittedNotGradedCount: number
 }
 
 interface UserEnrollment {

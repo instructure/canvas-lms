@@ -76,7 +76,7 @@ describe('AssignmentDueDate', () => {
     it('updates dueDate on change and triggers callback', async () => {
       const locale = 'en'
       const timeZone = DateTime.browserTimeZone()
-      const onAssignedInfoChange = jest.fn()
+      const onAssignedInfoChange = vi.fn()
       const initialAssignedInformation = {
         dueDate: '2023-10-17T06:00:00.000Z',
       }

@@ -292,7 +292,7 @@ describe('handleFacadeClick', () => {
     render(<Grouping {...props} ref={ref} />)
 
     const fakeEvent = {
-      preventDefault: jest.fn(),
+      preventDefault: vi.fn(),
     }
 
     ref.current.handleFacadeClick(fakeEvent)
@@ -303,7 +303,7 @@ describe('handleFacadeClick', () => {
 
 describe('toggleCompletion', () => {
   it('binds the toggleCompletion method to item', () => {
-    const mockToggleCompletion = jest.fn()
+    const mockToggleCompletion = vi.fn()
     const props = getDefaultProps()
     render(<Grouping {...props} toggleCompletion={mockToggleCompletion} />)
 
@@ -315,8 +315,8 @@ describe('toggleCompletion', () => {
 })
 
 it('registers itself as animatable', () => {
-  const fakeRegister = jest.fn()
-  const fakeDeregister = jest.fn()
+  const fakeRegister = vi.fn()
+  const fakeDeregister = vi.fn()
   const firstItems = [
     {
       title: 'asdf',

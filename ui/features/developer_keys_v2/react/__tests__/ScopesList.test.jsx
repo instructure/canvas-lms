@@ -21,7 +21,7 @@ import {render, screen, fireEvent} from '@testing-library/react'
 import DeveloperKeyScopesList from '../ScopesList'
 
 // Mock LazyLoad to render children immediately in tests
-jest.mock('react-lazy-load', () => ({
+vi.mock('react-lazy-load', () => ({
   __esModule: true,
   default: ({children}) => <div className="LazyLoad">{children}</div>,
 }))
@@ -172,7 +172,7 @@ describe('DeveloperKeyScopesList', () => {
 
   it('uses the correct handler the checkbox is checked', () => {
     const {ref} = renderDeveloperKeyScopesList()
-    const stubbedHandler = jest.fn()
+    const stubbedHandler = vi.fn()
     const component = ref.current
     const checkBox = screen.getByLabelText(/Enable all read only scopes/i)
 

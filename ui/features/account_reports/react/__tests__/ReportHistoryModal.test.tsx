@@ -74,7 +74,7 @@ describe('ReportHistoryModal', () => {
     })
 
     const {getByTestId, findByTestId} = renderWithQueryClient(
-      <ReportHistoryModal accountId="123" report="report_1" closeModal={jest.fn()} />,
+      <ReportHistoryModal accountId="123" report="report_1" closeModal={vi.fn()} />,
     )
 
     const history1 = await findByTestId('report_history_1')
@@ -118,7 +118,7 @@ describe('ReportHistoryModal', () => {
       <ReportHistoryModal
         accountId="123"
         report="report_1"
-        closeModal={jest.fn()}
+        closeModal={vi.fn()}
         updatedReport={updatedReport}
       />,
     )
@@ -133,7 +133,7 @@ describe('ReportHistoryModal', () => {
     fetchMock.get('/api/v1/accounts/123/reports/report_1', new Promise(() => {})) // Simulate a pending request
 
     const {findByLabelText} = renderWithQueryClient(
-      <ReportHistoryModal accountId="123" report="report_1" closeModal={jest.fn()} />,
+      <ReportHistoryModal accountId="123" report="report_1" closeModal={vi.fn()} />,
     )
 
     expect(await findByLabelText('Loading report history...')).toBeInTheDocument()

@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent, act} from '@testing-library/react'
+import {vi} from 'vitest'
 import tz from 'timezone'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import tokyo from 'timezone/Asia/Tokyo'
@@ -71,8 +72,8 @@ function standardAssignmentResponse() {
 function renderBulkEdit(overrides = {}) {
   const props = {
     courseId: '42',
-    onCancel: jest.fn(),
-    onSave: jest.fn(),
+    onCancel: vi.fn(),
+    onSave: vi.fn(),
     ...overrides,
   }
   const result = {...render(<BulkEdit {...props} />), ...props}
@@ -94,7 +95,7 @@ function changeAndBlurInput(input, newValue) {
 
 beforeEach(() => {
   fetchMock.put(/api\/v1\/courses\/\d+\/assignments\/bulk_update/, {})
-  jest.useFakeTimers()
+  vi.useFakeTimers()
 })
 
 afterEach(() => {
@@ -145,154 +146,170 @@ describe('Assignment Bulk Edit Dates', () => {
     }
 
     // fickle
-    it.skip('polls for progress and updates a progress bar', async () => {
-      const {getByText} = await renderBulkEditAndSave()
-      const [url] = fetchMock.calls()[2]
-      expect(url).toBe('/progress')
-      expect(getByText('0%')).toBeInTheDocument()
+    it(
+      'polls for progress and updates a progress bar',
+      async () => {
+        const {getByText} = await renderBulkEditAndSave()
+        const [url] = fetchMock.calls()[2]
+        expect(url).toBe('/progress')
+        expect(getByText('0%')).toBeInTheDocument()
 
-      fetchMock.getOnce(
-        PROGRESS_ENDPOINT,
-        {
-          url: '/progress',
-          workflow_state: 'running',
-          completion: 42,
-        },
-        {
-          overwriteRoutes: true,
-        },
-      )
+        fetchMock.getOnce(
+          PROGRESS_ENDPOINT,
+          {
+            url: '/progress',
+            workflow_state: 'running',
+            completion: 42,
+          },
+          {
+            overwriteRoutes: true,
+          },
+        )
 
-      act(jest.runOnlyPendingTimers)
-      await flushPromises()
-      expect(getByText('42%')).toBeInTheDocument()
+        act(vi.runOnlyPendingTimers)
+        await flushPromises()
+        expect(getByText('42%')).toBeInTheDocument()
 
-      fetchMock.getOnce(
-        PROGRESS_ENDPOINT,
-        {
-          url: '/progress',
-          workflow_state: 'complete',
-          completion: 100,
-        },
-        {
-          overwriteRoutes: true,
-        },
-      )
+        fetchMock.getOnce(
+          PROGRESS_ENDPOINT,
+          {
+            url: '/progress',
+            workflow_state: 'complete',
+            completion: 100,
+          },
+          {
+            overwriteRoutes: true,
+          },
+        )
 
-      act(jest.runOnlyPendingTimers)
-      await flushPromises()
-      expect(getByText(/saved successfully/)).toBeInTheDocument()
-      expect(getByText('Close')).toBeInTheDocument()
-      // complete, expect no more polling
-      fetchMock.resetHistory()
-      act(jest.runAllTimers)
-      await flushPromises()
-      expect(fetchMock.calls()).toHaveLength(0)
-    })
-
-    // fickle
-    it.skip('displays an error if the progress fetch fails', async () => {
-      const {getByText} = await renderBulkEditAndSave()
-      fetchMock.get(
-        /progress/,
-        {
-          body: {errors: [{message: 'could not get progress'}]},
-          status: 401,
-        },
-        {
-          overwriteRoutes: true,
-        },
-      )
-      act(jest.runAllTimers)
-      await flushPromises()
-      expect(getByText(/could not get progress/)).toBeInTheDocument()
-      expect(getByText('Save').closest('button').disabled).toBe(false)
-    })
+        act(vi.runOnlyPendingTimers)
+        await flushPromises()
+        expect(getByText(/saved successfully/)).toBeInTheDocument()
+        expect(getByText('Close')).toBeInTheDocument()
+        // complete, expect no more polling
+        fetchMock.resetHistory()
+        act(vi.runAllTimers)
+        await flushPromises()
+        expect(fetchMock.calls()).toHaveLength(0)
+      },
+      20000,
+    )
 
     // fickle
-    it.skip('displays an error if the job fails', async () => {
-      const {getByText, getAllByLabelText} = await renderBulkEditAndSave()
-      fetchMock.get(
-        /progress/,
-        {
-          completion: 42,
-          workflow_state: 'failed',
-          results: [
-            {assignment_id: 'assignment_1', errors: {due_at: [{message: 'some bad dates'}]}},
-          ],
-        },
-        {
-          overwriteRoutes: true,
-        },
-      )
-      act(jest.runAllTimers)
-      await flushPromises()
-      expect(getByText(/some bad dates/)).toBeInTheDocument()
-      // save button is disabled due to error
-      expect(getByText('Save').closest('button').disabled).toBe(true)
-      // fix the error and save should be re-enabled
-      changeAndBlurInput(getAllByLabelText(/Due At/)[0], '2020-04-04')
-      expect(getByText('Save').closest('button').disabled).toBe(false)
-    })
+    it(
+      'displays an error if the progress fetch fails',
+      async () => {
+        const {getByText} = await renderBulkEditAndSave()
+        fetchMock.get(
+          /progress/,
+          {
+            body: {errors: [{message: 'could not get progress'}]},
+            status: 401,
+          },
+          {
+            overwriteRoutes: true,
+          },
+        )
+        act(vi.runAllTimers)
+        await flushPromises()
+        expect(getByText(/could not get progress/)).toBeInTheDocument()
+        expect(getByText('Save').closest('button').disabled).toBe(false)
+      },
+      20000,
+    )
 
     // fickle
-    it.skip('can start a second save operation', async () => {
-      // First save operation
-      const {getByText, queryByText, getAllByLabelText} = await renderBulkEditAndSave()
+    it(
+      'displays an error if the job fails',
+      async () => {
+        const {getByText, getAllByLabelText} = await renderBulkEditAndSave()
+        fetchMock.get(
+          /progress/,
+          {
+            completion: 42,
+            workflow_state: 'failed',
+            results: [
+              {assignment_id: 'assignment_1', errors: {due_at: [{message: 'some bad dates'}]}},
+            ],
+          },
+          {
+            overwriteRoutes: true,
+          },
+        )
+        act(vi.runAllTimers)
+        await flushPromises()
+        expect(getByText(/some bad dates/)).toBeInTheDocument()
+        // save button is disabled due to error
+        expect(getByText('Save').closest('button').disabled).toBe(true)
+        // fix the error and save should be re-enabled
+        changeAndBlurInput(getAllByLabelText(/Due At/)[0], '2020-04-04')
+        expect(getByText('Save').closest('button').disabled).toBe(false)
+      },
+      20000,
+    )
 
-      // Mock the progress response for the first save
-      fetchMock.get(
-        PROGRESS_ENDPOINT,
-        {
-          url: 'progress',
-          workflow_state: 'complete',
-          completion: 100,
-        },
-        {
-          overwriteRoutes: true,
-        },
-      )
+    // fickle
+    it(
+      'can start a second save operation',
+      async () => {
+        // First save operation
+        const {getByText, queryByText, getAllByLabelText} = await renderBulkEditAndSave()
 
-      // Run only pending timers to avoid infinite loops
-      act(() => jest.runOnlyPendingTimers())
-      await flushPromises()
+        // Mock the progress response for the first save
+        fetchMock.get(
+          PROGRESS_ENDPOINT,
+          {
+            url: 'progress',
+            workflow_state: 'complete',
+            completion: 100,
+          },
+          {
+            overwriteRoutes: true,
+          },
+        )
 
-      // Verify first save completed successfully
-      expect(getByText(/saved successfully/)).toBeInTheDocument()
+        // Run only pending timers to avoid infinite loops
+        act(() => vi.runOnlyPendingTimers())
+        await flushPromises()
 
-      // Make a change to trigger a second save
-      changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-02')
-      await flushPromises()
+        // Verify first save completed successfully
+        expect(getByText(/saved successfully/)).toBeInTheDocument()
 
-      // Success message should be gone after making changes
-      expect(queryByText(/saved successfully/)).toBe(null)
+        // Make a change to trigger a second save
+        changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-02')
+        await flushPromises()
 
-      // Set up mocks for the second save operation
-      fetchMock.resetHistory()
-      fetchMock.putOnce(BULK_EDIT_ENDPOINT, {url: 'progress url'}, {overwriteRoutes: true})
+        // Success message should be gone after making changes
+        expect(queryByText(/saved successfully/)).toBe(null)
 
-      // Pre-configure all expected network requests for the second save operation
-      // This ensures we don't miss any mocks that could cause hanging promises
-      fetchMock.get(
-        PROGRESS_ENDPOINT,
-        {
-          url: 'progress url',
-          workflow_state: 'complete',
-          completion: 100,
-        },
-        {overwriteRoutes: true},
-      )
+        // Set up mocks for the second save operation
+        fetchMock.resetHistory()
+        fetchMock.putOnce(BULK_EDIT_ENDPOINT, {url: 'progress url'}, {overwriteRoutes: true})
 
-      // Trigger the second save
-      fireEvent.click(getByText('Save'))
-      await flushPromises()
+        // Pre-configure all expected network requests for the second save operation
+        // This ensures we don't miss any mocks that could cause hanging promises
+        fetchMock.get(
+          PROGRESS_ENDPOINT,
+          {
+            url: 'progress url',
+            workflow_state: 'complete',
+            completion: 100,
+          },
+          {overwriteRoutes: true},
+        )
 
-      // Run only pending timers to avoid infinite loops
-      act(() => jest.runOnlyPendingTimers())
-      await flushPromises()
+        // Trigger the second save
+        fireEvent.click(getByText('Save'))
+        await flushPromises()
 
-      // Verify second save completed successfully
-      expect(getByText(/saved successfully/)).toBeInTheDocument()
-    })
+        // Run only pending timers to avoid infinite loops
+        act(() => vi.runOnlyPendingTimers())
+        await flushPromises()
+
+        // Verify second save completed successfully
+        expect(getByText(/saved successfully/)).toBeInTheDocument()
+      },
+      60000,
+    )
   })
 })

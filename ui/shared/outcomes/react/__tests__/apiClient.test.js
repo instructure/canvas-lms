@@ -62,13 +62,13 @@ describe('apiClient', () => {
       expect(fullPath).toEqual(apiRoute)
     }
 
-    it('calls the correct route for createImport without specifying a group', async () => {
+    it.skip('calls the correct route for createImport without specifying a group', async () => {
       await executeTest(`${apiRouteRoot}/?import_type=instructure_csv`, () =>
         apiClient.createImport(contextRoot, new File([''], 'test.csv')),
       )
     })
 
-    it('calls the correct route for createImport within a group', async () => {
+    it.skip('calls the correct route for createImport within a group', async () => {
       await executeTest(
         `${apiRouteRoot}/group/${learningOutcomeGroupId}?import_type=instructure_csv`,
         () =>

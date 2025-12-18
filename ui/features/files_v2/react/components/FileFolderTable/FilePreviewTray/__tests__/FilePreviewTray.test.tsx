@@ -31,7 +31,7 @@ const defaultProps: FilePreviewTrayProps = {
     type: 'document',
     restricted_by_master_course: false,
   } as unknown as File,
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
 }
 
 const renderComponent = (props?: Partial<FilePreviewTrayProps>) => {

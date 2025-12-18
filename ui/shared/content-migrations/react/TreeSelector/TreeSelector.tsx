@@ -172,7 +172,7 @@ const uncheckAllChildrenAction = (
     newState[item.id] = {...item, checkboxState: nextCheckState}
 
     updateChildrenToNextState(item, newState, (treeNodes, childId) => {
-      treeNodes[childId] = {... treeNodes[childId], checkboxState: nextCheckState}
+      treeNodes[childId] = {...treeNodes[childId], checkboxState: nextCheckState}
     })
     updateParentsWithoutKnowAboutChildren(item, newState)
   }
@@ -265,7 +265,8 @@ const isParentItem = (item: CheckboxTreeNode) => {
 const areEqualChild = (prevProps: ItemProps, nextProps: ItemProps) => {
   return (
     prevProps.currentItem.checkboxState === nextProps.currentItem.checkboxState &&
-    prevProps.currentItem.importAsOneModuleItemState === nextProps.currentItem.importAsOneModuleItemState &&
+    prevProps.currentItem.importAsOneModuleItemState ===
+      nextProps.currentItem.importAsOneModuleItemState &&
     prevProps.dispatch === nextProps.dispatch
   )
 }
@@ -279,7 +280,10 @@ const areEqualParent = (prevProps: ItemProps, nextProps: ItemProps) => {
     prevNodesParam: Record<string, CheckboxTreeNode>,
     nextNodesParam: Record<string, CheckboxTreeNode>,
   ): boolean => {
-    if (prevNodesParam[currentItem.id].importAsOneModuleItemState !== nextNodesParam[currentItem.id].importAsOneModuleItemState) {
+    if (
+      prevNodesParam[currentItem.id].importAsOneModuleItemState !==
+      nextNodesParam[currentItem.id].importAsOneModuleItemState
+    ) {
       return true
     }
 
@@ -289,8 +293,11 @@ const areEqualParent = (prevProps: ItemProps, nextProps: ItemProps) => {
         return hasChildStateChangedRecursive(child, prevNodesParam, nextNodesParam)
       }
 
-      return child.checkboxState !== nextNodesParam[childId].checkboxState ||
-        prevNodesParam[childId].importAsOneModuleItemState !== nextNodesParam[childId].importAsOneModuleItemState
+      return (
+        child.checkboxState !== nextNodesParam[childId].checkboxState ||
+        prevNodesParam[childId].importAsOneModuleItemState !==
+          nextNodesParam[childId].importAsOneModuleItemState
+      )
     })
   }
 
@@ -303,7 +310,8 @@ const areEqualParent = (prevProps: ItemProps, nextProps: ItemProps) => {
   return (
     !hasChildStateChanged &&
     prevProps.currentItem.checkboxState === nextProps.currentItem.checkboxState &&
-    prevProps.currentItem.importAsOneModuleItemState === nextProps.currentItem.importAsOneModuleItemState &&
+    prevProps.currentItem.importAsOneModuleItemState ===
+      nextProps.currentItem.importAsOneModuleItemState &&
     prevProps.expanded === nextProps.expanded &&
     prevProps.dispatch === nextProps.dispatch
   )
@@ -313,7 +321,7 @@ const SubModuleSwitch = ({
   checkboxState,
   dispatch,
   currentItem,
-} : {
+}: {
   checkboxState: CheckboxState
   dispatch: (action: {type: DispatcherType; payload: string}) => void
   currentItem: CheckboxTreeNode
@@ -328,11 +336,18 @@ const SubModuleSwitch = ({
   const checkboxLabel = (disabled: boolean) => (
     <>
       <Text>{I18n.t('Import as a standalone module')}</Text>
-      <br/>
-      {disabled ?
-        <Text color="secondary">{I18n.t('Selection is disabled, as the parent is not selected as a standalone module import item.')}</Text> :
-        <Text color="secondary">{I18n.t('If not selected, this item will be imported as one module item.')}</Text>
-      }
+      <br />
+      {disabled ? (
+        <Text color="secondary">
+          {I18n.t(
+            'Selection is disabled, as the parent is not selected as a standalone module import item.',
+          )}
+        </Text>
+      ) : (
+        <Text color="secondary">
+          {I18n.t('If not selected, this item will be imported as one module item.')}
+        </Text>
+      )}
     </>
   )
 
@@ -342,10 +357,7 @@ const SubModuleSwitch = ({
 
   if (checkBoxChecked && importAsOneModuleItemState !== undefined) {
     return (
-      <View
-        margin="xx-small 0 xx-small x-large"
-        as="div"
-      >
+      <View margin="xx-small 0 xx-small x-large" as="div">
         <Flex direction="row" wrap="wrap">
           <Checkbox
             label={checkboxLabel(switchDisabled)}

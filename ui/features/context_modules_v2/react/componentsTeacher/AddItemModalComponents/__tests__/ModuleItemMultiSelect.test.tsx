@@ -19,13 +19,14 @@
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {type MockedFunction} from 'vitest'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../../hooks/useModuleContext'
 import ModuleItemMultiSelect from '../ModuleItemMultiSelect'
 import {useModuleItemContent} from '../../../hooks/queries/useModuleItemContent'
 
-jest.mock('../../../hooks/queries/useModuleItemContent')
+vi.mock('../../../hooks/queries/useModuleItemContent')
 
-const mockUseModuleItemContent = useModuleItemContent as jest.MockedFunction<
+const mockUseModuleItemContent = useModuleItemContent as MockedFunction<
   typeof useModuleItemContent
 >
 
@@ -51,7 +52,7 @@ const renderWithProviders = (
     itemType: 'assignment' as const,
     courseId: '123',
     selectedItemIds: [],
-    onSelectionChange: jest.fn(),
+    onSelectionChange: vi.fn(),
     renderLabel: 'Select Assignments',
   }
 
@@ -80,7 +81,7 @@ describe('ModuleItemMultiSelect', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockUseModuleItemContent.mockReturnValue({
       data: {
         pages: [
@@ -99,14 +100,14 @@ describe('ModuleItemMultiSelect', () => {
       isLoading: false,
       isError: false,
       hasNextPage: false,
-      fetchNextPage: jest.fn(),
+      fetchNextPage: vi.fn(),
       isFetchingNextPage: false,
     } as any)
   })
 
   describe('Multiple selection', () => {
     it('allows selecting multiple items', async () => {
-      const onSelectionChange = jest.fn()
+      const onSelectionChange = vi.fn()
       mockUseModuleItemContent.mockReturnValue({
         data: {
           pages: [
@@ -125,7 +126,7 @@ describe('ModuleItemMultiSelect', () => {
         isLoading: false,
         isError: false,
         hasNextPage: false,
-        fetchNextPage: jest.fn(),
+        fetchNextPage: vi.fn(),
         isFetchingNextPage: false,
       } as any)
 
@@ -162,7 +163,7 @@ describe('ModuleItemMultiSelect', () => {
         isLoading: false,
         isError: false,
         hasNextPage: false,
-        fetchNextPage: jest.fn(),
+        fetchNextPage: vi.fn(),
         isFetchingNextPage: false,
       } as any)
 
@@ -177,7 +178,7 @@ describe('ModuleItemMultiSelect', () => {
     })
 
     it('removes items when tag is dismissed', async () => {
-      const onSelectionChange = jest.fn()
+      const onSelectionChange = vi.fn()
       mockUseModuleItemContent.mockReturnValue({
         data: {
           pages: [
@@ -196,7 +197,7 @@ describe('ModuleItemMultiSelect', () => {
         isLoading: false,
         isError: false,
         hasNextPage: false,
-        fetchNextPage: jest.fn(),
+        fetchNextPage: vi.fn(),
         isFetchingNextPage: false,
       } as any)
 
@@ -237,7 +238,7 @@ describe('ModuleItemMultiSelect', () => {
         isLoading: false,
         isError: false,
         hasNextPage: true,
-        fetchNextPage: jest.fn(),
+        fetchNextPage: vi.fn(),
         isFetchingNextPage: false,
       } as any)
 
@@ -254,7 +255,7 @@ describe('ModuleItemMultiSelect', () => {
         isLoading: false,
         isError: true,
         hasNextPage: false,
-        fetchNextPage: jest.fn(),
+        fetchNextPage: vi.fn(),
         isFetchingNextPage: false,
       } as any)
 

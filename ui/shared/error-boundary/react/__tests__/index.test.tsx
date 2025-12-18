@@ -42,12 +42,12 @@ const defaultProps = () => ({
 })
 
 describe('ErrorBoundary', () => {
-  let consoleErrorSpy: jest.SpyInstance
+  let consoleErrorSpy: any
   let originalError: typeof window.onerror
 
   beforeEach(() => {
     // Mock console.error to prevent error output in tests
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     // Also suppress window.onerror to prevent JSDOM from logging errors
     originalError = window.onerror
@@ -85,7 +85,7 @@ describe('ErrorBoundary', () => {
   })
 
   test('calls "beforeCapture" when provided', () => {
-    const beforeCaptureMock = jest.fn()
+    const beforeCaptureMock = vi.fn()
     render(
       <ErrorBoundary errorComponent={<></>} beforeCapture={beforeCaptureMock}>
         <ThrowsErrorComponent />

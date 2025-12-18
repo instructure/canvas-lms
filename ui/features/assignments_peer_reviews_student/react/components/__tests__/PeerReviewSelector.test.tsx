@@ -29,23 +29,41 @@ describe('PeerReviewSelector', () => {
       available: true,
       workflowState: 'assigned',
       createdAt: '2025-11-01T00:00:00Z',
+      submission: {
+        _id: 'sub-1',
+        attempt: 1,
+        body: '<p>Test submission 1</p>',
+        submissionType: 'online_text_entry',
+      },
     },
     {
       _id: 'ar-2',
       available: true,
       workflowState: 'assigned',
       createdAt: '2025-11-02T00:00:00Z',
+      submission: {
+        _id: 'sub-2',
+        attempt: 1,
+        body: '<p>Test submission 2</p>',
+        submissionType: 'online_text_entry',
+      },
     },
     {
       _id: 'ar-3',
       available: true,
       workflowState: 'assigned',
       createdAt: '2025-11-03T00:00:00Z',
+      submission: {
+        _id: 'sub-3',
+        attempt: 1,
+        body: '<p>Test submission 3</p>',
+        submissionType: 'online_text_entry',
+      },
     },
   ]
 
   it('renders no peer reviews message when assessment requests are null', () => {
-    const mockOnChange = jest.fn()
+    const mockOnChange = vi.fn()
     render(
       <PeerReviewSelector
         assessmentRequests={null as any}
@@ -59,7 +77,7 @@ describe('PeerReviewSelector', () => {
   })
 
   it('shows correct count in label for second option selected', () => {
-    const mockOnChange = jest.fn()
+    const mockOnChange = vi.fn()
     render(
       <PeerReviewSelector
         assessmentRequests={mockAssessmentRequests}
@@ -73,7 +91,7 @@ describe('PeerReviewSelector', () => {
   })
 
   it('calls onSelectionChange when selection changes', async () => {
-    const mockOnChange = jest.fn()
+    const mockOnChange = vi.fn()
     const user = userEvent.setup()
     render(
       <PeerReviewSelector
@@ -93,7 +111,7 @@ describe('PeerReviewSelector', () => {
   })
 
   it('groups assessments into ready to review and completed sections', async () => {
-    const mockOnChange = jest.fn()
+    const mockOnChange = vi.fn()
     const user = userEvent.setup()
     const mixedAssessments: AssessmentRequest[] = [
       {
@@ -101,18 +119,36 @@ describe('PeerReviewSelector', () => {
         available: true,
         workflowState: 'assigned',
         createdAt: '2025-11-01T00:00:00Z',
+        submission: {
+          _id: 'sub-1',
+          attempt: 1,
+          body: '<p>Test submission 1</p>',
+          submissionType: 'online_text_entry',
+        },
       },
       {
         _id: 'ar-2',
         available: true,
         workflowState: 'assigned',
         createdAt: '2025-11-02T00:00:00Z',
+        submission: {
+          _id: 'sub-2',
+          attempt: 1,
+          body: '<p>Test submission 2</p>',
+          submissionType: 'online_text_entry',
+        },
       },
       {
         _id: 'ar-3',
         available: true,
         workflowState: 'completed',
         createdAt: '2025-11-03T00:00:00Z',
+        submission: {
+          _id: 'sub-3',
+          attempt: 1,
+          body: '<p>Test submission 3</p>',
+          submissionType: 'online_text_entry',
+        },
       },
     ]
 
@@ -132,7 +168,7 @@ describe('PeerReviewSelector', () => {
   })
 
   it('only shows ready to review group when no completed assessments', async () => {
-    const mockOnChange = jest.fn()
+    const mockOnChange = vi.fn()
     const user = userEvent.setup()
 
     render(
@@ -151,7 +187,7 @@ describe('PeerReviewSelector', () => {
   })
 
   it('filters out unavailable items and shows only available in selector with correct numbering when item is unavailable', async () => {
-    const mockOnChange = jest.fn()
+    const mockOnChange = vi.fn()
     const user = userEvent.setup()
     const assessmentsWithUnavailableFirst: AssessmentRequest[] = [
       {
@@ -159,18 +195,36 @@ describe('PeerReviewSelector', () => {
         available: false,
         workflowState: 'assigned',
         createdAt: '2025-11-01T00:00:00Z',
+        submission: {
+          _id: 'sub-1',
+          attempt: 1,
+          body: '<p>Test submission 1</p>',
+          submissionType: 'online_text_entry',
+        },
       },
       {
         _id: 'ar-2',
         available: true,
         workflowState: 'assigned',
         createdAt: '2025-11-02T00:00:00Z',
+        submission: {
+          _id: 'sub-2',
+          attempt: 1,
+          body: '<p>Test submission 2</p>',
+          submissionType: 'online_text_entry',
+        },
       },
       {
         _id: 'ar-3',
         available: true,
         workflowState: 'assigned',
         createdAt: '2025-11-03T00:00:00Z',
+        submission: {
+          _id: 'sub-3',
+          attempt: 1,
+          body: '<p>Test submission 3</p>',
+          submissionType: 'online_text_entry',
+        },
       },
     ]
 

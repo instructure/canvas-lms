@@ -21,13 +21,11 @@ import {render, screen, fireEvent} from '@testing-library/react'
 import TranslationOptions from '../TranslationOptions'
 import {useTranslationContext} from '../../../hooks/useTranslationContext'
 
-jest.mock('../../../hooks/useTranslationContext')
+vi.mock('../../../hooks/useTranslationContext')
 
-const mockUseTranslationContext = useTranslationContext as jest.MockedFunction<
-  typeof useTranslationContext
->
+const mockUseTranslationContext = useTranslationContext as ReturnType<typeof vi.fn>
 
-const translateBody = jest.fn()
+const translateBody = vi.fn()
 
 describe('TranslationOptions', () => {
   beforeAll(() => {
@@ -45,29 +43,28 @@ describe('TranslationOptions', () => {
 
   beforeEach(() => {
     translateBody.mockClear()
-    // @ts-expect-error
     mockUseTranslationContext.mockReturnValue({
-      setTranslationTargetLanguage: jest.fn(),
+      setTranslationTargetLanguage: vi.fn(),
       translateBody,
       translating: false,
-      setErrorMessages: jest.fn(),
+      setErrorMessages: vi.fn(),
     })
   })
 
   it('renders without crashing', () => {
-    render(<TranslationOptions asPrimary={null} onSetPrimary={jest.fn()} />)
+    render(<TranslationOptions asPrimary={null} onSetPrimary={vi.fn()} />)
     expect(screen.getByText(/Translate to/i)).toBeInTheDocument()
   })
 
   it('initial state is correct', () => {
-    render(<TranslationOptions asPrimary={null} onSetPrimary={jest.fn()} />)
+    render(<TranslationOptions asPrimary={null} onSetPrimary={vi.fn()} />)
     expect(screen.getByPlaceholderText(/Select a language.../i)).toHaveValue('')
     expect(screen.getByText(/^Translate$/i).closest('button')).toBeEnabled()
   })
 
   it('calls translateBody on clicking on translate button', () => {
     const {translateBody} = mockUseTranslationContext()
-    const setPrimaryMock = jest.fn()
+    const setPrimaryMock = vi.fn()
     render(
       <div id="flash_screenreader_holder" role="alert">
         <TranslationOptions asPrimary={null} onSetPrimary={setPrimaryMock} />
@@ -90,7 +87,7 @@ describe('TranslationOptions', () => {
 
     const valuesArr = [true, false]
 
-    const setPrimaryMock = jest.fn()
+    const setPrimaryMock = vi.fn()
     const {rerender} = render(<TranslationOptions asPrimary={null} onSetPrimary={setPrimaryMock} />)
 
     valuesArr.forEach(asPrimary => {
@@ -112,7 +109,7 @@ describe('TranslationOptions', () => {
   })
 
   it('updates asPrimary state on radio input change', () => {
-    const onSetPrimary = jest.fn()
+    const onSetPrimary = vi.fn()
     render(<TranslationOptions asPrimary={null} onSetPrimary={onSetPrimary} />)
     fireEvent.click(screen.getByLabelText(/Show translation first/i))
     expect(onSetPrimary).toHaveBeenCalledWith(true)
@@ -122,7 +119,7 @@ describe('TranslationOptions', () => {
     const {setTranslationTargetLanguage} = mockUseTranslationContext()
     render(
       <div id="flash_screenreader_holder" role="alert">
-        <TranslationOptions asPrimary={null} onSetPrimary={jest.fn()} />
+        <TranslationOptions asPrimary={null} onSetPrimary={vi.fn()} />
       </div>,
     )
 

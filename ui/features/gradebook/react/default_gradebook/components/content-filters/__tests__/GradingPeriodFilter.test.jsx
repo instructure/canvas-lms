@@ -28,7 +28,7 @@ describe('GradingPeriodFilter', () => {
       {id: '1501', title: 'Q1'},
       {id: '1502', title: 'Q2'},
     ],
-    onSelect: jest.fn(),
+    onSelect: vi.fn(),
     selectedGradingPeriodId: '0',
   }
 
@@ -37,7 +37,7 @@ describe('GradingPeriodFilter', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders with the correct label', () => {

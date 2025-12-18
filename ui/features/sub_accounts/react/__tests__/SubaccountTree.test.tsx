@@ -43,10 +43,9 @@ const props = {
   defaultExpanded: true,
 }
 
-const SUBACCOUNT_FETCH = (account: AccountWithCounts) => {
-  return encodeURI(
-    `/api/v1/accounts/${account.id}/sub_accounts?per_page=100&page=1&include[]=course_count&include[]=sub_account_count&order=name`,
-  )
+// Use regex matcher to handle different parameter orderings
+const SUBACCOUNT_FETCH_MATCHER = (account: AccountWithCounts) => {
+  return new RegExp(`/api/v1/accounts/${account.id}/sub_accounts`)
 }
 
 const renderSubaccountTree = (overrides = {}) => {
@@ -62,22 +61,25 @@ describe('SubaccountTree', () => {
   const queryClient = new QueryClient()
   beforeEach(() => {
     fetchMock.restore()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     queryClient.clear()
+    // Clear sessionStorage to avoid cached data interfering with tests
+    sessionStorage.clear()
   })
 
   afterEach(() => {
     queryClient.clear()
+    sessionStorage.clear()
   })
 
   // the only time this doesn't happen automatically is if the subaccount count is over 100
   it('fetches sub-accounts and expands collapses', async () => {
     const user = userEvent.setup()
-    fetchMock.get(SUBACCOUNT_FETCH(rootAccount), subAccounts)
+    fetchMock.get(SUBACCOUNT_FETCH_MATCHER(rootAccount), subAccounts)
     const {getByText, getByTestId, queryByText} = renderSubaccountTree()
 
     await waitFor(() => {
-      expect(fetchMock.called(SUBACCOUNT_FETCH(rootAccount), 'GET')).toBe(true)
+      expect(fetchMock.called(SUBACCOUNT_FETCH_MATCHER(rootAccount), 'GET')).toBe(true)
       expect(getByText('Root Account')).toBeInTheDocument()
       expect(getByText('Child 1')).toBeInTheDocument()
       expect(getByText('Child 2')).toBeInTheDocument()
@@ -96,11 +98,11 @@ describe('SubaccountTree', () => {
 
   it('does not fetch more subaccounts if subaccount count is 0', async () => {
     const account = {...rootAccount, sub_account_count: 0}
-    fetchMock.get(SUBACCOUNT_FETCH(rootAccount), subAccounts)
+    fetchMock.get(SUBACCOUNT_FETCH_MATCHER(rootAccount), subAccounts)
     const {getByText} = renderSubaccountTree({rootAccount: account})
 
     await waitFor(() => {
-      expect(fetchMock.called(SUBACCOUNT_FETCH(rootAccount), 'GET')).toBe(false)
+      expect(fetchMock.called(SUBACCOUNT_FETCH_MATCHER(rootAccount), 'GET')).toBe(false)
       expect(getByText('Root Account')).toBeInTheDocument()
     })
   })

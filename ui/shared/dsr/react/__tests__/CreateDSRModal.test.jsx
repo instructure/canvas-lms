@@ -18,11 +18,10 @@
 
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 import CreateDSRModal from '../CreateDSRModal'
 import axios from '@canvas/axios'
 
-jest.mock('@canvas/axios')
+vi.mock('@canvas/axios')
 
 const mockUser = {
   id: '1',
@@ -44,7 +43,7 @@ const pastDate = () => {
 }
 
 describe('CreateDSRModal', () => {
-  const afterSave = jest.fn()
+  const afterSave = vi.fn()
 
   const renderComponent = (props = {}) =>
     render(

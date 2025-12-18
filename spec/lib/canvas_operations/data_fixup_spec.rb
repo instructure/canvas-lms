@@ -103,6 +103,21 @@ RSpec.describe CanvasOperations::DataFixup do
     end
   end
 
+  shared_context "batch data fixup with restrictive scope" do
+    before do
+      stub_const("RestrictiveScopeDataFixup", Class.new(described_class) do
+        self.mode = :batch
+        self.progress_tracking = false
+
+        scope { User.where(name: "Target User") }
+
+        def process_batch(records)
+          records.update_all(name: "Fixed User")
+        end
+      end)
+    end
+  end
+
   describe "settings" do
     it "includes settings for batching and sleeping" do
       expect(described_class.range_batch_size).to eq(5_000)
@@ -139,6 +154,44 @@ RSpec.describe CanvasOperations::DataFixup do
     it "returns false in test environment even when set to true" do
       described_class.record_changes = true
       expect(described_class.record_changes?).to be(false)
+    end
+  end
+
+  describe "required method implementations" do
+    describe "#process_batch" do
+      it "raises NoMethodError when not implemented for batch mode" do
+        fixup_class = Class.new(described_class) do
+          self.mode = :batch
+          scope { User.all }
+        end
+
+        fixup = fixup_class.new
+        expect { fixup.send(:process_batch, []) }.to raise_error(NoMethodError, "Subclasses must implement #process_batch when mode is :batch")
+      end
+    end
+
+    describe "#process_record" do
+      it "raises NoMethodError when not implemented for individual_record mode" do
+        fixup_class = Class.new(described_class) do
+          self.mode = :individual_record
+          scope { User.all }
+        end
+
+        fixup = fixup_class.new
+        record = double("record")
+        expect { fixup.send(:process_record, record) }.to raise_error(NoMethodError, "Subclasses must implement #process_record when mode is :individual_record")
+      end
+    end
+
+    describe "#scope" do
+      it "raises NotImplementedError when not defined" do
+        fixup_class = Class.new(described_class) do
+          self.mode = :batch
+        end
+
+        fixup = fixup_class.new
+        expect { fixup.send(:scope) }.to raise_error(NotImplementedError, "Subclasses must define scope using `scope { ... }` or implement #scope method")
+      end
     end
   end
 
@@ -212,6 +265,32 @@ RSpec.describe CanvasOperations::DataFixup do
         expect(id_ranges.length).to eq 2
         expect(id_ranges.first).to include(user_one.id)
         expect(id_ranges.second).to include(user_two.id)
+      end
+
+      context "with restrictive scope" do
+        include_context "batch data fixup with restrictive scope"
+
+        before do
+          RestrictiveScopeDataFixup.range_batch_size = 1
+        end
+
+        it "does not enqueue process_range when process_batch? returns false" do
+          # Create users that don't match the restrictive scope (name: "Target User")
+          user_one = user_model(name: "User One")
+          User.create!(
+            id: user_one.id + 10,
+            name: "User Two"
+          )
+
+          fixup_instance = RestrictiveScopeDataFixup.new
+          job_scope = Delayed::Job.where(tag: "RestrictiveScopeDataFixup#process_range")
+
+          allow(Rails.env).to receive(:production?).and_return(true)
+
+          # No jobs should be enqueued because process_batch? will return false
+          # since no users in the ID ranges match the scope's where clause
+          expect { fixup_instance.send(:execute) }.not_to change { job_scope.count }
+        end
       end
 
       it "invokes the batch processing handler for each batch" do

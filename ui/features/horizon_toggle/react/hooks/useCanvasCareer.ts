@@ -42,7 +42,9 @@ const timeout = (delay: number) => {
 
 export const useCanvasCareer = ({
   onConversionCompleted,
-}: {onConversionCompleted: () => void}): UseCanvasCareerResult => {
+}: {
+  onConversionCompleted: () => void
+}): UseCanvasCareerResult => {
   const [data, setData] = useState<CanvasCareerValidationResponse>({errors: {}})
   const [loading, setLoading] = useState<boolean>(true)
   const [loadingText, setLoadingText] = useState<string>('')

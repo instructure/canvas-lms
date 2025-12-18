@@ -22,30 +22,30 @@ import {MemoryRouter, Routes} from 'react-router-dom'
 import {useNewLoginData} from '../../context'
 import {NewLoginRoutes} from '../NewLoginRoutes'
 
-jest.mock('../../assets/images/instructure.svg', () => 'instructure.svg')
-jest.mock('../../pages/SignIn', () => () => <div>Sign In Page</div>)
-jest.mock('../../pages/ForgotPassword', () => () => <div>Forgot Password Page</div>)
-jest.mock('../../pages/register/Landing', () => () => <div>Register Landing Page</div>)
-jest.mock('../../pages/register/Student', () => () => <div>Register Student Page</div>)
-jest.mock('../../pages/register/Parent', () => () => <div>Register Parent Page</div>)
-jest.mock('../../pages/register/Teacher', () => () => <div>Register Teacher Page</div>)
-jest.mock('@instructure/ui-img', () => {
+vi.mock('../../assets/images/instructure.svg', () => ({default: 'instructure.svg'}))
+vi.mock('../../pages/SignIn', () => ({default: () => <div>Sign In Page</div>}))
+vi.mock('../../pages/ForgotPassword', () => ({default: () => <div>Forgot Password Page</div>}))
+vi.mock('../../pages/register/Landing', () => ({default: () => <div>Register Landing Page</div>}))
+vi.mock('../../pages/register/Student', () => ({default: () => <div>Register Student Page</div>}))
+vi.mock('../../pages/register/Parent', () => ({default: () => <div>Register Parent Page</div>}))
+vi.mock('../../pages/register/Teacher', () => ({default: () => <div>Register Teacher Page</div>}))
+vi.mock('@instructure/ui-img', () => {
   const Img = ({src, alt}: {src: string; alt: string}) => <img src={src} alt={alt} />
   return {Img}
 })
-jest.mock('react-router-dom', () => {
-  const originalModule = jest.requireActual('react-router-dom')
+vi.mock('react-router-dom', async () => {
+  const originalModule = await vi.importActual('react-router-dom')
   return {
     ...originalModule,
     ScrollRestoration: () => null,
   }
 })
-jest.mock('../../context/NewLoginDataContext', () => ({
-  ...jest.requireActual('../../context/NewLoginDataContext'),
-  useNewLoginData: jest.fn(),
+vi.mock('../../context/NewLoginDataContext', async () => ({
+  ...(await vi.importActual('../../context/NewLoginDataContext')),
+  useNewLoginData: vi.fn(),
 }))
 
-const mockUseNewLoginData = useNewLoginData as jest.Mock
+const mockUseNewLoginData = useNewLoginData as ReturnType<typeof vi.fn>
 
 describe('NewLoginRoutes', () => {
   beforeEach(() => {
@@ -56,7 +56,7 @@ describe('NewLoginRoutes', () => {
     mockUseNewLoginData.mockReturnValue({
       selfRegistrationType: 'all',
     })
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

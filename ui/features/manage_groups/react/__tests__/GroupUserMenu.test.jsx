@@ -24,10 +24,10 @@ const defaultProps = {
   userId: 1,
   userName: 'Anakin Skywalker',
   isLeader: false,
-  onRemoveFromGroup: jest.fn(),
-  onRemoveAsLeader: jest.fn(),
-  onSetAsLeader: jest.fn(),
-  onMoveTo: jest.fn(),
+  onRemoveFromGroup: vi.fn(),
+  onRemoveAsLeader: vi.fn(),
+  onSetAsLeader: vi.fn(),
+  onMoveTo: vi.fn(),
 }
 
 const setup = (props = {}) => {

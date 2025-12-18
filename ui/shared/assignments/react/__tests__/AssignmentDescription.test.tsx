@@ -19,14 +19,17 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import AssignmentDescription from '../AssignmentDescription'
+import apiUserContent from '@canvas/util/jquery/apiUserContent'
 
-jest.mock('@canvas/util/jquery/apiUserContent', () => ({
-  convert: jest.fn((content: string) => content),
+vi.mock('@canvas/util/jquery/apiUserContent', () => ({
+  default: {
+    convert: vi.fn((content: string) => content),
+  },
 }))
 
 describe('AssignmentDescription', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders with description prop', () => {
@@ -59,7 +62,6 @@ describe('AssignmentDescription', () => {
   })
 
   it('calls apiUserContent.convert when description is provided', () => {
-    const apiUserContent = require('@canvas/util/jquery/apiUserContent')
     const description = '<p>Test description</p>'
 
     render(<AssignmentDescription description={description} />)
@@ -68,8 +70,6 @@ describe('AssignmentDescription', () => {
   })
 
   it('does not call apiUserContent.convert when no description is provided', () => {
-    const apiUserContent = require('@canvas/util/jquery/apiUserContent')
-
     render(<AssignmentDescription />)
 
     expect(apiUserContent.convert).not.toHaveBeenCalled()

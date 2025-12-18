@@ -26,8 +26,8 @@ import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(() => jest.fn()),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: vi.fn(() => vi.fn()),
 }))
 
 function renderWithQueryClient(ui: React.ReactElement) {
@@ -87,7 +87,7 @@ const canceledReport: AccountReport = {
 describe('ReportAction', () => {
   afterEach(() => {
     fetchMock.restore()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('report not running', () => {
@@ -99,7 +99,7 @@ describe('ReportAction', () => {
     })
 
     it('configures and runs a report with parameters', async () => {
-      const spy = jest.fn()
+      const spy = vi.fn()
       const user = userEvent.setup()
 
       const {getByText, getByLabelText} = renderWithQueryClient(
@@ -121,7 +121,7 @@ describe('ReportAction', () => {
     })
 
     it('runs a report without parameters', async () => {
-      const spy = jest.fn()
+      const spy = vi.fn()
       const user = userEvent.setup()
 
       const {getByText} = renderWithQueryClient(
@@ -149,7 +149,7 @@ describe('ReportAction', () => {
         accountId="123"
         report={reportWithParameters}
         reportRun={runningReport}
-        onStateChange={jest.fn()}
+        onStateChange={vi.fn()}
       />,
     )
     const progressBar = container.querySelector('progress')
@@ -159,7 +159,7 @@ describe('ReportAction', () => {
 
   it('cancels a running report', async () => {
     const user = userEvent.setup()
-    const spy = jest.fn()
+    const spy = vi.fn()
     fetchMock.get('/api/v1/accounts/123/reports/report_1/101', {
       body: runningReport,
       status: 200,
@@ -201,7 +201,7 @@ describe('ReportAction', () => {
         accountId="123"
         report={reportWithParameters}
         reportRun={runningReport}
-        onStateChange={jest.fn()}
+        onStateChange={vi.fn()}
       />,
     )
 
@@ -229,7 +229,7 @@ describe('ReportAction', () => {
         accountId="123"
         report={reportWithParameters}
         reportRun={runningReport}
-        onStateChange={jest.fn()}
+        onStateChange={vi.fn()}
       />,
     )
 

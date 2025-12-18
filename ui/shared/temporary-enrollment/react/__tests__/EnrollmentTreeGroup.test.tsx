@@ -74,8 +74,8 @@ describe('EnrollmentTreeGroup', () => {
   let section1Node: NodeStructure
   let courseNode: NodeStructure
   let roleNode: NodeStructure
-  let checkCallback: jest.Mock
-  let toggleCallback: jest.Mock
+  let checkCallback: any
+  let toggleCallback: any
   let rProps: any
 
   beforeEach(() => {
@@ -88,8 +88,8 @@ describe('EnrollmentTreeGroup', () => {
     courseNode.children = [section1Node]
     roleNode.children = [courseNode]
 
-    checkCallback = jest.fn()
-    toggleCallback = jest.fn()
+    checkCallback = vi.fn()
+    toggleCallback = vi.fn()
 
     rProps = {
       id: roleNode.id,
@@ -103,11 +103,11 @@ describe('EnrollmentTreeGroup', () => {
       updateToggle: toggleCallback,
     }
 
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders role with one course item when toggled', () => {

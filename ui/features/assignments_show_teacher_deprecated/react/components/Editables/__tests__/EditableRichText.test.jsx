@@ -37,7 +37,7 @@ it('renders the value in view mode', () => {
 })
 
 // Note: Cannot test edit mode since the RichContentEditor mock doesn't render
-// anything. Eventually, it will become testable using jest and we can revisit
+// anything. Eventually, it will become testable using vi and we can revisit
 // it('renders the value in edit mode', () => {
 //   const {container, getByText} = render(
 //     <EditableRichText

@@ -847,6 +847,7 @@ describe "Student reports" do
         purpose: "at1"
       )
       @user1.destroy
+      @at1.clear_full_token!
 
       @at2 = AccessToken.create!(
         user: @user2,
@@ -855,6 +856,7 @@ describe "Student reports" do
         purpose: "at2"
       )
 
+      @at2.clear_full_token!
       @at2.update_attribute(:last_used_at, 2.hours.ago)
 
       @at3 = AccessToken.create!(
@@ -863,6 +865,7 @@ describe "Student reports" do
         permanent_expires_at: nil,
         purpose: "at3"
       )
+      @at3.clear_full_token!
     end
 
     it "runs and include deleted users" do
@@ -870,23 +873,38 @@ describe "Student reports" do
       expect(parsed).to eq_stringified_array [
         [@user3.id,
          "Astley, Rick",
-         @at3.token_hint.gsub(/.+~/, ""),
+         @at3.id,
+         @at3.purpose,
+         @at3[:token_hint], # exclude shard on purpose
+         @at3.visible_token,
+         @at3.created_at.iso8601,
          "never",
          "never",
+         "active",
          DeveloperKey.default.id,
          DeveloperKey::DEFAULT_KEY_NAME],
         [@user2.id,
          "Bolton, Michael",
-         @at2.token_hint.gsub(/.+~/, ""),
+         @at2.id,
+         @at2.purpose,
+         @at2[:token_hint], # exclude shard on purpose
+         @at2.visible_token,
+         @at2.created_at.iso8601,
          @at2.permanent_expires_at.iso8601,
          @at2.last_used_at.iso8601,
+         "active",
          DeveloperKey.default.id,
          DeveloperKey::DEFAULT_KEY_NAME],
         [@user1.id,
          "Clair, John St.",
-         @at1.token_hint.gsub(/.+~/, ""),
+         @at1.id,
+         @at1.purpose,
+         @at1[:token_hint], # exclude shard on purpose
+         @at1.visible_token,
+         @at1.created_at.iso8601,
          @at1.permanent_expires_at.iso8601,
          "never",
+         "active",
          DeveloperKey.default.id,
          DeveloperKey::DEFAULT_KEY_NAME]
       ]

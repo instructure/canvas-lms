@@ -22,7 +22,7 @@ import ImportOutcomesModal from '../ImportOutcomesModal'
 
 const element = () => {
   const el = document.createElement('div')
-  el.trigger = jest.fn()
+  el.trigger = vi.fn()
   return el
 }
 
@@ -76,7 +76,7 @@ it('renders the invalid file error message if a file is rejected', () => {
 })
 
 it('triggers sync and hides if a file is accepted', () => {
-  const trigger = jest.fn()
+  const trigger = vi.fn()
   const toolbar = element()
   const dummyFile = {file: 'foo'}
   toolbar.trigger = trigger
@@ -95,7 +95,7 @@ it('triggers sync and hides if a file is accepted', () => {
 })
 
 it('calls onFileDrop and hides if a file is accepted', () => {
-  const onFileDrop = jest.fn()
+  const onFileDrop = vi.fn()
   const dummyFile = {file: 'foo'}
   let modalRef
   render(

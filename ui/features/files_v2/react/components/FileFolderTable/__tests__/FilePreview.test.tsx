@@ -20,8 +20,8 @@ import {render, screen} from '@testing-library/react'
 import {FilePreview, FilePreviewProps} from '../FilePreview'
 import {FAKE_FILES} from '../../../../fixtures/fakeData'
 
-jest.mock('@canvas/canvas-studio-player', () => {
-  const mockDefault = jest.fn(() => <div data-testid="media-player">Media Player</div>)
+vi.mock('@canvas/canvas-studio-player', () => {
+  const mockDefault = vi.fn(() => <div data-testid="media-player">Media Player</div>)
   return {
     __esModule: true,
     default: mockDefault,

@@ -62,7 +62,7 @@ $.fn.fillTemplateData = function (options) {
         }
         const $found_all = this.find('.' + item)
         const avoid = options.avoid || ''
-         
+
         $found_all.each(function () {
           const $found = $(this)
           if ($found.length > 0 && $found.closest(avoid).length === 0) {

@@ -419,7 +419,7 @@ export default function CanvasStudioPlayer({
               src={mediaSources}
               captions={mediaCaptions}
               hideFullScreen={!includeFullscreen}
-              title={getAriaLabel()}
+              title={getAriaLabel() ?? ''}
               onCaptionsDelete={hideCaptionButtons ? undefined : deleteCaption}
               enableSidebar={enableSidebar}
               openSidebar={openSidebar}

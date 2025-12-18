@@ -55,7 +55,12 @@ export interface GradebookProps {
   onChangeNameDisplayFormat: (format: NameDisplayFormat) => void
   onOutcomesReorder?: (orderedOutcomes: Outcome[]) => void
   contributingScores: ContributingScoresManager
-  onOpenStudentAssignmentTray?: (outcome: Outcome) => void
+  onOpenStudentAssignmentTray?: (
+    outcome: Outcome,
+    student: Student,
+    alignmentIndex: number,
+    alignments: ContributingScoreAlignment[],
+  ) => void
 }
 
 const GradebookComponent: React.FC<GradebookProps> = ({
@@ -171,7 +176,11 @@ const GradebookComponent: React.FC<GradebookProps> = ({
                             key={`alignment-${alignment.alignment_id}`}
                             size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}
                           >
-                            <ContributingScoreHeader label={alignment.associated_asset_name} />
+                            <ContributingScoreHeader
+                              alignment={alignment}
+                              courseId={courseId}
+                              sorting={sorting}
+                            />
                           </Flex.Item>
                         ),
                       )}

@@ -56,17 +56,19 @@ const ResponsiveNutritionFacts = (feature: string) => {
       render={(responsiveProps: any) => {
         const node = document.getElementById(responsiveProps.domElement)
         if (!node) {
-          captureException(new Error(`Could not find element with id ${responsiveProps.domElement}`))
+          captureException(
+            new Error(`Could not find element with id ${responsiveProps.domElement}`),
+          )
           return null
         }
         return createPortal(
-          <NutritionFacts 
-            responsiveProps={responsiveProps} 
+          <NutritionFacts
+            responsiveProps={responsiveProps}
             aiInformation={info.aiInformation}
             dataPermissionLevels={info.dataPermissionLevels}
             nutritionFacts={info.nutritionFacts}
-          />
-          , node
+          />,
+          node,
         )
       }}
     />

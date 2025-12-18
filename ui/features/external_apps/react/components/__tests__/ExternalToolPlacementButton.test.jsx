@@ -19,10 +19,12 @@ import {render, fireEvent, waitForElementToBeRemoved} from '@testing-library/rea
 import store from '../../lib/ExternalAppsStore'
 import ExternalToolPlacementButton from '../ExternalToolPlacementButton'
 
-jest.mock('../../lib/ExternalAppsStore')
+vi.mock('../../lib/ExternalAppsStore')
 
 // let this component's rendering be tested in other places and just focus on its presence
-jest.mock('../ExternalToolPlacementList', () => ({tool}) => <div>{Object.keys(tool)}</div>)
+vi.mock('../ExternalToolPlacementList', () => ({
+  default: ({tool}) => <div>{Object.keys(tool)}</div>,
+}))
 
 describe('ExternalToolPlacementButton', () => {
   const tool = {
@@ -35,7 +37,7 @@ describe('ExternalToolPlacementButton', () => {
       <ExternalToolPlacementButton
         tool={tool}
         returnFocus={() => {}}
-        onToggleSuccess={jest.fn()}
+        onToggleSuccess={vi.fn()}
         {...overrides}
       />,
     )
@@ -46,7 +48,7 @@ describe('ExternalToolPlacementButton', () => {
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('with defaults', () => {

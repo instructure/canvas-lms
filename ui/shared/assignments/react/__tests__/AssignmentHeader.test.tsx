@@ -40,7 +40,7 @@ const setUp = (propOverrides = {}) => {
 
 describe('AssignmentHeader', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('title', () => {

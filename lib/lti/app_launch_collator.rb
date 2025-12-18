@@ -46,8 +46,13 @@ module Lti
       end
 
       def message_handlers_for(context, placements)
-        MessageHandler.for_context(context).has_placements(*placements)
-                      .by_message_types("basic-lti-launch-request")
+        handlers_scope = MessageHandler.for_context(context).has_placements(*placements)
+                                       .by_message_types("basic-lti-launch-request")
+        if context.root_account.feature_enabled?(:lti_asset_processor_tii_migration)
+          handlers_scope.for_non_migrated_tool_proxies
+        else
+          handlers_scope
+        end
       end
 
       def bookmarked_collection(context, placements, options = {})

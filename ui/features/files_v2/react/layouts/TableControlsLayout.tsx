@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Flex } from "@instructure/ui-flex"
+import {Flex} from '@instructure/ui-flex'
 
 export const TableControlsLayout = (props: {
   breadcrumbs: React.ReactNode
@@ -25,15 +25,15 @@ export const TableControlsLayout = (props: {
 }) => {
   return (
     <Flex
-      as='div'
-      justifyItems='end'
+      as="div"
+      justifyItems="end"
       direction={props.size === 'small' ? 'column' : 'row'}
       wrap="wrap"
     >
-      <Flex.Item as='div' shouldGrow>
+      <Flex.Item as="div" shouldGrow>
         {props.breadcrumbs}
       </Flex.Item>
-      <Flex.Item as='div' overflowY='visible'>
+      <Flex.Item as="div" overflowY="visible">
         {props.bulkActions}
       </Flex.Item>
     </Flex>

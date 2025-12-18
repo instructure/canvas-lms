@@ -123,7 +123,6 @@
     "isomorphic-fetch": "2.2.1",
     "js-beautify": "1.14.9",
     "keycode": "^2",
-    "lodash": "^4",
     "mathlive": "^0.77.0",
     "minimatch": "~3.0.4",
     "moment-timezone": "^0.5.45",

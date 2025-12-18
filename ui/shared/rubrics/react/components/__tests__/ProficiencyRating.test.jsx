@@ -93,7 +93,7 @@ describe('ProficiencyRating', () => {
   })
 
   it('clicking mastery checkbox triggers change', async () => {
-    const onMasteryChange = jest.fn()
+    const onMasteryChange = vi.fn()
     const wrapper = renderProficiencyRating({onMasteryChange})
 
     await userEvent.click(wrapper.container.querySelector('input'))
@@ -109,7 +109,7 @@ describe('ProficiencyRating', () => {
   })
 
   it('changing description triggers change', async () => {
-    const onDescriptionChange = jest.fn()
+    const onDescriptionChange = vi.fn()
     const wrapper = renderProficiencyRating({onDescriptionChange})
 
     await userEvent.type(wrapper.container.querySelector('input[value="Stellar"]'), 'c')
@@ -125,7 +125,7 @@ describe('ProficiencyRating', () => {
   })
 
   it('changing points triggers change', async () => {
-    const onPointsChange = jest.fn()
+    const onPointsChange = vi.fn()
     const wrapper = renderProficiencyRating({onPointsChange})
 
     await userEvent.type(wrapper.container.querySelector('input[value="10"]'), 'c')
@@ -134,7 +134,7 @@ describe('ProficiencyRating', () => {
   })
 
   it('clicking delete button triggers delete', async () => {
-    const onDelete = jest.fn()
+    const onDelete = vi.fn()
     const wrapper = renderProficiencyRating({onDelete})
 
     await userEvent.click(wrapper.container.querySelector('.delete button'))
@@ -143,7 +143,7 @@ describe('ProficiencyRating', () => {
   })
 
   it('clicking disabled delete button does not triggers delete', async () => {
-    const onDelete = jest.fn()
+    const onDelete = vi.fn()
     const wrapper = renderProficiencyRating({
       onDelete,
       disableDelete: true,
@@ -155,8 +155,8 @@ describe('ProficiencyRating', () => {
   })
 
   it('calls onBlurChange with correct parameters when description input loses focus', async () => {
-    const onBlurChange = jest.fn()
-    const wrapper = renderProficiencyRating({ onBlurChange })
+    const onBlurChange = vi.fn()
+    const wrapper = renderProficiencyRating({onBlurChange})
 
     const descriptionInput = wrapper.container.querySelector('input[value="Stellar"]')
     fireEvent.blur(descriptionInput)
@@ -164,8 +164,8 @@ describe('ProficiencyRating', () => {
   })
 
   it('calls onBlurChange with correct parameters when points input loses focus', () => {
-    const onBlurChange = jest.fn()
-    const wrapper = renderProficiencyRating({ onBlurChange })
+    const onBlurChange = vi.fn()
+    const wrapper = renderProficiencyRating({onBlurChange})
 
     const pointsInput = wrapper.container.querySelectorAll('input')[2]
     fireEvent.blur(pointsInput)
@@ -174,11 +174,14 @@ describe('ProficiencyRating', () => {
   })
 
   it('shows error message when description input is empty and loses focus', () => {
-    const onBlurChange = jest.fn();
-    const wrapper = renderProficiencyRating({ onBlurChange, descriptionError: 'Description is required' })
+    const onBlurChange = vi.fn()
+    const wrapper = renderProficiencyRating({
+      onBlurChange,
+      descriptionError: 'Description is required',
+    })
 
     const descriptionInput = wrapper.container.querySelector('input[value="Stellar"]')
-    fireEvent.change(descriptionInput, { target: { value: '' } })
+    fireEvent.change(descriptionInput, {target: {value: ''}})
     fireEvent.blur(descriptionInput)
 
     expect(onBlurChange).toHaveBeenCalledWith('', 'description')
@@ -186,14 +189,14 @@ describe('ProficiencyRating', () => {
   })
 
   it('shows error message when points input is empty and loses focus', () => {
-    const onBlurChange = jest.fn();
-    const wrapper = renderProficiencyRating({ onBlurChange, pointsError: 'Invalid points' })
+    const onBlurChange = vi.fn()
+    const wrapper = renderProficiencyRating({onBlurChange, pointsError: 'Invalid points'})
 
     const pointsInput = wrapper.container.querySelector('input[value="10"]')
-    fireEvent.change(pointsInput, { target: { value: '' } })
+    fireEvent.change(pointsInput, {target: {value: ''}})
     fireEvent.blur(pointsInput)
 
     expect(onBlurChange).toHaveBeenCalledWith('', 'points')
     expect(wrapper.container).toHaveTextContent('Invalid points')
-  });
+  })
 })

@@ -98,7 +98,6 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
       <View as="div" margin="medium 0">
         {/* Wrap search input in form with role="search" for accessibility landmark navigation */}
         <form role="search" onSubmit={e => e.preventDefault()}>
-
           <TextInput
             id="issueSearchInput"
             value={searchInput}

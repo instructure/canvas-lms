@@ -18,11 +18,10 @@
 
 import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
-import '@testing-library/jest-dom'
 import NotificationAlert, {AccountNotificationData} from '../NotificationAlert'
 
 describe('NotificationAlert', () => {
-  const mockOnDismiss = jest.fn()
+  const mockOnDismiss = vi.fn()
 
   const baseNotification: AccountNotificationData = {
     id: '1',

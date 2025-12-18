@@ -23,8 +23,8 @@ import {timeEventToString} from '../../../../util/utils'
 import {OBSERVER_ENROLLMENT} from '../../../../util/constants'
 import {mockEnrollment} from '../../../../graphql/Mocks'
 
-jest.mock('../../../../util/utils', () => ({
-  timeEventToString: jest.fn(() => 'Feb 18, 2025 at 12:00pm'),
+vi.mock('../../../../util/utils', () => ({
+  timeEventToString: vi.fn(() => 'Feb 18, 2025 at 12:00pm'),
 }))
 
 describe('UserLastActivity', () => {
@@ -35,7 +35,7 @@ describe('UserLastActivity', () => {
   ]
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders last activity dates for valid enrollments', () => {

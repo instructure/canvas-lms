@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "active_record/connection_handling"
+require_relative "active_record/database_configurations"
 require_relative "active_record/enum"
 require_relative "active_record/polymorphic_associations"
 require_relative "active_record/schema_statements/polymorphic_associations"

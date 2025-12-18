@@ -58,21 +58,19 @@ export default class GraderCountNumberInput extends React.Component {
   }
 
   componentDidMount() {
-    $(document).on("validateGraderCountNumber", (_e, data) => {
-      this.setValidationError(!!data.error);
+    $(document).on('validateGraderCountNumber', (_e, data) => {
+      this.setValidationError(!!data.error)
     })
   }
 
   componentWillUnmount() {
-    $(document).off("validateGraderCountNumber")
+    $(document).off('validateGraderCountNumber')
   }
 
   setValidationError(validationError) {
     this.setState({
       validationError: validationError,
-      messages: validationError
-      ? [{text: '', type: 'error'}]
-      : []
+      messages: validationError ? [{text: '', type: 'error'}] : [],
     })
   }
 
@@ -98,8 +96,7 @@ export default class GraderCountNumberInput extends React.Component {
   }
 
   handleNumberInputChange(value) {
-    if(this.props.hideErrors)
-      this.props.hideErrors('grader_count_errors')
+    if (this.props.hideErrors) this.props.hideErrors('grader_count_errors')
 
     if (value === '') {
       this.setState({graderCount: '', messages: this.generateMessages(value, 'change')})

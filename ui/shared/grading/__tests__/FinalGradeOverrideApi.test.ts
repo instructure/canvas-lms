@@ -22,19 +22,21 @@ import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import * as FinalGradeOverrideApi from '../FinalGradeOverrideApi'
 import type {FinalGradeOverrideMap} from '../grading.d'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
-}))
-
 describe('Gradebook FinalGradeOverrideApi', () => {
   const server = setupServer()
+  let showFlashAlertSpy: ReturnType<typeof vi.spyOn>
 
   beforeAll(() => {
     server.listen()
   })
 
+  beforeEach(() => {
+    showFlashAlertSpy = vi.spyOn(FlashAlert, 'showFlashAlert').mockImplementation(() => {})
+  })
+
   afterEach(() => {
     server.resetHandlers()
+    showFlashAlertSpy.mockRestore()
   })
 
   afterAll(() => {
@@ -115,10 +117,6 @@ describe('Gradebook FinalGradeOverrideApi', () => {
             return HttpResponse.json({error: 'Server Error'}, {status: 500})
           }),
         )
-      })
-
-      afterEach(() => {
-        jest.clearAllMocks()
       })
 
       it('shows a flash alert', async () => {

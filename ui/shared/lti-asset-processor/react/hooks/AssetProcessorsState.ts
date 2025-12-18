@@ -56,7 +56,11 @@ export type AssetProcessorsState = {
     tool,
     data,
     type,
-  }: {tool: LtiLaunchDefinition; data: DeepLinkResponse; type: AssetProcessorType}) => void
+  }: {
+    tool: LtiLaunchDefinition
+    data: DeepLinkResponse
+    type: AssetProcessorType
+  }) => void
   removeAttachedProcessor: (index: number, onRemove?: () => void) => Promise<void>
   setFromExistingAttachedProcessors: (processors: ExistingAttachedAssetProcessor[]) => void
 }
@@ -97,7 +101,10 @@ export type AttachedAssetProcessor = {
 function newAttachedAssetProcessor({
   tool,
   contentItem,
-}: {tool: LtiLaunchDefinition; contentItem: AssetProcessorContentItem}): AttachedAssetProcessor {
+}: {
+  tool: LtiLaunchDefinition
+  contentItem: AssetProcessorContentItem
+}): AttachedAssetProcessor {
   const placement = placementData(tool, placementForContentItemType(contentItem))
   return {
     toolId: tool.definition_id,

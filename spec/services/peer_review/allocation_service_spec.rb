@@ -367,6 +367,124 @@ RSpec.describe PeerReview::AllocationService do
         end
       end
 
+      context "when peer_review_across_sections is true" do
+        let(:section1) { course.course_sections.create!(name: "Section 1") }
+        let(:section2) { course.course_sections.create!(name: "Section 2") }
+        let(:assessor2) { user_model }
+        let(:student4) { user_model }
+        let(:student5) { user_model }
+        let(:section_assignment) do
+          assignment_model(
+            course:,
+            title: "Section Peer Review Assignment",
+            peer_reviews: true,
+            peer_review_count: 2,
+            peer_review_across_sections: true,
+            automatic_peer_reviews: false,
+            submission_types: "online_text_entry"
+          )
+        end
+
+        before do
+          # Enroll assessor in section1
+          course.enroll_student(assessor2, enrollment_state: :active, section: section1)
+
+          # Enroll students in different sections
+          course.enroll_student(student4, enrollment_state: :active, section: section1)
+          course.enroll_student(student5, enrollment_state: :active, section: section2)
+
+          section_assignment.submit_homework(assessor2, body: "Assessor submission")
+          section_assignment.submit_homework(student4, body: "Student4 submission")
+          section_assignment.submit_homework(student5, body: "Student5 submission")
+        end
+
+        it "allocates peer reviews from any section" do
+          service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+          result = service2.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(2)
+          expect(result[:assessment_requests].map(&:user_id)).to match_array([student4.id, student5.id])
+        end
+      end
+
+      context "when peer_review_across_sections is false" do
+        let(:section1) { course.course_sections.create!(name: "Section 1") }
+        let(:section2) { course.course_sections.create!(name: "Section 2") }
+        let(:assessor2) { user_model }
+        let(:student4) { user_model }
+        let(:student5) { user_model }
+        let(:student6) { user_model }
+        let(:section_assignment) do
+          assignment_model(
+            course:,
+            title: "Section Peer Review Assignment",
+            peer_reviews: true,
+            peer_review_count: 2,
+            peer_review_across_sections: false,
+            automatic_peer_reviews: false,
+            submission_types: "online_text_entry"
+          )
+        end
+
+        before do
+          # Section 2
+          course.enroll_student(student6, enrollment_state: :active, section: section2)
+          section_assignment.submit_homework(student6, body: "Student6 submission")
+
+          # Section 1
+          course.enroll_student(assessor2, enrollment_state: :active, section: section1)
+          course.enroll_student(student4, enrollment_state: :active, section: section1)
+          course.enroll_student(student5, enrollment_state: :active, section: section1)
+          section_assignment.submit_homework(assessor2, body: "Assessor submission")
+          section_assignment.submit_homework(student4, body: "Student4 submission")
+          section_assignment.submit_homework(student5, body: "Student5 submission")
+        end
+
+        it "only allocates peer reviews from the same section" do
+          service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+          result = service2.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(2)
+          expect(result[:assessment_requests].map(&:user_id)).to match_array([student4.id, student5.id])
+        end
+
+        it "does not allocate reviews from different sections" do
+          service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+          result = service2.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].map(&:user_id)).not_to include(student6.id)
+        end
+
+        context "when there are insufficient submissions in the same section" do
+          before do
+            section_assignment.submissions.find_by(user: student5).destroy!
+          end
+
+          it "only allocates what is available in the same section" do
+            service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+            result = service2.allocate
+            expect(result[:success]).to be true
+            expect(result[:assessment_requests].size).to eq(1)
+            expect(result[:assessment_requests].first.user_id).to eq(student4.id)
+          end
+        end
+
+        context "when assessor is in multiple sections" do
+          before do
+            course.enroll_student(assessor2, enrollment_state: :active, section: section2, allow_multiple_enrollments: true)
+          end
+
+          it "allocates from all sections the assessor is enrolled in" do
+            service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+            result = service2.allocate
+            expect(result[:success]).to be true
+            expect(result[:assessment_requests].size).to eq(2)
+            # Should be able to allocate from both sections now
+            expect(result[:assessment_requests].map(&:user_id)).to match_array([student6.id, student4.id])
+          end
+        end
+      end
+
       context "when prioritizing must_review submissions" do
         before do
           # Create allocation rules for student1 and student2
@@ -640,6 +758,202 @@ RSpec.describe PeerReview::AllocationService do
         expect(result.map(&:id).uniq.size).to eq(result.size)
       end
     end
+
+    context "when recycling submissions that have all been reviewed" do
+      let(:student4) { user_model }
+      let(:student5) { user_model }
+
+      before do
+        course.enroll_student(student4, enrollment_state: :active)
+        course.enroll_student(student5, enrollment_state: :active)
+
+        assignment.submit_homework(assessor, body: "Assessor submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission1.update!(submitted_at: 5.days.ago)
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission2.update!(submitted_at: 4.days.ago)
+        @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
+        @submission3.update!(submitted_at: 3.days.ago)
+
+        # All submissions have been reviewed at least once
+        # submission1: 1 review
+        assignment.assign_peer_review(student4, student1)
+
+        # submission2: 2 reviews
+        assignment.assign_peer_review(student4, student2)
+        assignment.assign_peer_review(student5, student2)
+
+        # submission3: 3 reviews
+        assignment.assign_peer_review(student4, student3)
+        assignment.assign_peer_review(student5, student3)
+        assignment.assign_peer_review(student1, student3)
+      end
+
+      it "properly recycles by prioritizing fewest reviews first" do
+        available = [@submission1, @submission2, @submission3]
+        result = service.send(:select_submissions_to_allocate, available, 2)
+
+        expect(result.map(&:id)).to eq([@submission1.id, @submission2.id])
+      end
+
+      it "uses submitted_at to break ties when review counts are equal" do
+        # Give submission1 and submission2 the same review count
+        assignment.assign_peer_review(student5, student1)
+
+        available = [@submission1, @submission2, @submission3]
+        result = service.send(:select_submissions_to_allocate, available, 2)
+
+        expect(result.map(&:id)).to eq([@submission1.id, @submission2.id])
+      end
+
+      it "handles submissions with identical review counts and submitted_at consistently" do
+        time = 5.days.ago
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission1.update!(submitted_at: time)
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission2.update!(submitted_at: time)
+        available = [@submission1, @submission2]
+        result = service.send(:select_submissions_to_allocate, available, 1)
+        # Should return consistently (e.g., by submission.id)
+        expect(result.size).to eq(1)
+      end
+    end
+
+    context "when must_not_review rules exist" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: true,
+          review_permitted: false,
+          applies_to_assessor: true
+        )
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student3,
+          must_review: true,
+          review_permitted: false,
+          applies_to_assessor: false
+        )
+      end
+
+      it "excludes submissions with must_not_review rules" do
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:user_id)).not_to include(student2.id)
+        expect(available.map(&:user_id)).to include(student1.id)
+      end
+
+      it "does not allocate submissions with must_not_review rules" do
+        result = service.allocate
+        expect(result[:success]).to be true
+        expect(result[:assessment_requests].map(&:user_id)).not_to include(student2.id, student3.id)
+        expect(result[:assessment_requests].map(&:user_id)).to include(student1.id)
+      end
+    end
+
+    context "when mixing must_review and must_not_review rules" do
+      before do
+        assignment.update!(peer_review_count: 3)
+        assignment.submit_homework(assessor, body: "My submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission1.update!(submitted_at: 3.days.ago)
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission2.update!(submitted_at: 2.days.ago)
+        @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
+        @submission3.update!(submitted_at: 1.day.ago)
+
+        student4 = student_in_course(active_all: true).user
+        @submission4 = assignment.submit_homework(student4, body: "Student4 submission")
+        @submission4.update!(submitted_at: 4.days.ago)
+
+        # Must review student1
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student1,
+          must_review: true,
+          review_permitted: true
+        )
+
+        # Must not review student2
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: true,
+          review_permitted: false
+        )
+      end
+
+      it "prioritizes must_review submissions and excludes must_not_review submissions" do
+        result = service.allocate
+        expect(result[:success]).to be true
+        expect(result[:assessment_requests].size).to eq(3)
+
+        allocated_user_ids = result[:assessment_requests].map(&:user_id)
+
+        expect(allocated_user_ids).to include(student1.id)
+        expect(allocated_user_ids).not_to include(student2.id)
+        expect(allocated_user_ids).to include(student3.id)
+      end
+
+      it "filters out must_not_review in preload and prioritizes must_review in selection" do
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:user_id)).not_to include(student2.id)
+        expect(available.map(&:user_id)).to include(student1.id, student3.id)
+
+        result = service.send(:select_submissions_to_allocate, available, 3)
+        expect(result.first.user_id).to eq(student1.id)
+        expect(result.map(&:user_id)).not_to include(student2.id)
+      end
+    end
+
+    context "when all available submissions have must_not_review rules" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student1,
+          must_review: true,
+          review_permitted: false,
+          applies_to_assessor: true
+        )
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: true,
+          review_permitted: false,
+          applies_to_assessor: false
+        )
+      end
+
+      it "returns error when no submissions are available" do
+        result = service.allocate
+        expect(result[:success]).to be false
+        expect(result[:error_code]).to eq(:no_submissions_available)
+        expect(result[:message]).to include("no peer reviews available")
+      end
+    end
   end
 
   describe "#success_result" do
@@ -665,6 +979,169 @@ RSpec.describe PeerReview::AllocationService do
     it "defaults status to bad_request" do
       result = service.send(:error_result, :test_error, "Test message")
       expect(result[:status]).to eq(:bad_request)
+    end
+  end
+
+  describe "#preload_available_submissions" do
+    context "when peer_review_across_sections is true" do
+      let(:section1) { course.course_sections.create!(name: "Section 1") }
+      let(:section2) { course.course_sections.create!(name: "Section 2") }
+      let(:assessor2) { user_model }
+      let(:student4) { user_model }
+      let(:student5) { user_model }
+      let(:section_assignment) do
+        assignment_model(
+          course:,
+          title: "Section Peer Review Assignment",
+          peer_reviews: true,
+          peer_review_count: 2,
+          peer_review_across_sections: true,
+          automatic_peer_reviews: false,
+          submission_types: "online_text_entry"
+        )
+      end
+
+      before do
+        course.enroll_student(assessor2, enrollment_state: :active, section: section1)
+        course.enroll_student(student4, enrollment_state: :active, section: section1)
+        course.enroll_student(student5, enrollment_state: :active, section: section2)
+
+        section_assignment.submit_homework(assessor2, body: "Assessor submission")
+        section_assignment.submit_homework(student4, body: "Student4 submission")
+        section_assignment.submit_homework(student5, body: "Student5 submission")
+      end
+
+      it "includes submissions from all sections" do
+        service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+        available = service2.send(:preload_available_submissions)
+        expect(available.map(&:user_id)).to match_array([student4.id, student5.id])
+      end
+    end
+
+    context "when peer_review_across_sections is false" do
+      let(:section1) { course.course_sections.create!(name: "Section 1") }
+      let(:section2) { course.course_sections.create!(name: "Section 2") }
+      let(:assessor2) { user_model }
+      let(:student4) { user_model }
+      let(:student5) { user_model }
+      let(:student6) { user_model }
+      let(:section_assignment) do
+        assignment_model(
+          course:,
+          title: "Section Peer Review Assignment",
+          peer_reviews: true,
+          peer_review_count: 2,
+          peer_review_across_sections: false,
+          automatic_peer_reviews: false,
+          submission_types: "online_text_entry"
+        )
+      end
+
+      before do
+        course.enroll_student(assessor2, enrollment_state: :active, section: section1)
+        course.enroll_student(student4, enrollment_state: :active, section: section1)
+
+        course.enroll_student(student5, enrollment_state: :active, section: section2)
+        course.enroll_student(student6, enrollment_state: :active, section: section2)
+
+        section_assignment.submit_homework(assessor2, body: "Assessor submission")
+        section_assignment.submit_homework(student4, body: "Student4 submission")
+        section_assignment.submit_homework(student5, body: "Student5 submission")
+        section_assignment.submit_homework(student6, body: "Student6 submission")
+      end
+
+      it "only includes submissions from the same section as assessor" do
+        service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+        available = service2.send(:preload_available_submissions)
+        expect(available.map(&:user_id)).to eq([student4.id])
+      end
+
+      it "excludes submissions from different sections" do
+        service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+        available = service2.send(:preload_available_submissions)
+        expect(available.map(&:user_id)).not_to include(student5.id, student6.id)
+      end
+
+      context "when assessor is in multiple sections" do
+        before do
+          course.enroll_student(assessor2, enrollment_state: :active, section: section2, allow_multiple_enrollments: true)
+        end
+
+        it "includes submissions from all assessor's sections" do
+          service2 = described_class.new(assignment: section_assignment, assessor: assessor2)
+          available = service2.send(:preload_available_submissions)
+          expect(available.map(&:user_id)).to match_array([student4.id, student5.id, student6.id])
+        end
+      end
+    end
+
+    context "when filtering submissions by actual work submitted" do
+      before do
+        assignment.submit_homework(assessor, body: "Assessor submission")
+      end
+
+      it "includes submitted submissions with actual work" do
+        submission = assignment.submit_homework(student1, body: "Student1 submission")
+        submission.update!(workflow_state: "submitted")
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).to include(submission.id)
+      end
+
+      it "includes pending_review submissions with actual work" do
+        submission = assignment.submit_homework(student1, body: "Student1 submission")
+        submission.update!(workflow_state: "pending_review")
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).to include(submission.id)
+      end
+
+      it "includes graded submissions with actual work" do
+        submission = assignment.submit_homework(student1, body: "Student1 submission")
+        assignment.grade_student(student1, grader: course.teachers.first, score: 10)
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).to include(submission.id)
+      end
+
+      it "excludes graded submissions without actual submission_type" do
+        submission = assignment.submissions.find_by(user: student1)
+        submission.update!(workflow_state: "graded", score: 10, submission_type: nil)
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).not_to include(submission.id)
+      end
+
+      it "excludes deleted submissions" do
+        submission = assignment.submit_homework(student1, body: "Student1 submission")
+        submission.update!(workflow_state: "deleted")
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).not_to include(submission.id)
+      end
+
+      it "excludes unsubmitted submissions without submission_type" do
+        submission = assignment.submissions.find_by(user: student1)
+        submission.update!(workflow_state: "unsubmitted", submission_type: nil)
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).not_to include(submission.id)
+      end
+
+      it "excludes the assessor's own submission" do
+        assessor_submission = assignment.submissions.find_by(user: assessor)
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).not_to include(assessor_submission.id)
+      end
+
+      it "excludes submissions already assigned to the assessor" do
+        submission = assignment.submit_homework(student1, body: "Student1 submission")
+        assignment.assign_peer_review(assessor, student1)
+
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:id)).not_to include(submission.id)
+      end
     end
   end
 end

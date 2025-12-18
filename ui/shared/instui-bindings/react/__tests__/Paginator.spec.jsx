@@ -24,7 +24,7 @@ import Paginator from '../Paginator'
 const makeProps = (props = {}) =>
   merge(
     {
-      loadPage: jest.fn(),
+      loadPage: vi.fn(),
       page: 0,
       pageCount: 0,
     },

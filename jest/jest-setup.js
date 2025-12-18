@@ -24,6 +24,13 @@ import rceFormatMessage from '@instructure/canvas-rce/es/format-message'
 import filterUselessConsoleMessages from '@instructure/filter-console-messages'
 import CoreTranslations from '../public/javascripts/translations/en.json'
 import {up as installNodeDecorations} from '../ui/boot/initializers/installNodeDecorations'
+import {mocked} from '@canvas/test-utils/mocked'
+
+// Make mocked() available globally for safe mock casting
+// This is equivalent to jest.mocked() but works in both Jest and Vitest
+// Usage: mocked(myFunction).mockReturnValue('value')
+// Instead of: (myFunction as jest.Mock).mockReturnValue('value')
+global.mocked = mocked
 
 if (process.env.LOG_PLAYGROUND_URL_ON_FAILURE) {
   process.env.RTL_SKIP_AUTO_CLEANUP = 'true'

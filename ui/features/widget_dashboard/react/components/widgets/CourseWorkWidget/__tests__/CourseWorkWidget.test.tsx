@@ -375,7 +375,7 @@ describe('CourseWorkWidget', () => {
   })
 
   it('handles error state', async () => {
-    jest.spyOn(console, 'error').mockImplementation()
+    vi.spyOn(console, 'error').mockImplementation(() => {})
 
     server.use(
       http.post('/api/graphql', async ({request}) => {

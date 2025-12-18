@@ -31,12 +31,12 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {waitFor} from '@testing-library/react'
 
-jest.mock('@canvas/progress/resolve_progress')
+vi.mock('@canvas/progress/resolve_progress')
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(() => vi.fn(() => {})),
 }))
 
 describe('useOutcomesImport', () => {
@@ -48,7 +48,7 @@ describe('useOutcomesImport', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const wrapper = ({
@@ -100,7 +100,7 @@ describe('useOutcomesImport', () => {
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_FAILED})
     })
 
@@ -114,7 +114,7 @@ describe('useOutcomesImport', () => {
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(resolveProgress).toHaveBeenCalled()
       expect(resolveProgress).toHaveBeenCalledWith(
         {
@@ -138,7 +138,7 @@ describe('useOutcomesImport', () => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
       })
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_PENDING})
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_COMPLETED})
     })
 
@@ -163,7 +163,7 @@ describe('useOutcomesImport', () => {
 
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_PENDING})
 
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
 
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while importing this outcome.',
@@ -186,7 +186,7 @@ describe('useOutcomesImport', () => {
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while importing this outcome: Network error.',
         type: 'error',
@@ -203,7 +203,7 @@ describe('useOutcomesImport', () => {
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while importing this outcome.',
         type: 'error',
@@ -220,7 +220,7 @@ describe('useOutcomesImport', () => {
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_COMPLETED})
       act(() => {
         result.current.clearOutcomesStatus()
@@ -243,7 +243,7 @@ describe('useOutcomesImport', () => {
           sourceContextType: 'Account',
         })
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_COMPLETED})
     })
 
@@ -261,7 +261,7 @@ describe('useOutcomesImport', () => {
           targetGroupId: 123,
         })
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_COMPLETED})
     })
   })

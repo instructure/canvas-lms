@@ -21,6 +21,16 @@ import kalturaAnalytics from '../kalturaAnalytics'
 import mejs from '@canvas/mediaelement'
 import 'jquery.cookie'
 
+// Mock jQuery cookie plugin
+$.cookie = vi.fn((name, value, options) => {
+  if (value === null || value === undefined) {
+    // getter
+    return undefined
+  }
+  // setter
+  return undefined
+})
+
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toEqual(y)
 
@@ -45,7 +55,7 @@ describe('kaltura analytics helper', () => {
   })
 
   test('adds event listeners', function () {
-    player.addEventListener = jest.fn()
+    player.addEventListener = vi.fn()
     kalturaAnalytics('1', player, pluginSettings)
     expect(player.addEventListener).toHaveBeenCalledTimes(6)
   })
@@ -61,7 +71,7 @@ describe('kaltura analytics helper', () => {
 
   test('queue new analytics call', function () {
     const ka = kalturaAnalytics('1', player, pluginSettings)
-    const pinger = jest.fn()
+    const pinger = vi.fn()
     ka.iframes[0].pinger = pinger
     ka.queueAnalyticEvent('oioi')
     if (window.location.protocol === 'http:') {

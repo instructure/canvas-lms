@@ -24,7 +24,7 @@ import useCoursePeopleContext from '../../../hooks/useCoursePeopleContext'
 import type {CoursePeopleContextType} from '../../../../types'
 import {mockEnrollment} from '../../../../graphql/Mocks'
 
-jest.mock('../../../hooks/useCoursePeopleContext')
+vi.mock('../../../hooks/useCoursePeopleContext')
 
 const defaultProps: UserMenuProps = {
   uid: '1',
@@ -34,14 +34,14 @@ const defaultProps: UserMenuProps = {
   canRemoveUsers: true,
   customLinks: [],
   enrollments: [mockEnrollment()],
-  onResendInvitation: jest.fn(),
-  onLinkStudents: jest.fn(),
-  onEditSections: jest.fn(),
-  onEditRoles: jest.fn(),
-  onReactivateUser: jest.fn(),
-  onDeactivateUser: jest.fn(),
-  onRemoveUser: jest.fn(),
-  onCustomLinkSelect: jest.fn(),
+  onResendInvitation: vi.fn(),
+  onLinkStudents: vi.fn(),
+  onEditSections: vi.fn(),
+  onEditRoles: vi.fn(),
+  onReactivateUser: vi.fn(),
+  onDeactivateUser: vi.fn(),
+  onRemoveUser: vi.fn(),
+  onCustomLinkSelect: vi.fn(),
 }
 
 const defaultContext: Partial<CoursePeopleContextType> = {
@@ -72,11 +72,11 @@ const renderUserMenu = (props: Partial<UserMenuProps> = {}) => {
 
 describe('UserMenu', () => {
   beforeEach(() => {
-    ;(useCoursePeopleContext as jest.Mock).mockReturnValue(defaultContext)
+    ;(useCoursePeopleContext as any).mockReturnValue(defaultContext)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders menu', () => {
@@ -128,7 +128,7 @@ describe('UserMenu', () => {
     })
 
     it('shows resend invitation based on active granular enrollment permissions', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContext,
         activeGranularEnrollmentPermissions: ['TeacherEnrollment'],
       })
@@ -153,7 +153,7 @@ describe('UserMenu', () => {
     })
 
     it('hides edit roles and link students when course is concluded', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContext,
         courseConcluded: true,
       })

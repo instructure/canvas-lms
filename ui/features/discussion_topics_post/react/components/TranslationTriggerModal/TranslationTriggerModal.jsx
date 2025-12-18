@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'

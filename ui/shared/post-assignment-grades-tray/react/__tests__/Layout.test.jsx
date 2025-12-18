@@ -76,7 +76,6 @@ describe('PostAssignmentGradesTray Layout', () => {
   }
 
   function mountComponent(props = {}) {
-     
     ReactDOM.render(<Layout {...layoutProps(props)} />, $container)
   }
 

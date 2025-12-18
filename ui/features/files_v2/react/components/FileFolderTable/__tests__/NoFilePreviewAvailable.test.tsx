@@ -19,7 +19,6 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {file} from './fixtures'
-import '@testing-library/jest-dom'
 import NoFilePreviewAvailable from '../NoFilePreviewAvailable'
 
 describe('NoFilePreviewAvailable', () => {

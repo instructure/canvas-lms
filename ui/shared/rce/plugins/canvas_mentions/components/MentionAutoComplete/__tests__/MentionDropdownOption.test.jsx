@@ -54,7 +54,7 @@ describe('MentionDropdownOption tests', () => {
   })
 
   it('should call onSelect when selected', () => {
-    const selectSpy = jest.fn()
+    const selectSpy = vi.fn()
     const {container} = setup({onSelect: selectSpy})
     fireEvent.click(container.querySelector('li'))
     expect(selectSpy.mock.calls).toHaveLength(1)

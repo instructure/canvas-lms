@@ -85,7 +85,7 @@ describe('MoveModal utils', () => {
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
 
     it('sends move requests for all selected items', async () => {
@@ -127,7 +127,7 @@ describe('MoveModal utils', () => {
     })
 
     it('handles 409 conflict (name collision) for files', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
       fetchMock.put(`/api/v1/files/181`, {
         status: 409,
@@ -144,7 +144,7 @@ describe('MoveModal utils', () => {
           expandZip: false,
         },
       ]
-      const resolveCollisions = jest.fn()
+      const resolveCollisions = vi.fn()
       await sendMoveRequests(selectedFolder, resolveCollisions, selectedItems)
       expect(resolveCollisions).toHaveBeenCalledWith(
         expect.arrayContaining([

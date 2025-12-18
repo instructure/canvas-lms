@@ -93,7 +93,7 @@ describe('Form', () => {
 
   describe('calls onClearError when the form value changes', () => {
     it('for FormType.TextInput', async () => {
-      const onClearError = jest.fn()
+      const onClearError = vi.fn()
       const mockIssue = createMockIssue(FormType.TextInput, 'initial-value')
       const ref = React.createRef<FormHandle>()
 
@@ -104,7 +104,7 @@ describe('Form', () => {
     })
 
     it('for FormType.RadioInputGroup', async () => {
-      const onClearError = jest.fn()
+      const onClearError = vi.fn()
       const mockIssue = createMockIssue(FormType.RadioInputGroup, 'selected-option')
       const ref = React.createRef<FormHandle>()
 
@@ -117,7 +117,7 @@ describe('Form', () => {
     })
 
     it('for FormType.ColorPicker', async () => {
-      const onClearError = jest.fn()
+      const onClearError = vi.fn()
       const mockIssue = createMockIssue(FormType.ColorPicker, '#ff0000')
       const ref = React.createRef<FormHandle>()
 
@@ -131,7 +131,7 @@ describe('Form', () => {
     })
 
     it('for FormType.CheckboxTextInput', async () => {
-      const onClearError = jest.fn()
+      const onClearError = vi.fn()
       const mockIssue = createMockIssue(FormType.CheckboxTextInput, 'checkbox-text-value')
       const ref = React.createRef<FormHandle>()
 

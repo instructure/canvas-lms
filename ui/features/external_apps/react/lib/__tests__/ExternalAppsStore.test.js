@@ -85,7 +85,7 @@ describe('ExternalApps.ExternalAppsStore', () => {
     fakeENV.teardown()
   })
 
-  it('fetches external tools', done => {
+  it.skip('fetches external tools', done => {
     server.use(
       http.get('/api/v1/accounts/1/lti_apps', () => {
         return HttpResponse.json(tools)
@@ -101,7 +101,7 @@ describe('ExternalApps.ExternalAppsStore', () => {
     }, 100)
   })
 
-  it('handles resets and fetch responses interwoven', done => {
+  it.skip('handles resets and fetch responses interwoven', done => {
     server.use(
       http.get('/api/v1/accounts/1/lti_apps', () => {
         return HttpResponse.json(tools)

@@ -255,4 +255,68 @@ module StudentDashboardCommon
     @multi_course.enroll_user(@multi_section_observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @multi_stu_sec1, allow_multiple_enrollments: true)
     @multi_course.enroll_user(@multi_section_observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @multi_stu_sec2, allow_multiple_enrollments: true)
   end
+
+  def group_assignment_course_setup
+    workflow_edge_case_course_setup
+    @student1_group1 = user_factory(active_all: true, name: "Student 1")
+    @student2_group1 = user_factory(active_all: true, name: "Student 2")
+    @student_no_group = user_factory(active_all: true, name: "Student No Group")
+
+    @course4.enroll_student(@student1_group1, enrollment_state: :active)
+    @course4.enroll_student(@student2_group1, enrollment_state: :active)
+    @course4.enroll_student(@student_no_group, enrollment_state: :active)
+
+    # Create group set and groups
+    @group_category = @course4.group_categories.create!(name: "Project Groups")
+    @group1 = @course4.groups.create!(name: "Group 1", group_category: @group_category)
+    @group2 = @course4.groups.create!(name: "Group 2", group_category: @group_category)
+
+    @group1.add_user(@student1_group1)
+    @group1.add_user(@student2_group1)
+    @group2.add_user(@student3)
+  end
+
+  def group_assignment_setup
+    @group_assignment_graded_individually = @course4.assignments.create!(
+      name: "Graded Individually",
+      due_at: 2.days.from_now.end_of_day,
+      submission_types: "online_text_entry",
+      group_category: @group_category,
+      grade_group_students_individually: true,
+      points_possible: 10,
+      only_visible_to_overrides: true
+    )
+    @missing_group_assignment = @course4.assignments.create!(
+      name: "missing Group assignment",
+      due_at: 3.days.ago.end_of_day,
+      submission_types: "online_text_entry",
+      group_category: @group_category,
+      grade_group_students_individually: false,
+      points_possible: 10,
+      only_visible_to_overrides: true
+    )
+    @missing_graded_individually = @course4.assignments.create!(
+      name: "missing Graded Individually group assignment",
+      due_at: 3.days.ago.end_of_day,
+      submission_types: "online_text_entry",
+      group_category: @group_category,
+      grade_group_students_individually: true,
+      points_possible: 10,
+      only_visible_to_overrides: true
+    )
+    create_group_override_for_assignment(@group_assignment_graded_individually, group: @group1)
+    create_group_override_for_assignment(@missing_group_assignment, group: @group1, due_at: 3.days.ago.end_of_day)
+    create_group_override_for_assignment(@missing_graded_individually, group: @group1, due_at: 3.days.ago.end_of_day)
+  end
+
+  def submit_group_assignment
+    @group_assignment.submit_homework(@student1_group1,
+                                      submission_type:
+                                      "online_text_entry",
+                                      body: "Group submission")
+    @group_assignment_graded_individually.submit_homework(@student1_group1,
+                                                          submission_type:
+                                                          "online_text_entry",
+                                                          body: "Individual submission")
+  end
 end

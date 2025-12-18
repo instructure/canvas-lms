@@ -23,15 +23,14 @@ import {MediaBlockToolbar} from '../MediaBlockToolbar'
 
 let props: Partial<MediaBlockProps>
 
-const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
+const mockSetProp = vi.fn((callback: (props: Record<string, any>) => void) => {
   callback(props)
 })
 
-jest.mock('@craftjs/core', () => {
-  const module = jest.requireActual('@craftjs/core')
+vi.mock('@craftjs/core', async () => {
   return {
-    ...module,
-    useNode: jest.fn(_node => {
+    ...await vi.importActual('@craftjs/core'),
+    useNode: vi.fn(_node => {
       return {
         props,
         actions: {setProp: mockSetProp},

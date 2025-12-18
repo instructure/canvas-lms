@@ -37,13 +37,13 @@ describe('WikiPageRevision', () => {
 
   beforeEach(() => {
     fakeENV.setup()
-    jest.clearAllMocks()
-    jest.resetModules()
+    vi.clearAllMocks()
+    vi.resetModules()
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     server.resetHandlers()
   })
 
@@ -184,7 +184,7 @@ describe('WikiPageRevision', () => {
           contextAssetString: 'course_73',
         },
       )
-      jest.useFakeTimers()
+      vi.useFakeTimers()
 
       server.use(
         http.get('*/api/v1/courses/73/pages/page-url/revisions', () => {
@@ -192,17 +192,17 @@ describe('WikiPageRevision', () => {
         }),
       )
 
-      const fetchSpy = jest.spyOn(revision, 'fetch')
+      const fetchSpy = vi.spyOn(revision, 'fetch')
 
       revision.pollForChanges(5000)
       revision.pollForChanges(5000)
-      jest.advanceTimersByTime(4000)
+      vi.advanceTimersByTime(4000)
       expect(fetchSpy).not.toHaveBeenCalled()
-      jest.advanceTimersByTime(2000)
+      vi.advanceTimersByTime(2000)
       expect(fetchSpy).toHaveBeenCalledTimes(1)
 
       fetchSpy.mockRestore()
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
   })
 })

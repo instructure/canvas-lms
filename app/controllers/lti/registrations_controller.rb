@@ -136,6 +136,65 @@
 #       }
 #     }
 #
+# @model Lti::RegistrationAccountBinding
+#     {
+#       "id": "Lti::RegistrationAccountBinding",
+#       "description": "A binding between an LTI registration and an account, defining the registration's availability in that account",
+#       "properties": {
+#         "id": {
+#           "description": "the Canvas ID of the Lti::RegistrationAccountBinding object",
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "account_id": {
+#           "description": "The Canvas id of the account",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "root_account_id": {
+#           "description": "The Canvas id of the root account",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "registration_id": {
+#           "description": "The Canvas id of the Lti::Registration",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "The state of the binding (on, off, allow, deleted)",
+#           "example": "on",
+#           "type": "string",
+#           "enum": [
+#             "on",
+#             "off",
+#             "allow",
+#             "deleted"
+#           ]
+#         },
+#         "created_at": {
+#           "description": "Timestamp of the binding's creation",
+#           "example": "2024-01-01T00:00:00Z",
+#           "type": "string"
+#         },
+#         "updated_at": {
+#           "description": "Timestamp of the binding's last update",
+#           "example": "2024-01-01T00:00:00Z",
+#           "type": "string"
+#         },
+#         "created_by": {
+#           "description": "The user that created this binding",
+#           "example": { "type": "User" },
+#           "$ref": "User"
+#         },
+#         "updated_by": {
+#           "description": "The user that last updated this binding",
+#           "example": { "type": "User" },
+#           "$ref": "User"
+#         }
+#       }
+#     }
+#
 # @model Lti::LegacyConfiguration
 #     {
 #       "id": "Lti::LegacyConfiguration",
@@ -1073,6 +1132,15 @@ class Lti::RegistrationsController < ApplicationController
              })
     end
 
+    if @account.root_account.feature_enabled?(:lti_asset_processor_tii_migration)
+      turnitin_devkey_id = Setting.get("turnitin_asset_processor_client_id", "")
+      if turnitin_devkey_id.present?
+        js_env({
+                 turnitinAPClientId: turnitin_devkey_id
+               })
+      end
+    end
+
     # Inject feature flags for LTI registrations
     js_env({
              LTI_REGISTRATIONS_HISTORY: @account.root_account.feature_enabled?(:lti_registrations_history),
@@ -1720,7 +1788,6 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @argument id [Integer] The id of the registration.
   # @argument update_request_id [Integer] The id of the registration update request to retrieve.
-  # @argument include [String] Array of additional information to include ["configuration", "lti_registration"]
   # @returns Lti::RegistrationUpdateRequest
   #
   # @example_request
@@ -1738,14 +1805,11 @@ class Lti::RegistrationsController < ApplicationController
       return render json: { errors: "registration does not belong to account" }, status: :bad_request
     end
 
-    includes = Array(params[:include]).map(&:to_sym) & [:configuration, :lti_registration]
-
     render json: lti_registration_update_request_json(
       registration_update_request,
       @current_user,
       session,
-      @context,
-      includes:
+      @context
     )
   end
 

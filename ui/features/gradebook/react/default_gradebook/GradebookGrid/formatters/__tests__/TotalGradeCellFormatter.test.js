@@ -18,6 +18,7 @@
 
 import {createGradebook, setFixtureHtml} from '../../../__tests__/GradebookSpecHelper'
 import TotalGradeCellFormatter from '../TotalGradeCellFormatter'
+import I18nStubber from '@canvas/test-utils/I18nStubber'
 
 describe('GradebookGrid TotalGradeCellFormatter', () => {
   let fixture
@@ -42,18 +43,19 @@ describe('GradebookGrid TotalGradeCellFormatter', () => {
       show_total_grade_as_points: true,
     })
 
-    jest.spyOn(gradebook, 'getTotalPointsPossible').mockReturnValue(10)
-    jest.spyOn(gradebook, 'listInvalidAssignmentGroups').mockReturnValue([])
-    jest.spyOn(gradebook, 'listHiddenAssignments').mockReturnValue([])
-    jest.spyOn(gradebook, 'saveSettings')
+    vi.spyOn(gradebook, 'getTotalPointsPossible').mockReturnValue(10)
+    vi.spyOn(gradebook, 'listInvalidAssignmentGroups').mockReturnValue([])
+    vi.spyOn(gradebook, 'listHiddenAssignments').mockReturnValue([])
+    vi.spyOn(gradebook, 'saveSettings')
     formatter = new TotalGradeCellFormatter(gradebook)
 
     grade = {score: 8, possible: 10}
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     fixture.remove()
+    I18nStubber.clear()
   })
 
   const renderCell = () => {
@@ -197,7 +199,7 @@ describe('GradebookGrid TotalGradeCellFormatter', () => {
   })
 
   test('does not render a letter grade when not using a grading standard', () => {
-    jest.spyOn(gradebook, 'getCourseGradingScheme').mockReturnValue(null)
+    vi.spyOn(gradebook, 'getCourseGradingScheme').mockReturnValue(null)
     expect(renderCell().querySelector('.letter-grade-points')).toBeNull()
     gradebook.getCourseGradingScheme.mockRestore()
   })
@@ -210,5 +212,35 @@ describe('GradebookGrid TotalGradeCellFormatter', () => {
   test('does not render a letter grade when the grade has undefined points possible', () => {
     grade.possible = undefined
     expect(renderCell().querySelector('.letter-grade-points')).toBeNull()
+  })
+
+  test('renders letter grade in locales that use commas as decimal separators', () => {
+    // it is necessary to create a new gradebook and formatter
+    gradebook = createGradebook({
+      grading_standard: [
+        ['A', 0.9],
+        ['B', 0.8],
+        ['C', 0.7],
+        ['D', 0.6],
+        ['F', 0.0],
+      ],
+      grading_standard_points_based: true,
+      grading_standard_scaling_factor: 4.0,
+      show_total_grade_as_points: false,
+    })
+
+    formatter = new TotalGradeCellFormatter(gradebook)
+
+    // locale that uses comma as decimal separator
+    I18nStubber.pushFrame()
+    I18nStubber.setLocale('fr_FR')
+    I18nStubber.stub('fr_FR', {
+      'number.format.delimiter': ' ',
+      'number.format.separator': ',',
+    })
+
+    grade = {score: 2.4, possible: 4.0}
+
+    expect(renderCell().querySelector('.letter-grade-points').innerText).toBe('D')
   })
 })

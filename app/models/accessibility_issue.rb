@@ -36,6 +36,7 @@ class AccessibilityIssue < ActiveRecord::Base
   def allow_nil_param_value?
     [
       Accessibility::Rules::ImgAltRule.id,
+      Accessibility::Rules::ImgAltFilenameRule.id,
       Accessibility::Rules::ImgAltLengthRule.id,
     ].include? rule_type
   end

@@ -28,7 +28,9 @@ describe('ResendConfirmation', () => {
   const props: ResendConfirmationProps = {userId: '1', channelId: '2'}
   const RE_SEND_URI = `/confirmations/${props.userId}/re_send/${props.channelId}`
   const LIMIT_REACHED_URI = `/confirmations/${props.userId}/limit_reached/${props.channelId}`
-  const allText = Object.values(componentLabelByConfirmationState).filter(Boolean)
+  const allText = Object.values(componentLabelByConfirmationState).filter((text): text is string =>
+    Boolean(text),
+  )
 
   beforeEach(() => {
     fetchMock.get(LIMIT_REACHED_URI, {confirmation_limit_reached: false})

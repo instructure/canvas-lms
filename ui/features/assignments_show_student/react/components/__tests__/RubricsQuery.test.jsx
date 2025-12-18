@@ -25,8 +25,8 @@ import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {useAllPages} from '@canvas/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/query', () => ({
-  useAllPages: jest.fn(),
+vi.mock('@canvas/query', () => ({
+  useAllPages: vi.fn(),
 }))
 
 async function makeMocks() {
@@ -42,7 +42,6 @@ async function makeMocks() {
     Assignment: {rubric: {}},
     Rubric: {criteria: [{}]},
     Submission: {rubricAssessmentsConnection: []},
-    HtmlEncodedString: () => 'Mocked HTML encoded string',
   }
 
   const result = await mockQuery(RUBRIC_QUERY, overrides, variables)

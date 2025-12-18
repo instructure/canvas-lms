@@ -226,6 +226,19 @@ RSpec.describe PeerReviewSubAssignment do
         )
         expect(new_peer_review_sub).to be_valid
       end
+
+      it "allows deletion even when peer review submissions exist" do
+        AssessmentRequest.create!(
+          user: student,
+          asset: student_submission,
+          assessor_asset: assessor_submission,
+          assessor:,
+          workflow_state: "completed"
+        )
+
+        peer_review_sub_assignment.destroy
+        expect(peer_review_sub_assignment.workflow_state).to eq("deleted")
+      end
     end
   end
 

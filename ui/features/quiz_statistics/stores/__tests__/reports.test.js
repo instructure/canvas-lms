@@ -73,7 +73,7 @@ describe('.load', () => {
   })
 
   it('emits change', async () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
 
     server.use(
       http.get('http://localhost/reports*', () => {

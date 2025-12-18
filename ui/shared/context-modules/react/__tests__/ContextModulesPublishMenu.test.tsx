@@ -19,7 +19,8 @@
 
 import React from 'react'
 import {act, render, waitFor, fireEvent} from '@testing-library/react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {
   updateModulePendingPublishedStates,
   batchUpdateAllModulesApiCall,
@@ -28,41 +29,28 @@ import {
 import {monitorProgress, cancelProgressAction} from '@canvas/progress/ProgressHelpers'
 
 import ContextModulesPublishMenu from '../ContextModulesPublishMenu'
+import {type Mock} from 'vitest'
 
-jest.mock('@canvas/do-fetch-api-effect', () => ({
-  __esModule: true,
-  default: jest.fn(() =>
-    Promise.resolve({
-      response: new Response('', {status: 200}),
-      json: {
-        workflow_state: 'completed',
-        completion: 100,
-      },
-      text: '',
-    }),
-  ),
-}))
+const server = setupServer()
 
-jest.mock('@canvas/progress/ProgressHelpers', () => ({
+vi.mock('@canvas/progress/ProgressHelpers', () => ({
   _esModule: true,
-  monitorProgress: jest.fn(),
-  cancelProgressAction: jest.fn(),
+  monitorProgress: vi.fn(),
+  cancelProgressAction: vi.fn(),
 }))
 
-jest.mock('../../utils/publishAllModulesHelper', () => ({
+vi.mock('../../utils/publishAllModulesHelper', () => ({
   __esModule: true,
-  updateModulePendingPublishedStates: jest.fn(),
-  batchUpdateAllModulesApiCall: jest.fn(),
-  fetchAllItemPublishedStates: jest.fn(),
+  updateModulePendingPublishedStates: vi.fn(),
+  batchUpdateAllModulesApiCall: vi.fn(),
+  fetchAllItemPublishedStates: vi.fn(),
 }))
 
-const mockUpdateModulePendingPublishedStates = updateModulePendingPublishedStates as jest.Mock
-const mockMonitorProgress = monitorProgress as jest.Mock
-const mockBatchUpdateAllModulesApiCall = batchUpdateAllModulesApiCall as jest.Mock
-const mockCancelProgressAction = cancelProgressAction as jest.Mock
-const mockFetchAllItemPublishedStates = fetchAllItemPublishedStates as jest.Mock
-
-const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+const mockUpdateModulePendingPublishedStates = updateModulePendingPublishedStates as Mock
+const mockMonitorProgress = monitorProgress as Mock
+const mockBatchUpdateAllModulesApiCall = batchUpdateAllModulesApiCall as Mock
+const mockCancelProgressAction = cancelProgressAction as Mock
+const mockFetchAllItemPublishedStates = fetchAllItemPublishedStates as Mock
 
 const defaultProps = {
   courseId: '1',
@@ -71,23 +59,23 @@ const defaultProps = {
 }
 
 describe('ContextModulesPublishMenu', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    mockDoFetchApi.mockReset()
+    server.use(
+      http.get('*/progress/:id', () => {
+        return HttpResponse.json({
+          workflow_state: 'completed',
+          completion: 100,
+        })
+      }),
+    )
     mockUpdateModulePendingPublishedStates.mockReset()
     mockMonitorProgress.mockReset()
     mockBatchUpdateAllModulesApiCall.mockReset()
     mockCancelProgressAction.mockReset()
     mockFetchAllItemPublishedStates.mockReset()
-    mockDoFetchApi.mockImplementation(() =>
-      Promise.resolve({
-        response: new Response('', {status: 200}),
-        json: {
-          workflow_state: 'completed',
-          completion: 100,
-        },
-        text: '',
-      }),
-    )
     mockUpdateModulePendingPublishedStates.mockImplementation(() => {})
     mockMonitorProgress.mockImplementation(() => {})
     mockBatchUpdateAllModulesApiCall.mockImplementation(() => Promise.resolve())
@@ -96,7 +84,7 @@ describe('ContextModulesPublishMenu', () => {
   })
 
   afterEach(() => {
-    mockDoFetchApi.mockReset()
+    server.resetHandlers()
     mockUpdateModulePendingPublishedStates.mockReset()
     mockMonitorProgress.mockReset()
     mockBatchUpdateAllModulesApiCall.mockReset()
@@ -120,15 +108,13 @@ describe('ContextModulesPublishMenu', () => {
 
     it('renders a spinner when publish is in-flight', () => {
       // Mock the progress API call
-      ;(doFetchApi as jest.Mock).mockImplementation(() =>
-        Promise.resolve({
-          response: new Response('', {status: 200}),
-          json: {
+      server.use(
+        http.get('*/progress/:id', () => {
+          return HttpResponse.json({
             id: '17',
             workflow_state: 'running',
             completion: 50,
-          },
-          text: '',
+          })
         }),
       )
 
@@ -140,15 +126,13 @@ describe('ContextModulesPublishMenu', () => {
 
     it('updates all the modules when ready', async () => {
       // Mock the progress API call
-      ;(doFetchApi as jest.Mock).mockImplementation(() =>
-        Promise.resolve({
-          response: new Response('', {status: 200}),
-          json: {
+      server.use(
+        http.get('*/progress/:id', () => {
+          return HttpResponse.json({
             id: '17',
             workflow_state: 'completed',
             completion: 100,
-          },
-          text: '',
+          })
         }),
       )
 
@@ -161,12 +145,12 @@ describe('ContextModulesPublishMenu', () => {
     })
 
     describe('progress', () => {
-      let mockMonitorProgress: jest.Mock
-      let mockBatchUpdateAllModulesApiCall: jest.Mock
+      let mockMonitorProgress: Mock
+      let mockBatchUpdateAllModulesApiCall: Mock
 
       beforeEach(() => {
-        mockMonitorProgress = monitorProgress as jest.Mock
-        mockBatchUpdateAllModulesApiCall = batchUpdateAllModulesApiCall as jest.Mock
+        mockMonitorProgress = monitorProgress as Mock
+        mockBatchUpdateAllModulesApiCall = batchUpdateAllModulesApiCall as Mock
         mockBatchUpdateAllModulesApiCall.mockImplementation(() =>
           Promise.resolve({
             json: {

@@ -59,7 +59,7 @@ describe('AssociationsTable component', () => {
 
   test('calls onRemoveAssociations when association remove button is clicked', async () => {
     const props = defaultProps()
-    props.onRemoveAssociations = jest.fn()
+    props.onRemoveAssociations = vi.fn()
     const tree = render(<AssociationsTable {...props} />)
     const button = tree.container.querySelectorAll(
       'tr[data-testid="associations-course-row"] button',
@@ -130,5 +130,77 @@ describe('AssociationsTable component', () => {
     const {getByText} = render(<AssociationsTable {...props} />)
     const pill = getByText('Concluded')
     expect(pill).toBeInTheDocument()
+  })
+
+  test('renders course name as a clickable link with correct href', () => {
+    const props = defaultProps()
+    const {container} = render(<AssociationsTable {...props} />)
+    const firstRow = container.querySelectorAll('tr[data-testid="associations-course-row"]')[0]
+    const link = firstRow.querySelector('a[href^="/courses/"]')
+
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute('href', `/courses/${props.existingAssociations[0].id}`)
+    expect(link).toHaveTextContent(props.existingAssociations[0].name)
+  })
+
+  test('renders course links in all association states', () => {
+    const props = defaultProps()
+    props.addedAssociations = [
+      {
+        id: '99',
+        name: 'Added Course',
+        course_code: 'ADDED101',
+        term: {id: '1', name: 'Term One'},
+        teachers: [{display_name: 'Teacher'}],
+        sis_course_id: '9001',
+      },
+    ]
+    props.removedAssociations = [
+      {
+        id: '88',
+        name: 'Removed Course',
+        course_code: 'REMOVED101',
+        term: {id: '1', name: 'Term One'},
+        teachers: [{display_name: 'Teacher'}],
+        sis_course_id: '8001',
+      },
+    ]
+
+    const {container} = render(<AssociationsTable {...props} />)
+
+    // Check for links to existing associations
+    props.existingAssociations.forEach(course => {
+      const link = container.querySelector(`a[href="/courses/${course.id}"]`)
+      expect(link).toBeInTheDocument()
+    })
+
+    // Check for link to added association
+    const addedLink = container.querySelector(`a[href="/courses/99"]`)
+    expect(addedLink).toBeInTheDocument()
+
+    // Check for link to removed association
+    const removedLink = container.querySelector(`a[href="/courses/88"]`)
+    expect(removedLink).toBeInTheDocument()
+  })
+
+  test('falls back to plain text when course ID is missing', () => {
+    const props = defaultProps()
+    props.existingAssociations = [
+      {
+        id: null,
+        name: 'Course Without ID',
+        course_code: 'TEST101',
+        term: {id: '1', name: 'Term One'},
+        teachers: [{display_name: 'Teacher'}],
+        sis_course_id: '1001',
+      },
+    ]
+
+    const {container} = render(<AssociationsTable {...props} />)
+    const firstCell = container.querySelector('tr[data-testid="associations-course-row"] td')
+    const link = firstCell.querySelector('a[href^="/courses/"]')
+
+    expect(link).not.toBeInTheDocument()
+    expect(firstCell).toHaveTextContent('Course Without ID')
   })
 })

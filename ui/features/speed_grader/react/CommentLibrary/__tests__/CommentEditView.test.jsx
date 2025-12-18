@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {vi} from 'vitest'
 import React from 'react'
 import {fireEvent, render, act} from '@testing-library/react'
 import CommentEditView from '../CommentEditView'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('Comment', () => {
   let onCloseMock, updateCommentMock
@@ -36,12 +37,12 @@ describe('Comment', () => {
   }
 
   beforeEach(() => {
-    updateCommentMock = jest.fn()
-    onCloseMock = jest.fn()
+    updateCommentMock = vi.fn()
+    onCloseMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the comment text', () => {
@@ -92,7 +93,7 @@ describe('Comment', () => {
     fireEvent.click(getByText('Save'))
     expect(getByText('Save').closest('button')).toBeDisabled()
     expect(updateCommentMock).toHaveBeenCalled()
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(onCloseMock).toHaveBeenCalled()
   })
 })

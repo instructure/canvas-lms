@@ -100,7 +100,7 @@ describe('titleConflicts', () => {
   })
 
   describe('checkForTitleConflict', () => {
-    const mockCallback = jest.fn()
+    const mockCallback = vi.fn()
 
     beforeEach(() => {
       fetchMock.reset()
@@ -129,7 +129,7 @@ describe('titleConflicts', () => {
     })
 
     it('calls the callback with [] if the response is not ok', async () => {
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
       const title = 'uh oh'
       const body = JSON.stringify({errors: [{message: 'not found'}]})
       fetchMock.get(generateUrl(title), {status: 404, body})

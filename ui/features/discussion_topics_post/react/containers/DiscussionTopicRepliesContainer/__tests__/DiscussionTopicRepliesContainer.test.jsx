@@ -28,17 +28,18 @@ import {
 import {MockedProvider} from '@apollo/client/testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {UPDATE_DISCUSSION_ENTRIES_READ_STATE} from '../../../../graphql/Mutations'
 
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
+vi.mock('../../../utils', async () => ({
+  ...(await vi.importActual('../../../utils')),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
-jest.mock('../../../utils/constants', () => ({
-  ...jest.requireActual('../../../utils/constants'),
+vi.mock('../../../utils/constants', async () => ({
+  ...(await vi.importActual('../../../utils/constants')),
   AUTO_MARK_AS_READ_DELAY: 0,
 }))
-jest.mock('../../DiscussionThreadContainer/DiscussionThreadContainer', () => ({
+vi.mock('../../DiscussionThreadContainer/DiscussionThreadContainer', () => ({
   __esModule: true,
   DiscussionThreadContainer: ({markAsRead, discussionEntry}) => {
     return (
@@ -54,18 +55,18 @@ jest.mock('../../DiscussionThreadContainer/DiscussionThreadContainer', () => ({
 
 describe('DiscussionTopicRepliesContainer', () => {
   beforeAll(() => {
-    window.ENV = {
+    fakeENV.setup({
       course_id: '1',
       per_page: 20,
-    }
+    })
 
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
   })
@@ -90,7 +91,7 @@ describe('DiscussionTopicRepliesContainer', () => {
     }
   }
 
-  const setup = (props, mocks, {setOnFailure = jest.fn(), setOnSuccess = jest.fn()} = {}) => {
+  const setup = (props, mocks, {setOnFailure = vi.fn(), setOnSuccess = vi.fn()} = {}) => {
     return render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
@@ -126,7 +127,7 @@ describe('DiscussionTopicRepliesContainer', () => {
   })
 
   it('renders an error when UPDATE_DISCUSSION_ENTRIES_READ_STATE encounters an issue', async () => {
-    const setOnFailure = jest.fn()
+    const setOnFailure = vi.fn()
     const props = defaultProps()
     const entry = props.discussionTopic.discussionEntriesConnection.nodes[0]
 
@@ -154,7 +155,7 @@ describe('DiscussionTopicRepliesContainer', () => {
   })
 
   it('does not render error when UPDATE_DISCUSSION_ENTRIES_READ_STATE encounters a network issue', async () => {
-    const setOnFailure = jest.fn()
+    const setOnFailure = vi.fn()
     const props = defaultProps()
     const entry = props.discussionTopic.discussionEntriesConnection.nodes[0]
 

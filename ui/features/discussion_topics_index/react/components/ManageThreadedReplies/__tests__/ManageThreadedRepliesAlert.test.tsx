@@ -18,26 +18,26 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import ManageThreadedRepliesAlert from '../ManageThreadedRepliesAlert'
+import {useManageThreadedRepliesStore} from '../../../hooks/useManageThreadedRepliesStore'
 
 // Mock ENV global variable
 declare const ENV: {AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS?: string}
-jest.mock('../../../hooks/useManageThreadedRepliesStore', () => ({
-  useManageThreadedRepliesStore: jest.fn(),
+vi.mock('../../../hooks/useManageThreadedRepliesStore', () => ({
+  useManageThreadedRepliesStore: vi.fn(),
 }))
 
-const mockUseManageThreadedRepliesStore =
-  require('../../../hooks/useManageThreadedRepliesStore').useManageThreadedRepliesStore
+const mockUseManageThreadedRepliesStore = useManageThreadedRepliesStore as unknown as ReturnType<typeof vi.fn>
 
 describe('ManageThreadedRepliesAlert', () => {
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.clearAllMocks()
   })
 
   it('does not render when AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS is 0', () => {
     ENV.AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS = '0'
     mockUseManageThreadedRepliesStore.mockReturnValue(false)
 
-    render(<ManageThreadedRepliesAlert onOpen={jest.fn()} />)
+    render(<ManageThreadedRepliesAlert onOpen={vi.fn()} />)
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
@@ -47,7 +47,7 @@ describe('ManageThreadedRepliesAlert', () => {
     ENV.AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS = count.toString()
     mockUseManageThreadedRepliesStore.mockReturnValue(true)
 
-    render(<ManageThreadedRepliesAlert onOpen={jest.fn()} />)
+    render(<ManageThreadedRepliesAlert onOpen={vi.fn()} />)
 
     expect(screen.getByText(`${count} ${count > 1 ? 'decisions' : 'decision'}`)).toBeInTheDocument()
     expect(screen.getByTestId('manage-threaded-discussions')).toBeInTheDocument()

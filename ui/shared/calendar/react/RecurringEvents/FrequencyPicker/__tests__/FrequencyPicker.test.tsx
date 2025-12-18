@@ -36,7 +36,7 @@ const defaultProps = (overrides: UnknownSubset<FrequencyPickerProps> = {}) => {
     initialFrequency: 'weekly-day' as FrequencyOptionValue,
     locale: 'en',
     timezone: tz,
-    onChange: jest.fn(),
+    onChange: vi.fn(),
     ...overrides,
   }
 }
@@ -52,7 +52,7 @@ describe('FrequencyPicker', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('renders', () => {
@@ -165,7 +165,7 @@ describe('FrequencyPicker', () => {
       it('the error boundary fallback when enabled with no date', () => {
         // Suppress JSDOM VirtualConsole errors for this specific test
         const originalConsoleError = global.console.error
-        global.console.error = jest.fn()
+        global.console.error = vi.fn()
 
         const props = defaultProps({date: undefined})
         const {getByText} = render(
@@ -185,7 +185,7 @@ describe('FrequencyPicker', () => {
       it('the error boundary fallback with no date and a recurring frequency', () => {
         // Suppress JSDOM VirtualConsole errors for this specific test
         const originalConsoleError = global.console.error
-        global.console.error = jest.fn()
+        global.console.error = vi.fn()
 
         const props = defaultProps({
           date: undefined,

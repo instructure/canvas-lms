@@ -31,8 +31,14 @@ export const ZLtiRegistrationAccountBinding = z.object({
   workflow_state: z.string(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  created_by: ZUser.optional().nullable(),
-  updated_by: ZUser.optional().nullable(),
+  created_by: z
+    .union([ZUser, z.literal('Instructure')])
+    .optional()
+    .nullable(),
+  updated_by: z
+    .union([ZUser, z.literal('Instructure')])
+    .optional()
+    .nullable(),
 })
 
 export type LtiRegistrationAccountBinding = z.infer<typeof ZLtiRegistrationAccountBinding>

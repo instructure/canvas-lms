@@ -28,7 +28,7 @@ describe('UsageRightsDialog', () => {
   beforeEach(() => {
     const usageRights = {use_justification: 'choose'}
     defaultProps = {
-      closeModal: jest.fn(),
+      closeModal: vi.fn(),
       isOpen: true,
       itemsToManage: [
         new File({

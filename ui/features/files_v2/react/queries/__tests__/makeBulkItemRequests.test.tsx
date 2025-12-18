@@ -22,7 +22,7 @@ import {UnauthorizedError} from '../../../utils/apiUtils'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../fixtures/fakeData'
 
 describe('makeBulkItemRequests', () => {
-  const mockRequestFn = jest.fn()
+  const mockRequestFn = vi.fn()
 
   beforeEach(() => {
     mockRequestFn.mockReset()

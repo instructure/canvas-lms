@@ -72,7 +72,6 @@ function normalizeFileData(file) {
 
 function throwConnectionError(error) {
   if (error.name === 'TypeError') {
-     
     console.error(`Failed to fetch from the canvas-rce-api.
       Did you forget to start it or configure it?
       Details can be found at https://github.com/instructure/canvas-rce-api
@@ -140,14 +139,6 @@ class RceApiSource {
 
   initializeMedia(props) {
     return this.initializeDocuments(props)
-  }
-
-  initializeFlickr() {
-    return {
-      searchResults: [],
-      searching: false,
-      formExpanded: false,
-    }
   }
 
   // fetches the given URI and filters it to either an error or parsed response
@@ -234,16 +225,15 @@ class RceApiSource {
   }
 
   updateMediaObject(apiProps, {media_object_id, title, attachment_id}) {
-    const uri =
-      attachment_id
-        ? `${this.baseUri(
-            'media_attachments',
-            apiProps.host,
-          )}/${attachment_id}?user_entered_title=${encodeURIComponent(title)}`
-        : `${this.baseUri(
-            'media_objects',
-            apiProps.host,
-          )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
+    const uri = attachment_id
+      ? `${this.baseUri(
+          'media_attachments',
+          apiProps.host,
+        )}/${attachment_id}?user_entered_title=${encodeURIComponent(title)}`
+      : `${this.baseUri(
+          'media_objects',
+          apiProps.host,
+        )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
     return this.apiPost(uri, headerFor(this.jwt), null, 'PUT')
   }
 
@@ -445,13 +435,6 @@ class RceApiSource {
     return this.apiPost(uri, headers, body)
   }
 
-  searchFlickr(term, apiProps) {
-    const headers = headerFor(this.jwt)
-    const base = this.baseUri('flickr_search', apiProps.host)
-    const uri = `${base}?term=${encodeURIComponent(term)}`
-    return this.apiFetch(uri, headers)
-  }
-
   getFile(id, options = {}) {
     const headers = headerFor(this.jwt)
     const base = this.baseUri('file')
@@ -551,7 +534,7 @@ class RceApiSource {
       .catch(throwConnectionError)
       .catch(e =>
         e.response.json().then(responseBody => {
-          console.error(e)  
+          console.error(e)
           this.alertFunc(buildError(responseBody))
           throw e
         }),

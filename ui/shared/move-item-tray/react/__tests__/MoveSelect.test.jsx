@@ -54,8 +54,8 @@ afterAll(() => {
 })
 
 const stubs = {
-  onSelect: jest.fn(),
-  onClose: jest.fn(),
+  onSelect: vi.fn(),
+  onClose: vi.fn(),
 }
 const defaultProps = (props = {}) => ({
   items: [
@@ -129,7 +129,7 @@ const setupRefForMultipleItems = () => {
 
 describe('MoveSelect', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     server.resetHandlers()
     window.ENV = {COURSE_ID: '123'}
 

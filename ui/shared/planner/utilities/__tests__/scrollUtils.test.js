@@ -20,9 +20,9 @@ import {registerScrollEvents} from '../scrollUtils'
 function createMockWindow(opts) {
   const callbacks = {}
   return {
-    addEventListener: jest.fn((event, callback) => (callbacks[event] = callback)),
+    addEventListener: vi.fn((event, callback) => (callbacks[event] = callback)),
     pageYOffset: 0,
-    setTimeout: jest.fn(),
+    setTimeout: vi.fn(),
     document: {
       documentElement: {
         clientHeight: 42,
@@ -36,9 +36,9 @@ function createMockWindow(opts) {
 
 function mockRegister() {
   const wind = createMockWindow()
-  const pastCb = jest.fn()
-  const futureCb = jest.fn()
-  const scrollPositionChange = jest.fn()
+  const pastCb = vi.fn()
+  const futureCb = vi.fn()
+  const scrollPositionChange = vi.fn()
   const callbacks = {}
 
   registerScrollEvents({
@@ -175,11 +175,11 @@ describe('touch events', () => {
 describe('scroll events', () => {
   it('throttles the callback', () => {
     const mockWindow = createMockWindow()
-    const mockScrollCb = jest.fn()
+    const mockScrollCb = vi.fn()
     registerScrollEvents({
       window: mockWindow,
-      scrollIntoPast: jest.fn(),
-      scrollIntoFuture: jest.fn(),
+      scrollIntoPast: vi.fn(),
+      scrollIntoFuture: vi.fn(),
       scrollPositionChange: mockScrollCb,
     })
 

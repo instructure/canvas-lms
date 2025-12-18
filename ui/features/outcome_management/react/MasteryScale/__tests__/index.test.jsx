@@ -27,11 +27,9 @@ import MasteryScale from '../index'
 import {masteryScalesGraphqlMocks} from '@canvas/outcomes/mocks/Outcomes'
 import {useAllPages} from '@canvas/query'
 
-jest.mock('@canvas/query', () => ({
-  useAllPages: jest.fn(),
-}))
+vi.mock('@canvas/query')
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('MasteryScale', () => {
   beforeEach(() => {

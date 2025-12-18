@@ -23,10 +23,10 @@ import ZipFileImporter from '../zip_file'
 import fetchMock from 'fetch-mock'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
-const onSubmit = jest.fn()
-const onCancel = jest.fn()
+const onSubmit = vi.fn()
+const onCancel = vi.fn()
 
 const renderComponent = (overrideProps?: any) =>
   render(<ZipFileImporter onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
@@ -67,7 +67,7 @@ describe('ZipFileImporter', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fetchMock.restore()
   })
 

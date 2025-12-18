@@ -26,7 +26,7 @@ import {fireEvent, render} from '@testing-library/react'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionPermissions} from '../../../../graphql/DiscussionPermissions'
 
-jest.mock('../../../utils')
+vi.mock('../../../utils')
 
 const mockOverrides = [
   {
@@ -71,13 +71,13 @@ const mockSections = [
 ]
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })

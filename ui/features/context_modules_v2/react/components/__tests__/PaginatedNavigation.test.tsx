@@ -23,7 +23,7 @@ describe('PaginatedNavigation', () => {
   const defaultProps = {
     isLoading: false,
     currentPage: 1,
-    onPageChange: jest.fn(),
+    onPageChange: vi.fn(),
     visiblePageInfo: {
       start: 1,
       end: 10,
@@ -76,7 +76,7 @@ describe('PaginatedNavigation', () => {
   })
 
   it('calls onPageChange with expected arguments when page is clicked', () => {
-    const onPageChange = jest.fn()
+    const onPageChange = vi.fn()
     render(<PaginatedNavigation {...defaultProps} onPageChange={onPageChange} />)
 
     const page2Button = screen.getByText('2')

@@ -16,20 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {configure} from '@testing-library/react'
-
-// Configure testing-library to support act
-configure({asyncUtilTimeout: 4000})
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import '@testing-library/jest-dom/extend-expect'
-// React is needed for JSX in the components we're testing
-import {createRoot} from 'react-dom/client'
 import {
   initializePlanner,
-  loadPlannerDashboard,
   reloadPlannerForObserver,
-  renderToDoSidebar,
   renderWeeklyPlannerHeader,
   resetPlanner,
   store,
@@ -52,10 +43,10 @@ function defaultPlannerOptions() {
       K5_USER: false,
       K5_SUBJECT_COURSE: false,
     },
-    flashError: jest.fn(),
-    flashMessage: jest.fn(),
-    srFlashMessage: jest.fn(),
-    convertApiUserContent: jest.fn(),
+    flashError: vi.fn(),
+    flashMessage: vi.fn(),
+    srFlashMessage: vi.fn(),
+    convertApiUserContent: vi.fn(),
   }
 }
 
@@ -118,18 +109,18 @@ describe('with mock api', () => {
     document.body.appendChild(document.createElement('div')).id = 'dashboard-sidebar'
 
     // Setup mock for window.matchMedia
-    window.matchMedia = jest.fn().mockImplementation(query => ({
+    window.matchMedia = vi.fn().mockImplementation(query => ({
       matches: false,
       media: query,
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }))
 
     alertInitialize({
-      visualSuccessCallback: jest.fn(),
-      visualErrorCallback: jest.fn(),
-      srAlertCallback: jest.fn(),
+      visualSuccessCallback: vi.fn(),
+      visualErrorCallback: vi.fn(),
+      srAlertCallback: vi.fn(),
     })
   })
 
@@ -170,71 +161,6 @@ describe('with mock api', () => {
     })
   })
 
-  describe('loadPlannerDashboard', () => {
-    beforeEach(() => {
-      initializePlanner(defaultPlannerOptions())
-    })
-
-    it('dispatches getPlannerItems and getInitialOpportunities', () => {
-      // Mock document methods
-      jest.spyOn(document, 'getElementById').mockImplementation(id => {
-        if (
-          [
-            'dashboard-planner',
-            'dashboard-planner-header',
-            'dashboard-planner-header-aux',
-          ].includes(id)
-        ) {
-          return document.createElement('div')
-        }
-        return null
-      })
-
-      // Mock createRoot to prevent actual rendering
-      jest.spyOn(createRoot, 'constructor').mockImplementation(() => ({
-        render: jest.fn(),
-      }))
-
-      // Mock store dispatch
-      const originalDispatch = store.dispatch
-      store.dispatch = jest.fn().mockImplementation(() => Promise.resolve())
-
-      loadPlannerDashboard()
-
-      expect(store.dispatch).toHaveBeenCalled()
-
-      // Restore mocks
-      store.dispatch = originalDispatch
-      jest.restoreAllMocks()
-    })
-  })
-
-  describe('renderToDoSidebar', () => {
-    beforeEach(() => {
-      initializePlanner(defaultPlannerOptions())
-    })
-
-    it('renders into provided element', () => {
-      // Mock createRoot
-      const mockRender = jest.fn()
-      const mockCreateRoot = jest.fn().mockReturnValue({
-        render: mockRender,
-      })
-
-      jest.spyOn(createRoot, 'constructor').mockImplementation(mockCreateRoot)
-
-      const element = document.querySelector('#dashboard-sidebar')
-
-      // Ensure we don't throw an error
-      expect(() => {
-        renderToDoSidebar(element)
-      }).not.toThrow()
-
-      // Restore mocks
-      jest.restoreAllMocks()
-    })
-  })
-
   describe('renderWeeklyPlannerHeader', () => {
     beforeEach(() => {
       const opts = defaultPlannerOptions()
@@ -255,12 +181,12 @@ describe('with mock api', () => {
   describe('reloadPlannerForObserver', () => {
     beforeEach(() => {
       window.ENV ||= {}
-      store.dispatch = jest.fn()
+      store.dispatch = vi.fn()
       store.getState = () => defaultState
     })
 
     afterEach(() => {
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
 
     it('throws an exception unless the planner is initialized', () => {

@@ -26,10 +26,23 @@ import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMo
 import {MockedProvider} from '@apollo/client/testing'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import React, {createRef} from 'react'
-import StudentViewContext from '../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
-jest.mock('@canvas/upload-file')
+vi.mock('@canvas/upload-file')
+
+// Mock LazyLoad to render children immediately in tests
+vi.mock('@canvas/lazy-load', () => ({
+  __esModule: true,
+  default: ({children}) => children,
+  lazy: fn => {
+    let Component
+    fn().then(mod => {
+      Component = mod.default
+    })
+    return props => Component ? <Component {...props} /> : null
+  },
+}))
 
 const defaultMocks = (result = {data: {course: {externalToolsConnection: {nodes: []}}}}) => [
   {
@@ -46,14 +59,23 @@ describe('ContentTabs', () => {
     window.INST = window.INST || {}
     window.INST.editorButtons = []
 
-    // Mock URL.createObjectURL for file handling
-    URL.createObjectURL = jest.fn(blob => {
-      return `blob:mock-url-${blob.name || 'unnamed'}`
-    })
+    // Mock URL.createObjectURL for file handling if not already mocked
+    // (Vitest setup already provides this mock, Jest may not)
+    if (typeof URL.createObjectURL !== 'function') {
+      try {
+        Object.defineProperty(URL, 'createObjectURL', {
+          value: vi.fn(blob => `blob:mock-url-${blob?.name || 'unnamed'}`),
+          writable: true,
+          configurable: true,
+        })
+      } catch {
+        // Property may already be defined and non-configurable
+      }
+    }
 
     // Mock Blob.prototype.slice for file handling
     if (!Blob.prototype.slice) {
-      Blob.prototype.slice = jest.fn(function (start, end) {
+      Blob.prototype.slice = vi.fn(function (start, end) {
         return this
       })
     }
@@ -212,14 +234,15 @@ describe('ContentTabs', () => {
       })
       props.submitButtonRef = createSubmitButtonRef()
 
-      const {getByTestId} = render(
+      const {findByTestId} = render(
         <MockedQueryProvider>
           <MockedProvider mocks={defaultMocks()}>
             <AttemptTab {...props} focusAttemptOnInit={false} />
           </MockedProvider>
         </MockedQueryProvider>,
       )
-      expect(await waitFor(() => getByTestId('upload-pane'))).toBeInTheDocument()
+      // Use findByTestId with extended timeout for lazy-loaded component
+      expect(await findByTestId('upload-pane', {}, {timeout: 5000})).toBeInTheDocument()
     })
 
     it('renders the file preview tab when the submission is submitted', async () => {
@@ -280,7 +303,7 @@ describe('ContentTabs', () => {
     describe('Uploading a file', () => {
       beforeAll(() => {
         $('body').append('<div role="alert" id="flash_screenreader_holder" />')
-        uploadFileModule.uploadFiles = jest.fn()
+        uploadFileModule.uploadFiles.mockImplementation(vi.fn())
       })
 
       it('shows a file preview for an uploaded file', async () => {

@@ -47,7 +47,7 @@ describe('Conditional Release Stats reducer', () => {
   })
 
   test('open sidebar correctly', () => {
-    const element = jest.fn()
+    const element = vi.fn()
     const newState = reduce(actions.openSidebar(element))
     expect(newState.showDetails).toBe(true)
     expect(newState.sidebarTrigger).toBe(element)

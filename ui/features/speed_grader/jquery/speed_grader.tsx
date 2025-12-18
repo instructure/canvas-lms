@@ -1299,7 +1299,7 @@ function initCommentBox() {
             recording: false,
             html: '<div></div>',
             click() {
-              const $this = $(this)
+              const $this = $(this) as unknown as JQuery<HTMLElement>
               processSpeech($this)
             },
           },
@@ -1584,7 +1584,7 @@ EG = {
           return $width_resizer_ew.clone().addClass('clone')
         },
         snapTolerance: 200,
-        drag(_event: Event, ui) {
+        drag(_event: Event, ui: JQueryUI.DraggableEventUIParams) {
           const offset = ui.offset
           const windowWidth = $window.width() as number
           $left_side.width(`${(offset.left / windowWidth) * 100}%`)
@@ -1600,7 +1600,7 @@ EG = {
             $right_side.width('100%')
           }
         },
-        stop(event: Event, _ui) {
+        stop(event: Event, _ui: JQueryUI.DraggableEventUIParams) {
           event.stopImmediatePropagation()
           $resize_overlay.hide()
         },
@@ -1630,14 +1630,14 @@ EG = {
         snap: '#full_width_container',
         appendTo: '#full_width_container',
         helper: 'original',
-        drag(_event: Event, dragBar) {
+        drag(_event: Event, dragBar: JQueryUI.DraggableEventUIParams) {
           const topContainerDesiredHeight = dragBar.offset.top - $full_width_container.offset()!.top
           const topContainerDesiredPercent =
             (topContainerDesiredHeight / $full_width_container.height()!) * 100
           $left_side.css('flex', `0 0 ${topContainerDesiredPercent}%`)
           $right_side.css('flex', `0 0 ${100 - topContainerDesiredPercent}%`)
         },
-        stop(event: Event, _ui) {
+        stop(event: Event, _ui: JQueryUI.DraggableEventUIParams) {
           event.stopImmediatePropagation()
           $resize_overlay.hide()
         },
@@ -1862,7 +1862,7 @@ EG = {
         resizable: false,
         dialogClass: 'no-close',
         modal: true,
-        create(_e, _ui) {
+        create(_e: Event, _ui: JQueryUI.DialogUIParams) {
           const pane = $(this).dialog('widget').find('.ui-dialog-buttonpane')
           $(
             `<label class='do-not-show-again'><input type='checkbox'/>&nbsp;${I18n.t(
@@ -3411,6 +3411,12 @@ EG = {
       return
     }
 
+    const handleAmsSubmissionUpdate = () => {
+      refreshGrades(() => {
+        this.updateStatsInHeader()
+      })
+    }
+
     amsGradingRoot = createRoot(container)
     amsGradingRoot.render(
       <AmsLoader
@@ -3421,6 +3427,7 @@ EG = {
           studentUuid: this.currentStudent.uuid,
           submissionId: String(submission.id),
         }}
+        onSubmissionUpdate={handleAmsSubmissionUpdate}
       />,
     )
 
@@ -4271,7 +4278,10 @@ EG = {
       if (!submissions[0].submission.excused) {
         const outlierScoreHelper = new OutlierScoreHelper(score, pointsPossible)
         if (outlierScoreHelper.hasWarning()) {
-          $.flashWarning(outlierScoreHelper.warningMessage())
+          const warningMessage = outlierScoreHelper.warningMessage()
+          if (warningMessage) {
+            $.flashWarning(warningMessage)
+          }
         }
       }
 

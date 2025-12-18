@@ -23,16 +23,16 @@ import DuplicateConfirmationForm from '../DuplicateConfirmationForm'
 
 describe('DuplicateConfirmationForm', () => {
   const defaultProps = {
-    onCancel: jest.fn(),
-    onSuccess: jest.fn(),
-    onError: jest.fn(),
+    onCancel: vi.fn(),
+    onSuccess: vi.fn(),
+    onError: vi.fn(),
     toolData: {},
     configurationType: '',
     store: {},
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the duplicate confirmation form', () => {
@@ -53,7 +53,7 @@ describe('DuplicateConfirmationForm', () => {
 
   it('calls store.save when install button is clicked', async () => {
     const user = userEvent.setup()
-    const saveMock = jest.fn()
+    const saveMock = vi.fn()
     const props = {
       ...defaultProps,
       store: {save: saveMock},
@@ -67,7 +67,7 @@ describe('DuplicateConfirmationForm', () => {
 
   it('calls forceSaveTool when install button is clicked if provided', async () => {
     const user = userEvent.setup()
-    const forceSaveTool = jest.fn()
+    const forceSaveTool = vi.fn()
     const props = {
       ...defaultProps,
       forceSaveTool,
@@ -81,7 +81,7 @@ describe('DuplicateConfirmationForm', () => {
 
   it('sets verifyUniqueness to undefined when doing a force install', async () => {
     const user = userEvent.setup()
-    const saveMock = jest.fn()
+    const saveMock = vi.fn()
     const props = {
       ...defaultProps,
       store: {save: saveMock},

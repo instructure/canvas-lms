@@ -24,15 +24,15 @@ describe('RequirementCountInput', () => {
   const props: RequirementCountInputProps = {
     requirementCount: 'all',
     requireSequentialProgress: false,
-    onChangeRequirementCount: jest.fn(),
-    onToggleSequentialProgress: jest.fn(),
+    onChangeRequirementCount: vi.fn(),
+    onToggleSequentialProgress: vi.fn(),
   }
 
   const renderComponent = (overrides = {}) =>
     render(<RequirementCountInput {...props} {...overrides} />)
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders', () => {

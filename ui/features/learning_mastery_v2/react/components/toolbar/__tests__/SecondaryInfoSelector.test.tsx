@@ -23,7 +23,7 @@ import {SecondaryInfoSelector, SecondaryInfoSelectorProps} from '../SecondaryInf
 describe('SecondaryInfoSelector', () => {
   const defaultProps: SecondaryInfoSelectorProps = {
     value: SecondaryInfoDisplay.NONE,
-    onChange: jest.fn(),
+    onChange: vi.fn(),
   }
 
   it('renders all option items', () => {
@@ -35,7 +35,7 @@ describe('SecondaryInfoSelector', () => {
   })
 
   it('calls onChange when an option is clicked', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByLabelText} = render(<SecondaryInfoSelector {...defaultProps} onChange={onChange} />)
     const sisIdInput = getByLabelText('SIS ID')
     fireEvent.click(sisIdInput)

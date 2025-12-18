@@ -18,7 +18,7 @@
 
 import '@instructure/canvas-theme'
 import React from 'react'
-import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, fireEvent, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import AIExperienceShow from '../components/AIExperienceShow'
 import type {AIExperience} from '../../types'
@@ -43,7 +43,7 @@ describe('AIExperienceShow', () => {
       messages: [],
     })
     // Mock scrollIntoView which is not available in JSDOM
-    Element.prototype.scrollIntoView = jest.fn()
+    Element.prototype.scrollIntoView = vi.fn()
     // Reset window.location
     delete (window as any).location
     window.location = {
@@ -53,7 +53,8 @@ describe('AIExperienceShow', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    cleanup()
+    vi.clearAllMocks()
   })
 
   it('renders AI experience title', () => {

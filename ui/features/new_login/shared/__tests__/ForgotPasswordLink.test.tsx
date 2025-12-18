@@ -17,27 +17,32 @@
  */
 
 import {assignLocation} from '@canvas/util/globalUtils'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
 import {ForgotPasswordLink} from '..'
-import {NewLoginDataProvider, NewLoginProvider, useNewLogin, useNewLoginData} from '../../context'
+import {
+  NewLoginDataProvider,
+  NewLoginProvider,
+  useNewLogin,
+  useNewLoginData,
+} from '../../context'
 
-jest.mock('../../context', () => {
-  const originalModule = jest.requireActual('../../context')
+vi.mock('../../context', async () => {
+  const originalModule = await vi.importActual('../../context')
   return {
     ...originalModule,
-    useNewLogin: jest.fn(),
-    useNewLoginData: jest.fn(),
+    useNewLogin: vi.fn(),
+    useNewLoginData: vi.fn(),
   }
 })
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
-const mockUseNewLogin = useNewLogin as jest.Mock
-const mockUseNewLoginData = useNewLoginData as jest.Mock
+const mockUseNewLogin = vi.mocked(useNewLogin)
+const mockUseNewLoginData = vi.mocked(useNewLoginData)
 
 describe('ForgotPasswordLink', () => {
   const renderComponent = () => {
@@ -52,10 +57,29 @@ describe('ForgotPasswordLink', () => {
     )
   }
 
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
-    mockUseNewLogin.mockReturnValue({isUiActionPending: false})
-    mockUseNewLoginData.mockReturnValue({isPreviewMode: false, forgotPasswordUrl: null})
+    vi.clearAllMocks()
+    mockUseNewLogin.mockReturnValue({
+      isUiActionPending: false,
+      setIsUiActionPending: vi.fn(),
+      otpRequired: false,
+      setOtpRequired: vi.fn(),
+      rememberMe: false,
+      setRememberMe: vi.fn(),
+      showForgotPassword: false,
+      setShowForgotPassword: vi.fn(),
+      otpCommunicationChannelId: null,
+      setOtpCommunicationChannelId: vi.fn(),
+    })
+    mockUseNewLoginData.mockReturnValue({
+      isDataLoading: false,
+      isPreviewMode: false,
+      forgotPasswordUrl: undefined,
+    })
   })
 
   it('renders without crashing', () => {
@@ -65,20 +89,35 @@ describe('ForgotPasswordLink', () => {
 
   it('renders a link with forgotPasswordUrl when available', () => {
     const forgotPasswordUrl = 'https://example.com/reset-password'
-    mockUseNewLoginData.mockReturnValue({isPreviewMode: false, forgotPasswordUrl})
+    mockUseNewLoginData.mockReturnValue({
+      isDataLoading: false,
+      isPreviewMode: false,
+      forgotPasswordUrl,
+    })
     renderComponent()
     const button = screen.getByText('Forgot password?')
     expect(button.closest('a')).toHaveAttribute('href', forgotPasswordUrl)
   })
 
-  it('renders a link to Canvas’ forgot password route when forgotPasswordUrl is not provided', () => {
+  it('renders a link to Canvas forgot password route when forgotPasswordUrl is not provided', () => {
     renderComponent()
     const button = screen.getByText('Forgot password?')
     expect(button.closest('a')).toHaveAttribute('href', '/login/canvas/forgot-password')
   })
 
   it('disables the button when isUiActionPending is true', () => {
-    mockUseNewLogin.mockReturnValue({isUiActionPending: true})
+    mockUseNewLogin.mockReturnValue({
+      isUiActionPending: true,
+      setIsUiActionPending: vi.fn(),
+      otpRequired: false,
+      setOtpRequired: vi.fn(),
+      rememberMe: false,
+      setRememberMe: vi.fn(),
+      showForgotPassword: false,
+      setShowForgotPassword: vi.fn(),
+      otpCommunicationChannelId: null,
+      setOtpCommunicationChannelId: vi.fn(),
+    })
     renderComponent()
     const button = screen.getByText('Forgot password?')
     fireEvent.click(button)
@@ -87,6 +126,7 @@ describe('ForgotPasswordLink', () => {
 
   it('disables the button when isPreviewMode is true', () => {
     mockUseNewLoginData.mockReturnValue({
+      isDataLoading: false,
       isPreviewMode: true,
       forgotPasswordUrl: 'https://example.com/reset-password',
     })
@@ -98,7 +138,11 @@ describe('ForgotPasswordLink', () => {
 
   it('calls assignLocation when forgotPasswordUrl is provided and clicked', () => {
     const forgotPasswordUrl = 'https://example.com/reset-password'
-    mockUseNewLoginData.mockReturnValue({isPreviewMode: false, forgotPasswordUrl})
+    mockUseNewLoginData.mockReturnValue({
+      isDataLoading: false,
+      isPreviewMode: false,
+      forgotPasswordUrl,
+    })
     renderComponent()
     const button = screen.getByText('Forgot password?')
     fireEvent.click(button)

@@ -43,13 +43,31 @@
 class CareerExperienceController < ApplicationController
   before_action :require_user
 
+  # @API Check if Canvas Career is enabled
+  #
+  # Returns whether the root account has Canvas Career (Horizon) enabled
+  # in at least one subaccount.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/career/enabled \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns {enabled: boolean}
+  #
+  # @example_response
+  #   {"enabled": true}
+  def enabled
+    enabled = CanvasCareer::ExperienceResolver.career_affiliated_institution?(@domain_root_account)
+    render json: { enabled: }
+  end
+
   # @API Get current and available experiences
   #
   # Returns the current user's active experience and available experiences
   # they can switch to.
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/career_experience/experience_summary \
+  #   curl https://<canvas>/api/v1/career/experience_summary \
   #     -H 'Authorization: Bearer <token>'
   #
   # @returns ExperienceSummary
@@ -70,7 +88,7 @@ class CareerExperienceController < ApplicationController
   #   The experience to switch to.
   #
   # @example_request
-  #   curl -X POST https://<canvas>/api/v1/career_experience/switch_experience \
+  #   curl -X POST https://<canvas>/api/v1/career/switch_experience \
   #     -H 'Authorization: Bearer <token>' \
   #     -d 'experience=academic'
   #
@@ -98,7 +116,7 @@ class CareerExperienceController < ApplicationController
   #   The role to switch to.
   #
   # @example_request
-  #   curl -X POST https://<canvas>/api/v1/career_experience/switch_role \
+  #   curl -X POST https://<canvas>/api/v1/career/switch_role \
   #     -H 'Authorization: Bearer <token>' \
   #     -d 'role=learner'
   #

@@ -33,7 +33,8 @@ body.immersive-media-view .ic-Layout-wrapper {
     margin-left: 54px;
   }
 
-  body.immersive-media-view:not(.no-headers).primary-nav-expanded .ic-Layout-wrapper {
+  body.immersive-media-view:not(.no-headers).primary-nav-expanded
+    .ic-Layout-wrapper {
     margin-left: 84px;
   }
 }

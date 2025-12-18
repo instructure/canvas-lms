@@ -67,13 +67,25 @@ module Canvadocs
       @submission_context_ids ||= submissions.map { |s| s.assignment.context_id }.uniq
     end
 
+    def submission_shards
+      @submission_shards ||= submissions.map(&:shard).uniq
+    end
+
     def observing?(user)
-      user.observer_enrollments.active.where(course_id: submission_context_ids,
-                                             associated_user_id: submissions.map(&:user_id)).exists?
+      user.observer_enrollments
+          .active
+          .shard(submission_shards)
+          .where(course_id: submission_context_ids,
+                 associated_user_id: submissions.map(&:user_id))
+          .exists?
     end
 
     def managing?(user)
-      is_teacher = user.teacher_enrollments.active.where(course_id: submission_context_ids).exists?
+      is_teacher = user.teacher_enrollments
+                       .active
+                       .shard(submission_shards)
+                       .where(course_id: submission_context_ids)
+                       .exists?
       return true if is_teacher
 
       course = submissions.first.assignment.course

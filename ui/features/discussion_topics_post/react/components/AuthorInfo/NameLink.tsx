@@ -21,6 +21,7 @@ import {Text} from '@instructure/ui-text'
 import {SearchSpan} from '../SearchSpan/SearchSpan'
 import theme from '@instructure/ui-themes'
 import {getDisplayName} from '../../utils'
+import {htmlEscape} from '@instructure/html-escape'
 
 interface NameLinkProps {
   userType: string
@@ -60,7 +61,7 @@ const NameLink = (props: NameLinkProps) => {
             <SearchSpan
               isSplitView={props.discussionEntryProps?.isSplitView}
               searchTerm={props.searchTerm}
-              text={getDisplayName(props.discussionEntryProps)}
+              htmlBody={htmlEscape(getDisplayName(props.discussionEntryProps))}
             />
             {props.user?.pronouns && (
               <Text

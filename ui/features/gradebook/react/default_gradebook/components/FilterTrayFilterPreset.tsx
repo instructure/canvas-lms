@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useEffect, useRef} from 'react'
-import uuid from 'uuid'
+import * as uuid from 'uuid'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {chunk} from 'es-toolkit/compat'
 import {View} from '@instructure/ui-view'

@@ -33,6 +33,7 @@ module Types
     field :due_at, DateTimeType, null: true
     field :id, ID, null: true
     field :lock_at, DateTimeType, null: true
+    field :peer_review_dates, PeerReviewDatesType, null: true
     field :set, DateHashSetType, null: true
     field :title, String, null: true
     field :unlock_at, DateTimeType, null: true
@@ -44,6 +45,12 @@ module Types
         id: object[:set_id],
         type: object[:set_type]
       }
+    end
+
+    def peer_review_dates
+      return nil unless object[:peer_review_dates]
+
+      object[:peer_review_dates]
     end
   end
 end

@@ -147,7 +147,7 @@ describe('PostAssignmentGradesTray Api', () => {
     })
 
     test('consumers are required to handle when mutating rejects', async () => {
-      const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation(message => {
+      const mockConsoleLog = vi.spyOn(console, 'log').mockImplementation(message => {
         if (!message.includes('[GraphQL error]')) {
           originalConsoleLog(message)
         }
@@ -179,7 +179,7 @@ describe('PostAssignmentGradesTray Api', () => {
     })
 
     test('consumers are required to handle when mutating rejects', async () => {
-      const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation(message => {
+      const mockConsoleLog = vi.spyOn(console, 'log').mockImplementation(message => {
         if (!message.includes('[GraphQL error]')) {
           originalConsoleLog(message)
         }

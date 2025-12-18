@@ -32,9 +32,9 @@ describe('RequirementSelector', () => {
       {id: '1', name: 'Module 1', resource: 'page'},
       {id: '2', name: 'Module 2', resource: 'page'},
     ],
-    onDropRequirement: jest.fn(),
-    onUpdateRequirement: jest.fn(),
-    validatePointsInput: jest.fn(),
+    onDropRequirement: vi.fn(),
+    onUpdateRequirement: vi.fn(),
+    validatePointsInput: vi.fn(),
     pointsInputMessages: [],
     index: 0,
   }
@@ -44,7 +44,7 @@ describe('RequirementSelector', () => {
 
   beforeEach(() => {
     document.body.innerHTML = `<div id="flash_screenreader_holder" role="alert"></div>`
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders', () => {

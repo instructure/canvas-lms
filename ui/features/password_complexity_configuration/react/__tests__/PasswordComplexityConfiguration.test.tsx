@@ -18,16 +18,38 @@
 
 import React from 'react'
 import {render, screen, waitFor, cleanup} from '@testing-library/react'
-import '@testing-library/jest-dom'
 import PasswordComplexityConfiguration from '../PasswordComplexityConfiguration'
-import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import userEvent from '@testing-library/user-event'
-
-jest.mock('@canvas/do-fetch-api-effect/apiRequest')
-const mockedExecuteApiRequest = executeApiRequest as jest.MockedFunction<typeof executeApiRequest>
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const MOCK_MINIMUM_CHARACTER_LENGTH = '8'
 const MOCK_MAXIMUM_LOGIN_ATTEMPTS = '10'
+
+// Track PUT requests for verification
+let lastPutRequest: {method: string; path: string; body: any} | null = null
+
+const defaultPasswordPolicy = {
+  minimum_character_length: MOCK_MINIMUM_CHARACTER_LENGTH,
+  maximum_login_attempts: MOCK_MAXIMUM_LOGIN_ATTEMPTS,
+}
+
+const server = setupServer(
+  http.get('/api/v1/accounts/:accountId/settings', () => {
+    return HttpResponse.json({
+      password_policy: defaultPasswordPolicy,
+    })
+  }),
+  http.put('/api/v1/accounts/:accountId/', async ({request}) => {
+    const body = await request.json()
+    lastPutRequest = {
+      method: 'PUT',
+      path: new URL(request.url).pathname,
+      body,
+    }
+    return HttpResponse.json({})
+  }),
+)
 
 const getViewOptionsButton = async () => {
   const viewOptions = await waitFor(() => {
@@ -42,6 +64,7 @@ const getViewOptionsButton = async () => {
 
 describe('PasswordComplexityConfiguration Component', () => {
   beforeAll(() => {
+    server.listen()
     if (!window.ENV) {
       // @ts-expect-error
       window.ENV = {}
@@ -50,25 +73,18 @@ describe('PasswordComplexityConfiguration Component', () => {
   })
 
   afterAll(() => {
+    server.close()
     // @ts-expect-error
     delete window.ENV.DOMAIN_ROOT_ACCOUNT_ID
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    server.resetHandlers()
     cleanup()
   })
 
   beforeEach(() => {
-    mockedExecuteApiRequest.mockResolvedValue({
-      status: 200,
-      data: {
-        password_policy: {
-          minimum_character_length: MOCK_MINIMUM_CHARACTER_LENGTH,
-          maximum_login_attempts: MOCK_MAXIMUM_LOGIN_ATTEMPTS,
-        },
-      },
-    })
+    lastPutRequest = null
   })
 
   describe('tray Interaction', () => {
@@ -149,10 +165,11 @@ describe('PasswordComplexityConfiguration Component', () => {
     })
 
     it('should handle missing password_policy key gracefully', async () => {
-      mockedExecuteApiRequest.mockResolvedValue({
-        status: 200,
-        data: {},
-      })
+      server.use(
+        http.get('/api/v1/accounts/:accountId/settings', () => {
+          return HttpResponse.json({})
+        }),
+      )
       render(<PasswordComplexityConfiguration />)
       await userEvent.click(await getViewOptionsButton())
       await waitFor(() => expect(screen.getByTestId('cancelButton')).toBeEnabled())
@@ -167,12 +184,13 @@ describe('PasswordComplexityConfiguration Component', () => {
     })
 
     it('should handle undefined password_policy key gracefully', async () => {
-      mockedExecuteApiRequest.mockResolvedValue({
-        status: 200,
-        data: {
-          password_policy: undefined,
-        },
-      })
+      server.use(
+        http.get('/api/v1/accounts/:accountId/settings', () => {
+          return HttpResponse.json({
+            password_policy: undefined,
+          })
+        }),
+      )
       render(<PasswordComplexityConfiguration />)
       await userEvent.click(await getViewOptionsButton())
       await waitFor(() => expect(screen.getByTestId('cancelButton')).toBeEnabled())
@@ -187,12 +205,13 @@ describe('PasswordComplexityConfiguration Component', () => {
     })
 
     it('should handle completely empty password_policy', async () => {
-      mockedExecuteApiRequest.mockResolvedValue({
-        status: 200,
-        data: {
-          password_policy: {},
-        },
-      })
+      server.use(
+        http.get('/api/v1/accounts/:accountId/settings', () => {
+          return HttpResponse.json({
+            password_policy: {},
+          })
+        }),
+      )
       render(<PasswordComplexityConfiguration />)
       await userEvent.click(await getViewOptionsButton())
       await waitFor(() => expect(screen.getByTestId('cancelButton')).toBeEnabled())
@@ -208,16 +227,17 @@ describe('PasswordComplexityConfiguration Component', () => {
 
     it('should handle missing nested keys in password_policy', async () => {
       const minimumCharacterLength = '12'
-      mockedExecuteApiRequest.mockResolvedValue({
-        status: 200,
-        data: {
-          password_policy: {
-            require_number_characters: 'true',
-            allow_login_suspension: 'false',
-            minimum_character_length: minimumCharacterLength,
-          },
-        },
-      })
+      server.use(
+        http.get('/api/v1/accounts/:accountId/settings', () => {
+          return HttpResponse.json({
+            password_policy: {
+              require_number_characters: 'true',
+              allow_login_suspension: 'false',
+              minimum_character_length: minimumCharacterLength,
+            },
+          })
+        }),
+      )
       render(<PasswordComplexityConfiguration />)
       await userEvent.click(await getViewOptionsButton())
       await waitFor(() => expect(screen.getByTestId('cancelButton')).toBeEnabled())
@@ -236,26 +256,26 @@ describe('PasswordComplexityConfiguration Component', () => {
       await userEvent.click(checkbox)
       const saveButton = await screen.findByTestId('saveButton')
       await userEvent.click(saveButton)
-      const putCall = mockedExecuteApiRequest.mock.calls.find(call => call[0].method === 'PUT')
-      expect(putCall).toEqual([
-        {
-          method: 'PUT',
-          body: {
-            account: {
-              settings: {
-                password_policy: {
-                  require_number_characters: true,
-                  require_symbol_characters: false,
-                  allow_login_suspension: false,
-                  maximum_login_attempts: MOCK_MAXIMUM_LOGIN_ATTEMPTS,
-                  minimum_character_length: MOCK_MINIMUM_CHARACTER_LENGTH,
-                },
+      await waitFor(() => {
+        expect(lastPutRequest).not.toBeNull()
+      })
+      expect(lastPutRequest).toEqual({
+        method: 'PUT',
+        body: {
+          account: {
+            settings: {
+              password_policy: {
+                require_number_characters: true,
+                require_symbol_characters: false,
+                allow_login_suspension: false,
+                maximum_login_attempts: MOCK_MAXIMUM_LOGIN_ATTEMPTS,
+                minimum_character_length: MOCK_MINIMUM_CHARACTER_LENGTH,
               },
             },
           },
-          path: '/api/v1/accounts/1/',
         },
-      ])
+        path: '/api/v1/accounts/1/',
+      })
     })
   })
 })

@@ -59,7 +59,7 @@ describe('SubmissionTypeButton', () => {
   })
 
   it('calls the onSelected property when clicked', () => {
-    const onSelected = jest.fn()
+    const onSelected = vi.fn()
     const {getByRole} = render(
       <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} onSelected={onSelected} />,
     )

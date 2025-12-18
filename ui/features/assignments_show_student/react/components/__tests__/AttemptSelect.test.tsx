@@ -25,15 +25,15 @@ import userEvent from '@testing-library/user-event'
 
 type Submission = any // Using any since mockSubmission returns an unknown shape
 
-let mockedSetOnSuccess: jest.Mock
-let mockedOnChangeSubmission: jest.Mock
+let mockedSetOnSuccess: any
+let mockedOnChangeSubmission: any
 
 function mockContext(children: React.ReactNode) {
   return (
     <AlertManagerContext.Provider
       value={{
         setOnSuccess: mockedSetOnSuccess,
-        setOnFailure: jest.fn(),
+        setOnFailure: vi.fn(),
       }}
     >
       {children}
@@ -53,8 +53,8 @@ async function createProps({attempt}: {attempt: number}) {
 
 describe('Attempt', () => {
   beforeEach(() => {
-    mockedSetOnSuccess = jest.fn().mockResolvedValue({})
-    mockedOnChangeSubmission = jest.fn()
+    mockedSetOnSuccess = vi.fn().mockResolvedValue({})
+    mockedOnChangeSubmission = vi.fn()
   })
 
   it('renders correctly', async () => {

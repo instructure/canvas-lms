@@ -26,7 +26,6 @@ import imagesReducer from './images'
 import documentsReducer from './documents'
 import mediaReducer from './media'
 import upload from './upload'
-import flickrReducer from './flickr'
 import session from './session'
 import newPageLinkReducer from './newPageLinkExpanded'
 import {changeContextType, changeContextId, changeSearchString, changeSortBy} from './filter'
@@ -53,7 +52,6 @@ export default combineReducers({
   documents: documentsReducer,
   media: mediaReducer,
   upload,
-  flickr: flickrReducer,
   session,
   newPageLinkExpanded: newPageLinkReducer,
 })

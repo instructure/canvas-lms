@@ -27,6 +27,30 @@ module Plannable
       after_save :update_associated_planner_overrides
       before_save :check_if_associated_planner_overrides_need_updating
       scope :available_to_planner, -> { where(workflow_state: ACTIVE_WORKFLOW_STATES) }
+      scope :incomplete_for_planner, lambda { |user|
+        scope = where.not(
+          id: PlannerOverride.where(
+            plannable_type: klass.name,
+            user:,
+            marked_complete: true
+          ).select(:plannable_id)
+        )
+
+        if [Assignment, SubAssignment].include?(klass)
+          scope = scope.where.not(
+            Submission.where(user:)
+                      .where("submissions.assignment_id = assignments.id")
+                      .where.not(submitted_at: nil)
+                      .where(redo_request: [false, nil])
+                      .joins("LEFT JOIN #{PlannerOverride.quoted_table_name} ON
+                              planner_overrides.plannable_id = submissions.assignment_id
+                              AND planner_overrides.plannable_type = 'Assignment'
+                              AND planner_overrides.user_id = #{user.id}")
+                      .where("planner_overrides.marked_complete IS NOT FALSE").arel.exists
+          )
+        end
+        scope
+      }
     end
   end
 

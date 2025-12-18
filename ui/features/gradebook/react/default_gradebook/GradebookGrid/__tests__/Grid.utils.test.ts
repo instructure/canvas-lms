@@ -209,10 +209,12 @@ describe('getColumnOrder', () => {
 })
 
 describe('listRowIndicesForStudentIds', () => {
-  expect(
-    listRowIndicesForStudentIds(
-      [{id: '1101'}, {id: '1102'}, {id: '1103'}, {id: '1104'}],
-      ['1102', '1104'],
-    ),
-  ).toStrictEqual([1, 3])
+  it('returns row indices for student ids', () => {
+    expect(
+      listRowIndicesForStudentIds(
+        [{id: '1101'}, {id: '1102'}, {id: '1103'}, {id: '1104'}],
+        ['1102', '1104'],
+      ),
+    ).toStrictEqual([1, 3])
+  })
 })

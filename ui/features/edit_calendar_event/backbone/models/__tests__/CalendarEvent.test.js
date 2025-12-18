@@ -47,9 +47,9 @@ describe('Calendar', () => {
 
         calendarEvent = new CalendarEvent({sections_url: '/sections'})
 
-        jest.spyOn(calendarEvent, 'showSpinner')
-        jest.spyOn(calendarEvent, 'hideSpinner')
-        jest.spyOn(calendarEvent, 'loadFailure')
+        vi.spyOn(calendarEvent, 'showSpinner')
+        vi.spyOn(calendarEvent, 'hideSpinner')
+        vi.spyOn(calendarEvent, 'loadFailure')
       })
 
       afterEach(() => {

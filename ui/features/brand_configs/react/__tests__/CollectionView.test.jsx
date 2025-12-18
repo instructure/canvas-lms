@@ -24,13 +24,13 @@ import {http, HttpResponse} from 'msw'
 import Subject from '../CollectionView'
 import {submitHtmlForm} from '@canvas/theme-editor/submitHtmlForm'
 
-jest.mock('@canvas/theme-editor/submitHtmlForm', () => ({
+vi.mock('@canvas/theme-editor/submitHtmlForm', () => ({
   __esModule: true,
-  submitHtmlForm: jest.fn(),
+  submitHtmlForm: vi.fn(),
 }))
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  reloadWindow: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  reloadWindow: vi.fn(),
 }))
 
 const OUR_ACCOUNT_ID = '123'
@@ -120,7 +120,7 @@ describe('CollectionView', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
     server.resetHandlers()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
   afterAll(() => server.close())
 

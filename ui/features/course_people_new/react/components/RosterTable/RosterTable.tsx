@@ -32,12 +32,7 @@ interface RosterTableProps {
   sortDirection: SortDirection
 }
 
-const RosterTable: FC<RosterTableProps> = ({
-  users,
-  handleSort,
-  sortField,
-  sortDirection
-}) => {
+const RosterTable: FC<RosterTableProps> = ({users, handleSort, sortField, sortDirection}) => {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const userIds = (users || []).map(user => user._id)
 
@@ -54,18 +49,18 @@ const RosterTable: FC<RosterTableProps> = ({
     setSelected(copy)
   }
 
-  const allSelected =
-    selected.size > 0 && userIds.every(id => selected.has(id))
+  const allSelected = selected.size > 0 && userIds.every(id => selected.has(id))
   const someSelected = selected.size > 0 && !allSelected
 
-  const renderRows = () => (users || []).map(user => (
-    <RosterTableRow
-      key={`user-id-${user._id}`}
-      user={user}
-      isSelected={selected.has(user._id)}
-      handleSelectRow={handleSelectRow}
-    />
-  ))
+  const renderRows = () =>
+    (users || []).map(user => (
+      <RosterTableRow
+        key={`user-id-${user._id}`}
+        user={user}
+        isSelected={selected.has(user._id)}
+        handleSelectRow={handleSelectRow}
+      />
+    ))
 
   return (
     <Table caption={I18n.t('Course Roster')} data-testid="roster-table">
@@ -77,9 +72,7 @@ const RosterTable: FC<RosterTableProps> = ({
         sortField={sortField}
         sortDirection={sortDirection}
       />
-      <Table.Body>
-        {renderRows()}
-      </Table.Body>
+      <Table.Body>{renderRows()}</Table.Body>
     </Table>
   )
 }

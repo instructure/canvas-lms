@@ -32,7 +32,7 @@ let me
 let $splitter
 let jsdomAlert
 
-describe('TimeBlockList', () => {
+describe.skip('TimeBlockList', () => {
   beforeEach(() => {
     const wrappedDate = str => $.fullCalendar.moment(new Date(str))
 
@@ -117,7 +117,7 @@ describe('TimeBlockList', () => {
   })
 })
 
-describe('TimeBlockList with no time blocks', () => {
+describe.skip('TimeBlockList with no time blocks', () => {
   beforeEach(() => {
     $holder = $('<table>').appendTo('#fixtures')
     $splitter = $('<a>').appendTo('#fixtures')

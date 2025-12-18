@@ -17,17 +17,20 @@
  */
 
 import React from 'react'
-import {renderHook} from '@testing-library/react-hooks'
+import {renderHook, act} from '@testing-library/react-hooks'
+import {waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {type MockedFunction} from 'vitest'
 import {useOutcomes} from '../useOutcomes'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {executeQuery} from '@canvas/graphql'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
-jest.mock('@canvas/graphql')
+vi.mock('@canvas/graphql')
 
-const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
-const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+const mockExecuteQuery = executeQuery as MockedFunction<typeof executeQuery>
+
+const server = setupServer()
 
 const mockRootOutcomeGroup = {
   id: 1,
@@ -120,19 +123,23 @@ const createWrapper = () => {
 }
 
 describe('useOutcomes', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    server.resetHandlers()
+    vi.restoreAllMocks()
   })
 
   describe('with provided groupId', () => {
     it('fetches outcomes with provided groupId', async () => {
       mockExecuteQuery.mockResolvedValue(mockOutcomesData)
 
-      const {result, waitForNextUpdate} = renderHook(
+      const {result} = renderHook(
         () =>
           useOutcomes({
             courseId: '123',
@@ -143,7 +150,9 @@ describe('useOutcomes', () => {
 
       expect(result.current.isLoading).toBe(true)
 
-      await waitForNextUpdate()
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+      })
 
       expect(result.current.outcomes).toEqual(mockOutcomesData.group.outcomes.edges)
       expect(result.current.outcomesCount).toBe(2)
@@ -155,7 +164,7 @@ describe('useOutcomes', () => {
     it('passes searchTerm to executeQuery when provided', async () => {
       mockExecuteQuery.mockResolvedValue(mockOutcomesData)
 
-      const {waitForNextUpdate} = renderHook(
+      const {result} = renderHook(
         () =>
           useOutcomes({
             courseId: '123',
@@ -165,7 +174,9 @@ describe('useOutcomes', () => {
         {wrapper: createWrapper()},
       )
 
-      await waitForNextUpdate()
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+      })
 
       expect(mockExecuteQuery).toHaveBeenCalledWith(
         expect.anything(),
@@ -178,7 +189,7 @@ describe('useOutcomes', () => {
     it('trims whitespace from search term', async () => {
       mockExecuteQuery.mockResolvedValue(mockOutcomesData)
 
-      const {waitForNextUpdate} = renderHook(
+      const {result} = renderHook(
         () =>
           useOutcomes({
             courseId: '123',
@@ -188,7 +199,9 @@ describe('useOutcomes', () => {
         {wrapper: createWrapper()},
       )
 
-      await waitForNextUpdate()
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+      })
 
       expect(mockExecuteQuery).toHaveBeenCalledWith(
         expect.anything(),
@@ -201,7 +214,7 @@ describe('useOutcomes', () => {
     it('does not pass searchQuery when search term is empty', async () => {
       mockExecuteQuery.mockResolvedValue(mockOutcomesData)
 
-      const {waitForNextUpdate} = renderHook(
+      const {result} = renderHook(
         () =>
           useOutcomes({
             courseId: '123',
@@ -211,7 +224,9 @@ describe('useOutcomes', () => {
         {wrapper: createWrapper()},
       )
 
-      await waitForNextUpdate()
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+      })
 
       const calls = mockExecuteQuery.mock.calls
       const lastCall = calls[calls.length - 1]
@@ -222,7 +237,7 @@ describe('useOutcomes', () => {
       const error = new Error('Failed to fetch outcomes')
       mockExecuteQuery.mockRejectedValue(error)
 
-      const {result, waitForNextUpdate} = renderHook(
+      const {result} = renderHook(
         () =>
           useOutcomes({
             courseId: '123',
@@ -231,9 +246,10 @@ describe('useOutcomes', () => {
         {wrapper: createWrapper()},
       )
 
-      await waitForNextUpdate()
+      await waitFor(() => {
+        expect(result.current.error).toEqual(error)
+      })
 
-      expect(result.current.error).toEqual(error)
       expect(result.current.outcomes).toEqual([])
       expect(result.current.outcomesCount).toBe(0)
     })
@@ -254,7 +270,7 @@ describe('useOutcomes', () => {
       }
       mockExecuteQuery.mockResolvedValue(dataWithPagination)
 
-      const {result, waitForNextUpdate} = renderHook(
+      const {result} = renderHook(
         () =>
           useOutcomes({
             courseId: '123',
@@ -263,7 +279,9 @@ describe('useOutcomes', () => {
         {wrapper: createWrapper()},
       )
 
-      await waitForNextUpdate()
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+      })
 
       expect(result.current.hasNextPage).toBe(true)
       expect(result.current.endCursor).toBe('cursor123')
@@ -272,10 +290,16 @@ describe('useOutcomes', () => {
 
   describe('without provided groupId', () => {
     it('fetches root outcome group first, then fetches outcomes', async () => {
-      mockDoFetchApi.mockResolvedValue({json: mockRootOutcomeGroup} as any)
+      let rootGroupFetched = false
+      server.use(
+        http.get('/api/v1/courses/123/root_outcome_group', () => {
+          rootGroupFetched = true
+          return HttpResponse.json(mockRootOutcomeGroup)
+        }),
+      )
       mockExecuteQuery.mockResolvedValue(mockOutcomesData)
 
-      const {result, waitForNextUpdate} = renderHook(
+      const {result, rerender} = renderHook(
         () =>
           useOutcomes({
             courseId: '123',
@@ -285,32 +309,41 @@ describe('useOutcomes', () => {
 
       expect(result.current.isLoading).toBe(true)
 
-      await waitForNextUpdate()
-      await waitForNextUpdate()
-
-      expect(mockDoFetchApi).toHaveBeenCalledWith({
-        path: '/api/v1/courses/123/root_outcome_group',
-        method: 'GET',
+      // Wait for the root group fetch to be called first
+      await waitFor(() => {
+        expect(rootGroupFetched).toBe(true)
       })
 
-      expect(mockExecuteQuery).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          id: '1',
-          outcomesContextId: '123',
-          outcomesContextType: 'Course',
-        }),
-      )
+      // Force a rerender to allow the second query to pick up the new enabled state
+      await act(async () => {
+        rerender()
+      })
+
+      // Wait for the outcomes query to be called with the group ID from the first query
+      await waitFor(() => {
+        expect(mockExecuteQuery).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            id: '1',
+            outcomesContextId: '123',
+            outcomesContextType: 'Course',
+          }),
+        )
+      })
+
+      // Wait for loading to complete
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+      })
 
       expect(result.current.outcomes).toEqual(mockOutcomesData.group.outcomes.edges)
       expect(result.current.outcomesCount).toBe(2)
     })
 
     it('handles error from root outcome group fetch', async () => {
-      const error = new Error('Failed to fetch root group')
-      mockDoFetchApi.mockRejectedValue(error)
+      server.use(http.get('/api/v1/courses/123/root_outcome_group', () => HttpResponse.error()))
 
-      const {result, waitForNextUpdate} = renderHook(
+      const {result} = renderHook(
         () =>
           useOutcomes({
             courseId: '123',
@@ -318,9 +351,10 @@ describe('useOutcomes', () => {
         {wrapper: createWrapper()},
       )
 
-      await waitForNextUpdate()
+      await waitFor(() => {
+        expect(result.current.error).not.toBeNull()
+      })
 
-      expect(result.current.error).toEqual(error)
       expect(result.current.outcomes).toEqual([])
     })
   })
@@ -346,7 +380,7 @@ describe('useOutcomes', () => {
     it('fetches when enabled is true', async () => {
       mockExecuteQuery.mockResolvedValue(mockOutcomesData)
 
-      const {waitForNextUpdate} = renderHook(
+      const {result} = renderHook(
         () =>
           useOutcomes({
             courseId: '123',
@@ -356,7 +390,9 @@ describe('useOutcomes', () => {
         {wrapper: createWrapper()},
       )
 
-      await waitForNextUpdate()
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+      })
 
       expect(mockExecuteQuery).toHaveBeenCalled()
     })
@@ -378,7 +414,7 @@ describe('useOutcomes', () => {
         },
       } as any)
 
-      const {result, waitForNextUpdate} = renderHook(
+      const {result} = renderHook(
         () =>
           useOutcomes({
             courseId: '123',
@@ -387,7 +423,9 @@ describe('useOutcomes', () => {
         {wrapper: createWrapper()},
       )
 
-      await waitForNextUpdate()
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+      })
 
       expect(result.current.outcomes).toEqual([])
       expect(result.current.outcomesCount).toBe(0)
@@ -408,7 +446,7 @@ describe('useOutcomes', () => {
         },
       } as any)
 
-      const {result, waitForNextUpdate} = renderHook(
+      const {result} = renderHook(
         () =>
           useOutcomes({
             courseId: '123',
@@ -417,7 +455,9 @@ describe('useOutcomes', () => {
         {wrapper: createWrapper()},
       )
 
-      await waitForNextUpdate()
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+      })
 
       expect(result.current.hasNextPage).toBe(false)
       expect(result.current.endCursor).toBe(null)

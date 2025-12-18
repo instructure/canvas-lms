@@ -29,7 +29,7 @@ describe('Gradebook > Default Gradebook > Components > Content Filters > Section
       {id: '2002', name: 'Section 2'},
       {id: '2001', name: 'Section 1'},
     ],
-    onSelect: jest.fn(),
+    onSelect: vi.fn(),
     selectedSectionId: '0',
   }
 
@@ -47,7 +47,7 @@ describe('Gradebook > Default Gradebook > Components > Content Filters > Section
   afterEach(() => {
     cleanup()
     fakeENV.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('labels the filter with "Section Filter"', () => {

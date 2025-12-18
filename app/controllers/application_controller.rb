@@ -439,7 +439,6 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     account_level_blackout_dates
     assignment_edit_placement_not_on_announcements
-    accessibility_issues_in_full_page
     a11y_checker_ai_generation
     block_content_editor_toolbar_reorder
     commons_new_quizzes
@@ -3424,7 +3423,7 @@ class ApplicationController < ActionController::Base
 
   def peer_reviews_for_a2_enabled?
     current_user_is_student = @context.respond_to?(:user_is_student?) && @context.user_is_student?(@current_user)
-    current_user_is_student && @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:peer_reviews_for_a2)
+    current_user_is_student && @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:assignments_2_student)
   end
 
   # Show Student View button on the following controller/action pages, as long as defined tabs are not hidden

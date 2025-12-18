@@ -92,13 +92,6 @@ submission_comment_emojis:
       state: allowed_on # enable for automated testings builds and local testing
     development:
       state: allowed_on # enable for local development
-peer_reviews_for_a2:
-  state: hidden
-  applies_to: Course
-  display_name: Peer Review Support in Assignment Enhancements
-  description:
-    Students will be able to provide feedback on another student's assignment submission
-    using the enhanced assignment view
 assignment_missing_shortcut:
   state: hidden
   applies_to: SiteAdmin
@@ -516,47 +509,9 @@ scheduled_feedback_releases:
       state: allowed_on
     development:
       state: allowed_on
-use_batches_score_metadata_updates:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Use Batches for Score Metadata Updates
-  shadow: true
-  description: |
-    Enables batch processing with PostgreSQL CROSS JOIN to reduce log size and improve compatibility with Observe.
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
-send_metrics_for_comment_bank_items_connection_limit_used:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Send Metrics for when Limit Arg is used on Comment Bank Items
-  shadow: true
-  description: |
-    Enables sending metrics when the `limit` argument is used on user_type.comment_bank_items_connection.
 use_comment_library_v2:
   state: hidden
   applies_to: SiteAdmin
   display_name: Use Enhanced Comment Library in SpeedGrader
   description: |
     Enables the new Comment Library experience in SpeedGrader.
-send_metrics_for_comment_bank_items_count_used:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Send Metrics for when `comment_bank_items_count` resolver is used on Comment Bank Items
-  shadow: true
-  description: |
-    Enables sending metrics when the `comment_bank_items_count` resolver is used on user_type.comment_bank_items_connection.
-
-grade_summary_preload_optimizations:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Grade Summary Preload Optimizations
-  description: |
-    Enables optimizations for preloading data on the Grade Summary page.
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on

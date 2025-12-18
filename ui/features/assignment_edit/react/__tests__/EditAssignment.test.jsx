@@ -24,21 +24,35 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import {AnnotatedDocumentSelector} from '../EditAssignment'
 
 // Mock FlashAlert
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: () => jest.fn(),
-  showFlashSuccess: () => jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: () => vi.fn(),
+  showFlashSuccess: () => vi.fn(),
 }))
 
-jest.mock('@canvas/i18n', () => ({
-  useScope: () => ({
-    t: str => {
-      const translations = {
-        'Course files': 'Course files',
-        'Group files': 'Group files',
+vi.mock('@canvas/i18n', () => ({
+  useScope: (scope) => {
+    return {
+      t: (key, defaultValue) => {
+        const translations = {
+          'Course files': 'Course files',
+          'Group files': 'Group files',
+          'Remove selected attachment': 'Remove selected attachment',
+          'Available folders': 'Available folders',
+          'Loading': 'Loading',
+          'Help us improve by telling us what happened': 'Help us improve by telling us what happened',
+          'Report Issue': 'Report Issue',
+          'Comment failed to post! Please try again later.': 'Comment failed to post! Please try again later.',
+          'Comment submitted!': 'Comment submitted!',
+          'What happened?': 'What happened?',
+          'Your Email Address': 'Your Email Address',
+          'email@example.com': 'email@example.com',
+          'Submit': 'Submit',
+          'Sorry, Something Broke': 'Sorry, Something Broke',
+        }
+        return translations[key] || defaultValue || key
       }
-      return translations[str] || str
-    },
-  }),
+    }
+  },
 }))
 
 const server = setupServer(
@@ -159,7 +173,7 @@ describe('AnnotatedDocumentSelector', () => {
     })
 
     it('the button for removing the attachment calls onRemove', () => {
-      props.onRemove = jest.fn()
+      props.onRemove = vi.fn()
       const {queryByText} = render(<AnnotatedDocumentSelector {...props} />)
       const button = queryByText('Remove selected attachment')
       button.click()
@@ -197,7 +211,7 @@ describe('AnnotatedDocumentSelector', () => {
       })
 
       it('selecting a file in the FileBrowser calls onSelect', () => {
-        props.onSelect = jest.fn()
+        props.onSelect = vi.fn()
         const {queryByText} = render(<AnnotatedDocumentSelector {...props} />)
 
         waitFor(() => {

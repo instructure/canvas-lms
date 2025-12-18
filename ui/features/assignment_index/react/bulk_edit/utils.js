@@ -31,12 +31,14 @@ export function canEditAll(assignment) {
   return assignment.can_edit && assignment.all_dates.every(override => override.can_edit)
 }
 
-export function anyAssignmentEdited(assignments){
+export function anyAssignmentEdited(assignments) {
   const overrides = assignments.flatMap(a => a.all_dates)
   const originalDateFields = [
     originalDateField('due_at'),
     originalDateField('unlock_at'),
     originalDateField('lock_at'),
   ]
-  return overrides.some(override => originalDateFields.some(originalField => override.hasOwnProperty(originalField)))
+  return overrides.some(override =>
+    originalDateFields.some(originalField => override.hasOwnProperty(originalField)),
+  )
 }

@@ -25,20 +25,17 @@ import ContextModuleApi from '../../apis/ContextModuleApi'
 import SubmissionManager from '../SubmissionManager'
 import store from '../stores'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
-jest.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/rce/RichContentEditor')
 
-jest.mock('../../apis/ContextModuleApi')
-
-jest.mock('@canvas/do-fetch-api-effect')
-
-jest.useFakeTimers()
+vi.mock('../../apis/ContextModuleApi')
 
 describe('SubmissionManager', () => {
   beforeAll(() => {
@@ -58,7 +55,7 @@ describe('SubmissionManager', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('self assessment', () => {
@@ -80,7 +77,13 @@ describe('SubmissionManager', () => {
       fakeENV.teardown()
     })
 
+    let setOnFailure
+    let setOnSuccess
+
     const renderComponent = async (assignmentOverrides = {}, isSubmitted = true) => {
+      setOnFailure = vi.fn()
+      setOnSuccess = vi.fn()
+
       const props = await mockAssignmentAndSubmission({
         Submission: {
           ...(isSubmitted
@@ -125,7 +128,9 @@ describe('SubmissionManager', () => {
 
       return render(
         <MockedProvider>
-          <SubmissionManager {...props} />
+          <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
+            <SubmissionManager {...props} />
+          </AlertManagerContext.Provider>
         </MockedProvider>,
       )
     }
@@ -222,6 +227,28 @@ describe('SubmissionManager', () => {
       expect(getByTestId('rubric-self-assessment-rating-button-1')).toBeDisabled()
       expect(getByTestId('rubric-self-assessment-rating-button-selected')).toBeInTheDocument()
       expect(getByTestId('rubric-self-assessment-rating-button-0')).toBeDisabled()
+    })
+
+    it('shows error alert when trying to submit incomplete rubric', async () => {
+      store.setState({
+        displayedAssessment: {
+          data: [],
+        },
+        isSavingRubricAssessment: false,
+        selfAssessment: null,
+      })
+
+      const {getByTestId} = await renderComponent()
+
+      fireEvent.click(getByTestId('self-assess-button'))
+
+      expect(getByTestId('enhanced-rubric-assessment-tray')).toBeInTheDocument()
+
+      // Submit without selecting any ratings
+      const submitButton = getByTestId('save-rubric-assessment-button')
+      fireEvent.click(submitButton)
+
+      expect(setOnFailure).toHaveBeenCalledWith('Incomplete Self Assessment')
     })
   })
 })

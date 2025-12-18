@@ -29,7 +29,7 @@ describe('GroupCategoriesView', () => {
   let wrapper
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     fakeENV.setup()
     ENV.group_categories_url = '/api/v1/courses/1/group_categories'
     ENV.permissions = {can_add_groups: true}
@@ -44,7 +44,7 @@ describe('GroupCategoriesView', () => {
         name: 'group set 2',
       },
     ])
-    jest.spyOn(categories, 'fetch').mockReturnValue([])
+    vi.spyOn(categories, 'fetch').mockReturnValue([])
 
     view = new GroupCategoriesView({collection: categories})
     view.render()
@@ -57,7 +57,7 @@ describe('GroupCategoriesView', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.useRealTimers()
+    vi.useRealTimers()
     view.remove()
     document.body.removeChild(wrapper)
   })

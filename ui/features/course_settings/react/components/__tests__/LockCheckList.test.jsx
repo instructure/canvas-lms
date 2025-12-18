@@ -49,7 +49,7 @@ describe('LockCheckList component', () => {
 
   test('selecting checkbox calls onChange', async () => {
     const props = defaultProps()
-    props.onChange = jest.fn()
+    props.onChange = vi.fn()
     const {container} = render(<LockCheckList {...props} />)
     const checkbox = container.querySelector('.bcs_check_box-group input[type="checkbox"]')
     await userEvent.click(checkbox)

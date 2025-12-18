@@ -94,19 +94,19 @@ describe('Gradebook#gotAllAssignmentGroups', () => {
   })
 
   it('sets the "assignment groups loaded" state', () => {
-    jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
     gradebook.gotAllAssignmentGroups([])
     expect(gradebook.setAssignmentGroupsLoaded).toHaveBeenCalledTimes(1)
   })
 
   it('sets the "assignment groups loaded" state to true', () => {
-    jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
     gradebook.gotAllAssignmentGroups([])
     expect(gradebook.setAssignmentGroupsLoaded).toHaveBeenCalledWith(true)
   })
 
   it('adds the assignment group to the group definitions if it is new', () => {
-    jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
     const assignmentGroup = {
       id: '12',
       assignments: [{id: '35', name: 'An Assignment', due_at: null}],
@@ -116,7 +116,7 @@ describe('Gradebook#gotAllAssignmentGroups', () => {
   })
 
   it('adds new assignments to existing assignment groups', () => {
-    jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
     gradebook.assignmentGroups['12'] = {
       id: '12',
       assignments: [{id: '22', name: 'Some Other Assignment', due_at: null}],
@@ -131,7 +131,7 @@ describe('Gradebook#gotAllAssignmentGroups', () => {
   })
 
   it('does not add duplicate assignments to assignment groups', () => {
-    jest.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
     gradebook.assignmentGroups['12'] = {
       id: '12',
       assignments: [{id: '35', name: 'An Assignment', due_at: null}],
@@ -143,6 +143,288 @@ describe('Gradebook#gotAllAssignmentGroups', () => {
     gradebook.gotAllAssignmentGroups([assignmentGroup])
     const assignmentIds = gradebook.assignmentGroups['12'].assignments.map(a => a.id)
     expect(assignmentIds).toEqual(['35'])
+  })
+
+  describe('peer review sub assignments', () => {
+    beforeEach(() => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
+    })
+
+    afterEach(() => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
+    })
+
+    it('adds peer review sub assignments to the assignment group', () => {
+      vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+      vi.spyOn(gradebook, 'addAssignmentColumnDefinition')
+      const assignmentGroup = {
+        id: '12',
+        assignment_group_id: '12',
+        assignments: [
+          {
+            id: '35',
+            name: 'An Assignment',
+            due_at: null,
+            assignment_group_id: '12',
+            peer_reviews: true,
+            peer_review_sub_assignment: {
+              id: '36',
+              name: 'Peer Review',
+              due_at: null,
+            },
+          },
+        ],
+      }
+      gradebook.gotAllAssignmentGroups([assignmentGroup])
+      const assignmentIds = gradebook.assignmentGroups['12'].assignments.map(a => a.id)
+      expect(assignmentIds).toEqual(['35', '36'])
+    })
+
+    it('adds peer review sub assignments to the assignments object', () => {
+      vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+      vi.spyOn(gradebook, 'addAssignmentColumnDefinition')
+      const assignmentGroup = {
+        id: '12',
+        assignment_group_id: '12',
+        assignments: [
+          {
+            id: '35',
+            name: 'An Assignment',
+            due_at: null,
+            assignment_group_id: '12',
+            peer_reviews: true,
+            peer_review_sub_assignment: {
+              id: '36',
+              name: 'Peer Review',
+              due_at: null,
+            },
+          },
+        ],
+      }
+      gradebook.gotAllAssignmentGroups([assignmentGroup])
+      expect(gradebook.assignments['36']).toBeDefined()
+      expect(gradebook.assignments['36'].parent_assignment_id).toBe('35')
+    })
+
+    it('adds parent_assignment reference to peer review sub assignments', () => {
+      vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+      vi.spyOn(gradebook, 'addAssignmentColumnDefinition')
+      const parentAssignment = {
+        id: '35',
+        name: 'An Assignment',
+        due_at: null,
+        assignment_group_id: '12',
+        peer_reviews: true,
+        peer_review_sub_assignment: {
+          id: '36',
+          name: 'Peer Review',
+          due_at: null,
+        },
+      }
+      const assignmentGroup = {
+        id: '12',
+        assignment_group_id: '12',
+        assignments: [parentAssignment],
+      }
+      gradebook.gotAllAssignmentGroups([assignmentGroup])
+      expect(gradebook.assignments['36'].parent_assignment).toEqual(parentAssignment)
+    })
+
+    it('adds column definition for peer review sub assignments', () => {
+      vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+      vi.spyOn(gradebook, 'addAssignmentColumnDefinition')
+      const assignmentGroup = {
+        id: '12',
+        assignment_group_id: '12',
+        assignments: [
+          {
+            id: '35',
+            name: 'An Assignment',
+            due_at: null,
+            assignment_group_id: '12',
+            peer_reviews: true,
+            peer_review_sub_assignment: {
+              id: '36',
+              name: 'Peer Review',
+              due_at: null,
+            },
+          },
+        ],
+      }
+      gradebook.gotAllAssignmentGroups([assignmentGroup])
+      expect(gradebook.addAssignmentColumnDefinition).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  it('does not add peer review sub assignments when peer_review_sub_assignment is missing', () => {
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'addAssignmentColumnDefinition')
+    const assignmentGroup = {
+      id: '12',
+      assignment_group_id: '12',
+      assignments: [
+        {
+          id: '35',
+          name: 'An Assignment',
+          due_at: null,
+          assignment_group_id: '12',
+          peer_reviews: true,
+        },
+      ],
+    }
+    gradebook.gotAllAssignmentGroups([assignmentGroup])
+    expect(gradebook.addAssignmentColumnDefinition).toHaveBeenCalledTimes(1)
+    expect(gradebook.assignments['36']).toBeUndefined()
+  })
+
+  it('does not add peer review sub assignments when assignment does not have peer reviews enabled', () => {
+    vi.spyOn(gradebook, 'setAssignmentGroupsLoaded')
+    vi.spyOn(gradebook, 'addAssignmentColumnDefinition')
+    const assignmentGroup = {
+      id: '12',
+      assignment_group_id: '12',
+      assignments: [
+        {
+          id: '35',
+          name: 'An Assignment',
+          due_at: null,
+          assignment_group_id: '12',
+          peer_reviews: false,
+          peer_review_sub_assignment: {
+            id: '36',
+            name: 'Peer Review',
+            due_at: null,
+          },
+        },
+      ],
+    }
+    gradebook.gotAllAssignmentGroups([assignmentGroup])
+    expect(gradebook.addAssignmentColumnDefinition).toHaveBeenCalledTimes(1)
+    expect(gradebook.assignments['36']).toBeUndefined()
+  })
+})
+
+describe('Gradebook#updateFilterAssignmentIds', () => {
+  let gradebook
+
+  beforeEach(() => {
+    gradebook = createGradebook()
+    gradebook.setAssignments({
+      2301: {
+        id: '2301',
+        name: 'Assignment 1',
+        published: true,
+      },
+      2302: {
+        id: '2302',
+        name: 'Assignment 2',
+        published: true,
+        peer_review_sub_assignment: {
+          id: '2303',
+          name: 'Peer Review',
+        },
+      },
+      2303: {
+        id: '2303',
+        name: 'Peer Review',
+        published: true,
+        parent_assignment_id: '2302',
+      },
+      2304: {
+        id: '2304',
+        name: 'Assignment 3',
+        published: true,
+      },
+    })
+  })
+
+  it('includes peer review sub assignments right after their parent assignments', () => {
+    gradebook.updateFilterAssignmentIds()
+    expect(gradebook.filteredAssignmentIds).toEqual(['2301', '2302', '2303', '2304'])
+  })
+
+  it('removes duplicate peer review sub assignments', () => {
+    gradebook.updateFilterAssignmentIds()
+    const counts = gradebook.filteredAssignmentIds.reduce((acc, id) => {
+      acc[id] = (acc[id] || 0) + 1
+      return acc
+    }, {})
+    expect(counts['2303']).toBe(1)
+  })
+
+  it('maintains correct order with multiple peer review sub assignments', () => {
+    gradebook.setAssignments({
+      2301: {
+        id: '2301',
+        name: 'Assignment 1',
+        published: true,
+        peer_review_sub_assignment: {
+          id: '2305',
+          name: 'Peer Review 1',
+        },
+      },
+      2302: {
+        id: '2302',
+        name: 'Assignment 2',
+        published: true,
+        peer_review_sub_assignment: {
+          id: '2306',
+          name: 'Peer Review 2',
+        },
+      },
+      2303: {
+        id: '2303',
+        name: 'Assignment 3',
+        published: true,
+      },
+      2305: {
+        id: '2305',
+        name: 'Peer Review 1',
+        published: true,
+        parent_assignment_id: '2301',
+      },
+      2306: {
+        id: '2306',
+        name: 'Peer Review 2',
+        published: true,
+        parent_assignment_id: '2302',
+      },
+    })
+    gradebook.updateFilterAssignmentIds()
+    expect(gradebook.filteredAssignmentIds).toEqual(['2301', '2305', '2302', '2306', '2303'])
+  })
+
+  it('does not add peer review sub assignments if they are not in filtered assignments', () => {
+    gradebook.setAssignments({
+      2301: {
+        id: '2301',
+        name: 'Assignment 1',
+        published: true,
+        peer_review_sub_assignment: {
+          id: '2305',
+          name: 'Peer Review 1',
+        },
+      },
+      2305: {
+        id: '2305',
+        name: 'Peer Review 1',
+        published: false,
+        parent_assignment_id: '2301',
+      },
+    })
+    vi.spyOn(gradebook, 'filterAssignments').mockReturnValue([
+      {
+        id: '2301',
+        name: 'Assignment 1',
+        published: true,
+        peer_review_sub_assignment: {
+          id: '2305',
+          name: 'Peer Review 1',
+        },
+      },
+    ])
+    gradebook.updateFilterAssignmentIds()
+    expect(gradebook.filteredAssignmentIds).toEqual(['2301'])
   })
 })
 
@@ -164,7 +446,7 @@ describe('Gradebook#updateStudentHeadersAndReloadData', () => {
   })
 
   it('makes a call to update column headers', () => {
-    const updateColumnHeaders = jest.spyOn(
+    const updateColumnHeaders = vi.spyOn(
       gradebook.gradebookGrid.gridSupport.columns,
       'updateColumnHeaders',
     )
@@ -173,7 +455,7 @@ describe('Gradebook#updateStudentHeadersAndReloadData', () => {
   })
 
   it('updates the student column header', () => {
-    const updateColumnHeaders = jest.spyOn(
+    const updateColumnHeaders = vi.spyOn(
       gradebook.gradebookGrid.gridSupport.columns,
       'updateColumnHeaders',
     )
@@ -192,7 +474,7 @@ describe('Gradebook#gotCustomColumnDataChunk', () => {
       1101: {id: '1101', assignment_201: {}, assignment_202: {}},
       1102: {id: '1102', assignment_201: {}},
     }
-    jest.spyOn(gradebook, 'invalidateRowsForStudentIds')
+    vi.spyOn(gradebook, 'invalidateRowsForStudentIds')
   })
 
   it('updates students with custom column data', () => {
@@ -361,7 +643,7 @@ describe('Gradebook Assignment Student Visibility', () => {
     let saveSettingsStub
 
     beforeEach(() => {
-      saveSettingsStub = jest
+      saveSettingsStub = vi
         .spyOn(gradebook, 'saveSettings')
         .mockImplementation((_context_id, gradebook_settings) =>
           Promise.resolve(gradebook_settings),

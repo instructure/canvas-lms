@@ -80,12 +80,12 @@ describe('Gradebook', () => {
   ]
 
   const mockContributingScores: ContributingScoresManager = {
-    forOutcome: jest.fn(() => ({
+    forOutcome: vi.fn(() => ({
       isVisible: () => false,
-      toggleVisibility: jest.fn(),
+      toggleVisibility: vi.fn(),
       data: undefined,
       alignments: undefined,
-      scoresForUser: jest.fn(() => []),
+      scoresForUser: vi.fn(() => []),
       isLoading: false,
       error: undefined,
     })),
@@ -106,16 +106,18 @@ describe('Gradebook', () => {
         },
       ],
       courseId: '100',
-      setCurrentPage: jest.fn(),
+      setCurrentPage: vi.fn(),
       sorting: {
         sortOrder: SortOrder.ASC,
-        setSortOrder: jest.fn(),
+        setSortOrder: vi.fn(),
         sortBy: SortBy.SortableName,
-        setSortBy: jest.fn(),
+        setSortBy: vi.fn(),
         sortOutcomeId: null,
-        setSortOutcomeId: jest.fn(),
+        setSortOutcomeId: vi.fn(),
+        sortAlignmentId: null,
+        setSortAlignmentId: vi.fn(),
       },
-      onChangeNameDisplayFormat: jest.fn(),
+      onChangeNameDisplayFormat: vi.fn(),
       contributingScores: mockContributingScores,
       ...props,
     }
@@ -151,7 +153,9 @@ describe('Gradebook', () => {
     ]
     const props = defaultProps({outcomes: customOutcomes})
     const {container} = renderWithQueryClient(<Gradebook {...props} />)
-    const outcomeHeaders = container.querySelectorAll('[data-testid="outcome-header"]')
+    const outcomeHeaders = container.querySelectorAll(
+      '#outcomes-header [data-testid="column-header"]',
+    )
 
     expect(outcomeHeaders).toHaveLength(4)
     expect(outcomeHeaders[0]).toHaveTextContent('First Outcome')
@@ -191,9 +195,9 @@ describe('Gradebook', () => {
   describe('contributing scores headers', () => {
     it('does not render contributing score headers when outcome is not visible', () => {
       const mockContributingScoresNotVisible: ContributingScoresManager = {
-        forOutcome: jest.fn(() => ({
+        forOutcome: vi.fn(() => ({
           isVisible: () => false,
-          toggleVisibility: jest.fn(),
+          toggleVisibility: vi.fn(),
           data: undefined,
           alignments: [
             {
@@ -204,7 +208,7 @@ describe('Gradebook', () => {
               html_url: 'http://test.com/assignments/2',
             },
           ],
-          scoresForUser: jest.fn(() => []),
+          scoresForUser: vi.fn(() => []),
           isLoading: false,
           error: undefined,
         })),
@@ -217,28 +221,28 @@ describe('Gradebook', () => {
 
     it('renders contributing score headers when outcome is visible', () => {
       const mockContributingScoresVisible: ContributingScoresManager = {
-        forOutcome: jest.fn(outcomeId => {
+        forOutcome: vi.fn(outcomeId => {
           if (outcomeId === '1') {
             return {
               isVisible: () => true,
-              toggleVisibility: jest.fn(),
+              toggleVisibility: vi.fn(),
               data: {
                 outcome: {id: '1', title: 'Test Outcome'},
                 alignments: MOCK_ALIGNMENTS_TWO,
                 scores: [],
               },
               alignments: MOCK_ALIGNMENTS_TWO,
-              scoresForUser: jest.fn(() => []),
+              scoresForUser: vi.fn(() => []),
               isLoading: false,
               error: undefined,
             }
           }
           return {
             isVisible: () => false,
-            toggleVisibility: jest.fn(),
+            toggleVisibility: vi.fn(),
             data: undefined,
             alignments: undefined,
-            scoresForUser: jest.fn(() => []),
+            scoresForUser: vi.fn(() => []),
             isLoading: false,
             error: undefined,
           }
@@ -257,28 +261,28 @@ describe('Gradebook', () => {
 
     it('renders correct number of contributing score headers based on alignments', () => {
       const mockContributingScoresMultiple: ContributingScoresManager = {
-        forOutcome: jest.fn(outcomeId => {
+        forOutcome: vi.fn(outcomeId => {
           if (outcomeId === '1') {
             return {
               isVisible: () => true,
-              toggleVisibility: jest.fn(),
+              toggleVisibility: vi.fn(),
               data: {
                 outcome: {id: '1', title: 'Test Outcome'},
                 alignments: MOCK_ALIGNMENTS_THREE,
                 scores: [],
               },
               alignments: MOCK_ALIGNMENTS_THREE,
-              scoresForUser: jest.fn(() => []),
+              scoresForUser: vi.fn(() => []),
               isLoading: false,
               error: undefined,
             }
           }
           return {
             isVisible: () => false,
-            toggleVisibility: jest.fn(),
+            toggleVisibility: vi.fn(),
             data: undefined,
             alignments: undefined,
-            scoresForUser: jest.fn(() => []),
+            scoresForUser: vi.fn(() => []),
             isLoading: false,
             error: undefined,
           }
@@ -298,12 +302,12 @@ describe('Gradebook', () => {
 
     it('does not render contributing score headers when alignments is undefined', () => {
       const mockContributingScoresNoAlignments: ContributingScoresManager = {
-        forOutcome: jest.fn(() => ({
+        forOutcome: vi.fn(() => ({
           isVisible: () => true,
-          toggleVisibility: jest.fn(),
+          toggleVisibility: vi.fn(),
           data: undefined,
           alignments: undefined,
-          scoresForUser: jest.fn(() => []),
+          scoresForUser: vi.fn(() => []),
           isLoading: false,
           error: undefined,
         })),
@@ -312,24 +316,24 @@ describe('Gradebook', () => {
       const props = defaultProps({contributingScores: mockContributingScoresNoAlignments})
       const {container} = renderWithQueryClient(<Gradebook {...props} />)
 
-      // Should only have the regular outcome headers, not contributing score headers
-      const allHeaders = container.querySelectorAll('[data-testid="outcome-header"]')
-      // 2 outcomes from MOCK_OUTCOMES
+      const allHeaders = container.querySelectorAll(
+        '#outcomes-header [data-testid="column-header"]',
+      )
       expect(allHeaders).toHaveLength(2)
     })
 
     it('does not render contributing score headers when alignments is empty array', () => {
       const mockContributingScoresEmptyAlignments: ContributingScoresManager = {
-        forOutcome: jest.fn(() => ({
+        forOutcome: vi.fn(() => ({
           isVisible: () => true,
-          toggleVisibility: jest.fn(),
+          toggleVisibility: vi.fn(),
           data: {
             outcome: {id: '1', title: 'Test Outcome'},
             alignments: [],
             scores: [],
           },
           alignments: [],
-          scoresForUser: jest.fn(() => []),
+          scoresForUser: vi.fn(() => []),
           isLoading: false,
           error: undefined,
         })),
@@ -338,16 +342,17 @@ describe('Gradebook', () => {
       const props = defaultProps({contributingScores: mockContributingScoresEmptyAlignments})
       const {container} = renderWithQueryClient(<Gradebook {...props} />)
 
-      // Should only have the regular outcome headers
-      const allHeaders = container.querySelectorAll('[data-testid="outcome-header"]')
+      const allHeaders = container.querySelectorAll(
+        '#outcomes-header [data-testid="column-header"]',
+      )
       expect(allHeaders).toHaveLength(2)
     })
 
     it('renders contributing score headers for multiple visible outcomes', () => {
       const mockContributingScoresMultipleOutcomes: ContributingScoresManager = {
-        forOutcome: jest.fn(outcomeId => ({
+        forOutcome: vi.fn(outcomeId => ({
           isVisible: () => true,
-          toggleVisibility: jest.fn(),
+          toggleVisibility: vi.fn(),
           data: {
             outcome: {id: outcomeId.toString(), title: `Outcome ${outcomeId}`},
             alignments: [
@@ -370,7 +375,7 @@ describe('Gradebook', () => {
               html_url: `http://test.com/assignments/${outcomeId}`,
             },
           ],
-          scoresForUser: jest.fn(() => []),
+          scoresForUser: vi.fn(() => []),
           isLoading: false,
           error: undefined,
         })),

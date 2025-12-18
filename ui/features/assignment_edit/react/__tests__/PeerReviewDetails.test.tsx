@@ -22,11 +22,11 @@ import userEvent from '@testing-library/user-event'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
-import PeerReviewDetails from '../PeerReviewDetails'
+import PeerReviewDetails, {type AssignmentModel} from '../PeerReviewDetails'
 import {MAX_NUM_PEER_REVIEWS} from '../hooks/usePeerReviewSettings'
 
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(),
+vi.mock('@canvas/graphql', () => ({
+  executeQuery: vi.fn(),
 }))
 
 // @ts-expect-error
@@ -36,15 +36,15 @@ global.ENV = {
 }
 
 const createMockAssignment = (overrides = {}) => ({
-  peerReviews: jest.fn(() => false),
-  peerReviewCount: jest.fn(() => 1),
-  moderatedGrading: jest.fn(() => false),
-  courseID: jest.fn(() => '123'),
-  getId: jest.fn(() => '456'),
-  peerReviewSubmissionRequired: jest.fn(() => false),
-  groupCategoryId: jest.fn(() => null),
-  peerReviewAcrossSections: jest.fn(() => true),
-  hasPeerReviewSubmissions: jest.fn(() => false),
+  peerReviews: vi.fn(() => false),
+  peerReviewCount: vi.fn(() => 1),
+  moderatedGrading: vi.fn(() => false),
+  courseID: vi.fn(() => '123'),
+  getId: vi.fn(() => '456'),
+  peerReviewSubmissionRequired: vi.fn(() => false),
+  groupCategoryId: vi.fn(() => null),
+  peerReviewAcrossSections: vi.fn(() => true),
+  hasPeerReviewSubmissions: vi.fn(() => false),
   ...overrides,
 })
 
@@ -54,20 +54,20 @@ function renderWithQueryClient(ui: React.ReactElement) {
 }
 
 describe('PeerReviewDetails', () => {
-  let assignment: Assignment
+  let assignment: AssignmentModel
   let user: ReturnType<typeof userEvent.setup>
 
   beforeEach(() => {
     user = userEvent.setup()
-    assignment = createMockAssignment() as unknown as Assignment
-    assignment.peerReviews = jest.fn(() => false)
-    assignment.moderatedGrading = jest.fn(() => false)
+    assignment = createMockAssignment() as unknown as AssignmentModel
+    assignment.peerReviews = vi.fn(() => false)
+    assignment.moderatedGrading = vi.fn(() => false)
 
-    window.removeEventListener('message', jest.fn())
+    window.removeEventListener('message', vi.fn())
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('Initial rendering', () => {
@@ -77,7 +77,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('renders checkbox as checked when assignment has peer reviews enabled', () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       expect(screen.getByTestId('peer-review-checkbox')).toBeChecked()
@@ -91,7 +91,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('renders checkbox as disabled when assignment is moderated', () => {
-      assignment.moderatedGrading = jest.fn(() => true)
+      assignment.moderatedGrading = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const checkbox = screen.getByTestId('peer-review-checkbox')
@@ -99,8 +99,8 @@ describe('PeerReviewDetails', () => {
     })
 
     it('loads initial value of submission required as checked when set to true in assignment', async () => {
-      assignment.peerReviews = jest.fn(() => true)
-      assignment.peerReviewSubmissionRequired = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
+      assignment.peerReviewSubmissionRequired = vi.fn(() => true)
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
@@ -112,7 +112,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('defaults submission required to unchecked when not set in assignment', async () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
@@ -123,8 +123,8 @@ describe('PeerReviewDetails', () => {
     })
 
     it('loads initial value of across sections as checked when set to true in assignment', async () => {
-      assignment.peerReviews = jest.fn(() => true)
-      assignment.peerReviewAcrossSections = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
+      assignment.peerReviewAcrossSections = vi.fn(() => true)
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
@@ -136,8 +136,8 @@ describe('PeerReviewDetails', () => {
     })
 
     it('defaults across sections to checked when not set in assignment', async () => {
-      assignment.peerReviews = jest.fn(() => true)
-      assignment.peerReviewAcrossSections = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
+      assignment.peerReviewAcrossSections = vi.fn(() => true)
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
@@ -163,7 +163,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('hides settings when checkbox is unchecked', async () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const checkbox = screen.getByTestId('peer-review-checkbox')
@@ -397,7 +397,7 @@ describe('PeerReviewDetails', () => {
     it('shows within groups toggle when assignment is a group assignment', async () => {
       const mockCheckbox = document.getElementById('has_group_category') as HTMLInputElement
       mockCheckbox.checked = true
-      assignment.groupCategoryId = jest.fn(() => '123')
+      assignment.groupCategoryId = vi.fn(() => '123')
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       const checkbox = screen.getByTestId('peer-review-checkbox')
@@ -412,7 +412,7 @@ describe('PeerReviewDetails', () => {
     it('hides within groups toggle when assignment has blank group category', async () => {
       const mockCheckbox = document.getElementById('has_group_category') as HTMLInputElement
       mockCheckbox.checked = false
-      assignment.groupCategoryId = jest.fn(() => 'blank')
+      assignment.groupCategoryId = vi.fn(() => 'blank')
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       const checkbox = screen.getByTestId('peer-review-checkbox')
@@ -427,7 +427,7 @@ describe('PeerReviewDetails', () => {
     it('shows within groups toggle when group_category_changed event fires with group category', async () => {
       const mockCheckbox = document.getElementById('has_group_category') as HTMLInputElement
       mockCheckbox.checked = false
-      assignment.groupCategoryId = jest.fn(() => null)
+      assignment.groupCategoryId = vi.fn(() => null)
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       const checkbox = screen.getByTestId('peer-review-checkbox')
@@ -438,7 +438,7 @@ describe('PeerReviewDetails', () => {
       expect(screen.queryByText('Allow peer reviews within groups')).not.toBeInTheDocument()
 
       mockCheckbox.checked = true
-      assignment.groupCategoryId = jest.fn(() => '456')
+      assignment.groupCategoryId = vi.fn(() => '456')
       fireEvent(document, new Event('group_category_changed'))
 
       await waitFor(() => {
@@ -450,7 +450,7 @@ describe('PeerReviewDetails', () => {
     it('hides within groups toggle when group_category_changed event fires without group category', async () => {
       const mockCheckbox = document.getElementById('has_group_category') as HTMLInputElement
       mockCheckbox.checked = true
-      assignment.groupCategoryId = jest.fn(() => '789')
+      assignment.groupCategoryId = vi.fn(() => '789')
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       const checkbox = screen.getByTestId('peer-review-checkbox')
@@ -461,7 +461,7 @@ describe('PeerReviewDetails', () => {
       expect(screen.getByText('Allow peer reviews within groups')).toBeInTheDocument()
 
       mockCheckbox.checked = false
-      assignment.groupCategoryId = jest.fn(() => null)
+      assignment.groupCategoryId = vi.fn(() => null)
       fireEvent(document, new Event('group_category_changed'))
 
       await waitFor(() => {
@@ -473,7 +473,7 @@ describe('PeerReviewDetails', () => {
     it('hides within groups toggle when group_category_changed event fires with blank', async () => {
       const mockCheckbox = document.getElementById('has_group_category') as HTMLInputElement
       mockCheckbox.checked = true
-      assignment.groupCategoryId = jest.fn(() => '999')
+      assignment.groupCategoryId = vi.fn(() => '999')
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       const checkbox = screen.getByTestId('peer-review-checkbox')
@@ -484,7 +484,7 @@ describe('PeerReviewDetails', () => {
       expect(screen.getByText('Allow peer reviews within groups')).toBeInTheDocument()
 
       mockCheckbox.checked = false
-      assignment.groupCategoryId = jest.fn(() => 'blank')
+      assignment.groupCategoryId = vi.fn(() => 'blank')
       fireEvent(document, new Event('group_category_changed'))
 
       await waitFor(() => {
@@ -499,7 +499,7 @@ describe('PeerReviewDetails', () => {
         document.body.removeChild(mockCheckbox)
       }
 
-      assignment.groupCategoryId = jest.fn(() => '123')
+      assignment.groupCategoryId = vi.fn(() => '123')
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       const checkbox = screen.getByTestId('peer-review-checkbox')
       await user.click(checkbox)
@@ -567,7 +567,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('unchecks checkbox when disabled', async () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
       await user.click(advancedSettingsToggle)
@@ -763,13 +763,13 @@ describe('PeerReviewDetails', () => {
   describe('Data loading from existing assignment', () => {
     it('loads existing peer review count', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 5),
-        peerReviewSubAssignment: jest.fn(() => ({
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 5),
+        peerReviewSubAssignment: vi.fn(() => ({
           points_possible: 25,
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -779,13 +779,13 @@ describe('PeerReviewDetails', () => {
 
     it('calculates points per review from total points', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 4),
-        peerReviewSubAssignment: jest.fn(() => ({
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 4),
+        peerReviewSubAssignment: vi.fn(() => ({
           points_possible: 20,
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -795,13 +795,13 @@ describe('PeerReviewDetails', () => {
 
     it('loads pass_fail grading type', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 2),
-        peerReviewSubAssignment: jest.fn(() => ({
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 2),
+        peerReviewSubAssignment: vi.fn(() => ({
           points_possible: 10,
           grading_type: 'pass_fail',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -814,10 +814,10 @@ describe('PeerReviewDetails', () => {
 
     it('loads anonymous peer reviews setting', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 2),
-        anonymousPeerReviews: jest.fn(() => true),
-      }) as unknown as Assignment
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 2),
+        anonymousPeerReviews: vi.fn(() => true),
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -830,11 +830,11 @@ describe('PeerReviewDetails', () => {
 
     it('loads intra group peer reviews setting', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 2),
-        intraGroupPeerReviews: jest.fn(() => true),
-        groupCategoryId: jest.fn(() => '123'), // Make it a group assignment
-      }) as unknown as Assignment
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 2),
+        intraGroupPeerReviews: vi.fn(() => true),
+        groupCategoryId: vi.fn(() => '123'), // Make it a group assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -848,7 +848,7 @@ describe('PeerReviewDetails', () => {
 
   describe('Hidden inputs for Advanced Configuration', () => {
     it('creates hidden inputs for toggle values when peer reviews are enabled', () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       expect(
@@ -864,7 +864,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('resets peer-review values via hidden inputs when peer reviews are disabled', () => {
-      assignment.peerReviews = jest.fn(() => false)
+      assignment.peerReviews = vi.fn(() => false)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       expect(
@@ -915,11 +915,11 @@ describe('PeerReviewDetails', () => {
 
     it('within groups hidden input has correct value when enabled', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 2),
-        groupCategoryId: jest.fn(() => '123'),
-        intraGroupPeerReviews: jest.fn(() => true),
-      }) as unknown as Assignment
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 2),
+        groupCategoryId: vi.fn(() => '123'),
+        intraGroupPeerReviews: vi.fn(() => true),
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -930,7 +930,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('within groups hidden input has correct value when disabled', () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const withinGroupsHidden = document.getElementById(
@@ -941,10 +941,10 @@ describe('PeerReviewDetails', () => {
 
     it('anonymity hidden input has correct value when enabled', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 2),
-        anonymousPeerReviews: jest.fn(() => true),
-      }) as unknown as Assignment
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 2),
+        anonymousPeerReviews: vi.fn(() => true),
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -955,7 +955,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('anonymity hidden input has correct value when disabled', () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const anonymityHidden = document.getElementById(
@@ -966,10 +966,10 @@ describe('PeerReviewDetails', () => {
 
     it('submission required hidden input has correct value when enabled', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 2),
-        peerReviewSubmissionRequired: jest.fn(() => true),
-      }) as unknown as Assignment
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 2),
+        peerReviewSubmissionRequired: vi.fn(() => true),
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -980,7 +980,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('submission required hidden input has correct value when disabled', () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const submissionRequiredHidden = document.getElementById(
@@ -991,13 +991,13 @@ describe('PeerReviewDetails', () => {
 
     it('pass fail grading hidden input has correct value when enabled', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 2),
-        peerReviewSubAssignment: jest.fn(() => ({
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 2),
+        peerReviewSubAssignment: vi.fn(() => ({
           points_possible: 10,
           grading_type: 'pass_fail',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -1009,13 +1009,13 @@ describe('PeerReviewDetails', () => {
 
     it('pass fail grading hidden input has correct value when disabled', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 2),
-        peerReviewSubAssignment: jest.fn(() => ({
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 2),
+        peerReviewSubAssignment: vi.fn(() => ({
           points_possible: 10,
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -1026,8 +1026,8 @@ describe('PeerReviewDetails', () => {
     })
 
     it('within groups hidden input updates when toggle is changed', async () => {
-      assignment.peerReviews = jest.fn(() => true)
-      assignment.groupCategoryId = jest.fn(() => '123') // Make it a group assignment
+      assignment.peerReviews = vi.fn(() => true)
+      assignment.groupCategoryId = vi.fn(() => '123') // Make it a group assignment
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
@@ -1046,7 +1046,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('anonymity hidden input updates when toggle is changed', async () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
@@ -1064,7 +1064,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('submission required hidden input updates when toggle is changed', async () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
@@ -1082,7 +1082,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('pass fail grading hidden input updates when toggle is changed', async () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
@@ -1101,9 +1101,9 @@ describe('PeerReviewDetails', () => {
 
     it('reviews required hidden input has correct value when peer reviews enabled', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 3),
-      }) as unknown as Assignment
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 3),
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -1115,13 +1115,13 @@ describe('PeerReviewDetails', () => {
 
     it('points per review hidden input has correct value when peer reviews enabled', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 2),
-        peerReviewSubAssignment: jest.fn(() => ({
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 2),
+        peerReviewSubAssignment: vi.fn(() => ({
           points_possible: 10, // 10 / 2 = 5
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -1132,7 +1132,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('reviews required hidden input updates when user changes value', async () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
@@ -1147,7 +1147,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('points per review hidden input updates when user changes value', async () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
@@ -1163,13 +1163,13 @@ describe('PeerReviewDetails', () => {
 
     it('reviews required and points per review hidden inputs reset when peer reviews disabled', async () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 3),
-        peerReviewSubAssignment: jest.fn(() => ({
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 3),
+        peerReviewSubAssignment: vi.fn(() => ({
           points_possible: 15,
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -1201,13 +1201,13 @@ describe('PeerReviewDetails', () => {
   describe('Points formatting', () => {
     it('formats points per review with 2 decimals when loaded from database', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 3),
-        peerReviewSubAssignment: jest.fn(() => ({
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 3),
+        peerReviewSubAssignment: vi.fn(() => ({
           points_possible: 3.7, // 3.7 / 3 = 1.233333...
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -1217,13 +1217,13 @@ describe('PeerReviewDetails', () => {
 
     it('formats points as integer when value rounds to whole number', () => {
       const assignmentWithData = createMockAssignment({
-        peerReviews: jest.fn(() => true),
-        peerReviewCount: jest.fn(() => 4),
-        peerReviewSubAssignment: jest.fn(() => ({
+        peerReviews: vi.fn(() => true),
+        peerReviewCount: vi.fn(() => 4),
+        peerReviewSubAssignment: vi.fn(() => ({
           points_possible: 31.996, // 31.996 / 4 = 7.999, should round to 8
           grading_type: 'points',
         })),
-      }) as unknown as Assignment
+      }) as unknown as AssignmentModel
 
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
@@ -1232,7 +1232,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('formats points with 2 decimals after user input and blur', async () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
@@ -1245,7 +1245,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('formats integer input without decimals after blur', async () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
@@ -1258,7 +1258,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('shows zero as "0" without decimals', () => {
-      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
@@ -1268,8 +1268,8 @@ describe('PeerReviewDetails', () => {
 
   describe('Disabled state when peer review submissions exist', () => {
     beforeEach(() => {
-      assignment.peerReviews = jest.fn(() => true)
-      assignment.hasPeerReviewSubmissions = jest.fn(() => true)
+      assignment.peerReviews = vi.fn(() => true)
+      assignment.hasPeerReviewSubmissions = vi.fn(() => true)
     })
 
     it('shows alert message when peer review submissions exist', () => {
@@ -1297,7 +1297,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('does not show alert or disable fields when peer review submissions do not exist', () => {
-      assignment.hasPeerReviewSubmissions = jest.fn(() => false)
+      assignment.hasPeerReviewSubmissions = vi.fn(() => false)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       expect(
@@ -1334,7 +1334,7 @@ describe('PeerReviewDetails', () => {
 
     it('does not show alert or disable fields when hasPeerReviewSubmissions method does not exist', () => {
       const assignmentWithoutMethod = createMockAssignment({
-        peerReviews: jest.fn(() => true),
+        peerReviews: vi.fn(() => true),
       })
       delete (assignmentWithoutMethod as any).hasPeerReviewSubmissions
 

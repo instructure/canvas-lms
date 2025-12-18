@@ -708,6 +708,27 @@ describe "Api::V1::Assignment" do
         expect(json).not_to have_key("has_peer_review_submissions")
       end
     end
+
+    context "peer review sub-assignment html_url" do
+      it "uses parent assignment ID in html_url for peer review sub-assignments" do
+        course = course_model
+        parent_assignment = assignment_model(course:)
+        peer_review_sub_assignment = PeerReviewSubAssignment.create!(parent_assignment:)
+
+        json = api.assignment_json(peer_review_sub_assignment, user, session, {})
+
+        expect(json["html_url"]).to eq("assignment/url/#{course.id}/#{parent_assignment.id}")
+      end
+
+      it "uses its own ID in html_url for regular assignments" do
+        course = course_model
+        regular_assignment = assignment_model(course:)
+
+        json = api.assignment_json(regular_assignment, user, session, {})
+
+        expect(json["html_url"]).to eq("assignment/url/#{course.id}/#{regular_assignment.id}")
+      end
+    end
   end
 
   describe "*_settings_hash methods" do
@@ -1721,6 +1742,87 @@ describe "Api::V1::Assignment" do
             end
           end
         end
+      end
+    end
+  end
+
+  describe "#prepare_peer_review_params" do
+    context "when params is nil" do
+      it "returns empty hash" do
+        expect(api.send(:prepare_peer_review_params, nil)).to eq({})
+      end
+    end
+
+    context "when params is empty hash" do
+      it "returns empty hash" do
+        expect(api.send(:prepare_peer_review_params, {})).to eq({})
+      end
+    end
+
+    context "when params has values" do
+      let(:params) do
+        {
+          points_possible: 10,
+          grading_type: "points",
+          due_at: "2025-01-15T12:00:00Z"
+        }
+      end
+
+      it "includes all provided params" do
+        result = api.send(:prepare_peer_review_params, params)
+        expect(result).to eq(params)
+      end
+    end
+
+    context "when params has explicit nil values" do
+      let(:params) do
+        {
+          due_at: nil,
+          unlock_at: nil,
+          lock_at: nil
+        }
+      end
+
+      it "includes nil values to enable clearing dates" do
+        result = api.send(:prepare_peer_review_params, params)
+        expect(result).to eq(params)
+        expect(result).to have_key(:due_at)
+        expect(result[:due_at]).to be_nil
+      end
+    end
+
+    context "when params has blank string values" do
+      let(:params) do
+        {
+          points_possible: "",
+          due_at: "",
+          unlock_at: ""
+        }
+      end
+
+      it "filters out blank strings" do
+        result = api.send(:prepare_peer_review_params, params)
+        expect(result).to eq({})
+      end
+    end
+
+    context "when params has mix of values, nils, and blanks" do
+      let(:params) do
+        {
+          points_possible: 10,
+          grading_type: "",
+          due_at: nil,
+          unlock_at: "2025-01-15T12:00:00Z"
+        }
+      end
+
+      it "includes values and nil, but filters out blank strings" do
+        result = api.send(:prepare_peer_review_params, params)
+        expect(result[:points_possible]).to eq(10)
+        expect(result).to have_key(:due_at)
+        expect(result[:due_at]).to be_nil
+        expect(result[:unlock_at]).to eq("2025-01-15T12:00:00Z")
+        expect(result).not_to have_key(:grading_type)
       end
     end
   end

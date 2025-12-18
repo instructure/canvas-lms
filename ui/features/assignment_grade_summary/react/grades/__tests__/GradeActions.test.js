@@ -20,7 +20,7 @@ import * as GradeActions from '../GradeActions'
 import * as GradesApi from '../GradesApi'
 import configureStore from '../../configureStore'
 
-jest.mock('../GradesApi')
+vi.mock('../GradesApi')
 
 describe('GradeSummary GradeActions', () => {
   let store
@@ -45,7 +45,7 @@ describe('GradeSummary GradeActions', () => {
     }
 
     // Reset all mocks before each test
-    jest.resetAllMocks()
+    vi.resetAllMocks()
 
     // Set default mock implementations
     GradesApi.selectProvisionalGrade.mockResolvedValue()

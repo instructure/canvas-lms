@@ -46,17 +46,17 @@ afterAll(() => {
 
 // Mock HTMLElement.focus to prevent focus errors in tests
 beforeEach(() => {
-  HTMLElement.prototype.focus = jest.fn()
-  jest.useFakeTimers()
+  HTMLElement.prototype.focus = vi.fn()
+  vi.useFakeTimers()
 })
 
 afterEach(() => {
-  jest.useRealTimers()
+  vi.useRealTimers()
 })
 
 async function wait(ms = 0) {
   if (ms > 0) {
-    jest.advanceTimersByTime(ms)
+    vi.advanceTimersByTime(ms)
   }
   // Allow promises to resolve
   await Promise.resolve()
@@ -71,7 +71,7 @@ let getSpy
 describe('default proficiency', () => {
   beforeEach(() => {
     const err = assign(new Error(), {response: {status: 404}})
-    getSpy = jest.spyOn(axios, 'get').mockImplementation(() => Promise.reject(err))
+    getSpy = vi.spyOn(axios, 'get').mockImplementation(() => Promise.reject(err))
   })
 
   afterEach(() => {
@@ -159,7 +159,7 @@ describe('default proficiency', () => {
 
   it('clicking add rating button flashes SR message', async () => {
     const {getByText, getByRole} = render(<ProficiencyTable {...defaultProps} />)
-    const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
+    const flashMock = vi.spyOn($, 'screenReaderFlashMessage')
 
     await wait(1)
 
@@ -184,7 +184,7 @@ describe('default proficiency', () => {
 
   it('deleting rating removes rating and flashes SR message', async () => {
     const {getAllByRole, getByText} = render(<ProficiencyTable {...defaultProps} />)
-    const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
+    const flashMock = vi.spyOn($, 'screenReaderFlashMessage')
 
     await wait(1)
 
@@ -328,7 +328,7 @@ describe('default proficiency', () => {
   })
 
   it('sends POST on submit', async () => {
-    const postSpy = jest
+    const postSpy = vi
       .spyOn(axios, 'post')
       .mockImplementation(() => Promise.resolve({status: 200}))
 
@@ -360,7 +360,7 @@ describe('default proficiency', () => {
 
 describe('custom proficiency', () => {
   it('renders two ratings that are deletable', async () => {
-    const spy = jest.spyOn(axios, 'get').mockImplementation(() =>
+    const spy = vi.spyOn(axios, 'get').mockImplementation(() =>
       Promise.resolve({
         status: 200,
         data: {
@@ -396,7 +396,7 @@ describe('custom proficiency', () => {
   })
 
   it('renders one rating that is not deletable', async () => {
-    const spy = jest.spyOn(axios, 'get').mockImplementation(() =>
+    const spy = vi.spyOn(axios, 'get').mockImplementation(() =>
       Promise.resolve({
         status: 200,
         data: {

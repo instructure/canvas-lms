@@ -22,6 +22,13 @@ import {renderHook} from '@testing-library/react-hooks'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import fetchMock from 'fetch-mock'
 import {useContributingScores, ContributingScoresResponse} from '../useContributingScores'
+import {
+  DisplayFilter,
+  SecondaryInfoDisplay,
+  NameDisplayFormat,
+  ScoreDisplayFormat,
+  OutcomeArrangement,
+} from '../../utils/constants'
 
 describe('useContributingScores', () => {
   const courseId = '1'
@@ -300,7 +307,7 @@ describe('useContributingScores', () => {
       expect(scores).toEqual([])
     })
 
-    it('returns score strings for each alignment', async () => {
+    it('returns score for each alignment', async () => {
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
         {wrapper: createWrapper()},
@@ -322,11 +329,14 @@ describe('useContributingScores', () => {
 
       const scoresForUser6 = result.current.contributingScores.forOutcome('2').scoresForUser('6')
       // User 6 has no score for D_5 (undefined) and score 1 for D_6
-      expect(scoresForUser6).toEqual([undefined, 1])
+      expect(scoresForUser6).toEqual([undefined, mockContributingScoresOutcome2.scores[0]])
 
       const scoresForUser7 = result.current.contributingScores.forOutcome('2').scoresForUser('7')
       // User 7 has score 3 for D_5 and score 2 for D_6
-      expect(scoresForUser7).toEqual([3, 2])
+      expect(scoresForUser7).toEqual([
+        mockContributingScoresOutcome2.scores[1],
+        mockContributingScoresOutcome2.scores[2],
+      ])
     })
 
     it('returns undefined for alignments without scores', async () => {
@@ -559,6 +569,133 @@ describe('useContributingScores', () => {
 
       expect(result.current.isLoading).toBe(false)
       expect(result.current.error).toBeNull()
+    })
+  })
+
+  describe('show_unpublished_assignments setting', () => {
+    it('includes show_unpublished_assignments=true parameter when setting is enabled', async () => {
+      const settings = {
+        secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
+        displayFilters: [DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS],
+        nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+        studentsPerPage: 15,
+        scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
+        outcomeArrangement: OutcomeArrangement.UPLOAD_ORDER,
+      }
+
+      const {result} = renderHook(
+        () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true, settings}),
+        {wrapper: createWrapper()},
+      )
+
+      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
+      fetchMock.get(
+        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true&show_unpublished_assignments=true`,
+        mockContributingScoresOutcome2,
+      )
+
+      act(() => {
+        result.current.contributingScores.forOutcome('2').toggleVisibility()
+      })
+
+      await waitFor(() => {
+        expect(result.current.contributingScores.forOutcome('2').isLoading).toBe(false)
+      })
+
+      expect(fetchMock.calls()).toHaveLength(1)
+      const fetchUrl = fetchMock.calls()[0][0] as string
+      expect(fetchUrl).toContain('show_unpublished_assignments=true')
+    })
+
+    it('does not include show_unpublished_assignments parameter when setting is disabled', async () => {
+      const settings = {
+        secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
+        displayFilters: [],
+        nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+        studentsPerPage: 15,
+        scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
+        outcomeArrangement: OutcomeArrangement.UPLOAD_ORDER,
+      }
+
+      const {result} = renderHook(
+        () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true, settings}),
+        {wrapper: createWrapper()},
+      )
+
+      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
+      fetchMock.get(
+        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
+        mockContributingScoresOutcome2,
+      )
+
+      act(() => {
+        result.current.contributingScores.forOutcome('2').toggleVisibility()
+      })
+
+      await waitFor(() => {
+        expect(result.current.contributingScores.forOutcome('2').isLoading).toBe(false)
+      })
+
+      expect(fetchMock.calls()).toHaveLength(1)
+      const fetchUrl = fetchMock.calls()[0][0] as string
+      expect(fetchUrl).not.toContain('show_unpublished_assignments')
+    })
+
+    it('refetches when show_unpublished_assignments setting changes', async () => {
+      const settingsWithoutUnpublished = {
+        secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
+        displayFilters: [],
+        nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+        studentsPerPage: 15,
+        scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
+        outcomeArrangement: OutcomeArrangement.UPLOAD_ORDER,
+      }
+
+      const {result, rerender} = renderHook(
+        ({settings}: {settings: any}) =>
+          useContributingScores({courseId, studentIds, outcomeIds, enabled: true, settings}),
+        {
+          wrapper: createWrapper(),
+          initialProps: {settings: settingsWithoutUnpublished},
+        },
+      )
+
+      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
+      fetchMock.get(
+        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
+        mockContributingScoresOutcome2,
+      )
+
+      act(() => {
+        result.current.contributingScores.forOutcome('2').toggleVisibility()
+      })
+
+      await waitFor(() => {
+        expect(result.current.contributingScores.forOutcome('2').data).toBeDefined()
+      })
+
+      expect(fetchMock.calls()).toHaveLength(1)
+
+      // Change settings to include show_unpublished_assignments
+      const settingsWithUnpublished = {
+        ...settingsWithoutUnpublished,
+        displayFilters: [DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS],
+      }
+
+      fetchMock.get(
+        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true&show_unpublished_assignments=true`,
+        mockContributingScoresOutcome2,
+        {overwriteRoutes: false},
+      )
+
+      rerender({settings: settingsWithUnpublished})
+
+      await waitFor(() => {
+        expect(fetchMock.calls()).toHaveLength(2)
+      })
+
+      const secondCallUrl = fetchMock.calls()[1][0] as string
+      expect(secondCallUrl).toContain('show_unpublished_assignments=true')
     })
   })
 })

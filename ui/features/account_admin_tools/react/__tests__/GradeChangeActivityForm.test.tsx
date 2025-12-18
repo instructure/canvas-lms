@@ -26,10 +26,10 @@ import userEvent from '@testing-library/user-event'
 describe('GradeChangeActivityForm', () => {
   const props: GradeChangeActivityFormProps = {
     accountId: '1',
-    onSubmit: jest.fn(),
+    onSubmit: vi.fn(),
   }
 
-  afterEach(() => jest.resetAllMocks())
+  afterEach(() => vi.resetAllMocks())
 
   it.each([
     {inputLabel: 'Grader', fieldName: 'grader_id'},

@@ -21,11 +21,11 @@ import userEvent from '@testing-library/user-event'
 import ConfigurationFormLti2 from '../configuration_forms/ConfigurationFormLti2'
 
 // Mock jQuery and its flashError function
-jest.mock('jquery', () => {
+vi.mock('jquery', () => {
   const mockJQuery = () => ({
     // Add any jQuery methods used in the component
   })
-  mockJQuery.flashError = jest.fn()
+  mockJQuery.flashError = vi.fn()
   return mockJQuery
 })
 

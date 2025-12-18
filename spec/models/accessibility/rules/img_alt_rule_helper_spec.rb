@@ -70,7 +70,12 @@ describe Accessibility::Rules::ImgAltRuleHelper do
 
       result = described_class.adjust_img_style(elem)
 
-      expect(result).to include('style="max-width: 100%; max-height: 13rem; object-fit: contain;"')
+      expect(result).to include("display: flex")
+      expect(result).to include("justify-content: center")
+      expect(result).to include("align-items: center")
+      expect(result).to include("max-width: 100%")
+      expect(result).to include("max-height: 100%")
+      expect(result).to include("object-fit: contain")
       expect(result).to include('src="test.jpg"')
       expect(result).to include('alt="test"')
     end
@@ -88,7 +93,12 @@ describe Accessibility::Rules::ImgAltRuleHelper do
       expect(result.length).to eq(2)
       expect(elem["role"]).to eq("presentation")
       expect(elem["alt"]).to eq("")
-      expect(result[1]).to include('style="max-width: 100%; max-height: 13rem; object-fit: contain;"')
+      expect(result[1]).to include("display: flex")
+      expect(result[1]).to include("justify-content: center")
+      expect(result[1]).to include("align-items: center")
+      expect(result[1]).to include("max-width: 100%")
+      expect(result[1]).to include("max-height: 100%")
+      expect(result[1]).to include("object-fit: contain")
     end
 
     it "sets alt text for valid values" do
@@ -101,7 +111,12 @@ describe Accessibility::Rules::ImgAltRuleHelper do
       expect(result).to be_a(Array)
       expect(result.length).to eq(2)
       expect(elem["alt"]).to eq("A beautiful landscape")
-      expect(result[1]).to include('style="max-width: 100%; max-height: 13rem; object-fit: contain;"')
+      expect(result[1]).to include("display: flex")
+      expect(result[1]).to include("justify-content: center")
+      expect(result[1]).to include("align-items: center")
+      expect(result[1]).to include("max-width: 100%")
+      expect(result[1]).to include("max-height: 100%")
+      expect(result[1]).to include("object-fit: contain")
     end
 
     it "raises error for filename-like values" do

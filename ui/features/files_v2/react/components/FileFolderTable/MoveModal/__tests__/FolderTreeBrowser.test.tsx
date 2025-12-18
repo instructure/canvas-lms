@@ -23,13 +23,13 @@ import {FAKE_FOLDERS} from '../../../../../fixtures/fakeData'
 import FolderTreeBrowser from '../FolderTreeBrowser'
 import {useFoldersQuery} from '../hooks'
 
-jest.mock('../hooks', () => ({
-  useFoldersQuery: jest.fn(),
+vi.mock('../hooks', () => ({
+  useFoldersQuery: vi.fn(),
 }))
 
 const defaultProps = {
   rootFolder: FAKE_FOLDERS[0],
-  onSelectFolder: jest.fn(),
+  onSelectFolder: vi.fn(),
 }
 
 const renderComponent = (props: any = {}) =>
@@ -37,7 +37,7 @@ const renderComponent = (props: any = {}) =>
 
 describe('FolderTreeBrowser', () => {
   beforeEach(() => {
-    ;(useFoldersQuery as jest.Mock).mockReturnValue({
+    ;(useFoldersQuery as any).mockReturnValue({
       folders: {[FAKE_FOLDERS[1].id]: FAKE_FOLDERS[1]},
       foldersLoading: false,
       foldersSuccessful: true,

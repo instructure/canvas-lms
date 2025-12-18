@@ -25,22 +25,20 @@ import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/re
 import {act, fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
-import StudentViewContext, {StudentViewContextDefaults} from '../Context'
+import StudentViewContext, {
+  StudentViewContextDefaults,
+} from '@canvas/assignments/react/StudentViewContext'
 import SubmissionManager from '../SubmissionManager'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
-jest.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/rce/RichContentEditor')
 
-jest.mock('../../apis/ContextModuleApi')
-
-jest.mock('@canvas/do-fetch-api-effect')
-
-jest.useFakeTimers()
+vi.mock('../../apis/ContextModuleApi')
 
 function renderInContext(overrides = {}, children) {
   const contextProps = {...StudentViewContextDefaults, ...overrides}
@@ -83,7 +81,12 @@ describe('SubmissionManager', () => {
   })
 
   beforeEach(() => {
+    vi.useFakeTimers()
     ContextModuleApi.getContextModuleData.mockResolvedValue({})
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   describe('"Mark as Done" button', () => {
@@ -161,7 +164,7 @@ describe('SubmissionManager', () => {
       })
 
       // fickle
-      it.skip('sends a request when clicked', async () => {
+      it('sends a request when clicked', async () => {
         const variables = {
           done: true,
           itemId: '1',
@@ -177,7 +180,7 @@ describe('SubmissionManager', () => {
 
         const {getByTestId} = render(
           <AlertManagerContext.Provider
-            value={{...StudentViewContextDefaults, setOnFailure: jest.fn()}}
+            value={{...StudentViewContextDefaults, setOnFailure: vi.fn()}}
           >
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
@@ -192,12 +195,12 @@ describe('SubmissionManager', () => {
         })
 
         await act(async () => {
-          jest.runOnlyPendingTimers()
+          vi.runOnlyPendingTimers()
         })
         expect(getByTestId('set-module-item-completion-button')).toHaveTextContent('Done')
       })
 
-      it.skip('updates itself to the opposite appearance when the request succeeds', async () => {
+      it('updates itself to the opposite appearance when the request succeeds', async () => {
         const variables = {
           done: true,
           itemId: '1',
@@ -226,7 +229,7 @@ describe('SubmissionManager', () => {
         })
 
         await act(async () => {
-          jest.runOnlyPendingTimers()
+          vi.runOnlyPendingTimers()
         })
         expect(getByTestId('set-module-item-completion-button')).toHaveTextContent('Done')
       })
@@ -246,7 +249,7 @@ describe('SubmissionManager', () => {
         ]
 
         const {getByTestId} = render(
-          <AlertManagerContext.Provider value={{setOnFailure: jest.fn()}}>
+          <AlertManagerContext.Provider value={{setOnFailure: vi.fn()}}>
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
             </MockedProvider>
@@ -260,7 +263,7 @@ describe('SubmissionManager', () => {
         })
 
         await act(async () => {
-          jest.runOnlyPendingTimers()
+          vi.runOnlyPendingTimers()
         })
         expect(markAsDoneButton).toHaveTextContent('Mark as done')
       })

@@ -570,7 +570,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    resources :accessibility_issues, only: [:update, :show]
+    resources :accessibility_issues, only: [:update]
 
     resources :ai_experiences, only: %i[index create new show edit update destroy]
     resources :ai_experiences, only: %i[index show new edit]
@@ -2149,6 +2149,11 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/lti_resource_links/:id", action: :destroy
     end
 
+    scope(controller: "lti/asset_processor_tii_migrations_api") do
+      get "accounts/:account_id/asset_processors/tii_migrations", action: :index
+      post "accounts/:account_id/asset_processors/tii_migrations", action: :create
+    end
+
     scope(controller: :immersive_reader) do
       get "immersive_reader/authenticate", action: :authenticate
     end
@@ -2958,6 +2963,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :career_experience) do
+      get "career/enabled", action: :enabled
       get "career/experience_summary", action: :experience_summary
       post "career/switch_experience", action: :switch_experience
       post "career/switch_role", action: :switch_role

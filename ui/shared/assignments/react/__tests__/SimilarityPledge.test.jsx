@@ -26,19 +26,19 @@ describe('SimilarityPledge', () => {
       eulaUrl: '',
       checked: true,
       comments: '',
-      onChange: jest.fn(),
+      onChange: vi.fn(),
       pledgeText: 'a grave and solemn pledge',
       shouldShowPledgeError: false,
-      getShouldShowPledgeError: jest.fn(),
-      setShouldShowPledgeError: jest.fn(),
+      getShouldShowPledgeError: vi.fn(),
+      setShouldShowPledgeError: vi.fn(),
       checkboxRef: null,
-      ...overrides
+      ...overrides,
     }
     return render(<SimilarityPledge {...props} />)
   }
 
   it('calls the onChange property when the checkbox is toggled', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByTestId} = setup({eulaUrl: 'http://some.url', onChange: onChange})
     const checkbox = getByTestId('similarity-pledge-checkbox')
     act(() => {
@@ -94,18 +94,26 @@ describe('SimilarityPledge', () => {
   describe('validation', () => {
     it('displays an error message when shouldShowPledgeError is true', () => {
       const {getByText} = setup({checked: false, shouldShowPledgeError: true})
-      expect(getByText('You must agree to the submission pledge before you can submit the assignment')).toBeInTheDocument()
+      expect(
+        getByText('You must agree to the submission pledge before you can submit the assignment'),
+      ).toBeInTheDocument()
     })
 
     it('removes the error message when the checkbox is checked', () => {
-      const mockSetShouldShowPledgeError = jest.fn()
-      const {getByTestId, queryByText} = setup({checked: false, setShouldShowPledgeError: mockSetShouldShowPledgeError, shouldShowPledgeError: true})
+      const mockSetShouldShowPledgeError = vi.fn()
+      const {getByTestId, queryByText} = setup({
+        checked: false,
+        setShouldShowPledgeError: mockSetShouldShowPledgeError,
+        shouldShowPledgeError: true,
+      })
 
       const checkbox = getByTestId('similarity-pledge-checkbox')
       fireEvent.click(checkbox)
 
       expect(mockSetShouldShowPledgeError).toHaveBeenCalledWith(false, '')
-      expect(queryByText('You must agree to the submission pledge before you can submit the assignment')).not.toBeInTheDocument()
+      expect(
+        queryByText('You must agree to the submission pledge before you can submit the assignment'),
+      ).not.toBeInTheDocument()
     })
   })
 })

@@ -66,7 +66,7 @@ afterAll(() => {
 
 describe('GradebookHistory::SearchFormComponent', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   it('displays a flash alert on fetch failure', () => {
@@ -79,7 +79,7 @@ describe('GradebookHistory::SearchFormComponent', () => {
   })
 
   it('properly debounces getSearchOptions calls', () => {
-    const getSearchOptions = jest.fn()
+    const getSearchOptions = vi.fn()
     const {container} = mountSubject({getSearchOptions})
     const input = container.querySelector('input#assignments')
     fireEvent.click(input)
@@ -90,13 +90,13 @@ describe('GradebookHistory::SearchFormComponent', () => {
   describe('calls getSearchOptions with correct arguments after more than two letters are typed', () => {
     fields.forEach(field => {
       it(`for ${field}`, () => {
-        const getSearchOptions = jest.fn()
+        const getSearchOptions = vi.fn()
         const {container} = mountSubject({getSearchOptions})
         const input = container.querySelector(`input#${field}`)
         fireEvent.click(input)
         fireEvent.input(input, {target: {id: field, value: 'onetwo'}})
         act(() => {
-          jest.advanceTimersByTime(500)
+          vi.advanceTimersByTime(500)
         }) // wait for debounce
         expect(getSearchOptions).toHaveBeenCalledWith(field, 'onetwo')
       })
@@ -106,7 +106,7 @@ describe('GradebookHistory::SearchFormComponent', () => {
   describe('hits clearSearchOptions after two or fewer letters are typed', () => {
     fields.forEach(field => {
       it(`for ${field}`, () => {
-        const clearSearchOptions = jest.fn()
+        const clearSearchOptions = vi.fn()
         const {container} = mountSubject({
           clearSearchOptions,
           [field]: {
@@ -141,7 +141,7 @@ describe('GradebookHistory::SearchFormComponent', () => {
   })
 
   it('calls getSearchOptionsNextPage if there are more items to load', () => {
-    const getSearchOptionsNextPage = jest.fn()
+    const getSearchOptionsNextPage = vi.fn()
     const {rerender} = mountSubject({getSearchOptionsNextPage})
     expect(getSearchOptionsNextPage).not.toHaveBeenCalled()
     rerender(

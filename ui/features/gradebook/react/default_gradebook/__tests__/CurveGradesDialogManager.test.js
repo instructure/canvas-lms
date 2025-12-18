@@ -75,13 +75,13 @@ describe('CurveGradesDialogManager.createCurveGradesAction.isDisabled', () => {
     let flashErrorSpy
 
     beforeEach(() => {
-      flashErrorSpy = jest.spyOn($, 'flashError')
-      jest.spyOn(AsyncComponents, 'loadCurveGradesDialog').mockResolvedValue(CurveGradesDialog)
-      jest.spyOn(CurveGradesDialog.prototype, 'show').mockImplementation(() => {})
+      flashErrorSpy = vi.spyOn($, 'flashError')
+      vi.spyOn(AsyncComponents, 'loadCurveGradesDialog').mockResolvedValue(CurveGradesDialog)
+      vi.spyOn(CurveGradesDialog.prototype, 'show').mockImplementation(() => {})
     })
 
     afterEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     const getProps = ({inClosedGradingPeriod = false, isAdmin = false} = {}) => [

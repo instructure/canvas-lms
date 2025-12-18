@@ -37,18 +37,18 @@ import {courseMocks, groupDetailMocks, groupMocks} from '@canvas/outcomes/mocks/
 import {windowConfirm} from '@canvas/util/globalUtils'
 import {useAllPages} from '@canvas/query'
 
-jest.mock('@canvas/query', () => ({
-  useAllPages: jest.fn(),
+vi.mock('@canvas/query', () => ({
+  useAllPages: vi.fn(),
 }))
 
-jest.mock('@canvas/outcomes/react/OutcomesImporter', () => ({
-  showOutcomesImporter: jest.fn(() => jest.fn(() => {})),
-  showOutcomesImporterIfInProgress: jest.fn(() => jest.fn(() => {})),
+vi.mock('@canvas/outcomes/react/OutcomesImporter', () => ({
+  showOutcomesImporter: vi.fn(() => vi.fn(() => {})),
+  showOutcomesImporterIfInProgress: vi.fn(() => vi.fn(() => {})),
 }))
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  ...jest.requireActual('@canvas/util/globalUtils'),
-  windowConfirm: jest.fn(() => true),
+vi.mock('@canvas/util/globalUtils', async () => ({
+  ...await vi.importActual('@canvas/util/globalUtils'),
+  windowConfirm: vi.fn(() => true),
 }))
 
 describe('OutcomeManagement', () => {
@@ -56,12 +56,12 @@ describe('OutcomeManagement', () => {
 
   beforeEach(() => {
     cache = createCache()
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    jest.useRealTimers()
+    vi.clearAllMocks()
+    vi.useRealTimers()
   })
 
   /*
@@ -120,18 +120,18 @@ describe('OutcomeManagement', () => {
         <OutcomeManagement breakpoints={{tablet: true}} />
       </MockedProvider>,
     )
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
 
     // Select a group in the lsh
     const cf0 = await findByText('Course folder 0')
     fireEvent.click(cf0)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
 
     // The easy way to determine if lsh is passing to ManagementHeader is
     // to open the create outcome modal and check if the lhs group was loaded
     // by checking if the child of the lhs group is there
     fireEvent.click(within(getByTestId('managementHeader')).getByText('Create'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     // there's something weird going on in the test here that while we find the modal
     // .toBeInTheDocument() fails, even though a findBy for it fails before ^that click.
     // We can test that the elements expected to be within it exist.
@@ -166,7 +166,7 @@ describe('OutcomeManagement', () => {
         </MockedProvider>,
       )
       expect(getByText(/^Loading$/)).toBeInTheDocument() // spinner
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(getByTestId('managementHeader')).toBeInTheDocument()
     })
 
@@ -180,7 +180,7 @@ describe('OutcomeManagement', () => {
         </MockedProvider>,
       )
       expect(getByText(/^Loading$/)).toBeInTheDocument() // spinner
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Import'))
       const fileDrop = getByLabelText(/Upload your Outcomes!/i)
@@ -199,7 +199,7 @@ describe('OutcomeManagement', () => {
         </MockedProvider>,
       )
       expect(getByText(/^Loading$/)).toBeInTheDocument() // spinner
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showOutcomesImporterIfInProgress).toHaveBeenCalledTimes(1)
       expect(showOutcomesImporterIfInProgress).toHaveBeenCalledWith(
         {
@@ -215,7 +215,7 @@ describe('OutcomeManagement', () => {
       fireEvent.click(getByText('Calculation'))
       fireEvent.click(getByText('Manage'))
       expect(showOutcomesImporterIfInProgress).toHaveBeenCalledTimes(2)
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(getByTestId('outcomeManagementPanel')).toBeInTheDocument()
     })
 
@@ -231,7 +231,7 @@ describe('OutcomeManagement', () => {
           <OutcomeManagement />
         </MockedProvider>,
       )
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(getByText('Manage')).toBeInTheDocument()
       expect(getByText('Mastery')).toBeInTheDocument()
       expect(getByText('Calculation')).toBeInTheDocument()
@@ -244,7 +244,7 @@ describe('OutcomeManagement', () => {
           <OutcomeManagement />
         </MockedProvider>,
       )
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(getByText('Manage')).toBeInTheDocument()
       expect(queryByText('Mastery')).not.toBeInTheDocument()
       expect(queryByText('Calculation')).not.toBeInTheDocument()
@@ -263,7 +263,7 @@ describe('OutcomeManagement', () => {
       })
 
       beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
       })
 
       afterAll(() => {
@@ -308,10 +308,10 @@ describe('OutcomeManagement', () => {
         )
 
         fireEvent.click(getByText('Calculation'))
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runAllTimers())
         fireEvent.input(getByLabelText('Parameter'), {target: {value: ''}})
         fireEvent.click(getByText('Mastery'))
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runAllTimers())
         expect(windowConfirm).toHaveBeenCalledWith(
           'Are you sure you want to proceed? Changes you made will not be saved.',
         )
@@ -332,7 +332,7 @@ describe('OutcomeManagement', () => {
         )
 
         fireEvent.click(getByText('Calculation'))
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runAllTimers())
         fireEvent.input(getByLabelText('Parameter'), {target: {value: ''}})
         fireEvent.click(getByText('Mastery'))
         expect(queryByTestId('masteryScales')).not.toBeInTheDocument()
@@ -351,10 +351,10 @@ describe('OutcomeManagement', () => {
         const calculationButton = getByText('Calculation')
         fireEvent.click(calculationButton)
 
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runAllTimers())
 
-        const e = jest.mock()
-        e.preventDefault = jest.fn()
+        const e = vi.fn()
+        e.preventDefault = vi.fn()
         unloadEventListener(e)
         expect(e.preventDefault).not.toHaveBeenCalled()
       })
@@ -372,13 +372,13 @@ describe('OutcomeManagement', () => {
         const calculationButton = getByText('Calculation')
         fireEvent.click(calculationButton)
 
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runAllTimers())
 
         const parameter = getByLabelText(/Parameter/)
         fireEvent.input(parameter, {target: {value: '88'}})
 
-        const e = jest.mock()
-        e.preventDefault = jest.fn()
+        const e = vi.fn()
+        e.preventDefault = vi.fn()
         unloadEventListener(e)
         expect(e.preventDefault).toHaveBeenCalled()
       })
@@ -399,7 +399,7 @@ describe('OutcomeManagement', () => {
               <OutcomeManagement />
             </MockedProvider>,
           )
-          await act(async () => jest.runAllTimers())
+          await act(async () => vi.runAllTimers())
           expect(getByText('Alignments')).toBeInTheDocument()
         })
 
@@ -410,7 +410,7 @@ describe('OutcomeManagement', () => {
               <OutcomeManagement />
             </MockedProvider>,
           )
-          await act(async () => jest.runAllTimers())
+          await act(async () => vi.runAllTimers())
           expect(queryByText('Alignments')).not.toBeInTheDocument()
         })
 
@@ -421,7 +421,7 @@ describe('OutcomeManagement', () => {
               <OutcomeManagement />
             </MockedProvider>,
           )
-          await act(async () => jest.runAllTimers())
+          await act(async () => vi.runAllTimers())
           expect(queryByText('Alignments')).not.toBeInTheDocument()
         })
       })
@@ -434,7 +434,7 @@ describe('OutcomeManagement', () => {
               <OutcomeManagement />
             </MockedProvider>,
           )
-          await act(async () => jest.runAllTimers())
+          await act(async () => vi.runAllTimers())
           expect(queryByText('Alignments')).not.toBeInTheDocument()
         })
       })
@@ -451,7 +451,7 @@ describe('OutcomeManagement', () => {
             <OutcomeManagement />
           </MockedProvider>,
         )
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runAllTimers())
         expect(queryByText('Alignments')).not.toBeInTheDocument()
       })
     })
@@ -501,7 +501,7 @@ describe('OutcomeManagement', () => {
 describe('OutcomePanel', () => {
   beforeEach(() => {
     document.body.innerHTML = '<div id="outcomes" style="display:none">Outcomes Tab</div>'
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
@@ -510,14 +510,14 @@ describe('OutcomePanel', () => {
 
   it('sets style on mount', () => {
     render(<OutcomePanel />)
-    jest.runAllTimers()
+    vi.runAllTimers()
     expect(document.getElementById('outcomes').style.display).toEqual('block')
   })
 
   it('sets style on unmount', () => {
     const {unmount} = render(<OutcomePanel />)
     unmount()
-    jest.runAllTimers()
+    vi.runAllTimers()
     expect(document.getElementById('outcomes').style.display).toEqual('none')
   })
 })

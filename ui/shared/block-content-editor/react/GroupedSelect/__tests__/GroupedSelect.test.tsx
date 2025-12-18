@@ -20,9 +20,10 @@ import {render, screen} from '@testing-library/react'
 import {GroupedSelect} from '../GroupedSelect'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import {type Mock} from 'vitest'
 
 describe('GroupedSelect', () => {
-  let onChangeMock: jest.Mock
+  let onChangeMock: Mock
   const data: React.ComponentProps<typeof GroupedSelect>['data'] = [
     {
       groupName: 'G1',
@@ -41,7 +42,7 @@ describe('GroupedSelect', () => {
   ]
 
   beforeEach(() => {
-    onChangeMock = jest.fn()
+    onChangeMock = vi.fn()
   })
 
   it('renders grouped select with initial data', () => {

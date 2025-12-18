@@ -2285,6 +2285,12 @@ module ValidateDateTimeFormat
 end
 ActiveRecord::Base.prepend(ValidateDateTimeFormat)
 
+ActiveRecord::Base.singleton_class.include(Extensions::ActiveRecord::ConnectionHandling)
+
+ActiveRecord::DatabaseConfigurations.include(Extensions::ActiveRecord::DatabaseConfigurations)
+ActiveRecord::DatabaseConfigurations::DatabaseConfig.prepend(Extensions::ActiveRecord::DatabaseConfigurations::DatabaseConfig)
+ActiveRecord::DatabaseConfigurations::HashConfig.prepend(Extensions::ActiveRecord::DatabaseConfigurations::HashConfig)
+
 ActiveRecord::Associations::ClassMethods.prepend(Extensions::ActiveRecord::PolymorphicAssociations::ClassMethods)
 ActiveRecord::PredicateBuilder::PolymorphicArrayValue.prepend(Extensions::ActiveRecord::PolymorphicAssociations::PolymorphicArrayValue)
 

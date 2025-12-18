@@ -33,19 +33,31 @@ const testWidthQuery = (query, width) => {
 }
 
 describe('WithBreakpoints', () => {
-  const renderer = jest.fn(() => <div>Hello, world!</div>)
+  const renderer = vi.fn(() => <div>Hello, world!</div>)
   const Wrapped = WithBreakpoints(renderer)
 
   let matchMedia
-  const mockWindowWidth = width => {
-    if (window.matchMedia && !window.matchMedia._mocked) {
-      throw new Error('cannot mock when window.mediaQuery is defined')
+  let originalMatchMedia
+
+  beforeAll(() => {
+    // Save original matchMedia if it exists
+    originalMatchMedia = window.matchMedia
+  })
+
+  afterAll(() => {
+    // Restore original matchMedia
+    if (originalMatchMedia) {
+      window.matchMedia = originalMatchMedia
     }
+  })
+
+  const mockWindowWidth = width => {
     matchMedia = query => ({
       matches: testWidthQuery(query, width),
       addListener: Function.prototype,
       removeListener: Function.prototype,
     })
+    matchMedia._mocked = true
     window.matchMedia = matchMedia
   }
 
@@ -53,6 +65,7 @@ describe('WithBreakpoints', () => {
     renderer.mockClear()
     if (matchMedia) {
       delete window.matchMedia
+      matchMedia = null
     }
   })
 

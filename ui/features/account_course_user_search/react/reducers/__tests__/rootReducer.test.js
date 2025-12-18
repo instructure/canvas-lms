@@ -149,7 +149,7 @@ describe('Account Course User Search Reducer', () => {
           },
         ],
         xhr: {
-          getResponseHeader: jest.fn().mockReturnValue(LinkHeader),
+          getResponseHeader: vi.fn().mockReturnValue(LinkHeader),
         },
       },
     }

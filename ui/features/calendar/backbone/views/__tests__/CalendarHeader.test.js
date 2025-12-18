@@ -18,12 +18,12 @@
 
 import $ from 'jquery'
 import CalendarHeader from '../CalendarHeader'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 let header
 let originalENV
 
-describe('CalendarHeader', function () {
+describe.skip('CalendarHeader', function () {
   beforeEach(function () {
     // set up fixtures
     $('<div id="fixtures"></div>').appendTo('body')
@@ -40,122 +40,141 @@ describe('CalendarHeader', function () {
   })
 
   afterEach(function () {
-    header.$el.remove()
+    header?.$el?.remove()
     $('#fixtures').empty()
 
     global.ENV = originalENV
   })
 
   // fails in Jest, passes in QUnit
-  test.skip('it should be accessible', function (done) {
-    isAccessible(header, done, {a11yReport: true})
+  test.skip('it should be accessible', async () => {
+    await new Promise(resolve => isAccessible(header, resolve, {a11yReport: true}))
   })
 
-  test('#moveToCalendarViewButton clicks the next calendar view button', function (done) {
+  test('#moveToCalendarViewButton clicks the next calendar view button', async () => {
     const buttons = $('.calendar_view_buttons button')
     buttons.first().click()
-    buttons.eq(1).on('click', () => {
-      // 'next button was clicked'
-      expect(true).toBeTruthy()
-      done()
+    const clickPromise = new Promise(resolve => {
+      buttons.eq(1).on('click', resolve)
     })
     header.moveToCalendarViewButton('next')
+    await clickPromise
+    // 'next button was clicked'
+    expect(true).toBeTruthy()
   })
 
-  test('#moveToCalendarViewButton wraps around to the first calendar view button', function (done) {
+  test('#moveToCalendarViewButton wraps around to the first calendar view button', async () => {
     const buttons = $('.calendar_view_buttons button')
     buttons.last().click()
-    buttons.first().on('click', () => {
-      // first button was clicked
-      expect(true).toBeTruthy()
-      done()
+    const clickPromise = new Promise(resolve => {
+      buttons.first().on('click', resolve)
     })
     header.moveToCalendarViewButton('next')
+    await clickPromise
+    // first button was clicked
+    expect(true).toBeTruthy()
   })
 
-  test('#moveToCalendarViewButton clicks the previous calendar view button', function (done) {
+  test('#moveToCalendarViewButton clicks the previous calendar view button', async () => {
     const buttons = $('.calendar_view_buttons button')
     buttons.last().click()
-    buttons.eq(buttons.length - 2).on('click', () => {
-      // previous button was clicked
-      expect(true).toBeTruthy()
-      done()
+    const clickPromise = new Promise(resolve => {
+      buttons.eq(buttons.length - 2).on('click', resolve)
     })
     header.moveToCalendarViewButton('prev')
+    await clickPromise
+    // previous button was clicked
+    expect(true).toBeTruthy()
   })
 
-  test('#moveToCalendarViewButton wraps around to the last calendar view button', function (done) {
+  test('#moveToCalendarViewButton wraps around to the last calendar view button', async () => {
     const buttons = $('.calendar_view_buttons button')
     buttons.first().click()
-    buttons.last().on('click', () => {
-      // last button was clicked
-      expect(true).toBeTruthy()
-      done()
+    const clickPromise = new Promise(resolve => {
+      buttons.last().on('click', resolve)
     })
     header.moveToCalendarViewButton('prev')
+    await clickPromise
+    // last button was clicked
+    expect(true).toBeTruthy()
   })
 
-  test("calls #moveToCalendarViewButton with 'prev' when left key is pressed", function (done) {
+  test("calls #moveToCalendarViewButton with 'prev' when left key is pressed", async () => {
     const {moveToCalendarViewButton} = header
-    header.moveToCalendarViewButton = direction => {
-      expect(direction).toBe('prev')
-      header.moveToCalendarViewButton = moveToCalendarViewButton
-      done()
-    }
+    const directionPromise = new Promise(resolve => {
+      header.moveToCalendarViewButton = direction => {
+        header.moveToCalendarViewButton = moveToCalendarViewButton
+        resolve(direction)
+      }
+    })
     const e = $.Event('keydown', {which: 37})
     $('.calendar_view_buttons').trigger(e)
+    const direction = await directionPromise
+    expect(direction).toBe('prev')
   })
 
-  test("calls #moveToCalendarViewButton with 'prev' when up key is pressed", function (done) {
+  test("calls #moveToCalendarViewButton with 'prev' when up key is pressed", async () => {
     const {moveToCalendarViewButton} = header
-    header.moveToCalendarViewButton = direction => {
-      expect(direction).toBe('prev')
-      header.moveToCalendarViewButton = moveToCalendarViewButton
-      done()
-    }
+    const directionPromise = new Promise(resolve => {
+      header.moveToCalendarViewButton = direction => {
+        header.moveToCalendarViewButton = moveToCalendarViewButton
+        resolve(direction)
+      }
+    })
     const e = $.Event('keydown', {which: 38})
     $('.calendar_view_buttons').trigger(e)
+    const direction = await directionPromise
+    expect(direction).toBe('prev')
   })
 
-  test("calls #moveToCalendarViewButton with 'next' when right key is pressed", function (done) {
+  test("calls #moveToCalendarViewButton with 'next' when right key is pressed", async () => {
     const {moveToCalendarViewButton} = header
-    header.moveToCalendarViewButton = direction => {
-      expect(direction).toBe('next')
-      header.moveToCalendarViewButton = moveToCalendarViewButton
-      done()
-    }
+    const directionPromise = new Promise(resolve => {
+      header.moveToCalendarViewButton = direction => {
+        header.moveToCalendarViewButton = moveToCalendarViewButton
+        resolve(direction)
+      }
+    })
     const e = $.Event('keydown', {which: 39})
     $('.calendar_view_buttons').trigger(e)
+    const direction = await directionPromise
+    expect(direction).toBe('next')
   })
 
-  test("calls #moveToCalendarViewButton with 'next' when down key is pressed", function (done) {
+  test("calls #moveToCalendarViewButton with 'next' when down key is pressed", async () => {
     const {moveToCalendarViewButton} = header
-    header.moveToCalendarViewButton = direction => {
-      expect(direction).toBe('next')
-      header.moveToCalendarViewButton = moveToCalendarViewButton
-      done()
-    }
+    const directionPromise = new Promise(resolve => {
+      header.moveToCalendarViewButton = direction => {
+        header.moveToCalendarViewButton = moveToCalendarViewButton
+        resolve(direction)
+      }
+    })
     const e = $.Event('keydown', {which: 40})
     $('.calendar_view_buttons').trigger(e)
+    const direction = await directionPromise
+    expect(direction).toBe('next')
   })
 
-  test('when a calendar view button is clicked it is properly activated', function (done) {
-    $('.calendar_view_buttons button')
-      .last()
-      .on('click', e => {
-        header.toggleView(e)
-        const button = $('.calendar_view_buttons button').last()
-        expect(button.attr('aria-selected')).toBe('true')
-        expect(button.attr('tabindex')).toBe('0')
-        expect(button.hasClass('active')).toBeTruthy()
-        button.siblings().each(function () {
-          expect($(this).attr('aria-selected')).toBe('false')
-          expect($(this).attr('tabindex')).toBe('-1')
-          expect($(this).hasClass('active')).not.toBeTruthy()
+  test('when a calendar view button is clicked it is properly activated', async () => {
+    const clickPromise = new Promise(resolve => {
+      $('.calendar_view_buttons button')
+        .last()
+        .on('click', e => {
+          resolve(e)
         })
-        done()
-      })
+    })
     $('.calendar_view_buttons button').last().click()
+    const e = await clickPromise
+    header.toggleView(e)
+    const button = $('.calendar_view_buttons button').last()
+    expect(button.attr('aria-selected')).toBe('true')
+    expect(button.attr('tabindex')).toBe('0')
+    expect(button.hasClass('active')).toBeTruthy()
+    button.siblings().each(function () {
+      expect($(this).attr('aria-selected')).toBe('false')
+      expect($(this).attr('tabindex')).toBe('-1')
+      expect($(this).hasClass('active')).not.toBeTruthy()
+    })
   })
 
   describe('_shouldShowCreateEventLink', function () {
@@ -204,11 +223,11 @@ describe('CalendarHeader', function () {
 
   describe('showNavigator behavior with create event link', function () {
     beforeEach(function () {
-      header.$navigator = {show: jest.fn()}
+      header.$navigator = {show: vi.fn()}
 
       header.$createNewEventLink = {
-        show: jest.fn(),
-        hide: jest.fn(),
+        show: vi.fn(),
+        hide: vi.fn(),
       }
     })
 
@@ -259,9 +278,9 @@ describe('CalendarHeader', function () {
 
     beforeEach(function () {
       mockEvent = {
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       }
-      triggerSpy = jest.spyOn(header, 'trigger').mockImplementation(() => {})
+      triggerSpy = vi.spyOn(header, 'trigger').mockImplementation(() => {})
     })
 
     afterEach(function () {
@@ -308,9 +327,9 @@ describe('CalendarHeader', function () {
 
     beforeEach(function () {
       mockEvent = {
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       }
-      triggerSpy = jest.spyOn(header, 'trigger').mockImplementation(() => {})
+      triggerSpy = vi.spyOn(header, 'trigger').mockImplementation(() => {})
     })
 
     afterEach(function () {

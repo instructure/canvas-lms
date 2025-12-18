@@ -48,9 +48,9 @@ describe('Gradebook#sortGridRows', () => {
       },
     })
     gradebook.gridDisplaySettings.viewUngradedAsZero = false
-    gradebook.gradebookGrid.updateColumns = jest.fn()
-    gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders = jest.fn()
-    gradebook.saveSettings = jest.fn().mockResolvedValue({})
+    gradebook.gradebookGrid.updateColumns = vi.fn()
+    gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders = vi.fn()
+    gradebook.saveSettings = vi.fn().mockResolvedValue({})
   })
 
   afterEach(() => {
@@ -138,8 +138,8 @@ describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
       },
     }
     gradebook = createGradebook()
-    gradebook.arrangeColumnsBy = jest.fn()
-    gradebook.saveSettings = jest.fn().mockResolvedValue({})
+    gradebook.arrangeColumnsBy = vi.fn()
+    gradebook.saveSettings = vi.fn().mockResolvedValue({})
   })
 
   afterEach(async () => {
@@ -300,10 +300,10 @@ describe('when enhanced_gradebook_filters is enabled', () => {
     gradebook.setAssignments({2301: assignment})
     gradebook.setAssignmentsLoaded()
 
-    errorFn = jest.fn()
-    successFn = jest.fn()
+    errorFn = vi.fn()
+    successFn = vi.fn()
 
-    GradebookApi.saveUserSettings = jest.fn().mockResolvedValue({})
+    GradebookApi.saveUserSettings = vi.fn().mockResolvedValue({})
   })
 
   afterEach(() => {

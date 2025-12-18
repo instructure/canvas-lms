@@ -30,17 +30,17 @@ import {GradebookSortOrder} from '../../../types/gradebook.d'
 import * as ReactRouterDom from 'react-router-dom'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {type Mocked} from 'vitest'
 
-jest.mock('axios') // mock axios for final grade override helper API call
-jest.mock('@canvas/do-fetch-api-effect', () => jest.fn()) // mock doFetchApi for final grade override helper API call
-jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
-  executeApiRequest: jest.fn(),
+vi.mock('axios') // mock axios for final grade override helper API call
+vi.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
+  executeApiRequest: vi.fn(),
 }))
-const mockedAxios = axios as jest.Mocked<typeof axios>
-const mockedExecuteApiRequest = executeApiRequest as jest.MockedFunction<typeof executeApiRequest>
+const mockedAxios = axios as Mocked<typeof axios>
+const mockedExecuteApiRequest = executeApiRequest as Mocked<typeof executeApiRequest>
 const mockUserSettings = (mockGet = true) => {
   if (mockGet) {
-    jest.spyOn(userSettings, 'contextGet').mockImplementation(input => {
+    vi.spyOn(userSettings, 'contextGet').mockImplementation(input => {
       switch (input) {
         case 'sort_grade_columns_by':
           return {sortType: GradebookSortOrder.DueDate}
@@ -51,14 +51,14 @@ const mockUserSettings = (mockGet = true) => {
       }
     })
   }
-  const mockedContextSet = jest.spyOn(userSettings, 'contextSet')
+  const mockedContextSet = vi.spyOn(userSettings, 'contextSet')
   return {mockedContextSet}
 }
 
 const mockSearchParams = (defaultSearchParams = {}) => {
-  const setSearchParamsMock = jest.fn()
+  const setSearchParamsMock = vi.fn()
   const searchParamsMock = new URLSearchParams(defaultSearchParams)
-  jest
+  vi
     .spyOn(ReactRouterDom, 'useSearchParams')
     .mockReturnValue([searchParamsMock, setSearchParamsMock])
   return {searchParamsMock, setSearchParamsMock}
@@ -78,15 +78,15 @@ describe('Enhanced Individual Gradebook', () => {
     mockedAxios.get.mockResolvedValue({
       data: [],
     })
-    $.subscribe = jest.fn()
+    $.subscribe = vi.fn()
 
     setupCanvasQueries()
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
-    jest.resetAllMocks()
+    vi.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
+    vi.resetAllMocks()
   })
 
   const renderEnhancedIndividualGradebook = (mockOverrides = []) => {
@@ -139,7 +139,7 @@ describe('Enhanced Individual Gradebook', () => {
       mockUserSettings()
       const {getByTestId, getByRole} = renderEnhancedIndividualGradebook()
       await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
-      mockedExecuteApiRequest.mockResolvedValue({
+      vi.mocked(executeApiRequest).mockResolvedValue({
         data: [],
         status: 201,
       })

@@ -34,7 +34,7 @@ describe('ConfiguredTextInput', () => {
 
   it('calls onChange when input value changes', () => {
     const expectedValue = 'New Value'
-    const handleChange = jest.fn()
+    const handleChange = vi.fn()
 
     const {getByLabelText} = render(
       <ConfiguredTextInput label={label} inputValue={inputValue} onChange={handleChange} />,

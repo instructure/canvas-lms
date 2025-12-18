@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { Select } from '@instructure/ui-select'
-import { IconSearchLine } from '@instructure/ui-icons'
-import { Spinner } from '@instructure/ui-spinner'
-import type { CourseOption } from '../types'
+import React, {useState, useEffect, useCallback, useRef} from 'react'
+import {Select} from '@instructure/ui-select'
+import {IconSearchLine} from '@instructure/ui-icons'
+import {Spinner} from '@instructure/ui-spinner'
+import type {CourseOption} from '../types'
 import {FormMessage} from '@instructure/ui-form-field'
-import { useScope as createI18nScope } from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('content_migrations_redesign')
 
 type AsyncCourseSearchSelectProps = {
   getCourseOptions: (searchTerm: string) => Promise<CourseOption[]>
-  interaction: "disabled" | "enabled" | "readonly"
+  interaction: 'disabled' | 'enabled' | 'readonly'
   selectedCourse: CourseOption | null
   onSelectCourse: (course: CourseOption | null) => void
   messages?: FormMessage[]
@@ -46,7 +46,7 @@ const AsyncCourseSearchSelect = ({
   selectedCourse,
   onSelectCourse,
   messages = [],
-  inputRef
+  inputRef,
 }: AsyncCourseSearchSelectProps) => {
   const [inputValue, setInputValue] = useState('')
   const [isShowingOptions, setIsShowingOptions] = useState(false)
@@ -69,7 +69,7 @@ const AsyncCourseSearchSelect = ({
 
   const getOptionById = useCallback(
     (id: string) => filteredOptions.find(opt => opt.id === id),
-    [filteredOptions]
+    [filteredOptions],
   )
 
   const matchValue = () => {
@@ -110,7 +110,7 @@ const AsyncCourseSearchSelect = ({
     setHighlightedOptionId(null)
   }
 
-  const handleHighlight = (e: React.SyntheticEvent, { id }: any) => {
+  const handleHighlight = (e: React.SyntheticEvent, {id}: any) => {
     e.persist()
     const option = getOptionById(id)
     if (!option) return
@@ -118,7 +118,7 @@ const AsyncCourseSearchSelect = ({
     setInputValue(e.type === 'keydown' ? option.label : inputValue)
   }
 
-  const handleSelect = (_e: React.SyntheticEvent, { id }: any) => {
+  const handleSelect = (_e: React.SyntheticEvent, {id}: any) => {
     const option = getOptionById(id)
     if (!option) return
     setSelectedOptionId(id)
@@ -191,7 +191,11 @@ const AsyncCourseSearchSelect = ({
               isSelected={opt.id === selectedOptionId}
             >
               {opt.label}
-              <Text size="x-small" as="div" color={isHighlighted ? 'secondary-inverse' : 'secondary'}>
+              <Text
+                size="x-small"
+                as="div"
+                color={isHighlighted ? 'secondary-inverse' : 'secondary'}
+              >
                 {getCourseOptionDescription(opt)}
               </Text>
             </Select.Option>

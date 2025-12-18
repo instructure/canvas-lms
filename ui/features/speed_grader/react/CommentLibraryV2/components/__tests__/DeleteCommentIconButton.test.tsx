@@ -23,8 +23,9 @@ import {MockedProvider} from '@apollo/client/testing'
 import DeleteCommentIconButton from '../DeleteCommentIconButton'
 import {SpeedGraderLegacy_DeleteCommentBankItem} from '../../graphql/mutations'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {type MockInstance} from 'vitest'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 describe('DeleteCommentIconButton', () => {
   const defaultProps = {
@@ -33,11 +34,11 @@ describe('DeleteCommentIconButton', () => {
     index: 0,
   }
 
-  let confirmSpy: jest.SpyInstance
+  let confirmSpy: MockInstance
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    confirmSpy = jest.spyOn(window, 'confirm')
+    vi.clearAllMocks()
+    confirmSpy = vi.spyOn(window, 'confirm')
   })
 
   afterEach(() => {
@@ -112,7 +113,7 @@ describe('DeleteCommentIconButton', () => {
     it('does not trigger mutation when deletion is canceled', async () => {
       const user = userEvent.setup()
       confirmSpy.mockReturnValue(false)
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
 
       setup([createDeleteMock()])
 
@@ -126,7 +127,7 @@ describe('DeleteCommentIconButton', () => {
     it('triggers mutation when deletion is confirmed', async () => {
       const user = userEvent.setup()
       confirmSpy.mockReturnValue(true)
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
 
       setup([createDeleteMock()])
 
@@ -216,7 +217,7 @@ describe('DeleteCommentIconButton', () => {
     it('shows success flash alert on successful deletion', async () => {
       const user = userEvent.setup()
       confirmSpy.mockReturnValue(true)
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
 
       setup([createDeleteMock(true)])
 
@@ -234,7 +235,7 @@ describe('DeleteCommentIconButton', () => {
     it('shows error flash alert on failed deletion', async () => {
       const user = userEvent.setup()
       confirmSpy.mockReturnValue(true)
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
 
       setup([createDeleteMock(false)])
 
@@ -262,7 +263,7 @@ describe('DeleteCommentIconButton', () => {
     it('button is keyboard accessible with Enter key', async () => {
       const user = userEvent.setup()
       confirmSpy.mockReturnValue(true)
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
 
       setup([createDeleteMock()])
 
@@ -278,7 +279,7 @@ describe('DeleteCommentIconButton', () => {
     it('button is keyboard accessible with Space key', async () => {
       const user = userEvent.setup()
       confirmSpy.mockReturnValue(true)
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
 
       setup([createDeleteMock()])
 

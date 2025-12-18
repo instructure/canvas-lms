@@ -137,6 +137,8 @@ const ForbiddenWordsFileUpload = ({
 
       const preflightUrl = `/api/v1/folders/${folderId}/files`
       const preflightData = {name: filename, size: newFile.size, content_type: newFile.type}
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - uploadFile function has incomplete type definitions
       const uploadResponse = await uploadFile(preflightUrl, preflightData, newFile)
 
       if (uploadResponse.upload_status !== 'success') {

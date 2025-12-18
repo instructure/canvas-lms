@@ -185,6 +185,21 @@ RSpec.describe Lti::RegistrationsController do
         end
       end
     end
+
+    context "with lti_asset_processor_tii_migration enabled" do
+      let(:turnitin_client_id) { "12345" }
+
+      before do
+        account.root_account.enable_feature!(:lti_asset_processor_tii_migration)
+        allow(Setting).to receive(:get).and_call_original
+        allow(Setting).to receive(:get).with("turnitin_asset_processor_client_id", "").and_return(turnitin_client_id)
+      end
+
+      it "sets turnitinAPClientId in js_env" do
+        get :index, params: { account_id: account.id }
+        expect(assigns.dig(:js_env, :turnitinAPClientId)).to eq(turnitin_client_id)
+      end
+    end
   end
 
   describe "GET list", type: :request do
@@ -3089,51 +3104,6 @@ RSpec.describe Lti::RegistrationsController do
           registration_update_request.update!(rejected_at: 1.hour.ago)
           subject
           expect(response_json["status"]).to eq("rejected")
-        end
-      end
-
-      context "with include parameter" do
-        context "when including configuration" do
-          let(:params) { { include: ["configuration"] } }
-
-          it "includes configuration in response" do
-            subject
-            expect(response_json).to have_key("configuration")
-          end
-        end
-
-        context "when including lti_registration" do
-          let(:params) { { include: ["lti_registration"] } }
-
-          it "includes lti_registration in response" do
-            subject
-            expect(response_json).to have_key("lti_registration")
-            expect(response_json["lti_registration"]).to include(
-              "id" => registration.id,
-              "name" => registration.name,
-              "workflow_state" => registration.workflow_state
-            )
-          end
-        end
-
-        context "when including both configuration and lti_registration" do
-          let(:params) { { include: ["configuration", "lti_registration"] } }
-
-          it "includes both in response" do
-            subject
-            expect(response_json).to have_key("configuration")
-            expect(response_json).to have_key("lti_registration")
-          end
-        end
-
-        context "when including invalid include parameter" do
-          let(:params) { { include: ["invalid", "configuration"] } }
-
-          it "only includes valid parameters" do
-            subject
-            expect(response_json).to have_key("configuration")
-            expect(response_json).not_to have_key("invalid")
-          end
         end
       end
     end

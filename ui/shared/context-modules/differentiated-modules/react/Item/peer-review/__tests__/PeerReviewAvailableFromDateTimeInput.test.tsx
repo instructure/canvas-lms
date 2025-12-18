@@ -24,15 +24,15 @@ import PeerReviewAvailableFromDateTimeInput from '../PeerReviewAvailableFromDate
 describe('PeerReviewAvailableFromDateTimeInput', () => {
   const defaultProps = {
     peerReviewAvailableFromDate: null,
-    setPeerReviewAvailableFromDate: jest.fn(),
-    handlePeerReviewAvailableFromDateChange: jest.fn(),
+    setPeerReviewAvailableFromDate: vi.fn(),
+    handlePeerReviewAvailableFromDateChange: vi.fn(),
     clearButtonAltLabel: 'Clear input for 2 students',
     disabled: false,
     validationErrors: {},
     unparsedFieldKeys: new Set<string>(),
     dateInputRefs: {},
     timeInputRefs: {},
-    handleBlur: jest.fn(() => jest.fn()),
+    handleBlur: vi.fn(() => vi.fn()),
     breakpoints: {},
   }
 
@@ -40,7 +40,7 @@ describe('PeerReviewAvailableFromDateTimeInput', () => {
     render(<PeerReviewAvailableFromDateTimeInput {...defaultProps} {...overrides} />)
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders with correct labels', () => {
@@ -75,7 +75,7 @@ describe('PeerReviewAvailableFromDateTimeInput', () => {
   })
 
   it('calls setPeerReviewAvailableFromDate with null when clear button is clicked', async () => {
-    const setPeerReviewAvailableFromDate = jest.fn()
+    const setPeerReviewAvailableFromDate = vi.fn()
     renderComponent({
       peerReviewAvailableFromDate: '2024-11-15T00:00:00Z',
       setPeerReviewAvailableFromDate,
@@ -87,7 +87,7 @@ describe('PeerReviewAvailableFromDateTimeInput', () => {
   })
 
   it('calls handlePeerReviewAvailableFromDateChange when date is changed', async () => {
-    const handlePeerReviewAvailableFromDateChange = jest.fn()
+    const handlePeerReviewAvailableFromDateChange = vi.fn()
     renderComponent({
       handlePeerReviewAvailableFromDateChange,
     })
@@ -102,7 +102,7 @@ describe('PeerReviewAvailableFromDateTimeInput', () => {
   })
 
   it('calls handleBlur when input loses focus', () => {
-    const handleBlur = jest.fn(() => jest.fn())
+    const handleBlur = vi.fn(() => vi.fn())
     renderComponent({handleBlur})
 
     expect(handleBlur).toHaveBeenCalledWith('peer_review_available_from')

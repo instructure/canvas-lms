@@ -34,6 +34,11 @@ class AiExperience < ApplicationRecord
   scope :active, -> { where.not(workflow_state: "deleted") }
   scope :for_course, ->(course_id) { where(course_id:) }
 
+  # Manage conversation_context lifecycle in llm-conversation service
+  after_create :create_conversation_context
+  after_update :update_conversation_context, if: :should_update_context?
+  before_destroy :delete_conversation_context
+
   def delete
     return false if deleted?
 
@@ -71,6 +76,32 @@ class AiExperience < ApplicationRecord
       self.root_account_id ||= course.root_account_id
       self.account_id ||= course.account_id
     end
+  end
+
+  def create_conversation_context
+    LLMConversationContextManager.create_context(ai_experience: self)
+  rescue LlmConversation::Errors::ConversationError => e
+    Rails.logger.error("Failed to create conversation context for AiExperience #{id}: #{e.message}")
+    # Don't fail the AiExperience creation if context creation fails
+  end
+
+  def should_update_context?
+    llm_conversation_context_id.present? &&
+      (saved_change_to_pedagogical_guidance? || saved_change_to_facts? || saved_change_to_learning_objective?)
+  end
+
+  def update_conversation_context
+    LLMConversationContextManager.update_context(ai_experience: self)
+  rescue LlmConversation::Errors::ConversationError => e
+    Rails.logger.error("Failed to update conversation context for AiExperience #{id}: #{e.message}")
+    # Don't fail the AiExperience update if context update fails
+  end
+
+  def delete_conversation_context
+    LLMConversationContextManager.delete_context(ai_experience: self)
+  rescue LlmConversation::Errors::ConversationError => e
+    Rails.logger.error("Failed to delete conversation context for AiExperience #{id}: #{e.message}")
+    # Don't fail the AiExperience deletion if context deletion fails
   end
 
   before_create :set_account_associations

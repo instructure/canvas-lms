@@ -26,6 +26,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {FormField} from '@instructure/ui-form-field'
 import {Alert} from '@instructure/ui-alerts'
+import {htmlDecode} from '@canvas/util/TextHelper'
 
 const I18n = createI18nScope('shared_message_students')
 
@@ -247,7 +248,7 @@ class MessageStudents extends React.Component {
       const displayName = recipient.displayName || recipient.email
       return (
         <li key={recipient.id} className="ac-token">
-          {displayName}
+          {htmlDecode(displayName)}
         </li>
       )
     })

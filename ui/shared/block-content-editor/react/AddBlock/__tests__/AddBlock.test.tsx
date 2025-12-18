@@ -19,31 +19,31 @@
 import {render, screen} from '@testing-library/react'
 import {AddBlock} from '../AddBlock'
 
-const openMock = jest.fn()
-jest.mock('../../hooks/useAddBlockModal', () => ({
+const openMock = vi.fn()
+vi.mock('../../hooks/useAddBlockModal', () => ({
   __esModule: true,
-  useAddBlockModal: jest.fn(() => ({open: openMock})),
+  useAddBlockModal: vi.fn(() => ({open: openMock})),
 }))
 
-jest.mock('../../hooks/useAddNode', () => ({
-  useAddNode: jest.fn(),
+vi.mock('../../hooks/useAddNode', () => ({
+  useAddNode: vi.fn(),
 }))
 
-jest.mock('../../hooks/useGetBlocksCount', () => ({
+vi.mock('../../hooks/useGetBlocksCount', () => ({
   useGetBlocksCount: () => ({
     blocksCount: 0,
   }),
 }))
 
-jest.mock('../../hooks/useFocusManagement', () => ({
+vi.mock('../../hooks/useFocusManagement', () => ({
   useFocusManagement: () => ({
-    elementRef: jest.fn(),
+    elementRef: vi.fn(),
   }),
 }))
 
 describe('AddBlock', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders', async () => {

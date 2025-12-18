@@ -24,14 +24,14 @@ const defaultProps: ButtonBlockGeneralButtonSettingsProps = {
   alignment: 'left',
   layout: 'horizontal',
   isFullWidth: false,
-  onAlignmentChange: jest.fn(),
-  onLayoutChange: jest.fn(),
-  onIsFullWidthChange: jest.fn(),
+  onAlignmentChange: vi.fn(),
+  onLayoutChange: vi.fn(),
+  onIsFullWidthChange: vi.fn(),
 }
 
 describe('ButtonBlockGeneralButtonSettings', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('rendering', () => {
@@ -90,7 +90,7 @@ describe('ButtonBlockGeneralButtonSettings', () => {
 
   describe('event handlers', () => {
     it('calls onAlignmentChange when alignment option is selected', () => {
-      const onAlignmentChange = jest.fn()
+      const onAlignmentChange = vi.fn()
       render(
         <ButtonBlockGeneralButtonSettings
           {...defaultProps}
@@ -104,7 +104,7 @@ describe('ButtonBlockGeneralButtonSettings', () => {
     })
 
     it('calls onLayoutChange when layout option is selected', () => {
-      const onLayoutChange = jest.fn()
+      const onLayoutChange = vi.fn()
       render(<ButtonBlockGeneralButtonSettings {...defaultProps} onLayoutChange={onLayoutChange} />)
 
       fireEvent.click(screen.getByLabelText('Vertical'))
@@ -113,7 +113,7 @@ describe('ButtonBlockGeneralButtonSettings', () => {
     })
 
     it('calls onIsFullWidthChange when checkbox is changed', () => {
-      const onIsFullWidthChange = jest.fn()
+      const onIsFullWidthChange = vi.fn()
       render(
         <ButtonBlockGeneralButtonSettings
           {...defaultProps}

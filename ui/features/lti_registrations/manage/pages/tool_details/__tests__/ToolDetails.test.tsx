@@ -26,6 +26,7 @@ import {
 import {BrowserRouter} from 'react-router-dom'
 import fetchMock from 'fetch-mock'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {ZDeveloperKeyId} from '../../../model/developer_key/DeveloperKeyId'
 
 describe('ToolDetailsInner', () => {
   const renderToolDetailsInner = (
@@ -80,5 +81,39 @@ describe('ToolDetailsInner', () => {
     const wrapper = renderToolDetailsInner(registration)
     const deleteButton = wrapper.getByTestId('delete-app')
     expect(deleteButton).toHaveAttribute('disabled')
+  })
+
+  it('shows the "Migrate from LTI 2.0" button when turnitinAPClientId matches developer_key_id', async () => {
+    const registration = mockRegistrationWithAllInformation({
+      n: 'test',
+      i: 1,
+      registration: {
+        developer_key_id: ZDeveloperKeyId.parse('12345'),
+      },
+    })
+    window.ENV.turnitinAPClientId = '12345'
+
+    const wrapper = renderToolDetailsInner(registration)
+
+    expect(wrapper.queryByText('Migrate from LTI 2.0')).toBeInTheDocument()
+
+    delete window.ENV.turnitinAPClientId
+  })
+
+  it('does not show the "Migrate from LTI 2.0" button when turnitinAPClientId does not match', async () => {
+    const registration = mockRegistrationWithAllInformation({
+      n: 'test',
+      i: 1,
+      registration: {
+        developer_key_id: ZDeveloperKeyId.parse('12345'),
+      },
+    })
+    window.ENV.turnitinAPClientId = '99999'
+
+    const wrapper = renderToolDetailsInner(registration)
+
+    expect(wrapper.queryByText('Migrate from LTI 2.0')).not.toBeInTheDocument()
+
+    delete window.ENV.turnitinAPClientId
   })
 })

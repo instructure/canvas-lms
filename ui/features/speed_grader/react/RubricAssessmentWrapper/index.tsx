@@ -89,9 +89,10 @@ export default ({
     studentAssessment?.data ?? [],
   )
 
-  const mappedSelfAssessment = selfAssessment
-    ? mapRubricAssessmentDataUnderscoredKeysToCamelCase(selfAssessment.data)
-    : undefined
+  const mappedSelfAssessment =
+    selfAssessment && selfAssessment.data
+      ? mapRubricAssessmentDataUnderscoredKeysToCamelCase(selfAssessment.data)
+      : undefined
 
   const isPeerReview = studentAssessment?.assessment_type === 'peer_review'
   const rubricAssessmentData = isPeerReview ? [] : mappedAssessmentData

@@ -17,12 +17,16 @@
  */
 
 import {createCourseCopyMutation} from '../createCourseCopyMutation'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {convertFormDataToMigrationCreateRequest} from '@canvas/content-migrations/react/CommonMigratorControls/converter/form_data_converter'
 import type {CopyCourseFormSubmitData} from '../../types'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
-jest.mock('@canvas/content-migrations/react/CommonMigratorControls/converter/form_data_converter')
+vi.mock('@canvas/content-migrations/react/CommonMigratorControls/converter/form_data_converter')
+
+const server = setupServer()
+
+let capturedRequests: Array<{path: string; body: any}> = []
 
 describe('createCourseCopyMutation', () => {
   const accountId = '1'
@@ -48,19 +52,24 @@ describe('createCourseCopyMutation', () => {
   }
   const mockReturnValue = {settings: {}}
   const courseCreationResult = {id: '4'}
-  const contentMigrationResponseOk = {ok: true}
-  const contentMigrationResponseFailed = {ok: false}
+
+  const mockConvertFormDataToMigrationCreateRequest =
+    convertFormDataToMigrationCreateRequest as any
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    capturedRequests = []
+    vi.clearAllMocks()
   })
 
-  const mockDoFetchApi = doFetchApi as jest.Mock
-  const mockConvertFormDataToMigrationCreateRequest =
-    convertFormDataToMigrationCreateRequest as jest.Mock
+  afterEach(() => {
+    server.resetHandlers()
+  })
 
   it('should throw an error if course creation fails', async () => {
-    mockDoFetchApi.mockResolvedValueOnce({json: null})
+    server.use(http.post('/api/v1/accounts/:accountId/courses', () => HttpResponse.json(null)))
 
     await expect(createCourseCopyMutation({accountId, courseId, formData})).rejects.toThrow(
       'Failed to create course',
@@ -68,12 +77,19 @@ describe('createCourseCopyMutation', () => {
   })
 
   it('should throw an error if content migration fails', async () => {
-    mockDoFetchApi.mockResolvedValueOnce({json: courseCreationResult})
-    mockDoFetchApi.mockResolvedValueOnce({response: contentMigrationResponseFailed})
+    server.use(
+      http.post('/api/v1/accounts/:accountId/courses', () =>
+        HttpResponse.json(courseCreationResult),
+      ),
+      http.post(
+        '/api/v1/courses/:courseId/content_migrations',
+        () => new HttpResponse(null, {status: 500}),
+      ),
+    )
     mockConvertFormDataToMigrationCreateRequest.mockReturnValueOnce(mockReturnValue)
 
     await expect(createCourseCopyMutation({accountId, courseId, formData})).rejects.toThrow(
-      'Failed to create course',
+      'doFetchApi received a bad response',
     )
   })
 
@@ -81,8 +97,22 @@ describe('createCourseCopyMutation', () => {
     const modifiedFormData = {...formData, restrictEnrollmentsToCourseDates: true}
 
     it('should create a new course and copy content', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({json: courseCreationResult})
-      mockDoFetchApi.mockResolvedValueOnce({response: contentMigrationResponseOk})
+      server.use(
+        http.post('/api/v1/accounts/:accountId/courses', async ({request}) => {
+          capturedRequests.push({
+            path: new URL(request.url).pathname,
+            body: await request.json(),
+          })
+          return HttpResponse.json(courseCreationResult)
+        }),
+        http.post('/api/v1/courses/:courseId/content_migrations', async ({request}) => {
+          capturedRequests.push({
+            path: new URL(request.url).pathname,
+            body: await request.json(),
+          })
+          return HttpResponse.json({})
+        }),
+      )
       mockConvertFormDataToMigrationCreateRequest.mockReturnValueOnce(mockReturnValue)
 
       const result = await createCourseCopyMutation({
@@ -91,10 +121,9 @@ describe('createCourseCopyMutation', () => {
         formData: modifiedFormData,
       })
 
-      expect(doFetchApi).toHaveBeenCalledTimes(2)
-      expect(doFetchApi).toHaveBeenCalledWith({
+      expect(capturedRequests).toHaveLength(2)
+      expect(capturedRequests[0]).toEqual({
         path: `/api/v1/accounts/${accountId}/courses`,
-        method: 'POST',
         body: {
           course: {
             name: formData.courseName,
@@ -109,9 +138,8 @@ describe('createCourseCopyMutation', () => {
           skip_course_template: true,
         },
       })
-      expect(doFetchApi).toHaveBeenCalledWith({
+      expect(capturedRequests[1]).toEqual({
         path: `/api/v1/courses/${courseCreationResult.id}/content_migrations`,
-        method: 'POST',
         body: mockReturnValue,
       })
       expect(result).toBe(courseCreationResult.id)
@@ -122,8 +150,22 @@ describe('createCourseCopyMutation', () => {
     const modifiedFormData = {...formData, restrictEnrollmentsToCourseDates: false}
 
     it('should not include start_at and end_at in course creation params', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({json: courseCreationResult})
-      mockDoFetchApi.mockResolvedValueOnce({response: contentMigrationResponseOk})
+      server.use(
+        http.post('/api/v1/accounts/:accountId/courses', async ({request}) => {
+          capturedRequests.push({
+            path: new URL(request.url).pathname,
+            body: await request.json(),
+          })
+          return HttpResponse.json(courseCreationResult)
+        }),
+        http.post('/api/v1/courses/:courseId/content_migrations', async ({request}) => {
+          capturedRequests.push({
+            path: new URL(request.url).pathname,
+            body: await request.json(),
+          })
+          return HttpResponse.json({})
+        }),
+      )
       mockConvertFormDataToMigrationCreateRequest.mockReturnValueOnce(mockReturnValue)
 
       const result = await createCourseCopyMutation({
@@ -132,10 +174,9 @@ describe('createCourseCopyMutation', () => {
         formData: modifiedFormData,
       })
 
-      expect(doFetchApi).toHaveBeenCalledTimes(2)
-      expect(doFetchApi).toHaveBeenCalledWith({
+      expect(capturedRequests).toHaveLength(2)
+      expect(capturedRequests[0]).toEqual({
         path: `/api/v1/accounts/${accountId}/courses`,
-        method: 'POST',
         body: {
           course: {
             name: formData.courseName,
@@ -148,9 +189,8 @@ describe('createCourseCopyMutation', () => {
           skip_course_template: true,
         },
       })
-      expect(doFetchApi).toHaveBeenCalledWith({
+      expect(capturedRequests[1]).toEqual({
         path: `/api/v1/courses/${courseCreationResult.id}/content_migrations`,
-        method: 'POST',
         body: mockReturnValue,
       })
       expect(result).toBe(courseCreationResult.id)

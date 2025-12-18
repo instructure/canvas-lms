@@ -40,6 +40,11 @@ module Types
 
     field :assessment_type, AssessmentType, null: false
 
+    field :is_current_user, Boolean, null: false
+    def is_current_user
+      object.assessor_id == current_user&.id
+    end
+
     field :score, Float, null: true
 
     field :updated_at, Types::DateTimeType, null: true

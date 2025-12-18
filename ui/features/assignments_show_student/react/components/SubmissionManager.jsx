@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useEffect, useContext, useRef} from 'react'
+import React, {useState, useEffect, useContext, useRef, useMemo} from 'react'
 import {useApolloClient, useMutation} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
@@ -50,7 +50,7 @@ import {
   getPeerReviewHeaderText,
   getPeerReviewSubHeaderText,
   getRedirectUrlToFirstPeerReview,
-} from '../helpers/PeerReviewHelpers'
+} from '@canvas/assignments/helpers/PeerReviewHelpers'
 import {shouldRenderSelfAssessment, transformRubricAssessmentData} from '../helpers/RubricHelpers'
 import {
   friendlyTypeName,
@@ -61,9 +61,9 @@ import {
   getPointsValue,
 } from '../helpers/SubmissionHelpers'
 import AttemptTab from './AttemptTab'
-import StudentViewContext from './Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import MarkAsDoneButton from './MarkAsDoneButton'
-import PeerReviewPromptModal from './PeerReviewPromptModal'
+import PeerReviewPromptModal from '@canvas/assignments/react/PeerReviewPromptModal'
 import SimilarityPledge from '@canvas/assignments/react/SimilarityPledge'
 import StudentFooter from './StudentFooter'
 import useStore from './stores/index'
@@ -201,6 +201,8 @@ const SubmissionManager = ({
   const displayedAssessment = useStore(state => state.displayedAssessment)
   const isSavingRubricAssessment = useStore(state => state.isSavingRubricAssessment)
   const selfAssessment = useStore(state => state.selfAssessment)
+
+  const assignmentRubric = useMemo(() => assignment.rubric, [assignment.rubric?.id])
 
   const {setOnSuccess, setOnFailure} = useContext(AlertManagerContext)
   const {
@@ -919,7 +921,7 @@ const SubmissionManager = ({
         isOpen={isSelfAssessmentOpen}
         isPreviewMode={!!selfAssessment}
         onDismiss={() => setIsSelfAssessmentOpen(false)}
-        rubric={assignment.rubric}
+        rubric={assignmentRubric}
         rubricAssociationId={rubricData?.assignment?.rubricAssociation?._id}
         handleOnSubmitting={handleOnSubmitSelfAssessment}
         handleOnSuccess={() => setIsSelfAssessmentOpen(false)}

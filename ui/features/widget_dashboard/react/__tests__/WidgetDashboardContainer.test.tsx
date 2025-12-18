@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, http, HttpResponse} from 'msw'
@@ -320,5 +321,222 @@ describe('WidgetDashboardContainer', () => {
     expect(getByTestId('observed-student-label')).toBeInTheDocument()
 
     cleanup()
+  })
+
+  describe('Dashboard customization and save functionality', () => {
+    it('should not show customize button when feature flag is disabled', () => {
+      const {queryByTestId, cleanup} = setup({
+        dashboardFeatures: {
+          widget_dashboard_customization: false,
+        },
+      })
+
+      expect(queryByTestId('customize-dashboard-button')).not.toBeInTheDocument()
+
+      cleanup()
+    })
+
+    it('should show customize button when feature flag is enabled', () => {
+      const {getByTestId, cleanup} = setup({
+        dashboardFeatures: {
+          widget_dashboard_customization: true,
+        },
+      })
+
+      expect(getByTestId('customize-dashboard-button')).toBeInTheDocument()
+
+      cleanup()
+    })
+
+    it('should enter edit mode when customize button is clicked', async () => {
+      const user = userEvent.setup()
+      const {getByTestId, queryByTestId, cleanup} = setup({
+        dashboardFeatures: {
+          widget_dashboard_customization: true,
+        },
+      })
+
+      const customizeButton = getByTestId('customize-dashboard-button')
+      await user.click(customizeButton)
+
+      await waitFor(() => {
+        expect(queryByTestId('customize-dashboard-button')).not.toBeInTheDocument()
+        expect(getByTestId('save-customize-button')).toBeInTheDocument()
+        expect(getByTestId('cancel-customize-button')).toBeInTheDocument()
+      })
+
+      cleanup()
+    })
+
+    it('should exit edit mode when cancel button is clicked', async () => {
+      const user = userEvent.setup()
+      const {getByTestId, queryByTestId, cleanup} = setup({
+        dashboardFeatures: {
+          widget_dashboard_customization: true,
+        },
+      })
+
+      const customizeButton = getByTestId('customize-dashboard-button')
+      await user.click(customizeButton)
+
+      expect(getByTestId('cancel-customize-button')).toBeInTheDocument()
+
+      const cancelButton = getByTestId('cancel-customize-button')
+      await user.click(cancelButton)
+
+      await waitFor(() => {
+        expect(queryByTestId('cancel-customize-button')).not.toBeInTheDocument()
+        expect(queryByTestId('save-customize-button')).not.toBeInTheDocument()
+        expect(getByTestId('customize-dashboard-button')).toBeInTheDocument()
+      })
+
+      cleanup()
+    })
+
+    it('should call GraphQL mutation with correct payload when save button is clicked', async () => {
+      const user = userEvent.setup()
+      let capturedVariables: any = null
+
+      server.use(
+        graphql.mutation('UpdateWidgetDashboardLayout', ({variables}) => {
+          capturedVariables = variables
+          return HttpResponse.json({
+            data: {
+              updateWidgetDashboardLayout: {
+                layout: variables.layout,
+                errors: null,
+              },
+            },
+          })
+        }),
+      )
+
+      const {getByTestId, queryByTestId, cleanup} = setup({
+        dashboardFeatures: {
+          widget_dashboard_customization: true,
+        },
+      })
+
+      const customizeButton = getByTestId('customize-dashboard-button')
+      await user.click(customizeButton)
+
+      const saveButton = getByTestId('save-customize-button')
+      await user.click(saveButton)
+
+      await waitFor(() => {
+        expect(capturedVariables).not.toBeNull()
+        expect(capturedVariables.layout).toBeDefined()
+        const parsedLayout = JSON.parse(capturedVariables.layout)
+        expect(parsedLayout).toHaveProperty('columns')
+        expect(parsedLayout).toHaveProperty('widgets')
+      })
+
+      await waitFor(() => {
+        expect(queryByTestId('save-customize-button')).not.toBeInTheDocument()
+        expect(getByTestId('customize-dashboard-button')).toBeInTheDocument()
+      })
+
+      cleanup()
+    })
+
+    it('should display error alert when save mutation fails', async () => {
+      const user = userEvent.setup()
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+      server.use(
+        graphql.mutation('UpdateWidgetDashboardLayout', () => {
+          return HttpResponse.json({
+            data: {
+              updateWidgetDashboardLayout: {
+                layout: null,
+                errors: [{message: 'Invalid widget configuration'}],
+              },
+            },
+          })
+        }),
+      )
+
+      const {getByTestId, findByText, cleanup} = setup({
+        dashboardFeatures: {
+          widget_dashboard_customization: true,
+        },
+      })
+
+      const customizeButton = getByTestId('customize-dashboard-button')
+      await user.click(customizeButton)
+
+      const saveButton = getByTestId('save-customize-button')
+      await user.click(saveButton)
+
+      const errorAlert = await findByText(/Invalid widget configuration/i)
+      expect(errorAlert).toBeInTheDocument()
+
+      consoleErrorSpy.mockRestore()
+      cleanup()
+    })
+
+    it('should display error alert when network error occurs', async () => {
+      const user = userEvent.setup()
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+      server.use(
+        graphql.mutation('UpdateWidgetDashboardLayout', () => {
+          return HttpResponse.json({errors: [{message: 'Network error'}]}, {status: 500})
+        }),
+      )
+
+      const {getByTestId, findByText, cleanup} = setup({
+        dashboardFeatures: {
+          widget_dashboard_customization: true,
+        },
+      })
+
+      const customizeButton = getByTestId('customize-dashboard-button')
+      await user.click(customizeButton)
+
+      const saveButton = getByTestId('save-customize-button')
+      await user.click(saveButton)
+
+      const errorText = await findByText(/Failed to save widget layout/i)
+      expect(errorText).toBeInTheDocument()
+
+      consoleErrorSpy.mockRestore()
+      cleanup()
+    })
+
+    it('should complete full save flow and exit edit mode on success', async () => {
+      const user = userEvent.setup()
+      server.use(
+        graphql.mutation('UpdateWidgetDashboardLayout', ({variables}) => {
+          return HttpResponse.json({
+            data: {
+              updateWidgetDashboardLayout: {
+                layout: variables.layout,
+                errors: null,
+              },
+            },
+          })
+        }),
+      )
+
+      const {getByTestId, queryByTestId, cleanup} = setup({
+        dashboardFeatures: {
+          widget_dashboard_customization: true,
+        },
+      })
+
+      await user.click(getByTestId('customize-dashboard-button'))
+
+      expect(getByTestId('save-customize-button')).toBeInTheDocument()
+
+      await user.click(getByTestId('save-customize-button'))
+
+      await waitFor(() => {
+        expect(queryByTestId('save-customize-button')).not.toBeInTheDocument()
+        expect(getByTestId('customize-dashboard-button')).toBeInTheDocument()
+      })
+
+      cleanup()
+    })
   })
 })

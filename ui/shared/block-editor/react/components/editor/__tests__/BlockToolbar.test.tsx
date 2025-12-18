@@ -31,18 +31,18 @@ const user = userEvent.setup()
 let upNode: any
 let downNode: any
 let mountDiv: HTMLDivElement | null = null
-jest.mock('../../../utils', () => {
+vi.mock('../../../utils', async () => {
   return {
-    ...jest.requireActual('../../../utils'),
-    mountNode: jest.fn(() => mountDiv),
-    findUpNode: jest.fn(() => upNode),
-    findDownNode: jest.fn(() => downNode),
+    ...await vi.importActual('../../../utils'),
+    mountNode: vi.fn(() => mountDiv),
+    findUpNode: vi.fn(() => upNode),
+    findDownNode: vi.fn(() => downNode),
   }
 })
 
-const mockSelectNode = jest.fn()
-const mockDelete = jest.fn()
-const mockFocus = jest.fn()
+const mockSelectNode = vi.fn()
+const mockDelete = vi.fn()
+const mockFocus = vi.fn()
 let isMoveable = true
 let isDeletable = true
 let isSaveable = true
@@ -61,15 +61,15 @@ nodeDomNode.setAttribute('tabindex', '-1')
 nodeDomNode.style.width = '100px'
 nodeDomNode.style.height = '125px'
 // @ts-expect-error
-nodeDomNode.getBoundingClientRect = jest.fn(() => {
+nodeDomNode.getBoundingClientRect = vi.fn(() => {
   return {top: 0, left: 0, width: 100, height: 125}
 })
 
-jest.mock('@craftjs/core', () => {
-  const module = jest.requireActual('@craftjs/core')
+vi.mock('@craftjs/core', async () => {
+  const module = await vi.importActual('@craftjs/core')
   return {
     ...module,
-    useEditor: jest.fn(() => {
+    useEditor: vi.fn(() => {
       return {
         actions: {
           selectNode: mockSelectNode,
@@ -95,10 +95,10 @@ jest.mock('@craftjs/core', () => {
       }
     }),
 
-    useNode: jest.fn(() => {
+    useNode: vi.fn(() => {
       return {
         connectors: {
-          drag: jest.fn(),
+          drag: vi.fn(),
         },
         node: {
           id: 'nodeid',

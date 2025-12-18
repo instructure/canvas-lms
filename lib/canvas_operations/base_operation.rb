@@ -188,7 +188,9 @@ module CanvasOperations
     end
 
     def job_options
-      { singleton:, on_conflict: :overwrite }
+      opts = { singleton:, on_conflict: :overwrite }
+      opts[:on_permanent_failure] = :fail_with_error! unless use_progress_tracking?
+      opts
     end
 
     def context

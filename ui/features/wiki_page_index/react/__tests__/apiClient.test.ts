@@ -32,7 +32,7 @@ beforeEach(() => {
 
 afterEach(() => {
   server.resetHandlers()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 afterAll(() => {
@@ -49,6 +49,10 @@ it('deletes pages', async () => {
     }),
   )
   const response = await deletePages('courses', '1', ['my_page'])
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - deletePages response type incomplete
   expect(response.failures).toEqual([])
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - deletePages response type incomplete
   expect(response.successes[0].data).toEqual('my_page')
 })

@@ -16,53 +16,77 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {cancelOtpRequest, initiateOtpRequest, verifyOtpRequest} from '../otp'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/authenticity-token', () => jest.fn(() => 'testCsrfToken'))
-
-jest.mock('@canvas/do-fetch-api-effect', () => ({
+vi.mock('@canvas/authenticity-token', () => ({
   __esModule: true,
-  default: jest.fn(),
+  default: vi.fn(() => 'testCsrfToken'),
 }))
 
+const server = setupServer()
+
+let capturedRequest: {path: string; body: any} | null = null
+
 describe('OTP Service', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    capturedRequest = null
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   describe('initiateOtpRequest', () => {
     it('should call doFetchApi with correct parameters and handle success', async () => {
-      const mockResponse = {json: {otp_sent: true}, response: {status: 200}}
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      server.use(
+        http.get('/login/otp', ({request}) => {
+          capturedRequest = {
+            path: new URL(request.url).pathname,
+            body: null,
+          }
+          return HttpResponse.json({otp_sent: true})
+        }),
+      )
       const result = await initiateOtpRequest()
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/login/otp',
-        method: 'GET',
-      })
+      expect(capturedRequest?.path).toBe('/login/otp')
       expect(result).toEqual({status: 200, data: {otp_sent: true}})
     })
 
-    it('should handle failure response correctly', async () => {
-      const mockResponse = {json: {error: 'Failed to initiate OTP'}, response: {status: 400}}
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
-      const result = await initiateOtpRequest()
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/login/otp',
-        method: 'GET',
-      })
-      expect(result).toEqual({status: 400, data: {error: 'Failed to initiate OTP'}})
+    it('should throw on failure response', async () => {
+      server.use(
+        http.get('/login/otp', ({request}) => {
+          capturedRequest = {
+            path: new URL(request.url).pathname,
+            body: null,
+          }
+          return HttpResponse.json({error: 'Failed to initiate OTP'}, {status: 400})
+        }),
+      )
+      await expect(initiateOtpRequest()).rejects.toThrow('doFetchApi received a bad response')
+      expect(capturedRequest?.path).toBe('/login/otp')
     })
   })
 
   describe('verifyOtpRequest', () => {
     it('should call doFetchApi with correct parameters and handle success', async () => {
-      const mockResponse = {json: {otp_verified: true}, response: {status: 200}}
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      server.use(
+        http.post('/login/otp', async ({request}) => {
+          capturedRequest = {
+            path: new URL(request.url).pathname,
+            body: await request.json(),
+          }
+          return HttpResponse.json({otp_verified: true})
+        }),
+      )
       const result = await verifyOtpRequest('123456', true)
-      expect(doFetchApi).toHaveBeenCalledWith({
+      expect(capturedRequest).toEqual({
         path: '/login/otp',
-        method: 'POST',
         body: {
           authenticity_token: 'testCsrfToken',
           otp_login: {
@@ -74,13 +98,21 @@ describe('OTP Service', () => {
       expect(result).toEqual({status: 200, data: {otp_verified: true}})
     })
 
-    it('should handle failure response correctly', async () => {
-      const mockResponse = {json: {error: 'Failed to verify OTP'}, response: {status: 400}}
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
-      const result = await verifyOtpRequest('123456', true)
-      expect(doFetchApi).toHaveBeenCalledWith({
+    it('should throw on failure response', async () => {
+      server.use(
+        http.post('/login/otp', async ({request}) => {
+          capturedRequest = {
+            path: new URL(request.url).pathname,
+            body: await request.json(),
+          }
+          return HttpResponse.json({error: 'Failed to verify OTP'}, {status: 400})
+        }),
+      )
+      await expect(verifyOtpRequest('123456', true)).rejects.toThrow(
+        'doFetchApi received a bad response',
+      )
+      expect(capturedRequest).toEqual({
         path: '/login/otp',
-        method: 'POST',
         body: {
           authenticity_token: 'testCsrfToken',
           otp_login: {
@@ -89,37 +121,43 @@ describe('OTP Service', () => {
           },
         },
       })
-      expect(result).toEqual({status: 400, data: {error: 'Failed to verify OTP'}})
     })
   })
 
   describe('cancelOtpRequest', () => {
     it('should call doFetchApi with correct parameters and handle success', async () => {
-      const mockResponse = {json: {}, response: {status: 200}}
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      server.use(
+        http.delete('/login/otp/cancel', async ({request}) => {
+          capturedRequest = {
+            path: new URL(request.url).pathname,
+            body: {},
+          }
+          return HttpResponse.json({})
+        }),
+      )
       const result = await cancelOtpRequest()
-      expect(doFetchApi).toHaveBeenCalledWith({
+      expect(capturedRequest).toEqual({
         path: '/login/otp/cancel',
-        method: 'DELETE',
-        body: {
-          authenticity_token: 'testCsrfToken',
-        },
+        body: {},
       })
       expect(result).toEqual({status: 200, data: {}})
     })
 
-    it('should handle failure response correctly', async () => {
-      const mockResponse = {json: {}, response: {status: 400}}
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
-      const result = await cancelOtpRequest()
-      expect(doFetchApi).toHaveBeenCalledWith({
+    it('should throw on failure response', async () => {
+      server.use(
+        http.delete('/login/otp/cancel', async ({request}) => {
+          capturedRequest = {
+            path: new URL(request.url).pathname,
+            body: {},
+          }
+          return HttpResponse.json({}, {status: 400})
+        }),
+      )
+      await expect(cancelOtpRequest()).rejects.toThrow('doFetchApi received a bad response')
+      expect(capturedRequest).toEqual({
         path: '/login/otp/cancel',
-        method: 'DELETE',
-        body: {
-          authenticity_token: 'testCsrfToken',
-        },
+        body: {},
       })
-      expect(result).toEqual({status: 400, data: {}})
     })
   })
 })

@@ -116,7 +116,7 @@ describe('AssignmentFooter', () => {
 
   it('calls setOnFailure and does not render nav buttons when there is an error loading the sequence', async () => {
     const mockedContext = {
-      setOnFailure: jest.fn(),
+      setOnFailure: vi.fn(),
     }
     renderWithAlertManager(
       <MockedProvider mocks={[mockModuleSequenceError()]}>

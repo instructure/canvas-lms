@@ -78,7 +78,10 @@ describe CareerController do
             horizon_course_navigation: false,
             horizon_course_redesign: false,
             horizon_course_index_page: false,
-            horizon_chart_view: false
+            horizon_chart_view: false,
+            horizon_native_permissions_page: false,
+            horizon_course_academic_switcher: false,
+            horizon_syncable_objects_redesign: false
           )
         end
 

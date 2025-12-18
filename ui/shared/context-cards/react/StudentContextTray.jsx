@@ -36,6 +36,7 @@ import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
+import {htmlDecode} from '@canvas/util/TextHelper'
 
 const I18n = createI18nScope('student_context_trayStudentContextTray')
 
@@ -231,6 +232,7 @@ export default class StudentContextTray extends React.Component {
       window.ENV?.permissions?.can_manage_differentiation_tags &&
       user?.differentiationTagsConnection?.edges?.length > 0
 
+    const decodedShortName = htmlDecode(user?.short_name)
     return (
       <div>
         {this.state.messageFormOpen ? (
@@ -296,14 +298,14 @@ export default class StudentContextTray extends React.Component {
                               aria-label={I18n.t("Go to %{name}'s profile", {
                                 name:
                                   user.pronouns != null
-                                    ? `${user.short_name} ${user.pronouns}`
-                                    : user.short_name,
+                                    ? `${decodedShortName} ${user.pronouns}`
+                                    : decodedShortName,
                               })}
                               themeOverride={{largePadding: '0', largeHeight: 'normal'}}
                               display="block"
                               textAlign="start"
                             >
-                              {user.short_name} {user.pronouns ? <i>{user.pronouns}</i> : ''}
+                              {decodedShortName} {user.pronouns ? <i>{user.pronouns}</i> : ''}
                             </Link>
                           </Heading>
                         </div>

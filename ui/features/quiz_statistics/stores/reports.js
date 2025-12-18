@@ -170,7 +170,7 @@ export default new Store(
       return Store.prototype.__reset__.call(this)
     },
 
-    /** @private */
+    // @ts-expect-error Legacy class method parameters not typed
     trackReportGeneration(quizReport, autoDownload) {
       const quizReportId = quizReport.get('id')
       let generationRequest = generationRequests.filter(function (request) {
@@ -223,7 +223,7 @@ export default new Store(
         })
     },
 
-    /** @private */
+    // @ts-expect-error Legacy class method parameters not typed
     stopTracking(quizReportId) {
       const request = generationRequests.filter(function (request) {
         return request.quizReportId === quizReportId

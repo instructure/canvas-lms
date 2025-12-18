@@ -45,7 +45,7 @@ describe('SettingsTray', () => {
     })
 
     it('should call onDismiss when the close button is clicked', async () => {
-      const onDismissMock = jest.fn()
+      const onDismissMock = vi.fn()
       await renderSettingsTray({onDismiss: onDismissMock})
 
       const closeButton = screen.getByRole('button', {name: 'Close'})

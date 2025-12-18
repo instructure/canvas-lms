@@ -21,16 +21,16 @@ import {render, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ComposeActionButtons} from '../ComposeActionButtons'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: () => {},
   showFlashError: () => () => {},
 }))
 
 const createProps = overrides => ({
-  onAttachmentUpload: jest.fn(),
-  onMediaUpload: overrides?.hasOwnProperty('onMediaUpload') ? overrides.onMediaUpload : jest.fn(),
-  onCancel: jest.fn(),
-  onSend: jest.fn(),
+  onAttachmentUpload: vi.fn(),
+  onMediaUpload: overrides?.hasOwnProperty('onMediaUpload') ? overrides.onMediaUpload : vi.fn(),
+  onCancel: vi.fn(),
+  onSend: vi.fn(),
   isSending: false,
   ...overrides,
 })
@@ -38,7 +38,7 @@ const createProps = overrides => ({
 describe('ComposeActionButtons', () => {
   afterEach(() => {
     cleanup()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('attachment upload', () => {
@@ -46,12 +46,12 @@ describe('ComposeActionButtons', () => {
       const user = userEvent.setup()
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
-      
+
       const file = new File(['test'], 'test.txt', {type: 'text/plain'})
       const input = getByTestId('attachment-input')
-      
+
       await user.upload(input, file)
-      
+
       expect(props.onAttachmentUpload).toHaveBeenCalled()
     })
 
@@ -77,9 +77,9 @@ describe('ComposeActionButtons', () => {
       const user = userEvent.setup()
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
-      
+
       await user.click(getByTestId('media-upload'))
-      
+
       expect(props.onMediaUpload).toHaveBeenCalled()
     })
 
@@ -103,9 +103,9 @@ describe('ComposeActionButtons', () => {
       const user = userEvent.setup()
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
-      
+
       await user.click(getByTestId('cancel-button'))
-      
+
       expect(props.onCancel).toHaveBeenCalled()
     })
   })
@@ -115,9 +115,9 @@ describe('ComposeActionButtons', () => {
       const user = userEvent.setup()
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
-      
+
       await user.click(getByTestId('send-button'))
-      
+
       expect(props.onSend).toHaveBeenCalled()
     })
 

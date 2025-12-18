@@ -401,6 +401,8 @@ class OutcomeResultsController < ApplicationController
   #   the context.
   # @argument only_assignment_alignments [Boolean]
   #   If specified, only assignment alignments will be included in the results.
+  # @argument show_unpublished_assignments [Boolean]
+  #   If true, unpublished assignments will be included in the results. Defaults to false.
   #
   # @example_response
   #    {
@@ -434,6 +436,14 @@ class OutcomeResultsController < ApplicationController
 
     alignments = find_all_outcome_alignments(@outcome, @context)
     only_assignment_alignments = value_to_boolean(params[:only_assignment_alignments])
+    show_unpublished_assignments = value_to_boolean(params[:show_unpublished_assignments])
+
+    unless show_unpublished_assignments
+      alignments = alignments.reject do |alignment|
+        content = alignment.content_tag.content
+        content.is_a?(Assignment) && content.unpublished?
+      end
+    end
 
     canvas_results, os_results = find_canvas_os_results(all_users: false)
 
@@ -638,7 +648,10 @@ class OutcomeResultsController < ApplicationController
       user_query = user_query.where(enrollments: { course_section_id: params[:section_id].to_i })
     end
 
-    @users = user_query.distinct
+    # Preserve sort order by filtering existing @users array instead of replacing it
+    filtered_user_ids = user_query.distinct.pluck(:id).to_set
+    @users = @users.select { |u| filtered_user_ids.include?(u.id) }
+    @all_users = @all_users.select { |u| filtered_user_ids.include?(u.id) } if defined?(@all_users)
   end
 
   # Removes users without results based on already-fetched results
@@ -685,6 +698,7 @@ class OutcomeResultsController < ApplicationController
   def user_rollups_json
     handle_inst_statsd_outcomes_page_views
     return user_rollups_sorted_by_score_json if params[:sort_by] == "outcome" && params[:sort_outcome_id]
+    return user_rollups_sorted_by_alignment_score_json if params[:sort_by] == "contributing_score" && params[:sort_alignment_id]
 
     rollups = user_rollups
     @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
@@ -714,6 +728,53 @@ class OutcomeResultsController < ApplicationController
     rollups = rollups.select { |r| user_ids.include? r.context.id }
     json = outcome_results_rollups_json(rollups)
     json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
+    json
+  end
+
+  def user_rollups_sorted_by_alignment_score_json
+    missing_score_sort = (params[:sort_order] == "desc") ? CanvasSort::First : CanvasSort::Last
+    alignment_id_param = params[:sort_alignment_id]
+
+    content_tag_id = alignment_id_param.split("_").last.to_i
+
+    canvas_results = LearningOutcomeResult.active.with_active_link
+                                          .where(
+                                            context_code: @context.asset_string,
+                                            user_id: @all_users.map(&:id),
+                                            content_tag_id:
+                                          )
+
+    unless @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
+      canvas_results = canvas_results.exclude_muted_associations
+    end
+    canvas_results = canvas_results.where(hidden: false)
+
+    os_results = fetch_and_convert_os_results(all_users: true)
+    os_results_for_alignment = os_results&.select { |r| r.content_tag_id == content_tag_id } || []
+
+    all_alignment_results = canvas_results.to_a + os_results_for_alignment
+    results_by_user = all_alignment_results.index_by(&:user_id)
+
+    @all_users.sort_by! do |user|
+      result = results_by_user[user.id]
+      score = result&.score
+      [score || missing_score_sort, Canvas::ICU.collation_key(user.sortable_name)]
+    end
+    @all_users.reverse! if params[:sort_order] == "desc"
+
+    @users = @all_users
+    @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
+
+    # When sorting by contributing score, don't filter out users or outcomes without results
+    # since we want to show all users sorted by this specific alignment
+    original_exclude = params[:exclude]
+    params[:exclude] = Api.value_to_array(params[:exclude]).reject { |e| e == "missing_user_rollups" || e == "missing_outcome_results" }
+
+    rollups = user_rollups
+    json = outcome_results_rollups_json(rollups)
+    json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
+    params[:exclude] = original_exclude
+
     json
   end
 
@@ -818,12 +879,17 @@ class OutcomeResultsController < ApplicationController
     return true unless params[:sort_by]
 
     sort_by = params[:sort_by]
-    sortable_fields = %w[student student_name student_sis_id student_integration_id student_login_id outcome]
+    sortable_fields = %w[student student_name student_sis_id student_integration_id student_login_id outcome contributing_score]
     reject! "invalid sort_by parameter value" if sort_by && !sortable_fields.include?(sort_by)
     if sort_by == "outcome"
       sort_outcome_id = params[:sort_outcome_id]
       reject! "missing required sort_outcome_id parameter value" unless sort_outcome_id
       reject! "invalid sort_outcome_id parameter value" unless /\A\d+\z/.match?(sort_outcome_id)
+    end
+    if sort_by == "contributing_score"
+      sort_alignment_id = params[:sort_alignment_id]
+      reject! "missing required sort_alignment_id parameter value" unless sort_alignment_id
+      reject! "invalid sort_alignment_id parameter value" unless /\A[A-Z]_\d+\z/.match?(sort_alignment_id)
     end
     sort_order = params[:sort_order]
     reject! "invalid sort_order parameter value" if sort_by && sort_order && !%w[asc desc].include?(sort_order)
@@ -889,10 +955,6 @@ class OutcomeResultsController < ApplicationController
                                     .select("#{ContentTag.quoted_table_name}.*, u.position")
       end
 
-      # Sort outcomes by lmgb_position
-      # If there is no lmgb_position for an outcome, then place it at the end
-      @outcome_links.sort_by! { |link| link[:position] || link[:id] }
-
       associations = [:learning_outcome_content]
       if Api.value_to_array(params[:include]).include? "outcome_paths"
         associations << { associated_asset: :learning_outcome_group }
@@ -900,7 +962,26 @@ class OutcomeResultsController < ApplicationController
       @outcome_links.each_slice(100) do |outcome_links_slice|
         ActiveRecord::Associations.preload(outcome_links_slice, associations)
       end
+
+      apply_outcome_arrangement
+
       @outcomes = @outcome_links.map(&:learning_outcome_content)
+    end
+  end
+
+  def apply_outcome_arrangement
+    return unless @outcome_links.is_a?(Array) && @outcome_links.any?
+
+    settings = @current_user.get_preference(:learning_mastery_gradebook_settings, @context.global_id) || {}
+
+    case settings["outcome_arrangement"]
+    when "alphabetical"
+      @outcome_links.sort_by! { |link| link.learning_outcome_content&.title.to_s.downcase }
+    when "custom"
+      @outcome_links.sort_by! { |link| [link[:position] || Float::INFINITY, link[:id]] }
+    else
+      # Default to upload order
+      @outcome_links.sort_by!(&:id)
     end
   end
 

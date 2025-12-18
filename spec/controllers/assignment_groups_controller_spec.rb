@@ -833,9 +833,9 @@ describe AssignmentGroupsController do
         )
       end
 
-      context "peer_reviews_for_a2 FF disabled" do
+      context "assignments_2_student FF disabled" do
         before(:once) do
-          @course.disable_feature! :peer_reviews_for_a2
+          @course.disable_feature! :assignments_2_student
         end
 
         it "does not include assessment_requests when the current user is a teacher" do
@@ -857,9 +857,9 @@ describe AssignmentGroupsController do
         end
       end
 
-      context "peer_reviews_for_a2 FF enabled" do
+      context "assignments_2_student FF enabled" do
         before(:once) do
-          @course.enable_feature! :peer_reviews_for_a2
+          @course.enable_feature! :assignments_2_student
         end
 
         it "does not include assessment_requests when the current user is a teacher" do

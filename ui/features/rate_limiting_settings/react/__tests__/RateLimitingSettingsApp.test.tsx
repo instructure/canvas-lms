@@ -19,24 +19,22 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
 import RateLimitingSettingsApp from '../RateLimitingSettingsApp'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock the flash alert
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
-// Mock doFetchApi
-jest.mock('@canvas/do-fetch-api-effect', () => {
-  return jest.fn()
-})
+const server = setupServer()
 
 // Mock the copy to clipboard button
-jest.mock('@canvas/copy-to-clipboard-button', () => {
-  return function MockCopyToClipboardButton(props: any) {
+vi.mock('@canvas/copy-to-clipboard-button', () => ({
+  default: function MockCopyToClipboardButton(props: any) {
     return (
       <button
         onClick={() => navigator.clipboard?.writeText(props.value)}
@@ -46,16 +44,23 @@ jest.mock('@canvas/copy-to-clipboard-button', () => {
         Copy
       </button>
     )
-  }
-})
+  },
+}))
 
 beforeAll(() => {
+  server.listen()
   // Mock clipboard API
   Object.assign(navigator, {
     clipboard: {
-      writeText: jest.fn().mockResolvedValue(undefined),
+      writeText: vi.fn().mockResolvedValue(undefined),
     },
   })
+  fakeENV.setup({ACCOUNT_ID: '1'})
+})
+
+afterAll(() => {
+  server.close()
+  fakeENV.teardown()
 })
 
 const mockRateLimitSettings = [
@@ -100,9 +105,7 @@ const mockApiResponse = mockRateLimitSettings
 
 describe('RateLimitingSettingsApp', () => {
   beforeEach(() => {
-    fetchMock.reset()
-    ;(showFlashAlert as jest.Mock).mockClear()
-    ;(doFetchApi as jest.Mock).mockClear()
+    ;(showFlashAlert as any).mockClear()
 
     // Mock CSRF token meta tag
     const csrfMeta = document.createElement('meta')
@@ -112,14 +115,18 @@ describe('RateLimitingSettingsApp', () => {
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
     document.querySelectorAll('meta[name="csrf-token"]').forEach(meta => meta.remove())
   })
 
   describe('loading state', () => {
     it('shows loading spinner initially', () => {
-      // Mock doFetchApi to return a promise that never resolves
-      ;(doFetchApi as jest.Mock).mockReturnValue(new Promise(() => {}))
+      // Set up a handler that never resolves by using a delay longer than the test timeout
+      server.use(
+        http.get('/accounts/1/rate_limiting_settings', async () => {
+          await new Promise(() => {}) // Never resolves
+        }),
+      )
 
       render(<RateLimitingSettingsApp />)
 
@@ -129,7 +136,9 @@ describe('RateLimitingSettingsApp', () => {
 
   describe('data fetching', () => {
     it('fetches and displays rate limit settings', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValue({json: mockApiResponse})
+      server.use(
+        http.get('/accounts/1/rate_limiting_settings', () => HttpResponse.json(mockApiResponse)),
+      )
 
       render(<RateLimitingSettingsApp />)
 
@@ -144,7 +153,7 @@ describe('RateLimitingSettingsApp', () => {
     })
 
     it('shows error message when fetch fails', async () => {
-      ;(doFetchApi as jest.Mock).mockRejectedValue(new Error('Network error'))
+      server.use(http.get('/accounts/1/rate_limiting_settings', () => HttpResponse.error()))
 
       render(<RateLimitingSettingsApp />)
 
@@ -159,9 +168,7 @@ describe('RateLimitingSettingsApp', () => {
 
   describe('empty state', () => {
     it('shows empty message when no settings exist', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValue({
-        json: [], // BookmarkedCollection returns empty array directly
-      })
+      server.use(http.get('/accounts/1/rate_limiting_settings', () => HttpResponse.json([])))
 
       render(<RateLimitingSettingsApp />)
 
@@ -173,7 +180,9 @@ describe('RateLimitingSettingsApp', () => {
 
   describe('create rate limit button', () => {
     it('opens create modal when clicked', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValue({json: mockApiResponse})
+      server.use(
+        http.get('/accounts/1/rate_limiting_settings', () => HttpResponse.json(mockApiResponse)),
+      )
 
       render(<RateLimitingSettingsApp />)
 
@@ -190,7 +199,9 @@ describe('RateLimitingSettingsApp', () => {
 
   describe('actions menu', () => {
     it('shows edit and delete options for each setting', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValue({json: mockApiResponse})
+      server.use(
+        http.get('/accounts/1/rate_limiting_settings', () => HttpResponse.json(mockApiResponse)),
+      )
 
       render(<RateLimitingSettingsApp />)
 
@@ -213,12 +224,17 @@ describe('RateLimitingSettingsApp', () => {
 
   describe('delete functionality', () => {
     it('deletes a rate limit setting when confirmed', async () => {
-      ;(doFetchApi as jest.Mock)
-        .mockResolvedValueOnce({json: mockApiResponse}) // Initial load
-        .mockResolvedValueOnce({}) // Delete call
+      let deleteCallReceived = false
+      server.use(
+        http.get('/accounts/1/rate_limiting_settings', () => HttpResponse.json(mockApiResponse)),
+        http.delete('/accounts/1/rate_limiting_settings/1', () => {
+          deleteCallReceived = true
+          return HttpResponse.json({})
+        }),
+      )
 
       // Mock window.confirm
-      const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(true)
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
 
       render(<RateLimitingSettingsApp />)
 
@@ -239,14 +255,22 @@ describe('RateLimitingSettingsApp', () => {
         })
       })
 
+      expect(deleteCallReceived).toBe(true)
       confirmSpy.mockRestore()
     })
 
     it('does not delete when user cancels', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValue({json: mockApiResponse})
+      let deleteCallReceived = false
+      server.use(
+        http.get('/accounts/1/rate_limiting_settings', () => HttpResponse.json(mockApiResponse)),
+        http.delete('/accounts/1/rate_limiting_settings/1', () => {
+          deleteCallReceived = true
+          return HttpResponse.json({})
+        }),
+      )
 
       // Mock window.confirm to return false
-      const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false)
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
 
       render(<RateLimitingSettingsApp />)
 
@@ -260,8 +284,8 @@ describe('RateLimitingSettingsApp', () => {
       const deleteButton = screen.getByRole('menuitem', {name: /delete/i})
       await userEvent.click(deleteButton)
 
-      // Should only have been called once for initial load, not for delete
-      expect(doFetchApi).toHaveBeenCalledTimes(1)
+      // Delete should not have been called since user cancelled
+      expect(deleteCallReceived).toBe(false)
 
       confirmSpy.mockRestore()
     })

@@ -29,8 +29,8 @@ import {resetAndGetFilesEnv} from '../filesEnvUtils'
 import {createFilesContexts} from '../../fixtures/fileContexts'
 import {windowPathname} from '@canvas/util/globalUtils'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  windowPathname: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  windowPathname: vi.fn(),
 }))
 
 describe('generateFolderByPathUrl', () => {
@@ -217,7 +217,7 @@ describe('generateSearchNavigationUrl', () => {
     const filesContexts = createFilesContexts({
       isMultipleContexts: true,
     })
-    ;(windowPathname as jest.Mock).mockReturnValue('/files/folder/users_1')
+    vi.mocked(windowPathname).mockReturnValue('/files/folder/users_1')
     resetAndGetFilesEnv(filesContexts)
 
     const url = generateSearchNavigationUrl('foo')
@@ -226,7 +226,7 @@ describe('generateSearchNavigationUrl', () => {
 
   it('returns correct url when showing only course context', () => {
     const filesContexts = createFilesContexts()
-    ;(windowPathname as jest.Mock).mockReturnValue('/')
+    vi.mocked(windowPathname).mockReturnValue('/')
     resetAndGetFilesEnv(filesContexts)
 
     const url = generateSearchNavigationUrl('foo')

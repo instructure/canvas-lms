@@ -42,10 +42,10 @@ describe('OutcomeHeader', () => {
 
   const mockContributingScoresForOutcome: ContributingScoresForOutcome = {
     isVisible: () => false,
-    toggleVisibility: jest.fn(),
+    toggleVisibility: vi.fn(),
     data: undefined,
     alignments: undefined,
-    scoresForUser: jest.fn(() => []),
+    scoresForUser: vi.fn(() => []),
     isLoading: false,
     error: undefined,
   }
@@ -55,11 +55,13 @@ describe('OutcomeHeader', () => {
       outcome,
       sorting: {
         sortOrder: SortOrder.ASC,
-        setSortOrder: jest.fn(),
+        setSortOrder: vi.fn(),
         sortBy: SortBy.SortableName,
-        setSortBy: jest.fn(),
+        setSortBy: vi.fn(),
         sortOutcomeId: null,
-        setSortOutcomeId: jest.fn(),
+        setSortOutcomeId: vi.fn(),
+        sortAlignmentId: null,
+        setSortAlignmentId: vi.fn(),
       },
       contributingScoresForOutcome: mockContributingScoresForOutcome,
     }

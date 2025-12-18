@@ -17,35 +17,38 @@
  */
 
 import React from 'react'
-import {fireEvent, render, screen, waitFor} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
+import {cleanup, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import DiscussionInsights from '../DiscussionInsights'
 import useInsightStore from '../../../hooks/useInsightStore'
 import {useInsight} from '../../../hooks/useFetchInsights'
 
-jest.mock('../../../hooks/useInsightStore')
-const mockedUseInsightStore = useInsightStore as unknown as jest.Mock
+vi.mock('../../../hooks/useInsightStore')
+const mockedUseInsightStore = useInsightStore as unknown as any
 
-jest.mock('../../../hooks/useFetchInsights')
-const mockedUseInsight = useInsight as jest.Mock
+vi.mock('../../../hooks/useFetchInsights')
+const mockedUseInsight = useInsight as any
 
 describe('DiscussionInsights', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
     const mockState = {
       context: 'test-context',
       contextId: 'test-context-id',
       discussionId: 'test-discussion-id',
       filterType: 'all',
-      setModalOpen: jest.fn(),
-      genereteInsight: jest.fn(),
-      setEntryId: jest.fn(),
-      setEntries: jest.fn(),
-      setFeedbackNotes: jest.fn(),
-      setFilterType: jest.fn(),
-      setIsFilteredTable: jest.fn(),
-      openEvaluationModal: jest.fn(),
+      setModalOpen: vi.fn(),
+      genereteInsight: vi.fn(),
+      setEntryId: vi.fn(),
+      setEntries: vi.fn(),
+      setFeedbackNotes: vi.fn(),
+      setFilterType: vi.fn(),
+      setIsFilteredTable: vi.fn(),
+      openEvaluationModal: vi.fn(),
     }
-    mockedUseInsightStore.mockImplementation(selector => selector(mockState))
+    mockedUseInsightStore.mockImplementation((selector: any) => selector(mockState))
   })
 
   it('displays loading placeholder when loading', () => {
@@ -150,16 +153,16 @@ describe('Screen Reader Announcements', () => {
       contextId: 'test-context-id',
       discussionId: 'test-discussion-id',
       filterType: 'all',
-      setModalOpen: jest.fn(),
-      genereteInsight: jest.fn(),
-      setEntryId: jest.fn(),
-      setEntries: jest.fn(),
-      setFeedbackNotes: jest.fn(),
-      setFilterType: jest.fn(),
-      setIsFilteredTable: jest.fn(),
-      openEvaluationModal: jest.fn(),
+      setModalOpen: vi.fn(),
+      genereteInsight: vi.fn(),
+      setEntryId: vi.fn(),
+      setEntries: vi.fn(),
+      setFeedbackNotes: vi.fn(),
+      setFilterType: vi.fn(),
+      setIsFilteredTable: vi.fn(),
+      openEvaluationModal: vi.fn(),
     }
-    mockedUseInsightStore.mockImplementation(selector => selector(mockState))
+    mockedUseInsightStore.mockImplementation((selector: any) => selector(mockState))
   })
 
   it('announces when insights start loading', async () => {

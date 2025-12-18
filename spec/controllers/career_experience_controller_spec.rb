@@ -21,6 +21,7 @@
 describe CareerExperienceController do
   before :once do
     course_with_teacher(active_all: true)
+    account_admin_user(account: Account.default, user: @teacher)
   end
 
   before do
@@ -78,6 +79,27 @@ describe CareerExperienceController do
 
       expect(response).to have_http_status(:bad_request)
       expect(json_parse(response.body)["error"]).to eq "invalid_role"
+    end
+  end
+
+  describe "enabled" do
+    it "returns true when institution has career enabled in subaccounts" do
+      allow(CanvasCareer::ExperienceResolver).to receive(:career_affiliated_institution?).and_return(true)
+
+      get :enabled, format: :json
+      expect(response).to be_successful
+
+      json = json_parse(response.body)
+      expect(json["enabled"]).to be true
+    end
+
+    it "returns false when institution does not have career enabled" do
+      allow(CanvasCareer::ExperienceResolver).to receive(:career_affiliated_institution?).and_return(false)
+
+      get :enabled, format: :json
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json["enabled"]).to be false
     end
   end
 end

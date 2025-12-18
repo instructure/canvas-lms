@@ -19,6 +19,7 @@
 import {useState, useCallback, useMemo} from 'react'
 import {useQueries} from '@tanstack/react-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {GradebookSettings, DisplayFilter} from '../utils/constants'
 
 export interface ContributingScoreAlignment {
   alignment_id: string
@@ -48,7 +49,7 @@ export interface ContributingScoresForOutcome {
   toggleVisibility: () => void
   data?: ContributingScoresResponse
   alignments?: ContributingScoreAlignment[]
-  scoresForUser: (userId: string) => (number | undefined)[]
+  scoresForUser: (userId: string) => (ContributingScore | undefined)[]
   isLoading: boolean
   error?: Error | null
 }
@@ -62,19 +63,20 @@ interface UseContributingScoresProps {
   studentIds: string[]
   outcomeIds: (string | number)[]
   enabled?: boolean
+  settings?: GradebookSettings
 }
 
 const getScoresForUser = (
   data: ContributingScoresResponse | undefined,
   userId: string,
-): (number | undefined)[] => {
+): (ContributingScore | undefined)[] => {
   if (!data) return []
 
   return data.alignments.map(alignment => {
     const score = data.scores.find(
       s => s.user_id === userId && s.alignment_id === alignment.alignment_id,
     )
-    return score?.score
+    return score
   })
 }
 
@@ -83,6 +85,7 @@ export const useContributingScores = ({
   studentIds,
   outcomeIds,
   enabled = true,
+  settings,
 }: UseContributingScoresProps) => {
   const [visibleOutcomes, setVisibleOutcomes] = useState<Set<string | number>>(new Set())
 
@@ -98,14 +101,20 @@ export const useContributingScores = ({
     })
   }, [])
 
+  const showUnpublishedAssignments =
+    settings?.displayFilters.includes(DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS) ?? false
+
   // Create queries for all outcomes that are visible
   const queries = useQueries({
     queries: outcomeIds.map(outcomeId => ({
-      queryKey: ['contributingScores', courseId, outcomeId, studentIds],
+      queryKey: ['contributingScores', courseId, outcomeId, studentIds, showUnpublishedAssignments],
       queryFn: async (): Promise<ContributingScoresResponse> => {
         const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
+        const showUnpublishedParam = showUnpublishedAssignments
+          ? '&show_unpublished_assignments=true'
+          : ''
         const {json} = await doFetchApi({
-          path: `/api/v1/courses/${courseId}/outcomes/${outcomeId}/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
+          path: `/api/v1/courses/${courseId}/outcomes/${outcomeId}/contributing_scores?${userIdsParams}&only_assignment_alignments=true${showUnpublishedParam}`,
           method: 'GET',
         })
         return json as ContributingScoresResponse

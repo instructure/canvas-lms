@@ -289,6 +289,47 @@ describe Accessibility::ResourceScannerService do
       end
     end
 
+    context "when the resource has nil content" do
+      context "for a wiki page with nil body" do
+        before do
+          wiki_page.update!(body: nil)
+        end
+
+        it "completes the scan successfully" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("completed")
+        end
+
+        it "reports no issues for nil content" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.issue_count).to eq(0)
+          expect(AccessibilityIssue.where(context: wiki_page).count).to be(0)
+        end
+      end
+
+      context "for an assignment with nil description" do
+        subject { described_class.new(resource: assignment) }
+
+        let(:assignment) { assignment_model(course:, description: nil) }
+        let!(:scan) { accessibility_resource_scan_model(course:, context: assignment) }
+
+        it "completes the scan successfully" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("completed")
+        end
+
+        it "reports no issues for nil content" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.issue_count).to eq(0)
+          expect(AccessibilityIssue.where(context: assignment).count).to be(0)
+        end
+      end
+    end
+
     context "when the resource exceeds size limit" do
       context "for a wiki page" do
         before do

@@ -17,7 +17,7 @@
 
 import React from 'react'
 import fetchMock from 'fetch-mock'
-import {render, act, fireEvent, waitFor} from '@testing-library/react'
+import {cleanup, render, act, fireEvent, waitFor} from '@testing-library/react'
 import {QRMobileLogin} from '../QRMobileLogin'
 
 const MINUTES = 1000 * 60
@@ -34,6 +34,10 @@ const route = '/canvas/login.png'
 const doNotRespond = Function.prototype
 
 describe('QRMobileLogin', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   describe('before the API call responds', () => {
     beforeEach(() => {
       fetchMock.post(route, doNotRespond, {overwriteRoutes: true})
@@ -56,7 +60,7 @@ describe('QRMobileLogin', () => {
 
   describe('after the API call responds', () => {
     beforeEach(() => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
       fetchMock
         .postOnce(route, loginImageJsons[0], {overwriteRoutes: true})
         .postOnce(route, loginImageJsons[1], {overwriteRoutes: false})
@@ -66,12 +70,12 @@ describe('QRMobileLogin', () => {
       fetchMock.restore()
     })
 
-    // advances both global time and the jest timers by the given time duration
+    // advances both global time and the vi timers by the given time duration
     function advance(delay: number) {
       act(() => {
         const now = Date.now()
-        jest.setSystemTime(now + delay)
-        jest.runOnlyPendingTimers()
+        vi.setSystemTime(now + delay)
+        vi.runOnlyPendingTimers()
       })
     }
 

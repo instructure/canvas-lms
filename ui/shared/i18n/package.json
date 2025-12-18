@@ -4,5 +4,6 @@
   "version": "1.0.0",
   "author": "neme",
   "main": "./i18nObj.js",
-  "owner": "CFA"
+  "owner": "CFA",
+  "type": "module"
 }

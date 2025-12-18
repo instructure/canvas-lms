@@ -19,6 +19,7 @@
 import React from 'react'
 import AssignmentGradeInput from '../index'
 import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 describe('GradebookGrid CompleteIncompleteGradeInput', () => {
   let props
@@ -55,14 +56,16 @@ describe('GradebookGrid CompleteIncompleteGradeInput', () => {
   }
 
   async function openAndClick(optionText) {
-    await wrapper.getByRole('button').click()
+    const user = userEvent.setup()
+    await user.click(wrapper.getByRole('button'))
     resolveClose = () => {}
-    return wrapper.getByText(optionText).click()
+    const menuItem = await wrapper.findByRole('menuitem', {name: optionText})
+    return user.click(menuItem)
   }
 
   function getTextValue() {
-    const text = wrapper.find('.Grid__GradeCell__CompleteIncompleteValue').at(0)
-    return text.getDOMNode().textContent
+    const text = wrapper.container.querySelector('.Grid__GradeCell__CompleteIncompleteValue')
+    return text.textContent
   }
 
   test('adds the CompleteIncompleteInput-suffix class to the container', () => {
@@ -228,68 +231,68 @@ describe('GradebookGrid CompleteIncompleteGradeInput', () => {
       })
 
       test('sets enteredAs to "passFail"', async () => {
-        await openAndClick('Open Complete/Incomplete menu')
-        waitFor(() => expect(getGradeInfo().enteredAs).toBe('passFail'))
+        await openAndClick('Complete')
+        await waitFor(() => expect(getGradeInfo().enteredAs).toBe('passFail'))
       })
 
       test('sets grade to "complete" when "Complete" is clicked', async () => {
-        await openAndClick('Open Complete/Incomplete menu')
-        waitFor(() => expect(getGradeInfo().grade).toBe('complete'))
+        await openAndClick('Complete')
+        await waitFor(() => expect(getGradeInfo().grade).toBe('complete'))
       })
 
       test('sets score to points possible when "Complete" is clicked', async () => {
-        await openAndClick('Open Complete/Incomplete menu')
-        waitFor(() => expect(getGradeInfo().score).toBe(10))
+        await openAndClick('Complete')
+        await waitFor(() => expect(getGradeInfo().score).toBe(10))
       })
 
       test('sets excused to false when "Complete" is clicked', async () => {
-        await openAndClick('Open Complete/Incomplete menu')
-        waitFor(() => expect(getGradeInfo().excused).toBe(10))
+        await openAndClick('Complete')
+        await waitFor(() => expect(getGradeInfo().excused).toBe(false))
       })
 
       test('sets grade to "incomplete" when "Incomplete" is clicked', async () => {
-        await openAndClick('Open Complete/Incomplete menu')
-        waitFor(() => expect(getGradeInfo().grade).toBe(10))
+        await openAndClick('Incomplete')
+        await waitFor(() => expect(getGradeInfo().grade).toBe('incomplete'))
       })
 
       test('sets score to 0 when "Incomplete" is clicked', async () => {
-        await openAndClick('Open Complete/Incomplete menu')
-        waitFor(() => expect(getGradeInfo().score).toBe(10))
+        await openAndClick('Incomplete')
+        await waitFor(() => expect(getGradeInfo().score).toBe(0))
       })
 
       test('sets excused to false when "Incomplete" is clicked', async () => {
-        await openAndClick('Open Complete/Incomplete menu')
-        waitFor(() => expect(getGradeInfo().excused).toBe(10))
+        await openAndClick('Incomplete')
+        await waitFor(() => expect(getGradeInfo().excused).toBe(false))
       })
 
       test('sets grade to null when "Ungraded" is clicked', async () => {
         await openAndClick('Ungraded')
-        waitFor(() => expect(getGradeInfo().grade).toBe(10))
+        await waitFor(() => expect(getGradeInfo().grade).toBe(null))
       })
 
       test('sets score to null when "Ungraded" is clicked', async () => {
         await openAndClick('Ungraded')
-        waitFor(() => expect(getGradeInfo().score).toBe(10))
+        await waitFor(() => expect(getGradeInfo().score).toBe(null))
       })
 
       test('sets excused to false when "Ungraded" is clicked', async () => {
         await openAndClick('Ungraded')
-        waitFor(() => expect(getGradeInfo().excused).toBe(10))
+        await waitFor(() => expect(getGradeInfo().excused).toBe(false))
       })
 
       test('sets grade to null when "Excused" is clicked', async () => {
         await openAndClick('Excused')
-        waitFor(() => expect(getGradeInfo().grade).toBe(10))
+        await waitFor(() => expect(getGradeInfo().grade).toBe(null))
       })
 
       test('sets score to null when "Excused" is clicked', async () => {
         await openAndClick('Excused')
-        waitFor(() => expect(getGradeInfo().score).toBe(10))
+        await waitFor(() => expect(getGradeInfo().score).toBe(null))
       })
 
       test('sets excused to true when "Excused" is clicked', async () => {
         await openAndClick('Excused')
-        waitFor(() => expect(getGradeInfo().excused).toBe(10))
+        await waitFor(() => expect(getGradeInfo().excused).toBe(true))
       })
     })
   })
@@ -326,22 +329,22 @@ describe('GradebookGrid CompleteIncompleteGradeInput', () => {
     test('returns true when a different grade is clicked', async () => {
       props.submission = {...props.submission, enteredGrade: 'complete', enteredScore: 10}
       mountComponent()
-      await openAndClick('Open Complete/Incomplete menu')
-      waitFor(() => expect(hasGradeChanged()).toBe(true))
+      await openAndClick('Incomplete')
+      await waitFor(() => expect(hasGradeChanged()).toBe(true))
     })
 
     test('returns true when the submission becomes excused', async () => {
       props.submission = {...props.submission, enteredGrade: 'complete', enteredScore: 10}
       mountComponent()
       await openAndClick('Excused')
-      waitFor(() => expect(hasGradeChanged()).toBe(true))
+      await waitFor(() => expect(hasGradeChanged()).toBe(true))
     })
 
     test('returns false when the same grade is clicked', async () => {
       props.submission = {...props.submission, enteredGrade: 'complete', enteredScore: 10}
       mountComponent()
-      await openAndClick('Open Complete/Incomplete menu')
-      waitFor(() => expect(hasGradeChanged()).toBe(true))
+      await openAndClick('Complete')
+      await waitFor(() => expect(hasGradeChanged()).toBe(false))
     })
   })
 
@@ -349,7 +352,7 @@ describe('GradebookGrid CompleteIncompleteGradeInput', () => {
     test('includes "Complete", "Incomplete", "Ungraded", and "Excused"', async () => {
       mountComponent()
       await wrapper.getByRole('button').click()
-      waitFor(() => {
+      await waitFor(() => {
         expect(wrapper.getByText('Ungraded')).toBeInTheDocument()
         expect(wrapper.getByText('Excused')).toBeInTheDocument()
         expect(wrapper.getByText('Complete')).toBeInTheDocument()
@@ -359,14 +362,14 @@ describe('GradebookGrid CompleteIncompleteGradeInput', () => {
 
     test('sets the value to the selected option when clicked', async () => {
       mountComponent()
-      await openAndClick('Open Complete/Incomplete menu')
-      waitFor(() => expect(getTextValue()).toBe('Incomplete'))
+      await openAndClick('Incomplete')
+      await waitFor(() => expect(getTextValue()).toBe('Incomplete'))
     })
 
     test('set the value to "Excused" when clicked', async () => {
       mountComponent()
       await openAndClick('Excused')
-      waitFor(() => expect(getTextValue()).toBe('Excused'))
+      await waitFor(() => expect(getTextValue()).toBe('Excused'))
     })
   })
 })

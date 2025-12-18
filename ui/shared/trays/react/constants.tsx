@@ -20,12 +20,12 @@
  * Fallback iframe allowances used when they aren't provided to the editor.
  */
 export const fallbackIframeAllowances = [
-    'geolocation *',
-    'microphone *',
-    'camera *',
-    'midi *',
-    'encrypted-media *',
-    'autoplay *',
-    'clipboard-write *',
-    'display-capture *',
-  ]
+  'geolocation *',
+  'microphone *',
+  'camera *',
+  'midi *',
+  'encrypted-media *',
+  'autoplay *',
+  'clipboard-write *',
+  'display-capture *',
+]

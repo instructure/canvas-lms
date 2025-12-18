@@ -32,7 +32,10 @@ class AssignmentGroupWeightsView extends Backbone.View {
 
   findWeight() {
     const input = document.getElementById(`ag_${this.model.get('id')}_weight_input`)
-    return round(numberHelper.parse(document.getElementById(`ag_${this.model.get('id')}_weight_input`).value), 2)
+    return round(
+      numberHelper.parse(document.getElementById(`ag_${this.model.get('id')}_weight_input`).value),
+      2,
+    )
   }
 
   toJSON() {
@@ -52,7 +55,7 @@ class AssignmentGroupWeightsView extends Backbone.View {
           name={this.model.attributes.name}
           canChangeWeights={this.canChangeWeights}
           initialValue={this.model.attributes.group_weight}
-        />
+        />,
       )
     }, 0)
   }

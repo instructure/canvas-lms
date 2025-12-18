@@ -93,7 +93,7 @@ describe('#renderGradebookSettingsModal', () => {
       current_user_id: '1',
       context_id: '1',
     }
-    renderGradebookSettingsModalMock = jest.fn()
+    renderGradebookSettingsModalMock = vi.fn()
     AsyncComponents.renderGradebookSettingsModal = renderGradebookSettingsModalMock
   })
 
@@ -103,7 +103,7 @@ describe('#renderGradebookSettingsModal', () => {
     }
     $fixtures.remove()
     window.ENV = oldEnv
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('renders the GradebookSettingsModal component', () => {
@@ -153,7 +153,7 @@ describe('#renderGradebookSettingsModal', () => {
 
     beforeEach(() => {
       gradebook = createGradebook()
-      handleUpdatedMock = jest.fn()
+      handleUpdatedMock = vi.fn()
       gradebook.courseSettings.handleUpdated = handleUpdatedMock
       gradebook.renderGradebookSettingsModal()
       window.ENV = {FEATURES: {instui_nav: true}}
@@ -399,13 +399,13 @@ describe('Gradebook "Enter Grades as" Setting', () => {
         submission_types: ['online_text_entry'],
       },
     })
-    updateGridMock = jest.fn()
+    updateGridMock = vi.fn()
     gradebook.gradebookGrid.updateColumns = updateGridMock
   })
 
   afterEach(() => {
     window.ENV = undefined
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test.skip('calls updateGrid if a corresponding column is found', () => {

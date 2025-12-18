@@ -57,7 +57,9 @@ export const PageBlock = ({children}: PageBlockProps) => {
       requestAnimationFrame(() => {
         actions.selectNode()
         const scrollingContainer = getScrollParent()
-        scrollingContainer.scrollTo({top: 0, behavior: 'instant'})
+        if (scrollingContainer?.scrollTo) {
+          scrollingContainer.scrollTo({top: 0, behavior: 'instant'})
+        }
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

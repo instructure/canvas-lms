@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {HistoryDiffModal} from '../HistoryDiffModal'
 import type {ConfigChangeHistoryEntry} from '../../../../model/LtiRegistrationHistoryEntry'
@@ -138,7 +138,11 @@ const mockConfigChangeEntryWithDiff = (
 })
 
 describe('HistoryDiffModal', () => {
-  const onClose = jest.fn()
+  const onClose = vi.fn()
+
+  afterEach(() => {
+    cleanup()
+  })
 
   beforeEach(() => {
     onClose.mockClear()

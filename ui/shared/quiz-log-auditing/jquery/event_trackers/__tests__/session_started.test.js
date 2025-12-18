@@ -28,7 +28,7 @@ describe('Quizzes::LogAuditing::EventTrackers::SessionStarted', () => {
 
   test.skip('capturing: it works', () => {
     const tracker = new Subject()
-    const capture = jest.fn()
+    const capture = vi.fn()
     tracker.install(capture)
 
     // The actual conditions under which `capture` would be called are dependent on the implementation of `.install`

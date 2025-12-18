@@ -24,13 +24,13 @@ const defaultProps: ButtonBlockColorSettingsProps = {
   includeBlockTitle: false,
   backgroundColor: '#FFFFFF',
   titleColor: '#000000',
-  onBackgroundColorChange: jest.fn(),
-  onTitleColorChange: jest.fn(),
+  onBackgroundColorChange: vi.fn(),
+  onTitleColorChange: vi.fn(),
 }
 
 describe('ButtonBlockColorSettings', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('rendering', () => {

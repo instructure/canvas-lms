@@ -17,12 +17,16 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import {userEvent} from '@testing-library/user-event'
 import RegisterCommunication, {Tab} from '../RegisterCommunication'
 
 describe('RegisterCommunication', () => {
-  const onSubmit = jest.fn()
+  afterEach(() => {
+    cleanup()
+  })
+
+  const onSubmit = vi.fn()
 
   const tabIdAndLabelMap = {
     [Tab.EMAIL]: 'Email',

@@ -18,12 +18,11 @@
 
 import React from 'react'
 import {act, render} from '@testing-library/react'
-import type doFetchApi from '@canvas/do-fetch-api-effect'
 import ContextModulesPublishModal from '../ContextModulesPublishModal'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
-
-const mockDoFetchApi = jest.fn() as jest.MockedFunction<typeof doFetchApi>
+const server = setupServer()
 
 const defaultProps = {
   isOpen: true,
@@ -43,20 +42,22 @@ const defaultProps = {
 }
 
 beforeAll(() => {
-  mockDoFetchApi.mockResolvedValue({
-    response: new Response('', {status: 200}),
-    json: {completed: []},
-    text: '',
-  })
+  server.listen()
 })
 
 beforeEach(() => {
-  mockDoFetchApi.mockClear()
+  // Default handler for progress API
+  server.use(
+    http.get('/api/v1/progress/:progressId', () => HttpResponse.json({completed: []})),
+  )
 })
 
 afterEach(() => {
-  jest.clearAllMocks()
+  server.resetHandlers()
+  vi.clearAllMocks()
 })
+
+afterAll(() => server.close())
 
 describe('ContextModulesPublishModal', () => {
   it('renders the title and warning text', () => {
@@ -94,7 +95,7 @@ describe('ContextModulesPublishModal', () => {
   })
 
   it('calls onPublish when the publish button is clicked', () => {
-    const onPublish = jest.fn()
+    const onPublish = vi.fn()
     const {getByText} = render(
       <ContextModulesPublishModal {...defaultProps} onPublish={onPublish} />,
     )
@@ -104,7 +105,7 @@ describe('ContextModulesPublishModal', () => {
   })
 
   it('has a close button', () => {
-    const onDismiss = jest.fn()
+    const onDismiss = vi.fn()
     const {getByTestId} = render(
       <ContextModulesPublishModal {...defaultProps} onDismiss={onDismiss} />,
     )

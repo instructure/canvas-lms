@@ -27,17 +27,17 @@ import {FileManagementProvider} from '../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../__tests__/createMockContext'
 import {useGetQuota} from '../../hooks/useGetQuota'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn().mockReturnValue(jest.fn()),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: vi.fn().mockReturnValue(vi.fn()),
 }))
 
-jest.mock('../../hooks/useGetQuota', () => ({
-  useGetQuota: jest.fn(),
+vi.mock('../../hooks/useGetQuota', () => ({
+  useGetQuota: vi.fn(),
 }))
 
 describe('FilesUsageBar', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderComponent = () => {
@@ -60,7 +60,7 @@ describe('FilesUsageBar', () => {
   }
 
   it('renders progress bar with quota data when fetch is successful', async () => {
-    ;(useGetQuota as jest.Mock).mockImplementation(() => ({
+    ;(useGetQuota as any).mockImplementation(() => ({
       data: {quota_used: 500_000, quota: 1_000_000},
       error: null,
       isLoading: false,
@@ -76,7 +76,7 @@ describe('FilesUsageBar', () => {
   })
 
   it('displays error message if quota fetch fails', async () => {
-    ;(useGetQuota as jest.Mock).mockImplementation(() => ({
+    ;(useGetQuota as any).mockImplementation(() => ({
       data: null,
       error: new Error('Failed to fetch quota'),
       isLoading: false,

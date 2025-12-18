@@ -18,20 +18,30 @@
 
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import PeerReviewsStudentView from '../PeerReviewsStudentView'
 
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(),
+import {executeQuery} from '@canvas/graphql'
+import {useAllocatePeerReviews} from '../../hooks/useAllocatePeerReviews'
+
+vi.mock('@canvas/graphql', () => ({
+  executeQuery: vi.fn(),
 }))
 
-jest.mock('@canvas/util/jquery/apiUserContent', () => ({
-  convert: (html: string) => html,
+vi.mock('@canvas/util/jquery/apiUserContent', () => ({
+  default: {
+    convert: (html: string) => html,
+  },
 }))
 
-const {executeQuery} = require('@canvas/graphql')
-const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+vi.mock('../../hooks/useAllocatePeerReviews', () => ({
+  useAllocatePeerReviews: vi.fn(),
+}))
+
+const mockExecuteQuery = vi.mocked(executeQuery)
+const mockUseAllocatePeerReviews = vi.mocked(useAllocatePeerReviews)
 
 type PeerReviewsStudentViewProps = React.ComponentProps<typeof PeerReviewsStudentView>
 
@@ -52,9 +62,14 @@ function setup(props: Partial<PeerReviewsStudentViewProps> = {}) {
 }
 
 describe('PeerReviewsStudentView', () => {
+  const mockMutate = vi.fn()
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     queryClient.clear()
+    mockUseAllocatePeerReviews.mockReturnValue({
+      mutate: mockMutate,
+    } as any)
   })
 
   it('renders loading state initially', () => {
@@ -82,6 +97,24 @@ describe('PeerReviewsStudentView', () => {
         name: 'Test Peer Review Assignment',
         dueAt: '2025-12-31T23:59:59Z',
         description: '<p>This is the assignment description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+        },
+        assessmentRequestsForCurrentUser: [
+          {
+            _id: 'ar-1',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-01T00:00:00Z',
+          },
+          {
+            _id: 'ar-2',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-02T00:00:00Z',
+          },
+        ],
       },
     })
 
@@ -102,6 +135,11 @@ describe('PeerReviewsStudentView', () => {
         name: 'Assignment Without Due Date',
         dueAt: null,
         description: '<p>Description here</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 1,
+        },
+        assessmentRequestsForCurrentUser: [],
       },
     })
 
@@ -121,6 +159,11 @@ describe('PeerReviewsStudentView', () => {
         name: 'Assignment Without Description',
         dueAt: '2025-12-31T23:59:59Z',
         description: null,
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+        },
+        assessmentRequestsForCurrentUser: [],
       },
     })
 
@@ -140,6 +183,11 @@ describe('PeerReviewsStudentView', () => {
         name: 'Test Assignment',
         dueAt: '2025-12-31T23:59:59Z',
         description: '<p>Description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 1,
+        },
+        assessmentRequestsForCurrentUser: [],
       },
     })
 
@@ -159,6 +207,10 @@ describe('PeerReviewsStudentView', () => {
         name: 'Peer Review Assignment',
         dueAt: '2025-12-31T23:59:59Z',
         description: '<p>Assignment description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+        },
         assessmentRequestsForCurrentUser: [
           {
             _id: 'ar-1',
@@ -190,6 +242,10 @@ describe('PeerReviewsStudentView', () => {
         name: 'Assignment No Reviews',
         dueAt: '2025-12-31T23:59:59Z',
         description: '<p>Description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 0,
+        },
         assessmentRequestsForCurrentUser: null,
       },
     })
@@ -200,6 +256,342 @@ describe('PeerReviewsStudentView', () => {
       const selector = getByTestId('peer-review-selector')
       expect(selector).toBeInTheDocument()
       expect(selector).toHaveAttribute('value', 'No peer reviews available')
+    })
+  })
+
+  it('calls allocate when assessment requests count is less than peer reviews required', async () => {
+    mockExecuteQuery.mockResolvedValueOnce({
+      assignment: {
+        _id: '10',
+        name: 'Test Assignment',
+        dueAt: '2025-12-31T23:59:59Z',
+        description: '<p>Description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 3,
+        },
+        assessmentRequestsForCurrentUser: [
+          {
+            _id: 'ar-1',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-01T00:00:00Z',
+          },
+        ],
+      },
+    })
+
+    setup({assignmentId: '10'})
+
+    await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalledWith({
+        courseId: '100',
+        assignmentId: '10',
+      })
+    })
+  })
+
+  describe('Submission tab', () => {
+    it('renders submission when assessment request has a submission', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '9',
+          name: 'Assignment With Submission',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>Student submission text</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '9'})
+
+      await waitFor(() => {
+        expect(getByText('Submission')).toBeInTheDocument()
+      })
+    })
+
+    it('renders AssignmentSubmission component with correct submission data', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '11',
+          name: 'Assignment With Text Entry',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>This is the peer review submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByTestId, getByText} = setup({assignmentId: '11'})
+
+      await waitFor(() => {
+        expect(getByText('Submission')).toBeInTheDocument()
+      })
+
+      const user = userEvent.setup()
+      await user.click(getByText('Submission'))
+
+      await waitFor(() => {
+        expect(getByTestId('text-entry-content')).toBeInTheDocument()
+      })
+
+      expect(getByTestId('text-entry-content')).toHaveTextContent(
+        'This is the peer review submission',
+      )
+    })
+
+    it('updates submission display when peer review selection changes', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '12',
+          name: 'Multiple Peer Reviews',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>First submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+            {
+              _id: 'ar-2',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-02T00:00:00Z',
+              submission: {
+                _id: 'sub-2',
+                attempt: 1,
+                body: '<p>Second submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByTestId, getByText} = setup({assignmentId: '12'})
+
+      await waitFor(() => {
+        expect(getByText('Submission')).toBeInTheDocument()
+      })
+
+      const user = userEvent.setup()
+      await user.click(getByText('Submission'))
+
+      await waitFor(() => {
+        expect(getByTestId('text-entry-content')).toHaveTextContent('First submission')
+      })
+
+      const selector = getByTestId('peer-review-selector')
+      await user.click(selector)
+
+      const secondOption = getByText('Peer Review (2 of 2)')
+      await user.click(secondOption)
+
+      await waitFor(() => {
+        expect(getByTestId('text-entry-content')).toHaveTextContent('Second submission')
+      })
+    })
+  })
+
+  it('does not call allocate when assessment requests count equals peer reviews required', async () => {
+    mockExecuteQuery.mockResolvedValueOnce({
+      assignment: {
+        _id: '11',
+        name: 'Test Assignment',
+        dueAt: '2025-12-31T23:59:59Z',
+        description: '<p>Description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+        },
+        assessmentRequestsForCurrentUser: [
+          {
+            _id: 'ar-1',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-01T00:00:00Z',
+          },
+          {
+            _id: 'ar-2',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-02T00:00:00Z',
+          },
+        ],
+      },
+    })
+
+    setup({assignmentId: '11'})
+
+    await waitFor(() => {
+      expect(mockMutate).not.toHaveBeenCalled()
+    })
+  })
+
+  it('does not call allocate when no peer reviews are required', async () => {
+    mockExecuteQuery.mockResolvedValueOnce({
+      assignment: {
+        _id: '12',
+        name: 'Test Assignment',
+        dueAt: '2025-12-31T23:59:59Z',
+        description: '<p>Description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 0,
+        },
+        assessmentRequestsForCurrentUser: [],
+      },
+    })
+
+    setup({assignmentId: '12'})
+
+    await waitFor(() => {
+      expect(mockMutate).not.toHaveBeenCalled()
+    })
+  })
+
+  it('calls allocate only once even if component re-renders', async () => {
+    mockExecuteQuery.mockResolvedValue({
+      assignment: {
+        _id: '13',
+        name: 'Test Assignment',
+        dueAt: '2025-12-31T23:59:59Z',
+        description: '<p>Description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+        },
+        assessmentRequestsForCurrentUser: [
+          {
+            _id: 'ar-1',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-01T00:00:00Z',
+          },
+        ],
+      },
+    })
+
+    const {rerender} = setup({assignmentId: '13'})
+
+    await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalledTimes(1)
+    })
+
+    rerender(
+      <MockedQueryProvider>
+        <PeerReviewsStudentView assignmentId="13" />
+      </MockedQueryProvider>,
+    )
+
+    await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('Tab switching', () => {
+    it('switches between Assignment Details and Submission tabs', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '13',
+          name: 'Tab Switching Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Assignment description here</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>Submission text</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText, getByTestId} = setup({assignmentId: '13'})
+
+      await waitFor(() => {
+        expect(getByText('Assignment Details')).toBeInTheDocument()
+      })
+
+      expect(getByText('Assignment description here')).toBeInTheDocument()
+
+      const user = userEvent.setup()
+      await user.click(getByText('Submission'))
+
+      await waitFor(() => {
+        expect(getByTestId('text-entry-content')).toBeInTheDocument()
+      })
+    })
+
+    it('defaults to Assignment Details tab on initial render', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '14',
+          name: 'Default Tab Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description content</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>Submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '14'})
+
+      await waitFor(() => {
+        expect(getByText('Description content')).toBeInTheDocument()
+      })
     })
   })
 })

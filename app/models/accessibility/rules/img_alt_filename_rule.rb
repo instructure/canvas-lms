@@ -44,7 +44,7 @@ module Accessibility
           checkbox_subtext: I18n.t("Screen readers should skip purely decorative images."),
           undo_text: I18n.t("Alt text updated"),
           input_label: I18n.t("Alt text"),
-          input_description: I18n.t("Describe what's in the picture."),
+          input_description: I18n.t("Describe the content or purpose of this image."),
           input_max_length: ImgAltRuleHelper::MAX_LENGTH,
           can_generate_fix: true,
           generate_button_label: I18n.t("Generate alt text"),
@@ -70,6 +70,12 @@ module Accessibility
 
       def message
         I18n.t("This text (alt text) is read by screen readers and displayed if the image fails to load. Replace the filename with a meaningful description.")
+      end
+
+      def issue_preview(elem)
+        return nil unless elem.tag_name == "img"
+
+        ImgAltRuleHelper.adjust_img_style(elem)
       end
 
       def why

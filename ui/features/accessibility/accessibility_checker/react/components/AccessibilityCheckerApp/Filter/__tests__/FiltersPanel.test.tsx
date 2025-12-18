@@ -16,21 +16,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, within} from '@testing-library/react'
+import {cleanup, render, screen, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import FiltersPanel from '../FiltersPanel'
 import {AppliedFilter, FilterOption} from '../../../../../../shared/react/types'
 
 describe('FiltersPanel', () => {
-  const mockOnFilterChange = jest.fn()
+  const mockOnFilterChange = vi.fn()
 
   const defaultProps = {
     onFilterChange: mockOnFilterChange,
     appliedFilters: [] as AppliedFilter[],
   }
 
+  const mockMatchMedia = (matches: boolean) => {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation(query => ({
+        matches,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    })
+  }
+
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+    mockMatchMedia(true)
   })
 
   it('renders the filter panel with correct title', () => {
@@ -44,7 +65,7 @@ describe('FiltersPanel', () => {
     expect(screen.queryByTestId('apply-filters-button')).not.toBeInTheDocument()
   })
 
-  it('renders applied filters component', () => {
+  it('renders applied filters component on desktop', () => {
     render(
       <FiltersPanel
         {...defaultProps}
@@ -52,6 +73,18 @@ describe('FiltersPanel', () => {
       />,
     )
     expect(screen.getByTestId('applied-filters')).toBeInTheDocument()
+  })
+
+  it('does not render applied filters component on tablet', () => {
+    mockMatchMedia(false)
+
+    render(
+      <FiltersPanel
+        {...defaultProps}
+        appliedFilters={[{key: 'workflowStates', option: {value: 'published', label: 'Published'}}]}
+      />,
+    )
+    expect(screen.queryByTestId('applied-filters')).not.toBeInTheDocument()
   })
 
   it('does not show clear filters button when no filters are applied', () => {

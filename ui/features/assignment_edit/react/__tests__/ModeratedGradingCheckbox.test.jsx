@@ -59,11 +59,14 @@ describe('ModeratedGradingCheckbox', () => {
     expect(checkbox().checked).toBe(true)
   })
 
-  test('enables the checkbox if no graded submissions exist, it is not a peer ' +
-    'review assignment, and it is not a group assignment', () => {
-    mountComponent()
-    expect(checkbox().disabled).toBe(false)
-  })
+  test(
+    'enables the checkbox if no graded submissions exist, it is not a peer ' +
+      'review assignment, and it is not a group assignment',
+    () => {
+      mountComponent()
+      expect(checkbox().disabled).toBe(false)
+    },
+  )
 
   test('disables the checkbox if graded submissions exist', () => {
     props.gradedSubmissionsExist = true
@@ -85,7 +88,7 @@ describe('ModeratedGradingCheckbox', () => {
 
   test('calls onChange when checked', async () => {
     const user = userEvent.setup()
-    props.onChange = jest.fn()
+    props.onChange = vi.fn()
     mountComponent()
     await user.click(checkbox())
     expect(props.onChange).toHaveBeenCalledTimes(1)
@@ -93,7 +96,7 @@ describe('ModeratedGradingCheckbox', () => {
 
   test('calls onChange with `true` when being checked', async () => {
     const user = userEvent.setup()
-    props.onChange = jest.fn()
+    props.onChange = vi.fn()
     mountComponent()
     await user.click(checkbox())
     expect(props.onChange).toHaveBeenCalledWith(true)
@@ -102,7 +105,7 @@ describe('ModeratedGradingCheckbox', () => {
   test('calls onChange with `false` when being unchecked', async () => {
     const user = userEvent.setup()
     props.checked = true
-    props.onChange = jest.fn()
+    props.onChange = vi.fn()
     mountComponent()
     await user.click(checkbox())
     expect(props.onChange).toHaveBeenCalledWith(false)

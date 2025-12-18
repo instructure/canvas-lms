@@ -231,7 +231,7 @@ describe('Criterion', () => {
         <Table.Body>
           <Criterion
             assessment={{...assessments.points.data[1], comments: 'blah', editComments: false}}
-            onAssessmentChange={jest.fn()}
+            onAssessmentChange={vi.fn()}
             criterion={rubrics.points.criteria[1]}
             freeForm={false}
           />
@@ -246,7 +246,7 @@ describe('Criterion', () => {
         <Table.Body>
           <Criterion
             assessment={{...assessments.points.data[1], comments: '', editComments: true}}
-            onAssessmentChange={jest.fn()}
+            onAssessmentChange={vi.fn()}
             criterion={rubrics.points.criteria[1]}
             freeForm={false}
           />
@@ -261,7 +261,7 @@ describe('Criterion', () => {
         <Table.Body>
           <Criterion
             assessment={{...assessments.points.data[1], comments: '', editComments: false}}
-            onAssessmentChange={jest.fn()}
+            onAssessmentChange={vi.fn()}
             criterion={rubrics.points.criteria[1]}
             freeForm={false}
           />
@@ -308,13 +308,13 @@ describe('Criterion', () => {
 
     const criterion = rubrics.points.criteria[1]
     it('are visible by default', () => {
-      renderPoints({criterion, onAssessmentChange: jest.fn()})
+      renderPoints({criterion, onAssessmentChange: vi.fn()})
       expect(screen.getByLabelText('Points')).toBeInTheDocument()
     })
 
     it('can be changed', async () => {
       const user = userEvent.setup()
-      const onAssessmentChange = jest.fn()
+      const onAssessmentChange = vi.fn()
       renderPoints({criterion, onAssessmentChange})
 
       const pointsInput = screen
@@ -337,7 +337,7 @@ describe('Criterion', () => {
 
     it('can be selected and deselected', async () => {
       const user = userEvent.setup()
-      const onAssessmentChange = jest.fn()
+      const onAssessmentChange = vi.fn()
       renderPoints({criterion, onAssessmentChange})
 
       const pointsInput = screen
@@ -406,7 +406,7 @@ describe('Criterion', () => {
             hidePoints={false}
             freeForm={false}
             hasPointsColumn={true}
-            onAssessmentChange={jest.fn()}
+            onAssessmentChange={vi.fn()}
           />
         </Table.Body>
       </Table>,

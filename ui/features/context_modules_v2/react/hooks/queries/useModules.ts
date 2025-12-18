@@ -31,7 +31,11 @@ async function getModules({
   queryKey,
   pageParam,
   view,
-}: {queryKey: any; pageParam?: unknown; view: string}): Promise<ModulesResponse> {
+}: {
+  queryKey: any
+  pageParam?: unknown
+  view: string
+}): Promise<ModulesResponse> {
   const [_key, courseId] = queryKey
   const cursor = pageParam ? String(pageParam) : null
 

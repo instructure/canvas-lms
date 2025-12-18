@@ -147,7 +147,7 @@ describe('AssignToContent', () => {
       },
     ])
 
-    const onSyncMock = jest.fn()
+    const onSyncMock = vi.fn()
     render(
       <MockedQueryProvider>
         <AssignToContent
@@ -278,7 +278,7 @@ describe('AssignToContent', () => {
     })
 
     it('calls onSync with the importantDates flag when checking/unchecking the option', () => {
-      const onSyncMock = jest.fn()
+      const onSyncMock = vi.fn()
       const {getByTestId} = setUp({onSync: onSyncMock})
 
       getByTestId('important_dates').click()

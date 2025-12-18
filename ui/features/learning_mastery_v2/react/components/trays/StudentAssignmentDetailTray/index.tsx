@@ -22,9 +22,12 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Tray} from '@instructure/ui-tray'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Outcome} from '../../../types/rollup'
+import {Outcome, Student} from '../../../types/rollup'
 import {View} from '@instructure/ui-view'
 import TruncateWithTooltip from '@canvas/instui-bindings/react/TruncateWithTooltip'
+import {AssignmentSection} from './AssignmentSection'
+import {NavigatorProps} from './Navigator'
+import {StudentSection} from './StudentSection'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -32,12 +35,46 @@ export interface StudentAssignmentDetailTrayProps {
   open: boolean
   onDismiss: () => void
   outcome: Outcome
+  courseId: string
+  student: Student
+  assignment: {
+    id: string
+    name: string
+    htmlUrl: string
+  }
+  assignmentNavigator: NavigatorProps
+  studentNavigator: NavigatorProps
 }
+
+const TrayHeader = ({title, onClose}: {title: string; onClose: () => void}) => (
+  <Flex direction="row" data-testid="tray-header" padding="none none small">
+    <Flex.Item>
+      <CloseButton
+        size="small"
+        screenReaderLabel={I18n.t('Close Student Assignment Details')}
+        onClick={onClose}
+        data-testid="close-tray-button"
+      />
+    </Flex.Item>
+    <Flex.Item shouldGrow={true} shouldShrink={true}>
+      <View as="div" textAlign="center">
+        <Text weight="bold">
+          <TruncateWithTooltip>{title}</TruncateWithTooltip>
+        </Text>
+      </View>
+    </Flex.Item>
+  </Flex>
+)
 
 export const StudentAssignmentDetailTray: React.FC<StudentAssignmentDetailTrayProps> = ({
   open,
   onDismiss,
   outcome,
+  courseId,
+  student,
+  assignment,
+  assignmentNavigator,
+  studentNavigator,
 }) => {
   return (
     <Tray
@@ -49,23 +86,30 @@ export const StudentAssignmentDetailTray: React.FC<StudentAssignmentDetailTrayPr
       data-testid="student-assignment-detail-tray"
     >
       <Flex direction="column" padding="medium">
-        <Flex direction="row" data-testid="tray-header">
-          <Flex.Item>
-            <CloseButton
-              size="medium"
-              screenReaderLabel={I18n.t('Close Student Assignment Details')}
-              onClick={onDismiss}
-              data-testid="close-tray-button"
-            />
-          </Flex.Item>
-          <Flex.Item shouldGrow={true} shouldShrink={true}>
-            <View as="div" textAlign="center">
-              <Text size="large" weight="bold">
-                <TruncateWithTooltip>{outcome.title}</TruncateWithTooltip>
-              </Text>
-            </View>
-          </Flex.Item>
-        </Flex>
+        <TrayHeader title={outcome.title} onClose={onDismiss} />
+        <AssignmentSection
+          courseId={courseId}
+          studentId={student.id}
+          currentAssignment={{
+            id: assignment.id,
+            name: assignment.name,
+            htmlUrl: assignment.htmlUrl,
+          }}
+          hasPrevious={assignmentNavigator.hasPrevious}
+          hasNext={assignmentNavigator.hasNext}
+          onPrevious={assignmentNavigator.onPrevious}
+          onNext={assignmentNavigator.onNext}
+        />
+        <hr />
+        <StudentSection
+          currentStudent={student}
+          masteryReportUrl={`/courses/${courseId}/grades/${student.id}#tab-outcomes`}
+          hasPrevious={studentNavigator.hasPrevious}
+          hasNext={studentNavigator.hasNext}
+          onPrevious={studentNavigator.onPrevious}
+          onNext={studentNavigator.onNext}
+        />
+        <hr />
       </Flex>
     </Tray>
   )

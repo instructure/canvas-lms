@@ -114,7 +114,11 @@ RUN --mount=target=/tmp/src \
         tmp \
         ui \
         ui-build \
+        eslint.config.js \
+        eslint.config.vitest.js \
         jest.config.js \
+        vitest.config.ts \
+        vitest.workspace.ts \
         package.json \
         tsconfig.json \
         yarn.lock \

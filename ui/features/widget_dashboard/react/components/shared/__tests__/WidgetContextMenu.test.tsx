@@ -65,7 +65,7 @@ describe('WidgetContextMenu', () => {
       ),
       widget: mockWidget,
       config: mockConfig,
-      onSelect: jest.fn(),
+      onSelect: vi.fn(),
       ...overrides,
     }
   }
@@ -97,7 +97,7 @@ describe('WidgetContextMenu', () => {
 
   it('calls onSelect with "move-left" when Move left bottom is clicked', async () => {
     const user = userEvent.setup()
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     setup(
       buildDefaultProps({
         widget: {
@@ -118,7 +118,7 @@ describe('WidgetContextMenu', () => {
 
   it('calls onSelect with "move-right" when Move right bottom is clicked', async () => {
     const user = userEvent.setup()
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     setup(buildDefaultProps({onSelect}))
 
     await user.click(screen.getByTestId('menu-trigger'))
@@ -129,7 +129,7 @@ describe('WidgetContextMenu', () => {
 
   it('calls onSelect with "move-left-top" when Move left top is clicked', async () => {
     const user = userEvent.setup()
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     setup(
       buildDefaultProps({
         widget: {
@@ -150,7 +150,7 @@ describe('WidgetContextMenu', () => {
 
   it('calls onSelect with "move-right-top" when Move right top is clicked', async () => {
     const user = userEvent.setup()
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     setup(buildDefaultProps({onSelect}))
 
     await user.click(screen.getByTestId('menu-trigger'))
@@ -161,7 +161,7 @@ describe('WidgetContextMenu', () => {
 
   it('calls onSelect with "move-to-top" when Move to top is clicked', async () => {
     const user = userEvent.setup()
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     setup(
       buildDefaultProps({
         widget: {
@@ -182,7 +182,7 @@ describe('WidgetContextMenu', () => {
 
   it('calls onSelect with "move-up" when Move up is clicked', async () => {
     const user = userEvent.setup()
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     setup(
       buildDefaultProps({
         widget: {
@@ -203,7 +203,7 @@ describe('WidgetContextMenu', () => {
 
   it('calls onSelect with "move-down" when Move down is clicked', async () => {
     const user = userEvent.setup()
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     setup(buildDefaultProps({onSelect}))
 
     await user.click(screen.getByTestId('menu-trigger'))
@@ -214,7 +214,7 @@ describe('WidgetContextMenu', () => {
 
   it('calls onSelect with "move-to-bottom" when Move to bottom is clicked', async () => {
     const user = userEvent.setup()
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     setup(buildDefaultProps({onSelect}))
 
     await user.click(screen.getByTestId('menu-trigger'))
@@ -243,7 +243,7 @@ describe('WidgetContextMenu', () => {
 
   it('disables Move left top and Move left bottom when widget is in left column', async () => {
     const user = userEvent.setup()
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     setup(
       buildDefaultProps({
         widget: {...mockWidget, position: {col: 1, row: 1, relative: 1}},
@@ -264,7 +264,7 @@ describe('WidgetContextMenu', () => {
 
   it('disables Move right top and Move right bottom when widget is in right column', async () => {
     const user = userEvent.setup()
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     setup(
       buildDefaultProps({
         widget: {...mockWidget, position: {col: 2, row: 1, relative: 1}},
@@ -285,7 +285,7 @@ describe('WidgetContextMenu', () => {
 
   it('disables Move up and Move to top when widget is first in column', async () => {
     const user = userEvent.setup()
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     setup(
       buildDefaultProps({
         widget: {...mockWidget, position: {col: 1, row: 1, relative: 1}},
@@ -307,7 +307,7 @@ describe('WidgetContextMenu', () => {
 
   it('disables Move down and Move to bottom when widget is last in column', async () => {
     const user = userEvent.setup()
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     const lastWidget = {
       id: 'other-widget',
       type: 'test',

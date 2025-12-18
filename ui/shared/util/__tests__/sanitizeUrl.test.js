@@ -19,7 +19,6 @@
 import sanitizeUrl from '../sanitizeUrl'
 
 it('replaces javascript: scheme urls with about:blank', () => {
-   
   expect(sanitizeUrl('javascript:prompt(document.cookie);prompt(document.domain);')).toBe(
     'about:blank',
   )
@@ -32,7 +31,6 @@ it('is not fooled by obfuscating the scheme with newlines and stuff', () => {
 })
 
 it('is not hoodwinked by mixed-case tomfoolery', () => {
-   
   expect(sanitizeUrl('jaVascripT:prompt(document.cookie);prompt(document.domain);')).toBe(
     'about:blank',
   )

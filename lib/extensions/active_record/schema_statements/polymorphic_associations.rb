@@ -151,7 +151,7 @@ module Extensions
                                       end
                 end
 
-                ::ActiveRecord::ConnectionAdapters::ReferenceDefinition.new(sub_ref_name, index: sub_index, **).add_to(self)
+                ::ActiveRecord::ConnectionAdapters::ReferenceDefinition.new(sub_ref_name, index: sub_index, foreign_key:, **).add_to(self)
               end
 
               if check_constraint

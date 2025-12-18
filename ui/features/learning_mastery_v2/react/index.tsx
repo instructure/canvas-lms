@@ -39,6 +39,7 @@ import {saveLearningMasteryGradebookSettings, saveOutcomeOrder} from './apiClien
 import {Outcome} from './types/rollup'
 import {useContributingScores} from './hooks/useContributingScores'
 import {StudentAssignmentDetailTray} from './components/trays/StudentAssignmentDetailTray'
+import {useStudentAssignmentTray} from './hooks/useStudentAssignmentTray'
 
 const queryClient = new QueryClient()
 
@@ -73,13 +74,6 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
 
   const [isSavingSettings, setIsSavingSettings] = useState(false)
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
-  const [studentAssignmentTrayState, setStudentAssignmentTrayState] = useState<{
-    isOpen: boolean
-    outcome: Outcome | null
-  }>({
-    isOpen: false,
-    outcome: null,
-  })
 
   const {
     isLoading: isLoadingGradebook,
@@ -99,10 +93,13 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     selectedUserIds,
   })
 
-  const [outcomes, setOutcomes] = useState(initialOutcomes)
+  const studentAssignmentDetailTray = useStudentAssignmentTray(students)
+
+  const [localOutcomes, setLocalOutcomes] = useState<Outcome[] | null>(null)
+  const outcomes = localOutcomes ?? initialOutcomes
 
   useEffect(() => {
-    setOutcomes(initialOutcomes)
+    setLocalOutcomes(null)
   }, [initialOutcomes])
 
   const {
@@ -114,6 +111,7 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     courseId,
     studentIds: students.map(student => student.id),
     outcomeIds: outcomes.map(outcome => outcome.id),
+    settings: gradebookSettings,
   })
 
   const handleGradebookSettingsChange = useCallback(
@@ -160,34 +158,20 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
   const handleOutcomesReorder = useCallback(
     async (reorderedOutcomes: Outcome[]) => {
       const originalOutcomes = outcomes
-      setOutcomes(reorderedOutcomes)
+      setLocalOutcomes(reorderedOutcomes)
 
       try {
         await saveOutcomeOrder(courseId, reorderedOutcomes)
       } catch {
-        setOutcomes(originalOutcomes)
+        setLocalOutcomes(originalOutcomes === initialOutcomes ? null : originalOutcomes)
         showFlashAlert({
           type: 'error',
           message: I18n.t('Failed to save outcome order'),
         })
       }
     },
-    [courseId, outcomes],
+    [courseId, outcomes, initialOutcomes],
   )
-
-  const handleOpenStudentAssignmentTray = useCallback((outcome: Outcome) => {
-    setStudentAssignmentTrayState({
-      isOpen: true,
-      outcome,
-    })
-  }, [])
-
-  const handleCloseStudentAssignmentTray = useCallback(() => {
-    setStudentAssignmentTrayState({
-      isOpen: false,
-      outcome: null,
-    })
-  }, [])
 
   const renderBody = () => {
     if (error !== null || contributingScoresError !== null)
@@ -216,7 +200,7 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
         onChangeNameDisplayFormat={handleNameDisplayFormatChange}
         onOutcomesReorder={handleOutcomesReorder}
         contributingScores={contributingScores}
-        onOpenStudentAssignmentTray={handleOpenStudentAssignmentTray}
+        onOpenStudentAssignmentTray={studentAssignmentDetailTray.open}
         data-testid="gradebook-body"
       />
     )
@@ -243,13 +227,28 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
       )}
       <FilterWrapper pagination={pagination} onPerPageChange={handleUpdateStudentsPerPage} />
       {renderBody()}
-      {studentAssignmentTrayState.isOpen && studentAssignmentTrayState.outcome && (
-        <StudentAssignmentDetailTray
-          open={studentAssignmentTrayState.isOpen}
-          onDismiss={handleCloseStudentAssignmentTray}
-          outcome={studentAssignmentTrayState.outcome}
-        />
-      )}
+      {studentAssignmentDetailTray.isOpen &&
+        studentAssignmentDetailTray.state &&
+        studentAssignmentDetailTray.assignment && (
+          <StudentAssignmentDetailTray
+            open={true}
+            onDismiss={studentAssignmentDetailTray.close}
+            outcome={studentAssignmentDetailTray.state.outcome}
+            courseId={courseId}
+            student={studentAssignmentDetailTray.state.student}
+            assignment={studentAssignmentDetailTray.assignment}
+            assignmentNavigator={{
+              ...studentAssignmentDetailTray.assignmentNavigator,
+              onNext: studentAssignmentDetailTray.handlers.navigateNextAssignment,
+              onPrevious: studentAssignmentDetailTray.handlers.navigatePreviousAssignment,
+            }}
+            studentNavigator={{
+              ...studentAssignmentDetailTray.studentNavigator,
+              onNext: studentAssignmentDetailTray.handlers.navigateNextStudent,
+              onPrevious: studentAssignmentDetailTray.handlers.navigatePreviousStudent,
+            }}
+          />
+        )}
     </>
   )
 }

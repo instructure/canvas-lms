@@ -17,17 +17,17 @@
  */
 
 import React from 'react'
-import { createRoot } from 'react-dom/client'
+import {createRoot} from 'react-dom/client'
 // TODO: use URL() in browser to parse URL
 // eslint-disable-next-line import/no-nodejs-modules
-import { parse } from 'url'
+import {parse} from 'url'
 import ready from '@instructure/ready'
-import { useScope as createI18nScope } from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasMediaPlayer from '@canvas/canvas-media-player'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player'
-import { MediaInfo } from '@canvas/canvas-studio-player/react/types'
-import { captionLanguageForLocale } from '@instructure/canvas-media'
-import type { GlobalEnv } from '@canvas/global/env/GlobalEnv.d'
+import {MediaInfo} from '@canvas/canvas-studio-player/react/types'
+import {captionLanguageForLocale} from '@instructure/canvas-media'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
 declare const ENV: GlobalEnv & {
   media_object: MediaInfo
@@ -103,8 +103,8 @@ ready(() => {
         }))
         if (tracks)
           event?.source?.postMessage(
-            { subject: 'media_tracks_response', payload: tracks },
-            { targetOrigin: event.origin },
+            {subject: 'media_tracks_response', payload: tracks},
+            {targetOrigin: event.origin},
           )
       }
     },
@@ -140,20 +140,20 @@ ready(() => {
         kebabMenuElements={
           ENV.FEATURES?.rce_studio_embed_improvements
             ? [
-              {
-                id: 'expand-view',
-                text: I18n.t('Expand View'),
-                showInOverlay: true,
-                overlayText: I18n.t('Expand'),
-                icon: 'expand',
-                onClick: () => {
-                  if (window.top) {
-                    window.top.location.href = `/media_attachments/${attachment_id}/immersive_view`
-                  }
+                {
+                  id: 'expand-view',
+                  text: I18n.t('Expand View'),
+                  showInOverlay: true,
+                  overlayText: I18n.t('Expand'),
+                  icon: 'expand',
+                  onClick: () => {
+                    if (window.top) {
+                      window.top.location.href = `/media_attachments/${attachment_id}/immersive_view`
+                    }
+                  },
+                  order: 0,
                 },
-                order: 0,
-              },
-            ]
+              ]
             : []
         }
       />,

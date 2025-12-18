@@ -35,7 +35,7 @@
     "@instructure/emotion": "10.26.3",
     "@instructure/k5uploader": "*",
     "@instructure/media-capture": "^9.0.0",
-    "@instructure/studio-player": "1.4.2",
+    "@instructure/studio-player": "1.5.1",
     "@instructure/ui-a11y-content": "10.26.3",
     "@instructure/ui-alerts": "10.26.3",
     "@instructure/ui-billboard": "10.26.3",
@@ -68,7 +68,6 @@
     "axios": "^0.30.0",
     "format-message": "^6",
     "format-message-generate-id": "^6",
-    "lodash": "^4.17.21",
     "prop-types": "^15",
     "react": "^18",
     "react-dom": "^18"

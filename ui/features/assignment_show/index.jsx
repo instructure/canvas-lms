@@ -48,6 +48,9 @@ import {
   mapRubricUnderscoredKeysToCamelCase,
   mapRubricAssociationUnderscoredKeysToCamelCase,
 } from '@canvas/rubrics/react/utils'
+import {PeerReviewWidget} from '@canvas/assignments/react/PeerReviewWidget'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 
@@ -373,6 +376,19 @@ $(() => {
     'enhanced-rubric-self-assessment-edit',
     <RubricSelfAssessmentSettingsWrapper assignmentId={ENV.ASSIGNMENT_ID} />,
   )
+})
+
+$(() => {
+  const peerReviewMountPoint = document.getElementById('peer-review-assignment-widget-mount-point')
+
+  if (peerReviewMountPoint) {
+    createOrUpdateRoot(
+      'peer-review-assignment-widget-mount-point',
+      <QueryClientProvider client={queryClient}>
+        <PeerReviewWidget assignmentId={ENV.ASSIGNMENT_ID} courseId={ENV.COURSE_ID} />
+      </QueryClientProvider>,
+    )
+  }
 })
 
 $(() => {

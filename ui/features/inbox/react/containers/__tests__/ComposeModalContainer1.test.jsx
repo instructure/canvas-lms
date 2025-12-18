@@ -31,11 +31,13 @@ import * as uploadFileModule from '@canvas/upload-file'
 import {graphql, HttpResponse} from 'msw'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/upload-file')
+ 
+if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
+vi.mock('@canvas/upload-file')
 
-jest.mock('../../../util/utils', () => ({
-  ...jest.requireActual('../../../util/utils'),
-  responsiveQuerySizes: jest.fn().mockReturnValue({
+vi.mock('../../../util/utils', async () => ({
+  ...await vi.importActual('../../../util/utils'),
+  responsiveQuerySizes: vi.fn().mockReturnValue({
     desktop: {minWidth: '768px'},
   }),
 }))
@@ -48,17 +50,17 @@ describe('ComposeModalContainer', () => {
     server.close()
     server.listen({onUnhandledRequest: 'error'})
 
-    window.matchMedia = jest.fn().mockImplementation(() => ({
+    window.matchMedia = vi.fn().mockImplementation(() => ({
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }))
   })
 
   beforeEach(() => {
-    uploadFileModule.uploadFiles = jest.fn().mockResolvedValue([])
+    uploadFileModule.uploadFiles.mockResolvedValue([])
     fakeENV.setup({
       current_user_id: '1',
       CONVERSATIONS: {
@@ -71,7 +73,7 @@ describe('ComposeModalContainer', () => {
   afterEach(async () => {
     server.resetHandlers()
     // Clear any pending timers
-    jest.clearAllTimers()
+    vi.clearAllTimers()
     // Wait for any pending Apollo operations
     await waitForApolloLoading()
     // Clean up ENV
@@ -83,8 +85,8 @@ describe('ComposeModalContainer', () => {
   })
 
   const setup = ({
-    setOnFailure = jest.fn(),
-    setOnSuccess = jest.fn(),
+    setOnFailure = vi.fn(),
+    setOnSuccess = vi.fn(),
     isReply,
     isReplyAll,
     isForward,
@@ -99,12 +101,12 @@ describe('ComposeModalContainer', () => {
           <ConversationContext.Provider value={{isSubmissionCommentsType}}>
             <ComposeModalManager
               open={true}
-              onDismiss={jest.fn()}
+              onDismiss={vi.fn()}
               isReply={isReply}
               isReplyAll={isReplyAll}
               isForward={isForward}
               conversation={conversation}
-              onSelectedIdsChange={jest.fn()}
+              onSelectedIdsChange={vi.fn()}
               selectedIds={selectedIds}
               inboxSignatureBlock={inboxSignatureBlock}
             />
@@ -179,7 +181,7 @@ describe('ComposeModalContainer', () => {
     })
 
     afterEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('should not render if context is not selected', async () => {
@@ -191,18 +193,18 @@ describe('ComposeModalContainer', () => {
 
     it('should render if context is selected', async () => {
       // Create a spy for the getRecipientsObserver function
-      const getRecipientsObserverMock = jest.fn()
+      const getRecipientsObserverMock = vi.fn()
 
       // Setup the component with the necessary props
       const component = render(
         <ApolloProvider client={mswClient}>
-          <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
             <ConversationContext.Provider value={{isSubmissionCommentsType: false}}>
               <ComposeModalManager
                 open={true}
-                onDismiss={jest.fn()}
+                onDismiss={vi.fn()}
                 selectedIds={['1']}
-                onSelectedIdsChange={jest.fn()}
+                onSelectedIdsChange={vi.fn()}
                 // This is the key part - we need to set the activeCourseFilterID
                 activeCourseFilterID="course_1"
                 // Mock the getRecipientsObserver function
@@ -227,7 +229,7 @@ describe('ComposeModalContainer', () => {
     })
 
     it('should fetch all observers when button is clicked (single page)', async () => {
-      const onSelectedIdsChange = jest.fn()
+      const onSelectedIdsChange = vi.fn()
 
       // Setup MSW handler for single page response
       server.use(
@@ -266,11 +268,11 @@ describe('ComposeModalContainer', () => {
 
       const component = render(
         <ApolloProvider client={mswClient}>
-          <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
             <ConversationContext.Provider value={{isSubmissionCommentsType: false}}>
               <ComposeModalManager
                 open={true}
-                onDismiss={jest.fn()}
+                onDismiss={vi.fn()}
                 selectedIds={[
                   {id: 'user_1', _id: '1', name: 'Student 1'},
                   {id: 'user_2', _id: '2', name: 'Student 2'},
@@ -309,7 +311,7 @@ describe('ComposeModalContainer', () => {
 
     it('should fetch all observers across multiple pages when button is clicked', async () => {
       let callCount = 0
-      const onSelectedIdsChange = jest.fn()
+      const onSelectedIdsChange = vi.fn()
 
       // Setup MSW handler for multi-page response
       server.use(
@@ -370,11 +372,11 @@ describe('ComposeModalContainer', () => {
 
       const component = render(
         <ApolloProvider client={mswClient}>
-          <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
             <ConversationContext.Provider value={{isSubmissionCommentsType: false}}>
               <ComposeModalManager
                 open={true}
-                onDismiss={jest.fn()}
+                onDismiss={vi.fn()}
                 selectedIds={[
                   {id: 'user_100', _id: '100', name: 'Student 1'},
                   {id: 'user_101', _id: '101', name: 'Student 2'},
@@ -533,7 +535,7 @@ describe('ComposeModalContainer', () => {
       const component = setup()
 
       const select = await component.findByTestId('course-select-modal')
-      fireEvent.click(select) // This will fail without the fix because of an unhandled error. We can't have items with duplicate keys because of our jest-setup.
+      fireEvent.click(select) // This will fail without the fix because of an unhandled error. We can't have items with duplicate keys because of our vi-setup.
 
       const selectOptions = await component.findAllByText('Ipsum')
       expect(selectOptions).toHaveLength(3) // Should only have 3 unique courses

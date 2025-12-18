@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
 import {PlacementsConfirmationWrapper} from '../components/PlacementsConfirmationWrapper'
@@ -26,6 +26,10 @@ import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('PlacementsConfirmation', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   it('renders the PlacementsConfirmation', () => {
     const config = mockConfigWithPlacements([LtiPlacements.AccountNavigation])
     const reg = mockRegistration({}, config)

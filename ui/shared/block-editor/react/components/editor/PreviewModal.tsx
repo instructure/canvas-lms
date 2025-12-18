@@ -326,8 +326,12 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
         <Flex justifyItems="space-between">
           <Heading level="h2">{I18n.t('Preview')}</Heading>
           <Flex gap="large" direction="row-reverse">
-            <CloseButton data-testid="preview-modal-close-button"
-                         offset="small" onClick={onDismiss} screenReaderLabel={I18n.t('Close')} />
+            <CloseButton
+              data-testid="preview-modal-close-button"
+              offset="small"
+              onClick={onDismiss}
+              screenReaderLabel={I18n.t('Close')}
+            />
             <Flex as="div" gap="small">
               <IconButton
                 data-testid="preview-modal-icon-button-desktop"

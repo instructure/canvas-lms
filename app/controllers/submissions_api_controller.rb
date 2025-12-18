@@ -254,7 +254,8 @@ class SubmissionsApiController < ApplicationController
   # @returns [Submission]
   def index
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      @assignment = api_find(@context.assignments.active, params[:assignment_id])
+      assignment_scope = AbstractAssignment.assignment_or_peer_review.where(context: @context).active
+      @assignment = api_find(assignment_scope, params[:assignment_id])
       includes = Array.wrap(params[:include])
 
       student_ids = if value_to_boolean(params[:grouped])
@@ -453,7 +454,7 @@ class SubmissionsApiController < ApplicationController
 
     includes = Array(params[:include])
 
-    assignment_scope = @context.assignments.published.preload(:quiz, :discussion_topic, :post_policy)
+    assignment_scope = AbstractAssignment.assignment_or_peer_review.where(context: @context).published.preload(:quiz, :discussion_topic, :post_policy)
     if includes.include?("sub_assignment_submissions") && @context.discussion_checkpoints_enabled?
       assignment_scope = assignment_scope.preload(:sub_assignments)
     end
@@ -671,7 +672,8 @@ class SubmissionsApiController < ApplicationController
   # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"full_rubric_assessment"|"visibility"|"course"|"user"|"read_status"]
   #   Associations to include with the group.
   def show_anonymous
-    @assignment = api_find(@context.assignments.active, params[:assignment_id])
+    assignment_scope = AbstractAssignment.assignment_or_peer_review.where(context: @context).active
+    @assignment = api_find(assignment_scope, params[:assignment_id])
     @submission = @assignment.submissions.find_by!(anonymous_id: params[:anonymous_id])
     @user = get_user_considering_section(@submission.user_id)
     @anonymize_user_id = true
@@ -869,20 +871,16 @@ class SubmissionsApiController < ApplicationController
   #   Then a possible set of values for rubric_assessment would be:
   #       rubric_assessment[crit1][points]=3&rubric_assessment[crit1][rating_id]=rat1&rubric_assessment[crit2][points]=5&rubric_assessment[crit2][rating_id]=rat2&rubric_assessment[crit2][comments]=Well%20Done.
   def update
-    @assignment ||= api_find(@context.assignments.active, params[:assignment_id])
+    assignment_scope = AbstractAssignment.assignment_or_peer_review.where(context: @context).active
+    assignment_scope = assignment_scope.preload(:parent_assignment) if params[:assignment_id]
+    @assignment ||= api_find(assignment_scope, params[:assignment_id])
 
-    # Handle peer review sub assignment submissions
-    if params[:submission] && value_to_boolean(params[:submission][:peer_review])
-      validation_error = validate_peer_review_submission_conditions(@assignment)
-      if validation_error
-        return render json: { errors: [{ message: validation_error[:error] }] },
-                      status: validation_error[:status]
-      end
+    if peer_review_direct?
+      parent = @assignment.parent_assignment
+      return render_peer_review_error(error: I18n.t("This peer review sub assignment does not have a parent assignment"), status: :unprocessable_entity) unless parent
 
-      @assignment = @assignment.peer_review_sub_assignment
-
-      # Clear any cached submission since we're switching assignments
-      @submission = nil
+      validation_error = validate_parent_assignment_for_peer_review_grading(parent)
+      return render_peer_review_error(validation_error) if validation_error
     end
 
     if params[:submission] && params[:submission][:posted_grade] && !params[:submission][:provisional] &&
@@ -897,11 +895,6 @@ class SubmissionsApiController < ApplicationController
       return
     end
     @submission ||= @assignment.all_submissions.find_or_create_by!(user: @user)
-
-    # Clear permission cache for peer review submissions to ensure fresh authorization check
-    if params[:submission] && value_to_boolean(params[:submission][:peer_review])
-      @submission.clear_permissions_cache(@current_user, session)
-    end
 
     authorized = if params[:submission] || params[:rubric_assessment]
                    authorized_action(@submission, @current_user, :grade)
@@ -1220,7 +1213,8 @@ class SubmissionsApiController < ApplicationController
   #   Then a possible set of values for rubric_assessment would be:
   #       rubric_assessment[crit1][points]=3&rubric_assessment[crit1][rating_id]=rat1&rubric_assessment[crit2][points]=5&rubric_assessment[crit2][rating_id]=rat2&rubric_assessment[crit2][comments]=Well%20Done.
   def update_anonymous
-    @assignment = api_find(@context.assignments.active, params[:assignment_id])
+    assignment_scope = AbstractAssignment.assignment_or_peer_review.where(context: @context).active
+    @assignment = api_find(assignment_scope, params[:assignment_id])
     @submission = @assignment.submissions.find_by!(anonymous_id: params[:anonymous_id])
     @user = get_user_considering_section(@submission.user_id)
     @anonymize_user_id = true
@@ -1711,17 +1705,22 @@ class SubmissionsApiController < ApplicationController
     value_to_boolean(params[:include_deactivated])
   end
 
-  def validate_peer_review_submission_conditions(assignment)
-    unless assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+  def peer_review_direct?
+    @assignment.is_a?(PeerReviewSubAssignment)
+  end
+
+  def render_peer_review_error(error_hash)
+    render json: { errors: [{ message: error_hash[:error] }] },
+           status: error_hash[:status]
+  end
+
+  def validate_parent_assignment_for_peer_review_grading(parent_assignment)
+    unless parent_assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
       return { error: I18n.t("Peer review allocation and grading feature is not enabled for this course"), status: :unprocessable_entity }
     end
 
-    unless assignment.peer_reviews
-      return { error: I18n.t("This assignment does not have peer reviews enabled"), status: :unprocessable_entity }
-    end
-
-    unless assignment.peer_review_sub_assignment.present?
-      { error: I18n.t("This assignment does not have a peer review sub assignment"), status: :unprocessable_entity }
+    unless parent_assignment.peer_reviews
+      { error: I18n.t("This assignment does not have peer reviews enabled"), status: :unprocessable_entity }
     end
   end
 
@@ -1776,7 +1775,8 @@ class SubmissionsApiController < ApplicationController
   end
 
   def ensure_submission
-    @assignment = api_find(@context.assignments.active, params[:assignment_id])
+    assignment_scope = AbstractAssignment.assignment_or_peer_review.where(context: @context).active
+    @assignment = api_find(assignment_scope, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
     @submission = @assignment.submission_for_student(@user)
   end

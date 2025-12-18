@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {render, screen, waitFor, act} from '@testing-library/react'
+import {cleanup, render, screen, waitFor, act} from '@testing-library/react'
 import {OutcomeSearch} from '../OutcomeSearch'
 import * as useOutcomesHook from '../../../hooks/useOutcomes'
 
-jest.mock('../../../hooks/useOutcomes')
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('../../../hooks/useOutcomes')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 interface OutcomeEdge {
   canUnlink: boolean
@@ -125,7 +125,7 @@ const mockSearchResults: OutcomeEdge[] = [
 const defaultProps = {
   courseId: '123',
   selectedOutcomes: [],
-  onSelectOutcomes: jest.fn(),
+  onSelectOutcomes: vi.fn(),
 }
 
 describe('OutcomeSearch', () => {
@@ -137,9 +137,9 @@ describe('OutcomeSearch', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.useFakeTimers()
-    jest.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
+    vi.clearAllMocks()
+    vi.useFakeTimers()
+    vi.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
       outcomes: mockOutcomes,
       outcomesCount: mockOutcomes.length,
       isLoading: false,
@@ -150,9 +150,10 @@ describe('OutcomeSearch', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    jest.runOnlyPendingTimers()
-    jest.useRealTimers()
+    cleanup()
+    vi.restoreAllMocks()
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
   })
 
   it('renders OutcomeSearch with CanvasMultiSelect', () => {
@@ -193,7 +194,7 @@ describe('OutcomeSearch', () => {
   it('updates outcomes when useOutcomes returns new data', () => {
     const {rerender} = render(<OutcomeSearch {...defaultProps} />)
 
-    jest.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
+    vi.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
       outcomes: mockSearchResults,
       outcomesCount: mockSearchResults.length,
       isLoading: false,
@@ -227,7 +228,7 @@ describe('OutcomeSearch', () => {
     })
 
     act(() => {
-      jest.advanceTimersByTime(750)
+      vi.advanceTimersByTime(750)
     })
 
     await waitFor(() => {
@@ -239,7 +240,7 @@ describe('OutcomeSearch', () => {
   })
 
   it('renders component when useOutcomes hook returns error', () => {
-    jest.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
+    vi.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
       outcomes: [],
       outcomesCount: 0,
       isLoading: false,
@@ -254,7 +255,7 @@ describe('OutcomeSearch', () => {
   })
 
   it('handles empty outcomes array from useOutcomes hook', () => {
-    jest.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
+    vi.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
       outcomes: [],
       outcomesCount: 0,
       isLoading: false,
@@ -269,7 +270,7 @@ describe('OutcomeSearch', () => {
   })
 
   it('handles outcomes loading state from useOutcomes hook', () => {
-    jest.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
+    vi.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
       outcomes: [],
       outcomesCount: 0,
       isLoading: true,
@@ -311,7 +312,7 @@ describe('OutcomeSearch', () => {
     })
 
     act(() => {
-      jest.advanceTimersByTime(750)
+      vi.advanceTimersByTime(750)
     })
 
     await waitFor(() => {
@@ -327,7 +328,7 @@ describe('OutcomeSearch', () => {
     })
 
     act(() => {
-      jest.advanceTimersByTime(750)
+      vi.advanceTimersByTime(750)
     })
 
     await waitFor(() => {
@@ -343,7 +344,7 @@ describe('OutcomeSearch', () => {
   it('caches outcomes to preserve selected outcomes not in search results', () => {
     const {rerender} = render(<OutcomeSearch {...defaultProps} selectedOutcomes={['1']} />)
 
-    jest.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
+    vi.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
       outcomes: mockSearchResults,
       outcomesCount: mockSearchResults.length,
       isLoading: false,
@@ -358,7 +359,7 @@ describe('OutcomeSearch', () => {
   })
 
   it('clears search term when selection is made', async () => {
-    const onSelectOutcomes = jest.fn()
+    const onSelectOutcomes = vi.fn()
     render(<OutcomeSearch {...defaultProps} onSelectOutcomes={onSelectOutcomes} />)
 
     const input = screen.getByPlaceholderText('Search outcomes')
@@ -372,7 +373,7 @@ describe('OutcomeSearch', () => {
     })
 
     act(() => {
-      jest.advanceTimersByTime(750)
+      vi.advanceTimersByTime(750)
     })
 
     await waitFor(() => {
@@ -393,7 +394,7 @@ describe('OutcomeSearch', () => {
   })
 
   it('calls onSelectOutcomes when outcomes are selected', () => {
-    const onSelectOutcomes = jest.fn()
+    const onSelectOutcomes = vi.fn()
     render(<OutcomeSearch {...defaultProps} onSelectOutcomes={onSelectOutcomes} />)
 
     expect(screen.getByText('Outcomes')).toBeInTheDocument()
@@ -413,7 +414,7 @@ describe('OutcomeSearch', () => {
   })
 
   it('does not include loading outcomes in allOutcomes when isLoading is true', () => {
-    jest.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
+    vi.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
       outcomes: mockOutcomes,
       outcomesCount: mockOutcomes.length,
       isLoading: true,
@@ -430,7 +431,7 @@ describe('OutcomeSearch', () => {
   it('merges selected outcomes from cache with search results', () => {
     const {rerender} = render(<OutcomeSearch {...defaultProps} selectedOutcomes={['1', '2']} />)
 
-    jest.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
+    vi.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
       outcomes: mockSearchResults,
       outcomesCount: mockSearchResults.length,
       isLoading: false,
@@ -445,13 +446,13 @@ describe('OutcomeSearch', () => {
   })
 
   it('handles undefined selectedOutcomes prop', () => {
-    render(<OutcomeSearch courseId="123" onSelectOutcomes={jest.fn()} />)
+    render(<OutcomeSearch courseId="123" onSelectOutcomes={vi.fn()} />)
 
     expect(screen.getByText('Outcomes')).toBeInTheDocument()
   })
 
   it('sets isLoading prop on CanvasMultiSelect during API call', () => {
-    jest.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
+    vi.spyOn(useOutcomesHook, 'useOutcomes').mockReturnValue({
       outcomes: [],
       outcomesCount: 0,
       isLoading: true,

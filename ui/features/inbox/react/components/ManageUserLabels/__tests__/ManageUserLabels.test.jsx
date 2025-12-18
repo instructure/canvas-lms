@@ -24,9 +24,9 @@ const createProps = overrides => {
   return {
     open: true,
     labels: ['Assignment Info', 'Important'],
-    onCreate: jest.fn(),
-    onDelete: jest.fn(),
-    onClose: jest.fn(),
+    onCreate: vi.fn(),
+    onDelete: vi.fn(),
+    onClose: vi.fn(),
     ...overrides,
   }
 }
@@ -115,7 +115,8 @@ describe('ManageUserLabels', () => {
     expect(props.onCreate).not.toHaveBeenCalled()
   })
 
-  it('calls onDelete when the Save button is clicked', () => {
+  it('calls onDelete when the Save button is clicked', async () => {
+    vi.useFakeTimers()
     const props = createProps()
     const {getAllByTestId, getByText} = render(<ManageUserLabels {...props} />)
 
@@ -123,10 +124,13 @@ describe('ManageUserLabels', () => {
 
     fireEvent.click(getByText('Save'))
 
-    waitFor(() => {
-      expect(props.onDelete).toHaveBeenCalled()
-      expect(props.onDelete).toHaveBeenCalledWith(['Assignment Info'])
-    })
+    // The component has a 2500ms setTimeout before calling onDelete
+    await vi.advanceTimersByTimeAsync(2500)
+
+    expect(props.onDelete).toHaveBeenCalled()
+    expect(props.onDelete).toHaveBeenCalledWith(['Assignment Info'])
+
+    vi.useRealTimers()
   })
 
   it('does not calls onDelete when the Save button is clicked and no labels are deleted', () => {

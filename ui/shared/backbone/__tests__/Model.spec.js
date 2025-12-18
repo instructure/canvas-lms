@@ -26,7 +26,7 @@ describe('Backbone.Model', () => {
   })
 
   test('@mixin', () => {
-    const initSpy = jest.fn()
+    const initSpy = vi.fn()
     const mixable = {
       defaults: {cash: 'money'},
       initialize: initSpy,

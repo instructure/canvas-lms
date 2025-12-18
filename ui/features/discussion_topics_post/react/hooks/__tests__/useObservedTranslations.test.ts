@@ -22,28 +22,28 @@ import {useObservedTranslations} from '../useObservedTranslations'
 import {useTranslationStore} from '../useTranslationStore'
 import {useTranslation} from '../useTranslation'
 
-jest.mock('../useTranslationStore')
-jest.mock('../useTranslation')
+vi.mock('../useTranslationStore')
+vi.mock('../useTranslation')
 
-const useTranslationStoreMock = useTranslationStore as unknown as jest.Mock & {
-  getState: jest.Mock
+const useTranslationStoreMock = useTranslationStore as unknown as ReturnType<typeof vi.fn> & {
+  getState: ReturnType<typeof vi.fn>
 }
-const useTranslationMock = useTranslation as jest.Mock
+const useTranslationMock = useTranslation as ReturnType<typeof vi.fn>
 
 describe('useObservedTranslations', () => {
-  let setTranslationStartMock: jest.Mock
-  let enqueueTranslationMock: jest.Mock
-  let translateEntryMock: jest.Mock
+  let setTranslationStartMock: ReturnType<typeof vi.fn>
+  let enqueueTranslationMock: ReturnType<typeof vi.fn>
+  let translateEntryMock: ReturnType<typeof vi.fn>
   let observerInstance: IntersectionObserver
   let observerCallback: IntersectionObserverCallback
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.useFakeTimers()
+    vi.clearAllMocks()
+    vi.useFakeTimers()
 
-    setTranslationStartMock = jest.fn()
-    enqueueTranslationMock = jest.fn()
-    translateEntryMock = jest.fn()
+    setTranslationStartMock = vi.fn()
+    enqueueTranslationMock = vi.fn()
+    translateEntryMock = vi.fn()
 
     useTranslationStoreMock.mockImplementation((selector: any) => {
       if (typeof selector === 'function') {
@@ -52,7 +52,7 @@ describe('useObservedTranslations', () => {
       return {setTranslationStart: setTranslationStartMock}
     })
 
-    useTranslationStoreMock.getState = jest.fn(() => ({
+    useTranslationStoreMock.getState = vi.fn(() => ({
       entries: {},
       activeLanguage: 'en',
       translateAll: true,
@@ -63,16 +63,16 @@ describe('useObservedTranslations', () => {
     })
 
     // Mock IntersectionObserver
-    global.IntersectionObserver = jest.fn(callback => {
+    global.IntersectionObserver = vi.fn(callback => {
       observerCallback = callback
       observerInstance = {
-        observe: jest.fn(),
-        unobserve: jest.fn(),
-        disconnect: jest.fn(),
+        observe: vi.fn(),
+        unobserve: vi.fn(),
+        disconnect: vi.fn(),
         root: null,
         rootMargin: '',
         thresholds: [0.1],
-        takeRecords: jest.fn(),
+        takeRecords: vi.fn(),
       }
       return observerInstance
     }) as any
@@ -80,7 +80,7 @@ describe('useObservedTranslations', () => {
 
   afterEach(() => {
     cleanup()
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   describe('startObserving', () => {
@@ -120,7 +120,7 @@ describe('useObservedTranslations', () => {
       const mockElement = document.createElement('div')
       mockElement.dataset.id = 'entry-1'
 
-      useTranslationStoreMock.getState = jest.fn(() => ({
+      useTranslationStoreMock.getState = vi.fn(() => ({
         entries: {
           'entry-1': {
             message: 'Hello world',
@@ -155,7 +155,7 @@ describe('useObservedTranslations', () => {
       })
 
       act(() => {
-        jest.advanceTimersByTime(200)
+        vi.advanceTimersByTime(200)
       })
 
       expect(setTranslationStartMock).toHaveBeenCalledWith('entry-1')
@@ -168,7 +168,7 @@ describe('useObservedTranslations', () => {
       const mockElement = document.createElement('div')
       mockElement.dataset.id = 'entry-1'
 
-      useTranslationStoreMock.getState = jest.fn(() => ({
+      useTranslationStoreMock.getState = vi.fn(() => ({
         entries: {
           'entry-1': {
             message: 'Hello world',
@@ -203,7 +203,7 @@ describe('useObservedTranslations', () => {
       })
 
       act(() => {
-        jest.advanceTimersByTime(200)
+        vi.advanceTimersByTime(200)
       })
 
       expect(setTranslationStartMock).not.toHaveBeenCalled()
@@ -216,7 +216,7 @@ describe('useObservedTranslations', () => {
       const mockElement = document.createElement('div')
       mockElement.dataset.id = 'entry-1'
 
-      useTranslationStoreMock.getState = jest.fn(() => ({
+      useTranslationStoreMock.getState = vi.fn(() => ({
         entries: {
           'entry-1': {
             message: 'Hello world',
@@ -251,7 +251,7 @@ describe('useObservedTranslations', () => {
       })
 
       act(() => {
-        jest.advanceTimersByTime(200)
+        vi.advanceTimersByTime(200)
       })
 
       expect(setTranslationStartMock).not.toHaveBeenCalled()
@@ -264,7 +264,7 @@ describe('useObservedTranslations', () => {
       const mockElement = document.createElement('div')
       mockElement.dataset.id = 'entry-1'
 
-      useTranslationStoreMock.getState = jest.fn(() => ({
+      useTranslationStoreMock.getState = vi.fn(() => ({
         entries: {},
         activeLanguage: 'en',
         translateAll: true,
@@ -292,7 +292,7 @@ describe('useObservedTranslations', () => {
       })
 
       act(() => {
-        jest.advanceTimersByTime(200)
+        vi.advanceTimersByTime(200)
       })
 
       expect(setTranslationStartMock).not.toHaveBeenCalled()
@@ -326,7 +326,7 @@ describe('useObservedTranslations', () => {
       })
 
       act(() => {
-        jest.advanceTimersByTime(200)
+        vi.advanceTimersByTime(200)
       })
 
       expect(setTranslationStartMock).not.toHaveBeenCalled()
@@ -339,7 +339,7 @@ describe('useObservedTranslations', () => {
       const mockElement = document.createElement('div')
       mockElement.dataset.id = 'entry-1'
 
-      useTranslationStoreMock.getState = jest.fn(() => ({
+      useTranslationStoreMock.getState = vi.fn(() => ({
         entries: {
           'entry-1': {
             message: 'Hello world',
@@ -393,7 +393,7 @@ describe('useObservedTranslations', () => {
       })
 
       act(() => {
-        jest.advanceTimersByTime(200)
+        vi.advanceTimersByTime(200)
       })
 
       expect(setTranslationStartMock).not.toHaveBeenCalled()
@@ -413,7 +413,7 @@ describe('useObservedTranslations', () => {
         loading: false,
       }
 
-      useTranslationStoreMock.getState = jest.fn(() => ({
+      useTranslationStoreMock.getState = vi.fn(() => ({
         entries: {
           'entry-1': mockEntry,
         },
@@ -443,7 +443,7 @@ describe('useObservedTranslations', () => {
       })
 
       act(() => {
-        jest.advanceTimersByTime(200)
+        vi.advanceTimersByTime(200)
       })
 
       expect(enqueueTranslationMock).toHaveBeenCalledWith(expect.any(Function))
@@ -472,7 +472,7 @@ describe('useObservedTranslations', () => {
       const mockElement2 = document.createElement('div')
       mockElement2.dataset.id = 'entry-2'
 
-      useTranslationStoreMock.getState = jest.fn(() => ({
+      useTranslationStoreMock.getState = vi.fn(() => ({
         entries: {
           'entry-1': {
             message: 'Hello world',
@@ -522,7 +522,7 @@ describe('useObservedTranslations', () => {
       })
 
       act(() => {
-        jest.advanceTimersByTime(200)
+        vi.advanceTimersByTime(200)
       })
 
       expect(setTranslationStartMock).toHaveBeenCalledTimes(2)
@@ -591,7 +591,7 @@ describe('useObservedTranslations', () => {
       const mockElement = document.createElement('div')
       mockElement.dataset.id = 'entry-1'
 
-      useTranslationStoreMock.getState = jest.fn(() => ({
+      useTranslationStoreMock.getState = vi.fn(() => ({
         entries: {
           'entry-1': {
             message: 'Hello world',
@@ -627,13 +627,13 @@ describe('useObservedTranslations', () => {
 
       // Not triggered yet
       act(() => {
-        jest.advanceTimersByTime(100)
+        vi.advanceTimersByTime(100)
       })
       expect(setTranslationStartMock).not.toHaveBeenCalled()
 
       // Triggered after 200ms
       act(() => {
-        jest.advanceTimersByTime(100)
+        vi.advanceTimersByTime(100)
       })
       expect(setTranslationStartMock).toHaveBeenCalled()
     })

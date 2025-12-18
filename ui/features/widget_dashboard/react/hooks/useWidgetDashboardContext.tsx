@@ -37,6 +37,15 @@ interface DashboardPreferences {
   learner_dashboard_tab_selection?: 'dashboard' | 'courses'
   widget_dashboard_config?: {
     filters?: Record<string, Record<string, unknown>>
+    layout?: {
+      columns: number
+      widgets: Array<{
+        id: string
+        type: string
+        position: {col: number; row: number; relative: number}
+        title: string
+      }>
+    }
   }
 }
 

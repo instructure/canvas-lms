@@ -30,7 +30,7 @@
 import {registerJQueryValueHandler} from '@canvas/serialize-form'
 
 export const RCELOADED_EVENT_NAME = 'RceLoaded'
- 
+
 export let tmce
 
 function delaySend($target, methodName, ...args) {
@@ -86,7 +86,6 @@ export function send($target, methodName, ...args) {
   } else if (methodName === 'get_code') {
     return $target.val()
   } else {
-     
     console.warn(
       `called send('${methodName}') on an RCE instance that hasn't fully loaded, delaying send`,
     )

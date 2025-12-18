@@ -44,17 +44,17 @@ describe('Gradebook#saveSettings', () => {
         enhanced_gradebook_filters: true,
       })
 
-      errorFn = jest.fn()
-      successFn = jest.fn()
+      errorFn = vi.fn()
+      successFn = vi.fn()
 
-      jest.spyOn(GradebookApi, 'saveUserSettings').mockImplementation(() => Promise.resolve({}))
+      vi.spyOn(GradebookApi, 'saveUserSettings').mockImplementation(() => Promise.resolve({}))
 
       oldEnv = window.ENV
       window.ENV = {FEATURES: {instui_nav: true}}
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
       window.ENV = oldEnv
     })
 
@@ -99,7 +99,7 @@ describe('#renderGradebookSettingsModal', () => {
 
   beforeEach(() => {
     setFixtureHtml($fixtures)
-    jest.spyOn(AsyncComponents, 'renderGradebookSettingsModal').mockImplementation(() => {})
+    vi.spyOn(AsyncComponents, 'renderGradebookSettingsModal').mockImplementation(() => {})
     oldEnv = window.ENV
     window.ENV = {FEATURES: {instui_nav: true}}
   })
@@ -109,7 +109,7 @@ describe('#renderGradebookSettingsModal', () => {
       gradebook.destroy()
     }
     $fixtures.innerHTML = ''
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     window.ENV = oldEnv
   })
 
@@ -159,14 +159,14 @@ describe('#renderGradebookSettingsModal', () => {
     beforeEach(() => {
       gradebook = createGradebook()
       gradebook.renderGradebookSettingsModal()
-      jest.spyOn(gradebook.courseSettings, 'handleUpdated').mockImplementation(() => {})
+      vi.spyOn(gradebook.courseSettings, 'handleUpdated').mockImplementation(() => {})
       oldEnv = window.ENV
       window.ENV = {FEATURES: {instui_nav: true}}
     })
 
     afterEach(() => {
       window.ENV = oldEnv
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
 
     test('updates the course settings when called', () => {
@@ -420,7 +420,7 @@ describe('Gradebook "Enter Grades as" Setting', () => {
 
   describe('#getEnterGradesAsSetting', () => {
     beforeEach(() => {
-      jest.spyOn(gradebook, 'saveSettings').mockImplementation(() => Promise.resolve())
+      vi.spyOn(gradebook, 'saveSettings').mockImplementation(() => Promise.resolve())
     })
     test('returns the setting when stored', () => {
       gradebook.setEnterGradesAsSetting('2301', 'percent')
@@ -484,9 +484,9 @@ describe('Gradebook "Enter Grades as" Setting', () => {
 
   describe('#updateEnterGradesAsSetting', () => {
     beforeEach(() => {
-      jest.spyOn(gradebook, 'saveSettings').mockImplementation(() => Promise.resolve())
-      jest.spyOn(gradebook.gradebookGrid, 'invalidate').mockImplementation(() => {})
-      jest
+      vi.spyOn(gradebook, 'saveSettings').mockImplementation(() => Promise.resolve())
+      vi.spyOn(gradebook.gradebookGrid, 'invalidate').mockImplementation(() => {})
+      vi
         .spyOn(gradebook.gradebookGrid.gridSupport.columns, 'updateColumnHeaders')
         .mockImplementation(() => {})
       oldEnv = window.ENV
@@ -494,7 +494,7 @@ describe('Gradebook "Enter Grades as" Setting', () => {
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
       window.ENV = oldEnv
     })
 
@@ -557,13 +557,13 @@ describe('Gradebook "Enter Grades as" Setting', () => {
       const assignment = {id: '2301'}
       const column = gradebook.buildAssignmentColumn(assignment)
       gradebook.gridData.columns.definitions[column.id] = column
-      jest.spyOn(gradebook, 'updateGrid').mockImplementation(() => {})
+      vi.spyOn(gradebook, 'updateGrid').mockImplementation(() => {})
       oldEnv = window.ENV
       window.ENV = {FEATURES: {instui_nav: false}}
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
       window.ENV = oldEnv
     })
 

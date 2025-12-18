@@ -27,8 +27,8 @@ import * as StudentActions from '../../students/StudentActions'
 import FlashMessageHolder from '../FlashMessageHolder'
 import configureStore from '../../configureStore'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
 describe('GradeSummary FlashMessageHolder', () => {
@@ -55,7 +55,7 @@ describe('GradeSummary FlashMessageHolder', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   function mountComponent() {

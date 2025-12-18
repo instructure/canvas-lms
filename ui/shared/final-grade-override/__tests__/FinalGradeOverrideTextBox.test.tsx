@@ -47,7 +47,7 @@ const finalGradeOverrides = {
   gradingPeriodGrades: {'9': {percentage: 43, customGradeStatusId: null}},
 }
 
-const mockedOnGradeChange = jest.fn()
+const mockedOnGradeChange = vi.fn()
 
 const renderTextBox = (props: Partial<FinalGradeOverrideTextBoxProps> = {}) => {
   const defaultProps: FinalGradeOverrideTextBoxProps = {
@@ -60,7 +60,7 @@ const renderTextBox = (props: Partial<FinalGradeOverrideTextBoxProps> = {}) => {
 
 describe('FinalGradeOverrideTextBox', () => {
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   describe('without a grading scheme', () => {
     it('renders', () => {

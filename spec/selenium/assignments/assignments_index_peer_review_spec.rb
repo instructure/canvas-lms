@@ -26,7 +26,6 @@ describe "assignments index peer reviews" do
 
   before(:once) do
     Account.default.enable_feature!(:assignments_2_student)
-    Account.default.enable_feature!(:peer_reviews_for_a2)
     @course = course_factory(name: "course", active_course: true)
     @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
     @student1 = student_in_course(name: "Student 1", course: @course, enrollment_state: :active).user
@@ -170,97 +169,5 @@ describe "assignments index peer reviews" do
     expect(StudentAssignmentPageV2.assignment_sub_header).to include_text("Peer: Anonymous student")
     expect(StudentAssignmentPageV2.comment_container).to include_text("Add a comment to complete your peer review. You will only see comments written by you.")
     expect(StudentAssignmentPageV2.attempt_tab).to include_text("student 2 attempt")
-  end
-
-  context "with peer_review_allocation feature flag enabled" do
-    before(:once) do
-      Account.default.enable_feature!(:peer_review_allocation_and_grading)
-    end
-
-    it "displays peer review selector on new student peer review page with correct options", custom_timeout: 30 do
-      @peer_review_assignment.submit_homework(
-        @student1,
-        body: "student 1 attempt",
-        submission_type: "online_text_entry"
-      )
-      @peer_review_assignment.submit_homework(
-        @student2,
-        body: "student 2 attempt",
-        submission_type: "online_text_entry"
-      )
-      @peer_review_assignment.submit_homework(
-        @student3,
-        body: "student 3 attempt",
-        submission_type: "online_text_entry"
-      )
-
-      get "/courses/#{@course.id}/assignments/#{@peer_review_assignment.id}/peer_reviews"
-      selector = f("input[data-testid='peer-review-selector']")
-      expect(selector).to be_present
-      options = INSTUI_Select_options(selector)
-      option_names = options.map(&:text)
-      expect(option_names).to contain_exactly("Peer Review (1 of 2)", "Peer Review (2 of 2)")
-
-      click_INSTUI_Select_option(selector, option_names[1])
-      expect(selector.attribute("value")).to eq(option_names[1])
-    end
-
-    it "shows a default message when no peer reviews are available", custom_timeout: 30 do
-      no_peer_review_assignment = assignment_model({
-                                                     course: @course,
-                                                     peer_reviews: true,
-                                                     automatic_peer_reviews: false,
-                                                     points_possible: 10,
-                                                     submission_types: "online_text_entry"
-                                                   })
-
-      get "/courses/#{@course.id}/assignments/#{no_peer_review_assignment.id}/peer_reviews"
-      selector = f("input[data-testid='peer-review-selector']")
-
-      expect(selector).to be_present
-
-      expect(selector.attribute("value")).to eq("No peer reviews available")
-    end
-
-    it "groups peer review assessments into ready to review and completed sections", custom_timeout: 30 do
-      student4 = student_in_course(name: "Student 4", course: @course, enrollment_state: :active).user
-      completed_assessment = @peer_review_assignment.assign_peer_review(@student1, student4)
-
-      @peer_review_assignment.submit_homework(
-        @student1,
-        body: "student 1 attempt",
-        submission_type: "online_text_entry"
-      )
-      @peer_review_assignment.submit_homework(
-        @student2,
-        body: "student 2 attempt",
-        submission_type: "online_text_entry"
-      )
-      @peer_review_assignment.submit_homework(
-        @student3,
-        body: "student 3 attempt",
-        submission_type: "online_text_entry"
-      )
-      @peer_review_assignment.submit_homework(
-        student4,
-        body: "student 4 attempt",
-        submission_type: "online_text_entry"
-      )
-
-      completed_assessment.complete!
-
-      get "/courses/#{@course.id}/assignments/#{@peer_review_assignment.id}/peer_reviews"
-      selector = f("input[data-testid='peer-review-selector']")
-      expect(selector).to be_present
-
-      options = INSTUI_Select_options(selector)
-      option_texts = options.map(&:text)
-
-      peer_review_options = option_texts.select { |text| text.include?("Peer Review") }
-      expect(peer_review_options.count).to eq(3)
-
-      expect(f("body")).to include_text("Ready to Review")
-      expect(f("body")).to include_text("Completed Peer Reviews")
-    end
   end
 end

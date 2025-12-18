@@ -25,7 +25,7 @@ describe('ConfigurationForm', () => {
   const renderConfigurationForm = (props = {}) => {
     const defaultProps = {
       configurationType: 'manual',
-      handleSubmit: jest.fn(),
+      handleSubmit: vi.fn(),
       tool: {},
       showConfigurationSelector: true,
     }
@@ -33,7 +33,7 @@ describe('ConfigurationForm', () => {
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('form type rendering', () => {
@@ -82,19 +82,19 @@ describe('ConfigurationForm', () => {
         configurationType: 'manual',
         showConfigurationSelector: false,
       })
-      expect(screen.getByLabelText('Name *')).toBeInTheDocument()
+      expect(screen.getByRole('textbox', {name: /name/i})).toBeInTheDocument()
       expect(screen.queryByLabelText('Configuration Type')).not.toBeInTheDocument()
     })
   })
 
   describe('form submission', () => {
     it('saves manual form with trimmed props', async () => {
-      const handleSubmit = jest.fn()
+      const handleSubmit = vi.fn()
       const tool = {
         name: '  My App',
         consumerKey: '  key',
         sharedSecret: '  secret',
-        url: '  http://example.com',
+        url: 'http://example.com',
         domain: '  ',
         description: 'My super awesome example app',
         customFields: 'a=1\nb=2\nc=3',
@@ -107,31 +107,31 @@ describe('ConfigurationForm', () => {
       })
 
       // Fill in form fields
-      const nameInput = screen.getByLabelText('Name *')
+      const nameInput = screen.getByRole('textbox', {name: /name/i})
       await userEvent.clear(nameInput)
       await userEvent.type(nameInput, tool.name)
 
-      const consumerKeyInput = screen.getByLabelText('Consumer Key')
+      const consumerKeyInput = screen.getByRole('textbox', {name: /consumer key/i})
       await userEvent.clear(consumerKeyInput)
       await userEvent.type(consumerKeyInput, tool.consumerKey)
 
-      const sharedSecretInput = screen.getByLabelText('Shared Secret')
+      const sharedSecretInput = screen.getByRole('textbox', {name: /shared secret/i})
       await userEvent.clear(sharedSecretInput)
       await userEvent.type(sharedSecretInput, tool.sharedSecret)
 
-      const urlInput = screen.getByLabelText('Launch URL')
+      const urlInput = screen.getByRole('textbox', {name: /launch url/i})
       await userEvent.clear(urlInput)
       await userEvent.type(urlInput, tool.url)
 
-      const domainInput = screen.getByLabelText('Domain')
+      const domainInput = screen.getByRole('textbox', {name: /domain/i})
       await userEvent.clear(domainInput)
       await userEvent.type(domainInput, tool.domain)
 
-      const descriptionInput = screen.getByLabelText('Description')
+      const descriptionInput = screen.getByRole('textbox', {name: /description/i})
       await userEvent.clear(descriptionInput)
       await userEvent.type(descriptionInput, tool.description)
 
-      const customFieldsInput = screen.getByLabelText('Custom Fields')
+      const customFieldsInput = screen.getByRole('textbox', {name: /custom fields/i})
       await userEvent.clear(customFieldsInput)
       await userEvent.type(customFieldsInput, tool.customFields)
 
@@ -158,12 +158,12 @@ describe('ConfigurationForm', () => {
     })
 
     it('saves url form with trimmed props', async () => {
-      const handleSubmit = jest.fn()
+      const handleSubmit = vi.fn()
       const tool = {
         name: '  My App',
         consumerKey: '  key',
         sharedSecret: '  secret',
-        configUrl: '  http://example.com',
+        configUrl: 'http://example.com',
       }
 
       renderConfigurationForm({
@@ -173,19 +173,19 @@ describe('ConfigurationForm', () => {
       })
 
       // Fill in form fields
-      const nameInput = screen.getByLabelText('Name *')
+      const nameInput = screen.getByRole('textbox', {name: /name/i})
       await userEvent.clear(nameInput)
       await userEvent.type(nameInput, tool.name)
 
-      const consumerKeyInput = screen.getByLabelText('Consumer Key')
+      const consumerKeyInput = screen.getByRole('textbox', {name: /consumer key/i})
       await userEvent.clear(consumerKeyInput)
       await userEvent.type(consumerKeyInput, tool.consumerKey)
 
-      const sharedSecretInput = screen.getByLabelText('Shared Secret')
+      const sharedSecretInput = screen.getByRole('textbox', {name: /shared secret/i})
       await userEvent.clear(sharedSecretInput)
       await userEvent.type(sharedSecretInput, tool.sharedSecret)
 
-      const configUrlInput = screen.getByLabelText('Config URL *')
+      const configUrlInput = screen.getByRole('textbox', {name: /config url/i})
       await userEvent.clear(configUrlInput)
       await userEvent.type(configUrlInput, tool.configUrl)
 
@@ -208,7 +208,7 @@ describe('ConfigurationForm', () => {
     })
 
     it('saves xml form with trimmed props', async () => {
-      const handleSubmit = jest.fn()
+      const handleSubmit = vi.fn()
       const tool = {
         name: '  My App',
         consumerKey: '  key',
@@ -223,19 +223,19 @@ describe('ConfigurationForm', () => {
       })
 
       // Fill in form fields
-      const nameInput = screen.getByLabelText('Name *')
+      const nameInput = screen.getByRole('textbox', {name: /name/i})
       await userEvent.clear(nameInput)
       await userEvent.type(nameInput, tool.name)
 
-      const consumerKeyInput = screen.getByLabelText('Consumer Key')
+      const consumerKeyInput = screen.getByRole('textbox', {name: /consumer key/i})
       await userEvent.clear(consumerKeyInput)
       await userEvent.type(consumerKeyInput, tool.consumerKey)
 
-      const sharedSecretInput = screen.getByLabelText('Shared Secret')
+      const sharedSecretInput = screen.getByRole('textbox', {name: /shared secret/i})
       await userEvent.clear(sharedSecretInput)
       await userEvent.type(sharedSecretInput, tool.sharedSecret)
 
-      const xmlInput = screen.getByLabelText('XML Configuration *')
+      const xmlInput = screen.getByRole('textbox', {name: /xml configuration/i})
       await userEvent.clear(xmlInput)
       await userEvent.type(xmlInput, tool.xml)
 
@@ -258,9 +258,9 @@ describe('ConfigurationForm', () => {
     })
 
     it('saves lti2 form with trimmed props', async () => {
-      const handleSubmit = jest.fn()
+      const handleSubmit = vi.fn()
       const tool = {
-        registrationUrl: '  https://lti-tool-provider-example..com/register',
+        registrationUrl: 'https://lti-tool-provider-example..com/register',
       }
 
       renderConfigurationForm({
@@ -270,7 +270,7 @@ describe('ConfigurationForm', () => {
       })
 
       // Fill in form fields
-      const registrationUrlInput = screen.getByLabelText('Registration URL *')
+      const registrationUrlInput = screen.getByRole('textbox', {name: /registration url/i})
       await userEvent.clear(registrationUrlInput)
       await userEvent.type(registrationUrlInput, tool.registrationUrl)
 

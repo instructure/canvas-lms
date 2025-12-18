@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, render, screen} from '@testing-library/react'
+import {act, cleanup, render, screen} from '@testing-library/react'
 
 import {PacePicker} from '../pace_picker'
 import {
@@ -28,7 +28,7 @@ import {
   SORTED_SECTIONS,
 } from '../../../__tests__/fixtures'
 
-const selectPaceContextFn = jest.fn()
+const selectPaceContextFn = vi.fn()
 
 const defaultProps = {
   course: COURSE,
@@ -42,7 +42,8 @@ const defaultProps = {
 }
 
 afterEach(() => {
-  jest.clearAllMocks()
+  cleanup()
+  vi.clearAllMocks()
 })
 
 describe('PacePicker', () => {

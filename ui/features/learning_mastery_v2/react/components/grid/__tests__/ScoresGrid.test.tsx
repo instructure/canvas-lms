@@ -17,24 +17,53 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {ScoresGrid, ScoresGridProps} from '../ScoresGrid'
 import {Student, Outcome, StudentRollupData} from '../../../types/rollup'
 import {ScoreDisplayFormat} from '../../../utils/constants'
-import {ContributingScoresManager} from '../../../hooks/useContributingScores'
+import {
+  ContributingScoresManager,
+  ContributingScoreAlignment,
+} from '../../../hooks/useContributingScores'
 
 describe('ScoresGrid', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
+  const mockAlignments: ContributingScoreAlignment[] = [
+    {
+      alignment_id: 'align-1',
+      associated_asset_id: 'assignment-1',
+      associated_asset_name: 'Assignment 1',
+      associated_asset_type: 'Assignment',
+      html_url: '/courses/123/assignments/assignment-1',
+    },
+    {
+      alignment_id: 'align-2',
+      associated_asset_id: 'assignment-2',
+      associated_asset_name: 'Assignment 2',
+      associated_asset_type: 'Assignment',
+      html_url: '/courses/123/assignments/assignment-2',
+    },
+  ]
+
   const mockContributingScores: ContributingScoresManager = {
-    forOutcome: jest.fn(() => ({
+    forOutcome: vi.fn(() => ({
       isVisible: () => false,
-      toggleVisibility: jest.fn(),
+      toggleVisibility: vi.fn(),
       data: undefined,
       alignments: undefined,
-      scoresForUser: jest.fn(() => []),
+      scoresForUser: vi.fn(() => []),
       isLoading: false,
       error: undefined,
     })),
   }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
 
   const defaultProps = (props: Partial<ScoresGridProps> = {}): ScoresGridProps => {
     return {
@@ -125,5 +154,129 @@ describe('ScoresGrid', () => {
   it('renders correct test-id for student-outcome-score cells', () => {
     const {getByTestId} = render(<ScoresGrid {...defaultProps()} />)
     expect(getByTestId('student-outcome-score-1-1')).toBeInTheDocument()
+  })
+
+  it('renders grid with proper ARIA role', () => {
+    render(<ScoresGrid {...defaultProps()} />)
+    expect(screen.getByRole('grid')).toBeInTheDocument()
+  })
+
+  it('renders rows with proper ARIA role', () => {
+    render(<ScoresGrid {...defaultProps()} />)
+    expect(screen.getByRole('row')).toBeInTheDocument()
+  })
+
+  it('renders gridcells with proper ARIA role', () => {
+    render(<ScoresGrid {...defaultProps()} />)
+    const gridcells = screen.getAllByRole('gridcell')
+    expect(gridcells.length).toBeGreaterThan(0)
+  })
+
+  describe('contributing scores interaction', () => {
+    const mockContributingScoresVisible: ContributingScoresManager = {
+      forOutcome: vi.fn(() => ({
+        isVisible: () => true,
+        toggleVisibility: vi.fn(),
+        data: {
+          outcome: {
+            id: '1',
+            title: 'Outcome Title',
+          },
+          alignments: mockAlignments,
+          scores: [
+            {
+              user_id: '1',
+              alignment_id: 'align-1',
+              score: 85,
+            },
+          ],
+        },
+        alignments: mockAlignments,
+        scoresForUser: vi.fn(() => [
+          {
+            user_id: '1',
+            alignment_id: 'align-1',
+            score: 85,
+          },
+        ]),
+        isLoading: false,
+        error: undefined,
+      })),
+    }
+
+    it('renders contributing score cells when visible', () => {
+      render(
+        <ScoresGrid
+          {...defaultProps({
+            contributingScores: mockContributingScoresVisible,
+          })}
+        />,
+      )
+
+      expect(screen.getByTestId('contributing-score-1-1-0')).toBeInTheDocument()
+    })
+
+    it('shows action button on contributing score cell focus', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <ScoresGrid
+          {...defaultProps({
+            contributingScores: mockContributingScoresVisible,
+          })}
+        />,
+      )
+
+      const contributingCell = screen.getByTestId('contributing-score-1-1-0')
+      await user.click(contributingCell)
+
+      expect(
+        screen.getByRole('button', {name: 'View Contributing Score Details'}),
+      ).toBeInTheDocument()
+    })
+
+    it('calls onOpenStudentAssignmentTray when action button is clicked', async () => {
+      const user = userEvent.setup()
+      const onOpenStudentAssignmentTray = vi.fn()
+
+      render(
+        <ScoresGrid
+          {...defaultProps({
+            contributingScores: mockContributingScoresVisible,
+            onOpenStudentAssignmentTray,
+          })}
+        />,
+      )
+
+      const contributingCell = screen.getByTestId('contributing-score-1-1-0')
+      await user.click(contributingCell)
+
+      const button = screen.getByRole('button', {name: 'View Contributing Score Details'})
+      await user.click(button)
+
+      expect(onOpenStudentAssignmentTray).toHaveBeenCalledWith(
+        defaultProps().outcomes[0],
+        defaultProps().students[0],
+        0,
+        mockAlignments,
+      )
+    })
+
+    it('action button should be disabled when onOpenStudentAssignmentTray is not provided', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <ScoresGrid
+          {...defaultProps({
+            contributingScores: mockContributingScoresVisible,
+          })}
+        />,
+      )
+
+      const contributingCell = screen.getByTestId('contributing-score-1-1-0')
+      await user.click(contributingCell)
+
+      expect(screen.queryByRole('button', {name: 'View Contributing Score Details'})).toBeDisabled()
+    })
   })
 })

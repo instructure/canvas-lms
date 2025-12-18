@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// NOTE: I have not been able to get jest tests to interact with the TabsBlock so
+// NOTE: I have not been able to get vi tests to interact with the TabsBlock so
 // the only tests here are "does it render?" test.
 
 import React from 'react'

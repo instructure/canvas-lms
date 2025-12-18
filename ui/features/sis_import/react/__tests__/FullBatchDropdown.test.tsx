@@ -42,7 +42,7 @@ const allTerms: Term[] = [
 ]
 
 const props = {
-  onSelect: jest.fn(),
+  onSelect: vi.fn(),
   accountId: '1',
   isVisible: true,
 }

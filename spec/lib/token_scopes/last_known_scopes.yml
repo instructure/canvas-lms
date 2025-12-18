@@ -46,6 +46,10 @@
 - verb: POST
   path: '/api/v1/accounts/:account_id/app_center/apps/:app_id/reviews/self'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations'
+- verb: POST
+  path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations'
+- verb: GET
   path: '/api/v1/accounts/:account_id/authentication_providers'
 - verb: POST
   path: '/api/v1/accounts/:account_id/authentication_providers'
@@ -537,6 +541,8 @@
   path: '/api/v1/canvadoc_session'
 - verb: POST
   path: '/api/v1/canvadoc_session'
+- verb: GET
+  path: '/api/v1/career/enabled'
 - verb: GET
   path: '/api/v1/career/experience_summary'
 - verb: POST

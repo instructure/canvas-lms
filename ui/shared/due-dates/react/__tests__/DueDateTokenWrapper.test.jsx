@@ -22,17 +22,19 @@ import userEvent from '@testing-library/user-event'
 import DueDateTokenWrapper from '../DueDateTokenWrapper'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/user-settings', () => ({
-  map: jest.fn(),
-  get: jest.fn(),
-  set: jest.fn(),
+vi.mock('@canvas/user-settings', () => ({
+  map: vi.fn(),
+  get: vi.fn(),
+  set: vi.fn(),
 }))
 
 // Mock OverrideStudentStore
-jest.mock('../OverrideStudentStore', () => ({
-  fetchStudentsForCourse: jest.fn(),
-  fetchStudentsByName: jest.fn(),
-  getContextPath: jest.fn(() => '/courses/1'),
+vi.mock('../OverrideStudentStore', () => ({
+  default: {
+    fetchStudentsForCourse: vi.fn(),
+    fetchStudentsByName: vi.fn(),
+    getContextPath: vi.fn(() => '/courses/1'),
+  },
 }))
 
 describe('DueDateTokenWrapper', () => {
@@ -70,9 +72,9 @@ describe('DueDateTokenWrapper', () => {
         {group_id: '2', name: 'Reading Group Two'},
         {noop_id: '1', name: 'Mastery Paths'},
       ],
-      handleTokenAdd: jest.fn(),
-      handleTokenRemove: jest.fn(),
-      defaultSectionNamer: jest.fn(),
+      handleTokenAdd: vi.fn(),
+      handleTokenRemove: vi.fn(),
+      defaultSectionNamer: vi.fn(),
       allStudentsFetched: false,
       currentlySearching: false,
       rowKey: 'nullnullnull',
@@ -82,7 +84,7 @@ describe('DueDateTokenWrapper', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the token input', () => {
@@ -187,9 +189,9 @@ describe('Disabled DueDateTokenWrapper', () => {
     props = {
       tokens: [{id: '1', name: 'Atilla', student_id: '3', type: 'student'}],
       potentialOptions: [{course_section_id: '1', name: 'Patricians'}],
-      handleTokenAdd: jest.fn(),
-      handleTokenRemove: jest.fn(),
-      defaultSectionNamer: jest.fn(),
+      handleTokenAdd: vi.fn(),
+      handleTokenRemove: vi.fn(),
+      defaultSectionNamer: vi.fn(),
       allStudentsFetched: false,
       currentlySearching: false,
       rowKey: 'wat',
@@ -199,7 +201,7 @@ describe('Disabled DueDateTokenWrapper', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it.skip('renders a disabled token input', () => {

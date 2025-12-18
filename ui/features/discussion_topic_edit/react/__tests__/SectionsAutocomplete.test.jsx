@@ -78,7 +78,7 @@ describe('Sections Autocomplete', () => {
   })
 
   it('calls flashMessage when provided', () => {
-    const flashMessage = jest.fn()
+    const flashMessage = vi.fn()
     const props = {...defaultProps(), flashMessage}
 
     render(<SectionsAutocomplete {...props} />)

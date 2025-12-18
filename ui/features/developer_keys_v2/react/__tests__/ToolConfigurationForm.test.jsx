@@ -31,12 +31,12 @@ const defaultProps = (overrides = {}) => ({
   validScopes: {},
   editing: false,
   showRequiredMessages: false,
-  dispatch: jest.fn(),
-  updateConfigurationMethod: jest.fn(),
+  dispatch: vi.fn(),
+  updateConfigurationMethod: vi.fn(),
   configurationMethod: 'json',
   updateToolConfiguration: Function.prototype,
   updateToolConfigurationUrl: Function.prototype,
-  prettifyPastedJson: jest.fn(),
+  prettifyPastedJson: vi.fn(),
   canPrettify: false,
   ...overrides,
 })
@@ -137,7 +137,7 @@ describe('ToolConfigurationForm', () => {
     it('transitions to configuring by JSON when the json option is selected', () => {
       const {ref} = renderToolConfigurationForm({
         configurationMethod: 'url',
-        updatePastedJson: jest.fn(),
+        updatePastedJson: vi.fn(),
       })
 
       fireEvent.click(screen.getByRole('combobox', {name: /method/i}))

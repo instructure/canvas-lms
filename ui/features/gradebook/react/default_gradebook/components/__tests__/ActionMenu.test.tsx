@@ -19,14 +19,14 @@
 import $ from 'jquery'
 import React from 'react'
 import {userEvent} from '@testing-library/user-event'
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import PostGradesApp from '../../../SISGradePassback/PostGradesApp'
 import GradebookExportManager from '../../../shared/GradebookExportManager'
 import ActionMenu from '../ActionMenu'
 import {getActionMenuProps} from './helpers'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 let props: any = {}
@@ -37,7 +37,8 @@ describe('ActionMenu', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    cleanup()
+    vi.restoreAllMocks()
   })
 
   describe('Basic Rendering', () => {
@@ -157,14 +158,14 @@ describe('ActionMenu', () => {
     }
 
     test('Runs the export and updates the UI accordingly', async function () {
-      GradebookExportManager.prototype.startExport = jest.fn(() =>
+      GradebookExportManager.prototype.startExport = vi.fn(() =>
         Promise.resolve({
           attachmentUrl: 'http://attachmentUrl',
           updatedAt: '2009-01-20T17:00:00Z',
         }),
       )
-      $.flashMessage = jest.fn()
-      const spy = jest.spyOn(ActionMenu, 'gotoUrl')
+      $.flashMessage = vi.fn()
+      const spy = vi.spyOn(ActionMenu, 'gotoUrl')
       await subject(props)
       expect(screen.getByText('New Export (Jan 20, 2009 at 5pm)')).toBeInTheDocument()
       expect(GradebookExportManager.prototype.startExport).toHaveBeenCalledWith(
@@ -182,17 +183,17 @@ describe('ActionMenu', () => {
     })
 
     test('handleResumeExport will resume the export with success', async function () {
-      GradebookExportManager.prototype.monitorExport = jest.fn()
+      GradebookExportManager.prototype.monitorExport = vi.fn()
       props.lastExport = {progressId: '9000', workflowState: 'queued'}
       await subject(props)
       expect(GradebookExportManager.prototype.monitorExport).toHaveBeenCalledTimes(1)
     })
 
     test('On failure, shows an error and reenables the export buttons', async function () {
-      GradebookExportManager.prototype.startExport = jest.fn(() =>
+      GradebookExportManager.prototype.startExport = vi.fn(() =>
         Promise.reject(new Error('Mocked failure')),
       )
-      $.flashError = jest.fn()
+      $.flashError = vi.fn()
       await subject(props)
       expect($.flashError).toHaveBeenCalledWith('Gradebook Export Failed: Error: Mocked failure')
       expect(screen.getByText('Export Current Gradebook View')).toBeInTheDocument()
@@ -207,7 +208,7 @@ describe('ActionMenu', () => {
     }
 
     test('it takes you to the new imports page', async function () {
-      const spy = jest.spyOn(ActionMenu, 'gotoUrl')
+      const spy = vi.spyOn(ActionMenu, 'gotoUrl')
       props.gradebookImportUrl = 'http://importpage'
       await subject(props)
       expect(spy).toHaveBeenCalledWith('http://importpage')
@@ -220,7 +221,7 @@ describe('ActionMenu', () => {
     }
 
     test('is called once when the component renders', function () {
-      jest.spyOn(ActionMenu.prototype, 'disableImports').mockImplementation(() => false)
+      vi.spyOn(ActionMenu.prototype, 'disableImports').mockImplementation(() => false)
       const ref = React.createRef()
       subject(props, ref)
       expect(ActionMenu.prototype.disableImports).toHaveBeenCalledTimes(1)
@@ -308,7 +309,7 @@ describe('ActionMenu', () => {
     }
 
     test('returns the previous export stored in the state if it is available', function () {
-      jest.spyOn(ActionMenu.prototype, 'lastExportFromState').mockImplementation(() => {
+      vi.spyOn(ActionMenu.prototype, 'lastExportFromState').mockImplementation(() => {
         return {
           label: 'previous export label',
           attachmentUrl: 'http://attachmentUrl',
@@ -331,10 +332,10 @@ describe('ActionMenu', () => {
         label: 'Previous Export (Jan 20, 2009 at 5pm)',
       }
       subject(props, ref)
-      jest.spyOn(ActionMenu.prototype, 'lastExportFromState').mockImplementation(() => {
+      vi.spyOn(ActionMenu.prototype, 'lastExportFromState').mockImplementation(() => {
         return undefined
       })
-      jest.spyOn(ActionMenu.prototype, 'lastExportFromProps').mockImplementation(() => {
+      vi.spyOn(ActionMenu.prototype, 'lastExportFromProps').mockImplementation(() => {
         return {expectedPreviousExport, progressId: '9000', workflowState: 'completed'}
       })
       expect(ref.current.previousExport()).toEqual(expectedPreviousExport)
@@ -348,8 +349,8 @@ describe('ActionMenu', () => {
         return undefined
       }
       subject(props, ref)
-      jest.spyOn(ActionMenu.prototype, 'lastExportFromState').mockImplementation(returnUndefined)
-      jest.spyOn(ActionMenu.prototype, 'lastExportFromProps').mockImplementation(returnUndefined)
+      vi.spyOn(ActionMenu.prototype, 'lastExportFromState').mockImplementation(returnUndefined)
+      vi.spyOn(ActionMenu.prototype, 'lastExportFromProps').mockImplementation(returnUndefined)
       expect(ref.current.previousExport()).toEqual(undefined)
       expect(ActionMenu.prototype.lastExportFromState).toHaveBeenCalledTimes(1)
       expect(ActionMenu.prototype.lastExportFromProps).toHaveBeenCalledTimes(1)
@@ -384,7 +385,7 @@ describe('ActionMenu', () => {
     }
 
     test('Invokes the onSelect prop when selected', async function () {
-      props.postGradesLtis[0].onSelect = jest.fn()
+      props.postGradesLtis[0].onSelect = vi.fn()
       await subject(props)
       const syncButton = screen.getByText('Sync to Pinnacle')
       await userEvent.click(syncButton)
@@ -400,7 +401,7 @@ describe('ActionMenu', () => {
     }
 
     test('launches the PostGrades App when selected', async function () {
-      const spy = jest.spyOn(PostGradesApp, 'AppLaunch').mockImplementation(() => {})
+      const spy = vi.spyOn(PostGradesApp, 'AppLaunch').mockImplementation(() => {})
       props.postGradesFeature.enabled = true
       await subject(props)
 
@@ -426,7 +427,7 @@ describe('ActionMenu', () => {
         publishToSisUrl: 'http://example.com',
       }
       await subject(props)
-      const spy = jest.spyOn(ActionMenu, 'gotoUrl')
+      const spy = vi.spyOn(ActionMenu, 'gotoUrl')
       await userEvent.click(screen.getByText('Sync grades to SIS'))
       expect(spy).toHaveBeenCalledWith('http://example.com')
     })

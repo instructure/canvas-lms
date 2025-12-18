@@ -55,7 +55,7 @@ describe('MigrationSync component', () => {
 
   test('calls beginMigration when sync button is clicked', async () => {
     const props = defaultProps()
-    props.beginMigration = jest.fn()
+    props.beginMigration = vi.fn()
     const tree = render(<MigrationSync {...props} />)
     const button = tree.container.querySelector('.bcs__migration-sync button')
     const user = userEvent.setup({delay: null})
@@ -66,7 +66,7 @@ describe('MigrationSync component', () => {
   test('calls checkMigration on mount if it has not been checked already', () => {
     const props = defaultProps()
     props.hasCheckedMigration = false
-    props.checkMigration = jest.fn()
+    props.checkMigration = vi.fn()
     render(<MigrationSync {...props} />)
     expect(props.checkMigration).toHaveBeenCalledTimes(1)
   })
@@ -74,7 +74,7 @@ describe('MigrationSync component', () => {
   test('does not call checkMigration on mount if it has been checked already', () => {
     const props = defaultProps()
     props.hasCheckedMigration = true
-    props.checkMigration = jest.fn()
+    props.checkMigration = vi.fn()
     render(<MigrationSync {...props} />)
     expect(props.checkMigration).not.toHaveBeenCalled()
   })

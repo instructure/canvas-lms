@@ -23,7 +23,7 @@ describe('parseLinkHeader', () => {
 
   beforeEach(() => {
     xhr = {
-      getResponseHeader: jest
+      getResponseHeader: vi
         .fn()
         .mockReturnValue(
           '<http://canvas.example.com/api/v1/someendpoint&page=1&per_page=50>; rel="current",' +

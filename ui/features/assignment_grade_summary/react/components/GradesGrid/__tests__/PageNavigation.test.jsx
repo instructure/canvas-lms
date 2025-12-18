@@ -26,7 +26,7 @@ describe('GradeSummary PageNavigation', () => {
   beforeEach(() => {
     props = {
       currentPage: 1,
-      onPageClick: jest.fn(),
+      onPageClick: vi.fn(),
       pageCount: 10,
     }
   })

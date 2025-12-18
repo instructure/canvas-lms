@@ -116,8 +116,8 @@ describe('KBNavigator', () => {
     return {
       key,
       target,
-      preventDefault: jest.fn(),
-      stopPropagation: jest.fn(),
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
       ctrlKey: false,
       metaKey: false,
       altKey: false,
@@ -208,7 +208,7 @@ describe('KBNavigator', () => {
 
     describe('navigation', () => {
       it('should call handleDown on j key', () => {
-        const spy = jest.spyOn(navigator, 'handleDown')
+        const spy = vi.spyOn(navigator, 'handleDown')
         const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
         module1.focus()
         const mockEvent = createMockEvent('j', module1)
@@ -217,7 +217,7 @@ describe('KBNavigator', () => {
       })
 
       it('should call handleDown on ArrowDown key', () => {
-        const spy = jest.spyOn(navigator, 'handleDown')
+        const spy = vi.spyOn(navigator, 'handleDown')
         const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
         module1.focus()
         const mockEvent = createMockEvent('ArrowDown', module1)
@@ -226,7 +226,7 @@ describe('KBNavigator', () => {
       })
 
       it('should call handleUp on k key', () => {
-        const spy = jest.spyOn(navigator, 'handleUp')
+        const spy = vi.spyOn(navigator, 'handleUp')
         const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
         module1.focus()
         const mockEvent = createMockEvent('k', module1)
@@ -235,7 +235,7 @@ describe('KBNavigator', () => {
       })
 
       it('should call handleUp on ArrowUp key', () => {
-        const spy = jest.spyOn(navigator, 'handleUp')
+        const spy = vi.spyOn(navigator, 'handleUp')
         const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
         module1.focus()
         const mockEvent = createMockEvent('ArrowUp', module1)
@@ -244,7 +244,7 @@ describe('KBNavigator', () => {
       })
 
       it('should call handleHelp on ? key', () => {
-        const spy = jest.spyOn(navigator, 'handleHelp')
+        const spy = vi.spyOn(navigator, 'handleHelp')
         const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
         module1.focus()
         const mockEvent = createMockEvent('?', module1)
@@ -351,16 +351,16 @@ describe('KBNavigator', () => {
 
     describe('commands', () => {
       // Event listener and spy setup
-      let eventSpy: jest.Mock
+      let eventSpy: any
 
       beforeEach(() => {
-        eventSpy = jest.fn()
+        eventSpy = vi.fn()
         document.addEventListener('module-action', eventSpy)
       })
 
       afterEach(() => {
         document.removeEventListener('module-action', eventSpy)
-        jest.restoreAllMocks()
+        vi.restoreAllMocks()
       })
 
       describe('e', () => {

@@ -61,7 +61,7 @@ afterAll(() => {
 })
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 it('handles undefined state appropriately', () => {

@@ -21,11 +21,13 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import AnnouncementRow from '../AnnouncementRow'
 
 const mockLockIconView = {
-  render: jest.fn(),
-  remove: jest.fn(),
+  render: vi.fn(),
+  remove: vi.fn(),
 }
 
-jest.mock('@canvas/lock-icon', () => jest.fn(() => mockLockIconView))
+vi.mock('@canvas/lock-icon', () => ({
+  default: vi.fn(() => mockLockIconView),
+}))
 
 const defaultProps = (props = {}) => ({
   canManage: false,
@@ -165,12 +167,14 @@ describe('AnnouncementRow', () => {
     expect(container.querySelector('.lock-icon .lock-icon')).not.toBeInTheDocument()
   })
 
-  it('renders master course lock icon if masterCourseData is provided', () => {
+  it('renders master course lock icon if masterCourseData is provided', async () => {
     const masterCourseData = {isMasterCourse: true, masterCourse: {id: '1'}}
 
     renderAnnouncementRow({masterCourseData})
 
-    expect(mockLockIconView.render).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(mockLockIconView.render).toHaveBeenCalled()
+    })
   })
 
   it('renders reply button icon if user has reply permission', async () => {

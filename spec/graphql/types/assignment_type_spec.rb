@@ -1377,7 +1377,8 @@ describe Types::AssignmentType do
 
         query = GraphQLTypeTester.new(@assignment, current_user: teacher)
 
-        expect(query.resolve("submissionsConnection {nodes {subAssignmentSubmissions {assignmentId}}}")).to match_array [[@c1.id.to_s, @c2.id.to_s]]
+        result = query.resolve("submissionsConnection {nodes {subAssignmentSubmissions {assignmentId}}}")
+        expect(result.flatten).to contain_exactly(@c1.id.to_s, @c2.id.to_s)
       end
     end
   end
@@ -2097,6 +2098,353 @@ describe Types::AssignmentType do
       result = assignment_type.resolve("assignedToDates { id dueAt title base }")
       expect(result).to be_an(Array)
       expect(result.length).to eq(1)
+    end
+
+    describe "peerReviewDates" do
+      let(:peer_review_assignment) do
+        course.assignments.create!(
+          title: "Peer Review Assignment",
+          points_possible: 10,
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+      end
+      let(:peer_review_assignment_type) { GraphQLTypeTester.new(peer_review_assignment, current_user: student) }
+      let(:teacher_peer_review_assignment_type) { GraphQLTypeTester.new(peer_review_assignment, current_user: teacher) }
+
+      before do
+        course.enable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "returns nil when peer_review_sub_assignment does not exist" do
+        peer_review_assignment_type.extract_result = false
+        result = peer_review_assignment_type.resolve("assignedToDates { dueAt peerReviewDates { dueAt unlockAt lockAt } }")
+        assigned_to_dates = result["assignedToDates"]
+
+        expect(assigned_to_dates).to be_an(Array)
+        expect(assigned_to_dates).not_to be_empty
+        expect(assigned_to_dates.first["peerReviewDates"]).to be_nil
+      end
+
+      context "with peer_review_sub_assignment" do
+        let!(:peer_review_sub) do
+          service = PeerReview::PeerReviewCreatorService.new(
+            parent_assignment: peer_review_assignment,
+            points_possible: 5
+          )
+          service.call
+
+          peer_review_assignment.reload.peer_review_sub_assignment.tap do |sub|
+            sub.update!(
+              due_at: 2.weeks.from_now,
+              unlock_at: 1.week.from_now,
+              lock_at: 3.weeks.from_now
+            )
+          end
+        end
+
+        it "includes peerReviewDates for student" do
+          peer_review_assignment_type.extract_result = false
+          result = peer_review_assignment_type.resolve("assignedToDates { dueAt peerReviewDates { dueAt unlockAt lockAt } }")
+          assigned_to_dates = result["assignedToDates"]
+
+          expect(assigned_to_dates).to be_an(Array)
+          expect(assigned_to_dates).not_to be_empty
+
+          peer_review_dates = assigned_to_dates.first["peerReviewDates"]
+          expect(peer_review_dates).not_to be_nil
+          expect(Time.iso8601(peer_review_dates["dueAt"]).to_i).to eq(peer_review_sub.due_at.to_i)
+          expect(Time.iso8601(peer_review_dates["unlockAt"]).to_i).to eq(peer_review_sub.unlock_at.to_i)
+          expect(Time.iso8601(peer_review_dates["lockAt"]).to_i).to eq(peer_review_sub.lock_at.to_i)
+        end
+
+        it "includes peerReviewDates for teacher" do
+          teacher_peer_review_assignment_type.extract_result = false
+          result = teacher_peer_review_assignment_type.resolve("assignedToDates { dueAt peerReviewDates { dueAt unlockAt lockAt } }")
+          assigned_to_dates = result["assignedToDates"]
+
+          expect(assigned_to_dates).to be_an(Array)
+          expect(assigned_to_dates).not_to be_empty
+
+          peer_review_dates = assigned_to_dates.first["peerReviewDates"]
+          expect(peer_review_dates).not_to be_nil
+          expect(Time.iso8601(peer_review_dates["dueAt"]).to_i).to eq(peer_review_sub.due_at.to_i)
+          expect(Time.iso8601(peer_review_dates["unlockAt"]).to_i).to eq(peer_review_sub.unlock_at.to_i)
+          expect(Time.iso8601(peer_review_dates["lockAt"]).to_i).to eq(peer_review_sub.lock_at.to_i)
+        end
+
+        it "returns null values when peer review dates are not set" do
+          peer_review_sub.update!(due_at: nil, unlock_at: nil, lock_at: nil)
+
+          peer_review_assignment_type.extract_result = false
+          result = peer_review_assignment_type.resolve("assignedToDates { dueAt peerReviewDates { dueAt unlockAt lockAt } }")
+          assigned_to_dates = result["assignedToDates"]
+
+          expect(assigned_to_dates).to be_an(Array)
+          expect(assigned_to_dates).not_to be_empty
+
+          peer_review_dates = assigned_to_dates.first["peerReviewDates"]
+          expect(peer_review_dates).not_to be_nil
+          expect(peer_review_dates["dueAt"]).to be_nil
+          expect(peer_review_dates["unlockAt"]).to be_nil
+          expect(peer_review_dates["lockAt"]).to be_nil
+        end
+
+        it "includes override-specific peerReviewDates using parent_override relationship" do
+          section1 = course.course_sections.create!(name: "Section 1")
+          section2 = course.course_sections.create!(name: "Section 2")
+
+          section1_pr_due = 2.weeks.from_now
+          section1_pr_unlock = 1.5.weeks.from_now
+          section1_pr_lock = 2.5.weeks.from_now
+          section2_pr_due = 12.days.from_now
+          section2_pr_unlock = 11.days.from_now
+          section2_pr_lock = 13.days.from_now
+
+          parent_override1 = peer_review_assignment.assignment_overrides.create!(
+            set: section1,
+            due_at: 1.week.from_now
+          )
+          parent_override2 = peer_review_assignment.assignment_overrides.create!(
+            set: section2,
+            due_at: 10.days.from_now
+          )
+
+          peer_review_sub.assignment_overrides.create!(
+            parent_override: parent_override1,
+            set: section1,
+            due_at: section1_pr_due,
+            unlock_at: section1_pr_unlock,
+            lock_at: section1_pr_lock
+          )
+          peer_review_sub.assignment_overrides.create!(
+            parent_override: parent_override2,
+            set: section2,
+            due_at: section2_pr_due,
+            unlock_at: section2_pr_unlock,
+            lock_at: section2_pr_lock
+          )
+
+          teacher_peer_review_assignment_type.extract_result = false
+          result = teacher_peer_review_assignment_type.resolve("assignedToDates { id dueAt title peerReviewDates { dueAt unlockAt lockAt } }")
+          assigned_to_dates = result["assignedToDates"]
+
+          expect(assigned_to_dates).to be_an(Array)
+          expect(assigned_to_dates.length).to be >= 2
+
+          section1_entry = assigned_to_dates.find { |e| e["id"] == parent_override1.id.to_s }
+          expect(section1_entry).not_to be_nil
+          section1_peer_review_dates = section1_entry["peerReviewDates"]
+          expect(section1_peer_review_dates).not_to be_nil
+          expect(Time.iso8601(section1_peer_review_dates["dueAt"]).to_i).to eq(section1_pr_due.to_i)
+          expect(Time.iso8601(section1_peer_review_dates["unlockAt"]).to_i).to eq(section1_pr_unlock.to_i)
+          expect(Time.iso8601(section1_peer_review_dates["lockAt"]).to_i).to eq(section1_pr_lock.to_i)
+
+          section2_entry = assigned_to_dates.find { |e| e["id"] == parent_override2.id.to_s }
+          expect(section2_entry).not_to be_nil
+          section2_peer_review_dates = section2_entry["peerReviewDates"]
+          expect(section2_peer_review_dates).not_to be_nil
+          expect(Time.iso8601(section2_peer_review_dates["dueAt"]).to_i).to eq(section2_pr_due.to_i)
+          expect(Time.iso8601(section2_peer_review_dates["unlockAt"]).to_i).to eq(section2_pr_unlock.to_i)
+          expect(Time.iso8601(section2_peer_review_dates["lockAt"]).to_i).to eq(section2_pr_lock.to_i)
+        end
+
+        it "falls back to base peer review dates when override has no matching peer review override" do
+          section1 = course.course_sections.create!(name: "Section 1")
+
+          parent_override = peer_review_assignment.assignment_overrides.create!(
+            set: section1,
+            due_at: 1.week.from_now
+          )
+
+          teacher_peer_review_assignment_type.extract_result = false
+          result = teacher_peer_review_assignment_type.resolve("assignedToDates { id dueAt title peerReviewDates { dueAt unlockAt lockAt } }")
+          assigned_to_dates = result["assignedToDates"]
+
+          expect(assigned_to_dates).to be_an(Array)
+          section1_entry = assigned_to_dates.find { |e| e["id"] == parent_override.id.to_s }
+          expect(section1_entry).not_to be_nil
+
+          peer_review_dates = section1_entry["peerReviewDates"]
+          expect(peer_review_dates).not_to be_nil
+          expect(Time.iso8601(peer_review_dates["dueAt"]).to_i).to eq(peer_review_sub.due_at.to_i)
+          expect(Time.iso8601(peer_review_dates["unlockAt"]).to_i).to eq(peer_review_sub.unlock_at.to_i)
+          expect(Time.iso8601(peer_review_dates["lockAt"]).to_i).to eq(peer_review_sub.lock_at.to_i)
+        end
+
+        it "includes base peer review dates for base entries" do
+          teacher_peer_review_assignment_type.extract_result = false
+          result = teacher_peer_review_assignment_type.resolve("assignedToDates { dueAt title base peerReviewDates { dueAt unlockAt lockAt } }")
+          assigned_to_dates = result["assignedToDates"]
+
+          expect(assigned_to_dates).to be_an(Array)
+          base_entry = assigned_to_dates.find { |e| e["base"] == true }
+          expect(base_entry).not_to be_nil
+
+          peer_review_dates = base_entry["peerReviewDates"]
+          expect(peer_review_dates).not_to be_nil
+          expect(Time.iso8601(peer_review_dates["dueAt"]).to_i).to eq(peer_review_sub.due_at.to_i)
+          expect(Time.iso8601(peer_review_dates["unlockAt"]).to_i).to eq(peer_review_sub.unlock_at.to_i)
+          expect(Time.iso8601(peer_review_dates["lockAt"]).to_i).to eq(peer_review_sub.lock_at.to_i)
+        end
+
+        it "students only see their assigned peer review dates" do
+          section1 = course.course_sections.create!(name: "Section 1")
+          section2 = course.course_sections.create!(name: "Section 2")
+
+          student1 = user_factory(active_all: true)
+          student2 = user_factory(active_all: true)
+          course.enroll_student(student1, section: section1, enrollment_state: "active")
+          course.enroll_student(student2, section: section2, enrollment_state: "active")
+
+          section1_pr_due = 2.weeks.from_now
+          section1_pr_unlock = 1.5.weeks.from_now
+          section1_pr_lock = 2.5.weeks.from_now
+          section2_pr_due = 3.weeks.from_now
+          section2_pr_unlock = 2.5.weeks.from_now
+          section2_pr_lock = 3.5.weeks.from_now
+
+          parent_override1 = peer_review_assignment.assignment_overrides.create!(
+            set: section1,
+            due_at: 1.week.from_now
+          )
+          parent_override2 = peer_review_assignment.assignment_overrides.create!(
+            set: section2,
+            due_at: 10.days.from_now
+          )
+
+          peer_review_sub.assignment_overrides.create!(
+            parent_override: parent_override1,
+            set: section1,
+            due_at: section1_pr_due,
+            unlock_at: section1_pr_unlock,
+            lock_at: section1_pr_lock
+          )
+          peer_review_sub.assignment_overrides.create!(
+            parent_override: parent_override2,
+            set: section2,
+            due_at: section2_pr_due,
+            unlock_at: section2_pr_unlock,
+            lock_at: section2_pr_lock
+          )
+
+          student1_type = GraphQLTypeTester.new(peer_review_assignment, current_user: student1)
+          student1_type.extract_result = false
+          result1 = student1_type.resolve("assignedToDates { id dueAt title peerReviewDates { dueAt unlockAt lockAt } }")
+          assigned_to_dates1 = result1["assignedToDates"]
+
+          expect(assigned_to_dates1).to be_an(Array)
+          expect(assigned_to_dates1.length).to eq(1)
+          student1_entry = assigned_to_dates1.first
+          student1_peer_review_dates = student1_entry["peerReviewDates"]
+          expect(student1_peer_review_dates).not_to be_nil
+          expect(Time.iso8601(student1_peer_review_dates["dueAt"]).to_i).to eq(section1_pr_due.to_i)
+          expect(Time.iso8601(student1_peer_review_dates["unlockAt"]).to_i).to eq(section1_pr_unlock.to_i)
+          expect(Time.iso8601(student1_peer_review_dates["lockAt"]).to_i).to eq(section1_pr_lock.to_i)
+
+          student2_type = GraphQLTypeTester.new(peer_review_assignment, current_user: student2)
+          student2_type.extract_result = false
+          result2 = student2_type.resolve("assignedToDates { id dueAt title peerReviewDates { dueAt unlockAt lockAt } }")
+          assigned_to_dates2 = result2["assignedToDates"]
+
+          expect(assigned_to_dates2).to be_an(Array)
+          expect(assigned_to_dates2.length).to eq(1)
+          student2_entry = assigned_to_dates2.first
+          student2_peer_review_dates = student2_entry["peerReviewDates"]
+          expect(student2_peer_review_dates).not_to be_nil
+          expect(Time.iso8601(student2_peer_review_dates["dueAt"]).to_i).to eq(section2_pr_due.to_i)
+          expect(Time.iso8601(student2_peer_review_dates["unlockAt"]).to_i).to eq(section2_pr_unlock.to_i)
+          expect(Time.iso8601(student2_peer_review_dates["lockAt"]).to_i).to eq(section2_pr_lock.to_i)
+        end
+
+        it "returns distinct peer review dates for both section and ADHOC overrides when student has both" do
+          section1 = course.course_sections.create!(name: "Section 1")
+          student1 = user_factory(active_all: true)
+          course.enroll_student(student1, section: section1, enrollment_state: "active")
+
+          section1_pr_due = 2.weeks.from_now
+          section1_pr_unlock = 1.5.weeks.from_now
+          section1_pr_lock = 2.5.weeks.from_now
+          adhoc_pr_due = 3.weeks.from_now
+          adhoc_pr_unlock = 2.5.weeks.from_now
+          adhoc_pr_lock = 3.5.weeks.from_now
+
+          parent_section_override = peer_review_assignment.assignment_overrides.create!(
+            set: section1,
+            due_at: 1.week.from_now
+          )
+
+          parent_adhoc_override = peer_review_assignment.assignment_overrides.create!(
+            due_at: 10.days.from_now
+          )
+          parent_adhoc_override.assignment_override_students.create!(user: student1)
+
+          peer_review_sub.assignment_overrides.create!(
+            parent_override: parent_section_override,
+            set: section1,
+            due_at: section1_pr_due,
+            unlock_at: section1_pr_unlock,
+            lock_at: section1_pr_lock
+          )
+          peer_review_sub.assignment_overrides.create!(
+            parent_override: parent_adhoc_override,
+            due_at: adhoc_pr_due,
+            unlock_at: adhoc_pr_unlock,
+            lock_at: adhoc_pr_lock
+          )
+
+          student1_type = GraphQLTypeTester.new(peer_review_assignment, current_user: student1)
+          student1_type.extract_result = false
+          result = student1_type.resolve("assignedToDates { id dueAt title peerReviewDates { dueAt unlockAt lockAt } }")
+          assigned_to_dates = result["assignedToDates"]
+
+          expect(assigned_to_dates).to be_an(Array)
+          expect(assigned_to_dates.length).to eq(2)
+
+          # Verify section override and its peer review dates
+          section_entry = assigned_to_dates.find { |e| e["id"] == parent_section_override.id.to_s }
+          expect(section_entry).not_to be_nil
+          section_peer_review_dates = section_entry["peerReviewDates"]
+          expect(section_peer_review_dates).not_to be_nil
+          expect(Time.iso8601(section_peer_review_dates["dueAt"]).to_i).to eq(section1_pr_due.to_i)
+
+          # Verify ADHOC override and its peer review dates
+          adhoc_entry = assigned_to_dates.find { |e| e["id"] == parent_adhoc_override.id.to_s }
+          expect(adhoc_entry).not_to be_nil
+          adhoc_peer_review_dates = adhoc_entry["peerReviewDates"]
+          expect(adhoc_peer_review_dates).not_to be_nil
+          expect(Time.iso8601(adhoc_peer_review_dates["dueAt"]).to_i).to eq(adhoc_pr_due.to_i)
+          expect(Time.iso8601(adhoc_peer_review_dates["unlockAt"]).to_i).to eq(adhoc_pr_unlock.to_i)
+          expect(Time.iso8601(adhoc_peer_review_dates["lockAt"]).to_i).to eq(adhoc_pr_lock.to_i)
+
+          # Verify both overrides maintain their own distinct peer review dates
+          expect(adhoc_peer_review_dates["dueAt"]).not_to eq(section_peer_review_dates["dueAt"])
+        end
+
+        it "returns nil when feature flag is disabled" do
+          course.disable_feature!(:peer_review_allocation_and_grading)
+
+          peer_review_assignment_type.extract_result = false
+          result = peer_review_assignment_type.resolve("assignedToDates { dueAt peerReviewDates { dueAt unlockAt lockAt } }")
+          assigned_to_dates = result["assignedToDates"]
+
+          expect(assigned_to_dates).to be_an(Array)
+          expect(assigned_to_dates).not_to be_empty
+          expect(assigned_to_dates.first["peerReviewDates"]).to be_nil
+        end
+
+        it "returns nil when peer_review_sub_assignment is deleted" do
+          peer_review_sub.update!(workflow_state: "deleted")
+
+          peer_review_assignment_type.extract_result = false
+          result = peer_review_assignment_type.resolve("assignedToDates { dueAt peerReviewDates { dueAt unlockAt lockAt } }")
+          assigned_to_dates = result["assignedToDates"]
+
+          expect(assigned_to_dates).to be_an(Array)
+          expect(assigned_to_dates).not_to be_empty
+          expect(assigned_to_dates.first["peerReviewDates"]).to be_nil
+        end
+      end
     end
   end
 
