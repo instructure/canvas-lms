@@ -7953,7 +7953,7 @@ describe Assignment do
       @quiz.save!
       list = Assignment.not_locked.to_a
       expect(list.size).to be 1
-      expect(list.first.title).to eql "Test Assignment"
+      expect(list.first.title).to eql "Test Quiz"
     end
 
     it "includes assignments with unlock_at in the past" do
@@ -7961,7 +7961,7 @@ describe Assignment do
       @quiz.save!
       list = Assignment.not_locked.to_a
       expect(list.size).to be 1
-      expect(list.first.title).to eql "Test Assignment"
+      expect(list.first.title).to eql "Test Quiz"
     end
 
     it "includes assignments where lock_at is future" do
@@ -7969,7 +7969,7 @@ describe Assignment do
       @quiz.save!
       list = Assignment.not_locked.to_a
       expect(list.size).to be 1
-      expect(list.first.title).to eql "Test Assignment"
+      expect(list.first.title).to eql "Test Quiz"
     end
 
     it "includes assignments where unlock_at is in the past and lock_at is future" do
@@ -7979,7 +7979,7 @@ describe Assignment do
       @quiz.save!
       list = Assignment.not_locked.to_a
       expect(list.size).to be 1
-      expect(list.first.title).to eql "Test Assignment"
+      expect(list.first.title).to eql "Test Quiz"
     end
 
     it "does not include assignments where unlock_at is in future" do

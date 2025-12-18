@@ -457,6 +457,7 @@ class DiscussionTopic < ActiveRecord::Base
       if saved_change_to_group_category_id?
         assignment.validate_assignment_overrides(force_override_destroy: true)
       end
+      assignment.skip_attachment_association_update = skip_attachment_association_update
       assignment.updating_user = updating_user
       assignment.save
     end

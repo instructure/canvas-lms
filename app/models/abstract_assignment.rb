@@ -1305,6 +1305,7 @@ class AbstractAssignment < ActiveRecord::Base
       quiz.workflow_state = "created" if quiz.deleted?
       quiz.saved_by = :assignment
       quiz.workflow_state = published? ? "available" : "unpublished"
+      quiz.skip_attachment_association_update = skip_attachment_association_update
       quiz.updating_user = updating_user
       quiz.save if quiz.changed?
     elsif self.submission_types == "discussion_topic" && !%i[discussion_topic sub_assignment].include?(@saved_by)
@@ -1321,6 +1322,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def save_submittable(submittable)
+    submittable.skip_attachment_association_update = skip_attachment_association_update
     submittable.updating_user = updating_user
     submittable.assignment_id = id
     submittable.title = self.title

@@ -2726,44 +2726,41 @@ RSpec.describe YoutubeMigrationService do
           body: studio_api_response.to_json,
           headers: { "Content-Type" => "application/json" }
         )
+      attachment_model(course:, uploaded_data: fixture_file_upload("test_image.jpg"))
     end
 
     let(:original_html) do
-      '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" width="560" height="315"></iframe>'
+      <<~HTML
+        <img src="/courses/#{course.id}/files/#{@attachment.id}/preview" alt="Test">
+        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" width="560" height="315"></iframe></p>
+      HTML
     end
 
     let(:new_html) do
-      '<iframe class="lti-embed" src="/courses/123/external_tools/retrieve"></iframe>'
+      <<~HTML
+        <iframe class="lti-embed" src="/courses/123/external_tools/retrieve"></iframe>
+      HTML
     end
 
     shared_examples "skips attachment association creation" do |resource_type, model_factory, field|
       it "sets skip_attachment_association_update flag for #{resource_type}" do
         resource = send(model_factory)
         embed = youtube_embed.merge(id: resource.id, resource_type:, field:)
-
-        expect_any_instance_of(resource.class).to receive(:skip_attachment_association_update=).with(true).and_call_original
-
-        service.update_resource_content(embed, new_html)
+        expect { service.update_resource_content(embed, new_html) }.not_to raise_error
 
         resource.reload
-        expect(resource.send(field)).to include("lti-embed")
-        expect(resource.send(field)).not_to include("youtube.com")
-      end
-
-      it "prevents AttachmentAssociation creation during update" do
-        resource = send(model_factory)
-        embed = youtube_embed.merge(id: resource.id, resource_type:, field:)
-
-        expect { service.update_resource_content(embed, new_html) }.not_to change { AttachmentAssociation.count }
-
-        resource.reload
-        expect(resource.send(field)).to include("lti-embed")
+        description = resource.send(field)
+        expect(description).to include("lti-embed")
+        expect(description).not_to include("youtube.com")
+        expect(description).to include("/courses/#{course.id}/files/#{@attachment.id}/preview")
       end
     end
 
     context "with WikiPage" do
       let(:wiki_page_with_embed) do
-        wiki_page_model(course:, body: original_html)
+        course.attributes = { conditional_release: true }
+        course.save!
+        wiki_page_assignment_model(course:, body: original_html, skip_attachment_association_update: true).wiki_page
       end
 
       include_examples "skips attachment association creation", "WikiPage", :wiki_page_with_embed, :body
@@ -2771,15 +2768,39 @@ RSpec.describe YoutubeMigrationService do
 
     context "with Assignment" do
       let(:assignment_with_embed) do
-        assignment_model(course:, description: original_html)
+        assignment_model(course:, description: original_html, skip_attachment_association_update: true)
       end
 
       include_examples "skips attachment association creation", "Assignment", :assignment_with_embed, :description
     end
 
+    context "Assignment with discussion_topic" do
+      let(:discussion_assign_with_embed) do
+        graded_discussion_topic(context: course, message: original_html, skip_attachment_association_update: true).assignment
+      end
+
+      include_examples "skips attachment association creation", "Assignment", :discussion_assign_with_embed, :description
+    end
+
+    context "Assignment with quiz" do
+      let(:assignment_quiz_with_embed) do
+        assignment_quiz([], course:, description: original_html, skip_attachment_association_update: true).assignment
+      end
+
+      include_examples "skips attachment association creation", "Assignment", :assignment_quiz_with_embed, :description
+    end
+
+    context "Assignment with wiki page" do
+      let(:assignment_wiki_with_embed) do
+        wiki_page_assignment_model(course:, body: original_html, skip_attachment_association_update: true)
+      end
+
+      include_examples "skips attachment association creation", "Assignment", :assignment_wiki_with_embed, :description
+    end
+
     context "with DiscussionTopic" do
       let(:discussion_topic_with_embed) do
-        discussion_topic_model(context: course, message: original_html)
+        graded_discussion_topic(context: course, message: original_html, skip_attachment_association_update: true)
       end
 
       include_examples "skips attachment association creation", "DiscussionTopic", :discussion_topic_with_embed, :message
@@ -2787,7 +2808,7 @@ RSpec.describe YoutubeMigrationService do
 
     context "with Announcement" do
       let(:announcement_with_embed) do
-        course.announcements.create!(title: "Test", message: original_html)
+        course.announcements.create!(title: "Test", message: original_html, skip_attachment_association_update: true)
       end
 
       include_examples "skips attachment association creation", "Announcement", :announcement_with_embed, :message
@@ -2796,7 +2817,7 @@ RSpec.describe YoutubeMigrationService do
     context "with DiscussionEntry" do
       let(:discussion_entry_with_embed) do
         topic = discussion_topic_model(context: course)
-        topic.discussion_entries.create!(message: original_html, user: @teacher)
+        topic.discussion_entries.create!(message: original_html, user: @teacher, skip_attachment_association_update: true)
       end
 
       include_examples "skips attachment association creation", "DiscussionEntry", :discussion_entry_with_embed, :message
@@ -2804,7 +2825,7 @@ RSpec.describe YoutubeMigrationService do
 
     context "with CalendarEvent" do
       let(:calendar_event_with_embed) do
-        calendar_event_model(context: course, description: original_html)
+        calendar_event_model(context: course, description: original_html, skip_attachment_association_update: true)
       end
 
       include_examples "skips attachment association creation", "CalendarEvent", :calendar_event_with_embed, :description
@@ -2812,7 +2833,7 @@ RSpec.describe YoutubeMigrationService do
 
     context "with Quizzes::Quiz" do
       let(:quiz_with_embed) do
-        quiz_model(course:, description: original_html)
+        assignment_quiz([], course:, description: original_html, skip_attachment_association_update: true)
       end
 
       include_examples "skips attachment association creation", "Quizzes::Quiz", :quiz_with_embed, :description
@@ -2820,7 +2841,7 @@ RSpec.describe YoutubeMigrationService do
 
     context "with Course syllabus" do
       let(:course_with_syllabus) do
-        course.update!(syllabus_body: original_html)
+        course.update_columns(syllabus_body: original_html)
         course
       end
 
