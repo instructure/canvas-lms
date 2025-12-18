@@ -605,65 +605,49 @@ class YoutubeMigrationService
 
     case resource_type
     when "WikiPage"
-      page = course.wiki_pages.find(resource_id)
-      page.body = replace_youtube_embed_in_html(page.body, embed, new_html)
-      page.skip_attachment_association_update = true
-      page.save!
+      resource = course.wiki_pages.find(resource_id)
+      resource.body = replace_youtube_embed_in_html(resource.body, embed, new_html)
     when "Assignment"
-      assignment = course.assignments.find(resource_id)
-      assignment.description = replace_youtube_embed_in_html(assignment.description, embed, new_html)
-      assignment.skip_attachment_association_update = true
-      assignment.save!
+      resource = course.assignments.find(resource_id)
+      resource.description = replace_youtube_embed_in_html(resource.description, embed, new_html)
     when "DiscussionTopic"
-      topic = course.discussion_topics.find(resource_id)
-      topic.message = replace_youtube_embed_in_html(topic.message, embed, new_html)
-      topic.skip_attachment_association_update = true
-      topic.save!
+      resource = course.discussion_topics.find(resource_id)
+      resource.message = replace_youtube_embed_in_html(resource.message, embed, new_html)
     when "Announcement"
-      announcement = course.announcements.find(resource_id)
-      announcement.message = replace_youtube_embed_in_html(announcement.message, embed, new_html)
-      announcement.skip_attachment_association_update = true
-      announcement.save!
+      resource = course.announcements.find(resource_id)
+      resource.message = replace_youtube_embed_in_html(resource.message, embed, new_html)
     when "DiscussionEntry"
-      entry = DiscussionEntry.find(resource_id)
-      entry.message = replace_youtube_embed_in_html(entry.message, embed, new_html)
-      entry.skip_attachment_association_update = true
-      entry.save!
+      resource = DiscussionEntry.find(resource_id)
+      resource.message = replace_youtube_embed_in_html(resource.message, embed, new_html)
     when "CalendarEvent"
-      event = course.calendar_events.find(resource_id)
-      event.description = replace_youtube_embed_in_html(event.description, embed, new_html)
-      event.skip_attachment_association_update = true
-      event.save!
+      resource = course.calendar_events.find(resource_id)
+      resource.description = replace_youtube_embed_in_html(resource.description, embed, new_html)
     when "Course"
-      course.syllabus_body = replace_youtube_embed_in_html(course.syllabus_body, embed, new_html)
-      course.skip_attachment_association_update = true
-      course.save!
+      resource = course
+      resource.syllabus_body = replace_youtube_embed_in_html(resource.syllabus_body, embed, new_html)
     when "AssessmentQuestion"
       # AssessmentQuestion does not include LinkedAttachmentHandler
-      assessment_question = course.assessment_questions.find(resource_id)
-      question_data = assessment_question.question_data.dup
+      resource = course.assessment_questions.find(resource_id)
+      question_data = resource.question_data.dup
       question_data[field] = replace_youtube_embed_in_html(question_data[field], embed, new_html) if question_data[field]
-      assessment_question.question_data = question_data
-      assessment_question.save!
+      resource.question_data = question_data
     when "Quizzes::QuizQuestion"
-      quiz_question = Quizzes::QuizQuestion.find(resource_id)
-      question_data = quiz_question.question_data.dup
+      resource = Quizzes::QuizQuestion.find(resource_id)
+      question_data = resource.question_data.dup
       question_data[field] = replace_youtube_embed_in_html(question_data[field], embed, new_html) if question_data[field]
-      quiz_question.question_data = question_data
-      quiz_question.skip_attachment_association_update = true
-      quiz_question.save!
+      resource.question_data = question_data
     when "Quizzes::Quiz"
-      quiz = course.quizzes.find(resource_id)
+      resource = course.quizzes.find(resource_id)
       if field == :description
-        quiz.description = replace_youtube_embed_in_html(quiz.description, embed, new_html)
-        quiz.skip_attachment_association_update = true
-        quiz.save!
+        resource.description = replace_youtube_embed_in_html(resource.description, embed, new_html)
       else
         raise "Quiz field #{field} not supported for conversion"
       end
     else
       raise "Unsupported resource type for conversion: #{resource_type}"
     end
+    resource.skip_attachment_association_update = true
+    resource.save!
   end
 
   def replace_youtube_embed_in_html(html, embed, new_html)

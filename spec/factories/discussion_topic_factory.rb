@@ -27,8 +27,7 @@ module Factories
   def valid_discussion_topic_attributes
     {
       title: "value for title",
-      message: "value for message",
-      saving_user: @user || user_model
+      message: "value for message"
     }
   end
 

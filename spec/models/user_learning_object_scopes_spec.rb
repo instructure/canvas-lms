@@ -155,7 +155,7 @@ describe UserLearningObjectScopes do
         SubmissionLifecycleManager.recompute(@quiz.assignment)
         list = @student.assignments_for_student("submitting", contexts: [@course])
         expect(list.size).to be 1
-        expect(list.first.title).to eq "Test Assignment"
+        expect(list.first.title).to eq "Test Quiz"
       end
 
       it "includes assignments with unlock_at in the past" do
@@ -164,7 +164,7 @@ describe UserLearningObjectScopes do
         SubmissionLifecycleManager.recompute(@quiz.assignment)
         list = @student.assignments_for_student("submitting", contexts: [@course])
         expect(list.size).to be 1
-        expect(list.first.title).to eq "Test Assignment"
+        expect(list.first.title).to eq "Test Quiz"
       end
 
       it "includes assignments with lock_at in the future" do
@@ -173,7 +173,7 @@ describe UserLearningObjectScopes do
         SubmissionLifecycleManager.recompute(@quiz.assignment)
         list = @student.assignments_for_student("submitting", contexts: [@course])
         expect(list.size).to be 1
-        expect(list.first.title).to eq "Test Assignment"
+        expect(list.first.title).to eq "Test Quiz"
       end
 
       it "does not include assignments where unlock_at is in future" do
