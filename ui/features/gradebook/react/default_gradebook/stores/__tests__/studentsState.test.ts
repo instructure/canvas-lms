@@ -28,7 +28,7 @@ import {
   GetSubmissionsParams,
   Submission,
 } from '../graphql/submissions/getSubmissions'
-import {numberToLetters} from '../graphql/buildGraphQLQuery'
+import {encode} from '../graphql/buildGraphQLQuery'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Helper function to validate student data loading
@@ -384,7 +384,7 @@ describe('#loadGraphqlStudentData()', () => {
           userId: it.user_id,
         })) as unknown as Submission[]
         if (nodes) {
-          const alias = numberToLetters(parseInt(userId, 10))
+          const alias = encode(userId)
           res.course[alias] = {
             nodes,
             pageInfo: {
