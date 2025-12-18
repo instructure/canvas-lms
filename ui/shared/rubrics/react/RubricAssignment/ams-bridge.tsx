@@ -23,6 +23,8 @@ import {Alert} from '@instructure/ui-alerts'
 import {RubricAssignmentContainer} from './components/RubricAssignmentContainer'
 import type {RubricAssignmentContainerProps} from './components/RubricAssignmentContainer'
 import {useAssignmentRubric} from './hooks/useAssignmentRubric'
+import type {Rubric} from '../types/rubric'
+import {useEffect} from 'react'
 
 type ENVType = {
   COURSE_ID: string
@@ -32,9 +34,6 @@ type ENVType = {
   ai_rubrics_enabled: boolean
   current_user_id: string
   rubric_self_assessment_ff_enabled: boolean
-  FEATURES: {
-    ams_enhanced_rubrics: boolean
-  }
 }
 declare const ENV: ENVType
 
@@ -44,13 +43,11 @@ declare const ENV: ENVType
 function CanvasRubricBridge({
   assignmentId,
   assignmentPointsPossible,
-}: {
-  assignmentId: string
-  assignmentPointsPossible: number
-}) {
+  onRubricChange,
+  onRubricLoaded,
+}: AmsRubricConfig) {
   const courseId = ENV.COURSE_ID
   const currentUserId = ENV.current_user_id
-  const rubricsEnabled = ENV.FEATURES.ams_enhanced_rubrics
 
   const {
     data: rubricData,
@@ -63,6 +60,14 @@ function CanvasRubricBridge({
   const rubricSelfAssessmentFFEnabled = ENV.rubric_self_assessment_ff_enabled
   const aiRubricsEnabled = ENV.ai_rubrics_enabled
 
+  useEffect(() => {
+    onRubricLoaded()
+  }, [rubricData, onRubricLoaded])
+
+  const handleOnRubricChange = (rubric: Rubric | undefined) => {
+    onRubricChange(!!rubric)
+  }
+
   // Handle error state
   if (rubricError) {
     return <Alert variant="error">{rubricError.message || 'Failed to load rubric'}</Alert>
@@ -70,7 +75,7 @@ function CanvasRubricBridge({
 
   return (
     <>
-      {!rubricLoading && rubricsEnabled && (
+      {!rubricLoading && (
         <RubricAssignmentContainer
           assignmentId={assignmentId}
           courseId={courseId}
@@ -81,6 +86,8 @@ function CanvasRubricBridge({
           canManageRubrics={canManageRubrics}
           rubricSelfAssessmentFFEnabled={rubricSelfAssessmentFFEnabled}
           aiRubricsEnabled={aiRubricsEnabled}
+          onRubricChange={handleOnRubricChange}
+          containerStyles={{width: '100%'}}
         />
       )}
     </>
@@ -90,6 +97,8 @@ function CanvasRubricBridge({
 export type AmsRubricConfig = {
   assignmentId: string
   assignmentPointsPossible: number
+  onRubricChange: (isAdded: boolean) => void
+  onRubricLoaded: () => void
 }
 
 /**
@@ -123,6 +132,8 @@ export function createRubricController(container: HTMLElement): RubricController
           <CanvasRubricBridge
             assignmentId={config.assignmentId}
             assignmentPointsPossible={config.assignmentPointsPossible}
+            onRubricChange={config.onRubricChange}
+            onRubricLoaded={config.onRubricLoaded}
           />
         </QueryClientProvider>,
       )
