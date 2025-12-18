@@ -352,6 +352,31 @@ if (!window.HTMLElement.prototype.scrollIntoView) {
   window.HTMLElement.prototype.scrollIntoView = () => {}
 }
 
+// Fullscreen API mock - needed for media player tests
+// jsdom doesn't implement the Fullscreen API
+if (!document.fullscreenEnabled) {
+  Object.defineProperty(document, 'fullscreenEnabled', {value: true, writable: true, configurable: true})
+}
+if (!document.fullscreenElement) {
+  Object.defineProperty(document, 'fullscreenElement', {value: null, writable: true, configurable: true})
+}
+if (!document.exitFullscreen) {
+  document.exitFullscreen = vi.fn().mockResolvedValue(undefined)
+}
+if (!HTMLElement.prototype.requestFullscreen) {
+  HTMLElement.prototype.requestFullscreen = vi.fn().mockResolvedValue(undefined)
+}
+// Safari-specific fullscreen API
+if (!(document as any).webkitFullscreenEnabled) {
+  Object.defineProperty(document, 'webkitFullscreenEnabled', {value: true, writable: true, configurable: true})
+}
+if (!(HTMLVideoElement.prototype as any).webkitEnterFullscreen) {
+  ;(HTMLVideoElement.prototype as any).webkitEnterFullscreen = vi.fn()
+}
+if (!(HTMLVideoElement.prototype as any).webkitExitFullscreen) {
+  ;(HTMLVideoElement.prototype as any).webkitExitFullscreen = vi.fn()
+}
+
 if (!window.structuredClone) {
   ;(window as unknown as Record<string, unknown>).structuredClone = (obj: unknown) =>
     JSON.parse(JSON.stringify(obj))

@@ -62,7 +62,7 @@ const mockSearchParams = (defaultSearchParams = {}) => {
   return {searchParamsMock, setSearchParamsMock}
 }
 
-describe.skip('Enhanced Individual Wrapper Gradebook', () => {
+describe('Enhanced Individual Wrapper Gradebook', () => {
   beforeEach(() => {
     ;(window.ENV as any) = setGradebookOptions({outcome_gradebook_enabled: true})
     window.ENV.FEATURES = {instui_nav: true}

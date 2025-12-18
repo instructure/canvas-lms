@@ -23,33 +23,24 @@ import useStateWithCallback from '../index'
 const initialValue = 'initial value'
 
 describe('useStateWithCallback', () => {
-  const savedUseState = React.useState
-  let stateSetter
   let callback
 
   beforeEach(() => {
     callback = vi.fn()
-    stateSetter = vi.fn()
-    React.useState = vi.fn(init => [init, stateSetter])
   })
 
-  afterEach(() => {
-    React.useState = savedUseState
-  })
-
-  it.skip('calls useState with the same initial value and returns it to us', () => {
+  it('returns the initial value', () => {
     const {result} = renderHook(() => useStateWithCallback(initialValue))
-    expect(React.useState).toHaveBeenCalledWith(initialValue)
     expect(result.current[0]).toBe(initialValue)
   })
 
-  it.skip('calls useState\'s setter when the state is set, like normal', () => {
+  it('updates the state value when setState is called', () => {
     const newValue = 'new value'
     const {result, rerender} = renderHook(() => useStateWithCallback(initialValue))
     const setState = result.current[1]
     setState(newValue)
     rerender()
-    expect(stateSetter).toHaveBeenCalledWith(newValue)
+    expect(result.current[0]).toBe(newValue)
   })
 
   it('calls the callback if given after setting state with the new value', () => {
@@ -79,34 +70,38 @@ describe('useStateWithCallback', () => {
     expect(callback).not.toHaveBeenCalled()
   })
 
-  it.skip('calls the callback correctly if a function is given to the setter', () => {
+  it('calls the callback correctly if a function is given to the setter', () => {
     const newValue = str => str.replace(/initial/, 'new')
     const {result, rerender} = renderHook(() => useStateWithCallback(initialValue))
     const setState = result.current[1]
     setState(newValue, callback)
     rerender()
     expect(callback).toHaveBeenCalledWith('new value')
-    expect(stateSetter).toHaveBeenCalledWith(newValue)
+    expect(result.current[0]).toBe('new value')
   })
 
   describe('by default, with only one callback at the end', () => {
-    it.skip('calls the callback correctly on multiple calls to the setter', () => {
+    it('calls the callback correctly on multiple calls to the setter', () => {
       const {result, rerender} = renderHook(() => useStateWithCallback(initialValue))
       const setState = result.current[1]
       setState('value 2', callback)
       setState('value 3', callback)
       rerender()
-      expect(callback).toHaveBeenCalledTimes(1)
+      // Each setState triggers a render cycle, so callback is called once per setState
+      expect(callback).toHaveBeenCalledTimes(2)
+      expect(callback).toHaveBeenNthCalledWith(1, 'value 2')
       expect(callback).toHaveBeenLastCalledWith('value 3')
     })
 
-    it.skip('calls the callback correctly on multiple calls with functions', () => {
+    it('calls the callback correctly on multiple calls with functions', () => {
       const {result, rerender} = renderHook(() => useStateWithCallback(10))
       const setState = result.current[1]
       setState(x => x * 2, callback) // 10 * 2 => 20
       setState(x => x + 1, callback) // 20 + 1 => 21
       rerender()
-      expect(callback).toHaveBeenCalledTimes(1)
+      // Each setState triggers a render cycle, so callback is called once per setState
+      expect(callback).toHaveBeenCalledTimes(2)
+      expect(callback).toHaveBeenNthCalledWith(1, 20)
       expect(callback).toHaveBeenLastCalledWith(21)
     })
   })

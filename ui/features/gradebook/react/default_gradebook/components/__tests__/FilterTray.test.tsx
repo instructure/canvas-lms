@@ -169,6 +169,9 @@ describe('FilterTray', () => {
   })
 
   it.skip('Pressing tab from the first date input field with a date will allow the user to reach the delete filter preset button', async () => {
+    // SKIP REASON: Focus management after date selection in InstUI DateInput2 doesn't transfer
+    // to the end-date input as expected. The test clicks a date, then expects focus to move
+    // to endDate after tab, but focus remains elsewhere (likely close button).
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {getByText, getAllByText, getByTestId} = render(<FilterTray {...defaultProps} />)
     await user.click(getByText('Toggle Create Filter Preset'))

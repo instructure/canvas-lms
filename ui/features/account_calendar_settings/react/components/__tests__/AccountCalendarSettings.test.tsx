@@ -61,8 +61,7 @@ describe('AccountCalendarSettings', () => {
     ).toBeInTheDocument()
   })
 
-  // FOO-3934 skipped because of a timeout (> 5 seconds causing build to fail)
-  it.skip('saves changes when clicking apply', async () => {
+  it('saves changes when clicking apply', async () => {
     fetchMock.put(/\/api\/v1\/accounts\/1\/account_calendars/, {message: 'Updated 1 account'})
     const {findByText, getByText, findAllByText, getByTestId, findAllByTestId} = render(
       <AccountCalendarSettings {...defaultProps} />,
@@ -165,8 +164,7 @@ describe('AccountCalendarSettings', () => {
       expect(modalTitle).not.toBeInTheDocument()
     })
 
-    // LF-1202
-    it.skip('does not show the confirmation modal if changing only the account visibility', async () => {
+    it('does not show the confirmation modal if changing only the account visibility', async () => {
       const {queryByRole, getByRole, getByTestId, findByText} = render(
         <AccountCalendarSettings {...defaultProps} />,
       )
@@ -194,7 +192,7 @@ describe('AccountCalendarSettings', () => {
         )
       })
 
-      it.skip('calendar visibility changes (flaky)', async () => {
+      it('calendar visibility changes', async () => {
         const getUniversityCheckbox = () =>
           getByRole('checkbox', {
             name: 'Show account calendar for University',

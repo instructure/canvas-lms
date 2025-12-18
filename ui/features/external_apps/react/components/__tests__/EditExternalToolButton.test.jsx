@@ -23,8 +23,10 @@ import EditExternalToolButton from '../EditExternalToolButton'
 import store from '../../lib/ExternalAppsStore'
 
 vi.mock('../../lib/ExternalAppsStore', () => ({
-  fetchWithDetails: vi.fn(),
-  fetch: vi.fn(),
+  default: {
+    fetchWithDetails: vi.fn(),
+    fetch: vi.fn(),
+  },
 }))
 
 describe('EditExternalToolButton', () => {
@@ -49,7 +51,7 @@ describe('EditExternalToolButton', () => {
     ).not.toBeInTheDocument()
   })
 
-  it.skip('opens modal with expected tool state', async () => {
+  it('opens modal with expected tool state', async () => {
     const tool = {
       name: 'test tool',
       description: 'New tool description',
@@ -69,7 +71,7 @@ describe('EditExternalToolButton', () => {
     expect(store.fetchWithDetails).toHaveBeenCalledWith(tool)
   })
 
-  it.skip('sets new state from store response', async () => {
+  it('sets new state from store response', async () => {
     store.fetchWithDetails.mockResolvedValue({
       name: 'New Name',
       description: 'Current State',
@@ -96,7 +98,7 @@ describe('EditExternalToolButton', () => {
     ).not.toBeInTheDocument()
   })
 
-  it.skip('opens modal with expected tool state with granular permissions', async () => {
+  it('opens modal with expected tool state with granular permissions', async () => {
     const tool = {
       name: 'test tool',
       description: 'New tool description',
@@ -116,7 +118,7 @@ describe('EditExternalToolButton', () => {
     expect(store.fetchWithDetails).toHaveBeenCalledWith(tool)
   })
 
-  it.skip('sets new state from store response with granular permissions', async () => {
+  it('sets new state from store response with granular permissions', async () => {
     store.fetchWithDetails.mockResolvedValue({
       name: 'New Name',
       description: 'Current State',

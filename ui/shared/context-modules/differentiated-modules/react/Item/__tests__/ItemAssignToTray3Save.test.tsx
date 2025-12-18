@@ -71,8 +71,7 @@ describe('ItemAssignToTray - Save Operations', () => {
     cleanup()
   })
 
-  // TODO: flaky in Vitest - times out waiting for flash message
-  it.skip('creates new assignment overrides', async () => {
+  it('creates new assignment overrides', async () => {
     const {findByTestId, findByText, getByRole, findAllByText} = renderComponent()
     const assigneeSelector = await findByTestId('assignee_selector')
     act(() => assigneeSelector.click())
@@ -101,8 +100,7 @@ describe('ItemAssignToTray - Save Operations', () => {
     expect(requestBody).toEqual(expectedPayload)
   })
 
-  // TODO: flaky in Vitest - times out waiting for flash message
-  it.skip('calls onDismiss after saving', async () => {
+  it('calls onDismiss after saving', async () => {
     const onDismissMock = vi.fn()
     const {findAllByTestId, findByText, getByTestId, findAllByText} = renderComponent({
       onDismiss: onDismissMock,
@@ -154,8 +152,7 @@ describe('ItemAssignToTray - Save Operations', () => {
     })
   })
 
-  // TODO: flaky in Vitest - intermittently times out
-  it.skip('does not reload the page after saving if onSave is passed', async () => {
+  it('does not reload the page after saving if onSave is passed', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const onSave = vi.fn()
     const {getByTestId, findAllByTestId, findByText, unmount} = renderComponent({onSave})
@@ -174,8 +171,7 @@ describe('ItemAssignToTray - Save Operations', () => {
     unmount()
   })
 
-  // TODO: flaky in Vitest - timing issue with mock delay
-  it.skip('shows loading spinner while saving', async () => {
+  it('shows loading spinner while saving', async () => {
     fetchMock.put(DATE_DETAILS, {}, {overwriteRoutes: true, delay: 500})
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {getByTestId, findAllByTestId, findByText, getAllByTestId, unmount} = renderComponent()
@@ -200,8 +196,7 @@ describe('ItemAssignToTray - Save Operations', () => {
     expect(cards).toHaveLength(1)
   })
 
-  // TODO: flaky in Vitest - jsdom 25 timing issues with flash messages
-  it.skip('does not include ADHOC overrides without students when saving', async () => {
+  it('does not include ADHOC overrides without students when saving', async () => {
     fetchMock.get(OVERRIDES_URL, ADHOC_WITHOUT_STUDENTS, {
       overwriteRoutes: true,
     })
@@ -250,8 +245,7 @@ describe('ItemAssignToTray - Save Operations', () => {
       }
     })
 
-    // TODO: flaky in Vitest - intermittently times out
-    it.skip('validates if required due dates are set before applying changes', async () => {
+    it('validates if required due dates are set before applying changes', async () => {
       const {getByTestId, getAllByTestId, findAllByTestId, getByText, getAllByText, findByText} =
         renderComponent({
           postToSIS: true,

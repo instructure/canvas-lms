@@ -275,12 +275,12 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
     })
 
     describe('"Points" option', () => {
-      test.skip('is always present', () => {
+      test('is always present', () => {
         mountAndOpenOptionsMenu()
         expect(getEnterGradesAsOption('Points')).toBeInTheDocument()
       })
 
-      test.skip('is optionally selected', () => {
+      test('is optionally selected', () => {
         props.enterGradesAsSetting.selected = 'points'
         mountAndOpenOptionsMenu()
         expect(getEnterGradesAsOption('Points').getAttribute('aria-checked')).toBe('true')
@@ -292,13 +292,13 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
           props.enterGradesAsSetting.onSelect = vi.fn()
         })
 
-        test.skip('calls the onSelect callback', () => {
+        test('calls the onSelect callback', () => {
           mountAndOpenOptionsMenu()
           getEnterGradesAsOption('Points').click()
           expect(props.enterGradesAsSetting.onSelect).toHaveBeenCalledTimes(1)
         })
 
-        test.skip('calls the onSelect callback with "points"', () => {
+        test('calls the onSelect callback with "points"', () => {
           mountAndOpenOptionsMenu()
           getEnterGradesAsOption('Points').click()
           const [selected] = props.enterGradesAsSetting.onSelect.mock.calls[0]
@@ -308,12 +308,12 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
     })
 
     describe('"Percentage" option', () => {
-      test.skip('is always present', () => {
+      test('is always present', () => {
         mountAndOpenOptionsMenu()
         expect(getEnterGradesAsOption('Percentage')).toBeInTheDocument()
       })
 
-      test.skip('is optionally selected', () => {
+      test('is optionally selected', () => {
         props.enterGradesAsSetting.selected = 'percent'
         mountAndOpenOptionsMenu()
         expect(getEnterGradesAsOption('Percentage').getAttribute('aria-checked')).toBe('true')
@@ -326,12 +326,12 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
           mountAndOpenOptionsMenu()
         })
 
-        test.skip('calls the onSelect callback', () => {
+        test('calls the onSelect callback', () => {
           getEnterGradesAsOption('Percentage').click()
           expect(props.enterGradesAsSetting.onSelect).toHaveBeenCalledTimes(1)
         })
 
-        test.skip('calls the onSelect callback with "percent"', () => {
+        test('calls the onSelect callback with "percent"', () => {
           getEnterGradesAsOption('Percentage').click()
           const [selected] = props.enterGradesAsSetting.onSelect.mock.calls[0]
           expect(selected).toBe('percent')
@@ -340,13 +340,13 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
     })
 
     describe('"Grading Scheme" option', () => {
-      test.skip('is present when "showGradingSchemeOption" is true', () => {
+      test('is present when "showGradingSchemeOption" is true', () => {
         props.enterGradesAsSetting.showGradingSchemeOption = true
         mountAndOpenOptionsMenu()
         expect(getEnterGradesAsOption('Grading Scheme')).toBeInTheDocument()
       })
 
-      test.skip('is not present when "showGradingSchemeOption" is false', () => {
+      test('is not present when "showGradingSchemeOption" is false', () => {
         props.enterGradesAsSetting.showGradingSchemeOption = false
         mountAndOpenOptionsMenu()
         expect(getEnterGradesAsOption('Grading Scheme')).toBeUndefined()

@@ -146,8 +146,7 @@ describe('CreateCourseModal (1)', () => {
     expect(setModalOpen).toHaveBeenCalledWith(false)
   })
 
-  // fickle
-  it.skip('disables the create button without a subject name and account', async () => {
+  it('disables the create button without a subject name and account', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
     const {getByText, getByLabelText, getByRole} = render(<CreateCourseModal {...getProps()} />)
@@ -162,7 +161,7 @@ describe('CreateCourseModal (1)', () => {
     expect(createButton).not.toBeDisabled()
   })
 
-  it.skip('includes all received accounts in the select, handling pagination correctly', async () => {
+  it('includes all received accounts in the select, handling pagination correctly', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const accountsPage1 = []
     for (let i = 0; i < 50; i++) {
@@ -198,6 +197,7 @@ describe('CreateCourseModal (1)', () => {
     })
   })
 
+  // TODO: Test fails with "Cannot read properties of undefined (reading 'homeroom_course')" error
   it.skip('creates new subject and enrolls user in that subject', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
@@ -214,7 +214,7 @@ describe('CreateCourseModal (1)', () => {
     expect(getByText('Creating new subject...')).toBeInTheDocument()
   })
 
-  it.skip('shows an error message if subject creation fails', async () => {
+  it('shows an error message if subject creation fails', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
     fetchMock.post(encodeURI('/api/v1/accounts/5/courses?course[name]=Math&enroll_me=true'), 500)

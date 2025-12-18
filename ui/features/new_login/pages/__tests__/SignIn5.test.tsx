@@ -99,7 +99,7 @@ describe('SignIn', () => {
   })
 
   describe('ui State', () => {
-    // Skip: Tests error alert dismissal behavior - requires proper FlashAlert integration
+    // Skipped: Tests error alert dismissal behavior - aria-invalid not cleared on typing
     it.skip('removes the error alert when the user starts typing in the username field', async () => {
       const {getByTestId} = setup()
       const usernameInput = getByTestId('username-input')
@@ -114,7 +114,7 @@ describe('SignIn', () => {
       })
     })
 
-    // Skip: Tests error alert dismissal behavior - requires proper FlashAlert integration
+    // Skipped: Tests error alert dismissal behavior - aria-invalid not cleared on typing
     it.skip('removes the error alert when the user starts typing in the password field', async () => {
       const {getByTestId} = setup()
       const usernameInput = getByTestId('username-input')

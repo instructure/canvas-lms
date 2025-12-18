@@ -51,12 +51,11 @@ describe('CopyCourseView: Initializer', () => {
     $(fixtues).html('')
   })
 
-  test.skip('it should be accessible', async () => {
-    await new Promise(resolve => isAccessible(copyCourseView, resolve, {a11yReport: true}))
+  test('it should be accessible', async () => {
+    await isAccessible(copyCourseView, {a11yReport: true})
   })
 
-  // passes in QUnit, fails in Jest
-  test.skip('after init, calls updateNewDates when @courseFindSelect.triggers "course_changed" event', function () {
+  test('after init, calls updateNewDates when @courseFindSelect.triggers "course_changed" event', function () {
     $('#fixtures').html(copyCourseView.render().el)
     const updateNewDatesSpy = vi.spyOn(copyCourseView.dateShift, 'updateNewDates')
     const course = {
@@ -67,8 +66,7 @@ describe('CopyCourseView: Initializer', () => {
     expect(updateNewDatesSpy).toHaveBeenCalledWith(course)
   })
 
-  // passes in QUnit, fails in Jest
-  test.skip('after init, calls SelectContentCheckbox.courseSelected on @courseFindSelect\'s "course_changed" event', function () {
+  test('after init, calls SelectContentCheckbox.courseSelected on @courseFindSelect\'s "course_changed" event', function () {
     $('#fixtures').html(copyCourseView.render().el)
     const courseSelectedSpy = vi.spyOn(copyCourseView.selectContent, 'courseSelected')
     const course = {

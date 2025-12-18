@@ -40,7 +40,7 @@ describe('Attachment', () => {
     }
   }
 
-  it.skip('only displays LegacyFileUpload when hasMediaFeature is false', () => {
+  it('only displays LegacyFileUpload when hasMediaFeature is false', () => {
     mediaUtils.hasMediaFeature.mockImplementation(() => false)
     const {queryByText, queryByTestId} = render(<Attachment {...getProps()} />)
     expect(queryByText('Use Webcam')).not.toBeInTheDocument()
@@ -49,7 +49,7 @@ describe('Attachment', () => {
     mediaUtils.hasMediaFeature.mockImplementation(() => true)
   })
 
-  it.skip('shows both upload options', () => {
+  it('shows both upload options', () => {
     const {getByText} = render(<Attachment {...getProps()} />)
     expect(getByText('Choose a file to upload')).toBeInTheDocument()
     expect(getByText('Use Webcam')).toBeInTheDocument()
@@ -104,13 +104,14 @@ describe('Attachment', () => {
     expect(getByText('A file is required to make a submission.')).toBeInTheDocument()
   })
 
-  it.skip('displays WebcamModal when click on Use Webcam', async () => {
+  it('displays WebcamModal when click on Use Webcam', async () => {
     const {getByLabelText, getByText} = render(<Attachment {...getProps()} />)
     fireEvent.click(getByText('Use Webcam'))
     expect(getByLabelText('Webcam')).toBeInTheDocument()
     await act(() => mediaUtils.getUserMedia())
   })
 
+  // TODO: Test fails with "Not implemented: HTMLCanvasElement.prototype.toDataURL" - JSDOM limitation
   it.skip('displays picture when user take and select picture and calls setBlob with blob', async () => {
     const mockedBlob = new Blob(['test'], {type: 'image/png'})
     vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementationOnce(callback =>

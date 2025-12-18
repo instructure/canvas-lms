@@ -65,7 +65,7 @@ describe('DashboardCard (Legacy Tests)', () => {
   })
   afterAll(() => server.close())
 
-  it.skip('obtains new course activity when course activity is updated', async () => {
+  it('obtains new course activity when course activity is updated', async () => {
     const stream = {
       type: 'DiscussionTopic',
       unread_count: 1,
@@ -97,27 +97,27 @@ describe('DashboardCard (Legacy Tests)', () => {
     expect(CourseActivitySummaryStore.getStateForCourse).toHaveBeenCalledTimes(2)
   })
 
-  it.skip('is accessible', async () => {
+  it('is accessible', async () => {
     const {container} = render(<DashboardCard {...defaultProps} />)
     const results = await axe.run(container)
     expect(results.violations).toHaveLength(0)
   })
 
-  it.skip('does not have an image when a url is not provided', () => {
+  it('does not have an image when a url is not provided', () => {
     const {queryByText, getByText} = render(<DashboardCard {...defaultProps} />)
 
     expect(queryByText(`Course image for ${defaultProps.shortName}`)).not.toBeInTheDocument()
     expect(getByText(`Course card color region for ${defaultProps.shortName}`)).toBeInTheDocument()
   })
 
-  it.skip('has an image when a url is provided', () => {
+  it('has an image when a url is provided', () => {
     const props = {...defaultProps, image: 'http://coolUrl'}
     const {getByText} = render(<DashboardCard {...props} />)
 
     expect(getByText(`Course image for ${props.shortName}`)).toBeInTheDocument()
   })
 
-  it.skip('handles success removing course from favorites', async () => {
+  it('handles success removing course from favorites', async () => {
     const handleRerender = vi.fn()
     const props = {...defaultProps, onConfirmUnfavorite: handleRerender}
 
@@ -145,8 +145,7 @@ describe('DashboardCard (Legacy Tests)', () => {
     })
   })
 
-  // fickle
-  it.skip('handles failure removing course from favorites', async () => {
+  it('handles failure removing course from favorites', async () => {
     const handleRerender = vi.fn()
     const props = {...defaultProps, onConfirmUnfavorite: handleRerender}
 

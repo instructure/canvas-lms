@@ -262,7 +262,7 @@ describe('#renderGradebookSettingsModal', () => {
       expect(gradebookSettingsModalProps().allowViewUngradedAsZero).toBe(false)
     })
 
-    describe.skip('loadCurrentViewOptions prop', () => {
+    describe('loadCurrentViewOptions prop', () => {
       const viewOptions = () => gradebookSettingsModalProps().loadCurrentViewOptions()
 
       test('sets columnSortSettings to the current sort criterion and direction', () => {
@@ -289,7 +289,7 @@ describe('#renderGradebookSettingsModal', () => {
         })
         gradebook.renderGradebookSettingsModal()
 
-        expect(gradebookSettingsModalProps().showNotes).toBe(true)
+        expect(viewOptions().showNotes).toBe(true)
       })
 
       test('sets showNotes to false if the notes column is hidden', () => {
@@ -305,27 +305,27 @@ describe('#renderGradebookSettingsModal', () => {
         })
         gradebook.renderGradebookSettingsModal()
 
-        expect(gradebookSettingsModalProps().showNotes).toBe(false)
+        expect(viewOptions().showNotes).toBe(false)
       })
 
       test('sets showNotes to false if the notes column does not exist', () => {
         gradebook = createGradebook({enhanced_gradebook_filters: true})
         gradebook.renderGradebookSettingsModal()
-        expect(gradebookSettingsModalProps().showNotes).toBe(false)
+        expect(viewOptions().showNotes).toBe(false)
       })
 
       test('sets showUnpublishedAssignments to true if unpublished assignments are shown', () => {
         gradebook = createGradebook({enhanced_gradebook_filters: true})
         gradebook.initShowUnpublishedAssignments('true')
         gradebook.renderGradebookSettingsModal()
-        expect(gradebookSettingsModalProps().showUnpublishedAssignments).toBe(true)
+        expect(viewOptions().showUnpublishedAssignments).toBe(true)
       })
 
       test('sets showUnpublishedAssignments to false if unpublished assignments are not shown', () => {
         gradebook = createGradebook({enhanced_gradebook_filters: true})
         gradebook.initShowUnpublishedAssignments('not true')
         gradebook.renderGradebookSettingsModal()
-        expect(gradebookSettingsModalProps().showUnpublishedAssignments).toBe(false)
+        expect(viewOptions().showUnpublishedAssignments).toBe(false)
       })
 
       test('sets viewUngradedAsZero to true if view ungraded as 0 is active', () => {
@@ -335,7 +335,7 @@ describe('#renderGradebookSettingsModal', () => {
         })
         gradebook.gridDisplaySettings.viewUngradedAsZero = true
         gradebook.renderGradebookSettingsModal()
-        expect(gradebookSettingsModalProps().viewUngradedAsZero).toBe(true)
+        expect(viewOptions().viewUngradedAsZero).toBe(true)
       })
 
       test('sets viewUngradedAsZero to false if view ungraded as 0 is not active', () => {
@@ -345,13 +345,13 @@ describe('#renderGradebookSettingsModal', () => {
         })
         gradebook.gridDisplaySettings.viewUngradedAsZero = false
         gradebook.renderGradebookSettingsModal()
-        expect(gradebookSettingsModalProps().viewUngradedAsZero).toBe(false)
+        expect(viewOptions().viewUngradedAsZero).toBe(false)
       })
     })
   })
 })
 
-describe.skip('when enhanced gradebook filters are not enabled', () => {
+describe('when enhanced gradebook filters are not enabled', () => {
   let gradebook
 
   beforeEach(() => {
@@ -409,6 +409,8 @@ describe('Gradebook "Enter Grades as" Setting', () => {
   })
 
   test.skip('calls updateGrid if a corresponding column is found', () => {
+    // SKIP REASON: The gradebook grid doesn't have columns initialized for assignment 2301
+    // in this test setup, so postAssignmentGradesTrayOpenChanged doesn't find a column to update.
     gradebook.postAssignmentGradesTrayOpenChanged({assignmentId: '2301', isOpen: true})
     expect(updateGridMock).toHaveBeenCalledTimes(1)
   })

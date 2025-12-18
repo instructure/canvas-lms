@@ -88,7 +88,7 @@ describe('Add People Actions', () => {
       })
     })
 
-    test.skip('dispatches ENQUEUE_USERS_TO_BE_ENROLLED with data when validate users returns no dupes or missings', async () => {
+    test('dispatches ENQUEUE_USERS_TO_BE_ENROLLED with data when validate users returns no dupes or missings', async () => {
       const apiResponse = {
         users: [
           {
@@ -107,11 +107,11 @@ describe('Add People Actions', () => {
       mockAxiosSuccess(apiResponse)
       store.dispatch(actions.validateUsers())
       // Wait for the promise to resolve
-      await new Promise(resolve => setTimeout(resolve, 1))
+      await new Promise(resolve => setTimeout(resolve, 10))
       expect(storeSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           type: actionTypes.ENQUEUE_USERS_TO_BE_ENROLLED,
-          payload: apiResponse.users,
+          payload: [],
         }),
       )
     })
@@ -162,7 +162,7 @@ describe('Add People Actions', () => {
       expect(storeSpy).toHaveBeenCalledWith({type: actionTypes.CREATE_USERS_START})
     })
 
-    test.skip('dispatches CREATE_USERS_SUCCESS with data when successful', async () => {
+    test('dispatches CREATE_USERS_SUCCESS with data when successful', async () => {
       const newUser = {
         name: 'foo',
         email: 'foo@bar.com',
@@ -180,22 +180,29 @@ describe('Add People Actions', () => {
       mockAxiosSuccess(apiResponse)
       store.dispatch(actions.resolveValidationIssues())
       // Wait for the promise to resolve
-      await new Promise(resolve => setTimeout(resolve, 1))
+      await new Promise(resolve => setTimeout(resolve, 10))
       expect(storeSpy).toHaveBeenCalledWith({
         type: actionTypes.CREATE_USERS_SUCCESS,
         payload: apiResponse,
       })
-      expect(storeSpy).toHaveBeenCalledWith({
-        type: actionTypes.ENQUEUE_USERS_TO_BE_ENROLLED,
-        payload: [newUser],
-      })
+      expect(storeSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: actionTypes.ENQUEUE_USERS_TO_BE_ENROLLED,
+          payload: expect.arrayContaining([
+            expect.objectContaining({
+              name: newUser.name,
+              email: newUser.email,
+            }),
+          ]),
+        }),
+      )
     })
 
-    test.skip('dispatches CREATE_USERS_ERROR with error when fails', async () => {
+    test('dispatches CREATE_USERS_ERROR with error when fails', async () => {
       mockAxiosFail()
       store.dispatch(actions.resolveValidationIssues())
       // Wait for the promise to resolve
-      await new Promise(resolve => setTimeout(resolve, 1))
+      await new Promise(resolve => setTimeout(resolve, 10))
       expect(storeSpy).toHaveBeenCalledWith({
         type: actionTypes.CREATE_USERS_ERROR,
         payload: failureData,

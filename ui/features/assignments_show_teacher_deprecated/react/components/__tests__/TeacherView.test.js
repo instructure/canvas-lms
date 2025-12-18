@@ -45,8 +45,9 @@ describe('TeacherView', () => {
   })
 
   describe('publish toggle', () => {
-    // will be re-checked with ADMIN-2345 for flakiness
-
+    // TODO: These tests are skipped due to errors after Jest-to-Vitest migration.
+    // Error: Cannot read properties of undefined (reading 'length') in Overrides.renderOverrides
+    // Needs investigation into test setup and mock data for assignment overrides.
     it.skip('unpublishes the assignment', async () => {
       const assignment = mockAssignment()
       const {getByText, container} = await renderTeacherQueryAndWaitForResult(assignment, [
@@ -61,8 +62,6 @@ describe('TeacherView', () => {
       // make sure the mutation finishes
       expect(await waitForNoElement(() => getByText('Saving assignment'))).toBe(true)
     })
-
-    // will be re-checked with ADMIN-2345 for flakiness
 
     it.skip('saves the entire assignment when publishing via the toggle', async () => {
       const assignment = mockAssignment({state: 'unpublished'})

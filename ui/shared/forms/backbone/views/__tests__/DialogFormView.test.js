@@ -31,7 +31,10 @@ describe('DialogFormView', () => {
   let closeSpy
   let $dialog
 
-  const openDialog = () => view.$trigger.simulate('click')
+  const openDialog = () => {
+    // Use native DOM click instead of simulate
+    view.$trigger[0].click()
+  }
   const closeDialog = () => view.$el.dialog('close')
 
   const sendResponse = (method, json) =>
@@ -170,7 +173,7 @@ describe('DialogFormView', () => {
     }
   })
 
-  it.skip('opens and closes the dialog with the trigger', async () => {
+  it('opens and closes the dialog with the trigger', async () => {
     // Ensure $dialog is null at the start of the test
     expect($dialog).toBeNull()
     openDialog()
@@ -187,14 +190,14 @@ describe('DialogFormView', () => {
     })
   })
 
-  it.skip('submits the form', async () => {
+  it('submits the form', async () => {
     vi.useFakeTimers()
     openDialog()
     expect(view.model.get('is_awesome')).toBe(true)
 
-    // Simulate checkbox click and form submission
-    view.$('label').simulate('click')
-    view.$('button[type=submit]').simulate('click')
+    // Use native DOM click instead of simulate
+    view.$('label')[0].click()
+    view.$('button[type=submit]')[0].click()
 
     // Mock the server response
     model.set('is_awesome', false)
@@ -208,20 +211,20 @@ describe('DialogFormView', () => {
     vi.useRealTimers()
   })
 
-  it.skip('gets dialog title from trigger title', () => {
+  it('gets dialog title from trigger title', () => {
     openDialog()
     const dialogTitle = $('.ui-dialog-title:last').html()
     expect(dialogTitle).toBe(trigger.attr('title'))
   })
 
-  it.skip('gets dialog title from option', () => {
+  it('gets dialog title from option', () => {
     view.options.title = 'different title'
     openDialog()
     const dialogTitle = $('.ui-dialog-title:last').html()
     expect(dialogTitle).toBe(view.options.title)
   })
 
-  it.skip('gets dialog title from trigger aria-describedby', () => {
+  it('gets dialog title from trigger aria-describedby', () => {
     trigger.removeAttr('title')
     const describer = $('<div/>', {
       html: 'aria title',
@@ -234,7 +237,7 @@ describe('DialogFormView', () => {
     describer.remove()
   })
 
-  it.skip('renders correctly', () => {
+  it('renders correctly', () => {
     view.wrapperTemplate = () => 'wrapper:<div class="outlet"></div>'
     view.template = ({foo}) => foo
     view.model.set('foo', 'hello')
@@ -244,13 +247,13 @@ describe('DialogFormView', () => {
     expect(view.$el.find('.outlet').html()).toBe('hello')
   })
 
-  it.skip('calls view#close when dialog is closed', () => {
+  it('calls view#close when dialog is closed', () => {
     openDialog()
     closeDialog()
     expect(closeSpy).toHaveBeenCalled()
   })
 
-  // Skipping this test as it was skipped in the original
+  // This test needs focus behavior to be fully mocked - keeping it skipped for now
   it.skip('focuses close button when opened', () => {
     openDialog()
     expect(document.activeElement).toBe($('.ui-dialog-titlebar-close')[0])

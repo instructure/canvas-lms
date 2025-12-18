@@ -46,6 +46,7 @@ describe('Rce Abstraction - integration', () => {
               on() {},
             }
           },
+          tinymceOn() {},
         }
         return renderCallback(fakeEditor)
       },
@@ -60,8 +61,7 @@ describe('Rce Abstraction - integration', () => {
     vi.restoreAllMocks()
   })
 
-  // fails in Jest, passes in QUnit
-  it.skip('instatiating a remote editor', async () => {
+  it('instatiating a remote editor', async () => {
     RichContentEditor.preloadRemoteModule()
     const target = $('#big_rce_text')
     loadNewEditor()

@@ -85,38 +85,42 @@ describe('ExternalApps.ExternalAppsStore', () => {
     fakeENV.teardown()
   })
 
-  it.skip('fetches external tools', done => {
+  it('fetches external tools', () => {
     server.use(
       http.get('/api/v1/accounts/1/lti_apps', () => {
         return HttpResponse.json(tools)
       }),
     )
 
-    store.fetch()
-
-    // Wait for the async operation to complete
-    setTimeout(() => {
-      expect(store.getState().externalTools).toHaveLength(3)
-      done()
-    }, 100)
+    return new Promise(resolve => {
+      store.addChangeListener(() => {
+        if (store.getState().externalTools.length === 3) {
+          expect(store.getState().externalTools).toHaveLength(3)
+          resolve()
+        }
+      })
+      store.fetch()
+    })
   })
 
-  it.skip('handles resets and fetch responses interwoven', done => {
+  it('handles resets and fetch responses interwoven', () => {
     server.use(
       http.get('/api/v1/accounts/1/lti_apps', () => {
         return HttpResponse.json(tools)
       }),
     )
 
-    store.fetch()
-    store.reset()
-    store.fetch()
-
-    // Wait for the async operation to complete
-    setTimeout(() => {
-      expect(store.getState().externalTools).toHaveLength(3)
-      done()
-    }, 100)
+    return new Promise(resolve => {
+      store.addChangeListener(() => {
+        if (store.getState().externalTools.length === 3) {
+          expect(store.getState().externalTools).toHaveLength(3)
+          resolve()
+        }
+      })
+      store.fetch()
+      store.reset()
+      store.fetch()
+    })
   })
 
   it('updates access token', async () => {

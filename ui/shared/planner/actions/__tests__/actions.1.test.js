@@ -94,7 +94,7 @@ describe('api actions', () => {
   })
 
   describe('getNextOpportunities', () => {
-    it.skip('if no more pages dispatches addOpportunities with items and null url', async () => {
+    it('if no more pages dispatches addOpportunities with items and null url', async () => {
       server.use(
         http.get('*', () => {
           return new HttpResponse(
@@ -162,7 +162,7 @@ describe('api actions', () => {
     })
   })
 
-  describe.skip('getOpportunities', () => {
+  describe('getOpportunities', () => {
     it('dispatches startLoading and initialOpportunities actions', async () => {
       server.use(
         http.get('*', () => {

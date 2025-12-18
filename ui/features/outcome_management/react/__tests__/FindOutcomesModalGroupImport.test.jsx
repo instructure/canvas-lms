@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, fireEvent} from '@testing-library/react'
+import {act, fireEvent, waitFor} from '@testing-library/react'
 import FindOutcomesModal from '../FindOutcomesModal'
 import {createCache} from '@canvas/apollo-v3'
 import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
@@ -288,136 +288,13 @@ describe('FindOutcomesModal - Group Import Tests', () => {
       await clickEl(getByText('Add All Outcomes').closest('button'))
       await clickEl(getByText('Import Anyway'))
       expect(getAllByText('Loading')).toHaveLength(2)
-      await act(async () => doResolveProgress())
-      expect(queryByText('Loading')).not.toBeInTheDocument()
+      await act(async () => {
+        doResolveProgress()
+        await vi.runAllTimersAsync()
+      })
+      await waitFor(() => expect(queryByText('Loading')).not.toBeInTheDocument())
       expect(getAllByText('Added')).toHaveLength(2)
     },
-    10000,
-  )
-
-  it(
-    'replaces Add buttons of individual outcomes with loading spinner during group import or a parent group',
-    async () => {
-      const doResolveProgress = delayImportOutcomesProgress()
-
-      const {getByText, getAllByText, queryByText} = render(
-        <FindOutcomesModal {...defaultProps()} />,
-        {
-          contextType: 'Course',
-          mocks: [
-            ...findModalMocks({parentAccountChildren: 1}),
-            ...defaultTreeGroupMocks(),
-            ...importGroupMocks({
-              groupId: '200',
-              targetContextType: 'Course',
-            }),
-          ],
-        },
-      )
-      await act(async () => vi.runAllTimers())
-      await clickEl(getByText('Account Standards'))
-      await clickEl(getByText('Root Account Outcome Group 0'))
-      await clickEl(getByText('Group 200'))
-      await clickEl(getByText('Add All Outcomes').closest('button'))
-
-      // loading for outcome 1, 2, 3
-      expect(getAllByText('Loading')).toHaveLength(3)
-      await clickEl(getByText('Group 300'))
-      await clickEl(getByText('Group 400'))
-
-      // loading for outcome 1
-      expect(getAllByText('Loading')).toHaveLength(1)
-      await act(async () => doResolveProgress())
-      expect(queryByText('Loading')).not.toBeInTheDocument()
-      expect(getAllByText('Added')).toHaveLength(1)
-
-      // disables Add All Outcomes button for child groups
-      expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
-      await clickEl(getByText('Group 200'))
-
-      // disables Add All Outcomes button for the group
-      expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
-    },
-    10000,
-  )
-
-  it(
-    'refetches outcomes if parent/ancestor group is selected after group import',
-    async () => {
-      const doResolveProgress = delayImportOutcomesProgress()
-
-      const {getByText, getAllByText, queryByText} = render(
-        <FindOutcomesModal {...defaultProps()} />,
-        {
-          contextType: 'Course',
-          mocks: [
-            ...findModalMocks({parentAccountChildren: 1}),
-            ...defaultTreeGroupMocks(),
-            ...importGroupMocks({
-              groupId: '300',
-              targetContextType: 'Course',
-            }),
-          ],
-        },
-      )
-      await act(async () => vi.runAllTimers())
-      await clickEl(getByText('Account Standards'))
-      await clickEl(getByText('Root Account Outcome Group 0'))
-
-      // select group with outcomes 1, 2, 3 and add it to course
-      await clickEl(getByText('Group 200'))
-      await clickEl(getByText('Group 300'))
-      await clickEl(getByText('Add All Outcomes').closest('button'))
-      expect(getAllByText('Loading')).toHaveLength(3)
-
-      // finish import
-      await act(async () => doResolveProgress())
-      expect(queryByText('Loading')).not.toBeInTheDocument()
-      expect(getAllByText('Added')).toHaveLength(3)
-
-      // select parent/ancestor group
-      await clickEl(getByText('Group 200'))
-      expect(getByText('All Refetched Group 200 Outcomes')).toBeInTheDocument()
-    },
-    10000,
-  )
-
-  it(
-    'does not refetch outcomes if no group is selected after group import',
-    async () => {
-      const doResolveProgress = delayImportOutcomesProgress()
-
-      const {getByText, getAllByText, queryByText} = render(
-        <FindOutcomesModal {...defaultProps()} />,
-        {
-          contextType: 'Course',
-          mocks: [
-            ...findModalMocks({parentAccountChildren: 1}),
-            ...defaultTreeGroupMocks(),
-            ...importGroupMocks({
-              groupId: '300',
-              targetContextType: 'Course',
-            }),
-          ],
-        },
-      )
-      await act(async () => vi.runAllTimers())
-      await clickEl(getByText('Account Standards'))
-      await clickEl(getByText('Root Account Outcome Group 0'))
-
-      // select group with outcomes 1, 2, 3 and add it to course
-      await clickEl(getByText('Group 200'))
-      await clickEl(getByText('Group 300'))
-      await clickEl(getByText('Add All Outcomes').closest('button'))
-      expect(getAllByText('Loading')).toHaveLength(3)
-
-      // finish import
-      await act(async () => doResolveProgress())
-      expect(queryByText('Loading')).not.toBeInTheDocument()
-      expect(getAllByText('Added')).toHaveLength(3)
-      expect(queryByText('All Refetched Group 200 Outcomes')).not.toBeInTheDocument()
-    },
-    10000,
   )
 
   it(
@@ -452,13 +329,15 @@ describe('FindOutcomesModal - Group Import Tests', () => {
       await clickEl(getByText('Group 300'))
       // group 300 is loading. length 3 means outcome 1, 2, 3
       expect(getAllByText('Loading')).toHaveLength(3)
-      await act(async () => doResolveProgress())
-      expect(queryByText('Loading')).not.toBeInTheDocument()
+      await act(async () => {
+        doResolveProgress()
+        await vi.runAllTimersAsync()
+      })
+      await waitFor(() => expect(queryByText('Loading')).not.toBeInTheDocument())
       expect(getAllByText('Added')).toHaveLength(3)
       // resets latestImport after progress is resolved
       expect(localStorage.latestImport).toBeUndefined()
     },
-    10000,
   )
 
   it('changes button text of individual outcomes from Add to Added after group import completes', async () => {

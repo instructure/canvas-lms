@@ -23,4 +23,5 @@ export interface EnvDiscussions {
   }
   discussion_pin_post: string
   ASSIGNMENT_SECURE_PARAMS?: string
+  DISCUSSION_CHECKPOINTS_ENABLED?: boolean
 }

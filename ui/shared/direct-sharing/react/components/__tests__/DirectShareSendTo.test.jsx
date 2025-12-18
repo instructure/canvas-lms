@@ -158,6 +158,7 @@ describe('DirectShareSendToDialog', () => {
       expect(queryByTitle(/Teacher4 Middle LastName4/i)).toBeNull()
     })
 
+    // Skipped due to flaky async timing with React.lazy() and InstUI components
     it.skip('allows removal of recipient from final list', async () => {
       // Use real timers for Suspense to resolve
       vi.useRealTimers()

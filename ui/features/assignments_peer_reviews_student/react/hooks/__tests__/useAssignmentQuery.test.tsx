@@ -49,7 +49,7 @@ describe('useAssignmentQuery', () => {
     vi.clearAllMocks()
   })
 
-  it.skip('initializes with loading set to true and returns assignment data successfully', async () => {
+  it('initializes with loading set to true and returns assignment data successfully', async () => {
     mockExecuteQuery.mockResolvedValueOnce({
       assignment: {
         _id: '1',
@@ -115,7 +115,7 @@ describe('useAssignmentQuery', () => {
     expect(result.current.isError).toBe(false)
   })
 
-  it.skip('handles assignment with no due date', async () => {
+  it('handles assignment with no due date', async () => {
     mockExecuteQuery.mockResolvedValueOnce({
       assignment: {
         _id: '2',
@@ -142,7 +142,7 @@ describe('useAssignmentQuery', () => {
     expect(result.current.isError).toBe(false)
   })
 
-  it.skip('handles assignment with no description', async () => {
+  it('handles assignment with no description', async () => {
     mockExecuteQuery.mockResolvedValueOnce({
       assignment: {
         _id: '3',
@@ -169,7 +169,7 @@ describe('useAssignmentQuery', () => {
     expect(result.current.isError).toBe(false)
   })
 
-  it.skip('handles query error', async () => {
+  it('handles query error', async () => {
     mockExecuteQuery.mockRejectedValueOnce(new Error('Failed to fetch assignment'))
 
     const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('error-id'), {
@@ -183,7 +183,7 @@ describe('useAssignmentQuery', () => {
     expect(result.current.isError).toBe(true)
   })
 
-  it.skip('uses correct query key and variables', async () => {
+  it('uses correct query key and variables', async () => {
     mockExecuteQuery.mockResolvedValueOnce({
       assignment: {
         _id: '123',

@@ -20,12 +20,19 @@ import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import NeverDropCollection from '../../collections/NeverDropCollection'
 import NeverDropCollectionView from '../NeverDropCollectionView'
+import {fireEvent, waitFor} from '@testing-library/react'
 
-// Mock debounce to make it synchronous for testing
-vi.mock('lodash', () => ({
-  ...vi.requireActual('lodash'),
-  debounce: fn => fn,
-}))
+// Mock debounce and defer to make them synchronous for testing
+// NeverDropCollectionView uses es-toolkit/compat for debounce
+// NeverDropView uses es-toolkit/compat for defer
+vi.mock('es-toolkit/compat', async () => {
+  const actual = await vi.importActual('es-toolkit/compat')
+  return {
+    ...actual,
+    debounce: fn => fn,
+    defer: fn => fn(),
+  }
+})
 
 class AssignmentStub extends Backbone.Model {
   name() {
@@ -59,6 +66,20 @@ const addNeverDrop = function () {
 }
 
 describe('NeverDropCollectionView', () => {
+  beforeAll(() => {
+    // Create the fixtures container
+    const fixtures = document.createElement('div')
+    fixtures.id = 'fixtures'
+    document.body.appendChild(fixtures)
+  })
+
+  afterAll(() => {
+    const fixtures = document.getElementById('fixtures')
+    if (fixtures) {
+      fixtures.remove()
+    }
+  })
+
   beforeEach(() => {
     assignments = new Assignments([1, 2, 3].map(i => ({id: `${i}`, name: `Assignment ${i}`})))
     never_drops = new NeverDropCollection([], {
@@ -73,6 +94,11 @@ describe('NeverDropCollectionView', () => {
     $('#fixtures').empty().append(view.render().el)
   })
 
+  afterEach(() => {
+    view.remove()
+    $('#fixtures').empty()
+  })
+
   it('possibleValues is set to the range of assignment ids', function () {
     expect(never_drops.possibleValues).toEqual(assignments.map(a => a.id))
   })
@@ -83,21 +109,23 @@ describe('NeverDropCollectionView', () => {
     expect(never_drops.availableValues).toHaveLength(start_length - 1)
   })
 
-  // TODO: Rewrite for React - needs @testing-library/react utilities
-  it.skip('adding a NeverDrop renders a <select> with the value from the front of the availableValues collection', function () {
+  it('adding a NeverDrop renders a <select> with the value from the front of the availableValues collection', async function () {
     const expected_val = never_drops.availableValues.slice(0)[0].id
     addNeverDrop()
-    const select = $('#fixtures').find('select')
-    expect(select.length).toBeGreaterThan(0)
-    expect(select.val()).toBe(expected_val)
+    await waitFor(() => {
+      const select = $('#fixtures').find('select')
+      expect(select.length).toBeGreaterThan(0)
+      expect(select.val()).toBe(expected_val)
+    })
   })
 
-  // TODO: Rewrite for React - needs @testing-library/react utilities
-  it.skip('the number of <option>s with the value the same as availableValue should equal the number of selects', function () {
+  it('the number of <option>s with the value the same as availableValue should equal the number of selects', async function () {
     addNeverDrop()
     addNeverDrop()
-    const available_val = never_drops.availableValues.at(0).id
-    expect($('#fixtures').find(`option[value=${available_val}]`)).toHaveLength(2)
+    await waitFor(() => {
+      const available_val = never_drops.availableValues.at(0).id
+      expect($('#fixtures').find(`option[value="${available_val}"]`)).toHaveLength(2)
+    })
   })
 
   it('removing a NeverDrop from the collection increases availableValues by one', function () {
@@ -116,33 +144,53 @@ describe('NeverDropCollectionView', () => {
     expect(select).toHaveLength(0)
   })
 
-  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
-  it.skip('changing a <select> will remove all <option>s with that value from other selects', function () {
+  it('changing a <select> will remove all <option>s with that value from other selects', async function () {
     addNeverDrop()
     addNeverDrop()
-    const target_id = '1'
-
-    expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(2)
-    $('#fixtures').find('select:first').val(target_id).trigger('change')
-    expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(1)
-    expect(never_drops.takenValues.find(nd => nd.id === target_id)).toBeTruthy()
-  })
-
-  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
-  it.skip('changing a <select> will add all <option>s with the previous value to other selects', function () {
-    addNeverDrop()
-    addNeverDrop()
-    const change_id = '1'
+    // After adding two NeverDrops, each takes a value (1 and 2), but 3 is available in both
     const target_id = '3'
 
-    expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(1)
-    $('#fixtures').find('select:first').val(change_id).trigger('change')
-    expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(2)
-    expect(never_drops.availableValues.find(nd => nd.id === target_id)).toBeTruthy()
+    await waitFor(() => {
+      // Both selects have option value="3" available
+      expect($('#fixtures').find(`option[value="${target_id}"]`)).toHaveLength(2)
+    })
+
+    const selectElement = $('#fixtures').find('select:first')[0]
+    selectElement.value = target_id
+    fireEvent.change(selectElement)
+
+    await waitFor(() => {
+      // After changing first select to 3, option 3 should only appear in first select
+      expect($('#fixtures').find(`option[value="${target_id}"]`)).toHaveLength(1)
+      expect(never_drops.takenValues.find(nd => nd.id === target_id)).toBeTruthy()
+    })
   })
 
-  // TODO: Rewrite for React - needs @testing-library/react utilities
-  it.skip('resetting NeverDrops with a chosen assignment renders a <span>', function () {
+  it('changing a <select> will add all <option>s with the previous value to other selects', async function () {
+    addNeverDrop()
+    addNeverDrop()
+    // After adding two NeverDrops: first has 1, second has 2
+    // Option 3 is available in both (2 occurrences)
+    // Option 1 is only in first select (1 occurrence)
+
+    // First, change first select to 3 (takes 3 away from second)
+    await waitFor(() => {
+      expect($('#fixtures').find(`option[value="3"]`)).toHaveLength(2)
+    })
+
+    const selectElement = $('#fixtures').find('select:first')[0]
+    selectElement.value = '3'
+    fireEvent.change(selectElement)
+
+    await waitFor(() => {
+      // After change: first has 3, so option 1 becomes available to second select
+      // Option 1 should now appear in the second select (2 total: first has it available, second has it available)
+      expect($('#fixtures').find(`option[value="1"]`)).toHaveLength(2)
+      expect(never_drops.availableValues.find(nd => nd.id === '1')).toBeTruthy()
+    })
+  })
+
+  it('resetting NeverDrops with a chosen assignment renders a <span>', async function () {
     const target_id = '1'
     never_drops.reset([
       {
@@ -153,8 +201,10 @@ describe('NeverDropCollectionView', () => {
       },
     ])
 
-    expect($('#fixtures').find('span')).toHaveLength(1)
-    expect(never_drops.takenValues.find(nd => nd.id === target_id)).toBeTruthy()
+    await waitFor(() => {
+      expect($('#fixtures').find('[data-testid="chosen-assignment"]')).toHaveLength(1)
+      expect(never_drops.takenValues.find(nd => nd.id === target_id)).toBeTruthy()
+    })
   })
 
   it('when there are no availableValues, the add assignment link is not rendered', function () {
@@ -164,59 +214,76 @@ describe('NeverDropCollectionView', () => {
     expect($('#fixtures').find('.add_never_drop')).toHaveLength(0)
   })
 
-  // TODO: Rewrite for React - handlebars i18n helpers not rendering in test
-  it.skip("when there is at least one takenValue, the add assignment says 'add another assignment'", function () {
+  it("when there is at least one takenValue, the add assignment says 'add another assignment'", async function () {
     addNeverDrop()
-    const text = $('#fixtures').find('.add_never_drop').text()
-    expect($.trim(text)).toBeTruthy()
+    await waitFor(() => {
+      const text = $('#fixtures').find('.add_never_drop').text()
+      expect($.trim(text)).toContain('Add another assignment')
+    })
   })
 
-  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
-  it.skip('allows adding never_drop items when canChangeDropRules is true', function () {
+  it('allows adding never_drop items when canChangeDropRules is true', async function () {
     expect($('#fixtures').find('.add_never_drop').hasClass('disabled')).not.toBeTruthy()
-    $('#fixtures').find('.add_never_drop').trigger('click')
-    expect(never_drops).toHaveLength(1)
+    const addButton = $('#fixtures').find('.add_never_drop')[0]
+    fireEvent.click(addButton)
+    await waitFor(() => {
+      expect(never_drops).toHaveLength(1)
+    })
   })
 
-  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
-  it.skip('allows removing never_drop items when canChangeDropRules is true', function () {
+  it('allows removing never_drop items when canChangeDropRules is true', async function () {
     addNeverDrop()
-    $('#fixtures').find('.remove_never_drop').trigger('click')
+    await waitFor(() => {
+      expect($('#fixtures').find('.remove_never_drop')).toHaveLength(1)
+    })
+    const removeButton = $('#fixtures').find('.remove_never_drop')[0]
+    fireEvent.click(removeButton)
+    await waitFor(() => {
+      expect(never_drops).toHaveLength(0)
+    })
+  })
+
+  it('disables adding never_drop items when canChangeDropRules is false', async function () {
+    view.canChangeDropRules = false
+    view.render()
+    await waitFor(() => {
+      expect($('#fixtures').find('.add_never_drop').hasClass('disabled')).toBeTruthy()
+    })
+    const addButton = $('#fixtures').find('.add_never_drop')[0]
+    fireEvent.click(addButton)
+    // Should not add because canChangeDropRules is false
     expect(never_drops).toHaveLength(0)
   })
 
-  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
-  it.skip('disables adding never_drop items when canChangeDropRules is false', function () {
-    view.canChangeDropRules = false
-    view.render()
-    expect($('#fixtures').find('.add_never_drop').hasClass('disabled')).toBeTruthy()
-    $('#fixtures').find('.add_never_drop').trigger('click')
-    expect(never_drops).toHaveLength(0)
-  })
-
-  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
-  it.skip('disables removing never_drop items when canChangeDropRules is false', function () {
+  it('disables removing never_drop items when canChangeDropRules is false', async function () {
     addNeverDrop()
     view.canChangeDropRules = false
     view.render()
-    expect($('#fixtures').find('.remove_never_drop').hasClass('disabled')).toBeTruthy()
-    $('#fixtures').find('.remove_never_drop').trigger('click')
+    await waitFor(() => {
+      expect($('#fixtures').find('.remove_never_drop').hasClass('disabled')).toBeTruthy()
+    })
+    const removeButton = $('#fixtures').find('.remove_never_drop')[0]
+    fireEvent.click(removeButton)
+    // Should not remove because canChangeDropRules is false
     expect(never_drops).toHaveLength(1)
   })
 
-  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
-  it.skip('disables changing assignment options when canChangeDropRules is false', function () {
+  it('disables changing assignment options when canChangeDropRules is false', async function () {
     addNeverDrop()
     view.canChangeDropRules = false
     view.render()
-    expect($('#fixtures').find('select:first').attr('disabled')).toBeTruthy()
-    $('#fixtures').find('select:first').val('2').trigger('change')
+    await waitFor(() => {
+      expect($('#fixtures').find('select:first').attr('disabled')).toBeTruthy()
+    })
+    const selectElement = $('#fixtures').find('select:first')[0]
+    selectElement.value = '2'
+    fireEvent.change(selectElement)
+    // Should not change because canChangeDropRules is false
     expect(never_drops.takenValues.find(nd => nd.id === '2')).not.toBeTruthy()
   })
 
-  // TODO: Rewrite for React - handlebars i18n helpers not rendering in test
-  it.skip("when there are no takenValues, the add assignment says 'add an assignment'", () => {
+  it("when there are no takenValues, the add assignment says 'add an assignment'", () => {
     const text = $('#fixtures').find('.add_never_drop').text()
-    expect($.trim(text)).toBe('Add an assignment')
+    expect($.trim(text)).toContain('Add an assignment')
   })
 })

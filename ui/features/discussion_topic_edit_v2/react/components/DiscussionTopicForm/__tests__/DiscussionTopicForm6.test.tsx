@@ -103,15 +103,8 @@ describe('DiscussionTopicForm', () => {
       expect(queryByText('Document Processing App(s)')).not.toBeInTheDocument()
     })
 
-    it('shows AssetProcessors section when switching to graded', () => {
-      const {getByLabelText, queryByText} = setup({
-        isEditing: false,
-      })
-      act(() => {
-        getByLabelText('Graded').click()
-      })
-      expect(queryByText('Document Processing App(s)')).toBeInTheDocument()
-    })
+    // NOTE: "shows AssetProcessors section when switching to graded" test moved to
+    // DiscussionTopicFormAssetProcessorsSwitchToGraded.test.tsx to avoid CI timeout
 
     // TODO: vi->vitest - test times out waiting for async state, needs investigation
     it('can add existing asset processors from GraphQL to the store', async () => {

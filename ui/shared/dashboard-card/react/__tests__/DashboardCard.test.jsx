@@ -49,7 +49,7 @@ afterEach(() => {
   fetchMock.restore()
 })
 
-describe.skip('DashboardCardHeaderHero', () => {
+describe('DashboardCardHeaderHero', () => {
   it('doesnt add instFS query params if it doesnt use an inst-fs url', () => {
     const {container} = render(
       <DashboardCardHeaderHero image="https://example.com/path/to/image.png" />,

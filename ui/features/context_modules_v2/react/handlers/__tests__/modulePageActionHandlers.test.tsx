@@ -59,7 +59,7 @@ describe('handleOpeningEditItemModal', () => {
     ;(createRoot as any).mockClear()
   })
 
-  it.skip('opens the Edit modal for an item on page 1', () => {
+  it('opens the Edit modal for an item on page 1', () => {
     handleOpeningEditItemModal(courseId, moduleId, '3')
 
     expect(createRoot).toHaveBeenCalledTimes(1)
@@ -73,7 +73,7 @@ describe('handleOpeningEditItemModal', () => {
     expect(renderArg.props.itemURL).toBe('/p1')
   })
 
-  it.skip('opens the Edit modal for an item on page 2 (multi-page cache search)', () => {
+  it('opens the Edit modal for an item on page 2 (multi-page cache search)', () => {
     handleOpeningEditItemModal(courseId, moduleId, '4')
 
     expect(createRoot).toHaveBeenCalledTimes(1)
@@ -88,7 +88,7 @@ describe('handleOpeningEditItemModal', () => {
     expect(renderArg.props.itemNewTab).toBe(true)
   })
 
-  it.skip('opens the Edit modal for an item on page 3 (multi-page cache search)', () => {
+  it('opens the Edit modal for an item on page 3 (multi-page cache search)', () => {
     handleOpeningEditItemModal(courseId, moduleId, '5')
 
     expect(createRoot).toHaveBeenCalledTimes(1)
@@ -102,13 +102,13 @@ describe('handleOpeningEditItemModal', () => {
     expect(renderArg.props.itemURL).toBe('/p3')
   })
 
-  it.skip('does nothing when the item is not found in any cached page', () => {
+  it('does nothing when the item is not found in any cached page', () => {
     handleOpeningEditItemModal(courseId, moduleId, 'does-not-exist')
 
     expect(createRoot).not.toHaveBeenCalled()
   })
 
-  it.skip('does nothing when there is no cache for the module', () => {
+  it('does nothing when there is no cache for the module', () => {
     queryClient.clear()
 
     handleOpeningEditItemModal(courseId, moduleId, '3')

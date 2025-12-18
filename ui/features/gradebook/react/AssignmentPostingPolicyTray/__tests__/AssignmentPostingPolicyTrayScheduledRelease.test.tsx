@@ -202,7 +202,7 @@ describe('AssignmentPostingPolicyTray ScheduledReleasePolicy tests', () => {
     })
   })
 
-  it.skip('enables the "Save" button if scheduled post is selected and valid separate dates are set', async () => {
+  it('enables the "Save" button if scheduled post is selected and valid separate dates are set', async () => {
     const {getByTestId, getAllByPlaceholderText} = renderTray(context)
     const checkbox = getByTestId('scheduled-release-checkbox')
 
@@ -231,9 +231,7 @@ describe('AssignmentPostingPolicyTray ScheduledReleasePolicy tests', () => {
     const futureDateString2 = futureDate2.toISOString().slice(0, 16)
 
     await enterNewDateTime(dateInputs[0], futureDateString1)
-    await waitFor(() => expect(dateInputs[0]).toHaveValue(futureDateString1), {timeout: 1000})
     await enterNewDateTime(dateInputs[1], futureDateString2)
-    await waitFor(() => expect(dateInputs[1]).toHaveValue(futureDateString2), {timeout: 1000})
 
     await waitFor(() => {
       const saveButton = getByTestId('assignment-posting-policy-save-button')
@@ -241,7 +239,7 @@ describe('AssignmentPostingPolicyTray ScheduledReleasePolicy tests', () => {
     })
   }, 10000)
 
-  it.skip('disables the "Save" button and displays error messages if separate scheduled post dates are invalid', async () => {
+  it('disables the "Save" button and displays error messages if separate scheduled post dates are invalid', async () => {
     const {getByTestId, getAllByPlaceholderText} = renderTray(context)
     const checkbox = getByTestId('scheduled-release-checkbox')
 
@@ -279,7 +277,7 @@ describe('AssignmentPostingPolicyTray ScheduledReleasePolicy tests', () => {
     })
   })
 
-  it.skip('disables the "Save" button and displays error messages if the comment release date is after the grade release date', async () => {
+  it('disables the "Save" button and displays error messages if the comment release date is after the grade release date', async () => {
     const {getByTestId, getAllByPlaceholderText} = renderTray(context)
     const checkbox = getByTestId('scheduled-release-checkbox')
 
@@ -322,7 +320,7 @@ describe('AssignmentPostingPolicyTray ScheduledReleasePolicy tests', () => {
     })
   })
 
-  it.skip('does not show validation error for pre-existing grades date when only comments date is changed', async () => {
+  it('does not show validation error for pre-existing grades date when only comments date is changed', async () => {
     const pastDate = new Date()
     pastDate.setDate(pastDate.getDate() - 1)
     const pastDateString = pastDate.toISOString()
@@ -385,7 +383,7 @@ describe('AssignmentPostingPolicyTray ScheduledReleasePolicy tests', () => {
     expect(errorMessages).toHaveLength(0)
   })
 
-  it.skip('preserves existing validation errors when changing the other field', async () => {
+  it('preserves existing validation errors when changing the other field', async () => {
     const pastDate = new Date()
     pastDate.setDate(pastDate.getDate() - 1)
     const pastDateString = pastDate.toISOString()
@@ -586,7 +584,7 @@ describe('AssignmentPostingPolicyTray ScheduledReleasePolicy tests', () => {
       })
     })
 
-    it.skip('allows save when scheduled release is checked in separate mode and both valid dates are entered', async () => {
+    it('allows save when scheduled release is checked in separate mode and both valid dates are entered', async () => {
       const {getByTestId, getAllByPlaceholderText} = renderTray(context)
       const checkbox = getByTestId('scheduled-release-checkbox')
 

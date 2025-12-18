@@ -42,7 +42,7 @@ describe('isCompleted()', () => {
         }
       })
 
-      it.skip('returns true', () => {
+      it('returns true', () => {
         expect(subject().isCompleted()).toEqual(true)
       })
     })
@@ -54,7 +54,7 @@ describe('isCompleted()', () => {
         }
       })
 
-      it.skip('returns false', () => {
+      it('returns false', () => {
         expect(subject().isCompleted()).toEqual(false)
       })
     })

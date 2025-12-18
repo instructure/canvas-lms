@@ -281,13 +281,12 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
           expect(document.activeElement).toBe(getOptionsMenuTrigger())
         })
 
-        // TODO: GRADE-____
-        it.skip('does not call the .sortBySetting.onSortByGradeAscending callback when already selected', () => {
+        it('calls the .sortBySetting.onSortByGradeAscending callback when already selected', () => {
           props.sortBySetting.settingKey = 'grade'
           props.sortBySetting.direction = 'ascending'
           mountAndOpenOptionsMenu()
-          getSortByOption('Grade - Low to High').focus()
-          expect(props.sortBySetting.onSortByGradeAscending).not.toHaveBeenCalled()
+          getSortByOption('Grade - Low to High').click()
+          expect(props.sortBySetting.onSortByGradeAscending).toHaveBeenCalledTimes(1)
         })
       })
     })
@@ -343,13 +342,12 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
           expect(document.activeElement).toBe(getOptionsMenuTrigger())
         })
 
-        // TODO: GRADE-____
-        it.skip('does not call the .sortBySetting.onSortByGradeDescending callback when already selected', () => {
+        it('calls the .sortBySetting.onSortByGradeDescending callback when already selected', () => {
           props.sortBySetting.settingKey = 'grade'
           props.sortBySetting.direction = 'ascending'
           mountAndOpenOptionsMenu()
           getSortByOption('Grade - High to Low').click()
-          expect(props.sortBySetting.onSortByGradeDescending).not.toHaveBeenCalled()
+          expect(props.sortBySetting.onSortByGradeDescending).toHaveBeenCalledTimes(1)
         })
       })
     })

@@ -254,10 +254,10 @@ describe('Gradebook > Submissions', () => {
       expect(getAssignment('2301').assignment_visibility).toEqual([])
     })
 
-    test.skip('does nothing when the assignment is not loaded in Gradebook', () => {
+    test('does nothing when the assignment is not loaded in Gradebook', () => {
       studentSubmissions[0].submissions[1].assignment_id = '2309'
       gradebook.gotSubmissionsChunk(studentSubmissions)
-      expect(getAssignment('2309')).toBeNull()
+      expect(getAssignment('2309')).toBeUndefined()
     })
   })
 
@@ -482,13 +482,18 @@ describe('Gradebook > Submissions', () => {
       expect(getSubmission().hidden).toBe(false)
     })
 
+    // TODO: formatGrade is now being called even when assignment hasn't loaded. Behavior may have
+    // changed, or test expectations are outdated. Needs investigation.
     test.skip('does not format grades when the assignment has not loaded', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade')
+      const spy = vi.spyOn(GradeFormatHelper, 'formatGrade')
       delete gradebook.assignments[2301]
       gradebook.updateSubmission(submission)
-      expect(GradeFormatHelper.formatGrade).not.toHaveBeenCalled()
+      expect(spy).not.toHaveBeenCalled()
+      spy.mockRestore()
     })
 
+    // TODO: formatGrade is now being called for pass_fail grading types. Behavior may have
+    // changed, or test expectations are outdated. Needs investigation.
     test.skip('does not format grades for Complete/Incomplete assignments', () => {
       /*
        * When the grades ('complete', 'incomplete') for these assignments
@@ -497,10 +502,11 @@ describe('Gradebook > Submissions', () => {
        * this from happening. Eventually, grades will be purely the persisted,
        * data values from the database. And formatting will occur only in the UI.
        */
-      vi.spyOn(GradeFormatHelper, 'formatGrade')
+      const spy = vi.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.assignments[2301].grading_type = 'pass_fail'
       gradebook.updateSubmission(submission)
-      expect(GradeFormatHelper.formatGrade).not.toHaveBeenCalled()
+      expect(spy).not.toHaveBeenCalled()
+      spy.mockRestore()
     })
   })
 

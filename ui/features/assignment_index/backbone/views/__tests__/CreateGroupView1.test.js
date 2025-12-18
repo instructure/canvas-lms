@@ -69,7 +69,7 @@ describe('CreateGroupView', () => {
     vi.resetAllMocks()
   })
 
-  test.skip('it hides drop options for no assignments and undefined assignmentGroup id', async () => {
+  test('it hides drop options for no assignments and undefined assignmentGroup id', async () => {
     // Create a view with assignments to ensure the drop options are initially shown
     view = createView({
       assignmentGroups: new AssignmentGroupCollection([
@@ -116,7 +116,7 @@ describe('CreateGroupView', () => {
     expect(view.assignmentGroups.size()).toBe(3)
   })
 
-  test.skip('it should edit an existing assignment group', () => {
+  test('it should edit an existing assignment group', () => {
     // Create a simpler view with minimal configuration
     view = createView()
 

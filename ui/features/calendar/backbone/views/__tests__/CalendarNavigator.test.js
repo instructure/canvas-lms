@@ -48,7 +48,7 @@ describe('CalendarNavigator', () => {
     await new Promise(resolve => isAccessible(navigator, resolve, {a11yReport: true}))
   })
 
-  // TODO: LF-626 started failing only in Jenkins when unrelated code was removed
+  // jQuery UI datepicker doesn't render properly in jsdom
   test.skip('clicking a day in picker navigates to that date', function () {
     // instrument the callback
     const handler = vi.fn()
@@ -75,6 +75,7 @@ describe('CalendarNavigator', () => {
     expect(handler.mock.calls[0][0]).toEqual(expectedDate)
   })
 
+  // jQuery UI datepicker doesn't render properly in jsdom
   test.skip('hitting enter in date field navigates to date', function () {
     // instrument the callback
     const handler = vi.fn()

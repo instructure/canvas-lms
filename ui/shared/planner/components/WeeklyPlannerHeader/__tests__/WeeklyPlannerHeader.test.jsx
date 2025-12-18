@@ -160,44 +160,51 @@ describe('WeeklyPlannerHeader', () => {
 })
 
 describe('processFocusTarget', () => {
-  // fails in jsdom 25
-  it.skip('returns the focusTarget query param, removes it from the url, and updates to the new url', () => {
-    window.history.pushState({}, null, 'http://localhost?focusTarget=not-a-real-one')
-    expect(processFocusTarget()).toBe('not-a-real-one')
-    expect(window.history.replaceState).toHaveBeenCalledWith({}, null, 'http://localhost')
+  let replaceStateSpy
+
+  beforeEach(() => {
+    replaceStateSpy = vi.spyOn(window.history, 'replaceState').mockImplementation(() => {})
   })
 
-  // fails in jsdom 25
-  it.skip('keeps other query params intact', () => {
+  afterEach(() => {
+    replaceStateSpy.mockRestore()
+    window.history.pushState({}, null, 'http://localhost/')
+  })
+
+  it('returns the focusTarget query param, removes it from the url, and updates to the new url', () => {
+    window.history.pushState({}, null, 'http://localhost?focusTarget=not-a-real-one')
+    expect(processFocusTarget()).toBe('not-a-real-one')
+    expect(replaceStateSpy).toHaveBeenCalledWith({}, null, 'http://localhost/')
+  })
+
+  it('keeps other query params intact', () => {
     window.history.pushState(
       {},
       null,
       'http://localhost?first=yes&focusTarget=not-a-real-one&last=no',
     )
     expect(processFocusTarget()).toBe('not-a-real-one')
-    expect(window.history.replaceState).toHaveBeenCalledWith(
+    expect(replaceStateSpy).toHaveBeenCalledWith(
       {},
       null,
-      'http://localhost?first=yes&last=no',
+      'http://localhost/?first=yes&last=no',
     )
   })
 
-  // fails in jsdom 25
-  it.skip('returns undefined if no focusTarget query param was present', () => {
+  it('returns undefined if no focusTarget query param was present', () => {
     window.history.pushState({}, null, 'http://localhost?something=else')
     expect(processFocusTarget()).toBe(undefined)
-    expect(window.history.replaceState).toHaveBeenCalledWith(
+    expect(replaceStateSpy).toHaveBeenCalledWith(
       {},
       null,
-      'http://localhost?something=else',
+      'http://localhost/?something=else',
     )
   })
 
-  // fails in jsdom 25
-  it.skip('handles urls with no query params', () => {
+  it('handles urls with no query params', () => {
     window.history.pushState({}, null, 'http://localhost/courses/5#schedule')
     expect(processFocusTarget()).toBe(undefined)
-    expect(window.history.replaceState).toHaveBeenCalledWith(
+    expect(replaceStateSpy).toHaveBeenCalledWith(
       {},
       null,
       'http://localhost/courses/5#schedule',

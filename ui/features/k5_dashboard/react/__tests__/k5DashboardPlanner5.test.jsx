@@ -55,12 +55,10 @@ describe('K5Dashboard Schedule Section', () => {
     )
   })
 
-  afterEach(async () => {
+  afterEach(() => {
     global.ENV = {}
     resetPlanner()
     fetchMock.reset()
-    // Wait a bit for any pending transitions to complete
-    await new Promise(resolve => setTimeout(resolve, 100))
   })
 
   it('allows navigating to next/previous weeks if there are plannable items in the future/past', async () => {

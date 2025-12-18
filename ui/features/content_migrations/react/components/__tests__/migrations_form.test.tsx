@@ -166,7 +166,7 @@ describe('ContentMigrationForm', () => {
     })
   })
 
-  it.skip('performs file upload request when submitting', async () => {
+  it('performs file upload request when submitting', async () => {
     // Reset the mock before this test to ensure clean state
     setMigrationsMock.mockReset()
 
@@ -226,7 +226,7 @@ describe('ContentMigrationForm', () => {
     expect(setMigrationsMock).toHaveBeenCalled()
   })
 
-  it.skip('passes the file upload progress to the migrator component', async () => {
+  it('passes the file upload progress to the migrator component', async () => {
     renderComponent()
     await userEvent.click(await screen.findByTitle('Select one'))
     await userEvent.click(screen.getByText('Common Course Export Package'))

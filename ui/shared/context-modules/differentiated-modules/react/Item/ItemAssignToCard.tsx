@@ -501,7 +501,6 @@ export default forwardRef(function ItemAssignToCard(
               lock => lock === 'due_dates' || lock === 'availability_dates',
             )}
           />
-          {/* @ts-expect-error */}
           {!removeDueDateInput && (!isCheckpointed || !ENV.DISCUSSION_CHECKPOINTS_ENABLED) && (
             <DueDateTimeInput
               {...{
@@ -520,7 +519,6 @@ export default forwardRef(function ItemAssignToCard(
               disabledWithGradingPeriod={isInClosedGradingPeriod}
             />
           )}
-          {/* @ts-expect-error */}
           {isCheckpointed && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
             <ReplyToTopicDueDateTimeInput
               {...{
@@ -541,7 +539,6 @@ export default forwardRef(function ItemAssignToCard(
               disabledWithGradingPeriod={isInClosedGradingPeriod}
             />
           )}
-          {/* @ts-expect-error */}
           {isCheckpointed && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
             <RequiredRepliesDueDateTimeInput
               {...{

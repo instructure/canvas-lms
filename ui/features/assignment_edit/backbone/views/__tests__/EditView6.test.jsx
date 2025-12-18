@@ -172,7 +172,7 @@ afterEach(() => {
   fetchMock.reset()
 })
 
-describe.skip('EditView#handleModeratedGradingChanged', () => {
+describe('EditView#handleModeratedGradingChanged', () => {
   let view
 
   beforeEach(() => {
@@ -277,7 +277,7 @@ describe.skip('EditView#handleModeratedGradingChanged', () => {
   })
 })
 
-describe.skip('EditView#handleMessageEvent', () => {
+describe('EditView#handleMessageEvent', () => {
   let view
 
   beforeEach(() => {
@@ -396,7 +396,7 @@ describe.skip('EditView#handleMessageEvent', () => {
   })
 })
 
-describe.skip('EditView#handlesuppressFromGradebookChange', () => {
+describe('EditView#handlesuppressFromGradebookChange', () => {
   let view
 
   beforeEach(() => {

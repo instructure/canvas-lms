@@ -51,7 +51,7 @@ vi.mock('../constants', async () => ({
   TRUSTED_MESSAGE_ORIGIN: 'https://canvas.instructure.com',
 }))
 
-describe.skip('events', () => {
+describe('events', () => {
   let editor
 
   beforeEach(() => {

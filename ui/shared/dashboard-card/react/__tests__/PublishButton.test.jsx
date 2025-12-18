@@ -36,7 +36,7 @@ function createMockProps(opts = {}) {
   }
 }
 
-describe.skip('PublishButton', () => {
+describe('PublishButton', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.spyOn($, 'flashError').mockImplementation()

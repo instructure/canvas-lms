@@ -326,12 +326,37 @@ describe('Gradebook Grid Column Widths', () => {
       return columnData[columnId]
     })
 
+    gridSpecHelper.listColumnIds = vi.fn().mockReturnValue([
+      'assignment_2301',
+      'assignment_2304',
+    ])
+
     // Set up gradebookGrid
     gradebook.gradebookGrid = {
       gridData: {
         columns: {
           definitions: columnData,
         },
+      },
+      grid: {
+        getCellNode: vi.fn().mockImplementation((row, columnIndex) => {
+          const columnIds = gridSpecHelper.listColumnIds()
+          const columnId = columnIds[columnIndex]
+          const column = columnData[columnId]
+          if (!column) {
+            return null
+          }
+          return {
+            classList: {
+              contains: vi.fn().mockImplementation(className => {
+                if (className === 'minimized') {
+                  return column.width <= 50
+                }
+                return false
+              }),
+            },
+          }
+        }),
       },
       events: {
         onColumnsResized: {
@@ -394,6 +419,16 @@ describe('Gradebook Grid Column Widths', () => {
           width: 150,
           minimized: false,
         },
+        assignment_2302: {
+          id: 'assignment_2302',
+          width: 10,
+          minimized: true,
+        },
+        assignment_2303: {
+          id: 'assignment_2303',
+          width: 54,
+          minimized: false,
+        },
         assignment_2304: {
           id: 'assignment_2304',
           width: 150,
@@ -434,12 +469,39 @@ describe('Gradebook Grid Column Widths', () => {
         return columnData[columnId]
       })
 
+      gridSpecHelper.listColumnIds = vi.fn().mockReturnValue([
+        'assignment_2301',
+        'assignment_2302',
+        'assignment_2303',
+        'assignment_2304',
+      ])
+
       // Set up gradebookGrid
       gradebook.gradebookGrid = {
         gridData: {
           columns: {
             definitions: columnData,
           },
+        },
+        grid: {
+          getCellNode: vi.fn().mockImplementation((row, columnIndex) => {
+            const columnIds = gridSpecHelper.listColumnIds()
+            const columnId = columnIds[columnIndex]
+            const column = columnData[columnId]
+            if (!column) {
+              return null
+            }
+            return {
+              classList: {
+                contains: vi.fn().mockImplementation(className => {
+                  if (className === 'minimized') {
+                    return column.width <= 50
+                  }
+                  return false
+                }),
+              },
+            }
+          }),
         },
         events: {
           onColumnsResized: {
@@ -454,28 +516,25 @@ describe('Gradebook Grid Column Widths', () => {
       }
     })
 
-    it.skip('uses the default width for assignment column headers', () => {
+    it('uses the default width for assignment column headers', () => {
       const columnNode = gridSpecHelper.getColumnHeaderNode('assignment_2301')
       expect(columnNode.offsetWidth).toBeGreaterThan(10)
     })
 
-    // TODO: unskip in FOO-4349
-    it.skip('uses a stored width for assignment column headers', () => {
+    it('uses a stored width for assignment column headers', () => {
       const columnNode = gridSpecHelper.getColumnHeaderNode('assignment_2303')
       expect(columnNode.offsetWidth).toBe(54)
     })
 
-    // TODO: unskip in FOO-4349
-    it.skip('hides assignment column header content when the column is minimized', () => {
+    it('hides assignment column header content when the column is minimized', () => {
       const columnNode = gridSpecHelper.getColumnHeaderNode('assignment_2302')
-      expect(columnNode.classList).toContain('minimized')
+      expect(columnNode.classList.contains('minimized')).toBe(true)
     })
 
-    // TODO: unskip in FOO-4349
-    it.skip('hides assignment column cell content when the column is minimized', () => {
+    it('hides assignment column cell content when the column is minimized', () => {
       const columnIndex = gridSpecHelper.listColumnIds().indexOf('assignment_2302')
       const cellNode = gradebook.gradebookGrid.grid.getCellNode(0, columnIndex)
-      expect(cellNode.classList).toContain('minimized')
+      expect(cellNode.classList.contains('minimized')).toBe(true)
     })
   })
 
@@ -491,7 +550,7 @@ describe('Gradebook Grid Column Widths', () => {
       vi.spyOn(gradebook, 'saveColumnWidthPreference')
     })
 
-    it.skip('updates the column definitions for resized columns', () => {
+    it('updates the column definitions for resized columns', () => {
       const originalWidth = gridSpecHelper.getColumn('assignment_2304').width
       resizeColumn('assignment_2304', -20)
       expect(gradebook.gradebookGrid.gridData.columns.definitions.assignment_2304.width).toBe(
@@ -499,34 +558,32 @@ describe('Gradebook Grid Column Widths', () => {
       )
     })
 
-    it.skip('hides assignment column header content when the column is minimized', () => {
+    it('hides assignment column header content when the column is minimized', () => {
       resizeColumn('assignment_2304', -100)
       const columnNode = gridSpecHelper.getColumnHeaderNode('assignment_2304')
       expect(columnNode.classList.contains('minimized')).toBe(true)
     })
 
-    it.skip('unhides assignment column header content when the column is unminimized', () => {
+    it('unhides assignment column header content when the column is unminimized', () => {
       resizeColumn('assignment_2304', -100)
       resizeColumn('assignment_2304', 1)
       const columnNode = gridSpecHelper.getColumnHeaderNode('assignment_2304')
       expect(columnNode.classList.contains('minimized')).toBe(false)
     })
 
-    // TODO: unskip in FOO-4349
-    it.skip('hides assignment column cell content when the column is minimized', () => {
+    it('hides assignment column cell content when the column is minimized', () => {
       resizeColumn('assignment_2304', -100)
       const columnIndex = gridSpecHelper.listColumnIds().indexOf('assignment_2304')
       const cellNode = gradebook.gradebookGrid.grid.getCellNode(0, columnIndex)
-      expect(cellNode.classList).toContain('minimized')
+      expect(cellNode.classList.contains('minimized')).toBe(true)
     })
 
-    // TODO: unskip in FOO-4349
-    it.skip('unhides assignment column cell content when the column is unminimized', () => {
+    it('unhides assignment column cell content when the column is unminimized', () => {
       resizeColumn('assignment_2304', -100)
       resizeColumn('assignment_2304', 1)
       const columnIndex = gridSpecHelper.listColumnIds().indexOf('assignment_2304')
       const cellNode = gradebook.gradebookGrid.grid.getCellNode(0, columnIndex)
-      expect(cellNode.classList).not.toContain('minimized')
+      expect(cellNode.classList.contains('minimized')).toBe(false)
     })
   })
 })

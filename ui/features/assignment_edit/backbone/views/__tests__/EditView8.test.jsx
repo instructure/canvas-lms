@@ -135,7 +135,7 @@ const editView = (assignmentOpts = {}) => {
   return app
 }
 
-describe.skip('EditView - Peer Review Integration', () => {
+describe('EditView - Peer Review Integration', () => {
   let view
 
   beforeEach(() => {

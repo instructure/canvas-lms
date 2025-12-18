@@ -23,7 +23,7 @@ import {isAccessible} from '@canvas/test-utils/assertions'
 let header
 let originalENV
 
-describe.skip('CalendarHeader', function () {
+describe('CalendarHeader', function () {
   beforeEach(function () {
     // set up fixtures
     $('<div id="fixtures"></div>').appendTo('body')

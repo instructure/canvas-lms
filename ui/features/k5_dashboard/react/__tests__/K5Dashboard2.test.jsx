@@ -218,9 +218,7 @@ describe('K-5 Dashboard', () => {
       expect(await findByRole('tab', {name: 'Grades'})).toBeInTheDocument()
     })
 
-    // TODO: This test is skipped due to slow rendering in Vitest.
-    // Consider splitting to separate test file with its own setup/teardown.
-    it.skip('displays a score summary for each non-homeroom course', async () => {
+    it('displays a score summary for each non-homeroom course', async () => {
       const {getByText, queryByText, findByRole} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-grades" />,
       )
@@ -231,9 +229,7 @@ describe('K-5 Dashboard', () => {
   })
 
   describe('Resources Section', () => {
-    // TODO: This test is skipped due to slow rendering in Vitest.
-    // Consider splitting to separate test file with its own setup/teardown.
-    it.skip('displays syllabus content for homeroom under important info section', async () => {
+    it('displays syllabus content for homeroom under important info section', async () => {
       const {getByText, findByText} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-resources" />,
       )
@@ -241,9 +237,7 @@ describe('K-5 Dashboard', () => {
       expect(getByText('Important Info')).toBeInTheDocument()
     })
 
-    // TODO: This test is skipped due to slow rendering in Vitest.
-    // Consider splitting to separate test file with its own setup/teardown.
-    it.skip("shows apps installed in the user's courses", async () => {
+    it("shows apps installed in the user's courses", async () => {
       const wrapper = render(<K5Dashboard {...defaultProps} defaultTab="tab-resources" />)
 
       const button = await wrapper.findByTestId('k5-app-button')
@@ -294,9 +288,7 @@ describe('K-5 Dashboard', () => {
       expect(queryByText('Hide Important Dates')).not.toBeInTheDocument()
     })
 
-    // TODO: This test is skipped due to slow rendering in Vitest.
-    // Consider splitting to separate test file with its own setup/teardown.
-    it.skip('filters important dates to those selected', async () => {
+    it('filters important dates to those selected', async () => {
       server.use(
         http.get('/api/v1/dashboard/dashboard_cards', () =>
           HttpResponse.json(MOCK_CARDS.map(c => ({...c, enrollmentState: 'active'}))),

@@ -70,7 +70,7 @@ describe('UserSearchResultsView', () => {
     expect(renderSpy).toHaveBeenCalledTimes(1)
   })
 
-  it.skip('calls restore on model when restore button is clicked', () => {
+  it('calls restore on model when restore button is clicked', () => {
     userRestore.set(userJSON)
     const restoreSpy = vi.spyOn(userRestore, 'restore').mockResolvedValue({})
     userSearchResultsView.$restoreUserBtn.click()

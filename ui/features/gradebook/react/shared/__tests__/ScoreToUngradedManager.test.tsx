@@ -128,7 +128,7 @@ describe('ScoreToUngradedManager', () => {
     })
 
     it('clears any new process and returns a rejected promise if no monitoring is possible', async () => {
-      vi
+      const monitoringSpy = vi
         .spyOn(ScoreToUngradedManager.prototype as any, 'monitoringUrl')
         .mockReturnValue(undefined)
       const manager = new ScoreToUngradedManager()
@@ -139,10 +139,12 @@ describe('ScoreToUngradedManager', () => {
         expect(reason).toStrictEqual(
           'Score to ungraded process failed: No way to monitor score to ungraded provided!',
         )
+      } finally {
+        monitoringSpy.mockRestore()
       }
     })
 
-    it.skip('starts polling for progress and returns a rejected promise on progress failure', async () => {
+    it('starts polling for progress and returns a rejected promise on progress failure', async () => {
       const manager = new ScoreToUngradedManager(undefined, 1)
 
       vi.spyOn(axios, 'get').mockResolvedValue({
@@ -159,7 +161,7 @@ describe('ScoreToUngradedManager', () => {
       }
     })
 
-    it.skip('starts polling for progress and returns a rejected promise on unknown progress status', async () => {
+    it('starts polling for progress and returns a rejected promise on unknown progress status', async () => {
       const manager = new ScoreToUngradedManager(undefined, 1)
 
       vi.spyOn(axios, 'get').mockResolvedValue({
@@ -176,7 +178,7 @@ describe('ScoreToUngradedManager', () => {
       }
     })
 
-    it.skip('starts polling for progress and returns a fulfilled promise on progress completion', async () => {
+    it('starts polling for progress and returns a fulfilled promise on progress completion', async () => {
       const manager = new ScoreToUngradedManager(undefined, 1)
 
       vi.spyOn(axios, 'get').mockResolvedValue({

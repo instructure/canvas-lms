@@ -146,7 +146,7 @@ describe('WikiPageIndexView', () => {
       vi.clearAllMocks()
     })
 
-    it.skip('opens and closes the direct share course tray', () => {
+    it('opens and closes the direct share course tray', () => {
       const trayComponent = vi.spyOn(view, 'DirectShareCourseTray').mockReturnValue(null)
       ;(collection as any).trigger('fetch')
       view.$el.find('.copy-wiki-page-to').click()
@@ -167,7 +167,7 @@ describe('WikiPageIndexView', () => {
       )
     })
 
-    it.skip('opens and closes the direct share user modal', () => {
+    it('opens and closes the direct share user modal', () => {
       const userModal = vi.spyOn(view, 'DirectShareUserModal').mockReturnValue(null)
       ;(collection as any).trigger('fetch')
       view.$el.find('.send-wiki-page-to').click()
@@ -222,7 +222,7 @@ describe('WikiPageIndexView', () => {
       vi.clearAllMocks()
     })
 
-    it.skip('opens and closes the lti tray and returns focus', () => {
+    it('opens and closes the lti tray and returns focus', () => {
       const trayComponent = vi.spyOn(view, 'ContentTypeExternalToolTray').mockReturnValue(null)
       ;(collection as any).trigger('fetch')
       const toolbarKabobMenu = view.$el.find('.al-trigger')[0]
@@ -248,7 +248,7 @@ describe('WikiPageIndexView', () => {
       )
     })
 
-    it.skip('reloads page when closing tray if needed', () => {
+    it('reloads page when closing tray if needed', () => {
       const trayComponent = vi.spyOn(view, 'ContentTypeExternalToolTray').mockReturnValue(null)
       ;(collection as any).trigger('fetch')
       const toolbarKabobMenu = view.$el.find('.al-trigger')[0]
@@ -291,7 +291,7 @@ describe('WikiPageIndexView', () => {
       vi.clearAllMocks()
     })
 
-    it.skip('delegates to the collection sortByField', () => {
+    it('delegates to the collection sortByField', () => {
       const sortByFieldStub = vi.spyOn(collection, 'sortByField')
       const mockEvent = {
         preventDefault: vi.fn(),
@@ -329,7 +329,7 @@ describe('WikiPageIndexView', () => {
       vi.clearAllMocks()
     })
 
-    it.skip('has text "Page" when no preferred text editor', () => {
+    it('has text "Page" when no preferred text editor', () => {
       fakeENV.setup({
         text_editor_preference: null,
       })
@@ -337,7 +337,7 @@ describe('WikiPageIndexView', () => {
       expect(view.$('.new_page')[0]).toHaveTextContent('Page')
     })
 
-    it.skip('has text "Page" when block_editor is preferred text editor', () => {
+    it('has text "Page" when block_editor is preferred text editor', () => {
       fakeENV.setup({
         text_editor_preference: 'block_editor',
       })
@@ -345,7 +345,7 @@ describe('WikiPageIndexView', () => {
       expect(view.$('.new_page')[0]).toHaveTextContent('Page')
     })
 
-    it.skip('has text "RCE Page" when RCE is preferred text editor', () => {
+    it('has text "RCE Page" when RCE is preferred text editor', () => {
       fakeENV.setup({
         text_editor_preference: 'rce',
       })

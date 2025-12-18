@@ -57,13 +57,12 @@ describe('gradebook/SectionMenuView', () => {
     $('#fixtures').empty()
   })
 
-  // FOO-4485
-  test.skip('it renders a button', () => {
+  test('it renders a button', () => {
     expect(view.$el.find('button').length).toBeGreaterThan(0)
     expect(view.$el.find('button').text()).toMatch(/Section One/)
   })
 
-  // FOO-4485
+  // FOO-4485 - jQuery event binding error with fake timers
   test.skip('it displays given sections', () => {
     vi.useFakeTimers()
     view.$el.find('button').click()
