@@ -396,3 +396,11 @@ fix_bp_folder_unsynced_issue:
     When Folders get synchronised during BP sync, do not update the original Folder with cloned_item_id to trigger 'Unsynced Changes'
   applies_to: SiteAdmin
   shadow: true
+
+a11y_checker_account_statistics:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Accessibility Checker Account Statistics
+  description: |-
+    If enabled, the a11y statistics will start calculate on accounts where a11y_checker FF is enabled.
+  shadow: true
