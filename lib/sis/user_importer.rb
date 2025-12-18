@@ -129,18 +129,24 @@ module SIS
         until @batched_users.empty?
           user_row = @batched_users.shift
           pseudo = @root_account.pseudonyms.find_by(sis_user_id: user_row.user_id.to_s)
-          if user_row.authentication_provider_id.present?
-            unless @authentication_providers.key?(user_row.authentication_provider_id)
-              begin
-                @authentication_providers[user_row.authentication_provider_id] =
-                  @root_account.authentication_providers.active.find(user_row.authentication_provider_id)
-              rescue ActiveRecord::RecordNotFound
-                @authentication_providers[user_row.authentication_provider_id] = nil
+          pseudo_by_login = begin
+            if user_row.authentication_provider_id.present?
+              unless @authentication_providers.key?(user_row.authentication_provider_id)
+                begin
+                  @authentication_providers[user_row.authentication_provider_id] =
+                    @root_account.authentication_providers.active.find(user_row.authentication_provider_id)
+                rescue ActiveRecord::RecordNotFound
+                  @authentication_providers[user_row.authentication_provider_id] = nil
+                end
               end
+              @root_account.pseudonyms.active.by_unique_id(user_row.login_id).find_by(authentication_provider_id: @authentication_providers[user_row.authentication_provider_id])
+            else
+              @root_account.pseudonyms.active.by_unique_id(user_row.login_id).take
             end
-            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).find_by(authentication_provider_id: @authentication_providers[user_row.authentication_provider_id])
-          else
-            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).take
+          rescue Net::IMAP::StringPrep::ProhibitedCodepoint
+            message = I18n.t("Invalid Unicode characters in login_id '%{login_id}'; skipping", login_id: user_row.login_id)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+            next
           end
           pseudo_by_integration = nil
           pseudo_by_integration = @root_account.pseudonyms.find_by(integration_id: user_row.integration_id.to_s) if user_row.integration_id.present?
