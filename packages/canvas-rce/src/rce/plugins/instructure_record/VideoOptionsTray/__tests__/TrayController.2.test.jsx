@@ -281,4 +281,42 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(eventMock).toHaveBeenCalledTimes(0)
     })
   })
+
+  describe('focus behavior on tray close', () => {
+    beforeEach(() => {
+      jest.spyOn(bridge, 'focusActiveEditor')
+    })
+
+    afterEach(() => {
+      bridge.focusActiveEditor.mockRestore()
+    })
+
+    it('calls bridge.focusActiveEditor when closing normally', async () => {
+      trayController.showTrayForEditor(editors[0])
+      trayController.hideTrayForEditor(editors[0])
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+      expect(bridge.focusActiveEditor).toHaveBeenCalledWith(false)
+    })
+
+    it('does not call bridge.focusActiveEditor when skipFocusOnExit is true', async () => {
+      trayController.showTrayForEditor(editors[0])
+      trayController.hideTrayForEditor(editors[0], true)
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+      expect(bridge.focusActiveEditor).not.toHaveBeenCalled()
+    })
+
+    it('resets skipFocusOnExit flag after tray closes', async () => {
+      trayController.showTrayForEditor(editors[0])
+      trayController.hideTrayForEditor(editors[0], true)
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+      expect(bridge.focusActiveEditor).not.toHaveBeenCalled()
+
+      bridge.focusActiveEditor.mockClear()
+
+      trayController.showTrayForEditor(editors[0])
+      trayController.hideTrayForEditor(editors[0])
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+      expect(bridge.focusActiveEditor).toHaveBeenCalledWith(false)
+    })
+  })
 })

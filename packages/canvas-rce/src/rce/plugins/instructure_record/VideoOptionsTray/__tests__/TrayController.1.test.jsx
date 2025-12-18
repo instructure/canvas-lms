@@ -191,6 +191,32 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       trayController.hideTrayForEditor(editors[0])
       expect(getTray()).toBeNull()
     })
+
+    describe('with skipFocusOnExit parameter', () => {
+      it('does not select video container when skipFocusOnExit is true', async () => {
+        const selectSpy = jest.spyOn(editors[0].selection, 'select')
+        trayController.showTrayForEditor(editors[0])
+        trayController.hideTrayForEditor(editors[0], true)
+        await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+        expect(selectSpy).not.toHaveBeenCalled()
+      })
+
+      it('selects video container when skipFocusOnExit is false', async () => {
+        const selectSpy = jest.spyOn(editors[0].selection, 'select')
+        trayController.showTrayForEditor(editors[0])
+        trayController.hideTrayForEditor(editors[0], false)
+        await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+        expect(selectSpy).toHaveBeenCalledWith(trayController.$videoContainer)
+      })
+
+      it('selects video container when skipFocusOnExit is not provided', async () => {
+        const selectSpy = jest.spyOn(editors[0].selection, 'select')
+        trayController.showTrayForEditor(editors[0])
+        trayController.hideTrayForEditor(editors[0])
+        await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+        expect(selectSpy).toHaveBeenCalledWith(trayController.$videoContainer)
+      })
+    })
   })
 })
 
