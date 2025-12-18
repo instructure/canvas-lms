@@ -514,6 +514,187 @@ RSpec.describe PeerReview::AllocationService do
           expect(allocated_user_ids).to include(student1.id, student2.id, student3.id)
         end
       end
+
+      context "when prioritizing should_review submissions" do
+        before do
+          # Create should_review allocation rule for student1
+          AllocationRule.create!(
+            course:,
+            assignment:,
+            assessor:,
+            assessee: student1,
+            must_review: false,
+            review_permitted: true
+          )
+        end
+
+        it "allocates should_review submissions before regular submissions" do
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(3)
+
+          # Student1 should be prioritized due to should_review rule
+          allocated_user_ids = result[:assessment_requests].map(&:user_id)
+          expect(allocated_user_ids).to include(student1.id)
+          expect(allocated_user_ids.first).to eq(student1.id)
+        end
+
+        it "sorts should_review submissions by review count" do
+          student4 = student_in_course(active_all: true).user
+          assignment.submit_homework(student4, body: "Student4 submission")
+
+          AllocationRule.create!(
+            course:,
+            assignment:,
+            assessor:,
+            assessee: student4,
+            must_review: false,
+            review_permitted: true
+          )
+
+          # Give student1 more reviews than student4
+          assignment.assign_peer_review(student2, student1)
+          assignment.assign_peer_review(student3, student1)
+
+          result = service.allocate
+          expect(result[:success]).to be true
+
+          allocated_user_ids = result[:assessment_requests].map(&:user_id)
+          # student4 should come first (fewer reviews), student1 second (should_review but has more reviews)
+          expect(allocated_user_ids.first).to eq(student4.id)
+          expect(allocated_user_ids.second).to eq(student1.id)
+        end
+      end
+
+      context "when mixing must_review, should_review, and regular submissions" do
+        let(:student4) { student_in_course(active_all: true).user }
+
+        before do
+          assignment.submit_homework(student4, body: "Student4 submission")
+
+          # Must review student1
+          AllocationRule.create!(
+            course:,
+            assignment:,
+            assessor:,
+            assessee: student1,
+            must_review: true,
+            review_permitted: true
+          )
+
+          # Should review student2
+          AllocationRule.create!(
+            course:,
+            assignment:,
+            assessor:,
+            assessee: student2,
+            must_review: false,
+            review_permitted: true
+          )
+
+          # student3 and student4 have no rules (regular)
+        end
+
+        it "prioritizes must_review first, should_review second, then regular submissions" do
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(3)
+
+          allocated_user_ids = result[:assessment_requests].map(&:user_id)
+          # Must review first
+          expect(allocated_user_ids.first).to eq(student1.id)
+          # Should review second
+          expect(allocated_user_ids.second).to eq(student2.id)
+          # Regular submission last (either student3 or student4)
+          expect(allocated_user_ids.last).to be_in([student3.id, student4.id])
+        end
+
+        it "allocates all submissions when peer_review_count matches total students" do
+          assignment.update!(peer_review_count: 4)
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(4)
+
+          allocated_user_ids = result[:assessment_requests].map(&:user_id)
+          # Must review first
+          expect(allocated_user_ids.first).to eq(student1.id)
+          # Should review second
+          expect(allocated_user_ids.second).to eq(student2.id)
+          # Regular submissions last
+          expect(allocated_user_ids[2..]).to match_array([student3.id, student4.id])
+        end
+      end
+
+      context "when should_review submission is not available" do
+        let(:student4) { student_in_course(active_all: true).user }
+
+        before do
+          # Student4 has a should_review rule but hasn't submitted yet
+          AllocationRule.create!(
+            course:,
+            assignment:,
+            assessor:,
+            assessee: student4,
+            must_review: false,
+            review_permitted: true
+          )
+
+          # Student4's submission exists but is unsubmitted
+          assignment.submissions.find_by(user: student4).update!(workflow_state: "unsubmitted", submission_type: nil)
+        end
+
+        it "skips the should_review rule and allocates other available submissions" do
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(3)
+
+          allocated_user_ids = result[:assessment_requests].map(&:user_id)
+          # Should not include student4 since they didn't submit
+          expect(allocated_user_ids).not_to include(student4.id)
+          # Should allocate the three students who did submit
+          expect(allocated_user_ids).to match_array([student1.id, student2.id, student3.id])
+        end
+      end
+
+      context "when only should_review rules exist" do
+        before do
+          AllocationRule.create!(
+            course:,
+            assignment:,
+            assessor:,
+            assessee: student1,
+            must_review: false,
+            review_permitted: true
+          )
+          AllocationRule.create!(
+            course:,
+            assignment:,
+            assessor:,
+            assessee: student2,
+            must_review: false,
+            review_permitted: true
+          )
+        end
+
+        it "allocates all should_review submissions when they match the required count" do
+          assignment.update!(peer_review_count: 2)
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(2)
+          expect(result[:assessment_requests].map(&:user_id)).to match_array([student1.id, student2.id])
+        end
+
+        it "includes regular submissions when should_review count is insufficient" do
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(3)
+          allocated_user_ids = result[:assessment_requests].map(&:user_id)
+          # Should review first
+          expect(allocated_user_ids[0..1]).to match_array([student1.id, student2.id])
+          # Regular submission last
+          expect(allocated_user_ids.last).to eq(student3.id)
+        end
+      end
     end
 
     context "when peer_review_count is 1" do
