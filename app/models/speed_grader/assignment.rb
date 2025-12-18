@@ -278,14 +278,12 @@ module SpeedGrader
         end
       end
 
-      discussion_checkpoints_enabled = assignment.context.discussion_checkpoints_enabled?
       if assignment.submission_types.include?("discussion_topic")
         res[:student_entries] = assignment.discussion_topic.discussion_entries.pluck(:user_id, :id).group_by(&:first).transform_values { |entries| entries.map(&:last) }
       end
 
       res[:submissions] =
         submissions.map do |sub|
-          sub.workflow_state = "pending_review" if sub.checkpoints_needs_grading? && discussion_checkpoints_enabled
           submission_methods = %i[
             submission_history
             late
