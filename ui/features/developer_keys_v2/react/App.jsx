@@ -174,7 +174,7 @@ class DeveloperKeysApp extends React.Component {
             `You are being notified because this Canvas instance has recently received requests which would be blocked. You can read more in the *API Changelog* and learn how to mitigate this change in the blog post linked there.`,
             {
               wrappers: [
-                `<a data-pendo='api-cdn-change-log' target='_blank' href='https://community.instructure.com/en/discussion/626858/2025-api-and-cli-change-log/p1' style='text-decoration: underline'>$1</a>`,
+                `<a data-pendo='api-cdn-change-log' target='_blank' href='https://community.instructure.com/en/discussion/664378/2026-api-and-cli-change-log' style='text-decoration: underline'>$1</a>`,
               ],
             },
           ),
