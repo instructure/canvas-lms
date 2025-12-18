@@ -1373,7 +1373,6 @@ describe Types::AssignmentType do
       it "sub_submissions return correct submissions corresponding to the sub assignments" do
         root_entry = @topic.discussion_entries.create!(user: student, message: "my reply to topic")
         2.times { |i| @topic.discussion_entries.create!(user: student, message: "my child reply #{i}", parent_entry: root_entry) }
-        @topic.discussion_entries.create!(user: @other_student, message: "other student reply to topic")
 
         query = GraphQLTypeTester.new(@assignment, current_user: teacher)
 

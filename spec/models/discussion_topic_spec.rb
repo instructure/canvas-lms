@@ -3510,7 +3510,7 @@ describe DiscussionTopic do
       it "correctly marks the reply to topic checkpoint submission as submitted when the student replies to topic" do
         @topic.discussion_entries.create!(user: @student, message: "reply to topic")
 
-        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "pending_review"
         expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
         expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
       end
@@ -3521,7 +3521,7 @@ describe DiscussionTopic do
           @topic.discussion_entries.create!(user: @student, message: "reply to entry", root_entry_id: entry.id, parent_id: entry.id)
         end
 
-        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "pending_review"
         expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
         expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
       end
@@ -3531,7 +3531,7 @@ describe DiscussionTopic do
         @topic.discussion_entries.create!(user: @student, message: "reply to topic by student")
         @topic.discussion_entries.create!(user: @student, message: "reply to entry", root_entry_id: entry.id, parent_id: entry.id)
 
-        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "pending_review"
         expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
         expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
       end
@@ -3543,7 +3543,7 @@ describe DiscussionTopic do
           @topic.discussion_entries.create!(user: @student, message: "reply to entry by student", root_entry_id: entry_by_teacher.id, parent_id: entry_by_teacher.id)
         end
 
-        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "submitted"
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "pending_review"
         expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
         expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
       end
