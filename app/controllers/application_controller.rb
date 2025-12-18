@@ -3499,6 +3499,16 @@ class ApplicationController < ActionController::Base
                                                    })
     ).build_with_signature
 
+    # Calculate basename by removing the quiz subroute (full_path) from the current path
+    # E.g., /courses/3/assignments/9/moderation/1 -> /courses/3/assignments/9
+    basename = if params[:full_path].present?
+                 request.path.sub(params[:full_path], "")
+               else
+                 request.path
+               end
+
+    signed_launch_data[:basename] = basename
+
     js_env(NEW_QUIZZES: signed_launch_data)
 
     add_body_class("native-new-quizzes full-width")

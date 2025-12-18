@@ -105,6 +105,7 @@ export interface NewQuizzesContext {
     platform?: string
     lang?: string
   }
+  basename: string
   signature: string
 }
 
