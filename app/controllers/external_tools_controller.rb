@@ -2149,6 +2149,16 @@ class ExternalToolsController < ApplicationController
     # Build launch data with item banks context
     signed_launch_data = build_item_banks_launch_data(placement)
 
+    # Calculate basename removing the subroute (full_path) from the current path
+    # E.g., /courses/3/external_tools/7/banks -> /courses/3/external_tools/7
+    basename = if params[:full_path].present?
+                 request.path.sub(params[:full_path], "")
+               else
+                 request.path
+               end
+
+    signed_launch_data[:basename] = basename
+
     js_env(NEW_QUIZZES: signed_launch_data)
 
     add_body_class("native-new-quizzes full-width")

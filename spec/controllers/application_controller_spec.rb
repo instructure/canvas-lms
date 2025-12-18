@@ -3919,3 +3919,75 @@ RSpec.describe ApplicationController, "#add_ignite_agent_bundle?" do
     expect(controller.send(:add_ignite_agent_bundle?)).to be false
   end
 end
+
+RSpec.describe ApplicationController, "#render_native_new_quizzes" do
+  let(:course) { course_model }
+  let(:assignment) { assignment_model(context: course) }
+  let(:teacher) { teacher_in_course(course:, active_all: true).user }
+  let(:tool) do
+    course.context_external_tools.create!(
+      name: "New Quizzes",
+      url: "http://example.com/launch",
+      consumer_key: "key",
+      shared_secret: "secret",
+      tool_id: "Quizzes 2"
+    )
+  end
+  let(:request_mock) do
+    double(path: "/courses/3/assignments/9/moderation/1")
+  end
+
+  before do
+    user_session(teacher)
+    allow(controller).to receive(:add_new_quizzes_bundle)
+    allow(controller).to receive(:add_body_class)
+    allow(controller).to receive(:render)
+    allow(controller).to receive(:js_env).and_call_original
+    controller.instance_variable_set(:@context, course)
+    controller.instance_variable_set(:@assignment, assignment)
+    controller.instance_variable_set(:@tool, tool)
+    controller.instance_variable_set(:@current_user, teacher)
+    controller.instance_variable_set(:@domain_root_account, Account.default)
+    allow(controller).to receive(:request).and_return(request_mock)
+  end
+
+  it "sets basename in js_env when full_path param is present" do
+    allow(controller).to receive(:params).and_return({ full_path: "/moderation/1" })
+    launch_data = { test: "data" }
+    allow_any_instance_of(NewQuizzes::LaunchDataBuilder).to receive(:build_with_signature).and_return(launch_data)
+
+    expect(controller).to receive(:js_env) do |data|
+      expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/assignments/9")
+      expect(data[:NEW_QUIZZES][:test]).to eq("data")
+    end
+
+    controller.send(:render_native_new_quizzes)
+  end
+
+  it "uses request path as basename when full_path param is not present" do
+    allow(controller).to receive(:params).and_return({})
+    launch_data = { test: "data" }
+    allow_any_instance_of(NewQuizzes::LaunchDataBuilder).to receive(:build_with_signature).and_return(launch_data)
+
+    expect(controller).to receive(:js_env) do |data|
+      expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/assignments/9/moderation/1")
+      expect(data[:NEW_QUIZZES][:test]).to eq("data")
+    end
+
+    controller.send(:render_native_new_quizzes)
+  end
+
+  it "preserves other NEW_QUIZZES data in js_env" do
+    allow(controller).to receive(:params).and_return({ full_path: "/moderation/1" })
+    launch_data = { test: "data", other: "value" }
+    allow_any_instance_of(NewQuizzes::LaunchDataBuilder).to receive(:build_with_signature).and_return(launch_data)
+
+    expect(controller).to receive(:js_env) do |data|
+      expect(data[:NEW_QUIZZES][:test]).to eq("data")
+      expect(data[:NEW_QUIZZES][:other]).to eq("value")
+      expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/assignments/9")
+    end
+
+    controller.send(:render_native_new_quizzes)
+  end
+end
