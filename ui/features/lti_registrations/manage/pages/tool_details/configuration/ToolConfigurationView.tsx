@@ -17,11 +17,12 @@
  */
 
 import * as React from 'react'
-import {useOutletContext, Link as RouterLink} from 'react-router-dom'
+import {useOutletContext, Link as RouterLink, useNavigate} from 'react-router-dom'
 import type {ToolDetailsOutletContext} from '../ToolDetails'
 import {View, type ViewProps} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconCopyLine, IconRefreshLine} from '@instructure/ui-icons'
@@ -133,6 +134,7 @@ const LaunchTypeSpecificSettingsSection = (
 export const ToolConfigurationView = () => {
   const {registration} = useOutletContext<ToolDetailsOutletContext>()
   const mutation = useResetLtiRegistration()
+  const navigate = useNavigate()
 
   const customFields = Object.entries(registration.overlaid_configuration.custom_fields || {})
   const redirectUris = registration.overlaid_configuration.redirect_uris || []
@@ -497,8 +499,9 @@ export const ToolConfigurationView = () => {
             <Button
               data-pendo="lti-registrations-edit-config"
               color="primary"
-              as={RouterLink}
-              to={`/manage/${registration.id}/configuration/edit`}
+              onClick={e => {
+                navigate(`/manage/${registration.id}/configuration/edit`)
+              }}
             >
               {I18n.t('Edit')}
             </Button>
