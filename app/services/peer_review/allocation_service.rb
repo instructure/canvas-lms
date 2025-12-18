@@ -156,6 +156,12 @@ class PeerReview::AllocationService < ApplicationService
                                          .where(must_review: true, review_permitted: true)
                                          .pluck(:assessee_id)
 
+    should_review_user_ids = AllocationRule.active
+                                           .where(assignment: @assignment)
+                                           .where(assessor_id: @assessor.id)
+                                           .where(must_review: false, review_permitted: true)
+                                           .pluck(:assessee_id)
+
     submission_ids = available_submissions.map(&:id)
     review_counts = AssessmentRequest
                     .where(asset_type: "Submission", asset_id: submission_ids)
@@ -163,13 +169,15 @@ class PeerReview::AllocationService < ApplicationService
                     .count
 
     must_review_subs = available_submissions.select { |sub| must_review_user_ids.include?(sub.user_id) }
-    regular_subs = available_submissions - must_review_subs
+    should_review_subs = available_submissions.select { |sub| should_review_user_ids.include?(sub.user_id) }
+    regular_subs = available_submissions - must_review_subs - should_review_subs
 
     # Sort submissions by review count (fewest first), then by submitted_at
     must_review_subs.sort_by! { |sub| [review_counts[sub.id] || 0, sub.submitted_at] }
+    should_review_subs.sort_by! { |sub| [review_counts[sub.id] || 0, sub.submitted_at] }
     regular_subs.sort_by! { |sub| [review_counts[sub.id] || 0, sub.submitted_at] }
 
-    selected = must_review_subs + regular_subs
+    selected = must_review_subs + should_review_subs + regular_subs
     selected.take(count)
   end
 
