@@ -19,7 +19,7 @@ import {z} from 'zod'
 import {ZNextPageInfo} from '../PaginatedResult'
 import {executeQuery} from '@canvas/graphql'
 import {ZSubmissionType} from '../assignments/getAssignments'
-import {buildGraphQLQuery, numberToLetters} from '../buildGraphQLQuery'
+import {buildGraphQLQuery, encode} from '../buildGraphQLQuery'
 
 const ZLatePolicyStatus = z.enum(['late', 'missing', 'extended', 'none'])
 
@@ -232,7 +232,7 @@ export const getSubmissions = async (
     name: 'course',
     args: {id: '$courseId'},
     fields: userIds.map(id => {
-      const alias = numberToLetters(parseInt(id, 10))
+      const alias = encode(id)
       const cursor = after?.[alias]
       if (cursor === null) return ''
       return submissionsConnectionNode({alias, after: cursor ?? '', studentIds: [id]})
