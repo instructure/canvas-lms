@@ -23,13 +23,27 @@ import {Submission, Assignment} from '@canvas/assignments/react/AssignmentsPeerR
 
 const apolloClient = createClient()
 
+interface ReviewerSubmission {
+  _id: string
+  id: string
+  attempt: number
+  assignedAssessments: {
+    assetId: string
+    workflowState: string
+    assetSubmissionType: string | null
+  }[]
+}
+
 interface CommentsTrayContentWithApolloProps {
   submission: Submission
   assignment: Assignment
   isPeerReviewEnabled?: boolean
+  reviewerSubmission?: ReviewerSubmission | null
   renderTray: boolean
   closeTray: () => void
   open: boolean
+  onSuccessfulPeerReview: () => void
+  usePeerReviewModal?: boolean
 }
 
 /**

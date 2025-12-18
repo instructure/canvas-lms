@@ -19,9 +19,10 @@
 #
 
 class Loaders::AssessmentRequestLoader < GraphQL::Batch::Loader
-  def initialize(current_user:)
+  def initialize(current_user:, order_by_id: false)
     super()
     @current_user = current_user
+    @order_by_id = order_by_id
   end
 
   # This is somewhat complicated to remove a plethora of N+1s
@@ -33,6 +34,7 @@ class Loaders::AssessmentRequestLoader < GraphQL::Batch::Loader
     assignments_by_shard.each do |shard, assignments|
       assignments.each_slice(1000) do |assignment_slice|
         all_reviews = @current_user.assigned_submission_assessments.shard(shard).for_assignment(assignment_slice)
+        all_reviews = all_reviews.order(:id) if @order_by_id
 
         # Preload associations to prevent N+1 queries in the individual loaders
         ActiveRecord::Associations.preload(all_reviews, %i[asset submission_comments rubric_assessment])

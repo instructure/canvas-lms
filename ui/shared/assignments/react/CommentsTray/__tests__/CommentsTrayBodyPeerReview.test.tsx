@@ -366,4 +366,92 @@ describe('CommentsTrayBody - peer review mode enabled', () => {
     await waitFor(() => expect(onSuccessfulPeerReviewMockFunction).toHaveBeenCalled())
     expect(props.reviewerSubmission.assignedAssessments[0].workflowState).toEqual('completed')
   })
+
+  describe('using assessmentRequestsForCurrentUser', () => {
+    const getPropsWithAssessmentRequests = async (workflowState: string) => {
+      const props = await mockAssignmentAndSubmission()
+      const submissionId = props.submission._id as string
+
+      props.assignment.assessmentRequestsForCurrentUser = [
+        {
+          _id: 'ar-1',
+          workflowState,
+          submission: {
+            _id: submissionId,
+            attempt: 1,
+          },
+        },
+        {
+          _id: 'ar-2',
+          workflowState: 'assigned',
+          submission: {
+            _id: 'other-submission-id',
+            attempt: 1,
+          },
+        },
+      ]
+
+      return {...props, isPeerReviewEnabled: true}
+    }
+
+    it('displays an alert when assessmentRequestsForCurrentUser shows completed workflow state', async () => {
+      const overrides = {
+        SubmissionCommentConnection: {
+          nodes: [{_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', htmlComment: 'test comment'}],
+        },
+      }
+      const comments = await mockComments(overrides)
+      const props = await getPropsWithAssessmentRequests('completed')
+      props.submission.gradeHidden = true
+      const commentProps = {...props, comments}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
+
+      expect(queryByText('Your peer review is complete!')).toBeInTheDocument()
+    })
+
+    it('does not display alert when assessmentRequestsForCurrentUser shows assigned workflow state', async () => {
+      const props = await getPropsWithAssessmentRequests('assigned')
+      props.submission.gradeHidden = true
+      const commentProps = {...props, comments: []}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
+
+      expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
+    })
+
+    it('does not display alert when assignment has rubrics', async () => {
+      const props = await getPropsWithAssessmentRequests('completed')
+      props.assignment.rubric = {id: '123'}
+      props.submission.gradeHidden = true
+      const commentProps = {...props, comments: []}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
+
+      expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
+    })
+
+    it('does not display alert when peer review is not enabled', async () => {
+      const overrides = {
+        SubmissionCommentConnection: {
+          nodes: [{_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', htmlComment: 'test comment'}],
+        },
+      }
+      const comments = await mockComments(overrides)
+      const props = await getPropsWithAssessmentRequests('completed')
+      props.submission.gradeHidden = true
+      props.isPeerReviewEnabled = false
+      const commentProps = {...props, comments}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
+
+      expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
+    })
+
+    it('does not display alert when no matching assessment request is found', async () => {
+      const props = await getPropsWithAssessmentRequests('completed')
+      props.submission._id = 'non-matching-submission-id'
+      props.submission.gradeHidden = true
+      const commentProps = {...props, comments: []}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
+
+      expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
+    })
+  })
 })

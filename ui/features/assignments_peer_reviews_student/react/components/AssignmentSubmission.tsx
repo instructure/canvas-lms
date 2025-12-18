@@ -16,13 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import ErrorShip from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {Submission, Assignment} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
+import {
+  Submission,
+  Assignment,
+  ReviewerSubmission,
+} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import CommentsTrayContentWithApollo from './CommentsTrayContentWithApollo'
@@ -32,25 +36,64 @@ import {Heading} from '@instructure/ui-heading'
 import {calculateMasqueradeHeight} from '@canvas/context-modules/differentiated-modules/utils/miscHelpers'
 import UrlSubmissionDisplay from '@canvas/assignments/react/UrlSubmissionDisplay'
 import FileSubmissionPreview from '@canvas/assignments/react/FileSubmissionPreview'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('peer_reviews_student')
 
 interface AssignmentSubmissionProps {
   submission: Submission
   assignment: Assignment
+  isPeerReviewCompleted: boolean
+  reviewerSubmission?: ReviewerSubmission | null
   isMobile?: boolean
+  handleNextPeerReview: () => void
+  onCommentSubmitted: () => void
+  hasSeenPeerReviewModal: boolean
 }
 
 const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
   submission,
   assignment,
+  isPeerReviewCompleted,
+  reviewerSubmission,
+  handleNextPeerReview,
+  onCommentSubmitted,
   isMobile = false,
+  hasSeenPeerReviewModal,
 }) => {
   const [viewMode, setViewMode] = useState<'paper' | 'plain_text'>('paper')
   const [showComments, setShowComments] = useState(false)
+  const [peerReviewCommentCompleted, setPeerReviewCommentCompleted] =
+    useState(isPeerReviewCompleted)
+  const [initialIsPeerReviewCompleted, setInitialIsPeerReviewCompleted] =
+    useState(isPeerReviewCompleted)
+  const previousSubmissionIdRef = useRef(submission._id)
+
+  useEffect(() => {
+    if (submission._id !== previousSubmissionIdRef.current) {
+      // reset initialIsPeerReviewCompleted value
+      setInitialIsPeerReviewCompleted(isPeerReviewCompleted)
+      previousSubmissionIdRef.current = submission._id
+    }
+  }, [submission._id, isPeerReviewCompleted])
 
   const handleToggleComments = () => {
     setShowComments(!showComments)
+  }
+
+  const handlePeerReviewCompletion = () => {
+    if (peerReviewCommentCompleted) {
+      // reset the value
+      setPeerReviewCommentCompleted(false)
+      handleNextPeerReview()
+    } else {
+      showFlashAlert({
+        message: I18n.t(
+          'Before you can submit this peer review, you must leave a comment for your peer.',
+        ),
+        type: 'error',
+      })
+    }
   }
 
   const renderTextEntry = () => {
@@ -148,7 +191,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
     <View
       as="div"
       minHeight="calc(720px - 10.75rem)"
-      height="calc(100vh - 23rem)"
+      height="calc(100vh - 22rem)"
       overflowY="hidden"
     >
       <Flex as="div" height="100%" alignItems="start">
@@ -187,9 +230,15 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
                   submission={submission}
                   assignment={assignment}
                   isPeerReviewEnabled={true}
+                  reviewerSubmission={reviewerSubmission}
                   renderTray={isMobile}
                   closeTray={() => setShowComments(false)}
                   open={showComments}
+                  onSuccessfulPeerReview={() => {
+                    setPeerReviewCommentCompleted(true)
+                    onCommentSubmitted()
+                  }}
+                  usePeerReviewModal={false}
                 />
               </Flex.Item>
             </Flex>
@@ -228,15 +277,18 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
                 {showComments ? I18n.t('Hide Comments') : I18n.t('Show Comments')}
               </Button>
             </Flex.Item>
-            <Flex.Item>
-              <Button
-                color="primary"
-                data-testid="submit-peer-review-button"
-                size={isMobile ? 'small' : 'medium'}
-              >
-                {I18n.t('Submit Peer Review')}
-              </Button>
-            </Flex.Item>
+            {!initialIsPeerReviewCompleted && !hasSeenPeerReviewModal && (
+              <Flex.Item>
+                <Button
+                  color="primary"
+                  data-testid="submit-peer-review-button"
+                  size={isMobile ? 'small' : 'medium'}
+                  onClick={handlePeerReviewCompletion}
+                >
+                  {I18n.t('Submit Peer Review')}
+                </Button>
+              </Flex.Item>
+            )}
           </Flex>
         </View>
       </footer>

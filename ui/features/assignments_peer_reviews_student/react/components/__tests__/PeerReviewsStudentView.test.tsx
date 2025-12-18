@@ -25,6 +25,7 @@ import PeerReviewsStudentView from '../PeerReviewsStudentView'
 import {executeQuery} from '@canvas/graphql'
 import {useAllocatePeerReviews} from '../../hooks/useAllocatePeerReviews'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {useReviewerSubmissionQuery} from '../../hooks/useReviewerSubmissionQuery'
 
 vi.mock('@canvas/graphql', () => ({
   executeQuery: vi.fn(),
@@ -40,8 +41,13 @@ vi.mock('../../hooks/useAllocatePeerReviews', () => ({
   useAllocatePeerReviews: vi.fn(),
 }))
 
+vi.mock('../../hooks/useReviewerSubmissionQuery', () => ({
+  useReviewerSubmissionQuery: jest.fn(),
+}))
+
 const mockExecuteQuery = vi.mocked(executeQuery)
 const mockUseAllocatePeerReviews = vi.mocked(useAllocatePeerReviews)
+const mockUseReviewerSubmissionQuery = vi.mocked(useReviewerSubmissionQuery)
 
 type PeerReviewsStudentViewProps = React.ComponentProps<typeof PeerReviewsStudentView>
 
@@ -80,10 +86,20 @@ describe('PeerReviewsStudentView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     queryClient.clear()
+    window.ENV = {...globalEnv, ...ENV}
     mockUseAllocatePeerReviews.mockReturnValue({
       mutate: mockMutate,
     } as any)
-    window.ENV = {...globalEnv, ...ENV}
+    mockUseReviewerSubmissionQuery.mockReturnValue({
+      data: {
+        _id: 'reviewer-sub-1',
+        id: 'U3VibWlzc2lvbi0x',
+        attempt: 1,
+        assignedAssessments: [],
+      },
+      isLoading: false,
+      isError: false,
+    } as any)
   })
 
   it('renders loading state initially', () => {
@@ -100,7 +116,37 @@ describe('PeerReviewsStudentView', () => {
     const {getByText} = setup()
 
     await waitFor(() => {
-      expect(getByText('Failed to load assignment details')).toBeInTheDocument()
+      expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
+    })
+  })
+
+  it('renders error state when query returns null data', async () => {
+    mockExecuteQuery.mockResolvedValueOnce(null)
+
+    const {getByText} = setup()
+
+    await waitFor(() => {
+      expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
+    })
+  })
+
+  it('renders error state when query returns undefined assignment', async () => {
+    mockExecuteQuery.mockResolvedValueOnce({assignment: undefined})
+
+    const {getByText} = setup()
+
+    await waitFor(() => {
+      expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
+    })
+  })
+
+  it('renders error state when query returns empty object', async () => {
+    mockExecuteQuery.mockResolvedValueOnce({})
+
+    const {getByText} = setup()
+
+    await waitFor(() => {
+      expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
     })
   })
 
@@ -1179,6 +1225,28 @@ describe('PeerReviewsStudentView', () => {
 
       await waitFor(() => {
         expect(mockMutate).not.toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('useReviewerSubmissionQuery', () => {
+    it('called with correct parameters', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '22',
+          name: 'Hook Parameters Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {count: 1},
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      setup({assignmentId: '22'})
+
+      await waitFor(() => {
+        expect(mockUseReviewerSubmissionQuery).toHaveBeenCalledWith('22', '123')
       })
     })
   })

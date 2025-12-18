@@ -47,6 +47,7 @@ const createWrapper = () => {
 describe('useAssignmentQuery', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockExecuteQuery.mockClear()
   })
 
   it('initializes with loading set to true and returns assignment data successfully', async () => {

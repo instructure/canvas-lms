@@ -2748,6 +2748,85 @@ describe Submission do
         @course.account.save!
         expect(@submission.grants_right?(@student, :comment)).to be false
       end
+
+      context "for peer reviewers" do
+        before(:once) do
+          @assignment.update!(peer_reviews: true, submission_types: "online_text_entry")
+          @peer_reviewer = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+          @peer_reviewer_submission = @assignment.submissions.find_by(user: @peer_reviewer)
+          AssessmentRequest.create!(
+            assessor: @peer_reviewer,
+            assessor_asset: @peer_reviewer_submission,
+            asset: @submission,
+            user: @student
+          )
+        end
+
+        context "when peer_review_allocation_and_grading feature is disabled" do
+          before do
+            @course.root_account.disable_feature!(:peer_review_allocation_and_grading)
+          end
+
+          it "allows peer reviewer to read and comment when they have submitted" do
+            @assignment.submit_homework(@peer_reviewer, body: "my submission")
+            expect(@submission.grants_right?(@peer_reviewer, :read)).to be true
+            expect(@submission.grants_right?(@peer_reviewer, :comment)).to be true
+            expect(@submission.grants_right?(@peer_reviewer, :make_group_comment)).to be true
+          end
+
+          it "does not allow peer reviewer to read and comment when they have not submitted" do
+            expect(@submission.grants_right?(@peer_reviewer, :read)).to be false
+            expect(@submission.grants_right?(@peer_reviewer, :comment)).to be false
+            expect(@submission.grants_right?(@peer_reviewer, :make_group_comment)).to be false
+          end
+        end
+
+        context "when peer_review_allocation_and_grading feature is enabled" do
+          before do
+            @course.root_account.enable_feature!(:peer_review_allocation_and_grading)
+          end
+
+          context "when peer_review_submission_required is false" do
+            before do
+              @assignment.update!(peer_review_submission_required: false)
+              @submission.reload
+            end
+
+            it "allows peer reviewer to read and comment even without submission" do
+              expect(@submission.grants_right?(@peer_reviewer, :read)).to be true
+              expect(@submission.grants_right?(@peer_reviewer, :comment)).to be true
+              expect(@submission.grants_right?(@peer_reviewer, :make_group_comment)).to be true
+            end
+
+            it "allows peer reviewer to read and comment with submission" do
+              @assignment.submit_homework(@peer_reviewer, body: "my submission")
+              expect(@submission.grants_right?(@peer_reviewer, :read)).to be true
+              expect(@submission.grants_right?(@peer_reviewer, :comment)).to be true
+              expect(@submission.grants_right?(@peer_reviewer, :make_group_comment)).to be true
+            end
+          end
+
+          context "when peer_review_submission_required is true" do
+            before do
+              @assignment.update!(peer_review_submission_required: true)
+              @submission.reload
+            end
+
+            it "allows peer reviewer to read and comment when they have submitted" do
+              @assignment.submit_homework(@peer_reviewer, body: "my submission")
+              expect(@submission.grants_right?(@peer_reviewer, :read)).to be true
+              expect(@submission.grants_right?(@peer_reviewer, :comment)).to be true
+              expect(@submission.grants_right?(@peer_reviewer, :make_group_comment)).to be true
+            end
+
+            it "does not allow peer reviewer to read and comment when they have not submitted" do
+              expect(@submission.grants_right?(@peer_reviewer, :read)).to be false
+              expect(@submission.grants_right?(@peer_reviewer, :comment)).to be false
+              expect(@submission.grants_right?(@peer_reviewer, :make_group_comment)).to be false
+            end
+          end
+        end
+      end
     end
 
     describe "can :download" do

@@ -75,3 +75,18 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
     }
   }
 `
+
+export const REVIEWER_SUBMISSION_QUERY = gql`
+  query GetReviewerSubmission($assignmentId: ID!, $userId: ID!) {
+    submission(assignmentId: $assignmentId, userId: $userId) {
+      _id
+      id
+      attempt
+      assignedAssessments {
+        assetId
+        workflowState
+        assetSubmissionType
+      }
+    }
+  }
+`

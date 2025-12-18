@@ -89,3 +89,14 @@ interface SubmissionNode {
   _id: string
   submissionStatus: string | null
 }
+
+export interface ReviewerSubmission {
+  _id: string
+  id: string
+  attempt: number
+  assignedAssessments: {
+    assetId: string
+    workflowState: string
+    assetSubmissionType: string | null
+  }[]
+}
