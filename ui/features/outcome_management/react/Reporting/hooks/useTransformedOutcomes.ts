@@ -18,21 +18,8 @@
 
 import {StudentRollupData} from '@canvas/outcomes/react/types/rollup'
 
-import type {LMGBOutcomeReporting, LMGBRating, MasteryLevel, Outcome} from '../types'
-import {findRating} from '@canvas/outcomes/react/utils/ratings'
-
-const getMasteryLevelFromRating = (rating: LMGBRating | null): MasteryLevel => {
-  if (!rating) return 'unassessed'
-
-  const lowerCaseDescription = rating.description?.toLowerCase() || ''
-
-  if (lowerCaseDescription.includes('exceeds')) return 'exceeds_mastery'
-  if (lowerCaseDescription.includes('near')) return 'near_mastery'
-  if (lowerCaseDescription.includes('below')) return 'remediation'
-  if (lowerCaseDescription.includes('mastery')) return 'mastery'
-
-  return 'remediation'
-}
+import type {LMGBOutcomeReporting, MasteryLevel, Outcome} from '../types'
+import {getTagIcon} from '@canvas/outcomes/react/utils/icons'
 
 const transformOutcomeData = (
   outcomes: LMGBOutcomeReporting[],
@@ -50,8 +37,8 @@ const transformOutcomeData = (
     const totalAlignmentsCount = outcome.alignments?.length || 0
     const masteryScore = score ?? null
 
-    const rating = score ? findRating(outcome.ratings, score || 0) : null
-    const masteryLevel = getMasteryLevelFromRating(rating)
+    // static score handling will be fixed in https://instructure.atlassian.net/browse/OUTC-504
+    const masteryLevel = getTagIcon(score, outcome.mastery_points) as MasteryLevel
 
     return {
       id: outcome.id,

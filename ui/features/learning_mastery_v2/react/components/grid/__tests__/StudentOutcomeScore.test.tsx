@@ -19,11 +19,11 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {StudentOutcomeScore, StudentOutcomeScoreProps} from '../StudentOutcomeScore'
-import {svgUrl} from '../../../utils/icons'
+import {svgUrl} from '@canvas/outcomes/react/utils/icons'
 import {Outcome, Rating} from '@canvas/outcomes/react/types/rollup'
 import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 
-vi.mock('../../../utils/icons', () => ({
+vi.mock('@canvas/outcomes/react/utils/icons', () => ({
   svgUrl: vi.fn(() => 'http://test.com'),
 }))
 
