@@ -5131,8 +5131,8 @@ describe User do
         root_account.set_feature_flag!(:widget_dashboard, "allowed_on")
       end
 
-      it "returns true" do
-        expect(user.prefers_widget_dashboard?(root_account)).to be true
+      it "returns false (requires opt-in)" do
+        expect(user.prefers_widget_dashboard?(root_account)).to be false
       end
     end
 
@@ -5141,8 +5141,8 @@ describe User do
         root_account.enable_feature!(:widget_dashboard)
       end
 
-      it "returns true" do
-        expect(user.prefers_widget_dashboard?(root_account)).to be true
+      it "returns false (controller force_on logic handles locked state)" do
+        expect(user.prefers_widget_dashboard?(root_account)).to be false
       end
     end
 
@@ -5200,11 +5200,16 @@ describe User do
         domain_root_account.enable_feature!(:widget_dashboard)
       end
 
-      # Now should return true based on domain_root_account only
+      # Should still return false when preference is nil (requires explicit opt-in)
       # The cross-shard account's feature flag should be ignored
+      expect(user.prefers_widget_dashboard?(domain_root_account)).to be false
+
+      # Verify user preference override works (explicitly opt in)
+      user.preferences[:widget_dashboard_user_preference] = true
+      user.save!
       expect(user.prefers_widget_dashboard?(domain_root_account)).to be true
 
-      # Verify user preference override still works
+      # Verify user preference override works (explicitly opt out)
       user.preferences[:widget_dashboard_user_preference] = false
       user.save!
       expect(user.prefers_widget_dashboard?(domain_root_account)).to be false

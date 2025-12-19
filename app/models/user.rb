@@ -2130,19 +2130,13 @@ class User < ActiveRecord::Base
     true
   end
 
-  def prefers_widget_dashboard?(domain_root_account, flag = nil)
+  def prefers_widget_dashboard?(_domain_root_account, _flag = nil)
     # Explicit preference takes priority
     return preferences[:widget_dashboard_user_preference] unless preferences[:widget_dashboard_user_preference].nil?
 
-    # Default based on feature flag state on the domain root account:
-    # - "allowed" state: default to FALSE (opt-in required)
-    # - "allowed_on" state: default to TRUE (opt-out available)
-    # - "on" state: enabled for everyone
-    return false unless domain_root_account
-
-    # Use provided flag to avoid redundant lookups, or fetch if not provided
-    flag ||= domain_root_account.lookup_feature_flag(:widget_dashboard)
-    flag&.enabled? || false
+    # Require explicit opt-in for both "allowed" and "allowed_on" states
+    # When preference is nil, return false
+    false
   end
 
   def auto_show_cc?
