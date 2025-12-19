@@ -256,9 +256,9 @@ RSpec.describe ApplicationController do
             expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
           end
 
-          it "is set to true when feature flag is in 'allowed_on' state and user has no preference" do
+          it "is set to false when feature flag is in 'allowed_on' state and user has no preference (requires opt-in)" do
             Account.default.set_feature_flag!(:widget_dashboard, "allowed_on")
-            expect(controller.js_env[:widget_dashboard_overridable]).to be true
+            expect(controller.js_env[:widget_dashboard_overridable]).to be false
           end
 
           it "is not set when feature flag is in 'on' state" do
