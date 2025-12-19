@@ -52,6 +52,17 @@ describe Course do
       it_behaves_like "a learning outcome context"
     end
 
+    describe "accessibility_course_statistic association" do
+      it "has one accessibility course statistic" do
+        @course.save!
+        stat = AccessibilityCourseStatistic.create!(
+          course: @course,
+          active_issue_count: 5
+        )
+        expect(@course.accessibility_course_statistic).to eq(stat)
+      end
+    end
+
     it "re-runs SubmissionLifecycleManager if enrollment term changes" do
       @course.save!
       @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
