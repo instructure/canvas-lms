@@ -27,7 +27,7 @@ class ItemBanksController < ApplicationController
   def show
     return render status: :not_found, template: "shared/errors/404_message" unless ams_integration_enabled?
 
-    js_env(context_url: context_url(@context, :context_item_banks_url))
+    js_env(context_url: named_context_url(@context, :context_item_banks_url))
     remote_env(ams:
       {
         launch_url: Services::Ams.item_management_launch_url,
