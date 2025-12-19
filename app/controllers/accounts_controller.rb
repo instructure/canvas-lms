@@ -2152,6 +2152,17 @@ class AccountsController < ApplicationController
     render html: '<div id="account-calendar-settings-container"></div>'.html_safe, layout: true
   end
 
+  def accessibility
+    return render_unauthorized_action unless @account.can_see_accessibility_tab?(@current_user)
+
+    @page_title = t("Accessibility")
+    add_crumb @page_title
+    page_has_instui_topnav
+    set_active_tab "accessibility"
+
+    render html: "Accessibility placeholder".html_safe, layout: true
+  end
+
   def format_avatar_count(count = 0)
     (count > 99) ? "99+" : count
   end
