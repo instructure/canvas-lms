@@ -230,6 +230,36 @@ RSpec.describe Mutations::UpdateWidgetDashboardConfig do
     end
   end
 
+  context "todo list widget validation" do
+    it "accepts valid todo filter values" do
+      %w[incomplete_items complete_items all].each do |filter_value|
+        filters = { "filter" => filter_value }
+        result = run_mutation(widgetId: "todo-list-widget", filters:)
+
+        expect(result["errors"]).to be_nil, "Expected no errors for filter value '#{filter_value}', got: #{result["errors"].inspect}"
+        expect(result.dig("data", "updateWidgetDashboardConfig", "widgetId")).to eq("todo-list-widget")
+      end
+    end
+
+    it "rejects invalid todo filter values" do
+      filters = { "filter" => "invalid" }
+      result = run_mutation(widgetId: "todo-list-widget", filters:)
+
+      expect(result.dig("data", "updateWidgetDashboardConfig")).to be_nil
+      expect(result["errors"]).not_to be_nil
+      expect(result["errors"][0]["message"]).to include("filter must be one of: incomplete_items, complete_items, all")
+    end
+
+    it "rejects invalid keys for todo list widget" do
+      filters = { "filter" => "incomplete_items", "invalidKey" => "value" }
+      result = run_mutation(widgetId: "todo-list-widget", filters:)
+
+      expect(result.dig("data", "updateWidgetDashboardConfig")).to be_nil
+      expect(result["errors"]).not_to be_nil
+      expect(result["errors"][0]["message"]).to include("invalid filter keys for todo list widget")
+    end
+  end
+
   context "unknown widget types" do
     it "accepts generic JSON structures for unknown widgets" do
       filters = {
