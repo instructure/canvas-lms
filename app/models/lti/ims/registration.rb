@@ -44,6 +44,7 @@ class Lti::IMS::Registration < ApplicationRecord
   TOOL_ID_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/tool_id".freeze
   VENDOR_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/vendor".freeze
   CONTENT_MIGRATION_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/content_migration".freeze
+  DISABLE_REINSTALL_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/disable_reinstall".freeze
 
   validates :redirect_uris,
             :initiate_login_uri,
@@ -315,6 +316,10 @@ class Lti::IMS::Registration < ApplicationRecord
 
   def tool_id
     lti_tool_configuration[TOOL_ID_EXTENSION]
+  end
+
+  def reinstall_disabled?
+    lti_tool_configuration[DISABLE_REINSTALL_EXTENSION] == true
   end
 
   def vendor

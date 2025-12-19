@@ -391,7 +391,7 @@ export const ToolDetailsInner = ({
                   </Button>
                 )}
 
-                {typeof dynamicRegistrationUrl === 'string' ? (
+                {typeof dynamicRegistrationUrl === 'string' && !registration.reinstall_disabled ? (
                   <Button
                     color="primary"
                     onClick={() => {
