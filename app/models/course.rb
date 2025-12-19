@@ -327,6 +327,8 @@ class Course < ActiveRecord::Base
   has_many :accessibility_issues, dependent: :destroy
   has_many :allocation_rules, dependent: :destroy
 
+  has_one :accessibility_course_statistic, dependent: :destroy
+
   prepend Profile::Association
 
   before_create :set_restrict_quantitative_data_when_needed
