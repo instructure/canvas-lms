@@ -22,7 +22,10 @@ import {uniqueId} from 'es-toolkit/compat'
 import htmlEscape from '@instructure/html-escape'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import {enhanceUserContent} from '@instructure/canvas-rce'
+// These imports are this specific on purpose. The RCE uses lots of barrel imports/imports, which
+// rspack struggles to optimize, resulting in a much, much larger bundle that includes far too many
+// unnecessary packages.
+import {enhanceUserContent} from '@instructure/canvas-rce/es/enhance-user-content/enhance_user_content'
 import {makeAllExternalLinksExternalLinks} from '@instructure/canvas-rce/es/enhance-user-content/external_links'
 import {getMountPoint} from '@canvas/top-navigation/react/TopNavPortalBase'
 import './instructure_helper'

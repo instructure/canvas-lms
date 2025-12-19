@@ -102,7 +102,7 @@ module.exports = {
       chunks: 'all',
       cacheGroups: {
         react: {
-          test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+          test: /^(?:(?!node_modules).)*[\\/]node_modules[\\/](react|react-dom)[\\/]/,
           name: 'react',
           chunks: 'all',
         },

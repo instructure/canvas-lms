@@ -18,13 +18,15 @@
 
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import React from 'react'
+import React, {lazy, Suspense} from 'react'
 import {Outlet, ScrollRestoration} from 'react-router-dom'
 import {useNewLoginData} from '../context'
-import {AppNavBar, FooterLinks, GlobalStyle, InstructureLogo, LoginLogo} from '../shared'
+import {FooterLinks, GlobalStyle, InstructureLogo, LoginLogo} from '../shared'
 import ContentLayout from './ContentLayout'
 
-export const LoginLayout = () => {
+const AppNavBar = lazy(() => import('../shared/AppNavBar'))
+
+const LoginLayout = () => {
   const {loginLogoUrl} = useNewLoginData()
 
   return (
@@ -35,7 +37,9 @@ export const LoginLayout = () => {
       <View as="div" background="primary" height="100vh">
         <Flex direction="column" height="100%">
           <Flex.Item as="header" width="100%">
-            <AppNavBar />
+            <Suspense fallback={<div />}>
+              <AppNavBar />
+            </Suspense>
           </Flex.Item>
 
           <Flex.Item shouldGrow={true} overflowX="hidden">
@@ -68,3 +72,5 @@ export const LoginLayout = () => {
     </>
   )
 }
+
+export default LoginLayout
