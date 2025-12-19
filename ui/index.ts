@@ -27,7 +27,6 @@ import {captureException} from '@sentry/browser'
 // true modules that we use in this file
 import ready from '@instructure/ready'
 import splitAssetString from '@canvas/util/splitAssetString'
-import {Mathml} from '@instructure/canvas-rce'
 import {Capabilities as C, up} from '@canvas/engine'
 import {loadReactRouter} from './boot/initializers/router'
 import loadLocale from './loadLocale'
@@ -116,7 +115,7 @@ const advanceReadiness = (target: string) => {
   }
 }
 
-function afterDocumentReady() {
+async function afterDocumentReady() {
   Promise.all((window.deferredBundles || []).map(loadBundle)).then(() => {
     advanceReadiness('deferredBundles')
   })
@@ -131,7 +130,7 @@ function afterDocumentReady() {
   loadNewUserTutorials()
 
   if (!ENV.FEATURES.explicit_latex_typesetting) {
-    setupMathML()
+    await setupMathML()
   }
 
   // Only import the module if the persisted state indicates it
@@ -147,7 +146,8 @@ function afterDocumentReady() {
 }
 
 const RCE_HTML_EDITOR_CLASS = 'RceHtmlEditor'
-function setupMathML() {
+async function setupMathML() {
+  const {Mathml} = await import('@instructure/canvas-rce/es/enhance-user-content/mathml')
   const features = {
     new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
     explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,

@@ -18,7 +18,7 @@
 
 import {act, render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
-import {MemoryRouter, Routes} from 'react-router-dom'
+import {MemoryRouter, Routes, Outlet} from 'react-router-dom'
 import {useNewLoginData} from '../../context'
 import {NewLoginRoutes} from '../NewLoginRoutes'
 
@@ -29,6 +29,12 @@ vi.mock('../../pages/register/Landing', () => ({default: () => <div>Register Lan
 vi.mock('../../pages/register/Student', () => ({default: () => <div>Register Student Page</div>}))
 vi.mock('../../pages/register/Parent', () => ({default: () => <div>Register Parent Page</div>}))
 vi.mock('../../pages/register/Teacher', () => ({default: () => <div>Register Teacher Page</div>}))
+vi.mock('../../layouts/LoginLayout', () => ({
+  default: () => {
+    return <Outlet />
+  },
+}))
+vi.mock('../../shared/HelpTray', () => ({default: () => null}))
 vi.mock('@instructure/ui-img', () => {
   const Img = ({src, alt}: {src: string; alt: string}) => <img src={src} alt={alt} />
   return {Img}

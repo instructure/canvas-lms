@@ -16,7 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {mediaCommentThumbnail} from '@instructure/canvas-rce'
+// This import is super-specific on purpose. The RCE uses barrel imports/exports, which rspack
+// can't/won't optimize due to side-effects. By being this specific, we keep the bundle size down.
+import mediaCommentThumbnail from '@instructure/canvas-rce/es/enhance-user-content/media_comment_thumbnail'
 
 // public API
 export default ($.fn.mediaCommentThumbnail = function (size = 'normal', keepOriginalText) {
