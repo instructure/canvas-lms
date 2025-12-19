@@ -406,6 +406,51 @@ describe('TodoListWidget', () => {
       expect(screen.getByTestId('todo-filter-select')).toBeInTheDocument()
     })
 
+    it('initializes with persisted filter value', async () => {
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+          },
+        },
+      })
+
+      const persistedPreferences = {
+        dashboard_view: 'cards',
+        hide_dashcard_color_overlays: false,
+        custom_colors: {},
+        widget_dashboard_config: {
+          filters: {
+            'todo-list-widget': {
+              filter: 'complete_items',
+            },
+          },
+        },
+      }
+
+      render(
+        <QueryClientProvider client={queryClient}>
+          <WidgetDashboardProvider
+            sharedCourseData={mockSharedCourseData}
+            preferences={persistedPreferences}
+          >
+            <WidgetDashboardEditProvider>
+              <WidgetLayoutProvider>
+                <TodoListWidget {...buildDefaultProps()} />
+              </WidgetLayoutProvider>
+            </WidgetDashboardEditProvider>
+          </WidgetDashboardProvider>
+        </QueryClientProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+      })
+
+      const filterSelect = screen.getByTestId('todo-filter-select')
+      expect(filterSelect).toHaveValue('Complete')
+    })
+
     it('defaults to Incomplete filter', async () => {
       renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
 

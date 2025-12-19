@@ -33,14 +33,24 @@ import type {BaseWidgetProps} from '../../../types'
 import {usePlannerItems} from './hooks/usePlannerItems'
 import {useCreatePlannerNote} from './hooks/useCreatePlannerNote'
 import {useWidgetDashboard} from '../../../hooks/useWidgetDashboardContext'
+import {useWidgetConfig} from '../../../hooks/useWidgetConfig'
 
 const I18n = createI18nScope('widget_dashboard')
 
-type TodoFilter = 'incomplete_items' | 'complete_items' | undefined
+type TodoFilter = 'incomplete_items' | 'complete_items' | 'all'
+
+function isValidTodoFilter(value: unknown): value is TodoFilter {
+  return value === 'incomplete_items' || value === 'complete_items' || value === 'all'
+}
 
 const TodoListWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false}) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [filter, setFilter] = useState<TodoFilter>('incomplete_items')
+  const [filter, setFilter] = useWidgetConfig<TodoFilter>(
+    widget.id,
+    'filter',
+    'incomplete_items',
+    isValidTodoFilter,
+  )
 
   const dateRange = useMemo(() => {
     const twoWeeksAgo = new Date()
@@ -68,7 +78,7 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false})
     perPage: 5,
     startDate: dateRange.startDate,
     endDate: dateRange.endDate,
-    filter,
+    filter: filter === 'all' ? undefined : filter,
   })
 
   // Reset pagination when filter changes
@@ -122,9 +132,9 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false})
         <View as="div" padding="small 0" borderWidth="0 0 small 0">
           <SimpleSelect
             renderLabel={I18n.t('Filter')}
-            value={filter || 'all'}
+            value={filter}
             onChange={(_e, {value}) => {
-              setFilter(value === 'all' ? undefined : (value as TodoFilter))
+              setFilter(value as TodoFilter)
             }}
             width="200px"
             data-testid="todo-filter-select"

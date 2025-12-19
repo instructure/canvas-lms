@@ -44,6 +44,7 @@ class Mutations::UpdateWidgetDashboardConfig < Mutations::BaseMutation
   end
 
   ANNOUNCEMENTS_WIDGET_ID = "announcements-widget"
+  TODO_LIST_WIDGET_ID = "todo-list-widget"
   COURSE_WORK_WIDGET_IDS = %w[
     course-work-widget
     course-work-combined-widget
@@ -51,6 +52,7 @@ class Mutations::UpdateWidgetDashboardConfig < Mutations::BaseMutation
   ].freeze
 
   VALID_ANNOUNCEMENT_FILTERS = %w[unread read all].freeze
+  VALID_TODO_FILTERS = %w[incomplete_items complete_items all].freeze
   VALID_DATE_FILTERS = %w[not_submitted missing submitted].freeze
 
   private
@@ -73,6 +75,8 @@ class Mutations::UpdateWidgetDashboardConfig < Mutations::BaseMutation
   def validate_filter_structure!(widget_id, filters)
     if widget_id == ANNOUNCEMENTS_WIDGET_ID
       validate_announcements_filters!(filters)
+    elsif widget_id == TODO_LIST_WIDGET_ID
+      validate_todo_list_filters!(filters)
     elsif COURSE_WORK_WIDGET_IDS.include?(widget_id)
       validate_course_work_filters!(filters)
     else
@@ -91,6 +95,20 @@ class Mutations::UpdateWidgetDashboardConfig < Mutations::BaseMutation
     invalid_keys = filters.keys - ["filter"]
     unless invalid_keys.empty?
       raise GraphQL::ExecutionError, "invalid filter keys for announcements widget: #{invalid_keys.join(", ")}"
+    end
+  end
+
+  def validate_todo_list_filters!(filters)
+    if filters.key?("filter")
+      filter_value = filters["filter"]
+      unless filter_value.is_a?(String) && VALID_TODO_FILTERS.include?(filter_value)
+        raise GraphQL::ExecutionError, "filter must be one of: #{VALID_TODO_FILTERS.join(", ")}"
+      end
+    end
+
+    invalid_keys = filters.keys - ["filter"]
+    unless invalid_keys.empty?
+      raise GraphQL::ExecutionError, "invalid filter keys for todo list widget: #{invalid_keys.join(", ")}"
     end
   end
 
