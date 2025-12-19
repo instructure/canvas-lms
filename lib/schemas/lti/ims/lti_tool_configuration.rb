@@ -127,6 +127,7 @@ module Schemas::Lti::IMS
           { type: %w[string null], enum: [nil, *Lti::PrivacyLevelExpander::SUPPORTED_LEVELS] },
         ::Lti::IMS::Registration::TOOL_ID_EXTENSION => { type: %w[string null] },
         ::Lti::IMS::Registration::VENDOR_EXTENSION => { type: %w[string null] },
+        ::Lti::IMS::Registration::DISABLE_REINSTALL_EXTENSION => { type: %w[boolean null] },
         ::Lti::IMS::Registration::CONTENT_MIGRATION_EXTENSION => {
           "type" => "object",
           "required" => %w[

@@ -69,6 +69,7 @@ module Api::V1::Lti::Registration
       json["developer_key_id"] = registration.developer_key&.global_id
       json["ims_registration_id"] = registration.ims_registration&.id
       json["dynamic_registration_url"] = registration.ims_registration&.registration_url
+      json["reinstall_disabled"] = registration.ims_registration&.reinstall_disabled?
       json["manual_configuration_id"] = registration.manual_configuration&.id
 
       if context.root_account.feature_enabled?(:lti_registrations_templates)
