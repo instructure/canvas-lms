@@ -715,6 +715,7 @@ CanvasRails::Application.routes.draw do
     get :rate_limiting, controller: :rate_limiting_settings, action: :index, as: :rate_limiting
     resources :rate_limiting_settings, only: %i[index show create update destroy]
     get :eportfolio_moderation
+    get :accessibility
     get "search" => "accounts#course_user_search", :as => :course_user_search
     post "account_users" => "accounts#add_account_user", :as => :add_account_user
     delete "account_users/:id" => "accounts#remove_account_user", :as => :remove_account_user

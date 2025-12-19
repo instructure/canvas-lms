@@ -2678,4 +2678,79 @@ describe AccountsController do
       expect(InstStatsd::Statsd).to have_received(:distributed_increment).once.with("account_calendars.settings.visit")
     end
   end
+
+  describe "#accessibility" do
+    before(:once) do
+      @account = Account.default
+    end
+
+    context "when unauthenticated" do
+      it "redirects unauthenticated users to login" do
+        get "accessibility", params: { account_id: @account.id }
+        expect(response).to be_redirect
+      end
+    end
+
+    context "when only a11y_checker account feature flag is enabled" do
+      before(:once) do
+        @account.enable_feature!(:a11y_checker)
+        account_admin_user(account: @account)
+      end
+
+      before do
+        user_session(@user)
+      end
+
+      it "returns unauthorized when a11y_checker_account_statistics is disabled" do
+        get "accessibility", params: { account_id: @account.id }
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "when both a11y_checker and a11y_checker_account_statistics feature flags are enabled" do
+      before(:once) do
+        @account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+        account_admin_user(account: @account)
+      end
+
+      before do
+        user_session(@user)
+      end
+
+      it "renders successfully for authorized users" do
+        get "accessibility", params: { account_id: @account.id }
+        expect(response).to be_successful
+        expect(assigns[:page_title]).to eq("Accessibility")
+      end
+
+      it "sets the active tab to accessibility" do
+        get "accessibility", params: { account_id: @account.id }
+        expect(response).to be_successful
+        expect(assigns[:active_tab]).to eq("accessibility")
+      end
+
+      it "returns unauthorized for users without read_course_list permission" do
+        user_model
+        user_session(@user)
+        get "accessibility", params: { account_id: @account.id }
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "when a11y_checker flag is disabled" do
+      before(:once) do
+        account_admin_user(account: @account)
+      end
+
+      before do
+        user_session(@user)
+      end
+
+      it "returns unauthorized when a11y_checker is disabled" do
+        get "accessibility", params: { account_id: @account.id }
+        expect(response).to be_unauthorized
+      end
+    end
+  end
 end
