@@ -39,8 +39,14 @@ export const svgUrl = (points: number | null | undefined, masteryAt: number): st
  *  This code block only works with the default scale for outcomes
  *  After OUT-5226 (https://instructure.atlassian.net/browse/OUT-5226), support
  *  for custom outcome scales will be included
+ *
+ *  Dynamic score handling will be implemented in following ticket:
+ *  https://instructure.atlassian.net/browse/OUTC-504
  */
-const getTagIcon = (points: number | null | undefined, masteryAt: number): OutcomeIconType => {
+export const getTagIcon = (
+  points: number | null | undefined,
+  masteryAt: number,
+): OutcomeIconType => {
   if (points == null) {
     return 'unassessed'
   }
