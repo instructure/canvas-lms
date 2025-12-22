@@ -81,6 +81,61 @@ describe AccessibilityIssue do
         end
       end
     end
+
+    describe "is_syllabus_or_context" do
+      let(:course) { course_model }
+      let(:wiki_page) { wiki_page_model(course:) }
+
+      context "when is_syllabus is true and context is present" do
+        before do
+          subject.course = course
+          subject.is_syllabus = true
+          subject.wiki_page = wiki_page
+        end
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:base]).to include("is_syllabus and context must be mutually exclusive")
+        end
+      end
+
+      context "when is_syllabus is true and context is nil" do
+        before do
+          subject.course = course
+          subject.is_syllabus = true
+          subject.rule_type = Accessibility::Rules::ImgAltRule.id
+        end
+
+        it "is valid" do
+          expect(subject).to be_valid
+        end
+      end
+
+      context "when is_syllabus is false and context is present" do
+        before do
+          subject.course = course
+          subject.is_syllabus = false
+          subject.wiki_page = wiki_page
+          subject.rule_type = Accessibility::Rules::ImgAltRule.id
+        end
+
+        it "is valid" do
+          expect(subject).to be_valid
+        end
+      end
+
+      context "when is_syllabus is false and context is nil" do
+        before do
+          subject.course = course
+          subject.is_syllabus = false
+        end
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:base]).to include("is_syllabus and context must be mutually exclusive")
+        end
+      end
+    end
   end
 
   describe "#allow_nil_param_value?" do

@@ -102,26 +102,30 @@ describe Extensions::ActiveRecord::PolymorphicAssociations do
     let(:error_message) { "Exactly one context must be present" }
 
     context "validations" do
-      context "when none of the context associations are set" do
-        it "adds an error" do
-          subject.valid?
+      context "with optional false" do
+        subject { EstimatedDuration.new }
 
-          expect(subject.errors[:base]).to include(error_message)
+        context "when none of the context associations are set" do
+          it "adds an error" do
+            subject.valid?
+
+            expect(subject.errors[:base]).to include(error_message)
+          end
         end
-      end
 
-      context "when multiple context associations are set" do
-        it "adds an error" do
-          subject.wiki_page = wiki_page_model
-          subject.assignment = assignment_model
-          subject.valid?
+        context "when multiple context associations are set" do
+          it "adds an error" do
+            subject.wiki_page = wiki_page_model
+            subject.assignment = assignment_model
+            subject.valid?
 
-          expect(subject.errors[:base]).to include(error_message)
+            expect(subject.errors[:base]).to include(error_message)
+          end
         end
       end
 
       context "when only one context association is set" do
-        %i[assignment attachment wiki_page].each do |model|
+        %i[announcement assignment attachment discussion_topic wiki_page].each do |model|
           it "does not add an error for #{model}" do
             subject.public_send("#{model}=", public_send("#{model}_model"))
             subject.valid?
@@ -134,7 +138,7 @@ describe Extensions::ActiveRecord::PolymorphicAssociations do
 
     context "context methods" do
       describe "#context" do
-        %i[assignment attachment wiki_page].each do |model|
+        %i[announcement assignment attachment discussion_topic wiki_page].each do |model|
           context "with #{model}" do
             let(:context) { public_send("#{model}_model") }
 
@@ -147,7 +151,7 @@ describe Extensions::ActiveRecord::PolymorphicAssociations do
       end
 
       describe "#context=" do
-        %i[assignment attachment wiki_page].each do |model|
+        %i[announcement assignment attachment discussion_topic wiki_page].each do |model|
           context "with #{model}" do
             let(:context) { public_send("#{model}_model") }
 
@@ -161,7 +165,7 @@ describe Extensions::ActiveRecord::PolymorphicAssociations do
         context "when context is not supported" do
           it "raises an error" do
             expect { subject.context = PluginSetting.new }.to(
-              raise_error(TypeError, "PluginSetting is not one of Assignment, Attachment, WikiPage")
+              raise_error(TypeError, "PluginSetting is not one of Announcement, Assignment, Attachment, DiscussionTopic, WikiPage")
             )
           end
         end
