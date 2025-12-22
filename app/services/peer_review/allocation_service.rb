@@ -113,12 +113,11 @@ class PeerReview::AllocationService < ApplicationService
                                 .for_assessor(@assessor.id)
                                 .pluck(:user_id)
 
-    must_not_review_user_ids = AllocationRule.active
-                                             .where(assignment: @assignment)
-                                             .where(assessor_id: @assessor.id)
-                                             .where(must_review: true, review_permitted: false)
-                                             .pluck(:assessee_id)
+    rules = fetch_allocation_rules
+    must_not_review_user_ids = rules[:must_not_review]
 
+    # Find submissions excluding those by the assessor,
+    # already assigned users, and users in must_not_review allocation rule list
     submissions = @assignment.submissions
                              .active
                              .having_submission
@@ -150,35 +149,48 @@ class PeerReview::AllocationService < ApplicationService
   def select_submissions_to_allocate(available_submissions, count)
     return [] if available_submissions.empty?
 
-    must_review_user_ids = AllocationRule.active
-                                         .where(assignment: @assignment)
-                                         .where(assessor_id: @assessor.id)
-                                         .where(must_review: true, review_permitted: true)
-                                         .pluck(:assessee_id)
+    rules = fetch_allocation_rules
+    review_counts = calculate_review_counts(available_submissions)
 
-    should_review_user_ids = AllocationRule.active
-                                           .where(assignment: @assignment)
-                                           .where(assessor_id: @assessor.id)
-                                           .where(must_review: false, review_permitted: true)
-                                           .pluck(:assessee_id)
+    # Sort by priority tier (1=must, 2=should, 3=regular, 4=should_not), then review count, then date
+    available_submissions.sort_by do |sub|
+      priority = submission_priority(sub.user_id, rules)
+      [priority, review_counts[sub.id] || 0, sub.submitted_at]
+    end.take(count)
+  end
 
-    submission_ids = available_submissions.map(&:id)
-    review_counts = AssessmentRequest
-                    .where(asset_type: "Submission", asset_id: submission_ids)
-                    .group(:asset_id)
-                    .count
+  # Fetches all allocation rules for the assessor in a single query
+  # Returns a hash with rule categories: must_review, should_review, must_not_review, should_not_review
+  def fetch_allocation_rules
+    all_rules = AllocationRule.active
+                              .where(assignment: @assignment, assessor_id: @assessor.id)
+                              .pluck(:must_review, :review_permitted, :assessee_id)
 
-    must_review_subs = available_submissions.select { |sub| must_review_user_ids.include?(sub.user_id) }
-    should_review_subs = available_submissions.select { |sub| should_review_user_ids.include?(sub.user_id) }
-    regular_subs = available_submissions - must_review_subs - should_review_subs
+    {
+      must_review: all_rules.select { |must, permitted, _| must && permitted }.map(&:last),
+      should_review: all_rules.select { |must, permitted, _| !must && permitted }.map(&:last),
+      must_not_review: all_rules.select { |must, permitted, _| must && !permitted }.map(&:last),
+      should_not_review: all_rules.select { |must, permitted, _| !must && !permitted }.map(&:last)
+    }
+  end
 
-    # Sort submissions by review count (fewest first), then by submitted_at
-    must_review_subs.sort_by! { |sub| [review_counts[sub.id] || 0, sub.submitted_at] }
-    should_review_subs.sort_by! { |sub| [review_counts[sub.id] || 0, sub.submitted_at] }
-    regular_subs.sort_by! { |sub| [review_counts[sub.id] || 0, sub.submitted_at] }
+  # Determines priority tier for a submission based on allocation rules
+  # Returns: 1 (must_review), 2 (should_review), 3 (regular), or 4 (should_not_review)
+  def submission_priority(user_id, rules)
+    return 1 if rules[:must_review].include?(user_id)
+    return 2 if rules[:should_review].include?(user_id)
+    return 4 if rules[:should_not_review].include?(user_id)
 
-    selected = must_review_subs + should_review_subs + regular_subs
-    selected.take(count)
+    3 # regular submission (no rules)
+  end
+
+  # Calculates how many reviews each submission has received
+  def calculate_review_counts(submissions)
+    submission_ids = submissions.map(&:id)
+    AssessmentRequest
+      .where(asset_type: "Submission", asset_id: submission_ids)
+      .group(:asset_id)
+      .count
   end
 
   def success_result(assessment_requests)

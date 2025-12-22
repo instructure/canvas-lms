@@ -923,6 +923,36 @@ RSpec.describe PeerReview::AllocationService do
         expect(result.first.id).to eq(@submission4.id)
         expect(result.second.id).to eq(@submission2.id)
       end
+
+      it "uses submitted_at as tiebreaker when multiple must_review submissions have equal review counts" do
+        student4 = student_in_course(active_all: true).user
+        @submission4 = assignment.submit_homework(student4, body: "Student4 submission")
+        @submission4.update!(submitted_at: 4.days.ago)
+
+        # Add must_review rule for student4
+        # (student2 already has must_review from before block)
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student4,
+          must_review: true
+        )
+
+        # Submission dates:
+        # student2: 1 day ago (must_review)
+        # student4: 4 days ago (must_review)
+        # student1: 5 days ago (regular - no rule)
+        # student3: 3 days ago (regular - no rule)
+
+        available = [@submission1, @submission2, @submission3, @submission4]
+        result = service.send(:select_submissions_to_allocate, available, 2)
+
+        # Both student2 and student4 have must_review priority and 0 reviews
+        # Should sort by submitted_at (oldest first): student4 (4 days) before student2 (1 day)
+        expect(result.first.id).to eq(@submission4.id)
+        expect(result.second.id).to eq(@submission2.id)
+      end
     end
 
     context "when avoiding duplicates" do
@@ -1133,6 +1163,329 @@ RSpec.describe PeerReview::AllocationService do
         expect(result[:success]).to be false
         expect(result[:error_code]).to eq(:no_submissions_available)
         expect(result[:message]).to include("no peer reviews available")
+      end
+    end
+
+    context "when should_not_review rules exist" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: false,
+          review_permitted: false,
+          applies_to_assessor: true
+        )
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student3,
+          must_review: false,
+          review_permitted: false,
+          applies_to_assessor: false
+        )
+      end
+
+      it "includes submissions with should_not_review rules in available submissions" do
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:user_id)).to include(student1.id, student2.id, student3.id)
+      end
+
+      it "deprioritizes should_not_review submissions but allocates them when no better options exist" do
+        result = service.allocate
+        expect(result[:success]).to be true
+        # With peer_review_count=2 and only 3 submissions (1 regular, 2 should_not_review),
+        # it should allocate the regular one first, then one should_not_review as fallback
+        expect(result[:assessment_requests].map(&:user_id)).to include(student1.id)
+        expect(result[:assessment_requests].size).to eq(2)
+      end
+    end
+
+    context "when mixing must_review, should_review, and should_not_review rules" do
+      before do
+        assignment.update!(peer_review_count: 3)
+        assignment.submit_homework(assessor, body: "My submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission1.update!(submitted_at: 3.days.ago)
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission2.update!(submitted_at: 2.days.ago)
+        @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
+        @submission3.update!(submitted_at: 1.day.ago)
+
+        student4 = student_in_course(active_all: true).user
+        @submission4 = assignment.submit_homework(student4, body: "Student4 submission")
+        @submission4.update!(submitted_at: 4.days.ago)
+
+        # Must review student1
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student1,
+          must_review: true,
+          review_permitted: true
+        )
+
+        # Should not review student2
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: false,
+          review_permitted: false
+        )
+
+        # Should review student3
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student3,
+          must_review: false,
+          review_permitted: true
+        )
+      end
+
+      it "prioritizes must_review and should_review first, then regular, then should_not_review" do
+        result = service.allocate
+        expect(result[:success]).to be true
+        expect(result[:assessment_requests].size).to eq(3)
+
+        allocated_user_ids = result[:assessment_requests].map(&:user_id)
+
+        # Should allocate must_review, should_review, and regular (student4) before should_not_review
+        expect(allocated_user_ids).to include(student1.id, student3.id, @submission4.user_id)
+        expect(allocated_user_ids).not_to include(student2.id) # should_not_review is lowest priority
+      end
+
+      it "includes should_not_review in preload but deprioritizes in selection" do
+        available = service.send(:preload_available_submissions)
+        # All submissions should be available, including should_not_review
+        expect(available.map(&:user_id)).to include(student1.id, student2.id, student3.id, @submission4.user_id)
+
+        result = service.send(:select_submissions_to_allocate, available, 3)
+        # Verify priority order: must_review > should_review > regular > should_not_review
+        expect(result.first.user_id).to eq(student1.id) # must_review
+        expect(result.second.user_id).to eq(student3.id) # should_review
+        expect(result.third.user_id).to eq(@submission4.user_id) # regular (not student2 who is should_not_review)
+      end
+    end
+
+    context "when all available submissions have should_not_review rules" do
+      before do
+        assignment.submit_homework(assessor, body: "My submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student1,
+          must_review: false,
+          review_permitted: false,
+          applies_to_assessor: true
+        )
+
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: false,
+          review_permitted: false,
+          applies_to_assessor: false
+        )
+      end
+
+      it "allocates should_not_review submissions as fallback when no other options exist" do
+        result = service.allocate
+        expect(result[:success]).to be true
+        expect(result[:assessment_requests].size).to eq(2)
+        expect(result[:assessment_requests].map(&:user_id)).to match_array([student1.id, student2.id])
+      end
+    end
+
+    context "when mixing must_not_review and should_not_review rules" do
+      before do
+        assignment.update!(peer_review_count: 2)
+        assignment.submit_homework(assessor, body: "My submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
+
+        # Must not review student1
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student1,
+          must_review: true,
+          review_permitted: false
+        )
+
+        # Should not review student2
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: false,
+          review_permitted: false
+        )
+      end
+
+      it "excludes must_not_review but includes should_not_review in available submissions" do
+        available = service.send(:preload_available_submissions)
+        expect(available.map(&:user_id)).not_to include(student1.id) # must_not_review excluded
+        expect(available.map(&:user_id)).to include(student2.id, student3.id) # should_not_review and regular included
+      end
+
+      it "allocates regular submission first, then should_not_review as fallback, but never must_not_review" do
+        result = service.allocate
+        expect(result[:success]).to be true
+        expect(result[:assessment_requests].size).to eq(2)
+        expect(result[:assessment_requests].map(&:user_id)).not_to include(student1.id) # must_not_review never allocated
+        expect(result[:assessment_requests].map(&:user_id)).to include(student3.id) # regular allocated first
+        expect(result[:assessment_requests].map(&:user_id)).to include(student2.id) # should_not_review as fallback
+      end
+    end
+
+    context "when all four rule types are present" do
+      before do
+        assignment.update!(peer_review_count: 4)
+        assignment.submit_homework(assessor, body: "My submission")
+        @submission1 = assignment.submit_homework(student1, body: "Student1 submission")
+        @submission1.update!(submitted_at: 4.days.ago)
+        @submission2 = assignment.submit_homework(student2, body: "Student2 submission")
+        @submission2.update!(submitted_at: 3.days.ago)
+        @submission3 = assignment.submit_homework(student3, body: "Student3 submission")
+        @submission3.update!(submitted_at: 2.days.ago)
+
+        @student4 = student_in_course(active_all: true).user
+        @submission4 = assignment.submit_homework(@student4, body: "Student4 submission")
+        @submission4.update!(submitted_at: 1.day.ago)
+
+        @student5 = student_in_course(active_all: true).user
+        @submission5 = assignment.submit_homework(@student5, body: "Student5 submission")
+        @submission5.update!(submitted_at: 5.days.ago)
+
+        @student6 = student_in_course(active_all: true).user
+        @submission6 = assignment.submit_homework(@student6, body: "Student6 submission")
+        @submission6.update!(submitted_at: 6.days.ago)
+
+        # Must review student1 (highest priority)
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student1,
+          must_review: true,
+          review_permitted: true
+        )
+
+        # Should review student2 (medium priority)
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student2,
+          must_review: false,
+          review_permitted: true
+        )
+
+        # Must not review student3 (excluded)
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: student3,
+          must_review: true,
+          review_permitted: false
+        )
+
+        # Should not review student4 (excluded)
+        AllocationRule.create!(
+          course:,
+          assignment:,
+          assessor:,
+          assessee: @student4,
+          must_review: false,
+          review_permitted: false
+        )
+
+        # No rules for student5 and student6 (regular priority)
+      end
+
+      it "allocates in correct priority order: must_review > should_review > regular, excludes must_not_review, uses should_not_review as fallback" do
+        result = service.allocate
+        expect(result[:success]).to be true
+        expect(result[:assessment_requests].size).to eq(4)
+
+        allocated_user_ids = result[:assessment_requests].map(&:user_id)
+
+        # Must review should be allocated (highest priority)
+        expect(allocated_user_ids).to include(student1.id)
+
+        # Should review should be allocated (medium priority)
+        expect(allocated_user_ids).to include(student2.id)
+
+        # Must not review should NOT be allocated (hard excluded)
+        expect(allocated_user_ids).not_to include(student3.id)
+
+        # Regular submissions should fill remaining slots before should_not_review
+        expect(allocated_user_ids).to include(@student5.id, @student6.id)
+
+        # Should not review should NOT be allocated when better options exist
+        expect(allocated_user_ids).not_to include(@student4.id)
+      end
+
+      it "prioritizes correctly: must_review > should_review > regular > should_not_review, excludes must_not_review" do
+        available = service.send(:preload_available_submissions)
+
+        # Should exclude must_not_review (hard filter)
+        expect(available.map(&:user_id)).not_to include(student3.id)
+
+        # Should include must_review, should_review, regular, and should_not_review (soft filter)
+        expect(available.map(&:user_id)).to include(student1.id, student2.id, @student4.id, @student5.id, @student6.id)
+
+        result = service.send(:select_submissions_to_allocate, available, 4)
+
+        # Verify priority order
+        expect(result.first.user_id).to eq(student1.id) # must_review first
+        expect(result.second.user_id).to eq(student2.id) # should_review second
+        # Regular submissions fill remaining slots (sorted by submission date)
+        expect(result[2].user_id).to eq(@student6.id) # oldest regular
+        expect(result[3].user_id).to eq(@student5.id) # newer regular
+        # should_not_review (student4) is not allocated when better options exist
+      end
+
+      it "allocates should_not_review as fallback when regular submissions are exhausted" do
+        # Request 5 reviews, but only 4 better options exist (1 must_review, 1 should_review, 2 regular)
+        assignment.update!(peer_review_count: 5)
+        result = service.allocate
+        expect(result[:success]).to be true
+        expect(result[:assessment_requests].size).to eq(5)
+
+        allocated_user_ids = result[:assessment_requests].map(&:user_id)
+
+        # All better options allocated first
+        expect(allocated_user_ids).to include(student1.id, student2.id, @student5.id, @student6.id)
+
+        # should_not_review allocated as fallback since no better options remain
+        expect(allocated_user_ids).to include(@student4.id)
+
+        # must_not_review still never allocated
+        expect(allocated_user_ids).not_to include(student3.id)
       end
     end
   end
