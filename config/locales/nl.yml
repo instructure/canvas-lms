@@ -559,7 +559,7 @@ nl:
     tab_sis_import: SIS-import
     tab_statistics: Statistieken
     tab_sub_accounts: Subaccounts
-    tab_terms: Periodes
+    tab_terms: Periode
     tab_users: Gebruikers
     turnitin_pledge: "Deze ingediende opdracht is mijn eigen originele werk."
   account_580e7fda: account
@@ -1987,7 +1987,7 @@ nl:
       groups: Groepen
       imported_items_title: "Ingevoerde items"
       sections_label: Secties
-      terms_label: Periodes
+      terms_label: Periode
       users_label: Gebruikers
     sis_batch_messages: 
       sis_batch_errors_title: "Fouten die het importeren verhinderen"
@@ -1996,7 +1996,7 @@ nl:
       account_reports: 
         sis_export: 
           description: 
-            text: "SIS Export rapport: Dit rapport zal alle benodigde bestanden voor Gebruikers, Accounts, Periodes, Cursussen, Secties, Inschrijvingen, Groepen, Groepslidmaatschappen en Cross Listings voor een SIS-import in hun respectievelijke categorieën uitvoeren. Dit zal alleen items retourneren die gecreëerd of gewijzigd zijn door SIS."
+            text: "SIS Export rapport: Dit rapport zal alle benodigde bestanden voor Gebruikers, Accounts, Periode, Cursussen, Secties, Inschrijvingen, Groepen, Groepslidmaatschappen en Cross Listings voor een SIS-import in hun respectievelijke categorieën uitvoeren. Dit zal alleen items retourneren die gecreëerd of gewijzigd zijn door SIS."
     sis_export_csv_parameters: 
       account_reports: 
         default: 
@@ -33111,7 +33111,7 @@ nl:
       groups: "Groepen: %{group_count}"
       logins: "Aanmeldingen: %{login_count}"
       sections: "Secties: %{section_count}"
-      terms: "Periodes: %{term_count}"
+      terms: "Periode: %{term_count}"
       user_observers: "Waarnemers van gebruikers: %{user_observers_count}"
       users: "Gebruikers: %{user_count}"
     messages: 
