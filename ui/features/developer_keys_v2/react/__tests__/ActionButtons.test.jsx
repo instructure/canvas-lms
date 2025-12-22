@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import ActionButtons from '../ActionButtons'
 import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 
@@ -25,6 +26,7 @@ vi.mock('@canvas/instui-bindings/react/Confirm')
 
 const defaultProps = ({
   showVisibilityToggle = true,
+  visible = true,
   developerKey = {
     id: '1',
     api_key: 'test',
@@ -41,7 +43,7 @@ const defaultProps = ({
     ltiKeysSetLtiKey: vi.fn(),
     contextId: '2',
     developerKey,
-    visible: true,
+    visible,
     developerName: 'Unnamed Tool',
     onDelete: vi.fn(),
     showVisibilityToggle,
@@ -119,6 +121,98 @@ describe('ActionButtons', () => {
       title: 'Delete LTI Developer Key',
       message:
         'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.',
+    })
+  })
+
+  describe('when devKeysReadOnly is true', () => {
+    let originalEnv
+
+    beforeEach(() => {
+      originalEnv = window.ENV
+      window.ENV = {...originalEnv, devKeysReadOnly: true}
+    })
+
+    afterEach(() => {
+      window.ENV = originalEnv
+    })
+
+    it('disables visibility toggle button', () => {
+      const {getByText} = renderActionButtons()
+      const visibilityButton = getByText('Make key Unnamed Tool invisible').closest('button')
+      expect(visibilityButton).toBeDisabled()
+    })
+
+    it('disables delete button', () => {
+      const {getByText} = renderActionButtons()
+      const deleteButton = getByText(
+        'Key Unnamed Tool &mdash; you do not have permission to modify keys in this account',
+      ).closest('button')
+      expect(deleteButton).toBeDisabled()
+    })
+
+    it('shows read-only tooltip for visibility button when key is visible', async () => {
+      const user = userEvent.setup()
+      const {getByText, findByText} = renderActionButtons({visible: true})
+      const visibilityButton = getByText('Make key Unnamed Tool invisible').closest('button')
+
+      await user.hover(visibilityButton)
+
+      await findByText(
+        'Key is visible. You do not have permission to modify key visibility in this account',
+      )
+    })
+
+    it('shows read-only tooltip for visibility button when key is invisible', async () => {
+      const user = userEvent.setup()
+      const {getByText, findByText} = renderActionButtons({visible: false})
+      const visibilityButton = getByText('Make key Unnamed Tool visible').closest('button')
+
+      await user.hover(visibilityButton)
+
+      await findByText(
+        'Key is invisible. You do not have permission to modify key visibility in this account',
+      )
+    })
+
+    it('shows read-only tooltip for delete button', async () => {
+      const user = userEvent.setup()
+      const {getByText, findByText} = renderActionButtons()
+      const deleteButton = getByText(
+        'Key Unnamed Tool &mdash; you do not have permission to modify keys in this account',
+      ).closest('button')
+
+      await user.hover(deleteButton)
+
+      await findByText('You do not have permission to modify keys in this account')
+    })
+
+    it('changes edit button tooltip to view details for non-LTI keys', async () => {
+      const user = userEvent.setup()
+      const {container, findByText} = renderActionButtons()
+      const editButton = container.querySelector('#edit-developer-key-button-1')
+
+      await user.hover(editButton)
+
+      await findByText('View key details')
+    })
+
+    it('changes edit button tooltip to view details for LTI registration keys', async () => {
+      const user = userEvent.setup()
+      const {container, findByText} = renderActionButtons({
+        developerKey: {
+          id: '1',
+          api_key: 'test',
+          created_at: 'test',
+          is_lti_key: true,
+          is_lti_registration: true,
+          ltiRegistration: {},
+        },
+      })
+      const editButton = container.querySelector('#edit-developer-key-button-1')
+
+      await user.hover(editButton)
+
+      await findByText('View key details')
     })
   })
 })

@@ -267,6 +267,23 @@ BASE_PERMISSIONS = {
         description: -> { I18n.t("Not available at the subaccount level.") } }
     ]
   },
+  modify_site_admin_developer_keys: {
+    label: -> { I18n.t("Developer Keys - modify Site Admin developer keys") },
+    account_only: :site_admin,
+    true_for: %w[AccountAdmin],
+    available_to: %w[AccountAdmin AccountMembership],
+    account_details: [
+      { title: -> { I18n.t("Developer Keys") },
+        description: -> { I18n.t("Allows user to create, modify, and delete global (Site Admin) developer keys and LTI configurations.") } },
+      { description: -> { I18n.t("This permission controls access to Site Admin developer keys that are inherited by all accounts. Root Account-level keys are unaffected.") } }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Developer Keys") },
+        description: -> { I18n.t("Developer Keys - manage must also be enabled to access the Developer Keys page.") } },
+      { title: -> { I18n.t("Site Admin") },
+        description: -> { I18n.t("This permission is only available in Site Admin and controls access to global developer keys.") } }
+    ]
+  },
   moderate_user_content: {
     label: -> { I18n.t("Users - moderate content") },
     account_only: true,

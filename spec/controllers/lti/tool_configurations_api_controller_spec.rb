@@ -732,4 +732,135 @@ RSpec.describe Lti::ToolConfigurationsApiController do
       it { is_expected.to be_no_content }
     end
   end
+
+  describe "modify_site_admin_developer_keys permission" do
+    let(:site_admin_admin) { account_admin_user(account: Account.site_admin) }
+    let(:site_admin_without_permission) do
+      user = user_model
+      role = custom_account_role("limited_admin", account: Account.site_admin)
+      # Grant manage_developer_keys but not modify_site_admin_developer_keys
+      Account.site_admin.role_overrides.create!(
+        permission: :manage_developer_keys,
+        role:,
+        enabled: true
+      )
+      Account.site_admin.account_users.create!(user:, role:)
+      user
+    end
+    let(:site_admin_params) do
+      {
+        developer_key: dev_key_params,
+        account_id: Account.site_admin.id,
+        tool_configuration: {
+          settings: canvas_lti_configuration
+        }
+      }
+    end
+
+    describe "POST 'create'" do
+      subject { post :create, params: site_admin_params, format: :json }
+
+      context "when user has modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_admin) }
+
+        it "allows creating a site admin tool configuration" do
+          subject
+          expect(response).to be_successful
+          key = DeveloperKey.find(json_parse.dig("developer_key", "id"))
+          expect(key.account).to be_nil
+        end
+      end
+
+      context "when user lacks modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_without_permission) }
+
+        it "returns forbidden" do
+          subject
+          expect(response).to be_forbidden
+          expect(json_parse["errors"].first["message"]).to include("Site Admin developer keys")
+        end
+
+        context "when modify_site_admin_developer_keys_permission FF is off" do
+          before { Account.site_admin.disable_feature!(:modify_site_admin_developer_keys_permission) }
+
+          it "allows creating a site admin tool configuration" do
+            subject
+            expect(response).to be_successful
+            key = DeveloperKey.find(json_parse.dig("developer_key", "id"))
+            expect(key.account).to be_nil
+          end
+        end
+      end
+    end
+
+    describe "PUT 'update'" do
+      subject { put :update, params: update_params, format: :json }
+
+      let(:site_admin_key) { lti_developer_key_model(account: Account.site_admin) }
+      let(:site_admin_tool_config) { lti_tool_configuration_model(developer_key: site_admin_key, lti_registration: site_admin_key.lti_registration) }
+      let(:update_params) do
+        {
+          developer_key_id: site_admin_key.id,
+          developer_key: { name: "Updated Name" },
+          tool_configuration: {
+            settings: canvas_lti_configuration
+          }
+        }
+      end
+
+      before { site_admin_tool_config }
+
+      context "when user has modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_admin) }
+
+        it "allows updating a site admin tool configuration" do
+          subject
+          expect(response).to be_successful
+        end
+      end
+
+      context "when user lacks modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_without_permission) }
+
+        it "returns forbidden" do
+          subject
+          expect(response).to be_forbidden
+          expect(json_parse["errors"].first["message"]).to include("Site Admin developer keys")
+        end
+      end
+    end
+
+    describe "DELETE 'destroy'" do
+      subject { delete :destroy, params: destroy_params, format: :json }
+
+      let(:site_admin_key) { lti_developer_key_model(account: Account.site_admin) }
+      let(:site_admin_tool_config) { lti_tool_configuration_model(developer_key: site_admin_key, lti_registration: site_admin_key.lti_registration) }
+      let(:destroy_params) do
+        {
+          developer_key_id: site_admin_key.id
+        }
+      end
+
+      before { site_admin_tool_config }
+
+      context "when user has modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_admin) }
+
+        it "allows deleting a site admin tool configuration" do
+          subject
+          expect(response).to be_no_content
+        end
+      end
+
+      context "when user lacks modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_without_permission) }
+
+        it "returns forbidden" do
+          subject
+          expect(response).to be_forbidden
+          expect(json_parse["errors"].first["message"]).to include("Site Admin developer keys")
+        end
+      end
+    end
+  end
 end

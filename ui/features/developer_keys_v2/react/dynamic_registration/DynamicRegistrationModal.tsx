@@ -204,7 +204,15 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
             margin="small"
             disabled={
               !isValidUrl(state.dynamicRegistrationUrl) ||
-              state.tag === 'loading_registration_token'
+              state.tag === 'loading_registration_token' ||
+              ENV.devKeysReadOnly
+            }
+            title={
+              ENV.devKeysReadOnly
+                ? I18n.t(
+                    'You do not have permission to create or modify developer keys / LTI registrations in this account',
+                  )
+                : undefined
             }
             onClick={() => {
               loadingRegistrationToken()

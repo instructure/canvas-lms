@@ -193,6 +193,7 @@
 class DeveloperKeysController < ApplicationController
   before_action :set_key, only: [:update, :destroy]
   before_action :require_manage_developer_keys
+  before_action :require_modify_site_admin_developer_keys, except: %i[index lookup_utids]
   before_action :require_root_account, only: %i[index create]
 
   include HorizonMode
@@ -219,7 +220,8 @@ class DeveloperKeysController < ApplicationController
           enableTestClusterChecks: DeveloperKey.test_cluster_checks_enabled?,
           showApiGetWithBodyNotice: !!@domain_root_account.settings[:show_api_get_with_body_notice],
           validLtiScopes:
-            TokenScopes.public_lti_scopes_hash_for_account(@domain_root_account)
+            TokenScopes.public_lti_scopes_hash_for_account(@domain_root_account),
+          devKeysReadOnly: read_only_mode?
         )
 
         render :index
@@ -445,6 +447,30 @@ class DeveloperKeysController < ApplicationController
 
   def require_manage_developer_keys
     require_context_with_permission(account_context, :manage_developer_keys)
+  rescue ActiveRecord::RecordNotFound => e
+    report_error(e)
+    raise e
+  end
+
+  def read_only_mode?
+    account_context.root_account.site_admin? &&
+      Account.site_admin.feature_enabled?(:modify_site_admin_developer_keys_permission) &&
+      !Account.site_admin.grants_right?(@current_user, :modify_site_admin_developer_keys)
+  end
+
+  def require_modify_site_admin_developer_keys
+    if read_only_mode?
+      respond_to do |format|
+        format.html do
+          flash[:error] = t("You don't have permission to modify Site Admin developer keys")
+          redirect_to account_developer_keys_path(Account.site_admin)
+        end
+        format.json do
+          render json: { errors: [{ message: "You don't have permission to modify Site Admin developer keys" }] },
+                 status: :forbidden
+        end
+      end
+    end
   rescue ActiveRecord::RecordNotFound => e
     report_error(e)
     raise e
