@@ -137,7 +137,7 @@ export default class DeveloperKeyStateControl extends React.Component {
             <ScreenReaderContent>{I18n.t('Key state for the current account')}</ScreenReaderContent>
           }
           onChange={(e, val) => this.setBindingState(val)}
-          disabled={this.isDisabled()}
+          disabled={this.isDisabled() || ENV.devKeysReadOnly}
           name={this.props.developerKey.id}
           value={this.radioGroupValue()}
         >

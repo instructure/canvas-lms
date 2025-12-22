@@ -560,6 +560,20 @@ microsoft_group_enrollments_syncing:
     If enabled, syncing course enrollments to Microsoft Groups will be
     available. Account admins may enable this in account settings.
   applies_to: RootAccount
+modify_site_admin_developer_keys_permission:
+  state: hidden
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: 'Enforce "Developer Keys -- Modify Site Admin Keys" Permission'
+  description: |-
+    Enforce the modify_site_admin_developer_keys permission, which prevents
+    Site Admin users without the permission from modifying global Developer
+    Keys.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 nav_menu_links:
   state: hidden
   shadow: true

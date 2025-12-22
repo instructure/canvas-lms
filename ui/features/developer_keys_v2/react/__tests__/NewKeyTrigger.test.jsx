@@ -69,3 +69,33 @@ describe('DeveloperKeyModalTrigger', () => {
     expect(actions.developerKeysModalOpen).toHaveBeenCalled()
   })
 })
+
+describe('DeveloperKeyModalTrigger when devKeysReadOnly is true', () => {
+  beforeEach(() => {
+    window.ENV = {devKeysReadOnly: true}
+  })
+
+  afterEach(() => {
+    window.ENV = {}
+  })
+
+  it('disables the button when devKeysReadOnly is true', () => {
+    render(<DeveloperKeyModalTrigger store={store} actions={actions} setAddKeyButtonRef={() => {}} />)
+
+    const button = screen.getByRole('button', {
+      name: /create a developer key/i,
+    })
+
+    expect(button).toBeDisabled()
+  })
+
+  it('shows the correct tooltip message when devKeysReadOnly is true', () => {
+    render(<DeveloperKeyModalTrigger store={store} actions={actions} setAddKeyButtonRef={() => {}} />)
+
+    const button = screen.getByRole('button', {
+      name: /create a developer key/i,
+    })
+
+    expect(button).toHaveAttribute('title', 'You do not have permission to create or modify developer keys in this account')
+  })
+})

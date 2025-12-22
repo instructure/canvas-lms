@@ -100,7 +100,15 @@ class DeveloperKeyActionButtons extends React.Component {
     }
     if (visible) {
       return (
-        <Tooltip renderTip={I18n.t('Make key invisible')}>
+        <Tooltip
+          renderTip={
+            !ENV.devKeysReadOnly
+              ? I18n.t('Make key invisible')
+              : I18n.t(
+                  'Key is visible. You do not have permission to modify key visibility in this account',
+                )
+          }
+        >
           <IconButton
             withBackground={false}
             withBorder={false}
@@ -108,6 +116,7 @@ class DeveloperKeyActionButtons extends React.Component {
             size="small"
             onClick={this.makeInvisibleLinkHandler}
             screenReaderLabel={I18n.t('Make key %{developerName} invisible', {developerName})}
+            disabled={ENV.devKeysReadOnly}
           >
             <IconEyeLine />
           </IconButton>
@@ -116,7 +125,15 @@ class DeveloperKeyActionButtons extends React.Component {
     }
 
     return (
-      <Tooltip renderTip={I18n.t('Make key visible')}>
+      <Tooltip
+        renderTip={
+          !ENV.devKeysReadOnly
+            ? I18n.t('Make key visible')
+            : I18n.t(
+                'Key is invisible. You do not have permission to modify key visibility in this account',
+              )
+        }
+      >
         <IconButton
           withBackground={false}
           withBorder={false}
@@ -124,6 +141,7 @@ class DeveloperKeyActionButtons extends React.Component {
           margin="0"
           size="small"
           onClick={this.makeVisibleLinkHandler}
+          disabled={ENV.devKeysReadOnly}
         >
           <IconOffLine />
         </IconButton>
@@ -133,16 +151,22 @@ class DeveloperKeyActionButtons extends React.Component {
 
   renderEditButton() {
     const {developerName, developerKey} = this.props
+    const editKeyTooltip = ENV.devKeysReadOnly
+      ? I18n.t('View key details')
+      : I18n.t('Edit this key')
+    const editKeyLabel = ENV.devKeysReadOnly
+      ? I18n.t('View details for key %{developerName}', {developerName})
+      : I18n.t('Edit key %{developerName}', {developerName})
 
     return developerKey.is_lti_registration ? (
-      <Tooltip renderTip={I18n.t('Edit this key')}>
+      <Tooltip renderTip={editKeyTooltip}>
         <IconButton
           id={`edit-developer-key-button-${developerKey.id}`}
           as="a"
           href={`/accounts/${this.props.contextId}/developer_keys/${developerKey.id}`}
           withBackground={false}
           withBorder={false}
-          screenReaderLabel={I18n.t('Edit key %{developerName}', {developerName})}
+          screenReaderLabel={editKeyLabel}
           margin="0"
           size="small"
         >
@@ -150,12 +174,12 @@ class DeveloperKeyActionButtons extends React.Component {
         </IconButton>
       </Tooltip>
     ) : (
-      <Tooltip renderTip={I18n.t('Edit this key')}>
+      <Tooltip renderTip={editKeyTooltip}>
         <IconButton
           id={`edit-developer-key-button-${developerKey.id}`}
           withBackground={false}
           withBorder={false}
-          screenReaderLabel={I18n.t('Edit key %{developerName}', {developerName})}
+          screenReaderLabel={editKeyLabel}
           margin="0"
           size="small"
           onClick={this.editLinkHandler}
@@ -169,20 +193,30 @@ class DeveloperKeyActionButtons extends React.Component {
   render() {
     const {developerName} = this.props
 
+    const tooltipText = ENV.devKeysReadOnly
+      ? I18n.t('You do not have permission to modify keys in this account')
+      : I18n.t('Delete this key')
+    const screenReaderLabel = ENV.devKeysReadOnly
+      ? I18n.t(
+          'Key %{developerName} &mdash; you do not have permission to modify keys in this account',
+          {developerName},
+        )
+      : I18n.t('Delete key %{developerName}', {developerName})
     return (
       <div>
         {this.renderEditButton()}
         {this.renderVisibilityIcon()}
-        <Tooltip renderTip={I18n.t('Delete this key')}>
+        <Tooltip renderTip={tooltipText}>
           <IconButton
             id="delete-developer-key-button"
             withBackground={false}
             withBorder={false}
-            screenReaderLabel={I18n.t('Delete key %{developerName}', {developerName})}
+            screenReaderLabel={screenReaderLabel}
             margin="0"
             size="small"
             onClick={this.deleteLinkHandler}
             elementRef={this.refDeleteLink}
+            disabled={ENV.devKeysReadOnly}
           >
             <IconTrashLine />
           </IconButton>
