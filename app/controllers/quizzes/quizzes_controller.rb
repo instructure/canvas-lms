@@ -1173,6 +1173,7 @@ class Quizzes::QuizzesController < ApplicationController
       })
 
     css_bundle :enhanced_rubrics
+    @body_classes << "full-width padless-content"
     render html: '<div id="ams_container"></div>'.html_safe, layout: true
   end
 
