@@ -2313,8 +2313,12 @@ class AbstractAssignment < ActiveRecord::Base
 
     opts.delete(:id)
     group, students = group_students(original_student)
-    submissions = []
+    async_grade_students = []
+    graded_submissions = []
     grade_group_students = !(grade_group_students_individually || opts[:excused])
+    if group && grade_group_students && opts[:async_grade_group]
+      students, async_grade_students = students.partition { |student| student == original_student }
+    end
 
     if has_sub_assignments? && context.discussion_checkpoints_enabled?
       sub_assignment_tag = opts[:sub_assignment_tag]
@@ -2331,20 +2335,44 @@ class AbstractAssignment < ActiveRecord::Base
     # grading a student results in a teacher occupying a grader slot for that assignment if it is moderated.
     ensure_grader_can_adjudicate(grader: opts[:grader], provisional: opts[:provisional], occupy_slot: true) do
       if grade_group_students
-        find_or_create_submissions(students, Submission.preload(:grading_period, :stream_item, :lti_result)) do |submission|
-          submission.skip_grader_check = true if opts[:skip_grader_check]
-          submission&.lti_result&.mark_reviewed!
-          submissions << save_grade_to_submission(submission, original_student, group, opts)
+        graded_submissions = grade_students_in_group(students, group, original_student, opts)
+
+        if group && async_grade_students.any?
+          delay(
+            priority: Delayed::HIGH_PRIORITY,
+            strand: "AsyncGradeGroup:#{global_id}:#{group.global_id}"
+          ).grade_students_in_group_by_ids(async_grade_students.pluck(:id), group, original_student, opts)
         end
       else
         submission = find_or_create_submission(original_student, skip_grader_check: opts[:skip_grader_check])
         submission.skip_grader_check = true if opts[:skip_grader_check]
         submission&.lti_result&.mark_reviewed!
-        submissions << save_grade_to_submission(submission, original_student, group, opts)
+        graded_submissions = [save_grade_to_submission(submission, original_student, group, opts)]
       end
     end
 
-    submissions.compact
+    graded_submissions.compact
+  end
+
+  # exists to avoid the N+1 query problem that occurs while reconstituting
+  # students when grade_students_in_group is called in a delayed job
+  def grade_students_in_group_by_ids(student_ids, group, original_student, opts)
+    return unless group.present?
+
+    students = group.users.where(id: student_ids)
+    grade_students_in_group(students, group, original_student, opts)
+  end
+
+  def grade_students_in_group(students, group, original_student, opts)
+    graded_submissions = []
+    ActiveRecord::Base.transaction do
+      find_or_create_submissions(students, Submission.preload(:grading_period, :stream_item, :lti_result)) do |submission|
+        submission.skip_grader_check = true if opts[:skip_grader_check]
+        submission&.lti_result&.mark_reviewed!
+        graded_submissions << save_grade_to_submission(submission, original_student, group, opts)
+      end
+    end
+    graded_submissions
   end
 
   def tool_settings_resource_codes
@@ -2731,7 +2759,7 @@ class AbstractAssignment < ActiveRecord::Base
           else
             homework.saving_user = original_student
             homework.save!
-            annotation_context.update!(submission_attempt: homework.attempt) if annotation_context.present?
+            annotation_context.presence&.update!(submission_attempt: homework.attempt)
           end
         end
         homeworks << homework
@@ -4310,7 +4338,7 @@ class AbstractAssignment < ActiveRecord::Base
       course.refresh_content_participation_counts_for_users(user_ids)
     end
 
-    progress.set_results(assignment_id: id, posted_at: update_time, user_ids:) if progress.present?
+    progress.presence&.set_results(assignment_id: id, posted_at: update_time, user_ids:)
     broadcast_submissions_posted(posting_params) if posting_params.present?
   end
 
@@ -4331,7 +4359,7 @@ class AbstractAssignment < ActiveRecord::Base
     hide_stream_items(submissions:)
     course.recompute_student_scores(submissions.pluck(:user_id))
     update_muted_status!
-    progress.set_results(assignment_id: id, posted_at: nil, user_ids:) if progress.present?
+    progress.presence&.set_results(assignment_id: id, posted_at: nil, user_ids:)
   end
 
   def broadcast_submissions_posted(posting_params)

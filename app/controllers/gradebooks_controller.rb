@@ -254,7 +254,7 @@ class GradebooksController < ApplicationController
       }
       assignment_order = allowed_orders.fetch(params.fetch(:assignment_order), :due_at)
       @current_user.set_preference(:course_grades_assignment_order, @context.id, assignment_order)
-      redirect_back(fallback_location: course_grades_url(@context))
+      redirect_back_or_to(course_grades_url(@context))
     end
   end
 
@@ -914,7 +914,12 @@ class GradebooksController < ApplicationController
             if params.key?(:sub_assignment_tag) && @context.discussion_checkpoints_enabled?
               submission[:sub_assignment_tag] = params[:sub_assignment_tag]
             end
-            subs = @assignment.grade_student(@user, submission.merge(skip_grader_check: is_default_grade_for_missing))
+
+            opts = submission.merge(
+              skip_grader_check: is_default_grade_for_missing,
+              async_grade_group: value_to_boolean(params.fetch(:async_grade_group, false))
+            )
+            subs = @assignment.grade_student(@user, opts)
             apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
             @submissions += subs
           end
