@@ -4493,12 +4493,12 @@ describe Assignment do
     context "group assignments" do
       before :once do
         @student1, @student2 = n_students_in_course(2, course: @course)
-        gc = @course.group_categories.create! name: "a name"
-        group = gc.groups.create! name: "zxcv", context: @course
+        @gc = @course.group_categories.create! name: "a name"
+        group = @gc.groups.create! name: "zxcv", context: @course
         [@student1, @student2].each do |u|
           group.group_memberships.create! user: u, workflow_state: "accepted"
         end
-        @assignment.update_attribute :group_category, gc
+        @assignment.update_attribute :group_category, @gc
       end
 
       context "when excusing an assignment" do
@@ -4552,6 +4552,25 @@ describe Assignment do
           expect(sub2.user).to eq @student2
           expect(sub2.grade).to eq "10"
           expect(sub3).to be_nil
+        end
+
+        it "grades the target student synchronously and other members asynchronously with async_grade_group: true" do
+          assignment = @course.assignments.create!(group_category: @gc)
+          graded_submissions = assignment.grade_student(
+            @student1,
+            score: 42,
+            grader: @teacher,
+            async_grade_group: true
+          )
+
+          expect(graded_submissions.size).to eq 1
+          sub1 = graded_submissions.first
+          expect(sub1.user).to eq @student1
+          expect(sub1.score).to eq 42
+
+          expect { run_jobs }.to change {
+            assignment.submissions.find_by(user: @student2).score
+          }.from(nil).to(42)
         end
       end
     end
