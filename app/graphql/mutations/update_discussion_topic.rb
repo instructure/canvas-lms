@@ -44,6 +44,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     discussion_topic = DiscussionTopic.find(input[:discussion_topic_id])
     raise GraphQL::ExecutionError, "insufficient permission" unless discussion_topic.grants_right?(current_user, :update)
 
+    discussion_topic.updating_user = current_user
     if input[:message] != discussion_topic.message && discussion_topic.editing_restricted?(:content)
       # editing is impossible frontwise, so we're just gonna ignore auto formatting
       input[:message] = discussion_topic.message
@@ -126,8 +127,6 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
         return validation_error(err_message) unless err_message.nil?
       end
     end
-
-    discussion_topic.updating_user = current_user
 
     # Save the discussion topic before updating the assignment if the group category is being updated,
     # because creating group assignment overrides are dependent on the group category being set
