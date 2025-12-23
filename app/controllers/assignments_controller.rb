@@ -741,6 +741,11 @@ class AssignmentsController < ApplicationController
       return render_a2_peer_review_student_view
     end
 
+    if @context.feature_enabled?(:peer_review_allocation_and_grading) && authorized_action(@assignment, @current_user, :grade)
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id, open_allocation_tray: true)
+      return
+    end
+
     js_env({
              ASSIGNMENT_ID: @assignment.id,
              COURSE_ID: @context.id

@@ -42,6 +42,19 @@ vi.mock('../PeerReviewConfigurationTray', () => ({
   ),
 }))
 
+vi.mock('../PeerReviewAllocationRulesTray', () => ({
+  default: ({isTrayOpen, closeTray}: {isTrayOpen: boolean; closeTray: () => void}) => (
+    <div data-testid="mock-allocation-tray">
+      {isTrayOpen && (
+        <>
+          <div>Allocation Tray Content</div>
+          <button onClick={closeTray}>Close Allocation Tray</button>
+        </>
+      )}
+    </div>
+  ),
+}))
+
 describe('PeerReviewWidget', () => {
   const defaultProps = {
     assignmentId: '123',
@@ -52,6 +65,11 @@ describe('PeerReviewWidget', () => {
 
   beforeEach(() => {
     user = userEvent.setup()
+    ENV.CAN_EDIT_ASSIGNMENTS = false
+  })
+
+  afterEach(() => {
+    window.history.replaceState({}, '', window.location.pathname)
   })
 
   const renderWithQueryClient = (props = {}) => {
@@ -129,6 +147,71 @@ describe('PeerReviewWidget', () => {
     it('tray is initially closed', () => {
       renderWithQueryClient()
       expect(screen.queryByText('Config Tray Content')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Allocation Tray', () => {
+    it('opens allocation tray when Allocate Peer Reviews button is clicked', async () => {
+      renderWithQueryClient()
+
+      expect(screen.queryByText('Allocation Tray Content')).not.toBeInTheDocument()
+
+      const allocateButton = screen.getByTestId('allocate-peer-reviews-button')
+      await user.click(allocateButton)
+
+      expect(screen.getByText('Allocation Tray Content')).toBeInTheDocument()
+    })
+
+    it('closes allocation tray when close is triggered', async () => {
+      renderWithQueryClient()
+
+      const allocateButton = screen.getByTestId('allocate-peer-reviews-button')
+      await user.click(allocateButton)
+
+      expect(screen.getByText('Allocation Tray Content')).toBeInTheDocument()
+
+      const closeButton = screen.getByText('Close Allocation Tray')
+      await user.click(closeButton)
+
+      expect(screen.queryByText('Allocation Tray Content')).not.toBeInTheDocument()
+    })
+
+    it('tray is initially closed', () => {
+      renderWithQueryClient()
+      expect(screen.queryByText('Allocation Tray Content')).not.toBeInTheDocument()
+    })
+
+    it('passes canEdit from ENV.CAN_EDIT_ASSIGNMENTS to allocation tray', async () => {
+      ENV.CAN_EDIT_ASSIGNMENTS = true
+
+      renderWithQueryClient()
+
+      const allocateButton = screen.getByTestId('allocate-peer-reviews-button')
+      await user.click(allocateButton)
+
+      expect(screen.getByText('Allocation Tray Content')).toBeInTheDocument()
+    })
+
+    it('automatically opens allocation tray when open_allocation_tray URL parameter is true', () => {
+      window.history.replaceState({}, '', '?open_allocation_tray=true')
+
+      renderWithQueryClient()
+
+      expect(screen.getByText('Allocation Tray Content')).toBeInTheDocument()
+    })
+
+    it('does not automatically open allocation tray when URL parameter is false', () => {
+      window.history.replaceState({}, '', '?open_allocation_tray=false')
+
+      renderWithQueryClient()
+
+      expect(screen.queryByText('Allocation Tray Content')).not.toBeInTheDocument()
+    })
+
+    it('does not automatically open allocation tray when URL parameter is missing', () => {
+      renderWithQueryClient()
+
+      expect(screen.queryByText('Allocation Tray Content')).not.toBeInTheDocument()
     })
   })
 })

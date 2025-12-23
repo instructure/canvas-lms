@@ -115,13 +115,13 @@ interface DeleteFocusInfo {
 
 const PeerReviewAllocationRulesTray = ({
   assignmentId,
-  requiredPeerReviewsCount,
+  requiredPeerReviewsCount: requiredPeerReviewsCountProp,
   isTrayOpen,
   closeTray,
   canEdit = false,
 }: {
   assignmentId: string
-  requiredPeerReviewsCount: number
+  requiredPeerReviewsCount?: number
   isTrayOpen: boolean
   closeTray: () => void
   canEdit: boolean
@@ -144,12 +144,16 @@ const PeerReviewAllocationRulesTray = ({
   const createRuleButtonRef = useRef<HTMLButtonElement | null>(null)
   const screenReaderAnnouncementTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const {rules, totalCount, loading, error, refetch} = useAllocationRules(
-    assignmentId,
-    currentPage,
-    itemsPerPage,
-    searchTerm,
-  )
+  const {
+    rules,
+    totalCount,
+    loading,
+    error,
+    refetch,
+    requiredPeerReviewsCount: fetchedRequiredPeerReviewsCount,
+  } = useAllocationRules(assignmentId, currentPage, itemsPerPage, searchTerm)
+
+  const requiredPeerReviewsCount = requiredPeerReviewsCountProp ?? fetchedRequiredPeerReviewsCount
 
   const prevLoadingRef = useRef(loading)
   const prevSearchTermRef = useRef(searchTerm)
