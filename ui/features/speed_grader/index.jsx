@@ -91,6 +91,7 @@ ready(() => {
           window.ENV.CONTEXT_TIMEZONE ||
           'UTC',
         masquerade: window.ENV.masquerade ?? null,
+        isPeerReviewSubAssignment: window.ENV.IS_PEER_REVIEW_SUB_ASSIGNMENT ?? false,
         rceTrayProps: getRCSProps(),
       },
       features: {

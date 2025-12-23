@@ -857,7 +857,7 @@ class GradebooksController < ApplicationController
       user_ids = submissions.pluck(:user_id)
       assignment_ids = submissions.pluck(:assignment_id)
       users = @context.admin_visible_students.distinct.find(user_ids).index_by(&:id)
-      assignments = @context.assignments.active.find(assignment_ids).index_by(&:id)
+      assignments = assignment_scope.active.find(assignment_ids).index_by(&:id)
       # `submissions` is not a collection of ActiveRecord Submission objects,
       # so we pull the records here in order to check hide_grade_from_student?
       # on each submission below.
@@ -1066,13 +1066,18 @@ class GradebooksController < ApplicationController
     @assignment = if params[:assignment_id].blank?
                     nil
                   else
-                    @context.assignments.active.find(params[:assignment_id])
+                    assignment_scope.active.find(params[:assignment_id])
                   end
 
     platform_speedgrader_param_enabled = query_params_allow_platform_service_speedgrader?(params)
     platform_speedgrader_feature_enabled = platform_service_speedgrader_enabled?
     track_speedgrader_metrics(platform_speedgrader_param_enabled, platform_speedgrader_feature_enabled)
     platform_service_speedgrader_enabled = platform_speedgrader_param_enabled && platform_speedgrader_feature_enabled
+
+    # peer review sub assignments are only supported in the platform service speedgrader
+    if @assignment.is_a?(PeerReviewSubAssignment) && !platform_service_speedgrader_enabled
+      raise ActiveRecord::RecordNotFound
+    end
 
     if @assignment.moderated_grading? && !@assignment.user_is_moderation_grader?(@current_user)
       @assignment.create_moderation_grader(@current_user, occupy_slot: false)
@@ -1116,6 +1121,7 @@ class GradebooksController < ApplicationController
         gradebook_section_filter_id: filtered_sections,
         COMMENT_BANK_PER_ASSIGNMENT_ENABLED: Account.site_admin.feature_enabled?(:comment_bank_per_assignment),
         PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
+        IS_PEER_REVIEW_SUB_ASSIGNMENT: @assignment.is_a?(PeerReviewSubAssignment),
         show_inactive_enrollments: gradebook_settings(@context.global_id)&.[]("show_inactive_enrollments") == "true",
         show_concluded_enrollments: @context.completed? || gradebook_settings(@context.global_id)&.[]("show_concluded_enrollments") == "true",
       }
@@ -1577,6 +1583,14 @@ class GradebooksController < ApplicationController
   end
 
   private
+
+  def assignment_scope
+    @assignment_scope ||= if @context.feature_enabled?(:peer_review_allocation_and_grading)
+                            AbstractAssignment.assignment_or_peer_review.where(context: @context)
+                          else
+                            @context.assignments
+                          end
+  end
 
   def multiselect_filters_enabled?
     return @multiselect_filters_enabled if defined?(@multiselect_filters_enabled)

@@ -3129,6 +3129,282 @@ describe GradebooksController do
         end
       end
     end
+
+    context "with peer review sub assignment" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @parent_assignment = @course.assignments.create!(title: "Parent Assignment", peer_reviews: true, peer_review_count: 2)
+        @peer_review_sub_assignment = peer_review_model(parent_assignment: @parent_assignment)
+        @submission = @peer_review_sub_assignment.submissions.find_by!(user: @student)
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      context "when feature flag is enabled" do
+        it "allows grading peer review sub assignment" do
+          post(
+            "update_submission",
+            params: {
+              course_id: @course.id,
+              submission: {
+                assignment_id: @peer_review_sub_assignment.id,
+                user_id: @student.id,
+                grade: 8
+              }
+            },
+            format: :json
+          )
+          expect(response).to be_successful
+          @submission.reload
+          expect(@submission.grade).to eq("8")
+        end
+
+        it "returns submission data for peer review sub assignment" do
+          post(
+            "update_submission",
+            params: {
+              course_id: @course.id,
+              submission: {
+                assignment_id: @peer_review_sub_assignment.id,
+                user_id: @student.id,
+                grade: 9
+              }
+            },
+            format: :json
+          )
+          expect(response).to be_successful
+          submission = json.pick("submission")
+          expect(submission[:user_id]).to eq @student.id
+          expect(submission[:grade]).to eq "9"
+        end
+      end
+
+      context "when feature flag is disabled" do
+        before :once do
+          @course.disable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "fails to grade peer review sub assignment" do
+          post(
+            "update_submission",
+            params: {
+              course_id: @course.id,
+              submission: {
+                assignment_id: @peer_review_sub_assignment.id,
+                user_id: @student.id,
+                grade: 8
+              }
+            },
+            format: :json
+          )
+          expect(response).not_to be_successful
+        end
+      end
+    end
+
+    context "bulk update with mixed assignment types" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+
+        @regular_assignment = @course.assignments.create!(
+          title: "Regular Assignment",
+          points_possible: 100,
+          submission_types: "online_text_entry"
+        )
+        @regular_assignment.publish
+
+        @parent_assignment = @course.assignments.create!(
+          title: "Parent Assignment",
+          peer_reviews: true,
+          peer_review_count: 2,
+          points_possible: 50
+        )
+        @parent_assignment.publish
+        @peer_review_sub_assignment = peer_review_model(parent_assignment: @parent_assignment)
+        @peer_review_sub_assignment.publish
+
+        @student2 = student_in_course(course: @course, active_all: true).user
+
+        @regular_submission = @regular_assignment.submissions.find_by!(user: @student)
+        @peer_review_submission = @peer_review_sub_assignment.submissions.find_by!(user: @student)
+        @regular_submission2 = @regular_assignment.submissions.find_by!(user: @student2)
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "grades both regular and peer review sub assignments in a single bulk request" do
+        post(
+          "update_submission",
+          params: {
+            course_id: @course.id,
+            submissions: {
+              "0" => {
+                assignment_id: @regular_assignment.id,
+                user_id: @student.id,
+                grade: 85
+              },
+              "1" => {
+                assignment_id: @peer_review_sub_assignment.id,
+                user_id: @student.id,
+                grade: 7
+              }
+            }
+          },
+          format: :json
+        )
+
+        expect(response).to be_successful
+
+        @regular_submission.reload
+        expect(@regular_submission.grade).to eq("85")
+        expect(@regular_submission.score).to eq(85.0)
+
+        @peer_review_submission.reload
+        expect(@peer_review_submission.grade).to eq("7")
+        expect(@peer_review_submission.score).to eq(7.0)
+      end
+
+      it "returns submission data for both assignment types in bulk response" do
+        post(
+          "update_submission",
+          params: {
+            course_id: @course.id,
+            submissions: {
+              "0" => {
+                assignment_id: @regular_assignment.id,
+                user_id: @student.id,
+                grade: 90
+              },
+              "1" => {
+                assignment_id: @peer_review_sub_assignment.id,
+                user_id: @student.id,
+                grade: 8
+              }
+            }
+          },
+          format: :json
+        )
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        expect(json.length).to eq(2)
+
+        regular_response = json.find { |s| s.dig("submission", "assignment_id") == @regular_assignment.id }
+        peer_review_response = json.find { |s| s.dig("submission", "assignment_id") == @peer_review_sub_assignment.id }
+
+        expect(regular_response).to be_present
+        expect(regular_response.dig("submission", "grade")).to eq("90")
+        expect(regular_response.dig("submission", "user_id")).to eq(@student.id)
+
+        expect(peer_review_response).to be_present
+        expect(peer_review_response.dig("submission", "grade")).to eq("8")
+        expect(peer_review_response.dig("submission", "user_id")).to eq(@student.id)
+      end
+
+      it "handles multiple submissions with mixed assignment types" do
+        @regular_assignment2 = @course.assignments.create!(
+          title: "Regular Assignment 2",
+          points_possible: 80,
+          submission_types: "online_text_entry"
+        )
+        @regular_assignment2.publish
+
+        post(
+          "update_submission",
+          params: {
+            course_id: @course.id,
+            submissions: {
+              "0" => {
+                assignment_id: @regular_assignment.id,
+                user_id: @student.id,
+                grade: 88
+              },
+              "1" => {
+                assignment_id: @peer_review_sub_assignment.id,
+                user_id: @student.id,
+                grade: 6
+              },
+              "2" => {
+                assignment_id: @regular_assignment2.id,
+                user_id: @student.id,
+                grade: 72
+              }
+            }
+          },
+          format: :json
+        )
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        expect(json.length).to eq(3)
+
+        submission1 = @regular_assignment.submissions.find_by!(user: @student)
+        expect(submission1.grade).to eq("88")
+
+        submission2 = @peer_review_sub_assignment.submissions.find_by!(user: @student)
+        expect(submission2.grade).to eq("6")
+
+        submission3 = @regular_assignment2.submissions.find_by!(user: @student)
+        expect(submission3.grade).to eq("72")
+      end
+
+      context "when feature flag is disabled" do
+        before :once do
+          @course.disable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "fails to grade peer review sub assignment in bulk update" do
+          post(
+            "update_submission",
+            params: {
+              course_id: @course.id,
+              submissions: {
+                "0" => {
+                  assignment_id: @regular_assignment.id,
+                  user_id: @student.id,
+                  grade: 85
+                },
+                "1" => {
+                  assignment_id: @peer_review_sub_assignment.id,
+                  user_id: @student.id,
+                  grade: 7
+                }
+              }
+            },
+            format: :json
+          )
+
+          expect(response).not_to be_successful
+        end
+
+        it "successfully grades only regular assignments when peer review is excluded" do
+          post(
+            "update_submission",
+            params: {
+              course_id: @course.id,
+              submissions: {
+                "0" => {
+                  assignment_id: @regular_assignment.id,
+                  user_id: @student.id,
+                  grade: 85
+                }
+              }
+            },
+            format: :json
+          )
+
+          expect(response).to be_successful
+          @regular_submission.reload
+          expect(@regular_submission.grade).to eq("85")
+        end
+      end
+    end
   end
 
   describe "GET 'speed_grader'" do
@@ -3305,6 +3581,26 @@ describe GradebooksController do
         @course.disable_feature!(:peer_review_allocation_and_grading)
         get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
         expect(assigns[:js_env].fetch(:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED)).to be false
+      end
+
+      it "sets IS_PEER_REVIEW_SUB_ASSIGNMENT to false when assignment is not a peer review sub assignment" do
+        @assignment.publish
+        @course.enable_feature!(:platform_service_speedgrader)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:IS_PEER_REVIEW_SUB_ASSIGNMENT)).to be false
+      end
+
+      it "sets IS_PEER_REVIEW_SUB_ASSIGNMENT to true when assignment is a peer review sub assignment" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @course.enable_feature!(:platform_service_speedgrader)
+        @assignment.peer_reviews = true
+        @assignment.save!
+        @peer_review_sub_assignment = peer_review_model(parent_assignment: @assignment)
+        @assignment.publish
+        @peer_review_sub_assignment.publish
+
+        get "speed_grader", params: { course_id: @course, assignment_id: @peer_review_sub_assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:IS_PEER_REVIEW_SUB_ASSIGNMENT)).to be true
       end
     end
 
@@ -3682,6 +3978,63 @@ describe GradebooksController do
           user_session(@teacher)
           get "speed_grader", params: { course_id: @course, assignment_id: @mod_assignment.id }
           expect(controller.instance_variable_get(:@can_reassign_submissions)).to be true
+        end
+      end
+    end
+
+    context "with peer review sub assignment" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @parent_assignment = @course.assignments.create!(
+          title: "Parent Assignment",
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+        @peer_review_sub_assignment = peer_review_model(parent_assignment: @parent_assignment)
+        @parent_assignment.publish
+        @peer_review_sub_assignment.publish
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      context "when feature flag is enabled" do
+        context "with platform speedgrader enabled" do
+          before do
+            @course.enable_feature!(:platform_service_speedgrader)
+          end
+
+          it "allows access to peer review sub assignment" do
+            get "speed_grader", params: { course_id: @course.id, assignment_id: @peer_review_sub_assignment.id, platform_sg: true }
+            expect(response).not_to be_redirect
+            expect(assigns(:assignment)).to eq(@peer_review_sub_assignment)
+            expect(assigns(:assignment)).to be_a(PeerReviewSubAssignment)
+          end
+        end
+
+        context "without platform speedgrader enabled" do
+          it "returns not found for peer review sub assignment in classic speedgrader" do
+            get "speed_grader", params: { course_id: @course.id, assignment_id: @peer_review_sub_assignment.id }
+            expect(response).to have_http_status(:not_found)
+          end
+        end
+      end
+
+      context "when feature flag is disabled" do
+        before do
+          @course.disable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "returns not found for peer review sub assignment" do
+          get "speed_grader", params: { course_id: @course.id, assignment_id: @peer_review_sub_assignment.id }
+          expect(response).to have_http_status(:not_found)
+        end
+
+        it "still allows access to regular assignment" do
+          get "speed_grader", params: { course_id: @course.id, assignment_id: @assignment.id }
+          expect(response).not_to be_redirect
+          expect(assigns(:assignment)).to eq(@assignment)
         end
       end
     end
