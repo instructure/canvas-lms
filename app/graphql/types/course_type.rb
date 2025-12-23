@@ -236,7 +236,13 @@ module Types
       scope = course.active_course_sections
 
       if filter[:assignment_id]
-        assignment = course.assignments.active.find(filter[:assignment_id])
+        assignment_scope = if course.feature_enabled?(:peer_review_allocation_and_grading)
+                             AbstractAssignment.assignment_or_peer_review.where(context: course)
+                           else
+                             course.assignments
+                           end
+
+        assignment = assignment_scope.active.find(filter[:assignment_id])
         scope = scope.where(id: assignment.sections_for_assigned_students) if assignment.only_visible_to_overrides?
       end
 
