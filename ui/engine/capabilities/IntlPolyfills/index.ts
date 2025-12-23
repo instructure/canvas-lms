@@ -17,12 +17,14 @@
  */
 
 import type {Capability} from '@instructure/updown'
-import {shouldPolyfill as spfGCL} from '@formatjs/intl-getcanonicallocales/should-polyfill'
+// As of Dec 23, 2025, Firefox is the only major browser that doesn't
+// fully support Intl.Locale. Once they support a few of the final properties,
+// we can safely remove all of these polyfills.
 import {shouldPolyfill as spfL} from '@formatjs/intl-locale/should-polyfill'
+// As of Dec 23, 2025, Firefox is the only major browser that doesn't
+// fully support Intl.PluralRules. Once they support a few of the final properties,
+// we can safely remove all of these polyfills.
 import {shouldPolyfill as spfPR} from '@formatjs/intl-pluralrules/should-polyfill'
-import {shouldPolyfill as spfNF} from '@formatjs/intl-numberformat/should-polyfill'
-import {shouldPolyfill as spfDTF} from '@formatjs/intl-datetimeformat/should-polyfill'
-import {shouldPolyfill as spfRTF} from '@formatjs/intl-relativetimeformat/should-polyfill'
 import {oncePerPage} from '@instructure/updown'
 import {captureException} from '@sentry/browser'
 
@@ -135,12 +137,6 @@ function polyfillerFactory({
 }
 
 const subsystems: {[subsys: string]: Capability} = {
-  getcanonicallocales: polyfillerFactory({
-    subsysName: 'getCanonicalLocales',
-    should: spfGCL,
-    polyfill: () => import('@formatjs/intl-getcanonicallocales/polyfill'),
-  }),
-
   locale: polyfillerFactory({
     subsysName: 'Locale',
     should: spfL,
@@ -152,30 +148,6 @@ const subsystems: {[subsys: string]: Capability} = {
     should: spfPR,
     polyfill: () => import('@formatjs/intl-pluralrules/polyfill-force'),
     localeLoader: (l: string) => import('@formatjs/intl-pluralrules/locale-data/' + l),
-  }),
-
-  datetimeformat: polyfillerFactory({
-    subsysName: 'DateTimeFormat',
-    should: spfDTF,
-    polyfill: async () => {
-      await import('@formatjs/intl-datetimeformat/polyfill-force')
-      await import('@formatjs/intl-datetimeformat/add-all-tz')
-    },
-    localeLoader: (l: string) => import('@formatjs/intl-datetimeformat/locale-data/' + l),
-  }),
-
-  numberformat: polyfillerFactory({
-    subsysName: 'NumberFormat',
-    should: spfNF,
-    polyfill: () => import('@formatjs/intl-numberformat/polyfill-force'),
-    localeLoader: (l: string) => import('@formatjs/intl-numberformat/locale-data/' + l),
-  }),
-
-  relativetimeformat: polyfillerFactory({
-    subsysName: 'RelativeTimeFormat',
-    should: spfRTF,
-    polyfill: () => import('@formatjs/intl-relativetimeformat/polyfill-force'),
-    localeLoader: (l: string) => import('@formatjs/intl-relativetimeformat/locale-data/' + l),
   }),
 }
 
@@ -201,27 +173,12 @@ function polyfillUp(...polyfills: unknown[]) {
 
 const level1: Capability = {
   up: polyfillUp,
-  requires: [subsystems.getcanonicallocales],
-}
-
-const level2: Capability = {
-  up: polyfillUp,
-  requires: [level1, subsystems.locale],
-}
-
-const level3: Capability = {
-  up: polyfillUp,
-  requires: [level2, subsystems.pluralrules],
-}
-
-const level4: Capability = {
-  up: polyfillUp,
-  requires: [level3, subsystems.numberformat],
+  requires: [subsystems.locale],
 }
 
 const IntlPolyfills: Capability = {
   up: polyfillUp,
-  requires: [level4, subsystems.datetimeformat, subsystems.relativetimeformat],
+  requires: [level1, subsystems.pluralrules],
 }
 
 export default IntlPolyfills
