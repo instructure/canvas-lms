@@ -3589,7 +3589,7 @@ describe AssignmentsController do
       end
     end
 
-    context "when user is a teacher" do
+    context "when user is a teacher and peer_review_allocation_and_grading FF is enabled" do
       before :once do
         @course.enable_feature!(:peer_review_allocation_and_grading)
       end
@@ -3598,12 +3598,9 @@ describe AssignmentsController do
         user_session(@teacher)
       end
 
-      it "does not render A2 peer review student view" do
+      it "redirects to assignment page with open_allocation_tray parameter" do
         get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
-        expect(response).to have_http_status(:ok)
-        expect(assigns[:js_env][:ASSIGNMENT_ID]).to eq(@assignment.id)
-        expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
-        expect(assigns[:students_dropdown_list]).to be_present
+        expect(response).to redirect_to(course_assignment_path(@course, @assignment, open_allocation_tray: true))
       end
     end
 

@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {IconPeerReviewLine, IconSettingsLine} from '@instructure/ui-icons'
 import {PeerReviewConfigurationTray} from './PeerReviewConfigurationTray'
+import PeerReviewAllocationRulesTray from './PeerReviewAllocationRulesTray'
 
 const I18n = createI18nScope('peer-review-assignment-widget')
 
@@ -33,6 +34,14 @@ export interface PeerReviewWidgetProps {
 
 export const PeerReviewWidget = ({assignmentId, courseId}: PeerReviewWidgetProps) => {
   const [isConfigTrayOpen, setIsConfigTrayOpen] = useState(false)
+  const [isAllocationTrayOpen, setIsAllocationTrayOpen] = useState(false)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('open_allocation_tray') === 'true') {
+      setIsAllocationTrayOpen(true)
+    }
+  }, [])
 
   return (
     <>
@@ -62,6 +71,7 @@ export const PeerReviewWidget = ({assignmentId, courseId}: PeerReviewWidgetProps
             margin="0 0 0 small"
             data-testid="allocate-peer-reviews-button"
             aria-label={I18n.t('Open Peer Review Allocation Tray')}
+            onClick={() => setIsAllocationTrayOpen(true)}
           >
             {I18n.t('Allocate Peer Reviews')}
           </Button>
@@ -71,6 +81,12 @@ export const PeerReviewWidget = ({assignmentId, courseId}: PeerReviewWidgetProps
         assignmentId={assignmentId}
         isTrayOpen={isConfigTrayOpen}
         closeTray={() => setIsConfigTrayOpen(false)}
+      />
+      <PeerReviewAllocationRulesTray
+        assignmentId={assignmentId}
+        isTrayOpen={isAllocationTrayOpen}
+        closeTray={() => setIsAllocationTrayOpen(false)}
+        canEdit={ENV.CAN_EDIT_ASSIGNMENTS || false}
       />
     </>
   )
