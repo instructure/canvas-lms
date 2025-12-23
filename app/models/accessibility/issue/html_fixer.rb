@@ -31,7 +31,8 @@ module Accessibility
         @rule = Rule.registry[rule_id]
       end
 
-      def apply_fix!
+      def apply_fix!(updating_user: nil)
+        resource.try(:updating_user=, updating_user)
         html_content = resource.send(target_attribute)
         fixed_content, _, error = fix_content(html_content, rule, path, value)
         if error.nil?

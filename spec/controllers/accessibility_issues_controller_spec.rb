@@ -250,6 +250,34 @@ describe AccessibilityIssuesController do
           end
         end
       end
+
+      context "with linked files, no user (happens after content migration), and no attachment associations" do
+        before do
+          user_session(@teacher)
+        end
+
+        let(:attachment) { attachment_model(context: course, uploaded_data: fixture_file_upload("cn_image.jpg")) }
+        let(:img_wiki_page) do
+          body = <<~HTML
+            <div><img src='/courses/#{course.id}/files/#{attachment.id}/preview' /></div>
+          HTML
+          wiki_page_model(course:, title: "Image Wiki Page", body:, skip_attachment_association_update: true)
+        end
+        let(:img_scan) { accessibility_resource_scan_model(course:, context: img_wiki_page, issue_count: 1) }
+        let(:img_issue) do
+          accessibility_issue_model(
+            course:,
+            accessibility_resource_scan: img_scan,
+            rule_type: Accessibility::Rules::ImgAltFilenameRule.id,
+            node_path: ".//img"
+          )
+        end
+
+        it "successfully applies the fix" do
+          patch :update, params: { course_id: course.id, id: img_issue.id }, body: { workflow_state: "resolved", value: nil }.to_json, as: :json
+          expect(response).to have_http_status(:no_content)
+        end
+      end
     end
 
     context "when workflow_state is 'dismissed'" do
