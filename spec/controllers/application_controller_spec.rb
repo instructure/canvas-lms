@@ -685,6 +685,31 @@ RSpec.describe ApplicationController do
           expect(@controller.js_env[:CAREER_DARK_THEME_URL]).to eq "https://dark-theme.url"
         end
       end
+
+      describe "translation file preloading" do
+        before do
+          allow(controller).to receive(:api_request?).and_return(false)
+        end
+
+        it "does not preload translation file for English locale" do
+          I18n.with_locale(:en) do
+            controller.js_env({})
+            expect(controller.instance_variable_get(:@content_for_head)).to be_nil
+          end
+        end
+
+        it "preloads translation file for non-english locale" do
+          I18n.with_locale(:fr) do
+            controller.js_env({})
+            content_for_head = controller.instance_variable_get(:@content_for_head)
+            expect(content_for_head).not_to be_nil
+            expect(content_for_head.first).to include('rel="preload"')
+            expect(content_for_head.first).to include('as="fetch"')
+            expect(content_for_head.first).to include('type="application/json"')
+            expect(content_for_head.first).to match(%r{translations/fr.*\.json})
+          end
+        end
+      end
     end
 
     describe "clean_return_to" do
@@ -3339,6 +3364,38 @@ RSpec.describe ApplicationController do
         expect(subject).to have_key(:open_registration)
         expect(subject).not_to have_key(:calendar_contexts_limit)
       end
+    end
+  end
+
+  describe "#preload_translation_file" do
+    before do
+      controller.instance_variable_set(:@domain_root_account, Account.default)
+      allow(controller).to receive_messages(api_request?: false, helpers: double(preload_link_tag: "<link>"))
+    end
+
+    it "handles null @js_env" do
+      expect { controller.send(:preload_translation_file) }.not_to raise_error
+      expect(controller.instance_variable_get(:@content_for_head)).to be_nil
+    end
+
+    it "handles unset @js_env[:LOCALES]" do
+      controller.instance_variable_set(:@js_env, {})
+      expect { controller.send(:preload_translation_file) }.not_to raise_error
+      expect(controller.instance_variable_get(:@content_for_head)).to be_nil
+    end
+
+    it "does not add preload link for en locale" do
+      controller.instance_variable_set(:@js_env, { LOCALES: ["en"], LOCALE_TRANSLATION_FILE: "/translations/en.json" })
+      controller.send(:preload_translation_file)
+      expect(controller.instance_variable_get(:@content_for_head)).to be_nil
+    end
+
+    it "adds preload link for non-en locale" do
+      controller.instance_variable_set(:@js_env, { LOCALES: ["fr"], LOCALE_TRANSLATION_FILE: "/translations/fr.json" })
+      controller.send(:preload_translation_file)
+      content_for_head = controller.instance_variable_get(:@content_for_head)
+      expect(content_for_head).not_to be_nil
+      expect(content_for_head).to include("<link>")
     end
   end
 end

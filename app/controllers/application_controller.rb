@@ -406,6 +406,7 @@ class ApplicationController < ActionController::Base
           }
         end
       end
+      preload_translation_file
     end
 
     add_to_js_env(hash, @js_env, overwrite)
@@ -3399,6 +3400,21 @@ class ApplicationController < ActionController::Base
   def prefetch_xhr(*args, **kwargs)
     (@xhrs_to_prefetch_from_controller ||= []) << [args, kwargs]
   end
+
+  def preload_translation_file
+    return unless (file = @js_env && @js_env[:LOCALE_TRANSLATION_FILE])
+
+    locale = @js_env[:LOCALES]&.first
+    return if locale == "en"
+
+    (@content_for_head ||= []) << helpers.preload_link_tag(
+      file,
+      as: "fetch",
+      type: "application/json",
+      crossorigin: "anonymous"
+    )
+  end
+  helper_method :preload_translation_file
 
   def manage_live_events_context
     setup_live_events_context
