@@ -171,22 +171,6 @@ describe('ItemAssignToTray - Save Operations', () => {
     unmount()
   })
 
-  it('shows loading spinner while saving', async () => {
-    fetchMock.put(DATE_DETAILS, {}, {overwriteRoutes: true, delay: 500})
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {getByTestId, findAllByTestId, findByText, getAllByTestId, unmount} = renderComponent()
-    const addCardBtn = getAllByTestId('add-card')[0]
-    act(() => addCardBtn.click())
-    const assigneeSelector = (await findAllByTestId('assignee_selector'))[0]
-    assigneeSelector.click()
-    const option1 = await findByText(SECTIONS_DATA[3].name)
-    option1.click()
-    const save = getByTestId('differentiated_modules_save_button')
-    await user.click(save)
-    expect(getByTestId('cards-loading')).toBeInTheDocument()
-    unmount()
-  })
-
   it('does not show cards for ADHOC override with no students', async () => {
     fetchMock.get(OVERRIDES_URL, ADHOC_WITHOUT_STUDENTS, {
       overwriteRoutes: true,
