@@ -393,6 +393,19 @@ describe Canvas::CacheRegister do
       expect(keys).not_to be_empty
       expect(redis.ttl(keys.first)).to eq(-1)
     end
+
+    it "uses cache store default expires_in when not explicitly provided" do
+      allow(Rails.cache).to receive(:options).and_return({ expires_in: 1800 })
+
+      some_key = "default_ttl_test_key"
+      # Fallback to the cache store default TTL when not explicitly provided
+      Rails.cache.fetch_with_batched_keys(some_key, batch_object: @user, batched_keys: [:enrollments]) { "value" }
+
+      redis = Canvas::CacheRegister.redis(User.base_cache_register_key_for(@user), @user.shard)
+      keys = redis.keys("*default_ttl_test_key*")
+      expect(keys).not_to be_empty
+      expect(redis.ttl(keys.first)).to be_between(1750, 1800)
+    end
   end
 
   context "without an object" do
