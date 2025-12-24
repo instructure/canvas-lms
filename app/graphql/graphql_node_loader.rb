@@ -40,6 +40,13 @@ module GraphQLNodeLoader
       Loaders::SISIDLoader.for(Course).load(id).then(check_read_permission)
     when "Assignment"
       Loaders::IDLoader.for(Assignment).load(id).then(check_read_permission)
+    when "PeerReviewSubAssignment"
+      Loaders::IDLoader.for(PeerReviewSubAssignment).load(id).then do |peer_review_sub_assignment|
+        next nil unless peer_review_sub_assignment
+        next nil unless peer_review_sub_assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+
+        peer_review_sub_assignment
+      end.then(check_read_permission)
     when "AssignmentBySis"
       Loaders::SISIDLoader.for(Assignment).load(id).then(check_read_permission)
     when "Section"

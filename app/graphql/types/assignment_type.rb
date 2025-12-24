@@ -371,7 +371,10 @@ module Types
       Loaders::AssessmentRequestLoader.for(current_user:).load(assignment)
     end
 
-    field :peer_review_sub_assignment, AssignmentType, null: true
+    # Use string reference instead of constant to avoid circular dependency
+    # PeerReviewSubAssignmentType inherits from AssignmentType, so referencing
+    # the constant directly would create a loading deadlock
+    field :peer_review_sub_assignment, "Types::PeerReviewSubAssignmentType", null: true
     def peer_review_sub_assignment
       return nil unless assignment.grants_right?(current_user, session, :grade)
       return nil unless assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
@@ -445,12 +448,12 @@ module Types
 
     field :allow_google_docs_submission, Boolean, method: :allow_google_docs_submission?, null: true
     field :anonymize_students, Boolean, method: :anonymize_students?, null: true
-    field :new_quizzes_anonymous_participants, Boolean, method: :new_quizzes_anonymous_participants?, null: true
     field :expects_external_submission, Boolean, method: :expects_external_submission?, null: true
     field :expects_submission, Boolean, method: :expects_submission?, null: true
     field :grades_published_at, String, null: true
     field :important_dates, Boolean, null: true
     field :in_closed_grading_period, Boolean, method: :in_closed_grading_period?, null: true
+    field :new_quizzes_anonymous_participants, Boolean, method: :new_quizzes_anonymous_participants?, null: true
     field :non_digital_submission, Boolean, method: :non_digital_submission?, null: true
     field :submissions_downloads, Int, null: true
     field :time_zone_edited, String, null: true

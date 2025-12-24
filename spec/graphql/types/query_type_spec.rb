@@ -1249,4 +1249,137 @@ describe Types::QueryType do
       end
     end
   end
+
+  context "peerReviewSubAssignment query" do
+    before(:once) do
+      @course = Course.create!(name: "Test Course")
+      @teacher = teacher_in_course(course: @course, active_all: true).user
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+
+      @parent_assignment = @course.assignments.create!(
+        title: "Parent Assignment",
+        peer_reviews: true,
+        peer_review_count: 2
+      )
+      @peer_review_sub_assignment = peer_review_model(parent_assignment: @parent_assignment)
+    end
+
+    let(:query) do
+      <<~GQL
+        query($id: ID!) {
+          peerReviewSubAssignment(id: $id) {
+            _id
+            name
+            parentAssignmentId
+          }
+        }
+      GQL
+    end
+
+    def execute_query(query_string = query, user = @teacher, id = @peer_review_sub_assignment.id.to_s, other_context = {})
+      CanvasSchema.execute(
+        query_string,
+        variables: { id: },
+        context: { current_user: user }.merge(other_context)
+      )
+    end
+
+    context "with valid id" do
+      it "returns peer review sub assignment" do
+        result = execute_query
+
+        assignment = result.dig("data", "peerReviewSubAssignment")
+        expect(assignment["_id"]).to eq @peer_review_sub_assignment.id.to_s
+        expect(assignment["name"]).to eq @peer_review_sub_assignment.name
+        expect(assignment["parentAssignmentId"]).to eq @parent_assignment.id.to_s
+      end
+
+      it "works with relay id format" do
+        relay_id = GraphQLHelpers.relay_or_legacy_id_prepare_func("PeerReviewSubAssignment").call(@peer_review_sub_assignment.id.to_s)
+        result = execute_query(query, @teacher, relay_id)
+
+        assignment = result.dig("data", "peerReviewSubAssignment")
+        expect(assignment["_id"]).to eq @peer_review_sub_assignment.id.to_s
+      end
+    end
+
+    context "when feature flag is disabled" do
+      before do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "returns nil" do
+        result = execute_query
+
+        expect(result.dig("data", "peerReviewSubAssignment")).to be_nil
+      end
+    end
+
+    context "with invalid permissions" do
+      before(:once) do
+        @other_course = Course.create!(name: "Other Course")
+        @other_teacher = teacher_in_course(course: @other_course, active_all: true).user
+      end
+
+      it "returns nil for user without access" do
+        result = execute_query(query, @other_teacher)
+
+        expect(result.dig("data", "peerReviewSubAssignment")).to be_nil
+      end
+    end
+
+    context "with non-existent id" do
+      it "returns nil" do
+        result = execute_query(query, @teacher, "999999")
+
+        expect(result.dig("data", "peerReviewSubAssignment")).to be_nil
+      end
+    end
+
+    context "querying inherited fields" do
+      it "resolves fields inherited from AssignmentType" do
+        extended_query = <<~GQL
+          query($id: ID!) {
+            peerReviewSubAssignment(id: $id) {
+              _id
+              name
+              pointsPossible
+              courseId
+              state
+            }
+          }
+        GQL
+
+        result = execute_query(extended_query, @teacher, @peer_review_sub_assignment.id.to_s, request: ActionDispatch::TestRequest.create)
+
+        peer_review_sub_assignment = result.dig("data", "peerReviewSubAssignment")
+        expect(peer_review_sub_assignment["_id"]).to eq @peer_review_sub_assignment.id.to_s
+        expect(peer_review_sub_assignment["name"]).to eq @peer_review_sub_assignment.name
+        expect(peer_review_sub_assignment["pointsPossible"]).to eq @peer_review_sub_assignment.points_possible
+        expect(peer_review_sub_assignment["courseId"]).to eq @course.id.to_s
+        expect(peer_review_sub_assignment["state"]).to eq @peer_review_sub_assignment.workflow_state
+      end
+
+      context "overridden fields" do
+        it "returns html_url pointing to parent assignment" do
+          extended_query = <<~GQL
+            query($id: ID!) {
+              peerReviewSubAssignment(id: $id) {
+                htmlUrl
+                parentAssignment {
+                  htmlUrl
+                }
+              }
+            }
+          GQL
+
+          result = execute_query(extended_query, @teacher, @peer_review_sub_assignment.id.to_s, request: ActionDispatch::TestRequest.create)
+
+          peer_review_sub_assignment = result.dig("data", "peerReviewSubAssignment")
+          parent_assignment = peer_review_sub_assignment["parentAssignment"]
+          expect(peer_review_sub_assignment["htmlUrl"]).to eq(parent_assignment["htmlUrl"])
+        end
+      end
+    end
+  end
 end

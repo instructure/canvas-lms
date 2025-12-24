@@ -76,6 +76,17 @@ module Types
       GraphQLNodeLoader.load("AssignmentBySis", sis_id, context) if sis_id
     end
 
+    field :peer_review_sub_assignment, Types::PeerReviewSubAssignmentType, null: true do
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("PeerReviewSubAssignment")
+    end
+    def peer_review_sub_assignment(id:)
+      GraphQLNodeLoader.load("PeerReviewSubAssignment", id, context)
+    end
+
     field :assignment_group, Types::AssignmentGroupType, null: true do
       argument :id,
                ID,
