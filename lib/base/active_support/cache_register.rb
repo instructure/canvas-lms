@@ -105,7 +105,8 @@ module ActiveSupport
             instrument(:write, name, **options) do
               entry = ::ActiveSupport::Cache::Entry.new(result, **options)
               failsafe :write_entry, returning: false do
-                redis.set(frd_key, serialize_entry(entry, **options)) # write to the key generated in the lua script
+                ex = options[:expires_in]&.to_i.presence
+                redis.set(frd_key, serialize_entry(entry, **options), ex:) # write to the key generated in the lua script with TTL
               end
             end
             result

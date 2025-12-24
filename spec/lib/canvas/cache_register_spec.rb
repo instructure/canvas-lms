@@ -371,6 +371,28 @@ describe Canvas::CacheRegister do
         "b"
       end).to eql "b"
     end
+
+    it "sets Redis TTL when expires_in is provided" do
+      some_key = "ttl_test_key"
+      # Regression test: Ensure 'expires_in' is propagated to Redis to prevent keys from persisting indefinitely
+      Rails.cache.fetch_with_batched_keys(some_key, batch_object: @user, batched_keys: [:enrollments], expires_in: 1.hour) { "value" }
+
+      redis = Canvas::CacheRegister.redis(User.base_cache_register_key_for(@user), @user.shard)
+      keys = redis.keys("*ttl_test_key*")
+      expect(keys).not_to be_empty
+      expect(redis.ttl(keys.first)).to be_between(3500, 3600)
+    end
+
+    it "does not set Redis TTL when expires_in is not provided" do
+      some_key = "no_ttl_test_key"
+      # Ensure standard behavior is preserved (TTL should be -1 for indefinite keys)
+      Rails.cache.fetch_with_batched_keys(some_key, batch_object: @user, batched_keys: [:enrollments]) { "value" }
+
+      redis = Canvas::CacheRegister.redis(User.base_cache_register_key_for(@user), @user.shard)
+      keys = redis.keys("*no_ttl_test_key*")
+      expect(keys).not_to be_empty
+      expect(redis.ttl(keys.first)).to eq(-1)
+    end
   end
 
   context "without an object" do
