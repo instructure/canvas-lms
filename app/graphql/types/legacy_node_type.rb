@@ -45,6 +45,7 @@ class Types::LegacyNodeType < Types::BaseEnum
   value "OutcomeCalculationMethod"
   value "OutcomeProficiency"
   value "Page"
+  value "PeerReviewSubAssignment"
   value "PostPolicy"
   value "Progress"
   value "Rubric"
