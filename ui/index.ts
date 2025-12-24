@@ -147,7 +147,7 @@ async function afterDocumentReady() {
 
 const RCE_HTML_EDITOR_CLASS = 'RceHtmlEditor'
 async function setupMathML() {
-  const {Mathml} = await import('@instructure/canvas-rce/es/enhance-user-content/mathml')
+  const {Mathml} = await import('@instructure/canvas-rce/enhance-user-content')
   const features = {
     new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
     explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,

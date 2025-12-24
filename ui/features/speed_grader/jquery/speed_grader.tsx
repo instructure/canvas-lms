@@ -130,7 +130,7 @@ import type {SelectOptionDefinition} from './speed_grader_select_menu'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON' /* getJSON, ajaxJSON */
 import '@canvas/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
-import {loadDocPreview} from '@instructure/canvas-rce/es/enhance-user-content/doc_previews'
+import {loadDocPreview} from '@instructure/canvas-rce/enhance-user-content'
 import 'jqueryui/dialog'
 import 'jqueryui/menu'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
