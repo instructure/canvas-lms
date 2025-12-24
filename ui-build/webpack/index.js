@@ -167,7 +167,7 @@ module.exports = {
     hashFunction: 'xxhash64',
     filename: '[name]-entry-[contenthash].js',
     chunkFilename: '[name]-chunk-[contenthash].js',
-    pathinfo: 'verbose',
+    pathinfo: isProduction ? false : 'verbose',
   },
 
   resolve: {
