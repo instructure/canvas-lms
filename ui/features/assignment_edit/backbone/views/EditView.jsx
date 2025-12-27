@@ -1628,6 +1628,15 @@ EditView.prototype.getFormData = function () {
       'peer_reviews_submission_required_checkbox_hidden',
     )
     data.peer_review_submission_required = submissionRequiredHidden?.value === 'true'
+
+    // Add peer review due dates and overrides
+    const storedPeerReviewData = this.assignment.get('peer_review_data')
+    if (data.peer_reviews && storedPeerReviewData) {
+      data.peer_review = {
+        ...(data.peer_review || {}),
+        ...storedPeerReviewData,
+      }
+    }
   }
 
   return data

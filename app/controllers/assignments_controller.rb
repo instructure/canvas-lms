@@ -949,7 +949,8 @@ class AssignmentsController < ApplicationController
         ASSIGNMENT_OVERRIDES: assignment_overrides_json(
           @assignment.overrides_for(@current_user, ensure_set_not_empty: true),
           @current_user,
-          include_names: true
+          include_names: true,
+          include_child_peer_review_override_dates: @context.feature_enabled?(:peer_review_allocation_and_grading) && @assignment.peer_reviews && @assignment.peer_review_sub_assignment
         ),
         AVAILABLE_MODERATORS: @assignment.available_moderators.map { |user| { name: user.name, id: user.id } },
         COURSE_ID: @context.id,

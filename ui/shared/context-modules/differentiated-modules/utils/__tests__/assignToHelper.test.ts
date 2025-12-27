@@ -21,9 +21,20 @@ import type {
   ItemAssignToCardSpec,
   DateDetailsOverride,
   AssigneeOption,
+  BackendDateDetailsOverride,
 } from '../../react/Item/types'
 import {AssignmentOverridesPayload} from '../../react/types'
-import {generateAssignmentOverridesPayload, generateDateDetailsPayload} from '../assignToHelper'
+import {
+  generateAssignmentOverridesPayload,
+  generateDateDetailsPayload,
+  flattenPeerReviewDates,
+  markPeerReviewDefaultDates,
+  getAssignmentOverride,
+  getDefaultPeerReviewDates,
+  hasPeerReviewOverrideDates,
+  getPeerReviewOverride,
+  getAssignmentAndPeerReviewOverrides,
+} from '../assignToHelper'
 
 describe('assitnToHelper', () => {
   describe('generateAssignmentOverridesPayload', () => {
@@ -109,6 +120,9 @@ describe('assitnToHelper', () => {
         required_replies_due_at: null,
         unlock_at: null,
         lock_at: null,
+        peer_review_available_from: null,
+        peer_review_due_at: null,
+        peer_review_available_to: null,
         assignment_overrides: [] as DateDetailsOverride[],
         only_visible_to_overrides: false,
       }
@@ -652,6 +666,1015 @@ describe('assitnToHelper', () => {
         only_visible_to_overrides: true,
       }
       expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
+    })
+
+    it('includes peer review dates from everyone card in default payload', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          key: '1',
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['everyone'],
+          due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_from: '2024-01-15T12:00:00Z',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_to: '2024-01-25T12:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+
+      const payload = generateDateDetailsPayload(cards, false, [], [])
+
+      expect(payload.peer_review_available_from).toBe('2024-01-15T12:00:00Z')
+      expect(payload.peer_review_due_at).toBe('2024-01-20T12:00:00Z')
+      expect(payload.peer_review_available_to).toBe('2024-01-25T12:00:00Z')
+    })
+
+    it('includes peer review dates in section override', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: '1',
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['section-2'],
+          due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_from: '2024-01-15T12:00:00Z',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_to: '2024-01-25T12:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+
+      const payload = generateDateDetailsPayload(cards, false, [], [])
+
+      expect(payload.assignment_overrides).toHaveLength(1)
+      expect(payload.assignment_overrides[0].course_section_id).toBe('2')
+      expect(payload.assignment_overrides[0].peer_review_available_from).toBe(
+        '2024-01-15T12:00:00Z',
+      )
+      expect(payload.assignment_overrides[0].peer_review_due_at).toBe('2024-01-20T12:00:00Z')
+      expect(payload.assignment_overrides[0].peer_review_available_to).toBe('2024-01-25T12:00:00Z')
+    })
+
+    it('includes peer review dates in student override', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: '1',
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['student-123'],
+          due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_from: '2024-01-15T12:00:00Z',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_to: '2024-01-25T12:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+
+      const payload = generateDateDetailsPayload(cards, false, [], [])
+
+      expect(payload.assignment_overrides).toHaveLength(1)
+      expect(payload.assignment_overrides[0].student_ids).toEqual(['123'])
+      expect(payload.assignment_overrides[0].peer_review_available_from).toBe(
+        '2024-01-15T12:00:00Z',
+      )
+      expect(payload.assignment_overrides[0].peer_review_due_at).toBe('2024-01-20T12:00:00Z')
+      expect(payload.assignment_overrides[0].peer_review_available_to).toBe('2024-01-25T12:00:00Z')
+    })
+
+    it('includes peer review override_id when updating existing override', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: '999',
+          peer_review_override_id: '888',
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['section-2'],
+          defaultOptions: ['section-2'],
+          due_at: '2024-01-20T12:00:00Z',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+
+      const payload = generateDateDetailsPayload(cards, false, [], [])
+
+      expect(payload.assignment_overrides).toHaveLength(1)
+      expect(payload.assignment_overrides[0].id).toBe('999')
+      expect(payload.assignment_overrides[0].peer_review_override_id).toBe('888')
+    })
+
+    it('includes peer review dates in course override (Everyone else)', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: '1',
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['everyone'],
+          defaultOptions: ['everyone'],
+          due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_from: '2024-01-15T12:00:00Z',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_to: '2024-01-25T12:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+
+      const payload = generateDateDetailsPayload(cards, true, [], [])
+
+      expect(payload.assignment_overrides).toHaveLength(1)
+      expect(payload.assignment_overrides[0].course_id).toBe('everyone')
+      expect(payload.assignment_overrides[0].peer_review_available_from).toBe(
+        '2024-01-15T12:00:00Z',
+      )
+      expect(payload.assignment_overrides[0].peer_review_due_at).toBe('2024-01-20T12:00:00Z')
+      expect(payload.assignment_overrides[0].peer_review_available_to).toBe('2024-01-25T12:00:00Z')
+    })
+
+    it('includes peer review dates in tag override (non-collaborative group)', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: undefined,
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['tag-456'],
+          due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_from: '2024-01-15T12:00:00Z',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_to: '2024-01-25T12:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+
+      const payload = generateDateDetailsPayload(cards, false, [], [])
+
+      expect(payload.assignment_overrides).toHaveLength(1)
+      expect(payload.assignment_overrides[0].group_id).toBe('456')
+      expect(payload.assignment_overrides[0].non_collaborative).toBe(true)
+      expect(payload.assignment_overrides[0].peer_review_available_from).toBe(
+        '2024-01-15T12:00:00Z',
+      )
+      expect(payload.assignment_overrides[0].peer_review_due_at).toBe('2024-01-20T12:00:00Z')
+      expect(payload.assignment_overrides[0].peer_review_available_to).toBe('2024-01-25T12:00:00Z')
+    })
+
+    it('updates existing tag override with peer review dates', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: '789',
+          peer_review_override_id: '999',
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['tag-123'],
+          defaultOptions: ['tag-123'],
+          due_at: '2024-01-20T12:00:00Z',
+          peer_review_due_at: '2024-01-21T12:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+
+      const payload = generateDateDetailsPayload(cards, false, [], [])
+
+      expect(payload.assignment_overrides).toHaveLength(1)
+      expect(payload.assignment_overrides[0].id).toBe('789')
+      expect(payload.assignment_overrides[0].group_id).toBe('123')
+      expect(payload.assignment_overrides[0].non_collaborative).toBe(true)
+      expect(payload.assignment_overrides[0].peer_review_override_id).toBe('999')
+      expect(payload.assignment_overrides[0].peer_review_due_at).toBe('2024-01-21T12:00:00Z')
+    })
+
+    it('handles section and tag on different cards with different peer review dates', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: undefined,
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['section-2'],
+          due_at: '2024-01-20T12:00:00Z',
+          peer_review_due_at: '2024-01-22T12:00:00Z',
+        } as ItemAssignToCardSpec,
+        {
+          overrideId: undefined,
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['tag-5'],
+          due_at: '2024-01-20T12:00:00Z',
+          peer_review_due_at: '2024-01-23T12:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+
+      const payload = generateDateDetailsPayload(cards, false, [], [])
+
+      expect(payload.assignment_overrides).toHaveLength(2)
+      const sectionOverride = payload.assignment_overrides.find(o => o.course_section_id === '2')
+      const tagOverride = payload.assignment_overrides.find(o => o.group_id === '5')
+
+      expect(sectionOverride?.peer_review_due_at).toBe('2024-01-22T12:00:00Z')
+      expect(tagOverride?.peer_review_due_at).toBe('2024-01-23T12:00:00Z')
+      expect(tagOverride?.non_collaborative).toBe(true)
+    })
+  })
+
+  describe('flattenPeerReviewDates', () => {
+    it('flattens peer_review_dates object into flat fields', () => {
+      const input: BackendDateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '456',
+          peer_review_dates: {
+            id: '789',
+            due_at: '2024-01-20T12:00:00Z',
+            unlock_at: '2024-01-15T12:00:00Z',
+            lock_at: '2024-01-25T12:00:00Z',
+          },
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = flattenPeerReviewDates(input)
+
+      expect(result[0]).toEqual({
+        id: '123',
+        course_section_id: '456',
+        peer_review_override_id: '789',
+        peer_review_due_at: '2024-01-20T12:00:00Z',
+        peer_review_available_from: '2024-01-15T12:00:00Z',
+        peer_review_available_to: '2024-01-25T12:00:00Z',
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      })
+      expect(result[0]).not.toHaveProperty('peer_review_dates')
+    })
+
+    it('passes through overrides without peer_review_dates unchanged', () => {
+      const input: BackendDateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '456',
+          peer_review_override_id: '789',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = flattenPeerReviewDates(input)
+
+      expect(result[0]).toEqual(input[0])
+    })
+
+    it('handles an empty array', () => {
+      const result = flattenPeerReviewDates([])
+      expect(result).toEqual([])
+    })
+  })
+
+  describe('markPeerReviewDefaultDates', () => {
+    it('marks default section override as having default dates', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '1',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = markPeerReviewDefaultDates(overrides, '1')
+
+      expect(result[0].peer_review_default_dates).toBe(true)
+    })
+
+    it('does not mark course override as having default dates', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '1',
+          course_id: '456',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = markPeerReviewDefaultDates(overrides, '1')
+
+      expect(result[0].peer_review_default_dates).toBeUndefined()
+    })
+
+    it('does not mark non-default section override', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '2',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = markPeerReviewDefaultDates(overrides, '1')
+
+      expect(result[0].peer_review_default_dates).toBeUndefined()
+    })
+
+    it('does not mark student override', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          student_ids: ['456'],
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = markPeerReviewDefaultDates(overrides, '1')
+
+      expect(result[0].peer_review_default_dates).toBeUndefined()
+    })
+
+    it('does not mark group override (collaborative group)', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          group_id: '789',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = markPeerReviewDefaultDates(overrides, '1')
+
+      expect(result[0].peer_review_default_dates).toBeUndefined()
+    })
+
+    it('does not mark tag override (non-collaborative group)', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          group_id: '789',
+          non_collaborative: true,
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = markPeerReviewDefaultDates(overrides, '1')
+
+      expect(result[0].peer_review_default_dates).toBeUndefined()
+    })
+  })
+
+  describe('getAssignmentOverride', () => {
+    it('removes all peer review-specific fields', () => {
+      const override: DateDetailsOverride = {
+        id: '123',
+        course_section_id: '456',
+        due_at: '2024-01-20T12:00:00Z',
+        peer_review_override_id: '789',
+        peer_review_available_from: '2024-01-15T12:00:00Z',
+        peer_review_due_at: '2024-01-20T12:00:00Z',
+        peer_review_available_to: '2024-01-25T12:00:00Z',
+        peer_review_default_dates: true,
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      }
+
+      const result = getAssignmentOverride(override)
+
+      expect(result).toEqual({
+        id: '123',
+        course_section_id: '456',
+        due_at: '2024-01-20T12:00:00Z',
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      })
+      expect(result).not.toHaveProperty('peer_review_override_id')
+      expect(result).not.toHaveProperty('peer_review_available_from')
+      expect(result).not.toHaveProperty('peer_review_due_at')
+      expect(result).not.toHaveProperty('peer_review_available_to')
+      expect(result).not.toHaveProperty('peer_review_default_dates')
+    })
+  })
+
+  describe('getDefaultPeerReviewDates', () => {
+    it('extracts peer review dates from flat fields', () => {
+      const payload: DateDetailsOverride = {
+        peer_review_available_from: '2024-01-15T12:00:00Z',
+        peer_review_due_at: '2024-01-20T12:00:00Z',
+        peer_review_available_to: '2024-01-25T12:00:00Z',
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      }
+
+      const result = getDefaultPeerReviewDates(payload)
+
+      expect(result).toEqual({
+        unlock_at: '2024-01-15T12:00:00Z',
+        due_at: '2024-01-20T12:00:00Z',
+        lock_at: '2024-01-25T12:00:00Z',
+      })
+    })
+
+    it('handles null/undefined dates', () => {
+      const payload: DateDetailsOverride = {
+        peer_review_available_from: null,
+        peer_review_due_at: undefined,
+        peer_review_available_to: null,
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      }
+
+      const result = getDefaultPeerReviewDates(payload)
+
+      expect(result).toEqual({
+        unlock_at: null,
+        due_at: undefined,
+        lock_at: null,
+      })
+    })
+  })
+
+  describe('hasPeerReviewOverrideDates', () => {
+    it('returns true when peer_review_due_at is set', () => {
+      const override: DateDetailsOverride = {
+        peer_review_due_at: '2024-01-20T12:00:00Z',
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      }
+      expect(hasPeerReviewOverrideDates(override)).toBe(true)
+    })
+
+    it('returns true when peer_review_available_from is set', () => {
+      const override: DateDetailsOverride = {
+        peer_review_available_from: '2024-01-15T12:00:00Z',
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      }
+      expect(hasPeerReviewOverrideDates(override)).toBe(true)
+    })
+
+    it('returns true when peer_review_available_to is set', () => {
+      const override: DateDetailsOverride = {
+        peer_review_available_to: '2024-01-25T12:00:00Z',
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      }
+      expect(hasPeerReviewOverrideDates(override)).toBe(true)
+    })
+
+    it('returns false when no peer review dates are set', () => {
+      const override: DateDetailsOverride = {
+        due_at: '2024-01-20T12:00:00Z',
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      }
+      expect(hasPeerReviewOverrideDates(override)).toBe(false)
+    })
+  })
+
+  describe('getPeerReviewOverride', () => {
+    it('creates peer review override for section', () => {
+      const override: DateDetailsOverride = {
+        peer_review_override_id: '789',
+        course_section_id: '456',
+        peer_review_due_at: '2024-01-20T12:00:00Z',
+        peer_review_available_from: '2024-01-15T12:00:00Z',
+        peer_review_available_to: '2024-01-25T12:00:00Z',
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      }
+
+      const result = getPeerReviewOverride(override)
+
+      expect(result).toEqual({
+        id: '789',
+        course_section_id: '456',
+        student_ids: undefined,
+        course_id: undefined,
+        group_id: undefined,
+        due_at: '2024-01-20T12:00:00Z',
+        unlock_at: '2024-01-15T12:00:00Z',
+        lock_at: '2024-01-25T12:00:00Z',
+        unassign_item: false,
+      })
+    })
+
+    it('creates peer review override for students', () => {
+      const override: DateDetailsOverride = {
+        student_ids: ['123', '456'],
+        peer_review_due_at: '2024-01-20T12:00:00Z',
+        peer_review_available_from: null,
+        peer_review_available_to: null,
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      }
+
+      const result = getPeerReviewOverride(override)
+
+      expect(result.student_ids).toEqual(['123', '456'])
+      expect(result.due_at).toBe('2024-01-20T12:00:00Z')
+      expect(result.unlock_at).toBeNull()
+      expect(result.lock_at).toBeNull()
+    })
+
+    it('creates peer review override for course', () => {
+      const override: DateDetailsOverride = {
+        course_section_id: '1',
+        course_id: '456',
+        peer_review_due_at: '2024-01-20T12:00:00Z',
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      }
+
+      const result = getPeerReviewOverride(override)
+
+      expect(result.course_id).toBe('456')
+      expect(result.course_section_id).toBe('1')
+    })
+
+    it('creates peer review override for group (collaborative group)', () => {
+      const override: DateDetailsOverride = {
+        group_id: '555',
+        peer_review_override_id: '777',
+        peer_review_due_at: '2024-01-20T12:00:00Z',
+        peer_review_available_from: '2024-01-15T12:00:00Z',
+        peer_review_available_to: '2024-01-25T12:00:00Z',
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      }
+
+      const result = getPeerReviewOverride(override)
+
+      expect(result).toEqual({
+        id: '777',
+        course_section_id: undefined,
+        student_ids: undefined,
+        course_id: undefined,
+        group_id: '555',
+        non_collaborative: undefined,
+        due_at: '2024-01-20T12:00:00Z',
+        unlock_at: '2024-01-15T12:00:00Z',
+        lock_at: '2024-01-25T12:00:00Z',
+        unassign_item: false,
+      })
+    })
+
+    it('creates peer review override for tag (non-collaborative group)', () => {
+      const override: DateDetailsOverride = {
+        group_id: '789',
+        non_collaborative: true,
+        peer_review_override_id: '888',
+        peer_review_due_at: '2024-01-20T12:00:00Z',
+        peer_review_available_from: '2024-01-15T12:00:00Z',
+        peer_review_available_to: '2024-01-25T12:00:00Z',
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      }
+
+      const result = getPeerReviewOverride(override)
+
+      expect(result).toEqual({
+        id: '888',
+        course_section_id: undefined,
+        student_ids: undefined,
+        course_id: undefined,
+        group_id: '789',
+        due_at: '2024-01-20T12:00:00Z',
+        unlock_at: '2024-01-15T12:00:00Z',
+        lock_at: '2024-01-25T12:00:00Z',
+        unassign_item: false,
+      })
+    })
+  })
+
+  describe('getAssignmentAndPeerReviewOverrides', () => {
+    it('extracts default peer review dates from default section override', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '1',
+          due_at: '2024-01-20T12:00:00Z',
+          peer_review_default_dates: true,
+          peer_review_available_from: '2024-01-15T12:00:00Z',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_to: '2024-01-25T12:00:00Z',
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = getAssignmentAndPeerReviewOverrides(overrides)
+
+      expect(result.assignmentOverrides).toHaveLength(1)
+      expect(result.assignmentOverrides[0]).not.toHaveProperty('peer_review_due_at')
+      expect(result.peerReview).toEqual({
+        unlock_at: '2024-01-15T12:00:00Z',
+        due_at: '2024-01-20T12:00:00Z',
+        lock_at: '2024-01-25T12:00:00Z',
+        peer_review_overrides: [],
+      })
+    })
+
+    it('creates peer_review_overrides array for section overrides', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '2',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+        {
+          id: '124',
+          course_section_id: '3',
+          peer_review_due_at: '2024-01-21T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = getAssignmentAndPeerReviewOverrides(overrides)
+
+      expect(result.assignmentOverrides).toHaveLength(2)
+      expect(result.peerReview?.peer_review_overrides).toHaveLength(2)
+      expect(result.peerReview?.peer_review_overrides?.[0].course_section_id).toBe('2')
+      expect(result.peerReview?.peer_review_overrides?.[1].course_section_id).toBe('3')
+    })
+
+    it('creates peer review override for course override', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '1',
+          course_id: '456',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = getAssignmentAndPeerReviewOverrides(overrides)
+
+      expect(result.peerReview?.peer_review_overrides).toHaveLength(1)
+      expect(result.peerReview?.peer_review_overrides?.[0].course_id).toBe('456')
+    })
+
+    it('does not create peer review override when no dates are set', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '2',
+          due_at: '2024-01-20T12:00:00Z',
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = getAssignmentAndPeerReviewOverrides(overrides)
+
+      expect(result.assignmentOverrides).toHaveLength(1)
+      expect(result.peerReview).toEqual({
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        peer_review_overrides: [],
+      })
+    })
+
+    it('returns peerReview with empty overrides when no peer review data exists', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '2',
+          due_at: '2024-01-20T12:00:00Z',
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = getAssignmentAndPeerReviewOverrides(overrides)
+
+      expect(result.peerReview).toEqual({
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        peer_review_overrides: [],
+      })
+    })
+
+    it('creates peer review override for student override', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          student_ids: ['456', '789'],
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_from: '2024-01-15T12:00:00Z',
+          peer_review_available_to: '2024-01-25T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = getAssignmentAndPeerReviewOverrides(overrides)
+
+      expect(result.assignmentOverrides).toHaveLength(1)
+      expect(result.assignmentOverrides[0]).not.toHaveProperty('peer_review_due_at')
+      expect(result.peerReview?.peer_review_overrides).toHaveLength(1)
+      expect(result.peerReview?.peer_review_overrides?.[0].student_ids).toEqual(['456', '789'])
+      expect(result.peerReview?.peer_review_overrides?.[0].due_at).toBe('2024-01-20T12:00:00Z')
+    })
+
+    it('creates peer review override for group override (collaborative group)', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          group_id: '555',
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_from: '2024-01-15T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = getAssignmentAndPeerReviewOverrides(overrides)
+
+      expect(result.assignmentOverrides).toHaveLength(1)
+      expect(result.assignmentOverrides[0]).not.toHaveProperty('peer_review_due_at')
+      expect(result.peerReview?.peer_review_overrides).toHaveLength(1)
+      expect(result.peerReview?.peer_review_overrides?.[0].group_id).toBe('555')
+      expect(result.peerReview?.peer_review_overrides?.[0]).not.toHaveProperty('non_collaborative')
+      expect(result.peerReview?.peer_review_overrides?.[0].due_at).toBe('2024-01-20T12:00:00Z')
+    })
+
+    it('creates peer review override for tag override (non-collaborative group)', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          group_id: '789',
+          non_collaborative: true,
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_to: '2024-01-25T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = getAssignmentAndPeerReviewOverrides(overrides)
+
+      expect(result.assignmentOverrides).toHaveLength(1)
+      expect(result.assignmentOverrides[0]).not.toHaveProperty('peer_review_due_at')
+      expect(result.peerReview?.peer_review_overrides).toHaveLength(1)
+      expect(result.peerReview?.peer_review_overrides?.[0].group_id).toBe('789')
+      expect(result.peerReview?.peer_review_overrides?.[0]).not.toHaveProperty('non_collaborative')
+      expect(result.peerReview?.peer_review_overrides?.[0].due_at).toBe('2024-01-20T12:00:00Z')
+    })
+
+    it('sets top-level dates to null when there are overrides but no everyone override', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          student_ids: ['456', '789'],
+          peer_review_due_at: '2024-01-20T12:00:00Z',
+          peer_review_available_from: '2024-01-15T12:00:00Z',
+          peer_review_available_to: '2024-01-25T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = getAssignmentAndPeerReviewOverrides(overrides)
+
+      expect(result.peerReview?.peer_review_overrides).toHaveLength(1)
+      expect(result.peerReview?.due_at).toBeNull()
+      expect(result.peerReview?.unlock_at).toBeNull()
+      expect(result.peerReview?.lock_at).toBeNull()
+    })
+
+    it('sends empty peer_review_overrides when existing override has all dates cleared', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '2',
+          peer_review_override_id: '456',
+          peer_review_due_at: null,
+          peer_review_available_from: null,
+          peer_review_available_to: null,
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = getAssignmentAndPeerReviewOverrides(overrides)
+
+      expect(result.assignmentOverrides).toHaveLength(1)
+      expect(result.peerReview).toBeDefined()
+      expect(result.peerReview?.peer_review_overrides).toEqual([])
+      expect(result.peerReview?.due_at).toBeNull()
+      expect(result.peerReview?.unlock_at).toBeNull()
+      expect(result.peerReview?.lock_at).toBeNull()
+    })
+
+    it('sends empty peer_review_overrides when multiple existing overrides have dates cleared', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '2',
+          peer_review_override_id: '456',
+          peer_review_due_at: null,
+          peer_review_available_from: null,
+          peer_review_available_to: null,
+          due_at: '2024-01-20T12:00:00Z',
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+        {
+          id: '124',
+          student_ids: ['789'],
+          peer_review_override_id: '789',
+          peer_review_due_at: null,
+          peer_review_available_from: null,
+          peer_review_available_to: null,
+          due_at: '2024-01-21T12:00:00Z',
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = getAssignmentAndPeerReviewOverrides(overrides)
+
+      expect(result.assignmentOverrides).toHaveLength(2)
+      expect(result.peerReview?.peer_review_overrides).toEqual([])
+    })
+
+    it('includes only overrides with dates when some are cleared and some have dates', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '2',
+          peer_review_override_id: '456',
+          peer_review_due_at: null,
+          peer_review_available_from: null,
+          peer_review_available_to: null,
+          due_at: '2024-01-20T12:00:00Z',
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+        {
+          id: '124',
+          course_section_id: '3',
+          peer_review_override_id: '789',
+          peer_review_due_at: '2024-01-25T12:00:00Z',
+          peer_review_available_from: null,
+          peer_review_available_to: null,
+          due_at: '2024-01-21T12:00:00Z',
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = getAssignmentAndPeerReviewOverrides(overrides)
+
+      expect(result.assignmentOverrides).toHaveLength(2)
+      expect(result.peerReview?.peer_review_overrides).toHaveLength(1)
+      expect(result.peerReview?.peer_review_overrides?.[0].course_section_id).toBe('3')
+      expect(result.peerReview?.peer_review_overrides?.[0].due_at).toBe('2024-01-25T12:00:00Z')
     })
   })
 })

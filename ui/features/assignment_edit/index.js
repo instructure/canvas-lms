@@ -37,6 +37,7 @@ import LockManager from '@canvas/blueprint-courses/react/components/LockManager/
 import renderEditAssignmentsApp from './react/index'
 import {renderEnhancedRubrics} from './react/AssignmentRubric'
 import {renderPeerReviewDetails} from './react/PeerReviewDetails'
+import {flattenPeerReviewDates} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 
 function loadBackboneComponents() {
   function maybeScrollToTarget() {
@@ -58,7 +59,15 @@ function loadBackboneComponents() {
     lockManager.init({itemType: 'assignment', page: 'edit'})
     const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
 
-    if (ENV.ASSIGNMENT) ENV.ASSIGNMENT.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
+    if (ENV.ASSIGNMENT) {
+      let assignmentOverrides = ENV.ASSIGNMENT_OVERRIDES
+      if (ENV.ASSIGNMENT.peer_reviews && ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+        // Flatten nested peer_review_dates to flat fields at entry point
+        assignmentOverrides = flattenPeerReviewDates(ENV.ASSIGNMENT_OVERRIDES)
+      }
+
+      ENV.ASSIGNMENT.assignment_overrides = assignmentOverrides
+    }
 
     const userIsAdmin = ENV.current_user_is_admin
     const canEditGrades = ENV.PERMISSIONS?.can_edit_grades ?? false
