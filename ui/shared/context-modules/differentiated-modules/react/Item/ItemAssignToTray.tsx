@@ -46,6 +46,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {
   DateDetails,
   DateDetailsOverride,
+  DateDetailsPayload,
   DateLockTypes,
   exportedOverride,
   ItemAssignToCardSpec,
@@ -111,7 +112,7 @@ export const updateModuleItem = ({
   moduleItemType: ItemType
   moduleItemName: string
   moduleItemContentId: string
-  payload: DateDetails
+  payload: DateDetailsPayload
   onLoading: (flag: boolean) => void
   onSuccess: () => void
 }) => {

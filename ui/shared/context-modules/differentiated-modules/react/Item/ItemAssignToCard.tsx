@@ -273,6 +273,22 @@ export default forwardRef(function ItemAssignToCard(
     [validationErrors?.due_at],
   )
 
+  const validatePeerReviewDates = useCallback(
+    (newErrors: Record<string, string>) => {
+      const peerReviewFields = [
+        'peer_review_due_at',
+        'peer_review_available_from',
+        'peer_review_available_to',
+      ] as const
+      return peerReviewFields.some(field => {
+        const oldError = validationErrors?.[field]
+        const newError = newErrors?.[field]
+        return oldError !== newError
+      })
+    },
+    [validationErrors],
+  )
+
   useEffect(() => {
     onValidityChange?.(
       cardId,
@@ -287,10 +303,20 @@ export default forwardRef(function ItemAssignToCard(
     const newErrors = dateValidator.validateDatetimes(dateValidatorInputArgs)
     const newBadDates = Object.keys(newErrors)
     const oldBadDates = Object.keys(validationErrors)
-    if (!arrayEquals(newBadDates, oldBadDates) || validateTermForDueDate(newErrors)) {
+    if (
+      !arrayEquals(newBadDates, oldBadDates) ||
+      validateTermForDueDate(newErrors) ||
+      validatePeerReviewDates(newErrors)
+    ) {
       setValidationErrors(newErrors)
     }
-  }, [dateValidator, dateValidatorInputArgs, validateTermForDueDate, validationErrors])
+  }, [
+    dateValidator,
+    dateValidatorInputArgs,
+    validateTermForDueDate,
+    validatePeerReviewDates,
+    validationErrors,
+  ])
 
   useEffect(() => {
     const newError: FormMessage[] = []

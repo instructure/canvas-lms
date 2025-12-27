@@ -27,8 +27,10 @@ import {generateDateDetailsPayload} from '../../context-modules/differentiated-m
 import type {
   ItemAssignToCardSpec,
   DateDetailsOverride,
+  DateDetailsPayload,
   AssigneeOption,
   exportedOverride,
+  PeerReviewPayload,
 } from '@canvas/context-modules/differentiated-modules/react/Item/types'
 import type {ItemType} from '@canvas/context-modules/differentiated-modules/react/types'
 
@@ -73,12 +75,16 @@ const convertCardsToOverrides = (
       lock_at: payload.lock_at,
       reply_to_topic_due_at: payload.reply_to_topic_due_at,
       required_replies_due_at: payload.required_replies_due_at,
+      peer_review_available_from: payload.peer_review_available_from,
+      peer_review_due_at: payload.peer_review_due_at,
+      peer_review_available_to: payload.peer_review_available_to,
+      peer_review_default_dates: true,
       unassign_item: false,
     })
   }
+
   return overrides
 }
-
 interface ConvertedData {
   cards: ItemAssignToCardSpec[]
   selectedOptionIds: string[]
@@ -196,6 +202,7 @@ const convertOverridesToCards = (
         peer_review_available_from: override.peer_review_available_from,
         peer_review_due_at: override.peer_review_due_at,
         peer_review_available_to: override.peer_review_available_to,
+        peer_review_override_id: override.peer_review_override_id,
         selectedAssigneeIds: defaultOptions,
         defaultOptions,
         initialAssigneeOptions,

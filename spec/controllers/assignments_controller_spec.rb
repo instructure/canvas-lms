@@ -2779,6 +2779,75 @@ describe AssignmentsController do
       expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_TYPE]).to eq tool.class.to_s
     end
 
+    context "peer review override dates" do
+      before do
+        user_session(@teacher)
+        @assignment.update!(peer_reviews: true)
+      end
+
+      it "includes child peer review override dates when all conditions are met" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        peer_review_sub = peer_review_model(parent_assignment: @assignment)
+        section = @course.course_sections.create!(name: "Test Section")
+        parent_override = @assignment.assignment_overrides.create!(set: section, due_at: 1.day.from_now)
+        child_override = peer_review_sub.assignment_overrides.create!(
+          set: section,
+          parent_override:,
+          due_at: 2.days.from_now
+        )
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        overrides = assigns[:js_env][:ASSIGNMENT_OVERRIDES]
+        expect(overrides).to be_an(Array)
+        expect(overrides.length).to be > 0
+
+        parent_override_json = overrides.find { |o| o[:id] == parent_override.id }
+        expect(parent_override_json).to be_present
+        expect(parent_override_json[:peer_review_dates]).to be_present
+        expect(parent_override_json[:peer_review_dates][:id]).to eq(child_override.id)
+      end
+
+      it "does not include child peer review override dates when feature flag is disabled" do
+        section = @course.course_sections.create!(name: "Test Section")
+        parent_override = @assignment.assignment_overrides.create!(set: section, due_at: 1.day.from_now)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        overrides = assigns[:js_env][:ASSIGNMENT_OVERRIDES]
+        parent_override_json = overrides.find { |o| o[:id] == parent_override.id }
+        expect(parent_override_json).to be_present
+        expect(parent_override_json).not_to have_key(:peer_review_dates)
+      end
+
+      it "does not include child peer review override dates when peer_reviews is false" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @assignment.update!(peer_reviews: false)
+        section = @course.course_sections.create!(name: "Test Section")
+        parent_override = @assignment.assignment_overrides.create!(set: section, due_at: 1.day.from_now)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        overrides = assigns[:js_env][:ASSIGNMENT_OVERRIDES]
+        parent_override_json = overrides.find { |o| o[:id] == parent_override.id }
+        expect(parent_override_json).to be_present
+        expect(parent_override_json).not_to have_key(:peer_review_dates)
+      end
+
+      it "does not include child peer review override dates when peer_review_sub_assignment does not exist" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        section = @course.course_sections.create!(name: "Test Section")
+        parent_override = @assignment.assignment_overrides.create!(set: section, due_at: 1.day.from_now)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        overrides = assigns[:js_env][:ASSIGNMENT_OVERRIDES]
+        parent_override_json = overrides.find { |o| o[:id] == parent_override.id }
+        expect(parent_override_json).to be_present
+        expect(parent_override_json).not_to have_key(:peer_review_dates)
+      end
+    end
+
     it "bootstrap the assignment originality report visibility settings to js_env" do
       user_session(@teacher)
       get "edit", params: { course_id: @course.id, id: @assignment.id }
