@@ -16,15 +16,14 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-class AddAccessIgniteAgentPermission < ActiveRecord::Migration[7.2]
+class DeleteAccessIgniteAgentRoleOverride < ActiveRecord::Migration[8.0]
   tag :postdeploy
 
   def up
-    # Since the old permission has been removed, skip_validation to support
-    # migrations from scratch
-    DataFixup::AddRoleOverridesForNewPermission
-      .delay_if_production(priority: Delayed::LOW_PRIORITY)
-      .run(:manage_account_settings, :access_ignite_agent, skip_validation: true)
+    DataFixup::DeleteRoleOverrides
+      .delay_if_production(priority: Delayed::LOWER_PRIORITY, n_strand: "long_datafixups")
+      .run("access_ignite_agent")
   end
 end

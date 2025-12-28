@@ -2149,21 +2149,6 @@ BASE_PERMISSIONS = {
     account_only: true,
     account_allows: ->(a) { a.feature_enabled?(:intelligent_insights_rsi_report) }
   },
-  access_ignite_agent: {
-    label: -> { I18n.t("Ignite Agent - access") },
-    available_to: %w[AccountAdmin AccountMembership],
-    true_for: %w[AccountAdmin],
-    account_only: true,
-    account_allows: ->(a) { a.feature_enabled?(:ignite_agent_enabled) },
-    account_details: [
-      { title: -> { I18n.t("Ignite Agent") },
-        description: -> { I18n.t("Allows user to access the Ignite Agent AI companion for Canvas LMS.") } }
-    ],
-    account_considerations: [
-      { title: -> { I18n.t("Ignite Agent") },
-        description: -> { I18n.t("The Ignite Agent feature must be enabled for the account to assign this permission.") } }
-    ]
-  },
   manage_impact: {
     label: -> { I18n.t("Impact - Manage") },
     available_to: %w[AccountAdmin AccountMembership],
