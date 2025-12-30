@@ -318,10 +318,14 @@ class OutcomesApiController < ApplicationController
     }
   end
 
-  def find_outcomes_service_assignment_alignments(course, student_id)
+  def find_outcomes_service_assignment_alignments(course, student_id, assignment_id = nil)
     outcomes = ContentTag.active.where(context:).learning_outcome_links
     student_uuid = User.find(student_id).uuid
     assignments = Assignment.active.where(context:).quiz_lti
+
+    # Filter by assignment_id if provided
+    assignments = assignments.where(id: assignment_id) if assignment_id && assignment_id > 0
+
     return if assignments.nil? || outcomes.nil?
 
     os_alignments = get_outcome_alignments(context, outcomes.pluck(:content_id).join(","), { includes: "alignments", list_groups: false })
@@ -374,55 +378,138 @@ class OutcomesApiController < ApplicationController
     outcome_assignment_alignments.uniq
   end
 
-  # @API Get aligned assignments for an outcome in a course for a particular student
-  # Returns all assignments aligned to a specific outcome for a student in a course.
-  # @argument course_id [Integer]
+  # @API Get outcome alignments for a student or assignment
+  #
+  # Returns outcome alignments for a student or assignment in a course.
+  #
+  # @argument course_id [Required, Integer]
   #   The id of the course
   #
-  # @argument student_id [Integer]
-  #   The id of the student
+  # @argument student_id [Optional, Integer]
+  #   The id of the student. Returns alignments filtered by student submissions.
+  #   Can be combined with assignment_id to filter to a specific assignment.
+  #
+  # @argument assignment_id [Optional, Integer]
+  #   The id of the assignment. When provided without student_id, returns all
+  #   outcome alignments for the assignment (requires manage_grades or
+  #   view_all_grades permission). When provided with student_id, filters to
+  #   that student's submission.
+  #
+  # @note Either student_id or assignment_id must be provided.
+  #
+  # @note Assignment-only queries (without student_id):
+  #   - Only direct ContentTag alignments returned
+  #   - No quiz banks, live assessments, or outcomes service data
+  #   - Requires manage_grades or view_all_grades permission
   #
   # @returns [OutcomeAlignment]
 
   def outcome_alignments
-    if params[:student_id]
-      course = Course.find(params[:course_id])
-      can_manage = course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
-      student_id = params[:student_id].to_i
-      verify_readable_grade_enrollments([student_id]) unless can_manage
+    if params[:assignment_id].present? && params[:student_id].blank?
+      outcome_alignments_for_assignment
+    elsif params[:student_id].present?
+      outcome_alignments_for_student
+    else
+      render json: { message: "student_id or assignment_id is required" }, status: :bad_request
+    end
+  rescue ActiveRecord::RecordNotFound => e
+    render json: { message: e.message }, status: :not_found
+  end
 
-      assignment_states = ["deleted"]
-      assignment_states << "unpublished" unless can_manage
-      alignments = ActiveRecord::Base.connection.exec_query(ContentTag.active.for_context(course).learning_outcome_alignments
-        .select("content_tags.learning_outcome_id, content_tags.title, content_tags.content_id as assignment_id, assignments.submission_types")
-        .joins("INNER JOIN #{Assignment.quoted_table_name} assignments ON assignments.id = content_tags.content_id AND content_tags.content_type = 'Assignment'")
-        .joins("INNER JOIN #{Submission.quoted_table_name} submissions ON submissions.assignment_id = assignments.id AND submissions.user_id = #{student_id} AND submissions.workflow_state <> 'deleted'")
-        .where.not(assignments: { workflow_state: assignment_states })
-        .to_sql).to_a
-      alignments.each { |a| a[:url] = "#{polymorphic_url([course, :assignments])}/#{a["assignment_id"]}" }
+  # Direct params are those that have a direct correlation to attrs in the model
+  DIRECT_PARAMS = %w[title display_name description vendor_guid calculation_method calculation_int].freeze
 
-      quizzes = Quizzes::Quiz.active
-      quizzes = quizzes.where("quizzes.workflow_state IN ('active', 'available')") unless can_manage
-      quizzes = quizzes
-                .select(:title, :id, :assignment_id).preload(:quiz_questions)
-                .joins(assignment: :submissions)
-                .where(context: course)
-                .where(submissions: { user_id: student_id })
-                .where("submissions.workflow_state <> 'deleted'")
-      quiz_alignments = quizzes.map do |quiz|
-        bank_ids = quiz.quiz_questions.filter_map { |qq| qq.assessment_question.try(:assessment_question_bank_id) }.uniq
-        outcome_ids = ContentTag.active.where(content_id: bank_ids, content_type: "AssessmentQuestionBank", tag: "explicit_mastery").pluck(:learning_outcome_id)
-        outcome_ids.map do |id|
-          {
-            learning_outcome_id: id,
-            title: quiz.title,
-            assignment_id: quiz.assignment_id,
-            submission_types: "online_quiz",
-            url: "#{polymorphic_url([course, :quizzes])}/#{quiz.id}"
-          }
-        end
-      end.flatten
+  private
 
+  def outcome_alignments_for_assignment
+    course = Course.find(params[:course_id])
+
+    # Strict authorization: must have manage or view all grades
+    unless course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
+      return render json: { message: "Unauthorized" }, status: :unauthorized
+    end
+
+    assignment_id = params[:assignment_id].to_i
+    assignment = validate_assignment(course, assignment_id)
+    return unless assignment
+
+    alignments = fetch_assignment_alignments(course, assignment)
+    render json: alignments
+  end
+
+  def fetch_assignment_alignments(course, assignment)
+    query = ContentTag.active.for_context(course).learning_outcome_alignments
+                      .select("content_tags.learning_outcome_id, content_tags.title, content_tags.content_id as assignment_id, assignments.submission_types")
+                      .joins("INNER JOIN #{Assignment.quoted_table_name} assignments ON assignments.id = content_tags.content_id AND content_tags.content_type = 'Assignment'")
+                      .where(assignments: { id: assignment.id })
+                      .where.not(assignments: { workflow_state: "deleted" })
+
+    alignments = ActiveRecord::Base.connection.exec_query(query.to_sql).to_a
+    alignments.each { |a| a[:url] = "#{polymorphic_url([course, :assignments])}/#{a["assignment_id"]}" }
+    alignments
+  end
+
+  def outcome_alignments_for_student
+    course = Course.find(params[:course_id])
+    can_manage = course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
+    student_id = params[:student_id].to_i
+    verify_readable_grade_enrollments([student_id]) unless can_manage
+
+    # Extract assignment_id if provided
+    assignment_id = params[:assignment_id].to_i if params[:assignment_id].present?
+
+    # Validate assignment exists and belongs to course
+    if assignment_id && assignment_id > 0
+      assignment = course.assignments.active.find_by(id: assignment_id)
+      unless assignment
+        return render json: { message: "Assignment not found or does not belong to course" },
+                      status: :not_found
+      end
+    end
+
+    assignment_states = ["deleted"]
+    assignment_states << "unpublished" unless can_manage
+    query = ContentTag.active.for_context(course).learning_outcome_alignments
+                      .select("content_tags.learning_outcome_id, content_tags.title, content_tags.content_id as assignment_id, assignments.submission_types")
+                      .joins("INNER JOIN #{Assignment.quoted_table_name} assignments ON assignments.id = content_tags.content_id AND content_tags.content_type = 'Assignment'")
+                      .joins("INNER JOIN #{Submission.quoted_table_name} submissions ON submissions.assignment_id = assignments.id AND submissions.user_id = #{student_id} AND submissions.workflow_state <> 'deleted'")
+                      .where.not(assignments: { workflow_state: assignment_states })
+
+    # Filter by assignment_id if provided
+    query = query.where(assignments: { id: assignment_id }) if assignment_id && assignment_id > 0
+
+    alignments = ActiveRecord::Base.connection.exec_query(query.to_sql).to_a
+    alignments.each { |a| a[:url] = "#{polymorphic_url([course, :assignments])}/#{a["assignment_id"]}" }
+
+    quizzes = Quizzes::Quiz.active
+    quizzes = quizzes.where("quizzes.workflow_state IN ('active', 'available')") unless can_manage
+    quizzes = quizzes
+              .select(:title, :id, :assignment_id).preload(:quiz_questions)
+              .joins(assignment: :submissions)
+              .where(context: course)
+              .where(submissions: { user_id: student_id })
+              .where("submissions.workflow_state <> 'deleted'")
+
+    # Filter by assignment_id if provided
+    quizzes = quizzes.where(assignment_id:) if assignment_id && assignment_id > 0
+    quiz_alignments = quizzes.map do |quiz|
+      bank_ids = quiz.quiz_questions.filter_map { |qq| qq.assessment_question.try(:assessment_question_bank_id) }.uniq
+      outcome_ids = ContentTag.active.where(content_id: bank_ids, content_type: "AssessmentQuestionBank", tag: "explicit_mastery").pluck(:learning_outcome_id)
+      outcome_ids.map do |id|
+        {
+          learning_outcome_id: id,
+          title: quiz.title,
+          assignment_id: quiz.assignment_id,
+          submission_types: "online_quiz",
+          url: "#{polymorphic_url([course, :quizzes])}/#{quiz.id}"
+        }
+      end
+    end.flatten
+
+    # Only include live assessments if not filtering by assignment_id
+    # (live assessments don't have assignment_id)
+    magic_marker_alignments = []
+    if assignment_id.nil? || assignment_id.zero?
       live_assessments = LiveAssessments::Assessment.for_context(context)
                                                     .joins(:submissions)
                                                     .preload(:learning_outcome_alignments)
@@ -437,22 +524,32 @@ class OutcomesApiController < ApplicationController
           }
         end
       end.flatten
-
-      # find_outcomes_service_assignment_alignments
-      # Returns outcome service aligned assignments for a given course
-      # if the outcome_service_results_to_canvas FF is enabled
-      os_alignments = find_outcomes_service_assignment_alignments(course, student_id)
-      alignments.concat(quiz_alignments, magic_marker_alignments, os_alignments)
-
-      render json: alignments
-    else
-      render json: { message: "student_id is required" }, status: :bad_request
     end
-  rescue ActiveRecord::RecordNotFound => e
-    render json: { message: e.message }, status: :not_found
+
+    # find_outcomes_service_assignment_alignments
+    # Returns outcome service aligned assignments for a given course
+    # if the outcome_service_results_to_canvas FF is enabled
+    os_alignments = find_outcomes_service_assignment_alignments(course, student_id, assignment_id)
+    alignments.concat(quiz_alignments, magic_marker_alignments, os_alignments)
+
+    render json: alignments
   end
 
-  protected
+  def validate_assignment(course, assignment_id)
+    if assignment_id.nil? || assignment_id.zero?
+      render json: { message: "assignment_id is required" }, status: :bad_request
+      return nil
+    end
+
+    assignment = course.assignments.active.find_by(id: assignment_id)
+    unless assignment
+      render json: { message: "Assignment not found or does not belong to course" },
+             status: :not_found
+      return nil
+    end
+
+    assignment
+  end
 
   def get_outcome
     @outcome = LearningOutcome.active.find(params[:id])
@@ -477,7 +574,4 @@ class OutcomesApiController < ApplicationController
     params[:description] = process_incoming_html_content(params[:description]) if params[:description]
     oparams
   end
-
-  # Direct params are those that have a direct correlation to attrs in the model
-  DIRECT_PARAMS = %w[title display_name description vendor_guid calculation_method calculation_int].freeze
 end
