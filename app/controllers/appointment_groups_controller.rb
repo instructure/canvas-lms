@@ -247,17 +247,39 @@ class AppointmentGroupsController < ApplicationController
   def index
     return web_index unless request.format == :json
 
-    contexts = params[:context_codes] if params.include?(:context_codes)
+    @request_shard = Shard.current
 
-    if params[:scope] == "manageable"
-      scope = AppointmentGroup.manageable_by(@current_user, contexts)
-      scope = scope.current_or_undated unless value_to_boolean(params[:include_past_appointments])
-    else
-      scope = AppointmentGroup.reservable_by(@current_user, contexts)
-      scope = scope.current unless value_to_boolean(params[:include_past_appointments])
+    requested_contexts = nil
+    if params[:context_codes]
+      requested_contexts = params[:context_codes].filter_map do |code|
+        Context.find_by_asset_string(code)
+      end
     end
+
+    scope_method = (params[:scope] == "manageable") ? :manageable_by : :reservable_by
+    include_past = value_to_boolean(params[:include_past_appointments])
+
+    bookmarker = BookmarkedCollection::SimpleBookmarker.new(AppointmentGroup, :id)
+    base_scope = AppointmentGroup.order(:id)
+
+    groups = ShardedBookmarkedCollection.build(bookmarker, base_scope.shard(@current_user.in_region_associated_shards)) do |relation|
+      shard_contexts = requested_contexts&.select { |context| context.shard == Shard.current }
+      next if requested_contexts && shard_contexts.empty?
+
+      context_codes = shard_contexts&.map(&:asset_string)
+      relation = relation.send(scope_method, @current_user, context_codes)
+
+      if params[:scope] == "manageable"
+        relation = relation.current_or_undated unless include_past
+      else
+        relation = relation.current unless include_past
+      end
+
+      relation
+    end
+
     groups = Api.paginate(
-      scope.order(:id),
+      groups,
       self,
       api_v1_appointment_groups_url(scope: params[:scope])
     )
@@ -350,6 +372,7 @@ class AppointmentGroupsController < ApplicationController
   #        -F 'appointment_group[new_appointments][1][]=2012-07-19T23:00:00Z' \
   #        -H "Authorization: Bearer <token>"
   def create
+    # @request_shard = Shard.current
     contexts = get_contexts
     # Don't let people create new appointment groups for concluded courses.  Ideally
     # we would have a check on update as well but there may be existing ones and
@@ -407,6 +430,7 @@ class AppointmentGroupsController < ApplicationController
     if authorized_action(@group, @current_user, :read)
       return web_show unless request.format == :json
 
+      @request_shard = Shard.current
       render json: appointment_group_json(@group,
                                           @current_user,
                                           session,
@@ -568,12 +592,28 @@ class AppointmentGroupsController < ApplicationController
   #
   # @returns [CalendarEvent]
   def next_appointment
-    ag_scope = AppointmentGroup.current.reservable_by(@current_user)
     ids = Array(params[:appointment_group_ids])
-    ag_scope = ag_scope.where(id: ids) if ids.any?
+
+    # Support cross-shard appointment groups
+    appointment_groups = if ids.any?
+                           ids_by_shard = ids.group_by { |id| Shard.shard_for(id.to_i) }
+                           ids_by_shard.flat_map do |shard, shard_ids|
+                             shard.activate do
+                               local_ids = shard_ids.map(&:to_i)
+                               AppointmentGroup.current
+                                               .reservable_by(@current_user)
+                                               .where(id: local_ids)
+                                               .preload(appointments: :child_events)
+                                               .to_a
+                             end
+                           end
+                         else
+                           AppointmentGroup.current.reservable_by(@current_user).preload(appointments: :child_events).to_a
+                         end
+
     # FIXME: this could be a lot faster if we didn't look at eligibility to sign up.
     # since the UI only cares about the date to jump to, it might not make a difference in many cases
-    events = ag_scope.preload(appointments: :child_events).to_a.filter_map do |ag|
+    events = appointment_groups.filter_map do |ag|
       ag.appointments.detect do |appointment|
         appointment.start_at > Time.zone.now &&
           appointment.child_events_for(@current_user).empty? &&
@@ -611,8 +651,12 @@ class AppointmentGroupsController < ApplicationController
   end
 
   def get_appointment_group
-    @group = AppointmentGroup.find(params[:id].to_i)
-    @context = @group.contexts_for_user(@current_user).first # FIXME?
+    id = params[:id].to_i
+    shard = Shard.shard_for(id)
+    shard.activate do
+      @group = AppointmentGroup.find(id)
+      @context = @group.contexts_for_user(@current_user).first
+    end
   end
 
   def appointment_group_params
