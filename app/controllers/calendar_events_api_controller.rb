@@ -423,6 +423,8 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def render_events_for_user(user, route_url)
+    @request_shard = Shard.current
+
     assignment = @type == :assignment
     sub_assignment = @type == :sub_assignment
 
@@ -675,31 +677,34 @@ class CalendarEventsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def reserve
     get_event
-    if authorized_action(@event, @current_user, :reserve) && check_for_past_signup(@event)
-      begin
-        participant_id = Shard.relative_id_for(params[:participant_id], Shard.current, Shard.current) if params[:participant_id]
-        if participant_id && @event.appointment_group.grants_right?(@current_user, session, :manage)
-          participant = @event.appointment_group.possible_participants.detect { |p| p.id == participant_id }
-        else
-          participant = @event.appointment_group.participant_for(@current_user)
-          participant = nil if participant && participant_id && participant_id != participant.id
-        end
-        raise CalendarEvent::ReservationError, "invalid participant" unless participant
+    @request_shard = Shard.current
+    @event.shard.activate do
+      if authorized_action(@event, @current_user, :reserve) && check_for_past_signup(@event)
+        begin
+          participant_id = Shard.relative_id_for(params[:participant_id], Shard.current, Shard.current) if params[:participant_id]
+          if participant_id && @event.appointment_group.grants_right?(@current_user, session, :manage)
+            participant = @event.appointment_group.possible_participants.detect { |p| p.id == participant_id }
+          else
+            participant = @event.appointment_group.participant_for(@current_user)
+            participant = nil if participant && participant_id && participant_id != participant.id
+          end
+          raise CalendarEvent::ReservationError, "invalid participant" unless participant
 
-        reservation = @event.reserve_for(participant,
-                                         @current_user,
-                                         cancel_existing: value_to_boolean(params[:cancel_existing]),
-                                         comments: params["comments"])
-        render json: event_json(reservation, @current_user, session)
-      rescue CalendarEvent::ReservationError => e
-        reservations = participant ? @event.appointment_group.reservations_for(participant) : []
-        render json: [{
-          attribute: "reservation",
-          type: "calendar_event",
-          message: e.message,
-          reservations: reservations.map { |r| event_json(r, @current_user, session) }
-        }],
-               status: :bad_request
+          reservation = @event.reserve_for(participant,
+                                           @current_user,
+                                           cancel_existing: value_to_boolean(params[:cancel_existing]),
+                                           comments: params["comments"])
+          render json: event_json(reservation, @current_user, session, request_shard: @request_shard)
+        rescue CalendarEvent::ReservationError => e
+          reservations = participant ? @event.appointment_group.reservations_for(participant) : []
+          render json: [{
+            attribute: "reservation",
+            type: "calendar_event",
+            message: e.message,
+            reservations: reservations.map { |r| event_json(r, @current_user, session, request_shard: @request_shard) }
+          }],
+                 status: :bad_request
+        end
       end
     end
   end
@@ -1686,10 +1691,15 @@ class CalendarEventsApiController < ApplicationController
       # pull in reservable appointment group events, if requested
       group_codes = codes.grep(/\Aappointment_group_(\d+)\z/).map { |m| m.sub(/.*_/, "").to_i }
       if group_codes.present?
-        ags = AppointmentGroup
-              .reservable_by(user)
-              .where(id: group_codes)
-              .select(:id).to_a
+        # Support cross-shard appointment groups
+        ags = []
+        group_codes.each do |id|
+          shard = Shard.shard_for(id)
+          shard.activate do
+            ag = AppointmentGroup.reservable_by(user).where(id:).select(:id).first
+            ags << ag if ag
+          end
+        end
         @selected_contexts += ags
         @context_codes += ags.map(&:asset_string)
       end
@@ -1910,9 +1920,13 @@ class CalendarEventsApiController < ApplicationController
   def manageable_appointment_groups(user)
     return [] unless user
 
-    AppointmentGroup
-      .manageable_by(user, @context_codes)
-      .intersecting(@start_date, @end_date).select(:id)
+    user.in_region_associated_shards.flat_map do |shard|
+      shard.activate do
+        AppointmentGroup
+          .manageable_by(user)
+          .intersecting(@start_date, @end_date).to_a
+      end
+    end
   end
 
   def duplicate(options = {})
@@ -2130,7 +2144,7 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def check_for_past_signup(event)
-    if event && event.end_at < Time.now.utc && event.context.is_a?(AppointmentGroup) &&
+    if event && event.context.is_a?(AppointmentGroup) && event.end_at < Time.now.utc &&
        !event.context.grants_right?(@current_user, :manage)
       render json: { message: t("Cannot create or change reservation for past appointment") }, status: :forbidden
       return false
