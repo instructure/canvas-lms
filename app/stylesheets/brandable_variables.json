@@ -5,17 +5,17 @@
       {
         "variable_name": "ic-brand-primary",
         "type": "color",
-        "default": "#2B7ABC"
+        "default": "#902BBC"
       },
       {
         "variable_name": "ic-brand-font-color-dark",
         "type": "color",
-        "default": "#273540"
+        "default": "#40273E"
       },
       {
         "variable_name": "ic-link-color",
         "type": "color",
-        "default": "#0E68B3"
+        "default": "#A50EB3"
       },
       {
         "variable_name": "ic-brand-button--primary-bgd",
@@ -30,7 +30,7 @@
       {
         "variable_name": "ic-brand-button--secondary-bgd",
         "type": "color",
-        "default": "#273540"
+        "default": "#40273A"
       },
       {
         "variable_name": "ic-brand-button--secondary-text",
@@ -45,7 +45,7 @@
       {
         "variable_name": "ic-brand-global-nav-bgd",
         "type": "color",
-        "default": "#334451"
+        "default": "#51334C"
       },
       {
         "variable_name": "ic-brand-global-nav-ic-icon-svg-fill",
@@ -95,19 +95,19 @@
       {
         "variable_name": "ic-brand-global-nav-logo-bgd",
         "type": "color",
-        "default": "#334451"
+        "default": "#51334C"
       },
       {
         "variable_name": "ic-brand-header-image",
         "type": "image",
         "accept": "image/png,image/gif,image/jpeg,image/svg+xml,image/svg",
-        "default": "/images/canvas_logomark_only@2x.png"
+        "default": "/images/uef_logomark_only@2x.png"
       },
       {
         "variable_name": "ic-brand-mobile-global-nav-logo",
         "type": "image",
         "accept": "image/png,image/gif,image/jpeg,image/svg+xml,image/svg",
-        "default": "/images/mobile-global-nav-logo.svg"
+        "default": "/images/uef-mobile-global-nav-logo.svg"
       }
     ]
   },
@@ -168,7 +168,7 @@
       {
         "variable_name": "ic-brand-Login-body-bgd-color",
         "type": "color",
-        "default": "#334451"
+        "default": "#51334B"
       },
       {
         "variable_name": "ic-brand-Login-body-bgd-image",
@@ -179,13 +179,13 @@
       {
         "variable_name": "ic-brand-Login-body-bgd-shadow-color",
         "type": "color",
-        "default": "#273540"
+        "default": "#40273D"
       },
       {
         "variable_name": "ic-brand-Login-logo",
         "type": "image",
         "accept": "image/png,image/gif,image/jpeg, image/svg+xml,image/svg",
-        "default": "/images/login/canvas-logo.svg"
+        "default": "/images/login/uef-logo.svg"
       },
       {
         "variable_name": "ic-brand-Login-Content-bgd-color",
