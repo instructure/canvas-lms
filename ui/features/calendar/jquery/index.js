@@ -915,6 +915,8 @@ export default class Calendar {
   }
 
   eventSaved = event => {
+    if (!event) return
+
     event.removeClass('event_pending')
 
     // If we just saved a new event then the id field has changed from what it

@@ -295,7 +295,27 @@ Object.assign(CommonEvent.prototype, {
   },
 
   isOnCalendar(context_code) {
-    return this.calendarEvent.all_context_codes.match(new RegExp(`\\b${context_code}\\b`))
+    const allContextCodes = this.calendarEvent.all_context_codes
+    if (!allContextCodes || !context_code) return false
+
+    const [type, localId] = context_code.split('_')
+    if (!type || !localId) return false
+
+    const codes = allContextCodes.split(',')
+    return codes.some(code => {
+      const trimmedCode = code.trim()
+      if (trimmedCode === context_code) return true
+
+      const [codeType, codeId] = trimmedCode.split('_')
+      if (codeType !== type || !codeId) return false
+
+      if (codeId === localId) return true
+
+      if (codeId.length < 10 || localId.length >= codeId.length) return false
+
+      const globalIdPattern = new RegExp(`^\\d{10,}${localId}$`)
+      return globalIdPattern.test(codeId)
+    })
   },
 })
 
