@@ -34,6 +34,7 @@ export interface Assignment {
   pointsPossible: number
   courseId: string
   peerReviews: PeerReviews | null
+  submissionsConnection: SubmissionsConnection | null
   assessmentRequestsForCurrentUser: AssessmentRequest[] | null
   env?: {
     currentUser?: {
@@ -54,4 +55,14 @@ export interface AssessmentRequest {
 
 interface PeerReviews {
   count: number | null
+  submissionRequired: boolean | null
+}
+
+interface SubmissionsConnection {
+  nodes: SubmissionNode[] | null
+}
+
+interface SubmissionNode {
+  _id: string
+  submissionStatus: string | null
 }

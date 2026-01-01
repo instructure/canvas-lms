@@ -81,7 +81,7 @@ describe('useAssignmentQuery', () => {
       },
     })
 
-    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('1'), {
+    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('1', '123'), {
       wrapper: createWrapper(),
     })
 
@@ -142,7 +142,7 @@ describe('useAssignmentQuery', () => {
       },
     })
 
-    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('2'), {
+    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('2', '123'), {
       wrapper: createWrapper(),
     })
 
@@ -173,7 +173,7 @@ describe('useAssignmentQuery', () => {
       },
     })
 
-    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('3'), {
+    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('3', '123'), {
       wrapper: createWrapper(),
     })
 
@@ -188,7 +188,7 @@ describe('useAssignmentQuery', () => {
   it('handles query error', async () => {
     mockExecuteQuery.mockRejectedValueOnce(new Error('Failed to fetch assignment'))
 
-    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('error-id'), {
+    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('error-id', '123'), {
       wrapper: createWrapper(),
     })
 
@@ -218,7 +218,7 @@ describe('useAssignmentQuery', () => {
       },
     })
 
-    const {waitForNextUpdate} = renderHook(() => useAssignmentQuery('123'), {
+    const {waitForNextUpdate} = renderHook(() => useAssignmentQuery('123', '456'), {
       wrapper: createWrapper(),
     })
 
@@ -226,6 +226,7 @@ describe('useAssignmentQuery', () => {
 
     expect(mockExecuteQuery).toHaveBeenCalledWith(PEER_REVIEW_ASSIGNMENT_QUERY, {
       assignmentId: '123',
+      userId: '456',
     })
   })
 
@@ -260,7 +261,7 @@ describe('useAssignmentQuery', () => {
         },
       })
 
-      const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('4'), {
+      const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('4', '123'), {
         wrapper: createWrapper(),
       })
 
@@ -318,7 +319,7 @@ describe('useAssignmentQuery', () => {
         },
       })
 
-      const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('6'), {
+      const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('6', '123'), {
         wrapper: createWrapper(),
       })
 

@@ -22,9 +22,9 @@ import userEvent from '@testing-library/user-event'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import PeerReviewsStudentView from '../PeerReviewsStudentView'
-
 import {executeQuery} from '@canvas/graphql'
 import {useAllocatePeerReviews} from '../../hooks/useAllocatePeerReviews'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 vi.mock('@canvas/graphql', () => ({
   executeQuery: vi.fn(),
@@ -67,7 +67,15 @@ function setup(props: Partial<PeerReviewsStudentViewProps> = {}) {
 }
 
 describe('PeerReviewsStudentView', () => {
+  let globalEnv: GlobalEnv
   const mockMutate = vi.fn()
+  const ENV = {
+    current_user_id: '123',
+  }
+
+  beforeAll(() => {
+    globalEnv = {...window.ENV}
+  })
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -75,6 +83,7 @@ describe('PeerReviewsStudentView', () => {
     mockUseAllocatePeerReviews.mockReturnValue({
       mutate: mockMutate,
     } as any)
+    window.ENV = {...globalEnv, ...ENV}
   })
 
   it('renders loading state initially', () => {
@@ -105,6 +114,10 @@ describe('PeerReviewsStudentView', () => {
         courseId: '100',
         peerReviews: {
           count: 2,
+          submissionRequired: false,
+        },
+        submissionsConnection: {
+          nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
         },
         assessmentRequestsForCurrentUser: [
           {
@@ -670,6 +683,279 @@ describe('PeerReviewsStudentView', () => {
         const dividers = container.querySelectorAll('hr')
         expect(dividers.length).toBeGreaterThan(0)
       })
+    })
+  })
+
+  describe('Submission required for peer reviews', () => {
+    it('shows submission required view when submissionRequired is true and user has not submitted', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '18',
+          name: 'Submission Required Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: true,
+          },
+          submissionsConnection: {
+            nodes: [],
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByText, getByTestId} = setup({assignmentId: '18'})
+
+      await waitFor(() => {
+        expect(
+          getByText('You must submit your own work before you can review your peers.'),
+        ).toBeInTheDocument()
+      })
+
+      expect(getByTestId('title')).toHaveTextContent('Submission Required Test Peer Review')
+      expect(getByTestId('due-date')).toBeInTheDocument()
+    })
+
+    it('does not call allocate when submissionRequired is true and user has not submitted', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '22',
+          name: 'No Allocate Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 3,
+            submissionRequired: true,
+          },
+          submissionsConnection: {
+            nodes: [],
+          },
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+            },
+          ],
+        },
+      })
+
+      setup({assignmentId: '22'})
+
+      await waitFor(() => {
+        expect(mockMutate).not.toHaveBeenCalled()
+      })
+    })
+
+    it('shows peer review interface when submissionRequired is true and user has submitted', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '19',
+          name: 'User Has Submitted Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: true,
+          },
+          submissionsConnection: {
+            nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '19'})
+
+      await waitFor(() => {
+        expect(getByText('Assignment Details')).toBeInTheDocument()
+      })
+    })
+
+    it('shows peer review interface when submissionRequired is false even if user has not submitted', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '20',
+          name: 'Submission Not Required Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: false,
+          },
+          submissionsConnection: {
+            nodes: [],
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '20'})
+
+      await waitFor(() => {
+        expect(getByText('Assignment Details')).toBeInTheDocument()
+      })
+    })
+
+    it('shows peer review interface when submissionRequired is null', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '21',
+          name: 'Submission Required Null Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: null,
+          },
+          submissionsConnection: {
+            nodes: [],
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '21'})
+
+      await waitFor(() => {
+        expect(getByText('Assignment Details')).toBeInTheDocument()
+      })
+    })
+
+    it('does not show peer review selector when submission is required and user has not submitted', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '23',
+          name: 'No Selector Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: true,
+          },
+          submissionsConnection: {
+            nodes: [],
+          },
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+            },
+          ],
+        },
+      })
+
+      const {queryByTestId, getByText} = setup({assignmentId: '23'})
+
+      await waitFor(() => {
+        expect(
+          getByText('You must submit your own work before you can review your peers.'),
+        ).toBeInTheDocument()
+      })
+
+      expect(queryByTestId('peer-review-selector')).not.toBeInTheDocument()
+    })
+
+    it('shows peer review selector when submission is required and user has submitted', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '24',
+          name: 'Show Selector Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: true,
+          },
+          submissionsConnection: {
+            nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
+          },
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+            },
+          ],
+        },
+      })
+
+      const {getByTestId} = setup({assignmentId: '24'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+    })
+
+    it('does not show tabs when submission is required and user has not submitted', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '25',
+          name: 'No Tabs Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: true,
+          },
+          submissionsConnection: {
+            nodes: [],
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {queryByText, getByText} = setup({assignmentId: '25'})
+
+      await waitFor(() => {
+        expect(
+          getByText('You must submit your own work before you can review your peers.'),
+        ).toBeInTheDocument()
+      })
+
+      expect(queryByText('Assignment Details')).not.toBeInTheDocument()
+      expect(queryByText('Submission')).not.toBeInTheDocument()
+    })
+
+    it('shows tabs when submission is required and user has submitted', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '26',
+          name: 'Show Tabs Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: true,
+          },
+          submissionsConnection: {
+            nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '26'})
+
+      await waitFor(() => {
+        expect(getByText('Assignment Details')).toBeInTheDocument()
+      })
+
+      expect(getByText('Submission')).toBeInTheDocument()
     })
   })
 })

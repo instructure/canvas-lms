@@ -47,7 +47,8 @@ describe "peer review student landing page" do
                                      automatic_peer_reviews: false,
                                      peer_review_count: 2,
                                      points_possible: 10,
-                                     submission_types: "online_text_entry"
+                                     submission_types: "online_text_entry",
+                                     peer_review_submission_required: false
                                    })
 
     @assignment.submit_homework(@student1, body: "student 1 attempt", submission_type: "online_text_entry")
@@ -124,7 +125,8 @@ describe "peer review student landing page" do
                                                      peer_reviews: true,
                                                      automatic_peer_reviews: false,
                                                      points_possible: 10,
-                                                     submission_types: "online_text_entry"
+                                                     submission_types: "online_text_entry",
+                                                     peer_review_submission_required: false
                                                    })
 
       visit_peer_reviews_page(@course.id, no_peer_review_assignment.id)
