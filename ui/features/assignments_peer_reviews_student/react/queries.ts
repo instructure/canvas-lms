@@ -39,6 +39,14 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
           submissionStatus
         }
       }
+      assignedToDates {
+        dueAt
+        peerReviewDates {
+          dueAt
+          unlockAt
+          lockAt
+        }
+      }
       assessmentRequestsForCurrentUser {
         _id
         available

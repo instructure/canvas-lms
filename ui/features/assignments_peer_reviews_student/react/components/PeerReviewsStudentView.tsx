@@ -32,6 +32,8 @@ import {PeerReviewSelector} from './PeerReviewSelector'
 import AssignmentSubmission from './AssignmentSubmission'
 import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints/src'
 import theme from '@instructure/canvas-theme'
+import {isPeerReviewLocked} from '../utils/peerReviewLockUtils'
+import LockedPeerReview from './LockedPeerReview'
 
 const I18n = createI18nScope('peer_reviews_student')
 
@@ -63,6 +65,13 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
   useEffect(() => {
     if (data?.assignment && !hasCalledAllocate) {
       const assignment = data.assignment
+      const isLocked = isPeerReviewLocked(assignment)
+
+      // Don't allocate if the peer review is locked
+      if (isLocked) {
+        return
+      }
+
       const assessmentRequestsCount = assignment.assessmentRequestsForCurrentUser?.length || 0
       const peerReviewsRequired = assignment.peerReviews?.count || 0
 
@@ -95,10 +104,10 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
   const {
     assessmentRequestsForCurrentUser,
     name,
-    dueAt,
     description,
     peerReviews,
     submissionsConnection,
+    assignedToDates
   } = data.assignment
   const submissionRequired = peerReviews?.submissionRequired ?? false
   const hasSubmitted =
@@ -106,6 +115,8 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     submissionsConnection.nodes.length > 0 &&
     submissionsConnection.nodes[0]?.submissionStatus === 'submitted'
   const showSubmissionRequiredView = submissionRequired && !hasSubmitted
+  const isLocked = isPeerReviewLocked(data.assignment)
+  const peerReviewDueAt = assignedToDates?.[0]?.peerReviewDates?.dueAt
 
   const renderHeader = () => (
     <Flex justifyItems="space-between">
@@ -121,14 +132,14 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
               {I18n.t('%{name} Peer Review', {name: name})}
             </Text>
           </Flex.Item>
-          {dueAt && (
+          {peerReviewDueAt && (
             <Flex.Item>
               <Text size="medium" weight="bold">
                 <FriendlyDatetime
                   data-testid="due-date"
                   prefix={I18n.t('Due:')}
                   format={I18n.t('#date.formats.full_with_weekday')}
-                  dateTime={dueAt}
+                  dateTime={peerReviewDueAt}
                 />
               </Text>
             </Flex.Item>
@@ -145,6 +156,10 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
           <NeedsSubmissionPeerReview />
         </View>
       )
+    }
+
+    if (isLocked) {
+      return <LockedPeerReview assignment={data.assignment} />
     }
 
     return (
@@ -187,7 +202,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
       <View as="div">
         {renderHeader()}
         <Divider />
-        {data.assignment && !showSubmissionRequiredView && (
+        {data.assignment && !showSubmissionRequiredView && !isLocked && (
           <View as="div">
             <PeerReviewSelector
               key={`${assessmentRequestsForCurrentUser?.length || 0}-peer-reviews`}

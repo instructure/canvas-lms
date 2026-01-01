@@ -109,7 +109,6 @@ describe('PeerReviewsStudentView', () => {
       assignment: {
         _id: '1',
         name: 'Test Peer Review Assignment',
-        dueAt: '2025-12-31T23:59:59Z',
         description: '<p>This is the assignment description</p>',
         courseId: '100',
         peerReviews: {
@@ -119,6 +118,16 @@ describe('PeerReviewsStudentView', () => {
         submissionsConnection: {
           nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
         },
+        assignedToDates: [
+          {
+            dueAt: '2025-12-31T23:59:59Z',
+            peerReviewDates: {
+              dueAt: '2025-12-31T23:59:59Z',
+              unlockAt: null,
+              lockAt: null,
+            },
+          },
+        ],
         assessmentRequestsForCurrentUser: [
           {
             _id: 'ar-1',
@@ -157,6 +166,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 1,
         },
+        assignedToDates: null,
         assessmentRequestsForCurrentUser: [],
       },
     })
@@ -181,6 +191,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 2,
         },
+        assignedToDates: null,
         assessmentRequestsForCurrentUser: [],
       },
     })
@@ -205,6 +216,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 1,
         },
+        assignedToDates: null,
         assessmentRequestsForCurrentUser: [],
       },
     })
@@ -229,6 +241,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 2,
         },
+        assignedToDates: null,
         assessmentRequestsForCurrentUser: [
           {
             _id: 'ar-1',
@@ -264,6 +277,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 0,
         },
+        assignedToDates: null,
         assessmentRequestsForCurrentUser: null,
       },
     })
@@ -288,6 +302,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 3,
         },
+        assignedToDates: null,
         assessmentRequestsForCurrentUser: [
           {
             _id: 'ar-1',
@@ -317,6 +332,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Assignment With Submission',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          assignedToDates: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -348,6 +364,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Assignment With Text Entry',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          assignedToDates: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -390,6 +407,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Multiple Peer Reviews',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          assignedToDates: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -455,6 +473,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 2,
         },
+        assignedToDates: null,
         assessmentRequestsForCurrentUser: [
           {
             _id: 'ar-1',
@@ -490,6 +509,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 0,
         },
+        assignedToDates: null,
         assessmentRequestsForCurrentUser: [],
       },
     })
@@ -512,6 +532,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 2,
         },
+        assignedToDates: null,
         assessmentRequestsForCurrentUser: [
           {
             _id: 'ar-1',
@@ -551,6 +572,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Tab Switching Test',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Assignment description here</p>',
+          assignedToDates: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -591,6 +613,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Default Tab Test',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description content</p>',
+          assignedToDates: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -624,6 +647,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Mobile Test',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          assignedToDates: null,
           assessmentRequestsForCurrentUser: [],
         },
       })
@@ -647,6 +671,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Desktop Test',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          assignedToDates: null,
           assessmentRequestsForCurrentUser: [],
         },
       })
@@ -670,6 +695,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Mobile Divider Test',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          assignedToDates: null,
           assessmentRequestsForCurrentUser: [],
         },
       })
@@ -703,6 +729,15 @@ describe('PeerReviewsStudentView', () => {
             nodes: [],
           },
           assessmentRequestsForCurrentUser: [],
+          assignedToDates: [
+            {
+              dueAt: '2025-12-31T23:59:59Z',
+              peerReviewDates: {
+                dueAt: '2025-12-31T23:59:59Z',
+                unlockAt: null,
+              },
+            },
+          ],
         },
       })
 
@@ -956,6 +991,195 @@ describe('PeerReviewsStudentView', () => {
       })
 
       expect(getByText('Submission')).toBeInTheDocument()
+    })
+  })
+
+  describe('Locked peer review', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2020-10-01T12:00:00Z'))
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('renders locked view when peer review is locked before assignment due date', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '18',
+          name: 'Locked Assignment',
+          dueAt: '2020-09-15T16:00:00Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [],
+          assignedToDates: [
+            {
+              dueAt: '2020-10-20T16:00:00Z',
+              peerReviewDates: null,
+            },
+          ],
+        },
+      })
+
+      const {getByTestId, queryByTestId} = setup({assignmentId: '18'})
+
+      await waitFor(() => {
+        expect(getByTestId('locked-peer-review')).toBeInTheDocument()
+      })
+
+      expect(queryByTestId('peer-review-selector')).not.toBeInTheDocument()
+    })
+
+    it('renders locked view when peer review is locked before peer review unlock date', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '19',
+          name: 'Locked Peer Review',
+          dueAt: '2020-09-15T16:00:00Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [],
+          assignedToDates: [
+            {
+              dueAt: '2020-09-15T16:00:00Z',
+              peerReviewDates: {
+                unlockAt: '2020-10-31T06:00:00Z',
+                dueAt: null,
+                lockAt: null,
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByTestId, queryByTestId} = setup({assignmentId: '19'})
+
+      await waitFor(() => {
+        expect(getByTestId('locked-peer-review')).toBeInTheDocument()
+      })
+
+      expect(queryByTestId('peer-review-selector')).not.toBeInTheDocument()
+    })
+
+    it('renders normal view when peer review is not locked', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '20',
+          name: 'Unlocked Assignment',
+          dueAt: '2020-09-15T16:00:00Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2020-09-10T00:00:00Z',
+            },
+          ],
+          assignedToDates: [
+            {
+              dueAt: '2020-09-20T16:00:00Z',
+              peerReviewDates: null,
+            },
+          ],
+        },
+      })
+
+      const {getByTestId, queryByTestId} = setup({assignmentId: '20'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+
+      expect(queryByTestId('locked-peer-review')).not.toBeInTheDocument()
+    })
+
+    it('renders normal view when peer review unlock date has passed', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '21',
+          name: 'Unlocked Peer Review',
+          dueAt: '2020-09-15T16:00:00Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2020-09-10T00:00:00Z',
+            },
+          ],
+          assignedToDates: [
+            {
+              dueAt: '2020-09-20T16:00:00Z',
+              peerReviewDates: {
+                unlockAt: '2020-09-30T06:00:00Z',
+                dueAt: null,
+                lockAt: null,
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByTestId, queryByTestId} = setup({assignmentId: '21'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+
+      expect(queryByTestId('locked-peer-review')).not.toBeInTheDocument()
+    })
+
+    it('renders locked message with correct date', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '22',
+          name: 'Locked With Date',
+          dueAt: '2020-09-15T16:00:00Z',
+          description: '<p>Description</p>',
+          assessmentRequestsForCurrentUser: [],
+          assignedToDates: [
+            {
+              dueAt: '2020-10-20T16:00:00Z',
+              peerReviewDates: null,
+            },
+          ],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '22'})
+
+      await waitFor(() => {
+        expect(getByText(/This assignment is locked until/)).toBeInTheDocument()
+      })
+    })
+
+    it('does not allocate peer reviews when peer review is locked', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '23',
+          name: 'Locked Assignment No Allocate',
+          dueAt: '2020-09-15T16:00:00Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 3,
+          },
+          assessmentRequestsForCurrentUser: [],
+          assignedToDates: [
+            {
+              dueAt: '2020-10-20T16:00:00Z',
+              peerReviewDates: null,
+            },
+          ],
+        },
+      })
+
+      setup({assignmentId: '23'})
+
+      await waitFor(() => {
+        expect(mockMutate).not.toHaveBeenCalled()
+      })
     })
   })
 })

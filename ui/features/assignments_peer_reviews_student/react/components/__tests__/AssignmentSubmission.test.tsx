@@ -65,6 +65,7 @@ describe('AssignmentSubmission', () => {
     courseId: '1',
     peerReviews: null,
     submissionsConnection: null,
+    assignedToDates: null,
     assessmentRequestsForCurrentUser: null,
     ...overrides,
   })

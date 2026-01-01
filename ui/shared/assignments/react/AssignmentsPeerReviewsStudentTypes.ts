@@ -35,6 +35,17 @@ export interface Submission {
   attachments?: Attachment[] | null
 }
 
+export interface PeerReviewDates {
+  dueAt: string | null
+  unlockAt: string | null
+  lockAt: string | null
+}
+
+export interface AssignedToDates {
+  dueAt: string | null
+  peerReviewDates: PeerReviewDates | null
+}
+
 export interface Assignment {
   _id: string
   name: string
@@ -46,6 +57,7 @@ export interface Assignment {
   courseId: string
   peerReviews: PeerReviews | null
   submissionsConnection: SubmissionsConnection | null
+  assignedToDates: AssignedToDates[] | null
   assessmentRequestsForCurrentUser: AssessmentRequest[] | null
   env?: {
     currentUser?: {
