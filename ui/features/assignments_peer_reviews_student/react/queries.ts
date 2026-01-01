@@ -19,7 +19,7 @@
 import {gql} from '@apollo/client'
 
 export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
-  query GetPeerReviewAssignment($assignmentId: ID!) {
+  query GetPeerReviewAssignment($assignmentId: ID!, $userId: ID!) {
     assignment(id: $assignmentId) {
       _id
       name
@@ -31,6 +31,13 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
       courseId
       peerReviews {
         count
+        submissionRequired
+      }
+      submissionsConnection(filter: {userId: $userId}) {
+        nodes {
+          _id
+          submissionStatus
+        }
       }
       assessmentRequestsForCurrentUser {
         _id

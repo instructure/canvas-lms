@@ -47,6 +47,7 @@ describe('CommentsTrayContentWithApollo', () => {
       pointsPossible: 100,
       courseId: '1',
       peerReviews: null,
+      submissionsConnection: null,
       assessmentRequestsForCurrentUser: null,
     },
     isPeerReviewEnabled: true,

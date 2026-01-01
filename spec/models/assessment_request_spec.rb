@@ -269,6 +269,84 @@ describe AssessmentRequest do
       )
       expect(assessment_request).to be_available
     end
+
+    context "with peer_review_allocation_and_grading feature flag" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      context "when peer_review_submission_required is true" do
+        before :once do
+          @assignment.update!(peer_review_submission_required: true)
+        end
+
+        it "is available when both assessee and assessor have submitted" do
+          assessment_request = AssessmentRequest.create!(
+            asset: @assignment.submit_homework(@submission_student, body: "hi"),
+            user: @submission_student,
+            assessor: @review_student,
+            assessor_asset: @assignment.submit_homework(@review_student, body: "hi")
+          )
+          expect(assessment_request).to be_available
+        end
+
+        it "is not available when only assessee has submitted" do
+          assessment_request = AssessmentRequest.create!(
+            asset: @assignment.submit_homework(@submission_student, body: "hi"),
+            user: @submission_student,
+            assessor: @review_student,
+            assessor_asset: @assignment.submission_for_student(@review_student)
+          )
+          expect(assessment_request).not_to be_available
+        end
+
+        it "is not available when only assessor has submitted" do
+          assessment_request = AssessmentRequest.create!(
+            asset: @assignment.submission_for_student(@submission_student),
+            user: @submission_student,
+            assessor: @review_student,
+            assessor_asset: @assignment.submit_homework(@review_student, body: "hi")
+          )
+          expect(assessment_request).not_to be_available
+        end
+      end
+
+      context "when peer_review_submission_required is false" do
+        before :once do
+          @assignment.update!(peer_review_submission_required: false)
+        end
+
+        it "is available when both assessee and assessor have submitted" do
+          assessment_request = AssessmentRequest.create!(
+            asset: @assignment.submit_homework(@submission_student, body: "hi"),
+            user: @submission_student,
+            assessor: @review_student,
+            assessor_asset: @assignment.submit_homework(@review_student, body: "hi")
+          )
+          expect(assessment_request).to be_available
+        end
+
+        it "is available when only assessee has submitted" do
+          assessment_request = AssessmentRequest.create!(
+            asset: @assignment.submit_homework(@submission_student, body: "hi"),
+            user: @submission_student,
+            assessor: @review_student,
+            assessor_asset: @assignment.submission_for_student(@review_student)
+          )
+          expect(assessment_request).to be_available
+        end
+
+        it "is not available when only assessor has submitted" do
+          assessment_request = AssessmentRequest.create!(
+            asset: @assignment.submission_for_student(@submission_student),
+            user: @submission_student,
+            assessor: @review_student,
+            assessor_asset: @assignment.submit_homework(@review_student, body: "hi")
+          )
+          expect(assessment_request).not_to be_available
+        end
+      end
+    end
   end
 
   describe "#for_active_users" do

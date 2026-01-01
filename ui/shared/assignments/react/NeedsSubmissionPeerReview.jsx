@@ -22,7 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 
-import needsSubmissionPeerReviewSVG from '../images/bookmarks.svg'
+import needsSubmissionPeerReviewSVG from './images/bookmarks.svg'
 
 const I18n = createI18nScope('assignments_2')
 

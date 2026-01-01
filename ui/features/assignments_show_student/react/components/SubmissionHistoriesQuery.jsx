@@ -28,7 +28,7 @@ import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import ViewManager from './ViewManager'
 import UnavailablePeerReview from '../UnavailablePeerReview'
-import NeedsSubmissionPeerReview from '../NeedsSubmissionPeerReview'
+import NeedsSubmissionPeerReview from '@canvas/assignments/react/NeedsSubmissionPeerReview'
 
 const I18n = createI18nScope('assignments_2_submission_histories_query')
 

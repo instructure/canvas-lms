@@ -145,7 +145,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
     <View
       as="div"
       minHeight="calc(720px - 10.75rem)"
-      height="calc(100vh - 22rem)"
+      height="calc(100vh - 23rem)"
       overflowY="hidden"
     >
       <Flex as="div" height="100%" alignItems="start">
