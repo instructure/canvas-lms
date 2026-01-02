@@ -42,6 +42,7 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
           attempt
           body
           submissionType
+          url
         }
       }
       rubric {

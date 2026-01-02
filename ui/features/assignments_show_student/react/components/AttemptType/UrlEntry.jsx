@@ -29,12 +29,11 @@ import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {IconEyeLine, IconExternalLinkLine} from '@instructure/ui-icons'
-import {Text} from '@instructure/ui-text'
-import {Link} from '@instructure/ui-link'
+import {IconEyeLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {TextInput} from '@instructure/ui-text-input'
+import UrlSubmissionDisplay from '@canvas/assignments/react/UrlSubmissionDisplay'
 
 const I18n = createI18nScope('assignments_2_url_entry')
 
@@ -254,22 +253,7 @@ class UrlEntry extends React.Component {
   )
 
   renderSubmission = () => {
-    return (
-      <Flex direction="column">
-        <Flex.Item textAlign="center" margin="small 0 medium 0">
-          <Text size="large">
-            <Link
-              icon={IconExternalLinkLine}
-              iconPlacement="end"
-              margin="small"
-              onClick={() => window.open(this.props.submission.url)}
-            >
-              <span data-testid="url-submission-text">{this.props.submission.url}</span>
-            </Link>
-          </Text>
-        </Flex.Item>
-      </Flex>
-    )
+    return <UrlSubmissionDisplay url={this.props.submission.url} />
   }
 
   render() {

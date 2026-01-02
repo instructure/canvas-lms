@@ -213,6 +213,60 @@ describe('AssignmentSubmission', () => {
     })
   })
 
+  describe('online_url submissions', () => {
+    it('renders URL submission content', () => {
+      const submission = createSubmission({
+        submissionType: 'online_url',
+        url: 'https://example.com',
+      })
+      const assignment = createAssignment()
+      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+
+      expect(screen.getByTestId('url-entry-content')).toBeInTheDocument()
+      expect(screen.getByTestId('url-submission-text')).toHaveTextContent('https://example.com')
+    })
+
+    it('renders error when URL is missing', () => {
+      const submission = createSubmission({
+        submissionType: 'online_url',
+        url: null,
+      })
+      const assignment = createAssignment()
+      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+
+      expect(screen.getByText('Sorry, Something Broke')).toBeInTheDocument()
+    })
+
+    it('renders error when URL is empty string', () => {
+      const submission = createSubmission({
+        submissionType: 'online_url',
+        url: '',
+      })
+      const assignment = createAssignment()
+      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+
+      expect(screen.getByText('Sorry, Something Broke')).toBeInTheDocument()
+    })
+
+    it('opens URL in new window when link is clicked', async () => {
+      const user = userEvent.setup()
+      const mockWindowOpen = vi.fn()
+      window.open = mockWindowOpen
+
+      const submission = createSubmission({
+        submissionType: 'online_url',
+        url: 'https://example.com/test',
+      })
+      const assignment = createAssignment()
+      render(<AssignmentSubmission submission={submission} assignment={assignment} />)
+
+      const link = screen.getByTestId('url-submission-text')
+      await user.click(link)
+
+      expect(mockWindowOpen).toHaveBeenCalledWith('https://example.com/test')
+    })
+  })
+
   describe('unsupported submission types', () => {
     it('renders error page for unsupported submission type', () => {
       const submission = createSubmission({submissionType: 'unsupported'})
