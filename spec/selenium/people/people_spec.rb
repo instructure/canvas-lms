@@ -403,12 +403,12 @@ describe "people" do
 
           # Add ObserverEnrollment to tests after EGG-633 is merged
           @users = [
-            { name: "Alice", section: @section_a, last_activity: 3.days.ago, role: "StudentEnrollment", total_activity_time: 100 },
-            { name: "Bob", section: @section_b, last_activity: 2.days.ago, role: "StudentEnrollment", total_activity_time: 200 },
-            { name: "Charlie", section: @section_c, last_activity: 4.days.ago, role: "StudentEnrollment", total_activity_time: 150 },
-            { name: "Dana", section: @section_a, last_activity: 5.days.ago, role: "TaEnrollment", total_activity_time: 50 },
-            { name: "Eve", section: @section_b, last_activity: 6.days.ago, role: "DesignerEnrollment", total_activity_time: 75 },
-            { name: "Tom", section: @section_a, last_activity: 1.day.ago, role: "TeacherEnrollment", total_activity_time: 250 }
+            { name: "Alice", section: @section_a, last_activity: Time.zone.parse("2025-07-18 10:00:00"), role: "StudentEnrollment", total_activity_time: 100 },
+            { name: "Bob", section: @section_b, last_activity: Time.zone.parse("2025-07-19 10:00:00"), role: "StudentEnrollment", total_activity_time: 200 },
+            { name: "Charlie", section: @section_c, last_activity: Time.zone.parse("2025-07-17 10:00:00"), role: "StudentEnrollment", total_activity_time: 150 },
+            { name: "Dana", section: @section_a, last_activity: Time.zone.parse("2025-07-16 10:00:00"), role: "TaEnrollment", total_activity_time: 50 },
+            { name: "Eve", section: @section_b, last_activity: Time.zone.parse("2025-07-15 10:00:00"), role: "DesignerEnrollment", total_activity_time: 75 },
+            { name: "Tom", section: @section_a, last_activity: Time.zone.parse("2025-07-20 10:00:00"), role: "TeacherEnrollment", total_activity_time: 250 }
           ]
 
           @users.each do |info|
@@ -421,7 +421,21 @@ describe "people" do
             enrollment.save!
           end
 
-          @teacher = User.last
+          @teacher = User.create!(name: "Test Teacher")
+          @teacher.pseudonyms.create!(unique_id: "teacher@example.com", password: "fakepassword", password_confirmation: "fakepassword", sis_user_id: "Teacher_sis_id")
+          teacher_enrollment = @course.enroll_teacher(@teacher)
+          teacher_enrollment.accept!
+          # Set teacher's last_activity_at to an early date so they sort consistently
+          teacher_enrollment.last_activity_at = Time.zone.parse("2025-07-10 10:00:00")
+          teacher_enrollment.total_activity_time = 0
+          teacher_enrollment.save!
+        end
+
+        around do |example|
+          # Freeze time for entire test to prevent last_activity_at from being updated to current time
+          Timecop.freeze(Time.zone.parse("2025-07-10 10:00:00")) do
+            example.run
+          end
         end
 
         before do
@@ -435,8 +449,12 @@ describe "people" do
           cells.map(&:text)
         end
 
-        def sorted?(values, direction = :asc)
-          sorted = values.sort
+        def sorted?(values, direction = :asc, case_sensitive: true)
+          sorted = if case_sensitive
+                     values.sort
+                   else
+                     values.sort_by(&:downcase)
+                   end
           sorted.reverse! if direction == :desc
           values == sorted
         end
@@ -457,14 +475,14 @@ describe "people" do
           date_values == sorted
         end
 
-        def expect_sortable_column(column_id, data_id, first_order = :asc, second_order = :desc, compare_sorted_fn = nil)
+        def expect_sortable_column(column_id, data_id, first_order = :asc, second_order = :desc, compare_sorted_fn = nil, case_sensitive: true)
           f("th[data-testid='header-#{column_id}']").click
           wait_for_ajaximations
           values = column_values("#{data_id}-user-")
           if compare_sorted_fn
             expect(compare_sorted_fn.call(values, first_order)).to be true
           else
-            expect(sorted?(values, first_order)).to be true
+            expect(sorted?(values, first_order, case_sensitive:)).to be true
           end
 
           f("th[data-testid='header-#{column_id}']").click
@@ -473,7 +491,7 @@ describe "people" do
           if compare_sorted_fn
             expect(compare_sorted_fn.call(values, second_order)).to be true
           else
-            expect(sorted?(values, second_order)).to be true
+            expect(sorted?(values, second_order, case_sensitive:)).to be true
           end
         end
 
@@ -489,11 +507,13 @@ describe "people" do
         end
 
         it "sorts Login ID column asc/desc" do
-          expect_sortable_column("login_id", "login-id")
+          # Login IDs are sorted case-insensitively
+          expect_sortable_column("login_id", "login-id", :asc, :desc, nil, case_sensitive: false)
         end
 
         it "sorts SIS ID column asc/desc" do
-          expect_sortable_column("sis_id", "sis-id")
+          # SIS IDs are sorted case-insensitively
+          expect_sortable_column("sis_id", "sis-id", :asc, :desc, nil, case_sensitive: false)
         end
 
         it "sorts Section column asc/desc" do
@@ -520,11 +540,11 @@ describe "people" do
             @section_e = @course.course_sections.create!(name: "Section E")
 
             @users1 = [
-              { name: "Alice", section: @section_b, last_activity: 2.days.ago, role: "StudentEnrollment" },
-              { name: "Alice", section: @section_c, last_activity: 1.day.ago, role: "StudentEnrollment" },
-              { name: "Bob", section: @section_a, last_activity: 3.days.ago, role: "TaEnrollment" },
-              { name: "Bob", section: @section_c, last_activity: 1.day.ago, role: "TeacherEnrollment" },
-              { name: "Bob", section: @section_d, last_activity: 4.days.ago, role: "DesignerEnrollment" },
+              { name: "Alice", section: @section_b, last_activity: Time.zone.parse("2025-07-19 10:00:00"), role: "StudentEnrollment" },
+              { name: "Alice", section: @section_c, last_activity: Time.zone.parse("2025-07-20 10:00:00"), role: "StudentEnrollment" },
+              { name: "Bob", section: @section_a, last_activity: Time.zone.parse("2025-07-18 10:00:00"), role: "TaEnrollment" },
+              { name: "Bob", section: @section_c, last_activity: Time.zone.parse("2025-07-20 10:00:00"), role: "TeacherEnrollment" },
+              { name: "Bob", section: @section_d, last_activity: Time.zone.parse("2025-07-17 10:00:00"), role: "DesignerEnrollment" },
             ]
 
             @users1.each do |info|
