@@ -21,6 +21,7 @@ export interface Submission {
   attempt: number
   body?: string | null
   submissionType: string
+  url?: string | null
 }
 
 export interface Assignment {

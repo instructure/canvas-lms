@@ -30,6 +30,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {IconDiscussionLine} from '@instructure/ui-icons'
 import {Heading} from '@instructure/ui-heading'
 import {calculateMasqueradeHeight} from '@canvas/context-modules/differentiated-modules/utils/miscHelpers'
+import UrlSubmissionDisplay from '@canvas/assignments/react/UrlSubmissionDisplay'
 
 const I18n = createI18nScope('peer_reviews_student')
 
@@ -91,18 +92,51 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
     )
   }
 
+  const renderUrlEntry = () => {
+    if (!submission.url) {
+      return renderError(
+        I18n.t('URL Submission Error'),
+        I18n.t('Student Peer Review Submission Error Page.'),
+        I18n.t('The URL submission is missing or invalid.'),
+      )
+    }
+
+    return (
+      <View
+        as="div"
+        height="100%"
+        background="secondary"
+        padding="small"
+        overflowY={isMobile ? 'auto' : 'hidden'}
+        data-testid="url-entry-content"
+      >
+        <UrlSubmissionDisplay url={submission.url} />
+      </View>
+    )
+  }
+
+  const renderError = (subject: string, category: string, message: string) => {
+    return (
+      <GenericErrorPage
+        imageUrl={ErrorShip}
+        errorSubject={subject}
+        errorCategory={category}
+        errorMessage={message}
+      />
+    )
+  }
+
   const renderSubmissionType = () => {
     switch (submission.submissionType) {
       case 'online_text_entry':
         return renderTextEntry()
+      case 'online_url':
+        return renderUrlEntry()
       default:
-        return (
-          <GenericErrorPage
-            imageUrl={ErrorShip}
-            errorSubject={I18n.t('Submission type error')}
-            errorCategory={I18n.t('Student Peer Review Submission Error Page.')}
-            errorMessage={I18n.t('Submission type not yet supported.')}
-          />
+        return renderError(
+          I18n.t('Submission type error'),
+          I18n.t('Student Peer Review Submission Error Page.'),
+          I18n.t('Submission type not yet supported.'),
         )
     }
   }
