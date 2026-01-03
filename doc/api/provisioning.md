@@ -39,7 +39,7 @@ Once an access token is obtained, tools may begin to <a href="names_and_role.htm
 ### Workflow
 - Step 1: Configure a tool that support NRPS in Canvas
 - Step 2: Launch the tool
-- Step 3: Tool consumes the Names and Role service claim as described in the<a href="https://www.imsglobal.org/spec/lti-nrps/v2p0#lti-1-3-integration" target="_blank">NRPS specification</a>, or by substituting the desired course_id/group_id in the <a href="names_and_role.html" target="_blank">Names and Role API</a>.
+- Step 3: Tool consumes the Names and Role service claim as described in the <a href="https://www.imsglobal.org/spec/lti-nrps/v2p0#lti-1-3-integration" target="_blank">NRPS specification</a>, or by substituting the desired course_id/group_id in the <a href="names_and_role.html" target="_blank">Names and Role API</a>.
 - Step 4: Tool obtains <a href="file.oauth.html#accessing-lti-advantage-services" target="_blank">a client_credentials access token</a> (this can actually happen any time before the next step)
 - Step 5: Tool runs requests against the <a href="names_and_role.html" target="_blank">Names and Role API</a>.
 
