@@ -88,7 +88,7 @@ module SpeedGrader
         workflow_state
       ]
 
-      if !assignment.anonymize_students? || course.account_membership_allows(current_user)
+      if !anonymize_students? || course.account_membership_allows(current_user)
         attachment_json_fields << :viewed_at
       end
 
@@ -101,7 +101,7 @@ module SpeedGrader
         )
 
       res["context"]["concluded"] = assignment.context.concluded?
-      res["anonymize_students"] = assignment.anonymize_students?
+      res["anonymize_students"] = anonymize_students?
       res["anonymize_graders"] = !assignment.can_view_other_grader_identities?(current_user)
       res["post_manually"] = assignment.post_manually?
 
@@ -123,7 +123,7 @@ module SpeedGrader
           ignore_student_visibility: true
         ) { |rep, others| others.each { |s| res[:context][:rep_for_student][s.id] = rep.id } }
 
-      unless assignment.anonymize_students?
+      unless anonymize_students?
         num_students = students.length
         students = students.sort_by.with_index do |student, idx|
           # Ensure that any test students are sorted last. sort_by is not stable,
@@ -382,7 +382,7 @@ module SpeedGrader
 
                     # Fill in the parent's anonymous ID if this version was serialized
                     # without it
-                    if assignment.anonymize_students? &&
+                    if anonymize_students? &&
                        version_json["submission"]["anonymous_id"].blank?
                       version_json["submission"]["anonymous_id"] = sub.anonymous_id
                     end
@@ -486,6 +486,24 @@ module SpeedGrader
       StringifyIds.recursively_stringify_ids(res)
     ensure
       Attachment.skip_thumbnails = nil
+    end
+
+    # We can't update the existing assignment.anonymize_students? method because
+    # it is used outside speedgrader context.
+    def anonymize_students?
+      if assignment.quiz_lti?
+        assignment.new_quizzes_anonymous_participants?
+      else
+        assignment.anonymize_students?
+      end
+    end
+
+    # The same reason as anonymize_students? - we can't modify the SubmissionComment.anonymous_students? method directly,
+    # because it is used outside speedgrader context.
+    def anonymous_students?(current_user:, assignment:)
+      return @anonymous_students if defined? @anonymous_students
+
+      @anonymous_students = anonymize_students? || !assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
     end
 
     def quizzes_next_submission?
