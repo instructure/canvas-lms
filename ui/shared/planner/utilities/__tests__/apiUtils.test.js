@@ -661,7 +661,7 @@ describe('transformApiToInternalItem', () => {
     expect(() => transformApiToInternalItem({}, [])).toThrow()
   })
 
-  it('copes with a non-existent (e.g. concluded) course', () => {
+  it('uses context_name from API response when course is not in local courses array', () => {
     const apiResponse = makeApiResponse({
       course_id: 999,
       plannable_type: 'planner_note',
@@ -678,8 +678,35 @@ describe('transformApiToInternalItem', () => {
     expect(result.id).toBe(10)
     expect(result.uniqueId).toBe('planner_note-10')
     expect(result.course_id).toBe(999)
-    expect(result.context).toBeUndefined() // No course found with id 999
+    expect(result.context).toEqual({
+      type: 'Course',
+      id: 999,
+      title: 'course name for course id 999',
+      image_url: 'https://example.com/course/999/image',
+      color: undefined,
+      url: undefined,
+    })
     expect(result.completed).toBe(false)
+  })
+
+  it('returns undefined context when course is not in local array and no context_name in API response', () => {
+    const apiResponse = {
+      plannable_id: '10',
+      context_type: 'Course',
+      course_id: 999,
+      planner_override: null,
+      plannable_type: 'planner_note',
+      plannable: makePlannerNote({course_id: 999}),
+      submissions: false,
+      new_activity: false,
+      plannable_date: '2018-03-27T18:58:51Z',
+    }
+
+    const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
+
+    expect(result.type).toBe('To Do')
+    expect(result.course_id).toBe(999)
+    expect(result.context).toBeUndefined()
   })
 
   it('handles account-level group items', () => {
