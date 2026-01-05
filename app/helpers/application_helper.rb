@@ -1006,7 +1006,7 @@ module ApplicationHelper
   def csp_report_uri
     @csp_report_uri ||=
       if include_default_source_csp_directives? && (host = DynamicSettings.find("csp-logging")[:host])
-        " report-uri #{host}; "
+        " report-uri #{host};"
       else
         ""
       end
@@ -1014,26 +1014,21 @@ module ApplicationHelper
 
   def default_csp_logging_directives(include_script_src: true)
     if include_default_source_csp_directives?
-      script_src_directive = include_script_src ? "script-src 'self' 'unsafe-eval' #{allow_list_domains};" : ""
+      # Use default-src as comprehensive fallback
+      directives = "default-src 'self' 'unsafe-inline' data: #{allow_list_domains};"
 
-      directives = "default-src 'self'; \
-                    img-src 'self' data: #{allow_list_domains};\
-                    style-src 'self' 'unsafe-inline' #{allow_list_domains};\
-                    #{script_src_directive}\
-                    script-src-elem 'self' 'unsafe-inline' #{allow_list_domains};\
-                    font-src 'self' data: #{allow_list_domains};\
-                    connect-src 'self' #{allow_list_domains};\
-                    worker-src 'self' blob: #{allow_list_domains};\
-                    manifest-src 'self' #{allow_list_domains};\
-                    media-src 'self' #{allow_list_domains};"
+      if include_script_src
+        directives << "script-src 'self' 'unsafe-inline' 'unsafe-eval' #{allow_list_domains};"
+      end
 
-      directives.squish + csp_report_uri
+      directives << csp_report_uri if csp_report_uri.present?
+      directives.squish
     else
       ""
     end
   end
 
-  def include_files_domain_in_csp
+  def include_files_domain_in_csp?
     # TODO: make this configurable per-course, and depending on csp_context_is_submission?
     true
   end
@@ -1078,11 +1073,13 @@ module ApplicationHelper
   end
 
   def allow_list_domains(include_tools: false)
-    csp_context.csp_whitelisted_domains(request, include_files: include_files_domain_in_csp, include_tools:).join(" ")
+    include_files = include_files_domain_in_csp?
+
+    csp_context.csp_whitelisted_domains(request, include_files:, include_tools:).join(" ")
   end
 
   def csp_iframe_attribute
-    if include_files_domain_in_csp
+    if include_files_domain_in_csp?
       frame_domains = "'self' " + allow_list_domains(include_tools: true)
       object_domains = "'self' " + allow_list_domains
       script_domains = "'self' 'unsafe-eval' 'unsafe-inline' " + allow_list_domains
