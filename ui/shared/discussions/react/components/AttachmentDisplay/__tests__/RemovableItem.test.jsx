@@ -54,7 +54,7 @@ describe('RemovableItem', () => {
       }))
     })
 
-    it.skip('AttachmentButton renders the close button', () => {
+    it('AttachmentButton renders the close button', () => {
       const {queryByTestId} = setup({
         attachment: {
           _id: 1,

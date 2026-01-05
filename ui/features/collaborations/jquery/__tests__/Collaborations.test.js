@@ -78,7 +78,7 @@ describe('Collaborations', () => {
     $('#fixtures').append(dom)
   })
 
-  test.skip('shows a flash message when deletion is complete', async () => {
+  test('shows a flash message when deletion is complete', async () => {
     server.use(
       http.post('http://test.com', () => {
         return HttpResponse.json({})

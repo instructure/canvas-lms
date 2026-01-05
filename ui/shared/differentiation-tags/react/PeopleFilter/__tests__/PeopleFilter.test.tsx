@@ -29,7 +29,9 @@ vi.mock('@canvas/util/MessageBus', () => ({
   trigger: vi.fn(),
 }))
 
-const mockUseDifferentiationTagCategoriesIndex = useDifferentiationTagCategoriesIndex as ReturnType<typeof vi.fn>
+const mockUseDifferentiationTagCategoriesIndex = useDifferentiationTagCategoriesIndex as ReturnType<
+  typeof vi.fn
+>
 
 describe('PeopleFilter', () => {
   const defaultProps = {
@@ -101,8 +103,8 @@ describe('PeopleFilter', () => {
     const input = screen.getByRole('combobox')
     await user.click(input)
 
-    const roleOption = await screen.getByText('TeacherRole (2)')
-    user.click(roleOption)
+    const roleOption = screen.getByText('TeacherRole (2)')
+    await user.click(roleOption)
 
     await waitFor(() => {
       expect(MessageBus.trigger).toHaveBeenCalledWith(

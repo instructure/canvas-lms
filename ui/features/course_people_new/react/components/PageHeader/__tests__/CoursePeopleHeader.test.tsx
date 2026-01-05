@@ -30,7 +30,7 @@ describe('CoursePeopleHeader', () => {
     expect(getByTestId('course-people-header')).toHaveTextContent('People')
   })
 
-  it.skip('renders the CoursePeopleOptionsMenu component', () => {
+  it('renders the CoursePeopleOptionsMenu component', () => {
     const {getByText} = render(<CoursePeopleHeader />)
     expect(getByText('Options Menu')).toBeInTheDocument()
   })

@@ -193,7 +193,7 @@ describe('PageViewsTable', () => {
   })
 
   describe('pagination', () => {
-    it.skip('renders pagination component with correct buttons', async () => {
+    it('renders pagination component with correct buttons', async () => {
       // arrange
       const id = '127'
       const {resolver} = createPaginationMock(id, {maxPages: 2})
@@ -210,7 +210,7 @@ describe('PageViewsTable', () => {
       })
     })
 
-    it.skip('navigates to next page when pagination button is clicked', async () => {
+    it('navigates to next page when pagination button is clicked', async () => {
       // arrange
       const id = '128'
       const {resolver} = createPaginationMock(id, {maxPages: 3})

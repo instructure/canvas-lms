@@ -277,7 +277,7 @@ describe('processDashboardCards', () => {
 })
 
 describe('handleDashboardCardError', () => {
-  it.skip('shows flash alert', () => {
+  it('shows flash alert', () => {
     const e = new Error('Some error')
     handleDashboardCardError(e)
 

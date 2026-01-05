@@ -132,6 +132,10 @@ export function setupFlashHolder() {
   }
 }
 
+export function clearQueryCache() {
+  queryClient.clear()
+}
+
 export function renderComponent(overrides: Partial<ItemAssignToTrayProps> = {}) {
   return render(
     <MockedQueryProvider>

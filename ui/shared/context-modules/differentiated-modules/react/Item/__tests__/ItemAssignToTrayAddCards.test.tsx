@@ -19,6 +19,7 @@
 import {act, cleanup} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import {
+  clearQueryCache,
   OVERRIDES_URL,
   renderComponent,
   setupBaseMocks,
@@ -43,6 +44,7 @@ describe('ItemAssignToTray - Add Cards', () => {
     window.location = originalLocation
     fetchMock.resetHistory()
     fetchMock.restore()
+    clearQueryCache()
     cleanup()
   })
 
