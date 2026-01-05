@@ -117,6 +117,7 @@ module Importers
         item.send(:"#{attr}=", options[attr])
       end
 
+      item.discussion_type = DiscussionTopic::DiscussionTypes::THREADED if item.discussion_type == DiscussionTopic::DiscussionTypes::SIDE_COMMENT
       item.reply_to_entry_required_count = options[:reply_to_entry_required_count] || 0
       item.sort_order = DiscussionTopic::SortOrder::DEFAULT unless DiscussionTopic::SortOrder::TYPES.include?(item.sort_order)
 

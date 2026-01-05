@@ -174,5 +174,20 @@ describe Importers::DiscussionTopicImporter do
         expect(topic.assignment.lock_at).to be_nil
       end
     end
+
+    context "when discussion type is side_comment" do
+      it "converts side_comment to threaded during import" do
+        discussion_data = {
+          migration_id: "test_side_comment_discussion",
+          title: "Side Comment Discussion",
+          description: "Test description",
+          discussion_type: "side_comment"
+        }
+
+        topic = Importers::DiscussionTopicImporter.import_from_migration(discussion_data, context, migration)
+
+        expect(topic.discussion_type).to eq("threaded")
+      end
+    end
   end
 end
