@@ -175,6 +175,210 @@ RSpec.describe PeerReview::AllocationService do
         end
       end
 
+      context "when peer review start date has not been reached" do
+        before do
+          PeerReview::PeerReviewCreatorService.new(
+            parent_assignment: assignment,
+            points_possible: 5
+          ).call
+
+          assignment.reload.peer_review_sub_assignment.update!(unlock_at: 2.days.from_now)
+
+          assignment.update!(due_at: 3.days.ago)
+          assignment.submit_homework(assessor, body: "My submission")
+          assignment.submit_homework(student1, body: "Student1 submission")
+        end
+
+        it "returns error result with peer review start date message" do
+          result = service.allocate
+          expect(result[:success]).to be false
+          expect(result[:error_code]).to eq(:peer_review_not_started)
+          expect(result[:message]).to include("not available until")
+          expect(result[:status]).to eq(:bad_request)
+        end
+      end
+
+      context "when peer review start date has passed" do
+        before do
+          PeerReview::PeerReviewCreatorService.new(
+            parent_assignment: assignment,
+            points_possible: 5
+          ).call
+
+          assignment.reload.peer_review_sub_assignment.update!(unlock_at: 1.day.ago)
+
+          assignment.update!(due_at: 3.days.ago)
+          assignment.submit_homework(assessor, body: "My submission")
+          assignment.submit_homework(student1, body: "Student1 submission")
+          assignment.submit_homework(student2, body: "Student2 submission")
+        end
+
+        it "allows allocation" do
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests]).to be_an(Array)
+          expect(result[:assessment_requests].size).to eq(2)
+        end
+      end
+
+      context "when peer review unlock_at is not set" do
+        before do
+          PeerReview::PeerReviewCreatorService.new(
+            parent_assignment: assignment,
+            points_possible: 5
+          ).call
+
+          assignment.reload.peer_review_sub_assignment.update!(unlock_at: nil)
+
+          assignment.submit_homework(assessor, body: "My submission")
+          assignment.submit_homework(student1, body: "Student1 submission")
+          assignment.submit_homework(student2, body: "Student2 submission")
+        end
+
+        context "when parent assignment due_at is in the future" do
+          before do
+            assignment.update!(due_at: 1.day.from_now)
+          end
+
+          it "uses parent assignment due_at and blocks allocation" do
+            result = service.allocate
+            expect(result[:success]).to be false
+            expect(result[:error_code]).to eq(:peer_review_not_started)
+            expect(result[:message]).to include("not available until")
+          end
+        end
+
+        context "when parent assignment due_at is in the past" do
+          before do
+            assignment.update!(due_at: 1.day.ago)
+          end
+
+          it "uses parent assignment due_at and allows allocation" do
+            result = service.allocate
+            expect(result[:success]).to be true
+            expect(result[:assessment_requests].size).to eq(2)
+          end
+        end
+
+        context "when parent assignment due_at is nil" do
+          before do
+            assignment.update!(due_at: nil)
+          end
+
+          it "allows allocation when no dates are set" do
+            result = service.allocate
+            expect(result[:success]).to be true
+            expect(result[:assessment_requests].size).to eq(2)
+          end
+        end
+      end
+
+      context "when peer review start date has override for specific section" do
+        let(:section1) { course.course_sections.create!(name: "Section 1") }
+        let(:section2) { course.course_sections.create!(name: "Section 2") }
+        let(:assessor_section1) { user_model }
+        let(:assessor_section2) { user_model }
+        let(:student_section1) { user_model }
+        let(:student_section2) { user_model }
+
+        before do
+          PeerReview::PeerReviewCreatorService.new(
+            parent_assignment: assignment,
+            points_possible: 5
+          ).call
+
+          peer_review_sub = assignment.reload.peer_review_sub_assignment
+          peer_review_sub.update!(unlock_at: 3.days.from_now)
+
+          course.enroll_student(assessor_section1, enrollment_state: :active, section: section1)
+          course.enroll_student(assessor_section2, enrollment_state: :active, section: section2)
+          course.enroll_student(student_section1, enrollment_state: :active, section: section1)
+          course.enroll_student(student_section2, enrollment_state: :active, section: section2)
+
+          assignment.update!(due_at: 3.days.ago)
+          assignment.submit_homework(assessor_section1, body: "Assessor1 submission")
+          assignment.submit_homework(assessor_section2, body: "Assessor2 submission")
+          assignment.submit_homework(student_section1, body: "Student section1 submission")
+          assignment.submit_homework(student_section2, body: "Student section2 submission")
+
+          parent_override1 = assignment.assignment_overrides.create!(
+            set: section1,
+            due_at: 2.days.ago
+          )
+
+          peer_review_sub.assignment_overrides.create!(
+            parent_override: parent_override1,
+            set: section1,
+            unlock_at: 1.day.ago
+          )
+        end
+
+        it "allows allocation for section1 assessor with override in the past" do
+          service1 = described_class.new(assignment:, assessor: assessor_section1)
+          result = service1.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests]).to be_an(Array)
+        end
+
+        it "blocks allocation for section2 assessor with base unlock_at in the future" do
+          service2 = described_class.new(assignment:, assessor: assessor_section2)
+          result = service2.allocate
+          expect(result[:success]).to be false
+          expect(result[:error_code]).to eq(:peer_review_not_started)
+          expect(result[:message]).to include("not available until")
+        end
+      end
+
+      context "when peer review start date has ADHOC override" do
+        let(:adhoc_student) { user_model }
+        let(:regular_student) { user_model }
+
+        before do
+          PeerReview::PeerReviewCreatorService.new(
+            parent_assignment: assignment,
+            points_possible: 5
+          ).call
+
+          peer_review_sub = assignment.reload.peer_review_sub_assignment
+          peer_review_sub.update!(unlock_at: 3.days.from_now)
+
+          course.enroll_student(adhoc_student, enrollment_state: :active)
+          course.enroll_student(regular_student, enrollment_state: :active)
+
+          assignment.update!(due_at: 3.days.ago)
+          assignment.submit_homework(adhoc_student, body: "ADHOC student submission")
+          assignment.submit_homework(regular_student, body: "Regular student submission")
+          assignment.submit_homework(student1, body: "Student1 submission")
+
+          parent_adhoc = assignment.assignment_overrides.create!(
+            set_type: "ADHOC",
+            due_at: 2.days.ago
+          )
+          parent_adhoc.assignment_override_students.create!(user: adhoc_student)
+
+          peer_review_adhoc = peer_review_sub.assignment_overrides.create!(
+            parent_override: parent_adhoc,
+            set_type: "ADHOC",
+            unlock_at: 1.day.ago
+          )
+          peer_review_adhoc.assignment_override_students.create!(user: adhoc_student)
+        end
+
+        it "allows allocation for student with ADHOC override in the past" do
+          service_adhoc = described_class.new(assignment:, assessor: adhoc_student)
+          result = service_adhoc.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests]).to be_an(Array)
+        end
+
+        it "blocks allocation for student without override (using base unlock_at in the future)" do
+          service_regular = described_class.new(assignment:, assessor: regular_student)
+          result = service_regular.allocate
+          expect(result[:success]).to be false
+          expect(result[:error_code]).to eq(:peer_review_not_started)
+        end
+      end
+
       context "when peer review count limit is reached" do
         before do
           assignment.update!(peer_review_count: 1)

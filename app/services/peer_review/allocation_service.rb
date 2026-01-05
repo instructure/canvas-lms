@@ -85,6 +85,12 @@ class PeerReview::AllocationService < ApplicationService
       end
     end
 
+    # Validation: Check if peer review start date has passed
+    peer_review_start_date = peer_review_start_date_for_assessor
+    if peer_review_start_date && peer_review_start_date > Time.zone.now
+      return error_result(:peer_review_not_started, I18n.t("Peer reviews are not available until %{start_date}", start_date: peer_review_start_date), :bad_request)
+    end
+
     # Validation: Check if assessor has reached the required peer review count
     review_count = count_all_reviews
     if review_count >= @assignment.peer_review_count
@@ -207,5 +213,28 @@ class PeerReview::AllocationService < ApplicationService
       message:,
       status:
     }
+  end
+
+  def peer_review_start_date_for_assessor
+    peer_review_overrides = @assignment.peer_review_overrides_for_dates
+    return nil unless peer_review_overrides
+
+    user_assignment = @assignment.overridden_for(@assessor)
+    applied_override = user_assignment.applied_overrides&.first
+    override_hash = build_override_hash(applied_override)
+
+    peer_review_dates = @assignment.peer_review_dates_for_override(override_hash, peer_review_overrides)
+    return nil unless peer_review_dates
+
+    # Use unlock_at if set, otherwise fall back to parent assignment's due_at
+    peer_review_dates[:unlock_at] || user_assignment.due_at
+  end
+end
+
+def build_override_hash(applied_override)
+  if applied_override
+    { id: applied_override.id, base: false }
+  else
+    { id: nil, base: true }
   end
 end
