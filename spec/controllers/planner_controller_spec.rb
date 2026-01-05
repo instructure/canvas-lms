@@ -1858,8 +1858,21 @@ describe PlannerController do
         @course.update!(settings: @course.settings.merge(restrict_student_past_view: true))
         @course.enrollment_term.set_overrides(@course.account, "StudentEnrollment" => { end_at: 1.month.ago })
 
+        get :index, params: { observed_user_id: @student.to_param, context_codes: [@course.asset_string], include: %w[concluded] }
+        expect(response).to be_successful
+      end
+
+      it "does not show calendar events from concluded courses by default" do
+        @course.calendar_events.create!(title: "Course Event", start_at: 1.day.from_now)
+        @course.conclude_at = 2.days.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+
         get :index, params: { observed_user_id: @student.to_param, context_codes: [@course.asset_string] }
         expect(response).to be_successful
+        response_json = json_parse(response.body)
+        calendar_events = response_json.select { |i| i["plannable_type"] == "calendar_event" }
+        expect(calendar_events).to be_empty
       end
 
       context "cross-shard account calendars" do

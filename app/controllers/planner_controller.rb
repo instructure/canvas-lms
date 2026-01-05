@@ -481,7 +481,9 @@ class PlannerController < ApplicationController
 
       # allow observers additional access to courses where they're enrolled as an observer
       if @user != @current_user && params.key?(:observed_user_id)
-        @course_ids |= @current_user.observer_enrollments.active.where(associated_user: @user).shard(@current_user).pluck(:course_id).map { |id| Shard.relative_id_for(id, @current_user.shard, @user.shard) }
+        observer_course_ids = @current_user.observer_enrollments.active.where(associated_user: @user).shard(@current_user).pluck(:course_id).map { |id| Shard.relative_id_for(id, @current_user.shard, @user.shard) }
+        valid_observer_course_ids = @user.course_ids_for_todo_lists(:student, course_ids: observer_course_ids, include_concluded:)
+        @course_ids |= valid_observer_course_ids
       end
 
       # fetch all the objects they requested that weren't immediately available;
@@ -497,6 +499,11 @@ class PlannerController < ApplicationController
 
       return render_json_unauthorized unless contexts_to_check_permissions.all? do |context|
         next unless context.grants_any_right?(@user, session, *perms)
+
+        if params.key?(:observed_user_id) && context.is_a?(Course)
+          student_valid_course_ids = @user.course_ids_for_todo_lists(:student, course_ids: [context.id], include_concluded:)
+          next true if student_valid_course_ids.empty?
+        end
 
         # as we verify access to the missing requested objects, we add them back in to
         # the valid array
