@@ -1366,23 +1366,6 @@ describe Assignment do
         end
       end
     end
-
-    context "when anonymous_participants is used" do
-      it "students should be anonym" do
-        @assignment.settings = { "new_quizzes" => { "anonymous_participants" => true } }
-        expect(@assignment).to be_anonymize_students
-      end
-
-      it "students should not be anonym" do
-        @assignment.settings = { "new_quizzes" => { "anonymous_participants" => false } }
-        expect(@assignment).not_to be_anonymize_students
-      end
-
-      it "nil should be handled gracefully" do
-        @assignment.settings = { "new_quizzes" => { "anonymous_participants" => nil } }
-        expect(@assignment).not_to be_anonymize_students
-      end
-    end
   end
 
   describe "#can_read_assignment?" do

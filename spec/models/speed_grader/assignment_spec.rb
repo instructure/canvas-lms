@@ -3289,4 +3289,72 @@ describe SpeedGrader::Assignment do
       expect(json["post_manually"]).to be false
     end
   end
+
+  describe "#anonymize_students?" do
+    let_once(:assignment) { @course.assignments.create!(title: "test assignment") }
+    let(:speed_grader_assignment) { SpeedGrader::Assignment.new(assignment, @teacher) }
+
+    context "when assignment is quiz_lti" do
+      before do
+        allow(assignment).to receive(:quiz_lti?).and_return(true)
+      end
+
+      it "returns true when new_quizzes_anonymous_participants? is true" do
+        allow(assignment).to receive(:new_quizzes_anonymous_participants?).and_return(true)
+        expect(speed_grader_assignment.anonymize_students?).to be true
+      end
+
+      it "returns false when new_quizzes_anonymous_participants? is false" do
+        allow(assignment).to receive(:new_quizzes_anonymous_participants?).and_return(false)
+        expect(speed_grader_assignment.anonymize_students?).to be false
+      end
+    end
+
+    context "when assignment is not quiz_lti" do
+      before do
+        allow(assignment).to receive(:quiz_lti?).and_return(false)
+      end
+
+      it "delegates to assignment.anonymize_students? when true" do
+        allow(assignment).to receive(:anonymize_students?).and_return(true)
+        expect(speed_grader_assignment.anonymize_students?).to be true
+      end
+
+      it "delegates to assignment.anonymize_students? when false" do
+        allow(assignment).to receive(:anonymize_students?).and_return(false)
+        expect(speed_grader_assignment.anonymize_students?).to be false
+      end
+    end
+  end
+
+  describe "#anonymous_students?" do
+    let_once(:assignment) { @course.assignments.create!(title: "test assignment") }
+    let(:speed_grader_assignment) { SpeedGrader::Assignment.new(assignment, @teacher) }
+
+    context "when anonymize_students? is true" do
+      before do
+        allow(speed_grader_assignment).to receive(:anonymize_students?).and_return(true)
+      end
+
+      it "returns true regardless of user permissions" do
+        expect(speed_grader_assignment.anonymous_students?(current_user: @teacher, assignment:)).to be true
+      end
+    end
+
+    context "when anonymize_students? is false" do
+      before do
+        allow(speed_grader_assignment).to receive(:anonymize_students?).and_return(false)
+      end
+
+      it "returns false when user has manage_grades or view_all_grades permission" do
+        allow(assignment.context).to receive(:grants_any_right?).with(@teacher, :manage_grades, :view_all_grades).and_return(true)
+        expect(speed_grader_assignment.anonymous_students?(current_user: @teacher, assignment:)).to be false
+      end
+
+      it "returns true when user has neither manage_grades nor view_all_grades permission" do
+        allow(assignment.context).to receive(:grants_any_right?).with(@teacher, :manage_grades, :view_all_grades).and_return(false)
+        expect(speed_grader_assignment.anonymous_students?(current_user: @teacher, assignment:)).to be true
+      end
+    end
+  end
 end
