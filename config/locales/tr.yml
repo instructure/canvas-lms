@@ -462,6 +462,7 @@ tr:
     manually_created_courses: "Manuel Oluşturulan Dersler"
     root_account_cant_have_sis_id: "ÖBS ID'leri kök hesaplara ayarlanamaz"
     sis_id_in_use: "ÖBS ID \"%{sis_id}\" zaten kullanılıyor"
+    tab_accessibility: Erişilebilirlik
     tab_admin_tools: "Yönetici Araçları"
     tab_analytics_hub: "Analiz Merkezi (Analytics Hub)"
     tab_apps: Uygulamalar
