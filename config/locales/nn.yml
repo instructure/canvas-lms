@@ -390,6 +390,7 @@ nn:
     manually_created_courses: "Manuelt oppretta emne"
     root_account_cant_have_sis_id: "SIS-ID-ar kan ikkje setjast på rot-kontoar"
     sis_id_in_use: "SIS-ID \"%{sis_id}\" er allereie i bruk"
+    tab_accessibility: Tilgjengeligheit
     tab_admin_tools: Administrasjonsverktøy
     tab_analytics_hub: Analyse-hub
     tab_apps: Utvidingar
