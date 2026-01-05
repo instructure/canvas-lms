@@ -37,11 +37,15 @@ export function ImmersiveViewBackButton() {
   }, [])
 
   return isTablet ? (
-    <CloseButton size="medium" screenReaderLabel={I18n.t('Close')} onClick={handleClick} />
+    <CloseButton
+      size="medium"
+      screenReaderLabel={I18n.t('Go Back to Course')}
+      onClick={handleClick}
+    />
   ) : (
     <div className={styles.noShrink}>
       <Button color="primary" onClick={handleClick}>
-        {I18n.t('Back to Course')}
+        {I18n.t('Go Back to Course')}
       </Button>
     </div>
   )
