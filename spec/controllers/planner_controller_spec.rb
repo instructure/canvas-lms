@@ -56,6 +56,26 @@ describe PlannerController do
         expect(response).to be_successful
       end
 
+      it "includes items from all enrolled courses regardless of favorites when using include all_courses" do
+        favorited_course = @course
+        course_with_student(user: @student, active_all: true)
+        unfavorited_course = @course
+        unfavorited_assignment = unfavorited_course.assignments.create!(
+          title: "unfavorited assignment",
+          due_at: 1.week.from_now
+        )
+
+        @student.favorites.create!(context: favorited_course)
+
+        get :index, params: { include: ["all_courses"] }
+        response_json = json_parse(response.body)
+        assignment_ids = response_json.select { |i| i["plannable_type"] == "assignment" }.pluck("plannable_id")
+
+        expect(assignment_ids).to include(@assignment.id)
+        expect(assignment_ids).to include(@assignment2.id)
+        expect(assignment_ids).to include(unfavorited_assignment.id)
+      end
+
       it "renders unauthorized if student in limited access account" do
         @course.root_account.enable_feature!(:allow_limited_access_for_students)
         @course.account.settings[:enable_limited_access_for_students] = true

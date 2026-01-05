@@ -429,11 +429,11 @@ class PlannerController < ApplicationController
     if @include_context_codes || @include_all_courses
       context_codes = Array(params[:context_codes])
       if !@include_context_codes && @include_all_courses
-        opts = {}
-        opts[:observee_user] = @user
-        opts[:limit] = 50
-        context_codes = @current_user.menu_courses(nil, opts).pluck(:asset_string)
-        context_codes << @user.asset_string
+        @user.shard.activate do
+          course_ids = @user.course_ids_for_todo_lists(:student, include_concluded:)
+          context_codes = course_ids.map { |id| "course_#{id}" }
+          context_codes << @user.asset_string
+        end
       end
       context_ids = ActiveRecord::Base.parse_asset_string_list(context_codes)
       @course_ids = context_ids["Course"] || []
