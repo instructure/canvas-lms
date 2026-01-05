@@ -5,6 +5,7 @@ owned_globs:
   - lib/course_link_validator.rb
   - packages/canvas-media/**/*
   - packages/canvas-rce/**/*
+  - ui/features/accessibility/**/*
   - ui/features/course_link_validator/**/*
   - ui/features/files/**/*
   - ui/features/files_v2/**/*

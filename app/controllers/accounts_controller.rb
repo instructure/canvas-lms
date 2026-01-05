@@ -2160,7 +2160,9 @@ class AccountsController < ApplicationController
     page_has_instui_topnav
     set_active_tab "accessibility"
 
-    render html: "Accessibility placeholder".html_safe, layout: true
+    js_bundle :accessibility_course_statistics
+
+    render html: "", layout: true
   end
 
   def format_avatar_count(count = 0)
