@@ -189,6 +189,10 @@ module FeatureFlags
       only_admins_can_enable_during_eap(user, context, :a11y_checker, from_state, transitions, allow_subaccount_admins: true)
     end
 
+    def self.oak_flag_visible_on_hook(context)
+      OakPredicate.new(context, Shard.current.database_server.config[:region]).call
+    end
+
     # Private helper methods
 
     def self.shadow_flag_enabled?(context, flag_name)
