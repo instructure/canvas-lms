@@ -4662,7 +4662,6 @@ class Course < ActiveRecord::Base
 
   def horizon_back_to_units_enabled?
     horizon_course? &&
-      root_account.feature_enabled?(:horizon_course_redesign) &&
       root_account.feature_enabled?(:horizon_course_academic_switcher)
   end
 

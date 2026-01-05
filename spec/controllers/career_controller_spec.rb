@@ -66,18 +66,12 @@ describe CareerController do
           get :show, params: { course_id: @course.id }
 
           expect(assigns[:js_env][:CANVAS_CAREER][:FEATURES]).to include(
-            horizon_root_experience: false,
             horizon_role_dashboards: false,
             horizon_dashboard_ai_widgets: false,
             horizon_hris_integrations: false,
             horizon_user_profile_page: false,
-            horizon_bulk_metadata_import: false,
             horizon_manual_dashboard_builder: false,
-            horizon_dark_career_theme_in_learning_provider: false,
             horizon_learning_library: false,
-            horizon_course_navigation: false,
-            horizon_course_redesign: false,
-            horizon_course_index_page: false,
             horizon_chart_view: false,
             horizon_native_permissions_page: false,
             horizon_course_academic_switcher: false,

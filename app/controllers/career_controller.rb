@@ -54,18 +54,12 @@ class CareerController < ApplicationController
 
   def features_env
     %i[
-      horizon_root_experience
       horizon_role_dashboards
       horizon_dashboard_ai_widgets
       horizon_hris_integrations
       horizon_user_profile_page
-      horizon_bulk_metadata_import
       horizon_manual_dashboard_builder
-      horizon_dark_career_theme_in_learning_provider
       horizon_learning_library
-      horizon_course_navigation
-      horizon_course_redesign
-      horizon_course_index_page
       horizon_chart_view
       horizon_native_permissions_page
       horizon_course_academic_switcher

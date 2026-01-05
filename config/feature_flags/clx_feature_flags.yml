@@ -8,23 +8,7 @@ horizon_course_setting:
     Enables the Canvas Career tab in account settings.
   beta: true
 
-# Module Federation flags
-horizon_learning_provider_app_for_courses:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Learning Provider App (Course Contexts)"
-  description: |-
-    Enables the Canvas Career Learning Provider App in course contexts.
-
 # Feature flags read by Horizon app
-horizon_root_experience:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Root Account Experience"
-  description: |-
-    Enables the optimized root account experience in Canvas Career.
 horizon_role_dashboards:
   applies_to: RootAccount
   state: hidden
@@ -53,13 +37,6 @@ horizon_user_profile_page:
   display_name: "Canvas Career: User Profile Page"
   description: |-
     Enables the refreshed user profile page in Canvas Career.
-horizon_bulk_metadata_import:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Bulk Metadata Import"
-  description: |-
-    Enables importing metadata in bulk in Canvas Career.
 horizon_manual_dashboard_builder:
   applies_to: RootAccount
   state: hidden
@@ -67,13 +44,6 @@ horizon_manual_dashboard_builder:
   display_name: "Canvas Career: Manual Dashboard Builder"
   description: |-
     Enables manual dashboard builder in Canvas Career.
-horizon_dark_career_theme_in_learning_provider:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Dark theme in Learning Provider"
-  description: |-
-    Enables dark theme in Learning Provider.
 horizon_learning_library:
   applies_to: RootAccount
   state: hidden
@@ -81,27 +51,6 @@ horizon_learning_library:
   display_name: "Canvas Career: Learning Library"
   description: |-
     Enables the Learning Library in Canvas Career.
-horizon_course_navigation:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Course Navigation"
-  description: |-
-    Enables native course navigation in Canvas Career.
-horizon_course_redesign:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Course Redesign"
-  description: |-
-    Enables courses to leverage Canvas Career features natively.
-horizon_course_index_page:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Course Index Page"
-  description: |-
-    Enables native course index page in Canvas Career.
 horizon_chart_view:
   applies_to: RootAccount
   state: hidden
