@@ -113,12 +113,12 @@ class DiscussionTopicsApiController < ApplicationController
         json: {
           error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.")
         },
-        status: :unprocessable_entity
+        status: :unprocessable_content
       ) and return
     end
 
     current_count = Canvas.redis.get(cache_key).to_i
-    limit = llm_config_raw.rate_limit[:limit]
+    limit = llm_config_raw.rate_limit&.[](:limit)
     summary = @topic.summaries.where(user: @current_user, llm_config_version: llm_config_refined.name).order(created_at: :desc).first
     parent_summary = summary&.parent
 
@@ -163,7 +163,7 @@ class DiscussionTopicsApiController < ApplicationController
         json: {
           error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.")
         },
-        status: :unprocessable_entity
+        status: :unprocessable_content
       ) and return
     end
 
@@ -197,7 +197,7 @@ class DiscussionTopicsApiController < ApplicationController
     InstStatsd::Statsd.distributed_increment("discussion_topic.summary.generated")
 
     current_count = Canvas.redis.get(cache_key).to_i
-    limit = llm_config_raw.rate_limit[:limit]
+    limit = llm_config_raw.rate_limit&.[](:limit)
 
     render(json: { id: refined_summary.id, text: refined_summary.summary, usage: { currentCount: current_count, limit: } })
   rescue => e
@@ -212,17 +212,24 @@ class DiscussionTopicsApiController < ApplicationController
       render(json: { error: t("Sorry, the service is currently busy. Please try again later.") }, status: :service_unavailable)
     when InstLLM::ValidationTooLongError
       InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.too_long")
-      render(json: { error: t("Sorry, we are unable to summarize this discussion as it is too long.") }, status: :unprocessable_entity)
-    when InstLLM::ValidationError
+      render(json: { error: t("Sorry, we are unable to summarize this discussion as it is too long.") }, status: :unprocessable_content)
+    when InstLLM::ValidationError, InstructureMiscPlugin::Extensions::CedarClient::ValidationError
       InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.validation")
-      render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_entity)
+      render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_content)
     when InstLLMHelper::RateLimitExceededError
       InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.rate_limit_exceeded")
       render(json: { error: t("Sorry, you have reached the maximum number of summary generations allowed (%{limit}) for now. Please try again later.", limit: e.limit) }, status: :too_many_requests)
+    when InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.rate_limit_exceeded")
+      render(json: { error: t("Sorry, you have reached the maximum number of summary generations allowed for now. Please try again later.") }, status: :too_many_requests)
+    when InstructureMiscPlugin::Extensions::CedarClient::CedarClientError
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.cedar_client")
+      Canvas::Errors.capture_exception(:discussion_summary, e, :error)
+      render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_content)
     else
       InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.unknown")
       Canvas::Errors.capture_exception(:discussion_summary, e, :error)
-      render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
+      render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_content)
     end
   end
 
@@ -351,7 +358,7 @@ class DiscussionTopicsApiController < ApplicationController
     render json: {}
   rescue => e
     logger.error("Error generating insight for discussion topic: #{e.class} - #{e.message}")
-    render json: { error: "Failed to generate insight for discussion topic." }, status: :unprocessable_entity
+    render json: { error: "Failed to generate insight for discussion topic." }, status: :unprocessable_content
   end
 
   def insight_entries
@@ -1324,6 +1331,38 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def generate_llm_response(llm_config, prompt, options)
+    root_account = @topic.context.root_account
+
+    if root_account.feature_enabled?(:discussion_summary_with_cedar)
+      generate_llm_response_with_cedar(llm_config, prompt, options, root_account)
+    else
+      generate_llm_response_with_bedrock(llm_config, prompt, options)
+    end
+  end
+
+  def generate_llm_response_with_cedar(llm_config, prompt, _options, root_account)
+    response = nil
+    time = Benchmark.measure do
+      InstLLMHelper.with_rate_limit(user: @current_user, llm_config:) do
+        response = CedarClient.prompt(
+          prompt:,
+          model: llm_config.model_id,
+          feature_slug: "discussion-summary",
+          root_account_uuid: root_account.uuid,
+          current_user: @current_user
+        )
+      end
+    end
+
+    [
+      response.response,
+      response.input_tokens || 0,
+      response.output_tokens || 0,
+      time.real.round(2)
+    ]
+  end
+
+  def generate_llm_response_with_bedrock(llm_config, prompt, options)
     response = nil
     time = Benchmark.measure do
       InstLLMHelper.with_rate_limit(user: @current_user, llm_config:) do
