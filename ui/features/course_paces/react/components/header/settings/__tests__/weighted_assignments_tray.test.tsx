@@ -112,7 +112,7 @@ describe('WeightedAssignmentsTray', () => {
   })
 
   describe('weighted assignments validations', () => {
-    it.skip('should close the tray when the close button is clicked', () => {
+    it('should close the tray when the close button is clicked', () => {
       const {getByText} = renderConnected(<WeightedAssignmentsTray />, defaultStoreState)
       const cancelButton = getByText('Cancel').closest('button') as HTMLButtonElement
       fireEvent.click(cancelButton)

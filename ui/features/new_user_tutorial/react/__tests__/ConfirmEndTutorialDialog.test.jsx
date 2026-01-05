@@ -39,8 +39,14 @@ describe('ConfirmEndTutorialDialog Spec', () => {
     handleRequestClose() {},
   }
 
-  // fails in Jest, passes in QUnit
-  test.skip('handleOkayButtonClick calls the proper api endpoint and data', async () => {
+  // fails in Jest, passes in QUnit - works in Vitest
+  test('handleOkayButtonClick calls the proper api endpoint and data', async () => {
+    server.use(
+      http.put('/api/v1/users/self/features/flags/new_user_tutorial_on_off', () => {
+        return HttpResponse.json({}, {status: 200})
+      }),
+    )
+
     const user = userEvent.setup()
     const putSpy = vi.spyOn(axios, 'put')
     const {getByRole} = render(<ConfirmEndTutorialDialog {...defaultProps} />)
@@ -53,7 +59,7 @@ describe('ConfirmEndTutorialDialog Spec', () => {
     )
   })
 
-  // fails in Jest, passes in QUnit
+  // fails in Jest/Vitest, passes in QUnit (MSW not intercepting axios correctly)
   test.skip('handleOkayButtonClick calls onSuccessFunc after calling the api', async () => {
     server.use(
       http.put('/api/v1/users/self/features/flags/new_user_tutorial_on_off', () => {

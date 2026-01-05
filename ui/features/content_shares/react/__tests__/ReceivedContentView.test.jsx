@@ -28,7 +28,11 @@ const server = setupServer()
 describe('view of received content', () => {
   let liveRegion
 
-  beforeAll(() => server.listen())
+  beforeAll(async () => {
+    // Preload the lazy-loaded CourseImportPanel to avoid timing issues in tests
+    await import('../CourseImportPanel')
+    server.listen()
+  })
   afterEach(() => server.resetHandlers())
   afterAll(() => server.close())
 
@@ -187,7 +191,7 @@ describe('view of received content', () => {
     expect(document.querySelector('iframe')).toBeInTheDocument()
   })
 
-  it.skip('displays the import tray when requested', async () => {
+  it('displays the import tray when requested', async () => {
     const shares = [assignmentShare]
     server.use(
       http.get('/api/v1/users/self/content_shares/received', () => HttpResponse.json(shares)),
@@ -199,8 +203,12 @@ describe('view of received content', () => {
     })
 
     fireEvent.click(getByText(/manage options/i))
-    fireEvent.click(getByText('Import'))
-    expect(await findByText(/select a course/i)).toBeInTheDocument()
+    const importButton = await findByText('Import')
+    fireEvent.click(importButton)
+    // Wait for the lazy-loaded CourseImportPanel to render
+    await waitFor(() => {
+      expect(getByText(/select a course/i)).toBeInTheDocument()
+    })
   })
 
   it('announces when new shares are loaded', async () => {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, cleanup} from '@testing-library/react'
 import {createRoot, Root} from 'react-dom/client'
 import WikiPage from '../../../../shared/wiki/backbone/models/WikiPage'
 import WikiPageIndexItemView from '../../backbone/views/WikiPageIndexItemView'
@@ -42,6 +42,7 @@ const getProps = (
 
 describe('renderWikiPageTitle', () => {
   afterEach(() => {
+    cleanup()
     vi.restoreAllMocks()
   })
 

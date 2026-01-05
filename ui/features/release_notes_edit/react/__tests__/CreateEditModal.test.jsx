@@ -36,7 +36,7 @@ describe('create modal', () => {
     expect(getByText('Everyone')).toBeInTheDocument()
   })
 
-  // TODO unskip and finish these tests after upgrading vi/jsdom
+  // Button starts enabled in vitest, test expectations wrong
   it.skip('It blocks submission unless the basic english fields are completed', async () => {
     const onSubmit = vi.fn()
     const {getByLabelText, getByText} = render(

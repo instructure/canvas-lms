@@ -64,8 +64,7 @@ describe('ThemeEditorImageRow Component', () => {
     expect(subject.src.split('/').pop()).toBe(expected)
   })
 
-  // fails in Jest, passes in QUnit
-  test.skip('renders image with user input val', () => {
+  test('renders image with user input val', () => {
     const expected = 'image.png'
     props.placeholder = 'other.png'
     props.userInput = {val: expected}

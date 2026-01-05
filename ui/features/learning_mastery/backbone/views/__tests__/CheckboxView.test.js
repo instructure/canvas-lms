@@ -51,7 +51,7 @@ describe('gradebook/CheckboxView', () => {
     expect(view.checked).toBeTruthy()
   })
 
-  // passes in QUnit, fails in Jest
+  // passes in QUnit, fails in Jest and Vitest (CSS color issue)
   it.skip('visually indicates state', () => {
     const checkedColor = checkbox.css('background-color')
     expect(['rgb(255, 0, 0)', 'red']).toContain(checkedColor)
