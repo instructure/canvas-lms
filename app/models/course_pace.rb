@@ -295,7 +295,7 @@ class CoursePace < ActiveRecord::Base
 
   def start_date(with_context: false)
     valid_date_range = CourseDateRange.new(course)
-    student_enrollment = course.student_enrollments.find_by(user_id:) if user_id
+    student_enrollment = course.student_enrollments.order(created_at: :desc).find_by(user_id:) if user_id
 
     enrollment_start_date = student_enrollment&.start_at || [student_enrollment&.effective_start_at, student_enrollment&.created_at].compact.max
     date = enrollment_start_date || course_section&.start_at || valid_date_range.start_at[:date]
@@ -339,7 +339,7 @@ class CoursePace < ActiveRecord::Base
       range_end = CanvasTime.fancy_midnight(range_end - 1.minute)
     end
 
-    is_student_plan = course.student_enrollments.find_by(user_id:).present? if user_id
+    is_student_plan = course.student_enrollments.order(created_at: :desc).find_by(user_id:).present? if user_id
 
     date = if hard_end_dates
              self[:end_date]
