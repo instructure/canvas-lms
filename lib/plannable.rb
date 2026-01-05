@@ -190,6 +190,16 @@ module Plannable
           rel_hash = nil
         end
       end
+      # For simple {association: :column} structure, check attributes first
+      # This handles cases where the column was added via SELECT (e.g., with_user_due_date scope)
+      if col.keys.size == 1 && col.values.first.is_a?(Symbol)
+        column_name = col.values.first.to_s
+        if object.attributes.key?(column_name)
+          return object.attributes[column_name]
+        end
+      end
+
+      # Fall back to association navigation for truly nested cases
       rel_array.reduce(object) { |val, key| val.try(key) || val.try(:first).try(key) }
     end
 

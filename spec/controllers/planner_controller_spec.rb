@@ -1267,6 +1267,61 @@ describe PlannerController do
         end
       end
 
+      context "with assignment overrides" do
+        it "generates bookmarks using cached_due_date from overrides, not base due_at" do
+          # Create extra students to trigger bug with multiple submissions
+          4.times { |i| @course.enroll_student(User.create!(name: "Extra Student #{i + 2}"), enrollment_state: "active") }
+
+          # Page 1 assignments: Due 50-51 days from now
+          assignments_page1 = [50, 51].map do |day|
+            @course.assignments.create!(title: "Page 1 Day #{day}",
+                                        due_at: day.days.from_now,
+                                        workflow_state: "published",
+                                        submission_types: "online_text_entry")
+          end
+
+          # Assignment with override: Base due 40 days (early), override 52 days (sorts to end of page 1)
+          assignment_with_override = @course.assignments.create!(
+            title: "Assignment with Override",
+            due_at: 40.days.from_now,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          override = assignment_with_override.assignment_overrides.create!(
+            set_type: "ADHOC", due_at: 52.days.from_now, due_at_overridden: true
+          )
+          override.assignment_override_students.create!(user: @student)
+
+          # Page 2 assignments: Due 55-56 days from now
+          assignments_page2 = [55, 56].map do |day|
+            @course.assignments.create!(title: "Page 2 Day #{day}",
+                                        due_at: day.days.from_now,
+                                        workflow_state: "published",
+                                        submission_types: "online_text_entry")
+          end
+
+          SubmissionLifecycleManager.recompute_course(
+            @course,
+            assignments: assignments_page1.map(&:id) + [assignment_with_override.id] + assignments_page2.map(&:id),
+            run_immediately: true
+          )
+
+          # PAGE 1: Should contain assignments 1-2 and assignment with override
+          get :index, params: { start_date: 35.days.from_now.iso8601, end_date: 70.days.from_now.iso8601, per_page: 3 }
+
+          page1 = json_parse(response.body)
+          expect(page1.length).to eq(3)
+          expect(page1.map { |i| i["plannable"]["id"] }).to match_array(assignments_page1.map(&:id) + [assignment_with_override.id])
+
+          bookmark = Api.parse_pagination_links(response.headers["Link"]).detect { |l| l[:rel] == "next" }["page"]
+
+          # PAGE 2: Should only contain page 2 assignments (bug: if bookmark uses base due_at, page 1 assignments reappear)
+          get :index, params: { start_date: 35.days.from_now.iso8601, end_date: 70.days.from_now.iso8601, per_page: 3, page: bookmark }
+
+          expect(json_parse(response.body).map { |i| i["plannable"]["id"] }).to match_array(assignments_page2.map(&:id))
+        end
+      end
+
       context "peer_reviews pagination" do
         let(:per_page) { 5 }
 
