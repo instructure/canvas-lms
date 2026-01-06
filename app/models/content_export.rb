@@ -501,6 +501,24 @@ class ContentExport < ActiveRecord::Base
       asset_type ||= "announcements"
     end
 
+    if obj.is_a?(ContentTag) &&
+       Account.site_admin.feature_enabled?(:selective_content_tag_export) &&
+       context.try(:horizon_course?) &&
+       obj.context_module.present? &&
+       export_object?(obj.context_module)
+      if settings[:selective_content_tag_export]
+        # Selective mode: EXCLUDE content tags even when parent module is selected,
+        # unless the content tag is explicitly selected. This allows exporting individual
+        # module items (like ExternalUrls) without exporting all items in the module.
+        return false unless selected_content["content_tags"]
+
+        return is_set?(selected_content["content_tags"][select_content_key(obj)])
+      end
+
+      # parent module is being exported, export this content tag
+      return true
+    end
+
     asset_type ||= obj.class.table_name
     return true if is_set?(selected_content["all_#{asset_type}"])
     return true if is_set?(selected_content["all_assignments"]) && asset_type == "assignment_groups"
