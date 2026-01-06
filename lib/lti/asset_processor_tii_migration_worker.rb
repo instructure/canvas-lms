@@ -20,8 +20,8 @@
 
 module Lti
   class AssetProcessorTiiMigrationWorker
-    TII_TOOL_VENDOR_CODE = "turnitin.com"
-    TII_TOOL_PRODUCT_CODE = "turnitin-lti"
+    TII_TOOL_VENDOR_CODE = Rails.env.development? ? "Instructure.com" : "turnitin.com"
+    TII_TOOL_PRODUCT_CODE = Rails.env.development? ? "similarity detection reference tool" : "turnitin-lti"
 
     def initialize(account, email = nil)
       @account = account
@@ -218,12 +218,12 @@ module Lti
       Rails.logger.info("Migrating Tool Proxy ID=#{tool_proxy.global_id} to deployment ID=#{deployment.global_id}")
 
       migration_endpoint = extract_migration_endpoint(tool_proxy)
-      unless migration_endpoint
+      unless migration_endpoint || Rails.env.development?
         add_proxy_error(tool_proxy, "Failed to extract migration endpoint from Tool Proxy ID=#{tool_proxy.global_id}")
         return
       end
 
-      if call_tii_migration_endpoint(tool_proxy, deployment, migration_endpoint)
+      if Rails.env.development? || call_tii_migration_endpoint(tool_proxy, deployment, migration_endpoint)
         # Save deployment ID to tool_proxy
         tool_proxy.update_column(:migrated_to_context_external_tool_id, deployment.id)
         Rails.logger.info("Successfully migrated Tool Proxy ID=#{tool_proxy.global_id} to deployment ID=#{deployment.global_id}")

@@ -161,7 +161,11 @@ const MigrationRow = ({
           <Flex direction="column" gap="x-small">
             <View as="div">
               <Flex gap="x-small" alignItems="center">
-                <Link href={`#${migration.account_id}`} isWithinText={false}>
+                <Link
+                  href={`/accounts/${migration.account_id}`}
+                  isWithinText={false}
+                  target="_blank"
+                >
                   {migration.account_name}
                 </Link>
               </Flex>
