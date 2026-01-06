@@ -428,4 +428,57 @@ describe('AssignmentPostingPolicyTray ScheduledReleasePolicy tests', () => {
       expect(screen.getByText('Date must be in the future')).toBeInTheDocument()
     })
   })
+
+  it('shows validation errors when switching from shared mode with past date to separate mode, and persists errors until both dates are valid', async () => {
+    const {getByTestId, getByPlaceholderText, getAllByPlaceholderText} = renderTray(context)
+    const checkbox = getByTestId('scheduled-release-checkbox')
+
+    await userEvent.click(checkbox)
+    expect(checkbox).toBeChecked()
+
+    const sharedRadio = getByTestId('shared-scheduled-post')
+    expect(sharedRadio).toBeChecked()
+
+    const sharedDateInput = getByPlaceholderText('Choose release date')
+    const pastDate = new Date()
+    pastDate.setDate(pastDate.getDate() - 1)
+    const pastDateString = pastDate.toISOString().slice(0, 16)
+
+    await enterNewDateTime(sharedDateInput, pastDateString)
+
+    await waitFor(() => {
+      expect(screen.getByText('Date must be in the future')).toBeInTheDocument()
+    })
+
+    const separateRadio = getByTestId('separate-scheduled-post')
+    await userEvent.click(separateRadio)
+    expect(separateRadio).toBeChecked()
+
+    await waitFor(() => {
+      const errorMessages = screen.getAllByText('Date must be in the future')
+      expect(errorMessages).toHaveLength(2)
+    })
+
+    const saveButton = getSaveButton()
+    expect(saveButton).toBeDisabled()
+
+    const dateInputs = getAllByPlaceholderText('Select Date')
+    expect(dateInputs).toHaveLength(2)
+
+    const futureGradesDate = new Date()
+    futureGradesDate.setDate(futureGradesDate.getDate() + 2)
+    const futureGradesDateString = futureGradesDate.toISOString().slice(0, 16)
+
+    await enterNewDateTime(dateInputs[0], futureGradesDateString)
+
+    // Verify that save button is still disabled and comments error persists
+    await waitFor(() => {
+      expect(saveButton).toBeDisabled()
+      expect(screen.getByText('Date must be in the future')).toBeInTheDocument()
+    })
+
+    // The grades field should no longer have an error, only comments
+    const remainingErrors = screen.getAllByText('Date must be in the future')
+    expect(remainingErrors).toHaveLength(1)
+  })
 })
