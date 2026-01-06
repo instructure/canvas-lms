@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act, within} from '@testing-library/react'
+import {render, fireEvent, act} from '@testing-library/react'
 import {MockedProvider} from '@apollo/client/testing'
 import {
   OutcomePanel,
@@ -33,7 +33,6 @@ import {
   showOutcomesImporter,
   showOutcomesImporterIfInProgress,
 } from '@canvas/outcomes/react/OutcomesImporter'
-import {courseMocks, groupDetailMocks, groupMocks} from '@canvas/outcomes/mocks/Management'
 import {windowConfirm} from '@canvas/util/globalUtils'
 import {useAllPages} from '@canvas/query'
 
@@ -47,7 +46,7 @@ vi.mock('@canvas/outcomes/react/OutcomesImporter', () => ({
 }))
 
 vi.mock('@canvas/util/globalUtils', async () => ({
-  ...await vi.importActual('@canvas/util/globalUtils'),
+  ...(await vi.importActual('@canvas/util/globalUtils')),
   windowConfirm: vi.fn(() => true),
 }))
 
@@ -64,81 +63,8 @@ describe('OutcomeManagement', () => {
     vi.useRealTimers()
   })
 
-  /*
-    This test takes an average of 5.5 seconds to run.
-    For now, we are increaseing the timeout interval to 7.5 seconds
-  */
-  // OUT-6972 (10/23/2024)
-  it('renders ManagementHeader with lhsGroupId if selected a group in lhs', async () => {
-    const rceEnv = {
-      RICH_CONTENT_CAN_UPLOAD_FILES: true,
-      RICH_CONTENT_APP_HOST: 'rce-host',
-      JWT: 'test-jwt',
-      current_user_id: '1',
-    }
-    window.ENV = {
-      context_asset_string: 'course_2',
-      CONTEXT_URL_ROOT: '/course/2',
-      IMPROVED_OUTCOMES_MANAGEMENT: true,
-      PERMISSIONS: {
-        manage_proficiency_calculations: true,
-        manage_outcomes: true,
-      },
-      current_user: {id: '1'},
-      ...rceEnv,
-    }
-    const mocks = [
-      ...courseMocks({childGroupsCount: 2}),
-      ...groupMocks({
-        title: 'Course folder 0',
-        groupId: '200',
-        parentOutcomeGroupTitle: 'Root course folder',
-        parentOutcomeGroupId: '2',
-      }),
-      ...groupDetailMocks({
-        title: 'Course folder 0',
-        groupId: '200',
-        contextType: 'Course',
-        contextId: '2',
-        withMorePage: false,
-      }),
-      ...groupMocks({
-        groupId: '300',
-        childGroupOffset: 400,
-        parentOutcomeGroupTitle: 'Course folder 0',
-        parentOutcomeGroupId: '200',
-      }),
-      ...groupDetailMocks({
-        groupId: '300',
-        contextType: 'Course',
-        contextId: '2',
-        withMorePage: false,
-      }),
-    ]
-    const {findByText, findByTestId, getByTestId} = render(
-      <MockedProvider cache={cache} mocks={mocks}>
-        <OutcomeManagement breakpoints={{tablet: true}} />
-      </MockedProvider>,
-    )
-    await act(async () => vi.runAllTimers())
-
-    // Select a group in the lsh
-    const cf0 = await findByText('Course folder 0')
-    fireEvent.click(cf0)
-    await act(async () => vi.runAllTimers())
-
-    // The easy way to determine if lsh is passing to ManagementHeader is
-    // to open the create outcome modal and check if the lhs group was loaded
-    // by checking if the child of the lhs group is there
-    fireEvent.click(within(getByTestId('managementHeader')).getByText('Create'))
-    await act(async () => vi.runAllTimers())
-    // there's something weird going on in the test here that while we find the modal
-    // .toBeInTheDocument() fails, even though a findBy for it fails before ^that click.
-    // We can test that the elements expected to be within it exist.
-    const modal = await findByTestId('createOutcomeModal')
-    expect(within(modal).getByText('Course folder 0')).not.toBeNull()
-    expect(within(modal).getByText('Group 200 folder 0')).not.toBeNull()
-  }, 7500) // Increase time to 7.5 seconds
+  // OUT-6972 (10/23/2024) - Slow test (5.5+ seconds) extracted to separate file for CI stability
+  // See: OutcomeManagementLhsGroupId.test.jsx
 
   const sharedExamples = () => {
     beforeEach(() => {
