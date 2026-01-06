@@ -73,7 +73,8 @@ describe('GradebookExportManager - monitoringUrl', () => {
   let subject
 
   beforeEach(() => {
-    subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
+    // Create a fresh copy to avoid mutation between tests
+    subject = new GradebookExportManager(exportingUrl, currentUserId, {...workingExport})
     subject.monitoringBaseUrl = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
     subject.attachmentBaseUrl = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
   })
@@ -101,7 +102,8 @@ describe('GradebookExportManager - attachmentUrl', () => {
   let subject
 
   beforeEach(() => {
-    subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
+    // Create a fresh copy to avoid mutation between tests
+    subject = new GradebookExportManager(exportingUrl, currentUserId, {...workingExport})
     subject.monitoringBaseUrl = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
     subject.attachmentBaseUrl = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
   })

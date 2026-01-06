@@ -59,6 +59,7 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
+  vi.clearAllMocks()
   vi.spyOn($, 'flashMessage').mockImplementation(() => {})
   vi.spyOn($, 'flashError').mockImplementation(() => {})
   vi.mocked(processSingleContentItem).mockReturnValue({
@@ -66,6 +67,10 @@ beforeEach(() => {
     url: 'http://example.com/file.txt',
     text: 'Test File',
   })
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
 })
 
 afterAll(() => {

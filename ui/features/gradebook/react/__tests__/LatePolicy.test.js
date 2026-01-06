@@ -43,6 +43,9 @@ describe('Gradebook#applyLatePolicy', () => {
     submission4
 
   beforeEach(() => {
+    // Restore any existing spy before creating a new one to ensure clean state
+    vi.restoreAllMocks()
+
     gradingStandard = [['A', 0]]
     gradebook = createGradebook({grading_standard: gradingStandard})
     gradebook.gradingPeriodSet = {
@@ -51,9 +54,7 @@ describe('Gradebook#applyLatePolicy', () => {
         {id: 101, isClosed: false},
       ],
     }
-    latePolicyApplicator = vi
-      .spyOn(LatePolicyApplicator, 'processSubmission')
-      .mockReturnValue(true)
+    latePolicyApplicator = vi.spyOn(LatePolicyApplicator, 'processSubmission').mockReturnValue(true)
 
     submission1 = {
       user_id: 10,
@@ -97,6 +98,10 @@ describe('Gradebook#applyLatePolicy', () => {
       },
     }
     gradebook.courseContent.latePolicy = 'latepolicy'
+  })
+
+  afterEach(() => {
+    latePolicyApplicator.mockRestore()
   })
 
   it('skips submissions for which assignments are not loaded', () => {

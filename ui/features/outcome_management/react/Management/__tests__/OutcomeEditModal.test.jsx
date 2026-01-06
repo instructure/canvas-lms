@@ -216,10 +216,14 @@ describe('OutcomeEditModal', () => {
         description: 'Updated description',
         displayName: 'Updated friendly name',
       })
-      const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
+      const {getByText, getByDisplayValue, getByLabelText, queryByTestId} = renderWithProvider({
         mockOverrides: mocks,
       })
-      await act(async () => vi.runOnlyPendingTimers())
+      await act(async () => vi.runAllTimers())
+      await act(async () => vi.runAllTimers())
+      while (queryByTestId('rce-loading-spinner')) {
+        await act(async () => vi.runAllTimers())
+      }
       fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
       fireEvent.change(getByDisplayValue('Outcome description'), {
         target: {value: 'Updated description'},
@@ -240,11 +244,15 @@ describe('OutcomeEditModal', () => {
         title: 'Outcome',
         displayName: 'Updated friendly name',
       })
-      const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
+      const {getByText, getByDisplayValue, getByLabelText, queryByTestId} = renderWithProvider({
         mockOverrides: mocks,
         overrides: {outcome: {...outcome, _id: '3'}},
       })
-      await act(async () => vi.runOnlyPendingTimers())
+      await act(async () => vi.runAllTimers())
+      await act(async () => vi.runAllTimers())
+      while (queryByTestId('rce-loading-spinner')) {
+        await act(async () => vi.runAllTimers())
+      }
       fireEvent.change(getByDisplayValue('Outcome description'), {
         target: {value: null},
       })
@@ -263,11 +271,15 @@ describe('OutcomeEditModal', () => {
         description: '',
         displayName: 'Friendly name',
       })
-      const {getByText, getByLabelText, getByDisplayValue} = renderWithProvider({
+      const {getByText, getByLabelText, getByDisplayValue, queryByTestId} = renderWithProvider({
         mockOverrides: mocks,
         overrides: {outcome: {...outcome, _id: '2'}},
       })
-      await act(async () => vi.runOnlyPendingTimers())
+      await act(async () => vi.runAllTimers())
+      await act(async () => vi.runAllTimers())
+      while (queryByTestId('rce-loading-spinner')) {
+        await act(async () => vi.runAllTimers())
+      }
       fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Friendly name'}})
       fireEvent.change(getByDisplayValue('Outcome description'), {
         target: {value: null},

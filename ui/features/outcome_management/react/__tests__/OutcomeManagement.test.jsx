@@ -63,9 +63,6 @@ describe('OutcomeManagement', () => {
     vi.useRealTimers()
   })
 
-  // OUT-6972 (10/23/2024) - Slow test (5.5+ seconds) extracted to separate file for CI stability
-  // See: OutcomeManagementLhsGroupId.test.jsx
-
   const sharedExamples = () => {
     beforeEach(() => {
       window.ENV.ACCOUNT_LEVEL_MASTERY_SCALES = true

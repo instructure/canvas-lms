@@ -28,17 +28,26 @@ describe('DiscussionTopicForm Checkpoints Toggle', () => {
     setupDefaultEnv()
   })
 
-  it('unchecks the checkpoints checkbox when graded is unchecked', () => {
-    const {getByTestId, getByLabelText} = setup()
+  afterEach(() => {
+    // Clean up ENV to prevent state leakage to other tests
+    window.ENV = {}
+  })
+
+  it('unchecks the checkpoints checkbox when graded is unchecked', async () => {
+    const {getByTestId, getByLabelText, findByTestId} = setup()
 
     getByLabelText('Graded').click()
-    getByTestId('checkpoints-checkbox').querySelector('input').click()
-    expect(getByTestId('checkpoints-checkbox').querySelector('input').checked).toBe(true)
+    // Wait for the checkpoints checkbox to appear after graded is checked
+    const checkpointsCheckbox = await findByTestId('checkpoints-checkbox')
+    checkpointsCheckbox.querySelector('input').click()
+    expect(checkpointsCheckbox.querySelector('input').checked).toBe(true)
 
     // 1st graded click will uncheck checkpoints. but it also hides from document.
     // 2nd graded click will render checkpoints, notice its unchecked.
     getByLabelText('Graded').click()
     getByLabelText('Graded').click()
-    expect(getByTestId('checkpoints-checkbox').querySelector('input').checked).toBe(false)
-  })
+    // Wait for the checkpoints checkbox to reappear
+    const recheckCheckbox = await findByTestId('checkpoints-checkbox')
+    expect(recheckCheckbox.querySelector('input').checked).toBe(false)
+  }, 15000)
 })

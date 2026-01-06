@@ -39,7 +39,6 @@ describe('ConfirmEndTutorialDialog Spec', () => {
     handleRequestClose() {},
   }
 
-  // fails in Jest, passes in QUnit - works in Vitest
   test('handleOkayButtonClick calls the proper api endpoint and data', async () => {
     server.use(
       http.put('/api/v1/users/self/features/flags/new_user_tutorial_on_off', () => {
@@ -59,8 +58,7 @@ describe('ConfirmEndTutorialDialog Spec', () => {
     )
   })
 
-  // fails in Jest/Vitest, passes in QUnit (MSW not intercepting axios correctly)
-  test.skip('handleOkayButtonClick calls onSuccessFunc after calling the api', async () => {
+  test('handleOkayButtonClick calls onSuccessFunc after calling the api', async () => {
     server.use(
       http.put('/api/v1/users/self/features/flags/new_user_tutorial_on_off', () => {
         return HttpResponse.json({}, {status: 200})
@@ -69,7 +67,7 @@ describe('ConfirmEndTutorialDialog Spec', () => {
 
     const user = userEvent.setup()
     const onSuccessSpy = vi
-      .spyOn(ConfirmEndTutorialDialog.prototype, 'onSuccess')
+      .spyOn(ConfirmEndTutorialDialog, 'onSuccess')
       .mockImplementation(() => {})
     const {getByRole} = render(<ConfirmEndTutorialDialog {...defaultProps} />)
     const okButton = getByRole('button', {name: /okay/i})

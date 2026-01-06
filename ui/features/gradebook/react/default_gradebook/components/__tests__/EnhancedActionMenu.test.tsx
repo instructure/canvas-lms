@@ -105,11 +105,14 @@ describe('EnhancedActionMenu', () => {
     props = {
       ...workingMenuProps(),
     }
+    // Reset the assignLocation mock to ensure clean state
+    vi.mocked(assignLocation).mockClear()
   })
 
   afterEach(() => {
     fakeENV.teardown()
     vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
 
   const renderComponent = props_ => {
@@ -264,6 +267,10 @@ describe('EnhancedActionMenu', () => {
       startExport = vi.spyOn(GradebookExportManager.prototype, 'startExport')
       component = renderComponent(props)
       clickOnDropdown('Export')
+    })
+
+    afterEach(() => {
+      startExport.mockRestore()
     })
 
     it('shows a message to the user indicating the export is in progress', async () => {

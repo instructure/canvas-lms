@@ -401,8 +401,12 @@ describe('Gradebook > Submissions', () => {
 
   describe('#updateSubmission()', () => {
     let submission
+    let formatGradeSpy
 
     beforeEach(() => {
+      // Create spy once per test, ensuring clean state
+      formatGradeSpy = vi.spyOn(GradeFormatHelper, 'formatGrade')
+
       gradebook = createGradebook()
       gradebook.students = {1101: {id: '1101'}}
 
@@ -421,45 +425,45 @@ describe('Gradebook > Submissions', () => {
       }
     })
 
+    afterEach(() => {
+      formatGradeSpy.mockRestore()
+    })
+
     function getSubmission() {
       return gradebook.getSubmission('1101', '2301')
     }
 
     test('formats the grade for the submission', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.updateSubmission(submission)
-      expect(GradeFormatHelper.formatGrade).toHaveBeenCalledTimes(1)
+      expect(formatGradeSpy).toHaveBeenCalledTimes(1)
     })
 
     test('includes the grade when formatting the grade', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.updateSubmission(submission)
-      const grade = GradeFormatHelper.formatGrade.mock.calls[0][0]
+      const grade = formatGradeSpy.mock.calls[0][0]
       expect(grade).toBe('123.45')
     })
 
     test('includes the grading type when formatting the grade', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.updateSubmission(submission)
-      const options = GradeFormatHelper.formatGrade.mock.calls[0][1]
+      const options = formatGradeSpy.mock.calls[0][1]
       expect(options.gradingType).toBe('percent')
     })
 
     test('does not delocalize when formatting the grade', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.updateSubmission(submission)
-      const options = GradeFormatHelper.formatGrade.mock.calls[0][1]
+      const options = formatGradeSpy.mock.calls[0][1]
       expect(options.delocalize).toBe(false)
     })
 
     test('sets the formatted grade on submission', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade').mockReturnValue('123.45%')
+      formatGradeSpy.mockReturnValue('123.45%')
       gradebook.updateSubmission(submission)
       expect(getSubmission().grade).toBe('123.45%')
     })
 
     test('sets the raw grade on submission', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade').mockReturnValue('123.45%')
+      formatGradeSpy.mockReturnValue('123.45%')
       gradebook.updateSubmission(submission)
       expect(getSubmission().rawGrade).toBe('123.45')
     })

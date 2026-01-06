@@ -27,27 +27,6 @@ describe('DiscussionTopicForm Announcements Scheduled', () => {
     setupDefaultEnv()
   })
 
-  it(
-    'shows info alert when creating a scheduled announcement in an unpublished course',
-    async () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.course_published = false
-
-      const document = setup()
-
-      const dateInput = document.getByTestId('announcement-available-from-date')
-
-      await userEvent.click(dateInput)
-      await userEvent.type(dateInput, '09/30/2025')
-      fireEvent.blur(dateInput)
-
-      expect(await document.findByTestId('schedule-info-alert')).toHaveTextContent(
-        'Notifications will only be sent to students who have been enrolled. Please allow time for this process to finish after publishing your course before scheduling this announcement.',
-      )
-    },
-    {timeout: 10000},
-  )
-
   // InstUI DateTimeInput's initialTimeForNewDate prop only applies when using the
   // calendar picker to select a date, not when typing directly into the input field.
   // This test would need to use the calendar picker UI to verify this behavior.

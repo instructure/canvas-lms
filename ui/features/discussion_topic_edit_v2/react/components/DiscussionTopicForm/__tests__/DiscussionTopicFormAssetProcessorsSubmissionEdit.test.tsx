@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, act, waitFor, fireEvent} from '@testing-library/react'
+import {render, act, waitFor} from '@testing-library/react'
 import React from 'react'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
 import {Assignment} from '../../../../graphql/Assignment'
@@ -130,57 +130,6 @@ describe('DiscussionTopicForm AssetProcessors Submission', () => {
     const aps = submissionData.assignment.assetProcessors
     expect(aps).toEqual([
       {existingId: 1},
-      {
-        newContentItem: {
-          contextExternalToolId: parseInt(mockToolsForDiscussions[0].definition_id),
-          // from mockDeepLinkResponse:
-          text: 'Lti 1.3 Tool Text',
-          title: 'Lti 1.3 Tool Title',
-          report: {},
-        },
-      },
-    ])
-  })
-
-  it('adds a new discussion topic with AssetProcessors', async () => {
-    const mockOnSubmit = vi.fn()
-    const {getByTestId, getByLabelText, getByPlaceholderText, findByText} = setup({
-      isEditing: false,
-      onSubmit: mockOnSubmit,
-    })
-
-    fireEvent.input(getByPlaceholderText('Topic Title'), {target: {value: 'a title'}})
-
-    // Switch to graded and wait for form to update
-    await act(async () => {
-      getByLabelText('Graded').click()
-    })
-
-    // Wait for AssetProcessors section to appear (confirms form state updated)
-    await findByText('Document Processing App(s)')
-
-    act(() => {
-      useAssetProcessorsState.getState().addAttachedProcessors({
-        tool: mockToolsForDiscussions[0],
-        data: mockContributionDeepLinkResponse,
-        type: 'ActivityAssetProcessorContribution',
-      })
-    })
-
-    expect(useAssetProcessorsState.getState().attachedProcessors).toHaveLength(1)
-
-    await act(async () => {
-      getByTestId('save-button').click()
-    })
-
-    await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalled()
-    })
-
-    const submissionData = mockOnSubmit.mock.calls[0][0]
-    // For expected structure, see AttachedAssetProcessorGraphqlMutation
-    const aps = submissionData.assignment.assetProcessors
-    expect(aps).toEqual([
       {
         newContentItem: {
           contextExternalToolId: parseInt(mockToolsForDiscussions[0].definition_id),

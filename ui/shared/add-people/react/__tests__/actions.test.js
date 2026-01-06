@@ -199,6 +199,27 @@ describe('Add People Actions', () => {
     })
 
     test('dispatches CREATE_USERS_ERROR with error when fails', async () => {
+      const testState = {
+        ...INITIAL_STATE,
+        userValidationResult: {
+          duplicates: {
+            'test@example.com': {
+              createNew: true,
+              newUserInfo: {
+                name: 'Test User',
+                email: 'test@example.com',
+              },
+            },
+          },
+          missing: {},
+          validUsers: [],
+        },
+        courseParams: {
+          courseId: '1',
+          inviteUsersURL: '/courses/1/invite_users',
+        },
+      }
+      mockStore(testState)
       mockAxiosFail()
       store.dispatch(actions.resolveValidationIssues())
       // Wait for the promise to resolve

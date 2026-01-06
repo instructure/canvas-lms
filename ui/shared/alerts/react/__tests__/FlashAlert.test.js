@@ -29,6 +29,9 @@ const ids = ['flash_screenreader_holder', 'flashalert_message_holder', 'flash-me
 
 describe('FlashAlert', () => {
   beforeEach(() => {
+    // Clean up ENV.flashAlertTimeout BEFORE each test to ensure clean state
+    // This is critical for test isolation when running with randomization
+    delete ENV.flashAlertTimeout
     vi.useFakeTimers()
 
     for (let i = 0; i < ids.length; i++) {
@@ -45,6 +48,9 @@ describe('FlashAlert', () => {
     // add 10ms for cushion
     vi.advanceTimersByTime(10510)
     vi.useRealTimers()
+
+    // Clean up ENV.flashAlertTimeout to prevent state leakage between tests
+    delete ENV.flashAlertTimeout
 
     // remove the screenreader alert holder or railsFlashNotificationsHelperSpec can fail
     const sralertholder = document.getElementById('flash_screenreader_holder')

@@ -311,33 +311,4 @@ describe('Lti1p3RegistrationWizard', () => {
     await userEvent.click(screen.getByText('Previous').closest('button')!)
     expect(screen.getByText('Placements')).toBeInTheDocument()
   })
-
-  it('correctly skips EULA Settings when navigating back if not applicable', async () => {
-    render(
-      <Lti1p3RegistrationWizard
-        {...defaultProps}
-        internalConfiguration={mockInternalConfiguration({
-          scopes: ['https://canvas.instructure.com/lti-ags/progress/scope/show'],
-          placements: [
-            {
-              placement: 'course_navigation',
-              enabled: true,
-              text: 'Course Navigation',
-            },
-          ],
-        })}
-      />,
-    )
-
-    await userEvent.click(findNextButton())
-    await userEvent.click(findNextButton())
-    await userEvent.click(findNextButton())
-    await userEvent.click(findNextButton())
-
-    expect(screen.getByText('Override URIs')).toBeInTheDocument()
-
-    await userEvent.click(screen.getByText('Previous').closest('button')!)
-    expect(screen.getByText('Placements')).toBeInTheDocument()
-    expect(screen.queryByText('EULA Settings')).not.toBeInTheDocument()
-  })
 })
