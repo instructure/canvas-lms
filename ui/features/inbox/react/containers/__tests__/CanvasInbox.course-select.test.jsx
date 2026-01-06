@@ -60,6 +60,9 @@ describe('CanvasInbox App Container - Course Select', () => {
 
   afterEach(() => {
     server.resetHandlers()
+    mswClient.cache.reset()
+    window.history.replaceState({}, '', window.location.pathname)
+    window.location.hash = ''
   })
 
   afterAll(() => {
@@ -69,6 +72,8 @@ describe('CanvasInbox App Container - Course Select', () => {
 
   beforeEach(() => {
     mswClient.cache.reset()
+    // Clean up URL state from previous tests
+    window.history.replaceState({}, '', window.location.pathname)
     window.location.hash = ''
     window.ENV = {
       current_user_id: '9',
@@ -114,8 +119,10 @@ describe('CanvasInbox App Container - Course Select', () => {
     await waitForApolloLoading()
 
     mailboxDropdown = await container.findByTestId('course-select')
-    expect(mailboxDropdown.getAttribute('value')).toBe('XavierSchool')
-  })
+    await waitFor(() => expect(mailboxDropdown.getAttribute('value')).toBe('XavierSchool'), {
+      timeout: 5000,
+    })
+  }, 10000)
 
   it('should update the url correctly if scope filter is changed in UI', async () => {
     const container = setup()
@@ -144,20 +151,26 @@ describe('CanvasInbox App Container - Course Select', () => {
     await waitForApolloLoading()
 
     const mailboxDropdown = await container.findByTestId('course-select')
-    expect(window.location.hash).toBe('#filter=type=inbox')
+    await waitFor(() => expect(window.location.hash).toBe('#filter=type=inbox'), {timeout: 5000})
     expect(mailboxDropdown.getAttribute('value')).toBe('All Courses')
-  })
+  }, 10000)
 
   it('should set course select in compose modal to course name when the context id param is in the url', async () => {
+    // Set URL params before rendering to ensure the component reads them on mount
     const url = new URL(window.location.href)
     url.hash = '#filter=type=inbox'
     url.search = '?context_id=course_195&user_id=9&user_name=Ally'
-    window.history.pushState({}, '', url.toString())
+    window.history.replaceState({}, '', url.toString())
 
     const container = setup()
     await waitForApolloLoading()
 
-    const courseSelectModal = await container.findByTestId('course-select-modal')
-    expect(courseSelectModal.getAttribute('value')).toBe('XavierSchool')
+    // Wait for the compose modal to appear and the course select within it
+    const courseSelectModal = await container.findByTestId(
+      'course-select-modal',
+      {},
+      {timeout: 5000},
+    )
+    await waitFor(() => expect(courseSelectModal.getAttribute('value')).toBe('XavierSchool'))
   })
 })

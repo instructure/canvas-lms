@@ -38,7 +38,7 @@ vi.mock('@canvas/alerts/react/FlashAlert', () => ({
 vi.mock('@canvas/progress/resolve_progress')
 vi.useFakeTimers()
 
-describe('FindOutcomesModal - Group Import Tree Navigation Tests', () => {
+describe('FindOutcomesModal - Group Import Refetch Tests', () => {
   let cache
   let onCloseHandlerMock
   let setTargetGroupIdsToRefetchMock
@@ -67,20 +67,7 @@ describe('FindOutcomesModal - Group Import Tree Navigation Tests', () => {
     return renderWithContext(children, {...options, cache})
   }
 
-  it('renders modal and navigates to a group', async () => {
-    resolveProgress.mockImplementation(() => Promise.resolve())
-    const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-      contextType: 'Course',
-      mocks: [...findModalMocks({parentAccountChildren: 1}), ...defaultTreeGroupMocks()],
-    })
-    await act(async () => vi.runAllTimers())
-    await clickEl(getByText('Account Standards'))
-    await clickEl(getByText('Root Account Outcome Group 0'))
-    expect(getByText('Group 200')).toBeInTheDocument()
-  })
-
-  // Skipped: Test times out in CI (>10s) due to complex async rendering and progress polling
-  it.skip('replaces Add buttons of individual outcomes with loading spinner during group import or a parent group', async () => {
+  it('refetches outcomes if parent/ancestor group is selected after group import', async () => {
     const doResolveProgress = delayImportOutcomesProgress()
 
     const {getByText, getAllByText, queryByText} = render(
@@ -91,7 +78,7 @@ describe('FindOutcomesModal - Group Import Tree Navigation Tests', () => {
           ...findModalMocks({parentAccountChildren: 1}),
           ...defaultTreeGroupMocks(),
           ...importGroupMocks({
-            groupId: '200',
+            groupId: '300',
             targetContextType: 'Course',
           }),
         ],
@@ -100,28 +87,55 @@ describe('FindOutcomesModal - Group Import Tree Navigation Tests', () => {
     await act(async () => vi.runAllTimers())
     await clickEl(getByText('Account Standards'))
     await clickEl(getByText('Root Account Outcome Group 0'))
+
     await clickEl(getByText('Group 200'))
-    await clickEl(getByText('Add All Outcomes').closest('button'))
-
-    // loading for outcome 1, 2, 3
-    expect(getAllByText('Loading')).toHaveLength(3)
     await clickEl(getByText('Group 300'))
-    await clickEl(getByText('Group 400'))
+    await clickEl(getByText('Add All Outcomes').closest('button'))
+    expect(getAllByText('Loading')).toHaveLength(3)
 
-    // loading for outcome 1
-    expect(getAllByText('Loading')).toHaveLength(1)
     await act(async () => {
       doResolveProgress()
       await vi.runAllTimersAsync()
     })
     await waitFor(() => expect(queryByText('Loading')).not.toBeInTheDocument())
-    expect(getAllByText('Added')).toHaveLength(1)
+    expect(getAllByText('Added')).toHaveLength(3)
 
-    // disables Add All Outcomes button for child groups
-    expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
     await clickEl(getByText('Group 200'))
+    expect(getByText('All Refetched Group 200 Outcomes')).toBeInTheDocument()
+  })
 
-    // disables Add All Outcomes button for the group
-    expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
+  it('does not refetch outcomes if no group is selected after group import', async () => {
+    const doResolveProgress = delayImportOutcomesProgress()
+
+    const {getByText, getAllByText, queryByText} = render(
+      <FindOutcomesModal {...defaultProps()} />,
+      {
+        contextType: 'Course',
+        mocks: [
+          ...findModalMocks({parentAccountChildren: 1}),
+          ...defaultTreeGroupMocks(),
+          ...importGroupMocks({
+            groupId: '300',
+            targetContextType: 'Course',
+          }),
+        ],
+      },
+    )
+    await act(async () => vi.runAllTimers())
+    await clickEl(getByText('Account Standards'))
+    await clickEl(getByText('Root Account Outcome Group 0'))
+
+    await clickEl(getByText('Group 200'))
+    await clickEl(getByText('Group 300'))
+    await clickEl(getByText('Add All Outcomes').closest('button'))
+    expect(getAllByText('Loading')).toHaveLength(3)
+
+    await act(async () => {
+      doResolveProgress()
+      await vi.runAllTimersAsync()
+    })
+    await waitFor(() => expect(queryByText('Loading')).not.toBeInTheDocument())
+    expect(getAllByText('Added')).toHaveLength(3)
+    expect(queryByText('All Refetched Group 200 Outcomes')).not.toBeInTheDocument()
   })
 })

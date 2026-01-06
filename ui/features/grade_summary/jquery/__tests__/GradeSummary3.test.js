@@ -61,6 +61,7 @@ describe('GradeSummary', () => {
   })
 
   afterEach(() => {
+    vi.restoreAllMocks()
     fakeENV.teardown()
     $fixtures.remove()
   })

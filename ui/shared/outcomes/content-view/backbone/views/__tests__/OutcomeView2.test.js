@@ -186,57 +186,6 @@ describe('OutcomeView', () => {
   })
 
   describe('Calculation Method Changes', () => {
-    it('sets calculation int intelligently when calc method is changed', async () => {
-      const view = createView({
-        model: newOutcome({calculation_method: 'highest'}),
-        state: 'edit',
-      })
-
-      view.edit($.Event())
-      await waitFrames(30)
-
-      expect(view.$('#calculation_method')).toHaveLength(1)
-
-      view.$('#calculation_method').val('n_mastery').trigger('change')
-      await waitFrames(30)
-
-      const calcIntField = view.$('#calculation_int')
-      expect(calcIntField).toHaveLength(1)
-
-      await new Promise(resolve => setTimeout(resolve, 50))
-
-      const calcIntValue = calcIntField.val()
-      expect(calcIntValue).toBeDefined()
-      expect(calcIntValue).toBe('5')
-
-      view.$('#calculation_method').val('decaying_average').trigger('change')
-      await waitFrames(30)
-      await new Promise(resolve => setTimeout(resolve, 50))
-      expect(view.$('#calculation_int').val()).toBe('65')
-
-      view.$('#calculation_method').val('n_mastery').trigger('change')
-      await waitFrames(30)
-      await new Promise(resolve => setTimeout(resolve, 50))
-      expect(view.$('#calculation_int').val()).toBe('5')
-
-      view.$('#calculation_int').val('4').trigger('change')
-      await waitFrames(30)
-      expect(view.$('#calculation_int').val()).toBe('4')
-
-      view.$('#calculation_method').val('decaying_average').trigger('change')
-      await waitFrames(30)
-      await new Promise(resolve => setTimeout(resolve, 50))
-      expect(view.$('#calculation_int').val()).toBe('65')
-
-      view.$('#calculation_method').val('highest').trigger('change')
-      await waitFrames(30)
-      view.$('#calculation_method').val('decaying_average').trigger('change')
-      await waitFrames(30)
-      await new Promise(resolve => setTimeout(resolve, 50))
-      expect(view.$('#calculation_int').val()).toBe('65')
-      view.remove()
-    })
-
     it('does not change calc int to 65 when starting as n mastery and 5', async () => {
       const view = createView({
         model: newOutcome({

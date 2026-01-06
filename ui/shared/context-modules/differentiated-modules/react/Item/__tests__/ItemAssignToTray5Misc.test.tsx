@@ -272,18 +272,16 @@ describe('ItemAssignToTray - Pagination', () => {
 
     const {findAllByTestId} = renderComponent()
 
-    await waitFor(async () => {
-      expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(1)
+    const cards = await findAllByTestId('item-assign-to-card')
+    expect(cards).toHaveLength(5)
 
-      expect(
-        fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=2&per_page=100`),
-      ).toHaveLength(1)
-      expect(
-        fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=3&per_page=100`),
-      ).toHaveLength(1)
-      const cards = await findAllByTestId('item-assign-to-card')
-      expect(cards).toHaveLength(5)
-    })
+    expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(1)
+    expect(
+      fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=2&per_page=100`),
+    ).toHaveLength(1)
+    expect(
+      fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=3&per_page=100`),
+    ).toHaveLength(1)
   })
 })
 

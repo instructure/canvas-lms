@@ -49,9 +49,7 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
   let gradebook
   let gridSupport
 
-  // Set up MSW
   beforeAll(() => server.listen())
-  afterEach(() => server.resetHandlers())
   afterAll(() => server.close())
 
   beforeEach(() => {
@@ -107,6 +105,8 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
       editor.destroy()
     }
     $container.remove()
+    server.resetHandlers()
+    vi.restoreAllMocks()
   })
 
   function createEditor() {

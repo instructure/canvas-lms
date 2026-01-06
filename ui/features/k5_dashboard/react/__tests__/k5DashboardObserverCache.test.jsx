@@ -21,8 +21,6 @@ import {MOCK_CARDS, MOCK_CARDS_2} from '@canvas/k5/react/__tests__/fixtures'
 import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObservee'
 import {MOCK_OBSERVED_USERS_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
-import {resetPlanner} from '@canvas/planner'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import {act, render as testingLibraryRender} from '@testing-library/react'
@@ -109,10 +107,6 @@ describe('K5Dashboard Parent Support - Cache', () => {
   afterEach(() => {
     global.ENV = {}
     resetCardCache()
-    resetPlanner()
-    sessionStorage.clear()
-    window.location.hash = ''
-    destroyContainer()
     vi.clearAllMocks()
   })
 
@@ -127,8 +121,6 @@ describe('K5Dashboard Parent Support - Cache', () => {
         } else if (url.includes('observed_user_id=2')) {
           return HttpResponse.json(MOCK_CARDS_2)
         }
-        // Default return for any other request
-        return HttpResponse.json([])
       }),
     )
 
@@ -140,31 +132,18 @@ describe('K5Dashboard Parent Support - Cache', () => {
         observedUsersList={MOCK_OBSERVED_USERS_LIST}
       />,
     )
-    // Wait for initial student 4 cards to load
     expect(await findByText('Economics 101')).toBeInTheDocument()
     expect(queryByText('Economics 203')).not.toBeInTheDocument()
     const select = getByTestId('observed-student-dropdown')
     expect(select.value).toBe('Student 4')
     expect(requestUrls[requestUrls.length - 1]).toContain('observed_user_id=4')
-
-    // Switch to student 2
-    await act(async () => {
-      select.click()
-    })
-    await act(async () => {
-      getByText('Student 2').click()
-    })
+    act(() => select.click())
+    act(() => getByText('Student 2').click())
     expect(await findByText('Economics 203')).toBeInTheDocument()
     expect(queryByText('Economics 101')).not.toBeInTheDocument()
     expect(requestUrls[requestUrls.length - 1]).toContain('observed_user_id=2')
-
-    // Switch back to student 4 - should use cache
-    await act(async () => {
-      select.click()
-    })
-    await act(async () => {
-      getByText('Student 4').click()
-    })
+    act(() => select.click())
+    act(() => getByText('Student 4').click())
     expect(await findByText('Economics 101')).toBeInTheDocument()
     expect(queryByText('Economics 203')).not.toBeInTheDocument()
     // Should not fetch student 4's cards again; they've been cached

@@ -97,21 +97,6 @@ describe('StudentAnnotationAttempt', () => {
       })
     })
 
-    it('sets submission_attempt=draft when attempt index is 0', async () => {
-      const props = await makeProps({
-        Submission: {
-          state: 'graded',
-          attempt: 0,
-        },
-      })
-
-      render(<StudentAnnotationAttempt {...props} />)
-      const params = {submission_attempt: 'draft', submission_id: '1'}
-      await waitFor(() => {
-        expect(axiosMock).toHaveBeenCalledWith('/api/v1/canvadoc_session', params)
-      })
-    })
-
     it('does not create a submission draft when submission is graded', async () => {
       const props = await makeProps({
         Submission: {

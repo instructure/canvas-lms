@@ -77,7 +77,6 @@ const files = [
   },
 ]
 let mockTrayProps: any
-const user = userEvent.setup()
 
 describe('AddImageModal', () => {
   const mockOnSubmit = vi.fn()
@@ -151,6 +150,7 @@ describe('AddImageModal', () => {
   })
 
   it('calls onDismiss when the modal is dismissed', async () => {
+    const user = userEvent.setup()
     renderComponent()
     await user.click(screen.getAllByText('Close')[1].closest('button') as Element)
     waitFor(() => {
@@ -159,6 +159,7 @@ describe('AddImageModal', () => {
   })
 
   it('can submit URL images', async () => {
+    const user = userEvent.setup()
     renderComponent()
     await user.click(screen.getByText('URL'))
     await waitFor(() => {
@@ -176,6 +177,7 @@ describe('AddImageModal', () => {
   }, 10000)
 
   it('can submit URL images with alt texts', async () => {
+    const user = userEvent.setup()
     renderComponent()
     await user.click(screen.getByText('URL'))
     await waitFor(() => {
@@ -200,6 +202,7 @@ describe('AddImageModal', () => {
 
   it.skip('can submit course images', async () => {
     // RCX-2420 to fix it
+    const user = userEvent.setup()
     renderComponent()
     await user.click(screen.getByText('Course Images'))
     await waitFor(() => {
@@ -217,6 +220,7 @@ describe('AddImageModal', () => {
 
   it.skip('can submit user images', async () => {
     // RCX-2340 to fix it
+    const user = userEvent.setup()
     mockTrayProps.containingContext.contextType = 'user'
     renderComponent()
     await user.click(screen.getByText('User Images'))
@@ -240,11 +244,16 @@ describe('AddImageModal', () => {
     })
     renderComponent()
 
-    fireEvent.change(await screen.findByTestId('filedrop'), {
+    await waitFor(() => {
+      expect(screen.getByText('Computer')).toBeInTheDocument()
+    })
+
+    const filedrop = await screen.findByTestId('filedrop', {}, {timeout: 5000})
+    fireEvent.change(filedrop, {
       target: {
         files: [aFile],
       },
     })
     expect(screen.getByText(/remove foo\.png/i)).toBeInTheDocument()
-  })
+  }, 10000)
 })

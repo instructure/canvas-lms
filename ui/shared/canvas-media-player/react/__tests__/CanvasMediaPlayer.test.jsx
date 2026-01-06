@@ -380,7 +380,9 @@ describe('CanvasMediaPlayer', () => {
       it('renders all the buttons', async () => {
         // MAT-886 - Full Screen button does not render consistently in test environment
         // The @instructure/ui-media-player component has internal fullscreen detection
-        // Fullscreen API is now mocked globally in setup-vitests.tsx
+        // Ensure fullscreen is enabled for this test (may be disabled by other tests)
+        document.fullscreenEnabled = true
+        document.webkitFullscreenEnabled = true
         const {
           getAllByText,
           getByLabelText,
