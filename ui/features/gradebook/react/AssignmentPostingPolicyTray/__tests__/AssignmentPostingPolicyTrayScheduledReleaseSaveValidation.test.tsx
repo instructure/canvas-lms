@@ -112,7 +112,7 @@ describe('AssignmentPostingPolicyTray ScheduledRelease - Save Validation', () =>
     expect(saveButton).toBeEnabled()
     await userEvent.click(saveButton)
 
-    const errorMessages = screen.getAllByText(/Please enter a valid (grades|comment) release date/)
+    const errorMessages = screen.getAllByText(/Please enter a valid (grades|comments) release date/)
     expect(errorMessages).toHaveLength(2)
     expect(Api.setAssignmentPostPolicy).not.toHaveBeenCalled()
   })
@@ -145,7 +145,7 @@ describe('AssignmentPostingPolicyTray ScheduledRelease - Save Validation', () =>
     })
     await userEvent.click(saveButton)
 
-    expect(screen.getByText('Please enter a valid comment release date')).toBeInTheDocument()
+    expect(screen.getByText('Please enter a valid comments release date')).toBeInTheDocument()
     expect(Api.setAssignmentPostPolicy).not.toHaveBeenCalled()
   })
 
@@ -242,7 +242,7 @@ describe('AssignmentPostingPolicyTray ScheduledRelease - Save Validation', () =>
     await userEvent.click(saveButton)
 
     expect(screen.queryByText('Please enter a valid grades release date')).not.toBeInTheDocument()
-    expect(screen.queryByText('Please enter a valid comment release date')).not.toBeInTheDocument()
+    expect(screen.queryByText('Please enter a valid comments release date')).not.toBeInTheDocument()
 
     await waitFor(() => {
       expect(Api.setAssignmentPostPolicy).toHaveBeenCalled()

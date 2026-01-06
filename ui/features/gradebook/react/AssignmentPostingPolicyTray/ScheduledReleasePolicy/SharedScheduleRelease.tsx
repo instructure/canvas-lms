@@ -27,7 +27,7 @@ const I18n = createI18nScope('assignment_scheduled_release_policy')
 type SharedScheduledReleaseProps = {
   errorMessages: FormMessage[]
   postGradesAt?: string | null
-  handleChange: (value?: string, errorMessages?: FormMessage[]) => void
+  handleChange: (value?: string) => void
 }
 
 export const SharedScheduledRelease = ({
@@ -36,18 +36,7 @@ export const SharedScheduledRelease = ({
   handleChange,
 }: SharedScheduledReleaseProps) => {
   const onChange = (_e: React.SyntheticEvent, isoDate?: string) => {
-    const messages: FormMessage[] = []
-
-    if (!isoDate) {
-      messages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
-    }
-
-    if (isoDate && new Date(isoDate) < new Date()) {
-      messages.push({text: I18n.t('Date must be in the future'), type: 'error'})
-    }
-
-    // Pass both value and errors in a single callback to ensure atomic state update
-    handleChange(isoDate, messages)
+    handleChange(isoDate)
   }
 
   return (
