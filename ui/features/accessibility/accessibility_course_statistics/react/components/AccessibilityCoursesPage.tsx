@@ -19,17 +19,67 @@
 import React from 'react'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-spinner'
+import {Billboard} from '@instructure/ui-billboard'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {useCourses} from '../../hooks/useCourses'
+import {CoursesTable} from './CoursesTable'
+import {AccessibilityGenericErrorPage} from './AccessibilityGenericErrorPage'
+import EmptyDesert from '@canvas/images/react/EmptyDesert'
+import type {CoursesResponse} from '../../types/course'
+
+const I18n = createI18nScope('accessibility_course_statistics')
+
+const getAccountId = (): string => {
+  return window.ENV?.ACCOUNT_ID?.toString() || ''
+}
+
+const LoadingState: React.FC = () => (
+  <View as="div" textAlign="center" padding="large">
+    <Spinner renderTitle={I18n.t('Loading courses')} />
+  </View>
+)
+
+const EmptyState: React.FC = () => (
+  <Billboard
+    size="large"
+    heading={I18n.t('No courses found')}
+    headingAs="h2"
+    hero={<EmptyDesert />}
+  />
+)
+
+const CoursesContent: React.FC<{
+  isLoading: boolean
+  isError: boolean
+  data: CoursesResponse | undefined
+}> = ({isLoading, isError, data}) => {
+  if (isError) {
+    return <AccessibilityGenericErrorPage />
+  }
+
+  if (isLoading && !data) {
+    return <LoadingState />
+  }
+
+  if (!data || data.courses.length === 0) {
+    return <EmptyState />
+  }
+
+  return <CoursesTable courses={data.courses} />
+}
 
 export const AccessibilityCoursesPage: React.FC = () => {
+  const accountId = getAccountId()
+  const {data, isLoading, isError} = useCourses({accountId})
+
   return (
-    <View as="div" padding="medium">
+    <View as="div">
       <Heading level="h1" margin="0 0 medium">
-        Accessibility report
+        {I18n.t('Accessibility report')}
       </Heading>
-      <View as="div" background="secondary" padding="medium" borderRadius="medium">
-        <p>This is a placeholder for the Accessibility report page.</p>
-        <p>Course list with accessibility statistics will be implemented here.</p>
-      </View>
+
+      <CoursesContent isLoading={isLoading} isError={isError} data={data} />
     </View>
   )
 }
