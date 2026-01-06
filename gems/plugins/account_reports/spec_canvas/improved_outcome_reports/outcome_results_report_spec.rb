@@ -1007,4 +1007,26 @@ describe "OutcomeResultsReport" do
       end
     end
   end
+
+  context "GuardRail usage" do
+    before do
+      @root_account.enable_feature!(:outcome_service_results_to_canvas)
+    end
+
+    it "queries outcomes_new_quiz_scope on secondary/report replica" do
+      guardrail_environment_during_outcomes_call = nil
+
+      report_class = AccountReports::ImprovedOutcomeReports::OutcomeResultsReport
+      original_method = report_class.instance_method(:outcomes_new_quiz_scope)
+
+      allow_any_instance_of(report_class).to receive(:outcomes_new_quiz_scope) do |instance|
+        guardrail_environment_during_outcomes_call = GuardRail.environment
+        original_method.bind_call(instance)
+      end
+
+      read_report(report_type, { order:, parse_header: true, account: @root_account })
+
+      expect(guardrail_environment_during_outcomes_call).to be_in([:secondary, :report])
+    end
+  end
 end
