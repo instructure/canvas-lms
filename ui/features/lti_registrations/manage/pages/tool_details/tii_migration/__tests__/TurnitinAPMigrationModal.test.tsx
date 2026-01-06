@@ -207,6 +207,11 @@ describe('TurnitinAPMigrationModal', () => {
       expect(screen.getByText('Sub Account 3')).toBeInTheDocument()
       expect(screen.getByText('Failed Migration Account')).toBeInTheDocument()
     })
+
+    // Verify account links open in new tab with correct href
+    const businessSchoolLink = screen.getByRole('link', {name: 'Business School'})
+    expect(businessSchoolLink).toHaveAttribute('href', `/accounts/${mockMigrationReady.account_id}`)
+    expect(businessSchoolLink).toHaveAttribute('target', '_blank')
   })
 
   it('should display info alert about migration', async () => {
