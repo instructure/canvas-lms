@@ -63,7 +63,8 @@ module AccountReports
       def generate
         # Add text to the report description if user supplied ordering parameter
         add_outcome_order_text
-        config_options = { new_quizzes_scope: outcomes_new_quiz_scope }
+        new_quizzes_scope = ReportHelper.activate_report_db { outcomes_new_quiz_scope }
+        config_options = { new_quizzes_scope: }
         write_outcomes_report(HEADERS, outcome_results_scope, config_options)
       end
 
