@@ -662,6 +662,87 @@ describe SpeedGrader::Assignment do
     end
   end
 
+  describe "N+1 query prevention for attachment associations" do
+    it "preloads last_attachment_upload_status and folder to prevent N+1 queries" do
+      assignment = @course.assignments.create!(
+        title: "Test Assignment",
+        submission_types: ["online_upload"]
+      )
+
+      # Create 3 students
+      students = Array.new(10) do |i|
+        student = user_factory(active_all: true, name: "Student #{i}")
+        @course.enroll_student(student, enrollment_state: "active")
+        student
+      end
+
+      # Each student submits with multiple attachments and versions
+      students.each do |student|
+        folder = Folder.root_folders(student).first
+
+        # Create 3 attachments with upload statuses
+        attachments = Array.new(3) do |j|
+          att = student.attachments.create!(
+            uploaded_data: dummy_io,
+            filename: "file_#{j}.pdf",
+            display_name: "file_#{j}.pdf",
+            context: student,
+            folder:
+          )
+
+          # Add upload status to some attachments
+          if j.even?
+            AttachmentUploadStatus.create!(
+              attachment: att,
+              error: "test error"
+            )
+          end
+
+          att
+        end
+
+        # Submit with attachments
+        assignment.submit_homework(
+          student,
+          submission_type: "online_upload",
+          attachments:
+        )
+      end
+
+      # Count queries during JSON generation
+      upload_status_query_count = 0
+      folder_query_count = 0
+
+      subscription = ActiveSupport::Notifications.subscribe("sql.active_record") do |*args|
+        event = ActiveSupport::Notifications::Event.new(*args)
+        sql = event.payload[:sql]
+
+        # Count attachment_upload_statuses queries
+        if sql.match?(/SELECT.*FROM.*attachment_upload_statuses/i)
+          upload_status_query_count += 1
+        end
+
+        # Count folders queries
+        if sql.match?(/SELECT.*FROM.*folders/i)
+          folder_query_count += 1
+        end
+      end
+
+      # Generate JSON (this is where N+1 would occur)
+      SpeedGrader::Assignment.new(assignment, @teacher).json
+
+      ActiveSupport::Notifications.unsubscribe(subscription)
+
+      # With preloading: should be 2 queries each (1 for current submissions + 1 for history)
+      # Without preloading: would be N queries per attachment (one for each attachment)
+      expect(upload_status_query_count).to eq(2),
+                                           "Expected 2 upload_status queries but got #{upload_status_query_count}. This indicates an N+1 query problem."
+
+      expect(folder_query_count).to eq(2),
+                                    "Expected 2 folder queries but got #{folder_query_count}. This indicates an N+1 query problem."
+    end
+  end
+
   it "includes inline view pingback url for files" do
     assignment = @course.assignments.create! submission_types: ["online_upload"]
     attachment = @student.attachments.create! uploaded_data: dummy_io, filename: "doc.doc", display_name: "doc.doc", context: @student

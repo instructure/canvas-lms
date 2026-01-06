@@ -241,7 +241,7 @@ module SpeedGrader
       res[:context][:quiz] =
         assignment.quiz.as_json(include_root: false, only: [:anonymous_submissions])
 
-      attachment_includes = %i[canvadoc root_attachment]
+      attachment_includes = %i[canvadoc root_attachment last_attachment_upload_status folder]
 
       # Preload attachments for later looping
       attachments_for_submission =
