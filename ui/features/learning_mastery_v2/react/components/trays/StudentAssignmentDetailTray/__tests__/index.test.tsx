@@ -19,8 +19,10 @@
 import React from 'react'
 import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import fetchMock from 'fetch-mock'
 import {StudentAssignmentDetailTray} from '..'
-import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../../../__fixtures__/rollups'
+import {MOCK_OUTCOMES, MOCK_STUDENTS, MOCK_ROLLUPS} from '../../../../__fixtures__/rollups'
 
 describe('StudentAssignmentDetailTray', () => {
   const defaultProps = {
@@ -46,37 +48,62 @@ describe('StudentAssignmentDetailTray', () => {
       onPrevious: vi.fn(),
       onNext: vi.fn(),
     },
+    rollups: MOCK_ROLLUPS,
+    outcomes: MOCK_OUTCOMES,
   }
+
+  const createWrapper = () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    })
+
+    const Wrapper: React.FC<any> = ({children}) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    )
+    return Wrapper
+  }
+
+  const renderWithWrapper = (ui: React.ReactElement) => {
+    return render(ui, {wrapper: createWrapper()})
+  }
+
+  beforeEach(() => {
+    fetchMock.restore()
+    vi.clearAllMocks()
+    // Mock the outcome alignments API call
+    fetchMock.get(/\/api\/v1\/courses\/.*\/outcome_alignments.*/, [])
+  })
 
   afterEach(() => {
     cleanup()
-  })
-
-  beforeEach(() => {
-    vi.clearAllMocks()
+    fetchMock.restore()
   })
 
   describe('General behavior', () => {
     it('renders when open', () => {
-      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
       expect(screen.getByTestId('student-assignment-detail-tray')).toBeInTheDocument()
     })
 
     it('does not render when closed', () => {
-      render(<StudentAssignmentDetailTray {...defaultProps} open={false} />)
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} open={false} />)
       const tray = screen.queryByTestId('student-assignment-detail-tray')
       expect(tray).not.toBeInTheDocument()
     })
 
     it('displays the outcome title', () => {
-      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
       expect(screen.getByText(defaultProps.outcome.title)).toBeInTheDocument()
     })
 
     it('calls onDismiss when close button is clicked', async () => {
       const user = userEvent.setup()
       const onDismiss = vi.fn()
-      render(<StudentAssignmentDetailTray {...defaultProps} onDismiss={onDismiss} />)
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} onDismiss={onDismiss} />)
 
       const closeButton = screen.getByRole('button', {name: /close/i})
       await user.click(closeButton)
@@ -87,14 +114,14 @@ describe('StudentAssignmentDetailTray', () => {
 
   describe('AssignmentSection integration', () => {
     it('displays the assignment name as a link', () => {
-      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
       const link = screen.getByRole('link', {name: /Test Assignment/i})
       expect(link).toBeInTheDocument()
       expect(link).toHaveAttribute('href', '/courses/123/assignments/456')
     })
 
     it('renders SpeedGrader button', () => {
-      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
       const speedGraderButton = screen.getByRole('link', {name: /SpeedGrader/i})
       expect(speedGraderButton).toBeInTheDocument()
       expect(speedGraderButton).toHaveAttribute(
@@ -104,14 +131,14 @@ describe('StudentAssignmentDetailTray', () => {
     })
 
     it('renders assignment navigator', () => {
-      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
       expect(screen.getByTestId('assignment-navigator')).toBeInTheDocument()
     })
 
     it('calls assignmentNavigator onPrevious when assignment previous button is clicked', async () => {
       const user = userEvent.setup()
       const onPrevious = vi.fn()
-      render(
+      renderWithWrapper(
         <StudentAssignmentDetailTray
           {...defaultProps}
           assignmentNavigator={{...defaultProps.assignmentNavigator, onPrevious}}
@@ -127,7 +154,7 @@ describe('StudentAssignmentDetailTray', () => {
     it('calls assignmentNavigator onNext when assignment next button is clicked', async () => {
       const user = userEvent.setup()
       const onNext = vi.fn()
-      render(
+      renderWithWrapper(
         <StudentAssignmentDetailTray
           {...defaultProps}
           assignmentNavigator={{...defaultProps.assignmentNavigator, onNext}}
@@ -141,7 +168,7 @@ describe('StudentAssignmentDetailTray', () => {
     })
 
     it('disables assignment previous button when hasPrevious is false', () => {
-      render(
+      renderWithWrapper(
         <StudentAssignmentDetailTray
           {...defaultProps}
           assignmentNavigator={{...defaultProps.assignmentNavigator, hasPrevious: false}}
@@ -153,7 +180,7 @@ describe('StudentAssignmentDetailTray', () => {
     })
 
     it('disables assignment next button when hasNext is false', () => {
-      render(
+      renderWithWrapper(
         <StudentAssignmentDetailTray
           {...defaultProps}
           assignmentNavigator={{...defaultProps.assignmentNavigator, hasNext: false}}
@@ -167,24 +194,24 @@ describe('StudentAssignmentDetailTray', () => {
 
   describe('StudentSection integration', () => {
     it('renders student navigator', () => {
-      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
       expect(screen.getByTestId('student-navigator')).toBeInTheDocument()
     })
 
     it('displays student name', () => {
-      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
       expect(screen.getByText(MOCK_STUDENTS[0].name)).toBeInTheDocument()
     })
 
     it('displays student avatar', () => {
-      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
       const avatar = screen.getByRole('img', {name: MOCK_STUDENTS[0].name})
       expect(avatar).toBeInTheDocument()
       expect(avatar).toHaveAttribute('src', MOCK_STUDENTS[0].avatar_url)
     })
 
     it('renders mastery report link with correct URL', () => {
-      render(<StudentAssignmentDetailTray {...defaultProps} />)
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
       const link = screen.getByRole('link', {name: /View Mastery Report/i})
       expect(link).toBeInTheDocument()
       expect(link).toHaveAttribute('href', '/courses/123/grades/1#tab-outcomes')
@@ -193,7 +220,7 @@ describe('StudentAssignmentDetailTray', () => {
     it('calls studentNavigator onPrevious when student previous button is clicked', async () => {
       const user = userEvent.setup()
       const onPrevious = vi.fn()
-      render(
+      renderWithWrapper(
         <StudentAssignmentDetailTray
           {...defaultProps}
           studentNavigator={{...defaultProps.studentNavigator, onPrevious}}
@@ -209,7 +236,7 @@ describe('StudentAssignmentDetailTray', () => {
     it('calls studentNavigator onNext when student next button is clicked', async () => {
       const user = userEvent.setup()
       const onNext = vi.fn()
-      render(
+      renderWithWrapper(
         <StudentAssignmentDetailTray
           {...defaultProps}
           studentNavigator={{...defaultProps.studentNavigator, onNext}}
@@ -223,7 +250,7 @@ describe('StudentAssignmentDetailTray', () => {
     })
 
     it('disables student previous button when hasPrevious is false', () => {
-      render(
+      renderWithWrapper(
         <StudentAssignmentDetailTray
           {...defaultProps}
           studentNavigator={{...defaultProps.studentNavigator, hasPrevious: false}}
@@ -235,7 +262,7 @@ describe('StudentAssignmentDetailTray', () => {
     })
 
     it('disables student next button when hasNext is false', () => {
-      render(
+      renderWithWrapper(
         <StudentAssignmentDetailTray
           {...defaultProps}
           studentNavigator={{...defaultProps.studentNavigator, hasNext: false}}
@@ -247,7 +274,7 @@ describe('StudentAssignmentDetailTray', () => {
     })
 
     it('updates student information when student prop changes', () => {
-      const {rerender} = render(<StudentAssignmentDetailTray {...defaultProps} />)
+      const {rerender} = renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
       expect(screen.getByText(MOCK_STUDENTS[0].name)).toBeInTheDocument()
 
       rerender(<StudentAssignmentDetailTray {...defaultProps} student={MOCK_STUDENTS[1]} />)

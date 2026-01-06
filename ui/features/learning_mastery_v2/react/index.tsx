@@ -247,6 +247,8 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
               onNext: studentAssignmentDetailTray.handlers.navigateNextStudent,
               onPrevious: studentAssignmentDetailTray.handlers.navigatePreviousStudent,
             }}
+            rollups={rollups}
+            outcomes={outcomes}
           />
         )}
     </>
