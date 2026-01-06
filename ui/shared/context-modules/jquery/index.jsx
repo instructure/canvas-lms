@@ -2544,7 +2544,7 @@ function initContextModules() {
     if (expanding && ENV.FEATURE_MODULES_PERF && collapsedModuleIds?.length > 0) {
       await modules.lazyLoadItems(collapsedModuleIds)
     }
-    $('#expand_collapse_all').prop('disabled', false)
+    $('#expand_collapse_all').attr('aria-disabled', 'false')
   }
 
   // This is the onClick handler for the expand/collapse all button
