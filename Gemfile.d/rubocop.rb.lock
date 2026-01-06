@@ -64,7 +64,7 @@ GEM
     gergich (2.2.1)
       httparty (~> 0.17)
       sqlite3 (>= 1.4, < 3.0)
-    httparty (0.23.1)
+    httparty (0.24.0)
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
