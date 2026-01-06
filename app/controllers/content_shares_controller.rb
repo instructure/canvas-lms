@@ -150,13 +150,17 @@ class ContentSharesController < ApplicationController
     select = { create_params[:content_type].pluralize => [create_params[:content_id]] }
 
     include_module = Canvas::Plugin.value_to_boolean(create_params[:include_module])
+    enable_selective_export = false
+
     if content_type == ContentTag && include_module && content.context.try(:horizon_course?)
       select[:modules] = [content.context_module_id]
+      enable_selective_export = true
     end
 
     export_params = ActionController::Parameters.new(skip_notifications: true,
                                                      select:,
-                                                     export_type: ContentExport::COMMON_CARTRIDGE)
+                                                     export_type: ContentExport::COMMON_CARTRIDGE,
+                                                     selective_content_tag_export: enable_selective_export)
     export = create_content_export_from_api(export_params, content.context, @current_user)
     return unless export.instance_of?(ContentExport)
     return render(json: { message: "Unable to export content" }, status: :bad_request) unless export.id

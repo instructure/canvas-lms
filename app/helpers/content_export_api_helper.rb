@@ -26,6 +26,7 @@ module ContentExportApiHelper
     export.user = current_user
     export.workflow_state = "created"
     export.settings[:skip_notifications] = true if value_to_boolean(params[:skip_notifications])
+    export.settings[:selective_content_tag_export] = true if value_to_boolean(params[:selective_content_tag_export])
 
     # ZipExporter accepts unhashed asset strings, to avoid having to instantiate all the files and folders
     if params[:select]
