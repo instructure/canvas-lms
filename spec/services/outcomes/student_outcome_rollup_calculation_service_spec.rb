@@ -1415,7 +1415,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     let(:outcome2) { outcome_model(context: course) }
 
     # Helper to create a RollupScore using a LearningOutcomeResult objects
-    def create_rollup_score(outcome, score_value, calculation_method = "average")
+    def create_rollup_score(outcome, score_value, calculation_method = "average", submission_time = nil)
       # Set up the outcome with proper calculation method
       outcome.calculation_method = calculation_method
       outcome.rubric_criterion = {
@@ -1431,13 +1431,16 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
 
       assignment = assignment_model(context: course)
       alignment = outcome.align(assignment, course)
+      submitted_at = submission_time || 1.day.ago
       result = LearningOutcomeResult.create!(
         learning_outcome: outcome,
         user: student,
         context: course,
         alignment:,
         score: score_value,
-        possible: 5
+        possible: 5,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at:
       )
 
       RollupScore.new(outcome_results: [result])
@@ -1630,6 +1633,45 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       expect(outcome1_rollup.calculation_method).to eq("average")
       expect(outcome2_rollup.aggregate_score).to eq(3.5)
       expect(outcome2_rollup.calculation_method).to eq("highest")
+    end
+
+    it "persists submitted_at from the rollup score" do
+      submitted_at = 3.days.ago
+      rollup_score = create_rollup_score(outcome1, 4.0, "highest", submitted_at)
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      expect(stored_rollup.submitted_at).to be_within(1.second).of(submitted_at)
+    end
+
+    it "updates submitted_at when updating an existing rollup" do
+      old_time = 5.days.ago
+      new_time = 1.day.ago
+
+      # Create existing rollup with old submitted_at
+      existing = OutcomeRollup.create!(
+        root_account_id: course.root_account_id,
+        course_id: course.id,
+        user_id: student.id,
+        outcome_id: outcome1.id,
+        calculation_method: "highest",
+        aggregate_score: 3.0,
+        submitted_at: old_time,
+        last_calculated_at: 1.hour.ago
+      )
+
+      # Update with new result
+      rollup_score = create_rollup_score(outcome1, 4.5, "highest", new_time)
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      subject.send(:store_rollups, [rollup_collection])
+
+      # Verify submitted_at was updated
+      expect(existing.reload.submitted_at).to be_within(1.second).of(new_time)
+      expect(existing.aggregate_score).to eq(4.5)
     end
   end
 end

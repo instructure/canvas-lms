@@ -161,7 +161,7 @@ module Outcomes
         user = user_rollups.first.user
         scores = user_rollups.map do |rollup_record|
           # Use RollupScore in stored mode for pre-calculated rollups
-          # Note: count, hide_points, title, and submitted_at are not available in stored rollups
+          # Note: count, hide_points and title are not available in stored rollups
           RollupScore.new(
             opts: {
               stored: true,
@@ -170,7 +170,7 @@ module Outcomes
               count: 0, # TODO: should reflect actual number of results used in calculation
               hide_points: false, # TODO: should reflect whether points are hidden in actual results
               title: nil,         # Not available in stored rollups (aggregate data only)
-              submitted_at: nil   # Not available in stored rollups (aggregate data only)
+              submitted_at: rollup_record.submitted_at
             }
           )
         end

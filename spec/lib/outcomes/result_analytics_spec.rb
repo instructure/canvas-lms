@@ -1008,5 +1008,41 @@ describe Outcomes::ResultAnalytics do
       expect(score).to respond_to(:count)
       expect(score).to respond_to(:hide_points)
     end
+
+    it "populates submitted_at from the rollup record" do
+      submitted_at = 2.days.ago
+
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        submitted_at:,
+        last_calculated_at: Time.zone.now
+      )
+
+      rollups = ra.stored_outcome_rollups(users: [@students[0]], context: @course)
+
+      score = rollups.first.scores.first
+      expect(score.submitted_at).to be_within(1.second).of(submitted_at)
+    end
+
+    it "handles nil submitted_at gracefully" do
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        submitted_at: nil,
+        last_calculated_at: Time.zone.now
+      )
+
+      rollups = ra.stored_outcome_rollups(users: [@students[0]], context: @course)
+
+      score = rollups.first.scores.first
+      expect(score.submitted_at).to be_nil
+    end
   end
 end

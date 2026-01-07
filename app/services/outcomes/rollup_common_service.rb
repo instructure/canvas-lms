@@ -132,6 +132,7 @@ module Outcomes
           outcome_id: score.outcome.id,
           calculation_method: score.outcome.calculation_method,
           aggregate_score: score.score,
+          submitted_at: score.submitted_at,
           workflow_state: "active",
           last_calculated_at: Time.current,
         }
