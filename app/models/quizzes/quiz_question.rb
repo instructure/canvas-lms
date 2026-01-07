@@ -92,6 +92,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   def update_attachment_associations(migration: nil, skip_user_verification: false)
     unless skip_user_verification
+      return if workflow_state == "deleted"
       return unless attachment_associations_creation_enabled?
       return unless migration || saved_change_to_attribute?(:question_data)
     end
