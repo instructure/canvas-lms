@@ -22,9 +22,12 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import {FilePreviewModal, FilePreviewModalProps} from '../FilePreviewModal'
 import {FAKE_FILES} from '../../../../fixtures/fakeData'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import userEvent from '@testing-library/user-event'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+
+const server = setupServer()
 
 vi.mock('@canvas/canvas-studio-player', () => ({
   default: () => <div data-testid="media-player">Media Player</div>,
@@ -46,19 +49,21 @@ const renderComponent = (props?: Partial<FilePreviewModalProps>) => {
 }
 
 describe('FilePreviewModal', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     vi.clearAllMocks()
-    fetchMock.get(/\/media_attachments\/\d+\/info/, {
-      body: [],
-      headers: {},
-      status: 200,
-      overwriteRoutes: true,
-    })
+    server.use(
+      http.get(/\/media_attachments\/\d+\/info/, () => {
+        return HttpResponse.json([])
+      }),
+    )
     window.history.replaceState = vi.fn()
   })
 
   afterEach(() => {
-    fetchMock.reset()
+    server.resetHandlers()
     vi.restoreAllMocks()
     destroyContainer()
   })

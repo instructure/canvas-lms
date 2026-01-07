@@ -20,11 +20,18 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import fakeEnv from '@canvas/test-utils/fakeENV'
 
 import FeatureFlagTable from '../FeatureFlagTable'
 import sampleData from './sampleData.json'
+
+const server = setupServer()
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 const rows = [
   sampleData.allowedOnFeature,
@@ -87,8 +94,13 @@ describe('feature_flags::FeatureFlagTable', () => {
 
   it('updates status pills dynamically', async () => {
     window.ENV.CONTEXT_BASE_URL = '/accounts/1'
-    const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature8`
-    fetchMock.putOnce(route, sampleData.siteAdminOnFeature.feature_flag)
+    const apiCalled = vi.fn()
+    server.use(
+      http.put('/api/v1/accounts/1/features/flags/feature8', () => {
+        apiCalled()
+        return HttpResponse.json(sampleData.siteAdminOnFeature.feature_flag)
+      }),
+    )
 
     const {getByText, getAllByTestId} = wrapper(rows, title)
     const row = getAllByTestId('ff-table-row')[5] // siteAdminOffFeature
@@ -97,7 +109,7 @@ describe('feature_flags::FeatureFlagTable', () => {
     const button = row.querySelectorAll('button')[1]
     await userEvent.click(button)
     await userEvent.click(getByText('Enabled'))
-    await waitFor(() => expect(fetchMock.calls(route)).toHaveLength(1))
+    await waitFor(() => expect(apiCalled).toHaveBeenCalledTimes(1))
     expect(row).not.toHaveTextContent('Hidden')
   })
 
@@ -479,18 +491,24 @@ describe('feature_flags::FeatureFlagTable', () => {
 
     afterEach(() => {
       fakeEnv.teardown()
-      fetchMock.restore()
     })
 
     it('shows early access modal when enabling early access feature for first time', async () => {
-      const eapRoute = `/api/v1${ENV.CONTEXT_BASE_URL}/features/early_access_program`
-      const flagRoute = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/early_access_feature`
-
-      fetchMock.postOnce(eapRoute, {early_access_program: true})
-      fetchMock.putOnce(flagRoute, {
-        ...earlyAccessFeature.feature_flag,
-        state: 'allowed_on',
-      })
+      const eapApiCalled = vi.fn()
+      const flagApiCalled = vi.fn()
+      server.use(
+        http.post('/api/v1/accounts/1/features/early_access_program', () => {
+          eapApiCalled()
+          return HttpResponse.json({early_access_program: true})
+        }),
+        http.put('/api/v1/accounts/1/features/flags/early_access_feature', () => {
+          flagApiCalled()
+          return HttpResponse.json({
+            ...earlyAccessFeature.feature_flag,
+            state: 'allowed_on',
+          })
+        }),
+      )
 
       const {getByText, getByTestId, queryByText} = wrapper([earlyAccessFeature], title)
 
@@ -508,8 +526,8 @@ describe('feature_flags::FeatureFlagTable', () => {
       await userEvent.click(acceptButton)
 
       await waitFor(() => {
-        expect(fetchMock.called(eapRoute)).toBe(true)
-        expect(fetchMock.called(flagRoute)).toBe(true)
+        expect(eapApiCalled).toHaveBeenCalled()
+        expect(flagApiCalled).toHaveBeenCalled()
       })
 
       await waitFor(() => {
@@ -518,7 +536,16 @@ describe('feature_flags::FeatureFlagTable', () => {
     })
 
     it('does not change feature flag when user cancels early access modal', async () => {
-      const flagRoute = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/early_access_feature`
+      const flagApiCalled = vi.fn()
+      server.use(
+        http.put('/api/v1/accounts/1/features/flags/early_access_feature', () => {
+          flagApiCalled()
+          return HttpResponse.json({
+            ...earlyAccessFeature.feature_flag,
+            state: 'allowed_on',
+          })
+        }),
+      )
 
       const {getByText, getByTestId, queryByText} = wrapper([earlyAccessFeature], title)
 
@@ -538,7 +565,7 @@ describe('feature_flags::FeatureFlagTable', () => {
         expect(queryByText('Early Access Program Terms and Conditions')).not.toBeInTheDocument()
       })
 
-      expect(fetchMock.called(flagRoute)).toBe(false)
+      expect(flagApiCalled).not.toHaveBeenCalled()
     })
 
     it('skips modal when early access terms already accepted', async () => {
@@ -550,12 +577,16 @@ describe('feature_flags::FeatureFlagTable', () => {
         },
       })
 
-      const flagRoute = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/early_access_feature`
-
-      fetchMock.putOnce(flagRoute, {
-        ...earlyAccessFeature.feature_flag,
-        state: 'allowed_on',
-      })
+      const flagApiCalled = vi.fn()
+      server.use(
+        http.put('/api/v1/accounts/1/features/flags/early_access_feature', () => {
+          flagApiCalled()
+          return HttpResponse.json({
+            ...earlyAccessFeature.feature_flag,
+            state: 'allowed_on',
+          })
+        }),
+      )
 
       const {getByText, getByTestId, queryByText} = wrapper([earlyAccessFeature], title)
 
@@ -567,18 +598,22 @@ describe('feature_flags::FeatureFlagTable', () => {
       expect(queryByText('Early Access Program Terms and Conditions')).not.toBeInTheDocument()
 
       await waitFor(() => {
-        expect(fetchMock.called(flagRoute)).toBe(true)
+        expect(flagApiCalled).toHaveBeenCalled()
       })
     })
 
     it('does not show modal for non-early access features', async () => {
       const regularFeature = {...earlyAccessFeature, early_access_program: false}
-      const flagRoute = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/early_access_feature`
-
-      fetchMock.putOnce(flagRoute, {
-        ...regularFeature.feature_flag,
-        state: 'allowed_on',
-      })
+      const flagApiCalled = vi.fn()
+      server.use(
+        http.put('/api/v1/accounts/1/features/flags/early_access_feature', () => {
+          flagApiCalled()
+          return HttpResponse.json({
+            ...regularFeature.feature_flag,
+            state: 'allowed_on',
+          })
+        }),
+      )
 
       const {getByText, getByTestId, queryByText} = wrapper([regularFeature], title)
 
@@ -590,7 +625,7 @@ describe('feature_flags::FeatureFlagTable', () => {
       expect(queryByText('Early Access Program Terms and Conditions')).not.toBeInTheDocument()
 
       await waitFor(() => {
-        expect(fetchMock.called(flagRoute)).toBe(true)
+        expect(flagApiCalled).toHaveBeenCalled()
       })
     })
   })

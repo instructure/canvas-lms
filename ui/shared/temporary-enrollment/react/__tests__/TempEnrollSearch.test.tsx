@@ -19,7 +19,6 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {TempEnrollSearch} from '../TempEnrollSearch'
-import fetchMock from 'fetch-mock'
 import type {User} from '../types'
 
 describe('TempEnrollSearch', () => {
@@ -39,10 +38,6 @@ describe('TempEnrollSearch', () => {
   beforeAll(() => {
     // @ts-expect-error
     window.ENV = {ACCOUNT_ID: '1'}
-  })
-
-  afterEach(() => {
-    fetchMock.restore()
   })
 
   afterAll(() => {

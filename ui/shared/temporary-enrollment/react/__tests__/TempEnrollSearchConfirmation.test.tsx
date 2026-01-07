@@ -19,8 +19,11 @@
 import React from 'react'
 import {TempEnrollSearchConfirmation} from '../TempEnrollSearchConfirmation'
 import {render} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import type {User, DuplicateUser} from '../types'
+
+const server = setupServer()
 
 const props = {
   foundUsers: [],
@@ -80,13 +83,17 @@ const threeSisterUser = {
 }
 
 const userDetailsUriMock = (userId: string, response: object) =>
-  fetchMock.getOnce(`/api/v1/users/${userId}/profile`, response)
+  server.use(
+    http.get(`/api/v1/users/${userId}/profile`, () => HttpResponse.json(response), {once: true}),
+  )
 
 describe('TempEnrollSearchConfirmation', () => {
-  beforeEach(() => {
-    fetchMock.reset()
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
     vi.clearAllMocks()
   })
+  afterAll(() => server.close())
 
   it('render one user', async () => {
     userDetailsUriMock('1', oneUser)

@@ -16,14 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {renderHook} from '@testing-library/react-hooks/dom'
+import {waitFor} from '@testing-library/react'
 
 import useContentShareUserSearchApi from '../useContentShareUserSearchApi'
 
+const server = setupServer()
+
 describe('useContentShareUserSearchApi', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   const path = '/api/v1/courses/42/content_share_users'
@@ -37,14 +43,22 @@ describe('useContentShareUserSearchApi', () => {
   })
 
   it('fetches results if the search term is long enough', async () => {
-    fetchMock.mock(`path:${path}`, ['list of users'])
+    let requestMade = false
+    server.use(
+      http.get(path, () => {
+        requestMade = true
+        return HttpResponse.json(['list of users'])
+      }),
+    )
+
     const success = vi.fn()
     renderHook(() =>
       useContentShareUserSearchApi({success, courseId: '42', params: {search_term: '123'}}),
     )
-    await fetchMock.flush(true)
-    expect(fetchMock.done()).toBe(true)
-    expect(success).toHaveBeenCalledWith(['list of users'])
+    await waitFor(() => {
+      expect(requestMade).toBe(true)
+      expect(success).toHaveBeenCalledWith(['list of users'])
+    })
   })
 
   it('throws if the courseId parameter is missing', () => {

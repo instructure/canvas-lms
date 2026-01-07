@@ -19,7 +19,8 @@
 import React from 'react'
 import {render, fireEvent, act} from '@testing-library/react'
 import * as rtl from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import useManagedCourseSearchApi from '../../effects/useManagedCourseSearchApi'
 import useModuleCourseSearchApi, {
   useCourseModuleItemApi,
@@ -27,6 +28,8 @@ import useModuleCourseSearchApi, {
 import DirectShareCoursePanel from '../DirectShareCoursePanel'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+
+const server = setupServer()
 
 vi.mock('../../effects/useManagedCourseSearchApi')
 vi.mock('../../effects/useModuleCourseSearchApi')
@@ -36,8 +39,10 @@ vi.mock('@canvas/alerts/react/FlashAlert', () => ({
 
 describe('DirectShareCoursePanel', () => {
   let ariaLive
+  let lastRequestBody
 
   beforeAll(() => {
+    server.listen()
     ariaLive = document.createElement('div')
     ariaLive.id = 'flash_screenreader_holder'
     ariaLive.setAttribute('role', 'alert')
@@ -45,10 +50,12 @@ describe('DirectShareCoursePanel', () => {
   })
 
   afterAll(() => {
+    server.close()
     if (ariaLive) ariaLive.remove()
   })
 
   beforeEach(() => {
+    lastRequestBody = undefined
     // Setup default ENV values
     fakeENV.setup({
       FEATURES: {
@@ -65,7 +72,7 @@ describe('DirectShareCoursePanel', () => {
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
     fakeENV.teardown()
     vi.clearAllMocks()
   })
@@ -87,11 +94,18 @@ describe('DirectShareCoursePanel', () => {
   })
 
   it('starts a copy operation and reports status', async () => {
-    fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', {
-      id: '8',
-      workflow_state: 'running',
-    })
-    fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
+    server.use(
+      http.post('/api/v1/courses/abc/content_migrations', async ({request}) => {
+        lastRequestBody = await request.json()
+        return HttpResponse.json({
+          id: '8',
+          workflow_state: 'running',
+        })
+      }),
+      http.get('/api/v1/courses/abc/modules', () => {
+        return HttpResponse.json([])
+      }),
+    )
     const {getByText, getAllByText, getByLabelText, queryByText} = render(
       <DirectShareCoursePanel
         sourceCourseId="42"
@@ -104,16 +118,17 @@ describe('DirectShareCoursePanel', () => {
     fireEvent.click(getByText(/copy/i))
     expect(queryByText('Copy')).toBeNull()
     expect(getByText('Close')).toBeInTheDocument()
-    const [, fetchOptions] = fetchMock.lastCall()
-    expect(fetchOptions.method).toBe('POST')
-    expect(JSON.parse(fetchOptions.body)).toMatchObject({
-      migration_type: 'course_copy_importer',
-      select: {discussion_topics: ['1123']},
-      settings: {source_course_id: '42'},
+    await rtl.waitFor(() => {
+      expect(lastRequestBody).toMatchObject({
+        migration_type: 'course_copy_importer',
+        select: {discussion_topics: ['1123']},
+        settings: {source_course_id: '42'},
+      })
     })
     expect(getAllByText(/start/i)).not.toHaveLength(0)
-    await act(() => fetchMock.flush(true))
-    expect(getByText(/success/)).toBeInTheDocument()
+    await rtl.waitFor(() => {
+      expect(getByText(/success/)).toBeInTheDocument()
+    })
     expect(queryByText('Copy')).toBeNull()
     expect(getByText('Close')).toBeInTheDocument()
   })
@@ -182,22 +197,33 @@ describe('DirectShareCoursePanel', () => {
       })
 
       it('enables the copy button when a course is selected', async () => {
-        fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
+        server.use(
+          http.get('/api/v1/courses/abc/modules', () => {
+            return HttpResponse.json([])
+          }),
+        )
         const {getByText} = render(<DirectShareCoursePanel />)
         fireEvent.click(getByText(/select a course/i))
         fireEvent.click(getByText('abc'))
-        await act(() => fetchMock.flush(true))
-        const copyButton = getByText(/copy/i).closest('button')
-        expect(copyButton.getAttribute('disabled')).toBe(null)
+        await rtl.waitFor(() => {
+          const copyButton = getByText(/copy/i).closest('button')
+          expect(copyButton.getAttribute('disabled')).toBe(null)
+        })
       })
 
       it('disables the copy button again when a course search is initiated', async () => {
-        fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
+        server.use(
+          http.get('/api/v1/courses/abc/modules', () => {
+            return HttpResponse.json([])
+          }),
+        )
         const {getByText, getByLabelText} = render(<DirectShareCoursePanel />)
         const input = getByLabelText(/select a course/i)
         fireEvent.click(input)
         fireEvent.click(getByText('abc'))
-        await act(() => fetchMock.flush(true))
+        await rtl.waitFor(() => {
+          expect(getByText(/copy/i).closest('button').getAttribute('disabled')).toBe(null)
+        })
         fireEvent.change(input, {target: {value: 'foo'}})
         expect(getByText(/copy/i).closest('button').getAttribute('disabled')).toBe('')
       })
@@ -247,8 +273,14 @@ describe('DirectShareCoursePanel', () => {
     })
 
     it('reports an error if the fetch fails', async () => {
-      fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', 400)
-      fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
+      server.use(
+        http.post('/api/v1/courses/abc/content_migrations', () => {
+          return new HttpResponse(null, {status: 400})
+        }),
+        http.get('/api/v1/courses/abc/modules', () => {
+          return HttpResponse.json([])
+        }),
+      )
       const {getByText, getByLabelText, queryByText} = render(
         <DirectShareCoursePanel sourceCourseId="42" />,
       )
@@ -256,24 +288,32 @@ describe('DirectShareCoursePanel', () => {
       fireEvent.click(input)
       fireEvent.click(getByText('abc'))
       fireEvent.click(getByText('Copy'))
-      await act(() => fetchMock.flush(true))
-      expect(getByText(/problem/i)).toBeInTheDocument()
+      await rtl.waitFor(() => {
+        expect(getByText(/problem/i)).toBeInTheDocument()
+      })
       expect(queryByText('Copy')).toBeNull()
       expect(getByText('Close')).toBeInTheDocument()
     })
 
     it('calls showFlashError when the fetch fails', async () => {
-      fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', 400)
-      fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
+      server.use(
+        http.post('/api/v1/courses/abc/content_migrations', () => {
+          return new HttpResponse(null, {status: 400})
+        }),
+        http.get('/api/v1/courses/abc/modules', () => {
+          return HttpResponse.json([])
+        }),
+      )
       const {getByText, getByLabelText} = render(<DirectShareCoursePanel sourceCourseId="42" />)
       const input = getByLabelText(/select a course/i)
       fireEvent.click(input)
       fireEvent.click(getByText('abc'))
       fireEvent.click(getByText('Copy'))
-      await act(() => fetchMock.flush(true))
-      expect(showFlashError).toHaveBeenCalledWith(
-        'Failed to start copy operation. Please try again.',
-      )
+      await rtl.waitFor(() => {
+        expect(showFlashError).toHaveBeenCalledWith(
+          'Failed to start copy operation. Please try again.',
+        )
+      })
     })
   })
 })

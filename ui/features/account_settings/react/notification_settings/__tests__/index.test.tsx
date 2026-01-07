@@ -19,16 +19,15 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import NotificationSettings, {type NotificationSettingsProps} from '..'
 
-function formDataToObject(formData: FormData): Record<string, string> {
-  const obj: Record<string, string> = {}
-  formData.forEach((value, key) => {
-    obj[key] = value as string
-  })
-  return obj
-}
+const server = setupServer()
+
+// Track request info for assertions
+let lastRequestBody: FormData | null = null
+let lastRequestMethod: string | null = null
 
 function renderComponent(overrideProps = {}) {
   const props: NotificationSettingsProps = {
@@ -43,8 +42,13 @@ function renderComponent(overrideProps = {}) {
 }
 
 describe('NotificationSettings::', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
+    lastRequestBody = null
+    lastRequestMethod = null
   })
 
   it('renders all sections', () => {
@@ -72,8 +76,14 @@ describe('NotificationSettings::', () => {
 
   it('does not make an API call and highlights an empty required field', async () => {
     const id = '1'
+    const requestReceived = vi.fn()
     // simulate an API error so we don't try to reload the window
-    fetchMock.putOnce(`/accounts/${id}`, 500)
+    server.use(
+      http.put(`/accounts/${id}`, () => {
+        requestReceived()
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
     const {container, getByTestId} = renderComponent({
       accountId: id,
       customNameOption: 'custom',
@@ -86,13 +96,24 @@ describe('NotificationSettings::', () => {
     expect(container).toHaveTextContent('Please enter a custom "From" name.')
     // wait just a bit... long enough for a (wrong) API call to be made if it's going to
     await new Promise(resolve => setTimeout(resolve, 50))
-    expect(fetchMock.called()).toBe(false)
+    expect(requestReceived).not.toHaveBeenCalled()
   })
 
   it('sends the right data when updating', async () => {
     const id = '52'
+    const capturedFormData: Record<string, string> = {}
+    let capturedMethod: string | null = null
     // simulate an API error so we don't try to reload the window
-    fetchMock.putOnce(`/accounts/${id}`, 500)
+    server.use(
+      http.put(`/accounts/${id}`, async ({request}) => {
+        capturedMethod = request.method
+        const formData = await request.formData()
+        formData.forEach((value, key) => {
+          capturedFormData[key] = value as string
+        })
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
     // Render with a custom (but blank) name and external warning disabled
     // Then we will fill in the name and check the warning box
     // The result should be that the update succeeds (makes the API call)
@@ -104,11 +125,10 @@ describe('NotificationSettings::', () => {
     await userEvent.click(warningCheckbox) // enable external warning
     await userEvent.type(customNameInput, 'Jackson Roykirk')
     await userEvent.click(updateButton)
-    await waitFor(() => expect(fetchMock.called()).toBe(true))
-    const apiParms = fetchMock.lastOptions()
-    const formData = formDataToObject(apiParms?.body as FormData)
-    expect(apiParms?.method).toBe('PUT')
-    expect(formData['account[settings][external_notification_warning]']).toBe('1')
-    expect(formData['account[settings][outgoing_email_default_name]']).toBe('Jackson Roykirk')
+    await waitFor(() => expect(capturedMethod).toBe('PUT'))
+    expect(capturedFormData['account[settings][external_notification_warning]']).toBe('1')
+    expect(capturedFormData['account[settings][outgoing_email_default_name]']).toBe(
+      'Jackson Roykirk',
+    )
   })
 })

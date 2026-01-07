@@ -139,6 +139,10 @@ describe('EditView - Peer Review Integration', () => {
   let view
 
   beforeEach(() => {
+    // Use fake timers to prevent "window is not defined" errors from
+    // React scheduler tasks and debounced operations firing after test teardown
+    vi.useFakeTimers()
+
     document.body.innerHTML = '<div id="fixtures"></div>'
 
     fakeENV.setup({
@@ -165,6 +169,12 @@ describe('EditView - Peer Review Integration', () => {
   })
 
   afterEach(() => {
+    // Flush all pending timers while still in fake timer mode, then restore
+    // real timers to prevent "window is not defined" errors from React
+    // scheduler tasks firing after test environment is torn down
+    vi.runAllTimers()
+    vi.useRealTimers()
+
     if (view) {
       view.remove()
     }

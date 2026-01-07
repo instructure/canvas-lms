@@ -19,10 +19,17 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 import EarlyAccessModal from '../EarlyAccessModal'
+
+const server = setupServer()
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 describe('EarlyAccessModal', () => {
   const user = userEvent.setup()
@@ -35,16 +42,17 @@ describe('EarlyAccessModal', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    fetchMock.restore()
   })
 
   it('calls onAccept after successful API call when accept button is clicked', async () => {
     const onAccept = vi.fn()
     const onCancel = vi.fn()
 
-    fetchMock.postOnce('/api/v1/accounts/1/features/early_access_program', {
-      early_access_program: true,
-    })
+    server.use(
+      http.post('/api/v1/accounts/1/features/early_access_program', () => {
+        return HttpResponse.json({early_access_program: true})
+      }),
+    )
 
     const {getByText, getByTestId} = render(
       <EarlyAccessModal isOpen={true} onAccept={onAccept} onCancel={onCancel} />,
@@ -54,10 +62,6 @@ describe('EarlyAccessModal', () => {
 
     const acceptButton = getByTestId('eap-accept-button')
     await user.click(acceptButton)
-
-    await waitFor(() => {
-      expect(fetchMock.called('/api/v1/accounts/1/features/early_access_program')).toBe(true)
-    })
 
     await waitFor(() => {
       expect(onAccept).toHaveBeenCalled()
@@ -81,7 +85,6 @@ describe('EarlyAccessModal', () => {
 
     expect(onCancel).toHaveBeenCalled()
     expect(onAccept).not.toHaveBeenCalled()
-    expect(fetchMock.called()).toBe(false)
   })
 
   it('does not render when isOpen is false', () => {

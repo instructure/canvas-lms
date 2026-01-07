@@ -19,10 +19,13 @@
 import React from 'react'
 import {renderHook} from '@testing-library/react-hooks'
 import {waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {useGetFile} from '../useGetFile'
 import {NotFoundError} from '../../../utils/apiUtils'
+
+const server = setupServer()
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -51,23 +54,22 @@ describe('useGetFile', () => {
     folder_id: '789',
   }
 
-  beforeEach(() => {
-    fetchMock.reset()
-  })
+  let lastRequestUrl: string | undefined
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
   afterEach(() => {
-    fetchMock.reset()
+    server.resetHandlers()
+    lastRequestUrl = undefined
   })
 
   describe('when fileId is provided', () => {
     it('fetches file successfully', async () => {
-      fetchMock.get(
-        'path:/api/v1/files/123',
-        {
-          body: mockFile,
-          status: 200,
-        },
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/files/123', ({request}) => {
+          lastRequestUrl = request.url
+          return HttpResponse.json(mockFile)
+        }),
       )
 
       const {result} = renderHook(() => useGetFile({fileId: '123'}), {
@@ -79,21 +81,18 @@ describe('useGetFile', () => {
       })
 
       expect(result.current.data).toEqual(mockFile)
-      expect(fetchMock.lastUrl()).toContain('/api/v1/files/123')
-      expect(fetchMock.lastUrl()).toContain('include[]=user')
-      expect(fetchMock.lastUrl()).toContain('include[]=usage_rights')
-      expect(fetchMock.lastUrl()).toContain('include[]=enhanced_preview_url')
-      expect(fetchMock.lastUrl()).toContain('include[]=context_asset_string')
+      expect(lastRequestUrl).toContain('/api/v1/files/123')
+      expect(lastRequestUrl).toContain('include[]=user')
+      expect(lastRequestUrl).toContain('include[]=usage_rights')
+      expect(lastRequestUrl).toContain('include[]=enhanced_preview_url')
+      expect(lastRequestUrl).toContain('include[]=context_asset_string')
     })
 
     it('validates context and accepts file from correct context', async () => {
-      fetchMock.get(
-        'path:/api/v1/files/123',
-        {
-          body: mockFile,
-          status: 200,
-        },
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/files/123', () => {
+          return HttpResponse.json(mockFile)
+        }),
       )
 
       const {result} = renderHook(
@@ -116,13 +115,10 @@ describe('useGetFile', () => {
     })
 
     it('validates context and rejects file from wrong context', async () => {
-      fetchMock.get(
-        'path:/api/v1/files/123',
-        {
-          body: mockFile,
-          status: 200,
-        },
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/files/123', () => {
+          return HttpResponse.json(mockFile)
+        }),
       )
 
       const {result} = renderHook(
@@ -148,12 +144,10 @@ describe('useGetFile', () => {
     })
 
     it('handles API errors correctly', async () => {
-      fetchMock.get(
-        'path:/api/v1/files/123',
-        {
-          status: 404,
-        },
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/files/123', () => {
+          return new HttpResponse(null, {status: 404})
+        }),
       )
 
       const {result} = renderHook(() => useGetFile({fileId: '123'}), {
@@ -168,13 +162,10 @@ describe('useGetFile', () => {
     })
 
     it('handles empty response', async () => {
-      fetchMock.get(
-        'path:/api/v1/files/123',
-        {
-          body: null,
-          status: 200,
-        },
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/files/123', () => {
+          return HttpResponse.json(null)
+        }),
       )
 
       const {result} = renderHook(() => useGetFile({fileId: '123'}), {
@@ -192,25 +183,41 @@ describe('useGetFile', () => {
 
   describe('when fileId is null', () => {
     it('does not make API call', () => {
+      let requestMade = false
+      server.use(
+        http.get('/api/v1/files/*', () => {
+          requestMade = true
+          return HttpResponse.json({})
+        }),
+      )
+
       const {result} = renderHook(() => useGetFile({fileId: null}), {
         wrapper: createWrapper(),
       })
 
       expect(result.current.data).toBeUndefined()
       expect(result.current.isLoading).toBe(false)
-      expect(fetchMock.called()).toBe(false)
+      expect(requestMade).toBe(false)
     })
   })
 
   describe('when fileId is an empty string', () => {
     it('does not make API call', () => {
+      let requestMade = false
+      server.use(
+        http.get('/api/v1/files/*', () => {
+          requestMade = true
+          return HttpResponse.json({})
+        }),
+      )
+
       const {result} = renderHook(() => useGetFile({fileId: ''}), {
         wrapper: createWrapper(),
       })
 
       expect(result.current.data).toBeUndefined()
       expect(result.current.isLoading).toBe(false)
-      expect(fetchMock.called()).toBe(false)
+      expect(requestMade).toBe(false)
     })
   })
 })
