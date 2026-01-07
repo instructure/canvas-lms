@@ -111,4 +111,10 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
       subscription_id: tool_proxy.subscription_id,
     }
   end
+
+  # Returns true if this LTI2 plagiarism ToolProxy has been migrated to LTI1.3 AssetProcessor
+  # This can only happen with Turnitin tools.
+  def migrated?
+    associated_tool_proxy&.migrated_to_context_external_tool.present? && assignment.lti_asset_processors.present?
+  end
 end

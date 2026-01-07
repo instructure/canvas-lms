@@ -2365,7 +2365,14 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def tool_settings_tool
-    tool_settings_tools.first
+    tool = tool_settings_tools.first
+
+    # Hide migrated message handlers without deleting the association
+    if tool.is_a?(Lti::MessageHandler) && cpf_migrated?
+      nil
+    else
+      tool
+    end
   end
 
   def tool_settings_tool=(tool)
@@ -4707,5 +4714,12 @@ class AbstractAssignment < ActiveRecord::Base
       new_context_id: context.id,
       original_context_id: duplicate_of.course.id
     )
+  end
+
+  # Returns true if the Canvas Plagiarism Platform (LTI2 / CPF) configuration has been migrated to LTI1.3 Asset Processor
+  def cpf_migrated?
+    return false if assignment_configuration_tool_lookups.empty?
+
+    assignment_configuration_tool_lookups.first&.migrated?
   end
 end
