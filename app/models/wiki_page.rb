@@ -117,9 +117,20 @@ class WikiPage < ActiveRecord::Base
     wiki_ids += Course.where(id: course_ids).pluck(:wiki_id) if course_ids.any?
     wiki_ids += Group.where(id: group_ids).pluck(:wiki_id) if group_ids.any?
     context_pages = where(wiki_id: wiki_ids)
+    candidate_page_ids = context_pages.pluck(:id)
+
+    # Short-circuit if no pages to check (e.g., no pages with todo dates)
+    next context_pages.none if candidate_page_ids.empty?
 
     scope_assignments = context_pages.where.not(assignment_id: nil).pluck(:assignment_id)
-    visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(user_ids: user_id, course_ids:).map(&:wiki_page_id)
+    visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService
+                         .wiki_pages_visible_to_students(
+                           user_ids: user_id,
+                           course_ids:,
+                           wiki_page_ids: candidate_page_ids
+                         )
+                         .map(&:wiki_page_id)
+
     visible_assignments = if scope_assignments.empty?
                             []
                           else
