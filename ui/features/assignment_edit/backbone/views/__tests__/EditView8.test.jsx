@@ -165,6 +165,9 @@ describe('EditView - Peer Review Integration', () => {
   })
 
   afterEach(() => {
+    if (view) {
+      view.remove()
+    }
     fakeENV.teardown()
     document.body.innerHTML = ''
     vi.restoreAllMocks()
