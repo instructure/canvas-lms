@@ -781,19 +781,11 @@
         <xs:complexType>
           <xs:all minOccurs="0" maxOccurs="1">
             <xs:element name="available" type="xs:boolean" minOccurs="1"/>
-            <xs:element name="deployment_url" type="xs:anyURI" minOccurs="1"/>
             <!--
-              This will only appear if the tool isn't being exported with the course. This makes it
-              much easier to find the tool this context control should be associated with
-              when importing the course.
+              Migration ID of the deployment (context external tool) that this control is associated with.
+              Only controls whose associated tool is also being exported will be included in the export.
             -->
-            <xs:element name="preferred_deployment_id" type="xs:integer" minOccurs="0" maxOccurs="1"/>
-            <!--
-              This will only appear if the tool is also being exported with the course
-              If it doesn't appear, then this context control was not associated with a course-level tool
-              in it's source course.
-            -->
-            <xs:element name="deployment_migration_id" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="deployment_migration_id" type="xs:string" minOccurs="1"/>
           </xs:all>
           <xs:attribute name="identifier" type="xs:ID" use="required"/>
         </xs:complexType>

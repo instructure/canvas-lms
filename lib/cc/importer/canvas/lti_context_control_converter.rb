@@ -22,34 +22,28 @@ module CC::Importer::Canvas
     include CC::Importer
 
     def convert_lti_context_controls(document)
-      return [] unless document
+      return [] unless document&.at_css("lti_context_controls")
 
-      controls = []
       controls_node = document.at_css("lti_context_controls")
 
-      controls_node.children.each do |control|
+      controls_node.children.filter_map do |control|
         case control.name
         when "lti_context_control"
-          controls << convert_lti_context_control(control)
-        else
-          next
+          convert_lti_context_control(control)
         end
       end
-
-      controls.compact
     end
 
     def convert_lti_context_control(control_node)
       # We don't want to convert controls that don't have both of these properties, as we
       # really don't want to assume anything about the availability of the control.
-      return if get_bool_val(control_node, "available").nil? || get_node_val(control_node, "deployment_url").blank?
+      return if get_bool_val(control_node, "available").nil? || get_node_val(control_node, "deployment_migration_id").blank?
 
       control = {}.with_indifferent_access
 
-      control[:deployment_url] = get_node_val(control_node, "deployment_url")
+      control[:migration_id] = control_node["identifier"]
       control[:available] = get_bool_val(control_node, "available")
       control[:deployment_migration_id] = get_node_val(control_node, "deployment_migration_id")
-      control[:preferred_deployment_id] = get_int_val(control_node, "preferred_deployment_id")
 
       control
     end

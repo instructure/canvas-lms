@@ -142,11 +142,7 @@ module Importers
           migration.update_import_progress(58)
           Importers::ContextExternalToolImporter.process_migration(data, migration)
           migration.update_import_progress(60)
-          # We don't currently import context controls, as that would allow teachers to modify
-          # Context Controls, which they shouldn't have permission to do! We might revisit this
-          # in the future and let admins make this a toggleable feature, but for now it is
-          # always disabled.
-          # Importers::LtiContextControlImporter.process_migration(data, migration)
+          Importers::LtiContextControlImporter.process_migration(data, migration)
           migration.update_import_progress(61)
           Importers::ToolProfileImporter.process_migration(data, migration)
           migration.update_import_progress(62)
