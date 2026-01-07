@@ -85,6 +85,7 @@ describe('FindOutcomesModal - Group Import Refetch Tests', () => {
       },
     )
     await act(async () => vi.runAllTimers())
+    await waitFor(() => expect(getByText('Account Standards')).toBeInTheDocument())
     await clickEl(getByText('Account Standards'))
     await clickEl(getByText('Root Account Outcome Group 0'))
 
@@ -122,6 +123,7 @@ describe('FindOutcomesModal - Group Import Refetch Tests', () => {
       },
     )
     await act(async () => vi.runAllTimers())
+    await waitFor(() => expect(getByText('Account Standards')).toBeInTheDocument())
     await clickEl(getByText('Account Standards'))
     await clickEl(getByText('Root Account Outcome Group 0'))
 
