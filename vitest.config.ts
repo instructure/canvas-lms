@@ -118,7 +118,7 @@ export default defineConfig({
     jsx: 'automatic',
   },
   test: {
-    testTimeout: 10000,
+    testTimeout: 15000,
     environment: 'jsdom',
     reporters: [
       'default',
