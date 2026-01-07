@@ -104,7 +104,9 @@ describe Outcomes::CourseOutcomeRollupCalculationService do
             user: student,
             alignment:,
             score: 2.0 + i,
-            possible: 5.0
+            possible: 5.0,
+            title: "#{course.name}, #{assignment.title}",
+            submitted_at: (i + 1).days.ago
           )
         end
       end
@@ -129,6 +131,7 @@ describe Outcomes::CourseOutcomeRollupCalculationService do
           expect(rollup).to be_present
           expect(rollup.aggregate_score).to eq(2.0 + i)
           expect(rollup.calculation_method).to eq(outcome.calculation_method)
+          expect(rollup.submitted_at).to be_present
         end
       end
 
