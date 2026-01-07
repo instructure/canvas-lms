@@ -52,7 +52,7 @@ class Accessibility::CourseStatisticCalculatorService
   def calculate
     @statistic.update!(workflow_state: "in_progress")
 
-    # TODO: Implement actual calculation logic here
+    Accessibility::ActiveIssueCalculator.new(statistic: @statistic).calculate
 
     @statistic.update!(workflow_state: "active")
   rescue => e
