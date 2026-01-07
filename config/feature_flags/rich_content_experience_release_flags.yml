@@ -368,12 +368,20 @@ a11y_checker_eap:
   visible_on: a11y_checker_flag_enabled
   custom_transition_proc: only_admins_can_enable_a11y_checker_during_eap
 
-a11y_checker_ai_generation:
+a11y_checker_ai_alt_text_generation:
   applies_to: SiteAdmin
   state: hidden
-  display_name: Accessibility Checker AI Generation
+  display_name: Accessibility Checker AI Alt Text Generation
   description: |-
-    If enabled, the AI feature for generating text for the relevant rule such as alt text missing, table captions missing is displayed at the wizard.
+    If enabled, the AI feature for generating missing alt text will be displayed in the wizard.
+  shadow: true
+
+a11y_checker_ai_table_caption_generation:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Accessibility Checker AI Table Caption Generation
+  description: |-
+    If enabled, the AI feature for generating missing table captions is displayed in the wizard.
   shadow: true
 
 a11y_checker_additional_resources:

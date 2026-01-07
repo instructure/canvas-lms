@@ -33,10 +33,10 @@ module Accessibility
 
       def apply_fix!(updating_user: nil)
         resource.try(:updating_user=, updating_user)
-        html_content = resource.send(target_attribute)
+        html_content = resource.send(self.class.target_attribute(resource))
         fixed_content, _, error = fix_content(html_content, rule, path, value)
         if error.nil?
-          resource.send("#{target_attribute}=", fixed_content)
+          resource.send("#{self.class.target_attribute(resource)}=", fixed_content)
           resource.save_without_accessibility_scan!
           { json: { success: true }, status: :ok }
         else
@@ -45,7 +45,7 @@ module Accessibility
       end
 
       def preview_fix(element_only: false)
-        html_content = resource.send(target_attribute)
+        html_content = resource.send(self.class.target_attribute(resource))
 
         if element_only
           content, fixed_path, error = fix_content_element(html_content, rule, path, value)
@@ -61,7 +61,7 @@ module Accessibility
       end
 
       def generate_fix
-        html_content = resource.send(target_attribute)
+        html_content = resource.send(self.class.target_attribute(resource))
 
         begin
           element = find_element_at_path(html_content, path)
@@ -73,13 +73,24 @@ module Accessibility
               { json: { value: generated_value }, status: :ok }
             end
           else
-            Rails.logger.error("Element not found for path: #{path} (rule #{rule.id})")
+            Rails.logger.error("Element not found for path: #{path} (rule #{rule.class.id})")
             { json: { error: "Invalid issue placement" }, status: :bad_request }
           end
         rescue => e
-          Rails.logger.error "Cannot fix accessibility issue due to error: #{e.message} (rule #{rule.id})"
+          Rails.logger.error "Cannot fix accessibility issue due to error: #{e.message} (rule #{rule.class.id})"
           Rails.logger.error e.backtrace.join("\n")
           { json: { error: "Internal Error" }, status: :internal_server_error }
+        end
+      end
+
+      def self.target_attribute(resource)
+        case resource
+        when WikiPage
+          :body
+        when Assignment
+          :description
+        else
+          raise ArgumentError, "Unsupported resource type: #{resource.class.name}"
         end
       end
 
@@ -128,17 +139,6 @@ module Accessibility
         end
 
         [preview_content, nil, e.message]
-      end
-
-      def target_attribute
-        case resource
-        when WikiPage
-          :body
-        when Assignment
-          :description
-        else
-          raise ArgumentError, "Unsupported resource type: #{resource.class.name}"
-        end
       end
     end
   end

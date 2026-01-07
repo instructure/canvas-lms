@@ -20,7 +20,7 @@
 require "spec_helper"
 
 RSpec.describe Accessibility::GenerateController do
-  describe "#create" do
+  describe "#create_table_caption" do
     let!(:course) { Course.create! }
     let!(:user) { User.create! }
     let(:accessibility_issue_instance) { instance_double(Accessibility::Issue) }
@@ -34,7 +34,7 @@ RSpec.describe Accessibility::GenerateController do
       allow(LLMConfigs).to receive(:config_for).with("alt_text_generate").and_return({})
       allow(InstLLMHelper).to receive(:with_rate_limit).and_yield
       allow(course).to receive(:a11y_checker_enabled?).and_return(true)
-      Account.site_admin.enable_feature!(:a11y_checker_ai_generation)
+      Account.site_admin.enable_feature!(:a11y_checker_ai_table_caption_generation)
     end
 
     context "for a wiki page" do
@@ -54,7 +54,7 @@ RSpec.describe Accessibility::GenerateController do
       it "returns the correct response" do
         expect(accessibility_issue_instance).to receive(:generate_fix).with("some_rule", "WikiPage", wiki_page.id.to_s, "some_path", "some_value").and_return(response_data)
 
-        post :create, params:, format: :json
+        post :create_table_caption, params:, format: :json
         expect(response).to have_http_status(:ok)
         expect(response.parsed_body).to eq({ "result" => "success" })
       end
@@ -77,7 +77,7 @@ RSpec.describe Accessibility::GenerateController do
       it "returns the correct response" do
         expect(accessibility_issue_instance).to receive(:generate_fix).with("another_rule", "Assignment", assignment.id.to_s, "another_path", "another_value").and_return(response_data)
 
-        post :create, params:, format: :json
+        post :create_table_caption, params:, format: :json
         expect(response).to have_http_status(:ok)
         expect(response.parsed_body).to eq({ "result" => "success" })
       end
@@ -95,7 +95,7 @@ RSpec.describe Accessibility::GenerateController do
       it "returns an error" do
         expect(accessibility_issue_instance).to receive(:generate_fix).with("some_rule", nil, nil, nil, nil).and_return(error_response)
 
-        post :create, params:, format: :json
+        post :create_table_caption, params:, format: :json
         expect(response).to have_http_status(:bad_request)
         expect(response.parsed_body).to eq({ "error" => "missing params" })
       end
@@ -121,7 +121,7 @@ RSpec.describe Accessibility::GenerateController do
       end
 
       it "returns a too many requests status with appropriate error message" do
-        post :create, params:, format: :json
+        post :create_table_caption, params:, format: :json
 
         expect(response).to have_http_status(:too_many_requests)
       end
@@ -153,7 +153,165 @@ RSpec.describe Accessibility::GenerateController do
 
         allow(accessibility_issue_instance).to receive(:generate_fix).and_return({ json: {}, status: :ok })
 
-        post :create, params:, format: :json
+        post :create_table_caption, params:, format: :json
+      end
+    end
+  end
+
+  describe "#create_image_alt_text" do
+    let!(:course) { Course.create! }
+    let!(:user) { User.create! }
+    let!(:attachment) { attachment_model(context: user, size: 1.megabyte, content_type: "image/png") }
+
+    before do
+      allow(controller).to receive_messages(
+        require_context: true,
+        require_user: true,
+        check_authorized_action: true
+      )
+      controller.instance_variable_set(:@context, course)
+      controller.instance_variable_set(:@current_user, user)
+      controller.instance_variable_set(:@domain_root_account, Account.default)
+
+      allow(course).to receive_messages(a11y_checker_enabled?: true, root_account: Account.default)
+      Account.site_admin.enable_feature!(:a11y_checker_ai_alt_text_generation)
+
+      stub_const("CedarClient", Class.new do
+        def self.generate_alt_text(*)
+          Struct.new(:image, keyword_init: true).new(image: { "altText" => "Generated alt text" })
+        end
+      end)
+    end
+
+    context "with valid wiki page and image" do
+      let!(:wiki_page) do
+        page = course.wiki_pages.build(title: "Test Page", body: "<div><p><img src=\"/files/#{attachment.id}\" /></p></div>")
+        page.updating_user = user
+        page.save!
+        page
+      end
+
+      let(:params) do
+        {
+          course_id: course.id,
+          content_type: "Page",
+          content_id: wiki_page.id,
+          path: "./div/p/img"
+        }
+      end
+
+      it "generates alt text for the image" do
+        allow(Attachment).to receive(:find_by).with(id: attachment.id.to_s).and_return(attachment)
+        allow(attachment).to receive_messages(grants_right?: true, open: StringIO.new("fake image data"))
+
+        post :create_image_alt_text, params:, format: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq({ "value" => "Generated alt text" })
+      end
+
+      it "returns bad_request when user cannot read attachment" do
+        allow(Attachment).to receive(:find_by).with(id: attachment.id.to_s).and_return(attachment)
+        allow(attachment).to receive(:grants_right?).and_return(false)
+
+        post :create_image_alt_text, params:, format: :json
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Attachment not found")
+      end
+
+      it "returns bad_request when image is too large" do
+        large_attachment = attachment_model(context: user, size: 11.megabytes, content_type: "image/png")
+        wiki_page.update!(body: "<div><p><img src=\"/files/#{large_attachment.id}\" /></p></div>")
+
+        allow(Attachment).to receive(:find_by).with(id: large_attachment.id.to_s).and_return(large_attachment)
+        allow(large_attachment).to receive(:grants_right?).and_return(true)
+
+        post :create_image_alt_text, params:, format: :json
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Attachment not found")
+      end
+
+      it "returns bad_request when image type is not supported" do
+        unsupported_attachment = attachment_model(context: user, size: 1.megabyte, content_type: "application/pdf")
+        wiki_page.update!(body: "<div><p><img src=\"/files/#{unsupported_attachment.id}\" /></p></div>")
+
+        allow(Attachment).to receive(:find_by).with(id: unsupported_attachment.id.to_s).and_return(unsupported_attachment)
+        allow(unsupported_attachment).to receive(:grants_right?).and_return(true)
+
+        post :create_image_alt_text, params:, format: :json
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Attachment not found")
+      end
+    end
+
+    context "with external image" do
+      let!(:wiki_page) do
+        page = course.wiki_pages.build(title: "Test Page", body: "<img src=\"https://example.com/image.png\" />")
+        page.updating_user = user
+        page.save!
+        page
+      end
+
+      let(:params) do
+        {
+          course_id: course.id,
+          content_type: "Page",
+          content_id: wiki_page.id,
+          path: "./img"
+        }
+      end
+
+      it "returns error when image is not from Canvas" do
+        post :create_image_alt_text, params:, format: :json
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Attachment not found")
+      end
+    end
+
+    context "with missing image" do
+      let!(:wiki_page) do
+        page = course.wiki_pages.build(title: "Test Page", body: "<div><p><img src=\"/files/999999\" /></p></div>")
+        page.updating_user = user
+        page.save!
+        page
+      end
+
+      let(:params) do
+        {
+          course_id: course.id,
+          content_type: "Page",
+          content_id: wiki_page.id,
+          path: "./div/p/img"
+        }
+      end
+
+      it "returns bad_request when attachment does not exist" do
+        post :create_image_alt_text, params:, format: :json
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Attachment not found")
+      end
+    end
+
+    context "with invalid parameters" do
+      let(:params) do
+        {
+          course_id: course.id,
+          content_type: "",
+          content_id: "",
+          path: ""
+        }
+      end
+
+      it "returns bad_request for missing parameters" do
+        post :create_image_alt_text, params:, format: :json
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Attachment not found")
       end
     end
   end
@@ -177,20 +335,46 @@ RSpec.describe Accessibility::GenerateController do
       controller.send(:check_authorized_action)
     end
 
-    it "renders forbidden if AI generation feature flag is disabled" do
-      Account.site_admin.disable_feature!(:a11y_checker_ai_generation)
-
-      expect(controller).to receive(:render).with(status: :forbidden)
-
-      controller.send(:check_authorized_action)
-    end
-
-    it "calls authorized_action if a11y checker and ai generation is enabled" do
-      Account.site_admin.enable_feature!(:a11y_checker_ai_generation)
-
+    it "calls authorized_action if a11y checker is enabled" do
       expect(controller).to receive(:authorized_action).with(course, user, [:read, :update]).and_return(true)
 
       controller.send(:check_authorized_action)
+    end
+  end
+
+  describe "#check_table_caption_feature" do
+    it "renders forbidden if table caption feature flag is disabled" do
+      Account.site_admin.disable_feature!(:a11y_checker_ai_table_caption_generation)
+
+      expect(controller).to receive(:render).with(status: :forbidden)
+
+      controller.send(:check_table_caption_feature)
+    end
+
+    it "does not render forbidden if table caption feature flag is enabled" do
+      Account.site_admin.enable_feature!(:a11y_checker_ai_table_caption_generation)
+
+      expect(controller).not_to receive(:render)
+
+      controller.send(:check_table_caption_feature)
+    end
+  end
+
+  describe "#check_alt_text_feature" do
+    it "renders forbidden if alt text feature flag is disabled" do
+      Account.site_admin.disable_feature!(:a11y_checker_ai_alt_text_generation)
+
+      expect(controller).to receive(:render).with(status: :forbidden)
+
+      controller.send(:check_alt_text_feature)
+    end
+
+    it "does not render forbidden if alt text feature flag is enabled" do
+      Account.site_admin.enable_feature!(:a11y_checker_ai_alt_text_generation)
+
+      expect(controller).not_to receive(:render)
+
+      controller.send(:check_alt_text_feature)
     end
   end
 end

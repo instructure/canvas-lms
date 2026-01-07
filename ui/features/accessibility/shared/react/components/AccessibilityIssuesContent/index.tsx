@@ -82,6 +82,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   const [currentIssueIndex, setCurrentIssueIndex] = useState(0)
   const [isRemediated, setIsRemediated] = useState<boolean>(false)
   const [isFormLocked, setIsFormLocked] = useState<boolean>(false)
+  const [isGenerateLoading, setIsGenerateLoading] = useState<boolean>(false)
   const [assertiveAlertMessage, setAssertiveAlertMessage] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>()
   const [isSaveButtonEnabled, setIsSaveButtonEnabled] = useState<boolean>(true)
@@ -413,6 +414,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       undoMessage={currentIssue.form.undoText}
       isApplied={isRemediated}
       isLoading={isFormLocked}
+      isDisabled={isGenerateLoading}
     >
       {applyButtonText}
     </ApplyButton>
@@ -501,8 +503,10 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
                   onReload={updatePreview}
                   onClearError={handleClearError}
                   onValidationChange={handleValidationChange}
-                  isDisabled={isRemediated}
+                  isDisabled={isRemediated || isFormLocked}
                   actionButtons={currentIssue.form.canGenerateFix ? previewActionButton : undefined}
+                  previewRef={previewRef}
+                  onGenerateLoadingChange={setIsGenerateLoading}
                 />
                 {currentIssue.form.canGenerateFix &&
                   formError &&
