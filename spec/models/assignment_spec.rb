@@ -1709,6 +1709,49 @@ describe Assignment do
     end
   end
 
+  describe "#tool_settings_tool" do
+    context "when tool is a ContextExternalTool" do
+      it "returns the tool" do
+        setup_assignment_with_homework
+        tool = @course.context_external_tools.create!(name: "external tool", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
+        @assignment.tool_settings_tool = tool
+        @assignment.save!
+
+        expect(@assignment.tool_settings_tool).to eq(tool)
+      end
+    end
+
+    context "when tool is a Lti::MessageHandler" do
+      before do
+        setup_assignment_with_homework
+        course.assignments << @assignment
+        @assignment.tool_settings_tool = message_handler
+        @assignment.save!
+      end
+
+      context "and the tool proxy has not been migrated" do
+        it "returns the message handler" do
+          expect(message_handler.resource_handler.tool_proxy.migrated_to_context_external_tool).to be_nil
+          expect(@assignment.tool_settings_tool).to eq(message_handler)
+        end
+      end
+
+      context "and the tool proxy has been migrated to a ContextExternalTool" do
+        before do
+          migrated_tool = @course.context_external_tools.create!(name: "migrated tool", url: "http://www.example.com", consumer_key: "key", shared_secret: "secret")
+          message_handler.resource_handler.tool_proxy.update!(migrated_to_context_external_tool: migrated_tool)
+          # Add an LTI asset processor to satisfy the migrated? check
+          @assignment.lti_asset_processors.create!(context_external_tool: migrated_tool)
+        end
+
+        it "returns nil instead of the message handler" do
+          expect(message_handler.resource_handler.tool_proxy.migrated_to_context_external_tool).not_to be_nil
+          expect(@assignment.tool_settings_tool).to be_nil
+        end
+      end
+    end
+  end
+
   describe "#duplicate" do
     it "duplicates the assignment" do
       assignment = wiki_page_assignment_model({ title: "Wiki Assignment" })

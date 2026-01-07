@@ -157,7 +157,7 @@ module Lti
 
       if context_matching_deployments.empty?
         if deployments.any?
-          add_proxy_error(tool_proxy, "Found #{deployments.map { |d| "CET ID=#{d.id}" }.join(", ")}} TII AP deployments in context of Tool Proxy ID=#{tool_proxy.global_id}, but none match the context. Skipping migration.")
+          add_proxy_error(tool_proxy, "Found #{deployments.map { |d| "CET ID=#{d.id}" }.join(", ")} TII AP deployments in context of Tool Proxy ID=#{tool_proxy.global_id}, but none match the context. Skipping migration.")
           return
         end
         Rails.logger.info("No TII AP deployment found for Tool Proxy ID=#{tool_proxy.global_id}, creating one")
