@@ -85,7 +85,7 @@ export type RegistrationWizardModalState = {
    * JSON methods
    */
   jsonFetch: JsonFetchStatus
-  onSuccessfulInstallation?: () => void
+  onSuccessfulInstallation?: (registrationId: LtiRegistrationId) => void
 }
 
 type InstallMethod = 'dynamic_registration' | 'manual' | 'json' | 'json_url'
@@ -159,7 +159,7 @@ export const openJsonRegistrationWizard = (
   jsonCode: string,
   internalLtiConfig: InternalLtiConfiguration,
   unifiedToolId?: UnifiedToolId,
-  onSuccessfulInstallation?: () => void,
+  onSuccessfulInstallation?: (registrationId: LtiRegistrationId) => void,
 ) => {
   useRegistrationModalWizardState.setState(prev => {
     return {
@@ -185,7 +185,7 @@ export const openJsonUrlRegistrationWizard = (
   jsonUrl: string,
   internalLtiConfig: InternalLtiConfiguration,
   unifiedToolId?: UnifiedToolId,
-  onSuccessfulInstallation?: () => void,
+  onSuccessfulInstallation?: (registrationId: LtiRegistrationId) => void,
 ) => {
   useRegistrationModalWizardState.setState(prev => {
     return {
@@ -216,7 +216,7 @@ export const openJsonUrlRegistrationWizard = (
 export const openDynamicRegistrationWizard = (
   dynamicRegistrationUrl: string,
   unifiedToolId?: UnifiedToolId,
-  onSuccessfulInstallation?: () => void,
+  onSuccessfulInstallation?: (registrationId: LtiRegistrationId) => void,
 ) => {
   openRegistrationWizard({
     dynamicRegistrationUrl,
@@ -236,7 +236,7 @@ export const openDynamicRegistrationWizard = (
  */
 export const openEditDynamicRegistrationWizard = (
   existingRegistrationId: LtiRegistrationId,
-  onSuccessfulInstallation?: () => void,
+  onSuccessfulInstallation?: (registrationId: LtiRegistrationId) => void,
 ) => {
   openRegistrationWizard({
     existingRegistrationId,
@@ -247,7 +247,7 @@ export const openEditDynamicRegistrationWizard = (
 
 export const openEditManualRegistrationWizard = (
   existingRegistrationId: LtiRegistrationId,
-  onSuccessfulInstallation?: () => void,
+  onSuccessfulInstallation?: (registrationId: LtiRegistrationId) => void,
 ) => {
   openRegistrationWizard({
     existingRegistrationId,

@@ -25,6 +25,8 @@ import {mockLti1p3RegistrationWizardService} from '../../dynamic_registration_wi
 import {ZAccountId} from '../../model/AccountId'
 import {LtiScopes} from '@canvas/lti/model/LtiScope'
 import {LtiPlacements} from '../../model/LtiPlacement'
+import {success} from '../../../common/lib/apiResult/ApiResult'
+import {ZLtiRegistrationId} from '../../model/LtiRegistrationId'
 
 // NOTE: The registration wizard creates it's own store during render, so testing it is currently
 // quite slow. Hopefully, we can refactor it to make testing easier in the future, but for now,

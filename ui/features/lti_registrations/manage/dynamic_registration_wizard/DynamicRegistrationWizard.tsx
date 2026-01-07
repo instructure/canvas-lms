@@ -53,7 +53,7 @@ export type DynamicRegistrationWizardProps = {
   accountId: AccountId
   unifiedToolId?: UnifiedToolId
   onDismiss: () => boolean
-  onSuccessfulRegistration: () => void
+  onSuccessfulRegistration: (id: LtiRegistrationId) => void
   service: DynamicRegistrationWizardService
   registrationId?: LtiRegistrationId
 }

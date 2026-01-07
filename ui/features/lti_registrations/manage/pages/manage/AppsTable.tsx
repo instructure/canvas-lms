@@ -91,7 +91,7 @@ const renderEditButton = (r: LtiRegistration) => {
     return (
       <Menu.Item
         onClick={() => {
-          openEditDynamicRegistrationWizard(r.id, refreshRegistrations)
+          openEditDynamicRegistrationWizard(r.id, () => refreshRegistrations())
         }}
       >
         {I18n.t('Edit App')}
@@ -101,7 +101,7 @@ const renderEditButton = (r: LtiRegistration) => {
     return (
       <Menu.Item
         onClick={() => {
-          openEditManualRegistrationWizard(r.id, refreshRegistrations)
+          openEditManualRegistrationWizard(r.id, () => refreshRegistrations())
         }}
       >
         {I18n.t('Edit App')}

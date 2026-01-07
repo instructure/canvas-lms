@@ -73,13 +73,24 @@ export const findLtiVersion = (
 export const ProductConfigureButton = ({buttonWidth, product, accountId}: ConfigureButtonProps) => {
   const navigate = useNavigate()
 
-  const onSuccessfulInstall = React.useCallback(() => {
-    navigate('/manage')
-  }, [navigate])
+  const onSuccessfulInstall = React.useCallback(
+    (registrationId: string) => {
+      if (window.ENV.FEATURES.lti_registrations_next) {
+        navigate(`/manage/${registrationId}`)
+      } else {
+        navigate('/manage')
+      }
+    },
+    [navigate],
+  )
 
   const onSuccessfulInstallForInheritedKey = React.useCallback(
     (config: LtiRegistrationWithConfiguration) => {
-      navigate(`/manage?q=${config.admin_nickname || config.name}`)
+      if (window.ENV.FEATURES.lti_registrations_next) {
+        navigate(`/manage/${config.id}`)
+      } else {
+        navigate(`/manage?q=${config.admin_nickname || config.name}`)
+      }
     },
     [navigate],
   )

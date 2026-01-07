@@ -77,7 +77,7 @@ export interface DynamicRegistrationActions {
     registrationId: LtiRegistrationId,
     overlay: LtiConfigurationOverlay,
     adminNickname: string,
-    onSuccess: () => void,
+    onSuccess: (registrationId: LtiRegistrationId) => void,
   ) => Promise<unknown>
 
   updateAndClose: (
@@ -85,7 +85,7 @@ export interface DynamicRegistrationActions {
     registrationId: LtiRegistrationId,
     overlay: LtiConfigurationOverlay,
     adminNickname: string,
-    onSuccess: () => void,
+    onSuccess: (registrationId: LtiRegistrationId) => void,
   ) => Promise<unknown>
 
   /**
@@ -347,7 +347,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
         registrationId: LtiRegistrationId,
         overlay: LtiConfigurationOverlay,
         adminNickname: string,
-        onSuccess: () => void,
+        onSuccess: (registrationId: LtiRegistrationId) => void,
       ) => {
         set(stateFrom('Reviewing')(state => enabling(state.registration, state.overlayStore)))
         // We explicitly don't send the config, as we can't update the base config for Dynamic Registration.
@@ -360,7 +360,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
           workflowState: 'on',
         })
         if (isSuccessful(result)) {
-          onSuccess()
+          onSuccess(registrationId)
         } else {
           set(stateFor(errorState(formatApiResultError(result))))
         }
@@ -370,7 +370,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
         registrationId: LtiRegistrationId,
         overlay: LtiConfigurationOverlay,
         adminNickname: string,
-        onSuccess: () => void,
+        onSuccess: (registrationId: LtiRegistrationId) => void,
       ) => {
         set(stateFrom('Reviewing')(state => updating(state.registration, state.overlayStore)))
 
@@ -382,7 +382,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
         })
 
         if (isSuccessful(result)) {
-          onSuccess()
+          onSuccess(registrationId)
         } else {
           set(stateFor(errorState(formatApiResultError(result))))
         }
