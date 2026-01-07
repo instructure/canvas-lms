@@ -122,6 +122,167 @@ describe GradebookExporter do
       end
     end
 
+    describe "#sort_by_id_order" do
+      let(:exporter) { GradebookExporter.new(@course, @teacher, {}) }
+
+      context "with custom id order" do
+        it "sorts collection by provided ID order" do
+          items = [
+            double(id: 1, name: "First"),
+            double(id: 2, name: "Second"),
+            double(id: 3, name: "Third")
+          ]
+          id_order = [3, 1, 2]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order:,
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { item.name })
+
+          expect(result.map(&:id)).to eq([3, 1, 2])
+        end
+
+        it "handles string IDs by converting to integers" do
+          items = [
+            double(id: 1, name: "First"),
+            double(id: 2, name: "Second"),
+            double(id: 3, name: "Third")
+          ]
+          id_order = %w[3 1 2]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order:,
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { item.name })
+
+          expect(result.map(&:id)).to eq([3, 1, 2])
+        end
+
+        it "places items in custom order first, then remaining items sorted by ID" do
+          items = [
+            double(id: 4, name: "Fourth"),
+            double(id: 1, name: "First"),
+            double(id: 3, name: "Third"),
+            double(id: 2, name: "Second")
+          ]
+          id_order = [3, 1]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order:,
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { item.name })
+
+          # Items in order come first: [3, 1]
+          # Items not in order sorted by ID: [2, 4]
+          expect(result.map(&:id)).to eq([3, 1, 2, 4])
+        end
+
+        it "handles duplicate IDs in order by using ID as tie-breaker" do
+          items = [
+            double(id: 1, name: "First"),
+            double(id: 2, name: "Second")
+          ]
+          id_order = [1, 1, 2]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order:,
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { item.name })
+
+          expect(result.map(&:id)).to eq([1, 2])
+        end
+
+        it "works with custom accessor using method name" do
+          items = [
+            double(user_id: 10, name: "User A"),
+            double(user_id: 20, name: "User B"),
+            double(user_id: 30, name: "User C")
+          ]
+          id_order = [30, 10, 20]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order:,
+                                 id_accessor: :user_id,
+                                 fallback_sort: ->(item) { item.name })
+
+          expect(result.map(&:user_id)).to eq([30, 10, 20])
+        end
+
+        it "works with proc accessor" do
+          items = [
+            { id: 1, name: "First" },
+            { id: 2, name: "Second" },
+            { id: 3, name: "Third" }
+          ]
+          id_order = [2, 3, 1]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order:,
+                                 id_accessor: ->(item) { item[:id] },
+                                 fallback_sort: ->(item) { item[:name] })
+
+          expect(result.pluck(:id)).to eq([2, 3, 1])
+        end
+      end
+
+      context "without custom id order" do
+        it "uses fallback sort with nil id_order" do
+          items = [
+            double(id: 3, name: "Charlie"),
+            double(id: 1, name: "Alice"),
+            double(id: 2, name: "Bob")
+          ]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order: nil,
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { item.name })
+
+          expect(result.map(&:name)).to eq(%w[Alice Bob Charlie])
+        end
+
+        it "uses fallback sort with empty id_order" do
+          items = [
+            double(id: 3, name: "Charlie"),
+            double(id: 1, name: "Alice"),
+            double(id: 2, name: "Bob")
+          ]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order: [],
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { item.name })
+
+          expect(result.map(&:name)).to eq(%w[Alice Bob Charlie])
+        end
+
+        it "uses fallback sort with multiple sort keys" do
+          items = [
+            double(id: 1, group: "B", position: 2),
+            double(id: 2, group: "A", position: 1),
+            double(id: 3, group: "A", position: 2),
+            double(id: 4, group: "B", position: 1)
+          ]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order: nil,
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { [item.group, item.position] })
+
+          expect(result.map(&:id)).to eq([2, 3, 4, 1])
+        end
+      end
+    end
+
     describe "custom columns" do
       before(:once) do
         first_column = @course.custom_gradebook_columns.create! title: "Custom Column 1"
