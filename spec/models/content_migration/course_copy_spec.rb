@@ -561,8 +561,7 @@ describe ContentMigration do
                                        })
 
       tool = reg.deployments.first
-
-      # For asserting context controls don't copy
+      Lti::ContextControl.create!(course: @copy_from, deployment: tool, available: false)
       reg.new_external_tool(@copy_from)
 
       @copy_from.lti_resource_links.create!(
@@ -606,7 +605,9 @@ describe ContentMigration do
       expect(@copy_to.tab_configuration).to eq @copy_from.tab_configuration
 
       expect(@copy_to.lti_resource_links.size).to eq 2
-      expect(Lti::ContextControl.where(course: @copy_to).size).to eq 0
+      controls = Lti::ContextControl.where(context: @copy_to)
+      expect(controls.size).to eq 1
+      expect(controls.first.deployment.context).to eq @copy_to
       rla = @copy_to.lti_resource_links.find { |rl| rl.lookup_uuid == "1b302c1e-c0a2-42dc-88b6-c029699a7c7a" }
       expect(rla.url).to eq "http://example.com/resource-link-url"
 
