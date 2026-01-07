@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,10 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "pages/shared/message_students.scss";
-@import "pages/learning_mastery/learning_outcome_gradebook.scss";
-@import "pages/learning_mastery/gradebook.scss";
-@import "pages/learning_mastery/grade_passback.scss";
-@import "pages/learning_mastery/student_assignment_tray.scss";
-@import "pages/assignments2_student/students_comments.scss";
+// Styles for the Student Assignment Detail Tray in Learning Mastery Gradebook
+
+// Hide read/unread badge in instructor view - this is a student-facing feature
+.learning-mastery-comments .comment-row-container [data-cid="Badge"] {
+  display: none;
+}
+
+// Hide file upload and media upload buttons - instructors typically don't need these
+.learning-mastery-comments #attachmentFileButton,
+.learning-mastery-comments #mediaCommentButton {
+  display: none;
+}
