@@ -37,4 +37,8 @@ class AccessibilityCourseStatistic < ApplicationRecord
   end
 
   scope :not_deleted, -> { where.not(workflow_state: "deleted") }
+
+  def calculation_pending?
+    queued? || in_progress?
+  end
 end
