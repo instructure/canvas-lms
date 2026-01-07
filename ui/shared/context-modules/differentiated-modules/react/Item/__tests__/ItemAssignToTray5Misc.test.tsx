@@ -20,7 +20,6 @@ import React from 'react'
 import {render, cleanup, screen, waitFor} from '@testing-library/react'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
 import ItemAssignToTray from '../ItemAssignToTray'
 import {
   DEFAULT_PROPS,
@@ -29,10 +28,12 @@ import {
   OVERRIDES,
   OVERRIDES_URL,
   renderComponent,
-  SECTIONS_URL,
+  server,
   setupBaseMocks,
   setupEnv,
   setupFlashHolder,
+  http,
+  HttpResponse,
 } from './ItemAssignToTrayTestUtils'
 
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
@@ -70,6 +71,7 @@ describe('ItemAssignToTray - Module Overrides', () => {
 
   beforeAll(() => {
     setupFlashHolder()
+    server.listen()
   })
 
   beforeEach(() => {
@@ -80,15 +82,20 @@ describe('ItemAssignToTray - Module Overrides', () => {
 
   afterEach(() => {
     window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
   })
 
+  afterAll(() => {
+    server.close()
+  })
+
   it('shows module cards if they are not overridden', async () => {
-    fetchMock.get(OVERRIDES_URL, DATE_DETAILS_WITHOUT_OVERRIDES, {
-      overwriteRoutes: true,
-    })
+    server.use(
+      http.get(OVERRIDES_URL, () => {
+        return HttpResponse.json(DATE_DETAILS_WITHOUT_OVERRIDES)
+      }),
+    )
     const {getByText, findAllByTestId, getByTestId} = renderComponent()
     const cards = await findAllByTestId('item-assign-to-card')
     expect(getByText('Inherited from')).toBeInTheDocument()
@@ -97,9 +104,11 @@ describe('ItemAssignToTray - Module Overrides', () => {
   })
 
   it('does not show overridden module cards', async () => {
-    fetchMock.get(OVERRIDES_URL, DATE_DETAILS_WITH_OVERRIDES, {
-      overwriteRoutes: true,
-    })
+    server.use(
+      http.get(OVERRIDES_URL, () => {
+        return HttpResponse.json(DATE_DETAILS_WITH_OVERRIDES)
+      }),
+    )
     const {queryByText, findAllByTestId, queryByTestId} = renderComponent()
     const cards = await findAllByTestId('item-assign-to-card')
     expect(queryByText('Inherited from')).not.toBeInTheDocument()
@@ -110,14 +119,29 @@ describe('ItemAssignToTray - Module Overrides', () => {
 
 describe('ItemAssignToTray - Paced Course with Mastery Paths', () => {
   const originalLocation = window.location
+  let sectionsFetched: ReturnType<typeof vi.fn>
+  let overridesFetched: ReturnType<typeof vi.fn>
 
   beforeAll(() => {
     setupFlashHolder()
+    server.listen()
   })
 
   beforeEach(() => {
+    sectionsFetched = vi.fn()
+    overridesFetched = vi.fn()
     setupEnv()
     setupBaseMocks()
+    server.use(
+      http.get(/\/api\/v1\/courses\/.+\/sections/, () => {
+        sectionsFetched()
+        return HttpResponse.json([])
+      }),
+      http.get(OVERRIDES_URL, () => {
+        overridesFetched()
+        return HttpResponse.json({})
+      }),
+    )
     ENV.IN_PACED_COURSE = true
     ENV.FEATURES ||= {}
     ENV.FEATURES.course_pace_pacing_with_mastery_paths = true
@@ -128,14 +152,19 @@ describe('ItemAssignToTray - Paced Course with Mastery Paths', () => {
     window.location = originalLocation
     ENV.IN_PACED_COURSE = false
     ENV.FEATURES.course_pace_pacing_with_mastery_paths = false
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
   })
 
-  it('does not fetch assignee options', () => {
+  afterAll(() => {
+    server.close()
+  })
+
+  it('does not fetch assignee options', async () => {
     renderComponent()
-    expect(fetchMock.calls(SECTIONS_URL)).toHaveLength(0)
+    // Wait a tick to ensure no async fetch would have been triggered
+    await new Promise(resolve => setTimeout(resolve, 50))
+    expect(sectionsFetched).not.toHaveBeenCalled()
   })
 
   describe('with mastery paths', () => {
@@ -147,9 +176,11 @@ describe('ItemAssignToTray - Paced Course with Mastery Paths', () => {
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
     })
 
-    it('requests the existing overrides', () => {
+    it('requests the existing overrides', async () => {
       renderComponent()
-      expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(1)
+      await waitFor(() => {
+        expect(overridesFetched).toHaveBeenCalledTimes(1)
+      })
     })
 
     it('shows the mastery path toggle', () => {
@@ -164,6 +195,7 @@ describe('ItemAssignToTray - Card Focus', () => {
 
   beforeAll(() => {
     setupFlashHolder()
+    server.listen()
   })
 
   beforeEach(() => {
@@ -174,9 +206,12 @@ describe('ItemAssignToTray - Card Focus', () => {
 
   afterEach(() => {
     window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('focuses on the add button when deleting a card', async () => {
@@ -214,6 +249,7 @@ describe('ItemAssignToTray - Pagination', () => {
 
   beforeAll(() => {
     setupFlashHolder()
+    server.listen()
   })
 
   beforeEach(() => {
@@ -224,9 +260,12 @@ describe('ItemAssignToTray - Pagination', () => {
 
   afterEach(() => {
     window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('fetches and combines multiple pages of overrides', async () => {
@@ -237,12 +276,6 @@ describe('ItemAssignToTray - Pagination', () => {
         {id: '2', title: 'Override 2'},
       ],
     }
-    const response1 = {
-      body: page1,
-      headers: {
-        Link: '</api/v1/courses/1/assignments/23/date_details?page=2&per_page=100>; rel="next"',
-      },
-    }
 
     const page2 = {
       id: '23',
@@ -251,37 +284,53 @@ describe('ItemAssignToTray - Pagination', () => {
         {id: '4', title: 'Override 4'},
       ],
     }
-    const response2 = {
-      body: page2,
-      headers: {
-        Link: '</api/v1/courses/1/assignments/23/date_details?page=3&per_page=100>; rel="next"',
-      },
-    }
 
     const page3 = {
       id: '23',
       overrides: [{id: '5', title: 'Override 5'}],
     }
-    const response3 = {
-      body: page3,
-    }
 
-    fetchMock.get(OVERRIDES_URL, response1, {overwriteRoutes: true})
-    fetchMock.get(`/api/v1/courses/1/assignments/23/date_details?page=2&per_page=100`, response2)
-    fetchMock.get(`/api/v1/courses/1/assignments/23/date_details?page=3&per_page=100`, response3)
+    let page1Fetched = false
+    let page2Fetched = false
+    let page3Fetched = false
+
+    // Use a single handler that matches all requests to this endpoint
+    server.use(
+      http.get('/api/v1/courses/1/assignments/23/date_details', ({request}) => {
+        const url = new URL(request.url)
+        const page = url.searchParams.get('page')
+        if (page === '2') {
+          page2Fetched = true
+          return new HttpResponse(JSON.stringify(page2), {
+            headers: {
+              'Content-Type': 'application/json',
+              Link: '</api/v1/courses/1/assignments/23/date_details?page=3&per_page=100>; rel="next"',
+            },
+          })
+        }
+        if (page === '3') {
+          page3Fetched = true
+          return HttpResponse.json(page3)
+        }
+        // Default: page 1
+        page1Fetched = true
+        return new HttpResponse(JSON.stringify(page1), {
+          headers: {
+            'Content-Type': 'application/json',
+            Link: '</api/v1/courses/1/assignments/23/date_details?page=2&per_page=100>; rel="next"',
+          },
+        })
+      }),
+    )
 
     const {findAllByTestId} = renderComponent()
 
     const cards = await findAllByTestId('item-assign-to-card')
     expect(cards).toHaveLength(5)
 
-    expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(1)
-    expect(
-      fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=2&per_page=100`),
-    ).toHaveLength(1)
-    expect(
-      fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=3&per_page=100`),
-    ).toHaveLength(1)
+    expect(page1Fetched).toBe(true)
+    expect(page2Fetched).toBe(true)
+    expect(page3Fetched).toBe(true)
   })
 })
 
@@ -290,6 +339,7 @@ describe('ItemAssignToTray - Group Set Handling', () => {
 
   beforeAll(() => {
     setupFlashHolder()
+    server.listen()
   })
 
   beforeEach(() => {
@@ -300,32 +350,32 @@ describe('ItemAssignToTray - Group Set Handling', () => {
 
   afterEach(() => {
     window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
   })
 
-  it('handles deleted group set gracefully without closing the tray', async () => {
-    fetchMock.get(
-      OVERRIDES_URL,
-      {
-        id: '23',
-        due_at: '2023-10-05T12:00:00Z',
-        unlock_at: '2023-10-01T12:00:00Z',
-        lock_at: '2023-11-01T12:00:00Z',
-        only_visible_to_overrides: false,
-        visible_to_everyone: true,
-        group_category_id: FIRST_GROUP_CATEGORY_ID,
-        overrides: [],
-      },
-      {
-        overwriteRoutes: true,
-      },
-    )
+  afterAll(() => {
+    server.close()
+  })
 
-    fetchMock.get(FIRST_GROUP_CATEGORY_URL, 404, {
-      overwriteRoutes: true,
-    })
+  it('handles deleted group set gracefully without closing the tray', async () => {
+    server.use(
+      http.get(OVERRIDES_URL, () => {
+        return HttpResponse.json({
+          id: '23',
+          due_at: '2023-10-05T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          only_visible_to_overrides: false,
+          visible_to_everyone: true,
+          group_category_id: FIRST_GROUP_CATEGORY_ID,
+          overrides: [],
+        })
+      }),
+      http.get(FIRST_GROUP_CATEGORY_URL, () => {
+        return new HttpResponse(null, {status: 404})
+      }),
+    )
 
     const onCloseMock = vi.fn()
     const onDismissMock = vi.fn()

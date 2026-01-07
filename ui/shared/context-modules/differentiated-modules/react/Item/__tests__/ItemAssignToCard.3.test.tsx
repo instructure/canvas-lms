@@ -20,9 +20,12 @@ import React from 'react'
 import {render, fireEvent, screen, waitFor} from '@testing-library/react'
 import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
+
+const server = setupServer()
 
 const props: ItemAssignToCardProps = {
   courseId: '1',
@@ -79,9 +82,8 @@ const _withWithGradingPeriodsMock = () => {
 }
 
 describe('ItemAssignToCard', () => {
-  const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/1/modules/2/assignment_overrides?per_page=100`
+  const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/1/modules/2/assignment_overrides`
   const COURSE_SETTINGS_URL = `/api/v1/courses/1/settings`
-  const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
 
   beforeAll(() => {
     if (!document.getElementById('flash_screenreader_holder')) {
@@ -90,6 +92,7 @@ describe('ItemAssignToCard', () => {
       liveRegion.setAttribute('role', 'alert')
       document.body.appendChild(liveRegion)
     }
+    server.listen()
   })
 
   beforeEach(() => {
@@ -97,17 +100,29 @@ describe('ItemAssignToCard', () => {
     window.ENV.HAS_GRADING_PERIODS = false
     window.ENV.active_grading_periods = []
     window.ENV.current_user_is_admin = false
-    fetchMock.get(SECTIONS_URL, SECTIONS_DATA)
+    server.use(
+      http.get(/\/api\/v1\/courses\/.+\/sections/, () => {
+        return HttpResponse.json(SECTIONS_DATA)
+      }),
+      http.get(ASSIGNMENT_OVERRIDES_URL, () => {
+        return HttpResponse.json([])
+      }),
+      http.get(COURSE_SETTINGS_URL, () => {
+        return HttpResponse.json({hide_final_grades: false})
+      }),
+    )
     queryClient.setQueryData(['students', props.courseId, {per_page: 100}], STUDENTS_DATA)
-    fetchMock.get(ASSIGNMENT_OVERRIDES_URL, [])
-    fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
     window.ENV.HAS_GRADING_PERIODS = false
     window.ENV.active_grading_periods = []
     window.ENV.current_user_is_admin = false
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   describe('when course and user timezones differ', () => {
@@ -133,7 +148,6 @@ describe('ItemAssignToCard', () => {
       const dateTimeInput = getByTestId('due_at_input')
       expect(dateTimeInput).toBeInTheDocument()
     })
-
 
     it('defaults to the default due time for due dates from ENV if has undefined due time', async () => {
       window.ENV.DEFAULT_DUE_TIME = '08:00:00'

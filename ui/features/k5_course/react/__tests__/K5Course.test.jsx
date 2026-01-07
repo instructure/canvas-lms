@@ -21,7 +21,6 @@ import {TAB_IDS} from '@canvas/k5/react/utils'
 import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObservee'
 import {MOCK_OBSERVED_USERS_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
 import {act, render, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
 import React from 'react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
@@ -141,29 +140,6 @@ const defaultProps = {
   isMasterCourse: false,
   showImmersiveReader: false,
 }
-const FETCH_IMPORTANT_INFO_URL = encodeURI('/api/v1/courses/30?include[]=syllabus_body')
-const FETCH_APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_30'
-
-const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
-const GRADING_PERIODS_URL = encodeURI(
-  '/api/v1/courses/30?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores',
-)
-const OBSERVER_GRADING_PERIODS_URL = encodeURI(
-  '/api/v1/courses/30?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores&include[]=observed_users',
-)
-const ASSIGNMENT_GROUPS_URL = encodeURI(
-  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments',
-)
-const OBSERVER_ASSIGNMENT_GROUPS_URL = encodeURI(
-  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments&include[]=observed_users',
-)
-const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments?user_id=1'
-const OBSERVER_ENROLLMENTS_URL = '/api/v1/courses/30/enrollments?user_id=1&include=observed_users'
-const ANNOUNEMENTS_URL_REGEX = /\/api\/v1\/announcements\.*/
-
-const GROUPS_URL = encodeURI(
-  '/api/v1/courses/30/groups?include[]=users&include[]=group_category&include[]=permissions&include_inactive_users=true&section_restricted=true&filter=',
-)
 
 const createModulesPartial = () => {
   const modulesContainer = document.createElement('div')
@@ -209,18 +185,37 @@ afterAll(() => {
 })
 
 beforeEach(() => {
-  fetchMock.get(FETCH_IMPORTANT_INFO_URL, MOCK_COURSE_SYLLABUS)
-  fetchMock.get(FETCH_APPS_URL, MOCK_COURSE_APPS)
-  fetchMock.get(FETCH_TABS_URL, MOCK_COURSE_TABS)
-  fetchMock.get(GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_EMPTY)
-  fetchMock.get(ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS)
-  fetchMock.get(ENROLLMENTS_URL, MOCK_ENROLLMENTS)
-  fetchMock.get(ANNOUNEMENTS_URL_REGEX, [])
-  fetchMock.get(GROUPS_URL, MOCK_GROUPS)
-
-  // Mock the Groups URL with MSW (used by Backbone)
   server.use(
-    http.get('/api/v1/courses/30/groups', () => {
+    http.get('*/api/v1/courses/30', ({request}) => {
+      const url = new URL(request.url)
+      const include = url.searchParams.getAll('include[]')
+      if (include.includes('syllabus_body')) {
+        return HttpResponse.json(MOCK_COURSE_SYLLABUS)
+      }
+      if (include.includes('grading_periods')) {
+        if (include.includes('observed_users')) {
+          return HttpResponse.json(MOCK_GRADING_PERIODS_EMPTY)
+        }
+        return HttpResponse.json(MOCK_GRADING_PERIODS_EMPTY)
+      }
+      return HttpResponse.json({})
+    }),
+    http.get('*/api/v1/external_tools/visible_course_nav_tools', () => {
+      return HttpResponse.json(MOCK_COURSE_APPS)
+    }),
+    http.get('*/api/v1/courses/30/tabs', () => {
+      return HttpResponse.json(MOCK_COURSE_TABS)
+    }),
+    http.get('*/api/v1/courses/30/assignment_groups', () => {
+      return HttpResponse.json(MOCK_ASSIGNMENT_GROUPS)
+    }),
+    http.get('*/api/v1/courses/30/enrollments', () => {
+      return HttpResponse.json(MOCK_ENROLLMENTS)
+    }),
+    http.get('*/api/v1/announcements', () => {
+      return HttpResponse.json([])
+    }),
+    http.get('*/api/v1/courses/30/groups', () => {
       return HttpResponse.json(MOCK_GROUPS)
     }),
   )
@@ -238,7 +233,6 @@ afterEach(() => {
   modulesContainer?.remove()
 
   localStorage.clear()
-  fetchMock.restore()
   server.resetHandlers()
   window.location.hash = ''
 })
@@ -464,8 +458,14 @@ describe('K-5 Subject Course', () => {
       expect(getByRole('button', {name: 'Cancel'})).toBeInTheDocument()
     })
 
-    it('sends a POST to drop the course after confirming in the modal', () => {
-      fetchMock.post('http://unenroll_url/', 200)
+    it('sends a POST to drop the course after confirming in the modal', async () => {
+      let postCalled = false
+      server.use(
+        http.post('http://unenroll_url/', () => {
+          postCalled = true
+          return new HttpResponse(null, {status: 200})
+        }),
+      )
       const selfEnrollment = {
         option: 'unenroll',
         url: 'http://unenroll_url/',
@@ -478,7 +478,7 @@ describe('K-5 Subject Course', () => {
       const dropButton = getAllByRole('button', {name: 'Drop this Subject'})[1]
       act(() => dropButton.click())
       expect(getByText('Dropping subject')).toBeInTheDocument()
-      expect(fetchMock.called(selfEnrollment.url)).toBeTruthy()
+      await waitFor(() => expect(postCalled).toBe(true))
     })
 
     it('renders neither if selfEnrollment is nil', () => {
@@ -780,7 +780,16 @@ describe('K-5 Subject Course', () => {
       })
 
       it('shows an error if syllabus content fails to load', async () => {
-        fetchMock.get(FETCH_IMPORTANT_INFO_URL, 400, {overwriteRoutes: true})
+        server.use(
+          http.get('*/api/v1/courses/30', ({request}) => {
+            const url = new URL(request.url)
+            const include = url.searchParams.getAll('include[]')
+            if (include.includes('syllabus_body')) {
+              return new HttpResponse(null, {status: 400})
+            }
+            return HttpResponse.json({})
+          }),
+        )
         const {findAllByText} = render(
           <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />,
         )
@@ -790,9 +799,6 @@ describe('K-5 Subject Course', () => {
     })
 
     describe('apps section', () => {
-      afterEach(() => {
-        fetchMock.restore()
-      })
       it("displays user's apps", async () => {
         const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
         await waitFor(() => {
@@ -812,31 +818,83 @@ describe('K-5 Subject Course', () => {
       })
 
       it('shows an error if apps fail to load', async () => {
-        fetchMock.get(FETCH_APPS_URL, 400, {overwriteRoutes: true})
+        server.use(
+          http.get('*/api/v1/external_tools/visible_course_nav_tools', () => {
+            return new HttpResponse(null, {status: 400})
+          }),
+        )
         const {getAllByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
         await waitFor(() => expect(getAllByText('Failed to load apps.')[0]).toBeInTheDocument())
       })
     })
 
     it('does not load content until tab is active', async () => {
+      let syllabusRequested = false
+      let appsRequested = false
+      server.use(
+        http.get('*/api/v1/courses/30', ({request}) => {
+          const url = new URL(request.url)
+          const include = url.searchParams.getAll('include[]')
+          if (include.includes('syllabus_body')) {
+            syllabusRequested = true
+            return HttpResponse.json(MOCK_COURSE_SYLLABUS)
+          }
+          if (include.includes('grading_periods')) {
+            return HttpResponse.json(MOCK_GRADING_PERIODS_EMPTY)
+          }
+          return HttpResponse.json({})
+        }),
+        http.get('*/api/v1/external_tools/visible_course_nav_tools', () => {
+          appsRequested = true
+          return HttpResponse.json(MOCK_COURSE_APPS)
+        }),
+      )
       const {getByText, findByText} = render(
         <K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />,
       )
       expect(getByText('Time to learn!')).toBeInTheDocument()
-      expect(fetchMock.called(FETCH_IMPORTANT_INFO_URL)).toBeFalsy()
-      expect(fetchMock.called(FETCH_APPS_URL)).toBeFalsy()
+      expect(syllabusRequested).toBe(false)
+      expect(appsRequested).toBe(false)
       act(() => getByText('Resources').click())
       expect(await findByText('This is really important.')).toBeInTheDocument()
-      expect(fetchMock.called(FETCH_IMPORTANT_INFO_URL)).toBeTruthy()
-      expect(fetchMock.called(FETCH_APPS_URL)).toBeTruthy()
+      expect(syllabusRequested).toBe(true)
+      expect(appsRequested).toBe(true)
     })
   })
 
   describe('Observer Support', () => {
     beforeEach(() => {
-      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_EMPTY)
-      fetchMock.get(OBSERVER_ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
-      fetchMock.get(OBSERVER_ENROLLMENTS_URL, MOCK_ENROLLMENTS_WITH_OBSERVED_USERS)
+      server.use(
+        http.get('*/api/v1/courses/30', ({request}) => {
+          const url = new URL(request.url)
+          const include = url.searchParams.getAll('include[]')
+          if (include.includes('grading_periods') && include.includes('observed_users')) {
+            return HttpResponse.json(MOCK_GRADING_PERIODS_EMPTY)
+          }
+          if (include.includes('syllabus_body')) {
+            return HttpResponse.json(MOCK_COURSE_SYLLABUS)
+          }
+          if (include.includes('grading_periods')) {
+            return HttpResponse.json(MOCK_GRADING_PERIODS_EMPTY)
+          }
+          return HttpResponse.json({})
+        }),
+        http.get('*/api/v1/courses/30/assignment_groups', ({request}) => {
+          const url = new URL(request.url)
+          const include = url.searchParams.getAll('include[]')
+          if (include.includes('observed_users')) {
+            return HttpResponse.json(MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
+          }
+          return HttpResponse.json(MOCK_ASSIGNMENT_GROUPS)
+        }),
+        http.get('*/api/v1/courses/30/enrollments', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('include') === 'observed_users') {
+            return HttpResponse.json(MOCK_ENROLLMENTS_WITH_OBSERVED_USERS)
+          }
+          return HttpResponse.json(MOCK_ENROLLMENTS)
+        }),
+      )
     })
 
     afterEach(() => {

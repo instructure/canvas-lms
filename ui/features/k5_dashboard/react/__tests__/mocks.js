@@ -17,7 +17,12 @@
  */
 import {http, HttpResponse} from 'msw'
 import moment from 'moment-timezone'
-import {MOCK_CARDS, MOCK_PLANNER_ITEM} from '@canvas/k5/react/__tests__/fixtures'
+import {
+  MOCK_CARDS,
+  MOCK_PLANNER_ITEM,
+  MOCK_ASSIGNMENTS,
+  MOCK_EVENTS,
+} from '@canvas/k5/react/__tests__/fixtures'
 
 export const MOCK_TODOS = [
   {
@@ -196,6 +201,181 @@ export function createPlannerMocks() {
     http.get('/api/v1/users/self/missing_submission*', () =>
       HttpResponse.json(opportunities, {headers: {link: 'url; rel="current"'}}),
     ),
+  ]
+}
+
+// Common test data for K5 Dashboard tests
+export const k5DashboardAnnouncements = [
+  {
+    id: '20',
+    context_code: 'course_2',
+    title: 'Announcement here',
+    message: '<p>This is the announcement</p>',
+    html_url: 'http://google.com/announcement',
+    permissions: {
+      update: true,
+    },
+    attachments: [
+      {
+        display_name: 'exam1.pdf',
+        url: 'http://google.com/download',
+        filename: '1608134586_366__exam1.pdf',
+      },
+    ],
+  },
+  {
+    id: '21',
+    context_code: 'course_1',
+    title: "This sure isn't a homeroom",
+    message: '<p>Definitely not!</p>',
+    html_url: '/courses/1/announcements/21',
+  },
+]
+
+export const k5DashboardGradeCourses = [
+  {
+    id: '1',
+    name: 'Economics 101',
+    has_grading_periods: false,
+    enrollments: [
+      {
+        computed_current_score: 82,
+        computed_current_grade: 'B-',
+        type: 'student',
+      },
+    ],
+    homeroom_course: false,
+  },
+  {
+    id: '2',
+    name: 'Homeroom Class',
+    has_grading_periods: false,
+    enrollments: [
+      {
+        computed_current_score: null,
+        computed_current_grade: null,
+        type: 'student',
+      },
+    ],
+    homeroom_course: true,
+  },
+]
+
+export const k5DashboardSyllabus = {
+  id: '2',
+  syllabus_body: "<p>Here's the grading scheme for this class.</p>",
+}
+
+export const k5DashboardApps = [
+  {
+    id: '17',
+    course_navigation: {
+      text: 'Google Apps',
+      icon_url: 'google.png',
+    },
+    context_id: '1',
+    context_name: 'Economics 101',
+  },
+]
+
+export const k5DashboardStaff = [
+  {
+    id: '1',
+    short_name: 'Mrs. Thompson',
+    bio: 'Office Hours: 1-3pm W',
+    avatar_url: '/images/avatar1.png',
+    enrollments: [
+      {
+        role: 'TeacherEnrollment',
+      },
+    ],
+  },
+  {
+    id: '2',
+    short_name: 'Tommy the TA',
+    bio: 'Office Hours: 1-3pm F',
+    avatar_url: '/images/avatar2.png',
+    enrollments: [
+      {
+        role: 'TaEnrollment',
+      },
+    ],
+  },
+]
+
+/**
+ * Creates a request tracker for MSW handlers.
+ * Use this to track API calls similar to fetchMock.calls()
+ */
+export function createRequestTracker() {
+  const requests = []
+  return {
+    track: request => {
+      requests.push({
+        url: request.url,
+        method: request.method,
+        body: request.body,
+      })
+    },
+    calls: pattern => {
+      if (!pattern) return requests
+      const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern)
+      return requests.filter(r => regex.test(r.url))
+    },
+    lastUrl: pattern => {
+      const calls = pattern ? this.calls(pattern) : requests
+      return calls.length > 0 ? calls[calls.length - 1].url : null
+    },
+    called: pattern => this.calls(pattern).length > 0,
+    reset: () => {
+      requests.length = 0
+    },
+  }
+}
+
+/**
+ * Creates MSW handlers for K5 Dashboard API endpoints.
+ * @param {Object} overrides - Optional overrides for default mock data
+ * @returns {Array} Array of MSW request handlers
+ */
+export function createK5DashboardMocks(overrides = {}) {
+  const {
+    announcements = k5DashboardAnnouncements,
+    gradeCourses = k5DashboardGradeCourses,
+    syllabus = k5DashboardSyllabus,
+    apps = k5DashboardApps,
+    staff = k5DashboardStaff,
+    todos = MOCK_TODOS,
+    assignments = MOCK_ASSIGNMENTS,
+    events = MOCK_EVENTS,
+  } = overrides
+
+  return [
+    http.get(/\/api\/v1\/announcements.*/, () => HttpResponse.json(announcements)),
+    http.get(/\/api\/v1\/users\/self\/courses.*/, () => HttpResponse.json(gradeCourses)),
+    http.get('api/v1/courses/2', ({request}) => {
+      const url = new URL(request.url, 'http://localhost')
+      if (url.searchParams.get('include[]') === 'syllabus_body') {
+        return HttpResponse.json(syllabus)
+      }
+      return HttpResponse.json({id: '2'})
+    }),
+    http.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, () =>
+      HttpResponse.json(apps),
+    ),
+    http.get(/\/api\/v1\/courses\/2\/users.*/, () => HttpResponse.json(staff)),
+    http.get(/\/api\/v1\/users\/self\/todo.*/, () => HttpResponse.json(todos)),
+    http.put('/api/v1/users/self/settings', () => HttpResponse.json({})),
+    http.get(/\/api\/v1\/calendar_events\?type=assignment&important_dates=true.*/, () =>
+      HttpResponse.json(assignments),
+    ),
+    http.get(/\/api\/v1\/calendar_events\?type=event&important_dates=true.*/, () =>
+      HttpResponse.json(events),
+    ),
+    http.post(/\/api\/v1\/calendar_events\/save_selected_contexts.*/, () =>
+      HttpResponse.json({status: 'ok'}),
+    ),
+    http.put(/\/api\/v1\/users\/\d+\/colors.*/, () => HttpResponse.json([])),
   ]
 }
 

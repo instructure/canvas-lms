@@ -18,7 +18,8 @@
 
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import HomeroomAnnouncementsLayout from '../HomeroomAnnouncementsLayout'
 
 const homeroomAnnouncements = [
@@ -67,6 +68,16 @@ const homeroomAnnouncements = [
   },
 ]
 
+const server = setupServer(
+  http.get(/\/api\/v1\/announcements.*/, () =>
+    HttpResponse.json([], {
+      headers: {
+        Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"',
+      },
+    }),
+  ),
+)
+
 describe('HomeroomAnnouncementsLayout', () => {
   const getProps = (overrides = {}) => ({
     homeroomAnnouncements,
@@ -74,22 +85,12 @@ describe('HomeroomAnnouncementsLayout', () => {
     ...overrides,
   })
 
-  beforeEach(() => {
-    fetchMock.get(
-      /\/api\/v1\/announcements/,
-      {
-        body: '[]',
-        headers: {
-          Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"',
-        },
-      },
-      {},
-    )
-  })
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   afterEach(() => {
     localStorage.clear()
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   it('renders a view for each child passed', () => {
@@ -139,9 +140,8 @@ describe('HomeroomAnnouncementsLayout', () => {
     )
     // The Homeroom header is rendered by default, then removed
     // if the request for old announcements returns nothing.
-    // Wait for the fetch to complete before continuing.
-    await waitFor(() => fetchMock.done())
-    expect(queryByText('New Homeroom')).not.toBeInTheDocument()
+    // Wait for the fetch to complete and component to update.
+    await waitFor(() => expect(queryByText('New Homeroom')).not.toBeInTheDocument())
     expect(
       queryByText('New announcements show up in this area. Create a new announcement now.'),
     ).not.toBeInTheDocument()
