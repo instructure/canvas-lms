@@ -36,6 +36,7 @@ import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalS
 import {useAssetProcessorsToolsList} from '../hooks/useAssetProcessorsToolsList'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 vi.mock('@canvas/external-tools/messages')
 
@@ -52,12 +53,26 @@ const server = setupServer(
 describe('AssetProcessorsAddModal', () => {
   let mockOnProcessorResponse: any
   const queryClient = new QueryClient()
+  let originalPostMessage: typeof window.postMessage
 
-  beforeAll(() => server.listen())
-  afterAll(() => server.close())
+  beforeAll(() => {
+    server.listen()
+    // Save original postMessage for restoration
+    originalPostMessage = window.postMessage.bind(window)
+  })
+  afterAll(() => {
+    server.close()
+    // Restore original postMessage
+    window.postMessage = originalPostMessage
+  })
 
   beforeEach(() => {
+    fakeENV.setup()
     mockOnProcessorResponse = vi.fn()
+    // Mock postMessage globally to prevent jsdom errors with _origin being null.
+    // This is needed because monitorLtiMessages() adds a persistent listener that
+    // tries to respond to LTI messages via postMessage, which fails in jsdom.
+    window.postMessage = vi.fn()
   })
 
   afterEach(() => {
@@ -66,6 +81,7 @@ describe('AssetProcessorsAddModal', () => {
     vi.clearAllMocks()
     // Reset Zustand store state to prevent test pollution
     useAssetProcessorsAddModalState.getState().actions.close()
+    fakeENV.teardown()
   })
 
   function renderModal(type: AssetProcessorType) {
@@ -246,9 +262,10 @@ describe('AssetProcessorsAddModal', () => {
     const iframe = (await waitFor(() =>
       getByTitle('Configure new document processing app'),
     )) as HTMLIFrameElement
-    const source = iframe.contentWindow as Window
-    // If we don't overwrite postMessage we get some strange internal error in jsdom's postMessage
-    vi.spyOn(source, 'postMessage').mockImplementation(() => {})
+    // Also mock postMessage on the iframe's contentWindow since jsdom may route through it
+    if (iframe.contentWindow) {
+      iframe.contentWindow.postMessage = vi.fn()
+    }
 
     monitorLtiMessages()
 

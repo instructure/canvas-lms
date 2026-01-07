@@ -120,6 +120,9 @@ export default defineConfig({
   test: {
     testTimeout: 15000,
     environment: 'jsdom',
+    sequence: {
+      shuffle: true,
+    },
     reporters: [
       'default',
       [

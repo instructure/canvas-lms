@@ -93,12 +93,18 @@ describe('ProgressHelpers', () => {
 
       const setCurrentProgress = vi.fn()
       monitorProgress('3533', setCurrentProgress, () => {}, 50) // Use shorter polling interval
-      await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(1))
-      expect(apiCallCount).toBe(1)
-      await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(2))
-      expect(apiCallCount).toBe(2)
-      await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(3))
-      expect(apiCallCount).toBe(3)
+      await waitFor(() => {
+        expect(setCurrentProgress).toHaveBeenCalledTimes(1)
+        expect(apiCallCount).toBe(1)
+      })
+      await waitFor(() => {
+        expect(setCurrentProgress).toHaveBeenCalledTimes(2)
+        expect(apiCallCount).toBe(2)
+      })
+      await waitFor(() => {
+        expect(setCurrentProgress).toHaveBeenCalledTimes(3)
+        expect(apiCallCount).toBe(3)
+      })
     })
 
     it('polls for progress until failed', async () => {

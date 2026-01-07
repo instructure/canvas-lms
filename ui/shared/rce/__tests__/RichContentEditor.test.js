@@ -50,7 +50,9 @@ describe('RichContentEditor', () => {
     it('returns the given element if the id is missing', () => {
       const $el = $('<div/>')
       const $fresh = RichContentEditor.freshNode($el)
-      expect($fresh[0]).toBe($el[0])
+      // Check that we get back the same DOM node (not necessarily same jQuery wrapper)
+      expect($fresh).toHaveLength(1)
+      expect($fresh[0]).toEqual($el[0])
     })
   })
 

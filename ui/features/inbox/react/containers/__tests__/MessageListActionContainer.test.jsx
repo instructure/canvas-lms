@@ -23,9 +23,10 @@ import MessageListActionContainer from '../MessageListActionContainer'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {setupServer} from 'msw/node'
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import * as utils from '../../../util/utils'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 vi.mock('../../../util/utils', async () => {
   const actual = await vi.importActual('../../../util/utils')
@@ -54,18 +55,18 @@ describe('MessageListActionContainer', () => {
     })
   })
 
+  beforeEach(() => {
+    mswClient.cache.reset()
+    fakeENV.setup({current_user_id: '1'})
+  })
+
   afterEach(() => {
     server.resetHandlers()
+    fakeENV.teardown()
   })
 
   afterAll(() => {
     server.close()
-  })
-
-  beforeEach(() => {
-    window.ENV = {
-      current_user_id: 1,
-    }
   })
 
   const setup = overrideProps => {
@@ -114,17 +115,19 @@ describe('MessageListActionContainer', () => {
     })
 
     it('should render concluded courses', async () => {
-      const {findByTestId, queryAllByText} = setup()
+      const user = userEvent.setup()
+      const {findByTestId, findAllByText} = setup()
       const courseDropdown = await findByTestId('course-select')
-      fireEvent.click(courseDropdown)
-      expect(await queryAllByText('Ipsum')).toHaveLength(4)
+      await user.click(courseDropdown)
+      expect(await findAllByText('Ipsum')).toHaveLength(4)
     })
 
     it('should render concluded groups in list action container', async () => {
-      const {findByTestId, queryByText} = setup()
+      const user = userEvent.setup()
+      const {findByTestId, findByText} = setup()
       const courseDropdown = await findByTestId('course-select')
-      fireEvent.click(courseDropdown)
-      expect(await queryByText('concluded_group')).toBeInTheDocument()
+      await user.click(courseDropdown)
+      expect(await findByText('concluded_group')).toBeInTheDocument()
     })
 
     it('should call onCourseFilterSelect when course selected', async () => {
