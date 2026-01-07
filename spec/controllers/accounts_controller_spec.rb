@@ -1858,6 +1858,69 @@ describe AccountsController do
       end
     end
 
+    context "accessibility_course_statistic" do
+      before do
+        @account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+      end
+
+      it "includes accessibility_course_statistic when included in the includes param" do
+        admin_logged_in(@account)
+        statistic = AccessibilityCourseStatistic.create!(
+          course: @c1,
+          active_issue_count: 5,
+          workflow_state: "active"
+        )
+        get "courses_api", params: { account_id: @account.id, include: ["accessibility_course_statistic"] }
+
+        expect(response).to be_successful
+        courses = response.parsed_body
+        course1 = courses.find { |c| c["id"] == @c1.id }
+        expect(course1["accessibility_course_statistic"]).not_to be_nil
+        expect(course1["accessibility_course_statistic"]["id"]).to eq statistic.id
+        expect(course1["accessibility_course_statistic"]["course_id"]).to eq @c1.id
+        expect(course1["accessibility_course_statistic"]["active_issue_count"]).to eq 5
+        expect(course1["accessibility_course_statistic"]["workflow_state"]).to eq "active"
+      end
+
+      it "does not include accessibility_course_statistic when not in includes param" do
+        admin_logged_in(@account)
+        AccessibilityCourseStatistic.create!(
+          course: @c1,
+          active_issue_count: 5,
+          workflow_state: "active"
+        )
+        get "courses_api", params: { account_id: @account.id }
+
+        expect(response).to be_successful
+        expect(response.body).not_to match(/"accessibility_course_statistic"/)
+      end
+
+      it "returns null accessibility_course_statistic when course has no statistic" do
+        admin_logged_in(@account)
+        get "courses_api", params: { account_id: @account.id, include: ["accessibility_course_statistic"] }
+
+        expect(response).to be_successful
+        courses = response.parsed_body
+        course1 = courses.find { |c| c["id"] == @c1.id }
+        expect(course1["accessibility_course_statistic"]).to be_nil
+      end
+
+      it "does not include accessibility_course_statistic when a11y_checker_account_statistics is not enabled" do
+        Account.site_admin.disable_feature!(:a11y_checker_account_statistics)
+        admin_logged_in(@account)
+        AccessibilityCourseStatistic.create!(
+          course: @c1,
+          active_issue_count: 5,
+          workflow_state: "active"
+        )
+        get "courses_api", params: { account_id: @account.id, include: ["accessibility_course_statistic"] }
+
+        expect(response).to be_successful
+        expect(response.body).not_to match(/"accessibility_course_statistic"/)
+      end
+    end
+
     it "sets pagination total_pages/last page link for session-authenticated requests" do
       admin_logged_in(@account)
       get "courses_api", params: { account_id: @account.id, per_page: 1 }

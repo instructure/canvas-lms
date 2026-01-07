@@ -947,6 +947,7 @@ class AccountsController < ApplicationController
       course_preloads << :default_post_policy if includes.include?("post_manually")
       course_preloads << :active_teachers if includes.include?("active_teachers")
       course_preloads << :enrollment_term if includes.include?("term") || includes.include?("concluded")
+      course_preloads << :accessibility_course_statistic if includes.include?("accessibility_course_statistic") && @account.can_see_accessibility_tab?(@current_user)
       ActiveRecord::Associations.preload(@courses, course_preloads)
 
       preload_teachers(@courses) if includes.include?("teachers")

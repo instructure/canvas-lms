@@ -83,7 +83,12 @@ describe('useCourses', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(requestParams?.get('include[]')).toContain('total_students')
+    const includeParams = requestParams?.getAll('include[]')
+    expect(includeParams).toContain('total_students')
+    expect(includeParams).toContain('active_teachers')
+    expect(includeParams).toContain('subaccount')
+    expect(includeParams).toContain('term')
+    expect(includeParams).toContain('accessibility_course_statistic')
     expect(requestParams?.get('teacher_limit')).toBe('25')
     expect(requestParams?.get('per_page')).toBe('15')
     expect(requestParams?.get('no_avatar_fallback')).toBe('1')
@@ -148,5 +153,40 @@ describe('useCourses', () => {
 
     const cachedData = queryClient.getQueryData(['accessibility-courses', accountId])
     expect(cachedData).toBeTruthy()
+  })
+
+  it('includes accessibility_course_statistic in response', async () => {
+    const mockCourses = createMockCourses(1)
+    server.use(
+      http.get(`/api/v1/accounts/${accountId}/courses`, () => {
+        return HttpResponse.json(mockCourses)
+      }),
+    )
+
+    const {result} = renderHook(() => useCourses({accountId}), {wrapper})
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    const course = result.current.data?.courses[0]
+    expect(course?.accessibility_course_statistic).toBeDefined()
+    expect(course?.accessibility_course_statistic?.id).toBe(1)
+    expect(course?.accessibility_course_statistic?.active_issue_count).toBe(5)
+    expect(course?.accessibility_course_statistic?.workflow_state).toBe('active')
+  })
+
+  it('handles courses without accessibility_course_statistic', async () => {
+    const mockCourses = createMockCourses(1, {accessibility_course_statistic: null})
+    server.use(
+      http.get(`/api/v1/accounts/${accountId}/courses`, () => {
+        return HttpResponse.json(mockCourses)
+      }),
+    )
+
+    const {result} = renderHook(() => useCourses({accountId}), {wrapper})
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    const course = result.current.data?.courses[0]
+    expect(course?.accessibility_course_statistic).toBeNull()
   })
 })
