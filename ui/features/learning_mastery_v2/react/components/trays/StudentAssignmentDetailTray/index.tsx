@@ -29,6 +29,7 @@ import {AssignmentSection} from './AssignmentSection'
 import {NavigatorProps} from './Navigator'
 import {StudentSection} from './StudentSection'
 import {OutcomeResultSection} from './OutcomeResultSection'
+import {CommentsSection} from './CommentsSection'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -122,6 +123,8 @@ export const StudentAssignmentDetailTray: React.FC<StudentAssignmentDetailTrayPr
           rollups={rollups}
           outcomes={outcomes}
         />
+        <hr />
+        <CommentsSection courseId={courseId} assignmentId={assignment.id} studentId={student.id} />
       </Flex>
     </Tray>
   )

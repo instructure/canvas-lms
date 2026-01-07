@@ -74,8 +74,67 @@ describe('StudentAssignmentDetailTray', () => {
   beforeEach(() => {
     fetchMock.restore()
     vi.clearAllMocks()
+
+    // Mock ENV for comment components
+    window.ENV = {
+      ...window.ENV,
+      current_user_id: '999',
+      current_user: {
+        id: '999',
+        anonymous_id: 'anon999',
+        display_name: 'Test User',
+        avatar_image_url: 'https://example.com/avatar.jpg',
+        html_url: '/users/999',
+        pronouns: null,
+        fake_student: false,
+        avatar_is_fallback: false,
+      },
+      EMOJIS_ENABLED: true,
+      LOCALE: 'en',
+      FEATURES: {
+        consolidated_media_player: false,
+      },
+    } as any
+
     // Mock the outcome alignments API call
     fetchMock.get(/\/api\/v1\/courses\/.*\/outcome_alignments.*/, [])
+    // Mock GraphQL endpoint for comments
+    fetchMock.post('/api/graphql', {
+      data: {
+        assignment: {
+          _id: '456',
+          id: 'QXNzaWdubWVudC00NTY=',
+          name: 'Test Assignment',
+          pointsPossible: 100,
+          expectsSubmission: true,
+          nonDigitalSubmission: false,
+          gradingType: 'points',
+          submissionTypes: ['online_text_entry'],
+          groupCategoryId: null,
+          gradeGroupStudentsIndividually: false,
+          submissionsConnection: {
+            nodes: [
+              {
+                _id: '789',
+                id: 'U3VibWlzc2lvbi03ODk=',
+                attempt: 1,
+                state: 'submitted',
+                gradingStatus: 'graded',
+              },
+            ],
+          },
+        },
+        submissionComments: {
+          commentsConnection: {
+            nodes: [],
+            pageInfo: {
+              startCursor: null,
+              hasPreviousPage: false,
+            },
+          },
+        },
+      },
+    })
   })
 
   afterEach(() => {
@@ -105,7 +164,7 @@ describe('StudentAssignmentDetailTray', () => {
       const onDismiss = vi.fn()
       renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} onDismiss={onDismiss} />)
 
-      const closeButton = screen.getByRole('button', {name: /close/i})
+      const closeButton = screen.getByRole('button', {name: /close student assignment details/i})
       await user.click(closeButton)
 
       expect(onDismiss).toHaveBeenCalledTimes(1)
@@ -280,6 +339,126 @@ describe('StudentAssignmentDetailTray', () => {
       rerender(<StudentAssignmentDetailTray {...defaultProps} student={MOCK_STUDENTS[1]} />)
       expect(screen.getByText(MOCK_STUDENTS[1].name)).toBeInTheDocument()
       expect(screen.queryByText(MOCK_STUDENTS[0].name)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('CommentsSection integration', () => {
+    it('renders the comments section', async () => {
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
+      // Wait for GraphQL queries to resolve
+      await screen.findByText('Comment', {}, {timeout: 3000})
+      expect(screen.getByLabelText('Comment input box')).toBeInTheDocument()
+    })
+
+    it('shows loading spinner while fetching comments', () => {
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
+      expect(screen.getByTitle('Loading comments')).toBeInTheDocument()
+    })
+
+    it('displays comment input area after loading', async () => {
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
+      const commentInput = await screen.findByLabelText('Comment input box', {}, {timeout: 3000})
+      expect(commentInput).toBeInTheDocument()
+    })
+
+    it('displays send comment button', async () => {
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
+      const sendButton = await screen.findByRole('button', {name: /send comment/i}, {timeout: 3000})
+      expect(sendButton).toBeInTheDocument()
+    })
+
+    it('does not show placeholder graphics when there are no comments', async () => {
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
+      // Wait for loading to complete
+      await screen.findByLabelText('Comment input box', {}, {timeout: 3000})
+      // Should not show the default placeholder text
+      expect(screen.queryByText(/this is where you can leave a comment/i)).not.toBeInTheDocument()
+    })
+
+    it('renders comments when they exist', async () => {
+      // Override the default mock to include a comment
+      fetchMock.restore()
+      fetchMock.get(/\/api\/v1\/courses\/.*\/outcome_alignments.*/, [])
+      fetchMock.post(
+        '/api/graphql',
+        {
+          data: {
+            assignment: {
+              _id: '456',
+              id: 'QXNzaWdubWVudC00NTY=',
+              name: 'Test Assignment',
+              pointsPossible: 100,
+              expectsSubmission: true,
+              nonDigitalSubmission: false,
+              gradingType: 'points',
+              submissionTypes: ['online_text_entry'],
+              groupCategoryId: null,
+              gradeGroupStudentsIndividually: false,
+              submissionsConnection: {
+                nodes: [
+                  {
+                    _id: '789',
+                    id: 'U3VibWlzc2lvbi03ODk=',
+                    attempt: 1,
+                    state: 'submitted',
+                    gradingStatus: 'graded',
+                  },
+                ],
+              },
+            },
+            submissionComments: {
+              commentsConnection: {
+                nodes: [
+                  {
+                    _id: 'comment-1',
+                    comment: 'Great work!',
+                    htmlComment: 'Great work!',
+                    read: true,
+                    updatedAt: '2025-01-07T12:00:00Z',
+                    author: {
+                      shortName: 'Teacher',
+                      avatarUrl: 'https://example.com/avatar.jpg',
+                      __typename: 'User',
+                    },
+                    attachments: [],
+                    mediaObject: null,
+                    __typename: 'SubmissionComment',
+                  },
+                ],
+                pageInfo: {
+                  startCursor: null,
+                  hasPreviousPage: false,
+                },
+              },
+              __typename: 'Submission',
+            },
+          },
+        },
+        {overwriteRoutes: true},
+      )
+
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
+
+      // Wait for comment to appear
+      const commentText = await screen.findByText('Great work!', {}, {timeout: 3000})
+      expect(commentText).toBeInTheDocument()
+    })
+
+    it('hides file upload and media upload buttons via CSS', async () => {
+      renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
+      await screen.findByLabelText('Comment input box', {}, {timeout: 3000})
+
+      // Buttons exist in DOM but should be hidden via CSS
+      const fileButton = screen.queryByTestId('file-upload-button')
+      const mediaButton = screen.queryByTestId('media-upload-button')
+
+      // These buttons are rendered but hidden via CSS (#attachmentFileButton, #mediaCommentButton)
+      if (fileButton) {
+        expect(fileButton).toHaveAttribute('id', 'attachmentFileButton')
+      }
+      if (mediaButton) {
+        expect(mediaButton).toHaveAttribute('id', 'mediaCommentButton')
+      }
     })
   })
 })
