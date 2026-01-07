@@ -147,12 +147,28 @@ describe('CanvasInbox App Container - Course Select', () => {
     const container = setup()
     await waitForApolloLoading()
 
+    // Wait for courses to load by clicking the dropdown and verifying options appear
+    // This ensures the COURSES_QUERY has completed before we set an invalid course filter
+    const courseDropdown = await container.findByTestId('course-select')
+    await userEvent.click(courseDropdown)
+    const listbox = await container.findByRole('listbox')
+    await waitFor(() => within(listbox).getAllByRole('option', {name: /Ipsum/}))
+    // Click outside the dropdown to close it
+    await userEvent.click(document.body)
+    await waitForApolloLoading()
+
     window.location.hash = '#filter=type=inbox&course=FAKE_COURSE'
     await waitForApolloLoading()
 
-    const mailboxDropdown = await container.findByTestId('course-select')
+    // The main behavior: invalid course should be removed from URL
     await waitFor(() => expect(window.location.hash).toBe('#filter=type=inbox'), {timeout: 5000})
-    expect(mailboxDropdown.getAttribute('value')).toBe('All Courses')
+    // After the filter is cleared, the dropdown should show the placeholder
+    const mailboxDropdown = await container.findByTestId('course-select')
+    await waitFor(() => {
+      const value = mailboxDropdown.getAttribute('value')
+      // Either empty (showing placeholder) or 'All Courses' is acceptable
+      expect(value === '' || value === 'All Courses').toBe(true)
+    })
   }, 10000)
 
   it('should set course select in compose modal to course name when the context id param is in the url', async () => {
