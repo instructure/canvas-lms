@@ -17,16 +17,14 @@
  */
 
 import $ from 'jquery'
-import * as uploadFileModule from '@canvas/upload-file'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import FileUpload from '../FileUpload'
-import {fireEvent, render} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/client/testing'
 import React, {createRef} from 'react'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
-import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 
 vi.mock('@canvas/upload-file', () => ({
   uploadFile: vi.fn().mockImplementation(file => {
@@ -81,18 +79,10 @@ async function makeProps(overrides) {
   return props
 }
 
-describe('FileUpload - Management and Extensions', () => {
+describe('FileUpload - File Management', () => {
   beforeAll(() => {
     $('body').append('<div role="alert" id="flash_screenreader_holder" />')
   })
-
-  const uploadFiles = (element, files) => {
-    fireEvent.change(element, {
-      target: {
-        files,
-      },
-    })
-  }
 
   it('renders a button to remove the file', async () => {
     const mocks = await createGraphqlMocks()
@@ -182,105 +172,6 @@ describe('FileUpload - Management and Extensions', () => {
     expect(emptyRender).toContainElement(await findByRole('button', {name: /Files/}))
   })
 
-  it('displays allowed extensions in the upload box', async () => {
-    const mocks = await createGraphqlMocks()
-    const props = await makeProps({
-      Assignment: {allowedExtensions: ['jpg, png']},
-    })
-    const {getByTestId, getByText} = render(
-      <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
-      </MockedProvider>,
-    )
-    const emptyRender = getByTestId('upload-box')
-
-    expect(emptyRender).toContainElement(getByText('File permitted: JPG, PNG'))
-  })
-
-  it('does not display any allowed extensions if there are none', async () => {
-    const mocks = await createGraphqlMocks()
-    const props = await makeProps()
-    const {getByTestId, queryByText} = render(
-      <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
-      </MockedProvider>,
-    )
-    const emptyRender = getByTestId('upload-box')
-
-    expect(emptyRender).not.toContainElement(queryByText('File permitted'))
-  })
-
-  it('renders an error when adding a file that is not an allowed extension', async () => {
-    const mocks = await createGraphqlMocks()
-    const props = await makeProps({
-      Assignment: {allowedExtensions: ['jpg']},
-    })
-    const {container, getByText} = render(
-      <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
-      </MockedProvider>,
-    )
-    const fileInput = container.querySelector('input[id="inputFileDrop"]')
-    const file = new Blob(['foo'], {type: 'application/pdf'})
-    file.name = 'file1.pdf'
-
-    uploadFiles(fileInput, [file])
-
-    expect(getByText('Invalid file type')).toBeInTheDocument()
-  })
-
-  it('does not render an error when adding a file that is an allowed extension', async () => {
-    const mocks = await createGraphqlMocks()
-    const setOnSuccess = vi.fn()
-    const props = await makeProps({
-      Assignment: {allowedExtensions: ['jpg']},
-    })
-    const {container, queryByText} = render(
-      <MockedProvider mocks={mocks}>
-        <AlertManagerContext.Provider value={{setOnSuccess}}>
-          <FileUpload {...props} />
-        </AlertManagerContext.Provider>
-      </MockedProvider>,
-    )
-    const fileInput = container.querySelector('input[id="inputFileDrop"]')
-    const file = new Blob(['foo'], {type: 'application/jpg'})
-    file.name = 'file1.jpg'
-
-    uploadFiles(fileInput, [file])
-
-    expect(queryByText('Invalid file type')).toBeNull()
-  })
-
-  it('renders an error when attempting to submit the assignment with no files', async () => {
-    const mocks = await createGraphqlMocks()
-    const props = await makeProps({Submission: {submissionDraft: {meetsUploadCriteria: false}}})
-    const submitButton = document.createElement('button')
-    props.submitButtonRef.current = submitButton
-    const {getByText} = render(
-      <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
-      </MockedProvider>,
-    )
-    fireEvent.click(props.submitButtonRef.current)
-    expect(getByText('At least one submission type is required')).toBeInTheDocument()
-  })
-
-  it('clears error when clicking the FileDrop component', async () => {
-    const mocks = await createGraphqlMocks()
-    const props = await makeProps({Submission: {submissionDraft: {meetsUploadCriteria: false}}})
-    const submitButton = document.createElement('button')
-    props.submitButtonRef.current = submitButton
-    const {getByText, queryByText} = render(
-      <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
-      </MockedProvider>,
-    )
-    fireEvent.click(props.submitButtonRef.current)
-    expect(getByText('At least one submission type is required')).toBeInTheDocument()
-    fireEvent.click(document.getElementById('inputFileDrop'))
-    expect(queryByText('At least one submission type is required')).not.toBeInTheDocument()
-  })
-
   it('shows a checkmark icon for uploaded files', async () => {
     const mocks = await createGraphqlMocks()
     const setOnSuccess = vi.fn()
@@ -328,50 +219,5 @@ describe('FileUpload - Management and Extensions', () => {
     expect(progressBars[1].max).toBe(250)
     expect(progressBars[1]).toHaveAttribute('aria-valuetext', '20 percent')
     expect(progressBars[1]).toHaveAttribute('aria-label', 'Upload progress for file2.pdf')
-  })
-
-  describe('webcam photo upload', () => {
-    it('is available when the assignment has no file extension restrictions', async () => {
-      const mocks = await createGraphqlMocks()
-      const props = await makeProps()
-
-      const {findByRole} = render(
-        <MockedProvider mocks={mocks}>
-          <FileUpload {...props} />
-        </MockedProvider>,
-      )
-      fireEvent.click(await findByRole('button', {name: /Canvas Files/}))
-      expect(await findByRole('button', {name: /Webcam/})).toBeInTheDocument()
-    })
-
-    it('is available when the assignment allows PNG files', async () => {
-      const mocks = await createGraphqlMocks()
-      const props = await makeProps({
-        Assignment: {allowedExtensions: ['jpg', 'png']},
-      })
-
-      const {findByRole} = render(
-        <MockedProvider mocks={mocks}>
-          <FileUpload {...props} />
-        </MockedProvider>,
-      )
-      fireEvent.click(await findByRole('button', {name: /Canvas Files/}))
-      expect(await findByRole('button', {name: /Webcam/})).toBeInTheDocument()
-    })
-
-    it('is not available when the assignment does not allow PNG files', async () => {
-      const mocks = await createGraphqlMocks()
-      const props = await makeProps({
-        Assignment: {allowedExtensions: ['xls']},
-      })
-
-      const {findByRole, queryByRole} = render(
-        <MockedProvider mocks={mocks}>
-          <FileUpload {...props} />
-        </MockedProvider>,
-      )
-      fireEvent.click(await findByRole('button', {name: /Canvas Files/}))
-      expect(queryByRole('button', {name: /Webcam/})).not.toBeInTheDocument()
-    })
   })
 })

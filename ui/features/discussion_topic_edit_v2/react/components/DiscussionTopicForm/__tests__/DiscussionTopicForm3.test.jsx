@@ -16,18 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {render} from '@testing-library/react'
 import React from 'react'
-import {Assignment} from '../../../../graphql/Assignment'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
 import {GroupSet} from '../../../../graphql/GroupSet'
-import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from '../../../util/constants'
-import DiscussionTopicForm, {isGuidDataValid, getAbGuidArray} from '../DiscussionTopicForm'
+import DiscussionTopicForm from '../DiscussionTopicForm'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 vi.mock('@canvas/rce/react/CanvasRce')
 
-describe('DiscussionTopicForm', () => {
+describe('DiscussionTopicForm - UI Options', () => {
   const setup = ({
     isEditing = false,
     currentDiscussionTopic = {},
@@ -55,7 +53,7 @@ describe('DiscussionTopicForm', () => {
   }
 
   beforeEach(() => {
-    window.ENV = {
+    fakeENV.setup({
       DISCUSSION_TOPIC: {
         PERMISSIONS: {
           CAN_ATTACH: true,
@@ -81,57 +79,17 @@ describe('DiscussionTopicForm', () => {
       RESTRICT_QUANTITATIVE_DATA: false,
       context_type: 'Course',
       context_id: '1',
-    }
+    })
   })
 
-  describe('Revealing/hiding options', () => {
-    it('shows AnonymousResponseSelector when Anonymity selector is partial', async () => {
-      window.ENV.current_user.display_name = 'Student Name'
-      const document = setup({
-        currentDiscussionTopic: DiscussionTopic.mock({anonymousState: 'partial_anonymity'}),
-        isStudent: true,
-      })
+  afterEach(() => {
+    fakeENV.teardown()
+  })
 
-      expect(document.queryByText('Replying as')).toBeTruthy()
-    })
-
-    it('does not show AnonymousResponseSelector when Anonymity selector is full', async () => {
-      window.ENV.current_user.display_name = 'Student Name'
-      const document = setup({
-        currentDiscussionTopic: DiscussionTopic.mock({anonymousState: 'full_anonymity'}),
-        isStudent: true,
-      })
-
-      expect(document.queryByText('Replying as')).toBeFalsy()
-    })
-
-    it('disables group and graded discussion options when Fully/Partially Anonymous', () => {
-      const document = setup({
-        currentDiscussionTopic: DiscussionTopic.mock({anonymousState: 'full_anonymity'}),
-      })
-
-      expect(document.queryByTestId('graded-checkbox').querySelector('input')).toBeDisabled()
-      expect(
-        document.queryByTestId('group-discussion-checkbox').querySelector('input'),
-      ).toBeDisabled()
-    })
-
+  describe('Graded options', () => {
     it('hides student ToDo, and ungraded options when Graded', () => {
-      ENV = {
-        FEATURES: {},
-        SETTINGS: {},
-        STUDENT_PLANNER_ENABLED: true,
-        DISCUSSION_TOPIC: {
-          PERMISSIONS: {
-            CAN_MANAGE_CONTENT: true,
-            CAN_CREATE_ASSIGNMENT: true,
-          },
-          ATTRIBUTES: {
-            id: 1,
-          },
-        },
-      }
-      Object.assign(window.ENV, ENV)
+      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.id = 1
 
       const {queryByTestId, getByLabelText, queryByLabelText} = setup()
       expect(queryByLabelText('Add to student to-do')).toBeInTheDocument()
@@ -143,39 +101,18 @@ describe('DiscussionTopicForm', () => {
       expect(queryByTestId('todo-date-section')).not.toBeInTheDocument()
       expect(queryByTestId('assignment-assign-to-section')).toBeInTheDocument()
     })
+  })
 
+  describe('Attachment options', () => {
     it('does not display AttachButton when CAN_ATTACH is false', () => {
       window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH = false
       const document = setup()
 
       expect(document.queryByText('Attach')).toBeFalsy()
     })
+  })
 
-    it('shows AnonymousOptions when conditions are met', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
-      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
-
-      const document = setup({isGroupContext: false})
-      expect(document.queryAllByText('Anonymous Discussion')).toBeTruthy()
-    })
-
-    it('shows AnonymousOptions when students are explicitly allowed are met', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
-      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = false
-      window.ENV.allow_student_anonymous_discussion_topics = true
-
-      const document = setup({isGroupContext: false})
-      expect(document.queryAllByText('Anonymous Discussion')).toBeTruthy()
-    })
-
-    it('does not Show AnonymousOptions when in group context', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
-      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = false
-
-      const document = setup({isGroupContext: false})
-      expect(document.queryByText('Anonymous Discussion')).toBeFalsy()
-    })
-
+  describe('Usage rights', () => {
     it('does not show usageRights when not enabled', () => {
       window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH = true
       window.ENV.USAGE_RIGHTS_REQUIRED = false
@@ -193,7 +130,9 @@ describe('DiscussionTopicForm', () => {
       const document = setup()
       expect(document.queryByText('Set usage rights')).toBeTruthy()
     })
+  })
 
+  describe('Liking options', () => {
     it('does not show liking options when in K5_homeRoom', () => {
       window.ENV.K5_HOMEROOM_COURSE = true
 
@@ -207,7 +146,9 @@ describe('DiscussionTopicForm', () => {
       const document = setup()
       expect(document.queryByText('Allow liking')).toBeTruthy()
     })
+  })
 
+  describe('Publish options', () => {
     it('shows save and publish when not published', () => {
       const document = setup({
         currentDiscussionTopic: DiscussionTopic.mock({published: false}),
@@ -223,7 +164,9 @@ describe('DiscussionTopicForm', () => {
 
       expect(document.queryByTestId('save-and-publish-button')).toBeFalsy()
     })
+  })
 
+  describe('Group category', () => {
     it('displays a warning when a user can not edit group category', () => {
       const document = setup({
         groupCategories: [{_id: '1', name: 'Mutant Power Training Group 1'}],
@@ -247,194 +190,12 @@ describe('DiscussionTopicForm', () => {
 
       expect(document.queryByTestId('group-category-not-editable')).toBeFalsy()
     })
+  })
 
-    it('displays the checkpoints checkbox when the Graded option is selected and discussion checkpoints flag is on', () => {
-      const {queryByTestId, getByLabelText} = setup()
-
-      expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
-
-      getByLabelText('Graded').click()
-
-      expect(queryByTestId('checkpoints-checkbox')).toBeInTheDocument()
-    })
-
-    it('displays the suppress assignments checkbox whhen the Graded option is selected and suppress assignments setting is on', () => {
-      window.ENV.SETTINGS.suppress_assignments = true
-
-      const {queryByTestId, getByLabelText} = setup()
-
-      expect(queryByTestId('suppressed-assignment-checkbox')).not.toBeInTheDocument()
-
-      getByLabelText('Graded').click()
-
-      expect(queryByTestId('suppressed-assignment-checkbox')).toBeInTheDocument()
-    })
-
+  describe('Cancel button', () => {
     it('renders the cancel button', () => {
       const {queryByTestId} = setup()
       expect(queryByTestId('announcement-cancel-button')).toBeInTheDocument()
-    })
-
-    it('does not display the checkpoints checkbox when the Graded option is not selected and discussion checkpoints flag is on', () => {
-      const {queryByTestId} = setup()
-
-      expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
-    })
-
-    it('does not display the checkpoints checkbox when the discussion checkpoints flag is off', () => {
-      window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = false
-
-      const {queryByTestId, getByLabelText} = setup()
-
-      getByLabelText('Graded').click()
-
-      expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
-    })
-
-    it('displays the checkpoints checkbox when RESTRICT_QUANTITATIVE_DATA is false', () => {
-      const {queryByTestId, getByLabelText} = setup()
-
-      getByLabelText('Graded').click()
-
-      expect(queryByTestId('checkpoints-checkbox')).toBeInTheDocument()
-    })
-
-    it('does not display the checkpoints checkbox when RESTRICT_QUANTITATIVE_DATA is true', () => {
-      window.ENV.RESTRICT_QUANTITATIVE_DATA = true
-
-      const {queryByTestId, getByLabelText} = setup()
-
-      getByLabelText('Graded').click()
-
-      expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
-    })
-
-    it('disable checkpoints if there are student submissions', () => {
-      const {queryByTestId} = setup({
-        isEditing: true,
-        currentDiscussionTopic: DiscussionTopic.mock({
-          assignment: Assignment.mock(),
-          canGroup: false,
-        }),
-      })
-
-      expect(queryByTestId('checkpoints-checkbox').querySelector('input')).toBeDisabled()
-    })
-
-    it('disable checkpoints for group discussions with child topic replies', () => {
-      const {queryByTestId} = setup({
-        isEditing: true,
-        currentDiscussionTopic: DiscussionTopic.mock({
-          assignment: Assignment.mock(),
-          groupSet: GroupSet.mock(),
-          canGroup: false,
-        }),
-      })
-
-      expect(queryByTestId('checkpoints-checkbox').querySelector('input')).toBeDisabled()
-    })
-
-    it('displays "Allow Participants to Comment"', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
-      window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = false
-
-      const {queryByText} = setup()
-
-      expect(queryByText('Allow Participants to Comment')).toBeInTheDocument()
-    })
-
-    describe('when ANNOUNCEMENTS_COMMENTS_DISABLED is true', () => {
-      beforeEach(() => {
-        window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
-        window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
-      })
-
-      it('displays disabled "Allow Participants to Comment"', () => {
-        const {queryByLabelText} = setup()
-        const component = queryByLabelText('Allow Participants to Comment')
-
-        expect(component).toBeInTheDocument()
-        expect(component).toBeDisabled()
-      })
-
-      describe('when GROUP_CONTEXT_TYPE is set to null', () => {
-        it('renders tooltip for "Allow Participants to Comment" with the correct message', () => {
-          window.ENV.GROUP_CONTEXT_TYPE = null
-
-          const {queryByText} = setup()
-          const component = queryByText('This option is locked in course settings')
-          expect(component).toBeInTheDocument()
-        })
-      })
-
-      describe('when GROUP_CONTEXT_TYPE is set to Course', () => {
-        it('renders tooltip for "Allow Participants to Comment" with the correct message', () => {
-          window.ENV.GROUP_CONTEXT_TYPE = 'Course'
-
-          const {queryByText} = setup()
-          const component = queryByText('This option is locked in course settings')
-          expect(component).toBeInTheDocument()
-        })
-      })
-
-      describe('when GROUP_CONTEXT_TYPE is set to Account', () => {
-        it('renders tooltip for "Allow Participants to Comment" with the correct message', () => {
-          window.ENV.GROUP_CONTEXT_TYPE = 'Account'
-
-          const {queryByText} = setup()
-          const component = queryByText('This option is locked in account settings')
-          expect(component).toBeInTheDocument()
-        })
-      })
-    })
-  })
-
-  describe('Disallow threaded replies', () => {
-    it('disallow threaded replies checkbox is checked when discussion type is side comment and does not has threaded reply', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
-      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'side_comment'}})
-
-      const checkbox = getByTestId('disallow_threaded_replies').querySelector('input')
-      expect(getByTestId('disallow_threaded_replies')).toHaveAttribute(
-        'data-action-state',
-        'allowThreads',
-      )
-      expect(checkbox.checked).toBe(true)
-    })
-
-    it('disallow threaded replies checkbox is disabled when discussion type is side comment and has threaded replies', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = true
-      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'side_comment'}})
-
-      const checkbox = getByTestId('disallow_threaded_replies').querySelector('input')
-      expect(checkbox.disabled).toBe(true)
-      expect(checkbox.checked).toBe(false)
-    })
-
-    it('disallow threaded replies checkbox is not present in announcements if "Allow participants to comment" is disabled', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
-      window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
-
-      const {queryByTestId} = setup()
-
-      expect(queryByTestId('disallow_threaded_replies')).not.toBeInTheDocument()
-    })
-
-    it('disallow threaded replies checkbox is enabled in dicussions if "Allow participants to comment" is disabled', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
-      window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
-
-      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'threaded'}})
-
-      const checkbox = getByTestId('disallow_threaded_replies').querySelector('input')
-      expect(getByTestId('disallow_threaded_replies')).toHaveAttribute(
-        'data-action-state',
-        'disallowThreads',
-      )
-      expect(checkbox.disabled).toBe(false)
-      expect(checkbox.checked).toBe(false)
     })
   })
 })
