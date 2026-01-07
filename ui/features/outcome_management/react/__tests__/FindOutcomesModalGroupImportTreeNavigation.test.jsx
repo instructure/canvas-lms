@@ -36,7 +36,6 @@ vi.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 
 vi.mock('@canvas/progress/resolve_progress')
-vi.useFakeTimers()
 
 describe('FindOutcomesModal - Group Import Tree Navigation Tests', () => {
   let cache
@@ -46,6 +45,7 @@ describe('FindOutcomesModal - Group Import Tree Navigation Tests', () => {
   let defaultProps
 
   beforeEach(() => {
+    vi.useFakeTimers({shouldAdvanceTime: true})
     onCloseHandlerMock = vi.fn()
     setTargetGroupIdsToRefetchMock = vi.fn()
     setImportsTargetGroupMock = vi.fn()
@@ -60,6 +60,7 @@ describe('FindOutcomesModal - Group Import Tree Navigation Tests', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.useRealTimers()
     resolveProgress.mockReset()
   })
 
@@ -79,8 +80,7 @@ describe('FindOutcomesModal - Group Import Tree Navigation Tests', () => {
     expect(getByText('Group 200')).toBeInTheDocument()
   })
 
-  // Skipped: Test times out in CI (>10s) due to complex async rendering and progress polling
-  it.skip('replaces Add buttons of individual outcomes with loading spinner during group import or a parent group', async () => {
+  it('replaces Add buttons of individual outcomes with loading spinner during group import or a parent group', async () => {
     const doResolveProgress = delayImportOutcomesProgress()
 
     const {getByText, getAllByText, queryByText} = render(

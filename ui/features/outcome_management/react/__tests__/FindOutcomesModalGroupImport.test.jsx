@@ -40,7 +40,6 @@ vi.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 
 vi.mock('@canvas/progress/resolve_progress')
-vi.useFakeTimers()
 
 describe('FindOutcomesModal - Group Import Tests', () => {
   let cache
@@ -50,6 +49,7 @@ describe('FindOutcomesModal - Group Import Tests', () => {
   let defaultProps
 
   beforeEach(() => {
+    vi.useFakeTimers({shouldAdvanceTime: true})
     onCloseHandlerMock = vi.fn()
     setTargetGroupIdsToRefetchMock = vi.fn()
     setImportsTargetGroupMock = vi.fn()
@@ -64,6 +64,7 @@ describe('FindOutcomesModal - Group Import Tests', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.useRealTimers()
     resolveProgress.mockReset()
   })
 
@@ -263,82 +264,76 @@ describe('FindOutcomesModal - Group Import Tests', () => {
     expect(AddAllButton).toBeEnabled()
   })
 
-  it(
-    'replaces Add buttons of individual outcomes with loading spinner during group import',
-    async () => {
-      const doResolveProgress = delayImportOutcomesProgress()
-      const {getByText, getAllByText, queryByText} = render(
-        <FindOutcomesModal {...defaultProps()} />,
-        {
-          contextType: 'Course',
-          mocks: [
-            ...courseImportMocks,
-            ...importGroupMocks({
-              groupId: '300',
-              targetContextType: 'Course',
-            }),
-          ],
-        },
-      )
-      await act(async () => vi.runAllTimers())
-      await clickEl(getByText('Account Standards'))
-      await clickEl(getByText('Root Account Outcome Group 0'))
-      await clickEl(getByText('Group 100 folder 0'))
-      expect(getAllByText('Add')).toHaveLength(2)
-      await clickEl(getByText('Add All Outcomes').closest('button'))
-      await clickEl(getByText('Import Anyway'))
-      expect(getAllByText('Loading')).toHaveLength(2)
-      await act(async () => {
-        doResolveProgress()
-        await vi.runAllTimersAsync()
-      })
-      await waitFor(() => expect(queryByText('Loading')).not.toBeInTheDocument())
-      expect(getAllByText('Added')).toHaveLength(2)
-    },
-  )
+  it('replaces Add buttons of individual outcomes with loading spinner during group import', async () => {
+    const doResolveProgress = delayImportOutcomesProgress()
+    const {getByText, getAllByText, queryByText} = render(
+      <FindOutcomesModal {...defaultProps()} />,
+      {
+        contextType: 'Course',
+        mocks: [
+          ...courseImportMocks,
+          ...importGroupMocks({
+            groupId: '300',
+            targetContextType: 'Course',
+          }),
+        ],
+      },
+    )
+    await act(async () => vi.runAllTimers())
+    await clickEl(getByText('Account Standards'))
+    await clickEl(getByText('Root Account Outcome Group 0'))
+    await clickEl(getByText('Group 100 folder 0'))
+    expect(getAllByText('Add')).toHaveLength(2)
+    await clickEl(getByText('Add All Outcomes').closest('button'))
+    await clickEl(getByText('Import Anyway'))
+    expect(getAllByText('Loading')).toHaveLength(2)
+    await act(async () => {
+      doResolveProgress()
+      await vi.runAllTimersAsync()
+    })
+    await waitFor(() => expect(queryByText('Loading')).not.toBeInTheDocument())
+    expect(getAllByText('Added')).toHaveLength(2)
+  })
 
-  it(
-    'loads localstorage.activeImports if present',
-    async () => {
-      const doResolveProgress = delayImportOutcomesProgress()
+  it('loads localstorage.activeImports if present', async () => {
+    const doResolveProgress = delayImportOutcomesProgress()
 
-      localStorage.activeImports = JSON.stringify([
-        {
-          outcomeOrGroupId: '300',
-          isGroup: true,
-          groupTitle: 'Group 300',
-          progress: {_id: '111', state: 'queued', __typename: 'Progress'},
-        },
-      ])
+    localStorage.activeImports = JSON.stringify([
+      {
+        outcomeOrGroupId: '300',
+        isGroup: true,
+        groupTitle: 'Group 300',
+        progress: {_id: '111', state: 'queued', __typename: 'Progress'},
+      },
+    ])
 
-      const {getByText, getAllByText, queryByText} = render(
-        <FindOutcomesModal {...defaultProps()} />,
-        {
-          contextType: 'Course',
-          mocks: [...findModalMocks({parentAccountChildren: 1}), ...defaultTreeGroupMocks()],
-        },
-      )
-      await act(async () => vi.runAllTimers())
-      await clickEl(getByText('Account Standards'))
-      await clickEl(getByText('Root Account Outcome Group 0'))
-      await clickEl(getByText('Group 200'))
+    const {getByText, getAllByText, queryByText} = render(
+      <FindOutcomesModal {...defaultProps()} />,
+      {
+        contextType: 'Course',
+        mocks: [...findModalMocks({parentAccountChildren: 1}), ...defaultTreeGroupMocks()],
+      },
+    )
+    await act(async () => vi.runAllTimers())
+    await clickEl(getByText('Account Standards'))
+    await clickEl(getByText('Root Account Outcome Group 0'))
+    await clickEl(getByText('Group 200'))
 
-      // No loading since we've imported group 300
-      expect(queryByText('Loading')).not.toBeInTheDocument()
+    // No loading since we've imported group 300
+    expect(queryByText('Loading')).not.toBeInTheDocument()
 
-      await clickEl(getByText('Group 300'))
-      // group 300 is loading. length 3 means outcome 1, 2, 3
-      expect(getAllByText('Loading')).toHaveLength(3)
-      await act(async () => {
-        doResolveProgress()
-        await vi.runAllTimersAsync()
-      })
-      await waitFor(() => expect(queryByText('Loading')).not.toBeInTheDocument())
-      expect(getAllByText('Added')).toHaveLength(3)
-      // resets latestImport after progress is resolved
-      expect(localStorage.latestImport).toBeUndefined()
-    },
-  )
+    await clickEl(getByText('Group 300'))
+    // group 300 is loading. length 3 means outcome 1, 2, 3
+    expect(getAllByText('Loading')).toHaveLength(3)
+    await act(async () => {
+      doResolveProgress()
+      await vi.runAllTimersAsync()
+    })
+    await waitFor(() => expect(queryByText('Loading')).not.toBeInTheDocument())
+    expect(getAllByText('Added')).toHaveLength(3)
+    // resets latestImport after progress is resolved
+    expect(localStorage.latestImport).toBeUndefined()
+  })
 
   it('changes button text of individual outcomes from Add to Added after group import completes', async () => {
     resolveProgress.mockImplementation(() => Promise.resolve())
