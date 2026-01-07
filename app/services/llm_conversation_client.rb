@@ -75,23 +75,15 @@ class LLMConversationClient
   end
 
   def starting_messages
-    # Create a new conversation with prompt_code and conversation_context_id
+    # Create a new conversation with auto_initialize: true
+    # This will create the conversation and immediately generate the first message and response
     conversation = create_conversation
     @conversation_id = conversation["id"]
 
-    # The conversation has first_message (the interpolated input_template)
-    # We need to send it to get the AI's response
-    first_message = conversation["first_message"]
-
-    # Send the first message to get LLM response
-    llm_response = add_message_to_conversation(first_message, "User")
-
+    # With auto_initialize, messages already exist - just fetch them
     {
       conversation_id: @conversation_id,
-      messages: [
-        { role: "User", text: first_message },
-        { role: "Assistant", text: llm_response }
-      ]
+      messages:
     }
   end
 
@@ -178,7 +170,8 @@ class LLMConversationClient
       account_id: @root_account_uuid || "default",
       user_id: @current_user&.uuid || "anonymous",
       prompt_code: PROMPT_CODE,
-      workflow_state: "active"
+      workflow_state: "active",
+      auto_initialize: true
     }
 
     # Add conversation_context_id if provided
