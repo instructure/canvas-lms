@@ -30,6 +30,7 @@ import TextInputForm from './TextInput'
 import RadioInputGroupForm from './RadioInputGroupForm'
 import CheckboxTextInputForm from './CheckboxTextInput'
 import {AccessibilityIssue, FormType, FormValue} from '../../../types'
+import { PreviewHandle } from '../Preview'
 
 export interface FormHandle {
   getValue: () => FormValue
@@ -50,6 +51,8 @@ export interface FormComponentProps {
   onValidationChange?: (isValid: boolean, errorMessage?: string) => void
   actionButtons?: React.ReactNode
   isDisabled?: boolean
+  previewRef?: React.RefObject<PreviewHandle>
+  onGenerateLoadingChange?: (loading: boolean) => void
 }
 
 interface FormProps {
@@ -61,6 +64,8 @@ interface FormProps {
   onFormValueChange?: (formValue: FormValue) => void
   actionButtons?: React.ReactNode
   isDisabled?: boolean
+  previewRef?: React.RefObject<PreviewHandle>
+  onGenerateLoadingChange?: (loading: boolean) => void
 }
 
 const FormTypeMap = {
@@ -84,6 +89,8 @@ const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
       onFormValueChange,
       actionButtons,
       isDisabled,
+      previewRef,
+      onGenerateLoadingChange,
     }: FormProps,
     ref,
   ) => {
@@ -131,6 +138,8 @@ const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
         onValidationChange={onValidationChange}
         actionButtons={actionButtons}
         isDisabled={isDisabled}
+        previewRef={previewRef}
+        onGenerateLoadingChange={onGenerateLoadingChange}
       />
     )
   },

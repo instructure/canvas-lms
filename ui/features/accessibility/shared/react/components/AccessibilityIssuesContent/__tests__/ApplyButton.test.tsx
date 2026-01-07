@@ -77,6 +77,29 @@ describe('ApplyButton', () => {
 
       expect(defaultProps.onApply).not.toHaveBeenCalled()
     })
+
+    it('disables button when isDisabled is true', () => {
+      render(<ApplyButton {...defaultProps} isDisabled={true} />)
+
+      const applyButton = screen.getByTestId('apply-button')
+      expect(applyButton).toBeDisabled()
+    })
+
+    it('does not call onApply when isDisabled is true', async () => {
+      render(<ApplyButton {...defaultProps} isDisabled={true} />)
+
+      const applyButton = screen.getByTestId('apply-button')
+      await userEvent.click(applyButton)
+
+      expect(defaultProps.onApply).not.toHaveBeenCalled()
+    })
+
+    it('disables button when both isLoading and isDisabled are true', () => {
+      render(<ApplyButton {...defaultProps} isLoading={true} isDisabled={true} />)
+
+      const applyButton = screen.getByTestId('apply-button')
+      expect(applyButton).toBeDisabled()
+    })
   })
 
   describe('when applied', () => {

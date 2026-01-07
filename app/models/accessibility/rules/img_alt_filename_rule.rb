@@ -47,17 +47,10 @@ module Accessibility
           input_description: I18n.t("Describe the content or purpose of this image."),
           input_max_length: ImgAltRuleHelper::MAX_LENGTH,
           can_generate_fix: true,
+          is_canvas_image: Accessibility::AiGenerationService.extract_attachment_id_from_element(elem).present?,
           generate_button_label: I18n.t("Generate alt text"),
           value: elem.get_attribute("alt") || ""
         )
-      end
-
-      def generate_fix(elem)
-        return nil if elem.tag_name != "img"
-        return nil unless elem.attribute?("src")
-
-        src = elem.get_attribute("src")
-        ImgAltRuleHelper.generate_alt_text(src)
       end
 
       def fix!(elem, value)
