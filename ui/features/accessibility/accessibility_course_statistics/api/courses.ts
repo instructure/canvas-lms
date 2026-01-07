@@ -30,7 +30,13 @@ export const fetchCourses = async (params: FetchCoursesParams): Promise<CoursesR
   const {accountId} = params
 
   const queryParams: Record<string, any> = {
-    include: ['total_students', 'active_teachers', 'subaccount', 'term'],
+    include: [
+      'total_students',
+      'active_teachers',
+      'subaccount',
+      'term',
+      'accessibility_course_statistic',
+    ],
     teacher_limit: TEACHER_LIMIT,
     per_page: COURSES_PER_PAGE,
     no_avatar_fallback: 1,

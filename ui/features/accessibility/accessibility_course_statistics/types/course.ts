@@ -31,6 +31,15 @@ export interface Teacher {
   avatar_image_url?: string
 }
 
+export interface AccessibilityCourseStatistic {
+  id: number
+  course_id: number
+  active_issue_count: number | null
+  workflow_state: 'initialized' | 'queued' | 'in_progress' | 'active' | 'failed' | 'deleted'
+  created_at: string
+  updated_at: string
+}
+
 export interface Course {
   id: string
   name: string
@@ -41,6 +50,7 @@ export interface Course {
   term?: Term
   subaccount_id?: string
   subaccount_name?: string
+  accessibility_course_statistic?: AccessibilityCourseStatistic | null
 }
 
 export interface CoursesResponse {
