@@ -1331,16 +1331,10 @@ describe "Common Cartridge exporting" do
           )
         end
 
-        it "only exports the control for the account-level tool" do
+        it "does not export any context controls when no tools are being exported" do
+          course_control
           subject
-          doc = Nokogiri::XML(@zip_file.read("course_settings/lti_context_controls.xml"))
-          expect(doc).to be_present
-
-          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool.primary_context_control)}]")).to be_nil
-          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.primary_context_control)}]")).to be_nil
-          tool_node = doc.at_css("lti_context_control[identifier=#{mig_id(account_level_tool.context_controls.find_by(course:))}]")
-          expect(tool_node).to be_present
-          expect(tool_node.at_css("deployment_migration_id")).to be_nil
+          expect(@zip_file.find_entry("course_settings/lti_context_controls.xml")).to be_nil
         end
       end
     end
