@@ -28,6 +28,9 @@ import {StudentMasteryScoreSummary} from './StudentMasteryScoreSummary'
 import ReportingBreadcrumbs from './ReportingBreadcrumbs'
 import StudentOutcomesTable from './StudentOutcomesTable'
 import {useTransformedOutcomes} from './hooks/useTransformedOutcomes'
+import OutcomesControlsBar from './OutcomesControlsBar'
+import useSearch from '@canvas/outcomes/react/hooks/useSearch'
+import {theme} from '@instructure/canvas-theme'
 
 const I18n = createI18nScope('OutcomeManagement')
 
@@ -69,6 +72,27 @@ const Reporting = () => {
     }
   }, [error])
 
+  const {
+    search,
+    debouncedSearch,
+    onChangeHandler: onSearchChangeHandler,
+    onClearHandler: onSearchClearHandler,
+  } = useSearch(300)
+
+  const filteredOutcomes = useMemo(() => {
+    if (!debouncedSearch) {
+      return transformedOutcomes
+    }
+
+    const searchLower = debouncedSearch.toLowerCase()
+    return transformedOutcomes.filter(
+      outcome =>
+        outcome.code?.toLowerCase().includes(searchLower) ||
+        outcome.name?.toLowerCase().includes(searchLower) ||
+        outcome.description?.toLowerCase().includes(searchLower),
+    )
+  }, [transformedOutcomes, debouncedSearch])
+
   if (studentId && isLoading) {
     return (
       <View data-testid="outcome-reporting" display="block" textAlign="center">
@@ -95,7 +119,18 @@ const Reporting = () => {
         />
       )}
 
-      <StudentOutcomesTable outcomes={transformedOutcomes} />
+      <View as="div" margin="large 0 0 0">
+        <hr
+          style={{border: 'none', borderBottom: `1px solid ${theme.colors.contrasts.grey3045}`}}
+        />
+      </View>
+
+      <OutcomesControlsBar
+        search={search}
+        onSearchChangeHandler={onSearchChangeHandler}
+        onSearchClearHandler={onSearchClearHandler}
+      />
+      <StudentOutcomesTable outcomes={filteredOutcomes} />
     </View>
   )
 }
