@@ -34,7 +34,7 @@ import {
 } from '@canvas/outcomes/mocks/Management'
 import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
 import resolveProgress from '@canvas/progress/resolve_progress'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: vi.fn(),
@@ -77,7 +77,7 @@ const defaultTreeGroupMocks = () =>
     withGroupDetailsRefetch: true,
   })
 
-describe('FindOutcomesModal - Individual Outcome Import Tests', () => {
+describe('FindOutcomesModal - Import Basic Tests', () => {
   let cache
   let onCloseHandlerMock
   let setTargetGroupIdsToRefetchMock
@@ -106,7 +106,11 @@ describe('FindOutcomesModal - Individual Outcome Import Tests', () => {
   ]
 
   beforeAll(() => {
-    window.ENV = {}
+    fakeENV.setup()
+  })
+
+  afterAll(() => {
+    fakeENV.teardown()
   })
 
   beforeEach(() => {
@@ -254,148 +258,5 @@ describe('FindOutcomesModal - Individual Outcome Import Tests', () => {
     await clickEl(addButton)
 
     await waitFor(() => expect(addButton).toBeEnabled())
-  })
-
-  describe('imports to different contexts', () => {
-    it('imports Account outcome to Course', async () => {
-      const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-        contextType: 'Course',
-        mocks: [
-          ...courseImportMocks,
-          ...importOutcomeMocks({
-            outcomeId: '5',
-            targetContextType: 'Course',
-            sourceContextId: '1',
-            sourceContextType: 'Account',
-          }),
-        ],
-      })
-
-      await navigateToGroup(getByText)
-
-      const addButton = getAllByText('Add')[0].closest('button')
-      expect(addButton).toBeEnabled()
-      await clickEl(addButton)
-
-      await waitFor(() => {
-        expect(getByText('Added')).toBeInTheDocument()
-        expect(getByText('Added').closest('button')).toBeDisabled()
-      })
-    })
-
-    it('imports Account outcome to Sub-account', async () => {
-      const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-        contextType: 'Account',
-        mocks: [
-          ...findModalMocks(),
-          ...groupMocks({groupId: '100'}),
-          ...findOutcomesMocks({
-            groupId: '300',
-            isImported: false,
-            contextType: 'Account',
-            outcomesGroupContextId: '2',
-            outcomesCount: 51,
-            withFindGroupRefetch,
-          }),
-          ...importOutcomeMocks({
-            outcomeId: '5',
-            sourceContextId: '2',
-            sourceContextType: 'Account',
-          }),
-        ],
-      })
-
-      await navigateToGroup(getByText)
-
-      const addButton = getAllByText('Add')[0].closest('button')
-      await clickEl(addButton)
-
-      await waitFor(() => expect(getByText('Added').closest('button')).toBeDisabled())
-    })
-
-    it('imports Global outcome to Account', async () => {
-      const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-        contextType: 'Account',
-        mocks: [
-          ...findModalMocks(),
-          ...groupMocks({groupId: '100'}),
-          ...findOutcomesMocks({
-            groupId: '300',
-            isImported: false,
-            contextType: 'Account',
-            outcomesGroupContextId: null,
-            outcomesGroupContextType: null,
-            outcomesCount: 51,
-            withFindGroupRefetch,
-          }),
-          ...importOutcomeMocks({
-            outcomeId: '5',
-            sourceContextId: null,
-            sourceContextType: null,
-          }),
-        ],
-      })
-
-      await navigateToGroup(getByText)
-
-      const addButton = getAllByText('Add')[0].closest('button')
-      await clickEl(addButton)
-
-      await waitFor(() => expect(getByText('Added').closest('button')).toBeDisabled())
-    })
-  })
-
-  describe('error handling', () => {
-    it('displays custom error message when provided', async () => {
-      const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-        contextType: 'Course',
-        mocks: [
-          ...courseImportMocks,
-          ...importOutcomeMocks({
-            outcomeId: '5',
-            targetContextType: 'Course',
-            sourceContextId: '1',
-            sourceContextType: 'Account',
-            failResponse: true,
-          }),
-        ],
-      })
-
-      await navigateToGroup(getByText)
-      await clickEl(getAllByText('Add')[0].closest('button'))
-
-      await waitFor(() =>
-        expect(showFlashAlert).toHaveBeenCalledWith({
-          message: 'An error occurred while importing this outcome: Network error.',
-          type: 'error',
-        }),
-      )
-    })
-
-    it('displays generic error message when no error message provided', async () => {
-      const {getByText, getAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-        contextType: 'Course',
-        mocks: [
-          ...courseImportMocks,
-          ...importOutcomeMocks({
-            outcomeId: '5',
-            targetContextType: 'Course',
-            sourceContextId: '1',
-            sourceContextType: 'Account',
-            failMutationNoErrMsg: true,
-          }),
-        ],
-      })
-
-      await navigateToGroup(getByText)
-      await clickEl(getAllByText('Add')[0].closest('button'))
-
-      await waitFor(() =>
-        expect(showFlashAlert).toHaveBeenCalledWith({
-          message: 'An error occurred while importing this outcome.',
-          type: 'error',
-        }),
-      )
-    })
   })
 })

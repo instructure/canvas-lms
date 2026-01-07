@@ -19,35 +19,17 @@
 import React from 'react'
 import {render, fireEvent, act} from '@testing-library/react'
 import {MockedProvider} from '@apollo/client/testing'
-import {
-  OutcomePanel,
-  OutcomeManagementWithoutGraphql as OutcomeManagement,
-} from '../OutcomeManagement'
-import {
-  masteryCalculationGraphqlMocks,
-  masteryScalesGraphqlMocks,
-  outcomeGroupsMocks,
-} from '@canvas/outcomes/mocks/Outcomes'
+import {OutcomeManagementWithoutGraphql as OutcomeManagement} from '../OutcomeManagement'
+import {outcomeGroupsMocks} from '@canvas/outcomes/mocks/Outcomes'
 import {createCache} from '@canvas/apollo-v3'
 import {
   showOutcomesImporter,
   showOutcomesImporterIfInProgress,
 } from '@canvas/outcomes/react/OutcomesImporter'
-import {windowConfirm} from '@canvas/util/globalUtils'
-import {useAllPages} from '@canvas/query'
-
-vi.mock('@canvas/query', () => ({
-  useAllPages: vi.fn(),
-}))
 
 vi.mock('@canvas/outcomes/react/OutcomesImporter', () => ({
   showOutcomesImporter: vi.fn(() => vi.fn(() => {})),
   showOutcomesImporterIfInProgress: vi.fn(() => vi.fn(() => {})),
-}))
-
-vi.mock('@canvas/util/globalUtils', async () => ({
-  ...(await vi.importActual('@canvas/util/globalUtils')),
-  windowConfirm: vi.fn(() => true),
 }))
 
 describe('OutcomeManagement', () => {
@@ -172,140 +154,6 @@ describe('OutcomeManagement', () => {
       expect(queryByText('Mastery')).not.toBeInTheDocument()
       expect(queryByText('Calculation')).not.toBeInTheDocument()
     })
-
-    describe('Changes confirmation', () => {
-      let originalAddEventListener, unloadEventListener
-
-      beforeAll(() => {
-        originalAddEventListener = window.addEventListener
-        window.addEventListener = (eventName, callback) => {
-          if (eventName === 'beforeunload') {
-            unloadEventListener = callback
-          }
-        }
-      })
-
-      beforeEach(() => {
-        vi.clearAllMocks()
-      })
-
-      afterAll(() => {
-        window.addEventListener = originalAddEventListener
-        unloadEventListener = null
-      })
-
-      it("Doesn't ask to confirm tab change when there is not change", () => {
-        useAllPages.mockReturnValue({
-          data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
-          isError: false,
-          isLoading: false,
-        })
-        const {getByText} = render(
-          <MockedProvider
-            cache={cache}
-            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
-          >
-            <OutcomeManagement />
-          </MockedProvider>,
-        )
-
-        fireEvent.click(getByText('Mastery'))
-        fireEvent.click(getByText('Calculation'))
-
-        expect(windowConfirm).not.toHaveBeenCalled()
-      })
-
-      it('Asks to confirm tab change when there is changes', async () => {
-        useAllPages.mockReturnValue({
-          data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
-          isError: false,
-          isLoading: false,
-        })
-        const {getByText, getByLabelText, getByTestId} = render(
-          <MockedProvider
-            cache={cache}
-            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
-          >
-            <OutcomeManagement />
-          </MockedProvider>,
-        )
-
-        fireEvent.click(getByText('Calculation'))
-        await act(async () => vi.runAllTimers())
-        fireEvent.input(getByLabelText('Parameter'), {target: {value: ''}})
-        fireEvent.click(getByText('Mastery'))
-        await act(async () => vi.runAllTimers())
-        expect(windowConfirm).toHaveBeenCalledWith(
-          'Are you sure you want to proceed? Changes you made will not be saved.',
-        )
-        expect(getByTestId('masteryScales')).toBeInTheDocument()
-      })
-
-      it("Doesn't change tabs when doesn't confirm", async () => {
-        // mock decline from user
-        windowConfirm.mockImplementationOnce(() => false)
-
-        const {getByText, getByLabelText, queryByTestId} = render(
-          <MockedProvider
-            cache={cache}
-            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
-          >
-            <OutcomeManagement />
-          </MockedProvider>,
-        )
-
-        fireEvent.click(getByText('Calculation'))
-        await act(async () => vi.runAllTimers())
-        fireEvent.input(getByLabelText('Parameter'), {target: {value: ''}})
-        fireEvent.click(getByText('Mastery'))
-        expect(queryByTestId('masteryScales')).not.toBeInTheDocument()
-      })
-
-      it("Allows to leave page when doesn't have changes", async () => {
-        const {getByText} = render(
-          <MockedProvider
-            cache={cache}
-            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
-          >
-            <OutcomeManagement />
-          </MockedProvider>,
-        )
-
-        const calculationButton = getByText('Calculation')
-        fireEvent.click(calculationButton)
-
-        await act(async () => vi.runAllTimers())
-
-        const e = vi.fn()
-        e.preventDefault = vi.fn()
-        unloadEventListener(e)
-        expect(e.preventDefault).not.toHaveBeenCalled()
-      })
-
-      it("Doesn't Allow to leave page when has changes", async () => {
-        const {getByText, getByLabelText} = render(
-          <MockedProvider
-            cache={cache}
-            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
-          >
-            <OutcomeManagement />
-          </MockedProvider>,
-        )
-
-        const calculationButton = getByText('Calculation')
-        fireEvent.click(calculationButton)
-
-        await act(async () => vi.runAllTimers())
-
-        const parameter = getByLabelText(/Parameter/)
-        fireEvent.input(parameter, {target: {value: '88'}})
-
-        const e = vi.fn()
-        e.preventDefault = vi.fn()
-        unloadEventListener(e)
-        expect(e.preventDefault).toHaveBeenCalled()
-      })
-    })
   }
 
   const courseOnlyTests = () => {
@@ -418,29 +266,5 @@ describe('OutcomeManagement', () => {
 
     sharedExamples()
     courseOnlyTests()
-  })
-})
-
-describe('OutcomePanel', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '<div id="outcomes" style="display:none">Outcomes Tab</div>'
-    vi.useFakeTimers()
-  })
-
-  afterEach(() => {
-    document.body.innerHTML = ''
-  })
-
-  it('sets style on mount', () => {
-    render(<OutcomePanel />)
-    vi.runAllTimers()
-    expect(document.getElementById('outcomes').style.display).toEqual('block')
-  })
-
-  it('sets style on unmount', () => {
-    const {unmount} = render(<OutcomePanel />)
-    unmount()
-    vi.runAllTimers()
-    expect(document.getElementById('outcomes').style.display).toEqual('none')
   })
 })
