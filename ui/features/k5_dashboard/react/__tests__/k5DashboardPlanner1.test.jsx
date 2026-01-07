@@ -19,10 +19,10 @@
 import React from 'react'
 import {render as testingLibraryRender} from '@testing-library/react'
 import K5Dashboard from '../K5Dashboard'
+import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import {resetPlanner} from '@canvas/planner'
 import {createPlannerMocks, defaultK5DashboardProps as defaultProps, defaultEnv} from './mocks'
-import fetchMock from 'fetch-mock'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 
@@ -45,10 +45,11 @@ describe('K5Dashboard Schedule Section', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
-    fetchMock.get(/\/api\/v1\/announcements/, [])
-    fetchMock.get(/\/api\/v1\/calendar_events/, [])
-    fetchMock.put(/.*\/api\/v1\/users\/\d+\/colors/, {})
-    fetchMock.spy()
+    server.use(
+      http.get(/\/api\/v1\/announcements.*/, () => HttpResponse.json([])),
+      http.get('/api/v1/calendar_events', () => HttpResponse.json([])),
+      http.put(/\/api\/v1\/users\/\d+\/colors.*/, () => HttpResponse.json({})),
+    )
     global.ENV = defaultEnv
     fetchShowK5Dashboard.mockImplementation(() =>
       Promise.resolve({show_k5_dashboard: true, use_classic_font: false}),
@@ -58,7 +59,6 @@ describe('K5Dashboard Schedule Section', () => {
   afterEach(async () => {
     global.ENV = {}
     resetPlanner()
-    fetchMock.reset()
     // Wait a bit for any pending transitions to complete
     await new Promise(resolve => setTimeout(resolve, 100))
   })

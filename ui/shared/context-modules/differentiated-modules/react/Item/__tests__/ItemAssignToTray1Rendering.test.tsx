@@ -17,14 +17,16 @@
  */
 
 import {cleanup, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
 import {
   DEFAULT_PROPS,
   OVERRIDES_URL,
   renderComponent,
+  server,
   setupBaseMocks,
   setupEnv,
   setupFlashHolder,
+  http,
+  HttpResponse,
 } from './ItemAssignToTrayTestUtils'
 
 describe('ItemAssignToTray - Rendering', () => {
@@ -32,6 +34,7 @@ describe('ItemAssignToTray - Rendering', () => {
 
   beforeAll(() => {
     setupFlashHolder()
+    server.listen()
   })
 
   beforeEach(() => {
@@ -42,9 +45,12 @@ describe('ItemAssignToTray - Rendering', () => {
 
   afterEach(() => {
     window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('renders basic elements', () => {
@@ -168,24 +174,26 @@ describe('ItemAssignToTray - Rendering', () => {
     expect(onDismiss).toHaveBeenCalled()
   })
 
-  it('fetches assignee options when defaultCards are passed', () => {
-    fetchMock.get(
-      OVERRIDES_URL,
-      {
-        id: '23',
-        due_at: '2023-10-05T12:00:00Z',
-        unlock_at: '2023-10-01T12:00:00Z',
-        lock_at: '2023-11-01T12:00:00Z',
-        only_visible_to_overrides: false,
-        visible_to_everyone: true,
-        overrides: [],
-      },
-      {
-        overwriteRoutes: true,
-      },
+  it('fetches assignee options when defaultCards are passed', async () => {
+    const overridesFetched = vi.fn()
+    server.use(
+      http.get(OVERRIDES_URL, () => {
+        overridesFetched()
+        return HttpResponse.json({
+          id: '23',
+          due_at: '2023-10-05T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          only_visible_to_overrides: false,
+          visible_to_everyone: true,
+          overrides: [],
+        })
+      }),
     )
     renderComponent({defaultCards: []})
-    expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(1)
+    await waitFor(() => {
+      expect(overridesFetched).toHaveBeenCalledTimes(1)
+    })
   })
 
   // TODO: flaky in Vitest - times out waiting for cards to load
@@ -201,10 +209,19 @@ describe('ItemAssignToTray - Rendering', () => {
   })
 
   describe('in a paced course', () => {
+    let overridesFetched: ReturnType<typeof vi.fn>
+
     beforeEach(() => {
       ENV.IN_PACED_COURSE = true
       ENV.FEATURES ||= {}
       ENV.FEATURES.course_pace_pacing_with_mastery_paths = true
+      overridesFetched = vi.fn()
+      server.use(
+        http.get(OVERRIDES_URL, () => {
+          overridesFetched()
+          return HttpResponse.json({})
+        }),
+      )
     })
 
     afterEach(() => {
@@ -217,9 +234,11 @@ describe('ItemAssignToTray - Rendering', () => {
       expect(getByTestId('CoursePacingNotice')).toBeInTheDocument()
     })
 
-    it('does not request existing overrides', () => {
+    it('does not request existing overrides', async () => {
       renderComponent()
-      expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(0)
+      // Wait a tick to ensure no async fetch would have been triggered
+      await new Promise(resolve => setTimeout(resolve, 50))
+      expect(overridesFetched).not.toHaveBeenCalled()
     })
   })
 })

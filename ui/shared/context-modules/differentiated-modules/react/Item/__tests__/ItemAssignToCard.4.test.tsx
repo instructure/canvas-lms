@@ -20,9 +20,12 @@ import React from 'react'
 import {render, screen, waitFor, act} from '@testing-library/react'
 import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
+
+const server = setupServer()
 
 const props: ItemAssignToCardProps = {
   courseId: '1',
@@ -53,9 +56,8 @@ const renderComponent = (overrides: Partial<ItemAssignToCardProps> = {}) =>
   )
 
 describe('ItemAssignToCard - PeerReviewSelector Integration', () => {
-  const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/1/modules/2/assignment_overrides?per_page=100`
+  const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/1/modules/2/assignment_overrides`
   const COURSE_SETTINGS_URL = `/api/v1/courses/1/settings`
-  const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
 
   let mockCheckbox: HTMLInputElement
   const originalENV = window.ENV
@@ -67,6 +69,7 @@ describe('ItemAssignToCard - PeerReviewSelector Integration', () => {
       liveRegion.setAttribute('role', 'alert')
       document.body.appendChild(liveRegion)
     }
+    server.listen()
   })
 
   beforeEach(() => {
@@ -91,18 +94,30 @@ describe('ItemAssignToCard - PeerReviewSelector Integration', () => {
     mockCheckbox.checked = true
     document.body.appendChild(mockCheckbox)
 
-    fetchMock.get(SECTIONS_URL, SECTIONS_DATA)
+    server.use(
+      http.get(/\/api\/v1\/courses\/.+\/sections/, () => {
+        return HttpResponse.json(SECTIONS_DATA)
+      }),
+      http.get(ASSIGNMENT_OVERRIDES_URL, () => {
+        return HttpResponse.json([])
+      }),
+      http.get(COURSE_SETTINGS_URL, () => {
+        return HttpResponse.json({hide_final_grades: false})
+      }),
+    )
     queryClient.setQueryData(['students', props.courseId, {per_page: 100}], STUDENTS_DATA)
-    fetchMock.get(ASSIGNMENT_OVERRIDES_URL, [])
-    fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
   })
 
   afterEach(() => {
     window.ENV = originalENV
-    fetchMock.restore()
+    server.resetHandlers()
     if (mockCheckbox && mockCheckbox.parentNode) {
       document.body.removeChild(mockCheckbox)
     }
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   describe('PeerReviewSelector visibility', () => {

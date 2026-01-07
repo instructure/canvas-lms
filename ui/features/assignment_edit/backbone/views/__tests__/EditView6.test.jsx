@@ -34,7 +34,37 @@ import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import React from 'react'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+// MSW server setup
+const server = setupServer(
+  http.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions/, () => {
+    return HttpResponse.json([])
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, () => {
+    return HttpResponse.json([])
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/settings/, () => {
+    return HttpResponse.json({})
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/sections/, () => {
+    return HttpResponse.json([])
+  }),
+  http.post('http://localhost/api/graphql', () => {
+    return HttpResponse.json({
+      data: {
+        legacyNode: {
+          id: '1',
+          name: 'Test Course',
+          enrollmentsConnection: {
+            edges: [],
+          },
+        },
+      },
+    })
+  }),
+)
 
 vi.mock('@canvas/rce/serviceRCELoader')
 vi.mock('@canvas/external-tools/react/components/ExternalToolModalLauncher')
@@ -149,28 +179,9 @@ const disableCheckbox = id => {
   document.getElementById(id).disabled = true
 }
 
-beforeEach(() => {
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions/, [])
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, [])
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/settings/, {})
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/sections/, [])
-  // Mock GraphQL endpoint for differentiated modules
-  fetchMock.post('http://localhost/api/graphql', {
-    data: {
-      legacyNode: {
-        id: '1',
-        name: 'Test Course',
-        enrollmentsConnection: {
-          edges: [],
-        },
-      },
-    },
-  })
-})
-
-afterEach(() => {
-  fetchMock.reset()
-})
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+afterEach(() => server.resetHandlers())
 
 describe('EditView#handleModeratedGradingChanged', () => {
   let view
@@ -321,8 +332,6 @@ describe('EditView#handleMessageEvent', () => {
       USAGE_RIGHTS_REQUIRED: false,
       ROOT_FOLDER_ID: '1',
     })
-
-    fetchMock.mock(/^\/api\/v1\/courses\/\d+\/assignments\/\d+$/, [])
 
     view = createEditView()
   })

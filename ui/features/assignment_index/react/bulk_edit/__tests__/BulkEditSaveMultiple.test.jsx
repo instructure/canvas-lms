@@ -22,10 +22,26 @@ import tz from 'timezone'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import tokyo from 'timezone/Asia/Tokyo'
 import moment from 'moment-timezone'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import BulkEdit from '../BulkEdit'
 
 const ASSIGNMENTS_ENDPOINT = /api\/v1\/courses\/\d+\/assignments/
+const BULK_UPDATE_ENDPOINT = /api\/v1\/courses\/\d+\/assignments\/bulk_update/
+
+// Track captured requests for assertions
+let capturedRequests = []
+
+const server = setupServer(
+  http.get(ASSIGNMENTS_ENDPOINT, () => {
+    return HttpResponse.json([])
+  }),
+  http.put(BULK_UPDATE_ENDPOINT, async ({request}) => {
+    const body = await request.json()
+    capturedRequests.push({url: request.url, body})
+    return HttpResponse.json({})
+  }),
+)
 
 async function flushPromises() {
   await act(() => new Promise(resolve => setTimeout(resolve, 0)))
@@ -76,7 +92,11 @@ function renderBulkEdit(overrides = {}) {
 }
 
 async function renderBulkEditAndWait(overrides = {}, assignments = standardAssignmentResponse()) {
-  fetchMock.getOnce(ASSIGNMENTS_ENDPOINT, assignments)
+  server.use(
+    http.get(ASSIGNMENTS_ENDPOINT, () => {
+      return HttpResponse.json(assignments)
+    }),
+  )
   const result = renderBulkEdit(overrides)
   await flushPromises()
   result.assignments = assignments
@@ -88,15 +108,19 @@ function changeAndBlurInput(input, newValue) {
   fireEvent.blur(input)
 }
 
+beforeAll(() => server.listen())
+
 beforeEach(() => {
-  fetchMock.put(/api\/v1\/courses\/\d+\/assignments\/bulk_update/, {})
+  capturedRequests = []
   // Note: This test file intentionally does NOT use fake timers
   // because changing multiple inputs with fake timers can cause timeouts
 })
 
 afterEach(() => {
-  fetchMock.reset()
+  server.resetHandlers()
 })
+
+afterAll(() => server.close())
 
 describe('Assignment Bulk Edit - Save Multiple', () => {
   let oldEnv
@@ -129,7 +153,7 @@ describe('Assignment Bulk Edit - Save Multiple', () => {
     changeAndBlurInput(getAllByLabelText('Due At')[2], dueAtDate)
     fireEvent.click(getByText('Save'))
     await flushPromises()
-    const body = JSON.parse(fetchMock.calls()[1][1].body)
+    const body = capturedRequests[0].body
     expect(body).toMatchObject([
       {
         id: 'assignment_1',

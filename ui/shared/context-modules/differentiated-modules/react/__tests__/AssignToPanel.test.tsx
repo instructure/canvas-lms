@@ -26,10 +26,13 @@ import {
   DIFFERENTIATION_TAGS_DATA,
 } from './mocks'
 import * as utils from '../../utils/assignToHelper'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import userEvent from '@testing-library/user-event'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
+
+const server = setupServer()
 
 vi.mock('../../utils/assignToHelper', async () => {
   const originalModule = await vi.importActual('../../utils/assignToHelper')
@@ -55,11 +58,7 @@ describe('AssignToPanel', () => {
     mountNodeRef: {current: null},
   }
 
-  const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides?per_page=100`
-  const ASSIGNMENT_OVERRIDES_URL_PUT = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
-  const COURSE_SETTINGS_URL = `/api/v1/courses/${props.courseId}/settings`
-  const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
-  const DIFFERENTIATION_TAGS_URL = `/api/v1/courses/${props.courseId}/groups?collaboration_state=non_collaborative&include=group_category&per_page=100`
+  let lastPutBody: unknown = null
 
   beforeAll(() => {
     if (!document.getElementById('flash_screenreader_holder')) {
@@ -68,20 +67,39 @@ describe('AssignToPanel', () => {
       liveRegion.setAttribute('role', 'alert')
       document.body.appendChild(liveRegion)
     }
+    server.listen()
   })
 
   beforeEach(() => {
-    fetchMock.get(SECTIONS_URL, SECTIONS_DATA)
+    lastPutBody = null
+    server.use(
+      http.get(/\/api\/v1\/courses\/.+\/sections/, () => {
+        return HttpResponse.json(SECTIONS_DATA)
+      }),
+      http.get(/\/api\/v1\/courses\/.+\/modules\/.+\/assignment_overrides/, () => {
+        return HttpResponse.json([])
+      }),
+      http.get(/\/api\/v1\/courses\/.+\/settings/, () => {
+        return HttpResponse.json({hide_final_grades: false})
+      }),
+      http.put(/\/api\/v1\/courses\/.+\/modules\/.+\/assignment_overrides/, async ({request}) => {
+        lastPutBody = await request.json()
+        return HttpResponse.json({})
+      }),
+      http.get(/\/api\/v1\/courses\/.+\/groups/, () => {
+        return HttpResponse.json(DIFFERENTIATION_TAGS_DATA)
+      }),
+    )
     queryClient.setQueryData(['students', props.courseId, {per_page: 100}], STUDENTS_DATA)
-    fetchMock.get(ASSIGNMENT_OVERRIDES_URL, [])
-    fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
-    fetchMock.put(ASSIGNMENT_OVERRIDES_URL_PUT, {})
-    fetchMock.get(DIFFERENTIATION_TAGS_URL, DIFFERENTIATION_TAGS_DATA)
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
     queryClient.removeQueries()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   const renderComponent = (overrides = {}) =>
@@ -116,18 +134,22 @@ describe('AssignToPanel', () => {
   })
 
   it('renders custom access as the default option if there are assignmentOverrides', async () => {
-    fetchMock.get(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
-      overwriteRoutes: true,
-    })
+    server.use(
+      http.get(/\/api\/v1\/courses\/.+\/modules\/.+\/assignment_overrides/, () => {
+        return HttpResponse.json(ASSIGNMENT_OVERRIDES_DATA)
+      }),
+    )
     const {findByTestId} = renderComponent()
     expect(await findByTestId('loading-overlay')).toBeInTheDocument()
     expect(await findByTestId('custom-option')).toBeChecked()
   })
 
   it('not render custom access as the default option if default option is called', async () => {
-    fetchMock.get(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
-      overwriteRoutes: true,
-    })
+    server.use(
+      http.get(/\/api\/v1\/courses\/.+\/modules\/.+\/assignment_overrides/, () => {
+        return HttpResponse.json(ASSIGNMENT_OVERRIDES_DATA)
+      }),
+    )
     const {findByTestId} = renderComponent({defaultOption: 'everyone'})
     expect(await findByTestId('everyone-option')).toBeChecked()
   })
@@ -188,9 +210,11 @@ describe('AssignToPanel', () => {
     })
 
     it('shows existing assignmentOverrides as the default selection', async () => {
-      fetchMock.get(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
-        overwriteRoutes: true,
-      })
+      server.use(
+        http.get(/\/api\/v1\/courses\/.+\/modules\/.+\/assignment_overrides/, () => {
+          return HttpResponse.json(ASSIGNMENT_OVERRIDES_DATA)
+        }),
+      )
       const assignedSections = ASSIGNMENT_OVERRIDES_DATA.filter(
         override => override.course_section !== undefined,
       )
@@ -314,9 +338,11 @@ describe('AssignToPanel', () => {
     })
 
     it('displays empty assignee error on clearAll after component is rendered with pills', async () => {
-      fetchMock.get(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
-        overwriteRoutes: true,
-      })
+      server.use(
+        http.get(/\/api\/v1\/courses\/.+\/modules\/.+\/assignment_overrides/, () => {
+          return HttpResponse.json(ASSIGNMENT_OVERRIDES_DATA)
+        }),
+      )
       renderComponent()
       expect(await screen.findByTestId('custom-option')).toBeChecked()
       const clearAllButton = screen.getByTestId('clear_selection_button')
@@ -365,16 +391,18 @@ describe('AssignToPanel', () => {
 
       getByRole('button', {name: 'Save'}).click()
       expect((await findAllByText('Module access updated successfully.'))[0]).toBeInTheDocument()
-      const requestBody = fetchMock.lastOptions(ASSIGNMENT_OVERRIDES_URL_PUT)?.body
       const expectedPayload = {
         overrides: [{course_section_id: SECTIONS_DATA[0].id}],
       }
-      // Compare as objects to avoid JSON property order issues
-      expect(JSON.parse(requestBody as unknown as string)).toEqual(expectedPayload)
+      expect(lastPutBody).toEqual(expectedPayload)
     })
 
     it('updates existing assignment overrides', async () => {
-      fetchMock.get(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {overwriteRoutes: true})
+      server.use(
+        http.get(/\/api\/v1\/courses\/.+\/modules\/.+\/assignment_overrides/, () => {
+          return HttpResponse.json(ASSIGNMENT_OVERRIDES_DATA)
+        }),
+      )
       const studentsOverride = ASSIGNMENT_OVERRIDES_DATA[0]
       const existingOverride = ASSIGNMENT_OVERRIDES_DATA[1]
       const {findByTestId, findByText, getByRole, findAllByText} = renderComponent()
@@ -388,15 +416,13 @@ describe('AssignToPanel', () => {
 
       getByRole('button', {name: 'Save'}).click()
       expect((await findAllByText('Module access updated successfully.'))[0]).toBeInTheDocument()
-      const requestBody = fetchMock.lastOptions(ASSIGNMENT_OVERRIDES_URL_PUT)?.body
       // it sends back the student list override, including the assignment override id
       const expectedPayload = {
         overrides: [
           {id: studentsOverride.id, student_ids: studentsOverride.students!.map(({id}) => id)},
         ],
       }
-      // Compare as objects to avoid JSON property order issues
-      expect(JSON.parse(requestBody as unknown as string)).toEqual(expectedPayload)
+      expect(lastPutBody).toEqual(expectedPayload)
     })
 
     it('updates the modules UI', async () => {
@@ -407,7 +433,6 @@ describe('AssignToPanel', () => {
     })
 
     it('calls onDidSubmit instead of onDismiss if passed', async () => {
-      fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
       const onDidSubmitMock = vi.fn()
       const onDismissMock = vi.fn()
       renderComponent({

@@ -24,7 +24,7 @@ import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import {render as testingLibraryRender} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import React from 'react'
 import K5Dashboard from '../K5Dashboard'
@@ -48,20 +48,24 @@ beforeEach(() => {
   resetCardCache()
   resetPlanner()
   sessionStorage.clear()
-  server.use(...createPlannerMocks())
-  fetchMock.get(/\/api\/v1\/announcements.*/, [])
-  fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, [])
-  fetchMock.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, [])
-  fetchMock.get(/\/api\/v1\/calendar_events\?type=assignment.*/, [])
-  fetchMock.get(/\/api\/v1\/calendar_events\?type=event.*/, [])
-  fetchMock.post(/\/api\/v1\/calendar_events\/save_selected_contexts.*/, {status: 'ok'})
-  fetchMock.put(/\/api\/v1\/users\/\d+\/colors\.*/, [])
+  server.use(
+    ...createPlannerMocks(),
+    http.get(/\/api\/v1\/announcements.*/, () => HttpResponse.json([])),
+    http.get(/\/api\/v1\/users\/self\/courses.*/, () => HttpResponse.json([])),
+    http.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, () => HttpResponse.json([])),
+    http.get('/api/v1/calendar_events', ({request}) => {
+      return HttpResponse.json([])
+    }),
+    http.post(/\/api\/v1\/calendar_events\/save_selected_contexts.*/, () =>
+      HttpResponse.json({status: 'ok'}),
+    ),
+    http.put(/\/api\/v1\/users\/\d+\/colors.*/, () => HttpResponse.json([])),
+  )
   fakeENV.setup(defaultEnv)
 })
 
 afterEach(() => {
   server.resetHandlers()
-  fetchMock.restore()
   fakeENV.teardown()
   resetPlanner()
   resetCardCache()

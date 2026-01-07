@@ -17,14 +17,28 @@
  */
 
 import React from 'react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {act, render, waitFor} from '@testing-library/react'
 
 import FilterCalendarsModal from '../FilterCalendarsModal'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import {IMPORTANT_DATES_CONTEXTS} from '@canvas/k5/react/__tests__/fixtures'
 
-const SAVED_SELECTED_CONTEXTS_URL = /\/api\/v1\/calendar_events\/save_selected_contexts.*/
+// Track requests for assertions
+let requestLog = []
+let saveContextsStatus = 200
+
+const server = setupServer(
+  http.post('/api/v1/calendar_events/save_selected_contexts', async ({request}) => {
+    const url = new URL(request.url)
+    requestLog.push({url: request.url, method: 'POST'})
+    if (saveContextsStatus !== 200) {
+      return new HttpResponse(null, {status: saveContextsStatus})
+    }
+    return HttpResponse.json({status: 'ok'})
+  }),
+)
 
 const defaultProps = {
   closeModal: vi.fn(),
@@ -35,13 +49,17 @@ const defaultProps = {
   updateSelectedContextCodes: vi.fn(),
 }
 
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+
 beforeEach(() => {
-  fetchMock.post(SAVED_SELECTED_CONTEXTS_URL, JSON.stringify({status: 'ok'}))
+  saveContextsStatus = 200
+  requestLog = []
 })
 
 afterEach(() => {
   vi.resetAllMocks()
-  fetchMock.restore()
+  server.resetHandlers()
   destroyContainer()
 })
 
@@ -79,14 +97,16 @@ describe('FilterCalendarsModal', () => {
     expect(defaultProps.closeModal).toHaveBeenCalledTimes(1)
     expect(defaultProps.updateSelectedContextCodes).toHaveBeenCalledWith(['course_3'])
 
-    await waitFor(() => expect(fetchMock.called(SAVED_SELECTED_CONTEXTS_URL, 'POST')).toBe(true))
-    expect(fetchMock.lastUrl(SAVED_SELECTED_CONTEXTS_URL)).toMatch(
-      'selected_contexts%5B%5D=course_3',
-    )
+    await waitFor(() => {
+      const postRequests = requestLog.filter(req => req.method === 'POST')
+      expect(postRequests.length).toBeGreaterThan(0)
+    })
+    const lastPostRequest = requestLog.filter(req => req.method === 'POST').pop()
+    expect(lastPostRequest.url).toMatch('selected_contexts%5B%5D=course_3')
   })
 
   it('renders an error message if saving selected contexts fails', async () => {
-    fetchMock.post(SAVED_SELECTED_CONTEXTS_URL, 500, {overwriteRoutes: true})
+    saveContextsStatus = 500
 
     const {findAllByText, getByRole} = render(<FilterCalendarsModal {...defaultProps} />)
 
