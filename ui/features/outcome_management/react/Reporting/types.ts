@@ -81,6 +81,8 @@ export type MasteryLevel =
   | 'remediation'
   | 'unassessed'
 
+export type MasteryFilter = 'all' | 'mastery' | 'not_started' | 'in_progress'
+
 export type SortColumn = 'code' | 'assessed' | 'mastery'
 
 export interface Outcome {

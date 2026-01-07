@@ -18,56 +18,79 @@
 
 import {render, screen} from '@testing-library/react'
 import OutcomesControlsBar from '../OutcomesControlsBar'
+import type {MasteryFilter} from '../types'
 
 describe('OutcomesControlsBar', () => {
   const defaultProps = {
     search: '',
     onSearchChangeHandler: jest.fn(),
     onSearchClearHandler: jest.fn(),
+    masteryFilter: 'all' as MasteryFilter,
+    onMasteryFilterChange: jest.fn(),
   }
 
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  it('renders the component', () => {
-    render(<OutcomesControlsBar {...defaultProps} />)
-    expect(screen.getByTestId('search-input')).toBeInTheDocument()
+  describe('search input', () => {
+    it('renders search component', () => {
+      render(<OutcomesControlsBar {...defaultProps} />)
+      expect(screen.getByTestId('search-input')).toBeInTheDocument()
+    })
+
+    it('renders search input with correct placeholder', () => {
+      render(<OutcomesControlsBar {...defaultProps} />)
+      const searchInput = screen.getByTestId('search-input')
+      expect(searchInput).toHaveAttribute('placeholder', 'Search...')
+    })
+
+    it('renders search input with correct screen reader label', () => {
+      render(<OutcomesControlsBar {...defaultProps} />)
+      const searchInput = screen.getByTestId('search-input')
+      expect(searchInput).toHaveAccessibleName('Search outcomes')
+    })
+
+    it('displays the current search value', () => {
+      render(<OutcomesControlsBar {...defaultProps} search="test search" />)
+      const searchInput = screen.getByTestId('search-input') as HTMLInputElement
+      expect(searchInput.value).toBe('test search')
+    })
+
+    it('does not display clear button when search is empty', () => {
+      render(<OutcomesControlsBar {...defaultProps} search="" />)
+      const clearButton = screen.queryByTestId('clear-search-icon')
+      expect(clearButton).not.toBeInTheDocument()
+    })
+
+    it('displays clear button when search has value', () => {
+      render(<OutcomesControlsBar {...defaultProps} search="test" />)
+      const clearButton = screen.getByTestId('clear-search-icon')
+      expect(clearButton).toBeInTheDocument()
+    })
+
+    it('search input has type="search"', () => {
+      render(<OutcomesControlsBar {...defaultProps} />)
+      const searchInput = screen.getByTestId('search-input') as HTMLInputElement
+      expect(searchInput.type).toBe('search')
+    })
   })
 
-  it('renders search input with correct placeholder', () => {
-    render(<OutcomesControlsBar {...defaultProps} />)
-    const searchInput = screen.getByTestId('search-input')
-    expect(searchInput).toHaveAttribute('placeholder', 'Search...')
-  })
+  describe('mastery filter', () => {
+    it('renders mastery filter dropdown', () => {
+      render(<OutcomesControlsBar {...defaultProps} />)
+      expect(screen.getByTestId('mastery-filter-select')).toBeInTheDocument()
+    })
 
-  it('renders search input with correct screen reader label', () => {
-    render(<OutcomesControlsBar {...defaultProps} />)
-    const searchInput = screen.getByTestId('search-input')
-    expect(searchInput).toHaveAccessibleName('Search outcomes')
-  })
+    it('displays "Not Started" when not_started filter is selected', () => {
+      render(<OutcomesControlsBar {...defaultProps} masteryFilter="not_started" />)
+      const filterSelect = screen.getByTestId('mastery-filter-select') as HTMLInputElement
+      expect(filterSelect.value).toBe('Not Started')
+    })
 
-  it('displays the current search value', () => {
-    render(<OutcomesControlsBar {...defaultProps} search="test search" />)
-    const searchInput = screen.getByTestId('search-input') as HTMLInputElement
-    expect(searchInput.value).toBe('test search')
-  })
-
-  it('does not display clear button when search is empty', () => {
-    render(<OutcomesControlsBar {...defaultProps} search="" />)
-    const clearButton = screen.queryByTestId('clear-search-icon')
-    expect(clearButton).not.toBeInTheDocument()
-  })
-
-  it('displays clear button when search has value', () => {
-    render(<OutcomesControlsBar {...defaultProps} search="test" />)
-    const clearButton = screen.getByTestId('clear-search-icon')
-    expect(clearButton).toBeInTheDocument()
-  })
-
-  it('search input has type="search"', () => {
-    render(<OutcomesControlsBar {...defaultProps} />)
-    const searchInput = screen.getByTestId('search-input') as HTMLInputElement
-    expect(searchInput.type).toBe('search')
+    it('has correct screen reader label', () => {
+      render(<OutcomesControlsBar {...defaultProps} />)
+      expect(screen.getByLabelText('Filter by mastery')).toBeInTheDocument()
+    })
   })
 })
