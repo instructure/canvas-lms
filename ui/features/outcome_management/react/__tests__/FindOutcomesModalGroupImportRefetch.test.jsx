@@ -36,7 +36,6 @@ vi.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 
 vi.mock('@canvas/progress/resolve_progress')
-vi.useFakeTimers()
 
 describe('FindOutcomesModal - Group Import Refetch Tests', () => {
   let cache
@@ -46,6 +45,7 @@ describe('FindOutcomesModal - Group Import Refetch Tests', () => {
   let defaultProps
 
   beforeEach(() => {
+    vi.useFakeTimers({shouldAdvanceTime: true})
     onCloseHandlerMock = vi.fn()
     setTargetGroupIdsToRefetchMock = vi.fn()
     setImportsTargetGroupMock = vi.fn()
@@ -60,6 +60,7 @@ describe('FindOutcomesModal - Group Import Refetch Tests', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.useRealTimers()
     resolveProgress.mockReset()
   })
 
