@@ -18,9 +18,12 @@
 
 import React from 'react'
 import {render, fireEvent, act, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import useContentShareUserSearchApi from '../../effects/useContentShareUserSearchApi'
 import DirectShareUserModal from '../DirectShareUserModal'
+
+const server = setupServer()
 
 vi.mock('../../effects/useContentShareUserSearchApi')
 
@@ -72,8 +75,10 @@ vi.mock('../DirectShareUserPanel', () => ({
 
 describe('DirectShareUserModal', () => {
   let ariaLive
+  let lastRequestBody
 
   beforeAll(() => {
+    server.listen()
     window.ENV = {COURSE_ID: '42'}
     ariaLive = document.createElement('div')
     ariaLive.id = 'flash_screenreader_holder'
@@ -82,18 +87,20 @@ describe('DirectShareUserModal', () => {
   })
 
   afterAll(() => {
+    server.close()
     delete window.ENV
     if (ariaLive) ariaLive.remove()
   })
 
   beforeEach(() => {
+    lastRequestBody = undefined
     useContentShareUserSearchApi.mockImplementation(() => {
       // Mock implementation - not used with the mocked DirectShareUserPanel
     })
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
     vi.clearAllMocks()
   })
 
@@ -105,7 +112,12 @@ describe('DirectShareUserModal', () => {
   }
 
   it('starts a share operation and reports status', async () => {
-    fetchMock.postOnce('path:/api/v1/users/self/content_shares', 200)
+    server.use(
+      http.post('/api/v1/users/self/content_shares', async ({request}) => {
+        lastRequestBody = await request.json()
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
     const onDismiss = vi.fn()
     const {getByText, getAllByText, findByLabelText} = render(
       <DirectShareUserModal
@@ -117,21 +129,26 @@ describe('DirectShareUserModal', () => {
     )
     await selectUser(getByText, findByLabelText)
     fireEvent.click(getByText('Send'))
-    const [, fetchOptions] = fetchMock.lastCall()
-    expect(fetchOptions.method).toBe('POST')
-    expect(JSON.parse(fetchOptions.body)).toMatchObject({
-      receiver_ids: ['abc'],
-      content_type: 'discussion_topic',
-      content_id: '42',
+    await waitFor(() => {
+      expect(lastRequestBody).toMatchObject({
+        receiver_ids: ['abc'],
+        content_type: 'discussion_topic',
+        content_id: '42',
+      })
     })
     expect(getAllByText(/start/i)).not.toHaveLength(0)
-    await act(() => fetchMock.flush(true))
-    expect(getAllByText(/success/i)).toHaveLength(2) // visible and sr alert
+    await waitFor(() => {
+      expect(getAllByText(/success/i)).toHaveLength(2) // visible and sr alert
+    })
     expect(onDismiss).toHaveBeenCalled()
   })
 
   it('clears user selection when the modal is closed', async () => {
-    fetchMock.get('*', [{id: 'abc', name: 'abc'}])
+    server.use(
+      http.get('*', () => {
+        return HttpResponse.json([{id: 'abc', name: 'abc'}])
+      }),
+    )
     const {queryByText, getByText, findByLabelText, rerender} = render(
       <DirectShareUserModal open={true} courseId="1" />,
     )
@@ -151,7 +168,11 @@ describe('DirectShareUserModal', () => {
     })
 
     it('reports an error if the fetch fails', async () => {
-      fetchMock.postOnce('path:/api/v1/users/self/content_shares', 400)
+      server.use(
+        http.post('/api/v1/users/self/content_shares', () => {
+          return new HttpResponse(null, {status: 400})
+        }),
+      )
       const {getByText, findByLabelText} = render(
         <DirectShareUserModal
           open={true}
@@ -161,8 +182,9 @@ describe('DirectShareUserModal', () => {
       )
       await selectUser(getByText, findByLabelText)
       fireEvent.click(getByText('Send'))
-      await act(() => fetchMock.flush(true))
-      expect(getByText(/error/i)).toBeInTheDocument()
+      await waitFor(() => {
+        expect(getByText(/error/i)).toBeInTheDocument()
+      })
       expect(getByText('Send').closest('button').getAttribute('disabled')).toBeNull()
     })
   })

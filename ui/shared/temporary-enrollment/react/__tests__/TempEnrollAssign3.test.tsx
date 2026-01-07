@@ -19,7 +19,10 @@
 import {fireEvent, render, waitFor, within} from '@testing-library/react'
 import {Props, TempEnrollAssign, tempEnrollAssignData} from '../TempEnrollAssign'
 import {MAX_ALLOWED_COURSES_PER_PAGE, PROVIDER, User} from '../types'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 const backCall = vi.fn()
 
@@ -103,6 +106,8 @@ const ENROLLMENTS_URI = encodeURI(
 )
 
 describe('TempEnrollAssign', () => {
+  beforeAll(() => server.listen())
+
   beforeEach(() => {
     // @ts-expect-error
     window.ENV = {
@@ -110,18 +115,18 @@ describe('TempEnrollAssign', () => {
       CONTEXT_TIMEZONE: 'Asia/Brunei',
       context_asset_string: 'account_1',
     }
-    fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
+    server.use(http.get(ENROLLMENTS_URI, () => HttpResponse.json(enrollmentsByCourse)))
   })
 
   afterEach(() => {
-    fetchMock.reset()
-    fetchMock.restore()
+    server.resetHandlers()
     vi.clearAllMocks()
     // ensure a clean state before each tests
     localStorage.clear()
   })
 
   afterAll(() => {
+    server.close()
     // @ts-expect-error
     window.ENV = {}
   })

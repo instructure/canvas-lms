@@ -19,9 +19,12 @@
 import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {type Props, TempEnrollAssign} from '../TempEnrollAssign'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {MAX_ALLOWED_COURSES_PER_PAGE, PROVIDER, type User} from '../types'
 import fakeENV from '@canvas/test-utils/fakeENV'
+
+const server = setupServer()
 
 const backCall = vi.fn()
 
@@ -138,6 +141,8 @@ const ENROLLMENTS_URI_PAGE_2 = encodeURI(
 )
 
 describe('TempEnrollAssign', () => {
+  beforeAll(() => server.listen())
+
   beforeEach(() => {
     // Use fakeENV instead of directly modifying window.ENV
     fakeENV.setup({
@@ -148,8 +153,7 @@ describe('TempEnrollAssign', () => {
   })
 
   afterEach(() => {
-    fetchMock.reset()
-    fetchMock.restore()
+    server.resetHandlers()
     vi.clearAllMocks()
     // Clean up fakeENV
     fakeENV.teardown()
@@ -158,12 +162,12 @@ describe('TempEnrollAssign', () => {
   })
 
   afterAll(() => {
-    // No need to reset window.ENV here as fakeENV.teardown() handles it
+    server.close()
   })
 
   describe('With Successful API calls', () => {
     beforeEach(() => {
-      fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
+      server.use(http.get(ENROLLMENTS_URI, () => HttpResponse.json(enrollmentsByCourse)))
     })
 
     it('initializes with ROLE as the default role in the summary', async () => {
@@ -303,13 +307,7 @@ describe('TempEnrollAssign', () => {
 
     it('changes summary when date and time changes', async () => {
       // Mock the courses API to prevent unmatched GET warnings
-      fetchMock.get(
-        '/api/v1/users/1/courses?enrollment_state=active&include%5B%5D=sections&include%5B%5D=term&per_page=100',
-        {
-          status: 200,
-          body: [],
-        },
-      )
+      server.use(http.get('/api/v1/users/1/courses', () => HttpResponse.json([])))
 
       // Set up a clean environment for this test
       fakeENV.setup({
@@ -377,7 +375,6 @@ describe('TempEnrollAssign', () => {
 
       // Clean up
       fakeENV.teardown()
-      fetchMock.restore()
     })
   })
 
@@ -386,11 +383,7 @@ describe('TempEnrollAssign', () => {
       // mock console.error
       vi.spyOn(console, 'error').mockImplementation(() => {})
 
-      fetchMock.get(ENROLLMENTS_URI, 500)
-    })
-
-    afterEach(() => {
-      fetchMock.reset()
+      server.use(http.get(ENROLLMENTS_URI, () => new HttpResponse(null, {status: 500})))
     })
 
     it('shows error for failed enrollments fetch', async () => {
@@ -404,21 +397,20 @@ describe('TempEnrollAssign', () => {
 
   describe('pagination', () => {
     beforeEach(() => {
-      fetchMock.get(ENROLLMENTS_URI, {
-        status: 200,
-        headers: {
-          Link: `<${ENROLLMENTS_URI_PAGE_2}>; rel="next"`,
-        },
-        body: enrollmentsByCourse,
-      })
-      fetchMock.get(ENROLLMENTS_URI_PAGE_2, {
-        status: 200,
-        body: enrollmentsByCoursePage2,
-      })
-    })
-
-    afterEach(() => {
-      fetchMock.reset()
+      server.use(
+        http.get('/api/v1/users/:userId/courses', ({request}) => {
+          const url = new URL(request.url)
+          const page = url.searchParams.get('page')
+          if (page === '2') {
+            return HttpResponse.json(enrollmentsByCoursePage2)
+          }
+          return HttpResponse.json(enrollmentsByCourse, {
+            headers: {
+              Link: `<${ENROLLMENTS_URI_PAGE_2}>; rel="next"`,
+            },
+          })
+        }),
+      )
     })
 
     it('aggregates results from multiple pages', async () => {

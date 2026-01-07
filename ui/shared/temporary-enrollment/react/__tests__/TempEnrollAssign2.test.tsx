@@ -29,7 +29,8 @@ import {
   TempEnrollAssign,
   tempEnrollAssignData,
 } from '../TempEnrollAssign'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {
   type Enrollment,
   MAX_ALLOWED_COURSES_PER_PAGE,
@@ -42,6 +43,8 @@ import {deleteEnrollment, getTemporaryEnrollmentPairing} from '../api/enrollment
 import * as localStorageUtils from '../util/helpers'
 import {getDayBoundaries} from '../util/helpers'
 import MockDate from 'mockdate'
+
+const server = setupServer()
 
 const backCall = vi.fn()
 
@@ -133,6 +136,8 @@ function formatDateToLocalString(utcDateStr: string) {
 }
 
 describe('TempEnrollAssign', () => {
+  beforeAll(() => server.listen())
+
   beforeEach(() => {
     // @ts-expect-error
     window.ENV = {
@@ -143,14 +148,14 @@ describe('TempEnrollAssign', () => {
   })
 
   afterEach(() => {
-    fetchMock.reset()
-    fetchMock.restore()
+    server.resetHandlers()
     vi.clearAllMocks()
     // ensure a clean state before each tests
     localStorage.clear()
   })
 
   afterAll(() => {
+    server.close()
     // @ts-expect-error
     window.ENV = {}
   })
@@ -195,7 +200,7 @@ describe('TempEnrollAssign', () => {
     ] as Enrollment[]
 
     beforeEach(() => {
-      fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
+      server.use(http.get(ENROLLMENTS_URI, () => HttpResponse.json(enrollmentsByCourse)))
       tempProps = {
         ...props,
         tempEnrollmentsPairing: tempEnrollmentsPairingMock,
@@ -442,11 +447,9 @@ describe('TempEnrollAssign', () => {
     let mockRoles: Role[]
 
     function mockGetFromLocalStorage<T extends object>(data: T | undefined) {
-      vi
-        .spyOn(localStorageUtils, 'getFromLocalStorage')
-        .mockImplementation((storageKey: string) =>
-          storageKey === tempEnrollAssignData ? data : undefined,
-        )
+      vi.spyOn(localStorageUtils, 'getFromLocalStorage').mockImplementation((storageKey: string) =>
+        storageKey === tempEnrollAssignData ? data : undefined,
+      )
     }
 
     beforeEach(() => {

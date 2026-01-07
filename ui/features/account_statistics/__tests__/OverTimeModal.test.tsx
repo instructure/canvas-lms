@@ -19,7 +19,8 @@
 import {render, waitFor} from '@testing-library/react'
 import OverTimeModal from '../OverTimeModal'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {queryClient} from '@canvas/query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 
@@ -32,6 +33,8 @@ vi.mock('../OverTimeGraph', () => ({
     </div>
   )),
 }))
+
+const server = setupServer()
 
 const renderModal = () => {
   const screen = render(
@@ -60,33 +63,43 @@ const generateUrl = (accountId: string, key: string) =>
   `/accounts/${accountId}/statistics/over_time/${key}`
 
 describe('OverTimeModal', () => {
+  beforeAll(() => server.listen())
   afterAll(() => {
+    server.close()
     vi.clearAllMocks()
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   it('opens and fetches when the link is clicked', async () => {
-    const initialUrl = generateUrl('1', 'test_type')
+    const requestReceived = vi.fn()
+    server.use(
+      http.get('/accounts/1/statistics/over_time/test_type', () => {
+        requestReceived()
+        return HttpResponse.json(fakeResponse)
+      }),
+    )
     const user = userEvent.setup()
-    fetchMock.get(initialUrl, fakeResponse)
     const {getByText} = renderModal()
 
-    expect(fetchMock.called(initialUrl)).toBe(false)
+    expect(requestReceived).not.toHaveBeenCalled()
     user.click(getByText('View TestType'))
 
     await waitFor(() => {
-      expect(fetchMock.called(initialUrl)).toBe(true)
+      expect(requestReceived).toHaveBeenCalled()
       expect(getByText('TestType Over Time')).toBeInTheDocument()
     })
   })
 
   it('validates that clicking the close button will close the modal', async () => {
-    const initialUrl = generateUrl('1', 'another_type')
+    server.use(
+      http.get('/accounts/1/statistics/over_time/another_type', () => {
+        return HttpResponse.json(fakeResponse)
+      }),
+    )
     const user = userEvent.setup()
-    fetchMock.get(initialUrl, fakeResponse)
     const {getByText, queryByText, getByTestId} = renderModal()
 
     await user.click(getByText('View AnotherType'))
@@ -104,9 +117,12 @@ describe('OverTimeModal', () => {
   })
 
   it('renders error message when fetch request fails', async () => {
-    const initialUrl = generateUrl('1', 'another_type')
+    server.use(
+      http.get('/accounts/1/statistics/over_time/another_type', () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
     const user = userEvent.setup()
-    fetchMock.get(initialUrl, 500)
     const {getByText} = renderModal()
 
     await user.click(getByText('View AnotherType'))

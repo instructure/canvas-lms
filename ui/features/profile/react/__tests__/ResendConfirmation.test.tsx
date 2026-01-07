@@ -18,11 +18,14 @@
 
 import React from 'react'
 import {render, screen, waitFor, fireEvent} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import ResendConfirmation, {
   componentLabelByConfirmationState,
   type ResendConfirmationProps,
 } from '../ResendConfirmation'
+
+const server = setupServer()
 
 describe('ResendConfirmation', () => {
   const props: ResendConfirmationProps = {userId: '1', channelId: '2'}
@@ -32,13 +35,22 @@ describe('ResendConfirmation', () => {
     Boolean(text),
   )
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.get(LIMIT_REACHED_URI, {confirmation_limit_reached: false})
-    fetchMock.post(RE_SEND_URI, 200)
+    server.use(
+      http.get(LIMIT_REACHED_URI, () => {
+        return HttpResponse.json({confirmation_limit_reached: false})
+      }),
+      http.post(RE_SEND_URI, () => {
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
   })
 
   afterEach(() => {
-    fetchMock.reset()
+    server.resetHandlers()
   })
 
   it('should be hidden by default', () => {
@@ -50,7 +62,11 @@ describe('ResendConfirmation', () => {
   })
 
   it('should remain hidden if the confirmation limit reached', async () => {
-    fetchMock.get(LIMIT_REACHED_URI, {confirmation_limit_reached: true}, {overwriteRoutes: true})
+    server.use(
+      http.get(LIMIT_REACHED_URI, () => {
+        return HttpResponse.json({confirmation_limit_reached: true})
+      }),
+    )
     render(<ResendConfirmation {...props} />)
 
     // Wait for the fetch to complete
@@ -79,7 +95,11 @@ describe('ResendConfirmation', () => {
   })
 
   it('should show the error text if the response fail', async () => {
-    fetchMock.post(RE_SEND_URI, 500, {overwriteRoutes: true})
+    server.use(
+      http.post(RE_SEND_URI, () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
     render(<ResendConfirmation {...props} />)
     const idleText = await screen.findByText(componentLabelByConfirmationState.idle)
 

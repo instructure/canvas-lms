@@ -20,15 +20,27 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import ManuallySettableQuotas from '../ManuallySettableQuotas'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
+
+// Track request info for assertions
+let lastRequestReceived = false
+let lastRequestBody: unknown = null
 
 describe('ManuallySettableQuotas', () => {
   const courseId = '1'
   const foundCourse = {name: 'Test Course', storage_quota_mb: '100'}
   const COURSE_API_URI = `/api/v1/courses/${courseId}`
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   afterEach(() => {
-    fetchMock.reset()
+    server.resetHandlers()
+    lastRequestReceived = false
+    lastRequestBody = null
   })
 
   describe('Find course or group form', () => {
@@ -45,7 +57,13 @@ describe('ManuallySettableQuotas', () => {
     })
 
     it('should show an error if the course/group not found', async () => {
-      fetchMock.get(COURSE_API_URI, 404, {overwriteRoutes: true})
+      const requestReceived = vi.fn()
+      server.use(
+        http.get(COURSE_API_URI, () => {
+          requestReceived()
+          return new HttpResponse(null, {status: 404})
+        }),
+      )
       render(<ManuallySettableQuotas />)
       const id = screen.getByLabelText(/id \*/i)
       const submit = screen.getByLabelText('Find')
@@ -55,11 +73,17 @@ describe('ManuallySettableQuotas', () => {
 
       const errorMessage = await screen.findAllByText('Could not find a course with that ID.')
       expect(errorMessage).toHaveLength(2)
-      expect(fetchMock.called(COURSE_API_URI, {method: 'GET', body: {id: courseId}})).toBe(true)
+      expect(requestReceived).toHaveBeenCalled()
     })
 
     it('should show an error if the user has no access to the course', async () => {
-      fetchMock.get(COURSE_API_URI, 401, {overwriteRoutes: true})
+      const requestReceived = vi.fn()
+      server.use(
+        http.get(COURSE_API_URI, () => {
+          requestReceived()
+          return new HttpResponse(null, {status: 401})
+        }),
+      )
       render(<ManuallySettableQuotas />)
       const id = screen.getByLabelText(/id \*/i)
       const submit = screen.getByLabelText('Find')
@@ -71,11 +95,15 @@ describe('ManuallySettableQuotas', () => {
         'You are not authorized to access that course.',
       )
       expect(errorMessage).toHaveLength(2)
-      expect(fetchMock.called(COURSE_API_URI, {method: 'GET', body: {id: courseId}})).toBe(true)
+      expect(requestReceived).toHaveBeenCalled()
     })
 
     it('should show the quota form if the course/group is found', async () => {
-      fetchMock.get(COURSE_API_URI, foundCourse, {overwriteRoutes: true})
+      server.use(
+        http.get(COURSE_API_URI, () => {
+          return HttpResponse.json(foundCourse)
+        }),
+      )
       render(<ManuallySettableQuotas />)
       const id = screen.getByLabelText(/id \*/i)
       const submit = screen.getByLabelText('Find')
@@ -92,7 +120,11 @@ describe('ManuallySettableQuotas', () => {
 
   describe('Update quotas form', () => {
     beforeEach(async () => {
-      fetchMock.get(COURSE_API_URI, foundCourse, {overwriteRoutes: true})
+      server.use(
+        http.get(COURSE_API_URI, () => {
+          return HttpResponse.json(foundCourse)
+        }),
+      )
       render(<ManuallySettableQuotas />)
       const id = screen.getByLabelText(/id \*/i)
       const submit = screen.getByLabelText('Find')
@@ -125,7 +157,11 @@ describe('ManuallySettableQuotas', () => {
     })
 
     it('should show an error alert if the update fails', async () => {
-      fetchMock.put(COURSE_API_URI, 500, {overwriteRoutes: true})
+      server.use(
+        http.put(COURSE_API_URI, () => {
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
       const courseStorage = await screen.findByLabelText(new RegExp(`${foundCourse.name} *`, 'i'))
       const submit = screen.getByLabelText('Update Quota')
 
@@ -137,7 +173,14 @@ describe('ManuallySettableQuotas', () => {
     })
 
     it('should show a success alert if the quota was updated', async () => {
-      fetchMock.put(COURSE_API_URI, 200, {overwriteRoutes: true})
+      const requestBodyCapture = vi.fn()
+      server.use(
+        http.put(COURSE_API_URI, async ({request}) => {
+          const body = await request.json()
+          requestBodyCapture(body)
+          return new HttpResponse(null, {status: 200})
+        }),
+      )
       const courseStorage = await screen.findByLabelText(new RegExp(`${foundCourse.name} *`, 'i'))
       const submit = screen.getByLabelText('Update Quota')
       const newQuota = '1000'
@@ -148,12 +191,9 @@ describe('ManuallySettableQuotas', () => {
 
       const successMessage = await screen.findAllByText('Quota updated.')
       expect(successMessage).toHaveLength(2)
-      expect(
-        fetchMock.called(COURSE_API_URI, {
-          method: 'PUT',
-          body: {course: {...foundCourse, storage_quota_mb: newQuota}},
-        }),
-      ).toBe(true)
+      expect(requestBodyCapture).toHaveBeenCalledWith({
+        course: {...foundCourse, storage_quota_mb: newQuota},
+      })
     })
   })
 })

@@ -18,10 +18,13 @@
 
 import React from 'react'
 import {render, fireEvent, waitFor, act} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import useContentShareUserSearchApi from '../../effects/useContentShareUserSearchApi'
 import DirectShareUserModal from '../DirectShareUserModal'
 import fakeENV from '@canvas/test-utils/fakeENV'
+
+const server = setupServer()
 
 vi.mock('../../effects/useContentShareUserSearchApi')
 
@@ -81,6 +84,7 @@ describe('DirectShareUserModal', () => {
   let ariaLive
 
   beforeAll(() => {
+    server.listen()
     fakeENV.setup({COURSE_ID: '42'})
     ariaLive = document.createElement('div')
     ariaLive.id = 'flash_screenreader_holder'
@@ -89,6 +93,7 @@ describe('DirectShareUserModal', () => {
   })
 
   afterAll(() => {
+    server.close()
     fakeENV.teardown()
     if (ariaLive) ariaLive.remove()
   })
@@ -106,7 +111,7 @@ describe('DirectShareUserModal', () => {
 
   afterEach(async () => {
     await flushAllTimersAndPromises()
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   async function selectUser(getByText, findByLabelText, name = 'abc') {
@@ -137,7 +142,11 @@ describe('DirectShareUserModal', () => {
       })
 
       it('disables the send button when a search has started UNDER TEST', async () => {
-        fetchMock.postOnce('/api/v1/users/self/content_shares', 200)
+        server.use(
+          http.post('/api/v1/users/self/content_shares', () => {
+            return new HttpResponse(null, {status: 200})
+          }),
+        )
         const {getByText, findByLabelText} = render(
           <DirectShareUserModal open={true} courseId="1" onDismiss={Function.prototype} />,
         )

@@ -18,10 +18,16 @@
 
 import React from 'react'
 import {render, act, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 import {AccountTree} from '../AccountTree'
 import {RESPONSE_ACCOUNT_1, RESPONSE_ACCOUNT_4} from './fixtures'
+
+const server = setupServer()
+
+// Track API calls for tests that need to verify call counts
+let apiCallTracker: {url: string}[] = []
 
 const defaultProps = {
   originAccountId: 1,
@@ -34,13 +40,28 @@ const defaultProps = {
   expandedAccounts: [1],
 }
 
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+
 beforeEach(() => {
-  fetchMock.get(/\/api\/v1\/accounts\/1\/account_calendars.*/, RESPONSE_ACCOUNT_1)
-  fetchMock.get(/\/api\/v1\/accounts\/4\/account_calendars.*/, RESPONSE_ACCOUNT_4)
+  apiCallTracker = []
+  server.use(
+    http.get('/api/v1/accounts/:accountId/account_calendars', ({params, request}) => {
+      apiCallTracker.push({url: request.url})
+      const accountId = params.accountId
+      if (accountId === '1') {
+        return HttpResponse.json(RESPONSE_ACCOUNT_1)
+      }
+      if (accountId === '4') {
+        return HttpResponse.json(RESPONSE_ACCOUNT_4)
+      }
+      return HttpResponse.json([])
+    }),
+  )
 })
 
 afterEach(() => {
-  fetchMock.restore()
+  server.resetHandlers()
 })
 
 describe('AccountTree', () => {
@@ -100,9 +121,9 @@ describe('AccountTree', () => {
     )
     // On mount, only the origin account should be fetched (not all accounts in expandedAccounts)
     await waitFor(() => {
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(apiCallTracker).toHaveLength(1)
     })
-    expect(fetchMock.calls()[0][0]).toContain('/accounts/1/account_calendars')
+    expect(apiCallTracker[0].url).toContain('/accounts/1/account_calendars')
 
     // Wait for the parent account to be rendered
     expect(await findByRole('button', {name: 'University, 5 accounts'})).toBeInTheDocument()
@@ -116,7 +137,7 @@ describe('AccountTree', () => {
       <AccountTree {...defaultProps} onAccountExpandedToggled={onAccountExpandedToggled} />,
     )
     await waitFor(() => {
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(apiCallTracker).toHaveLength(1)
     })
 
     // Expand CPMS by clicking its toggle button
@@ -127,22 +148,27 @@ describe('AccountTree', () => {
     expect(onAccountExpandedToggled).toHaveBeenCalledWith(4, true)
     // Verify that a second fetch was triggered for CPMS's children
     await waitFor(() => {
-      expect(fetchMock.calls()).toHaveLength(2)
+      expect(apiCallTracker).toHaveLength(2)
     })
-    expect(fetchMock.calls()[1][0]).toContain('/accounts/4/account_calendars')
+    expect(apiCallTracker[1].url).toContain('/accounts/4/account_calendars')
   })
 
   it('loads multiple pages properly if needed', async () => {
-    fetchMock.restore()
-    fetchMock.getOnce(/\/api\/v1\/accounts\/1\/account_calendars.*/, {
-      body: RESPONSE_ACCOUNT_1.slice(0, 3),
-      headers: {
-        Link: '</api/v1/accounts/1/account_calendars?page=2&per_page=100>; rel="next"',
-      },
-    })
-    fetchMock.getOnce(
-      '/api/v1/accounts/1/account_calendars?page=2&per_page=100',
-      RESPONSE_ACCOUNT_1.slice(3, 5),
+    let page1Called = false
+    server.use(
+      http.get('/api/v1/accounts/1/account_calendars', ({request}) => {
+        const url = new URL(request.url)
+        const page = url.searchParams.get('page')
+        if (page === '2') {
+          return HttpResponse.json(RESPONSE_ACCOUNT_1.slice(3, 5))
+        }
+        page1Called = true
+        return HttpResponse.json(RESPONSE_ACCOUNT_1.slice(0, 3), {
+          headers: {
+            Link: '</api/v1/accounts/1/account_calendars?page=2&per_page=100>; rel="next"',
+          },
+        })
+      }),
     )
     const {findByRole, getByRole} = render(<AccountTree {...defaultProps} />)
     expect(await findByRole('button', {name: 'University, 5 accounts'})).toBeInTheDocument()

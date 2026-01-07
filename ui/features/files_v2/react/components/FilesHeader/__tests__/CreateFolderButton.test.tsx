@@ -26,8 +26,11 @@ import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {RowsProvider} from '../../../contexts/RowsContext'
 import {mockRowsContext} from '../../FileFolderTable/__tests__/testUtils'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+
+const server = setupServer()
 
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: vi.fn(() => () => {}),
@@ -46,13 +49,20 @@ const renderComponent = () => {
 }
 vi.useFakeTimers()
 describe('CreateFolderButton', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     vi.clearAllMocks()
-    fetchMock.post(/.*\/folders/, 200)
+    server.use(
+      http.post(/.*\/folders/, () => {
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   it('can open and close the create folder modal', async () => {
