@@ -46,6 +46,7 @@ import {isLtiPlacementWithIcon} from '../model/LtiPlacement'
 import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {Header} from '../registration_wizard_forms/Header'
 import {LaunchTypeSpecificSettingsConfirmationWrapper} from './components/LaunchTypeSpecificSettingsConfirmationWrapper'
+import {LtiRegistrationId} from '../model/LtiRegistrationId'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -56,7 +57,7 @@ export type Lti1p3RegistrationWizardProps = {
   service: Lti1p3RegistrationWizardService
   onDismiss: () => void
   unifiedToolId?: UnifiedToolId
-  onSuccessfulRegistration: () => void
+  onSuccessfulRegistration: (registrationId: LtiRegistrationId) => void
 }
 
 export const Lti1p3RegistrationWizard = ({

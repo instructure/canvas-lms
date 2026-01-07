@@ -42,12 +42,12 @@ export interface Lti1p3RegistrationWizardActions {
   setStep: (step: Lti1p3RegistrationWizardStep) => void
   setReviewing: (reviewing: boolean) => void
   install: (
-    onSuccessfulInstallation: () => void,
+    onSuccessfulInstallation: (registrationId: LtiRegistrationId) => void,
     accountId: AccountId,
     unifiedToolId?: string,
   ) => Promise<void>
   update: (
-    onSuccessfulUpdate: () => void,
+    onSuccessfulUpdate: (registrationId: LtiRegistrationId) => void,
     accountId: AccountId,
     registrationId: LtiRegistrationId,
     unifiedToolId?: string,
@@ -119,7 +119,7 @@ export const createLti1p3RegistrationWizardState = ({
       )
 
       if (isSuccessful(result)) {
-        onSuccessfulInstallation()
+        onSuccessfulInstallation(result.data.id)
       } else {
         set(state => ({
           state: {
@@ -147,7 +147,7 @@ export const createLti1p3RegistrationWizardState = ({
       })
 
       if (isSuccessful(result)) {
-        onSuccessfulUpdate()
+        onSuccessfulUpdate(registrationId)
       } else {
         set(state => ({
           state: {

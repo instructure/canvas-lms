@@ -141,9 +141,9 @@ const ModalBodyWrapper = ({
           service={lti1p3RegistrationWizardService}
           internalConfiguration={state.jsonFetch.result.data}
           unifiedToolId={state.unifiedToolId}
-          onSuccessfulRegistration={() => {
+          onSuccessfulRegistration={id => {
             state.close()
-            state.onSuccessfulInstallation?.()
+            state.onSuccessfulInstallation?.(id)
           }}
           onDismiss={onDismiss}
         />
@@ -157,14 +157,14 @@ const ModalBodyWrapper = ({
           unifiedToolId={state.unifiedToolId}
           onDismiss={onDismiss}
           registrationId={state.existingRegistrationId}
-          onSuccessfulRegistration={() => {
+          onSuccessfulRegistration={id => {
             state.close()
             showFlashSuccess(
               state.existingRegistrationId
                 ? I18n.t('App updated successfully!')
                 : I18n.t('App installed successfully!'),
             )()
-            state.onSuccessfulInstallation?.()
+            state.onSuccessfulInstallation?.(id)
           }}
         />
       )
@@ -172,9 +172,9 @@ const ModalBodyWrapper = ({
       return (
         <EditLti1p3RegistrationWizard
           accountId={accountId}
-          onSuccessfulRegistration={() => {
+          onSuccessfulRegistration={id => {
             state.close()
-            state.onSuccessfulInstallation?.()
+            state.onSuccessfulInstallation?.(id)
           }}
           registrationId={state.existingRegistrationId}
           service={lti1p3RegistrationWizardService}
@@ -197,9 +197,9 @@ const ModalBodyWrapper = ({
             placements: [],
           }}
           unifiedToolId={state.unifiedToolId}
-          onSuccessfulRegistration={() => {
+          onSuccessfulRegistration={id => {
             state.close()
-            state.onSuccessfulInstallation?.()
+            state.onSuccessfulInstallation?.(id)
           }}
           onDismiss={onDismiss}
         />

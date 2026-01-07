@@ -39,7 +39,7 @@ export type Lti1p3RegistrationWizardProps = {
   service: Lti1p3RegistrationWizardService
   onDismiss: () => void
   unifiedToolId?: UnifiedToolId
-  onSuccessfulRegistration: () => void
+  onSuccessfulRegistration: (registrationId: LtiRegistrationId) => void
 }
 
 /**
