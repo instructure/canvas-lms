@@ -29,8 +29,8 @@ import ReportingBreadcrumbs from './ReportingBreadcrumbs'
 import StudentOutcomesTable from './StudentOutcomesTable'
 import {useTransformedOutcomes} from './hooks/useTransformedOutcomes'
 import OutcomesControlsBar from './OutcomesControlsBar'
-import useSearch from '@canvas/outcomes/react/hooks/useSearch'
 import {theme} from '@instructure/canvas-theme'
+import {useOutcomeFilters} from './hooks/useOutcomeFilters'
 
 const I18n = createI18nScope('OutcomeManagement')
 
@@ -74,24 +74,12 @@ const Reporting = () => {
 
   const {
     search,
-    debouncedSearch,
-    onChangeHandler: onSearchChangeHandler,
-    onClearHandler: onSearchClearHandler,
-  } = useSearch(300)
-
-  const filteredOutcomes = useMemo(() => {
-    if (!debouncedSearch) {
-      return transformedOutcomes
-    }
-
-    const searchLower = debouncedSearch.toLowerCase()
-    return transformedOutcomes.filter(
-      outcome =>
-        outcome.code?.toLowerCase().includes(searchLower) ||
-        outcome.name?.toLowerCase().includes(searchLower) ||
-        outcome.description?.toLowerCase().includes(searchLower),
-    )
-  }, [transformedOutcomes, debouncedSearch])
+    onSearchChangeHandler,
+    onSearchClearHandler,
+    masteryFilter,
+    setMasteryFilter,
+    filteredOutcomes,
+  } = useOutcomeFilters(transformedOutcomes)
 
   if (studentId && isLoading) {
     return (
@@ -129,6 +117,8 @@ const Reporting = () => {
         search={search}
         onSearchChangeHandler={onSearchChangeHandler}
         onSearchClearHandler={onSearchClearHandler}
+        masteryFilter={masteryFilter}
+        onMasteryFilterChange={setMasteryFilter}
       />
       <StudentOutcomesTable outcomes={filteredOutcomes} />
     </View>
