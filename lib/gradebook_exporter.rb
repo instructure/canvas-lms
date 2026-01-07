@@ -386,6 +386,15 @@ class GradebookExporter
     )
   end
 
+  def sort_enrollments(enrollments)
+    sort_by_id_order(
+      enrollments,
+      id_order: @options[:student_order],
+      id_accessor: :user_id,
+      fallback_sort: ->(e) { [e.user.sortable_name.downcase, e.user_id] }
+    )
+  end
+
   def show_integration_id?
     @show_integration_id ||= @course.root_account.settings[:include_integration_ids_in_gradebook_exports] == true
   end
@@ -397,9 +406,19 @@ class GradebookExporter
     # user > pseudonyms > account: used in SisPseudonym > works_for_account
     includes = { user: { pseudonyms: :account }, course_section: [], scores: [] }
 
-    enrollments = scope.preload(includes).eager_load(:user).order_by_sortable_name.to_a
+    # Load enrollments WITHOUT sorting (remove order_by_sortable_name)
+    enrollments = scope.preload(includes).eager_load(:user).to_a
     enrollments.each { |e| e.course = @course }
-    enrollments.partition { |e| e.type != "StudentViewEnrollment" }.flatten
+
+    # Partition first (real students, then test students)
+    real_students, test_students = enrollments.partition { |e| e.type != "StudentViewEnrollment" }
+
+    # Sort each group separately
+    real_students = sort_enrollments(real_students)
+    test_students = sort_enrollments(test_students)
+
+    # Return combined array
+    real_students + test_students
   end
 
   def format_numbers(number)

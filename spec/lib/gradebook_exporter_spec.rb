@@ -283,6 +283,164 @@ describe GradebookExporter do
       end
     end
 
+    describe "student order" do
+      let!(:test_course) { course_model(grading_standard_id: 0) }
+      let!(:test_teacher) { course_with_teacher(course: test_course, active_all: true).user }
+      let!(:student_a) { student_in_course(course: test_course, name: "Alice Anderson", active_all: true).user }
+      let!(:student_b) { student_in_course(course: test_course, name: "Bob Brown", active_all: true).user }
+      let!(:student_c) { student_in_course(course: test_course, name: "Charlie Chen", active_all: true).user }
+      let!(:assignment) { test_course.assignments.create!(name: "Test Assignment") }
+
+      def student_ids_from_csv(csv)
+        rows = CSV.parse(csv, headers: true)
+        # Skip first row after headers (points possible row)
+        rows.drop(1).filter_map { |row| row["ID"]&.to_i }
+      end
+
+      context "when student_order is provided" do
+        it "returns students in the specified student_order" do
+          exporter_options = {
+            current_view: true,
+            student_order: [student_c.id, student_a.id, student_b.id],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          expect(student_ids).to eq([student_c.id, student_a.id, student_b.id])
+        end
+
+        it "accepts student_order as an array of strings" do
+          exporter_options = {
+            current_view: true,
+            student_order: [student_b.id.to_s, student_c.id.to_s, student_a.id.to_s],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          expect(student_ids).to eq([student_b.id, student_c.id, student_a.id])
+        end
+
+        it "filters to only students in student_order when current_view is true" do
+          exporter_options = {
+            current_view: true,
+            student_order: [student_a.id, student_c.id],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          expect(student_ids).to eq([student_a.id, student_c.id])
+          expect(student_ids).not_to include(student_b.id)
+        end
+
+        it "includes all students but respects order when current_view is false" do
+          exporter_options = {
+            current_view: false,
+            student_order: [student_c.id, student_a.id],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          # Should have all 3 students
+          expect(student_ids.length).to eq(3)
+          # First two should be in specified order
+          expect(student_ids[0]).to eq(student_c.id)
+          expect(student_ids[1]).to eq(student_a.id)
+          # Third student comes after (by user_id)
+          expect(student_ids[2]).to eq(student_b.id)
+        end
+
+        it "handles students with identical sortable names in custom order" do
+          # Create two students with identical names (the original EVAL-5639 scenario)
+          student_d = student_in_course(course: test_course, name: "John Smith", active_all: true).user
+          student_e = student_in_course(course: test_course, name: "John Smith", active_all: true).user
+
+          exporter_options = {
+            current_view: true,
+            student_order: [student_e.id, student_d.id, student_a.id],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          # Should maintain the exact custom order, not alphabetical
+          expect(student_ids).to eq([student_e.id, student_d.id, student_a.id])
+        end
+      end
+
+      context "when student_order is not provided" do
+        it "returns students sorted alphabetically by sortable_name" do
+          exporter_options = {
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          rows = CSV.parse(csv, headers: true)
+
+          # Skip first row after headers (points possible row)
+          student_names = rows.drop(1).filter_map { |row| row["Student"] }
+
+          # Should be in alphabetical order
+          expect(student_names[0]).to include("Anderson")  # Alice
+          expect(student_names[1]).to include("Brown")     # Bob
+          expect(student_names[2]).to include("Chen")      # Charlie
+        end
+
+        it "returns no students when student_order is empty with current_view" do
+          exporter_options = {
+            current_view: true,
+            student_order: [],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          # Should have no students (filtered out by current_view logic)
+          expect(student_ids).to be_empty
+        end
+
+        it "uses user_id as secondary sort for students with identical sortable names" do
+          # Create two students with identical names
+          student_d = student_in_course(course: test_course, name: "John Smith", active_all: true).user
+          student_e = student_in_course(course: test_course, name: "John Smith", active_all: true).user
+
+          exporter_options = {
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          # Find the two John Smiths in the result
+          john_smith_ids = [student_d.id, student_e.id].sort
+          result_john_ids = student_ids.select { |id| john_smith_ids.include?(id) }
+
+          # Should be sorted by user_id (ascending) as secondary sort
+          expect(result_john_ids).to eq(john_smith_ids)
+        end
+      end
+
+      context "with test students" do
+        it "keeps test students after real students with same ordering applied" do
+          test_student = test_course.student_view_student
+
+          exporter_options = {
+            current_view: false,
+            student_order: [student_c.id, student_a.id, student_b.id, test_student.id],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          # Real students come first in custom order
+          expect(student_ids[0..2]).to eq([student_c.id, student_a.id, student_b.id])
+          # Test student comes last
+          expect(student_ids.last).to eq(test_student.id)
+        end
+      end
+    end
+
     describe "custom columns" do
       before(:once) do
         first_column = @course.custom_gradebook_columns.create! title: "Custom Column 1"
