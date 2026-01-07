@@ -163,6 +163,36 @@ describe Accessibility::CourseStatisticCalculatorService do
       expect(statistic.reload.workflow_state).to eq("active")
     end
 
+    it "calls ActiveIssueCalculator to set active issue count" do
+      counter = instance_double(Accessibility::ActiveIssueCalculator)
+      expect(Accessibility::ActiveIssueCalculator).to receive(:new).with(statistic:).and_return(counter)
+      expect(counter).to receive(:calculate)
+      service.calculate
+    end
+
+    context "when there are active issues in the course" do
+      before do
+        5.times { accessibility_issue_model(course:, workflow_state: "active") }
+        2.times { accessibility_issue_model(course:, workflow_state: "resolved") }
+      end
+
+      it "sets active_issue_count to the correct value" do
+        service.calculate
+        expect(statistic.reload.active_issue_count).to eq(5)
+      end
+    end
+
+    context "when there are no active issues" do
+      before do
+        3.times { accessibility_issue_model(course:, workflow_state: "resolved") }
+      end
+
+      it "sets active_issue_count to 0" do
+        service.calculate
+        expect(statistic.reload.active_issue_count).to eq(0)
+      end
+    end
+
     context "when an error occurs" do
       before do
         call_count = 0

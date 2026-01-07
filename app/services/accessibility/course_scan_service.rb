@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Accessibility::CourseScanService < ApplicationService
+  include Accessibility::Concerns::CourseStatisticsQueueable
+
   SCAN_TAG = "course_accessibility_scan"
 
   class ScanLimitExceededError < StandardError; end
@@ -47,6 +49,7 @@ class Accessibility::CourseScanService < ApplicationService
     service.scan_course
     progress.set_results({})
     progress.complete!
+    service.queue_course_statistics(progress.context)
   rescue => e
     progress.fail!
     ErrorReport.log_exception(
