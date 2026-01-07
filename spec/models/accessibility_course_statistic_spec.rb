@@ -241,4 +241,56 @@ RSpec.describe AccessibilityCourseStatistic do
       expect(AccessibilityCourseStatistic.count).to eq(2)
     end
   end
+
+  describe "#calculation_pending?" do
+    let(:stat) { AccessibilityCourseStatistic.create!(course:) }
+
+    context "when workflow_state is queued" do
+      before { stat.update!(workflow_state: "queued") }
+
+      it "returns true" do
+        expect(stat.calculation_pending?).to be true
+      end
+    end
+
+    context "when workflow_state is in_progress" do
+      before { stat.update!(workflow_state: "in_progress") }
+
+      it "returns true" do
+        expect(stat.calculation_pending?).to be true
+      end
+    end
+
+    context "when workflow_state is initialized" do
+      before { stat.update!(workflow_state: "initialized") }
+
+      it "returns false" do
+        expect(stat.calculation_pending?).to be false
+      end
+    end
+
+    context "when workflow_state is active" do
+      before { stat.update!(workflow_state: "active") }
+
+      it "returns false" do
+        expect(stat.calculation_pending?).to be false
+      end
+    end
+
+    context "when workflow_state is failed" do
+      before { stat.update!(workflow_state: "failed") }
+
+      it "returns false" do
+        expect(stat.calculation_pending?).to be false
+      end
+    end
+
+    context "when workflow_state is deleted" do
+      before { stat.update!(workflow_state: "deleted") }
+
+      it "returns false" do
+        expect(stat.calculation_pending?).to be false
+      end
+    end
+  end
 end

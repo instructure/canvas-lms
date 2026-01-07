@@ -253,6 +253,24 @@ describe Accessibility::ResourceScannerService do
           tags: { cluster: scan.course.shard.database_server&.id }
         )
       end
+
+      context "when a11y_checker_account_statistics feature flag is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+        end
+
+        it "queues course statistics calculation" do
+          expect(Accessibility::CourseStatisticCalculatorService).to receive(:queue_calculation).with(course)
+          subject.scan_resource(scan:)
+        end
+      end
+
+      context "when a11y_checker_account_statistics feature flag is disabled" do
+        it "does not queue course statistics calculation" do
+          expect(Accessibility::CourseStatisticCalculatorService).not_to receive(:queue_calculation)
+          subject.scan_resource(scan:)
+        end
+      end
     end
 
     context "when the scan fails" do

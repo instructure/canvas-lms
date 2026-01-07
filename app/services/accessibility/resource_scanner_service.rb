@@ -76,6 +76,11 @@ class Accessibility::ResourceScannerService < ApplicationService
       workflow_state: "completed",
       issue_count: issues.count
     )
+
+    if Account.site_admin.feature_enabled?(:a11y_checker_account_statistics)
+      Accessibility::CourseStatisticCalculatorService.queue_calculation(scan.course)
+    end
+
     log_to_datadog(scan)
   rescue => e
     error_report = ErrorReport.log_exception(
