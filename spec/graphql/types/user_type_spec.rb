@@ -746,6 +746,84 @@ describe Types::UserType do
         expect(user_type.resolve("enrollments(horizonCourses: false) { _id }", current_user: @student).length).to eq @student.enrollments.length - 1
       end
     end
+
+    context "cross-shard" do
+      specs_require_sharding
+
+      before :once do
+        @shard1.activate do
+          @cross_shard_user = user_with_pseudonym(active_all: true)
+        end
+
+        @shard2.activate do
+          @cross_shard_account = Account.create!
+          @cross_shard_course = @cross_shard_account.courses.create!
+          @cross_shard_course.offer!
+          @cross_shard_enrollment = @cross_shard_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+        end
+      end
+
+      let(:cross_shard_user_type) { GraphQLTypeTester.new(@cross_shard_user, current_user: @cross_shard_user) }
+
+      it "returns enrollments from other shards" do
+        @shard1.activate do
+          enrollments = cross_shard_user_type.resolve("enrollments { _id }")
+          expect(enrollments.length).to eq(1)
+          expect(enrollments).to include(@cross_shard_enrollment.global_id.to_s)
+        end
+      end
+
+      it "returns enrollments from multiple shards" do
+        @shard1.activate do
+          @account1 = Account.create!
+          @course1 = @account1.courses.create!
+          @course1.offer!
+          @enrollment1 = @course1.enroll_student(@cross_shard_user, enrollment_state: "active")
+
+          enrollments = cross_shard_user_type.resolve("enrollments { _id }")
+          expect(enrollments.length).to eq(2)
+        end
+      end
+
+      it "filters by course_id across shards" do
+        @shard1.activate do
+          @account1 = Account.create!
+          @course1 = @account1.courses.create!
+          @course1.offer!
+          @enrollment1 = @course1.enroll_student(@cross_shard_user, enrollment_state: "active")
+
+          enrollments = cross_shard_user_type.resolve(%|enrollments(courseId: "#{@cross_shard_course.id}") { _id }|)
+          expect(enrollments.length).to eq(1)
+          expect(enrollments.first).to eq(@cross_shard_enrollment.global_id.to_s)
+        end
+      end
+
+      it "excludes concluded enrollments across shards with currentOnly" do
+        @cross_shard_enrollment.complete!
+
+        @shard1.activate do
+          @account1 = Account.create!
+          @course1 = @account1.courses.create!
+          @course1.offer!
+          @enrollment1 = @course1.enroll_student(@cross_shard_user, enrollment_state: "active")
+
+          enrollments = cross_shard_user_type.resolve("enrollments(currentOnly: true) { _id }")
+          expect(enrollments.length).to eq(1)
+        end
+      end
+
+      it "includes enrollments from multiple shards with currentOnly" do
+        @shard1.activate do
+          @account1 = Account.create!
+          @course1 = @account1.courses.create!
+          @course1.offer!
+          @enrollment1 = @course1.enroll_student(@cross_shard_user, enrollment_state: "active")
+
+          enrollments = cross_shard_user_type.resolve("enrollments(currentOnly: true) { _id }")
+          expect(enrollments.length).to eq(2)
+        end
+      end
+    end
   end
 
   context "enrollments_connection" do
