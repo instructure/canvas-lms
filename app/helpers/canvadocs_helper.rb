@@ -30,7 +30,6 @@ module CanvadocsHelper
       anonymous_instructor_annotations: assignment.anonymous_instructor_annotations,
       enable_annotations:,
       enrollment_type: canvadocs_user_role(assignment.course, user),
-      moderated_grading_allow_list: submission.moderated_grading_allow_list(user),
       submission_id: submission.id,
       disable_annotation_notifications:,
       send_usage_metrics: user.account.feature_enabled?(:send_usage_metrics)

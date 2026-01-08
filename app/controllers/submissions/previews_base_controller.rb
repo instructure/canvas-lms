@@ -46,10 +46,6 @@ module Submissions
         @body_classes.push("full-width", "student-annotation-container")
       end
 
-      if @assignment.moderated_grading?
-        @moderated_grading_allow_list = @submission.moderated_grading_allow_list
-      end
-
       @anonymous_instructor_annotations = @context.grants_right?(@current_user, :manage_grades) &&
                                           @assignment.anonymous_instructor_annotations
 
