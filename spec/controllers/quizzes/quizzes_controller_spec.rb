@@ -3198,4 +3198,54 @@ describe Quizzes::QuizzesController do
       expect(return_value).to be false
     end
   end
+
+  describe "GET 'index' with skip_permissions" do
+    before :once do
+      @quiz1 = @course.quizzes.create!(title: "Quiz 1", description: "Description 1")
+      @quiz2 = @course.quizzes.create!(title: "Quiz 2", description: "Description 2")
+    end
+
+    it "passes skip_permissions: true for students" do
+      user_session(@student)
+
+      expect_any_instance_of(Quizzes::QuizzesController).to receive(:quizzes_json) do |*args|
+        options = args.last
+        expect(options).to be_a(Hash)
+        expect(options[:skip_permissions]).to be true
+        []
+      end.at_least(:once)
+
+      get "index", params: { course_id: @course.id }
+      expect(response).to be_successful
+    end
+
+    it "passes skip_permissions: false for teachers" do
+      user_session(@teacher)
+
+      expect_any_instance_of(Quizzes::QuizzesController).to receive(:quizzes_json) do |*args|
+        options = args.last
+        expect(options).to be_a(Hash)
+        expect(options[:skip_permissions]).to be false
+        []
+      end.at_least(:once)
+
+      get "index", params: { course_id: @course.id }
+      expect(response).to be_successful
+    end
+
+    it "passes skip_permissions: false for TAs" do
+      ta_in_course(active_all: true, course: @course)
+      user_session(@ta)
+
+      expect_any_instance_of(Quizzes::QuizzesController).to receive(:quizzes_json) do |*args|
+        options = args.last
+        expect(options).to be_a(Hash)
+        expect(options[:skip_permissions]).to be false
+        []
+      end.at_least(:once)
+
+      get "index", params: { course_id: @course.id }
+      expect(response).to be_successful
+    end
+  end
 end

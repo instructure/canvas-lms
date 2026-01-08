@@ -123,7 +123,9 @@ class Quizzes::QuizzesController < ApplicationController
                               permissions: quiz_options,
                               master_course_status: mc_status,
                               skip_date_overrides: true,
-                              skip_lock_tests: true
+                              skip_lock_tests: true,
+                              skip_description: true,
+                              skip_permissions: @context.user_is_student?(@current_user)
                             }]
       max_name_length = AssignmentUtil.assignment_max_name_length(@context)
       sis_name = AssignmentUtil.post_to_sis_friendly_name(@context)
