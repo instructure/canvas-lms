@@ -226,35 +226,65 @@ module AccountReports
       def outcomes_new_quiz_scope
         return [] unless account.feature_enabled?(:outcome_service_results_to_canvas)
 
-        nq_assignments = account.learning_outcome_links.active
-                                .select(<<~SQL.squish)
-                                  distinct on (learning_outcomes.id, c.id, a.id)
-                                  learning_outcomes.short_description         AS "learning outcome name",
-                                  learning_outcomes.id                        AS "learning outcome id",
-                                  learning_outcomes.display_name              AS "learning outcome friendly name",
-                                  learning_outcomes.data                      AS "learning outcome data",
-                                  g.title                                     AS "learning outcome group title",
-                                  g.id                                        AS "learning outcome group id",
-                                  c.name                                      AS "course name",
-                                  c.id                                        AS "course id",
-                                  c.sis_source_id                             AS "course sis id",
-                                  a.id                                        AS "assignment id",
-                                  a.title                                     AS "assessment title",
-                                  a.id                                        AS "assessment id",
-                                  acct.id                                     AS "account id",
-                                  acct.name                                   AS "account name"
-                                SQL
-                                .joins(<<~SQL.squish)
-                                  INNER JOIN #{LearningOutcome.quoted_table_name} ON learning_outcomes.id = content_tags.content_id
-                                    AND content_tags.content_type = 'LearningOutcome'
-                                  INNER JOIN #{LearningOutcomeGroup.quoted_table_name} g ON g.id = content_tags.associated_asset_id
-                                    AND content_tags.associated_asset_type = 'LearningOutcomeGroup'
-                                  INNER JOIN #{ContentTag.quoted_table_name} cct ON cct.content_id = content_tags.content_id AND cct.context_type = 'Course'
-                                  INNER JOIN #{Course.quoted_table_name} c ON cct.context_id = c.id
-                                  INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
-                                  INNER JOIN #{Assignment.quoted_table_name} a ON (a.context_id = c.id AND a.context_type = 'Course'
-                                  AND a.submission_types = 'external_tool' AND a.workflow_state <> 'deleted')
-                                SQL
+        # Step 1: Get account-level outcome metadata
+        account_outcomes = account.learning_outcome_links.active
+                                  .select(<<~SQL.squish)
+                                    DISTINCT
+                                    learning_outcomes.short_description AS "learning outcome name",
+                                    learning_outcomes.id                AS "learning outcome id",
+                                    learning_outcomes.display_name      AS "learning outcome friendly name",
+                                    learning_outcomes.data              AS "learning outcome data",
+                                    g.title                             AS "learning outcome group title",
+                                    g.id                                AS "learning outcome group id"
+                                  SQL
+                                  .joins(<<~SQL.squish)
+                                    INNER JOIN #{LearningOutcome.quoted_table_name}
+                                      ON learning_outcomes.id = content_tags.content_id
+                                      AND content_tags.content_type = 'LearningOutcome'
+                                    INNER JOIN #{LearningOutcomeGroup.quoted_table_name} g
+                                      ON g.id = content_tags.associated_asset_id
+                                      AND content_tags.associated_asset_type = 'LearningOutcomeGroup'
+                                  SQL
+
+        return [] if account_outcomes.empty?
+
+        # Step 2: Get course IDs that have these outcomes linked
+        outcome_ids = account_outcomes.pluck("learning_outcomes.id")
+
+        courses_base = ContentTag.where(
+          content_id: outcome_ids,
+          content_type: "LearningOutcome",
+          context_type: "Course",
+          tag_type: "learning_outcome_association"
+        ).where.not(workflow_state: "deleted")
+                                 .joins("INNER JOIN #{Course.quoted_table_name} ON courses.id = content_tags.context_id")
+                                 .select("DISTINCT content_tags.content_id AS outcome_id, courses.id AS course_id")
+
+        unless @include_deleted
+          courses_base = courses_base.where("courses.workflow_state IN ('available', 'completed')")
+        end
+
+        courses_base = join_course_sub_account_scope(account, courses_base, "courses")
+        courses_base = add_term_scope(courses_base, "courses")
+
+        return [] if courses_base.empty?
+
+        # Step 3: Get assignments with course and account info
+        course_ids = courses_base.pluck("courses.id").uniq
+
+        nq_assignments = Assignment.where(context_id: course_ids, context_type: "Course", submission_types: "external_tool").active
+                                   .joins("INNER JOIN #{Course.quoted_table_name} c ON c.id = assignments.context_id")
+                                   .joins("INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id")
+                                   .select(<<~SQL.squish)
+                                     assignments.id    AS "assignment id",
+                                     assignments.title AS "assessment title",
+                                     assignments.id    AS "assessment id",
+                                     c.id              AS "course id",
+                                     c.name            AS "course name",
+                                     c.sis_source_id   AS "course sis id",
+                                     acct.id           AS "account id",
+                                     acct.name         AS "account name"
+                                   SQL
 
         unless @include_deleted
           nq_assignments = nq_assignments.where("c.workflow_state IN ('available', 'completed')")
@@ -273,28 +303,37 @@ module AccountReports
         courses = {}
         accounts = {}
         assignments = {}
-        outcomes = {}
-        nq_assignments.in_batches(strategy: :cursor) do |batch|
-          batch.each do |s|
-            c_id = s["course id"]
-            if courses.key?(c_id)
-              course_map = courses[c_id]
-              course_map[:assignment_ids].add(s["assignment id"])
-              course_map[:outcome_ids].add(s["learning outcome id"])
-            else
-              courses[c_id] = { course_id: c_id, assignment_ids: Set[s["assignment id"]], outcome_ids: Set[s["learning outcome id"]] }
-            end
-            accounts[s["account id"]] = s
-            assignments[s["assignment id"].to_s] = s
-            outcomes[s["learning outcome id"].to_s] = s
+        nq_assignments.find_each(strategy: :cursor) do |s|
+          c_id = s["course id"]
+          if courses.key?(c_id)
+            course_map = courses[c_id]
+            course_map[:assignment_ids].add(s["assignment id"])
+          else
+            courses[c_id] = { course_id: c_id, assignment_ids: Set[s["assignment id"]], outcome_ids: Set.new }
+          end
+          accounts[s["account id"]] = s
+          assignments[s["assignment id"].to_s] = s
+        end
+
+        courses_base.find_each(strategy: :cursor) do |row|
+          c_id = row.course_id
+          if courses.key?(c_id)
+            course_map = courses[c_id]
+            course_map[:outcome_ids].add(row.outcome_id)
           end
         end
+
+        # Preload all course records at once to avoid N+1 queries
+        course_records = Course.where(id: courses.keys).preload(:account).index_by(&:id)
+        outcomes = account_outcomes.index_by { |o| o["learning outcome id"] }
 
         student_results = {}
         courses.each_value do |c|
           # There is no need to check if the feature flag :outcome_service_results_to_canvas is enabled for the
           # course because get_lmgb_results will return nil if it is not enabled
-          course = Course.find(c[:course_id])
+          course = course_records[c[:course_id]]
+          next if course.blank? || c[:assignment_ids].blank? || c[:outcome_ids].blank?
+
           account = accounts[course.account_id]
 
           assignment_ids = c[:assignment_ids].to_a.join(",")
@@ -305,7 +344,7 @@ module AccountReports
           os_results.each do |authoritative_result|
             composite_key = "#{c[:course_id]}_#{authoritative_result[:associated_asset_id]}_#{authoritative_result[:external_outcome_id]}_#{authoritative_result[:user_uuid]}"
             assignment = assignments[authoritative_result[:associated_asset_id].to_s]
-            outcome = outcomes[authoritative_result[:external_outcome_id].to_s]
+            outcome = outcomes[authoritative_result[:external_outcome_id].to_i]
             if student_results.key?(composite_key)
               # This should not happen, but if it does we take the result that was submitted last.
               current_result = student_results[composite_key].first
