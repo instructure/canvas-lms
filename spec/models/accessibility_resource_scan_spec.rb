@@ -304,4 +304,114 @@ describe AccessibilityResourceScan do
       end
     end
   end
+
+  describe "#closed?" do
+    let(:scan) { accessibility_resource_scan_model }
+
+    context "when closed_at is present" do
+      before { scan.update!(closed_at: Time.current) }
+
+      it "returns true" do
+        expect(scan.closed?).to be true
+      end
+    end
+
+    context "when closed_at is nil" do
+      before { scan.update!(closed_at: nil) }
+
+      it "returns false" do
+        expect(scan.closed?).to be false
+      end
+    end
+  end
+
+  describe "#open?" do
+    let(:scan) { accessibility_resource_scan_model }
+
+    context "when closed_at is nil" do
+      before { scan.update!(closed_at: nil) }
+
+      it "returns true" do
+        expect(scan.open?).to be true
+      end
+    end
+
+    context "when closed_at is present" do
+      before { scan.update!(closed_at: Time.current) }
+
+      it "returns false" do
+        expect(scan.open?).to be false
+      end
+    end
+  end
+
+  describe "#bulk_close_issues!" do
+    let(:scan) { accessibility_resource_scan_model }
+    let(:user) { user_model }
+
+    before do
+      3.times { accessibility_issue_model(accessibility_resource_scan: scan, workflow_state: "active") }
+      2.times { accessibility_issue_model(accessibility_resource_scan: scan, workflow_state: "resolved") }
+    end
+
+    context "when scan is open" do
+      it "closes all active issues" do
+        scan.bulk_close_issues!(user_id: user.id)
+
+        expect(scan.accessibility_issues.where(workflow_state: "closed").count).to eq 3
+        expect(scan.accessibility_issues.where(workflow_state: "resolved").count).to eq 2
+      end
+
+      it "sets updated_by_id on closed issues" do
+        scan.bulk_close_issues!(user_id: user.id)
+
+        scan.accessibility_issues.where(workflow_state: "closed").find_each do |issue|
+          expect(issue.updated_by_id).to eq user.id
+        end
+      end
+
+      it "updates updated_at on closed issues" do
+        scan.bulk_close_issues!(user_id: user.id)
+
+        scan.accessibility_issues.where(workflow_state: "closed").find_each do |issue|
+          expect(issue.updated_at).to be_within(1.second).of(Time.current)
+        end
+      end
+
+      it "sets closed_at on the scan" do
+        scan.bulk_close_issues!(user_id: user.id)
+
+        expect(scan.reload.closed_at).to be_within(1.second).of(Time.current)
+      end
+
+      it "sets issue_count to 0" do
+        scan.bulk_close_issues!(user_id: user.id)
+
+        expect(scan.reload.issue_count).to eq 0
+      end
+
+      it "performs all updates in a transaction" do
+        expect(ActiveRecord::Base).to receive(:transaction).and_call_original
+
+        scan.bulk_close_issues!(user_id: user.id)
+      end
+
+      it "does not trigger callbacks on issues (uses update_all)" do
+        # This documents that we intentionally skip callbacks for performance
+        # If callbacks are added that MUST run, this test will remind you to refactor
+        expect_any_instance_of(AccessibilityIssue).not_to receive(:save)
+        expect_any_instance_of(AccessibilityIssue).not_to receive(:update)
+
+        scan.bulk_close_issues!(user_id: user.id)
+      end
+    end
+
+    context "when scan is already closed" do
+      before { scan.update!(closed_at: Time.current) }
+
+      it "raises an error" do
+        expect { scan.bulk_close_issues!(user_id: user.id) }.to raise_error("Resource is already closed")
+      end
+    end
+  end
 end
