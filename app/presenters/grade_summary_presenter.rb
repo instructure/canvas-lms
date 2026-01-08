@@ -252,7 +252,7 @@ class GradeSummaryPresenter
       { originality_reports: :lti_link },
       :user,
       { assignment: %i[context post_policy] },
-      { rubric_assessments: [:assessor, :rubric, { rubric_association: { association_object: :context } }] },
+      { rubric_assessments: [:assessor, :rubric, :user, { rubric_association: [:context, { association_object: :context }] }] },
       { submission_comments: :viewed_submission_comments },
       { visible_submission_comments: :author }
     ]

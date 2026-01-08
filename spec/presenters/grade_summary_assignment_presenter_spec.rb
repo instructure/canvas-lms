@@ -459,4 +459,129 @@ describe GradeSummaryAssignmentPresenter do
       end
     end
   end
+
+  describe "#should_link_to_peer_reviews_page?" do
+    let(:parent_assignment) { @course.assignments.create!(title: "parent assignment", points_possible: 10, peer_reviews: true) }
+    let(:peer_review_sub_assignment) do
+      PeerReviewSubAssignment.create!(
+        context: @course,
+        parent_assignment:,
+        title: "Peer Review",
+        points_possible: 10,
+        workflow_state: "active"
+      )
+    end
+    let(:peer_review_submission) { peer_review_sub_assignment.find_or_create_submission(@student) }
+
+    context "when feature flag is disabled" do
+      before do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "returns false for peer review sub assignment when student is viewing" do
+        summary = GradeSummaryPresenter.new(@course, @student, @student.id)
+        presenter = GradeSummaryAssignmentPresenter.new(summary, @student, peer_review_sub_assignment, peer_review_submission)
+        expect(presenter.should_link_to_peer_reviews_page?).to be false
+      end
+
+      it "returns false for peer review sub assignment when observer is viewing" do
+        observer = user_factory(active_all: true)
+        observer_enrollment = @course.enroll_user(observer, "ObserverEnrollment", associated_user_id: @student.id)
+        observer_enrollment.update!(workflow_state: "active")
+        summary = GradeSummaryPresenter.new(@course, observer, @student.id)
+        presenter = GradeSummaryAssignmentPresenter.new(summary, observer, peer_review_sub_assignment, peer_review_submission)
+        expect(presenter.should_link_to_peer_reviews_page?).to be false
+      end
+    end
+
+    context "when feature flag is enabled" do
+      before do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "returns true for peer review sub assignment when student is viewing" do
+        summary = GradeSummaryPresenter.new(@course, @student, @student.id)
+        presenter = GradeSummaryAssignmentPresenter.new(summary, @student, peer_review_sub_assignment, peer_review_submission)
+        expect(presenter.should_link_to_peer_reviews_page?).to be true
+      end
+
+      it "returns true for peer review sub assignment when observer is viewing" do
+        observer = user_factory(active_all: true)
+        observer_enrollment = @course.enroll_user(observer, "ObserverEnrollment", associated_user_id: @student.id)
+        observer_enrollment.update!(workflow_state: "active")
+        summary = GradeSummaryPresenter.new(@course, observer, @student.id)
+        presenter = GradeSummaryAssignmentPresenter.new(summary, observer, peer_review_sub_assignment, peer_review_submission)
+        expect(presenter.should_link_to_peer_reviews_page?).to be true
+      end
+
+      it "returns false for peer review sub assignment when teacher is viewing" do
+        summary = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+        presenter = GradeSummaryAssignmentPresenter.new(summary, @teacher, peer_review_sub_assignment, peer_review_submission)
+        expect(presenter.should_link_to_peer_reviews_page?).to be false
+      end
+
+      it "returns false for regular assignment" do
+        summary = GradeSummaryPresenter.new(@course, @student, @student.id)
+        presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, @submission)
+        expect(presenter.should_link_to_peer_reviews_page?).to be false
+      end
+    end
+  end
+
+  describe "#peer_reviews_url" do
+    let(:parent_assignment) { @course.assignments.create!(title: "parent assignment", points_possible: 10, peer_reviews: true) }
+    let(:peer_review_sub_assignment) do
+      PeerReviewSubAssignment.create!(
+        context: @course,
+        parent_assignment:,
+        title: "Peer Review",
+        points_possible: 10,
+        workflow_state: "active"
+      )
+    end
+    let(:peer_review_submission) { peer_review_sub_assignment.find_or_create_submission(@student) }
+
+    context "when feature flag is enabled and student is viewing" do
+      before do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "returns the correct peer reviews URL for peer review sub assignment" do
+        summary = GradeSummaryPresenter.new(@course, @student, @student.id)
+        presenter = GradeSummaryAssignmentPresenter.new(summary, @student, peer_review_sub_assignment, peer_review_submission)
+        expected_url = "/courses/#{@course.id}/assignments/#{parent_assignment.id}/peer_reviews"
+        expect(presenter.peer_reviews_url).to eq(expected_url)
+      end
+
+      it "returns nil for regular assignment" do
+        summary = GradeSummaryPresenter.new(@course, @student, @student.id)
+        presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, @submission)
+        expect(presenter.peer_reviews_url).to be_nil
+      end
+    end
+
+    context "when feature flag is disabled" do
+      before do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "returns nil for peer review sub assignment" do
+        summary = GradeSummaryPresenter.new(@course, @student, @student.id)
+        presenter = GradeSummaryAssignmentPresenter.new(summary, @student, peer_review_sub_assignment, peer_review_submission)
+        expect(presenter.peer_reviews_url).to be_nil
+      end
+    end
+
+    context "when teacher is viewing" do
+      before do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "returns nil for peer review sub assignment" do
+        summary = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+        presenter = GradeSummaryAssignmentPresenter.new(summary, @teacher, peer_review_sub_assignment, peer_review_submission)
+        expect(presenter.peer_reviews_url).to be_nil
+      end
+    end
+  end
 end

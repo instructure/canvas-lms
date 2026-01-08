@@ -105,6 +105,17 @@ class GradeSummaryAssignmentPresenter
     end
   end
 
+  def should_link_to_peer_reviews_page?
+    assignment.context.feature_enabled?(:peer_review_allocation_and_grading) && assignment.is_a?(PeerReviewSubAssignment) && (@summary.student_is_user? || @summary.user_an_observer_of_student?)
+  end
+
+  def peer_reviews_url
+    return nil unless should_link_to_peer_reviews_page?
+
+    parent = assignment.parent_assignment
+    "/courses/#{parent.context_id}/assignments/#{parent.id}/peer_reviews"
+  end
+
   def has_no_group_weight?
     !assignment.try(:group_weight)
   end
