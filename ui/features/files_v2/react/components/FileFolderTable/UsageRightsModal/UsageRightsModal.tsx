@@ -40,6 +40,7 @@ import {
   defaultCopyright,
   defaultCCValue,
   defaultSelectedRight,
+  hasDifferentUsageRights,
   parseNewRows,
 } from './UsageRightsModalUtils'
 
@@ -76,8 +77,8 @@ const UsageRightsModal = ({open, items, onDismiss}: UsageRightsModalProps) => {
 
   const showCreativeCommonsOptions = useMemo(() => usageRight === 'creative_commons', [usageRight])
   const showDifferentRightsMessage = useMemo(
-    () => (copyrightHolder == null || usageRight === 'choose') && items.length > 1,
-    [copyrightHolder, items.length, usageRight],
+    () => hasDifferentUsageRights(items),
+    [items],
   )
 
   const resetState = useCallback(() => {
