@@ -17,7 +17,6 @@
  */
 
 import {getByText, queryByText, findByText, waitForElementToBeRemoved} from '@testing-library/dom'
-import fetchMock from 'fetch-mock'
 import {setupServer} from 'msw/node'
 import Backbone from '@canvas/backbone'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
@@ -817,8 +816,7 @@ describe.skip('AssignmentListItemViewSpec - opens and closes the direct share co
       can_manage: true,
     })
     const view = createView(model, {directShareEnabled: true})
-    // Mock the API call before triggering the action
-    fetchMock.mock('/users/self/manageable_courses', [])
+    // Note: API call would need MSW mock for '/users/self/manageable_courses' if this test were enabled
     view.$('.copy_assignment_to').click()
     expect(await findByText(document.body, 'Select a Course')).toBeTruthy()
     getByText(document.body, 'Close').click()

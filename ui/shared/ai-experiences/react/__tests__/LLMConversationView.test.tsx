@@ -19,8 +19,12 @@
 import '@instructure/canvas-theme'
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse, delay} from 'msw'
+import {setupServer} from 'msw/node'
 import LLMConversationView from '../components/LLMConversationView'
+
+const server = setupServer()
+let apiCallCount = 0
 
 const defaultProps = {
   isOpen: true,
@@ -36,25 +40,32 @@ const defaultProps = {
 }
 
 describe('LLMConversationView', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.restore()
+    apiCallCount = 0
     // Mock scrollIntoView which is not available in JSDOM
     Element.prototype.scrollIntoView = vi.fn()
     // Mock focus which is used for accessibility
     HTMLElement.prototype.focus = vi.fn()
 
     // Default mocks for most tests - can be overridden in individual tests
-    // Mock get active conversation (returns empty - no active conversation)
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {})
-    // Mock create new conversation
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/conversations', {
-      id: '1',
-      messages: [],
-    })
+    server.use(
+      // Mock get active conversation (returns empty - no active conversation)
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      // Mock create new conversation
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({id: '1', messages: []})
+      }),
+    )
   })
 
   afterEach(() => {
     vi.clearAllMocks()
+    server.resetHandlers()
   })
 
   it('does not render when closed', () => {
@@ -114,11 +125,13 @@ describe('LLMConversationView', () => {
     ]
 
     // Override default mocks with custom messages
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations',
-      {id: '1', messages: mockMessages},
-      {overwriteRoutes: true},
+    server.use(
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({id: '1', messages: mockMessages})
+      }),
     )
 
     render(<LLMConversationView {...defaultProps} />)
@@ -137,11 +150,13 @@ describe('LLMConversationView', () => {
     ]
 
     // Override default mocks with custom messages
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations',
-      {id: '1', messages: mockMessages},
-      {overwriteRoutes: true},
+    server.use(
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({id: '1', messages: mockMessages})
+      }),
     )
 
     render(<LLMConversationView {...defaultProps} />)
@@ -170,22 +185,24 @@ describe('LLMConversationView', () => {
     ]
 
     // Override default mocks with custom messages
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations',
-      {id: '1', messages: initialMessages},
-      {overwriteRoutes: true},
+    server.use(
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({id: '1', messages: initialMessages})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', () => {
+        return HttpResponse.json({
+          id: '1',
+          messages: [
+            ...initialMessages,
+            {role: 'User', text: 'Test message', timestamp: new Date()},
+            {role: 'Assistant', text: 'Response', timestamp: new Date()},
+          ],
+        })
+      }),
     )
-
-    // Mock post message
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', {
-      id: '1',
-      messages: [
-        ...initialMessages,
-        {role: 'User', text: 'Test message', timestamp: new Date()},
-        {role: 'Assistant', text: 'Response', timestamp: new Date()},
-      ],
-    })
 
     render(<LLMConversationView {...defaultProps} />)
 
@@ -228,21 +245,23 @@ describe('LLMConversationView', () => {
     ]
 
     // Override default mocks with custom messages
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations',
-      {id: '1', messages: initialMessages},
-      {overwriteRoutes: true},
-    )
-
-    // Mock post message with delay
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations/1/messages',
-      {
-        id: '1',
-        messages: [...initialMessages, {role: 'User', text: 'New message', timestamp: new Date()}],
-      },
-      {delay: 100},
+    server.use(
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({id: '1', messages: initialMessages})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', async () => {
+        await delay(100)
+        return HttpResponse.json({
+          id: '1',
+          messages: [
+            ...initialMessages,
+            {role: 'User', text: 'New message', timestamp: new Date()},
+          ],
+        })
+      }),
     )
 
     render(<LLMConversationView {...defaultProps} />)
@@ -270,11 +289,14 @@ describe('LLMConversationView', () => {
     ]
 
     // Override default mocks with custom messages
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations',
-      {id: '1', messages: mockMessages},
-      {overwriteRoutes: true},
+    server.use(
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        apiCallCount++
+        return HttpResponse.json({id: '1', messages: mockMessages})
+      }),
     )
 
     render(<LLMConversationView {...defaultProps} />)
@@ -288,7 +310,7 @@ describe('LLMConversationView', () => {
 
     // Should re-initialize conversation
     await waitFor(() => {
-      expect(fetchMock.calls().length).toBeGreaterThan(1)
+      expect(apiCallCount).toBeGreaterThan(1)
     })
   })
 
@@ -300,11 +322,13 @@ describe('LLMConversationView', () => {
     ]
 
     // Override default mocks with custom messages
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations',
-      {id: '1', messages: mockMessages},
-      {overwriteRoutes: true},
+    server.use(
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({id: '1', messages: mockMessages})
+      }),
     )
 
     render(<LLMConversationView {...defaultProps} />)
@@ -343,15 +367,13 @@ describe('LLMConversationView', () => {
       ]
 
       // Override default mocks with custom messages
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {id: '1', messages: mockMessages},
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({id: '1', messages: mockMessages})
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -370,15 +392,13 @@ describe('LLMConversationView', () => {
       ]
 
       // Override default mocks with custom messages
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {id: '1', messages: mockMessages},
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({id: '1', messages: mockMessages})
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -391,15 +411,14 @@ describe('LLMConversationView', () => {
 
     it('announces "Initializing conversation..." when initializing', () => {
       // Override with delayed response
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {id: '1', messages: []},
-        {delay: 100, overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', async () => {
+          await delay(100)
+          return HttpResponse.json({id: '1', messages: []})
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -415,29 +434,24 @@ describe('LLMConversationView', () => {
       ]
 
       // Override default mocks with custom messages
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {id: '1', messages: initialMessages},
-        {overwriteRoutes: true},
-      )
-
-      // Mock post message with delay
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations/1/messages',
-        {
-          id: '1',
-          messages: [
-            ...initialMessages,
-            {role: 'User', text: 'Test', timestamp: new Date()},
-            {role: 'Assistant', text: 'Response', timestamp: new Date()},
-          ],
-        },
-        {delay: 100},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({id: '1', messages: initialMessages})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', async () => {
+          await delay(100)
+          return HttpResponse.json({
+            id: '1',
+            messages: [
+              ...initialMessages,
+              {role: 'User', text: 'Test', timestamp: new Date()},
+              {role: 'Assistant', text: 'Response', timestamp: new Date()},
+            ],
+          })
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -463,15 +477,13 @@ describe('LLMConversationView', () => {
   describe('error handling', () => {
     it('displays error alert when conversation initialization fails', async () => {
       // Override with error response
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {status: 503, body: {error: 'Service unavailable'}},
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({error: 'Service unavailable'}, {status: 503})
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -490,21 +502,17 @@ describe('LLMConversationView', () => {
       ]
 
       // Override default mocks with custom messages
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({id: '1', messages: initialMessages})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', () => {
+          return HttpResponse.json({error: 'Failed to send'}, {status: 503})
+        }),
       )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {id: '1', messages: initialMessages},
-        {overwriteRoutes: true},
-      )
-      // Mock post message failure
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', {
-        status: 503,
-        body: {error: 'Failed to send'},
-      })
 
       render(<LLMConversationView {...defaultProps} />)
 
@@ -532,23 +540,21 @@ describe('LLMConversationView', () => {
         {role: 'Assistant', text: 'Hello', timestamp: new Date()},
       ]
 
-      // Mock get active conversation
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      // Mock create conversation (first call - success)
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {id: '1', messages: initialMessages},
-        {repeat: 1, overwriteRoutes: true},
-      )
-      // Mock create conversation (second call for restart - failure)
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {status: 503, body: {error: 'Failed to restart'}},
-        {repeat: 1, overwriteRoutes: false},
+      let postCallCount = 0
+      // Mock get active conversation and create conversation with first success, second failure
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          postCallCount++
+          if (postCallCount === 1) {
+            // First call - success
+            return HttpResponse.json({id: '1', messages: initialMessages})
+          }
+          // Second call for restart - failure
+          return HttpResponse.json({error: 'Failed to restart'}, {status: 503})
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -569,15 +575,13 @@ describe('LLMConversationView', () => {
 
     it('allows dismissing error alerts', async () => {
       // Override with error response
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {status: 503, body: {error: 'Service unavailable'}},
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({error: 'Service unavailable'}, {status: 503})
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -599,29 +603,27 @@ describe('LLMConversationView', () => {
     })
 
     it('clears error when retrying after failure', async () => {
-      // Mock get active conversation
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      // Mock create conversation (first call - failure)
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {status: 503, body: {error: 'Failed'}},
-        {repeat: 1, overwriteRoutes: true},
-      )
-      // Mock create conversation (second call - success)
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {
-          id: '1',
-          messages: [
-            {role: 'User', text: 'Start', timestamp: new Date()},
-            {role: 'Assistant', text: 'Hello', timestamp: new Date()},
-          ],
-        },
-        {repeat: 1, overwriteRoutes: false},
+      let postCallCount = 0
+      // Mock get active conversation and create conversation with first failure, second success
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          postCallCount++
+          if (postCallCount === 1) {
+            // First call - failure
+            return HttpResponse.json({error: 'Failed'}, {status: 503})
+          }
+          // Second call - success
+          return HttpResponse.json({
+            id: '1',
+            messages: [
+              {role: 'User', text: 'Start', timestamp: new Date()},
+              {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+            ],
+          })
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)

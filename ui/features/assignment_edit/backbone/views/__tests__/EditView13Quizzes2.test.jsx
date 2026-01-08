@@ -31,7 +31,6 @@ import Section from '@canvas/sections/backbone/models/Section'
 import React from 'react'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
-import fetchMock from 'fetch-mock'
 import {createRoot} from 'react-dom/client'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
@@ -99,6 +98,9 @@ const server = setupServer(
   }),
   http.get(/\/api\/v1\/courses\/\d+\/sections/, () => {
     return HttpResponse.json([])
+  }),
+  http.post(/\/api\/graphql/, () => {
+    return HttpResponse.json({})
   }),
   http.all(/\/api\/.*/, () => {
     return HttpResponse.json([])
@@ -203,6 +205,7 @@ describe('EditView - Quizzes 2', () => {
       CANCEL_TO: currentOrigin + '/cancel',
       SETTINGS: {},
       FEATURES: {},
+      IN_PACED_COURSE: false,
     }
 
     vi.mocked(getUrlWithHorizonParams).mockImplementation((url, additionalParams) => {
@@ -214,14 +217,7 @@ describe('EditView - Quizzes 2', () => {
       return url
     })
 
-    fetchMock.get('/api/v1/courses/1/settings', {})
-    fetchMock.get('/api/v1/courses/1/sections?per_page=100', [])
-    fetchMock.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions*/, [])
-    fetchMock.post(/.*\/api\/graphql/, {})
-    fetchMock.get('*', {status: 404})
-    fetchMock.post('*', {status: 404})
-    fetchMock.put('*', {status: 404})
-    fetchMock.delete('*', {status: 404})
+    // All API mocks handled by MSW server setup above
     RCELoader.RCE = null
     return RCELoader.loadRCE()
   })
@@ -231,7 +227,6 @@ describe('EditView - Quizzes 2', () => {
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
-    fetchMock.reset()
     server.resetHandlers()
     vi.resetModules()
     vi.clearAllMocks()

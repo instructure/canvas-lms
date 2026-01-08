@@ -17,15 +17,25 @@
  */
 
 import {cleanup, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
-import {renderComponent, setupBaseMocks, setupEnv, setupFlashHolder} from './ItemAssignToTrayTestUtils'
+import {
+  renderComponent,
+  server,
+  setupBaseMocks,
+  setupEnv,
+  setupFlashHolder,
+  http,
+  HttpResponse,
+} from './ItemAssignToTrayTestUtils'
 
 describe('ItemAssignToTray - Blueprint Input Controls', () => {
   const originalLocation = window.location
 
   beforeAll(() => {
+    server.listen()
     setupFlashHolder()
   })
+
+  afterAll(() => server.close())
 
   beforeEach(() => {
     setupEnv()
@@ -35,22 +45,25 @@ describe('ItemAssignToTray - Blueprint Input Controls', () => {
 
   afterEach(() => {
     window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
   })
 
   it('disables due date input and assignee selector when due_dates are blueprint-locked', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
-      id: '31',
-      due_at: '2023-10-05T12:00:00Z',
-      unlock_at: '2023-10-01T12:00:00Z',
-      lock_at: '2023-11-01T12:00:00Z',
-      only_visible_to_overrides: false,
-      visible_to_everyone: true,
-      overrides: [],
-      blueprint_date_locks: ['due_dates'],
-    })
+    server.use(
+      http.get('/api/v1/courses/1/assignments/31/date_details', () => {
+        return HttpResponse.json({
+          id: '31',
+          due_at: '2023-10-05T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          only_visible_to_overrides: false,
+          visible_to_everyone: true,
+          overrides: [],
+          blueprint_date_locks: ['due_dates'],
+        })
+      }),
+    )
     const {getByTestId, findByTestId, findAllByText, getByLabelText} = renderComponent({
       itemContentId: '31',
     })
@@ -67,16 +80,20 @@ describe('ItemAssignToTray - Blueprint Input Controls', () => {
   })
 
   it('disables availability date inputs and assignee selector when availability_dates are blueprint-locked', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
-      id: '31',
-      due_at: '2023-10-05T12:00:00Z',
-      unlock_at: '2023-10-01T12:00:00Z',
-      lock_at: '2023-11-01T12:00:00Z',
-      only_visible_to_overrides: false,
-      visible_to_everyone: true,
-      overrides: [],
-      blueprint_date_locks: ['availability_dates'],
-    })
+    server.use(
+      http.get('/api/v1/courses/1/assignments/31/date_details', () => {
+        return HttpResponse.json({
+          id: '31',
+          due_at: '2023-10-05T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          only_visible_to_overrides: false,
+          visible_to_everyone: true,
+          overrides: [],
+          blueprint_date_locks: ['availability_dates'],
+        })
+      }),
+    )
     const {getByTestId, findByTestId, findAllByText, getByLabelText} = renderComponent({
       itemContentId: '31',
     })
@@ -93,16 +110,20 @@ describe('ItemAssignToTray - Blueprint Input Controls', () => {
   })
 
   it('does not disable save button or assignee selector if blueprint locks are not date-related', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
-      id: '31',
-      due_at: '2023-10-05T12:00:00Z',
-      unlock_at: '2023-10-01T12:00:00Z',
-      lock_at: '2023-11-01T12:00:00Z',
-      only_visible_to_overrides: false,
-      visible_to_everyone: true,
-      overrides: [],
-      blueprint_date_locks: ['content', 'points'],
-    })
+    server.use(
+      http.get('/api/v1/courses/1/assignments/31/date_details', () => {
+        return HttpResponse.json({
+          id: '31',
+          due_at: '2023-10-05T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          only_visible_to_overrides: false,
+          visible_to_everyone: true,
+          overrides: [],
+          blueprint_date_locks: ['content', 'points'],
+        })
+      }),
+    )
     const {getByTestId, findByTestId} = renderComponent({itemContentId: '31'})
     const assigneeSelector = await findByTestId('assignee_selector')
     await waitFor(() => {

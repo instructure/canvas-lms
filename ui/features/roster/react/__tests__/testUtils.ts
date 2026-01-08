@@ -17,7 +17,8 @@
  */
 
 import {WorkflowState} from 'api'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {SetupServer} from 'msw/node'
 import {RemovableEnrollment} from '../EditRolesModal'
 
 export const AVAILABLE_ROLES = [
@@ -93,13 +94,21 @@ export const GENERIC_ENROLLMENT = {
   user: {},
 }
 
-export function mockDelete(enrollments: RemovableEnrollment[], roleId: string) {
+export function setupDeleteMocks(
+  server: SetupServer,
+  enrollments: RemovableEnrollment[],
+  roleId: string,
+) {
   const paths: string[] = []
   const deletedEnrollments: RemovableEnrollment[] = []
   enrollments.forEach(enrollment => {
     if (roleId === enrollment.role_id) return
     const deletePath = `/unenroll/${enrollment.id}`
-    fetchMock.delete(deletePath, {enrollment: enrollment})
+    server.use(
+      http.delete(deletePath, () => {
+        return HttpResponse.json({enrollment: enrollment})
+      }),
+    )
     paths.push(deletePath)
     deletedEnrollments.push(enrollment)
   })
@@ -109,7 +118,11 @@ export function mockDelete(enrollments: RemovableEnrollment[], roleId: string) {
   }
 }
 
-export function mockPost(enrollments: RemovableEnrollment[], roleId: string) {
+export function setupPostMocks(
+  server: SetupServer,
+  enrollments: RemovableEnrollment[],
+  roleId: string,
+) {
   const newEnrollments: RemovableEnrollment[] = []
   const paths: string[] = []
   const existing_section_ids = enrollments
@@ -128,7 +141,11 @@ export function mockPost(enrollments: RemovableEnrollment[], roleId: string) {
       ...enrollment,
       role_id: roleId,
     }
-    fetchMock.post(postPath, newEnrollment)
+    server.use(
+      http.post(postPath, () => {
+        return HttpResponse.json(newEnrollment)
+      }),
+    )
     newEnrollments.push({...newEnrollment, can_be_removed: true})
     paths.push(postPath)
   })

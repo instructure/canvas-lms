@@ -19,9 +19,12 @@
 import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import ContentMigrationsTable from '../migrations_table'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import type {ContentMigrationItem} from '../types'
 import fakeENV from '@canvas/test-utils/fakeENV'
+
+const server = setupServer()
 
 const migrations: ContentMigrationItem[] = [
   {
@@ -67,13 +70,26 @@ describe('ContentMigrationTable', () => {
   // This is used to mock the result INST-UI Responsive component for rendering
   const originalMediaResult = window.matchMedia('(min-width: 768px)')
 
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
-
   beforeAll(() => {
     window.ENV.COURSE_ID = '0'
-    fetchMock.mock('/api/v1/courses/0/content_migrations?per_page=25', ['api_return'])
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
+  beforeEach(() => {
+    server.use(
+      http.get('/api/v1/courses/0/content_migrations', () => {
+        return HttpResponse.json(['api_return'])
+      }),
+    )
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
+    server.resetHandlers()
   })
 
   describe('ContentMigrationTableCondensedView', () => {

@@ -19,7 +19,8 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {
   pickBucketForScore,
@@ -28,6 +29,11 @@ import {
 import {StudentCellPopover, StudentCellPopoverProps} from '../StudentCellPopover'
 import {MOCK_STUDENTS, MOCK_OUTCOMES} from '../../../__fixtures__/rollups'
 import {StudentRollupData, Outcome, Student} from '@canvas/outcomes/react/types/rollup'
+
+const server = setupServer()
+
+// Track API calls for caching tests
+let apiCallCount = 0
 
 // Mock the MessageStudents component
 vi.mock('@canvas/message-students-modal', () => {
@@ -56,6 +62,13 @@ const renderWithQueryClient = (ui: React.ReactElement) => {
 }
 
 describe('StudentCellPopover', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => {
+    server.resetHandlers()
+    apiCallCount = 0
+  })
+
   const mockStudent = MOCK_STUDENTS[0]
   const mockOutcomes = MOCK_OUTCOMES
   const courseId = '100'
@@ -112,14 +125,6 @@ describe('StudentCellPopover', () => {
     ...props,
   })
 
-  beforeEach(() => {
-    fetchMock.restore()
-  })
-
-  afterEach(() => {
-    fetchMock.restore()
-  })
-
   describe('popover appearance', () => {
     it('renders the trigger button', () => {
       renderWithQueryClient(<StudentCellPopover {...defaultProps()} />)
@@ -128,9 +133,10 @@ describe('StudentCellPopover', () => {
 
     it('popover appears when trigger is clicked', async () => {
       const user = userEvent.setup()
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${mockStudent.id}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get('/api/v1/courses/:courseId/users/:userId/lmgb_user_details', () => {
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
 
       renderWithQueryClient(<StudentCellPopover {...defaultProps()} />)
@@ -148,12 +154,14 @@ describe('StudentCellPopover', () => {
     })
 
     it('shows loading spinner while fetching user details', async () => {
-      let res: (value: {} | PromiseLike<{}>) => void
+      let resolveRequest: () => void
       const user = userEvent.setup()
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${mockStudent.id}/lmgb_user_details`,
-        new Promise(resolve => {
-          res = resolve
+      server.use(
+        http.get('/api/v1/courses/:courseId/users/:userId/lmgb_user_details', async () => {
+          await new Promise<void>(resolve => {
+            resolveRequest = resolve
+          })
+          return HttpResponse.json(mockUserDetails)
         }),
       )
 
@@ -164,7 +172,7 @@ describe('StudentCellPopover', () => {
       // Spinner should appear while loading
       expect(screen.getByText('Loading user details')).toBeInTheDocument()
 
-      res!({body: mockUserDetails})
+      resolveRequest!()
 
       // Wait for content to load
       await waitFor(() => {
@@ -174,10 +182,11 @@ describe('StudentCellPopover', () => {
 
     it('shows error message when API call fails', async () => {
       const user = userEvent.setup()
-      fetchMock.get(`/api/v1/courses/${courseId}/users/${mockStudent.id}/lmgb_user_details`, {
-        status: 500,
-        body: {error: 'Server error'},
-      })
+      server.use(
+        http.get('/api/v1/courses/:courseId/users/:userId/lmgb_user_details', () => {
+          return HttpResponse.json({error: 'Server error'}, {status: 500})
+        }),
+      )
 
       renderWithQueryClient(<StudentCellPopover {...defaultProps()} />)
 
@@ -191,9 +200,10 @@ describe('StudentCellPopover', () => {
 
   describe('student information display', () => {
     beforeEach(() => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${mockStudent.id}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get('/api/v1/courses/:courseId/users/:userId/lmgb_user_details', () => {
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
     })
 
@@ -265,10 +275,10 @@ describe('StudentCellPopover', () => {
         },
       }
 
-      fetchMock.restore()
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${mockStudent.id}/lmgb_user_details`,
-        detailsWithoutLogin,
+      server.use(
+        http.get('/api/v1/courses/:courseId/users/:userId/lmgb_user_details', () => {
+          return HttpResponse.json(detailsWithoutLogin)
+        }),
       )
 
       renderWithQueryClient(<StudentCellPopover {...defaultProps()} />)
@@ -283,9 +293,10 @@ describe('StudentCellPopover', () => {
 
   describe('scores display', () => {
     beforeEach(() => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${mockStudent.id}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get('/api/v1/courses/:courseId/users/:userId/lmgb_user_details', () => {
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
     })
 
@@ -341,9 +352,11 @@ describe('StudentCellPopover', () => {
 
   describe('close functionality', () => {
     beforeEach(() => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${mockStudent.id}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get('/api/v1/courses/:courseId/users/:userId/lmgb_user_details', () => {
+          apiCallCount++
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
     })
 
@@ -387,7 +400,7 @@ describe('StudentCellPopover', () => {
       })
 
       // Verify API was called once
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(apiCallCount).toBe(1)
 
       // Open again
       await user.click(screen.getByTestId('student-cell-link'))
@@ -396,15 +409,16 @@ describe('StudentCellPopover', () => {
       })
 
       // API should still have been called only once (data is cached)
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(apiCallCount).toBe(1)
     })
   })
 
   describe('message functionality', () => {
     beforeEach(() => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${mockStudent.id}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get('/api/v1/courses/:courseId/users/:userId/lmgb_user_details', () => {
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
     })
 
@@ -456,9 +470,10 @@ describe('StudentCellPopover', () => {
 
   describe('View Mastery Report link', () => {
     beforeEach(() => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${mockStudent.id}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get('/api/v1/courses/:courseId/users/:userId/lmgb_user_details', () => {
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
     })
 
@@ -479,12 +494,6 @@ describe('StudentCellPopover', () => {
       const customStudentId = '999'
       const customStudent = {...mockStudent, id: customStudentId}
       const customGradesUrl = `/courses/${courseId}/grades/${customStudentId}#tab-outcomes`
-
-      fetchMock.restore()
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${customStudentId}/lmgb_user_details`,
-        mockUserDetails,
-      )
 
       renderWithQueryClient(
         <StudentCellPopover

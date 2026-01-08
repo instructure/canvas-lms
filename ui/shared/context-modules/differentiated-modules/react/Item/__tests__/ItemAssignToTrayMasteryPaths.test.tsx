@@ -17,22 +17,25 @@
  */
 
 import {cleanup, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
 import {
-  OVERRIDES_URL,
   renderComponent,
-  SECTIONS_URL,
+  server,
   setupBaseMocks,
   setupEnv,
   setupFlashHolder,
+  http,
+  HttpResponse,
 } from './ItemAssignToTrayTestUtils'
 
 describe('ItemAssignToTray - Mastery Paths & Errors', () => {
   const originalLocation = window.location
 
   beforeAll(() => {
+    server.listen()
     setupFlashHolder()
   })
+
+  afterAll(() => server.close())
 
   beforeEach(() => {
     setupEnv()
@@ -42,31 +45,28 @@ describe('ItemAssignToTray - Mastery Paths & Errors', () => {
 
   afterEach(() => {
     window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
   })
 
   it('renders mastery paths option for noop 1 overrides', async () => {
-    fetchMock.get(
-      '/api/v1/courses/1/settings',
-      {conditional_release: true},
-      {overwriteRoutes: true},
-    )
-    fetchMock.get(
-      OVERRIDES_URL,
-      {
-        overrides: [
-          {
-            due_at: null,
-            id: undefined,
-            lock_at: null,
-            noop_id: 1,
-            unlock_at: null,
-          },
-        ],
-      },
-      {overwriteRoutes: true},
+    server.use(
+      http.get('/api/v1/courses/1/settings', () => {
+        return HttpResponse.json({conditional_release: true})
+      }),
+      http.get('/api/v1/courses/1/assignments/23/date_details', () => {
+        return HttpResponse.json({
+          overrides: [
+            {
+              due_at: null,
+              id: undefined,
+              lock_at: null,
+              noop_id: 1,
+              unlock_at: null,
+            },
+          ],
+        })
+      }),
     )
     const {findAllByTestId} = renderComponent()
     const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
@@ -75,7 +75,11 @@ describe('ItemAssignToTray - Mastery Paths & Errors', () => {
   })
 
   it('calls onDismiss when an error occurs while fetching data', async () => {
-    fetchMock.getOnce(SECTIONS_URL, 500, {overwriteRoutes: true})
+    server.use(
+      http.get(/\/api\/v1\/courses\/.+\/sections/, () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
     const onDismiss = vi.fn()
     renderComponent({onDismiss})
     await waitFor(() => expect(onDismiss).toHaveBeenCalledTimes(1))

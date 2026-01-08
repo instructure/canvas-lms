@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 import {
   fetchCourseInstructors,
@@ -37,14 +38,12 @@ import {
 
 import {MOCK_ASSIGNMENTS, MOCK_EVENTS} from './fixtures'
 
-const ANNOUNCEMENT_URL =
-  '/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1'
-const GRADING_PERIODS_URL = /\/api\/v1\/users\/self\/enrollments\?.*/
-const USERS_URL =
-  '/api/v1/courses/test/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments'
-const APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_test'
+const server = setupServer()
+
+const ANNOUNCEMENT_URL = '/api/v1/announcements'
+const USERS_URL = '/api/v1/courses/test/users'
+const APPS_URL = '/api/v1/external_tools/visible_course_nav_tools'
 const CONVERSATIONS_URL = '/api/v1/conversations'
-const getSyllabusUrl = courseId => encodeURI(`/api/v1/courses/${courseId}?include[]=syllabus_body`)
 
 const DEFAULT_GRADING_SCHEME = [
   ['A', 0.94],
@@ -61,35 +60,39 @@ const DEFAULT_GRADING_SCHEME = [
   ['F', 0.0],
 ]
 
+beforeAll(() => server.listen())
+afterAll(() => server.close())
 afterEach(() => {
-  fetchMock.restore()
+  server.resetHandlers()
 })
 
 describe('fetchLatestAnnouncement', () => {
   it('returns the first announcement if multiple are returned', async () => {
-    fetchMock.get(
-      ANNOUNCEMENT_URL,
-      JSON.stringify([
-        {
-          title: 'I am first',
-        },
-        {
-          title: 'I am not',
-        },
-      ]),
+    server.use(
+      http.get(ANNOUNCEMENT_URL, () => {
+        return HttpResponse.json([{title: 'I am first'}, {title: 'I am not'}])
+      }),
     )
     const announcement = await fetchLatestAnnouncement('test')
     expect(announcement).toEqual({title: 'I am first'})
   })
 
   it('returns null if an empty array is returned', async () => {
-    fetchMock.get(ANNOUNCEMENT_URL, '[]')
+    server.use(
+      http.get(ANNOUNCEMENT_URL, () => {
+        return HttpResponse.json([])
+      }),
+    )
     const announcement = await fetchLatestAnnouncement('test')
     expect(announcement).toBeNull()
   })
 
   it('returns null if something falsy is returned', async () => {
-    fetchMock.get(ANNOUNCEMENT_URL, 'null')
+    server.use(
+      http.get(ANNOUNCEMENT_URL, () => {
+        return HttpResponse.json(null)
+      }),
+    )
     const announcement = await fetchLatestAnnouncement('test')
     expect(announcement).toBeNull()
   })
@@ -97,16 +100,10 @@ describe('fetchLatestAnnouncement', () => {
 
 describe('fetchCourseInstructors', () => {
   it('returns multiple instructors if applicable', async () => {
-    fetchMock.get(
-      USERS_URL,
-      JSON.stringify([
-        {
-          id: 14,
-        },
-        {
-          id: 15,
-        },
-      ]),
+    server.use(
+      http.get(USERS_URL, () => {
+        return HttpResponse.json([{id: 14}, {id: 15}])
+      }),
     )
     const instructors = await fetchCourseInstructors('test')
     expect(instructors).toHaveLength(2)
@@ -321,7 +318,11 @@ describe('fetchGradesForGradingPeriod', () => {
   }
 
   it('translates grading period grades to just the ones we care about', async () => {
-    fetchMock.get(GRADING_PERIODS_URL, JSON.stringify([defaultEnrollment]))
+    server.use(
+      http.get('/api/v1/users/self/enrollments', () => {
+        return HttpResponse.json([defaultEnrollment])
+      }),
+    )
     const enrollments = await fetchGradesForGradingPeriod(12)
     expect(enrollments).toEqual([
       {
@@ -333,7 +334,11 @@ describe('fetchGradesForGradingPeriod', () => {
   })
 
   it("doesn't include score and grade if the grades object is missing", async () => {
-    fetchMock.get(GRADING_PERIODS_URL, JSON.stringify([{...defaultEnrollment, grades: undefined}]))
+    server.use(
+      http.get('/api/v1/users/self/enrollments', () => {
+        return HttpResponse.json([{...defaultEnrollment, grades: undefined}])
+      }),
+    )
     const enrollments = await fetchGradesForGradingPeriod(12)
     expect(enrollments).toEqual([
       {
@@ -347,16 +352,10 @@ describe('fetchGradesForGradingPeriod', () => {
 
 describe('fetchCourseApps', () => {
   it('calls apps api and returns list of apps', async () => {
-    fetchMock.get(
-      APPS_URL,
-      JSON.stringify([
-        {
-          id: 1,
-        },
-        {
-          id: 2,
-        },
-      ]),
+    server.use(
+      http.get(APPS_URL, () => {
+        return HttpResponse.json([{id: 1}, {id: 2}])
+      }),
     )
     const apps = await fetchCourseApps(['test'])
     expect(apps).toHaveLength(2)
@@ -367,7 +366,11 @@ describe('fetchCourseApps', () => {
 
 describe('sendMessage', () => {
   it('posts to the conversations endpoint', async () => {
-    fetchMock.post(CONVERSATIONS_URL, 200)
+    server.use(
+      http.post(CONVERSATIONS_URL, () => {
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
     const result = await sendMessage(1, 'Hello user #1!', null)
     expect(result.response.ok).toBeTruthy()
   })
@@ -716,8 +719,17 @@ describe('getTotalGradeStringFromEnrollments', () => {
 
 describe('fetchImportantInfos', () => {
   it('returns syllabus objects for each homeroom course', async () => {
-    fetchMock.get(getSyllabusUrl('32'), {syllabus_body: 'Hello!'})
-    fetchMock.get(getSyllabusUrl('35'), {syllabus_body: 'Welcome'})
+    server.use(
+      http.get('/api/v1/courses/:courseId', ({params}) => {
+        if (params.courseId === '32') {
+          return HttpResponse.json({syllabus_body: 'Hello!'})
+        }
+        if (params.courseId === '35') {
+          return HttpResponse.json({syllabus_body: 'Welcome'})
+        }
+        return HttpResponse.json({})
+      }),
+    )
     const response = await fetchImportantInfos([
       {
         id: '32',
@@ -743,7 +755,11 @@ describe('fetchImportantInfos', () => {
   })
 
   it("doesn't return data for homerooms with no syllabus content", async () => {
-    fetchMock.get(getSyllabusUrl('32'), {syllabus_body: null})
+    server.use(
+      http.get('/api/v1/courses/:courseId', () => {
+        return HttpResponse.json({syllabus_body: null})
+      }),
+    )
     const response = await fetchImportantInfos([
       {
         id: '32',

@@ -31,6 +31,7 @@ import {http, HttpResponse} from 'msw'
 import userEvent from '@testing-library/user-event'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const server = setupServer()
 
@@ -245,9 +246,10 @@ describe('AssignToPanel', () => {
     })
 
     it('can select a differentiation tag as an assignee', async () => {
-      const originalEnv = {...window.ENV}
-      window.ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS = true
-      window.ENV.CAN_MANAGE_DIFFERENTIATION_TAGS = true
+      fakeENV.setup({
+        ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: true,
+        CAN_MANAGE_DIFFERENTIATION_TAGS: true,
+      })
       const {findByTestId, findByText, getAllByTestId} = renderComponent()
       const customOption = await findByTestId('custom-option')
       await userEvent.click(customOption)
@@ -256,7 +258,7 @@ describe('AssignToPanel', () => {
       const option = await findByText(DIFFERENTIATION_TAGS_DATA[0].name)
       await userEvent.click(option)
       expect(getAllByTestId('assignee_selector_selected_option')).toHaveLength(1)
-      window.ENV = originalEnv
+      fakeENV.teardown()
     })
   })
 

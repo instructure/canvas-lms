@@ -32,7 +32,8 @@ import {
   mockNonDynamicRegistration,
   mockRegistrationWithAllInformation,
 } from '../../../manage/__tests__/helpers'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {userEvent} from '@testing-library/user-event'
 import {fireEvent} from '@testing-library/react'
@@ -44,6 +45,8 @@ vi.mock('react-router-dom', async () => {
     useNavigate: vi.fn(),
   }
 })
+
+const server = setupServer()
 
 describe('Tool Configuration View Launch Settings', () => {
   it('should render the Launch Settings for manual registrations', () => {
@@ -500,6 +503,10 @@ describe('Tool Configuration View Tool Icon URL', () => {
 })
 
 describe('Tool Configuration Restore Default Button', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => server.resetHandlers())
+
   it('should disable the button on a site admin inherited tool', () => {
     const registration = mockSiteAdminRegistration('site admin reg', 1)
     const router = createMemoryRouter([
@@ -534,12 +541,22 @@ describe('Tool Configuration Restore Default Button', () => {
   })
 
   it('should call the delete endpoint when clicked', async () => {
-    fetchMock.put(
-      '/api/v1/accounts/1/lti_registrations/1/reset',
-      mockRegistrationWithAllInformation({
-        n: 'Test App',
-        i: 1,
-      }),
+    let capturedUrl = ''
+    let capturedMethod = ''
+    server.use(
+      http.put(
+        '/api/v1/accounts/:accountId/lti_registrations/:registrationId/reset',
+        ({request}) => {
+          capturedUrl = request.url
+          capturedMethod = request.method
+          return HttpResponse.json(
+            mockRegistrationWithAllInformation({
+              n: 'Test App',
+              i: 1,
+            }),
+          )
+        },
+      ),
     )
 
     const {getByText} = renderApp({
@@ -565,13 +582,8 @@ describe('Tool Configuration Restore Default Button', () => {
     const resetModalBtn = getByText('Reset').closest('button')
     await clickOrFail(resetModalBtn)
 
-    const response = fetchMock.calls()[0]
-    const responseUrl = response[0]
-    const responseHeaders = response[1]
-    expect(responseUrl).toBe('/api/v1/accounts/1/lti_registrations/1/reset')
-    expect(responseHeaders).toMatchObject({
-      method: 'PUT',
-    })
+    expect(capturedUrl).toContain('/api/v1/accounts/1/lti_registrations/1/reset')
+    expect(capturedMethod).toBe('PUT')
   })
 })
 

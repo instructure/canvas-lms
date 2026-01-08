@@ -17,8 +17,11 @@
  */
 
 import {fireEvent, render, waitFor} from '@testing-library/react'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import Feedback from '../Feedback'
-import fetchMock from 'fetch-mock'
+
+const server = setupServer()
 
 const props = {
   courseId: '1',
@@ -26,52 +29,57 @@ const props = {
 }
 
 describe('Feedback', () => {
-  afterEach(() => {
-    fetchMock.restore()
+  let capturedUrls: string[]
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
+  beforeEach(() => {
+    capturedUrls = []
+    server.use(
+      http.get(`/api/v1/courses/${props.courseId}/smartsearch/log`, ({request}) => {
+        capturedUrls.push(request.url)
+        return HttpResponse.json({})
+      }),
+    )
   })
 
   it('sends positive feedback', async () => {
-    fetchMock.get(`begin:/api/v1/courses/${props.courseId}/smartsearch/log`, {})
     const {getByTestId} = render(<Feedback {...props} />)
 
     fireEvent.click(getByTestId('positive-feedback'))
     fireEvent.click(getByTestId('pf-close'))
 
     await waitFor(() => {
-      expect(
-        fetchMock.called(url => {
-          const parsedUrl = new URL(url, window.location.href)
-          const params = parsedUrl.searchParams
-          return (
-            params.get('a') === 'LIKE' && params.get('q') === 'kittens' && params.get('c') === ''
-          )
-        }),
-      ).toBe(true)
+      expect(capturedUrls.length).toBeGreaterThan(0)
+      const url = capturedUrls[capturedUrls.length - 1]
+      const parsedUrl = new URL(url)
+      const params = parsedUrl.searchParams
+      expect(params.get('a')).toBe('LIKE')
+      expect(params.get('q')).toBe('kittens')
+      expect(params.get('c')).toBe('')
     })
   })
 
   it('sends negative feedback with no comments', async () => {
-    fetchMock.get(`begin:/api/v1/courses/${props.courseId}/smartsearch/log`, {})
     const {getByTestId} = render(<Feedback {...props} />)
 
     fireEvent.click(getByTestId('negative-feedback'))
     fireEvent.click(getByTestId('nf-close'))
 
     await waitFor(() => {
-      expect(
-        fetchMock.called(url => {
-          const parsedUrl = new URL(url, window.location.href)
-          const params = parsedUrl.searchParams
-          return (
-            params.get('a') === 'DISLIKE' && params.get('q') === 'kittens' && params.get('c') === ''
-          )
-        }),
-      ).toBe(true)
+      expect(capturedUrls.length).toBeGreaterThan(0)
+      const url = capturedUrls[capturedUrls.length - 1]
+      const parsedUrl = new URL(url)
+      const params = parsedUrl.searchParams
+      expect(params.get('a')).toBe('DISLIKE')
+      expect(params.get('q')).toBe('kittens')
+      expect(params.get('c')).toBe('')
     })
   })
 
   it('sends negative feedback with comments', async () => {
-    fetchMock.get(`begin:/api/v1/courses/${props.courseId}/smartsearch/log`, {})
     const {getByLabelText, getByTestId} = render(<Feedback {...props} />)
 
     fireEvent.click(getByTestId('negative-feedback'))
@@ -83,17 +91,13 @@ describe('Feedback', () => {
     fireEvent.click(getByTestId('nf-submit'))
 
     await waitFor(() => {
-      expect(
-        fetchMock.called(url => {
-          const parsedUrl = new URL(url, window.location.href)
-          const params = parsedUrl.searchParams
-          return (
-            params.get('a') === 'DISLIKE' &&
-            params.get('q') === 'kittens' &&
-            params.get('c') === 'Not enough kittens'
-          )
-        }),
-      ).toBe(true)
+      expect(capturedUrls.length).toBeGreaterThan(0)
+      const url = capturedUrls[capturedUrls.length - 1]
+      const parsedUrl = new URL(url)
+      const params = parsedUrl.searchParams
+      expect(params.get('a')).toBe('DISLIKE')
+      expect(params.get('q')).toBe('kittens')
+      expect(params.get('c')).toBe('Not enough kittens')
     })
   })
 })

@@ -19,10 +19,13 @@
 import React from 'react'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {OutcomeResultSection, OutcomeResultSectionProps} from '../OutcomeResultSection'
 import {Outcome, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+const server = setupServer()
 
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: vi.fn(),
@@ -120,21 +123,24 @@ describe('OutcomeResultSection', () => {
     return Wrapper
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.restore()
     vi.clearAllMocks()
   })
 
   afterEach(() => {
     cleanup()
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   describe('successful rendering', () => {
     it('renders aligned outcomes section', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        mockAlignments,
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', () => {
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       render(<OutcomeResultSection {...defaultProps} />, {wrapper: createWrapper()})
@@ -145,9 +151,10 @@ describe('OutcomeResultSection', () => {
     })
 
     it('displays outcome titles', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        mockAlignments,
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', () => {
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       render(<OutcomeResultSection {...defaultProps} />, {wrapper: createWrapper()})
@@ -159,9 +166,10 @@ describe('OutcomeResultSection', () => {
     })
 
     it('displays outcome display names', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        mockAlignments,
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', () => {
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       render(<OutcomeResultSection {...defaultProps} />, {wrapper: createWrapper()})
@@ -173,9 +181,10 @@ describe('OutcomeResultSection', () => {
     })
 
     it('displays outcome scores', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        mockAlignments,
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', () => {
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       render(<OutcomeResultSection {...defaultProps} />, {wrapper: createWrapper()})
@@ -187,9 +196,10 @@ describe('OutcomeResultSection', () => {
     })
 
     it('renders StudentOutcomeScore components for each outcome', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        mockAlignments,
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', () => {
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       render(<OutcomeResultSection {...defaultProps} />, {
@@ -208,9 +218,10 @@ describe('OutcomeResultSection', () => {
     it('only displays outcomes that are aligned to the assignment', async () => {
       const alignmentsWithOnlyOne = [mockAlignments[0]]
 
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        alignmentsWithOnlyOne,
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', () => {
+          return HttpResponse.json(alignmentsWithOnlyOne)
+        }),
       )
 
       render(<OutcomeResultSection {...defaultProps} />, {wrapper: createWrapper()})
@@ -237,9 +248,10 @@ describe('OutcomeResultSection', () => {
         },
       ]
 
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        mockAlignments,
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', () => {
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       render(<OutcomeResultSection {...defaultProps} rollups={rollupsWithoutScore} />, {
@@ -260,9 +272,12 @@ describe('OutcomeResultSection', () => {
 
   describe('loading state', () => {
     it('displays loading spinner while fetching alignments', () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        new Promise(() => {}), // Never resolves
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', async () => {
+          // Delay indefinitely to simulate loading
+          await new Promise(() => {})
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       render(<OutcomeResultSection {...defaultProps} />, {wrapper: createWrapper()})
@@ -273,9 +288,10 @@ describe('OutcomeResultSection', () => {
 
   describe('error handling', () => {
     it('renders nothing on 500 error', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        {status: 500, body: {error: 'Server error'}},
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', () => {
+          return new HttpResponse(JSON.stringify({error: 'Server error'}), {status: 500})
+        }),
       )
 
       const {container} = render(<OutcomeResultSection {...defaultProps} />, {
@@ -296,9 +312,10 @@ describe('OutcomeResultSection', () => {
     })
 
     it('renders nothing on 404 error', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        {status: 404},
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', () => {
+          return new HttpResponse(null, {status: 404})
+        }),
       )
 
       const {container} = render(<OutcomeResultSection {...defaultProps} />, {
@@ -317,9 +334,10 @@ describe('OutcomeResultSection', () => {
     })
 
     it('renders nothing on network error', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        {throws: new Error('Network error')},
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', () => {
+          return HttpResponse.error()
+        }),
       )
 
       const {container} = render(<OutcomeResultSection {...defaultProps} />, {
@@ -340,9 +358,10 @@ describe('OutcomeResultSection', () => {
 
   describe('edge cases', () => {
     it('handles empty alignments array', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        [],
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', () => {
+          return HttpResponse.json([])
+        }),
       )
 
       render(<OutcomeResultSection {...defaultProps} />, {wrapper: createWrapper()})
@@ -357,9 +376,10 @@ describe('OutcomeResultSection', () => {
     })
 
     it('handles student with no rollup data', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        mockAlignments,
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', () => {
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       render(<OutcomeResultSection {...defaultProps} rollups={[]} />, {
@@ -383,9 +403,10 @@ describe('OutcomeResultSection', () => {
         },
       ]
 
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        alignmentsWithDifferentId,
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcome_alignments', () => {
+          return HttpResponse.json(alignmentsWithDifferentId)
+        }),
       )
 
       render(<OutcomeResultSection {...defaultProps} />, {wrapper: createWrapper()})

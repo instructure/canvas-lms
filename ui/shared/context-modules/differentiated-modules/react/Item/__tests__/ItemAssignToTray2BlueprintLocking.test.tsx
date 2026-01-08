@@ -17,15 +17,25 @@
  */
 
 import {cleanup, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
-import {renderComponent, setupBaseMocks, setupEnv, setupFlashHolder} from './ItemAssignToTrayTestUtils'
+import {
+  renderComponent,
+  server,
+  setupBaseMocks,
+  setupEnv,
+  setupFlashHolder,
+  http,
+  HttpResponse,
+} from './ItemAssignToTrayTestUtils'
 
 describe('ItemAssignToTray - Blueprint Locking Info', () => {
   const originalLocation = window.location
 
   beforeAll(() => {
+    server.listen()
     setupFlashHolder()
   })
+
+  afterAll(() => server.close())
 
   beforeEach(() => {
     setupEnv()
@@ -35,15 +45,18 @@ describe('ItemAssignToTray - Blueprint Locking Info', () => {
 
   afterEach(() => {
     window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
   })
 
   it('renders blueprint locking info when there are locked dates', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
-      blueprint_date_locks: ['availability_dates'],
-    })
+    server.use(
+      http.get('/api/v1/courses/1/assignments/31/date_details', () => {
+        return HttpResponse.json({
+          blueprint_date_locks: ['availability_dates'],
+        })
+      }),
+    )
     const {getAllByText, getByTestId} = renderComponent({itemContentId: '31'})
     const loadingSpinner = getByTestId('cards-loading')
     await waitFor(() => {
@@ -56,9 +69,13 @@ describe('ItemAssignToTray - Blueprint Locking Info', () => {
   })
 
   it('renders blueprint locking info when there are locked dates and default cards', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
-      blueprint_date_locks: ['availability_dates'],
-    })
+    server.use(
+      http.get('/api/v1/courses/1/assignments/31/date_details', () => {
+        return HttpResponse.json({
+          blueprint_date_locks: ['availability_dates'],
+        })
+      }),
+    )
     const {getAllByText, findAllByTestId} = renderComponent({
       itemContentId: '31',
       defaultCards: [
@@ -83,9 +100,13 @@ describe('ItemAssignToTray - Blueprint Locking Info', () => {
   })
 
   it('does not render blueprint locking info when locked with unlocked due dates', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
-      blueprint_date_locks: [],
-    })
+    server.use(
+      http.get('/api/v1/courses/1/assignments/31/date_details', () => {
+        return HttpResponse.json({
+          blueprint_date_locks: [],
+        })
+      }),
+    )
     const {getByTestId, queryByText} = renderComponent({itemContentId: '31'})
 
     const loadingSpinner = getByTestId('cards-loading')
@@ -97,18 +118,26 @@ describe('ItemAssignToTray - Blueprint Locking Info', () => {
   })
 
   it('disables add button if there are blueprint-locked dates', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
-      blueprint_date_locks: ['availability_dates'],
-    })
+    server.use(
+      http.get('/api/v1/courses/1/assignments/31/date_details', () => {
+        return HttpResponse.json({
+          blueprint_date_locks: ['availability_dates'],
+        })
+      }),
+    )
     const {getAllByTestId, findAllByText} = renderComponent({itemContentId: '31'})
     await findAllByText('Locked:')
     expect(getAllByTestId('add-card')[0]).toBeDisabled()
   })
 
   it('disables add button if there are blueprint-locked dates and default cards', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
-      blueprint_date_locks: ['availability_dates'],
-    })
+    server.use(
+      http.get('/api/v1/courses/1/assignments/31/date_details', () => {
+        return HttpResponse.json({
+          blueprint_date_locks: ['availability_dates'],
+        })
+      }),
+    )
     const {getAllByTestId, findAllByText} = renderComponent({
       itemContentId: '31',
       defaultCards: [

@@ -24,11 +24,18 @@ import {
   mockSiteAdminRegistration,
 } from '../../manage/__tests__/helpers'
 import {BrowserRouter} from 'react-router-dom'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ZDeveloperKeyId} from '../../../model/developer_key/DeveloperKeyId'
 
+const server = setupServer()
+
 describe('ToolDetailsInner', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => server.resetHandlers())
+
   const renderToolDetailsInner = (
     registration = mockRegistrationWithAllInformation({n: 'test', i: 1}),
   ) => {
@@ -49,10 +56,18 @@ describe('ToolDetailsInner', () => {
   })
 
   it('calls the delete API endpoint when the delete button is clicked', async () => {
-    fetchMock.delete('/api/v1/accounts/1/lti_registrations/1', {
-      __type: 'Success',
-      data: {},
-    })
+    let capturedUrl = ''
+    let capturedMethod = ''
+    server.use(
+      http.delete('/api/v1/accounts/:accountId/lti_registrations/:registrationId', ({request}) => {
+        capturedUrl = request.url
+        capturedMethod = request.method
+        return HttpResponse.json({
+          __type: 'Success',
+          data: {},
+        })
+      }),
+    )
 
     const wrapper = renderToolDetailsInner()
     const deleteBtn = await wrapper.getByText('Delete App').closest('button')
@@ -60,13 +75,8 @@ describe('ToolDetailsInner', () => {
     const confirmationModalAcceptBtn = await wrapper.getByText('Delete').closest('button')
     await clickOrFail(confirmationModalAcceptBtn)
 
-    const response = fetchMock.calls()[0]
-    const responseUrl = response[0]
-    const responseHeaders = response[1]
-    expect(responseUrl).toBe('/api/v1/accounts/1/lti_registrations/1')
-    expect(responseHeaders).toMatchObject({
-      method: 'DELETE',
-    })
+    expect(capturedUrl).toContain('/api/v1/accounts/1/lti_registrations/1')
+    expect(capturedMethod).toBe('DELETE')
   })
 
   it('shows the delete button on a site admin registration', async () => {

@@ -20,12 +20,16 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import {editView} from './utils'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.simulate'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 // Suppress React warnings
 const originalConsoleError = console.error
 const originalConsoleWarn = console.warn
 beforeAll(() => {
+  server.listen()
   console.error = (...args) => {
     if (
       typeof args[0] === 'string' &&
@@ -47,6 +51,7 @@ beforeAll(() => {
 })
 
 afterAll(() => {
+  server.close()
   console.error = originalConsoleError
   console.warn = originalConsoleWarn
 })
@@ -60,30 +65,35 @@ describe('EditView', () => {
     ENV.SETTINGS = {suppress_assignments: false}
 
     // Mock API endpoints
-    fetchMock
-      .get('path:/api/v1/courses/1/lti_apps/launch_definitions', {
-        tools: [],
-      })
-      .post(/.*\/api\/graphql/, {
-        data: {
-          course: {
-            enrollmentsConnection: {
-              nodes: [],
-              pageInfo: {
-                hasNextPage: false,
-                endCursor: null,
+    server.use(
+      http.get('/api/v1/courses/1/lti_apps/launch_definitions', () => {
+        return HttpResponse.json({tools: []})
+      }),
+      http.post(/\/api\/graphql/, () => {
+        return HttpResponse.json({
+          data: {
+            course: {
+              enrollmentsConnection: {
+                nodes: [],
+                pageInfo: {
+                  hasNextPage: false,
+                  endCursor: null,
+                },
               },
             },
           },
-        },
-      })
-      .get('*', 200) // Catch any other requests
+        })
+      }),
+      http.get('*', () => {
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
   })
 
   afterEach(() => {
     $container.remove()
     fakeENV.teardown()
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   describe('Sections Specific', () => {
