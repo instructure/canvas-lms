@@ -66,6 +66,11 @@ RSpec.describe AccessibilityCourseStatistic do
       stat = AccessibilityCourseStatistic.create!(course:)
       expect(stat.active_issue_count).to be_nil
     end
+
+    it "sets default resolved_issue_count to nil" do
+      stat = AccessibilityCourseStatistic.create!(course:)
+      expect(stat.resolved_issue_count).to be_nil
+    end
   end
 
   describe "required associations" do
@@ -161,6 +166,27 @@ RSpec.describe AccessibilityCourseStatistic do
 
       stat.update!(active_issue_count: 15)
       expect(stat.reload.active_issue_count).to eq(15)
+    end
+
+    it "can create with resolved_issue_count" do
+      stat = AccessibilityCourseStatistic.create!(
+        course:,
+        resolved_issue_count: 3
+      )
+
+      expect(stat.resolved_issue_count).to eq(3)
+    end
+
+    it "can update resolved_issue_count" do
+      stat = AccessibilityCourseStatistic.create!(
+        course:,
+        resolved_issue_count: 5
+      )
+
+      expect(stat.resolved_issue_count).to eq(5)
+
+      stat.update!(resolved_issue_count: 8)
+      expect(stat.reload.resolved_issue_count).to eq(8)
     end
   end
 
