@@ -135,6 +135,7 @@ module Outcomes
           submitted_at: score.submitted_at,
           title: score.title,
           hide_points: score.hide_points || false,
+          results_count: score.count,
           workflow_state: "active",
           last_calculated_at: Time.current,
         }

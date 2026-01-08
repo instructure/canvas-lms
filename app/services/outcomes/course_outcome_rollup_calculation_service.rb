@@ -180,6 +180,7 @@ module Outcomes
             submitted_at: score.submitted_at,
             title: score.title,
             hide_points: score.hide_points || false,
+            results_count: score.count,
             workflow_state: "active",
             last_calculated_at: Time.current,
           }
@@ -205,7 +206,7 @@ module Outcomes
             result = OutcomeRollup.upsert_all(
               batch,
               unique_by: %i[course_id user_id outcome_id],
-              update_only: %i[calculation_method aggregate_score submitted_at title hide_points last_calculated_at workflow_state],
+              update_only: %i[calculation_method aggregate_score submitted_at title hide_points results_count last_calculated_at workflow_state],
               returning: %w[id]
             )
             batch_ids = result.map { |row| row["id"] }

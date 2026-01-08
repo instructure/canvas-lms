@@ -437,7 +437,8 @@ describe Outcomes::RollupCommonService do
              score: 4.0,
              submitted_at: submitted_at1,
              title: "Assignment 1",
-             hide_points: false)
+             hide_points: false,
+             count: 1)
     end
 
     let(:score2) do
@@ -446,7 +447,8 @@ describe Outcomes::RollupCommonService do
              score: 3.5,
              submitted_at: submitted_at2,
              title: "Assignment 2",
-             hide_points: true)
+             hide_points: true,
+             count: 2)
     end
 
     let(:nil_score) do
@@ -455,7 +457,8 @@ describe Outcomes::RollupCommonService do
              score: nil,
              submitted_at: nil,
              title: nil,
-             hide_points: false)
+             hide_points: false,
+             count: 0)
     end
 
     let(:rollup) do
@@ -482,6 +485,7 @@ describe Outcomes::RollupCommonService do
         submitted_at: submitted_at1,
         title: "Assignment 1",
         hide_points: false,
+        results_count: 1,
         workflow_state: "active"
       )
 
@@ -491,7 +495,8 @@ describe Outcomes::RollupCommonService do
         aggregate_score: 3.5,
         submitted_at: submitted_at2,
         title: "Assignment 2",
-        hide_points: true
+        hide_points: true,
+        results_count: 2
       )
     end
 
@@ -526,6 +531,7 @@ describe Outcomes::RollupCommonService do
         :submitted_at,
         :title,
         :hide_points,
+        :results_count,
         :workflow_state,
         :last_calculated_at
       )
