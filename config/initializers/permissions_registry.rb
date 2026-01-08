@@ -2178,6 +2178,20 @@ BASE_PERMISSIONS = {
         description: -> { I18n.t("Impact is an add-on to Canvas LMS. Contact your CSM if interested.") } }
     ]
   },
+  access_oak: {
+    label: -> { I18n.t("IgniteAI Agent") },
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: [],
+    account_allows: ->(a) { a.feature_enabled?(:oak_for_admins) },
+    details: [
+      { title: -> { I18n.t("IgniteAI Agent") },
+        description: -> { I18n.t("Allows user to access the IgniteAI Agent for Canvas LMS.") } }
+    ],
+    considerations: [
+      { title: -> { I18n.t("IgniteAI Agent") },
+        description: -> { I18n.t("The IgniteAI Agent feature flag must be enabled for the account to assign this permission.") } }
+    ]
+  },
   block_editor_template_editor: {
     label: -> { I18n.t("Block Editor Templates - edit") },
     available_to: %w[TeacherEnrollment DesignerEnrollment AccountAdmin AccountMembership],

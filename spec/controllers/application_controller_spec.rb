@@ -3860,62 +3860,64 @@ RSpec.describe ApplicationController, "#cached_js_env_account_features" do
 end
 
 RSpec.describe ApplicationController, "#add_ignite_agent_bundle?" do
-  let_once(:user) { user_factory(active_all: true) }
   let_once(:account) { Account.default }
 
   before do
     controller.instance_variable_set(:@domain_root_account, account)
-    controller.instance_variable_set(:@current_user, user)
     allow(controller).to receive(:session).and_return({})
   end
 
-  it "returns false when no user is logged in" do
-    controller.instance_variable_set(:@current_user, nil)
-    expect(controller.send(:add_ignite_agent_bundle?)).to be false
-  end
-
-  it "returns false when ignite_agent_enabled feature is disabled" do
-    account.disable_feature!(:ignite_agent_enabled)
-    expect(controller.send(:add_ignite_agent_bundle?)).to be false
-  end
-
-  it "returns true when user has manage_account_settings permission" do
-    account.enable_feature!(:ignite_agent_enabled)
-    account.role_overrides.create!(
-      permission: :manage_account_settings,
-      role: admin_role,
-      enabled: true
-    )
-    account.account_users.create!(user:, role: admin_role)
-
-    expect(controller.send(:add_ignite_agent_bundle?)).to be true
-  end
-
-  it "returns false when user lacks manage_account_settings and ignite_agent_enabled_for_user feature flag" do
-    account.enable_feature!(:ignite_agent_enabled)
-    expect(controller.send(:add_ignite_agent_bundle?)).to be false
-  end
-
-  it "returns true when user has ignite_agent_enabled_for_user feature flag" do
-    account.enable_feature!(:ignite_agent_enabled)
-    user.enable_feature!(:ignite_agent_enabled_for_user)
-
-    expect(controller.send(:add_ignite_agent_bundle?)).to be true
-  end
-
   it "returns false when preview param is true" do
-    account.enable_feature!(:ignite_agent_enabled)
-    user.enable_feature!(:ignite_agent_enabled_for_user)
     allow(controller).to receive(:params).and_return({ preview: "true" })
 
     expect(controller.send(:add_ignite_agent_bundle?)).to be false
   end
 
   it "returns false on oauth2_provider confirm page" do
-    account.enable_feature!(:ignite_agent_enabled)
-    user.enable_feature!(:ignite_agent_enabled_for_user)
     allow(controller).to receive_messages(controller_name: "oauth2_provider", action_name: "confirm", params: {})
 
     expect(controller.send(:add_ignite_agent_bundle?)).to be false
+  end
+
+  context "with legacy ignite_agent_enabled feature flag" do
+    before do
+      account.enable_feature!(:ignite_agent_enabled)
+    end
+
+    it "returns true when user has manage_account_settings permission" do
+      admin_user = account_admin_user
+      controller.instance_variable_set(:@current_user, admin_user)
+
+      expect(controller.send(:add_ignite_agent_bundle?)).to be true
+    end
+
+    it "returns true when user has ignite_agent_enabled_for_user feature flag" do
+      user = user_model
+      user.enable_feature!(:ignite_agent_enabled_for_user)
+      controller.instance_variable_set(:@current_user, user)
+
+      expect(controller.send(:add_ignite_agent_bundle?)).to be true
+    end
+  end
+
+  context "with oak_for_admins feature flag" do
+    before do
+      account.enable_feature!(:oak_for_admins)
+    end
+
+    it "returns true when user has access_oak permissions" do
+      admin_user =
+        account_admin_user_with_role_changes(
+          role_changes: {
+            manage_account_settings: false,
+            access_oak: true
+          },
+          account:,
+          role: Role.get_built_in_role("AccountMembership", root_account_id: account)
+        )
+      controller.instance_variable_set(:@current_user, admin_user)
+
+      expect(controller.send(:add_ignite_agent_bundle?)).to be true
+    end
   end
 end

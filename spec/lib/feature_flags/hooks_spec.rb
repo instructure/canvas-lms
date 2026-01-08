@@ -573,4 +573,28 @@ describe FeatureFlags::Hooks do
       end
     end
   end
+
+  describe "oak_flag_visible_on_hook" do
+    let(:context) { double("Context") }
+    let(:current_shard) { double("Shard", database_server: double(config: { region: "us-east-1" })) }
+    let(:oak_predicate) { instance_double(FeatureFlags::OakPredicate) }
+
+    before do
+      allow(Shard).to receive(:current).and_return(current_shard)
+      allow(FeatureFlags::OakPredicate).to receive(:new).and_return(oak_predicate)
+      allow(oak_predicate).to receive(:call)
+    end
+
+    it "creates a new OakPredicate with context and region" do
+      expect(FeatureFlags::OakPredicate).to receive(:new).with(context, "us-east-1")
+
+      FeatureFlags::Hooks.oak_flag_visible_on_hook(context)
+    end
+
+    it "calls .call on the OakPredicate instance" do
+      expect(oak_predicate).to receive(:call)
+
+      FeatureFlags::Hooks.oak_flag_visible_on_hook(context)
+    end
+  end
 end
