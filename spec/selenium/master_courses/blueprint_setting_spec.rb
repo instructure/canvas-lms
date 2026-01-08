@@ -55,7 +55,7 @@ describe "master courses - settings" do
   it "prevents creating a blueprint course from associated course", priority: "2" do
     @associated_course = @template.add_child_course!(course_factory(name: "ac1", active_all: true)).child_course
     get "/courses/#{@associated_course.id}/settings"
-    expect(f(".disabled_message")).to be
+    expect(element_exists?("#blueprint_menu")).to be_falsey
   end
 
   it "prevents blueprinting a course with students", priority: "1" do
@@ -63,7 +63,7 @@ describe "master courses - settings" do
     course2 = course_factory(active_all: true)
     course2.enroll_user(student1, "StudentEnrollment", enrollment_state: "active")
     get "/courses/#{course2.id}/settings"
-    expect(f(".disabled_message")).to be
+    expect(f("#blueprint_menu .disabled_message")).to be_displayed
   end
 
   it "prevents adding students to blueprint course", priority: "1" do

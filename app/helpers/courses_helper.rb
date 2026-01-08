@@ -160,6 +160,18 @@ module CoursesHelper
     Api::V1::Tab.tab_is?(tab, @context, const_name)
   end
 
+  def sortable_tabs_tab_disabled_message(tab)
+    if @context.elementary_subject_course?
+      I18n.t("courses.settings.tab_hidden_if_disabled_k5", "Tab disabled, won't appear in subject navigation")
+    elsif tab[:external]
+      I18n.t("courses.settings.tab_hidden_if_disabled", "Page disabled, won't appear in navigation")
+    elsif [Course::TAB_GRADES, Course::TAB_DISCUSSIONS].include?(tab[:id])
+      I18n.t("courses.settings.tab_cant_disable", "This page can't be disabled, only hidden")
+    else
+      I18n.t("courses.settings.tab_disabled", "Page disabled, will redirect to course home page")
+    end
+  end
+
   def sortable_tabs
     tabs =
       @context.tabs_available(
@@ -168,7 +180,8 @@ module CoursesHelper
         root_account: @domain_root_account,
         course_subject_tabs: @context.try(:elementary_subject_course?)
       )
-    tabs.select do |tab|
+
+    tabs = tabs.select do |tab|
       if tab_is?(tab, :TAB_COLLABORATIONS)
         Collaboration.any_collaborations_configured?(@context) &&
           !@context.feature_enabled?(:new_collaborations)
@@ -181,6 +194,13 @@ module CoursesHelper
       else
         !tab_is?(tab, :TAB_SETTINGS)
       end
+    end
+
+    tabs.map do |tab|
+      tab.merge({
+        immovable: @context.tab_enabled?(tab) ? nil : true,
+        disabled_message: sortable_tabs_tab_disabled_message(tab)
+      }.compact)
     end
   end
 

@@ -53,6 +53,9 @@ const QuantitativeDataOptions = React.lazy(
 const CourseDefaultDueTime = React.lazy(() => import('./react/components/CourseDefaultDueTime'))
 const Integrations = React.lazy(() => import('@canvas/integrations/react/courses/Integrations'))
 const CourseApps = React.lazy(() => import('./react/components/CourseApps'))
+const CourseNavigationSettings = React.lazy(
+  () => import('./react/components/CourseNavigationSettings'),
+)
 
 const Loading = () => <Spinner size="x-small" renderTitle={I18n.t('Loading')} />
 const ErrorMessage = () => (
@@ -220,6 +223,36 @@ ready(() => {
         </ErrorBoundary>
       </Suspense>,
       tabsMountpoint,
+    )
+  }
+
+  const navSettingsContainer = document.getElementById('course_navigation_settings_container')
+  if (navSettingsContainer) {
+    render(
+      <Suspense fallback={<Loading />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
+          <CourseNavigationSettings
+            onSubmit={tabs => {
+              const form = document.querySelector<HTMLFormElement>(
+                'form#course_navigation_settings_form',
+              )
+              if (!form) {
+                console.error('Course navigation settings form not found')
+                return
+              }
+              const tabsJsonHiddenInput =
+                form.querySelector<HTMLInputElement>('input[name="tabs_json"]')
+              if (!tabsJsonHiddenInput) {
+                console.error('Tabs JSON input not found')
+                return
+              }
+              tabsJsonHiddenInput.value = JSON.stringify(tabs)
+              form.submit()
+            }}
+          />
+        </ErrorBoundary>
+      </Suspense>,
+      navSettingsContainer,
     )
   }
 })
