@@ -339,11 +339,6 @@ module SpeedGrader
             enable_annotations:
               !provisional_grader_or_moderator? ||
               assignment.can_be_moderated_grader?(current_user),
-            moderated_grading_allow_list:
-              sub.moderated_grading_allow_list(
-                current_user,
-                loaded_attachments: attachments_for_submission[sub]
-              ),
             submission_id: sub.id
           }
 
