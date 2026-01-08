@@ -929,5 +929,16 @@ describe "Student reports" do
       parsed = read_report(@type, { order: 1 })
       expect(parsed.length).to eq 2
     end
+
+    it "excludes expired tokens when requested" do
+      parsed = read_report(
+        @type,
+        { params: { "include_deleted" => true, "exclude_deleted_and_expired" => true }, order: 1 }
+      )
+
+      expect(parsed.length).to eq 2
+      user1_row = parsed.detect { |row| row[0] == @user1.id.to_s }
+      expect(user1_row).to be_nil
+    end
   end
 end
