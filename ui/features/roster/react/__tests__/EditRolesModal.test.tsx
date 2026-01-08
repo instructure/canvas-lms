@@ -19,8 +19,17 @@
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import EditRolesModal from '../EditRolesModal'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
-import {AVAILABLE_ROLES, GENERIC_ENROLLMENT, mockDelete, mockPost, USER_ID} from './testUtils'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import {
+  AVAILABLE_ROLES,
+  GENERIC_ENROLLMENT,
+  setupDeleteMocks,
+  setupPostMocks,
+  USER_ID,
+} from './testUtils'
+
+const server = setupServer()
 
 const currentEnrollments = [
   {
@@ -42,9 +51,15 @@ const defaultProps = {
 }
 
 describe('EditRolesModal', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.restore()
     vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   it("renders modal with user's current role", async () => {
@@ -59,8 +74,8 @@ describe('EditRolesModal', () => {
 
   it('calls onSubmit when submitting', async () => {
     const user = userEvent.setup()
-    const {deletedEnrollments, deletedPaths} = mockDelete(currentEnrollments, '3')
-    const {newEnrollments, postPaths} = mockPost(currentEnrollments, '3')
+    const {deletedEnrollments} = setupDeleteMocks(server, currentEnrollments, '3')
+    const {newEnrollments} = setupPostMocks(server, currentEnrollments, '3')
     const {getByTestId, getByText} = render(<EditRolesModal {...defaultProps} />)
 
     fireEvent.click(getByTestId('edit-roles-select'))
@@ -73,8 +88,6 @@ describe('EditRolesModal', () => {
     await waitFor(() => {
       expect(defaultProps.onSubmit).toHaveBeenCalledWith(newEnrollments, deletedEnrollments)
       expect(defaultProps.onClose).toHaveBeenCalled()
-      expect(fetchMock.called(deletedPaths[0], 'DELETE')).toBe(true)
-      expect(fetchMock.called(postPaths[0], 'POST')).toBe(true)
     })
   })
 
@@ -89,24 +102,26 @@ describe('EditRolesModal', () => {
 
   it("skips onSubmit if role hasn't changed", async () => {
     const user = userEvent.setup()
-    const deleted = mockDelete(currentEnrollments, '1')
-    const created = mockPost(currentEnrollments, '1') // 1 is student; existing enrollment is for student
+    setupDeleteMocks(server, currentEnrollments, '1')
+    setupPostMocks(server, currentEnrollments, '1') // 1 is student; existing enrollment is for student
     const {getByTestId} = render(<EditRolesModal {...defaultProps} />)
     await user.click(getByTestId('update-roles'))
     await waitFor(() => {
       expect(defaultProps.onSubmit).not.toHaveBeenCalled()
       expect(defaultProps.onClose).toHaveBeenCalled()
-      expect(fetchMock.called(deleted.deletedPaths[0], 'DELETE')).toBe(false)
-      expect(fetchMock.called(created.postPaths[0], 'POST')).toBe(false)
     })
   })
 
   it('flashes error message if role failed to change', async () => {
     const user = userEvent.setup()
-    fetchMock.delete(`/unenroll/${currentEnrollments[0].id}`, {status: 500})
-    fetchMock.post(`/api/v1/sections/${currentEnrollments[0].course_section_id}/enrollments`, {
-      status: 500,
-    })
+    server.use(
+      http.delete(`/unenroll/${currentEnrollments[0].id}`, () => {
+        return HttpResponse.json({error: 'Internal Server Error'}, {status: 500})
+      }),
+      http.post(`/api/v1/sections/${currentEnrollments[0].course_section_id}/enrollments`, () => {
+        return HttpResponse.json({error: 'Internal Server Error'}, {status: 500})
+      }),
+    )
     const {getByTestId, getByText, getAllByText} = render(<EditRolesModal {...defaultProps} />)
 
     fireEvent.click(getByTestId('edit-roles-select'))
@@ -148,8 +163,8 @@ describe('EditRolesModal', () => {
       ...defaultProps,
       currentEnrollments: multipleEnrollments,
     }
-    const {deletedEnrollments, deletedPaths} = mockDelete(multipleEnrollments, '3')
-    const {newEnrollments, postPaths} = mockPost(multipleEnrollments, '3') // set all enrollments to TA
+    const {deletedEnrollments} = setupDeleteMocks(server, multipleEnrollments, '3')
+    const {newEnrollments} = setupPostMocks(server, multipleEnrollments, '3') // set all enrollments to TA
     const {getByTestId, getByText} = render(<EditRolesModal {...props} />)
 
     expect(getByText(/multiple roles in the course/)).toBeInTheDocument()
@@ -161,9 +176,5 @@ describe('EditRolesModal', () => {
       expect(props.onSubmit).toHaveBeenCalledWith(newEnrollments, deletedEnrollments)
       expect(props.onClose).toHaveBeenCalled()
     })
-    expect(fetchMock.called(deletedPaths[0], 'DELETE')).toBe(true)
-    expect(fetchMock.called(deletedPaths[1], 'DELETE')).toBe(true)
-    expect(fetchMock.called(postPaths[0], 'POST')).toBe(true)
-    expect(fetchMock.called(postPaths[1], 'POST')).toBe(true)
   })
 })

@@ -17,22 +17,26 @@
  */
 
 import {cleanup, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
 import {
   OVERRIDES,
-  OVERRIDES_URL,
   renderComponent,
+  server,
   setupBaseMocks,
   setupEnv,
   setupFlashHolder,
+  http,
+  HttpResponse,
 } from './ItemAssignToTrayTestUtils'
 
 describe('ItemAssignToTray - Everyone Option', () => {
   const originalLocation = window.location
 
   beforeAll(() => {
+    server.listen()
     setupFlashHolder()
   })
+
+  afterAll(() => server.close())
 
   beforeEach(() => {
     setupEnv()
@@ -42,26 +46,23 @@ describe('ItemAssignToTray - Everyone Option', () => {
 
   afterEach(() => {
     window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
   })
 
   it('does not render everyone option if the assignment is set to overrides only', async () => {
-    fetchMock.get(
-      OVERRIDES_URL,
-      {
-        id: '23',
-        due_at: null,
-        unlock_at: null,
-        lock_at: null,
-        only_visible_to_overrides: true,
-        visible_to_everyone: false,
-        overrides: OVERRIDES,
-      },
-      {
-        overwriteRoutes: true,
-      },
+    server.use(
+      http.get('/api/v1/courses/1/assignments/23/date_details', () => {
+        return HttpResponse.json({
+          id: '23',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          only_visible_to_overrides: true,
+          visible_to_everyone: false,
+          overrides: OVERRIDES,
+        })
+      }),
     )
     const {findAllByTestId, getAllByTestId} = renderComponent()
     const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
@@ -74,20 +75,18 @@ describe('ItemAssignToTray - Everyone Option', () => {
   })
 
   it('renders everyone option if there are no overrides', async () => {
-    fetchMock.get(
-      OVERRIDES_URL,
-      {
-        id: '23',
-        due_at: '2023-10-05T12:00:00Z',
-        unlock_at: '2023-10-01T12:00:00Z',
-        lock_at: '2023-11-01T12:00:00Z',
-        only_visible_to_overrides: false,
-        visible_to_everyone: true,
-        overrides: [],
-      },
-      {
-        overwriteRoutes: true,
-      },
+    server.use(
+      http.get('/api/v1/courses/1/assignments/23/date_details', () => {
+        return HttpResponse.json({
+          id: '23',
+          due_at: '2023-10-05T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          only_visible_to_overrides: false,
+          visible_to_everyone: true,
+          overrides: [],
+        })
+      }),
     )
     const {findAllByTestId} = renderComponent()
     const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
@@ -96,35 +95,33 @@ describe('ItemAssignToTray - Everyone Option', () => {
   })
 
   it('renders everyone option for item with course and module overrides', async () => {
-    fetchMock.get(
-      OVERRIDES_URL,
-      {
-        id: '23',
-        due_at: '2023-10-05T12:00:00Z',
-        unlock_at: '2023-10-01T12:00:00Z',
-        lock_at: '2023-11-01T12:00:00Z',
-        only_visible_to_overrides: true,
-        visible_to_everyone: true,
-        overrides: [
-          {
-            due_at: null,
-            id: undefined,
-            lock_at: null,
-            course_id: 1,
-            unlock_at: null,
-          },
-          {
-            due_at: null,
-            id: undefined,
-            lock_at: null,
-            context_module_id: 1,
-            unlock_at: null,
-          },
-        ],
-      },
-      {
-        overwriteRoutes: true,
-      },
+    server.use(
+      http.get('/api/v1/courses/1/assignments/23/date_details', () => {
+        return HttpResponse.json({
+          id: '23',
+          due_at: '2023-10-05T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          only_visible_to_overrides: true,
+          visible_to_everyone: true,
+          overrides: [
+            {
+              due_at: null,
+              id: undefined,
+              lock_at: null,
+              course_id: 1,
+              unlock_at: null,
+            },
+            {
+              due_at: null,
+              id: undefined,
+              lock_at: null,
+              context_module_id: 1,
+              unlock_at: null,
+            },
+          ],
+        })
+      }),
     )
     const {findAllByTestId} = renderComponent()
     const selectedOptions = await findAllByTestId('assignee_selector_selected_option')

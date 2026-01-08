@@ -20,8 +20,13 @@ import React from 'react'
 import {waitFor} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {useOutcomeAlignments} from '../useOutcomeAlignments'
+
+const server = setupServer()
+let apiCallCount = 0
+let lastRequestUrl = ''
 
 describe('useOutcomeAlignments', () => {
   const courseId = '123'
@@ -62,19 +67,26 @@ describe('useOutcomeAlignments', () => {
     return Wrapper
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.restore()
+    apiCallCount = 0
+    lastRequestUrl = ''
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   describe('successful data fetching', () => {
     it('fetches and returns outcome alignments with studentId and assignmentId', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        mockAlignments,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, ({request}) => {
+          apiCallCount++
+          lastRequestUrl = request.url
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       const {result} = renderHook(
@@ -97,9 +109,11 @@ describe('useOutcomeAlignments', () => {
     })
 
     it('fetches with only studentId', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}`,
-        mockAlignments,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, () => {
+          apiCallCount++
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       const {result} = renderHook(() => useOutcomeAlignments({courseId, studentId}), {
@@ -114,9 +128,11 @@ describe('useOutcomeAlignments', () => {
     })
 
     it('fetches with only assignmentId', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?assignment_id=${assignmentId}`,
-        mockAlignments,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, () => {
+          apiCallCount++
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       const {result} = renderHook(() => useOutcomeAlignments({courseId, assignmentId}), {
@@ -131,9 +147,11 @@ describe('useOutcomeAlignments', () => {
     })
 
     it('returns alignment details correctly', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        mockAlignments,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, () => {
+          apiCallCount++
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       const {result} = renderHook(() => useOutcomeAlignments({courseId, studentId, assignmentId}), {
@@ -149,9 +167,11 @@ describe('useOutcomeAlignments', () => {
     })
 
     it('handles empty alignments array', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignmentId}`,
-        [],
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, () => {
+          apiCallCount++
+          return HttpResponse.json([])
+        }),
       )
 
       const {result} = renderHook(() => useOutcomeAlignments({courseId, studentId, assignmentId}), {
@@ -166,10 +186,11 @@ describe('useOutcomeAlignments', () => {
 
   describe('error handling', () => {
     it('handles 404 error', async () => {
-      fetchMock.get(`/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}`, {
-        status: 404,
-        body: {error: 'Not found'},
-      })
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, () => {
+          return HttpResponse.json({error: 'Not found'}, {status: 404})
+        }),
+      )
 
       const {result} = renderHook(() => useOutcomeAlignments({courseId, studentId}), {
         wrapper: createWrapper(),
@@ -184,10 +205,11 @@ describe('useOutcomeAlignments', () => {
     })
 
     it('handles 500 server error', async () => {
-      fetchMock.get(`/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}`, {
-        status: 500,
-        body: {error: 'Internal server error'},
-      })
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, () => {
+          return HttpResponse.json({error: 'Internal server error'}, {status: 500})
+        }),
+      )
 
       const {result} = renderHook(() => useOutcomeAlignments({courseId, studentId}), {
         wrapper: createWrapper(),
@@ -202,9 +224,11 @@ describe('useOutcomeAlignments', () => {
     })
 
     it('handles network error', async () => {
-      fetchMock.get(`/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}`, {
-        throws: new Error('Network error'),
-      })
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, () => {
+          return HttpResponse.error()
+        }),
+      )
 
       const {result} = renderHook(() => useOutcomeAlignments({courseId, studentId}), {
         wrapper: createWrapper(),
@@ -220,7 +244,12 @@ describe('useOutcomeAlignments', () => {
 
   describe('enabled parameter', () => {
     it('does not fetch when enabled is false', async () => {
-      fetchMock.get(/.*/, mockAlignments)
+      server.use(
+        http.get('*', () => {
+          apiCallCount++
+          return HttpResponse.json(mockAlignments)
+        }),
+      )
 
       const {result} = renderHook(
         () => useOutcomeAlignments({courseId, studentId, enabled: false}),
@@ -238,13 +267,15 @@ describe('useOutcomeAlignments', () => {
         expect(result.current.data).toBeUndefined()
       })
 
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
     })
 
     it('fetches when enabled changes from false to true', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}`,
-        mockAlignments,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, () => {
+          apiCallCount++
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       const {result, rerender} = renderHook(
@@ -255,7 +286,7 @@ describe('useOutcomeAlignments', () => {
         },
       )
 
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
 
       rerender({enabled: true})
 
@@ -263,12 +294,17 @@ describe('useOutcomeAlignments', () => {
         expect(result.current.isSuccess).toBe(true)
       })
 
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(apiCallCount).toBe(1)
       expect(result.current.data).toEqual(mockAlignments)
     })
 
     it('does not fetch when courseId is missing', async () => {
-      fetchMock.get(/.*/, mockAlignments)
+      server.use(
+        http.get('*', () => {
+          apiCallCount++
+          return HttpResponse.json(mockAlignments)
+        }),
+      )
 
       const {result} = renderHook(() => useOutcomeAlignments({courseId: '', studentId}), {
         wrapper: createWrapper(),
@@ -282,11 +318,16 @@ describe('useOutcomeAlignments', () => {
         expect(result.current.data).toBeUndefined()
       })
 
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
     })
 
     it('does not fetch when both studentId and assignmentId are missing', async () => {
-      fetchMock.get(/.*/, mockAlignments)
+      server.use(
+        http.get('*', () => {
+          apiCallCount++
+          return HttpResponse.json(mockAlignments)
+        }),
+      )
 
       const {result} = renderHook(() => useOutcomeAlignments({courseId}), {
         wrapper: createWrapper(),
@@ -300,7 +341,7 @@ describe('useOutcomeAlignments', () => {
         expect(result.current.data).toBeUndefined()
       })
 
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
     })
   })
 
@@ -309,12 +350,18 @@ describe('useOutcomeAlignments', () => {
       const student1Id = '111'
       const student2Id = '222'
 
-      fetchMock.get(`/api/v1/courses/${courseId}/outcome_alignments?student_id=${student1Id}`, [
-        {...mockAlignments[0], learning_outcome_id: 100},
-      ])
-      fetchMock.get(`/api/v1/courses/${courseId}/outcome_alignments?student_id=${student2Id}`, [
-        {...mockAlignments[0], learning_outcome_id: 200},
-      ])
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, ({request}) => {
+          apiCallCount++
+          const url = new URL(request.url)
+          const sid = url.searchParams.get('student_id')
+          if (sid === student1Id) {
+            return HttpResponse.json([{...mockAlignments[0], learning_outcome_id: 100}])
+          } else {
+            return HttpResponse.json([{...mockAlignments[0], learning_outcome_id: 200}])
+          }
+        }),
+      )
 
       const wrapper = createWrapper()
 
@@ -336,20 +383,24 @@ describe('useOutcomeAlignments', () => {
         expect(result2.current.data?.[0].learning_outcome_id).toBe(200)
       })
 
-      expect(fetchMock.calls()).toHaveLength(2)
+      expect(apiCallCount).toBe(2)
     })
 
     it('uses different cache keys for different assignments', async () => {
       const assignment1Id = '100'
       const assignment2Id = '200'
 
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignment1Id}`,
-        [{...mockAlignments[0], assignment_id: 100}],
-      )
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}&assignment_id=${assignment2Id}`,
-        [{...mockAlignments[0], assignment_id: 200}],
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, ({request}) => {
+          apiCallCount++
+          const url = new URL(request.url)
+          const aid = url.searchParams.get('assignment_id')
+          if (aid === assignment1Id) {
+            return HttpResponse.json([{...mockAlignments[0], assignment_id: 100}])
+          } else {
+            return HttpResponse.json([{...mockAlignments[0], assignment_id: 200}])
+          }
+        }),
       )
 
       const wrapper = createWrapper()
@@ -372,13 +423,19 @@ describe('useOutcomeAlignments', () => {
         expect(result2.current.data?.[0].assignment_id).toBe(200)
       })
 
-      expect(fetchMock.calls()).toHaveLength(2)
+      expect(apiCallCount).toBe(2)
     })
   })
 
   describe('query string construction', () => {
     it('constructs query string with both studentId and assignmentId', async () => {
-      fetchMock.get(/.*/, mockAlignments)
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, ({request}) => {
+          apiCallCount++
+          lastRequestUrl = request.url
+          return HttpResponse.json(mockAlignments)
+        }),
+      )
 
       const {result} = renderHook(() => useOutcomeAlignments({courseId, studentId, assignmentId}), {
         wrapper: createWrapper(),
@@ -388,33 +445,17 @@ describe('useOutcomeAlignments', () => {
         expect(result.current.isSuccess).toBe(true)
       })
 
-      const calls = fetchMock.calls()
-      expect(calls[0][0]).toContain('student_id=456')
-      expect(calls[0][0]).toContain('assignment_id=789')
+      expect(lastRequestUrl).toContain('student_id=456')
+      expect(lastRequestUrl).toContain('assignment_id=789')
     })
 
     it('constructs query string with only studentId', async () => {
-      fetchMock.get(/.*/, mockAlignments)
-
-      const {result} = renderHook(() => useOutcomeAlignments({courseId, studentId}), {
-        wrapper: createWrapper(),
-      })
-
-      await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true)
-      })
-
-      const calls = fetchMock.calls()
-      expect(calls[0][0]).toContain('student_id=456')
-      expect(calls[0][0]).not.toContain('assignment_id')
-    })
-  })
-
-  describe('default parameters', () => {
-    it('uses enabled=true by default when conditions are met', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}`,
-        mockAlignments,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, ({request}) => {
+          apiCallCount++
+          lastRequestUrl = request.url
+          return HttpResponse.json(mockAlignments)
+        }),
       )
 
       const {result} = renderHook(() => useOutcomeAlignments({courseId, studentId}), {
@@ -425,7 +466,29 @@ describe('useOutcomeAlignments', () => {
         expect(result.current.isSuccess).toBe(true)
       })
 
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(lastRequestUrl).toContain('student_id=456')
+      expect(lastRequestUrl).not.toContain('assignment_id')
+    })
+  })
+
+  describe('default parameters', () => {
+    it('uses enabled=true by default when conditions are met', async () => {
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/outcome_alignments`, () => {
+          apiCallCount++
+          return HttpResponse.json(mockAlignments)
+        }),
+      )
+
+      const {result} = renderHook(() => useOutcomeAlignments({courseId, studentId}), {
+        wrapper: createWrapper(),
+      })
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true)
+      })
+
+      expect(apiCallCount).toBe(1)
       expect(result.current.data).toEqual(mockAlignments)
     })
   })

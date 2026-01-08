@@ -20,7 +20,8 @@ import React from 'react'
 import {act, waitFor} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {useContributingScores, ContributingScoresResponse} from '../useContributingScores'
 import {
   DisplayFilter,
@@ -29,6 +30,8 @@ import {
   ScoreDisplayFormat,
   OutcomeArrangement,
 } from '@canvas/outcomes/react/utils/constants'
+
+const server = setupServer()
 
 describe('useContributingScores', () => {
   const courseId = '1'
@@ -113,12 +116,19 @@ describe('useContributingScores', () => {
     return Wrapper
   }
 
+  let apiCallCount = 0
+  let apiCalls: string[] = []
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.restore()
+    apiCallCount = 0
+    apiCalls = []
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   describe('initial state', () => {
@@ -147,6 +157,13 @@ describe('useContributingScores', () => {
     })
 
     it('does not make API calls when outcomes are not visible', async () => {
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores', () => {
+          apiCallCount++
+          return HttpResponse.json({})
+        }),
+      )
+
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
         {wrapper: createWrapper()},
@@ -156,21 +173,21 @@ describe('useContributingScores', () => {
         expect(result.current.isLoading).toBe(false)
       })
 
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
     })
   })
 
   describe('toggleVisibility', () => {
     it('toggles outcome visibility on', async () => {
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores', () => {
+          return HttpResponse.json(mockContributingScoresOutcome2)
+        }),
+      )
+
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
         {wrapper: createWrapper()},
-      )
-
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome2,
       )
 
       expect(result.current.contributingScores.forOutcome('2').isVisible()).toBe(false)
@@ -183,15 +200,15 @@ describe('useContributingScores', () => {
     })
 
     it('toggles outcome visibility off', async () => {
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores', () => {
+          return HttpResponse.json(mockContributingScoresOutcome2)
+        }),
+      )
+
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
         {wrapper: createWrapper()},
-      )
-
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome2,
       )
 
       act(() => {
@@ -210,15 +227,16 @@ describe('useContributingScores', () => {
 
   describe('data fetching', () => {
     it('fetches data when outcome visibility is toggled on', async () => {
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores', () => {
+          apiCallCount++
+          return HttpResponse.json(mockContributingScoresOutcome2)
+        }),
+      )
+
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
         {wrapper: createWrapper()},
-      )
-
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome2,
       )
 
       act(() => {
@@ -229,26 +247,32 @@ describe('useContributingScores', () => {
         expect(result.current.contributingScores.forOutcome('2').isLoading).toBe(false)
       })
 
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(apiCallCount).toBe(1)
       expect(result.current.contributingScores.forOutcome('2').data).toEqual(
         mockContributingScoresOutcome2,
       )
     })
 
     it('fetches data for multiple visible outcomes', async () => {
+      server.use(
+        http.get(
+          '/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores',
+          ({params}) => {
+            apiCallCount++
+            const outcomeId = params.outcomeId
+            if (outcomeId === '2') {
+              return HttpResponse.json(mockContributingScoresOutcome2)
+            } else if (outcomeId === '3') {
+              return HttpResponse.json(mockContributingScoresOutcome3)
+            }
+            return HttpResponse.json({})
+          },
+        ),
+      )
+
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
         {wrapper: createWrapper()},
-      )
-
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome2,
-      )
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/3/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome3,
       )
 
       act(() => {
@@ -261,7 +285,7 @@ describe('useContributingScores', () => {
         expect(result.current.contributingScores.forOutcome('3').isLoading).toBe(false)
       })
 
-      expect(fetchMock.calls()).toHaveLength(2)
+      expect(apiCallCount).toBe(2)
       expect(result.current.contributingScores.forOutcome('2').data).toEqual(
         mockContributingScoresOutcome2,
       )
@@ -271,15 +295,15 @@ describe('useContributingScores', () => {
     })
 
     it('returns alignments from fetched data', async () => {
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores', () => {
+          return HttpResponse.json(mockContributingScoresOutcome2)
+        }),
+      )
+
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
         {wrapper: createWrapper()},
-      )
-
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome2,
       )
 
       act(() => {
@@ -308,15 +332,15 @@ describe('useContributingScores', () => {
     })
 
     it('returns score for each alignment', async () => {
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores', () => {
+          return HttpResponse.json(mockContributingScoresOutcome2)
+        }),
+      )
+
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
         {wrapper: createWrapper()},
-      )
-
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome2,
       )
 
       act(() => {
@@ -340,15 +364,15 @@ describe('useContributingScores', () => {
     })
 
     it('returns undefined for alignments without scores', async () => {
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores', () => {
+          return HttpResponse.json(mockContributingScoresOutcome2)
+        }),
+      )
+
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
         {wrapper: createWrapper()},
-      )
-
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome2,
       )
 
       act(() => {
@@ -367,18 +391,15 @@ describe('useContributingScores', () => {
 
   describe('error handling', () => {
     it('handles API error', async () => {
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores', () => {
+          return new HttpResponse(JSON.stringify({error: 'Internal server error'}), {status: 500})
+        }),
+      )
+
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
         {wrapper: createWrapper()},
-      )
-
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        {
-          status: 500,
-          body: {error: 'Internal server error'},
-        },
       )
 
       act(() => {
@@ -393,17 +414,15 @@ describe('useContributingScores', () => {
     })
 
     it('handles network error', async () => {
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores', () => {
+          return HttpResponse.error()
+        }),
+      )
+
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
         {wrapper: createWrapper()},
-      )
-
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        {
-          throws: new Error('Network error'),
-        },
       )
 
       act(() => {
@@ -418,17 +437,18 @@ describe('useContributingScores', () => {
 
   describe('enabled parameter', () => {
     it('does not fetch when enabled is false', async () => {
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores', () => {
+          apiCallCount++
+          return HttpResponse.json(mockContributingScoresOutcome2)
+        }),
+      )
+
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: false}),
         {wrapper: createWrapper()},
       )
 
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome2,
-      )
-
       act(() => {
         result.current.contributingScores.forOutcome('2').toggleVisibility()
       })
@@ -437,17 +457,22 @@ describe('useContributingScores', () => {
         expect(result.current.isLoading).toBe(false)
       })
 
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
     })
 
     it('does not fetch when studentIds is empty', async () => {
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores', () => {
+          apiCallCount++
+          return HttpResponse.json(mockContributingScoresOutcome2)
+        }),
+      )
+
       const {result} = renderHook(
         () => useContributingScores({courseId, studentIds: [], outcomeIds, enabled: true}),
         {wrapper: createWrapper()},
       )
 
-      fetchMock.get(/.*/, mockContributingScoresOutcome2)
-
       act(() => {
         result.current.contributingScores.forOutcome('2').toggleVisibility()
       })
@@ -456,12 +481,19 @@ describe('useContributingScores', () => {
         expect(result.current.isLoading).toBe(false)
       })
 
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
     })
   })
 
   describe('refetching on studentIds change', () => {
     it('refetches data when studentIds change', async () => {
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores', () => {
+          apiCallCount++
+          return HttpResponse.json(mockContributingScoresOutcome2)
+        }),
+      )
+
       const {result, rerender} = renderHook(
         ({ids}: {ids: string[]}) =>
           useContributingScores({courseId, studentIds: ids, outcomeIds, enabled: true}),
@@ -469,12 +501,6 @@ describe('useContributingScores', () => {
           wrapper: createWrapper(),
           initialProps: {ids: ['6']},
         },
-      )
-
-      let userIdsParams = ['6'].map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome2,
       )
 
       act(() => {
@@ -485,37 +511,31 @@ describe('useContributingScores', () => {
         expect(result.current.contributingScores.forOutcome('2').data).toBeDefined()
       })
 
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(apiCallCount).toBe(1)
 
       // Change studentIds
-      userIdsParams = ['6', '7'].map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome2,
-        {overwriteRoutes: false},
-      )
-
       rerender({ids: ['6', '7']})
 
       await waitFor(() => {
-        expect(fetchMock.calls()).toHaveLength(2)
+        expect(apiCallCount).toBe(2)
       })
     })
   })
 
   describe('caching behavior', () => {
     it('caches data for 5 minutes (staleTime)', async () => {
+      server.use(
+        http.get('/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores', () => {
+          apiCallCount++
+          return HttpResponse.json(mockContributingScoresOutcome2)
+        }),
+      )
+
       const wrapper = createWrapper()
 
       const {result: result1} = renderHook(
         () => useContributingScores({courseId, studentIds, outcomeIds, enabled: true}),
         {wrapper},
-      )
-
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome2,
       )
 
       act(() => {
@@ -526,7 +546,7 @@ describe('useContributingScores', () => {
         expect(result1.current.contributingScores.forOutcome('2').data).toBeDefined()
       })
 
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(apiCallCount).toBe(1)
 
       // Second render with same params should use cache
       const {result: result2} = renderHook(
@@ -543,7 +563,7 @@ describe('useContributingScores', () => {
       })
 
       // Should still only have 1 API call (cached)
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(apiCallCount).toBe(1)
     })
   })
 
@@ -574,6 +594,18 @@ describe('useContributingScores', () => {
 
   describe('show_unpublished_assignments setting', () => {
     it('includes show_unpublished_assignments=true parameter when setting is enabled', async () => {
+      let capturedUrl = ''
+      server.use(
+        http.get(
+          '/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores',
+          ({request}) => {
+            apiCallCount++
+            capturedUrl = request.url
+            return HttpResponse.json(mockContributingScoresOutcome2)
+          },
+        ),
+      )
+
       const settings = {
         secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
         displayFilters: [DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS],
@@ -588,12 +620,6 @@ describe('useContributingScores', () => {
         {wrapper: createWrapper()},
       )
 
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true&show_unpublished_assignments=true`,
-        mockContributingScoresOutcome2,
-      )
-
       act(() => {
         result.current.contributingScores.forOutcome('2').toggleVisibility()
       })
@@ -602,12 +628,23 @@ describe('useContributingScores', () => {
         expect(result.current.contributingScores.forOutcome('2').isLoading).toBe(false)
       })
 
-      expect(fetchMock.calls()).toHaveLength(1)
-      const fetchUrl = fetchMock.calls()[0][0] as string
-      expect(fetchUrl).toContain('show_unpublished_assignments=true')
+      expect(apiCallCount).toBe(1)
+      expect(capturedUrl).toContain('show_unpublished_assignments=true')
     })
 
     it('does not include show_unpublished_assignments parameter when setting is disabled', async () => {
+      let capturedUrl = ''
+      server.use(
+        http.get(
+          '/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores',
+          ({request}) => {
+            apiCallCount++
+            capturedUrl = request.url
+            return HttpResponse.json(mockContributingScoresOutcome2)
+          },
+        ),
+      )
+
       const settings = {
         secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
         displayFilters: [],
@@ -622,12 +659,6 @@ describe('useContributingScores', () => {
         {wrapper: createWrapper()},
       )
 
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome2,
-      )
-
       act(() => {
         result.current.contributingScores.forOutcome('2').toggleVisibility()
       })
@@ -636,12 +667,23 @@ describe('useContributingScores', () => {
         expect(result.current.contributingScores.forOutcome('2').isLoading).toBe(false)
       })
 
-      expect(fetchMock.calls()).toHaveLength(1)
-      const fetchUrl = fetchMock.calls()[0][0] as string
-      expect(fetchUrl).not.toContain('show_unpublished_assignments')
+      expect(apiCallCount).toBe(1)
+      expect(capturedUrl).not.toContain('show_unpublished_assignments')
     })
 
     it('refetches when show_unpublished_assignments setting changes', async () => {
+      const capturedUrls: string[] = []
+      server.use(
+        http.get(
+          '/api/v1/courses/:courseId/outcomes/:outcomeId/contributing_scores',
+          ({request}) => {
+            apiCallCount++
+            capturedUrls.push(request.url)
+            return HttpResponse.json(mockContributingScoresOutcome2)
+          },
+        ),
+      )
+
       const settingsWithoutUnpublished = {
         secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
         displayFilters: [],
@@ -660,12 +702,6 @@ describe('useContributingScores', () => {
         },
       )
 
-      const userIdsParams = studentIds.map(id => `user_ids[]=${id}`).join('&')
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true`,
-        mockContributingScoresOutcome2,
-      )
-
       act(() => {
         result.current.contributingScores.forOutcome('2').toggleVisibility()
       })
@@ -674,7 +710,7 @@ describe('useContributingScores', () => {
         expect(result.current.contributingScores.forOutcome('2').data).toBeDefined()
       })
 
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(apiCallCount).toBe(1)
 
       // Change settings to include show_unpublished_assignments
       const settingsWithUnpublished = {
@@ -682,20 +718,13 @@ describe('useContributingScores', () => {
         displayFilters: [DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS],
       }
 
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/outcomes/2/contributing_scores?${userIdsParams}&only_assignment_alignments=true&show_unpublished_assignments=true`,
-        mockContributingScoresOutcome2,
-        {overwriteRoutes: false},
-      )
-
       rerender({settings: settingsWithUnpublished})
 
       await waitFor(() => {
-        expect(fetchMock.calls()).toHaveLength(2)
+        expect(apiCallCount).toBe(2)
       })
 
-      const secondCallUrl = fetchMock.calls()[1][0] as string
-      expect(secondCallUrl).toContain('show_unpublished_assignments=true')
+      expect(capturedUrls[1]).toContain('show_unpublished_assignments=true')
     })
   })
 })

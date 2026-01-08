@@ -15,8 +15,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {render, fireEvent, screen} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {render, fireEvent, screen, waitFor} from '@testing-library/react'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import stubEnv from '@canvas/stub-env'
 import GroupCategoryMessageAllUnassignedModal from '../GroupCategoryMessageAllUnassignedModal'
 import {userEvent} from '@testing-library/user-event'
@@ -27,6 +28,8 @@ vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: vi.fn(() => vi.fn()),
   showFlashError: vi.fn(() => vi.fn()),
 }))
+
+const server = setupServer()
 
 describe('GroupCategoryMessageAllUnassignedModal', () => {
   const onDismiss = vi.fn()
@@ -40,9 +43,9 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
     context_asset_string: 'course_1',
   })
 
-  afterEach(() => {
-    fetchMock.restore()
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   it('renders form fields', () => {
     const {queryByText, queryAllByText, queryByLabelText, queryByPlaceholderText} = render(
@@ -125,7 +128,13 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
   })
 
   it('fetches and reports status', async () => {
-    fetchMock.postOnce(`path:/api/v1/conversations`, 200)
+    let capturedBody = null
+    server.use(
+      http.post('/api/v1/conversations', async ({request}) => {
+        capturedBody = await request.json()
+        return HttpResponse.json({}, {status: 200})
+      }),
+    )
     const {getByText, getAllByText, getByLabelText} = render(
       <GroupCategoryMessageAllUnassignedModal
         groupCategory={groupCategory}
@@ -138,17 +147,16 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
       target: {value: 'hi'},
     })
     fireEvent.click(getByText('Send Message'))
-    const [, fetchOptions] = fetchMock.lastCall()
-    expect(fetchOptions.method).toBe('POST')
-    expect(JSON.parse(fetchOptions.body)).toMatchObject({
-      body: 'hi',
-      context_code: 'course_1',
-      recipients: ['1'],
-    })
     expect(getAllByText(/Sending Message/i)).toBeTruthy()
-    await fetchMock.flush(true)
-    expect(showFlashSuccess).toHaveBeenCalledWith('Message Sent!')
-    expect(onDismiss).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(capturedBody).toMatchObject({
+        body: 'hi',
+        context_code: 'course_1',
+        recipients: ['1'],
+      })
+      expect(showFlashSuccess).toHaveBeenCalledWith('Message Sent!')
+      expect(onDismiss).toHaveBeenCalled()
+    })
   })
 
   describe('errors', () => {
@@ -161,7 +169,11 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
     })
 
     it('reports an error if the fetch fails', async () => {
-      fetchMock.postOnce(`path:/api/v1/conversations`, 500)
+      server.use(
+        http.post('/api/v1/conversations', () => {
+          return HttpResponse.json({error: 'Internal Server Error'}, {status: 500})
+        }),
+      )
       const {getByText, getAllByText, getByLabelText} = render(
         <GroupCategoryMessageAllUnassignedModal
           groupCategory={groupCategory}
@@ -174,12 +186,12 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
         target: {value: 'hi'},
       })
       fireEvent.click(getByText('Send Message'))
-      await fetchMock.flush(true)
-      expect(getAllByText(/Failed/i)).toBeTruthy()
+      await waitFor(() => {
+        expect(getAllByText(/Failed/i)).toBeTruthy()
+      })
     })
 
     it('shows error if user tries to submit an empty message', async () => {
-      fetchMock.postOnce(`path:/api/v1/conversations`, 500)
       render(
         <GroupCategoryMessageAllUnassignedModal
           groupCategory={groupCategory}

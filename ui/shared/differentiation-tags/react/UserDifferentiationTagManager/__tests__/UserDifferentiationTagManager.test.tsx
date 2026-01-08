@@ -20,7 +20,8 @@ import React from 'react'
 import {render, screen, waitFor, cleanup} from '@testing-library/react'
 import {userEvent} from '@testing-library/user-event'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import UserDifferentiationTagManager from '../UserDifferentiationTagManager'
 import type {UserDifferentiationTagManagerProps} from '../UserDifferentiationTagManager'
 import {useDifferentiationTagCategoriesIndex} from '../../hooks/useDifferentiationTagCategoriesIndex'
@@ -29,6 +30,8 @@ import $ from 'jquery'
 
 vi.mock('../../hooks/useDifferentiationTagCategoriesIndex')
 vi.mock('../../hooks/useAddTagMembership')
+
+const server = setupServer()
 
 const mockUseDifferentiationTagCategoriesIndex = useDifferentiationTagCategoriesIndex as any
 const mockUseAddTagMembership = useAddTagMembership as any
@@ -58,6 +61,9 @@ describe('UserDifferentiationTagManager', () => {
     render(<UserDifferentiationTagManager {...defaultProps} {...props} />)
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup({
       current_context: {
@@ -69,7 +75,11 @@ describe('UserDifferentiationTagManager', () => {
     $.flashMessage = vi.fn()
     $.flashError = vi.fn()
     // Mock the bulk_user_tags API endpoint to prevent unhandled rejections
-    fetchMock.get(/\/api\/v1\/courses\/\d+\/bulk_user_tags/, {})
+    server.use(
+      http.get(/\/api\/v1\/courses\/\d+\/bulk_user_tags/, () => {
+        return HttpResponse.json({})
+      }),
+    )
     // Set up default mock return values
     mockUseDifferentiationTagCategoriesIndex.mockReturnValue({
       data: [],
@@ -88,7 +98,7 @@ describe('UserDifferentiationTagManager', () => {
   afterEach(() => {
     cleanup()
     fakeENV.teardown()
-    fetchMock.restore()
+    server.resetHandlers()
     vi.clearAllMocks()
   })
 

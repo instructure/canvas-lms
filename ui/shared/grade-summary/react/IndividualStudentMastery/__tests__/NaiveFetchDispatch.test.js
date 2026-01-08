@@ -16,17 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 import NaiveFetchDispatch from '../NaiveFetchDispatch'
+
+const server = setupServer()
 
 describe('Outcomes > IndividualStudentMastery > NaiveFetchDispatch', () => {
   const URL = 'http://localhost/example'
 
   let dispatch
+  let callCount
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     dispatch = new NaiveFetchDispatch({activeRequestLimit: 2})
+    callCount = 0
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   describe('#fetch()', () => {
@@ -39,8 +51,18 @@ describe('Outcomes > IndividualStudentMastery > NaiveFetchDispatch', () => {
     function stageRequests(resourceCount) {
       for (let resourceIndex = 1; resourceIndex <= resourceCount; resourceIndex++) {
         exampleData[resourceIndex] = {resourceIndex}
-        fetchMock.mock(resourceUrl(resourceIndex), exampleData[resourceIndex])
       }
+      // Set up MSW handler with wildcard to match query params
+      server.use(
+        http.get('http://localhost/example/', ({request}) => {
+          callCount++
+          // Extract index from URL string
+          const urlStr = request.url
+          const match = urlStr.match(/index=(\d+)/)
+          const index = match ? parseInt(match[1], 10) : null
+          return HttpResponse.json(exampleData[index])
+        }),
+      )
     }
 
     function fetch(resourceIndex) {
@@ -51,16 +73,13 @@ describe('Outcomes > IndividualStudentMastery > NaiveFetchDispatch', () => {
 
     beforeEach(() => {
       exampleData = {}
+      callCount = 0
       stageRequests(4)
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
     })
 
     it('sends a request for the resource', async () => {
       await fetch(1)
-      expect(fetchMock.calls(url => url.match(URL))).toHaveLength(1)
+      expect(callCount).toBe(1)
     })
 
     it('resolves with the data from the request', async () => {
@@ -71,7 +90,7 @@ describe('Outcomes > IndividualStudentMastery > NaiveFetchDispatch', () => {
     it('resolves when flooded with requests', async () => {
       const requests = [1, 2, 3, 4].map(fetch)
       await Promise.all(requests)
-      expect(fetchMock.calls(url => url.match(URL))).toHaveLength(4) // 4 resources
+      expect(callCount).toBe(4)
     })
   })
 })

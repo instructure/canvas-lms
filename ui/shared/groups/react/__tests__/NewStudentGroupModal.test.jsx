@@ -18,13 +18,17 @@
 
 import React from 'react'
 import {render, fireEvent, waitFor, screen} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import stubEnv from '@canvas/stub-env'
 import User from '@canvas/users/backbone/models/User'
 import NewStudentGroupModal from '../NewStudentGroupModal'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
 injectGlobalAlertContainers()
+
+const server = setupServer()
+let lastPostBody = null
 
 const defaultProps = {
   open: true,
@@ -42,15 +46,20 @@ describe('NewStudentGroupModal', () => {
     course_id: '1',
   })
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.get(
-      `/api/v1/courses/${ENV.course_id}/users?search_term=&enrollment_type=student&per_page=100&sort=username`,
-      [new User({id: '1', name: 'Student'})],
+    lastPostBody = null
+    server.use(
+      http.get('/api/v1/courses/:courseId/users', () => {
+        return HttpResponse.json([new User({id: '1', name: 'Student'})])
+      }),
     )
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   it('renders form fields', () => {
@@ -117,7 +126,12 @@ describe('NewStudentGroupModal', () => {
   })
 
   it('fetches and reports status', async () => {
-    fetchMock.postOnce(`path:/courses/${ENV.course_id}/groups`, 200)
+    server.use(
+      http.post('/courses/:courseId/groups', async ({request}) => {
+        lastPostBody = await request.json()
+        return HttpResponse.json({})
+      }),
+    )
     const onDismissMock = vi.fn()
     const {getByText, getByRole, getAllByText, getByLabelText} = renderComponent({
       onDismiss: onDismissMock,
@@ -133,18 +147,20 @@ describe('NewStudentGroupModal', () => {
     // Now click the student option
     fireEvent.click(getByRole('option', {name: 'Student'}))
     fireEvent.click(getByText('Submit'))
-    const [, fetchOptions] = fetchMock.lastCall()
-    expect(fetchOptions.method).toBe('POST')
-    expect(JSON.parse(fetchOptions.body)).toMatchObject({
+    expect(getAllByText(/Saving group/i)).toBeTruthy()
+    await waitFor(() => {
+      expect(lastPostBody).not.toBeNull()
+    })
+    expect(lastPostBody).toMatchObject({
       group: {
         join_level: 'parent_context_auto_join',
         name: 'name',
       },
       invitees: ['1'],
     })
-    expect(getAllByText(/Saving group/i)).toBeTruthy()
-    await fetchMock.flush(true)
-    expect(getAllByText(/Created group/i)).toBeTruthy()
+    await waitFor(() => {
+      expect(getAllByText(/Created group/i)).toBeTruthy()
+    })
     expect(onDismissMock).toHaveBeenCalled()
   })
 
@@ -158,14 +174,19 @@ describe('NewStudentGroupModal', () => {
     })
 
     it('reports an error if the fetch fails', async () => {
-      fetchMock.postOnce(`path:/courses/${ENV.course_id}/groups`, 400)
+      server.use(
+        http.post('/courses/:courseId/groups', () => {
+          return new HttpResponse(null, {status: 400})
+        }),
+      )
       const {getByText, getAllByText, getByLabelText} = renderComponent()
       fireEvent.input(getByLabelText('Group Name *'), {
         target: {value: 'name'},
       })
       fireEvent.click(getByText('Submit'))
-      await fetchMock.flush(true)
-      expect(getAllByText(/error/i)).toBeTruthy()
+      await waitFor(() => {
+        expect(getAllByText(/error/i)).toBeTruthy()
+      })
     })
   })
 })

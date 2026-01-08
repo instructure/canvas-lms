@@ -17,27 +17,28 @@
  */
 
 import {act, cleanup} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {queryClient} from '@canvas/query'
 import {
   DEFAULT_PROPS,
-  FIRST_GROUP_CATEGORY_URL,
-  OVERRIDES_URL,
   renderComponent,
-  SECOND_GROUP_CATEGORY_URL,
-  SECTIONS_URL,
   FIRST_GROUP_CATEGORY_DATA,
   SECOND_GROUP_CATEGORY_DATA,
   SECTIONS_DATA,
   STUDENTS_DATA,
   setupFlashHolder,
+  server,
+  http,
+  HttpResponse,
 } from './ItemAssignToTrayTestUtils'
 
 describe('ItemAssignToTray - Add Card with Many Overrides', () => {
   beforeAll(() => {
+    server.listen()
     setupFlashHolder()
   })
+
+  afterAll(() => server.close())
 
   beforeEach(() => {
     fakeENV.setup({
@@ -52,53 +53,59 @@ describe('ItemAssignToTray - Add Card with Many Overrides', () => {
       MASTER_COURSE_DATA: undefined,
     })
     // Setup base mocks
-    fetchMock.get('/api/v1/courses/1/settings', {conditional_release: false})
-    fetchMock
-      .get(SECTIONS_URL, SECTIONS_DATA)
-      .get(FIRST_GROUP_CATEGORY_URL, FIRST_GROUP_CATEGORY_DATA)
-      .get(SECOND_GROUP_CATEGORY_URL, SECOND_GROUP_CATEGORY_DATA)
+    server.use(
+      http.get('/api/v1/courses/1/settings', () => {
+        return HttpResponse.json({conditional_release: false})
+      }),
+      http.get(/\/api\/v1\/courses\/.+\/sections/, () => {
+        return HttpResponse.json(SECTIONS_DATA)
+      }),
+      http.get('/api/v1/group_categories/2/groups', () => {
+        return HttpResponse.json(FIRST_GROUP_CATEGORY_DATA)
+      }),
+      http.get('/api/v1/group_categories/3/groups', () => {
+        return HttpResponse.json(SECOND_GROUP_CATEGORY_DATA)
+      }),
+    )
     queryClient.setQueryData(['students', DEFAULT_PROPS.courseId, {per_page: 100}], STUDENTS_DATA)
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
   })
 
   // Rendering 4 cards is slow; increase timeout for CI stability
   it('shows top add button if more than 3 cards exist', async () => {
-    fetchMock.get(
-      OVERRIDES_URL,
-      {
-        id: '23',
-        due_at: '2023-10-05T12:00:00Z',
-        unlock_at: '2023-10-01T12:00:00Z',
-        lock_at: '2023-11-01T12:00:00Z',
-        only_visible_to_overrides: false,
-        visible_to_everyone: true,
-        overrides: [
-          {
-            id: '2',
-            assignment_id: '23',
-            course_section_id: '4',
-          },
-          {
-            id: '3',
-            assignment_id: '23',
-            course_section_id: '5',
-          },
-          {
-            id: '4',
-            assignment_id: '23',
-            course_section_id: '6',
-          },
-        ],
-      },
-      {
-        overwriteRoutes: true,
-      },
+    server.use(
+      http.get('/api/v1/courses/1/assignments/23/date_details', () => {
+        return HttpResponse.json({
+          id: '23',
+          due_at: '2023-10-05T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          only_visible_to_overrides: false,
+          visible_to_everyone: true,
+          overrides: [
+            {
+              id: '2',
+              assignment_id: '23',
+              course_section_id: '4',
+            },
+            {
+              id: '3',
+              assignment_id: '23',
+              course_section_id: '5',
+            },
+            {
+              id: '4',
+              assignment_id: '23',
+              course_section_id: '6',
+            },
+          ],
+        })
+      }),
     )
     const {findAllByTestId, getAllByTestId} = renderComponent()
     const cards = await findAllByTestId('item-assign-to-card')

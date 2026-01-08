@@ -235,16 +235,6 @@ describe('TempEnrollUsersListRow', () => {
       let temporaryEnrollmentProps
 
       beforeEach(() => {
-        // enrollment providers
-        // fetchMock.get(`/api/v1/users/${defaultProps.user.id}/temporary_enrollment_status`, {
-        //   is_provider: true,
-        //   is_recipient: false,
-        // })
-        // enrollment recipients
-        // fetchMock.get(`/api/v1/users/${defaultProps.user.id}/temporary_enrollment_status`, {
-        //   is_provider: false,
-        //   is_recipient: true,
-        // })
         // ensures these props are reset before each test
         temporaryEnrollmentProps = {
           ...defaultProps,

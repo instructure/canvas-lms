@@ -19,19 +19,20 @@
 import React from 'react'
 import {render, act, cleanup} from '@testing-library/react'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import fetchMock from 'fetch-mock'
 import ItemAssignToTray from '../ItemAssignToTray'
 import {
   DEFAULT_PROPS,
   FIRST_GROUP_CATEGORY_DATA,
   FIRST_GROUP_CATEGORY_ID,
-  OVERRIDES_URL,
   SECOND_GROUP_CATEGORY_DATA,
   SECOND_GROUP_CATEGORY_ID,
   renderComponent,
+  server,
   setupBaseMocks,
   setupEnv,
   setupFlashHolder,
+  http,
+  HttpResponse,
 } from './ItemAssignToTrayTestUtils'
 
 // SKIP REASON: These tests exceed the 10s CI timeout limit (test times: ~10-11s each)
@@ -56,8 +57,11 @@ describe.skip('ItemAssignToTray - Student Groups', () => {
   }
 
   beforeAll(() => {
+    server.listen()
     setupFlashHolder()
   })
+
+  afterAll(() => server.close())
 
   beforeEach(() => {
     setupEnv()
@@ -67,15 +71,16 @@ describe.skip('ItemAssignToTray - Student Groups', () => {
 
   afterEach(() => {
     window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
   })
 
   it('displays student groups if the assignment is a group assignment', async () => {
-    fetchMock.get(OVERRIDES_URL, payload, {
-      overwriteRoutes: true,
-    })
+    server.use(
+      http.get('/api/v1/courses/1/assignments/23/date_details', () => {
+        return HttpResponse.json(payload)
+      }),
+    )
     const {findByText, findByTestId, getByText} = renderComponent()
     const assigneeSelector = await findByTestId('assignee_selector')
     act(() => assigneeSelector.click())
@@ -86,9 +91,11 @@ describe.skip('ItemAssignToTray - Student Groups', () => {
   })
 
   it('refreshes the group options if the group category is overridden', async () => {
-    fetchMock.get(OVERRIDES_URL, payload, {
-      overwriteRoutes: true,
-    })
+    server.use(
+      http.get('/api/v1/courses/1/assignments/23/date_details', () => {
+        return HttpResponse.json(payload)
+      }),
+    )
     const {findByText, findByTestId, getByText, queryByText, rerender} = renderComponent()
     const assigneeSelector = await findByTestId('assignee_selector')
     act(() => assigneeSelector.click())

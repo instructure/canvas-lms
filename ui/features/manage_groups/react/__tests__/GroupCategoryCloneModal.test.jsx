@@ -14,9 +14,10 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import React from 'react'
 import GroupCategoryCloneModal, {CATEGORY_NAME_MAX_LENGTH} from '../GroupCategoryCloneModal'
 
@@ -24,6 +25,8 @@ import GroupCategoryCloneModal, {CATEGORY_NAME_MAX_LENGTH} from '../GroupCategor
 vi.mock('@canvas/util/globalUtils', () => ({
   reloadWindow: vi.fn(),
 }))
+
+const server = setupServer()
 
 describe('GroupCategoryCloneModal', () => {
   const onDismiss = vi.fn()
@@ -33,9 +36,9 @@ describe('GroupCategoryCloneModal', () => {
     name: '',
   }
 
-  afterEach(() => {
-    fetchMock.restore()
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   describe('clone group set', () => {
     it('prepends (Clone) to name from given group set', () => {
@@ -80,10 +83,16 @@ describe('GroupCategoryCloneModal', () => {
     })
 
     it('creates a clone from current group set and reports status', async () => {
-      fetchMock.postOnce(`path:/group_categories/${groupCategory.id}/clone_with_name`, {
-        status: 200,
-        group_category: {id: '1'},
-      })
+      let capturedBody = null
+      server.use(
+        http.post(`/group_categories/${groupCategory.id}/clone_with_name`, async ({request}) => {
+          capturedBody = await request.json()
+          return HttpResponse.json({
+            status: 200,
+            group_category: {id: '1'},
+          })
+        }),
+      )
       const {getByText, getAllByText} = render(
         <GroupCategoryCloneModal
           groupCategory={{...groupCategory, name: 'Course Admin View Group Set'}}
@@ -95,15 +104,14 @@ describe('GroupCategoryCloneModal', () => {
       await userEvent
         .setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
         .click(getByText('Submit'))
-      const [, fetchOptions] = fetchMock.lastCall()
-      expect(fetchOptions.method).toBe('POST')
-      expect(JSON.parse(fetchOptions.body)).toMatchObject({
-        name: '(Clone) Course Admin View Group Set',
-      })
       expect(getAllByText(/cloning/i)).toBeTruthy()
-      await act(() => fetchMock.flush(true))
-      expect(getAllByText(/success/i)).toBeTruthy()
-      expect(onDismiss).toHaveBeenCalled()
+      await waitFor(() => {
+        expect(capturedBody).toMatchObject({
+          name: '(Clone) Course Admin View Group Set',
+        })
+        expect(getAllByText(/success/i)).toBeTruthy()
+        expect(onDismiss).toHaveBeenCalled()
+      })
     })
   })
 
@@ -117,7 +125,11 @@ describe('GroupCategoryCloneModal', () => {
     })
 
     it('reports an error if the fetch fails', async () => {
-      fetchMock.postOnce(`path:/group_categories/${groupCategory.id}/clone_with_name`, 400)
+      server.use(
+        http.post(`/group_categories/${groupCategory.id}/clone_with_name`, () => {
+          return HttpResponse.json({error: 'Bad Request'}, {status: 400})
+        }),
+      )
       const {getByText} = render(
         <GroupCategoryCloneModal
           groupCategory={{...groupCategory, name: 'Course Admin View Group Set'}}
@@ -129,8 +141,9 @@ describe('GroupCategoryCloneModal', () => {
       await userEvent
         .setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
         .click(getByText('Submit'))
-      await act(() => fetchMock.flush(true))
-      expect(getByText(/error/i)).toBeInTheDocument()
+      await waitFor(() => {
+        expect(getByText(/error/i)).toBeInTheDocument()
+      })
     })
 
     it('Shows error if name is empty and clears it when user enters a name', async () => {
