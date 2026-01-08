@@ -168,7 +168,7 @@ class DeveloperKeysApp extends React.Component {
       {
         text: [
           I18n.t(
-            `API GET requests with a body instead of query parameters will be blocked in Production in the February release, as part of fronting Canvas with a CDN. These requests are already blocked in Beta and Test.`,
+            `API GET requests with a body instead of query parameters will be blocked in Production in the April release, as part of fronting Canvas with a CDN. These requests are already blocked in Beta and Test.`,
           ),
           I18n.t(
             `You are being notified because this Canvas instance has recently received requests which would be blocked. You can read more in the *API Changelog* and learn how to mitigate this change in the blog post linked there.`,
