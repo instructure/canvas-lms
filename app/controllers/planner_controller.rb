@@ -176,6 +176,17 @@ class PlannerController < ApplicationController
     end
   end
 
+  def get_local_context_ids_for_current_shard
+    shard_course_ids = @course_ids&.select { |id| Shard.shard_for(id) == Shard.current }
+    shard_group_ids = @group_ids&.select { |id| Shard.shard_for(id) == Shard.current }
+    return nil if shard_course_ids.blank? && shard_group_ids.blank?
+
+    local_course_ids = shard_course_ids&.map { |id| Shard.relative_id_for(id, @user.shard, Shard.current) } || []
+    local_group_ids = shard_group_ids&.map { |id| Shard.relative_id_for(id, @user.shard, Shard.current) } || []
+
+    { local_course_ids:, local_group_ids: }
+  end
+
   def set_user
     include_visible_courses = params[:include]&.include?("all_courses")
 
@@ -261,34 +272,90 @@ class PlannerController < ApplicationController
   end
 
   def assignment_collection(completion_filter: nil)
-    viewing = @user.assignments_for_student("viewing", **default_opts)
-                   .preload(:quiz, :discussion_topic, :wiki_page)
-    viewing = apply_completion_filter(viewing, @user, completion_filter)
-    item_collection("viewing",
-                    viewing,
-                    Assignment,
-                    [{ submissions: :cached_due_date }, :due_at, :created_at],
-                    :id)
+    descending = params[:order] == "desc"
+    bookmarker = Plannable::Bookmarker.new(Assignment, descending, [{ submissions: :cached_due_date }, :due_at, :created_at], :id)
+
+    base_relation = Assignment.published
+                              .due_between_for_user(start_date, end_date, @user)
+                              .shard(@shards_to_query)
+
+    collection = ShardedBookmarkedCollection.build(bookmarker, base_relation, always_use_bookmarks: true) do |sharded_relation|
+      context_ids = get_local_context_ids_for_current_shard
+      next nil unless context_ids
+
+      scope = sharded_relation.where("(context_type = 'Course' AND context_id IN (?)) OR (context_type = 'Group' AND context_id IN (?))",
+                                     context_ids[:local_course_ids].presence || [],
+                                     context_ids[:local_group_ids].presence || [])
+                              .without_suppressed_assignments
+                              .preload(:quiz, :discussion_topic, :wiki_page)
+
+      scope = scope.not_ignored_by(@user, "viewing") unless default_opts[:include_ignored]
+
+      apply_completion_filter(scope, @user, completion_filter)
+    end
+
+    collection = BookmarkedCollection.wrap(bookmarker, collection) if collection.is_a?(ActiveRecord::Relation)
+    ["viewing", collection]
   end
 
   def sub_assignment_collection(completion_filter: nil)
-    scope = @user.assignments_for_student("viewing", is_sub_assignment: true, **default_opts).preload(:discussion_topic)
-    scope = apply_completion_filter(scope, @user, completion_filter)
-    item_collection("sub_assignment_viewing",
-                    scope,
-                    SubAssignment,
-                    [{ submissions: :cached_due_date }, :due_at, :created_at],
-                    :id)
+    descending = params[:order] == "desc"
+    bookmarker = Plannable::Bookmarker.new(SubAssignment, descending, [{ submissions: :cached_due_date }, :due_at, :created_at], :id)
+
+    base_relation = SubAssignment.published
+                                 .due_between_for_user(start_date, end_date, @user)
+                                 .shard(@shards_to_query)
+
+    collection = ShardedBookmarkedCollection.build(bookmarker, base_relation, always_use_bookmarks: true) do |sharded_relation|
+      context_ids = get_local_context_ids_for_current_shard
+      next nil unless context_ids
+
+      courses = Course.where(id: context_ids[:local_course_ids]).preload(:account).to_a
+      groups = Group.where(id: context_ids[:local_group_ids]).preload(context: :account).to_a
+
+      courses_with_checkpoints = courses.select(&:discussion_checkpoints_enabled?).map(&:id)
+      groups_with_checkpoints = groups.select(&:discussion_checkpoints_enabled?).map(&:id)
+
+      next nil if courses_with_checkpoints.empty? && groups_with_checkpoints.empty?
+
+      scope = sharded_relation.where("(context_type = 'Course' AND context_id IN (?)) OR (context_type = 'Group' AND context_id IN (?))",
+                                     courses_with_checkpoints.presence || [],
+                                     groups_with_checkpoints.presence || [])
+                              .without_suppressed_assignments
+                              .preload(:discussion_topic)
+
+      scope = scope.not_ignored_by(@user, "viewing") unless default_opts[:include_ignored]
+
+      apply_completion_filter(scope, @user, completion_filter)
+    end
+
+    collection = BookmarkedCollection.wrap(bookmarker, collection) if collection.is_a?(ActiveRecord::Relation)
+    ["sub_assignment_viewing", collection]
   end
 
   def ungraded_quiz_collection(completion_filter: nil)
-    scope = @user.ungraded_quizzes(**default_opts)
-    scope = apply_completion_filter(scope, @user, completion_filter)
-    item_collection("ungraded_quizzes",
-                    scope,
-                    Quizzes::Quiz,
-                    %i[user_due_date due_at created_at],
-                    :id)
+    descending = params[:order] == "desc"
+    bookmarker = Plannable::Bookmarker.new(Quizzes::Quiz, descending, %i[user_due_date due_at created_at], :id)
+
+    base_relation = Quizzes::Quiz.ungraded_with_user_due_date(@user)
+                                 .where("user_due_date BETWEEN ? AND ?", start_date, end_date)
+                                 .shard(@shards_to_query)
+
+    collection = ShardedBookmarkedCollection.build(bookmarker, base_relation, always_use_bookmarks: true) do |sharded_relation|
+      context_ids = get_local_context_ids_for_current_shard
+      next nil unless context_ids
+
+      scope = sharded_relation.where("(context_type = 'Course' AND context_id IN (?)) OR (context_type = 'Group' AND context_id IN (?))",
+                                     context_ids[:local_course_ids].presence || [],
+                                     context_ids[:local_group_ids].presence || [])
+
+      scope = scope.not_ignored_by(@user, "viewing") unless default_opts[:include_ignored]
+
+      apply_completion_filter(scope, @user, completion_filter)
+    end
+
+    collection = BookmarkedCollection.wrap(bookmarker, collection) if collection.is_a?(ActiveRecord::Relation)
+    ["ungraded_quizzes", collection]
   end
 
   def unread_discussion_topic_collection
@@ -338,59 +405,140 @@ class PlannerController < ApplicationController
 
   def planner_note_collection(completion_filter: nil)
     user = @local_user_ids.presence || @user
-    shard = @local_user_ids.present? ? Shard.shard_for(@local_user_ids.first) : @user.shard # TODO: fix to span multiple shards if needed
-    course_ids = @course_ids.map { |id| Shard.relative_id_for(id, @user.shard, shard) }
-    course_ids += [nil] if @user_ids.present?
-    scope = shard.activate { PlannerNote.active.where(user:, todo_date: @start_date..@end_date, course_id: course_ids) }
-    scope = apply_completion_filter(scope, user, completion_filter)
-    item_collection("planner_notes",
-                    scope,
-                    PlannerNote,
-                    [:todo_date, :created_at],
-                    :id)
+    descending = params[:order] == "desc"
+    bookmarker = Plannable::Bookmarker.new(PlannerNote, descending, [:todo_date, :created_at], :id)
+
+    base_relation = PlannerNote.active.where(user:, todo_date: @start_date..@end_date).shard(@shards_to_query)
+
+    collection = ShardedBookmarkedCollection.build(bookmarker, base_relation, always_use_bookmarks: true) do |sharded_relation|
+      course_ids = @course_ids&.map { |id| Shard.relative_id_for(id, @user.shard, Shard.current) } || []
+      course_ids += [nil] if @user_ids.present?
+
+      next nil if course_ids.empty?
+
+      scope = sharded_relation.where(course_id: course_ids)
+      apply_completion_filter(scope, user, completion_filter)
+    end
+
+    collection = BookmarkedCollection.wrap(bookmarker, collection) if collection.is_a?(ActiveRecord::Relation)
+    ["planner_notes", collection]
   end
 
   def page_collection(completion_filter: nil)
-    scope = @user.wiki_pages_needing_viewing(**default_opts.except(:include_locked))
-    scope = apply_completion_filter(scope, @user, completion_filter)
-    item_collection("pages",
-                    scope,
-                    WikiPage,
-                    [:todo_date, :created_at],
-                    :id)
+    descending = params[:order] == "desc"
+    bookmarker = Plannable::Bookmarker.new(WikiPage, descending, [:todo_date, :created_at], :id)
+
+    base_relation = WikiPage.active
+                            .where(todo_date: start_date..end_date)
+                            .shard(@shards_to_query)
+
+    collection = ShardedBookmarkedCollection.build(bookmarker, base_relation, always_use_bookmarks: true) do |sharded_relation|
+      context_ids = get_local_context_ids_for_current_shard
+      next nil unless context_ids
+
+      wiki_ids = []
+      wiki_ids.concat(Course.where(id: context_ids[:local_course_ids]).pluck(:wiki_id).compact) if context_ids[:local_course_ids].any?
+      wiki_ids.concat(Group.where(id: context_ids[:local_group_ids]).pluck(:wiki_id).compact) if context_ids[:local_group_ids].any?
+      next nil if wiki_ids.empty?
+
+      scope = sharded_relation.where(wiki_id: wiki_ids)
+
+      scope = scope.not_ignored_by(@user, "viewing") unless default_opts[:include_ignored]
+
+      apply_completion_filter(scope, @user, completion_filter)
+    end
+
+    collection = BookmarkedCollection.wrap(bookmarker, collection) if collection.is_a?(ActiveRecord::Relation)
+    ["pages", collection]
   end
 
   def ungraded_discussion_collection(completion_filter: nil)
-    scope = @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked))
-    scope = apply_completion_filter(scope, @user, completion_filter)
-    item_collection("ungraded_discussions",
-                    scope,
-                    DiscussionTopic,
-                    %i[todo_date posted_at created_at],
-                    :id)
+    descending = params[:order] == "desc"
+    bookmarker = Plannable::Bookmarker.new(DiscussionTopic, descending, %i[todo_date posted_at created_at], :id)
+
+    base_relation = DiscussionTopic.active
+                                   .published
+                                   .where(assignment_id: nil)
+                                   .where("todo_date BETWEEN ? AND ? OR (todo_date IS NULL AND (posted_at BETWEEN ? AND ? OR delayed_post_at BETWEEN ? AND ?))",
+                                          start_date,
+                                          end_date,
+                                          start_date,
+                                          end_date,
+                                          start_date,
+                                          end_date)
+                                   .shard(@shards_to_query)
+
+    collection = ShardedBookmarkedCollection.build(bookmarker, base_relation, always_use_bookmarks: true) do |sharded_relation|
+      context_ids = get_local_context_ids_for_current_shard
+      next nil unless context_ids
+
+      scope = sharded_relation.where("(context_type = 'Course' AND context_id IN (?)) OR (context_type = 'Group' AND context_id IN (?))",
+                                     context_ids[:local_course_ids].presence || [],
+                                     context_ids[:local_group_ids].presence || [])
+                              .visible_to_ungraded_discussion_student_visibilities(@user, context_ids[:local_course_ids])
+
+      scope = scope.not_ignored_by(@user, "viewing") unless default_opts[:include_ignored]
+
+      apply_completion_filter(scope, @user, completion_filter)
+    end
+
+    collection = BookmarkedCollection.wrap(bookmarker, collection) if collection.is_a?(ActiveRecord::Relation)
+    ["ungraded_discussions", collection]
   end
 
   def calendar_events_collection(completion_filter: nil)
-    scope = CalendarEvent.active.not_hidden.for_user_and_context_codes(@user, @context_codes)
-                         .between(@start_date, @end_date)
-    scope = apply_completion_filter(scope, @user, completion_filter)
-    item_collection("calendar_events",
-                    scope,
-                    CalendarEvent,
-                    [:start_at, :created_at],
-                    :id)
+    descending = params[:order] == "desc"
+    bookmarker = Plannable::Bookmarker.new(CalendarEvent, descending, [:start_at, :created_at], :id)
+
+    base_relation = CalendarEvent.active.not_hidden.between(@start_date, @end_date).shard(@shards_to_query)
+
+    collection = ShardedBookmarkedCollection.build(bookmarker, base_relation, always_use_bookmarks: true) do |sharded_relation|
+      shard_context_codes = @context_codes&.filter_map do |code|
+        type, id = code.split("_", 2)
+        id = id.to_i
+        next unless Shard.shard_for(id) == Shard.current
+
+        local_id = Shard.relative_id_for(id, @user.shard, Shard.current)
+        "#{type}_#{local_id}"
+      end
+      next nil if shard_context_codes.blank?
+
+      scope = sharded_relation.for_user_and_context_codes(@user, shard_context_codes)
+      apply_completion_filter(scope, @user, completion_filter)
+    end
+
+    collection = BookmarkedCollection.wrap(bookmarker, collection) if collection.is_a?(ActiveRecord::Relation)
+    ["calendar_events", collection]
   end
 
   def peer_reviews_collection(completion_filter: nil)
-    scope = @user.submissions_needing_peer_review(**default_opts.except(:include_locked))
-    scope = apply_completion_filter(scope, @user, completion_filter)
-    item_collection("peer_reviews",
-                    scope,
-                    AssessmentRequest,
-                    [{ submission: { assignment: :peer_reviews_due_at } },
-                     { assessor_asset: :cached_due_date },
-                     :created_at],
-                    :id)
+    descending = params[:order] == "desc"
+    bookmarker = Plannable::Bookmarker.new(AssessmentRequest, descending, [:created_at], :id)
+
+    base_relation = AssessmentRequest.where(assessor_id: @user.id)
+                                     .joins(submission: :assignment)
+                                     .joins("INNER JOIN #{Submission.quoted_table_name} AS assessor_asset ON assessment_requests.assessor_asset_id = assessor_asset.id
+                                            AND assessor_asset.assignment_id = assignments.id")
+                                     .where("(assignments.peer_reviews_due_at BETWEEN ? AND ?) OR (assessor_asset.cached_due_date BETWEEN ? AND ?)",
+                                            start_date,
+                                            end_date,
+                                            start_date,
+                                            end_date)
+                                     .shard(@shards_to_query)
+
+    collection = ShardedBookmarkedCollection.build(bookmarker, base_relation, always_use_bookmarks: true) do |sharded_relation|
+      context_ids = get_local_context_ids_for_current_shard
+      next nil unless context_ids
+
+      scope = sharded_relation.where(assignments: { context_type: "Course", context_id: context_ids[:local_course_ids] })
+
+      scope = scope.not_ignored_by(@user, "viewing") unless default_opts[:include_ignored]
+
+      apply_completion_filter(scope, @user, completion_filter)
+    end
+
+    collection = BookmarkedCollection.wrap(bookmarker, collection) if collection.is_a?(ActiveRecord::Relation)
+    ["peer_reviews", collection]
   end
 
   def item_collection(label, scope, base_model, *order_by)
@@ -470,6 +618,19 @@ class PlannerController < ApplicationController
       original_account_ids = @account_ids || []
       if @user
         @course_ids = @user.course_ids_for_todo_lists(:student, course_ids: @course_ids, include_concluded:)
+        if include_concluded && @course_ids.present?
+          active_enrollment_course_ids = []
+          Shard.partition_by_shard(@course_ids) do |shard_course_ids|
+            found_local = Enrollment.where(Enrollment.active_student_conditions)
+                                    .where(user_id: @user.id, course_id: shard_course_ids)
+                                    .pluck(:course_id)
+            # Convert local IDs to global IDs
+            found_global = found_local.map { |local_id| Shard.global_id_for(local_id, Shard.current) }
+            active_enrollment_course_ids.concat(found_global)
+          end
+          @course_ids &= active_enrollment_course_ids
+        end
+
         @group_ids = @user.group_ids_for_todo_lists(group_ids: @group_ids)
         @account_ids ||= enabled_account_calendars
         @account_ids &= allowed_account_calendars
@@ -523,6 +684,19 @@ class PlannerController < ApplicationController
     @context_codes.concat(@local_group_ids.map { |id| "group_#{id}" })
     @context_codes.concat(@local_user_ids.map { |id| "user_#{id}" })
     @context_codes.concat(@local_account_ids.map { |id| "account_#{id}" })
+
+    @shards_to_query = Set.new
+    if @user
+      @user.shard.activate do
+        Shard.partition_by_shard(@course_ids || []) { @shards_to_query << Shard.current }
+        Shard.partition_by_shard(@group_ids || []) { @shards_to_query << Shard.current }
+        Shard.partition_by_shard(@user_ids || []) { @shards_to_query << Shard.current }
+        @shards_to_query << Shard.current if @shards_to_query.empty?
+      end
+      @shards_to_query = @shards_to_query.to_a
+    else
+      @shards_to_query = [Shard.current]
+    end
   end
 
   def contexts_cache_key

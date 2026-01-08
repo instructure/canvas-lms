@@ -84,6 +84,7 @@ class Enrollment < ActiveRecord::Base
   after_commit :update_cached_due_dates
   after_save :update_assignment_overrides_if_needed
   after_create :needs_grading_count_updated, if: :active_student?
+  after_create :associate_user_with_course_shard
   after_update :needs_grading_count_updated, if: :active_student_changed?
 
   after_commit :sync_microsoft_group
@@ -1610,6 +1611,13 @@ class Enrollment < ActiveRecord::Base
 
   def enrollments_exist_for_user_in_course?
     Enrollment.active.where(user_id:, course_id:).exists?
+  end
+
+  def associate_user_with_course_shard
+    return unless user && course
+    return if user.shard == course.shard
+
+    user.associate_with_shard(course.shard)
   end
 
   def copy_scores_from_existing_enrollment
