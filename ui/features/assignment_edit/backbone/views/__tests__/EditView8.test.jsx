@@ -18,6 +18,12 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
+
+// Mock the RCE loader to prevent dynamic import timeouts during tests
+// The RCE preloadRemoteModule() is called at the module level when EditView is imported,
+// causing Vitest worker timeouts if not mocked
+vi.mock('@canvas/rce/serviceRCELoader')
+
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
 import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector'
