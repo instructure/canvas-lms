@@ -270,6 +270,8 @@ module Quizzes
           accepts_jsonapi? && user_may_grade? && user_may_manage?
         when :locked_for_user, :lock_info, :lock_explanation
           !serializer_option(:skip_lock_tests)
+        when :description
+          !serializer_option(:skip_description)
         when :anonymous_submissions
           quiz.survey?
         when :permissions
