@@ -18,10 +18,13 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 import AdminTable from '../AdminTable'
 
-describe('AdminTable', () => {
+const USER_EVENT_OPTIONS = {delay: null}
+
+describe('AdminTable filtering tests', () => {
   const idFor = n => `1000000000000${n}`
 
   const devKeyList = (numKeys = 10) => {
@@ -68,19 +71,41 @@ describe('AdminTable', () => {
     )
   }
 
-  it('renders table with placeholder text if no keys are given', () => {
-    const wrapper = component([])
-    expect(wrapper.getByRole('table')).toBeInTheDocument()
-    expect(wrapper.getByText('Nothing here yet')).toBeInTheDocument()
-  })
+  const waitForDebounce = () => new Promise(resolve => setTimeout(resolve, 400))
 
-  it('renders a DeveloperKey for each key', () => {
+  it('filters by selecting type', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
     const wrapper = component()
-    expect(wrapper.getAllByRole('row')).toHaveLength(11)
+
+    await user.click(wrapper.getByRole('combobox'))
+    await user.click(wrapper.getByRole('option', {name: 'LTI Keys'}))
+    expect(wrapper.getAllByRole('row')).toHaveLength(2)
   })
 
-  /**
-   * Tests for deleting keys and manipulating refs are found in
-   * spec/javascripts/jsx/developer_keys/AdminTableSpec.jsx
-   */
+  it('filters by searching for name', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const wrapper = component()
+
+    await user.type(wrapper.getByRole('searchbox'), 'key-1')
+    await waitForDebounce()
+    expect(wrapper.getAllByRole('row')).toHaveLength(2)
+  })
+
+  it('filters by searching for email', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const wrapper = component()
+
+    await user.type(wrapper.getByRole('searchbox'), 'email-1')
+    await waitForDebounce()
+    expect(wrapper.getAllByRole('row')).toHaveLength(2)
+  })
+
+  it('filters by searching for id', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const wrapper = component()
+
+    await user.type(wrapper.getByRole('searchbox'), idFor(1))
+    await waitForDebounce()
+    expect(wrapper.getAllByRole('row')).toHaveLength(2)
+  })
 })
