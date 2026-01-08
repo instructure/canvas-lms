@@ -17,9 +17,14 @@
  */
 
 import {resetCardCache} from '@canvas/dashboard-card'
-import {MOCK_ASSIGNMENTS, MOCK_EVENTS} from '@canvas/k5/react/__tests__/fixtures'
+import {
+  MOCK_ACCOUNT_CALENDAR_EVENT,
+  MOCK_ASSIGNMENTS,
+  MOCK_CARDS,
+  MOCK_EVENTS,
+} from '@canvas/k5/react/__tests__/fixtures'
 import {resetPlanner} from '@canvas/planner'
-import {act, screen, render as testingLibraryRender, waitFor} from '@testing-library/react'
+import {act, render as testingLibraryRender, waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import React from 'react'
@@ -122,6 +127,7 @@ const staff = [
 
 // Store for dynamic assignment responses
 let assignmentResponse = MOCK_ASSIGNMENTS
+let eventResponse = MOCK_EVENTS
 
 beforeAll(() => {
   server.listen()
@@ -130,6 +136,7 @@ beforeAll(() => {
 beforeEach(() => {
   requestLog = []
   assignmentResponse = MOCK_ASSIGNMENTS
+  eventResponse = MOCK_EVENTS
 
   server.use(
     ...createPlannerMocks(),
@@ -158,7 +165,7 @@ beforeEach(() => {
         return HttpResponse.json(assignmentResponse)
       }
       if (importantDates === 'true' && type === 'event') {
-        return HttpResponse.json(MOCK_EVENTS)
+        return HttpResponse.json(eventResponse)
       }
       return HttpResponse.json([])
     }),
@@ -185,93 +192,111 @@ afterAll(() => {
   server.close()
 })
 
-describe('K-5 Dashboard', () => {
-  describe('Grades Section', () => {
-    it(
-      'does not show the grades tab to students if hideGradesTabForStudents is set',
-      {timeout: 15000},
-      async () => {
-        const {findByRole, queryByRole} = render(
-          <K5Dashboard
-            {...defaultProps}
-            currentUserRoles={['student']}
-            hideGradesTabForStudents={true}
-          />,
-        )
-        await findByRole('tab', {name: 'Homeroom'}, {timeout: 10000})
-        expect(queryByRole('tab', {name: 'Grades'})).not.toBeInTheDocument()
-      },
+describe('K-5 Dashboard Important Dates', () => {
+  it('renders a sidebar with important dates and no tray buttons on large screens', async () => {
+    const {getByText, queryByText} = render(<K5Dashboard {...defaultProps} />)
+    await waitFor(() => expect(getByText('History Discussion')).toBeInTheDocument())
+    expect(getByText('Algebra 2')).toBeInTheDocument()
+    expect(getByText('Important Dates')).toBeInTheDocument()
+    expect(queryByText('View Important Dates')).not.toBeInTheDocument()
+    expect(queryByText('Hide Important Dates')).not.toBeInTheDocument()
+  })
+
+  it('filters important dates to those selected', async () => {
+    server.use(
+      http.get('/api/v1/dashboard/dashboard_cards', () =>
+        HttpResponse.json(MOCK_CARDS.map(c => ({...c, enrollmentState: 'active'}))),
+      ),
+      // Only return assignments associated with course_1 initially
+      http.get('/api/v1/calendar_events', ({request}) => {
+        const url = new URL(request.url)
+        trackRequest(request.url)
+        const type = url.searchParams.get('type')
+        const importantDates = url.searchParams.get('important_dates')
+
+        if (importantDates === 'true' && type === 'assignment') {
+          return HttpResponse.json(assignmentResponse)
+        }
+        if (importantDates === 'true' && type === 'event') {
+          return HttpResponse.json(eventResponse)
+        }
+        return HttpResponse.json([])
+      }),
     )
-
-    it('shows the grades tab to teachers even if hideGradesTabForStudents is set', async () => {
-      const {findByRole} = render(
-        <K5Dashboard
-          {...defaultProps}
-          currentUserRoles={['student', 'teacher']}
-          hideGradesTabForStudents={true}
-        />,
-      )
-      expect(await findByRole('tab', {name: 'Grades'})).toBeInTheDocument()
+    // Only return assignments associated with course_1
+    assignmentResponse = MOCK_ASSIGNMENTS.slice(0, 1)
+    const {getByLabelText, getByTestId, getByText, queryByText} = render(
+      <K5Dashboard
+        {...defaultProps}
+        selectedContextsLimit={1}
+        selectedContextCodes={['course_1']}
+      />,
+    )
+    await waitFor(() => {
+      expect(getByText('Algebra 2')).toBeInTheDocument()
+      expect(queryByText('History Discussion')).not.toBeInTheDocument()
+      expect(queryByText('History Exam')).not.toBeInTheDocument()
     })
+    const assignmentCalls = requestLog.filter(
+      url =>
+        typeof url === 'string' &&
+        url.includes('calendar_events') &&
+        url.includes('type=assignment'),
+    )
+    expect(assignmentCalls.length).toBeGreaterThan(0)
+    const lastAssignmentUrl = assignmentCalls[assignmentCalls.length - 1]
+    expect(lastAssignmentUrl).toMatch('context_codes%5B%5D=course_1')
+    expect(lastAssignmentUrl).not.toMatch('context_codes%5B%5D=course_3')
 
-    it('displays a score summary for each non-homeroom course', async () => {
-      const {getByText, queryByText, findByRole} = render(
-        <K5Dashboard {...defaultProps} defaultTab="tab-grades" />,
-      )
-      expect(await findByRole('link', {name: 'Economics 101'})).toBeInTheDocument()
-      expect(getByText('B-')).toBeInTheDocument()
-      expect(queryByText('Homeroom Class')).not.toBeInTheDocument()
+    // Only return assignments associated with course_3 on next call
+    assignmentResponse = MOCK_ASSIGNMENTS.slice(1, 3)
+    act(() => getByTestId('filter-important-dates-button').click())
+
+    const subjectCalendarEconomics = getByLabelText('Economics 101', {selector: 'input'})
+    expect(subjectCalendarEconomics).toBeChecked()
+
+    const subjectCalendarMaths = getByLabelText('The Maths', {selector: 'input'})
+    expect(subjectCalendarMaths).not.toBeChecked()
+
+    act(() => subjectCalendarEconomics.click())
+    act(() => subjectCalendarMaths.click())
+    act(() => getByText('Submit').click())
+    await waitFor(() => {
+      expect(queryByText('Algebra 2')).not.toBeInTheDocument()
+      expect(getByText('History Discussion')).toBeInTheDocument()
+      expect(getByText('History Exam')).toBeInTheDocument()
     })
+    const latestAssignmentCalls = requestLog.filter(
+      url =>
+        typeof url === 'string' &&
+        url.includes('calendar_events') &&
+        url.includes('type=assignment'),
+    )
+    const lastUrl = latestAssignmentCalls[latestAssignmentCalls.length - 1]
+    expect(lastUrl).not.toMatch('context_codes%5B%5D=course_1')
+    expect(lastUrl).toMatch('context_codes%5B%5D=course_3')
   })
 
-  describe('Resources Section', () => {
-    it('displays syllabus content for homeroom under important info section', async () => {
-      const {getByText, findByText} = render(
-        <K5Dashboard {...defaultProps} defaultTab="tab-resources" />,
-      )
-      expect(await findByText("Here's the grading scheme for this class.")).toBeInTheDocument()
-      expect(getByText('Important Info')).toBeInTheDocument()
-    })
-
-    it("shows apps installed in the user's courses", async () => {
-      const wrapper = render(<K5Dashboard {...defaultProps} defaultTab="tab-resources" />)
-
-      const button = await wrapper.findByTestId('k5-app-button')
-      expect(button).toBeInTheDocument()
-      expect(button).toHaveTextContent('Google Apps')
-
-      const icon = wrapper.getByTestId('renderedIcon')
-      expect(icon).toBeInTheDocument()
-      expect(icon.src).toContain('google.png')
-    })
-
-    it('shows the staff contact info for each staff member in all homeroom courses', async () => {
-      const wrapper = render(<K5Dashboard {...defaultProps} defaultTab="tab-resources" />)
-      expect(await wrapper.findByText('Mrs. Thompson')).toBeInTheDocument()
-      expect(wrapper.getByText('Office Hours: 1-3pm W')).toBeInTheDocument()
-      expect(wrapper.getByText('Teacher')).toBeInTheDocument()
-      expect(wrapper.getByText('Tommy the TA')).toBeInTheDocument()
-      expect(wrapper.getByText('Teaching Assistant')).toBeInTheDocument()
-    })
+  it('loads important dates on the grades tab', async () => {
+    const {getByText} = render(<K5Dashboard {...defaultProps} defaultTab="tab-grades" />)
+    await waitFor(() => expect(getByText('History Discussion')).toBeInTheDocument())
   })
 
-  describe('Todos Section', () => {
-    it('displays todo tab to teachers', async () => {
-      const {findByText} = render(<K5Dashboard {...defaultProps} currentUserRoles={['teacher']} />)
-      const todoTab = await findByText('To Do')
-      expect(todoTab).toBeInTheDocument()
-      act(() => todoTab.click())
-
-      const gradeButton = await findByText('Grade Plant a plant')
-      expect(gradeButton).toBeInTheDocument()
-    })
-
-    it('does not show the todos tab to students or admins', async () => {
-      const {findByRole, queryByRole} = render(
-        <K5Dashboard {...defaultProps} currentUserRoles={['admin', 'student']} />,
-      )
-      expect(await findByRole('tab', {name: 'Homeroom', selected: true})).toBeInTheDocument()
-      expect(queryByRole('tab', {name: 'To Do'})).not.toBeInTheDocument()
-    })
+  it('includes account calendar events', async () => {
+    eventResponse = [...MOCK_EVENTS, MOCK_ACCOUNT_CALENDAR_EVENT]
+    const {getByText} = render(
+      <K5Dashboard {...defaultProps} selectedContextCodes={['course_1', 'account_1']} />,
+    )
+    await waitFor(() => expect(getByText('History Discussion')).toBeInTheDocument())
+    const eventCalls = requestLog.filter(
+      url =>
+        typeof url === 'string' && url.includes('calendar_events') && url.includes('type=event'),
+    )
+    expect(eventCalls.length).toBeGreaterThan(0)
+    const lastEventUrl = eventCalls[eventCalls.length - 1]
+    expect(lastEventUrl).toMatch('context_codes%5B%5D=course_1&context_codes%5B%5D=account_1')
+    ;['Morning Yoga', 'Football Game', 'CSU'].forEach(label =>
+      expect(getByText(label)).toBeInTheDocument(),
+    )
   })
 })

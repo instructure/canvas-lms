@@ -28,6 +28,7 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 
 const BULK_EDIT_ENDPOINT = /api\/v1\/courses\/\d+\/assignments\/bulk_update/
 const ASSIGNMENTS_ENDPOINT = /api\/v1\/courses\/\d+\/assignments/
+const PROGRESS_ENDPOINT = /progress/
 
 const realSetTimeout = setTimeout
 async function flushPromises() {
@@ -100,7 +101,7 @@ afterEach(() => {
   fetchMock.reset()
 })
 
-describe('Assignment Bulk Edit Dates - Save Progress Errors', () => {
+describe('Assignment Bulk Edit Dates - Save Progress', () => {
   beforeEach(() => {
     fakeENV.setup({
       TIMEZONE: 'Asia/Tokyo',
@@ -135,44 +136,95 @@ describe('Assignment Bulk Edit Dates - Save Progress Errors', () => {
     return fns
   }
 
-  it('displays an error if the progress fetch fails', async () => {
-    const {getByText} = await renderBulkEditAndSave()
-    fetchMock.get(
-      /progress/,
-      {
-        body: {errors: [{message: 'could not get progress'}]},
-        status: 401,
-      },
-      {
-        overwriteRoutes: true,
-      },
-    )
-    act(vi.runAllTimers)
-    await flushPromises()
-    expect(getByText(/could not get progress/)).toBeInTheDocument()
-    expect(getByText('Save').closest('button').disabled).toBe(false)
-  }, 20000)
+  describe('Polling', () => {
+    it('polls for progress and updates a progress bar', async () => {
+      const {getByText} = await renderBulkEditAndSave()
+      const [url] = fetchMock.calls()[2]
+      expect(url).toBe('/progress')
+      expect(getByText('0%')).toBeInTheDocument()
 
-  it('displays an error if the job fails', async () => {
-    const {getByText, getAllByLabelText} = await renderBulkEditAndSave()
-    fetchMock.get(
-      /progress/,
-      {
-        completion: 42,
-        workflow_state: 'failed',
-        results: [{assignment_id: 'assignment_1', errors: {due_at: [{message: 'some bad dates'}]}}],
-      },
-      {
-        overwriteRoutes: true,
-      },
-    )
-    act(vi.runAllTimers)
-    await flushPromises()
-    expect(getByText(/some bad dates/)).toBeInTheDocument()
-    // save button is disabled due to error
-    expect(getByText('Save').closest('button').disabled).toBe(true)
-    // fix the error and save should be re-enabled
-    changeAndBlurInput(getAllByLabelText(/Due At/)[0], '2020-04-04')
-    expect(getByText('Save').closest('button').disabled).toBe(false)
-  }, 20000)
+      fetchMock.getOnce(
+        PROGRESS_ENDPOINT,
+        {
+          url: '/progress',
+          workflow_state: 'running',
+          completion: 42,
+        },
+        {
+          overwriteRoutes: true,
+        },
+      )
+
+      act(vi.runOnlyPendingTimers)
+      await flushPromises()
+      expect(getByText('42%')).toBeInTheDocument()
+
+      fetchMock.getOnce(
+        PROGRESS_ENDPOINT,
+        {
+          url: '/progress',
+          workflow_state: 'complete',
+          completion: 100,
+        },
+        {
+          overwriteRoutes: true,
+        },
+      )
+
+      act(vi.runOnlyPendingTimers)
+      await flushPromises()
+      expect(getByText(/saved successfully/)).toBeInTheDocument()
+      expect(getByText('Close')).toBeInTheDocument()
+      // complete, expect no more polling
+      fetchMock.resetHistory()
+      act(vi.runAllTimers)
+      await flushPromises()
+      expect(fetchMock.calls()).toHaveLength(0)
+    }, 20000)
+  })
+
+  describe('Errors', () => {
+    it('displays an error if the progress fetch fails', async () => {
+      const {getByText} = await renderBulkEditAndSave()
+      fetchMock.get(
+        /progress/,
+        {
+          body: {errors: [{message: 'could not get progress'}]},
+          status: 401,
+        },
+        {
+          overwriteRoutes: true,
+        },
+      )
+      act(vi.runAllTimers)
+      await flushPromises()
+      expect(getByText(/could not get progress/)).toBeInTheDocument()
+      expect(getByText('Save').closest('button').disabled).toBe(false)
+    }, 20000)
+
+    it('displays an error if the job fails', async () => {
+      const {getByText, getAllByLabelText} = await renderBulkEditAndSave()
+      fetchMock.get(
+        /progress/,
+        {
+          completion: 42,
+          workflow_state: 'failed',
+          results: [
+            {assignment_id: 'assignment_1', errors: {due_at: [{message: 'some bad dates'}]}},
+          ],
+        },
+        {
+          overwriteRoutes: true,
+        },
+      )
+      act(vi.runAllTimers)
+      await flushPromises()
+      expect(getByText(/some bad dates/)).toBeInTheDocument()
+      // save button is disabled due to error
+      expect(getByText('Save').closest('button').disabled).toBe(true)
+      // fix the error and save should be re-enabled
+      changeAndBlurInput(getAllByLabelText(/Due At/)[0], '2020-04-04')
+      expect(getByText('Save').closest('button').disabled).toBe(false)
+    }, 20000)
+  })
 })
