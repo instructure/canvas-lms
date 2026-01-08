@@ -24,6 +24,7 @@ module Accessibility
     before_action :require_context
     before_action :require_user
     before_action :check_authorized_action
+    before_action :check_close_issues_feature_flag, only: [:close_issues]
 
     ALLOWED_SORTS = %w[resource_name resource_type resource_workflow_state resource_updated_at issue_count].freeze
 
@@ -66,12 +67,42 @@ module Accessibility
       render json: { scans: scans.map { |scan| scan_attributes(scan) } }
     end
 
+    # PATCH /courses/:course_id/accessibility/resource_scan/:id/close_issues
+    # Params:
+    #   id – scan ID
+    #   close – boolean (true = close, false = reopen)
+    def close_issues
+      scan = AccessibilityResourceScan.find(params[:id])
+
+      unless scan.course_id == @context.id
+        return render json: { error: "Scan not found" }, status: :not_found
+      end
+
+      close = ["true", true].include?(params[:close])
+
+      Accessibility::BulkCloseIssuesService.call(
+        scan:,
+        user_id: @current_user.id,
+        close:
+      )
+
+      render json: scan_attributes(scan.reload), status: :ok
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: "Scan not found" }, status: :not_found
+    rescue => e
+      render json: { error: e.message }, status: :unprocessable_content
+    end
+
     private
 
     def check_authorized_action
       return render status: :forbidden unless @context.try(:a11y_checker_enabled?)
 
       authorized_action(@context, @current_user, [:read, :update])
+    end
+
+    def check_close_issues_feature_flag
+      render_unauthorized_action unless Account.site_admin.feature_enabled?(:a11y_checker_close_issues)
     end
 
     # Apply sorting to the supplied ActiveRecord::Relation of AccessibilityResourceScan
@@ -122,7 +153,8 @@ module Accessibility
         resource_updated_at: scan.resource_updated_at&.iso8601 || "",
         resource_url: scan.context_url,
         workflow_state: scan.workflow_state,
-        error_message: scan.error_message || ""
+        error_message: scan.error_message || "",
+        closed_at: scan.closed_at&.iso8601
       }
 
       # Only include issue-related data when the scan is completed

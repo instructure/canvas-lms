@@ -72,12 +72,13 @@ class Accessibility::ResourceScannerService < ApplicationService
 
     issues = scan_resource_for_issues
 
-    scan.accessibility_issues.active.delete_all
+    scan.accessibility_issues.rescannable.delete_all
     scan.accessibility_issues.create!(issues) if issues.any?
 
     scan.update(
       workflow_state: "completed",
-      issue_count: issues.count
+      issue_count: issues.count,
+      closed_at: nil
     )
     queue_course_statistics(scan.course)
     log_to_datadog(scan)

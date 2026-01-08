@@ -356,7 +356,7 @@ a11y_checker:
   state: hidden
   display_name: Accessibility Checker
   description: |-
-    Enable the new Accessibility Checker.
+    Course level content accessibility report and remediation wizard.
   shadow: true
 
 a11y_checker_eap:
@@ -390,6 +390,15 @@ a11y_checker_additional_resources:
   display_name: Accessibility Checker Additional Resources
   description: |-
     If enabled, the Accessibility checker will include additional resources during the course scan. It will include Announcements, Discussion Topics (Graded and Ungraded) and Syllabus.
+  shadow: true
+
+a11y_checker_close_issues:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: |-
+    Accessibility Checker: closing remediation
+  description: |-
+    Enable closing accessibility remediation on individual resources in the Course Accessibility Checker, excluding any remaining errors on them from statistics.
   shadow: true
 
 ux_list_concluded_courses_in_bp:
