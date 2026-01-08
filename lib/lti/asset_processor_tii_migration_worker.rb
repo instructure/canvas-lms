@@ -150,7 +150,7 @@ module Lti
       deployments = find_tii_asset_processor_deployments(tool_proxy.context)
       context_matching_deployments = deployments.select { |deployment| deployment.context == tool_proxy.context }
 
-      if deployments.length > 1
+      if context_matching_deployments.length > 1
         add_proxy_error(tool_proxy, "Multiple TII AP deployments found in context. #{deployments.map(&:id).join(", ")}")
         return
       end
