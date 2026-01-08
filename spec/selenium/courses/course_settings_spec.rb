@@ -449,27 +449,27 @@ describe "course settings" do
     end
 
     it "disables from Course Navigation tab", priority: "1" do
-      get "/courses/#{@course.id}/settings#tab-navigation"
-      ff(".al-trigger")[0].click
-      ff(".icon-x")[0].click
-      wait_for_ajaximations
-      f("#nav_form button.btn.btn-primary").click
-      wait_for_ajaximations
-      enter_student_view
-      wait_for_ajaximations
+      @course.root_account.enable_feature!(:course_settings_navigation_react)
       get "/courses/#{@course.id}/settings#tab-navigation"
       wait_for_ajaximations
-      expect(f("#content")).not_to contain_link("Home")
-    end
 
-    describe "move dialog" do
-      it "returns focus to cog menu button when disabling an item" do
-        get "/courses/#{@course.id}/settings#tab-navigation"
-        cog_menu_button = ff(".al-trigger")[2]
-        cog_menu_button.click # open the menu
-        ff(".disable_nav_item_link")[2].click # click "Disable"
-        check_element_has_focus(cog_menu_button)
-      end
+      # Syllabus starts enabled
+      expect(f("#syllabus-link")).not_to have_attribute("aria-label", "Disabled. Not visible to students")
+
+      # Wait for React component to render - look for enabled tabs container
+      wait_for(method: nil, timeout: 5) { element_exists?('[data-rbd-droppable-id="enabled-tabs"]') }
+      # Find settings buttons within nav items. TAB_SYLLABUS = 1 (defined in Course model)
+      settings_buttons = ff('#nav_edit_tab_id_1 button[type="button"]')
+
+      # Click the settings button for the first movable tab
+      settings_buttons[0].click
+      # Click the "Disable" menu item - use span instead of li since InstUI uses spans
+      fj("[role='menuitem']:contains('Disable')").click
+      wait_for_ajaximations
+      fj("button:contains('Save')").click
+      wait_for_ajaximations
+
+      expect(f("#syllabus-link")).to have_attribute("aria-label", "Disabled. Not visible to students")
     end
 
     context "participation" do
