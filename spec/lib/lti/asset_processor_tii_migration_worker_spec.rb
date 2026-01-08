@@ -588,14 +588,25 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       worker.instance_variable_set(:@progress, test_progress)
     end
 
-    it "adds error when multiple deployments found in context hierarchy" do
+    it "throws error when multiple deployments found in the context" do
       # Create two deployments with the same developer key and context controls
       tii_registration.new_external_tool(course)
-      tii_registration.new_external_tool(sub_account)
+      tii_registration.new_external_tool(course)
       worker.send(:initialize_proxy_results, course_tool_proxy)
       worker.send(:migrate_tool_proxy, course_tool_proxy)
       results = worker.instance_variable_get(:@results)
       expect(results[:proxies][course_tool_proxy.id][:errors].first).to match(/Multiple TII AP deployments found/)
+    end
+
+    it "throws no error when multiple deployments found in context hierarchy, but only one is matching the context" do
+      # Create two deployments with the same developer key and context controls
+      tii_registration.new_external_tool(course)
+      tii_registration.new_external_tool(sub_account)
+      allow(worker).to receive(:tii_tp_migration)
+      worker.send(:initialize_proxy_results, course_tool_proxy)
+      worker.send(:migrate_tool_proxy, course_tool_proxy)
+      results = worker.instance_variable_get(:@results)
+      expect(results[:proxies][course_tool_proxy.id][:errors]).to be_empty
     end
 
     it "adds error when deployment found in parent context but not in tool proxy context" do
