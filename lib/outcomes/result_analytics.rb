@@ -161,13 +161,12 @@ module Outcomes
         user = user_rollups.first.user
         scores = user_rollups.map do |rollup_record|
           # Use RollupScore in stored mode for pre-calculated rollups
-          # Note: count is not available in stored rollups
           RollupScore.new(
             opts: {
               stored: true,
               outcome: rollup_record.outcome,
               score: rollup_record.aggregate_score,
-              count: 0, # TODO: should reflect actual number of results used in calculation
+              count: rollup_record.results_count,
               hide_points: rollup_record.hide_points,
               title: rollup_record.title,
               submitted_at: rollup_record.submitted_at
