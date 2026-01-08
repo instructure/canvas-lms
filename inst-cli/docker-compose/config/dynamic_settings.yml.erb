@@ -14,7 +14,7 @@ development:
         app-host: "http://address-book.docker"
         secret: "opensesame"
       live-events-subscription-service:
-        app-host: "http://les.docker"
+        app-host: "http://les-web.<%= Inst::Config.domain %>"
         sad-panda: null
       math-man:
         base_url: "http://mathman.docker"
@@ -91,3 +91,4 @@ development:
       datadog_apm.yml: |
         sample_rate: 0.0
         host_sample_rate: 0.0
+      internal_access_manager_base_url: "http://iam-web.<%= Inst::Config.domain %>"
