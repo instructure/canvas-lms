@@ -125,8 +125,31 @@ describe('UsageRightsModal', () => {
       })
     })
 
-    it('with alert', async () => {
+    it('with alert when items have different usage rights', async () => {
       renderComponent()
+      expect(
+        await screen.findByText('Items selected have different usage rights.'),
+      ).toBeInTheDocument()
+    })
+
+    it('without alert when all items have no usage rights', async () => {
+      const filesWithNoRights = [FAKE_FILES[0], FAKE_FILES[1], FAKE_FILES[2]]
+      renderComponent({items: filesWithNoRights})
+      await waitFor(() => {
+        expect(screen.queryByText('Items selected have different usage rights.')).not.toBeInTheDocument()
+      })
+    })
+
+    it('without alert when single item has no usage rights', async () => {
+      renderComponent({items: [FAKE_FILES[0]]})
+      await waitFor(() => {
+        expect(screen.queryByText('Items selected have different usage rights.')).not.toBeInTheDocument()
+      })
+    })
+
+    it('with alert when some items have usage rights and some do not', async () => {
+      const mixedItems = [FAKE_FILES[0], FAKE_FILES[7]]
+      renderComponent({items: mixedItems})
       expect(
         await screen.findByText('Items selected have different usage rights.'),
       ).toBeInTheDocument()
