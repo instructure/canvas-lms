@@ -4840,7 +4840,7 @@ is:
     default_title: Verkefni
     drop_rules_must_be_positive: "Fella niður reglur verða að vera jákvæð tala"
     drop_rules_too_high: "Fella niður reglur geta ekki verið hærri en fjöldi verkefna"
-  assignment_group_1a781505: Verkefnahópur
+  assignment_group_1a781505: Verkefnaflokkur
   assignment_group_export_fd77c394: "Flytja út verkefnishóp"
   assignment_group_filter_c03f8a1d: "Sía verkefnahóps"
   assignment_group_id_b4b3bcf2: "Auðkenni verkefnishóps"
@@ -4958,7 +4958,7 @@ is:
     assignment_group_list: 
       no_assignment_groups: "Engir verkefnahópar fundust"
     assignment_group_selector: 
-      assignment_group: Verkefnahópur
+      assignment_group: Verkefnaflokkur
       assignment_group_options: 
         create_group: "Stofna hóp"
         new_group: "Nýr hópur"
@@ -5013,7 +5013,7 @@ is:
       drop_highest: "Hæstu einkunnir:"
       drop_lowest: "Lægstu einkunnir:"
       example_group_name: "t.d. Ritgerðarhópur 1"
-      group_name: "Heiti hóps:"
+      group_name: "Heiti flokks:"
       never_drop: "Aldrei sleppa:"
       percent_of_total: "% af heildareinkunn"
       save: Vista
@@ -5422,11 +5422,11 @@ is:
         due: Skilafrestur
       instructions: 
         syllabus: |-
-            Á síðu kennsluáætlun er námskeiðið sýnt í töflu ásamt grunnforsendum einkunnamats.
-            Þú getur bætt við athugasemdum, ábendingum eða hugmyndum um námskeiðið, skipulag þess,
-            námskeiðsstefnur eða annað.
+            Á síðu kennsluáætlunar birtist tímaáætlun og grunnatriði námsmats.
+            Hægt er að bæta við upplýsingum, svo sem um skipulag
+            námskeiðs eða annað.
             
-            Smelltu á "Breyta" til að skrá athugasemdir.
+            Smelltu á „breyta“ efst á síðunni til að bæta við efni.
       labels: 
         assignments_summary: "Yfirlit námskeiðs"
         important_info_description: "Lýsing á mikilvægum upplýsingum"
@@ -6337,7 +6337,7 @@ is:
   by_reverting_all_canvas_career_features_will_be_di_30059635: "Með því að snúa þessu til baka verða allir Canvas Career eiginleikar óvirkir. Að snúa aftur mun leiða til þess að eiginleikar tapast, þar á meðal einfaldaða notendaviðmótið, forritastjórnun, gervigreindardrifinni aðgerðalegri innsýn og fleira! Þessir eiginleikar verða ekki lengur tiltækir eftir að reikningnum er aftur snúið."
   by_reverting_all_canvas_career_features_will_be_di_33da5059: "Með því að snúa þessu til baka verða allir Canvas Career eiginleikar óvirkir. Að snúa aftur mun leiða til þess að eiginleikar tapast, þar á meðal einfaldaða notendaviðmótið ásamt forritastjórnun, gervigreindardrifinni aðgerðalegri innsýn og fleira! Þessir eiginleikar verða ekki lengur tiltækir eftir að undirreikningnum er aftur snúið."
   by_reverting_this_course_all_canvas_career_feature_5e246288: "Með því að snúa þessu námskeiði til baka verða allir Canvas Career eiginleikar óvirkir. Allt efni sem er eytt eða breytt verður áfram eins og það er og ekki er hægt að endurheimta það. Að snúa námskeiði til baka mun hafa í för með sér tap á eiginleikum, þar á meðal framvindustikunni, minnisbókarfærslum, AI Assist, Skillspace árangri og áætluðum tímalýsigögnum. Þessir eiginleikar verða ekki lengur tiltækir eftir að námskeiðinu er aftur snúið."
-  by_selecting_make_all_discussions_threaded_you_wil_cf286418: "Með því að velja „Setja allar umræður í þráð“ muntu uppfæra allar umræður sem ekki eru í þræði í námskeiðinu í þráð. Þessi aðgerð mun afmerkja „Óheimila svaraþráð“, sem virkjar svör í þræði fyrir allar umræður."
+  by_selecting_make_all_discussions_threaded_you_wil_cf286418: "Með því að velja „Setja allar umræður í þráð“ muntu uppfæra allar umræður sem ekki eru í þræði í námskeiðinu í þráð. Þessi aðgerð mun afmerkja „Ekki leyfa svarþræði“, sem virkjar svör í þræði fyrir allar umræður."
   by_url_a163275e: "Eftir slóð"
   bzzzzt_try_again_1eee9e8: "Bzzzzt, reyndu aftur."
   c4e_analytics_66e0fc46: "C4E greiningar"
@@ -8366,7 +8366,7 @@ is:
     index: 
       buttons: 
         create: "Stofna útflutning"
-      content_exports: "Útflutningar efnis"
+      content_exports: "Útflutningur efnis"
       export_type: "Tegund útflutnings"
       labels: 
         course: Námskeið
@@ -8392,7 +8392,7 @@ is:
         all_quizzes: "Öll próf"
       select_quizzes: "Velja próf til að flytja út"
   content_exports_cannot_be_downloaded_after_days_da_396dfbca: "Ekki er hægt að hlaða niður útflutningsefni eftir %{days} daga."
-  content_exports_e5a66f6a: "Útflutningar efnis"
+  content_exports_e5a66f6a: "Útflutningur efnis"
   content_for_section_1_7ecfb319: "Efni fyrir hluta 1"
   content_for_section_2_e7c6e2a3: "Efni fyrir hluta 2"
   content_for_section_3_90c1d235: "Efni fyrir hluta 3"
@@ -11931,7 +11931,7 @@ is:
   disallow_comments_6d04b47a: "Banna athugasemdir"
   disallow_comments_for_title_21f9c653: "Banna athugasemdir fyrir %{title}"
   disallow_replies_for_title_ca3806b2: "Banna svör við %{title}"
-  disallow_threaded_replies_71c66c21: "Óheimila svaraþráð"
+  disallow_threaded_replies_71c66c21: "Ekki leyfa svarþræði"
   disallow_threaded_replies_fix_alert_c62e5fc1: "Óheimila svaraþráð Laga viðvörun"
   discard_changes_e04b15f9: "Henda breytingum"
   discarded_20a4e7e8: Fargað
@@ -13034,7 +13034,7 @@ is:
   enable_pkce_in_oauth2_authorization_code_flow_b5521c4e: "Virkja PKCE í flæði OAuth2 heimildarkóða"
   enable_platform_notification_service_217f3b9e: "Virkja tilkynningaþjónustu vettvangs"
   enable_platform_notification_services_421105da: "Virkja tilkynningaþjónustu vettvangs"
-  enable_podcast_feed_e67c49ac: "Heimila hlaðvarpsstreymi"
+  enable_podcast_feed_e67c49ac: "Virkja hlaðvarpsstreymi"
   enable_quiz_visibility_after_course_conclusion_2dff3534: "Virkja sýnileika prófs eftir lok námskeiðs"
   enable_range_fec198ac: "Virkja bil stiga"
   enable_rce_studio_embed_improvements_to_embedded_c_dd4d60b0: "Virkjaðu RCE Studio Embed úrbætur á innfelldu efni í Rich Content ritilinn."
@@ -15726,7 +15726,7 @@ is:
         discussion_view_with_context: "Sýna svör í samhengi"
         save_settings: "Vista stillingar"
         show_new_sg_ui: "Nota nýja SpeedGrader UI"
-      comment_submitted: "Athugasemdin var skilað."
+      comment_submitted: "Athugasemdinni var skilað."
       crocodoc_pending: "Crocodoc er enn að vinna þetta skjal."
       headers: 
         anonymous_submission: "Svör nemanda eru falin því þetta verkefni er nafnlaust."
@@ -16211,7 +16211,7 @@ is:
         available_groups: "Tiltækir hópar"
         new_group: "Búa til nýjan hóp"
       labels: 
-        name: "Heiti hóps:"
+        name: "Heiti flokks:"
         restrictions_for_joining_groups: "Tek þátt"
         users_to_invite: Bjóða
       options: 
@@ -21692,7 +21692,7 @@ is:
   migrating_name_e05aa53e: "Flytur \"%{name}\""
   migration: 
     announcement_type: Tilkynning
-    assignment_group_type: Verkefnahópur
+    assignment_group_type: Verkefnaflokkur
     assignment_type: Verkefni
     calendar_event_type: Dagatalsviðburður
     discussion_topic_type: Umræðuefni
@@ -26913,7 +26913,7 @@ is:
         default_group_name: Verkefnaflokkur
         edit_questions_and_points: "Veldu *%{num_questions}* spurningar, #%{num_points}# punktar fyrir spurningu"
         labels: 
-          group_name: "Heiti hóps:"
+          group_name: "Heiti flokks:"
           number_of_questions: "Fjöldi spurninga"
           points_per_question: "Punktar fyrir spurningu"
           question_bank: "Spurningar verða teknar úr spurningabankanum"
@@ -26985,7 +26985,7 @@ is:
         due: Skilafrestur
         filter: IP-sía
         for: Fyrir
-        group: Verkefnahópur
+        group: Verkefnaflokkur
         label: 
           time_limit: Tímamörk
         multiple_attempts: "Margar tilraunir"
@@ -33123,7 +33123,7 @@ is:
   these_pronouns_will_be_available_to_canvas_users_i_e8f474e5: "Þessi fornöfn verða aðgengileg Canvas-notendum til að velja á reikningnum þínum."
   these_scores_are_out_of_order_4f0859ef: "þessar einkunnir eru ekki í réttri röð"
   they_them_d6125799: þau/þeim/þeirra
-  they_them_f4d17a04: Þau/þeirra
+  they_them_f4d17a04: Hán/Háns
   they_were_merged_into_other_user_64758f01: "Þau voru sameinuð í *%{other_user}*."
   thinking_3fde768c: Hugsar...
   third_20c6a639: þriðja
