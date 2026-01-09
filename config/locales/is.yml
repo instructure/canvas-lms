@@ -75,7 +75,7 @@ is:
   9th_grade_cb54efe: "9. bekkur"
   AssignmentGroupCreateDialog: 
     titles: 
-      add_assignment_group: "Bæta við verkefnahópi"
+      add_assignment_group: "Bæta við verkefnaflokki"
   AssignmentGroupListItemView: 
     drop_highest_rule: 
       one: "Sleppa hæstu einkunn"
@@ -4847,7 +4847,7 @@ is:
   assignment_group_is_required_to_move_assignments_18f63b05: "Verkefnahópur er áskilinn til að færa verkefni"
   assignment_group_selector: 
     assignment_group_must_have_group: "Veldu verkefnahóp fyrir þetta verkefni"
-  assignment_group_was_saved_successfully_5caa27d3: "Verkefnahópur var vistaður"
+  assignment_group_was_saved_successfully_5caa27d3: "Verkefnaflokkur var vistaður"
   assignment_group_weight_data_report_449e1d1d: "Skýrsla um vegin gögn verkefnishóps"
   assignment_group_weights_and_drop_rules_can_t_be_e_7b5f305d: "Ekki er hægt að breyta vægi og fellireglum verkefnahóps því verkefni eru í einum hópanna með lokuðum skiladögum."
   assignment_group_weights_can_t_be_edited_because_t_b6b591ae: "Ekki er hægt að breyta vægi verkefnahóps því verkefni eru í einum hópanna með lokuðum skiladögum."
@@ -4869,7 +4869,7 @@ is:
     errors: 
       frozen_assignments_error: "Ekki er hægt að eyða hópi með læst verkefni"
   assignment_groups_bc9cc3c9: Verkefnahópar
-  assignment_groups_weight_2f1a5a7c: "Vægi verkefnahópa"
+  assignment_groups_weight_2f1a5a7c: "Vægi verkefnaflokka"
   assignment_has_a_locked_date_due_date_cannot_be_se_2e2e3389: "Verkefni er með fastri dagsetningu Skiladagur getur ekki verið utan við fastar dagsetningar"
   assignment_has_been_graded_for_name_4384f9b: "%{assignment} %{name} var gefin einkunn fyrir."
   assignment_has_self_assessments_or_due_date_has_pa_8c5fb7af: "Verkefnið hefur sjálfsmat eða skiladagur er liðinn"
@@ -4954,7 +4954,7 @@ is:
         add_group: "Bæta við hópi"
         cancel: "Hætta við"
       links: 
-        add_assignment_group: "Bæta við verkefnahópi"
+        add_assignment_group: "Bæta við verkefnaflokki"
     assignment_group_list: 
       no_assignment_groups: "Engir verkefnahópar fundust"
     assignment_group_selector: 
@@ -5012,7 +5012,7 @@ is:
       cancel: "Hætta við"
       drop_highest: "Hæstu einkunnir:"
       drop_lowest: "Lægstu einkunnir:"
-      example_group_name: "t.d. Ritgerðarhópur 1"
+      example_group_name: "t.d. Ritgerðarflokkur 1"
       group_name: "Heiti flokks:"
       never_drop: "Aldrei sleppa:"
       percent_of_total: "% af heildareinkunn"
@@ -5135,7 +5135,7 @@ is:
       assignments: Verkefni
       search_for_assignment: "Leita að verkefni"
       title_add_assignment: "Bæta við verkefni"
-      title_add_group: "Bæta við verkefnahópi"
+      title_add_group: "Bæta við verkefnaflokki"
       title_add_quiz_lti: "Bæta við prófi"
     invalid_file_retrieval: "Ekki tókst að endurheimta skrána sem send var frá þessu tæki."
     keyboard_add_item: "Bæta verkefni við valinn hóp"
@@ -11161,18 +11161,18 @@ is:
       - Lau
     abbr_month_names: 
       - ~
-      - jan
-      - feb
-      - mar
-      - apr
+      - jan.
+      - feb.
+      - mar.
+      - apr.
       - maí
-      - jún
-      - júl
-      - ágú
-      - sep
-      - okt
-      - nóv
-      - des
+      - jún.
+      - júl.
+      - ág.
+      - sept.
+      - okt.
+      - nóv.
+      - des.
     datepicker: 
       column_headings: 
         - Sun
@@ -36580,7 +36580,7 @@ is:
   weeks_4504fe8b: Vikur
   weight_9b308e5b: Vægi
   weight_ff579a8e: "Vægi:"
-  weight_final_grade_based_on_assignment_groups_3124161: "Vegin lokaeinkunn byggð á verkefnahópum"
+  weight_final_grade_based_on_assignment_groups_3124161: "Vegin lokaeinkunn byggð á verkefnaflokkum"
   weight_of_final_abbbe82f: "%{weight} af loka"
   weight_of_grade_19d9ce0f: "%{weight} af einkunn/"
   weight_of_grade_dff535d9: "%{weight} af einkunn"
