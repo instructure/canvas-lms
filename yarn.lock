@@ -2991,10 +2991,10 @@
   dependencies:
     prop-types "^15"
 
-"@instructure/studio-player@1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.5.1.tgz#811402b2500dea753a3b08ad04434b4eb9e04163"
-  integrity sha512-V8BBU31gsiKIkVrB+NUDLPDIlYBKgYj9Yd7cUe/rJNbskv5RNK0WfhJs3HoRzgq9XutVDlbOcSDL+p4d6Nm8xQ==
+"@instructure/studio-player@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.6.0.tgz#bc919fa40c53c9affbfe4b1658a10a806e982e70"
+  integrity sha512-xOkpdnhoZ/DeGCZrpeRxyeLtLKXaBwFMzNnXjL0stC9vr9LKxeBrQiWX+mZXCvLYGKTD4onDISuJVbPg9bHORA==
   dependencies:
     "@floating-ui/react" "^0.27.3"
     "@nanostores/react" "^1.0.0"
@@ -3002,6 +3002,7 @@
     dashjs "4.7.4"
     i18next "^24.2.1"
     i18next-resources-to-backend "^1.2.1"
+    jwt-decode "^4.0.0"
     nanostores "^1.0.1"
     react "^18.3.1"
     react-dom "^18.3.1"
@@ -16713,6 +16714,11 @@ just-debounce@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/just-debounce/-/just-debounce-1.1.0.tgz#2f81a3ad4121a76bc7cb45dbf704c0d76a8e5ddf"
   integrity sha512-qpcRocdkUmf+UTNBYx5w6dexX5J31AKK1OmPwH630a83DdVVUIngk55RSAiIGpQyoH0dlr872VHfPjnQnK1qDQ==
+
+jwt-decode@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-4.0.0.tgz#2270352425fd413785b2faf11f6e755c5151bd4b"
+  integrity sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==
 
 keycode@^2, keycode@^2.2.0, keycode@^2.2.1:
   version "2.2.1"
