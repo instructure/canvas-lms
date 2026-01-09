@@ -667,3 +667,100 @@ describe('AssignmentAssetProcessorEula', () => {
     expect(elem).not.toBeInTheDocument()
   })
 })
+
+describe('peer_review_allocation_and_grading feature flag', () => {
+  describe('with peer review mode enabled and peerReviewLinkData', () => {
+    let props
+    beforeEach(async () => {
+      props = await mockAssignmentAndSubmission()
+      props.assignment.env.peerReviewModeEnabled = true
+      props.peerReviewLinkData = {
+        ...props.submission,
+        assignedAssessments: [
+          {
+            assetId: '1',
+            anonymousUser: null,
+            anonymousId: 'xaU9cd',
+            workflowState: 'assigned',
+            assetSubmissionType: null,
+          },
+        ],
+      }
+    })
+
+    it('renders PeerReviewNavigationLink when feature flag is disabled', () => {
+      window.ENV.peer_review_allocation_and_grading = false
+      const {queryAllByTestId} = render(<Header {...props} />)
+      expect(queryAllByTestId('header-peer-review-link').length).toBeGreaterThan(0)
+    })
+
+    it('does not render PeerReviewNavigationLink when feature flag is enabled', () => {
+      window.ENV.peer_review_allocation_and_grading = true
+      const {queryAllByTestId} = render(<Header {...props} />)
+      expect(queryAllByTestId('header-peer-review-link')).toHaveLength(0)
+    })
+  })
+
+  describe('with peer review mode enabled and reviewerSubmission', () => {
+    let props
+    beforeEach(async () => {
+      props = await mockAssignmentAndSubmission()
+      props.assignment.env.peerReviewModeEnabled = true
+      props.reviewerSubmission = {
+        ...props.submission,
+        assignedAssessments: [
+          {
+            assetId: '1',
+            anonymousUser: null,
+            anonymousId: 'xaU9cd',
+            workflowState: 'assigned',
+            assetSubmissionType: 'online_text_entry',
+          },
+        ],
+      }
+    })
+
+    it('renders PeerReviewNavigationLink when feature flag is disabled', () => {
+      window.ENV.peer_review_allocation_and_grading = false
+      const {queryAllByTestId} = render(<Header {...props} />)
+      expect(queryAllByTestId('header-peer-review-link').length).toBeGreaterThan(0)
+    })
+
+    it('does not render PeerReviewNavigationLink when feature flag is enabled', () => {
+      window.ENV.peer_review_allocation_and_grading = true
+      const {queryAllByTestId} = render(<Header {...props} />)
+      expect(queryAllByTestId('header-peer-review-link')).toHaveLength(0)
+    })
+  })
+
+  describe('with peer review mode disabled and submission has assignedAssessments', () => {
+    let props
+    beforeEach(async () => {
+      props = await mockAssignmentAndSubmission({
+        Submission: {...SubmissionMocks.submitted},
+      })
+      props.assignment.env.peerReviewModeEnabled = false
+      props.submission.assignedAssessments = [
+        {
+          assetId: '1',
+          anonymizedUser: {_id: '1', displayName: 'Jim'},
+          anonymousId: null,
+          workflowState: 'assigned',
+          assetSubmissionType: null,
+        },
+      ]
+    })
+
+    it('renders PeerReviewNavigationLink when feature flag is disabled', () => {
+      window.ENV.peer_review_allocation_and_grading = false
+      const {queryAllByTestId} = render(<Header {...props} />)
+      expect(queryAllByTestId('header-peer-review-link').length).toBeGreaterThan(0)
+    })
+
+    it('does not render PeerReviewNavigationLink when feature flag is enabled', () => {
+      window.ENV.peer_review_allocation_and_grading = true
+      const {queryAllByTestId} = render(<Header {...props} />)
+      expect(queryAllByTestId('header-peer-review-link')).toHaveLength(0)
+    })
+  })
+})

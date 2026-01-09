@@ -669,24 +669,26 @@ const SubmissionManager = ({
       I18n.t('Your work has been submitted.'),
       I18n.t('Check back later to view feedback.'),
     ])
-    setPeerReviewSubHeaderText([
-      {
-        props: {size: 'large', weight: 'bold'},
-        text: I18n.t(
-          {
-            one: 'You have 1 Peer Review to complete.',
-            other: 'You have %{count} Peer Reviews to complete.',
-          },
-          {count: availableCount + unavailableCount},
-        ),
-      },
-      {
-        props: {size: 'medium'},
-        text: I18n.t('Peer submissions ready for review: %{availableCount}', {availableCount}),
-      },
-    ])
-    setPeerReviewShowSubHeaderBorder(true)
-    setPeerReviewButtonText('Peer Review')
+    if (!window.ENV.peer_review_allocation_and_grading) {
+      setPeerReviewSubHeaderText([
+        {
+          props: {size: 'large', weight: 'bold'},
+          text: I18n.t(
+            {
+              one: 'You have 1 Peer Review to complete.',
+              other: 'You have %{count} Peer Reviews to complete.',
+            },
+            {count: availableCount + unavailableCount},
+          ),
+        },
+        {
+          props: {size: 'medium'},
+          text: I18n.t('Peer submissions ready for review: %{availableCount}', {availableCount}),
+        },
+      ])
+      setPeerReviewShowSubHeaderBorder(true)
+      setPeerReviewButtonText('Peer Review')
+    }
   }
 
   const handleOpenPeerReviewPromptModal = () => {
