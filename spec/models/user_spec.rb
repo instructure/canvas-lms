@@ -4186,6 +4186,31 @@ describe User do
     end
   end
 
+  describe "check_accounts_any_right?" do
+    it "returns false for empty rights array" do
+      user1 = user_factory
+      user2 = user_factory
+      expect(user1.check_accounts_any_right?(user2)).to be false
+    end
+
+    it "returns false when user is nil" do
+      user1 = user_factory
+      expect(user1.check_accounts_any_right?(nil, :manage_students)).to be false
+    end
+
+    it "returns true when any of multiple rights is granted" do
+      target = user_factory
+      seeker = account_admin_user_with_role_changes(role_changes: { view_user_logins: true, manage_user_logins: false })
+      expect(target.check_accounts_any_right?(seeker, :view_user_logins, :manage_user_logins)).to be true
+    end
+
+    it "returns false when none of multiple rights are granted" do
+      target = user_factory
+      seeker = account_admin_user_with_role_changes(role_changes: { view_user_logins: false, manage_user_logins: false })
+      expect(target.check_accounts_any_right?(seeker, :view_user_logins, :manage_user_logins)).to be false
+    end
+  end
+
   describe "cached_course_ids_for_observed_user" do
     before :once do
       @observer = user_factory(active_all: true)

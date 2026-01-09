@@ -1406,15 +1406,26 @@ class User < ActiveRecord::Base
   end
 
   def check_accounts_right?(user, sought_right)
-    # check if the user we are given is an admin in one of this user's accounts
     return false unless user && sought_right
-    return account.grants_right?(user, sought_right) if fake_student? # doesn't have account association
+
+    check_accounts(user) { |account| account.grants_right?(user, sought_right) }
+  end
+
+  def check_accounts_any_right?(user, *sought_rights)
+    return false unless user && sought_rights.any?
+
+    check_accounts(user) { |account| account.grants_any_right?(user, *sought_rights) }
+  end
+
+  def check_accounts(user, &)
+    # check if the user we are given is an admin in one of this user's accounts
+    return yield(account) if fake_student? # doesn't have account association
 
     # Intentionally include deleted pseudonyms when checking deleted users (important for diagnosing deleted users)
     accounts_to_search =
       if associated_accounts.empty?
         if merged_into_user && active_merged_into_user
-          return active_merged_into_user.check_accounts_right?(user, sought_right)
+          return active_merged_into_user.check_accounts(user, &)
         elsif Account.joins(:pseudonyms).where(pseudonyms: { user_id: id }).exists?
           Account.joins(:pseudonyms).where(pseudonyms: { user_id: id })
         else
@@ -1428,9 +1439,9 @@ class User < ActiveRecord::Base
     search_method = lambda do |shard|
       # new users with creation pending enrollments don't have account associations
       if accounts_to_search.shard(shard).empty? && common_shards.length == 1 && !unavailable?
-        account.grants_right?(user, sought_right)
+        yield(account)
       else
-        accounts_to_search.shard(shard).any? { |a| a.grants_right?(user, sought_right) }
+        accounts_to_search.shard(shard).any?(&)
       end
     end
     # search shards the two users have in common first, since they're most likely
