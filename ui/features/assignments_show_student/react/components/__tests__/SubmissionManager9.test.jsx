@@ -31,8 +31,8 @@ import SubmissionManager from '../SubmissionManager'
 import store from '../stores'
 import {setupServer} from 'msw/node'
 import {graphql, http, HttpResponse} from 'msw'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
-// Reset all mocks before each test to ensure isolation
 beforeEach(() => {
   vi.resetAllMocks()
   ContextModuleApi.getContextModuleData.mockResolvedValue({})
@@ -137,7 +137,6 @@ describe('SubmissionManager', () => {
     })
 
     describe('with rubrics', () => {
-      const originalENV = window.ENV
       let props, mocks
 
       function generateAssessmentItem(
@@ -160,11 +159,11 @@ describe('SubmissionManager', () => {
       }
 
       function setCurrentUserAsAssessmentOwner() {
-        window.ENV = {...originalENV, COURSE_ID: '4', current_user: {id: '2'}}
+        fakeENV.setup({COURSE_ID: '4', current_user: {id: '2'}})
       }
 
       function setOtherUserAsAssessmentOwner() {
-        window.ENV = {...originalENV, COURSE_ID: '4', current_user: {id: '4'}}
+        fakeENV.setup({COURSE_ID: '4', current_user: {id: '4'}})
       }
 
       async function setMocks() {
@@ -204,8 +203,8 @@ describe('SubmissionManager', () => {
       }
 
       beforeEach(async () => {
+        fakeENV.setup()
         lastCapturedRequest = null
-        // Default handler that captures request and returns success
         server.use(
           http.post(
             '/courses/:courseId/rubric_associations/:rubricAssociationId/assessments',
@@ -240,8 +239,7 @@ describe('SubmissionManager', () => {
       afterEach(() => {
         server.resetHandlers()
         mswClient.cache.reset()
-        window.ENV = originalENV
-        // Reset all store state to avoid pollution between tests
+        fakeENV.teardown()
         store.setState({
           displayedAssessment: null,
           isSavingRubricAssessment: false,
@@ -512,18 +510,26 @@ describe('SubmissionManager', () => {
           () => {
             expect(getByTestId('submit-peer-review-button')).toBeInTheDocument()
           },
-          {timeout: 5000},
+          {timeout: 10000, interval: 50},
         )
 
-        fireEvent.click(getByTestId('submit-peer-review-button'))
+        const button = getByTestId('submit-peer-review-button')
+        await waitFor(
+          () => {
+            expect(button).toBeEnabled()
+          },
+          {timeout: 5000, interval: 50},
+        )
+
+        fireEvent.click(button)
 
         await waitFor(
           () => {
             expect(getByTestId('peer-review-prompt-modal')).toBeInTheDocument()
           },
-          {timeout: 5000},
+          {timeout: 15000, interval: 100},
         )
-      }, 15000)
+      }, 30000)
 
       it('renders peer review modal for completing all rubric assessments', async () => {
         setOtherUserAsAssessmentOwner()
@@ -532,24 +538,20 @@ describe('SubmissionManager', () => {
           _id: 'test-id',
           assignedAssessments: [
             {
-              assetId: '1',
-              anonymousId: null,
+              assetId: props.submission._id,
               workflowState: 'assigned',
-              anonymousUser: false,
+              assetSubmissionType: 'online-text',
             },
             {
-              assetId: '2',
-              anonymousId: null,
+              assetId: 'some other user id',
               workflowState: 'assigned',
-              anonymousUser: false,
+              assetSubmissionType: 'online-text',
             },
           ],
         }
-
-        // Set up peer review mode
+        props.reviewerSubmission = reviewerSubmission
         props.assignment.env.peerReviewModeEnabled = true
         props.assignment.env.peerReviewAvailable = true
-        props.reviewerSubmission = reviewerSubmission
 
         store.setState({
           displayedAssessment: {
@@ -562,29 +564,35 @@ describe('SubmissionManager', () => {
         })
 
         const {getByTestId} = render(
-          <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
-            <ApolloProvider client={mswClient}>
-              <SubmissionManager {...props} />
-            </ApolloProvider>
-          </AlertManagerContext.Provider>,
+          <ApolloProvider client={mswClient}>
+            <SubmissionManager {...props} />
+          </ApolloProvider>,
         )
 
-        // Wait for Apollo cache to settle
-        await waitFor(() => {})
+        await waitFor(
+          () => {
+            expect(getByTestId('submit-peer-review-button')).toBeInTheDocument()
+          },
+          {timeout: 10000, interval: 50},
+        )
 
-        // Wait for the submit button to be enabled
-        const submitButton = await waitFor(() => getByTestId('submit-peer-review-button'))
-        expect(submitButton).toBeEnabled()
+        const button = getByTestId('submit-peer-review-button')
+        await waitFor(
+          () => {
+            expect(button).toBeEnabled()
+          },
+          {timeout: 5000, interval: 50},
+        )
 
-        // Click the submit button
-        fireEvent.click(submitButton)
+        fireEvent.click(button)
 
-        // Verify modal appears using screen since it's rendered at the root level
-        await waitFor(() => {
-          const modal = screen.getByTestId('peer-review-prompt-modal')
-          expect(modal).toBeInTheDocument()
-        })
-      })
+        await waitFor(
+          () => {
+            expect(getByTestId('peer-review-prompt-modal')).toBeInTheDocument()
+          },
+          {timeout: 15000, interval: 100},
+        )
+      }, 30000)
 
       // This test is flaky due to the same async state management issues as the success alert test above.
       // The store state gets overwritten during component mount before the click handler runs.

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, render as rtlRender, fireEvent, waitFor} from '@testing-library/react'
+import {act, render as rtlRender, fireEvent} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import {createCache} from '@canvas/apollo-v3'
@@ -92,10 +92,12 @@ describe('CreateOutcomeModal', () => {
     onCloseHandlerMock = vi.fn()
     onSuccessMock = vi.fn()
     cache = createCache()
+    vi.clearAllTimers()
   })
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.clearAllTimers()
   })
 
   const itBehavesLikeAForm = specProps => {
@@ -238,12 +240,10 @@ describe('CreateOutcomeModal', () => {
         })
         await user.click(getByText('Account folder 0'))
         await user.click(getByText('Create'))
-        await act(async () => vi.runOnlyPendingTimers())
-        await waitFor(() => {
-          expect(onSuccessMock).toHaveBeenCalledTimes(1)
-          expect(onSuccessMock).toHaveBeenCalledWith({
-            selectedGroupAncestorIds: ['100', '1'],
-          })
+        await act(async () => vi.runAllTimersAsync())
+        expect(onSuccessMock).toHaveBeenCalledTimes(1)
+        expect(onSuccessMock).toHaveBeenCalledWith({
+          selectedGroupAncestorIds: ['100', '1'],
         })
       })
 
@@ -270,12 +270,10 @@ describe('CreateOutcomeModal', () => {
           target: {value: 'Friendly Description value'},
         })
         await user.click(getByText('Create'))
-        await act(async () => vi.runOnlyPendingTimers())
-        await waitFor(() => {
-          expect(showFlashAlert).toHaveBeenCalledWith({
-            message: '"Outcome 123" was successfully created.',
-            type: 'success',
-          })
+        await act(async () => vi.runAllTimersAsync())
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: '"Outcome 123" was successfully created.',
+          type: 'success',
         })
       })
 
@@ -297,11 +295,10 @@ describe('CreateOutcomeModal', () => {
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         await user.click(getByText('Create'))
-        await waitFor(() => {
-          expect(showFlashAlert).toHaveBeenCalledWith({
-            message: 'An error occurred while creating this outcome. Please try again.',
-            type: 'error',
-          })
+        await act(async () => vi.runAllTimersAsync())
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'An error occurred while creating this outcome. Please try again.',
+          type: 'error',
         })
       })
 
@@ -323,12 +320,10 @@ describe('CreateOutcomeModal', () => {
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         await user.click(getByText('Create'))
-        await act(async () => vi.runOnlyPendingTimers())
-        await waitFor(() => {
-          expect(showFlashAlert).toHaveBeenCalledWith({
-            message: 'An error occurred while creating this outcome. Please try again.',
-            type: 'error',
-          })
+        await act(async () => vi.runAllTimersAsync())
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'An error occurred while creating this outcome. Please try again.',
+          type: 'error',
         })
       })
 
@@ -356,12 +351,10 @@ describe('CreateOutcomeModal', () => {
           target: {value: 'Friendly description'},
         })
         await user.click(getByText('Create'))
-        await act(async () => vi.runOnlyPendingTimers())
-        await waitFor(() => {
-          expect(showFlashAlert).toHaveBeenCalledWith({
-            message: 'An error occurred while creating this outcome. Please try again.',
-            type: 'error',
-          })
+        await act(async () => vi.runAllTimersAsync())
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'An error occurred while creating this outcome. Please try again.',
+          type: 'error',
         })
       })
     })
