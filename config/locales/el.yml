@@ -1741,6 +1741,7 @@ el:
       recipients_required: "Απαιτείται τουλάχιστον ένας παραλήπτης"
       threshold_should_be_numeric: "Πρέπει να είναι θετικό νούμερο"
   alerts_6b871b71: Συναγερμοί
+  aligned_outcomes_d0a0c159: "Αποτελέσματα που Ευθυγραμμίστηκαν"
   all_4321c3a1: Όλα
   all_account_types_e83c1516: "Όλοι οι τύποι των Λογαριασμών"
   all_accounts_3bafc860: "Όλοι οι λογαριασμοί"
