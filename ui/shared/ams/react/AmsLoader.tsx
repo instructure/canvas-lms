@@ -70,6 +70,10 @@ export function AmsLoader({
       }
     }
 
+    const customerAppVariant = ENV.FEATURES.ams_advanced_content_organization
+      ? ['content-team']
+      : []
+
     loadAmsModule()
       .then(module => {
         if (stillMounting && containerRef.current) {
@@ -86,6 +90,7 @@ export function AmsLoader({
             rubrics: {
               createController: createRubricController,
             },
+            customerAppVariant,
             ...(gradingContext && {gradingContext}),
             ...(onSubmissionUpdate && {onSubmissionUpdate}),
           })
