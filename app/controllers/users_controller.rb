@@ -3177,7 +3177,6 @@ class UsersController < ApplicationController
 
     if cc_params
       cc_type = (cc_params[:type] || CommunicationChannel::TYPE_EMAIL).downcase
-      # cc_type = (cc_params[:type] || CommunicationChannel::TYPE_EMAIL)
       cc_addr = cc_params[:address] || params[:pseudonym][:unique_id]
 
       cc_addr = nil if cc_type == CommunicationChannel::TYPE_EMAIL && !EmailAddressValidator.valid?(cc_addr)
