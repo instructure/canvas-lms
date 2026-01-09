@@ -31,7 +31,7 @@ interface CircularReference {
   ref?: CircularReference
 }
 
-describe.skip('helpers.ts', () => {
+describe('helpers.ts', () => {
   describe('local storage', () => {
     beforeEach(() => {
       localStorage.clear()
@@ -94,14 +94,15 @@ describe.skip('helpers.ts', () => {
 
       it('does not modify localStorage when there is a serialization error', () => {
         const circularRef: any = {}
-        const initialLocalStorage = {...localStorage}
+        const initialKeys = Object.keys(localStorage)
         const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
         circularRef.ref = circularRef
         setToLocalStorage('circularKey', circularRef)
 
         expect(errorSpy).toHaveBeenCalled()
-        expect(localStorage).toEqual(initialLocalStorage)
+        expect(Object.keys(localStorage)).toEqual(initialKeys)
+        expect(localStorage.getItem('circularKey')).toBeNull()
 
         errorSpy.mockRestore()
       })

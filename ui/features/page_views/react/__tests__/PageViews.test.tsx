@@ -21,10 +21,7 @@ import {render, fireEvent, screen} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import PageViews, {type PageViewsProps} from '../PageViews'
 import * as PageViewsTableModule from '../PageViewsTable'
-import {
-  fudgeDateForProfileTimezone,
-  unfudgeDateForProfileTimezone,
-} from '@instructure/moment-utils'
+import {fudgeDateForProfileTimezone, unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 
 const queryClient = new QueryClient()
 
@@ -76,27 +73,24 @@ describe('PageViews', () => {
     expect(endDate?.valueOf()).toBe(cacheTopDate.valueOf())
   })
 
-  it.skip('start date within cache properly passed to the table', async () => {
+  it('start date within cache properly passed to the table', async () => {
     const {getByTestId} = render(<Subject userId="1" />)
     // Create yesterday at midnight using the same fudge/unfudge logic as the component
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
-    const fudgedYesterday =
-      fudgeDateForProfileTimezone(yesterday) ?? yesterday
+    const fudgedYesterday = fudgeDateForProfileTimezone(yesterday) ?? yesterday
     fudgedYesterday.setHours(0, 0, 0, 0)
     const unfudgedYesterday = unfudgeDateForProfileTimezone(fudgedYesterday) ?? fudgedYesterday
 
     const dateText = unfudgedYesterday.toISOString().slice(0, 10)
-    const date = new Date(dateText)
-    const expectedDate = formatForDisplay(date)
+    const expectedDate = formatForDisplay(unfudgedYesterday)
     const dateField: HTMLInputElement = getByTestId(
       'page-views-date-start-filter',
     ) as HTMLInputElement
     fireEvent.change(dateField, {target: {value: dateText}})
     fireEvent.blur(dateField)
-    expect(dateField.value).toBe(expectedDate) // UTC date
+    expect(dateField.value).toBe(expectedDate)
     const {startDate} = MockPageViewsTable.mock.calls[1][0] // second call after rerender
-    const expectedStartDate = unfudgeDateForProfileTimezone(date) ?? new Date('1970-01-01')
-    expect(startDate?.toISOString()).toBe(expectedStartDate?.toISOString())
+    expect(startDate?.toISOString()).toBe(unfudgedYesterday.toISOString())
   })
 
   it('start date outside cache must display error', async () => {

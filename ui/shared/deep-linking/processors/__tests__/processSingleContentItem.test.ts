@@ -21,6 +21,10 @@ import $ from 'jquery'
 import processSingleContentItem from '../processSingleContentItem'
 
 vi.mock('jquery', () => ({
+  default: {
+    flashError: vi.fn(),
+    flashMessage: vi.fn(),
+  },
   flashError: vi.fn(),
   flashMessage: vi.fn(),
 }))
@@ -49,7 +53,7 @@ const data = (overrides: Partial<DeepLinkResponse>) => ({
   ...overrides,
 })
 
-describe.skip('processSingleContentItem', () => {
+describe('processSingleContentItem', () => {
   beforeEach(() => {
     ;($.flashError as unknown as {mockClear: () => void}).mockClear()
     ;($.flashMessage as unknown as {mockClear: () => void}).mockClear()
