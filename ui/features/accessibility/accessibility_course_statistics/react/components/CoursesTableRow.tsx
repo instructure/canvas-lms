@@ -23,9 +23,11 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Avatar} from '@instructure/ui-avatar'
+import {Spinner} from '@instructure/ui-spinner'
 import {IconPublishSolid, IconUnpublishedLine, IconCheckSolid} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {Course, Teacher} from '../../types/course'
+import type {Course} from '../../types/course'
+import {Badge} from '@instructure/ui-badge'
 
 const I18n = createI18nScope('accessibility_course_statistics')
 
@@ -61,14 +63,14 @@ const StatusCell: React.FC<{workflowState: Course['workflow_state']}> = ({workfl
   const {tooltip, classname, icon} = getStatusDisplay(workflowState)
 
   return (
-    <Table.Cell textAlign="center">
+    <Table.RowHeader textAlign="center">
       <span className={`published-status ${classname}`}>
         <Tooltip renderTip={tooltip}>
           {icon}
           <ScreenReaderContent>{tooltip}</ScreenReaderContent>
         </Tooltip>
       </span>
-    </Table.Cell>
+    </Table.RowHeader>
   )
 }
 
@@ -89,7 +91,7 @@ const TermCell: React.FC<{termName?: string}> = ({termName}) => (
   <Table.Cell>{termName || ''}</Table.Cell>
 )
 
-const TeachersCell: React.FC<{teachers?: Teacher[]}> = ({teachers}) => {
+const TeachersCell: React.FC<{teachers?: Course['teachers']}> = ({teachers}) => {
   const [showAll, setShowAll] = useState(false)
 
   if (!teachers || teachers.length === 0) {
@@ -142,11 +144,55 @@ const StudentCountCell: React.FC<{count?: number}> = ({count}) => (
   <Table.Cell>{count ?? 0}</Table.Cell>
 )
 
+const IssuesCell: React.FC<{statistic?: Course['accessibility_course_statistic']}> = ({
+  statistic,
+}) => {
+  if (
+    !statistic ||
+    statistic.workflow_state === 'initialized' ||
+    statistic.workflow_state === 'deleted'
+  ) {
+    return <Table.Cell>{I18n.t('No report')}</Table.Cell>
+  }
+
+  if (statistic.workflow_state === 'in_progress' || statistic.workflow_state === 'queued') {
+    return (
+      <Table.Cell>
+        <Spinner renderTitle={I18n.t('Checking...')} size="x-small" margin="0 x-small 0 0" />
+        {I18n.t('Checking...')}
+      </Table.Cell>
+    )
+  }
+
+  if (statistic.workflow_state === 'active') {
+    const activeIssueCount = statistic.active_issue_count ?? 0
+    return activeIssueCount === 0 ? (
+      <Table.Cell>
+        <span className="published-status published-course">
+          <IconPublishSolid size="x-small" />
+          <ScreenReaderContent>{I18n.t('No issues')}</ScreenReaderContent>
+        </span>
+      </Table.Cell>
+    ) : (
+      <Table.Cell>
+        <Badge standalone={true} variant="danger" count={activeIssueCount}></Badge>
+      </Table.Cell>
+    )
+  }
+
+  if (statistic.workflow_state === 'failed') {
+    return <Table.Cell>{I18n.t('Failed')}</Table.Cell>
+  }
+
+  return <Table.Cell />
+}
+
 export const CoursesTableRow: React.FC<CoursesTableRowProps> = ({course, showSISIds}) => {
   return (
     <Table.Row key={course.id}>
       <StatusCell workflowState={course.workflow_state} />
       <CourseNameCell courseId={course.id} courseName={course.name} />
+      <IssuesCell statistic={course.accessibility_course_statistic} />
       {showSISIds && <SISIdCell sisId={course.sis_course_id} />}
       <TermCell termName={course.term?.name} />
       <TeachersCell teachers={course.teachers} />

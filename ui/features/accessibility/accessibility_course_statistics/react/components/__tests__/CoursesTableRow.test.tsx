@@ -294,4 +294,237 @@ describe('CoursesTableRow', () => {
       expect(screen.getByText('0')).toBeInTheDocument()
     })
   })
+
+  describe('Issues column', () => {
+    it('shows "No report" when statistic is undefined', () => {
+      const course = createMockCourse({accessibility_course_statistic: undefined})
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      expect(screen.getByText('No report')).toBeInTheDocument()
+    })
+
+    it('shows "No report" when statistic is null', () => {
+      const course = createMockCourse({accessibility_course_statistic: null})
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      expect(screen.getByText('No report')).toBeInTheDocument()
+    })
+
+    it('shows "No report" when workflow_state is initialized', () => {
+      const course = createMockCourse({
+        accessibility_course_statistic: {
+          id: 1,
+          course_id: 1,
+          active_issue_count: 0,
+          workflow_state: 'initialized',
+          created_at: '2026-01-07T12:00:00Z',
+          updated_at: '2026-01-07T12:00:00Z',
+        },
+      })
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      expect(screen.getByText('No report')).toBeInTheDocument()
+    })
+
+    it('shows "No report" when workflow_state is deleted', () => {
+      const course = createMockCourse({
+        accessibility_course_statistic: {
+          id: 1,
+          course_id: 1,
+          active_issue_count: 5,
+          workflow_state: 'deleted',
+          created_at: '2026-01-07T12:00:00Z',
+          updated_at: '2026-01-07T12:00:00Z',
+        },
+      })
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      expect(screen.getByText('No report')).toBeInTheDocument()
+    })
+
+    it('shows spinner and "Checking..." when workflow_state is in_progress', () => {
+      const course = createMockCourse({
+        accessibility_course_statistic: {
+          id: 1,
+          course_id: 1,
+          active_issue_count: null,
+          workflow_state: 'in_progress',
+          created_at: '2026-01-07T12:00:00Z',
+          updated_at: '2026-01-07T12:00:00Z',
+        },
+      })
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      const checkingElements = screen.getAllByText('Checking...')
+      expect(checkingElements.length).toBeGreaterThan(0)
+    })
+
+    it('shows spinner and "Checking..." when workflow_state is queued', () => {
+      const course = createMockCourse({
+        accessibility_course_statistic: {
+          id: 1,
+          course_id: 1,
+          active_issue_count: null,
+          workflow_state: 'queued',
+          created_at: '2026-01-07T12:00:00Z',
+          updated_at: '2026-01-07T12:00:00Z',
+        },
+      })
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      const checkingElements = screen.getAllByText('Checking...')
+      expect(checkingElements.length).toBeGreaterThan(0)
+    })
+
+    it('shows published icon when workflow_state is active and active_issue_count is 0', () => {
+      const course = createMockCourse({
+        accessibility_course_statistic: {
+          id: 1,
+          course_id: 1,
+          active_issue_count: 0,
+          workflow_state: 'active',
+          created_at: '2026-01-07T12:00:00Z',
+          updated_at: '2026-01-07T12:00:00Z',
+        },
+      })
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      const noIssuesElements = screen.getAllByText('No issues')
+      expect(noIssuesElements.length).toBeGreaterThan(0)
+    })
+
+    it('shows published icon when workflow_state is active and active_issue_count is null', () => {
+      const course = createMockCourse({
+        accessibility_course_statistic: {
+          id: 1,
+          course_id: 1,
+          active_issue_count: null,
+          workflow_state: 'active',
+          created_at: '2026-01-07T12:00:00Z',
+          updated_at: '2026-01-07T12:00:00Z',
+        },
+      })
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      const noIssuesElements = screen.getAllByText('No issues')
+      expect(noIssuesElements.length).toBeGreaterThan(0)
+    })
+
+    it('shows published icon when workflow_state is active and active_issue_count is undefined', () => {
+      const course = createMockCourse({
+        accessibility_course_statistic: {
+          id: 1,
+          course_id: 1,
+          active_issue_count: undefined as any,
+          workflow_state: 'active',
+          created_at: '2026-01-07T12:00:00Z',
+          updated_at: '2026-01-07T12:00:00Z',
+        },
+      })
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      const noIssuesElements = screen.getAllByText('No issues')
+      expect(noIssuesElements.length).toBeGreaterThan(0)
+    })
+
+    it('shows badge with count when workflow_state is active and active_issue_count > 0', () => {
+      const course = createMockCourse({
+        accessibility_course_statistic: {
+          id: 1,
+          course_id: 1,
+          active_issue_count: 5,
+          workflow_state: 'active',
+          created_at: '2026-01-07T12:00:00Z',
+          updated_at: '2026-01-07T12:00:00Z',
+        },
+      })
+      const {container} = render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      const badge = container.querySelector('[class*="badge"]')
+      expect(badge).toBeInTheDocument()
+      expect(badge?.textContent).toBe('5')
+    })
+
+    it('shows "Failed" when workflow_state is failed', () => {
+      const course = createMockCourse({
+        accessibility_course_statistic: {
+          id: 1,
+          course_id: 1,
+          active_issue_count: null,
+          workflow_state: 'failed',
+          created_at: '2026-01-07T12:00:00Z',
+          updated_at: '2026-01-07T12:00:00Z',
+        },
+      })
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      expect(screen.getByText('Failed')).toBeInTheDocument()
+    })
+  })
 })

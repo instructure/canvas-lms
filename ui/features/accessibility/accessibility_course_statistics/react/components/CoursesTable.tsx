@@ -37,6 +37,7 @@ export const CoursesTable: React.FC<CoursesTableProps> = ({courses}) => {
         <Table.Row>
           <Table.ColHeader id="header-course-status">{I18n.t('Status')}</Table.ColHeader>
           <Table.ColHeader id="header-course-name">{I18n.t('Course')}</Table.ColHeader>
+          <Table.ColHeader id="header-active-issue-count">{I18n.t('Issues')}</Table.ColHeader>
           {showSISIds && <Table.ColHeader id="header-sis-id">{I18n.t('SIS ID')}</Table.ColHeader>}
           <Table.ColHeader id="header-term">{I18n.t('Term')}</Table.ColHeader>
           <Table.ColHeader id="header-teacher">{I18n.t('Teacher')}</Table.ColHeader>
