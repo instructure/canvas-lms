@@ -19,19 +19,19 @@
 import {render, waitFor} from '@testing-library/react'
 import {type MockedFunction} from 'vitest'
 import LearningMastery from '../index'
-import useRollups from '../hooks/useRollups'
+import useRollups from '@canvas/outcomes/react/hooks/useRollups'
 import {useGradebookSettings} from '../hooks/useGradebookSettings'
 import {useStudents} from '../hooks/useStudents'
 import {useContributingScores} from '../hooks/useContributingScores'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {Rating, Student, Outcome, StudentRollupData} from '../types/rollup'
-import {SortOrder, SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '../utils/constants'
+import {Rating, Student, Outcome, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
+import {SortOrder, SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
 import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../__fixtures__/rollups'
 import {saveLearningMasteryGradebookSettings} from '../apiClient'
 
 vi.mock('../apiClient')
 
-vi.mock('../hooks/useRollups')
+vi.mock('@canvas/outcomes/react/hooks/useRollups')
 vi.mock('../hooks/useGradebookSettings')
 vi.mock('../hooks/useStudents')
 vi.mock('../hooks/useContributingScores')

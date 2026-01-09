@@ -22,7 +22,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconMoreLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
-import {CELL_HEIGHT, COLUMN_WIDTH} from '../../utils/constants'
+import {CELL_HEIGHT, COLUMN_WIDTH} from '@canvas/outcomes/react/utils/constants'
 import TruncateWithTooltip from '@canvas/instui-bindings/react/TruncateWithTooltip'
 
 export interface ColumnHeaderProps {

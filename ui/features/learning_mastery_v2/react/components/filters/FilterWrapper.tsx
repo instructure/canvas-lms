@@ -17,10 +17,13 @@
  */
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-import {Pagination} from '../../types/rollup'
+import {Pagination} from '@canvas/outcomes/react/types/rollup'
 import {TotalStudentText} from '../pagination/TotalStudentText'
 import {StudentPerPageSelector} from '../pagination/StudentPerPageSelector'
-import {DEFAULT_STUDENTS_PER_PAGE, STUDENTS_PER_PAGE_OPTIONS} from '../../utils/constants'
+import {
+  DEFAULT_STUDENTS_PER_PAGE,
+  STUDENTS_PER_PAGE_OPTIONS,
+} from '@canvas/outcomes/react/utils/constants'
 
 interface FilterWrapperProps {
   pagination?: Pagination

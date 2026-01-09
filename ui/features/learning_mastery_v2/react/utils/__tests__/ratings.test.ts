@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {findRating} from '../ratings'
-import {Rating} from '../../types/rollup'
+import {findRating} from '@canvas/outcomes/react/utils/ratings'
+import {Rating} from '@canvas/outcomes/react/types/rollup'
 
 describe('findRating', () => {
   const ratings: Rating[] = [

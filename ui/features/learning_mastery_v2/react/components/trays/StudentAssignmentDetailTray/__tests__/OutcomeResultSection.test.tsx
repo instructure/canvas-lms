@@ -21,7 +21,7 @@ import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import fetchMock from 'fetch-mock'
 import {OutcomeResultSection, OutcomeResultSectionProps} from '../OutcomeResultSection'
-import {Outcome, StudentRollupData} from '../../../../types/rollup'
+import {Outcome, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({

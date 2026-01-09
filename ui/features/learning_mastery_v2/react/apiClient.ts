@@ -17,79 +17,8 @@
  */
 import axios from '@canvas/axios'
 import {AxiosResponse} from 'axios'
-import {
-  DEFAULT_STUDENTS_PER_PAGE,
-  SortOrder,
-  SortBy,
-  GradebookSettings,
-  DisplayFilter,
-} from './utils/constants'
-import {Student, Outcome} from './types/rollup'
-
-/**
- * Parameters for outcome rollups API
- */
-interface RollupParams {
-  rating_percents: boolean
-  per_page: number
-  exclude: string[]
-  include: string[]
-  sort_by: string
-  sort_order: string
-  page: number
-  add_defaults?: boolean
-  sort_outcome_id?: string
-  sort_alignment_id?: string
-  user_ids?: number[]
-}
-
-/**
- * Load outcome rollups for a course
- * @param courseId - The ID of the course
- * @param gradebookFilters - Filters to exclude from the results
- * @param needDefaults - Whether to include default outcomes
- * @param page - The page number to retrieve
- * @param perPage - The number of results per page
- * @param sortOrder - The order to sort the results by
- * @param sortBy - The field to sort the results by
- * @param sortOutcomeId - The ID of the outcome to sort by (when sortBy is 'outcome')
- * @param selectedUserIds - Array of user IDs to filter by (optional)
- * @param selectedOutcomeIds - Array of outcome IDs to filter by (optional)
- * @param sortAlignmentId - The ID of the alignment to sort by (when sortBy is 'contributing_score')
- * @returns A promise that resolves to the API response
- */
-export const loadRollups = (
-  courseId: string | number,
-  gradebookFilters: string[],
-  needDefaults: boolean = false,
-  page: number = 1,
-  perPage: number = DEFAULT_STUDENTS_PER_PAGE,
-  sortOrder: SortOrder = SortOrder.ASC,
-  sortBy: string = SortBy.SortableName,
-  sortOutcomeId?: string,
-  selectedUserIds?: number[],
-  selectedOutcomeIds?: string[],
-  sortAlignmentId?: string,
-): Promise<AxiosResponse> => {
-  const params: {params: RollupParams} = {
-    params: {
-      rating_percents: true,
-      per_page: perPage,
-      exclude: gradebookFilters,
-      include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
-      sort_by: sortBy,
-      sort_order: sortOrder,
-      page,
-      ...(needDefaults && {add_defaults: true}),
-      ...(sortOutcomeId && {sort_outcome_id: sortOutcomeId}),
-      ...(sortAlignmentId && {sort_alignment_id: sortAlignmentId}),
-      ...(selectedUserIds && selectedUserIds.length > 0 && {user_ids: selectedUserIds}),
-      ...(selectedOutcomeIds && selectedOutcomeIds.length > 0 && {outcome_ids: selectedOutcomeIds}),
-    },
-  }
-
-  return axios.get(`/api/v1/courses/${courseId}/outcome_rollups`, params)
-}
+import {GradebookSettings, DisplayFilter} from '@canvas/outcomes/react/utils/constants'
+import {Student, Outcome} from '@canvas/outcomes/react/types/rollup'
 
 /**
  * Parameters for CSV export

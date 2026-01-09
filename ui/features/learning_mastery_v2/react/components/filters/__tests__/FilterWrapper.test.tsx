@@ -19,7 +19,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {FilterWrapper} from '../FilterWrapper'
-import {Pagination} from '../../../types/rollup'
+import {Pagination} from '@canvas/outcomes/react/types/rollup'
 
 const mockPagination: Pagination = {
   currentPage: 1,

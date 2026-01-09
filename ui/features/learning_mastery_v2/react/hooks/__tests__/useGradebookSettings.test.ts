@@ -26,7 +26,7 @@ import {
   NameDisplayFormat,
   ScoreDisplayFormat,
   OutcomeArrangement,
-} from '../../utils/constants'
+} from '@canvas/outcomes/react/utils/constants'
 
 vi.mock('../../apiClient')
 
@@ -70,9 +70,7 @@ describe('useGradebookSettings', () => {
   })
 
   it('sets default settings on error', async () => {
-    vi
-      .spyOn(apiClient, 'loadLearningMasteryGradebookSettings')
-      .mockRejectedValue(new Error('fail'))
+    vi.spyOn(apiClient, 'loadLearningMasteryGradebookSettings').mockRejectedValue(new Error('fail'))
     const {result, waitForNextUpdate} = renderHook(() => useGradebookSettings(courseId))
     await waitForNextUpdate()
     expect(result.current.settings).toEqual(DEFAULT_GRADEBOOK_SETTINGS)

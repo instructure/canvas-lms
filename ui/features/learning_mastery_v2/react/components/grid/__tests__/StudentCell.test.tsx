@@ -22,8 +22,8 @@ import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {StudentCell, StudentCellProps} from '../StudentCell'
-import {Student} from '../../../types/rollup'
-import {SecondaryInfoDisplay, NameDisplayFormat} from '../../../utils/constants'
+import {Student} from '@canvas/outcomes/react/types/rollup'
+import {SecondaryInfoDisplay, NameDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 import {MOCK_STUDENTS} from '../../../__fixtures__/rollups'
 
 // Helper to render with QueryClientProvider

@@ -22,13 +22,12 @@ import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {
-  StudentCellPopover,
-  StudentCellPopoverProps,
   pickBucketForScore,
   calculateScores,
-} from '../StudentCellPopover'
+} from '@canvas/outcomes/react/hooks/useStudentMasteryScores'
+import {StudentCellPopover, StudentCellPopoverProps} from '../StudentCellPopover'
 import {MOCK_STUDENTS, MOCK_OUTCOMES} from '../../../__fixtures__/rollups'
-import {StudentRollupData, Outcome, Student} from '../../../types/rollup'
+import {StudentRollupData, Outcome, Student} from '@canvas/outcomes/react/types/rollup'
 
 // Mock the MessageStudents component
 vi.mock('@canvas/message-students-modal', () => {

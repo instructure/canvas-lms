@@ -17,8 +17,8 @@
  */
 
 import axios from '@canvas/axios'
+import {loadRollups} from '@canvas/outcomes/react/apiClient'
 import {
-  loadRollups,
   exportCSV,
   saveLearningMasteryGradebookSettings,
   loadCourseUsers,
@@ -33,7 +33,7 @@ import {
   NameDisplayFormat,
   ScoreDisplayFormat,
   OutcomeArrangement,
-} from '../utils/constants'
+} from '@canvas/outcomes/react/utils/constants'
 import {type Mocked} from 'vitest'
 
 vi.mock('@canvas/axios')
