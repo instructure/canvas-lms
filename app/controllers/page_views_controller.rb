@@ -308,10 +308,10 @@ class PageViewsController < ApplicationController
     # Date range is irrelevant - Query reads sequentially until LIMIT is reached, then stops
     # RCU formula: DynamoDB uses eventually consistent reads (50% cost of strongly consistent)
     # Eventually consistent: 1 RCU per 8192 bytes, avg line = 592 bytes, lines per RCU ≈ 13.838
-    # Rate limit cost = actual RCU * 5 multiplier (balanced: permissive but protective)
+    # Rate limit cost = actual RCU * 2 multiplier (permissive: higher throughput for clients)
     per_page = (params[:per_page] || 10).to_i.clamp(1, 200)
     actual_rcu = (per_page * 0.0723).ceil
-    final_cost = actual_rcu * 5
+    final_cost = actual_rcu * 2
 
     increment_request_cost(final_cost)
 
