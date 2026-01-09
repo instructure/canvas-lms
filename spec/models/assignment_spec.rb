@@ -1736,12 +1736,10 @@ describe Assignment do
         end
       end
 
-      context "and the tool proxy has been migrated to a ContextExternalTool" do
+      context "and the tool proxy migration has started" do
         before do
           migrated_tool = @course.context_external_tools.create!(name: "migrated tool", url: "http://www.example.com", consumer_key: "key", shared_secret: "secret")
           message_handler.resource_handler.tool_proxy.update!(migrated_to_context_external_tool: migrated_tool)
-          # Add an LTI asset processor to satisfy the migrated? check
-          @assignment.lti_asset_processors.create!(context_external_tool: migrated_tool, custom: { migrated_from_cpf: "true" })
         end
 
         it "returns nil instead of the message handler" do
