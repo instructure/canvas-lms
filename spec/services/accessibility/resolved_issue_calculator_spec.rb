@@ -17,25 +17,25 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe Accessibility::ActiveIssueCalculator do
+describe Accessibility::ResolvedIssueCalculator do
   let(:course) { course_model }
   let(:statistic) { AccessibilityCourseStatistic.create!(course:) }
   let(:service) { described_class.new(statistic:) }
 
   describe "#calculate" do
-    context "when there are no issues" do
+    context "when there are no resolved issues" do
       it "returns 0" do
         result = service.calculate
         expect(result).to eq(0)
       end
     end
 
-    context "when there are active issues" do
+    context "when there are resolved issues" do
       before do
-        3.times { accessibility_issue_model(course:, workflow_state: "active") }
+        3.times { accessibility_issue_model(course:, workflow_state: "resolved") }
       end
 
-      it "returns the count of active issues" do
+      it "returns the count of resolved issues" do
         result = service.calculate
         expect(result).to eq(3)
       end
@@ -48,9 +48,9 @@ describe Accessibility::ActiveIssueCalculator do
         3.times { accessibility_issue_model(course:, workflow_state: "dismissed") }
       end
 
-      it "returns only the count of active issues" do
+      it "returns only the count of resolved issues" do
         result = service.calculate
-        expect(result).to eq(5)
+        expect(result).to eq(2)
       end
     end
 
@@ -58,11 +58,11 @@ describe Accessibility::ActiveIssueCalculator do
       let(:other_course) { course_model }
 
       before do
-        3.times { accessibility_issue_model(course:, workflow_state: "active") }
-        5.times { accessibility_issue_model(course: other_course, workflow_state: "active") }
+        3.times { accessibility_issue_model(course:, workflow_state: "resolved") }
+        5.times { accessibility_issue_model(course: other_course, workflow_state: "resolved") }
       end
 
-      it "returns count only for the specified course" do
+      it "returns resolved count only for the specified course" do
         result = service.calculate
         expect(result).to eq(3)
       end

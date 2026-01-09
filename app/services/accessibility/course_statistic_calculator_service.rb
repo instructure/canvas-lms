@@ -18,10 +18,11 @@
 
 class Accessibility::CourseStatisticCalculatorService
   SCAN_TAG = "accessibility_course_statistics"
-  ERROR_TAG = "accessibility_course_statistics"
+  ERROR_TAG = "accessibility_course_statistics_error"
+  DELAY_SETTING = "accessibility_course_statistics_calculation_delay"
 
   def self.calculation_delay
-    Setting.get("accessibility_course_statistics_calculation_delay", 5.minutes.to_s).to_i.seconds
+    Setting.get(DELAY_SETTING, 5.minutes.to_s).to_i.seconds
   end
 
   def self.queue_calculation(course)
@@ -29,7 +30,7 @@ class Accessibility::CourseStatisticCalculatorService
 
     return statistic if statistic.calculation_pending?
 
-    statistic.update!(workflow_state: "queued")
+    statistic.update!(workflow_state: :queued)
 
     delay(
       n_strand: [SCAN_TAG, course.account.global_id],
@@ -50,13 +51,18 @@ class Accessibility::CourseStatisticCalculatorService
   end
 
   def calculate
-    @statistic.update!(workflow_state: "in_progress")
+    @statistic.update!(workflow_state: :in_progress)
 
-    Accessibility::ActiveIssueCalculator.new(statistic: @statistic).calculate
+    active_issue_count = Accessibility::ActiveIssueCalculator.new(statistic: @statistic).calculate
+    resolved_issue_count = Accessibility::ResolvedIssueCalculator.new(statistic: @statistic).calculate
 
-    @statistic.update!(workflow_state: "active")
+    @statistic.update!(
+      workflow_state: :active,
+      active_issue_count:,
+      resolved_issue_count:
+    )
   rescue => e
-    @statistic.update!(workflow_state: "failed")
+    @statistic.update!(workflow_state: :failed)
     ErrorReport.log_exception(
       ERROR_TAG,
       e,
