@@ -18,33 +18,21 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen, waitFor, cleanup} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {useStudentMasteryScores} from '@canvas/outcomes/react/hooks/useStudentMasteryScores'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import Reporting from '../index'
 import useRollups from '@canvas/outcomes/react/hooks/useRollups'
+import {vi} from 'vitest'
 
-jest.mock('@canvas/outcomes/react/hooks/useCanvasContext')
-jest.mock('@canvas/outcomes/react/hooks/useStudentMasteryScores')
-jest.mock('@canvas/outcomes/react/hooks/useRollups')
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-    },
-  },
-})
-
-const renderReporting = (props = {}) =>
-  render(
-    <QueryClientProvider client={queryClient}>
-      <Reporting {...props} />
-    </QueryClientProvider>,
-  )
+vi.mock('@canvas/outcomes/react/hooks/useCanvasContext')
+vi.mock('@canvas/outcomes/react/hooks/useStudentMasteryScores')
+vi.mock('@canvas/outcomes/react/hooks/useRollups')
 
 describe('Reporting', () => {
+  let queryClient
+
   const mockStudent = {
     id: '123',
     name: 'Jane Smith',
@@ -70,45 +58,56 @@ describe('Reporting', () => {
     },
   }
 
-  let mockSearch = '?student_id=123'
-  const originalURLSearchParams = global.URLSearchParams
+  const defaultRollupsReturn = {
+    outcomes: [],
+    rollups: [],
+    students: [],
+    isLoading: false,
+    error: null,
+  }
 
-  beforeAll(() => {
-    global.URLSearchParams = class extends originalURLSearchParams {
-      constructor(_search) {
-        super(mockSearch)
-      }
-    }
-  })
+  const setWindowSearch = search => {
+    delete window.location
+    window.location = {search}
+  }
 
-  afterAll(() => {
-    global.URLSearchParams = originalURLSearchParams
-  })
+  const renderReporting = (props = {}) =>
+    render(
+      <QueryClientProvider client={queryClient}>
+        <Reporting {...props} />
+      </QueryClientProvider>,
+    )
 
   beforeEach(() => {
-    mockSearch = '?student_id=123'
+    // Create fresh QueryClient for each test
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    })
 
+    // Set default window.location.search
+    setWindowSearch('?student_id=123')
+
+    // Set up default mocks
     useCanvasContext.mockReturnValue({
       contextId: '1',
       accountLevelMasteryScalesFF: true,
     })
+
+    useRollups.mockReturnValue(defaultRollupsReturn)
+    useStudentMasteryScores.mockReturnValue(null)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    queryClient.clear()
+    cleanup()
+    vi.clearAllMocks()
   })
 
   it('renders empty view when no student_id is in URL', () => {
-    mockSearch = ''
-    useRollups.mockReturnValue({
-      outcomes: [],
-      rollups: [],
-      students: [],
-      isLoading: false,
-      error: null,
-    })
-    useStudentMasteryScores.mockReturnValue(null)
+    setWindowSearch('')
 
     renderReporting()
 
@@ -118,13 +117,9 @@ describe('Reporting', () => {
 
   it('shows loading spinner while fetching data', () => {
     useRollups.mockReturnValue({
-      outcomes: [],
-      rollups: [],
-      students: [],
+      ...defaultRollupsReturn,
       isLoading: true,
-      error: null,
     })
-    useStudentMasteryScores.mockReturnValue(null)
 
     renderReporting()
 
@@ -133,11 +128,8 @@ describe('Reporting', () => {
 
   it('renders StudentMasteryHeader with student data when loaded', async () => {
     useRollups.mockReturnValue({
-      outcomes: [],
-      rollups: [],
+      ...defaultRollupsReturn,
       students: [mockStudent],
-      isLoading: false,
-      error: null,
     })
     useStudentMasteryScores.mockReturnValue(mockScores)
 
@@ -150,11 +142,8 @@ describe('Reporting', () => {
 
   it('renders StudentMasteryHeader with correct mastery level', async () => {
     useRollups.mockReturnValue({
-      outcomes: [],
-      rollups: [],
+      ...defaultRollupsReturn,
       students: [mockStudent],
-      isLoading: false,
-      error: null,
     })
     useStudentMasteryScores.mockReturnValue(mockScores)
 
@@ -169,11 +158,8 @@ describe('Reporting', () => {
 
   it('renders StudentMasteryHeader with buckets', async () => {
     useRollups.mockReturnValue({
-      outcomes: [],
-      rollups: [],
+      ...defaultRollupsReturn,
       students: [mockStudent],
-      isLoading: false,
-      error: null,
     })
     useStudentMasteryScores.mockReturnValue(mockScores)
 
@@ -186,15 +172,6 @@ describe('Reporting', () => {
   })
 
   it('does not render StudentMasteryHeader when student not found', async () => {
-    useRollups.mockReturnValue({
-      outcomes: [],
-      rollups: [],
-      students: [],
-      isLoading: false,
-      error: null,
-    })
-    useStudentMasteryScores.mockReturnValue(null)
-
     renderReporting()
 
     await waitFor(() => {
@@ -204,13 +181,9 @@ describe('Reporting', () => {
 
   it('does not render StudentMasteryHeader when scores are null', async () => {
     useRollups.mockReturnValue({
-      outcomes: [],
-      rollups: [],
+      ...defaultRollupsReturn,
       students: [mockStudent],
-      isLoading: false,
-      error: null,
     })
-    useStudentMasteryScores.mockReturnValue(null)
 
     renderReporting()
 
@@ -220,15 +193,6 @@ describe('Reporting', () => {
   })
 
   it('calls useRollups with correct parameters', () => {
-    useRollups.mockReturnValue({
-      outcomes: [],
-      rollups: [],
-      students: [],
-      isLoading: false,
-      error: null,
-    })
-    useStudentMasteryScores.mockReturnValue(null)
-
     renderReporting()
 
     expect(useRollups).toHaveBeenCalledWith({
@@ -240,12 +204,14 @@ describe('Reporting', () => {
   })
 
   it('calls useStudentMasteryScores with correct parameters', async () => {
+    const outcomes = [{id: '1', title: 'Outcome 1'}]
+    const rollups = [{studentId: '123', outcomeRollups: []}]
+
     useRollups.mockReturnValue({
-      outcomes: [{id: '1', title: 'Outcome 1'}],
-      rollups: [{studentId: '123', outcomeRollups: []}],
+      ...defaultRollupsReturn,
+      outcomes,
+      rollups,
       students: [mockStudent],
-      isLoading: false,
-      error: null,
     })
     useStudentMasteryScores.mockReturnValue(mockScores)
 
@@ -254,22 +220,14 @@ describe('Reporting', () => {
     await waitFor(() => {
       expect(useStudentMasteryScores).toHaveBeenCalledWith({
         student: mockStudent,
-        outcomes: [{id: '1', title: 'Outcome 1'}],
-        rollups: [{studentId: '123', outcomeRollups: []}],
+        outcomes,
+        rollups,
       })
     })
   })
 
   it('parses student_id from URL correctly', () => {
-    mockSearch = '?student_id=456'
-    useRollups.mockReturnValue({
-      outcomes: [],
-      rollups: [],
-      students: [],
-      isLoading: false,
-      error: null,
-    })
-    useStudentMasteryScores.mockReturnValue(null)
+    setWindowSearch('?student_id=456')
 
     renderReporting()
 
@@ -281,15 +239,11 @@ describe('Reporting', () => {
   })
 
   it('handles missing student gracefully', async () => {
-    mockSearch = '?student_id=999'
+    setWindowSearch('?student_id=999')
     useRollups.mockReturnValue({
-      outcomes: [],
-      rollups: [],
+      ...defaultRollupsReturn,
       students: [mockStudent],
-      isLoading: false,
-      error: null,
     })
-    useStudentMasteryScores.mockReturnValue(null)
 
     renderReporting()
 
@@ -299,7 +253,7 @@ describe('Reporting', () => {
   })
 
   it('renders the "All Students" link with correct href', () => {
-    const {getByTestId} = render(<Reporting />)
+    const {getByTestId} = renderReporting()
     const link = getByTestId('all-students-link')
     expect(link).toBeInTheDocument()
     expect(link).toHaveAttribute('href', 'gradebook')

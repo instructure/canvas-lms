@@ -16,13 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import 'jquery-migrate'
+// IMPORTANT: Mock must be hoisted before other imports
+import {vi} from 'vitest'
 
 // Mock the RCE loader to prevent dynamic import timeouts during tests
 // The RCE preloadRemoteModule() is called at the module level when EditView is imported,
 // causing Vitest worker timeouts if not mocked
 vi.mock('@canvas/rce/serviceRCELoader')
+
+import $ from 'jquery'
+import 'jquery-migrate'
 
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
@@ -141,7 +144,7 @@ const editView = (assignmentOpts = {}) => {
   return app
 }
 
-describe('EditView - Peer Review Integration', () => {
+describe('EditView - Peer Review Integration - Error Positioning', () => {
   let view
 
   beforeEach(() => {
@@ -149,6 +152,7 @@ describe('EditView - Peer Review Integration', () => {
     // React scheduler tasks and debounced operations firing after test teardown
     vi.useFakeTimers()
 
+    // Clear any existing fixtures
     document.body.innerHTML = '<div id="fixtures"></div>'
 
     fakeENV.setup({
@@ -181,191 +185,25 @@ describe('EditView - Peer Review Integration', () => {
     vi.runAllTimers()
     vi.useRealTimers()
 
+    // Clean up view and all child views
     if (view) {
       view.remove()
+      view = null
     }
-    fakeENV.teardown()
+
+    // Clean up any jQuery event handlers
+    $(document).off()
+    $(window).off()
+
+    // Clean up DOM
+    const fixtures = document.getElementById('fixtures')
+    if (fixtures) {
+      fixtures.innerHTML = ''
+    }
     document.body.innerHTML = ''
-    vi.restoreAllMocks()
-  })
 
-  describe('validateBeforeSave', () => {
-    it('calls validatePeerReviewDetails when peer reviews are enabled', () => {
-      const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
-      peerReviewCheckbox.checked = true
-
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      const mockValidate = vi.fn().mockReturnValue(true)
-      peerReviewDetailsEl.validatePeerReviewDetails = mockValidate
-
-      const errors = view.validateBeforeSave({}, {})
-
-      expect(mockValidate).toHaveBeenCalledTimes(1)
-      expect(errors.peer_review_details).toBeUndefined()
-    })
-
-    it('adds error when validatePeerReviewDetails returns false', () => {
-      const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
-      peerReviewCheckbox.checked = true
-
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      const mockValidate = vi.fn().mockReturnValue(false)
-      peerReviewDetailsEl.validatePeerReviewDetails = mockValidate
-
-      const errors = view.validateBeforeSave({}, {})
-
-      expect(mockValidate).toHaveBeenCalledTimes(1)
-      expect(errors.peer_review_details).toBe(true)
-    })
-
-    it('does not call validatePeerReviewDetails when peer reviews are disabled', () => {
-      const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
-      peerReviewCheckbox.checked = false
-
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      const mockValidate = vi.fn()
-      peerReviewDetailsEl.validatePeerReviewDetails = mockValidate
-
-      const errors = view.validateBeforeSave({}, {})
-
-      expect(mockValidate).not.toHaveBeenCalled()
-      expect(errors.peer_review_details).toBeUndefined()
-    })
-
-    it('does not call validatePeerReviewDetails when feature flag is disabled', () => {
-      ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
-
-      const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
-      peerReviewCheckbox.checked = true
-
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      const mockValidate = vi.fn()
-      peerReviewDetailsEl.validatePeerReviewDetails = mockValidate
-
-      const errors = view.validateBeforeSave({}, {})
-
-      expect(mockValidate).not.toHaveBeenCalled()
-      expect(errors.peer_review_details).toBeUndefined()
-    })
-
-    it('does not error when validatePeerReviewDetails function is not defined', () => {
-      const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
-      peerReviewCheckbox.checked = true
-
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      delete peerReviewDetailsEl.validatePeerReviewDetails
-
-      const errors = view.validateBeforeSave({}, {})
-
-      expect(errors.peer_review_details).toBeUndefined()
-    })
-
-    it('does not error when peer review element does not exist', () => {
-      const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
-      peerReviewCheckbox.checked = true
-
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      peerReviewDetailsEl.remove()
-
-      const errors = view.validateBeforeSave({}, {})
-
-      expect(errors.peer_review_details).toBeUndefined()
-    })
-  })
-
-  describe('showErrors', () => {
-    it('calls focusOnFirstError for peer_review_details errors', () => {
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      const mockFocus = vi.fn()
-      peerReviewDetailsEl.focusOnFirstError = mockFocus
-
-      const errors = {peer_review_details: true}
-      view.showErrors(errors)
-
-      expect(mockFocus).toHaveBeenCalledTimes(1)
-    })
-
-    it('does not call focusOnFirstError when feature flag is disabled', () => {
-      ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
-
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      const mockFocus = vi.fn()
-      peerReviewDetailsEl.focusOnFirstError = mockFocus
-
-      const errors = {peer_review_details: true}
-      view.showErrors(errors)
-
-      expect(mockFocus).not.toHaveBeenCalled()
-    })
-
-    it('does not call focusOnFirstError when focusOnFirstError function is not defined', () => {
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      delete peerReviewDetailsEl.focusOnFirstError
-
-      const errors = {peer_review_details: true}
-
-      expect(() => view.showErrors(errors)).not.toThrow()
-    })
-
-    it('does not call focusOnFirstError when peer review element does not exist', () => {
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      peerReviewDetailsEl.remove()
-
-      const errors = {peer_review_details: true}
-
-      expect(() => view.showErrors(errors)).not.toThrow()
-    })
-
-    it('only focuses once when shouldFocus is true', () => {
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      const mockFocus = vi.fn()
-      peerReviewDetailsEl.focusOnFirstError = mockFocus
-
-      const errors = {peer_review_details: true, name: [{message: 'Name is required'}]}
-      view.showErrors(errors)
-
-      expect(mockFocus).toHaveBeenCalledTimes(1)
-    })
-
-    it('does not display error container for peer_review_details', () => {
-      const peerReviewDetailsEl = document.getElementById(
-        'peer_reviews_allocation_and_grading_details',
-      )
-      peerReviewDetailsEl.focusOnFirstError = vi.fn()
-
-      const peerReviewDetailsErrors = document.createElement('div')
-      peerReviewDetailsErrors.id = 'peer_review_details_errors'
-      document.body.appendChild(peerReviewDetailsErrors)
-
-      const errors = {peer_review_details: true}
-      view.showErrors(errors)
-
-      expect(peerReviewDetailsErrors.innerHTML).toBe('')
-
-      document.body.removeChild(peerReviewDetailsErrors)
-    })
+    fakeENV.teardown()
+    vi.clearAllMocks()
   })
 
   describe('sortErrorsByVerticalScreenPosition', () => {
