@@ -458,7 +458,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
               <Badge
                 count={unreadReleaseNotesCount}
                 formatOutput={(count: string) =>
-                  (unreadReleaseNotesCount || 0) > 0 ? (
+                  (unreadReleaseNotesCount || 0) > 0 && !releaseNotesBadgeDisabled ? (
                     <AccessibleContent
                       alt={I18n.t(
                         {

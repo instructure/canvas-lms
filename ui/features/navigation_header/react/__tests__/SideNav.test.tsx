@@ -24,6 +24,22 @@ import type {ExternalTool} from '../utils'
 
 const queryClient = new QueryClient()
 
+const baseEnvConfig = {
+  current_user: {
+    id: '',
+    avatar_image_url: 'testSrc',
+    anonymous_id: '',
+    display_name: 'Test DisplayName',
+    html_url: '',
+    pronouns: '',
+  },
+  SETTINGS: {
+    collapse_global_nav: false,
+  },
+  K5_USER: false,
+  help_link_icon: 'help',
+}
+
 describe('SideNav', () => {
   afterEach(() => {
     cleanup()
@@ -31,23 +47,7 @@ describe('SideNav', () => {
   })
 
   beforeEach(() => {
-    fakeENV.setup({
-      current_user: {
-        id: '1',
-        avatar_image_url: 'testSrc',
-        anonymous_id: 'anon1',
-        display_name: 'Test DisplayName',
-        html_url: '/users/1',
-        pronouns: '',
-        fake_student: false,
-        avatar_is_fallback: false,
-      },
-      SETTINGS: {
-        collapse_global_nav: false,
-      },
-      K5_USER: false,
-      help_link_icon: 'help',
-    })
+    fakeENV.setup(baseEnvConfig)
   })
 
   it('renders', () => {
@@ -113,6 +113,10 @@ describe('SideNav', () => {
     })
 
     it('should render custom logo when theme has custom image', () => {
+      fakeENV.setup({
+        ...baseEnvConfig,
+        active_brand_config: {variables: {'ic-brand-header-image': 'some-url'}},
+      })
       render(
         <MockedQueryClientProvider client={queryClient}>
           <SideNav />
@@ -124,15 +128,8 @@ describe('SideNav', () => {
   })
 
   describe('Tests K5 User Features', () => {
-    beforeEach(() => {
-      window.ENV.K5_USER = true
-    })
-
-    afterAll(() => {
-      window.ENV.K5_USER = false
-    })
-
     it('should render text and icons for a K5 User', () => {
+      fakeENV.setup({...baseEnvConfig, K5_USER: true})
       render(
         <MockedQueryClientProvider client={queryClient}>
           <SideNav />
@@ -146,7 +143,7 @@ describe('SideNav', () => {
 
   describe('Test Help Icon variations', () => {
     it('should render HelpInfo icon', () => {
-      window.ENV.help_link_icon = InformationIconEnum.INFORMATION
+      fakeENV.setup({...baseEnvConfig, help_link_icon: InformationIconEnum.INFORMATION})
       render(
         <MockedQueryClientProvider client={queryClient}>
           <SideNav />
@@ -155,7 +152,7 @@ describe('SideNav', () => {
       expect(screen.getByTestId('HelpInfo')).toBeInTheDocument()
     })
     it('should render HelpFolder icon', () => {
-      window.ENV.help_link_icon = InformationIconEnum.FOLDER
+      fakeENV.setup({...baseEnvConfig, help_link_icon: InformationIconEnum.FOLDER})
       render(
         <MockedQueryClientProvider client={queryClient}>
           <SideNav />
@@ -165,7 +162,7 @@ describe('SideNav', () => {
     })
 
     it('should render HelpCog icon', () => {
-      window.ENV.help_link_icon = InformationIconEnum.COG
+      fakeENV.setup({...baseEnvConfig, help_link_icon: InformationIconEnum.COG})
       render(
         <MockedQueryClientProvider client={queryClient}>
           <SideNav />
@@ -174,7 +171,7 @@ describe('SideNav', () => {
       expect(screen.getByTestId('HelpCog')).toBeInTheDocument()
     })
     it('should render HelpLifePreserver icon', () => {
-      window.ENV.help_link_icon = InformationIconEnum.LIFE_SAVER
+      fakeENV.setup({...baseEnvConfig, help_link_icon: InformationIconEnum.LIFE_SAVER})
       render(
         <MockedQueryClientProvider client={queryClient}>
           <SideNav />
@@ -183,7 +180,7 @@ describe('SideNav', () => {
       expect(screen.getByTestId('HelpLifePreserver')).toBeInTheDocument()
     })
     it('should render default icon', () => {
-      window.ENV.help_link_icon = 'help'
+      fakeENV.setup({...baseEnvConfig, help_link_icon: 'help'})
       render(
         <MockedQueryClientProvider client={queryClient}>
           <SideNav />
@@ -335,6 +332,38 @@ describe('SideNav', () => {
       )
       const fallbackIcon = screen.getByTestId('IconExternalLinkLine')
       expect(fallbackIcon).toBeInTheDocument()
+    })
+  })
+
+  describe('Release Notes Badge', () => {
+    it('displays release notes badge when badge is enabled', () => {
+      queryClient.setQueryData(['unread_count', 'release_notes'], 2)
+      queryClient.setQueryData(['settings', 'release_notes_badge_disabled'], false)
+
+      render(
+        <MockedQueryClientProvider client={queryClient}>
+          <SideNav />
+        </MockedQueryClientProvider>,
+      )
+
+      const helpTray = screen.getByTestId('sidenav-container')
+      expect(helpTray).toBeInTheDocument()
+      expect(screen.getByText(/unread release notes/i)).toBeInTheDocument()
+    })
+
+    it('does not display release notes badge when badge is disabled', () => {
+      queryClient.setQueryData(['unread_count', 'release_notes'], 2)
+      queryClient.setQueryData(['settings', 'release_notes_badge_disabled'], true)
+
+      render(
+        <MockedQueryClientProvider client={queryClient}>
+          <SideNav />
+        </MockedQueryClientProvider>,
+      )
+
+      const helpTray = screen.getByTestId('sidenav-container')
+      expect(helpTray).toBeInTheDocument()
+      expect(screen.queryByText(/unread release notes/i)).not.toBeInTheDocument()
     })
   })
 })
