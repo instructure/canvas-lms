@@ -370,7 +370,7 @@ module SpeedGrader
                     version_json["submission"]["has_originality_report"] =
                       version.has_originality_report?
                     version_json["submission"]["has_plagiarism_tool"] =
-                      version.assignment.assignment_configuration_tool_lookup_ids.present?
+                      version.assignment.has_non_migrated_tool?
                     version_json["submission"]["has_originality_score"] =
                       version.originality_reports_for_display.any? do |o|
                         o.originality_score.present?

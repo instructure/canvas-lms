@@ -102,6 +102,20 @@ describe Types::AssignmentType do
 
   describe "hasPlagiarismTool" do
     it "returns true when assignment has a plagiarism tool configured" do
+      assignment.assignment_configuration_tool_lookups.create!(
+        tool_product_code: "product",
+        tool_vendor_code: "vendor",
+        tool_resource_type_code: "resource-type-code",
+        tool_type: "Lti::MessageHandler"
+      )
+      expect(assignment_type.resolve("hasPlagiarismTool")).to be true
+    end
+
+    it "returns false when assignment has no plagiarism tool configured" do
+      expect(assignment_type.resolve("hasPlagiarismTool")).to be false
+    end
+
+    it "returns false when CPF has been migrated" do
       tool = course.context_external_tools.create!(
         name: "Plagiarism Tool",
         url: "http://example.com",
@@ -112,10 +126,10 @@ describe Types::AssignmentType do
         tool:,
         tool_type: "ContextExternalTool"
       )
-      expect(assignment_type.resolve("hasPlagiarismTool")).to be true
-    end
 
-    it "returns false when assignment has no plagiarism tool configured" do
+      # Mock the migrated? method to return true
+      allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:migrated?).and_return(true)
+
       expect(assignment_type.resolve("hasPlagiarismTool")).to be false
     end
   end

@@ -468,7 +468,7 @@ module Types
 
     field :has_plagiarism_tool, Boolean, "Indicates if the assignment has LTI 2.0 plagiarism detection tool configured", null: false
     def has_plagiarism_tool
-      assignment.assignment_configuration_tool_lookup_ids.present?
+      assignment.has_non_migrated_tool?
     end
 
     field :muted, Boolean, null: true

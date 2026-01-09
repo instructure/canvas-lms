@@ -3612,6 +3612,40 @@ describe Submission do
       end
     end
 
+    describe "#originality_data with CPF migration" do
+      it "returns empty hash when cpf_migrated? is true" do
+        submission.assignment.assignment_configuration_tool_lookups.create!(
+          tool_product_code: "turnitin-lti",
+          tool_vendor_code: "turnitin.com",
+          tool_resource_type_code: "resource-type-code",
+          tool_type: "Lti::MessageHandler"
+        )
+        allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:migrated?).and_return(true)
+
+        originality_report.originality_report_url = "http://example.com"
+        originality_report.save!
+
+        expect(submission.originality_data).to eq({})
+      end
+
+      it "returns originality data when cpf_migrated? is false" do
+        submission.assignment.assignment_configuration_tool_lookups.create!(
+          tool_product_code: "turnitin-lti",
+          tool_vendor_code: "turnitin.com",
+          tool_resource_type_code: "resource-type-code",
+          tool_type: "Lti::MessageHandler"
+        )
+        allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:migrated?).and_return(false)
+
+        originality_report.originality_report_url = "http://example.com"
+        originality_report.save!
+
+        result = submission.originality_data
+        expect(result).to include(attachment.asset_string)
+        expect(result[attachment.asset_string][:report_url]).to eq originality_report.originality_report_url
+      end
+    end
+
     describe "#has_originality_report?" do
       let(:test_course) do
         test_course = course_model
