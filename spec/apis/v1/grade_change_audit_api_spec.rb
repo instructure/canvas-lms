@@ -50,6 +50,11 @@ describe "GradeChangeAudit API", type: :request do
       query_string << "per_page=#{arguments[:per_page]}"
     end
 
+    if (page = options.delete(:page))
+      arguments[:page] = page.to_s
+      query_string << "page=#{CGI.escape(arguments[:page])}"
+    end
+
     if (start_time = options.delete(:start_time))
       arguments[:start_time] = start_time.iso8601
       query_string << "start_time=#{arguments[:start_time]}"
@@ -572,6 +577,75 @@ describe "GradeChangeAudit API", type: :request do
 
     it "has pagination headers" do
       expect(response.headers["Link"]).to match(/rel="next"/)
+    end
+  end
+
+  context "when multiple records share the same timestamp" do
+    let(:test_record_count) { 10 }
+    let(:page_size) { 5 }
+
+    before do
+      # Use future timestamp to ensure test records appear on first pages
+      # (avoids interference from the @event created in global before block)
+      timestamp = 1.hour.from_now
+
+      @test_records = []
+      test_record_count.times do |i|
+        assignment = @course.assignments.create!(title: "Test Assignment #{i}", points_possible: 10)
+        submission = assignment.grade_student(@student, grade: i + 1, grader: @teacher).first
+
+        record = Auditors::GradeChange::Record.new(
+          "created_at" => timestamp,
+          "submission" => submission
+        )
+        @test_records << Auditors::GradeChange::Stream.insert(record)
+      end
+    end
+
+    it "returns all records across pages with no duplicates or gaps" do
+      # Fetch first two pages
+      json_page1 = fetch_for_context(@course, per_page: page_size)
+      link_header = response.headers["Link"]
+      next_url = link_header.match(/<([^>]+)>;\s*rel="next"/)[1]
+      next_page_value = CGI.parse(URI.parse(next_url).query)["page"].first
+
+      json_page2 = fetch_for_context(@course, per_page: page_size, page: next_page_value)
+
+      # Filter to just our test records (those with identical timestamps)
+      test_timestamp = @test_records.first.created_at.iso8601
+      test_events_page1 = json_page1["events"].select { |e| e["created_at"] == test_timestamp }
+      test_events_page2 = json_page2["events"].select { |e| e["created_at"] == test_timestamp }
+
+      test_ids_page1 = test_events_page1.pluck("id")
+      test_ids_page2 = test_events_page2.pluck("id")
+
+      # Should find all test records across both pages
+      total_test_events = (test_ids_page1 + test_ids_page2).size
+      expect(total_test_events).to eq(test_record_count),
+                                   "Expected all #{test_record_count} test records but got #{total_test_events}"
+
+      # Should have no duplicates
+      duplicates = test_ids_page1 & test_ids_page2
+      expect(duplicates).to be_empty, "Found duplicates: #{duplicates}"
+    end
+
+    it "uses array bookmark format with [timestamp, id]" do
+      fetch_for_context(@course, per_page: page_size)
+
+      link_header = response.headers["Link"]
+      next_url = link_header.match(/<([^>]+)>;\s*rel="next"/)[1]
+      bookmark_param = CGI.parse(URI.parse(next_url).query)["page"].first
+
+      # Decode bookmark (format: "bookmark:BASE64_JSON")
+      bookmark_data = bookmark_param.gsub(/^bookmark:/, "")
+      bookmark = JSONToken.decode(bookmark_data)
+
+      # Verify structure
+      expect(bookmark).to be_an(Array)
+      expect(bookmark.size).to eq(2)
+      expect(bookmark[0]).to be_a(String)
+      expect(bookmark[1]).to be_an(Integer)
+      expect { Time.zone.parse(bookmark[0]) }.not_to raise_error
     end
   end
 end

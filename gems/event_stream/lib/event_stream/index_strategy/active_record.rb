@@ -55,9 +55,23 @@ module EventStream::IndexStrategy
     def self.pager_to_records(index_scope, pager)
       bookmark_scope = index_scope
       if (bookmark = pager.current_bookmark)
-        bookmark_scope = bookmark_scope.where(created_at: ...Time.zone.parse(bookmark))
+        if bookmark.is_a?(Array)
+          # New format: stable sorting with [timestamp, id]
+          # Arrays are comparable, which is required for cross-shard bookmark merging
+          parsed_time = Time.zone.parse(bookmark[0])
+          bookmark_id = bookmark[1]
+          bookmark_scope = bookmark_scope.where(
+            "(created_at < ? OR (created_at = ? AND id < ?))",
+            parsed_time,
+            parsed_time,
+            bookmark_id
+          )
+        else
+          # Legacy format: timestamp only (may have sorting issues but won't break)
+          bookmark_scope = bookmark_scope.where(created_at: ...Time.zone.parse(bookmark))
+        end
       end
-      bookmark_scope = bookmark_scope.order(created_at: :desc)
+      bookmark_scope = bookmark_scope.order(created_at: :desc, id: :desc)
       bookmark_scope.paginate(page: 1, per_page: pager.per_page)
     end
 
@@ -67,11 +81,28 @@ module EventStream::IndexStrategy
       end
 
       def bookmark_for(object)
-        object.created_at.to_s
+        # Return an array [timestamp, id] instead of just timestamp for stable sorting.
+        # Arrays are comparable in Ruby (element-by-element comparison), which is
+        # required for BookmarkedCollection.merge to correctly interleave records
+        # from multiple shards when doing cross-shard queries.
+        [object.created_at.to_s, object.id]
       end
 
       def validate(bookmark)
-        bookmark.is_a?(String) && Time.zone.parse(bookmark).present?
+        if bookmark.is_a?(Array)
+          # New format: [timestamp, id] array for stable sorting
+          bookmark.size == 2 &&
+            bookmark[0].is_a?(String) &&
+            Time.zone.parse(bookmark[0]).present? &&
+            bookmark[1].is_a?(Integer)
+        elsif bookmark.is_a?(String)
+          # Legacy format: just timestamp string for backward compatibility
+          Time.zone.parse(bookmark).present?
+        else
+          false
+        end
+      rescue
+        false
       end
     end
   end
