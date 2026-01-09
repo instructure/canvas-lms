@@ -1754,6 +1754,7 @@ hy:
       recipients_required: "Առնվազն մեկ ստացող է պահանջվում"
       threshold_should_be_numeric: "Սա պետք է դրական թիվ լինի"
   alerts_6b871b71: Զգուշացումներ
+  aligned_outcomes_d0a0c159: "Համապատասխանեցված արդյունքներ"
   all_4321c3a1: Բոլորը
   all_account_types_e83c1516: "Բոլոր տեսակի հաշիվներ"
   all_accounts_3bafc860: "Բոլոր հաշիվներ"
