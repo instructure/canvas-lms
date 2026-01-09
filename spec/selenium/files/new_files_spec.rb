@@ -349,14 +349,14 @@ describe "better_file_browsing" do
       it "will not show CC button when no CC is uploaded" do
         get "/courses/#{@course.id}/files/#{@att.id}/file_preview"
         wait_for_selector('[aria-label="Video Player"]')
-        expect(f("#media_preview")).not_to contain_jqcss('[aria-label="Enable Captions"]')
+        expect(f("#media_preview")).not_to contain_jqcss('[aria-label="Captions"]')
       end
 
       it "will show CC button when a CC is uploaded" do
         @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "subs")
         get "/courses/#{@course.id}/files/#{@att.id}/file_preview"
         wait_for_selector('[aria-label="Video Player"]')
-        expect(f('[aria-label="Enable Captions"]')).to be_present
+        expect(f('[aria-label="Captions"]')).to be_present
       end
     end
   end

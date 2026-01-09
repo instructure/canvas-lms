@@ -145,6 +145,7 @@ ready(() => {
                   text: I18n.t('Expand View'),
                   showInOverlay: true,
                   overlayText: I18n.t('Expand'),
+                  ariaLabel: I18n.t('Open immersive view with all media tools'),
                   icon: 'expand',
                   onClick: () => {
                     if (window.top) {
