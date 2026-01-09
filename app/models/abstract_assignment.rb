@@ -4720,6 +4720,6 @@ class AbstractAssignment < ActiveRecord::Base
   def cpf_migrated?
     return false if assignment_configuration_tool_lookups.empty?
 
-    assignment_configuration_tool_lookups.first&.migrated?
+    assignment_configuration_tool_lookups.first&.migration_started?
   end
 end
