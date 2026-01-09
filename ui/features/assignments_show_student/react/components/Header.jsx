@@ -123,19 +123,22 @@ class Header extends React.Component {
   )
 
   render() {
+    const isPeerReviewGradingAndAllocationEnabled = window.ENV.peer_review_allocation_and_grading
     let topRightComponent
     if (this.isPeerReviewModeEnabled()) {
       topRightComponent = (
         <Flex wrap="wrap">
           {this.props.peerReviewLinkData ? (
-            <Flex.Item>
-              <PeerReviewNavigationLink
-                assignedAssessments={this.props.peerReviewLinkData?.assignedAssessments}
-                currentAssessmentIndex={this.currentAssessmentIndex(
-                  this.props.peerReviewLinkData?.assignedAssessments,
-                )}
-              />
-            </Flex.Item>
+            !isPeerReviewGradingAndAllocationEnabled && (
+              <Flex.Item>
+                <PeerReviewNavigationLink
+                  assignedAssessments={this.props.peerReviewLinkData?.assignedAssessments}
+                  currentAssessmentIndex={this.currentAssessmentIndex(
+                    this.props.peerReviewLinkData?.assignedAssessments,
+                  )}
+                />
+              </Flex.Item>
+            )
           ) : (
             <>
               {/* EVAL-3711 Remove ICE Feature Flag */}
@@ -149,14 +152,16 @@ class Header extends React.Component {
                   />
                 </Flex.Item>
               )}
-              <Flex.Item>
-                <PeerReviewNavigationLink
-                  assignedAssessments={this.props.reviewerSubmission?.assignedAssessments}
-                  currentAssessmentIndex={this.currentAssessmentIndex(
-                    this.props.reviewerSubmission?.assignedAssessments,
-                  )}
-                />
-              </Flex.Item>
+              {!isPeerReviewGradingAndAllocationEnabled && (
+                <Flex.Item>
+                  <PeerReviewNavigationLink
+                    assignedAssessments={this.props.reviewerSubmission?.assignedAssessments}
+                    currentAssessmentIndex={this.currentAssessmentIndex(
+                      this.props.reviewerSubmission?.assignedAssessments,
+                    )}
+                  />
+                </Flex.Item>
+              )}
             </>
           )}
         </Flex>
@@ -165,14 +170,15 @@ class Header extends React.Component {
       topRightComponent = (
         <Flex wrap="wrap" alignItems="center">
           <Flex.Item padding="0 small 0 0">{this.renderLatestGrade()}</Flex.Item>
-          {this.props.submission?.assignedAssessments?.length > 0 && (
-            <Flex.Item>
-              <PeerReviewNavigationLink
-                assignedAssessments={this.props.submission.assignedAssessments}
-                currentAssessmentIndex={0}
-              />
-            </Flex.Item>
-          )}
+          {this.props.submission?.assignedAssessments?.length > 0 &&
+            !isPeerReviewGradingAndAllocationEnabled && (
+              <Flex.Item>
+                <PeerReviewNavigationLink
+                  assignedAssessments={this.props.submission.assignedAssessments}
+                  currentAssessmentIndex={0}
+                />
+              </Flex.Item>
+            )}
         </Flex>
       )
     }
