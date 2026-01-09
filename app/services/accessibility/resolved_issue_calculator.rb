@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Accessibility::ActiveIssueCalculator
+class Accessibility::ResolvedIssueCalculator
   def initialize(statistic:)
     @statistic = statistic
   end
@@ -25,7 +25,7 @@ class Accessibility::ActiveIssueCalculator
   def calculate
     AccessibilityIssue.where(
       course: @statistic.course,
-      workflow_state: :active
+      workflow_state: :resolved
     ).count
   end
 end

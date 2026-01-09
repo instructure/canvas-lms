@@ -195,18 +195,7 @@ describe Accessibility::CourseStatisticCalculatorService do
 
     context "when an error occurs" do
       before do
-        call_count = 0
-        allow(statistic).to receive(:update!) do |args|
-          call_count += 1
-          if call_count == 1 && args[:workflow_state] == "in_progress"
-            statistic.workflow_state = "in_progress"
-            statistic.save!(validate: false)
-          elsif call_count == 2 && args[:workflow_state] == "active"
-            raise StandardError, "Calculation failed"
-          else
-            statistic.update_column(:workflow_state, args[:workflow_state])
-          end
-        end
+        allow(Accessibility::ResolvedIssueCalculator).to receive(:new).and_raise(StandardError, "Calculation failed")
       end
 
       it "updates workflow_state to failed" do
@@ -217,7 +206,7 @@ describe Accessibility::CourseStatisticCalculatorService do
       it "logs an error report" do
         error_report = instance_double("ErrorReport", id: 12_345)
         expect(ErrorReport).to receive(:log_exception).with(
-          "accessibility_course_statistics",
+          "accessibility_course_statistics_error",
           kind_of(StandardError),
           hash_including(
             statistic_id: statistic.global_id,
