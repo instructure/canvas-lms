@@ -178,6 +178,108 @@ describe Types::QueryType do
         ).to eq(original_object.id.to_s)
       end
     end
+
+    context "with multiple root accounts on same shard" do
+      let_once(:shared_sis_id) { "SHARED_SIS_ID" }
+      let_once(:root_account_1) { Account.create! }
+      let_once(:root_account_2) { Account.create! }
+      let_once(:account_1) { root_account_1.sub_accounts.create!(name: "Sub Account 1") }
+      let_once(:account_2) { root_account_2.sub_accounts.create!(name: "Sub Account 2") }
+      let_once(:course_1) do
+        Course.create!(
+          account: account_1,
+          root_account: root_account_1,
+          sis_source_id: shared_sis_id,
+          name: "Course 1"
+        )
+      end
+      let_once(:course_2) do
+        Course.create!(
+          account: account_2,
+          root_account: root_account_2,
+          sis_source_id: shared_sis_id,
+          name: "Course 2"
+        )
+      end
+
+      it "returns course from domain root account for local user" do
+        user = user_factory
+        course_1.enroll_teacher(user, enrollment_state: "active")
+
+        result = CanvasSchema.execute(
+          "{ course(sisId: \"#{shared_sis_id}\") { _id name } }",
+          context: { current_user: user, domain_root_account: root_account_1 }
+        )
+
+        expect(result.dig("data", "course", "_id")).to eq(course_1.id.to_s)
+        expect(result.dig("data", "course", "name")).to eq("Course 1")
+      end
+
+      it "returns null for local user querying from wrong account" do
+        user = user_factory
+        course_2.enroll_teacher(user, enrollment_state: "active")
+
+        result = CanvasSchema.execute(
+          "{ course(sisId: \"#{shared_sis_id}\") { _id name } }",
+          context: { current_user: user, domain_root_account: root_account_1 }
+        )
+
+        expect(result.dig("data", "course")).to be_nil
+      end
+
+      it "returns course from domain root account for siteadmin" do
+        siteadmin = site_admin_user
+
+        result = CanvasSchema.execute(
+          "{ course(sisId: \"#{shared_sis_id}\") { _id name } }",
+          context: { current_user: siteadmin, domain_root_account: root_account_2 }
+        )
+
+        expect(result.dig("data", "course", "_id")).to eq(course_2.id.to_s)
+        expect(result.dig("data", "course", "name")).to eq("Course 2")
+      end
+
+      it "scopes account queries to domain root account" do
+        account_1.update!(sis_source_id: shared_sis_id)
+        account_2.update!(sis_source_id: shared_sis_id)
+        siteadmin = site_admin_user
+
+        result = CanvasSchema.execute(
+          "{ account(sisId: \"#{shared_sis_id}\") { _id name } }",
+          context: { current_user: siteadmin, domain_root_account: root_account_1 }
+        )
+
+        expect(result.dig("data", "account", "_id")).to eq(account_1.id.to_s)
+      end
+
+      it "scopes assignment queries to domain root account" do
+        assignment_1 = course_1.assignments.create!(name: "Assignment 1", sis_source_id: shared_sis_id)
+        course_2.assignments.create!(name: "Assignment 2", sis_source_id: shared_sis_id)
+        siteadmin = site_admin_user
+
+        result = CanvasSchema.execute(
+          "{ assignment(sisId: \"#{shared_sis_id}\") { _id name } }",
+          context: { current_user: siteadmin, domain_root_account: root_account_1 }
+        )
+
+        expect(result.dig("data", "assignment", "_id")).to eq(assignment_1.id.to_s)
+        expect(result.dig("data", "assignment", "name")).to eq("Assignment 1")
+      end
+
+      it "scopes term queries to domain root account" do
+        root_account_1.enrollment_terms.create!(name: "Term 1", sis_source_id: shared_sis_id)
+        term_2 = root_account_2.enrollment_terms.create!(name: "Term 2", sis_source_id: shared_sis_id)
+        siteadmin = site_admin_user
+
+        result = CanvasSchema.execute(
+          "{ term(sisId: \"#{shared_sis_id}\") { _id name } }",
+          context: { current_user: siteadmin, domain_root_account: root_account_2 }
+        )
+
+        expect(result.dig("data", "term", "_id")).to eq(term_2.id.to_s)
+        expect(result.dig("data", "term", "name")).to eq("Term 2")
+      end
+    end
   end
 
   context "LearningOutcome" do
