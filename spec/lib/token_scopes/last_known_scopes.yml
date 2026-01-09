@@ -1361,6 +1361,8 @@
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/date_details/convert_tag_overrides'
 - verb: POST
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/extensions'
+- verb: GET
+  path: '/api/v1/courses/:course_id/quizzes/:quiz_id/groups'
 - verb: POST
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/groups'
 - verb: DELETE
