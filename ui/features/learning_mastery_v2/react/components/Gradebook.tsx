@@ -35,10 +35,15 @@ import {
   DEFAULT_GRADEBOOK_SETTINGS,
   DisplayFilter,
   NameDisplayFormat,
-} from '../utils/constants'
-import {Student, Outcome, StudentRollupData, Pagination as PaginationType} from '../types/rollup'
+} from '@canvas/outcomes/react/utils/constants'
+import {
+  Student,
+  Outcome,
+  StudentRollupData,
+  Pagination as PaginationType,
+} from '@canvas/outcomes/react/types/rollup'
 import {GradebookPagination} from './pagination/GradebookPagination'
-import {Sorting} from '../types/shapes'
+import {Sorting} from '@canvas/outcomes/react/types/shapes'
 import DragDropWrapper from './grid/DragDropWrapper'
 import {ContributingScoreAlignment, ContributingScoresManager} from '../hooks/useContributingScores'
 import {ContributingScoreHeader} from './grid/ContributingScoreHeader'

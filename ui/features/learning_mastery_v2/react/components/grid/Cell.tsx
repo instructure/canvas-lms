@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {View, ViewProps} from '@instructure/ui-view'
-import {COLUMN_WIDTH, CELL_HEIGHT, COLUMN_PADDING} from '../../utils/constants'
+import {COLUMN_WIDTH, CELL_HEIGHT, COLUMN_PADDING} from '@canvas/outcomes/react/utils/constants'
 import {Flex} from '@instructure/ui-flex'
 
 export interface CellProps extends ViewProps {

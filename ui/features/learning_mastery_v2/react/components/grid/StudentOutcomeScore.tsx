@@ -18,10 +18,10 @@
 import React from 'react'
 import SVGWrapper from '@canvas/svg-wrapper'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Outcome} from '../../types/rollup'
+import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import {svgUrl} from '../../utils/icons'
-import {ScoreDisplayFormat} from '../../utils/constants'
-import {findRating} from '../../utils/ratings'
+import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
+import {findRating} from '@canvas/outcomes/react/utils/ratings'
 import {ScoreWithLabel} from './ScoreWithLabel'
 
 const I18n = createI18nScope('learning_mastery_gradebook')

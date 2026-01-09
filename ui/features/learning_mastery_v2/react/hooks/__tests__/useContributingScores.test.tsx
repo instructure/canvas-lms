@@ -28,7 +28,7 @@ import {
   NameDisplayFormat,
   ScoreDisplayFormat,
   OutcomeArrangement,
-} from '../../utils/constants'
+} from '@canvas/outcomes/react/utils/constants'
 
 describe('useContributingScores', () => {
   const courseId = '1'

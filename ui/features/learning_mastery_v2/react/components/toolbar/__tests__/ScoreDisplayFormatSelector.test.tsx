@@ -21,7 +21,7 @@ import {
   ScoreDisplayFormatSelector,
   ScoreDisplayFormatSelectorProps,
 } from '../ScoreDisplayFormatSelector'
-import {ScoreDisplayFormat} from '../../../utils/constants'
+import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 
 describe('ScoreDisplayFormatSelector', () => {
   const defaultProps: ScoreDisplayFormatSelectorProps = {

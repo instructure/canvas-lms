@@ -21,7 +21,7 @@ import CanvasMultiSelect from '@canvas/multi-select'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {debounce} from 'es-toolkit/compat'
-import {Student} from '../../types/rollup'
+import {Student} from '@canvas/outcomes/react/types/rollup'
 import {useStudents} from '../../hooks/useStudents'
 
 const I18n = createI18nScope('LearningMasteryGradebook')

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Outcome, StudentRollupData, Student} from '../../types/rollup'
+import {Outcome, StudentRollupData, Student} from '@canvas/outcomes/react/types/rollup'
 
-import React, {useState, useMemo} from 'react'
+import React, {useState} from 'react'
 import {Link} from '@instructure/ui-link'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -32,6 +32,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import MessageStudents from '@canvas/message-students-modal'
 import {Img} from '@instructure/ui-img'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {useStudentMasteryScores} from '@canvas/outcomes/react/hooks/useStudentMasteryScores'
 import {useLmgbUserDetails} from '../../hooks/useLmgbUserDetails'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
@@ -44,88 +45,6 @@ export interface StudentCellPopoverProps {
   courseId: string
   outcomes?: Outcome[]
   rollups?: StudentRollupData[]
-}
-
-interface ScoreCalcResult {
-  masteryRelativeAverage: number | null
-  grossAverage: number | null
-  averageIconURL: string
-  averageText: string
-  buckets: {
-    [key: string]: {
-      name: string
-      iconURL: string
-      count: number
-    }
-  }
-}
-
-export const pickBucketForScore = (score: number | null, buckets: ScoreCalcResult['buckets']) => {
-  if (score === null) return buckets.no_evidence
-  if (score > 0) return buckets.exceeds_mastery
-  if (score === 0) return buckets.mastery
-  if (score < -1) return buckets.remediation
-  if (score < 0) return buckets.near_mastery
-  return buckets.no_evidence
-}
-
-export const calculateScores = (
-  outcomes: Outcome[],
-  rollups: StudentRollupData[],
-  student: Student,
-) => {
-  const result: ScoreCalcResult = {
-    masteryRelativeAverage: null,
-    grossAverage: null,
-    averageIconURL: '',
-    averageText: '',
-    buckets: {
-      no_evidence: {name: t('No Evidence'), iconURL: '/images/outcomes/no_evidence.svg', count: 0},
-      remediation: {name: t('Remediation'), iconURL: '/images/outcomes/remediation.svg', count: 0},
-      near_mastery: {
-        name: t('Near Mastery'),
-        iconURL: '/images/outcomes/near_mastery.svg',
-        count: 0,
-      },
-      mastery: {name: t('Mastery'), iconURL: '/images/outcomes/mastery.svg', count: 0},
-      exceeds_mastery: {
-        name: t('Exceeds Mastery'),
-        iconURL: '/images/outcomes/exceeds_mastery.svg',
-        count: 0,
-      },
-    },
-  }
-
-  const userOutcomeRollups = rollups?.find(r => r.studentId === student.id)?.outcomeRollups || []
-
-  if (outcomes?.length)
-    result.buckets.no_evidence.count = outcomes.length - userOutcomeRollups.length
-
-  let grossTotalScore = 0
-  let masteryRelativeTotalScore = 0
-  let withResultsCount = 0
-
-  userOutcomeRollups.forEach(rollup => {
-    const outcome = outcomes?.find(o => o.id === rollup.outcomeId)
-    if (!outcome) return
-    const masteryScore = rollup.rating.points - outcome.mastery_points
-    const bucket = pickBucketForScore(masteryScore, result.buckets)
-    bucket.count++
-    masteryRelativeTotalScore += masteryScore
-    grossTotalScore += rollup.rating.points
-    withResultsCount++
-  })
-
-  if (withResultsCount > 0) {
-    result.masteryRelativeAverage = masteryRelativeTotalScore / withResultsCount
-    result.grossAverage = grossTotalScore / withResultsCount
-  }
-
-  const averageBucket = pickBucketForScore(result.masteryRelativeAverage, result.buckets)
-  result.averageIconURL = averageBucket.iconURL
-  result.averageText = averageBucket.name
-
-  return result
 }
 
 export const StudentCellPopover: React.FC<StudentCellPopoverProps> = ({
@@ -151,10 +70,11 @@ export const StudentCellPopover: React.FC<StudentCellPopoverProps> = ({
 
   const error = queryError ? t('Failed to load user details') : null
 
-  const scores = useMemo(() => {
-    if (!userDetails) return null
-    return calculateScores(outcomes || [], rollups || [], student)
-  }, [userDetails, outcomes, rollups, student])
+  const scores = useStudentMasteryScores({
+    student: userDetails ? student : null,
+    outcomes: outcomes || [],
+    rollups: rollups || [],
+  })
 
   const renderLastLogin = () => {
     let dateText: string = t('Never')

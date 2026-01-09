@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Outcome, Rating, Student, StudentRollupData} from '../types/rollup'
+import {Outcome, Rating, Student, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
 
 export const MOCK_STUDENTS: Student[] = [
   {

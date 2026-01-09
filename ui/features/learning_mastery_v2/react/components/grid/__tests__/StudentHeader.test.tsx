@@ -20,7 +20,7 @@ import React from 'react'
 import {cleanup, render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {StudentHeader, StudentHeaderProps} from '../StudentHeader'
-import {SortOrder, SortBy, NameDisplayFormat} from '../../../utils/constants'
+import {SortOrder, SortBy, NameDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 
 const makeProps = (props = {}): StudentHeaderProps => {
   return {

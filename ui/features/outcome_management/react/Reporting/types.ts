@@ -16,26 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {Outcome as LMGBOutcome} from '@canvas/outcomes/react/types/rollup'
+
 export interface LMGBRating {
   points: number
   color: string
   description?: string
   mastery?: boolean
-}
-
-interface LMGBOutcome {
-  id: string | number
-  title: string
-  context_type?: string
-  context_id?: string
-  description?: string
-  display_name?: string
-  friendly_description?: string
-  calculation_method: string
-  calculation_int?: number
-  points_possible: number
-  mastery_points: number
-  ratings: LMGBRating[]
 }
 
 interface LMGBScore {

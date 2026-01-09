@@ -19,7 +19,7 @@
 import React from 'react'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ScoreDisplayFormat} from '../../utils/constants'
+import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 

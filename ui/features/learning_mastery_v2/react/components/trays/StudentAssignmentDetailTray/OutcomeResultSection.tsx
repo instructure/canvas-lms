@@ -24,10 +24,10 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {Outcome, StudentRollupData} from '../../../types/rollup'
+import {Outcome, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
+import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 import {useOutcomeAlignments} from '../../../hooks/useOutcomeAlignments'
 import {StudentOutcomeScore} from '../../grid/StudentOutcomeScore'
-import {ScoreDisplayFormat} from '../../../utils/constants'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 

@@ -16,26 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MOCK_API_OUTCOMES} from '../studentOutcomesTableMock'
+import {StudentRollupData} from '@canvas/outcomes/react/types/rollup'
 
-import type {
-  LMGBRating,
-  LMGBScoreReporting,
-  MasteryLevel,
-  Outcome,
-  RollupsResponseReporting,
-} from '../types'
-
-/**
- * Finds the appropriate rating for a given score from a list of ratings.
- * Assumes ratings are sorted in descending order by points.
- *
- * Returns the first rating where the score meets or exceeds the rating's point threshold.
- * If no rating matches, returns the lowest rating as a fallback.
- */
-const findRating = (ratings: LMGBRating[], score: number): LMGBRating => {
-  return ratings.find(r => score >= r.points) ?? ratings[ratings.length - 1]
-}
+import type {LMGBOutcomeReporting, LMGBRating, MasteryLevel, Outcome} from '../types'
+import {findRating} from '@canvas/outcomes/react/utils/ratings'
 
 const getMasteryLevelFromRating = (rating: LMGBRating | null): MasteryLevel => {
   if (!rating) return 'unassessed'
@@ -50,30 +34,23 @@ const getMasteryLevelFromRating = (rating: LMGBRating | null): MasteryLevel => {
   return 'remediation'
 }
 
-const transformOutcomeData = (apiResponse: RollupsResponseReporting): Outcome[] => {
-  const {rollups, linked} = apiResponse
-  const outcomesList = linked?.outcomes || []
+const transformOutcomeData = (
+  outcomes: LMGBOutcomeReporting[],
+  rollups: StudentRollupData[],
+): Outcome[] => {
+  const outcomesList = outcomes
   const studentRollup = rollups?.[0]
 
   if (!studentRollup) return []
 
-  const scoresMap: Record<string, LMGBScoreReporting> = {}
-  studentRollup.scores?.forEach(scoreData => {
-    const outcomeId = scoreData.links?.outcome
-    if (outcomeId) {
-      scoresMap[outcomeId] = {
-        ...scoreData,
-      }
-    }
-  })
-
   return outcomesList.map(outcome => {
-    const scoreData = scoresMap[outcome.id]
-    const assessedAlignmentsCount = scoreData?.count || 0
+    const score = studentRollup.outcomeRollups.find(o => o.outcomeId === outcome.id)?.score
+    const assessedAlignmentsCount =
+      studentRollup.outcomeRollups.filter(o => o.outcomeId === outcome.id).length || 0
     const totalAlignmentsCount = outcome.alignments?.length || 0
-    const masteryScore = scoreData?.score
+    const masteryScore = score ?? null
 
-    const rating = scoreData ? findRating(outcome.ratings, scoreData.score || 0) : null
+    const rating = score ? findRating(outcome.ratings, score || 0) : null
     const masteryLevel = getMasteryLevelFromRating(rating)
 
     return {
@@ -89,10 +66,11 @@ const transformOutcomeData = (apiResponse: RollupsResponseReporting): Outcome[] 
   })
 }
 
-export const useOutcomeRollups = (): {outcomes: Outcome[]} => {
-  const apiOutcomes = MOCK_API_OUTCOMES
+export const useTransformedOutcomes = (
+  outcomes: LMGBOutcomeReporting[],
+  rollups: StudentRollupData[],
+): {outcomes: Outcome[]} => {
+  const result = transformOutcomeData(outcomes, rollups)
 
-  const outcomes = transformOutcomeData(apiOutcomes)
-
-  return {outcomes}
+  return {outcomes: result}
 }

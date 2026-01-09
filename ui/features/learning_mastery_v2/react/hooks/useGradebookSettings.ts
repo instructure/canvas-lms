@@ -27,7 +27,7 @@ import {
   ScoreDisplayFormat,
   OutcomeArrangement,
   DEFAULT_GRADEBOOK_SETTINGS,
-} from '../utils/constants'
+} from '@canvas/outcomes/react/utils/constants'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 

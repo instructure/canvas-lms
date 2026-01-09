@@ -21,7 +21,7 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ContributingScoreHeader, ContributingScoreHeaderProps} from '../ContributingScoreHeader'
 import {ContributingScoreAlignment} from '../../../hooks/useContributingScores'
-import {SortOrder, SortBy} from '../../../utils/constants'
+import {SortOrder, SortBy} from '@canvas/outcomes/react/utils/constants'
 
 const mockOpenWindow = vi.fn()
 vi.mock('@canvas/util/globalUtils', () => ({

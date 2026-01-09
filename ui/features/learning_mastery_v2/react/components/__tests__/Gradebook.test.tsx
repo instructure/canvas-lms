@@ -21,7 +21,7 @@ import {render} from '@testing-library/react'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {Gradebook, GradebookProps} from '../Gradebook'
-import {SortOrder, SortBy} from '../../utils/constants'
+import {SortOrder, SortBy} from '@canvas/outcomes/react/utils/constants'
 import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../__fixtures__/rollups'
 import {ContributingScoresManager} from '../../hooks/useContributingScores'
 
